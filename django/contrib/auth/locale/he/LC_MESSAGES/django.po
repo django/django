@@ -1,18 +1,19 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Alex Gaynor <inactive+Alex@transifex.com>, 2011-2012
+# 534b44a19bf18d20b71ecc4eb77c572f_db336e9 <f8268c65f822ec11a3a2e5d482cd7ead_175>, 2011-2012
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Meir Kriheli <mkriheli@gmail.com>, 2012-2015,2017,2019
+# Meir Kriheli <mkriheli@gmail.com>, 2012-2015,2017,2019,2023
 # אורי רודברג <uri@speedy.net>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2020-01-19 11:14+0000\n"
-"Last-Translator: אורי רודברג <uri@speedy.net>\n"
-"Language-Team: Hebrew (http://www.transifex.com/django/django/language/he/)\n"
+"POT-Creation-Date: 2023-03-17 03:19-0500\n"
+"PO-Revision-Date: 2023-12-04 08:09+0000\n"
+"Last-Translator: Meir Kriheli <mkriheli@gmail.com>, "
+"2012-2015,2017,2019,2023\n"
+"Language-Team: Hebrew (http://app.transifex.com/django/django/language/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -135,6 +136,9 @@ msgstr "work factor"
 
 msgid "checksum"
 msgstr "סיכום ביקורת"
+
+msgid "block size"
+msgstr "גודל בלוק"
 
 msgid "name"
 msgstr "שם"
@@ -265,10 +269,10 @@ msgid "Password reset on %(site_name)s"
 msgstr "החלפת הסיסמה ב-%(site_name)s"
 
 msgid ""
-"Enter a valid username. This value may contain only English letters, "
-"numbers, and @/./+/-/_ characters."
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
 msgstr ""
-"יש להזין שם משתמש חוקי. ערך זה יכול להכיל אותיות אנגליות, ספרות והתווים @/./"
+"יש להזין שם משתמש חוקי. ערך זה יכול להכיל אותיות אנגליות, ספרות והתווים  @/./"
 "+/-/_ בלבד."
 
 msgid ""

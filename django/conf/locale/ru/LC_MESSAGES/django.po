@@ -19,17 +19,17 @@
 # Panasoft, 2021
 # Вася Аникин <anikin.vasya@gmail.com>, 2017
 # SeryiMysh <vital@dorokhin.kz>, 2020
-# Алексей Борискин <sun.void@gmail.com>, 2013-2017,2019-2020,2022
+# Алексей Борискин <sun.void@gmail.com>, 2013-2017,2019-2020,2022-2023
 # Bobsans <mr.bobsans@gmail.com>, 2016,2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:23-0500\n"
-"PO-Revision-Date: 2022-05-25 06:49+0000\n"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 06:49+0000\n"
 "Last-Translator: Алексей Борискин <sun.void@gmail.com>, "
-"2013-2017,2019-2020,2022\n"
-"Language-Team: Russian (http://www.transifex.com/django/django/language/"
+"2013-2017,2019-2020,2022-2023\n"
+"Language-Team: Russian (http://app.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -71,6 +71,9 @@ msgstr "Боснийский"
 
 msgid "Catalan"
 msgstr "Каталанский"
+
+msgid "Central Kurdish (Sorani)"
+msgstr "Центральнокурдский (Сорани)"
 
 msgid "Czech"
 msgstr "Чешский"
@@ -312,6 +315,9 @@ msgstr "Татарский"
 msgid "Udmurt"
 msgstr "Удмуртский"
 
+msgid "Uyghur"
+msgstr "Уйгурский"
+
 msgid "Ukrainian"
 msgstr "Украинский"
 
@@ -410,6 +416,15 @@ msgstr "Убедитесь, что это значение больше либо
 #, python-format
 msgid "Ensure this value is a multiple of step size %(limit_value)s."
 msgstr "Убедитесь, что это значение кратно числу %(limit_value)s."
+
+#, python-format
+msgid ""
+"Ensure this value is a multiple of step size %(limit_value)s, starting from "
+"%(offset)s, e.g. %(offset)s, %(valid_value1)s, %(valid_value2)s, and so on."
+msgstr ""
+"Убедитесь, что данное значение отстоит от %(offset)s на число, кратное шагу "
+"%(limit_value)s, например: %(offset)s, %(valid_value1)s, %(valid_value2)s и "
+"так далее."
 
 #, python-format
 msgid ""
@@ -544,6 +559,9 @@ msgstr "Логическое (True или False)"
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "Строка (до %(max_length)s)"
+
+msgid "String (unlimited)"
+msgstr "Строка (неограниченной длины)"
 
 msgid "Comma-separated integers"
 msgstr "Целые, разделенные запятыми"

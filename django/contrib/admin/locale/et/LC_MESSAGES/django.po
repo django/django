@@ -13,10 +13,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-17 02:13-0600\n"
-"PO-Revision-Date: 2023-04-25 07:05+0000\n"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 07:05+0000\n"
 "Last-Translator: Martin <martinpajuste@gmail.com>, 2015,2022-2023\n"
-"Language-Team: Estonian (http://www.transifex.com/django/django/language/"
+"Language-Team: Estonian (http://app.transifex.com/django/django/language/"
 "et/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -79,7 +79,7 @@ msgid "Empty"
 msgstr "Tühi"
 
 msgid "Not empty"
-msgstr "Mitte tühi"
+msgstr "Täidetud"
 
 #, python-format
 msgid ""
@@ -182,6 +182,9 @@ msgstr "Puudub"
 
 msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr "Hoia all “Control” või “Command” Macil, et valida rohkem kui üks."
+
+msgid "Select this object for an action - {}"
+msgstr "Vali toiminguks käesolev objekt - {}"
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -340,6 +343,9 @@ msgstr "Märgista kõik %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Tühjenda valik"
 
+msgid "Breadcrumbs"
+msgstr "Lingirivi"
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "Rakenduse %(name)s moodulid"
@@ -376,7 +382,7 @@ msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Sisestage uus salasõna kasutajale <strong>%(username)s</strong>"
 
 msgid "Skip to main content"
-msgstr ""
+msgstr "Liigu põhisisu juurde"
 
 msgid "Welcome,"
 msgstr "Tere tulemast,"
@@ -390,9 +396,6 @@ msgstr "Dokumentatsioon"
 msgid "Log out"
 msgstr "Logi välja"
 
-msgid "Breadcrumbs"
-msgstr ""
-
 #, python-format
 msgid "Add %(name)s"
 msgstr "Lisa %(name)s"
@@ -405,6 +408,12 @@ msgstr "Näita lehel"
 
 msgid "Filter"
 msgstr "Filtreeri"
+
+msgid "Hide counts"
+msgstr "Peida loendused"
+
+msgid "Show counts"
+msgstr "Näita loendusi"
 
 msgid "Clear all filters"
 msgstr "Tühjenda kõik filtrid"
@@ -420,13 +429,13 @@ msgid "Toggle sorting"
 msgstr "Sorteerimine"
 
 msgid "Toggle theme (current theme: auto)"
-msgstr ""
+msgstr "Teema lülitamine (hetkel: automaatne)"
 
 msgid "Toggle theme (current theme: light)"
-msgstr ""
+msgstr "Teema lülitamine (hetkel: hele)"
 
 msgid "Toggle theme (current theme: dark)"
-msgstr ""
+msgstr "Teema lülitamine (hetkel: tume)"
 
 msgid "Delete"
 msgstr "Kustuta"
@@ -514,6 +523,15 @@ msgstr "Minu toimingud"
 msgid "None available"
 msgstr "Ei leitud ühtegi"
 
+msgid "Added:"
+msgstr "Lisatud:"
+
+msgid "Changed:"
+msgstr "Muudetud:"
+
+msgid "Deleted:"
+msgstr "Kustutatud:"
+
 msgid "Unknown content"
 msgstr "Tundmatu sisu"
 
@@ -540,13 +558,13 @@ msgid "Toggle navigation"
 msgstr "Lülita navigeerimine sisse"
 
 msgid "Sidebar"
-msgstr ""
+msgstr "Külgriba"
 
 msgid "Start typing to filter…"
-msgstr ""
+msgstr "Filtreerimiseks alusta trükkimist..."
 
 msgid "Filter navigation items"
-msgstr ""
+msgstr "Filtreeri navigatsioonielemente"
 
 msgid "Date/time"
 msgstr "Kuupäev/kellaaeg"
@@ -721,6 +739,9 @@ msgstr "E-posti aadress:"
 
 msgid "Reset my password"
 msgstr "Reseti parool"
+
+msgid "Select all objects on this page for an action"
+msgstr "Vali toiminguks kõik objektid sellel lehel"
 
 msgid "All dates"
 msgstr "Kõik kuupäevad"

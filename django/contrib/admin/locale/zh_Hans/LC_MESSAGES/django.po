@@ -13,6 +13,7 @@
 # Liping Wang <lynn.config@gmail.com>, 2016-2017
 # mozillazg <opensource.mozillazg@gmail.com>, 2016
 # Ronald White <tkliuxing@me.com>, 2013-2014
+# Scott Jiang, 2023
 # Sean Lee <iseansay@gmail.com>, 2013
 # Sean Lee <iseansay@gmail.com>, 2013
 # slene <vslene@gmail.com>, 2011
@@ -22,7 +23,7 @@
 # yf zhan <daxian12345@gmail.com>, 2018
 # dykai <yingkaidang@gmail.com>, 2019
 # ced773123cfad7b4e8b79ca80f736af9, 2012
-# Fangjiaqi77 <370358679@qq.com>, 2020
+# LatteFang <370358679@qq.com>, 2020
 # Kevin Sze <leiarix@gmail.com>, 2012
 # 考证 李 <likaozheng@gmail.com>, 2020
 # 雨翌 <yumendy@163.com>, 2016
@@ -32,10 +33,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-17 02:13-0600\n"
-"PO-Revision-Date: 2023-04-25 07:05+0000\n"
-"Last-Translator: 高乐喆 <gaolezhe@outlook.com>, 2023\n"
-"Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 07:05+0000\n"
+"Last-Translator: Scott Jiang, 2023\n"
+"Language-Team: Chinese (China) (http://app.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -104,7 +105,8 @@ msgstr "非空"
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
 "that both fields may be case-sensitive."
-msgstr "请输入一个正确的 %(username)s 和密码. 注意他们都是区分大小写的."
+msgstr ""
+"请输入一个正确的工作人员账户 %(username)s 和密码. 注意他们都是区分大小写的."
 
 msgid "Action:"
 msgstr "动作"
@@ -199,6 +201,9 @@ msgstr "无"
 
 msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr "按住 Control 键或 Mac 上的 Command 键来选择多项。"
+
+msgid "Select this object for an action - {}"
+msgstr ""
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -352,6 +357,9 @@ msgstr "选中所有的 %(total_count)s 个 %(module_name)s"
 msgid "Clear selection"
 msgstr "清除选中"
 
+msgid "Breadcrumbs"
+msgstr "条形导航"
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "在应用程序 %(name)s 中的模型"
@@ -399,9 +407,6 @@ msgstr "文档"
 msgid "Log out"
 msgstr "注销"
 
-msgid "Breadcrumbs"
-msgstr "面包屑"
-
 #, python-format
 msgid "Add %(name)s"
 msgstr "增加 %(name)s"
@@ -415,8 +420,14 @@ msgstr "在站点上查看"
 msgid "Filter"
 msgstr "过滤器"
 
+msgid "Hide counts"
+msgstr ""
+
+msgid "Show counts"
+msgstr ""
+
 msgid "Clear all filters"
-msgstr "清除所有过滤器"
+msgstr "清除所有筛选"
 
 msgid "Remove from sorting"
 msgstr "删除排序"
@@ -516,7 +527,16 @@ msgid "My actions"
 msgstr "我的动作"
 
 msgid "None available"
-msgstr "无可用的"
+msgstr "无可选的"
+
+msgid "Added:"
+msgstr ""
+
+msgid "Changed:"
+msgstr ""
+
+msgid "Deleted:"
+msgstr ""
 
 msgid "Unknown content"
 msgstr "未知内容"
@@ -623,7 +643,7 @@ msgid "View selected %(model)s"
 msgstr "查看已选择的%(model)s"
 
 msgid "Thanks for spending some quality time with the web site today."
-msgstr "感谢您今天与本网站共度一段高品质时光。"
+msgstr "感谢您今天与本网站共享一段美好时光。"
 
 msgid "Log in again"
 msgstr "重新登录"
@@ -712,6 +732,9 @@ msgstr "电子邮件地址："
 
 msgid "Reset my password"
 msgstr "重设我的密码"
+
+msgid "Select all objects on this page for an action"
+msgstr ""
 
 msgid "All dates"
 msgstr "所有日期"

@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# F Wolff <friedel@translate.org.za>, 2019-2020
+# F Wolff <friedel@translate.org.za>, 2019-2020,2023
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2020-07-20 17:08+0000\n"
-"Last-Translator: F Wolff <friedel@translate.org.za>\n"
-"Language-Team: Afrikaans (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2023-03-17 03:19-0500\n"
+"PO-Revision-Date: 2023-12-04 08:09+0000\n"
+"Last-Translator: F Wolff <friedel@translate.org.za>, 2019-2020,2023\n"
+"Language-Team: Afrikaans (http://app.transifex.com/django/django/language/"
 "af/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -69,8 +69,8 @@ msgid ""
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
 "Rou wagwoorde word nie gestoor nie, dus is daar geen manier om die gebruiker "
-"se wagwoord te sien nie, maar die wagwoord kan gewysig word met <a href="
-"\"{}\">hierdie vorm</a>."
+"se wagwoord te sien nie, maar die wagwoord kan gewysig word met <a "
+"href=\"{}\">hierdie vorm</a>."
 
 #, python-format
 msgid ""
@@ -133,6 +133,9 @@ msgstr "werkfaktor"
 
 msgid "checksum"
 msgstr "kontrolesom"
+
+msgid "block size"
+msgstr "blokgrootte"
 
 msgid "name"
 msgstr "naam"
@@ -266,11 +269,11 @@ msgid "Password reset on %(site_name)s"
 msgstr "Wagwoordherstel op %(site_name)s"
 
 msgid ""
-"Enter a valid username. This value may contain only English letters, "
-"numbers, and @/./+/-/_ characters."
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
 msgstr ""
-"Tik 'n geldige gebruikernaam. Dié waarde mag slegs alfabetletters, syfers en "
-"die karakters @/./+/-/_ bevat."
+"Tik ’n geldige gebruikernaam. Dié waarde mag slegs hoof- en kleinletters "
+"sonder aksente, syfers en die karakters @/./+/-/_ bevat."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "

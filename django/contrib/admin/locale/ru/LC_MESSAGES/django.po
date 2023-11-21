@@ -10,17 +10,17 @@
 # Sergey <inoks@mail.ru>, 2016
 # Jannis Leidel <jannis@leidel.info>, 2011
 # SeryiMysh <vital@dorokhin.kz>, 2020
-# Алексей Борискин <sun.void@gmail.com>, 2012-2015,2022
+# Алексей Борискин <sun.void@gmail.com>, 2012-2015,2022-2023
 # Дмитрий <nerosketch@gmail.com>, 2019
 # Bobsans <mr.bobsans@gmail.com>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:10-0500\n"
-"PO-Revision-Date: 2022-05-25 07:05+0000\n"
-"Last-Translator: Алексей Борискин <sun.void@gmail.com>, 2012-2015,2022\n"
-"Language-Team: Russian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 07:05+0000\n"
+"Last-Translator: Алексей Борискин <sun.void@gmail.com>, 2012-2015,2022-2023\n"
+"Language-Team: Russian (http://app.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -191,6 +191,9 @@ msgstr ""
 "Удерживайте “Control“ (или “Command“ на Mac), чтобы выбрать несколько "
 "значений."
 
+msgid "Select this object for an action - {}"
+msgstr "Выбрать этот объект, чтобы применить к нему действие - {}"
+
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr "{name} \"{obj}\" был успешно добавлен."
@@ -355,6 +358,9 @@ msgstr "Выбрать все %(module_name)s (%(total_count)s)"
 msgid "Clear selection"
 msgstr "Снять выделение"
 
+msgid "Breadcrumbs"
+msgstr "Хлебные крошки"
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "Модели в приложении %(name)s"
@@ -382,14 +388,18 @@ msgid "Change password"
 msgstr "Изменить пароль"
 
 msgid "Please correct the error below."
-msgstr "Пожалуйста, исправьте ошибку ниже."
-
-msgid "Please correct the errors below."
-msgstr "Пожалуйста, исправьте ошибки ниже."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Пожалуйста, исправьте ошибку ниже."
+msgstr[1] "Пожалуйста, исправьте ошибки ниже."
+msgstr[2] "Пожалуйста, исправьте ошибки ниже."
+msgstr[3] "Пожалуйста, исправьте ошибки ниже."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Введите новый пароль для пользователя <strong>%(username)s</strong>."
+
+msgid "Skip to main content"
+msgstr "К основному"
 
 msgid "Welcome,"
 msgstr "Добро пожаловать,"
@@ -416,6 +426,12 @@ msgstr "Смотреть на сайте"
 msgid "Filter"
 msgstr "Фильтр"
 
+msgid "Hide counts"
+msgstr "Скрыть счётчики"
+
+msgid "Show counts"
+msgstr "Показать счётчики"
+
 msgid "Clear all filters"
 msgstr "Сбросить все фильтры"
 
@@ -428,6 +444,15 @@ msgstr "Приоритет сортировки: %(priority_number)s"
 
 msgid "Toggle sorting"
 msgstr "Сортировать в другом направлении"
+
+msgid "Toggle theme (current theme: auto)"
+msgstr "Переключить тему (текущая: выбрана автоматически)"
+
+msgid "Toggle theme (current theme: light)"
+msgstr "Переключить тему (текущая: светлая)"
+
+msgid "Toggle theme (current theme: dark)"
+msgstr "Переключить тему (текущая: тёмная)"
 
 msgid "Delete"
 msgstr "Удалить"
@@ -514,6 +539,15 @@ msgstr "Мои действия"
 msgid "None available"
 msgstr "Недоступно"
 
+msgid "Added:"
+msgstr "Создано:"
+
+msgid "Changed:"
+msgstr "Изменено:"
+
+msgid "Deleted:"
+msgstr "Удалено:"
+
 msgid "Unknown content"
 msgstr "Неизвестный тип"
 
@@ -541,6 +575,9 @@ msgstr "Забыли свой пароль или имя пользовател�
 msgid "Toggle navigation"
 msgstr "Переключить навигацию"
 
+msgid "Sidebar"
+msgstr "Боковая панель"
+
 msgid "Start typing to filter…"
 msgstr "Начните печатать для фильтрации..."
 
@@ -557,10 +594,11 @@ msgid "Action"
 msgstr "Действие"
 
 msgid "entry"
-msgstr "запись"
-
-msgid "entries"
-msgstr "записи"
+msgid_plural "entries"
+msgstr[0] "запись"
+msgstr[1] "записи"
+msgstr[2] "записей"
+msgstr[3] "записей"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -724,6 +762,9 @@ msgstr "Адрес электронной почты:"
 
 msgid "Reset my password"
 msgstr "Восстановить мой пароль"
+
+msgid "Select all objects on this page for an action"
+msgstr "Выбрать все объекты на этой странице, чтобы применить к ним действие"
 
 msgid "All dates"
 msgstr "Все даты"

@@ -4,17 +4,17 @@
 # eallik <eallik@gmail.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janno Liivak <jannolii@gmail.com>, 2013-2015
-# Martin <martinpajuste@gmail.com>, 2021
+# Martin <martinpajuste@gmail.com>, 2021,2023
 # Martin <martinpajuste@gmail.com>, 2016,2020
 # Ragnar Rebase <rrebase@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-03-22 11:55+0000\n"
-"Last-Translator: Martin <martinpajuste@gmail.com>\n"
-"Language-Team: Estonian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2023-09-18 15:04-0300\n"
+"PO-Revision-Date: 2023-12-04 07:59+0000\n"
+"Last-Translator: Martin <martinpajuste@gmail.com>, 2021,2023\n"
+"Language-Team: Estonian (http://app.transifex.com/django/django/language/"
 "et/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -68,12 +68,22 @@ msgstr ""
 "allolevast kastist ning vajutades noolt \"Eemalda\" liigutada neid ühest "
 "kastist teise."
 
+#, javascript-format
+msgid "Type into this box to filter down the list of selected %s."
+msgstr "Filtreeri selle kasti abil valitud \"%s\" nimekirja."
+
 msgid "Remove all"
 msgstr "Eemalda kõik"
 
 #, javascript-format
 msgid "Click to remove all chosen %s at once."
 msgstr "Kliki, et eemaldada kõik valitud %s korraga."
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] "%s valik ei ole nähtaval"
+msgstr[1] "%s valikut ei ole nähtaval"
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -234,6 +244,55 @@ msgstr "nov"
 msgctxt "abbrev. month December"
 msgid "Dec"
 msgstr "dets"
+
+msgid "Sunday"
+msgstr "pühapäev"
+
+msgid "Monday"
+msgstr "esmaspäev"
+
+msgid "Tuesday"
+msgstr "teisipäev"
+
+msgid "Wednesday"
+msgstr "kolmapäev"
+
+msgid "Thursday"
+msgstr "neljapäev"
+
+msgid "Friday"
+msgstr "reede"
+
+msgid "Saturday"
+msgstr "laupäev"
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr "pühap."
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr "esmasp."
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr "teisip."
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr "kolmap."
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr "neljap."
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr "reede"
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr "laup."
 
 msgctxt "one letter Sunday"
 msgid "S"

@@ -6,10 +6,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-17 02:13-0600\n"
-"PO-Revision-Date: 2023-04-25 07:05+0000\n"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 07:05+0000\n"
 "Last-Translator: Michael Wolf <milupo@sorbzilla.de>, 2016-2023\n"
-"Language-Team: Upper Sorbian (http://www.transifex.com/django/django/"
+"Language-Team: Upper Sorbian (http://app.transifex.com/django/django/"
 "language/hsb/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -178,6 +178,9 @@ msgid "Hold down “Control”, or “Command” on a Mac, to select more than o
 msgstr ""
 "Dźeržće „ctrl“ abo „cmd“ na Mac stłóčeny, zo byšće wjace hač jedyn wubrał."
 
+msgid "Select this object for an action - {}"
+msgstr "Wubjerće tutón objekt za akciju – {}"
+
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr "{name} „{obj}“ je so wuspěšnje přidał."
@@ -340,6 +343,9 @@ msgstr "Wubjerće wšě %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Wuběr wotstronić"
 
+msgid "Breadcrumbs"
+msgstr "Chlěbowe srjódki"
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "Modele w nałoženju %(name)s"
@@ -392,9 +398,6 @@ msgstr "Dokumentacija"
 msgid "Log out"
 msgstr "Wotzjewić"
 
-msgid "Breadcrumbs"
-msgstr "Chlěbowe srjódki"
-
 #, python-format
 msgid "Add %(name)s"
 msgstr "%(name)s přidać"
@@ -407,6 +410,12 @@ msgstr "Na sydle pokazać"
 
 msgid "Filter"
 msgstr "Filtrować"
+
+msgid "Hide counts"
+msgstr "Ličby schować"
+
+msgid "Show counts"
+msgstr "Ličby pokazać"
 
 msgid "Clear all filters"
 msgstr "Wšě filtry zhašeć"
@@ -513,6 +522,15 @@ msgstr "Moje akcije"
 
 msgid "None available"
 msgstr "Žadyn k dispoziciji"
+
+msgid "Added:"
+msgstr "Přidaty:"
+
+msgid "Changed:"
+msgstr "Změnjeny:"
+
+msgid "Deleted:"
+msgstr "Zhašany:"
 
 msgid "Unknown content"
 msgstr "Njeznaty wobsah"
@@ -727,6 +745,9 @@ msgstr "E-mejlowa adresa:"
 
 msgid "Reset my password"
 msgstr "Moje hesło wróćo stajić"
+
+msgid "Select all objects on this page for an action"
+msgstr "Wubjerće wšě objekty na tutej stronje za akciju"
 
 msgid "All dates"
 msgstr "Wšě daty"

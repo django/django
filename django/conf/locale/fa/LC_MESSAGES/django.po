@@ -3,6 +3,7 @@
 # Translators:
 # Ahmad Hosseini <ahmadly.com@gmail.com>, 2020
 # alirezamastery <alireza.mastery@gmail.com>, 2021
+# ali salehi, 2023
 # Ali Vakilzade <ali.vakilzade@gmail.com>, 2015
 # Arash Fazeli <a.fazeli@gmail.com>, 2012
 # Eric Hamiter <ehamiter@gmail.com>, 2019
@@ -24,10 +25,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:23-0500\n"
-"PO-Revision-Date: 2022-07-25 06:49+0000\n"
-"Last-Translator: Eshagh <ase.mugem@gmail.com>\n"
-"Language-Team: Persian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 06:49+0000\n"
+"Last-Translator: ali salehi, 2023\n"
+"Language-Team: Persian (http://app.transifex.com/django/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -67,6 +68,9 @@ msgstr "بوسنیایی"
 
 msgid "Catalan"
 msgstr "کاتالونیایی"
+
+msgid "Central Kurdish (Sorani)"
+msgstr ""
 
 msgid "Czech"
 msgstr "چکی"
@@ -308,6 +312,9 @@ msgstr "تاتار"
 msgid "Udmurt"
 msgstr "ادمورت"
 
+msgid "Uyghur"
+msgstr ""
+
 msgid "Ukrainian"
 msgstr "اکراینی"
 
@@ -403,6 +410,12 @@ msgstr "مطمئن شوید این مقدار بزرگتر و یا مساوی %(
 
 #, python-format
 msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr ""
+
+#, python-format
+msgid ""
+"Ensure this value is a multiple of step size %(limit_value)s, starting from "
+"%(offset)s, e.g. %(offset)s, %(valid_value1)s, %(valid_value2)s, and so on."
 msgstr ""
 
 #, python-format
@@ -518,6 +531,9 @@ msgstr "بولی (درست یا غلط)"
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "رشته (تا %(max_length)s)"
+
+msgid "String (unlimited)"
+msgstr "رشته (بی نهایت)"
 
 msgid "Comma-separated integers"
 msgstr "اعداد صحیح جدا-شده با ویلگول"
@@ -1198,8 +1214,8 @@ msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
 "including the “Referrer-Policy: no-referrer” header, please remove them. The "
 "CSRF protection requires the “Referer” header to do strict referer checking. "
-"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" …> for links to third-party sites."
+"If you’re concerned about privacy, use alternatives like <a "
+"rel=\"noreferrer\" …> for links to third-party sites."
 msgstr ""
 "اگر شما از تگ <meta name=\"referrer\" content=\"no-referrer\"> استفاده "
 "می‌کنید یا سر تیتر \"Referrer-Policy: no-referrer\"  را اضافه کرده‌اید، لطفاً "
@@ -1299,13 +1315,13 @@ msgstr ""
 #, python-format
 msgid ""
 "You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> is in your settings file and you have not configured any "
-"URLs."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
+"configured any URLs."
 msgstr ""
 "شما این صفحه را به این دلیل مشاهده می کنید که <a href=\"https://docs."
-"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" rel="
-"\"noopener\">DEBUG=True</a> در فایل تنظیمات شما وجود دارد و شما هیچ URL "
+"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> در فایل تنظیمات شما وجود دارد و شما هیچ URL "
 "تنظیم نکرده اید."
 
 msgid "Django Documentation"

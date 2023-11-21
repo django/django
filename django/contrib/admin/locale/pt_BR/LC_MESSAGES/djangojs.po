@@ -4,7 +4,8 @@
 # Allisson Azevedo <allisson@gmail.com>, 2014
 # andrewsmedina <andrewsmedina@gmail.com>, 2016
 # Eduardo Cereto Carvalho, 2011
-# semente, 2012
+# Gabriel da Mota <gabrielmotaa@hotmail.com>, 2023
+# fa9e10542e458baef0599ae856e43651_13d2225, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jonas Rodrigues, 2023
 # Lucas Infante <maccinza@gmail.com>, 2015
@@ -16,10 +17,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-17 03:19-0500\n"
-"PO-Revision-Date: 2023-04-25 07:59+0000\n"
-"Last-Translator: Jonas Rodrigues, 2023\n"
-"Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
+"POT-Creation-Date: 2023-09-18 15:04-0300\n"
+"PO-Revision-Date: 2023-12-04 07:59+0000\n"
+"Last-Translator: Gabriel da Mota <gabrielmotaa@hotmail.com>, 2023\n"
+"Language-Team: Portuguese (Brazil) (http://app.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -85,9 +86,9 @@ msgstr "Clique para remover de uma só vez todos os %s escolhidos."
 #, javascript-format
 msgid "%s selected option not visible"
 msgid_plural "%s selected options not visible"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%s opção selecionada não visível"
+msgstr[1] "%s opções selecionadas não visíveis"
+msgstr[2] "%s opções selecionadas não visíveis"
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -252,6 +253,55 @@ msgstr "Nov"
 msgctxt "abbrev. month December"
 msgid "Dec"
 msgstr "Dez"
+
+msgid "Sunday"
+msgstr "Domingo"
+
+msgid "Monday"
+msgstr "Segunda-feira"
+
+msgid "Tuesday"
+msgstr "Terça-feira"
+
+msgid "Wednesday"
+msgstr "Quarta-feira"
+
+msgid "Thursday"
+msgstr "Quinta-feira"
+
+msgid "Friday"
+msgstr "Sexta-feira"
+
+msgid "Saturday"
+msgstr "Sábado"
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr "Dom"
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr "Seg"
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr "Ter"
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr "Qua"
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr "Qui"
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr "Sex"
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr "Sáb"
 
 msgctxt "one letter Sunday"
 msgid "S"
