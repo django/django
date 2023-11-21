@@ -303,6 +303,10 @@ Miscellaneous
   ``ModelAdmin.log_deletions()`` and  ``LogEntryManager.log_actions()``
   instead.
 
+* The undocumented ``django.utils.itercompat.is_iterable()`` function and the
+  ``django.utils.itercompat`` module are deprecated. Use
+  ``isinstance(..., collections.abc.Iterable)`` instead.
+
 Features removed in 5.1
 =======================
 

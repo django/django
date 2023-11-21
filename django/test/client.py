@@ -2,6 +2,7 @@ import json
 import mimetypes
 import os
 import sys
+from collections.abc import Iterable
 from copy import copy
 from functools import partial
 from http import HTTPStatus
@@ -25,7 +26,6 @@ from django.urls import resolve
 from django.utils.encoding import force_bytes
 from django.utils.functional import SimpleLazyObject
 from django.utils.http import urlencode
-from django.utils.itercompat import is_iterable
 from django.utils.regex_helper import _lazy_re_compile
 
 __all__ = (
@@ -303,7 +303,7 @@ def encode_multipart(boundary, data):
             )
         elif is_file(value):
             lines.extend(encode_file(boundary, key, value))
-        elif not isinstance(value, str) and is_iterable(value):
+        elif not isinstance(value, str) and isinstance(value, Iterable):
             for item in value:
                 if is_file(item):
                     lines.extend(encode_file(boundary, key, item))
