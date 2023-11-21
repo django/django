@@ -1,6 +1,6 @@
 aiosmtpd
 asgiref >= 3.7.0
-argon2-cffi >= 19.2.0
+argon2-cffi >= 19.2.0; sys.platform != 'win32' or python_version < '3.13'
 bcrypt
 black
 docutils >= 0.19
