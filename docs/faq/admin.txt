@@ -116,5 +116,5 @@ What assistive technologies are supported for using the admin?
 The admin is intended to be compatible with a wide range of assistive
 technologies, but there are currently many blockers. The support target is all
 latest versions of major assistive technologies, including Dragon, JAWS, NVDA,
-Orca, TalkBack, Voice Control, VoiceOver, Windows Contrast Themes, ZoomText,
-and screen magnifiers.
+Orca, TalkBack, Voice Control, VoiceOver iOS, VoiceOver macOS, Windows Contrast
+Themes, ZoomText, and screen magnifiers.
