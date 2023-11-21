@@ -22,6 +22,7 @@ from django.utils.encoding import (
 )
 from django.utils.functional import SimpleLazyObject
 from django.utils.translation import gettext_lazy
+from django.utils.version import PYPY
 
 
 class TestEncodingUtils(SimpleTestCase):
@@ -43,9 +44,10 @@ class TestEncodingUtils(SimpleTestCase):
         self.assertIs(type(force_str(s)), str)
 
     def test_force_str_DjangoUnicodeDecodeError(self):
+        reason = "unexpected end of data" if PYPY else "invalid start byte"
         msg = (
-            "'utf-8' codec can't decode byte 0xff in position 0: invalid "
-            "start byte. You passed in b'\\xff' (<class 'bytes'>)"
+            f"'utf-8' codec can't decode byte 0xff in position 0: {reason}. "
+            "You passed in b'\\xff' (<class 'bytes'>)"
         )
         with self.assertRaisesMessage(DjangoUnicodeDecodeError, msg):
             force_str(b"\xff")
