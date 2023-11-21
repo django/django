@@ -18,6 +18,15 @@ from django.db.migrations.utils import COMPILED_REGEX_TYPE, RegexObject
 from django.utils.functional import LazyObject, Promise
 from django.utils.version import PY311, get_docs_version
 
+FUNCTION_TYPES = (types.FunctionType, types.BuiltinFunctionType, types.MethodType)
+
+if isinstance(functools._lru_cache_wrapper, type):
+    # When using CPython's _functools C module, LRU cache function decorators
+    # present as a class and not a function, so add that class to the list of
+    # function types. In the pure Python implementation and PyPy they present
+    # as normal functions which are already handled.
+    FUNCTION_TYPES += (functools._lru_cache_wrapper,)
+
 
 class BaseSerializer:
     def __init__(self, value):
@@ -346,12 +355,7 @@ class Serializer:
         (bool, int, types.NoneType, bytes, str, range): BaseSimpleSerializer,
         decimal.Decimal: DecimalSerializer,
         (functools.partial, functools.partialmethod): FunctoolsPartialSerializer,
-        (
-            types.FunctionType,
-            types.BuiltinFunctionType,
-            types.MethodType,
-            functools._lru_cache_wrapper,
-        ): FunctionTypeSerializer,
+        FUNCTION_TYPES: FunctionTypeSerializer,
         collections.abc.Iterable: IterableSerializer,
         (COMPILED_REGEX_TYPE, RegexObject): RegexSerializer,
         uuid.UUID: UUIDSerializer,
