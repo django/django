@@ -37,6 +37,25 @@ jobs:
       - name: Run tests
         run: python tests/runtests.py -v2
 
+  pypy:
+    runs-on: ubuntu-latest
+    name: Ubuntu, SQLite, PyPy3.10
+    continue-on-error: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: pypy-3.10-nightly
+          cache: 'pip'
+          cache-dependency-path: 'tests/requirements/py3.txt'
+      - name: Install and upgrade packaging tools
+        run: python -m pip install --upgrade pip setuptools wheel
+      - run: python -m pip install -r tests/requirements/py3.txt -e .
+      - name: Run tests
+        run: python tests/runtests.py -v2
+
   javascript-tests:
     runs-on: ubuntu-latest
     name: JavaScript tests
