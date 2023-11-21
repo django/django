@@ -1,13 +1,13 @@
 import gc
-import sys
 import weakref
 from types import TracebackType
 
 from django.dispatch import Signal, receiver
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
+from django.utils.version import PYPY
 
-if hasattr(sys, "pypy_version_info"):
+if PYPY:
 
     def garbage_collect():
         # Collecting weakreferences can take two collections on PyPy.

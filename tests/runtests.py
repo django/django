@@ -30,7 +30,7 @@ else:
     from django.test.utils import NullTimeKeeper, TimeKeeper, get_runner
     from django.utils.deprecation import RemovedInDjango60Warning
     from django.utils.log import DEFAULT_LOGGING
-    from django.utils.version import PY312
+    from django.utils.version import PY312, PYPY
 
 try:
     import MySQLdb
@@ -52,7 +52,7 @@ warnings.simplefilter("error", RuntimeWarning)
 # references, which are a minority, so the garbage collection threshold can be
 # larger than the default threshold of 700 allocations + deallocations without
 # much increase in memory usage.
-if not hasattr(sys, "pypy_version_info"):
+if not PYPY:
     gc.set_threshold(100_000)
 
 RUNTESTS_DIR = os.path.abspath(os.path.dirname(__file__))
