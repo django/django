@@ -377,7 +377,7 @@ class PasswordResetForm(forms.Form):
             if app_name != "":
                 context['password_reset_confirm'] = f"{app_name}:password_reset_confirm"
             else:
-                context['password_reset_confirm'] = 'password_reset_confirm'            
+                context['password_reset_confirm'] = 'password_reset_confirm'
             self.send_mail(
                 subject_template_name,
                 email_template_name,
