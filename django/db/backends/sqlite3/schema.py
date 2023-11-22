@@ -107,6 +107,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         mapping = {
             f.column: self.quote_name(f.column)
             for f in model._meta.local_concrete_fields
+            if f.generated is False
         }
         # This maps field names (not columns) for things like unique_together
         rename_mapping = {}
@@ -163,7 +164,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Remove any deleted fields
         if delete_field:
             del body[delete_field.name]
-            del mapping[delete_field.column]
+            mapping.pop(delete_field.column, None)
             # Remove any implicit M2M tables
             if (
                 delete_field.many_to_many
