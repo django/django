@@ -191,7 +191,7 @@ class ModelBase(type):
         # Add remaining attributes (those with a contribute_to_class() method)
         # to the class.
         # for obj_name, obj in contributable_attrs.items():
-        # PP Update: Set *all* attrs again, not only remeaning ones, so the attrs order
+        # PP Update: Set *all* attrs again, not only remaining ones, so the attrs order
         # will still matter (definition of property named `foo` after django field named
         # `foo` will take place instead of the previous field, order matter
         for obj_name, obj in attrs.items():
