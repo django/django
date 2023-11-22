@@ -1,3 +1,4 @@
+from django.apps import apps
 from django.db import IntegrityError, connection
 from django.db.models import (
     CharField,
@@ -32,6 +33,25 @@ class BaseGeneratedFieldTests(SimpleTestCase):
                 editable=True,
                 db_persist=False,
             )
+
+    @isolate_apps("model_fields")
+    def test_contribute_to_class(self):
+        class BareModel(Model):
+            pass
+
+        new_field = GeneratedField(
+            expression=Lower("nonexistent"),
+            output_field=IntegerField(),
+            db_persist=True,
+        )
+        apps.models_ready = False
+        try:
+            # GeneratedField can be added to the model even when apps are not
+            # fully loaded.
+            new_field.contribute_to_class(BareModel, "name")
+            self.assertEqual(BareModel._meta.get_field("name"), new_field)
+        finally:
+            apps.models_ready = True
 
     def test_blank_unsupported(self):
         with self.assertRaisesMessage(ValueError, "GeneratedField must be blank."):
@@ -217,10 +237,6 @@ class GeneratedFieldTestMixin:
         db_parameters = field.db_parameters(connection)
         self.assertEqual(db_parameters["collation"], collation)
         self.assertEqual(db_parameters["type"], field.output_field.db_type(connection))
-        self.assertNotEqual(
-            db_parameters["type"],
-            field._resolved_expression.output_field.db_type(connection),
-        )
 
     def test_db_type_parameters(self):
         db_type_parameters = self.output_field_db_collation_model._meta.get_field(
