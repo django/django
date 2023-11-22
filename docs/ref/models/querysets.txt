@@ -2431,10 +2431,12 @@ This has a number of caveats though:
 * The model's ``save()`` method will not be called, and the ``pre_save`` and
   ``post_save`` signals will not be sent.
 * It does not work with child models in a multi-table inheritance scenario.
-* If the model's primary key is an :class:`~django.db.models.AutoField`, the
-  primary key attribute can only be retrieved on certain databases (currently
-  PostgreSQL, MariaDB, and SQLite 3.35+). On other databases, it will not be
-  set.
+* To retrieve the primary key attribute, you need to meet all these conditions:
+    * The model's primary key is an :class:`~django.db.models.AutoField`, or 
+       its subclasses.
+    * The database has ``can_return_rows_from_bulk_insert=True`` (currently
+       PostgreSQL, MariaDB, and SQLite 3.35+). 
+    * ``ignore_on_conflict`` must be False.
 * It does not work with many-to-many relationships.
 * It casts ``objs`` to a list, which fully evaluates ``objs`` if it's a
   generator. The cast allows inspecting all objects so that any objects with a
