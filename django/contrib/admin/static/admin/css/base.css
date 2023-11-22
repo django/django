@@ -1135,7 +1135,7 @@ a.deletelink:focus, a.deletelink:hover {
     padding: 2px 6px;
     font-weight: bold;
     font-size: 0.8125rem;
-    vertical-align: top;
+    vertical-align: middle;
 }
 
 .paginator a:focus, .paginator a:hover {
