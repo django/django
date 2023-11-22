@@ -224,6 +224,11 @@ class PasswordResetView(PasswordContextMixin, FormView):
 
     @method_decorator(csrf_protect)
     def dispatch(self, *args, **kwargs):
+        self.app_name = self.request.resolver_match.app_name
+        if self.app_name != "":
+            self.success_url = reverse_lazy(f"{self.app_name}:password_reset_done")
+        else:
+            self.success_url = reverse_lazy("password_reset_done")
         return super().dispatch(*args, **kwargs)
 
     def form_valid(self, form):
@@ -236,6 +241,7 @@ class PasswordResetView(PasswordContextMixin, FormView):
             "request": self.request,
             "html_email_template_name": self.html_email_template_name,
             "extra_email_context": self.extra_email_context,
+            "app_name": self.app_name,
         }
         form.save(**opts)
         return super().form_valid(form)

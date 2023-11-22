@@ -348,6 +348,7 @@ class PasswordResetForm(forms.Form):
         request=None,
         html_email_template_name=None,
         extra_email_context=None,
+        app_name=None,
     ):
         """
         Generate a one-use only link for resetting password and send it to the
@@ -373,6 +374,10 @@ class PasswordResetForm(forms.Form):
                 "protocol": "https" if use_https else "http",
                 **(extra_email_context or {}),
             }
+            if app_name != "":
+                context['password_reset_confirm'] = f"{app_name}:password_reset_confirm"
+            else:
+                context['password_reset_confirm'] = 'password_reset_confirm'            
             self.send_mail(
                 subject_template_name,
                 email_template_name,
