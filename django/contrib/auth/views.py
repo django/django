@@ -28,6 +28,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
+from django.contrib import messages
 
 UserModel = get_user_model()
 
@@ -92,6 +93,7 @@ class LoginView(RedirectURLMixin, FormView):
         if self.next_page:
             return resolve_url(self.next_page)
         else:
+            messages.success(self.request, "Logged in successfully.")
             return resolve_url(settings.LOGIN_REDIRECT_URL)
 
     def get_form_class(self):
@@ -133,6 +135,7 @@ class LogoutView(RedirectURLMixin, TemplateView):
     @method_decorator(csrf_protect)
     @method_decorator(never_cache)
     def dispatch(self, request, *args, **kwargs):
+        messages.success(self.request, "Logged out successfully.")
         return super().dispatch(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
