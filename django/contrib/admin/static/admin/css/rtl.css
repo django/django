@@ -289,3 +289,7 @@ form .form-row p.datetime {
     margin-left: inherit;
     margin-right: 2px;
 }
+
+.selector .selector-chooser {
+    margin: 0;
+}

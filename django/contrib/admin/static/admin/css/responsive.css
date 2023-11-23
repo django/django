@@ -237,22 +237,6 @@ input[type="submit"], button {
         padding: 7px;
     }
 
-    /* Related widget */
-
-    .related-widget-wrapper {
-        float: none;
-    }
-
-    .related-widget-wrapper-link + .selector {
-        max-width: calc(100% - 30px);
-        margin-right: 15px;
-    }
-
-    select + .related-widget-wrapper-link,
-    .related-widget-wrapper-link + .related-widget-wrapper-link {
-        margin-left: 10px;
-    }
-
     /* Selector */
 
     .selector {
@@ -270,7 +254,7 @@ input[type="submit"], button {
     }
 
     .selector .selector-filter input {
-        width: auto;
+        width: 100%;
         min-height: 0;
         flex: 1 1;
     }
@@ -292,7 +276,6 @@ input[type="submit"], button {
         width: 26px;
         height: 52px;
         padding: 2px 0;
-        margin: auto 15px;
         border-radius: 20px;
         transform: translateY(-10px);
     }
@@ -336,7 +319,6 @@ input[type="submit"], button {
         width: 52px;
         height: 26px;
         padding: 0 2px;
-        margin: 15px auto;
         transform: none;
     }
 
@@ -684,19 +666,10 @@ input[type="submit"], button {
         align-self: center;
     }
 
-    select + .related-widget-wrapper-link,
-    .related-widget-wrapper-link + .related-widget-wrapper-link {
-        margin-left: 15px;
-    }
-
     /* Selector */
 
     .selector {
         flex-direction: column;
-    }
-
-    .selector > * {
-        float: none;
     }
 
     .selector-available, .selector-chosen {
@@ -710,11 +683,9 @@ input[type="submit"], button {
 
     .selector ul.selector-chooser {
         display: block;
-        float: none;
         width: 52px;
         height: 26px;
         padding: 0 2px;
-        margin: 15px auto 20px;
         transform: none;
     }
 

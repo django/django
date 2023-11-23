@@ -5,9 +5,13 @@ QUnit.module('admin.SelectFilter2');
 
 QUnit.test('init', function(assert) {
     const $ = django.jQuery;
-    $('<form><select id="id"></select></form>').appendTo('#qunit-fixture');
-    $('<option value="0">A</option>').appendTo('#id');
+    $('<form id="test"></form>').appendTo('#qunit-fixture');
+    $('<label for="id_id">Test</label>').appendTo('#test');
+    $('<div class="helptext">This is helpful.</div>').appendTo('#test');
+    $('<select id="id"><option value="0">A</option></select>').appendTo('#test');
     SelectFilter.init('id', 'things', 0);
+    assert.equal($('#test').children().first().prop("tagName"), "DIV");
+    assert.equal($('#test').children().first().attr("class"), "selector");
     assert.equal($('.selector-available h2').text().trim(), "Available things");
     assert.equal($('.selector-chosen h2').text().trim(), "Chosen things");
     assert.equal($('.selector-chosen select')[0].getAttribute('multiple'), '');
