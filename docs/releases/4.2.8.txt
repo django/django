@@ -20,3 +20,7 @@ Bugfixes
 * Fixed a regression in Django 4.2 that caused a crash when annotating a
   ``QuerySet`` with a ``Window`` expressions composed of a ``partition_by``
   clause mixing field types and aggregation expressions (:ticket:`34987`).
+
+* Fixed a regression in Django 4.2 where the admin's change list page had
+  misaligned pagination links and inputs when using ``list_editable``
+  (:ticket:`34991`).
