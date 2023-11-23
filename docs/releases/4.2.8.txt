@@ -24,3 +24,6 @@ Bugfixes
 * Fixed a regression in Django 4.2 where the admin's change list page had
   misaligned pagination links and inputs when using ``list_editable``
   (:ticket:`34991`).
+
+* Fixed a regression in Django 4.2 where checkboxes in the admin would be
+  centered on narrower screen widths (:ticket:`34994`).
