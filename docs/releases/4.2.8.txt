@@ -16,3 +16,7 @@ Bugfixes
 * Fixed a regression in Django 4.2 that caused a crash of
   ``QuerySet.aggregate()`` with aggregates referencing other aggregates or
   window functions through conditional expressions (:ticket:`34975`).
+
+* Fixed a regression in Django 4.2 that caused a crash when annotating a
+  ``QuerySet`` with a ``Window`` expressions composed of a ``partition_by``
+  clause mixing field types and aggregation expressions (:ticket:`34987`).
