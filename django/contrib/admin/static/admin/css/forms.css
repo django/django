@@ -24,7 +24,6 @@ form .form-row p {
 
 .flex-container {
     display: flex;
-    flex-wrap: wrap;
 }
 
 .form-multiline > div {
@@ -78,6 +77,7 @@ form ul.inline li {
 .aligned label {
     display: block;
     padding: 4px 10px 0 0;
+    min-width: 160px;
     width: 160px;
     word-wrap: break-word;
     line-height: 1;

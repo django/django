@@ -588,6 +588,7 @@ input[type="submit"], button {
 
     .aligned label {
         width: 100%;
+        min-width: auto;
         padding: 0 0 10px;
     }
 
