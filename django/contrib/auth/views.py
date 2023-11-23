@@ -8,6 +8,7 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.contrib.auth.forms import (
     AuthenticationForm,
     PasswordChangeForm,
@@ -28,7 +29,6 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
-from django.contrib import messages
 
 UserModel = get_user_model()
 
