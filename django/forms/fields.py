@@ -1288,7 +1288,7 @@ class GenericIPAddressField(CharField):
         self.unpack_ipv4 = unpack_ipv4
         self.default_validators = validators.ip_address_validators(
             protocol, unpack_ipv4
-        )[0]
+        )
         super().__init__(**kwargs)
 
     def to_python(self, value):
