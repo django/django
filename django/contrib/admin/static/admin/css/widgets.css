@@ -69,6 +69,7 @@
     padding: 0;
     overflow: hidden;
     line-height: 1;
+    min-width: auto;
 }
 
 .selector .selector-available input,
