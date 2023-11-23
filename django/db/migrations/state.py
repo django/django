@@ -738,13 +738,15 @@ class ModelState:
             # Sanity-check that relation fields are NOT referring to a model class.
             if field.is_relation and hasattr(field.related_model, "_meta"):
                 raise ValueError(
-                    'ModelState.fields cannot refer to a model class - "%s.to" does. '
-                    "Use a string reference instead." % name
+                    'Model fields in "ModelState.fields" cannot refer to a model class '
+                    f'- "{self.app_label}.{self.name}.{name}.to" does. Use a string '
+                    "reference instead."
                 )
             if field.many_to_many and hasattr(field.remote_field.through, "_meta"):
                 raise ValueError(
-                    'ModelState.fields cannot refer to a model class - "%s.through" '
-                    "does. Use a string reference instead." % name
+                    'Model fields in "ModelState.fields" cannot refer to a model class '
+                    f'- "{self.app_label}.{self.name}.{name}.through" does. Use a '
+                    "string reference instead."
                 )
         # Sanity-check that indexes have their name set.
         for index in self.options["indexes"]:
