@@ -107,6 +107,16 @@ thead th.sorted .text {
     border-left: none;
 }
 
+.paginator .end {
+    margin-left: 6px;
+    margin-right: 0;
+}
+
+.paginator input {
+    margin-left: 0;
+    margin-right: auto;
+}
+
 /* FORMS */
 
 .aligned label {
