@@ -1223,6 +1223,12 @@ class ExpressionList(Func):
         # Casting to numeric is unnecessary.
         return self.as_sql(compiler, connection, **extra_context)
 
+    def get_group_by_cols(self):
+        group_by_cols = []
+        for partition in self.get_source_expressions():
+            group_by_cols.extend(partition.get_group_by_cols())
+        return group_by_cols
+
 
 class OrderByList(Func):
     template = "ORDER BY %(expressions)s"
