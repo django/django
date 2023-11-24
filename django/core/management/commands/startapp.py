@@ -21,6 +21,7 @@ class Command(TemplateCommand):
             # Get an absolute path of a directory
             target = os.path.abspath(target)
 
-        print(f"🎉 Fantastic! Your shiny new Django app '{app_name}' has been created! 🚀")
-        print(f"📁 Explore it in your coding realm at: '{target}'")
-        print("💡 Get ready to craft something extraordinary and let your creativity sparkle! ✨ Happy coding! 🌈")
+        
+        print(f'Success! Created {app_name} at {target}')
+
+        print('\nHappy coding!')

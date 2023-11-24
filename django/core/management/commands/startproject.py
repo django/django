@@ -26,7 +26,30 @@ class Command(TemplateCommand):
         else:
             # Get an absolute path of a directory
             target = os.path.abspath(target)
+        
+        target = os.path.join(target, project_name)
 
-        print(f"🚀 Hooray! Your brand new project '{project_name}' is now ready to soar! 🌟")
-        print(f"📁 Find it in your workspace at: '{target}'")
-        print("💡 Get ready to bring your ideas to life and create something amazing! Happy coding! 🎉")
+        def print_file_structure(base_path, indent='    '*2):
+            for item in os.listdir(base_path):
+                if item == '__pycache__':
+                    continue
+
+                item_path = os.path.join(base_path, item)
+
+                if os.path.isfile(item_path):
+                    print(f'{indent}{item}')
+                elif os.path.isdir(item_path):
+                    print(f'{indent}{item}/')
+                    print_file_structure(item_path, indent + '    ')
+
+        print(f'Success! Created {project_name} at {target}')
+
+        print('\nProject structure:')
+        print(f'    {os.path.basename(target)}/')
+        print_file_structure(target)
+
+        print('\nNext Steps:')
+        print(f'    cd {project_name}/')
+        print('    python manage.py runserver')
+
+        print('\nHappy coding!')
