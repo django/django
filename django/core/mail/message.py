@@ -152,18 +152,16 @@ class MIMEMixin:
 class SafeMIMEMessage(MIMEMixin, MIMEMessage):
     def __setitem__(self, name, val):
         # message/rfc822 attachments must be ASCII
-        name, val = forbid_multi_line_headers(name, val, "ascii")
-        MIMEMessage.__setitem__(self, name, val)
+        super().__setitem__(*forbid_multi_line_headers(name, val, "ascii"))
 
 
 class SafeMIMEText(MIMEMixin, MIMEText):
     def __init__(self, _text, _subtype="plain", _charset=None):
         self.encoding = _charset
-        MIMEText.__init__(self, _text, _subtype=_subtype, _charset=_charset)
+        super().__init__(_text, _subtype=_subtype, _charset=_charset)
 
     def __setitem__(self, name, val):
-        name, val = forbid_multi_line_headers(name, val, self.encoding)
-        MIMEText.__setitem__(self, name, val)
+        super().__setitem__(*forbid_multi_line_headers(name, val, self.encoding))
 
     def set_payload(self, payload, charset=None):
         if charset == "utf-8" and not isinstance(charset, Charset.Charset):
@@ -174,7 +172,7 @@ class SafeMIMEText(MIMEMixin, MIMEText):
             # Quoted-Printable encoding has the side effect of shortening long
             # lines, if any (#22561).
             charset = utf8_charset_qp if has_long_lines else utf8_charset
-        MIMEText.set_payload(self, payload, charset=charset)
+        super().set_payload(payload, charset=charset)
 
 
 class SafeMIMEMultipart(MIMEMixin, MIMEMultipart):
@@ -182,11 +180,10 @@ class SafeMIMEMultipart(MIMEMixin, MIMEMultipart):
         self, _subtype="mixed", boundary=None, _subparts=None, encoding=None, **_params
     ):
         self.encoding = encoding
-        MIMEMultipart.__init__(self, _subtype, boundary, _subparts, **_params)
+        super().__init__(_subtype, boundary, _subparts, **_params)
 
     def __setitem__(self, name, val):
-        name, val = forbid_multi_line_headers(name, val, self.encoding)
-        MIMEMultipart.__setitem__(self, name, val)
+        super().__setitem__(*forbid_multi_line_headers(name, val, self.encoding))
 
 
 class EmailMessage:
