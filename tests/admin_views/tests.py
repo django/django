@@ -5810,9 +5810,13 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertEqual(num_initial_select2_inputs, 4)
 
         # Add an inline
-        self.selenium.find_elements(By.LINK_TEXT, "Add another Related prepopulated")[
-            0
-        ].click()
+        element = self.selenium.find_elements(
+            By.LINK_TEXT, "Add another Related prepopulated"
+        )[0]
+        self.selenium.execute_script(
+            "window.scrollTo(%s, %s);" % (element.location["x"], element.location["y"])
+        )
+        element.click()
         self.assertEqual(
             len(self.selenium.find_elements(By.CLASS_NAME, "select2-selection")),
             num_initial_select2_inputs + 2,
