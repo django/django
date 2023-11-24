@@ -329,7 +329,7 @@ def parse_header_parameters(line):
     Return the main content-type and a dictionary of options.
     """
     parts = _parseparam(";" + line)
-    key = parts.__next__().lower()
+    key = next(parts).lower()
     pdict = {}
     for p in parts:
         i = p.find("=")
