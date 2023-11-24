@@ -338,8 +338,8 @@ File Storage
 Forms
 ~~~~~
 
-* The new ``assume_scheme`` argument for :class:`~django.forms.URLField` allows
-  specifying a default URL scheme.
+* The new :attr:`~django.forms.URLField.assume_scheme` argument for
+  :class:`~django.forms.URLField` allows specifying a default URL scheme.
 
 * In order to improve accessibility, the following changes are made:
 
