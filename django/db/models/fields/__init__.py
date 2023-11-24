@@ -2217,7 +2217,7 @@ class GenericIPAddressField(Field):
         self.default_validators = validators.ip_address_validators(
             protocol, unpack_ipv4
         )
-        kwargs["max_length"] = 39
+        kwargs["max_length"] = 40
         super().__init__(verbose_name, name, *args, **kwargs)
 
     def check(self, **kwargs):
@@ -2244,7 +2244,7 @@ class GenericIPAddressField(Field):
             kwargs["unpack_ipv4"] = self.unpack_ipv4
         if self.protocol != "both":
             kwargs["protocol"] = self.protocol
-        if kwargs.get("max_length") == 39:
+        if kwargs.get("max_length") == 40:
             del kwargs["max_length"]
         return name, path, args, kwargs
 
