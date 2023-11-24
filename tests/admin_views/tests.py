@@ -5842,7 +5842,8 @@ class SeleniumTests(AdminSeleniumTestCase):
             By.ID, "id_relatedprepopulated_set-2-0-status"
         )
         self.selenium.execute_script(
-            "window.scrollTo(200, %s);" % element.location["y"]
+            "window.scrollTo(%s, %s);"
+            % (status_element.location["x"], status_element.location["y"])
         )
         self.selenium.find_element(
             By.ID, "id_relatedprepopulated_set-2-0-pubdate"
