@@ -1141,12 +1141,16 @@ For each field, we describe the default widget used if you don't specify
     * Error message keys: ``required``, ``invalid``
 
     Has the optional arguments ``max_length``, ``min_length``, ``empty_value``
-    which work just as they do for :class:`CharField`, and ``assume_scheme``
-    that defaults to ``"http"``.
+    which work just as they do for :class:`CharField`, and one more argument:
 
-    .. versionchanged:: 5.0
+    .. attribute:: assume_scheme
 
-        The ``assume_scheme`` argument was added.
+        .. versionadded:: 5.0
+
+        The scheme assumed for URLs provided without one. Defaults to
+        ``"http"``. For example, if ``assume_scheme`` is ``"https"`` and the
+        provided value is ``"example.com"``, the normalized value will be
+        ``"https://example.com"``.
 
     .. deprecated:: 5.0
 
