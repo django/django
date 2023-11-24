@@ -5766,6 +5766,11 @@ class SeleniumTests(AdminSeleniumTestCase):
 
         # Main form ----------------------------------------------------------
         self.selenium.find_element(By.ID, "id_pubdate").send_keys("2012-02-18")
+        status_element = self.selenium.find_element(By.ID, "id_status")
+        self.selenium.execute_script(
+            "window.scrollTo(%s, %s);"
+            % (status_element.location["x"], status_element.location["y"])
+        )
         self.select_option("#id_status", "option two")
         self.selenium.find_element(By.ID, "id_name").send_keys(
             " the mAin nÀMë and it's awεšomeıııİ"
