@@ -1,3 +1,4 @@
+from collections.abc import Iterable
 from unittest import mock
 
 from django.contrib.contenttypes.models import ContentType
@@ -443,9 +444,7 @@ class CustomPrefetchTests(TestCase):
         if hasattr(obj_iter, "all"):
             obj_iter = obj_iter.all()
 
-        try:
-            iter(obj_iter)
-        except TypeError:
+        if not isinstance(obj_iter, Iterable):
             obj_iter = [obj_iter]
 
         for obj in obj_iter:

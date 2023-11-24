@@ -2,6 +2,7 @@ import base64
 import re
 import unicodedata
 from binascii import Error as BinasciiError
+from collections.abc import Iterable
 from datetime import datetime, timezone
 from email.utils import formatdate
 from urllib.parse import quote, unquote
@@ -58,15 +59,13 @@ def urlencode(query, doseq=False):
         elif not doseq or isinstance(value, (str, bytes)):
             query_val = value
         else:
-            try:
-                itr = iter(value)
-            except TypeError:
+            if not isinstance(value, Iterable):
                 query_val = value
             else:
                 # Consume generators and iterators, when doseq=True, to
                 # work around https://bugs.python.org/issue31706.
                 query_val = []
-                for item in itr:
+                for item in value:
                     if item is None:
                         raise TypeError(
                             "Cannot encode None for key '%s' in a query "
