@@ -150,7 +150,7 @@ def Deserializer(
                     )
                 except base.M2MDeserializationError as e:
                     raise base.DeserializationError.WithData(
-                        e.original_exc, d["model"], d.get("pk"), e.pk
+                        e.__cause__, d["model"], d.get("pk"), e.pk
                     )
                 if values == base.DEFER_FIELD:
                     deferred_fields[field] = field_value

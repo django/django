@@ -335,40 +335,24 @@ class Deserializer(base.Deserializer):
         Handle a <field> node for a ManyToManyField.
         """
         model = field.remote_field.model
-        default_manager = model._default_manager
-        if hasattr(default_manager, "get_by_natural_key"):
+        manager = model._default_manager
+        natural = hasattr(manager, "get_by_natural_key")
 
-            def m2m_convert(n):
-                keys = n.getElementsByTagName("natural")
-                if keys:
-                    # If there are 'natural' subelements, it must be a natural key
-                    field_value = [getInnerText(k).strip() for k in keys]
-                    obj_pk = (
-                        default_manager.db_manager(self.db)
-                        .get_by_natural_key(*field_value)
-                        .pk
-                    )
-                else:
-                    # Otherwise, treat like a normal PK value.
-                    obj_pk = model._meta.pk.to_python(n.getAttribute("pk"))
-                return obj_pk
+        def m2m_convert(v):
+            try:
+                if natural and (keys := v.getElementsByTagName("natural")):
+                    values = (getInnerText(k).strip() for k in keys)
+                    return manager.db_manager(self.db).get_by_natural_key(*values).pk
+                return model._meta.pk.to_python(v.getAttribute("pk"))
+            except Exception as e:
+                if isinstance(e, ObjectDoesNotExist) and self.handle_forward_references:
+                    raise e
+                raise base.M2MDeserializationError(v) from e
 
-        else:
-
-            def m2m_convert(n):
-                return model._meta.pk.to_python(n.getAttribute("pk"))
-
-        values = []
         try:
-            for c in node.getElementsByTagName("object"):
-                values.append(m2m_convert(c))
-        except Exception as e:
-            if isinstance(e, ObjectDoesNotExist) and self.handle_forward_references:
-                return base.DEFER_FIELD
-            else:
-                raise base.M2MDeserializationError(e, c)
-        else:
-            return values
+            return [m2m_convert(v) for v in node.getElementsByTagName("object")]
+        except ObjectDoesNotExist:
+            return base.DEFER_FIELD
 
     def _get_model_from_node(self, node, attr):
         """
