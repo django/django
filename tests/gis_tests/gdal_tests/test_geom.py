@@ -170,7 +170,7 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
             self.assertNotEqual(linestr, prev)
             msg = "Index out of range when accessing points of a line string: %s."
             with self.assertRaisesMessage(IndexError, msg % len(linestr)):
-                linestr.__getitem__(len(linestr))
+                linestr[len(linestr)]
             prev = linestr
 
             # Testing the x, y properties.
@@ -196,7 +196,7 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
                 self.assertEqual("LINESTRING", ls.geom_name)
             msg = "Index out of range when accessing geometry in a collection: %s."
             with self.assertRaisesMessage(IndexError, msg % len(mlinestr)):
-                mlinestr.__getitem__(len(mlinestr))
+                mlinestr[len(mlinestr)]
 
     def test_linearring(self):
         "Testing LinearRing objects."
@@ -227,7 +227,7 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
             self.assertEqual(p.n_i + 1, len(poly))
             msg = "Index out of range when accessing rings of a polygon: %s."
             with self.assertRaisesMessage(IndexError, msg % len(poly)):
-                poly.__getitem__(len(poly))
+                poly[len(poly)]
 
             # Testing area & centroid.
             self.assertAlmostEqual(p.area, poly.area, 9)
@@ -282,7 +282,7 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
                 self.assertEqual(mp.num_geom, len(mpoly))
                 msg = "Index out of range when accessing geometry in a collection: %s."
                 with self.assertRaisesMessage(IndexError, msg % len(mpoly)):
-                    mpoly.__getitem__(len(mpoly))
+                    mpoly[len(mpoly)]
                 for p in mpoly:
                     self.assertEqual("POLYGON", p.geom_name)
                     self.assertEqual(3, p.geom_type)

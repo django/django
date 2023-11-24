@@ -89,7 +89,7 @@ class MultiValueDictTests(SimpleTestCase):
             [("name", ["Adrian", "Simon"]), ("position", ["Developer"]), ("empty", [])],
         )
         with self.assertRaisesMessage(MultiValueDictKeyError, "'lastname'"):
-            d.__getitem__("lastname")
+            d["lastname"]
         self.assertIsNone(d.get("empty"))
         self.assertEqual(d.get("empty", "nonexistent"), "nonexistent")
         self.assertIsNone(d.get("lastname"))
@@ -266,7 +266,7 @@ class ImmutableListTests(SimpleTestCase):
 
         # AttributeError: Object is immutable!
         with self.assertRaisesMessage(AttributeError, "Object is immutable!"):
-            d.__setitem__(1, "test")
+            d[1] = "test"
 
 
 class DictWrapperTests(SimpleTestCase):

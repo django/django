@@ -321,9 +321,9 @@ class SpatialRefTest(SimpleTestCase):
         "Testing the attr_value() method."
         s1 = SpatialReference("WGS84")
         with self.assertRaises(TypeError):
-            s1.__getitem__(0)
+            s1[0]
         with self.assertRaises(TypeError):
-            s1.__getitem__(("GEOGCS", "foo"))
+            s1[("GEOGCS", "foo")]
         self.assertEqual("WGS 84", s1["GEOGCS"])
         self.assertEqual("WGS_1984", s1["DATUM"])
         self.assertEqual("EPSG", s1["AUTHORITY"])

@@ -385,7 +385,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             self.assertAlmostEqual(mp.centroid[1], mpnt.centroid.tuple[1], 9)
 
             with self.assertRaises(IndexError):
-                mpnt.__getitem__(len(mpnt))
+                mpnt[len(mpnt)]
             self.assertEqual(mp.centroid, mpnt.centroid.tuple)
             self.assertEqual(mp.coords, tuple(m.tuple for m in mpnt))
             for p in mpnt:
@@ -412,7 +412,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             self.assertEqual(ls, fromstr(line.wkt))
             self.assertIs(ls == prev, False)  # Use assertIs() to test __eq__.
             with self.assertRaises(IndexError):
-                ls.__getitem__(len(ls))
+                ls[len(ls)]
             prev = ls
 
             # Creating a LineString from a tuple, list, and numpy array
@@ -502,7 +502,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
                 self.assertIs(ls.empty, False)
 
             with self.assertRaises(IndexError):
-                ml.__getitem__(len(ml))
+                ml[len(ml)]
             self.assertEqual(ml.wkt, MultiLineString(*tuple(s.clone() for s in ml)).wkt)
             self.assertEqual(
                 ml, MultiLineString(*tuple(LineString(s.tuple) for s in ml))
@@ -598,11 +598,11 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
 
             # Testing __getitem__ and __setitem__ on invalid indices
             with self.assertRaises(IndexError):
-                poly.__getitem__(len(poly))
+                poly[len(poly)]
             with self.assertRaises(IndexError):
-                poly.__setitem__(len(poly), False)
+                poly[len(poly)] = False
             with self.assertRaises(IndexError):
-                poly.__getitem__(-1 * len(poly) - 1)
+                poly[-1 * len(poly) - 1]
 
             # Testing __iter__
             for r in poly:
@@ -663,7 +663,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
                 self.assertEqual(mp.n_p, mpoly.num_coords)
                 self.assertEqual(mp.num_geom, len(mpoly))
                 with self.assertRaises(IndexError):
-                    mpoly.__getitem__(len(mpoly))
+                    mpoly[len(mpoly)]
                 for p in mpoly:
                     self.assertEqual(p.geom_type, "Polygon")
                     self.assertEqual(p.geom_typeid, 3)
@@ -971,7 +971,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
 
             # Should only be able to use __setitem__ with LinearRing geometries.
             with self.assertRaises(TypeError):
-                poly.__setitem__(0, LineString((1, 1), (2, 2)))
+                poly[0] = LineString((1, 1), (2, 2))
 
             # Constructing the new shell by adding 500 to every point in the old shell.
             shell_tup = poly.shell.tuple
@@ -1109,7 +1109,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         ls = LineString((2.0, 3.0, 8.0), (50.0, 250.0, -117.0))
         self.assertEqual(((2.0, 3.0, 8.0), (50.0, 250.0, -117.0)), ls.tuple)
         with self.assertRaises(TypeError):
-            ls.__setitem__(0, (1.0, 2.0))
+            ls[0] = (1.0, 2.0)
         ls[0] = (1.0, 2.0, 3.0)
         self.assertEqual((1.0, 2.0, 3.0), ls[0])
 
@@ -1198,10 +1198,10 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
                 self.assertEqual(0, len(lr))
                 self.assertIs(lr.empty, True)
                 with self.assertRaises(IndexError):
-                    lr.__getitem__(0)
+                    lr[0]
             else:
                 with self.assertRaises(IndexError):
-                    g.__getitem__(0)
+                    g[0]
 
     def test_collection_dims(self):
         gc = GeometryCollection([])
