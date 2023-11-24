@@ -5748,6 +5748,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertAlmostEqual(offset_left, offset_right, delta=3)
         self.take_screenshot("login")
 
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark"])
     def test_prepopulated_fields(self):
         """
         The JavaScript-automated prepopulated fields work with the main form
@@ -5767,10 +5768,12 @@ class SeleniumTests(AdminSeleniumTestCase):
         # Main form ----------------------------------------------------------
         self.selenium.find_element(By.ID, "id_pubdate").send_keys("2012-02-18")
         status_element = self.selenium.find_element(By.ID, "id_status")
+        self.take_screenshot("before_scroll")
         self.selenium.execute_script(
             "window.scrollTo(%s, %s);"
             % (status_element.location["x"], status_element.location["y"])
         )
+        self.take_screenshot("after_scroll")
         self.select_option("#id_status", "option two")
         self.selenium.find_element(By.ID, "id_name").send_keys(
             " the mAin nÀMë and it's awεšomeıııİ"
