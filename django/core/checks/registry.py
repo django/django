@@ -1,7 +1,7 @@
+from collections.abc import Iterable
 from itertools import chain
 
 from django.utils.inspect import func_accepts_kwargs
-from django.utils.itercompat import is_iterable
 
 
 class Tags:
@@ -86,7 +86,7 @@ class CheckRegistry:
 
         for check in checks:
             new_errors = check(app_configs=app_configs, databases=databases)
-            if not is_iterable(new_errors):
+            if not isinstance(new_errors, Iterable):
                 raise TypeError(
                     "The function %r did not return a list. All functions "
                     "registered with the checks registry must return a list." % check,

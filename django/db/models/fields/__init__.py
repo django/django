@@ -5,6 +5,7 @@ import operator
 import uuid
 import warnings
 from base64 import b64decode, b64encode
+from collections.abc import Iterable
 from functools import partialmethod, total_ordering
 
 from django import forms
@@ -31,7 +32,6 @@ from django.utils.dateparse import (
 from django.utils.duration import duration_microseconds, duration_string
 from django.utils.functional import Promise, cached_property
 from django.utils.ipv6 import clean_ipv6_address
-from django.utils.itercompat import is_iterable
 from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy as _
 
@@ -317,13 +317,13 @@ class Field(RegisterLookupMixin):
 
     @classmethod
     def _choices_is_value(cls, value):
-        return isinstance(value, (str, Promise)) or not is_iterable(value)
+        return isinstance(value, (str, Promise)) or not isinstance(value, Iterable)
 
     def _check_choices(self):
         if not self.choices:
             return []
 
-        if not is_iterable(self.choices) or isinstance(self.choices, str):
+        if not isinstance(self.choices, Iterable) or isinstance(self.choices, str):
             return [
                 checks.Error(
                     "'choices' must be a mapping (e.g. a dictionary) or an iterable "

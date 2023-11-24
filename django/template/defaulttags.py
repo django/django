@@ -3,6 +3,7 @@ import re
 import sys
 import warnings
 from collections import namedtuple
+from collections.abc import Iterable
 from datetime import datetime
 from itertools import cycle as itertools_cycle
 from itertools import groupby
@@ -10,7 +11,6 @@ from itertools import groupby
 from django.conf import settings
 from django.utils import timezone
 from django.utils.html import conditional_escape, escape, format_html
-from django.utils.itercompat import is_iterable
 from django.utils.lorem_ipsum import paragraphs, words
 from django.utils.safestring import mark_safe
 
@@ -1198,7 +1198,7 @@ def query_string(context, query_dict=None, **kwargs):
         if value is None:
             if key in query_dict:
                 del query_dict[key]
-        elif is_iterable(value) and not isinstance(value, str):
+        elif isinstance(value, Iterable) and not isinstance(value, str):
             query_dict.setlist(key, value)
         else:
             query_dict[key] = value

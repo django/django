@@ -59,6 +59,9 @@ details on these changes.
 * The ``ModelAdmin.log_deletion()`` and ``LogEntryManager.log_action()``
   methods will be removed.
 
+* The undocumented ``django.utils.itercompat.is_iterable()`` function and the
+  ``django.utils.itercompat`` module will be removed.
+
 .. _deprecation-removed-in-5.1:
 
 5.1
