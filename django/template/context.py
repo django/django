@@ -1,3 +1,4 @@
+from collections.abc import Mapping
 from contextlib import contextmanager
 from copy import copy
 
@@ -161,7 +162,7 @@ class Context(BaseContext):
 
     def update(self, other_dict):
         "Push other_dict to the stack of dictionaries in the Context"
-        if not hasattr(other_dict, "__getitem__"):
+        if not isinstance(other_dict, (BaseContext, Mapping)):
             raise TypeError("other_dict must be a mapping (dictionary-like) object.")
         if isinstance(other_dict, BaseContext):
             other_dict = other_dict.dicts[1:].pop()
