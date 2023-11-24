@@ -1,4 +1,5 @@
 import json
+from collections.abc import Iterable
 
 from django import forms
 from django.contrib.admin.utils import (
@@ -130,7 +131,7 @@ class Fieldset:
 class Fieldline:
     def __init__(self, form, field, readonly_fields=None, model_admin=None):
         self.form = form  # A django.forms.Form instance
-        if not hasattr(field, "__iter__") or isinstance(field, str):
+        if not isinstance(field, Iterable) or isinstance(field, str):
             self.fields = [field]
         else:
             self.fields = field

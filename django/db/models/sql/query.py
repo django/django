@@ -11,7 +11,7 @@ import difflib
 import functools
 import sys
 from collections import Counter, namedtuple
-from collections.abc import Iterator, Mapping
+from collections.abc import Iterable, Iterator, Mapping
 from itertools import chain, count, product
 from string import ascii_uppercase
 
@@ -1334,7 +1334,7 @@ class Query(BaseExpression):
                 )
             elif hasattr(value, "_meta"):
                 self.check_query_object_type(value, opts, field)
-            elif hasattr(value, "__iter__"):
+            elif isinstance(value, Iterable):
                 for v in value:
                     self.check_query_object_type(v, opts, field)
 

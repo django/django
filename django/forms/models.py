@@ -2,6 +2,7 @@
 Helper functions for creating Form classes from Django models
 and database field objects.
 """
+from collections.abc import Iterable
 from itertools import chain
 
 from django.core.exceptions import (
@@ -1649,7 +1650,7 @@ class ModelMultipleChoiceField(ModelChoiceField):
 
     def prepare_value(self, value):
         if (
-            hasattr(value, "__iter__")
+            isinstance(value, Iterable)
             and not isinstance(value, str)
             and not hasattr(value, "_meta")
         ):

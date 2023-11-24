@@ -7,6 +7,7 @@ import re
 import sys
 import time
 import warnings
+from collections.abc import Iterable
 from email.header import Header
 from http.client import responses
 from urllib.parse import urlparse
@@ -395,7 +396,7 @@ class HttpResponse(HttpResponseBase):
     @content.setter
     def content(self, value):
         # Consume iterators upon assignment to allow repeated iteration.
-        if hasattr(value, "__iter__") and not isinstance(
+        if isinstance(value, Iterable) and not isinstance(
             value, (bytes, memoryview, str)
         ):
             content = b"".join(self.make_bytes(chunk) for chunk in value)

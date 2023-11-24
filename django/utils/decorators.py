@@ -1,5 +1,6 @@
 "Functions that help with dynamically creating decorators for views."
 
+from collections.abc import Iterable
 from functools import partial, update_wrapper, wraps
 
 from asgiref.sync import iscoroutinefunction
@@ -29,7 +30,7 @@ def _multi_decorate(decorators, method):
     Decorate `method` with one or more function decorators. `decorators` can be
     a single decorator or an iterable of decorators.
     """
-    if hasattr(decorators, "__iter__"):
+    if isinstance(decorators, Iterable):
         # Apply a list/tuple of decorators if 'decorators' is one. Decorator
         # functions are applied so that the call order is the same as the
         # order in which they appear in the iterable.
@@ -84,7 +85,7 @@ def method_decorator(decorator, name=""):
 
     # Don't worry about making _dec look similar to a list/tuple as it's rather
     # meaningless.
-    if not hasattr(decorator, "__iter__"):
+    if not isinstance(decorator, Iterable):
         update_wrapper(_dec, decorator)
     # Change the name to aid debugging.
     obj = decorator if hasattr(decorator, "__name__") else decorator.__class__
