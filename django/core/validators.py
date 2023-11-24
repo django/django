@@ -276,14 +276,18 @@ def validate_ipv4_address(value):
         ipaddress.IPv4Address(value)
     except ValueError:
         raise ValidationError(
-            _("Enter a valid IPv4 address."), code="invalid", params={"value": value}
+            _("Enter a valid %(protocol)s address."),
+            code="invalid",
+            params={"protocol": _("IPv4"), "value": value},
         )
 
 
 def validate_ipv6_address(value):
     if not is_valid_ipv6_address(value):
         raise ValidationError(
-            _("Enter a valid IPv6 address."), code="invalid", params={"value": value}
+            _("Enter a valid %(protocol)s address."),
+            code="invalid",
+            params={"protocol": _("IPv6"), "value": value},
         )
 
 
@@ -295,16 +299,16 @@ def validate_ipv46_address(value):
             validate_ipv6_address(value)
         except ValidationError:
             raise ValidationError(
-                _("Enter a valid IPv4 or IPv6 address."),
+                _("Enter a valid %(protocol)s address."),
                 code="invalid",
-                params={"value": value},
+                params={"protocol": _("IPv4 or IPv6"), "value": value},
             )
 
 
 ip_address_validator_map = {
-    "both": ([validate_ipv46_address], _("Enter a valid IPv4 or IPv6 address.")),
-    "ipv4": ([validate_ipv4_address], _("Enter a valid IPv4 address.")),
-    "ipv6": ([validate_ipv6_address], _("Enter a valid IPv6 address.")),
+    "both": [validate_ipv46_address],
+    "ipv4": [validate_ipv4_address],
+    "ipv6": [validate_ipv6_address],
 }
 
 
