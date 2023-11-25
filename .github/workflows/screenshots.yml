@@ -23,7 +23,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: refs/pull/${{ github.event.pull_request.number }}/merge
+          ref: '${{ github.event.pull_request.merge_commit_sha }}'
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
