@@ -951,7 +951,9 @@ class ModelRefreshTests(TestCase):
         # Relation is added and prefetch cache is stale.
         self.assertCountEqual(a2_prefetched.selfref_set.all(), [])
         self.assertCountEqual(a2_prefetched.cited.all(), [])
-        a2_prefetched.refresh_from_db(fields=["selfref_set", "cited"])
+        fields = ["selfref_set", "cited"]
+        a2_prefetched.refresh_from_db(fields=fields)
+        self.assertEqual(fields, ["selfref_set", "cited"])
         # Cache was cleared and new results are available.
         self.assertCountEqual(a2_prefetched.selfref_set.all(), [s])
         self.assertCountEqual(a2_prefetched.cited.all(), [s])
