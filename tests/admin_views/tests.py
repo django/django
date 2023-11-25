@@ -5747,6 +5747,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         # Use assertAlmostEqual to avoid pixel rounding errors.
         self.assertAlmostEqual(offset_left, offset_right, delta=3)
         self.take_screenshot("login")
+        self.take_screenshow("TESTING_IF_YOU_EXIST")
 
     def test_prepopulated_fields(self):
         """
