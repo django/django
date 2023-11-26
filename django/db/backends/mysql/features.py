@@ -6,7 +6,6 @@ from django.utils.functional import cached_property
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     empty_fetchmany_value = ()
-    allows_group_by_selected_pks = True
     related_fields_match_type = True
     # MySQL doesn't support sliced subqueries with IN/ALL/ANY/SOME.
     allow_sliced_subqueries_with_in = False
@@ -319,3 +318,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     def has_native_uuid_field(self):
         is_mariadb = self.connection.mysql_is_mariadb
         return is_mariadb and self.connection.mysql_version >= (10, 7)
+
+    @cached_property
+    def allows_group_by_selected_pks(self):
+        if self.connection.mysql_is_mariadb:
+            return "ONLY_FULL_GROUP_BY" not in self.connection.sql_mode
+        return True
