@@ -212,20 +212,15 @@ This is the logger used to signify a source code file modification.
 ``django.contrib.gis``
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-<<<<<<< HEAD
 Logging related to :doc:`contrib/gis/index`, at diverse levels : external GeoSpatial libraries (GEOS, GDAL...), Database Schema and Geometry widget.
 
 * In case of a database error the SQL query is added to the log context
-=======
-Logging related to GeoDjango internals, including external GeoSpatial libraries (Geos, GDAL...).
->>>>>>> 86350e582b5951f8ae0d9b49e3b5c5c97073dd06
 
 .. _django-dispatch-logger:
 
 ``django.dispatch``
 ~~~~~~~~~~~~~~~~~~~
 
-<<<<<<< HEAD
 Logger used in :doc:`signals`. 
 
 At the ERROR level the logger adds the following extra context :
@@ -234,9 +229,6 @@ At the ERROR level the logger adds the following extra context :
 * ``err``: The error itself.
 
 As well as the traceback.
-=======
-Logger used in Django Signal.
->>>>>>> 86350e582b5951f8ae0d9b49e3b5c5c97073dd06
 
 .. _django-security-logger:
 
