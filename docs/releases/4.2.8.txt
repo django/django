@@ -27,3 +27,7 @@ Bugfixes
 
 * Fixed a regression in Django 4.2 where checkboxes in the admin would be
   centered on narrower screen widths (:ticket:`34994`).
+
+* Fixed a regression in Django 4.2 that caused a crash of querysets with
+  aggregations on MariaDB when the ``ONLY_FULL_GROUP_BY`` SQL mode was enabled
+  (:ticket:`34992`).
