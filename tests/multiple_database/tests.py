@@ -2009,12 +2009,9 @@ class FixtureTestCase(TestCase):
         this shouldn't raise an error (#14068).
         """
         new_io = StringIO()
-        management.call_command("loaddata", "pets", stdout=new_io, stderr=new_io)
-        command_output = new_io.getvalue().strip()
-        # No objects will actually be loaded
-        self.assertEqual(
-            command_output, "Installed 0 object(s) (of 2) from 1 fixture(s)"
-        )
+        warn_msg = "No fixture data found for 'pets'. (File format may be invalid.)"
+        with self.assertWarnsMessage(RuntimeWarning, warn_msg):
+            management.call_command("loaddata", "pets", stdout=new_io, stderr=new_io)
 
 
 class PickleQuerySetTestCase(TestCase):

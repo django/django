@@ -1,6 +1,6 @@
 from django.core import serializers
 from django.db import connection
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 from .models import (
     Child,
@@ -13,8 +13,40 @@ from .models import (
 from .tests import register_tests
 
 
+class TestRouter:
+    def allow_migrate(self, db, app_label, **hints):
+        if hints.get("model_name") == "naturalkeyanchor":
+            return db != "other"
+
+
+@override_settings(DATABASE_ROUTERS=[TestRouter()])
+def natural_key_deserializer_multidb_test(self, format):
+    book1 = {
+        "data": "978-1590597255",
+        "title": "The Definitive Guide to Django: Web Development Done Right",
+    }
+    book2 = {"data": "978-1590599969", "title": "Practical Django Projects"}
+
+    # Create books
+    NaturalKeyAnchor.objects.create(**book1)
+    NaturalKeyAnchor.objects.create(**book2)
+
+    # Serialize books.
+    string_data = serializers.serialize(
+        format,
+        NaturalKeyAnchor.objects.all(),
+        indent=2,
+        use_natural_foreign_keys=True,
+        use_natural_primary_keys=True,
+    )
+
+    # Deserialize and test.
+    books = list(serializers.deserialize(format, string_data, using="other"))
+    self.assertEqual(books, [])
+
+
 class NaturalKeySerializerTests(TestCase):
-    pass
+    databases = {"default", "other"}
 
 
 def natural_key_serializer_test(self, format):
@@ -283,4 +315,9 @@ register_tests(
     NaturalKeySerializerTests,
     "test_%s_fk_as_pk_natural_key_not_called",
     fk_as_pk_natural_key_not_called,
+)
+register_tests(
+    NaturalKeySerializerTests,
+    "test_%s_natural_key_deserializer_multidb",
+    natural_key_deserializer_multidb_test,
 )

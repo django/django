@@ -6,7 +6,7 @@ other serializers.
 
 from django.apps import apps
 from django.core.serializers import base
-from django.db import DEFAULT_DB_ALIAS, models
+from django.db import DEFAULT_DB_ALIAS, models, router
 from django.utils.encoding import is_protected_type
 
 
@@ -117,6 +117,9 @@ def Deserializer(
                 continue
             else:
                 raise
+
+        if not router.allow_migrate_model(using, Model):
+            continue
         data = {}
         if "pk" in d:
             try:

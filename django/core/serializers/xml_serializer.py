@@ -10,7 +10,7 @@ from django.apps import apps
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.serializers import base
-from django.db import DEFAULT_DB_ALIAS, models
+from django.db import DEFAULT_DB_ALIAS, models, router
 from django.utils.xmlutils import SimplerXMLGenerator, UnserializableContentError
 
 
@@ -209,7 +209,9 @@ class Deserializer(base.Deserializer):
         for event, node in self.event_stream:
             if event == "START_ELEMENT" and node.nodeName == "object":
                 self.event_stream.expandNode(node)
-                return self._handle_object(node)
+                if (obj := self._handle_object(node)) is None:
+                    continue
+                return obj
         raise StopIteration
 
     def _handle_object(self, node):
@@ -217,6 +219,8 @@ class Deserializer(base.Deserializer):
         # Look up the model using the model loading mechanism. If this fails,
         # bail.
         Model = self._get_model_from_node(node, "model")
+        if not router.allow_migrate_model(self.db, Model):
+            return
 
         # Start building a data dictionary from the object.
         data = {}
