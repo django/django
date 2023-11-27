@@ -259,11 +259,13 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         except NotRegistered:
             return None
         else:
-            ordering = related_admin.get_ordering(request)
-            if ordering is not None and ordering != ():
-                return db_field.remote_field.model._default_manager.using(db).order_by(
-                    *ordering
-                )
+            if related_admin is not None:
+                ordering = related_admin.get_ordering(request)
+                if ordering is not None and ordering != ():
+                    queryset = related_admin.get_queryset(request)
+                    if db:
+                        queryset = queryset.using(db)
+                    return queryset.order_by(*ordering)
         return None
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
