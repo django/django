@@ -1259,6 +1259,7 @@ database.
 
     Also, if you call the database-altering methods
     :meth:`~django.db.models.fields.related.RelatedManager.add`,
+    :meth:`~django.db.models.fields.related.RelatedManager.create`,
     :meth:`~django.db.models.fields.related.RelatedManager.remove`,
     :meth:`~django.db.models.fields.related.RelatedManager.clear` or
     :meth:`~django.db.models.fields.related.RelatedManager.set`, on
