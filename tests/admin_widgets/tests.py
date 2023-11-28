@@ -1717,13 +1717,15 @@ class AdminRawIdWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
 
 class RelatedFieldWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
     def test_ForeignKey_using_to_field(self):
+        from selenium.webdriver import ActionChains
         from selenium.webdriver.common.by import By
         from selenium.webdriver.support.ui import Select
 
         self.admin_login(username="super", password="secret", login_url="/")
-        self.selenium.get(
-            self.live_server_url + reverse("admin:admin_widgets_profile_add")
-        )
+        with self.wait_page_loaded():
+            self.selenium.get(
+                self.live_server_url + reverse("admin:admin_widgets_profile_add")
+            )
 
         main_window = self.selenium.current_window_handle
         # Click the Add User button to add new
@@ -1769,7 +1771,8 @@ class RelatedFieldWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
             By.CSS_SELECTOR, "#id_user option[value=changednewuser]"
         )
 
-        self.selenium.find_element(By.ID, "view_id_user").click()
+        element = self.selenium.find_element(By.ID, "view_id_user")
+        ActionChains(self.selenium).move_to_element(element).click(element).perform()
         self.wait_for_value("#id_username", "changednewuser")
         self.selenium.back()
 
