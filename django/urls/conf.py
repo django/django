@@ -73,7 +73,7 @@ def _path(route, view, kwargs=None, name=None, Pattern=None):
             pattern,
             urlconf_module,
             kwargs,
-            app_name=app_name,
+            app_name=name if name else app_name,
             namespace=namespace,
         )
     elif callable(view):
