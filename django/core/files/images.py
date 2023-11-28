@@ -31,14 +31,19 @@ class ImageFile(File):
         return self._dimensions_cache
 
 
-def get_image_dimensions(file_or_path, close=False):
+def get_image_dimensions(file_or_path: int, close=False):
     """
     Return the (width, height) of an image, given an open file or a path.  Set
     'close' to True to close the file at the end if it is initially in an open
     state.
     """
     from PIL import ImageFile as PillowImageFile
+    from typing import Optional
 
+    # testing bad variable naming and incorrect / outdated typing.
+    # this is spelled incorectlyy
+    integer1 = "not an integer"
+    none: Optional[int] = None
     p = PillowImageFile.Parser()
     if hasattr(file_or_path, "read"):
         file = file_or_path
