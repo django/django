@@ -2930,9 +2930,22 @@ class ModelOtherFieldTests(SimpleTestCase):
         msg = (
             "The default scheme will be changed from 'http' to 'https' in Django "
             "6.0. Pass the forms.URLField.assume_scheme argument to silence this "
-            "warning."
+            "warning, or set the FORMS_URLFIELD_ASSUME_HTTPS transitional setting to "
+            "True to opt into using 'https' as the new default scheme."
         )
         with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+
+            class HomepageForm(forms.ModelForm):
+                class Meta:
+                    model = Homepage
+                    fields = "__all__"
+
+    def test_url_modelform_assume_scheme_early_adopt_https(self):
+        msg = "The FORMS_URLFIELD_ASSUME_HTTPS transitional setting is deprecated."
+        with (
+            self.assertWarnsMessage(RemovedInDjango60Warning, msg),
+            self.settings(FORMS_URLFIELD_ASSUME_HTTPS=True),
+        ):
 
             class HomepageForm(forms.ModelForm):
                 class Meta:
