@@ -16,7 +16,7 @@ from pathlib import Path
 import django
 from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.deprecation import RemovedInDjango51Warning
+from django.utils.deprecation import RemovedInDjango51Warning, RemovedInDjango60Warning
 from django.utils.functional import LazyObject, empty
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
@@ -29,6 +29,11 @@ DEFAULT_FILE_STORAGE_DEPRECATED_MSG = (
 
 STATICFILES_STORAGE_DEPRECATED_MSG = (
     "The STATICFILES_STORAGE setting is deprecated. Use STORAGES instead."
+)
+
+# RemovedInDjango60Warning.
+FORMS_URLFIELD_ASSUME_HTTPS_DEPRECATED_MSG = (
+    "The FORMS_URLFIELD_ASSUME_HTTPS transitional setting is deprecated."
 )
 
 
@@ -205,6 +210,12 @@ class Settings:
                 setattr(self, setting, setting_value)
                 self._explicit_settings.add(setting)
 
+        if self.is_overridden("FORMS_URLFIELD_ASSUME_HTTPS"):
+            warnings.warn(
+                FORMS_URLFIELD_ASSUME_HTTPS_DEPRECATED_MSG,
+                RemovedInDjango60Warning,
+            )
+
         if hasattr(time, "tzset") and self.TIME_ZONE:
             # When we can, attempt to validate the timezone. If we can't find
             # this file, no check happens and it's harmless.
@@ -293,6 +304,11 @@ class UserSettingsHolder:
                 "BACKEND": self.STATICFILES_STORAGE
             }
             warnings.warn(STATICFILES_STORAGE_DEPRECATED_MSG, RemovedInDjango51Warning)
+        if name == "FORMS_URLFIELD_ASSUME_HTTPS":
+            warnings.warn(
+                FORMS_URLFIELD_ASSUME_HTTPS_DEPRECATED_MSG,
+                RemovedInDjango60Warning,
+            )
         super().__setattr__(name, value)
         # RemovedInDjango51Warning.
         if name == "STORAGES":
