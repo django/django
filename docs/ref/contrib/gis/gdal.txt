@@ -1980,7 +1980,7 @@ For instance:
 
     # Read a raster as a file object from a remote source.
     >>> from urllib.request import urlopen
-    >>> dat = urlopen("http://example.com/raster.tif").read()
+    >>> dat = urlopen("https://example.com/raster.tif").read()
     # Instantiate a raster from the bytes object.
     >>> rst = GDALRaster(dat)
     # The name starts with /vsimem/, indicating that the raster lives in the

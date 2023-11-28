@@ -246,7 +246,7 @@ Getting the current domain for full URLs
 
 Django's ``get_absolute_url()`` convention is nice for getting your objects'
 URL without the domain name, but in some cases you might want to display the
-full URL -- with ``http://`` and the domain and everything -- for an object.
+full URL -- with ``https://`` and the domain and everything -- for an object.
 To do this, you can use the sites framework. An example:
 
 .. code-block:: pycon

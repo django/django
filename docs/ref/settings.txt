@@ -2096,7 +2096,7 @@ If you want to use ``{{ MEDIA_URL }}`` in your templates, add
 ``'django.template.context_processors.media'`` in the ``'context_processors'``
 option of :setting:`TEMPLATES`.
 
-Example: ``"http://media.example.com/"``
+Example: ``"https://media.example.com/"``
 
 .. warning::
 
@@ -3478,7 +3478,7 @@ Default: ``None``
 
 URL to use when referring to static files located in :setting:`STATIC_ROOT`.
 
-Example: ``"static/"`` or ``"http://static.example.com/"``
+Example: ``"static/"`` or ``"https://static.example.com/"``
 
 If not ``None``, this will be used as the base path for
 :ref:`asset definitions<form-asset-paths>` (the ``Media`` class) and the
