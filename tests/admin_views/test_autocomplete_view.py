@@ -461,8 +461,8 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
         search = self.selenium.find_element(By.CSS_SELECTOR, ".select2-search__field")
         # Load next page of results by scrolling to the bottom of the list.
-        with self.select2_ajax_wait():
-            for _ in range(PAGINATOR_SIZE + 1):
+        for _ in range(PAGINATOR_SIZE + 1):
+            with self.select2_ajax_wait():
                 search.send_keys(Keys.ARROW_DOWN)
         # All objects are now loaded.
         self.assertCountSeleniumElements(
@@ -532,7 +532,9 @@ class SeleniumTests(AdminSeleniumTestCase):
             with self.select2_ajax_wait():
                 search.send_keys(Keys.ARROW_DOWN)
         self.assertCountSeleniumElements(
-            ".select2-results__option", 31, root_element=result_container
+            ".select2-results__option",
+            PAGINATOR_SIZE + 11,
+            root_element=result_container,
         )
         # Limit the results with the search field.
         with self.select2_ajax_wait():
@@ -540,7 +542,9 @@ class SeleniumTests(AdminSeleniumTestCase):
             # Ajax request is delayed.
             self.assertIs(result_container.is_displayed(), True)
             self.assertCountSeleniumElements(
-                ".select2-results__option", 32, root_element=result_container
+                ".select2-results__option",
+                PAGINATOR_SIZE + 12,
+                root_element=result_container,
             )
         self.assertIs(result_container.is_displayed(), True)
 
