@@ -87,6 +87,7 @@
     font-size: 0.875rem;
     padding: 5px;
     color: var(--body-fg);
+    background: var(--body-bg);
 }
 
 #toolbar #searchbar {
