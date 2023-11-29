@@ -1,4 +1,6 @@
 from django.core.exceptions import FieldDoesNotExist, FieldError
+from django.db.models import FETCH_PEERS, RAISE, lazy_mode
+from django.db.models.lazy import LazyFieldAccess
 from django.test import SimpleTestCase, TestCase
 
 from .models import (
@@ -29,6 +31,7 @@ class DeferTests(AssertionMixin, TestCase):
     def setUpTestData(cls):
         cls.s1 = Secondary.objects.create(first="x1", second="y1")
         cls.p1 = Primary.objects.create(name="p1", value="xx", related=cls.s1)
+        cls.p2 = Primary.objects.create(name="p2", value="yy", related=cls.s1)
 
     def test_defer(self):
         qs = Primary.objects.all()
@@ -141,7 +144,6 @@ class DeferTests(AssertionMixin, TestCase):
     def test_saving_object_with_deferred_field(self):
         # Saving models with deferred fields is possible (but inefficient,
         # since every field has to be retrieved first).
-        Primary.objects.create(name="p2", value="xy", related=self.s1)
         obj = Primary.objects.defer("value").get(name="p2")
         obj.name = "a new name"
         obj.save()
@@ -180,9 +182,39 @@ class DeferTests(AssertionMixin, TestCase):
         self.assertEqual(obj.name, "adonis")
 
     def test_defer_fk_attname(self):
-        primary = Primary.objects.defer("related_id").get()
+        primary = Primary.objects.defer("related_id").get(name="p1")
         with self.assertNumQueries(1):
             self.assertEqual(primary.related_id, self.p1.related_id)
+
+    def test_only_lazy_mode_fetch_peers(self):
+        with lazy_mode(FETCH_PEERS), self.assertNumQueries(2):
+            for p in Primary.objects.only("name"):
+                p.value
+
+    def test_only_lazy_mode_fetch_peers_single(self):
+        with lazy_mode(FETCH_PEERS), self.assertNumQueries(2):
+            p1 = Primary.objects.only("name").get(name="p1")
+            p1.value
+
+    def test_defer_lazy_mode_fetch_peers(self):
+        with lazy_mode(FETCH_PEERS), self.assertNumQueries(2):
+            for p in Primary.objects.defer("value"):
+                p.value
+
+    def test_defer_lazy_mode_fetch_peers_single(self):
+        with lazy_mode(FETCH_PEERS), self.assertNumQueries(2):
+            p1 = Primary.objects.defer("value").get(name="p1")
+            p1.value
+
+    def test_only_lazy_mode_raise(self):
+        msg = "Lazy loading of Primary.value blocked."
+        with self.assertRaisesMessage(LazyFieldAccess, msg), lazy_mode(RAISE):
+            list(Primary.objects.only("name"))[0].value
+
+    def test_defer_lazy_mode_raise(self):
+        msg = "Lazy loading of Primary.value blocked."
+        with self.assertRaisesMessage(LazyFieldAccess, msg), lazy_mode(RAISE):
+            list(Primary.objects.defer("value"))[0].value
 
 
 class BigChildDeferTests(AssertionMixin, TestCase):

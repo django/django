@@ -454,6 +454,13 @@ class ModelState:
     # on the actual save.
     adding = True
     fields_cache = ModelStateFieldsCacheDescriptor()
+    # Sequence of weak references to all instances loaded by the same QuerySet
+    peers = ()
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        state.pop("peers", None)
+        return state
 
 
 class Model(AltersData, metaclass=ModelBase):
@@ -684,8 +691,8 @@ class Model(AltersData, metaclass=ModelBase):
         should be an iterable of field attnames. If fields is None, then
         all non-deferred fields are reloaded.
 
-        When accessing deferred fields of an instance, the deferred loading
-        of the field will call this method.
+        When lazy loading deferred fields for a single instance (not multiple
+        as per FETCH_PEERS), the deferred loading uses this method.
         """
         if fields is None:
             self._prefetched_objects_cache = {}

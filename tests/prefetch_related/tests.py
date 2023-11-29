@@ -5,6 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import NotSupportedError, connection
 from django.db.models import Prefetch, QuerySet, prefetch_related_objects
 from django.db.models.fields.related import ForwardManyToOneDescriptor
+from django.db.models.lazy import RAISE, lazy_mode
 from django.db.models.query import get_prefetcher, prefetch_one_level
 from django.db.models.sql import Query
 from django.test import (
@@ -106,6 +107,11 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
 
         normal_books = [a.first_book for a in Author.objects.all()]
         self.assertEqual(books, normal_books)
+
+    @lazy_mode(RAISE)
+    def test_lazy_mode_raise(self):
+        authors = list(Author.objects.prefetch_related("first_book"))
+        authors[0].first_book  # No exception, already loaded
 
     def test_foreignkey_reverse(self):
         with self.assertNumQueries(2):
