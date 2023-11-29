@@ -224,7 +224,8 @@ class DeferredAttribute:
                     raise AttributeError(
                         "Cannot read a generated field from an unsaved model."
                     )
-                instance.refresh_from_db(fields=[field_name])
+
+                instance._state.fetch_mode.fetch(self, instance)
             else:
                 data[field_name] = val
         return data[field_name]
@@ -240,6 +241,20 @@ class DeferredAttribute:
         if self.field.primary_key and self.field != link_field:
             return getattr(instance, link_field.attname)
         return None
+
+    def fetch_one(self, instance):
+        instance.refresh_from_db(fields=[self.field.attname])
+
+    def fetch_many(self, instances):
+        attname = self.field.attname
+        value_by_pk = {
+            pk: value
+            for pk, value in self.field.model._base_manager.db_manager()
+            .filter(pk__in={i.pk for i in instances})
+            .values_list("pk", attname)
+        }
+        for instance in instances:
+            setattr(instance, attname, value_by_pk[instance.pk])
 
 
 class class_or_instance_method:
