@@ -1,7 +1,8 @@
 from datetime import date
 from decimal import Decimal
 
-from django.core.exceptions import FieldDoesNotExist
+from django.core.exceptions import FieldDoesNotExist, FieldFetchBlocked
+from django.db.models import FETCH_PEERS, RAISE
 from django.db.models.query import RawQuerySet
 from django.test import TestCase, skipUnlessDBFeature
 
@@ -158,6 +159,22 @@ class RawQueryTests(TestCase):
         books = Book.objects.all()
         self.assertSuccessfulRawQuery(Book, query, books)
 
+    def test_fk_fetch_mode_peers(self):
+        query = "SELECT * FROM raw_query_book"
+        books = list(Book.objects.fetch_mode(FETCH_PEERS).raw(query))
+        with self.assertNumQueries(1):
+            books[0].author
+            books[1].author
+
+    def test_fk_fetch_mode_raise(self):
+        query = "SELECT * FROM raw_query_book"
+        books = list(Book.objects.fetch_mode(RAISE).raw(query))
+        msg = "Fetching of Book.author blocked."
+        with self.assertRaisesMessage(FieldFetchBlocked, msg) as cm:
+            books[0].author
+        self.assertIsNone(cm.exception.__cause__)
+        self.assertTrue(cm.exception.__suppress_context__)
+
     def test_db_column_handler(self):
         """
         Test of a simple raw query against a model containing a field with
@@ -293,6 +310,23 @@ class RawQueryTests(TestCase):
         msg = "Raw query must include the primary key"
         with self.assertRaisesMessage(FieldDoesNotExist, msg):
             list(Author.objects.raw(query))
+
+    def test_missing_fields_fetch_mode_peers(self):
+        query = "SELECT id, first_name, dob FROM raw_query_author"
+        authors = list(Author.objects.fetch_mode(FETCH_PEERS).raw(query))
+        with self.assertNumQueries(1):
+            authors[0].last_name
+            authors[1].last_name
+
+    def test_missing_fields_fetch_mode_raise(self):
+        query = "SELECT id, first_name, dob FROM raw_query_author"
+        authors = list(Author.objects.fetch_mode(RAISE).raw(query))
+        msg = "Fetching of Author.last_name blocked."
+        with self.assertRaisesMessage(FieldFetchBlocked, msg) as cm:
+            authors[0].last_name
+        self.assertIsNone(cm.exception.__cause__)
+        self.assertTrue(cm.exception.__suppress_context__)
+        self.assertTrue(cm.exception.__suppress_context__)
 
     def test_annotations(self):
         query = (

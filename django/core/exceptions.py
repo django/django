@@ -132,6 +132,12 @@ class FieldError(Exception):
     pass
 
 
+class FieldFetchBlocked(FieldError):
+    """On-demand fetching of a model field blocked."""
+
+    pass
+
+
 NON_FIELD_ERRORS = "__all__"
 
 

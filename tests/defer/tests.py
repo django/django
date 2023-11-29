@@ -1,4 +1,5 @@
-from django.core.exceptions import FieldDoesNotExist, FieldError
+from django.core.exceptions import FieldDoesNotExist, FieldError, FieldFetchBlocked
+from django.db.models import FETCH_PEERS, RAISE
 from django.test import SimpleTestCase, TestCase
 
 from .models import (
@@ -29,6 +30,7 @@ class DeferTests(AssertionMixin, TestCase):
     def setUpTestData(cls):
         cls.s1 = Secondary.objects.create(first="x1", second="y1")
         cls.p1 = Primary.objects.create(name="p1", value="xx", related=cls.s1)
+        cls.p2 = Primary.objects.create(name="p2", value="yy", related=cls.s1)
 
     def test_defer(self):
         qs = Primary.objects.all()
@@ -141,7 +143,6 @@ class DeferTests(AssertionMixin, TestCase):
     def test_saving_object_with_deferred_field(self):
         # Saving models with deferred fields is possible (but inefficient,
         # since every field has to be retrieved first).
-        Primary.objects.create(name="p2", value="xy", related=self.s1)
         obj = Primary.objects.defer("value").get(name="p2")
         obj.name = "a new name"
         obj.save()
@@ -181,9 +182,70 @@ class DeferTests(AssertionMixin, TestCase):
         self.assertEqual(obj.name, "adonis")
 
     def test_defer_fk_attname(self):
-        primary = Primary.objects.defer("related_id").get()
+        primary = Primary.objects.defer("related_id").get(name="p1")
         with self.assertNumQueries(1):
             self.assertEqual(primary.related_id, self.p1.related_id)
+
+    def test_only_fetch_mode_fetch_peers(self):
+        p1, p2 = Primary.objects.fetch_mode(FETCH_PEERS).only("name")
+        with self.assertNumQueries(1):
+            p1.value
+        with self.assertNumQueries(0):
+            p2.value
+
+    def test_only_fetch_mode_fetch_peers_single(self):
+        p1 = Primary.objects.fetch_mode(FETCH_PEERS).only("name").get(name="p1")
+        with self.assertNumQueries(1):
+            p1.value
+
+    def test_defer_fetch_mode_fetch_peers(self):
+        p1, p2 = Primary.objects.fetch_mode(FETCH_PEERS).defer("value")
+        with self.assertNumQueries(1):
+            p1.value
+        with self.assertNumQueries(0):
+            p2.value
+
+    def test_defer_fetch_mode_fetch_peers_single(self):
+        p1 = Primary.objects.fetch_mode(FETCH_PEERS).defer("value").get(name="p1")
+        with self.assertNumQueries(1):
+            p1.value
+
+    def test_only_fetch_mode_raise(self):
+        p1 = Primary.objects.fetch_mode(RAISE).only("name").get(name="p1")
+        msg = "Fetching of Primary.value blocked."
+        with self.assertRaisesMessage(FieldFetchBlocked, msg) as cm:
+            p1.value
+        self.assertIsNone(cm.exception.__cause__)
+        self.assertTrue(cm.exception.__suppress_context__)
+
+    def test_defer_fetch_mode_raise(self):
+        p1 = Primary.objects.fetch_mode(RAISE).defer("value").get(name="p1")
+        msg = "Fetching of Primary.value blocked."
+        with self.assertRaisesMessage(FieldFetchBlocked, msg) as cm:
+            p1.value
+        self.assertIsNone(cm.exception.__cause__)
+        self.assertTrue(cm.exception.__suppress_context__)
+
+
+class DeferOtherDatabaseTests(TestCase):
+    databases = {"other"}
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.s1 = Secondary.objects.using("other").create(first="x1", second="y1")
+        cls.p1 = Primary.objects.using("other").create(
+            name="p1", value="xx", related=cls.s1
+        )
+        cls.p2 = Primary.objects.using("other").create(
+            name="p2", value="yy", related=cls.s1
+        )
+
+    def test_defer_fetch_mode_fetch_peers(self):
+        p1, p2 = Primary.objects.using("other").fetch_mode(FETCH_PEERS).defer("value")
+        with self.assertNumQueries(1, using="other"):
+            p1.value
+        with self.assertNumQueries(0, using="other"):
+            p2.value
 
 
 class BigChildDeferTests(AssertionMixin, TestCase):
