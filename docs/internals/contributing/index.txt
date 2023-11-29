@@ -11,25 +11,34 @@ Work on the Django framework
 
 The work on Django itself falls into three major areas:
 
-**Writing code** 💻
-    Fix a bug, or add a new feature. You can make a pull request and see **your
-    code** in the next version of Django!
+Writing code 💻
+---------------
 
-    Start from the :doc:`writing-code/index` docs.
+Fix a bug, or add a new feature. You can make a pull request and see **your
+code** in the next version of Django!
 
-**Writing documentation** ✍️
-    Django's documentation is one of its key strengths. It's informative
-    and thorough. You can help to improve the documentation and keep it
-    relevant as the framework evolves.
+Start from the :doc:`writing-code/index` docs.
 
-    See :doc:`writing-documentation` for more.
+Writing documentation ✍️
+------------------------
 
-**Localizing Django** 🗺️
-    Django is translated into over 100 languages - There's even some
-    translation for Klingon?! The i18n team is always looking for translators
-    to help maintain and increase language reach.
+Django's documentation is one of its key strengths. It's informative and
+thorough. You can help to improve the documentation and keep it relevant as the
+framework evolves.
 
-    See :doc:`localizing` to help translate Django.
+See :doc:`writing-documentation` for more.
+
+Localizing Django 🗺️
+--------------------
+
+Django is translated into over 100 languages - There's even some translation
+for Klingon?! The i18n team is always looking for translators to help maintain
+and increase language reach.
+
+See :doc:`localizing` to help translate Django.
+
+Contributing guide 📖
+=====================
 
 If you think working *with* Django is fun, wait until you start working *on*
 it. Really, **ANYONE** can do something to help make Django better and greater!
