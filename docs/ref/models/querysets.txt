@@ -1031,6 +1031,24 @@ Uses SQL's ``EXCEPT`` operator to keep only elements present in the
 
 See :meth:`union` for some restrictions.
 
+``fetch_mode()``
+~~~~~~~~~~~~~~~~
+
+.. versionadded:: 6.0
+
+.. method:: fetch_mode(mode)
+
+Sets the :doc:`fetch mode </topics/db/fetch-modes>` for model instances created
+by this ``QuerySet``. Use this to control on-demand loading of fields when they
+are accessed, such as foreign keys and deferred fields. For example, to use
+the :attr:`~django.db.models.FETCH_PEERS` mode:
+
+.. code-block:: python
+
+    from django.db.models import FETCH_PEERS
+
+    books = Book.objects.fetch_mode(FETCH_PEERS)
+
 ``select_related()``
 ~~~~~~~~~~~~~~~~~~~~
 
