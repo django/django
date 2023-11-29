@@ -363,7 +363,7 @@ class HttpRequest:
 
         selected_parser = None
         for parser in parser_list:
-            if self.content_type == parser.media_type:
+            if parser.can_handle(self.content_type):
                 selected_parser = parser
                 break
 

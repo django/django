@@ -8,6 +8,9 @@ from django.utils.datastructures import ImmutableList, MultiValueDict
 class BaseParser:
     media_type = None
 
+    def can_handle(self, media_type):
+        return media_type == self.media_type
+
     def parse(self, request):
         pass
 
