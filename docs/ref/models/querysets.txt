@@ -1022,15 +1022,38 @@ Uses SQL's ``EXCEPT`` operator to keep only elements present in the
 
 See :meth:`union` for some restrictions.
 
+``fetch_mode()``
+~~~~~~~~~~~~~~~~
+
+.. versionadded:: 6.1
+
+.. method:: fetch_mode(mode)
+
+Returns a ``QuerySet`` that sets the given fetch mode for all model instances
+created by this ``QuerySet``. The fetch mode controls on-demand loading of
+fields when they are accessed, such as for foreign keys and deferred fields.
+For example, to use the :attr:`~django.db.models.FETCH_PEERS` mode to
+batch-load all related objects on first access:
+
+.. code-block:: python
+
+    from django.db import models
+
+    books = Book.objects.fetch_mode(models.FETCH_PEERS)
+
+See more in the :doc:`fetch mode topic guide </topics/db/fetch-modes>`.
+
 ``select_related()``
 ~~~~~~~~~~~~~~~~~~~~
 
 .. method:: select_related(*fields)
 
-Returns a ``QuerySet`` that will "follow" foreign-key relationships, selecting
-additional related-object data when it executes its query. This is a
-performance booster which results in a single more complex query but means
-later use of foreign-key relationships won't require database queries.
+Returns a ``QuerySet`` that will join in the named foreign-key relationships,
+selecting additional related objects when it executes its query. This method
+can be a performance booster, fetching data ahead of time rather than
+triggering on-demand loading through the model instances'
+:doc:`fetch mode </topics/db/fetch-modes>`, at the cost of a more complex
+initial query.
 
 The following examples illustrate the difference between plain lookups and
 ``select_related()`` lookups. Here's standard lookup::
@@ -1050,20 +1073,8 @@ And here's ``select_related`` lookup::
     # in the previous query.
     b = e.blog
 
-You can use ``select_related()`` with any queryset of objects::
-
-    from django.utils import timezone
-
-    # Find all the blogs with entries scheduled to be published in the future.
-    blogs = set()
-
-    for e in Entry.objects.filter(pub_date__gt=timezone.now()).select_related("blog"):
-        # Without select_related(), this would make a database query for each
-        # loop iteration in order to fetch the related blog for each entry.
-        blogs.add(e.blog)
-
-The order of ``filter()`` and ``select_related()`` chaining isn't important.
-These querysets are equivalent::
+You can use ``select_related()`` with any queryset. The order of chaining with
+other methods isn't important. For example, these querysets are equivalent::
 
     Entry.objects.filter(pub_date__gt=timezone.now()).select_related("blog")
     Entry.objects.select_related("blog").filter(pub_date__gt=timezone.now())
@@ -1141,12 +1152,15 @@ that is that ``select_related('foo', 'bar')`` is equivalent to
 
 .. method:: prefetch_related(*lookups)
 
-Returns a ``QuerySet`` that will automatically retrieve, in a single batch,
-related objects for each of the specified lookups.
+Returns a ``QuerySet`` that will automatically retrieve the given lookups, each
+in one extra batch query. Prefetching is a way to optimize database access
+when you know you'll be accessing related objects later, so you can avoid
+triggering the on-demand loading behavior of the model instances'
+:doc:`fetch mode </topics/db/fetch-modes>`.
 
-This has a similar purpose to ``select_related``, in that both are designed to
-stop the deluge of database queries that is caused by accessing related
-objects, but the strategy is quite different.
+This method has a similar purpose to :meth:`select_related`, in that both are
+designed to eagerly fetch related objects. However, they work in different
+ways.
 
 ``select_related`` works by creating an SQL join and including the fields of
 the related object in the ``SELECT`` statement. For this reason,
