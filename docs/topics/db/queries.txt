@@ -1702,6 +1702,12 @@ the link from the related model to the model that defines the relationship.
 For example, a ``Blog`` object ``b`` has a manager that returns all related
 ``Entry`` objects in the ``entry_set`` attribute: ``b.entry_set.all()``.
 
+These accessors may be prefetched by the ``QuerySet`` methods
+:meth:`~django.db.models.query.QuerySet.select_related` or
+:meth:`~django.db.models.query.QuerySet.prefetch_related`. If not prefetched,
+access will trigger an on-demand fetch through the model's
+:doc:`fetch mode </topics/db/fetch-modes>`.
+
 All examples in this section use the sample ``Blog``, ``Author`` and ``Entry``
 models defined at the top of this page.
 
