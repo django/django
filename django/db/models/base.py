@@ -32,6 +32,7 @@ from django.db.models import NOT_PROVIDED, ExpressionWrapper, IntegerField, Max,
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import CASCADE, Collector
 from django.db.models.expressions import DatabaseDefault
+from django.db.models.fetch_modes import FETCH_ONE
 from django.db.models.fields.composite import CompositePrimaryKey
 from django.db.models.fields.related import (
     ForeignObjectRel,
@@ -466,6 +467,14 @@ class ModelStateFieldsCacheDescriptor:
         return res
 
 
+class ModelStateFetchModeDescriptor:
+    def __get__(self, instance, cls=None):
+        if instance is None:
+            return self
+        res = instance.fetch_mode = FETCH_ONE
+        return res
+
+
 class ModelState:
     """Store model instance state."""
 
@@ -476,6 +485,14 @@ class ModelState:
     # on the actual save.
     adding = True
     fields_cache = ModelStateFieldsCacheDescriptor()
+    fetch_mode = ModelStateFetchModeDescriptor()
+    peers = ()
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        # Weak references can't be pickled.
+        state.pop("peers", None)
+        return state
 
 
 class Model(AltersData, metaclass=ModelBase):
@@ -595,7 +612,7 @@ class Model(AltersData, metaclass=ModelBase):
         post_init.send(sender=cls, instance=self)
 
     @classmethod
-    def from_db(cls, db, field_names, values):
+    def from_db(cls, db, field_names, values, *, fetch_mode=None):
         if len(values) != len(cls._meta.concrete_fields):
             values_iter = iter(values)
             values = [
@@ -605,6 +622,8 @@ class Model(AltersData, metaclass=ModelBase):
         new = cls(*values)
         new._state.adding = False
         new._state.db = db
+        if fetch_mode is not None:
+            new._state.fetch_mode = fetch_mode
         return new
 
     def __repr__(self):
@@ -714,8 +733,8 @@ class Model(AltersData, metaclass=ModelBase):
         should be an iterable of field attnames. If fields is None, then
         all non-deferred fields are reloaded.
 
-        When accessing deferred fields of an instance, the deferred loading
-        of the field will call this method.
+        When fetching deferred fields for a single instance (the FETCH_ONE
+        fetch mode), the deferred loading uses this method.
         """
         if fields is None:
             self._prefetched_objects_cache = {}

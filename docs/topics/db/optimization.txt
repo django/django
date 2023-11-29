@@ -196,28 +196,46 @@ thousands of records are returned. The penalty will be compounded if the
 database lives on a separate server, where network overhead and latency also
 play a factor.
 
-Retrieve everything at once if you know you will need it
-========================================================
+Retrieve related objects efficiently
+====================================
 
-Hitting the database multiple times for different parts of a single 'set' of
-data that you will need all parts of is, in general, less efficient than
-retrieving it all in one query. This is particularly important if you have a
-query that is executed in a loop, and could therefore end up doing many
-database queries, when only one was needed. So:
+Generally, accessing the database multiple times to retrieve different parts
+of a single "set" of data is less efficient than retrieving it all in one
+query. This is particularly important if you have a query that is executed in a
+loop, and could therefore end up doing many database queries, when only one
+is needed. Below are some techniques to combine queries for efficiency.
+
+Use the ``FETCH_PEERS`` fetch mode
+----------------------------------
+
+Use the :attr:`~django.db.models.FETCH_PEERS` fetch mode to make on-demand
+field access more efficient with bulk-fetching. Enable all it for all usage of
+your models :ref:`with a custom manager <fetch-modes-custom-manager>`.
+
+Using this fetch mode is easier than declaring fields to fetch with
+:meth:`~django.db.models.query.QuerySet.select_related` or
+:meth:`~django.db.models.query.QuerySet.prefetch_related`, especially when it's
+hard to predict which fields will be accessed.
 
 Use ``QuerySet.select_related()`` and ``prefetch_related()``
 ------------------------------------------------------------
 
-Understand :meth:`~django.db.models.query.QuerySet.select_related` and
-:meth:`~django.db.models.query.QuerySet.prefetch_related` thoroughly, and use
-them:
+When the :attr:`~django.db.models.FETCH_PEERS` fetch mode is not appropriate or
+efficient enough, use :meth:`~django.db.models.query.QuerySet.select_related`
+and :meth:`~django.db.models.query.QuerySet.prefetch_related`. Understand their
+documentation thoroughly and apply them where needed.
 
-* in :doc:`managers and default managers </topics/db/managers>` where
-  appropriate. Be aware when your manager is and is not used; sometimes this is
-  tricky so don't make assumptions.
+It may be useful to apply these methods in :doc:`managers and default managers
+</topics/db/managers>`. Be aware when your manager is and is not used;
+sometimes this is tricky so don't make assumptions.
 
-* in view code or other layers, possibly making use of
-  :func:`~django.db.models.prefetch_related_objects` where needed.
+Use ``prefetch_related_objects()``
+----------------------------------
+
+Where :attr:`~django.db.models.query.QuerySet.prefetch_related` would be useful
+after the queryset has been evaluated, use
+:func:`~django.db.models.prefetch_related_objects` to execute an extra
+prefetch.
 
 Don't retrieve things you don't need
 ====================================
