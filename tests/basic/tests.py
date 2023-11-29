@@ -777,6 +777,7 @@ class ManagerTest(SimpleTestCase):
         "alatest",
         "aupdate",
         "aupdate_or_create",
+        "fetch_mode",
     ]
 
     def test_manager_methods(self):
