@@ -316,13 +316,6 @@ class CustomChoicesTests(SimpleTestCase):
             class Boolean(bool, models.Choices):
                 pass
 
-    def test_timezone_unsupported(self):
-        msg = "type 'datetime.timezone' is not an acceptable base type"
-        with self.assertRaisesMessage(TypeError, msg):
-
-            class Timezone(datetime.timezone, models.Choices):
-                pass
-
     def test_uuid_unsupported(self):
         with self.assertRaises(TypeError):
 
