@@ -225,16 +225,6 @@ class GeoIP2:
         else:
             return None
 
-    # #### GeoIP Database Information Routines ####
-    @property
-    def info(self):
-        "Return information about the GeoIP library and databases in use."
-        meta = self._reader.metadata()
-        return "GeoIP Library:\n\t%s.%s\n" % (
-            meta.binary_format_major_version,
-            meta.binary_format_minor_version,
-        )
-
     @classmethod
     def open(cls, full_path, cache):
         return GeoIP2(full_path, cache)
