@@ -53,7 +53,8 @@
 
 .selector .selector-filter {
     border: 1px solid var(--border-color);
-    border-width: 0 1px;
+    border-block-width: 0;
+    border-inline-width: 1px;
     padding: 8px;
     color: var(--body-quiet-color);
     font-size: 0.625rem;
