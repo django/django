@@ -87,7 +87,7 @@ html[data-theme="light"],
 }
 
 html, body {
-    height: 100%;
+    block-size: 100%;
 }
 
 body {
@@ -131,7 +131,8 @@ a.section:focus, a.section:hover {
 /* GLOBAL DEFAULTS */
 
 p, ol, ul, dl {
-    margin: .2em 0 .8em 0;
+    margin-block: .2em .8em;
+    margin-inline: 0;
 }
 
 p {
@@ -144,7 +145,8 @@ h1,h2,h3,h4,h5 {
 }
 
 h1 {
-    margin: 0 0 20px;
+    margin-block: 0 20px;
+    margin-inline: 0;
     font-weight: 300;
     font-size: 1.25rem;
     color: var(--body-quiet-color);
@@ -152,30 +154,34 @@ h1 {
 
 h2 {
     font-size: 1rem;
-    margin: 1em 0 .5em 0;
+    margin-block: 1em .5em;
+    margin-inline: 0;
 }
 
 h2.subhead {
     font-weight: normal;
-    margin-top: 0;
+    margin-block-start: 0;
 }
 
 h3 {
     font-size: 0.875rem;
-    margin: .8em 0 .3em 0;
+    margin-block: .8em .3em;
+    margin-inline: 0;
     color: var(--body-quiet-color);
     font-weight: bold;
 }
 
 h4 {
     font-size: 0.75rem;
-    margin: 1em 0 .8em 0;
-    padding-bottom: 3px;
+    margin-block: 1em .8em;
+    margin-inline: 0;
+    padding-block-end: 3px;
 }
 
 h5 {
     font-size: 0.625rem;
-    margin: 1.5em 0 .5em 0;
+    margin-block: 1.5em .5em;
+    margin-inline: 0;
     color: var(--body-quiet-color);
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -183,11 +189,12 @@ h5 {
 
 ul > li {
     list-style-type: square;
-    padding: 1px 0;
+    padding-block: 1px;
+    padding-inline: 0;
 }
 
 li ul {
-    margin-bottom: 0;
+    margin-block-end: 0;
 }
 
 li, dt, dd {
@@ -197,11 +204,11 @@ li, dt, dd {
 
 dt {
     font-weight: bold;
-    margin-top: 4px;
+    margin-block-start: 4px;
 }
 
 dd {
-    margin-left: 0;
+    margin-inline-start: 0;
 }
 
 form {
@@ -211,31 +218,32 @@ form {
 
 fieldset {
     margin: 0;
-    min-width: 0;
+    min-inline-size: 0;
     padding: 0;
     border: none;
-    border-top: 1px solid var(--hairline-color);
+    border-block-start: 1px solid var(--hairline-color);
 }
 
 blockquote {
     font-size: 0.6875rem;
     color: #777;
-    margin-left: 2px;
-    padding-left: 10px;
-    border-left: 5px solid #ddd;
+    margin-inline-start: 2px;
+    padding-inline-start: 10px;
+    border-inline-start: 5px solid #ddd;
 }
 
 code, pre {
     font-family: var(--font-family-monospace);
     color: var(--body-quiet-color);
     font-size: 0.75rem;
-    overflow-x: auto;
+    overflow-inline: auto;
 }
 
 pre.literal-block {
     margin: 10px;
     background: var(--darkened-bg);
-    padding: 6px 8px;
+    padding-block: 6px;
+    padding-inline: 8px;
 }
 
 code strong {
@@ -246,7 +254,7 @@ hr {
     clear: both;
     color: var(--hairline-color);
     background-color: var(--hairline-color);
-    height: 1px;
+    block-size: 1px;
     border: none;
     margin: 0;
     padding: 0;
@@ -269,7 +277,7 @@ hr {
 }
 
 div.help ul {
-     margin-bottom: 0;
+     margin-block-end: 0;
 }
 
 .help-tooltip {
@@ -307,30 +315,31 @@ table {
 td, th {
     font-size: 0.8125rem;
     line-height: 1rem;
-    border-bottom: 1px solid var(--hairline-color);
+    border-block-end: 1px solid var(--hairline-color);
     vertical-align: top;
     padding: 8px;
 }
 
 th {
     font-weight: 600;
-    text-align: left;
+    text-align: start;
 }
 
 thead th,
 tfoot td {
     color: var(--body-quiet-color);
-    padding: 5px 10px;
+    padding-block: 5px;
+    padding-inline: 10px;
     font-size: 0.6875rem;
     background: var(--body-bg);
     border: none;
-    border-top: 1px solid var(--hairline-color);
-    border-bottom: 1px solid var(--hairline-color);
+    border-block-start: 1px solid var(--hairline-color);
+    border-block-end: 1px solid var(--hairline-color);
 }
 
 tfoot td {
-    border-bottom: none;
-    border-top: 1px solid var(--hairline-color);
+    border-block-end: none;
+    border-block-start: 1px solid var(--hairline-color);
 }
 
 thead th.required {
@@ -355,7 +364,8 @@ tr:nth-child(odd) + .row-form-errors .errorlist {
 /* SORTABLE TABLES */
 
 thead th {
-    padding: 5px 10px;
+    padding-block: 5px;
+    padding-inline: 10px;
     line-height: normal;
     text-transform: uppercase;
     background: var(--darkened-bg);
@@ -370,18 +380,20 @@ thead th.sorted {
 }
 
 thead th.sorted .text {
-    padding-right: 42px;
+    padding-inline-end: 42px;
 }
 
 table thead th .text span {
-    padding: 8px 10px;
+    padding-block: 8px;
+    padding-inline: 10px;
     display: block;
 }
 
 table thead th .text a {
     display: block;
     cursor: pointer;
-    padding: 8px 10px;
+    padding-block: 8px;
+    padding-inline: 10px;
 }
 
 table thead th .text a:focus, table thead th .text a:hover {
@@ -398,24 +410,25 @@ table thead th.sorted:hover a.sortremove {
 
 table thead th.sorted .sortoptions {
     display: block;
-    padding: 9px 5px 0 5px;
-    float: right;
-    text-align: right;
+    padding-block: 9px 0;
+    padding-inline: 5px;
+    float: inline-end;
+    text-align: end;
 }
 
 table thead th.sorted .sortpriority {
     font-size: .8em;
-    min-width: 12px;
+    min-inline-size: 12px;
     text-align: center;
     vertical-align: 3px;
-    margin-left: 2px;
-    margin-right: 2px;
+    margin-inline-start: 2px;
+    margin-inline-end: 2px;
 }
 
 table thead th.sorted .sortoptions a {
     position: relative;
-    width: 14px;
-    height: 14px;
+    inline-size: 14px;
+    block-size: 14px;
     display: inline-block;
     background: url(../img/sorting-icons.svg) 0 0 no-repeat;
     background-size: 14px auto;
@@ -428,8 +441,8 @@ table thead th.sorted .sortoptions a.sortremove {
 table thead th.sorted .sortoptions a.sortremove:after {
     content: '\\';
     position: absolute;
-    top: -6px;
-    left: 3px;
+    inset-block-start: -6px;
+    inset-inline-start: 3px;
     font-weight: 200;
     font-size: 1.125rem;
     color: var(--body-quiet-color);
@@ -455,7 +468,7 @@ table thead th.sorted .sortoptions a.ascending:hover {
 }
 
 table thead th.sorted .sortoptions a.descending {
-    top: 1px;
+    inset-block-start: 1px;
     background-position: 0 -56px;
 }
 
@@ -467,15 +480,18 @@ table thead th.sorted .sortoptions a.descending:hover {
 /* FORM DEFAULTS */
 
 input, textarea, select, .form-row p, form .button {
-    margin: 2px 0;
-    padding: 2px 3px;
+    margin-block: 2px;
+    margin-inline: 0;
+    padding-block: 2px;
+    padding-inline: 3px;
     vertical-align: middle;
     font-family: var(--font-family-primary);
     font-weight: normal;
     font-size: 0.8125rem;
 }
 .form-row div.help {
-    padding: 2px 3px;
+    padding-block: 2px;
+    padding-inline: 3px;
 }
 
 textarea {
@@ -486,8 +502,9 @@ input[type=text], input[type=password], input[type=email], input[type=url],
 input[type=number], input[type=tel], textarea, select, .vTextField {
     border: 1px solid var(--border-color);
     border-radius: 4px;
-    padding: 5px 6px;
-    margin-top: 0;
+    padding-block: 5px;
+    padding-inline: 6px;
+    margin-block-start: 0;
     color: var(--body-fg);
     background-color: var(--body-bg);
 }
@@ -499,20 +516,21 @@ textarea:focus, select:focus, .vTextField:focus {
 }
 
 select {
-    height: 1.875rem;
+    block-size: 1.875rem;
 }
 
 select[multiple] {
     /* Allow HTML size attribute to override the height in the rule above. */
-    height: auto;
-    min-height: 150px;
+    block-size: auto;
+    min-block-size: 150px;
 }
 
 /* FORM BUTTONS */
 
 .button, input[type=submit], input[type=button], .submit-row input, a.button {
     background: var(--button-bg);
-    padding: 10px 15px;
+    padding-block: 10px;
+    padding-inline: 15px;
     border: none;
     border-radius: 4px;
     color: var(--button-fg);
@@ -521,7 +539,8 @@ select[multiple] {
 }
 
 a.button {
-    padding: 4px 5px;
+    padding-block: 4px;
+    padding-inline: 5px;
 }
 
 .button:active, input[type=submit]:active, input[type=button]:active,
@@ -557,25 +576,25 @@ input[type=button][disabled].default {
 
 .module {
     border: none;
-    margin-bottom: 30px;
+    margin-block-end: 30px;
     background: var(--body-bg);
 }
 
 .module p, .module ul, .module h3, .module h4, .module dl, .module pre {
-    padding-left: 10px;
-    padding-right: 10px;
+    padding-inline-start: 10px;
+    padding-inline-end: 10px;
 }
 
 .module blockquote {
-    margin-left: 12px;
+    margin-inline-start: 12px;
 }
 
 .module ul, .module ol {
-    margin-left: 1.5em;
+    margin-inline-start: 1.5em;
 }
 
 .module h3 {
-    margin-top: .6em;
+    margin-block-start: .6em;
 }
 
 .module h2, .module caption, .inline-group h2 {
@@ -583,7 +602,7 @@ input[type=button][disabled].default {
     padding: 8px;
     font-weight: 400;
     font-size: 0.8125rem;
-    text-align: left;
+    text-align: start;
     background: var(--header-bg);
     color: var(--header-link-color);
 }
@@ -610,8 +629,10 @@ ul.messagelist li {
     display: block;
     font-weight: 400;
     font-size: 0.8125rem;
-    padding: 10px 10px 10px 65px;
-    margin: 0 0 10px 0;
+    padding-block: 10px;
+    padding-inline: 65px 10px;
+    margin-block: 0 10px;
+    margin-inline: 0;
     background: var(--message-success-bg) url(../img/icon-yes.svg) 40px 12px no-repeat;
     background-size: 16px auto;
     color: var(--body-fg);
@@ -632,8 +653,10 @@ ul.messagelist li.error {
     font-size: 0.875rem;
     font-weight: 700;
     display: block;
-    padding: 10px 12px;
-    margin: 0 0 10px 0;
+    padding-block: 10px;
+    padding-inline: 12px;
+    margin-block: 0 10px;
+    margin-inline: 0;
     color: var(--error-fg);
     border: 1px solid var(--error-fg);
     border-radius: 4px;
@@ -643,7 +666,8 @@ ul.messagelist li.error {
 }
 
 ul.errorlist {
-    margin: 0 0 4px;
+    margin-block: 0 4px;
+    margin-inline: 0;
     padding: 0;
     color: var(--error-fg);
     background: var(--body-bg);
@@ -652,12 +676,12 @@ ul.errorlist {
 ul.errorlist li {
     font-size: 0.8125rem;
     display: block;
-    margin-bottom: 4px;
+    margin-block-end: 4px;
     overflow-wrap: break-word;
 }
 
 ul.errorlist li:first-child {
-    margin-top: 0;
+    margin-block-start: 0;
 }
 
 ul.errorlist li a {
@@ -677,12 +701,12 @@ td ul.errorlist li {
 .form-row.errors {
     margin: 0;
     border: none;
-    border-bottom: 1px solid var(--hairline-color);
+    border-block-end: 1px solid var(--hairline-color);
     background: none;
 }
 
 .form-row.errors ul.errorlist li {
-    padding-left: 0;
+    padding-inline-start: 0;
 }
 
 .errors input, .errors select, .errors textarea,
@@ -692,17 +716,19 @@ td ul.errorlist + input, td ul.errorlist + select, td ul.errorlist + textarea {
 
 .description {
     font-size: 0.75rem;
-    padding: 5px 0 0 12px;
+    padding-block: 5px 0;
+    padding-inline: 12px 0;
 }
 
 /* BREADCRUMBS */
 
 div.breadcrumbs {
     background: var(--breadcrumbs-bg);
-    padding: 10px 40px;
+    padding-block: 10px;
+    padding-inline: 40px;
     border: none;
     color: var(--breadcrumbs-fg);
-    text-align: left;
+    text-align: start;
 }
 
 div.breadcrumbs a {
@@ -716,27 +742,27 @@ div.breadcrumbs a:focus, div.breadcrumbs a:hover {
 /* ACTION ICONS */
 
 .viewlink, .inlineviewlink {
-    padding-left: 16px;
+    padding-inline-start: 16px;
     background: url(../img/icon-viewlink.svg) 0 1px no-repeat;
 }
 
 .hidelink {
-    padding-left: 16px;
+    padding-inline-start: 16px;
     background: url(../img/icon-hidelink.svg) 0 1px no-repeat;
 }
 
 .addlink {
-    padding-left: 16px;
+    padding-inline-start: 16px;
     background: url(../img/icon-addlink.svg) 0 1px no-repeat;
 }
 
 .changelink, .inlinechangelink {
-    padding-left: 16px;
+    padding-inline-start: 16px;
     background: url(../img/icon-changelink.svg) 0 1px no-repeat;
 }
 
 .deletelink {
-    padding-left: 16px;
+    padding-inline-start: 16px;
     background: url(../img/icon-deletelink.svg) 0 1px no-repeat;
 }
 
@@ -754,17 +780,17 @@ a.deletelink:focus, a.deletelink:hover {
 .object-tools {
     font-size: 0.625rem;
     font-weight: bold;
-    padding-left: 0;
-    float: right;
+    padding-inline-start: 0;
+    float: inline-end;
     position: relative;
-    margin-top: -48px;
+    margin-block-start: -48px;
 }
 
 .object-tools li {
     display: block;
-    float: left;
-    margin-left: 5px;
-    height: 1rem;
+    float: inline-start;
+    margin-inline-start: 5px;
+    block-size: 1rem;
 }
 
 .object-tools a {
@@ -773,8 +799,9 @@ a.deletelink:focus, a.deletelink:hover {
 
 .object-tools a:link, .object-tools a:visited {
     display: block;
-    float: left;
-    padding: 3px 12px;
+    float: inline-start;
+    padding-block: 3px;
+    padding-inline: 12px;
     background: var(--object-tools-bg);
     color: var(--object-tools-fg);
     font-weight: 400;
@@ -794,7 +821,7 @@ a.deletelink:focus, a.deletelink:hover {
 .object-tools a.viewsitelink, .object-tools a.addlink {
     background-repeat: no-repeat;
     background-position: right 7px center;
-    padding-right: 26px;
+    padding-inline-end: 26px;
 }
 
 .object-tools a.viewsitelink {
@@ -808,16 +835,16 @@ a.deletelink:focus, a.deletelink:hover {
 /* OBJECT HISTORY */
 
 #change-history table {
-    width: 100%;
+    inline-size: 100%;
 }
 
 #change-history table tbody th {
-    width: 16em;
+    inline-size: 16em;
 }
 
 #change-history .paginator {
     color: var(--body-quiet-color);
-    border-bottom: 1px solid var(--hairline-color);
+    border-block-end: 1px solid var(--hairline-color);
     background: var(--body-bg);
     overflow: hidden;
 }
@@ -826,12 +853,12 @@ a.deletelink:focus, a.deletelink:hover {
 
 #container {
     position: relative;
-    width: 100%;
-    min-width: 980px;
+    inline-size: 100%;
+    min-inline-size: 980px;
     padding: 0;
     display: flex;
     flex-direction: column;
-    height: 100%;
+    block-size: 100%;
 }
 
 #container > .main {
@@ -841,12 +868,12 @@ a.deletelink:focus, a.deletelink:hover {
 
 .main > .content {
     flex:  1 0;
-    max-width: 100%;
+    max-inline-size: 100%;
 }
 
 .skip-to-content-link {
     position: absolute;
-    top: -999px;
+    inset-block-start: -999px;
     margin: 5px;
     padding: 5px;
     background: var(--body-bg);
@@ -854,28 +881,29 @@ a.deletelink:focus, a.deletelink:hover {
 }
 
 .skip-to-content-link:focus {
-    left: 0px;
-    top: 0px;
+    inset-inline-start: 0px;
+    inset-block-start: 0px;
 }
 
 #content {
-    padding: 20px 40px;
+    padding-block: 20px;
+    padding-inline: 40px;
 }
 
 .dashboard #content {
-    width: 600px;
+    inline-size: 600px;
 }
 
 #content-main {
-    float: left;
-    width: 100%;
+    float: inline-start;
+    inline-size: 100%;
 }
 
 #content-related {
-    float: right;
-    width: 260px;
+    float: inline-end;
+    inline-size: 260px;
     position: relative;
-    margin-right: -300px;
+    margin-inline-end: -300px;
 }
 
 @media (forced-colors: active) {
@@ -892,36 +920,37 @@ a.deletelink:focus, a.deletelink:hover {
 /* COLUMN TYPES */
 
 .colMS {
-    margin-right: 300px;
+    margin-inline-end: 300px;
 }
 
 .colSM {
-    margin-left: 300px;
+    margin-inline-start: 300px;
 }
 
 .colSM #content-related {
-    float: left;
-    margin-right: 0;
-    margin-left: -300px;
+    float: inline-start;
+    margin-inline-end: 0;
+    margin-inline-start: -300px;
 }
 
 .colSM #content-main {
-    float: right;
+    float: inline-end;
 }
 
 .popup .colM {
-    width: auto;
+    inline-size: auto;
 }
 
 /* HEADER */
 
 #header {
-    width: auto;
-    height: auto;
+    inline-size: auto;
+    block-size: auto;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 40px;
+    padding-block: 10px;
+    padding-inline: 40px;
     background: var(--header-bg);
     color: var(--header-color);
 }
@@ -936,7 +965,7 @@ a.deletelink:focus, a.deletelink:hover {
 
 @media (forced-colors: active) {
   #header {
-      border-bottom: 1px solid;
+      border-block-end: 1px solid;
   }
 }
 
@@ -958,9 +987,11 @@ a.deletelink:focus, a.deletelink:hover {
 }
 
 #branding h2 {
-    padding: 0 10px;
+    padding-block: 0;
+    padding-inline: 10px;
     font-size: 0.875rem;
-    margin: -8px 0 8px 0;
+    margin-block: -8px 8px;
+    margin-inline: 0;
     font-weight: normal;
     color: var(--header-color);
 }
@@ -981,9 +1012,10 @@ a.deletelink:focus, a.deletelink:hover {
 }
 
 #user-tools {
-    float: right;
-    margin: 0 0 0 20px;
-    text-align: right;
+    float: inline-end;
+    margin-block: 0;
+    margin-inline: 20px 0;
+    text-align: end;
 }
 
 #user-tools, #logout-form button{
@@ -995,17 +1027,17 @@ a.deletelink:focus, a.deletelink:hover {
 }
 
 #user-tools a, #logout-form button {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+    border-block-end: 1px solid rgba(255, 255, 255, 0.25);
 }
 
 #user-tools a:focus, #user-tools a:hover,
 #logout-form button:active, #logout-form button:hover {
     text-decoration: none;
-    border-bottom: 0;
+    border-block-end: 0;
 }
 
 #logout-form button:active, #logout-form button:hover {
-    margin-bottom: 1px;
+    margin-block-end: 1px;
 }
 
 /* SIDEBAR */
@@ -1020,8 +1052,10 @@ a.deletelink:focus, a.deletelink:hover {
 
 #content-related h3 {
     color: var(--body-quiet-color);
-    padding: 0 16px;
-    margin: 0 0 16px;
+    padding-block: 0;
+    padding-inline: 16px;
+    margin-block: 0 16px;
+    margin-inline: 0;
 }
 
 #content-related h4 {
@@ -1029,8 +1063,8 @@ a.deletelink:focus, a.deletelink:hover {
 }
 
 #content-related p {
-    padding-left: 16px;
-    padding-right: 16px;
+    padding-inline-start: 16px;
+    padding-inline-end: 16px;
 }
 
 #content-related .actionlist {
@@ -1040,15 +1074,15 @@ a.deletelink:focus, a.deletelink:hover {
 
 #content-related .actionlist li {
     line-height: 1.2;
-    margin-bottom: 10px;
-    padding-left: 18px;
+    margin-block-end: 10px;
+    padding-inline-start: 18px;
 }
 
 #content-related .module h2 {
     background: none;
     padding: 16px;
-    margin-bottom: 16px;
-    border-bottom: 1px solid var(--hairline-color);
+    margin-block-end: 16px;
+    border-block-end: 1px solid var(--hairline-color);
     font-size: 1.125rem;
     color: var(--body-fg);
 }
@@ -1056,7 +1090,8 @@ a.deletelink:focus, a.deletelink:hover {
 .delete-confirmation form input[type="submit"] {
     background: var(--delete-button-bg);
     border-radius: 4px;
-    padding: 10px 15px;
+    padding-block: 10px;
+    padding-inline: 15px;
     color: var(--button-fg);
 }
 
@@ -1069,13 +1104,15 @@ a.deletelink:focus, a.deletelink:hover {
 .delete-confirmation form .cancel-link {
     display: inline-block;
     vertical-align: middle;
-    height: 0.9375rem;
+    block-size: 0.9375rem;
     line-height: 0.9375rem;
     border-radius: 4px;
-    padding: 10px 15px;
+    padding-block: 10px;
+    padding-inline: 15px;
     color: var(--button-fg);
     background: var(--close-button-bg);
-    margin: 0 0 0 10px;
+    margin-block: 0;
+    margin-inline: 10px 0;
 }
 
 .delete-confirmation form .cancel-link:active,
@@ -1090,11 +1127,12 @@ a.deletelink:focus, a.deletelink:hover {
 }
 
 .popup #container {
-    min-width: 0;
+    min-inline-size: 0;
 }
 
 .popup #header {
-    padding: 10px 20px;
+    padding-block: 10px;
+    padding-inline: 20px;
 }
 
 /* PAGINATOR */
@@ -1104,16 +1142,17 @@ a.deletelink:focus, a.deletelink:hover {
     align-items: center;
     gap: 4px;
     font-size: 0.8125rem;
-    padding-top: 10px;
-    padding-bottom: 10px;
+    padding-block-start: 10px;
+    padding-block-end: 10px;
     line-height: 22px;
     margin: 0;
-    border-top: 1px solid var(--hairline-color);
-    width: 100%;
+    border-block-start: 1px solid var(--hairline-color);
+    inline-size: 100%;
 }
 
 .paginator a:link, .paginator a:visited {
-    padding: 2px 6px;
+    padding-block: 2px;
+    padding-inline: 6px;
     background: var(--button-bg);
     text-decoration: none;
     color: var(--button-fg);
@@ -1131,11 +1170,12 @@ a.deletelink:focus, a.deletelink:hover {
 }
 
 .paginator .end {
-    margin-right: 6px;
+    margin-inline-end: 6px;
 }
 
 .paginator .this-page {
-    padding: 2px 6px;
+    padding-block: 2px;
+    padding-inline: 6px;
     font-weight: bold;
     font-size: 0.8125rem;
     vertical-align: top;
@@ -1147,7 +1187,7 @@ a.deletelink:focus, a.deletelink:hover {
 }
 
 .paginator input {
-    margin-left: auto;
+    margin-inline-start: auto;
 }
 
 .base-svgs {
@@ -1156,8 +1196,8 @@ a.deletelink:focus, a.deletelink:hover {
 
 .visually-hidden {
     position: absolute;
-    width: 1px;
-    height: 1px;
+    inline-size: 1px;
+    block-size: 1px;
     padding: 0;
     overflow: hidden;
     clip: rect(0,0,0,0);

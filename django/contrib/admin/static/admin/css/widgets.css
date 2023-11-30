@@ -1,21 +1,21 @@
 /* SELECTOR (FILTER INTERFACE) */
 
 .selector {
-    width: 800px;
-    float: left;
+    inline-size: 800px;
+    float: inline-start;
     display: flex;
 }
 
 .selector select {
-    width: 380px;
-    height: 17.2em;
+    inline-size: 380px;
+    block-size: 17.2em;
     flex: 1 0 auto;
 }
 
 .selector-available, .selector-chosen {
-    width: 380px;
+    inline-size: 380px;
     text-align: center;
-    margin-bottom: 5px;
+    margin-block-end: 5px;
     display: flex;
     flex-direction: column;
 }
@@ -27,9 +27,10 @@
 
 .selector-chosen .list-footer-display {
     border: 1px solid var(--border-color);
-    border-top: none;
+    border-block-start: none;
     border-radius: 0 0 4px 4px;
-    margin: 0 0 10px;
+    margin-block: 0 10px;
+    margin-inline: 0;
     padding: 8px;
     text-align: center;
     background: var(--primary);
@@ -52,38 +53,41 @@
 
 .selector .selector-filter {
     border: 1px solid var(--border-color);
-    border-width: 0 1px;
+    border-block-width: 0;
+    border-inline-width: 1px;
     padding: 8px;
     color: var(--body-quiet-color);
     font-size: 0.625rem;
     margin: 0;
-    text-align: left;
+    text-align: start;
 }
 
 .selector .selector-filter label,
 .inline-group .aligned .selector .selector-filter label {
-    float: left;
-    margin: 7px 0 0;
-    width: 18px;
-    height: 18px;
+    float: inline-start;
+    margin-block: 7px 0;
+    margin-inline: 0;
+    inline-size: 18px;
+    block-size: 18px;
     padding: 0;
     overflow: hidden;
     line-height: 1;
-    min-width: auto;
+    min-inline-size: auto;
 }
 
 .selector .selector-available input,
 .selector .selector-chosen input {
-    width: 320px;
-    margin-left: 8px;
+    inline-size: 320px;
+    margin-inline-start: 8px;
 }
 
 .selector ul.selector-chooser {
     align-self: center;
-    width: 22px;
+    inline-size: 22px;
     background-color: var(--selected-bg);
     border-radius: 10px;
-    margin: 0 5px;
+    margin-block: 0;
+    margin-inline: 5px;
     padding: 0;
     transform: translateY(-17px);
 }
@@ -95,14 +99,16 @@
 }
 
 .selector select {
-    padding: 0 10px;
-    margin: 0 0 10px;
+    padding-block: 0;
+    padding-inline: 10px;
+    margin-block: 0 10px;
+    margin-inline: 0;
     border-radius: 0 0 4px 4px;
 }
 .selector .selector-chosen--with-filtered select {
     margin: 0;
     border-radius: 0;
-    height: 14em;
+    block-size: 14em;
 }
 
 .selector .selector-chosen:not(.selector-chosen--with-filtered) .list-footer-display {
@@ -110,8 +116,8 @@
 }
 
 .selector-add, .selector-remove {
-    width: 16px;
-    height: 16px;
+    inline-size: 16px;
+    block-size: 16px;
     display: block;
     text-indent: -3000px;
     overflow: hidden;
@@ -145,9 +151,10 @@
 
 a.selector-chooseall, a.selector-clearall {
     display: inline-block;
-    height: 16px;
-    text-align: left;
-    margin: 1px auto 3px;
+    block-size: 16px;
+    text-align: start;
+    margin-block: 1px 3px;
+    margin-inline: auto;
     overflow: hidden;
     font-weight: bold;
     line-height: 16px;
@@ -170,7 +177,8 @@ a.active.selector-chooseall:hover, a.active.selector-clearall:hover {
 }
 
 a.selector-chooseall {
-    padding: 0 18px 0 0;
+    padding-block: 0;
+    padding-inline: 0 18px;
     background: url(../img/selector-icons.svg) right -160px no-repeat;
     cursor: default;
 }
@@ -180,7 +188,8 @@ a.active.selector-chooseall:focus, a.active.selector-chooseall:hover {
 }
 
 a.selector-clearall {
-    padding: 0 0 0 18px;
+    padding-block: 0;
+    padding-inline: 18px 0;
     background: url(../img/selector-icons.svg) 0 -128px no-repeat;
     cursor: default;
 }
@@ -192,40 +201,42 @@ a.active.selector-clearall:focus, a.active.selector-clearall:hover {
 /* STACKED SELECTORS */
 
 .stacked {
-    float: left;
-    width: 490px;
+    float: inline-start;
+    inline-size: 490px;
     display: block;
 }
 
 .stacked select {
-    width: 480px;
-    height: 10.1em;
+    inline-size: 480px;
+    block-size: 10.1em;
 }
 
 .stacked .selector-available, .stacked .selector-chosen {
-    width: 480px;
+    inline-size: 480px;
 }
 
 .stacked .selector-available {
-    margin-bottom: 0;
+    margin-block-end: 0;
 }
 
 .stacked .selector-available input {
-    width: 422px;
+    inline-size: 422px;
 }
 
 .stacked ul.selector-chooser {
-    height: 22px;
-    width: 50px;
-    margin: 0 0 10px 40%;
+    block-size: 22px;
+    inline-size: 50px;
+    margin-block: 0 10px;
+    margin-inline: 40% 0;
     background-color: #eee;
     border-radius: 10px;
     transform: none;
 }
 
 .stacked .selector-chooser li {
-    float: left;
-    padding: 3px 3px 3px 5px;
+    float: inline-start;
+    padding-block: 3px;
+    padding-inline: 5px 3px;
 }
 
 .stacked .selector-chooseall, .stacked .selector-clearall {
@@ -266,9 +277,10 @@ a.active.selector-clearall:focus, a.active.selector-clearall:hover {
     background: url(../img/icon-unknown.svg) 0 0 no-repeat;
     display: inline-block;
     vertical-align: middle;
-    margin: -2px 0 0 2px;
-    width: 13px;
-    height: 13px;
+    margin-block: -2px 0;
+    margin-inline: 2px 0;
+    inline-size: 13px;
+    block-size: 13px;
 }
 
 .selector .selector-chosen .help-icon {
@@ -278,8 +290,8 @@ a.active.selector-clearall:focus, a.active.selector-clearall:hover {
 .selector .search-label-icon {
     background: url(../img/search.svg) 0 0 no-repeat;
     display: inline-block;
-    height: 1.125rem;
-    width: 1.125rem;
+    block-size: 1.125rem;
+    inline-size: 1.125rem;
 }
 
 /* DATE AND TIME */
@@ -300,22 +312,22 @@ p.datetime {
 }
 
 .datetime input, .form-row .datetime input.vDateField, .form-row .datetime input.vTimeField {
-    margin-left: 5px;
-    margin-bottom: 4px;
+    margin-inline-start: 5px;
+    margin-block-end: 4px;
 }
 
 table p.datetime {
     font-size: 0.6875rem;
-    margin-left: 0;
-    padding-left: 0;
+    margin-inline-start: 0;
+    padding-inline-start: 0;
 }
 
 .datetimeshortcuts .clock-icon, .datetimeshortcuts .date-icon {
     position: relative;
     display: inline-block;
     vertical-align: middle;
-    height: 16px;
-    width: 16px;
+    block-size: 16px;
+    inline-size: 16px;
     overflow: hidden;
 }
 
@@ -330,7 +342,7 @@ table p.datetime {
 
 .datetimeshortcuts .date-icon {
     background: url(../img/icon-calendar.svg) 0 0 no-repeat;
-    top: -1px;
+    inset-block-start: -1px;
 }
 
 .datetimeshortcuts a:focus .date-icon,
@@ -374,7 +386,7 @@ p.file-upload {
 }
 
 .file-upload .deletelink {
-    margin-left: 5px;
+    margin-inline-start: 5px;
 }
 
 span.clearable-file-input label {
@@ -387,9 +399,10 @@ span.clearable-file-input label {
 /* CALENDARS & CLOCKS */
 
 .calendarbox, .clockbox {
-    margin: 5px auto;
+    margin-block: 5px;
+    margin-inline: auto;
     font-size: 0.75rem;
-    width: 19em;
+    inline-size: 19em;
     text-align: center;
     background: var(--body-bg);
     color: var(--body-fg);
@@ -401,7 +414,7 @@ span.clearable-file-input label {
 }
 
 .clockbox {
-    width: auto;
+    inline-size: auto;
 }
 
 .calendar {
@@ -414,13 +427,13 @@ span.clearable-file-input label {
     padding: 0;
     border-collapse: collapse;
     background: white;
-    width: 100%;
+    inline-size: 100%;
 }
 
 .calendar caption, .calendarbox h2 {
     margin: 0;
     text-align: center;
-    border-top: none;
+    border-block-start: none;
     font-weight: 700;
     font-size: 0.75rem;
     color: #333;
@@ -428,9 +441,10 @@ span.clearable-file-input label {
 }
 
 .calendar th {
-    padding: 8px 5px;
+    padding-block: 8px;
+    padding-inline: 5px;
     background: var(--darkened-bg);
-    border-bottom: 1px solid var(--border-color);
+    border-block-end: 1px solid var(--border-color);
     font-weight: 400;
     font-size: 0.75rem;
     text-align: center;
@@ -442,8 +456,8 @@ span.clearable-file-input label {
     font-size: 0.75rem;
     text-align: center;
     padding: 0;
-    border-top: 1px solid var(--hairline-color);
-    border-bottom: none;
+    border-block-start: 1px solid var(--hairline-color);
+    border-block-end: none;
 }
 
 .calendar td.selected a {
@@ -483,7 +497,8 @@ span.clearable-file-input label {
     text-align: center;
     color: #ccc;
     margin: 0;
-    padding: 1px 3px;
+    padding-block: 1px;
+    padding-inline: 3px;
 }
 
 .calendarnav a:link, #calendarnav a:visited,
@@ -496,22 +511,23 @@ span.clearable-file-input label {
     color: var(--body-quiet-color);
     font-size: 0.6875rem;
     line-height: 0.6875rem;
-    border-top: 1px solid var(--hairline-color);
-    padding: 8px 0;
+    border-block-start: 1px solid var(--hairline-color);
+    padding-block: 8px;
+    padding-inline: 0;
 }
 
 .calendarbox .calendarnav-previous, .calendarbox .calendarnav-next {
     display: block;
     position: absolute;
-    top: 8px;
-    width: 15px;
-    height: 15px;
+    inset-block-start: 8px;
+    inline-size: 15px;
+    block-size: 15px;
     text-indent: -9999px;
     padding: 0;
 }
 
 .calendarnav-previous {
-    left: 10px;
+    inset-inline-start: 10px;
     background: url(../img/calendar-icons.svg) 0 0 no-repeat;
 }
 
@@ -521,7 +537,7 @@ span.clearable-file-input label {
 }
 
 .calendarnav-next {
-    right: 10px;
+    inset-inline-end: 10px;
     background: url(../img/calendar-icons.svg) 0 -30px no-repeat;
 }
 
@@ -532,10 +548,11 @@ span.clearable-file-input label {
 
 .calendar-cancel {
     margin: 0;
-    padding: 4px 0;
+    padding-block: 4px;
+    padding-inline: 0;
     font-size: 0.75rem;
     background: var(--close-button-bg);
-    border-top: 1px solid var(--border-color);
+    border-block-start: 1px solid var(--border-color);
     color: var(--button-fg);
 }
 
@@ -561,11 +578,11 @@ ul.timelist, .timelist li {
 /* EDIT INLINE */
 
 .inline-deletelink {
-    float: right;
+    float: inline-end;
     text-indent: -9999px;
     background: url(../img/inline-delete.svg) 0 0 no-repeat;
-    width: 16px;
-    height: 16px;
+    inline-size: 16px;
+    block-size: 16px;
     border: 0px none;
 }
 
@@ -575,7 +592,7 @@ ul.timelist, .timelist li {
 
 /* RELATED WIDGET WRAPPER */
 .related-widget-wrapper {
-    float: left;       /* display properly in form rows with multiple fields */
+    float: inline-start;       /* display properly in form rows with multiple fields */
     overflow: hidden;  /* clear floated contents */
 }
 
@@ -591,11 +608,11 @@ ul.timelist, .timelist li {
 
 select + .related-widget-wrapper-link,
 .related-widget-wrapper-link + .related-widget-wrapper-link {
-    margin-left: 7px;
+    margin-inline-start: 7px;
 }
 
 /* GIS MAPS */
 .dj_map {
-    width: 600px;
-    height: 400px;
+    inline-size: 600px;
+    block-size: 400px;
 }

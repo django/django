@@ -4,7 +4,7 @@
 }
 
 .dashboard .module table th {
-    width: 100%;
+    inline-size: 100%;
 }
 
 .dashboard .module table td {
@@ -13,13 +13,13 @@
 
 .dashboard .module table td a {
     display: block;
-    padding-right: .6em;
+    padding-inline-end: .6em;
 }
 
 /* RECENT ACTIONS MODULE */
 
 .module ul.actionlist {
-    margin-left: 0;
+    margin-inline-start: 0;
 }
 
 ul.actionlist li {

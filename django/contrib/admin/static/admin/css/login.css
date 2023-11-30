@@ -2,12 +2,13 @@
 
 .login {
     background: var(--darkened-bg);
-    height: auto;
+    block-size: auto;
 }
 
 .login #header {
-    height: auto;
-    padding: 15px 16px;
+    block-size: auto;
+    padding-block: 15px;
+    padding-inline: 16px;
     justify-content: center;
 }
 
@@ -21,7 +22,8 @@
 }
 
 .login #content {
-    padding: 20px 20px 0;
+    padding-block: 20px 0;
+    padding-inline: 20px;
 }
 
 .login #container {
@@ -29,14 +31,16 @@
     border: 1px solid var(--hairline-color);
     border-radius: 4px;
     overflow: hidden;
-    width: 28em;
-    min-width: 300px;
-    margin: 100px auto;
-    height: auto;
+    inline-size: 28em;
+    min-inline-size: 300px;
+    margin-block: 100px;
+    margin-inline: auto;
+    block-size: auto;
 }
 
 .login .form-row {
-    padding: 4px 0;
+    padding-block: 4px;
+    padding-inline: 0;
 }
 
 .login .form-row label {
@@ -46,12 +50,13 @@
 
 .login .form-row #id_username, .login .form-row #id_password {
     padding: 8px;
-    width: 100%;
+    inline-size: 100%;
     box-sizing: border-box;
 }
 
 .login .submit-row {
-    padding: 1em 0 0 0;
+    padding-block: 1em 0;
+    padding-inline: 0;
     margin: 0;
     text-align: center;
 }

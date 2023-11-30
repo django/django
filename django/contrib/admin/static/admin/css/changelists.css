@@ -8,44 +8,44 @@
 
 #changelist .changelist-form-container {
     flex: 1 1 auto;
-    min-width: 0;
+    min-inline-size: 0;
 }
 
 #changelist table {
-    width: 100%;
+    inline-size: 100%;
 }
 
 .change-list .hiddenfields { display:none; }
 
 .change-list .filtered table {
-    border-right: none;
+    border-inline-end: none;
 }
 
 .change-list .filtered {
-    min-height: 400px;
+    min-block-size: 400px;
 }
 
 .change-list .filtered .results, .change-list .filtered .paginator,
 .filtered #toolbar, .filtered div.xfull {
-    width: auto;
+    inline-size: auto;
 }
 
 .change-list .filtered table tbody th {
-    padding-right: 1em;
+    padding-inline-end: 1em;
 }
 
 #changelist-form .results {
-    overflow-x: auto;
-    width: 100%;
+    overflow-inline: auto;
+    inline-size: 100%;
 }
 
 #changelist .toplinks {
-    border-bottom: 1px solid var(--hairline-color);
+    border-block-end: 1px solid var(--hairline-color);
 }
 
 #changelist .paginator {
     color: var(--body-quiet-color);
-    border-bottom: 1px solid var(--hairline-color);
+    border-block-end: 1px solid var(--hairline-color);
     background: var(--body-bg);
     overflow: hidden;
 }
@@ -59,7 +59,7 @@
 }
 
 #changelist table thead th.action-checkbox-column {
-    width: 1.5em;
+    inline-size: 1.5em;
     text-align: center;
 }
 
@@ -74,10 +74,11 @@
 /* TOOLBAR */
 
 #toolbar {
-    padding: 8px 10px;
-    margin-bottom: 15px;
-    border-top: 1px solid var(--hairline-color);
-    border-bottom: 1px solid var(--hairline-color);
+    padding-block: 8px;
+    padding-inline: 10px;
+    margin-block-end: 15px;
+    border-block-start: 1px solid var(--hairline-color);
+    border-block-end: 1px solid var(--hairline-color);
     background: var(--darkened-bg);
     color: var(--body-quiet-color);
 }
@@ -90,13 +91,14 @@
 }
 
 #toolbar #searchbar {
-    height: 1.1875rem;
+    block-size: 1.1875rem;
     border: 1px solid var(--border-color);
-    padding: 2px 5px;
+    padding-block: 2px;
+    padding-inline: 5px;
     margin: 0;
     vertical-align: top;
     font-size: 0.8125rem;
-    max-width: 100%;
+    max-inline-size: 100%;
 }
 
 #toolbar #searchbar:focus {
@@ -106,7 +108,8 @@
 #toolbar form input[type="submit"] {
     border: 1px solid var(--border-color);
     font-size: 0.8125rem;
-    padding: 4px 8px;
+    padding-block: 4px;
+    padding-inline: 8px;
     margin: 0;
     vertical-align: middle;
     background: var(--body-bg);
@@ -122,7 +125,7 @@
 
 #changelist-search img {
     vertical-align: middle;
-    margin-right: 4px;
+    margin-inline-end: 4px;
 }
 
 #changelist-search .help {
@@ -135,8 +138,9 @@
     flex: 0 0 240px;
     order: 1;
     background: var(--darkened-bg);
-    border-left: none;
-    margin: 0 0 0 30px;
+    border-inline-start: none;
+    margin-block: 0;
+    margin-inline: 30px 0;
 }
 
 @media (forced-colors: active) {
@@ -149,16 +153,18 @@
     font-size: 0.875rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    padding: 5px 15px;
-    margin-bottom: 12px;
-    border-bottom: none;
+    padding-block: 5px;
+    padding-inline: 15px;
+    margin-block-end: 12px;
+    border-block-end: none;
 }
 
 #changelist-filter h3,
 #changelist-filter details summary {
     font-weight: 400;
-    padding: 0 15px;
-    margin-bottom: 10px;
+    padding-block: 0;
+    padding-inline: 15px;
+    margin-block-end: 10px;
     cursor: pointer;
 }
 
@@ -185,19 +191,21 @@
 }
 
 #changelist-filter ul {
-    margin: 5px 0;
-    padding: 0 15px 15px;
-    border-bottom: 1px solid var(--hairline-color);
+    margin-block: 5px;
+    margin-inline: 0;
+    padding-block: 0 15px;
+    padding-inline: 15px;
+    border-block-end: 1px solid var(--hairline-color);
 }
 
 #changelist-filter ul:last-child {
-    border-bottom: none;
+    border-block-end: none;
 }
 
 #changelist-filter li {
     list-style-type: none;
-    margin-left: 0;
-    padding-left: 0;
+    margin-inline-start: 0;
+    padding-inline-start: 0;
 }
 
 #changelist-filter a {
@@ -207,9 +215,9 @@
 }
 
 #changelist-filter li.selected {
-    border-left: 5px solid var(--hairline-color);
-    padding-left: 10px;
-    margin-left: -15px;
+    border-inline-start: 5px solid var(--hairline-color);
+    padding-inline-start: 10px;
+    margin-inline-start: -15px;
 }
 
 #changelist-filter li.selected a {
@@ -224,15 +232,15 @@
 
 #changelist-filter #changelist-filter-extra-actions {
     font-size: 0.8125rem;
-    margin-bottom: 10px;
-    border-bottom: 1px solid var(--hairline-color);
+    margin-block-end: 10px;
+    border-block-end: 1px solid var(--hairline-color);
 }
 
 /* DATE DRILLDOWN */
 
 .change-list .toplinks {
     display: flex;
-    padding-bottom: 5px;
+    padding-block-end: 5px;
     flex-wrap: wrap;
     gap: 3px 17px;
     font-weight: bold;
@@ -254,7 +262,7 @@
 /* ACTIONS */
 
 .filtered .actions {
-    border-right: none;
+    border-inline-end: none;
 }
 
 #changelist table input {
@@ -284,11 +292,11 @@
 #changelist .actions {
     padding: 10px;
     background: var(--body-bg);
-    border-top: none;
-    border-bottom: none;
+    border-block-start: none;
+    border-block-end: none;
     line-height: 1.5rem;
     color: var(--body-quiet-color);
-    width: 100%;
+    inline-size: 100%;
 }
 
 #changelist .actions span.all,
@@ -296,23 +304,25 @@
 #changelist .actions span.clear,
 #changelist .actions span.question {
     font-size: 0.8125rem;
-    margin: 0 0.5em;
+    margin-block: 0;
+    margin-inline: 0.5em;
 }
 
 #changelist .actions:last-child {
-    border-bottom: none;
+    border-block-end: none;
 }
 
 #changelist .actions select {
     vertical-align: top;
-    height: 1.5rem;
+    block-size: 1.5rem;
     color: var(--body-fg);
     border: 1px solid var(--border-color);
     border-radius: 4px;
     font-size: 0.875rem;
-    padding: 0 0 0 4px;
+    padding-block: 0;
+    padding-inline: 4px 0;
     margin: 0;
-    margin-left: 10px;
+    margin-inline-start: 10px;
 }
 
 #changelist .actions select:focus {
@@ -332,9 +342,10 @@
     background: var(--body-bg);
     box-shadow: 0 -15px 20px -10px rgba(0, 0, 0, 0.15) inset;
     cursor: pointer;
-    height: 1.5rem;
+    block-size: 1.5rem;
     line-height: 1;
-    padding: 4px 8px;
+    padding-block: 4px;
+    padding-inline: 8px;
     margin: 0;
     color: var(--body-fg);
 }

@@ -24,27 +24,31 @@ input[type="submit"], button {
     /* Layout */
 
     #container {
-        min-width: 0;
+        min-inline-size: 0;
     }
 
     #content {
-        padding: 15px 20px 20px;
+        padding-block: 15px 20px;
+        padding-inline: 20px;
     }
 
     div.breadcrumbs {
-        padding: 10px 30px;
+        padding-block: 10px;
+        padding-inline: 30px;
     }
 
     /* Header */
 
     #header {
         flex-direction: column;
-        padding: 15px 30px;
+        padding-block: 15px;
+        padding-inline: 30px;
         justify-content: flex-start;
     }
 
     #site-name {
-        margin: 0 0 8px;
+        margin-block: 0 8px;
+        margin-inline: 0;
         line-height: 1.2;
     }
 
@@ -52,7 +56,7 @@ input[type="submit"], button {
         margin: 0;
         font-weight: 400;
         line-height: 1.85;
-        text-align: left;
+        text-align: start;
     }
 
     #user-tools a {
@@ -63,27 +67,27 @@ input[type="submit"], button {
     /* Dashboard */
 
     .dashboard #content {
-        width: auto;
+        inline-size: auto;
     }
 
     #content-related {
-        margin-right: -290px;
+        margin-inline-end: -290px;
     }
 
     .colSM #content-related {
-        margin-left: -290px;
+        margin-inline-start: -290px;
     }
 
     .colMS {
-        margin-right: 290px;
+        margin-inline-end: 290px;
     }
 
     .colSM {
-        margin-left: 290px;
+        margin-inline-start: 290px;
     }
 
     .dashboard .module table td a {
-        padding-right: 0;
+        padding-inline-end: 0;
     }
 
     td .changelink, td .addlink {
@@ -100,7 +104,7 @@ input[type="submit"], button {
     #changelist-search > div {
         display: flex;
         flex-wrap: nowrap;
-        max-width: 480px;
+        max-inline-size: 480px;
     }
 
     #changelist-search label {
@@ -109,9 +113,10 @@ input[type="submit"], button {
 
     #toolbar form #searchbar {
         flex: 1 0 auto;
-        width: 0;
-        height: 1.375rem;
-        margin: 0 10px 0 6px;
+        inline-size: 0;
+        block-size: 1.375rem;
+        margin-block: 0;
+        margin-inline: 6px 10px;
     }
 
     #toolbar form input[type=submit] {
@@ -119,15 +124,17 @@ input[type="submit"], button {
     }
 
     #changelist-search .quiet {
-        width: 0;
+        inline-size: 0;
         flex: 1 0 auto;
-        margin: 5px 0 0 25px;
+        margin-block: 5px 0;
+        margin-inline: 25px 0;
     }
 
     #changelist .actions {
         display: flex;
         flex-wrap: wrap;
-        padding: 15px 0;
+        padding-block: 15px;
+        padding-inline: 0;
     }
 
     #changelist .actions label {
@@ -139,8 +146,9 @@ input[type="submit"], button {
     }
 
     #changelist .actions .button {
-        min-width: 48px;
-        margin: 0 10px;
+        min-inline-size: 48px;
+        margin-block: 0;
+        margin-inline: 10px;
     }
 
     #changelist .actions span.all,
@@ -148,7 +156,8 @@ input[type="submit"], button {
     #changelist .actions span.question,
     #changelist .actions span.action-counter {
         font-size: 0.6875rem;
-        margin: 0 10px 0 0;
+        margin-block: 0;
+        margin-inline: 0 10px;
     }
 
     #changelist-filter {
@@ -161,11 +170,11 @@ input[type="submit"], button {
     .filtered .actions,
 
     #changelist .paginator {
-        border-top-color: var(--hairline-color); /* XXX Is this used at all? */
+        border-block-start-color: var(--hairline-color); /* XXX Is this used at all? */
     }
 
     #changelist .results + .paginator {
-        border-top: none;
+        border-block-start: none;
     }
 
     /* Forms */
@@ -185,44 +194,45 @@ input[type="submit"], button {
     .form-row .vTextField {
         box-sizing: border-box;
         margin: 0;
-        padding: 6px 8px;
-        min-height: 2.25rem;
+        padding-block: 6px;
+        padding-inline: 8px;
+        min-block-size: 2.25rem;
         font-size: 0.875rem;
     }
 
     .form-row select {
-        height: 2.25rem;
+        block-size: 2.25rem;
     }
 
     .form-row select[multiple] {
-        height: auto;
-        min-height: 0;
+        block-size: auto;
+        min-block-size: 0;
     }
 
     fieldset .fieldBox + .fieldBox {
-        margin-top: 10px;
-        padding-top: 10px;
-        border-top: 1px solid var(--hairline-color);
+        margin-block-start: 10px;
+        padding-block-start: 10px;
+        border-block-start: 1px solid var(--hairline-color);
     }
 
     textarea {
-        max-width: 100%;
-        max-height: 120px;
+        max-inline-size: 100%;
+        max-block-size: 120px;
     }
 
     .aligned label {
-        padding-top: 6px;
+        padding-block-start: 6px;
     }
 
     .aligned .related-lookup,
     .aligned .datetimeshortcuts,
     .aligned .related-lookup + strong {
         align-self: center;
-        margin-left: 15px;
+        margin-inline-start: 15px;
     }
 
     form .aligned div.radiolist {
-        margin-left: 2px;
+        margin-inline-start: 2px;
     }
 
     .submit-row {
@@ -230,7 +240,8 @@ input[type="submit"], button {
     }
 
     .submit-row a.deletelink {
-        padding: 10px 7px;
+        padding-block: 10px;
+        padding-inline: 7px;
     }
 
     .button, input[type=submit], input[type=button], .submit-row input, a.button {
@@ -244,20 +255,20 @@ input[type="submit"], button {
     }
 
     .related-widget-wrapper-link + .selector {
-        max-width: calc(100% - 30px);
-        margin-right: 15px;
+        max-inline-size: calc(100% - 30px);
+        margin-inline-end: 15px;
     }
 
     select + .related-widget-wrapper-link,
     .related-widget-wrapper-link + .related-widget-wrapper-link {
-        margin-left: 10px;
+        margin-inline-start: 10px;
     }
 
     /* Selector */
 
     .selector {
         display: flex;
-        width: 100%;
+        inline-size: 100%;
     }
 
     .selector .selector-filter {
@@ -266,40 +277,43 @@ input[type="submit"], button {
     }
 
     .selector .selector-filter label {
-        margin: 0 8px 0 0;
+        margin-block: 0;
+        margin-inline: 0 8px;
     }
 
     .selector .selector-filter input {
-        width: auto;
-        min-height: 0;
+        inline-size: auto;
+        min-block-size: 0;
         flex: 1 1;
     }
 
     .selector-available, .selector-chosen {
-        width: auto;
+        inline-size: auto;
         flex: 1 1;
         display: flex;
         flex-direction: column;
     }
 
     .selector select {
-        width: 100%;
+        inline-size: 100%;
         flex: 1 0 auto;
-        margin-bottom: 5px;
+        margin-block-end: 5px;
     }
 
     .selector ul.selector-chooser {
-        width: 26px;
-        height: 52px;
-        padding: 2px 0;
-        margin: auto 15px;
+        inline-size: 26px;
+        block-size: 52px;
+        padding-block: 2px;
+        padding-inline: 0;
+        margin-block: auto;
+        margin-inline: 15px;
         border-radius: 20px;
         transform: translateY(-10px);
     }
 
     .selector-add, .selector-remove {
-        width: 20px;
-        height: 20px;
+        inline-size: 20px;
+        block-size: 20px;
         background-size: 20px auto;
     }
 
@@ -317,7 +331,7 @@ input[type="submit"], button {
 
     .stacked {
         flex-direction: column;
-        max-width: 480px;
+        max-inline-size: 480px;
     }
 
     .stacked > * {
@@ -325,18 +339,20 @@ input[type="submit"], button {
     }
 
     .stacked select {
-        margin-bottom: 0;
+        margin-block-end: 0;
     }
 
     .stacked .selector-available, .stacked .selector-chosen {
-        width: auto;
+        inline-size: auto;
     }
 
     .stacked ul.selector-chooser {
-        width: 52px;
-        height: 26px;
-        padding: 0 2px;
-        margin: 15px auto;
+        inline-size: 52px;
+        block-size: 26px;
+        padding-block: 0;
+        padding-inline: 2px;
+        margin-block: 15px;
+        margin-inline: auto;
         transform: none;
     }
 
@@ -385,8 +401,8 @@ input[type="submit"], button {
     }
 
     .datetime input {
-        width: 50%;
-        max-width: 120px;
+        inline-size: 50%;
+        max-inline-size: 120px;
     }
 
     .datetime span {
@@ -404,7 +420,7 @@ input[type="submit"], button {
     }
 
     .form-row .datetime input.vDateField, .form-row .datetime input.vTimeField {
-        width: 75%;
+        inline-size: 75%;
     }
 
     .inline-group {
@@ -414,7 +430,7 @@ input[type="submit"], button {
     /* Messages */
 
     ul.messagelist li {
-        padding-left: 55px;
+        padding-inline-start: 55px;
         background-position: 30px 12px;
     }
 
@@ -429,7 +445,8 @@ input[type="submit"], button {
     /* Login */
 
     .login #header {
-        padding: 15px 20px;
+        padding-block: 15px;
+        padding-inline: 20px;
     }
 
     .login #site-name {
@@ -439,19 +456,19 @@ input[type="submit"], button {
     /* GIS */
 
     div.olMap {
-        max-width: calc(100vw - 30px);
-        max-height: 300px;
+        max-inline-size: calc(100vw - 30px);
+        max-block-size: 300px;
     }
 
     .olMap + .clear_features {
         display: block;
-        margin-top: 10px;
+        margin-block-start: 10px;
     }
 
     /* Docs */
 
     .module table.xfull {
-        width: 100%;
+        inline-size: 100%;
     }
 
     pre.literal-block {
@@ -473,7 +490,8 @@ input[type="submit"], button {
     }
 
     div.breadcrumbs {
-        padding: 10px 15px;
+        padding-block: 10px;
+        padding-inline: 15px;
     }
 
     /* Dashboard */
@@ -483,16 +501,17 @@ input[type="submit"], button {
     }
 
     #content-related, .colSM #content-related {
-        width: 100%;
+        inline-size: 100%;
         margin: 0;
     }
 
     #content-related .module {
-        margin-bottom: 0;
+        margin-block-end: 0;
     }
 
     #content-related .module h2 {
-        padding: 10px 15px;
+        padding-block: 10px;
+        padding-inline: 15px;
         font-size: 1rem;
     }
 
@@ -508,7 +527,7 @@ input[type="submit"], button {
     }
 
     #changelist-filter {
-        margin-left: 0;
+        margin-inline-start: 0;
     }
 
     #changelist .actions label {
@@ -517,7 +536,7 @@ input[type="submit"], button {
 
     #changelist .actions select {
         flex: 1 0;
-        width: 100%;
+        inline-size: 100%;
     }
 
     #changelist .actions span {
@@ -526,39 +545,41 @@ input[type="submit"], button {
 
     #changelist-filter {
         position: static;
-        width: auto;
-        margin-top: 30px;
+        inline-size: auto;
+        margin-block-start: 30px;
     }
 
     .object-tools {
         float: none;
-        margin: 0 0 15px;
+        margin-block: 0 15px;
+        margin-inline: 0;
         padding: 0;
         overflow: hidden;
     }
 
     .object-tools li {
-        height: auto;
-        margin-left: 0;
+        block-size: auto;
+        margin-inline-start: 0;
     }
 
     .object-tools li + li {
-        margin-left: 15px;
+        margin-inline-start: 15px;
     }
 
     /* Forms */
 
     .form-row {
-        padding: 15px 0;
+        padding-block: 15px;
+        padding-inline: 0;
     }
 
     .aligned .form-row,
     .aligned .form-row > div {
-        max-width: 100vw;
+        max-inline-size: 100vw;
     }
 
     .aligned .form-row > div {
-        width: calc(100vw - 30px);
+        inline-size: calc(100vw - 30px);
     }
 
     .flex-container {
@@ -570,16 +591,16 @@ input[type="submit"], button {
     }
 
     textarea {
-        max-width: none;
+        max-inline-size: none;
     }
 
     .vURLField {
-        width: auto;
+        inline-size: auto;
     }
 
     fieldset .fieldBox + .fieldBox {
-        margin-top: 15px;
-        padding-top: 15px;
+        margin-block-start: 15px;
+        padding-block-start: 15px;
     }
 
     fieldset.collapsed .form-row {
@@ -587,20 +608,21 @@ input[type="submit"], button {
     }
 
     .aligned label {
-        width: 100%;
-        min-width: auto;
-        padding: 0 0 10px;
+        inline-size: 100%;
+        min-inline-size: auto;
+        padding-block: 0 10px;
+        padding-inline: 0;
     }
 
     .aligned label:after {
-        max-height: 0;
+        max-block-size: 0;
     }
 
     .aligned .form-row input,
     .aligned .form-row select,
     .aligned .form-row textarea {
         flex: 1 1 auto;
-        max-width: 100%;
+        max-inline-size: 100%;
     }
 
     .aligned .checkbox-row input {
@@ -610,14 +632,15 @@ input[type="submit"], button {
 
     .aligned .vCheckboxLabel {
         flex: 1 0;
-        padding: 1px 0 0 5px;
+        padding-block: 1px 0;
+        padding-inline: 5px 0;
     }
 
     .aligned label + p,
     .aligned label + div.help,
     .aligned label + div.readonly {
         padding: 0;
-        margin-left: 0;
+        margin-inline-start: 0;
     }
 
     .aligned p.file-upload {
@@ -625,45 +648,46 @@ input[type="submit"], button {
     }
 
     span.clearable-file-input {
-        margin-left: 15px;
+        margin-inline-start: 15px;
     }
 
     span.clearable-file-input label {
         font-size: 0.8125rem;
-        padding-bottom: 0;
+        padding-block-end: 0;
     }
 
     .aligned .timezonewarning {
         flex: 1 0 100%;
-        margin-top: 5px;
+        margin-block-start: 5px;
     }
 
     form .aligned .form-row div.help {
-        width: 100%;
-        margin: 5px 0 0;
+        inline-size: 100%;
+        margin-block: 5px 0;
+        margin-inline: 0;
         padding: 0;
     }
 
     form .aligned ul,
     form .aligned ul.errorlist {
-        margin-left: 0;
-        padding-left: 0;
+        margin-inline-start: 0;
+        padding-inline-start: 0;
     }
 
     form .aligned div.radiolist {
-        margin-top: 5px;
-        margin-right: 15px;
-        margin-bottom: -3px;
+        margin-block-start: 5px;
+        margin-inline-end: 15px;
+        margin-block-end: -3px;
     }
 
     form .aligned div.radiolist:not(.inline) div + div {
-        margin-top: 5px;
+        margin-block-start: 5px;
     }
 
     /* Related widget */
 
     .related-widget-wrapper {
-        width: 100%;
+        inline-size: 100%;
         display: flex;
         align-items: flex-start;
     }
@@ -686,7 +710,7 @@ input[type="submit"], button {
 
     select + .related-widget-wrapper-link,
     .related-widget-wrapper-link + .related-widget-wrapper-link {
-        margin-left: 15px;
+        margin-inline-start: 15px;
     }
 
     /* Selector */
@@ -700,26 +724,28 @@ input[type="submit"], button {
     }
 
     .selector-available, .selector-chosen {
-        margin-bottom: 0;
+        margin-block-end: 0;
         flex: 1 1 auto;
     }
 
     .selector select {
-        max-height: 96px;
+        max-block-size: 96px;
     }
 
     .selector ul.selector-chooser {
         display: block;
         float: none;
-        width: 52px;
-        height: 26px;
-        padding: 0 2px;
-        margin: 15px auto 20px;
+        inline-size: 52px;
+        block-size: 26px;
+        padding-block: 0;
+        padding-inline: 2px;
+        margin-block: 15px 20px;
+        margin-inline: auto;
         transform: none;
     }
 
     .selector ul.selector-chooser li {
-        float: left;
+        float: inline-start;
     }
 
     .selector-remove {
@@ -743,7 +769,7 @@ input[type="submit"], button {
     .inline-group[data-inline-type="stacked"] .inline-related {
         border: 1px solid var(--hairline-color);
         border-radius: 4px;
-        margin-top: 15px;
+        margin-block-start: 15px;
         overflow: auto;
     }
 
@@ -752,47 +778,48 @@ input[type="submit"], button {
     }
 
     .inline-group[data-inline-type="stacked"] .inline-related .module {
-        padding: 0 10px;
+        padding-block: 0;
+        padding-inline: 10px;
     }
 
     .inline-group[data-inline-type="stacked"] .inline-related .module .form-row {
-        border-top: 1px solid var(--hairline-color);
-        border-bottom: none;
+        border-block-start: 1px solid var(--hairline-color);
+        border-block-end: none;
     }
 
     .inline-group[data-inline-type="stacked"] .inline-related .module .form-row:first-child {
-        border-top: none;
+        border-block-start: none;
     }
 
     .inline-group[data-inline-type="stacked"] .inline-related h3 {
         padding: 10px;
-        border-top-width: 0;
-        border-bottom-width: 2px;
+        border-block-start-width: 0;
+        border-block-end-width: 2px;
         display: flex;
         flex-wrap: wrap;
         align-items: center;
     }
 
     .inline-group[data-inline-type="stacked"] .inline-related h3 .inline_label {
-        margin-right: auto;
+        margin-inline-end: auto;
     }
 
     .inline-group[data-inline-type="stacked"] .inline-related h3 span.delete {
         float: none;
         flex: 1 1 100%;
-        margin-top: 5px;
+        margin-block-start: 5px;
     }
 
     .inline-group[data-inline-type="stacked"] .aligned .form-row > div:not([class]) {
-        width: 100%;
+        inline-size: 100%;
     }
 
     .inline-group[data-inline-type="stacked"] .aligned label {
-        width: 100%;
+        inline-size: 100%;
     }
 
     .inline-group[data-inline-type="stacked"] div.add-row {
-        margin-top: 15px;
+        margin-block-start: 15px;
         border: 1px solid var(--hairline-color);
         border-radius: 4px;
     }
@@ -805,7 +832,8 @@ input[type="submit"], button {
     .inline-group div.add-row a,
     .inline-group .tabular tr.add-row td a {
         display: block;
-        padding: 8px 10px 8px 26px;
+        padding-block: 8px;
+        padding-inline: 26px 10px;
         background-position: 8px 9px;
     }
 
@@ -813,7 +841,8 @@ input[type="submit"], button {
 
     .submit-row {
         padding: 10px;
-        margin: 0 0 15px;
+        margin-block: 0 15px;
+        margin-inline: 0;
         flex-direction: column;
         gap: 8px;
     }
@@ -823,7 +852,8 @@ input[type="submit"], button {
     }
 
     .submit-row a.closelink {
-        padding: 10px 0;
+        padding-block: 10px;
+        padding-inline: 0;
         text-align: center;
     }
 
@@ -834,7 +864,7 @@ input[type="submit"], button {
     /* Messages */
 
     ul.messagelist li {
-        padding-left: 40px;
+        padding-inline-start: 40px;
         background-position: 15px 12px;
     }
 
@@ -849,19 +879,22 @@ input[type="submit"], button {
     /* Paginator */
 
     .paginator .this-page, .paginator a:link, .paginator a:visited {
-        padding: 4px 10px;
+        padding-block: 4px;
+        padding-inline: 10px;
     }
 
     /* Login */
 
     body.login {
-        padding: 0 15px;
+        padding-block: 0;
+        padding-inline: 15px;
     }
 
     .login #container {
-        width: auto;
-        max-width: 480px;
-        margin: 50px auto;
+        inline-size: auto;
+        max-inline-size: 480px;
+        margin-block: 50px;
+        margin-inline: auto;
     }
 
     .login #header,
@@ -878,16 +911,18 @@ input[type="submit"], button {
     }
 
     .login .form-row + .form-row {
-        margin-top: 15px;
+        margin-block-start: 15px;
     }
 
     .login .form-row label {
-        margin: 0 0 5px;
+        margin-block: 0 5px;
+        margin-inline: 0;
         line-height: 1.2;
     }
 
     .login .submit-row {
-        padding: 15px 0 0;
+        padding-block: 15px 0;
+        padding-inline: 0;
     }
 
     .login br {
@@ -900,8 +935,10 @@ input[type="submit"], button {
     }
 
     .errornote {
-        margin: 0 0 20px;
-        padding: 8px 12px;
+        margin-block: 0 20px;
+        margin-inline: 0;
+        padding-block: 8px;
+        padding-inline: 12px;
         font-size: 0.8125rem;
     }
 
@@ -909,8 +946,8 @@ input[type="submit"], button {
 
     .calendarbox, .clockbox {
         position: fixed !important;
-        top: 50% !important;
-        left: 50% !important;
+        inset-block-start: 50% !important;
+        inset-inline-start: 50% !important;
         transform: translate(-50%, -50%);
         margin: 0;
         border: none;
@@ -920,10 +957,10 @@ input[type="submit"], button {
     .calendarbox:before, .clockbox:before {
         content: '';
         position: fixed;
-        top: 50%;
-        left: 50%;
-        width: 100vw;
-        height: 100vh;
+        inset-block-start: 50%;
+        inset-inline-start: 50%;
+        inline-size: 100vw;
+        block-size: 100vh;
         background: rgba(0, 0, 0, 0.75);
         transform: translate(-50%, -50%);
     }
@@ -948,13 +985,15 @@ input[type="submit"], button {
     }
 
     .calendar-shortcuts {
-        padding: 10px 0;
+        padding-block: 10px;
+        padding-inline: 0;
         font-size: 0.75rem;
         line-height: 0.75rem;
     }
 
     .calendar-shortcuts a {
-        margin: 0 4px;
+        margin-block: 0;
+        margin-inline: 4px;
     }
 
     .timelist a {
@@ -963,11 +1002,13 @@ input[type="submit"], button {
     }
 
     .calendar-cancel {
-        padding: 8px 10px;
+        padding-block: 8px;
+        padding-inline: 10px;
     }
 
     .clockbox h2 {
-        padding: 8px 15px;
+        padding-block: 8px;
+        padding-inline: 15px;
     }
 
     .calendar caption {
@@ -976,7 +1017,7 @@ input[type="submit"], button {
 
     .calendarbox .calendarnav-previous, .calendarbox .calendarnav-next {
         z-index: 1;
-        top: 10px;
+        inset-block-start: 10px;
     }
 
     /* History */
@@ -987,7 +1028,7 @@ input[type="submit"], button {
     }
 
     table#change-history tbody th {
-        width: auto;
+        inline-size: auto;
     }
 
     /* Docs */

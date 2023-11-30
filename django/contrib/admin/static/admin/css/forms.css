@@ -6,7 +6,7 @@
     overflow: hidden;
     padding: 10px;
     font-size: 0.8125rem;
-    border-bottom: 1px solid var(--hairline-color);
+    border-block-end: 1px solid var(--hairline-color);
 }
 
 .form-row img, .form-row input {
@@ -14,12 +14,12 @@
 }
 
 .form-row label input[type="checkbox"] {
-    margin-top: 0;
+    margin-block-start: 0;
     vertical-align: 0;
 }
 
 form .form-row p {
-    padding-left: 0;
+    padding-inline-start: 0;
 }
 
 .flex-container {
@@ -27,7 +27,7 @@ form .form-row p {
 }
 
 .form-multiline > div {
-    padding-bottom: 10px;
+    padding-block-end: 10px;
 }
 
 /* FORM LABELS */
@@ -46,7 +46,7 @@ label {
 /* RADIO BUTTONS */
 
 form div.radiolist div {
-    padding-right: 7px;
+    padding-inline-end: 7px;
 }
 
 form div.radiolist.inline div {
@@ -54,31 +54,33 @@ form div.radiolist.inline div {
 }
 
 form div.radiolist label {
-    width: auto;
+    inline-size: auto;
 }
 
 form div.radiolist input[type="radio"] {
-    margin: -2px 4px 0 0;
+    margin-block: -2px 0;
+    margin-inline: 0 4px;
     padding: 0;
 }
 
 form ul.inline {
-    margin-left: 0;
+    margin-inline-start: 0;
     padding: 0;
 }
 
 form ul.inline li {
-    float: left;
-    padding-right: 7px;
+    float: inline-start;
+    padding-inline-end: 7px;
 }
 
 /* ALIGNED FIELDSETS */
 
 .aligned label {
     display: block;
-    padding: 4px 10px 0 0;
-    min-width: 160px;
-    width: 160px;
+    padding-block: 4px 0;
+    padding-inline: 0 10px;
+    min-inline-size: 160px;
+    inline-size: 160px;
     word-wrap: break-word;
     line-height: 1;
 }
@@ -87,34 +89,35 @@ form ul.inline li {
     content: '';
     display: inline-block;
     vertical-align: middle;
-    height: 1.625rem;
+    block-size: 1.625rem;
 }
 
 .aligned label + p, .aligned .checkbox-row + div.help, .aligned label + div.readonly {
-    padding: 6px 0;
-    margin-top: 0;
-    margin-bottom: 0;
-    margin-left: 0;
+    padding-block: 6px;
+    padding-inline: 0;
+    margin-block-start: 0;
+    margin-block-end: 0;
+    margin-inline-start: 0;
     overflow-wrap: break-word;
 }
 
 .aligned ul label {
     display: inline;
     float: none;
-    width: auto;
+    inline-size: auto;
 }
 
 .aligned .form-row input {
-    margin-bottom: 0;
+    margin-block-end: 0;
 }
 
 .colMS .aligned .vLargeTextField, .colMS .aligned .vXMLLargeTextField {
-    width: 350px;
+    inline-size: 350px;
 }
 
 form .aligned ul {
-    margin-left: 160px;
-    padding-left: 10px;
+    margin-inline-start: 160px;
+    padding-inline-start: 10px;
 }
 
 form .aligned div.radiolist {
@@ -125,23 +128,23 @@ form .aligned div.radiolist {
 
 form .aligned p.help,
 form .aligned div.help {
-    margin-top: 0;
-    margin-left: 160px;
-    padding-left: 10px;
+    margin-block-start: 0;
+    margin-inline-start: 160px;
+    padding-inline-start: 10px;
 }
 
 form .aligned p.date div.help.timezonewarning,
 form .aligned p.datetime div.help.timezonewarning,
 form .aligned p.time div.help.timezonewarning {
-    margin-left: 0;
-    padding-left: 0;
+    margin-inline-start: 0;
+    padding-inline-start: 0;
     font-weight: normal;
 }
 
 form .aligned p.help:last-child,
 form .aligned div.help:last-child {
-    margin-bottom: 0;
-    padding-bottom: 0;
+    margin-block-end: 0;
+    padding-block-end: 0;
 }
 
 form .aligned input + p.help,
@@ -150,8 +153,8 @@ form .aligned select + p.help,
 form .aligned input + div.help,
 form .aligned textarea + div.help,
 form .aligned select + div.help {
-    margin-left: 160px;
-    padding-left: 10px;
+    margin-inline-start: 160px;
+    padding-inline-start: 10px;
 }
 
 form .aligned ul li {
@@ -159,56 +162,57 @@ form .aligned ul li {
 }
 
 form .aligned table p {
-    margin-left: 0;
-    padding-left: 0;
+    margin-inline-start: 0;
+    padding-inline-start: 0;
 }
 
 .aligned .vCheckboxLabel {
     float: none;
-    width: auto;
+    inline-size: auto;
     display: inline-block;
     vertical-align: -3px;
-    padding: 0 0 5px 5px;
+    padding-block: 0 5px;
+    padding-inline: 5px 0;
 }
 
 .aligned .vCheckboxLabel + p.help,
 .aligned .vCheckboxLabel + div.help {
-    margin-top: -4px;
+    margin-block-start: -4px;
 }
 
 .colM .aligned .vLargeTextField, .colM .aligned .vXMLLargeTextField {
-    width: 610px;
+    inline-size: 610px;
 }
 
 fieldset .fieldBox {
-    margin-right: 20px;
+    margin-inline-end: 20px;
 }
 
 /* WIDE FIELDSETS */
 
 .wide label {
-    width: 200px;
+    inline-size: 200px;
 }
 
 form .wide p,
 form .wide ul.errorlist,
 form .wide input + p.help,
 form .wide input + div.help {
-    margin-left: 200px;
+    margin-inline-start: 200px;
 }
 
 form .wide p.help,
 form .wide div.help {
-    padding-left: 50px;
+    padding-inline-start: 50px;
 }
 
 form div.help ul {
-    padding-left: 0;
-    margin-left: 0;
+    padding-inline-start: 0;
+    margin-inline-start: 0;
 }
 
 .colM fieldset.wide .vLargeTextField, .colM fieldset.wide .vXMLLargeTextField {
-    width: 450px;
+    inline-size: 450px;
 }
 
 /* COLLAPSED FIELDSETS */
@@ -251,8 +255,10 @@ fieldset.monospace textarea {
 /* SUBMIT ROW */
 
 .submit-row {
-    padding: 12px 14px 12px;
-    margin: 0 0 20px;
+    padding-block: 12px;
+    padding-inline: 14px;
+    margin-block: 0 20px;
+    margin-inline: 0;
     background: var(--darkened-bg);
     border: 1px solid var(--hairline-color);
     border-radius: 4px;
@@ -267,7 +273,7 @@ body.popup .submit-row {
 }
 
 .submit-row input {
-    height: 2.1875rem;
+    block-size: 2.1875rem;
     line-height: 0.9375rem;
 }
 
@@ -280,15 +286,16 @@ body.popup .submit-row {
 }
 
 .submit-row a.deletelink {
-    margin-left: auto;
+    margin-inline-start: auto;
 }
 
 .submit-row a.deletelink {
     display: block;
     background: var(--delete-button-bg);
     border-radius: 4px;
-    padding: 0.625rem 0.9375rem;
-    height: 0.9375rem;
+    padding-block: 0.625rem;
+    padding-inline: 0.9375rem;
+    block-size: 0.9375rem;
     line-height: 0.9375rem;
     color: var(--button-fg);
 }
@@ -297,8 +304,9 @@ body.popup .submit-row {
     display: inline-block;
     background: var(--close-button-bg);
     border-radius: 4px;
-    padding: 10px 15px;
-    height: 0.9375rem;
+    padding-block: 10px;
+    padding-inline: 15px;
+    block-size: 0.9375rem;
     line-height: 0.9375rem;
     color: var(--button-fg);
 }
@@ -328,63 +336,65 @@ body.popup .submit-row {
 }
 
 .vDateField, .vTimeField {
-    margin-right: 2px;
-    margin-bottom: 4px;
+    margin-inline-end: 2px;
+    margin-block-end: 4px;
 }
 
 .vDateField {
-    min-width: 6.85em;
+    min-inline-size: 6.85em;
 }
 
 .vTimeField {
-    min-width: 4.7em;
+    min-inline-size: 4.7em;
 }
 
 .vURLField {
-    width: 30em;
+    inline-size: 30em;
 }
 
 .vLargeTextField, .vXMLLargeTextField {
-    width: 48em;
+    inline-size: 48em;
 }
 
 .flatpages-flatpage #id_content {
-    height: 40.2em;
+    block-size: 40.2em;
 }
 
 .module table .vPositiveSmallIntegerField {
-    width: 2.2em;
+    inline-size: 2.2em;
 }
 
 .vIntegerField {
-    width: 5em;
+    inline-size: 5em;
 }
 
 .vBigIntegerField {
-    width: 10em;
+    inline-size: 10em;
 }
 
 .vForeignKeyRawIdAdminField {
-    width: 5em;
+    inline-size: 5em;
 }
 
 .vTextField, .vUUIDField {
-    width: 20em;
+    inline-size: 20em;
 }
 
 /* INLINES */
 
 .inline-group {
     padding: 0;
-    margin: 0 0 30px;
+    margin-block: 0 30px;
+    margin-inline: 0;
 }
 
 .inline-group thead th {
-    padding: 8px 10px;
+    padding-block: 8px;
+    padding-inline: 10px;
 }
 
 .inline-group .aligned label {
-    width: 160px;
+    inline-size: 160px;
 }
 
 .inline-related {
@@ -397,16 +407,16 @@ body.popup .submit-row {
     padding: 5px;
     font-size: 0.8125rem;
     background: var(--darkened-bg);
-    border-top: 1px solid var(--hairline-color);
-    border-bottom: 1px solid var(--hairline-color);
+    border-block-start: 1px solid var(--hairline-color);
+    border-block-end: 1px solid var(--hairline-color);
 }
 
 .inline-related h3 span.delete {
-    float: right;
+    float: inline-end;
 }
 
 .inline-related h3 span.delete label {
-    margin-left: 2px;
+    margin-inline-start: 2px;
     font-size: 0.6875rem;
 }
 
@@ -414,14 +424,15 @@ body.popup .submit-row {
     margin: 0;
     background: var(--body-bg);
     border: none;
-    width: 100%;
+    inline-size: 100%;
 }
 
 .inline-related fieldset.module h3 {
     margin: 0;
-    padding: 2px 5px 3px 5px;
+    padding-block: 2px 3px;
+    padding-inline: 5px;
     font-size: 0.6875rem;
-    text-align: left;
+    text-align: start;
     font-weight: bold;
     background: #bcd;
     color: var(--body-bg);
@@ -432,8 +443,8 @@ body.popup .submit-row {
 }
 
 .inline-related.tabular fieldset.module table {
-    width: 100%;
-    overflow-x: scroll;
+    inline-size: 100%;
+    overflow-inline: scroll;
 }
 
 .last-related fieldset {
@@ -441,25 +452,27 @@ body.popup .submit-row {
 }
 
 .inline-group .tabular tr.has_original td {
-    padding-top: 2em;
+    padding-block-start: 2em;
 }
 
 .inline-group .tabular tr td.original {
-    padding: 2px 0 0 0;
-    width: 0;
+    padding-block: 2px 0;
+    padding-inline: 0;
+    inline-size: 0;
     _position: relative;
 }
 
 .inline-group .tabular th.original {
-    width: 0px;
+    inline-size: 0px;
     padding: 0;
 }
 
 .inline-group .tabular td.original p {
     position: absolute;
-    left: 0;
-    height: 1.1em;
-    padding: 2px 9px;
+    inset-inline-start: 0;
+    block-size: 1.1em;
+    padding-block: 2px;
+    padding-inline: 9px;
     overflow: hidden;
     font-size: 0.5625rem;
     font-weight: bold;
@@ -475,27 +488,30 @@ body.popup .submit-row {
 
 .inline-group ul.tools li {
     display: inline;
-    padding: 0 5px;
+    padding-block: 0;
+    padding-inline: 5px;
 }
 
 .inline-group div.add-row,
 .inline-group .tabular tr.add-row td {
     color: var(--body-quiet-color);
     background: var(--darkened-bg);
-    padding: 8px 10px;
-    border-bottom: 1px solid var(--hairline-color);
+    padding-block: 8px;
+    padding-inline: 10px;
+    border-block-end: 1px solid var(--hairline-color);
 }
 
 .inline-group .tabular tr.add-row td {
-    padding: 8px 10px;
-    border-bottom: 1px solid var(--hairline-color);
+    padding-block: 8px;
+    padding-inline: 10px;
+    border-block-end: 1px solid var(--hairline-color);
 }
 
 .inline-group ul.tools a.add,
 .inline-group div.add-row a,
 .inline-group .tabular tr.add-row td a {
     background: url(../img/icon-addlink.svg) 0 1px no-repeat;
-    padding-left: 16px;
+    padding-inline-start: 16px;
     font-size: 0.75rem;
 }
 
@@ -506,7 +522,7 @@ body.popup .submit-row {
 /* RELATED FIELD ADD ONE / LOOKUP */
 
 .related-lookup {
-    margin-left: 5px;
+    margin-inline-start: 5px;
     display: inline-block;
     vertical-align: middle;
     background-repeat: no-repeat;
@@ -514,17 +530,17 @@ body.popup .submit-row {
 }
 
 .related-lookup {
-    width: 1rem;
-    height: 1rem;
+    inline-size: 1rem;
+    block-size: 1rem;
     background-image: url(../img/search.svg);
 }
 
 form .related-widget-wrapper ul {
     display: inline-block;
-    margin-left: 0;
-    padding-left: 0;
+    margin-inline-start: 0;
+    padding-inline-start: 0;
 }
 
 .clearable-file-input input {
-    margin-top: 0;
+    margin-block-start: 0;
 }
