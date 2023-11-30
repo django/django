@@ -1,0 +1,34 @@
+name: Start preview app
+
+on:
+  pull_request:
+    types: [labeled, synchronize, opened, reopened, close]
+    paths-ignore:
+      - 'docs/**'
+
+concurrency:
+  group: ${{ github.workflow }}-pr-${{ github.event.number }}
+  cancel-in-progress: true
+
+permissions:
+   contents: read
+
+env:
+    FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+    FLY_REGION: waw
+    FLY_ORG: personal
+
+jobs:
+  preview-app:
+    if: contains(github.event.pull_request.labels.*.name, 'PR preview app')
+    runs-on: ubuntu-latest
+    name: Preview app
+    environment:
+      name: pr-${{github.event.number }}
+      url: ${{ steps.deploy.outputs.url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Deploy preview app
+        uses: superfly/fly-pr-review-apps@1.0.0
+        id: deploy 
