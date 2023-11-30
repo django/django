@@ -77,7 +77,8 @@ form ul.inline li {
 
 .aligned label {
     display: block;
-    padding: 4px 10px 0 0;
+    padding-block: 4px 0;
+    padding-inline: 0 10px;
     min-inline-size: 160px;
     inline-size: 160px;
     word-wrap: break-word;
@@ -169,7 +170,8 @@ form .aligned table p {
     inline-size: auto;
     display: inline-block;
     vertical-align: -3px;
-    padding: 0 0 5px 5px;
+    padding-block: 0 5px;
+    padding-inline: 5px 0;
 }
 
 .aligned .vCheckboxLabel + p.help,

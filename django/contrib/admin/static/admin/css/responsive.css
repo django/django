@@ -619,7 +619,8 @@ input[type="submit"], button {
 
     .aligned .vCheckboxLabel {
         flex: 1 0;
-        padding: 1px 0 0 5px;
+        padding-block: 1px 0;
+        padding-inline: 5px 0;
     }
 
     .aligned label + p,
@@ -816,7 +817,8 @@ input[type="submit"], button {
     .inline-group div.add-row a,
     .inline-group .tabular tr.add-row td a {
         display: block;
-        padding: 8px 10px 8px 26px;
+        padding-block: 8px;
+        padding-inline: 26px 10px;
         background-position: 8px 9px;
     }
 

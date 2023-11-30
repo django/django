@@ -313,7 +313,8 @@
     border: 1px solid var(--border-color);
     border-radius: 4px;
     font-size: 0.875rem;
-    padding: 0 0 0 4px;
+    padding-block: 0;
+    padding-inline: 4px 0;
     margin: 0;
     margin-inline-start: 10px;
 }

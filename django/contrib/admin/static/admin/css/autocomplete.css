@@ -104,7 +104,8 @@ select.admin-autocomplete {
     box-sizing: border-box;
     list-style: none;
     margin: 0;
-    padding: 0 10px 5px 5px;
+    padding-block: 0 5px;
+    padding-inline: 5px 10px;
     inline-size: 100%;
     display: flex;
     flex-wrap: wrap;

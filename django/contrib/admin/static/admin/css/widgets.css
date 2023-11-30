@@ -175,7 +175,8 @@ a.active.selector-chooseall:hover, a.active.selector-clearall:hover {
 }
 
 a.selector-chooseall {
-    padding: 0 18px 0 0;
+    padding-block: 0;
+    padding-inline: 0 18px;
     background: url(../img/selector-icons.svg) right -160px no-repeat;
     cursor: default;
 }
@@ -185,7 +186,8 @@ a.active.selector-chooseall:focus, a.active.selector-chooseall:hover {
 }
 
 a.selector-clearall {
-    padding: 0 0 0 18px;
+    padding-block: 0;
+    padding-inline: 18px 0;
     background: url(../img/selector-icons.svg) 0 -128px no-repeat;
     cursor: default;
 }
@@ -231,7 +233,8 @@ a.active.selector-clearall:focus, a.active.selector-clearall:hover {
 
 .stacked .selector-chooser li {
     float: left;
-    padding: 3px 3px 3px 5px;
+    padding-block: 3px;
+    padding-inline: 5px 3px;
 }
 
 .stacked .selector-chooseall, .stacked .selector-clearall {

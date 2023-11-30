@@ -617,7 +617,8 @@ ul.messagelist li {
     display: block;
     font-weight: 400;
     font-size: 0.8125rem;
-    padding: 10px 10px 10px 65px;
+    padding-block: 10px;
+    padding-inline: 65px 10px;
     margin-block: 0 10px;
     margin-inline: 0;
     background: var(--message-success-bg) url(../img/icon-yes.svg) 40px 12px no-repeat;
@@ -702,7 +703,8 @@ td ul.errorlist + input, td ul.errorlist + select, td ul.errorlist + textarea {
 
 .description {
     font-size: 0.75rem;
-    padding: 5px 0 0 12px;
+    padding-block: 5px 0;
+    padding-inline: 12px 0;
 }
 
 /* BREADCRUMBS */
