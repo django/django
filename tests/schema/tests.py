@@ -4742,6 +4742,23 @@ class SchemaTests(TransactionTestCase):
         )
 
     @isolate_apps("schema")
+    @skipIfDBFeature("supports_comments")
+    def test_db_comment_table_unsupported(self):
+        class ModelWithDbTableComment(Model):
+            class Meta:
+                app_label = "schema"
+                db_table_comment = "Custom table comment"
+
+        # Table comments are ignored on databases that don't support them.
+        with connection.schema_editor() as editor, self.assertNumQueries(1):
+            editor.create_model(ModelWithDbTableComment)
+        self.isolated_local_models = [ModelWithDbTableComment]
+        with connection.schema_editor() as editor, self.assertNumQueries(0):
+            editor.alter_db_table_comment(
+                ModelWithDbTableComment, "Custom table comment", "New table comment"
+            )
+
+    @isolate_apps("schema")
     @skipUnlessDBFeature("supports_comments", "supports_foreign_keys")
     def test_db_comments_from_abstract_model(self):
         class AbstractModelWithDbComments(Model):
