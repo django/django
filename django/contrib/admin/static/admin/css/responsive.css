@@ -44,7 +44,8 @@ input[type="submit"], button {
     }
 
     #site-name {
-        margin: 0 0 8px;
+        margin-block: 0 8px;
+        margin-inline: 0;
         line-height: 1.2;
     }
 
@@ -536,7 +537,8 @@ input[type="submit"], button {
 
     .object-tools {
         float: none;
-        margin: 0 0 15px;
+        margin-block: 0 15px;
+        margin-inline: 0;
         padding: 0;
         overflow: hidden;
     }
@@ -644,7 +646,8 @@ input[type="submit"], button {
 
     form .aligned .form-row div.help {
         inline-size: 100%;
-        margin: 5px 0 0;
+        margin-block: 5px 0;
+        margin-inline: 0;
         padding: 0;
     }
 
@@ -718,7 +721,8 @@ input[type="submit"], button {
         inline-size: 52px;
         block-size: 26px;
         padding: 0 2px;
-        margin: 15px auto 20px;
+        margin-block: 15px 20px;
+        margin-inline: auto;
         transform: none;
     }
 
@@ -817,7 +821,8 @@ input[type="submit"], button {
 
     .submit-row {
         padding: 10px;
-        margin: 0 0 15px;
+        margin-block: 0 15px;
+        margin-inline: 0;
         flex-direction: column;
         gap: 8px;
     }
@@ -886,7 +891,8 @@ input[type="submit"], button {
     }
 
     .login .form-row label {
-        margin: 0 0 5px;
+        margin-block: 0 5px;
+        margin-inline: 0;
         line-height: 1.2;
     }
 
@@ -904,7 +910,8 @@ input[type="submit"], button {
     }
 
     .errornote {
-        margin: 0 0 20px;
+        margin-block: 0 20px;
+        margin-inline: 0;
         padding: 8px 12px;
         font-size: 0.8125rem;
     }

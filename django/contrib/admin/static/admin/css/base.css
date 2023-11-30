@@ -131,7 +131,8 @@ a.section:focus, a.section:hover {
 /* GLOBAL DEFAULTS */
 
 p, ol, ul, dl {
-    margin: .2em 0 .8em;
+    margin-block: .2em .8em;
+    margin-inline: 0;
 }
 
 p {
@@ -144,7 +145,8 @@ h1,h2,h3,h4,h5 {
 }
 
 h1 {
-    margin: 0 0 20px;
+    margin-block: 0 20px;
+    margin-inline: 0;
     font-weight: 300;
     font-size: 1.25rem;
     color: var(--body-quiet-color);
@@ -152,7 +154,8 @@ h1 {
 
 h2 {
     font-size: 1rem;
-    margin: 1em 0 .5em;
+    margin-block: 1em .5em;
+    margin-inline: 0;
 }
 
 h2.subhead {
@@ -162,20 +165,23 @@ h2.subhead {
 
 h3 {
     font-size: 0.875rem;
-    margin: .8em 0 .3em;
+    margin-block: .8em .3em;
+    margin-inline: 0;
     color: var(--body-quiet-color);
     font-weight: bold;
 }
 
 h4 {
     font-size: 0.75rem;
-    margin: 1em 0 .8em;
+    margin-block: 1em .8em;
+    margin-inline: 0;
     padding-bottom: 3px;
 }
 
 h5 {
     font-size: 0.625rem;
-    margin: 1.5em 0 .5em;
+    margin-block: 1.5em .5em;
+    margin-inline: 0;
     color: var(--body-quiet-color);
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -611,7 +617,8 @@ ul.messagelist li {
     font-weight: 400;
     font-size: 0.8125rem;
     padding: 10px 10px 10px 65px;
-    margin: 0 0 10px;
+    margin-block: 0 10px;
+    margin-inline: 0;
     background: var(--message-success-bg) url(../img/icon-yes.svg) 40px 12px no-repeat;
     background-size: 16px auto;
     color: var(--body-fg);
@@ -633,7 +640,8 @@ ul.messagelist li.error {
     font-weight: 700;
     display: block;
     padding: 10px 12px;
-    margin: 0 0 10px;
+    margin-block: 0 10px;
+    margin-inline: 0;
     color: var(--error-fg);
     border: 1px solid var(--error-fg);
     border-radius: 4px;
@@ -643,7 +651,8 @@ ul.messagelist li.error {
 }
 
 ul.errorlist {
-    margin: 0 0 4px;
+    margin-block: 0 4px;
+    margin-inline: 0;
     padding: 0;
     color: var(--error-fg);
     background: var(--body-bg);
@@ -960,7 +969,8 @@ a.deletelink:focus, a.deletelink:hover {
 #branding h2 {
     padding: 0 10px;
     font-size: 0.875rem;
-    margin: -8px 0 8px;
+    margin-block: -8px 8px;
+    margin-inline: 0;
     font-weight: normal;
     color: var(--header-color);
 }
@@ -1022,7 +1032,8 @@ a.deletelink:focus, a.deletelink:hover {
 #content-related h3 {
     color: var(--body-quiet-color);
     padding: 0 16px;
-    margin: 0 0 16px;
+    margin-block: 0 16px;
+    margin-inline: 0;
 }
 
 #content-related h4 {

@@ -253,7 +253,8 @@ fieldset.monospace textarea {
 
 .submit-row {
     padding: 12px 14px 12px;
-    margin: 0 0 20px;
+    margin-block: 0 20px;
+    margin-inline: 0;
     background: var(--darkened-bg);
     border: 1px solid var(--hairline-color);
     border-radius: 4px;
@@ -377,7 +378,8 @@ body.popup .submit-row {
 
 .inline-group {
     padding: 0;
-    margin: 0 0 30px;
+    margin-block: 0 30px;
+    margin-inline: 0;
 }
 
 .inline-group thead th {
