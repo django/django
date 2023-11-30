@@ -131,7 +131,7 @@ a.section:focus, a.section:hover {
 /* GLOBAL DEFAULTS */
 
 p, ol, ul, dl {
-    margin: .2em 0 .8em 0;
+    margin: .2em 0 .8em;
 }
 
 p {
@@ -152,7 +152,7 @@ h1 {
 
 h2 {
     font-size: 1rem;
-    margin: 1em 0 .5em 0;
+    margin: 1em 0 .5em;
 }
 
 h2.subhead {
@@ -162,20 +162,20 @@ h2.subhead {
 
 h3 {
     font-size: 0.875rem;
-    margin: .8em 0 .3em 0;
+    margin: .8em 0 .3em;
     color: var(--body-quiet-color);
     font-weight: bold;
 }
 
 h4 {
     font-size: 0.75rem;
-    margin: 1em 0 .8em 0;
+    margin: 1em 0 .8em;
     padding-bottom: 3px;
 }
 
 h5 {
     font-size: 0.625rem;
-    margin: 1.5em 0 .5em 0;
+    margin: 1.5em 0 .5em;
     color: var(--body-quiet-color);
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -611,7 +611,7 @@ ul.messagelist li {
     font-weight: 400;
     font-size: 0.8125rem;
     padding: 10px 10px 10px 65px;
-    margin: 0 0 10px 0;
+    margin: 0 0 10px;
     background: var(--message-success-bg) url(../img/icon-yes.svg) 40px 12px no-repeat;
     background-size: 16px auto;
     color: var(--body-fg);
@@ -633,7 +633,7 @@ ul.messagelist li.error {
     font-weight: 700;
     display: block;
     padding: 10px 12px;
-    margin: 0 0 10px 0;
+    margin: 0 0 10px;
     color: var(--error-fg);
     border: 1px solid var(--error-fg);
     border-radius: 4px;
@@ -960,7 +960,7 @@ a.deletelink:focus, a.deletelink:hover {
 #branding h2 {
     padding: 0 10px;
     font-size: 0.875rem;
-    margin: -8px 0 8px 0;
+    margin: -8px 0 8px;
     font-weight: normal;
     color: var(--header-color);
 }
