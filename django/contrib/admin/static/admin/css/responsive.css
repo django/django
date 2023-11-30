@@ -793,8 +793,8 @@ input[type="submit"], button {
 
     .inline-group[data-inline-type="stacked"] .inline-related h3 {
         padding: 10px;
-        border-top-width: 0;
-        border-bottom-width: 2px;
+        border-block-start-width: 0;
+        border-block-end-width: 2px;
         display: flex;
         flex-wrap: wrap;
         align-items: center;
