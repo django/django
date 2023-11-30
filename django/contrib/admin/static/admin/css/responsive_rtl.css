@@ -2,7 +2,6 @@
 
 @media (max-width: 1024px) {
     [dir="rtl"] .colMS {
-        margin-right: 0;
     }
 
     [dir="rtl"] #user-tools {
@@ -15,8 +14,6 @@
     }
 
     [dir="rtl"] #changelist .actions select {
-        margin-left: 0;
-        margin-right: 15px;
     }
 
     [dir="rtl"] .change-list .filtered .results,
@@ -25,7 +22,6 @@
     [dir="rtl"] .filtered div.xfull,
     [dir="rtl"] .filtered .actions,
     [dir="rtl"] #changelist-filter {
-        margin-left: 0;
     }
 
     [dir="rtl"] .inline-group ul.tools a.add,
@@ -36,13 +32,9 @@
     }
 
     [dir="rtl"] .related-widget-wrapper-link + .selector {
-        margin-right: 0;
-        margin-left: 15px;
     }
 
     [dir="rtl"] .selector .selector-filter label {
-        margin-right: 0;
-        margin-left: 8px;
     }
 
     [dir="rtl"] .object-tools li {
@@ -50,8 +42,6 @@
     }
 
     [dir="rtl"] .object-tools li + li {
-        margin-left: 0;
-        margin-right: 15px;
     }
 
     [dir="rtl"] .dashboard .module table td a {
@@ -81,18 +71,13 @@
 @media (max-width: 767px) {
     [dir="rtl"] .aligned .related-lookup,
     [dir="rtl"] .aligned .datetimeshortcuts {
-        margin-left: 0;
-        margin-right: 15px;
     }
 
     [dir="rtl"] .aligned ul,
     [dir="rtl"] form .aligned ul.errorlist {
-        margin-right: 0;
     }
 
     [dir="rtl"] #changelist-filter {
-        margin-left: 0;
-        margin-right: 0;
     }
     [dir="rtl"] .aligned .vCheckboxLabel {
         padding: 1px 5px 0 0;

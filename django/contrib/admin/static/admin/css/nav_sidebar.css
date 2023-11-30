@@ -35,7 +35,7 @@
     z-index: 15;
     flex: 0 0 275px;
     left: -276px;
-    margin-left: -276px;
+    margin-inline-start: -276px;
     border-top: 1px solid transparent;
     border-right: 1px solid var(--hairline-color);
     background-color: var(--body-bg);
@@ -46,9 +46,9 @@
     border-left: 1px solid var(--hairline-color);
     border-right: 0;
     left: 0;
-    margin-left: 0;
+    margin-inline-start: 0;
     right: -276px;
-    margin-right: -276px;
+    margin-inline-end: -276px;
 }
 
 .toggle-nav-sidebar::before {
@@ -64,12 +64,12 @@
 }
 
 .main.shifted > #nav-sidebar {
-    margin-left: 0;
+    margin-inline-start: 0;
     visibility: visible;
 }
 
 [dir="rtl"] .main.shifted > #nav-sidebar {
-    margin-right: 0;
+    margin-inline-end: 0;
 }
 
 #nav-sidebar .module th {

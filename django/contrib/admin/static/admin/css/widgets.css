@@ -15,7 +15,7 @@
 .selector-available, .selector-chosen {
     inline-size: 380px;
     text-align: center;
-    margin-bottom: 5px;
+    margin-block-end: 5px;
     display: flex;
     flex-direction: column;
 }
@@ -77,7 +77,7 @@
 .selector .selector-available input,
 .selector .selector-chosen input {
     inline-size: 320px;
-    margin-left: 8px;
+    margin-inline-start: 8px;
 }
 
 .selector ul.selector-chooser {
@@ -212,7 +212,7 @@ a.active.selector-clearall:focus, a.active.selector-clearall:hover {
 }
 
 .stacked .selector-available {
-    margin-bottom: 0;
+    margin-block-end: 0;
 }
 
 .stacked .selector-available input {
@@ -307,13 +307,13 @@ p.datetime {
 }
 
 .datetime input, .form-row .datetime input.vDateField, .form-row .datetime input.vTimeField {
-    margin-left: 5px;
-    margin-bottom: 4px;
+    margin-inline-start: 5px;
+    margin-block-end: 4px;
 }
 
 table p.datetime {
     font-size: 0.6875rem;
-    margin-left: 0;
+    margin-inline-start: 0;
     padding-left: 0;
 }
 
@@ -381,7 +381,7 @@ p.file-upload {
 }
 
 .file-upload .deletelink {
-    margin-left: 5px;
+    margin-inline-start: 5px;
 }
 
 span.clearable-file-input label {
@@ -599,7 +599,7 @@ ul.timelist, .timelist li {
 
 select + .related-widget-wrapper-link,
 .related-widget-wrapper-link + .related-widget-wrapper-link {
-    margin-left: 7px;
+    margin-inline-start: 7px;
 }
 
 /* GIS MAPS */

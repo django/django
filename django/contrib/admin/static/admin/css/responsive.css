@@ -68,19 +68,19 @@ input[type="submit"], button {
     }
 
     #content-related {
-        margin-right: -290px;
+        margin-inline-end: -290px;
     }
 
     .colSM #content-related {
-        margin-left: -290px;
+        margin-inline-start: -290px;
     }
 
     .colMS {
-        margin-right: 290px;
+        margin-inline-end: 290px;
     }
 
     .colSM {
-        margin-left: 290px;
+        margin-inline-start: 290px;
     }
 
     .dashboard .module table td a {
@@ -205,7 +205,7 @@ input[type="submit"], button {
     }
 
     fieldset .fieldBox + .fieldBox {
-        margin-top: 10px;
+        margin-block-start: 10px;
         padding-top: 10px;
         border-top: 1px solid var(--hairline-color);
     }
@@ -223,11 +223,11 @@ input[type="submit"], button {
     .aligned .datetimeshortcuts,
     .aligned .related-lookup + strong {
         align-self: center;
-        margin-left: 15px;
+        margin-inline-start: 15px;
     }
 
     form .aligned div.radiolist {
-        margin-left: 2px;
+        margin-inline-start: 2px;
     }
 
     .submit-row {
@@ -250,12 +250,12 @@ input[type="submit"], button {
 
     .related-widget-wrapper-link + .selector {
         max-inline-size: calc(100% - 30px);
-        margin-right: 15px;
+        margin-inline-end: 15px;
     }
 
     select + .related-widget-wrapper-link,
     .related-widget-wrapper-link + .related-widget-wrapper-link {
-        margin-left: 10px;
+        margin-inline-start: 10px;
     }
 
     /* Selector */
@@ -291,7 +291,7 @@ input[type="submit"], button {
     .selector select {
         inline-size: 100%;
         flex: 1 0 auto;
-        margin-bottom: 5px;
+        margin-block-end: 5px;
     }
 
     .selector ul.selector-chooser {
@@ -332,7 +332,7 @@ input[type="submit"], button {
     }
 
     .stacked select {
-        margin-bottom: 0;
+        margin-block-end: 0;
     }
 
     .stacked .selector-available, .stacked .selector-chosen {
@@ -453,7 +453,7 @@ input[type="submit"], button {
 
     .olMap + .clear_features {
         display: block;
-        margin-top: 10px;
+        margin-block-start: 10px;
     }
 
     /* Docs */
@@ -496,7 +496,7 @@ input[type="submit"], button {
     }
 
     #content-related .module {
-        margin-bottom: 0;
+        margin-block-end: 0;
     }
 
     #content-related .module h2 {
@@ -516,7 +516,7 @@ input[type="submit"], button {
     }
 
     #changelist-filter {
-        margin-left: 0;
+        margin-inline-start: 0;
     }
 
     #changelist .actions label {
@@ -535,7 +535,7 @@ input[type="submit"], button {
     #changelist-filter {
         position: static;
         inline-size: auto;
-        margin-top: 30px;
+        margin-block-start: 30px;
     }
 
     .object-tools {
@@ -548,11 +548,11 @@ input[type="submit"], button {
 
     .object-tools li {
         block-size: auto;
-        margin-left: 0;
+        margin-inline-start: 0;
     }
 
     .object-tools li + li {
-        margin-left: 15px;
+        margin-inline-start: 15px;
     }
 
     /* Forms */
@@ -587,7 +587,7 @@ input[type="submit"], button {
     }
 
     fieldset .fieldBox + .fieldBox {
-        margin-top: 15px;
+        margin-block-start: 15px;
         padding-top: 15px;
     }
 
@@ -626,7 +626,7 @@ input[type="submit"], button {
     .aligned label + div.help,
     .aligned label + div.readonly {
         padding: 0;
-        margin-left: 0;
+        margin-inline-start: 0;
     }
 
     .aligned p.file-upload {
@@ -634,7 +634,7 @@ input[type="submit"], button {
     }
 
     span.clearable-file-input {
-        margin-left: 15px;
+        margin-inline-start: 15px;
     }
 
     span.clearable-file-input label {
@@ -644,7 +644,7 @@ input[type="submit"], button {
 
     .aligned .timezonewarning {
         flex: 1 0 100%;
-        margin-top: 5px;
+        margin-block-start: 5px;
     }
 
     form .aligned .form-row div.help {
@@ -656,18 +656,18 @@ input[type="submit"], button {
 
     form .aligned ul,
     form .aligned ul.errorlist {
-        margin-left: 0;
+        margin-inline-start: 0;
         padding-left: 0;
     }
 
     form .aligned div.radiolist {
-        margin-top: 5px;
-        margin-right: 15px;
-        margin-bottom: -3px;
+        margin-block-start: 5px;
+        margin-inline-end: 15px;
+        margin-block-end: -3px;
     }
 
     form .aligned div.radiolist:not(.inline) div + div {
-        margin-top: 5px;
+        margin-block-start: 5px;
     }
 
     /* Related widget */
@@ -696,7 +696,7 @@ input[type="submit"], button {
 
     select + .related-widget-wrapper-link,
     .related-widget-wrapper-link + .related-widget-wrapper-link {
-        margin-left: 15px;
+        margin-inline-start: 15px;
     }
 
     /* Selector */
@@ -710,7 +710,7 @@ input[type="submit"], button {
     }
 
     .selector-available, .selector-chosen {
-        margin-bottom: 0;
+        margin-block-end: 0;
         flex: 1 1 auto;
     }
 
@@ -754,7 +754,7 @@ input[type="submit"], button {
     .inline-group[data-inline-type="stacked"] .inline-related {
         border: 1px solid var(--hairline-color);
         border-radius: 4px;
-        margin-top: 15px;
+        margin-block-start: 15px;
         overflow: auto;
     }
 
@@ -785,13 +785,13 @@ input[type="submit"], button {
     }
 
     .inline-group[data-inline-type="stacked"] .inline-related h3 .inline_label {
-        margin-right: auto;
+        margin-inline-end: auto;
     }
 
     .inline-group[data-inline-type="stacked"] .inline-related h3 span.delete {
         float: none;
         flex: 1 1 100%;
-        margin-top: 5px;
+        margin-block-start: 5px;
     }
 
     .inline-group[data-inline-type="stacked"] .aligned .form-row > div:not([class]) {
@@ -803,7 +803,7 @@ input[type="submit"], button {
     }
 
     .inline-group[data-inline-type="stacked"] div.add-row {
-        margin-top: 15px;
+        margin-block-start: 15px;
         border: 1px solid var(--hairline-color);
         border-radius: 4px;
     }
@@ -891,7 +891,7 @@ input[type="submit"], button {
     }
 
     .login .form-row + .form-row {
-        margin-top: 15px;
+        margin-block-start: 15px;
     }
 
     .login .form-row label {

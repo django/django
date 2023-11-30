@@ -73,7 +73,7 @@ html[data-theme="dark"] {
     background: transparent;
     vertical-align: middle;
     margin-inline-start: 5px;
-    margin-top: -1px;
+    margin-block-start: -1px;
 }
 
 .theme-toggle svg {

@@ -19,7 +19,7 @@
 /* RECENT ACTIONS MODULE */
 
 .module ul.actionlist {
-    margin-left: 0;
+    margin-inline-start: 0;
 }
 
 ul.actionlist li {

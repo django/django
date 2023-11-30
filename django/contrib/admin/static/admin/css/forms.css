@@ -14,7 +14,7 @@
 }
 
 .form-row label input[type="checkbox"] {
-    margin-top: 0;
+    margin-block-start: 0;
     vertical-align: 0;
 }
 
@@ -64,7 +64,7 @@ form div.radiolist input[type="radio"] {
 }
 
 form ul.inline {
-    margin-left: 0;
+    margin-inline-start: 0;
     padding: 0;
 }
 
@@ -93,9 +93,9 @@ form ul.inline li {
 
 .aligned label + p, .aligned .checkbox-row + div.help, .aligned label + div.readonly {
     padding: 6px 0;
-    margin-top: 0;
-    margin-bottom: 0;
-    margin-left: 0;
+    margin-block-start: 0;
+    margin-block-end: 0;
+    margin-inline-start: 0;
     overflow-wrap: break-word;
 }
 
@@ -106,7 +106,7 @@ form ul.inline li {
 }
 
 .aligned .form-row input {
-    margin-bottom: 0;
+    margin-block-end: 0;
 }
 
 .colMS .aligned .vLargeTextField, .colMS .aligned .vXMLLargeTextField {
@@ -114,7 +114,7 @@ form ul.inline li {
 }
 
 form .aligned ul {
-    margin-left: 160px;
+    margin-inline-start: 160px;
     padding-left: 10px;
 }
 
@@ -126,22 +126,22 @@ form .aligned div.radiolist {
 
 form .aligned p.help,
 form .aligned div.help {
-    margin-top: 0;
-    margin-left: 160px;
+    margin-block-start: 0;
+    margin-inline-start: 160px;
     padding-left: 10px;
 }
 
 form .aligned p.date div.help.timezonewarning,
 form .aligned p.datetime div.help.timezonewarning,
 form .aligned p.time div.help.timezonewarning {
-    margin-left: 0;
+    margin-inline-start: 0;
     padding-left: 0;
     font-weight: normal;
 }
 
 form .aligned p.help:last-child,
 form .aligned div.help:last-child {
-    margin-bottom: 0;
+    margin-block-end: 0;
     padding-bottom: 0;
 }
 
@@ -151,7 +151,7 @@ form .aligned select + p.help,
 form .aligned input + div.help,
 form .aligned textarea + div.help,
 form .aligned select + div.help {
-    margin-left: 160px;
+    margin-inline-start: 160px;
     padding-left: 10px;
 }
 
@@ -160,7 +160,7 @@ form .aligned ul li {
 }
 
 form .aligned table p {
-    margin-left: 0;
+    margin-inline-start: 0;
     padding-left: 0;
 }
 
@@ -174,7 +174,7 @@ form .aligned table p {
 
 .aligned .vCheckboxLabel + p.help,
 .aligned .vCheckboxLabel + div.help {
-    margin-top: -4px;
+    margin-block-start: -4px;
 }
 
 .colM .aligned .vLargeTextField, .colM .aligned .vXMLLargeTextField {
@@ -182,7 +182,7 @@ form .aligned table p {
 }
 
 fieldset .fieldBox {
-    margin-right: 20px;
+    margin-inline-end: 20px;
 }
 
 /* WIDE FIELDSETS */
@@ -195,7 +195,7 @@ form .wide p,
 form .wide ul.errorlist,
 form .wide input + p.help,
 form .wide input + div.help {
-    margin-left: 200px;
+    margin-inline-start: 200px;
 }
 
 form .wide p.help,
@@ -205,7 +205,7 @@ form .wide div.help {
 
 form div.help ul {
     padding-left: 0;
-    margin-left: 0;
+    margin-inline-start: 0;
 }
 
 .colM fieldset.wide .vLargeTextField, .colM fieldset.wide .vXMLLargeTextField {
@@ -282,7 +282,7 @@ body.popup .submit-row {
 }
 
 .submit-row a.deletelink {
-    margin-left: auto;
+    margin-inline-start: auto;
 }
 
 .submit-row a.deletelink {
@@ -330,8 +330,8 @@ body.popup .submit-row {
 }
 
 .vDateField, .vTimeField {
-    margin-right: 2px;
-    margin-bottom: 4px;
+    margin-inline-end: 2px;
+    margin-block-end: 4px;
 }
 
 .vDateField {
@@ -409,7 +409,7 @@ body.popup .submit-row {
 }
 
 .inline-related h3 span.delete label {
-    margin-left: 2px;
+    margin-inline-start: 2px;
     font-size: 0.6875rem;
 }
 
@@ -509,7 +509,7 @@ body.popup .submit-row {
 /* RELATED FIELD ADD ONE / LOOKUP */
 
 .related-lookup {
-    margin-left: 5px;
+    margin-inline-start: 5px;
     display: inline-block;
     vertical-align: middle;
     background-repeat: no-repeat;
@@ -524,10 +524,10 @@ body.popup .submit-row {
 
 form .related-widget-wrapper ul {
     display: inline-block;
-    margin-left: 0;
+    margin-inline-start: 0;
     padding-left: 0;
 }
 
 .clearable-file-input input {
-    margin-top: 0;
+    margin-block-start: 0;
 }
