@@ -13,7 +13,7 @@
     flex: 0 0 23px;
     inline-size: 23px;
     border: 0;
-    border-right: 1px solid var(--hairline-color);
+    border-inline-end: 1px solid var(--hairline-color);
     background-color: var(--body-bg);
     cursor: pointer;
     font-size: 1.25rem;
@@ -22,8 +22,8 @@
 }
 
 [dir="rtl"] .toggle-nav-sidebar {
-    border-left: 1px solid var(--hairline-color);
-    border-right: 0;
+    border-inline-start: 1px solid var(--hairline-color);
+    border-inline-end: 0;
 }
 
 .toggle-nav-sidebar:hover,
@@ -36,15 +36,15 @@
     flex: 0 0 275px;
     inset-inline-start: -276px;
     margin-inline-start: -276px;
-    border-top: 1px solid transparent;
-    border-right: 1px solid var(--hairline-color);
+    border-block-start: 1px solid transparent;
+    border-inline-end: 1px solid var(--hairline-color);
     background-color: var(--body-bg);
     overflow: auto;
 }
 
 [dir="rtl"] #nav-sidebar {
-    border-left: 1px solid var(--hairline-color);
-    border-right: 0;
+    border-inline-start: 1px solid var(--hairline-color);
+    border-inline-end: 0;
     inset-inline-start: 0;
     margin-inline-start: 0;
     inset-inline-end: -276px;

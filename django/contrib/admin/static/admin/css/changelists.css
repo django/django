@@ -18,7 +18,7 @@
 .change-list .hiddenfields { display:none; }
 
 .change-list .filtered table {
-    border-right: none;
+    border-inline-end: none;
 }
 
 .change-list .filtered {
@@ -40,12 +40,12 @@
 }
 
 #changelist .toplinks {
-    border-bottom: 1px solid var(--hairline-color);
+    border-block-end: 1px solid var(--hairline-color);
 }
 
 #changelist .paginator {
     color: var(--body-quiet-color);
-    border-bottom: 1px solid var(--hairline-color);
+    border-block-end: 1px solid var(--hairline-color);
     background: var(--body-bg);
     overflow: hidden;
 }
@@ -77,8 +77,8 @@
     padding-block: 8px;
     padding-inline: 10px;
     margin-block-end: 15px;
-    border-top: 1px solid var(--hairline-color);
-    border-bottom: 1px solid var(--hairline-color);
+    border-block-start: 1px solid var(--hairline-color);
+    border-block-end: 1px solid var(--hairline-color);
     background: var(--darkened-bg);
     color: var(--body-quiet-color);
 }
@@ -138,7 +138,7 @@
     flex: 0 0 240px;
     order: 1;
     background: var(--darkened-bg);
-    border-left: none;
+    border-inline-start: none;
     margin-block: 0;
     margin-inline: 30px 0;
 }
@@ -156,7 +156,7 @@
     padding-block: 5px;
     padding-inline: 15px;
     margin-block-end: 12px;
-    border-bottom: none;
+    border-block-end: none;
 }
 
 #changelist-filter h3,
@@ -195,11 +195,11 @@
     margin-inline: 0;
     padding-block: 0 15px;
     padding-inline: 15px;
-    border-bottom: 1px solid var(--hairline-color);
+    border-block-end: 1px solid var(--hairline-color);
 }
 
 #changelist-filter ul:last-child {
-    border-bottom: none;
+    border-block-end: none;
 }
 
 #changelist-filter li {
@@ -215,7 +215,7 @@
 }
 
 #changelist-filter li.selected {
-    border-left: 5px solid var(--hairline-color);
+    border-inline-start: 5px solid var(--hairline-color);
     padding-inline-start: 10px;
     margin-inline-start: -15px;
 }
@@ -233,7 +233,7 @@
 #changelist-filter #changelist-filter-extra-actions {
     font-size: 0.8125rem;
     margin-block-end: 10px;
-    border-bottom: 1px solid var(--hairline-color);
+    border-block-end: 1px solid var(--hairline-color);
 }
 
 /* DATE DRILLDOWN */
@@ -262,7 +262,7 @@
 /* ACTIONS */
 
 .filtered .actions {
-    border-right: none;
+    border-inline-end: none;
 }
 
 #changelist table input {
@@ -292,8 +292,8 @@
 #changelist .actions {
     padding: 10px;
     background: var(--body-bg);
-    border-top: none;
-    border-bottom: none;
+    border-block-start: none;
+    border-block-end: none;
     line-height: 1.5rem;
     color: var(--body-quiet-color);
     inline-size: 100%;
@@ -309,7 +309,7 @@
 }
 
 #changelist .actions:last-child {
-    border-bottom: none;
+    border-block-end: none;
 }
 
 #changelist .actions select {

@@ -221,7 +221,7 @@ fieldset {
     min-inline-size: 0;
     padding: 0;
     border: none;
-    border-top: 1px solid var(--hairline-color);
+    border-block-start: 1px solid var(--hairline-color);
 }
 
 blockquote {
@@ -229,7 +229,7 @@ blockquote {
     color: #777;
     margin-inline-start: 2px;
     padding-inline-start: 10px;
-    border-left: 5px solid #ddd;
+    border-inline-start: 5px solid #ddd;
 }
 
 code, pre {
@@ -315,7 +315,7 @@ table {
 td, th {
     font-size: 0.8125rem;
     line-height: 1rem;
-    border-bottom: 1px solid var(--hairline-color);
+    border-block-end: 1px solid var(--hairline-color);
     vertical-align: top;
     padding: 8px;
 }
@@ -333,13 +333,13 @@ tfoot td {
     font-size: 0.6875rem;
     background: var(--body-bg);
     border: none;
-    border-top: 1px solid var(--hairline-color);
-    border-bottom: 1px solid var(--hairline-color);
+    border-block-start: 1px solid var(--hairline-color);
+    border-block-end: 1px solid var(--hairline-color);
 }
 
 tfoot td {
-    border-bottom: none;
-    border-top: 1px solid var(--hairline-color);
+    border-block-end: none;
+    border-block-start: 1px solid var(--hairline-color);
 }
 
 thead th.required {
@@ -701,7 +701,7 @@ td ul.errorlist li {
 .form-row.errors {
     margin: 0;
     border: none;
-    border-bottom: 1px solid var(--hairline-color);
+    border-block-end: 1px solid var(--hairline-color);
     background: none;
 }
 
@@ -844,7 +844,7 @@ a.deletelink:focus, a.deletelink:hover {
 
 #change-history .paginator {
     color: var(--body-quiet-color);
-    border-bottom: 1px solid var(--hairline-color);
+    border-block-end: 1px solid var(--hairline-color);
     background: var(--body-bg);
     overflow: hidden;
 }
@@ -965,7 +965,7 @@ a.deletelink:focus, a.deletelink:hover {
 
 @media (forced-colors: active) {
   #header {
-      border-bottom: 1px solid;
+      border-block-end: 1px solid;
   }
 }
 
@@ -1027,13 +1027,13 @@ a.deletelink:focus, a.deletelink:hover {
 }
 
 #user-tools a, #logout-form button {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+    border-block-end: 1px solid rgba(255, 255, 255, 0.25);
 }
 
 #user-tools a:focus, #user-tools a:hover,
 #logout-form button:active, #logout-form button:hover {
     text-decoration: none;
-    border-bottom: 0;
+    border-block-end: 0;
 }
 
 #logout-form button:active, #logout-form button:hover {
@@ -1082,7 +1082,7 @@ a.deletelink:focus, a.deletelink:hover {
     background: none;
     padding: 16px;
     margin-block-end: 16px;
-    border-bottom: 1px solid var(--hairline-color);
+    border-block-end: 1px solid var(--hairline-color);
     font-size: 1.125rem;
     color: var(--body-fg);
 }
@@ -1146,7 +1146,7 @@ a.deletelink:focus, a.deletelink:hover {
     padding-block-end: 10px;
     line-height: 22px;
     margin: 0;
-    border-top: 1px solid var(--hairline-color);
+    border-block-start: 1px solid var(--hairline-color);
     inline-size: 100%;
 }
 

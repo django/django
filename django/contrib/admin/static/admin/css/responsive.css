@@ -174,7 +174,7 @@ input[type="submit"], button {
     }
 
     #changelist .results + .paginator {
-        border-top: none;
+        border-block-start: none;
     }
 
     /* Forms */
@@ -212,7 +212,7 @@ input[type="submit"], button {
     fieldset .fieldBox + .fieldBox {
         margin-block-start: 10px;
         padding-block-start: 10px;
-        border-top: 1px solid var(--hairline-color);
+        border-block-start: 1px solid var(--hairline-color);
     }
 
     textarea {
@@ -783,12 +783,12 @@ input[type="submit"], button {
     }
 
     .inline-group[data-inline-type="stacked"] .inline-related .module .form-row {
-        border-top: 1px solid var(--hairline-color);
-        border-bottom: none;
+        border-block-start: 1px solid var(--hairline-color);
+        border-block-end: none;
     }
 
     .inline-group[data-inline-type="stacked"] .inline-related .module .form-row:first-child {
-        border-top: none;
+        border-block-start: none;
     }
 
     .inline-group[data-inline-type="stacked"] .inline-related h3 {

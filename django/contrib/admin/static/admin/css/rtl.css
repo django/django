@@ -25,7 +25,6 @@ th {
 
 thead th:first-child,
 tfoot td:first-child {
-    border-left: none;
 }
 
 /* LAYOUT */
@@ -66,23 +65,15 @@ thead th.sorted .text {
 /* changelists styles */
 
 .change-list .filtered table {
-    border-left: none;
-    border-right: 0px none;
 }
 
 #changelist-filter {
-    border-left: none;
-    border-right: none;
 }
 
 #changelist-filter li.selected {
-    border-left: none;
-    border-right: 5px solid var(--hairline-color);
 }
 
 #changelist table tbody td:first-child, #changelist table tbody th:first-child {
-    border-right: none;
-    border-left: none;
 }
 
 .paginator .end {
