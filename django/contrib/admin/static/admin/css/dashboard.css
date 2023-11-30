@@ -13,7 +13,7 @@
 
 .dashboard .module table td a {
     display: block;
-    padding-right: .6em;
+    padding-inline-end: .6em;
 }
 
 /* RECENT ACTIONS MODULE */

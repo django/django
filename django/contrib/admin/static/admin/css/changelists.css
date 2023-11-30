@@ -31,7 +31,7 @@
 }
 
 .change-list .filtered table tbody th {
-    padding-right: 1em;
+    padding-inline-end: 1em;
 }
 
 #changelist-form .results {
@@ -205,7 +205,7 @@
 #changelist-filter li {
     list-style-type: none;
     margin-inline-start: 0;
-    padding-left: 0;
+    padding-inline-start: 0;
 }
 
 #changelist-filter a {
@@ -216,7 +216,7 @@
 
 #changelist-filter li.selected {
     border-left: 5px solid var(--hairline-color);
-    padding-left: 10px;
+    padding-inline-start: 10px;
     margin-inline-start: -15px;
 }
 
@@ -240,7 +240,7 @@
 
 .change-list .toplinks {
     display: flex;
-    padding-bottom: 5px;
+    padding-block-end: 5px;
     flex-wrap: wrap;
     gap: 3px 17px;
     font-weight: bold;

@@ -79,7 +79,7 @@
 
 #nav-sidebar .module th,
 #nav-sidebar .module caption {
-    padding-left: 16px;
+    padding-inline-start: 16px;
 }
 
 #nav-sidebar .module td {
@@ -88,8 +88,8 @@
 
 [dir="rtl"] #nav-sidebar .module th,
 [dir="rtl"] #nav-sidebar .module caption {
-    padding-left: 8px;
-    padding-right: 16px;
+    padding-inline-start: 8px;
+    padding-inline-end: 16px;
 }
 
 #nav-sidebar .current-app .section:link,

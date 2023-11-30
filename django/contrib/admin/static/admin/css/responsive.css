@@ -87,7 +87,7 @@ input[type="submit"], button {
     }
 
     .dashboard .module table td a {
-        padding-right: 0;
+        padding-inline-end: 0;
     }
 
     td .changelink, td .addlink {
@@ -211,7 +211,7 @@ input[type="submit"], button {
 
     fieldset .fieldBox + .fieldBox {
         margin-block-start: 10px;
-        padding-top: 10px;
+        padding-block-start: 10px;
         border-top: 1px solid var(--hairline-color);
     }
 
@@ -221,7 +221,7 @@ input[type="submit"], button {
     }
 
     .aligned label {
-        padding-top: 6px;
+        padding-block-start: 6px;
     }
 
     .aligned .related-lookup,
@@ -430,7 +430,7 @@ input[type="submit"], button {
     /* Messages */
 
     ul.messagelist li {
-        padding-left: 55px;
+        padding-inline-start: 55px;
         background-position: 30px 12px;
     }
 
@@ -600,7 +600,7 @@ input[type="submit"], button {
 
     fieldset .fieldBox + .fieldBox {
         margin-block-start: 15px;
-        padding-top: 15px;
+        padding-block-start: 15px;
     }
 
     fieldset.collapsed .form-row {
@@ -653,7 +653,7 @@ input[type="submit"], button {
 
     span.clearable-file-input label {
         font-size: 0.8125rem;
-        padding-bottom: 0;
+        padding-block-end: 0;
     }
 
     .aligned .timezonewarning {
@@ -671,7 +671,7 @@ input[type="submit"], button {
     form .aligned ul,
     form .aligned ul.errorlist {
         margin-inline-start: 0;
-        padding-left: 0;
+        padding-inline-start: 0;
     }
 
     form .aligned div.radiolist {
@@ -864,7 +864,7 @@ input[type="submit"], button {
     /* Messages */
 
     ul.messagelist li {
-        padding-left: 40px;
+        padding-inline-start: 40px;
         background-position: 15px 12px;
     }
 

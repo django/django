@@ -19,7 +19,7 @@
 }
 
 form .form-row p {
-    padding-left: 0;
+    padding-inline-start: 0;
 }
 
 .flex-container {
@@ -27,7 +27,7 @@ form .form-row p {
 }
 
 .form-multiline > div {
-    padding-bottom: 10px;
+    padding-block-end: 10px;
 }
 
 /* FORM LABELS */
@@ -46,7 +46,7 @@ label {
 /* RADIO BUTTONS */
 
 form div.radiolist div {
-    padding-right: 7px;
+    padding-inline-end: 7px;
 }
 
 form div.radiolist.inline div {
@@ -70,7 +70,7 @@ form ul.inline {
 
 form ul.inline li {
     float: left;
-    padding-right: 7px;
+    padding-inline-end: 7px;
 }
 
 /* ALIGNED FIELDSETS */
@@ -117,7 +117,7 @@ form ul.inline li {
 
 form .aligned ul {
     margin-inline-start: 160px;
-    padding-left: 10px;
+    padding-inline-start: 10px;
 }
 
 form .aligned div.radiolist {
@@ -130,21 +130,21 @@ form .aligned p.help,
 form .aligned div.help {
     margin-block-start: 0;
     margin-inline-start: 160px;
-    padding-left: 10px;
+    padding-inline-start: 10px;
 }
 
 form .aligned p.date div.help.timezonewarning,
 form .aligned p.datetime div.help.timezonewarning,
 form .aligned p.time div.help.timezonewarning {
     margin-inline-start: 0;
-    padding-left: 0;
+    padding-inline-start: 0;
     font-weight: normal;
 }
 
 form .aligned p.help:last-child,
 form .aligned div.help:last-child {
     margin-block-end: 0;
-    padding-bottom: 0;
+    padding-block-end: 0;
 }
 
 form .aligned input + p.help,
@@ -154,7 +154,7 @@ form .aligned input + div.help,
 form .aligned textarea + div.help,
 form .aligned select + div.help {
     margin-inline-start: 160px;
-    padding-left: 10px;
+    padding-inline-start: 10px;
 }
 
 form .aligned ul li {
@@ -163,7 +163,7 @@ form .aligned ul li {
 
 form .aligned table p {
     margin-inline-start: 0;
-    padding-left: 0;
+    padding-inline-start: 0;
 }
 
 .aligned .vCheckboxLabel {
@@ -203,11 +203,11 @@ form .wide input + div.help {
 
 form .wide p.help,
 form .wide div.help {
-    padding-left: 50px;
+    padding-inline-start: 50px;
 }
 
 form div.help ul {
-    padding-left: 0;
+    padding-inline-start: 0;
     margin-inline-start: 0;
 }
 
@@ -452,7 +452,7 @@ body.popup .submit-row {
 }
 
 .inline-group .tabular tr.has_original td {
-    padding-top: 2em;
+    padding-block-start: 2em;
 }
 
 .inline-group .tabular tr td.original {
@@ -511,7 +511,7 @@ body.popup .submit-row {
 .inline-group div.add-row a,
 .inline-group .tabular tr.add-row td a {
     background: url(../img/icon-addlink.svg) 0 1px no-repeat;
-    padding-left: 16px;
+    padding-inline-start: 16px;
     font-size: 0.75rem;
 }
 
@@ -538,7 +538,7 @@ body.popup .submit-row {
 form .related-widget-wrapper ul {
     display: inline-block;
     margin-inline-start: 0;
-    padding-left: 0;
+    padding-inline-start: 0;
 }
 
 .clearable-file-input input {

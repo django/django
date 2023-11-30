@@ -12,14 +12,10 @@ th {
 }
 
 .viewlink, .addlink, .changelink, .hidelink {
-    padding-left: 0;
-    padding-right: 16px;
     background-position: 100% 1px;
 }
 
 .deletelink {
-    padding-left: 0;
-    padding-right: 16px;
     background-position: 100% 1px;
 }
 
@@ -60,15 +56,11 @@ table thead th.sorted .sortoptions {
 }
 
 thead th.sorted .text {
-    padding-right: 0;
-    padding-left: 42px;
 }
 
 /* dashboard styles */
 
 .dashboard .module table td a {
-    padding-left: .6em;
-    padding-right: 16px;
 }
 
 /* changelists styles */
@@ -85,9 +77,7 @@ thead th.sorted .text {
 
 #changelist-filter li.selected {
     border-left: none;
-    padding-left: 10px;
     border-right: 5px solid var(--hairline-color);
-    padding-right: 10px;
 }
 
 #changelist table tbody td:first-child, #changelist table tbody th:first-child {
@@ -116,19 +106,14 @@ thead th.sorted .text {
 }
 
 form .aligned ul {
-    padding-right: 10px;
-    padding-left: 0;
 }
 
 form ul.inline li {
     float: right;
-    padding-right: 0;
-    padding-left: 7px;
 }
 
 form .aligned p.help,
 form .aligned div.help {
-    padding-right: 10px;
 }
 
 form div.help ul,
@@ -136,12 +121,9 @@ form .aligned .checkbox-row + .help,
 form .aligned p.date div.help.timezonewarning,
 form .aligned p.datetime div.help.timezonewarning,
 form .aligned p.time div.help.timezonewarning {
-    padding-right: 0;
 }
 
 form .wide p.help, form .wide div.help {
-    padding-left: 0;
-    padding-right: 50px;
 }
 
 .submit-row {
@@ -243,8 +225,6 @@ form .form-row p.datetime {
 }
 
 .inline-related h3 span.delete {
-    padding-right: 20px;
-    padding-left: inherit;
     float:left;
 }
 

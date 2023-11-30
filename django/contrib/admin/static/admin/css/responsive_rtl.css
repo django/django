@@ -9,8 +9,6 @@
     }
 
     [dir="rtl"] #changelist .actions label {
-        padding-left: 10px;
-        padding-right: 0;
     }
 
     [dir="rtl"] #changelist .actions select {
@@ -44,8 +42,6 @@
     }
 
     [dir="rtl"] .dashboard .module table td a {
-        padding-left: 0;
-        padding-right: 16px;
     }
 
     [dir="rtl"] .selector-add {

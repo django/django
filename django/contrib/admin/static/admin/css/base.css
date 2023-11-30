@@ -175,7 +175,7 @@ h4 {
     font-size: 0.75rem;
     margin-block: 1em .8em;
     margin-inline: 0;
-    padding-bottom: 3px;
+    padding-block-end: 3px;
 }
 
 h5 {
@@ -228,7 +228,7 @@ blockquote {
     font-size: 0.6875rem;
     color: #777;
     margin-inline-start: 2px;
-    padding-left: 10px;
+    padding-inline-start: 10px;
     border-left: 5px solid #ddd;
 }
 
@@ -380,7 +380,7 @@ thead th.sorted {
 }
 
 thead th.sorted .text {
-    padding-right: 42px;
+    padding-inline-end: 42px;
 }
 
 table thead th .text span {
@@ -581,8 +581,8 @@ input[type=button][disabled].default {
 }
 
 .module p, .module ul, .module h3, .module h4, .module dl, .module pre {
-    padding-left: 10px;
-    padding-right: 10px;
+    padding-inline-start: 10px;
+    padding-inline-end: 10px;
 }
 
 .module blockquote {
@@ -706,7 +706,7 @@ td ul.errorlist li {
 }
 
 .form-row.errors ul.errorlist li {
-    padding-left: 0;
+    padding-inline-start: 0;
 }
 
 .errors input, .errors select, .errors textarea,
@@ -742,27 +742,27 @@ div.breadcrumbs a:focus, div.breadcrumbs a:hover {
 /* ACTION ICONS */
 
 .viewlink, .inlineviewlink {
-    padding-left: 16px;
+    padding-inline-start: 16px;
     background: url(../img/icon-viewlink.svg) 0 1px no-repeat;
 }
 
 .hidelink {
-    padding-left: 16px;
+    padding-inline-start: 16px;
     background: url(../img/icon-hidelink.svg) 0 1px no-repeat;
 }
 
 .addlink {
-    padding-left: 16px;
+    padding-inline-start: 16px;
     background: url(../img/icon-addlink.svg) 0 1px no-repeat;
 }
 
 .changelink, .inlinechangelink {
-    padding-left: 16px;
+    padding-inline-start: 16px;
     background: url(../img/icon-changelink.svg) 0 1px no-repeat;
 }
 
 .deletelink {
-    padding-left: 16px;
+    padding-inline-start: 16px;
     background: url(../img/icon-deletelink.svg) 0 1px no-repeat;
 }
 
@@ -780,7 +780,7 @@ a.deletelink:focus, a.deletelink:hover {
 .object-tools {
     font-size: 0.625rem;
     font-weight: bold;
-    padding-left: 0;
+    padding-inline-start: 0;
     float: right;
     position: relative;
     margin-block-start: -48px;
@@ -821,7 +821,7 @@ a.deletelink:focus, a.deletelink:hover {
 .object-tools a.viewsitelink, .object-tools a.addlink {
     background-repeat: no-repeat;
     background-position: right 7px center;
-    padding-right: 26px;
+    padding-inline-end: 26px;
 }
 
 .object-tools a.viewsitelink {
@@ -1063,8 +1063,8 @@ a.deletelink:focus, a.deletelink:hover {
 }
 
 #content-related p {
-    padding-left: 16px;
-    padding-right: 16px;
+    padding-inline-start: 16px;
+    padding-inline-end: 16px;
 }
 
 #content-related .actionlist {
@@ -1075,7 +1075,7 @@ a.deletelink:focus, a.deletelink:hover {
 #content-related .actionlist li {
     line-height: 1.2;
     margin-block-end: 10px;
-    padding-left: 18px;
+    padding-inline-start: 18px;
 }
 
 #content-related .module h2 {
@@ -1142,8 +1142,8 @@ a.deletelink:focus, a.deletelink:hover {
     align-items: center;
     gap: 4px;
     font-size: 0.8125rem;
-    padding-top: 10px;
-    padding-bottom: 10px;
+    padding-block-start: 10px;
+    padding-block-end: 10px;
     line-height: 22px;
     margin: 0;
     border-top: 1px solid var(--hairline-color);

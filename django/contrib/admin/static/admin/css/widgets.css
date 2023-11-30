@@ -318,7 +318,7 @@ p.datetime {
 table p.datetime {
     font-size: 0.6875rem;
     margin-inline-start: 0;
-    padding-left: 0;
+    padding-inline-start: 0;
 }
 
 .datetimeshortcuts .clock-icon, .datetimeshortcuts .date-icon {
