@@ -217,7 +217,8 @@ a.active.selector-clearall:focus, a.active.selector-clearall:hover {
 .stacked ul.selector-chooser {
     block-size: 22px;
     inline-size: 50px;
-    margin: 0 0 10px 40%;
+    margin-block: 0 10px;
+    margin-inline: 40% 0;
     background-color: #eee;
     border-radius: 10px;
     transform: none;
@@ -266,7 +267,8 @@ a.active.selector-clearall:focus, a.active.selector-clearall:hover {
     background: url(../img/icon-unknown.svg) 0 0 no-repeat;
     display: inline-block;
     vertical-align: middle;
-    margin: -2px 0 0 2px;
+    margin-block: -2px 0;
+    margin-inline: 2px 0;
     inline-size: 13px;
     block-size: 13px;
 }

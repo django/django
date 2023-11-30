@@ -58,7 +58,8 @@ form div.radiolist label {
 }
 
 form div.radiolist input[type="radio"] {
-    margin: -2px 4px 0 0;
+    margin-block: -2px 0;
+    margin-inline: 0 4px;
     padding: 0;
 }
 

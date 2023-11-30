@@ -111,7 +111,8 @@ input[type="submit"], button {
         flex: 1 0 auto;
         inline-size: 0;
         block-size: 1.375rem;
-        margin: 0 10px 0 6px;
+        margin-block: 0;
+        margin-inline: 6px 10px;
     }
 
     #toolbar form input[type=submit] {
@@ -121,7 +122,8 @@ input[type="submit"], button {
     #changelist-search .quiet {
         inline-size: 0;
         flex: 1 0 auto;
-        margin: 5px 0 0 25px;
+        margin-block: 5px 0;
+        margin-inline: 25px 0;
     }
 
     #changelist .actions {
@@ -148,7 +150,8 @@ input[type="submit"], button {
     #changelist .actions span.question,
     #changelist .actions span.action-counter {
         font-size: 0.6875rem;
-        margin: 0 10px 0 0;
+        margin-block: 0;
+        margin-inline: 0 10px;
     }
 
     #changelist-filter {
@@ -266,7 +269,8 @@ input[type="submit"], button {
     }
 
     .selector .selector-filter label {
-        margin: 0 8px 0 0;
+        margin-block: 0;
+        margin-inline: 0 8px;
     }
 
     .selector .selector-filter input {

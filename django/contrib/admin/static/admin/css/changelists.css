@@ -136,7 +136,8 @@
     order: 1;
     background: var(--darkened-bg);
     border-left: none;
-    margin: 0 0 0 30px;
+    margin-block: 0;
+    margin-inline: 30px 0;
 }
 
 @media (forced-colors: active) {

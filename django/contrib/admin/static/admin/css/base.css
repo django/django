@@ -982,7 +982,8 @@ a.deletelink:focus, a.deletelink:hover {
 
 #user-tools {
     float: right;
-    margin: 0 0 0 20px;
+    margin-block: 0;
+    margin-inline: 20px 0;
     text-align: right;
 }
 
@@ -1075,7 +1076,8 @@ a.deletelink:focus, a.deletelink:hover {
     padding: 10px 15px;
     color: var(--button-fg);
     background: var(--close-button-bg);
-    margin: 0 0 0 10px;
+    margin-block: 0;
+    margin-inline: 10px 0;
 }
 
 .delete-confirmation form .cancel-link:active,
