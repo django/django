@@ -195,7 +195,7 @@ fieldset .fieldBox {
     top: 0;
     left: auto;
     right: 10px;
-    background: url(../img/calendar-icons.svg) 0 -30px no-repeat;
+    background-position: 0 -30px;
 }
 
 .calendarbox .calendarnav-previous:focus,
@@ -207,7 +207,7 @@ fieldset .fieldBox {
     top: 0;
     right: auto;
     left: 10px;
-    background: url(../img/calendar-icons.svg) 0 0 no-repeat;
+    background-position: 0 0;
 }
 
 .calendarbox .calendarnav-next:focus,
@@ -228,7 +228,7 @@ fieldset .fieldBox {
 }
 
 .selector-add {
-  background: url(../img/selector-icons.svg) 0 -64px no-repeat;
+    background-position: 0 -64px;
 }
 
 .active.selector-add:focus, .active.selector-add:hover {
@@ -236,7 +236,7 @@ fieldset .fieldBox {
 }
 
 .selector-remove {
-  background: url(../img/selector-icons.svg) 0 -96px no-repeat;
+    background-position: 0 -96px;
 }
 
 .active.selector-remove:focus, .active.selector-remove:hover {
@@ -244,7 +244,7 @@ fieldset .fieldBox {
 }
 
 a.selector-chooseall {
-    background: url(../img/selector-icons.svg) right -128px no-repeat;
+    background-position: right -128px;
 }
 
 a.active.selector-chooseall:focus, a.active.selector-chooseall:hover {
@@ -252,7 +252,7 @@ a.active.selector-chooseall:focus, a.active.selector-chooseall:hover {
 }
 
 a.selector-clearall {
-    background: url(../img/selector-icons.svg) 0 -160px no-repeat;
+    background-position: 0 -160px;
 }
 
 a.active.selector-clearall:focus, a.active.selector-clearall:hover {
