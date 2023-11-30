@@ -187,13 +187,13 @@ select.admin-autocomplete {
 }
 
 .select2-container--admin-autocomplete.select2-container--open.select2-container--above .select2-selection--single, .select2-container--admin-autocomplete.select2-container--open.select2-container--above .select2-selection--multiple {
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
+    border-start-start-radius: 0;
+    border-end-start-radius: 0;
 }
 
 .select2-container--admin-autocomplete.select2-container--open.select2-container--below .select2-selection--single, .select2-container--admin-autocomplete.select2-container--open.select2-container--below .select2-selection--multiple {
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
+    border-start-end-radius: 0;
+    border-end-end-radius: 0;
 }
 
 .select2-container--admin-autocomplete .select2-search--dropdown {
