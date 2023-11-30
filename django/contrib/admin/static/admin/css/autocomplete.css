@@ -138,7 +138,8 @@ select.admin-autocomplete {
     float: left;
     margin-inline-end: 5px;
     margin-block-start: 5px;
-    padding: 0 5px;
+    padding-block: 0;
+    padding-inline: 5px;
 }
 
 .select2-container--admin-autocomplete .select2-selection--multiple .select2-selection__choice__remove {

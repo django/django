@@ -189,7 +189,8 @@ h5 {
 
 ul > li {
     list-style-type: square;
-    padding: 1px 0;
+    padding-block: 1px;
+    padding-inline: 0;
 }
 
 li ul {
@@ -241,7 +242,8 @@ code, pre {
 pre.literal-block {
     margin: 10px;
     background: var(--darkened-bg);
-    padding: 6px 8px;
+    padding-block: 6px;
+    padding-inline: 8px;
 }
 
 code strong {
@@ -326,7 +328,8 @@ th {
 thead th,
 tfoot td {
     color: var(--body-quiet-color);
-    padding: 5px 10px;
+    padding-block: 5px;
+    padding-inline: 10px;
     font-size: 0.6875rem;
     background: var(--body-bg);
     border: none;
@@ -361,7 +364,8 @@ tr:nth-child(odd) + .row-form-errors .errorlist {
 /* SORTABLE TABLES */
 
 thead th {
-    padding: 5px 10px;
+    padding-block: 5px;
+    padding-inline: 10px;
     line-height: normal;
     text-transform: uppercase;
     background: var(--darkened-bg);
@@ -380,14 +384,16 @@ thead th.sorted .text {
 }
 
 table thead th .text span {
-    padding: 8px 10px;
+    padding-block: 8px;
+    padding-inline: 10px;
     display: block;
 }
 
 table thead th .text a {
     display: block;
     cursor: pointer;
-    padding: 8px 10px;
+    padding-block: 8px;
+    padding-inline: 10px;
 }
 
 table thead th .text a:focus, table thead th .text a:hover {
@@ -476,14 +482,16 @@ table thead th.sorted .sortoptions a.descending:hover {
 input, textarea, select, .form-row p, form .button {
     margin-block: 2px;
     margin-inline: 0;
-    padding: 2px 3px;
+    padding-block: 2px;
+    padding-inline: 3px;
     vertical-align: middle;
     font-family: var(--font-family-primary);
     font-weight: normal;
     font-size: 0.8125rem;
 }
 .form-row div.help {
-    padding: 2px 3px;
+    padding-block: 2px;
+    padding-inline: 3px;
 }
 
 textarea {
@@ -494,7 +502,8 @@ input[type=text], input[type=password], input[type=email], input[type=url],
 input[type=number], input[type=tel], textarea, select, .vTextField {
     border: 1px solid var(--border-color);
     border-radius: 4px;
-    padding: 5px 6px;
+    padding-block: 5px;
+    padding-inline: 6px;
     margin-block-start: 0;
     color: var(--body-fg);
     background-color: var(--body-bg);
@@ -520,7 +529,8 @@ select[multiple] {
 
 .button, input[type=submit], input[type=button], .submit-row input, a.button {
     background: var(--button-bg);
-    padding: 10px 15px;
+    padding-block: 10px;
+    padding-inline: 15px;
     border: none;
     border-radius: 4px;
     color: var(--button-fg);
@@ -529,7 +539,8 @@ select[multiple] {
 }
 
 a.button {
-    padding: 4px 5px;
+    padding-block: 4px;
+    padding-inline: 5px;
 }
 
 .button:active, input[type=submit]:active, input[type=button]:active,
@@ -642,7 +653,8 @@ ul.messagelist li.error {
     font-size: 0.875rem;
     font-weight: 700;
     display: block;
-    padding: 10px 12px;
+    padding-block: 10px;
+    padding-inline: 12px;
     margin-block: 0 10px;
     margin-inline: 0;
     color: var(--error-fg);
@@ -712,7 +724,8 @@ td ul.errorlist + input, td ul.errorlist + select, td ul.errorlist + textarea {
 
 div.breadcrumbs {
     background: var(--breadcrumbs-bg);
-    padding: 10px 40px;
+    padding-block: 10px;
+    padding-inline: 40px;
     border: none;
     color: var(--breadcrumbs-fg);
     text-align: left;
@@ -787,7 +800,8 @@ a.deletelink:focus, a.deletelink:hover {
 .object-tools a:link, .object-tools a:visited {
     display: block;
     float: left;
-    padding: 3px 12px;
+    padding-block: 3px;
+    padding-inline: 12px;
     background: var(--object-tools-bg);
     color: var(--object-tools-fg);
     font-weight: 400;
@@ -872,7 +886,8 @@ a.deletelink:focus, a.deletelink:hover {
 }
 
 #content {
-    padding: 20px 40px;
+    padding-block: 20px;
+    padding-inline: 40px;
 }
 
 .dashboard #content {
@@ -934,7 +949,8 @@ a.deletelink:focus, a.deletelink:hover {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 40px;
+    padding-block: 10px;
+    padding-inline: 40px;
     background: var(--header-bg);
     color: var(--header-color);
 }
@@ -971,7 +987,8 @@ a.deletelink:focus, a.deletelink:hover {
 }
 
 #branding h2 {
-    padding: 0 10px;
+    padding-block: 0;
+    padding-inline: 10px;
     font-size: 0.875rem;
     margin-block: -8px 8px;
     margin-inline: 0;
@@ -1035,7 +1052,8 @@ a.deletelink:focus, a.deletelink:hover {
 
 #content-related h3 {
     color: var(--body-quiet-color);
-    padding: 0 16px;
+    padding-block: 0;
+    padding-inline: 16px;
     margin-block: 0 16px;
     margin-inline: 0;
 }
@@ -1072,7 +1090,8 @@ a.deletelink:focus, a.deletelink:hover {
 .delete-confirmation form input[type="submit"] {
     background: var(--delete-button-bg);
     border-radius: 4px;
-    padding: 10px 15px;
+    padding-block: 10px;
+    padding-inline: 15px;
     color: var(--button-fg);
 }
 
@@ -1088,7 +1107,8 @@ a.deletelink:focus, a.deletelink:hover {
     block-size: 0.9375rem;
     line-height: 0.9375rem;
     border-radius: 4px;
-    padding: 10px 15px;
+    padding-block: 10px;
+    padding-inline: 15px;
     color: var(--button-fg);
     background: var(--close-button-bg);
     margin-block: 0;
@@ -1111,7 +1131,8 @@ a.deletelink:focus, a.deletelink:hover {
 }
 
 .popup #header {
-    padding: 10px 20px;
+    padding-block: 10px;
+    padding-inline: 20px;
 }
 
 /* PAGINATOR */
@@ -1130,7 +1151,8 @@ a.deletelink:focus, a.deletelink:hover {
 }
 
 .paginator a:link, .paginator a:visited {
-    padding: 2px 6px;
+    padding-block: 2px;
+    padding-inline: 6px;
     background: var(--button-bg);
     text-decoration: none;
     color: var(--button-fg);
@@ -1152,7 +1174,8 @@ a.deletelink:focus, a.deletelink:hover {
 }
 
 .paginator .this-page {
-    padding: 2px 6px;
+    padding-block: 2px;
+    padding-inline: 6px;
     font-weight: bold;
     font-size: 0.8125rem;
     vertical-align: top;

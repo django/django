@@ -7,7 +7,8 @@
 
 .login #header {
     block-size: auto;
-    padding: 15px 16px;
+    padding-block: 15px;
+    padding-inline: 16px;
     justify-content: center;
 }
 
@@ -38,7 +39,8 @@
 }
 
 .login .form-row {
-    padding: 4px 0;
+    padding-block: 4px;
+    padding-inline: 0;
 }
 
 .login .form-row label {

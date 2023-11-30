@@ -130,7 +130,8 @@
 #nav-filter {
     inline-size: 100%;
     box-sizing: border-box;
-    padding: 2px 5px;
+    padding-block: 2px;
+    padding-inline: 5px;
     margin-block: 5px;
     margin-inline: 0;
     border: 1px solid var(--border-color);

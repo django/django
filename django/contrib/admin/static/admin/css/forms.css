@@ -93,7 +93,8 @@ form ul.inline li {
 }
 
 .aligned label + p, .aligned .checkbox-row + div.help, .aligned label + div.readonly {
-    padding: 6px 0;
+    padding-block: 6px;
+    padding-inline: 0;
     margin-block-start: 0;
     margin-block-end: 0;
     margin-inline-start: 0;
@@ -254,7 +255,8 @@ fieldset.monospace textarea {
 /* SUBMIT ROW */
 
 .submit-row {
-    padding: 12px 14px;
+    padding-block: 12px;
+    padding-inline: 14px;
     margin-block: 0 20px;
     margin-inline: 0;
     background: var(--darkened-bg);
@@ -291,7 +293,8 @@ body.popup .submit-row {
     display: block;
     background: var(--delete-button-bg);
     border-radius: 4px;
-    padding: 0.625rem 0.9375rem;
+    padding-block: 0.625rem;
+    padding-inline: 0.9375rem;
     block-size: 0.9375rem;
     line-height: 0.9375rem;
     color: var(--button-fg);
@@ -301,7 +304,8 @@ body.popup .submit-row {
     display: inline-block;
     background: var(--close-button-bg);
     border-radius: 4px;
-    padding: 10px 15px;
+    padding-block: 10px;
+    padding-inline: 15px;
     block-size: 0.9375rem;
     line-height: 0.9375rem;
     color: var(--button-fg);
@@ -385,7 +389,8 @@ body.popup .submit-row {
 }
 
 .inline-group thead th {
-    padding: 8px 10px;
+    padding-block: 8px;
+    padding-inline: 10px;
 }
 
 .inline-group .aligned label {
@@ -466,7 +471,8 @@ body.popup .submit-row {
     position: absolute;
     inset-inline-start: 0;
     block-size: 1.1em;
-    padding: 2px 9px;
+    padding-block: 2px;
+    padding-inline: 9px;
     overflow: hidden;
     font-size: 0.5625rem;
     font-weight: bold;
@@ -482,19 +488,22 @@ body.popup .submit-row {
 
 .inline-group ul.tools li {
     display: inline;
-    padding: 0 5px;
+    padding-block: 0;
+    padding-inline: 5px;
 }
 
 .inline-group div.add-row,
 .inline-group .tabular tr.add-row td {
     color: var(--body-quiet-color);
     background: var(--darkened-bg);
-    padding: 8px 10px;
+    padding-block: 8px;
+    padding-inline: 10px;
     border-bottom: 1px solid var(--hairline-color);
 }
 
 .inline-group .tabular tr.add-row td {
-    padding: 8px 10px;
+    padding-block: 8px;
+    padding-inline: 10px;
     border-bottom: 1px solid var(--hairline-color);
 }
 

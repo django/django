@@ -33,14 +33,16 @@ input[type="submit"], button {
     }
 
     div.breadcrumbs {
-        padding: 10px 30px;
+        padding-block: 10px;
+        padding-inline: 30px;
     }
 
     /* Header */
 
     #header {
         flex-direction: column;
-        padding: 15px 30px;
+        padding-block: 15px;
+        padding-inline: 30px;
         justify-content: flex-start;
     }
 
@@ -131,7 +133,8 @@ input[type="submit"], button {
     #changelist .actions {
         display: flex;
         flex-wrap: wrap;
-        padding: 15px 0;
+        padding-block: 15px;
+        padding-inline: 0;
     }
 
     #changelist .actions label {
@@ -191,7 +194,8 @@ input[type="submit"], button {
     .form-row .vTextField {
         box-sizing: border-box;
         margin: 0;
-        padding: 6px 8px;
+        padding-block: 6px;
+        padding-inline: 8px;
         min-block-size: 2.25rem;
         font-size: 0.875rem;
     }
@@ -236,7 +240,8 @@ input[type="submit"], button {
     }
 
     .submit-row a.deletelink {
-        padding: 10px 7px;
+        padding-block: 10px;
+        padding-inline: 7px;
     }
 
     .button, input[type=submit], input[type=button], .submit-row input, a.button {
@@ -298,7 +303,8 @@ input[type="submit"], button {
     .selector ul.selector-chooser {
         inline-size: 26px;
         block-size: 52px;
-        padding: 2px 0;
+        padding-block: 2px;
+        padding-inline: 0;
         margin-block: auto;
         margin-inline: 15px;
         border-radius: 20px;
@@ -343,7 +349,8 @@ input[type="submit"], button {
     .stacked ul.selector-chooser {
         inline-size: 52px;
         block-size: 26px;
-        padding: 0 2px;
+        padding-block: 0;
+        padding-inline: 2px;
         margin-block: 15px;
         margin-inline: auto;
         transform: none;
@@ -438,7 +445,8 @@ input[type="submit"], button {
     /* Login */
 
     .login #header {
-        padding: 15px 20px;
+        padding-block: 15px;
+        padding-inline: 20px;
     }
 
     .login #site-name {
@@ -482,7 +490,8 @@ input[type="submit"], button {
     }
 
     div.breadcrumbs {
-        padding: 10px 15px;
+        padding-block: 10px;
+        padding-inline: 15px;
     }
 
     /* Dashboard */
@@ -501,7 +510,8 @@ input[type="submit"], button {
     }
 
     #content-related .module h2 {
-        padding: 10px 15px;
+        padding-block: 10px;
+        padding-inline: 15px;
         font-size: 1rem;
     }
 
@@ -559,7 +569,8 @@ input[type="submit"], button {
     /* Forms */
 
     .form-row {
-        padding: 15px 0;
+        padding-block: 15px;
+        padding-inline: 0;
     }
 
     .aligned .form-row,
@@ -726,7 +737,8 @@ input[type="submit"], button {
         float: none;
         inline-size: 52px;
         block-size: 26px;
-        padding: 0 2px;
+        padding-block: 0;
+        padding-inline: 2px;
         margin-block: 15px 20px;
         margin-inline: auto;
         transform: none;
@@ -766,7 +778,8 @@ input[type="submit"], button {
     }
 
     .inline-group[data-inline-type="stacked"] .inline-related .module {
-        padding: 0 10px;
+        padding-block: 0;
+        padding-inline: 10px;
     }
 
     .inline-group[data-inline-type="stacked"] .inline-related .module .form-row {
@@ -839,7 +852,8 @@ input[type="submit"], button {
     }
 
     .submit-row a.closelink {
-        padding: 10px 0;
+        padding-block: 10px;
+        padding-inline: 0;
         text-align: center;
     }
 
@@ -865,13 +879,15 @@ input[type="submit"], button {
     /* Paginator */
 
     .paginator .this-page, .paginator a:link, .paginator a:visited {
-        padding: 4px 10px;
+        padding-block: 4px;
+        padding-inline: 10px;
     }
 
     /* Login */
 
     body.login {
-        padding: 0 15px;
+        padding-block: 0;
+        padding-inline: 15px;
     }
 
     .login #container {
@@ -921,7 +937,8 @@ input[type="submit"], button {
     .errornote {
         margin-block: 0 20px;
         margin-inline: 0;
-        padding: 8px 12px;
+        padding-block: 8px;
+        padding-inline: 12px;
         font-size: 0.8125rem;
     }
 
@@ -968,7 +985,8 @@ input[type="submit"], button {
     }
 
     .calendar-shortcuts {
-        padding: 10px 0;
+        padding-block: 10px;
+        padding-inline: 0;
         font-size: 0.75rem;
         line-height: 0.75rem;
     }
@@ -984,11 +1002,13 @@ input[type="submit"], button {
     }
 
     .calendar-cancel {
-        padding: 8px 10px;
+        padding-block: 8px;
+        padding-inline: 10px;
     }
 
     .clockbox h2 {
-        padding: 8px 15px;
+        padding-block: 8px;
+        padding-inline: 15px;
     }
 
     .calendar caption {
