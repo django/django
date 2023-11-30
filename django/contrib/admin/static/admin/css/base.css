@@ -473,7 +473,8 @@ table thead th.sorted .sortoptions a.descending:hover {
 /* FORM DEFAULTS */
 
 input, textarea, select, .form-row p, form .button {
-    margin: 2px 0;
+    margin-block: 2px;
+    margin-inline: 0;
     padding: 2px 3px;
     vertical-align: middle;
     font-family: var(--font-family-primary);

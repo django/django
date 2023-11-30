@@ -186,7 +186,8 @@
 }
 
 #changelist-filter ul {
-    margin: 5px 0;
+    margin-block: 5px;
+    margin-inline: 0;
     padding: 0 15px 15px;
     border-bottom: 1px solid var(--hairline-color);
 }
@@ -297,7 +298,8 @@
 #changelist .actions span.clear,
 #changelist .actions span.question {
     font-size: 0.8125rem;
-    margin: 0 0.5em;
+    margin-block: 0;
+    margin-inline: 0.5em;
 }
 
 #changelist .actions:last-child {

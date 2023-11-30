@@ -131,7 +131,8 @@
     inline-size: 100%;
     box-sizing: border-box;
     padding: 2px 5px;
-    margin: 5px 0;
+    margin-block: 5px;
+    margin-inline: 0;
     border: 1px solid var(--border-color);
     background-color: var(--darkened-bg);
     color: var(--body-fg);

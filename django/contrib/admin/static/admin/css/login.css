@@ -31,7 +31,8 @@
     overflow: hidden;
     inline-size: 28em;
     min-inline-size: 300px;
-    margin: 100px auto;
+    margin-block: 100px;
+    margin-inline: auto;
     block-size: auto;
 }
 

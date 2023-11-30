@@ -85,7 +85,8 @@
     inline-size: 22px;
     background-color: var(--selected-bg);
     border-radius: 10px;
-    margin: 0 5px;
+    margin-block: 0;
+    margin-inline: 5px;
     padding: 0;
     transform: translateY(-17px);
 }
@@ -393,7 +394,8 @@ span.clearable-file-input label {
 /* CALENDARS & CLOCKS */
 
 .calendarbox, .clockbox {
-    margin: 5px auto;
+    margin-block: 5px;
+    margin-inline: auto;
     font-size: 0.75rem;
     inline-size: 19em;
     text-align: center;

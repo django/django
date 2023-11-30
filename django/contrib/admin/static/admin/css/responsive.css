@@ -143,7 +143,8 @@ input[type="submit"], button {
 
     #changelist .actions .button {
         min-inline-size: 48px;
-        margin: 0 10px;
+        margin-block: 0;
+        margin-inline: 10px;
     }
 
     #changelist .actions span.all,
@@ -297,7 +298,8 @@ input[type="submit"], button {
         inline-size: 26px;
         block-size: 52px;
         padding: 2px 0;
-        margin: auto 15px;
+        margin-block: auto;
+        margin-inline: 15px;
         border-radius: 20px;
         transform: translateY(-10px);
     }
@@ -341,7 +343,8 @@ input[type="submit"], button {
         inline-size: 52px;
         block-size: 26px;
         padding: 0 2px;
-        margin: 15px auto;
+        margin-block: 15px;
+        margin-inline: auto;
         transform: none;
     }
 
@@ -870,7 +873,8 @@ input[type="submit"], button {
     .login #container {
         inline-size: auto;
         max-inline-size: 480px;
-        margin: 50px auto;
+        margin-block: 50px;
+        margin-inline: auto;
     }
 
     .login #header,
@@ -965,7 +969,8 @@ input[type="submit"], button {
     }
 
     .calendar-shortcuts a {
-        margin: 0 4px;
+        margin-block: 0;
+        margin-inline: 4px;
     }
 
     .timelist a {
