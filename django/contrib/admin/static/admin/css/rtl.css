@@ -151,6 +151,7 @@ form ul.inline li {
 
 form .aligned p.help,
 form .aligned div.help {
+    margin-left: 0;
     margin-right: 160px;
     padding-right: 10px;
 }
@@ -167,14 +168,6 @@ form .aligned p.time div.help.timezonewarning {
 form .wide p.help, form .wide div.help {
     padding-left: 0;
     padding-right: 50px;
-}
-
-form .wide p,
-form .wide ul.errorlist,
-form .wide input + p.help,
-form .wide input + div.help {
-    margin-right: 200px;
-    margin-left: 0px;
 }
 
 .submit-row {
