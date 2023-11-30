@@ -190,13 +190,6 @@ fieldset .fieldBox {
     width: 200px;
 }
 
-form .wide p,
-form .wide ul.errorlist,
-form .wide input + p.help,
-form .wide input + div.help {
-    margin-left: 200px;
-}
-
 form .wide p.help,
 form .wide div.help {
     padding-left: 50px;
