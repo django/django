@@ -20,6 +20,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_delete_column = "ALTER TABLE %(table)s DROP COLUMN %(column)s"
     sql_create_unique = "CREATE UNIQUE INDEX %(name)s ON %(table)s (%(columns)s)"
     sql_delete_unique = "DROP INDEX %(name)s"
+    sql_alter_table_comment = None
+    sql_alter_column_comment = None
 
     def __enter__(self):
         # Some SQLite schema alterations need foreign key constraints to be

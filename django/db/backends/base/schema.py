@@ -637,13 +637,14 @@ class BaseDatabaseSchemaEditor:
                 sql.rename_table_references(old_db_table, new_db_table)
 
     def alter_db_table_comment(self, model, old_db_table_comment, new_db_table_comment):
-        self.execute(
-            self.sql_alter_table_comment
-            % {
-                "table": self.quote_name(model._meta.db_table),
-                "comment": self.quote_value(new_db_table_comment or ""),
-            }
-        )
+        if self.sql_alter_table_comment and self.connection.features.supports_comments:
+            self.execute(
+                self.sql_alter_table_comment
+                % {
+                    "table": self.quote_name(model._meta.db_table),
+                    "comment": self.quote_value(new_db_table_comment or ""),
+                }
+            )
 
     def alter_db_tablespace(self, model, old_db_tablespace, new_db_tablespace):
         """Move a model's table between tablespaces."""
