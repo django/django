@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib.gis.geoip2 import HAS_GEOIP2
 from django.contrib.gis.geos import GEOSGeometry
 from django.test import SimpleTestCase
+from django.utils.deprecation import RemovedInDjango60Warning
 
 if HAS_GEOIP2:
     from django.contrib.gis.geoip2 import GeoIP2, GeoIP2Exception
@@ -71,8 +72,6 @@ class GeoIPTest(SimpleTestCase):
         # No city database available, these calls should fail.
         with self.assertRaises(GeoIP2Exception):
             cntry_g.city("tmc.edu")
-        with self.assertRaises(GeoIP2Exception):
-            cntry_g.coords("tmc.edu")
 
         # Non-string query should raise TypeError
         with self.assertRaises(TypeError):
@@ -139,7 +138,6 @@ class GeoIPTest(SimpleTestCase):
 
             for e1, e2 in (
                 geom.tuple,
-                g.coords(query),
                 g.lon_lat(query),
                 g.lat_lon(query),
             ):
@@ -182,3 +180,11 @@ class GeoIPTest(SimpleTestCase):
             g._check_query("2002:81ed:c9a5::81ed:c9a5"), "2002:81ed:c9a5::81ed:c9a5"
         )
         self.assertEqual(g._check_query("invalid-ip-address"), "expected")
+
+    def test_coords_deprecation_warning(self):
+        g = GeoIP2()
+        msg = "GeoIP2.coords() is deprecated. Use GeoIP2.lon_lat() instead."
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+            e1, e2 = g.coords(self.fqdn)
+        self.assertIsInstance(e1, float)
+        self.assertIsInstance(e2, float)

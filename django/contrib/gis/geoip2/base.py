@@ -1,4 +1,5 @@
 import socket
+import warnings
 
 import geoip2.database
 
@@ -6,6 +7,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_ipv46_address
 from django.utils._os import to_path
+from django.utils.deprecation import RemovedInDjango60Warning
 
 from .resources import City, Country
 
@@ -199,6 +201,11 @@ class GeoIP2:
         return Country(self._country_or_city(enc_query))
 
     def coords(self, query, ordering=("longitude", "latitude")):
+        warnings.warn(
+            "GeoIP2.coords() is deprecated. Use GeoIP2.lon_lat() instead.",
+            RemovedInDjango60Warning,
+            stacklevel=2,
+        )
         data = self.city(query)
         return tuple(data[o] for o in ordering)
 

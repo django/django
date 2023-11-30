@@ -64,6 +64,8 @@ details on these changes.
 * The undocumented ``django.utils.itercompat.is_iterable()`` function and the
   ``django.utils.itercompat`` module will be removed.
 
+* The ``django.contrib.gis.geoip2.GeoIP2.coords()`` method will be removed.
+
 .. _deprecation-removed-in-5.1:
 
 5.1

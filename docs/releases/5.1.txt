@@ -307,6 +307,9 @@ Miscellaneous
   ``django.utils.itercompat`` module are deprecated. Use
   ``isinstance(..., collections.abc.Iterable)`` instead.
 
+* The ``django.contrib.gis.geoip2.GeoIP2.coords()`` method is deprecated. Use
+  ``django.contrib.gis.geoip2.GeoIP2.lon_lat()`` instead.
+
 Features removed in 5.1
 =======================
 

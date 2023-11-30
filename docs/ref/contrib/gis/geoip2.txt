@@ -133,6 +133,10 @@ Coordinate Retrieval
 
 Returns a coordinate tuple of (longitude, latitude).
 
+.. deprecated:: 5.1
+
+    Use :meth:`.GeoIP2.lon_lat` instead.
+
 .. method:: GeoIP2.lon_lat(query)
 
 Returns a coordinate tuple of (longitude, latitude).
