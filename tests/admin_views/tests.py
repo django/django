@@ -6101,6 +6101,9 @@ class SeleniumTests(AdminSeleniumTestCase):
         status = self.selenium.find_element(
             By.ID, "id_relatedprepopulated_set-2-0-status"
         )
+        # Fix for Firefox which does not scroll to clicked elements automatically with
+        # the Options API
+        self.selenium.execute_script("arguments[0].scrollIntoView();", status)
         ActionChains(self.selenium).move_to_element(status).click(status).perform()
         self.selenium.find_element(
             By.ID, "id_relatedprepopulated_set-2-0-pubdate"
@@ -6135,6 +6138,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         status = self.selenium.find_element(
             By.ID, "id_relatedprepopulated_set-2-1-status"
         )
+        self.selenium.execute_script("arguments[0].scrollIntoView();", status)
         ActionChains(self.selenium).move_to_element(status).click(status).perform()
         self.select_option("#id_relatedprepopulated_set-2-1-status", "option one")
         self.selenium.find_element(
@@ -6163,6 +6167,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         row_id = "id_relatedprepopulated_set-4-0-"
         self.selenium.find_element(By.ID, f"{row_id}pubdate").send_keys("2011-12-12")
         status = self.selenium.find_element(By.ID, f"{row_id}status")
+        self.selenium.execute_script("arguments[0].scrollIntoView();", status)
         ActionChains(self.selenium).move_to_element(status).click(status).perform()
         self.select_option(f"#{row_id}status", "option one")
         self.selenium.find_element(By.ID, f"{row_id}name").send_keys(
@@ -6177,13 +6182,16 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertEqual(slug1, "stacked-inline-2011-12-12")
         self.assertEqual(slug2, "option-one")
         # Add inline.
-        self.selenium.find_elements(
+        add_link = self.selenium.find_elements(
             By.LINK_TEXT,
             "Add another Related prepopulated",
-        )[3].click()
+        )[3]
+        self.selenium.execute_script("arguments[0].scrollIntoView();", add_link)
+        add_link.click()
         row_id = "id_relatedprepopulated_set-4-1-"
         self.selenium.find_element(By.ID, f"{row_id}pubdate").send_keys("1999-01-20")
         status = self.selenium.find_element(By.ID, f"{row_id}status")
+        self.selenium.execute_script("arguments[0].scrollIntoView();", status)
         ActionChains(self.selenium).move_to_element(status).click(status).perform()
         self.select_option(f"#{row_id}status", "option two")
         self.selenium.find_element(By.ID, f"{row_id}name").send_keys(
