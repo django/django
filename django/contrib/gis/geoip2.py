@@ -1,13 +1,35 @@
+"""
+This module houses the GeoIP2 object, a wrapper for the MaxMind GeoIP2(R)
+Python API (https://geoip2.readthedocs.io/). This is an alternative to the
+Python GeoIP2 interface provided by MaxMind.
+
+GeoIP(R) is a registered trademark of MaxMind, Inc.
+
+For IP-based geolocation, this module requires the GeoLite2 Country and City
+datasets, in binary format (CSV will not work!). The datasets may be
+downloaded from MaxMind at https://dev.maxmind.com/geoip/geoip2/geolite2/.
+Grab GeoLite2-Country.mmdb.gz and GeoLite2-City.mmdb.gz, and unzip them in the
+directory corresponding to settings.GEOIP_PATH.
+"""
+
 import socket
 import warnings
-
-import geoip2.database
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_ipv46_address
 from django.utils._os import to_path
 from django.utils.deprecation import RemovedInDjango60Warning
+
+__all__ = ["HAS_GEOIP2"]
+
+try:
+    import geoip2.database
+except ImportError:
+    HAS_GEOIP2 = False
+else:
+    HAS_GEOIP2 = True
+    __all__ += ["GeoIP2", "GeoIP2Exception"]
 
 # Creating the settings dictionary with any settings, if needed.
 GEOIP_SETTINGS = {
