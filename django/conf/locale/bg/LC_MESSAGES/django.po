@@ -1129,7 +1129,7 @@ msgstr "или"
 
 #. Translators: This string is used as a separator between list elements
 msgid ", "
-msgstr ","
+msgstr ", "
 
 #, python-format
 msgid "%(num)d year"
