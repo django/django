@@ -35,3 +35,6 @@ Bugfixes
 * Fixed a regression in Django 4.2 where the admin's read-only password widget
   and some help texts were incorrectly aligned at tablet widths
   (:ticket:`34982`).
+
+* Fixed a regression in Django 4.2 that caused a migration crash on SQLite when
+  altering unsupported ``Meta.db_table_comment`` (:ticket:`35006`).
