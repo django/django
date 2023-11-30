@@ -424,7 +424,8 @@ body.popup .submit-row {
 
 .inline-related fieldset.module h3 {
     margin: 0;
-    padding: 2px 5px 3px;
+    padding-block: 2px 3px;
+    padding-inline: 5px;
     font-size: 0.6875rem;
     text-align: left;
     font-weight: bold;
@@ -450,7 +451,8 @@ body.popup .submit-row {
 }
 
 .inline-group .tabular tr td.original {
-    padding: 2px 0 0;
+    padding-block: 2px 0;
+    padding-inline: 0;
     inline-size: 0;
     _position: relative;
 }

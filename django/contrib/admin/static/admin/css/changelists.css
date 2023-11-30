@@ -188,7 +188,8 @@
 #changelist-filter ul {
     margin-block: 5px;
     margin-inline: 0;
-    padding: 0 15px 15px;
+    padding-block: 0 15px;
+    padding-inline: 15px;
     border-bottom: 1px solid var(--hairline-color);
 }
 

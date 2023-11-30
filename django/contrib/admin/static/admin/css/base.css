@@ -404,7 +404,8 @@ table thead th.sorted:hover a.sortremove {
 
 table thead th.sorted .sortoptions {
     display: block;
-    padding: 9px 5px 0;
+    padding-block: 9px 0;
+    padding-inline: 5px;
     float: right;
     text-align: right;
 }

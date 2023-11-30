@@ -28,7 +28,8 @@ input[type="submit"], button {
     }
 
     #content {
-        padding: 15px 20px 20px;
+        padding-block: 15px 20px;
+        padding-inline: 20px;
     }
 
     div.breadcrumbs {
@@ -598,7 +599,8 @@ input[type="submit"], button {
     .aligned label {
         inline-size: 100%;
         min-inline-size: auto;
-        padding: 0 0 10px;
+        padding-block: 0 10px;
+        padding-inline: 0;
     }
 
     .aligned label:after {
@@ -903,7 +905,8 @@ input[type="submit"], button {
     }
 
     .login .submit-row {
-        padding: 15px 0 0;
+        padding-block: 15px 0;
+        padding-inline: 0;
     }
 
     .login br {
