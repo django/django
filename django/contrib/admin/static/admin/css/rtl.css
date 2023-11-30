@@ -1,11 +1,9 @@
 /* GLOBAL */
 
 th {
-    text-align: right;
 }
 
 .module h2, .module caption {
-    text-align: right;
 }
 
 .module ul, .module ol {
@@ -29,11 +27,9 @@ tfoot td:first-child {
 /* LAYOUT */
 
 #user-tools {
-    text-align: left;
 }
 
 div.breadcrumbs {
-    text-align: right;
 }
 
 #content-main {
@@ -113,7 +109,6 @@ form .wide p.help, form .wide div.help {
 }
 
 .submit-row {
-    text-align: right;
 }
 
 fieldset .fieldBox {
@@ -149,14 +144,12 @@ fieldset .fieldBox {
 }
 
 .calendar caption, .calendarbox h2 {
-    text-align: center;
 }
 
 .selector {
 }
 
 .selector .selector-filter {
-    text-align: right;
 }
 
 .selector-add {
@@ -204,7 +197,6 @@ form .form-row p.datetime {
 /* MISC */
 
 .inline-related h2, .inline-group h2 {
-    text-align: right
 }
 
 .inline-related h3 span.delete {

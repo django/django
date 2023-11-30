@@ -322,7 +322,7 @@ td, th {
 
 th {
     font-weight: 600;
-    text-align: left;
+    text-align: start;
 }
 
 thead th,
@@ -413,7 +413,7 @@ table thead th.sorted .sortoptions {
     padding-block: 9px 0;
     padding-inline: 5px;
     float: inline-end;
-    text-align: right;
+    text-align: end;
 }
 
 table thead th.sorted .sortpriority {
@@ -602,7 +602,7 @@ input[type=button][disabled].default {
     padding: 8px;
     font-weight: 400;
     font-size: 0.8125rem;
-    text-align: left;
+    text-align: start;
     background: var(--header-bg);
     color: var(--header-link-color);
 }
@@ -728,7 +728,7 @@ div.breadcrumbs {
     padding-inline: 40px;
     border: none;
     color: var(--breadcrumbs-fg);
-    text-align: left;
+    text-align: start;
 }
 
 div.breadcrumbs a {
@@ -1015,7 +1015,7 @@ a.deletelink:focus, a.deletelink:hover {
     float: inline-end;
     margin-block: 0;
     margin-inline: 20px 0;
-    text-align: right;
+    text-align: end;
 }
 
 #user-tools, #logout-form button{

@@ -59,7 +59,7 @@
     color: var(--body-quiet-color);
     font-size: 0.625rem;
     margin: 0;
-    text-align: left;
+    text-align: start;
 }
 
 .selector .selector-filter label,
@@ -152,7 +152,7 @@
 a.selector-chooseall, a.selector-clearall {
     display: inline-block;
     block-size: 16px;
-    text-align: left;
+    text-align: start;
     margin-block: 1px 3px;
     margin-inline: auto;
     overflow: hidden;

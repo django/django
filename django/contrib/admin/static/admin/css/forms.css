@@ -432,7 +432,7 @@ body.popup .submit-row {
     padding-block: 2px 3px;
     padding-inline: 5px;
     font-size: 0.6875rem;
-    text-align: left;
+    text-align: start;
     font-weight: bold;
     background: #bcd;
     color: var(--body-bg);
