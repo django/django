@@ -745,7 +745,7 @@ input[type="submit"], button {
     }
 
     .selector ul.selector-chooser li {
-        float: left;
+        float: inline-start;
     }
 
     .selector-remove {

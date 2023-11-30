@@ -20,7 +20,6 @@ th {
 }
 
 .object-tools {
-    float: left;
 }
 
 thead th:first-child,
@@ -38,11 +37,9 @@ div.breadcrumbs {
 }
 
 #content-main {
-    float: right;
 }
 
 #content-related {
-    float: left;
 }
 
 .colMS {
@@ -51,7 +48,6 @@ div.breadcrumbs {
 /* SORTABLE TABLES */
 
 table thead th.sorted .sortoptions {
-   float: left;
 }
 
 thead th.sorted .text {
@@ -100,7 +96,6 @@ form .aligned ul {
 }
 
 form ul.inline li {
-    float: right;
 }
 
 form .aligned p.help,
@@ -158,7 +153,6 @@ fieldset .fieldBox {
 }
 
 .selector {
-    float: right;
 }
 
 .selector .selector-filter {
@@ -198,7 +192,6 @@ a.active.selector-clearall:focus, a.active.selector-clearall:hover {
 }
 
 .inline-deletelink {
-    float: left;
 }
 
 form .form-row p.datetime {
@@ -206,7 +199,6 @@ form .form-row p.datetime {
 }
 
 .related-widget-wrapper {
-    float: right;
 }
 
 /* MISC */
@@ -216,7 +208,6 @@ form .form-row p.datetime {
 }
 
 .inline-related h3 span.delete {
-    float:left;
 }
 
 .inline-related h3 span.delete label {

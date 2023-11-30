@@ -2,7 +2,7 @@
 
 .selector {
     inline-size: 800px;
-    float: left;
+    float: inline-start;
     display: flex;
 }
 
@@ -64,7 +64,7 @@
 
 .selector .selector-filter label,
 .inline-group .aligned .selector .selector-filter label {
-    float: left;
+    float: inline-start;
     margin-block: 7px 0;
     margin-inline: 0;
     inline-size: 18px;
@@ -201,7 +201,7 @@ a.active.selector-clearall:focus, a.active.selector-clearall:hover {
 /* STACKED SELECTORS */
 
 .stacked {
-    float: left;
+    float: inline-start;
     inline-size: 490px;
     display: block;
 }
@@ -234,7 +234,7 @@ a.active.selector-clearall:focus, a.active.selector-clearall:hover {
 }
 
 .stacked .selector-chooser li {
-    float: left;
+    float: inline-start;
     padding-block: 3px;
     padding-inline: 5px 3px;
 }
@@ -578,7 +578,7 @@ ul.timelist, .timelist li {
 /* EDIT INLINE */
 
 .inline-deletelink {
-    float: right;
+    float: inline-end;
     text-indent: -9999px;
     background: url(../img/inline-delete.svg) 0 0 no-repeat;
     inline-size: 16px;
@@ -592,7 +592,7 @@ ul.timelist, .timelist li {
 
 /* RELATED WIDGET WRAPPER */
 .related-widget-wrapper {
-    float: left;       /* display properly in form rows with multiple fields */
+    float: inline-start;       /* display properly in form rows with multiple fields */
     overflow: hidden;  /* clear floated contents */
 }
 

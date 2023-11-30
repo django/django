@@ -35,7 +35,6 @@
     }
 
     [dir="rtl"] .object-tools li {
-        float: right;
     }
 
     [dir="rtl"] .object-tools li + li {

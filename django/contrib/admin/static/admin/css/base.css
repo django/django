@@ -412,7 +412,7 @@ table thead th.sorted .sortoptions {
     display: block;
     padding-block: 9px 0;
     padding-inline: 5px;
-    float: right;
+    float: inline-end;
     text-align: right;
 }
 
@@ -781,14 +781,14 @@ a.deletelink:focus, a.deletelink:hover {
     font-size: 0.625rem;
     font-weight: bold;
     padding-inline-start: 0;
-    float: right;
+    float: inline-end;
     position: relative;
     margin-block-start: -48px;
 }
 
 .object-tools li {
     display: block;
-    float: left;
+    float: inline-start;
     margin-inline-start: 5px;
     block-size: 1rem;
 }
@@ -799,7 +799,7 @@ a.deletelink:focus, a.deletelink:hover {
 
 .object-tools a:link, .object-tools a:visited {
     display: block;
-    float: left;
+    float: inline-start;
     padding-block: 3px;
     padding-inline: 12px;
     background: var(--object-tools-bg);
@@ -895,12 +895,12 @@ a.deletelink:focus, a.deletelink:hover {
 }
 
 #content-main {
-    float: left;
+    float: inline-start;
     inline-size: 100%;
 }
 
 #content-related {
-    float: right;
+    float: inline-end;
     inline-size: 260px;
     position: relative;
     margin-inline-end: -300px;
@@ -928,13 +928,13 @@ a.deletelink:focus, a.deletelink:hover {
 }
 
 .colSM #content-related {
-    float: left;
+    float: inline-start;
     margin-inline-end: 0;
     margin-inline-start: -300px;
 }
 
 .colSM #content-main {
-    float: right;
+    float: inline-end;
 }
 
 .popup .colM {
@@ -1012,7 +1012,7 @@ a.deletelink:focus, a.deletelink:hover {
 }
 
 #user-tools {
-    float: right;
+    float: inline-end;
     margin-block: 0;
     margin-inline: 20px 0;
     text-align: right;

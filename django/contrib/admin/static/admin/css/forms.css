@@ -69,7 +69,7 @@ form ul.inline {
 }
 
 form ul.inline li {
-    float: left;
+    float: inline-start;
     padding-inline-end: 7px;
 }
 
@@ -412,7 +412,7 @@ body.popup .submit-row {
 }
 
 .inline-related h3 span.delete {
-    float: right;
+    float: inline-end;
 }
 
 .inline-related h3 span.delete label {
