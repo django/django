@@ -252,7 +252,7 @@ fieldset.monospace textarea {
 /* SUBMIT ROW */
 
 .submit-row {
-    padding: 12px 14px 12px;
+    padding: 12px 14px;
     margin-block: 0 20px;
     margin-inline: 0;
     background: var(--darkened-bg);
