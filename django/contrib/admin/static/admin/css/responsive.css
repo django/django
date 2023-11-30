@@ -24,7 +24,7 @@ input[type="submit"], button {
     /* Layout */
 
     #container {
-        min-width: 0;
+        min-inline-size: 0;
     }
 
     #content {
@@ -63,7 +63,7 @@ input[type="submit"], button {
     /* Dashboard */
 
     .dashboard #content {
-        width: auto;
+        inline-size: auto;
     }
 
     #content-related {
@@ -100,7 +100,7 @@ input[type="submit"], button {
     #changelist-search > div {
         display: flex;
         flex-wrap: nowrap;
-        max-width: 480px;
+        max-inline-size: 480px;
     }
 
     #changelist-search label {
@@ -109,8 +109,8 @@ input[type="submit"], button {
 
     #toolbar form #searchbar {
         flex: 1 0 auto;
-        width: 0;
-        height: 1.375rem;
+        inline-size: 0;
+        block-size: 1.375rem;
         margin: 0 10px 0 6px;
     }
 
@@ -119,7 +119,7 @@ input[type="submit"], button {
     }
 
     #changelist-search .quiet {
-        width: 0;
+        inline-size: 0;
         flex: 1 0 auto;
         margin: 5px 0 0 25px;
     }
@@ -139,7 +139,7 @@ input[type="submit"], button {
     }
 
     #changelist .actions .button {
-        min-width: 48px;
+        min-inline-size: 48px;
         margin: 0 10px;
     }
 
@@ -186,17 +186,17 @@ input[type="submit"], button {
         box-sizing: border-box;
         margin: 0;
         padding: 6px 8px;
-        min-height: 2.25rem;
+        min-block-size: 2.25rem;
         font-size: 0.875rem;
     }
 
     .form-row select {
-        height: 2.25rem;
+        block-size: 2.25rem;
     }
 
     .form-row select[multiple] {
-        height: auto;
-        min-height: 0;
+        block-size: auto;
+        min-block-size: 0;
     }
 
     fieldset .fieldBox + .fieldBox {
@@ -206,8 +206,8 @@ input[type="submit"], button {
     }
 
     textarea {
-        max-width: 100%;
-        max-height: 120px;
+        max-inline-size: 100%;
+        max-block-size: 120px;
     }
 
     .aligned label {
@@ -244,7 +244,7 @@ input[type="submit"], button {
     }
 
     .related-widget-wrapper-link + .selector {
-        max-width: calc(100% - 30px);
+        max-inline-size: calc(100% - 30px);
         margin-right: 15px;
     }
 
@@ -257,7 +257,7 @@ input[type="submit"], button {
 
     .selector {
         display: flex;
-        width: 100%;
+        inline-size: 100%;
     }
 
     .selector .selector-filter {
@@ -270,27 +270,27 @@ input[type="submit"], button {
     }
 
     .selector .selector-filter input {
-        width: auto;
-        min-height: 0;
+        inline-size: auto;
+        min-block-size: 0;
         flex: 1 1;
     }
 
     .selector-available, .selector-chosen {
-        width: auto;
+        inline-size: auto;
         flex: 1 1;
         display: flex;
         flex-direction: column;
     }
 
     .selector select {
-        width: 100%;
+        inline-size: 100%;
         flex: 1 0 auto;
         margin-bottom: 5px;
     }
 
     .selector ul.selector-chooser {
-        width: 26px;
-        height: 52px;
+        inline-size: 26px;
+        block-size: 52px;
         padding: 2px 0;
         margin: auto 15px;
         border-radius: 20px;
@@ -298,8 +298,8 @@ input[type="submit"], button {
     }
 
     .selector-add, .selector-remove {
-        width: 20px;
-        height: 20px;
+        inline-size: 20px;
+        block-size: 20px;
         background-size: 20px auto;
     }
 
@@ -317,7 +317,7 @@ input[type="submit"], button {
 
     .stacked {
         flex-direction: column;
-        max-width: 480px;
+        max-inline-size: 480px;
     }
 
     .stacked > * {
@@ -329,12 +329,12 @@ input[type="submit"], button {
     }
 
     .stacked .selector-available, .stacked .selector-chosen {
-        width: auto;
+        inline-size: auto;
     }
 
     .stacked ul.selector-chooser {
-        width: 52px;
-        height: 26px;
+        inline-size: 52px;
+        block-size: 26px;
         padding: 0 2px;
         margin: 15px auto;
         transform: none;
@@ -385,8 +385,8 @@ input[type="submit"], button {
     }
 
     .datetime input {
-        width: 50%;
-        max-width: 120px;
+        inline-size: 50%;
+        max-inline-size: 120px;
     }
 
     .datetime span {
@@ -404,7 +404,7 @@ input[type="submit"], button {
     }
 
     .form-row .datetime input.vDateField, .form-row .datetime input.vTimeField {
-        width: 75%;
+        inline-size: 75%;
     }
 
     .inline-group {
@@ -439,8 +439,8 @@ input[type="submit"], button {
     /* GIS */
 
     div.olMap {
-        max-width: calc(100vw - 30px);
-        max-height: 300px;
+        max-inline-size: calc(100vw - 30px);
+        max-block-size: 300px;
     }
 
     .olMap + .clear_features {
@@ -451,7 +451,7 @@ input[type="submit"], button {
     /* Docs */
 
     .module table.xfull {
-        width: 100%;
+        inline-size: 100%;
     }
 
     pre.literal-block {
@@ -483,7 +483,7 @@ input[type="submit"], button {
     }
 
     #content-related, .colSM #content-related {
-        width: 100%;
+        inline-size: 100%;
         margin: 0;
     }
 
@@ -517,7 +517,7 @@ input[type="submit"], button {
 
     #changelist .actions select {
         flex: 1 0;
-        width: 100%;
+        inline-size: 100%;
     }
 
     #changelist .actions span {
@@ -526,7 +526,7 @@ input[type="submit"], button {
 
     #changelist-filter {
         position: static;
-        width: auto;
+        inline-size: auto;
         margin-top: 30px;
     }
 
@@ -538,7 +538,7 @@ input[type="submit"], button {
     }
 
     .object-tools li {
-        height: auto;
+        block-size: auto;
         margin-left: 0;
     }
 
@@ -554,11 +554,11 @@ input[type="submit"], button {
 
     .aligned .form-row,
     .aligned .form-row > div {
-        max-width: 100vw;
+        max-inline-size: 100vw;
     }
 
     .aligned .form-row > div {
-        width: calc(100vw - 30px);
+        inline-size: calc(100vw - 30px);
     }
 
     .flex-container {
@@ -570,11 +570,11 @@ input[type="submit"], button {
     }
 
     textarea {
-        max-width: none;
+        max-inline-size: none;
     }
 
     .vURLField {
-        width: auto;
+        inline-size: auto;
     }
 
     fieldset .fieldBox + .fieldBox {
@@ -587,20 +587,20 @@ input[type="submit"], button {
     }
 
     .aligned label {
-        width: 100%;
-        min-width: auto;
+        inline-size: 100%;
+        min-inline-size: auto;
         padding: 0 0 10px;
     }
 
     .aligned label:after {
-        max-height: 0;
+        max-block-size: 0;
     }
 
     .aligned .form-row input,
     .aligned .form-row select,
     .aligned .form-row textarea {
         flex: 1 1 auto;
-        max-width: 100%;
+        max-inline-size: 100%;
     }
 
     .aligned .checkbox-row input {
@@ -639,7 +639,7 @@ input[type="submit"], button {
     }
 
     form .aligned .form-row div.help {
-        width: 100%;
+        inline-size: 100%;
         margin: 5px 0 0;
         padding: 0;
     }
@@ -663,7 +663,7 @@ input[type="submit"], button {
     /* Related widget */
 
     .related-widget-wrapper {
-        width: 100%;
+        inline-size: 100%;
         display: flex;
         align-items: flex-start;
     }
@@ -705,14 +705,14 @@ input[type="submit"], button {
     }
 
     .selector select {
-        max-height: 96px;
+        max-block-size: 96px;
     }
 
     .selector ul.selector-chooser {
         display: block;
         float: none;
-        width: 52px;
-        height: 26px;
+        inline-size: 52px;
+        block-size: 26px;
         padding: 0 2px;
         margin: 15px auto 20px;
         transform: none;
@@ -784,11 +784,11 @@ input[type="submit"], button {
     }
 
     .inline-group[data-inline-type="stacked"] .aligned .form-row > div:not([class]) {
-        width: 100%;
+        inline-size: 100%;
     }
 
     .inline-group[data-inline-type="stacked"] .aligned label {
-        width: 100%;
+        inline-size: 100%;
     }
 
     .inline-group[data-inline-type="stacked"] div.add-row {
@@ -859,8 +859,8 @@ input[type="submit"], button {
     }
 
     .login #container {
-        width: auto;
-        max-width: 480px;
+        inline-size: auto;
+        max-inline-size: 480px;
         margin: 50px auto;
     }
 
@@ -922,8 +922,8 @@ input[type="submit"], button {
         position: fixed;
         top: 50%;
         left: 50%;
-        width: 100vw;
-        height: 100vh;
+        inline-size: 100vw;
+        block-size: 100vh;
         background: rgba(0, 0, 0, 0.75);
         transform: translate(-50%, -50%);
     }
@@ -987,7 +987,7 @@ input[type="submit"], button {
     }
 
     table#change-history tbody th {
-        width: auto;
+        inline-size: auto;
     }
 
     /* Docs */

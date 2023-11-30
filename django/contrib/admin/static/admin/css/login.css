@@ -2,11 +2,11 @@
 
 .login {
     background: var(--darkened-bg);
-    height: auto;
+    block-size: auto;
 }
 
 .login #header {
-    height: auto;
+    block-size: auto;
     padding: 15px 16px;
     justify-content: center;
 }
@@ -29,10 +29,10 @@
     border: 1px solid var(--hairline-color);
     border-radius: 4px;
     overflow: hidden;
-    width: 28em;
-    min-width: 300px;
+    inline-size: 28em;
+    min-inline-size: 300px;
     margin: 100px auto;
-    height: auto;
+    block-size: auto;
 }
 
 .login .form-row {
@@ -46,7 +46,7 @@
 
 .login .form-row #id_username, .login .form-row #id_password {
     padding: 8px;
-    width: 100%;
+    inline-size: 100%;
     box-sizing: border-box;
 }
 

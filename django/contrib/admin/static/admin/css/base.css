@@ -87,7 +87,7 @@ html[data-theme="light"],
 }
 
 html, body {
-    height: 100%;
+    block-size: 100%;
 }
 
 body {
@@ -211,7 +211,7 @@ form {
 
 fieldset {
     margin: 0;
-    min-width: 0;
+    min-inline-size: 0;
     padding: 0;
     border: none;
     border-top: 1px solid var(--hairline-color);
@@ -246,7 +246,7 @@ hr {
     clear: both;
     color: var(--hairline-color);
     background-color: var(--hairline-color);
-    height: 1px;
+    block-size: 1px;
     border: none;
     margin: 0;
     padding: 0;
@@ -405,7 +405,7 @@ table thead th.sorted .sortoptions {
 
 table thead th.sorted .sortpriority {
     font-size: .8em;
-    min-width: 12px;
+    min-inline-size: 12px;
     text-align: center;
     vertical-align: 3px;
     margin-left: 2px;
@@ -414,8 +414,8 @@ table thead th.sorted .sortpriority {
 
 table thead th.sorted .sortoptions a {
     position: relative;
-    width: 14px;
-    height: 14px;
+    inline-size: 14px;
+    block-size: 14px;
     display: inline-block;
     background: url(../img/sorting-icons.svg) 0 0 no-repeat;
     background-size: 14px auto;
@@ -499,13 +499,13 @@ textarea:focus, select:focus, .vTextField:focus {
 }
 
 select {
-    height: 1.875rem;
+    block-size: 1.875rem;
 }
 
 select[multiple] {
     /* Allow HTML size attribute to override the height in the rule above. */
-    height: auto;
-    min-height: 150px;
+    block-size: auto;
+    min-block-size: 150px;
 }
 
 /* FORM BUTTONS */
@@ -764,7 +764,7 @@ a.deletelink:focus, a.deletelink:hover {
     display: block;
     float: left;
     margin-left: 5px;
-    height: 1rem;
+    block-size: 1rem;
 }
 
 .object-tools a {
@@ -808,11 +808,11 @@ a.deletelink:focus, a.deletelink:hover {
 /* OBJECT HISTORY */
 
 #change-history table {
-    width: 100%;
+    inline-size: 100%;
 }
 
 #change-history table tbody th {
-    width: 16em;
+    inline-size: 16em;
 }
 
 #change-history .paginator {
@@ -826,12 +826,12 @@ a.deletelink:focus, a.deletelink:hover {
 
 #container {
     position: relative;
-    width: 100%;
-    min-width: 980px;
+    inline-size: 100%;
+    min-inline-size: 980px;
     padding: 0;
     display: flex;
     flex-direction: column;
-    height: 100%;
+    block-size: 100%;
 }
 
 #container > .main {
@@ -841,7 +841,7 @@ a.deletelink:focus, a.deletelink:hover {
 
 .main > .content {
     flex:  1 0;
-    max-width: 100%;
+    max-inline-size: 100%;
 }
 
 .skip-to-content-link {
@@ -863,17 +863,17 @@ a.deletelink:focus, a.deletelink:hover {
 }
 
 .dashboard #content {
-    width: 600px;
+    inline-size: 600px;
 }
 
 #content-main {
     float: left;
-    width: 100%;
+    inline-size: 100%;
 }
 
 #content-related {
     float: right;
-    width: 260px;
+    inline-size: 260px;
     position: relative;
     margin-right: -300px;
 }
@@ -910,14 +910,14 @@ a.deletelink:focus, a.deletelink:hover {
 }
 
 .popup .colM {
-    width: auto;
+    inline-size: auto;
 }
 
 /* HEADER */
 
 #header {
-    width: auto;
-    height: auto;
+    inline-size: auto;
+    block-size: auto;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -1069,7 +1069,7 @@ a.deletelink:focus, a.deletelink:hover {
 .delete-confirmation form .cancel-link {
     display: inline-block;
     vertical-align: middle;
-    height: 0.9375rem;
+    block-size: 0.9375rem;
     line-height: 0.9375rem;
     border-radius: 4px;
     padding: 10px 15px;
@@ -1090,7 +1090,7 @@ a.deletelink:focus, a.deletelink:hover {
 }
 
 .popup #container {
-    min-width: 0;
+    min-inline-size: 0;
 }
 
 .popup #header {
@@ -1109,7 +1109,7 @@ a.deletelink:focus, a.deletelink:hover {
     line-height: 22px;
     margin: 0;
     border-top: 1px solid var(--hairline-color);
-    width: 100%;
+    inline-size: 100%;
 }
 
 .paginator a:link, .paginator a:visited {
@@ -1156,8 +1156,8 @@ a.deletelink:focus, a.deletelink:hover {
 
 .visually-hidden {
     position: absolute;
-    width: 1px;
-    height: 1px;
+    inline-size: 1px;
+    block-size: 1px;
     padding: 0;
     overflow: hidden;
     clip: rect(0,0,0,0);

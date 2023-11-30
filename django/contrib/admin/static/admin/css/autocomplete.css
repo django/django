@@ -1,21 +1,21 @@
 select.admin-autocomplete {
-    width: 20em;
+    inline-size: 20em;
 }
 
 .select2-container--admin-autocomplete.select2-container {
-    min-height: 30px;
+    min-block-size: 30px;
 }
 
 .select2-container--admin-autocomplete .select2-selection--single,
 .select2-container--admin-autocomplete .select2-selection--multiple {
-    min-height: 30px;
+    min-block-size: 30px;
     padding: 0;
 }
 
 .select2-container--admin-autocomplete.select2-container--focus .select2-selection,
 .select2-container--admin-autocomplete.select2-container--open .select2-selection {
     border-color: var(--body-quiet-color);
-    min-height: 30px;
+    min-block-size: 30px;
 }
 
 .select2-container--admin-autocomplete.select2-container--focus .select2-selection.select2-selection--single,
@@ -50,24 +50,24 @@ select.admin-autocomplete {
 }
 
 .select2-container--admin-autocomplete .select2-selection--single .select2-selection__arrow {
-    height: 26px;
+    block-size: 26px;
     position: absolute;
     top: 1px;
     right: 1px;
-    width: 20px;
+    inline-size: 20px;
 }
 
 .select2-container--admin-autocomplete .select2-selection--single .select2-selection__arrow b {
     border-color: #888 transparent transparent transparent;
     border-style: solid;
     border-width: 5px 4px 0 4px;
-    height: 0;
+    block-size: 0;
     left: 50%;
     margin-left: -4px;
     margin-top: -2px;
     position: absolute;
     top: 50%;
-    width: 0;
+    inline-size: 0;
 }
 
 .select2-container--admin-autocomplete[dir="rtl"] .select2-selection--single .select2-selection__clear {
@@ -105,7 +105,7 @@ select.admin-autocomplete {
     list-style: none;
     margin: 0;
     padding: 0 10px 5px 5px;
-    width: 100%;
+    inline-size: 100%;
     display: flex;
     flex-wrap: wrap;
 }
@@ -211,7 +211,7 @@ select.admin-autocomplete {
 }
 
 .select2-container--admin-autocomplete .select2-results > .select2-results__options {
-    max-height: 200px;
+    max-block-size: 200px;
     overflow-y: auto;
     color: var(--body-fg);
     background: var(--body-bg);

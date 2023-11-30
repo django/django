@@ -54,7 +54,7 @@ form div.radiolist.inline div {
 }
 
 form div.radiolist label {
-    width: auto;
+    inline-size: auto;
 }
 
 form div.radiolist input[type="radio"] {
@@ -77,8 +77,8 @@ form ul.inline li {
 .aligned label {
     display: block;
     padding: 4px 10px 0 0;
-    min-width: 160px;
-    width: 160px;
+    min-inline-size: 160px;
+    inline-size: 160px;
     word-wrap: break-word;
     line-height: 1;
 }
@@ -87,7 +87,7 @@ form ul.inline li {
     content: '';
     display: inline-block;
     vertical-align: middle;
-    height: 1.625rem;
+    block-size: 1.625rem;
 }
 
 .aligned label + p, .aligned .checkbox-row + div.help, .aligned label + div.readonly {
@@ -101,7 +101,7 @@ form ul.inline li {
 .aligned ul label {
     display: inline;
     float: none;
-    width: auto;
+    inline-size: auto;
 }
 
 .aligned .form-row input {
@@ -109,7 +109,7 @@ form ul.inline li {
 }
 
 .colMS .aligned .vLargeTextField, .colMS .aligned .vXMLLargeTextField {
-    width: 350px;
+    inline-size: 350px;
 }
 
 form .aligned ul {
@@ -165,7 +165,7 @@ form .aligned table p {
 
 .aligned .vCheckboxLabel {
     float: none;
-    width: auto;
+    inline-size: auto;
     display: inline-block;
     vertical-align: -3px;
     padding: 0 0 5px 5px;
@@ -177,7 +177,7 @@ form .aligned table p {
 }
 
 .colM .aligned .vLargeTextField, .colM .aligned .vXMLLargeTextField {
-    width: 610px;
+    inline-size: 610px;
 }
 
 fieldset .fieldBox {
@@ -187,7 +187,7 @@ fieldset .fieldBox {
 /* WIDE FIELDSETS */
 
 .wide label {
-    width: 200px;
+    inline-size: 200px;
 }
 
 form .wide p,
@@ -208,7 +208,7 @@ form div.help ul {
 }
 
 .colM fieldset.wide .vLargeTextField, .colM fieldset.wide .vXMLLargeTextField {
-    width: 450px;
+    inline-size: 450px;
 }
 
 /* COLLAPSED FIELDSETS */
@@ -267,7 +267,7 @@ body.popup .submit-row {
 }
 
 .submit-row input {
-    height: 2.1875rem;
+    block-size: 2.1875rem;
     line-height: 0.9375rem;
 }
 
@@ -288,7 +288,7 @@ body.popup .submit-row {
     background: var(--delete-button-bg);
     border-radius: 4px;
     padding: 0.625rem 0.9375rem;
-    height: 0.9375rem;
+    block-size: 0.9375rem;
     line-height: 0.9375rem;
     color: var(--button-fg);
 }
@@ -298,7 +298,7 @@ body.popup .submit-row {
     background: var(--close-button-bg);
     border-radius: 4px;
     padding: 10px 15px;
-    height: 0.9375rem;
+    block-size: 0.9375rem;
     line-height: 0.9375rem;
     color: var(--button-fg);
 }
@@ -333,43 +333,43 @@ body.popup .submit-row {
 }
 
 .vDateField {
-    min-width: 6.85em;
+    min-inline-size: 6.85em;
 }
 
 .vTimeField {
-    min-width: 4.7em;
+    min-inline-size: 4.7em;
 }
 
 .vURLField {
-    width: 30em;
+    inline-size: 30em;
 }
 
 .vLargeTextField, .vXMLLargeTextField {
-    width: 48em;
+    inline-size: 48em;
 }
 
 .flatpages-flatpage #id_content {
-    height: 40.2em;
+    block-size: 40.2em;
 }
 
 .module table .vPositiveSmallIntegerField {
-    width: 2.2em;
+    inline-size: 2.2em;
 }
 
 .vIntegerField {
-    width: 5em;
+    inline-size: 5em;
 }
 
 .vBigIntegerField {
-    width: 10em;
+    inline-size: 10em;
 }
 
 .vForeignKeyRawIdAdminField {
-    width: 5em;
+    inline-size: 5em;
 }
 
 .vTextField, .vUUIDField {
-    width: 20em;
+    inline-size: 20em;
 }
 
 /* INLINES */
@@ -384,7 +384,7 @@ body.popup .submit-row {
 }
 
 .inline-group .aligned label {
-    width: 160px;
+    inline-size: 160px;
 }
 
 .inline-related {
@@ -414,7 +414,7 @@ body.popup .submit-row {
     margin: 0;
     background: var(--body-bg);
     border: none;
-    width: 100%;
+    inline-size: 100%;
 }
 
 .inline-related fieldset.module h3 {
@@ -432,7 +432,7 @@ body.popup .submit-row {
 }
 
 .inline-related.tabular fieldset.module table {
-    width: 100%;
+    inline-size: 100%;
     overflow-x: scroll;
 }
 
@@ -446,19 +446,19 @@ body.popup .submit-row {
 
 .inline-group .tabular tr td.original {
     padding: 2px 0 0 0;
-    width: 0;
+    inline-size: 0;
     _position: relative;
 }
 
 .inline-group .tabular th.original {
-    width: 0px;
+    inline-size: 0px;
     padding: 0;
 }
 
 .inline-group .tabular td.original p {
     position: absolute;
     left: 0;
-    height: 1.1em;
+    block-size: 1.1em;
     padding: 2px 9px;
     overflow: hidden;
     font-size: 0.5625rem;
@@ -514,8 +514,8 @@ body.popup .submit-row {
 }
 
 .related-lookup {
-    width: 1rem;
-    height: 1rem;
+    inline-size: 1rem;
+    block-size: 1rem;
     background-image: url(../img/search.svg);
 }
 

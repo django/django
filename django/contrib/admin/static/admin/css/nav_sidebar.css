@@ -1,7 +1,7 @@
 .sticky {
     position: sticky;
     top: 0;
-    max-height: 100vh;
+    max-block-size: 100vh;
 }
 
 .toggle-nav-sidebar {
@@ -11,7 +11,7 @@
     align-items: center;
     justify-content: center;
     flex: 0 0 23px;
-    width: 23px;
+    inline-size: 23px;
     border: 0;
     border-right: 1px solid var(--hairline-color);
     background-color: var(--body-bg);
@@ -73,7 +73,7 @@
 }
 
 #nav-sidebar .module th {
-    width: 100%;
+    inline-size: 100%;
     overflow-wrap: anywhere;
 }
 
@@ -109,11 +109,11 @@
 }
 
 .main > #nav-sidebar + .content {
-    max-width: calc(100% - 23px);
+    max-inline-size: calc(100% - 23px);
 }
 
 .main.shifted > #nav-sidebar + .content {
-    max-width: calc(100% - 299px);
+    max-inline-size: calc(100% - 299px);
 }
 
 @media (max-width: 767px) {
@@ -123,12 +123,12 @@
 
     .main > #nav-sidebar + .content,
     .main.shifted > #nav-sidebar + .content {
-        max-width: 100%;
+        max-inline-size: 100%;
     }
 }
 
 #nav-filter {
-    width: 100%;
+    inline-size: 100%;
     box-sizing: border-box;
     padding: 2px 5px;
     margin: 5px 0;
@@ -146,5 +146,5 @@
 }
 
 #nav-sidebar table {
-    width: 100%;
+    inline-size: 100%;
 }

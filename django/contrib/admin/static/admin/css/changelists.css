@@ -8,11 +8,11 @@
 
 #changelist .changelist-form-container {
     flex: 1 1 auto;
-    min-width: 0;
+    min-inline-size: 0;
 }
 
 #changelist table {
-    width: 100%;
+    inline-size: 100%;
 }
 
 .change-list .hiddenfields { display:none; }
@@ -22,12 +22,12 @@
 }
 
 .change-list .filtered {
-    min-height: 400px;
+    min-block-size: 400px;
 }
 
 .change-list .filtered .results, .change-list .filtered .paginator,
 .filtered #toolbar, .filtered div.xfull {
-    width: auto;
+    inline-size: auto;
 }
 
 .change-list .filtered table tbody th {
@@ -36,7 +36,7 @@
 
 #changelist-form .results {
     overflow-x: auto;
-    width: 100%;
+    inline-size: 100%;
 }
 
 #changelist .toplinks {
@@ -59,7 +59,7 @@
 }
 
 #changelist table thead th.action-checkbox-column {
-    width: 1.5em;
+    inline-size: 1.5em;
     text-align: center;
 }
 
@@ -90,13 +90,13 @@
 }
 
 #toolbar #searchbar {
-    height: 1.1875rem;
+    block-size: 1.1875rem;
     border: 1px solid var(--border-color);
     padding: 2px 5px;
     margin: 0;
     vertical-align: top;
     font-size: 0.8125rem;
-    max-width: 100%;
+    max-inline-size: 100%;
 }
 
 #toolbar #searchbar:focus {
@@ -288,7 +288,7 @@
     border-bottom: none;
     line-height: 1.5rem;
     color: var(--body-quiet-color);
-    width: 100%;
+    inline-size: 100%;
 }
 
 #changelist .actions span.all,
@@ -305,7 +305,7 @@
 
 #changelist .actions select {
     vertical-align: top;
-    height: 1.5rem;
+    block-size: 1.5rem;
     color: var(--body-fg);
     border: 1px solid var(--border-color);
     border-radius: 4px;
@@ -332,7 +332,7 @@
     background: var(--body-bg);
     box-shadow: 0 -15px 20px -10px rgba(0, 0, 0, 0.15) inset;
     cursor: pointer;
-    height: 1.5rem;
+    block-size: 1.5rem;
     line-height: 1;
     padding: 4px 8px;
     margin: 0;
