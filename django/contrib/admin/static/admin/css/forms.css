@@ -444,7 +444,7 @@ body.popup .submit-row {
 
 .inline-related.tabular fieldset.module table {
     inline-size: 100%;
-    overflow-x: scroll;
+    overflow-inline: scroll;
 }
 
 .last-related fieldset {

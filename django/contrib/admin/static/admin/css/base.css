@@ -236,7 +236,7 @@ code, pre {
     font-family: var(--font-family-monospace);
     color: var(--body-quiet-color);
     font-size: 0.75rem;
-    overflow-x: auto;
+    overflow-inline: auto;
 }
 
 pre.literal-block {

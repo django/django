@@ -35,7 +35,7 @@
 }
 
 #changelist-form .results {
-    overflow-x: auto;
+    overflow-inline: auto;
     inline-size: 100%;
 }
 
