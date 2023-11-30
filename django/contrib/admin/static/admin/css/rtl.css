@@ -1,14 +1,5 @@
 /* GLOBAL */
 
-th {
-}
-
-.module h2, .module caption {
-}
-
-.module ul, .module ol {
-}
-
 .viewlink, .addlink, .changelink, .hidelink {
     background-position: 100% 1px;
 }
@@ -17,102 +8,7 @@ th {
     background-position: 100% 1px;
 }
 
-.object-tools {
-}
-
-thead th:first-child,
-tfoot td:first-child {
-}
-
-/* LAYOUT */
-
-#user-tools {
-}
-
-div.breadcrumbs {
-}
-
-#content-main {
-}
-
-#content-related {
-}
-
-.colMS {
-}
-
-/* SORTABLE TABLES */
-
-table thead th.sorted .sortoptions {
-}
-
-thead th.sorted .text {
-}
-
-/* dashboard styles */
-
-.dashboard .module table td a {
-}
-
-/* changelists styles */
-
-.change-list .filtered table {
-}
-
-#changelist-filter {
-}
-
-#changelist-filter li.selected {
-}
-
-#changelist table tbody td:first-child, #changelist table tbody th:first-child {
-}
-
-.paginator .end {
-}
-
-.paginator input {
-}
-
 /* FORMS */
-
-.aligned label {
-}
-
-.submit-row a.deletelink {
-}
-
-.vDateField, .vTimeField {
-}
-
-.aligned .form-row input {
-}
-
-form .aligned ul {
-}
-
-form ul.inline li {
-}
-
-form .aligned p.help,
-form .aligned div.help {
-}
-
-form div.help ul,
-form .aligned .checkbox-row + .help,
-form .aligned p.date div.help.timezonewarning,
-form .aligned p.datetime div.help.timezonewarning,
-form .aligned p.time div.help.timezonewarning {
-}
-
-form .wide p.help, form .wide div.help {
-}
-
-.submit-row {
-}
-
-fieldset .fieldBox {
-}
 
 .errorlist li {
     background-position: 100% 12px;
@@ -141,15 +37,6 @@ fieldset .fieldBox {
 .calendarbox .calendarnav-next:focus,
 .calendarbox .calendarnav-next:hover {
     background-position: 0 -15px;
-}
-
-.calendar caption, .calendarbox h2 {
-}
-
-.selector {
-}
-
-.selector .selector-filter {
 }
 
 .selector-add {
@@ -184,23 +71,6 @@ a.active.selector-clearall:focus, a.active.selector-clearall:hover {
     background-position: 0 -176px;
 }
 
-.inline-deletelink {
-}
-
 form .form-row p.datetime {
     overflow: hidden;
-}
-
-.related-widget-wrapper {
-}
-
-/* MISC */
-
-.inline-related h2, .inline-group h2 {
-}
-
-.inline-related h3 span.delete {
-}
-
-.inline-related h3 span.delete label {
 }

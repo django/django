@@ -1,45 +1,10 @@
 /* TABLETS */
 
 @media (max-width: 1024px) {
-    [dir="rtl"] .colMS {
-    }
-
-    [dir="rtl"] #user-tools {
-    }
-
-    [dir="rtl"] #changelist .actions label {
-    }
-
-    [dir="rtl"] #changelist .actions select {
-    }
-
-    [dir="rtl"] .change-list .filtered .results,
-    [dir="rtl"] .change-list .filtered .paginator,
-    [dir="rtl"] .filtered #toolbar,
-    [dir="rtl"] .filtered div.xfull,
-    [dir="rtl"] .filtered .actions,
-    [dir="rtl"] #changelist-filter {
-    }
-
     [dir="rtl"] .inline-group ul.tools a.add,
     [dir="rtl"] .inline-group div.add-row a,
     [dir="rtl"] .inline-group .tabular tr.add-row td a {
         background-position: calc(100% - 8px) 9px;
-    }
-
-    [dir="rtl"] .related-widget-wrapper-link + .selector {
-    }
-
-    [dir="rtl"] .selector .selector-filter label {
-    }
-
-    [dir="rtl"] .object-tools li {
-    }
-
-    [dir="rtl"] .object-tools li + li {
-    }
-
-    [dir="rtl"] .dashboard .module table td a {
     }
 
     [dir="rtl"] .selector-add {
@@ -56,22 +21,5 @@
 
     [dir="rtl"] .active.selector-remove:focus, .active.selector-remove:hover {
         background-position: 0 -140px;
-    }
-}
-
-/* MOBILE */
-
-@media (max-width: 767px) {
-    [dir="rtl"] .aligned .related-lookup,
-    [dir="rtl"] .aligned .datetimeshortcuts {
-    }
-
-    [dir="rtl"] .aligned ul,
-    [dir="rtl"] form .aligned ul.errorlist {
-    }
-
-    [dir="rtl"] #changelist-filter {
-    }
-    [dir="rtl"] .aligned .vCheckboxLabel {
     }
 }
