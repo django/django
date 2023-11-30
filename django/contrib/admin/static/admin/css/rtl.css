@@ -35,8 +35,6 @@ tfoot td:first-child {
 /* LAYOUT */
 
 #user-tools {
-    right: auto;
-    left: 0;
     text-align: left;
 }
 
@@ -167,9 +165,6 @@ fieldset .fieldBox {
 /* WIDGETS */
 
 .calendarnav-previous {
-    top: 0;
-    left: auto;
-    right: 10px;
     background-position: 0 -30px;
 }
 
@@ -179,9 +174,6 @@ fieldset .fieldBox {
 }
 
 .calendarnav-next {
-    top: 0;
-    right: auto;
-    left: 10px;
     background-position: 0 0;
 }
 
@@ -255,8 +247,6 @@ form .form-row p.datetime {
 .inline-related h3 span.delete {
     padding-right: 20px;
     padding-left: inherit;
-    left: 10px;
-    right: inherit;
     float:left;
 }
 

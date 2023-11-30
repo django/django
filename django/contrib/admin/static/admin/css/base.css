@@ -434,8 +434,8 @@ table thead th.sorted .sortoptions a.sortremove {
 table thead th.sorted .sortoptions a.sortremove:after {
     content: '\\';
     position: absolute;
-    top: -6px;
-    left: 3px;
+    inset-block-start: -6px;
+    inset-inline-start: 3px;
     font-weight: 200;
     font-size: 1.125rem;
     color: var(--body-quiet-color);
@@ -461,7 +461,7 @@ table thead th.sorted .sortoptions a.ascending:hover {
 }
 
 table thead th.sorted .sortoptions a.descending {
-    top: 1px;
+    inset-block-start: 1px;
     background-position: 0 -56px;
 }
 
@@ -856,7 +856,7 @@ a.deletelink:focus, a.deletelink:hover {
 
 .skip-to-content-link {
     position: absolute;
-    top: -999px;
+    inset-block-start: -999px;
     margin: 5px;
     padding: 5px;
     background: var(--body-bg);
@@ -864,8 +864,8 @@ a.deletelink:focus, a.deletelink:hover {
 }
 
 .skip-to-content-link:focus {
-    left: 0px;
-    top: 0px;
+    inset-inline-start: 0px;
+    inset-block-start: 0px;
 }
 
 #content {

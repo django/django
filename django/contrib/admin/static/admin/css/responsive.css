@@ -924,8 +924,8 @@ input[type="submit"], button {
 
     .calendarbox, .clockbox {
         position: fixed !important;
-        top: 50% !important;
-        left: 50% !important;
+        inset-block-start: 50% !important;
+        inset-inline-start: 50% !important;
         transform: translate(-50%, -50%);
         margin: 0;
         border: none;
@@ -935,8 +935,8 @@ input[type="submit"], button {
     .calendarbox:before, .clockbox:before {
         content: '';
         position: fixed;
-        top: 50%;
-        left: 50%;
+        inset-block-start: 50%;
+        inset-inline-start: 50%;
         inline-size: 100vw;
         block-size: 100vh;
         background: rgba(0, 0, 0, 0.75);
@@ -992,7 +992,7 @@ input[type="submit"], button {
 
     .calendarbox .calendarnav-previous, .calendarbox .calendarnav-next {
         z-index: 1;
-        top: 10px;
+        inset-block-start: 10px;
     }
 
     /* History */

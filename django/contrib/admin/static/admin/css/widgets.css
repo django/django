@@ -337,7 +337,7 @@ table p.datetime {
 
 .datetimeshortcuts .date-icon {
     background: url(../img/icon-calendar.svg) 0 0 no-repeat;
-    top: -1px;
+    inset-block-start: -1px;
 }
 
 .datetimeshortcuts a:focus .date-icon,
@@ -511,7 +511,7 @@ span.clearable-file-input label {
 .calendarbox .calendarnav-previous, .calendarbox .calendarnav-next {
     display: block;
     position: absolute;
-    top: 8px;
+    inset-block-start: 8px;
     inline-size: 15px;
     block-size: 15px;
     text-indent: -9999px;
@@ -519,7 +519,7 @@ span.clearable-file-input label {
 }
 
 .calendarnav-previous {
-    left: 10px;
+    inset-inline-start: 10px;
     background: url(../img/calendar-icons.svg) 0 0 no-repeat;
 }
 
@@ -529,7 +529,7 @@ span.clearable-file-input label {
 }
 
 .calendarnav-next {
-    right: 10px;
+    inset-inline-end: 10px;
     background: url(../img/calendar-icons.svg) 0 -30px no-repeat;
 }
 

@@ -1,12 +1,12 @@
 .sticky {
     position: sticky;
-    top: 0;
+    inset-block-start: 0;
     max-block-size: 100vh;
 }
 
 .toggle-nav-sidebar {
     z-index: 20;
-    left: 0;
+    inset-inline-start: 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -34,7 +34,7 @@
 #nav-sidebar {
     z-index: 15;
     flex: 0 0 275px;
-    left: -276px;
+    inset-inline-start: -276px;
     margin-inline-start: -276px;
     border-top: 1px solid transparent;
     border-right: 1px solid var(--hairline-color);
@@ -45,9 +45,9 @@
 [dir="rtl"] #nav-sidebar {
     border-left: 1px solid var(--hairline-color);
     border-right: 0;
-    left: 0;
+    inset-inline-start: 0;
     margin-inline-start: 0;
-    right: -276px;
+    inset-inline-end: -276px;
     margin-inline-end: -276px;
 }
 
