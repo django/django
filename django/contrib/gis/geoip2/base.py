@@ -132,8 +132,10 @@ class GeoIP2:
 
     def __del__(self):
         # Cleanup any GeoIP file handles lying around.
-        if self._reader:
-            self._reader.close()
+        if self._city:
+            self._city.close()
+        if self._country:
+            self._country.close()
 
     def __repr__(self):
         meta = self._reader.metadata()

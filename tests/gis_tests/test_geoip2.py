@@ -152,6 +152,16 @@ class GeoIPTest(SimpleTestCase):
         self.assertEqual("Lawrence", d["city"])
         self.assertEqual("KS", d["region"])
 
+    def test_del(self):
+        g = GeoIP2()
+        city = g._city
+        country = g._country
+        self.assertIs(city._db_reader.closed, False)
+        self.assertIs(country._db_reader.closed, False)
+        del g
+        self.assertIs(city._db_reader.closed, True)
+        self.assertIs(country._db_reader.closed, True)
+
     def test_repr(self):
         path = settings.GEOIP_PATH
         g = GeoIP2(path=path)
