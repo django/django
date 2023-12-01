@@ -3,7 +3,7 @@
 .selector {
     display: flex;
     flex-grow: 1;
-    gap: 10px;
+    gap: 0 10px;
 }
 
 .selector select {
@@ -15,7 +15,6 @@
 
 .selector-available, .selector-chosen {
     text-align: center;
-    margin-bottom: 5px;
     display: flex;
     flex-direction: column;
     flex: 1 1;
@@ -88,6 +87,7 @@
     width: 22px;
     background-color: var(--selected-bg);
     border-radius: 10px;
+    margin: 0;
     padding: 0;
     transform: translateY(-17px);
 }
@@ -151,7 +151,7 @@ a.selector-chooseall, a.selector-clearall {
     display: inline-block;
     height: 16px;
     text-align: left;
-    margin: 1px auto 3px;
+    margin: 0 auto;
     overflow: hidden;
     font-weight: bold;
     line-height: 16px;
@@ -580,8 +580,10 @@ ul.timelist, .timelist li {
 /* RELATED WIDGET WRAPPER */
 .related-widget-wrapper {
     display: flex;
-    gap: 10px;
+    gap: 0 10px;
     flex-grow: 1;
+    flex-wrap: wrap;
+    margin-bottom: 5px;
 }
 
 .related-widget-wrapper-link {
