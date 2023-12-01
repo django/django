@@ -29,7 +29,7 @@ from django.core.exceptions import (
     SuspiciousOperation,
 )
 from django.core.paginator import InvalidPage
-from django.db.models import F, Field, ManyToOneRel, OrderBy, Manager
+from django.db.models import F, Field, Manager, ManyToOneRel, OrderBy
 from django.db.models.expressions import Combinable
 from django.urls import reverse
 from django.utils.deprecation import RemovedInDjango60Warning
