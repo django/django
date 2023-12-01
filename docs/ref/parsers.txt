@@ -56,3 +56,20 @@ Parses HTML form content (). The ``parse()`` method returns a
 
 Parses multipart form content and supports file uploads. The method returns
 a ``QueryDict`` for ``data`` and an ``MultiValueDict`` for ``FILES``.
+
+HttpRequest.Parsers
+===================
+
+``HttpRequest.parsers`` returns a list of parsers to be used when parsing a
+request's content. By default, the parsers list will be Django's included
+parsers (``FormParser, ``MultiPartParser``).
+
+Parsers can be customised by setting a list of parsers to be used on the
+request. This could be in a middleware or in a view, but must be done before
+``data`` or ``FILES`` is accessed. For example:
+
+.. code-block:: python
+
+    def index(request):
+        request.parsers = [MyCustomParser(), FormParser(), ...]
+        ...

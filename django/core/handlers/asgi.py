@@ -19,6 +19,7 @@ from django.http import (
     HttpResponseServerError,
     QueryDict,
     parse_cookie,
+    parsers,
 )
 from django.urls import set_script_prefix
 from django.utils.functional import cached_property
@@ -111,6 +112,10 @@ class ASGIRequest(HttpRequest):
         self._stream = body_file
         # Other bits.
         self.resolver_match = None
+        self._parsers = [
+            parsers.FormParser(),
+            parsers.MultiPartParser(),
+        ]
 
     @cached_property
     def GET(self):

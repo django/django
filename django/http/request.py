@@ -69,6 +69,10 @@ class HttpRequest:
         self.resolver_match = None
         self.content_type = None
         self.content_params = None
+        self._parsers = [
+            parsers.FormParser(),
+            parsers.MultiPartParser(),
+        ]
 
     def __repr__(self):
         if self.method is None or not self.get_full_path():
@@ -416,6 +420,19 @@ class HttpRequest:
 
     def readlines(self):
         return list(self)
+
+    @property
+    def parsers(self):
+        return self._parsers
+
+    @parsers.setter
+    def parsers(self, parsers):
+        # TODO Also check for _data once added
+        if hasattr(self, "_files"):
+            raise AttributeError(
+                "You cannot change parsers after processing the request's content."
+            )
+        self._parsers = parsers
 
 
 class HttpHeaders(CaseInsensitiveMapping):
