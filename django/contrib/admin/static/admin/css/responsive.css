@@ -670,10 +670,10 @@ input[type="submit"], button {
 
     .selector {
         flex-direction: column;
+        gap: 10px 0;
     }
 
     .selector-available, .selector-chosen {
-        margin-bottom: 0;
         flex: 1 1 auto;
     }
 
