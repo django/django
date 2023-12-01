@@ -111,7 +111,7 @@ class BaseDatabaseSchemaEditor:
 
     sql_create_unique = (
         "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s "
-        "UNIQUE (%(columns)s)%(deferrable)s"
+        "UNIQUE%(nulls_distinct)s (%(columns)s)%(deferrable)s"
     )
     sql_delete_unique = sql_delete_constraint
 

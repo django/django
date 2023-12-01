@@ -3468,7 +3468,7 @@ class SchemaTests(TransactionTestCase):
                 editor.add_constraint(Author, constraint)
 
     @skipUnlessDBFeature("supports_nulls_distinct_unique_constraints")
-    def test_unique_constraint_nulls_distinct(self):
+    def test_unique_constraint_index_nulls_distinct(self):
         with connection.schema_editor() as editor:
             editor.create_model(Author)
         nulls_distinct = UniqueConstraint(
@@ -3490,6 +3490,29 @@ class SchemaTests(TransactionTestCase):
         constraints = self.get_constraints(Author._meta.db_table)
         self.assertNotIn(nulls_distinct.name, constraints)
         self.assertNotIn(nulls_not_distinct.name, constraints)
+
+    @skipUnlessDBFeature("supports_nulls_distinct_unique_constraints")
+    def test_unique_constraint_nulls_distinct(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        constraint = UniqueConstraint(
+            fields=["height", "weight"], name="constraint", nulls_distinct=False
+        )
+        with connection.schema_editor() as editor:
+            editor.add_constraint(Author, constraint)
+        Author.objects.create(name="", height=None, weight=None)
+        Author.objects.create(name="", height=1, weight=None)
+        Author.objects.create(name="", height=None, weight=1)
+        with self.assertRaises(IntegrityError):
+            Author.objects.create(name="", height=None, weight=None)
+        with self.assertRaises(IntegrityError):
+            Author.objects.create(name="", height=1, weight=None)
+        with self.assertRaises(IntegrityError):
+            Author.objects.create(name="", height=None, weight=1)
+        with connection.schema_editor() as editor:
+            editor.remove_constraint(Author, constraint)
+        constraints = self.get_constraints(Author._meta.db_table)
+        self.assertNotIn(constraint.name, constraints)
 
     @skipIfDBFeature("supports_nulls_distinct_unique_constraints")
     def test_unique_constraint_nulls_distinct_unsupported(self):
