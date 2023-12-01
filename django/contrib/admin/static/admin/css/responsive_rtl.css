@@ -97,4 +97,20 @@
     [dir="rtl"] .aligned .vCheckboxLabel {
         padding: 1px 5px 0 0;
     }
+
+    [dir="rtl"] .selector-remove {
+        background-position: 0 0;
+    }
+
+    [dir="rtl"] .active.selector-remove:focus, .active.selector-remove:hover {
+        background-position: 0 -20px;
+    }
+
+    [dir="rtl"] .selector-add  {
+        background-position: 0 -40px;
+    }
+
+    [dir="rtl"] .active.selector-add:focus, .active.selector-add:hover {
+        background-position: 0 -60px;
+    }
 }
