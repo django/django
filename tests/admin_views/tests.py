@@ -4916,7 +4916,8 @@ class AdminCustomQuerysetTest(TestCase):
         changelist_url = reverse("admin:admin_views_person_changelist")
 
         # 5 queries are expected: 1 for the session, 1 for the user,
-        # 1 for the counts if there are no filters, 2 if there are and 1 for the objects on the page
+        # 1 for the counts if there are no filters, 2 if there are
+        # and 1 for the objects on the page
         with self.assertNumQueries(4):
             resp = self.client.get(changelist_url)
             self.assertEqual(resp.context["selection_note"], "0 of 2 selected")
