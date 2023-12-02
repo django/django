@@ -3,6 +3,8 @@ from django.contrib.admin.options import ModelAdmin
 from django.contrib.auth.models import User
 from django.db.models import F
 from django.test import RequestFactory, TestCase
+from django.db import models
+
 
 from .models import (
     Band,
@@ -10,6 +12,10 @@ from .models import (
     Song,
     SongInlineDefaultOrdering,
     SongInlineNewOrdering,
+    SystemUser,
+    UserPermission,
+    ReportData
+
 )
 
 
@@ -206,3 +212,42 @@ class TestRelatedFieldsAdminOrdering(TestCase):
         site.register(Band, StaticOrderingBandAdmin)
 
         self.check_ordering_of_field_choices([self.b2])
+
+
+class TestCustomAdminOrdering(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        # Create permissions
+        perm1 = UserPermission.objects.create(permission='Permission 1')
+        perm2 = UserPermission.objects.create(permission='Permission 2')
+        perm3 = UserPermission.objects.create(permission='Permission 3')
+
+        # Create users with permissions
+        cls.user1 = SystemUser.objects.create(name='User 1')
+        cls.user2 = SystemUser.objects.create(name='User 2')
+
+        cls.user1.permissions.add(perm1, perm2)
+        cls.user2.permissions.add(perm1, perm2, perm3)
+
+        # Register Admin classes
+        class UserAdmin(admin.ModelAdmin):
+            ordering = ['-permissions__count']
+
+            def get_queryset(self, request):
+                qs = super().get_queryset(request)
+                return qs.annotate(permissions__count=models.Count("permissions"))
+
+        class ReportAdmin(admin.ModelAdmin):
+            pass
+
+        admin.site.register(SystemUser, UserAdmin)
+        admin.site.register(ReportData, ReportAdmin)
+
+    def test_system_user_ordering(self):
+        # Test if the ordering for SystemUser Admin is as expected
+        fk_field = admin.site._registry[ReportData].formfield_for_foreignkey(
+            ReportData.owner.field, request=None
+        )
+        expected_order = [self.user2, self.user1]  # Expected ordering by permissions count
+        self.assertEqual(list(fk_field.queryset), expected_order)
