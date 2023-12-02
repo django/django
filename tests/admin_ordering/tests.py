@@ -1,11 +1,9 @@
 from django.contrib import admin
 from django.contrib.admin.options import ModelAdmin
-from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
 from django.db.models import F
 from django.test import RequestFactory, TestCase
-
-
 
 from .models import (
     Band,
@@ -215,24 +213,23 @@ class TestRelatedFieldsAdminOrdering(TestCase):
 
 
 class TestCustomAdminOrdering(TestCase):
-
     @classmethod
     def setUpTestData(cls):
         # Create permissions
-        perm1 = UserPermission.objects.create(permission='Permission 1')
-        perm2 = UserPermission.objects.create(permission='Permission 2')
-        perm3 = UserPermission.objects.create(permission='Permission 3')
+        perm1 = UserPermission.objects.create(permission="Permission 1")
+        perm2 = UserPermission.objects.create(permission="Permission 2")
+        perm3 = UserPermission.objects.create(permission="Permission 3")
 
         # Create users with permissions
-        cls.user1 = SystemUser.objects.create(name='User 1')
-        cls.user2 = SystemUser.objects.create(name='User 2')
+        cls.user1 = SystemUser.objects.create(name="User 1")
+        cls.user2 = SystemUser.objects.create(name="User 2")
 
         cls.user1.permissions.add(perm1, perm2)
         cls.user2.permissions.add(perm1, perm2, perm3)
 
         # Register Admin classes
         class UserAdmin(admin.ModelAdmin):
-            ordering = ['-permissions__count']
+            ordering = ["-permissions__count"]
 
             def get_queryset(self, request):
                 qs = super().get_queryset(request)
@@ -249,5 +246,5 @@ class TestCustomAdminOrdering(TestCase):
         fk_field = admin.site._registry[ReportData].formfield_for_foreignkey(
             ReportData.owner.field, request=None
         )
-        expected_order = [self.user2, self.user1]  # Ordering by permissions count
+        expected_order = [self.user2, self.user1]  # Ordering by permissions
         self.assertEqual(list(fk_field.queryset), expected_order)
