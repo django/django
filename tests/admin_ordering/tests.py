@@ -1,9 +1,10 @@
 from django.contrib import admin
 from django.contrib.admin.options import ModelAdmin
+from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import F
 from django.test import RequestFactory, TestCase
-from django.db import models
+
 
 
 from .models import (
