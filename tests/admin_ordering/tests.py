@@ -9,12 +9,12 @@ from django.db import models
 from .models import (
     Band,
     DynOrderingBandAdmin,
+    ReportData,
     Song,
     SongInlineDefaultOrdering,
     SongInlineNewOrdering,
     SystemUser,
     UserPermission,
-    ReportData,
 )
 
 
@@ -250,4 +250,3 @@ class TestCustomAdminOrdering(TestCase):
         )
         expected_order = [self.user2, self.user1]  # Ordering by permissions count
         self.assertEqual(list(fk_field.queryset), expected_order)
-

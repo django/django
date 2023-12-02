@@ -53,5 +53,3 @@ class SystemUser(models.Model):
 class ReportData(models.Model):
     title = models.CharField(max_length=255)
     owner = models.ForeignKey(SystemUser, on_delete=models.CASCADE)
-
-
