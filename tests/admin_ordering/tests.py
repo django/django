@@ -251,3 +251,4 @@ class TestCustomAdminOrdering(TestCase):
         )
         expected_order = [self.user2, self.user1]  # Expected ordering by permissions count
         self.assertEqual(list(fk_field.queryset), expected_order)
+
