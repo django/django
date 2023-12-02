@@ -14,8 +14,7 @@ from .models import (
     SongInlineNewOrdering,
     SystemUser,
     UserPermission,
-    ReportData
-
+    ReportData,
 )
 
 
@@ -249,6 +248,6 @@ class TestCustomAdminOrdering(TestCase):
         fk_field = admin.site._registry[ReportData].formfield_for_foreignkey(
             ReportData.owner.field, request=None
         )
-        expected_order = [self.user2, self.user1]  # Expected ordering by permissions count
+        expected_order = [self.user2, self.user1]  # Ordering by permissions count
         self.assertEqual(list(fk_field.queryset), expected_order)
 
