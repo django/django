@@ -22,7 +22,6 @@
     function showClear(options) {
         show(options.acrossClears);
         hide(options.acrossQuestions);
-        document.querySelector(options.actionContainer).classList.remove(options.selectedClass);
         show(options.allContainer);
         hide(options.counterContainer);
     }
@@ -40,7 +39,6 @@
         acrossInputs.forEach(function(acrossInput) {
             acrossInput.value = 0;
         });
-        document.querySelector(options.actionContainer).classList.remove(options.selectedClass);
     }
 
     function checker(actionCheckboxes, options, checked) {
@@ -51,7 +49,6 @@
         }
         actionCheckboxes.forEach(function(el) {
             el.checked = checked;
-            el.closest('tr').classList.toggle(options.selectedClass, checked);
         });
     }
 
@@ -85,7 +82,6 @@
         acrossQuestions: "div.actions span.question",
         acrossClears: "div.actions span.clear",
         allToggleId: "action-toggle",
-        selectedClass: "selected"
     };
 
     window.Actions = function(actionCheckboxes, options) {

@@ -262,20 +262,11 @@
     vertical-align: baseline;
 }
 
-/* Once the :has() pseudo-class is supported by all browsers, the tr.selected
-   selector and the JS adding the class can be removed. */
-#changelist tbody tr.selected {
-    background-color: var(--selected-row);
-}
-
 #changelist tbody tr:has(.action-select:checked) {
     background-color: var(--selected-row);
 }
 
 @media (forced-colors: active) {
-    #changelist tbody tr.selected {
-        background-color: SelectedItem;
-    }
     #changelist tbody tr:has(.action-select:checked) {
         background-color: SelectedItem;
     }

@@ -1712,7 +1712,6 @@ class SeleniumTests(AdminSeleniumTestCase):
         row_selector.click()
         self.assertEqual(selection_indicator.text, "1 of 1 selected")
         self.assertIs(all_selector.get_property("checked"), True)
-        self.assertEqual(row.get_attribute("class"), "selected")
 
         # Deselect a row and check again
         row_selector.click()
