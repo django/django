@@ -6,11 +6,11 @@ import sys
 import types
 import warnings
 from pathlib import Path
+from reprlib import Repr
 
 from django.conf import settings
 from django.http import Http404, HttpResponse, HttpResponseNotFound
 from django.template import Context, Engine, TemplateDoesNotExist
-from django.template.defaultfilters import pprint
 from django.urls import resolve
 from django.utils import timezone
 from django.utils.datastructures import MultiValueDict
@@ -347,15 +347,16 @@ class ExceptionReporter:
             self.template_does_not_exist = True
             self.postmortem = self.exc_value.chain or [self.exc_value]
 
+        repr_handler = Repr()
+        repr_handler.maxstring = 2048
+        repr_handler.fillvalue = "... trimmed content ..."
+
         frames = self.get_traceback_frames()
         for i, frame in enumerate(frames):
             if "vars" in frame:
                 frame_vars = []
                 for k, v in frame["vars"]:
-                    v = pprint(v)
-                    # Trim large blobs of data
-                    if len(v) > 4096:
-                        v = "%s… <trimmed %d bytes string>" % (v[0:4096], len(v))
+                    repr_handler.repr(v)
                     frame_vars.append((k, v))
                 frame["vars"] = frame_vars
             frames[i] = frame
@@ -367,7 +368,7 @@ class ExceptionReporter:
             if start is not None and end is not None:
                 unicode_str = self.exc_value.args[1]
                 unicode_hint = force_str(
-                    unicode_str[max(start - 5, 0) : min(end + 5, len(unicode_str))],
+                    unicode_str[max(start - 5, 0): min(end + 5, len(unicode_str))],
                     "ascii",
                     errors="replace",
                 )
@@ -483,7 +484,7 @@ class ExceptionReporter:
         try:
             pre_context = source[lower_bound:lineno]
             context_line = source[lineno]
-            post_context = source[lineno + 1 : upper_bound]
+            post_context = source[lineno + 1: upper_bound]
         except IndexError:
             return None, [], None, []
         return lower_bound, pre_context, context_line, post_context
