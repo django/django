@@ -35,11 +35,6 @@
         background-position: calc(100% - 8px) 9px;
     }
 
-    [dir="rtl"] .related-widget-wrapper-link + .selector {
-        margin-right: 0;
-        margin-left: 15px;
-    }
-
     [dir="rtl"] .selector .selector-filter label {
         margin-right: 0;
         margin-left: 8px;
