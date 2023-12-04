@@ -30,8 +30,6 @@ host_validation_re = _lazy_re_compile(
     r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9.:]+\])(?::([0-9]+))?$"
 )
 
-POST_PARSERS = (parsers.FormParser(), parsers.MultiPartParser())
-
 
 class UnreadablePostError(OSError):
     pass
@@ -354,7 +352,7 @@ class HttpRequest:
         self._files = MultiValueDict()
 
     def _load_post_and_files(
-        self, data_attr="_post", parsers=POST_PARSERS, methods=("POST",)
+        self, data_attr="_post", parser_list=None, methods=("POST",)
     ):
         if methods and self.method not in methods:
             self._post, self._files = (
@@ -362,20 +360,21 @@ class HttpRequest:
                 MultiValueDict(),
             )
             return
-
         if self._read_started and not hasattr(self, "_body"):
             setattr(self, data_attr, QueryDict())
             self._files = MultiValueDict()
             return
 
+        if parser_list is None:
+            parser_list = [parsers.FormParser(), parsers.MultiPartParser()]
         selected_parser = None
-        for parser in parsers:
+        for parser in parser_list:
             if parser.can_handle(self.content_type):
                 selected_parser = parser
                 break
 
         if selected_parser:
-            selected_parser.parsers = parsers
+            selected_parser.parsers = parser_list
             try:
                 if selected_parser._supports_form_parsing:
                     # TODO Not sure how to make these consistent.
