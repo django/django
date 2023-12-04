@@ -1,23 +1,9 @@
-import gc
 import weakref
 from types import TracebackType
 
 from django.dispatch import Signal, receiver
 from django.test import SimpleTestCase
-from django.test.utils import override_settings
-from django.utils.version import PYPY
-
-if PYPY:
-
-    def garbage_collect():
-        # Collecting weakreferences can take two collections on PyPy.
-        gc.collect()
-        gc.collect()
-
-else:
-
-    def garbage_collect():
-        gc.collect()
+from django.test.utils import garbage_collect, override_settings
 
 
 def receiver_1_arg(val, **kwargs):

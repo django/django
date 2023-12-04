@@ -1,4 +1,5 @@
 import collections
+import gc
 import logging
 import os
 import re
@@ -27,6 +28,7 @@ from django.template import Template
 from django.test.signals import template_rendered
 from django.urls import get_script_prefix, set_script_prefix
 from django.utils.translation import deactivate
+from django.utils.version import PYPY
 
 try:
     import jinja2
@@ -38,6 +40,7 @@ __all__ = (
     "Approximate",
     "ContextList",
     "isolate_lru_cache",
+    "garbage_collect",
     "get_runner",
     "CaptureQueriesContext",
     "ignore_warnings",
@@ -982,3 +985,10 @@ def register_lookup(field, *lookups, lookup_name=None):
     finally:
         for lookup in lookups:
             field._unregister_lookup(lookup, lookup_name)
+
+
+def garbage_collect():
+    gc.collect()
+    if PYPY:
+        # Collecting weakreferences can take two collections on PyPy.
+        gc.collect()
