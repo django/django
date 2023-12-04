@@ -2,7 +2,7 @@
 Django 4.2.8 release notes
 ==========================
 
-*Expected December 4, 2023*
+*December 4, 2023*
 
 Django 4.2.8 fixes several bugs in 4.2.7 and adds compatibility with Python
 3.12.
