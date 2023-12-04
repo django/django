@@ -1,8 +1,8 @@
-============================================
-Django 5.0 release notes - UNDER DEVELOPMENT
-============================================
+========================
+Django 5.0 release notes
+========================
 
-*Expected December 2023*
+*December 4, 2023*
 
 Welcome to Django 5.0!
 
