@@ -31,17 +31,20 @@ class ServerSideCursorsPostgres(TestCase):
 
     @contextmanager
     def override_db_setting(self, **kwargs):
-        for setting in kwargs:
-            original_value = connection.settings_dict.get(setting)
-            if setting in connection.settings_dict:
-                self.addCleanup(
-                    operator.setitem, connection.settings_dict, setting, original_value
-                )
-            else:
-                self.addCleanup(operator.delitem, connection.settings_dict, setting)
+        cleanups = []
+        settings = connection.settings_dict
 
-            connection.settings_dict[setting] = kwargs[setting]
-            yield
+        for name, value in kwargs.items():
+            if name in settings:
+                cleanups.append((operator.setitem, settings, name, settings[name]))
+            else:
+                cleanups.append((operator.delitem, settings, name))
+            settings[name] = value
+
+        yield
+
+        for operation, *args in reversed(cleanups):
+            operation(*args)
 
     def assertUsesCursor(self, queryset, num_expected=1):
         next(queryset)  # Open a server-side cursor
@@ -55,6 +58,15 @@ class ServerSideCursorsPostgres(TestCase):
 
     def assertNotUsesCursor(self, queryset):
         self.assertUsesCursor(queryset, num_expected=0)
+
+    def test_override_db_setting(self):
+        self.assertNotIn("A", connection.settings_dict)
+        self.assertNotIn("B", connection.settings_dict)
+        with self.override_db_setting(A=1, B=2):
+            self.assertEqual(connection.settings_dict["A"], 1)
+            self.assertEqual(connection.settings_dict["B"], 2)
+        self.assertNotIn("A", connection.settings_dict)
+        self.assertNotIn("B", connection.settings_dict)
 
     def test_server_side_cursor(self):
         self.assertUsesCursor(Person.objects.iterator())
