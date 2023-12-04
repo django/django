@@ -57,6 +57,16 @@ Parses HTML form content (). The ``parse()`` method returns a
 Parses multipart form content and supports file uploads. The method returns
 a ``QueryDict`` for ``data`` and an ``MultiValueDict`` for ``FILES``.
 
+.. class:: JSONParser
+
+    .. attribute:: media_type
+
+      ``"application/json"``
+
+The ``parse()`` method deserializes JSON to a Python dictionary. This is
+returned for ``data`` and empty ``MultiValueDict`` is provided for ``FILES``.
+
+
 HttpRequest.Parsers
 ===================
 

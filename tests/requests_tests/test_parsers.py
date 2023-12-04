@@ -1,6 +1,6 @@
 from django.core.handlers.wsgi import WSGIRequest
 from django.http import HttpRequest
-from django.http.parsers import BaseParser, FormParser, MultiPartParser
+from django.http.parsers import BaseParser, FormParser, JSONParser, MultiPartParser
 from django.test import SimpleTestCase
 from django.test.client import FakePayload
 from django.utils.http import urlencode
@@ -31,9 +31,10 @@ class TestParsers(SimpleTestCase):
 
     def test_request_parser_no_setting(self):
         request = HttpRequest()
-        form, multipart = request.parsers
+        form, multipart, json = request.parsers
         self.assertIsInstance(form, FormParser)
         self.assertIsInstance(multipart, MultiPartParser)
+        self.assertIsInstance(json, JSONParser)
 
     def test_set_parser(self):
         request = HttpRequest()

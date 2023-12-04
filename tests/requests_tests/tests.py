@@ -14,7 +14,7 @@ from django.http import (
     UnreadablePostError,
 )
 from django.http.multipartparser import MAX_TOTAL_HEADER_SIZE, MultiPartParserError
-from django.http.request import split_domain_port
+from django.http.request import QueryDict, split_domain_port
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.client import BOUNDARY, MULTIPART_CONTENT, FakePayload
 
@@ -99,6 +99,7 @@ class RequestsTests(SimpleTestCase):
         )
         self.assertEqual(list(request.GET), [])
         self.assertEqual(list(request.POST), [])
+        self.assertEqual(list(request.data), [])
         self.assertEqual(list(request.COOKIES), [])
         self.assertEqual(
             set(request.META),
@@ -339,7 +340,7 @@ class RequestsTests(SimpleTestCase):
     def test_read_after_value(self):
         """
         Reading from request is allowed after accessing request contents as
-        POST or body.
+        POST, data or body.
         """
         payload = FakePayload("name=value")
         request = WSGIRequest(
@@ -351,12 +352,13 @@ class RequestsTests(SimpleTestCase):
             }
         )
         self.assertEqual(request.POST, {"name": ["value"]})
+        self.assertEqual(request.data, {"name": ["value"]})
         self.assertEqual(request.body, b"name=value")
         self.assertEqual(request.read(), b"name=value")
 
     def test_value_after_read(self):
         """
-        Construction of POST or body is not allowed after reading
+        Construction of POST, data or body is not allowed after reading
         from request.
         """
         payload = FakePayload("name=value")
@@ -372,6 +374,7 @@ class RequestsTests(SimpleTestCase):
         with self.assertRaises(RawPostDataException):
             request.body
         self.assertEqual(request.POST, {})
+        self.assertEqual(request.data, {})
 
     def test_non_ascii_POST(self):
         payload = FakePayload(urlencode({"key": "España"}))
@@ -384,6 +387,7 @@ class RequestsTests(SimpleTestCase):
             }
         )
         self.assertEqual(request.POST, {"key": ["España"]})
+        self.assertEqual(request.data, {"key": ["España"]})
 
     def test_non_utf8_charset_POST_bad_request(self):
         payload = FakePayload(urlencode({"key": "España".encode("latin-1")}))
@@ -400,6 +404,8 @@ class RequestsTests(SimpleTestCase):
         )
         with self.assertRaisesMessage(BadRequest, msg):
             request.POST
+        with self.assertRaisesMessage(BadRequest, msg):
+            request.data
         request = WSGIRequest(environ)
         with self.assertRaisesMessage(BadRequest, msg):
             request.FILES
@@ -419,6 +425,7 @@ class RequestsTests(SimpleTestCase):
                     }
                 )
                 self.assertEqual(request.POST, {"key": ["España"]})
+                self.assertEqual(request.data, {"key": ["España"]})
 
     def test_body_after_POST_multipart_form_data(self):
         """
@@ -477,6 +484,7 @@ class RequestsTests(SimpleTestCase):
             }
         )
         self.assertEqual(request.POST, {})
+        self.assertEqual(request.data, {})
         self.assertEqual(request.body, payload_data)
 
     def test_POST_multipart_with_content_length_zero(self):
@@ -506,6 +514,7 @@ class RequestsTests(SimpleTestCase):
             }
         )
         self.assertEqual(request.POST, {})
+        self.assertEqual(request.data, {})
 
     @override_settings(
         FILE_UPLOAD_HANDLERS=["requests_tests.tests.ErrorFileUploadHandler"]
@@ -559,7 +568,7 @@ class RequestsTests(SimpleTestCase):
         self.assertEqual(request.POST, "_POST")
         self.assertEqual(request.FILES, "_FILES")
 
-    def test_request_methods_with_content(self):
+    def test_request_methods_with_content_POST(self):
         for method in ["GET", "PUT", "DELETE"]:
             with self.subTest(method=method):
                 payload = FakePayload(urlencode({"key": "value"}))
@@ -572,6 +581,20 @@ class RequestsTests(SimpleTestCase):
                     }
                 )
                 self.assertEqual(request.POST, {})
+
+    def test_request_methods_with_content_data(self):
+        for method in ["GET", "PUT", "DELETE"]:
+            with self.subTest(method=method):
+                payload = FakePayload(urlencode({"key": "value"}))
+                request = WSGIRequest(
+                    {
+                        "REQUEST_METHOD": method,
+                        "CONTENT_LENGTH": len(payload),
+                        "CONTENT_TYPE": "application/x-www-form-urlencoded",
+                        "wsgi.input": payload,
+                    }
+                )
+                self.assertEqual(request.data, QueryDict("key=value"))
 
     def test_POST_content_type_json(self):
         payload = FakePayload(
@@ -593,12 +616,39 @@ class RequestsTests(SimpleTestCase):
         self.assertEqual(request.POST, {})
         self.assertEqual(request.FILES, {})
 
+    def test_data_content_type_json(self):
+        payload = FakePayload(
+            "\r\n".join(
+                [
+                    '{"pk": 1, "model": "store.book", "fields": {"name": "Mostly Ha'
+                    'rmless", "author": ["Douglas", "Adams"]}}',
+                ]
+            )
+        )
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "CONTENT_TYPE": "application/json",
+                "CONTENT_LENGTH": len(payload),
+                "wsgi.input": payload,
+            }
+        )
+        self.assertEqual(
+            request.data,
+            {
+                "pk": 1,
+                "model": "store.book",
+                "fields": {"name": "Mostly Harmless", "author": ["Douglas", "Adams"]},
+            },
+        )
+        self.assertEqual(request.FILES, {})
+
     _json_payload = [
         'Content-Disposition: form-data; name="JSON"',
         "Content-Type: application/json",
         "",
         '{"pk": 1, "model": "store.book", "fields": {"name": "Mostly Harmless", '
-        '"author": ["Douglas", Adams"]}}',
+        '"author": ["Douglas", "Adams"]}}',
     ]
 
     def test_POST_form_data_json(self):
@@ -618,7 +668,7 @@ class RequestsTests(SimpleTestCase):
             {
                 "JSON": [
                     '{"pk": 1, "model": "store.book", "fields": {"name": "Mostly '
-                    'Harmless", "author": ["Douglas", Adams"]}}'
+                    'Harmless", "author": ["Douglas", "Adams"]}}'
                 ],
             },
         )
@@ -651,7 +701,46 @@ class RequestsTests(SimpleTestCase):
                 "name": ["value"],
                 "JSON": [
                     '{"pk": 1, "model": "store.book", "fields": {"name": "Mostly '
-                    'Harmless", "author": ["Douglas", Adams"]}}'
+                    'Harmless", "author": ["Douglas", "Adams"]}}'
+                ],
+            },
+        )
+
+    def test_data_multipart_json(self):
+        payload = FakePayload(
+            "\r\n".join(
+                [
+                    f"--{BOUNDARY}",
+                    'Content-Disposition: form-data; name="name"',
+                    "",
+                    "value",
+                    f"--{BOUNDARY}",
+                    *self._json_payload,
+                    f"--{BOUNDARY}--",
+                ]
+            )
+        )
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "CONTENT_TYPE": MULTIPART_CONTENT,
+                "CONTENT_LENGTH": len(payload),
+                "wsgi.input": payload,
+            }
+        )
+        self.assertEqual(
+            request.data,
+            {
+                "name": ["value"],
+                "JSON": [
+                    {
+                        "pk": 1,
+                        "model": "store.book",
+                        "fields": {
+                            "name": "Mostly Harmless",
+                            "author": ["Douglas", "Adams"],
+                        },
+                    }
                 ],
             },
         )
@@ -689,7 +778,52 @@ class RequestsTests(SimpleTestCase):
                 "name": ["value"],
                 "JSON": [
                     '{"pk": 1, "model": "store.book", "fields": {"name": "Mostly '
-                    'Harmless", "author": ["Douglas", Adams"]}}'
+                    'Harmless", "author": ["Douglas", "Adams"]}}'
+                ],
+                "CSV": ["Framework,ID.Django,1.Flask,2."],
+            },
+        )
+
+    def test_data_multipart_json_csv(self):
+        payload = FakePayload(
+            "\r\n".join(
+                [
+                    f"--{BOUNDARY}",
+                    'Content-Disposition: form-data; name="name"',
+                    "",
+                    "value",
+                    f"--{BOUNDARY}",
+                    *self._json_payload,
+                    f"--{BOUNDARY}",
+                    'Content-Disposition: form-data; name="CSV"',
+                    "Content-Type: text/csv",
+                    "",
+                    "Framework,ID.Django,1.Flask,2.",
+                    f"--{BOUNDARY}--",
+                ]
+            )
+        )
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "CONTENT_TYPE": MULTIPART_CONTENT,
+                "CONTENT_LENGTH": len(payload),
+                "wsgi.input": payload,
+            }
+        )
+        self.assertEqual(
+            request.data,
+            {
+                "name": ["value"],
+                "JSON": [
+                    {
+                        "pk": 1,
+                        "model": "store.book",
+                        "fields": {
+                            "name": "Mostly Harmless",
+                            "author": ["Douglas", "Adams"],
+                        },
+                    }
                 ],
                 "CSV": ["Framework,ID.Django,1.Flask,2."],
             },
@@ -730,7 +864,55 @@ class RequestsTests(SimpleTestCase):
                 "name": ["value"],
                 "JSON": [
                     '{"pk": 1, "model": "store.book", "fields": {"name": "Mostly '
-                    'Harmless", "author": ["Douglas", Adams"]}}'
+                    'Harmless", "author": ["Douglas", "Adams"]}}'
+                ],
+            },
+        )
+        self.assertEqual(len(request.FILES), 1)
+        self.assertIsInstance((request.FILES["File"]), InMemoryUploadedFile)
+
+    def test_data_multipart_with_file(self):
+        payload = FakePayload(
+            "\r\n".join(
+                [
+                    f"--{BOUNDARY}",
+                    'Content-Disposition: form-data; name="name"',
+                    "",
+                    "value",
+                    f"--{BOUNDARY}",
+                    *self._json_payload,
+                    f"--{BOUNDARY}",
+                    'Content-Disposition: form-data; name="File"; filename="test.csv"',
+                    "Content-Type: application/octet-stream",
+                    "",
+                    "Framework,ID",
+                    "Django,1",
+                    "Flask,2",
+                    f"--{BOUNDARY}--",
+                ]
+            )
+        )
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "CONTENT_TYPE": MULTIPART_CONTENT,
+                "CONTENT_LENGTH": len(payload),
+                "wsgi.input": payload,
+            }
+        )
+        self.assertEqual(
+            request.data,
+            {
+                "name": ["value"],
+                "JSON": [
+                    {
+                        "pk": 1,
+                        "model": "store.book",
+                        "fields": {
+                            "name": "Mostly Harmless",
+                            "author": ["Douglas", "Adams"],
+                        },
+                    }
                 ],
             },
         )
@@ -794,9 +976,9 @@ class RequestsTests(SimpleTestCase):
         )
         self.assertEqual(list(request), [b"name=value"])
 
-    def test_POST_after_body_read(self):
+    def test_POST_and_data_after_body_read(self):
         """
-        POST should be populated even if body is read first
+        POST and data should be populated even if body is read first
         """
         payload = FakePayload("name=value")
         request = WSGIRequest(
@@ -809,10 +991,11 @@ class RequestsTests(SimpleTestCase):
         )
         request.body  # evaluate
         self.assertEqual(request.POST, {"name": ["value"]})
+        self.assertEqual(request.data, {"name": ["value"]})
 
-    def test_POST_after_body_read_and_stream_read(self):
+    def test_POST_and_data_after_body_read_and_stream_read(self):
         """
-        POST should be populated even if body is read first, and then
+        POST and data should be populated even if body is read first, and then
         the stream is read second.
         """
         payload = FakePayload("name=value")
@@ -827,6 +1010,7 @@ class RequestsTests(SimpleTestCase):
         request.body  # evaluate
         self.assertEqual(request.read(1), b"n")
         self.assertEqual(request.POST, {"name": ["value"]})
+        self.assertEqual(request.data, {"name": ["value"]})
 
     def test_multipart_post_field_with_base64(self):
         payload = FakePayload(

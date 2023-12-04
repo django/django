@@ -119,6 +119,15 @@ All attributes should be considered read-only, unless stated otherwise.
 
     ``POST`` does *not* include file-upload information. See :attr:`FILES`.
 
+.. attribute:: HttpRequest.data
+
+    Similar to :attr:`HttpRequest.POST` but parses the :attr:`HttpRequest.body`
+    with the parsers returned by :attr:`HttpRequest.parsers``. By default this
+    will result in ``application/json`` data being parsed in addition to form
+    data.
+
+    In addition data will be parsed for all :attr:`HttpRequest.method` methods.
+
 .. attribute:: HttpRequest.COOKIES
 
     A dictionary containing all cookies. Keys and values are strings.

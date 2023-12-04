@@ -81,6 +81,7 @@ class WSGIRequest(HttpRequest):
         self._parsers = [
             parsers.FormParser(),
             parsers.MultiPartParser(),
+            parsers.JSONParser(),
         ]
 
     def _get_scheme(self):

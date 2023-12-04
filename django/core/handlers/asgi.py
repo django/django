@@ -115,6 +115,7 @@ class ASGIRequest(HttpRequest):
         self._parsers = [
             parsers.FormParser(),
             parsers.MultiPartParser(),
+            parsers.JSONParser(),
         ]
 
     @cached_property

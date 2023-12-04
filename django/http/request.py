@@ -30,6 +30,8 @@ host_validation_re = _lazy_re_compile(
     r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9.:]+\])(?::([0-9]+))?$"
 )
 
+POST_PARSERS = (parsers.FormParser(), parsers.MultiPartParser())
+
 
 class UnreadablePostError(OSError):
     pass
@@ -72,6 +74,7 @@ class HttpRequest:
         self._parsers = [
             parsers.FormParser(),
             parsers.MultiPartParser(),
+            parsers.JSONParser(),
         ]
 
     def __repr__(self):
@@ -350,43 +353,52 @@ class HttpRequest:
         self._post = QueryDict()
         self._files = MultiValueDict()
 
-    def _load_post_and_files(self):
-        """Populate self._post and self._files if the content-type is a form type"""
-        if self.method != "POST":
+    def _load_post_and_files(
+        self, data_attr="_post", parsers=POST_PARSERS, methods=("POST",)
+    ):
+        if methods and self.method not in methods:
             self._post, self._files = (
                 QueryDict(encoding=self._encoding),
                 MultiValueDict(),
             )
             return
+
         if self._read_started and not hasattr(self, "_body"):
-            self._mark_post_parse_error()
+            setattr(self, data_attr, QueryDict())
+            self._files = MultiValueDict()
             return
 
-        # TODO create a parsers setter/getter/initializer like upload_handlers
-        parser_list = (parsers.FormParser(), parsers.MultiPartParser())
-
         selected_parser = None
-        for parser in parser_list:
+        for parser in parsers:
             if parser.can_handle(self.content_type):
                 selected_parser = parser
                 break
 
         if selected_parser:
+            selected_parser.parsers = parsers
             try:
-                self._post, self._files = parser.parse(self)
+                if selected_parser._supports_form_parsing:
+                    # TODO Not sure how to make these consistent.
+                    data, self._files = parser.parse(None, self)
+                    setattr(self, data_attr, data)
+                else:
+                    data, self._files = parser.parse(self.body, self)
+                    setattr(self, data_attr, data)
             except Exception as e:
                 # TODO 'application/x-www-form-urlencoded' didn't do this.
                 # An error occurred while parsing POST data. Since when
                 # formatting the error the request handler might access
                 # self.POST, set self._post and self._file to prevent
                 # attempts to parse POST data again.
-                self._mark_post_parse_error()
+                data_attr = QueryDict()
+                self._files = MultiValueDict()
                 raise e
         else:
-            self._post, self._files = (
+            data, self._files = (
                 QueryDict(encoding=self._encoding),
                 MultiValueDict(),
             )
+            setattr(self, data_attr, data)
 
     def close(self):
         if hasattr(self, "_files"):
@@ -427,12 +439,22 @@ class HttpRequest:
 
     @parsers.setter
     def parsers(self, parsers):
-        # TODO Also check for _data once added
-        if hasattr(self, "_files"):
+        if hasattr(self, "_data") or hasattr(self, "_files"):
             raise AttributeError(
                 "You cannot change parsers after processing the request's content."
             )
         self._parsers = parsers
+
+    # TODO should this property be on [WSGI|ASGI]Request?
+    @property
+    def data(self):
+        if not hasattr(self, "_data"):
+            self._load_post_and_files("_data", self.parsers, methods=None)
+        return self._data
+
+    @data.setter
+    def data(self, data):
+        self._data = data
 
 
 class HttpHeaders(CaseInsensitiveMapping):
