@@ -53,7 +53,7 @@ class ServerSideCursorsPostgres(TestCase):
             self.assertFalse(cursor.is_holdable)
             self.assertFalse(cursor.is_binary)
 
-    def asserNotUsesCursor(self, queryset):
+    def assertNotUsesCursor(self, queryset):
         self.assertUsesCursor(queryset, num_expected=0)
 
     def test_server_side_cursor(self):
@@ -98,4 +98,4 @@ class ServerSideCursorsPostgres(TestCase):
             del persons  # Close server-side cursor
 
         with self.override_db_setting(DISABLE_SERVER_SIDE_CURSORS=True):
-            self.asserNotUsesCursor(Person.objects.iterator())
+            self.assertNotUsesCursor(Person.objects.iterator())
