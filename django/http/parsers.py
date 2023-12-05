@@ -70,6 +70,11 @@ class JSONParser(BaseParser):
     def parse(self, request):
         from django.http import HttpRequest
 
+        def strict_constant(o):
+            raise ValueError(
+                "Out of range float values are not JSON compliant: " + repr(o)
+            )
+
         if isinstance(request, HttpRequest):
             request = request.body
-        return json.loads(request), MultiValueDict()
+        return json.loads(request, parse_constant=strict_constant), MultiValueDict()

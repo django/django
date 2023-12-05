@@ -60,3 +60,13 @@ class TestParsers(SimpleTestCase):
         msg = "You cannot change parsers after processing the request's content."
         with self.assertRaisesMessage(AttributeError, msg):
             request.parsers = []
+
+    def test_json_strict(self):
+        parser = JSONParser()
+
+        msg_base = "Out of range float values are not JSON compliant: '%s'"
+        for value in ["Infinity", "-Infinity", "NaN"]:
+            with self.subTest(value=value):
+                msg = msg_base % value
+                with self.assertRaisesMessage(ValueError, msg):
+                    parser.parse(bytes(value.encode()))
