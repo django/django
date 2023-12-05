@@ -16,16 +16,11 @@ class BaseParser:
     def parse(self, data, request=None):
         pass
 
-    @property
-    def _supports_form_parsing(self):
-        form_media = ("application/x-www-form-urlencoded", "multipart/form-data")
-        return self.media_type in form_media
-
 
 class FormParser(BaseParser):
     media_type = "application/x-www-form-urlencoded"
 
-    def parse(self, data, request=None):
+    def parse(self, request):
         from django.http import QueryDict
 
         # According to RFC 1866, the "application/x-www-form-urlencoded"
@@ -42,7 +37,7 @@ class FormParser(BaseParser):
 class MultiPartParser(BaseParser):
     media_type = "multipart/form-data"
 
-    def parse(self, data, request=None):
+    def parse(self, request):
         if hasattr(request, "_body"):
             # Use already read data
             data = BytesIO(request._body)
@@ -71,6 +66,10 @@ class MultiPartParser(BaseParser):
 class JSONParser(BaseParser):
     media_type = "application/json"
 
-    def parse(self, data, request=None):
-        # TODO enable strict mode. Like DRF.
-        return json.loads(data), MultiValueDict()
+    # TODO rename request -- it's not always one.
+    def parse(self, request):
+        from django.http import HttpRequest
+
+        if isinstance(request, HttpRequest):
+            request = request.body
+        return json.loads(request), MultiValueDict()

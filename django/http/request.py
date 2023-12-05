@@ -376,13 +376,8 @@ class HttpRequest:
         if selected_parser:
             selected_parser.parsers = parser_list
             try:
-                if selected_parser._supports_form_parsing:
-                    # TODO Not sure how to make these consistent.
-                    data, self._files = parser.parse(None, self)
-                    setattr(self, data_attr, data)
-                else:
-                    data, self._files = parser.parse(self.body, self)
-                    setattr(self, data_attr, data)
+                data, self._files = parser.parse(self)
+                setattr(self, data_attr, data)
             except Exception as e:
                 # TODO 'application/x-www-form-urlencoded' didn't do this.
                 # An error occurred while parsing POST data. Since when
