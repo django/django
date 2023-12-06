@@ -21,8 +21,8 @@ class InsertVar:
         "PositiveBigIntegerField": int,
         "PositiveSmallIntegerField": int,
         "PositiveIntegerField": int,
-        "FloatField": Database.NATIVE_FLOAT,
-        "DateTimeField": Database.TIMESTAMP,
+        "FloatField": Database.DB_TYPE_BINARY_DOUBLE,
+        "DateTimeField": Database.DB_TYPE_TIMESTAMP,
         "DateField": Database.Date,
         "DecimalField": decimal.Decimal,
     }
@@ -46,7 +46,7 @@ class Oracle_datetime(datetime.datetime):
     to tell oracledb to save the microseconds too.
     """
 
-    input_size = Database.TIMESTAMP
+    input_size = Database.DB_TYPE_TIMESTAMP
 
     @classmethod
     def from_datetime(cls, dt):
