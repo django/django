@@ -472,24 +472,24 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
                 # Lookups on nonexistent fields are ok, since they're ignored
                 # later.
                 break
-            if not prev_field or (
-                prev_field.is_relation
-                and field not in model._meta.parents.values()
-                and field is not model._meta.auto_field
-                and (
-                    model._meta.auto_field is None
-                    or part not in getattr(prev_field, "to_fields", [])
-                )
-            ):
-                relation_parts.append(part)
             if not getattr(field, "path_infos", None):
                 # This is not a relational field, so further parts
                 # must be transforms.
                 break
+            if (
+                not prev_field
+                or (field.is_relation and field not in model._meta.parents.values())
+                or (
+                    prev_field.is_relation
+                    and model._meta.auto_field is None
+                    and part not in getattr(prev_field, "to_fields", [])
+                )
+            ):
+                relation_parts.append(part)
             prev_field = field
             model = field.path_infos[-1].to_opts.model
 
-        if len(relation_parts) <= 1:
+        if not relation_parts:
             # Either a local field filter, or no fields at all.
             return True
         valid_lookups = {self.date_hierarchy}
