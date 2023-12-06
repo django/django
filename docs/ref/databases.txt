@@ -160,8 +160,14 @@ password from the `password file`_, you must specify them in the
 
     localhost:5432:NAME:USER:PASSWORD
 
+The PostgreSQL backend passes the content of :setting:`OPTIONS` as keyword
+arguments to the connection constructor, allowing for more advanced control
+of driver behavior. All available `parameters`_ are described in detail in the
+PostgreSQL documentation.
+
 .. _connection service file: https://www.postgresql.org/docs/current/libpq-pgservice.html
 .. _password file: https://www.postgresql.org/docs/current/libpq-pgpass.html
+.. _parameters: https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-PARAMKEYWORDS
 
 .. warning::
 
