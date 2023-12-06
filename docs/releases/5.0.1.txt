@@ -9,4 +9,6 @@ Django 5.0.1 fixes several bugs in 5.0.
 Bugfixes
 ========
 
-* ...
+* Reallowed, following a regression in Django 5.0, using a foreign key to a
+  model with a primary key that is not ``AutoField`` in
+  :attr:`.ModelAdmin.list_filter` (:ticket:`35020`).
