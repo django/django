@@ -781,7 +781,11 @@ class Model(AltersData, metaclass=ModelBase):
         if force_insert and (force_update or update_fields):
             raise ValueError("Cannot force both insert and updating in model saving.")
 
-        deferred_fields = self.get_deferred_fields()
+        deferred_non_generated_fields = {
+            f.attname
+            for f in self._meta.concrete_fields
+            if f.attname not in self.__dict__ and f.generated is False
+        }
         if update_fields is not None:
             # If update_fields is empty, skip the save. We do also check for
             # no-op saves later on for inheritance cases. This bailout is
@@ -802,12 +806,16 @@ class Model(AltersData, metaclass=ModelBase):
 
         # If saving to the same database, and this model is deferred, then
         # automatically do an "update_fields" save on the loaded fields.
-        elif not force_insert and deferred_fields and using == self._state.db:
+        elif (
+            not force_insert
+            and deferred_non_generated_fields
+            and using == self._state.db
+        ):
             field_names = set()
             for field in self._meta.concrete_fields:
                 if not field.primary_key and not hasattr(field, "through"):
                     field_names.add(field.attname)
-            loaded_fields = field_names.difference(deferred_fields)
+            loaded_fields = field_names.difference(deferred_non_generated_fields)
             if loaded_fields:
                 update_fields = frozenset(loaded_fields)
 

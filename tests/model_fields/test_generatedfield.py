@@ -1,4 +1,5 @@
 import uuid
+from decimal import Decimal
 
 from django.apps import apps
 from django.db import IntegrityError, connection
@@ -15,6 +16,7 @@ from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import isolate_apps
 
 from .models import (
+    Foo,
     GeneratedModel,
     GeneratedModelFieldWithConverters,
     GeneratedModelNull,
@@ -186,6 +188,19 @@ class GeneratedFieldTestMixin:
         m.save()
         m.refresh_from_db()
         self.assertEqual(m.field, 8)
+
+    def test_save_model_with_foreign_key(self):
+        fk_object = Foo.objects.create(a="abc", d=Decimal("12.34"))
+        m = self.base_model(a=1, b=2, fk=fk_object)
+        m.save()
+        m = self._refresh_if_needed(m)
+        self.assertEqual(m.field, 3)
+
+    def test_generated_fields_can_be_deferred(self):
+        fk_object = Foo.objects.create(a="abc", d=Decimal("12.34"))
+        m = self.base_model.objects.create(a=1, b=2, fk=fk_object)
+        m = self.base_model.objects.defer("field").get(id=m.id)
+        self.assertEqual(m.get_deferred_fields(), {"field"})
 
     def test_update(self):
         m = self.base_model.objects.create(a=1, b=2)
