@@ -77,16 +77,17 @@ meaning that if a migration fails to apply you will have to manually unpick
 the changes in order to try again (it's impossible to roll back to an
 earlier point).
 
-In addition, MySQL will fully rewrite tables for almost every schema operation
-and generally takes a time proportional to the number of rows in the table to
-add or remove columns. On slower hardware this can be worse than a minute per
-million rows - adding a few columns to a table with just a few million rows
-could lock your site up for over ten minutes.
+MySQL 8.0 introduced significant performance enhancements for
+`DDL operations`_, making them more efficient and reducing the need for full
+table rebuilds. However, it cannot guarantee a complete absence of locks or
+interruptions. In situations where locks are still necessary, the duration of
+these operations will be proportionate to the number of rows involved.
 
-Finally, MySQL has relatively small limits on name lengths for columns, tables
-and indexes, as well as a limit on the combined size of all columns an index
-covers. This means that indexes that are possible on other backends will
-fail to be created under MySQL.
+Finally, MySQL has a relatively small limit on the combined size of all columns
+an index covers. This means that indexes that are possible on other backends
+will fail to be created under MySQL.
+
+.. _DDL operations: https://dev.mysql.com/doc/refman/en/innodb-online-ddl-operations.html
 
 SQLite
 ------
