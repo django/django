@@ -502,6 +502,7 @@ class GeneratedModel(models.Model):
         output_field=models.IntegerField(),
         db_persist=True,
     )
+    fk = models.ForeignKey(Foo, on_delete=models.CASCADE, null=True)
 
     class Meta:
         required_db_features = {"supports_stored_generated_columns"}
@@ -515,6 +516,7 @@ class GeneratedModelVirtual(models.Model):
         output_field=models.IntegerField(),
         db_persist=False,
     )
+    fk = models.ForeignKey(Foo, on_delete=models.CASCADE, null=True)
 
     class Meta:
         required_db_features = {"supports_virtual_generated_columns"}

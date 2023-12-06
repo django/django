@@ -16,3 +16,7 @@ Bugfixes
 * Fixed a long standing bug in handling the ``RETURNING INTO`` clause that
   caused a crash when creating a model instance with a ``GeneratedField`` which
   ``output_field`` had backend-specific converters (:ticket:`35024`).
+
+* Fixed a regression in Django 5.0 that caused a crash of ``Model.save()`` for
+  models with both ``GeneratedField`` and ``ForeignKey`` fields
+  (:ticket:`35019`).
