@@ -482,6 +482,18 @@ class UUIDGrandchild(UUIDChild):
     pass
 
 
+class GeneratedModelFieldWithConverters(models.Model):
+    field = models.UUIDField()
+    field_copy = models.GeneratedField(
+        expression=F("field"),
+        output_field=models.UUIDField(),
+        db_persist=True,
+    )
+
+    class Meta:
+        required_db_features = {"supports_stored_generated_columns"}
+
+
 class GeneratedModel(models.Model):
     a = models.IntegerField()
     b = models.IntegerField()
