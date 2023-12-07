@@ -1,3 +1,5 @@
+import uuid
+
 from django.apps import apps
 from django.db import IntegrityError, connection
 from django.db.models import (
@@ -14,6 +16,7 @@ from django.test.utils import isolate_apps
 
 from .models import (
     GeneratedModel,
+    GeneratedModelFieldWithConverters,
     GeneratedModelNull,
     GeneratedModelNullVirtual,
     GeneratedModelOutputFieldDbCollation,
@@ -265,6 +268,11 @@ class StoredGeneratedFieldTests(GeneratedFieldTestMixin, TestCase):
     nullable_model = GeneratedModelNull
     output_field_db_collation_model = GeneratedModelOutputFieldDbCollation
     params_model = GeneratedModelParams
+
+    def test_create_field_with_db_converters(self):
+        obj = GeneratedModelFieldWithConverters.objects.create(field=uuid.uuid4())
+        obj = self._refresh_if_needed(obj)
+        self.assertEqual(obj.field, obj.field_copy)
 
 
 @skipUnlessDBFeature("supports_virtual_generated_columns")
