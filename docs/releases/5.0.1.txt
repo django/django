@@ -12,3 +12,7 @@ Bugfixes
 * Reallowed, following a regression in Django 5.0, using a foreign key to a
   model with a primary key that is not ``AutoField`` in
   :attr:`.ModelAdmin.list_filter` (:ticket:`35020`).
+
+* Fixed a long standing bug in handling the ``RETURNING INTO`` clause that
+  caused a crash when creating a model instance with a ``GeneratedField`` which
+  ``output_field`` had backend-specific converters (:ticket:`35024`).
