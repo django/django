@@ -387,18 +387,24 @@ class SQLCompiler:
                     True,
                 )
                 continue
-            if col in self.query.annotations:
-                # References to an expression which is masked out of the SELECT
-                # clause.
+
+            ref, *transforms = col.split(LOOKUP_SEP)
+            if expr := self.query.annotations.get(ref):
                 if self.query.combinator and self.select:
+                    if transforms:
+                        raise NotImplementedError(
+                            "Ordering combined queries by transforms is not "
+                            "implemented."
+                        )
                     # Don't use the resolved annotation because other
-                    # combinated queries might define it differently.
-                    expr = F(col)
-                else:
-                    expr = self.query.annotations[col]
-                    if isinstance(expr, Value):
-                        # output_field must be resolved for constants.
-                        expr = Cast(expr, expr.output_field)
+                    # combined queries might define it differently.
+                    expr = F(ref)
+                if transforms:
+                    for name in transforms:
+                        expr = self.query.try_transform(expr, name)
+                if isinstance(expr, Value):
+                    # output_field must be resolved for constants.
+                    expr = Cast(expr, expr.output_field)
                 yield OrderBy(expr, descending=descending), False
                 continue
 

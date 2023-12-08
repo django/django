@@ -181,6 +181,9 @@ Models
   :class:`~django.db.models.expressions.ValueRange` allows excluding rows,
   groups, and ties from the window frames.
 
+* :meth:`.QuerySet.order_by` now supports ordering by annotation transforms
+  such as ``JSONObject`` keys and ``ArrayAgg`` indices.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

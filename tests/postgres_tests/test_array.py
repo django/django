@@ -469,6 +469,16 @@ class TestQuerying(PostgreSQLTestCase):
         self.assertIn("GROUP BY 2", sql)
         self.assertIn("ORDER BY 2", sql)
 
+    def test_order_by_arrayagg_index(self):
+        qs = (
+            NullableIntegerArrayModel.objects.values("order")
+            .annotate(ids=ArrayAgg("id"))
+            .order_by("-ids__0")
+        )
+        self.assertQuerySetEqual(
+            qs, [{"order": obj.order, "ids": [obj.id]} for obj in reversed(self.objs)]
+        )
+
     def test_index(self):
         self.assertSequenceEqual(
             NullableIntegerArrayModel.objects.filter(field__0=2), self.objs[1:3]
