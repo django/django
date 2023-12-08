@@ -57,7 +57,7 @@ like in JSON:
       }
     ]
 
-And here's that same fixture as YAML:
+And here's that same fixture as YAML :
 
 .. code-block:: yaml
 
