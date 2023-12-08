@@ -242,7 +242,7 @@ class TestCustomAdminOrdering(TestCase):
         admin.site.register(ReportData, ReportAdmin)
 
     def test_system_user_ordering(self):
-        # Test if the ordering for SystemUser Admin is as expected
+        #Test if the ordering for SystemUser Admin is as expected
         fk_field = admin.site._registry[ReportData].formfield_for_foreignkey(
             ReportData.owner.field, request=None
         )
