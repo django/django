@@ -24,3 +24,6 @@ Bugfixes
 * Fixed a bug in Django 5.0 that caused a migration crash on Oracle < 23c when
   adding a ``GeneratedField`` with ``output_field=BooleanField``
   (:ticket:`35018`).
+
+* Fixed a regression in Django 5.0 where admin fields on the same line could
+  overflow the page and become non-interactive (:ticket:`35012`).

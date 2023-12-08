@@ -26,6 +26,10 @@ form .form-row p {
     display: flex;
 }
 
+.form-multiline {
+    flex-wrap: wrap;
+}
+
 .form-multiline > div {
     padding-bottom: 10px;
 }
