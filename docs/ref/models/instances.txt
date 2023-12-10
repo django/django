@@ -142,8 +142,8 @@ value from the database:
     >>> del obj.field
     >>> obj.field  # Loads the field from the database
 
-.. method:: Model.refresh_from_db(using=None, fields=None)
-.. method:: Model.arefresh_from_db(using=None, fields=None)
+.. method:: Model.refresh_from_db(using=None, fields=None, for_update=False)
+.. method:: Model.arefresh_from_db(using=None, fields=None, for_update=False)
 
 *Asynchronous version*: ``arefresh_from_db()``
 
@@ -196,6 +196,15 @@ all of the instance's fields when a deferred field is reloaded::
                     # then load all of them
                     fields = fields.union(deferred_fields)
             super().refresh_from_db(using, fields, **kwargs)
+
+The ``for_update`` parameter can be used to lock the row until the end of
+transaction before reloading model's values. Underneath it uses
+:meth:`~django.db.models.query.QuerySet.select_for_update` and it is an optimized
+shorthand for::
+
+    _ = MyModel.objects.select_for_update().get(pk=obj.pk)
+    obj.refresh_from_db()
+
 
 .. method:: Model.get_deferred_fields()
 

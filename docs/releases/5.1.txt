@@ -181,6 +181,9 @@ Models
   :class:`~django.db.models.expressions.ValueRange` allows excluding rows,
   groups, and ties from the window frames.
 
+* The new ``for_update`` argument of :meth:`.Model.refresh_from_db` can be used
+  to lock the row before reloading model's values (:ticket:`28344`).
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

@@ -672,7 +672,7 @@ class Model(AltersData, metaclass=ModelBase):
             if f.attname not in self.__dict__
         }
 
-    def refresh_from_db(self, using=None, fields=None):
+    def refresh_from_db(self, using=None, fields=None, for_update=False):
         """
         Reload field values from the database.
 
@@ -708,6 +708,9 @@ class Model(AltersData, metaclass=ModelBase):
         db_instance_qs = self.__class__._base_manager.db_manager(
             using, hints=hints
         ).filter(pk=self.pk)
+
+        if for_update:
+            db_instance_qs = db_instance_qs.select_for_update()
 
         # Use provided fields, if not set then reload all non-deferred fields.
         deferred_fields = self.get_deferred_fields()
