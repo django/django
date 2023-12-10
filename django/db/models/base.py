@@ -673,7 +673,7 @@ class Model(AltersData, metaclass=ModelBase):
             if f.attname not in self.__dict__
         }
 
-    def refresh_from_db(self, using=None, fields=None):
+    def refresh_from_db(self, using=None, fields=None, from_queryset=None):
         """
         Reload field values from the database.
 
@@ -705,10 +705,13 @@ class Model(AltersData, metaclass=ModelBase):
                     "are not allowed in fields." % LOOKUP_SEP
                 )
 
-        hints = {"instance": self}
-        db_instance_qs = self.__class__._base_manager.db_manager(
-            using, hints=hints
-        ).filter(pk=self.pk)
+        if from_queryset is None:
+            hints = {"instance": self}
+            from_queryset = self.__class__._base_manager.db_manager(using, hints=hints)
+        elif using is not None:
+            from_queryset = from_queryset.using(using)
+
+        db_instance_qs = from_queryset.filter(pk=self.pk)
 
         # Use provided fields, if not set then reload all non-deferred fields.
         deferred_fields = self.get_deferred_fields()
@@ -729,9 +732,12 @@ class Model(AltersData, metaclass=ModelBase):
                 # This field wasn't refreshed - skip ahead.
                 continue
             setattr(self, field.attname, getattr(db_instance, field.attname))
-            # Clear cached foreign keys.
-            if field.is_relation and field.is_cached(self):
-                field.delete_cached_value(self)
+            # Clear or copy cached foreign keys.
+            if field.is_relation:
+                if field.is_cached(db_instance):
+                    field.set_cached_value(self, field.get_cached_value(db_instance))
+                elif field.is_cached(self):
+                    field.delete_cached_value(self)
 
         # Clear cached relations.
         for field in self._meta.related_objects:
@@ -745,8 +751,10 @@ class Model(AltersData, metaclass=ModelBase):
 
         self._state.db = db_instance._state.db
 
-    async def arefresh_from_db(self, using=None, fields=None):
-        return await sync_to_async(self.refresh_from_db)(using=using, fields=fields)
+    async def arefresh_from_db(self, using=None, fields=None, from_queryset=None):
+        return await sync_to_async(self.refresh_from_db)(
+            using=using, fields=fields, from_queryset=from_queryset
+        )
 
     def serializable_value(self, field_name):
         """

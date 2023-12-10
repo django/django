@@ -4,7 +4,14 @@ from datetime import datetime, timedelta
 from unittest import mock
 
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
-from django.db import DEFAULT_DB_ALIAS, DatabaseError, connections, models
+from django.db import (
+    DEFAULT_DB_ALIAS,
+    DatabaseError,
+    connection,
+    connections,
+    models,
+    transaction,
+)
 from django.db.models.manager import BaseManager
 from django.db.models.query import MAX_GET_RESULTS, EmptyQuerySet
 from django.test import (
@@ -13,7 +20,8 @@ from django.test import (
     TransactionTestCase,
     skipUnlessDBFeature,
 )
-from django.test.utils import ignore_warnings
+from django.test.utils import CaptureQueriesContext, ignore_warnings
+from django.utils.connection import ConnectionDoesNotExist
 from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.translation import gettext_lazy
 
@@ -1003,3 +1011,47 @@ class ModelRefreshTests(TestCase):
         # Cache was cleared and new results are available.
         self.assertCountEqual(a2_prefetched.selfref_set.all(), [s])
         self.assertCountEqual(a2_prefetched.cited.all(), [s])
+
+    @skipUnlessDBFeature("has_select_for_update")
+    def test_refresh_for_update(self):
+        a = Article.objects.create(pub_date=datetime.now())
+        for_update_sql = connection.ops.for_update_sql()
+
+        with transaction.atomic(), CaptureQueriesContext(connection) as ctx:
+            a.refresh_from_db(from_queryset=Article.objects.select_for_update())
+        self.assertTrue(
+            any(for_update_sql in query["sql"] for query in ctx.captured_queries)
+        )
+
+    def test_refresh_with_related(self):
+        a = Article.objects.create(pub_date=datetime.now())
+        fa = FeaturedArticle.objects.create(article=a)
+
+        from_queryset = FeaturedArticle.objects.select_related("article")
+        with self.assertNumQueries(1):
+            fa.refresh_from_db(from_queryset=from_queryset)
+            self.assertEqual(fa.article.pub_date, a.pub_date)
+        with self.assertNumQueries(2):
+            fa.refresh_from_db()
+            self.assertEqual(fa.article.pub_date, a.pub_date)
+
+    def test_refresh_overwrites_queryset_using(self):
+        a = Article.objects.create(pub_date=datetime.now())
+
+        from_queryset = Article.objects.using("nonexistent")
+        with self.assertRaises(ConnectionDoesNotExist):
+            a.refresh_from_db(from_queryset=from_queryset)
+        a.refresh_from_db(using="default", from_queryset=from_queryset)
+
+    def test_refresh_overwrites_queryset_fields(self):
+        a = Article.objects.create(pub_date=datetime.now())
+        headline = "headline"
+        Article.objects.filter(pk=a.pk).update(headline=headline)
+
+        from_queryset = Article.objects.only("pub_date")
+        with self.assertNumQueries(1):
+            a.refresh_from_db(from_queryset=from_queryset)
+            self.assertNotEqual(a.headline, headline)
+        with self.assertNumQueries(1):
+            a.refresh_from_db(fields=["headline"], from_queryset=from_queryset)
+            self.assertEqual(a.headline, headline)

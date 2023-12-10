@@ -142,8 +142,8 @@ value from the database:
     >>> del obj.field
     >>> obj.field  # Loads the field from the database
 
-.. method:: Model.refresh_from_db(using=None, fields=None)
-.. method:: Model.arefresh_from_db(using=None, fields=None)
+.. method:: Model.refresh_from_db(using=None, fields=None, from_queryset=None)
+.. method:: Model.arefresh_from_db(using=None, fields=None, from_queryset=None)
 
 *Asynchronous version*: ``arefresh_from_db()``
 
@@ -196,6 +196,27 @@ all of the instance's fields when a deferred field is reloaded::
                     # then load all of them
                     fields = fields.union(deferred_fields)
             super().refresh_from_db(using, fields, **kwargs)
+
+The ``from_queryset`` argument allows using a different queryset than the one
+created from :attr:`~django.db.models.Model._base_manager`. It gives you more
+control over how the model is reloaded. For example, when your model uses soft
+deletion you can make ``refresh_from_db()`` to take this into account::
+
+    obj.refresh_from_db(from_queryset=MyModel.active_objects.all())
+
+You can cache related objects that otherwise would be cleared from the reloaded
+instance::
+
+    obj.refresh_from_db(from_queryset=MyModel.objects.select_related("related_field"))
+
+You can lock the row until the end of transaction before reloading a model's
+values::
+
+    obj.refresh_from_db(from_queryset=MyModel.objects.select_for_update())
+
+.. versionchanged:: 5.1
+
+    The ``from_queryset`` argument was added.
 
 .. method:: Model.get_deferred_fields()
 
