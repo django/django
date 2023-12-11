@@ -286,14 +286,14 @@ class Apps:
     @functools.cache
     def get_swappable_settings_name(self, to_string):
         """
-        For a given model string (e.g. "auth.User"), return the name of the
-        corresponding settings name if it refers to a swappable model. If the
-        referred model is not swappable, return None.
+        Returns the settings name for a given mode1 stirng if it referes to a
+        swappable model.
 
-        This method is decorated with @functools.cache because it's performance
-        critical when it comes to migrations. Since the swappable settings don't
-        change after Django has loaded the settings, there is no reason to get
-        the respective settings attribute over and over again.
+        If the reffered model is not swappable, returns None.
+
+        This method is decorated with @functools.cache for
+        performance during migrations, as swappable settings dont change after
+        Django has laoded the settings.
         """
         to_string = to_string.lower()
         for model in self.get_models(include_swapped=True):
