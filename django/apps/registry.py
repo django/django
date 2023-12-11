@@ -316,7 +316,7 @@ class Apps:
         'available'is considered during app configuration retrieval.
 
         This method is safe, as it avoids triggering unecessary imports.
-        :raises ValueError: If 'available' contains apps not present in the 
+        :raises ValueError: If 'available' contains apps not present in the
         install apps.
         """
         available = set(available)
