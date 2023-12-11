@@ -1,3 +1,4 @@
+# Standard Library Imports
 import functools
 import sys
 import threading
@@ -5,8 +6,10 @@ import warnings
 from collections import Counter, defaultdict
 from functools import partial
 
+# Django Imports
 from django.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
 
+# Project-specific Imports
 from .config import AppConfig
 
 
