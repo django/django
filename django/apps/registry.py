@@ -308,15 +308,16 @@ class Apps:
 
     def set_available_apps(self, available):
         """
-        Restrict the set of installed apps used by get_app_config[s].
+        Restricts the set of installed apps used by get_app_config[s].
+        :param available: An iterable of application names.
 
-        available must be an iterable of application names.
+        This method is used to optimize performance in TransactionTestCase.
+        It ensures that only a subset of installed apps specified by
+        'available'is considered during app configuration retrieval.
 
-        set_available_apps() must be balanced with unset_available_apps().
-
-        Primarily used for performance optimization in TransactionTestCase.
-
-        This method is safe in the sense that it doesn't trigger any imports.
+        This method is safe, as it avoids triggering unecessary imports.
+        :raises ValueError: If 'available' contains apps not present in the 
+        install apps.
         """
         available = set(available)
         installed = {app_config.name for app_config in self.get_app_configs()}
