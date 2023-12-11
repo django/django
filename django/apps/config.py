@@ -1,11 +1,14 @@
+# Standard Library Imports
 import inspect
 import os
 from importlib import import_module
 
+# Django Imports
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string, module_has_submodule
 
+# Global Variables
 APPS_MODULE_NAME = "apps"
 MODELS_MODULE_NAME = "models"
 
@@ -25,18 +28,20 @@ class AppConfig:
         # registry when it registers the AppConfig instance.
         self.apps = None
 
-        # The following attributes could be defined at the class level in a
-        # subclass, hence the test-and-set pattern.
-
-        # Last component of the Python path to the application e.g. 'admin'.
+        # Use the test-and-set pattern to define these attributes at the class
+        # level in a subclass.
+        # Determine the last component of the Python path to the application
+        # e.g. 'admin'.
         # This value must be unique across a Django project.
         if not hasattr(self, "label"):
             self.label = app_name.rpartition(".")[2]
+
+        # Check if the label is a valid Python identifier
         if not self.label.isidentifier():
             raise ImproperlyConfigured(
                 "The app label '%s' is not a valid Python identifier." % self.label
             )
-
+        
         # Human-readable name for the application e.g. "Admin".
         if not hasattr(self, "verbose_name"):
             self.verbose_name = self.label.title()
@@ -56,16 +61,24 @@ class AppConfig:
         self.models = None
 
     def __repr__(self):
+        """Return a string representation of the AppConfig. This is used for
+        debugging and logging purposes."""
+
         return "<%s: %s>" % (self.__class__.__name__, self.label)
 
     @cached_property
     def default_auto_field(self):
-        from django.conf import settings
+        """Return the default auto field for the application. The default auto
+        field is determined by the Django settings."""
 
+        from django.conf import settings
         return settings.DEFAULT_AUTO_FIELD
 
     @property
     def _is_default_auto_field_overridden(self):
+        """Check if the default auot field is overriden in current AppConfig.
+        Returns True if overriden, False otherwise."""
+
         return self.__class__.default_auto_field is not AppConfig.default_auto_field
 
     def _path_from_module(self, module):
