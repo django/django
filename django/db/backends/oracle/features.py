@@ -179,3 +179,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def supports_boolean_expr_in_select_clause(self):
         return self.connection.oracle_version >= (23,)
+
+    @cached_property
+    def supports_aggregation_over_interval_types(self):
+        return self.connection.oracle_version >= (23,)
