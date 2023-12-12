@@ -21,6 +21,7 @@ class InsertVar:
         "PositiveBigIntegerField": int,
         "PositiveSmallIntegerField": int,
         "PositiveIntegerField": int,
+        "BooleanField": int,
         "FloatField": Database.NATIVE_FLOAT,
         "DateTimeField": Database.TIMESTAMP,
         "DateField": Database.Date,

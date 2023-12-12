@@ -76,7 +76,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_slicing_ordering_in_compound = True
     requires_compound_order_by_subquery = True
     allows_multiple_constraints_on_same_fields = False
-    supports_boolean_expr_in_select_clause = False
     supports_comparing_boolean_expr = False
     supports_json_field_contains = False
     supports_collation_on_textfield = False
@@ -118,6 +117,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         },
         "Oracle doesn't support comparing NCLOB to NUMBER.": {
             "generic_relations_regress.tests.GenericRelationTests.test_textlink_filter",
+        },
+        "Oracle doesn't support casting filters to NUMBER.": {
+            "lookup.tests.LookupQueryingTests.test_aggregate_combined_lookup",
         },
     }
     django_test_expected_failures = {
@@ -166,3 +168,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def supports_primitives_in_json_field(self):
         return self.connection.oracle_version >= (21,)
+
+    @cached_property
+    def supports_boolean_expr_in_select_clause(self):
+        return self.connection.oracle_version >= (23,)

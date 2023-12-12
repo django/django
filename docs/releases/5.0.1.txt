@@ -20,3 +20,7 @@ Bugfixes
 * Fixed a regression in Django 5.0 that caused a crash of ``Model.save()`` for
   models with both ``GeneratedField`` and ``ForeignKey`` fields
   (:ticket:`35019`).
+
+* Fixed a bug in Django 5.0 that caused a migration crash on Oracle < 23c when
+  adding a ``GeneratedField`` with ``output_field=BooleanField``
+  (:ticket:`35018`).
