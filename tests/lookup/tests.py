@@ -1522,7 +1522,6 @@ class LookupQueryingTests(TestCase):
         qs = Season.objects.order_by(LessThan(F("year"), 1910), F("year"))
         self.assertSequenceEqual(qs, [self.s1, self.s3, self.s2])
 
-    @skipUnlessDBFeature("supports_boolean_expr_in_select_clause")
     def test_aggregate_combined_lookup(self):
         expression = Cast(GreaterThan(F("year"), 1900), models.IntegerField())
         qs = Season.objects.aggregate(modern=models.Sum(expression))

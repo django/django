@@ -58,7 +58,13 @@ class GeneratedField(Field):
         resolved_expression = self.expression.resolve_expression(
             self._query, allow_joins=False
         )
-        return compiler.compile(resolved_expression)
+        sql, params = compiler.compile(resolved_expression)
+        if (
+            getattr(self.expression, "conditional", False)
+            and not connection.features.supports_boolean_expr_in_select_clause
+        ):
+            sql = f"CASE WHEN {sql} THEN 1 ELSE 0 END"
+        return sql, params
 
     def check(self, **kwargs):
         databases = kwargs.get("databases") or []
