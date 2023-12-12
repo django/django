@@ -4079,7 +4079,7 @@ A ``Q()`` object represents an SQL condition that can be used in
 database-related operations. It's similar to how an
 :class:`F() <django.db.models.F>` object represents the value of a model field
 or annotation. They make it possible to define and reuse conditions, and
-combine them using operators such as ``|`` (``OR``), ``&`` (``AND``), and ``^``
+combine them using operators such as ``|`` (``OR``), ``&`` (``AND``), ``~`` (``NOT``), and ``^``
 (``XOR``). See :ref:`complex-lookups-with-q`.
 
 ``Prefetch()`` objects
