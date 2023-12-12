@@ -37,7 +37,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     requires_literal_defaults = True
     supports_default_keyword_in_bulk_insert = False
     closed_cursor_error_class = InterfaceError
-    bare_select_suffix = " FROM DUAL"
     # Select for update with limit can be achieved on Oracle, but not with the
     # current backend.
     supports_select_for_update_with_limit = False
@@ -159,9 +158,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     @cached_property
     def supports_collation_on_charfield(self):
+        sql = "SELECT CAST('a' AS VARCHAR2(4001))" + self.bare_select_suffix
         with self.connection.cursor() as cursor:
             try:
-                cursor.execute("SELECT CAST('a' AS VARCHAR2(4001)) FROM dual")
+                cursor.execute(sql)
             except DatabaseError as e:
                 if e.args[0].code == 910:
                     return False
@@ -183,3 +183,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def supports_aggregation_over_interval_types(self):
         return self.connection.oracle_version >= (23,)
+
+    @cached_property
+    def bare_select_suffix(self):
+        return "" if self.connection.oracle_version >= (23,) else " FROM DUAL"

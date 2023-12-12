@@ -43,8 +43,9 @@ class Tests(TestCase):
         An 'almost right' datetime works with configured NLS parameters
         (#18465).
         """
+        suffix = connection.features.bare_select_suffix
         with connection.cursor() as cursor:
-            query = "select 1 from dual where '1936-12-29 00:00' < sysdate"
+            query = f"SELECT 1{suffix} WHERE '1936-12-29 00:00' < SYSDATE"
             # The query succeeds without errors - pre #18465 this
             # wasn't the case.
             cursor.execute(query)
