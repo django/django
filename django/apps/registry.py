@@ -105,7 +105,8 @@ class Apps:
             counts = Counter(
                 app_config.name for app_config in self.app_configs.values()
             )
-            duplicates = [name for name, count in counts.most_common() if count > 1]
+            duplicates = [name for name, count in counts.most_common() if
+                          count > 1]
             if duplicates:
                 raise ImproperlyConfigured(
                     "Application names aren't unique, "
@@ -185,7 +186,8 @@ class Apps:
 
         result = []
         for app_config in self.app_configs.values():
-            result.extend(app_config.get_models(include_auto_created, include_swapped))
+            result.extend(app_config.get_models(include_auto_created,
+                                                include_swapped))
         return result
 
     def get_model(self, app_label, model_name=None, require_ready=True):
@@ -227,8 +229,10 @@ class Apps:
                 and model.__module__ == app_models[model_name].__module__
             ):
                 warnings.warn(
-                    "Model '%s.%s' was already registered. Reloading models is not "
-                    "advised as it can lead to inconsistencies, most notably with "
+                    "Model '%s.%s' was already registered. Reloading models is\
+                    not "
+                    "advised as it can lead to inconsistencies, most notably\
+                        with "
                     "related models." % (app_label, model_name),
                     RuntimeWarning,
                     stacklevel=2,
@@ -280,7 +284,8 @@ class Apps:
         """
         model = self.all_models[app_label].get(model_name.lower())
         if model is None:
-            raise LookupError("Model '%s.%s' not registered." % (app_label, model_name))
+            raise LookupError("Model '%s.%s' not registered." % (app_label,
+                                                                 model_name))
         return model
 
     @functools.cache
@@ -323,7 +328,8 @@ class Apps:
         installed = {app_config.name for app_config in self.get_app_configs()}
         if not available.issubset(installed):
             raise ValueError(
-                "Available apps isn't a subset of installed apps, extra apps: %s"
+                "Available apps isn't a subset of installed apps, extra apps:\
+                %s"
                 % ", ".join(available - installed)
             )
 
@@ -382,8 +388,10 @@ class Apps:
         # the relation tree and the fields cache.
         self.get_models.cache_clear()
         if self.ready:
-            # Circumvent self.get_models() to prevent that the cache is refilled.
-            # This particularly prevents that an empty value is cached while cloning.
+            # Circumvent self.get_models() to prevent that the cache is\
+            # refilled.
+            # This particularly prevents that an empty value is cached while
+            # \cloning.
             for app_config in self.app_configs.values():
                 for model in app_config.get_models(include_auto_created=True):
                     model._meta._expire_cache()
