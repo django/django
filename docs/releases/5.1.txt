@@ -52,6 +52,11 @@ Minor features
   form save. This is now available in the admin when visiting the user creation
   and password change pages.
 
+* :func:`~.django.contrib.auth.decorators.login_required`,
+  :func:`~.django.contrib.auth.decorators.permission_required`, and
+  :func:`~.django.contrib.auth.decorators.user_passes_test` decorators now
+  support wrapping asynchronous view functions.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
