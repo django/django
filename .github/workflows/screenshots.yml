@@ -1,7 +1,7 @@
 name: Visual Regression Tests
 
 on:
-  pull_request_target:
+  pull_request:
     types: [labeled, synchronize, opened, reopened]
     paths-ignore:
       - 'docs/**'
@@ -45,35 +45,3 @@ jobs:
         with:
           name: screenshots-${{ github.event.pull_request.head.sha }}
           path: tests/screenshots/
-
-      - name: Find comment to update
-        uses: peter-evans/find-comment@v2
-        id: find-comment
-        with:
-          issue-number: ${{ github.event.pull_request.number }}
-          comment-author: 'github-actions[bot]'
-          body-includes: You can download the generated screenshots from the workflow artifacts.
-
-      - name: Create comment
-        if: steps.find-comment.outputs.comment-id == ''
-        uses: peter-evans/create-or-update-comment@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          issue-number: ${{ github.event.pull_request.number }}
-          body: |
-            🖼️ **Screenshots created**
-
-            You can download the generated screenshots from the workflow artifacts.
-
-            _Please note that artifacts are only available for download for ${{ github.retention_days }} days._
-
-            - Generated screenshots for ${{ github.event.pull_request.head.sha }} at ${{ steps.generate-screenshots.outputs.date }} ([download](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})).
-
-      - name: Update comment
-        if: steps.find-comment.outputs.comment-id != ''
-        uses: peter-evans/create-or-update-comment@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          comment-id: ${{ steps.find-comment.outputs.comment-id }}
-          body: |
-            - Generated screenshots for ${{ github.event.pull_request.head.sha }} at ${{ steps.generate-screenshots.outputs.date }} ([download](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})).
