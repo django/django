@@ -1,3 +1,4 @@
+# Standard Library Imports
 import functools
 import sys
 import threading
@@ -5,8 +6,10 @@ import warnings
 from collections import Counter, defaultdict
 from functools import partial
 
+# Django Imports
 from django.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
 
+# Project-specific Imports
 from .config import AppConfig
 
 
@@ -102,7 +105,8 @@ class Apps:
             counts = Counter(
                 app_config.name for app_config in self.app_configs.values()
             )
-            duplicates = [name for name, count in counts.most_common() if count > 1]
+            duplicates = [name for name, count in counts.most_common() if
+                          count > 1]
             if duplicates:
                 raise ImproperlyConfigured(
                     "Application names aren't unique, "
@@ -182,7 +186,8 @@ class Apps:
 
         result = []
         for app_config in self.app_configs.values():
-            result.extend(app_config.get_models(include_auto_created, include_swapped))
+            result.extend(app_config.get_models(include_auto_created,
+                                                include_swapped))
         return result
 
     def get_model(self, app_label, model_name=None, require_ready=True):
@@ -224,8 +229,10 @@ class Apps:
                 and model.__module__ == app_models[model_name].__module__
             ):
                 warnings.warn(
-                    "Model '%s.%s' was already registered. Reloading models is not "
-                    "advised as it can lead to inconsistencies, most notably with "
+                    "Model '%s.%s' was already registered. Reloading models is\
+                    not "
+                    "advised as it can lead to inconsistencies, most notably\
+                        with "
                     "related models." % (app_label, model_name),
                     RuntimeWarning,
                     stacklevel=2,
@@ -277,20 +284,21 @@ class Apps:
         """
         model = self.all_models[app_label].get(model_name.lower())
         if model is None:
-            raise LookupError("Model '%s.%s' not registered." % (app_label, model_name))
+            raise LookupError("Model '%s.%s' not registered." % (app_label,
+                                                                 model_name))
         return model
 
     @functools.cache
     def get_swappable_settings_name(self, to_string):
         """
-        For a given model string (e.g. "auth.User"), return the name of the
-        corresponding settings name if it refers to a swappable model. If the
-        referred model is not swappable, return None.
+        Returns the settings name for a given mode1 stirng if it referes to a
+        swappable model.
 
-        This method is decorated with @functools.cache because it's performance
-        critical when it comes to migrations. Since the swappable settings don't
-        change after Django has loaded the settings, there is no reason to get
-        the respective settings attribute over and over again.
+        If the reffered model is not swappable, returns None.
+
+        This method is decorated with @functools.cache for
+        performance during migrations, as swappable settings dont change after
+        Django has laoded the settings.
         """
         to_string = to_string.lower()
         for model in self.get_models(include_swapped=True):
@@ -305,21 +313,23 @@ class Apps:
 
     def set_available_apps(self, available):
         """
-        Restrict the set of installed apps used by get_app_config[s].
+        Restricts the set of installed apps used by get_app_config[s].
+        :param available: An iterable of application names.
 
-        available must be an iterable of application names.
+        This method is used to optimize performance in TransactionTestCase.
+        It ensures that only a subset of installed apps specified by
+        'available'is considered during app configuration retrieval.
 
-        set_available_apps() must be balanced with unset_available_apps().
-
-        Primarily used for performance optimization in TransactionTestCase.
-
-        This method is safe in the sense that it doesn't trigger any imports.
+        This method is safe, as it avoids triggering unecessary imports.
+        :raises ValueError: If 'available' contains apps not present in the
+        install apps.
         """
         available = set(available)
         installed = {app_config.name for app_config in self.get_app_configs()}
         if not available.issubset(installed):
             raise ValueError(
-                "Available apps isn't a subset of installed apps, extra apps: %s"
+                "Available apps isn't a subset of installed apps, extra apps:\
+                %s"
                 % ", ".join(available - installed)
             )
 
@@ -378,8 +388,10 @@ class Apps:
         # the relation tree and the fields cache.
         self.get_models.cache_clear()
         if self.ready:
-            # Circumvent self.get_models() to prevent that the cache is refilled.
-            # This particularly prevents that an empty value is cached while cloning.
+            # Circumvent self.get_models() to prevent that the cache is\
+            # refilled.
+            # This particularly prevents that an empty value is cached while
+            # \cloning.
             for app_config in self.app_configs.values():
                 for model in app_config.get_models(include_auto_created=True):
                     model._meta._expire_cache()

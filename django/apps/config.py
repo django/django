@@ -1,11 +1,14 @@
+# Standard Library Imports
 import inspect
 import os
 from importlib import import_module
 
+# Django Imports
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string, module_has_submodule
 
+# Global Variables
 APPS_MODULE_NAME = "apps"
 MODELS_MODULE_NAME = "models"
 
@@ -25,18 +28,19 @@ class AppConfig:
         # registry when it registers the AppConfig instance.
         self.apps = None
 
-        # The following attributes could be defined at the class level in a
-        # subclass, hence the test-and-set pattern.
-
-        # Last component of the Python path to the application e.g. 'admin'.
+        # Use the test-and-set pattern to define these attributes at the class
+        # level in a subclass.
+        # Determine the last component of the Python path to the application
+        # e.g. 'admin'.
         # This value must be unique across a Django project.
         if not hasattr(self, "label"):
             self.label = app_name.rpartition(".")[2]
+
+        # Check if the label is a valid Python identifier
         if not self.label.isidentifier():
             raise ImproperlyConfigured(
-                "The app label '%s' is not a valid Python identifier." % self.label
-            )
-
+                "The app label '%s' is not a valid Python identifier."
+                % self.label)
         # Human-readable name for the application e.g. "Admin".
         if not hasattr(self, "verbose_name"):
             self.verbose_name = self.label.title()
@@ -56,17 +60,26 @@ class AppConfig:
         self.models = None
 
     def __repr__(self):
+        """Return a string representation of the AppConfig. This is used for
+        debugging and logging purposes."""
+
         return "<%s: %s>" % (self.__class__.__name__, self.label)
 
     @cached_property
     def default_auto_field(self):
-        from django.conf import settings
+        """Return the default auto field for the application. The default auto
+        field is determined by the Django settings."""
 
+        from django.conf import settings
         return settings.DEFAULT_AUTO_FIELD
 
     @property
     def _is_default_auto_field_overridden(self):
-        return self.__class__.default_auto_field is not AppConfig.default_auto_field
+        """Check if the default auot field is overriden in current AppConfig.
+        Returns True if overriden, False otherwise."""
+
+        return self.__class__.default_auto_field \
+            is not AppConfig.default_auto_field
 
     def _path_from_module(self, module):
         """Attempt to determine app's filesystem path from its module."""
@@ -125,7 +138,8 @@ class AppConfig:
                 # excluding those that explicitly define default = False.
                 app_configs = [
                     (name, candidate)
-                    for name, candidate in inspect.getmembers(mod, inspect.isclass)
+                    for name, candidate
+                    in inspect.getmembers(mod, inspect.isclass)
                     if (
                         issubclass(candidate, cls)
                         and candidate is not cls
@@ -178,7 +192,8 @@ class AppConfig:
                 mod = import_module(mod_path)
                 candidates = [
                     repr(name)
-                    for name, candidate in inspect.getmembers(mod, inspect.isclass)
+                    for name, candidate
+                    in inspect.getmembers(mod, inspect.isclass)
                     if issubclass(candidate, cls) and candidate is not cls
                 ]
                 msg = "Module '%s' does not contain a '%s' class." % (
@@ -195,7 +210,8 @@ class AppConfig:
         # Check for obvious errors. (This check prevents duck typing, but
         # it could be removed if it became a problem in practice.)
         if not issubclass(app_config_class, AppConfig):
-            raise ImproperlyConfigured("'%s' isn't a subclass of AppConfig." % entry)
+            raise ImproperlyConfigured("'%s' isn't a subclass of AppConfig." %
+                                       entry)
 
         # Obtain app name here rather than in AppClass.__init__ to keep
         # all error checking for entries in INSTALLED_APPS in one place.
@@ -203,7 +219,8 @@ class AppConfig:
             try:
                 app_name = app_config_class.name
             except AttributeError:
-                raise ImproperlyConfigured("'%s' must supply a name attribute." % entry)
+                raise ImproperlyConfigured("'%s' must supply a name attribute."
+                                           % entry)
 
         # Ensure app_name points to a valid module.
         try:
@@ -235,7 +252,8 @@ class AppConfig:
             return self.models[model_name.lower()]
         except KeyError:
             raise LookupError(
-                "App '%s' doesn't have a '%s' model." % (self.label, model_name)
+                "App '%s' doesn't have a '%s' model." % (self.label,
+                                                         model_name)
             )
 
     def get_models(self, include_auto_created=False, include_swapped=False):
