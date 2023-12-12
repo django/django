@@ -10,3 +10,29 @@
 {% endblock %}
 
 {% block nav-global %}{% endblock %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <script>
+        document.addEventListener('keydown', function(event) {
+            // Save and continue editing on Command + S (Ctrl + S)
+            if ((event.ctrlKey || event.metaKey) && !event.shiftKey && !event.altKey && event.key === 's') {
+                event.preventDefault();
+                document.querySelector('input[name="_continue"]').click();
+                return false;
+            }
+            // Save on Command + Shift + S
+            if ((event.ctrlKey || event.metaKey) && event.shiftKey && !event.altKey && event.key === 's') {
+                event.preventDefault();
+                document.querySelector('input[name="_save"]').click();
+                return false;
+            }
+            // Save and add another on Command + Alt + S (Ctrl + Alt + S)
+            if ((event.ctrlKey || event.metaKey) && !event.shiftKey && event.altKey && event.key === 's') {
+                event.preventDefault();
+                document.querySelector('input[name="_addanother"]').click();
+                return false;
+            }
+        });
+    </script>
+{% endblock %}
