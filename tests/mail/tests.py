@@ -1,4 +1,3 @@
-import collections
 import mimetypes
 import os
 import shutil
