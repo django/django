@@ -100,7 +100,15 @@ class BaseFormSet(RenderableFormMixin):
         self._errors = None
         self._non_form_errors = None
         self.form_renderer = self.renderer
-        self.renderer = self.renderer or get_default_renderer()
+
+        if self.renderer is None:
+            form_renderer = self.empty_form.default_renderer
+            if form_renderer is None:
+                self.renderer = get_default_renderer()
+            else:
+                self.renderer = form_renderer
+                if isinstance(self.renderer, type):
+                    self.renderer = self.renderer()
 
         messages = {}
         for cls in reversed(type(self).__mro__):
