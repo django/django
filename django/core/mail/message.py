@@ -1,4 +1,3 @@
-import collections
 import mimetypes
 from email import charset as Charset
 from email import encoders as Encoders
