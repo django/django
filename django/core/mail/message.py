@@ -1,3 +1,4 @@
+import collections
 import mimetypes
 from email import charset as Charset
 from email import encoders as Encoders
@@ -277,9 +278,29 @@ class EmailMessage:
         if "message-id" not in header_names:
             # Use cached DNS_NAME for performance
             msg["Message-ID"] = make_msgid(domain=DNS_NAME)
-        for name, value in self.extra_headers.items():
-            if name.lower() != "from":  # From is already handled
-                msg[name] = value
+
+        HEADERS_TO_PASS_THROUGH_SELF = {
+            "from": "from_email",
+            "subject": "subject",
+            "to": "to",
+            "cc": "cc",
+            "reply-to": "reply_to",
+        }
+
+        for key, value in self.extra_headers.items():
+            if key.lower() in HEADERS_TO_PASS_THROUGH_SELF:
+                attr_to_check = HEADERS_TO_PASS_THROUGH_SELF[key.lower()]
+                # If not accounted for because we never set
+                # self.<header>, or if `self.<header>` is a defunct/default value,
+                # then attach it to the message.
+                accounted_for = hasattr(self, attr_to_check) and bool(getattr(self, attr_to_check))
+                if not accounted_for:
+                    msg[key] = value
+            else:
+                # Transfer straight from the extra_headers
+                # and since extra_headers is a dict,
+                # all headers provided will be unique (upto casing).
+                msg[key] = value
         return msg
 
     def recipients(self):

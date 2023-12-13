@@ -1,3 +1,4 @@
+import collections
 import mimetypes
 import os
 import shutil
@@ -58,7 +59,50 @@ class HeadersCheckMixin:
         )
 
 
-class MailTests(HeadersCheckMixin, SimpleTestCase):
+class UniqueHeadersMixin:
+    def assertMessageHasUniqueHeaders(self, message, headers=None):
+        """
+        Asserts that the `message` has at most one instance of a header
+        in the `headers` list.
+
+        message: can be an instance of an email.Message subclass or a string
+                 with the contents of an email message.
+        """
+        if isinstance(message, bytes):
+            message = message_from_bytes(message)
+        if headers is None:
+            # See https://datatracker.ietf.org/doc/html/rfc5322#section-3.6
+            # for the list of unique headers.
+            headers = {
+                "to",
+                "cc",
+                "reply-to",
+                "from",
+                "bcc",
+                "in-reply-to",
+                "message-id",
+                "references",
+                "subject",
+                "orig-date",
+                "from-date",
+                "sender",
+            }
+
+        seen_headers = set()
+        for header, _ in message.raw_items():
+            if header.lower() in headers:
+                self.assertTrue(header.lower() not in seen_headers)
+                seen_headers.add(header.lower())
+
+        # header_counts = collections.defaultdict(lambda: 0)
+        # for header, _ in message.raw_items():
+        #     header_counts[header.lower()] += 1
+        #
+        # for header in headers.intersection(header_counts):
+        #     self.assertTrue(header_counts[header] <= 1)
+
+
+class MailTests(HeadersCheckMixin, UniqueHeadersMixin, SimpleTestCase):
     """
     Non-backend specific tests.
     """
@@ -141,6 +185,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         message = email.message()
         self.assertEqual(message["Cc"], "cc@example.com")
         self.assertEqual(email.recipients(), ["to@example.com", "cc@example.com"])
+        self.assertMessageHasUniqueHeaders(message)
 
         # Test multiple CC with multiple To
         email = EmailMessage(
@@ -161,6 +206,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
                 "cc.other@example.com",
             ],
         )
+        self.assertMessageHasUniqueHeaders(message)
 
         # Testing with Bcc
         email = EmailMessage(
@@ -183,6 +229,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
                 "bcc@example.com",
             ],
         )
+        self.assertMessageHasUniqueHeaders(message)
 
     def test_cc_headers(self):
         message = EmailMessage(
@@ -194,6 +241,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             headers={"Cc": "override@example.com"},
         ).message()
         self.assertEqual(message["Cc"], "override@example.com")
+        self.assertMessageHasUniqueHeaders(message)
 
     def test_cc_in_headers_only(self):
         message = EmailMessage(
@@ -204,6 +252,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             headers={"Cc": "foo@example.com"},
         ).message()
         self.assertEqual(message["Cc"], "foo@example.com")
+        self.assertMessageHasUniqueHeaders(message)
 
     def test_reply_to(self):
         email = EmailMessage(
@@ -227,6 +276,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         self.assertEqual(
             message["Reply-To"], "reply_to1@example.com, reply_to2@example.com"
         )
+        self.assertMessageHasUniqueHeaders(message)
 
     def test_recipients_as_tuple(self):
         email = EmailMessage(
@@ -249,6 +299,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
                 "bcc@example.com",
             ],
         )
+        self.assertMessageHasUniqueHeaders(message)
 
     def test_recipients_as_string(self):
         with self.assertRaisesMessage(
@@ -336,6 +387,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
                 ("date", "Fri, 09 Nov 2001 01:08:47 -0000"),
             },
         )
+        self.assertMessageHasUniqueHeaders(email.message())
 
     def test_from_header(self):
         """
@@ -349,6 +401,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             headers={"From": "from@example.com"},
         )
         message = email.message()
+        self.assertMessageHasUniqueHeaders(message)
         self.assertEqual(message["From"], "from@example.com")
 
     def test_to_header(self):
@@ -383,6 +436,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         self.assertEqual(
             email.to, ["list-subscriber@example.com", "list-subscriber2@example.com"]
         )
+        self.assertMessageHasUniqueHeaders(message)
 
     def test_to_in_headers_only(self):
         message = EmailMessage(
@@ -392,6 +446,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             headers={"To": "to@example.com"},
         ).message()
         self.assertEqual(message["To"], "to@example.com")
+        self.assertMessageHasUniqueHeaders(message)
 
     def test_reply_to_header(self):
         """
@@ -407,6 +462,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         )
         message = email.message()
         self.assertEqual(message["Reply-To"], "override@example.com")
+        self.assertMessageHasUniqueHeaders(message)
 
     def test_reply_to_in_headers_only(self):
         message = EmailMessage(
@@ -417,6 +473,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             headers={"Reply-To": "reply_to@example.com"},
         ).message()
         self.assertEqual(message["Reply-To"], "reply_to@example.com")
+        self.assertMessageHasUniqueHeaders(message)
 
     def test_multiple_message_call(self):
         """
@@ -432,8 +489,10 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         )
         message = email.message()
         self.assertEqual(message["From"], "from@example.com")
+        self.assertMessageHasUniqueHeaders(message)
         message = email.message()
         self.assertEqual(message["From"], "from@example.com")
+        self.assertMessageHasUniqueHeaders(message)
 
     def test_unicode_address_header(self):
         """
@@ -481,6 +540,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         self.assertEqual(
             message["Comments"], "=?utf-8?q?My_S=C3=BCrname_is_non-ASCII?="
         )
+        self.assertMessageHasUniqueHeaders(message)
 
     def test_safe_mime_multipart(self):
         """
@@ -508,6 +568,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             msg.message()["Subject"],
             "=?iso-8859-1?q?Message_from_Firstname_S=FCrname?=",
         )
+        self.assertMessageHasUniqueHeaders(msg.message())
 
     def test_safe_mime_multipart_with_attachments(self):
         """
@@ -577,6 +638,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
                 ("Content-Transfer-Encoding", "quoted-printable"),
             },
         )
+        self.assertMessageHasUniqueHeaders(payload0)
         self.assertTrue(
             payload0.as_bytes().endswith(b"\n\nFirstname S=FCrname is a great guy.")
         )
@@ -589,6 +651,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
                 ("Content-Transfer-Encoding", "quoted-printable"),
             },
         )
+        self.assertMessageHasUniqueHeaders(payload1)
         self.assertTrue(
             payload1.as_bytes().endswith(
                 b"\n\n<p>Firstname S=FCrname is a <strong>great</strong> guy.</p>"
