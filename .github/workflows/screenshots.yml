@@ -10,10 +10,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-permissions:
-  contents: read
-  pull-requests: write
-
 jobs:
   selenium-screenshots:
     if: contains(join(github.event.pull_request.labels.*.name, '|'), 'screenshots')
