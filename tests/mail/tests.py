@@ -93,13 +93,6 @@ class UniqueHeadersMixin:
                 self.assertTrue(header.lower() not in seen_headers)
                 seen_headers.add(header.lower())
 
-        # header_counts = collections.defaultdict(lambda: 0)
-        # for header, _ in message.raw_items():
-        #     header_counts[header.lower()] += 1
-        #
-        # for header in headers.intersection(header_counts):
-        #     self.assertTrue(header_counts[header] <= 1)
-
 
 class MailTests(HeadersCheckMixin, UniqueHeadersMixin, SimpleTestCase):
     """
