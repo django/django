@@ -508,6 +508,12 @@ Django < 5.0 should be replaced with a ``UUIDField`` subclass backed by
         def db_type(self, connection):
             return "char(32)"
 
+        def get_db_prep_value(self, value, connection, prepared=False):
+            value = super().get_db_prep_value(value, connection, prepared)
+            if value is not None:
+                value = value.hex
+            return value
+
 For example::
 
     class MyModel(models.Model):
@@ -516,8 +522,7 @@ For example::
 Should become::
 
     class Char32UUIDField(models.UUIDField):
-        def db_type(self, connection):
-            return "char(32)"
+        ...
 
 
     class MyModel(models.Model):
