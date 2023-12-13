@@ -10,7 +10,7 @@ from pathlib import Path
 from unittest import mock
 
 from django.conf import settings
-from django.contrib.sessions.backends.base import UpdateError
+from django.contrib.sessions.backends.base import SessionBase, UpdateError
 from django.contrib.sessions.backends.cache import SessionStore as CacheSession
 from django.contrib.sessions.backends.cached_db import SessionStore as CacheDBSession
 from django.contrib.sessions.backends.db import SessionStore as DatabaseSession
@@ -929,3 +929,45 @@ class ClearSessionsCommandTests(SimpleTestCase):
         with self.settings(SESSION_ENGINE="sessions_tests.no_clear_expired"):
             with self.assertRaisesMessage(management.CommandError, msg):
                 management.call_command("clearsessions")
+
+
+class SessionBaseTests(SimpleTestCase):
+    not_implemented_msg = "subclasses of SessionBase must provide %s() method"
+
+    def setUp(self):
+        self.session = SessionBase()
+
+    def test_create(self):
+        msg = self.not_implemented_msg % "a create"
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            self.session.create()
+
+    def test_delete(self):
+        msg = self.not_implemented_msg % "a delete"
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            self.session.delete()
+
+    def test_exists(self):
+        msg = self.not_implemented_msg % "an exists"
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            self.session.exists(None)
+
+    def test_load(self):
+        msg = self.not_implemented_msg % "a load"
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            self.session.load()
+
+    def test_save(self):
+        msg = self.not_implemented_msg % "a save"
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            self.session.save()
+
+    def test_test_cookie(self):
+        self.assertIs(self.session.has_key(self.session.TEST_COOKIE_NAME), False)
+        self.session.set_test_cookie()
+        self.assertIs(self.session.test_cookie_worked(), True)
+        self.session.delete_test_cookie()
+        self.assertIs(self.session.has_key(self.session.TEST_COOKIE_NAME), False)
+
+    def test_is_empty(self):
+        self.assertIs(self.session.is_empty(), True)
