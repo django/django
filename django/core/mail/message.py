@@ -293,7 +293,9 @@ class EmailMessage:
                 # If not accounted for because we never set
                 # self.<header>, or if `self.<header>` is a defunct/default value,
                 # then attach it to the message.
-                accounted_for = hasattr(self, attr_to_check) and bool(getattr(self, attr_to_check))
+                accounted_for = hasattr(self, attr_to_check) and bool(
+                    getattr(self, attr_to_check)
+                )
                 if not accounted_for:
                     msg[key] = value
             else:
