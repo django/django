@@ -663,8 +663,10 @@ A string representing the time zone for this database connection or ``None``.
 This inner option of the :setting:`DATABASES` setting accepts the same values
 as the general :setting:`TIME_ZONE` setting.
 
-When :setting:`USE_TZ` is ``True`` and this option is set, reading datetimes
-from the database returns aware datetimes in this time zone instead of UTC.
+When :setting:`USE_TZ` is ``True``, reading datetimes from the database
+returns aware datetimes with the timezone set to this option's value if not
+``None``, or to UTC otherwise.
+
 When :setting:`USE_TZ` is ``False``, it is an error to set this option.
 
 * If the database backend doesn't support time zones (e.g. SQLite, MySQL,
@@ -687,13 +689,18 @@ When :setting:`USE_TZ` is ``False``, it is an error to set this option.
     third-party systems connect to the same database and expect to find
     datetimes in local time, then you must set this option.
 
-* If the database backend supports time zones (e.g. PostgreSQL), the
-  ``TIME_ZONE`` option is very rarely needed. It can be changed at any time;
-  the database takes care of converting datetimes to the desired time zone.
+* If the database backend supports time zones (e.g., PostgreSQL), then the
+  database connection's time zone is set to this value.
 
-  Setting the time zone of the database connection may be useful for running
-  raw SQL queries involving date/time functions provided by the database, such
-  as ``date_trunc``, because their results depend on the time zone.
+  Although setting the ``TIME_ZONE`` option is very rarely needed, there are
+  situations where it becomes necessary. Specifically, it's recommended to
+  match the general :setting:`TIME_ZONE` setting when dealing with raw queries
+  involving date/time functions like PostgreSQL's ``date_trunc()`` or
+  ``generate_series()``, especially when generating time-based series that
+  transition daylight savings.
+
+  This value can be changed at any time, the database will handle the
+  conversion of datetimes to the configured time zone.
 
   However, this has a downside: receiving all datetimes in local time makes
   datetime arithmetic more tricky — you must account for possible offset
