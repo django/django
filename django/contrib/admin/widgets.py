@@ -202,7 +202,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
                 % (
                     self.admin_site.name,
                     obj._meta.app_label,
-                    obj._meta.object_name.lower(),
+                    obj._meta.model_name,
                 ),
                 args=(obj.pk,),
             )
