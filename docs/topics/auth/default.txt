@@ -776,7 +776,7 @@ The ``permission_required`` decorator
 
     It's a relatively common task to check whether a user has a particular
     permission. For that reason, Django provides a shortcut for that case: the
-    :func:`~django.contrib.auth.decorators.permission_required()` decorator.::
+    :func:`~django.contrib.auth.decorators.permission_required()` decorator::
 
         from django.contrib.auth.decorators import permission_required
 
