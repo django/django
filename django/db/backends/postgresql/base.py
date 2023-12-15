@@ -321,11 +321,26 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     @async_unsafe
     def create_cursor(self, name=None):
         if name:
-            # In autocommit mode, the cursor will be used outside of a
-            # transaction, hence use a holdable cursor.
-            cursor = self.connection.cursor(
-                name, scrollable=False, withhold=self.connection.autocommit
-            )
+            if is_psycopg3 and (
+                self.settings_dict.get("OPTIONS", {}).get("server_side_binding")
+                is not True
+            ):
+                # psycopg >= 3 forces the usage of server-side bindings for
+                # named cursors so a specialized class that implements
+                # server-side cursors while performing client-side bindings
+                # must be used if `server_side_binding` is disabled (default).
+                cursor = ServerSideCursor(
+                    self.connection,
+                    name=name,
+                    scrollable=False,
+                    withhold=self.connection.autocommit,
+                )
+            else:
+                # In autocommit mode, the cursor will be used outside of a
+                # transaction, hence use a holdable cursor.
+                cursor = self.connection.cursor(
+                    name, scrollable=False, withhold=self.connection.autocommit
+                )
         else:
             cursor = self.connection.cursor()
 
@@ -468,6 +483,23 @@ if is_psycopg3:
 
     class Cursor(CursorMixin, Database.ClientCursor):
         pass
+
+    class ServerSideCursor(
+        CursorMixin, Database.client_cursor.ClientCursorMixin, Database.ServerCursor
+    ):
+        """
+        psycopg >= 3 forces the usage of server-side bindings when using named
+        cursors but the ORM doesn't yet support the systematic generation of
+        prepareable SQL (#20516).
+
+        ClientCursorMixin forces the usage of client-side bindings while
+        ServerCursor implements the logic required to declare and scroll
+        through named cursors.
+
+        Mixing ClientCursorMixin in wouldn't be necessary if Cursor allowed to
+        specify how parameters should be bound instead, which ServerCursor
+        would inherit, but that's not the case.
+        """
 
     class CursorDebugWrapper(BaseCursorDebugWrapper):
         def copy(self, statement):
