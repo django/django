@@ -92,7 +92,7 @@ Some examples
     >>> Company.objects.order_by("name__length")
 
     # Boolean expression can be used directly in filters.
-    >>> from django.db.models import Exists
+    >>> from django.db.models import Exists, OuterRef
     >>> Company.objects.filter(
     ...     Exists(Employee.objects.filter(company=OuterRef("pk"), salary__gt=10))
     ... )
