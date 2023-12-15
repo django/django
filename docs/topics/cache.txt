@@ -1049,7 +1049,7 @@ of keys to be cleared:
 
 Finally, if you want to delete all the keys in the cache, use
 ``cache.clear()``.  Be careful with this; ``clear()`` will remove *everything*
-from the cache, not just the keys set by your application. :
+from the cache, not just the keys set by your application:
 
 .. code-block:: pycon
 
