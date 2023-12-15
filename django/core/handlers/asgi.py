@@ -113,9 +113,9 @@ class ASGIRequest(HttpRequest):
         # Other bits.
         self.resolver_match = None
         self._parsers = [
-            parsers.FormParser(),
-            parsers.MultiPartParser(),
-            parsers.JSONParser(),
+            parsers.FormParser,
+            parsers.MultiPartParser,
+            parsers.JSONParser,
         ]
 
     @cached_property

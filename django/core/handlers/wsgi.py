@@ -79,9 +79,9 @@ class WSGIRequest(HttpRequest):
         self._read_started = False
         self.resolver_match = None
         self._parsers = [
-            parsers.FormParser(),
-            parsers.MultiPartParser(),
-            parsers.JSONParser(),
+            parsers.FormParser,
+            parsers.MultiPartParser,
+            parsers.JSONParser,
         ]
 
     def _get_scheme(self):

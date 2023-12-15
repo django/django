@@ -673,6 +673,34 @@ class RequestsTests(SimpleTestCase):
             },
         )
 
+    def test_data_form_data_json(self):
+        payload = FakePayload(
+            "\r\n".join([f"--{BOUNDARY}", *self._json_payload, f"--{BOUNDARY}--"])
+        )
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "CONTENT_TYPE": MULTIPART_CONTENT,
+                "CONTENT_LENGTH": len(payload),
+                "wsgi.input": payload,
+            }
+        )
+        self.assertEqual(
+            request.data,
+            {
+                "JSON": [
+                    {
+                        "pk": 1,
+                        "model": "store.book",
+                        "fields": {
+                            "name": "Mostly Harmless",
+                            "author": ["Douglas", "Adams"],
+                        },
+                    }
+                ],
+            },
+        )
+
     def test_POST_multipart_json(self):
         payload = FakePayload(
             "\r\n".join(
@@ -1036,6 +1064,7 @@ class RequestsTests(SimpleTestCase):
         )
         request.body  # evaluate
         self.assertEqual(request.POST, {"name": ["value"]})
+        self.assertEqual(request.data, {"name": ["value"]})
 
     def test_multipart_post_field_with_invalid_base64(self):
         payload = FakePayload(
@@ -1061,6 +1090,7 @@ class RequestsTests(SimpleTestCase):
         )
         request.body  # evaluate
         self.assertEqual(request.POST, {"name": ["123"]})
+        self.assertEqual(request.data, {"name": ["123"]})
 
     def test_POST_after_body_read_and_stream_read_multipart(self):
         """
@@ -1090,6 +1120,7 @@ class RequestsTests(SimpleTestCase):
         # Consume enough data to mess up the parsing:
         self.assertEqual(request.read(13), b"--boundary\r\nC")
         self.assertEqual(request.POST, {"name": ["value"]})
+        self.assertEqual(request.data, {"name": ["value"]})
 
     def test_POST_immutable_for_multipart(self):
         """
@@ -1115,6 +1146,7 @@ class RequestsTests(SimpleTestCase):
             }
         )
         self.assertFalse(request.POST._mutable)
+        self.assertFalse(request.data._mutable)
 
     def test_multipart_without_boundary(self):
         request = WSGIRequest(
@@ -1129,6 +1161,10 @@ class RequestsTests(SimpleTestCase):
             MultiPartParserError, "Invalid boundary in multipart: None"
         ):
             request.POST
+        with self.assertRaisesMessage(
+            MultiPartParserError, "Invalid boundary in multipart: None"
+        ):
+            request.data
 
     def test_multipart_non_ascii_content_type(self):
         request = WSGIRequest(
@@ -1145,6 +1181,8 @@ class RequestsTests(SimpleTestCase):
         )
         with self.assertRaisesMessage(MultiPartParserError, msg):
             request.POST
+        with self.assertRaisesMessage(MultiPartParserError, msg):
+            request.data
 
     def test_multipart_with_header_fields_too_large(self):
         payload = FakePayload(

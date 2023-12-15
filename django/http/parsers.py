@@ -10,39 +10,50 @@ class BaseParser:
     media_type = None
     parsers = None
 
-    def can_handle(self, media_type):
-        return media_type == self.media_type
+    def __init__(self, request):
+        self.request = request
 
-    def parse(self, data, request=None):
+    @classmethod
+    def can_handle(cls, media_type):
+        return media_type == cls.media_type
+
+    def parse(self, data):
         pass
 
 
 class FormParser(BaseParser):
     media_type = "application/x-www-form-urlencoded"
 
-    def parse(self, request):
-        from django.http import QueryDict
-
+    def __init__(self, request):
+        super().__init__(request)
         # According to RFC 1866, the "application/x-www-form-urlencoded"
         # content type does not have a charset and should be always treated
         # as UTF-8.
-        if request._encoding is not None and request._encoding.lower() != "utf-8":
+        if (
+            self.request._encoding is not None
+            and self.request._encoding.lower() != "utf-8"
+        ):
             raise BadRequest(
                 "HTTP requests with the 'application/x-www-form-urlencoded' "
                 "content type must be UTF-8 encoded."
             )
-        return QueryDict(request.body, encoding="utf-8"), MultiValueDict()
+
+    def parse(self, data):
+        from django.http import QueryDict
+
+        return QueryDict(data, encoding="utf-8"), MultiValueDict()
 
 
 class MultiPartParser(BaseParser):
     media_type = "multipart/form-data"
 
-    def parse(self, request):
+    def parse(self, data):
+        request = self.request
         if hasattr(request, "_body"):
             # Use already read data
-            data = BytesIO(request._body)
+            request_data = BytesIO(request._body)
         else:
-            data = request
+            request_data = request
 
         # TODO - POST and data can be called on the same request. This parser can be
         # called multiple times on the same request. While `_post` `_data` are different
@@ -56,7 +67,11 @@ class MultiPartParser(BaseParser):
                 ),
             )
         parser = _MultiPartParser(
-            request.META, data, request.upload_handlers, request.encoding, self.parsers
+            request.META,
+            request_data,
+            request.upload_handlers,
+            request.encoding,
+            self.parsers,
         )
         # TODO _post could also be _data
         _post, _files = parser.parse()
@@ -66,15 +81,10 @@ class MultiPartParser(BaseParser):
 class JSONParser(BaseParser):
     media_type = "application/json"
 
-    # TODO rename request -- it's not always one.
-    def parse(self, request):
-        from django.http import HttpRequest
-
+    def parse(self, data):
         def strict_constant(o):
             raise ValueError(
                 "Out of range float values are not JSON compliant: " + repr(o)
             )
 
-        if isinstance(request, HttpRequest):
-            request = request.body
-        return json.loads(request, parse_constant=strict_constant), MultiValueDict()
+        return json.loads(data, parse_constant=strict_constant), MultiValueDict()

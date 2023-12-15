@@ -70,9 +70,9 @@ class HttpRequest:
         self.content_type = None
         self.content_params = None
         self._parsers = [
-            parsers.FormParser(),
-            parsers.MultiPartParser(),
-            parsers.JSONParser(),
+            parsers.FormParser,
+            parsers.MultiPartParser,
+            parsers.JSONParser,
         ]
 
     def __repr__(self):
@@ -366,7 +366,7 @@ class HttpRequest:
             return
 
         if parser_list is None:
-            parser_list = [parsers.FormParser(), parsers.MultiPartParser()]
+            parser_list = [parsers.FormParser, parsers.MultiPartParser]
         selected_parser = None
         for parser in parser_list:
             if parser.can_handle(self.content_type):
@@ -374,9 +374,13 @@ class HttpRequest:
                 break
 
         if selected_parser:
-            selected_parser.parsers = parser_list
+            parser = selected_parser(self)
             try:
-                data, self._files = parser.parse(self)
+                if self.content_type == "multipart/form-data":
+                    parser.parsers = (parser(self) for parser in parser_list)
+                    data, self._files = parser.parse(None)
+                else:
+                    data, self._files = parser.parse(self.body)
                 setattr(self, data_attr, data)
             except Exception as e:
                 # TODO 'application/x-www-form-urlencoded' didn't do this.

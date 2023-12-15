@@ -8,11 +8,11 @@ from django.utils.http import urlencode
 
 class TestParsers(SimpleTestCase):
     def test_can_handle(self):
-        parser = MultiPartParser()
+        parser = MultiPartParser(HttpRequest())
         self.assertIs(parser.can_handle("multipart/form-data"), True)
         self.assertIs(parser.can_handle("application/json"), False)
 
-        parser = FormParser()
+        parser = FormParser(HttpRequest())
         self.assertIs(parser.can_handle("application/x-www-form-urlencoded"), True)
         self.assertIs(parser.can_handle("multipart/form-data"), False)
 
@@ -24,7 +24,7 @@ class TestParsers(SimpleTestCase):
                 main_type, sub_type = media_type.split("/")
                 return main_type == "text"
 
-        parser = CustomParser()
+        parser = CustomParser(None)
         self.assertIs(parser.can_handle("application/json"), False)
         self.assertTrue(parser.can_handle("text/*"), True)
         self.assertTrue(parser.can_handle("text/csv"), True)
@@ -32,16 +32,16 @@ class TestParsers(SimpleTestCase):
     def test_request_parser_no_setting(self):
         request = HttpRequest()
         form, multipart, json = request.parsers
-        self.assertIsInstance(form, FormParser)
-        self.assertIsInstance(multipart, MultiPartParser)
-        self.assertIsInstance(json, JSONParser)
+        self.assertIs(form, FormParser)
+        self.assertIs(multipart, MultiPartParser)
+        self.assertIs(json, JSONParser)
 
     def test_set_parser(self):
         request = HttpRequest()
-        request.parsers = [FormParser()]
+        request.parsers = [FormParser]
 
         self.assertEqual(len(request.parsers), 1)
-        self.assertIsInstance(request.parsers[0], FormParser)
+        self.assertIs(request.parsers[0], FormParser)
 
     def test_set_parsers_following_files_access(self):
         payload = FakePayload(urlencode({"key": "value"}))
@@ -62,7 +62,7 @@ class TestParsers(SimpleTestCase):
             request.parsers = []
 
     def test_json_strict(self):
-        parser = JSONParser()
+        parser = JSONParser(None)
 
         msg_base = "Out of range float values are not JSON compliant: '%s'"
         for value in ["Infinity", "-Infinity", "NaN"]:
