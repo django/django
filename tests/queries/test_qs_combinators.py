@@ -337,7 +337,7 @@ class QuerySetSetOperationTests(TestCase):
                 super().__init__(expr, 2)
 
         output_field = IntegerField()
-        output_field.register_instance_lookup(Mod2, "mod2")
+        output_field.register_lookup(Mod2, "mod2")
         qs1 = Number.objects.annotate(
             annotation=Value(1, output_field=output_field),
         )
