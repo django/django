@@ -1734,7 +1734,7 @@ class AggregateTestCase(TestCase):
                 super().__init__(expr, 100)
 
         sum_field = IntegerField()
-        sum_field.register_instance_lookup(Mod100, "mod100")
+        sum_field.register_lookup(Mod100, "mod100")
         publisher_pages = (
             Book.objects.values("publisher")
             .annotate(sum_pages=Sum("pages", output_field=sum_field))
