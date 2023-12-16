@@ -2641,7 +2641,7 @@ limit should be used. (In particular, when prefetching across two or more
 relations, a ``chunk_size`` should be small enough that the anticipated number
 of results for each prefetched relation still falls below the limit.)
 
-So long as the QuerySet does not prefetch any related objects, providing no
+As long as the QuerySet does not prefetch any related objects, providing no
 value for ``chunk_size`` will result in Django using an implicit default of
 2000.
 
