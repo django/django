@@ -377,6 +377,6 @@ Similar to :class:`TemporaryFileUploadHandler`, when using
 :class:`PersistedTemporaryFileUploadHandler`, Django will write the 
 uploaded to a temporary file stored in your system's temporary directory.
 However, the file will not be suppressed after your first read, and will 
-persist until you delete it. This behavior can be usefull when having many 
+persist until you delete it. This behavior can be useful when having many 
 threads reading from the uploaded file.
 
