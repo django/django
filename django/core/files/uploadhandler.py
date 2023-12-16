@@ -6,9 +6,9 @@ from io import BytesIO
 
 from django.conf import settings
 from django.core.files.uploadedfile import (
-    InMemoryUploadedFile, 
+    InMemoryUploadedFile,
+    PersistedTemporaryUploadedFile,
     TemporaryUploadedFile,
-    PersistedTemporaryUploadedFile
 )
 from django.utils.module_loading import import_string
 
@@ -19,9 +19,9 @@ __all__ = [
     "FileUploadHandler",
     "TemporaryFileUploadHandler",
     "MemoryFileUploadHandler",
-    "LongTemporaryFileUploadHandler",
     "load_handler",
-    "StopFutureHandlers"
+    "StopFutureHandlers",
+    "PersistedTemporaryFileUploadHandler",
 ]
 
 
@@ -238,7 +238,7 @@ class MemoryFileUploadHandler(FileUploadHandler):
             charset=self.charset,
             content_type_extra=self.content_type_extra,
         )
-    
+
 
 class PersistedTemporaryFileUploadHandler(TemporaryFileUploadHandler):
     """

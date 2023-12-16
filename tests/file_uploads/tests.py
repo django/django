@@ -581,7 +581,7 @@ class FileUploadTests(TestCase):
             self.assertIs(os.path.exists(temp_path), False)
 
     def test_upload_temporary_file_handler(self):
-         with tempfile.NamedTemporaryFile() as temp_file:
+        with tempfile.NamedTemporaryFile() as temp_file:
             temp_file.write(b"a")
             temp_file.seek(0)
             response = self.client.post("/temp_file/", {"file": temp_file})
@@ -590,10 +590,12 @@ class FileUploadTests(TestCase):
             self.assertIs(os.path.exists(temp_path), False)
 
     def test_upload_persisted_temporary_file_handler(self):
-         with tempfile.NamedTemporaryFile() as temp_file:
+        with tempfile.NamedTemporaryFile() as temp_file:
             temp_file.write(b"a")
             temp_file.seek(0)
-            response = self.client.post("/temp_file/persisted_file/", {"file": temp_file})
+            response = self.client.post(
+                "/temp_file/persisted_file/", {"file": temp_file}
+            )
             temp_path = response.json()["temp_path"]
             # File does not get deleted after first access
             self.assertIs(os.path.exists(temp_path), True)
