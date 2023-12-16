@@ -189,7 +189,7 @@ class Settings:
 
                 if setting in int_settings and not isinstance(setting_value, int):
                     raise ImproperlyConfigured(
-                        "The %s setting must be an int." % setting
+                        "The %s setting must be an integer." % setting
                     )
                 setattr(self, setting, setting_value)
                 self._explicit_settings.add(setting)

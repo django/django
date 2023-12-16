@@ -497,8 +497,8 @@ class TestListSettings(SimpleTestCase):
 
 class TestIntSettings(SimpleTestCase):
     """
-    Make sure settings that should be lists or tuples throw
-    ImproperlyConfigured if they are set to a string instead of a list or tuple.
+    Make sure settings that should be integers throw
+    ImproperlyConfigured if they are set to a float instead of an integer
     """
 
     int_settings = ("DATA_UPLOAD_MAX_MEMORY_SIZE",)
@@ -506,7 +506,7 @@ class TestIntSettings(SimpleTestCase):
     def test_int_settings(self):
         settings_module = ModuleType("fake_settings_module")
         settings_module.SECRET_KEY = "foo"
-        msg = "The %s setting must be an int."
+        msg = "The %s setting must be an integer."
         for setting in self.int_settings:
             setattr(settings_module, setting, (4e7))
             sys.modules["fake_settings_module"] = settings_module
