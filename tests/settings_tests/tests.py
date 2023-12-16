@@ -494,6 +494,29 @@ class TestListSettings(SimpleTestCase):
                 del sys.modules["fake_settings_module"]
                 delattr(settings_module, setting)
 
+class TestIntSettings(SimpleTestCase):
+    """
+        Make sure settings that should be lists or tuples throw
+        ImproperlyConfigured if they are set to a string instead of a list or tuple.
+        """
+
+    int_settings = (
+        "DATA_UPLOAD_MAX_MEMORY_SIZE",
+    )
+
+    def test_int_settings(self):
+        settings_module = ModuleType("fake_settings_module")
+        settings_module.SECRET_KEY = "foo"
+        msg = "The %s setting must be an int."
+        for setting in self.int_settings:
+            setattr(settings_module, setting, (4e7))
+            sys.modules["fake_settings_module"] = settings_module
+            try:
+                with self.assertRaisesMessage(ImproperlyConfigured, msg % setting):
+                    Settings("fake_settings_module")
+            finally:
+                del sys.modules["fake_settings_module"]
+                delattr(settings_module, setting)
 
 class SettingChangeEnterException(Exception):
     pass

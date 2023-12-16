@@ -172,6 +172,11 @@ class Settings:
             "LOCALE_PATHS",
             "SECRET_KEY_FALLBACKS",
         )
+
+        int_settings = (
+            "DATA_UPLOAD_MAX_MEMORY_SIZE"
+        )
+
         self._explicit_settings = set()
         for setting in dir(mod):
             if setting.isupper():
@@ -182,6 +187,13 @@ class Settings:
                 ):
                     raise ImproperlyConfigured(
                         "The %s setting must be a list or a tuple." % setting
+                    )
+
+                if setting in int_settings and not isinstance(
+                    setting_value, int
+                ):
+                    raise ImproperlyConfigured(
+                        "The %s setting must be an int." % setting
                     )
                 setattr(self, setting, setting_value)
                 self._explicit_settings.add(setting)
