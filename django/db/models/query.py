@@ -6,6 +6,7 @@ import copy
 import operator
 import warnings
 from itertools import chain, islice
+import itertools
 
 from asgiref.sync import sync_to_async
 
@@ -2508,59 +2509,50 @@ def get_prefetcher(instance, through_attr, to_attr):
                     is_fetched = in_prefetched_cache
     return prefetcher, rel_obj_descriptor, attr_found, is_fetched
 
-
 def prefetch_one_level(instances, prefetcher, lookup, level):
     """
     Helper function for prefetch_related_objects().
-
     Run prefetches on all instances using the prefetcher object,
     assigning results to relevant caches in instance.
-
     Return the prefetched objects along with any additional prefetches that
     must be done due to prefetch_related lookups found from default managers.
     """
-    # prefetcher must have a method get_prefetch_querysets() which takes a list
-    # of instances, and returns a tuple:
-
-    # (queryset of instances of self.model that are related to passed in instances,
-    #  callable that gets value to be matched for returned instances,
-    #  callable that gets value to be matched for passed in instances,
-    #  boolean that is True for singly related objects,
-    #  cache or field name to assign to,
-    #  boolean that is True when the previous argument is a cache name vs a field name).
-
-    # The 'values to be matched' must be hashable as they will be used
-    # in a dictionary.
-
-    if hasattr(prefetcher, "get_prefetch_querysets"):
-        (
-            rel_qs,
-            rel_obj_attr,
-            instance_attr,
-            single,
-            cache_name,
-            is_descriptor,
-        ) = prefetcher.get_prefetch_querysets(
-            instances, lookup.get_current_querysets(level)
-        )
+    # On some databases (e.g. SQLite), the maximum number of variables in a
+    # query limits the number of instances that can be prefetched at once. In
+    # this case, do the query in batches.
+    connection = connections[instances[0]._state.db]
+    if connection.features.max_query_params is None:
+        batches = [instances]
     else:
-        warnings.warn(
-            "The usage of get_prefetch_queryset() in prefetch_related_objects() is "
-            "deprecated. Implement get_prefetch_querysets() instead.",
-            RemovedInDjango60Warning,
-            stacklevel=2,
+        # Subtract a safety margin because the queryset might contain custom
+        # filtering expressions that also use variables.
+        batch_size = connection.features.max_query_params - 25
+        batches = [
+            instances[i:i + batch_size]
+            for i in range(0, len(instances), batch_size)
+        ]
+
+    batch_querysets = []
+
+    for batch in batches:
+        # 1. Assume that get_prefetch_queryset() returns the same values for
+        # rel_obj_attr, instance_attr, single, and cache_name since it's called
+        # with homogeneous values. It's fine to use those values returned by
+        # the last call.
+        # 2. prefetcher must have a get_prefetch_queryset() method which takes
+        # a list of instances and returns a tuple:
+        # (queryset of instances of self.model that are related to passed in instances,
+        #  callable that gets value to be matched for returned instances,
+        #  callable that gets value to be matched for passed in instances,
+        #  boolean that is True for singly related objects,
+        #  cache name to assign to).
+        # 3. The 'values to be matched' must be hashable as they will be used
+        # in a dictionary.
+        rel_qs, rel_obj_attr, instance_attr, single, cache_name, var = (
+            prefetcher.get_prefetch_querysets(batch, lookup.get_current_querysets(level))
         )
-        queryset = None
-        if querysets := lookup.get_current_querysets(level):
-            queryset = querysets[0]
-        (
-            rel_qs,
-            rel_obj_attr,
-            instance_attr,
-            single,
-            cache_name,
-            is_descriptor,
-        ) = prefetcher.get_prefetch_queryset(instances, queryset)
+        batch_querysets.append(rel_qs)
+
     # We have to handle the possibility that the QuerySet we just got back
     # contains some prefetch_related lookups. We don't want to trigger the
     # prefetch_related functionality by evaluating the query. Rather, we need
@@ -2568,21 +2560,22 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
     # Copy the lookups in case it is a Prefetch object which could be reused
     # later (happens in nested prefetch_related).
     additional_lookups = [
-        copy.copy(additional_lookup)
-        for additional_lookup in getattr(rel_qs, "_prefetch_related_lookups", ())
+        copy.copy(additional_lookup) for additional_lookup
+        in getattr(batch_querysets[0], '_prefetch_related_lookups', ())
     ]
     if additional_lookups:
         # Don't need to clone because the manager should have given us a fresh
         # instance, so we access an internal instead of using public interface
         # for performance reasons.
-        rel_qs._prefetch_related_lookups = ()
-
-    all_related_objects = list(rel_qs)
+        for rel_qs in batch_querysets:
+            rel_qs._prefetch_related_lookups = ()
+    all_related_objects = list(itertools.chain.from_iterable(batch_querysets))
 
     rel_obj_cache = {}
     for rel_obj in all_related_objects:
         rel_attr_val = rel_obj_attr(rel_obj)
-        rel_obj_cache.setdefault(rel_attr_val, []).append(rel_obj)
+        if rel_obj not in rel_obj_cache.setdefault(rel_attr_val, []):
+            rel_obj_cache.setdefault(rel_attr_val, []).append(rel_obj)
 
     to_attr, as_attr = lookup.get_current_to_attr(level)
     # Make sure `to_attr` does not conflict with a field.
@@ -2595,30 +2588,17 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
         except exceptions.FieldDoesNotExist:
             pass
         else:
-            msg = "to_attr={} conflicts with a field on the {} model."
+            msg = 'to_attr={} conflicts with a field on the {} model.'
             raise ValueError(msg.format(to_attr, model.__name__))
-
     # Whether or not we're prefetching the last part of the lookup.
     leaf = len(lookup.prefetch_through.split(LOOKUP_SEP)) - 1 == level
-
     for obj in instances:
         instance_attr_val = instance_attr(obj)
         vals = rel_obj_cache.get(instance_attr_val, [])
-
         if single:
             val = vals[0] if vals else None
-            if as_attr:
-                # A to_attr has been given for the prefetch.
-                setattr(obj, to_attr, val)
-            elif is_descriptor:
-                # cache_name points to a field name in obj.
-                # This field is a descriptor for a related object.
-                setattr(obj, cache_name, val)
-            else:
-                # No to_attr has been given for this prefetch operation and the
-                # cache_name does not point to a descriptor. Store the value of
-                # the field in the object's field cache.
-                obj._state.fields_cache[cache_name] = val
+            to_attr = to_attr if as_attr else cache_name
+            setattr(obj, to_attr, val)
         else:
             if as_attr:
                 setattr(obj, to_attr, vals)
@@ -2634,7 +2614,6 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
                 qs._prefetch_done = True
                 obj._prefetched_objects_cache[cache_name] = qs
     return all_related_objects, additional_lookups
-
 
 class RelatedPopulator:
     """
