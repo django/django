@@ -520,11 +520,11 @@ class Query(BaseExpression):
                         self.model._meta.pk.get_col(inner_query.get_initial_alias()),
                     )
                 inner_query.default_cols = False
-                if not qualify:
+                if not qualify and not self.combinator:
                     # Mask existing annotations that are not referenced by
                     # aggregates to be pushed to the outer query unless
-                    # filtering against window functions is involved as it
-                    # requires complex realising.
+                    # filtering against window functions or if the query is
+                    # combined as both would require complex realiasing logic.
                     annotation_mask = set()
                     if isinstance(self.group_by, tuple):
                         for expr in self.group_by:
