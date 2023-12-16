@@ -173,9 +173,7 @@ class Settings:
             "SECRET_KEY_FALLBACKS",
         )
 
-        int_settings = (
-            "DATA_UPLOAD_MAX_MEMORY_SIZE"
-        )
+        int_settings = "DATA_UPLOAD_MAX_MEMORY_SIZE"
 
         self._explicit_settings = set()
         for setting in dir(mod):
@@ -189,9 +187,7 @@ class Settings:
                         "The %s setting must be a list or a tuple." % setting
                     )
 
-                if setting in int_settings and not isinstance(
-                    setting_value, int
-                ):
+                if setting in int_settings and not isinstance(setting_value, int):
                     raise ImproperlyConfigured(
                         "The %s setting must be an int." % setting
                     )
