@@ -360,3 +360,23 @@ list::
             @method_decorator(csrf_protect)
             def post(self, request, *args, **kwargs):
                 ...  # Process request
+
+``PersistedTemporaryFileUploadHandler``
+=======================================
+
+.. versionadded:: 5.1
+
+.. currentmodule:: django.core.files.uploadhandler
+
+When a user uploads a file, Django passes off the file data to an *upload
+handler* -- a small class that handles file data as it gets uploaded. Upload
+handlers are initially defined in the :setting:`FILE_UPLOAD_HANDLERS` setting,
+as described above.
+
+Similar to :class:`TemporaryFileUploadHandler`, when using 
+:class:`PersistedTemporaryFileUploadHandler`, Django will write the 
+uploaded to a temporary file stored in your system's temporary directory.
+However, the file will not be suppressed after your first read, and will 
+persist until you delete it. This behavior can be usefull when having many 
+threads reading from the uploaded file.
+

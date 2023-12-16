@@ -2,7 +2,7 @@ import hashlib
 import os
 
 from django.core.files.uploadedfile import UploadedFile
-from django.core.files.uploadhandler import TemporaryFileUploadHandler
+from django.core.files.uploadhandler import TemporaryFileUploadHandler, PersistedTemporaryFileUploadHandler
 from django.http import HttpResponse, HttpResponseServerError, JsonResponse
 
 from .models import FileModel
@@ -121,6 +121,22 @@ def file_stop_upload_temporary_file(request):
     request.FILES  # Trigger file parsing.
     return JsonResponse(
         {"temp_path": request.upload_handlers[0].file.temporary_file_path()},
+    )
+
+def file_upload_temporary_file(request):
+    request.upload_handlers.insert(0, TemporaryFileUploadHandler())
+    request.upload_handlers.pop(2)
+    request.FILES # Trigger file parsing.
+    return JsonResponse(
+        {"temp_path": request.upload_handlers[0].file.temporary_file_path()}
+    )
+
+def file_upload_persisted_temporary_file(request):
+    request.upload_handlers.insert(0, PersistedTemporaryFileUploadHandler())
+    request.upload_handlers.pop(2)
+    request.FILES # Trigger file parsing.
+    return JsonResponse(
+        {"temp_path": request.upload_handlers[0].file.temporary_file_path()}
     )
 
 

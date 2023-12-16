@@ -133,7 +133,8 @@ File Storage
 File Uploads
 ~~~~~~~~~~~~
 
-* ...
+* :class:`~django.core.files.uploadhandler.PersistedTemporaryFileUploadHandler`
+   and :class:`~django.core.files.uploadedfile.PersistedTemporaryUploadedFile`
 
 Forms
 ~~~~~

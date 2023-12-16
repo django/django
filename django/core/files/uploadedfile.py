@@ -15,13 +15,15 @@ __all__ = (
     "TemporaryUploadedFile",
     "InMemoryUploadedFile",
     "SimpleUploadedFile",
+    "PersistedTemporaryUploadedFile"
 )
 
 
 class UploadedFile(File):
     """
-    An abstract uploaded file (``TemporaryUploadedFile`` and
-    ``InMemoryUploadedFile`` are the built-in concrete subclasses).
+    An abstract uploaded file (``TemporaryUploadedFile``,
+    ``InMemoryUploadedFile`` and ``PersistedTemporaryUploadedFile`` are 
+    the built-in concrete subclasses).
 
     An ``UploadedFile`` object behaves somewhat like a file object and
     represents some file data that the user submitted with a form.
@@ -148,3 +150,31 @@ class SimpleUploadedFile(InMemoryUploadedFile):
             file_dict["content"],
             file_dict.get("content-type", "text/plain"),
         )
+
+
+class PersistedTemporaryUploadedFile(UploadedFile):
+    """
+    A file uploaded to a temporary location (i.e. stream-to-disk).
+    The file does not get deleted after a first read from disk
+    """
+
+    def __init__(self, name, content_type, size, charset, content_type_extra=None):
+        _, ext = os.path.splitext(name)
+        file = tempfile.NamedTemporaryFile(
+            suffix=".upload" + ext, dir=settings.FILE_UPLOAD_TEMP_DIR, 
+            delete=False # forbid the file from being deleted automatically
+        )
+        super().__init__(file, name, content_type, size, charset, content_type_extra)
+
+    def temporary_file_path(self):
+        """Return the full path of this file."""
+        return self.file.name
+    
+    def close(self):
+        try:
+            return self.file.close()
+        except FileNotFoundError:
+            # The file was moved or deleted before the tempfile could unlink
+            # it. Still sets self.file.close_called and calls
+            # self.file.file.close() before the exception.
+            pass

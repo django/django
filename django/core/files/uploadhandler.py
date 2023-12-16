@@ -5,7 +5,11 @@ import os
 from io import BytesIO
 
 from django.conf import settings
-from django.core.files.uploadedfile import InMemoryUploadedFile, TemporaryUploadedFile
+from django.core.files.uploadedfile import (
+    InMemoryUploadedFile, 
+    TemporaryUploadedFile,
+    PersistedTemporaryUploadedFile
+)
 from django.utils.module_loading import import_string
 
 __all__ = [
@@ -15,8 +19,9 @@ __all__ = [
     "FileUploadHandler",
     "TemporaryFileUploadHandler",
     "MemoryFileUploadHandler",
+    "LongTemporaryFileUploadHandler",
     "load_handler",
-    "StopFutureHandlers",
+    "StopFutureHandlers"
 ]
 
 
@@ -232,6 +237,23 @@ class MemoryFileUploadHandler(FileUploadHandler):
             size=file_size,
             charset=self.charset,
             content_type_extra=self.content_type_extra,
+        )
+    
+
+class PersistedTemporaryFileUploadHandler(TemporaryFileUploadHandler):
+    """
+    Upload handler that streams data into a temporary file.
+    The file does not get deleted after a first read and should
+    be closed after use.
+    """
+
+    def new_file(self, *args, **kwargs):
+        """
+        Create the file object to append to as data is coming in.
+        """
+        super().new_file(*args, **kwargs)
+        self.file = PersistedTemporaryUploadedFile(
+            self.file_name, self.content_type, 0, self.charset, self.content_type_extra
         )
 
 
