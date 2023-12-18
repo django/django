@@ -4587,7 +4587,6 @@ class Ticket23622Tests(TestCase):
 
 
 class TestQueryNote(TestCase):
-
     def test_note(self):
         query = str(MyObject.objects.comment("this is unit test").all().query)
         self.assertTrue(query.startswith("/* this is unit test */ SELECT"))
