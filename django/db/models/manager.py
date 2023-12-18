@@ -153,9 +153,11 @@ class BaseManager:
         Return a new QuerySet object. Subclasses can override this method to
         customize the behavior of the Manager.
         """
-        queryset = self._queryset_class(model=self.model, using=self._db, hints=self._hints)
-        if getattr(self, '_comment_value', None):
-            setattr(queryset.query, 'comment', self._comment_value)
+        queryset = self._queryset_class(
+            model=self.model, using=self._db, hints=self._hints
+        )
+        if getattr(self, "_comment_value", None):
+            setattr(queryset.query, "comment", self._comment_value)
             # clear comment
             self._comment_value = None
         return queryset
