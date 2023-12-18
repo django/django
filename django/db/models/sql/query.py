@@ -304,6 +304,9 @@ class Query(BaseExpression):
 
         self._filtered_relations = {}
 
+        #  store comments here
+        self.comment = None
+
     @property
     def output_field(self):
         if len(self.select) == 1:

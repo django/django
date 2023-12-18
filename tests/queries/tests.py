@@ -4584,3 +4584,10 @@ class Ticket23622Tests(TestCase):
             set(Ticket23605A.objects.filter(qy).values_list("pk", flat=True)),
         )
         self.assertSequenceEqual(Ticket23605A.objects.filter(qx), [a2])
+
+
+class TestQueryNote(TestCase):
+
+    def test_note(self):
+        query = str(MyObject.objects.comment('this is unit test').all().query)
+        self.assertTrue(query.startswith('/* this is unit test */ SELECT') )

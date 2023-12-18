@@ -784,7 +784,10 @@ class SQLCompiler:
                     )
                 except FullResultSet:
                     having, h_params = "", []
-                result = ["SELECT"]
+                if getattr(self.query, "comment", None):
+                    result = [f"/* {self.query.comment} */ SELECT"]
+                else:
+                    result = ["SELECT"]
                 params = []
 
                 if self.query.distinct:

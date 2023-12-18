@@ -30,6 +30,7 @@ class BaseManager:
         self.model = None
         self.name = None
         self._db = None
+        self._comment_value = None
         self._hints = {}
 
     def __str__(self):
@@ -152,7 +153,12 @@ class BaseManager:
         Return a new QuerySet object. Subclasses can override this method to
         customize the behavior of the Manager.
         """
-        return self._queryset_class(model=self.model, using=self._db, hints=self._hints)
+        queryset = self._queryset_class(model=self.model, using=self._db, hints=self._hints)
+        if getattr(self, '_comment_value', None):
+            setattr(queryset.query, 'comment', self._comment_value)
+            # clear comment
+            self._comment_value = None
+        return queryset
 
     def all(self):
         # We can't proxy this method through the `QuerySet` like we do for the
@@ -171,6 +177,11 @@ class BaseManager:
 
     def __hash__(self):
         return id(self)
+
+    def comment(self, comment_value):
+        # store comment in here
+        self._comment_value = comment_value
+        return self
 
 
 class Manager(BaseManager.from_queryset(QuerySet)):
