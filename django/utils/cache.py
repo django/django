@@ -166,13 +166,13 @@ def get_conditional_response(request, etag=None, last_modified=None, response=No
         return response
 
     # Get HTTP request headers.
-    if_match_etags = parse_etags(request.META.get("HTTP_IF_MATCH", ""))
-    if_unmodified_since = request.META.get("HTTP_IF_UNMODIFIED_SINCE")
+    if_match_etags = parse_etags(request.meta.get("HTTP_IF_MATCH", ""))
+    if_unmodified_since = request.meta.get("HTTP_IF_UNMODIFIED_SINCE")
     if_unmodified_since = if_unmodified_since and parse_http_date_safe(
         if_unmodified_since
     )
-    if_none_match_etags = parse_etags(request.META.get("HTTP_IF_NONE_MATCH", ""))
-    if_modified_since = request.META.get("HTTP_IF_MODIFIED_SINCE")
+    if_none_match_etags = parse_etags(request.meta.get("HTTP_IF_NONE_MATCH", ""))
+    if_modified_since = request.meta.get("HTTP_IF_MODIFIED_SINCE")
     if_modified_since = if_modified_since and parse_http_date_safe(if_modified_since)
 
     # Evaluation of request preconditions below follows RFC 9110 Section
@@ -350,7 +350,7 @@ def _generate_cache_key(request, method, headerlist, key_prefix):
     """Return a cache key from the headers given in the header list."""
     ctx = md5(usedforsecurity=False)
     for header in headerlist:
-        value = request.META.get(header)
+        value = request.meta.get(header)
         if value is not None:
             ctx.update(value.encode())
     url = md5(request.build_absolute_uri().encode("ascii"), usedforsecurity=False)

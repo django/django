@@ -135,7 +135,11 @@ All attributes should be considered read-only, unless stated otherwise.
     ``<form>`` that posted to the request had ``enctype="multipart/form-data"``.
     Otherwise, ``FILES`` will be a blank dictionary-like object.
 
-.. attribute:: HttpRequest.META
+.. attribute:: HttpRequest.meta
+
+    .. versionadded:: 5.1
+
+        This is the new name for :attr:`HttpRequest.META`.
 
     A dictionary containing all available HTTP headers. Available headers
     depend on the client and server, but here are some examples:
@@ -284,6 +288,20 @@ middleware class is listed in :setting:`MIDDLEWARE`.
     The :meth:`auser` method does the same thing but can be used from async
     contexts.
 
+Alias attributes
+----------------
+
+These attributes are the old names for other attributes, and are preserved as
+aliases for backwards compatibility.
+
+.. attribute:: HttpRequest.GET
+
+    An alias of :attr:`HttpRequest.query_params`.
+
+.. attribute:: HttpRequest.META
+
+    An alias of :attr:`HttpRequest.meta`.
+
 Methods
 -------
 
@@ -332,10 +350,10 @@ Methods
                     recent proxy is used.
                     """
                     for field in self.FORWARDED_FOR_FIELDS:
-                        if field in request.META:
-                            if "," in request.META[field]:
-                                parts = request.META[field].split(",")
-                                request.META[field] = parts[-1].strip()
+                        if field in request.meta:
+                            if "," in request.meta[field]:
+                                parts = request.meta[field].split(",")
+                                request.meta[field] = parts[-1].strip()
                     return self.get_response(request)
 
         This middleware should be positioned before any other middleware that
@@ -347,7 +365,7 @@ Methods
 
     Returns the originating port of the request using information from the
     ``HTTP_X_FORWARDED_PORT`` (if :setting:`USE_X_FORWARDED_PORT` is enabled)
-    and ``SERVER_PORT`` ``META`` variables, in that order.
+    and ``SERVER_PORT`` :attr:`HttpRequest.meta` variables, in that order.
 
 .. method:: HttpRequest.get_full_path()
 

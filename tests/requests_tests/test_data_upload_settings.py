@@ -10,7 +10,8 @@ from django.test import SimpleTestCase
 from django.test.client import FakePayload
 
 TOO_MANY_FIELDS_MSG = (
-    "The number of GET/POST parameters exceeded settings.DATA_UPLOAD_MAX_NUMBER_FIELDS."
+    "The number of query_params/POST parameters exceeded "
+    "settings.DATA_UPLOAD_MAX_NUMBER_FIELDS."
 )
 TOO_MANY_FILES_MSG = (
     "The number of files exceeded settings.DATA_UPLOAD_MAX_NUMBER_FILES."

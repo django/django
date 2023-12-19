@@ -45,7 +45,7 @@ def trace_view(request):
     elif request.body:
         return HttpResponseBadRequest("TRACE requests MUST NOT include an entity")
     else:
-        protocol = request.META["SERVER_PROTOCOL"]
+        protocol = request.meta["SERVER_PROTOCOL"]
         t = Template(
             "{{ method }} {{ uri }} {{ version }}",
             name="TRACE Template",
@@ -65,7 +65,7 @@ def put_view(request):
         t = Template("Data received: {{ data }} is the body.", name="PUT Template")
         c = Context(
             {
-                "Content-Length": request.META["CONTENT_LENGTH"],
+                "Content-Length": request.meta["CONTENT_LENGTH"],
                 "data": request.body.decode(),
             }
         )
@@ -116,7 +116,7 @@ def json_view(request):
     A view that expects a request with the header 'application/json' and JSON
     data, which is deserialized and included in the context.
     """
-    if request.META.get("CONTENT_TYPE") != "application/json":
+    if request.meta.get("CONTENT_TYPE") != "application/json":
         return HttpResponse()
 
     t = Template("Viewing {} page. With data {{ data }}.".format(request.method))
@@ -191,7 +191,7 @@ def view_with_secure(request):
     "A view that indicates if the request was secure"
     response = HttpResponse()
     response.test_was_secure_request = request.is_secure()
-    response.test_server_port = request.META.get("SERVER_PORT", 80)
+    response.test_server_port = request.meta.get("SERVER_PORT", 80)
     return response
 
 

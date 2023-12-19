@@ -25,7 +25,7 @@ class XViewMiddleware(MiddlewareMixin):
                 "'django.contrib.auth.middleware.AuthenticationMiddleware'."
             )
         if request.method == "HEAD" and (
-            request.META.get("REMOTE_ADDR") in settings.INTERNAL_IPS
+            request.meta.get("REMOTE_ADDR") in settings.INTERNAL_IPS
             or (request.user.is_active and request.user.is_staff)
         ):
             response = HttpResponse()

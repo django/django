@@ -2263,8 +2263,8 @@ class CacheI18nTest(SimpleTestCase):
 
     def check_accept_language_vary(self, accept_language, vary, reference_key):
         request = self.factory.get(self.path)
-        request.META["HTTP_ACCEPT_LANGUAGE"] = accept_language
-        request.META["HTTP_ACCEPT_ENCODING"] = "gzip;q=1.0, identity; q=0.5, *;q=0"
+        request.meta["HTTP_ACCEPT_LANGUAGE"] = accept_language
+        request.meta["HTTP_ACCEPT_ENCODING"] = "gzip;q=1.0, identity; q=0.5, *;q=0"
         response = HttpResponse()
         response.headers["Vary"] = vary
         key = learn_cache_key(request, response)
@@ -2277,7 +2277,7 @@ class CacheI18nTest(SimpleTestCase):
         lang = translation.get_language()
         self.assertEqual(lang, "en")
         request = self.factory.get(self.path)
-        request.META["HTTP_ACCEPT_ENCODING"] = "gzip;q=1.0, identity; q=0.5, *;q=0"
+        request.meta["HTTP_ACCEPT_ENCODING"] = "gzip;q=1.0, identity; q=0.5, *;q=0"
         response = HttpResponse()
         response.headers["Vary"] = "accept-encoding"
         key = learn_cache_key(request, response)

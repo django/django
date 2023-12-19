@@ -51,7 +51,7 @@ def serve(request, path, document_root=None, show_indexes=False):
     # Respect the If-Modified-Since header.
     statobj = fullpath.stat()
     if not was_modified_since(
-        request.META.get("HTTP_IF_MODIFIED_SINCE"), statobj.st_mtime
+        request.meta.get("HTTP_IF_MODIFIED_SINCE"), statobj.st_mtime
     ):
         return HttpResponseNotModified()
     content_type, encoding = mimetypes.guess_type(str(fullpath))

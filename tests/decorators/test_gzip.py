@@ -29,7 +29,7 @@ class GzipPageTests(SimpleTestCase):
             return HttpResponse(content=self.content)
 
         request = HttpRequest()
-        request.META["HTTP_ACCEPT_ENCODING"] = "gzip"
+        request.meta["HTTP_ACCEPT_ENCODING"] = "gzip"
         response = sync_view(request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.get("Content-Encoding"), "gzip")
@@ -40,7 +40,7 @@ class GzipPageTests(SimpleTestCase):
             return HttpResponse(content=self.content)
 
         request = HttpRequest()
-        request.META["HTTP_ACCEPT_ENCODING"] = "gzip"
+        request.meta["HTTP_ACCEPT_ENCODING"] = "gzip"
         response = await async_view(request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.get("Content-Encoding"), "gzip")

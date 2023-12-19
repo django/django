@@ -81,9 +81,9 @@ def _unmask_cipher_token(token):
 
 
 def _add_new_csrf_cookie(request):
-    """Generate a new random CSRF_COOKIE value, and add it to request.META."""
+    """Generate a new random CSRF_COOKIE value, and add it to request.meta."""
     csrf_secret = _get_new_csrf_string()
-    request.META.update(
+    request.meta.update(
         {
             "CSRF_COOKIE": csrf_secret,
             "CSRF_COOKIE_NEEDS_UPDATE": True,
@@ -102,12 +102,12 @@ def get_token(request):
     header to the outgoing response.  For this reason, you may need to use this
     function lazily, as is done by the csrf context processor.
     """
-    if "CSRF_COOKIE" in request.META:
-        csrf_secret = request.META["CSRF_COOKIE"]
+    if "CSRF_COOKIE" in request.meta:
+        csrf_secret = request.meta["CSRF_COOKIE"]
         # Since the cookie is being used, flag to send the cookie in
         # process_response() (even if the client already has it) in order to
         # renew the expiry timer.
-        request.META["CSRF_COOKIE_NEEDS_UPDATE"] = True
+        request.meta["CSRF_COOKIE_NEEDS_UPDATE"] = True
     else:
         csrf_secret = _add_new_csrf_cookie(request)
     return _mask_cipher_secret(csrf_secret)
@@ -251,12 +251,12 @@ class CsrfViewMiddleware(MiddlewareMixin):
 
     def _set_csrf_cookie(self, request, response):
         if settings.CSRF_USE_SESSIONS:
-            if request.session.get(CSRF_SESSION_KEY) != request.META["CSRF_COOKIE"]:
-                request.session[CSRF_SESSION_KEY] = request.META["CSRF_COOKIE"]
+            if request.session.get(CSRF_SESSION_KEY) != request.meta["CSRF_COOKIE"]:
+                request.session[CSRF_SESSION_KEY] = request.meta["CSRF_COOKIE"]
         else:
             response.set_cookie(
                 settings.CSRF_COOKIE_NAME,
-                request.META["CSRF_COOKIE"],
+                request.meta["CSRF_COOKIE"],
                 max_age=settings.CSRF_COOKIE_AGE,
                 domain=settings.CSRF_COOKIE_DOMAIN,
                 path=settings.CSRF_COOKIE_PATH,
@@ -268,7 +268,7 @@ class CsrfViewMiddleware(MiddlewareMixin):
             patch_vary_headers(response, ("Cookie",))
 
     def _origin_verified(self, request):
-        request_origin = request.META["HTTP_ORIGIN"]
+        request_origin = request.meta["HTTP_ORIGIN"]
         try:
             good_host = request.get_host()
         except DisallowedHost:
@@ -294,7 +294,7 @@ class CsrfViewMiddleware(MiddlewareMixin):
         )
 
     def _check_referer(self, request):
-        referer = request.META.get("HTTP_REFERER")
+        referer = request.meta.get("HTTP_REFERER")
         if referer is None:
             raise RejectRequest(REASON_NO_REFERER)
 
@@ -380,7 +380,7 @@ class CsrfViewMiddleware(MiddlewareMixin):
                 # depending on whether the client obtained the token from
                 # the DOM or the cookie (and if the cookie, whether the cookie
                 # was masked or unmasked).
-                request_csrf_token = request.META[settings.CSRF_HEADER_NAME]
+                request_csrf_token = request.meta[settings.CSRF_HEADER_NAME]
             except KeyError:
                 raise RejectRequest(REASON_CSRF_TOKEN_MISSING)
             token_source = settings.CSRF_HEADER_NAME
@@ -408,13 +408,13 @@ class CsrfViewMiddleware(MiddlewareMixin):
                 # masked, this also causes it to be replaced with the unmasked
                 # form, but only in cases where the secret is already getting
                 # saved anyways.
-                request.META["CSRF_COOKIE"] = csrf_secret
+                request.meta["CSRF_COOKIE"] = csrf_secret
 
     def process_view(self, request, callback, callback_args, callback_kwargs):
         if getattr(request, "csrf_processing_done", False):
             return None
 
-        # Wait until request.META["CSRF_COOKIE"] has been manipulated before
+        # Wait until request.meta["CSRF_COOKIE"] has been manipulated before
         # bailing out, so that get_token still works
         if getattr(callback, "csrf_exempt", False):
             return None
@@ -432,10 +432,10 @@ class CsrfViewMiddleware(MiddlewareMixin):
 
         # Reject the request if the Origin header doesn't match an allowed
         # value.
-        if "HTTP_ORIGIN" in request.META:
+        if "HTTP_ORIGIN" in request.meta:
             if not self._origin_verified(request):
                 return self._reject(
-                    request, REASON_BAD_ORIGIN % request.META["HTTP_ORIGIN"]
+                    request, REASON_BAD_ORIGIN % request.meta["HTTP_ORIGIN"]
                 )
         elif request.is_secure():
             # If the Origin header wasn't provided, reject HTTPS requests if
@@ -468,7 +468,7 @@ class CsrfViewMiddleware(MiddlewareMixin):
         return self._accept(request)
 
     def process_response(self, request, response):
-        if request.META.get("CSRF_COOKIE_NEEDS_UPDATE"):
+        if request.meta.get("CSRF_COOKIE_NEEDS_UPDATE"):
             self._set_csrf_cookie(request, response)
             # Unset the flag to prevent _set_csrf_cookie() from being
             # unnecessarily called again in process_response() by other
@@ -477,6 +477,6 @@ class CsrfViewMiddleware(MiddlewareMixin):
             # CSRF_COOKIE_NEEDS_UPDATE is still respected in subsequent calls
             # e.g. in case rotate_token() is called in process_response() later
             # by custom middleware but before those subsequent calls.
-            request.META["CSRF_COOKIE_NEEDS_UPDATE"] = False
+            request.meta["CSRF_COOKIE_NEEDS_UPDATE"] = False
 
         return response

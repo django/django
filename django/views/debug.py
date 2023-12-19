@@ -158,11 +158,11 @@ class SafeExceptionReporterFilter:
 
     def get_safe_request_meta(self, request):
         """
-        Return a dictionary of request.META with sensitive values redacted.
+        Return a dictionary of request.meta with sensitive values redacted.
         """
-        if not hasattr(request, "META"):
+        if not hasattr(request, "meta"):
             return {}
-        return {k: self.cleanse_setting(k, v) for k, v in request.META.items()}
+        return {k: self.cleanse_setting(k, v) for k, v in request.meta.items()}
 
     def get_safe_cookies(self, request):
         """

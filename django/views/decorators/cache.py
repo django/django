@@ -30,7 +30,7 @@ def cache_page(timeout, *, cache=None, key_prefix=None):
 
 def _check_request(request, decorator_name):
     # Ensure argument looks like a request.
-    if not hasattr(request, "META"):
+    if not hasattr(request, "meta"):
         raise TypeError(
             f"{decorator_name} didn't receive an HttpRequest. If you are "
             "decorating a classmethod, be sure to use @method_decorator."

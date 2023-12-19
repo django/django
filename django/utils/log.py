@@ -98,7 +98,7 @@ class AdminEmailHandler(logging.Handler):
                 record.levelname,
                 (
                     "internal"
-                    if request.META.get("REMOTE_ADDR") in settings.INTERNAL_IPS
+                    if request.meta.get("REMOTE_ADDR") in settings.INTERNAL_IPS
                     else "EXTERNAL"
                 ),
                 record.getMessage(),

@@ -187,7 +187,13 @@ Models
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Some request attributes have been renamed:
+
+  * :attr:`.HttpRequest.GET` is now :attr:`.HttpRequest.query_params`.
+  * :attr:`.HttpRequest.META` is now :attr:`.HttpRequest.meta`.
+
+  The old names remain as aliases for backwards compatibility and will not be
+  removed.
 
 Security
 ~~~~~~~~

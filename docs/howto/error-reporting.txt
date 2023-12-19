@@ -288,7 +288,7 @@ following attributes and methods:
     .. attribute:: hidden_settings
 
         A compiled regular expression object used to match settings and
-        ``request.META`` values considered as sensitive. By default equivalent
+        ``request.meta`` values considered as sensitive. By default equivalent
         to::
 
             import re
@@ -300,7 +300,7 @@ following attributes and methods:
         Returns ``True`` to activate the filtering in
         :meth:`get_post_parameters` and :meth:`get_traceback_frame_variables`.
         By default the filter is active if :setting:`DEBUG` is ``False``. Note
-        that sensitive ``request.META`` values are always filtered along with
+        that sensitive ``request.meta`` values are always filtered along with
         sensitive setting values, as described in the :setting:`DEBUG`
         documentation.
 

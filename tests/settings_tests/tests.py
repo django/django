@@ -373,33 +373,33 @@ class SecureProxySslHeaderTest(SimpleTestCase):
     @override_settings(SECURE_PROXY_SSL_HEADER=("HTTP_X_FORWARDED_PROTO", "https"))
     def test_set_with_xheader_wrong(self):
         req = HttpRequest()
-        req.META["HTTP_X_FORWARDED_PROTO"] = "wrongvalue"
+        req.meta["HTTP_X_FORWARDED_PROTO"] = "wrongvalue"
         self.assertIs(req.is_secure(), False)
 
     @override_settings(SECURE_PROXY_SSL_HEADER=("HTTP_X_FORWARDED_PROTO", "https"))
     def test_set_with_xheader_right(self):
         req = HttpRequest()
-        req.META["HTTP_X_FORWARDED_PROTO"] = "https"
+        req.meta["HTTP_X_FORWARDED_PROTO"] = "https"
         self.assertIs(req.is_secure(), True)
 
     @override_settings(SECURE_PROXY_SSL_HEADER=("HTTP_X_FORWARDED_PROTO", "https"))
     def test_set_with_xheader_leftmost_right(self):
         req = HttpRequest()
-        req.META["HTTP_X_FORWARDED_PROTO"] = "https, http"
+        req.meta["HTTP_X_FORWARDED_PROTO"] = "https, http"
         self.assertIs(req.is_secure(), True)
-        req.META["HTTP_X_FORWARDED_PROTO"] = "https  , http"
+        req.meta["HTTP_X_FORWARDED_PROTO"] = "https  , http"
         self.assertIs(req.is_secure(), True)
 
     @override_settings(SECURE_PROXY_SSL_HEADER=("HTTP_X_FORWARDED_PROTO", "https"))
     def test_set_with_xheader_leftmost_not_secure(self):
         req = HttpRequest()
-        req.META["HTTP_X_FORWARDED_PROTO"] = "http, https"
+        req.meta["HTTP_X_FORWARDED_PROTO"] = "http, https"
         self.assertIs(req.is_secure(), False)
 
     @override_settings(SECURE_PROXY_SSL_HEADER=("HTTP_X_FORWARDED_PROTO", "https"))
     def test_set_with_xheader_multiple_not_secure(self):
         req = HttpRequest()
-        req.META["HTTP_X_FORWARDED_PROTO"] = "http ,wrongvalue,http,http"
+        req.meta["HTTP_X_FORWARDED_PROTO"] = "http ,wrongvalue,http,http"
         self.assertIs(req.is_secure(), False)
 
     @override_settings(SECURE_PROXY_SSL_HEADER=("HTTP_X_FORWARDED_PROTO", "https"))
@@ -411,7 +411,7 @@ class SecureProxySslHeaderTest(SimpleTestCase):
 
         # Client connects via HTTP.
         req = ProxyRequest()
-        req.META["HTTP_X_FORWARDED_PROTO"] = "http"
+        req.meta["HTTP_X_FORWARDED_PROTO"] = "http"
         self.assertIs(req.is_secure(), False)
 
 
