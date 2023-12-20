@@ -22,6 +22,7 @@ if lib_path:
 elif os.name == "nt":
     # Windows NT shared libraries
     lib_names = [
+        "gdal308",
         "gdal307",
         "gdal306",
         "gdal305",
@@ -36,6 +37,7 @@ elif os.name == "posix":
     lib_names = [
         "gdal",
         "GDAL",
+        "gdal3.8.0",
         "gdal3.7.0",
         "gdal3.6.0",
         "gdal3.5.0",
