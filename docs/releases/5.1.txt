@@ -238,6 +238,9 @@ Tests
      self.client.post("/items/1", query_params={"action": "delete"})
      await self.async_client.post("/items/1", query_params={"action": "delete"})
 
+* The new :meth:`.SimpleTestCase.assertNotInHTML` assertion allows testing that
+  an HTML fragment is not contained in the given HTML haystack.
+
 URLs
 ~~~~
 

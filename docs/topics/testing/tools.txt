@@ -1905,6 +1905,16 @@ your test suite.
 
         In older versions, error messages didn't contain the ``haystack``.
 
+.. method:: SimpleTestCase.assertNotInHTML(needle, haystack, msg_prefix="")
+
+    .. versionadded:: 5.1
+
+    Asserts that the HTML fragment ``needle`` is *not* contained in the
+    ``haystack``.
+
+    Whitespace in most cases is ignored, and attribute ordering is not
+    significant. See :meth:`~SimpleTestCase.assertHTMLEqual` for more details.
+
 .. method:: SimpleTestCase.assertJSONEqual(raw, expected_data, msg=None)
 
     Asserts that the JSON fragments ``raw`` and ``expected_data`` are equal.

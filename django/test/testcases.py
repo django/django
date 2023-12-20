@@ -922,14 +922,17 @@ class SimpleTestCase(unittest.TestCase):
             msg_prefix += ": "
         haystack_repr = safe_repr(haystack)
         if count is not None:
-            self.assertEqual(
-                real_count,
-                count,
-                (
-                    f"{msg_prefix}Found {real_count} instances of {needle!r} (expected "
-                    f"{count}) in the following response\n{haystack_repr}"
-                ),
-            )
+            if count == 0:
+                msg = (
+                    f"{needle!r} unexpectedly found in the following response\n"
+                    f"{haystack_repr}"
+                )
+            else:
+                msg = (
+                    f"Found {real_count} instances of {needle!r} (expected {count}) in "
+                    f"the following response\n{haystack_repr}"
+                )
+            self.assertEqual(real_count, count, f"{msg_prefix}{msg}")
         else:
             self.assertTrue(
                 real_count != 0,
@@ -938,6 +941,9 @@ class SimpleTestCase(unittest.TestCase):
                     f"{haystack_repr}"
                 ),
             )
+
+    def assertNotInHTML(self, needle, haystack, msg_prefix=""):
+        self.assertInHTML(needle, haystack, count=0, msg_prefix=msg_prefix)
 
     def assertJSONEqual(self, raw, expected_data, msg=None):
         """
