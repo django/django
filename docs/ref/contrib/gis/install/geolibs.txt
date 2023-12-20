@@ -9,7 +9,7 @@ geospatial libraries:
 Program                   Description                           Required                          Supported Versions
 ========================  ====================================  ================================  ===========================================
 :doc:`GEOS <../geos>`     Geometry Engine Open Source           Yes                               3.12, 3.11, 3.10, 3.9, 3.8
-`PROJ`_                   Cartographic Projections library      Yes (PostgreSQL and SQLite only)  9.x, 8.x, 7.x, 6.x, 5.x
+`PROJ`_                   Cartographic Projections library      Yes (PostgreSQL and SQLite only)  9.x, 8.x, 7.x, 6.x
 :doc:`GDAL <../gdal>`     Geospatial Data Abstraction Library   Yes                               3.7, 3.6, 3.5, 3.4, 3.3, 3.2, 3.1, 3.0, 2.4
 :doc:`GeoIP <../geoip2>`  IP-based geolocation library          No                                2
 `PostGIS`__               Spatial extensions for PostgreSQL     Yes (PostgreSQL only)             3.4, 3.3, 3.2, 3.1, 3.0
@@ -45,7 +45,6 @@ totally fine with GeoDjango. Your mileage may vary.
     PROJ 8.0.0 2021-03-01
     PROJ 7.0.0 2020-02-25
     PROJ 6.0.0 2019-02-26
-    PROJ 5.0.0 2018-03-01
     SpatiaLite 4.3.0 2015-09-07
     SpatiaLite 5.0.0 2020-08-23
     SpatiaLite 5.1.0 2023-08-04
@@ -191,8 +190,7 @@ PROJ < 7.x) [#]_:
     $ wget https://download.osgeo.org/proj/proj-data-X.Y.tar.gz
 
 Next, untar the source code archive, and extract the datum shifting files in the
-``data`` subdirectory (use ``nad`` subdirectory for PROJ < 6.x). This must be
-done *prior* to configuration:
+``data`` subdirectory. This must be done *prior* to configuration:
 
 .. code-block:: shell
 

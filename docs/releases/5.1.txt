@@ -271,6 +271,8 @@ backends.
 
 * Support for PostGIS 2.5 is removed.
 
+* Support for PROJ < 6 is removed.
+
 Dropped support for MariaDB 10.4
 --------------------------------
 
