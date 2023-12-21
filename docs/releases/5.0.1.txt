@@ -29,3 +29,6 @@ Bugfixes
   overflow the page and become non-interactive (:ticket:`35012`).
 
 * Added compatibility for ``oracledb`` 2.0.0 (:ticket:`35054`).
+
+* Fixed a regression in Django 5.0 where querysets referenced incorrect field
+  names from ``FilteredRelation()`` (:ticket:`35050`).

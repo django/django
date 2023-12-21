@@ -94,14 +94,16 @@ def get_child_with_renamed_prefix(prefix, replacement, child):
         return rename_prefix_from_q(prefix, replacement, child)
     if isinstance(child, tuple):
         lhs, rhs = child
-        lhs = lhs.replace(prefix, replacement, 1)
+        if lhs.startswith(prefix + LOOKUP_SEP):
+            lhs = lhs.replace(prefix, replacement, 1)
         if not isinstance(rhs, F) and hasattr(rhs, "resolve_expression"):
             rhs = get_child_with_renamed_prefix(prefix, replacement, rhs)
         return lhs, rhs
 
     if isinstance(child, F):
         child = child.copy()
-        child.name = child.name.replace(prefix, replacement, 1)
+        if child.name.startswith(prefix + LOOKUP_SEP):
+            child.name = child.name.replace(prefix, replacement, 1)
     elif hasattr(child, "resolve_expression"):
         child = child.copy()
         child.set_source_expressions(
