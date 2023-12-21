@@ -27,3 +27,7 @@ Bugfixes
 
 * Fixed a regression in Django 5.0 where admin fields on the same line could
   overflow the page and become non-interactive (:ticket:`35012`).
+
+* Fixed a bug in Django 5.0 that caused a crash during migration when changing
+  a ``Meta.index_together`` to :class:`~django.db.models.Index`, when a
+  ``Meta.unique_together`` existed on the same fields (:ticket:`35022`).
