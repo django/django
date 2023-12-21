@@ -665,6 +665,8 @@ class DiscoverRunner:
         shuffle=False,
         logger=None,
         durations=None,
+        pair=None,
+        bisect=None,
         **kwargs,
     ):
         self.pattern = pattern
@@ -703,6 +705,8 @@ class DiscoverRunner:
         self._shuffler = None
         self.logger = logger
         self.durations = durations
+        self.pair = pair
+        self.bisect = bisect
 
     @classmethod
     def add_arguments(cls, parser):
@@ -801,6 +805,14 @@ class DiscoverRunner:
                 "or substring. Can be used multiple times. Same as "
                 "unittest -k option."
             ),
+        )
+        parser.add_argument(
+            "--pair",
+            help="Run tests in pairs to find the problem test in pairs",
+        )
+        parser.add_argument(
+            "--bisect",
+            help="Run tests in bisecting the tests to find the problem test",
         )
         if PY312:
             parser.add_argument(
@@ -1041,6 +1053,154 @@ class DiscoverRunner:
             )
         return databases
 
+    def paired_tests(self, paired_test, test_labels):
+        test_labels = test_labels or ["."]
+
+        print("***** Trying paired execution")
+
+        # Make sure the constant member of the pair isn't in the test list
+        # Also remove tests that need to be run in specific combinations
+        for label in [paired_test, "model_inheritance_same_model_name"]:
+            try:
+                test_labels.remove(label)
+            except ValueError:
+                pass
+
+        for i, label in enumerate(test_labels):
+            print(
+                "***** %d of %d: Check test pairing with %s"
+                % (i + 1, len(test_labels), label)
+            )
+
+            self.setup_test_environment()
+            suite = self.build_suite([label, paired_test])
+            databases = self.get_databases(suite)
+            suite.serialized_aliases = set(
+                alias for alias, serialize in databases.items() if serialize
+            )
+
+            suite.used_aliases = set(databases)
+            with self.time_keeper.timed("%d Database Setup" % (i + 1)):
+                old_config = self.setup_databases(
+                    aliases=databases,
+                    serialized_aliases=suite.serialized_aliases,
+                )
+
+            run_failed = False
+            try:
+                self.run_checks(databases)
+                result = self.run_suite(suite)
+            except Exception:
+                run_failed = True
+                raise
+            finally:
+                try:
+                    with self.time_keeper.timed("%d Database Teardown" % (i + 1)):
+                        self.teardown_databases(old_config)
+                    self.teardown_test_environment()
+                except Exception:
+                    # Silence teardown exceptions if an exception was raised during
+                    # runs to avoid shadowing it.
+                    if not run_failed:
+                        raise
+            if result.failures or result.errors:
+                print("***** Found problem pair with %s" % label)
+                return
+
+        print("***** No problem pair found")
+
+    def bisect_tests(self, bisection_label, test_labels):
+        test_labels = test_labels or ["."]
+
+        print("***** Bisecting test suite: %s" % " ".join(test_labels))
+
+        # Make sure the bisection point isn't in the test list
+        # Also remove tests that need to be run in specific combinations
+        for label in [bisection_label, "model_inheritance_same_model_name"]:
+            try:
+                test_labels.remove(label)
+            except ValueError:
+                pass
+
+        self.setup_test_environment()
+
+        failures = []
+        iteration = 1
+        while len(test_labels) > 1:
+            midpoint = len(test_labels) // 2
+            test_labels_a = test_labels[:midpoint] + [bisection_label]
+            test_labels_b = test_labels[midpoint:] + [bisection_label]
+
+            for i, labels in enumerate([test_labels_a, test_labels_b]):
+                if i == 0:
+                    print(
+                        "***** Pass %da: Running the first half of the test suite"
+                        % iteration
+                    )
+                else:
+                    print(
+                        "***** Pass %db: Running the second half of the test suite"
+                        % iteration
+                    )
+                print("***** Test labels: %s" % " ".join(labels))
+
+                suite = self.build_suite(labels)
+                databases = self.get_databases(suite)
+                suite.serialized_aliases = set(
+                    alias for alias, serialize in databases.items() if serialize
+                )
+
+                suite.used_aliases = set(databases)
+                with self.time_keeper.timed(
+                    "%d%c Database Setup" % (iteration, chr(ord("a") + i))
+                ):
+                    old_config = self.setup_databases(
+                        aliases=databases,
+                        serialized_aliases=suite.serialized_aliases,
+                    )
+                run_failed = False
+                try:
+                    self.run_checks(databases)
+                    result = self.run_suite(suite)
+                except Exception:
+                    run_failed = True
+                    raise
+                finally:
+                    try:
+                        with self.time_keeper.timed(
+                            "%d%c Database Teardown" % (iteration, chr(ord("a") + i))
+                        ):
+                            self.teardown_databases(old_config)
+                        self.teardown_test_environment()
+                    except Exception:
+                        # Silence teardown exceptions if an exception was raised during
+                        # runs to avoid shadowing it.
+                        if not run_failed:
+                            raise
+                if result.failures or result.errors:
+                    failures.append(labels)
+                else:
+                    failures.append([])
+
+            failures_a, failures_b = failures
+            if failures_a and not failures_b:
+                print("***** Problem found in first half. Bisecting again...")
+                iteration += 1
+                test_labels = test_labels_a[:-1]
+            elif failures_b and not failures_a:
+                print("***** Problem found in second half. Bisecting again...")
+                iteration += 1
+                test_labels = test_labels_b[:-1]
+            elif failures_a and failures_b:
+                print("***** Problem found in both halves.")
+                break
+            else:
+                print("***** No problem found in either half.")
+                break
+
+        if len(test_labels) == 1:
+            print("***** Source of error: %s" % test_labels[0])
+
     def run_tests(self, test_labels, **kwargs):
         """
         Run the unit tests for all the test labels in the provided list.
@@ -1050,6 +1210,13 @@ class DiscoverRunner:
 
         Return the number of tests that failed.
         """
+        if self.pair:
+            self.paired_tests(self.pair, test_labels)
+            return
+        elif self.bisect:
+            self.bisect_tests(self.bisect, test_labels)
+            return
+
         self.setup_test_environment()
         suite = self.build_suite(test_labels)
         databases = self.get_databases(suite)
