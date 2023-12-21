@@ -32,11 +32,13 @@ QUnit.test('custom time shortcuts', function(assert) {
 
 QUnit.test('time zone offset warning', function(assert) {
     const $ = django.jQuery;
-    const savedOffset = $('body').attr('data-admin-utc-offset');
+    const savedServerOffsetFn = DateTimeShortcuts.serverOffset;
     const timeField = $('<input type="text" name="time_test" class="vTimeField">');
     $('#qunit-fixture').append(timeField);
-    $('body').attr('data-admin-utc-offset', new Date().getTimezoneOffset() * -60 + 3600);
+    DateTimeShortcuts.serverOffset = function() {
+        return new Date().getTimezoneOffset() * -60 + 3600;
+    };
     DateTimeShortcuts.init();
-    $('body').attr('data-admin-utc-offset', savedOffset);
+    DateTimeShortcuts.serverOffset = savedServerOffsetFn;
     assert.equal($('.timezonewarning').text(), 'Note: You are 1 hour behind server time.');
 });

@@ -9,6 +9,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from django.db.models import CASCADE, UUIDField
+from django.forms.utils import to_current_timezone
 from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
 from django.utils.html import smart_urlquote
@@ -60,6 +61,17 @@ class BaseAdminDateWidget(forms.DateInput):
         super().__init__(attrs=attrs, format=format)
 
 
+class AdminDateISOWidget(forms.DateInput):
+    class Media:
+        js = [
+            "admin/js/admin/DateTimeISOShortcuts.js",
+        ]
+
+    def __init__(self, attrs=None, format=None):
+        attrs = {"type": "date", "class": "vDateField", "size": "10", **(attrs or {})}
+        super().__init__(attrs=attrs, format="%Y-%m-%d")
+
+
 class AdminDateWidget(BaseAdminDateWidget):
     template_name = "admin/widgets/date.html"
 
@@ -74,6 +86,37 @@ class BaseAdminTimeWidget(forms.TimeInput):
     def __init__(self, attrs=None, format=None):
         attrs = {"class": "vTimeField", "size": "8", **(attrs or {})}
         super().__init__(attrs=attrs, format=format)
+
+
+class AdminTimeISOWidget(forms.TimeInput):
+    class Media:
+        js = [
+            "admin/js/admin/DateTimeISOShortcuts.js",
+        ]
+
+    def __init__(self, attrs=None, format=None):
+        attrs = {"type": "time", "class": "vTimeField", "size": "8", **(attrs or {})}
+        super().__init__(attrs=attrs, format="%H:%M:%S")
+
+
+class AdminDateTimeISOWidget(forms.DateTimeInput):
+    class Media:
+        js = [
+            "admin/js/admin/DateTimeISOShortcuts.js",
+        ]
+
+    def __init__(self, attrs=None, format=None):
+        attrs = {
+            "type": "datetime-local",
+            "class": "vDateTimeField",
+            "size": "8",
+            **(attrs or {}),
+        }
+        super().__init__(attrs=attrs, format="%Y-%m-%dT%H:%M:%S")
+
+    def format_value(self, value):
+        timezoned_value = to_current_timezone(value)
+        return super().format_value(timezoned_value)
 
 
 class AdminTimeWidget(BaseAdminTimeWidget):

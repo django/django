@@ -5,6 +5,8 @@
 /* VARIABLE DEFINITIONS */
 html[data-theme="light"],
 :root {
+    --color-scheme: normal;
+
     --primary: #79aec8;
     --secondary: #417690;
     --accent: #f5dd5d;
@@ -483,6 +485,7 @@ textarea {
 }
 
 input[type=text], input[type=password], input[type=email], input[type=url],
+input[type=date], input[type=time], input[type=datetime-local],
 input[type=number], input[type=tel], textarea, select, .vTextField {
     border: 1px solid var(--border-color);
     border-radius: 4px;
@@ -492,7 +495,12 @@ input[type=number], input[type=tel], textarea, select, .vTextField {
     background-color: var(--body-bg);
 }
 
+input[type=date], input[type=time], input[type=datetime-local] {
+    color-scheme: var(--color-scheme);
+}
+
 input[type=text]:focus, input[type=password]:focus, input[type=email]:focus,
+input[type=date]:focus, input[type=time]:focus, input[type=datetime-local]:focus,
 input[type=url]:focus, input[type=number]:focus, input[type=tel]:focus,
 textarea:focus, select:focus, .vTextField:focus {
     border-color: var(--body-quiet-color);

@@ -27,8 +27,11 @@
         shortCutsClass: 'datetimeshortcuts', // class of the clock and cal shortcuts
         timezoneWarningClass: 'timezonewarning', // class of the warning for timezone mismatch
         timezoneOffset: 0,
+        serverOffset: function() {
+            return document.body.dataset.adminUtcOffset;
+        },
         init: function() {
-            const serverOffset = document.body.dataset.adminUtcOffset;
+            const serverOffset = DateTimeShortcuts.serverOffset();
             if (serverOffset) {
                 const localOffset = new Date().getTimezoneOffset() * -60;
                 DateTimeShortcuts.timezoneOffset = localOffset - serverOffset;
@@ -47,7 +50,7 @@
         },
         // Return the current time while accounting for the server timezone.
         now: function() {
-            const serverOffset = document.body.dataset.adminUtcOffset;
+            const serverOffset = DateTimeShortcuts.serverOffset();
             if (serverOffset) {
                 const localNow = new Date();
                 const localOffset = localNow.getTimezoneOffset() * -60;
