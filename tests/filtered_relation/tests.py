@@ -792,6 +792,42 @@ class FilteredRelationTests(TestCase):
         ).filter(my_books__isnull=True)
         self.assertSequenceEqual(qs, [])
 
+    def test_conditional_expression_rhs_contains_relation_name(self):
+        qs = Book.objects.annotate(
+            rel=FilteredRelation(
+                "editor",
+                condition=Q(id=1 * F("number_editor")),
+            )
+        ).filter(rel__isnull=True)
+        self.assertSequenceEqual(qs, [])
+
+    def test_conditional_expression_rhs_startswith_relation_name(self):
+        qs = Book.objects.annotate(
+            rel=FilteredRelation(
+                "editor",
+                condition=Q(id=1 * F("editor_number")),
+            )
+        ).filter(rel__isnull=True)
+        self.assertSequenceEqual(qs, [])
+
+    def test_conditional_expression_lhs_startswith_relation_name(self):
+        qs = Book.objects.annotate(
+            rel=FilteredRelation(
+                "editor",
+                condition=Q(editor_number__gt=1),
+            )
+        ).filter(rel__isnull=True)
+        self.assertSequenceEqual(qs, [])
+
+    def test_conditional_expression_lhs_contains_relation_name(self):
+        qs = Book.objects.annotate(
+            rel=FilteredRelation(
+                "editor",
+                condition=Q(number_editor__gt=1),
+            )
+        ).filter(rel__isnull=True)
+        self.assertSequenceEqual(qs, [])
+
 
 class FilteredRelationAggregationTests(TestCase):
     @classmethod
