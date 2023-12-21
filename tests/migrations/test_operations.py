@@ -3287,6 +3287,23 @@ class OperationTests(OperationTestBase):
             },
         )
 
+    @ignore_warnings(category=RemovedInDjango51Warning)
+    def test_rename_index_unnamed_index_with_unique_index(self):
+        app_label = "test_rninuiwui"
+        project_state = self.set_up_test_model(app_label, index_together=True)
+        operations = [
+            migrations.AlterUniqueTogether("Pony", ["weight", "pink"]),
+        ]
+        self.apply_operations(app_label, project_state, operations)
+
+        operation = migrations.RenameIndex(
+            "Pony", new_name="new_pony_test_idx", old_fields=("weight", "pink")
+        )
+        new_state = project_state.clone()
+        operation.state_forwards(app_label, new_state)
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+
     def test_rename_index_unknown_unnamed_index(self):
         app_label = "test_rninuui"
         project_state = self.set_up_test_model(app_label)
