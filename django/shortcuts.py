@@ -152,7 +152,7 @@ def resolve_url(to, *args, **kwargs):
     """
     Return a URL appropriate for the arguments passed.
 
-    The arguments could be:
+    The arguments could befffffff:
 
         * A model: the model's `get_absolute_url()` function will be called.
 
