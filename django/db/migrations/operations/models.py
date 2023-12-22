@@ -1017,7 +1017,10 @@ class RenameIndex(IndexOperation):
                 from_model._meta.get_field(field).column for field in self.old_fields
             ]
             matching_index_name = schema_editor._constraint_names(
-                from_model, column_names=columns, index=True
+                from_model,
+                column_names=columns,
+                index=True,
+                unique=False,
             )
             if len(matching_index_name) != 1:
                 raise ValueError(
