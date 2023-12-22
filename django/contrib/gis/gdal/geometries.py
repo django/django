@@ -123,7 +123,9 @@ class OGRGeometry(GDALBase):
             self.srs = srs
 
         # Setting the class depending upon the OGR Geometry Type
-        self.__class__ = GEO_CLASSES[self.geom_type.num]
+        if (geo_class := GEO_CLASSES.get(self.geom_type.num)) is None:
+            raise TypeError(f"Unsupported geometry type: {self.geom_type}")
+        self.__class__ = geo_class
 
     # Pickle routines
     def __getstate__(self):
