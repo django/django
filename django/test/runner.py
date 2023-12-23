@@ -1105,9 +1105,10 @@ class DiscoverRunner:
                         raise
             if result.failures or result.errors:
                 print("***** Found problem pair with %s" % label)
-                return
+                return 0
 
         print("***** No problem pair found")
+        return 1
 
     def bisect_tests(self, bisection_label, test_labels):
         test_labels = test_labels or ["."]
@@ -1200,6 +1201,8 @@ class DiscoverRunner:
 
         if len(test_labels) == 1:
             print("***** Source of error: %s" % test_labels[0])
+            return 0
+        return 1
 
     def run_tests(self, test_labels, **kwargs):
         """
@@ -1211,11 +1214,9 @@ class DiscoverRunner:
         Return the number of tests that failed.
         """
         if self.pair:
-            self.paired_tests(self.pair, test_labels)
-            return
+            return self.paired_tests(self.pair, test_labels)
         elif self.bisect:
-            self.bisect_tests(self.bisect, test_labels)
-            return
+            return self.bisect_tests(self.bisect, test_labels)
 
         self.setup_test_environment()
         suite = self.build_suite(test_labels)
