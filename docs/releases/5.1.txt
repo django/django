@@ -250,6 +250,9 @@ Tests
 * The new :meth:`.SimpleTestCase.assertNotInHTML` assertion allows testing that
   an HTML fragment is not contained in the given HTML haystack.
 
+* In order to enforce test isolation, database connections inside threads are
+  no longer allowed in :class:`~django.test.SimpleTestCase`.
+
 URLs
 ~~~~
 
