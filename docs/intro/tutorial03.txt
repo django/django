@@ -106,7 +106,7 @@ Wire these new views into the ``polls.urls`` module by adding the following
     ]
 
 Take a look in your browser, at "/polls/34/". It'll run the ``detail()``
-method and display whatever ID you provide in the URL. Try
+function and display whatever ID you provide in the URL. Try
 "/polls/34/results/" and "/polls/34/vote/" too -- these will display the
 placeholder results and voting pages.
 
