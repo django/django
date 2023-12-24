@@ -256,6 +256,25 @@ class LiveServerViews(LiveServerBase):
         finally:
             conn.close()
 
+    def test_head_content_length_removed(self):
+        conn = HTTPConnection(
+            LiveServerViews.server_thread.host, LiveServerViews.server_thread.port
+        )
+
+        conn.request("HEAD", "/head_view/?content-length=0")
+        response = conn.getresponse()
+        self.assertIsNone(response.getheader("Content-Length"))
+        conn.close()
+
+    def test_head_content_length_set(self):
+        conn = HTTPConnection(
+            LiveServerViews.server_thread.host, LiveServerViews.server_thread.port
+        )
+        conn.request("HEAD", "/head_view/?content-length=11151978")
+        response = conn.getresponse()
+        self.assertEqual(response.getheader("Content-Length"), "11151978")
+        conn.close()
+
     def test_keep_alive_connection_clears_previous_request_data(self):
         conn = HTTPConnection(
             LiveServerViews.server_thread.host, LiveServerViews.server_thread.port

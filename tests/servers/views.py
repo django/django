@@ -47,6 +47,15 @@ def check_model_instance_from_subview(request):
         return HttpResponse("subview calling view: {}".format(response.read().decode()))
 
 
+def head_view(request):
+    return HttpResponse(
+        headers={
+            "Accept-Ranges": "bytes",
+            "Content-Length": request.GET["content-length"],
+        }
+    )
+
+
 @csrf_exempt
 def method_view(request):
     return HttpResponse(request.method)

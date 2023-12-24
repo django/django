@@ -134,6 +134,7 @@ class ServerHandler(simple_server.ServerHandler):
         if (
             self.environ["REQUEST_METHOD"] == "HEAD"
             and "Content-Length" in self.headers
+            and str(self.headers["Content-Length"]) == "0"
         ):
             del self.headers["Content-Length"]
         # HTTP/1.1 requires support for persistent connections. Send 'close' if
