@@ -1447,6 +1447,32 @@ class MigrationAutodetector:
                     ),
                 )
 
+    def compare_altered_constraints(self, constraints_to_add, constraints_compared):
+        constraints = []
+        for c in constraints_to_add:
+            # check if there is any constraint compared equals
+            equals = False
+            for o in constraints_compared:
+                if (
+                    isinstance(c, models.CheckConstraint)
+                    and isinstance(o, models.CheckConstraint)
+                    and c.check == o.check
+                ):
+                    equals = True
+                    break
+                if (
+                    isinstance(c, models.UniqueConstraint)
+                    and isinstance(o, models.UniqueConstraint)
+                    and c.fields == o.fields
+                ):
+                    equals = True
+                    break
+            # if all constraints compared are different
+            # it add the new constraint to list
+            if not equals:
+                constraints.append(c)
+        return constraints
+
     def create_altered_constraints(self):
         option_name = operations.AddConstraint.option_name
         for app_label, model_name in sorted(self.kept_model_keys):
@@ -1458,8 +1484,13 @@ class MigrationAutodetector:
 
             old_constraints = old_model_state.options[option_name]
             new_constraints = new_model_state.options[option_name]
-            add_constraints = [c for c in new_constraints if c not in old_constraints]
-            rem_constraints = [c for c in old_constraints if c not in new_constraints]
+
+            add_constraints = self.compare_altered_constraints(
+                new_constraints, old_constraints
+            )
+            rem_constraints = self.compare_altered_constraints(
+                old_constraints, new_constraints
+            )
 
             self.altered_constraints.update(
                 {
