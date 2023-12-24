@@ -258,6 +258,8 @@ class EmailMessage:
         return self.connection
 
     def message(self):
+        HEADER_WITH_ONE_OCCURRENCE = ["to", "reply-to", "cc"]
+
         encoding = self.encoding or settings.DEFAULT_CHARSET
         msg = SafeMIMEText(self.body, self.content_subtype, encoding)
         msg = self._create_message(msg)
@@ -280,6 +282,8 @@ class EmailMessage:
             # Use cached DNS_NAME for performance
             msg["Message-ID"] = make_msgid(domain=DNS_NAME)
         for name, value in self.extra_headers.items():
+            if name.lower() in HEADER_WITH_ONE_OCCURRENCE and msg[name] is not None:
+                raise ValueError("Cannot insert repeated headers")
             if name.lower() != "from":  # From is already handled
                 msg[name] = value
         return msg

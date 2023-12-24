@@ -191,9 +191,8 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             "bounce@example.com",
             ["to@example.com"],
             cc=["foo@example.com"],
-            headers={"Cc": "override@example.com"},
         ).message()
-        self.assertEqual(message["Cc"], "override@example.com")
+        self.assertEqual(message["Cc"], "foo@example.com")
 
     def test_cc_in_headers_only(self):
         message = EmailMessage(
@@ -359,14 +358,17 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             "Subject",
             "Content",
             "bounce@example.com",
-            ["list-subscriber@example.com", "list-subscriber2@example.com"],
-            headers={"To": "mailing-list@example.com"},
+            headers={
+                "To": ", ".join(
+                    ["guy1@example.com", "guy2@example.com", "guy3@example.com"]
+                )
+            },
         )
         message = email.message()
-        self.assertEqual(message["To"], "mailing-list@example.com")
         self.assertEqual(
-            email.to, ["list-subscriber@example.com", "list-subscriber2@example.com"]
+            message["To"], "guy1@example.com, guy2@example.com, guy3@example.com"
         )
+        self.assertEqual(email.to, [])
 
         # If we don't set the To header manually, it should default to the `to`
         # argument to the constructor.
@@ -403,10 +405,9 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             "bounce@example.com",
             ["to@example.com"],
             reply_to=["foo@example.com"],
-            headers={"Reply-To": "override@example.com"},
         )
         message = email.message()
-        self.assertEqual(message["Reply-To"], "override@example.com")
+        self.assertEqual(message["Reply-To"], "foo@example.com")
 
     def test_reply_to_in_headers_only(self):
         message = EmailMessage(
