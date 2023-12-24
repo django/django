@@ -1,7 +1,4 @@
-from unittest import skipIf
-
 from django.contrib.gis.gdal import (
-    GDAL_VERSION,
     AxisOrder,
     CoordTransform,
     GDALException,
@@ -358,7 +355,6 @@ class SpatialRefTest(SimpleTestCase):
             self.assertIn("Langschoß", srs.pretty_wkt)
             self.assertIn("Langschoß", srs.xml)
 
-    @skipIf(GDAL_VERSION < (3, 0), "GDAL >= 3.0 is required")
     def test_axis_order(self):
         wgs84_trad = SpatialReference(4326, axis_order=AxisOrder.TRADITIONAL)
         wgs84_auth = SpatialReference(4326, axis_order=AxisOrder.AUTHORITY)
@@ -379,12 +375,6 @@ class SpatialRefTest(SimpleTestCase):
         msg = "SpatialReference.axis_order must be an AxisOrder instance."
         with self.assertRaisesMessage(ValueError, msg):
             SpatialReference(4326, axis_order="other")
-
-    @skipIf(GDAL_VERSION > (3, 0), "GDAL < 3.0 doesn't support authority.")
-    def test_axis_order_non_traditional_invalid(self):
-        msg = "AxisOrder.AUTHORITY is not supported in GDAL < 3.0."
-        with self.assertRaisesMessage(ValueError, msg):
-            SpatialReference(4326, axis_order=AxisOrder.AUTHORITY)
 
     def test_esri(self):
         srs = SpatialReference("NAD83")

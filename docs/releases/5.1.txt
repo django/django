@@ -238,6 +238,9 @@ Tests
      self.client.post("/items/1", query_params={"action": "delete"})
      await self.async_client.post("/items/1", query_params={"action": "delete"})
 
+* The new :meth:`.SimpleTestCase.assertNotInHTML` assertion allows testing that
+  an HTML fragment is not contained in the given HTML haystack.
+
 URLs
 ~~~~
 
@@ -270,6 +273,10 @@ backends.
 -------------------------
 
 * Support for PostGIS 2.5 is removed.
+
+* Support for PROJ < 6 is removed.
+
+* Support for GDAL 2.4 is removed.
 
 Dropped support for MariaDB 10.4
 --------------------------------

@@ -1,7 +1,7 @@
 from ctypes import POINTER, c_char_p, c_double, c_int, c_void_p
 
 from django.contrib.gis.gdal.envelope import OGREnvelope
-from django.contrib.gis.gdal.libgdal import lgdal
+from django.contrib.gis.gdal.libgdal import GDAL_VERSION, lgdal
 from django.contrib.gis.gdal.prototypes.errcheck import check_envelope
 from django.contrib.gis.gdal.prototypes.generation import (
     const_string_output,
@@ -52,9 +52,18 @@ gety = pnt_func(lgdal.OGR_G_GetY)
 getz = pnt_func(lgdal.OGR_G_GetZ)
 
 # Geometry creation routines.
-from_wkb = geom_output(
-    lgdal.OGR_G_CreateFromWkb, [c_char_p, c_void_p, POINTER(c_void_p), c_int], offset=-2
-)
+if GDAL_VERSION >= (3, 3):
+    from_wkb = geom_output(
+        lgdal.OGR_G_CreateFromWkbEx,
+        [c_char_p, c_void_p, POINTER(c_void_p), c_int],
+        offset=-2,
+    )
+else:
+    from_wkb = geom_output(
+        lgdal.OGR_G_CreateFromWkb,
+        [c_char_p, c_void_p, POINTER(c_void_p), c_int],
+        offset=-2,
+    )
 from_wkt = geom_output(
     lgdal.OGR_G_CreateFromWkt,
     [POINTER(c_char_p), c_void_p, POINTER(c_void_p)],
@@ -88,7 +97,10 @@ to_wkt = string_output(
 to_gml = string_output(
     lgdal.OGR_G_ExportToGML, [c_void_p], str_result=True, decoding="ascii"
 )
-get_wkbsize = int_output(lgdal.OGR_G_WkbSize, [c_void_p])
+if GDAL_VERSION >= (3, 3):
+    get_wkbsize = int_output(lgdal.OGR_G_WkbSizeEx, [c_void_p])
+else:
+    get_wkbsize = int_output(lgdal.OGR_G_WkbSize, [c_void_p])
 
 # Geometry spatial-reference related routines.
 assign_srs = void_output(

@@ -188,6 +188,12 @@ Methods
         You may need this if authentication for your application takes place
         against an existing external source such as an LDAP directory.
 
+        .. admonition:: Password reset restriction
+
+            Users having an unusable password will not able to request a
+            password reset email via
+            :class:`~django.contrib.auth.views.PasswordResetView`.
+
     .. method:: has_usable_password()
 
         Returns ``False`` if
