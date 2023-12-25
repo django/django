@@ -362,7 +362,8 @@ class CsrfViewMiddleware(MiddlewareMixin):
 
         # Check non-cookie token for match.
         request_csrf_token = ""
-        if request.method == "POST":
+        # request.method == "POST" fails if you use custom middleware with form field _method to convert request.method to PUT/DELETE... etc
+        if request.method != "GET":
             try:
                 request_csrf_token = request.POST.get("csrfmiddlewaretoken", "")
             except UnreadablePostError:
