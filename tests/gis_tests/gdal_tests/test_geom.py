@@ -58,6 +58,9 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
         self.assertEqual(0, gt.num)
         self.assertEqual("Unknown", gt.name)
 
+    def test_geom_type_repr(self):
+        self.assertEqual(repr(OGRGeomType("point")), "<OGRGeomType: Point>")
+
     def test_geomtype_25d(self):
         "Testing OGRGeomType object with 25D types."
         wkb25bit = OGRGeomType.wkb25bit

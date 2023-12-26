@@ -55,6 +55,9 @@ class OGRGeomType:
         "Return the value of the name property."
         return self.name
 
+    def __repr__(self):
+        return f"<{self.__class__.__qualname__}: {self.name}>"
+
     def __eq__(self, other):
         """
         Do an equivalence test on the OGR type with the given
