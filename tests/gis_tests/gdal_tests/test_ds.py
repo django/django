@@ -316,7 +316,7 @@ class DataSourceTest(SimpleTestCase):
         filter_extent = (-105.609252, 37.255001, -103.609252, 39.255001)
         lyr.spatial_filter = (-105.609252, 37.255001, -103.609252, 39.255001)
         self.assertEqual(OGRGeometry.from_bbox(filter_extent), lyr.spatial_filter)
-        feats = [feat for feat in lyr]
+        feats = list(lyr)
         self.assertEqual(1, len(feats))
         self.assertEqual("Pueblo", feats[0].get("Name"))
 
@@ -328,7 +328,7 @@ class DataSourceTest(SimpleTestCase):
         )
         lyr.spatial_filter = filter_geom
         self.assertEqual(filter_geom, lyr.spatial_filter)
-        feats = [feat for feat in lyr]
+        feats = list(lyr)
         self.assertEqual(1, len(feats))
         self.assertEqual("Houston", feats[0].get("Name"))
 

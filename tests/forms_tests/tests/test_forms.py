@@ -4777,7 +4777,7 @@ Options: <select multiple name="options" aria-invalid="true" required>
             def __init__(self, *args, **kwargs):
                 super().__init__(*args, **kwargs)
                 # Populate fields cache.
-                [field for field in self]
+                list(self)
                 # Removed cached field.
                 del self.fields["name"]
 

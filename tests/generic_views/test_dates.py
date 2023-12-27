@@ -170,7 +170,7 @@ class ArchiveIndexViewTests(TestDataMixin, TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(
             list(res.context["date_list"]),
-            list(reversed(sorted(res.context["date_list"]))),
+            sorted(res.context["date_list"], reverse=True),
         )
 
     def test_archive_view_custom_sorting(self):
@@ -357,7 +357,7 @@ class YearArchiveViewTests(TestDataMixin, TestCase):
         _make_books(10, base_date=datetime.date(2011, 12, 25))
         res = self.client.get("/dates/books/2011/")
         self.assertEqual(
-            list(res.context["date_list"]), list(sorted(res.context["date_list"]))
+            list(res.context["date_list"]), sorted(res.context["date_list"])
         )
 
     @mock.patch("django.views.generic.list.MultipleObjectMixin.get_context_data")
@@ -542,7 +542,7 @@ class MonthArchiveViewTests(TestDataMixin, TestCase):
         _make_books(10, base_date=datetime.date(2011, 12, 25))
         res = self.client.get("/dates/books/2011/dec/")
         self.assertEqual(
-            list(res.context["date_list"]), list(sorted(res.context["date_list"]))
+            list(res.context["date_list"]), sorted(res.context["date_list"])
         )
 
 

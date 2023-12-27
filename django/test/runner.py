@@ -1053,9 +1053,9 @@ class DiscoverRunner:
         self.setup_test_environment()
         suite = self.build_suite(test_labels)
         databases = self.get_databases(suite)
-        suite.serialized_aliases = set(
+        suite.serialized_aliases = {
             alias for alias, serialize in databases.items() if serialize
-        )
+        }
         suite.used_aliases = set(databases)
         with self.time_keeper.timed("Total database setup"):
             old_config = self.setup_databases(

@@ -113,9 +113,7 @@ def get_installed_libraries():
     individual module names, not the full module paths. Example:
     django.templatetags.i18n is stored as i18n.
     """
-    return {
-        module_name: full_name for module_name, full_name in get_template_tag_modules()
-    }
+    return dict(get_template_tag_modules())
 
 
 def get_package_libraries(pkg):

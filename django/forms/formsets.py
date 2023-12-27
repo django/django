@@ -385,7 +385,7 @@ class BaseFormSet(RenderableFormMixin):
         # List comprehension ensures is_valid() is called for all forms.
         # Forms due to be deleted shouldn't cause the formset to be invalid.
         forms_valid = all(
-            [
+            [  # noqa: C419
                 form.is_valid()
                 for form in self.forms
                 if not (self.can_delete and self._should_delete_form(form))
@@ -576,4 +576,4 @@ def formset_factory(
 def all_valid(formsets):
     """Validate every formset and return True if all are valid."""
     # List comprehension ensures is_valid() is called for all formsets.
-    return all([formset.is_valid() for formset in formsets])
+    return all([formset.is_valid() for formset in formsets])  # noqa: C419
