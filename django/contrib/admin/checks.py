@@ -532,7 +532,7 @@ class BaseModelAdminChecks:
                 field=field_name, option=label, obj=obj, id="admin.E019"
             )
         else:
-            if not field.many_to_many:
+            if not field.many_to_many or isinstance(field, models.ManyToManyRel):
                 return must_be(
                     "a many-to-many field", option=label, obj=obj, id="admin.E020"
                 )
