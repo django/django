@@ -51,6 +51,13 @@ class SampleFailingSubtest(SimpleTestCase):
             with self.subTest(index=i):
                 self.assertEqual(i, 1)
 
+    # This method name doesn't begin with "test" to prevent test discovery
+    # from seeing it.
+    def pickle_error_test(self):
+        with self.subTest("TypeError: cannot pickle memoryview object"):
+            self.x = memoryview(b"")
+            self.fail("expected failure")
+
 
 class RemoteTestResultTest(SimpleTestCase):
     def _test_error_exc_info(self):
@@ -105,6 +112,16 @@ class RemoteTestResultTest(SimpleTestCase):
         msg = "__init__() missing 1 required positional argument"
         with self.assertRaisesMessage(TypeError, msg):
             result._confirm_picklable(not_unpicklable_error)
+
+    def test_unpicklable_subtest(self):
+        result = RemoteTestResult()
+        subtest_test = SampleFailingSubtest(methodName="pickle_error_test")
+        subtest_test.run(result=result)
+
+        events = result.events
+        subtest_event = events[1]
+        assertion_error = subtest_event[3]
+        self.assertEqual(str(assertion_error[1]), "expected failure")
 
     @unittest.skipUnless(tblib is not None, "requires tblib to be installed")
     def test_add_failing_subtests(self):
