@@ -12,7 +12,7 @@ Pillow >= 6.2.0
 pylibmc; sys.platform != 'win32'
 pymemcache >= 3.4.0
 # RemovedInDjango41Warning.
-python-memcached >= 1.59
+python-memcached == 1.59
 pytz
 pywatchman; sys.platform != 'win32'
 PyYAML
