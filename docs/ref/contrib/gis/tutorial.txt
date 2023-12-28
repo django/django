@@ -252,7 +252,7 @@ model:
 
 This command should produce the following output:
 
-.. console::
+.. code-block:: sql
 
     BEGIN;
     --
@@ -686,12 +686,13 @@ __ https://spatialreference.org/ref/epsg/32140/
 
     .. code-block:: pycon
 
-        from django.db import connection
-        # or if you're querying a non-default database:
-        from django.db import connections
-        connection = connections['your_gis_db_alias']
-
-        City.objects.raw('SELECT id, name, %s as point from myapp_city' % (connection.ops.select % 'point'))
+        >>> from django.db import connection
+        >>> # or if you're querying a non-default database:
+        >>> from django.db import connections
+        >>> connection = connections["your_gis_db_alias"]
+        >>> City.objects.raw(
+        ...     "SELECT id, name, %s as point from myapp_city" % (connection.ops.select % "point")
+        ... )
 
     You should only use raw queries when you know exactly what you're doing.
 

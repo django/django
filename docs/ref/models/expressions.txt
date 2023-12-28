@@ -755,9 +755,7 @@ should avoid them if possible.
     your SQL with user-provided data.
 
     You also must not quote placeholders in the SQL string. This example is
-    vulnerable to SQL injection because of the quotes around ``%s``:
-
-    .. code-block:: pycon
+    vulnerable to SQL injection because of the quotes around ``%s``::
 
         RawSQL("select col from sometable where othercol = '%s'")  # unsafe!
 
