@@ -136,10 +136,6 @@
     }
 }
 
-.main > #nav-sidebar + .content {
-    max-width: calc(100% - 23px);
-}
-
 #nav-filter {
     width: 100%;
     box-sizing: border-box;

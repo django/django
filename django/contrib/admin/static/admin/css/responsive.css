@@ -151,11 +151,6 @@ input[type="submit"], button {
         margin: 0 10px 0 0;
     }
 
-    #nav-sidebar,
-    #changelist-filter {
-        flex-basis: 200px;
-    }
-
     .change-list .filtered .results,
     .change-list .filtered .paginator,
     .filtered #toolbar,
@@ -473,6 +468,10 @@ input[type="submit"], button {
         padding: 10px 15px;
     }
 
+    #content-start {
+        overflow-x: inherit;
+    }
+
     /* Dashboard */
 
     .colMS, .colSM {
@@ -504,7 +503,7 @@ input[type="submit"], button {
         padding: 10px;
     }
 
-    /* navigation sidebar, toggling buttons */
+    /* navigation sidebar, sidebars toggle buttons */
     #nav-sidebar,
     #toggle-nav-sidebar,
     #toggle-filter-sidebar {

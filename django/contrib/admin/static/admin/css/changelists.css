@@ -1,6 +1,7 @@
 /* CHANGELISTS */
 
 #content-start {
+    /* prevent horizontal scrollbar on small screens with sidebars */
     overflow-x: auto;
 }
 
