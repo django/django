@@ -519,11 +519,10 @@ Use of both ``and`` and ``or`` clauses within the same tag is allowed, with
 
     {% if athlete_list and coach_list or cheerleader_list %}
 
-will be interpreted like:
+will be interpreted like::
 
-.. code-block:: pycon
-
-    if (athlete_list and coach_list) or cheerleader_list
+    if (athlete_list and coach_list) or cheerleader_list:
+        ...
 
 Use of actual parentheses in the :ttag:`if` tag is invalid syntax. If you need
 them to indicate precedence, you should use nested :ttag:`if` tags.
