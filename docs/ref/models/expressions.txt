@@ -578,6 +578,13 @@ On PostgreSQL, the SQL looks like:
     write an equivalent queryset that performs the same task more
     clearly or efficiently.
 
+.. warning::
+
+    Unlike other supported database backends, subqueries performed with the
+    SQLite database backend will succeed when the subquery returns multiple
+    results. This can cause unexpected behavior. See
+    :ref:`limiting-the-subquery-to-a-single-row` for prevention steps.
+
 Referencing columns from the outer queryset
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -614,6 +621,8 @@ all comments for posts published within the last day:
 
 In this case, the subquery must use :meth:`~.QuerySet.values`
 to return only a single column: the primary key of the post.
+
+.. _limiting-the-subquery-to-a-single-row:
 
 Limiting the subquery to a single row
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
