@@ -79,6 +79,7 @@
 
 {% block filters %}
   {% if cl.has_filters %}
+    <button class="sticky toggle-sidebar sidebar-filter" id="toggle-filter-sidebar" aria-label="{% translate 'Toggle filters' %}"></button>
     <nav id="changelist-filter" class="module sticky" aria-labelledby="changelist-filter-header">
       <h2 id="changelist-filter-header">{% translate 'Filter' %}</h2>
       {% if cl.is_facets_optional or cl.has_active_filters %}<div id="changelist-filter-extra-actions">
@@ -92,6 +93,5 @@
       </div>{% endif %}
       {% for spec in cl.filter_specs %}{% admin_list_filter cl spec %}{% endfor %}
     </nav>
-    <button class="sticky toggle-sidebar sidebar-filter" id="toggle-filter-sidebar" aria-label="{% translate 'Toggle filters' %}"></button>
   {% endif %}
 {% endblock %}

@@ -151,6 +151,7 @@ input[type="submit"], button {
         margin: 0 10px 0 0;
     }
 
+    #nav-sidebar,
     #changelist-filter {
         flex-basis: 200px;
     }

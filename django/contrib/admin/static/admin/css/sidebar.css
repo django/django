@@ -27,6 +27,7 @@
 #toggle-filter-sidebar {
     right: 0;
     border-left: 1px solid var(--hairline-color);
+    order: 2;
 }
 
 [dir="rtl"] #toggle-nav-sidebar {
