@@ -8,10 +8,6 @@
   <link rel="stylesheet" href="{% static "admin/css/dark_mode.css" %}">
   <script src="{% static "admin/js/theme.js" %}"></script>
 {% endblock %}
-{% if not is_popup and is_nav_sidebar_enabled %}
-  <link rel="stylesheet" href="{% static "admin/css/sidebar.css" %}">
-  <script src="{% static 'admin/js/nav_sidebar.js' %}" defer></script>
-{% endif %}
 {% block extrastyle %}{% endblock %}
 {% if LANGUAGE_BIDI %}<link rel="stylesheet" href="{% block stylesheet_rtl %}{% static "admin/css/rtl.css" %}{% endblock %}">{% endif %}
 {% block extrahead %}{% endblock %}

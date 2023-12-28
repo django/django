@@ -73,6 +73,7 @@
 
 .main > #changelist-filter {
     display: none;
+    flex: 0 1 270px;
 }
 
 .main > #nav-sidebar {
@@ -137,8 +138,9 @@
 }
 
 @media (max-width: 767px) {
-    #nav-sidebar, #toggle-nav-sidebar {
-        display: none;
+    #nav-sidebar, #toggle-nav-sidebar,
+    #toggle-filter-sidebar, #changelist-filter {
+        display: none !important;
     }
 
     .main > #nav-sidebar + .content,

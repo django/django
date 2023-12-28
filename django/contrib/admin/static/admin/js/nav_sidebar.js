@@ -75,20 +75,22 @@
         }
     }
     window.initSidebarQuickFilter = initSidebarQuickFilter;
-    initSidebarQuickFilter();
 
-    // secondary sidebar (filter)
-    handleSidebarToggle(
-        'toggle-filter-sidebar',
-        'changelist-filter',
-        'django.admin.filterSidebarIsOpen',
-    );
+    window.addEventListener('load', function() {
+        initSidebarQuickFilter();
 
-    // leading sidebar (nav)
-    handleSidebarToggle(
-        'toggle-nav-sidebar',
-        'nav-sidebar',
-        'django.admin.navSidebarIsOpen',
-    );
+        // secondary sidebar (filter)
+        handleSidebarToggle(
+            'toggle-filter-sidebar',
+            'changelist-filter',
+            'django.admin.filterSidebarIsOpen',
+        );
 
+        // leading sidebar (nav)
+        handleSidebarToggle(
+            'toggle-nav-sidebar',
+            'nav-sidebar',
+            'django.admin.navSidebarIsOpen',
+        );
+    })
 }
