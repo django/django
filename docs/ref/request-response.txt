@@ -1090,12 +1090,11 @@ Custom response classes
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 If you find yourself needing a response class that Django doesn't provide, you
-can create it with the help of :py:class:`http.HTTPStatus`. For example:
-
-.. code-block:: pycon
+can create it with the help of :py:class:`http.HTTPStatus`. For example::
 
     from http import HTTPStatus
     from django.http import HttpResponse
+
 
     class HttpResponseNoContent(HttpResponse):
         status_code = HTTPStatus.NO_CONTENT
