@@ -1,9 +1,10 @@
+from http.client import HTTPConnection
 from io import BytesIO
 from socketserver import ThreadingMixIn
 
 from django.core.handlers.wsgi import WSGIRequest
 from django.core.servers.basehttp import WSGIRequestHandler, WSGIServer
-from django.test import SimpleTestCase
+from django.test import LiveServerTestCase, SimpleTestCase, override_settings
 from django.test.client import RequestFactory
 from django.test.utils import captured_stderr
 
@@ -189,3 +190,27 @@ class WSGIServerTestCase(SimpleTestCase):
                         self.assertEqual(cm.records[0].getMessage(), msg)
                 finally:
                     server.server_close()
+
+
+@override_settings(ROOT_URLCONF="servers.urls")
+class LiveServerViews(LiveServerTestCase):
+    available_apps = []
+
+    def test_head_content_length_removed(self):
+        conn = HTTPConnection(
+            LiveServerViews.server_thread.host, LiveServerViews.server_thread.port
+        )
+
+        conn.request("HEAD", "/head_view/?content-length=0")
+        response = conn.getresponse()
+        self.assertIsNone(response.getheader("Content-Length"))
+        conn.close()
+
+    def test_head_content_length_set(self):
+        conn = HTTPConnection(
+            LiveServerViews.server_thread.host, LiveServerViews.server_thread.port
+        )
+        conn.request("HEAD", "/head_view/?content-length=11151978")
+        response = conn.getresponse()
+        self.assertEqual(response.getheader("Content-Length"), "11151978")
+        conn.close()
