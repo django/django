@@ -151,6 +151,10 @@ input[type="submit"], button {
         margin: 0 10px 0 0;
     }
 
+    #changelist-filter {
+        flex-basis: 200px;
+    }
+
     .change-list .filtered .results,
     .change-list .filtered .paginator,
     .filtered #toolbar,
@@ -510,10 +514,6 @@ input[type="submit"], button {
         display: none;
     }
 
-    #nav-sidebar + .content {
-        max-width: 100%;
-    }
-
     #changelist .actions label {
         flex: 1 1;
     }
@@ -530,7 +530,7 @@ input[type="submit"], button {
     #changelist-filter {
         display: block;
         margin-left: 0;
-        flex: 1 1 auto;
+        flex: 1 1 200px;
     }
 
     .object-tools {
