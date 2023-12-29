@@ -1267,12 +1267,12 @@ class ExpressionList(Func):
 
     def get_group_by_cols(self):
         group_by_cols = []
-        for partition in self.get_source_expressions():
-            group_by_cols.extend(partition.get_group_by_cols())
+        for expr in self.get_source_expressions():
+            group_by_cols.extend(expr.get_group_by_cols())
         return group_by_cols
 
 
-class OrderByList(Func):
+class OrderByList(ExpressionList):
     allowed_default = False
     template = "ORDER BY %(expressions)s"
 
@@ -1286,17 +1286,6 @@ class OrderByList(Func):
             for expr in expressions
         )
         super().__init__(*expressions, **extra)
-
-    def as_sql(self, *args, **kwargs):
-        if not self.source_expressions:
-            return "", ()
-        return super().as_sql(*args, **kwargs)
-
-    def get_group_by_cols(self):
-        group_by_cols = []
-        for order_by in self.get_source_expressions():
-            group_by_cols.extend(order_by.get_group_by_cols())
-        return group_by_cols
 
 
 @deconstructible(path="django.db.models.ExpressionWrapper")
