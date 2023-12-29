@@ -401,7 +401,7 @@ template, the link was partially hardcoded like this:
 
 The problem with this hardcoded, tightly-coupled approach is that it becomes
 challenging to change URLs on projects with a lot of templates. However, since
-you defined the name argument in the :func:`~django.urls.path` functions in
+you defined the ``name`` argument in the :func:`~django.urls.path` functions in
 the ``polls.urls`` module, you can remove a reliance on specific URL paths
 defined in your url configurations by using the ``{% url %}`` template tag:
 
