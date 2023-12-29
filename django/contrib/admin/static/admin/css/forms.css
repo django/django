@@ -24,6 +24,7 @@ form .form-row p {
 
 .flex-container {
     display: flex;
+    align-items: center;
 }
 
 .form-multiline {
