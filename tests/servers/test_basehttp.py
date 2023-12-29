@@ -1,4 +1,3 @@
-from http.client import HTTPConnection
 from io import BytesIO
 from socketserver import ThreadingMixIn
 

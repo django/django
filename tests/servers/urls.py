@@ -11,6 +11,5 @@ urlpatterns = [
     path("subview_calling_view/", views.subview_calling_view),
     path("subview/", views.subview),
     path("check_model_instance_from_subview/", views.check_model_instance_from_subview),
-    path("head_view/", views.head_view),
     path("method_view/", views.method_view),
 ]
