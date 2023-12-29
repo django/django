@@ -163,11 +163,9 @@ class ChangepasswordManagementCommandTestCase(TestCase):
 
     def setUp(self):
         self.stdout = StringIO()
+        self.addCleanup(self.stdout.close)
         self.stderr = StringIO()
-
-    def tearDown(self):
-        self.stdout.close()
-        self.stderr.close()
+        self.addCleanup(self.stderr.close)
 
     @mock.patch.object(getpass, "getpass", return_value="password")
     def test_get_pass(self, mock_get_pass):

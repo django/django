@@ -12,9 +12,7 @@ class LocalizedTimeTests(SimpleTestCase):
         # nl/formats.py has customized TIME_INPUT_FORMATS:
         # ['%H:%M:%S', '%H.%M:%S', '%H.%M', '%H:%M']
         activate("nl")
-
-    def tearDown(self):
-        deactivate()
+        self.addCleanup(deactivate)
 
     def test_timeField(self):
         "TimeFields can parse dates in the default format"
@@ -323,9 +321,7 @@ class SimpleTimeFormatTests(SimpleTestCase):
 class LocalizedDateTests(SimpleTestCase):
     def setUp(self):
         activate("de")
-
-    def tearDown(self):
-        deactivate()
+        self.addCleanup(deactivate)
 
     def test_dateField(self):
         "DateFields can parse dates in the default format"
@@ -637,9 +633,7 @@ class SimpleDateFormatTests(SimpleTestCase):
 class LocalizedDateTimeTests(SimpleTestCase):
     def setUp(self):
         activate("de")
-
-    def tearDown(self):
-        deactivate()
+        self.addCleanup(deactivate)
 
     def test_dateTimeField(self):
         "DateTimeFields can parse dates in the default format"

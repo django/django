@@ -27,9 +27,7 @@ class SitesFrameworkTests(TestCase):
 
     def setUp(self):
         Site.objects.clear_cache()
-
-    def tearDown(self):
-        Site.objects.clear_cache()
+        self.addCleanup(Site.objects.clear_cache)
 
     def test_site_manager(self):
         # Make sure that get_current() does not return a deleted Site object.

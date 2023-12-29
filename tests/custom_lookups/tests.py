@@ -460,9 +460,7 @@ class YearLteTests(TestCase):
 
     def setUp(self):
         models.DateField.register_lookup(YearTransform)
-
-    def tearDown(self):
-        models.DateField._unregister_lookup(YearTransform)
+        self.addCleanup(models.DateField._unregister_lookup, YearTransform)
 
     @unittest.skipUnless(
         connection.vendor == "postgresql", "PostgreSQL specific SQL used"

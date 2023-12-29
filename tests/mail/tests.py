@@ -1173,11 +1173,9 @@ class BaseEmailBackendTests(HeadersCheckMixin):
     email_backend = None
 
     def setUp(self):
-        self.settings_override = override_settings(EMAIL_BACKEND=self.email_backend)
-        self.settings_override.enable()
-
-    def tearDown(self):
-        self.settings_override.disable()
+        settings_override = override_settings(EMAIL_BACKEND=self.email_backend)
+        settings_override.enable()
+        self.addCleanup(settings_override.disable)
 
     def assertStartsWith(self, first, second):
         if not first.startswith(second):
@@ -1575,12 +1573,9 @@ class FileBackendTests(BaseEmailBackendTests, SimpleTestCase):
         super().setUp()
         self.tmp_dir = self.mkdtemp()
         self.addCleanup(shutil.rmtree, self.tmp_dir)
-        self._settings_override = override_settings(EMAIL_FILE_PATH=self.tmp_dir)
-        self._settings_override.enable()
-
-    def tearDown(self):
-        self._settings_override.disable()
-        super().tearDown()
+        _settings_override = override_settings(EMAIL_FILE_PATH=self.tmp_dir)
+        _settings_override.enable()
+        self.addCleanup(_settings_override.disable)
 
     def mkdtemp(self):
         return tempfile.mkdtemp()
@@ -1754,10 +1749,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
     def setUp(self):
         super().setUp()
         self.smtp_handler.flush_mailbox()
-
-    def tearDown(self):
-        self.smtp_handler.flush_mailbox()
-        super().tearDown()
+        self.addCleanup(self.smtp_handler.flush_mailbox)
 
     def flush_mailbox(self):
         self.smtp_handler.flush_mailbox()

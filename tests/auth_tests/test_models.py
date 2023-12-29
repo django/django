@@ -519,9 +519,7 @@ class TestCreateSuperUserSignals(TestCase):
     def setUp(self):
         self.signals_count = 0
         post_save.connect(self.post_save_listener, sender=User)
-
-    def tearDown(self):
-        post_save.disconnect(self.post_save_listener, sender=User)
+        self.addCleanup(post_save.disconnect, self.post_save_listener, sender=User)
 
     def test_create_user(self):
         User.objects.create_user("JohnDoe")
