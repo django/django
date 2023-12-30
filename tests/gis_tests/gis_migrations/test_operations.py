@@ -92,6 +92,20 @@ class OperationTestCase(TransactionTestCase):
         else:
             self.assertIn([column], [c["columns"] for c in constraints.values()])
 
+    def assertSpatialIndexNotExists(self, table, column, raster=False):
+        with connection.cursor() as cursor:
+            constraints = connection.introspection.get_constraints(cursor, table)
+        if raster:
+            self.assertFalse(
+                any(
+                    "st_convexhull(%s)" % column in c["definition"]
+                    for c in constraints.values()
+                    if c["definition"] is not None
+                )
+            )
+        else:
+            self.assertNotIn([column], [c["columns"] for c in constraints.values()])
+
     def alter_gis_model(
         self,
         migration_class,
@@ -213,6 +227,98 @@ class OperationTests(OperationTestCase):
 
         if connection.features.supports_raster:
             self.assertSpatialIndexExists("gis_neighborhood", "rast", raster=True)
+
+    @skipUnlessDBFeature("can_alter_geometry_field")
+    def test_alter_field_remove_spatial_index(self):
+        """
+        Test that indexes are removed when `spatial_index` is changed to False
+        """
+        if not self.has_spatial_indexes:
+            self.skipTest("No support for Spatial indexes")
+
+        self.alter_gis_model(
+            migrations.AlterField,
+            "Neighborhood",
+            "geom",
+            False,
+            fields.MultiPolygonField,
+            field_class_kwargs={"srid": 4326, "spatial_index": False},
+        )
+        self.assertSpatialIndexNotExists("gis_neighborhood", "geom")
+
+    @skipUnlessDBFeature("can_alter_geometry_field")
+    def test_alter_field_add_spatial_index(self):
+        """
+        Test that indexes are added when `spatial_index` is changed to True
+        """
+        if not self.has_spatial_indexes:
+            self.skipTest("No support for Spatial indexes")
+
+        self.alter_gis_model(
+            migrations.AddField,
+            "Neighborhood",
+            "point",
+            False,
+            fields.PointField,
+            field_class_kwargs={"srid": 4326, "spatial_index": False},
+        )
+        self.assertSpatialIndexNotExists("gis_neighborhood", "point")
+
+        self.alter_gis_model(
+            migrations.AlterField,
+            "Neighborhood",
+            "point",
+            False,
+            fields.PointField,
+            field_class_kwargs={"srid": 4326, "spatial_index": True},
+        )
+        self.assertSpatialIndexExists("gis_neighborhood", "point")
+
+    @skipUnlessDBFeature("supports_raster", "can_alter_geometry_field")
+    def test_alter_raster_field_remove_spatial_index(self):
+        """
+        Test that raster indexes are removed when `spatial_index` is changed to False
+        """
+        if not self.has_spatial_indexes:
+            self.skipTest("No support for Spatial indexes")
+
+        self.alter_gis_model(
+            migrations.AlterField,
+            "Neighborhood",
+            "rast",
+            False,
+            fields.RasterField,
+            field_class_kwargs={"srid": 4326, "null": True, "spatial_index": False},
+        )
+        self.assertSpatialIndexNotExists("gis_neighborhood", "rast", raster=True)
+
+    @skipUnlessDBFeature("supports_raster", "can_alter_geometry_field")
+    def test_alter_raster_field_add_spatial_index(self):
+        """
+        Test that raster indexes are added when `spatial_index` is changed to True
+        """
+        if not self.has_spatial_indexes:
+            self.skipTest("No support for Spatial indexes")
+
+        self.alter_gis_model(
+            migrations.AddField,
+            "Neighborhood",
+            "heatmap",
+            False,
+            fields.RasterField,
+            field_class_kwargs={"srid": 4326, "null": True, "spatial_index": False},
+        )
+        self.assertSpatialIndexNotExists("gis_neighborhood", "heatmap", raster=True)
+
+        self.alter_gis_model(
+            migrations.AlterField,
+            "Neighborhood",
+            "heatmap",
+            False,
+            fields.RasterField,
+            field_class_kwargs={"srid": 4326, "null": True, "spatial_index": True},
+        )
+        self.assertSpatialIndexExists("gis_neighborhood", "heatmap", raster=True)
 
     @skipUnlessDBFeature("supports_3d_storage")
     def test_add_3d_field_opclass(self):

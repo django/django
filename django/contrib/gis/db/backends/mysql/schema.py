@@ -31,18 +31,9 @@ class MySQLGISSchemaEditor(DatabaseSchemaEditor):
 
     def column_sql(self, model, field, include_default=False):
         column_sql = super().column_sql(model, field, include_default)
-        # MySQL doesn't support spatial indexes on NULL columns
-        if isinstance(field, GeometryField) and field.spatial_index and not field.null:
-            qn = self.connection.ops.quote_name
-            db_table = model._meta.db_table
-            self.geometry_sql.append(
-                self.sql_add_spatial_index
-                % {
-                    "index": qn(self._create_spatial_index_name(model, field)),
-                    "table": qn(db_table),
-                    "column": qn(field.column),
-                }
-            )
+        if self._should_have_spatial_index(field):
+            self._queue_create_spatial_index(model, field)
+
         return column_sql
 
     def create_model(self, model):
@@ -54,19 +45,42 @@ class MySQLGISSchemaEditor(DatabaseSchemaEditor):
         self.create_spatial_indexes()
 
     def remove_field(self, model, field):
-        if isinstance(field, GeometryField) and field.spatial_index:
-            index_name = self._create_spatial_index_name(model, field)
-            sql = self._delete_index_sql(model, index_name)
-            try:
-                self.execute(sql)
-            except OperationalError:
-                logger.error(
-                    "Couldn't remove spatial index: %s (may be expected "
-                    "if your storage engine doesn't support them).",
-                    sql,
-                )
+        if self._should_have_spatial_index(field):
+            self._drop_spatial_index(model, field)
 
         super().remove_field(model, field)
+
+    def _alter_field(
+        self,
+        model,
+        old_field,
+        new_field,
+        old_type,
+        new_type,
+        old_db_params,
+        new_db_params,
+        strict=False,
+    ):
+        super()._alter_field(
+            model,
+            old_field,
+            new_field,
+            old_type,
+            new_type,
+            old_db_params,
+            new_db_params,
+            strict=strict,
+        )
+
+        # Create/drop spatial indexes - superclasses only handle db_index and unique
+        old_field_index = self._should_have_spatial_index(old_field)
+        new_field_index = self._should_have_spatial_index(new_field)
+
+        if not old_field_index and new_field_index:
+            self._queue_create_spatial_index(model, new_field)
+            self.create_spatial_indexes()
+        elif old_field_index and not new_field_index:
+            self._drop_spatial_index(model, old_field)
 
     def _create_spatial_index_name(self, model, field):
         return "%s_%s_id" % (model._meta.db_table, field.column)
@@ -81,3 +95,36 @@ class MySQLGISSchemaEditor(DatabaseSchemaEditor):
                     f"support them.",
                 )
         self.geometry_sql = []
+
+    def _should_have_spatial_index(self, field):
+        # MySQL doesn't support spatial indexes on NULL columns
+        return (
+            isinstance(field, GeometryField) and field.spatial_index and not field.null
+        )
+
+    def _queue_create_spatial_index(self, model, field):
+        """Queues SQL to drop a field's index for create_spatial_indexes()."""
+        qn = self.connection.ops.quote_name
+        db_table = model._meta.db_table
+        self.geometry_sql.append(
+            self.sql_add_spatial_index
+            % {
+                "index": qn(self._create_spatial_index_name(model, field)),
+                "table": qn(db_table),
+                "column": qn(field.column),
+            }
+        )
+
+    def _drop_spatial_index(self, model, field):
+        """Executes SQL to drop the spatial index on the given field."""
+        index_name = self._create_spatial_index_name(model, field)
+        sql = self._delete_index_sql(model, index_name)
+
+        try:
+            self.execute(sql)
+        except OperationalError:
+            logger.error(
+                "Couldn't remove spatial index: %s (may be expected "
+                "if your storage engine doesn't support them).",
+                sql,
+            )

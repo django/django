@@ -22,6 +22,38 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
             return True
         return super()._field_should_be_indexed(model, field)
 
+    def _alter_field(
+        self,
+        model,
+        old_field,
+        new_field,
+        old_type,
+        new_type,
+        old_db_params,
+        new_db_params,
+        strict=False,
+    ):
+        super()._alter_field(
+            model,
+            old_field,
+            new_field,
+            old_type,
+            new_type,
+            old_db_params,
+            new_db_params,
+            strict=strict,
+        )
+
+        # Create/drop spatial indexes - superclasses only handle db_index and unique
+        old_field_index = getattr(old_field, "spatial_index", False)
+        new_field_index = getattr(new_field, "spatial_index", False)
+
+        if not old_field_index and new_field_index:
+            self.execute(self._create_index_sql(model, fields=[new_field]))
+        elif old_field_index and not new_field_index:
+            index_to_remove = self._create_spatial_index_name(model, old_field)
+            self.execute(self._delete_index_sql(model, index_to_remove))
+
     def _create_index_sql(self, model, *, fields=None, **kwargs):
         if fields is None or len(fields) != 1 or not hasattr(fields[0], "geodetic"):
             return super()._create_index_sql(model, fields=fields, **kwargs)
@@ -39,7 +71,7 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
             opclasses = [self.geom_index_ops_nd]
         name = kwargs.get("name")
         if not name:
-            name = self._create_index_name(model._meta.db_table, [field.column], "_id")
+            name = self._create_spatial_index_name(model, field)
 
         return super()._create_index_sql(
             model,
@@ -49,6 +81,9 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
             opclasses=opclasses,
             expressions=expressions,
         )
+
+    def _create_spatial_index_name(self, model, field):
+        return self._create_index_name(model._meta.db_table, [field.column], "_id")
 
     def _alter_column_type_sql(
         self, table, old_field, new_field, new_type, old_collation, new_collation

@@ -43,11 +43,10 @@ class OracleGISSchemaEditor(DatabaseSchemaEditor):
     def column_sql(self, model, field, include_default=False):
         column_sql = super().column_sql(model, field, include_default)
         if isinstance(field, GeometryField):
-            db_table = model._meta.db_table
             self.geometry_sql.append(
                 self.sql_add_geometry_metadata
                 % {
-                    "table": self.geo_quote_name(db_table),
+                    "table": self.geo_quote_name(model._meta.db_table),
                     "column": self.geo_quote_name(field.column),
                     "dim0": field._extent[0],
                     "dim1": field._extent[1],
@@ -58,16 +57,8 @@ class OracleGISSchemaEditor(DatabaseSchemaEditor):
                 }
             )
             if field.spatial_index:
-                self.geometry_sql.append(
-                    self.sql_add_spatial_index
-                    % {
-                        "index": self.quote_name(
-                            self._create_spatial_index_name(model, field)
-                        ),
-                        "table": self.quote_name(db_table),
-                        "column": self.quote_name(field.column),
-                    }
-                )
+                self._queue_create_spatial_index(model, field)
+
         return column_sql
 
     def create_model(self, model):
@@ -97,9 +88,45 @@ class OracleGISSchemaEditor(DatabaseSchemaEditor):
                 }
             )
             if field.spatial_index:
-                index_name = self._create_spatial_index_name(model, field)
-                self.execute(self._delete_index_sql(model, index_name))
+                self._drop_spatial_index(model, field)
+
         super().remove_field(model, field)
+
+    def _alter_field(
+        self,
+        model,
+        old_field,
+        new_field,
+        old_type,
+        new_type,
+        old_db_params,
+        new_db_params,
+        strict=False,
+    ):
+        super()._alter_field(
+            model,
+            old_field,
+            new_field,
+            old_type,
+            new_type,
+            old_db_params,
+            new_db_params,
+            strict=strict,
+        )
+
+        # Create/drop spatial indexes - superclasses only handle db_index and unique
+        old_field_index = (
+            isinstance(old_field, GeometryField) and old_field.spatial_index
+        )
+        new_field_index = (
+            isinstance(new_field, GeometryField) and new_field.spatial_index
+        )
+
+        if not old_field_index and new_field_index:
+            self._queue_create_spatial_index(model, new_field)
+            self.run_geometry_sql()
+        elif old_field_index and not new_field_index:
+            self._drop_spatial_index(model, old_field)
 
     def run_geometry_sql(self):
         for sql in self.geometry_sql:
@@ -112,3 +139,19 @@ class OracleGISSchemaEditor(DatabaseSchemaEditor):
         return truncate_name(
             "%s_%s_id" % (strip_quotes(model._meta.db_table), field.column), 30
         )
+
+    def _queue_create_spatial_index(self, model, field):
+        """Queues SQL to drop a field's index for execution by run_geometry_sql()."""
+        self.geometry_sql.append(
+            self.sql_add_spatial_index
+            % {
+                "index": self.quote_name(self._create_spatial_index_name(model, field)),
+                "table": self.quote_name(model._meta.db_table),
+                "column": self.quote_name(field.column),
+            }
+        )
+
+    def _drop_spatial_index(self, model, field):
+        """Executes SQL to drop the spatial index on the given field."""
+        index_name = self._create_spatial_index_name(model, field)
+        self.execute(self._delete_index_sql(model, index_name))
