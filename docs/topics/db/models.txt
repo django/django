@@ -157,9 +157,12 @@ ones:
     <Field.blank>`, the field will be required.
 
 :attr:`~Field.choices`
-    A :term:`sequence` of 2-tuples to use as choices for this field. If this
-    is given, the default form widget will be a select box instead of the
-    standard text field and will limit choices to the choices given.
+    A :term:`sequence` of 2-value tuples, a :term:`mapping`, an
+    :ref:`enumeration type <field-choices-enum-types>`, or a callable (that
+    expects no arguments and returns any of the previous formats), to use as
+    choices for this field. If this is given, the default form widget will be a
+    select box instead of the standard text field and will limit choices to the
+    choices given.
 
     A choices list looks like this::
 
@@ -215,6 +218,10 @@ ones:
 
     Further examples are available in the :ref:`model field reference
     <field-choices>`.
+
+    .. versionchanged:: 5.0
+
+        Support for mappings and callables was added.
 
 :attr:`~Field.default`
     The default value for the field. This can be a value or a callable
