@@ -68,6 +68,9 @@ details on these changes.
 
 * The ``django.contrib.gis.geoip2.GeoIP2.open()`` method will be removed.
 
+* Support for passing positional arguments to ``Model.save()`` and
+  ``Model.asave()`` will be removed.
+
 .. _deprecation-removed-in-5.1:
 
 5.1
