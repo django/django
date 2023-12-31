@@ -51,11 +51,9 @@ class DeleteLockingTest(TransactionTestCase):
         # Create a second connection to the default database
         self.conn2 = connection.copy()
         self.conn2.set_autocommit(False)
-
-    def tearDown(self):
         # Close down the second connection.
-        self.conn2.rollback()
-        self.conn2.close()
+        self.addCleanup(self.conn2.close)
+        self.addCleanup(self.conn2.rollback)
 
     def test_concurrent_delete(self):
         """Concurrent deletes don't collide and lock the database (#9479)."""

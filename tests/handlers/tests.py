@@ -16,9 +16,7 @@ class HandlerTests(SimpleTestCase):
 
     def setUp(self):
         request_started.disconnect(close_old_connections)
-
-    def tearDown(self):
-        request_started.connect(close_old_connections)
+        self.addCleanup(request_started.connect, close_old_connections)
 
     def test_middleware_initialized(self):
         handler = WSGIHandler()
@@ -150,11 +148,9 @@ class SignalsTests(SimpleTestCase):
         self.signals = []
         self.signaled_environ = None
         request_started.connect(self.register_started)
+        self.addCleanup(request_started.disconnect, self.register_started)
         request_finished.connect(self.register_finished)
-
-    def tearDown(self):
-        request_started.disconnect(self.register_started)
-        request_finished.disconnect(self.register_finished)
+        self.addCleanup(request_finished.disconnect, self.register_finished)
 
     def register_started(self, **kwargs):
         self.signals.append("started")

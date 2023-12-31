@@ -49,12 +49,10 @@ class SessionTestsMixin:
 
     def setUp(self):
         self.session = self.backend()
-
-    def tearDown(self):
         # NB: be careful to delete any sessions created; stale sessions fill up
         # the /tmp (with some backends) and eventually overwhelm it after lots
         # of runs (think buildbots)
-        self.session.delete()
+        self.addCleanup(self.session.delete)
 
     def test_new_session(self):
         self.assertIs(self.session.modified, False)
@@ -532,6 +530,7 @@ class FileSessionTests(SessionTestsMixin, SimpleTestCase):
         # Do file session tests in an isolated directory, and kill it after we're done.
         self.original_session_file_path = settings.SESSION_FILE_PATH
         self.temp_session_store = settings.SESSION_FILE_PATH = self.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.temp_session_store)
         # Reset the file session backend's internal caches
         if hasattr(self.backend, "_storage_path"):
             del self.backend._storage_path
@@ -540,7 +539,6 @@ class FileSessionTests(SessionTestsMixin, SimpleTestCase):
     def tearDown(self):
         super().tearDown()
         settings.SESSION_FILE_PATH = self.original_session_file_path
-        shutil.rmtree(self.temp_session_store)
 
     def mkdtemp(self):
         return tempfile.mkdtemp()

@@ -10,11 +10,9 @@ from django.utils.timezone import get_default_timezone, get_fixed_timezone, make
 @override_settings(TIME_ZONE="Europe/Copenhagen")
 class DateFormatTests(SimpleTestCase):
     def setUp(self):
-        self._orig_lang = translation.get_language()
+        _orig_lang = translation.get_language()
         translation.activate("en-us")
-
-    def tearDown(self):
-        translation.activate(self._orig_lang)
+        self.addCleanup(translation.activate, _orig_lang)
 
     def test_date(self):
         d = date(2009, 5, 16)

@@ -762,9 +762,7 @@ class FileCloseTests(SimpleTestCase):
         # Disable the request_finished signal during this test
         # to avoid interfering with the database connection.
         request_finished.disconnect(close_old_connections)
-
-    def tearDown(self):
-        request_finished.connect(close_old_connections)
+        self.addCleanup(request_finished.connect, close_old_connections)
 
     def test_response(self):
         filename = os.path.join(os.path.dirname(__file__), "abc.txt")

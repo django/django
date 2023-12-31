@@ -1155,11 +1155,7 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         # The super calls needs to happen first for the settings override.
         super().setUp()
         self.create_table()
-
-    def tearDown(self):
-        # The super call needs to happen first because it uses the database.
-        super().tearDown()
-        self.drop_table()
+        self.addCleanup(self.drop_table)
 
     def create_table(self):
         management.call_command("createcachetable", verbosity=0)
@@ -2509,12 +2505,9 @@ class CacheMiddlewareTest(SimpleTestCase):
 
     def setUp(self):
         self.default_cache = caches["default"]
+        self.addCleanup(self.default_cache.clear)
         self.other_cache = caches["other"]
-
-    def tearDown(self):
-        self.default_cache.clear()
-        self.other_cache.clear()
-        super().tearDown()
+        self.addCleanup(self.other_cache.clear)
 
     def test_constructor(self):
         """

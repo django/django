@@ -315,13 +315,11 @@ class TestCommonRoots(SimpleTestCase):
 
 class TestSysPathDirectories(SimpleTestCase):
     def setUp(self):
-        self._directory = tempfile.TemporaryDirectory()
-        self.directory = Path(self._directory.name).resolve(strict=True).absolute()
+        _directory = tempfile.TemporaryDirectory()
+        self.addCleanup(_directory.cleanup)
+        self.directory = Path(_directory.name).resolve(strict=True).absolute()
         self.file = self.directory / "test"
         self.file.touch()
-
-    def tearDown(self):
-        self._directory.cleanup()
 
     def test_sys_paths_with_directories(self):
         with extend_sys_path(str(self.file)):
@@ -542,15 +540,13 @@ class ReloaderTests(SimpleTestCase):
     RELOADER_CLS = None
 
     def setUp(self):
-        self._tempdir = tempfile.TemporaryDirectory()
-        self.tempdir = Path(self._tempdir.name).resolve(strict=True).absolute()
+        _tempdir = tempfile.TemporaryDirectory()
+        self.tempdir = Path(_tempdir.name).resolve(strict=True).absolute()
         self.existing_file = self.ensure_file(self.tempdir / "test.py")
         self.nonexistent_file = (self.tempdir / "does_not_exist.py").absolute()
         self.reloader = self.RELOADER_CLS()
-
-    def tearDown(self):
-        self._tempdir.cleanup()
-        self.reloader.stop()
+        self.addCleanup(self.reloader.stop)
+        self.addCleanup(_tempdir.cleanup)
 
     def ensure_file(self, path):
         path.parent.mkdir(exist_ok=True, parents=True)

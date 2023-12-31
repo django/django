@@ -12,9 +12,7 @@ from .models import Author, ConcreteModel, FooWithUrl, ProxyModel
 class ContentTypesTests(TestCase):
     def setUp(self):
         ContentType.objects.clear_cache()
-
-    def tearDown(self):
-        ContentType.objects.clear_cache()
+        self.addCleanup(ContentType.objects.clear_cache)
 
     def test_lookup_cache(self):
         """
