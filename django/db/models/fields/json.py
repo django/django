@@ -1,4 +1,5 @@
 import json
+from collections.abc import Callable, Iterable
 
 from django import forms
 from django.core import checks, exceptions
@@ -11,6 +12,7 @@ from django.db.models.lookups import (
     PostgresOperatorLookup,
     Transform,
 )
+from django.utils.functional import Promise
 from django.utils.translation import gettext_lazy as _
 
 from . import Field
@@ -95,6 +97,21 @@ class JSONField(CheckFieldDefaultMixin, Field):
 
     def get_internal_type(self):
         return "JSONField"
+
+    def get_prep_value(self, value):
+        match value:
+            case str() | Promise():
+                pass
+            case dict():
+                value = {
+                    self.get_prep_value(k): self.get_prep_value(v)
+                    for k, v in value.items()
+                }
+            case Iterable():
+                if isinstance(value.__class__, Callable):
+                    value = value.__class__(self.get_prep_value(v) for v in value)
+
+        return super().get_prep_value(value)
 
     def get_db_prep_value(self, value, connection, prepared=False):
         if not prepared:

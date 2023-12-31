@@ -17,6 +17,7 @@ from django.db.models import (
     ImageField,
     IntegerField,
     IPAddressField,
+    JSONField,
     PositiveBigIntegerField,
     PositiveIntegerField,
     PositiveSmallIntegerField,
@@ -27,7 +28,8 @@ from django.db.models import (
     URLField,
 )
 from django.test import SimpleTestCase
-from django.utils.functional import lazy
+from django.utils.functional import Promise, lazy
+from django.utils.translation import gettext_lazy
 
 
 class PromiseTest(SimpleTestCase):
@@ -98,6 +100,31 @@ class PromiseTest(SimpleTestCase):
         self.assertIsInstance(IPAddressField().get_prep_value(lazy_func()), str)
         lazy_func = lazy(lambda: 0, int)
         self.assertIsInstance(IPAddressField().get_prep_value(lazy_func()), str)
+
+    def test_JSONField(self):
+        top_key = gettext_lazy("Salutation")
+        data = {
+            top_key: {
+                "en": {
+                    gettext_lazy("Formal"): [gettext_lazy("Dear")],
+                    gettext_lazy("Informal"): {
+                        gettext_lazy("Hello"),
+                        gettext_lazy("Hi"),
+                    },
+                },
+            },
+        }
+        prepared = JSONField().get_prep_value(data)
+        for top_key, top_val in prepared.items():
+            self.assertNotIsInstance(top_key, Promise)
+            self.assertNotIsInstance(top_val, Promise)
+            for language_obj in top_val.values():
+                self.assertNotIsInstance(language_obj, Promise)
+                for inner_key, inner_val in language_obj.items():
+                    self.assertNotIsInstance(inner_key, Promise)
+                    self.assertNotIsInstance(inner_val, Promise)
+                    for salutation_value in inner_val:
+                        self.assertNotIsInstance(salutation_value, Promise)
 
     def test_GenericIPAddressField(self):
         lazy_func = lazy(lambda: "127.0.0.1", str)

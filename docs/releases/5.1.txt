@@ -192,6 +192,9 @@ Models
   :class:`~django.contrib.postgres.fields.ArrayField` can now be :ref:`sliced
   <slicing-using-f>`.
 
+* ``JSONField`` now resolves nested lazy objects such as those created by
+  :func:`~django.utils.translation.gettext_lazy`.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
