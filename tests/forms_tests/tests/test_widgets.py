@@ -7,7 +7,6 @@ from ..models import Article
 
 @override_settings(ROOT_URLCONF="forms_tests.urls")
 class LiveWidgetTests(AdminSeleniumTestCase):
-
     available_apps = ["forms_tests"] + AdminSeleniumTestCase.available_apps
 
     def test_textarea_trailing_newlines(self):

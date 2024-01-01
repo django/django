@@ -14,12 +14,7 @@ from django.test import (
 from django.test.utils import override_settings
 from django.utils import timezone
 
-from .models import (
-    Article,
-    ArticleTranslation,
-    IndexedArticle2,
-    IndexTogetherSingleList,
-)
+from .models import Article, ArticleTranslation, IndexedArticle2
 
 
 class SchemaIndexesTests(TestCase):
@@ -65,26 +60,15 @@ class SchemaIndexesTests(TestCase):
             )
         self.assertEqual(index_name, expected[connection.vendor])
 
-    def test_index_together(self):
+    def test_quoted_index_name(self):
         editor = connection.schema_editor()
         index_sql = [str(statement) for statement in editor._model_indexes_sql(Article)]
         self.assertEqual(len(index_sql), 1)
-        # Ensure the index name is properly quoted
+        # Ensure the index name is properly quoted.
         self.assertIn(
-            connection.ops.quote_name(
-                editor._create_index_name(
-                    Article._meta.db_table, ["headline", "pub_date"], suffix="_idx"
-                )
-            ),
+            connection.ops.quote_name(Article._meta.indexes[0].name),
             index_sql[0],
         )
-
-    def test_index_together_single_list(self):
-        # Test for using index_together with a single list (#22172)
-        index_sql = connection.schema_editor()._model_indexes_sql(
-            IndexTogetherSingleList
-        )
-        self.assertEqual(len(index_sql), 1)
 
     def test_columns_list_sql(self):
         index = Index(fields=["headline"], name="whitespace_idx")

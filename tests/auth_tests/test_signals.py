@@ -30,14 +30,13 @@ class SignalTestCase(TestCase):
         self.logged_out = []
         self.login_failed = []
         signals.user_logged_in.connect(self.listener_login)
+        self.addCleanup(signals.user_logged_in.disconnect, self.listener_login)
         signals.user_logged_out.connect(self.listener_logout)
+        self.addCleanup(signals.user_logged_out.disconnect, self.listener_logout)
         signals.user_login_failed.connect(self.listener_login_failed)
-
-    def tearDown(self):
-        """Disconnect the listeners"""
-        signals.user_logged_in.disconnect(self.listener_login)
-        signals.user_logged_out.disconnect(self.listener_logout)
-        signals.user_login_failed.disconnect(self.listener_login_failed)
+        self.addCleanup(
+            signals.user_login_failed.disconnect, self.listener_login_failed
+        )
 
     def test_login(self):
         # Only a successful login will trigger the success signal.

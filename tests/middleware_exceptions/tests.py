@@ -172,7 +172,6 @@ class MyMiddlewareWithExceptionMessage:
     MIDDLEWARE=["django.middleware.common.CommonMiddleware"],
 )
 class MiddlewareNotUsedTests(SimpleTestCase):
-
     rf = RequestFactory()
 
     def test_raise_exception(self):

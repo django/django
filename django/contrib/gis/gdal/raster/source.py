@@ -12,6 +12,7 @@ from ctypes import (
     c_void_p,
     string_at,
 )
+from pathlib import Path
 
 from django.contrib.gis.gdal.driver import Driver
 from django.contrib.gis.gdal.error import GDALException
@@ -83,7 +84,8 @@ class GDALRaster(GDALRasterBase):
             ds_input = json.loads(ds_input)
 
         # If input is a valid file path, try setting file as source.
-        if isinstance(ds_input, str):
+        if isinstance(ds_input, (str, Path)):
+            ds_input = str(ds_input)
             if not ds_input.startswith(VSI_FILESYSTEM_PREFIX) and not os.path.exists(
                 ds_input
             ):

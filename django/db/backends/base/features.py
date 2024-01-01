@@ -8,10 +8,13 @@ class BaseDatabaseFeatures:
     gis_enabled = False
     # Oracle can't group by LOB (large object) data types.
     allows_group_by_lob = True
-    allows_group_by_pk = False
     allows_group_by_selected_pks = False
+    allows_group_by_select_index = True
     empty_fetchmany_value = []
     update_can_self_select = True
+    # Does the backend support self-reference subqueries in the DELETE
+    # statement?
+    delete_can_self_reference_subquery = True
 
     # Does the backend distinguish between '' and None?
     interprets_empty_strings_as_nulls = False
@@ -24,6 +27,11 @@ class BaseDatabaseFeatures:
     # Does the backend allow inserting duplicate rows when a unique_together
     # constraint exists and some fields are nullable but not all of them?
     supports_partially_nullable_unique_constraints = True
+
+    # Does the backend supports specifying whether NULL values should be
+    # considered distinct in unique constraints?
+    supports_nulls_distinct_unique_constraints = False
+
     # Does the backend support initially deferrable unique constraints?
     supports_deferrable_unique_constraints = False
 
@@ -164,8 +172,7 @@ class BaseDatabaseFeatures:
     # Can we roll back DDL in a transaction?
     can_rollback_ddl = False
 
-    # Does it support operations requiring references rename in a transaction?
-    supports_atomic_references_rename = True
+    schema_editor_uses_clientside_param_binding = False
 
     # Can we issue more than one ALTER COLUMN clause in an ALTER TABLE?
     supports_combined_alters = False
@@ -195,6 +202,15 @@ class BaseDatabaseFeatures:
 
     # Does the backend require literal defaults, rather than parameterized ones?
     requires_literal_defaults = False
+
+    # Does the backend support functions in defaults?
+    supports_expression_defaults = True
+
+    # Does the backend support the DEFAULT keyword in insert queries?
+    supports_default_keyword_in_insert = True
+
+    # Does the backend support the DEFAULT keyword in bulk insert queries?
+    supports_default_keyword_in_bulk_insert = True
 
     # Does the backend require a connection reset after each material schema change?
     connection_persists_old_columns = False
@@ -235,6 +251,7 @@ class BaseDatabaseFeatures:
     supports_select_difference = True
     supports_slicing_ordering_in_compound = False
     supports_parentheses_in_compound = True
+    requires_compound_order_by_subquery = False
 
     # Does the database support SQL 2003 FILTER (WHERE ...) in aggregate
     # expressions?
@@ -246,6 +263,7 @@ class BaseDatabaseFeatures:
     # Does the backend support window expressions (expression OVER (...))?
     supports_over_clause = False
     supports_frame_range_fixed_distance = False
+    supports_frame_exclusion = False
     only_supports_unbounded_with_preceding_and_following = False
 
     # Does the backend support CAST with precision?
@@ -259,6 +277,10 @@ class BaseDatabaseFeatures:
     # functionality of the procedure isn't important.
     create_test_procedure_without_params_sql = None
     create_test_procedure_with_int_param_sql = None
+
+    # SQL to create a table with a composite primary key for use by the Django
+    # test suite.
+    create_test_table_with_composite_primary_key = None
 
     # Does the backend support keyword parameters for cursor.callproc()?
     supports_callproc_kwargs = False
@@ -298,6 +320,9 @@ class BaseDatabaseFeatures:
     # Does the backend support boolean expressions in SELECT and GROUP BY
     # clauses?
     supports_boolean_expr_in_select_clause = True
+    # Does the backend support comparing boolean expressions in WHERE clauses?
+    # Eg: WHERE (price > 0) IS NOT NULL
+    supports_comparing_boolean_expr = True
 
     # Does the backend support JSONField?
     supports_json_field = True
@@ -324,8 +349,24 @@ class BaseDatabaseFeatures:
     # Does the backend support non-deterministic collations?
     supports_non_deterministic_collations = True
 
+    # Does the backend support column and table comments?
+    supports_comments = False
+    # Does the backend support column comments in ADD COLUMN statements?
+    supports_comments_inline = False
+
+    # Does the backend support stored generated columns?
+    supports_stored_generated_columns = False
+    # Does the backend support virtual generated columns?
+    supports_virtual_generated_columns = False
+
     # Does the backend support the logical XOR operator?
     supports_logical_xor = False
+
+    # Set to (exception, message) if null characters in text are disallowed.
+    prohibits_null_characters_in_text_exception = None
+
+    # Does the backend support unlimited character columns?
+    supports_unlimited_charfield = False
 
     # Collation names for use by the Django test suite.
     test_collations = {
@@ -333,9 +374,13 @@ class BaseDatabaseFeatures:
         "cs": None,  # Case-sensitive.
         "non_default": None,  # Non-default.
         "swedish_ci": None,  # Swedish case-insensitive.
+        "virtual": None,  # A collation that can be used for virtual columns.
     }
     # SQL template override for tests.aggregation.tests.NowUTC
     test_now_utc_template = None
+
+    # SQL to create a model instance using the database defaults.
+    insert_test_table_with_defaults = None
 
     # A set of dotted paths to tests in Django's test suite that are expected
     # to fail on this database.

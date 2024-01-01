@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# F Wolff <friedel@translate.org.za>, 2019
+# F Wolff <friedel@translate.org.za>, 2019,2023
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-16 20:42+0100\n"
-"PO-Revision-Date: 2019-01-18 05:25+0000\n"
-"Last-Translator: F Wolff <friedel@translate.org.za>\n"
-"Language-Team: Afrikaans (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2023-12-04 19:03+0000\n"
+"Last-Translator: F Wolff <friedel@translate.org.za>, 2019,2023\n"
+"Language-Team: Afrikaans (http://app.transifex.com/django/django/language/"
 "af/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -27,10 +27,10 @@ msgid "URL"
 msgstr "URL"
 
 msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+"Example: “/about/contact/”. Make sure to have leading and trailing slashes."
 msgstr ""
-"Voorbeeld: “/about/contact/”. Maak seker dat daar skuinsstrepe voor en agter "
-"staan."
+"Voorbeeld “/about/kontak/”. Maak seker dat dit begin en eindig met ’n "
+"skuinsstreep."
 
 msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
@@ -39,9 +39,9 @@ msgstr ""
 "Hierdie waarde moet slegs letters, syfers, punte, onderstrepies, "
 "koppeltekens, skuinsstrepe of tildes bevat."
 
-msgid "Example: '/about/contact'. Make sure to have a leading slash."
+msgid "Example: “/about/contact”. Make sure to have a leading slash."
 msgstr ""
-"Voorbeeld: “/about/contact”. Maak seker daar is ’n skuinsstreep vooraan."
+"Voorbeeld “/about/kontak/”. Maak seker dat dit begin met ’n skuinsstreep."
 
 msgid "URL is missing a leading slash."
 msgstr "’n Skuinsstreep ontbreek vooraan URL."
@@ -66,11 +66,11 @@ msgid "template name"
 msgstr "sjabloonnaam"
 
 msgid ""
-"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
-"will use 'flatpages/default.html'."
+"Example: “flatpages/contact_page.html”. If this isn’t provided, the system "
+"will use “flatpages/default.html”."
 msgstr ""
-"Voorbeeld: “flatpages/contact_page.html”. As hierdie nie verskaf word nie "
-"sal die stelsel “flatpages/default.html” gebruik."
+"Voorbeeld “/flatpages/kontakbladsy.html”. As dit weggelaat word, sal die "
+"stelsel “flatpages/default.html” gebruik."
 
 msgid "registration required"
 msgstr "registrasie benodig"

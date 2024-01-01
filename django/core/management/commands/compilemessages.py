@@ -91,7 +91,8 @@ class Command(BaseCommand):
 
         # Walk entire tree, looking for locale directories
         for dirpath, dirnames, filenames in os.walk(".", topdown=True):
-            for dirname in dirnames:
+            # As we may modify dirnames, iterate through a copy of it instead
+            for dirname in list(dirnames):
                 if is_ignored_path(
                     os.path.normpath(os.path.join(dirpath, dirname)), ignore_patterns
                 ):

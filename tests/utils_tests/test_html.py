@@ -1,7 +1,9 @@
 import os
 from datetime import datetime
 
+from django.core.serializers.json import DjangoJSONEncoder
 from django.test import SimpleTestCase
+from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.functional import lazystr
 from django.utils.html import (
     conditional_escape,
@@ -63,6 +65,15 @@ class TestUtilsHtml(SimpleTestCase):
             ),
             "&lt; Dangerous &gt; <b>safe</b> &lt; dangerous again <i>safe again</i>",
         )
+
+    def test_format_html_no_params(self):
+        msg = "Calling format_html() without passing args or kwargs is deprecated."
+        # RemovedInDjango60Warning: when the deprecation ends, replace with:
+        # msg = "args or kwargs must be provided."
+        # with self.assertRaisesMessage(ValueError, msg):
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+            name = "Adam"
+            self.assertEqual(format_html(f"<i>{name}</i>"), "<i>Adam</i>")
 
     def test_linebreaks(self):
         items = (
@@ -210,6 +221,16 @@ class TestUtilsHtml(SimpleTestCase):
         for arg, expected in tests:
             with self.subTest(arg=arg):
                 self.assertEqual(json_script(arg, "test_id"), expected)
+
+    def test_json_script_custom_encoder(self):
+        class CustomDjangoJSONEncoder(DjangoJSONEncoder):
+            def encode(self, o):
+                return '{"hello": "world"}'
+
+        self.assertHTMLEqual(
+            json_script({}, encoder=CustomDjangoJSONEncoder),
+            '<script type="application/json">{"hello": "world"}</script>',
+        )
 
     def test_json_script_without_id(self):
         self.assertHTMLEqual(

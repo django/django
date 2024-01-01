@@ -1,7 +1,9 @@
 import itertools
 import math
+import warnings
 
-from django.core.exceptions import EmptyResultSet
+from django.core.exceptions import EmptyResultSet, FullResultSet
+from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.models.expressions import Case, Expression, Func, Value, When
 from django.db.models.fields import (
     BooleanField,
@@ -13,6 +15,7 @@ from django.db.models.fields import (
 )
 from django.db.models.query_utils import RegisterLookupMixin
 from django.utils.datastructures import OrderedSet
+from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.functional import cached_property
 from django.utils.hashable import make_hashable
 
@@ -128,7 +131,7 @@ class Lookup(Expression):
     def rhs_is_direct_value(self):
         return not hasattr(self.rhs, "as_sql")
 
-    def get_group_by_cols(self, alias=None):
+    def get_group_by_cols(self):
         cols = []
         for source in self.get_source_expressions():
             cols.extend(source.get_group_by_cols())
@@ -171,9 +174,10 @@ class Lookup(Expression):
         c.lhs = self.lhs.resolve_expression(
             query, allow_joins, reuse, summarize, for_save
         )
-        c.rhs = self.rhs.resolve_expression(
-            query, allow_joins, reuse, summarize, for_save
-        )
+        if hasattr(self.rhs, "resolve_expression"):
+            c.rhs = self.rhs.resolve_expression(
+                query, allow_joins, reuse, summarize, for_save
+            )
         return c
 
     def select_format(self, compiler, sql, params):
@@ -183,6 +187,10 @@ class Lookup(Expression):
         if not compiler.connection.features.supports_boolean_expr_in_select_clause:
             sql = f"CASE WHEN {sql} THEN 1 ELSE 0 END"
         return sql, params
+
+    @cached_property
+    def allowed_default(self):
+        return self.lhs.allowed_default and self.rhs.allowed_default
 
 
 class Transform(RegisterLookupMixin, Func):
@@ -212,8 +220,22 @@ class BuiltinLookup(Lookup):
     def process_lhs(self, compiler, connection, lhs=None):
         lhs_sql, params = super().process_lhs(compiler, connection, lhs)
         field_internal_type = self.lhs.output_field.get_internal_type()
-        db_type = self.lhs.output_field.db_type(connection=connection)
-        lhs_sql = connection.ops.field_cast_sql(db_type, field_internal_type) % lhs_sql
+        if (
+            hasattr(connection.ops.__class__, "field_cast_sql")
+            and connection.ops.__class__.field_cast_sql
+            is not BaseDatabaseOperations.field_cast_sql
+        ):
+            warnings.warn(
+                (
+                    "The usage of DatabaseOperations.field_cast_sql() is deprecated. "
+                    "Implement DatabaseOperations.lookup_cast() instead."
+                ),
+                RemovedInDjango60Warning,
+            )
+            db_type = self.lhs.output_field.db_type(connection=connection)
+            lhs_sql = (
+                connection.ops.field_cast_sql(db_type, field_internal_type) % lhs_sql
+            )
         lhs_sql = (
             connection.ops.lookup_cast(self.lookup_name, field_internal_type) % lhs_sql
         )
@@ -308,7 +330,7 @@ class FieldGetDbPrepValueIterableMixin(FieldGetDbPrepValueMixin):
         return sql, tuple(params)
 
 
-class PostgresOperatorLookup(FieldGetDbPrepValueMixin, Lookup):
+class PostgresOperatorLookup(Lookup):
     """Lookup defined by operators on PostgreSQL."""
 
     postgres_operator = None
@@ -388,6 +410,24 @@ class LessThanOrEqual(FieldGetDbPrepValueMixin, BuiltinLookup):
     lookup_name = "lte"
 
 
+class IntegerFieldOverflow:
+    underflow_exception = EmptyResultSet
+    overflow_exception = EmptyResultSet
+
+    def process_rhs(self, compiler, connection):
+        rhs = self.rhs
+        if isinstance(rhs, int):
+            field_internal_type = self.lhs.output_field.get_internal_type()
+            min_value, max_value = connection.ops.integer_field_range(
+                field_internal_type
+            )
+            if min_value is not None and rhs < min_value:
+                raise self.underflow_exception
+            if max_value is not None and rhs > max_value:
+                raise self.overflow_exception
+        return super().process_rhs(compiler, connection)
+
+
 class IntegerFieldFloatRounding:
     """
     Allow floats to work as query values for IntegerField. Without this, the
@@ -401,18 +441,43 @@ class IntegerFieldFloatRounding:
 
 
 @IntegerField.register_lookup
-class IntegerGreaterThanOrEqual(IntegerFieldFloatRounding, GreaterThanOrEqual):
+class IntegerFieldExact(IntegerFieldOverflow, Exact):
     pass
 
 
 @IntegerField.register_lookup
-class IntegerLessThan(IntegerFieldFloatRounding, LessThan):
-    pass
+class IntegerGreaterThan(IntegerFieldOverflow, GreaterThan):
+    underflow_exception = FullResultSet
+
+
+@IntegerField.register_lookup
+class IntegerGreaterThanOrEqual(
+    IntegerFieldOverflow, IntegerFieldFloatRounding, GreaterThanOrEqual
+):
+    underflow_exception = FullResultSet
+
+
+@IntegerField.register_lookup
+class IntegerLessThan(IntegerFieldOverflow, IntegerFieldFloatRounding, LessThan):
+    overflow_exception = FullResultSet
+
+
+@IntegerField.register_lookup
+class IntegerLessThanOrEqual(IntegerFieldOverflow, LessThanOrEqual):
+    overflow_exception = FullResultSet
 
 
 @Field.register_lookup
 class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
     lookup_name = "in"
+
+    def get_refs(self):
+        refs = super().get_refs()
+        if self.rhs_is_direct_value():
+            for rhs in self.rhs:
+                if get_rhs_refs := getattr(rhs, "get_refs", None):
+                    refs |= get_rhs_refs()
+        return refs
 
     def get_prep_lookup(self):
         from django.db.models.sql.query import Query  # avoid circular import
@@ -567,7 +632,16 @@ class IsNull(BuiltinLookup):
             raise ValueError(
                 "The QuerySet value for an isnull lookup must be True or False."
             )
-        sql, params = compiler.compile(self.lhs)
+        if isinstance(self.lhs, Value):
+            if self.lhs.value is None or (
+                self.lhs.value == ""
+                and connection.features.interprets_empty_strings_as_nulls
+            ):
+                result_exception = FullResultSet if self.rhs else EmptyResultSet
+            else:
+                result_exception = EmptyResultSet if self.rhs else FullResultSet
+            raise result_exception
+        sql, params = self.process_lhs(compiler, connection)
         if self.rhs:
             return "%s IS NULL" % sql, params
         else:

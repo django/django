@@ -50,11 +50,23 @@ QUnit.test('Date.getFullMonthName', function(assert) {
     assert.equal(new Date(2020, 9, 26).getFullMonthName(), 'October', 'oct 26');
 });
 
+QUnit.test('Date.getAbbrevDayName', function(assert) {
+    assert.equal(new Date(2020, 0, 26).getAbbrevDayName(), 'Sun', 'jan 26 2020 is a Sunday');
+    assert.equal(new Date(2020, 9, 26).getAbbrevDayName(), 'Mon', 'oct 26 2020 is a Monday');
+});
+
+QUnit.test('Date.getFullDayName', function(assert) {
+    assert.equal(new Date(2020, 0, 26).getFullDayName(), 'Sunday', 'jan 26 2020 is a Sunday');
+    assert.equal(new Date(2020, 9, 26).getFullDayName(), 'Monday', 'oct 26 2020 is a Monday');
+});
+
 QUnit.test('Date.strftime', function(assert) {
     const date = new Date(2014, 6, 1, 11, 0, 5);
     assert.equal(date.strftime('%Y-%m-%d %H:%M:%S'), '2014-07-01 11:00:05');
     assert.equal(date.strftime('%B %d, %Y'), 'July 01, 2014');
     assert.equal(date.strftime('%b %d, %Y'), 'Jul 01, 2014');
+    assert.equal(date.strftime('%a %d %m %y'), 'Tue 01 07 14');
+    assert.equal(date.strftime('%A (day %w of week) %I %p'), 'Tuesday (day 02 of week) 11 AM');
 });
 
 QUnit.test('String.strptime', function(assert) {

@@ -2,10 +2,11 @@ from collections import namedtuple
 
 from django.db.backends.base.introspection import BaseDatabaseIntrospection
 from django.db.backends.base.introspection import FieldInfo as BaseFieldInfo
-from django.db.backends.base.introspection import TableInfo
+from django.db.backends.base.introspection import TableInfo as BaseTableInfo
 from django.db.models import Index
 
-FieldInfo = namedtuple("FieldInfo", BaseFieldInfo._fields + ("is_autofield",))
+FieldInfo = namedtuple("FieldInfo", BaseFieldInfo._fields + ("is_autofield", "comment"))
+TableInfo = namedtuple("TableInfo", BaseTableInfo._fields + ("comment",))
 
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
@@ -62,7 +63,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     WHEN c.relispartition THEN 'p'
                     WHEN c.relkind IN ('m', 'v') THEN 'v'
                     ELSE 't'
-                END
+                END,
+                obj_description(c.oid, 'pg_class')
             FROM pg_catalog.pg_class c
             LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
             WHERE c.relkind IN ('f', 'm', 'p', 'r', 'v')
@@ -91,7 +93,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 NOT (a.attnotnull OR (t.typtype = 'd' AND t.typnotnull)) AS is_nullable,
                 pg_get_expr(ad.adbin, ad.adrelid) AS column_default,
                 CASE WHEN collname = 'default' THEN NULL ELSE collname END AS collation,
-                a.attidentity != '' AS is_autofield
+                a.attidentity != '' AS is_autofield,
+                col_description(a.attrelid, a.attnum) AS column_comment
             FROM pg_attribute a
             LEFT JOIN pg_attrdef ad ON a.attrelid = ad.adrelid AND a.attnum = ad.adnum
             LEFT JOIN pg_collation co ON a.attcollation = co.oid
@@ -113,7 +116,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             FieldInfo(
                 line.name,
                 line.type_code,
-                line.display_size,
+                # display_size is always None on psycopg2.
+                line.internal_size if line.display_size is None else line.display_size,
                 line.internal_size,
                 line.precision,
                 line.scale,

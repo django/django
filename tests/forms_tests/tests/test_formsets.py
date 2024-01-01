@@ -23,12 +23,14 @@ from django.forms.formsets import (
     all_valid,
     formset_factory,
 )
-from django.forms.renderers import TemplatesSetting, get_default_renderer
+from django.forms.renderers import (
+    DjangoTemplates,
+    TemplatesSetting,
+    get_default_renderer,
+)
 from django.forms.utils import ErrorList
 from django.forms.widgets import HiddenInput
 from django.test import SimpleTestCase
-from django.test.utils import isolate_lru_cache
-from django.utils.deprecation import RemovedInDjango50Warning
 
 from . import jinja2_tests
 
@@ -179,6 +181,10 @@ class FormsFormsetTestCase(SimpleTestCase):
         self.assertTrue(hasattr(formset.empty_form, "custom_kwarg"))
         self.assertEqual(formset.empty_form.custom_kwarg, 1)
 
+    def test_empty_permitted_ignored_empty_form(self):
+        formset = ArticleFormSet(form_kwargs={"empty_permitted": False})
+        self.assertIs(formset.empty_form.empty_permitted, True)
+
     def test_formset_validation(self):
         # FormSet instances can also have an error attribute if validation failed for
         # any of the forms.
@@ -245,10 +251,11 @@ class FormsFormsetTestCase(SimpleTestCase):
         )
         self.assertHTMLEqual(
             "\n".join(form.as_ul() for form in formset.forms),
-            """<li>Choice: <input type="text" name="choices-0-choice" value="Calexico"></li>
-<li>Votes: <input type="number" name="choices-0-votes" value="100"></li>
-<li>Choice: <input type="text" name="choices-1-choice"></li>
-<li>Votes: <input type="number" name="choices-1-votes"></li>""",
+            '<li>Choice: <input type="text" name="choices-0-choice" value="Calexico">'
+            "</li>"
+            '<li>Votes: <input type="number" name="choices-0-votes" value="100"></li>'
+            '<li>Choice: <input type="text" name="choices-1-choice"></li>'
+            '<li>Votes: <input type="number" name="choices-1-votes"></li>',
         )
 
     def test_blank_form_unfilled(self):
@@ -564,14 +571,15 @@ class FormsFormsetTestCase(SimpleTestCase):
         formset = ChoiceFormSet(initial=initial, auto_id=False, prefix="choices")
         self.assertHTMLEqual(
             "\n".join(form.as_ul() for form in formset.forms),
-            """<li>Choice: <input type="text" name="choices-0-choice" value="Calexico"></li>
-<li>Votes: <input type="number" name="choices-0-votes" value="100"></li>
-<li>Choice: <input type="text" name="choices-1-choice"></li>
-<li>Votes: <input type="number" name="choices-1-votes"></li>
-<li>Choice: <input type="text" name="choices-2-choice"></li>
-<li>Votes: <input type="number" name="choices-2-votes"></li>
-<li>Choice: <input type="text" name="choices-3-choice"></li>
-<li>Votes: <input type="number" name="choices-3-votes"></li>""",
+            '<li>Choice: <input type="text" name="choices-0-choice" value="Calexico">'
+            "</li>"
+            '<li>Votes: <input type="number" name="choices-0-votes" value="100"></li>'
+            '<li>Choice: <input type="text" name="choices-1-choice"></li>'
+            '<li>Votes: <input type="number" name="choices-1-votes"></li>'
+            '<li>Choice: <input type="text" name="choices-2-choice"></li>'
+            '<li>Votes: <input type="number" name="choices-2-votes"></li>'
+            '<li>Choice: <input type="text" name="choices-3-choice"></li>'
+            '<li>Votes: <input type="number" name="choices-3-votes"></li>',
         )
         # Retrieving an empty form works. Tt shows up in the form list.
         self.assertTrue(formset.empty_form.empty_permitted)
@@ -595,15 +603,17 @@ class FormsFormsetTestCase(SimpleTestCase):
         formset = ChoiceFormSet(initial=initial, auto_id=False, prefix="choices")
         self.assertHTMLEqual(
             "\n".join(form.as_ul() for form in formset.forms),
-            """<li>Choice: <input type="text" name="choices-0-choice" value="Calexico"></li>
-<li>Votes: <input type="number" name="choices-0-votes" value="100"></li>
-<li>Delete: <input type="checkbox" name="choices-0-DELETE"></li>
-<li>Choice: <input type="text" name="choices-1-choice" value="Fergie"></li>
-<li>Votes: <input type="number" name="choices-1-votes" value="900"></li>
-<li>Delete: <input type="checkbox" name="choices-1-DELETE"></li>
-<li>Choice: <input type="text" name="choices-2-choice"></li>
-<li>Votes: <input type="number" name="choices-2-votes"></li>
-<li>Delete: <input type="checkbox" name="choices-2-DELETE"></li>""",
+            '<li>Choice: <input type="text" name="choices-0-choice" value="Calexico">'
+            "</li>"
+            '<li>Votes: <input type="number" name="choices-0-votes" value="100"></li>'
+            '<li>Delete: <input type="checkbox" name="choices-0-DELETE"></li>'
+            '<li>Choice: <input type="text" name="choices-1-choice" value="Fergie">'
+            "</li>"
+            '<li>Votes: <input type="number" name="choices-1-votes" value="900"></li>'
+            '<li>Delete: <input type="checkbox" name="choices-1-DELETE"></li>'
+            '<li>Choice: <input type="text" name="choices-2-choice"></li>'
+            '<li>Votes: <input type="number" name="choices-2-votes"></li>'
+            '<li>Delete: <input type="checkbox" name="choices-2-DELETE"></li>',
         )
         # To delete something, set that form's special delete field to 'on'.
         # Let's go ahead and delete Fergie.
@@ -738,15 +748,17 @@ class FormsFormsetTestCase(SimpleTestCase):
         formset = ChoiceFormSet(initial=initial, auto_id=False, prefix="choices")
         self.assertHTMLEqual(
             "\n".join(form.as_ul() for form in formset.forms),
-            """<li>Choice: <input type="text" name="choices-0-choice" value="Calexico"></li>
-<li>Votes: <input type="number" name="choices-0-votes" value="100"></li>
-<li>Order: <input type="number" name="choices-0-ORDER" value="1"></li>
-<li>Choice: <input type="text" name="choices-1-choice" value="Fergie"></li>
-<li>Votes: <input type="number" name="choices-1-votes" value="900"></li>
-<li>Order: <input type="number" name="choices-1-ORDER" value="2"></li>
-<li>Choice: <input type="text" name="choices-2-choice"></li>
-<li>Votes: <input type="number" name="choices-2-votes"></li>
-<li>Order: <input type="number" name="choices-2-ORDER"></li>""",
+            '<li>Choice: <input type="text" name="choices-0-choice" value="Calexico">'
+            "</li>"
+            '<li>Votes: <input type="number" name="choices-0-votes" value="100"></li>'
+            '<li>Order: <input type="number" name="choices-0-ORDER" value="1"></li>'
+            '<li>Choice: <input type="text" name="choices-1-choice" value="Fergie">'
+            "</li>"
+            '<li>Votes: <input type="number" name="choices-1-votes" value="900"></li>'
+            '<li>Order: <input type="number" name="choices-1-ORDER" value="2"></li>'
+            '<li>Choice: <input type="text" name="choices-2-choice"></li>'
+            '<li>Votes: <input type="number" name="choices-2-votes"></li>'
+            '<li>Order: <input type="number" name="choices-2-ORDER"></li>',
         )
         data = {
             "choices-TOTAL_FORMS": "3",  # the number of forms rendered
@@ -864,22 +876,25 @@ class FormsFormsetTestCase(SimpleTestCase):
         formset = ChoiceFormSet(initial=initial, auto_id=False, prefix="choices")
         self.assertHTMLEqual(
             "\n".join(form.as_ul() for form in formset.forms),
-            """<li>Choice: <input type="text" name="choices-0-choice" value="Calexico"></li>
-<li>Votes: <input type="number" name="choices-0-votes" value="100"></li>
-<li>Order: <input type="number" name="choices-0-ORDER" value="1"></li>
-<li>Delete: <input type="checkbox" name="choices-0-DELETE"></li>
-<li>Choice: <input type="text" name="choices-1-choice" value="Fergie"></li>
-<li>Votes: <input type="number" name="choices-1-votes" value="900"></li>
-<li>Order: <input type="number" name="choices-1-ORDER" value="2"></li>
-<li>Delete: <input type="checkbox" name="choices-1-DELETE"></li>
-<li>Choice: <input type="text" name="choices-2-choice" value="The Decemberists"></li>
-<li>Votes: <input type="number" name="choices-2-votes" value="500"></li>
-<li>Order: <input type="number" name="choices-2-ORDER" value="3"></li>
-<li>Delete: <input type="checkbox" name="choices-2-DELETE"></li>
-<li>Choice: <input type="text" name="choices-3-choice"></li>
-<li>Votes: <input type="number" name="choices-3-votes"></li>
-<li>Order: <input type="number" name="choices-3-ORDER"></li>
-<li>Delete: <input type="checkbox" name="choices-3-DELETE"></li>""",
+            '<li>Choice: <input type="text" name="choices-0-choice" value="Calexico">'
+            "</li>"
+            '<li>Votes: <input type="number" name="choices-0-votes" value="100"></li>'
+            '<li>Order: <input type="number" name="choices-0-ORDER" value="1"></li>'
+            '<li>Delete: <input type="checkbox" name="choices-0-DELETE"></li>'
+            '<li>Choice: <input type="text" name="choices-1-choice" value="Fergie">'
+            "</li>"
+            '<li>Votes: <input type="number" name="choices-1-votes" value="900"></li>'
+            '<li>Order: <input type="number" name="choices-1-ORDER" value="2"></li>'
+            '<li>Delete: <input type="checkbox" name="choices-1-DELETE"></li>'
+            '<li>Choice: <input type="text" name="choices-2-choice" '
+            'value="The Decemberists"></li>'
+            '<li>Votes: <input type="number" name="choices-2-votes" value="500"></li>'
+            '<li>Order: <input type="number" name="choices-2-ORDER" value="3"></li>'
+            '<li>Delete: <input type="checkbox" name="choices-2-DELETE"></li>'
+            '<li>Choice: <input type="text" name="choices-3-choice"></li>'
+            '<li>Votes: <input type="number" name="choices-3-votes"></li>'
+            '<li>Order: <input type="number" name="choices-3-ORDER"></li>'
+            '<li>Delete: <input type="checkbox" name="choices-3-DELETE"></li>',
         )
         # Let's delete Fergie, and put The Decemberists ahead of Calexico.
         data = {
@@ -1469,6 +1484,7 @@ class FormsFormsetTestCase(SimpleTestCase):
         self.assertIn("DELETE", formset.forms[0].fields)
         self.assertNotIn("DELETE", formset.forms[1].fields)
         self.assertNotIn("DELETE", formset.forms[2].fields)
+        self.assertNotIn("DELETE", formset.empty_form.fields)
 
         formset = ChoiceFormFormset(
             data={
@@ -1540,6 +1556,60 @@ class FormsFormsetTestCase(SimpleTestCase):
         self.assertEqual(formset.management_form.renderer, renderer)
         self.assertEqual(formset.non_form_errors().renderer, renderer)
         self.assertEqual(formset.empty_form.renderer, renderer)
+
+    def test_form_default_renderer(self):
+        """
+        In the absence of a renderer passed to the formset_factory(),
+        Form.default_renderer is respected.
+        """
+
+        class CustomRenderer(DjangoTemplates):
+            pass
+
+        class ChoiceWithDefaultRenderer(Choice):
+            default_renderer = CustomRenderer()
+
+        data = {
+            "choices-TOTAL_FORMS": "1",
+            "choices-INITIAL_FORMS": "0",
+            "choices-MIN_NUM_FORMS": "0",
+        }
+
+        ChoiceFormSet = formset_factory(ChoiceWithDefaultRenderer)
+        formset = ChoiceFormSet(data, prefix="choices")
+        self.assertEqual(
+            formset.forms[0].renderer, ChoiceWithDefaultRenderer.default_renderer
+        )
+        self.assertEqual(
+            formset.empty_form.renderer, ChoiceWithDefaultRenderer.default_renderer
+        )
+        default_renderer = get_default_renderer()
+        self.assertIsInstance(formset.renderer, type(default_renderer))
+
+    def test_form_default_renderer_class(self):
+        """
+        In the absence of a renderer passed to the formset_factory(),
+        Form.default_renderer is respected.
+        """
+
+        class CustomRenderer(DjangoTemplates):
+            pass
+
+        class ChoiceWithDefaultRenderer(Choice):
+            default_renderer = CustomRenderer
+
+        data = {
+            "choices-TOTAL_FORMS": "1",
+            "choices-INITIAL_FORMS": "0",
+            "choices-MIN_NUM_FORMS": "0",
+        }
+
+        ChoiceFormSet = formset_factory(ChoiceWithDefaultRenderer)
+        formset = ChoiceFormSet(data, prefix="choices")
+        self.assertIsInstance(formset.forms[0].renderer, CustomRenderer)
+        self.assertIsInstance(formset.empty_form.renderer, CustomRenderer)
+        default_renderer = get_default_renderer()
+        self.assertIsInstance(formset.renderer, type(default_renderer))
 
     def test_repr(self):
         valid_formset = self.make_choiceformset([("test", 1)])
@@ -1887,17 +1957,3 @@ class AllValidTests(SimpleTestCase):
         ]
         self.assertEqual(formset1._errors, expected_errors)
         self.assertEqual(formset2._errors, expected_errors)
-
-
-class DeprecationTests(SimpleTestCase):
-    def test_warning(self):
-        from django.forms.utils import DEFAULT_TEMPLATE_DEPRECATION_MSG
-
-        with isolate_lru_cache(get_default_renderer), self.settings(
-            FORM_RENDERER="django.forms.renderers.DjangoTemplates"
-        ), self.assertRaisesMessage(
-            RemovedInDjango50Warning, DEFAULT_TEMPLATE_DEPRECATION_MSG
-        ):
-            ChoiceFormSet = formset_factory(Choice)
-            formset = ChoiceFormSet()
-            str(formset)

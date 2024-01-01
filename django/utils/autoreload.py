@@ -1,4 +1,3 @@
-import functools
 import itertools
 import logging
 import os
@@ -10,6 +9,7 @@ import time
 import traceback
 import weakref
 from collections import defaultdict
+from functools import lru_cache, wraps
 from pathlib import Path
 from types import ModuleType
 from zipimport import zipimporter
@@ -57,7 +57,7 @@ def is_django_path(path):
 
 
 def check_errors(fn):
-    @functools.wraps(fn)
+    @wraps(fn)
     def wrapper(*args, **kwargs):
         global _exception
         try:
@@ -120,7 +120,7 @@ def iter_all_python_module_files():
     return iter_modules_and_files(modules, frozenset(_error_files))
 
 
-@functools.lru_cache(maxsize=1)
+@lru_cache(maxsize=1)
 def iter_modules_and_files(modules, extra_files):
     """Iterate through all modules needed to be watched."""
     sys_file_paths = []
@@ -170,7 +170,7 @@ def iter_modules_and_files(modules, extra_files):
     return frozenset(results)
 
 
-@functools.lru_cache(maxsize=1)
+@lru_cache(maxsize=1)
 def common_roots(paths):
     """
     Return a tuple of common roots that are shared between the given paths.
@@ -227,9 +227,10 @@ def get_child_arguments():
     import __main__
 
     py_script = Path(sys.argv[0])
+    exe_entrypoint = py_script.with_suffix(".exe")
 
     args = [sys.executable] + ["-W%s" % o for o in sys.warnoptions]
-    if sys.implementation.name == "cpython":
+    if sys.implementation.name in ("cpython", "pypy"):
         args.extend(
             f"-X{key}" if value is True else f"-X{key}={value}"
             for key, value in sys._xoptions.items()
@@ -237,7 +238,7 @@ def get_child_arguments():
     # __spec__ is set when the server was started with the `-m` option,
     # see https://docs.python.org/3/reference/import.html#main-spec
     # __spec__ may not exist, e.g. when running in a Conda env.
-    if getattr(__main__, "__spec__", None) is not None:
+    if getattr(__main__, "__spec__", None) is not None and not exe_entrypoint.exists():
         spec = __main__.__spec__
         if (spec.name == "__main__" or spec.name.endswith(".__main__")) and spec.parent:
             name = spec.parent
@@ -248,7 +249,6 @@ def get_child_arguments():
     elif not py_script.exists():
         # sys.argv[0] may not exist for several reasons on Windows.
         # It may exist with a .exe extension or have a -script.py suffix.
-        exe_entrypoint = py_script.with_suffix(".exe")
         if exe_entrypoint.exists():
             # Should be executed directly, ignoring sys.executable.
             return [exe_entrypoint, *sys.argv[1:]]
@@ -463,7 +463,7 @@ class WatchmanReloader(BaseReloader):
         logger.debug("Watchman watch-project result: %s", result)
         return result["watch"], result.get("relative_path")
 
-    @functools.lru_cache
+    @lru_cache
     def _get_clock(self, root):
         return self.client.query("clock", root)["clock"]
 
@@ -657,16 +657,7 @@ def start_django(reloader, main_func, *args, **kwargs):
     django_main_thread.start()
 
     while not reloader.should_stop:
-        try:
-            reloader.run(django_main_thread)
-        except WatchmanUnavailable as ex:
-            # It's possible that the watchman service shuts down or otherwise
-            # becomes unavailable. In that case, use the StatReloader.
-            reloader = StatReloader()
-            logger.error("Error connecting to Watchman: %s", ex)
-            logger.info(
-                "Watching for file changes with %s", reloader.__class__.__name__
-            )
+        reloader.run(django_main_thread)
 
 
 def run_with_reloader(main_func, *args, **kwargs):

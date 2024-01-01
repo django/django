@@ -21,7 +21,7 @@ class ConcatTests(TestCase):
         Author.objects.create(name="Margaret", goes_by="Maggie")
         Author.objects.create(name="Rhonda", alias="adnohR")
         authors = Author.objects.annotate(joined=Concat("alias", "goes_by"))
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             authors.order_by("name"),
             [
                 "",
@@ -46,7 +46,7 @@ class ConcatTests(TestCase):
         authors = Author.objects.annotate(
             joined=Concat("name", V(" ("), "goes_by", V(")"), output_field=CharField()),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             authors.order_by("name"),
             [
                 "Jayden ()",
@@ -75,7 +75,10 @@ class ConcatTests(TestCase):
         expected = article.title + " - " + article.text
         self.assertEqual(expected.upper(), article.title_text)
 
-    @skipUnless(connection.vendor == "sqlite", "sqlite specific implementation detail.")
+    @skipUnless(
+        connection.vendor in ("sqlite", "postgresql"),
+        "SQLite and PostgreSQL specific implementation detail.",
+    )
     def test_coalesce_idempotent(self):
         pair = ConcatPair(V("a"), V("b"))
         # Check nodes counts
@@ -89,3 +92,18 @@ class ConcatTests(TestCase):
         qs = Article.objects.annotate(description=Concat("title", V(": "), "summary"))
         # Multiple compilations should not alter the generated query.
         self.assertEqual(str(qs.query), str(qs.all().query))
+
+    def test_concat_non_str(self):
+        Author.objects.create(name="The Name", age=42)
+        with self.assertNumQueries(1) as ctx:
+            author = Author.objects.annotate(
+                name_text=Concat(
+                    "name", V(":"), "alias", V(":"), "age", output_field=TextField()
+                ),
+            ).get()
+        self.assertEqual(author.name_text, "The Name::42")
+        # Only non-string columns are casted on PostgreSQL.
+        self.assertEqual(
+            ctx.captured_queries[0]["sql"].count("::text"),
+            1 if connection.vendor == "postgresql" else 0,
+        )

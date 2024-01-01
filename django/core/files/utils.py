@@ -26,7 +26,7 @@ def validate_file_name(name, allow_relative_path=False):
 
 class FileProxyMixin:
     """
-    A mixin class used to forward file methods to an underlaying file
+    A mixin class used to forward file methods to an underlying file
     object.  The internal file object has to be called "file"::
 
         class FileProxy(FileProxyMixin):

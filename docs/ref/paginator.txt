@@ -14,7 +14,7 @@ For examples, see the :doc:`Pagination topic guide </topics/pagination>`.
 ``Paginator`` class
 ===================
 
-.. class:: Paginator(object_list, per_page, orphans=0, allow_empty_first_page=True)
+.. class:: Paginator(object_list, per_page, orphans=0, allow_empty_first_page=True, error_messages=None)
 
     A paginator acts like a sequence of :class:`Page` when using ``len()`` or
     iterating it directly.
@@ -55,6 +55,40 @@ For examples, see the :doc:`Pagination topic guide </topics/pagination>`.
     Optional. Whether or not the first page is allowed to be empty.  If
     ``False`` and ``object_list`` is  empty, then an ``EmptyPage`` error will
     be raised.
+
+.. attribute:: Paginator.error_messages
+
+    .. versionadded:: 5.0
+
+    The ``error_messages`` argument lets you override the default messages that
+    the paginator will raise. Pass in a dictionary with keys matching the error
+    messages you want to override. Available error message keys are:
+    ``invalid_page``, ``min_page``, and ``no_results``.
+
+    For example, here is the default error message:
+
+    .. code-block:: pycon
+
+        >>> from django.core.paginator import Paginator
+        >>> paginator = Paginator([1, 2, 3], 2)
+        >>> paginator.page(5)
+        Traceback (most recent call last):
+          ...
+        EmptyPage: That page contains no results
+
+    And here is a custom error message:
+
+    .. code-block:: pycon
+
+        >>> paginator = Paginator(
+        ...     [1, 2, 3],
+        ...     2,
+        ...     error_messages={"no_results": "Page does not exist"},
+        ... )
+        >>> paginator.page(5)
+        Traceback (most recent call last):
+          ...
+        EmptyPage: Page does not exist
 
 Methods
 -------

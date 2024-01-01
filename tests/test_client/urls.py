@@ -7,6 +7,7 @@ from . import views
 urlpatterns = [
     path("upload_view/", views.upload_view, name="upload_view"),
     path("get_view/", views.get_view, name="get_view"),
+    path("cbv_view/", views.CBView.as_view()),
     path("post_view/", views.post_view),
     path("post_then_get_view/", views.post_then_get_view),
     path("put_view/", views.put_view),
@@ -24,6 +25,12 @@ urlpatterns = [
         "redirect_view_308_query_string/",
         views.method_saving_308_redirect_query_string_view,
     ),
+    path(
+        "redirect_to_different_hostname/",
+        views.redirect_to_different_hostname,
+        name="redirect_to_different_hostname",
+    ),
+    path("get_host_view/", views.get_host_view, name="get_host_view"),
     path("secure_view/", views.view_with_secure),
     path(
         "permanent_redirect_view/",

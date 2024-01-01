@@ -35,6 +35,10 @@ class CreateExtension(Operation):
         # installed, otherwise a subsequent data migration would use the same
         # connection.
         register_type_handlers(schema_editor.connection)
+        if hasattr(schema_editor.connection, "register_geometry_adapters"):
+            schema_editor.connection.register_geometry_adapters(
+                schema_editor.connection.connection, True
+            )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         if not router.allow_migrate(schema_editor.connection.alias, app_label):
@@ -185,12 +189,6 @@ class CollationOperation(Operation):
         )
 
     def create_collation(self, schema_editor):
-        if self.deterministic is False and not (
-            schema_editor.connection.features.supports_non_deterministic_collations
-        ):
-            raise NotSupportedError(
-                "Non-deterministic collations require PostgreSQL 12+."
-            )
         args = {"locale": schema_editor.quote_name(self.locale)}
         if self.provider != "libc":
             args["provider"] = schema_editor.quote_name(self.provider)

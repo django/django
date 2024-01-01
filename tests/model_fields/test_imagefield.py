@@ -5,6 +5,7 @@ from unittest import skipIf
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files import File
 from django.core.files.images import ImageFile
+from django.db.models import signals
 from django.test import TestCase
 from django.test.testcases import SerializeMixin
 
@@ -54,20 +55,13 @@ class ImageFieldTestMixin(SerializeMixin):
         if os.path.exists(temp_storage_dir):
             shutil.rmtree(temp_storage_dir)
         os.mkdir(temp_storage_dir)
-
+        self.addCleanup(shutil.rmtree, temp_storage_dir)
         file_path1 = os.path.join(os.path.dirname(__file__), "4x8.png")
         self.file1 = self.File(open(file_path1, "rb"), name="4x8.png")
-
+        self.addCleanup(self.file1.close)
         file_path2 = os.path.join(os.path.dirname(__file__), "8x4.png")
         self.file2 = self.File(open(file_path2, "rb"), name="8x4.png")
-
-    def tearDown(self):
-        """
-        Removes temp directory and all its contents.
-        """
-        self.file1.close()
-        self.file2.close()
-        shutil.rmtree(temp_storage_dir)
+        self.addCleanup(self.file2.close)
 
     def check_dimensions(self, instance, width, height, field_name="mugshot"):
         """
@@ -327,6 +321,20 @@ class ImageFieldNoDimensionsTests(ImageFieldTwoDimensionsTests):
     """
 
     PersonModel = Person
+
+    def test_post_init_not_connected(self):
+        person_model_id = id(self.PersonModel)
+        self.assertNotIn(
+            person_model_id,
+            [sender_id for (_, sender_id), *_ in signals.post_init.receivers],
+        )
+
+    def test_save_does_not_close_file(self):
+        p = self.PersonModel(name="Joe")
+        p.mugshot.save("mug", self.file1)
+        with p.mugshot as f:
+            # Underlying file object wasn’t closed.
+            self.assertEqual(f.tell(), 0)
 
 
 @skipIf(Image is None, "Pillow is required to test ImageField")

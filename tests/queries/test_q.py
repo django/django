@@ -8,7 +8,7 @@ from django.db.models import (
     Q,
     Value,
 )
-from django.db.models.expressions import RawSQL
+from django.db.models.expressions import NegatedExpression, RawSQL
 from django.db.models.functions import Lower
 from django.db.models.sql.where import NothingNode
 from django.test import SimpleTestCase, TestCase
@@ -87,7 +87,7 @@ class QTests(SimpleTestCase):
         ]
         for q in tests:
             with self.subTest(q=q):
-                self.assertIs(q.negated, True)
+                self.assertIsInstance(q, NegatedExpression)
 
     def test_deconstruct(self):
         q = Q(price__gt=F("discounted_price"))
@@ -114,7 +114,7 @@ class QTests(SimpleTestCase):
                 ("price", F("discounted_price")),
             ),
         )
-        self.assertEqual(kwargs, {"_connector": "OR"})
+        self.assertEqual(kwargs, {"_connector": Q.OR})
 
     def test_deconstruct_xor(self):
         q1 = Q(price__gt=F("discounted_price"))
@@ -128,7 +128,7 @@ class QTests(SimpleTestCase):
                 ("price", F("discounted_price")),
             ),
         )
-        self.assertEqual(kwargs, {"_connector": "XOR"})
+        self.assertEqual(kwargs, {"_connector": Q.XOR})
 
     def test_deconstruct_and(self):
         q1 = Q(price__gt=F("discounted_price"))
@@ -200,6 +200,44 @@ class QTests(SimpleTestCase):
         path, args, kwargs = q.deconstruct()
         self.assertEqual(Q(*args, **kwargs), q)
 
+    def test_equal(self):
+        self.assertEqual(Q(), Q())
+        self.assertEqual(
+            Q(("pk__in", (1, 2))),
+            Q(("pk__in", [1, 2])),
+        )
+        self.assertEqual(
+            Q(("pk__in", (1, 2))),
+            Q(pk__in=[1, 2]),
+        )
+        self.assertEqual(
+            Q(("pk__in", (1, 2))),
+            Q(("pk__in", {1: "first", 2: "second"}.keys())),
+        )
+        self.assertNotEqual(
+            Q(name__iexact=F("other_name")),
+            Q(name=Lower(F("other_name"))),
+        )
+
+    def test_hash(self):
+        self.assertEqual(hash(Q()), hash(Q()))
+        self.assertEqual(
+            hash(Q(("pk__in", (1, 2)))),
+            hash(Q(("pk__in", [1, 2]))),
+        )
+        self.assertEqual(
+            hash(Q(("pk__in", (1, 2)))),
+            hash(Q(pk__in=[1, 2])),
+        )
+        self.assertEqual(
+            hash(Q(("pk__in", (1, 2)))),
+            hash(Q(("pk__in", {1: "first", 2: "second"}.keys()))),
+        )
+        self.assertNotEqual(
+            hash(Q(name__iexact=F("other_name"))),
+            hash(Q(name=Lower(F("other_name")))),
+        )
+
     def test_flatten(self):
         q = Q()
         self.assertEqual(list(q.flatten()), [q])
@@ -215,6 +253,15 @@ class QTests(SimpleTestCase):
         )
         flatten = list(q.flatten())
         self.assertEqual(len(flatten), 7)
+
+    def test_create_helper(self):
+        items = [("a", 1), ("b", 2), ("c", 3)]
+        for connector in [Q.AND, Q.OR, Q.XOR]:
+            with self.subTest(connector=connector):
+                self.assertEqual(
+                    Q.create(items, connector=connector),
+                    Q(*items, _connector=connector),
+                )
 
 
 class QCheckTests(TestCase):

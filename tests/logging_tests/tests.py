@@ -419,14 +419,14 @@ class AdminEmailHandlerTest(SimpleTestCase):
         # Text email
         admin_email_handler.include_html = False
         try:
-            self.client.get("/", HTTP_HOST="evil.com")
+            self.client.get("/", headers={"host": "evil.com"})
         finally:
             admin_email_handler.include_html = old_include_html
 
         # HTML email
         admin_email_handler.include_html = True
         try:
-            self.client.get("/", HTTP_HOST="evil.com")
+            self.client.get("/", headers={"host": "evil.com"})
         finally:
             admin_email_handler.include_html = old_include_html
 
@@ -579,19 +579,17 @@ args=(sys.stdout,)
 [formatter_simple]
 format=%(message)s
 """
-        self.temp_file = NamedTemporaryFile()
-        self.temp_file.write(logging_conf.encode())
-        self.temp_file.flush()
+        temp_file = NamedTemporaryFile()
+        temp_file.write(logging_conf.encode())
+        temp_file.flush()
+        self.addCleanup(temp_file.close)
         self.write_settings(
             "settings.py",
             sdict={
                 "LOGGING_CONFIG": '"logging.config.fileConfig"',
-                "LOGGING": 'r"%s"' % self.temp_file.name,
+                "LOGGING": 'r"%s"' % temp_file.name,
             },
         )
-
-    def tearDown(self):
-        self.temp_file.close()
 
     def test_custom_logging(self):
         out, err = self.run_manage(["check"])

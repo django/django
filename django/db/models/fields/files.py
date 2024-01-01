@@ -10,10 +10,11 @@ from django.core.files.utils import validate_file_name
 from django.db.models import signals
 from django.db.models.fields import Field
 from django.db.models.query_utils import DeferredAttribute
+from django.db.models.utils import AltersData
 from django.utils.translation import gettext_lazy as _
 
 
-class FieldFile(File):
+class FieldFile(File, AltersData):
     def __init__(self, instance, field, name):
         super().__init__(None, name)
         self.instance = instance
@@ -167,7 +168,7 @@ class FileDescriptor(DeferredAttribute):
             return self
 
         # This is slightly complicated, so worth an explanation.
-        # instance.file`needs to ultimately return some instance of `File`,
+        # instance.file needs to ultimately return some instance of `File`,
         # probably a subclass. Additionally, this returned object needs to have
         # the FieldFile API so that users can easily do things like
         # instance.file.path and have that delegated to the file storage engine.
@@ -221,7 +222,6 @@ class FileDescriptor(DeferredAttribute):
 
 
 class FileField(Field):
-
     # The class to wrap instance attributes in. Accessing the file object off
     # the instance will always return an instance of attr_class.
     attr_class = FieldFile
@@ -294,8 +294,9 @@ class FileField(Field):
         if kwargs.get("max_length") == 100:
             del kwargs["max_length"]
         kwargs["upload_to"] = self.upload_to
-        if self.storage is not default_storage:
-            kwargs["storage"] = getattr(self, "_storage_callable", self.storage)
+        storage = getattr(self, "_storage_callable", self.storage)
+        if storage is not default_storage:
+            kwargs["storage"] = storage
         return name, path, args, kwargs
 
     def get_internal_type(self):
@@ -440,7 +441,8 @@ class ImageField(FileField):
         # after their corresponding image field don't stay cleared by
         # Model.__init__, see bug #11196.
         # Only run post-initialization dimension update on non-abstract models
-        if not cls._meta.abstract:
+        # with width_field/height_field.
+        if not cls._meta.abstract and (self.width_field or self.height_field):
             signals.post_init.connect(self.update_dimension_fields, sender=cls)
 
     def update_dimension_fields(self, instance, force=False, *args, **kwargs):

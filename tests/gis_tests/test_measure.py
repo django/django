@@ -6,9 +6,10 @@ and conversions. Here are some tests.
 import unittest
 
 from django.contrib.gis.measure import A, Area, D, Distance
+from django.test import SimpleTestCase
 
 
-class DistanceTest(unittest.TestCase):
+class DistanceTest(SimpleTestCase):
     "Testing the Distance object"
 
     def test_init(self):
@@ -157,6 +158,13 @@ class DistanceTest(unittest.TestCase):
             with self.subTest(nm=nm):
                 self.assertEqual(att, D.unit_attname(nm))
 
+    def test_unit_att_name_invalid(self):
+        msg = "Unknown unit type: invalid-unit-name"
+        with self.assertRaisesMessage(AttributeError, msg):
+            D.unit_attname("invalid-unit-name")
+        with self.assertRaisesMessage(AttributeError, msg):
+            A.unit_attname("invalid-unit-name")
+
     def test_hash(self):
         d1 = D(m=99)
         d2 = D(m=100)
@@ -293,18 +301,3 @@ class AreaTest(unittest.TestCase):
         self.assertEqual(hash(a2), hash(a3))
         self.assertNotEqual(hash(a1), hash(a2))
         self.assertNotEqual(hash(a1), hash(a3))
-
-
-def suite():
-    s = unittest.TestSuite()
-    s.addTest(unittest.makeSuite(DistanceTest))
-    s.addTest(unittest.makeSuite(AreaTest))
-    return s
-
-
-def run(verbosity=2):
-    unittest.TextTestRunner(verbosity=verbosity).run(suite())
-
-
-if __name__ == "__main__":
-    run()

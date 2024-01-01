@@ -45,7 +45,7 @@ JavaScript tests
 ================
 
 Django's JavaScript tests can be run in a browser or from the command line.
-The tests are located in a top level ``js_tests`` directory.
+The tests are located in a top level :source:`js_tests` directory.
 
 Writing tests
 -------------
@@ -89,7 +89,7 @@ The JavaScript tests may be run from a web browser or from the command line.
 Testing from a web browser
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To run the tests from a web browser, open up ``js_tests/tests.html`` in your
+To run the tests from a web browser, open up :source:`js_tests/tests.html` in your
 browser.
 
 To measure code coverage when running the tests, you need to view that file

@@ -4,9 +4,7 @@ managing the "Vary" header of responses. It includes functions to patch the
 header of response objects directly and decorators that change functions to do
 that header-patching themselves.
 
-For information on the Vary header, see:
-
-    https://tools.ietf.org/html/rfc7231#section-7.1.4
+For information on the Vary header, see RFC 9110 Section 12.5.5.
 
 Essentially, the "Vary" HTTP header defines which headers a cache should take
 into account when building its cache key. Requests with the same path but
@@ -18,11 +16,11 @@ An example: i18n middleware would need to distinguish caches by the
 """
 import time
 from collections import defaultdict
+from hashlib import md5
 
 from django.conf import settings
 from django.core.cache import caches
 from django.http import HttpResponse, HttpResponseNotModified
-from django.utils.crypto import md5
 from django.utils.http import http_date, parse_etags, parse_http_date_safe, quote_etag
 from django.utils.log import log_response
 from django.utils.regex_helper import _lazy_re_compile
@@ -80,7 +78,7 @@ def patch_cache_control(response, **kwargs):
     elif "public" in cc and "private" in kwargs:
         del cc["public"]
 
-    for (k, v) in kwargs.items():
+    for k, v in kwargs.items():
         directive = k.replace("_", "-")
         if directive == "no-cache":
             # no-cache supports multiple field names.
@@ -139,7 +137,7 @@ def _precondition_failed(request):
 def _not_modified(request, response=None):
     new_response = HttpResponseNotModified()
     if response:
-        # Preserve the headers required by Section 4.1 of RFC 7232, as well as
+        # Preserve the headers required by RFC 9110 Section 15.4.5, as well as
         # Last-Modified.
         for header in (
             "Cache-Control",
@@ -177,7 +175,9 @@ def get_conditional_response(request, etag=None, last_modified=None, response=No
     if_modified_since = request.META.get("HTTP_IF_MODIFIED_SINCE")
     if_modified_since = if_modified_since and parse_http_date_safe(if_modified_since)
 
-    # Step 1 of section 6 of RFC 7232: Test the If-Match precondition.
+    # Evaluation of request preconditions below follows RFC 9110 Section
+    # 13.2.2.
+    # Step 1: Test the If-Match precondition.
     if if_match_etags and not _if_match_passes(etag, if_match_etags):
         return _precondition_failed(request)
 
@@ -212,7 +212,7 @@ def get_conditional_response(request, etag=None, last_modified=None, response=No
 
 def _if_match_passes(target_etag, etags):
     """
-    Test the If-Match comparison as defined in section 3.1 of RFC 7232.
+    Test the If-Match comparison as defined in RFC 9110 Section 13.1.1.
     """
     if not target_etag:
         # If there isn't an ETag, then there can't be a match.
@@ -233,15 +233,15 @@ def _if_match_passes(target_etag, etags):
 
 def _if_unmodified_since_passes(last_modified, if_unmodified_since):
     """
-    Test the If-Unmodified-Since comparison as defined in section 3.4 of
-    RFC 7232.
+    Test the If-Unmodified-Since comparison as defined in RFC 9110 Section
+    13.1.4.
     """
     return last_modified and last_modified <= if_unmodified_since
 
 
 def _if_none_match_passes(target_etag, etags):
     """
-    Test the If-None-Match comparison as defined in section 3.2 of RFC 7232.
+    Test the If-None-Match comparison as defined in RFC 9110 Section 13.1.2.
     """
     if not target_etag:
         # If there isn't an ETag, then there isn't a match.
@@ -260,7 +260,8 @@ def _if_none_match_passes(target_etag, etags):
 
 def _if_modified_since_passes(last_modified, if_modified_since):
     """
-    Test the If-Modified-Since comparison as defined in section 3.3 of RFC 7232.
+    Test the If-Modified-Since comparison as defined in RFC 9110 Section
+    13.1.3.
     """
     return not last_modified or last_modified > if_modified_since
 

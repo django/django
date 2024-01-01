@@ -2,8 +2,6 @@
 Porting your apps from Django 0.96 to 1.0
 =========================================
 
-.. highlight:: python
-
 Django 1.0 breaks compatibility with 0.96 in some areas.
 
 This guide will help you port 0.96 projects and apps to 1.0. The first part of
@@ -92,13 +90,13 @@ Old (0.96) ``models.py``::
     class Author(models.Model):
         first_name = models.CharField(maxlength=30)
         last_name = models.CharField(maxlength=30)
-        slug = models.CharField(maxlength=60, prepopulate_from=('first_name', 'last_name'))
+        slug = models.CharField(maxlength=60, prepopulate_from=("first_name", "last_name"))
 
         class Admin:
-            list_display = ['first_name', 'last_name']
+            list_display = ["first_name", "last_name"]
 
         def __str__(self):
-            return '%s %s' % (self.first_name, self.last_name)
+            return "%s %s" % (self.first_name, self.last_name)
 
 New (1.0) ``models.py``::
 
@@ -108,18 +106,18 @@ New (1.0) ``models.py``::
         slug = models.CharField(max_length=60)
 
         def __unicode__(self):
-            return u'%s %s' % (self.first_name, self.last_name)
+            return "%s %s" % (self.first_name, self.last_name)
 
 New (1.0) ``admin.py``::
 
     from django.contrib import admin
     from models import Author
 
+
     class AuthorAdmin(admin.ModelAdmin):
-        list_display = ['first_name', 'last_name']
-        prepopulated_fields = {
-            'slug': ('first_name', 'last_name')
-        }
+        list_display = ["first_name", "last_name"]
+        prepopulated_fields = {"slug": ("first_name", "last_name")}
+
 
     admin.site.register(Author, AuthorAdmin)
 
@@ -149,6 +147,7 @@ Old (0.96)::
     class Parent(models.Model):
         ...
 
+
     class Child(models.Model):
         parent = models.ForeignKey(Parent, edit_inline=models.STACKED, num_in_admin=3)
 
@@ -159,9 +158,11 @@ New (1.0)::
         model = Child
         extra = 3
 
+
     class ParentAdmin(admin.ModelAdmin):
         model = Parent
         inlines = [ChildInline]
+
 
     admin.site.register(Parent, ParentAdmin)
 
@@ -179,29 +180,29 @@ Old (0.96)::
         ...
 
         class Admin:
-            fields = (
-                (None, {'fields': ('foo','bar')}),
-            )
+            fields = ((None, {"fields": ("foo", "bar")}),)
+
 
     class ModelTwo(models.Model):
         ...
 
         class Admin:
             fields = (
-                ('group1', {'fields': ('foo','bar'),   'classes': 'collapse'}),
-                ('group2', {'fields': ('spam','eggs'), 'classes': 'collapse wide'}),
+                ("group1", {"fields": ("foo", "bar"), "classes": "collapse"}),
+                ("group2", {"fields": ("spam", "eggs"), "classes": "collapse wide"}),
             )
 
 
 New (1.0)::
 
     class ModelOneAdmin(admin.ModelAdmin):
-        fields = ('foo', 'bar')
+        fields = ("foo", "bar")
+
 
     class ModelTwoAdmin(admin.ModelAdmin):
         fieldsets = (
-            ('group1', {'fields': ('foo','bar'),   'classes': 'collapse'}),
-            ('group2', {'fields': ('spam','eggs'), 'classes': 'collapse wide'}),
+            ("group1", {"fields": ("foo", "bar"), "classes": "collapse"}),
+            ("group2", {"fields": ("spam", "eggs"), "classes": "collapse wide"}),
         )
 
 
@@ -227,9 +228,9 @@ Old (0.96) ``urls.py``::
 
     from django.conf.urls.defaults import *
 
-    urlpatterns = patterns('',
-        (r'^admin/', include('django.contrib.admin.urls')),
-
+    urlpatterns = patterns(
+        "",
+        (r"^admin/", include("django.contrib.admin.urls")),
         # ... the rest of your URLs here ...
     )
 
@@ -239,11 +240,12 @@ New (1.0) ``urls.py``::
 
     # The next two lines enable the admin and load each admin.py file:
     from django.contrib import admin
+
     admin.autodiscover()
 
-    urlpatterns = patterns('',
-        (r'^admin/(.*)', admin.site.root),
-
+    urlpatterns = patterns(
+        "",
+        (r"^admin/(.*)", admin.site.root),
         # ... the rest of your URLs here ...
     )
 
@@ -284,7 +286,7 @@ syntax no longer works.
 Thus, in a view like::
 
       def my_view(request):
-          f = request.FILES['file_field_name']
+          f = request.FILES["file_field_name"]
           ...
 
 ...you'd need to make the following changes:
@@ -465,12 +467,12 @@ it is assumed you deliberately wanted to catch that pattern.
 For most people, this won't require any changes. Some people, though, have URL
 patterns that look like this::
 
-    r'/some_prefix/(.*)$'
+    r"/some_prefix/(.*)$"
 
 Previously, those patterns would have been redirected to have a trailing
 slash. If you always want a slash on such URLs, rewrite the pattern as::
 
-    r'/some_prefix/(.*/)$'
+    r"/some_prefix/(.*/)$"
 
 Smaller model changes
 ---------------------
@@ -512,6 +514,7 @@ Old (0.96)::
 New (1.0)::
 
     import datetime
+
 
     class Article(models.Model):
         title = models.CharField(max_length=100)
@@ -649,13 +652,14 @@ Testing
 Old (0.96)::
 
     from django.test import Client
+
     c = Client()
-    c.login('/path/to/login','myuser','mypassword')
+    c.login("/path/to/login", "myuser", "mypassword")
 
 New (1.0)::
 
     # ... same as above, but then:
-    c.login(username='myuser', password='mypassword')
+    c.login(username="myuser", password="mypassword")
 
 Management commands
 -------------------
@@ -670,14 +674,16 @@ Calls to management services in your code now need to use
 load_data::
 
       from django.core import management
+
       management.flush(verbosity=0, interactive=False)
-      management.load_data(['test_data'], verbosity=0)
+      management.load_data(["test_data"], verbosity=0)
 
 ...you'll need to change this code to read::
 
       from django.core import management
-      management.call_command('flush', verbosity=0, interactive=False)
-      management.call_command('loaddata', 'test_data', verbosity=0)
+
+      management.call_command("flush", verbosity=0, interactive=False)
+      management.call_command("loaddata", "test_data", verbosity=0)
 
 Subcommands must now precede options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

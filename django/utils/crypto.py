@@ -7,7 +7,6 @@ import secrets
 
 from django.conf import settings
 from django.utils.encoding import force_bytes
-from django.utils.inspect import func_supports_parameter
 
 
 class InvalidAlgorithm(ValueError):
@@ -75,19 +74,3 @@ def pbkdf2(password, salt, iterations, dklen=0, digest=None):
     password = force_bytes(password)
     salt = force_bytes(salt)
     return hashlib.pbkdf2_hmac(digest().name, password, salt, iterations, dklen)
-
-
-# TODO: Remove when dropping support for PY38. inspect.signature() is used to
-# detect whether the usedforsecurity argument is available as this fix may also
-# have been applied by downstream package maintainers to other versions in
-# their repositories.
-if func_supports_parameter(hashlib.md5, "usedforsecurity"):
-    md5 = hashlib.md5
-    new_hash = hashlib.new
-else:
-
-    def md5(data=b"", *, usedforsecurity=True):
-        return hashlib.md5(data)
-
-    def new_hash(hash_algorithm, *, usedforsecurity=True):
-        return hashlib.new(hash_algorithm)

@@ -155,7 +155,7 @@ class PyLibMCCache(BaseMemcachedCache):
     def client_servers(self):
         output = []
         for server in self._servers:
-            output.append(server[5:] if server.startswith("unix:") else server)
+            output.append(server.removeprefix("unix:"))
         return output
 
     def touch(self, key, timeout=DEFAULT_TIMEOUT, version=None):

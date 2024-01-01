@@ -18,7 +18,7 @@ def user_passes_test(
 
     def decorator(view_func):
         @wraps(view_func)
-        def _wrapped_view(request, *args, **kwargs):
+        def _wrapper_view(request, *args, **kwargs):
             if test_func(request.user):
                 return view_func(request, *args, **kwargs)
             path = request.build_absolute_uri()
@@ -35,7 +35,7 @@ def user_passes_test(
 
             return redirect_to_login(path, resolved_login_url, redirect_field_name)
 
-        return _wrapped_view
+        return _wrapper_view
 
     return decorator
 

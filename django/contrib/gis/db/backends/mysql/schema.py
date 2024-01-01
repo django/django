@@ -81,8 +81,7 @@ class MySQLGISSchemaEditor(DatabaseSchemaEditor):
                 self.execute(sql)
             except OperationalError:
                 logger.error(
-                    "Cannot create SPATIAL INDEX %s. Only MyISAM and (as of "
-                    "MySQL 5.7.5) InnoDB support them.",
-                    sql,
+                    f"Cannot create SPATIAL INDEX {sql}. Only MyISAM, Aria, and InnoDB "
+                    f"support them.",
                 )
         self.geometry_sql = []

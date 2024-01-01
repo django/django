@@ -7,13 +7,18 @@ from urllib.parse import parse_qsl, quote, urlencode, urljoin, urlsplit
 from django.conf import settings
 from django.core import signing
 from django.core.exceptions import (
+    BadRequest,
     DisallowedHost,
     ImproperlyConfigured,
     RequestDataTooBig,
     TooManyFieldsSent,
 )
 from django.core.files import uploadhandler
-from django.http.multipartparser import MultiPartParser, MultiPartParserError
+from django.http.multipartparser import (
+    MultiPartParser,
+    MultiPartParserError,
+    TooManyFilesSent,
+)
 from django.utils.datastructures import (
     CaseInsensitiveMapping,
     ImmutableList,
@@ -24,11 +29,9 @@ from django.utils.functional import cached_property
 from django.utils.http import is_same_domain, parse_header_parameters
 from django.utils.regex_helper import _lazy_re_compile
 
-from .multipartparser import parse_header
-
 RAISE_ERROR = object()
 host_validation_re = _lazy_re_compile(
-    r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(:[0-9]+)?$"
+    r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9.:]+\])(?::([0-9]+))?$"
 )
 
 
@@ -227,9 +230,7 @@ class HttpRequest:
                 # If location starts with '//' but has no netloc, reuse the
                 # schema and netloc from the current request. Strip the double
                 # slashes and continue as if it wasn't specified.
-                if location.startswith("//"):
-                    location = location[2:]
-                location = self._current_scheme_host + location
+                location = self._current_scheme_host + location.removeprefix("//")
             else:
                 # Join the constructed URL with the provided location, which
                 # allows the provided location to apply query strings to the
@@ -340,6 +341,8 @@ class HttpRequest:
                 self._body = self.read()
             except OSError as e:
                 raise UnreadablePostError(*e.args) from e
+            finally:
+                self._stream.close()
             self._stream = BytesIO(self._body)
         return self._body
 
@@ -367,7 +370,7 @@ class HttpRequest:
                 data = self
             try:
                 self._post, self._files = self.parse_file_upload(self.META, data)
-            except MultiPartParserError:
+            except (MultiPartParserError, TooManyFilesSent):
                 # An error occurred while parsing POST data. Since when
                 # formatting the error the request handler might access
                 # self.POST, set self._post and self._file to prevent
@@ -375,10 +378,16 @@ class HttpRequest:
                 self._mark_post_parse_error()
                 raise
         elif self.content_type == "application/x-www-form-urlencoded":
-            self._post, self._files = (
-                QueryDict(self.body, encoding=self._encoding),
-                MultiValueDict(),
-            )
+            # According to RFC 1866, the "application/x-www-form-urlencoded"
+            # content type does not have a charset and should be always treated
+            # as UTF-8.
+            if self._encoding is not None and self._encoding.lower() != "utf-8":
+                raise BadRequest(
+                    "HTTP requests with the 'application/x-www-form-urlencoded' "
+                    "content type must be UTF-8 encoded."
+                )
+            self._post = QueryDict(self.body, encoding="utf-8")
+            self._files = MultiValueDict()
         else:
             self._post, self._files = (
                 QueryDict(encoding=self._encoding),
@@ -439,10 +448,35 @@ class HttpHeaders(CaseInsensitiveMapping):
     @classmethod
     def parse_header_name(cls, header):
         if header.startswith(cls.HTTP_PREFIX):
-            header = header[len(cls.HTTP_PREFIX) :]
+            header = header.removeprefix(cls.HTTP_PREFIX)
         elif header not in cls.UNPREFIXED_HEADERS:
             return None
         return header.replace("_", "-").title()
+
+    @classmethod
+    def to_wsgi_name(cls, header):
+        header = header.replace("-", "_").upper()
+        if header in cls.UNPREFIXED_HEADERS:
+            return header
+        return f"{cls.HTTP_PREFIX}{header}"
+
+    @classmethod
+    def to_asgi_name(cls, header):
+        return header.replace("-", "_").upper()
+
+    @classmethod
+    def to_wsgi_names(cls, headers):
+        return {
+            cls.to_wsgi_name(header_name): value
+            for header_name, value in headers.items()
+        }
+
+    @classmethod
+    def to_asgi_names(cls, headers):
+        return {
+            cls.to_asgi_name(header_name): value
+            for header_name, value in headers.items()
+        }
 
 
 class QueryDict(MultiValueDict):
@@ -618,15 +652,13 @@ class QueryDict(MultiValueDict):
 
 class MediaType:
     def __init__(self, media_type_raw_line):
-        full_type, self.params = parse_header(
-            media_type_raw_line.encode("ascii") if media_type_raw_line else b""
+        full_type, self.params = parse_header_parameters(
+            media_type_raw_line if media_type_raw_line else ""
         )
         self.main_type, _, self.sub_type = full_type.partition("/")
 
     def __str__(self):
-        params_str = "".join(
-            "; %s=%s" % (k, v.decode("ascii")) for k, v in self.params.items()
-        )
+        params_str = "".join("; %s=%s" % (k, v) for k, v in self.params.items())
         return "%s%s%s" % (
             self.main_type,
             ("/%s" % self.sub_type) if self.sub_type else "",
@@ -673,19 +705,11 @@ def split_domain_port(host):
     Returned domain is lowercased. If the host is invalid, the domain will be
     empty.
     """
-    host = host.lower()
-
-    if not host_validation_re.match(host):
-        return "", ""
-
-    if host[-1] == "]":
-        # It's an IPv6 address without a port.
-        return host, ""
-    bits = host.rsplit(":", 1)
-    domain, port = bits if len(bits) == 2 else (bits[0], "")
-    # Remove a trailing dot (if present) from the domain.
-    domain = domain[:-1] if domain.endswith(".") else domain
-    return domain, port
+    if match := host_validation_re.fullmatch(host.lower()):
+        domain, port = match.groups(default="")
+        # Remove a trailing dot (if present) from the domain.
+        return domain.removesuffix("."), port
+    return "", ""
 
 
 def validate_host(host, allowed_hosts):

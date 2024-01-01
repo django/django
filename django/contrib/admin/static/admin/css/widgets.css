@@ -1,27 +1,23 @@
 /* SELECTOR (FILTER INTERFACE) */
 
 .selector {
-    width: 800px;
-    float: left;
     display: flex;
+    flex-grow: 1;
+    gap: 0 10px;
 }
 
 .selector select {
-    width: 380px;
     height: 17.2em;
     flex: 1 0 auto;
+    overflow: scroll;
+    width: 100%;
 }
 
 .selector-available, .selector-chosen {
-    width: 380px;
     text-align: center;
-    margin-bottom: 5px;
     display: flex;
     flex-direction: column;
-}
-
-.selector-chosen select {
-    border-top: none;
+    flex: 1 1;
 }
 
 .selector-available h2, .selector-chosen h2 {
@@ -29,8 +25,23 @@
     border-radius: 4px 4px 0 0;
 }
 
-.selector-chosen h2 {
+.selector-chosen .list-footer-display {
+    border: 1px solid var(--border-color);
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    margin: 0 0 10px;
+    padding: 8px;
+    text-align: center;
     background: var(--primary);
+    color: var(--header-link-color);
+    cursor: pointer;
+}
+.selector-chosen .list-footer-display__clear {
+    color: var(--breadcrumbs-fg);
+}
+
+.selector-chosen h2 {
+    background: var(--secondary);
     color: var(--header-link-color);
 }
 
@@ -47,6 +58,7 @@
     font-size: 0.625rem;
     margin: 0;
     text-align: left;
+    display: flex;
 }
 
 .selector .selector-filter label,
@@ -58,10 +70,15 @@
     padding: 0;
     overflow: hidden;
     line-height: 1;
+    min-width: auto;
 }
 
-.selector .selector-available input {
-    width: 320px;
+.selector-filter input {
+    flex-grow: 1;
+}
+
+.selector .selector-available input,
+.selector .selector-chosen input {
     margin-left: 8px;
 }
 
@@ -70,7 +87,7 @@
     width: 22px;
     background-color: var(--selected-bg);
     border-radius: 10px;
-    margin: 0 5px;
+    margin: 0;
     padding: 0;
     transform: translateY(-17px);
 }
@@ -85,6 +102,15 @@
     padding: 0 10px;
     margin: 0 0 10px;
     border-radius: 0 0 4px 4px;
+}
+.selector .selector-chosen--with-filtered select {
+    margin: 0;
+    border-radius: 0;
+    height: 14em;
+}
+
+.selector .selector-chosen:not(.selector-chosen--with-filtered) .list-footer-display {
+    display: none;
 }
 
 .selector-add, .selector-remove {
@@ -125,7 +151,7 @@ a.selector-chooseall, a.selector-clearall {
     display: inline-block;
     height: 16px;
     text-align: left;
-    margin: 1px auto 3px;
+    margin: 0 auto;
     overflow: hidden;
     font-weight: bold;
     line-height: 16px;
@@ -256,8 +282,8 @@ a.active.selector-clearall:focus, a.active.selector-clearall:hover {
 .selector .search-label-icon {
     background: url(../img/search.svg) 0 0 no-repeat;
     display: inline-block;
-    height: 18px;
-    width: 18px;
+    height: 1.125rem;
+    width: 1.125rem;
 }
 
 /* DATE AND TIME */
@@ -347,10 +373,6 @@ p.file-upload {
     font-weight: bold;
 }
 
-.aligned p.file-upload {
-    margin-left: 170px;
-}
-
 .file-upload a {
     font-weight: normal;
 }
@@ -429,7 +451,7 @@ span.clearable-file-input label {
 }
 
 .calendar td.selected a {
-    background: var(--primary);
+    background: var(--secondary);
     color: var(--button-fg);
 }
 
@@ -477,7 +499,7 @@ span.clearable-file-input label {
     background: var(--body-bg);
     color: var(--body-quiet-color);
     font-size: 0.6875rem;
-    line-height: 11px;
+    line-height: 0.6875rem;
     border-top: 1px solid var(--hairline-color);
     padding: 8px 0;
 }
@@ -516,17 +538,17 @@ span.clearable-file-input label {
     margin: 0;
     padding: 4px 0;
     font-size: 0.75rem;
-    background: #eee;
+    background: var(--close-button-bg);
     border-top: 1px solid var(--border-color);
-    color: var(--body-fg);
+    color: var(--button-fg);
 }
 
 .calendar-cancel:focus, .calendar-cancel:hover {
-    background: #ddd;
+    background: var(--close-button-hover-bg);
 }
 
 .calendar-cancel a {
-    color: black;
+    color: var(--button-fg);
     display: block;
 }
 
@@ -557,24 +579,25 @@ ul.timelist, .timelist li {
 
 /* RELATED WIDGET WRAPPER */
 .related-widget-wrapper {
-    float: left;       /* display properly in form rows with multiple fields */
-    overflow: hidden;  /* clear floated contents */
+    display: flex;
+    gap: 0 10px;
+    flex-grow: 1;
+    flex-wrap: wrap;
+    margin-bottom: 5px;
 }
 
 .related-widget-wrapper-link {
-    opacity: 0.3;
+    opacity: .6;
+    filter: grayscale(1);
 }
 
 .related-widget-wrapper-link:link {
-    opacity: .8;
-}
-
-.related-widget-wrapper-link:link:focus,
-.related-widget-wrapper-link:link:hover {
     opacity: 1;
+    filter: grayscale(0);
 }
 
-select + .related-widget-wrapper-link,
-.related-widget-wrapper-link + .related-widget-wrapper-link {
-    margin-left: 7px;
+/* GIS MAPS */
+.dj_map {
+    width: 600px;
+    height: 400px;
 }

@@ -6,12 +6,14 @@ import os
 from django.contrib.gis.db import models
 from django.contrib.gis.db.models.functions import Area, Distance
 from django.contrib.gis.measure import D
+from django.core.exceptions import ValidationError
 from django.db import NotSupportedError, connection
 from django.db.models.functions import Cast
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
+from django.test.utils import CaptureQueriesContext
 
 from ..utils import FuncTestMixin
-from .models import City, County, Zipcode
+from .models import City, CityUnique, County, Zipcode
 
 
 class GeographyTest(TestCase):
@@ -38,28 +40,46 @@ class GeographyTest(TestCase):
         for cities in [cities1, cities2]:
             self.assertEqual(["Dallas", "Houston", "Oklahoma City"], cities)
 
-    def test04_invalid_operators_functions(self):
+    @skipUnlessDBFeature("supports_geography", "supports_geometry_field_unique_index")
+    def test_geography_unique(self):
         """
-        Exceptions are raised for operators & functions invalid on geography
-        fields.
+        Cast geography fields to geometry type when validating uniqueness to
+        remove the reliance on unavailable ~= operator.
         """
-        if not connection.ops.postgis:
-            self.skipTest("This is a PostGIS-specific test.")
-        # Only a subset of the geometry functions & operator are available
-        # to PostGIS geography types.  For more information, visit:
-        # http://postgis.refractions.net/documentation/manual-1.5/ch08.html#PostGIS_GeographyFunctions
-        z = Zipcode.objects.get(code="77002")
-        # ST_Within not available.
-        with self.assertRaises(ValueError):
-            City.objects.filter(point__within=z.poly).count()
-        # `@` operator not available.
-        with self.assertRaises(ValueError):
-            City.objects.filter(point__contained=z.poly).count()
-
-        # Regression test for #14060, `~=` was never really implemented for PostGIS.
         htown = City.objects.get(name="Houston")
-        with self.assertRaises(ValueError):
-            City.objects.get(point__exact=htown.point)
+        CityUnique.objects.create(point=htown.point)
+        duplicate = CityUnique(point=htown.point)
+        msg = "City unique with this Point already exists."
+        with self.assertRaisesMessage(ValidationError, msg):
+            duplicate.validate_unique()
+
+    @skipUnlessDBFeature("supports_geography")
+    def test_operators_functions_unavailable_for_geography(self):
+        """
+        Geography fields are cast to geometry if the relevant operators or
+        functions are not available.
+        """
+        z = Zipcode.objects.get(code="77002")
+        point_field = "%s.%s::geometry" % (
+            connection.ops.quote_name(City._meta.db_table),
+            connection.ops.quote_name("point"),
+        )
+        # ST_Within.
+        qs = City.objects.filter(point__within=z.poly)
+        with CaptureQueriesContext(connection) as ctx:
+            self.assertEqual(qs.count(), 1)
+        self.assertIn(f"ST_Within({point_field}", ctx.captured_queries[0]["sql"])
+        # @ operator.
+        qs = City.objects.filter(point__contained=z.poly)
+        with CaptureQueriesContext(connection) as ctx:
+            self.assertEqual(qs.count(), 1)
+        self.assertIn(f"{point_field} @", ctx.captured_queries[0]["sql"])
+        # ~= operator.
+        htown = City.objects.get(name="Houston")
+        qs = City.objects.filter(point__exact=htown.point)
+        with CaptureQueriesContext(connection) as ctx:
+            self.assertEqual(qs.count(), 1)
+        self.assertIn(f"{point_field} ~=", ctx.captured_queries[0]["sql"])
 
     def test05_geography_layermapping(self):
         "Testing LayerMapping support on models with geography fields."

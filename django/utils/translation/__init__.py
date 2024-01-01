@@ -149,7 +149,7 @@ def lazy_number(func, resultclass, number=None, **kwargs):
                     number_value = rhs
                 translated = self._translate(number_value)
                 try:
-                    translated = translated % rhs
+                    translated %= rhs
                 except TypeError:
                     # String doesn't contain a placeholder for the number.
                     pass

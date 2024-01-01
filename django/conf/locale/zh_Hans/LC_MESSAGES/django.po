@@ -1,9 +1,12 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# HuanCheng Bai白宦成 <xiqingongzi@gmail.com>, 2017-2018
+# HuanCheng Bai白宦成（Bestony） <xiqingongzi@gmail.com>, 2017-2018
 # lanbla <lanlinwen@buaa.edu.cn>, 2021
 # Daniel Duan <DaNmarner@gmail.com>, 2013
+# Fan Xu <xlivevil@aliyun.com>, 2022
+# Ford Guo <agile.guo@gmail.com>, 2022
+# Huanqun Yang, 2022
 # jamin M <lxxmbyx@163.com>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kevin Sze <leiarix@gmail.com>, 2012
@@ -29,15 +32,16 @@
 # ced773123cfad7b4e8b79ca80f736af9, 2011-2012
 # Ziya Tang <tcztzy@gmail.com>, 2018
 # 付峥 <fuzheng1998@outlook.com>, 2018
-# fangjiaqi77 <370358679@qq.com>, 2020
+# Fangjiaqi77 <370358679@qq.com>, 2020
 # Kevin Sze <leiarix@gmail.com>, 2012
+# 高乐喆 <gaolezhe@outlook.com>, 2023
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-11-22 03:05+0000\n"
-"Last-Translator: lanbla <lanlinwen@buaa.edu.cn>\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-25 06:49+0000\n"
+"Last-Translator: 高乐喆 <gaolezhe@outlook.com>, 2023\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -78,6 +82,9 @@ msgstr "波斯尼亚语"
 
 msgid "Catalan"
 msgstr "加泰罗尼亚语"
+
+msgid "Central Kurdish (Sorani)"
+msgstr "中部库尔德语（Sorani）"
 
 msgid "Czech"
 msgstr "捷克语"
@@ -410,6 +417,10 @@ msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "确保该值大于或等于%(limit_value)s。"
 
 #, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr "确保该值是步长的倍数%(limit_value)s"
+
+#, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
 "%(show_value)d)."
@@ -467,6 +478,10 @@ msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr "包含 %(field_labels)s 的 %(model_name)s 已经存在。"
 
 #, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr "约束 “%(name)s” 是无效的"
+
+#, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "值 %(value)r 不是有效选项。"
 
@@ -480,8 +495,8 @@ msgstr "此字段不能为空。"
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "具有 %(field_label)s 的 %(model_name)s 已存在。"
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -507,6 +522,9 @@ msgstr "布尔值( True或False )"
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "字符串（最长 %(max_length)s 位）"
+
+msgid "String (unlimited)"
+msgstr "字符串（无限）"
 
 msgid "Comma-separated integers"
 msgstr "逗号分隔的整数"
@@ -762,14 +780,14 @@ msgstr ""
 "在，你可能需要提交错误报告。"
 
 #, python-format
-msgid "Please submit at most %d form."
-msgid_plural "Please submit at most %d forms."
-msgstr[0] "请最多提交 %d 个表单。"
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] "请最多提交 %(num)d 个表单。"
 
 #, python-format
-msgid "Please submit at least %d form."
-msgid_plural "Please submit at least %d forms."
-msgstr[0] "请至少提交 %d 个表单。"
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] "请至少提交 %(num)d 个表单。"
 
 msgid "Order"
 msgstr "排序"
@@ -1095,7 +1113,7 @@ msgstr "该值不是合法的IPv6地址。"
 #, python-format
 msgctxt "String to return when truncating text"
 msgid "%(truncated_text)s…"
-msgstr "%(truncated_text)s"
+msgstr "%(truncated_text)s..."
 
 msgid "or"
 msgstr "或"
@@ -1161,8 +1179,8 @@ msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
 "including the “Referrer-Policy: no-referrer” header, please remove them. The "
 "CSRF protection requires the “Referer” header to do strict referer checking. "
-"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" …> for links to third-party sites."
+"If you’re concerned about privacy, use alternatives like <a "
+"rel=\"noreferrer\" …> for links to third-party sites."
 msgstr ""
 "如果您使用的是<meta name=\"referrer\" content=\"no-referrer\">标签或包"
 "含“Referrer-Policy: no-referrer”的HTTP头，请将其删除。CSRF保护要求“Referer”头"
@@ -1260,13 +1278,13 @@ msgstr ""
 #, python-format
 msgid ""
 "You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> is in your settings file and you have not configured any "
-"URLs."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
+"configured any URLs."
 msgstr ""
 "您现在看见这个页面，因为您设置了 <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> 并且您还没有配置任何URLs。"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> 并且您还没有配置任何URLs。"
 
 msgid "Django Documentation"
 msgstr "Django 文档"

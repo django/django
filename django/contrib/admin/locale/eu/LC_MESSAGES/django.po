@@ -2,7 +2,7 @@
 #
 # Translators:
 # Aitzol Naberan <anaberan@codesyntax.com>, 2013,2016
-# Eneko Illarramendi <eneko@illarra.com>, 2017-2019
+# Eneko Illarramendi <eneko@illarra.com>, 2017-2019,2022
 # Jannis Leidel <jannis@leidel.info>, 2011
 # julen, 2012-2013
 # julen, 2013
@@ -12,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-03-22 12:29+0000\n"
-"Last-Translator: Yoaira García <ygarcia@codesyntax.eus>\n"
+"POT-Creation-Date: 2022-05-17 05:10-0500\n"
+"PO-Revision-Date: 2022-07-25 07:05+0000\n"
+"Last-Translator: Eneko Illarramendi <eneko@illarra.com>\n"
 "Language-Team: Basque (http://www.transifex.com/django/django/language/eu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -137,7 +137,7 @@ msgstr "log sarrerak"
 
 #, python-format
 msgid "Added “%(object)s”."
-msgstr ""
+msgstr "\"%(object)s\" gehituta."
 
 #, python-format
 msgid "Changed “%(object)s” — %(changes)s"
@@ -145,14 +145,14 @@ msgstr ""
 
 #, python-format
 msgid "Deleted “%(object)s.”"
-msgstr ""
+msgstr "\"%(object)s\" ezabatuta."
 
 msgid "LogEntry Object"
 msgstr "LogEntry objetua"
 
 #, python-brace-format
 msgid "Added {name} “{object}”."
-msgstr ""
+msgstr "{name} \"{object}\" gehituta."
 
 msgid "Added."
 msgstr "Gehituta"
@@ -170,7 +170,7 @@ msgstr "{fields} aldatuta."
 
 #, python-brace-format
 msgid "Deleted {name} “{object}”."
-msgstr ""
+msgstr "{name} \"{object}\" ezabatuta."
 
 msgid "No fields changed."
 msgstr "Ez da eremurik aldatu."
@@ -180,6 +180,8 @@ msgstr "Bat ere ez"
 
 msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr ""
+"Bat baino gehiago hautatzeko, sakatu \"Kontrol\" tekla edo \"Command\" Mac "
+"batean."
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -192,15 +194,18 @@ msgstr "Aldaketa gehiago egin ditzazkezu jarraian."
 msgid ""
 "The {name} “{obj}” was added successfully. You may add another {name} below."
 msgstr ""
+"{name} \"{obj}\" ondo gehitu da. Beste {name} bat gehitu dezakezu jarraian."
 
 #, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may edit it again below."
 msgstr ""
+"{name} \"{obj}\" ondo aldatu da. Aldaketa gehiago egin ditzazkezu jarraian."
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully. You may edit it again below."
 msgstr ""
+"{name} \"{obj}\" ondo gehitu da. Aldaketa gehiago egin ditzazkezu jarraian."
 
 #, python-brace-format
 msgid ""
@@ -224,11 +229,12 @@ msgstr "Ez dago ekintzarik aukeratuta."
 
 #, python-format
 msgid "The %(name)s “%(obj)s” was deleted successfully."
-msgstr ""
+msgstr "%(name)s \"%(obj)s\" ondo ezabatu da."
 
 #, python-format
 msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
 msgstr ""
+"\"%(key)s\" ID-a duen %(name)s ez da existitzen. Agian ezabatua izan da?"
 
 #, python-format
 msgid "Add %s"
@@ -265,8 +271,9 @@ msgstr "Guztira %(cnt)s, 0 aukeratuta"
 msgid "Change history: %s"
 msgstr "Aldaketen historia: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -518,6 +525,12 @@ msgstr "Pasahitza edo erabiltzaile-izena ahaztu duzu?"
 msgid "Toggle navigation"
 msgstr ""
 
+msgid "Start typing to filter…"
+msgstr "Hasi idazten filtratzeko..."
+
+msgid "Filter navigation items"
+msgstr ""
+
 msgid "Date/time"
 msgstr "Data/ordua"
 
@@ -526,6 +539,12 @@ msgstr "Erabiltzailea"
 
 msgid "Action"
 msgstr "Ekintza"
+
+msgid "entry"
+msgstr "sarrera"
+
+msgid "entries"
+msgstr "sarrerak"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -581,8 +600,12 @@ msgstr "Gehitu beste %(model)s"
 msgid "Delete selected %(model)s"
 msgstr "Ezabatu aukeratutako %(model)s"
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Eskerrik asko webguneari zure probetxuzko denbora eskaintzeagatik."
+#, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr ""
 
 msgid "Log in again"
 msgstr "Hasi saioa berriro"
@@ -656,7 +679,7 @@ msgid "Please go to the following page and choose a new password:"
 msgstr "Zoaz hurrengo orrira eta aukeratu pasahitz berria:"
 
 msgid "Your username, in case you’ve forgotten:"
-msgstr ""
+msgstr "Zure erabiltzaile-izena, ahaztu baduzu:"
 
 msgid "Thanks for using our site!"
 msgstr "Mila esker gure webgunea erabiltzeagatik!"

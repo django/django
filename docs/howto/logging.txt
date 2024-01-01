@@ -41,7 +41,7 @@ And then in a function, for example in a view, send a record to the logger::
     def some_view(request):
         ...
         if some_risky_state:
-            logger.warning('Platform is running at risk')
+            logger.warning("Platform is running at risk")
 
 When this code is executed, a :py:class:`~logging.LogRecord` containing that
 message will be sent to the logger. If you're using Django's default logging
@@ -51,7 +51,7 @@ The ``WARNING`` level used in the example above is one of several
 :ref:`logging severity levels <topic-logging-parts-loggers>`: ``DEBUG``,
 ``INFO``, ``WARNING``, ``ERROR``, ``CRITICAL``. So, another example might be::
 
-    logger.critical('Payment system is not responding')
+    logger.critical("Payment system is not responding")
 
 .. important::
 
@@ -99,8 +99,8 @@ Create a ``LOGGING`` dictionary
 In your ``settings.py``::
 
     LOGGING = {
-        'version': 1,                       # the dictConfig format version
-        'disable_existing_loggers': False,  # retain the default loggers
+        "version": 1,  # the dictConfig format version
+        "disable_existing_loggers": False,  # retain the default loggers
     }
 
 It nearly always makes sense to retain and extend the default logging
@@ -117,11 +117,11 @@ file ``general.log`` (at the project root):
     :emphasize-lines: 3-8
 
     LOGGING = {
-        [...]
-        'handlers': {
-            'file': {
-                'class': 'logging.FileHandler',
-                'filename': 'general.log',
+        # ...
+        "handlers": {
+            "file": {
+                "class": "logging.FileHandler",
+                "filename": "general.log",
             },
         },
     }
@@ -138,9 +138,9 @@ messages of all levels). Using the example above, adding:
     :emphasize-lines: 4
 
     {
-        'class': 'logging.FileHandler',
-        'filename': 'general.log',
-        'level': 'DEBUG',
+        "class": "logging.FileHandler",
+        "filename": "general.log",
+        "level": "DEBUG",
     }
 
 would define a handler configuration that only accepts records of level
@@ -156,11 +156,11 @@ example:
     :emphasize-lines: 3-8
 
     LOGGING = {
-        [...]
-        'loggers': {
-            '': {
-                'level': 'DEBUG',
-                'handlers': ['file'],
+        # ...
+        "loggers": {
+            "": {
+                "level": "DEBUG",
+                "handlers": ["file"],
             },
         },
     }
@@ -178,7 +178,7 @@ between loggers and handlers is many-to-many.
 
 If you execute::
 
-    logger.debug('Attempting to connect to API')
+    logger.debug("Attempting to connect to API")
 
 in your code, you will find that message in the file ``general.log`` in the
 root of the project.
@@ -195,15 +195,15 @@ formatters named ``verbose`` and ``simple``:
     :emphasize-lines: 3-12
 
     LOGGING = {
-        [...]
-        'formatters': {
-            'verbose': {
-                'format': '{name} {levelname} {asctime} {module} {process:d} {thread:d} {message}',
-                'style': '{',
+        # ...
+        "formatters": {
+            "verbose": {
+                "format": "{name} {levelname} {asctime} {module} {process:d} {thread:d} {message}",
+                "style": "{",
             },
-            'simple': {
-                'format': '{levelname} {message}',
-                'style': '{',
+            "simple": {
+                "format": "{levelname} {message}",
+                "style": "{",
             },
         },
     }
@@ -220,13 +220,13 @@ dictionary referring to the formatter by name, for example:
 .. code-block:: python
     :emphasize-lines: 5
 
-    'handlers': {
-        'file': {
-            'class': 'logging.FileHandler',
-            'filename': 'general.log',
-            'formatter': 'verbose',
+    "handlers": {
+        "file": {
+            "class": "logging.FileHandler",
+            "filename": "general.log",
+            "formatter": "verbose",
         },
-    },
+    }
 
 .. _naming-loggers:
 
@@ -253,11 +253,9 @@ A logger mapping named ``my_app.views`` will capture records from this logger:
     :emphasize-lines: 4
 
     LOGGING = {
-        [...]
-        'loggers': {
-            'my_app.views': {
-                ...
-            },
+        # ...
+        "loggers": {
+            "my_app.views": {...},
         },
     }
 
@@ -269,17 +267,15 @@ from loggers anywhere within the ``my_app`` namespace (including
     :emphasize-lines: 4
 
     LOGGING = {
-        [...]
-        'loggers': {
-            'my_app': {
-                ...
-            },
+        # ...
+        "loggers": {
+            "my_app": {...},
         },
     }
 
 You can also define logger namespacing explicitly::
 
-    logger = logging.getLogger('project.payment')
+    logger = logging.getLogger("project.payment")
 
 and set up logger mappings accordingly.
 
@@ -297,17 +293,17 @@ by a mapping for both ``my_app`` and ``my_app.views``.
 To manage this behavior, set the propagation key on the mappings you define::
 
     LOGGING = {
-        [...]
-        'loggers': {
-            'my_app': {
-                [...]
+        # ...
+        "loggers": {
+            "my_app": {
+                # ...
             },
-            'my_app.views': {
-                [...]
+            "my_app.views": {
+                # ...
             },
-            'my_app.views.private': {
-                [...]
-                'propagate': False,
+            "my_app.views.private": {
+                # ...
+                "propagate": False,
             },
         },
     }
@@ -333,7 +329,7 @@ For example, you could set an environment variable ``DJANGO_LOG_LEVEL``
 appropriately in your development and staging environments, and make use of it
 in a logger mapping thus::
 
-    'level': os.getenv('DJANGO_LOG_LEVEL', 'WARNING')
+    "level": os.getenv("DJANGO_LOG_LEVEL", "WARNING")
 
 \- so that unless the environment specifies a lower log level, this
 configuration will only forward records of severity ``WARNING`` and above to

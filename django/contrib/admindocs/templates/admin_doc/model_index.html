@@ -27,7 +27,7 @@
 <table class="xfull">
 {% for model in group.list %}
 <tr>
-<th><a href="{% url 'django-admindocs-models-detail' app_label=model.app_label model_name=model.model_name %}">{{ model.object_name }}</a></th>
+<th scope="col"><a href="{% url 'django-admindocs-models-detail' app_label=model.app_label model_name=model.model_name %}">{{ model.object_name }}</a></th>
 </tr>
 {% endfor %}
 </table>

@@ -1,4 +1,6 @@
+import gzip
 import re
+import secrets
 import unicodedata
 from gzip import GzipFile
 from gzip import compress as gzip_compress
@@ -62,28 +64,35 @@ def wrap(text, width):
     return "".join(_generator())
 
 
+def add_truncation_text(text, truncate=None):
+    if truncate is None:
+        truncate = pgettext(
+            "String to return when truncating text", "%(truncated_text)s…"
+        )
+    if "%(truncated_text)s" in truncate:
+        return truncate % {"truncated_text": text}
+    # The truncation text didn't contain the %(truncated_text)s string
+    # replacement argument so just append it to the text.
+    if text.endswith(truncate):
+        # But don't append the truncation text if the current text already ends
+        # in this.
+        return text
+    return f"{text}{truncate}"
+
+
 class Truncator(SimpleLazyObject):
     """
     An object used to truncate text, either by characters or words.
+
+    When truncating HTML text (either chars or words), input will be limited to
+    at most `MAX_LENGTH_HTML` characters.
     """
+
+    # 5 million characters are approximately 4000 text pages or 3 web pages.
+    MAX_LENGTH_HTML = 5_000_000
 
     def __init__(self, text):
         super().__init__(lambda: str(text))
-
-    def add_truncation_text(self, text, truncate=None):
-        if truncate is None:
-            truncate = pgettext(
-                "String to return when truncating text", "%(truncated_text)s…"
-            )
-        if "%(truncated_text)s" in truncate:
-            return truncate % {"truncated_text": text}
-        # The truncation text didn't contain the %(truncated_text)s string
-        # replacement argument so just append it to the text.
-        if text.endswith(truncate):
-            # But don't append the truncation text if the current text already
-            # ends in this.
-            return text
-        return "%s%s" % (text, truncate)
 
     def chars(self, num, truncate=None, html=False):
         """
@@ -99,7 +108,7 @@ class Truncator(SimpleLazyObject):
 
         # Calculate the length to truncate to (max length - end_text length)
         truncate_len = length
-        for char in self.add_truncation_text("", truncate):
+        for char in add_truncation_text("", truncate):
             if not unicodedata.combining(char):
                 truncate_len -= 1
                 if truncate_len == 0:
@@ -122,7 +131,7 @@ class Truncator(SimpleLazyObject):
                 end_index = i
             if s_len > length:
                 # Return the truncated string
-                return self.add_truncation_text(text[: end_index or 0], truncate)
+                return add_truncation_text(text[: end_index or 0], truncate)
 
         # Return the original string since no truncation was necessary
         return text
@@ -148,7 +157,7 @@ class Truncator(SimpleLazyObject):
         words = self._wrapped.split()
         if len(words) > length:
             words = words[:length]
-            return self.add_truncation_text(" ".join(words), truncate)
+            return add_truncation_text(" ".join(words), truncate)
         return " ".join(words)
 
     def _truncate_html(self, length, truncate, text, truncate_len, words):
@@ -161,6 +170,11 @@ class Truncator(SimpleLazyObject):
         """
         if words and length <= 0:
             return ""
+
+        size_limited = False
+        if len(text) > self.MAX_LENGTH_HTML:
+            text = text[: self.MAX_LENGTH_HTML]
+            size_limited = True
 
         html4_singlets = (
             "br",
@@ -218,10 +232,14 @@ class Truncator(SimpleLazyObject):
                 # Add it to the start of the open tags list
                 open_tags.insert(0, tagname)
 
+        truncate_text = add_truncation_text("", truncate)
+
         if current_len <= length:
+            if size_limited and truncate_text:
+                text += truncate_text
             return text
+
         out = text[:end_text_pos]
-        truncate_text = self.add_truncation_text("", truncate)
         if truncate_text:
             out += truncate_text
         # Close any tags still open
@@ -314,8 +332,23 @@ def phone2numeric(phone):
     return "".join(char2number.get(c, c) for c in phone.lower())
 
 
-def compress_string(s):
-    return gzip_compress(s, compresslevel=6, mtime=0)
+def _get_random_filename(max_random_bytes):
+    return b"a" * secrets.randbelow(max_random_bytes)
+
+
+def compress_string(s, *, max_random_bytes=None):
+    compressed_data = gzip_compress(s, compresslevel=6, mtime=0)
+
+    if not max_random_bytes:
+        return compressed_data
+
+    compressed_view = memoryview(compressed_data)
+    header = bytearray(compressed_view[:10])
+    header[3] = gzip.FNAME
+
+    filename = _get_random_filename(max_random_bytes) + b"\x00"
+
+    return bytes(header) + filename + compressed_view[10:]
 
 
 class StreamingBuffer(BytesIO):
@@ -327,9 +360,12 @@ class StreamingBuffer(BytesIO):
 
 
 # Like compress_string, but for iterators of strings.
-def compress_sequence(sequence):
+def compress_sequence(sequence, *, max_random_bytes=None):
     buf = StreamingBuffer()
-    with GzipFile(mode="wb", compresslevel=6, fileobj=buf, mtime=0) as zfile:
+    filename = _get_random_filename(max_random_bytes) if max_random_bytes else None
+    with GzipFile(
+        filename=filename, mode="wb", compresslevel=6, fileobj=buf, mtime=0
+    ) as zfile:
         # Output headers...
         yield buf.read()
         for item in sequence:

@@ -7,14 +7,18 @@ from asgiref.testing import ApplicationCommunicator
 
 from django.contrib.staticfiles.handlers import ASGIStaticFilesHandler
 from django.core.asgi import get_asgi_application
+from django.core.handlers.asgi import ASGIHandler, ASGIRequest
 from django.core.signals import request_finished, request_started
 from django.db import close_old_connections
+from django.http import HttpResponse, StreamingHttpResponse
 from django.test import (
     AsyncRequestFactory,
     SimpleTestCase,
+    ignore_warnings,
     modify_settings,
     override_settings,
 )
+from django.urls import path
 from django.utils.http import http_date
 
 from .urls import sync_waiter, test_filename
@@ -28,9 +32,7 @@ class ASGITest(SimpleTestCase):
 
     def setUp(self):
         request_started.disconnect(close_old_connections)
-
-    def tearDown(self):
-        request_started.connect(close_old_connections)
+        self.addCleanup(request_started.connect, close_old_connections)
 
     async def test_get_asgi_application(self):
         """
@@ -55,7 +57,16 @@ class ASGITest(SimpleTestCase):
         response_body = await communicator.receive_output()
         self.assertEqual(response_body["type"], "http.response.body")
         self.assertEqual(response_body["body"], b"Hello World!")
+        # Allow response.close() to finish.
+        await communicator.wait()
 
+    # Python's file API is not async compatible. A third-party library such
+    # as https://github.com/Tinche/aiofiles allows passing the file to
+    # FileResponse as an async iterator. With a sync iterator
+    # StreamingHTTPResponse triggers a warning when iterating the file.
+    # assertWarnsMessage is not async compatible, so ignore_warnings for the
+    # test.
+    @ignore_warnings(module="django.http.response")
     async def test_file_response(self):
         """
         Makes sure that FileResponse works over ASGI.
@@ -89,6 +100,8 @@ class ASGITest(SimpleTestCase):
                     self.assertEqual(value, b"text/plain")
                 else:
                     raise
+
+        # Warning ignored here.
         response_body = await communicator.receive_output()
         self.assertEqual(response_body["type"], "http.response.body")
         self.assertEqual(response_body["body"], test_file_contents)
@@ -162,6 +175,38 @@ class ASGITest(SimpleTestCase):
         response_body = await communicator.receive_output()
         self.assertEqual(response_body["type"], "http.response.body")
         self.assertEqual(response_body["body"], b"From Scotland,Wales")
+        # Allow response.close() to finish
+        await communicator.wait()
+
+    async def test_post_body(self):
+        application = get_asgi_application()
+        scope = self.async_request_factory._base_scope(
+            method="POST",
+            path="/post/",
+            query_string="echo=1",
+        )
+        communicator = ApplicationCommunicator(application, scope)
+        await communicator.send_input({"type": "http.request", "body": b"Echo!"})
+        response_start = await communicator.receive_output()
+        self.assertEqual(response_start["type"], "http.response.start")
+        self.assertEqual(response_start["status"], 200)
+        response_body = await communicator.receive_output()
+        self.assertEqual(response_body["type"], "http.response.body")
+        self.assertEqual(response_body["body"], b"Echo!")
+
+    async def test_untouched_request_body_gets_closed(self):
+        application = get_asgi_application()
+        scope = self.async_request_factory._base_scope(method="POST", path="/post/")
+        communicator = ApplicationCommunicator(application, scope)
+        await communicator.send_input({"type": "http.request"})
+        response_start = await communicator.receive_output()
+        self.assertEqual(response_start["type"], "http.response.start")
+        self.assertEqual(response_start["status"], 204)
+        response_body = await communicator.receive_output()
+        self.assertEqual(response_body["type"], "http.response.body")
+        self.assertEqual(response_body["body"], b"")
+        # Allow response.close() to finish
+        await communicator.wait()
 
     async def test_get_query_string(self):
         application = get_asgi_application()
@@ -179,11 +224,66 @@ class ASGITest(SimpleTestCase):
                 response_body = await communicator.receive_output()
                 self.assertEqual(response_body["type"], "http.response.body")
                 self.assertEqual(response_body["body"], b"Hello Andrew!")
+                # Allow response.close() to finish
+                await communicator.wait()
 
     async def test_disconnect(self):
         application = get_asgi_application()
         scope = self.async_request_factory._base_scope(path="/")
         communicator = ApplicationCommunicator(application, scope)
+        await communicator.send_input({"type": "http.disconnect"})
+        with self.assertRaises(asyncio.TimeoutError):
+            await communicator.receive_output()
+
+    async def test_disconnect_both_return(self):
+        # Force both the disconnect listener and the task that sends the
+        # response to finish at the same time.
+        application = get_asgi_application()
+        scope = self.async_request_factory._base_scope(path="/")
+        communicator = ApplicationCommunicator(application, scope)
+        await communicator.send_input({"type": "http.request", "body": b"some body"})
+        # Fetch response headers (this yields to asyncio and causes
+        # ASGHandler.send_response() to dump the body of the response in the
+        # queue).
+        await communicator.receive_output()
+        # Fetch response body (there's already some data queued up, so this
+        # doesn't actually yield to the event loop, it just succeeds
+        # instantly).
+        await communicator.receive_output()
+        # Send disconnect at the same time that response finishes (this just
+        # puts some info in a queue, it doesn't have to yield to the event
+        # loop).
+        await communicator.send_input({"type": "http.disconnect"})
+        # Waiting for the communicator _does_ yield to the event loop, since
+        # ASGIHandler.send_response() is still waiting to do response.close().
+        # It so happens that there are enough remaining yield points in both
+        # tasks that they both finish while the loop is running.
+        await communicator.wait()
+
+    async def test_disconnect_with_body(self):
+        application = get_asgi_application()
+        scope = self.async_request_factory._base_scope(path="/")
+        communicator = ApplicationCommunicator(application, scope)
+        await communicator.send_input({"type": "http.request", "body": b"some body"})
+        await communicator.send_input({"type": "http.disconnect"})
+        with self.assertRaises(asyncio.TimeoutError):
+            await communicator.receive_output()
+
+    async def test_assert_in_listen_for_disconnect(self):
+        application = get_asgi_application()
+        scope = self.async_request_factory._base_scope(path="/")
+        communicator = ApplicationCommunicator(application, scope)
+        await communicator.send_input({"type": "http.request"})
+        await communicator.send_input({"type": "http.not_a_real_message"})
+        msg = "Invalid ASGI message after request body: http.not_a_real_message"
+        with self.assertRaisesMessage(AssertionError, msg):
+            await communicator.wait()
+
+    async def test_delayed_disconnect_with_body(self):
+        application = get_asgi_application()
+        scope = self.async_request_factory._base_scope(path="/delayed_hello/")
+        communicator = ApplicationCommunicator(application, scope)
+        await communicator.send_input({"type": "http.request", "body": b"some body"})
         await communicator.send_input({"type": "http.disconnect"})
         with self.assertRaises(asyncio.TimeoutError):
             await communicator.receive_output()
@@ -272,3 +372,148 @@ class ASGITest(SimpleTestCase):
         self.assertEqual(len(sync_waiter.active_threads), 2)
 
         sync_waiter.active_threads.clear()
+
+    async def test_asyncio_cancel_error(self):
+        # Flag to check if the view was cancelled.
+        view_did_cancel = False
+
+        # A view that will listen for the cancelled error.
+        async def view(request):
+            nonlocal view_did_cancel
+            try:
+                await asyncio.sleep(0.2)
+                return HttpResponse("Hello World!")
+            except asyncio.CancelledError:
+                # Set the flag.
+                view_did_cancel = True
+                raise
+
+        # Request class to use the view.
+        class TestASGIRequest(ASGIRequest):
+            urlconf = (path("cancel/", view),)
+
+        # Handler to use request class.
+        class TestASGIHandler(ASGIHandler):
+            request_class = TestASGIRequest
+
+        # Request cycle should complete since no disconnect was sent.
+        application = TestASGIHandler()
+        scope = self.async_request_factory._base_scope(path="/cancel/")
+        communicator = ApplicationCommunicator(application, scope)
+        await communicator.send_input({"type": "http.request"})
+        response_start = await communicator.receive_output()
+        self.assertEqual(response_start["type"], "http.response.start")
+        self.assertEqual(response_start["status"], 200)
+        response_body = await communicator.receive_output()
+        self.assertEqual(response_body["type"], "http.response.body")
+        self.assertEqual(response_body["body"], b"Hello World!")
+        # Give response.close() time to finish.
+        await communicator.wait()
+        self.assertIs(view_did_cancel, False)
+
+        # Request cycle with a disconnect before the view can respond.
+        application = TestASGIHandler()
+        scope = self.async_request_factory._base_scope(path="/cancel/")
+        communicator = ApplicationCommunicator(application, scope)
+        await communicator.send_input({"type": "http.request"})
+        # Let the view actually start.
+        await asyncio.sleep(0.1)
+        # Disconnect the client.
+        await communicator.send_input({"type": "http.disconnect"})
+        # The handler should not send a response.
+        with self.assertRaises(asyncio.TimeoutError):
+            await communicator.receive_output()
+        await communicator.wait()
+        self.assertIs(view_did_cancel, True)
+
+    async def test_asyncio_streaming_cancel_error(self):
+        # Similar to test_asyncio_cancel_error(), but during a streaming
+        # response.
+        view_did_cancel = False
+
+        async def streaming_response():
+            nonlocal view_did_cancel
+            try:
+                await asyncio.sleep(0.2)
+                yield b"Hello World!"
+            except asyncio.CancelledError:
+                # Set the flag.
+                view_did_cancel = True
+                raise
+
+        async def view(request):
+            return StreamingHttpResponse(streaming_response())
+
+        class TestASGIRequest(ASGIRequest):
+            urlconf = (path("cancel/", view),)
+
+        class TestASGIHandler(ASGIHandler):
+            request_class = TestASGIRequest
+
+        # With no disconnect, the request cycle should complete in the same
+        # manner as the non-streaming response.
+        application = TestASGIHandler()
+        scope = self.async_request_factory._base_scope(path="/cancel/")
+        communicator = ApplicationCommunicator(application, scope)
+        await communicator.send_input({"type": "http.request"})
+        response_start = await communicator.receive_output()
+        self.assertEqual(response_start["type"], "http.response.start")
+        self.assertEqual(response_start["status"], 200)
+        response_body = await communicator.receive_output()
+        self.assertEqual(response_body["type"], "http.response.body")
+        self.assertEqual(response_body["body"], b"Hello World!")
+        await communicator.wait()
+        self.assertIs(view_did_cancel, False)
+
+        # Request cycle with a disconnect.
+        application = TestASGIHandler()
+        scope = self.async_request_factory._base_scope(path="/cancel/")
+        communicator = ApplicationCommunicator(application, scope)
+        await communicator.send_input({"type": "http.request"})
+        response_start = await communicator.receive_output()
+        # Fetch the start of response so streaming can begin
+        self.assertEqual(response_start["type"], "http.response.start")
+        self.assertEqual(response_start["status"], 200)
+        await asyncio.sleep(0.1)
+        # Now disconnect the client.
+        await communicator.send_input({"type": "http.disconnect"})
+        # This time the handler should not send a response.
+        with self.assertRaises(asyncio.TimeoutError):
+            await communicator.receive_output()
+        await communicator.wait()
+        self.assertIs(view_did_cancel, True)
+
+    async def test_streaming(self):
+        scope = self.async_request_factory._base_scope(
+            path="/streaming/", query_string=b"sleep=0.001"
+        )
+        application = get_asgi_application()
+        communicator = ApplicationCommunicator(application, scope)
+        await communicator.send_input({"type": "http.request"})
+        # Fetch http.response.start.
+        await communicator.receive_output(timeout=1)
+        # Fetch the 'first' and 'last'.
+        first_response = await communicator.receive_output(timeout=1)
+        self.assertEqual(first_response["body"], b"first\n")
+        second_response = await communicator.receive_output(timeout=1)
+        self.assertEqual(second_response["body"], b"last\n")
+        # Fetch the rest of the response so that coroutines are cleaned up.
+        await communicator.receive_output(timeout=1)
+        with self.assertRaises(asyncio.TimeoutError):
+            await communicator.receive_output(timeout=1)
+
+    async def test_streaming_disconnect(self):
+        scope = self.async_request_factory._base_scope(
+            path="/streaming/", query_string=b"sleep=0.1"
+        )
+        application = get_asgi_application()
+        communicator = ApplicationCommunicator(application, scope)
+        await communicator.send_input({"type": "http.request"})
+        await communicator.receive_output(timeout=1)
+        first_response = await communicator.receive_output(timeout=1)
+        self.assertEqual(first_response["body"], b"first\n")
+        # Disconnect the client.
+        await communicator.send_input({"type": "http.disconnect"})
+        # 'last\n' isn't sent.
+        with self.assertRaises(asyncio.TimeoutError):
+            await communicator.receive_output(timeout=0.2)

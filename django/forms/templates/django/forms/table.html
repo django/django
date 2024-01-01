@@ -16,7 +16,7 @@
       {{ field }}
       {% if field.help_text %}
         <br>
-        <span class="helptext">{{ field.help_text|safe }}</span>
+        <span class="helptext"{% if field.auto_id %} id="{{ field.auto_id }}_helptext"{% endif %}>{{ field.help_text|safe }}</span>
       {% endif %}
       {% if forloop.last %}
         {% for field in hidden_fields %}{{ field }}{% endfor %}

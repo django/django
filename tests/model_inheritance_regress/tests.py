@@ -416,11 +416,6 @@ class ModelInheritanceTest(TestCase):
         parties = list(p4.bachelorparty_set.all())
         self.assertEqual(parties, [bachelor, messy_parent])
 
-    def test_abstract_base_class_m2m_relation_inheritance_manager_reused(self):
-        p1 = Person.objects.create(name="Alice")
-        self.assertIs(p1.birthdayparty_set, p1.birthdayparty_set)
-        self.assertIs(p1.bachelorparty_set, p1.bachelorparty_set)
-
     def test_abstract_verbose_name_plural_inheritance(self):
         """
         verbose_name_plural correctly inherited from ABC if inheritance chain
@@ -434,10 +429,10 @@ class ModelInheritanceTest(TestCase):
 
     def test_inherited_nullable_exclude(self):
         obj = SelfRefChild.objects.create(child_data=37, parent_data=42)
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             SelfRefParent.objects.exclude(self_data=72), [obj.pk], attrgetter("pk")
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             SelfRefChild.objects.exclude(self_data=72), [obj.pk], attrgetter("pk")
         )
 
@@ -529,7 +524,7 @@ class ModelInheritanceTest(TestCase):
         Supplier.objects.create(name="John", restaurant=r1)
         Supplier.objects.create(name="Jane", restaurant=r2)
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Supplier.objects.order_by("name").select_related(),
             [
                 "Jane",

@@ -33,13 +33,13 @@ Each specified field should be either a ``BooleanField``, ``CharField``,
 ``ManyToManyField``, for example::
 
     class PersonAdmin(admin.ModelAdmin):
-        list_filter = ('is_staff', 'company')
+        list_filter = ["is_staff", "company"]
 
 Field names in ``list_filter`` can also span relations
 using the ``__`` lookup, for example::
 
     class PersonAdmin(admin.UserAdmin):
-        list_filter = ('company__name',)
+        list_filter = ["company__name"]
 
 Using a ``SimpleListFilter``
 ============================
@@ -54,13 +54,14 @@ and ``parameter_name`` attributes, and override the ``lookups`` and
     from django.contrib import admin
     from django.utils.translation import gettext_lazy as _
 
+
     class DecadeBornListFilter(admin.SimpleListFilter):
         # Human-readable title which will be displayed in the
         # right admin sidebar just above the filter options.
-        title = _('decade born')
+        title = _("decade born")
 
         # Parameter for the filter that will be used in the URL query.
-        parameter_name = 'decade'
+        parameter_name = "decade"
 
         def lookups(self, request, model_admin):
             """
@@ -70,10 +71,10 @@ and ``parameter_name`` attributes, and override the ``lookups`` and
             human-readable name for the option that will appear
             in the right sidebar.
             """
-            return (
-                ('80s', _('in the eighties')),
-                ('90s', _('in the nineties')),
-            )
+            return [
+                ("80s", _("in the eighties")),
+                ("90s", _("in the nineties")),
+            ]
 
         def queryset(self, request, queryset):
             """
@@ -83,19 +84,20 @@ and ``parameter_name`` attributes, and override the ``lookups`` and
             """
             # Compare the requested value (either '80s' or '90s')
             # to decide how to filter the queryset.
-            if self.value() == '80s':
+            if self.value() == "80s":
                 return queryset.filter(
                     birthday__gte=date(1980, 1, 1),
                     birthday__lte=date(1989, 12, 31),
                 )
-            if self.value() == '90s':
+            if self.value() == "90s":
                 return queryset.filter(
                     birthday__gte=date(1990, 1, 1),
                     birthday__lte=date(1999, 12, 31),
                 )
 
+
     class PersonAdmin(admin.ModelAdmin):
-        list_filter = (DecadeBornListFilter,)
+        list_filter = [DecadeBornListFilter]
 
 .. note::
 
@@ -103,7 +105,6 @@ and ``parameter_name`` attributes, and override the ``lookups`` and
     and ``queryset`` methods, for example::
 
         class AuthDecadeBornListFilter(DecadeBornListFilter):
-
             def lookups(self, request, model_admin):
                 if request.user.is_superuser:
                     return super().lookups(request, model_admin)
@@ -117,7 +118,6 @@ and ``parameter_name`` attributes, and override the ``lookups`` and
     available data::
 
         class AdvancedDecadeBornListFilter(DecadeBornListFilter):
-
             def lookups(self, request, model_admin):
                 """
                 Only show the lookups if there actually is
@@ -128,12 +128,12 @@ and ``parameter_name`` attributes, and override the ``lookups`` and
                     birthday__gte=date(1980, 1, 1),
                     birthday__lte=date(1989, 12, 31),
                 ).exists():
-                    yield ('80s', _('in the eighties'))
+                    yield ("80s", _("in the eighties"))
                 if qs.filter(
                     birthday__gte=date(1990, 1, 1),
                     birthday__lte=date(1999, 12, 31),
                 ).exists():
-                    yield ('90s', _('in the nineties'))
+                    yield ("90s", _("in the nineties"))
 
 Using a field name and an explicit ``FieldListFilter``
 ======================================================
@@ -144,9 +144,9 @@ field name and the second element is a class inheriting from
 ``django.contrib.admin.FieldListFilter``, for example::
 
     class PersonAdmin(admin.ModelAdmin):
-        list_filter = (
-            ('is_staff', admin.BooleanFieldListFilter),
-        )
+        list_filter = [
+            ("is_staff", admin.BooleanFieldListFilter),
+        ]
 
 Here the ``is_staff`` field will use the ``BooleanFieldListFilter``. Specifying
 only the field name, fields will automatically use the appropriate filter for
@@ -159,9 +159,9 @@ You can limit the choices of a related model to the objects involved in
 that relation using ``RelatedOnlyFieldListFilter``::
 
     class BookAdmin(admin.ModelAdmin):
-        list_filter = (
-            ('author', admin.RelatedOnlyFieldListFilter),
-        )
+        list_filter = [
+            ("author", admin.RelatedOnlyFieldListFilter),
+        ]
 
 Assuming ``author`` is a ``ForeignKey`` to a ``User`` model, this will
 limit the ``list_filter`` choices to the users who have written a book,
@@ -172,9 +172,9 @@ filter on both empty strings and nulls, depending on what the field
 allows to store::
 
     class BookAdmin(admin.ModelAdmin):
-        list_filter = (
-            ('title', admin.EmptyFieldListFilter),
-        )
+        list_filter = [
+            ("title", admin.EmptyFieldListFilter),
+        ]
 
 By defining a filter using the ``__in`` lookup, it is possible to filter for
 any of a group of values. You need to override the ``expected_parameters``
@@ -186,10 +186,10 @@ the separator::
 
     class FilterWithCustomSeparator(admin.FieldListFilter):
         # custom list separator that should be used to separate values.
-        list_separator = '|'
+        list_separator = "|"
 
         def __init__(self, field, request, params, model, model_admin, field_path):
-            self.lookup_kwarg = '%s__in' % field_path
+            self.lookup_kwarg = "%s__in" % field_path
             super().__init__(field, request, params, model, model_admin, field_path)
 
         def expected_parameters(self):
@@ -210,3 +210,14 @@ It is possible to specify a custom template for rendering a list filter::
 
 See the default template provided by Django (``admin/filter.html``) for a
 concrete example.
+
+.. _facet-filters:
+
+Facets
+======
+
+.. versionadded:: 5.0
+
+By default, counts for each filter, known as facets, can be shown by toggling
+on via the admin UI. These counts will update according to the currently
+applied filters. See :attr:`ModelAdmin.show_facets` for more details.

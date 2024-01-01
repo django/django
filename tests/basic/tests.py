@@ -1,3 +1,4 @@
+import inspect
 import threading
 from datetime import datetime, timedelta
 from unittest import mock
@@ -19,6 +20,7 @@ from .models import (
     ArticleSelectOnSave,
     ChildPrimaryKeyWithDefault,
     FeaturedArticle,
+    PrimaryKeyWithDbDefault,
     PrimaryKeyWithDefault,
     SelfRef,
 )
@@ -174,6 +176,11 @@ class ModelInstanceCreationTests(TestCase):
         with self.assertNumQueries(1):
             PrimaryKeyWithDefault().save()
 
+    def test_save_primary_with_db_default(self):
+        # An UPDATE attempt is skipped when a primary key has db_default.
+        with self.assertNumQueries(1):
+            PrimaryKeyWithDbDefault().save()
+
     def test_save_parent_primary_with_default(self):
         # An UPDATE attempt is skipped when an inherited primary key has
         # default.
@@ -198,7 +205,7 @@ class ModelTest(TestCase):
         some_pub_date = datetime(2014, 5, 16, 12, 1)
         for headline in headlines:
             Article(headline=headline, pub_date=some_pub_date).save()
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Article.objects.order_by("headline"),
             sorted(headlines),
             transform=lambda a: a.headline,
@@ -627,7 +634,6 @@ class ModelLookupTest(TestCase):
 
 
 class ConcurrentSaveTests(TransactionTestCase):
-
     available_apps = ["basic"]
 
     @skipUnlessDBFeature("test_db_allows_multiple_connections")
@@ -736,6 +742,17 @@ class ManagerTest(SimpleTestCase):
             sorted(self.QUERYSET_PROXY_METHODS),
         )
 
+    def test_manager_method_attributes(self):
+        self.assertEqual(Article.objects.get.__doc__, models.QuerySet.get.__doc__)
+        self.assertEqual(Article.objects.count.__name__, models.QuerySet.count.__name__)
+
+    def test_manager_method_signature(self):
+        self.assertEqual(
+            str(inspect.signature(Article.objects.bulk_create)),
+            "(objs, batch_size=None, ignore_conflicts=False, update_conflicts=False, "
+            "update_fields=None, unique_fields=None)",
+        )
+
 
 class SelectOnSaveTests(TestCase):
     def test_select_on_save(self):
@@ -793,8 +810,9 @@ class SelectOnSaveTests(TestCase):
                 "An error occurred in the current transaction. You can't "
                 "execute queries until the end of the 'atomic' block."
             )
-            with self.assertRaisesMessage(DatabaseError, msg):
+            with self.assertRaisesMessage(DatabaseError, msg) as cm:
                 asos.save(update_fields=["pub_date"])
+            self.assertIsInstance(cm.exception.__cause__, DatabaseError)
         finally:
             Article._base_manager._queryset_class = orig_class
 
@@ -908,24 +926,34 @@ class ModelRefreshTests(TestCase):
 
     def test_prefetched_cache_cleared(self):
         a = Article.objects.create(pub_date=datetime(2005, 7, 28))
-        s = SelfRef.objects.create(article=a)
+        s = SelfRef.objects.create(article=a, article_cited=a)
         # refresh_from_db() without fields=[...]
-        a1_prefetched = Article.objects.prefetch_related("selfref_set").first()
+        a1_prefetched = Article.objects.prefetch_related("selfref_set", "cited").first()
         self.assertCountEqual(a1_prefetched.selfref_set.all(), [s])
+        self.assertCountEqual(a1_prefetched.cited.all(), [s])
         s.article = None
+        s.article_cited = None
         s.save()
         # Relation is cleared and prefetch cache is stale.
         self.assertCountEqual(a1_prefetched.selfref_set.all(), [s])
+        self.assertCountEqual(a1_prefetched.cited.all(), [s])
         a1_prefetched.refresh_from_db()
         # Cache was cleared and new results are available.
         self.assertCountEqual(a1_prefetched.selfref_set.all(), [])
+        self.assertCountEqual(a1_prefetched.cited.all(), [])
         # refresh_from_db() with fields=[...]
-        a2_prefetched = Article.objects.prefetch_related("selfref_set").first()
+        a2_prefetched = Article.objects.prefetch_related("selfref_set", "cited").first()
         self.assertCountEqual(a2_prefetched.selfref_set.all(), [])
+        self.assertCountEqual(a2_prefetched.cited.all(), [])
         s.article = a
+        s.article_cited = a
         s.save()
         # Relation is added and prefetch cache is stale.
         self.assertCountEqual(a2_prefetched.selfref_set.all(), [])
-        a2_prefetched.refresh_from_db(fields=["selfref_set"])
+        self.assertCountEqual(a2_prefetched.cited.all(), [])
+        fields = ["selfref_set", "cited"]
+        a2_prefetched.refresh_from_db(fields=fields)
+        self.assertEqual(fields, ["selfref_set", "cited"])
         # Cache was cleared and new results are available.
         self.assertCountEqual(a2_prefetched.selfref_set.all(), [s])
+        self.assertCountEqual(a2_prefetched.cited.all(), [s])

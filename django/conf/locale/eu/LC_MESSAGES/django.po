@@ -3,7 +3,7 @@
 # Translators:
 # Aitzol Naberan <anaberan@codesyntax.com>, 2013,2016
 # Ander Martinez <ander.basaundi@gmail.com>, 2013-2014
-# Eneko Illarramendi <eneko@illarra.com>, 2017-2019,2021
+# Eneko Illarramendi <eneko@illarra.com>, 2017-2019,2021-2022
 # Jannis Leidel <jannis@leidel.info>, 2011
 # jazpillaga <jazpillaga@codesyntax.com>, 2011
 # julen, 2011-2012
@@ -16,9 +16,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-05-09 16:11+0000\n"
-"Last-Translator: Mikel Maldonado <d.mikel.maldonado@gmail.com>\n"
+"POT-Creation-Date: 2022-05-17 05:23-0500\n"
+"PO-Revision-Date: 2022-07-25 06:49+0000\n"
+"Last-Translator: Eneko Illarramendi <eneko@illarra.com>\n"
 "Language-Team: Basque (http://www.transifex.com/django/django/language/eu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -215,6 +215,9 @@ msgstr "Mongoliera"
 msgid "Marathi"
 msgstr "Marathera"
 
+msgid "Malay"
+msgstr ""
+
 msgid "Burmese"
 msgstr "Birmaniera"
 
@@ -388,6 +391,10 @@ msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "Ziurtatu balio hau %(limit_value)s baino handiagoa edo berdina dela."
 
 #, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr ""
+
+#, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
 "%(show_value)d)."
@@ -455,6 +462,10 @@ msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr "%(field_labels)s hauek dauzkan %(model_name)s dagoeneko existitzen da."
 
 #, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr ""
+
+#, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "%(value)r balioa ez da baleko aukera bat."
 
@@ -468,8 +479,8 @@ msgstr "Eremu honek ezin du hutsik egon."
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(field_label)s hori daukan %(model_name)s dagoeneko existitzen da."
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -756,14 +767,14 @@ msgid ""
 msgstr ""
 
 #, python-format
-msgid "Please submit at most %d form."
-msgid_plural "Please submit at most %d forms."
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
 msgstr[0] ""
 msgstr[1] ""
 
 #, python-format
-msgid "Please submit at least %d form."
-msgid_plural "Please submit at least %d forms."
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
 msgstr[0] ""
 msgstr[1] ""
 
@@ -1100,40 +1111,40 @@ msgid ", "
 msgstr ", "
 
 #, python-format
-msgid "%d year"
-msgid_plural "%d years"
-msgstr[0] "urte %d"
-msgstr[1] "%d urte"
+msgid "%(num)d year"
+msgid_plural "%(num)d years"
+msgstr[0] "urte %(num)d"
+msgstr[1] "%(num)d urte"
 
 #, python-format
-msgid "%d month"
-msgid_plural "%d months"
-msgstr[0] "hilabete %d"
-msgstr[1] "%d hilabete"
+msgid "%(num)d month"
+msgid_plural "%(num)d months"
+msgstr[0] "hilabete %(num)d"
+msgstr[1] "%(num)d hilabete"
 
 #, python-format
-msgid "%d week"
-msgid_plural "%d weeks"
-msgstr[0] "aste %d"
-msgstr[1] "%d aste"
+msgid "%(num)d week"
+msgid_plural "%(num)d weeks"
+msgstr[0] "aste %(num)d"
+msgstr[1] "%(num)d aste"
 
 #, python-format
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "egun %d"
-msgstr[1] "%d egun"
+msgid "%(num)d day"
+msgid_plural "%(num)d days"
+msgstr[0] "egun %(num)d"
+msgstr[1] "%(num)d egun"
 
 #, python-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "ordu %d"
-msgstr[1] "%d ordu"
+msgid "%(num)d hour"
+msgid_plural "%(num)d hours"
+msgstr[0] "ordu %(num)d"
+msgstr[1] "%(num)d ordu"
 
 #, python-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "minutu %d"
-msgstr[1] "%d minutu"
+msgid "%(num)d minute"
+msgid_plural "%(num)d minutes"
+msgstr[0] "minutu %(num)d"
+msgstr[1] "%(num)d minutu"
 
 msgid "Forbidden"
 msgstr "Debekatuta"
@@ -1143,7 +1154,7 @@ msgstr "CSRF egiaztapenak huts egin du. Eskaera abortatu da."
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a “Referer "
-"header” to be sent by your Web browser, but none was sent. This header is "
+"header” to be sent by your web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""

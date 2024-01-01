@@ -102,6 +102,11 @@ class MultiValueDictTests(SimpleTestCase):
         self.assertEqual(d.getlist("lastname"), ["Holovaty", "Willison"])
         self.assertEqual(list(d.values()), ["Simon", "Developer", [], "Willison"])
 
+        d.setlistdefault("lastname", ["Doe"])
+        self.assertEqual(d.getlist("lastname"), ["Holovaty", "Willison"])
+        d.setlistdefault("newkey", ["Doe"])
+        self.assertEqual(d.getlist("newkey"), ["Doe"])
+
     def test_appendlist(self):
         d = MultiValueDict()
         d.appendlist("name", "Adrian")

@@ -1,15 +1,13 @@
 import unittest
 
 from django.contrib.admindocs.utils import (
-    _is_callback,
     docutils_is_available,
     parse_docstring,
     parse_rst,
 )
 from django.test.utils import captured_stderr
-from django.urls import get_resolver
 
-from .tests import AdminDocsSimpleTestCase, SimpleTestCase
+from .tests import AdminDocsSimpleTestCase
 
 
 @unittest.skipUnless(docutils_is_available, "no docutils installed.")
@@ -106,6 +104,22 @@ class TestUtils(AdminDocsSimpleTestCase):
             self.assertEqual(parse_rst(body, ""), "<p>second line</p>\n")
         self.assertEqual(stderr.getvalue(), "")
 
+    def test_parse_rst_view_case_sensitive(self):
+        source = ":view:`myapp.views.Index`"
+        rendered = (
+            '<p><a class="reference external" '
+            'href="/admindocs/views/myapp.views.Index/">myapp.views.Index</a></p>'
+        )
+        self.assertHTMLEqual(parse_rst(source, "view"), rendered)
+
+    def test_parse_rst_template_case_sensitive(self):
+        source = ":template:`Index.html`"
+        rendered = (
+            '<p><a class="reference external" href="/admindocs/templates/Index.html/">'
+            "Index.html</a></p>"
+        )
+        self.assertHTMLEqual(parse_rst(source, "template"), rendered)
+
     def test_publish_parts(self):
         """
         Django shouldn't break the default role for interpreted text
@@ -121,28 +135,3 @@ class TestUtils(AdminDocsSimpleTestCase):
         markup = "<p>reST, <cite>interpreted text</cite>, default role.</p>\n"
         parts = docutils.core.publish_parts(source=source, writer_name="html4css1")
         self.assertEqual(parts["fragment"], markup)
-
-
-class TestResolver(SimpleTestCase):
-    def test_namespaced_view_detail(self):
-        resolver = get_resolver("urlpatterns_reverse.nested_urls")
-        self.assertTrue(_is_callback("urlpatterns_reverse.nested_urls.view1", resolver))
-        self.assertTrue(_is_callback("urlpatterns_reverse.nested_urls.view2", resolver))
-        self.assertTrue(_is_callback("urlpatterns_reverse.nested_urls.View3", resolver))
-        self.assertFalse(_is_callback("urlpatterns_reverse.nested_urls.blub", resolver))
-
-    def test_view_detail_as_method(self):
-        # Views which have a class name as part of their path.
-        resolver = get_resolver("urlpatterns_reverse.method_view_urls")
-        self.assertTrue(
-            _is_callback(
-                "urlpatterns_reverse.method_view_urls.ViewContainer.method_view",
-                resolver,
-            )
-        )
-        self.assertTrue(
-            _is_callback(
-                "urlpatterns_reverse.method_view_urls.ViewContainer.classmethod_view",
-                resolver,
-            )
-        )

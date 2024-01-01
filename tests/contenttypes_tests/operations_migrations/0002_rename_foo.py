@@ -24,7 +24,6 @@ def assert_foo_contenttype_not_cached(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("contenttypes_tests", "0001_initial"),
     ]

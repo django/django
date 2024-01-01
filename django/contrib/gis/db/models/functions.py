@@ -69,6 +69,8 @@ class GeoFuncMixin:
 
     def resolve_expression(self, *args, **kwargs):
         res = super().resolve_expression(*args, **kwargs)
+        if not self.geom_param_pos:
+            return res
 
         # Ensure that expressions are geometric.
         source_fields = res.get_source_fields()
@@ -193,8 +195,7 @@ class AsGeoJSON(GeoFunc):
             options = 1
         elif crs:
             options = 2
-        if options:
-            expressions.append(options)
+        expressions.append(options)
         super().__init__(*expressions, **extra)
 
     def as_oracle(self, compiler, connection, **extra_context):
@@ -278,6 +279,11 @@ class Centroid(OracleToleranceMixin, GeomOutputGeoFunc):
     arity = 1
 
 
+class ClosestPoint(GeomOutputGeoFunc):
+    arity = 2
+    geom_param_pos = (0, 1)
+
+
 class Difference(OracleToleranceMixin, GeomOutputGeoFunc):
     arity = 2
     geom_param_pos = (0, 1)
@@ -351,6 +357,18 @@ class ForcePolygonCW(GeomOutputGeoFunc):
     arity = 1
 
 
+class FromWKB(GeoFunc):
+    output_field = GeometryField(srid=0)
+    arity = 1
+    geom_param_pos = ()
+
+
+class FromWKT(GeoFunc):
+    output_field = GeometryField(srid=0)
+    arity = 1
+    geom_param_pos = ()
+
+
 class GeoHash(GeoFunc):
     output_field = TextField()
 
@@ -379,6 +397,12 @@ class GeometryDistance(GeoFunc):
 class Intersection(OracleToleranceMixin, GeomOutputGeoFunc):
     arity = 2
     geom_param_pos = (0, 1)
+
+
+@BaseSpatialField.register_lookup
+class IsEmpty(GeoFuncMixin, Transform):
+    lookup_name = "isempty"
+    output_field = BooleanField()
 
 
 @BaseSpatialField.register_lookup

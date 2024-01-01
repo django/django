@@ -5,9 +5,8 @@ Move a file in the safest way possible::
     >>> file_move_safe("/tmp/old_file", "/tmp/new_file")
 """
 
-import errno
 import os
-from shutil import copystat
+from shutil import copymode, copystat
 
 from django.core.files import locks
 
@@ -82,12 +81,15 @@ def file_move_safe(
 
     try:
         copystat(old_file_name, new_file_name)
-    except PermissionError as e:
+    except PermissionError:
         # Certain filesystems (e.g. CIFS) fail to copy the file's metadata if
         # the type of the destination filesystem isn't the same as the source
-        # filesystem; ignore that.
-        if e.errno != errno.EPERM:
-            raise
+        # filesystem. This also happens with some SELinux-enabled systems.
+        # Ignore that, but try to set basic permissions.
+        try:
+            copymode(old_file_name, new_file_name)
+        except PermissionError:
+            pass
 
     try:
         os.remove(old_file_name)

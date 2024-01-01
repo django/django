@@ -1118,7 +1118,7 @@ class QueryTestCase(TestCase):
 
         # Set a foreign key with an object from a different database
         msg = (
-            'Cannot assign "<ContentType: multiple_database | book>": the '
+            'Cannot assign "<ContentType: Multiple_Database | book>": the '
             "current database router prevents this relation."
         )
         with self.assertRaisesMessage(ValueError, msg):
@@ -1230,10 +1230,10 @@ class QueryTestCase(TestCase):
         val = Book.objects.db_manager("other").raw(
             "SELECT id FROM multiple_database_book"
         )
-        self.assertQuerysetEqual(val, [dive.pk], attrgetter("pk"))
+        self.assertQuerySetEqual(val, [dive.pk], attrgetter("pk"))
 
         val = Book.objects.raw("SELECT id FROM multiple_database_book").using("other")
-        self.assertQuerysetEqual(val, [dive.pk], attrgetter("pk"))
+        self.assertQuerySetEqual(val, [dive.pk], attrgetter("pk"))
 
     def test_select_related(self):
         """
@@ -2240,7 +2240,6 @@ class SyncOnlyDefaultDatabaseRouter:
 
 
 class MigrateTestCase(TestCase):
-
     # Limit memory usage when calling 'migrate'.
     available_apps = [
         "multiple_database",

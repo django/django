@@ -12,9 +12,7 @@ class LocalizedTimeTests(SimpleTestCase):
         # nl/formats.py has customized TIME_INPUT_FORMATS:
         # ['%H:%M:%S', '%H.%M:%S', '%H.%M', '%H:%M']
         activate("nl")
-
-    def tearDown(self):
-        deactivate()
+        self.addCleanup(deactivate)
 
     def test_timeField(self):
         "TimeFields can parse dates in the default format"
@@ -120,7 +118,7 @@ class LocalizedTimeTests(SimpleTestCase):
         self.assertEqual(text, "13:30:00")
 
 
-@translation.override(None)  # RemovedInDjango50Warning.
+@translation.override(None)
 @override_settings(TIME_INPUT_FORMATS=["%I:%M:%S %p", "%I:%M %p"])
 class CustomTimeInputFormatsTests(SimpleTestCase):
     def test_timeField(self):
@@ -323,9 +321,7 @@ class SimpleTimeFormatTests(SimpleTestCase):
 class LocalizedDateTests(SimpleTestCase):
     def setUp(self):
         activate("de")
-
-    def tearDown(self):
-        deactivate()
+        self.addCleanup(deactivate)
 
     def test_dateField(self):
         "DateFields can parse dates in the default format"
@@ -434,7 +430,7 @@ class LocalizedDateTests(SimpleTestCase):
         self.assertEqual(text, "21.12.2010")
 
 
-@translation.override(None)  # RemovedInDjango50Warning.
+@translation.override(None)
 @override_settings(DATE_INPUT_FORMATS=["%d.%m.%Y", "%d-%m-%Y"])
 class CustomDateInputFormatsTests(SimpleTestCase):
     def test_dateField(self):
@@ -637,9 +633,7 @@ class SimpleDateFormatTests(SimpleTestCase):
 class LocalizedDateTimeTests(SimpleTestCase):
     def setUp(self):
         activate("de")
-
-    def tearDown(self):
-        deactivate()
+        self.addCleanup(deactivate)
 
     def test_dateTimeField(self):
         "DateTimeFields can parse dates in the default format"
@@ -756,7 +750,7 @@ class LocalizedDateTimeTests(SimpleTestCase):
         self.assertEqual(text, "21.12.2010 13:30:00")
 
 
-@translation.override(None)  # RemovedInDjango50Warning.
+@translation.override(None)
 @override_settings(DATETIME_INPUT_FORMATS=["%I:%M:%S %p %d/%m/%Y", "%I:%M %p %d-%m-%Y"])
 class CustomDateTimeInputFormatsTests(SimpleTestCase):
     def test_dateTimeField(self):

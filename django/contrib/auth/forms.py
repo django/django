@@ -71,7 +71,15 @@ class ReadOnlyPasswordHashField(forms.Field):
 
 class UsernameField(forms.CharField):
     def to_python(self, value):
-        return unicodedata.normalize("NFKC", super().to_python(value))
+        value = super().to_python(value)
+        if self.max_length is not None and len(value) > self.max_length:
+            # Normalization can increase the string length (e.g.
+            # "ﬀ" -> "ff", "½" -> "1⁄2") but cannot reduce it, so there is no
+            # point in normalizing invalid data. Moreover, Unicode
+            # normalization is very slow on Windows and can be a DoS attack
+            # vector.
+            return value
+        return unicodedata.normalize("NFKC", value)
 
     def widget_attrs(self, widget):
         return {
@@ -81,7 +89,7 @@ class UsernameField(forms.CharField):
         }
 
 
-class UserCreationForm(forms.ModelForm):
+class BaseUserCreationForm(forms.ModelForm):
     """
     A form that creates a user, with no privileges, from the given username and
     password.
@@ -141,7 +149,30 @@ class UserCreationForm(forms.ModelForm):
         user.set_password(self.cleaned_data["password1"])
         if commit:
             user.save()
+            if hasattr(self, "save_m2m"):
+                self.save_m2m()
         return user
+
+
+class UserCreationForm(BaseUserCreationForm):
+    def clean_username(self):
+        """Reject usernames that differ only in case."""
+        username = self.cleaned_data.get("username")
+        if (
+            username
+            and self._meta.model.objects.filter(username__iexact=username).exists()
+        ):
+            self._update_errors(
+                ValidationError(
+                    {
+                        "username": self.instance.unique_error_message(
+                            self._meta.model, ["username"]
+                        )
+                    }
+                )
+            )
+        else:
+            return username
 
 
 class UserChangeForm(forms.ModelForm):
@@ -163,7 +194,9 @@ class UserChangeForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         password = self.fields.get("password")
         if password:
-            password.help_text = password.help_text.format("../password/")
+            password.help_text = password.help_text.format(
+                f"../../{self.instance.pk}/password/"
+            )
         user_permissions = self.fields.get("user_permissions")
         if user_permissions:
             user_permissions.queryset = user_permissions.queryset.select_related(
@@ -352,7 +385,7 @@ class PasswordResetForm(forms.Form):
 
 class SetPasswordForm(forms.Form):
     """
-    A form that lets a user change set their password without entering the old
+    A form that lets a user set their password without entering the old
     password
     """
 
@@ -378,12 +411,11 @@ class SetPasswordForm(forms.Form):
     def clean_new_password2(self):
         password1 = self.cleaned_data.get("new_password1")
         password2 = self.cleaned_data.get("new_password2")
-        if password1 and password2:
-            if password1 != password2:
-                raise ValidationError(
-                    self.error_messages["password_mismatch"],
-                    code="password_mismatch",
-                )
+        if password1 and password2 and password1 != password2:
+            raise ValidationError(
+                self.error_messages["password_mismatch"],
+                code="password_mismatch",
+            )
         password_validation.validate_password(password2, self.user)
         return password2
 

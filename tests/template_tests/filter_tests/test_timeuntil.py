@@ -9,7 +9,6 @@ from .timezone_utils import TimezoneTestCase
 
 
 class TimeuntilTests(TimezoneTestCase):
-
     # Default compare with datetime.now()
     @setup({"timeuntil01": "{{ a|timeuntil }}"})
     def test_timeuntil01(self):

@@ -209,7 +209,7 @@ class DummyCacheTests(SimpleTestCase):
             "Iñtërnâtiônàlizætiøn": "Iñtërnâtiônàlizætiøn2",
             "ascii2": {"x": 1},
         }
-        for (key, value) in stuff.items():
+        for key, value in stuff.items():
             with self.subTest(key=key):
                 cache.set(key, value)
                 self.assertIsNone(cache.get(key))
@@ -514,23 +514,23 @@ class BaseCacheTests:
             "ascii2": {"x": 1},
         }
         # Test `set`
-        for (key, value) in stuff.items():
+        for key, value in stuff.items():
             with self.subTest(key=key):
                 cache.set(key, value)
                 self.assertEqual(cache.get(key), value)
 
         # Test `add`
-        for (key, value) in stuff.items():
+        for key, value in stuff.items():
             with self.subTest(key=key):
                 self.assertIs(cache.delete(key), True)
                 self.assertIs(cache.add(key, value), True)
                 self.assertEqual(cache.get(key), value)
 
         # Test `set_many`
-        for (key, value) in stuff.items():
+        for key, value in stuff.items():
             self.assertIs(cache.delete(key), True)
         cache.set_many(stuff)
-        for (key, value) in stuff.items():
+        for key, value in stuff.items():
             with self.subTest(key=key):
                 self.assertEqual(cache.get(key), value)
 
@@ -577,6 +577,9 @@ class BaseCacheTests:
         self.assertIsNone(cache.get("key1"))
         self.assertIsNone(cache.get("key2"))
 
+    def test_set_many_empty_data(self):
+        self.assertEqual(cache.set_many({}), [])
+
     def test_delete_many(self):
         # Multiple keys can be deleted using delete_many
         cache.set_many({"key1": "spam", "key2": "eggs", "key3": "ham"})
@@ -584,6 +587,9 @@ class BaseCacheTests:
         self.assertIsNone(cache.get("key1"))
         self.assertIsNone(cache.get("key2"))
         self.assertEqual(cache.get("key3"), "ham")
+
+    def test_delete_many_no_keys(self):
+        self.assertIsNone(cache.delete_many([]))
 
     def test_clear(self):
         # The cache can be emptied using clear
@@ -698,6 +704,7 @@ class BaseCacheTests:
         portable caching code without making it too difficult to use production
         backends with more liberal key rules. Refs #6447.
         """
+
         # mimic custom ``make_key`` method being defined since the default will
         # never show the below warnings
         def func(key, *args):
@@ -796,7 +803,6 @@ class BaseCacheTests:
         self.assertIsNone(caches["v2"].get("answer4", version=2))
 
     def test_cache_versioning_add(self):
-
         # add, default version = 1, but manually override version = 2
         self.assertIs(cache.add("answer1", 42, version=2), True)
         self.assertIsNone(cache.get("answer1", version=1))
@@ -1143,18 +1149,13 @@ class BaseCacheTests:
     )
 )
 class DBCacheTests(BaseCacheTests, TransactionTestCase):
-
     available_apps = ["cache"]
 
     def setUp(self):
         # The super calls needs to happen first for the settings override.
         super().setUp()
         self.create_table()
-
-    def tearDown(self):
-        # The super call needs to happen first because it uses the database.
-        super().tearDown()
-        self.drop_table()
+        self.addCleanup(self.drop_table)
 
     def create_table(self):
         management.call_command("createcachetable", verbosity=0)
@@ -1462,7 +1463,6 @@ redis_excluded_caches = {"cull", "zero_cull"}
 
 
 class BaseMemcachedTests(BaseCacheTests):
-
     # By default it's assumed that the client doesn't clean up connections
     # properly, in which case the backend must do so after each request.
     should_disconnect_on_close = True
@@ -1756,6 +1756,34 @@ class FileBasedCacheTests(BaseCacheTests, TestCase):
         with open(cache_file, "rb") as fh:
             self.assertIs(cache._is_expired(fh), True)
 
+    def test_has_key_race_handling(self):
+        self.assertIs(cache.add("key", "value"), True)
+        with mock.patch("builtins.open", side_effect=FileNotFoundError) as mocked_open:
+            self.assertIs(cache.has_key("key"), False)
+            mocked_open.assert_called_once()
+
+    def test_touch(self):
+        """Override to manually advance time since file access can be slow."""
+
+        class ManualTickingTime:
+            def __init__(self):
+                # Freeze time, calling `sleep` will manually advance it.
+                self._time = time.time()
+
+            def time(self):
+                return self._time
+
+            def sleep(self, seconds):
+                self._time += seconds
+
+        mocked_time = ManualTickingTime()
+        with (
+            mock.patch("django.core.cache.backends.filebased.time", new=mocked_time),
+            mock.patch("django.core.cache.backends.base.time", new=mocked_time),
+            mock.patch("cache.tests.time", new=mocked_time),
+        ):
+            super().test_touch()
+
 
 @unittest.skipUnless(RedisCache_params, "Redis backend not configured")
 @override_settings(
@@ -1774,6 +1802,14 @@ class RedisCacheTests(BaseCacheTests, TestCase):
     @property
     def incr_decr_type_error(self):
         return self.lib.ResponseError
+
+    def test_incr_write_connection(self):
+        cache.set("number", 42)
+        with mock.patch(
+            "django.core.cache.backends.redis.RedisCacheClient.get_client"
+        ) as mocked_get_client:
+            cache.incr("number")
+            self.assertEqual(mocked_get_client.call_args.kwargs, {"write": True})
 
     def test_cache_client_class(self):
         self.assertIs(cache._class, RedisCacheClient)
@@ -1984,7 +2020,7 @@ class CacheUtils(SimpleTestCase):
 
     host = "www.example.com"
     path = "/cache/test/"
-    factory = RequestFactory(HTTP_HOST=host)
+    factory = RequestFactory(headers={"host": host})
 
     def tearDown(self):
         cache.clear()
@@ -2075,9 +2111,9 @@ class CacheUtils(SimpleTestCase):
         """
         get_cache_key keys differ by fully-qualified URL instead of path
         """
-        request1 = self.factory.get(self.path, HTTP_HOST="sub-1.example.com")
+        request1 = self.factory.get(self.path, headers={"host": "sub-1.example.com"})
         learn_cache_key(request1, HttpResponse())
-        request2 = self.factory.get(self.path, HTTP_HOST="sub-2.example.com")
+        request2 = self.factory.get(self.path, headers={"host": "sub-2.example.com"})
         learn_cache_key(request2, HttpResponse())
         self.assertNotEqual(get_cache_key(request1), get_cache_key(request2))
 
@@ -2469,12 +2505,9 @@ class CacheMiddlewareTest(SimpleTestCase):
 
     def setUp(self):
         self.default_cache = caches["default"]
+        self.addCleanup(self.default_cache.clear)
         self.other_cache = caches["other"]
-
-    def tearDown(self):
-        self.default_cache.clear()
-        self.other_cache.clear()
-        super().tearDown()
+        self.addCleanup(self.other_cache.clear)
 
     def test_constructor(self):
         """

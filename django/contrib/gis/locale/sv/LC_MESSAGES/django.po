@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Albin Larsson <albin.post@gmail.com>, 2022
 # Andreas Pelme <andreas@pelme.se>, 2011-2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jonathan Lindén, 2015
@@ -11,10 +12,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2019-01-28 14:06+0000\n"
-"Last-Translator: Petter Strandmark <petter.strandmark@gmail.com>\n"
-"Language-Team: Swedish (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 18:45+0000\n"
+"Last-Translator: Albin Larsson <albin.post@gmail.com>, 2022\n"
+"Language-Team: Swedish (http://app.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -29,7 +30,7 @@ msgid "The base GIS field."
 msgstr "Basklassen för GIS-fält."
 
 msgid ""
-"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
+"The base Geometry field — maps to the OpenGIS Specification Geometry type."
 msgstr ""
 "Basklassen för geometri-fält -- motsvarar ”Geometry”-typen i OpenGIS-"
 "specifikationen."
@@ -78,9 +79,6 @@ msgstr "Ett fel uppstod under transformering till SRID:t hos formulärsfältet."
 msgid "Delete all Features"
 msgstr "Ta bort alla attribut"
 
-msgid "WKT debugging window:"
-msgstr "WKT felsökningsfönster:"
-
 msgid "Debugging window (serialized value)"
 msgstr "Felsökningsfönster (serialiserat värde)"
 
@@ -88,5 +86,5 @@ msgid "No feeds are registered."
 msgstr "Inga flöden är registrerade."
 
 #, python-format
-msgid "Slug %r isn't registered."
+msgid "Slug %r isn’t registered."
 msgstr "Slugen %r är inte registrerad."

@@ -46,7 +46,6 @@ class StateTests(SimpleTestCase):
                 app_label = "migrations"
                 apps = new_apps
                 unique_together = ["name", "bio"]
-                index_together = ["bio", "age"]
 
         class AuthorProxy(Author):
             class Meta:
@@ -75,7 +74,6 @@ class StateTests(SimpleTestCase):
                 indexes = [models.Index(fields=["title"])]
 
         class Food(models.Model):
-
             food_mgr = FoodManager("a", "b")
             food_qs = FoodQuerySet.as_manager()
             food_no_mgr = NoMigrationFoodManager("x", "y")
@@ -90,7 +88,6 @@ class StateTests(SimpleTestCase):
                 apps = new_apps
 
         class FoodNoDefaultManager(models.Model):
-
             food_no_mgr = NoMigrationFoodManager("x", "y")
             food_mgr = FoodManager("a", "b")
             food_qs = FoodQuerySet.as_manager()
@@ -140,7 +137,6 @@ class StateTests(SimpleTestCase):
             author_state.options,
             {
                 "unique_together": {("name", "bio")},
-                "index_together": {("bio", "age")},
                 "indexes": [],
                 "constraints": [],
             },
@@ -1655,8 +1651,8 @@ class ModelStateTests(SimpleTestCase):
         field = models.ForeignKey(UnicodeModel, models.CASCADE)
         with self.assertRaisesMessage(
             ValueError,
-            'ModelState.fields cannot refer to a model class - "field.to" does. '
-            "Use a string reference instead.",
+            'Model fields in "ModelState.fields" cannot refer to a model class - '
+            '"app.Model.field.to" does. Use a string reference instead.',
         ):
             ModelState("app", "Model", [("field", field)])
 
@@ -1665,8 +1661,8 @@ class ModelStateTests(SimpleTestCase):
         field.remote_field.through = UnicodeModel
         with self.assertRaisesMessage(
             ValueError,
-            'ModelState.fields cannot refer to a model class - "field.through" does. '
-            "Use a string reference instead.",
+            'Model fields in "ModelState.fields" cannot refer to a model class - '
+            '"app.Model.field.through" does. Use a string reference instead.',
         ):
             ModelState("app", "Model", [("field", field)])
 
@@ -1816,7 +1812,6 @@ class ModelStateTests(SimpleTestCase):
         new_apps = Apps(["migrations"])
 
         class Food(models.Model):
-
             food_mgr = FoodManager("a", "b")
             food_qs = FoodQuerySet.as_manager()
             food_no_mgr = NoMigrationFoodManager("x", "y")

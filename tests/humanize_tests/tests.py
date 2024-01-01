@@ -506,8 +506,8 @@ class HumanizeTests(SimpleTestCase):
             # "%(delta)s from now" translations
             now + datetime.timedelta(days=1),
             now + datetime.timedelta(days=2),
-            now + datetime.timedelta(days=30),
-            now + datetime.timedelta(days=60),
+            now + datetime.timedelta(days=31),
+            now + datetime.timedelta(days=61),
             now + datetime.timedelta(days=500),
             now + datetime.timedelta(days=865),
         ]

@@ -38,9 +38,9 @@ class SecurityMiddleware(MiddlewareMixin):
         ):
             sts_header = "max-age=%s" % self.sts_seconds
             if self.sts_include_subdomains:
-                sts_header = sts_header + "; includeSubDomains"
+                sts_header += "; includeSubDomains"
             if self.sts_preload:
-                sts_header = sts_header + "; preload"
+                sts_header += "; preload"
             response.headers["Strict-Transport-Security"] = sts_header
 
         if self.content_type_nosniff:

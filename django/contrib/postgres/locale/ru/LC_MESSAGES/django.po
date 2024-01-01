@@ -6,24 +6,24 @@
 # crazyzubr <hjcnbckfd@gmail.com>, 2020
 # Kirill Gagarski <gagarin.gtn@gmail.com>, 2015
 # Вася Аникин <anikin.vasya@gmail.com>, 2017
-# Алексей Борискин <sun.void@gmail.com>, 2015-2018
-# Дмитрий Шатера <mr.bobsans@gmail.com>, 2018
+# Алексей Борискин <sun.void@gmail.com>, 2015-2018,2023
+# Bobsans <mr.bobsans@gmail.com>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-11 20:56+0200\n"
-"PO-Revision-Date: 2020-05-14 05:03+0000\n"
-"Last-Translator: crazyzubr <hjcnbckfd@gmail.com>\n"
-"Language-Team: Russian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-12-04 09:22+0000\n"
+"Last-Translator: Алексей Борискин <sun.void@gmail.com>, 2015-2018,2023\n"
+"Language-Team: Russian (http://app.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: ru\n"
-"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
-"%100>=11 && n%100<=14)? 2 : 3);\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
+"(n%100>=11 && n%100<=14)? 2 : 3);\n"
 
 msgid "PostgreSQL extensions"
 msgstr "Расширения PostgreSQL"
@@ -120,13 +120,12 @@ msgstr ""
 
 #, python-format
 msgid ""
-"Ensure that this range is completely less than or equal to %(limit_value)s."
+"Ensure that the upper bound of the range is not greater than %(limit_value)s."
 msgstr ""
-"Убедитесь, что все значения, принадлежащие этому интервалу, меньше или равны "
-"%(limit_value)s."
+"Убедитесь, что верхняя граница диапазона не больше, чем %(limit_value)s."
 
 #, python-format
 msgid ""
-"Ensure that this range is completely greater than or equal to "
-"%(limit_value)s."
-msgstr "Убедитесь, что этот диапазон, больше или равен %(limit_value)s."
+"Ensure that the lower bound of the range is not less than %(limit_value)s."
+msgstr ""
+"Убедитесь, что нижняя граница диапазона не меньше, чем %(limit_value)s."

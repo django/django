@@ -4,10 +4,11 @@ from django.contrib.admin import BooleanFieldListFilter, SimpleListFilter
 from django.contrib.admin.options import VERTICAL, ModelAdmin, TabularInline
 from django.contrib.admin.sites import AdminSite
 from django.core.checks import Error
-from django.db.models import CASCADE, F, Field, ForeignKey, Model
+from django.db.models import CASCADE, F, Field, ForeignKey, ManyToManyField, Model
 from django.db.models.functions import Upper
 from django.forms.models import BaseModelFormSet
 from django.test import SimpleTestCase
+from django.test.utils import isolate_apps
 
 from .models import Band, Song, User, ValidationTestInlineModel, ValidationTestModel
 
@@ -321,6 +322,44 @@ class FilterVerticalCheckTests(CheckTestCase):
             "admin.E020",
         )
 
+    @isolate_apps("modeladmin")
+    def test_invalid_reverse_m2m_field_with_related_name(self):
+        class Contact(Model):
+            pass
+
+        class Customer(Model):
+            contacts = ManyToManyField("Contact", related_name="customers")
+
+        class TestModelAdmin(ModelAdmin):
+            filter_vertical = ["customers"]
+
+        self.assertIsInvalid(
+            TestModelAdmin,
+            Contact,
+            "The value of 'filter_vertical[0]' must be a many-to-many field.",
+            "admin.E020",
+        )
+
+    @isolate_apps("modeladmin")
+    def test_invalid_m2m_field_with_through(self):
+        class Artist(Model):
+            bands = ManyToManyField("Band", through="BandArtist")
+
+        class BandArtist(Model):
+            artist = ForeignKey("Artist", on_delete=CASCADE)
+            band = ForeignKey("Band", on_delete=CASCADE)
+
+        class TestModelAdmin(ModelAdmin):
+            filter_vertical = ["bands"]
+
+        self.assertIsInvalid(
+            TestModelAdmin,
+            Artist,
+            "The value of 'filter_vertical[0]' cannot include the ManyToManyField "
+            "'bands', because that field manually specifies a relationship model.",
+            "admin.E013",
+        )
+
     def test_valid_case(self):
         class TestModelAdmin(ModelAdmin):
             filter_vertical = ("users",)
@@ -361,6 +400,44 @@ class FilterHorizontalCheckTests(CheckTestCase):
             ValidationTestModel,
             "The value of 'filter_horizontal[0]' must be a many-to-many field.",
             "admin.E020",
+        )
+
+    @isolate_apps("modeladmin")
+    def test_invalid_reverse_m2m_field_with_related_name(self):
+        class Contact(Model):
+            pass
+
+        class Customer(Model):
+            contacts = ManyToManyField("Contact", related_name="customers")
+
+        class TestModelAdmin(ModelAdmin):
+            filter_horizontal = ["customers"]
+
+        self.assertIsInvalid(
+            TestModelAdmin,
+            Contact,
+            "The value of 'filter_horizontal[0]' must be a many-to-many field.",
+            "admin.E020",
+        )
+
+    @isolate_apps("modeladmin")
+    def test_invalid_m2m_field_with_through(self):
+        class Artist(Model):
+            bands = ManyToManyField("Band", through="BandArtist")
+
+        class BandArtist(Model):
+            artist = ForeignKey("Artist", on_delete=CASCADE)
+            band = ForeignKey("Band", on_delete=CASCADE)
+
+        class TestModelAdmin(ModelAdmin):
+            filter_horizontal = ["bands"]
+
+        self.assertIsInvalid(
+            TestModelAdmin,
+            Artist,
+            "The value of 'filter_horizontal[0]' cannot include the ManyToManyField "
+            "'bands', because that field manually specifies a relationship model.",
+            "admin.E013",
         )
 
     def test_valid_case(self):
@@ -537,7 +614,44 @@ class ListDisplayTests(CheckTestCase):
         self.assertIsInvalid(
             TestModelAdmin,
             ValidationTestModel,
-            "The value of 'list_display[0]' must not be a ManyToManyField.",
+            "The value of 'list_display[0]' must not be a many-to-many field or a "
+            "reverse foreign key.",
+            "admin.E109",
+        )
+
+    def test_invalid_reverse_related_field(self):
+        class TestModelAdmin(ModelAdmin):
+            list_display = ["song_set"]
+
+        self.assertIsInvalid(
+            TestModelAdmin,
+            Band,
+            "The value of 'list_display[0]' must not be a many-to-many field or a "
+            "reverse foreign key.",
+            "admin.E109",
+        )
+
+    def test_invalid_related_field(self):
+        class TestModelAdmin(ModelAdmin):
+            list_display = ["song"]
+
+        self.assertIsInvalid(
+            TestModelAdmin,
+            Band,
+            "The value of 'list_display[0]' must not be a many-to-many field or a "
+            "reverse foreign key.",
+            "admin.E109",
+        )
+
+    def test_invalid_m2m_related_name(self):
+        class TestModelAdmin(ModelAdmin):
+            list_display = ["featured"]
+
+        self.assertIsInvalid(
+            TestModelAdmin,
+            Band,
+            "The value of 'list_display[0]' must not be a many-to-many field or a "
+            "reverse foreign key.",
             "admin.E109",
         )
 
@@ -1189,6 +1303,45 @@ class FkNameCheckTests(CheckTestCase):
             inlines = [ValidationTestInline]
 
         self.assertIsValid(TestModelAdmin, ValidationTestModel)
+
+    def test_proxy_model(self):
+        class Reporter(Model):
+            pass
+
+        class ProxyJournalist(Reporter):
+            class Meta:
+                proxy = True
+
+        class Article(Model):
+            reporter = ForeignKey(ProxyJournalist, on_delete=CASCADE)
+
+        class ArticleInline(admin.TabularInline):
+            model = Article
+
+        class ReporterAdmin(admin.ModelAdmin):
+            inlines = [ArticleInline]
+
+        self.assertIsValid(ReporterAdmin, Reporter)
+
+    def test_proxy_model_fk_name(self):
+        class ReporterFkName(Model):
+            pass
+
+        class ProxyJournalistFkName(ReporterFkName):
+            class Meta:
+                proxy = True
+
+        class ArticleFkName(Model):
+            reporter = ForeignKey(ProxyJournalistFkName, on_delete=CASCADE)
+
+        class ArticleInline(admin.TabularInline):
+            model = ArticleFkName
+            fk_name = "reporter"
+
+        class ReporterAdmin(admin.ModelAdmin):
+            inlines = [ArticleInline]
+
+        self.assertIsValid(ReporterAdmin, ReporterFkName)
 
     def test_proxy_model_parent(self):
         class Parent(Model):

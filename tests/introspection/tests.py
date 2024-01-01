@@ -9,6 +9,7 @@ from .models import (
     City,
     Comment,
     Country,
+    DbCommentModel,
     District,
     Reporter,
     UniqueConstraintConditionModel,
@@ -16,7 +17,6 @@ from .models import (
 
 
 class IntrospectionTests(TransactionTestCase):
-
     available_apps = ["introspection"]
 
     def test_table_names(self):
@@ -132,7 +132,7 @@ class IntrospectionTests(TransactionTestCase):
             )
         self.assertEqual(
             [
-                r[3]
+                r[2]
                 for r in desc
                 if connection.introspection.get_field_type(r[1], r) == "CharField"
             ],
@@ -177,6 +177,26 @@ class IntrospectionTests(TransactionTestCase):
         self.assertIn(
             connection.features.introspected_field_types["SmallAutoField"],
             [connection.introspection.get_field_type(r[1], r) for r in desc],
+        )
+
+    @skipUnlessDBFeature("supports_comments")
+    def test_db_comments(self):
+        with connection.cursor() as cursor:
+            desc = connection.introspection.get_table_description(
+                cursor, DbCommentModel._meta.db_table
+            )
+            table_list = connection.introspection.get_table_list(cursor)
+        self.assertEqual(
+            ["'Name' column comment"],
+            [field.comment for field in desc if field.name == "name"],
+        )
+        self.assertEqual(
+            ["Custom table comment"],
+            [
+                table.comment
+                for table in table_list
+                if table.name == "introspection_dbcommentmodel"
+            ],
         )
 
     # Regression test for #9991 - 'real' types in postgres

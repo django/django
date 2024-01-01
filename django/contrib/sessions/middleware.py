@@ -53,8 +53,8 @@ class SessionMiddleware(MiddlewareMixin):
                     expires_time = time.time() + max_age
                     expires = http_date(expires_time)
                 # Save the session data and refresh the client cookie.
-                # Skip session save for 500 responses, refs #3881.
-                if response.status_code != 500:
+                # Skip session save for 5xx responses.
+                if response.status_code < 500:
                     try:
                         request.session.save()
                     except UpdateError:

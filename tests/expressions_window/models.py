@@ -17,6 +17,13 @@ class Employee(models.Model):
     bonus = models.DecimalField(decimal_places=2, max_digits=15, null=True)
 
 
+class PastEmployeeDepartment(models.Model):
+    employee = models.ForeignKey(
+        Employee, related_name="past_departments", on_delete=models.CASCADE
+    )
+    department = models.CharField(max_length=40, blank=False, null=False)
+
+
 class Detail(models.Model):
     value = models.JSONField()
 

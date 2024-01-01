@@ -53,7 +53,7 @@ However, if you are working with non-UTC time zones, and using the ``pytz``
 <DATABASE-TIME_ZONE>` setting, you will need to audit your code, since ``pytz``
 and ``zoneinfo`` are not entirely equivalent.
 
-To give time for such an audit, the transitional :setting:`USE_DEPRECATED_PYTZ`
+To give time for such an audit, the transitional ``USE_DEPRECATED_PYTZ``
 setting allows continued use of ``pytz`` during the 4.x release cycle. This
 setting will be removed in Django 5.0.
 
@@ -62,7 +62,7 @@ author, can be used to assist with the migration from ``pytz``. This package
 provides shims to help you safely remove ``pytz``, and has a detailed
 `migration guide`_ showing how to move to the new ``zoneinfo`` APIs.
 
-Using `pytz_deprecation_shim`_ and the :setting:`USE_DEPRECATED_PYTZ`
+Using `pytz_deprecation_shim`_ and the ``USE_DEPRECATED_PYTZ``
 transitional setting is recommended if you need a gradual update path.
 
 .. _pytz_deprecation_shim: https://pytz-deprecation-shim.readthedocs.io/en/latest/index.html
@@ -89,9 +89,9 @@ For example::
         class Meta:
             constraints = [
                 UniqueConstraint(
-                    Lower('first_name'),
-                    Lower('last_name').desc(),
-                    name='first_last_name_unique',
+                    Lower("first_name"),
+                    Lower("last_name").desc(),
+                    name="first_last_name_unique",
                 ),
             ]
 
@@ -109,11 +109,9 @@ Redis cache backend
 -------------------
 
 The new ``django.core.cache.backends.redis.RedisCache`` cache backend provides
-built-in support for caching with Redis. `redis-py`_ 3.0.0 or higher is
-required. For more details, see the :ref:`documentation on caching with Redis
-in Django <redis>`.
-
-.. _`redis-py`: https://pypi.org/project/redis/
+built-in support for caching with Redis. :pypi:`redis-py <redis>` 3.0.0 or
+higher is required. For more details, see the :ref:`documentation on caching
+with Redis in Django <redis>`.
 
 Template based form rendering
 -----------------------------
@@ -468,7 +466,7 @@ instead.
 If you want to support legacy browsers and set the header, use this line in a
 custom middleware::
 
-    response.headers.setdefault('X-XSS-Protection', '1; mode=block')
+    response.headers.setdefault("X-XSS-Protection", "1; mode=block")
 
 .. _Content-Security-Policy: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy
 
@@ -491,6 +489,15 @@ some cases.
 :class:`~django.views.generic.edit.FormMixin` to handle POST requests. As a
 consequence, any custom deletion logic in ``delete()`` handlers should be
 moved to ``form_valid()``, or a shared helper method, if required.
+
+Table and column naming scheme changes on Oracle
+------------------------------------------------
+
+Django 4.0 inadvertently changed the table and column naming scheme on Oracle.
+This causes errors for models and fields with names longer than 30 characters.
+Unfortunately, renaming some Oracle tables and columns is required. Use the
+upgrade script in :ticket:`33789 <33789#comment:15>` to generate ``RENAME``
+statements to change naming scheme.
 
 Miscellaneous
 -------------
@@ -581,7 +588,7 @@ Miscellaneous
   :ref:`Localization section <use_l10n_deprecation>` above for more details.
 
 * As part of the :ref:`move to zoneinfo <whats-new-4.0>`,
-  :attr:`django.utils.timezone.utc` is changed to alias
+  ``django.utils.timezone.utc`` is changed to alias
   :attr:`datetime.timezone.utc`.
 
 * The minimum supported version of ``asgiref`` is increased from 3.3.2 to

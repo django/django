@@ -1,22 +1,22 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Michael Wolf <milupo@sorbzilla.de>, 2016,2020-2021
+# Michael Wolf <milupo@sorbzilla.de>, 2016,2020-2023
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-02-01 21:45+0000\n"
-"Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
-"Language-Team: Upper Sorbian (http://www.transifex.com/django/django/"
+"POT-Creation-Date: 2023-09-18 15:04-0300\n"
+"PO-Revision-Date: 2023-12-04 07:59+0000\n"
+"Last-Translator: Michael Wolf <milupo@sorbzilla.de>, 2016,2020-2023\n"
+"Language-Team: Upper Sorbian (http://app.transifex.com/django/django/"
 "language/hsb/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: hsb\n"
-"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n"
-"%100==4 ? 2 : 3);\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || "
+"n%100==4 ? 2 : 3);\n"
 
 #, javascript-format
 msgid "Available %s"
@@ -65,12 +65,26 @@ msgstr ""
 "slědowacym kašćiku wuběraće a potom na šipk „Wotstronić“ mjez kašćikomaj "
 "kliknjeće."
 
+#, javascript-format
+msgid "Type into this box to filter down the list of selected %s."
+msgstr ""
+"Zapisajće do tutoho kašćika, zo byšće někotre z lisćiny wubranych %s "
+"wufiltrował."
+
 msgid "Remove all"
 msgstr "Wšě wotstronić"
 
 #, javascript-format
 msgid "Click to remove all chosen %s at once."
 msgstr "Klikńće, zo byšće wšě wubrane %s naraz wotstronił."
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] "%swubrane nastajenje njewidźomne"
+msgstr[1] "%swubranej nastajeni njewidźomnej"
+msgstr[2] "%s wubrane nastajenja njewidźomne"
+msgstr[3] "%swubranych nastajenjow njewidźomne"
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -238,6 +252,55 @@ msgstr "Now."
 msgctxt "abbrev. month December"
 msgid "Dec"
 msgstr "Dec."
+
+msgid "Sunday"
+msgstr "Njedźela"
+
+msgid "Monday"
+msgstr "Póndźela"
+
+msgid "Tuesday"
+msgstr "Wutora"
+
+msgid "Wednesday"
+msgstr "Srjeda"
+
+msgid "Thursday"
+msgstr "Štwórtk"
+
+msgid "Friday"
+msgstr "Pjatk"
+
+msgid "Saturday"
+msgstr "Sobota"
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr "Nje"
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr "Pón"
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr "Wut"
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr "Srj"
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr "Štw"
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr "Pja"
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr "Sob"
 
 msgctxt "one letter Sunday"
 msgid "S"

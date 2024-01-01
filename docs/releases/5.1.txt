@@ -1,0 +1,375 @@
+============================================
+Django 5.1 release notes - UNDER DEVELOPMENT
+============================================
+
+*Expected August 2024*
+
+Welcome to Django 5.1!
+
+These release notes cover the :ref:`new features <whats-new-5.1>`, as well as
+some :ref:`backwards incompatible changes <backwards-incompatible-5.1>` you'll
+want to be aware of when upgrading from Django 5.0 or earlier. We've
+:ref:`begun the deprecation process for some features
+<deprecated-features-5.1>`.
+
+See the :doc:`/howto/upgrade-version` guide if you're updating an existing
+project.
+
+Python compatibility
+====================
+
+Django 5.1 supports Python 3.10, 3.11, and 3.12. We **highly recommend** and
+only officially support the latest release of each series.
+
+.. _whats-new-5.1:
+
+What's new in Django 5.1
+========================
+
+Minor features
+--------------
+
+:mod:`django.contrib.admin`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.admindocs`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.auth`
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The default iteration count for the PBKDF2 password hasher is increased from
+  720,000 to 870,000.
+
+:mod:`django.contrib.contenttypes`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.gis`
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.messages`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.postgres`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.redirects`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sessions`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sitemaps`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sites`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.staticfiles`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.syndication`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Asynchronous views
+~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Cache
+~~~~~
+
+* ...
+
+CSRF
+~~~~
+
+* ...
+
+Decorators
+~~~~~~~~~~
+
+* ...
+
+Email
+~~~~~
+
+* ...
+
+Error Reporting
+~~~~~~~~~~~~~~~
+
+* ...
+
+File Storage
+~~~~~~~~~~~~
+
+* ...
+
+File Uploads
+~~~~~~~~~~~~
+
+* ...
+
+Forms
+~~~~~
+
+* In order to improve accessibility and enable screen readers to associate
+  fieldsets with their help text, the form fieldset now includes the
+  ``aria-describedby`` HTML attribute.
+
+Generic Views
+~~~~~~~~~~~~~
+
+* ...
+
+Internationalization
+~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Logging
+~~~~~~~
+
+* ...
+
+Management Commands
+~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Migrations
+~~~~~~~~~~
+
+* ...
+
+Models
+~~~~~~
+
+* :meth:`.QuerySet.explain` now supports the ``generic_plan`` option on
+  PostgreSQL 16+.
+
+* :class:`~django.db.models.expressions.RowRange` now accepts positive integers
+  for the ``start`` argument and negative integers for the ``end`` argument.
+
+* The new ``exclusion`` argument of
+  :class:`~django.db.models.expressions.RowRange` and
+  :class:`~django.db.models.expressions.ValueRange` allows excluding rows,
+  groups, and ties from the window frames.
+
+* :meth:`.QuerySet.order_by` now supports ordering by annotation transforms
+  such as ``JSONObject`` keys and ``ArrayAgg`` indices.
+
+* :class:`F() <django.db.models.F>` and :class:`OuterRef()
+  <django.db.models.OuterRef>` expressions that output
+  :class:`~django.db.models.CharField`, :class:`~django.db.models.EmailField`,
+  :class:`~django.db.models.SlugField`, :class:`~django.db.models.URLField`,
+  :class:`~django.db.models.TextField`, or
+  :class:`~django.contrib.postgres.fields.ArrayField` can now be :ref:`sliced
+  <slicing-using-f>`.
+
+Requests and Responses
+~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Security
+~~~~~~~~
+
+* ...
+
+Serialization
+~~~~~~~~~~~~~
+
+* ...
+
+Signals
+~~~~~~~
+
+* ...
+
+Templates
+~~~~~~~~~
+
+* Custom tags may now set extra data on the ``Parser`` object that will later
+  be made available on the ``Template`` instance. Such data may be used, for
+  example, by the template loader, or other template clients.
+
+* The new :ttag:`{% query_string %} <query_string>` template tag allows
+  changing a :class:`~django.http.QueryDict` instance for use in links, for
+  example, to generate a link to the next page while keeping any filtering
+  options in place.
+
+Tests
+~~~~~
+
+* :meth:`~django.test.SimpleTestCase.assertContains`,
+  :meth:`~django.test.SimpleTestCase.assertNotContains`, and
+  :meth:`~django.test.SimpleTestCase.assertInHTML` assertions now add haystacks
+  to assertion error messages.
+
+* The Django test runner now supports a ``--screenshots`` option to save
+  screenshots for Selenium tests.
+
+* The :class:`~django.test.RequestFactory`,
+  :class:`~django.test.AsyncRequestFactory`, :class:`~django.test.Client`, and
+  :class:`~django.test.AsyncClient` classes now support the ``query_params``
+  parameter, which accepts a dictionary of query string keys and values. This
+  allows setting query strings on any HTTP methods more easily.
+
+  .. code-block:: python
+
+     self.client.post("/items/1", query_params={"action": "delete"})
+     await self.async_client.post("/items/1", query_params={"action": "delete"})
+
+* The new :meth:`.SimpleTestCase.assertNotInHTML` assertion allows testing that
+  an HTML fragment is not contained in the given HTML haystack.
+
+URLs
+~~~~
+
+* ...
+
+Utilities
+~~~~~~~~~
+
+* ...
+
+Validators
+~~~~~~~~~~
+
+* ...
+
+.. _backwards-incompatible-5.1:
+
+Backwards incompatible changes in 5.1
+=====================================
+
+Database backend API
+--------------------
+
+This section describes changes that may be needed in third-party database
+backends.
+
+* ...
+
+:mod:`django.contrib.gis`
+-------------------------
+
+* Support for PostGIS 2.5 is removed.
+
+* Support for PROJ < 6 is removed.
+
+* Support for GDAL 2.4 is removed.
+
+Dropped support for MariaDB 10.4
+--------------------------------
+
+Upstream support for MariaDB 10.4 ends in June 2024. Django 5.1 supports
+MariaDB 10.5 and higher.
+
+Dropped support for PostgreSQL 12
+---------------------------------
+
+Upstream support for PostgreSQL 12 ends in November 2024. Django 5.1 supports
+PostgreSQL 13 and higher.
+
+Miscellaneous
+-------------
+
+* In order to improve accessibility, the admin's changelist filter is now
+  rendered in a ``<nav>`` tag instead of a ``<div>``.
+
+* :meth:`.SimpleTestCase.assertURLEqual` and
+  :meth:`~django.test.SimpleTestCase.assertInHTML` now add ``": "`` to the
+  ``msg_prefix``. This is consistent with the behavior of other assertions.
+
+.. _deprecated-features-5.1:
+
+Features deprecated in 5.1
+==========================
+
+Miscellaneous
+-------------
+
+* The ``ModelAdmin.log_deletion()`` and ``LogEntryManager.log_action()``
+  methods are deprecated. Subclasses should implement
+  ``ModelAdmin.log_deletions()`` and  ``LogEntryManager.log_actions()``
+  instead.
+
+* The undocumented ``django.utils.itercompat.is_iterable()`` function and the
+  ``django.utils.itercompat`` module are deprecated. Use
+  ``isinstance(..., collections.abc.Iterable)`` instead.
+
+* The ``django.contrib.gis.geoip2.GeoIP2.coords()`` method is deprecated. Use
+  ``django.contrib.gis.geoip2.GeoIP2.lon_lat()`` instead.
+
+* The ``django.contrib.gis.geoip2.GeoIP2.open()`` method is deprecated. Use the
+  :class:`~django.contrib.gis.geoip2.GeoIP2` constructor instead.
+
+Features removed in 5.1
+=======================
+
+These features have reached the end of their deprecation cycle and are removed
+in Django 5.1.
+
+See :ref:`deprecated-features-4.2` for details on these changes, including how
+to remove usage of these features.
+
+* The ``BaseUserManager.make_random_password()`` method is removed.
+
+* The model's ``Meta.index_together`` option is removed.
+
+* The ``length_is`` template filter is removed.
+
+* The ``django.contrib.auth.hashers.SHA1PasswordHasher``,
+  ``django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher``, and
+  ``django.contrib.auth.hashers.UnsaltedMD5PasswordHasher`` are removed.
+
+* The model ``django.contrib.postgres.fields.CICharField``,
+  ``django.contrib.postgres.fields.CIEmailField``, and
+  ``django.contrib.postgres.fields.CITextField`` are removed, except for
+  support in historical migrations.
+
+* The ``django.contrib.postgres.fields.CIText`` mixin is removed.
+
+* The ``map_width`` and ``map_height`` attributes of ``BaseGeometryWidget`` are
+  removed.
+
+* The ``SimpleTestCase.assertFormsetError()`` method is removed.
+
+* The ``TransactionTestCase.assertQuerysetEqual()`` method is removed.
+
+* Support for passing encoded JSON string literals to ``JSONField`` and
+  associated lookups and expressions is removed.
+
+* Support for passing positional arguments to ``Signer`` and
+  ``TimestampSigner`` is removed.
+
+* The ``DEFAULT_FILE_STORAGE`` and ``STATICFILES_STORAGE`` settings is removed.
+
+* The ``django.core.files.storage.get_storage_class()`` function is removed.

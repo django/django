@@ -2,6 +2,7 @@ from unittest import mock
 
 from django.db import transaction
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
+from django.utils.deprecation import RemovedInDjango60Warning
 
 from .models import Article, InheritedArticleA, InheritedArticleB, Publication, User
 
@@ -91,6 +92,25 @@ class ManyToManyTests(TestCase):
         self.assertSequenceEqual(a5.authors.all(), [user_2])
         a5.authors.remove(user_2.username)
         self.assertSequenceEqual(a5.authors.all(), [])
+
+    def test_related_manager_refresh(self):
+        user_1 = User.objects.create(username="Jean")
+        user_2 = User.objects.create(username="Joe")
+        self.a3.authors.add(user_1.username)
+        self.assertSequenceEqual(user_1.article_set.all(), [self.a3])
+        # Change the username on a different instance of the same user.
+        user_1_from_db = User.objects.get(pk=user_1.pk)
+        self.assertSequenceEqual(user_1_from_db.article_set.all(), [self.a3])
+        user_1_from_db.username = "Paul"
+        self.a3.authors.set([user_2.username])
+        user_1_from_db.save()
+        # Assign a different article.
+        self.a4.authors.add(user_1_from_db.username)
+        self.assertSequenceEqual(user_1_from_db.article_set.all(), [self.a4])
+        # Refresh the instance with an evaluated related manager.
+        user_1.refresh_from_db()
+        self.assertEqual(user_1.username, "Paul")
+        self.assertSequenceEqual(user_1.article_set.all(), [self.a4])
 
     def test_add_remove_invalid_type(self):
         msg = "Field 'id' expected a number but got 'invalid'."
@@ -493,6 +513,12 @@ class ManyToManyTests(TestCase):
         a4.publications.add(self.p1)
         self.assertEqual(a4.publications.count(), 2)
 
+    def test_create_after_prefetch(self):
+        a4 = Article.objects.prefetch_related("publications").get(id=self.a4.id)
+        self.assertSequenceEqual(a4.publications.all(), [self.p2])
+        p5 = a4.publications.create(title="Django beats")
+        self.assertCountEqual(a4.publications.all(), [self.p2, p5])
+
     def test_set_after_prefetch(self):
         a4 = Article.objects.prefetch_related("publications").get(id=self.a4.id)
         self.assertEqual(a4.publications.count(), 1)
@@ -536,3 +562,23 @@ class ManyToManyTests(TestCase):
         self.assertEqual(
             self.p3.article_set.exists(), self.p3.article_set.all().exists()
         )
+
+    def test_get_prefetch_queryset_warning(self):
+        articles = Article.objects.all()
+        msg = (
+            "get_prefetch_queryset() is deprecated. Use get_prefetch_querysets() "
+            "instead."
+        )
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+            self.a1.publications.get_prefetch_queryset(articles)
+
+    def test_get_prefetch_querysets_invalid_querysets_length(self):
+        articles = Article.objects.all()
+        msg = (
+            "querysets argument of get_prefetch_querysets() should have a length of 1."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            self.a1.publications.get_prefetch_querysets(
+                instances=articles,
+                querysets=[Publication.objects.all(), Publication.objects.all()],
+            )

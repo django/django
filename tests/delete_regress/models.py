@@ -90,6 +90,12 @@ class Location(models.Model):
 class Item(models.Model):
     version = models.ForeignKey(Version, models.CASCADE)
     location = models.ForeignKey(Location, models.SET_NULL, blank=True, null=True)
+    location_value = models.ForeignKey(
+        Location, models.SET(42), default=1, db_constraint=False, related_name="+"
+    )
+    location_default = models.ForeignKey(
+        Location, models.SET_DEFAULT, default=1, db_constraint=False, related_name="+"
+    )
 
 
 # Models for #16128

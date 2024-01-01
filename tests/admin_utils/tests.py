@@ -7,6 +7,7 @@ from django.contrib import admin
 from django.contrib.admin import helpers
 from django.contrib.admin.utils import (
     NestedObjects,
+    build_q_object_from_lookup_parameters,
     display_for_field,
     display_for_value,
     flatten,
@@ -99,7 +100,6 @@ class NestedObjectsTests(TestCase):
 
 
 class UtilsTests(SimpleTestCase):
-
     empty_value = "-empty-"
 
     def test_values_from_lookup_field(self):
@@ -325,7 +325,7 @@ class UtilsTests(SimpleTestCase):
         )
         msg = "Unable to lookup 'nonexistent' on Article or ArticleForm"
         with self.assertRaisesMessage(AttributeError, msg):
-            label_for_field("nonexistent", Article, form=ArticleForm()),
+            label_for_field("nonexistent", Article, form=ArticleForm())
 
     def test_label_for_property(self):
         class MockModelAdmin:
@@ -425,3 +425,17 @@ class UtilsTests(SimpleTestCase):
 
     def test_quote(self):
         self.assertEqual(quote("something\nor\nother"), "something_0Aor_0Aother")
+
+    def test_build_q_object_from_lookup_parameters(self):
+        parameters = {
+            "title__in": [["Article 1", "Article 2"]],
+            "hist__iexact": ["history"],
+            "site__pk": [1, 2],
+        }
+        q_obj = build_q_object_from_lookup_parameters(parameters)
+        self.assertEqual(
+            q_obj,
+            models.Q(title__in=["Article 1", "Article 2"])
+            & models.Q(hist__iexact="history")
+            & (models.Q(site__pk=1) | models.Q(site__pk=2)),
+        )

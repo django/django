@@ -10,7 +10,7 @@ class RevisionableModel(models.Model):
     title = models.CharField(blank=True, max_length=255)
     when = models.DateTimeField(default=datetime.datetime.now)
 
-    def save(self, *args, force_insert=None, force_update=None, **kwargs):
+    def save(self, *args, force_insert=False, force_update=False, **kwargs):
         super().save(
             *args, force_insert=force_insert, force_update=force_update, **kwargs
         )

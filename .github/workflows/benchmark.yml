@@ -1,0 +1,41 @@
+name: Benchmark
+
+on:
+  pull_request:
+    types: [ labeled, synchronize, opened, reopened ]
+
+permissions:
+   contents: read
+
+jobs:
+  Run_benchmarks:
+    if: contains(github.event.pull_request.labels.*.name, 'benchmark')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Benchmark Repo
+        uses: actions/checkout@v4
+        with:
+          repository: django/django-asv
+          path: "."
+      - name: Install Requirements
+        run: pip install -r requirements.txt
+      - name: Cache Django
+        uses: actions/cache@v3
+        with:
+          path: Django/*
+          key: Django
+      - name: Run Benchmarks
+        shell: bash -l {0}
+        run: |-
+          asv machine --machine ubuntu-latest --yes > /dev/null
+          echo 'Beginning benchmarks...'
+          asv continuous --interleave-processes -a processes=2 --split --show-stderr 'HEAD^' 'HEAD' |\
+          sed -n -E '/(before.*after.*ratio)|(BENCHMARKS)/,$p' >> out.txt
+          echo 'Benchmarks Done.'
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat out.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          if grep -q "PERFORMANCE DECREASED" out.txt;
+          then
+            exit 1
+          fi

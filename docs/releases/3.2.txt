@@ -76,19 +76,21 @@ default value of :setting:`DEFAULT_AUTO_FIELD` will be changed to
 To avoid unwanted migrations in the future, either explicitly set
 :setting:`DEFAULT_AUTO_FIELD` to :class:`~django.db.models.AutoField`::
 
-    DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+    DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 or configure it on a per-app basis::
 
     from django.apps import AppConfig
 
+
     class MyAppConfig(AppConfig):
-        default_auto_field = 'django.db.models.AutoField'
-        name = 'my_app'
+        default_auto_field = "django.db.models.AutoField"
+        name = "my_app"
 
 or on a per-model basis::
 
     from django.db import models
+
 
     class MyModel(models.Model):
         id = models.AutoField(primary_key=True)
@@ -124,13 +126,13 @@ functional indexes on expressions and database functions. For example::
         class Meta:
             indexes = [
                 Index(
-                    Lower('first_name'),
-                    Upper('last_name').desc(),
-                    name='first_last_name_idx',
+                    Lower("first_name"),
+                    Upper("last_name").desc(),
+                    name="first_last_name_idx",
                 ),
                 Index(
-                    F('height') / (F('weight') + Value(5)),
-                    name='calc_idx',
+                    F("height") / (F("weight") + Value(5)),
+                    name="calc_idx",
                 ),
             ]
 
@@ -141,11 +143,9 @@ Functional indexes are added to models using the
 ----------------------
 
 The new ``django.core.cache.backends.memcached.PyMemcacheCache`` cache backend
-allows using the pymemcache_ library for memcached. ``pymemcache`` 3.4.0 or
-higher is required. For more details, see the :doc:`documentation on caching in
-Django </topics/cache>`.
-
-.. _pymemcache: https://pypi.org/project/pymemcache/
+allows using the :pypi:`pymemcache` library for memcached. ``pymemcache`` 3.4.0
+or higher is required. For more details, see the :doc:`documentation on caching
+in Django </topics/cache>`.
 
 New decorators for the admin site
 ---------------------------------
@@ -247,8 +247,8 @@ Minor features
 * The new :attr:`.ExclusionConstraint.include` attribute allows creating
   covering exclusion constraints on PostgreSQL 12+.
 
-* The new :attr:`.ExclusionConstraint.opclasses` attribute allows setting
-  PostgreSQL operator classes.
+* The new ``ExclusionConstraint.opclasses`` attribute allows setting PostgreSQL
+  operator classes.
 
 * The new :attr:`.JSONBAgg.ordering` attribute determines the ordering of the
   aggregated elements.
@@ -539,7 +539,8 @@ Tests
   <django.db.transaction.on_commit>` in a list. This allows you to test such
   callbacks without using the slower :class:`.TransactionTestCase`.
 
-* :meth:`.TransactionTestCase.assertQuerysetEqual` now supports direct
+* :meth:`TransactionTestCase.assertQuerysetEqual()
+  <django.test.TransactionTestCase.assertQuerySetEqual>` now supports direct
   comparison against another queryset rather than being restricted to
   comparison against a list of string representations of objects when using the
   default value for the ``transform`` argument.

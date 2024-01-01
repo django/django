@@ -14,19 +14,22 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   windows:
     runs-on: windows-latest
     strategy:
       matrix:
         python-version:
-          - '3.10'
+          - '3.12'
     name: Windows, SQLite, Python ${{ matrix.python-version }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Set up Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
@@ -42,11 +45,11 @@ jobs:
     name: JavaScript tests
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '12'
+          node-version: '20'
           cache: 'npm'
           cache-dependency-path: '**/package.json'
       - run: npm install

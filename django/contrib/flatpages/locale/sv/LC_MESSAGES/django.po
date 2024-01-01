@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Albin Larsson <albin.post@gmail.com>, 2022
 # Andreas Pelme <andreas@pelme.se>, 2011-2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jonathan Lindén, 2014
@@ -10,9 +11,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-16 20:42+0100\n"
-"PO-Revision-Date: 2019-01-28 13:46+0000\n"
-"Last-Translator: Petter Strandmark <petter.strandmark@gmail.com>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2022-07-24 19:03+0000\n"
+"Last-Translator: Albin Larsson <albin.post@gmail.com>\n"
 "Language-Team: Swedish (http://www.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -31,9 +32,10 @@ msgid "URL"
 msgstr "URL"
 
 msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+"Example: “/about/contact/”. Make sure to have leading and trailing slashes."
 msgstr ""
-"Exempel: '/om/kontakt/'. Se till att ha inledande och avslutande snedstreck."
+"Exempel: \"/om/kontakt/\". Se till att ha inledande och avslutande "
+"snedstreck."
 
 msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
@@ -42,8 +44,8 @@ msgstr ""
 "Detta värde får endast innehålla bokstäver, siffror, punkter, understreck, "
 "bindestreck, snedstreck och tilde."
 
-msgid "Example: '/about/contact'. Make sure to have a leading slash."
-msgstr "Exempel: '/about/contact'. Se till att den börjar med ett snedstreck."
+msgid "Example: “/about/contact”. Make sure to have a leading slash."
+msgstr "Exempel: \"/om/kontakt/\". Se till att ett inledande snedstreck."
 
 msgid "URL is missing a leading slash."
 msgstr "URL:en saknar ett inledande snedstreck."
@@ -68,8 +70,8 @@ msgid "template name"
 msgstr "mallnamn"
 
 msgid ""
-"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
-"will use 'flatpages/default.html'."
+"Example: “flatpages/contact_page.html”. If this isn’t provided, the system "
+"will use “flatpages/default.html”."
 msgstr ""
 "Exempel: 'sidor/kontaktsida.html'. Om detta inte fylls i kommer systemet att "
 "använda 'flatpages/default.html'."

@@ -89,7 +89,9 @@ class ContentTypeManager(models.Manager):
             )
             cts = self.filter(condition)
             for ct in cts:
-                opts_models = needed_opts.pop(ct.model_class()._meta, [])
+                opts_models = needed_opts.pop(
+                    ct._meta.apps.get_model(ct.app_label, ct.model)._meta, []
+                )
                 for model in opts_models:
                     results[model] = ct
                 self._add_to_cache(self.db, ct)
@@ -160,7 +162,10 @@ class ContentType(models.Model):
         model = self.model_class()
         if not model:
             return self.model
-        return "%s | %s" % (model._meta.app_label, model._meta.verbose_name)
+        return "%s | %s" % (
+            model._meta.app_config.verbose_name,
+            model._meta.verbose_name,
+        )
 
     def model_class(self):
         """Return the model class for this type of content."""

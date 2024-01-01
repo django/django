@@ -1,3 +1,5 @@
+from functools import partial
+
 from django.contrib import auth
 from django.contrib.auth import load_backend
 from django.contrib.auth.backends import RemoteUserBackend
@@ -12,6 +14,12 @@ def get_user(request):
     return request._cached_user
 
 
+async def auser(request):
+    if not hasattr(request, "_acached_user"):
+        request._acached_user = await auth.aget_user(request)
+    return request._acached_user
+
+
 class AuthenticationMiddleware(MiddlewareMixin):
     def process_request(self, request):
         if not hasattr(request, "session"):
@@ -23,6 +31,7 @@ class AuthenticationMiddleware(MiddlewareMixin):
                 "'django.contrib.auth.middleware.AuthenticationMiddleware'."
             )
         request.user = SimpleLazyObject(lambda: get_user(request))
+        request.auser = partial(auser, request)
 
 
 class RemoteUserMiddleware(MiddlewareMixin):

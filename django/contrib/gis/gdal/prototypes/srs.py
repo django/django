@@ -1,6 +1,6 @@
 from ctypes import POINTER, c_char_p, c_int, c_void_p
 
-from django.contrib.gis.gdal.libgdal import GDAL_VERSION, lgdal, std_call
+from django.contrib.gis.gdal.libgdal import lgdal, std_call
 from django.contrib.gis.gdal.prototypes.generation import (
     const_string_output,
     double_output,
@@ -36,11 +36,9 @@ destroy_srs = void_output(
     std_call("OSRDestroySpatialReference"), [c_void_p], errcheck=False
 )
 srs_validate = void_output(lgdal.OSRValidate, [c_void_p])
-
-if GDAL_VERSION >= (3, 0):
-    set_axis_strategy = void_output(
-        lgdal.OSRSetAxisMappingStrategy, [c_void_p, c_int], errcheck=False
-    )
+set_axis_strategy = void_output(
+    lgdal.OSRSetAxisMappingStrategy, [c_void_p, c_int], errcheck=False
+)
 
 # Getting the semi_major, semi_minor, and flattening functions.
 semi_major = srs_double(lgdal.OSRGetSemiMajor)

@@ -1,17 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2012
-# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2014-2016
-# Jaffa McNeill <inactive+jaffamcneill@transifex.com>, 2011
+# Batist D 🐍 <baptiste+transifex@darthenay.fr>, 2012
+# Batist D 🐍 <baptiste+transifex@darthenay.fr>, 2014-2016
+# 977db45bb2d7151f88325d4fbeca189e_848074d <3d1ba07956d05291bf7c987ecea0a7ef_13052>, 2011
+# Meiyer <interdist+translations@gmail.com>, 2022
 # Adamo Mesha <adam.raizen@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:50+0200\n"
-"PO-Revision-Date: 2017-09-19 16:41+0000\n"
-"Last-Translator: Baptiste Darthenay <baptiste+transifex@darthenay.fr>\n"
+"POT-Creation-Date: 2022-05-17 05:26-0500\n"
+"PO-Revision-Date: 2022-05-25 07:05+0000\n"
+"Last-Translator: Meiyer <interdist+translations@gmail.com>, 2022\n"
 "Language-Team: Esperanto (http://www.transifex.com/django/django/language/"
 "eo/)\n"
 "MIME-Version: 1.0\n"
@@ -22,61 +23,59 @@ msgstr ""
 
 #, javascript-format
 msgid "Available %s"
-msgstr "Disponebla %s"
+msgstr "Disponeblaj %s"
 
 #, javascript-format
 msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
 msgstr ""
-"Tio ĉi estas la listo de disponeblaj %s. Vi povas forigi kelkajn elektante "
-"ilin en la suba skatolo kaj tiam klakante la \"Elekti\" sagon inter la du "
-"skatoloj."
+"Tio ĉi estas la listo de disponeblaj %s. Vi povas aktivigi kelkajn markante "
+"ilin en la suba kesto kaj klakante la sagon “Elekti” inter la du kestoj."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
-msgstr "Entipu en ĉi-tiu skatolo por filtri la liston de haveblaj %s."
+msgstr "Tajpu en ĉi-tiu skatolo por filtri la liston de haveblaj %s."
 
 msgid "Filter"
 msgstr "Filtru"
 
 msgid "Choose all"
-msgstr "Elekti ĉiuj"
+msgstr "Elekti ĉiujn"
 
 #, javascript-format
 msgid "Click to choose all %s at once."
-msgstr "Klaku por tuj elekti ĉiuj %s."
+msgstr "Klaku por tuj elekti ĉiujn %sn."
 
 msgid "Choose"
 msgstr "Elekti"
 
 msgid "Remove"
-msgstr "Forigu"
+msgstr "Forigi"
 
 #, javascript-format
 msgid "Chosen %s"
-msgstr "Elektita %s"
+msgstr "Elektitaj %s"
 
 #, javascript-format
 msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
 msgstr ""
-"Tio ĉi estas la listo de elektitaj %s. Vi povas forigi kelkajn elektante "
-"ilin en la suba skatolo kaj tiam klakante la \"Forigi\" sagon inter la du "
-"skatoloj."
+"Tio ĉi estas la listo de elektitaj %s. Vi povas malaktivigi kelkajn markante "
+"ilin en la suba kesto kaj klakante la sagon “Forigi” inter la du kestoj."
 
 msgid "Remove all"
-msgstr "Forigu ĉiujn"
+msgstr "Forigi ĉiujn"
 
 #, javascript-format
 msgid "Click to remove all chosen %s at once."
-msgstr "Klaku por tuj forigi ĉiujn %s elektitajn."
+msgstr "Klaku por tuj forigi ĉiujn %sn elektitajn."
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] "%(sel)s de %(cnt)s elektita"
-msgstr[1] "%(sel)s de %(cnt)s elektitaj"
+msgstr[1] "%(sel)s el %(cnt)s elektitaj"
 
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
@@ -86,47 +85,43 @@ msgstr ""
 "agon, viaj neŝirmitaj ŝanĝoj perdiĝos."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
-"Vi elektas agon, sed vi ne ŝirmis viajn ŝanĝojn al individuaj kampoj ĝis "
-"nun. Bonvolu klaku BONA por ŝirmi. Vi devos ripeton la agon"
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
-"Vi elektas agon, kaj vi ne faris ajnajn ŝanĝojn ĉe unuopaj kampoj. Vi  "
-"verŝajne serĉas la Iru-butonon prefere ol la Ŝirmu-butono."
 
 msgid "Now"
 msgstr "Nun"
 
 msgid "Midnight"
-msgstr "Noktomezo"
+msgstr "Noktomeze"
 
 msgid "6 a.m."
 msgstr "6 a.t.m."
 
 msgid "Noon"
-msgstr "Tagmezo"
+msgstr "Tagmeze"
 
 msgid "6 p.m."
-msgstr "6 ptm"
+msgstr "6 p.t.m."
 
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Noto: Vi estas %s horo antaŭ la servila horo."
-msgstr[1] "Noto: Vi estas %s horoj antaŭ la servila horo."
+msgstr[0] "Noto: Vi estas %s horon post la servila horo."
+msgstr[1] "Noto: Vi estas %s horojn post la servila horo."
 
 #, javascript-format
 msgid "Note: You are %s hour behind server time."
 msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "Noto: Vi estas %s horo post la servila horo."
-msgstr[1] "Noto: Vi estas %s horoj post la servila horo."
+msgstr[0] "Noto: Vi estas %s horon antaŭ la servila horo."
+msgstr[1] "Noto: Vi estas %s horojn antaŭ la servila horo."
 
 msgid "Choose a Time"
 msgstr "Elektu horon"
@@ -135,7 +130,7 @@ msgid "Choose a time"
 msgstr "Elektu tempon"
 
 msgid "Cancel"
-msgstr "Malmendu"
+msgstr "Nuligi"
 
 msgid "Today"
 msgstr "Hodiaŭ"
@@ -185,6 +180,54 @@ msgstr "novembro"
 msgid "December"
 msgstr "decembro"
 
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "jan."
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "feb."
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "mar."
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "apr."
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "maj."
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "jun."
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "jul."
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "aŭg."
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "sep."
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "okt."
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "nov."
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "dec."
+
 msgctxt "one letter Sunday"
 msgid "S"
 msgstr "d"
@@ -213,8 +256,13 @@ msgctxt "one letter Saturday"
 msgid "S"
 msgstr "s"
 
+msgid ""
+"You have already submitted this form. Are you sure you want to submit it "
+"again?"
+msgstr "Vi jam forsendis tiun ĉi formularon. Ĉu vi certe volas resendi ĝin?"
+
 msgid "Show"
-msgstr "Montru"
+msgstr "Montri"
 
 msgid "Hide"
-msgstr "Kaŝu"
+msgstr "Kaŝi"

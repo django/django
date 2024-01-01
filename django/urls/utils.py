@@ -5,7 +5,7 @@ from django.core.exceptions import ViewDoesNotExist
 from django.utils.module_loading import module_has_submodule
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def get_callable(lookup_view):
     """
     Return a callable corresponding to lookup_view.

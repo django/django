@@ -17,7 +17,7 @@ class GeoJSONSerializerTests(TestCase):
         all_formats = set(serializers.get_serializer_formats())
         public_formats = set(serializers.get_public_serializer_formats())
 
-        self.assertIn("geojson", all_formats),
+        self.assertIn("geojson", all_formats)
         self.assertIn("geojson", public_formats)
 
     def test_serialization_base(self):
@@ -27,6 +27,7 @@ class GeoJSONSerializerTests(TestCase):
         self.assertEqual(geodata["features"][0]["geometry"]["type"], "Point")
         self.assertEqual(geodata["features"][0]["properties"]["name"], "Chicago")
         first_city = City.objects.order_by("name").first()
+        self.assertEqual(geodata["features"][0]["id"], first_city.pk)
         self.assertEqual(geodata["features"][0]["properties"]["pk"], str(first_city.pk))
 
     def test_geometry_field_option(self):
@@ -60,6 +61,17 @@ class GeoJSONSerializerTests(TestCase):
         )
         geodata = json.loads(geojson)
         self.assertEqual(geodata["features"][0]["geometry"]["type"], "Polygon")
+
+    def test_id_field_option(self):
+        """
+        By default Django uses the pk of the object as the id for a feature.
+        The 'id_field' option can be used to specify a different field to use
+        as the id.
+        """
+        cities = City.objects.order_by("name")
+        geojson = serializers.serialize("geojson", cities, id_field="name")
+        geodata = json.loads(geojson)
+        self.assertEqual(geodata["features"][0]["id"], cities[0].name)
 
     def test_fields_option(self):
         """

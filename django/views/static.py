@@ -14,6 +14,16 @@ from django.utils.translation import gettext as _
 from django.utils.translation import gettext_lazy
 
 
+def builtin_template_path(name):
+    """
+    Return a path to a builtin template.
+
+    Avoid calling this function at the module level or in a class-definition
+    because __file__ may not exist, e.g. in frozen environments.
+    """
+    return Path(__file__).parent / "templates" / name
+
+
 def serve(request, path, document_root=None, show_indexes=False):
     """
     Serve static files below a given point in the directory structure.
@@ -53,29 +63,7 @@ def serve(request, path, document_root=None, show_indexes=False):
     return response
 
 
-DEFAULT_DIRECTORY_INDEX_TEMPLATE = """
-{% load i18n %}
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
-    <meta http-equiv="Content-Language" content="en-us">
-    <meta name="robots" content="NONE,NOARCHIVE">
-    <title>{% blocktranslate %}Index of {{ directory }}{% endblocktranslate %}</title>
-  </head>
-  <body>
-    <h1>{% blocktranslate %}Index of {{ directory }}{% endblocktranslate %}</h1>
-    <ul>
-      {% if directory != "/" %}
-      <li><a href="../">../</a></li>
-      {% endif %}
-      {% for f in file_list %}
-      <li><a href="{{ f|urlencode }}">{{ f }}</a></li>
-      {% endfor %}
-    </ul>
-  </body>
-</html>
-"""
+# Translatable string for static directory index template title.
 template_translatable = gettext_lazy("Index of %(directory)s")
 
 
@@ -88,9 +76,10 @@ def directory_index(path, fullpath):
             ]
         )
     except TemplateDoesNotExist:
-        t = Engine(libraries={"i18n": "django.templatetags.i18n"}).from_string(
-            DEFAULT_DIRECTORY_INDEX_TEMPLATE
-        )
+        with builtin_template_path("directory_index.html").open(encoding="utf-8") as fh:
+            t = Engine(libraries={"i18n": "django.templatetags.i18n"}).from_string(
+                fh.read()
+            )
         c = Context()
     else:
         c = {}

@@ -392,10 +392,12 @@ existing row will result in an ``IntegrityError``.
 
 In order to update an existing model for a specific primary key value, use the
 :meth:`~django.db.models.query.QuerySet.update_or_create` method or
-``QuerySet.filter(pk=…).update(…)`` instead. For example::
+``QuerySet.filter(pk=…).update(…)`` instead. For example:
 
-    >>> MyModel.objects.update_or_create(pk=existing_pk, defaults={'name': 'new name'})
-    >>> MyModel.objects.filter(pk=existing_pk).update(name='new name')
+.. code-block:: pycon
+
+    >>> MyModel.objects.update_or_create(pk=existing_pk, defaults={"name": "new name"})
+    >>> MyModel.objects.filter(pk=existing_pk).update(name="new name")
 
 Database backend API
 --------------------
@@ -495,7 +497,7 @@ Django 3.0, we're removing these APIs at this time.
   Python 3.
 
 * ``django.utils.six`` - Remove usage of this vendored library or switch to
-  `six <https://pypi.org/project/six/>`_.
+  :pypi:`six`.
 
 * ``django.utils.encoding.python_2_unicode_compatible()`` - Alias of
   ``six.python_2_unicode_compatible()``.

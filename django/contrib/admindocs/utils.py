@@ -1,15 +1,11 @@
 "Misc. utility functions/classes for admin documentation generator."
 
-import functools
 import re
 from email.errors import HeaderParseError
 from email.parser import HeaderParser
 from inspect import cleandoc
 
-from asgiref.local import Local
-
 from django.urls import reverse
-from django.urls.resolvers import URLPattern
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.safestring import mark_safe
 
@@ -105,6 +101,9 @@ ROLES = {
 
 
 def create_reference_role(rolename, urlbase):
+    # Views and template names are case-sensitive.
+    is_case_sensitive = rolename in ["template", "view"]
+
     def _role(name, rawtext, text, lineno, inliner, options=None, content=None):
         if options is None:
             options = {}
@@ -115,7 +114,7 @@ def create_reference_role(rolename, urlbase):
                 urlbase
                 % (
                     inliner.document.settings.link_base,
-                    text.lower(),
+                    text if is_case_sensitive else text.lower(),
                 )
             ),
             **options,
@@ -243,43 +242,3 @@ def remove_non_capturing_groups(pattern):
         final_pattern += pattern[prev_end:start]
         prev_end = end
     return final_pattern + pattern[prev_end:]
-
-
-# Callback strings are cached in a dictionary for every urlconf.
-# The active calback_strs are stored by thread id to make them thread local.
-_callback_strs = set()
-_active = Local()
-_active.local_value = _callback_strs
-
-
-def _is_callback(name, urlresolver=None):
-    if urlresolver and not urlresolver._populated:
-        register_callback(urlresolver, _active.local_value)
-    return name in _active.local_value
-
-
-@functools.lru_cache(maxsize=None)
-def lookup_str(urlpattern):
-    """
-    A string that identifies the view (e.g. 'path.to.view_function' or
-    'path.to.ClassBasedView').
-    """
-    callback = urlpattern.callback
-    if isinstance(callback, functools.partial):
-        callback = callback.func
-    if hasattr(callback, "view_class"):
-        callback = callback.view_class
-    elif not hasattr(callback, "__name__"):
-        return callback.__module__ + "." + callback.__class__.__name__
-    return callback.__module__ + "." + callback.__qualname__
-
-
-def register_callback(urlresolver, thread):
-    for url_pattern in reversed(urlresolver.url_patterns):
-        if isinstance(url_pattern, URLPattern):
-            thread.add(lookup_str(url_pattern))
-        else:  # url_pattern is a URLResolver.
-            _active.url_pattern_value = _callback_strs
-            register_callback(url_pattern, _active.url_pattern_value)
-            thread.update(_active.url_pattern_value)
-    urlresolver._populated = True

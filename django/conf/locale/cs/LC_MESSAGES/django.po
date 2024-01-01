@@ -4,18 +4,19 @@
 # Claude Paroz <claude@2xlibre.net>, 2020
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jan Papež <honyczek@centrum.cz>, 2012
+# trendspotter <jirka.p@volny.cz>, 2022
 # Jirka Vejrazka <Jirka.Vejrazka@gmail.com>, 2011
-# trendspotter, 2020
+# trendspotter <jirka.p@volny.cz>, 2020
 # Tomáš Ehrlich <tomas.ehrlich@gmail.com>, 2015
 # Vláďa Macek <macek@sandbox.cz>, 2012-2014
-# Vláďa Macek <macek@sandbox.cz>, 2015-2021
+# Vláďa Macek <macek@sandbox.cz>, 2015-2022
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-10 16:05+0200\n"
-"PO-Revision-Date: 2021-03-18 23:20+0000\n"
-"Last-Translator: Vláďa Macek <macek@sandbox.cz>\n"
+"POT-Creation-Date: 2022-05-17 05:23-0500\n"
+"PO-Revision-Date: 2022-07-25 06:49+0000\n"
+"Last-Translator: trendspotter <jirka.p@volny.cz>\n"
 "Language-Team: Czech (http://www.transifex.com/django/django/language/cs/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -213,6 +214,9 @@ msgstr "mongolsky"
 msgid "Marathi"
 msgstr "marathi"
 
+msgid "Malay"
+msgstr "malajštinou"
+
 msgid "Burmese"
 msgstr "barmštinou"
 
@@ -389,6 +393,11 @@ msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "Hodnota musí být větší nebo rovna %(limit_value)s."
 
 #, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr ""
+"Ujistěte se, že tato hodnota je násobkem velikosti kroku %(limit_value)s."
+
+#, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
 "%(show_value)d)."
@@ -478,6 +487,10 @@ msgstr ""
 "již existuje."
 
 #, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr "Omezení \"%(name)s\" je porušeno."
+
+#, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Hodnota %(value)r není platná možnost."
 
@@ -492,8 +505,8 @@ msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr ""
 "Položka %(model_name)s s touto hodnotou v poli %(field_label)s již existuje."
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -791,20 +804,20 @@ msgstr ""
 "problém ohlásit."
 
 #, python-format
-msgid "Please submit at most %d form."
-msgid_plural "Please submit at most %d forms."
-msgstr[0] "Odešlete nejvýše %d formulář."
-msgstr[1] "Odešlete nejvýše %d formuláře."
-msgstr[2] "Odešlete nejvýše %d formuláře."
-msgstr[3] "Odešlete nejvýše %d formulářů."
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #, python-format
-msgid "Please submit at least %d form."
-msgid_plural "Please submit at least %d forms."
-msgstr[0] "Odešlete nejméně %d formulář."
-msgstr[1] "Odešlete nejméně %d formuláře."
-msgstr[2] "Odešlete nejméně %d formuláře."
-msgstr[3] "Odešlete nejméně %d formulářů."
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 msgid "Order"
 msgstr "Pořadí"
@@ -1198,14 +1211,14 @@ msgstr "Selhalo ověření typu CSRF. Požadavek byl zadržen."
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a “Referer "
-"header” to be sent by your Web browser, but none was sent. This header is "
+"header” to be sent by your web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
-"Tato zpráva se zobrazuje, protože tento web na protokolu HTTPS požaduje "
-"záhlaví \"Referer\" od vašeho webového prohlížeče. Záhlaví je požadováno z "
-"bezpečnostních důvodů, aby se zajistilo, že vašeho prohlížeče se nezmocnil "
-"někdo další."
+"Tuto zprávu vidíte, protože tento web na protokolu HTTPS vyžaduje, aby váš "
+"prohlížeč zaslal v požadavku záhlaví \"Referer\", k čemuž nedošlo. Záhlaví "
+"je požadováno z bezpečnostních důvodů pro kontrolu toho, že prohlížeče se "
+"nezmocnila třetí strana."
 
 msgid ""
 "If you have configured your browser to disable “Referer” headers, please re-"

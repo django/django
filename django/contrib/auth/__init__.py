@@ -1,6 +1,8 @@
 import inspect
 import re
 
+from asgiref.sync import sync_to_async
+
 from django.apps import apps as django_apps
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
@@ -91,6 +93,12 @@ def authenticate(request=None, **credentials):
     )
 
 
+@sensitive_variables("credentials")
+async def aauthenticate(request=None, **credentials):
+    """See authenticate()."""
+    return await sync_to_async(authenticate)(request, **credentials)
+
+
 def login(request, user, backend=None):
     """
     Persist a user id and a backend in the request. This way a user doesn't
@@ -144,6 +152,11 @@ def login(request, user, backend=None):
     user_logged_in.send(sender=user.__class__, request=request, user=user)
 
 
+async def alogin(request, user, backend=None):
+    """See login()."""
+    return await sync_to_async(login)(request, user, backend)
+
+
 def logout(request):
     """
     Remove the authenticated user's ID from the request and flush their session
@@ -160,6 +173,11 @@ def logout(request):
         from django.contrib.auth.models import AnonymousUser
 
         request.user = AnonymousUser()
+
+
+async def alogout(request):
+    """See logout()."""
+    return await sync_to_async(logout)(request)
 
 
 def get_user_model():
@@ -199,14 +217,33 @@ def get_user(request):
             # Verify the session
             if hasattr(user, "get_session_auth_hash"):
                 session_hash = request.session.get(HASH_SESSION_KEY)
-                session_hash_verified = session_hash and constant_time_compare(
-                    session_hash, user.get_session_auth_hash()
-                )
+                if not session_hash:
+                    session_hash_verified = False
+                else:
+                    session_auth_hash = user.get_session_auth_hash()
+                    session_hash_verified = constant_time_compare(
+                        session_hash, session_auth_hash
+                    )
                 if not session_hash_verified:
-                    request.session.flush()
-                    user = None
+                    # If the current secret does not verify the session, try
+                    # with the fallback secrets and stop when a matching one is
+                    # found.
+                    if session_hash and any(
+                        constant_time_compare(session_hash, fallback_auth_hash)
+                        for fallback_auth_hash in user.get_session_auth_fallback_hash()
+                    ):
+                        request.session.cycle_key()
+                        request.session[HASH_SESSION_KEY] = session_auth_hash
+                    else:
+                        request.session.flush()
+                        user = None
 
     return user or AnonymousUser()
+
+
+async def aget_user(request):
+    """See get_user()."""
+    return await sync_to_async(get_user)(request)
 
 
 def get_permission_codename(action, opts):
@@ -228,3 +265,8 @@ def update_session_auth_hash(request, user):
     request.session.cycle_key()
     if hasattr(user, "get_session_auth_hash") and request.user == user:
         request.session[HASH_SESSION_KEY] = user.get_session_auth_hash()
+
+
+async def aupdate_session_auth_hash(request, user):
+    """See update_session_auth_hash()."""
+    return await sync_to_async(update_session_auth_hash)(request, user)

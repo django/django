@@ -127,7 +127,6 @@ class Command(BaseCommand):
         threading = options["use_threading"]
         # 'shutdown_message' is a stealth option.
         shutdown_message = options.get("shutdown_message", "")
-        quit_command = "CTRL-BREAK" if sys.platform == "win32" else "CONTROL-C"
 
         if not options["skip_checks"]:
             self.stdout.write("Performing system checks...\n\n")
@@ -135,23 +134,6 @@ class Command(BaseCommand):
         # Need to check migrations here, so can't use the
         # requires_migrations_check attribute.
         self.check_migrations()
-        now = datetime.now().strftime("%B %d, %Y - %X")
-        self.stdout.write(now)
-        self.stdout.write(
-            (
-                "Django version %(version)s, using settings %(settings)r\n"
-                "Starting development server at %(protocol)s://%(addr)s:%(port)s/\n"
-                "Quit the server with %(quit_command)s."
-            )
-            % {
-                "version": self.get_version(),
-                "settings": settings.SETTINGS_MODULE,
-                "protocol": self.protocol,
-                "addr": "[%s]" % self.addr if self._raw_ipv6 else self.addr,
-                "port": self.port,
-                "quit_command": quit_command,
-            }
-        )
 
         try:
             handler = self.get_handler(*args, **options)
@@ -161,6 +143,7 @@ class Command(BaseCommand):
                 handler,
                 ipv6=self.use_ipv6,
                 threading=threading,
+                on_bind=self.on_bind,
                 server_cls=self.server_cls,
             )
         except OSError as e:
@@ -181,3 +164,23 @@ class Command(BaseCommand):
             if shutdown_message:
                 self.stdout.write(shutdown_message)
             sys.exit(0)
+
+    def on_bind(self, server_port):
+        quit_command = "CTRL-BREAK" if sys.platform == "win32" else "CONTROL-C"
+
+        if self._raw_ipv6:
+            addr = f"[{self.addr}]"
+        elif self.addr == "0":
+            addr = "0.0.0.0"
+        else:
+            addr = self.addr
+
+        now = datetime.now().strftime("%B %d, %Y - %X")
+        version = self.get_version()
+        print(
+            f"{now}\n"
+            f"Django version {version}, using settings {settings.SETTINGS_MODULE!r}\n"
+            f"Starting development server at {self.protocol}://{addr}:{server_port}/\n"
+            f"Quit the server with {quit_command}.",
+            file=self.stdout,
+        )

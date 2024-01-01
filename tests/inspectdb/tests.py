@@ -1,9 +1,9 @@
-import os
 import re
 from io import StringIO
 from unittest import mock, skipUnless
 
 from django.core.management import call_command
+from django.core.management.commands import inspectdb
 from django.db import connection
 from django.db.backends.base.introspection import TableInfo
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
@@ -129,6 +129,24 @@ class InspectDBTestCase(TestCase):
             "null_json_field = models.JSONField(blank=True, null=True)", output
         )
 
+    @skipUnlessDBFeature("supports_comments")
+    def test_db_comments(self):
+        out = StringIO()
+        call_command("inspectdb", "inspectdb_dbcomment", stdout=out)
+        output = out.getvalue()
+        integer_field_type = connection.features.introspected_field_types[
+            "IntegerField"
+        ]
+        self.assertIn(
+            f"rank = models.{integer_field_type}("
+            f"db_comment=\"'Rank' column comment\")",
+            output,
+        )
+        self.assertIn(
+            "        db_table_comment = 'Custom table comment'",
+            output,
+        )
+
     @skipUnlessDBFeature("supports_collation_on_charfield")
     @skipUnless(test_collation, "Language collations are not supported.")
     def test_char_field_db_collation(self):
@@ -165,6 +183,13 @@ class InspectDBTestCase(TestCase):
                 "null=True)" % test_collation,
                 output,
             )
+
+    @skipUnlessDBFeature("supports_unlimited_charfield")
+    def test_char_field_unlimited(self):
+        out = StringIO()
+        call_command("inspectdb", "inspectdb_charfieldunlimited", stdout=out)
+        output = out.getvalue()
+        self.assertIn("char_field = models.CharField()", output)
 
     def test_number_field_types(self):
         """Test introspection of various Django field types"""
@@ -330,6 +355,25 @@ class InspectDBTestCase(TestCase):
         output = out.getvalue()
         self.assertIn("class InspectdbSpecialTableName(models.Model):", output)
 
+    def test_custom_normalize_table_name(self):
+        def pascal_case_table_only(table_name):
+            return table_name.startswith("inspectdb_pascal")
+
+        class MyCommand(inspectdb.Command):
+            def normalize_table_name(self, table_name):
+                normalized_name = table_name.split(".")[1]
+                if connection.features.ignores_table_name_case:
+                    normalized_name = normalized_name.lower()
+                return normalized_name
+
+        out = StringIO()
+        call_command(MyCommand(), table_name_filter=pascal_case_table_only, stdout=out)
+        if connection.features.ignores_table_name_case:
+            expected_model_name = "pascalcase"
+        else:
+            expected_model_name = "PascalCase"
+        self.assertIn(f"class {expected_model_name}(models.Model):", out.getvalue())
+
     @skipUnlessDBFeature("supports_expression_indexes")
     def test_table_with_func_unique_constraint(self):
         out = StringIO()
@@ -432,6 +476,15 @@ class InspectDBTestCase(TestCase):
         self.assertIn("# Unable to inspect table 'nonexistent'", output)
         # The error message depends on the backend
         self.assertIn("# The error was:", output)
+
+    def test_same_relations(self):
+        out = StringIO()
+        call_command("inspectdb", "inspectdb_message", stdout=out)
+        self.assertIn(
+            "author = models.ForeignKey('InspectdbPeople', models.DO_NOTHING, "
+            "related_name='inspectdbmessage_author_set')",
+            out.getvalue(),
+        )
 
 
 class InspectDBTransactionalTests(TransactionTestCase):
@@ -554,17 +607,17 @@ class InspectDBTransactionalTests(TransactionTestCase):
                 "CREATE SERVER inspectdb_server FOREIGN DATA WRAPPER file_fdw"
             )
             cursor.execute(
-                """\
+                """
                 CREATE FOREIGN TABLE inspectdb_iris_foreign_table (
                     petal_length real,
                     petal_width real,
                     sepal_length real,
                     sepal_width real
                 ) SERVER inspectdb_server OPTIONS (
-                    filename %s
+                    program 'echo 1,2,3,4',
+                    format 'csv'
                 )
-            """,
-                [os.devnull],
+                """
             )
         out = StringIO()
         foreign_table_model = "class InspectdbIrisForeignTable(models.Model):"
@@ -585,3 +638,33 @@ class InspectDBTransactionalTests(TransactionTestCase):
                 )
                 cursor.execute("DROP SERVER IF EXISTS inspectdb_server")
                 cursor.execute("DROP EXTENSION IF EXISTS file_fdw")
+
+    @skipUnlessDBFeature("create_test_table_with_composite_primary_key")
+    def test_composite_primary_key(self):
+        table_name = "test_table_composite_pk"
+        with connection.cursor() as cursor:
+            cursor.execute(
+                connection.features.create_test_table_with_composite_primary_key
+            )
+        out = StringIO()
+        if connection.vendor == "sqlite":
+            field_type = connection.features.introspected_field_types["AutoField"]
+        else:
+            field_type = connection.features.introspected_field_types["IntegerField"]
+        try:
+            call_command("inspectdb", table_name, stdout=out)
+            output = out.getvalue()
+            self.assertIn(
+                f"column_1 = models.{field_type}(primary_key=True)  # The composite "
+                f"primary key (column_1, column_2) found, that is not supported. The "
+                f"first column is selected.",
+                output,
+            )
+            self.assertIn(
+                "column_2 = models.%s()"
+                % connection.features.introspected_field_types["IntegerField"],
+                output,
+            )
+        finally:
+            with connection.cursor() as cursor:
+                cursor.execute("DROP TABLE %s" % table_name)

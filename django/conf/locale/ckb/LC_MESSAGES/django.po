@@ -1,0 +1,1313 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Bawar Jalal, 2021
+# Bawar Jalal, 2020-2021
+# Bawar Jalal, 2020
+# kosar tofiq <kosar.belana@gmail.com>, 2020-2021
+# Swara <swara09@gmail.com>, 2022-2023
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-25 06:49+0000\n"
+"Last-Translator: Swara <swara09@gmail.com>, 2022-2023\n"
+"Language-Team: Central Kurdish (http://app.transifex.com/django/django/"
+"language/ckb/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ckb\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Afrikaans"
+msgstr "ئەفریقی"
+
+msgid "Arabic"
+msgstr "عەرەبی"
+
+msgid "Algerian Arabic"
+msgstr "عەرەبیی جەزائیری"
+
+msgid "Asturian"
+msgstr "ئاستوری"
+
+msgid "Azerbaijani"
+msgstr "ئازەربایجانی"
+
+msgid "Bulgarian"
+msgstr "بولگاری"
+
+msgid "Belarusian"
+msgstr "بیلاڕوسی"
+
+msgid "Bengali"
+msgstr "بەنگالی"
+
+msgid "Breton"
+msgstr "بریتۆنی"
+
+msgid "Bosnian"
+msgstr "بۆسنێیی"
+
+msgid "Catalan"
+msgstr "کاتالانی"
+
+msgid "Central Kurdish (Sorani)"
+msgstr ""
+
+msgid "Czech"
+msgstr "چیکی"
+
+msgid "Welsh"
+msgstr "وێڵزی"
+
+msgid "Danish"
+msgstr "دانیمارکی"
+
+msgid "German"
+msgstr "ئەڵمانی"
+
+msgid "Lower Sorbian"
+msgstr "سۆربیانی خواروو"
+
+msgid "Greek"
+msgstr "یۆنانی"
+
+msgid "English"
+msgstr "ئینگلیزی"
+
+msgid "Australian English"
+msgstr "ئینگلیزی ئوستورالی"
+
+msgid "British English"
+msgstr "ئینگلیزی بەریتانی"
+
+msgid "Esperanto"
+msgstr "ئێسپەرانتەویی"
+
+msgid "Spanish"
+msgstr "ئیسپانی"
+
+msgid "Argentinian Spanish"
+msgstr "ئیسپانیی ئەرجەنتینی"
+
+msgid "Colombian Spanish"
+msgstr "ئیسپانیی کۆڵۆمبی"
+
+msgid "Mexican Spanish"
+msgstr "ئیسپانیی مەکسیکی"
+
+msgid "Nicaraguan Spanish"
+msgstr "ئیسپانیی نیکاراگوایی"
+
+msgid "Venezuelan Spanish"
+msgstr "ئیسپانیی فەنزوێلایی"
+
+msgid "Estonian"
+msgstr "ئیستۆنی"
+
+msgid "Basque"
+msgstr "باسکۆیی"
+
+msgid "Persian"
+msgstr "فارسی"
+
+msgid "Finnish"
+msgstr "فینلەندی"
+
+msgid "French"
+msgstr "فەڕەنسی"
+
+msgid "Frisian"
+msgstr "فریسی"
+
+msgid "Irish"
+msgstr "ئیرلەندی"
+
+msgid "Scottish Gaelic"
+msgstr "گالیکی سکۆتلەندی"
+
+msgid "Galician"
+msgstr "گالیسیایی"
+
+msgid "Hebrew"
+msgstr "ئیسرائیلی"
+
+msgid "Hindi"
+msgstr "هیندی"
+
+msgid "Croatian"
+msgstr "کڕواتی"
+
+msgid "Upper Sorbian"
+msgstr "سڕبی سەروو"
+
+msgid "Hungarian"
+msgstr "هەنگاری"
+
+msgid "Armenian"
+msgstr "ئەرمەنی"
+
+msgid "Interlingua"
+msgstr "ئینتەرلینگوایی"
+
+msgid "Indonesian"
+msgstr "ئیندۆنیزی"
+
+msgid "Igbo"
+msgstr "ئیگبۆیی"
+
+msgid "Ido"
+msgstr "ئیدۆیی"
+
+msgid "Icelandic"
+msgstr "ئایسلەندی"
+
+msgid "Italian"
+msgstr "ئیتاڵی"
+
+msgid "Japanese"
+msgstr "یابانی"
+
+msgid "Georgian"
+msgstr "جۆرجی"
+
+msgid "Kabyle"
+msgstr "کابایلی"
+
+msgid "Kazakh"
+msgstr "کازاخی"
+
+msgid "Khmer"
+msgstr "خەمیری"
+
+msgid "Kannada"
+msgstr "کانێدایی"
+
+msgid "Korean"
+msgstr "کۆری"
+
+msgid "Kyrgyz"
+msgstr "کیرگزستانی"
+
+msgid "Luxembourgish"
+msgstr "لۆکسەمبۆرگی"
+
+msgid "Lithuanian"
+msgstr "لیتوانی"
+
+msgid "Latvian"
+msgstr "لاتیڤی"
+
+msgid "Macedonian"
+msgstr "مەسەدۆنی"
+
+msgid "Malayalam"
+msgstr "مەلایالامی"
+
+msgid "Mongolian"
+msgstr "مەنگۆلی"
+
+msgid "Marathi"
+msgstr "ماراسی"
+
+msgid "Malay"
+msgstr "مالایی"
+
+msgid "Burmese"
+msgstr "بورمایی"
+
+msgid "Norwegian Bokmål"
+msgstr "بۆکامۆلی نەرویجی"
+
+msgid "Nepali"
+msgstr "نیپاڵی"
+
+msgid "Dutch"
+msgstr "هۆڵەندی"
+
+msgid "Norwegian Nynorsk"
+msgstr "نینۆرسکی نەرویجی"
+
+msgid "Ossetic"
+msgstr "ئۆسیتی"
+
+msgid "Punjabi"
+msgstr "پونجابی"
+
+msgid "Polish"
+msgstr "پۆڵۆنی"
+
+msgid "Portuguese"
+msgstr "پورتوگالی"
+
+msgid "Brazilian Portuguese"
+msgstr "پورتوگالیی بەڕازیلی"
+
+msgid "Romanian"
+msgstr "ڕۆمانیایی"
+
+msgid "Russian"
+msgstr "ڕووسی"
+
+msgid "Slovak"
+msgstr "سلۆڤاکی"
+
+msgid "Slovenian"
+msgstr "سلۆڤینیایی"
+
+msgid "Albanian"
+msgstr "ئەلبانی"
+
+msgid "Serbian"
+msgstr "سڕبی"
+
+msgid "Serbian Latin"
+msgstr "سڕبیی لاتین"
+
+msgid "Swedish"
+msgstr "سویدی"
+
+msgid "Swahili"
+msgstr "سواهیلی"
+
+msgid "Tamil"
+msgstr "تامیلی"
+
+msgid "Telugu"
+msgstr "تێلوگویی"
+
+msgid "Tajik"
+msgstr "تاجیکی"
+
+msgid "Thai"
+msgstr "تایلاندی"
+
+msgid "Turkmen"
+msgstr "تورکمانی"
+
+msgid "Turkish"
+msgstr "تورکی"
+
+msgid "Tatar"
+msgstr "تاتاری"
+
+msgid "Udmurt"
+msgstr "ئودمورتی"
+
+msgid "Ukrainian"
+msgstr "ئۆکرانی"
+
+msgid "Urdu"
+msgstr "ئوردویی"
+
+msgid "Uzbek"
+msgstr "ئۆزبەکی"
+
+msgid "Vietnamese"
+msgstr "ڤێتنامی"
+
+msgid "Simplified Chinese"
+msgstr "چینی سادەکراو"
+
+msgid "Traditional Chinese"
+msgstr "چینی کلاسیکی"
+
+msgid "Messages"
+msgstr "پەیامەکان"
+
+msgid "Site Maps"
+msgstr "نەخشەکانی پێگە"
+
+msgid "Static Files"
+msgstr "فایلە نەگۆڕەکان"
+
+msgid "Syndication"
+msgstr "هاوبەشکردن"
+
+#. Translators: String used to replace omitted page numbers in elided page
+#. range generated by paginators, e.g. [1, 2, '…', 5, 6, 7, '…', 9, 10].
+msgid "…"
+msgstr "..."
+
+msgid "That page number is not an integer"
+msgstr "ئەو ژمارەی پەڕەیە ژمارەی تەواو نییە"
+
+msgid "That page number is less than 1"
+msgstr "ئەو ژمارەی پەڕەیە لە 1 کەمترە"
+
+msgid "That page contains no results"
+msgstr "ئەو پەڕەیە هیچ ئەنجامێکی تێدا نییە"
+
+msgid "Enter a valid value."
+msgstr "نرخێکی دروست لەناودابنێ."
+
+msgid "Enter a valid URL."
+msgstr "URL ی دروست لەناودابنێ."
+
+msgid "Enter a valid integer."
+msgstr "ژمارەیەکی تەواو لەناودابنێ"
+
+msgid "Enter a valid email address."
+msgstr "ناونیشانێکی ئیمەیڵی دروست لەناودابنێ"
+
+#. Translators: "letters" means latin letters: a-z and A-Z.
+msgid ""
+"Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
+msgstr "\"سلەگ\"ێکی دروست بنوسە کە پێکهاتووە لە پیت، ژمارە، ژێرهێڵ یان هێڵ."
+
+msgid ""
+"Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr ""
+"\"سلەگ\"ێکی دروست بنوسە کە پێکهاتووە لە پیتی یونیکۆد، ژمارە، هێڵی ژێرەوە، "
+"یان هێما."
+
+msgid "Enter a valid IPv4 address."
+msgstr "ناونیشانێکی IPv4 ی دروست لەناودابنێ."
+
+msgid "Enter a valid IPv6 address."
+msgstr "ناونیشانێکی IPv64 ی دروست لەناودابنێ."
+
+msgid "Enter a valid IPv4 or IPv6 address."
+msgstr "ناونیشانێکی IPv4 یان IPv6 ی دروست لەناودابنێ."
+
+msgid "Enter only digits separated by commas."
+msgstr "تەنها ژمارە لەناودابنێ بە فاریزە جیاکرابێتەوە."
+
+#, python-format
+msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
+msgstr "دڵنیاببە ئەم نرخە %(limit_value)sە (ئەوە %(show_value)sە). "
+
+#, python-format
+msgid "Ensure this value is less than or equal to %(limit_value)s."
+msgstr "دڵنیاببە ئەم نرخە کەمترە یاخود یەکسانە بە %(limit_value)s."
+
+#, python-format
+msgid "Ensure this value is greater than or equal to %(limit_value)s."
+msgstr "دڵنیاببە ئەم نرخە گەورەترە یاخود یەکسانە بە %(limit_value)s."
+
+#, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr "دڵنیابە کە ئەم بەهایە چەندانێکە لە قەبارەی هەنگاوی%(limit_value)s."
+
+#, python-format
+msgid ""
+"Ensure this value has at least %(limit_value)d character (it has "
+"%(show_value)d)."
+msgid_plural ""
+"Ensure this value has at least %(limit_value)d characters (it has "
+"%(show_value)d)."
+msgstr[0] ""
+"دڵنیابە ئەم بەهایە لانیکەم %(limit_value)d نوسەی هەیە (%(show_value)d هەیە)."
+msgstr[1] ""
+"دڵنیابە ئەم بەهایە لانیکەم %(limit_value)d نوسەی هەیە (%(show_value)d هەیە)."
+
+#, python-format
+msgid ""
+"Ensure this value has at most %(limit_value)d character (it has "
+"%(show_value)d)."
+msgid_plural ""
+"Ensure this value has at most %(limit_value)d characters (it has "
+"%(show_value)d)."
+msgstr[0] ""
+"دڵنیابە ئەم بەهایە لانی زۆر %(limit_value)d نوسەی هەیە (%(show_value)d هەیە)."
+msgstr[1] ""
+"دڵنیابە ئەم بەهایە لانی زۆر %(limit_value)d نوسەی هەیە (%(show_value)d هەیە)."
+
+msgid "Enter a number."
+msgstr "ژمارەیەک بنوسە."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] "دڵنیابە لەوەی بەگشتی زیاتر لە %(max)s ژمارە نیە."
+msgstr[1] "دڵنیابە لەوەی بەگشتی زیاتر لە %(max)s ژمارە نیە."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] "دڵنیابە لەوەی بەگشتی زیاتر لە %(max)s ژمارەی دەیی نیە."
+msgstr[1] "دڵنیابە لەوەی بەگشتی زیاتر لە %(max)s ژمارەی دەیی نیە."
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] "دڵنیابە لەوەی زیاتر نیە لە %(max)s ژمارە پێش خاڵی ژمارەی دەیی."
+msgstr[1] "دڵنیابە لەوەی زیاتر نیە لە %(max)s ژمارە پێش خاڵی ژمارەی دەیی."
+
+#, python-format
+msgid ""
+"File extension “%(extension)s” is not allowed. Allowed extensions are: "
+"%(allowed_extensions)s."
+msgstr ""
+"پەڕگەپاشبەندی “%(extension)s” ڕێگەپێنەدراوە. پاشبنەدە ڕێگەپێدراوەکان: "
+"%(allowed_extensions)s."
+
+msgid "Null characters are not allowed."
+msgstr "نوسەی بەتاڵ ڕێگەپێنەدراوە."
+
+msgid "and"
+msgstr "و"
+
+#, python-format
+msgid "%(model_name)s with this %(field_labels)s already exists."
+msgstr "%(model_name)s لەگەڵ %(field_labels)s پێشتر تۆمارکراوە."
+
+#, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr "سنوردارکردنی “%(name)s” پێشێلکراوە."
+
+#, python-format
+msgid "Value %(value)r is not a valid choice."
+msgstr "بەهای %(value)r هەڵبژاردەیەکی دروست نیە."
+
+msgid "This field cannot be null."
+msgstr "ئەم خانەیە نابێت پووچ بێت."
+
+msgid "This field cannot be blank."
+msgstr "ئەم خانەیە نابێت بەتاڵ بێت."
+
+#, python-format
+msgid "%(model_name)s with this %(field_label)s already exists."
+msgstr "%(model_name)s لەگەڵ %(field_label)s پێشتر تۆمارکراوە."
+
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
+#, python-format
+msgid ""
+"%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
+msgstr ""
+"%(field_label)s دەبێت بێهاوتا بێت بۆ %(date_field_label)s %(lookup_type)s."
+
+#, python-format
+msgid "Field of type: %(field_type)s"
+msgstr "خانە لە جۆری: %(field_type)s"
+
+#, python-format
+msgid "“%(value)s” value must be either True or False."
+msgstr "بەهای “%(value)s” دەبێت دروست یان چەوت بێت."
+
+#, python-format
+msgid "“%(value)s” value must be either True, False, or None."
+msgstr "بەهای “%(value)s” دەبێت یان دروست، یان چەوت یان هیچ بێت."
+
+msgid "Boolean (Either True or False)"
+msgstr "بولی (یان دروست یان چەوت)"
+
+#, python-format
+msgid "String (up to %(max_length)s)"
+msgstr "ڕیزبەند (تا %(max_length)s)"
+
+msgid "String (unlimited)"
+msgstr ""
+
+msgid "Comma-separated integers"
+msgstr "ژمارە تەواوەکان بە کۆما جیاکراونەتەوە"
+
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
+"format."
+msgstr ""
+"بەهای “%(value)s” شێوازی بەروارێکی نادروستی هەیە. دەبێت بەشێوازی  YYYY-MM-DD "
+"بێت."
+
+#, python-format
+msgid ""
+"“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
+"date."
+msgstr ""
+"بەهای “%(value)s” شێوازێکی تەواوی هەیە (YYYY-MM-DD) بەڵام بەروارێکی هەڵەیە."
+
+msgid "Date (without time)"
+msgstr "بەروار (بەبێ کات)"
+
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"uuuuuu]][TZ] format."
+msgstr ""
+"بەهای “%(value)s” شێوازێکی نادروستی هەیە. دەبێت بەشێوەی  YYYY-MM-DD HH:MM[:"
+"ss[.uuuuuu]][TZ] بێت."
+
+#, python-format
+msgid ""
+"“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"[TZ]) but it is an invalid date/time."
+msgstr ""
+"بەهای “%(value)s” شێوازێکی دروستی هەیە (YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) "
+"بەروار/کاتێکی نادروستە."
+
+msgid "Date (with time)"
+msgstr "بەروار (لەگەڵ کات)"
+
+#, python-format
+msgid "“%(value)s” value must be a decimal number."
+msgstr "بەهای “%(value)s” دەبێت ژمارەیەکی دەیی بێت."
+
+msgid "Decimal number"
+msgstr "ژمارەی دەیی"
+
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
+"uuuuuu] format."
+msgstr ""
+"بەهای “%(value)s” شێوازێکی هەڵەی هەیە. دەبێت بەشێوەی [DD] [[HH:]MM:]ss[."
+"uuuuuu] format بێت."
+
+msgid "Duration"
+msgstr "ماوە"
+
+msgid "Email address"
+msgstr "ناونیشانی ئیمەیڵ"
+
+msgid "File path"
+msgstr "ڕێڕەوی پەڕگە"
+
+#, python-format
+msgid "“%(value)s” value must be a float."
+msgstr "بەهای “%(value)s” دەبێت ژمارەی کەرتی بێت."
+
+msgid "Floating point number"
+msgstr "خاڵی ژمارەی کەرتی"
+
+#, python-format
+msgid "“%(value)s” value must be an integer."
+msgstr "بەهای “%(value)s” دەبێت ژمارەی تەواو بێت."
+
+msgid "Integer"
+msgstr "ژمارەی تەواو"
+
+msgid "Big (8 byte) integer"
+msgstr "(8بایت) ژمارەی تەواوی گەورە"
+
+msgid "Small integer"
+msgstr "ژمارەی تەواوی بچوک"
+
+msgid "IPv4 address"
+msgstr "ناونیشانی IPv4"
+
+msgid "IP address"
+msgstr "ناونیشانی ئای پی"
+
+#, python-format
+msgid "“%(value)s” value must be either None, True or False."
+msgstr "بەهای “%(value)s” دەبێت یان هیچ، یان دروست یان چەوت بێت."
+
+msgid "Boolean (Either True, False or None)"
+msgstr "بولی (یان دروست یان چەوت یان هیچ)"
+
+msgid "Positive big integer"
+msgstr "ژمارەی تەواوی گەورەی ئەرێنی"
+
+msgid "Positive integer"
+msgstr "ژمارەی تەواوی ئەرێنی"
+
+msgid "Positive small integer"
+msgstr "ژمارەی تەواوی بچوکی ئەرێنی"
+
+#, python-format
+msgid "Slug (up to %(max_length)s)"
+msgstr "سلەگ (تا %(max_length)s)"
+
+msgid "Text"
+msgstr "نوسین"
+
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
+"format."
+msgstr ""
+"بەهای “%(value)s” شێوازێکی هەڵەی هەیە. دەبێت بەشێوەی HH:MM[:ss[.uuuuuu]] بێت."
+
+#, python-format
+msgid ""
+"“%(value)s” value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
+"invalid time."
+msgstr ""
+"“%(value)s” بەهاکە شێوازێکی دروستی هەیە (HH:MM[:ss[.uuuuuu]]) بەڵام کاتێکی "
+"نادروستە."
+
+msgid "Time"
+msgstr "کات"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Raw binary data"
+msgstr "داتای دووانەیی خاو"
+
+#, python-format
+msgid "“%(value)s” is not a valid UUID."
+msgstr "“%(value)s ” UUIDێکی دروستی نیە."
+
+msgid "Universally unique identifier"
+msgstr "ناسێنەرێکی بێهاوتای گشتگیر"
+
+msgid "File"
+msgstr "پەڕگە"
+
+msgid "Image"
+msgstr "وێنە"
+
+msgid "A JSON object"
+msgstr "ئۆبجێکتێکی JSON"
+
+msgid "Value must be valid JSON."
+msgstr "بەها پێویستە JSONی دروست بێت."
+
+#, python-format
+msgid "%(model)s instance with %(field)s %(value)r does not exist."
+msgstr "%(model)s هاوشێوەیە لەگەڵ %(field)s %(value)r نیە."
+
+msgid "Foreign Key (type determined by related field)"
+msgstr "کلیلی دەرەکی(جۆر بەپێی خانەی پەیوەندیدار دیاری دەکرێت)"
+
+msgid "One-to-one relationship"
+msgstr "پەیوەندیی یەک-بۆ-یەک"
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr "%(from)s-%(to)s پەیوەندی"
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr "%(from)s-%(to)s پەیوەندییەکان"
+
+msgid "Many-to-many relationship"
+msgstr "پەیوەندیی گشت-بۆ-گشت"
+
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ":؟.!"
+
+msgid "This field is required."
+msgstr "ئەم خانەیە داواکراوە."
+
+msgid "Enter a whole number."
+msgstr "ژمارەیەکی تەواو بنوسە."
+
+msgid "Enter a valid date."
+msgstr "بەرواری دروست بنوسە."
+
+msgid "Enter a valid time."
+msgstr "تکایە کاتێکی ڕاست بنووسە."
+
+msgid "Enter a valid date/time."
+msgstr "بەروار/کاتی دروست بنوسە."
+
+msgid "Enter a valid duration."
+msgstr "بەهای دروستی ماوە بنوسە."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "ژمارەی ڕۆژەکان دەبێت لەنێوان {min_days} و {max_days} بێت."
+
+msgid "No file was submitted. Check the encoding type on the form."
+msgstr "هیچ پەڕگەیەک نەنێردراوە. جۆری کۆدکردنی پەڕگەکە لەسەر فۆرمەکە بپشکنە."
+
+msgid "No file was submitted."
+msgstr "هیچ پەڕگەیەک نەنێردراوە."
+
+msgid "The submitted file is empty."
+msgstr "پەڕگەی نێردراو بەتاڵە."
+
+#, python-format
+msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
+msgid_plural ""
+"Ensure this filename has at most %(max)d characters (it has %(length)d)."
+msgstr[0] "دڵنیابە کە ناوی پەڕگە زیاتر لە %(max)d نوسەی نیە (%(length)d هەیە)."
+msgstr[1] "دڵنیابە کە ناوی پەڕگە زیاتر لە %(max)d نوسەی نیە (%(length)d هەیە)."
+
+msgid "Please either submit a file or check the clear checkbox, not both."
+msgstr ""
+"تکایە یان پەڕگەیەک بنێرە یان چوارچێوەی پشکنین هەڵبژێرە، نەک هەردووکیان."
+
+msgid ""
+"Upload a valid image. The file you uploaded was either not an image or a "
+"corrupted image."
+msgstr ""
+"وێنەی دروست هەڵبژێرە. ئەو پەڕگەی بەرزتکردۆوە یان وێنە نیە یان وێنەیەکی خراپ "
+"بووە."
+
+#, python-format
+msgid "Select a valid choice. %(value)s is not one of the available choices."
+msgstr ""
+"هەڵبژاردەیەکی دروست دیاری بکە. %(value)s یەکێک نیە لە هەڵبژاردە بەردەستەکان."
+
+msgid "Enter a list of values."
+msgstr "لیستی بەهاکان بنوسە."
+
+msgid "Enter a complete value."
+msgstr "تەواوی بەهایەک بنوسە."
+
+msgid "Enter a valid UUID."
+msgstr "بەهای دروستی UUID بنوسە."
+
+msgid "Enter a valid JSON."
+msgstr "JSONی دروست بنوسە."
+
+#. Translators: This is the default suffix added to form field labels
+msgid ":"
+msgstr ":"
+
+#, python-format
+msgid "(Hidden field %(name)s) %(error)s"
+msgstr "(خانەی شاراوە %(name)s) %(error)s"
+
+#, python-format
+msgid ""
+"ManagementForm data is missing or has been tampered with. Missing fields: "
+"%(field_names)s. You may need to file a bug report if the issue persists."
+msgstr ""
+"داتاکانی فۆڕمی بەڕێوەبردن نەماوە یان دەستکاری کراون. خانە وونبووەکان: "
+"%(field_names)s. لەوانەیە پێویستت بە تۆمارکردنی ڕاپۆرتی هەڵە بێت ئەگەر "
+"کێشەکە بەردەوام بوو."
+
+#, python-format
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] "تکایە لانی زۆر %(num)d فۆرم بنێرە."
+msgstr[1] "تکایە لانی زۆر %(num)d فۆرم بنێرە."
+
+#, python-format
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] "تکایە لانی کەم %(num)d فۆرم بنێرە."
+msgstr[1] "تکایە لانی کەم %(num)d فۆرم بنێرە."
+
+msgid "Order"
+msgstr "ڕیز"
+
+msgid "Delete"
+msgstr "سڕینەوە"
+
+#, python-format
+msgid "Please correct the duplicate data for %(field)s."
+msgstr "تکایە داتا دووبارەکراوەکان چاکبکەرەوە بۆ %(field)s."
+
+#, python-format
+msgid "Please correct the duplicate data for %(field)s, which must be unique."
+msgstr ""
+"تکایە ئەو داتا دووبارەکراوەکانە چاکبکەرەوە بۆ %(field)s، کە دەبێت بێهاوتابن."
+
+#, python-format
+msgid ""
+"Please correct the duplicate data for %(field_name)s which must be unique "
+"for the %(lookup)s in %(date_field)s."
+msgstr ""
+"تکایە ئەو داتا دووبارەکراوەکان چاکبکەرەوە بۆ %(field_name)s کە دەبێت بێهاوتا "
+"بن بۆ %(lookup)s لە%(date_field)s."
+
+msgid "Please correct the duplicate values below."
+msgstr "تکایە بەها دووبارەکانی خوارەوە ڕاست بکەرەوە."
+
+msgid "The inline value did not match the parent instance."
+msgstr "بەهای ناوهێڵ هاوشێوەی نمونەی باوانەکەی نیە."
+
+msgid "Select a valid choice. That choice is not one of the available choices."
+msgstr "هەڵبژاردەی دروست دیاری بکە. هەڵبژاردە لە هەڵبژاردە بەردەستەکان نیە."
+
+#, python-format
+msgid "“%(pk)s” is not a valid value."
+msgstr "“%(pk)s” بەهایەکی دروست نیە."
+
+#, python-format
+msgid ""
+"%(datetime)s couldn’t be interpreted in time zone %(current_timezone)s; it "
+"may be ambiguous or it may not exist."
+msgstr ""
+"%(datetime)s نەتوانرا لە ناوچەی کاتدا لێکبدرێتەوە %(current_timezone)s؛ "
+"لەوانەیە ناڕوون بێت یان لەوانەیە بوونی نەبێت."
+
+msgid "Clear"
+msgstr "پاککردنەوە"
+
+msgid "Currently"
+msgstr "ئێستا"
+
+msgid "Change"
+msgstr "گۆڕین"
+
+msgid "Unknown"
+msgstr "نەزانراو"
+
+msgid "Yes"
+msgstr "بەڵێ"
+
+msgid "No"
+msgstr "نەخێر"
+
+#. Translators: Please do not add spaces around commas.
+msgid "yes,no,maybe"
+msgstr "بەڵێ،نەخێر،لەوانەیە"
+
+#, python-format
+msgid "%(size)d byte"
+msgid_plural "%(size)d bytes"
+msgstr[0] "%(size)dبایت"
+msgstr[1] "%(size)d بایت"
+
+#, python-format
+msgid "%s KB"
+msgstr "%s کب"
+
+#, python-format
+msgid "%s MB"
+msgstr "%s مب"
+
+#, python-format
+msgid "%s GB"
+msgstr "%s گب"
+
+#, python-format
+msgid "%s TB"
+msgstr "%s تب"
+
+#, python-format
+msgid "%s PB"
+msgstr "%s پب"
+
+msgid "p.m."
+msgstr "پ.ن"
+
+msgid "a.m."
+msgstr "پ.ن"
+
+msgid "PM"
+msgstr "د.ن"
+
+msgid "AM"
+msgstr "پ.ن"
+
+msgid "midnight"
+msgstr "نیوەشەو"
+
+msgid "noon"
+msgstr "نیوەڕۆ"
+
+msgid "Monday"
+msgstr "دووشەممە"
+
+msgid "Tuesday"
+msgstr "سێشەممە"
+
+msgid "Wednesday"
+msgstr "چوارشەممە"
+
+msgid "Thursday"
+msgstr "پێنجشەممە"
+
+msgid "Friday"
+msgstr "هەینی"
+
+msgid "Saturday"
+msgstr "شەممە"
+
+msgid "Sunday"
+msgstr "یەکشەممە"
+
+msgid "Mon"
+msgstr "دوو"
+
+msgid "Tue"
+msgstr "سێ"
+
+msgid "Wed"
+msgstr "چوار"
+
+msgid "Thu"
+msgstr "پێنج"
+
+msgid "Fri"
+msgstr "هەین"
+
+msgid "Sat"
+msgstr "شەم"
+
+msgid "Sun"
+msgstr "یەک"
+
+msgid "January"
+msgstr "ڕێبەندان"
+
+msgid "February"
+msgstr "ڕەشەمە"
+
+msgid "March"
+msgstr "نەورۆز"
+
+msgid "April"
+msgstr "گوڵان"
+
+msgid "May"
+msgstr "جۆزەردان"
+
+msgid "June"
+msgstr "پوشپەڕ"
+
+msgid "July"
+msgstr "گەلاوێژ"
+
+msgid "August"
+msgstr "خەرمانان"
+
+msgid "September"
+msgstr "ڕەزبەر"
+
+msgid "October"
+msgstr "گەڵاڕێزان"
+
+msgid "November"
+msgstr "سەرماوەرز"
+
+msgid "December"
+msgstr "بەفرانبار"
+
+msgid "jan"
+msgstr "‎ڕێبەندان"
+
+msgid "feb"
+msgstr "ڕەشەمە"
+
+msgid "mar"
+msgstr "نەورۆز"
+
+msgid "apr"
+msgstr "گوڵان"
+
+msgid "may"
+msgstr "‎جۆزەردان"
+
+msgid "jun"
+msgstr "پوشپەڕ"
+
+msgid "jul"
+msgstr "‎گەلاوێژ"
+
+msgid "aug"
+msgstr "خەرمانان"
+
+msgid "sep"
+msgstr "‎ڕەزبەر"
+
+msgid "oct"
+msgstr "‎گەڵاڕێزان"
+
+msgid "nov"
+msgstr "‎سەرماوەرز"
+
+msgid "dec"
+msgstr "‎بەفرانبار"
+
+msgctxt "abbrev. month"
+msgid "Jan."
+msgstr "‎ڕێبەندان"
+
+msgctxt "abbrev. month"
+msgid "Feb."
+msgstr "ڕەشەمە"
+
+msgctxt "abbrev. month"
+msgid "March"
+msgstr "نەورۆز"
+
+msgctxt "abbrev. month"
+msgid "April"
+msgstr "گوڵان"
+
+msgctxt "abbrev. month"
+msgid "May"
+msgstr "جۆزەردان"
+
+msgctxt "abbrev. month"
+msgid "June"
+msgstr "پوشپەڕ"
+
+msgctxt "abbrev. month"
+msgid "July"
+msgstr "گەلاوێژ"
+
+msgctxt "abbrev. month"
+msgid "Aug."
+msgstr "خەرمانان"
+
+msgctxt "abbrev. month"
+msgid "Sept."
+msgstr "ڕەزبەر"
+
+msgctxt "abbrev. month"
+msgid "Oct."
+msgstr "‎گەڵاڕێزان"
+
+msgctxt "abbrev. month"
+msgid "Nov."
+msgstr "‎سەرماوەرز"
+
+msgctxt "abbrev. month"
+msgid "Dec."
+msgstr "‎بەفرانبار"
+
+msgctxt "alt. month"
+msgid "January"
+msgstr "ڕێبەندان"
+
+msgctxt "alt. month"
+msgid "February"
+msgstr "ڕەشەمە"
+
+msgctxt "alt. month"
+msgid "March"
+msgstr "نەورۆز"
+
+msgctxt "alt. month"
+msgid "April"
+msgstr "گوڵان"
+
+msgctxt "alt. month"
+msgid "May"
+msgstr "جۆزەردان"
+
+msgctxt "alt. month"
+msgid "June"
+msgstr "پوشپەڕ"
+
+msgctxt "alt. month"
+msgid "July"
+msgstr "گەلاوێژ"
+
+msgctxt "alt. month"
+msgid "August"
+msgstr "خەرمانان"
+
+msgctxt "alt. month"
+msgid "September"
+msgstr "ڕەزبەر"
+
+msgctxt "alt. month"
+msgid "October"
+msgstr "گەڵاڕێزان"
+
+msgctxt "alt. month"
+msgid "November"
+msgstr "سەرماوەرز"
+
+msgctxt "alt. month"
+msgid "December"
+msgstr "بەفرانبار"
+
+msgid "This is not a valid IPv6 address."
+msgstr "ئەمە ناونیشانی IPv6 دروست نیە."
+
+#, python-format
+msgctxt "String to return when truncating text"
+msgid "%(truncated_text)s…"
+msgstr "%(truncated_text)s..."
+
+msgid "or"
+msgstr "یان"
+
+#. Translators: This string is used as a separator between list elements
+msgid ", "
+msgstr "، "
+
+#, python-format
+msgid "%(num)d year"
+msgid_plural "%(num)d years"
+msgstr[0] "‫%(num)d ساڵ"
+msgstr[1] "‫%(num)d ساڵ"
+
+#, python-format
+msgid "%(num)d month"
+msgid_plural "%(num)d months"
+msgstr[0] "‫%(num)d مانگ"
+msgstr[1] "‫%(num)d مانگ"
+
+#, python-format
+msgid "%(num)d week"
+msgid_plural "%(num)d weeks"
+msgstr[0] "‫%(num)d هەفتە"
+msgstr[1] "‫%(num)d هەفتە"
+
+#, python-format
+msgid "%(num)d day"
+msgid_plural "%(num)d days"
+msgstr[0] "‫%(num)d ڕۆژ"
+msgstr[1] "‫%(num)d ڕۆژ"
+
+#, python-format
+msgid "%(num)d hour"
+msgid_plural "%(num)d hours"
+msgstr[0] "‫%(num)d کاتژمێر"
+msgstr[1] "‫%(num)d کاتژمێر"
+
+#, python-format
+msgid "%(num)d minute"
+msgid_plural "%(num)d minutes"
+msgstr[0] "‫%(num)d خولەک"
+msgstr[1] "‫%(num)d خولەک"
+
+msgid "Forbidden"
+msgstr "ڕێپێنەدراو"
+
+msgid "CSRF verification failed. Request aborted."
+msgstr "پشتڕاستکردنەوەی CSRF شکستی هێنا. داواکاری هەڵوەشاوەتەوە."
+
+msgid ""
+"You are seeing this message because this HTTPS site requires a “Referer "
+"header” to be sent by your web browser, but none was sent. This header is "
+"required for security reasons, to ensure that your browser is not being "
+"hijacked by third parties."
+msgstr ""
+"تۆ ئەم پەیامە دەبینیت چونکە ئەم ماڵپەڕە HTTPS پێویستی بە \"سەردێڕی "
+"ئاماژەدەر\" هەیە کە لەلایەن وێبگەڕەکەتەوە بنێردرێت، بەڵام هیچیان نەنێردراوە. "
+"ئەم سەردێڕە بۆ هۆکاری ئاسایش پێویستە، بۆ دڵنیابوون لەوەی کە وێبگەڕەکەت "
+"لەلایەن لایەنی سێیەمەوە دەستی بەسەردا ناگیرێت."
+
+msgid ""
+"If you have configured your browser to disable “Referer” headers, please re-"
+"enable them, at least for this site, or for HTTPS connections, or for “same-"
+"origin” requests."
+msgstr ""
+"ئەگەر ڕێکخستنی شەکرۆکەی ئەم وێبگەڕەت بۆ “Referer” ناچالاککردووە، تکایە "
+"چالاکی بکەرەوە، لانیکەم بۆ ئەم ماڵپەڕە، یان بۆ پەیوەندییەکانی HTTPS، یاخود "
+"بۆ داواکانی \"Same-origin\"."
+
+msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the “Referrer-Policy: no-referrer” header, please remove them. The "
+"CSRF protection requires the “Referer” header to do strict referer checking. "
+"If you’re concerned about privacy, use alternatives like <a "
+"rel=\"noreferrer\" …> for links to third-party sites."
+msgstr ""
+"ئەگەر تۆ تاگی <meta name=\"referrer\" content=\"no-referrer\"> بەکاردەهێنێت "
+"یان سەرپەڕەی “Referrer-Policy: no-referrer” لەخۆدەگرێت، تکایە بیانسڕەوە. "
+"پاراستنی CSRFەکە پێویستی بە سەرپەڕەی “Referer”هەیە بۆ ئەنجامدانی پشکنینی "
+"گەڕاندنەوەی توندوتۆڵ. ئەگەر خەمی تایبەتمەندیت هەیە، بەدیلەکانی وەکو <a "
+"rel=\"noreferrer\" …> بۆ بەستنەوەی ماڵپەڕەکانی لایەنی سێیەم."
+
+msgid ""
+"You are seeing this message because this site requires a CSRF cookie when "
+"submitting forms. This cookie is required for security reasons, to ensure "
+"that your browser is not being hijacked by third parties."
+msgstr ""
+"تۆ ئەم پەیامە دەبینیت چونکە ئەم ماڵپەڕە پێویستی بە شەکرۆکەی CSRF هەیە لە "
+"کاتی ناردنی فۆڕمەکاندا. ئەم شەکرۆکەیە بۆ هۆکاری ئاسایش پێویستە، بۆ دڵنیابوون "
+"لەوەی کە وێبگەڕەکەت لەلایەن لایەنی سێیەمەوە دەستی بەسەردا ناگیرێت."
+
+msgid ""
+"If you have configured your browser to disable cookies, please re-enable "
+"them, at least for this site, or for “same-origin” requests."
+msgstr ""
+"ئەگەر ڕێکخستنی شەکرۆکەی ئەم وێبگەڕەت ناچالاککردووە، تکایە چالاکی بکەرەوە، "
+"لانیکەم بۆ ئەم ماڵپەڕە، یان بۆ داواکانی \"Same-origin\""
+
+msgid "More information is available with DEBUG=True."
+msgstr "زانیاریی زیاتر بەردەستە لەگەڵ DEBUG=True."
+
+msgid "No year specified"
+msgstr "هیچ ساڵێک دیاری نەکراوە"
+
+msgid "Date out of range"
+msgstr "بەروار لە دەرەوەی بواردایە"
+
+msgid "No month specified"
+msgstr "هیچ مانگێک دیاری نەکراوە"
+
+msgid "No day specified"
+msgstr "هیچ ڕۆژێک دیاری نەکراوە"
+
+msgid "No week specified"
+msgstr "هیچ حەفتەیەک دیاری نەکراوە"
+
+#, python-format
+msgid "No %(verbose_name_plural)s available"
+msgstr "هیچ %(verbose_name_plural)s بەردەست نییە"
+
+#, python-format
+msgid ""
+"Future %(verbose_name_plural)s not available because %(class_name)s."
+"allow_future is False."
+msgstr ""
+"لەداهاتوودا %(verbose_name_plural)s بەردەست نیە چونکە %(class_name)s."
+"allow_future چەوتە."
+
+#, python-format
+msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
+msgstr "ڕیزبەندی بەروار نادروستە “%(datestr)s” شێوازی “%(format)s” پێ بدە"
+
+#, python-format
+msgid "No %(verbose_name)s found matching the query"
+msgstr "هیچ %(verbose_name)s هاوتای داواکارییەکە نیە"
+
+msgid "Page is not “last”, nor can it be converted to an int."
+msgstr "لاپەڕە “کۆتا” نییە، هەروەها ناتوانرێت بگۆڕدرێت بۆ ژمارەی تەواو."
+
+#, python-format
+msgid "Invalid page (%(page_number)s): %(message)s"
+msgstr "لاپەڕەی نادروستە (%(page_number)s): %(message)s"
+
+#, python-format
+msgid "Empty list and “%(class_name)s.allow_empty” is False."
+msgstr "لیستی بەتاڵ و “%(class_name)s.allow_empty” چەوتە."
+
+msgid "Directory indexes are not allowed here."
+msgstr "لێرەدا نوانەی بوخچەکان ڕێگەپێدراو نیە."
+
+#, python-format
+msgid "“%(path)s” does not exist"
+msgstr "“%(path)s” بوونی نیە"
+
+#, python-format
+msgid "Index of %(directory)s"
+msgstr "نوانەی %(directory)s"
+
+msgid "The install worked successfully! Congratulations!"
+msgstr "دامەزراندن بەسەرکەوتوویی کاریکرد! پیرۆزە!"
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+"سەیری <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">تێبینیەکانی بڵاوکردنەوە</a> بکە بۆ جانگۆی "
+"%(version)s"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
+"configured any URLs."
+msgstr ""
+"ئەم لاپەڕەیە دەبینیت چونکە <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> لەناو پەڕگەی ڕێکخستنەکانتە و بۆ هیچ URLێک "
+"ڕێکنەخراوە."
+
+msgid "Django Documentation"
+msgstr "بەڵگەنامەکردنی جانگۆ"
+
+msgid "Topics, references, &amp; how-to’s"
+msgstr "بابەتەکان, سەرچاوەکان, &amp; چۆنێتی"
+
+msgid "Tutorial: A Polling App"
+msgstr "فێرکاریی: ئاپێکی ڕاپرسی"
+
+msgid "Get started with Django"
+msgstr "دەستپێبکە لەگەڵ جانگۆ"
+
+msgid "Django Community"
+msgstr "کۆمەڵگەی جانگۆ"
+
+msgid "Connect, get help, or contribute"
+msgstr "پەیوەندی بکە، یارمەتی وەربگرە، یان بەشداری بکە"

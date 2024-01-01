@@ -1,3 +1,5 @@
+from unittest import SkipTest
+
 from django.core import validators
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, connection, models
@@ -93,6 +95,43 @@ class IntegerFieldTests(TestCase):
                 instance.full_clean()
             instance.value = max_value
             instance.full_clean()
+
+    def test_backend_range_min_value_lookups(self):
+        min_value = self.backend_range[0]
+        if min_value is None:
+            raise SkipTest("Backend doesn't define an integer min value.")
+        underflow_value = min_value - 1
+        self.model.objects.create(value=min_value)
+        # A refresh of obj is necessary because last_insert_id() is bugged
+        # on MySQL and returns invalid values.
+        obj = self.model.objects.get(value=min_value)
+        with self.assertNumQueries(0), self.assertRaises(self.model.DoesNotExist):
+            self.model.objects.get(value=underflow_value)
+        with self.assertNumQueries(1):
+            self.assertEqual(self.model.objects.get(value__gt=underflow_value), obj)
+        with self.assertNumQueries(1):
+            self.assertEqual(self.model.objects.get(value__gte=underflow_value), obj)
+        with self.assertNumQueries(0), self.assertRaises(self.model.DoesNotExist):
+            self.model.objects.get(value__lt=underflow_value)
+        with self.assertNumQueries(0), self.assertRaises(self.model.DoesNotExist):
+            self.model.objects.get(value__lte=underflow_value)
+
+    def test_backend_range_max_value_lookups(self):
+        max_value = self.backend_range[-1]
+        if max_value is None:
+            raise SkipTest("Backend doesn't define an integer max value.")
+        overflow_value = max_value + 1
+        obj = self.model.objects.create(value=max_value)
+        with self.assertNumQueries(0), self.assertRaises(self.model.DoesNotExist):
+            self.model.objects.get(value=overflow_value)
+        with self.assertNumQueries(0), self.assertRaises(self.model.DoesNotExist):
+            self.model.objects.get(value__gt=overflow_value)
+        with self.assertNumQueries(0), self.assertRaises(self.model.DoesNotExist):
+            self.model.objects.get(value__gte=overflow_value)
+        with self.assertNumQueries(1):
+            self.assertEqual(self.model.objects.get(value__lt=overflow_value), obj)
+        with self.assertNumQueries(1):
+            self.assertEqual(self.model.objects.get(value__lte=overflow_value), obj)
 
     def test_redundant_backend_range_validators(self):
         """
@@ -240,6 +279,14 @@ class ValidationTests(SimpleTestCase):
         f = models.IntegerField(choices=(("group", ((10, "A"), (20, "B"))), (30, "C")))
         self.assertEqual(10, f.clean(10, None))
 
+    def test_choices_validation_supports_named_groups_dicts(self):
+        f = models.IntegerField(choices={"group": ((10, "A"), (20, "B")), 30: "C"})
+        self.assertEqual(10, f.clean(10, None))
+
+    def test_choices_validation_supports_named_groups_nested_dicts(self):
+        f = models.IntegerField(choices={"group": {10: "A", 20: "B"}, 30: "C"})
+        self.assertEqual(10, f.clean(10, None))
+
     def test_nullable_integerfield_raises_error_with_blank_false(self):
         f = models.IntegerField(null=True, blank=False)
         with self.assertRaises(ValidationError):
@@ -262,11 +309,26 @@ class ValidationTests(SimpleTestCase):
             f.clean("0", None)
 
     def test_enum_choices_cleans_valid_string(self):
-        f = models.IntegerField(choices=self.Choices.choices)
+        f = models.IntegerField(choices=self.Choices)
         self.assertEqual(f.clean("1", None), 1)
 
     def test_enum_choices_invalid_input(self):
-        f = models.IntegerField(choices=self.Choices.choices)
+        f = models.IntegerField(choices=self.Choices)
+        with self.assertRaises(ValidationError):
+            f.clean("A", None)
+        with self.assertRaises(ValidationError):
+            f.clean("3", None)
+
+    def test_callable_choices(self):
+        def get_choices():
+            return {i: str(i) for i in range(3)}
+
+        f = models.IntegerField(choices=get_choices)
+
+        for i in get_choices():
+            with self.subTest(i=i):
+                self.assertEqual(i, f.clean(i, None))
+
         with self.assertRaises(ValidationError):
             f.clean("A", None)
         with self.assertRaises(ValidationError):

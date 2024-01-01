@@ -11,6 +11,8 @@ from django.db import DEFAULT_DB_ALIAS, OperationalError, connections, router
 from django.db.migrations import Migration
 from django.db.migrations.autodetector import MigrationAutodetector
 from django.db.migrations.loader import MigrationLoader
+from django.db.migrations.migration import SwappableTuple
+from django.db.migrations.optimizer import MigrationOptimizer
 from django.db.migrations.questioner import (
     InteractiveMigrationQuestioner,
     MigrationQuestioner,
@@ -68,7 +70,10 @@ class Command(BaseCommand):
             "--check",
             action="store_true",
             dest="check_changes",
-            help="Exit with a non-zero status if model changes are missing migrations.",
+            help=(
+                "Exit with a non-zero status if model changes are missing migrations "
+                "and don't actually write them. Implies --dry-run."
+            ),
         )
         parser.add_argument(
             "--scriptable",
@@ -77,6 +82,15 @@ class Command(BaseCommand):
             help=(
                 "Divert log output and input prompts to stderr, writing only "
                 "paths of generated migration files to stdout."
+            ),
+        )
+        parser.add_argument(
+            "--update",
+            action="store_true",
+            dest="update",
+            help=(
+                "Merge model changes into the latest migration and optimize the "
+                "resulting operations."
             ),
         )
 
@@ -100,7 +114,10 @@ class Command(BaseCommand):
             raise CommandError("The migration name must be a valid Python identifier.")
         self.include_header = options["include_header"]
         check_changes = options["check_changes"]
+        if check_changes:
+            self.dry_run = True
         self.scriptable = options["scriptable"]
+        self.update = options["update"]
         # If logs and prompts are diverted to stderr, remove the ERROR style.
         if self.scriptable:
             self.stderr.style_func = None
@@ -236,11 +253,85 @@ class Command(BaseCommand):
                 else:
                     self.log("No changes detected")
         else:
-            self.write_migration_files(changes)
+            if self.update:
+                self.write_to_last_migration_files(changes)
+            else:
+                self.write_migration_files(changes)
             if check_changes:
                 sys.exit(1)
 
-    def write_migration_files(self, changes):
+    def write_to_last_migration_files(self, changes):
+        loader = MigrationLoader(connections[DEFAULT_DB_ALIAS])
+        new_changes = {}
+        update_previous_migration_paths = {}
+        for app_label, app_migrations in changes.items():
+            # Find last migration.
+            leaf_migration_nodes = loader.graph.leaf_nodes(app=app_label)
+            if len(leaf_migration_nodes) == 0:
+                raise CommandError(
+                    f"App {app_label} has no migration, cannot update last migration."
+                )
+            leaf_migration_node = leaf_migration_nodes[0]
+            # Multiple leaf nodes have already been checked earlier in command.
+            leaf_migration = loader.graph.nodes[leaf_migration_node]
+            # Updated migration cannot be a squash migration, a dependency of
+            # another migration, and cannot be already applied.
+            if leaf_migration.replaces:
+                raise CommandError(
+                    f"Cannot update squash migration '{leaf_migration}'."
+                )
+            if leaf_migration_node in loader.applied_migrations:
+                raise CommandError(
+                    f"Cannot update applied migration '{leaf_migration}'."
+                )
+            depending_migrations = [
+                migration
+                for migration in loader.disk_migrations.values()
+                if leaf_migration_node in migration.dependencies
+            ]
+            if depending_migrations:
+                formatted_migrations = ", ".join(
+                    [f"'{migration}'" for migration in depending_migrations]
+                )
+                raise CommandError(
+                    f"Cannot update migration '{leaf_migration}' that migrations "
+                    f"{formatted_migrations} depend on."
+                )
+            # Build new migration.
+            for migration in app_migrations:
+                leaf_migration.operations.extend(migration.operations)
+
+                for dependency in migration.dependencies:
+                    if isinstance(dependency, SwappableTuple):
+                        if settings.AUTH_USER_MODEL == dependency.setting:
+                            leaf_migration.dependencies.append(
+                                ("__setting__", "AUTH_USER_MODEL")
+                            )
+                        else:
+                            leaf_migration.dependencies.append(dependency)
+                    elif dependency[0] != migration.app_label:
+                        leaf_migration.dependencies.append(dependency)
+            # Optimize migration.
+            optimizer = MigrationOptimizer()
+            leaf_migration.operations = optimizer.optimize(
+                leaf_migration.operations, app_label
+            )
+            # Update name.
+            previous_migration_path = MigrationWriter(leaf_migration).path
+            name_fragment = self.migration_name or leaf_migration.suggest_name()
+            suggested_name = leaf_migration.name[:4] + f"_{name_fragment}"
+            if leaf_migration.name == suggested_name:
+                new_name = leaf_migration.name + "_updated"
+            else:
+                new_name = suggested_name
+            leaf_migration.name = new_name
+            # Register overridden migration.
+            new_changes[app_label] = [leaf_migration]
+            update_previous_migration_paths[app_label] = previous_migration_path
+
+        self.write_migration_files(new_changes, update_previous_migration_paths)
+
+    def write_migration_files(self, changes, update_previous_migration_paths=None):
         """
         Take a changes dict and write them out as migration files.
         """
@@ -254,12 +345,7 @@ class Command(BaseCommand):
                 if self.verbosity >= 1:
                     # Display a relative path if it's below the current working
                     # directory, or an absolute path otherwise.
-                    try:
-                        migration_string = os.path.relpath(writer.path)
-                    except ValueError:
-                        migration_string = writer.path
-                    if migration_string.startswith(".."):
-                        migration_string = writer.path
+                    migration_string = self.get_relative_path(writer.path)
                     self.log("  %s\n" % self.style.MIGRATE_LABEL(migration_string))
                     for operation in migration.operations:
                         self.log("    - %s" % operation.describe())
@@ -279,6 +365,22 @@ class Command(BaseCommand):
                     with open(writer.path, "w", encoding="utf-8") as fh:
                         fh.write(migration_string)
                         self.written_files.append(writer.path)
+                    if update_previous_migration_paths:
+                        prev_path = update_previous_migration_paths[app_label]
+                        rel_prev_path = self.get_relative_path(prev_path)
+                        if writer.needs_manual_porting:
+                            migration_path = self.get_relative_path(writer.path)
+                            self.log(
+                                self.style.WARNING(
+                                    f"Updated migration {migration_path} requires "
+                                    f"manual porting.\n"
+                                    f"Previous migration {rel_prev_path} was kept and "
+                                    f"must be deleted after porting functions manually."
+                                )
+                            )
+                        else:
+                            os.remove(prev_path)
+                            self.log(f"Deleted {rel_prev_path}")
                 elif self.verbosity == 3:
                     # Alternatively, makemigrations --dry-run --verbosity 3
                     # will log the migrations rather than saving the file to
@@ -290,6 +392,16 @@ class Command(BaseCommand):
                     )
                     self.log(writer.as_string())
         run_formatters(self.written_files)
+
+    @staticmethod
+    def get_relative_path(path):
+        try:
+            migration_string = os.path.relpath(path)
+        except ValueError:
+            migration_string = path
+        if migration_string.startswith(".."):
+            migration_string = path
+        return migration_string
 
     def handle_merge(self, loader, conflicts):
         """

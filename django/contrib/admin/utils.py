@@ -2,6 +2,8 @@ import datetime
 import decimal
 import json
 from collections import defaultdict
+from functools import reduce
+from operator import or_
 
 from django.core.exceptions import FieldDoesNotExist
 from django.db import models, router
@@ -10,6 +12,7 @@ from django.db.models.deletion import Collector
 from django.forms.utils import pretty_name
 from django.urls import NoReverseMatch, reverse
 from django.utils import formats, timezone
+from django.utils.hashable import make_hashable
 from django.utils.html import format_html
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.text import capfirst
@@ -53,10 +56,17 @@ def lookup_spawns_duplicates(opts, lookup_path):
     return False
 
 
+def get_last_value_from_parameters(parameters, key):
+    value = parameters.get(key)
+    return value[-1] if isinstance(value, list) else value
+
+
 def prepare_lookup_value(key, value, separator=","):
     """
     Return a lookup value prepared to be used in queryset filtering.
     """
+    if isinstance(value, list):
+        return [prepare_lookup_value(key, v, separator=separator) for v in value]
     # if key ends with __in, split parameter into separate values
     if key.endswith("__in"):
         value = value.split(separator)
@@ -64,6 +74,13 @@ def prepare_lookup_value(key, value, separator=","):
     elif key.endswith("__isnull"):
         value = value.lower() not in ("", "false", "0")
     return value
+
+
+def build_q_object_from_lookup_parameters(parameters):
+    q_object = models.Q()
+    for param, param_item_list in parameters.items():
+        q_object &= reduce(or_, (models.Q((param, item)) for item in param_item_list))
+    return q_object
 
 
 def quote(s):
@@ -122,13 +139,14 @@ def get_deleted_objects(objs, request, admin_site):
 
     def format_callback(obj):
         model = obj.__class__
-        has_admin = model in admin_site._registry
         opts = obj._meta
 
         no_edit_link = "%s: %s" % (capfirst(opts.verbose_name), obj)
 
-        if has_admin:
-            if not admin_site._registry[model].has_delete_permission(request, obj):
+        if admin_site.is_registered(model):
+            if not admin_site.get_model_admin(model).has_delete_permission(
+                request, obj
+            ):
                 perms_needed.add(opts.verbose_name)
             try:
                 admin_url = reverse(
@@ -284,6 +302,8 @@ def lookup_field(name, obj, model_admin=None):
                 value = attr()
             else:
                 value = attr
+            if hasattr(model_admin, "model") and hasattr(model_admin.model, name):
+                attr = getattr(model_admin.model, name)
         f = None
     else:
         attr = None
@@ -401,7 +421,14 @@ def display_for_field(value, field, empty_value_display):
     from django.contrib.admin.templatetags.admin_list import _boolean_icon
 
     if getattr(field, "flatchoices", None):
-        return dict(field.flatchoices).get(value, empty_value_display)
+        try:
+            return dict(field.flatchoices).get(value, empty_value_display)
+        except TypeError:
+            # Allow list-like choices.
+            flatchoices = make_hashable(field.flatchoices)
+            value = make_hashable(value)
+            return dict(flatchoices).get(value, empty_value_display)
+
     # BooleanField needs special-case null-handling, so it comes before the
     # general null test.
     elif isinstance(field, models.BooleanField):

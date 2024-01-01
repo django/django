@@ -21,7 +21,6 @@ TEST_SETTINGS = {
 
 
 class LiveServerBase(StaticLiveServerTestCase):
-
     available_apps = []
 
     @classmethod

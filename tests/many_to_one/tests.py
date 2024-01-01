@@ -4,6 +4,7 @@ from copy import deepcopy
 from django.core.exceptions import FieldError, MultipleObjectsReturned
 from django.db import IntegrityError, models, transaction
 from django.test import TestCase
+from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.translation import gettext_lazy
 
 from .models import (
@@ -290,7 +291,7 @@ class ManyToOneTests(TestCase):
         )
         # ... and should work fine with the string that comes out of
         # forms.Form.cleaned_data.
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             (
                 Article.objects.filter(reporter__first_name__exact="John").extra(
                     where=["many_to_one_reporter.last_name='%s'" % "Smith"]
@@ -654,6 +655,16 @@ class ManyToOneTests(TestCase):
         self.assertIsNot(c.parent, p)
         self.assertEqual(c.parent, p)
 
+    def test_save_parent_after_assign(self):
+        category = Category(name="cats")
+        record = Record(category=category)
+        category.save()
+        record.save()
+        category.name = "dogs"
+        with self.assertNumQueries(0):
+            self.assertEqual(category.id, record.category_id)
+            self.assertEqual(category.name, record.category.name)
+
     def test_save_nullable_fk_after_parent(self):
         parent = Parent()
         child = ChildNullableParent(parent=parent)
@@ -748,6 +759,9 @@ class ManyToOneTests(TestCase):
         )
         with self.assertRaisesMessage(ValueError, msg):
             th.child_set.count()
+        # The reverse foreign key manager can be created.
+        self.assertEqual(th.child_set.model, Third)
+
         th.save()
         # Now the model is saved, so we will need to execute a query.
         with self.assertNumQueries(1):
@@ -785,6 +799,14 @@ class ManyToOneTests(TestCase):
         # doesn't exist should be an instance of a subclass of `AttributeError`
         # refs #21563
         self.assertFalse(hasattr(Article(), "reporter"))
+
+    def test_create_after_prefetch(self):
+        c = City.objects.create(name="Musical City")
+        d1 = District.objects.create(name="Ladida", city=c)
+        city = City.objects.prefetch_related("districts").get(id=c.id)
+        self.assertSequenceEqual(city.districts.all(), [d1])
+        d2 = city.districts.create(name="Goa")
+        self.assertSequenceEqual(city.districts.all(), [d1, d2])
 
     def test_clear_after_prefetch(self):
         c = City.objects.create(name="Musical City")
@@ -864,3 +886,49 @@ class ManyToOneTests(TestCase):
             usa.cities.remove(chicago.pk)
         with self.assertRaisesMessage(TypeError, msg):
             usa.cities.set([chicago.pk])
+
+    def test_get_prefetch_queryset_warning(self):
+        City.objects.create(name="Chicago")
+        cities = City.objects.all()
+        msg = (
+            "get_prefetch_queryset() is deprecated. Use get_prefetch_querysets() "
+            "instead."
+        )
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+            City.country.get_prefetch_queryset(cities)
+
+    def test_get_prefetch_queryset_reverse_warning(self):
+        usa = Country.objects.create(name="United States")
+        City.objects.create(name="Chicago")
+        countries = Country.objects.all()
+        msg = (
+            "get_prefetch_queryset() is deprecated. Use get_prefetch_querysets() "
+            "instead."
+        )
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+            usa.cities.get_prefetch_queryset(countries)
+
+    def test_get_prefetch_querysets_invalid_querysets_length(self):
+        City.objects.create(name="Chicago")
+        cities = City.objects.all()
+        msg = (
+            "querysets argument of get_prefetch_querysets() should have a length of 1."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            City.country.get_prefetch_querysets(
+                instances=cities,
+                querysets=[Country.objects.all(), Country.objects.all()],
+            )
+
+    def test_get_prefetch_querysets_reverse_invalid_querysets_length(self):
+        usa = Country.objects.create(name="United States")
+        City.objects.create(name="Chicago")
+        countries = Country.objects.all()
+        msg = (
+            "querysets argument of get_prefetch_querysets() should have a length of 1."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            usa.cities.get_prefetch_querysets(
+                instances=countries,
+                querysets=[City.objects.all(), City.objects.all()],
+            )

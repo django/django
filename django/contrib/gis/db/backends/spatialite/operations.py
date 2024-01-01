@@ -67,6 +67,8 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
     function_names = {
         "AsWKB": "St_AsBinary",
         "ForcePolygonCW": "ST_ForceLHR",
+        "FromWKB": "ST_GeomFromWKB",
+        "FromWKT": "ST_GeomFromText",
         "Length": "ST_Length",
         "LineLocatePoint": "ST_Line_Locate_Point",
         "NumPoints": "ST_NPoints",
@@ -78,7 +80,7 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
 
     @cached_property
     def unsupported_functions(self):
-        unsupported = {"BoundingCircle", "GeometryDistance", "MemSize"}
+        unsupported = {"BoundingCircle", "GeometryDistance", "IsEmpty", "MemSize"}
         if not self.geom_lib_version():
             unsupported |= {"Azimuth", "GeoHash", "MakeValid"}
         return unsupported

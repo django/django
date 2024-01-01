@@ -1,5 +1,5 @@
 """
-Models for testing various aspects of the djang.contrib.admindocs app
+Models for testing various aspects of the django.contrib.admindocs app.
 """
 
 from django.db import models

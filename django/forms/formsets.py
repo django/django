@@ -99,6 +99,8 @@ class BaseFormSet(RenderableFormMixin):
         self.error_class = error_class
         self._errors = None
         self._non_form_errors = None
+        self.form_renderer = self.renderer
+        self.renderer = self.renderer or get_default_renderer()
 
         messages = {}
         for cls in reversed(type(self).__mro__):
@@ -224,7 +226,7 @@ class BaseFormSet(RenderableFormMixin):
             # incorrect validation for extra, optional, and deleted
             # forms in the formset.
             "use_required_attribute": False,
-            "renderer": self.renderer,
+            "renderer": self.form_renderer,
         }
         if self.is_bound:
             defaults["data"] = self.data
@@ -255,14 +257,15 @@ class BaseFormSet(RenderableFormMixin):
 
     @property
     def empty_form(self):
-        form = self.form(
-            auto_id=self.auto_id,
-            prefix=self.add_prefix("__prefix__"),
-            empty_permitted=True,
-            use_required_attribute=False,
+        form_kwargs = {
             **self.get_form_kwargs(None),
-            renderer=self.renderer,
-        )
+            "auto_id": self.auto_id,
+            "prefix": self.add_prefix("__prefix__"),
+            "empty_permitted": True,
+            "use_required_attribute": False,
+            "renderer": self.form_renderer,
+        }
+        form = self.form(**form_kwargs)
         self.add_fields(form, None)
         return form
 
@@ -489,7 +492,9 @@ class BaseFormSet(RenderableFormMixin):
                     required=False,
                     widget=self.get_ordering_widget(),
                 )
-        if self.can_delete and (self.can_delete_extra or index < initial_form_count):
+        if self.can_delete and (
+            self.can_delete_extra or (index is not None and index < initial_form_count)
+        ):
             form.fields[DELETION_FIELD_NAME] = BooleanField(
                 label=_("Delete"),
                 required=False,
@@ -563,7 +568,7 @@ def formset_factory(
         "absolute_max": absolute_max,
         "validate_min": validate_min,
         "validate_max": validate_max,
-        "renderer": renderer or get_default_renderer(),
+        "renderer": renderer,
     }
     return type(form.__name__ + "FormSet", (formset,), attrs)
 
