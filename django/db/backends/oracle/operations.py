@@ -54,7 +54,7 @@ BEGIN
     SELECT NVL(last_number - cache_size, 0) INTO seq_value FROM user_sequences
            WHERE sequence_name = seq_name;
     WHILE table_value > seq_value LOOP
-        EXECUTE IMMEDIATE 'SELECT "'||seq_name||'".nextval FROM DUAL'
+        EXECUTE IMMEDIATE 'SELECT "'||seq_name||'".nextval%(suffix)s'
         INTO seq_value;
     END LOOP;
 END;
@@ -527,6 +527,7 @@ END;
                 "column": column,
                 "table_name": strip_quotes(table),
                 "column_name": strip_quotes(column),
+                "suffix": self.connection.features.bare_select_suffix,
             }
             sql.append(query)
         return sql
@@ -550,6 +551,7 @@ END;
                             "column": column,
                             "table_name": strip_quotes(table),
                             "column_name": strip_quotes(column),
+                            "suffix": self.connection.features.bare_select_suffix,
                         }
                     )
                     # Only one AutoField is allowed per model, so don't
@@ -683,7 +685,8 @@ END;
                 if not query:
                     placeholder = "%s col_%s" % (placeholder, i)
                 select.append(placeholder)
-            query.append("SELECT %s FROM DUAL" % ", ".join(select))
+            suffix = self.connection.features.bare_select_suffix
+            query.append(f"SELECT %s{suffix}" % ", ".join(select))
         # Bulk insert to tables with Oracle identity columns causes Oracle to
         # add sequence.nextval to it. Sequence.nextval cannot be used with the
         # UNION operator. To prevent incorrect SQL, move UNION to a subquery.
