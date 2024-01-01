@@ -1343,9 +1343,12 @@ See :ref:`Filtering error reports<filtering-error-reports>`.
 
 Default: ``'webmaster@localhost'``
 
-Default email address to use for various automated correspondence from the
-site manager(s). This doesn't include error messages sent to :setting:`ADMINS`
-and :setting:`MANAGERS`; for that, see :setting:`SERVER_EMAIL`.
+Default email address for automated correspondence from the site manager(s).
+This address is used in the ``From:`` header of outgoing emails and can take
+any format valid in the chosen email sending protocol.
+
+This doesn't affect error messages sent to :setting:`ADMINS` and
+:setting:`MANAGERS`. See :setting:`SERVER_EMAIL` for that.
 
 .. setting:: DEFAULT_INDEX_TABLESPACE
 
@@ -2535,7 +2538,9 @@ example, to define a YAML serializer, use::
 Default: ``'root@localhost'``
 
 The email address that error messages come from, such as those sent to
-:setting:`ADMINS` and :setting:`MANAGERS`.
+:setting:`ADMINS` and :setting:`MANAGERS`. This address is used in the
+``From:`` header and can take any format valid in the chosen email sending
+protocol.
 
 .. admonition:: Why are my emails sent from a different address?
 

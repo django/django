@@ -184,6 +184,14 @@ Models
 * :meth:`.QuerySet.order_by` now supports ordering by annotation transforms
   such as ``JSONObject`` keys and ``ArrayAgg`` indices.
 
+* :class:`F() <django.db.models.F>` and :class:`OuterRef()
+  <django.db.models.OuterRef>` expressions that output
+  :class:`~django.db.models.CharField`, :class:`~django.db.models.EmailField`,
+  :class:`~django.db.models.SlugField`, :class:`~django.db.models.URLField`,
+  :class:`~django.db.models.TextField`, or
+  :class:`~django.contrib.postgres.fields.ArrayField` can now be :ref:`sliced
+  <slicing-using-f>`.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

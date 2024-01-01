@@ -21,14 +21,12 @@ class RemoteUserTest(TestCase):
     known_user2 = "knownuser2"
 
     def setUp(self):
-        self.patched_settings = modify_settings(
+        patched_settings = modify_settings(
             AUTHENTICATION_BACKENDS={"append": self.backend},
             MIDDLEWARE={"append": self.middleware},
         )
-        self.patched_settings.enable()
-
-    def tearDown(self):
-        self.patched_settings.disable()
+        patched_settings.enable()
+        self.addCleanup(patched_settings.disable)
 
     def test_no_remote_user(self):
         """Users are not created when remote user is not specified."""

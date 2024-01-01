@@ -32,9 +32,7 @@ class ASGITest(SimpleTestCase):
 
     def setUp(self):
         request_started.disconnect(close_old_connections)
-
-    def tearDown(self):
-        request_started.connect(close_old_connections)
+        self.addCleanup(request_started.connect, close_old_connections)
 
     async def test_get_asgi_application(self):
         """

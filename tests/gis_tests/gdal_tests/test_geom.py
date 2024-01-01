@@ -35,7 +35,7 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
         with self.assertRaises(GDALException):
             OGRGeomType("fooD")
         with self.assertRaises(GDALException):
-            OGRGeomType(9)
+            OGRGeomType(4001)
 
         # Equivalence can take strings, ints, and other OGRGeomTypes
         self.assertEqual(OGRGeomType(1), OGRGeomType(1))
@@ -635,3 +635,82 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
     def test_empty_point_to_geos(self):
         p = OGRGeometry("POINT EMPTY", srs=4326)
         self.assertEqual(p.geos.ewkt, p.ewkt)
+
+    def test_geometry_types(self):
+        tests = [
+            ("Point", 1, True),
+            ("LineString", 2, True),
+            ("Polygon", 3, True),
+            ("MultiPoint", 4, True),
+            ("Multilinestring", 5, True),
+            ("MultiPolygon", 6, True),
+            ("GeometryCollection", 7, True),
+            ("CircularString", 8, False),
+            ("CompoundCurve", 9, False),
+            ("CurvePolygon", 10, False),
+            ("MultiCurve", 11, False),
+            ("MultiSurface", 12, False),
+            # 13 (Curve) and 14 (Surface) are abstract types.
+            ("PolyhedralSurface", 15, False),
+            ("TIN", 16, False),
+            ("Triangle", 17, False),
+            ("Linearring", 2, True),
+            # Types 1 - 7 with Z dimension have 2.5D enums.
+            ("Point Z", -2147483647, True),  # 1001
+            ("LineString Z", -2147483646, True),  # 1002
+            ("Polygon Z", -2147483645, True),  # 1003
+            ("MultiPoint Z", -2147483644, True),  # 1004
+            ("Multilinestring Z", -2147483643, True),  # 1005
+            ("MultiPolygon Z", -2147483642, True),  # 1006
+            ("GeometryCollection Z", -2147483641, True),  # 1007
+            ("CircularString Z", 1008, False),
+            ("CompoundCurve Z", 1009, False),
+            ("CurvePolygon Z", 1010, False),
+            ("MultiCurve Z", 1011, False),
+            ("MultiSurface Z", 1012, False),
+            ("PolyhedralSurface Z", 1015, False),
+            ("TIN Z", 1016, False),
+            ("Triangle Z", 1017, False),
+            ("Point M", 2001, False),
+            ("LineString M", 2002, False),
+            ("Polygon M", 2003, False),
+            ("MultiPoint M", 2004, False),
+            ("MultiLineString M", 2005, False),
+            ("MultiPolygon M", 2006, False),
+            ("GeometryCollection M", 2007, False),
+            ("CircularString M", 2008, False),
+            ("CompoundCurve M", 2009, False),
+            ("CurvePolygon M", 2010, False),
+            ("MultiCurve M", 2011, False),
+            ("MultiSurface M", 2012, False),
+            ("PolyhedralSurface M", 2015, False),
+            ("TIN M", 2016, False),
+            ("Triangle M", 2017, False),
+            ("Point ZM", 3001, False),
+            ("LineString ZM", 3002, False),
+            ("Polygon ZM", 3003, False),
+            ("MultiPoint ZM", 3004, False),
+            ("MultiLineString ZM", 3005, False),
+            ("MultiPolygon ZM", 3006, False),
+            ("GeometryCollection ZM", 3007, False),
+            ("CircularString ZM", 3008, False),
+            ("CompoundCurve ZM", 3009, False),
+            ("CurvePolygon ZM", 3010, False),
+            ("MultiCurve ZM", 3011, False),
+            ("MultiSurface ZM", 3012, False),
+            ("PolyhedralSurface ZM", 3015, False),
+            ("TIN ZM", 3016, False),
+            ("Triangle ZM", 3017, False),
+        ]
+
+        for test in tests:
+            geom_type, num, supported = test
+            with self.subTest(geom_type=geom_type, num=num, supported=supported):
+                if supported:
+                    g = OGRGeometry(f"{geom_type} EMPTY")
+                    self.assertEqual(g.geom_type.num, num)
+                else:
+                    type_ = geom_type.replace(" ", "")
+                    msg = f"Unsupported geometry type: {type_}"
+                    with self.assertRaisesMessage(TypeError, msg):
+                        OGRGeometry(f"{geom_type} EMPTY")

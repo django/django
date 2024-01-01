@@ -1904,9 +1904,7 @@ class CustomExceptionReporterFilter(SafeExceptionReporterFilter):
 class CustomExceptionReporterFilterTests(SimpleTestCase):
     def setUp(self):
         get_default_exception_reporter_filter.cache_clear()
-
-    def tearDown(self):
-        get_default_exception_reporter_filter.cache_clear()
+        self.addCleanup(get_default_exception_reporter_filter.cache_clear)
 
     def test_setting_allows_custom_subclass(self):
         self.assertIsInstance(

@@ -32,7 +32,7 @@ class BaseTests:
     }
 
     def setUp(self):
-        self.settings_override = override_settings(
+        settings_override = override_settings(
             TEMPLATES=[
                 {
                     "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -52,10 +52,8 @@ class BaseTests:
             % (self.storage_class.__module__, self.storage_class.__name__),
             SESSION_SERIALIZER="django.contrib.sessions.serializers.JSONSerializer",
         )
-        self.settings_override.enable()
-
-    def tearDown(self):
-        self.settings_override.disable()
+        settings_override.enable()
+        self.addCleanup(settings_override.disable)
 
     def get_request(self):
         return HttpRequest()

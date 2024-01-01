@@ -19,6 +19,4 @@ class MultipleLocaleActivationTestCase(SimpleTestCase):
 
     def setUp(self):
         self._old_language = get_language()
-
-    def tearDown(self):
-        activate(self._old_language)
+        self.addCleanup(activate, self._old_language)

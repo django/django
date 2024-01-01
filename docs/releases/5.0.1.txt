@@ -32,3 +32,7 @@ Bugfixes
 
 * Fixed a regression in Django 5.0 where querysets referenced incorrect field
   names from ``FilteredRelation()`` (:ticket:`35050`).
+
+* Fixed a regression in Django 5.0 that caused a system check crash when
+  ``ModelAdmin.filter_horizontal`` or ``filter_vertical`` contained a reverse
+  many-to-many relation with ``related_name`` (:ticket:`35056`).
