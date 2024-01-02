@@ -1183,11 +1183,11 @@ class QuerySet(AltersData):
 
         collector = Collector(using=del_query.db, origin=self)
         collector.collect(del_query)
-        deleted, _rows_count = collector.delete()
+        num_deleted, num_deleted_per_model = collector.delete()
 
         # Clear the result cache, in case this QuerySet gets reused.
         self._result_cache = None
-        return deleted, _rows_count
+        return num_deleted, num_deleted_per_model
 
     delete.alters_data = True
     delete.queryset_only = True
