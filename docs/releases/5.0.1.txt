@@ -2,7 +2,7 @@
 Django 5.0.1 release notes
 ==========================
 
-*Expected January 2, 2024*
+*January 2, 2024*
 
 Django 5.0.1 fixes several bugs in 5.0.
 
