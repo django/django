@@ -30,10 +30,17 @@ class Command(BaseCommand):
     stealth_options = ("shutdown_message",)
     suppressed_base_arguments = {"--verbosity", "--traceback"}
 
-    default_addr = "127.0.0.1"
     default_addr_ipv6 = "::1"
     default_port = "8000"
     protocol = "http"
+    try:
+        # This gets the local hostname
+        hostname = socket.gethostname()
+        # This gets the IP address associated with the hostname
+        default_addr = socket.gethostbyname(hostname)
+    except Exception:
+        default_addr = "127.0.0.1"
+
     server_cls = WSGIServer
 
     def add_arguments(self, parser):
