@@ -157,7 +157,7 @@ class WSGIRequestHandlerTestCase(SimpleTestCase):
         # The body is not returned in a HEAD response.
         self.assertEqual(body, b"\r\n")
         self.assertIs(
-            any([line.startswith(b"Content-Length:") for line in lines]), False
+            any(line.startswith(b"Content-Length:") for line in lines), False
         )
         self.assertNotIn(b"Connection: close\r\n", lines)
 
