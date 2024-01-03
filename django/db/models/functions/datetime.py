@@ -79,7 +79,7 @@ class Extract(TimezoneMixin, Transform):
         else:
             # resolve_expression has already validated the output_field so this
             # assert should never be hit.
-            assert False, "Tried to Extract from an invalid type."
+            raise AssertionError("Tried to Extract from an invalid type.")
         return sql, params
 
     def resolve_expression(
