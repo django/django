@@ -229,7 +229,9 @@ class ASGIHandler(base.BaseHandler):
         if message["type"] == "http.disconnect":
             raise RequestAborted()
         # This should never happen.
-        raise AssertionError("Invalid ASGI message after request body: %s" % message["type"])
+        raise AssertionError(
+            "Invalid ASGI message after request body: %s" % message["type"]
+        )
 
     async def run_get_response(self, request):
         """Get async response."""

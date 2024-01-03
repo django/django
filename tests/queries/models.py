@@ -411,7 +411,9 @@ class ObjectA(models.Model):
 
     def __iter__(self):
         # Ticket #23721
-        raise AssertionError("type checking should happen without calling model __iter__")
+        raise AssertionError(
+            "type checking should happen without calling model __iter__"
+        )
 
 
 class ProxyObjectA(ObjectA):
