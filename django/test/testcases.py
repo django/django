@@ -10,6 +10,7 @@ from contextlib import contextmanager
 from copy import copy, deepcopy
 from difflib import get_close_matches
 from functools import wraps
+from unittest import mock
 from unittest.suite import _DebugResult
 from unittest.util import safe_repr
 from urllib.parse import (
@@ -37,6 +38,7 @@ from django.core.management.sql import emit_post_migrate_signal
 from django.core.servers.basehttp import ThreadedWSGIServer, WSGIRequestHandler
 from django.core.signals import setting_changed
 from django.db import DEFAULT_DB_ALIAS, connection, connections, transaction
+from django.db.backends.base.base import NO_DB_ALIAS, BaseDatabaseWrapper
 from django.forms.fields import CharField
 from django.http import QueryDict
 from django.http.request import split_domain_port, validate_host
@@ -255,6 +257,13 @@ class SimpleTestCase(unittest.TestCase):
                 }
                 method = getattr(connection, name)
                 setattr(connection, name, _DatabaseFailure(method, message))
+        cls.enterClassContext(
+            mock.patch.object(
+                BaseDatabaseWrapper,
+                "ensure_connection",
+                new=cls.ensure_connection_patch_method(),
+            )
+        )
 
     @classmethod
     def _remove_databases_failures(cls):
@@ -265,6 +274,28 @@ class SimpleTestCase(unittest.TestCase):
             for name, _ in cls._disallowed_connection_methods:
                 method = getattr(connection, name)
                 setattr(connection, name, method.wrapped)
+
+    @classmethod
+    def ensure_connection_patch_method(cls):
+        real_ensure_connection = BaseDatabaseWrapper.ensure_connection
+
+        def patched_ensure_connection(self, *args, **kwargs):
+            if (
+                self.connection is None
+                and self.alias not in cls.databases
+                and self.alias != NO_DB_ALIAS
+            ):
+                # Connection has not yet been established, but the alias is not allowed.
+                message = cls._disallowed_database_msg % {
+                    "test": f"{cls.__module__}.{cls.__qualname__}",
+                    "alias": self.alias,
+                    "operation": "threaded connections",
+                }
+                return _DatabaseFailure(self.ensure_connection, message)()
+
+            real_ensure_connection(self, *args, **kwargs)
+
+        return patched_ensure_connection
 
     def __call__(self, result=None):
         """
