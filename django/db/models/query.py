@@ -2613,6 +2613,10 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
                 # since we have merged this into the current work.
                 qs._prefetch_done = True
                 obj._prefetched_objects_cache[cache_name] = qs
+
+    print("rel_qs: ", rel_qs)
+    print("all_related_objects: ", all_related_objects)
+    print("Hai rel_obj_cache: ", rel_obj_cache)
     return all_related_objects, additional_lookups
 
 class RelatedPopulator:

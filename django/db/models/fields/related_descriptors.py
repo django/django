@@ -172,6 +172,8 @@ class ForwardManyToOneDescriptor:
                 "of 1."
             )
         queryset = querysets[0] if querysets else self.get_queryset()
+        print("Qeuryset:",queryset)
+        print("Type of Qeuryset:",type(queryset))
         queryset._add_hints(instance=instances[0])
 
         rel_obj_attr = self.field.get_foreign_related_value
