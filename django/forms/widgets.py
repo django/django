@@ -1147,7 +1147,7 @@ class SelectDateWidget(Widget):
             if match:
                 # Convert any zeros in the date to empty strings to match the
                 # empty option value.
-                year, month, day = [int(val) or "" for val in match.groups()]
+                year, month, day = (int(val) or "" for val in match.groups())
             else:
                 input_format = get_format("DATE_INPUT_FORMATS")[0]
                 try:
