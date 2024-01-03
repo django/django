@@ -219,7 +219,7 @@ class WSGIServerTestCase(SimpleTestCase):
                 try:
                     server = WSGIServer(("localhost", 0), WSGIRequestHandler)
                     try:
-                        raise exception()
+                        raise exception
                     except Exception:
                         with captured_stderr() as err:
                             with self.assertLogs("django.server", "INFO") as cm:

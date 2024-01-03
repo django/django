@@ -24,7 +24,7 @@ class TestConnectionOnCommit(TransactionTestCase):
 
     def notify(self, id_):
         if id_ == "error":
-            raise ForcedError()
+            raise ForcedError
         self.notified.append(id_)
 
     def do(self, num):
@@ -94,7 +94,7 @@ class TestConnectionOnCommit(TransactionTestCase):
         try:
             with transaction.atomic():
                 self.do(1)
-                raise ForcedError()
+                raise ForcedError
         except ForcedError:
             pass
 
@@ -117,7 +117,7 @@ class TestConnectionOnCommit(TransactionTestCase):
             try:
                 with transaction.atomic():
                     self.do(2)
-                    raise ForcedError()
+                    raise ForcedError
             except ForcedError:
                 pass
             # another successful savepoint
@@ -133,7 +133,7 @@ class TestConnectionOnCommit(TransactionTestCase):
             with transaction.atomic():
                 with transaction.atomic():
                     self.do(1)
-                raise ForcedError()
+                raise ForcedError
         except ForcedError:
             pass
 
@@ -145,7 +145,7 @@ class TestConnectionOnCommit(TransactionTestCase):
                 with transaction.atomic():
                     with transaction.atomic():
                         self.do(1)
-                    raise ForcedError()
+                    raise ForcedError
             except ForcedError:
                 pass
             self.do(2)
@@ -158,7 +158,7 @@ class TestConnectionOnCommit(TransactionTestCase):
                 self.do(1)
                 try:
                     with transaction.atomic(savepoint=False):
-                        raise ForcedError()
+                        raise ForcedError
                 except ForcedError:
                     pass
 
@@ -170,7 +170,7 @@ class TestConnectionOnCommit(TransactionTestCase):
                 self.do(1)
                 try:
                     with transaction.atomic():
-                        raise ForcedError()
+                        raise ForcedError
                 except ForcedError:
                     pass
 
@@ -197,7 +197,7 @@ class TestConnectionOnCommit(TransactionTestCase):
         try:
             with transaction.atomic():
                 self.do(1)
-                raise ForcedError()
+                raise ForcedError
         except ForcedError:
             pass
 

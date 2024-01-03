@@ -679,7 +679,7 @@ class ListDisplayTests(CheckTestCase):
 
             def __get__(self, instance, owner):
                 if instance is None:
-                    raise AttributeError()
+                    raise AttributeError
 
         class TestModel(Model):
             field = PositionField()

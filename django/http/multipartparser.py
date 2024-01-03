@@ -545,11 +545,11 @@ class ChunkIter:
         try:
             data = self.flo.read(self.chunk_size)
         except InputStreamExhausted:
-            raise StopIteration()
+            raise StopIteration
         if data:
             return data
         else:
-            raise StopIteration()
+            raise StopIteration
 
     def __iter__(self):
         return self
@@ -571,7 +571,7 @@ class InterBoundaryIter:
         try:
             return LazyStream(BoundaryIter(self._stream, self._boundary))
         except InputStreamExhausted:
-            raise StopIteration()
+            raise StopIteration
 
 
 class BoundaryIter:
@@ -598,7 +598,7 @@ class BoundaryIter:
         # use Python find. Wrap the latter for consistency.
         unused_char = self._stream.read(1)
         if not unused_char:
-            raise InputStreamExhausted()
+            raise InputStreamExhausted
         self._stream.unget(unused_char)
 
     def __iter__(self):
@@ -606,7 +606,7 @@ class BoundaryIter:
 
     def __next__(self):
         if self._done:
-            raise StopIteration()
+            raise StopIteration
 
         stream = self._stream
         rollback = self._rollback
@@ -624,7 +624,7 @@ class BoundaryIter:
             self._done = True
 
         if not chunks:
-            raise StopIteration()
+            raise StopIteration
 
         chunk = b"".join(chunks)
         boundary = self._find_boundary(chunk)

@@ -38,7 +38,7 @@ def internal_server_error(request):
 
 
 def permission_denied(request):
-    raise PermissionDenied()
+    raise PermissionDenied
 
 
 def multi_part_parser_error(request):

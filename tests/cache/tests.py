@@ -77,7 +77,7 @@ class C:
 
 class Unpicklable:
     def __getstate__(self):
-        raise pickle.PickleError()
+        raise pickle.PickleError
 
 
 def empty_response(request):

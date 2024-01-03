@@ -470,7 +470,7 @@ class BaseDatabaseSchemaEditor:
         for particularly tricky backends (defaults are not user-defined, though,
         so this is safe).
         """
-        raise NotImplementedError()
+        raise NotImplementedError
 
     # Actions
 

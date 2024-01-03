@@ -37,7 +37,7 @@ class StopUploadTemporaryFileHandler(TemporaryFileUploadHandler):
     """A handler that raises a StopUpload exception."""
 
     def receive_data_chunk(self, raw_data, start):
-        raise StopUpload()
+        raise StopUpload
 
 
 class CustomUploadError(Exception):

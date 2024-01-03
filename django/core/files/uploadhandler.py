@@ -209,7 +209,7 @@ class MemoryFileUploadHandler(FileUploadHandler):
         super().new_file(*args, **kwargs)
         if self.activated:
             self.file = BytesIO()
-            raise StopFutureHandlers()
+            raise StopFutureHandlers
 
     def receive_data_chunk(self, raw_data, start):
         """Add the data to the BytesIO file."""

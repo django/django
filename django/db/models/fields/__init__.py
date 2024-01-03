@@ -1724,7 +1724,7 @@ class DecimalField(Field):
         try:
             decimal_places = int(self.decimal_places)
             if decimal_places < 0:
-                raise ValueError()
+                raise ValueError
         except TypeError:
             return [
                 checks.Error(
@@ -1748,7 +1748,7 @@ class DecimalField(Field):
         try:
             max_digits = int(self.max_digits)
             if max_digits <= 0:
-                raise ValueError()
+                raise ValueError
         except TypeError:
             return [
                 checks.Error(

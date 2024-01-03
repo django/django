@@ -436,9 +436,9 @@ class FileStorageTests(SimpleTestCase):
             elif path == os.path.join(self.temp_dir, "raced"):
                 real_makedirs(path, mode, exist_ok)
                 if not exist_ok:
-                    raise FileExistsError()
+                    raise FileExistsError
             elif path == os.path.join(self.temp_dir, "error"):
-                raise PermissionError()
+                raise PermissionError
             else:
                 self.fail("unexpected argument %r" % path)
 
@@ -472,9 +472,9 @@ class FileStorageTests(SimpleTestCase):
                 real_remove(path)
             elif path == os.path.join(self.temp_dir, "raced.file"):
                 real_remove(path)
-                raise FileNotFoundError()
+                raise FileNotFoundError
             elif path == os.path.join(self.temp_dir, "error.file"):
-                raise PermissionError()
+                raise PermissionError
             else:
                 self.fail("unexpected argument %r" % path)
 

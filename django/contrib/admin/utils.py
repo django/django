@@ -326,7 +326,7 @@ def _get_non_gfk_field(opts, name):
         # Generic foreign keys OR reverse relations
         ((field.many_to_one and not field.related_model) or field.one_to_many)
     ):
-        raise FieldDoesNotExist()
+        raise FieldDoesNotExist
 
     # Avoid coercing <FK>_id fields to FK
     if (
@@ -335,7 +335,7 @@ def _get_non_gfk_field(opts, name):
         and hasattr(field, "attname")
         and field.attname == name
     ):
-        raise FieldIsAForeignKeyColumnName()
+        raise FieldIsAForeignKeyColumnName
 
     return field
 

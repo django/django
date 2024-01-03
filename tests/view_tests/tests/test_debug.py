@@ -1008,7 +1008,7 @@ class ExceptionReporterTests(SimpleTestCase):
                     return b"EXC\xe9EXC"
 
             somevar = b"VAL\xe9VAL"  # NOQA
-            raise NonUtf8Output()
+            raise NonUtf8Output
         except Exception:
             exc_type, exc_value, tb = sys.exc_info()
         reporter = ExceptionReporter(None, exc_type, exc_value, tb)
@@ -1039,7 +1039,7 @@ class ExceptionReporterTests(SimpleTestCase):
                     raise MemoryError("OOM")
 
             oomvalue = OomOutput()  # NOQA
-            raise ValueError()
+            raise ValueError
         except Exception:
             exc_type, exc_value, tb = sys.exc_info()
         reporter = ExceptionReporter(None, exc_type, exc_value, tb)
@@ -1057,7 +1057,7 @@ class ExceptionReporterTests(SimpleTestCase):
                     return repr("A" * large)
 
             largevalue = LargeOutput()  # NOQA
-            raise ValueError()
+            raise ValueError
         except Exception:
             exc_type, exc_value, tb = sys.exc_info()
         reporter = ExceptionReporter(None, exc_type, exc_value, tb)
@@ -1173,7 +1173,7 @@ class ExceptionReporterTests(SimpleTestCase):
 
         class ExceptionUser:
             def __str__(self):
-                raise Exception()
+                raise Exception
 
         request = self.rf.get("/test_view/")
         request.user = ExceptionUser()

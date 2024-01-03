@@ -152,7 +152,7 @@ class TestObj:
         return False
 
     def is_bad(self):
-        raise ShouldNotExecuteException()
+        raise ShouldNotExecuteException
 
 
 class SilentGetItemClass:

@@ -44,7 +44,7 @@ def not_in_transaction_using_text(request):
 
 
 def bad_request(request):
-    raise BadRequest()
+    raise BadRequest
 
 
 def suspicious(request):

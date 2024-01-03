@@ -227,7 +227,7 @@ class ASGIHandler(base.BaseHandler):
         """Listen for disconnect from the client."""
         message = await receive()
         if message["type"] == "http.disconnect":
-            raise RequestAborted()
+            raise RequestAborted
         # This should never happen.
         assert False, "Invalid ASGI message after request body: %s" % message["type"]
 
@@ -253,7 +253,7 @@ class ASGIHandler(base.BaseHandler):
             if message["type"] == "http.disconnect":
                 body_file.close()
                 # Early client disconnect.
-                raise RequestAborted()
+                raise RequestAborted
             # Add a body chunk from the message, if provided.
             if "body" in message:
                 body_file.write(message["body"])

@@ -71,7 +71,7 @@ def Deserializer(stream_or_string, **options):
     except (GeneratorExit, DeserializationError):
         raise
     except Exception as exc:
-        raise DeserializationError() from exc
+        raise DeserializationError from exc
 
 
 class DjangoJSONEncoder(json.JSONEncoder):

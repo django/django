@@ -74,11 +74,11 @@ class DatabaseCreationTests(SimpleTestCase):
         error = errors.DuplicateDatabase(
             "database %s already exists" % parameters["dbname"]
         )
-        raise DatabaseError() from error
+        raise DatabaseError from error
 
     def _execute_raise_permission_denied(self, cursor, parameters, keepdb=False):
         error = errors.InsufficientPrivilege("permission denied to create database")
-        raise DatabaseError() from error
+        raise DatabaseError from error
 
     def patch_test_db_creation(self, execute_create_test_db):
         return mock.patch.object(

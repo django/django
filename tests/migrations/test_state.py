@@ -359,7 +359,7 @@ class StateTests(SimpleTestCase):
         with self.assertRaises(ValueError):
             with apps.bulk_update():
                 self.assertFalse(apps.ready)
-                raise ValueError()
+                raise ValueError
         self.assertTrue(apps.ready)
 
     def test_render(self):

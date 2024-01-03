@@ -25,7 +25,7 @@ def staff_only_view(request):
     if request.user.is_staff:
         return HttpResponse()
     else:
-        raise CustomTestException()
+        raise CustomTestException
 
 
 @login_required

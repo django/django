@@ -33,7 +33,7 @@ class Tests(TestCase):
 
         def mocked_connect(self):
             if self.settings_dict["NAME"] is None:
-                raise DatabaseError()
+                raise DatabaseError
             return orig_connect(self)
 
         with connection._nodb_cursor() as cursor:
@@ -89,7 +89,7 @@ class Tests(TestCase):
         """
 
         def mocked_connect(self):
-            raise DatabaseError()
+            raise DatabaseError
 
         def mocked_all(self):
             test_connection = copy.copy(connections[DEFAULT_DB_ALIAS])

@@ -20,7 +20,7 @@ def server_error(request):
 
 
 def permission_denied(request):
-    raise PermissionDenied()
+    raise PermissionDenied
 
 
 def exception_in_render(request):

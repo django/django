@@ -1899,7 +1899,7 @@ class TestBadSetUpTestData(TestCase):
     @classmethod
     def setUpTestData(cls):
         # Simulate a broken setUpTestData() method.
-        raise cls.MyException()
+        raise cls.MyException
 
     def test_failure_in_setUpTestData_should_rollback_transaction(self):
         # setUpTestData() should call _rollback_atomics() so that the
