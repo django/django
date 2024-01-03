@@ -368,6 +368,9 @@ a section of code like:
 
     {% block branding %}
     <div id="site-name"><a href="{% url 'admin:index' %}">Polls Administration</a></div>
+    {% if user.is_anonymous %}
+      {% include "admin/color_theme_toggle.html" %}
+    {% endif %}
     {% endblock %}
 
 We use this approach to teach you how to override templates. In an actual
