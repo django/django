@@ -248,6 +248,12 @@ class EmailMessage:
                 else:
                     self.attach(*attachment)
         self.extra_headers = headers or {}
+        self.headers_with_one_occurrence = {
+            "To": self.to,
+            "Cc": self.cc,
+            "Bcc": self.bcc,
+            "Reply-To": self.reply_to,
+        }
         self.connection = connection
 
     def get_connection(self, fail_silently=False):
@@ -286,6 +292,10 @@ class EmailMessage:
                 raise ValueError("Cannot insert repeated headers")
             if name.lower() != "from":  # From is already handled
                 msg[name] = value
+        for header, value_header in self.headers_with_one_occurrence.items():
+            # extra_headers takes precedence over to/cc/bcc/reply_to parameters.
+            if msg.get(header) is None and value_header:
+                msg[header] = ", ".join(str(v) for v in value_header)
         return msg
 
     def recipients(self):
