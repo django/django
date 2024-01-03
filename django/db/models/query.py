@@ -2616,7 +2616,7 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
 
     print("rel_qs: ", rel_qs)
     print("all_related_objects: ", all_related_objects)
-    print("Hai rel_obj_cache: ", rel_obj_cache)
+    print("HOi rel_obj_cache: ", rel_obj_cache)
     return all_related_objects, additional_lookups
 
 class RelatedPopulator:
