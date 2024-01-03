@@ -76,7 +76,7 @@ After the previous tutorials, our project should look like this:
             static/
                 polls/
                     images/
-                        background.gif
+                        background.png
                     style.css
             templates/
                 polls/
