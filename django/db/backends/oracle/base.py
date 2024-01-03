@@ -526,7 +526,7 @@ class FormatStylePlaceholderCursor:
         # it does want a trailing ';' but not a trailing '/'.  However, these
         # characters must be included in the original query in case the query
         # is being passed to SQL*Plus.
-        if query.endswith(";") or query.endswith("/"):
+        if query.endswith((";", "/")):
             query = query[:-1]
         if params is None:
             params = []
