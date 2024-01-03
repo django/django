@@ -1053,18 +1053,28 @@ class DiscoverRunner:
             )
         return databases
 
+    def get_test_modules(self, test_labels):
+        if test_labels:
+            return list(test_labels)
+
+        test_labels = ["."]
+        modules = {
+            test.__module__
+            for label in test_labels
+            for test in iter_test_cases(self.load_tests_for_label(label, {}))
+        }
+
+        return list(modules)
+
     def paired_tests(self, paired_test, test_labels):
-        test_labels = test_labels or ["."]
+        test_labels = self.get_test_modules(test_labels)
 
         print("***** Trying paired execution")
-
         # Make sure the constant member of the pair isn't in the test list
-        # Also remove tests that need to be run in specific combinations
-        for label in [paired_test, "model_inheritance_same_model_name"]:
-            try:
-                test_labels.remove(label)
-            except ValueError:
-                pass
+        try:
+            test_labels.remove(paired_test)
+        except ValueError:
+            pass
 
         for i, label in enumerate(test_labels):
             print(
@@ -1111,28 +1121,27 @@ class DiscoverRunner:
         return 1
 
     def bisect_tests(self, bisection_label, test_labels):
-        test_labels = test_labels or ["."]
+        test_labels = test_labels or self.get_test_modules(test_labels)
 
         print("***** Bisecting test suite: %s" % " ".join(test_labels))
 
         # Make sure the bisection point isn't in the test list
         # Also remove tests that need to be run in specific combinations
-        for label in [bisection_label, "model_inheritance_same_model_name"]:
-            try:
-                test_labels.remove(label)
-            except ValueError:
-                pass
+        try:
+            test_labels.remove(bisection_label)
+        except ValueError:
+            pass
 
-        self.setup_test_environment()
-
-        failures = []
         iteration = 1
         while len(test_labels) > 1:
+            failures = []
             midpoint = len(test_labels) // 2
             test_labels_a = test_labels[:midpoint] + [bisection_label]
             test_labels_b = test_labels[midpoint:] + [bisection_label]
 
             for i, labels in enumerate([test_labels_a, test_labels_b]):
+                self.setup_test_environment()
+
                 if i == 0:
                     print(
                         "***** Pass %da: Running the first half of the test suite"
@@ -1397,3 +1406,66 @@ def test_match_tags(test, tags, exclude_tags):
 def filter_tests_by_tags(tests, tags, exclude_tags):
     """Return the matching tests as an iterator."""
     return (test for test in tests if test_match_tags(test, tags, exclude_tags))
+
+
+'''
+def get_label_module(label):
+    """Return the top-level module part for a test label."""
+    path = Path(label)
+    if len(path.parts) == 1:
+        # Interpret the label as a dotted module name.
+        return label.split(".")[0]
+
+    # Otherwise, interpret the label as a path. Check existence first to
+    # provide a better error message than relative_to() if it doesn't exist.
+    if not path.exists():
+        raise RuntimeError(f"Test label path {label} does not exist")
+    path = path.resolve()
+    rel_path = path.relative_to(RUNTESTS_DIR) # realative to test directory
+    return rel_path.parts[0]
+
+def get_test_modules():
+    """
+    Scan the tests directory and yield the names of all test modules.
+
+    The yielded names have either one dotted part like "test_runner" or, in
+    the case of GIS tests, two dotted parts like "gis_tests.gdal_tests".
+    """
+    discovery_dirs = [""]
+
+    for dirname in discovery_dirs:
+        dirpath = os.path.join(RUNTESTS_DIR, dirname)
+        with os.scandir(dirpath) as entries:
+            for f in entries:
+                if (
+                    "." in f.name
+                    or f.is_file()
+                    or not os.path.exists(os.path.join(f.path, "__init__.py"))
+                ):
+                    continue
+                test_module = f.name
+                if dirname:
+                    test_module = dirname + "." + test_module
+                yield test_module
+'''
+
+
+def get_filtered_test_modules(test_labels=None):
+    if test_labels is None:
+        test_labels = []
+    # Reduce each test label to just the top-level module part.
+    label_modules = set()
+    for label in test_labels:
+        test_module = get_label_module(label)
+        label_modules.add(test_module)
+
+    def _module_match_label(module_name, label):
+        # Exact or ancestor match.
+        return module_name == label or module_name.startswith(label + ".")
+
+    for test_module in get_test_modules():
+        if not test_labels or any(
+            _module_match_label(test_module, label_module)
+            for label_module in label_modules
+        ):
+            yield test_module
