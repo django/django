@@ -161,7 +161,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         # property. This is necessary as the shareability is disabled by
         # default in sqlite3 and it cannot be changed once a connection is
         # opened.
-        if "check_same_thread" in kwargs and kwargs["check_same_thread"]:
+        if kwargs.get("check_same_thread"):
             warnings.warn(
                 "The `check_same_thread` option was provided and set to "
                 "True. It will be overridden with False. Use the "
