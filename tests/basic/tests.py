@@ -13,6 +13,8 @@ from django.test import (
     TransactionTestCase,
     skipUnlessDBFeature,
 )
+from django.test.utils import ignore_warnings
+from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.translation import gettext_lazy
 
 from .models import (
@@ -186,6 +188,50 @@ class ModelInstanceCreationTests(TestCase):
         # default.
         with self.assertNumQueries(2):
             ChildPrimaryKeyWithDefault().save()
+
+    def test_save_deprecation(self):
+        a = Article(headline="original", pub_date=datetime(2014, 5, 16))
+        msg = "Passing positional arguments to save() is deprecated"
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+            a.save(False, False, None, None)
+            self.assertEqual(Article.objects.count(), 1)
+
+    async def test_asave_deprecation(self):
+        a = Article(headline="original", pub_date=datetime(2014, 5, 16))
+        msg = "Passing positional arguments to asave() is deprecated"
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+            await a.asave(False, False, None, None)
+            self.assertEqual(await Article.objects.acount(), 1)
+
+    @ignore_warnings(category=RemovedInDjango60Warning)
+    def test_save_positional_arguments(self):
+        a = Article.objects.create(headline="original", pub_date=datetime(2014, 5, 16))
+        a.headline = "changed"
+
+        a.save(False, False, None, ["pub_date"])
+        a.refresh_from_db()
+        self.assertEqual(a.headline, "original")
+
+        a.headline = "changed"
+        a.save(False, False, None, ["pub_date", "headline"])
+        a.refresh_from_db()
+        self.assertEqual(a.headline, "changed")
+
+    @ignore_warnings(category=RemovedInDjango60Warning)
+    async def test_asave_positional_arguments(self):
+        a = await Article.objects.acreate(
+            headline="original", pub_date=datetime(2014, 5, 16)
+        )
+        a.headline = "changed"
+
+        await a.asave(False, False, None, ["pub_date"])
+        await a.arefresh_from_db()
+        self.assertEqual(a.headline, "original")
+
+        a.headline = "changed"
+        await a.asave(False, False, None, ["pub_date", "headline"])
+        await a.arefresh_from_db()
+        self.assertEqual(a.headline, "changed")
 
 
 class ModelTest(TestCase):

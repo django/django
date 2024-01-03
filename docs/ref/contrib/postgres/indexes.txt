@@ -46,14 +46,23 @@ available from the ``django.contrib.postgres.indexes`` module.
 ``BTreeIndex``
 ==============
 
-.. class:: BTreeIndex(*expressions, fillfactor=None, **options)
+.. class:: BTreeIndex(*expressions, fillfactor=None, deduplicate_items=None, **options)
 
     Creates a B-Tree index.
 
     Provide an integer value from 10 to 100 to the fillfactor_ parameter to
     tune how packed the index pages will be. PostgreSQL's default is 90.
 
+    Provide a boolean value to the deduplicate_items_ parameter to control
+    whether deduplication is enabled. PostgreSQL enables deduplication by
+    default.
+
+    .. versionchanged:: 5.1
+
+        The ``deduplicate_items`` parameter was added.
+
     .. _fillfactor: https://www.postgresql.org/docs/current/sql-createindex.html#SQL-CREATEINDEX-STORAGE-PARAMETERS
+    .. _deduplicate_items: https://www.postgresql.org/docs/current/btree-implementation.html#BTREE-DEDUPLICATION
 
 ``GinIndex``
 ============

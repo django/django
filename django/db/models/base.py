@@ -49,6 +49,7 @@ from django.db.models.signals import (
     pre_save,
 )
 from django.db.models.utils import AltersData, make_model_tuple
+from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.encoding import force_str
 from django.utils.hashable import make_hashable
 from django.utils.text import capfirst, get_text_list
@@ -764,8 +765,17 @@ class Model(AltersData, metaclass=ModelBase):
             return getattr(self, field_name)
         return getattr(self, field.attname)
 
+    # RemovedInDjango60Warning: When the deprecation ends, replace with:
+    # def save(
+    #   self, *, force_insert=False, force_update=False, using=None, update_fields=None,
+    # ):
     def save(
-        self, force_insert=False, force_update=False, using=None, update_fields=None
+        self,
+        *args,
+        force_insert=False,
+        force_update=False,
+        using=None,
+        update_fields=None,
     ):
         """
         Save the current instance. Override this in a subclass if you want to
@@ -775,6 +785,26 @@ class Model(AltersData, metaclass=ModelBase):
         that the "save" must be an SQL insert or update (or equivalent for
         non-SQL backends), respectively. Normally, they should not be set.
         """
+        # RemovedInDjango60Warning.
+        if args:
+            warnings.warn(
+                "Passing positional arguments to save() is deprecated",
+                RemovedInDjango60Warning,
+                stacklevel=2,
+            )
+            for arg, attr in zip(
+                args, ["force_insert", "force_update", "using", "update_fields"]
+            ):
+                if arg:
+                    if attr == "force_insert":
+                        force_insert = arg
+                    elif attr == "force_update":
+                        force_update = arg
+                    elif attr == "using":
+                        using = arg
+                    else:
+                        update_fields = arg
+
         self._prepare_related_fields_for_save(operation_name="save")
 
         using = using or router.db_for_write(self.__class__, instance=self)
@@ -828,9 +858,38 @@ class Model(AltersData, metaclass=ModelBase):
 
     save.alters_data = True
 
+    # RemovedInDjango60Warning: When the deprecation ends, replace with:
+    # async def asave(
+    #   self, *, force_insert=False, force_update=False, using=None, update_fields=None,
+    # ):
     async def asave(
-        self, force_insert=False, force_update=False, using=None, update_fields=None
+        self,
+        *args,
+        force_insert=False,
+        force_update=False,
+        using=None,
+        update_fields=None,
     ):
+        # RemovedInDjango60Warning.
+        if args:
+            warnings.warn(
+                "Passing positional arguments to asave() is deprecated",
+                RemovedInDjango60Warning,
+                stacklevel=2,
+            )
+            for arg, attr in zip(
+                args, ["force_insert", "force_update", "using", "update_fields"]
+            ):
+                if arg:
+                    if attr == "force_insert":
+                        force_insert = arg
+                    elif attr == "force_update":
+                        force_update = arg
+                    elif attr == "using":
+                        using = arg
+                    else:
+                        update_fields = arg
+
         return await sync_to_async(self.save)(
             force_insert=force_insert,
             force_update=force_update,

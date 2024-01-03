@@ -116,7 +116,7 @@ are loaded from the database::
         return instance
 
 
-    def save(self, *args, **kwargs):
+    def save(self, **kwargs):
         # Check how the current values differ from ._loaded_values. For example,
         # prevent changing the creator_id of the model. (This example doesn't
         # support cases where 'creator_id' is deferred).
@@ -124,7 +124,7 @@ are loaded from the database::
             self.creator_id != self._loaded_values["creator_id"]
         ):
             raise ValueError("Updating the value of creator isn't allowed")
-        super().save(*args, **kwargs)
+        super().save(**kwargs)
 
 The example above shows a full ``from_db()`` implementation to clarify how that
 is done. In this case it would be possible to use a ``super()`` call in the
@@ -410,8 +410,8 @@ Saving objects
 
 To save an object back to the database, call ``save()``:
 
-.. method:: Model.save(force_insert=False, force_update=False, using=DEFAULT_DB_ALIAS, update_fields=None)
-.. method:: Model.asave(force_insert=False, force_update=False, using=DEFAULT_DB_ALIAS, update_fields=None)
+.. method:: Model.save(*, force_insert=False, force_update=False, using=DEFAULT_DB_ALIAS, update_fields=None)
+.. method:: Model.asave(*, force_insert=False, force_update=False, using=DEFAULT_DB_ALIAS, update_fields=None)
 
 *Asynchronous version*: ``asave()``
 
@@ -423,6 +423,10 @@ If you want customized saving behavior, you can override this ``save()``
 method. See :ref:`overriding-model-methods` for more details.
 
 The model save process also has some subtleties; see the sections below.
+
+.. deprecated:: 5.1
+
+    Support for positional arguments is deprecated.
 
 Auto-incrementing primary keys
 ------------------------------
