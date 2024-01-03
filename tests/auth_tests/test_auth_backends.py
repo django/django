@@ -94,15 +94,17 @@ class BaseModelBackendTest:
 
     backend = "django.contrib.auth.backends.ModelBackend"
 
+    @classmethod
+    def setUpClass(cls):
+        cls.enterClassContext(
+            modify_settings(AUTHENTICATION_BACKENDS={"append": cls.backend})
+        )
+        super().setUpClass()
+
     def setUp(self):
         # The custom_perms test messes with ContentTypes, which will be cached.
         # Flush the cache to ensure there are no side effects.
         self.addCleanup(ContentType.objects.clear_cache)
-        patched_settings = modify_settings(
-            AUTHENTICATION_BACKENDS={"append": self.backend},
-        )
-        patched_settings.enable()
-        self.addCleanup(patched_settings.disable)
         self.create_users()
 
     def test_has_perm(self):

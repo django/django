@@ -4,15 +4,15 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.test import SimpleTestCase, override_settings
 from django.utils import translation
-from django.utils.translation import activate, deactivate
 
 
 class LocalizedTimeTests(SimpleTestCase):
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         # nl/formats.py has customized TIME_INPUT_FORMATS:
         # ['%H:%M:%S', '%H.%M:%S', '%H.%M', '%H:%M']
-        activate("nl")
-        self.addCleanup(deactivate)
+        cls.enterClassContext(translation.override("nl"))
+        super().setUpClass()
 
     def test_timeField(self):
         "TimeFields can parse dates in the default format"
@@ -319,9 +319,10 @@ class SimpleTimeFormatTests(SimpleTestCase):
 
 
 class LocalizedDateTests(SimpleTestCase):
-    def setUp(self):
-        activate("de")
-        self.addCleanup(deactivate)
+    @classmethod
+    def setUpClass(cls):
+        cls.enterClassContext(translation.override("de"))
+        super().setUpClass()
 
     def test_dateField(self):
         "DateFields can parse dates in the default format"
@@ -631,9 +632,10 @@ class SimpleDateFormatTests(SimpleTestCase):
 
 
 class LocalizedDateTimeTests(SimpleTestCase):
-    def setUp(self):
-        activate("de")
-        self.addCleanup(deactivate)
+    @classmethod
+    def setUpClass(cls):
+        cls.enterClassContext(translation.override("de"))
+        super().setUpClass()
 
     def test_dateTimeField(self):
         "DateTimeFields can parse dates in the default format"
