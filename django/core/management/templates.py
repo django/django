@@ -118,7 +118,7 @@ class TemplateCommand(BaseCommand):
         extra_files = []
         excluded_directories = [".git", "__pycache__"]
         for file in options["files"]:
-            extra_files.extend([s.strip() for s in file.split(",")])
+            extra_files.extend(s.strip() for s in file.split(","))
         if exclude := options.get("exclude"):
             for directory in exclude:
                 excluded_directories.append(directory.strip())
