@@ -130,7 +130,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         )
 
     def test_headers_not_repeated(self):
-        tests = ["To", "Cc", "Bcc", "Reply_To"]
+        tests = ["To", "Cc", "Reply_To"]
         for header in tests:
             with self.subTest(header=header):
                 header_attr = header.lower()

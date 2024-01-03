@@ -251,7 +251,6 @@ class EmailMessage:
         self.headers_with_one_occurrence = {
             "To": self.to,
             "Cc": self.cc,
-            "Bcc": self.bcc,
             "Reply-To": self.reply_to,
         }
         self.connection = connection
