@@ -10,6 +10,7 @@ repos:
       - id: blacken-docs
         additional_dependencies:
         - black==23.10.0
+        files: 'docs/.*\.txt$'
   - repo: https://github.com/PyCQA/isort
     rev: 5.12.0
     hooks:
