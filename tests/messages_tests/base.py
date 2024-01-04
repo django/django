@@ -31,29 +31,32 @@ class BaseTests:
         "error": constants.ERROR,
     }
 
-    def setUp(self):
-        settings_override = override_settings(
-            TEMPLATES=[
-                {
-                    "BACKEND": "django.template.backends.django.DjangoTemplates",
-                    "DIRS": [],
-                    "APP_DIRS": True,
-                    "OPTIONS": {
-                        "context_processors": (
-                            "django.contrib.auth.context_processors.auth",
-                            "django.contrib.messages.context_processors.messages",
-                        ),
-                    },
-                }
-            ],
-            ROOT_URLCONF="messages_tests.urls",
-            MESSAGE_TAGS={},
-            MESSAGE_STORAGE="%s.%s"
-            % (self.storage_class.__module__, self.storage_class.__name__),
-            SESSION_SERIALIZER="django.contrib.sessions.serializers.JSONSerializer",
+    @classmethod
+    def setUpClass(cls):
+        cls.enterClassContext(
+            override_settings(
+                TEMPLATES=[
+                    {
+                        "BACKEND": "django.template.backends.django.DjangoTemplates",
+                        "DIRS": [],
+                        "APP_DIRS": True,
+                        "OPTIONS": {
+                            "context_processors": (
+                                "django.contrib.auth.context_processors.auth",
+                                "django.contrib.messages.context_processors.messages",
+                            ),
+                        },
+                    }
+                ],
+                ROOT_URLCONF="messages_tests.urls",
+                MESSAGE_TAGS={},
+                MESSAGE_STORAGE=(
+                    f"{cls.storage_class.__module__}.{cls.storage_class.__name__}"
+                ),
+                SESSION_SERIALIZER="django.contrib.sessions.serializers.JSONSerializer",
+            )
         )
-        settings_override.enable()
-        self.addCleanup(settings_override.disable)
+        super().setUpClass()
 
     def get_request(self):
         return HttpRequest()

@@ -1172,10 +1172,10 @@ class PythonGlobalState(SimpleTestCase):
 class BaseEmailBackendTests(HeadersCheckMixin):
     email_backend = None
 
-    def setUp(self):
-        settings_override = override_settings(EMAIL_BACKEND=self.email_backend)
-        settings_override.enable()
-        self.addCleanup(settings_override.disable)
+    @classmethod
+    def setUpClass(cls):
+        cls.enterClassContext(override_settings(EMAIL_BACKEND=cls.email_backend))
+        super().setUpClass()
 
     def assertStartsWith(self, first, second):
         if not first.startswith(second):

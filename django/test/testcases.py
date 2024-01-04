@@ -211,13 +211,9 @@ class SimpleTestCase(unittest.TestCase):
     def setUpClass(cls):
         super().setUpClass()
         if cls._overridden_settings:
-            cls._cls_overridden_context = override_settings(**cls._overridden_settings)
-            cls._cls_overridden_context.enable()
-            cls.addClassCleanup(cls._cls_overridden_context.disable)
+            cls.enterClassContext(override_settings(**cls._overridden_settings))
         if cls._modified_settings:
-            cls._cls_modified_context = modify_settings(cls._modified_settings)
-            cls._cls_modified_context.enable()
-            cls.addClassCleanup(cls._cls_modified_context.disable)
+            cls.enterClassContext(modify_settings(cls._modified_settings))
         cls._add_databases_failures()
         cls.addClassCleanup(cls._remove_databases_failures)
 
@@ -1732,11 +1728,9 @@ class LiveServerTestCase(TransactionTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls._live_server_modified_settings = modify_settings(
-            ALLOWED_HOSTS={"append": cls.allowed_host},
+        cls.enterClassContext(
+            modify_settings(ALLOWED_HOSTS={"append": cls.allowed_host})
         )
-        cls._live_server_modified_settings.enable()
-        cls.addClassCleanup(cls._live_server_modified_settings.disable)
         cls._start_server_thread()
 
     @classmethod
