@@ -11,12 +11,7 @@ from django.db import (
 )
 from django.db.models import FileField, Value
 from django.db.models.functions import Lower, Now
-from django.test import (
-    TestCase,
-    override_settings,
-    skipIfDBFeature,
-    skipUnlessDBFeature,
-)
+from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
 from .models import (
     BigAutoFieldModel,
@@ -212,7 +207,7 @@ class BulkCreateTests(TestCase):
 
     @skipUnlessDBFeature("has_bulk_insert")
     def test_large_batch_efficiency(self):
-        with override_settings(DEBUG=True):
+        with self.settings(DEBUG=True):
             connection.queries_log.clear()
             TwoFields.objects.bulk_create(
                 [TwoFields(f1=i, f2=i + 1) for i in range(0, 1001)]
@@ -243,7 +238,7 @@ class BulkCreateTests(TestCase):
         Test inserting a large batch with objects having primary key set
         mixed together with objects without PK set.
         """
-        with override_settings(DEBUG=True):
+        with self.settings(DEBUG=True):
             connection.queries_log.clear()
             TwoFields.objects.bulk_create(
                 [

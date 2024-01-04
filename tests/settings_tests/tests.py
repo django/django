@@ -435,7 +435,7 @@ class IsOverriddenTest(SimpleTestCase):
 
     def test_override(self):
         self.assertFalse(settings.is_overridden("ALLOWED_HOSTS"))
-        with override_settings(ALLOWED_HOSTS=[]):
+        with self.settings(ALLOWED_HOSTS=[]):
             self.assertTrue(settings.is_overridden("ALLOWED_HOSTS"))
 
     def test_unevaluated_lazysettings_repr(self):

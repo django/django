@@ -3,7 +3,7 @@ from decimal import Decimal
 
 from django.contrib.humanize.templatetags import humanize
 from django.template import Context, Template, defaultfilters
-from django.test import SimpleTestCase, modify_settings, override_settings
+from django.test import SimpleTestCase, modify_settings
 from django.utils import translation
 from django.utils.html import escape
 from django.utils.timezone import get_fixed_timezone
@@ -363,7 +363,7 @@ class HumanizeTests(SimpleTestCase):
 
         orig_humanize_datetime, humanize.datetime = humanize.datetime, MockDateTime
         try:
-            with override_settings(TIME_ZONE="America/Chicago", USE_TZ=True):
+            with self.settings(TIME_ZONE="America/Chicago", USE_TZ=True):
                 with translation.override("en"):
                     self.humanize_tester([dt], ["yesterday"], "naturalday")
         finally:
@@ -433,7 +433,7 @@ class HumanizeTests(SimpleTestCase):
         try:
             with translation.override("en"):
                 self.humanize_tester(test_list, result_list, "naturaltime")
-                with override_settings(USE_TZ=True):
+                with self.settings(USE_TZ=True):
                     self.humanize_tester(
                         test_list, result_list_with_tz_support, "naturaltime"
                     )

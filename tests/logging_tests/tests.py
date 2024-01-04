@@ -513,9 +513,7 @@ class SetupConfigureLogging(SimpleTestCase):
         from django import setup
 
         try:
-            with override_settings(
-                LOGGING_CONFIG="logging_tests.tests.dictConfig",
-            ):
+            with self.settings(LOGGING_CONFIG="logging_tests.tests.dictConfig"):
                 setup()
         finally:
             # Restore logging from settings.

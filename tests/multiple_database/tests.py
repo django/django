@@ -1361,7 +1361,7 @@ class RouterTestCase(TestCase):
         self.assertTrue(router.allow_migrate_model("other", User))
         self.assertTrue(router.allow_migrate_model("other", Book))
 
-        with override_settings(DATABASE_ROUTERS=[TestRouter(), AuthRouter()]):
+        with self.settings(DATABASE_ROUTERS=[TestRouter(), AuthRouter()]):
             # Add the auth router to the chain. TestRouter is a universal
             # synchronizer, so it should have no effect.
             self.assertTrue(router.allow_migrate_model("default", User))
@@ -1370,7 +1370,7 @@ class RouterTestCase(TestCase):
             self.assertTrue(router.allow_migrate_model("other", User))
             self.assertTrue(router.allow_migrate_model("other", Book))
 
-        with override_settings(DATABASE_ROUTERS=[AuthRouter(), TestRouter()]):
+        with self.settings(DATABASE_ROUTERS=[AuthRouter(), TestRouter()]):
             # Now check what happens if the router order is reversed.
             self.assertFalse(router.allow_migrate_model("default", User))
             self.assertTrue(router.allow_migrate_model("default", Book))
@@ -1397,7 +1397,7 @@ class RouterTestCase(TestCase):
         self.assertTrue(router.allow_migrate_model("default", User))
         self.assertTrue(router.allow_migrate_model("default", Book))
 
-        with override_settings(
+        with self.settings(
             DATABASE_ROUTERS=[WriteRouter(), AuthRouter(), TestRouter()]
         ):
             self.assertEqual(router.db_for_read(User), "default")
@@ -2051,7 +2051,7 @@ class SignalTests(TestCase):
     databases = {"default", "other"}
 
     def override_router(self):
-        return override_settings(DATABASE_ROUTERS=[WriteToOtherRouter()])
+        return self.settings(DATABASE_ROUTERS=[WriteToOtherRouter()])
 
     def test_database_arg_save_and_delete(self):
         """
@@ -2155,7 +2155,7 @@ class RouterAttributeErrorTestCase(TestCase):
     databases = {"default", "other"}
 
     def override_router(self):
-        return override_settings(DATABASE_ROUTERS=[AttributeErrorRouter()])
+        return self.settings(DATABASE_ROUTERS=[AttributeErrorRouter()])
 
     def test_attribute_error_read(self):
         "The AttributeError from AttributeErrorRouter bubbles up"
@@ -2266,7 +2266,7 @@ class MigrateTestCase(TestCase):
         cts = ContentType.objects.using("other").filter(app_label="multiple_database")
 
         cts.delete()
-        with override_settings(DATABASE_ROUTERS=[SyncOnlyDefaultDatabaseRouter()]):
+        with self.settings(DATABASE_ROUTERS=[SyncOnlyDefaultDatabaseRouter()]):
             management.call_command(
                 "migrate", verbosity=0, interactive=False, database="other"
             )
@@ -2291,7 +2291,7 @@ class RouteForWriteTestCase(TestCase):
             raise RouterUsed(mode=RouterUsed.WRITE, model=model, hints=hints)
 
     def override_router(self):
-        return override_settings(
+        return self.settings(
             DATABASE_ROUTERS=[RouteForWriteTestCase.WriteCheckRouter()]
         )
 

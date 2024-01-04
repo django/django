@@ -248,9 +248,7 @@ class SecurityMiddlewareTest(SimpleTestCase):
             (("strict-origin", "origin"), "strict-origin,origin"),
         )
         for value, expected in tests:
-            with self.subTest(value=value), override_settings(
-                SECURE_REFERRER_POLICY=value
-            ):
+            with self.subTest(value=value), self.settings(SECURE_REFERRER_POLICY=value):
                 self.assertEqual(
                     self.process_response().headers["Referrer-Policy"],
                     expected,
@@ -287,7 +285,7 @@ class SecurityMiddlewareTest(SimpleTestCase):
         """
         tests = ["same-origin", "same-origin-allow-popups", "unsafe-none"]
         for value in tests:
-            with self.subTest(value=value), override_settings(
+            with self.subTest(value=value), self.settings(
                 SECURE_CROSS_ORIGIN_OPENER_POLICY=value,
             ):
                 self.assertEqual(

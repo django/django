@@ -1174,7 +1174,7 @@ class BaseEmailBackendTests(HeadersCheckMixin):
 
     @classmethod
     def setUpClass(cls):
-        cls.enterClassContext(override_settings(EMAIL_BACKEND=cls.email_backend))
+        cls.enterClassContext(cls.settings(EMAIL_BACKEND=cls.email_backend))
         super().setUpClass()
 
     def assertStartsWith(self, first, second):
@@ -1573,7 +1573,7 @@ class FileBackendTests(BaseEmailBackendTests, SimpleTestCase):
         super().setUp()
         self.tmp_dir = self.mkdtemp()
         self.addCleanup(shutil.rmtree, self.tmp_dir)
-        _settings_override = override_settings(EMAIL_FILE_PATH=self.tmp_dir)
+        _settings_override = self.settings(EMAIL_FILE_PATH=self.tmp_dir)
         _settings_override.enable()
         self.addCleanup(_settings_override.disable)
 
@@ -1728,7 +1728,7 @@ class SMTPBackendTestsBase(SimpleTestCase):
             hostname="127.0.0.1",
             port=port,
         )
-        cls._settings_override = override_settings(
+        cls._settings_override = cls.settings(
             EMAIL_HOST=cls.smtp_controller.hostname,
             EMAIL_PORT=cls.smtp_controller.port,
         )

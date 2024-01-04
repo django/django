@@ -1112,7 +1112,7 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
                 expected_caption = "{:s} {:d}".format(may_translation.upper(), 1984)
 
                 # Every locale.
-                with override_settings(LANGUAGE_CODE=language_code):
+                with self.settings(LANGUAGE_CODE=language_code):
                     # Open a page that has a date picker widget.
                     self.selenium.get(self.live_server_url + url)
                     # Click on the calendar icon.

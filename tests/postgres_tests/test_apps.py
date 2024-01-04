@@ -5,7 +5,7 @@ from django.db import connection
 from django.db.backends.signals import connection_created
 from django.db.migrations.writer import MigrationWriter
 from django.test import TestCase
-from django.test.utils import CaptureQueriesContext, modify_settings, override_settings
+from django.test.utils import CaptureQueriesContext, modify_settings
 
 try:
     from django.contrib.postgres.fields import (
@@ -33,7 +33,7 @@ class PostgresConfigTests(TestCase):
         # "django.contrib.postgres" app.
         get_hstore_oids.cache_clear()
         with CaptureQueriesContext(connection) as captured_queries:
-            with override_settings(INSTALLED_APPS=["django.contrib.postgres"]):
+            with self.settings(INSTALLED_APPS=["django.contrib.postgres"]):
                 pass
         self.assertGreaterEqual(len(captured_queries), 1)
 

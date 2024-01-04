@@ -3570,7 +3570,7 @@ class AutodetectorTests(BaseAutodetectorTests):
     def test_swappable_changed(self):
         with isolate_lru_cache(apps.get_swappable_settings_name):
             before = self.make_project_state([self.custom_user, self.author_with_user])
-            with override_settings(AUTH_USER_MODEL="thirdapp.CustomUser"):
+            with self.settings(AUTH_USER_MODEL="thirdapp.CustomUser"):
                 after = self.make_project_state(
                     [self.custom_user, self.author_with_custom_user]
                 )

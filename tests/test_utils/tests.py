@@ -1751,12 +1751,12 @@ class OverrideSettingsTests(SimpleTestCase):
         with self.assertRaises(NoReverseMatch):
             reverse("second")
 
-        with override_settings(ROOT_URLCONF=FirstUrls):
+        with self.settings(ROOT_URLCONF=FirstUrls):
             self.client.get(reverse("first"))
             with self.assertRaises(NoReverseMatch):
                 reverse("second")
 
-            with override_settings(ROOT_URLCONF=SecondUrls):
+            with self.settings(ROOT_URLCONF=SecondUrls):
                 with self.assertRaises(NoReverseMatch):
                     reverse("first")
                 self.client.get(reverse("second"))

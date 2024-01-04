@@ -270,7 +270,7 @@ class MigrateTests(MigrationTestBase):
 
     @skipUnlessDBFeature("ignores_table_name_case")
     def test_migrate_fake_initial_case_insensitive(self):
-        with override_settings(
+        with self.settings(
             MIGRATION_MODULES={
                 "migrations": "migrations.test_fake_initial_case_insensitive.initial",
             }
@@ -278,7 +278,7 @@ class MigrateTests(MigrationTestBase):
             call_command("migrate", "migrations", "0001", verbosity=0)
             call_command("migrate", "migrations", "zero", fake=True, verbosity=0)
 
-        with override_settings(
+        with self.settings(
             MIGRATION_MODULES={
                 "migrations": (
                     "migrations.test_fake_initial_case_insensitive.fake_initial"

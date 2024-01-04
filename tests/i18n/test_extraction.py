@@ -618,7 +618,7 @@ class JavaScriptExtractorTests(ExtractorTests):
         """
         Regression test for #23583.
         """
-        with override_settings(
+        with self.settings(
             STATIC_ROOT=os.path.join(self.test_dir, "static/"),
             MEDIA_ROOT=os.path.join(self.test_dir, "media_root/"),
         ):
@@ -692,7 +692,7 @@ class IgnoredExtractorTests(ExtractorTests):
         self.assertNotMsgId("This should be ignored too.", po_contents)
 
     def test_media_static_dirs_ignored(self):
-        with override_settings(
+        with self.settings(
             STATIC_ROOT=os.path.join(self.test_dir, "static/"),
             MEDIA_ROOT=os.path.join(self.test_dir, "media_root/"),
         ):
@@ -1029,7 +1029,7 @@ class CustomLayoutExtractionTests(ExtractorTests):
         * translations for an app containing a locale folder are stored in that folder
         * translations outside of that app are in LOCALE_PATHS[0]
         """
-        with override_settings(LOCALE_PATHS=[locale_path]):
+        with self.settings(LOCALE_PATHS=[locale_path]):
             management.call_command("makemessages", locale=[LOCALE], verbosity=0)
             project_de_locale = os.path.join(
                 self.test_dir, "project_locale", "de", "LC_MESSAGES", "django.po"

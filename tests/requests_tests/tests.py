@@ -164,7 +164,7 @@ class RequestsTests(SimpleTestCase):
         The FORCE_SCRIPT_NAME setting takes precedence over the request's
         SCRIPT_NAME environment parameter (#20169).
         """
-        with override_settings(FORCE_SCRIPT_NAME="/FORCED_PREFIX/"):
+        with self.settings(FORCE_SCRIPT_NAME="/FORCED_PREFIX/"):
             request = WSGIRequest(
                 {
                     "PATH_INFO": "/somepath/",
@@ -181,7 +181,7 @@ class RequestsTests(SimpleTestCase):
         the FORCE_SCRIPT_NAME setting has a trailing slash (#20169).
         """
         # With trailing slash
-        with override_settings(FORCE_SCRIPT_NAME="/FORCED_PREFIX/"):
+        with self.settings(FORCE_SCRIPT_NAME="/FORCED_PREFIX/"):
             request = WSGIRequest(
                 {
                     "PATH_INFO": "/somepath/",
@@ -191,7 +191,7 @@ class RequestsTests(SimpleTestCase):
             )
             self.assertEqual(request.path, "/FORCED_PREFIX/somepath/")
         # Without trailing slash
-        with override_settings(FORCE_SCRIPT_NAME="/FORCED_PREFIX"):
+        with self.settings(FORCE_SCRIPT_NAME="/FORCED_PREFIX"):
             request = WSGIRequest(
                 {
                     "PATH_INFO": "/somepath/",

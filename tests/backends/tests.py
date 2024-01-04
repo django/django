@@ -344,7 +344,7 @@ class BackendTestCase(TransactionTestCase):
         self.assertEqual(Square.objects.count(), 5)
 
         args = ((i, i**2) for i in range(3, 7))
-        with override_settings(DEBUG=True):
+        with self.settings(DEBUG=True):
             # same test for DebugCursorWrapper
             self.create_squares_with_executemany(args)
         self.assertEqual(Square.objects.count(), 9)
@@ -373,7 +373,7 @@ class BackendTestCase(TransactionTestCase):
         self.assertEqual(Square.objects.count(), 5)
 
         args = ({"root": i, "square": i**2} for i in range(3, 7))
-        with override_settings(DEBUG=True):
+        with self.settings(DEBUG=True):
             # same test for DebugCursorWrapper
             self.create_squares(args, "pyformat", multiple=True)
         self.assertEqual(Square.objects.count(), 9)

@@ -46,10 +46,10 @@ class TestRunserver(StaticFilesTestCase):
         handler = command.get_handler(use_static_handler=True, insecure_serving=True)
         missing_static_file = os.path.join(settings.STATIC_URL, "unknown.css")
         req = RequestFactory().get(missing_static_file)
-        with override_settings(DEBUG=False):
+        with self.settings(DEBUG=False):
             response = handler.get_response(req)
             self.assertEqual(response.status_code, 404)
-        with override_settings(DEBUG=True):
+        with self.settings(DEBUG=True):
             response = handler.get_response(req)
             self.assertEqual(response.status_code, 404)
 
@@ -130,7 +130,7 @@ class TestConfiguration(StaticFilesTestCase):
         msg = "without having set the STATIC_ROOT setting to a filesystem path"
         err = StringIO()
         for root in ["", None]:
-            with override_settings(STATIC_ROOT=root):
+            with self.settings(STATIC_ROOT=root):
                 with self.assertRaisesMessage(ImproperlyConfigured, msg):
                     call_command(
                         "collectstatic", interactive=False, verbosity=0, stderr=err
@@ -358,7 +358,7 @@ class TestInteractiveMessages(CollectionTestCase):
         with tempfile.TemporaryDirectory(
             prefix="collectstatic_empty_staticdir_test"
         ) as static_dir:
-            with override_settings(STATIC_ROOT=static_dir):
+            with self.settings(STATIC_ROOT=static_dir):
                 call_command("collectstatic", interactive=True, stdout=stdout)
         output = stdout.getvalue()
         self.assertNotIn(self.overwrite_warning_msg, output)

@@ -10,7 +10,7 @@ from unittest import mock
 from django.core.management import CommandError, call_command, execute_from_command_line
 from django.core.management.commands.makemessages import Command as MakeMessagesCommand
 from django.core.management.utils import find_command
-from django.test import SimpleTestCase, override_settings
+from django.test import SimpleTestCase
 from django.test.utils import captured_stderr, captured_stdout
 from django.utils import translation
 from django.utils.translation import gettext
@@ -91,13 +91,13 @@ class MultipleLocaleCompilationTests(MessageCompilationTests):
         self.MO_FILE_FR = os.path.join(localedir, "fr/LC_MESSAGES/django.mo")
 
     def test_one_locale(self):
-        with override_settings(LOCALE_PATHS=[os.path.join(self.test_dir, "locale")]):
+        with self.settings(LOCALE_PATHS=[os.path.join(self.test_dir, "locale")]):
             call_command("compilemessages", locale=["hr"], verbosity=0)
 
             self.assertTrue(os.path.exists(self.MO_FILE_HR))
 
     def test_multiple_locales(self):
-        with override_settings(LOCALE_PATHS=[os.path.join(self.test_dir, "locale")]):
+        with self.settings(LOCALE_PATHS=[os.path.join(self.test_dir, "locale")]):
             call_command("compilemessages", locale=["hr", "fr"], verbosity=0)
 
             self.assertTrue(os.path.exists(self.MO_FILE_HR))
@@ -294,14 +294,14 @@ class FuzzyTranslationTest(ProjectAndAppTests):
         gettext_module._translations = {}  # flush cache or test will be useless
 
     def test_nofuzzy_compiling(self):
-        with override_settings(LOCALE_PATHS=[os.path.join(self.test_dir, "locale")]):
+        with self.settings(LOCALE_PATHS=[os.path.join(self.test_dir, "locale")]):
             call_command("compilemessages", locale=[self.LOCALE], verbosity=0)
             with translation.override(self.LOCALE):
                 self.assertEqual(gettext("Lenin"), "Ленин")
                 self.assertEqual(gettext("Vodka"), "Vodka")
 
     def test_fuzzy_compiling(self):
-        with override_settings(LOCALE_PATHS=[os.path.join(self.test_dir, "locale")]):
+        with self.settings(LOCALE_PATHS=[os.path.join(self.test_dir, "locale")]):
             call_command(
                 "compilemessages", locale=[self.LOCALE], fuzzy=True, verbosity=0
             )
@@ -321,6 +321,6 @@ class PathLibLocaleCompilationTests(MessageCompilationTests):
     work_subdir = "exclude"
 
     def test_locale_paths_pathlib(self):
-        with override_settings(LOCALE_PATHS=[Path(self.test_dir) / "canned_locale"]):
+        with self.settings(LOCALE_PATHS=[Path(self.test_dir) / "canned_locale"]):
             call_command("compilemessages", locale=["fr"], verbosity=0)
             self.assertTrue(os.path.exists("canned_locale/fr/LC_MESSAGES/django.mo"))

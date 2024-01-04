@@ -724,11 +724,11 @@ class XFrameOptionsMiddlewareTest(SimpleTestCase):
         The X_FRAME_OPTIONS setting can be set to SAMEORIGIN to have the
         middleware use that value for the HTTP header.
         """
-        with override_settings(X_FRAME_OPTIONS="SAMEORIGIN"):
+        with self.settings(X_FRAME_OPTIONS="SAMEORIGIN"):
             r = XFrameOptionsMiddleware(get_response_empty)(HttpRequest())
             self.assertEqual(r.headers["X-Frame-Options"], "SAMEORIGIN")
 
-        with override_settings(X_FRAME_OPTIONS="sameorigin"):
+        with self.settings(X_FRAME_OPTIONS="sameorigin"):
             r = XFrameOptionsMiddleware(get_response_empty)(HttpRequest())
             self.assertEqual(r.headers["X-Frame-Options"], "SAMEORIGIN")
 
@@ -737,11 +737,11 @@ class XFrameOptionsMiddlewareTest(SimpleTestCase):
         The X_FRAME_OPTIONS setting can be set to DENY to have the middleware
         use that value for the HTTP header.
         """
-        with override_settings(X_FRAME_OPTIONS="DENY"):
+        with self.settings(X_FRAME_OPTIONS="DENY"):
             r = XFrameOptionsMiddleware(get_response_empty)(HttpRequest())
             self.assertEqual(r.headers["X-Frame-Options"], "DENY")
 
-        with override_settings(X_FRAME_OPTIONS="deny"):
+        with self.settings(X_FRAME_OPTIONS="deny"):
             r = XFrameOptionsMiddleware(get_response_empty)(HttpRequest())
             self.assertEqual(r.headers["X-Frame-Options"], "DENY")
 
@@ -750,8 +750,8 @@ class XFrameOptionsMiddlewareTest(SimpleTestCase):
         If the X_FRAME_OPTIONS setting is not set then it defaults to
         DENY.
         """
-        with override_settings(X_FRAME_OPTIONS=None):
-            del settings.X_FRAME_OPTIONS  # restored by override_settings
+        with self.settings(X_FRAME_OPTIONS=None):
+            del settings.X_FRAME_OPTIONS  # Restored by self.settings().
             r = XFrameOptionsMiddleware(get_response_empty)(HttpRequest())
             self.assertEqual(r.headers["X-Frame-Options"], "DENY")
 
@@ -771,11 +771,11 @@ class XFrameOptionsMiddlewareTest(SimpleTestCase):
             response.headers["X-Frame-Options"] = "DENY"
             return response
 
-        with override_settings(X_FRAME_OPTIONS="DENY"):
+        with self.settings(X_FRAME_OPTIONS="DENY"):
             r = XFrameOptionsMiddleware(same_origin_response)(HttpRequest())
             self.assertEqual(r.headers["X-Frame-Options"], "SAMEORIGIN")
 
-        with override_settings(X_FRAME_OPTIONS="SAMEORIGIN"):
+        with self.settings(X_FRAME_OPTIONS="SAMEORIGIN"):
             r = XFrameOptionsMiddleware(deny_response)(HttpRequest())
             self.assertEqual(r.headers["X-Frame-Options"], "DENY")
 
@@ -795,7 +795,7 @@ class XFrameOptionsMiddlewareTest(SimpleTestCase):
             response.xframe_options_exempt = False
             return response
 
-        with override_settings(X_FRAME_OPTIONS="SAMEORIGIN"):
+        with self.settings(X_FRAME_OPTIONS="SAMEORIGIN"):
             r = XFrameOptionsMiddleware(xframe_not_exempt_response)(HttpRequest())
             self.assertEqual(r.headers["X-Frame-Options"], "SAMEORIGIN")
 
@@ -823,7 +823,7 @@ class XFrameOptionsMiddlewareTest(SimpleTestCase):
             response.sameorigin = True
             return response
 
-        with override_settings(X_FRAME_OPTIONS="DENY"):
+        with self.settings(X_FRAME_OPTIONS="DENY"):
             r = OtherXFrameOptionsMiddleware(same_origin_response)(HttpRequest())
             self.assertEqual(r.headers["X-Frame-Options"], "SAMEORIGIN")
 
@@ -832,7 +832,7 @@ class XFrameOptionsMiddlewareTest(SimpleTestCase):
             r = OtherXFrameOptionsMiddleware(get_response_empty)(request)
             self.assertEqual(r.headers["X-Frame-Options"], "SAMEORIGIN")
 
-        with override_settings(X_FRAME_OPTIONS="SAMEORIGIN"):
+        with self.settings(X_FRAME_OPTIONS="SAMEORIGIN"):
             r = OtherXFrameOptionsMiddleware(get_response_empty)(HttpRequest())
             self.assertEqual(r.headers["X-Frame-Options"], "DENY")
 

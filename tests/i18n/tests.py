@@ -435,7 +435,7 @@ class TranslationTests(SimpleTestCase):
 
     def test_language_bidi_null(self):
         self.assertIs(trans_null.get_language_bidi(), False)
-        with override_settings(LANGUAGE_CODE="he"):
+        with self.settings(LANGUAGE_CODE="he"):
             self.assertIs(get_language_bidi(), True)
 
 
@@ -1746,9 +1746,9 @@ class MiscTests(SimpleTestCase):
             self.assertNotEqual("pt-br", g(request))
 
     def test_i18n_patterns_returns_list(self):
-        with override_settings(USE_I18N=False):
+        with self.settings(USE_I18N=False):
             self.assertIsInstance(i18n_patterns([]), list)
-        with override_settings(USE_I18N=True):
+        with self.settings(USE_I18N=True):
             self.assertIsInstance(i18n_patterns([]), list)
 
 
@@ -2001,7 +2001,7 @@ class CountrySpecificLanguageTests(SimpleTestCase):
     def test_get_language_from_request_null(self):
         lang = trans_null.get_language_from_request(None)
         self.assertEqual(lang, "en")
-        with override_settings(LANGUAGE_CODE="de"):
+        with self.settings(LANGUAGE_CODE="de"):
             lang = trans_null.get_language_from_request(None)
             self.assertEqual(lang, "de")
 

@@ -214,14 +214,12 @@ class LoaderTests(TestCase):
             migration_loader.get_migration_by_prefix("migrations", "blarg")
 
     def test_load_import_error(self):
-        with override_settings(
-            MIGRATION_MODULES={"migrations": "import_error_package"}
-        ):
+        with self.settings(MIGRATION_MODULES={"migrations": "import_error_package"}):
             with self.assertRaises(ImportError):
                 MigrationLoader(connection)
 
     def test_load_module_file(self):
-        with override_settings(
+        with self.settings(
             MIGRATION_MODULES={"migrations": "migrations.faulty_migrations.file"}
         ):
             loader = MigrationLoader(connection)
@@ -232,7 +230,7 @@ class LoaderTests(TestCase):
             )
 
     def test_load_empty_dir(self):
-        with override_settings(
+        with self.settings(
             MIGRATION_MODULES={"migrations": "migrations.faulty_migrations.namespace"}
         ):
             loader = MigrationLoader(connection)

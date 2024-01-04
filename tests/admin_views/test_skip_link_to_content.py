@@ -100,7 +100,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         from selenium.webdriver.common.by import By
         from selenium.webdriver.common.keys import Keys
 
-        with override_settings(LANGUAGE_CODE="ar"):
+        with self.settings(LANGUAGE_CODE="ar"):
             self.admin_login(
                 username="super",
                 password="secret",

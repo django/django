@@ -34,7 +34,7 @@ class BaseTests:
     @classmethod
     def setUpClass(cls):
         cls.enterClassContext(
-            override_settings(
+            cls.settings(
                 TEMPLATES=[
                     {
                         "BACKEND": "django.template.backends.django.DjangoTemplates",

@@ -2,7 +2,7 @@ import datetime
 import zoneinfo
 from unittest import mock
 
-from django.test import SimpleTestCase, override_settings
+from django.test import SimpleTestCase
 from django.utils import timezone
 
 PARIS_ZI = zoneinfo.ZoneInfo("Europe/Paris")
@@ -16,9 +16,9 @@ class TimezoneTests(SimpleTestCase):
         self.assertIsInstance(timezone.get_default_timezone(), zoneinfo.ZoneInfo)
 
     def test_now(self):
-        with override_settings(USE_TZ=True):
+        with self.settings(USE_TZ=True):
             self.assertTrue(timezone.is_aware(timezone.now()))
-        with override_settings(USE_TZ=False):
+        with self.settings(USE_TZ=False):
             self.assertTrue(timezone.is_naive(timezone.now()))
 
     def test_localdate(self):

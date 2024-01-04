@@ -78,7 +78,7 @@ class DebugContextProcessorTests(TestCase):
         self.assertContains(response, "Have debug")
 
         # And now we should not
-        with override_settings(DEBUG=False):
+        with self.settings(DEBUG=False):
             response = self.client.get(url)
             self.assertNotContains(response, "Have debug")
 

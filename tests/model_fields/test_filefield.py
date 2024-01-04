@@ -116,7 +116,7 @@ class FileFieldTests(TestCase):
 
     def test_media_root_pathlib(self):
         with tempfile.TemporaryDirectory() as tmp_dir:
-            with override_settings(MEDIA_ROOT=Path(tmp_dir)):
+            with self.settings(MEDIA_ROOT=Path(tmp_dir)):
                 with TemporaryUploadedFile(
                     "foo.txt", "text/plain", 1, "utf-8"
                 ) as tmp_file:
@@ -130,7 +130,7 @@ class FileFieldTests(TestCase):
 
     def test_pickle(self):
         with tempfile.TemporaryDirectory() as tmp_dir:
-            with override_settings(MEDIA_ROOT=Path(tmp_dir)):
+            with self.settings(MEDIA_ROOT=Path(tmp_dir)):
                 with open(__file__, "rb") as fp:
                     file1 = File(fp, name="test_file.py")
                     document = Document(myfile="test_file.py")

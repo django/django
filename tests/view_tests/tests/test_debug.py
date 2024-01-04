@@ -332,7 +332,7 @@ class DebugViewTests(SimpleTestCase):
         with tempfile.NamedTemporaryFile(prefix=template_name) as tmpfile:
             tempdir = os.path.dirname(tmpfile.name)
             template_path = os.path.join(tempdir, template_name)
-            with override_settings(
+            with self.settings(
                 TEMPLATES=[
                     {
                         "BACKEND": "django.template.backends.django.DjangoTemplates",

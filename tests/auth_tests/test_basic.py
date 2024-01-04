@@ -156,7 +156,7 @@ class TestGetUser(TestCase):
         request = HttpRequest()
         request.session = self.client.session
         prev_session_key = request.session.session_key
-        with override_settings(
+        with self.settings(
             SECRET_KEY="newsecret",
             SECRET_KEY_FALLBACKS=[settings.SECRET_KEY],
         ):
@@ -166,7 +166,7 @@ class TestGetUser(TestCase):
             self.assertNotEqual(request.session.session_key, prev_session_key)
         # Remove the fallback secret.
         # The session hash should be updated using the current secret.
-        with override_settings(SECRET_KEY="newsecret"):
+        with self.settings(SECRET_KEY="newsecret"):
             user = get_user(request)
             self.assertIsInstance(user, User)
             self.assertEqual(user.username, created_user.username)

@@ -9,7 +9,7 @@ from urllib.request import urlopen
 
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.core.exceptions import ImproperlyConfigured
-from django.test import modify_settings, override_settings
+from django.test import modify_settings
 
 TEST_ROOT = os.path.dirname(__file__)
 TEST_SETTINGS = {
@@ -25,7 +25,7 @@ class LiveServerBase(StaticLiveServerTestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.enterClassContext(override_settings(**TEST_SETTINGS))
+        cls.enterClassContext(cls.settings(**TEST_SETTINGS))
         super().setUpClass()
 
 
