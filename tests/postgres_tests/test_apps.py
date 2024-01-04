@@ -5,7 +5,7 @@ from django.db import connection
 from django.db.backends.signals import connection_created
 from django.db.migrations.writer import MigrationWriter
 from django.test import TestCase
-from django.test.utils import CaptureQueriesContext, modify_settings
+from django.test.utils import CaptureQueriesContext
 
 try:
     from django.contrib.postgres.fields import (
@@ -43,7 +43,7 @@ class PostgresConfigTests(TestCase):
         self.assertNotIn(
             register_type_handlers, connection_created._live_receivers(None)[0]
         )
-        with modify_settings(INSTALLED_APPS={"append": "django.contrib.postgres"}):
+        with self.modify_settings(INSTALLED_APPS={"append": "django.contrib.postgres"}):
             self.assertIn(
                 register_type_handlers, connection_created._live_receivers(None)[0]
             )

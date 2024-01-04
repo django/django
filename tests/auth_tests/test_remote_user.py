@@ -6,7 +6,7 @@ from django.contrib.auth.backends import RemoteUserBackend
 from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.contrib.auth.models import User
 from django.middleware.csrf import _get_new_csrf_string, _mask_cipher_secret
-from django.test import Client, TestCase, modify_settings, override_settings
+from django.test import Client, TestCase, override_settings
 
 
 @override_settings(ROOT_URLCONF="auth_tests.urls")
@@ -23,7 +23,7 @@ class RemoteUserTest(TestCase):
     @classmethod
     def setUpClass(cls):
         cls.enterClassContext(
-            modify_settings(
+            cls.modify_settings(
                 AUTHENTICATION_BACKENDS={"append": cls.backend},
                 MIDDLEWARE={"append": cls.middleware},
             )
