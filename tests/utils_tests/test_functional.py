@@ -248,6 +248,8 @@ class FunctionalTests(SimpleTestCase):
 
     def test_lazy_format(self):
         class QuotedString(str):
+            __slots__ = ()
+
             def __format__(self, format_spec):
                 value = super().__format__(format_spec)
                 return f"“{value}”"

@@ -8,6 +8,8 @@ class SchemaEditorTests(SimpleTestCase):
         """SchemaEditor.effective_default() shouldn't call callable defaults."""
 
         class MyStr(str):
+            __slots__ = ()
+
             def __call__(self):
                 return self
 

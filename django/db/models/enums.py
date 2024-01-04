@@ -20,7 +20,7 @@ else:
         pass
 
     class StrEnum(str, ReprEnum):
-        pass
+        __slots__ = ()
 
 
 __all__ = ["Choices", "IntegerChoices", "TextChoices"]

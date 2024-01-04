@@ -1339,11 +1339,11 @@ class UUIDField(CharField):
 
 
 class InvalidJSONInput(str):
-    pass
+    __slots__ = ()
 
 
 class JSONString(str):
-    pass
+    __slots__ = ()
 
 
 class JSONField(CharField):

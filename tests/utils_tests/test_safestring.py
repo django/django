@@ -7,6 +7,8 @@ from django.utils.translation import gettext_lazy
 
 
 class customescape(str):
+    __slots__ = ()
+
     def __html__(self):
         # Implement specific and wrong escaping in order to be able to detect
         # when it runs.

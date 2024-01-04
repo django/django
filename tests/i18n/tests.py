@@ -492,6 +492,8 @@ class TranslationThreadSafetyTests(SimpleTestCase):
         # here we rely on .split() being called inside the _fetch()
         # in trans_real.translation()
         class sideeffect_str(str):
+            __slots__ = ()
+
             def split(self, *args, **kwargs):
                 res = str.split(self, *args, **kwargs)
                 trans_real._translations["en-YY"] = None

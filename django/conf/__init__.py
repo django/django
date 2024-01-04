@@ -34,6 +34,7 @@ class SettingsReference(str):
     String subclass which references a current settings value. It's treated as
     the value in memory but serializes to a settings.NAME attribute reference.
     """
+    __slots__ = ('setting_name',)
 
     def __new__(self, value, setting_name):
         return str.__new__(self, value)
