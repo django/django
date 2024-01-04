@@ -1404,6 +1404,12 @@ Django provides a standard Python context manager (see :pep:`343`) called
 This example will override the :setting:`LOGIN_URL` setting for the code
 in the ``with`` block and reset its value to the previous state afterward.
 
+This method is static and, as such, can also be called from class methods.
+
+.. versionchanged:: 5.1
+
+    Changed from an instance method to a static method.
+
 .. method:: SimpleTestCase.modify_settings()
 
 It can prove unwieldy to redefine settings that contain a list of values. In
@@ -1433,6 +1439,12 @@ settings changes::
 For each action, you can supply either a list of values or a string. When the
 value already exists in the list, ``append`` and ``prepend`` have no effect;
 neither does ``remove`` when the value doesn't exist.
+
+This method is static and, as such, can also be called from class methods.
+
+.. versionchanged:: 5.1
+
+    Changed from an instance method to a static method.
 
 .. function:: override_settings(**kwargs)
 

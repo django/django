@@ -364,14 +364,16 @@ class SimpleTestCase(unittest.TestCase):
         def enterClassContext(cls, cm):
             return _enter_context(cm, cls.addClassCleanup)
 
-    def settings(self, **kwargs):
+    @staticmethod
+    def settings(**kwargs):
         """
         A context manager that temporarily sets a setting and reverts to the
         original value when exiting the context.
         """
         return override_settings(**kwargs)
 
-    def modify_settings(self, **kwargs):
+    @staticmethod
+    def modify_settings(**kwargs):
         """
         A context manager that temporarily applies changes a list setting and
         reverts back to the original value when exiting the context.
