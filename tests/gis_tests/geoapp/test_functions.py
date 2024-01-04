@@ -258,7 +258,12 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             # num_seg is the number of segments per quarter circle.
             return (4 * num_seg) + 1
 
-        expected_areas = (169, 136) if connection.ops.postgis else (171, 126)
+        if connection.ops.postgis:
+            expected_areas = (169, 136)
+        elif connection.ops.spatialite:
+            expected_areas = (168, 135)
+        else:  # Oracle.
+            expected_areas = (171, 126)
         qs = Country.objects.annotate(
             circle=functions.BoundingCircle("mpoly")
         ).order_by("name")

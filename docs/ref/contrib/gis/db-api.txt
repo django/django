@@ -397,7 +397,7 @@ Function                              PostGIS  Oracle         MariaDB      MySQL
 :class:`AsWKB`                        X        X              X            X           X
 :class:`AsWKT`                        X        X              X            X           X
 :class:`Azimuth`                      X                                                X (LWGEOM/RTTOPO)
-:class:`BoundingCircle`               X        X
+:class:`BoundingCircle`               X        X                                       X (≥ 5.1)
 :class:`Centroid`                     X        X              X            X           X
 :class:`ClosestPoint`                 X                                                X
 :class:`Difference`                   X        X              X            X           X

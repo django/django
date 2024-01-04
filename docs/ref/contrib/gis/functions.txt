@@ -230,12 +230,17 @@ south = ``π``; west = ``3π/2``.
 
 *Availability*: `PostGIS <https://postgis.net/docs/ST_MinimumBoundingCircle.html>`__,
 `Oracle <https://docs.oracle.com/en/database/oracle/oracle-database/21/spatl/
-SDO_GEOM-reference.html#GUID-82A61626-BB64-4793-B53D-A0DBEC91831A>`_
+SDO_GEOM-reference.html#GUID-82A61626-BB64-4793-B53D-A0DBEC91831A>`_,
+SpatiaLite 5.1+
 
 Accepts a single geographic field or expression and returns the smallest circle
 polygon that can fully contain the geometry.
 
 The ``num_seg`` parameter is used only on PostGIS.
+
+.. versionchanged:: 5.1
+
+    SpatiaLite 5.1+ support was added.
 
 ``Centroid``
 ============
