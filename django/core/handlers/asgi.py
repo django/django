@@ -186,11 +186,18 @@ class ASGIHandler(base.BaseHandler):
         if request is None:
             body_file.close()
             await self.send_response(error_response, send)
+            await sync_to_async(error_response.close)()
             return
 
         async def process_request(request, send):
             response = await self.run_get_response(request)
-            await self.send_response(response, send)
+            try:
+                await self.send_response(response, send)
+            except asyncio.CancelledError:
+                # Client disconnected during send_response (ignore exception).
+                pass
+
+            return response
 
         # Try to catch a disconnect while getting response.
         tasks = [
@@ -221,6 +228,14 @@ class ASGIHandler(base.BaseHandler):
                 except asyncio.CancelledError:
                     # Task re-raised the CancelledError as expected.
                     pass
+
+        try:
+            response = tasks[1].result()
+        except asyncio.CancelledError:
+            await signals.request_finished.asend(sender=self.__class__)
+        else:
+            await sync_to_async(response.close)()
+
         body_file.close()
 
     async def listen_for_disconnect(self, receive):
@@ -346,7 +361,6 @@ class ASGIHandler(base.BaseHandler):
                         "more_body": not last,
                     }
                 )
-        await sync_to_async(response.close, thread_sensitive=True)()
 
     @classmethod
     def chunk_bytes(cls, data):
