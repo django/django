@@ -2187,8 +2187,8 @@ redirected into a ``StringIO`` instance::
     class ClosepollTest(TestCase):
         def test_command_output(self):
             out = StringIO()
-            call_command("closepoll", stdout=out)
-            self.assertIn("Expected output", out.getvalue())
+            call_command("closepoll", poll_ids=[1], stdout=out)
+            self.assertIn('Successfully closed poll "1"', out.getvalue())
 
 .. _skipping-tests:
 
