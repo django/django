@@ -102,6 +102,52 @@ class NestedObjectsTests(TestCase):
 class UtilsTests(SimpleTestCase):
     empty_value = "-empty-"
 
+    def _empty_display_for_field(self, value):
+        display_value = display_for_field(value, models.CharField(), self.empty_value)
+        self.assertEqual(display_value, self.empty_value)
+
+        display_value = display_for_field(
+            value,
+            models.CharField(choices=((value, "test_empty"),)),
+            self.empty_value,
+        )
+        self.assertEqual(display_value, "test_empty")
+
+        display_value = display_for_field(value, models.DateField(), self.empty_value)
+        self.assertEqual(display_value, self.empty_value)
+
+        display_value = display_for_field(value, models.TimeField(), self.empty_value)
+        self.assertEqual(display_value, self.empty_value)
+
+        display_value = display_for_field(
+            value, models.BooleanField(null=True), self.empty_value
+        )
+        expected = '<img src="%sadmin/img/icon-unknown.svg" alt="%s" />' % (
+            settings.STATIC_URL,
+            value,
+        )
+        self.assertHTMLEqual(display_value, expected)
+
+        display_value = display_for_field(
+            value, models.DecimalField(), self.empty_value
+        )
+        self.assertEqual(display_value, self.empty_value)
+
+        display_value = display_for_field(value, models.FloatField(), self.empty_value)
+        self.assertEqual(display_value, self.empty_value)
+
+        display_value = display_for_field(value, models.JSONField(), self.empty_value)
+        self.assertEqual(display_value, self.empty_value)
+
+    def test_empty_display_for_field(self):
+        """
+        Regression test for #12550: display_for_field should handle None value.
+        Regression test for #28404: Django admin empty_value/empty_value_display doesn't
+                                    check for empty strings
+        """
+        for field_value in [None, ""]:
+            self._empty_display_for_field(field_value)
+
     def test_values_from_lookup_field(self):
         """
         Regression test for #12654: lookup_field
@@ -148,43 +194,6 @@ class UtilsTests(SimpleTestCase):
                 )
 
             self.assertEqual(value, resolved_value)
-
-    def test_null_display_for_field(self):
-        """
-        Regression test for #12550: display_for_field should handle None
-        value.
-        """
-        display_value = display_for_field(None, models.CharField(), self.empty_value)
-        self.assertEqual(display_value, self.empty_value)
-
-        display_value = display_for_field(
-            None, models.CharField(choices=((None, "test_none"),)), self.empty_value
-        )
-        self.assertEqual(display_value, "test_none")
-
-        display_value = display_for_field(None, models.DateField(), self.empty_value)
-        self.assertEqual(display_value, self.empty_value)
-
-        display_value = display_for_field(None, models.TimeField(), self.empty_value)
-        self.assertEqual(display_value, self.empty_value)
-
-        display_value = display_for_field(
-            None, models.BooleanField(null=True), self.empty_value
-        )
-        expected = (
-            '<img src="%sadmin/img/icon-unknown.svg" alt="None" />'
-            % settings.STATIC_URL
-        )
-        self.assertHTMLEqual(display_value, expected)
-
-        display_value = display_for_field(None, models.DecimalField(), self.empty_value)
-        self.assertEqual(display_value, self.empty_value)
-
-        display_value = display_for_field(None, models.FloatField(), self.empty_value)
-        self.assertEqual(display_value, self.empty_value)
-
-        display_value = display_for_field(None, models.JSONField(), self.empty_value)
-        self.assertEqual(display_value, self.empty_value)
 
     def test_json_display_for_field(self):
         tests = [

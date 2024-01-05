@@ -49,6 +49,7 @@ from .models import (
     UnsafeLimitChoicesTo,
     VideoStream,
 )
+from .widgetadmin import AlbumAdmin
 from .widgetadmin import site as widget_admin_site
 
 
@@ -639,9 +640,12 @@ class AdminFileWidgetTests(TestDataMixin, TestCase):
             html=True,
         )
         response = self.client.get(reverse("admin:admin_widgets_album_add"))
+        empty_value_display = AlbumAdmin(
+            Album, widget_admin_site
+        ).get_empty_value_display()
         self.assertContains(
             response,
-            '<div class="readonly"></div>',
+            '<div class="readonly">%s</div>' % empty_value_display,
             html=True,
         )
 
