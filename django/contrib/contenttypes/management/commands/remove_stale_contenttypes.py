@@ -82,7 +82,7 @@ class Command(BaseCommand):
                         "are:\n\n"
                         f"{content_type_display}\n\n"
                         "This list doesn't include any cascade deletions to data "
-                        "outside of Django's\n"
+                        "outside of Django\n"
                         "models (uncommon).\n\n"
                         "Are you sure you want to delete these content types?\n"
                         "If you're unsure, answer 'no'."
