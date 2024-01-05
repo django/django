@@ -467,7 +467,8 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
 
         relation_parts = []
         prev_field = None
-        for part in lookup.split(LOOKUP_SEP):
+        parts = lookup.split(LOOKUP_SEP)
+        for part in parts:
             try:
                 field = model._meta.get_field(part)
             except FieldDoesNotExist:
@@ -491,7 +492,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
             prev_field = field
             model = field.path_infos[-1].to_opts.model
 
-        if not relation_parts:
+        if not relation_parts or len(parts) == 1:
             # Either a local field filter, or no fields at all.
             return True
         valid_lookups = {self.date_hierarchy}
