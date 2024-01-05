@@ -163,6 +163,20 @@ class ModelAdminTests(TestCase):
         )
 
     @isolate_apps("modeladmin")
+    def test_lookup_allowed_for_local_fk_fields(self):
+        class Country(models.Model):
+            pass
+
+        class Place(models.Model):
+            country = models.ForeignKey(Country, models.CASCADE)
+
+        class PlaceAdmin(ModelAdmin):
+            pass
+
+        ma = PlaceAdmin(Place, self.site)
+        self.assertIs(ma.lookup_allowed("country", "1", request), True)
+
+    @isolate_apps("modeladmin")
     def test_lookup_allowed_non_autofield_primary_key(self):
         class Country(models.Model):
             id = models.CharField(max_length=2, primary_key=True)
