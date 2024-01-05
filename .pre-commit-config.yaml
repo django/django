@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/psf/black-pre-commit-mirror
-    rev: 23.10.0
+    rev: 23.12.1
     hooks:
     - id: black
       exclude: \.py-tpl$
@@ -9,17 +9,17 @@ repos:
     hooks:
       - id: blacken-docs
         additional_dependencies:
-        - black==23.10.0
+        - black==23.12.1
         files: 'docs/.*\.txt$'
   - repo: https://github.com/PyCQA/isort
-    rev: 5.12.0
+    rev: 5.13.2
     hooks:
       - id: isort
   - repo: https://github.com/PyCQA/flake8
-    rev: 6.1.0
+    rev: 7.0.0
     hooks:
       - id: flake8
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.52.0
+    rev: v8.56.0
     hooks:
       - id: eslint
