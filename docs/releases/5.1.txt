@@ -56,6 +56,9 @@ Minor features
 * :class:`~django.contrib.gis.db.models.functions.BoundingCircle` is now
   supported on SpatiaLite 5.1+.
 
+* :class:`~django.contrib.gis.db.models.Collect` is now supported on MySQL
+  8.0.24+.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
