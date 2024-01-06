@@ -61,7 +61,7 @@ You'll need a few things before getting started:
 
   .. code-block:: shell
 
-      $ python -m pip install wheel twine
+      $ python -m pip install build twine
 
 * Access to Django's project on PyPI. Create a project-scoped token following
   the `official documentation <https://pypi.org/help/#apitoken>`_ and set up
@@ -238,7 +238,7 @@ OK, this is the fun part, where we actually push out a release!
    on ``VERSION``.
 
 #. If this is a pre-release package, update the "Development Status" trove
-   classifier in ``setup.cfg`` to reflect this. Otherwise, make sure the
+   classifier in ``pyproject.toml`` to reflect this. Otherwise, make sure the
    classifier is set to ``Development Status :: 5 - Production/Stable``.
 
 #. Tag the release using ``git tag``. For example:
