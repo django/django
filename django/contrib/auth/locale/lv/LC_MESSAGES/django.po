@@ -240,7 +240,7 @@ msgid_plural ""
 msgstr[0] ""
 "Šī parole ir pārāk īsa. Tai ir jābūt vismaz %(min_length)d zīmes garai."
 msgstr[1] ""
-"Šī parole ir pārāk īsa. Tai ir jābūt vismaz %(min_length)d zīmi garai.."
+"Šī parole ir pārāk īsa. Tai ir jābūt vismaz %(min_length)d zīmi garai."
 msgstr[2] ""
 "Šī parole ir pārāk īsa. Tai ir jābūt vismaz %(min_length)d zīmēm garai."
 
