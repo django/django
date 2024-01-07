@@ -10,7 +10,7 @@ from django.utils.connection import BaseConnectionHandler
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 
-DEFAULT_DB_ALIAS = "default"
+DEFAULT_DB_ALIAS = "default" or getattr(settings, "MAIN_DATABASE_NAME", "default")
 DJANGO_VERSION_PICKLE_KEY = "_django_version"
 
 
@@ -150,7 +150,8 @@ class ConnectionHandler(BaseConnectionHandler):
             databases[DEFAULT_DB_ALIAS] = {"ENGINE": "django.db.backends.dummy"}
         elif DEFAULT_DB_ALIAS not in databases:
             raise ImproperlyConfigured(
-                f"You must define a '{DEFAULT_DB_ALIAS}' database."
+                f"You must define a database called '{DEFAULT_DB_ALIAS}' or set "
+                "a value in settings.py for MAIN_DATABASE_NAME."
             )
         elif databases[DEFAULT_DB_ALIAS] == {}:
             databases[DEFAULT_DB_ALIAS]["ENGINE"] = "django.db.backends.dummy"

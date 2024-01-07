@@ -36,7 +36,7 @@ class ConnectionHandlerTests(SimpleTestCase):
     def test_no_default_database(self):
         DATABASES = {"other": {}}
         conns = ConnectionHandler(DATABASES)
-        msg = "You must define a 'default' database."
+        msg = "You must define a database called 'default' or set a value in settings.py for MAIN_DATABASE_NAME."
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             conns["other"].ensure_connection()
 
