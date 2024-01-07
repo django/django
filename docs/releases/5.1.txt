@@ -59,6 +59,9 @@ Minor features
 * :class:`~django.contrib.gis.db.models.Collect` is now supported on MySQL
   8.0.24+.
 
+* :class:`~django.contrib.gis.geoip2.GeoIP2` now allows querying using
+  :class:`ipaddress.IPv4Address` or :class:`ipaddress.IPv6Address` objects.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

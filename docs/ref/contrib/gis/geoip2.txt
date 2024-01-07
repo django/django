@@ -107,10 +107,11 @@ and given cache setting.
 Querying
 --------
 
-All the following querying routines may take either a string IP address
-or a fully qualified domain name (FQDN). For example, both
-``'205.186.163.125'`` and ``'djangoproject.com'`` would be valid query
-parameters.
+All the following querying routines may take an instance of
+:class:`~ipaddress.IPv4Address` or :class:`~ipaddress.IPv6Address`, a string IP
+address, or a fully qualified domain name (FQDN). For example,
+``IPv4Address("205.186.163.125")``, ``"205.186.163.125"``, and
+``"djangoproject.com"`` would all be valid query parameters.
 
 .. method:: GeoIP2.city(query)
 

@@ -12,6 +12,7 @@ Grab GeoLite2-Country.mmdb.gz and GeoLite2-City.mmdb.gz, and unzip them in the
 directory corresponding to settings.GEOIP_PATH.
 """
 
+import ipaddress
 import socket
 import warnings
 
@@ -172,10 +173,10 @@ class GeoIP2:
 
     def _check_query(self, query, city=False, city_or_country=False):
         "Check the query and database availability."
-        # Making sure a string was passed in for the query.
-        if not isinstance(query, str):
+        if not isinstance(query, (str, ipaddress.IPv4Address, ipaddress.IPv6Address)):
             raise TypeError(
-                "GeoIP query must be a string, not type %s" % type(query).__name__
+                "GeoIP query must be a string or instance of IPv4Address or "
+                "IPv6Address, not type %s" % type(query).__name__,
             )
 
         # Extra checks for the existence of country and city databases.
