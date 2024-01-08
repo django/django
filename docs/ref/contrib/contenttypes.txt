@@ -114,8 +114,10 @@ model it represents, or to retrieve objects from that model:
     :meth:`a get() lookup <django.db.models.query.QuerySet.get>`
     on that model, returning the corresponding object.
 
-    The query uses the default database, unless the ``using`` argument
-    specifies a different database.
+    .. versionadded:: 5.1
+
+        The ``using`` argument was added, for specifying a different database
+        than the default.
 
 .. method:: ContentType.model_class()
 
