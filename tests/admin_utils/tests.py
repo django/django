@@ -159,9 +159,12 @@ class UtilsTests(SimpleTestCase):
             models.TimeField(),
         ]
         for model_field in tests:
-            with self.subTest(model_field=model_field):
-                display_value = display_for_field(None, model_field, self.empty_value)
-                self.assertEqual(display_value, self.empty_value)
+            for value in model_field.empty_values:
+                with self.subTest(model_field=model_field, empty_value=value):
+                    display_value = display_for_field(
+                        value, model_field, self.empty_value
+                    )
+                    self.assertEqual(display_value, self.empty_value)
 
     def test_empty_value_display_choices(self):
         model_field = models.CharField(choices=((None, "test_none"),))

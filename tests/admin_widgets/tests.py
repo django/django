@@ -641,7 +641,7 @@ class AdminFileWidgetTests(TestDataMixin, TestCase):
         response = self.client.get(reverse("admin:admin_widgets_album_add"))
         self.assertContains(
             response,
-            '<div class="readonly"></div>',
+            '<div class="readonly">-</div>',
             html=True,
         )
 
