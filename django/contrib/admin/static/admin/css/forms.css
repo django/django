@@ -194,6 +194,10 @@ fieldset .fieldBox {
     width: 200px;
 }
 
+form .wide.aligned ul.errorlist {
+    margin-left: 200px;
+}
+
 form .wide p.help,
 form .wide div.help {
     padding-left: 50px;
