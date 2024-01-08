@@ -181,10 +181,7 @@ class ContentType(models.Model):
         method. The ObjectNotExist exception, if thrown, will not be caught,
         so code that calls this method should catch it.
         """
-        if using:
-            return self.model_class()._base_manager.using(using).get(**kwargs)
-        else:
-            return self.model_class()._base_manager.get(**kwargs)
+        return self.model_class()._base_manager.using(using).get(**kwargs)
 
     def get_all_objects_for_this_type(self, **kwargs):
         """
