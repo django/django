@@ -205,7 +205,10 @@ enforced immediately after every command.
 .. admonition:: MySQL, MariaDB, and SQLite.
 
     Deferrable unique constraints are ignored on MySQL, MariaDB, and SQLite as
-    neither supports them.
+    neither supports them. Therefore, if the deferrable option is used with these databases,
+    the unique constraint will not be created. This means that the deferrable option will be ignored,
+    and the constraint will not be added to the database.
+
 
 .. warning::
 
@@ -272,7 +275,12 @@ For example::
 creates a unique constraint that only allows one row to store a ``NULL`` value
 in the ``ordering`` column.
 
-``nulls_distinct`` is ignored for databases besides PostgreSQL 15+.
+.. admonition:: MySQL, MariaDB, and SQLite.
+
+    nulls_distinct unique constraints are ignored on MySQL, MariaDB, and SQLite as
+    neither supports them. Therefore, if the nulls_distinct option is used with these databases,
+    the unique constraint will not be created. This means that the nulls_distinct option will be ignored,
+    and the constraint will not be added to the database.
 
 ``violation_error_code``
 ------------------------
