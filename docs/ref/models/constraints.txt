@@ -229,7 +229,8 @@ For example::
 will allow filtering on ``room`` and ``date``, also selecting ``full_name``,
 while fetching data only from the index.
 
-``include`` is supported only on PostgreSQL.
+Unique constraints with non-key columns are ignored for databases besides
+PostgreSQL.
 
 Non-key columns have the same database restrictions as :attr:`Index.include`.
 
@@ -272,7 +273,8 @@ For example::
 creates a unique constraint that only allows one row to store a ``NULL`` value
 in the ``ordering`` column.
 
-``nulls_distinct`` is ignored for databases besides PostgreSQL 15+.
+Unique constraints with ``nulls_distinct`` are ignored for databases besides
+PostgreSQL 15+.
 
 ``violation_error_code``
 ------------------------
