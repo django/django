@@ -108,8 +108,11 @@ class GeoLite2Test(SimpleTestCase):
                 self.assertEqual(
                     g.country(query),
                     {
+                        "continent_code": "EU",
+                        "continent_name": "Europe",
                         "country_code": "GB",
                         "country_name": "United Kingdom",
+                        "is_in_european_union": False,
                     },
                 )
                 self.assertEqual(g.country_code(query), "GB")
@@ -122,18 +125,23 @@ class GeoLite2Test(SimpleTestCase):
                 self.assertEqual(
                     g.city(query),
                     {
+                        "accuracy_radius": 100,
                         "city": "Boxford",
                         "continent_code": "EU",
                         "continent_name": "Europe",
                         "country_code": "GB",
                         "country_name": "United Kingdom",
-                        "dma_code": None,
                         "is_in_european_union": False,
                         "latitude": 51.75,
                         "longitude": -1.25,
+                        "metro_code": None,
                         "postal_code": "OX1",
-                        "region": "ENG",
+                        "region_code": "ENG",
+                        "region_name": "England",
                         "time_zone": "Europe/London",
+                        # Kept for backward compatibility.
+                        "dma_code": None,
+                        "region": "ENG",
                     },
                 )
 
@@ -148,8 +156,11 @@ class GeoLite2Test(SimpleTestCase):
                 self.assertEqual(
                     g.country(query),
                     {
+                        "continent_code": "EU",
+                        "continent_name": "Europe",
                         "country_code": "GB",
                         "country_name": "United Kingdom",
+                        "is_in_european_union": False,
                     },
                 )
                 self.assertEqual(g.country_code(query), "GB")
