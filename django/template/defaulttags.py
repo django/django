@@ -4,6 +4,7 @@ import sys
 import warnings
 from collections import namedtuple
 from collections.abc import Iterable
+from copy import copy
 from datetime import datetime
 from itertools import cycle as itertools_cycle
 from itertools import groupby
@@ -100,8 +101,9 @@ class CycleNode(Node):
     def render(self, context):
         if self not in context.render_context:
             # First time the node is rendered in template
-            context.render_context[self] = itertools_cycle(self.cyclevars)
-        cycle_iter = context.render_context[self]
+            self.reset(context)
+        if not (cycle_iter := context.render_context[self]):
+            return ""
         value = next(cycle_iter).resolve(context)
         if self.variable_name:
             context.set_upward(self.variable_name, value)
@@ -112,8 +114,27 @@ class CycleNode(Node):
     def reset(self, context):
         """
         Reset the cycle iteration back to the beginning.
+
+        If there is only one cycle variable and its context value is a list, then create
+        a list of expressions (FilterExpression) with each list element and create a
+        cycle iterater for that instead.
+
         """
-        context.render_context[self] = itertools_cycle(self.cyclevars)
+        cyclevars = self.cyclevars
+        if (expression := cyclevars[0]).is_var:
+            if (var_name := expression.var.var) in context:
+                if isinstance(value_list := context[var_name], list):
+                    cyclevars = []
+                    for value in value_list:
+                        value_expression = copy(expression)
+                        value_expression.token = repr(str(value))
+                        value_expression.var = str(value)
+                        value_expression.is_var = False
+                        cyclevars.append(value_expression)
+            else:
+                cyclevars = []
+
+        context.render_context[self] = itertools_cycle(cyclevars) if cyclevars else None
 
 
 class DebugNode(Node):
@@ -608,6 +629,23 @@ def cycle(parser, token):
             {% cycle 'row1' 'row2' as rowcolors silent %}
             <tr class="{{ rowcolors }}">{% include "subtemplate.html " %}</tr>
         {% endfor %}
+
+    In addition to cycling through given strings it is also possible to use a context
+    variable. Here is the same example as above with a "colors" context variable ['red',
+    'green', 'blue'] in a loop:
+
+        {% for o in some_list %}
+            <tr class="{% cycle colors %}">
+                ...
+            </tr>
+        {% endfor %}
+
+    Or outside of a loop:
+
+            <tr class="{% cycle colors as rowcolor %}">...</tr>
+            <tr class="{% cycle rowcolor %}">...</tr>
+            <tr class="{% cycle rowcolor %}">...</tr>
+
     """
     # Note: This returns the exact same node on each {% cycle name %} call;
     # that is, the node object returned from {% cycle a b c as name %} and the
@@ -630,17 +668,12 @@ def cycle(parser, token):
     if len(args) == 2:
         # {% cycle foo %} case.
         name = args[1]
-        if not hasattr(parser, "_named_cycle_nodes"):
-            raise TemplateSyntaxError(
-                "No named cycles in template. '%s' is not defined" % name
-            )
-        if name not in parser._named_cycle_nodes:
-            raise TemplateSyntaxError("Named cycle '%s' does not exist" % name)
-        return parser._named_cycle_nodes[name]
+        if hasattr(parser, "_named_cycle_nodes") and name in parser._named_cycle_nodes:
+            return parser._named_cycle_nodes[name]
 
     as_form = False
 
-    if len(args) > 4:
+    if len(args) > 3:
         # {% cycle ... as foo [silent] %} case.
         if args[-3] == "as":
             if args[-1] != "silent":

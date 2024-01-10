@@ -7,9 +7,9 @@ from ..utils import setup
 class CycleTagTests(SimpleTestCase):
     @setup({"cycle01": "{% cycle a %}"})
     def test_cycle01(self):
-        msg = "No named cycles in template. 'a' is not defined"
-        with self.assertRaisesMessage(TemplateSyntaxError, msg):
-            self.engine.get_template("cycle01")
+        """This used to raise an exception in prior versions."""
+        output = self.engine.render_to_string("cycle01")
+        self.assertEqual(output, "")
 
     @setup({"cycle05": "{% cycle %}"})
     def test_cycle05(self):
@@ -215,6 +215,75 @@ class CycleTagTests(SimpleTestCase):
         )
         self.assertEqual(output, "bcabcabcccaa")
 
+    @setup({"cycle40": "{% cycle colors %}"})
+    def test_cycle40(self):
+        output = self.engine.render_to_string(
+            "cycle40", {"colors": ["red", "green", "blue"]}
+        )
+        self.assertEqual(output, "red")
+
+    @setup({"cycle41": "{% cycle colors %}{% cycle colors %}"})
+    def test_cycle41(self):
+        output = self.engine.render_to_string(
+            "cycle41", {"colors": ["red", "green", "blue"]}
+        )
+        self.assertEqual(output, "redred")
+
+    @setup(
+        {
+            "cycle42": "{% cycle questions as question %} "
+            "{% cycle question %} {% cycle question %}"
+        }
+    )
+    def test_cycle42(self):
+        output = self.engine.render_to_string(
+            "cycle42", {"questions": ["life", "universe", "everything"]}
+        )
+        self.assertEqual(output, "life universe everything")
+
+    @setup({"cycle43": "{% cycle colors|upper as color %}{% cycle color %}"})
+    def test_cycle43(self):
+        output = self.engine.render_to_string(
+            "cycle43", {"colors": ["red", "green", "blue"]}
+        )
+        self.assertEqual(output, "REDGREEN")
+
+    @setup(
+        {
+            "cycle44": "{% cycle colors as color silent %}{{ color }}"
+            "{% cycle color %}{{ color }}"
+            "{% cycle color %}{{ color }}"
+        }
+    )
+    def test_cycle44(self):
+        output = self.engine.render_to_string(
+            "cycle44", {"colors": ["red", "green", "blue"]}
+        )
+        self.assertEqual(output, "redgreenblue")
+
+    @setup(
+        {
+            "cycle45": "{% cycle colors as color %}{% cycle color %}"
+            "{% resetcycle color %}{% cycle color %}"
+        }
+    )
+    def test_cycle45(self):
+        output = self.engine.render_to_string(
+            "cycle45", {"colors": ["red", "green", "blue"]}
+        )
+        self.assertEqual(output, "redgreenred")
+
+    @setup({"cycle46": "{% for x in values %}{% cycle colors %}{% endfor %}"})
+    def test_cycle46(self):
+        output = self.engine.render_to_string(
+            "cycle46",
+            {
+                "values": [1, 2, 3, 4],
+                "colors": ["red", "green", "blue"],
+            },
+        )
+        self.assertEqual(output, "redgreenbluered")
+
     @setup(
         {
             "undefined_cycle": "{% cycle 'a' 'b' 'c' as cycler silent %}"
@@ -224,7 +293,6 @@ class CycleTagTests(SimpleTestCase):
         }
     )
     def test_cycle_undefined(self):
-        with self.assertRaisesMessage(
-            TemplateSyntaxError, "Named cycle 'undefined' does not exist"
-        ):
-            self.engine.render_to_string("undefined_cycle")
+        """This used to raise an exception in prior versions."""
+        output = self.engine.render_to_string("undefined_cycle")
+        self.assertEqual(output, "")
