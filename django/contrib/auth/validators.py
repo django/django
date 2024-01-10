@@ -23,3 +23,13 @@ class UnicodeUsernameValidator(validators.RegexValidator):
         "numbers, and @/./+/-/_ characters."
     )
     flags = 0
+
+
+@deconstructible
+class UnicodeNameValidator(validators.RegexValidator):
+    regex = r"^[\w\s]+\Z"
+    message = _(
+        "Enter a valid name. This value may contain only letters, "
+        "numbers and spaces."
+    )
+    flags = 0
