@@ -1318,6 +1318,12 @@ class QueryTestCase(TestCase):
         book = book_type.get_object_for_this_type(title=book_title)
         self.assertEqual(book.published, book_published_date)
 
+        book = book_type.get_object_for_this_type(using="other", title=book_title)
+        self.assertEqual(book.published, book_published_date)
+
+        with self.assertRaises(Book.DoesNotExist):
+            book_type.get_object_for_this_type(using="default", title=book_title)
+
         all_books = book_type.get_all_objects_for_this_type()
         self.assertEqual(len(all_books), 1)
 
