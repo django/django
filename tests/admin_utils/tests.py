@@ -17,6 +17,7 @@ from django.contrib.admin.utils import (
     lookup_field,
     quote,
 )
+from django.core.validators import EMPTY_VALUES
 from django.db import DEFAULT_DB_ALIAS, models
 from django.test import SimpleTestCase, TestCase, override_settings
 from django.utils.formats import localize
@@ -248,6 +249,12 @@ class UtilsTests(SimpleTestCase):
         )
         self.assertEqual(display_for_value(True, ""), "True")
         self.assertEqual(display_for_value(False, ""), "False")
+
+    def test_list_display_for_value_empty(self):
+        for value in EMPTY_VALUES:
+            with self.subTest(empty_value=value):
+                display_value = display_for_value(value, self.empty_value)
+                self.assertEqual(display_value, self.empty_value)
 
     def test_label_for_field(self):
         """

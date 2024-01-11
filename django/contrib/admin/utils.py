@@ -6,6 +6,7 @@ from functools import reduce
 from operator import or_
 
 from django.core.exceptions import FieldDoesNotExist
+from django.core.validators import EMPTY_VALUES
 from django.db import models, router
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import Collector
@@ -459,7 +460,7 @@ def display_for_value(value, empty_value_display, boolean=False):
 
     if boolean:
         return _boolean_icon(value)
-    elif value is None:
+    elif value in EMPTY_VALUES:
         return empty_value_display
     elif isinstance(value, bool):
         return str(value)
