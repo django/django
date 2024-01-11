@@ -711,10 +711,16 @@ class GeoQuerySetTest(TestCase):
         tx = Country.objects.get(name="Texas").mpoly
         # Tolerance is greater than distance between Forney and Dallas, that's
         # why Dallas is ignored.
-        forney_houston = GEOSGeometry(
-            "MULTIPOINT(-95.363151 29.763374, -96.467222 32.751389)",
-            srid=4326,
-        )
+        if connection.ops.oracle and connection.oracle_version >= (23,):
+            forney_houston = GEOSGeometry(
+                "MULTIPOINT (-95.363151 29.763374, -96.801611 32.782057)",
+                srid=4326,
+            )
+        else:
+            forney_houston = GEOSGeometry(
+                "MULTIPOINT(-95.363151 29.763374, -96.467222 32.751389)",
+                srid=4326,
+            )
         self.assertIs(
             forney_houston.equals_exact(
                 City.objects.filter(point__within=tx).aggregate(
