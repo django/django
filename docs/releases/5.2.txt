@@ -358,6 +358,11 @@ Miscellaneous
 * ``HttpRequest.accepted_types`` is now sorted by the client's preference, based
   on the request's ``Accept`` header.
 
+* :attr:`.UniqueConstraint.violation_error_code` and
+  :attr:`.UniqueConstraint.violation_error_message` are now always used when
+  provided. Previously, these were ignored when :attr:`.UniqueConstraint.fields`
+  were set without a :attr:`.UniqueConstraint.condition`.
+
 * The :func:`~django.template.context_processors.debug` context processor is no
   longer included in the default project template.
 
