@@ -36,6 +36,10 @@ class Command(BaseCommand):
                 'and reverse dependencies (run_before) will be included.'
             )
         )
+        formats.add_argument(
+            '--last', action='store_true', default=False,
+            help='Show only the leaf nodes (most recent migration) for the given app(s)'
+        )
 
         parser.set_defaults(format='list')
 
@@ -49,7 +53,7 @@ class Command(BaseCommand):
         if options['format'] == "plan":
             return self.show_plan(connection, options['app_label'])
         else:
-            return self.show_list(connection, options['app_label'])
+            return self.show_list(connection, options['app_label'], only_leafs=options['last'])
 
     def _validate_app_names(self, loader, app_names):
         has_bad_names = False
@@ -62,7 +66,7 @@ class Command(BaseCommand):
         if has_bad_names:
             sys.exit(2)
 
-    def show_list(self, connection, app_names=None):
+    def show_list(self, connection, app_names=None, only_leafs=False):
         """
         Show a list of all migrations on the system, or only those of
         some named apps.
@@ -82,7 +86,7 @@ class Command(BaseCommand):
             self.stdout.write(app_name, self.style.MIGRATE_LABEL)
             shown = set()
             for node in graph.leaf_nodes(app_name):
-                for plan_node in graph.forwards_plan(node):
+                for plan_node in graph.forwards_plan(node) if not only_leafs else [node]:
                     if plan_node not in shown and plan_node[0] == app_name:
                         # Give it a nice title if it's a squashed one
                         title = plan_node[1]
