@@ -1,14 +1,17 @@
 'use strict';
 {
     function initModelFilter() {
-        const options = [];
-        const navSidebar = document.getElementById('nav-sidebar');
-        if (!navSidebar) {
+        if (!document.getElementById('model-filter')) {
             return;
         }
-        navSidebar.querySelectorAll('th[scope=row] a').forEach((container) => {
-            options.push({title: container.innerHTML, node: container});
-        });
+
+        const options = [];
+        const filterableElements = document.getElementsByClassName('filterable-apps-table');
+        for (const filterableElement of filterableElements) {
+            filterableElement.querySelectorAll('th[scope=row] a').forEach((container) => {
+                options.push({title: container.innerHTML, node: container});
+            });
+        }
 
         function checkValue(event) {
             let filterValue = event.target.value;
@@ -45,10 +48,14 @@
         nav.addEventListener('input', checkValue, false);
         nav.addEventListener('keyup', checkValue, false);
 
-        const storedValue = sessionStorage.getItem('django.admin.modelFilterValue');
-        if (storedValue) {
-            nav.value = storedValue;
-            checkValue({target: nav, key: ''});
+        // Only retrieve the stored value if the current page is not the index page
+        const adminSiteUrl = document.head.dataset.adminUrl;
+        if (!location.pathname.endsWith(adminSiteUrl)) {
+            const storedValue = sessionStorage.getItem('django.admin.modelFilterValue');
+            if (storedValue) {
+                nav.value = storedValue;
+                checkValue({target: nav, key: ''});
+            }
         }
     }
     window.initModelFilter = initModelFilter;
