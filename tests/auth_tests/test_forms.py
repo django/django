@@ -1324,6 +1324,42 @@ class AdminPasswordChangeFormTest(TestDataMixin, TestCase):
         self.assertEqual(password_changed.call_count, 1)
         self.assertEqual(form.changed_data, ["password"])
 
+    @override_settings(
+        AUTH_PASSWORD_VALIDATORS=[
+            {
+                "NAME": (
+                    "django.contrib.auth.password_validation."
+                    "UserAttributeSimilarityValidator"
+                )
+            },
+            {
+                "NAME": (
+                    "django.contrib.auth.password_validation.MinimumLengthValidator"
+                ),
+                "OPTIONS": {
+                    "min_length": 12,
+                },
+            },
+        ]
+    )
+    def test_validates_password(self):
+        user = User.objects.get(username="testclient")
+        data = {
+            "password1": "testclient",
+            "password2": "testclient",
+        }
+        form = AdminPasswordChangeForm(user, data)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(len(form["password2"].errors), 2)
+        self.assertIn(
+            "The password is too similar to the username.",
+            form["password2"].errors,
+        )
+        self.assertIn(
+            "This password is too short. It must contain at least 12 characters.",
+            form["password2"].errors,
+        )
+
     def test_password_whitespace_not_stripped(self):
         user = User.objects.get(username="testclient")
         data = {
