@@ -590,10 +590,6 @@ END;
         if value is None:
             return None
 
-        # Expression values are adapted by the database.
-        if hasattr(value, "resolve_expression"):
-            return value
-
         # oracledb doesn't support tz-aware datetimes
         if timezone.is_aware(value):
             if settings.USE_TZ:
@@ -609,10 +605,6 @@ END;
     def adapt_timefield_value(self, value):
         if value is None:
             return None
-
-        # Expression values are adapted by the database.
-        if hasattr(value, "resolve_expression"):
-            return value
 
         if isinstance(value, str):
             return datetime.datetime.strptime(value, "%H:%M:%S")

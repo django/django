@@ -1225,7 +1225,7 @@ class IterableLookupInnerExpressionsTests(TestCase):
         queryset = Company.objects.filter(name__in=[F("num_chairs") + "1)) OR ((1==1"])
         self.assertQuerySetEqual(queryset, [], ordered=False)
 
-    def test_range_lookup_allows_F_expressions_and_expressions_for_datetimes(self):
+    def test_range_lookup_allows_F_expressions_and_expressions_for_dates(self):
         start = datetime.datetime(2016, 2, 3, 15, 0, 0)
         end = datetime.datetime(2016, 2, 5, 15, 0, 0)
         experiment_1 = Experiment.objects.create(
@@ -1256,9 +1256,19 @@ class IterableLookupInnerExpressionsTests(TestCase):
             experiment=experiment_2,
             result_time=datetime.datetime(2016, 1, 8, 5, 0, 0),
         )
-        within_experiment_time = [F("experiment__start"), F("experiment__end")]
-        queryset = Result.objects.filter(result_time__range=within_experiment_time)
-        self.assertSequenceEqual(queryset, [r1])
+        tests = [
+            # Datetimes.
+            ([F("experiment__start"), F("experiment__end")], "result_time__range"),
+            # Dates.
+            (
+                [F("experiment__start__date"), F("experiment__end__date")],
+                "result_time__date__range",
+            ),
+        ]
+        for within_experiment_time, lookup in tests:
+            with self.subTest(lookup=lookup):
+                queryset = Result.objects.filter(**{lookup: within_experiment_time})
+                self.assertSequenceEqual(queryset, [r1])
 
 
 class FTests(SimpleTestCase):
