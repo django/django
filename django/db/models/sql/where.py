@@ -204,6 +204,8 @@ class WhereNode(tree.Node):
         Relabel the alias values of any children. 'change_map' is a dictionary
         mapping old (current) alias values to the new values.
         """
+        if not change_map:
+            return self
         for pos, child in enumerate(self.children):
             if hasattr(child, "relabel_aliases"):
                 # For example another WhereNode
@@ -225,6 +227,8 @@ class WhereNode(tree.Node):
         return clone
 
     def replace_expressions(self, replacements):
+        if not replacements:
+            return self
         if replacement := replacements.get(self):
             return replacement
         clone = self.create(connector=self.connector, negated=self.negated)

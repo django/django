@@ -972,6 +972,8 @@ class Query(BaseExpression):
         relabelling any references to them in select columns and the where
         clause.
         """
+        if not change_map:
+            return self
         # If keys and values of change_map were to intersect, an alias might be
         # updated twice (e.g. T4 -> T5, T5 -> T6, so also T4 -> T6) depending
         # on their order in change_map.

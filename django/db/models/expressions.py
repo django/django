@@ -402,10 +402,13 @@ class BaseExpression:
         return clone
 
     def replace_expressions(self, replacements):
+        if not replacements:
+            return self
         if replacement := replacements.get(self):
             return replacement
+        if not (source_expressions := self.get_source_expressions()):
+            return self
         clone = self.copy()
-        source_expressions = clone.get_source_expressions()
         clone.set_source_expressions(
             [
                 expr.replace_expressions(replacements) if expr else None
