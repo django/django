@@ -1151,7 +1151,7 @@ class IterableLookupInnerExpressionsTests(TestCase):
             [self.c5040, self.c5050, self.c5060],
         )
 
-    def test_expressions_in_lookups_join_choice(self):
+    def test_expressions_range_lookups_join_choice(self):
         midpoint = datetime.time(13, 0)
         t1 = Time.objects.create(time=datetime.time(12, 0))
         t2 = Time.objects.create(time=datetime.time(14, 0))
@@ -1225,7 +1225,7 @@ class IterableLookupInnerExpressionsTests(TestCase):
         queryset = Company.objects.filter(name__in=[F("num_chairs") + "1)) OR ((1==1"])
         self.assertQuerySetEqual(queryset, [], ordered=False)
 
-    def test_in_lookup_allows_F_expressions_and_expressions_for_datetimes(self):
+    def test_range_lookup_allows_F_expressions_and_expressions_for_datetimes(self):
         start = datetime.datetime(2016, 2, 3, 15, 0, 0)
         end = datetime.datetime(2016, 2, 5, 15, 0, 0)
         experiment_1 = Experiment.objects.create(
