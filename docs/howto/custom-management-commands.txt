@@ -83,6 +83,19 @@ look like this::
 
         self.stdout.write("Unterminated line", ending="")
 
+.. note::
+    Django management commands, by default, do not provide a direct attribute
+    for reading from standard input (stdin). This is contrary to stdout and
+    stderr where you can use BaseCommand.stdout and BaseCommand.stderr 
+    to write to stdout or stderr. However, you can leverage Python's built-in 
+    sys.stdin to interact with user input or read data from other sources
+    like this::
+
+        class Command(BaseCommand):
+            def handle(self, *args, **options):
+                piped_data = sys.stdin.read()
+                self.stdout.write(f"Piped data: {piped_data}")
+
 The new custom command can be called using ``python manage.py closepoll
 <poll_ids>``.
 
