@@ -90,7 +90,6 @@ class TemplateCommand(BaseCommand):
         self.verbosity = options["verbosity"]
 
         self.validate_name(name)
-
         # if some directory is given, make sure it's nicely expanded
         if target is None:
             top_dir = os.path.join(os.getcwd(), name)
@@ -137,10 +136,12 @@ class TemplateCommand(BaseCommand):
         camel_case_name = "camel_case_%s_name" % app_or_project
         camel_case_value = "".join(x for x in name.title() if x != "_")
 
+        config_dir_name = "config"
         context = Context(
             {
                 **options,
                 base_name: name,
+                "settings_dir": config_dir_name,
                 base_directory: top_dir,
                 camel_case_name: camel_case_value,
                 "docs_version": get_docs_version(),
@@ -159,7 +160,7 @@ class TemplateCommand(BaseCommand):
 
         for root, dirs, files in os.walk(template_dir):
             path_rest = root[prefix_length:]
-            relative_dir = path_rest.replace(base_name, name)
+            relative_dir = path_rest.replace(base_name, config_dir_name)
             if relative_dir:
                 target_dir = os.path.join(top_dir, relative_dir)
                 os.makedirs(target_dir, exist_ok=True)
@@ -177,7 +178,9 @@ class TemplateCommand(BaseCommand):
                     continue
                 old_path = os.path.join(root, filename)
                 new_path = os.path.join(
-                    top_dir, relative_dir, filename.replace(base_name, name)
+                    top_dir,
+                    relative_dir,
+                    filename.replace(base_name, config_dir_name),
                 )
                 for old_suffix, new_suffix in self.rewrite_template_suffixes:
                     if new_path.endswith(old_suffix):

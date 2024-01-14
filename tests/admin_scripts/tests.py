@@ -156,7 +156,7 @@ class AdminScriptTestCase(SimpleTestCase):
         with open(test_manage_py) as fp:
             manage_py_contents = fp.read()
         manage_py_contents = manage_py_contents.replace(
-            "{{ project_name }}", "test_project"
+            "{{ settings_dir }}", "test_project"
         )
         with open(test_manage_py, "w") as fp:
             fp.write(manage_py_contents)
@@ -2827,7 +2827,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
                 os.path.exists(os.path.join(testproject_dir, directory)),
                 False,
             )
-        not_excluded = os.path.join(testproject_dir, project_name)
+        not_excluded = os.path.join(testproject_dir, "config")
         self.assertIs(os.path.exists(not_excluded), True)
 
     @unittest.skipIf(
@@ -2841,8 +2841,8 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         self.assertIs(os.path.isdir(testproject_dir), True)
         tests = [
             (["manage.py"], 0o700),
-            (["testproject"], 0o700),
-            (["testproject", "settings.py"], 0o600),
+            (["config"], 0o700),
+            (["config", "settings.py"], 0o600),
         ]
         for paths, expected_mode in tests:
             file_path = os.path.join(testproject_dir, *paths)
