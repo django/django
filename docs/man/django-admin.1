@@ -2365,7 +2365,7 @@ django\-admin migrate \-\-pythonpath=\(aq/home/djangoprojects/myproject\(aq
 .UNINDENT
 .sp
 Specifies the settings module to use. The settings module should be in Python
-package syntax, e.g. \fBmysite.settings\fP\&. If this isn\(aqt provided,
+package syntax, e.g. \fBconfig.settings\fP\&. If this isn\(aqt provided,
 \fBdjango\-admin\fP will use the \fI\%DJANGO_SETTINGS_MODULE\fP environment
 variable.
 .sp
@@ -2378,7 +2378,7 @@ Example usage:
 .sp
 .nf
 .ft C
-django\-admin migrate \-\-settings=mysite.settings
+django\-admin migrate \-\-settings=config.settings
 .ft P
 .fi
 .UNINDENT

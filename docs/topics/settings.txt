@@ -43,7 +43,7 @@ When you use Django, you have to tell it which settings you're using. Do this
 by using an environment variable, :envvar:`DJANGO_SETTINGS_MODULE`.
 
 The value of :envvar:`DJANGO_SETTINGS_MODULE` should be in Python path syntax,
-e.g. ``mysite.settings``. Note that the settings module should be on the
+e.g. ``config.settings``. Note that the settings module should be on the
 Python `import search path`_.
 
 .. _import search path: https://diveinto.org/python3/your-first-python-program.html#importsearchpath
@@ -59,21 +59,21 @@ Example (Unix Bash shell):
 
 .. code-block:: shell
 
-    export DJANGO_SETTINGS_MODULE=mysite.settings
+    export DJANGO_SETTINGS_MODULE=config.settings
     django-admin runserver
 
 Example (Windows shell):
 
 .. code-block:: doscon
 
-    set DJANGO_SETTINGS_MODULE=mysite.settings
+    set DJANGO_SETTINGS_MODULE=config.settings
     django-admin runserver
 
 Use the ``--settings`` command-line argument to specify the settings manually:
 
 .. code-block:: shell
 
-    django-admin runserver --settings=mysite.settings
+    django-admin runserver --settings=config.settings
 
 .. _django-admin: ../django-admin/
 
@@ -85,7 +85,7 @@ application what settings file to use. Do that with ``os.environ``::
 
     import os
 
-    os.environ["DJANGO_SETTINGS_MODULE"] = "mysite.settings"
+    os.environ["DJANGO_SETTINGS_MODULE"] = "config.settings"
 
 Read the :doc:`Django mod_wsgi documentation
 </howto/deployment/wsgi/modwsgi>` for more information and other common

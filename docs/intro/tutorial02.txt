@@ -14,7 +14,7 @@ introduction to Django's automatically-generated admin site.
 Database setup
 ==============
 
-Now, open up :file:`mysite/settings.py`. It's a normal Python module with
+Now, open up :file:`config/settings.py`. It's a normal Python module with
 module-level variables representing Django settings.
 
 By default, the configuration uses SQLite. If you're new to databases, or
@@ -52,7 +52,7 @@ For more details, see the reference documentation for :setting:`DATABASES`.
     database by this point. Do that with "``CREATE DATABASE database_name;``"
     within your database's interactive prompt.
 
-    Also make sure that the database user provided in :file:`mysite/settings.py`
+    Also make sure that the database user provided in :file:`config/settings.py`
     has "create database" privileges. This allows automatic creation of a
     :ref:`test database <the-test-database>` which will be needed in a later
     tutorial.
@@ -60,7 +60,7 @@ For more details, see the reference documentation for :setting:`DATABASES`.
     If you're using SQLite, you don't need to create anything beforehand - the
     database file will be created automatically when it is needed.
 
-While you're editing :file:`mysite/settings.py`, set :setting:`TIME_ZONE` to
+While you're editing :file:`config/settings.py`, set :setting:`TIME_ZONE` to
 your time zone.
 
 Also, note the :setting:`INSTALLED_APPS` setting at the top of the file. That
@@ -96,7 +96,7 @@ that, run the following command:
 
 The :djadmin:`migrate` command looks at the :setting:`INSTALLED_APPS` setting
 and creates any necessary database tables according to the database settings
-in your :file:`mysite/settings.py` file and the database migrations shipped
+in your :file:`config/settings.py` file and the database migrations shipped
 with the app (we'll cover those later). You'll see a message for each
 migration it applies. If you're interested, run the command-line client for your
 database and type ``\dt`` (PostgreSQL), ``SHOW TABLES;`` (MariaDB, MySQL),
@@ -212,12 +212,12 @@ But first we need to tell our project that the ``polls`` app is installed.
 To include the app in our project, we need to add a reference to its
 configuration class in the :setting:`INSTALLED_APPS` setting. The
 ``PollsConfig`` class is in the :file:`polls/apps.py` file, so its dotted path
-is ``'polls.apps.PollsConfig'``. Edit the :file:`mysite/settings.py` file and
+is ``'polls.apps.PollsConfig'``. Edit the :file:`config/settings.py` file and
 add that dotted path to the :setting:`INSTALLED_APPS` setting. It'll look like
 this:
 
 .. code-block:: python
-    :caption: ``mysite/settings.py``
+    :caption: ``config/settings.py``
 
     INSTALLED_APPS = [
         "polls.apps.PollsConfig",
@@ -379,7 +379,7 @@ API Django gives you. To invoke the Python shell, use this command:
 
 We're using this instead of simply typing "python", because :file:`manage.py`
 sets the :envvar:`DJANGO_SETTINGS_MODULE` environment variable, which gives
-Django the Python import path to your :file:`mysite/settings.py` file.
+Django the Python import path to your :file:`config/settings.py` file.
 
 Once you're in the shell, explore the :doc:`database API </topics/db/queries>`:
 

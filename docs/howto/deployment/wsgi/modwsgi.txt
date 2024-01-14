@@ -31,11 +31,11 @@ Once you've got mod_wsgi installed and activated, edit your Apache server's
 
 .. code-block:: apache
 
-    WSGIScriptAlias / /path/to/mysite.com/mysite/wsgi.py
+    WSGIScriptAlias / /path/to/mysite.com/config/wsgi.py
     WSGIPythonHome /path/to/venv
     WSGIPythonPath /path/to/mysite.com
 
-    <Directory /path/to/mysite.com/mysite>
+    <Directory /path/to/mysite.com/config>
     <Files wsgi.py>
     Require all granted
     </Files>
@@ -129,7 +129,7 @@ to the configuration above:
 
 .. code-block:: apache
 
-    WSGIScriptAlias /mysite /path/to/mysite.com/mysite/wsgi.py process-group=example.com
+    WSGIScriptAlias /mysite /path/to/mysite.com/config/wsgi.py process-group=example.com
 
 See the official mod_wsgi documentation for `details on setting up daemon
 mode`_.
@@ -174,7 +174,7 @@ a static file. All other URLs will be served using mod_wsgi:
     Require all granted
     </Directory>
 
-    WSGIScriptAlias / /path/to/mysite.com/mysite/wsgi.py
+    WSGIScriptAlias / /path/to/mysite.com/config/wsgi.py
 
     <Directory /path/to/mysite.com/mysite>
     <Files wsgi.py>

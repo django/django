@@ -45,7 +45,7 @@ only authenticated users to be able to view:
 
 .. code-block:: apache
 
-    WSGIScriptAlias / /path/to/mysite.com/mysite/wsgi.py
+    WSGIScriptAlias / /path/to/mysite.com/config/wsgi.py
     WSGIPythonPath /path/to/mysite.com
 
     WSGIProcessGroup %{GLOBAL}
@@ -56,7 +56,7 @@ only authenticated users to be able to view:
         AuthName "Top Secret"
         Require valid-user
         AuthBasicProvider wsgi
-        WSGIAuthUserScript /path/to/mysite.com/mysite/wsgi.py
+        WSGIAuthUserScript /path/to/mysite.com/config/wsgi.py
     </Location>
 
 The ``WSGIAuthUserScript`` directive tells mod_wsgi to execute the
@@ -78,13 +78,13 @@ application :doc:`that is created by django-admin startproject
         LoadModule auth_basic_module modules/mod_auth_basic.so
         LoadModule authz_user_module modules/mod_authz_user.so
 
-Finally, edit your WSGI script ``mysite.wsgi`` to tie Apache's authentication
+Finally, edit your WSGI script ``config.wsgi`` to tie Apache's authentication
 to your site's authentication mechanisms by importing the ``check_password``
 function::
 
     import os
 
-    os.environ["DJANGO_SETTINGS_MODULE"] = "mysite.settings"
+    os.environ["DJANGO_SETTINGS_MODULE"] = "config.settings"
 
     from django.contrib.auth.handlers.modwsgi import check_password
 
@@ -111,7 +111,7 @@ In this case, the Apache configuration should look like this:
 
 .. code-block:: apache
 
-    WSGIScriptAlias / /path/to/mysite.com/mysite/wsgi.py
+    WSGIScriptAlias / /path/to/mysite.com/config/wsgi.py
 
     WSGIProcessGroup %{GLOBAL}
     WSGIApplicationGroup %{GLOBAL}
@@ -120,14 +120,14 @@ In this case, the Apache configuration should look like this:
         AuthType Basic
         AuthName "Top Secret"
         AuthBasicProvider wsgi
-        WSGIAuthUserScript /path/to/mysite.com/mysite/wsgi.py
-        WSGIAuthGroupScript /path/to/mysite.com/mysite/wsgi.py
+        WSGIAuthUserScript /path/to/mysite.com/config/wsgi.py
+        WSGIAuthGroupScript /path/to/mysite.com/config/wsgi.py
         Require group secret-agents
         Require valid-user
     </Location>
 
 To support the ``WSGIAuthGroupScript`` directive, the same WSGI script
-``mysite.wsgi`` must also import the ``groups_for_user`` function which
+``config.wsgi`` must also import the ``groups_for_user`` function which
 returns a list groups the given user belongs to.
 
 .. code-block:: python

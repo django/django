@@ -25,7 +25,7 @@ location of a module containing a WSGI application object named
 
 .. code-block:: shell
 
-    gunicorn myproject.wsgi
+    gunicorn config.wsgi
 
 This will start one process running one thread listening on ``127.0.0.1:8000``.
 It requires that your project be on the Python path; the simplest way to ensure

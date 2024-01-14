@@ -53,8 +53,8 @@ settings module. You can use a different value for development and production;
 it all depends on how you organize your settings.
 
 If this variable isn't set, the default :file:`wsgi.py` sets it to
-``mysite.settings``, where ``mysite`` is the name of your project. That's how
-:djadmin:`runserver` discovers the default settings file by default.
+``config.settings``. That's how :djadmin:`runserver` discovers the default
+settings file by default.
 
 .. note::
 
@@ -63,7 +63,7 @@ If this variable isn't set, the default :file:`wsgi.py` sets it to
 
     To avoid this problem, use mod_wsgi's daemon mode with each site in its
     own daemon process, or override the value from the environment by
-    enforcing ``os.environ["DJANGO_SETTINGS_MODULE"] = "mysite.settings"`` in
+    enforcing ``os.environ["DJANGO_SETTINGS_MODULE"] = "config.settings"`` in
     your :file:`wsgi.py`.
 
 

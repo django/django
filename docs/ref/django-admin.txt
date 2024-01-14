@@ -1815,7 +1815,7 @@ Example usage:
 .. django-admin-option:: --settings SETTINGS
 
 Specifies the settings module to use. The settings module should be in Python
-package syntax, e.g. ``mysite.settings``. If this isn't provided,
+package syntax, e.g. ``config.settings``. If this isn't provided,
 ``django-admin`` will use the :envvar:`DJANGO_SETTINGS_MODULE` environment
 variable.
 
@@ -1826,7 +1826,7 @@ Example usage:
 
 .. console::
 
-    django-admin migrate --settings=mysite.settings
+    django-admin migrate --settings=config.settings
 
 .. django-admin-option:: --traceback
 

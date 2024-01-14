@@ -149,22 +149,22 @@ effect).
 The :func:`~django.views.defaults.page_not_found` view is overridden by
 :data:`~django.conf.urls.handler404`::
 
-    handler404 = "mysite.views.my_custom_page_not_found_view"
+    handler404 = "config.views.my_custom_page_not_found_view"
 
 The :func:`~django.views.defaults.server_error` view is overridden by
 :data:`~django.conf.urls.handler500`::
 
-    handler500 = "mysite.views.my_custom_error_view"
+    handler500 = "config.views.my_custom_error_view"
 
 The :func:`~django.views.defaults.permission_denied` view is overridden by
 :data:`~django.conf.urls.handler403`::
 
-    handler403 = "mysite.views.my_custom_permission_denied_view"
+    handler403 = "config.views.my_custom_permission_denied_view"
 
 The :func:`~django.views.defaults.bad_request` view is overridden by
 :data:`~django.conf.urls.handler400`::
 
-    handler400 = "mysite.views.my_custom_bad_request_view"
+    handler400 = "config.views.my_custom_bad_request_view"
 
 .. seealso::
 

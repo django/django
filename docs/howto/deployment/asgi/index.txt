@@ -60,7 +60,7 @@ settings module. You can use a different value for development and production;
 it all depends on how you organize your settings.
 
 If this variable isn't set, the default :file:`asgi.py` sets it to
-``mysite.settings``, where ``mysite`` is the name of your project.
+``config.settings``.
 
 Applying ASGI middleware
 ========================

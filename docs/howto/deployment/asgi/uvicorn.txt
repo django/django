@@ -26,7 +26,7 @@ For a typical Django project, invoking Uvicorn would look like:
 
 .. code-block:: shell
 
-    python -m uvicorn myproject.asgi:application
+    python -m uvicorn config.asgi:application
 
 This will start one process listening on ``127.0.0.1:8000``. It requires that
 your project be on the Python path; to ensure that run this command from the
@@ -53,7 +53,7 @@ Then start Gunicorn using the Uvicorn worker class like this:
 
 .. code-block:: shell
 
-    python -m gunicorn myproject.asgi:application -k uvicorn.workers.UvicornWorker
+    python -m gunicorn config.asgi:application -k uvicorn.workers.UvicornWorker
 
 .. _Uvicorn: https://www.uvicorn.org/
 .. _Gunicorn: https://gunicorn.org/

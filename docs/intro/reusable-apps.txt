@@ -59,7 +59,7 @@ After the previous tutorials, our project should look like this:
 
     mysite/
         manage.py
-        mysite/
+        config/
             __init__.py
             settings.py
             urls.py
@@ -315,14 +315,14 @@ working. We'll now fix this by installing our new ``django-polls`` package.
 
       python -m pip install --user django-polls/dist/django-polls-0.1.tar.gz
 
-#. Update ``mysite/settings.py`` to point to the new module name::
+#. Update ``config/settings.py`` to point to the new module name::
 
     INSTALLED_APPS = [
         "django_polls.apps.PollsConfig",
         ...,
     ]
 
-#. Update ``mysite/urls.py`` to point to the new module name::
+#. Update ``config/urls.py`` to point to the new module name::
 
     urlpatterns = [
         path("polls/", include("django_polls.urls")),
