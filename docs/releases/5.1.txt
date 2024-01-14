@@ -326,12 +326,6 @@ Dropped support for PostgreSQL 12
 Upstream support for PostgreSQL 12 ends in November 2024. Django 5.1 supports
 PostgreSQL 13 and higher.
 
-WSGI and ASGI Default Paths
----------------------------
-* The default for :file:`wsgi.py` and :file:`asgi.py` files in new
-  projects is now :file:`config/wsgi.py` and :file:`config/asgi.py` instead of
-  :file:`mysite/wsgi.py` and :file:`mysite/asgi.py` respectively where
-  ``mysite`` is the name of the project.
 
 Miscellaneous
 -------------
