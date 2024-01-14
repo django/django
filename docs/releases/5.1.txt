@@ -176,9 +176,9 @@ Logging
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
-* :djadmin:'startproject' now will store all project files (except
-:files:`manage.py') in a :file'config/' directory instead a directory with the
-project name.
+* :djadmin:`startproject` now will store all project files
+  (except :file:`manage.py`) in a :file:`config/` directory instead a directory
+  with the project name.
 
 Migrations
 ~~~~~~~~~~
