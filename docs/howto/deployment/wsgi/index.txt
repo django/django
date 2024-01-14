@@ -30,7 +30,7 @@ provided as an object named ``application`` in a Python module accessible to
 the server.
 
 The :djadmin:`startproject` command creates a file
-:file:`<project_name>/wsgi.py` that contains such an ``application`` callable.
+:file:`config/wsgi.py` that contains such an ``application`` callable.
 
 It's used both by Django's development server and in production WSGI
 deployments.
@@ -38,8 +38,8 @@ deployments.
 WSGI servers obtain the path to the ``application`` callable from their
 configuration. Django's built-in server, namely the :djadmin:`runserver`
 command, reads it from the :setting:`WSGI_APPLICATION` setting. By default, it's
-set to ``<project_name>.wsgi.application``, which points to the ``application``
-callable in :file:`<project_name>/wsgi.py`.
+set to ``config.wsgi.application``, which points to the ``application``
+callable in :file:`config/wsgi.py`.
 
 Configuring the settings module
 ===============================

@@ -29,13 +29,13 @@ provided as an object named ``application`` in a Python module accessible to
 the server.
 
 The :djadmin:`startproject` command creates a file
-:file:`<project_name>/asgi.py` that contains such an ``application`` callable.
+:file:`config/asgi.py` that contains such an ``application`` callable.
 
 It's not used by the development server (``runserver``), but can be used by
 any ASGI server either in development or in production.
 
 ASGI servers usually take the path to the application callable as a string;
-for most Django projects, this will look like ``myproject.asgi:application``.
+for most Django projects, this will look like ``config.asgi:application``.
 
 .. warning::
 

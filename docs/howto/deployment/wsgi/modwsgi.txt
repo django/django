@@ -72,11 +72,11 @@ should put in this file, and what else you can add to it.
     will use the settings of whichever one happens to run first. This can be
     solved by changing::
 
-        os.environ.setdefault("DJANGO_SETTINGS_MODULE", "{{ project_name }}.settings")
+        os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 
     in ``wsgi.py``, to::
 
-        os.environ["DJANGO_SETTINGS_MODULE"] = "{{ project_name }}.settings"
+        os.environ["DJANGO_SETTINGS_MODULE"] = "config.settings"
 
     or by :ref:`using mod_wsgi daemon mode<daemon-mode>` and ensuring that each
     site runs in its own daemon process.
