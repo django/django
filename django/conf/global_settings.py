@@ -640,6 +640,7 @@ STATICFILES_FINDERS = [
 # MIGRATIONS #
 ##############
 
+MIGRATE = True
 # Migration module overrides for apps, by app label.
 MIGRATION_MODULES = {}
 
