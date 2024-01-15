@@ -70,6 +70,8 @@ Minor features
   ``metro_code`` and ``region_code``, but the previous keys are also retained
   for backward compatibility.
 
+* :class:`~django.contrib.gis.measure.Area` now supports the ``ha`` unit.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
