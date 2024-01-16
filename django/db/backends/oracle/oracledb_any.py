@@ -10,6 +10,8 @@ try:
 except ImportError as e:
     try:
         import cx_Oracle as oracledb  # NOQA
+        # For making the connection pooling work for cx_Oracle
+        oracledb.create_pool = oracledb.SessionPool
 
         warnings.warn(
             "cx_Oracle is deprecated. Use oracledb instead.",

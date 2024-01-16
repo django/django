@@ -166,6 +166,12 @@ class ConnectionHandler(BaseConnectionHandler):
             conn.setdefault("CONN_HEALTH_CHECKS", False)
             conn.setdefault("OPTIONS", {})
             conn.setdefault("TIME_ZONE", None)
+            conn.setdefault("USE_CONNECTION_POOL", False)
+            conn.setdefault("POOL_MIN", 0)
+            conn.setdefault("POOL_MAX", 100)
+            conn.setdefault("POOL_INCREMENT", 1)
+            conn.setdefault("POOL_CCLASS", None)
+            conn.setdefault("POOL_TIMEOUT", 100)
             for setting in ["NAME", "USER", "PASSWORD", "HOST", "PORT"]:
                 conn.setdefault(setting, "")
 
