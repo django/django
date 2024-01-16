@@ -21,7 +21,10 @@ class Command(BaseCommand):
         parser.add_argument(
             "--list-tags",
             action="store_true",
-            help="List available tags.",
+            help=(
+                "List available tags. Specify --deploy to include available deployment "
+                "tags."
+            ),
         )
         parser.add_argument(
             "--deploy",
