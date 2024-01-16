@@ -2170,6 +2170,13 @@ manually, assign the empty list to ``mail.outbox``::
     # Empty the test outbox
     mail.outbox = []
 
+.. note::
+    If your application defines a different email backend to be used, you can
+    still ensure emails are redirected to the dummy outbox during testing.
+    Do this by mocking any connection object to be an instance from
+    :meth:`~django.core.mail.get_connection()` (with no backend specified,
+    to ensure the ``locmem`` email backend is used).
+
 .. _topics-testing-management-commands:
 
 Management Commands
