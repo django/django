@@ -67,7 +67,7 @@ views for displaying drilldown pages for date-based data.
         from django.urls import path
         from django.views.generic.dates import ArchiveIndexView
 
-        from myapp.models import Article
+        from .models import Article
 
         urlpatterns = [
             path(
@@ -151,7 +151,7 @@ views for displaying drilldown pages for date-based data.
 
     * Uses a default ``template_name_suffix`` of ``_archive_year``.
 
-    **Example myapp/views.py**::
+    **Example views.py**::
 
         from django.views.generic.dates import YearArchiveView
 
@@ -164,7 +164,7 @@ views for displaying drilldown pages for date-based data.
             make_object_list = True
             allow_future = True
 
-    **Example myapp/urls.py**::
+    **Example urls.py**::
 
         from django.urls import path
 
@@ -174,7 +174,7 @@ views for displaying drilldown pages for date-based data.
             path("<int:year>/", ArticleYearArchiveView.as_view(), name="article_year_archive"),
         ]
 
-    **Example myapp/article_archive_year.html**:
+    **Example article_archive_year.html**:
 
     .. code-block:: html+django
 
@@ -243,7 +243,7 @@ views for displaying drilldown pages for date-based data.
 
     * Uses a default ``template_name_suffix`` of ``_archive_month``.
 
-    **Example myapp/views.py**::
+    **Example views.py**::
 
         from django.views.generic.dates import MonthArchiveView
 
@@ -255,7 +255,7 @@ views for displaying drilldown pages for date-based data.
             date_field = "pub_date"
             allow_future = True
 
-    **Example myapp/urls.py**::
+    **Example urls.py**::
 
         from django.urls import path
 
@@ -276,7 +276,7 @@ views for displaying drilldown pages for date-based data.
             ),
         ]
 
-    **Example myapp/article_archive_month.html**:
+    **Example article_archive_month.html**:
 
     .. code-block:: html+django
 
@@ -351,7 +351,7 @@ views for displaying drilldown pages for date-based data.
 
       * ``'%V'``: ISO 8601 week number where the week begins on Monday.
 
-    **Example myapp/views.py**::
+    **Example views.py**::
 
         from django.views.generic.dates import WeekArchiveView
 
@@ -364,7 +364,7 @@ views for displaying drilldown pages for date-based data.
             week_format = "%W"
             allow_future = True
 
-    **Example myapp/urls.py**::
+    **Example urls.py**::
 
         from django.urls import path
 
@@ -379,7 +379,7 @@ views for displaying drilldown pages for date-based data.
             ),
         ]
 
-    **Example myapp/article_archive_week.html**:
+    **Example article_archive_week.html**:
 
     .. code-block:: html+django
 
@@ -467,7 +467,7 @@ views for displaying drilldown pages for date-based data.
 
     * Uses a default ``template_name_suffix`` of ``_archive_day``.
 
-    **Example myapp/views.py**::
+    **Example views.py**::
 
         from django.views.generic.dates import DayArchiveView
 
@@ -479,7 +479,7 @@ views for displaying drilldown pages for date-based data.
             date_field = "pub_date"
             allow_future = True
 
-    **Example myapp/urls.py**::
+    **Example urls.py**::
 
         from django.urls import path
 
@@ -494,7 +494,7 @@ views for displaying drilldown pages for date-based data.
             ),
         ]
 
-    **Example myapp/article_archive_day.html**:
+    **Example article_archive_day.html**:
 
     .. code-block:: html+django
 
@@ -543,7 +543,7 @@ views for displaying drilldown pages for date-based data.
 
     * Uses a default ``template_name_suffix`` of ``_archive_today``.
 
-    **Example myapp/views.py**::
+    **Example views.py**::
 
         from django.views.generic.dates import TodayArchiveView
 
@@ -555,7 +555,7 @@ views for displaying drilldown pages for date-based data.
             date_field = "pub_date"
             allow_future = True
 
-    **Example myapp/urls.py**::
+    **Example urls.py**::
 
         from django.urls import path
 
@@ -603,7 +603,7 @@ views for displaying drilldown pages for date-based data.
 
     * Uses a default ``template_name_suffix`` of ``_detail``.
 
-    **Example myapp/urls.py**::
+    **Example urls.py**::
 
         from django.urls import path
         from django.views.generic.dates import DateDetailView
@@ -616,7 +616,7 @@ views for displaying drilldown pages for date-based data.
             ),
         ]
 
-    **Example myapp/article_detail.html**:
+    **Example article_detail.html**:
 
     .. code-block:: html+django
 
