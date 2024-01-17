@@ -72,6 +72,12 @@ Minor features
 
 * :class:`~django.contrib.gis.measure.Area` now supports the ``ha`` unit.
 
+* The new :attr:`.OGRGeometry.is_3d` attribute allows checking if a geometry
+  has a ``Z`` coordinate dimension.
+
+* The new :meth:`.OGRGeometry.set_3d` method allows addition and removal of the
+  ``Z`` coordinate dimension.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
