@@ -62,7 +62,7 @@ views for displaying drilldown pages for date-based data.
       month or day using the attribute ``date_list_period``. This also applies
       to all subclass views.
 
-    **Example myapp/urls.py**::
+    **Example urls.py**::
 
         from django.urls import path
         from django.views.generic.dates import ArchiveIndexView
@@ -77,7 +77,7 @@ views for displaying drilldown pages for date-based data.
             ),
         ]
 
-    **Example myapp/article_archive.html**:
+    **Example article_archive.html**:
 
     .. code-block:: html+django
 
@@ -155,7 +155,7 @@ views for displaying drilldown pages for date-based data.
 
         from django.views.generic.dates import YearArchiveView
 
-        from myapp.models import Article
+        from .models import Article
 
 
         class ArticleYearArchiveView(YearArchiveView):
@@ -168,7 +168,7 @@ views for displaying drilldown pages for date-based data.
 
         from django.urls import path
 
-        from myapp.views import ArticleYearArchiveView
+        from .views import ArticleYearArchiveView
 
         urlpatterns = [
             path("<int:year>/", ArticleYearArchiveView.as_view(), name="article_year_archive"),
@@ -247,7 +247,7 @@ views for displaying drilldown pages for date-based data.
 
         from django.views.generic.dates import MonthArchiveView
 
-        from myapp.models import Article
+        from .models import Article
 
 
         class ArticleMonthArchiveView(MonthArchiveView):
@@ -259,7 +259,7 @@ views for displaying drilldown pages for date-based data.
 
         from django.urls import path
 
-        from myapp.views import ArticleMonthArchiveView
+        from .views import ArticleMonthArchiveView
 
         urlpatterns = [
             # Example: /2012/08/
@@ -355,7 +355,7 @@ views for displaying drilldown pages for date-based data.
 
         from django.views.generic.dates import WeekArchiveView
 
-        from myapp.models import Article
+        from .models import Article
 
 
         class ArticleWeekArchiveView(WeekArchiveView):
@@ -368,7 +368,7 @@ views for displaying drilldown pages for date-based data.
 
         from django.urls import path
 
-        from myapp.views import ArticleWeekArchiveView
+        from .views import ArticleWeekArchiveView
 
         urlpatterns = [
             # Example: /2012/week/23/
@@ -471,7 +471,7 @@ views for displaying drilldown pages for date-based data.
 
         from django.views.generic.dates import DayArchiveView
 
-        from myapp.models import Article
+        from .models import Article
 
 
         class ArticleDayArchiveView(DayArchiveView):
@@ -483,7 +483,7 @@ views for displaying drilldown pages for date-based data.
 
         from django.urls import path
 
-        from myapp.views import ArticleDayArchiveView
+        from .views import ArticleDayArchiveView
 
         urlpatterns = [
             # Example: /2012/nov/10/
@@ -547,7 +547,7 @@ views for displaying drilldown pages for date-based data.
 
         from django.views.generic.dates import TodayArchiveView
 
-        from myapp.models import Article
+        from .models import Article
 
 
         class ArticleTodayArchiveView(TodayArchiveView):
@@ -559,7 +559,7 @@ views for displaying drilldown pages for date-based data.
 
         from django.urls import path
 
-        from myapp.views import ArticleTodayArchiveView
+        from .views import ArticleTodayArchiveView
 
         urlpatterns = [
             path("today/", ArticleTodayArchiveView.as_view(), name="archive_today"),

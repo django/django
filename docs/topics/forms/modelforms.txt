@@ -22,7 +22,7 @@ For example:
 .. code-block:: pycon
 
     >>> from django.forms import ModelForm
-    >>> from myapp.models import Article
+    >>> from .models import Article
 
     # Create the form class.
     >>> class ArticleForm(ModelForm):
@@ -334,8 +334,8 @@ this is supplied, ``save()`` will update that instance. If it's not supplied,
 
 .. code-block:: pycon
 
-    >>> from myapp.models import Article
-    >>> from myapp.forms import ArticleForm
+    >>> from .models import Article
+    >>> from .forms import ArticleForm
 
     # Create a form instance from POST data.
     >>> f = ArticleForm(request.POST)
@@ -526,7 +526,7 @@ For example, if you want the ``CharField`` for the ``name`` attribute of
 ``<input type="text">``, you can override the field's widget::
 
     from django.forms import ModelForm, Textarea
-    from myapp.models import Author
+    from .models import Author
 
 
     class AuthorForm(ModelForm):
@@ -574,7 +574,7 @@ For example, if you wanted to use ``MySlugFormField`` for the ``slug``
 field, you could do the following::
 
     from django.forms import ModelForm
-    from myapp.models import Article
+    from .models import Article
 
 
     class ArticleForm(ModelForm):
@@ -588,7 +588,7 @@ field, you could do the following::
 or::
 
     from django.forms import ModelForm
-    from myapp.models import Article
+    from .models import Article
 
 
     def formfield_for_dbfield(db_field, **kwargs):
@@ -611,7 +611,7 @@ If you want to specify a field's validators, you can do so by defining
 the field declaratively and setting its ``validators`` parameter::
 
     from django.forms import CharField, ModelForm
-    from myapp.models import Article
+    from .models import Article
 
 
     class ArticleForm(ModelForm):
@@ -684,7 +684,7 @@ enable localization for fields, you can use the ``localized_fields``
 attribute on the ``Meta`` class.
 
     >>> from django.forms import ModelForm
-    >>> from myapp.models import Author
+    >>> from .models import Author
     >>> class AuthorForm(ModelForm):
     ...     class Meta:
     ...         model = Author
@@ -774,7 +774,7 @@ to make:
 .. code-block:: pycon
 
     >>> from django.forms import modelform_factory
-    >>> from myapp.models import Book
+    >>> from .models import Book
     >>> BookForm = modelform_factory(Book, fields=["author", "title"])
 
 This can also be used to make modifications to existing forms, for example by
@@ -810,7 +810,7 @@ convenient. Let's reuse the ``Author`` model from above:
 .. code-block:: pycon
 
     >>> from django.forms import modelformset_factory
-    >>> from myapp.models import Author
+    >>> from .models import Author
     >>> AuthorFormSet = modelformset_factory(Author, fields=["name", "title"])
 
 Using ``fields`` restricts the formset to use only the given fields.
@@ -866,7 +866,7 @@ Alternatively, you can create a subclass that sets ``self.queryset`` in
 ``__init__``::
 
     from django.forms import BaseModelFormSet
-    from myapp.models import Author
+    from .models import Author
 
 
     class BaseAuthorFormSet(BaseModelFormSet):
@@ -1077,7 +1077,7 @@ formset to edit ``Author`` model instances::
 
     from django.forms import modelformset_factory
     from django.shortcuts import render
-    from myapp.models import Author
+    from .models import Author
 
 
     def manage_authors(request):
@@ -1146,7 +1146,7 @@ formset::
 
     from django.forms import modelformset_factory
     from django.shortcuts import render
-    from myapp.models import Author
+    from .models import Author
 
 
     def manage_authors(request):

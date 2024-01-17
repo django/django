@@ -87,7 +87,7 @@ Other topics
     application. Let's take a look at an example of the ``ModelAdmin``::
 
         from django.contrib import admin
-        from myapp.models import Author
+        from .models import Author
 
 
         class AuthorAdmin(admin.ModelAdmin):
@@ -106,7 +106,7 @@ Other topics
         preceding example could be simplified to::
 
             from django.contrib import admin
-            from myapp.models import Author
+            from .models import Author
 
             admin.site.register(Author)
 
@@ -487,7 +487,7 @@ subclass::
 
             from django import forms
             from django.contrib import admin
-            from myapp.models import Person
+            from .models import Person
 
 
             class PersonForm(forms.ModelForm):
@@ -520,8 +520,8 @@ subclass::
         from django.db import models
 
         # Import our custom widget and our model from where they're defined
-        from myapp.models import MyModel
-        from myapp.widgets import RichTextEditorWidget
+        from .models import MyModel
+        from .widgets import RichTextEditorWidget
 
 
         class MyModelAdmin(admin.ModelAdmin):
@@ -2469,7 +2469,7 @@ you need to explicitly define the foreign key since it is unable to do so
 automatically::
 
     from django.contrib import admin
-    from myapp.models import Friendship
+    from .models import Friendship
 
 
     class FriendshipInline(admin.TabularInline):
@@ -2645,7 +2645,7 @@ any other inline. In your ``admin.py`` for this example app::
     from django.contrib import admin
     from django.contrib.contenttypes.admin import GenericTabularInline
 
-    from myapp.models import Image, Product
+    from .models import Image, Product
 
 
     class ImageInline(GenericTabularInline):
@@ -3100,7 +3100,7 @@ to reference your :class:`AdminSite` subclass.
 
     from django.urls import path
 
-    from myapp.admin import admin_site
+    from .admin import admin_site
 
     urlpatterns = [
         path("myadmin/", admin_site.urls),

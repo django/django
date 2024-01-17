@@ -71,7 +71,7 @@ example:
 
     >>> import datetime
     >>> from django.forms import formset_factory
-    >>> from myapp.forms import ArticleForm
+    >>> from .forms import ArticleForm
     >>> ArticleFormSet = formset_factory(ArticleForm, extra=2)
     >>> formset = ArticleFormSet(
     ...     initial=[
@@ -116,7 +116,7 @@ gives you the ability to limit the number of forms the formset will display:
 .. code-block:: pycon
 
     >>> from django.forms import formset_factory
-    >>> from myapp.forms import ArticleForm
+    >>> from .forms import ArticleForm
     >>> ArticleFormSet = formset_factory(ArticleForm, extra=2, max_num=1)
     >>> formset = ArticleFormSet()
     >>> for form in formset:
@@ -158,7 +158,7 @@ protects against memory exhaustion attacks using forged ``POST`` requests:
 .. code-block:: pycon
 
     >>> from django.forms.formsets import formset_factory
-    >>> from myapp.forms import ArticleForm
+    >>> from .forms import ArticleForm
     >>> ArticleFormSet = formset_factory(ArticleForm, absolute_max=1500)
     >>> data = {
     ...     "form-TOTAL_FORMS": "1501",
@@ -187,7 +187,7 @@ all forms in the formset:
 .. code-block:: pycon
 
     >>> from django.forms import formset_factory
-    >>> from myapp.forms import ArticleForm
+    >>> from .forms import ArticleForm
     >>> ArticleFormSet = formset_factory(ArticleForm)
     >>> data = {
     ...     "form-TOTAL_FORMS": "1",
@@ -366,7 +366,7 @@ is where you define your own validation that works at the formset level:
     >>> from django.core.exceptions import ValidationError
     >>> from django.forms import BaseFormSet
     >>> from django.forms import formset_factory
-    >>> from myapp.forms import ArticleForm
+    >>> from .forms import ArticleForm
 
     >>> class BaseArticleFormSet(BaseFormSet):
     ...     def clean(self):
@@ -433,7 +433,7 @@ that the number of forms in the data set, minus those marked for
 deletion, is less than or equal to ``max_num``.
 
     >>> from django.forms import formset_factory
-    >>> from myapp.forms import ArticleForm
+    >>> from .forms import ArticleForm
     >>> ArticleFormSet = formset_factory(ArticleForm, max_num=1, validate_max=True)
     >>> data = {
     ...     'form-TOTAL_FORMS': '2',
@@ -476,7 +476,7 @@ that the number of forms in the data set, minus those marked for
 deletion, is greater than or equal to ``min_num``.
 
     >>> from django.forms import formset_factory
-    >>> from myapp.forms import ArticleForm
+    >>> from .forms import ArticleForm
     >>> ArticleFormSet = formset_factory(ArticleForm, min_num=3, validate_min=True)
     >>> data = {
     ...     'form-TOTAL_FORMS': '2',
@@ -521,7 +521,7 @@ Lets you create a formset with the ability to order:
 .. code-block:: pycon
 
     >>> from django.forms import formset_factory
-    >>> from myapp.forms import ArticleForm
+    >>> from .forms import ArticleForm
     >>> ArticleFormSet = formset_factory(ArticleForm, can_order=True)
     >>> formset = ArticleFormSet(
     ...     initial=[
@@ -598,7 +598,7 @@ Set ``ordering_widget`` to specify the widget class to be used with
 .. code-block:: pycon
 
     >>> from django.forms import BaseFormSet, formset_factory
-    >>> from myapp.forms import ArticleForm
+    >>> from .forms import ArticleForm
     >>> class BaseArticleFormSet(BaseFormSet):
     ...     ordering_widget = HiddenInput
     ...
@@ -618,7 +618,7 @@ use with ``can_order``:
 .. code-block:: pycon
 
     >>> from django.forms import BaseFormSet, formset_factory
-    >>> from myapp.forms import ArticleForm
+    >>> from .forms import ArticleForm
     >>> class BaseArticleFormSet(BaseFormSet):
     ...     def get_ordering_widget(self):
     ...         return HiddenInput(attrs={"class": "ordering"})
@@ -640,7 +640,7 @@ Lets you create a formset with the ability to select forms for deletion:
 .. code-block:: pycon
 
     >>> from django.forms import formset_factory
-    >>> from myapp.forms import ArticleForm
+    >>> from .forms import ArticleForm
     >>> ArticleFormSet = formset_factory(ArticleForm, can_delete=True)
     >>> formset = ArticleFormSet(
     ...     initial=[
@@ -731,7 +731,7 @@ Set ``deletion_widget`` to specify the widget class to be used with
 .. code-block:: pycon
 
     >>> from django.forms import BaseFormSet, formset_factory
-    >>> from myapp.forms import ArticleForm
+    >>> from .forms import ArticleForm
     >>> class BaseArticleFormSet(BaseFormSet):
     ...     deletion_widget = HiddenInput
     ...
@@ -751,7 +751,7 @@ use with ``can_delete``:
 .. code-block:: pycon
 
     >>> from django.forms import BaseFormSet, formset_factory
-    >>> from myapp.forms import ArticleForm
+    >>> from .forms import ArticleForm
     >>> class BaseArticleFormSet(BaseFormSet):
     ...     def get_deletion_widget(self):
     ...         return HiddenInput(attrs={"class": "deletion"})
@@ -783,7 +783,7 @@ fields/attributes of the order and deletion fields:
 
     >>> from django.forms import BaseFormSet
     >>> from django.forms import formset_factory
-    >>> from myapp.forms import ArticleForm
+    >>> from .forms import ArticleForm
     >>> class BaseArticleFormSet(BaseFormSet):
     ...     def add_fields(self, form, index):
     ...         super().add_fields(form, index)
@@ -811,7 +811,7 @@ You can pass this parameter when instantiating the formset:
 
     >>> from django.forms import BaseFormSet
     >>> from django.forms import formset_factory
-    >>> from myapp.forms import ArticleForm
+    >>> from .forms import ArticleForm
 
     >>> class MyArticleForm(ArticleForm):
     ...     def __init__(self, *args, user, **kwargs):
@@ -963,7 +963,7 @@ use the management form inside the template. Let's look at a sample view::
 
     from django.forms import formset_factory
     from django.shortcuts import render
-    from myapp.forms import ArticleForm
+    from .forms import ArticleForm
 
 
     def manage_articles(request):
@@ -1049,7 +1049,7 @@ a look at how this might be accomplished::
 
     from django.forms import formset_factory
     from django.shortcuts import render
-    from myapp.forms import ArticleForm, BookForm
+    from .forms import ArticleForm, BookForm
 
 
     def manage_articles(request):
