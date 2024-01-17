@@ -229,7 +229,7 @@ MRO is an acronym for Method Resolution Order.
         from django.urls import path
         from django.views.generic.base import RedirectView
 
-        from article.views import ArticleCounterRedirectView, ArticleDetailView
+        from articles.views import ArticleCounterRedirectView, ArticleDetailView
 
         urlpatterns = [
             path(
