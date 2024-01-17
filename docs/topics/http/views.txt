@@ -116,7 +116,8 @@ Example usage::
 
     from django.http import Http404
     from django.shortcuts import render
-    from polls.models import Poll
+
+    from .models import Poll
 
 
     def detail(request, poll_id):

@@ -143,8 +143,9 @@ into those elements.
       before. You can provide your implementation of ``get_context_data`` method
       in your ``Feed`` subclass. For example::
 
-        from mysite.models import Article
         from django.contrib.syndication.views import Feed
+
+        from .models import Article
 
 
         class ArticlesFeed(Feed):

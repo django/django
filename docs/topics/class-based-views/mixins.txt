@@ -227,7 +227,8 @@ We'll demonstrate this with the ``Author`` model we used in the
     from django.urls import reverse
     from django.views import View
     from django.views.generic.detail import SingleObjectMixin
-    from books.models import Author
+
+    from .models import Author
 
 
     class RecordInterestView(SingleObjectMixin, View):
@@ -319,7 +320,8 @@ Now we can write a new ``PublisherDetailView``::
 
     from django.views.generic import ListView
     from django.views.generic.detail import SingleObjectMixin
-    from books.models import Publisher
+
+    from .models import Publisher
 
 
     class PublisherDetailView(SingleObjectMixin, ListView):
@@ -455,7 +457,8 @@ Our new ``AuthorDetailView`` looks like this::
     from django.urls import reverse
     from django.views.generic import DetailView
     from django.views.generic.edit import FormMixin
-    from books.models import Author
+
+    from .models import Author
 
 
     class AuthorInterestForm(forms.Form):
@@ -523,7 +526,8 @@ write our own ``get_context_data()`` to make the
 
     from django import forms
     from django.views.generic import DetailView
-    from books.models import Author
+
+    from .models import Author
 
 
     class AuthorInterestForm(forms.Form):

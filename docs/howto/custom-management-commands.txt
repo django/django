@@ -47,7 +47,8 @@ To implement the command, edit ``polls/management/commands/closepoll.py`` to
 look like this::
 
     from django.core.management.base import BaseCommand, CommandError
-    from polls.models import Question as Poll
+
+    from ...models import Question as Poll
 
 
     class Command(BaseCommand):

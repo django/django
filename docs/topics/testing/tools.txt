@@ -1246,7 +1246,8 @@ specifying a ``fixtures`` class attribute on your :class:`django.test.TestCase`
 subclass::
 
     from django.test import TestCase
-    from myapp.models import Animal
+
+    from .models import Animal
 
 
     class AnimalTestCase(TestCase):

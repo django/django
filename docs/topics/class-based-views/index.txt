@@ -62,7 +62,7 @@ or methods. Consider, for example, a view that just displays one template,
 :class:`~django.views.generic.base.TemplateView` - so we can subclass it, and
 override the template name::
 
-    # some_app/views.py
+    # views.py
     from django.views.generic import TemplateView
 
 
@@ -111,7 +111,8 @@ And the view::
 
     from django.http import HttpResponse
     from django.views.generic import ListView
-    from books.models import Book
+
+    from .models import Book
 
 
     class BookListView(ListView):

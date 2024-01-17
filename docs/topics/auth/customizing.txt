@@ -421,6 +421,7 @@ Also, register the model in the app's ``admin.py``::
 
     from django.contrib import admin
     from django.contrib.auth.admin import UserAdmin
+
     from .models import User
 
     admin.site.register(User, UserAdmin)
@@ -854,7 +855,8 @@ If your custom user model is a subclass of ``AbstractUser``, then you can
 extend these forms in this manner::
 
     from django.contrib.auth.forms import UserCreationForm
-    from myapp.models import CustomUser
+
+    from .models import CustomUser
 
 
     class CustomUserCreationForm(UserCreationForm):
@@ -1110,7 +1112,7 @@ code would be required in the app's ``admin.py`` file::
     from django.contrib.auth.forms import ReadOnlyPasswordHashField
     from django.core.exceptions import ValidationError
 
-    from customauth.models import MyUser
+    from .models import MyUser
 
 
     class UserCreationForm(forms.ModelForm):

@@ -517,7 +517,8 @@ template sections to be easily incorporated into custom tags.
 For example, a custom block tag which creates a chart could look like this::
 
     from django import template
-    from myapp.charts import render_chart
+
+    from ..charts import render_chart
 
     register = template.Library()
 

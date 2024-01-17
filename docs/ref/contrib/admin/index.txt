@@ -88,7 +88,8 @@ Other topics
     application. Let's take a look at an example of the ``ModelAdmin``::
 
         from django.contrib import admin
-        from myapp.models import Author
+
+        from .models import Author
 
 
         class AuthorAdmin(admin.ModelAdmin):
@@ -107,7 +108,8 @@ Other topics
         preceding example could be simplified to::
 
             from django.contrib import admin
-            from myapp.models import Author
+
+            from .models import Author
 
             admin.site.register(Author)
 
@@ -119,6 +121,7 @@ The ``register`` decorator
     There is also a decorator for registering your ``ModelAdmin`` classes::
 
         from django.contrib import admin
+
         from .models import Author
 
 
@@ -131,8 +134,9 @@ The ``register`` decorator
     argument::
 
         from django.contrib import admin
-        from .models import Author, Editor, Reader
         from myproject.admin_site import custom_admin_site
+
+        from .models import Author, Editor, Reader
 
 
         @admin.register(Author, Reader, Editor, site=custom_admin_site)
@@ -507,7 +511,8 @@ subclass::
 
             from django import forms
             from django.contrib import admin
-            from myapp.models import Person
+
+            from .models import Person
 
 
             class PersonForm(forms.ModelForm):
@@ -540,8 +545,8 @@ subclass::
         from django.db import models
 
         # Import our custom widget and our model from where they're defined
-        from myapp.models import MyModel
-        from myapp.widgets import RichTextEditorWidget
+        from .models import MyModel
+        from .widgets import RichTextEditorWidget
 
 
         class MyModelAdmin(admin.ModelAdmin):
@@ -2251,7 +2256,8 @@ information.
     inlines to a model by specifying them in a ``ModelAdmin.inlines``::
 
         from django.contrib import admin
-        from myapp.models import Author, Book
+
+        from .models import Author, Book
 
 
         class BookInline(admin.TabularInline):
@@ -2515,7 +2521,8 @@ you need to explicitly define the foreign key since it is unable to do so
 automatically::
 
     from django.contrib import admin
-    from myapp.models import Friendship, Person
+
+    from .models import Friendship, Person
 
 
     class FriendshipInline(admin.TabularInline):
@@ -2559,7 +2566,8 @@ If you want to display many-to-many relations using an inline, you can do
 so by defining an ``InlineModelAdmin`` object for the relationship::
 
     from django.contrib import admin
-    from myapp.models import Group
+
+    from .models import Group
 
 
     class MembershipInline(admin.TabularInline):
@@ -2692,7 +2700,7 @@ any other inline. In your ``admin.py`` for this example app::
     from django.contrib import admin
     from django.contrib.contenttypes.admin import GenericTabularInline
 
-    from myapp.models import Image, Product
+    from .models import Image, Product
 
 
     class ImageInline(GenericTabularInline):

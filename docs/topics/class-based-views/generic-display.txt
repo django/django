@@ -109,7 +109,8 @@ Now we need to define a view::
 
     # views.py
     from django.views.generic import ListView
-    from books.models import Publisher
+
+    from .models import Publisher
 
 
     class PublisherListView(ListView):
@@ -183,7 +184,8 @@ specifies the context variable to use::
 
     # views.py
     from django.views.generic import ListView
-    from books.models import Publisher
+
+    from .models import Publisher
 
 
     class PublisherListView(ListView):
@@ -211,7 +213,8 @@ The default implementation adds the object being displayed to the template, but
 you can override it to send more::
 
     from django.views.generic import DetailView
-    from books.models import Book, Publisher
+
+    from .models import Book, Publisher
 
 
     class PublisherDetailView(DetailView):
@@ -255,7 +258,8 @@ specify the objects that the view will operate upon -- you can also
 specify the list of objects using the ``queryset`` argument::
 
     from django.views.generic import DetailView
-    from books.models import Publisher
+
+    from .models import Publisher
 
 
     class PublisherDetailView(DetailView):
@@ -274,7 +278,8 @@ To pick an example, we might want to order a list of books by publication date,
 with the most recent first::
 
     from django.views.generic import ListView
-    from books.models import Book
+
+    from .models import Book
 
 
     class BookListView(ListView):
@@ -286,7 +291,8 @@ usually want to do more than just reorder objects. If you want to present a
 list of books by a particular publisher, you can use the same technique::
 
     from django.views.generic import ListView
-    from books.models import Book
+
+    from .models import Book
 
 
     class AcmeBookListView(ListView):
@@ -345,7 +351,8 @@ Next, we'll write the ``PublisherBookListView`` view itself::
     # views.py
     from django.shortcuts import get_object_or_404
     from django.views.generic import ListView
-    from books.models import Book, Publisher
+
+    from .models import Book, Publisher
 
 
     class PublisherBookListView(ListView):
@@ -414,7 +421,8 @@ object -- so we override it and wrap the call::
 
     from django.utils import timezone
     from django.views.generic import DetailView
-    from books.models import Author
+
+    from .models import Author
 
 
     class AuthorDetailView(DetailView):
