@@ -250,7 +250,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def get_new_connection(self, conn_params):
         if self.settings_dict["USE_CONNECTION_POOL"]:
             pool = self.settings_dict.get("POOL")
-            if pool is None: 
+            if pool is None:
                 pool = self.settings_dict["POOL"] = Database.create_pool(
                     user=self.settings_dict["USER"],
                     password=self.settings_dict["PASSWORD"],
@@ -260,9 +260,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                     increment=self.settings_dict["POOL_INCREMENT"],
                     timeout=self.settings_dict["POOL_TIMEOUT"],
                     **conn_params,
-                )      
+                )
             return pool.acquire(cclass=self.settings_dict["POOL_CCLASS"])
-        
+
         return Database.connect(
             user=self.settings_dict["USER"],
             password=self.settings_dict["PASSWORD"],
