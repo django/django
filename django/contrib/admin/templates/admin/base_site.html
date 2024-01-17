@@ -13,25 +13,37 @@
 
 {% block extrahead %}
     {{ block.super }}
-    <script>
+        <script>
         document.addEventListener('keydown', function(event) {
+            function clickIfExistsButton(selector) {
+                const button = document.querySelector(selector);
+                if (button) {
+                    button.click();
+                    return true;
+                }
+                return false;
+            }
+
             // Save and continue editing on Command + S (Ctrl + S)
             if ((event.ctrlKey || event.metaKey) && !event.shiftKey && !event.altKey && event.key === 's') {
                 event.preventDefault();
-                document.querySelector('input[name="_continue"]').click();
-                return false;
+                if(clickIfExistsButton('input[name="_continue"]')) {
+                    return false;
+                }
             }
             // Save on Command + Shift + S
             if ((event.ctrlKey || event.metaKey) && event.shiftKey && !event.altKey && event.key === 's') {
                 event.preventDefault();
-                document.querySelector('input[name="_save"]').click();
-                return false;
+                if(clickIfExistsButton('input[name="_save"]')) {
+                    return false;
+                }
             }
             // Save and add another on Command + Alt + S (Ctrl + Alt + S)
             if ((event.ctrlKey || event.metaKey) && !event.shiftKey && event.altKey && event.key === 's') {
                 event.preventDefault();
-                document.querySelector('input[name="_addanother"]').click();
-                return false;
+                if(clickIfExistsButton('input[name="_addanother"]')) {
+                    return false;
+                }
             }
         });
     </script>
