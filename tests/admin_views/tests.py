@@ -7265,7 +7265,7 @@ class UserAdminTest(TestCase):
         response = self.client.get(
             reverse("admin:auth_user_add") + "?%s=1" % IS_POPUP_VAR
         )
-        for input in re.findall(r'<input[^>]*>', response.content.decode()):
+        for input in re.findall(r"<input[^>]*>", response.content.decode()):
             self.assertFalse('name="_continue"' in input)
             self.assertFalse('name="_addanother"' in input)
         data = {
@@ -7298,7 +7298,7 @@ class UserAdminTest(TestCase):
             reverse("admin:auth_user_change", args=(user.pk,)) + "?%s=1" % IS_POPUP_VAR
         )
         response = self.client.get(url)
-        for input in re.findall(r'<input[^>]*>', response.content.decode()):
+        for input in re.findall(r"<input[^>]*>", response.content.decode()):
             self.assertFalse('name="_continue"' in input)
             self.assertFalse('name="_addanother"' in input)
         data = {
