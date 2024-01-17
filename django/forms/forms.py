@@ -6,7 +6,7 @@ import copy
 import datetime
 
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
-from django.forms.fields import Field, FileField
+from django.forms.fields import Field
 from django.forms.utils import ErrorDict, ErrorList, RenderableFormMixin
 from django.forms.widgets import Media, MediaDefiningClass
 from django.utils.datastructures import MultiValueDict
@@ -331,10 +331,7 @@ class BaseForm(RenderableFormMixin):
             field = bf.field
             value = bf.initial if field.disabled else bf.data
             try:
-                if isinstance(field, FileField):
-                    value = field.clean(value, bf.initial)
-                else:
-                    value = field.clean(value)
+                value = field._clean_bound_field(bf)
                 self.cleaned_data[name] = value
                 if hasattr(self, "clean_%s" % name):
                     value = getattr(self, "clean_%s" % name)()
