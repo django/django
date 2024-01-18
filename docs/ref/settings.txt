@@ -1296,7 +1296,7 @@ Default primary key field type to use for models that don't have a field with
     :class:`~django.db.migrations.operations.RunSQL` operation to your
     migrations to perform the required ``ALTER TABLE`` step. You can check the
     existing table name through ``sqlmigrate``, ``dbshell``, or with the
-    field’s ``remote_field.through._meta.db_table`` property.
+    field's ``remote_field.through._meta.db_table`` property.
 
     Explicitly defined through models are already handled by the migrations
     system.
@@ -3476,7 +3476,7 @@ usage.
     your static files from their permanent locations into one directory for
     ease of deployment; it is **not** a place to store your static files
     permanently. You should do that in directories that will be found by
-    :doc:`staticfiles</ref/contrib/staticfiles>`’s
+    :doc:`staticfiles</ref/contrib/staticfiles>`'s
     :setting:`finders<STATICFILES_FINDERS>`, which by default, are
     ``'static/'`` app sub-directories and any directories you include in
     :setting:`STATICFILES_DIRS`).
