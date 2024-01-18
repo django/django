@@ -27,9 +27,14 @@
             }
 
             // Set hints for buttons based on the OS
-            setButtonHint('input[name="_continue"]', (isMac ? macHint : windowsHint) + 'S');
-            setButtonHint('input[name="_save"]', (isMac ? macHint : windowsHint) + 'Shift + S');
-            setButtonHint('input[name="_addanother"]', (isMac ? macHint : windowsHint) + 'Alt + S');
+            continue_selector = 'input[name="_continue"]'
+            save_selector = 'input[name="_save"]'
+            addanother_selector = 'input[name="_addanother"]'
+
+
+            setButtonHint(continue_selector, (isMac ? macHint : windowsHint) + 'S');
+            setButtonHint(save_selector, (isMac ? macHint : windowsHint) + 'Shift + S');
+            setButtonHint(addanother_selector, (isMac ? macHint : windowsHint) + 'Alt + S');
 
             document.addEventListener('keydown', function(event) {
                 function clickIfExistsButton(selector) {
@@ -44,21 +49,21 @@
                 // Save and continue editing on Command + S (Ctrl + S)
                 if ((event.ctrlKey || event.metaKey) && !event.shiftKey && !event.altKey && event.key === 's') {
                     event.preventDefault();
-                    if(clickIfExistsButton('input[name="_continue"]')) {
+                    if(clickIfExistsButton(continue_selector)) {
                         return false;
                     }
                 }
                 // Save on Command + Shift + S (Ctrl + Shift + S)
                 if ((event.ctrlKey || event.metaKey) && event.shiftKey && !event.altKey && event.key === 's') {
                     event.preventDefault();
-                    if(clickIfExistsButton('input[name="_save"]')) {
+                    if(clickIfExistsButton(save_selector)) {
                         return false;
                     }
                 }
                 // Save and add another on Command + Alt + S (Ctrl + Alt + S)
                 if ((event.ctrlKey || event.metaKey) && !event.shiftKey && event.altKey && event.key === 's') {
                     event.preventDefault();
-                    if(clickIfExistsButton('input[name="_addanother"]')) {
+                    if(clickIfExistsButton(addanother_selector)) {
                         return false;
                     }
                 }
