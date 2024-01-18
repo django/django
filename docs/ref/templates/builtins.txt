@@ -2484,8 +2484,8 @@ individual elements of the sequence.
 
 Returns a slice of the list.
 
-Uses the same syntax as Python's list slicing. See
-https://diveinto.org/python3/native-datatypes.html#slicinglists for an
+Uses the same syntax as Python's list slicing. See the `Python documentation
+<https://docs.python.org/3/tutorial/introduction.html#lists>`_ for an
 introduction.
 
 Example:

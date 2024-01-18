@@ -1797,9 +1797,9 @@ allows for the following options by default:
 
 .. django-admin-option:: --pythonpath PYTHONPATH
 
-Adds the given filesystem path to the Python `import search path`_. If this
-isn't provided, ``django-admin`` will use the :envvar:`PYTHONPATH` environment
-variable.
+Adds the given filesystem path to the Python :py:data:`sys.path` module
+attribute. If this isn't provided, ``django-admin`` will use the
+:envvar:`PYTHONPATH` environment variable.
 
 This option is unnecessary in ``manage.py``, because it takes care of setting
 the Python path for you.
@@ -1809,8 +1809,6 @@ Example usage:
 .. console::
 
     django-admin migrate --pythonpath='/home/djangoprojects/myproject'
-
-.. _import search path: https://diveinto.org/python3/your-first-python-program.html#importsearchpath
 
 .. django-admin-option:: --settings SETTINGS
 
