@@ -331,8 +331,7 @@ class BaseForm(RenderableFormMixin):
             field = bf.field
             value = bf.initial if field.disabled else bf.data
             try:
-                value = field._clean_bound_field(bf)
-                self.cleaned_data[name] = value
+                self.cleaned_data[name] = field._clean_bound_field(bf)
                 if hasattr(self, "clean_%s" % name):
                     value = getattr(self, "clean_%s" % name)()
                     self.cleaned_data[name] = value
