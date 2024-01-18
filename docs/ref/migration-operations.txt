@@ -532,7 +532,7 @@ structure of an ``Operation`` looks like this::
         reversible = False
 
         # This categorizes the operation. The corresponding symbol will be
-        # display by the makemigrations command.
+        # displayed by the makemigrations command.
         category = OperationCategory.ADDITION
 
         def __init__(self, arg1, arg2):
