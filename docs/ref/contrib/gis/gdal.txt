@@ -556,6 +556,27 @@ coordinate transformation:
     Returns or sets the coordinate dimension of this geometry. For example, the
     value would be 2 for two-dimensional geometries.
 
+    .. attribute:: is_3d
+
+    .. versionadded:: 5.1
+
+    A boolean indicating if this geometry has Z coordinates.
+
+    .. method:: set_3d(value)
+
+    .. versionadded:: 5.1
+
+    A method that adds or removes the Z coordinate dimension.
+
+    .. code-block:: pycon
+
+        >>> p = OGRGeometry("POINT (1 2 3)")
+        >>> p.is_3d
+        True
+        >>> p.set_3d(False)
+        >>> p.wkt
+        "POINT (1 2)"
+
     .. attribute:: geom_count
 
     Returns the number of elements in this geometry:

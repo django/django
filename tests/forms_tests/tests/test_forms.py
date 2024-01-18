@@ -14,6 +14,7 @@ from django.forms import (
     DateField,
     DateTimeField,
     EmailField,
+    Field,
     FileField,
     FileInput,
     FloatField,
@@ -35,10 +36,9 @@ from django.forms import (
     TextInput,
     TimeField,
     ValidationError,
-    forms,
 )
 from django.forms.renderers import DjangoTemplates, get_default_renderer
-from django.forms.utils import ErrorList
+from django.forms.utils import ErrorDict, ErrorList
 from django.http import QueryDict
 from django.template import Context, Template
 from django.test import SimpleTestCase
@@ -1656,7 +1656,7 @@ class FormsTestCase(SimpleTestCase):
                     self._errors = e.update_error_dict(self._errors)
 
                 try:
-                    raise ValidationError({"code": forms.ErrorList(["Code error 3."])})
+                    raise ValidationError({"code": ErrorList(["Code error 3."])})
                 except ValidationError as e:
                     self._errors = e.update_error_dict(self._errors)
 
@@ -1680,7 +1680,7 @@ class FormsTestCase(SimpleTestCase):
         self.assertFalse(form.is_valid())
 
         # update_error_dict didn't lose track of the ErrorDict type.
-        self.assertIsInstance(form._errors, forms.ErrorDict)
+        self.assertIsInstance(form._errors, ErrorDict)
 
         self.assertEqual(
             dict(form.errors),
@@ -2738,7 +2738,7 @@ Options: <select multiple name="options" aria-invalid="true" required>
         self.assertNotIn("birthday", p.changed_data)
 
         # A field raising ValidationError is always in changed_data
-        class PedanticField(forms.Field):
+        class PedanticField(Field):
             def to_python(self, value):
                 raise ValidationError("Whatever")
 
@@ -2879,7 +2879,7 @@ Options: <select multiple name="options" aria-invalid="true" required>
                     microseconds,
                 )
 
-        class DateTimeForm(forms.Form):
+        class DateTimeForm(Form):
             dt = DateTimeField(initial=FakeTime().now, disabled=disabled)
 
         return DateTimeForm({})
@@ -2914,7 +2914,7 @@ Options: <select multiple name="options" aria-invalid="true" required>
         self.assertEqual(cleaned, bf.initial)
 
     def test_datetime_changed_data_callable_with_microseconds(self):
-        class DateTimeForm(forms.Form):
+        class DateTimeForm(Form):
             dt = DateTimeField(
                 initial=lambda: datetime.datetime(2006, 10, 25, 14, 30, 45, 123456),
                 disabled=True,
@@ -3570,8 +3570,8 @@ Options: <select multiple name="options" aria-invalid="true" required>
         )
 
     def test_filefield_initial_callable(self):
-        class FileForm(forms.Form):
-            file1 = forms.FileField(initial=lambda: "resume.txt")
+        class FileForm(Form):
+            file1 = FileField(initial=lambda: "resume.txt")
 
         f = FileForm({})
         self.assertEqual(f.errors, {})
@@ -3579,7 +3579,7 @@ Options: <select multiple name="options" aria-invalid="true" required>
 
     def test_filefield_with_fileinput_required(self):
         class FileForm(Form):
-            file1 = forms.FileField(widget=FileInput)
+            file1 = FileField(widget=FileInput)
 
         f = FileForm(auto_id=False)
         self.assertHTMLEqual(
@@ -4057,7 +4057,7 @@ Options: <select multiple name="options" aria-invalid="true" required>
                     return {}
                 return super().to_python(value)
 
-        class JSONForm(forms.Form):
+        class JSONForm(Form):
             json = CustomJSONField()
 
         form = JSONForm(data={"json": "{}"})

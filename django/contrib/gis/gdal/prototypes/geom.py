@@ -4,6 +4,7 @@ from django.contrib.gis.gdal.envelope import OGREnvelope
 from django.contrib.gis.gdal.libgdal import GDAL_VERSION, lgdal
 from django.contrib.gis.gdal.prototypes.errcheck import check_envelope
 from django.contrib.gis.gdal.prototypes.generation import (
+    bool_output,
     const_string_output,
     double_output,
     geom_output,
@@ -79,6 +80,8 @@ geom_diff = geom_output(lgdal.OGR_G_Difference, [c_void_p, c_void_p])
 geom_intersection = geom_output(lgdal.OGR_G_Intersection, [c_void_p, c_void_p])
 geom_sym_diff = geom_output(lgdal.OGR_G_SymmetricDifference, [c_void_p, c_void_p])
 geom_union = geom_output(lgdal.OGR_G_Union, [c_void_p, c_void_p])
+is_3d = bool_output(lgdal.OGR_G_Is3D, [c_void_p])
+set_3d = void_output(lgdal.OGR_G_Set3D, [c_void_p, c_int], errcheck=False)
 
 # Geometry modification routines.
 add_geom = void_output(lgdal.OGR_G_AddGeometry, [c_void_p, c_void_p])

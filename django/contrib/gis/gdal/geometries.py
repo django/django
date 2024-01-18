@@ -268,6 +268,20 @@ class OGRGeometry(GDALBase):
         "Return the envelope as a 4-tuple, instead of as an Envelope object."
         return self.envelope.tuple
 
+    @property
+    def is_3d(self):
+        """Return True if the geometry has Z coordinates."""
+        return capi.is_3d(self.ptr)
+
+    def set_3d(self, value):
+        """Set if this geometry has Z coordinates."""
+        if value is True:
+            capi.set_3d(self.ptr, 1)
+        elif value is False:
+            capi.set_3d(self.ptr, 0)
+        else:
+            raise ValueError(f"Input to 'set_3d' must be a boolean, got '{value!r}'.")
+
     # #### SpatialReference-related Properties ####
 
     # The SRS property
@@ -546,16 +560,15 @@ class Point(OGRGeometry):
     @property
     def z(self):
         "Return the Z coordinate for this Point."
-        if self.coord_dim == 3:
+        if self.is_3d:
             return capi.getz(self.ptr, 0)
 
     @property
     def tuple(self):
         "Return the tuple of this point."
-        if self.coord_dim == 2:
-            return (self.x, self.y)
-        elif self.coord_dim == 3:
+        if self.is_3d:
             return (self.x, self.y, self.z)
+        return self.x, self.y
 
     coords = tuple
 
@@ -566,13 +579,13 @@ class LineString(OGRGeometry):
         if 0 <= index < self.point_count:
             x, y, z = c_double(), c_double(), c_double()
             capi.get_point(self.ptr, index, byref(x), byref(y), byref(z))
+            if self.is_3d:
+                return x.value, y.value, z.value
             dim = self.coord_dim
             if dim == 1:
                 return (x.value,)
             elif dim == 2:
                 return (x.value, y.value)
-            elif dim == 3:
-                return (x.value, y.value, z.value)
         else:
             raise IndexError(
                 "Index out of range when accessing points of a line string: %s." % index
@@ -609,7 +622,7 @@ class LineString(OGRGeometry):
     @property
     def z(self):
         "Return the Z coordinates in a list."
-        if self.coord_dim == 3:
+        if self.is_3d:
             return self._listarr(capi.getz)
 
 

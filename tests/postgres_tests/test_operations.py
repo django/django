@@ -59,6 +59,10 @@ class AddIndexConcurrentlyTests(OperationTestBase):
             operation.describe(),
             "Concurrently create index pony_pink_idx on field(s) pink of model Pony",
         )
+        self.assertEqual(
+            operation.formatted_description(),
+            "+ Concurrently create index pony_pink_idx on field(s) pink of model Pony",
+        )
         operation.state_forwards(self.app_label, new_state)
         self.assertEqual(
             len(new_state.models[self.app_label, "pony"].options["indexes"]), 1
@@ -154,6 +158,10 @@ class RemoveIndexConcurrentlyTests(OperationTestBase):
             operation.describe(),
             "Concurrently remove index pony_pink_idx from Pony",
         )
+        self.assertEqual(
+            operation.formatted_description(),
+            "- Concurrently remove index pony_pink_idx from Pony",
+        )
         operation.state_forwards(self.app_label, new_state)
         self.assertEqual(
             len(new_state.models[self.app_label, "pony"].options["indexes"]), 0
@@ -190,6 +198,9 @@ class CreateExtensionTests(PostgreSQLTestCase):
     @override_settings(DATABASE_ROUTERS=[NoMigrationRouter()])
     def test_no_allow_migrate(self):
         operation = CreateExtension("tablefunc")
+        self.assertEqual(
+            operation.formatted_description(), "+ Creates extension tablefunc"
+        )
         project_state = ProjectState()
         new_state = project_state.clone()
         # Don't create an extension.
@@ -287,6 +298,7 @@ class CreateCollationTests(PostgreSQLTestCase):
         operation = CreateCollation("C_test", locale="C")
         self.assertEqual(operation.migration_name_fragment, "create_collation_c_test")
         self.assertEqual(operation.describe(), "Create collation C_test")
+        self.assertEqual(operation.formatted_description(), "+ Create collation C_test")
         project_state = ProjectState()
         new_state = project_state.clone()
         # Create a collation.
@@ -418,6 +430,7 @@ class RemoveCollationTests(PostgreSQLTestCase):
         operation = RemoveCollation("C_test", locale="C")
         self.assertEqual(operation.migration_name_fragment, "remove_collation_c_test")
         self.assertEqual(operation.describe(), "Remove collation C_test")
+        self.assertEqual(operation.formatted_description(), "- Remove collation C_test")
         project_state = ProjectState()
         new_state = project_state.clone()
         # Remove a collation.
@@ -469,6 +482,10 @@ class AddConstraintNotValidTests(OperationTestBase):
         self.assertEqual(
             operation.describe(),
             f"Create not valid constraint {constraint_name} on model Pony",
+        )
+        self.assertEqual(
+            operation.formatted_description(),
+            f"+ Create not valid constraint {constraint_name} on model Pony",
         )
         self.assertEqual(
             operation.migration_name_fragment,
@@ -529,6 +546,10 @@ class ValidateConstraintTests(OperationTestBase):
         self.assertEqual(
             operation.describe(),
             f"Validate constraint {constraint_name} on model Pony",
+        )
+        self.assertEqual(
+            operation.formatted_description(),
+            f"~ Validate constraint {constraint_name} on model Pony",
         )
         self.assertEqual(
             operation.migration_name_fragment,

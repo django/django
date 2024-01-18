@@ -241,7 +241,7 @@ create a database migration:
     $ python manage.py makemigrations
     Migrations for 'world':
       world/migrations/0001_initial.py:
-        - Create model WorldBorder
+        + Create model WorldBorder
 
 Let's look at the SQL that will generate the table for the ``WorldBorder``
 model:

@@ -102,7 +102,7 @@ body {
 /* LINKS */
 
 a:link, a:visited {
-    color: var(--body-fg);
+    color: var(--link-fg);
     text-decoration: none;
     transition: color 0.15s, background 0.15s;
 }
