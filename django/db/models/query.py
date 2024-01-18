@@ -744,6 +744,57 @@ class QuerySet(AltersData):
             return OnConflict.UPDATE
         return None
 
+    def _bulk_create_multi_table(
+        self,
+        objs,
+        batch_size,
+        ignore_conflicts,
+        update_conflicts,
+        update_fields,
+        unique_fields,
+    ):
+        # Vérification de la capacité de retour des IDs
+        connection = connections[self.db]
+        can_return_ids = connection.features.can_return_rows_from_bulk_insert
+
+        # Traiter les modèles parents
+        parent_model = None
+        for obj in objs:
+            for parent in obj._meta.get_parent_list():
+                parent_model = parent._meta.concrete_model
+                break
+            if parent_model:
+                break
+
+        if not parent_model:
+            raise ValueError("No parent model found")
+
+        # Créer et insérer les objets parents
+        parent_objs = []
+        for obj in objs:
+            parent_obj = parent_model()
+            for field in parent_model._meta.local_fields:
+                setattr(parent_obj, field.name, getattr(obj, field.name))
+            parent_objs.append(parent_obj)
+
+        # Insérer les parents
+        parent_model.objects.bulk_create(parent_objs, batch_size, ignore_conflicts)
+
+        # Associer les IDs parent aux objets enfant et préparer pour l'insertion
+        if can_return_ids:
+            for parent_obj, obj in zip(parent_objs, objs):
+                setattr(obj, parent_model._meta.model_name + "_ptr", parent_obj)
+
+        # Insérer les modèles enfants
+        self.model.objects.bulk_create(
+            objs,
+            batch_size,
+            ignore_conflicts,
+            update_conflicts,
+            update_fields,
+            unique_fields,
+        )
+
     def bulk_create(
         self,
         objs,
