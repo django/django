@@ -39,6 +39,7 @@ from .models import B, Person, Through
 class MySuite:
     def __init__(self):
         self.tests = []
+        self.serialized_aliases = None
 
     def addTest(self, test):
         self.tests.append(test)
@@ -706,6 +707,70 @@ class NoInitializeSuiteTestRunnerTests(SimpleTestCase):
                     "test_runner_apps.simple.tests",
                 ]
             )
+
+
+class TestPollutionDetection(SimpleTestCase):
+    class TestRunner(DiscoverRunner):
+        def setup_test_environment(self, **kwargs):
+            return
+
+        def setup_databases(self, **kwargs):
+            return
+
+        def run_checks(self, databases):
+            return
+
+        def teardown_databases(self, old_config, **kwargs):
+            return
+
+        def teardown_test_environment(self, **kwargs):
+            return
+
+        def get_databases(self, *args):
+            return {}
+
+        def build_suite(self, test_classes):
+            suite = MySuite()
+            for test_class in test_classes:
+                suite.addTest(test_class)
+
+            return suite
+
+        def run_suite(self, suite):
+            polluter = False
+            result = mock.Mock()
+            result.failures = False
+            result.errors = False
+
+            for test in suite.tests:
+                if test == "Polluter":
+                    polluter = True
+                if test == "Polluted" and polluter:
+                    result.failures = True
+
+            return result
+
+    def test_pair(self):
+        runner = self.TestRunner()
+
+        with mock.patch("builtins.print") as mock_print:
+            runner.paired_tests("Polluted", ["Test1", "Test2", "Test3", "Polluter"])
+        mock_print.assert_called_with("***** Found problem pair with Polluter")
+
+        with mock.patch("builtins.print") as mock_print:
+            runner.paired_tests("Test0", ["Test1", "Test2", "Test3", "Test4"])
+        mock_print.assert_called_with("***** No problem pair found")
+
+    def test_bisect(self):
+        runner = self.TestRunner()
+
+        with mock.patch("builtins.print") as mock_print:
+            runner.bisect_tests("Polluted", ["Test1", "Test2", "Test3", "Polluter"])
+        mock_print.assert_called_with("***** Source of error: Polluter")
+
+        with mock.patch("builtins.print") as mock_print:
+            runner.bisect_tests("Test0", ["Test1", "Test2", "Test3", "Test4"])
+        mock_print.assert_called_with("***** No problem found in either half")
 
 
 class TestRunnerInitializerTests(SimpleTestCase):

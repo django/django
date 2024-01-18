@@ -1067,7 +1067,7 @@ class DiscoverRunner:
         return list(modules)
 
     def paired_tests(self, paired_test, test_labels):
-        test_labels = self.get_test_modules(test_labels)
+        test_labels = list(test_labels) or self.get_test_modules(test_labels)
 
         print("***** Trying paired execution")
         # Make sure the constant member of the pair isn't in the test list
@@ -1121,12 +1121,11 @@ class DiscoverRunner:
         return 1
 
     def bisect_tests(self, bisection_label, test_labels):
-        test_labels = test_labels or self.get_test_modules(test_labels)
+        test_labels = list(test_labels) or self.get_test_modules(test_labels)
 
         print("***** Bisecting test suite: %s" % " ".join(test_labels))
 
         # Make sure the bisection point isn't in the test list
-        # Also remove tests that need to be run in specific combinations
         try:
             test_labels.remove(bisection_label)
         except ValueError:
@@ -1202,10 +1201,10 @@ class DiscoverRunner:
                 iteration += 1
                 test_labels = test_labels_b[:-1]
             elif failures_a and failures_b:
-                print("***** Problem found in both halves.")
+                print("***** Problem found in both halves")
                 break
             else:
-                print("***** No problem found in either half.")
+                print("***** No problem found in either half")
                 break
 
         if len(test_labels) == 1:
