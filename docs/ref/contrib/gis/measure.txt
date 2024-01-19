@@ -116,6 +116,19 @@ Unit Attribute                     Full name or alias(es)
     For example, ``Area(sq_m=2)`` creates an :class:`Area` object
     representing two square meters.
 
+In addition to unit with the ``sq_`` prefix, the following units are also
+supported on :class:`Area`:
+
+=================================  ========================================
+Unit Attribute                     Full name or alias(es)
+=================================  ========================================
+``ha``                             Hectare
+=================================  ========================================
+
+.. versionchanged:: 5.1
+
+    Support for the ``ha`` unit was added.
+
 Measurement API
 ===============
 

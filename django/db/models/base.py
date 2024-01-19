@@ -1628,7 +1628,7 @@ class Model(AltersData, metaclass=ModelBase):
 
         errors = {}
         for f in self._meta.fields:
-            if f.name in exclude:
+            if f.name in exclude or f.generated:
                 continue
             # Skip validation for empty fields with blank=True. The developer
             # is responsible for making sure they have a valid value.

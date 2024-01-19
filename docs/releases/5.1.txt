@@ -70,6 +70,14 @@ Minor features
   ``metro_code`` and ``region_code``, but the previous keys are also retained
   for backward compatibility.
 
+* :class:`~django.contrib.gis.measure.Area` now supports the ``ha`` unit.
+
+* The new :attr:`.OGRGeometry.is_3d` attribute allows checking if a geometry
+  has a ``Z`` coordinate dimension.
+
+* The new :meth:`.OGRGeometry.set_3d` method allows addition and removal of the
+  ``Z`` coordinate dimension.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -176,12 +184,17 @@ Logging
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :djadmin:`makemigrations` command now displays meaningful symbols for each
+  operation to highlight :class:`operation categories
+  <django.db.migrations.operations.base.OperationCategory>`.
 
 Migrations
 ~~~~~~~~~~
 
-* ...
+* The new ``Operation.category`` attribute allows specifying an
+  :class:`operation category
+  <django.db.migrations.operations.base.OperationCategory>` used by the
+  :djadmin:`makemigrations` to display a meaningful symbol for the operation.
 
 Models
 ~~~~~~

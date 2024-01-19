@@ -2,7 +2,7 @@ from django.db.migrations.utils import field_references
 from django.db.models import NOT_PROVIDED
 from django.utils.functional import cached_property
 
-from .base import Operation
+from .base import Operation, OperationCategory
 
 
 class FieldOperation(Operation):
@@ -74,6 +74,8 @@ class FieldOperation(Operation):
 
 class AddField(FieldOperation):
     """Add a field to a model."""
+
+    category = OperationCategory.ADDITION
 
     def __init__(self, model_name, name, field, preserve_default=True):
         self.preserve_default = preserve_default
@@ -154,6 +156,8 @@ class AddField(FieldOperation):
 class RemoveField(FieldOperation):
     """Remove a field from a model."""
 
+    category = OperationCategory.REMOVAL
+
     def deconstruct(self):
         kwargs = {
             "model_name": self.model_name,
@@ -200,6 +204,8 @@ class AlterField(FieldOperation):
     Alter a field's database column (e.g. null, max_length) to the provided
     new field.
     """
+
+    category = OperationCategory.ALTERATION
 
     def __init__(self, model_name, name, field, preserve_default=True):
         self.preserve_default = preserve_default
@@ -269,6 +275,8 @@ class AlterField(FieldOperation):
 
 class RenameField(FieldOperation):
     """Rename a field on the model. Might affect db_column too."""
+
+    category = OperationCategory.ALTERATION
 
     def __init__(self, model_name, old_name, new_name):
         self.old_name = old_name

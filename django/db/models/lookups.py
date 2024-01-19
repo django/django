@@ -268,11 +268,16 @@ class FieldGetDbPrepValueMixin:
             getattr(field, "get_db_prep_value", None)
             or self.lhs.output_field.get_db_prep_value
         )
+        if not self.get_db_prep_lookup_value_is_iterable:
+            value = [value]
         return (
             "%s",
-            [get_db_prep_value(v, connection, prepared=True) for v in value]
-            if self.get_db_prep_lookup_value_is_iterable
-            else [get_db_prep_value(value, connection, prepared=True)],
+            [
+                v
+                if hasattr(v, "as_sql")
+                else get_db_prep_value(v, connection, prepared=True)
+                for v in value
+            ],
         )
 
 
