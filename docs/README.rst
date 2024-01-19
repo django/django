@@ -1,5 +1,5 @@
 The documentation in this tree is in plain text files and can be viewed using
-any text file viewer.
+any suitable text file viewer such as notepad.
 
 It uses `ReST`_ (reStructuredText), and the `Sphinx`_ documentation system.
 This allows it to be built into other forms for easier viewing and browsing.
