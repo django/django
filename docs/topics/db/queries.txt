@@ -417,7 +417,7 @@ second will raise ``DoesNotExist`` if no objects match the given criteria. See
 Field lookups
 -------------
 
-Field lookups are how you specify the meat of an SQL ``WHERE`` clause. They're
+Field lookups are how you specify the meet of an SQL ``WHERE`` clause. They're
 specified as keyword arguments to the :class:`~django.db.models.query.QuerySet`
 methods :meth:`~django.db.models.query.QuerySet.filter`,
 :meth:`~django.db.models.query.QuerySet.exclude` and
