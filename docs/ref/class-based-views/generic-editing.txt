@@ -64,8 +64,9 @@ editing content:
 
     **Example views.py**::
 
-        from .forms import ContactForm
         from django.views.generic.edit import FormView
+
+        from .forms import ContactForm
 
 
         class ContactFormView(FormView):
@@ -142,6 +143,7 @@ editing content:
     **Example views.py**::
 
         from django.views.generic.edit import CreateView
+
         from .models import Author
 
 
@@ -222,6 +224,7 @@ editing content:
     **Example views.py**::
 
         from django.views.generic.edit import UpdateView
+
         from .models import Author
 
 
@@ -310,6 +313,7 @@ editing content:
 
         from django.urls import reverse_lazy
         from django.views.generic.edit import DeleteView
+
         from .models import Author
 
 

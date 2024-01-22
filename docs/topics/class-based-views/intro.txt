@@ -93,6 +93,7 @@ or raises :class:`~django.http.HttpResponseNotAllowed` if not::
 
     # urls.py
     from django.urls import path
+
     from .views import MyView
 
     urlpatterns = [

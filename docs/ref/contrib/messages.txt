@@ -373,6 +373,7 @@ Adding messages in class-based views
 
     from django.contrib.messages.views import SuccessMessageMixin
     from django.views.generic.edit import CreateView
+
     from .models import Author
 
 
@@ -391,6 +392,7 @@ method.
 
     from django.contrib.messages.views import SuccessMessageMixin
     from django.views.generic.edit import CreateView
+
     from .models import ComplicatedModel
 
 

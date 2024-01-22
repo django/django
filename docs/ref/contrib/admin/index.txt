@@ -87,6 +87,7 @@ Other topics
     application. Let's take a look at an example of the ``ModelAdmin``::
 
         from django.contrib import admin
+
         from .models import Author
 
 
@@ -106,6 +107,7 @@ Other topics
         preceding example could be simplified to::
 
             from django.contrib import admin
+
             from .models import Author
 
             admin.site.register(Author)
@@ -487,6 +489,7 @@ subclass::
 
             from django import forms
             from django.contrib import admin
+
             from .models import Person
 
 
@@ -2469,6 +2472,7 @@ you need to explicitly define the foreign key since it is unable to do so
 automatically::
 
     from django.contrib import admin
+
     from .models import Friendship
 
 
