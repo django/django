@@ -222,7 +222,7 @@ some other flavor of Unix, run:
 
 .. console::
 
-    $ ./runtests.py
+    $ python ./runtests.py
 
 Now sit back and relax. Django's entire test suite has thousands of tests, and
 it takes at least a few minutes to run, depending on the speed of your
@@ -361,7 +361,7 @@ that's really what happens. ``cd`` to the Django ``tests/`` directory and run:
 
 .. console::
 
-    $ ./runtests.py shortcuts
+    $ python ./runtests.py shortcuts
 
 If the tests ran correctly, you should see one failure corresponding to the test
 method we added, with this error:
@@ -390,7 +390,7 @@ whether the code we added is working correctly. Again, navigate to the Django
 
 .. console::
 
-    $ ./runtests.py shortcuts
+    $ python ./runtests.py shortcuts
 
 Everything should pass. If it doesn't, make sure you correctly added the
 function to the correct file.
@@ -409,7 +409,7 @@ directory and run:
 
 .. console::
 
-    $ ./runtests.py
+    $ python ./runtests.py
 
 Writing Documentation
 =====================
