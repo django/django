@@ -1608,7 +1608,7 @@ Helper functions
       Defaults to :setting:`settings.LOGIN_URL <LOGIN_URL>` if not supplied.
 
     * ``redirect_field_name``: The name of a ``GET`` field containing the
-      URL to redirect to after log out. Overrides ``next`` if the given
+      URL to redirect to after login. Overrides ``next`` if the given
       ``GET`` parameter is passed.
 
 .. _built-in-auth-forms:
