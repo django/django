@@ -75,12 +75,13 @@ def intcomma(value, use_l10n=True):
             return intcomma(value, False)
         else:
             return number_format(value, use_l10n=True, force_grouping=True)
-    orig = str(value)
-    new = re.sub(r"^(-?\d+)(\d{3})", r"\g<1>,\g<2>", orig)
-    if orig == new:
-        return new
-    else:
-        return intcomma(new, use_l10n)
+    result = str(value)
+    match = re.match(r"-?\d+", result)
+    if match:
+        prefix = match[0]
+        prefix_with_commas = re.sub(r"\d{3}", r"\g<0>,", prefix[::-1])[::-1]
+        result = prefix_with_commas + result[len(prefix) :]
+    return result
 
 
 # A tuple of standard large number to their converters
