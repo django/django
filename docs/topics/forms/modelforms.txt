@@ -22,7 +22,7 @@ For example:
 .. code-block:: pycon
 
     >>> from django.forms import ModelForm
-    >>> from .models import Article
+    >>> from myapp.models import Article
 
     # Create the form class.
     >>> class ArticleForm(ModelForm):
@@ -334,8 +334,8 @@ this is supplied, ``save()`` will update that instance. If it's not supplied,
 
 .. code-block:: pycon
 
-    >>> from .models import Article
-    >>> from .forms import ArticleForm
+    >>> from myapp.models import Article
+    >>> from myapp.forms import ArticleForm
 
     # Create a form instance from POST data.
     >>> f = ArticleForm(request.POST)
@@ -684,7 +684,7 @@ enable localization for fields, you can use the ``localized_fields``
 attribute on the ``Meta`` class.
 
     >>> from django.forms import ModelForm
-    >>> from .models import Author
+    >>> from myapp.models import Author
     >>> class AuthorForm(ModelForm):
     ...     class Meta:
     ...         model = Author
@@ -774,7 +774,7 @@ to make:
 .. code-block:: pycon
 
     >>> from django.forms import modelform_factory
-    >>> from .models import Book
+    >>> from myapp.models import Book
     >>> BookForm = modelform_factory(Book, fields=["author", "title"])
 
 This can also be used to make modifications to existing forms, for example by
@@ -810,7 +810,7 @@ convenient. Let's reuse the ``Author`` model from above:
 .. code-block:: pycon
 
     >>> from django.forms import modelformset_factory
-    >>> from .models import Author
+    >>> from myapp.models import Author
     >>> AuthorFormSet = modelformset_factory(Author, fields=["name", "title"])
 
 Using ``fields`` restricts the formset to use only the given fields.
