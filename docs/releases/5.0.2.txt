@@ -7,6 +7,12 @@ Django 5.0.2 release notes
 Django 5.0.2 fixes a security issue with severity "moderate" and several bugs
 in 5.0.1. Also, the latest string translations from Transifex are incorporated.
 
+CVE-2024-24680: Potential denial-of-service in ``intcomma`` template filter
+===========================================================================
+
+The ``intcomma`` template filter was subject to a potential denial-of-service
+attack when used with very long strings.
+
 Bugfixes
 ========
 
