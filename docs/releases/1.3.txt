@@ -397,7 +397,7 @@ To return to the previous rendering (without the ability to clear the
 ``Document`` model with a ``FileField`` named ``document``::
 
     from django import forms
-    from .models import Document
+    from myapp.models import Document
 
 
     class DocumentForm(forms.ModelForm):

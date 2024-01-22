@@ -1273,7 +1273,7 @@ etc.
 So these days, the above use of the ``prefix`` arg is much more likely to be
 written (and is better written) as::
 
-    from . import views
+    from myapp import views
 
     urlpatterns = patterns(
         "",
@@ -1288,7 +1288,7 @@ Updating your code is as simple as ensuring that ``urlpatterns`` is a list of
 ``django.conf.urls.url()`` instances. For example::
 
     from django.conf.urls import url
-    from . import views
+    from myapp import views
 
     urlpatterns = [
         url("^$", views.myview),
