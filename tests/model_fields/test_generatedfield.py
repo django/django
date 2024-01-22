@@ -168,6 +168,14 @@ class GeneratedFieldTestMixin:
         with self.assertRaisesMessage(AttributeError, msg):
             m.field
 
+    def test_full_clean(self):
+        m = self.base_model(a=1, b=2)
+        # full_clean() ignores GeneratedFields.
+        m.full_clean()
+        m.save()
+        m = self._refresh_if_needed(m)
+        self.assertEqual(m.field, 3)
+
     def test_create(self):
         m = self.base_model.objects.create(a=1, b=2)
         m = self._refresh_if_needed(m)

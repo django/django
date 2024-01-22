@@ -15,3 +15,6 @@ Bugfixes
 
 * Fixed a regression in Django 5.0 where links in the admin had an incorrect
   color (:ticket:`35121`).
+
+* Fixed a bug in Django 5.0 that caused a crash of ``Model.full_clean()`` on
+  models with a ``GeneratedField`` (:ticket:`35127`).
