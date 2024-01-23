@@ -249,6 +249,14 @@ class EmailValidator:
             and (self.code == other.code)
         )
 
+    def validate_email_with_special_char(self, value):
+        super().__call__(value)
+        if not self.user_regex.match(value):
+            raise ValidationError(
+                _("Enter a valid email address with no special characters."),
+                code="invalid_special_char_email",
+                params={"value": value},
+            )
 
 validate_email = EmailValidator()
 
