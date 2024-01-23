@@ -66,7 +66,7 @@ class UserAdmin(admin.ModelAdmin):
             None,
             {
                 "classes": ("wide",),
-                "fields": ("username", "password1", "password2"),
+                "fields": ("username", "usable_password", "password1", "password2"),
             },
         ),
     )
@@ -164,10 +164,27 @@ class UserAdmin(admin.ModelAdmin):
         if request.method == "POST":
             form = self.change_password_form(user, request.POST)
             if form.is_valid():
-                form.save()
+                # If disabling password-based authentication was requested
+                # (via the form field `usable_password`), the submit action
+                # must be "unset-password". This check is most relevant when
+                # the admin user has two submit buttons available (for example
+                # when Javascript is disabled).
+                valid_submission = (
+                    form.cleaned_data["set_usable_password"]
+                    or "unset-password" in request.POST
+                )
+                if not valid_submission:
+                    msg = gettext("Conflicting form data submitted. Please try again.")
+                    messages.error(request, msg)
+                    return HttpResponseRedirect(request.get_full_path())
+
+                user = form.save()
                 change_message = self.construct_change_message(request, form, None)
                 self.log_change(request, user, change_message)
-                msg = gettext("Password changed successfully.")
+                if user.has_usable_password():
+                    msg = gettext("Password changed successfully.")
+                else:
+                    msg = gettext("Password-based authentication was disabled.")
                 messages.success(request, msg)
                 update_session_auth_hash(request, form.user)
                 return HttpResponseRedirect(
@@ -187,8 +204,12 @@ class UserAdmin(admin.ModelAdmin):
         fieldsets = [(None, {"fields": list(form.base_fields)})]
         admin_form = admin.helpers.AdminForm(form, fieldsets, {})
 
+        if user.has_usable_password():
+            title = _("Change password: %s")
+        else:
+            title = _("Set password: %s")
         context = {
-            "title": _("Change password: %s") % escape(user.get_username()),
+            "title": title % escape(user.get_username()),
             "adminForm": admin_form,
             "form_url": form_url,
             "form": form,

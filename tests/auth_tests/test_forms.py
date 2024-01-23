@@ -221,6 +221,16 @@ class BaseUserCreationFormTest(TestDataMixin, TestCase):
             form["password2"].errors,
         )
 
+        # passwords are not validated if `usable_password` is unset
+        data = {
+            "username": "othertestclient",
+            "password1": "othertestclient",
+            "password2": "othertestclient",
+            "usable_password": "false",
+        }
+        form = BaseUserCreationForm(data)
+        self.assertIs(form.is_valid(), True, form.errors)
+
     def test_custom_form(self):
         class CustomUserCreationForm(BaseUserCreationForm):
             class Meta(BaseUserCreationForm.Meta):
@@ -349,6 +359,19 @@ class BaseUserCreationFormTest(TestDataMixin, TestCase):
             ["The password is too similar to the first name."],
         )
 
+        # passwords are not validated if `usable_password` is unset
+        form = CustomUserCreationForm(
+            {
+                "username": "testuser",
+                "password1": "testpassword",
+                "password2": "testpassword",
+                "first_name": "testpassword",
+                "last_name": "lastname",
+                "usable_password": "false",
+            }
+        )
+        self.assertIs(form.is_valid(), True, form.errors)
+
     def test_username_field_autocapitalize_none(self):
         form = BaseUserCreationForm()
         self.assertEqual(
@@ -367,6 +390,17 @@ class BaseUserCreationFormTest(TestDataMixin, TestCase):
                 self.assertEqual(
                     form.fields[field_name].widget.attrs["autocomplete"], autocomplete
                 )
+
+    def test_unusable_password(self):
+        data = {
+            "username": "new-user-which-does-not-exist",
+            "usable_password": "false",
+        }
+        form = BaseUserCreationForm(data)
+        self.assertIs(form.is_valid(), True, form.errors)
+        u = form.save()
+        self.assertEqual(u.username, data["username"])
+        self.assertFalse(u.has_usable_password())
 
 
 class UserCreationFormTest(TestDataMixin, TestCase):
@@ -744,6 +778,23 @@ class SetPasswordFormTest(TestDataMixin, TestCase):
             form["new_password2"].errors,
         )
 
+        # SetPasswordForm does not consider usable_password for form validation
+        data = {
+            "new_password1": "testclient",
+            "new_password2": "testclient",
+            "usable_password": "false",
+        }
+        form = SetPasswordForm(user, data)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(len(form["new_password2"].errors), 2)
+        self.assertIn(
+            "The password is too similar to the username.", form["new_password2"].errors
+        )
+        self.assertIn(
+            "This password is too short. It must contain at least 12 characters.",
+            form["new_password2"].errors,
+        )
+
     def test_no_password(self):
         user = User.objects.get(username="testclient")
         data = {"new_password1": "new-password"}
@@ -973,23 +1024,33 @@ class UserChangeFormTest(TestDataMixin, TestCase):
 
     @override_settings(ROOT_URLCONF="auth_tests.urls_admin")
     def test_link_to_password_reset_in_helptext_via_to_field(self):
-        user = User.objects.get(username="testclient")
-        form = UserChangeForm(data={}, instance=user)
-        password_help_text = form.fields["password"].help_text
-        matches = re.search('<a href="(.*?)">', password_help_text)
+        cases = [
+            (
+                "testclient",
+                'you can change or unset the password using <a href="(.*?)">',
+            ),
+            (
+                "unusable_password",
+                "Enable password-based authentication for this user by setting "
+                'a password using <a href="(.*?)">this form</a>.',
+            ),
+        ]
+        for username, expected_help_text in cases:
+            with self.subTest(username=username):
+                user = User.objects.get(username=username)
+                form = UserChangeForm(data={}, instance=user)
+                password_help_text = form.fields["password"].help_text
+                matches = re.search(expected_help_text, password_help_text)
 
-        # URL to UserChangeForm in admin via to_field (instead of pk).
-        admin_user_change_url = reverse(
-            f"admin:{user._meta.app_label}_{user._meta.model_name}_change",
-            args=(user.username,),
-        )
-        joined_url = urllib.parse.urljoin(admin_user_change_url, matches.group(1))
+                url_prefix = f"admin:{user._meta.app_label}_{user._meta.model_name}"
+                # URL to UserChangeForm in admin via to_field (instead of pk).
+                user_change_url = reverse(f"{url_prefix}_change", args=(user.username,))
+                joined_url = urllib.parse.urljoin(user_change_url, matches.group(1))
 
-        pw_change_url = reverse(
-            f"admin:{user._meta.app_label}_{user._meta.model_name}_password_change",
-            args=(user.pk,),
-        )
-        self.assertEqual(joined_url, pw_change_url)
+                pw_change_url = reverse(
+                    f"{url_prefix}_password_change", args=(user.pk,)
+                )
+                self.assertEqual(joined_url, pw_change_url)
 
     def test_custom_form(self):
         class CustomUserChangeForm(UserChangeForm):
@@ -1363,6 +1424,15 @@ class AdminPasswordChangeFormTest(TestDataMixin, TestCase):
             form["password2"].errors,
         )
 
+        # passwords are not validated if `usable_password` is unset
+        data = {
+            "password1": "testclient",
+            "password2": "testclient",
+            "usable_password": "false",
+        }
+        form = AdminPasswordChangeForm(user, data)
+        self.assertIs(form.is_valid(), True, form.errors)
+
     def test_password_whitespace_not_stripped(self):
         user = User.objects.get(username="testclient")
         data = {
@@ -1417,3 +1487,29 @@ class AdminPasswordChangeFormTest(TestDataMixin, TestCase):
                 self.assertEqual(
                     form.fields[field_name].widget.attrs["autocomplete"], autocomplete
                 )
+
+    def test_enable_password_authentication(self):
+        user = User.objects.get(username="unusable_password")
+        form = AdminPasswordChangeForm(
+            user,
+            {"password1": "complexpassword", "password2": "complexpassword"},
+        )
+        self.assertNotIn("usable_password", form.fields)
+        self.assertIs(form.is_valid(), True)
+        user = form.save(commit=True)
+        self.assertIs(user.has_usable_password(), True)
+
+    def test_disable_password_authentication(self):
+        user = User.objects.get(username="testclient")
+        form = AdminPasswordChangeForm(
+            user,
+            {"usable_password": "false", "password1": "", "password2": "test"},
+        )
+        self.assertIn("usable_password", form.fields)
+        self.assertIn(
+            "If disabled, the current password for this user will be lost.",
+            form.fields["usable_password"].help_text,
+        )
+        self.assertIs(form.is_valid(), True)  # Valid despite password empty/mismatch.
+        user = form.save(commit=True)
+        self.assertIs(user.has_usable_password(), False)

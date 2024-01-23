@@ -1623,9 +1623,17 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
 
 .. class:: AdminPasswordChangeForm
 
-    A form used in the admin interface to change a user's password.
+    A form used in the admin interface to change a user's password, including
+    the ability to set an :meth:`unusable password
+    <django.contrib.auth.models.User.set_unusable_password>`, which blocks the
+    user from logging in with password-based authentication.
 
     Takes the ``user`` as the first positional argument.
+
+    .. versionchanged:: 5.1
+
+        Option to disable (or reenable) password-based authentication was
+        added.
 
 .. class:: AuthenticationForm
 
@@ -1717,12 +1725,21 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
     A :class:`~django.forms.ModelForm` for creating a new user. This is the
     recommended base class if you need to customize the user creation form.
 
-    It has three fields: ``username`` (from the user model), ``password1``,
-    and ``password2``. It verifies that ``password1`` and ``password2`` match,
-    validates the password using
+    It has four fields: ``username`` (from the user model), ``password1``,
+    ``password2``, and ``usable_password`` (the latter is enabled by default).
+    If ``usable_password`` is enabled, it verifies that ``password1`` and
+    ``password2`` are non empty and match, validates the password using
     :func:`~django.contrib.auth.password_validation.validate_password`, and
     sets the user's password using
     :meth:`~django.contrib.auth.models.User.set_password()`.
+    If ``usable_password`` is disabled, no password validation is done, and
+    password-based authentication is disabled for the user by calling
+    :meth:`~django.contrib.auth.models.User.set_unusable_password()`.
+
+    .. versionchanged:: 5.1
+
+        Option to create users with disabled password-based authentication was
+        added.
 
 .. class:: UserCreationForm
 
@@ -1837,6 +1854,8 @@ You should see a link to "Users" in the "Auth"
 section of the main admin index page. The "Add user" admin page is different
 than standard admin pages in that it requires you to choose a username and
 password before allowing you to edit the rest of the user's fields.
+Alternatively, on this page, you can choose a username and disable
+password-based authentication for the user.
 
 Also note: if you want a user account to be able to create users using the
 Django admin site, you'll need to give them permission to add users *and*
@@ -1858,4 +1877,4 @@ Changing passwords
 User passwords are not displayed in the admin (nor stored in the database), but
 the :doc:`password storage details </topics/auth/passwords>` are displayed.
 Included in the display of this information is a link to
-a password change form that allows admins to change user passwords.
+a password change form that allows admins to change or unset user passwords.

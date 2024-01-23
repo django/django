@@ -46,6 +46,12 @@ Minor features
 * The default iteration count for the PBKDF2 password hasher is increased from
   720,000 to 870,000.
 
+* :class:`~django.contrib.auth.forms.BaseUserCreationForm` and
+  :class:`~django.contrib.auth.forms.AdminPasswordChangeForm` now support
+  disabling password-based authentication by setting an unusable password on
+  form save. This is now available in the admin when visiting the user creation
+  and password change pages.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
