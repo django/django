@@ -15,7 +15,7 @@
         const sidebarNode = document.getElementById(sidebarID);
         sidebarNode.setAttribute('aria-expanded', sidebarIsOpen);
 
-        toggleNode.addEventListener('click', function () {
+        toggleNode.addEventListener('click', function() {
             sidebarIsOpen = !sidebarIsOpen;
             localStorage.setItem(storeProperty, sidebarIsOpen);
             mainNode.classList.toggle(toggleClass);
@@ -83,14 +83,14 @@
         handleSidebarToggle(
             'toggle-filter-sidebar',
             'changelist-filter',
-            'django.admin.filterSidebarIsOpen',
+            'django.admin.filterSidebarIsOpen'
         );
 
         // leading sidebar (nav)
         handleSidebarToggle(
             'toggle-nav-sidebar',
             'nav-sidebar',
-            'django.admin.navSidebarIsOpen',
+            'django.admin.navSidebarIsOpen'
         );
-    })
+    });
 }
