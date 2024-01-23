@@ -1,25 +1,25 @@
 'use strict';
 {
-    const toggleNavSidebar = document.getElementById('toggle-nav-sidebar');
-    if (toggleNavSidebar !== null) {
-        const navSidebar = document.getElementById('nav-sidebar');
-        const main = document.getElementById('main');
-        let navSidebarIsOpen = localStorage.getItem('django.admin.navSidebarIsOpen');
-        if (navSidebarIsOpen === null) {
-            navSidebarIsOpen = 'true';
+    function handleSidebarToggle(toggleElementId, sidebarID, storeProperty) {
+        const toggleNode = document.getElementById(toggleElementId);
+        if (toggleNode === null) {
+            return;
         }
-        main.classList.toggle('shifted', navSidebarIsOpen === 'true');
-        navSidebar.setAttribute('aria-expanded', navSidebarIsOpen);
 
-        toggleNavSidebar.addEventListener('click', function() {
-            if (navSidebarIsOpen === 'true') {
-                navSidebarIsOpen = 'false';
-            } else {
-                navSidebarIsOpen = 'true';
-            }
-            localStorage.setItem('django.admin.navSidebarIsOpen', navSidebarIsOpen);
-            main.classList.toggle('shifted');
-            navSidebar.setAttribute('aria-expanded', navSidebarIsOpen);
+        const toggleClass = `${sidebarID}-expanded`;
+        let sidebarIsOpen = localStorage.getItem(storeProperty) !== 'false';
+
+        const mainNode = document.getElementById('main');
+        mainNode.classList.toggle(toggleClass, sidebarIsOpen);
+
+        const sidebarNode = document.getElementById(sidebarID);
+        sidebarNode.setAttribute('aria-expanded', sidebarIsOpen);
+
+        toggleNode.addEventListener('click', function() {
+            sidebarIsOpen = !sidebarIsOpen;
+            localStorage.setItem(storeProperty, sidebarIsOpen);
+            mainNode.classList.toggle(toggleClass);
+            sidebarNode.setAttribute('aria-expanded', sidebarIsOpen);
         });
     }
 
@@ -75,5 +75,22 @@
         }
     }
     window.initSidebarQuickFilter = initSidebarQuickFilter;
-    initSidebarQuickFilter();
+
+    window.addEventListener('load', function() {
+        initSidebarQuickFilter();
+
+        // secondary sidebar (filter)
+        handleSidebarToggle(
+            'toggle-filter-sidebar',
+            'changelist-filter',
+            'django.admin.filterSidebarIsOpen'
+        );
+
+        // leading sidebar (nav)
+        handleSidebarToggle(
+            'toggle-nav-sidebar',
+            'nav-sidebar',
+            'django.admin.navSidebarIsOpen'
+        );
+    });
 }

@@ -4,16 +4,14 @@
     max-height: 100vh;
 }
 
-.toggle-nav-sidebar {
+.toggle-sidebar {
     z-index: 20;
-    left: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     flex: 0 0 23px;
     width: 23px;
     border: 0;
-    border-right: 1px solid var(--hairline-color);
     background-color: var(--body-bg);
     cursor: pointer;
     font-size: 1.25rem;
@@ -21,13 +19,29 @@
     padding: 0;
 }
 
-[dir="rtl"] .toggle-nav-sidebar {
+#toggle-nav-sidebar {
+    left: 0;
+    border-right: 1px solid var(--hairline-color);
+}
+
+#toggle-filter-sidebar {
+    right: 0;
+    border-left: 1px solid var(--hairline-color);
+    order: 2;
+}
+
+[dir="rtl"] #toggle-nav-sidebar {
     border-left: 1px solid var(--hairline-color);
     border-right: 0;
 }
 
-.toggle-nav-sidebar:hover,
-.toggle-nav-sidebar:focus {
+[dir="rtl"] #toggle-filter-sidebar {
+    border-left: 0;
+    border-right:  1px solid var(--hairline-color);
+}
+
+.toggle-sidebar:hover,
+.toggle-sidebar:focus {
     background-color: var(--darkened-bg);
 }
 
@@ -51,24 +65,38 @@
     margin-right: -276px;
 }
 
-.toggle-nav-sidebar::before {
+#toggle-nav-sidebar::before,
+.main.changelist-filter-expanded #toggle-filter-sidebar::before {
+    /* arrow right */
     content: '\00BB';
 }
 
-.main.shifted .toggle-nav-sidebar::before {
+#toggle-filter-sidebar::before,
+.main.nav-sidebar-expanded #toggle-nav-sidebar::before {
+    /* arrow left */
     content: '\00AB';
 }
 
-.main > #nav-sidebar {
+#changelist-filter {
+    display: none;
+    flex: 0 1 270px;
+}
+
+#nav-sidebar {
     visibility: hidden;
 }
 
-.main.shifted > #nav-sidebar {
-    margin-left: 0;
-    visibility: visible;
+.main.changelist-filter-expanded > #changelist-filter {
+    display: block;
 }
 
-[dir="rtl"] .main.shifted > #nav-sidebar {
+.main.nav-sidebar-expanded > #nav-sidebar {
+    margin-left: 0;
+    visibility: visible;
+    max-width: calc(100% - 299px);
+}
+
+[dir="rtl"] .main.nav-sidebar-expanded > #nav-sidebar {
     margin-right: 0;
 }
 
@@ -105,25 +133,6 @@
 @media (forced-colors: active) {
     #nav-sidebar .current-model {
         background-color: SelectedItem;
-    }
-}
-
-.main > #nav-sidebar + .content {
-    max-width: calc(100% - 23px);
-}
-
-.main.shifted > #nav-sidebar + .content {
-    max-width: calc(100% - 299px);
-}
-
-@media (max-width: 767px) {
-    #nav-sidebar, #toggle-nav-sidebar {
-        display: none;
-    }
-
-    .main > #nav-sidebar + .content,
-    .main.shifted > #nav-sidebar + .content {
-        max-width: 100%;
     }
 }
 

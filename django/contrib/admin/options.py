@@ -758,6 +758,9 @@ class ModelAdmin(BaseModelAdmin):
     @property
     def media(self):
         extra = "" if settings.DEBUG else ".min"
+
+        css = {"screen": ("admin/css/sidebar.css",)}
+
         js = [
             "vendor/jquery/jquery%s.js" % extra,
             "jquery.init.js",
@@ -767,8 +770,12 @@ class ModelAdmin(BaseModelAdmin):
             "urlify.js",
             "prepopulate.js",
             "vendor/xregexp/xregexp%s.js" % extra,
+            "nav_sidebar.js",
         ]
-        return forms.Media(js=["admin/js/%s" % url for url in js])
+        return forms.Media(
+            js=["admin/js/%s" % url for url in js],
+            css=css,
+        )
 
     def get_model_perms(self, request):
         """

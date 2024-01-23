@@ -164,6 +164,11 @@ input[type="submit"], button {
         border-top-color: var(--hairline-color); /* XXX Is this used at all? */
     }
 
+    .change-list .filtered {
+        /* dont force min-height for mobile, filter is shown below */
+        min-height: auto;
+    }
+
     #changelist .results + .paginator {
         border-top: none;
     }
@@ -451,6 +456,10 @@ input[type="submit"], button {
 @media (max-width: 767px) {
     /* Layout */
 
+    #container > .main {
+        flex-wrap: wrap;
+    }
+
     #header, #content, #footer {
         padding: 15px;
     }
@@ -461,6 +470,10 @@ input[type="submit"], button {
 
     div.breadcrumbs {
         padding: 10px 15px;
+    }
+
+    #content-start {
+        overflow-x: inherit;
     }
 
     /* Dashboard */
@@ -494,8 +507,11 @@ input[type="submit"], button {
         padding: 10px;
     }
 
-    #changelist-filter {
-        margin-left: 0;
+    /* navigation sidebar, sidebars toggle buttons */
+    #nav-sidebar,
+    #toggle-nav-sidebar,
+    #toggle-filter-sidebar {
+        display: none;
     }
 
     #changelist .actions label {
@@ -512,9 +528,9 @@ input[type="submit"], button {
     }
 
     #changelist-filter {
-        position: static;
-        width: auto;
-        margin-top: 30px;
+        display: block;
+        margin-left: 0;
+        flex: 1 1 200px;
     }
 
     .object-tools {
