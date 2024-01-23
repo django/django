@@ -227,6 +227,17 @@ class EmailValidator:
                     return
             raise ValidationError(self.message, code=self.code, params={"value": value})
 
+        # Additional validation for special characters
+        self.validate_email_with_special_char(value)
+
+    def validate_email_with_special_char(self, value):
+        if not self.user_regex.match(value):
+            raise ValidationError(
+                _("Enter a valid email address with no special characters."),
+                code="invalid_special_char_email",
+                params={"value": value},
+            )
+
     def validate_domain_part(self, domain_part):
         if self.domain_regex.match(domain_part):
             return True
@@ -249,15 +260,6 @@ class EmailValidator:
             and (self.code == other.code)
         )
 
-    def validate_email_with_special_char(self, value):
-        super().__call__(value)
-        if not self.user_regex.match(value):
-            raise ValidationError(
-                _("Enter a valid email address with no special characters."),
-                code="invalid_special_char_email",
-                params={"value": value},
-            )
-
 validate_email = EmailValidator()
 
 slug_re = _lazy_re_compile(r"^[-a-zA-Z0-9_]+\Z")
@@ -277,6 +279,7 @@ validate_unicode_slug = RegexValidator(
     ),
     "invalid",
 )
+
 
 
 def validate_ipv4_address(value):
