@@ -1103,7 +1103,7 @@ class RequestFactoryTest(SimpleTestCase):
         url_path = "/somewhere/"
         request = self.request_factory.trace(url_path)
         response = trace_view(request)
-        protocol = request.META["SERVER_PROTOCOL"]
+        protocol = request.meta["SERVER_PROTOCOL"]
         echoed_request_line = "TRACE {} {}".format(url_path, protocol)
         self.assertContains(response, echoed_request_line)
 
@@ -1115,9 +1115,9 @@ class RequestFactoryTest(SimpleTestCase):
             }
         ).get("/somewhere/")
         self.assertEqual(request.headers["authorization"], "Bearer faketoken")
-        self.assertIn("HTTP_AUTHORIZATION", request.META)
+        self.assertIn("HTTP_AUTHORIZATION", request.meta)
         self.assertEqual(request.headers["x-another-header"], "some other value")
-        self.assertIn("HTTP_X_ANOTHER_HEADER", request.META)
+        self.assertIn("HTTP_X_ANOTHER_HEADER", request.meta)
 
         request = RequestFactory(
             headers={
@@ -1126,9 +1126,9 @@ class RequestFactoryTest(SimpleTestCase):
             }
         ).get("/somewhere/")
         self.assertEqual(request.headers["authorization"], "Bearer faketoken")
-        self.assertIn("HTTP_AUTHORIZATION", request.META)
+        self.assertIn("HTTP_AUTHORIZATION", request.meta)
         self.assertEqual(request.headers["x-another-header"], "some other value")
-        self.assertIn("HTTP_X_ANOTHER_HEADER", request.META)
+        self.assertIn("HTTP_X_ANOTHER_HEADER", request.meta)
 
     def test_request_factory_sets_headers(self):
         for method_name, view in self.http_methods_and_views:
@@ -1141,9 +1141,9 @@ class RequestFactoryTest(SimpleTestCase):
                 },
             )
             self.assertEqual(request.headers["authorization"], "Bearer faketoken")
-            self.assertIn("HTTP_AUTHORIZATION", request.META)
+            self.assertIn("HTTP_AUTHORIZATION", request.meta)
             self.assertEqual(request.headers["x-another-header"], "some other value")
-            self.assertIn("HTTP_X_ANOTHER_HEADER", request.META)
+            self.assertIn("HTTP_X_ANOTHER_HEADER", request.meta)
 
             request = method(
                 "/somewhere/",
@@ -1153,9 +1153,9 @@ class RequestFactoryTest(SimpleTestCase):
                 },
             )
             self.assertEqual(request.headers["authorization"], "Bearer faketoken")
-            self.assertIn("HTTP_AUTHORIZATION", request.META)
+            self.assertIn("HTTP_AUTHORIZATION", request.meta)
             self.assertEqual(request.headers["x-another-header"], "some other value")
-            self.assertIn("HTTP_X_ANOTHER_HEADER", request.META)
+            self.assertIn("HTTP_X_ANOTHER_HEADER", request.meta)
 
     def test_request_factory_query_params(self):
         tests = (
@@ -1310,9 +1310,9 @@ class AsyncRequestFactoryTest(SimpleTestCase):
             X_ANOTHER_HEADER="some other value",
         )
         self.assertEqual(request.headers["authorization"], "Bearer faketoken")
-        self.assertIn("HTTP_AUTHORIZATION", request.META)
+        self.assertIn("HTTP_AUTHORIZATION", request.meta)
         self.assertEqual(request.headers["x-another-header"], "some other value")
-        self.assertIn("HTTP_X_ANOTHER_HEADER", request.META)
+        self.assertIn("HTTP_X_ANOTHER_HEADER", request.meta)
 
         request = self.request_factory.get(
             "/somewhere/",
@@ -1322,9 +1322,9 @@ class AsyncRequestFactoryTest(SimpleTestCase):
             },
         )
         self.assertEqual(request.headers["authorization"], "Bearer faketoken")
-        self.assertIn("HTTP_AUTHORIZATION", request.META)
+        self.assertIn("HTTP_AUTHORIZATION", request.meta)
         self.assertEqual(request.headers["x-another-header"], "some other value")
-        self.assertIn("HTTP_X_ANOTHER_HEADER", request.META)
+        self.assertIn("HTTP_X_ANOTHER_HEADER", request.meta)
 
     def test_request_factory_query_string(self):
         request = self.request_factory.get("/somewhere/", {"example": "data"})

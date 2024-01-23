@@ -818,10 +818,10 @@ class LoginTest(AuthViewsTestCase):
         # Use POST request to log in
         SessionMiddleware(get_response).process_request(req)
         CsrfViewMiddleware(get_response).process_view(req, LoginView.as_view(), (), {})
-        req.META[
+        req.meta[
             "SERVER_NAME"
         ] = "testserver"  # Required to have redirect work in login view
-        req.META["SERVER_PORT"] = 80
+        req.meta["SERVER_PORT"] = 80
         resp = CsrfViewMiddleware(LoginView.as_view())(req)
         csrf_cookie = resp.cookies.get(settings.CSRF_COOKIE_NAME, None)
         token2 = csrf_cookie.coded_value
@@ -998,8 +998,8 @@ class LogoutThenLoginTests(AuthViewsTestCase):
         csrf_token = get_token(req)
         req.COOKIES[settings.CSRF_COOKIE_NAME] = csrf_token
         req.POST = {"csrfmiddlewaretoken": csrf_token}
-        req.META["SERVER_NAME"] = "testserver"
-        req.META["SERVER_PORT"] = 80
+        req.meta["SERVER_NAME"] = "testserver"
+        req.meta["SERVER_PORT"] = 80
         req.session = self.client.session
         response = logout_then_login(req)
         self.confirm_logged_out()
@@ -1012,8 +1012,8 @@ class LogoutThenLoginTests(AuthViewsTestCase):
         csrf_token = get_token(req)
         req.COOKIES[settings.CSRF_COOKIE_NAME] = csrf_token
         req.POST = {"csrfmiddlewaretoken": csrf_token}
-        req.META["SERVER_NAME"] = "testserver"
-        req.META["SERVER_PORT"] = 80
+        req.meta["SERVER_NAME"] = "testserver"
+        req.meta["SERVER_PORT"] = 80
         req.session = self.client.session
         response = logout_then_login(req, login_url="/custom/")
         self.confirm_logged_out()
@@ -1024,8 +1024,8 @@ class LogoutThenLoginTests(AuthViewsTestCase):
         self.login()
         req = HttpRequest()
         req.method = "GET"
-        req.META["SERVER_NAME"] = "testserver"
-        req.META["SERVER_PORT"] = 80
+        req.meta["SERVER_NAME"] = "testserver"
+        req.meta["SERVER_PORT"] = 80
         req.session = self.client.session
         response = logout_then_login(req)
         self.assertEqual(response.status_code, 405)

@@ -1165,7 +1165,7 @@ implementation details see :ref:`using-the-views`.
 
     * ``site_name``: An alias for ``site.name``. If you don't have the site
       framework installed, this will be set to the value of
-      :attr:`request.META['SERVER_NAME'] <django.http.HttpRequest.META>`.
+      :attr:`request.meta['SERVER_NAME'] <django.http.HttpRequest.meta>`.
       For more on sites, see :doc:`/ref/contrib/sites`.
 
     If you'd prefer not to call the template :file:`registration/login.html`,
@@ -1280,7 +1280,7 @@ implementation details see :ref:`using-the-views`.
 
     * ``site_name``: An alias for ``site.name``. If you don't have the site
       framework installed, this will be set to the value of
-      :attr:`request.META['SERVER_NAME'] <django.http.HttpRequest.META>`.
+      :attr:`request.meta['SERVER_NAME'] <django.http.HttpRequest.meta>`.
       For more on sites, see :doc:`/ref/contrib/sites`.
 
 .. function:: logout_then_login(request, login_url=None)
@@ -1455,7 +1455,7 @@ implementation details see :ref:`using-the-views`.
 
     * ``site_name``: An alias for ``site.name``. If you don't have the site
       framework installed, this will be set to the value of
-      :attr:`request.META['SERVER_NAME'] <django.http.HttpRequest.META>`.
+      :attr:`request.meta['SERVER_NAME'] <django.http.HttpRequest.meta>`.
       For more on sites, see :doc:`/ref/contrib/sites`.
 
     * ``domain``: An alias for ``site.domain``. If you don't have the site

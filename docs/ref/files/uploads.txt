@@ -217,14 +217,14 @@ attributes:
     Callback signaling that the upload was interrupted, e.g. when the user
     closed their browser during file upload.
 
-.. method:: FileUploadHandler.handle_raw_input(input_data, META, content_length, boundary, encoding)
+.. method:: FileUploadHandler.handle_raw_input(input_data, meta, content_length, boundary, encoding)
 
     Allows the handler to completely override the parsing of the raw
     HTTP input.
 
     ``input_data`` is a file-like object that supports ``read()``-ing.
 
-    ``META`` is the same object as ``request.META``.
+    ``META`` is the same object as ``request.meta``.
 
     ``content_length`` is the length of the data in ``input_data``. Don't
     read more than ``content_length`` bytes from ``input_data``.

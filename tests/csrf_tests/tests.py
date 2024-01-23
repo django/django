@@ -89,33 +89,33 @@ class CsrfFunctionTests(CsrfFunctionTestMixin, SimpleTestCase):
 
     def test_get_token_csrf_cookie_set(self):
         request = HttpRequest()
-        request.META["CSRF_COOKIE"] = TEST_SECRET
-        self.assertNotIn("CSRF_COOKIE_NEEDS_UPDATE", request.META)
+        request.meta["CSRF_COOKIE"] = TEST_SECRET
+        self.assertNotIn("CSRF_COOKIE_NEEDS_UPDATE", request.meta)
         token = get_token(request)
         self.assertMaskedSecretCorrect(token, TEST_SECRET)
         # The existing cookie is preserved.
-        self.assertEqual(request.META["CSRF_COOKIE"], TEST_SECRET)
-        self.assertIs(request.META["CSRF_COOKIE_NEEDS_UPDATE"], True)
+        self.assertEqual(request.meta["CSRF_COOKIE"], TEST_SECRET)
+        self.assertIs(request.meta["CSRF_COOKIE_NEEDS_UPDATE"], True)
 
     def test_get_token_csrf_cookie_not_set(self):
         request = HttpRequest()
-        self.assertNotIn("CSRF_COOKIE", request.META)
-        self.assertNotIn("CSRF_COOKIE_NEEDS_UPDATE", request.META)
+        self.assertNotIn("CSRF_COOKIE", request.meta)
+        self.assertNotIn("CSRF_COOKIE_NEEDS_UPDATE", request.meta)
         token = get_token(request)
-        cookie = request.META["CSRF_COOKIE"]
+        cookie = request.meta["CSRF_COOKIE"]
         self.assertMaskedSecretCorrect(token, cookie)
-        self.assertIs(request.META["CSRF_COOKIE_NEEDS_UPDATE"], True)
+        self.assertIs(request.meta["CSRF_COOKIE_NEEDS_UPDATE"], True)
 
     def test_rotate_token(self):
         request = HttpRequest()
-        request.META["CSRF_COOKIE"] = TEST_SECRET
-        self.assertNotIn("CSRF_COOKIE_NEEDS_UPDATE", request.META)
+        request.meta["CSRF_COOKIE"] = TEST_SECRET
+        self.assertNotIn("CSRF_COOKIE_NEEDS_UPDATE", request.meta)
         rotate_token(request)
         # The underlying secret was changed.
-        cookie = request.META["CSRF_COOKIE"]
+        cookie = request.meta["CSRF_COOKIE"]
         self.assertEqual(len(cookie), CSRF_SECRET_LENGTH)
         self.assertNotEqual(cookie, TEST_SECRET)
-        self.assertIs(request.META["CSRF_COOKIE_NEEDS_UPDATE"], True)
+        self.assertIs(request.meta["CSRF_COOKIE_NEEDS_UPDATE"], True)
 
     def test_check_token_format_valid(self):
         cases = [
@@ -259,9 +259,9 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         """
         The method argument defaults to "GET". The cookie argument defaults to
         this class's default test cookie. The post_token and meta_token
-        arguments are included in the request's req.POST and req.META headers,
+        arguments are included in the request's req.POST and req.meta headers,
         respectively, when that argument is provided and non-None. The
-        token_header argument is the header key to use for req.META, defaults
+        token_header argument is the header key to use for req.meta, defaults
         to "HTTP_X_CSRFTOKEN".
         """
         if cookie is None:
@@ -276,7 +276,7 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         if post_token is not None:
             req.POST["csrfmiddlewaretoken"] = post_token
         if meta_token is not None:
-            req.META[token_header] = meta_token
+            req.meta[token_header] = meta_token
         return req
 
     def _get_POST_csrf_cookie_request(
@@ -621,9 +621,9 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         """
         req = self._get_POST_request_with_token()
         req._is_secure_override = True
-        req.META["HTTP_HOST"] = "www.example.com"
-        req.META["HTTP_REFERER"] = "https://www.evil.org/somepage"
-        req.META["SERVER_PORT"] = "443"
+        req.meta["HTTP_HOST"] = "www.example.com"
+        req.meta["HTTP_REFERER"] = "https://www.evil.org/somepage"
+        req.meta["SERVER_PORT"] = "443"
         mw = CsrfViewMiddleware(post_form_view)
         response = mw.process_view(req, post_form_view, (), {})
         self.assertContains(
@@ -658,9 +658,9 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         """
         req = self._get_request(method="POST")
         req._is_secure_override = True
-        req.META["HTTP_HOST"] = "@malformed"
-        req.META["HTTP_REFERER"] = "https://www.evil.org/somepage"
-        req.META["SERVER_PORT"] = "443"
+        req.meta["HTTP_HOST"] = "@malformed"
+        req.meta["HTTP_REFERER"] = "https://www.evil.org/somepage"
+        req.meta["SERVER_PORT"] = "443"
         mw = CsrfViewMiddleware(token_view)
         expected = (
             "Referer checking failed - https://www.evil.org/somepage does not "
@@ -674,8 +674,8 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
     def test_origin_malformed_host(self):
         req = self._get_request(method="POST")
         req._is_secure_override = True
-        req.META["HTTP_HOST"] = "@malformed"
-        req.META["HTTP_ORIGIN"] = "https://www.evil.org"
+        req.meta["HTTP_HOST"] = "@malformed"
+        req.meta["HTTP_ORIGIN"] = "https://www.evil.org"
         mw = CsrfViewMiddleware(token_view)
         self._check_referer_rejects(mw, req)
         response = mw.process_view(req, token_view, (), {})
@@ -689,7 +689,7 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         malformed_referer_msg = "Referer checking failed - Referer is malformed."
         req = self._get_POST_request_with_token()
         req._is_secure_override = True
-        req.META["HTTP_REFERER"] = "http://http://www.example.com/"
+        req.meta["HTTP_REFERER"] = "http://http://www.example.com/"
         mw = CsrfViewMiddleware(post_form_view)
         self._check_referer_rejects(mw, req)
         response = mw.process_view(req, post_form_view, (), {})
@@ -699,12 +699,12 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
             status_code=403,
         )
         # Empty
-        req.META["HTTP_REFERER"] = ""
+        req.meta["HTTP_REFERER"] = ""
         self._check_referer_rejects(mw, req)
         response = mw.process_view(req, post_form_view, (), {})
         self.assertContains(response, malformed_referer_msg, status_code=403)
         # Non-ASCII
-        req.META["HTTP_REFERER"] = "ØBöIß"
+        req.meta["HTTP_REFERER"] = "ØBöIß"
         self._check_referer_rejects(mw, req)
         response = mw.process_view(req, post_form_view, (), {})
         self.assertContains(response, malformed_referer_msg, status_code=403)
@@ -713,7 +713,7 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         # ParseResult(
         #   scheme='', netloc='example.com', path='/', params='', query='', fragment='',
         # )
-        req.META["HTTP_REFERER"] = "//example.com/"
+        req.meta["HTTP_REFERER"] = "//example.com/"
         self._check_referer_rejects(mw, req)
         response = mw.process_view(req, post_form_view, (), {})
         self.assertContains(response, malformed_referer_msg, status_code=403)
@@ -722,14 +722,14 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         # ParseResult(
         #   scheme='https', netloc='', path='', params='', query='', fragment='',
         # )
-        req.META["HTTP_REFERER"] = "https://"
+        req.meta["HTTP_REFERER"] = "https://"
         self._check_referer_rejects(mw, req)
         response = mw.process_view(req, post_form_view, (), {})
         self.assertContains(response, malformed_referer_msg, status_code=403)
         # Invalid URL
         # >>> urlparse('https://[')
         # ValueError: Invalid IPv6 URL
-        req.META["HTTP_REFERER"] = "https://["
+        req.meta["HTTP_REFERER"] = "https://["
         self._check_referer_rejects(mw, req)
         response = mw.process_view(req, post_form_view, (), {})
         self.assertContains(response, malformed_referer_msg, status_code=403)
@@ -741,8 +741,8 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         """
         req = self._get_POST_request_with_token()
         req._is_secure_override = True
-        req.META["HTTP_HOST"] = "www.example.com"
-        req.META["HTTP_REFERER"] = "https://www.example.com/somepage"
+        req.meta["HTTP_HOST"] = "www.example.com"
+        req.meta["HTTP_REFERER"] = "https://www.example.com/somepage"
         mw = CsrfViewMiddleware(post_form_view)
         mw.process_request(req)
         resp = mw.process_view(req, post_form_view, (), {})
@@ -757,8 +757,8 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         # See ticket #15617
         req = self._get_POST_request_with_token()
         req._is_secure_override = True
-        req.META["HTTP_HOST"] = "www.example.com"
-        req.META["HTTP_REFERER"] = "https://www.example.com"
+        req.meta["HTTP_HOST"] = "www.example.com"
+        req.meta["HTTP_REFERER"] = "https://www.example.com"
         mw = CsrfViewMiddleware(post_form_view)
         mw.process_request(req)
         resp = mw.process_view(req, post_form_view, (), {})
@@ -767,7 +767,7 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
     def _test_https_good_referer_behind_proxy(self):
         req = self._get_POST_request_with_token()
         req._is_secure_override = True
-        req.META.update(
+        req.meta.update(
             {
                 "HTTP_HOST": "10.0.0.2",
                 "HTTP_REFERER": "https://www.example.com/somepage",
@@ -789,8 +789,8 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         """
         req = self._get_POST_request_with_token()
         req._is_secure_override = True
-        req.META["HTTP_HOST"] = "@malformed"
-        req.META["HTTP_REFERER"] = "https://dashboard.example.com/somepage"
+        req.meta["HTTP_HOST"] = "@malformed"
+        req.meta["HTTP_REFERER"] = "https://dashboard.example.com/somepage"
         mw = CsrfViewMiddleware(post_form_view)
         mw.process_request(req)
         resp = mw.process_view(req, post_form_view, (), {})
@@ -807,8 +807,8 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         """
         req = self._get_POST_request_with_token()
         req._is_secure_override = True
-        req.META["HTTP_HOST"] = "www.example.com"
-        req.META["HTTP_REFERER"] = "https://dashboard.example.com"
+        req.meta["HTTP_HOST"] = "www.example.com"
+        req.meta["HTTP_REFERER"] = "https://dashboard.example.com"
         mw = CsrfViewMiddleware(post_form_view)
         mw.process_request(req)
         resp = mw.process_view(req, post_form_view, (), {})
@@ -825,8 +825,8 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         """
         req = self._get_POST_request_with_token()
         req._is_secure_override = True
-        req.META["HTTP_HOST"] = "www.example.com"
-        req.META["HTTP_REFERER"] = "https://dashboard.example.com"
+        req.meta["HTTP_HOST"] = "www.example.com"
+        req.meta["HTTP_REFERER"] = "https://dashboard.example.com"
         mw = CsrfViewMiddleware(post_form_view)
         mw.process_request(req)
         response = mw.process_view(req, post_form_view, (), {})
@@ -835,8 +835,8 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
     def _test_https_good_referer_matches_cookie_domain(self):
         req = self._get_POST_request_with_token()
         req._is_secure_override = True
-        req.META["HTTP_REFERER"] = "https://foo.example.com/"
-        req.META["SERVER_PORT"] = "443"
+        req.meta["HTTP_REFERER"] = "https://foo.example.com/"
+        req.meta["SERVER_PORT"] = "443"
         mw = CsrfViewMiddleware(post_form_view)
         mw.process_request(req)
         response = mw.process_view(req, post_form_view, (), {})
@@ -845,9 +845,9 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
     def _test_https_good_referer_matches_cookie_domain_with_different_port(self):
         req = self._get_POST_request_with_token()
         req._is_secure_override = True
-        req.META["HTTP_HOST"] = "www.example.com"
-        req.META["HTTP_REFERER"] = "https://foo.example.com:4443/"
-        req.META["SERVER_PORT"] = "4443"
+        req.meta["HTTP_HOST"] = "www.example.com"
+        req.meta["HTTP_REFERER"] = "https://foo.example.com:4443/"
+        req.meta["SERVER_PORT"] = "4443"
         mw = CsrfViewMiddleware(post_form_view)
         mw.process_request(req)
         response = mw.process_view(req, post_form_view, (), {})
@@ -899,30 +899,30 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
     def test_bad_origin_bad_domain(self):
         """A request with a bad origin is rejected."""
         req = self._get_POST_request_with_token()
-        req.META["HTTP_HOST"] = "www.example.com"
-        req.META["HTTP_ORIGIN"] = "https://www.evil.org"
+        req.meta["HTTP_HOST"] = "www.example.com"
+        req.meta["HTTP_ORIGIN"] = "https://www.evil.org"
         mw = CsrfViewMiddleware(post_form_view)
         self._check_referer_rejects(mw, req)
         self.assertIs(mw._origin_verified(req), False)
         with self.assertLogs("django.security.csrf", "WARNING") as cm:
             response = mw.process_view(req, post_form_view, (), {})
         self.assertEqual(response.status_code, 403)
-        msg = REASON_BAD_ORIGIN % req.META["HTTP_ORIGIN"]
+        msg = REASON_BAD_ORIGIN % req.meta["HTTP_ORIGIN"]
         self.assertEqual(cm.records[0].getMessage(), "Forbidden (%s): " % msg)
 
     @override_settings(ALLOWED_HOSTS=["www.example.com"])
     def test_bad_origin_null_origin(self):
         """A request with a null origin is rejected."""
         req = self._get_POST_request_with_token()
-        req.META["HTTP_HOST"] = "www.example.com"
-        req.META["HTTP_ORIGIN"] = "null"
+        req.meta["HTTP_HOST"] = "www.example.com"
+        req.meta["HTTP_ORIGIN"] = "null"
         mw = CsrfViewMiddleware(post_form_view)
         self._check_referer_rejects(mw, req)
         self.assertIs(mw._origin_verified(req), False)
         with self.assertLogs("django.security.csrf", "WARNING") as cm:
             response = mw.process_view(req, post_form_view, (), {})
         self.assertEqual(response.status_code, 403)
-        msg = REASON_BAD_ORIGIN % req.META["HTTP_ORIGIN"]
+        msg = REASON_BAD_ORIGIN % req.meta["HTTP_ORIGIN"]
         self.assertEqual(cm.records[0].getMessage(), "Forbidden (%s): " % msg)
 
     @override_settings(ALLOWED_HOSTS=["www.example.com"])
@@ -930,15 +930,15 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         """A request with an origin with wrong protocol is rejected."""
         req = self._get_POST_request_with_token()
         req._is_secure_override = True
-        req.META["HTTP_HOST"] = "www.example.com"
-        req.META["HTTP_ORIGIN"] = "http://example.com"
+        req.meta["HTTP_HOST"] = "www.example.com"
+        req.meta["HTTP_ORIGIN"] = "http://example.com"
         mw = CsrfViewMiddleware(post_form_view)
         self._check_referer_rejects(mw, req)
         self.assertIs(mw._origin_verified(req), False)
         with self.assertLogs("django.security.csrf", "WARNING") as cm:
             response = mw.process_view(req, post_form_view, (), {})
         self.assertEqual(response.status_code, 403)
-        msg = REASON_BAD_ORIGIN % req.META["HTTP_ORIGIN"]
+        msg = REASON_BAD_ORIGIN % req.meta["HTTP_ORIGIN"]
         self.assertEqual(cm.records[0].getMessage(), "Forbidden (%s): " % msg)
 
     @override_settings(
@@ -957,15 +957,15 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         """
         req = self._get_POST_request_with_token()
         req._is_secure_override = True
-        req.META["HTTP_HOST"] = "www.example.com"
-        req.META["HTTP_ORIGIN"] = "http://foo.example.com"
+        req.meta["HTTP_HOST"] = "www.example.com"
+        req.meta["HTTP_ORIGIN"] = "http://foo.example.com"
         mw = CsrfViewMiddleware(post_form_view)
         self._check_referer_rejects(mw, req)
         self.assertIs(mw._origin_verified(req), False)
         with self.assertLogs("django.security.csrf", "WARNING") as cm:
             response = mw.process_view(req, post_form_view, (), {})
         self.assertEqual(response.status_code, 403)
-        msg = REASON_BAD_ORIGIN % req.META["HTTP_ORIGIN"]
+        msg = REASON_BAD_ORIGIN % req.meta["HTTP_ORIGIN"]
         self.assertEqual(cm.records[0].getMessage(), "Forbidden (%s): " % msg)
         self.assertEqual(mw.allowed_origins_exact, {"http://no-match.com"})
         self.assertEqual(
@@ -983,23 +983,23 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         rejected.
         """
         req = self._get_POST_request_with_token()
-        req.META["HTTP_HOST"] = "www.example.com"
-        req.META["HTTP_ORIGIN"] = "https://["
+        req.meta["HTTP_HOST"] = "www.example.com"
+        req.meta["HTTP_ORIGIN"] = "https://["
         mw = CsrfViewMiddleware(post_form_view)
         self._check_referer_rejects(mw, req)
         self.assertIs(mw._origin_verified(req), False)
         with self.assertLogs("django.security.csrf", "WARNING") as cm:
             response = mw.process_view(req, post_form_view, (), {})
         self.assertEqual(response.status_code, 403)
-        msg = REASON_BAD_ORIGIN % req.META["HTTP_ORIGIN"]
+        msg = REASON_BAD_ORIGIN % req.meta["HTTP_ORIGIN"]
         self.assertEqual(cm.records[0].getMessage(), "Forbidden (%s): " % msg)
 
     @override_settings(ALLOWED_HOSTS=["www.example.com"])
     def test_good_origin_insecure(self):
         """A POST HTTP request with a good origin is accepted."""
         req = self._get_POST_request_with_token()
-        req.META["HTTP_HOST"] = "www.example.com"
-        req.META["HTTP_ORIGIN"] = "http://www.example.com"
+        req.meta["HTTP_HOST"] = "www.example.com"
+        req.meta["HTTP_ORIGIN"] = "http://www.example.com"
         mw = CsrfViewMiddleware(post_form_view)
         self.assertIs(mw._origin_verified(req), True)
         response = mw.process_view(req, post_form_view, (), {})
@@ -1010,8 +1010,8 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         """A POST HTTPS request with a good origin is accepted."""
         req = self._get_POST_request_with_token()
         req._is_secure_override = True
-        req.META["HTTP_HOST"] = "www.example.com"
-        req.META["HTTP_ORIGIN"] = "https://www.example.com"
+        req.meta["HTTP_HOST"] = "www.example.com"
+        req.meta["HTTP_ORIGIN"] = "https://www.example.com"
         mw = CsrfViewMiddleware(post_form_view)
         self.assertIs(mw._origin_verified(req), True)
         response = mw.process_view(req, post_form_view, (), {})
@@ -1028,8 +1028,8 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         """
         req = self._get_POST_request_with_token()
         req._is_secure_override = True
-        req.META["HTTP_HOST"] = "www.example.com"
-        req.META["HTTP_ORIGIN"] = "https://dashboard.example.com"
+        req.meta["HTTP_HOST"] = "www.example.com"
+        req.meta["HTTP_ORIGIN"] = "https://dashboard.example.com"
         mw = CsrfViewMiddleware(post_form_view)
         self.assertIs(mw._origin_verified(req), True)
         resp = mw.process_view(req, post_form_view, (), {})
@@ -1048,8 +1048,8 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         """
         req = self._get_POST_request_with_token()
         req._is_secure_override = True
-        req.META["HTTP_HOST"] = "www.example.com"
-        req.META["HTTP_ORIGIN"] = "https://foo.example.com"
+        req.meta["HTTP_HOST"] = "www.example.com"
+        req.meta["HTTP_ORIGIN"] = "https://foo.example.com"
         mw = CsrfViewMiddleware(post_form_view)
         self.assertIs(mw._origin_verified(req), True)
         response = mw.process_view(req, post_form_view, (), {})
@@ -1331,8 +1331,8 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
         """
         req = self._get_POST_request_with_token()
         req._is_secure_override = True
-        req.META["HTTP_REFERER"] = "http://example.com/"
-        req.META["SERVER_PORT"] = "443"
+        req.meta["HTTP_REFERER"] = "http://example.com/"
+        req.meta["SERVER_PORT"] = "443"
         mw = CsrfViewMiddleware(post_form_view)
         self._check_referer_rejects(mw, req)
         response = mw.process_view(req, post_form_view, (), {})
@@ -1468,8 +1468,8 @@ class CsrfViewMiddlewareUseSessionsTests(CsrfViewMiddlewareTestMixin, SimpleTest
         """
         req = self._get_POST_request_with_token()
         req._is_secure_override = True
-        req.META["HTTP_REFERER"] = "http://example.com/"
-        req.META["SERVER_PORT"] = "443"
+        req.meta["HTTP_REFERER"] = "http://example.com/"
+        req.meta["SERVER_PORT"] = "443"
         mw = CsrfViewMiddleware(post_form_view)
         response = mw.process_view(req, post_form_view, (), {})
         self.assertContains(

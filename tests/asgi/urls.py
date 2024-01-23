@@ -20,8 +20,8 @@ def hello_with_delay(request):
 
 def hello_meta(request):
     return HttpResponse(
-        "From %s" % request.META.get("HTTP_REFERER") or "",
-        content_type=request.META.get("CONTENT_TYPE"),
+        "From %s" % request.meta.get("HTTP_REFERER") or "",
+        content_type=request.meta.get("CONTENT_TYPE"),
     )
 
 

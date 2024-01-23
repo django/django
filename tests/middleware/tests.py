@@ -355,14 +355,14 @@ class CommonMiddlewareTest(SimpleTestCase):
     @override_settings(DISALLOWED_USER_AGENTS=[re.compile(r"foo")])
     def test_disallowed_user_agents(self):
         request = self.rf.get("/slash")
-        request.META["HTTP_USER_AGENT"] = "foo"
+        request.meta["HTTP_USER_AGENT"] = "foo"
         with self.assertRaisesMessage(PermissionDenied, "Forbidden user agent"):
             CommonMiddleware(get_response_empty).process_request(request)
 
     def test_non_ascii_query_string_does_not_crash(self):
         """Regression test for #15152"""
         request = self.rf.get("/slash")
-        request.META["QUERY_STRING"] = "drink=café"
+        request.meta["QUERY_STRING"] = "drink=café"
         r = CommonMiddleware(get_response_empty).process_request(request)
         self.assertIsNone(r)
         response = HttpResponseNotFound()
@@ -401,7 +401,7 @@ class BrokenLinkEmailsMiddlewareTest(SimpleTestCase):
         return self.client.get(req.path)
 
     def test_404_error_reporting(self):
-        self.req.META["HTTP_REFERER"] = "/another/url/"
+        self.req.meta["HTTP_REFERER"] = "/another/url/"
         BrokenLinkEmailsMiddleware(self.get_response)(self.req)
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn("Broken", mail.outbox[0].subject)
@@ -426,17 +426,17 @@ class BrokenLinkEmailsMiddlewareTest(SimpleTestCase):
                 """Check user-agent in addition to normal checks."""
                 if super().is_ignorable_request(request, uri, domain, referer):
                     return True
-                user_agent = request.META["HTTP_USER_AGENT"]
+                user_agent = request.meta["HTTP_USER_AGENT"]
                 return any(
                     pattern.search(user_agent)
                     for pattern in self.ignored_user_agent_patterns
                 )
 
-        self.req.META["HTTP_REFERER"] = "/another/url/"
-        self.req.META["HTTP_USER_AGENT"] = "Spider machine 3.4"
+        self.req.meta["HTTP_REFERER"] = "/another/url/"
+        self.req.meta["HTTP_USER_AGENT"] = "Spider machine 3.4"
         SubclassedMiddleware(self.get_response)(self.req)
         self.assertEqual(len(mail.outbox), 0)
-        self.req.META["HTTP_USER_AGENT"] = "My user agent"
+        self.req.meta["HTTP_USER_AGENT"] = "My user agent"
         SubclassedMiddleware(self.get_response)(self.req)
         self.assertEqual(len(mail.outbox), 1)
 
@@ -445,25 +445,25 @@ class BrokenLinkEmailsMiddlewareTest(SimpleTestCase):
         Some bots set the referer to the current URL to avoid being blocked by
         an referer check (#25302).
         """
-        self.req.META["HTTP_REFERER"] = self.req.path
+        self.req.meta["HTTP_REFERER"] = self.req.path
         BrokenLinkEmailsMiddleware(self.get_response)(self.req)
         self.assertEqual(len(mail.outbox), 0)
 
         # URL with scheme and domain should also be ignored
-        self.req.META["HTTP_REFERER"] = "http://testserver%s" % self.req.path
+        self.req.meta["HTTP_REFERER"] = "http://testserver%s" % self.req.path
         BrokenLinkEmailsMiddleware(self.get_response)(self.req)
         self.assertEqual(len(mail.outbox), 0)
 
         # URL with a different scheme should be ignored as well because bots
         # tend to use http:// in referers even when browsing HTTPS websites.
-        self.req.META["HTTP_X_PROTO"] = "https"
-        self.req.META["SERVER_PORT"] = 443
+        self.req.meta["HTTP_X_PROTO"] = "https"
+        self.req.meta["SERVER_PORT"] = 443
         with self.settings(SECURE_PROXY_SSL_HEADER=("HTTP_X_PROTO", "https")):
             BrokenLinkEmailsMiddleware(self.get_response)(self.req)
         self.assertEqual(len(mail.outbox), 0)
 
     def test_referer_equal_to_requested_url_on_another_domain(self):
-        self.req.META["HTTP_REFERER"] = "http://anotherserver%s" % self.req.path
+        self.req.meta["HTTP_REFERER"] = "http://anotherserver%s" % self.req.path
         BrokenLinkEmailsMiddleware(self.get_response)(self.req)
         self.assertEqual(len(mail.outbox), 1)
 
@@ -472,7 +472,7 @@ class BrokenLinkEmailsMiddlewareTest(SimpleTestCase):
         self,
     ):
         self.req.path = self.req.path_info = "/regular_url/that/does/not/exist/"
-        self.req.META["HTTP_REFERER"] = self.req.path_info[:-1]
+        self.req.meta["HTTP_REFERER"] = self.req.path_info[:-1]
         BrokenLinkEmailsMiddleware(self.get_response)(self.req)
         self.assertEqual(len(mail.outbox), 0)
 
@@ -481,7 +481,7 @@ class BrokenLinkEmailsMiddlewareTest(SimpleTestCase):
         self,
     ):
         self.req.path = self.req.path_info = "/regular_url/that/does/not/exist/"
-        self.req.META["HTTP_REFERER"] = self.req.path_info[:-1]
+        self.req.meta["HTTP_REFERER"] = self.req.path_info[:-1]
         BrokenLinkEmailsMiddleware(self.get_response)(self.req)
         self.assertEqual(len(mail.outbox), 1)
 
@@ -542,7 +542,7 @@ class ConditionalGetMiddlewareTest(SimpleTestCase):
         )
 
     def test_if_none_match_and_no_etag(self):
-        self.req.META["HTTP_IF_NONE_MATCH"] = "spam"
+        self.req.meta["HTTP_IF_NONE_MATCH"] = "spam"
         resp = ConditionalGetMiddleware(self.get_response)(self.req)
         self.assertEqual(resp.status_code, 200)
 
@@ -552,13 +552,13 @@ class ConditionalGetMiddlewareTest(SimpleTestCase):
         self.assertEqual(resp.status_code, 200)
 
     def test_if_none_match_and_same_etag(self):
-        self.req.META["HTTP_IF_NONE_MATCH"] = '"spam"'
+        self.req.meta["HTTP_IF_NONE_MATCH"] = '"spam"'
         self.resp_headers["ETag"] = '"spam"'
         resp = ConditionalGetMiddleware(self.get_response)(self.req)
         self.assertEqual(resp.status_code, 304)
 
     def test_if_none_match_and_different_etag(self):
-        self.req.META["HTTP_IF_NONE_MATCH"] = "spam"
+        self.req.meta["HTTP_IF_NONE_MATCH"] = "spam"
         self.resp_headers["ETag"] = "eggs"
         resp = ConditionalGetMiddleware(self.get_response)(self.req)
         self.assertEqual(resp.status_code, 200)
@@ -571,7 +571,7 @@ class ConditionalGetMiddlewareTest(SimpleTestCase):
             resp.status_code = 301
             return resp
 
-        self.req.META["HTTP_IF_NONE_MATCH"] = "spam"
+        self.req.meta["HTTP_IF_NONE_MATCH"] = "spam"
         resp = ConditionalGetMiddleware(get_response)(self.req)
         self.assertEqual(resp.status_code, 301)
 
@@ -582,14 +582,14 @@ class ConditionalGetMiddlewareTest(SimpleTestCase):
             resp.status_code = 400
             return resp
 
-        self.req.META["HTTP_IF_NONE_MATCH"] = "spam"
+        self.req.meta["HTTP_IF_NONE_MATCH"] = "spam"
         resp = ConditionalGetMiddleware(get_response)(self.req)
         self.assertEqual(resp.status_code, 400)
 
     # Tests for the Last-Modified header
 
     def test_if_modified_since_and_no_last_modified(self):
-        self.req.META["HTTP_IF_MODIFIED_SINCE"] = "Sat, 12 Feb 2011 17:38:44 GMT"
+        self.req.meta["HTTP_IF_MODIFIED_SINCE"] = "Sat, 12 Feb 2011 17:38:44 GMT"
         resp = ConditionalGetMiddleware(self.get_response)(self.req)
         self.assertEqual(resp.status_code, 200)
 
@@ -599,19 +599,19 @@ class ConditionalGetMiddlewareTest(SimpleTestCase):
         self.assertEqual(resp.status_code, 200)
 
     def test_if_modified_since_and_same_last_modified(self):
-        self.req.META["HTTP_IF_MODIFIED_SINCE"] = "Sat, 12 Feb 2011 17:38:44 GMT"
+        self.req.meta["HTTP_IF_MODIFIED_SINCE"] = "Sat, 12 Feb 2011 17:38:44 GMT"
         self.resp_headers["Last-Modified"] = "Sat, 12 Feb 2011 17:38:44 GMT"
         self.resp = ConditionalGetMiddleware(self.get_response)(self.req)
         self.assertEqual(self.resp.status_code, 304)
 
     def test_if_modified_since_and_last_modified_in_the_past(self):
-        self.req.META["HTTP_IF_MODIFIED_SINCE"] = "Sat, 12 Feb 2011 17:38:44 GMT"
+        self.req.meta["HTTP_IF_MODIFIED_SINCE"] = "Sat, 12 Feb 2011 17:38:44 GMT"
         self.resp_headers["Last-Modified"] = "Sat, 12 Feb 2011 17:35:44 GMT"
         resp = ConditionalGetMiddleware(self.get_response)(self.req)
         self.assertEqual(resp.status_code, 304)
 
     def test_if_modified_since_and_last_modified_in_the_future(self):
-        self.req.META["HTTP_IF_MODIFIED_SINCE"] = "Sat, 12 Feb 2011 17:38:44 GMT"
+        self.req.meta["HTTP_IF_MODIFIED_SINCE"] = "Sat, 12 Feb 2011 17:38:44 GMT"
         self.resp_headers["Last-Modified"] = "Sat, 12 Feb 2011 17:41:44 GMT"
         self.resp = ConditionalGetMiddleware(self.get_response)(self.req)
         self.assertEqual(self.resp.status_code, 200)
@@ -624,7 +624,7 @@ class ConditionalGetMiddlewareTest(SimpleTestCase):
             resp.status_code = 301
             return resp
 
-        self.req.META["HTTP_IF_MODIFIED_SINCE"] = "Sat, 12 Feb 2011 17:38:44 GMT"
+        self.req.meta["HTTP_IF_MODIFIED_SINCE"] = "Sat, 12 Feb 2011 17:38:44 GMT"
         resp = ConditionalGetMiddleware(get_response)(self.req)
         self.assertEqual(resp.status_code, 301)
 
@@ -635,7 +635,7 @@ class ConditionalGetMiddlewareTest(SimpleTestCase):
             resp.status_code = 400
             return resp
 
-        self.req.META["HTTP_IF_MODIFIED_SINCE"] = "Sat, 12 Feb 2011 17:38:44 GMT"
+        self.req.meta["HTTP_IF_MODIFIED_SINCE"] = "Sat, 12 Feb 2011 17:38:44 GMT"
         resp = ConditionalGetMiddleware(get_response)(self.req)
         self.assertEqual(resp.status_code, 400)
 
@@ -658,7 +658,7 @@ class ConditionalGetMiddlewareTest(SimpleTestCase):
             resp.set_cookie("key", "value")
             return resp
 
-        self.req.META["HTTP_IF_NONE_MATCH"] = '"spam"'
+        self.req.meta["HTTP_IF_NONE_MATCH"] = '"spam"'
 
         new_response = ConditionalGetMiddleware(get_response)(self.req)
         self.assertEqual(new_response.status_code, 304)
@@ -853,8 +853,8 @@ class GZipMiddlewareTest(SimpleTestCase):
 
     def setUp(self):
         self.req = self.request_factory.get("/")
-        self.req.META["HTTP_ACCEPT_ENCODING"] = "gzip, deflate"
-        self.req.META[
+        self.req.meta["HTTP_ACCEPT_ENCODING"] = "gzip, deflate"
+        self.req.meta[
             "HTTP_USER_AGENT"
         ] = "Mozilla/5.0 (Windows NT 5.1; rv:9.0.1) Gecko/20100101 Firefox/9.0.1"
         self.resp = HttpResponse()

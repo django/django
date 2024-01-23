@@ -323,7 +323,7 @@ class AdminSite:
         For sites running on a subpath, use the SCRIPT_NAME value if site_url
         hasn't been customized.
         """
-        script_name = request.META["SCRIPT_NAME"]
+        script_name = request.meta["SCRIPT_NAME"]
         site_url = (
             script_name if self.site_url == "/" and script_name else self.site_url
         )

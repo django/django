@@ -65,9 +65,9 @@ class WSGIRequest(HttpRequest):
         # http://test/something and http://test//something being different as
         # stated in RFC 3986.
         self.path = "%s/%s" % (script_name.rstrip("/"), path_info.replace("/", "", 1))
-        self.META = environ
-        self.META["PATH_INFO"] = path_info
-        self.META["SCRIPT_NAME"] = script_name
+        self.meta = environ
+        self.meta["PATH_INFO"] = path_info
+        self.meta["SCRIPT_NAME"] = script_name
         self.method = environ["REQUEST_METHOD"].upper()
         # Set content_type, content_params, and encoding.
         self._set_content_type_params(environ)
@@ -83,7 +83,7 @@ class WSGIRequest(HttpRequest):
         return self.environ.get("wsgi.url_scheme")
 
     @cached_property
-    def GET(self):
+    def query_params(self):
         # The WSGI spec says 'QUERY_STRING' may be absent.
         raw_query_string = get_bytes_from_wsgi(self.environ, "QUERY_STRING", "")
         return QueryDict(raw_query_string, encoding=self._encoding)
