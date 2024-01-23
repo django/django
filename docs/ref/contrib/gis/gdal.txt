@@ -581,6 +581,27 @@ coordinate transformation:
         >>> p.wkt
         "POINT (1 2)"
 
+    .. attribute:: is_measured
+
+    .. versionadded:: 5.1
+
+    A boolean indicating if this geometry has M coordinates.
+
+    .. method:: set_measured(value)
+
+    .. versionadded:: 5.1
+
+    A method to add or remove the M coordinate dimension.
+
+    .. code-block:: pycon
+
+        >>> p = OGRGeometry("POINT (1 2)")
+        >>> p.is_measured
+        False
+        >>> p.set_measured(True)
+        >>> p.wkt
+        "POINT M (1 2 0)"
+
     .. attribute:: geom_count
 
     Returns the number of elements in this geometry:
@@ -863,6 +884,18 @@ coordinate transformation:
 
         >>> OGRGeometry("POINT (1 2 3)").z
         3.0
+
+    .. attribute:: m
+
+    .. versionadded:: 5.1
+
+    Returns the M coordinate of this point, or ``None`` if the Point does not
+    have an M coordinate:
+
+    .. code-block:: pycon
+
+        >>> OGRGeometry("POINT ZM (1 2 3 4)").m
+        4.0
 
 .. class:: LineString
 
