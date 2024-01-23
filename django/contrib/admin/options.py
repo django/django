@@ -759,11 +759,7 @@ class ModelAdmin(BaseModelAdmin):
     def media(self):
         extra = "" if settings.DEBUG else ".min"
 
-        css = {
-            "screen": (
-                'admin/css/sidebar.css',
-            )
-        }
+        css = {"screen": ("admin/css/sidebar.css",)}
 
         js = [
             "vendor/jquery/jquery%s.js" % extra,
