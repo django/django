@@ -235,6 +235,9 @@ Models
   reload a model's value. This can be used to lock the row before reloading or
   to select related objects.
 
+* The new ``"transaction_mode"`` option is now supported in :setting:`OPTIONS`
+  on SQLite to allow specifying the :ref:`sqlite-transaction-behavior`.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

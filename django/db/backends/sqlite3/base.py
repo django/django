@@ -135,6 +135,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         "iendswith": r"LIKE '%%' || UPPER({}) ESCAPE '\'",
     }
 
+    transaction_modes = frozenset(["DEFERRED", "EXCLUSIVE", "IMMEDIATE"])
+
     Database = Database
     SchemaEditorClass = DatabaseSchemaEditor
     # Classes instantiated in __init__().
@@ -171,6 +173,20 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 RuntimeWarning,
             )
         kwargs.update({"check_same_thread": False, "uri": True})
+        transaction_mode = kwargs.pop("transaction_mode", None)
+        if (
+            transaction_mode is not None
+            and transaction_mode.upper() not in self.transaction_modes
+        ):
+            allowed_transaction_modes = ", ".join(
+                [f"{mode!r}" for mode in sorted(self.transaction_modes)]
+            )
+            raise ImproperlyConfigured(
+                f"settings.DATABASES[{self.alias!r}]['OPTIONS']['transaction_mode'] "
+                f"is improperly configured to '{transaction_mode}'. Use one of "
+                f"{allowed_transaction_modes}, or None."
+            )
+        self.transaction_mode = transaction_mode.upper() if transaction_mode else None
         return kwargs
 
     def get_database_version(self):
@@ -298,7 +314,10 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         Staying in autocommit mode works around a bug of sqlite3 that breaks
         savepoints when autocommit is disabled.
         """
-        self.cursor().execute("BEGIN")
+        if self.transaction_mode is None:
+            self.cursor().execute("BEGIN")
+        else:
+            self.cursor().execute(f"BEGIN {self.transaction_mode}")
 
     def is_in_memory_db(self):
         return self.creation.is_in_memory_db(self.settings_dict["NAME"])
