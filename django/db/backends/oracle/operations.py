@@ -165,6 +165,9 @@ END;
 
     def datetime_extract_sql(self, lookup_type, sql, params, tzname):
         sql, params = self._convert_sql_to_tz(sql, params, tzname)
+        if lookup_type == "second":
+            # Truncate fractional seconds.
+            return f"FLOOR(EXTRACT(SECOND FROM {sql}))", params
         return self.date_extract_sql(lookup_type, sql, params)
 
     def datetime_trunc_sql(self, lookup_type, sql, params, tzname):
@@ -187,6 +190,12 @@ END;
             # Cast to DATE removes sub-second precision.
             return f"CAST({sql} AS DATE)", params
         return f"TRUNC({sql}, %s)", (*params, trunc_param)
+
+    def time_extract_sql(self, lookup_type, sql, params):
+        if lookup_type == "second":
+            # Truncate fractional seconds.
+            return f"FLOOR(EXTRACT(SECOND FROM {sql}))", params
+        return self.date_extract_sql(lookup_type, sql, params)
 
     def time_trunc_sql(self, lookup_type, sql, params, tzname=None):
         # The implementation is similar to `datetime_trunc_sql` as both
