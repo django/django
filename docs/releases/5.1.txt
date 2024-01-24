@@ -437,6 +437,11 @@ Miscellaneous
   :class:`~django.core.exceptions.FieldError` when saving a file without a
   ``name``.
 
+* ``ImageField.update_dimension_fields(force=True)`` is no longer called after
+  saving the image to storage. If your storage backend resizes images, the
+  ``width_field`` and ``height_field`` will not match the width and height of
+  the image.
+
 .. _deprecated-features-5.1:
 
 Features deprecated in 5.1
