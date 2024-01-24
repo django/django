@@ -893,11 +893,6 @@ a.deletelink:focus, a.deletelink:hover {
   }
 }
 
-#footer {
-    clear: both;
-    padding: 10px;
-}
-
 /* COLUMN TYPES */
 
 .colMS {

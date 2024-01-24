@@ -348,6 +348,10 @@ Miscellaneous
 * In order to improve accessibility, the admin's changelist filter is now
   rendered in a ``<nav>`` tag instead of a ``<div>``.
 
+* In order to improve accessibility, the admin's footer is now rendered in
+  a ``<footer>`` tag instead of a ``<div>``, and also moved below the
+  ``<div id="main">`` element.
+
 * :meth:`.SimpleTestCase.assertURLEqual` and
   :meth:`~django.test.SimpleTestCase.assertInHTML` now add ``": "`` to the
   ``msg_prefix``. This is consistent with the behavior of other assertions.

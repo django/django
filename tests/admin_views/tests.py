@@ -1605,6 +1605,13 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             '<main id="content-start" class="content" tabindex="-1">',
         )
 
+    def test_footer(self):
+        response = self.client.get(reverse("admin:index"))
+        self.assertContains(response, '<footer id="footer">')
+        self.client.logout()
+        response = self.client.get(reverse("admin:login"))
+        self.assertContains(response, '<footer id="footer">')
+
     def test_aria_describedby_for_add_and_change_links(self):
         response = self.client.get(reverse("admin:index"))
         tests = [
