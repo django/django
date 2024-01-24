@@ -324,7 +324,7 @@ TEST_DATA = [
     (validate_email, "a@%s.us" % ("a" * 63), None),
     (validate_email, "a@%s.us" % ("a" * 64), ValidationError),
     # validation error if max length of email exceeds 254 chracters.
-    (validate_email, "%s@example.com" % ("a" * 50), None), 
+    (validate_email, "%s@example.com" % ("a" * 50), None),
     (validate_email, "%s@example.com" % ("a" * 250), ValidationError),
     # Trailing newlines in username or domain not allowed
     (validate_email, "a@b.com\n", ValidationError),
