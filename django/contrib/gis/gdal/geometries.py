@@ -39,6 +39,7 @@
   True True
 """
 import sys
+import warnings
 from binascii import b2a_hex
 from ctypes import byref, c_char_p, c_double, c_ubyte, c_void_p, string_at
 
@@ -50,6 +51,7 @@ from django.contrib.gis.gdal.prototypes import geom as capi
 from django.contrib.gis.gdal.prototypes import srs as srs_api
 from django.contrib.gis.gdal.srs import CoordTransform, SpatialReference
 from django.contrib.gis.geometry import hex_regex, json_regex, wkt_regex
+from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.encoding import force_bytes
 
 
@@ -206,17 +208,20 @@ class OGRGeometry(GDALBase):
         "Return 0 for points, 1 for lines, and 2 for surfaces."
         return capi.get_dims(self.ptr)
 
-    def _get_coord_dim(self):
+    @property
+    def coord_dim(self):
         "Return the coordinate dimension of the Geometry."
         return capi.get_coord_dim(self.ptr)
 
-    def _set_coord_dim(self, dim):
+    # RemovedInDjango60Warning
+    @coord_dim.setter
+    def coord_dim(self, dim):
         "Set the coordinate dimension of this Geometry."
+        msg = "coord_dim setter is deprecated. Use set_3d() instead."
+        warnings.warn(msg, RemovedInDjango60Warning, stacklevel=2)
         if dim not in (2, 3):
             raise ValueError("Geometry dimension must be either 2 or 3")
         capi.set_coord_dim(self.ptr, dim)
-
-    coord_dim = property(_get_coord_dim, _set_coord_dim)
 
     @property
     def geom_count(self):

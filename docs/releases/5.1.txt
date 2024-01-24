@@ -378,6 +378,9 @@ Miscellaneous
 * Passing positional arguments to :meth:`.Model.save` and :meth:`.Model.asave`
   is deprecated in favor of keyword-only arguments.
 
+* Setting ``django.contrib.gis.gdal.OGRGeometry.coord_dim`` is deprecated. Use
+  :meth:`~django.contrib.gis.gdal.OGRGeometry.set_3d` instead.
+
 Features removed in 5.1
 =======================
 

@@ -553,8 +553,12 @@ coordinate transformation:
 
     .. attribute:: coord_dim
 
-    Returns or sets the coordinate dimension of this geometry. For example, the
-    value would be 2 for two-dimensional geometries.
+    Returns the coordinate dimension of this geometry. For example, the value
+    would be 2 for two-dimensional geometries.
+
+    .. deprecated:: 5.1
+
+        The ``coord_dim`` setter is deprecated. Use :meth:`.set_3d` instead.
 
     .. attribute:: is_3d
 

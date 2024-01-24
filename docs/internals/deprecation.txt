@@ -71,6 +71,9 @@ details on these changes.
 * Support for passing positional arguments to ``Model.save()`` and
   ``Model.asave()`` will be removed.
 
+* The setter for ``django.contrib.gis.gdal.OGRGeometry.coord_dim`` will be
+  removed.
+
 .. _deprecation-removed-in-5.1:
 
 5.1
