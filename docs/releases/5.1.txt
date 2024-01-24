@@ -419,6 +419,11 @@ Miscellaneous
 * The undocumented ``django.urls.converters.get_converter()`` function is
   removed.
 
+* :class:`~django.db.models.ImageField` no longer re-reads the file from the
+  storage backend after ``width_field`` and ``height_field`` are set. If
+  your storage backend resizes images, the actual image's width and height will
+  not match the auto-populated fields.
+
 * The minimum supported version of SQLite is increased from 3.27.0 to 3.31.0.
 
 .. _deprecated-features-5.1:

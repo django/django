@@ -1361,6 +1361,13 @@ can change the maximum length using the :attr:`~CharField.max_length` argument.
 The default form widget for this field is a
 :class:`~django.forms.ClearableFileInput`.
 
+.. versionchanged:: 5.1
+
+    In older versions, auto-populating ``height_field`` and ``width_field`` 
+    would always result in re-reading the file from the storage backend. If 
+    your storage backend resizes images, the actual image's width and height 
+    will not match the auto-populated fields.
+
 ``IntegerField``
 ----------------
 
