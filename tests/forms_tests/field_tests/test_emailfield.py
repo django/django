@@ -64,10 +64,10 @@ class EmailFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
             "'Ensure this value has at most 15 characters (it has 20).'",
         ):
             f.clean("alf123456788@foo.com")
-        long_email = 'a' * 245 + '@example.com'
+        long_email = "a" * 245 + "@example.com"
         with self.assertRaisesMessage(
             ValidationError,
-            "'Ensure this value has at most 15 characters (it has 257).'"
+            "'Ensure this value has at most 15 characters (it has 257).'",
         ):
             f.clean(long_email)
 
