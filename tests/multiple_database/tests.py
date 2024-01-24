@@ -4,7 +4,6 @@ from io import StringIO
 from operator import attrgetter
 from unittest.mock import Mock
 
-from django.contrib import admin
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core import management
@@ -15,7 +14,7 @@ from django.test import SimpleTestCase, TestCase, override_settings
 from django.urls import reverse
 
 from .models import Book, Person, Pet, Review, UserProfile
-from .routers import AdminRouter, AuthRouter, TestRouter, WriteRouter
+from .routers import AuthRouter, TestRouter, WriteRouter
 
 
 class QueryTestCase(TestCase):
@@ -1338,8 +1337,10 @@ class QueryTestCase(TestCase):
         )
         book_id = book.id
 
-        with override_settings(DATABASE_ROUTERS=["multiple_database.tests.AdminRouter"],
-                               ROOT_URLCONF="multiple_database.urls"):
+        with override_settings(
+            DATABASE_ROUTERS=["multiple_database.routers.AdminRouter"],
+            ROOT_URLCONF="multiple_database.urls",
+        ):
             user = User.objects.create_superuser(
                 username="super", password="secret", email="super@example.com"
             )
@@ -1353,7 +1354,9 @@ class QueryTestCase(TestCase):
             shortcut_url = reverse("admin:view_on_site", args=(book_type.pk, book_id))
             response = self.client.get(shortcut_url, follow=False)
             self.assertEqual(response.status_code, 302)
-            self.assertRegex(response.url, f"http://(testserver|example.com)/books/{book_id}/")
+            self.assertRegex(
+                response.url, f"http://(testserver|example.com)/books/{book_id}/"
+            )
 
 
 class ConnectionRouterTestCase(SimpleTestCase):
