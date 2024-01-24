@@ -349,7 +349,7 @@ Miscellaneous
   rendered in a ``<nav>`` tag instead of a ``<div>``.
 
 * In order to improve accessibility, the admin's footer is now rendered in
-  a ``<footer>`` tag instead of a ``<div>``. It is now located below the
+  a ``<footer>`` tag instead of a ``<div>``, and also moved below the
   ``<div id="main">`` element.
 
 * :meth:`.SimpleTestCase.assertURLEqual` and
