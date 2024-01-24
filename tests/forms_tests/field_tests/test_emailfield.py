@@ -65,7 +65,9 @@ class EmailFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         ):
             f.clean("alf123456788@foo.com")
         email = 'a' * 245 + '@example.com'  # This email has 255 characters
-        with self.assertRaisesMessage(ValidationError, "'Ensure this value has at most 254 characters (it has 255).'"):
+        with self.assertRaisesMessage(
+            ValidationError, "'Ensure this value has at most 254 characters (it has 255).'"
+        ):
             f.clean(email)
     def test_emailfield_strip_on_none_value(self):
         f = EmailField(required=False, empty_value=None)
