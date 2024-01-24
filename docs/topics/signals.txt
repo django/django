@@ -197,7 +197,7 @@ signals sent by some model::
     from django.db.models.signals import pre_save
     from django.dispatch import receiver
 
-    from .models import MyModel
+    from myapp.models import MyModel
 
 
     @receiver(pre_save, sender=MyModel)

@@ -1261,7 +1261,7 @@ subclass::
 
     from django.test import TestCase
 
-    from .models import Animal
+    from myapp.models import Animal
 
 
     class AnimalTestCase(TestCase):

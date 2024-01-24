@@ -92,7 +92,7 @@ your view class, for example::
 
     from django.views.generic import ListView
 
-    from .models import Contact
+    from myapp.models import Contact
 
 
     class ContactListView(ListView):
@@ -140,7 +140,7 @@ function to paginate a queryset::
     from django.core.paginator import Paginator
     from django.shortcuts import render
 
-    from .models import Contact
+    from myapp.models import Contact
 
 
     def listing(request):

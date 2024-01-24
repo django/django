@@ -245,7 +245,7 @@ works with an API-based workflow as well as 'normal' form POSTs::
     from django.http import JsonResponse
     from django.views.generic.edit import CreateView
 
-    from .models import Author
+    from myapp.models import Author
 
 
     class JsonableResponseMixin:

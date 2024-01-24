@@ -88,7 +88,7 @@ Other topics
 
         from django.contrib import admin
 
-        from .models import Author
+        from myapp.models import Author
 
 
         class AuthorAdmin(admin.ModelAdmin):
@@ -490,7 +490,7 @@ subclass::
             from django import forms
             from django.contrib import admin
 
-            from .models import Person
+            from myapp.models import Person
 
 
             class PersonForm(forms.ModelForm):
@@ -523,8 +523,8 @@ subclass::
         from django.db import models
 
         # Import our custom widget and our model from where they're defined
-        from .models import MyModel
-        from .widgets import RichTextEditorWidget
+        from myapp.models import MyModel
+        from myapp.widgets import RichTextEditorWidget
 
 
         class MyModelAdmin(admin.ModelAdmin):
@@ -2473,7 +2473,7 @@ automatically::
 
     from django.contrib import admin
 
-    from .models import Friendship
+    from myapp.models import Friendship
 
 
     class FriendshipInline(admin.TabularInline):
@@ -2649,7 +2649,7 @@ any other inline. In your ``admin.py`` for this example app::
     from django.contrib import admin
     from django.contrib.contenttypes.admin import GenericTabularInline
 
-    from .models import Image, Product
+    from myapp.models import Image, Product
 
 
     class ImageInline(GenericTabularInline):
@@ -3104,7 +3104,7 @@ to reference your :class:`AdminSite` subclass.
 
     from django.urls import path
 
-    from .admin import admin_site
+    from myapp.admin import admin_site
 
     urlpatterns = [
         path("myadmin/", admin_site.urls),

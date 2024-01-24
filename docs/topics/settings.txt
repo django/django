@@ -226,7 +226,7 @@ In this example, default settings are taken from ``myapp_defaults``, and the
 
     from django.conf import settings
 
-    from . import myapp_defaults
+    from myapp import myapp_defaults
 
     settings.configure(default_settings=myapp_defaults, DEBUG=True)
 
@@ -288,13 +288,13 @@ settings and populate Django's application registry. For example::
     import django
     from django.conf import settings
 
-    from . import myapp_defaults
+    from myapp import myapp_defaults
 
     settings.configure(default_settings=myapp_defaults, DEBUG=True)
     django.setup()
 
     # Now this script or any imported module can use any part of Django it needs.
-    from . import models
+    from myapp import models
 
 Note that calling ``django.setup()`` is only necessary if your code is truly
 standalone. When invoked by your web server, or through :doc:`django-admin

@@ -92,7 +92,7 @@ For example::
 
     from django.shortcuts import render
 
-    from .models import MyModel
+    from myapp.models import MyModel
 
 
     def my_view(request, slug):

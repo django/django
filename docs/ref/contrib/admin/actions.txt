@@ -130,7 +130,7 @@ the action and its registration would look like::
 
     from django.contrib import admin
 
-    from .models import Article
+    from myapp.models import Article
 
 
     @admin.action(description="Mark selected stories as published")
