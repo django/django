@@ -673,7 +673,7 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
             ("TIN Z", 1016, False),
             ("Triangle Z", 1017, False),
             ("Point M", 2001, True),
-            ("LineString M", 2002, False),
+            ("LineString M", 2002, True),
             ("Polygon M", 2003, False),
             ("MultiPoint M", 2004, False),
             ("MultiLineString M", 2005, False),
@@ -688,7 +688,7 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
             ("TIN M", 2016, False),
             ("Triangle M", 2017, False),
             ("Point ZM", 3001, True),
-            ("LineString ZM", 3002, False),
+            ("LineString ZM", 3002, True),
             ("Polygon ZM", 3003, False),
             ("MultiPoint ZM", 3004, False),
             ("MultiLineString ZM", 3005, False),
@@ -899,6 +899,21 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
             "GEOMETRYCOLLECTION (POINT (110 260),LINESTRING (110 0,110 60))"
         )
         self.assertEqual(geometrycollection.centroid.wkt, "POINT (110 30)")
+
+    def test_linestring_m_dimension(self):
+        geom = OGRGeometry("LINESTRING(0 1 2 10, 1 2 3 11, 2 3 4 12)")
+        self.assertIs(geom.is_measured, True)
+        self.assertEqual(geom.m, [10.0, 11.0, 12.0])
+        self.assertEqual(geom[0], (0.0, 1.0, 2.0, 10.0))
+
+        geom = OGRGeometry("LINESTRING M (0 1 10, 1 2 11)")
+        self.assertIs(geom.is_measured, True)
+        self.assertEqual(geom.m, [10.0, 11.0])
+        self.assertEqual(geom[0], (0.0, 1.0, 10.0))
+
+        geom.set_measured(False)
+        self.assertIs(geom.is_measured, False)
+        self.assertIs(geom.m, None)
 
 
 class DeprecationTests(SimpleTestCase):

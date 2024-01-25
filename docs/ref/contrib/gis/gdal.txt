@@ -936,6 +936,17 @@ coordinate transformation:
         >>> OGRGeometry("LINESTRING (1 2 3,4 5 6)").z
         [3.0, 6.0]
 
+    .. attribute:: m
+
+    .. versionadded:: 5.1
+
+    Returns a list of M coordinates in this line or ``None`` if the line does
+    not have M coordinates:
+
+    .. code-block:: pycon
+
+        >>> OGRGeometry("LINESTRING(0 1 2 10, 1 2 3 11, 2 3 4 12)").m
+        [10.0, 11.0, 12.0]
 
 .. class:: Polygon
 

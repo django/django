@@ -78,10 +78,11 @@ Minor features
 * The new :meth:`.OGRGeometry.set_3d` method allows addition and removal of the
   ``Z`` coordinate dimension.
 
-* :class:`~django.contrib.gis.gdal.OGRGeometry` and
-  :class:`~django.contrib.gis.gdal.Point` now support measured geometries
-  via the new :attr:`.OGRGeometry.is_measured` and :attr:`.Point.m` properties,
-  and the :meth:`.OGRGeometry.set_measured` method.
+* :class:`~django.contrib.gis.gdal.OGRGeometry`,
+  :class:`~django.contrib.gis.gdal.Point`, and
+  :class:`~django.contrib.gis.gdal.LineString` now support measured geometries
+  via the new :attr:`.OGRGeometry.is_measured` and ``m`` properties, and the
+  :meth:`.OGRGeometry.set_measured` method.
 
 * :attr:`.OGRGeometry.centroid` is now available on all supported geometry
   types.
