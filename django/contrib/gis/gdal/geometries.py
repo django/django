@@ -287,6 +287,22 @@ class OGRGeometry(GDALBase):
         else:
             raise ValueError(f"Input to 'set_3d' must be a boolean, got '{value!r}'.")
 
+    @property
+    def is_measured(self):
+        """Return True if the geometry has M coordinates."""
+        return capi.is_measured(self.ptr)
+
+    def set_measured(self, value):
+        """Set if this geometry has M coordinates."""
+        if value is True:
+            capi.set_measured(self.ptr, 1)
+        elif value is False:
+            capi.set_measured(self.ptr, 0)
+        else:
+            raise ValueError(
+                f"Input to 'set_measured' must be a boolean, got '{value!r}'."
+            )
+
     # #### SpatialReference-related Properties ####
 
     # The SRS property
@@ -386,14 +402,22 @@ class OGRGeometry(GDALBase):
         sz = self.wkb_size
         # Creating the unsigned character buffer, and passing it in by reference.
         buf = (c_ubyte * sz)()
-        capi.to_wkb(self.ptr, byteorder, byref(buf))
+        # For backward compatibility, export old-style 99-402 extended
+        # dimension types when geometry does not have an M dimension.
+        # https://gdal.org/api/vector_c_api.html#_CPPv417OGR_G_ExportToWkb12OGRGeometryH15OGRwkbByteOrderPh
+        to_wkb = capi.to_iso_wkb if self.is_measured else capi.to_wkb
+        to_wkb(self.ptr, byteorder, byref(buf))
         # Returning a buffer of the string at the pointer.
         return memoryview(string_at(buf, sz))
 
     @property
     def wkt(self):
         "Return the WKT representation of the Geometry."
-        return capi.to_wkt(self.ptr, byref(c_char_p()))
+        # For backward compatibility, export old-style 99-402 extended
+        # dimension types when geometry does not have an M dimension.
+        # https://gdal.org/api/vector_c_api.html#_CPPv417OGR_G_ExportToWkt12OGRGeometryHPPc
+        to_wkt = capi.to_iso_wkt if self.is_measured else capi.to_wkt
+        return to_wkt(self.ptr, byref(c_char_p()))
 
     @property
     def ewkt(self):
@@ -569,10 +593,20 @@ class Point(OGRGeometry):
             return capi.getz(self.ptr, 0)
 
     @property
+    def m(self):
+        """Return the M coordinate for this Point."""
+        if self.is_measured:
+            return capi.getm(self.ptr, 0)
+
+    @property
     def tuple(self):
         "Return the tuple of this point."
+        if self.is_3d and self.is_measured:
+            return self.x, self.y, self.z, self.m
         if self.is_3d:
-            return (self.x, self.y, self.z)
+            return self.x, self.y, self.z
+        if self.is_measured:
+            return self.x, self.y, self.m
         return self.x, self.y
 
     coords = tuple
@@ -753,7 +787,9 @@ GEO_CLASSES = {
     6: MultiPolygon,
     7: GeometryCollection,
     101: LinearRing,
-    1 + OGRGeomType.wkb25bit: Point,
+    2001: Point,  # POINT M
+    3001: Point,  # POINT ZM
+    1 + OGRGeomType.wkb25bit: Point,  # POINT Z
     2 + OGRGeomType.wkb25bit: LineString,
     3 + OGRGeomType.wkb25bit: Polygon,
     4 + OGRGeomType.wkb25bit: MultiPoint,

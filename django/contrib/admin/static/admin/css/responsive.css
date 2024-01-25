@@ -451,12 +451,8 @@ input[type="submit"], button {
 @media (max-width: 767px) {
     /* Layout */
 
-    #header, #content, #footer {
+    #header, #content {
         padding: 15px;
-    }
-
-    #footer:empty {
-        padding: 0;
     }
 
     div.breadcrumbs {

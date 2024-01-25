@@ -672,7 +672,7 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
             ("PolyhedralSurface Z", 1015, False),
             ("TIN Z", 1016, False),
             ("Triangle Z", 1017, False),
-            ("Point M", 2001, False),
+            ("Point M", 2001, True),
             ("LineString M", 2002, False),
             ("Polygon M", 2003, False),
             ("MultiPoint M", 2004, False),
@@ -687,7 +687,7 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
             ("PolyhedralSurface M", 2015, False),
             ("TIN M", 2016, False),
             ("Triangle M", 2017, False),
-            ("Point ZM", 3001, False),
+            ("Point ZM", 3001, True),
             ("LineString ZM", 3002, False),
             ("Polygon ZM", 3003, False),
             ("MultiPoint ZM", 3004, False),
@@ -811,6 +811,71 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
                 g = OGRGeometry(geom)
                 self.assertEqual(g.wkt, geom)
                 self.assertEqual(g.wkb.hex(), wkb)
+
+    def test_measure_is_measure_and_set_measure(self):
+        geom = OGRGeometry("POINT (1 2 3)")
+        self.assertIs(geom.is_measured, False)
+        geom.set_measured(True)
+        self.assertIs(geom.is_measured, True)
+        self.assertEqual(geom.wkt, "POINT ZM (1 2 3 0)")
+        geom.set_measured(False)
+        self.assertIs(geom.is_measured, False)
+        self.assertEqual(geom.wkt, "POINT (1 2 3)")
+        msg = "Input to 'set_measured' must be a boolean, got 'None'"
+        with self.assertRaisesMessage(ValueError, msg):
+            geom.set_measured(None)
+
+    def test_point_m_coordinate(self):
+        geom = OGRGeometry("POINT ZM (1 2 3 4)")
+        self.assertEqual(geom.m, 4)
+        geom = OGRGeometry("POINT (1 2 3 4)")
+        self.assertEqual(geom.m, 4)
+        geom = OGRGeometry("POINT M (1 2 3)")
+        self.assertEqual(geom.m, 3)
+        geom = OGRGeometry("POINT Z (1 2 3)")
+        self.assertEqual(geom.m, None)
+
+    def test_point_m_tuple(self):
+        geom = OGRGeometry("POINT ZM (1 2 3 4)")
+        self.assertEqual(geom.tuple, (geom.x, geom.y, geom.z, geom.m))
+        geom = OGRGeometry("POINT M (1 2 3)")
+        self.assertEqual(geom.tuple, (geom.x, geom.y, geom.m))
+        geom = OGRGeometry("POINT Z (1 2 3)")
+        self.assertEqual(geom.tuple, (geom.x, geom.y, geom.z))
+        geom = OGRGeometry("POINT (1 2 3)")
+        self.assertEqual(geom.tuple, (geom.x, geom.y, geom.z))
+
+    def test_point_m_wkt_wkb(self):
+        wkt = "POINT ZM (1 2 3 4)"
+        geom = OGRGeometry(wkt)
+        self.assertEqual(geom.wkt, wkt)
+        self.assertEqual(
+            geom.wkb.hex(),
+            "01b90b0000000000000000f03f00000000000000"
+            "4000000000000008400000000000001040",
+        )
+        wkt = "POINT M (1 2 3)"
+        geom = OGRGeometry(wkt)
+        self.assertEqual(geom.wkt, wkt)
+        self.assertEqual(
+            geom.wkb.hex(),
+            "01d1070000000000000000f03f00000000000000400000000000000840",
+        )
+
+    def test_point_m_dimension_types(self):
+        geom = OGRGeometry("POINT ZM (1 2 3 4)")
+        self.assertEqual(geom.geom_type.name, "PointZM")
+        self.assertEqual(geom.geom_type.num, 3001)
+        geom = OGRGeometry("POINT M (1 2 3)")
+        self.assertEqual(geom.geom_type.name, "PointM")
+        self.assertEqual(geom.geom_type.num, 2001)
+
+    def test_point_m_dimension_geos(self):
+        """GEOSGeometry does not yet support the M dimension."""
+        geom = OGRGeometry("POINT ZM (1 2 3 4)")
+        self.assertEqual(geom.geos.wkt, "POINT Z (1 2 3)")
+        geom = OGRGeometry("POINT M (1 2 3)")
+        self.assertEqual(geom.geos.wkt, "POINT (1 2)")
 
 
 class DeprecationTests(SimpleTestCase):
