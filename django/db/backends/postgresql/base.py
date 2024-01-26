@@ -86,7 +86,7 @@ def _get_varchar_column(data):
     return "varchar(%(max_length)s)" % data
 
 
-class DatabaseWrapper(BaseDatabaseWrapper):
+class PostgreSQLBaseDatabaseWrapper:
     vendor = "postgresql"
     display_name = "PostgreSQL"
     # This dictionary maps Field objects to their associated PostgreSQL column
@@ -180,14 +180,12 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     # PostgreSQL backend-specific attributes.
     _named_cursor_idx = 0
 
-    def get_database_version(self):
-        """
-        Return a tuple of the database's version.
-        E.g. for pg_version 120004, return (12, 4).
-        """
-        return divmod(self.pg_version, 10000)
+    def tzinfo_factory(self, offset):
+        return self.timezone
 
-    def get_connection_params(self):
+    # ##### shared code #####
+
+    def _base_get_connection_params(self):
         settings_dict = self.settings_dict
         # None may be used to connect to the default 'postgres' db
         if settings_dict["NAME"] == "" and not settings_dict.get("OPTIONS", {}).get(
@@ -223,13 +221,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
         conn_params.pop("assume_role", None)
         conn_params.pop("isolation_level", None)
-        server_side_binding = conn_params.pop("server_side_binding", None)
-        conn_params.setdefault(
-            "cursor_factory",
-            ServerBindingCursor
-            if is_psycopg3 and server_side_binding is True
-            else Cursor,
-        )
         if settings_dict["USER"]:
             conn_params["user"] = settings_dict["USER"]
         if settings_dict["PASSWORD"]:
@@ -247,10 +238,10 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             conn_params["prepare_threshold"] = conn_params.pop(
                 "prepare_threshold", None
             )
+
         return conn_params
 
-    @async_unsafe
-    def get_new_connection(self, conn_params):
+    def _prepare_get_new_connection(self):
         # self.isolation_level must be set:
         # - after connecting to the database in order to obtain the database's
         #   default when no value is explicitly specified in options.
@@ -272,6 +263,32 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                     f"Invalid transaction isolation level {isolation_level_value} "
                     f"specified. Use one of the psycopg.IsolationLevel values."
                 )
+
+        return (set_isolation_level,)
+
+
+class DatabaseWrapper(PostgreSQLBaseDatabaseWrapper, BaseDatabaseWrapper):
+    def get_database_version(self):
+        """
+        Return a tuple of the database's version.
+        E.g. for pg_version 120004, return (12, 4).
+        """
+        return divmod(self.pg_version, 10000)
+
+    def get_connection_params(self):
+        conn_params = self._base_get_connection_params()
+        server_side_binding = conn_params.pop("server_side_binding", None)
+        conn_params.setdefault(
+            "cursor_factory",
+            ServerBindingCursor
+            if is_psycopg3 and server_side_binding is True
+            else Cursor,
+        )
+        return conn_params
+
+    @async_unsafe
+    def get_new_connection(self, conn_params):
+        (set_isolation_level,) = self._prepare_get_new_connection()
         connection = self.Database.connect(**conn_params)
         if set_isolation_level:
             connection.isolation_level = self.isolation_level
@@ -353,9 +370,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         else:
             cursor.tzinfo_factory = self.tzinfo_factory if settings.USE_TZ else None
         return cursor
-
-    def tzinfo_factory(self, offset):
-        return self.timezone
 
     @async_unsafe
     def chunked_cursor(self):

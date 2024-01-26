@@ -4,7 +4,7 @@ import functools
 import logging
 import time
 import warnings
-from contextlib import contextmanager
+from contextlib import asynccontextmanager, contextmanager
 from hashlib import md5
 
 from django.apps import apps
@@ -114,6 +114,81 @@ class CursorWrapper:
             return self.cursor.executemany(sql, param_list)
 
 
+class CursorWrapperAsync(CursorWrapper):
+    def __aiter__(self):
+        with self.db.wrap_database_errors:
+            return self.cursor
+
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, type, value, traceback):
+        # Close instead of passing through to avoid backend-specific behavior
+        # (#17671). Catch errors liberally because errors in cleanup code
+        # aren't useful.
+        try:
+            await self.close()
+        except self.db.Database.Error:
+            pass
+
+    # The following methods cannot be implemented in __getattr__, because the
+    # code must run when the method is invoked, not just when it is accessed.
+
+    async def callproc(self, procname, params=None, kparams=None):
+        # Keyword parameters for callproc aren't supported in PEP 249, but the
+        # database driver may support them (e.g. oracledb).
+        if kparams is not None and not self.db.features.supports_callproc_kwargs:
+            raise NotSupportedError(
+                "Keyword parameters for callproc are not supported on this "
+                "database backend."
+            )
+        if not apps.ready:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+        self.db.validate_no_broken_transaction()
+        with self.db.wrap_database_errors:
+            if params is None and kparams is None:
+                return await self.cursor.callproc(procname)
+            elif kparams is None:
+                return await self.cursor.callproc(procname, params)
+            else:
+                params = params or ()
+                return await self.cursor.callproc(procname, params, kparams)
+
+    async def execute(self, sql, params=None):
+        return await self._execute_with_wrappers(
+            sql, params, many=False, executor=self._execute
+        )
+
+    async def executemany(self, sql, param_list):
+        return await self._execute_with_wrappers(
+            sql, param_list, many=True, executor=self._executemany
+        )
+
+    async def _execute_with_wrappers(self, sql, params, many, executor):
+        context = {"connection": self.db, "cursor": self}
+        for wrapper in reversed(self.db.execute_wrappers):
+            executor = functools.partial(wrapper, executor)
+        return await executor(sql, params, many, context)
+
+    async def _execute(self, sql, params, *ignored_wrapper_args):
+        if not apps.ready:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+        self.db.validate_no_broken_transaction()
+        with self.db.wrap_database_errors:
+            if params is None:
+                # params default might be backend specific.
+                return await self.cursor.execute(sql)
+            else:
+                return await self.cursor.execute(sql, params)
+
+    async def _executemany(self, sql, param_list, *ignored_wrapper_args):
+        if not apps.ready:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+        self.db.validate_no_broken_transaction()
+        with self.db.wrap_database_errors:
+            return await self.cursor.executemany(sql, param_list)
+
+
 class CursorDebugWrapper(CursorWrapper):
     # XXX callproc isn't instrumented at this time.
 
@@ -137,6 +212,57 @@ class CursorDebugWrapper(CursorWrapper):
             duration = stop - start
             if use_last_executed_query:
                 sql = self.db.ops.last_executed_query(self.cursor, sql, params)
+            try:
+                times = len(params) if many else ""
+            except TypeError:
+                # params could be an iterator.
+                times = "?"
+            self.db.queries_log.append(
+                {
+                    "sql": "%s times: %s" % (times, sql) if many else sql,
+                    "time": "%.3f" % duration,
+                }
+            )
+            logger.debug(
+                "(%.3f) %s; args=%s; alias=%s",
+                duration,
+                sql,
+                params,
+                self.db.alias,
+                extra={
+                    "duration": duration,
+                    "sql": sql,
+                    "params": params,
+                    "alias": self.db.alias,
+                },
+            )
+
+
+class CursorDebugWrapperAsync(CursorWrapperAsync):
+    # XXX callproc isn't instrumented at this time.
+
+    async def execute(self, sql, params=None):
+        async with self.debug_sql(sql, params, use_last_executed_query=True):
+            return await super().execute(sql, params)
+
+    async def executemany(self, sql, param_list):
+        async with self.debug_sql(sql, param_list, many=True):
+            return await super().executemany(sql, param_list)
+
+    @asynccontextmanager
+    async def debug_sql(
+        self, sql=None, params=None, use_last_executed_query=False, many=False
+    ):
+        start = time.monotonic()
+        try:
+            yield
+        finally:
+            stop = time.monotonic()
+            duration = stop - start
+            if use_last_executed_query:
+                sql = await self.db.ops.last_executed_query_async(
+                    self.cursor, sql, params
+                )
             try:
                 times = len(params) if many else ""
             except TypeError:

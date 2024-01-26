@@ -113,5 +113,7 @@ class Tests(TestCase):
             msg = "MySQL 8.0.11 or later is required (found 8.0.4)."
 
         with self.assertRaisesMessage(NotSupportedError, msg):
-            connection.check_database_version_supported()
+            connection.check_database_version_supported(
+                connection.get_database_version()
+            )
         self.assertTrue(mocked_get_database_version.called)

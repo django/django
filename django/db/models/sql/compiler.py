@@ -1509,6 +1509,16 @@ class SQLCompiler:
                 row[pos] = value
             yield row
 
+    def _finish_results_iter(self, results, tuple_expected=False):
+        fields = [s[0] for s in self.select[0 : self.col_count]]
+        converters = self.get_converters(fields)
+        rows = chain.from_iterable(results)
+        if converters:
+            rows = self.apply_converters(rows, converters)
+            if tuple_expected:
+                rows = map(tuple, rows)
+        return rows
+
     def results_iter(
         self,
         results=None,
@@ -1521,14 +1531,21 @@ class SQLCompiler:
             results = self.execute_sql(
                 MULTI, chunked_fetch=chunked_fetch, chunk_size=chunk_size
             )
-        fields = [s[0] for s in self.select[0 : self.col_count]]
-        converters = self.get_converters(fields)
-        rows = chain.from_iterable(results)
-        if converters:
-            rows = self.apply_converters(rows, converters)
-            if tuple_expected:
-                rows = map(tuple, rows)
-        return rows
+        return self._finish_results_iter(results, tuple_expected)
+
+    async def async_results_iter(
+        self,
+        results=None,
+        tuple_expected=False,
+        chunked_fetch=False,
+        chunk_size=GET_ITERATOR_CHUNK_SIZE,
+    ):
+        """Return an iterator over the results from executing this query."""
+        if results is None:
+            results = await self.async_execute_sql(
+                MULTI, chunked_fetch=chunked_fetch, chunk_size=chunk_size
+            )
+        return self._finish_results_iter(results, tuple_expected)
 
     def has_results(self):
         """
@@ -1601,6 +1618,60 @@ class SQLCompiler:
             # before going any further. Use chunked_fetch if requested,
             # unless the database doesn't support it.
             return list(result)
+        return result
+
+    async def async_execute_sql(
+        self, result_type=MULTI, chunked_fetch=False, chunk_size=GET_ITERATOR_CHUNK_SIZE
+    ):
+        result_type = result_type or NO_RESULTS
+        try:
+            sql, params = self.as_sql()
+            if not sql:
+                raise EmptyResultSet
+        except EmptyResultSet:
+            if result_type == MULTI:
+                return iter([])
+            else:
+                return
+        if chunked_fetch:
+            cursor = await self.connection.chunked_cursor()
+        else:
+            cursor = await self.connection.cursor()
+        try:
+            await cursor.execute(sql, params)
+        except Exception:
+            # Might fail for server-side cursors (e.g. connection closed)
+            await cursor.close()
+            raise
+
+        if result_type == CURSOR:
+            # Give the caller the cursor to process and close.
+            return cursor
+        if result_type == SINGLE:
+            try:
+                val = await cursor.fetchone()
+                if val:
+                    return val[0 : self.col_count]
+                return val
+            finally:
+                # done with the cursor
+                await cursor.close()
+        if result_type == NO_RESULTS:
+            await cursor.close()
+            return
+
+        result = async_cursor_iter(
+            cursor,
+            self.connection.features.empty_fetchmany_value,
+            self.col_count if self.has_extra_select else None,
+            chunk_size,
+        )
+        if not chunked_fetch or not self.connection.features.can_use_chunked_reads:
+            # If we are using non-chunked reads, we return the same data
+            # structure as normally, but ensure it is all read into memory
+            # before going any further. Use chunked_fetch if requested,
+            # unless the database doesn't support it.
+            return [item async for item in result]
         return result
 
     def as_subquery_condition(self, alias, columns, compiler):
@@ -2108,3 +2179,11 @@ def cursor_iter(cursor, sentinel, col_count, itersize):
             yield rows if col_count is None else [r[:col_count] for r in rows]
     finally:
         cursor.close()
+
+
+async def async_cursor_iter(cursor, sentinel, col_count, itersize):
+    try:
+        while (rows := await cursor.fetchmany(itersize)) != sentinel:
+            yield rows if col_count is None else [r[:col_count] for r in rows]
+    finally:
+        await cursor.close()

@@ -84,7 +84,7 @@ class LoadBackendTests(SimpleTestCase):
             "'foo' isn't an available database backend or couldn't be "
             "imported. Check the above exception. To use one of the built-in "
             "backends, use 'django.db.backends.XXX', where XXX is one of:\n"
-            "    'mysql', 'oracle', 'postgresql', 'sqlite3'"
+            "    'mysql', 'oracle', 'postgresql', 'postgresql_async', 'sqlite3'"
         )
         with self.assertRaisesMessage(ImproperlyConfigured, msg) as cm:
             load_backend("foo")

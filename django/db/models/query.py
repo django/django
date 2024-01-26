@@ -7,7 +7,7 @@ import operator
 import warnings
 from itertools import chain, islice
 
-from asgiref.sync import sync_to_async
+from asgiref.sync import async_to_sync, sync_to_async
 
 import django
 from django.conf import settings
@@ -85,12 +85,46 @@ class ModelIterable(BaseIterable):
     def __iter__(self):
         queryset = self.queryset
         db = queryset.db
+        if not queryset.db_is_async:
+            compiler, results = self._get_results()
+        else:
+            compiler, results = async_to_sync(self._async_get_results)()
+        yield from self._generator(queryset, db, compiler, results)
+
+    async def __aiter__(self):
+        queryset = self.queryset
+        db = queryset.db
+        if queryset.db_is_async:
+            compiler, results = await self._async_get_results()
+        else:
+            compiler, results = await sync_to_async(self._get_results)()
+        for item in self._generator(queryset, db, compiler, results):
+            yield item
+
+    def _get_results(self):
+        queryset = self.queryset
+        db = queryset.db
         compiler = queryset.query.get_compiler(using=db)
         # Execute the query. This will also fill compiler.select, klass_info,
         # and annotations.
         results = compiler.execute_sql(
             chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size
         )
+        return compiler, results
+
+    async def _async_get_results(self):
+        queryset = self.queryset
+        db = queryset.db
+        compiler = queryset.query.get_compiler(using=db)
+        # Execute the query. This will also fill compiler.select, klass_info,
+        # and annotations.
+        results = await compiler.execute_sql(
+            chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size
+        )
+        return compiler, results
+
+    @staticmethod
+    def _generator(queryset, db, compiler, results):
         select, klass_info, annotation_col_map = (
             compiler.select,
             compiler.klass_info,
@@ -287,6 +321,14 @@ class FlatValuesListIterable(BaseIterable):
         ):
             yield row[0]
 
+    async def __aiter__(self):
+        queryset = self.queryset
+        compiler = queryset.query.get_compiler(queryset.db)
+        for row in await compiler.async_results_iter(
+            chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size
+        ):
+            yield row[0]
+
 
 class QuerySet(AltersData):
     """Represent a lazy database lookup for a set of objects."""
@@ -395,14 +437,20 @@ class QuerySet(AltersData):
             3. self.iterator()
                - Responsible for turning the rows into model objects.
         """
-        self._fetch_all()
+        if self.db_is_async:
+            async_to_sync(self._async_fetch_all)()
+        else:
+            self._fetch_all()
         return iter(self._result_cache)
 
     def __aiter__(self):
         # Remember, __aiter__ itself is synchronous, it's the thing it returns
         # that is async!
         async def generator():
-            await sync_to_async(self._fetch_all)()
+            if not self.db_is_async:
+                await sync_to_async(self._fetch_all)()
+            else:
+                await self._async_fetch_all()
             for item in self._result_cache:
                 yield item
 
@@ -612,19 +660,26 @@ class QuerySet(AltersData):
         If the QuerySet is already fully cached, return the length of the
         cached results set to avoid multiple SELECT COUNT(*) calls.
         """
+        if self.db_is_async:
+            return async_to_sync(self.acount)()
+
         if self._result_cache is not None:
             return len(self._result_cache)
-
         return self.query.get_count(using=self.db)
 
     async def acount(self):
-        return await sync_to_async(self.count)()
+        if not self.db_is_async:
+            return await sync_to_async(self.count)()
 
-    def get(self, *args, **kwargs):
-        """
-        Perform the query and return a single object matching the given
-        keyword arguments.
-        """
+        if self._result_cache is not None:
+            return len(self._result_cache)
+        return await self.query.async_get_count(using=self.db)
+
+    @cached_property
+    def db_is_async(self):
+        return connections[self.db].is_async
+
+    def _prepare_get(self, *args, **kwargs):
         if self.query.combinator and (args or kwargs):
             raise NotSupportedError(
                 "Calling QuerySet.get(...) with filters after %s() is not "
@@ -640,7 +695,9 @@ class QuerySet(AltersData):
         ):
             limit = MAX_GET_RESULTS
             clone.query.set_limits(high=limit)
-        num = len(clone)
+        return clone, limit
+
+    def _finish_get(self, clone, limit, num):
         if num == 1:
             return clone._result_cache[0]
         if not num:
@@ -655,8 +712,25 @@ class QuerySet(AltersData):
             )
         )
 
+    def get(self, *args, **kwargs):
+        """
+        Perform the query and return a single object matching the given
+        keyword arguments.
+        """
+        if self.db_is_async:
+            return async_to_sync(self.aget)(*args, **kwargs)
+
+        clone, limit = self._prepare_get(*args, **kwargs)
+        num = len(clone)
+        return self._finish_get(clone, limit, num)
+
     async def aget(self, *args, **kwargs):
-        return await sync_to_async(self.get)(*args, **kwargs)
+        if not self.db_is_async:
+            return await sync_to_async(self.get)(*args, **kwargs)
+
+        clone, limit = self._prepare_get(*args, **kwargs)
+        num = len([obj async for obj in clone])
+        return self._finish_get(clone, limit, num)
 
     def create(self, **kwargs):
         """
@@ -1085,31 +1159,50 @@ class QuerySet(AltersData):
     async def alatest(self, *fields):
         return await sync_to_async(self.latest)(*fields)
 
-    def first(self):
-        """Return the first object of a query or None if no match is found."""
+    def _first_qs(self):
         if self.ordered:
             queryset = self
         else:
             self._check_ordering_first_last_queryset_aggregation(method="first")
             queryset = self.order_by("pk")
-        for obj in queryset[:1]:
+        return queryset
+
+    def first(self):
+        """Return the first object of a query or None if no match is found."""
+        if self.db_is_async:
+            return async_to_sync(self.afirst)()
+        for obj in self._first_qs()[:1]:
             return obj
 
     async def afirst(self):
-        return await sync_to_async(self.first)()
+        if not self.db_is_async:
+            return await sync_to_async(self.first)()
 
-    def last(self):
-        """Return the last object of a query or None if no match is found."""
+        async for obj in self._first_qs()[:1]:
+            return obj
+
+    def _last_qs(self):
         if self.ordered:
             queryset = self.reverse()
         else:
             self._check_ordering_first_last_queryset_aggregation(method="last")
             queryset = self.order_by("-pk")
-        for obj in queryset[:1]:
+        return queryset
+
+    def last(self):
+        """Return the last object of a query or None if no match is found."""
+        if self.db_is_async:
+            return async_to_sync(self.alast)()
+
+        for obj in self._last_qs()[:1]:
             return obj
 
     async def alast(self):
-        return await sync_to_async(self.last)()
+        if not self.db_is_async:
+            return await sync_to_async(self.last)()
+
+        async for obj in self._last_qs()[:1]:
+            return obj
 
     def in_bulk(self, id_list=None, *, field_name="pk"):
         """
@@ -1316,6 +1409,13 @@ class QuerySet(AltersData):
     def _prefetch_related_objects(self):
         # This method can only be called once the result cache has been filled.
         prefetch_related_objects(self._result_cache, *self._prefetch_related_lookups)
+        self._prefetch_done = True
+
+    async def _async_prefetch_related_objects(self):
+        # This method can only be called once the result cache has been filled.
+        await aprefetch_related_objects(
+            self._result_cache, *self._prefetch_related_lookups
+        )
         self._prefetch_done = True
 
     def explain(self, *, format=None, **options):
@@ -1927,6 +2027,12 @@ class QuerySet(AltersData):
         if self._prefetch_related_lookups and not self._prefetch_done:
             self._prefetch_related_objects()
 
+    async def _async_fetch_all(self):
+        if self._result_cache is None:
+            self._result_cache = [item async for item in self._iterable_class(self)]
+        if self._prefetch_related_lookups and not self._prefetch_done:
+            await self._async_prefetch_related_objects()
+
     def _next_is_sticky(self):
         """
         Indicate that the next filter call and the one following that should
@@ -2275,14 +2381,7 @@ def normalize_prefetch_lookups(lookups, prefix=None):
     return ret
 
 
-def prefetch_related_objects(model_instances, *related_lookups):
-    """
-    Populate prefetched object caches for a list of model instances based on
-    the lookups/Prefetch instances given.
-    """
-    if not model_instances:
-        return  # nothing to do
-
+def _prefetch_related_objects_generator(model_instances, *related_lookups):
     # We need to be able to dynamically add to the list of prefetch_related
     # lookups that we look up (see below).  So we need some book keeping to
     # ensure we don't do duplicate work.
@@ -2376,7 +2475,7 @@ def prefetch_related_objects(model_instances, *related_lookups):
                 obj_to_fetch = [obj for obj in obj_list if not is_fetched(obj)]
 
             if obj_to_fetch:
-                obj_list, additional_lookups = prefetch_one_level(
+                obj_list, additional_lookups = yield (
                     obj_to_fetch,
                     prefetcher,
                     lookup,
@@ -2429,11 +2528,71 @@ def prefetch_related_objects(model_instances, *related_lookups):
                 obj_list = new_obj_list
 
 
+def prefetch_related_objects(model_instances, *related_lookups):
+    """
+    Populate prefetched object caches for a list of model instances based on
+    the lookups/Prefetch instances given.
+    """
+    if not model_instances:
+        return  # nothing to do
+
+    if (
+        hasattr(model_instances[0], "_state")
+        and connections[model_instances[0]._state.db].is_async
+    ):
+        return async_to_sync(aprefetch_related_objects)(
+            model_instances, *related_lookups
+        )
+
+    generator = _prefetch_related_objects_generator(model_instances, *related_lookups)
+    try:
+        obj_to_fetch, prefetcher, lookup, level = next(generator)
+        while True:
+            all_related_objects, additional_lookups = prefetch_one_level(
+                obj_to_fetch,
+                prefetcher,
+                lookup,
+                level,
+            )
+            obj_to_fetch, prefetcher, lookup, level = generator.send(
+                (all_related_objects, additional_lookups)
+            )
+    except StopIteration:
+        pass
+    finally:
+        generator.close()
+
+
 async def aprefetch_related_objects(model_instances, *related_lookups):
     """See prefetch_related_objects()."""
-    return await sync_to_async(prefetch_related_objects)(
-        model_instances, *related_lookups
-    )
+    if not model_instances:
+        return  # nothing to do
+
+    if (
+        hasattr(model_instances[0], "_state")
+        and not connections[model_instances[0]._state.db].is_async
+    ):
+        return await sync_to_async(prefetch_related_objects)(
+            model_instances, *related_lookups
+        )
+
+    generator = _prefetch_related_objects_generator(model_instances, *related_lookups)
+    try:
+        obj_to_fetch, prefetcher, lookup, level = next(generator)
+        while True:
+            all_related_objects, additional_lookups = await aprefetch_one_level(
+                obj_to_fetch,
+                prefetcher,
+                lookup,
+                level,
+            )
+            obj_to_fetch, prefetcher, lookup, level = generator.send(
+                (all_related_objects, additional_lookups)
+            )
+    except StopIteration:
+        pass
+    finally:
+        generator.close()
 
 
 def get_prefetcher(instance, through_attr, to_attr):
@@ -2509,16 +2668,7 @@ def get_prefetcher(instance, through_attr, to_attr):
     return prefetcher, rel_obj_descriptor, attr_found, is_fetched
 
 
-def prefetch_one_level(instances, prefetcher, lookup, level):
-    """
-    Helper function for prefetch_related_objects().
-
-    Run prefetches on all instances using the prefetcher object,
-    assigning results to relevant caches in instance.
-
-    Return the prefetched objects along with any additional prefetches that
-    must be done due to prefetch_related lookups found from default managers.
-    """
+def _prepare_prefetch_one_level(instances, prefetcher, lookup, level):
     # prefetcher must have a method get_prefetch_querysets() which takes a list
     # of instances, and returns a tuple:
 
@@ -2577,8 +2727,28 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
         # for performance reasons.
         rel_qs._prefetch_related_lookups = ()
 
-    all_related_objects = list(rel_qs)
+    return (
+        rel_qs,
+        rel_obj_attr,
+        instance_attr,
+        single,
+        cache_name,
+        is_descriptor,
+        additional_lookups,
+    )
 
+
+def _finish_prefetch_one_level(
+    all_related_objects,
+    rel_obj_attr,
+    lookup,
+    level,
+    instances,
+    instance_attr,
+    single,
+    is_descriptor,
+    cache_name,
+):
     rel_obj_cache = {}
     for rel_obj in all_related_objects:
         rel_attr_val = rel_obj_attr(rel_obj)
@@ -2633,6 +2803,72 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
                 # since we have merged this into the current work.
                 qs._prefetch_done = True
                 obj._prefetched_objects_cache[cache_name] = qs
+
+
+def prefetch_one_level(instances, prefetcher, lookup, level):
+    """
+    Helper function for prefetch_related_objects().
+
+    Run prefetches on all instances using the prefetcher object,
+    assigning results to relevant caches in instance.
+
+    Return the prefetched objects along with any additional prefetches that
+    must be done due to prefetch_related lookups found from default managers.
+    """
+    (
+        rel_qs,
+        rel_obj_attr,
+        instance_attr,
+        single,
+        cache_name,
+        is_descriptor,
+        additional_lookups,
+    ) = _prepare_prefetch_one_level(instances, prefetcher, lookup, level)
+
+    all_related_objects = list(rel_qs)
+
+    _finish_prefetch_one_level(
+        all_related_objects,
+        rel_obj_attr,
+        lookup,
+        level,
+        instances,
+        instance_attr,
+        single,
+        is_descriptor,
+        cache_name,
+    )
+
+    return all_related_objects, additional_lookups
+
+
+async def aprefetch_one_level(instances, prefetcher, lookup, level):
+    """See aprefetch_related_objects()."""
+
+    (
+        rel_qs,
+        rel_obj_attr,
+        instance_attr,
+        single,
+        cache_name,
+        is_descriptor,
+        additional_lookups,
+    ) = _prepare_prefetch_one_level(instances, prefetcher, lookup, level)
+
+    all_related_objects = [qs async for qs in rel_qs]
+
+    _finish_prefetch_one_level(
+        all_related_objects,
+        rel_obj_attr,
+        lookup,
+        level,
+        instances,
+        instance_attr,
+        single,
+        is_descriptor,
+        cache_name,
+    )
+
     return all_related_objects, additional_lookups
 
 
