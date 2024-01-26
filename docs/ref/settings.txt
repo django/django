@@ -273,8 +273,8 @@ See :doc:`/topics/cache`.
 
 Default: ``600``
 
-The default number of seconds to cache a page for the :ref:`cache middleware
-<the-per-site-cache>`.
+The default integer number of seconds to cache a page for the
+:ref:`cache middleware <the-per-site-cache>`.
 
 See :doc:`/topics/cache`.
 
