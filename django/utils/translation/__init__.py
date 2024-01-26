@@ -1,6 +1,7 @@
 """
 Internationalization support.
 """
+
 from contextlib import ContextDecorator
 from decimal import ROUND_UP, Decimal
 

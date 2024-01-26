@@ -2,6 +2,7 @@
 Helpers to manipulate deferred DDL statements that might need to be adjusted or
 discarded within when executing a migration.
 """
+
 from copy import deepcopy
 
 

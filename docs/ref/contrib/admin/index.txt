@@ -751,8 +751,7 @@ subclass::
       like::
 
           @admin.display(ordering="-first_name")
-          def colored_first_name(self):
-              ...
+          def colored_first_name(self): ...
 
       The ``ordering`` argument supports query lookups to sort by values on
       related models. This example includes an "author first name" column in
@@ -3128,8 +3127,7 @@ returns a site instance.
     from django.contrib import admin
 
 
-    class MyAdminSite(admin.AdminSite):
-        ...
+    class MyAdminSite(admin.AdminSite): ...
 
 .. code-block:: python
     :caption: ``myproject/apps.py``
@@ -3467,5 +3465,4 @@ The ``staff_member_required`` decorator
 
 
         @staff_member_required
-        def my_view(request):
-            ...
+        def my_view(request): ...

@@ -1,6 +1,7 @@
 """
 Implementations of SQL functions for SQLite.
 """
+
 import functools
 import random
 import statistics

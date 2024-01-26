@@ -3,6 +3,7 @@ Utility functions for handling images.
 
 Requires Pillow as you might imagine.
 """
+
 import struct
 import zlib
 

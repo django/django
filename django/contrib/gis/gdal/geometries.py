@@ -38,6 +38,7 @@
   >>> print(gt1 == 3, gt1 == 'Polygon') # Equivalence works w/non-OGRGeomType objects
   True True
 """
+
 import sys
 import warnings
 from binascii import b2a_hex

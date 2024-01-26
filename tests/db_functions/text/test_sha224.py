@@ -37,9 +37,11 @@ class SHA224Tests(TestCase):
                 "2297904883e78183cb118fc3dc21a610d60daada7b6ebdbc85139f4d",
                 "eba942746e5855121d9d8f79e27dfdebed81adc85b6bf41591203080",
                 "d14a028c2a3a2bc9476102bb288234c415a2b01f828ea62ac5b3e42f",
-                "d14a028c2a3a2bc9476102bb288234c415a2b01f828ea62ac5b3e42f"
-                if connection.features.interprets_empty_strings_as_nulls
-                else None,
+                (
+                    "d14a028c2a3a2bc9476102bb288234c415a2b01f828ea62ac5b3e42f"
+                    if connection.features.interprets_empty_strings_as_nulls
+                    else None
+                ),
             ],
         )
 

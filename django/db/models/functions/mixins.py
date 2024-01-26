@@ -14,9 +14,11 @@ class FixDecimalInputMixin:
         clone = self.copy()
         clone.set_source_expressions(
             [
-                Cast(expression, output_field)
-                if isinstance(expression.output_field, FloatField)
-                else expression
+                (
+                    Cast(expression, output_field)
+                    if isinstance(expression.output_field, FloatField)
+                    else expression
+                )
                 for expression in self.get_source_expressions()
             ]
         )

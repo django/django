@@ -170,9 +170,11 @@ class HttpRequest:
         return "%s%s%s" % (
             escape_uri_path(path),
             "/" if force_append_slash and not path.endswith("/") else "",
-            ("?" + iri_to_uri(self.META.get("QUERY_STRING", "")))
-            if self.META.get("QUERY_STRING", "")
-            else "",
+            (
+                ("?" + iri_to_uri(self.META.get("QUERY_STRING", "")))
+                if self.META.get("QUERY_STRING", "")
+                else ""
+            ),
         )
 
     def get_signed_cookie(self, key, default=RAISE_ERROR, salt="", max_age=None):

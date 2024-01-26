@@ -1,4 +1,5 @@
 """Compare two HTML documents."""
+
 import html
 from html.parser import HTMLParser
 

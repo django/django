@@ -2,6 +2,7 @@
  This module houses the error-checking routines used by the GDAL
  ctypes prototypes.
 """
+
 from ctypes import c_void_p, string_at
 
 from django.contrib.gis.gdal.error import GDALException, SRSException, check_err

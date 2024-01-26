@@ -1,6 +1,7 @@
 """
 Testing of admin inline formsets.
 """
+
 import random
 
 from django.contrib.contenttypes.fields import GenericForeignKey

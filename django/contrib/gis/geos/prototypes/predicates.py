@@ -2,6 +2,7 @@
  This module houses the GEOS ctypes prototype functions for the
  unary and binary predicate operations on geometries.
 """
+
 from ctypes import c_byte, c_char_p, c_double
 
 from django.contrib.gis.geos.libgeos import GEOM_PTR, GEOSFuncFactory

@@ -1,6 +1,7 @@
 """
 Tests for stuff in django.utils.datastructures.
 """
+
 import collections.abc
 import copy
 import pickle
