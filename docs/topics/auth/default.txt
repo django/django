@@ -553,8 +553,7 @@ The ``login_required`` decorator
 
 
         @login_required
-        def my_view(request):
-            ...
+        def my_view(request): ...
 
     :func:`~django.contrib.auth.decorators.login_required` does the following:
 
@@ -575,8 +574,7 @@ The ``login_required`` decorator
 
 
         @login_required(redirect_field_name="my_redirect_field")
-        def my_view(request):
-            ...
+        def my_view(request): ...
 
     Note that if you provide a value to ``redirect_field_name``, you will most
     likely need to customize your login template as well, since the template
@@ -590,8 +588,7 @@ The ``login_required`` decorator
 
 
         @login_required(login_url="/accounts/login/")
-        def my_view(request):
-            ...
+        def my_view(request): ...
 
     Note that if you don't specify the ``login_url`` parameter, you'll need to
     ensure that the :setting:`settings.LOGIN_URL <LOGIN_URL>` and your login
@@ -688,8 +685,7 @@ email in the desired domain and if not, redirects to the login page::
 
 
         @user_passes_test(email_check)
-        def my_view(request):
-            ...
+        def my_view(request): ...
 
     :func:`~django.contrib.auth.decorators.user_passes_test` takes a required
     argument: a callable that takes a
@@ -716,8 +712,7 @@ email in the desired domain and if not, redirects to the login page::
     For example::
 
         @user_passes_test(email_check, login_url="/login/")
-        def my_view(request):
-            ...
+        def my_view(request): ...
 
 .. currentmodule:: django.contrib.auth.mixins
 
@@ -761,8 +756,7 @@ email in the desired domain and if not, redirects to the login page::
                     return self.request.user.username.startswith("django")
 
 
-            class MyView(TestMixin1, TestMixin2, View):
-                ...
+            class MyView(TestMixin1, TestMixin2, View): ...
 
         If ``TestMixin1`` would call ``super()`` and take that result into
         account, ``TestMixin1`` wouldn't work standalone anymore.
@@ -782,8 +776,7 @@ The ``permission_required`` decorator
 
 
         @permission_required("polls.add_choice")
-        def my_view(request):
-            ...
+        def my_view(request): ...
 
     Just like the :meth:`~django.contrib.auth.models.User.has_perm` method,
     permission names take the form ``"<app label>.<permission codename>"``
@@ -800,8 +793,7 @@ The ``permission_required`` decorator
 
 
         @permission_required("polls.add_choice", login_url="/loginpage/")
-        def my_view(request):
-            ...
+        def my_view(request): ...
 
     As in the :func:`~django.contrib.auth.decorators.login_required` decorator,
     ``login_url`` defaults to :setting:`settings.LOGIN_URL <LOGIN_URL>`.
@@ -820,8 +812,7 @@ The ``permission_required`` decorator
 
         @login_required
         @permission_required("polls.add_choice", raise_exception=True)
-        def my_view(request):
-            ...
+        def my_view(request): ...
 
     This also avoids a redirect loop when :class:`.LoginView`'s
     ``redirect_authenticated_user=True`` and the logged-in user doesn't have

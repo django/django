@@ -11,6 +11,7 @@ downloaded from MaxMind at https://dev.maxmind.com/geoip/geoip2/geolite2/.
 Grab GeoLite2-Country.mmdb.gz and GeoLite2-City.mmdb.gz, and unzip them in the
 directory corresponding to settings.GEOIP_PATH.
 """
+
 __all__ = ["HAS_GEOIP2"]
 
 try:

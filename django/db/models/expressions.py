@@ -203,9 +203,11 @@ class BaseExpression:
 
     def _parse_expressions(self, *expressions):
         return [
-            arg
-            if hasattr(arg, "resolve_expression")
-            else (F(arg) if isinstance(arg, str) else Value(arg))
+            (
+                arg
+                if hasattr(arg, "resolve_expression")
+                else (F(arg) if isinstance(arg, str) else Value(arg))
+            )
             for arg in expressions
         ]
 
@@ -284,9 +286,11 @@ class BaseExpression:
         c.is_summary = summarize
         c.set_source_expressions(
             [
-                expr.resolve_expression(query, allow_joins, reuse, summarize)
-                if expr
-                else None
+                (
+                    expr.resolve_expression(query, allow_joins, reuse, summarize)
+                    if expr
+                    else None
+                )
                 for expr in c.get_source_expressions()
             ]
         )
@@ -365,22 +369,16 @@ class BaseExpression:
         field = self.output_field
         internal_type = field.get_internal_type()
         if internal_type == "FloatField":
-            return (
-                lambda value, expression, connection: None
-                if value is None
-                else float(value)
+            return lambda value, expression, connection: (
+                None if value is None else float(value)
             )
         elif internal_type.endswith("IntegerField"):
-            return (
-                lambda value, expression, connection: None
-                if value is None
-                else int(value)
+            return lambda value, expression, connection: (
+                None if value is None else int(value)
             )
         elif internal_type == "DecimalField":
-            return (
-                lambda value, expression, connection: None
-                if value is None
-                else Decimal(value)
+            return lambda value, expression, connection: (
+                None if value is None else Decimal(value)
             )
         return self._convert_value_noop
 
@@ -426,9 +424,11 @@ class BaseExpression:
         clone = self.copy()
         clone.set_source_expressions(
             [
-                F(f"{prefix}{expr.name}")
-                if isinstance(expr, F)
-                else expr.prefix_references(prefix)
+                (
+                    F(f"{prefix}{expr.name}")
+                    if isinstance(expr, F)
+                    else expr.prefix_references(prefix)
+                )
                 for expr in self.get_source_expressions()
             ]
         )

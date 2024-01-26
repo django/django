@@ -2,6 +2,7 @@
 This module allows importing AbstractBaseUser even when django.contrib.auth is
 not in INSTALLED_APPS.
 """
+
 import unicodedata
 import warnings
 

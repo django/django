@@ -352,9 +352,9 @@ class HttpResponseTests(SimpleTestCase):
         h.headers["Content-Disposition"] = 'attachment; filename="%s"' % f
         # This one is triggering https://bugs.python.org/issue20747, that is Python
         # will itself insert a newline in the header
-        h.headers[
-            "Content-Disposition"
-        ] = 'attachment; filename="EdelRot_Blu\u0308te (3)-0.JPG"'
+        h.headers["Content-Disposition"] = (
+            'attachment; filename="EdelRot_Blu\u0308te (3)-0.JPG"'
+        )
 
     def test_newlines_in_headers(self):
         # Bug #10188: Do not allow newlines in headers (CR or LF)

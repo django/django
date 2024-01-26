@@ -2,6 +2,7 @@
 The tests are shared with contenttypes_tests and so shouldn't import or
 reference any models directly. Subclasses should inherit django.test.TestCase.
 """
+
 from operator import attrgetter
 
 
@@ -117,8 +118,11 @@ class BaseOrderWithRespectToTests:
                 return "other"
 
         with self.settings(DATABASE_ROUTERS=[WriteToOtherRouter()]):
-            with self.assertNumQueries(0, using="default"), self.assertNumQueries(
-                1,
-                using="other",
+            with (
+                self.assertNumQueries(0, using="default"),
+                self.assertNumQueries(
+                    1,
+                    using="other",
+                ),
             ):
                 self.q1.set_answer_order([3, 1, 2, 4])

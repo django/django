@@ -1,6 +1,7 @@
 """
 Sphinx plugins for Django documentation.
 """
+
 import json
 import os
 import re

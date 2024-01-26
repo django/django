@@ -62,6 +62,7 @@ and two directions (forward and reverse) for a total of six combinations.
    If you're looking for ``ForwardManyToManyDescriptor`` or
    ``ReverseManyToManyDescriptor``, use ``ManyToManyDescriptor`` instead.
 """
+
 import warnings
 
 from asgiref.sync import sync_to_async

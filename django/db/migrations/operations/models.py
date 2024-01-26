@@ -55,11 +55,11 @@ class CreateModel(ModelOperation):
         _check_for_duplicates(
             "bases",
             (
-                base._meta.label_lower
-                if hasattr(base, "_meta")
-                else base.lower()
-                if isinstance(base, str)
-                else base
+                (
+                    base._meta.label_lower
+                    if hasattr(base, "_meta")
+                    else base.lower() if isinstance(base, str) else base
+                )
                 for base in self.bases
             ),
         )

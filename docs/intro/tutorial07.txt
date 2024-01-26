@@ -174,8 +174,7 @@ tabular way of displaying inline related objects. To use it, change the
 .. code-block:: python
     :caption: ``polls/admin.py``
 
-    class ChoiceInline(admin.TabularInline):
-        ...
+    class ChoiceInline(admin.TabularInline): ...
 
 With that ``TabularInline`` (instead of ``StackedInline``), the
 related objects are displayed in a more compact, table-based format:

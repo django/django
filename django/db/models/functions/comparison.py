@@ -1,4 +1,5 @@
 """Database functions that do comparisons or type conversions."""
+
 from django.db import NotSupportedError
 from django.db.models.expressions import Func, Value
 from django.db.models.fields import TextField

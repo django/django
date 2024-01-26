@@ -16,6 +16,7 @@ Example Usage::
     ...     locks.lock(f, locks.LOCK_EX)
     ...     f.write('Django')
 """
+
 import os
 
 __all__ = ("LOCK_EX", "LOCK_SH", "LOCK_NB", "lock", "unlock")

@@ -2,6 +2,7 @@
  This module houses the Geometry Collection objects:
  GeometryCollection, MultiPoint, MultiLineString, and MultiPolygon
 """
+
 from django.contrib.gis.geos import prototypes as capi
 from django.contrib.gis.geos.geometry import GEOSGeometry, LinearGeometryMixin
 from django.contrib.gis.geos.libgeos import GEOM_PTR

@@ -486,8 +486,9 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
             user_login_failed.disconnect(signal_handler)
 
     def test_inactive_user_i18n(self):
-        with self.settings(USE_I18N=True), translation.override(
-            "pt-br", deactivate=True
+        with (
+            self.settings(USE_I18N=True),
+            translation.override("pt-br", deactivate=True),
         ):
             # The user is inactive.
             data = {
@@ -906,9 +907,9 @@ class UserChangeFormTest(TestDataMixin, TestCase):
         class MyUserForm(UserChangeForm):
             def __init__(self, *args, **kwargs):
                 super().__init__(*args, **kwargs)
-                self.fields[
-                    "groups"
-                ].help_text = "These groups give users different permissions"
+                self.fields["groups"].help_text = (
+                    "These groups give users different permissions"
+                )
 
             class Meta(UserChangeForm.Meta):
                 fields = ("groups",)

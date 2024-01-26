@@ -3,6 +3,7 @@
  related data structures. OGR_Dr_*, OGR_DS_*, OGR_L_*, OGR_F_*,
  OGR_Fld_* routines are relevant here.
 """
+
 from ctypes import POINTER, c_char_p, c_double, c_int, c_long, c_void_p
 
 from django.contrib.gis.gdal.envelope import OGREnvelope

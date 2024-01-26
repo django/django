@@ -5,6 +5,7 @@ URLResolver is the main class here. Its resolve() method takes a URL (as
 a string) and returns a ResolverMatch object which provides access to all
 attributes of the resolved URL match.
 """
+
 import functools
 import inspect
 import re
@@ -91,9 +92,11 @@ class ResolverMatch:
                 self.app_names,
                 self.namespaces,
                 self.route,
-                f", captured_kwargs={self.captured_kwargs!r}"
-                if self.captured_kwargs
-                else "",
+                (
+                    f", captured_kwargs={self.captured_kwargs!r}"
+                    if self.captured_kwargs
+                    else ""
+                ),
                 f", extra_kwargs={self.extra_kwargs!r}" if self.extra_kwargs else "",
             )
         )

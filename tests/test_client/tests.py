@@ -19,6 +19,7 @@ testing against the contexts and templates produced by a view,
 rather than the HTML rendered to the end-user.
 
 """
+
 import copy
 import itertools
 import tempfile

@@ -1216,9 +1216,9 @@ class SQLCompiler:
                 "field": f,
                 "reverse": False,
                 "local_setter": f.set_cached_value,
-                "remote_setter": f.remote_field.set_cached_value
-                if f.unique
-                else lambda x, y: None,
+                "remote_setter": (
+                    f.remote_field.set_cached_value if f.unique else lambda x, y: None
+                ),
                 "from_parent": False,
             }
             related_klass_infos.append(klass_info)

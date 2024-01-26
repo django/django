@@ -3,6 +3,7 @@ Oracle database backend for Django.
 
 Requires oracledb: https://oracle.github.io/python-oracledb/
 """
+
 import datetime
 import decimal
 import os

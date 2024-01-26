@@ -2,6 +2,7 @@
 SQL functions reference lists:
 https://www.gaia-gis.it/gaia-sins/spatialite-sql-4.3.0.html
 """
+
 from django.contrib.gis.db import models
 from django.contrib.gis.db.backends.base.operations import BaseSpatialOperations
 from django.contrib.gis.db.backends.spatialite.adapter import SpatiaLiteAdapter

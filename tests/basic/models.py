@@ -3,6 +3,7 @@ Bare-bones model
 
 This is a basic model with only two non-primary-key fields.
 """
+
 import uuid
 
 from django.db import models

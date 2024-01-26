@@ -1,4 +1,5 @@
 """Translation helper functions."""
+
 import functools
 import gettext as gettext_module
 import os

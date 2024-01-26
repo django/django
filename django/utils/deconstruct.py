@@ -42,9 +42,11 @@ def deconstructible(*args, path=None):
                     "#serializing-values" % (name, module_name, get_docs_version())
                 )
             return (
-                path
-                if path and type(obj) is klass
-                else f"{obj.__class__.__module__}.{name}",
+                (
+                    path
+                    if path and type(obj) is klass
+                    else f"{obj.__class__.__module__}.{name}"
+                ),
                 obj._constructor_args[0],
                 obj._constructor_args[1],
             )

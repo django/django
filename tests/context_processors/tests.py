@@ -1,6 +1,7 @@
 """
 Tests for Django's bundled context processors.
 """
+
 from django.test import SimpleTestCase, TestCase, override_settings
 
 

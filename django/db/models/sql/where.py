@@ -1,6 +1,7 @@
 """
 Code to manage the creation and SQL rendering of 'where' constraints.
 """
+
 import operator
 from functools import reduce
 

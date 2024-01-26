@@ -1,6 +1,7 @@
 """
 Form Widget classes specific to the Django admin site.
 """
+
 import copy
 import json
 

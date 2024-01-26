@@ -270,9 +270,11 @@ class FieldGetDbPrepValueMixin:
         )
         return (
             "%s",
-            [get_db_prep_value(v, connection, prepared=True) for v in value]
-            if self.get_db_prep_lookup_value_is_iterable
-            else [get_db_prep_value(value, connection, prepared=True)],
+            (
+                [get_db_prep_value(v, connection, prepared=True) for v in value]
+                if self.get_db_prep_lookup_value_is_iterable
+                else [get_db_prep_value(value, connection, prepared=True)]
+            ),
         )
 
 

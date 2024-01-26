@@ -4,6 +4,7 @@ The following classes are for testing basic data marshalling, including
 NULL values, where allowed.
 The basic idea is to have a model for each Django data type.
 """
+
 import uuid
 
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation

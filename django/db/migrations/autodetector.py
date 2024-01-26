@@ -566,11 +566,12 @@ class MigrationAutodetector:
                                 rem_model_state.app_label,
                                 rem_model_state.name_lower,
                             )
-                            self.renamed_models_rel[
-                                renamed_models_rel_key
-                            ] = "%s.%s" % (
-                                model_state.app_label,
-                                model_state.name_lower,
+                            self.renamed_models_rel[renamed_models_rel_key] = (
+                                "%s.%s"
+                                % (
+                                    model_state.app_label,
+                                    model_state.name_lower,
+                                )
                             )
                             self.old_model_keys.remove((rem_app_label, rem_model_name))
                             self.old_model_keys.add((app_label, model_name))
@@ -971,9 +972,9 @@ class MigrationAutodetector:
                                 (rem_app_label, rem_model_name, rem_field_name)
                             )
                             old_field_keys.add((app_label, model_name, field_name))
-                            self.renamed_fields[
-                                app_label, model_name, field_name
-                            ] = rem_field_name
+                            self.renamed_fields[app_label, model_name, field_name] = (
+                                rem_field_name
+                            )
                             break
 
     def generate_renamed_fields(self):

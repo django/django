@@ -3,6 +3,7 @@ This module is for inspecting OGR data sources and generating either
 models for GeoDjango and/or mapping dictionaries for use with the
 `LayerMapping` utility.
 """
+
 from django.contrib.gis.gdal import DataSource
 from django.contrib.gis.gdal.field import (
     OFTDate,
