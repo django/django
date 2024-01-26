@@ -113,9 +113,11 @@ class DateFunctionTests(TestCase):
             end_date=end_datetime.date() if end_datetime else None,
             start_time=start_datetime.time() if start_datetime else None,
             end_time=end_datetime.time() if end_datetime else None,
-            duration=(end_datetime - start_datetime)
-            if start_datetime and end_datetime
-            else None,
+            duration=(
+                (end_datetime - start_datetime)
+                if start_datetime and end_datetime
+                else None
+            ),
         )
 
     def test_extract_year_exact_lookup(self):

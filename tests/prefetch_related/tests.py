@@ -1620,8 +1620,9 @@ class MultiDbTests(TestCase):
         )
 
         # Explicit using on a different db.
-        with self.assertNumQueries(1, using="default"), self.assertNumQueries(
-            1, using="other"
+        with (
+            self.assertNumQueries(1, using="default"),
+            self.assertNumQueries(1, using="other"),
         ):
             prefetch = Prefetch(
                 "first_time_authors", queryset=Author.objects.using("default")

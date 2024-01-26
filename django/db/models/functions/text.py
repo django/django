@@ -89,9 +89,11 @@ class ConcatPair(Func):
         c = self.copy()
         c.set_source_expressions(
             [
-                expression
-                if isinstance(expression.output_field, (CharField, TextField))
-                else Cast(expression, TextField())
+                (
+                    expression
+                    if isinstance(expression.output_field, (CharField, TextField))
+                    else Cast(expression, TextField())
+                )
                 for expression in c.get_source_expressions()
             ]
         )

@@ -240,8 +240,9 @@ class HandlerRequestTests(SimpleTestCase):
             ("/no_response_cbv/", "handlers.views.NoResponse.__call__"),
         )
         for url, view in tests:
-            with self.subTest(url=url), self.assertRaisesMessage(
-                ValueError, msg % view
+            with (
+                self.subTest(url=url),
+                self.assertRaisesMessage(ValueError, msg % view),
             ):
                 self.client.get(url)
 

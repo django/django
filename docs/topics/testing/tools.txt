@@ -1361,8 +1361,7 @@ For example::
     class OtherDBTests(TestCase):
         databases = {"other"}
 
-        def test_other_db_query(self):
-            ...
+        def test_other_db_query(self): ...
 
 This test will only allow queries against the ``other`` database. Just like for
 :attr:`SimpleTestCase.databases` and :attr:`TransactionTestCase.databases`, the
@@ -1981,22 +1980,18 @@ you might label fast or slow tests::
 
     class SampleTestCase(TestCase):
         @tag("fast")
-        def test_fast(self):
-            ...
+        def test_fast(self): ...
 
         @tag("slow")
-        def test_slow(self):
-            ...
+        def test_slow(self): ...
 
         @tag("slow", "core")
-        def test_slow_but_core(self):
-            ...
+        def test_slow_but_core(self): ...
 
 You can also tag a test case class::
 
     @tag("slow", "core")
-    class SampleTestCase(TestCase):
-        ...
+    class SampleTestCase(TestCase): ...
 
 Subclasses inherit tags from superclasses, and methods inherit tags from their
 class. Given::
@@ -2004,8 +1999,7 @@ class. Given::
     @tag("foo")
     class SampleTestCaseChild(SampleTestCase):
         @tag("bar")
-        def test(self):
-            ...
+        def test(self): ...
 
 ``SampleTestCaseChild.test`` will be labeled with ``'slow'``, ``'core'``,
 ``'bar'``, and ``'foo'``.
@@ -2105,8 +2099,7 @@ creates.
         class MyTests(TestCase):
             @mock.patch(...)
             @async_to_sync
-            async def test_my_thing(self):
-                ...
+            async def test_my_thing(self): ...
 
 .. _topics-testing-email:
 

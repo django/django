@@ -704,8 +704,7 @@ using the previous ``ArticleForm`` class:
 .. code-block:: pycon
 
     >>> class EnhancedArticleForm(ArticleForm):
-    ...     def clean_pub_date(self):
-    ...         ...
+    ...     def clean_pub_date(self): ...
     ...
 
 This creates a form that behaves identically to ``ArticleForm``, except there's

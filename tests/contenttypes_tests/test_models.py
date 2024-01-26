@@ -323,8 +323,9 @@ class ContentTypesMultidbTests(TestCase):
         db_for_read().
         """
         ContentType.objects.clear_cache()
-        with self.assertNumQueries(0, using="default"), self.assertNumQueries(
-            1, using="other"
+        with (
+            self.assertNumQueries(0, using="default"),
+            self.assertNumQueries(1, using="other"),
         ):
             ContentType.objects.get_for_model(Author)
 

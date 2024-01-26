@@ -190,8 +190,7 @@ level:
 
 
     @ignore_warnings(category=RemovedInDjangoXXWarning)
-    def test_foo(self):
-        ...
+    def test_foo(self): ...
 
 #) For an entire test case::
 
@@ -200,8 +199,7 @@ level:
 
 
     @ignore_warnings(category=RemovedInDjangoXXWarning)
-    class MyDeprecatedTests(unittest.TestCase):
-        ...
+    class MyDeprecatedTests(unittest.TestCase): ...
 
 You should also add a test for the deprecation warning::
 

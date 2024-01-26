@@ -338,7 +338,8 @@ list::
 
         @csrf_protect
         def _upload_file_view(request):
-            ...  # Process request
+            # Process request
+            ...
 
     If you are using a class-based view, you will need to use
     :func:`~django.views.decorators.csrf.csrf_exempt` on its
@@ -359,4 +360,5 @@ list::
 
             @method_decorator(csrf_protect)
             def post(self, request, *args, **kwargs):
-                ...  # Process request
+                # Process request
+                ...

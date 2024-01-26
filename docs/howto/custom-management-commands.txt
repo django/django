@@ -146,8 +146,7 @@ decorator on your :meth:`~BaseCommand.handle` method::
         ...
 
         @no_translations
-        def handle(self, *args, **options):
-            ...
+        def handle(self, *args, **options): ...
 
 Since translation deactivation requires access to configured settings, the
 decorator can't be used for commands that work without configured settings.

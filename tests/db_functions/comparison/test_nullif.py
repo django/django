@@ -23,9 +23,11 @@ class NullIfTests(TestCase):
             [
                 ("smithj",),
                 (
-                    ""
-                    if connection.features.interprets_empty_strings_as_nulls
-                    else None,
+                    (
+                        ""
+                        if connection.features.interprets_empty_strings_as_nulls
+                        else None
+                    ),
                 ),
             ],
         )

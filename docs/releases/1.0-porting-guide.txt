@@ -144,8 +144,7 @@ example:
 
 Old (0.96)::
 
-    class Parent(models.Model):
-        ...
+    class Parent(models.Model): ...
 
 
     class Child(models.Model):

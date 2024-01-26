@@ -3,6 +3,7 @@ A series of tests to establish that the command-line management tools work as
 advertised - especially with regards to the handling of the
 DJANGO_SETTINGS_MODULE and default settings.py files.
 """
+
 import os
 import re
 import shutil
@@ -757,7 +758,9 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         with open(os.path.join(app_path, "apps.py"), encoding="utf8") as f:
             content = f.read()
             self.assertIn("class こんにちはConfig(AppConfig)", content)
-            self.assertIn('name = "こんにちは"' if HAS_BLACK else "name = 'こんにちは'", content)
+            self.assertIn(
+                'name = "こんにちは"' if HAS_BLACK else "name = 'こんにちは'", content
+            )
 
     def test_builtin_command(self):
         """

@@ -724,9 +724,9 @@ class BaseDatabaseSchemaEditor:
                 namespace, _ = split_identifier(model._meta.db_table)
                 definition += " " + self.sql_create_column_inline_fk % {
                     "name": self._fk_constraint_name(model, field, constraint_suffix),
-                    "namespace": "%s." % self.quote_name(namespace)
-                    if namespace
-                    else "",
+                    "namespace": (
+                        "%s." % self.quote_name(namespace) if namespace else ""
+                    ),
                     "column": self.quote_name(field.column),
                     "to_table": self.quote_name(to_table),
                     "to_column": self.quote_name(to_column),
@@ -1919,11 +1919,13 @@ class BaseDatabaseSchemaEditor:
         """Return all constraint names matching the columns and conditions."""
         if column_names is not None:
             column_names = [
-                self.connection.introspection.identifier_converter(
-                    truncate_name(name, self.connection.ops.max_name_length())
+                (
+                    self.connection.introspection.identifier_converter(
+                        truncate_name(name, self.connection.ops.max_name_length())
+                    )
+                    if self.connection.features.truncates_names
+                    else self.connection.introspection.identifier_converter(name)
                 )
-                if self.connection.features.truncates_names
-                else self.connection.introspection.identifier_converter(name)
                 for name in column_names
             ]
         with self.connection.cursor() as cursor:

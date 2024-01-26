@@ -113,8 +113,7 @@ You can register "deployment checks" that are only relevant to a production
 settings file like this::
 
     @register(Tags.security, deploy=True)
-    def my_check(app_configs, **kwargs):
-        ...
+    def my_check(app_configs, **kwargs): ...
 
 These checks will only be run if the :option:`check --deploy` option is used.
 
@@ -124,8 +123,7 @@ to ``register``.
 
 The code below is equivalent to the code above::
 
-    def my_check(app_configs, **kwargs):
-        ...
+    def my_check(app_configs, **kwargs): ...
 
 
     register(my_check, Tags.security, deploy=True)

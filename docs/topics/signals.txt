@@ -200,8 +200,7 @@ signals sent by some model::
 
 
     @receiver(pre_save, sender=MyModel)
-    def my_handler(sender, **kwargs):
-        ...
+    def my_handler(sender, **kwargs): ...
 
 The ``my_handler`` function will only be called when an instance of ``MyModel``
 is saved.

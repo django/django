@@ -1,6 +1,7 @@
 """
 GDAL - Constant definitions
 """
+
 from ctypes import (
     c_double,
     c_float,

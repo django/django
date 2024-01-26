@@ -640,9 +640,10 @@ class SchemaTests(TransactionTestCase):
         # Add the new field
         new_field = IntegerField(null=True)
         new_field.set_attributes_from_name("age")
-        with CaptureQueriesContext(
-            connection
-        ) as ctx, connection.schema_editor() as editor:
+        with (
+            CaptureQueriesContext(connection) as ctx,
+            connection.schema_editor() as editor,
+        ):
             editor.add_field(Author, new_field)
         drop_default_sql = editor.sql_alter_column_no_default % {
             "column": editor.quote_name(new_field.name),
@@ -2483,9 +2484,10 @@ class SchemaTests(TransactionTestCase):
         with self.assertRaises(DatabaseError):
             self.column_classes(new_field.remote_field.through)
         # Add the field
-        with CaptureQueriesContext(
-            connection
-        ) as ctx, connection.schema_editor() as editor:
+        with (
+            CaptureQueriesContext(connection) as ctx,
+            connection.schema_editor() as editor,
+        ):
             editor.add_field(LocalAuthorWithM2M, new_field)
         # Table is not rebuilt.
         self.assertEqual(
@@ -2963,9 +2965,11 @@ class SchemaTests(TransactionTestCase):
         )
         # Redundant foreign key index is not added.
         self.assertEqual(
-            len(old_constraints) - 1
-            if connection.features.supports_partial_indexes
-            else len(old_constraints),
+            (
+                len(old_constraints) - 1
+                if connection.features.supports_partial_indexes
+                else len(old_constraints)
+            ),
             len(new_constraints),
         )
 

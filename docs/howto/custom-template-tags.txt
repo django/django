@@ -561,8 +561,7 @@ template loader, we'd register the tag like this::
 
     # Here, register is a django.template.Library instance, as before
     @register.inclusion_tag("results.html")
-    def show_results(poll):
-        ...
+    def show_results(poll): ...
 
 Alternatively it is possible to register the inclusion tag using a
 :class:`django.template.Template` instance::
@@ -917,13 +916,11 @@ The ``tag()`` method takes two arguments:
 As with filter registration, it is also possible to use this as a decorator::
 
     @register.tag(name="current_time")
-    def do_current_time(parser, token):
-        ...
+    def do_current_time(parser, token): ...
 
 
     @register.tag
-    def shout(parser, token):
-        ...
+    def shout(parser, token): ...
 
 If you leave off the ``name`` argument, as in the second example above, Django
 will use the function's name as the tag name.

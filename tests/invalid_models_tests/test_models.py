@@ -1898,15 +1898,18 @@ class ConstraintsTests(TestCase):
 
         self.assertEqual(
             Model.check(databases=self.databases),
-            [
-                Error(
-                    "'constraints' refers to the nonexistent field 'missing_field'.",
-                    obj=Model,
-                    id="models.E012",
-                ),
-            ]
-            if connection.features.supports_table_check_constraints
-            else [],
+            (
+                [
+                    Error(
+                        "'constraints' refers to the nonexistent field "
+                        "'missing_field'.",
+                        obj=Model,
+                        id="models.E012",
+                    ),
+                ]
+                if connection.features.supports_table_check_constraints
+                else []
+            ),
         )
 
     @skipUnlessDBFeature("supports_table_check_constraints")
@@ -2252,15 +2255,18 @@ class ConstraintsTests(TestCase):
 
         self.assertEqual(
             Model.check(databases=self.databases),
-            [
-                Error(
-                    "'constraints' refers to the nonexistent field 'missing_field'.",
-                    obj=Model,
-                    id="models.E012",
-                ),
-            ]
-            if connection.features.supports_partial_indexes
-            else [],
+            (
+                [
+                    Error(
+                        "'constraints' refers to the nonexistent field "
+                        "'missing_field'.",
+                        obj=Model,
+                        id="models.E012",
+                    ),
+                ]
+                if connection.features.supports_partial_indexes
+                else []
+            ),
         )
 
     def test_unique_constraint_condition_pointing_to_joined_fields(self):
@@ -2280,15 +2286,17 @@ class ConstraintsTests(TestCase):
 
         self.assertEqual(
             Model.check(databases=self.databases),
-            [
-                Error(
-                    "'constraints' refers to the joined field 'parent__age__lt'.",
-                    obj=Model,
-                    id="models.E041",
-                )
-            ]
-            if connection.features.supports_partial_indexes
-            else [],
+            (
+                [
+                    Error(
+                        "'constraints' refers to the joined field 'parent__age__lt'.",
+                        obj=Model,
+                        id="models.E041",
+                    )
+                ]
+                if connection.features.supports_partial_indexes
+                else []
+            ),
         )
 
     def test_unique_constraint_pointing_to_reverse_o2o(self):
@@ -2307,15 +2315,17 @@ class ConstraintsTests(TestCase):
 
         self.assertEqual(
             Model.check(databases=self.databases),
-            [
-                Error(
-                    "'constraints' refers to the nonexistent field 'model'.",
-                    obj=Model,
-                    id="models.E012",
-                ),
-            ]
-            if connection.features.supports_partial_indexes
-            else [],
+            (
+                [
+                    Error(
+                        "'constraints' refers to the nonexistent field 'model'.",
+                        obj=Model,
+                        id="models.E012",
+                    ),
+                ]
+                if connection.features.supports_partial_indexes
+                else []
+            ),
         )
 
     def test_deferrable_unique_constraint(self):

@@ -39,10 +39,12 @@ class SHA384Tests(TestCase):
                 "26676a43c7ba378621175853b0",
                 "38b060a751ac96384cd9327eb1b1e36a21fdb71114be07434c0cc7bf63f6e1da274ede"
                 "bfe76f65fbd51ad2f14898b95b",
-                "38b060a751ac96384cd9327eb1b1e36a21fdb71114be07434c0cc7bf63f6e1da274ede"
-                "bfe76f65fbd51ad2f14898b95b"
-                if connection.features.interprets_empty_strings_as_nulls
-                else None,
+                (
+                    "38b060a751ac96384cd9327eb1b1e36a21fdb71114be07434c0cc7bf63f6e1da27"
+                    "4edebfe76f65fbd51ad2f14898b95b"
+                    if connection.features.interprets_empty_strings_as_nulls
+                    else None
+                ),
             ],
         )
 

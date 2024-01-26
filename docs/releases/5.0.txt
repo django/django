@@ -521,8 +521,7 @@ For example::
 
 Should become::
 
-    class Char32UUIDField(models.UUIDField):
-        ...
+    class Char32UUIDField(models.UUIDField): ...
 
 
     class MyModel(models.Model):
