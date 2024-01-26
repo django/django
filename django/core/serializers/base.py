@@ -1,6 +1,7 @@
 """
 Module for abstract serializer/unserializer base classes.
 """
+from collections.abc import Iterable
 from io import StringIO
 
 from django.core.exceptions import ObjectDoesNotExist
@@ -39,8 +40,7 @@ class DeserializationError(Exception):
 class M2MDeserializationError(Exception):
     """Something bad happened during deserialization of a ManyToManyField."""
 
-    def __init__(self, original_exc, pk):
-        self.original_exc = original_exc
+    def __init__(self, pk):
         self.pk = pk
 
 
@@ -282,7 +282,7 @@ class DeserializedObject:
                     )
                 except M2MDeserializationError as e:
                     raise DeserializationError.WithData(
-                        e.original_exc, label, self.object.pk, e.pk
+                        e.__cause__, label, self.object.pk, e.pk
                     )
                 self.m2m_data[field.name] = values
             elif isinstance(field.remote_field, models.ManyToOneRel):
@@ -326,37 +326,25 @@ def build_instance(Model, data, db):
 
 def deserialize_m2m_values(field, field_value, using, handle_forward_references):
     model = field.remote_field.model
-    if hasattr(model._default_manager, "get_by_natural_key"):
+    manager = model._default_manager
+    natural = hasattr(manager, "get_by_natural_key")
 
-        def m2m_convert(value):
-            if hasattr(value, "__iter__") and not isinstance(value, str):
-                return (
-                    model._default_manager.db_manager(using)
-                    .get_by_natural_key(*value)
-                    .pk
-                )
-            else:
-                return model._meta.pk.to_python(value)
-
-    else:
-
-        def m2m_convert(v):
+    def m2m_convert(v):
+        try:
+            if natural and isinstance(v, Iterable) and not isinstance(v, str):
+                return manager.db_manager(using).get_by_natural_key(*v).pk
             return model._meta.pk.to_python(v)
+        except Exception as e:
+            if isinstance(e, ObjectDoesNotExist) and handle_forward_references:
+                raise e
+            raise M2MDeserializationError(v) from e
 
     try:
-        pks_iter = iter(field_value)
+        return [m2m_convert(v) for v in field_value]
     except TypeError as e:
-        raise M2MDeserializationError(e, field_value)
-    try:
-        values = []
-        for pk in pks_iter:
-            values.append(m2m_convert(pk))
-        return values
-    except Exception as e:
-        if isinstance(e, ObjectDoesNotExist) and handle_forward_references:
-            return DEFER_FIELD
-        else:
-            raise M2MDeserializationError(e, pk)
+        raise M2MDeserializationError(field_value) from e
+    except ObjectDoesNotExist:
+        return DEFER_FIELD
 
 
 def deserialize_fk_value(field, field_value, using, handle_forward_references):
@@ -367,7 +355,7 @@ def deserialize_fk_value(field, field_value, using, handle_forward_references):
     field_name = field.remote_field.field_name
     if (
         hasattr(default_manager, "get_by_natural_key")
-        and hasattr(field_value, "__iter__")
+        and isinstance(field_value, Iterable)
         and not isinstance(field_value, str)
     ):
         try:

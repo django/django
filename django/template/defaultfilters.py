@@ -1,7 +1,7 @@
 """Default variable filters."""
 import random as random_module
 import re
-import types
+from collections.abc import Iterable
 from decimal import ROUND_HALF_UP, Context, Decimal, InvalidOperation, getcontext
 from functools import wraps
 from inspect import unwrap
@@ -12,6 +12,7 @@ from urllib.parse import quote
 from django.utils import formats
 from django.utils.dateformat import format, time_format
 from django.utils.encoding import iri_to_uri
+from django.utils.functional import Promise
 from django.utils.html import avoid_wrapping, conditional_escape, escape, escapejs
 from django.utils.html import json_script as _json_script
 from django.utils.html import linebreaks, strip_tags
@@ -686,17 +687,14 @@ def unordered_list(value, autoescape=True):
                 except StopIteration:
                     yield item, None
                     break
-                if isinstance(next_item, (list, tuple, types.GeneratorType)):
-                    try:
-                        iter(next_item)
-                    except TypeError:
-                        pass
-                    else:
-                        yield item, next_item
-                        item = next(item_iterator)
-                        continue
-                yield item, None
-                item = next_item
+                if isinstance(next_item, Iterable) and not isinstance(
+                    next_item, (Promise, str)
+                ):
+                    yield item, next_item
+                    item = next(item_iterator)
+                else:
+                    yield item, None
+                    item = next_item
         except StopIteration:
             pass
 

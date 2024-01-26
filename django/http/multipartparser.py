@@ -8,6 +8,7 @@ import base64
 import binascii
 import collections
 import html
+from collections.abc import Iterable
 
 from django.conf import settings
 from django.core.exceptions import (
@@ -672,9 +673,9 @@ class BoundaryIter:
 
 def exhaust(stream_or_iterable):
     """Exhaust an iterator or stream."""
-    try:
-        iterator = iter(stream_or_iterable)
-    except TypeError:
+    if isinstance(stream_or_iterable, Iterable):
+        iterator = stream_or_iterable
+    else:
         iterator = ChunkIter(stream_or_iterable, 16384)
     collections.deque(iterator, maxlen=0)  # consume iterator quickly.
 

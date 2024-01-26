@@ -33,12 +33,12 @@ class QueryDictTests(SimpleTestCase):
     def test_missing_key(self):
         q = QueryDict()
         with self.assertRaises(KeyError):
-            q.__getitem__("foo")
+            q["foo"]
 
     def test_immutability(self):
         q = QueryDict()
         with self.assertRaises(AttributeError):
-            q.__setitem__("something", "bar")
+            q["something"] = "bar"
         with self.assertRaises(AttributeError):
             q.setlist("foo", ["bar"])
         with self.assertRaises(AttributeError):
@@ -74,9 +74,9 @@ class QueryDictTests(SimpleTestCase):
         q = QueryDict("foo=bar")
         self.assertEqual(q["foo"], "bar")
         with self.assertRaises(KeyError):
-            q.__getitem__("bar")
+            q["bar"]
         with self.assertRaises(AttributeError):
-            q.__setitem__("something", "bar")
+            q["something"] = "bar"
 
         self.assertEqual(q.get("foo", "default"), "bar")
         self.assertEqual(q.get("bar", "default"), "default")
@@ -132,7 +132,7 @@ class QueryDictTests(SimpleTestCase):
         """A copy of a QueryDict is mutable."""
         q = QueryDict().copy()
         with self.assertRaises(KeyError):
-            q.__getitem__("foo")
+            q["foo"]
         q["name"] = "john"
         self.assertEqual(q["name"], "john")
 
@@ -189,7 +189,7 @@ class QueryDictTests(SimpleTestCase):
 
         self.assertEqual(q["vote"], "no")
         with self.assertRaises(AttributeError):
-            q.__setitem__("something", "bar")
+            q["something"] = "bar"
 
         self.assertEqual(q.get("vote", "default"), "no")
         self.assertEqual(q.get("foo", "default"), "default")
@@ -223,7 +223,7 @@ class QueryDictTests(SimpleTestCase):
         with self.assertRaises(AttributeError):
             q.setdefault("foo", "bar")
         with self.assertRaises(AttributeError):
-            q.__delitem__("vote")
+            del q["vote"]
 
     def test_pickle(self):
         q = QueryDict()
@@ -339,9 +339,9 @@ class HttpResponseTests(SimpleTestCase):
 
         r = HttpResponse()
         with self.assertRaises(UnicodeError):
-            r.headers.__setitem__("føø", "bar")
+            r.headers["føø"] = "bar"
         with self.assertRaises(UnicodeError):
-            r.headers.__setitem__("føø".encode(), "bar")
+            r.headers["føø".encode()] = "bar"
 
     def test_long_line(self):
         # Bug #20889: long lines trigger newlines to be added to headers
@@ -360,9 +360,9 @@ class HttpResponseTests(SimpleTestCase):
         # Bug #10188: Do not allow newlines in headers (CR or LF)
         r = HttpResponse()
         with self.assertRaises(BadHeaderError):
-            r.headers.__setitem__("test\rstr", "test")
+            r.headers["test\rstr"] = "test"
         with self.assertRaises(BadHeaderError):
-            r.headers.__setitem__("test\nstr", "test")
+            r.headers["test\nstr"] = "test"
 
     def test_encoded_with_newlines_in_headers(self):
         """

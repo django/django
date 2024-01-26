@@ -131,12 +131,12 @@ class DataSourceTest(SimpleTestCase):
             # Making sure indexing works
             msg = "Index out of range when accessing layers in a datasource: %s."
             with self.assertRaisesMessage(IndexError, msg % len(ds)):
-                ds.__getitem__(len(ds))
+                ds[len(ds)]
 
             with self.assertRaisesMessage(
                 IndexError, "Invalid OGR layer name given: invalid."
             ):
-                ds.__getitem__("invalid")
+                ds["invalid"]
 
     def test_ds_input_pathlib(self):
         test_shp = Path(get_ds_file("test_point", "shp"))
@@ -181,9 +181,9 @@ class DataSourceTest(SimpleTestCase):
                 with self.assertRaisesMessage(
                     IndexError, "Negative indices are not allowed on OGR Layers."
                 ):
-                    layer.__getitem__(-1)
+                    layer[-1]
                 with self.assertRaisesMessage(IndexError, "Invalid feature id: 50000."):
-                    layer.__getitem__(50000)
+                    layer[50000]
 
                 if hasattr(source, "field_values"):
                     # Testing `Layer.get_fields` (which uses Layer.__iter__)
@@ -204,12 +204,12 @@ class DataSourceTest(SimpleTestCase):
                             "Index out of range when accessing field in a feature: %s."
                         )
                         with self.assertRaisesMessage(IndexError, msg % len(feat)):
-                            feat.__getitem__(len(feat))
+                            feat[len(feat)]
 
                         with self.assertRaisesMessage(
                             IndexError, "Invalid OFT field name given: invalid."
                         ):
-                            feat.__getitem__("invalid")
+                            feat["invalid"]
 
     def test03b_layer_slice(self):
         "Test indexing and slicing on Layers."
