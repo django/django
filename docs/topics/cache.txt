@@ -608,8 +608,9 @@ entire site. You'll need to add
 Then, add the following required settings to your Django settings file:
 
 * :setting:`CACHE_MIDDLEWARE_ALIAS` -- The cache alias to use for storage.
-* :setting:`CACHE_MIDDLEWARE_SECONDS` -- The number of seconds each page should
-  be cached.
+* :setting:`CACHE_MIDDLEWARE_SECONDS` -- The integer number of seconds each
+  page should be cached.
+
 * :setting:`CACHE_MIDDLEWARE_KEY_PREFIX` -- If the cache is shared across
   multiple sites using the same Django installation, set this to the name of
   the site, or some other string that is unique to this Django instance, to
