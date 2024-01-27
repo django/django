@@ -721,8 +721,8 @@ def mock_subprocess_call(args):
 
 
 def mock_iter_test_cases(tests):
-    testcase1 = mock.Mock(__module__='module1')
-    testcase2 = mock.Mock(__module__='module2')
+    testcase1 = mock.Mock(__module__="module1")
+    testcase2 = mock.Mock(__module__="module2")
 
     for testcase in [testcase1, testcase2]:
         yield testcase
@@ -736,20 +736,29 @@ class TestPollutionDetectionTools(SimpleTestCase):
 
         runner = DiscoverRunner(pattern="test_*.py", tags="a", shuffle=True)
         subprocess_args = runner.get_subprocess_args(["manage.py", "test"])
-        self.assertEqual(subprocess_args[1:], ["manage.py", "test", "--pattern=test_*.py", "--tag={'a'}", "--shuffle=True"])
+        self.assertEqual(
+            subprocess_args[1:],
+            [
+                "manage.py",
+                "test",
+                "--pattern=test_*.py",
+                "--tag={'a'}",
+                "--shuffle=True",
+            ],
+        )
 
-    @mock.patch.object(DiscoverRunner, 'load_tests_for_label', return_value = None)
+    @mock.patch.object(DiscoverRunner, "load_tests_for_label", return_value=None)
     @mock.patch("django.test.runner.iter_test_cases", new=mock_iter_test_cases)
     def test_get_test_modules(self, mock_load_tests_for_label):
         runner = DiscoverRunner()
         modules = runner.get_test_modules(None)
-        expected_modules = ['module1', 'module2']
+        expected_modules = ["module1", "module2"]
         self.assertEqual(len(modules), len(expected_modules))
         self.assertEqual(set(modules), set(expected_modules))
 
         runner = DiscoverRunner()
-        modules = runner.get_test_modules(['module1'])
-        self.assertEqual(modules, ['module1'])
+        modules = runner.get_test_modules(["module1"])
+        self.assertEqual(modules, ["module1"])
 
     @mock.patch("subprocess.run", side_effect=mock_subprocess_run)
     def test_bisect_tests(self, mock_run):
@@ -766,11 +775,13 @@ class TestPollutionDetectionTools(SimpleTestCase):
         )
 
         with mock.patch("builtins.print") as mock_print:
-            runner.bisect_tests("Polluted", ["Polluter", "Polluter", "Polluter", "Polluter"])
+            runner.bisect_tests(
+                "Polluted", ["Polluter", "Polluter", "Polluter", "Polluter"]
+            )
         mock_print.assert_called_with("***** Multiple sources of failure found")
 
     @mock.patch("subprocess.call", side_effect=mock_subprocess_call)
-    def test_pair_tests(self, mock_run):
+    def test_pair_tests(self, mock_call):
         runner = DiscoverRunner()
 
         with mock.patch("builtins.print") as mock_print:
