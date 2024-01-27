@@ -16,6 +16,7 @@ from collections import defaultdict
 from contextlib import contextmanager
 from importlib import import_module
 from io import StringIO
+import subprocess
 
 import sqlparse
 
@@ -394,6 +395,24 @@ def parallel_type(value):
         raise argparse.ArgumentTypeError(
             f"{value!r} is not an integer or the string 'auto'"
         )
+
+
+# def get_subprocess_args(options, file):
+#     if isinstance(file, str):
+#         file = [file]
+
+#     subprocess_args = [sys.executable] + file + ["--settings=%s" % options.settings] # need to have the path for maanage.py
+
+#     if options.tags:
+#         subprocess_args.append("--tag=%s" % options.tags)
+#     if options.exclude_tags:
+#         subprocess_args.append("--exclude_tag=%s" % options.exclude_tags)
+#     if options.shuffle is not False:
+#         if options.shuffle is None:
+#             subprocess_args.append("--shuffle")
+#         else:
+#             subprocess_args.append("--shuffle=%s" % options.shuffle)
+#     return subprocess_args
 
 
 _worker_id = 0
@@ -906,6 +925,22 @@ class DiscoverRunner:
         self.test_loader._top_level_dir = None
         return tests
 
+    def get_subprocess_args(self, command):
+        subprocess_args = [sys.executable] + command
+
+        if self.pattern:
+            subprocess_args.append("--pattern=%s" % self.pattern)
+        if self.tags:
+            subprocess_args.append("--tag=%s" % self.tags)
+        if self.exclude_tags:
+            subprocess_args.append("--exclude_tag=%s" % self.exclude_tags)
+        if self.shuffle is not False:
+            if self.shuffle is None:
+                subprocess_args.append("--shuffle")
+            else:
+                subprocess_args.append("--shuffle=%s" % self.shuffle)
+        return subprocess_args
+
     def build_suite(self, test_labels=None, **kwargs):
         test_labels = test_labels or ["."]
 
@@ -1067,61 +1102,32 @@ class DiscoverRunner:
         return list(modules)
 
     def paired_tests(self, paired_test, test_labels):
-        test_labels = list(test_labels) or self.get_test_modules(test_labels)
+        test_labels = self.get_test_modules(test_labels)
 
         print("***** Trying paired execution")
+
         # Make sure the constant member of the pair isn't in the test list
         try:
             test_labels.remove(paired_test)
         except ValueError:
             pass
 
+        subprocess_args = self.get_subprocess_args([sys.argv[0], sys.argv[1]])
+
         for i, label in enumerate(test_labels):
             print(
                 "***** %d of %d: Check test pairing with %s"
                 % (i + 1, len(test_labels), label)
             )
-
-            self.setup_test_environment()
-            suite = self.build_suite([label, paired_test])
-            databases = self.get_databases(suite)
-            suite.serialized_aliases = set(
-                alias for alias, serialize in databases.items() if serialize
-            )
-
-            suite.used_aliases = set(databases)
-            with self.time_keeper.timed("%d Database Setup" % (i + 1)):
-                old_config = self.setup_databases(
-                    aliases=databases,
-                    serialized_aliases=suite.serialized_aliases,
-                )
-
-            run_failed = False
-            try:
-                self.run_checks(databases)
-                result = self.run_suite(suite)
-            except Exception:
-                run_failed = True
-                raise
-            finally:
-                try:
-                    with self.time_keeper.timed("%d Database Teardown" % (i + 1)):
-                        self.teardown_databases(old_config)
-                    self.teardown_test_environment()
-                except Exception:
-                    # Silence teardown exceptions if an exception was raised during
-                    # runs to avoid shadowing it.
-                    if not run_failed:
-                        raise
-            if result.failures or result.errors:
+            failures = subprocess.call(subprocess_args + [label, paired_test])
+            if failures:
                 print("***** Found problem pair with %s" % label)
-                return 0
+                return
 
         print("***** No problem pair found")
-        return 1
 
     def bisect_tests(self, bisection_label, test_labels):
-        test_labels = list(test_labels) or self.get_test_modules(test_labels)
+        test_labels = self.get_test_modules(test_labels)
 
         print("***** Bisecting test suite: %s" % " ".join(test_labels))
 
@@ -1131,86 +1137,43 @@ class DiscoverRunner:
         except ValueError:
             pass
 
+        subprocess_args = self.get_subprocess_args([sys.argv[0], sys.argv[1]])
+
         iteration = 1
         while len(test_labels) > 1:
-            failures = []
             midpoint = len(test_labels) // 2
             test_labels_a = test_labels[:midpoint] + [bisection_label]
             test_labels_b = test_labels[midpoint:] + [bisection_label]
+            print(
+                "***** Pass %da: Running the first half of the test suite" % iteration
+            )
+            print("***** Test labels: %s" % " ".join(test_labels_a))
+            failures_a = subprocess.run(subprocess_args + test_labels_a)
 
-            for i, labels in enumerate([test_labels_a, test_labels_b]):
-                self.setup_test_environment()
+            print(
+                "***** Pass %db: Running the second half of the test suite" % iteration
+            )
+            print("***** Test labels: %s" % " ".join(test_labels_b))
+            print("")
+            failures_b = subprocess.run(subprocess_args + test_labels_b)
 
-                if i == 0:
-                    print(
-                        "***** Pass %da: Running the first half of the test suite"
-                        % iteration
-                    )
-                else:
-                    print(
-                        "***** Pass %db: Running the second half of the test suite"
-                        % iteration
-                    )
-                print("***** Test labels: %s" % " ".join(labels))
-
-                suite = self.build_suite(labels)
-                databases = self.get_databases(suite)
-                suite.serialized_aliases = set(
-                    alias for alias, serialize in databases.items() if serialize
-                )
-
-                suite.used_aliases = set(databases)
-                with self.time_keeper.timed(
-                    "%d%c Database Setup" % (iteration, chr(ord("a") + i))
-                ):
-                    old_config = self.setup_databases(
-                        aliases=databases,
-                        serialized_aliases=suite.serialized_aliases,
-                    )
-                run_failed = False
-                try:
-                    self.run_checks(databases)
-                    result = self.run_suite(suite)
-                except Exception:
-                    run_failed = True
-                    raise
-                finally:
-                    try:
-                        with self.time_keeper.timed(
-                            "%d%c Database Teardown" % (iteration, chr(ord("a") + i))
-                        ):
-                            self.teardown_databases(old_config)
-                        self.teardown_test_environment()
-                    except Exception:
-                        # Silence teardown exceptions if an exception was raised during
-                        # runs to avoid shadowing it.
-                        if not run_failed:
-                            raise
-                if result.failures or result.errors:
-                    failures.append(labels)
-                else:
-                    failures.append([])
-
-            failures_a, failures_b = failures
-            if failures_a and not failures_b:
+            if failures_a.returncode and not failures_b.returncode:
                 print("***** Problem found in first half. Bisecting again...")
                 iteration += 1
                 test_labels = test_labels_a[:-1]
-            elif failures_b and not failures_a:
+            elif failures_b.returncode and not failures_a.returncode:
                 print("***** Problem found in second half. Bisecting again...")
                 iteration += 1
                 test_labels = test_labels_b[:-1]
-            elif failures_a and failures_b:
-                print("***** Problem found in both halves")
+            elif failures_a.returncode and failures_b.returncode:
+                print("***** Multiple sources of failure found")
                 break
             else:
-                print("***** No problem found in either half")
+                print("***** No source of failure found... try pair execution (--pair)")
                 break
 
         if len(test_labels) == 1:
             print("***** Source of error: %s" % test_labels[0])
-            return 0
-        return 1
 
     def run_tests(self, test_labels, **kwargs):
         """
