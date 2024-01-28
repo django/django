@@ -1562,6 +1562,61 @@ Shows the N slowest test cases (N=0 for all).
 
     This feature is only available for Python 3.12 and later.
 
+.. django-admin-option:: --bisect FAILING_TEST_CASE
+
+.. versionadded:: 5.1
+
+Performs a binary search over the test suite to find a minimal set of tests 
+that cause a given test to fail. This can often help identify a small number 
+of tests that may be related to the failure.
+
+.. console::
+
+    django-admin test --bisect basic.tests.ModelTest.test_fail
+
+If you suspect certain test cases may be causing the failure, you can limit 
+the analysis to these :ref:`specific tests <running-tests>`. Simply specify
+their labels after the first one.
+
+for example, this command:
+
+.. console::
+
+    django-admin test --bisect basic.tests.ModelTest.test_fail foo bar baz 
+
+...would perform a binary search over the ``foo``, ``bar``, and ``baz`` tests
+in combination with ``basic.tests.ModelTest.test_fail`` to find the minimal set of tests that
+cause the failure.
+
+.. admonition:: Python 3.5 and later
+
+    This feature is only available for Python 3.5 and later.
+
+.. django-admin-option:: --pair FAILING_TEST_CASE
+
+.. versionadded:: 5.1
+
+Performs a pairwise serch over the test suite to find a test that cause a given
+test to fail. This can identify one test that, when run prior to the target test,
+leads to the failure.
+
+.. console::
+
+    django-admin test --pair basic.tests.ModelTest.test_fail 
+
+If you suspect certain test cases may be causing the failure, you can limit 
+the analysis to these :ref:`specific tests <running-tests>`. Simply specify
+their labels after the first one.
+
+For example, this command:
+
+.. console::
+
+    django-admin test --pair basic.tests.ModelTest.test_fail foo bar baz 
+
+...would perform a pairwise search over the ``foo``, ``bar``, and ``baz`` pairing each
+with ``basic.tests.ModelTest.test_fail`` to find the the problem test case.
+
 ``testserver``
 --------------
 
