@@ -1309,7 +1309,7 @@ class AutodetectorTests(BaseAutodetectorTests):
             changes, "testapp", 0, 0, name="name", preserve_default=True
         )
         self.assertOperationFieldAttributes(
-            changes, "testapp", 0, 0, db_default=models.Value("Ada Lovelace")
+            changes, "testapp", 0, 0, db_default="Ada Lovelace"
         )
 
     @mock.patch(
@@ -1515,7 +1515,7 @@ class AutodetectorTests(BaseAutodetectorTests):
             changes, "testapp", 0, 0, name="name", preserve_default=True
         )
         self.assertOperationFieldAttributes(
-            changes, "testapp", 0, 0, db_default=models.Value("Ada Lovelace")
+            changes, "testapp", 0, 0, db_default="Ada Lovelace"
         )
 
     @mock.patch(

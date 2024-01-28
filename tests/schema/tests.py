@@ -7,6 +7,7 @@ from unittest import mock
 
 from django.core.exceptions import FieldError
 from django.core.management.color import no_style
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import (
     DatabaseError,
     DataError,
@@ -2332,6 +2333,26 @@ class SchemaTests(TransactionTestCase):
         new_field.model = Author
         with connection.schema_editor() as editor, self.assertNumQueries(0):
             editor.alter_field(Author, Author._meta.get_field("name"), new_field)
+
+    @isolate_apps("schema")
+    def test_db_default_output_field_resolving(self):
+        class Author(Model):
+            data = JSONField(
+                encoder=DjangoJSONEncoder,
+                db_default={
+                    "epoch": datetime.datetime(1970, 1, 1, tzinfo=datetime.timezone.utc)
+                },
+            )
+
+            class Meta:
+                app_label = "schema"
+
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+
+        author = Author.objects.create()
+        author.refresh_from_db()
+        self.assertEqual(author.data, {"epoch": "1970-01-01T00:00:00Z"})
 
     @skipUnlessDBFeature(
         "supports_column_check_constraints", "can_introspect_check_constraints"
