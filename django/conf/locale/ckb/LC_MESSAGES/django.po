@@ -5,14 +5,14 @@
 # Bawar Jalal, 2020-2021
 # Bawar Jalal, 2020
 # kosar tofiq <kosar.belana@gmail.com>, 2020-2021
-# Swara <swara09@gmail.com>, 2022-2023
+# Swara <swara09@gmail.com>, 2022-2024
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-17 02:13-0600\n"
-"PO-Revision-Date: 2023-04-25 06:49+0000\n"
-"Last-Translator: Swara <swara09@gmail.com>, 2022-2023\n"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2024-01-12 06:49+0000\n"
+"Last-Translator: Swara <swara09@gmail.com>, 2022-2024\n"
 "Language-Team: Central Kurdish (http://app.transifex.com/django/django/"
 "language/ckb/)\n"
 "MIME-Version: 1.0\n"
@@ -55,7 +55,7 @@ msgid "Catalan"
 msgstr "کاتالانی"
 
 msgid "Central Kurdish (Sorani)"
-msgstr ""
+msgstr "کوردی"
 
 msgid "Czech"
 msgstr "چیکی"
@@ -297,6 +297,9 @@ msgstr "تاتاری"
 msgid "Udmurt"
 msgstr "ئودمورتی"
 
+msgid "Uyghur"
+msgstr "ئۆیغور"
+
 msgid "Ukrainian"
 msgstr "ئۆکرانی"
 
@@ -392,6 +395,15 @@ msgstr "دڵنیاببە ئەم نرخە گەورەترە یاخود یەکسا�
 #, python-format
 msgid "Ensure this value is a multiple of step size %(limit_value)s."
 msgstr "دڵنیابە کە ئەم بەهایە چەندانێکە لە قەبارەی هەنگاوی%(limit_value)s."
+
+#, python-format
+msgid ""
+"Ensure this value is a multiple of step size %(limit_value)s, starting from "
+"%(offset)s, e.g. %(offset)s, %(valid_value1)s, %(valid_value2)s, and so on."
+msgstr ""
+"دڵنیابە ئەم بەهایە چەند هێندەیەکی قەبارەی هەنگاوەکانە %(limit_value)s, "
+"دەستپێدەکات لە %(offset)s، بۆ نموونە %(offset)s، %(valid_value1)s، "
+"%(valid_value2)s، هتد."
 
 #, python-format
 msgid ""
@@ -504,7 +516,7 @@ msgid "String (up to %(max_length)s)"
 msgstr "ڕیزبەند (تا %(max_length)s)"
 
 msgid "String (unlimited)"
-msgstr ""
+msgstr "ڕیز(بێسنوور)"
 
 msgid "Comma-separated integers"
 msgstr "ژمارە تەواوەکان بە کۆما جیاکراونەتەوە"
