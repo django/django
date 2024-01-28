@@ -218,12 +218,6 @@ class Field(RegisterLookupMixin):
         self.remote_field = rel
         self.is_relation = self.remote_field is not None
         self.default = default
-        if db_default is not NOT_PROVIDED and not hasattr(
-            db_default, "resolve_expression"
-        ):
-            from django.db.models.expressions import Value
-
-            db_default = Value(db_default)
         self.db_default = db_default
         self.editable = editable
         self.serialize = serialize
@@ -407,7 +401,7 @@ class Field(RegisterLookupMixin):
                 continue
             connection = connections[db]
 
-            if not getattr(self.db_default, "allowed_default", False) and (
+            if not getattr(self._db_default_expression, "allowed_default", False) and (
                 connection.features.supports_expression_defaults
             ):
                 msg = f"{self.db_default} cannot be used in db_default."
@@ -993,7 +987,7 @@ class Field(RegisterLookupMixin):
             from django.db.models.expressions import DatabaseDefault
 
             if isinstance(value, DatabaseDefault):
-                return self.db_default
+                return self._db_default_expression
         return value
 
     def get_prep_value(self, value):
@@ -1045,6 +1039,17 @@ class Field(RegisterLookupMixin):
         ):
             return return_None
         return str  # return empty string
+
+    @cached_property
+    def _db_default_expression(self):
+        db_default = self.db_default
+        if db_default is not NOT_PROVIDED and not hasattr(
+            db_default, "resolve_expression"
+        ):
+            from django.db.models.expressions import Value
+
+            db_default = Value(db_default, self)
+        return db_default
 
     def get_choices(
         self,
