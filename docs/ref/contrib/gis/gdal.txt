@@ -839,6 +839,15 @@ coordinate transformation:
     Returns the region consisting of the union of this geometry and
     the other, as a new :class:`OGRGeometry` object.
 
+    .. attribute:: centroid
+
+    Returns a :class:`Point` representing the centroid of this geometry.
+
+    .. versionchanged:: 5.1
+
+        ``centroid`` was promoted from a :class:`.Polygon` only attribute to
+        being available on all geometry types.
+
     .. attribute:: tuple
 
     Returns the coordinates of a point geometry as a tuple, the
@@ -938,10 +947,6 @@ coordinate transformation:
     .. attribute:: exterior_ring
 
     An alias for :attr:`shell`.
-
-    .. attribute:: centroid
-
-    Returns a :class:`Point` representing the centroid of this polygon.
 
 .. class:: GeometryCollection
 

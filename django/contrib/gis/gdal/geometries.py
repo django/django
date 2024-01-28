@@ -565,6 +565,14 @@ class OGRGeometry(GDALBase):
         """
         return self._geomgen(capi.geom_union, other)
 
+    @property
+    def centroid(self):
+        """Return the centroid (a Point) of this Polygon."""
+        # The centroid is a Point, create a geometry for this.
+        p = OGRGeometry(OGRGeomType("Point"))
+        capi.get_centroid(self.ptr, p.ptr)
+        return p
+
 
 # The subclasses for OGR Geometry.
 class Point(OGRGeometry):
@@ -707,14 +715,6 @@ class Polygon(OGRGeometry):
         "Return the number of Points in this Polygon."
         # Summing up the number of points in each ring of the Polygon.
         return sum(self[i].point_count for i in range(self.geom_count))
-
-    @property
-    def centroid(self):
-        "Return the centroid (a Point) of this Polygon."
-        # The centroid is a Point, create a geometry for this.
-        p = OGRGeometry(OGRGeomType("Point"))
-        capi.get_centroid(self.ptr, p.ptr)
-        return p
 
 
 # Geometry Collection base class.

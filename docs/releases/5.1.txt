@@ -83,6 +83,9 @@ Minor features
   via the new :attr:`.OGRGeometry.is_measured` and :attr:`.Point.m` properties,
   and the :meth:`.OGRGeometry.set_measured` method.
 
+* :attr:`.OGRGeometry.centroid` is now available on all supported geometry
+  types.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
