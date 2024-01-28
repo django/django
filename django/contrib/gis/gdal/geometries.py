@@ -800,11 +800,13 @@ GEO_CLASSES = {
     101: LinearRing,
     2001: Point,  # POINT M
     2002: LineString,  # LINESTRING M
+    2003: Polygon,  # POLYGON M
     3001: Point,  # POINT ZM
     3002: LineString,  # LINESTRING ZM
+    3003: Polygon,  # POLYGON ZM
     1 + OGRGeomType.wkb25bit: Point,  # POINT Z
     2 + OGRGeomType.wkb25bit: LineString,  # LINESTRING Z
-    3 + OGRGeomType.wkb25bit: Polygon,
+    3 + OGRGeomType.wkb25bit: Polygon,  # POLYGON Z
     4 + OGRGeomType.wkb25bit: MultiPoint,
     5 + OGRGeomType.wkb25bit: MultiLineString,
     6 + OGRGeomType.wkb25bit: MultiPolygon,

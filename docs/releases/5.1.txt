@@ -79,8 +79,9 @@ Minor features
   ``Z`` coordinate dimension.
 
 * :class:`~django.contrib.gis.gdal.OGRGeometry`,
-  :class:`~django.contrib.gis.gdal.Point`, and
-  :class:`~django.contrib.gis.gdal.LineString` now support measured geometries
+  :class:`~django.contrib.gis.gdal.Point`,
+  :class:`~django.contrib.gis.gdal.LineString`, and
+  :class:`~django.contrib.gis.gdal.Polygon` now support measured geometries
   via the new :attr:`.OGRGeometry.is_measured` and ``m`` properties, and the
   :meth:`.OGRGeometry.set_measured` method.
 
