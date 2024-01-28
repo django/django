@@ -156,7 +156,8 @@ Email
 Error Reporting
 ~~~~~~~~~~~~~~~
 
-* ...
+* In order to improve accessibility, the technical 404 and 500 error pages now
+  use HTML landmark elements for the header, footer, and main content areas.
 
 File Storage
 ~~~~~~~~~~~~
