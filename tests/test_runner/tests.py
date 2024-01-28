@@ -732,7 +732,7 @@ class TestPollutionDetectionTools(SimpleTestCase):
     def test_get_subprocess_args(self):
         runner = DiscoverRunner()
         subprocess_args = runner.get_subprocess_args(["manage.py", "test"])
-        self.assertEqual(subprocess_args[1:], ["manage.py", "test"])
+        self.assertEqual(subprocess_args[1:], ["manage.py", "test", "--verbosity=1"])
 
         runner = DiscoverRunner(pattern="test_*.py", tags="a", shuffle=True)
         subprocess_args = runner.get_subprocess_args(["manage.py", "test"])
@@ -742,6 +742,7 @@ class TestPollutionDetectionTools(SimpleTestCase):
                 "manage.py",
                 "test",
                 "--pattern=test_*.py",
+                "--verbosity=1",
                 "--tag={'a'}",
                 "--shuffle=True",
             ],
@@ -781,7 +782,7 @@ class TestPollutionDetectionTools(SimpleTestCase):
         mock_print.assert_called_with("***** Multiple sources of failure found")
 
     @mock.patch("subprocess.call", side_effect=mock_subprocess_call)
-    def test_pair_tests(self, mock_call):
+    def test_paired_tests(self, mock_call):
         runner = DiscoverRunner()
 
         with mock.patch("builtins.print") as mock_print:

@@ -16,7 +16,6 @@ from collections import defaultdict
 from contextlib import contextmanager
 from importlib import import_module
 from io import StringIO
-import subprocess
 
 import sqlparse
 
@@ -913,6 +912,12 @@ class DiscoverRunner:
 
         if self.pattern:
             subprocess_args.append("--pattern=%s" % self.pattern)
+        if self.failfast:
+            subprocess_args.append("--failfast")
+        if self.verbosity:
+            subprocess_args.append("--verbosity=%s" % self.verbosity)
+        if not self.interactive:
+            subprocess_args.append("--noinput")
         if self.tags:
             subprocess_args.append("--tag=%s" % self.tags)
         if self.exclude_tags:
@@ -1095,7 +1100,7 @@ class DiscoverRunner:
         except ValueError:
             pass
 
-        subprocess_args = self.get_subprocess_args([sys.argv[0], sys.argv[1]])
+        subprocess_args = self.get_subprocess_args([sys.argv[0], "test"])
         return run_pairing(paired_test, test_labels, subprocess_args)
 
     def bisect_tests(self, bisection_label, test_labels):
@@ -1109,7 +1114,7 @@ class DiscoverRunner:
         except ValueError:
             pass
 
-        subprocess_args = self.get_subprocess_args([sys.argv[0], sys.argv[1]])
+        subprocess_args = self.get_subprocess_args([sys.argv[0], "test"])
         return run_bisection(bisection_label, test_labels, subprocess_args)
 
     def run_tests(self, test_labels, **kwargs):
