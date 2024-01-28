@@ -76,12 +76,8 @@ class AppConfig:
         paths = list(getattr(module, "__path__", []))
         if len(paths) != 1:
             filename = getattr(module, "__file__", None)
-            if filename is not None:
-                paths = [os.path.dirname(filename)]
-            else:
-                # For unknown reasons, sometimes the list returned by __path__
-                # contains duplicates that must be removed (#25246).
-                paths = list(set(paths))
+            paths = [os.path.dirname(filename)] if filename is not None else list(set(paths)) # For unknown reasons, sometimes the list returned by __path__
+            # contains duplicates that must be removed (#25246).
         if len(paths) > 1:
             raise ImproperlyConfigured(
                 "The app module %r has multiple filesystem locations (%r); "
