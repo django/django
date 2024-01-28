@@ -6,17 +6,17 @@
 # Bedilbek Khamidov <bedilbek@gmail.com>, 2019
 # Claude Paroz <claude@2xlibre.net>, 2019
 # Nuriddin Islamov, 2021
-# Shukrullo Turgunov <shukrullo@umail.uz>, 2021
+# Shukrullo Turgunov <shukrullo@umail.uz>, 2021,2024
 # Sukhrobbek Ismatov <isukhrobbek@gmail.com>, 2019
 # Yet Sum <sotuvchicom@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-12-16 12:06+0000\n"
-"Last-Translator: Alex Ibragimov\n"
-"Language-Team: Uzbek (http://www.transifex.com/django/django/language/uz/)\n"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2024-01-25 07:05+0000\n"
+"Last-Translator: Shukrullo Turgunov <shukrullo@umail.uz>, 2021,2024\n"
+"Language-Team: Uzbek (http://app.transifex.com/django/django/language/uz/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -25,7 +25,7 @@ msgstr ""
 
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
-msgstr "%(verbose_name_plural)s tanlanganlarni o'chirish"
+msgstr "%(verbose_name_plural)s larni o'chirish"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -42,7 +42,7 @@ msgid "Administration"
 msgstr "Administratsiya"
 
 msgid "All"
-msgstr "Hammasi"
+msgstr "Barchasi"
 
 msgid "Yes"
 msgstr "Ha"
@@ -96,7 +96,7 @@ msgid "Add another %(verbose_name)s"
 msgstr "Boshqa %(verbose_name)s qo‘shish"
 
 msgid "Remove"
-msgstr "Olib tashlash"
+msgstr "O'chirish"
 
 msgid "Addition"
 msgstr " Qo'shish"
@@ -182,6 +182,9 @@ msgstr "Bo'sh"
 msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr ""
 
+msgid "Select this object for an action - {}"
+msgstr ""
+
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr ""
@@ -262,8 +265,9 @@ msgstr ""
 msgid "Change history: %s"
 msgstr ""
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr ""
@@ -329,6 +333,9 @@ msgstr ""
 msgid "Clear selection"
 msgstr ""
 
+msgid "Breadcrumbs"
+msgstr ""
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr ""
@@ -354,13 +361,14 @@ msgid "Change password"
 msgstr "Parolni o'zgartirish"
 
 msgid "Please correct the error below."
-msgstr ""
-
-msgid "Please correct the errors below."
-msgstr ""
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr ""
+
+msgid "Skip to main content"
 msgstr ""
 
 msgid "Welcome,"
@@ -388,6 +396,12 @@ msgstr "Saytda ko'rish"
 msgid "Filter"
 msgstr "Saralash"
 
+msgid "Hide counts"
+msgstr ""
+
+msgid "Show counts"
+msgstr ""
+
 msgid "Clear all filters"
 msgstr ""
 
@@ -399,6 +413,15 @@ msgid "Sorting priority: %(priority_number)s"
 msgstr ""
 
 msgid "Toggle sorting"
+msgstr ""
+
+msgid "Toggle theme (current theme: auto)"
+msgstr ""
+
+msgid "Toggle theme (current theme: light)"
+msgstr ""
+
+msgid "Toggle theme (current theme: dark)"
 msgstr ""
 
 msgid "Delete"
@@ -473,6 +496,15 @@ msgstr "Mening harakatlarim"
 msgid "None available"
 msgstr ""
 
+msgid "Added:"
+msgstr ""
+
+msgid "Changed:"
+msgstr ""
+
+msgid "Deleted:"
+msgstr ""
+
 msgid "Unknown content"
 msgstr ""
 
@@ -494,6 +526,9 @@ msgstr ""
 msgid "Toggle navigation"
 msgstr "Navigatsiyani almashtirish"
 
+msgid "Sidebar"
+msgstr ""
+
 msgid "Start typing to filter…"
 msgstr ""
 
@@ -508,6 +543,10 @@ msgstr ""
 
 msgid "Action"
 msgstr ""
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] ""
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -560,6 +599,10 @@ msgstr ""
 
 #, python-format
 msgid "Delete selected %(model)s"
+msgstr ""
+
+#, python-format
+msgid "View selected %(model)s"
 msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."
@@ -646,6 +689,9 @@ msgstr ""
 
 msgid "Reset my password"
 msgstr "Parolimni tiklash"
+
+msgid "Select all objects on this page for an action"
+msgstr ""
 
 msgid "All dates"
 msgstr "Barcha sanalar"

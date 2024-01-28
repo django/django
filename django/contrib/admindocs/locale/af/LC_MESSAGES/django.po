@@ -64,13 +64,16 @@ msgid ""
 msgstr ""
 
 msgid "Models"
-msgstr ""
+msgstr "Modelle"
 
 msgid ""
 "Models are descriptions of all the objects in the system and their "
 "associated fields. Each model has a list of fields which can be accessed as "
 "template variables"
 msgstr ""
+"Modelle is beskrywings van al die objekte in die stelsel met hulle velde. "
+"Elke model het 'n lys velde wat bereikbaar is as veranderlikes in 'n "
+"sjabloon."
 
 msgid "Views"
 msgstr ""
@@ -107,7 +110,7 @@ msgstr ""
 
 #, python-format
 msgid "Model: %(name)s"
-msgstr ""
+msgstr "Model: %(name)s"
 
 msgid "Fields"
 msgstr "Velde"
@@ -202,10 +205,10 @@ msgid "Templates:"
 msgstr ""
 
 msgid "Back to View documentation"
-msgstr ""
+msgstr "Terug na Sien dokumentasie"
 
 msgid "View documentation"
-msgstr ""
+msgstr "Sien dokumentasie"
 
 msgid "Jump to namespace"
 msgstr ""

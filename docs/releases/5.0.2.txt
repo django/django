@@ -4,7 +4,8 @@ Django 5.0.2 release notes
 
 *Expected February 5, 2024*
 
-Django 5.0.2 fixes several bugs in 5.0.1.
+Django 5.0.2 fixes several bugs in 5.0.1. Also, the latest string translations
+from Transifex are incorporated.
 
 Bugfixes
 ========
