@@ -30,8 +30,8 @@ else:
         NullTimeKeeper,
         TimeKeeper,
         get_runner,
-        run_pairing,
         run_bisection,
+        run_pairing,
     )
     from django.utils.deprecation import RemovedInDjango60Warning
     from django.utils.log import DEFAULT_LOGGING

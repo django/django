@@ -1596,7 +1596,7 @@ cause the failure.
 
 .. versionadded:: 5.1
 
-Performs a pairwise serch over the test suite to find a test that cause a given
+Performs a pairwise search over the test suite to find a test that cause a given
 test to fail. This can identify one test that, when run prior to the target test,
 leads to the failure.
 

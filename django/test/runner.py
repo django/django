@@ -23,12 +23,17 @@ import django
 from django.core.management import call_command
 from django.db import connections
 from django.test import SimpleTestCase, TestCase
-from django.test.utils import NullTimeKeeper, TimeKeeper, iter_test_cases
+from django.test.utils import (
+    NullTimeKeeper,
+    TimeKeeper,
+    iter_test_cases,
+    run_bisection,
+    run_pairing,
+)
 from django.test.utils import setup_databases as _setup_databases
 from django.test.utils import setup_test_environment
 from django.test.utils import teardown_databases as _teardown_databases
 from django.test.utils import teardown_test_environment
-from django.test.utils import run_bisection, run_pairing
 from django.utils.datastructures import OrderedSet
 from django.utils.version import PY312
 

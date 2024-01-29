@@ -396,7 +396,7 @@ Executing tests using Bisection and Pairing
 
 Sometimes, a test may pass when run in isolation but fail when run as part of a
 test suite. This can be sue to test pollution, where some state from one test
-affects the execuion of another test. To help analyze this problem, we have 
+affects the execution of another test. To help analyze this problem, we have 
 bisect and pair options.
 
 See :option:`test --bisect` and :option:`test --pair`.
