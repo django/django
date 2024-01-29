@@ -1,0 +1,9 @@
+===========================
+Django 3.2.24 release notes
+===========================
+
+*February 6, 2024*
+
+Django 3.2.24 fixes a security issue with severity "moderate" in 3.2.23.
+
+...
