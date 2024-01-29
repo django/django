@@ -392,7 +392,7 @@ class CustomURLConfTest(SimpleTestCase):
     },
 )
 @override_settings(
-    CACHE_MIDDLEWARE_SECONDS=2.0, ROOT_URLCONF="template_tests.alternate_urls"
+    CACHE_MIDDLEWARE_SECONDS=2, ROOT_URLCONF="template_tests.alternate_urls"
 )
 class CacheMiddlewareTest(SimpleTestCase):
     def test_middleware_caching(self):
