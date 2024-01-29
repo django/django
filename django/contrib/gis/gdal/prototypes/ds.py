@@ -3,7 +3,8 @@
  related data structures. OGR_Dr_*, OGR_DS_*, OGR_L_*, OGR_F_*,
  OGR_Fld_* routines are relevant here.
 """
-from ctypes import POINTER, c_char_p, c_double, c_int, c_long, c_void_p
+
+from ctypes import POINTER, c_char_p, c_double, c_int, c_long, c_uint, c_void_p
 
 from django.contrib.gis.gdal.envelope import OGREnvelope
 from django.contrib.gis.gdal.libgdal import lgdal
@@ -21,26 +22,36 @@ from django.contrib.gis.gdal.prototypes.generation import (
 
 c_int_p = POINTER(c_int)  # shortcut type
 
+GDAL_OF_READONLY = 0x00
+GDAL_OF_UPDATE = 0x01
+
+GDAL_OF_ALL = 0x00
+GDAL_OF_RASTER = 0x02
+GDAL_OF_VECTOR = 0x04
+
 # Driver Routines
-register_all = void_output(lgdal.OGRRegisterAll, [], errcheck=False)
-cleanup_all = void_output(lgdal.OGRCleanupAll, [], errcheck=False)
-get_driver = voidptr_output(lgdal.OGRGetDriver, [c_int])
+register_all = void_output(lgdal.GDALAllRegister, [], errcheck=False)
+cleanup_all = void_output(lgdal.GDALDestroyDriverManager, [], errcheck=False)
+get_driver = voidptr_output(lgdal.GDALGetDriver, [c_int])
 get_driver_by_name = voidptr_output(
-    lgdal.OGRGetDriverByName, [c_char_p], errcheck=False
+    lgdal.GDALGetDriverByName, [c_char_p], errcheck=False
 )
-get_driver_count = int_output(lgdal.OGRGetDriverCount, [])
-get_driver_name = const_string_output(
-    lgdal.OGR_Dr_GetName, [c_void_p], decoding="ascii"
-)
+get_driver_count = int_output(lgdal.GDALGetDriverCount, [])
+get_driver_description = const_string_output(lgdal.GDALGetDescription, [c_void_p])
 
 # DataSource
-open_ds = voidptr_output(lgdal.OGROpen, [c_char_p, c_int, POINTER(c_void_p)])
-destroy_ds = void_output(lgdal.OGR_DS_Destroy, [c_void_p], errcheck=False)
-release_ds = void_output(lgdal.OGRReleaseDataSource, [c_void_p])
-get_ds_name = const_string_output(lgdal.OGR_DS_GetName, [c_void_p])
-get_layer = voidptr_output(lgdal.OGR_DS_GetLayer, [c_void_p, c_int])
-get_layer_by_name = voidptr_output(lgdal.OGR_DS_GetLayerByName, [c_void_p, c_char_p])
-get_layer_count = int_output(lgdal.OGR_DS_GetLayerCount, [c_void_p])
+open_ds = voidptr_output(
+    lgdal.GDALOpenEx,
+    [c_char_p, c_uint, POINTER(c_char_p), POINTER(c_char_p), POINTER(c_char_p)],
+)
+destroy_ds = void_output(lgdal.GDALClose, [c_void_p], errcheck=False)
+get_ds_name = const_string_output(lgdal.GDALGetDescription, [c_void_p])
+get_dataset_driver = voidptr_output(lgdal.GDALGetDatasetDriver, [c_void_p])
+get_layer = voidptr_output(lgdal.GDALDatasetGetLayer, [c_void_p, c_int])
+get_layer_by_name = voidptr_output(
+    lgdal.GDALDatasetGetLayerByName, [c_void_p, c_char_p]
+)
+get_layer_count = int_output(lgdal.GDALDatasetGetLayerCount, [c_void_p])
 
 # Layer Routines
 get_extent = void_output(lgdal.OGR_L_GetExtent, [c_void_p, POINTER(OGREnvelope), c_int])

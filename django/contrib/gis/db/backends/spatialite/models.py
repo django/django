@@ -1,6 +1,7 @@
 """
  The GeometryColumns and SpatialRefSys models for the SpatiaLite backend.
 """
+
 from django.contrib.gis.db.backends.base.models import SpatialRefSysMixin
 from django.db import models
 

@@ -97,7 +97,7 @@ class Extract(TimezoneMixin, Transform):
                 "TimeField, or DurationField."
             )
         # Passing dates to functions expecting datetimes is most likely a mistake.
-        if type(field) == DateField and copy.lookup_name in (
+        if type(field) is DateField and copy.lookup_name in (
             "hour",
             "minute",
             "second",
@@ -236,23 +236,24 @@ class Now(Func):
             **extra_context,
         )
 
+    def as_oracle(self, compiler, connection, **extra_context):
+        return self.as_sql(
+            compiler, connection, template="LOCALTIMESTAMP", **extra_context
+        )
+
 
 class TruncBase(TimezoneMixin, Transform):
     kind = None
     tzinfo = None
 
-    # RemovedInDjango50Warning: when the deprecation ends, remove is_dst
-    # argument.
     def __init__(
         self,
         expression,
         output_field=None,
         tzinfo=None,
-        is_dst=timezone.NOT_PASSED,
         **extra,
     ):
         self.tzinfo = tzinfo
-        self.is_dst = is_dst
         super().__init__(expression, output_field=output_field, **extra)
 
     def as_sql(self, compiler, connection):
@@ -309,7 +310,7 @@ class TruncBase(TimezoneMixin, Transform):
         has_explicit_output_field = (
             class_output_field or field.__class__ is not copy.output_field.__class__
         )
-        if type(field) == DateField and (
+        if type(field) is DateField and (
             isinstance(output_field, DateTimeField)
             or copy.kind in ("hour", "minute", "second", "time")
         ):
@@ -317,9 +318,11 @@ class TruncBase(TimezoneMixin, Transform):
                 "Cannot truncate DateField '%s' to %s."
                 % (
                     field.name,
-                    output_field.__class__.__name__
-                    if has_explicit_output_field
-                    else "DateTimeField",
+                    (
+                        output_field.__class__.__name__
+                        if has_explicit_output_field
+                        else "DateTimeField"
+                    ),
                 )
             )
         elif isinstance(field, TimeField) and (
@@ -330,9 +333,11 @@ class TruncBase(TimezoneMixin, Transform):
                 "Cannot truncate TimeField '%s' to %s."
                 % (
                     field.name,
-                    output_field.__class__.__name__
-                    if has_explicit_output_field
-                    else "DateTimeField",
+                    (
+                        output_field.__class__.__name__
+                        if has_explicit_output_field
+                        else "DateTimeField"
+                    ),
                 )
             )
         return copy
@@ -343,7 +348,7 @@ class TruncBase(TimezoneMixin, Transform):
                 pass
             elif value is not None:
                 value = value.replace(tzinfo=None)
-                value = timezone.make_aware(value, self.tzinfo, is_dst=self.is_dst)
+                value = timezone.make_aware(value, self.tzinfo)
             elif not connection.features.has_zoneinfo_database:
                 raise ValueError(
                     "Database returned an invalid datetime value. Are time "
@@ -360,22 +365,16 @@ class TruncBase(TimezoneMixin, Transform):
 
 
 class Trunc(TruncBase):
-
-    # RemovedInDjango50Warning: when the deprecation ends, remove is_dst
-    # argument.
     def __init__(
         self,
         expression,
         kind,
         output_field=None,
         tzinfo=None,
-        is_dst=timezone.NOT_PASSED,
         **extra,
     ):
         self.kind = kind
-        super().__init__(
-            expression, output_field=output_field, tzinfo=tzinfo, is_dst=is_dst, **extra
-        )
+        super().__init__(expression, output_field=output_field, tzinfo=tzinfo, **extra)
 
 
 class TruncYear(TruncBase):

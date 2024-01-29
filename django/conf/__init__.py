@@ -16,27 +16,16 @@ from pathlib import Path
 import django
 from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.deprecation import RemovedInDjango50Warning
+from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.functional import LazyObject, empty
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
+DEFAULT_STORAGE_ALIAS = "default"
+STATICFILES_STORAGE_ALIAS = "staticfiles"
 
-# RemovedInDjango50Warning
-USE_DEPRECATED_PYTZ_DEPRECATED_MSG = (
-    "The USE_DEPRECATED_PYTZ setting, and support for pytz timezones is "
-    "deprecated in favor of the stdlib zoneinfo module. Please update your "
-    "code to use zoneinfo and remove the USE_DEPRECATED_PYTZ setting."
-)
-
-USE_L10N_DEPRECATED_MSG = (
-    "The USE_L10N setting is deprecated. Starting with Django 5.0, localized "
-    "formatting of data will always be enabled. For example Django will "
-    "display numbers and dates using the format of the current locale."
-)
-
-CSRF_COOKIE_MASKED_DEPRECATED_MSG = (
-    "The CSRF_COOKIE_MASKED transitional setting is deprecated. Support for "
-    "it will be removed in Django 5.0."
+# RemovedInDjango60Warning.
+FORMS_URLFIELD_ASSUME_HTTPS_DEPRECATED_MSG = (
+    "The FORMS_URLFIELD_ASSUME_HTTPS transitional setting is deprecated."
 )
 
 
@@ -154,27 +143,14 @@ class LazySettings(LazyObject):
         """Return True if the settings have already been configured."""
         return self._wrapped is not empty
 
-    @property
-    def USE_L10N(self):
+    def _show_deprecation_warning(self, message, category):
         stack = traceback.extract_stack()
         # Show a warning if the setting is used outside of Django.
-        # Stack index: -1 this line, -2 the LazyObject __getattribute__(),
-        # -3 the caller.
-        filename, _, _, _ = stack[-3]
+        # Stack index: -1 this line, -2 the property, -3 the
+        # LazyObject __getattribute__(), -4 the caller.
+        filename, _, _, _ = stack[-4]
         if not filename.startswith(os.path.dirname(django.__file__)):
-            warnings.warn(
-                USE_L10N_DEPRECATED_MSG,
-                RemovedInDjango50Warning,
-                stacklevel=2,
-            )
-        return self.__getattr__("USE_L10N")
-
-    # RemovedInDjango50Warning.
-    @property
-    def _USE_L10N_INTERNAL(self):
-        # Special hook to avoid checking a traceback in internal use on hot
-        # paths.
-        return self.__getattr__("USE_L10N")
+            warnings.warn(message, category, stacklevel=2)
 
 
 class Settings:
@@ -210,19 +186,11 @@ class Settings:
                 setattr(self, setting, setting_value)
                 self._explicit_settings.add(setting)
 
-        if self.USE_TZ is False and not self.is_overridden("USE_TZ"):
+        if self.is_overridden("FORMS_URLFIELD_ASSUME_HTTPS"):
             warnings.warn(
-                "The default value of USE_TZ will change from False to True "
-                "in Django 5.0. Set USE_TZ to False in your project settings "
-                "if you want to keep the current default behavior.",
-                category=RemovedInDjango50Warning,
+                FORMS_URLFIELD_ASSUME_HTTPS_DEPRECATED_MSG,
+                RemovedInDjango60Warning,
             )
-
-        if self.is_overridden("USE_DEPRECATED_PYTZ"):
-            warnings.warn(USE_DEPRECATED_PYTZ_DEPRECATED_MSG, RemovedInDjango50Warning)
-
-        if self.is_overridden("CSRF_COOKIE_MASKED"):
-            warnings.warn(CSRF_COOKIE_MASKED_DEPRECATED_MSG, RemovedInDjango50Warning)
 
         if hasattr(time, "tzset") and self.TIME_ZONE:
             # When we can, attempt to validate the timezone. If we can't find
@@ -235,9 +203,6 @@ class Settings:
             # we don't do this unconditionally (breaks Windows).
             os.environ["TZ"] = self.TIME_ZONE
             time.tzset()
-
-        if self.is_overridden("USE_L10N"):
-            warnings.warn(USE_L10N_DEPRECATED_MSG, RemovedInDjango50Warning)
 
     def is_overridden(self, setting):
         return setting in self._explicit_settings
@@ -271,13 +236,12 @@ class UserSettingsHolder:
 
     def __setattr__(self, name, value):
         self._deleted.discard(name)
-        if name == "USE_L10N":
-            warnings.warn(USE_L10N_DEPRECATED_MSG, RemovedInDjango50Warning)
-        if name == "CSRF_COOKIE_MASKED":
-            warnings.warn(CSRF_COOKIE_MASKED_DEPRECATED_MSG, RemovedInDjango50Warning)
+        if name == "FORMS_URLFIELD_ASSUME_HTTPS":
+            warnings.warn(
+                FORMS_URLFIELD_ASSUME_HTTPS_DEPRECATED_MSG,
+                RemovedInDjango60Warning,
+            )
         super().__setattr__(name, value)
-        if name == "USE_DEPRECATED_PYTZ":
-            warnings.warn(USE_DEPRECATED_PYTZ_DEPRECATED_MSG, RemovedInDjango50Warning)
 
     def __delattr__(self, name):
         self._deleted.add(name)

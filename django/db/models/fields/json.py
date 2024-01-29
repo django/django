@@ -3,7 +3,7 @@ import json
 from django import forms
 from django.core import checks, exceptions
 from django.db import NotSupportedError, connections, router
-from django.db.models import lookups
+from django.db.models import expressions, lookups
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields import TextField
 from django.db.models.lookups import (
@@ -97,7 +97,13 @@ class JSONField(CheckFieldDefaultMixin, Field):
         return "JSONField"
 
     def get_db_prep_value(self, value, connection, prepared=False):
-        if hasattr(value, "as_sql"):
+        if not prepared:
+            value = self.get_prep_value(value)
+        if isinstance(value, expressions.Value) and isinstance(
+            value.output_field, JSONField
+        ):
+            value = value.value
+        elif hasattr(value, "as_sql"):
             return value
         return connection.ops.adapt_json_value(value, self.encoder)
 
@@ -346,10 +352,13 @@ class KeyTransform(Transform):
     def as_oracle(self, compiler, connection):
         lhs, params, key_transforms = self.preprocess_lhs(compiler, connection)
         json_path = compile_json_path(key_transforms)
-        return (
-            "COALESCE(JSON_QUERY(%s, '%s'), JSON_VALUE(%s, '%s'))"
-            % ((lhs, json_path) * 2)
-        ), tuple(params) * 2
+        if connection.features.supports_primitives_in_json_field:
+            sql = (
+                "COALESCE(JSON_VALUE(%s, '%s'), JSON_QUERY(%s, '%s' DISALLOW SCALARS))"
+            )
+        else:
+            sql = "COALESCE(JSON_QUERY(%s, '%s'), JSON_VALUE(%s, '%s'))"
+        return sql % ((lhs, json_path) * 2), tuple(params) * 2
 
     def as_postgresql(self, compiler, connection):
         lhs, params, key_transforms = self.preprocess_lhs(compiler, connection)

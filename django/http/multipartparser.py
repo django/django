@@ -4,6 +4,7 @@ Multi-part parsing for file uploads.
 Exposes one class, ``MultiPartParser``, which feeds chunks of uploaded data to
 file upload handlers for processing.
 """
+
 import base64
 import binascii
 import collections
@@ -14,6 +15,7 @@ from django.core.exceptions import (
     RequestDataTooBig,
     SuspiciousMultipartForm,
     TooManyFieldsSent,
+    TooManyFilesSent,
 )
 from django.core.files.uploadhandler import SkipFile, StopFutureHandlers, StopUpload
 from django.utils.datastructures import MultiValueDict
@@ -39,6 +41,8 @@ class InputStreamExhausted(Exception):
 RAW = "raw"
 FILE = "file"
 FIELD = "field"
+FIELD_TYPES = frozenset([FIELD, RAW])
+MAX_TOTAL_HEADER_SIZE = 1024
 
 
 class MultiPartParser:
@@ -111,6 +115,22 @@ class MultiPartParser:
         self._upload_handlers = upload_handlers
 
     def parse(self):
+        # Call the actual parse routine and close all open files in case of
+        # errors. This is needed because if exceptions are thrown the
+        # MultiPartParser will not be garbage collected immediately and
+        # resources would be kept alive. This is only needed for errors because
+        # the Request object closes all uploaded files at the end of the
+        # request.
+        try:
+            return self._parse()
+        except Exception:
+            if hasattr(self, "_files"):
+                for _, files in self._files.lists():
+                    for fileobj in files:
+                        fileobj.close()
+            raise
+
+    def _parse(self):
         """
         Parse the POST data and break it into a FILES MultiValueDict and a POST
         MultiValueDict.
@@ -156,6 +176,8 @@ class MultiPartParser:
         num_bytes_read = 0
         # To count the number of keys in the request.
         num_post_keys = 0
+        # To count the number of files in the request.
+        num_files = 0
         # To limit the amount of data read from the request.
         read_size = None
         # Whether a file upload is finished.
@@ -171,6 +193,20 @@ class MultiPartParser:
                     old_field_name = None
                     uploaded_file = True
 
+                if (
+                    item_type in FIELD_TYPES
+                    and settings.DATA_UPLOAD_MAX_NUMBER_FIELDS is not None
+                ):
+                    # Avoid storing more than DATA_UPLOAD_MAX_NUMBER_FIELDS.
+                    num_post_keys += 1
+                    # 2 accounts for empty raw fields before and after the
+                    # last boundary.
+                    if settings.DATA_UPLOAD_MAX_NUMBER_FIELDS + 2 < num_post_keys:
+                        raise TooManyFieldsSent(
+                            "The number of GET/POST parameters exceeded "
+                            "settings.DATA_UPLOAD_MAX_NUMBER_FIELDS."
+                        )
+
                 try:
                     disposition = meta_data["content-disposition"][1]
                     field_name = disposition["name"].strip()
@@ -183,17 +219,6 @@ class MultiPartParser:
                 field_name = force_str(field_name, encoding, errors="replace")
 
                 if item_type == FIELD:
-                    # Avoid storing more than DATA_UPLOAD_MAX_NUMBER_FIELDS.
-                    num_post_keys += 1
-                    if (
-                        settings.DATA_UPLOAD_MAX_NUMBER_FIELDS is not None
-                        and settings.DATA_UPLOAD_MAX_NUMBER_FIELDS < num_post_keys
-                    ):
-                        raise TooManyFieldsSent(
-                            "The number of GET/POST parameters exceeded "
-                            "settings.DATA_UPLOAD_MAX_NUMBER_FIELDS."
-                        )
-
                     # Avoid reading more than DATA_UPLOAD_MAX_MEMORY_SIZE.
                     if settings.DATA_UPLOAD_MAX_MEMORY_SIZE is not None:
                         read_size = (
@@ -228,6 +253,16 @@ class MultiPartParser:
                         field_name, force_str(data, encoding, errors="replace")
                     )
                 elif item_type == FILE:
+                    # Avoid storing more than DATA_UPLOAD_MAX_NUMBER_FILES.
+                    num_files += 1
+                    if (
+                        settings.DATA_UPLOAD_MAX_NUMBER_FILES is not None
+                        and num_files > settings.DATA_UPLOAD_MAX_NUMBER_FILES
+                    ):
+                        raise TooManyFilesSent(
+                            "The number of files exceeded "
+                            "settings.DATA_UPLOAD_MAX_NUMBER_FILES."
+                        )
                     # This is a file, use the handler...
                     file_name = disposition.get("filename")
                     if file_name:
@@ -305,8 +340,13 @@ class MultiPartParser:
                         # Handle file upload completions on next iteration.
                         old_field_name = field_name
                 else:
-                    # If this is neither a FIELD or a FILE, just exhaust the stream.
-                    exhaust(stream)
+                    # If this is neither a FIELD nor a FILE, exhaust the field
+                    # stream. Note: There could be an error here at some point,
+                    # but there will be at least two RAW types (before and
+                    # after the other boundaries). This branch is usually not
+                    # reached at all, because a missing content-disposition
+                    # header will skip the whole boundary.
+                    exhaust(field_stream)
         except StopUpload as e:
             self._close_files()
             if not e.connection_reset:
@@ -644,21 +684,30 @@ def parse_boundary_stream(stream, max_header_size):
     """
     Parse one and exactly one stream that encapsulates a boundary.
     """
-    # Stream at beginning of header, look for end of header
-    # and parse it if found. The header must fit within one
-    # chunk.
-    chunk = stream.read(max_header_size)
 
-    # 'find' returns the top of these four bytes, so we'll
-    # need to munch them later to prevent them from polluting
-    # the payload.
-    header_end = chunk.find(b"\r\n\r\n")
+    # Look for the end of headers and if not found extend the search to double
+    # the size up to the MAX_TOTAL_HEADER_SIZE.
+    headers_chunk_size = 1024
+    while True:
+        if headers_chunk_size > max_header_size:
+            raise MultiPartParserError("Request max total header size exceeded.")
 
-    if header_end == -1:
-        # we find no header, so we just mark this fact and pass on
-        # the stream verbatim
+        # Stream at beginning of header, look for end of header and parse it if
+        # found. The header must fit within one chunk.
+        chunk = stream.read(headers_chunk_size)
+        # 'find' returns the top of these four bytes, so munch them later to
+        # prevent them from polluting the payload.
+        header_end = chunk.find(b"\r\n\r\n")
+        if header_end != -1:
+            break
+
+        # Find no header, mark this fact and pass on the stream verbatim.
         stream.unget(chunk)
-        return (RAW, {}, stream)
+        # No more data to read.
+        if len(chunk) < headers_chunk_size:
+            return (RAW, {}, stream)
+        # Double the chunk size.
+        headers_chunk_size *= 2
 
     header = chunk[:header_end]
 
@@ -702,4 +751,4 @@ class Parser:
         boundarystream = InterBoundaryIter(self._stream, self._separator)
         for sub_stream in boundarystream:
             # Iterate over each part
-            yield parse_boundary_stream(sub_stream, 1024)
+            yield parse_boundary_stream(sub_stream, MAX_TOTAL_HEADER_SIZE)

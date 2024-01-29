@@ -104,6 +104,7 @@ class URLValidator(RegexValidator):
     message = _("Enter a valid URL.")
     schemes = ["http", "https", "ftp", "ftps"]
     unsafe_chars = frozenset("\t\r\n")
+    max_length = 2048
 
     def __init__(self, schemes=None, **kwargs):
         super().__init__(**kwargs)
@@ -111,7 +112,7 @@ class URLValidator(RegexValidator):
             self.schemes = schemes
 
     def __call__(self, value):
-        if not isinstance(value, str):
+        if not isinstance(value, str) or len(value) > self.max_length:
             raise ValidationError(self.message, code=self.code, params={"value": value})
         if self.unsafe_chars.intersection(value):
             raise ValidationError(self.message, code=self.code, params={"value": value})
@@ -203,7 +204,9 @@ class EmailValidator:
             self.domain_allowlist = allowlist
 
     def __call__(self, value):
-        if not value or "@" not in value:
+        # The maximum length of an email is 320 characters per RFC 3696
+        # section 3.
+        if not value or "@" not in value or len(value) > 320:
             raise ValidationError(self.message, code=self.code, params={"value": value})
 
         user_part, domain_part = value.rsplit("@", 1)
@@ -241,7 +244,7 @@ class EmailValidator:
     def __eq__(self, other):
         return (
             isinstance(other, EmailValidator)
-            and (self.domain_allowlist == other.domain_allowlist)
+            and (set(self.domain_allowlist) == set(other.domain_allowlist))
             and (self.message == other.message)
             and (self.code == other.code)
         )
@@ -273,24 +276,18 @@ def validate_ipv4_address(value):
         ipaddress.IPv4Address(value)
     except ValueError:
         raise ValidationError(
-            _("Enter a valid IPv4 address."), code="invalid", params={"value": value}
+            _("Enter a valid %(protocol)s address."),
+            code="invalid",
+            params={"protocol": _("IPv4"), "value": value},
         )
-    else:
-        # Leading zeros are forbidden to avoid ambiguity with the octal
-        # notation. This restriction is included in Python 3.9.5+.
-        # TODO: Remove when dropping support for PY39.
-        if any(octet != "0" and octet[0] == "0" for octet in value.split(".")):
-            raise ValidationError(
-                _("Enter a valid IPv4 address."),
-                code="invalid",
-                params={"value": value},
-            )
 
 
 def validate_ipv6_address(value):
     if not is_valid_ipv6_address(value):
         raise ValidationError(
-            _("Enter a valid IPv6 address."), code="invalid", params={"value": value}
+            _("Enter a valid %(protocol)s address."),
+            code="invalid",
+            params={"protocol": _("IPv6"), "value": value},
         )
 
 
@@ -302,16 +299,16 @@ def validate_ipv46_address(value):
             validate_ipv6_address(value)
         except ValidationError:
             raise ValidationError(
-                _("Enter a valid IPv4 or IPv6 address."),
+                _("Enter a valid %(protocol)s address."),
                 code="invalid",
-                params={"value": value},
+                params={"protocol": _("IPv4 or IPv6"), "value": value},
             )
 
 
 ip_address_validator_map = {
-    "both": ([validate_ipv46_address], _("Enter a valid IPv4 or IPv6 address.")),
-    "ipv4": ([validate_ipv4_address], _("Enter a valid IPv4 address.")),
-    "ipv6": ([validate_ipv6_address], _("Enter a valid IPv6 address.")),
+    "both": [validate_ipv46_address],
+    "ipv4": [validate_ipv4_address],
+    "ipv6": [validate_ipv6_address],
 }
 
 
@@ -407,8 +404,37 @@ class StepValueValidator(BaseValidator):
     message = _("Ensure this value is a multiple of step size %(limit_value)s.")
     code = "step_size"
 
+    def __init__(self, limit_value, message=None, offset=None):
+        super().__init__(limit_value, message)
+        if offset is not None:
+            self.message = _(
+                "Ensure this value is a multiple of step size %(limit_value)s, "
+                "starting from %(offset)s, e.g. %(offset)s, %(valid_value1)s, "
+                "%(valid_value2)s, and so on."
+            )
+        self.offset = offset
+
+    def __call__(self, value):
+        if self.offset is None:
+            super().__call__(value)
+        else:
+            cleaned = self.clean(value)
+            limit_value = (
+                self.limit_value() if callable(self.limit_value) else self.limit_value
+            )
+            if self.compare(cleaned, limit_value):
+                offset = cleaned.__class__(self.offset)
+                params = {
+                    "limit_value": limit_value,
+                    "offset": offset,
+                    "valid_value1": offset + limit_value,
+                    "valid_value2": offset + 2 * limit_value,
+                }
+                raise ValidationError(self.message, code=self.code, params=params)
+
     def compare(self, a, b):
-        return not math.isclose(math.remainder(a, b), 0, abs_tol=1e-9)
+        offset = 0 if self.offset is None else self.offset
+        return not math.isclose(math.remainder(a - offset, b), 0, abs_tol=1e-9)
 
 
 @deconstructible
@@ -573,7 +599,8 @@ class FileExtensionValidator:
     def __eq__(self, other):
         return (
             isinstance(other, self.__class__)
-            and self.allowed_extensions == other.allowed_extensions
+            and set(self.allowed_extensions or [])
+            == set(other.allowed_extensions or [])
             and self.message == other.message
             and self.code == other.code
         )

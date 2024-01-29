@@ -2,18 +2,18 @@
 #
 # Translators:
 # André Hagenbruch, 2011-2012
-# Florian Apolloner <florian@apolloner.eu>, 2020-2022
-# Jannis Leidel <jannis@leidel.info>, 2011,2013-2016
+# Florian Apolloner <florian@apolloner.eu>, 2020-2023
+# Jannis Leidel <jannis@leidel.info>, 2011,2013-2016,2023
 # jnns, 2016
-# Markus Holtermann <info@markusholtermann.eu>, 2020
+# Markus Holtermann <info@markusholtermann.eu>, 2020,2023
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:26-0500\n"
-"PO-Revision-Date: 2022-07-25 07:59+0000\n"
-"Last-Translator: Florian Apolloner <florian@apolloner.eu>\n"
-"Language-Team: German (http://www.transifex.com/django/django/language/de/)\n"
+"POT-Creation-Date: 2023-09-18 15:04-0300\n"
+"PO-Revision-Date: 2023-12-04 07:59+0000\n"
+"Last-Translator: Markus Holtermann <info@markusholtermann.eu>, 2020,2023\n"
+"Language-Team: German (http://app.transifex.com/django/django/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -66,12 +66,23 @@ msgstr ""
 "Dies ist die Liste der ausgewählten %s. Einfach im unten stehenden Feld "
 "markieren und mithilfe des „Entfernen“-Pfeils wieder entfernen."
 
+#, javascript-format
+msgid "Type into this box to filter down the list of selected %s."
+msgstr ""
+"In diesem Feld tippen, um die Liste der ausgewählten %s einzuschränken."
+
 msgid "Remove all"
 msgstr "Alle entfernen"
 
 #, javascript-format
 msgid "Click to remove all chosen %s at once."
 msgstr "Klicken, um alle ausgewählten %s auf einmal zu entfernen."
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] "%s ausgewählte Option nicht sichtbar"
+msgstr[1] "%s ausgewählte Optionen nicht sichtbar"
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -236,6 +247,55 @@ msgctxt "abbrev. month December"
 msgid "Dec"
 msgstr "Dez"
 
+msgid "Sunday"
+msgstr "Sonntag"
+
+msgid "Monday"
+msgstr "Montag"
+
+msgid "Tuesday"
+msgstr "Dienstag"
+
+msgid "Wednesday"
+msgstr "Mittwoch"
+
+msgid "Thursday"
+msgstr "Donnerstag"
+
+msgid "Friday"
+msgstr "Freitag"
+
+msgid "Saturday"
+msgstr "Samstag"
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr "So"
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr "Mo"
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr "Di"
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr "Mi"
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr "Do"
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr "Fr"
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr "Sa"
+
 msgctxt "one letter Sunday"
 msgid "S"
 msgstr "So"
@@ -263,13 +323,6 @@ msgstr "Fr"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "Sa"
-
-msgid ""
-"You have already submitted this form. Are you sure you want to submit it "
-"again?"
-msgstr ""
-"Das Formular wurde bereits abgeschickt. Soll es wirklich nochmals "
-"abgeschickt werden?"
 
 msgid "Show"
 msgstr "Einblenden"

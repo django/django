@@ -23,12 +23,14 @@ from django.forms.formsets import (
     all_valid,
     formset_factory,
 )
-from django.forms.renderers import TemplatesSetting, get_default_renderer
+from django.forms.renderers import (
+    DjangoTemplates,
+    TemplatesSetting,
+    get_default_renderer,
+)
 from django.forms.utils import ErrorList
 from django.forms.widgets import HiddenInput
 from django.test import SimpleTestCase
-from django.test.utils import isolate_lru_cache
-from django.utils.deprecation import RemovedInDjango50Warning
 
 from . import jinja2_tests
 
@@ -215,9 +217,12 @@ class FormsFormsetTestCase(SimpleTestCase):
             [("Calexico", "100"), ("Any1", "42"), ("Any2", "101")]
         )
 
-        with mock.patch(
-            "django.forms.formsets.ManagementForm.is_valid", mocked_is_valid
-        ), mock.patch("django.forms.forms.BaseForm.full_clean", mocked_full_clean):
+        with (
+            mock.patch(
+                "django.forms.formsets.ManagementForm.is_valid", mocked_is_valid
+            ),
+            mock.patch("django.forms.forms.BaseForm.full_clean", mocked_full_clean),
+        ):
             self.assertTrue(formset.is_valid())
         self.assertEqual(is_valid_counter.call_count, 1)
         self.assertEqual(full_clean_counter.call_count, 4)
@@ -1482,6 +1487,7 @@ class FormsFormsetTestCase(SimpleTestCase):
         self.assertIn("DELETE", formset.forms[0].fields)
         self.assertNotIn("DELETE", formset.forms[1].fields)
         self.assertNotIn("DELETE", formset.forms[2].fields)
+        self.assertNotIn("DELETE", formset.empty_form.fields)
 
         formset = ChoiceFormFormset(
             data={
@@ -1553,6 +1559,60 @@ class FormsFormsetTestCase(SimpleTestCase):
         self.assertEqual(formset.management_form.renderer, renderer)
         self.assertEqual(formset.non_form_errors().renderer, renderer)
         self.assertEqual(formset.empty_form.renderer, renderer)
+
+    def test_form_default_renderer(self):
+        """
+        In the absence of a renderer passed to the formset_factory(),
+        Form.default_renderer is respected.
+        """
+
+        class CustomRenderer(DjangoTemplates):
+            pass
+
+        class ChoiceWithDefaultRenderer(Choice):
+            default_renderer = CustomRenderer()
+
+        data = {
+            "choices-TOTAL_FORMS": "1",
+            "choices-INITIAL_FORMS": "0",
+            "choices-MIN_NUM_FORMS": "0",
+        }
+
+        ChoiceFormSet = formset_factory(ChoiceWithDefaultRenderer)
+        formset = ChoiceFormSet(data, prefix="choices")
+        self.assertEqual(
+            formset.forms[0].renderer, ChoiceWithDefaultRenderer.default_renderer
+        )
+        self.assertEqual(
+            formset.empty_form.renderer, ChoiceWithDefaultRenderer.default_renderer
+        )
+        default_renderer = get_default_renderer()
+        self.assertIsInstance(formset.renderer, type(default_renderer))
+
+    def test_form_default_renderer_class(self):
+        """
+        In the absence of a renderer passed to the formset_factory(),
+        Form.default_renderer is respected.
+        """
+
+        class CustomRenderer(DjangoTemplates):
+            pass
+
+        class ChoiceWithDefaultRenderer(Choice):
+            default_renderer = CustomRenderer
+
+        data = {
+            "choices-TOTAL_FORMS": "1",
+            "choices-INITIAL_FORMS": "0",
+            "choices-MIN_NUM_FORMS": "0",
+        }
+
+        ChoiceFormSet = formset_factory(ChoiceWithDefaultRenderer)
+        formset = ChoiceFormSet(data, prefix="choices")
+        self.assertIsInstance(formset.forms[0].renderer, CustomRenderer)
+        self.assertIsInstance(formset.empty_form.renderer, CustomRenderer)
+        default_renderer = get_default_renderer()
+        self.assertIsInstance(formset.renderer, type(default_renderer))
 
     def test_repr(self):
         valid_formset = self.make_choiceformset([("test", 1)])
@@ -1900,28 +1960,3 @@ class AllValidTests(SimpleTestCase):
         ]
         self.assertEqual(formset1._errors, expected_errors)
         self.assertEqual(formset2._errors, expected_errors)
-
-
-class DeprecationTests(SimpleTestCase):
-    def test_warning(self):
-        from django.forms.utils import DEFAULT_TEMPLATE_DEPRECATION_MSG
-
-        with isolate_lru_cache(get_default_renderer), self.settings(
-            FORM_RENDERER="django.forms.renderers.DjangoTemplates"
-        ), self.assertRaisesMessage(
-            RemovedInDjango50Warning, DEFAULT_TEMPLATE_DEPRECATION_MSG
-        ):
-            ChoiceFormSet = formset_factory(Choice)
-            formset = ChoiceFormSet()
-            str(formset)
-
-    def test_no_management_form_warning(self):
-        """
-        Management forms are already rendered with the new div template.
-        """
-        with isolate_lru_cache(get_default_renderer), self.settings(
-            FORM_RENDERER="django.forms.renderers.DjangoTemplates"
-        ):
-            ChoiceFormSet = formset_factory(Choice, formset=BaseFormSet)
-            formset = ChoiceFormSet()
-            str(formset.management_form)

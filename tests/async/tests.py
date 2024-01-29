@@ -2,7 +2,7 @@ import asyncio
 import os
 from unittest import mock
 
-from asgiref.sync import async_to_sync
+from asgiref.sync import async_to_sync, iscoroutinefunction
 
 from django.core.cache import DEFAULT_CACHE_ALIAS, caches
 from django.core.exceptions import ImproperlyConfigured, SynchronousOnlyOperation
@@ -84,7 +84,7 @@ class ViewTests(SimpleTestCase):
             with self.subTest(view_cls=view_cls, is_async=is_async):
                 self.assertIs(view_cls.view_is_async, is_async)
                 callback = view_cls.as_view()
-                self.assertIs(asyncio.iscoroutinefunction(callback), is_async)
+                self.assertIs(iscoroutinefunction(callback), is_async)
 
     def test_mixed_views_raise_error(self):
         class MixedView(View):

@@ -178,6 +178,11 @@ class DeferTests(AssertionMixin, TestCase):
         obj = ShadowChild.objects.defer("name").get()
         self.assertEqual(obj.name, "adonis")
 
+    def test_defer_fk_attname(self):
+        primary = Primary.objects.defer("related_id").get()
+        with self.assertNumQueries(1):
+            self.assertEqual(primary.related_id, self.p1.related_id)
+
 
 class BigChildDeferTests(AssertionMixin, TestCase):
     @classmethod

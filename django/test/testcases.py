@@ -1,18 +1,16 @@
-import asyncio
 import difflib
-import inspect
 import json
 import logging
 import posixpath
 import sys
 import threading
 import unittest
-import warnings
 from collections import Counter
 from contextlib import contextmanager
 from copy import copy, deepcopy
 from difflib import get_close_matches
 from functools import wraps
+from unittest import mock
 from unittest.suite import _DebugResult
 from unittest.util import safe_repr
 from urllib.parse import (
@@ -26,7 +24,7 @@ from urllib.parse import (
 )
 from urllib.request import url2pathname
 
-from asgiref.sync import async_to_sync
+from asgiref.sync import async_to_sync, iscoroutinefunction
 
 from django.apps import apps
 from django.conf import settings
@@ -40,10 +38,10 @@ from django.core.management.sql import emit_post_migrate_signal
 from django.core.servers.basehttp import ThreadedWSGIServer, WSGIRequestHandler
 from django.core.signals import setting_changed
 from django.db import DEFAULT_DB_ALIAS, connection, connections, transaction
+from django.db.backends.base.base import NO_DB_ALIAS, BaseDatabaseWrapper
 from django.forms.fields import CharField
 from django.http import QueryDict
 from django.http.request import split_domain_port, validate_host
-from django.http.response import HttpResponseBase
 from django.test.client import AsyncClient, Client
 from django.test.html import HTMLParseError, parse_html
 from django.test.signals import template_rendered
@@ -54,9 +52,8 @@ from django.test.utils import (
     modify_settings,
     override_settings,
 )
-from django.utils.deprecation import RemovedInDjango50Warning, RemovedInDjango51Warning
 from django.utils.functional import classproperty
-from django.utils.version import PY310
+from django.utils.version import PY311
 from django.views.static import serve
 
 logger = logging.getLogger("django.test")
@@ -68,6 +65,24 @@ __all__ = (
     "skipIfDBFeature",
     "skipUnlessDBFeature",
 )
+
+
+if not PY311:
+    # Backport of unittest.case._enter_context() from Python 3.11.
+    def _enter_context(cm, addcleanup):
+        # Look up the special methods on the type to match the with statement.
+        cls = type(cm)
+        try:
+            enter = cls.__enter__
+            exit = cls.__exit__
+        except AttributeError:
+            raise TypeError(
+                f"'{cls.__module__}.{cls.__qualname__}' object does not support the "
+                f"context manager protocol"
+            ) from None
+        result = enter(cm)
+        addcleanup(exit, cm, None, None, None)
+        return result
 
 
 def to_list(value):
@@ -120,18 +135,16 @@ class _AssertTemplateUsedContext:
         self.count = count
 
         self.rendered_templates = []
-        self.rendered_template_names = []
         self.context = ContextList()
 
     def on_template_render(self, sender, signal, template, context, **kwargs):
         self.rendered_templates.append(template)
-        self.rendered_template_names.append(template.name)
         self.context.append(copy(context))
 
     def test(self):
         self.test_case._assert_template_used(
             self.template_name,
-            self.rendered_template_names,
+            [t.name for t in self.rendered_templates if t.name is not None],
             self.msg_prefix,
             self.count,
         )
@@ -149,8 +162,11 @@ class _AssertTemplateUsedContext:
 
 class _AssertTemplateNotUsedContext(_AssertTemplateUsedContext):
     def test(self):
+        rendered_template_names = [
+            t.name for t in self.rendered_templates if t.name is not None
+        ]
         self.test_case.assertFalse(
-            self.template_name in self.rendered_template_names,
+            self.template_name in rendered_template_names,
             f"{self.msg_prefix}Template '{self.template_name}' was used "
             f"unexpectedly in rendering the response",
         )
@@ -169,129 +185,7 @@ class _DatabaseFailure:
         raise DatabaseOperationForbidden(self.message)
 
 
-# RemovedInDjango50Warning
-class _AssertFormErrorDeprecationHelper:
-    @staticmethod
-    def assertFormError(self, response, form, field, errors, msg_prefix=""):
-        """
-        Search through all the rendered contexts of the `response` for a form named
-        `form` then dispatch to the new assertFormError() using that instance.
-        If multiple contexts contain the form, they're all checked in order and any
-        failure will abort (this matches the old behavior).
-        """
-        warning_msg = (
-            f"Passing response to assertFormError() is deprecated. Use the form object "
-            f"directly: assertFormError(response.context[{form!r}], {field!r}, ...)"
-        )
-        warnings.warn(warning_msg, RemovedInDjango50Warning, stacklevel=2)
-
-        full_msg_prefix = f"{msg_prefix}: " if msg_prefix else ""
-        contexts = to_list(response.context) if response.context is not None else []
-        if not contexts:
-            self.fail(
-                f"{full_msg_prefix}Response did not use any contexts to render the "
-                f"response"
-            )
-        # Search all contexts for the error.
-        found_form = False
-        for i, context in enumerate(contexts):
-            if form not in context:
-                continue
-            found_form = True
-            self.assertFormError(context[form], field, errors, msg_prefix=msg_prefix)
-        if not found_form:
-            self.fail(
-                f"{full_msg_prefix}The form '{form}' was not used to render the "
-                f"response"
-            )
-
-    @staticmethod
-    def assertFormSetError(
-        self, response, formset, form_index, field, errors, msg_prefix=""
-    ):
-        """
-        Search for a formset named "formset" in the "response" and dispatch to
-        the new assertFormSetError() using that instance. If the name is found
-        in multiple contexts they're all checked in order and any failure will
-        abort the test.
-        """
-        warning_msg = (
-            f"Passing response to assertFormSetError() is deprecated. Use the formset "
-            f"object directly: assertFormSetError(response.context[{formset!r}], "
-            f"{form_index!r}, ...)"
-        )
-        warnings.warn(warning_msg, RemovedInDjango50Warning, stacklevel=2)
-
-        full_msg_prefix = f"{msg_prefix}: " if msg_prefix else ""
-        contexts = to_list(response.context) if response.context is not None else []
-        if not contexts:
-            self.fail(
-                f"{full_msg_prefix}Response did not use any contexts to render the "
-                f"response"
-            )
-        found_formset = False
-        for i, context in enumerate(contexts):
-            if formset not in context or not hasattr(context[formset], "forms"):
-                continue
-            found_formset = True
-            self.assertFormSetError(
-                context[formset], form_index, field, errors, msg_prefix
-            )
-        if not found_formset:
-            self.fail(
-                f"{full_msg_prefix}The formset '{formset}' was not used to render the "
-                f"response"
-            )
-
-    @classmethod
-    def patch_signature(cls, new_method):
-        """
-        Replace the decorated method with a new one that inspects the passed
-        args/kwargs and dispatch to the old implementation (with deprecation
-        warning) when it detects the old signature.
-        """
-
-        @wraps(new_method)
-        def patched_method(self, *args, **kwargs):
-            old_method = getattr(cls, new_method.__name__)
-            old_signature = inspect.signature(old_method)
-            try:
-                old_bound_args = old_signature.bind(self, *args, **kwargs)
-            except TypeError:
-                # If old signature doesn't match then either:
-                # 1) new signature will match
-                # 2) or a TypeError will be raised showing the user information
-                # about the new signature.
-                return new_method(self, *args, **kwargs)
-
-            new_signature = inspect.signature(new_method)
-            try:
-                new_bound_args = new_signature.bind(self, *args, **kwargs)
-            except TypeError:
-                # Old signature matches but not the new one (because of
-                # previous try/except).
-                return old_method(self, *args, **kwargs)
-
-            # If both signatures match, decide on which method to call by
-            # inspecting the first arg (arg[0] = self).
-            assert old_bound_args.args[1] == new_bound_args.args[1]
-            if hasattr(
-                old_bound_args.args[1], "context"
-            ):  # Looks like a response object => old method.
-                return old_method(self, *args, **kwargs)
-            elif isinstance(old_bound_args.args[1], HttpResponseBase):
-                raise ValueError(
-                    f"{old_method.__name__}() is only usable on responses fetched "
-                    f"using the Django test Client."
-                )
-            else:
-                return new_method(self, *args, **kwargs)
-
-        return patched_method
-
-
 class SimpleTestCase(unittest.TestCase):
-
     # The class we'll use for the test client self.client.
     # Can be overridden in derived classes.
     client_class = Client
@@ -317,13 +211,9 @@ class SimpleTestCase(unittest.TestCase):
     def setUpClass(cls):
         super().setUpClass()
         if cls._overridden_settings:
-            cls._cls_overridden_context = override_settings(**cls._overridden_settings)
-            cls._cls_overridden_context.enable()
-            cls.addClassCleanup(cls._cls_overridden_context.disable)
+            cls.enterClassContext(override_settings(**cls._overridden_settings))
         if cls._modified_settings:
-            cls._cls_modified_context = modify_settings(cls._modified_settings)
-            cls._cls_modified_context.enable()
-            cls.addClassCleanup(cls._cls_modified_context.disable)
+            cls.enterClassContext(modify_settings(cls._modified_settings))
         cls._add_databases_failures()
         cls.addClassCleanup(cls._remove_databases_failures)
 
@@ -363,6 +253,13 @@ class SimpleTestCase(unittest.TestCase):
                 }
                 method = getattr(connection, name)
                 setattr(connection, name, _DatabaseFailure(method, message))
+        cls.enterClassContext(
+            mock.patch.object(
+                BaseDatabaseWrapper,
+                "ensure_connection",
+                new=cls.ensure_connection_patch_method(),
+            )
+        )
 
     @classmethod
     def _remove_databases_failures(cls):
@@ -374,10 +271,32 @@ class SimpleTestCase(unittest.TestCase):
                 method = getattr(connection, name)
                 setattr(connection, name, method.wrapped)
 
+    @classmethod
+    def ensure_connection_patch_method(cls):
+        real_ensure_connection = BaseDatabaseWrapper.ensure_connection
+
+        def patched_ensure_connection(self, *args, **kwargs):
+            if (
+                self.connection is None
+                and self.alias not in cls.databases
+                and self.alias != NO_DB_ALIAS
+            ):
+                # Connection has not yet been established, but the alias is not allowed.
+                message = cls._disallowed_database_msg % {
+                    "test": f"{cls.__module__}.{cls.__qualname__}",
+                    "alias": self.alias,
+                    "operation": "threaded connections",
+                }
+                return _DatabaseFailure(self.ensure_connection, message)()
+
+            real_ensure_connection(self, *args, **kwargs)
+
+        return patched_ensure_connection
+
     def __call__(self, result=None):
         """
         Wrapper around default __call__ method to perform common Django test
-        set up. This means that user-defined Test Cases aren't required to
+        set up. This means that user-defined TestCases aren't required to
         include a call to super().setUp().
         """
         self._setup_and_call(result)
@@ -401,7 +320,7 @@ class SimpleTestCase(unittest.TestCase):
         )
 
         # Convert async test methods.
-        if asyncio.iscoroutinefunction(testMethod):
+        if iscoroutinefunction(testMethod):
             setattr(self, self._testMethodName, async_to_sync(testMethod))
 
         if not skipped:
@@ -438,6 +357,12 @@ class SimpleTestCase(unittest.TestCase):
     def _post_teardown(self):
         """Perform post-test things."""
         pass
+
+    if not PY311:
+        # Backport of unittest.TestCase.enterClassContext() from Python 3.11.
+        @classmethod
+        def enterClassContext(cls, cm):
+            return _enter_context(cm, cls.addClassCleanup)
 
     def settings(self, **kwargs):
         """
@@ -546,10 +471,12 @@ class SimpleTestCase(unittest.TestCase):
                 # Get the redirection page, using the same client that was used
                 # to obtain the original response.
                 extra = response.client.extra or {}
+                headers = response.client.headers or {}
                 redirect_response = response.client.get(
                     path,
                     QueryDict(query),
                     secure=(scheme == "https"),
+                    headers=headers,
                     **extra,
                 )
                 self.assertEqual(
@@ -588,6 +515,8 @@ class SimpleTestCase(unittest.TestCase):
                 (scheme, netloc, path, params, urlencode(query_parts), fragment)
             )
 
+        if msg_prefix:
+            msg_prefix += ": "
         self.assertEqual(
             normalize(url1),
             normalize(url2),
@@ -618,6 +547,7 @@ class SimpleTestCase(unittest.TestCase):
             content = b"".join(response.streaming_content)
         else:
             content = response.content
+        content_repr = safe_repr(content)
         if not isinstance(text, bytes) or html:
             text = str(text)
             content = content.decode(response.charset)
@@ -632,7 +562,7 @@ class SimpleTestCase(unittest.TestCase):
                 self, text, None, "Second argument is not valid HTML:"
             )
         real_count = content.count(text)
-        return (text_repr, real_count, msg_prefix)
+        return text_repr, real_count, msg_prefix, content_repr
 
     def assertContains(
         self, response, text, count=None, status_code=200, msg_prefix="", html=False
@@ -644,7 +574,7 @@ class SimpleTestCase(unittest.TestCase):
         If ``count`` is None, the count doesn't matter - the assertion is true
         if the text occurs at least once in the response.
         """
-        text_repr, real_count, msg_prefix = self._assert_contains(
+        text_repr, real_count, msg_prefix, content_repr = self._assert_contains(
             response, text, status_code, msg_prefix, html
         )
 
@@ -652,13 +582,18 @@ class SimpleTestCase(unittest.TestCase):
             self.assertEqual(
                 real_count,
                 count,
-                msg_prefix
-                + "Found %d instances of %s in response (expected %d)"
-                % (real_count, text_repr, count),
+                (
+                    f"{msg_prefix}Found {real_count} instances of {text_repr} "
+                    f"(expected {count}) in the following response\n{content_repr}"
+                ),
             )
         else:
             self.assertTrue(
-                real_count != 0, msg_prefix + "Couldn't find %s in response" % text_repr
+                real_count != 0,
+                (
+                    f"{msg_prefix}Couldn't find {text_repr} in the following response\n"
+                    f"{content_repr}"
+                ),
             )
 
     def assertNotContains(
@@ -669,12 +604,17 @@ class SimpleTestCase(unittest.TestCase):
         successfully, (i.e., the HTTP status code was as expected) and that
         ``text`` doesn't occur in the content of the response.
         """
-        text_repr, real_count, msg_prefix = self._assert_contains(
+        text_repr, real_count, msg_prefix, content_repr = self._assert_contains(
             response, text, status_code, msg_prefix, html
         )
 
         self.assertEqual(
-            real_count, 0, msg_prefix + "Response should not contain %s" % text_repr
+            real_count,
+            0,
+            (
+                f"{msg_prefix}{text_repr} unexpectedly found in the following response"
+                f"\n{content_repr}"
+            ),
         )
 
     def _check_test_client_response(self, response, attribute, method_name):
@@ -710,9 +650,6 @@ class SimpleTestCase(unittest.TestCase):
 
         self.assertEqual(field_errors, errors, msg_prefix + failure_message)
 
-    # RemovedInDjango50Warning: When the deprecation ends, remove the
-    # decorator.
-    @_AssertFormErrorDeprecationHelper.patch_signature
     def assertFormError(self, form, field, errors, msg_prefix=""):
         """
         Assert that a field named "field" on the given form object has specific
@@ -723,32 +660,11 @@ class SimpleTestCase(unittest.TestCase):
 
         You can pass field=None to check the form's non-field errors.
         """
-        if errors is None:
-            warnings.warn(
-                "Passing errors=None to assertFormError() is deprecated, use "
-                "errors=[] instead.",
-                RemovedInDjango50Warning,
-                stacklevel=2,
-            )
-            errors = []
-
         if msg_prefix:
             msg_prefix += ": "
         errors = to_list(errors)
         self._assert_form_error(form, field, errors, msg_prefix, f"form {form!r}")
 
-    # RemovedInDjango51Warning.
-    def assertFormsetError(self, *args, **kw):
-        warnings.warn(
-            "assertFormsetError() is deprecated in favor of assertFormSetError().",
-            category=RemovedInDjango51Warning,
-            stacklevel=2,
-        )
-        return self.assertFormSetError(*args, **kw)
-
-    # RemovedInDjango50Warning: When the deprecation ends, remove the
-    # decorator.
-    @_AssertFormErrorDeprecationHelper.patch_signature
     def assertFormSetError(self, formset, form_index, field, errors, msg_prefix=""):
         """
         Similar to assertFormError() but for formsets.
@@ -759,15 +675,6 @@ class SimpleTestCase(unittest.TestCase):
 
         Other parameters are the same as assertFormError().
         """
-        if errors is None:
-            warnings.warn(
-                "Passing errors=None to assertFormSetError() is deprecated, "
-                "use errors=[] instead.",
-                RemovedInDjango50Warning,
-                stacklevel=2,
-            )
-            errors = []
-
         if form_index is None and field is not None:
             raise ValueError("You must use field=None with form_index=None.")
 
@@ -799,7 +706,6 @@ class SimpleTestCase(unittest.TestCase):
             )
 
     def _get_template_used(self, response, template_name, msg_prefix, method_name):
-
         if response is None and template_name is None:
             raise TypeError("response and/or template_name argument must be provided")
 
@@ -941,32 +847,6 @@ class SimpleTestCase(unittest.TestCase):
             **kwargs,
         )
 
-    # A similar method is available in Python 3.10+.
-    if not PY310:
-
-        @contextmanager
-        def assertNoLogs(self, logger, level=None):
-            """
-            Assert no messages are logged on the logger, with at least the
-            given level.
-            """
-            if isinstance(level, int):
-                level = logging.getLevelName(level)
-            elif level is None:
-                level = "INFO"
-            try:
-                with self.assertLogs(logger, level) as cm:
-                    yield
-            except AssertionError as e:
-                msg = e.args[0]
-                expected_msg = (
-                    f"no logs of level {level} or higher triggered on {logger}"
-                )
-                if msg != expected_msg:
-                    raise e
-            else:
-                self.fail(f"Unexpected logs found: {cm.output!r}")
-
     def assertFieldOutput(
         self,
         fieldclass,
@@ -1058,25 +938,39 @@ class SimpleTestCase(unittest.TestCase):
             self.fail(self._formatMessage(msg, standardMsg))
 
     def assertInHTML(self, needle, haystack, count=None, msg_prefix=""):
-        needle = assert_and_parse_html(
+        parsed_needle = assert_and_parse_html(
             self, needle, None, "First argument is not valid HTML:"
         )
-        haystack = assert_and_parse_html(
+        parsed_haystack = assert_and_parse_html(
             self, haystack, None, "Second argument is not valid HTML:"
         )
-        real_count = haystack.count(needle)
+        real_count = parsed_haystack.count(parsed_needle)
+        if msg_prefix:
+            msg_prefix += ": "
+        haystack_repr = safe_repr(haystack)
         if count is not None:
-            self.assertEqual(
-                real_count,
-                count,
-                msg_prefix
-                + "Found %d instances of '%s' in response (expected %d)"
-                % (real_count, needle, count),
-            )
+            if count == 0:
+                msg = (
+                    f"{needle!r} unexpectedly found in the following response\n"
+                    f"{haystack_repr}"
+                )
+            else:
+                msg = (
+                    f"Found {real_count} instances of {needle!r} (expected {count}) in "
+                    f"the following response\n{haystack_repr}"
+                )
+            self.assertEqual(real_count, count, f"{msg_prefix}{msg}")
         else:
             self.assertTrue(
-                real_count != 0, msg_prefix + "Couldn't find '%s' in response" % needle
+                real_count != 0,
+                (
+                    f"{msg_prefix}Couldn't find {needle!r} in the following response\n"
+                    f"{haystack_repr}"
+                ),
             )
+
+    def assertNotInHTML(self, needle, haystack, msg_prefix=""):
+        self.assertInHTML(needle, haystack, count=0, msg_prefix=msg_prefix)
 
     def assertJSONEqual(self, raw, expected_data, msg=None):
         """
@@ -1156,7 +1050,6 @@ class SimpleTestCase(unittest.TestCase):
 
 
 class TransactionTestCase(SimpleTestCase):
-
     # Subclasses can ask for resetting of auto increment sequence before each
     # test case
     reset_sequences = False
@@ -1261,11 +1154,7 @@ class TransactionTestCase(SimpleTestCase):
                     apps.set_available_apps(self.available_apps)
 
             if self.fixtures:
-                # We have to use this slightly awkward syntax due to the fact
-                # that we're using *args and **kwargs together.
-                call_command(
-                    "loaddata", *self.fixtures, **{"verbosity": 0, "database": db_name}
-                )
+                call_command("loaddata", *self.fixtures, verbosity=0, database=db_name)
 
     def _should_reload_connections(self):
         return True
@@ -1321,15 +1210,6 @@ class TransactionTestCase(SimpleTestCase):
                 allow_cascade=self.available_apps is not None,
                 inhibit_post_migrate=inhibit_post_migrate,
             )
-
-    # RemovedInDjango51Warning.
-    def assertQuerysetEqual(self, *args, **kw):
-        warnings.warn(
-            "assertQuerysetEqual() is deprecated in favor of assertQuerySetEqual().",
-            category=RemovedInDjango51Warning,
-            stacklevel=2,
-        )
-        return self.assertQuerySetEqual(*args, **kw)
 
     def assertQuerySetEqual(self, qs, values, transform=None, ordered=True, msg=None):
         values = list(values)
@@ -1458,7 +1338,8 @@ class TestCase(TransactionTestCase):
                     call_command(
                         "loaddata",
                         *cls.fixtures,
-                        **{"verbosity": 0, "database": db_name},
+                        verbosity=0,
+                        database=db_name,
                     )
                 except Exception:
                     cls._rollback_atomics(cls.cls_atomics)
@@ -1697,7 +1578,7 @@ class FSFilesHandler(WSGIHandler):
 
     def file_path(self, url):
         """Return the relative path to the file on disk for the given URL."""
-        relative_url = url[len(self.base_url[2]) :]
+        relative_url = url.removeprefix(self.base_url[2])
         return url2pathname(relative_url)
 
     def get_response(self, request):
@@ -1847,11 +1728,9 @@ class LiveServerTestCase(TransactionTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls._live_server_modified_settings = modify_settings(
-            ALLOWED_HOSTS={"append": cls.allowed_host},
+        cls.enterClassContext(
+            modify_settings(ALLOWED_HOSTS={"append": cls.allowed_host})
         )
-        cls._live_server_modified_settings.enable()
-        cls.addClassCleanup(cls._live_server_modified_settings.disable)
         cls._start_server_thread()
 
     @classmethod

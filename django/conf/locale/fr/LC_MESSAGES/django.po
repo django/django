@@ -3,7 +3,7 @@
 # Translators:
 # Bruno Brouard <annoa.b@gmail.com>, 2021
 # Simon Charette <charette.s@gmail.com>, 2012
-# Claude Paroz <claude@2xlibre.net>, 2013-2022
+# Claude Paroz <claude@2xlibre.net>, 2013-2023
 # Claude Paroz <claude@2xlibre.net>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jean-Baptiste Mora, 2014
@@ -13,10 +13,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:23-0500\n"
-"PO-Revision-Date: 2022-07-25 06:49+0000\n"
-"Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
-"Language-Team: French (http://www.transifex.com/django/django/language/fr/)\n"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 06:49+0000\n"
+"Last-Translator: Claude Paroz <claude@2xlibre.net>, 2013-2023\n"
+"Language-Team: French (http://app.transifex.com/django/django/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -55,6 +55,9 @@ msgstr "Bosniaque"
 
 msgid "Catalan"
 msgstr "Catalan"
+
+msgid "Central Kurdish (Sorani)"
+msgstr "Kurde central (sorani)"
 
 msgid "Czech"
 msgstr "Tchèque"
@@ -296,6 +299,9 @@ msgstr "Tatar"
 msgid "Udmurt"
 msgstr "Oudmourte"
 
+msgid "Uyghur"
+msgstr "Ouïghour"
+
 msgid "Ukrainian"
 msgstr "Ukrainien"
 
@@ -402,6 +408,15 @@ msgstr ""
 
 #, python-format
 msgid ""
+"Ensure this value is a multiple of step size %(limit_value)s, starting from "
+"%(offset)s, e.g. %(offset)s, %(valid_value1)s, %(valid_value2)s, and so on."
+msgstr ""
+"Assurez-vous que cette valeur est un multiple de la taille de pas "
+"%(limit_value)s, débutant à %(offset)s, par ex. %(offset)s, "
+"%(valid_value1)s, %(valid_value2)s, etc."
+
+#, python-format
+msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
 "%(show_value)d)."
 msgid_plural ""
@@ -411,6 +426,9 @@ msgstr[0] ""
 "Assurez-vous que cette valeur comporte au moins %(limit_value)d caractère "
 "(actuellement %(show_value)d)."
 msgstr[1] ""
+"Assurez-vous que cette valeur comporte au moins %(limit_value)d caractères "
+"(actuellement %(show_value)d)."
+msgstr[2] ""
 "Assurez-vous que cette valeur comporte au moins %(limit_value)d caractères "
 "(actuellement %(show_value)d)."
 
@@ -427,6 +445,9 @@ msgstr[0] ""
 msgstr[1] ""
 "Assurez-vous que cette valeur comporte au plus %(limit_value)d caractères "
 "(actuellement %(show_value)d)."
+msgstr[2] ""
+"Assurez-vous que cette valeur comporte au plus %(limit_value)d caractères "
+"(actuellement %(show_value)d)."
 
 msgid "Enter a number."
 msgstr "Saisissez un nombre."
@@ -436,6 +457,7 @@ msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
 msgstr[0] "Assurez-vous qu'il n'y a pas plus de %(max)s chiffre au total."
 msgstr[1] "Assurez-vous qu’il n’y a pas plus de %(max)s chiffres au total."
+msgstr[2] "Assurez-vous qu’il n’y a pas plus de %(max)s chiffres au total."
 
 #, python-format
 msgid "Ensure that there are no more than %(max)s decimal place."
@@ -443,6 +465,8 @@ msgid_plural "Ensure that there are no more than %(max)s decimal places."
 msgstr[0] ""
 "Assurez-vous qu'il n'y a pas plus de %(max)s chiffre après la virgule."
 msgstr[1] ""
+"Assurez-vous qu’il n’y a pas plus de %(max)s chiffres après la virgule."
+msgstr[2] ""
 "Assurez-vous qu’il n’y a pas plus de %(max)s chiffres après la virgule."
 
 #, python-format
@@ -453,6 +477,8 @@ msgid_plural ""
 msgstr[0] ""
 "Assurez-vous qu'il n'y a pas plus de %(max)s chiffre avant la virgule."
 msgstr[1] ""
+"Assurez-vous qu’il n’y a pas plus de %(max)s chiffres avant la virgule."
+msgstr[2] ""
 "Assurez-vous qu’il n’y a pas plus de %(max)s chiffres avant la virgule."
 
 #, python-format
@@ -519,6 +545,9 @@ msgstr "Booléen (soit True (vrai) ou False (faux))"
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "Chaîne de caractères (jusqu'à %(max_length)s)"
+
+msgid "String (unlimited)"
+msgstr "Chaîne de caractères (illimitée)"
 
 msgid "Comma-separated integers"
 msgstr "Des entiers séparés par une virgule"
@@ -748,6 +777,9 @@ msgstr[0] ""
 msgstr[1] ""
 "Assurez-vous que ce nom de fichier comporte au plus %(max)d caractères "
 "(actuellement %(length)d)."
+msgstr[2] ""
+"Assurez-vous que ce nom de fichier comporte au plus %(max)d caractères "
+"(actuellement %(length)d)."
 
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr "Envoyez un fichier ou cochez la case d’effacement, mais pas les deux."
@@ -797,12 +829,14 @@ msgid "Please submit at most %(num)d form."
 msgid_plural "Please submit at most %(num)d forms."
 msgstr[0] "Veuillez soumettre au plus %(num)d formulaire."
 msgstr[1] "Veuillez soumettre au plus %(num)d formulaires."
+msgstr[2] "Veuillez soumettre au plus %(num)d formulaires."
 
 #, python-format
 msgid "Please submit at least %(num)d form."
 msgid_plural "Please submit at least %(num)d forms."
 msgstr[0] "Veuillez soumettre au moins %(num)d formulaire."
 msgstr[1] "Veuillez soumettre au moins %(num)d formulaires."
+msgstr[2] "Veuillez soumettre au moins %(num)d formulaires."
 
 msgid "Order"
 msgstr "Ordre"
@@ -878,6 +912,7 @@ msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d octet"
 msgstr[1] "%(size)d octets"
+msgstr[2] "%(size)d octets"
 
 #, python-format
 msgid "%s KB"
@@ -1147,36 +1182,42 @@ msgid "%(num)d year"
 msgid_plural "%(num)d years"
 msgstr[0] "%(num)d année"
 msgstr[1] "%(num)d années"
+msgstr[2] "%(num)d années"
 
 #, python-format
 msgid "%(num)d month"
 msgid_plural "%(num)d months"
 msgstr[0] "%(num)d mois"
 msgstr[1] "%(num)d mois"
+msgstr[2] "%(num)d mois"
 
 #, python-format
 msgid "%(num)d week"
 msgid_plural "%(num)d weeks"
 msgstr[0] "%(num)d semaine"
 msgstr[1] "%(num)d semaines"
+msgstr[2] "%(num)d semaines"
 
 #, python-format
 msgid "%(num)d day"
 msgid_plural "%(num)d days"
 msgstr[0] "%(num)d jour"
 msgstr[1] "%(num)d jours"
+msgstr[2] "%(num)d jours"
 
 #, python-format
 msgid "%(num)d hour"
 msgid_plural "%(num)d hours"
 msgstr[0] "%(num)d heure"
 msgstr[1] "%(num)d heures"
+msgstr[2] "%(num)d heures"
 
 #, python-format
 msgid "%(num)d minute"
 msgid_plural "%(num)d minutes"
 msgstr[0] "%(num)d minute"
 msgstr[1] "%(num)d minutes"
+msgstr[2] "%(num)d minutes"
 
 msgid "Forbidden"
 msgstr "Interdit"
@@ -1209,8 +1250,8 @@ msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
 "including the “Referrer-Policy: no-referrer” header, please remove them. The "
 "CSRF protection requires the “Referer” header to do strict referer checking. "
-"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" …> for links to third-party sites."
+"If you’re concerned about privacy, use alternatives like <a "
+"rel=\"noreferrer\" …> for links to third-party sites."
 msgstr ""
 "Si vous utilisez la balise <meta name=\"referrer\" content=\"no-referrer\"> "
 "ou que vous incluez l’en-tête « Referrer-Policy: no-referrer », il est "
@@ -1318,14 +1359,14 @@ msgstr ""
 #, python-format
 msgid ""
 "You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> is in your settings file and you have not configured any "
-"URLs."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
+"configured any URLs."
 msgstr ""
-"Vous voyez cette page parce que votre fichier de réglages contient <a href="
-"\"https://docs.djangoproject.com/fr/%(version)s/ref/settings/#debug\" target="
-"\"_blank\" rel=\"noopener\">DEBUG=True</a> et que vous n’avez pas encore "
-"configuré d’URL."
+"Vous voyez cette page parce que votre fichier de réglages contient <a "
+"href=\"https://docs.djangoproject.com/fr/%(version)s/ref/settings/#debug\" "
+"target=\"_blank\" rel=\"noopener\">DEBUG=True</a> et que vous n’avez pas "
+"encore configuré d’URL."
 
 msgid "Django Documentation"
 msgstr "Documentation de Django"

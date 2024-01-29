@@ -6,23 +6,24 @@
 # Davide Targa <davide.targa@gmail.com>, 2021
 # Denis Darii <denis.darii@gmail.com>, 2011
 # Flavio Curella <flavio.curella@gmail.com>, 2013
+# Franky Bonanno, 2023
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Luciano De Falco Alfano, 2016
 # Marco Bonetti, 2014
 # Mirco Grillo <mirco.grillomg@gmail.com>, 2018,2020
 # Nicola Larosa <transifex@teknico.net>, 2013
 # palmux <palmux@gmail.com>, 2014-2015,2021
-# Paolo Melchiorre <paolo@melchiorre.org>, 2022
+# Paolo Melchiorre <paolo@melchiorre.org>, 2022-2023
 # Mattia Procopio <promat85@gmail.com>, 2015
 # Stefano Brentegani <sbrentegani@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:10-0500\n"
-"PO-Revision-Date: 2022-07-25 07:05+0000\n"
-"Last-Translator: Paolo Melchiorre <paolo@melchiorre.org>\n"
-"Language-Team: Italian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 07:05+0000\n"
+"Last-Translator: Franky Bonanno, 2023\n"
+"Language-Team: Italian (http://app.transifex.com/django/django/language/"
 "it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -190,6 +191,9 @@ msgid "Hold down “Control”, or “Command” on a Mac, to select more than o
 msgstr ""
 "Tieni premuto \"Control\", o \"Command\" su Mac, per selezionarne più di uno."
 
+msgid "Select this object for an action - {}"
+msgstr "Seleziona questo oggetto per intraprendere un'azione - {}"
+
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr "Il {name} \"{obj}\" è stato aggiunto con successo."
@@ -268,12 +272,14 @@ msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s modificato correttamente."
 msgstr[1] "%(count)s %(name)s modificati correttamente."
+msgstr[2] "%(count)s %(name)s modificati correttamente."
 
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s selezionato"
 msgstr[1] "Tutti i %(total_count)s selezionati"
+msgstr[2] "Tutti i %(total_count)s selezionati"
 
 #, python-format
 msgid "0 of %(cnt)s selected"
@@ -356,6 +362,9 @@ msgstr "Seleziona tutti %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Annulla la selezione"
 
+msgid "Breadcrumbs"
+msgstr "Breadcrumbs"
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "Modelli nell'applicazione %(name)s"
@@ -383,15 +392,18 @@ msgid "Change password"
 msgstr "Modifica password"
 
 msgid "Please correct the error below."
-msgstr "Per favore, correggi l'errore sottostante"
-
-msgid "Please correct the errors below."
-msgstr "Correggi gli errori qui sotto."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Si prega di correggere l'errore sottostante."
+msgstr[1] "Si prega di correggere gli errori sottostanti."
+msgstr[2] "Si prega di correggere gli errori sottostanti."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr ""
 "Inserisci una nuova password per l'utente <strong>%(username)s</strong>."
+
+msgid "Skip to main content"
+msgstr "Passa al contenuto principale"
 
 msgid "Welcome,"
 msgstr "Benvenuto,"
@@ -418,6 +430,12 @@ msgstr "Vedi sul sito"
 msgid "Filter"
 msgstr "Filtra"
 
+msgid "Hide counts"
+msgstr "Nascondi i conteggi "
+
+msgid "Show counts"
+msgstr "Mostra i conteggi "
+
 msgid "Clear all filters"
 msgstr "Cancella tutti i filtri"
 
@@ -430,6 +448,15 @@ msgstr "Priorità d'ordinamento: %(priority_number)s"
 
 msgid "Toggle sorting"
 msgstr "Abilita/disabilita ordinamento"
+
+msgid "Toggle theme (current theme: auto)"
+msgstr "Cambia tema (tema corrente: auto)"
+
+msgid "Toggle theme (current theme: light)"
+msgstr "Cambia tema (tema corrente: chiaro)"
+
+msgid "Toggle theme (current theme: dark)"
+msgstr "Cambia tema (tema corrente: scuro)"
 
 msgid "Delete"
 msgstr "Cancella"
@@ -517,6 +544,15 @@ msgstr "Le mie azioni"
 msgid "None available"
 msgstr "Nulla disponibile"
 
+msgid "Added:"
+msgstr "Aggiunto"
+
+msgid "Changed:"
+msgstr "Cambiato "
+
+msgid "Deleted:"
+msgstr "Eliminato "
+
 msgid "Unknown content"
 msgstr "Contenuto sconosciuto"
 
@@ -543,6 +579,9 @@ msgstr "Hai dimenticato la password o lo username?"
 msgid "Toggle navigation"
 msgstr "Abilita/disabilita navigazione"
 
+msgid "Sidebar"
+msgstr "Barra laterale"
+
 msgid "Start typing to filter…"
 msgstr "Inizia a scrivere per filtrare..."
 
@@ -559,10 +598,10 @@ msgid "Action"
 msgstr "Azione"
 
 msgid "entry"
-msgstr "voce"
-
-msgid "entries"
-msgstr "voci"
+msgid_plural "entries"
+msgstr[0] "voce"
+msgstr[1] "voci"
+msgstr[2] "voci"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -588,6 +627,7 @@ msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
 msgstr[0] "%(counter)s risultato"
 msgstr[1] "%(counter)s risultati"
+msgstr[2] "%(counter)s risultati"
 
 #, python-format
 msgid "%(full_result_count)s total"
@@ -722,6 +762,10 @@ msgstr "Indirizzo email:"
 
 msgid "Reset my password"
 msgstr "Reimposta la mia password"
+
+msgid "Select all objects on this page for an action"
+msgstr ""
+"Seleziona tutti gli oggetti di questa pagina per intraprendere un'azione "
 
 msgid "All dates"
 msgstr "Tutte le date"

@@ -8,6 +8,8 @@ from django.db.models.deletion import Collector
 
 
 class Command(BaseCommand):
+    help = "Deletes stale content types in the database."
+
     def add_arguments(self, parser):
         parser.add_argument(
             "--noinput",
@@ -80,7 +82,7 @@ class Command(BaseCommand):
                         "are:\n\n"
                         f"{content_type_display}\n\n"
                         "This list doesn't include any cascade deletions to data "
-                        "outside of Django's\n"
+                        "outside of Django\n"
                         "models (uncommon).\n\n"
                         "Are you sure you want to delete these content types?\n"
                         "If you're unsure, answer 'no'."

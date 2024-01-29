@@ -4,20 +4,20 @@
 # André Hagenbruch, 2012
 # Florian Apolloner <florian@apolloner.eu>, 2011
 # Dimitris Glezos <glezos@transifex.com>, 2012
-# Florian Apolloner <florian@apolloner.eu>, 2020-2022
+# Florian Apolloner <florian@apolloner.eu>, 2020-2023
 # jnns, 2013
 # Jannis Leidel <jannis@leidel.info>, 2013-2018,2020
 # jnns, 2016
-# Markus Holtermann <info@markusholtermann.eu>, 2020
+# Markus Holtermann <info@markusholtermann.eu>, 2020,2023
 # Markus Holtermann <info@markusholtermann.eu>, 2013,2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:10-0500\n"
-"PO-Revision-Date: 2022-07-25 07:05+0000\n"
-"Last-Translator: Florian Apolloner <florian@apolloner.eu>\n"
-"Language-Team: German (http://www.transifex.com/django/django/language/de/)\n"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 07:05+0000\n"
+"Last-Translator: Markus Holtermann <info@markusholtermann.eu>, 2020,2023\n"
+"Language-Team: German (http://app.transifex.com/django/django/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -185,6 +185,9 @@ msgstr ""
 "Halten Sie die Strg-Taste (⌘ für Mac) während des Klickens gedrückt, um "
 "mehrere Einträge auszuwählen."
 
+msgid "Select this object for an action - {}"
+msgstr "Dieses Objekt für eine Aktion auswählen - {}"
+
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr "{name} „{obj}“ wurde erfolgreich hinzugefügt."
@@ -349,6 +352,9 @@ msgstr "Alle %(total_count)s %(module_name)s auswählen"
 msgid "Clear selection"
 msgstr "Auswahl widerrufen"
 
+msgid "Breadcrumbs"
+msgstr "„Brotkrümel“"
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "Modelle der %(name)s-Anwendung"
@@ -378,16 +384,18 @@ msgid "Change password"
 msgstr "Passwort ändern"
 
 msgid "Please correct the error below."
-msgstr "Bitte den unten aufgeführten Fehler korrigieren."
-
-msgid "Please correct the errors below."
-msgstr "Bitte die unten aufgeführten Fehler korrigieren."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Bitte den unten aufgeführten Fehler korrigieren."
+msgstr[1] "Bitte die unten aufgeführten Fehler korrigieren."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr ""
 "Bitte geben Sie ein neues Passwort für den Benutzer <strong>%(username)s</"
 "strong> ein."
+
+msgid "Skip to main content"
+msgstr "Zum Hauptinhalt springen"
 
 msgid "Welcome,"
 msgstr "Willkommen,"
@@ -414,6 +422,12 @@ msgstr "Auf der Website anzeigen"
 msgid "Filter"
 msgstr "Filter"
 
+msgid "Hide counts"
+msgstr "Anzahl verstecken"
+
+msgid "Show counts"
+msgstr "Anzahl anzeigen"
+
 msgid "Clear all filters"
 msgstr "Alle Filter zurücksetzen"
 
@@ -426,6 +440,15 @@ msgstr "Sortierung: %(priority_number)s"
 
 msgid "Toggle sorting"
 msgstr "Sortierung ein-/ausschalten"
+
+msgid "Toggle theme (current theme: auto)"
+msgstr "Design wechseln (aktuelles Design: automatisch)"
+
+msgid "Toggle theme (current theme: light)"
+msgstr "Design wechseln (aktuelles Design: hell)"
+
+msgid "Toggle theme (current theme: dark)"
+msgstr "Design wechseln (aktuelles Design: dunkel)"
 
 msgid "Delete"
 msgstr "Löschen"
@@ -513,6 +536,15 @@ msgstr "Meine Aktionen"
 msgid "None available"
 msgstr "Keine vorhanden"
 
+msgid "Added:"
+msgstr "Hinzugefügt:"
+
+msgid "Changed:"
+msgstr "Geändert:"
+
+msgid "Deleted:"
+msgstr "Gelöscht:"
+
 msgid "Unknown content"
 msgstr "Unbekannter Inhalt"
 
@@ -539,6 +571,9 @@ msgstr "Benutzername oder Passwort vergessen?"
 msgid "Toggle navigation"
 msgstr "Navigation ein-/ausblenden"
 
+msgid "Sidebar"
+msgstr "Seitenleiste"
+
 msgid "Start typing to filter…"
 msgstr "Eingabe beginnen um zu filtern…"
 
@@ -555,10 +590,9 @@ msgid "Action"
 msgstr "Aktion"
 
 msgid "entry"
-msgstr "Eintrag"
-
-msgid "entries"
-msgstr "Einträge"
+msgid_plural "entries"
+msgstr[0] "Eintrag"
+msgstr[1] "Einträge"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -722,6 +756,9 @@ msgstr "E-Mail-Adresse:"
 
 msgid "Reset my password"
 msgstr "Mein Passwort zurücksetzen"
+
+msgid "Select all objects on this page for an action"
+msgstr "Alle Objekte auf dieser Seite für eine Aktion auswählen"
 
 msgid "All dates"
 msgstr "Alle Daten"

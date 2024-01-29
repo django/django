@@ -17,7 +17,7 @@ from django.utils.translation import gettext as _
 from django.utils.translation import ngettext
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def get_default_password_validators():
     return get_password_validators(settings.AUTH_PASSWORD_VALIDATORS)
 

@@ -1,39 +1,40 @@
 /* global ol */
 'use strict';
-function GeometryTypeControl(opt_options) {
+class GeometryTypeControl extends ol.control.Control {
     // Map control to switch type when geometry type is unknown
-    const options = opt_options || {};
+    constructor(opt_options) {
+        const options = opt_options || {};
 
-    const element = document.createElement('div');
-    element.className = 'switch-type type-' + options.type + ' ol-control ol-unselectable';
-    if (options.active) {
-        element.classList.add("type-active");
-    }
-
-    const self = this;
-    const switchType = function(e) {
-        e.preventDefault();
-        if (options.widget.currentGeometryType !== self) {
-            options.widget.map.removeInteraction(options.widget.interactions.draw);
-            options.widget.interactions.draw = new ol.interaction.Draw({
-                features: options.widget.featureCollection,
-                type: options.type
-            });
-            options.widget.map.addInteraction(options.widget.interactions.draw);
-            options.widget.currentGeometryType.element.classList.remove('type-active');
-            options.widget.currentGeometryType = self;
+        const element = document.createElement('div');
+        element.className = 'switch-type type-' + options.type + ' ol-control ol-unselectable';
+        if (options.active) {
             element.classList.add("type-active");
         }
-    };
 
-    element.addEventListener('click', switchType, false);
-    element.addEventListener('touchstart', switchType, false);
+        super({
+            element: element,
+            target: options.target
+        });
+        const self = this;
+        const switchType = function(e) {
+            e.preventDefault();
+            if (options.widget.currentGeometryType !== self) {
+                options.widget.map.removeInteraction(options.widget.interactions.draw);
+                options.widget.interactions.draw = new ol.interaction.Draw({
+                    features: options.widget.featureCollection,
+                    type: options.type
+                });
+                options.widget.map.addInteraction(options.widget.interactions.draw);
+                options.widget.currentGeometryType.element.classList.remove('type-active');
+                options.widget.currentGeometryType = self;
+                element.classList.add("type-active");
+            }
+        };
 
-    ol.control.Control.call(this, {
-        element: element
-    });
-};
-ol.inherits(GeometryTypeControl, ol.control.Control);
+        element.addEventListener('click', switchType, false);
+        element.addEventListener('touchstart', switchType, false);
+    }
+}
 
 // TODO: allow deleting individual features (#8972)
 class MapWidget {
@@ -61,11 +62,6 @@ class MapWidget {
             this.options.base_layer = new ol.layer.Tile({source: new ol.source.OSM()});
         }
 
-        // RemovedInDjango51Warning: when the deprecation ends, remove setting
-        // width/height (3 lines below).
-        const mapContainer = document.getElementById(this.options.map_id);
-        mapContainer.style.width = `${mapContainer.dataset.width}px`;
-        mapContainer.style.height = `${mapContainer.dataset.height}px`;
         this.map = this.createMap();
         this.featureCollection = new ol.Collection();
         this.featureOverlay = new ol.layer.Vector({

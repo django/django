@@ -2,7 +2,7 @@
 #
 # Translators:
 # Ahmet Emre Aladağ <emre.aladag@isik.edu.tr>, 2013
-# BouRock, 2015-2017,2019-2021
+# BouRock, 2015-2017,2019-2021,2023
 # BouRock, 2014-2015
 # Caner Başaran <basaran.caner@gmail.com>, 2013
 # Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2014
@@ -15,9 +15,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-09-22 17:30+0000\n"
-"Last-Translator: BouRock\n"
+"POT-Creation-Date: 2023-03-17 03:19-0500\n"
+"PO-Revision-Date: 2023-04-25 08:09+0000\n"
+"Last-Translator: BouRock, 2015-2017,2019-2021,2023\n"
 "Language-Team: Turkish (http://www.transifex.com/django/django/language/"
 "tr/)\n"
 "MIME-Version: 1.0\n"
@@ -275,11 +275,11 @@ msgid "Password reset on %(site_name)s"
 msgstr "%(site_name)s sitesinde parola sıfırlama"
 
 msgid ""
-"Enter a valid username. This value may contain only English letters, "
-"numbers, and @/./+/-/_ characters."
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
 msgstr ""
-"Geçerli bir kullanıcı adı girin. Bu değer sadece İngilizce harfleri, "
-"sayıları, ve @/./+/-/_ karakterlerini içerebilir."
+"Geçerli bir kullanıcı adı girin. Bu değer sadece aksansız küçük a-z ve büyük "
+"A-Z harfleri, sayıları, ve @/./+/-/_ karakterlerini içerebilir."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "

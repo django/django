@@ -10,8 +10,6 @@ on securing a Django-powered site.
 Cross site scripting (XSS) protection
 =====================================
 
-.. highlight:: html+django
-
 XSS attacks allow a user to inject client side scripts into the browsers of
 other users. This is usually achieved by storing the malicious scripts in the
 database where it will be retrieved and displayed to other users, or by getting

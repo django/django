@@ -40,6 +40,7 @@ backends
 backport
 backported
 backports
+backtick
 backtraces
 balancer
 basename
@@ -118,6 +119,7 @@ datetimes
 declaratively
 decrementing
 deduplicates
+deduplication
 deepcopy
 deferrable
 deprecations
@@ -136,6 +138,7 @@ dimensioned
 discoverable
 Disqus
 distro
+django
 djangoproject
 dm
 docstring
@@ -234,6 +237,7 @@ iterable
 iterables
 iteratively
 ize
+Jazzband
 Jinja
 jQuery
 Jupyter
@@ -246,7 +250,6 @@ kilometre
 Koziarski
 kwarg
 kwargs
-Kyngesburye
 Kyrgyz
 latin
 lawrence
@@ -326,6 +329,7 @@ OGC
 OGR
 ons
 orderable
+Orca
 Orléans
 orm
 Outdim
@@ -414,6 +418,7 @@ redisplayed
 redisplaying
 redisplays
 reenable
+reescape
 referer
 referers
 reflow
@@ -584,6 +589,7 @@ util
 utils
 Uvicorn
 uWSGI
+Uyghur
 validator
 validators
 variadic

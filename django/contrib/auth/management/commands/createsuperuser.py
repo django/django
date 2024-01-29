@@ -1,6 +1,7 @@
 """
 Management utility to create superusers.
 """
+
 import getpass
 import os
 import sys
@@ -219,11 +220,15 @@ class Command(BaseCommand):
                 for field_name in self.UserModel.REQUIRED_FIELDS:
                     env_var = "DJANGO_SUPERUSER_" + field_name.upper()
                     value = options[field_name] or os.environ.get(env_var)
+                    field = self.UserModel._meta.get_field(field_name)
                     if not value:
+                        if field.blank and (
+                            options[field_name] == "" or os.environ.get(env_var) == ""
+                        ):
+                            continue
                         raise CommandError(
                             "You must use --%s with --noinput." % field_name
                         )
-                    field = self.UserModel._meta.get_field(field_name)
                     user_data[field_name] = field.clean(value, None)
                     if field.many_to_many and isinstance(user_data[field_name], str):
                         user_data[field_name] = [
@@ -267,15 +272,19 @@ class Command(BaseCommand):
         return "%s%s%s: " % (
             capfirst(field.verbose_name),
             " (leave blank to use '%s')" % default if default else "",
-            " (%s.%s)"
-            % (
-                field.remote_field.model._meta.object_name,
-                field.m2m_target_field_name()
-                if field.many_to_many
-                else field.remote_field.field_name,
-            )
-            if field.remote_field
-            else "",
+            (
+                " (%s.%s)"
+                % (
+                    field.remote_field.model._meta.object_name,
+                    (
+                        field.m2m_target_field_name()
+                        if field.many_to_many
+                        else field.remote_field.field_name
+                    ),
+                )
+                if field.remote_field
+                else ""
+            ),
         )
 
     @cached_property

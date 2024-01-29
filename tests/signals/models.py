@@ -1,6 +1,7 @@
 """
 Testing signals before/after saving and deleting.
 """
+
 from django.db import models
 
 

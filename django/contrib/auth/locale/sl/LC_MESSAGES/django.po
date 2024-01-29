@@ -1,26 +1,27 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Andrej Marsetič, 2022-2023
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jure Cuhalev <gandalf@owca.info>, 2012
-# Primož Verdnik <primoz.verdnik@gmail.com>, 2017
-# zejn <zejn@kiberpipa.org>, 2013,2016-2017
-# zejn <zejn@kiberpipa.org>, 2011-2013
+# Primoz Verdnik <primoz.verdnik@gmail.com>, 2017
+# zejn <zelo.zejn+transifex@gmail.com>, 2013,2016-2017
+# zejn <zelo.zejn+transifex@gmail.com>, 2011-2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2017-12-03 15:49+0000\n"
-"Last-Translator: zejn <zejn@kiberpipa.org>\n"
-"Language-Team: Slovenian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2023-03-17 03:19-0500\n"
+"PO-Revision-Date: 2023-12-04 08:09+0000\n"
+"Last-Translator: Andrej Marsetič, 2022-2023\n"
+"Language-Team: Slovenian (http://app.transifex.com/django/django/language/"
 "sl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: sl\n"
-"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n"
-"%100==4 ? 2 : 3);\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || "
+"n%100==4 ? 2 : 3);\n"
 
 msgid "Personal info"
 msgstr "Osebni podatki"
@@ -57,8 +58,8 @@ msgstr "Geslo ni nastavljeno."
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Neveljavna oblika gesla ali neznan algoritem razpršila."
 
-msgid "The two password fields didn't match."
-msgstr "Gesli se ne ujemata."
+msgid "The two password fields didn’t match."
+msgstr "Polji za geslo se nista ujemali."
 
 msgid "Password"
 msgstr "Geslo"
@@ -70,11 +71,11 @@ msgid "Enter the same password as before, for verification."
 msgstr "Vnesite isto geslo kot prej, za preverjanje."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
+"Raw passwords are not stored, so there is no way to see this user’s "
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"Čitljiva gesla se ne shranjujejo, tako da ni možno videti gesla tega "
-"uporabnika, lahko pa geslo spremenite z uporabo <a href=\"{}\">tega obrazca</"
+"Neobdelana gesla niso shranjena, zato gesla tega uporabnika ni mogoče "
+"videti, vendar lahko geslo spremenite z uporabo<a href=\"{}\">tega obrazca</"
 "a>."
 
 #, python-format
@@ -138,6 +139,9 @@ msgstr "faktor obremenitve"
 
 msgid "checksum"
 msgstr "nadzorna vsota"
+
+msgid "block size"
+msgstr "velikost bloka"
 
 msgid "name"
 msgstr "ime"
@@ -250,31 +254,31 @@ msgstr[3] "Vaše geslo mora imeti vsaj %(min_length)d znakov."
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "Geslo je preveč podobno %(verbose_name)s."
 
-msgid "Your password can't be too similar to your other personal information."
-msgstr "Geslo ne sme biti preveč podobno ostalim vašim osebnim podatkom."
+msgid "Your password can’t be too similar to your other personal information."
+msgstr "Vaše geslo ne sme biti preveč podobno vašim drugim osebnim podatkom."
 
 msgid "This password is too common."
 msgstr "Geslo je eno izmed preveč pogosto uporabljanih."
 
-msgid "Your password can't be a commonly used password."
-msgstr "Vaše geslo ne sme biti eno izmed pogosto uporabljanih gesel."
+msgid "Your password can’t be a commonly used password."
+msgstr "Vaše geslo ne sme biti pogosto uporabljeno geslo."
 
 msgid "This password is entirely numeric."
 msgstr "Vaše geslo je sestavljeno samo iz števk."
 
-msgid "Your password can't be entirely numeric."
-msgstr "Vaše geslo ne sme biti sestavljeno samo iz števk."
+msgid "Your password can’t be entirely numeric."
+msgstr "Vaše geslo ne sme biti v celoti sestavljeno iz številk."
 
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Geslo na %(site_name)s je ponastavljeno."
 
 msgid ""
-"Enter a valid username. This value may contain only English letters, "
-"numbers, and @/./+/-/_ characters."
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
 msgstr ""
-"Vnesite veljavno uporabniško ime. Ta vrednost sme vsebovati le angleške "
-"črke, števke in znake @/./+/-/_."
+"Vnesite veljavno uporabniško ime. Ta vrednost lahko vsebuje samo nenaglašene "
+"male črke a–z in velike črke A–Z, številke in znake @/./+/-/_."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "

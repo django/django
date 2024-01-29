@@ -2,8 +2,6 @@
 Many-to-many relationships
 ==========================
 
-.. highlight:: pycon
-
 To define a many-to-many relationship, use
 :class:`~django.db.models.ManyToManyField`.
 
@@ -14,21 +12,23 @@ objects, and a ``Publication`` has multiple ``Article`` objects:
 
     from django.db import models
 
+
     class Publication(models.Model):
         title = models.CharField(max_length=30)
 
         class Meta:
-            ordering = ['title']
+            ordering = ["title"]
 
         def __str__(self):
             return self.title
+
 
     class Article(models.Model):
         headline = models.CharField(max_length=100)
         publications = models.ManyToManyField(Publication)
 
         class Meta:
-            ordering = ['headline']
+            ordering = ["headline"]
 
         def __str__(self):
             return self.headline
@@ -36,20 +36,26 @@ objects, and a ``Publication`` has multiple ``Article`` objects:
 What follows are examples of operations that can be performed using the Python
 API facilities.
 
-Create a few ``Publications``::
+Create a few ``Publications``:
 
-    >>> p1 = Publication(title='The Python Journal')
+.. code-block:: pycon
+
+    >>> p1 = Publication(title="The Python Journal")
     >>> p1.save()
-    >>> p2 = Publication(title='Science News')
+    >>> p2 = Publication(title="Science News")
     >>> p2.save()
-    >>> p3 = Publication(title='Science Weekly')
+    >>> p3 = Publication(title="Science Weekly")
     >>> p3.save()
 
-Create an ``Article``::
+Create an ``Article``:
 
-    >>> a1 = Article(headline='Django lets you build web apps easily')
+.. code-block:: pycon
 
-You can't associate it with a ``Publication`` until it's been saved::
+    >>> a1 = Article(headline="Django lets you build web apps easily")
+
+You can't associate it with a ``Publication`` until it's been saved:
+
+.. code-block:: pycon
 
     >>> a1.publications.add(p1)
     Traceback (most recent call last):
@@ -57,26 +63,35 @@ You can't associate it with a ``Publication`` until it's been saved::
     ValueError: "<Article: Django lets you build web apps easily>" needs to have a value for field "id" before this many-to-many relationship can be used.
 
 Save it!
-::
+
+.. code-block:: pycon
 
     >>> a1.save()
 
-Associate the ``Article`` with a ``Publication``::
+Associate the ``Article`` with a ``Publication``:
+
+.. code-block:: pycon
 
     >>> a1.publications.add(p1)
 
-Create another ``Article``, and set it to appear in the ``Publications``::
+Create another ``Article``, and set it to appear in the ``Publications``:
 
-    >>> a2 = Article(headline='NASA uses Python')
+.. code-block:: pycon
+
+    >>> a2 = Article(headline="NASA uses Python")
     >>> a2.save()
     >>> a2.publications.add(p1, p2)
     >>> a2.publications.add(p3)
 
-Adding a second time is OK, it will not duplicate the relation::
+Adding a second time is OK, it will not duplicate the relation:
+
+.. code-block:: pycon
 
     >>> a2.publications.add(p3)
 
-Adding an object of the wrong type raises :exc:`TypeError`::
+Adding an object of the wrong type raises :exc:`TypeError`:
+
+.. code-block:: pycon
 
     >>> a2.publications.add(a1)
     Traceback (most recent call last):
@@ -84,18 +99,24 @@ Adding an object of the wrong type raises :exc:`TypeError`::
     TypeError: 'Publication' instance expected
 
 Create and add a ``Publication`` to an ``Article`` in one step using
-:meth:`~django.db.models.fields.related.RelatedManager.create`::
+:meth:`~django.db.models.fields.related.RelatedManager.create`:
 
-    >>> new_publication = a2.publications.create(title='Highlights for Children')
+.. code-block:: pycon
 
-``Article`` objects have access to their related ``Publication`` objects::
+    >>> new_publication = a2.publications.create(title="Highlights for Children")
+
+``Article`` objects have access to their related ``Publication`` objects:
+
+.. code-block:: pycon
 
     >>> a1.publications.all()
     <QuerySet [<Publication: The Python Journal>]>
     >>> a2.publications.all()
     <QuerySet [<Publication: Highlights for Children>, <Publication: Science News>, <Publication: Science Weekly>, <Publication: The Python Journal>]>
 
-``Publication`` objects have access to their related ``Article`` objects::
+``Publication`` objects have access to their related ``Article`` objects:
+
+.. code-block:: pycon
 
     >>> p2.article_set.all()
     <QuerySet [<Article: NASA uses Python>]>
@@ -105,7 +126,9 @@ Create and add a ``Publication`` to an ``Article`` in one step using
     <QuerySet [<Article: NASA uses Python>]>
 
 Many-to-many relationships can be queried using :ref:`lookups across
-relationships <lookups-that-span-relationships>`::
+relationships <lookups-that-span-relationships>`:
+
+.. code-block:: pycon
 
     >>> Article.objects.filter(publications__id=1)
     <QuerySet [<Article: Django lets you build web apps easily>, <Article: NASA uses Python>]>
@@ -123,7 +146,9 @@ relationships <lookups-that-span-relationships>`::
     <QuerySet [<Article: NASA uses Python>]>
 
 The :meth:`~django.db.models.query.QuerySet.count` function respects
-:meth:`~django.db.models.query.QuerySet.distinct` as well::
+:meth:`~django.db.models.query.QuerySet.distinct` as well:
+
+.. code-block:: pycon
 
     >>> Article.objects.filter(publications__title__startswith="Science").count()
     2
@@ -131,13 +156,15 @@ The :meth:`~django.db.models.query.QuerySet.count` function respects
     >>> Article.objects.filter(publications__title__startswith="Science").distinct().count()
     1
 
-    >>> Article.objects.filter(publications__in=[1,2]).distinct()
+    >>> Article.objects.filter(publications__in=[1, 2]).distinct()
     <QuerySet [<Article: Django lets you build web apps easily>, <Article: NASA uses Python>]>
-    >>> Article.objects.filter(publications__in=[p1,p2]).distinct()
+    >>> Article.objects.filter(publications__in=[p1, p2]).distinct()
     <QuerySet [<Article: Django lets you build web apps easily>, <Article: NASA uses Python>]>
 
 Reverse m2m queries are supported (i.e., starting at the table that doesn't have
-a :class:`~django.db.models.ManyToManyField`)::
+a :class:`~django.db.models.ManyToManyField`):
+
+.. code-block:: pycon
 
     >>> Publication.objects.filter(id=1)
     <QuerySet [<Publication: The Python Journal>]>
@@ -156,18 +183,22 @@ a :class:`~django.db.models.ManyToManyField`)::
     >>> Publication.objects.filter(article=a1)
     <QuerySet [<Publication: The Python Journal>]>
 
-    >>> Publication.objects.filter(article__in=[1,2]).distinct()
+    >>> Publication.objects.filter(article__in=[1, 2]).distinct()
     <QuerySet [<Publication: Highlights for Children>, <Publication: Science News>, <Publication: Science Weekly>, <Publication: The Python Journal>]>
-    >>> Publication.objects.filter(article__in=[a1,a2]).distinct()
+    >>> Publication.objects.filter(article__in=[a1, a2]).distinct()
     <QuerySet [<Publication: Highlights for Children>, <Publication: Science News>, <Publication: Science Weekly>, <Publication: The Python Journal>]>
 
 Excluding a related item works as you would expect, too (although the SQL
-involved is a little complex)::
+involved is a little complex):
+
+.. code-block:: pycon
 
     >>> Article.objects.exclude(publications=p2)
     <QuerySet [<Article: Django lets you build web apps easily>]>
 
-If we delete a ``Publication``, its ``Articles`` won't be able to access it::
+If we delete a ``Publication``, its ``Articles`` won't be able to access it:
+
+.. code-block:: pycon
 
     >>> p1.delete()
     >>> Publication.objects.all()
@@ -176,7 +207,9 @@ If we delete a ``Publication``, its ``Articles`` won't be able to access it::
     >>> a1.publications.all()
     <QuerySet []>
 
-If we delete an ``Article``, its ``Publications`` won't be able to access it::
+If we delete an ``Article``, its ``Publications`` won't be able to access it:
+
+.. code-block:: pycon
 
     >>> a2.delete()
     >>> Article.objects.all()
@@ -184,9 +217,11 @@ If we delete an ``Article``, its ``Publications`` won't be able to access it::
     >>> p2.article_set.all()
     <QuerySet []>
 
-Adding via the 'other' end of an m2m::
+Adding via the 'other' end of an m2m:
 
-    >>> a4 = Article(headline='NASA finds intelligent life on Earth')
+.. code-block:: pycon
+
+    >>> a4 = Article(headline="NASA finds intelligent life on Earth")
     >>> a4.save()
     >>> p2.article_set.add(a4)
     >>> p2.article_set.all()
@@ -194,16 +229,20 @@ Adding via the 'other' end of an m2m::
     >>> a4.publications.all()
     <QuerySet [<Publication: Science News>]>
 
-Adding via the other end using keywords::
+Adding via the other end using keywords:
 
-    >>> new_article = p2.article_set.create(headline='Oxygen-free diet works wonders')
+.. code-block:: pycon
+
+    >>> new_article = p2.article_set.create(headline="Oxygen-free diet works wonders")
     >>> p2.article_set.all()
     <QuerySet [<Article: NASA finds intelligent life on Earth>, <Article: Oxygen-free diet works wonders>]>
     >>> a5 = p2.article_set.all()[1]
     >>> a5.publications.all()
     <QuerySet [<Publication: Science News>]>
 
-Removing ``Publication`` from an ``Article``::
+Removing ``Publication`` from an ``Article``:
+
+.. code-block:: pycon
 
     >>> a4.publications.remove(p2)
     >>> p2.article_set.all()
@@ -211,7 +250,9 @@ Removing ``Publication`` from an ``Article``::
     >>> a4.publications.all()
     <QuerySet []>
 
-And from the other end::
+And from the other end:
+
+.. code-block:: pycon
 
     >>> p2.article_set.remove(a5)
     >>> p2.article_set.all()
@@ -219,7 +260,9 @@ And from the other end::
     >>> a5.publications.all()
     <QuerySet []>
 
-Relation sets can be set::
+Relation sets can be set:
+
+.. code-block:: pycon
 
     >>> a4.publications.all()
     <QuerySet [<Publication: Science News>]>
@@ -227,13 +270,17 @@ Relation sets can be set::
     >>> a4.publications.all()
     <QuerySet [<Publication: Science Weekly>]>
 
-Relation sets can be cleared::
+Relation sets can be cleared:
+
+.. code-block:: pycon
 
     >>> p2.article_set.clear()
     >>> p2.article_set.all()
     <QuerySet []>
 
-And you can clear from the other end::
+And you can clear from the other end:
+
+.. code-block:: pycon
 
     >>> p2.article_set.add(a4, a5)
     >>> p2.article_set.all()
@@ -246,18 +293,22 @@ And you can clear from the other end::
     >>> p2.article_set.all()
     <QuerySet [<Article: Oxygen-free diet works wonders>]>
 
-Recreate the ``Article`` and ``Publication`` we have deleted::
+Recreate the ``Article`` and ``Publication`` we have deleted:
 
-    >>> p1 = Publication(title='The Python Journal')
+.. code-block:: pycon
+
+    >>> p1 = Publication(title="The Python Journal")
     >>> p1.save()
-    >>> a2 = Article(headline='NASA uses Python')
+    >>> a2 = Article(headline="NASA uses Python")
     >>> a2.save()
     >>> a2.publications.add(p1, p2, p3)
 
 Bulk delete some ``Publications`` - references to deleted publications should
-go::
+go:
 
-    >>> Publication.objects.filter(title__startswith='Science').delete()
+.. code-block:: pycon
+
+    >>> Publication.objects.filter(title__startswith="Science").delete()
     >>> Publication.objects.all()
     <QuerySet [<Publication: Highlights for Children>, <Publication: The Python Journal>]>
     >>> Article.objects.all()
@@ -265,16 +316,20 @@ go::
     >>> a2.publications.all()
     <QuerySet [<Publication: The Python Journal>]>
 
-Bulk delete some articles - references to deleted objects should go::
+Bulk delete some articles - references to deleted objects should go:
 
-    >>> q = Article.objects.filter(headline__startswith='Django')
+.. code-block:: pycon
+
+    >>> q = Article.objects.filter(headline__startswith="Django")
     >>> print(q)
     <QuerySet [<Article: Django lets you build web apps easily>]>
     >>> q.delete()
 
 After the :meth:`~django.db.models.query.QuerySet.delete`, the
 :class:`~django.db.models.query.QuerySet` cache needs to be cleared, and the
-referenced objects should be gone::
+referenced objects should be gone:
+
+.. code-block:: pycon
 
     >>> print(q)
     <QuerySet []>

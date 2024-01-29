@@ -81,7 +81,7 @@ class WSGIFileWrapperTests(TestCase):
 
     def test_file_wrapper_uses_sendfile(self):
         env = {"SERVER_PROTOCOL": "HTTP/1.0"}
-        handler = FileWrapperHandler(None, BytesIO(), BytesIO(), env)
+        handler = FileWrapperHandler(BytesIO(), BytesIO(), BytesIO(), env)
         handler.run(wsgi_app_file_wrapper)
         self.assertTrue(handler._used_sendfile)
         self.assertEqual(handler.stdout.getvalue(), b"")
@@ -89,7 +89,7 @@ class WSGIFileWrapperTests(TestCase):
 
     def test_file_wrapper_no_sendfile(self):
         env = {"SERVER_PROTOCOL": "HTTP/1.0"}
-        handler = FileWrapperHandler(None, BytesIO(), BytesIO(), env)
+        handler = FileWrapperHandler(BytesIO(), BytesIO(), BytesIO(), env)
         handler.run(wsgi_app)
         self.assertFalse(handler._used_sendfile)
         self.assertEqual(handler.stdout.getvalue().splitlines()[-1], b"Hello World!")
@@ -102,7 +102,7 @@ class WSGIFileWrapperTests(TestCase):
         response when file_wrapper is used.
         """
         env = RequestFactory().get("/fileresponse/").environ
-        handler = FileWrapperHandler(None, BytesIO(), BytesIO(), env)
+        handler = FileWrapperHandler(BytesIO(), BytesIO(), BytesIO(), env)
         handler.run(get_internal_wsgi_application())
         # Sendfile is used only when file_wrapper has been used.
         self.assertTrue(handler._used_sendfile)
@@ -119,7 +119,7 @@ class WSGIFileWrapperTests(TestCase):
     @override_settings(ROOT_URLCONF="builtin_server.urls")
     def test_file_response_call_request_finished(self):
         env = RequestFactory().get("/fileresponse/").environ
-        handler = FileWrapperHandler(None, BytesIO(), BytesIO(), env)
+        handler = FileWrapperHandler(BytesIO(), BytesIO(), BytesIO(), env)
         with mock.MagicMock() as signal_handler:
             request_finished.connect(signal_handler)
             handler.run(get_internal_wsgi_application())

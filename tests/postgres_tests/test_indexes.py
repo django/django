@@ -15,7 +15,7 @@ from django.db import NotSupportedError, connection
 from django.db.models import CharField, F, Index, Q
 from django.db.models.functions import Cast, Collate, Length, Lower
 from django.test import skipUnlessDBFeature
-from django.test.utils import modify_settings, register_lookup
+from django.test.utils import register_lookup
 
 from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase
 from .fields import SearchVector, SearchVectorField
@@ -143,12 +143,29 @@ class BTreeIndexTests(IndexTestMixin, PostgreSQLSimpleTestCase):
         self.assertEqual(BTreeIndex.suffix, "btree")
 
     def test_deconstruction(self):
-        index = BTreeIndex(fields=["title"], name="test_title_btree", fillfactor=80)
+        index = BTreeIndex(fields=["title"], name="test_title_btree")
+        path, args, kwargs = index.deconstruct()
+        self.assertEqual(path, "django.contrib.postgres.indexes.BTreeIndex")
+        self.assertEqual(args, ())
+        self.assertEqual(kwargs, {"fields": ["title"], "name": "test_title_btree"})
+
+        index = BTreeIndex(
+            fields=["title"],
+            name="test_title_btree",
+            fillfactor=80,
+            deduplicate_items=False,
+        )
         path, args, kwargs = index.deconstruct()
         self.assertEqual(path, "django.contrib.postgres.indexes.BTreeIndex")
         self.assertEqual(args, ())
         self.assertEqual(
-            kwargs, {"fields": ["title"], "name": "test_title_btree", "fillfactor": 80}
+            kwargs,
+            {
+                "fields": ["title"],
+                "name": "test_title_btree",
+                "fillfactor": 80,
+                "deduplicate_items": False,
+            },
         )
 
 
@@ -235,7 +252,6 @@ class SpGistIndexTests(IndexTestMixin, PostgreSQLSimpleTestCase):
         )
 
 
-@modify_settings(INSTALLED_APPS={"append": "django.contrib.postgres"})
 class SchemaTests(PostgreSQLTestCase):
     get_opclass_query = """
         SELECT opcname, c.relname FROM pg_opclass AS oc
@@ -456,13 +472,18 @@ class SchemaTests(PostgreSQLTestCase):
         )
 
     def test_btree_parameters(self):
-        index_name = "integer_array_btree_fillfactor"
-        index = BTreeIndex(fields=["field"], name=index_name, fillfactor=80)
+        index_name = "integer_array_btree_parameters"
+        index = BTreeIndex(
+            fields=["field"], name=index_name, fillfactor=80, deduplicate_items=False
+        )
         with connection.schema_editor() as editor:
             editor.add_index(CharFieldModel, index)
         constraints = self.get_constraints(CharFieldModel._meta.db_table)
         self.assertEqual(constraints[index_name]["type"], BTreeIndex.suffix)
-        self.assertEqual(constraints[index_name]["options"], ["fillfactor=80"])
+        self.assertEqual(
+            constraints[index_name]["options"],
+            ["fillfactor=80", "deduplicate_items=off"],
+        )
         with connection.schema_editor() as editor:
             editor.remove_index(CharFieldModel, index)
         self.assertNotIn(
@@ -539,6 +560,21 @@ class SchemaTests(PostgreSQLTestCase):
         with connection.schema_editor() as editor:
             editor.remove_index(Scene, index)
         self.assertNotIn(index_name, self.get_constraints(table))
+
+    def test_search_vector(self):
+        """SearchVector generates IMMUTABLE SQL in order to be indexable."""
+        index_name = "test_search_vector"
+        index = Index(SearchVector("id", "scene", config="english"), name=index_name)
+        # Indexed function must be IMMUTABLE.
+        with connection.schema_editor() as editor:
+            editor.add_index(Scene, index)
+        constraints = self.get_constraints(Scene._meta.db_table)
+        self.assertIn(index_name, constraints)
+        self.assertIs(constraints[index_name]["index"], True)
+
+        with connection.schema_editor() as editor:
+            editor.remove_index(Scene, index)
+        self.assertNotIn(index_name, self.get_constraints(Scene._meta.db_table))
 
     def test_hash_index(self):
         # Ensure the table is there and doesn't have an index.

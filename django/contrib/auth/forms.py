@@ -71,7 +71,15 @@ class ReadOnlyPasswordHashField(forms.Field):
 
 class UsernameField(forms.CharField):
     def to_python(self, value):
-        return unicodedata.normalize("NFKC", super().to_python(value))
+        value = super().to_python(value)
+        if self.max_length is not None and len(value) > self.max_length:
+            # Normalization can increase the string length (e.g.
+            # "ﬀ" -> "ff", "½" -> "1⁄2") but cannot reduce it, so there is no
+            # point in normalizing invalid data. Moreover, Unicode
+            # normalization is very slow on Windows and can be a DoS attack
+            # vector.
+            return value
+        return unicodedata.normalize("NFKC", value)
 
     def widget_attrs(self, widget):
         return {
@@ -81,7 +89,7 @@ class UsernameField(forms.CharField):
         }
 
 
-class UserCreationForm(forms.ModelForm):
+class BaseUserCreationForm(forms.ModelForm):
     """
     A form that creates a user, with no privileges, from the given username and
     password.
@@ -141,7 +149,30 @@ class UserCreationForm(forms.ModelForm):
         user.set_password(self.cleaned_data["password1"])
         if commit:
             user.save()
+            if hasattr(self, "save_m2m"):
+                self.save_m2m()
         return user
+
+
+class UserCreationForm(BaseUserCreationForm):
+    def clean_username(self):
+        """Reject usernames that differ only in case."""
+        username = self.cleaned_data.get("username")
+        if (
+            username
+            and self._meta.model.objects.filter(username__iexact=username).exists()
+        ):
+            self._update_errors(
+                ValidationError(
+                    {
+                        "username": self.instance.unique_error_message(
+                            self._meta.model, ["username"]
+                        )
+                    }
+                )
+            )
+        else:
+            return username
 
 
 class UserChangeForm(forms.ModelForm):

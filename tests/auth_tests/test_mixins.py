@@ -51,7 +51,6 @@ class StackedMixinsView2(
 
 
 class AccessMixinTests(TestCase):
-
     factory = RequestFactory()
 
     def test_stacked_mixins_success(self):
@@ -134,7 +133,6 @@ class AccessMixinTests(TestCase):
 
 
 class UserPassesTestTests(SimpleTestCase):
-
     factory = RequestFactory()
 
     def _test_redirect(self, view=None, url="/accounts/login/?next=/rand"):
@@ -213,7 +211,6 @@ class UserPassesTestTests(SimpleTestCase):
 
 
 class LoginRequiredMixinTests(TestCase):
-
     factory = RequestFactory()
 
     @classmethod
@@ -243,7 +240,6 @@ class LoginRequiredMixinTests(TestCase):
 
 
 class PermissionsRequiredMixinTests(TestCase):
-
     factory = RequestFactory()
 
     @classmethod

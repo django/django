@@ -106,10 +106,12 @@ class UserAdmin(admin.ModelAdmin):
             ),
         ] + super().get_urls()
 
-    def lookup_allowed(self, lookup, value):
+    # RemovedInDjango60Warning: when the deprecation ends, replace with:
+    # def lookup_allowed(self, lookup, value, request):
+    def lookup_allowed(self, lookup, value, request=None):
         # Don't allow lookups involving passwords.
         return not lookup.startswith("password") and super().lookup_allowed(
-            lookup, value
+            lookup, value, request
         )
 
     @sensitive_post_parameters_m

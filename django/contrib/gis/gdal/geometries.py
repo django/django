@@ -38,7 +38,9 @@
   >>> print(gt1 == 3, gt1 == 'Polygon') # Equivalence works w/non-OGRGeomType objects
   True True
 """
+
 import sys
+import warnings
 from binascii import b2a_hex
 from ctypes import byref, c_char_p, c_double, c_ubyte, c_void_p, string_at
 
@@ -50,6 +52,7 @@ from django.contrib.gis.gdal.prototypes import geom as capi
 from django.contrib.gis.gdal.prototypes import srs as srs_api
 from django.contrib.gis.gdal.srs import CoordTransform, SpatialReference
 from django.contrib.gis.geometry import hex_regex, json_regex, wkt_regex
+from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.encoding import force_bytes
 
 
@@ -123,7 +126,9 @@ class OGRGeometry(GDALBase):
             self.srs = srs
 
         # Setting the class depending upon the OGR Geometry Type
-        self.__class__ = GEO_CLASSES[self.geom_type.num]
+        if (geo_class := GEO_CLASSES.get(self.geom_type.num)) is None:
+            raise TypeError(f"Unsupported geometry type: {self.geom_type}")
+        self.__class__ = geo_class
 
     # Pickle routines
     def __getstate__(self):
@@ -204,17 +209,20 @@ class OGRGeometry(GDALBase):
         "Return 0 for points, 1 for lines, and 2 for surfaces."
         return capi.get_dims(self.ptr)
 
-    def _get_coord_dim(self):
+    @property
+    def coord_dim(self):
         "Return the coordinate dimension of the Geometry."
         return capi.get_coord_dim(self.ptr)
 
-    def _set_coord_dim(self, dim):
+    # RemovedInDjango60Warning
+    @coord_dim.setter
+    def coord_dim(self, dim):
         "Set the coordinate dimension of this Geometry."
+        msg = "coord_dim setter is deprecated. Use set_3d() instead."
+        warnings.warn(msg, RemovedInDjango60Warning, stacklevel=2)
         if dim not in (2, 3):
             raise ValueError("Geometry dimension must be either 2 or 3")
         capi.set_coord_dim(self.ptr, dim)
-
-    coord_dim = property(_get_coord_dim, _set_coord_dim)
 
     @property
     def geom_count(self):
@@ -265,6 +273,36 @@ class OGRGeometry(GDALBase):
     def extent(self):
         "Return the envelope as a 4-tuple, instead of as an Envelope object."
         return self.envelope.tuple
+
+    @property
+    def is_3d(self):
+        """Return True if the geometry has Z coordinates."""
+        return capi.is_3d(self.ptr)
+
+    def set_3d(self, value):
+        """Set if this geometry has Z coordinates."""
+        if value is True:
+            capi.set_3d(self.ptr, 1)
+        elif value is False:
+            capi.set_3d(self.ptr, 0)
+        else:
+            raise ValueError(f"Input to 'set_3d' must be a boolean, got '{value!r}'.")
+
+    @property
+    def is_measured(self):
+        """Return True if the geometry has M coordinates."""
+        return capi.is_measured(self.ptr)
+
+    def set_measured(self, value):
+        """Set if this geometry has M coordinates."""
+        if value is True:
+            capi.set_measured(self.ptr, 1)
+        elif value is False:
+            capi.set_measured(self.ptr, 0)
+        else:
+            raise ValueError(
+                f"Input to 'set_measured' must be a boolean, got '{value!r}'."
+            )
 
     # #### SpatialReference-related Properties ####
 
@@ -365,14 +403,22 @@ class OGRGeometry(GDALBase):
         sz = self.wkb_size
         # Creating the unsigned character buffer, and passing it in by reference.
         buf = (c_ubyte * sz)()
-        capi.to_wkb(self.ptr, byteorder, byref(buf))
+        # For backward compatibility, export old-style 99-402 extended
+        # dimension types when geometry does not have an M dimension.
+        # https://gdal.org/api/vector_c_api.html#_CPPv417OGR_G_ExportToWkb12OGRGeometryH15OGRwkbByteOrderPh
+        to_wkb = capi.to_iso_wkb if self.is_measured else capi.to_wkb
+        to_wkb(self.ptr, byteorder, byref(buf))
         # Returning a buffer of the string at the pointer.
         return memoryview(string_at(buf, sz))
 
     @property
     def wkt(self):
         "Return the WKT representation of the Geometry."
-        return capi.to_wkt(self.ptr, byref(c_char_p()))
+        # For backward compatibility, export old-style 99-402 extended
+        # dimension types when geometry does not have an M dimension.
+        # https://gdal.org/api/vector_c_api.html#_CPPv417OGR_G_ExportToWkt12OGRGeometryHPPc
+        to_wkt = capi.to_iso_wkt if self.is_measured else capi.to_wkt
+        return to_wkt(self.ptr, byref(c_char_p()))
 
     @property
     def ewkt(self):
@@ -519,6 +565,14 @@ class OGRGeometry(GDALBase):
         """
         return self._geomgen(capi.geom_union, other)
 
+    @property
+    def centroid(self):
+        """Return the centroid (a Point) of this Polygon."""
+        # The centroid is a Point, create a geometry for this.
+        p = OGRGeometry(OGRGeomType("Point"))
+        capi.get_centroid(self.ptr, p.ptr)
+        return p
+
 
 # The subclasses for OGR Geometry.
 class Point(OGRGeometry):
@@ -544,16 +598,25 @@ class Point(OGRGeometry):
     @property
     def z(self):
         "Return the Z coordinate for this Point."
-        if self.coord_dim == 3:
+        if self.is_3d:
             return capi.getz(self.ptr, 0)
+
+    @property
+    def m(self):
+        """Return the M coordinate for this Point."""
+        if self.is_measured:
+            return capi.getm(self.ptr, 0)
 
     @property
     def tuple(self):
         "Return the tuple of this point."
-        if self.coord_dim == 2:
-            return (self.x, self.y)
-        elif self.coord_dim == 3:
-            return (self.x, self.y, self.z)
+        if self.is_3d and self.is_measured:
+            return self.x, self.y, self.z, self.m
+        if self.is_3d:
+            return self.x, self.y, self.z
+        if self.is_measured:
+            return self.x, self.y, self.m
+        return self.x, self.y
 
     coords = tuple
 
@@ -564,13 +627,13 @@ class LineString(OGRGeometry):
         if 0 <= index < self.point_count:
             x, y, z = c_double(), c_double(), c_double()
             capi.get_point(self.ptr, index, byref(x), byref(y), byref(z))
+            if self.is_3d:
+                return x.value, y.value, z.value
             dim = self.coord_dim
             if dim == 1:
                 return (x.value,)
             elif dim == 2:
                 return (x.value, y.value)
-            elif dim == 3:
-                return (x.value, y.value, z.value)
         else:
             raise IndexError(
                 "Index out of range when accessing points of a line string: %s." % index
@@ -607,7 +670,7 @@ class LineString(OGRGeometry):
     @property
     def z(self):
         "Return the Z coordinates in a list."
-        if self.coord_dim == 3:
+        if self.is_3d:
             return self._listarr(capi.getz)
 
 
@@ -652,14 +715,6 @@ class Polygon(OGRGeometry):
         "Return the number of Points in this Polygon."
         # Summing up the number of points in each ring of the Polygon.
         return sum(self[i].point_count for i in range(self.geom_count))
-
-    @property
-    def centroid(self):
-        "Return the centroid (a Point) of this Polygon."
-        # The centroid is a Point, create a geometry for this.
-        p = OGRGeometry(OGRGeomType("Point"))
-        capi.get_centroid(self.ptr, p.ptr)
-        return p
 
 
 # Geometry Collection base class.
@@ -733,7 +788,9 @@ GEO_CLASSES = {
     6: MultiPolygon,
     7: GeometryCollection,
     101: LinearRing,
-    1 + OGRGeomType.wkb25bit: Point,
+    2001: Point,  # POINT M
+    3001: Point,  # POINT ZM
+    1 + OGRGeomType.wkb25bit: Point,  # POINT Z
     2 + OGRGeomType.wkb25bit: LineString,
     3 + OGRGeomType.wkb25bit: Polygon,
     4 + OGRGeomType.wkb25bit: MultiPoint,

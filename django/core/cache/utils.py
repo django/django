@@ -1,4 +1,4 @@
-from django.utils.crypto import md5
+from hashlib import md5
 
 TEMPLATE_FRAGMENT_KEY_TEMPLATE = "template.cache.%s.%s"
 

@@ -1,14 +1,10 @@
 import gettext
 import os
 import re
+import zoneinfo
 from datetime import datetime, timedelta
 from importlib import import_module
 from unittest import skipUnless
-
-try:
-    import zoneinfo
-except ImportError:
-    from backports import zoneinfo
 
 from django import forms
 from django.conf import settings
@@ -26,9 +22,11 @@ from django.db.models import (
     ManyToManyField,
     UUIDField,
 )
-from django.test import SimpleTestCase, TestCase, override_settings
+from django.test import SimpleTestCase, TestCase, ignore_warnings, override_settings
+from django.test.utils import requires_tz_support
 from django.urls import reverse
 from django.utils import translation
+from django.utils.deprecation import RemovedInDjango60Warning
 
 from .models import (
     Advisor,
@@ -75,6 +73,7 @@ class AdminFormfieldForDBFieldTests(SimpleTestCase):
         Helper to call formfield_for_dbfield for a given model and field name
         and verify that the returned formfield is appropriate.
         """
+
         # Override any settings on the model admin
         class MyModelAdmin(admin.ModelAdmin):
             pass
@@ -109,6 +108,7 @@ class AdminFormfieldForDBFieldTests(SimpleTestCase):
     def test_TextField(self):
         self.assertFormfield(Event, "description", widgets.AdminTextareaWidget)
 
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_URLField(self):
         self.assertFormfield(Event, "link", widgets.AdminURLFieldWidget)
 
@@ -323,6 +323,7 @@ class AdminForeignKeyRawIdWidget(TestDataMixin, TestCase):
     def setUp(self):
         self.client.force_login(self.superuser)
 
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_nonexistent_target_id(self):
         band = Band.objects.create(name="Bogey Blues")
         pk = band.pk
@@ -338,8 +339,8 @@ class AdminForeignKeyRawIdWidget(TestDataMixin, TestCase):
             "Select a valid choice. That choice is not one of the available choices.",
         )
 
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_invalid_target_id(self):
-
         for test_str in ("Iñtërnâtiônàlizætiøn", "1234'", -1234):
             # This should result in an error message, not a server exception.
             response = self.client.post(
@@ -398,15 +399,17 @@ class AdminDateWidgetTest(SimpleTestCase):
         w = widgets.AdminDateWidget()
         self.assertHTMLEqual(
             w.render("test", datetime(2007, 12, 1, 9, 30)),
+            '<p class="date">'
             '<input value="2007-12-01" type="text" class="vDateField" name="test" '
-            'size="10">',
+            'size="10"></p>',
         )
         # pass attrs to widget
         w = widgets.AdminDateWidget(attrs={"size": 20, "class": "myDateField"})
         self.assertHTMLEqual(
             w.render("test", datetime(2007, 12, 1, 9, 30)),
+            '<p class="date">'
             '<input value="2007-12-01" type="text" class="myDateField" name="test" '
-            'size="20">',
+            'size="20"></p>',
         )
 
 
@@ -415,15 +418,17 @@ class AdminTimeWidgetTest(SimpleTestCase):
         w = widgets.AdminTimeWidget()
         self.assertHTMLEqual(
             w.render("test", datetime(2007, 12, 1, 9, 30)),
+            '<p class="time">'
             '<input value="09:30:00" type="text" class="vTimeField" name="test" '
-            'size="8">',
+            'size="8"></p>',
         )
         # pass attrs to widget
         w = widgets.AdminTimeWidget(attrs={"size": 20, "class": "myTimeField"})
         self.assertHTMLEqual(
             w.render("test", datetime(2007, 12, 1, 9, 30)),
+            '<p class="time">'
             '<input value="09:30:00" type="text" class="myTimeField" name="test" '
-            'size="20">',
+            'size="20"></p>',
         )
 
 
@@ -636,7 +641,7 @@ class AdminFileWidgetTests(TestDataMixin, TestCase):
         response = self.client.get(reverse("admin:admin_widgets_album_add"))
         self.assertContains(
             response,
-            '<div class="readonly"></div>',
+            '<div class="readonly">-</div>',
             html=True,
         )
 
@@ -908,7 +913,6 @@ class RelatedFieldWidgetWrapperTests(SimpleTestCase):
 
 @override_settings(ROOT_URLCONF="admin_widgets.urls")
 class AdminWidgetSeleniumTestCase(AdminSeleniumTestCase):
-
     available_apps = ["admin_widgets"] + AdminSeleniumTestCase.available_apps
 
     def setUp(self):
@@ -1079,7 +1083,6 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
         """
         from selenium.webdriver.common.by import By
 
-        self.selenium.set_window_size(1024, 768)
         self.admin_login(username="super", password="secret", login_url="/")
 
         # Enter test data
@@ -1092,32 +1095,33 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
         path = os.path.join(
             os.path.dirname(import_module("django.contrib.admin").__file__), "locale"
         )
-        for language_code, language_name in settings.LANGUAGES:
-            try:
-                catalog = gettext.translation("djangojs", path, [language_code])
-            except OSError:
-                continue
-            if month_string in catalog._catalog:
-                month_name = catalog._catalog[month_string]
-            else:
-                month_name = month_string
+        url = reverse("admin:admin_widgets_member_change", args=(member.pk,))
+        with self.small_screen_size():
+            for language_code, language_name in settings.LANGUAGES:
+                try:
+                    catalog = gettext.translation("djangojs", path, [language_code])
+                except OSError:
+                    continue
+                if month_string in catalog._catalog:
+                    month_name = catalog._catalog[month_string]
+                else:
+                    month_name = month_string
 
-            # Get the expected caption
-            may_translation = month_name
-            expected_caption = "{:s} {:d}".format(may_translation.upper(), 1984)
+                # Get the expected caption.
+                may_translation = month_name
+                expected_caption = "{:s} {:d}".format(may_translation.upper(), 1984)
 
-            # Test with every locale
-            with override_settings(LANGUAGE_CODE=language_code):
-
-                # Open a page that has a date picker widget
-                url = reverse("admin:admin_widgets_member_change", args=(member.pk,))
-                self.selenium.get(self.live_server_url + url)
-                # Click on the calendar icon
-                self.selenium.find_element(By.ID, "calendarlink0").click()
-                # Make sure that the right month and year are displayed
-                self.wait_for_text("#calendarin0 caption", expected_caption)
+                # Every locale.
+                with override_settings(LANGUAGE_CODE=language_code):
+                    # Open a page that has a date picker widget.
+                    self.selenium.get(self.live_server_url + url)
+                    # Click on the calendar icon.
+                    self.selenium.find_element(By.ID, "calendarlink0").click()
+                    # The right month and year are displayed.
+                    self.wait_for_text("#calendarin0 caption", expected_caption)
 
 
+@requires_tz_support
 @override_settings(TIME_ZONE="Asia/Singapore")
 class DateTimePickerShortcutsSeleniumTests(AdminWidgetSeleniumTestCase):
     def test_date_time_picker_shortcuts(self):
@@ -1412,23 +1416,24 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
     def test_basic(self):
         from selenium.webdriver.common.by import By
 
-        self.selenium.set_window_size(1024, 768)
         self.school.students.set([self.lisa, self.peter])
         self.school.alumni.set([self.lisa, self.peter])
 
-        self.admin_login(username="super", password="secret", login_url="/")
-        self.selenium.get(
-            self.live_server_url
-            + reverse("admin:admin_widgets_school_change", args=(self.school.id,))
-        )
+        with self.small_screen_size():
+            self.admin_login(username="super", password="secret", login_url="/")
+            self.selenium.get(
+                self.live_server_url
+                + reverse("admin:admin_widgets_school_change", args=(self.school.id,))
+            )
 
-        self.wait_page_ready()
-        self.execute_basic_operations("vertical", "students")
-        self.execute_basic_operations("horizontal", "alumni")
+            self.wait_page_ready()
+            self.execute_basic_operations("vertical", "students")
+            self.execute_basic_operations("horizontal", "alumni")
 
-        # Save and check that everything is properly stored in the database ---
-        self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
-        self.wait_page_ready()
+            # Save, everything should be stored properly stored in the
+            # database.
+            self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
+            self.wait_page_ready()
         self.school = School.objects.get(id=self.school.id)  # Reload from database
         self.assertEqual(
             list(self.school.students.all()),
@@ -1447,113 +1452,116 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         from selenium.webdriver.common.by import By
         from selenium.webdriver.common.keys import Keys
 
-        self.selenium.set_window_size(1024, 768)
         self.school.students.set([self.lisa, self.peter])
         self.school.alumni.set([self.lisa, self.peter])
 
-        self.admin_login(username="super", password="secret", login_url="/")
-        self.selenium.get(
-            self.live_server_url
-            + reverse("admin:admin_widgets_school_change", args=(self.school.id,))
-        )
-
-        for field_name in ["students", "alumni"]:
-            from_box = "#id_%s_from" % field_name
-            to_box = "#id_%s_to" % field_name
-            choose_link = "id_%s_add_link" % field_name
-            remove_link = "id_%s_remove_link" % field_name
-            input = self.selenium.find_element(By.ID, "id_%s_input" % field_name)
-
-            # Initial values
-            self.assertSelectOptions(
-                from_box,
-                [
-                    str(self.arthur.id),
-                    str(self.bob.id),
-                    str(self.cliff.id),
-                    str(self.jason.id),
-                    str(self.jenny.id),
-                    str(self.john.id),
-                ],
+        with self.small_screen_size():
+            self.admin_login(username="super", password="secret", login_url="/")
+            self.selenium.get(
+                self.live_server_url
+                + reverse("admin:admin_widgets_school_change", args=(self.school.id,))
             )
 
-            # Typing in some characters filters out non-matching options
-            input.send_keys("a")
-            self.assertSelectOptions(
-                from_box, [str(self.arthur.id), str(self.jason.id)]
-            )
-            input.send_keys("R")
-            self.assertSelectOptions(from_box, [str(self.arthur.id)])
+            for field_name in ["students", "alumni"]:
+                from_box = "#id_%s_from" % field_name
+                to_box = "#id_%s_to" % field_name
+                choose_link = "id_%s_add_link" % field_name
+                remove_link = "id_%s_remove_link" % field_name
+                input = self.selenium.find_element(By.ID, "id_%s_input" % field_name)
+                # Initial values.
+                self.assertSelectOptions(
+                    from_box,
+                    [
+                        str(self.arthur.id),
+                        str(self.bob.id),
+                        str(self.cliff.id),
+                        str(self.jason.id),
+                        str(self.jenny.id),
+                        str(self.john.id),
+                    ],
+                )
+                # Typing in some characters filters out non-matching options.
+                input.send_keys("a")
+                self.assertSelectOptions(
+                    from_box, [str(self.arthur.id), str(self.jason.id)]
+                )
+                input.send_keys("R")
+                self.assertSelectOptions(from_box, [str(self.arthur.id)])
+                # Clearing the text box makes the other options reappear.
+                input.send_keys([Keys.BACK_SPACE])
+                self.assertSelectOptions(
+                    from_box, [str(self.arthur.id), str(self.jason.id)]
+                )
+                input.send_keys([Keys.BACK_SPACE])
+                self.assertSelectOptions(
+                    from_box,
+                    [
+                        str(self.arthur.id),
+                        str(self.bob.id),
+                        str(self.cliff.id),
+                        str(self.jason.id),
+                        str(self.jenny.id),
+                        str(self.john.id),
+                    ],
+                )
 
-            # Clearing the text box makes the other options reappear
-            input.send_keys([Keys.BACK_SPACE])
-            self.assertSelectOptions(
-                from_box, [str(self.arthur.id), str(self.jason.id)]
-            )
-            input.send_keys([Keys.BACK_SPACE])
-            self.assertSelectOptions(
-                from_box,
-                [
-                    str(self.arthur.id),
-                    str(self.bob.id),
-                    str(self.cliff.id),
-                    str(self.jason.id),
-                    str(self.jenny.id),
-                    str(self.john.id),
-                ],
-            )
+                # Choosing a filtered option sends it properly to the 'to' box.
+                input.send_keys("a")
+                self.assertSelectOptions(
+                    from_box, [str(self.arthur.id), str(self.jason.id)]
+                )
+                self.select_option(from_box, str(self.jason.id))
+                self.selenium.find_element(By.ID, choose_link).click()
+                self.assertSelectOptions(from_box, [str(self.arthur.id)])
+                self.assertSelectOptions(
+                    to_box,
+                    [
+                        str(self.lisa.id),
+                        str(self.peter.id),
+                        str(self.jason.id),
+                    ],
+                )
 
-            # -----------------------------------------------------------------
-            # Choosing a filtered option sends it properly to the 'to' box.
-            input.send_keys("a")
-            self.assertSelectOptions(
-                from_box, [str(self.arthur.id), str(self.jason.id)]
-            )
-            self.select_option(from_box, str(self.jason.id))
-            self.selenium.find_element(By.ID, choose_link).click()
-            self.assertSelectOptions(from_box, [str(self.arthur.id)])
-            self.assertSelectOptions(
-                to_box,
-                [
-                    str(self.lisa.id),
-                    str(self.peter.id),
-                    str(self.jason.id),
-                ],
-            )
+                self.select_option(to_box, str(self.lisa.id))
+                self.selenium.find_element(By.ID, remove_link).click()
+                self.assertSelectOptions(
+                    from_box, [str(self.arthur.id), str(self.lisa.id)]
+                )
+                self.assertSelectOptions(
+                    to_box, [str(self.peter.id), str(self.jason.id)]
+                )
 
-            self.select_option(to_box, str(self.lisa.id))
-            self.selenium.find_element(By.ID, remove_link).click()
-            self.assertSelectOptions(from_box, [str(self.arthur.id), str(self.lisa.id)])
-            self.assertSelectOptions(to_box, [str(self.peter.id), str(self.jason.id)])
+                input.send_keys([Keys.BACK_SPACE])  # Clear text box
+                self.assertSelectOptions(
+                    from_box,
+                    [
+                        str(self.arthur.id),
+                        str(self.bob.id),
+                        str(self.cliff.id),
+                        str(self.jenny.id),
+                        str(self.john.id),
+                        str(self.lisa.id),
+                    ],
+                )
+                self.assertSelectOptions(
+                    to_box, [str(self.peter.id), str(self.jason.id)]
+                )
 
-            input.send_keys([Keys.BACK_SPACE])  # Clear text box
-            self.assertSelectOptions(
-                from_box,
-                [
-                    str(self.arthur.id),
-                    str(self.bob.id),
-                    str(self.cliff.id),
-                    str(self.jenny.id),
-                    str(self.john.id),
-                    str(self.lisa.id),
-                ],
-            )
-            self.assertSelectOptions(to_box, [str(self.peter.id), str(self.jason.id)])
+                # Pressing enter on a filtered option sends it properly to
+                # the 'to' box.
+                self.select_option(to_box, str(self.jason.id))
+                self.selenium.find_element(By.ID, remove_link).click()
+                input.send_keys("ja")
+                self.assertSelectOptions(from_box, [str(self.jason.id)])
+                input.send_keys([Keys.ENTER])
+                self.assertSelectOptions(
+                    to_box, [str(self.peter.id), str(self.jason.id)]
+                )
+                input.send_keys([Keys.BACK_SPACE, Keys.BACK_SPACE])
 
-            # -----------------------------------------------------------------
-            # Pressing enter on a filtered option sends it properly to
-            # the 'to' box.
-            self.select_option(to_box, str(self.jason.id))
-            self.selenium.find_element(By.ID, remove_link).click()
-            input.send_keys("ja")
-            self.assertSelectOptions(from_box, [str(self.jason.id)])
-            input.send_keys([Keys.ENTER])
-            self.assertSelectOptions(to_box, [str(self.peter.id), str(self.jason.id)])
-            input.send_keys([Keys.BACK_SPACE, Keys.BACK_SPACE])
-
-        # Save and check that everything is properly stored in the database ---
-        with self.wait_page_loaded():
-            self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
+            # Save, everything should be stored properly in the database.
+            with self.wait_page_loaded():
+                self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
         self.school = School.objects.get(id=self.school.id)  # Reload from database
         self.assertEqual(list(self.school.students.all()), [self.jason, self.peter])
         self.assertEqual(list(self.school.alumni.all()), [self.jason, self.peter])
@@ -1616,6 +1624,7 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         self.assertCountSeleniumElements("#id_students_to > option", 2)
 
 
+@ignore_warnings(category=RemovedInDjango60Warning)
 class AdminRawIdWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
     def setUp(self):
         super().setUp()
@@ -1708,13 +1717,15 @@ class AdminRawIdWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
 
 class RelatedFieldWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
     def test_ForeignKey_using_to_field(self):
+        from selenium.webdriver import ActionChains
         from selenium.webdriver.common.by import By
         from selenium.webdriver.support.ui import Select
 
         self.admin_login(username="super", password="secret", login_url="/")
-        self.selenium.get(
-            self.live_server_url + reverse("admin:admin_widgets_profile_add")
-        )
+        with self.wait_page_loaded():
+            self.selenium.get(
+                self.live_server_url + reverse("admin:admin_widgets_profile_add")
+            )
 
         main_window = self.selenium.current_window_handle
         # Click the Add User button to add new
@@ -1760,7 +1771,8 @@ class RelatedFieldWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
             By.CSS_SELECTOR, "#id_user option[value=changednewuser]"
         )
 
-        self.selenium.find_element(By.ID, "view_id_user").click()
+        element = self.selenium.find_element(By.ID, "view_id_user")
+        ActionChains(self.selenium).move_to_element(element).click(element).perform()
         self.wait_for_value("#id_username", "changednewuser")
         self.selenium.back()
 
@@ -1778,39 +1790,59 @@ class RelatedFieldWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
 
 @skipUnless(Image, "Pillow not installed")
 class ImageFieldWidgetsSeleniumTests(AdminWidgetSeleniumTestCase):
-    def test_clearablefileinput_widget(self):
+    name_input_id = "id_name"
+    photo_input_id = "id_photo"
+    tests_files_folder = "%s/files" % os.getcwd()
+    clear_checkbox_id = "photo-clear_id"
+
+    def _submit_and_wait(self):
+        from selenium.webdriver.common.by import By
+
+        with self.wait_page_loaded():
+            self.selenium.find_element(
+                By.CSS_SELECTOR, "input[value='Save and continue editing']"
+            ).click()
+
+    def _run_image_upload_path(self):
         from selenium.webdriver.common.by import By
 
         self.admin_login(username="super", password="secret", login_url="/")
         self.selenium.get(
             self.live_server_url + reverse("admin:admin_widgets_student_add"),
         )
-
-        photo_input_id = "id_photo"
-        save_and_edit_button_css_selector = "input[value='Save and continue editing']"
-        tests_files_folder = "%s/files" % os.getcwd()
-        clear_checkbox_id = "photo-clear_id"
-
-        def _submit_and_wait():
-            with self.wait_page_loaded():
-                self.selenium.find_element(
-                    By.CSS_SELECTOR, save_and_edit_button_css_selector
-                ).click()
-
         # Add a student.
-        title_input = self.selenium.find_element(By.ID, "id_name")
-        title_input.send_keys("Joe Doe")
-        photo_input = self.selenium.find_element(By.ID, photo_input_id)
-        photo_input.send_keys(f"{tests_files_folder}/test.png")
-        _submit_and_wait()
+        name_input = self.selenium.find_element(By.ID, self.name_input_id)
+        name_input.send_keys("Joe Doe")
+        photo_input = self.selenium.find_element(By.ID, self.photo_input_id)
+        photo_input.send_keys(f"{self.tests_files_folder}/test.png")
+        self._submit_and_wait()
         student = Student.objects.last()
         self.assertEqual(student.name, "Joe Doe")
-        self.assertEqual(student.photo.name, "photos/test.png")
+        self.assertRegex(student.photo.name, r"^photos\/(test|test_.+).png")
+
+    def test_clearablefileinput_widget(self):
+        from selenium.webdriver.common.by import By
+
+        self._run_image_upload_path()
+        self.selenium.find_element(By.ID, self.clear_checkbox_id).click()
+        self._submit_and_wait()
+        student = Student.objects.last()
+        self.assertEqual(student.name, "Joe Doe")
+        self.assertEqual(student.photo.name, "")
+        # "Currently" with "Clear" checkbox and "Change" are not shown.
+        photo_field_row = self.selenium.find_element(By.CSS_SELECTOR, ".field-photo")
+        self.assertNotIn("Currently", photo_field_row.text)
+        self.assertNotIn("Change", photo_field_row.text)
+
+    def test_clearablefileinput_widget_invalid_file(self):
+        from selenium.webdriver.common.by import By
+
+        self._run_image_upload_path()
         # Uploading non-image files is not supported by Safari with Selenium,
         # so upload a broken one instead.
-        photo_input = self.selenium.find_element(By.ID, photo_input_id)
-        photo_input.send_keys(f"{tests_files_folder}/brokenimg.png")
-        _submit_and_wait()
+        photo_input = self.selenium.find_element(By.ID, self.photo_input_id)
+        photo_input.send_keys(f"{self.tests_files_folder}/brokenimg.png")
+        self._submit_and_wait()
         self.assertEqual(
             self.selenium.find_element(By.CSS_SELECTOR, ".errorlist li").text,
             (
@@ -1819,12 +1851,30 @@ class ImageFieldWidgetsSeleniumTests(AdminWidgetSeleniumTestCase):
             ),
         )
         # "Currently" with "Clear" checkbox and "Change" still shown.
-        cover_field_row = self.selenium.find_element(By.CSS_SELECTOR, ".field-photo")
-        self.assertIn("Currently", cover_field_row.text)
-        self.assertIn("Change", cover_field_row.text)
-        # "Clear" box works.
-        self.selenium.find_element(By.ID, clear_checkbox_id).click()
-        _submit_and_wait()
-        student.refresh_from_db()
-        self.assertEqual(student.name, "Joe Doe")
-        self.assertEqual(student.photo.name, "")
+        photo_field_row = self.selenium.find_element(By.CSS_SELECTOR, ".field-photo")
+        self.assertIn("Currently", photo_field_row.text)
+        self.assertIn("Change", photo_field_row.text)
+
+    def test_clearablefileinput_widget_preserve_clear_checkbox(self):
+        from selenium.webdriver.common.by import By
+
+        self._run_image_upload_path()
+        # "Clear" is not checked by default.
+        self.assertIs(
+            self.selenium.find_element(By.ID, self.clear_checkbox_id).is_selected(),
+            False,
+        )
+        # "Clear" was checked, but a validation error is raised.
+        name_input = self.selenium.find_element(By.ID, self.name_input_id)
+        name_input.clear()
+        self.selenium.find_element(By.ID, self.clear_checkbox_id).click()
+        self._submit_and_wait()
+        self.assertEqual(
+            self.selenium.find_element(By.CSS_SELECTOR, ".errorlist li").text,
+            "This field is required.",
+        )
+        # "Clear" persists checked.
+        self.assertIs(
+            self.selenium.find_element(By.ID, self.clear_checkbox_id).is_selected(),
+            True,
+        )

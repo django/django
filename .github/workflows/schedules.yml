@@ -21,7 +21,7 @@ jobs:
         branch:
           - main
     steps:
-      - uses: actions/github-script@v6
+      - uses: actions/github-script@v7
         with:
           github-token: ${{secrets.SCHEDULE_WORKFLOW_TOKEN}}
           script: |
@@ -42,5 +42,5 @@ jobs:
                 ref: '${{ matrix.branch }}',
               })
             } else {
-              console.log(`No commits found since ${yesterday} on brach ${{ matrix.branch }}`)
+              console.log(`No commits found since ${yesterday} on branch ${{ matrix.branch }}`)
             }

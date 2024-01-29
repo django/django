@@ -14,13 +14,14 @@ cache keys to prevent delivery of wrong content.
 An example: i18n middleware would need to distinguish caches by the
 "Accept-language" header.
 """
+
 import time
 from collections import defaultdict
+from hashlib import md5
 
 from django.conf import settings
 from django.core.cache import caches
 from django.http import HttpResponse, HttpResponseNotModified
-from django.utils.crypto import md5
 from django.utils.http import http_date, parse_etags, parse_http_date_safe, quote_etag
 from django.utils.log import log_response
 from django.utils.regex_helper import _lazy_re_compile
@@ -78,7 +79,7 @@ def patch_cache_control(response, **kwargs):
     elif "public" in cc and "private" in kwargs:
         del cc["public"]
 
-    for (k, v) in kwargs.items():
+    for k, v in kwargs.items():
         directive = k.replace("_", "-")
         if directive == "no-cache":
             # no-cache supports multiple field names.

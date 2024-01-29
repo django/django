@@ -8,8 +8,9 @@ from . import FormFieldAssertionsMixin
 class EmailFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
     def test_emailfield_1(self):
         f = EmailField()
+        self.assertEqual(f.max_length, 320)
         self.assertWidgetRendersTo(
-            f, '<input type="email" name="f" id="id_f" required>'
+            f, '<input type="email" name="f" id="id_f" maxlength="320" required>'
         )
         with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
             f.clean("")
@@ -70,6 +71,6 @@ class EmailFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         self.assertIsNone(f.clean(None))
 
     def test_emailfield_unable_to_set_strip_kwarg(self):
-        msg = "__init__() got multiple values for keyword argument 'strip'"
+        msg = "got multiple values for keyword argument 'strip'"
         with self.assertRaisesMessage(TypeError, msg):
             EmailField(strip=False)

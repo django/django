@@ -5,6 +5,7 @@ Factored out from django.db.models.query to avoid making the main module very
 large and/or so that they can be used by other modules without getting into
 circular import difficulties.
 """
+
 import functools
 import inspect
 import logging
@@ -14,6 +15,8 @@ from django.core.exceptions import FieldError
 from django.db import DEFAULT_DB_ALIAS, DatabaseError, connections
 from django.db.models.constants import LOOKUP_SEP
 from django.utils import tree
+from django.utils.functional import cached_property
+from django.utils.hashable import make_hashable
 
 logger = logging.getLogger("django.db.models")
 
@@ -151,6 +154,27 @@ class Q(tree.Node):
             kwargs["_negated"] = True
         return path, args, kwargs
 
+    @cached_property
+    def identity(self):
+        path, args, kwargs = self.deconstruct()
+        identity = [path, *kwargs.items()]
+        for child in args:
+            if isinstance(child, tuple):
+                arg, value = child
+                value = make_hashable(value)
+                identity.append((arg, value))
+            else:
+                identity.append(child)
+        return tuple(identity)
+
+    def __eq__(self, other):
+        if not isinstance(other, Q):
+            return NotImplemented
+        return other.identity == self.identity
+
+    def __hash__(self):
+        return hash(self.identity)
+
 
 class DeferredAttribute:
     """
@@ -175,6 +199,10 @@ class DeferredAttribute:
             # might be able to reuse the already loaded value. Refs #18343.
             val = self._check_parent_chain(instance)
             if val is None:
+                if instance.pk is None and self.field.generated:
+                    raise AttributeError(
+                        "Cannot read a generated field from an unsaved model."
+                    )
                 instance.refresh_from_db(fields=[field_name])
             else:
                 data[field_name] = val
@@ -213,7 +241,7 @@ class RegisterLookupMixin:
     def _get_lookup(self, lookup_name):
         return self.get_lookups().get(lookup_name, None)
 
-    @functools.lru_cache(maxsize=None)
+    @functools.cache
     def get_class_lookups(cls):
         class_lookups = [
             parent.__dict__.get("class_lookups", {}) for parent in inspect.getmro(cls)
@@ -403,8 +431,11 @@ class FilteredRelation:
         self.alias = None
         if not isinstance(condition, Q):
             raise ValueError("condition argument must be a Q() instance.")
+        # .condition and .resolved_condition have to be stored independently
+        # as the former must remain unchanged for Join.__eq__ to remain stable
+        # and reusable even once their .filtered_relation are resolved.
         self.condition = condition
-        self.path = []
+        self.resolved_condition = None
 
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
@@ -418,18 +449,26 @@ class FilteredRelation:
     def clone(self):
         clone = FilteredRelation(self.relation_name, condition=self.condition)
         clone.alias = self.alias
-        clone.path = self.path[:]
+        if (resolved_condition := self.resolved_condition) is not None:
+            clone.resolved_condition = resolved_condition.clone()
         return clone
 
-    def resolve_expression(self, *args, **kwargs):
-        """
-        QuerySet.annotate() only accepts expression-like arguments
-        (with a resolve_expression() method).
-        """
-        raise NotImplementedError("FilteredRelation.resolve_expression() is unused.")
+    def relabeled_clone(self, change_map):
+        clone = self.clone()
+        if resolved_condition := clone.resolved_condition:
+            clone.resolved_condition = resolved_condition.relabeled_clone(change_map)
+        return clone
+
+    def resolve_expression(self, query, reuse, *args, **kwargs):
+        clone = self.clone()
+        clone.resolved_condition = query.build_filter(
+            self.condition,
+            can_reuse=reuse,
+            allow_joins=True,
+            split_subq=False,
+            update_join_types=False,
+        )[0]
+        return clone
 
     def as_sql(self, compiler, connection):
-        # Resolve the condition in Join.filtered_relation.
-        query = compiler.query
-        where = query.build_filtered_relation_q(self.condition, reuse=set(self.path))
-        return compiler.compile(where)
+        return compiler.compile(self.resolved_condition)

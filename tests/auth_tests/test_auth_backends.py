@@ -6,6 +6,7 @@ from django.contrib.auth import (
     BACKEND_SESSION_KEY,
     SESSION_KEY,
     _clean_credentials,
+    aauthenticate,
     authenticate,
     get_user,
     signals,
@@ -93,19 +94,18 @@ class BaseModelBackendTest:
 
     backend = "django.contrib.auth.backends.ModelBackend"
 
-    def setUp(self):
-        self.patched_settings = modify_settings(
-            AUTHENTICATION_BACKENDS={"append": self.backend},
+    @classmethod
+    def setUpClass(cls):
+        cls.enterClassContext(
+            modify_settings(AUTHENTICATION_BACKENDS={"append": cls.backend})
         )
-        self.patched_settings.enable()
-        self.create_users()
+        super().setUpClass()
 
-    def tearDown(self):
-        self.patched_settings.disable()
-        # The custom_perms test messes with ContentTypes, which will
-        # be cached; flush the cache to ensure there are no side effects
-        # Refs #14975, #14925
-        ContentType.objects.clear_cache()
+    def setUp(self):
+        # The custom_perms test messes with ContentTypes, which will be cached.
+        # Flush the cache to ensure there are no side effects.
+        self.addCleanup(ContentType.objects.clear_cache)
+        self.create_users()
 
     def test_has_perm(self):
         user = self.UserModel._default_manager.get(pk=self.user.pk)
@@ -614,9 +614,9 @@ class PermissionDeniedBackendTest(TestCase):
     def setUp(self):
         self.user_login_failed = []
         signals.user_login_failed.connect(self.user_login_failed_listener)
-
-    def tearDown(self):
-        signals.user_login_failed.disconnect(self.user_login_failed_listener)
+        self.addCleanup(
+            signals.user_login_failed.disconnect, self.user_login_failed_listener
+        )
 
     def user_login_failed_listener(self, sender, credentials, **kwargs):
         self.user_login_failed.append(credentials)
@@ -750,6 +750,28 @@ class AuthenticateTests(TestCase):
     def test_authenticate_sensitive_variables(self):
         try:
             authenticate(username="testusername", password=self.sensitive_password)
+        except TypeError:
+            exc_info = sys.exc_info()
+        rf = RequestFactory()
+        response = technical_500_response(rf.get("/"), *exc_info)
+        self.assertNotContains(response, self.sensitive_password, status_code=500)
+        self.assertContains(response, "TypeErrorBackend", status_code=500)
+        self.assertContains(
+            response,
+            '<tr><td>credentials</td><td class="code">'
+            "<pre>&#39;********************&#39;</pre></td></tr>",
+            html=True,
+            status_code=500,
+        )
+
+    @override_settings(
+        AUTHENTICATION_BACKENDS=["auth_tests.test_auth_backends.TypeErrorBackend"]
+    )
+    async def test_aauthenticate_sensitive_variables(self):
+        try:
+            await aauthenticate(
+                username="testusername", password=self.sensitive_password
+            )
         except TypeError:
             exc_info = sys.exc_info()
         rf = RequestFactory()

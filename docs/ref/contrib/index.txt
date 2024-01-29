@@ -10,7 +10,7 @@ This code lives in :source:`django/contrib` in the Django distribution. This doc
 gives a rundown of the packages in ``contrib``, along with any dependencies
 those packages have.
 
-.. admonition:: Note
+.. admonition:: Including ``contrib`` packages in ``INSTALLED_APPS``
 
     For most of these add-ons -- specifically, the add-ons that include either
     models or template tags -- you'll need to add the package name (e.g.,

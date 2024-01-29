@@ -7,6 +7,7 @@
 # ausaki <www.ljm969087551@qq.com>, 2017
 # jamin M <lxxmbyx@163.com>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Kaiqi Zhu, 2023
 # Kevin Sze <leiarix@gmail.com>, 2012
 # Lele Long <schemacs@gmail.com>, 2011,2015
 # Liping Wang <lynn.config@gmail.com>, 2016-2017
@@ -16,14 +17,15 @@
 # hizyn <zhangyanan5552@gmail.com>, 2016
 # ced773123cfad7b4e8b79ca80f736af9, 2011
 # Kevin Sze <leiarix@gmail.com>, 2012
+# 高乐喆 <gaolezhe@outlook.com>, 2023
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-11-22 03:12+0000\n"
-"Last-Translator: lanbla <lanlinwen@buaa.edu.cn>\n"
-"Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
+"POT-Creation-Date: 2023-03-17 03:19-0500\n"
+"PO-Revision-Date: 2023-12-04 08:09+0000\n"
+"Last-Translator: Kaiqi Zhu, 2023\n"
+"Language-Team: Chinese (China) (http://app.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -82,8 +84,8 @@ msgid ""
 "Raw passwords are not stored, so there is no way to see this user’s "
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"密码原文未存储在系统中，因此无法看到该用户的密码。然而你可以通过<a href="
-"\"{}\">这个表单</a>来修改密码。"
+"密码原文未存储在系统中，因此无法看到该用户的密码。然而你可以通过<a "
+"href=\"{}\">这个表单</a>来修改密码。"
 
 #, python-format
 msgid ""
@@ -268,10 +270,9 @@ msgid "Password reset on %(site_name)s"
 msgstr "重置 %(site_name)s 的密码"
 
 msgid ""
-"Enter a valid username. This value may contain only English letters, "
-"numbers, and @/./+/-/_ characters."
-msgstr ""
-"请输入合法的用户名。只能包含英文字母、数字、特殊字符“@”、“.”、“-”和“_”。"
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
+msgstr "请输入合法的用户名。只能包含小写和大写字母、数字和@/./+/-/_符号。"
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "

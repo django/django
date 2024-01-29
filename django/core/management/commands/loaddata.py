@@ -207,7 +207,7 @@ class Command(BaseCommand):
             self.models.add(obj.object.__class__)
             try:
                 obj.save(using=self.using)
-            # psycopg2 raises ValueError if data contains NUL chars.
+            # psycopg raises ValueError if data contains NUL chars.
             except (DatabaseError, IntegrityError, ValueError) as e:
                 e.args = (
                     "Could not load %(object_label)s(pk=%(pk)s): %(error_msg)s"
@@ -311,7 +311,7 @@ class Command(BaseCommand):
                 fixture_files_in_dir.append((candidate, fixture_dir, fixture_name))
         return fixture_files_in_dir
 
-    @functools.lru_cache(maxsize=None)
+    @functools.cache
     def find_fixtures(self, fixture_label):
         """Find fixture files for a given label."""
         if fixture_label == READ_STDIN:

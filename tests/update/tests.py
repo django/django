@@ -249,6 +249,13 @@ class AdvancedTests(TestCase):
         Bar.objects.annotate(abs_id=Abs("m2m_foo")).order_by("abs_id").update(x=3)
         self.assertEqual(Bar.objects.get().x, 3)
 
+    def test_update_ordered_by_m2m_annotation_desc(self):
+        foo = Foo.objects.create(target="test")
+        Bar.objects.create(foo=foo)
+
+        Bar.objects.annotate(abs_id=Abs("m2m_foo")).order_by("-abs_id").update(x=4)
+        self.assertEqual(Bar.objects.get().x, 4)
+
     def test_update_negated_f(self):
         DataPoint.objects.update(is_active=~F("is_active"))
         self.assertCountEqual(
@@ -305,6 +312,14 @@ class MySQLUpdateOrderByTest(TestCase):
         updated = (
             UniqueNumber.objects.annotate(number_inverse=F("number").desc())
             .order_by("number_inverse")
+            .update(number=F("number") + 1)
+        )
+        self.assertEqual(updated, 2)
+
+    def test_order_by_update_on_unique_constraint_annotation_desc(self):
+        updated = (
+            UniqueNumber.objects.annotate(number_annotation=F("number"))
+            .order_by("-number_annotation")
             .update(number=F("number") + 1)
         )
         self.assertEqual(updated, 2)

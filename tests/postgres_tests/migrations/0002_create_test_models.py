@@ -3,9 +3,6 @@ from django.db import migrations, models
 from ..fields import (
     ArrayField,
     BigIntegerRangeField,
-    CICharField,
-    CIEmailField,
-    CITextField,
     DateRangeField,
     DateTimeRangeField,
     DecimalRangeField,
@@ -18,7 +15,6 @@ from ..models import TagField
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("postgres_tests", "0001_setup_extensions"),
     ]
@@ -289,23 +285,6 @@ class Migration(migrations.Migration):
                 ("name", models.CharField(max_length=255)),
             ],
             options=None,
-            bases=None,
-        ),
-        # RemovedInDjango51Warning.
-        migrations.CreateModel(
-            name="CITestModel",
-            fields=[
-                (
-                    "name",
-                    CICharField(primary_key=True, serialize=False, max_length=255),
-                ),
-                ("email", CIEmailField()),
-                ("description", CITextField()),
-                ("array_field", ArrayField(CITextField(), null=True)),
-            ],
-            options={
-                "required_db_vendor": "postgresql",
-            },
             bases=None,
         ),
         migrations.CreateModel(

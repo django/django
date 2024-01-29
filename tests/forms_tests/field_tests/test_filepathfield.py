@@ -9,9 +9,7 @@ PATH = os.path.dirname(os.path.abspath(__file__))
 
 def fix_os_paths(x):
     if isinstance(x, str):
-        if x.startswith(PATH):
-            x = x[len(PATH) :]
-        return x.replace("\\", "/")
+        return x.removeprefix(PATH).replace("\\", "/")
     elif isinstance(x, tuple):
         return tuple(fix_os_paths(list(x)))
     elif isinstance(x, list):

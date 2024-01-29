@@ -10,7 +10,7 @@ from django.template import (
     VariableDoesNotExist,
 )
 from django.template.context import RenderContext
-from django.test import RequestFactory, SimpleTestCase
+from django.test import RequestFactory, SimpleTestCase, override_settings
 
 
 class ContextTests(SimpleTestCase):
@@ -222,6 +222,10 @@ class ContextTests(SimpleTestCase):
         self.assertEqual(c.dicts[-1]["a"], 2)
 
 
+def context_process_returning_none(request):
+    return None
+
+
 class RequestContextTests(SimpleTestCase):
     request_factory = RequestFactory()
 
@@ -276,3 +280,26 @@ class RequestContextTests(SimpleTestCase):
         context = RequestContext(request, {})
         context["foo"] = "foo"
         self.assertEqual(template.render(context), "foo")
+
+    @override_settings(
+        TEMPLATES=[
+            {
+                "BACKEND": "django.template.backends.django.DjangoTemplates",
+                "OPTIONS": {
+                    "context_processors": [
+                        "django.template.context_processors.request",
+                        "template_tests.test_context.context_process_returning_none",
+                    ],
+                },
+            }
+        ],
+    )
+    def test_template_context_processor_returning_none(self):
+        request_context = RequestContext(HttpRequest())
+        msg = (
+            "Context processor context_process_returning_none didn't return a "
+            "dictionary."
+        )
+        with self.assertRaisesMessage(TypeError, msg):
+            with request_context.bind_template(Template("")):
+                pass

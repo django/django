@@ -4,20 +4,21 @@
 # André Hagenbruch, 2011-2012
 # Florian Apolloner <florian@apolloner.eu>, 2011
 # Daniel Roschka <dunedan@phoenitydawn.de>, 2016
-# Florian Apolloner <florian@apolloner.eu>, 2018,2020-2022
+# Florian Apolloner <florian@apolloner.eu>, 2018,2020-2023
 # jnns, 2011,2013
 # Jannis Leidel <jannis@leidel.info>, 2013-2018,2020
 # jnns, 2016
+# Markus Holtermann <info@markusholtermann.eu>, 2023
 # Markus Holtermann <info@markusholtermann.eu>, 2013,2015
 # Raphael Michel <mail@raphaelmichel.de>, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:23-0500\n"
-"PO-Revision-Date: 2022-07-25 06:49+0000\n"
-"Last-Translator: Florian Apolloner <florian@apolloner.eu>\n"
-"Language-Team: German (http://www.transifex.com/django/django/language/de/)\n"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 06:49+0000\n"
+"Last-Translator: Markus Holtermann <info@markusholtermann.eu>, 2023\n"
+"Language-Team: German (http://app.transifex.com/django/django/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -56,6 +57,9 @@ msgstr "Bosnisch"
 
 msgid "Catalan"
 msgstr "Katalanisch"
+
+msgid "Central Kurdish (Sorani)"
+msgstr "Zentralkurdisch (Sorani)"
 
 msgid "Czech"
 msgstr "Tschechisch"
@@ -297,6 +301,9 @@ msgstr "Tatarisch"
 msgid "Udmurt"
 msgstr "Udmurtisch"
 
+msgid "Uyghur"
+msgstr "Uigurisch"
+
 msgid "Ukrainian"
 msgstr "Ukrainisch"
 
@@ -396,6 +403,14 @@ msgstr "Dieser Wert muss größer oder gleich %(limit_value)s sein."
 #, python-format
 msgid "Ensure this value is a multiple of step size %(limit_value)s."
 msgstr "Dieser Wert muss ein Vielfaches von %(limit_value)s sein."
+
+#, python-format
+msgid ""
+"Ensure this value is a multiple of step size %(limit_value)s, starting from "
+"%(offset)s, e.g. %(offset)s, %(valid_value1)s, %(valid_value2)s, and so on."
+msgstr ""
+"Dieser Wert muss ein Vielfaches von %(limit_value)s sein und bei %(offset)s "
+"beginnen, z.B. %(offset)s, %(valid_value1)s, %(valid_value2)s, und so weiter."
 
 #, python-format
 msgid ""
@@ -518,6 +533,9 @@ msgstr "Boolescher Wert (True oder False)"
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "Zeichenkette (bis zu %(max_length)s Zeichen)"
+
+msgid "String (unlimited)"
+msgstr "Zeichenkette (unlimitiert)"
 
 msgid "Comma-separated integers"
 msgstr "Kommaseparierte Liste von Ganzzahlen"
@@ -1207,8 +1225,8 @@ msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
 "including the “Referrer-Policy: no-referrer” header, please remove them. The "
 "CSRF protection requires the “Referer” header to do strict referer checking. "
-"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" …> for links to third-party sites."
+"If you’re concerned about privacy, use alternatives like <a "
+"rel=\"noreferrer\" …> for links to third-party sites."
 msgstr ""
 "Wenn der Tag „<meta name=\"referrer\" content=\"no-referrer\">“ oder der "
 "„Referrer-Policy: no-referrer“-Header verwendet wird, entfernen Sie sie "
@@ -1303,20 +1321,20 @@ msgid ""
 "View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
 "target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
 msgstr ""
-"<a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" target="
-"\"_blank\" rel=\"noopener\">Versionshinweise</a> für Django %(version)s "
-"anzeigen"
+"<a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">Versionshinweise</a> für Django "
+"%(version)s anzeigen"
 
 #, python-format
 msgid ""
 "You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> is in your settings file and you have not configured any "
-"URLs."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
+"configured any URLs."
 msgstr ""
 "Diese Seite ist sichtbar weil in der Settings-Datei <a href=\"https://docs."
-"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" rel="
-"\"noopener\">DEBUG = True</a> steht und die URLs noch nicht konfiguriert "
+"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG = True</a> steht und die URLs noch nicht konfiguriert "
 "sind."
 
 msgid "Django Documentation"

@@ -49,6 +49,7 @@ from django.db.models.signals import (
     pre_save,
 )
 from django.db.models.utils import AltersData, make_model_tuple
+from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.encoding import force_str
 from django.utils.hashable import make_hashable
 from django.utils.text import capfirst, get_text_list
@@ -508,7 +509,7 @@ class Model(AltersData, metaclass=ModelBase):
         for field in fields_iter:
             is_related_object = False
             # Virtual field
-            if field.attname not in kwargs and field.column is None:
+            if field.attname not in kwargs and field.column is None or field.generated:
                 continue
             if kwargs:
                 if isinstance(field.remote_field, ForeignObjectRel):
@@ -672,7 +673,7 @@ class Model(AltersData, metaclass=ModelBase):
             if f.attname not in self.__dict__
         }
 
-    def refresh_from_db(self, using=None, fields=None):
+    def refresh_from_db(self, using=None, fields=None, from_queryset=None):
         """
         Reload field values from the database.
 
@@ -691,7 +692,8 @@ class Model(AltersData, metaclass=ModelBase):
             self._prefetched_objects_cache = {}
         else:
             prefetched_objects_cache = getattr(self, "_prefetched_objects_cache", ())
-            for field in fields:
+            fields = list(fields)
+            for field in list(fields):
                 if field in prefetched_objects_cache:
                     del prefetched_objects_cache[field]
                     fields.remove(field)
@@ -703,15 +705,17 @@ class Model(AltersData, metaclass=ModelBase):
                     "are not allowed in fields." % LOOKUP_SEP
                 )
 
-        hints = {"instance": self}
-        db_instance_qs = self.__class__._base_manager.db_manager(
-            using, hints=hints
-        ).filter(pk=self.pk)
+        if from_queryset is None:
+            hints = {"instance": self}
+            from_queryset = self.__class__._base_manager.db_manager(using, hints=hints)
+        elif using is not None:
+            from_queryset = from_queryset.using(using)
+
+        db_instance_qs = from_queryset.filter(pk=self.pk)
 
         # Use provided fields, if not set then reload all non-deferred fields.
         deferred_fields = self.get_deferred_fields()
         if fields is not None:
-            fields = list(fields)
             db_instance_qs = db_instance_qs.only(*fields)
         elif deferred_fields:
             fields = [
@@ -728,9 +732,12 @@ class Model(AltersData, metaclass=ModelBase):
                 # This field wasn't refreshed - skip ahead.
                 continue
             setattr(self, field.attname, getattr(db_instance, field.attname))
-            # Clear cached foreign keys.
-            if field.is_relation and field.is_cached(self):
-                field.delete_cached_value(self)
+            # Clear or copy cached foreign keys.
+            if field.is_relation:
+                if field.is_cached(db_instance):
+                    field.set_cached_value(self, field.get_cached_value(db_instance))
+                elif field.is_cached(self):
+                    field.delete_cached_value(self)
 
         # Clear cached relations.
         for field in self._meta.related_objects:
@@ -744,8 +751,10 @@ class Model(AltersData, metaclass=ModelBase):
 
         self._state.db = db_instance._state.db
 
-    async def arefresh_from_db(self, using=None, fields=None):
-        return await sync_to_async(self.refresh_from_db)(using=using, fields=fields)
+    async def arefresh_from_db(self, using=None, fields=None, from_queryset=None):
+        return await sync_to_async(self.refresh_from_db)(
+            using=using, fields=fields, from_queryset=from_queryset
+        )
 
     def serializable_value(self, field_name):
         """
@@ -764,8 +773,17 @@ class Model(AltersData, metaclass=ModelBase):
             return getattr(self, field_name)
         return getattr(self, field.attname)
 
+    # RemovedInDjango60Warning: When the deprecation ends, replace with:
+    # def save(
+    #   self, *, force_insert=False, force_update=False, using=None, update_fields=None,
+    # ):
     def save(
-        self, force_insert=False, force_update=False, using=None, update_fields=None
+        self,
+        *args,
+        force_insert=False,
+        force_update=False,
+        using=None,
+        update_fields=None,
     ):
         """
         Save the current instance. Override this in a subclass if you want to
@@ -775,13 +793,37 @@ class Model(AltersData, metaclass=ModelBase):
         that the "save" must be an SQL insert or update (or equivalent for
         non-SQL backends), respectively. Normally, they should not be set.
         """
+        # RemovedInDjango60Warning.
+        if args:
+            warnings.warn(
+                "Passing positional arguments to save() is deprecated",
+                RemovedInDjango60Warning,
+                stacklevel=2,
+            )
+            for arg, attr in zip(
+                args, ["force_insert", "force_update", "using", "update_fields"]
+            ):
+                if arg:
+                    if attr == "force_insert":
+                        force_insert = arg
+                    elif attr == "force_update":
+                        force_update = arg
+                    elif attr == "using":
+                        using = arg
+                    else:
+                        update_fields = arg
+
         self._prepare_related_fields_for_save(operation_name="save")
 
         using = using or router.db_for_write(self.__class__, instance=self)
         if force_insert and (force_update or update_fields):
             raise ValueError("Cannot force both insert and updating in model saving.")
 
-        deferred_fields = self.get_deferred_fields()
+        deferred_non_generated_fields = {
+            f.attname
+            for f in self._meta.concrete_fields
+            if f.attname not in self.__dict__ and f.generated is False
+        }
         if update_fields is not None:
             # If update_fields is empty, skip the save. We do also check for
             # no-op saves later on for inheritance cases. This bailout is
@@ -802,12 +844,16 @@ class Model(AltersData, metaclass=ModelBase):
 
         # If saving to the same database, and this model is deferred, then
         # automatically do an "update_fields" save on the loaded fields.
-        elif not force_insert and deferred_fields and using == self._state.db:
+        elif (
+            not force_insert
+            and deferred_non_generated_fields
+            and using == self._state.db
+        ):
             field_names = set()
             for field in self._meta.concrete_fields:
                 if not field.primary_key and not hasattr(field, "through"):
                     field_names.add(field.attname)
-            loaded_fields = field_names.difference(deferred_fields)
+            loaded_fields = field_names.difference(deferred_non_generated_fields)
             if loaded_fields:
                 update_fields = frozenset(loaded_fields)
 
@@ -820,9 +866,38 @@ class Model(AltersData, metaclass=ModelBase):
 
     save.alters_data = True
 
+    # RemovedInDjango60Warning: When the deprecation ends, replace with:
+    # async def asave(
+    #   self, *, force_insert=False, force_update=False, using=None, update_fields=None,
+    # ):
     async def asave(
-        self, force_insert=False, force_update=False, using=None, update_fields=None
+        self,
+        *args,
+        force_insert=False,
+        force_update=False,
+        using=None,
+        update_fields=None,
     ):
+        # RemovedInDjango60Warning.
+        if args:
+            warnings.warn(
+                "Passing positional arguments to asave() is deprecated",
+                RemovedInDjango60Warning,
+                stacklevel=2,
+            )
+            for arg, attr in zip(
+                args, ["force_insert", "force_update", "using", "update_fields"]
+            ):
+                if arg:
+                    if attr == "force_insert":
+                        force_insert = arg
+                    elif attr == "force_update":
+                        force_update = arg
+                    elif attr == "using":
+                        using = arg
+                    else:
+                        update_fields = arg
+
         return await sync_to_async(self.save)(
             force_insert=force_insert,
             force_update=force_update,
@@ -831,6 +906,26 @@ class Model(AltersData, metaclass=ModelBase):
         )
 
     asave.alters_data = True
+
+    @classmethod
+    def _validate_force_insert(cls, force_insert):
+        if force_insert is False:
+            return ()
+        if force_insert is True:
+            return (cls,)
+        if not isinstance(force_insert, tuple):
+            raise TypeError("force_insert must be a bool or tuple.")
+        for member in force_insert:
+            if not isinstance(member, ModelBase):
+                raise TypeError(
+                    f"Invalid force_insert member. {member!r} must be a model subclass."
+                )
+            if not issubclass(cls, member):
+                raise TypeError(
+                    f"Invalid force_insert member. {member.__qualname__} must be a "
+                    f"base of {cls.__qualname__}."
+                )
+        return force_insert
 
     def save_base(
         self,
@@ -873,7 +968,11 @@ class Model(AltersData, metaclass=ModelBase):
         with context_manager:
             parent_inserted = False
             if not raw:
-                parent_inserted = self._save_parents(cls, using, update_fields)
+                # Validate force insert only when parents are inserted.
+                force_insert = self._validate_force_insert(force_insert)
+                parent_inserted = self._save_parents(
+                    cls, using, update_fields, force_insert
+                )
             updated = self._save_table(
                 raw,
                 cls,
@@ -900,10 +999,14 @@ class Model(AltersData, metaclass=ModelBase):
 
     save_base.alters_data = True
 
-    def _save_parents(self, cls, using, update_fields):
+    def _save_parents(
+        self, cls, using, update_fields, force_insert, updated_parents=None
+    ):
         """Save all the parents of cls using values from self."""
         meta = cls._meta
         inserted = False
+        if updated_parents is None:
+            updated_parents = {}
         for parent, field in meta.parents.items():
             # Make sure the link fields are synced between parent and self.
             if (
@@ -912,16 +1015,24 @@ class Model(AltersData, metaclass=ModelBase):
                 and getattr(self, field.attname) is not None
             ):
                 setattr(self, parent._meta.pk.attname, getattr(self, field.attname))
-            parent_inserted = self._save_parents(
-                cls=parent, using=using, update_fields=update_fields
-            )
-            updated = self._save_table(
-                cls=parent,
-                using=using,
-                update_fields=update_fields,
-                force_insert=parent_inserted,
-            )
-            if not updated:
+            if (parent_updated := updated_parents.get(parent)) is None:
+                parent_inserted = self._save_parents(
+                    cls=parent,
+                    using=using,
+                    update_fields=update_fields,
+                    force_insert=force_insert,
+                    updated_parents=updated_parents,
+                )
+                updated = self._save_table(
+                    cls=parent,
+                    using=using,
+                    update_fields=update_fields,
+                    force_insert=parent_inserted or issubclass(parent, force_insert),
+                )
+                if not updated:
+                    inserted = True
+                updated_parents[parent] = updated
+            elif not parent_updated:
                 inserted = True
             # Set the parent's PK value to self.
             if field:
@@ -971,8 +1082,10 @@ class Model(AltersData, metaclass=ModelBase):
             not raw
             and not force_insert
             and self._state.adding
-            and meta.pk.default
-            and meta.pk.default is not NOT_PROVIDED
+            and (
+                (meta.pk.default and meta.pk.default is not NOT_PROVIDED)
+                or (meta.pk.db_default and meta.pk.db_default is not NOT_PROVIDED)
+            )
         ):
             force_insert = True
         # If possible, try an UPDATE. If that doesn't update anything, do an INSERT.
@@ -1012,10 +1125,11 @@ class Model(AltersData, metaclass=ModelBase):
                         ),
                     )["_order__max"]
                 )
-            fields = meta.local_concrete_fields
-            if not pk_set:
-                fields = [f for f in fields if f is not meta.auto_field]
-
+            fields = [
+                f
+                for f in meta.local_concrete_fields
+                if not f.generated and (pk_set or f is not meta.auto_field)
+            ]
             returning_fields = meta.db_returning_fields
             results = self._do_insert(
                 cls._base_manager, using, fields, returning_fields, raw
@@ -1197,11 +1311,14 @@ class Model(AltersData, metaclass=ModelBase):
         if exclude is None:
             exclude = set()
         meta = meta or self._meta
-        return {
+        field_map = {
             field.name: Value(getattr(self, field.attname), field)
             for field in meta.local_concrete_fields
             if field.name not in exclude
         }
+        if "pk" not in exclude:
+            field_map["pk"] = Value(self.pk, meta.pk)
+        return field_map
 
     def prepare_database_save(self, field):
         if self.pk is None:
@@ -1444,7 +1561,10 @@ class Model(AltersData, metaclass=ModelBase):
                 try:
                     constraint.validate(model_class, self, exclude=exclude, using=using)
                 except ValidationError as e:
-                    if e.code == "unique" and len(constraint.fields) == 1:
+                    if (
+                        getattr(e, "code", None) == "unique"
+                        and len(constraint.fields) == 1
+                    ):
                         errors.setdefault(constraint.fields[0], []).append(e)
                     else:
                         errors = e.update_error_dict(errors)
@@ -1508,7 +1628,7 @@ class Model(AltersData, metaclass=ModelBase):
 
         errors = {}
         for f in self._meta.fields:
-            if f.name in exclude:
+            if f.name in exclude or f.generated:
                 continue
             # Skip validation for empty fields with blank=True. The developer
             # is responsible for making sure they have a valid value.
@@ -1550,12 +1670,12 @@ class Model(AltersData, metaclass=ModelBase):
             if not clash_errors:
                 errors.extend(cls._check_column_name_clashes())
             errors += [
-                *cls._check_index_together(),
                 *cls._check_unique_together(),
                 *cls._check_indexes(databases),
                 *cls._check_ordering(),
                 *cls._check_constraints(databases),
                 *cls._check_default_pk(),
+                *cls._check_db_table_comment(databases),
             ]
 
         return errors
@@ -1591,6 +1711,29 @@ class Model(AltersData, metaclass=ModelBase):
                 ),
             ]
         return []
+
+    @classmethod
+    def _check_db_table_comment(cls, databases):
+        if not cls._meta.db_table_comment:
+            return []
+        errors = []
+        for db in databases:
+            if not router.allow_migrate_model(db, cls):
+                continue
+            connection = connections[db]
+            if not (
+                connection.features.supports_comments
+                or "supports_comments" in cls._meta.required_db_features
+            ):
+                errors.append(
+                    checks.Warning(
+                        f"{connection.display_name} does not support comments on "
+                        f"tables (db_table_comment).",
+                        obj=cls,
+                        id="models.W046",
+                    )
+                )
+        return errors
 
     @classmethod
     def _check_swappable(cls):
@@ -1737,6 +1880,21 @@ class Model(AltersData, metaclass=ModelBase):
                 if f not in used_fields:
                     used_fields[f.name] = f
 
+        # Check that parent links in diamond-shaped MTI models don't clash.
+        for parent_link in cls._meta.parents.values():
+            if not parent_link:
+                continue
+            clash = used_fields.get(parent_link.name) or None
+            if clash:
+                errors.append(
+                    checks.Error(
+                        f"The field '{parent_link.name}' clashes with the field "
+                        f"'{clash.name}' from model '{clash.model._meta}'.",
+                        obj=cls,
+                        id="models.E006",
+                    )
+                )
+
         for f in cls._meta.local_fields:
             clash = used_fields.get(f.name) or used_fields.get(f.attname) or None
             # Note that we may detect clash between user-defined non-unique
@@ -1843,36 +2001,6 @@ class Model(AltersData, metaclass=ModelBase):
                 )
             )
         return errors
-
-    # RemovedInDjango51Warning.
-    @classmethod
-    def _check_index_together(cls):
-        """Check the value of "index_together" option."""
-        if not isinstance(cls._meta.index_together, (tuple, list)):
-            return [
-                checks.Error(
-                    "'index_together' must be a list or tuple.",
-                    obj=cls,
-                    id="models.E008",
-                )
-            ]
-
-        elif any(
-            not isinstance(fields, (tuple, list)) for fields in cls._meta.index_together
-        ):
-            return [
-                checks.Error(
-                    "All 'index_together' elements must be lists or tuples.",
-                    obj=cls,
-                    id="models.E009",
-                )
-            ]
-
-        else:
-            errors = []
-            for fields in cls._meta.index_together:
-                errors.extend(cls._check_local_fields(fields, "index_together"))
-            return errors
 
     @classmethod
     def _check_unique_together(cls):
@@ -2085,7 +2213,7 @@ class Model(AltersData, metaclass=ModelBase):
         fields = (f for f in fields if isinstance(f, str) and f != "?")
 
         # Convert "-field" to "field".
-        fields = ((f[1:] if f.startswith("-") else f) for f in fields)
+        fields = (f.removeprefix("-") for f in fields)
 
         # Separate related fields and non-related fields.
         _fields = []
@@ -2137,9 +2265,11 @@ class Model(AltersData, metaclass=ModelBase):
         opts = cls._meta
         valid_fields = set(
             chain.from_iterable(
-                (f.name, f.attname)
-                if not (f.auto_created and not f.concrete)
-                else (f.field.related_query_name(),)
+                (
+                    (f.name, f.attname)
+                    if not (f.auto_created and not f.concrete)
+                    else (f.field.related_query_name(),)
+                )
                 for f in chain(opts.fields, opts.related_objects)
             )
         )
@@ -2360,6 +2490,29 @@ class Model(AltersData, metaclass=ModelBase):
                         ),
                         obj=cls,
                         id="models.W044",
+                    )
+                )
+            if not (
+                connection.features.supports_nulls_distinct_unique_constraints
+                or (
+                    "supports_nulls_distinct_unique_constraints"
+                    in cls._meta.required_db_features
+                )
+            ) and any(
+                isinstance(constraint, UniqueConstraint)
+                and constraint.nulls_distinct is not None
+                for constraint in cls._meta.constraints
+            ):
+                errors.append(
+                    checks.Warning(
+                        "%s does not support unique constraints with "
+                        "nulls distinct." % connection.display_name,
+                        hint=(
+                            "A constraint won't be created. Silence this "
+                            "warning if you don't care about it."
+                        ),
+                        obj=cls,
+                        id="models.W047",
                     )
                 )
             fields = set(

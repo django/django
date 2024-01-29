@@ -1,9 +1,9 @@
+from collections.abc import Iterable
 from functools import wraps
 from importlib import import_module
 from inspect import getfullargspec, unwrap
 
 from django.utils.html import conditional_escape
-from django.utils.itercompat import is_iterable
 
 from .base import Node, Template, token_kwargs
 from .exceptions import TemplateSyntaxError
@@ -263,7 +263,9 @@ class InclusionNode(TagHelperNode):
                 t = self.filename
             elif isinstance(getattr(self.filename, "template", None), Template):
                 t = self.filename.template
-            elif not isinstance(self.filename, str) and is_iterable(self.filename):
+            elif not isinstance(self.filename, str) and isinstance(
+                self.filename, Iterable
+            ):
                 t = context.template.engine.select_template(self.filename)
             else:
                 t = context.template.engine.get_template(self.filename)

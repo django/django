@@ -1,5 +1,3 @@
-import warnings
-
 from django.db.models.lookups import (
     Exact,
     GreaterThan,
@@ -9,7 +7,6 @@ from django.db.models.lookups import (
     LessThan,
     LessThanOrEqual,
 )
-from django.utils.deprecation import RemovedInDjango50Warning
 
 
 class MultiColSource:
@@ -45,14 +42,7 @@ def get_normalized_value(value, lhs):
 
     if isinstance(value, Model):
         if value.pk is None:
-            # When the deprecation ends, replace with:
-            # raise ValueError(
-            #     "Model instances passed to related filters must be saved."
-            # )
-            warnings.warn(
-                "Passing unsaved model instances to related filters is deprecated.",
-                RemovedInDjango50Warning,
-            )
+            raise ValueError("Model instances passed to related filters must be saved.")
         value_list = []
         sources = lhs.output_field.path_infos[-1].target_fields
         for source in sources:

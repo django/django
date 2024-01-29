@@ -33,6 +33,7 @@ from django.db.models.functions import (
     Lower,
     Trim,
 )
+from django.db.models.sql.query import get_field_names_from_opts
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import register_lookup
 
@@ -464,6 +465,16 @@ class NonAggregateAnnotationTestCase(TestCase):
                     sum_rating=F("nope")
                 )
             )
+
+    def test_values_wrong_annotation(self):
+        expected_message = (
+            "Cannot resolve keyword 'annotation_typo' into field. Choices are: %s"
+        )
+        article_fields = ", ".join(
+            ["annotation"] + sorted(get_field_names_from_opts(Book._meta))
+        )
+        with self.assertRaisesMessage(FieldError, expected_message % article_fields):
+            Book.objects.annotate(annotation=Value(1)).values_list("annotation_typo")
 
     def test_decimal_annotation(self):
         salary = Decimal(10) ** -Employee._meta.get_field("salary").decimal_places
@@ -1015,6 +1026,14 @@ class NonAggregateAnnotationTestCase(TestCase):
                 {"name": "Prentice Hall"},
                 {"name": "Morgan Kaufmann"},
             ],
+        )
+
+    def test_annotation_exists_none_query(self):
+        self.assertIs(
+            Author.objects.annotate(exists=Exists(Company.objects.none()))
+            .get(pk=self.a1.pk)
+            .exists,
+            False,
         )
 
     def test_annotation_exists_aggregate_values_chaining(self):

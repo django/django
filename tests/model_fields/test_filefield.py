@@ -120,9 +120,12 @@ class FileFieldTests(TestCase):
                 with TemporaryUploadedFile(
                     "foo.txt", "text/plain", 1, "utf-8"
                 ) as tmp_file:
-                    Document.objects.create(myfile=tmp_file)
-                    self.assertTrue(
-                        os.path.exists(os.path.join(tmp_dir, "unused", "foo.txt"))
+                    document = Document.objects.create(myfile=tmp_file)
+                    self.assertIs(
+                        document.myfile.storage.exists(
+                            os.path.join("unused", "foo.txt")
+                        ),
+                        True,
                     )
 
     def test_pickle(self):

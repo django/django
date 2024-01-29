@@ -1,7 +1,10 @@
-from psycopg2.extras import DateRange, DateTimeTZRange, NumericRange
-
 from django import forms
 from django.core import exceptions
+from django.db.backends.postgresql.psycopg_any import (
+    DateRange,
+    DateTimeTZRange,
+    NumericRange,
+)
 from django.forms.widgets import HiddenInput, MultiWidget
 from django.utils.translation import gettext_lazy as _
 

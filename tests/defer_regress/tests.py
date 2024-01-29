@@ -1,11 +1,9 @@
 from operator import attrgetter
 
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.sessions.backends.db import SessionStore
 from django.db import models
 from django.db.models import Count
-from django.test import TestCase, ignore_warnings, override_settings
-from django.utils.deprecation import RemovedInDjango50Warning
+from django.test import TestCase
 
 from .models import (
     Base,
@@ -106,29 +104,6 @@ class DeferRegressionTest(TestCase):
             list(SimpleItem.objects.annotate(Count("feature")).only("name")), list
         )
 
-    @ignore_warnings(category=RemovedInDjango50Warning)
-    @override_settings(
-        SESSION_SERIALIZER="django.contrib.sessions.serializers.PickleSerializer"
-    )
-    def test_ticket_12163(self):
-        # Test for #12163 - Pickling error saving session with unsaved model
-        # instances.
-        SESSION_KEY = "2b1189a188b44ad18c35e1baac6ceead"
-
-        item = Item()
-        item._deferred = False
-        s = SessionStore(SESSION_KEY)
-        s.clear()
-        s["item"] = item
-        s.save(must_create=True)
-
-        s = SessionStore(SESSION_KEY)
-        s.modified = True
-        s.save()
-
-        i2 = s["item"]
-        self.assertFalse(i2._deferred)
-
     def test_ticket_16409(self):
         # Regression for #16409 - make sure defer() and only() work with annotate()
         self.assertIsInstance(
@@ -196,6 +171,16 @@ class DeferRegressionTest(TestCase):
         with self.assertNumQueries(1):
             i = Item.objects.select_related("one_to_one_item").defer(
                 "value", "one_to_one_item__name"
+            )[0]
+            self.assertEqual(i.one_to_one_item.pk, o2o.pk)
+            self.assertEqual(i.name, "first")
+        with self.assertNumQueries(1):
+            self.assertEqual(i.one_to_one_item.name, "second")
+        with self.assertNumQueries(1):
+            self.assertEqual(i.value, 42)
+        with self.assertNumQueries(1):
+            i = Item.objects.select_related("one_to_one_item").only(
+                "name", "one_to_one_item__item"
             )[0]
             self.assertEqual(i.one_to_one_item.pk, o2o.pk)
             self.assertEqual(i.name, "first")
@@ -296,6 +281,34 @@ class DeferRegressionTest(TestCase):
         with self.assertNumQueries(1):
             self.assertEqual(leaf.second_child.value, 64)
 
+    def test_defer_many_to_many_ignored(self):
+        location = Location.objects.create()
+        request = Request.objects.create(location=location)
+        with self.assertNumQueries(1):
+            self.assertEqual(Request.objects.defer("items").get(), request)
+
+    def test_only_many_to_many_ignored(self):
+        location = Location.objects.create()
+        request = Request.objects.create(location=location)
+        with self.assertNumQueries(1):
+            self.assertEqual(Request.objects.only("items").get(), request)
+
+    def test_defer_reverse_many_to_many_ignored(self):
+        location = Location.objects.create()
+        request = Request.objects.create(location=location)
+        item = Item.objects.create(value=1)
+        request.items.add(item)
+        with self.assertNumQueries(1):
+            self.assertEqual(Item.objects.defer("request").get(), item)
+
+    def test_only_reverse_many_to_many_ignored(self):
+        location = Location.objects.create()
+        request = Request.objects.create(location=location)
+        item = Item.objects.create(value=1)
+        request.items.add(item)
+        with self.assertNumQueries(1):
+            self.assertEqual(Item.objects.only("request").get(), item)
+
 
 class DeferDeletionSignalsTests(TestCase):
     senders = [Item, Proxy]
@@ -309,12 +322,13 @@ class DeferDeletionSignalsTests(TestCase):
         self.post_delete_senders = []
         for sender in self.senders:
             models.signals.pre_delete.connect(self.pre_delete_receiver, sender)
+            self.addCleanup(
+                models.signals.pre_delete.disconnect, self.pre_delete_receiver, sender
+            )
             models.signals.post_delete.connect(self.post_delete_receiver, sender)
-
-    def tearDown(self):
-        for sender in self.senders:
-            models.signals.pre_delete.disconnect(self.pre_delete_receiver, sender)
-            models.signals.post_delete.disconnect(self.post_delete_receiver, sender)
+            self.addCleanup(
+                models.signals.post_delete.disconnect, self.post_delete_receiver, sender
+            )
 
     def pre_delete_receiver(self, sender, **kwargs):
         self.pre_delete_senders.append(sender)

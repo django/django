@@ -9,11 +9,14 @@ from io import BytesIO, StringIO
 from unittest import mock
 from urllib.parse import quote
 
+from django.conf import DEFAULT_STORAGE_ALIAS
 from django.core.exceptions import SuspiciousFileOperation
 from django.core.files import temp as tempfile
+from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import SimpleUploadedFile, UploadedFile
 from django.http.multipartparser import (
     FILE,
+    MAX_TOTAL_HEADER_SIZE,
     MultiPartParser,
     MultiPartParserError,
     Parser,
@@ -25,7 +28,8 @@ from .models import FileModel
 
 UNICODE_FILENAME = "test-0123456789_中文_Orléans.jpg"
 MEDIA_ROOT = sys_tempfile.mkdtemp()
-UPLOAD_TO = os.path.join(MEDIA_ROOT, "test_upload")
+UPLOAD_FOLDER = "test_upload"
+UPLOAD_TO = os.path.join(MEDIA_ROOT, UPLOAD_FOLDER)
 
 CANDIDATE_TRAVERSAL_FILE_NAMES = [
     "/tmp/hax0rd.txt",  # Absolute path, *nix-style.
@@ -448,9 +452,10 @@ class FileUploadTests(TestCase):
 
     def test_file_content(self):
         file = tempfile.NamedTemporaryFile
-        with file(suffix=".ctype_extra") as no_content_type, file(
-            suffix=".ctype_extra"
-        ) as simple_file:
+        with (
+            file(suffix=".ctype_extra") as no_content_type,
+            file(suffix=".ctype_extra") as simple_file,
+        ):
             no_content_type.write(b"no content")
             no_content_type.seek(0)
 
@@ -479,9 +484,10 @@ class FileUploadTests(TestCase):
     def test_content_type_extra(self):
         """Uploaded files may have content type parameters available."""
         file = tempfile.NamedTemporaryFile
-        with file(suffix=".ctype_extra") as no_content_type, file(
-            suffix=".ctype_extra"
-        ) as simple_file:
+        with (
+            file(suffix=".ctype_extra") as no_content_type,
+            file(suffix=".ctype_extra") as simple_file,
+        ):
             no_content_type.write(b"something")
             no_content_type.seek(0)
 
@@ -599,6 +605,57 @@ class FileUploadTests(TestCase):
                 )
             temp_path = response.json()["temp_path"]
             self.assertIs(os.path.exists(temp_path), False)
+
+    def test_upload_large_header_fields(self):
+        payload = client.FakePayload(
+            "\r\n".join(
+                [
+                    "--" + client.BOUNDARY,
+                    'Content-Disposition: form-data; name="my_file"; '
+                    'filename="test.txt"',
+                    "Content-Type: text/plain",
+                    "X-Long-Header: %s" % ("-" * 500),
+                    "",
+                    "file contents",
+                    "--" + client.BOUNDARY + "--\r\n",
+                ]
+            ),
+        )
+        r = {
+            "CONTENT_LENGTH": len(payload),
+            "CONTENT_TYPE": client.MULTIPART_CONTENT,
+            "PATH_INFO": "/echo_content/",
+            "REQUEST_METHOD": "POST",
+            "wsgi.input": payload,
+        }
+        response = self.client.request(**r)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {"my_file": "file contents"})
+
+    def test_upload_header_fields_too_large(self):
+        payload = client.FakePayload(
+            "\r\n".join(
+                [
+                    "--" + client.BOUNDARY,
+                    'Content-Disposition: form-data; name="my_file"; '
+                    'filename="test.txt"',
+                    "Content-Type: text/plain",
+                    "X-Long-Header: %s" % ("-" * (MAX_TOTAL_HEADER_SIZE + 1)),
+                    "",
+                    "file contents",
+                    "--" + client.BOUNDARY + "--\r\n",
+                ]
+            ),
+        )
+        r = {
+            "CONTENT_LENGTH": len(payload),
+            "CONTENT_TYPE": client.MULTIPART_CONTENT,
+            "PATH_INFO": "/echo_content/",
+            "REQUEST_METHOD": "POST",
+            "wsgi.input": payload,
+        }
+        response = self.client.request(**r)
+        self.assertEqual(response.status_code, 400)
 
     def test_fileupload_getlist(self):
         file = tempfile.NamedTemporaryFile
@@ -803,6 +860,13 @@ class DirectoryCreationTests(SimpleTestCase):
     @unittest.skipIf(
         sys.platform == "win32", "Python on Windows doesn't have working os.chmod()."
     )
+    @override_settings(
+        STORAGES={
+            DEFAULT_STORAGE_ALIAS: {
+                "BACKEND": "django.core.files.storage.FileSystemStorage",
+            }
+        }
+    )
     def test_readonly_root(self):
         """Permission errors are not swallowed"""
         os.chmod(MEDIA_ROOT, 0o500)
@@ -813,9 +877,11 @@ class DirectoryCreationTests(SimpleTestCase):
             )
 
     def test_not_a_directory(self):
+        default_storage.delete(UPLOAD_TO)
         # Create a file with the upload directory name
-        open(UPLOAD_TO, "wb").close()
-        self.addCleanup(os.remove, UPLOAD_TO)
+        with SimpleUploadedFile(UPLOAD_TO, b"x") as file:
+            default_storage.save(UPLOAD_TO, file)
+        self.addCleanup(default_storage.delete, UPLOAD_TO)
         msg = "%s exists and is not a directory." % UPLOAD_TO
         with self.assertRaisesMessage(FileExistsError, msg):
             with SimpleUploadedFile("foo.txt", b"x") as file:

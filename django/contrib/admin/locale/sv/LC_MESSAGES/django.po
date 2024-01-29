@@ -1,8 +1,9 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Albin Larsson <albin.post@gmail.com>, 2022
+# Albin Larsson <albin.post@gmail.com>, 2022-2023
 # Alex Nordlund <deep.alexander@gmail.com>, 2012
+# Anders Hovmöller <boxed@killingar.net>, 2023
 # Andreas Pelme <andreas@pelme.se>, 2014
 # d7bcbd5f5cbecdc2b959899620582440, 2011
 # Cybjit <cybjit@gmail.com>, 2012
@@ -20,10 +21,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:10-0500\n"
-"PO-Revision-Date: 2022-07-25 07:05+0000\n"
-"Last-Translator: Elias Johnstone <eli87as@gmail.com>\n"
-"Language-Team: Swedish (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 07:05+0000\n"
+"Last-Translator: Albin Larsson <albin.post@gmail.com>, 2022-2023\n"
+"Language-Team: Swedish (http://app.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -191,6 +192,9 @@ msgid "Hold down “Control”, or “Command” on a Mac, to select more than o
 msgstr ""
 "Håll inne “Control”, eller “Command” på en Mac, för att välja fler än en."
 
+msgid "Select this object for an action - {}"
+msgstr ""
+
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr "Lade till {name} “{obj}”."
@@ -346,6 +350,9 @@ msgstr "Välj alla %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Rensa urval"
 
+msgid "Breadcrumbs"
+msgstr "Brödsmulor"
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "Modeller i applikationen %(name)s"
@@ -373,14 +380,16 @@ msgid "Change password"
 msgstr "Ändra lösenord"
 
 msgid "Please correct the error below."
-msgstr "Vänligen rätta nedanstående fel"
-
-msgid "Please correct the errors below."
-msgstr "Vänligen rätta till felen nedan."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Var god rätta felet nedan."
+msgstr[1] "Vad god rätta felen nedan."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Ange nytt lösenord för användare <strong>%(username)s</strong>."
+
+msgid "Skip to main content"
+msgstr "Hoppa till huvudinnehållet"
 
 msgid "Welcome,"
 msgstr "Välkommen,"
@@ -407,6 +416,12 @@ msgstr "Visa på webbplats"
 msgid "Filter"
 msgstr "Filtrera"
 
+msgid "Hide counts"
+msgstr ""
+
+msgid "Show counts"
+msgstr ""
+
 msgid "Clear all filters"
 msgstr "Rensa alla filter"
 
@@ -419,6 +434,15 @@ msgstr "Sorteringsprioritet: %(priority_number)s"
 
 msgid "Toggle sorting"
 msgstr "Ändra sorteringsordning"
+
+msgid "Toggle theme (current theme: auto)"
+msgstr "Växla tema (aktuellt tema: automatiskt)"
+
+msgid "Toggle theme (current theme: light)"
+msgstr "Växla tema (aktuellt tema: ljust)"
+
+msgid "Toggle theme (current theme: dark)"
+msgstr "Växla tema (aktuellt tema: mörkt)"
 
 msgid "Delete"
 msgstr "Radera"
@@ -506,6 +530,15 @@ msgstr "Mina händelser"
 msgid "None available"
 msgstr "Inga tillgängliga"
 
+msgid "Added:"
+msgstr ""
+
+msgid "Changed:"
+msgstr ""
+
+msgid "Deleted:"
+msgstr ""
+
 msgid "Unknown content"
 msgstr "Okänt innehåll"
 
@@ -532,6 +565,9 @@ msgstr "Har du glömt lösenordet eller användarnamnet?"
 msgid "Toggle navigation"
 msgstr "Växla navigering"
 
+msgid "Sidebar"
+msgstr "Sidopanel"
+
 msgid "Start typing to filter…"
 msgstr "Börja skriv för att filtrera..."
 
@@ -548,10 +584,9 @@ msgid "Action"
 msgstr "Händelse"
 
 msgid "entry"
-msgstr "post"
-
-msgid "entries"
-msgstr "poster"
+msgid_plural "entries"
+msgstr[0] "post"
+msgstr[1] "poster"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -712,6 +747,9 @@ msgstr "E-postadress:"
 
 msgid "Reset my password"
 msgstr "Nollställ mitt lösenord"
+
+msgid "Select all objects on this page for an action"
+msgstr ""
 
 msgid "All dates"
 msgstr "Alla datum"

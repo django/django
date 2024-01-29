@@ -1,4 +1,15 @@
+import enum
+
 from django.db import router
+
+
+class OperationCategory(str, enum.Enum):
+    ADDITION = "+"
+    REMOVAL = "-"
+    ALTERATION = "~"
+    PYTHON = "p"
+    SQL = "s"
+    MIXED = "?"
 
 
 class Operation:
@@ -32,6 +43,8 @@ class Operation:
     elidable = False
 
     serialization_expand_args = []
+
+    category = None
 
     def __new__(cls, *args, **kwargs):
         # We capture the arguments to make returning them trivial
@@ -84,6 +97,13 @@ class Operation:
         Output a brief summary of what the action does.
         """
         return "%s: %s" % (self.__class__.__name__, self._constructor_args)
+
+    def formatted_description(self):
+        """Output a description prefixed by a category symbol."""
+        description = self.describe()
+        if self.category is None:
+            return f"{OperationCategory.MIXED.value} {description}"
+        return f"{self.category.value} {description}"
 
     @property
     def migration_name_fragment(self):

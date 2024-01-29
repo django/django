@@ -18,7 +18,7 @@ The first defense against CSRF attacks is to ensure that GET requests (and other
 Requests via 'unsafe' methods, such as POST, PUT, and DELETE, can then be
 protected by the steps outlined in :ref:`using-csrf`.
 
-.. _Cross Site Request Forgeries: https://www.squarefree.com/securitytips/web-developers.html#CSRF
+.. _Cross Site Request Forgeries: https://owasp.org/www-community/attacks/csrf#overview
 
 .. _how-csrf-works:
 
@@ -82,10 +82,6 @@ The CSRF protection is based on the following things:
    Expanding the accepted referers beyond the current host or cookie domain can
    be done with the :setting:`CSRF_TRUSTED_ORIGINS` setting.
 
-.. versionchanged:: 4.1
-
-    In older versions, the CSRF cookie value was masked.
-
 This ensures that only forms that have originated from trusted domains can be
 used to POST data back.
 
@@ -115,7 +111,7 @@ vulnerability allows and much worse).
     alternatives like ``<a rel="noreferrer" ...>"`` for links to third-party
     sites.
 
-.. _BREACH: http://breachattack.com/
+.. _BREACH: https://www.breachattack.com/
 .. _Origin header: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Origin
 .. _disable the referer: https://www.w3.org/TR/referrer-policy/#referrer-policy-delivery
 
@@ -149,9 +145,14 @@ class-based views<decorating-class-based-views>`.
         from django.http import HttpResponse
         from django.views.decorators.csrf import csrf_exempt
 
+
         @csrf_exempt
         def my_view(request):
-            return HttpResponse('Hello world')
+            return HttpResponse("Hello world")
+
+    .. versionchanged:: 5.0
+
+        Support for wrapping asynchronous view functions was added.
 
 .. function:: csrf_protect(view)
 
@@ -162,11 +163,16 @@ class-based views<decorating-class-based-views>`.
         from django.shortcuts import render
         from django.views.decorators.csrf import csrf_protect
 
+
         @csrf_protect
         def my_view(request):
             c = {}
             # ...
             return render(request, "a_template.html", c)
+
+    .. versionchanged:: 5.0
+
+        Support for wrapping asynchronous view functions was added.
 
 .. function:: requires_csrf_token(view)
 
@@ -181,15 +187,24 @@ class-based views<decorating-class-based-views>`.
         from django.shortcuts import render
         from django.views.decorators.csrf import requires_csrf_token
 
+
         @requires_csrf_token
         def my_view(request):
             c = {}
             # ...
             return render(request, "a_template.html", c)
 
+    .. versionchanged:: 5.0
+
+        Support for wrapping asynchronous view functions was added.
+
 .. function:: ensure_csrf_cookie(view)
 
     This decorator forces a view to send the CSRF cookie.
+
+    .. versionchanged:: 5.0
+
+        Support for wrapping asynchronous view functions was added.
 
 Settings
 ========

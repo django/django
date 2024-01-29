@@ -1,9 +1,12 @@
 import decimal
+from unittest import mock
 
 from django.core.management.color import no_style
 from django.db import NotSupportedError, connection, transaction
 from django.db.backends.base.operations import BaseDatabaseOperations
-from django.db.models import DurationField, Value
+from django.db.models import DurationField
+from django.db.models.expressions import Col
+from django.db.models.lookups import Exact
 from django.test import (
     SimpleTestCase,
     TestCase,
@@ -12,6 +15,7 @@ from django.test import (
     skipIfDBFeature,
 )
 from django.utils import timezone
+from django.utils.deprecation import RemovedInDjango60Warning
 
 from ..models import Author, Book
 
@@ -85,16 +89,8 @@ class SimpleDatabaseOperationTests(SimpleTestCase):
     def test_adapt_timefield_value_none(self):
         self.assertIsNone(self.ops.adapt_timefield_value(None))
 
-    def test_adapt_timefield_value_expression(self):
-        value = Value(timezone.now().time())
-        self.assertEqual(self.ops.adapt_timefield_value(value), value)
-
     def test_adapt_datetimefield_value_none(self):
         self.assertIsNone(self.ops.adapt_datetimefield_value(None))
-
-    def test_adapt_datetimefield_value_expression(self):
-        value = Value(timezone.now())
-        self.assertEqual(self.ops.adapt_datetimefield_value(value), value)
 
     def test_adapt_timefield_value(self):
         msg = "Django does not support timezone-aware times."
@@ -159,6 +155,20 @@ class SimpleDatabaseOperationTests(SimpleTestCase):
         ):
             self.ops.datetime_extract_sql(None, None, None, None)
 
+    def test_prepare_join_on_clause(self):
+        author_table = Author._meta.db_table
+        author_id_field = Author._meta.get_field("id")
+        book_table = Book._meta.db_table
+        book_fk_field = Book._meta.get_field("author")
+        lhs_expr, rhs_expr = self.ops.prepare_join_on_clause(
+            author_table,
+            author_id_field,
+            book_table,
+            book_fk_field,
+        )
+        self.assertEqual(lhs_expr, Col(author_table, author_id_field))
+        self.assertEqual(rhs_expr, Col(book_table, book_fk_field))
+
 
 class DatabaseOperationTests(TestCase):
     def setUp(self):
@@ -220,3 +230,24 @@ class SqlFlushTests(TransactionTestCase):
                 self.assertEqual(author.pk, 1)
                 book = Book.objects.create(author=author)
                 self.assertEqual(book.pk, 1)
+
+
+class DeprecationTests(TestCase):
+    def test_field_cast_sql_warning(self):
+        base_ops = BaseDatabaseOperations(connection=connection)
+        msg = (
+            "DatabaseOperations.field_cast_sql() is deprecated use "
+            "DatabaseOperations.lookup_cast() instead."
+        )
+        with self.assertRaisesMessage(RemovedInDjango60Warning, msg):
+            base_ops.field_cast_sql("integer", "IntegerField")
+
+    def test_field_cast_sql_usage_warning(self):
+        compiler = Author.objects.all().query.get_compiler(connection.alias)
+        msg = (
+            "The usage of DatabaseOperations.field_cast_sql() is deprecated. Implement "
+            "DatabaseOperations.lookup_cast() instead."
+        )
+        with mock.patch.object(connection.ops.__class__, "field_cast_sql"):
+            with self.assertRaisesMessage(RemovedInDjango60Warning, msg):
+                Exact("name", "book__author__name").as_sql(compiler, connection)

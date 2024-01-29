@@ -55,7 +55,7 @@ class PaginationTests(SimpleTestCase):
         ten = nine + [10]
         eleven = ten + [11]
         tests = (
-            # Each item is two tuples:
+            # Each item is 2-tuple:
             #     First tuple is Paginator parameters - object_list, per_page,
             #         orphans, and allow_empty_first_page.
             #     Second tuple is resulting Paginator attributes - count,
@@ -127,6 +127,34 @@ class PaginationTests(SimpleTestCase):
             paginator.validate_number("x")
         with self.assertRaises(PageNotAnInteger):
             paginator.validate_number(1.2)
+
+    def test_error_messages(self):
+        error_messages = {
+            "invalid_page": "Wrong page number",
+            "min_page": "Too small",
+            "no_results": "There is nothing here",
+        }
+        paginator = Paginator([1, 2, 3], 2, error_messages=error_messages)
+        msg = "Wrong page number"
+        with self.assertRaisesMessage(PageNotAnInteger, msg):
+            paginator.validate_number(1.2)
+        msg = "Too small"
+        with self.assertRaisesMessage(EmptyPage, msg):
+            paginator.validate_number(-1)
+        msg = "There is nothing here"
+        with self.assertRaisesMessage(EmptyPage, msg):
+            paginator.validate_number(3)
+
+        error_messages = {"min_page": "Too small"}
+        paginator = Paginator([1, 2, 3], 2, error_messages=error_messages)
+        # Custom message.
+        msg = "Too small"
+        with self.assertRaisesMessage(EmptyPage, msg):
+            paginator.validate_number(-1)
+        # Default message.
+        msg = "That page contains no results"
+        with self.assertRaisesMessage(EmptyPage, msg):
+            paginator.validate_number(3)
 
     def test_float_integer_page(self):
         paginator = Paginator([1, 2, 3], 2)
@@ -205,7 +233,7 @@ class PaginationTests(SimpleTestCase):
         """
         ten = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
         tests = (
-            # Each item is three tuples:
+            # Each item is 3-tuple:
             #     First tuple is Paginator parameters - object_list, per_page,
             #         orphans, and allow_empty_first_page.
             #     Second tuple is the start and end indexes of the first page.

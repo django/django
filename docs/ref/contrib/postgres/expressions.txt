@@ -22,13 +22,15 @@ in the way that it does not act as an aggregate function and does not require
 an SQL ``GROUP BY`` clause to build the list of values.
 
 For example, if you want to annotate all related books to an author as JSON
-objects::
+objects:
+
+.. code-block:: pycon
 
     >>> from django.db.models import OuterRef
     >>> from django.db.models.functions import JSONObject
     >>> from django.contrib.postgres.expressions import ArraySubquery
-    >>> books = Book.objects.filter(author=OuterRef('pk')).values(
-    ...     json=JSONObject(title='title', pages='pages')
+    >>> books = Book.objects.filter(author=OuterRef("pk")).values(
+    ...     json=JSONObject(title="title", pages="pages")
     ... )
     >>> author = Author.objects.annotate(books=ArraySubquery(books)).first()
     >>> author.books

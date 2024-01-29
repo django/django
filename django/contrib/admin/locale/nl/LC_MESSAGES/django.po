@@ -12,15 +12,15 @@
 # Meteor0id, 2019-2020
 # 8de006b1b0894aab6aef71979dcd8bd6_5c6b207 <ff2658a8d8dbebbd9cc240b8c133a515_234097>, 2014-2015
 # Tino de Bruijn <tinodb@gmail.com>, 2011
-# Tonnes <tonnes.mb@gmail.com>, 2017,2019-2020,2022
+# Tonnes <tonnes.mb@gmail.com>, 2017,2019-2020,2022-2023
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:10-0500\n"
-"PO-Revision-Date: 2022-07-25 07:05+0000\n"
-"Last-Translator: Tonnes <tonnes.mb@gmail.com>\n"
-"Language-Team: Dutch (http://www.transifex.com/django/django/language/nl/)\n"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 07:05+0000\n"
+"Last-Translator: Tonnes <tonnes.mb@gmail.com>, 2017,2019-2020,2022-2023\n"
+"Language-Team: Dutch (http://app.transifex.com/django/django/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -188,6 +188,9 @@ msgstr ""
 "Houd ‘Control’, of ‘Command’ op een Mac, ingedrukt om meerdere items te "
 "selecteren."
 
+msgid "Select this object for an action - {}"
+msgstr "Selecteer dit object voor een actie - {}"
+
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr "De {name} ‘{obj}’ is met succes toegevoegd."
@@ -353,6 +356,9 @@ msgstr "Alle %(total_count)s %(module_name)s selecteren"
 msgid "Clear selection"
 msgstr "Selectie wissen"
 
+msgid "Breadcrumbs"
+msgstr "Broodkruimels"
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "Modellen in de %(name)s-toepassing"
@@ -380,15 +386,17 @@ msgid "Change password"
 msgstr "Wachtwoord wijzigen"
 
 msgid "Please correct the error below."
-msgstr "Corrigeer de fout hieronder."
-
-msgid "Please correct the errors below."
-msgstr "Corrigeer de fouten hieronder."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Corrigeer de onderstaande fout."
+msgstr[1] "Corrigeer de onderstaande fouten."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr ""
 "Voer een nieuw wachtwoord in voor de gebruiker <strong>%(username)s</strong>."
+
+msgid "Skip to main content"
+msgstr "Naar hoofdinhoud"
 
 msgid "Welcome,"
 msgstr "Welkom,"
@@ -415,6 +423,12 @@ msgstr "Weergeven op website"
 msgid "Filter"
 msgstr "Filter"
 
+msgid "Hide counts"
+msgstr "Aantallen verbergen"
+
+msgid "Show counts"
+msgstr "Aantallen tonen"
+
 msgid "Clear all filters"
 msgstr "Alle filters wissen"
 
@@ -427,6 +441,15 @@ msgstr "Sorteerprioriteit: %(priority_number)s"
 
 msgid "Toggle sorting"
 msgstr "Sortering aan/uit"
+
+msgid "Toggle theme (current theme: auto)"
+msgstr "Thema wisselen (huidige thema: auto)"
+
+msgid "Toggle theme (current theme: light)"
+msgstr "Thema wisselen (huidige thema: licht)"
+
+msgid "Toggle theme (current theme: dark)"
+msgstr "Thema wisselen (huidige thema: donker)"
 
 msgid "Delete"
 msgstr "Verwijderen"
@@ -514,6 +537,15 @@ msgstr "Mijn acties"
 msgid "None available"
 msgstr "Geen beschikbaar"
 
+msgid "Added:"
+msgstr "Toegevoegd:"
+
+msgid "Changed:"
+msgstr "Gewijzigd:"
+
+msgid "Deleted:"
+msgstr "Verwijderd:"
+
 msgid "Unknown content"
 msgstr "Onbekende inhoud"
 
@@ -540,6 +572,9 @@ msgstr "Wachtwoord of gebruikersnaam vergeten?"
 msgid "Toggle navigation"
 msgstr "Navigatie aan/uit"
 
+msgid "Sidebar"
+msgstr "Zijbalk"
+
 msgid "Start typing to filter…"
 msgstr "Begin met typen om te filteren…"
 
@@ -556,10 +591,9 @@ msgid "Action"
 msgstr "Actie"
 
 msgid "entry"
-msgstr "vermelding"
-
-msgid "entries"
-msgstr "vermeldingen"
+msgid_plural "entries"
+msgstr[0] "vermelding"
+msgstr[1] "vermeldingen"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -720,6 +754,9 @@ msgstr "E-mailadres:"
 
 msgid "Reset my password"
 msgstr "Mijn wachtwoord opnieuw instellen"
+
+msgid "Select all objects on this page for an action"
+msgstr "Selecteer alle objecten op deze pagina voor een actie"
 
 msgid "All dates"
 msgstr "Alle datums"

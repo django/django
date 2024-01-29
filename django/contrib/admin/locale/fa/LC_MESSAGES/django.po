@@ -3,13 +3,16 @@
 # Translators:
 # Ahmad Hosseini <ahmadly.com@gmail.com>, 2020
 # Ali Nikneshan <ali@nikneshan.com>, 2015,2020
+# ali salehi, 2023
 # Ali Vakilzade <ali.vakilzade@gmail.com>, 2015
+# Aly Ahmady <better.aly.ahmady@gmail.com>, 2022
 # Amir Ajorloo <amirajorloo@gmail.com>, 2020
 # Arash Fazeli <a.fazeli@gmail.com>, 2012
 # Farshad Asadpour, 2021
 # Jannis Leidel <jannis@leidel.info>, 2011
 # MJafar Mashhadi <raindigital2007@gmail.com>, 2018
 # Mohammad Hossein Mojtahedi <Mhm5000@gmail.com>, 2017,2019
+# Peyman Salehi <peymanslh@protonmail.com>, 2023
 # Pouya Abbassi, 2016
 # rahim agh <rahim.aghareb@gmail.com>, 2021
 # Reza Mohammadi <reza@teeleh.ir>, 2013-2014
@@ -18,10 +21,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-10-23 18:10+0000\n"
-"Last-Translator: Farshad Asadpour\n"
-"Language-Team: Persian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 07:05+0000\n"
+"Last-Translator: ali salehi, 2023\n"
+"Language-Team: Persian (http://app.transifex.com/django/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -159,7 +162,7 @@ msgstr "شئ LogEntry"
 
 #, python-brace-format
 msgid "Added {name} “{object}”."
-msgstr "اضافه شد {name} \"{object}\"."
+msgstr "{name} \"{object}\" اضافه شد."
 
 msgid "Added."
 msgstr "اضافه شد"
@@ -187,8 +190,11 @@ msgstr "هیچ"
 
 msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr ""
-"برای انتخاب بیش از یکی \"Control\"، یا \"Command\" روی Mac، را پایین نگه "
+"برای انتخاب بیش از یکی، کلید \"Control\"، یا \"Command\" روی Mac، را نگه "
 "دارید."
+
+msgid "Select this object for an action - {}"
+msgstr ""
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -282,8 +288,9 @@ msgstr "0 از %(cnt)s انتخاب شده‌اند"
 msgid "Change history: %s"
 msgstr "تاریخچهٔ تغییر: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -353,6 +360,9 @@ msgstr "انتخاب تمامی %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "لغو انتخاب‌ها"
 
+msgid "Breadcrumbs"
+msgstr ""
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "مدلها در برنامه %(name)s "
@@ -380,14 +390,16 @@ msgid "Change password"
 msgstr "تغییر گذرواژه"
 
 msgid "Please correct the error below."
-msgstr "لطفاً خطای زیر را تصحیح کنید."
-
-msgid "Please correct the errors below."
-msgstr "لطفاً خطاهای زیر را تصحیح کنید."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "برای کابر <strong>%(username)s</strong> یک گذرنامهٔ جدید وارد کنید."
+
+msgid "Skip to main content"
+msgstr "انتقال به محتوای اصلی"
 
 msgid "Welcome,"
 msgstr "خوش آمدید،"
@@ -414,6 +426,12 @@ msgstr "مشاهده در وب‌گاه"
 msgid "Filter"
 msgstr "فیلتر"
 
+msgid "Hide counts"
+msgstr ""
+
+msgid "Show counts"
+msgstr "نمایش تعداد"
+
 msgid "Clear all filters"
 msgstr "پاک کردن همه فیلترها"
 
@@ -426,6 +444,15 @@ msgstr "اولویت مرتب‌سازی: %(priority_number)s"
 
 msgid "Toggle sorting"
 msgstr "تعویض مرتب سازی"
+
+msgid "Toggle theme (current theme: auto)"
+msgstr "تغییر رنگ پوسته (حالت کنونی: خودکار)"
+
+msgid "Toggle theme (current theme: light)"
+msgstr "تغییر رنگ پوسته (حالت کنونی: روشن)"
+
+msgid "Toggle theme (current theme: dark)"
+msgstr "تغییر رنگ پوسته (حالت کنونی: تیره)"
 
 msgid "Delete"
 msgstr "حذف"
@@ -511,6 +538,15 @@ msgstr "فعالیتهای من"
 msgid "None available"
 msgstr "چیزی در دسترس نیست"
 
+msgid "Added:"
+msgstr "اضافه شده:"
+
+msgid "Changed:"
+msgstr "ویرایش شده:"
+
+msgid "Deleted:"
+msgstr "حذف شده:"
+
 msgid "Unknown content"
 msgstr "محتوا ناشناخته"
 
@@ -537,6 +573,9 @@ msgstr "گذرواژه یا نام کاربری خود را فراموش کرد�
 msgid "Toggle navigation"
 msgstr "تعویض جهت یابی"
 
+msgid "Sidebar"
+msgstr "ستون کناری"
+
 msgid "Start typing to filter…"
 msgstr "آغار به کار نوشتن برای فیلترکردن ..."
 
@@ -551,6 +590,11 @@ msgstr "کاربر"
 
 msgid "Action"
 msgstr "عمل"
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -607,6 +651,10 @@ msgstr "افزدون %(model)s دیگر"
 #, python-format
 msgid "Delete selected %(model)s"
 msgstr "حذف کردن %(model)s انتخاب شده"
+
+#, python-format
+msgid "View selected %(model)s"
+msgstr "نمایش %(model)sهای انتخاب شده"
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr ""
@@ -707,6 +755,9 @@ msgstr "آدرس ایمیل:"
 
 msgid "Reset my password"
 msgstr "ایجاد گذرواژهٔ جدید"
+
+msgid "Select all objects on this page for an action"
+msgstr ""
 
 msgid "All dates"
 msgstr "همهٔ تاریخ‌ها"

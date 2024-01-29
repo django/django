@@ -4,16 +4,16 @@
 # BouRock, 2015,2019
 # BouRock, 2014-2015
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Murat Çorlu <muratcorlu@gmail.com>, 2012
+# Murat Çorlu <muratcorlu@me.com>, 2012
 # Murat Sahin <martinamca@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-09-17 08:30+0000\n"
-"Last-Translator: BouRock\n"
-"Language-Team: Turkish (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 18:45+0000\n"
+"Last-Translator: BouRock, 2015,2019\n"
+"Language-Team: Turkish (http://app.transifex.com/django/django/language/"
 "tr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -76,9 +76,6 @@ msgstr ""
 
 msgid "Delete all Features"
 msgstr "Tüm Özellikleri Sil"
-
-msgid "WKT debugging window:"
-msgstr "WKT hata ayıklama penceresi:"
 
 msgid "Debugging window (serialized value)"
 msgstr "Hata ayıklama penceresi (serileştirilmiş değer)"

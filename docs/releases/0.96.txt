@@ -105,12 +105,12 @@ slashes one level.
 For example, this used to work::
 
     # Find text containing a single backslash
-    MyModel.objects.filter(text__contains='\\\\')
+    MyModel.objects.filter(text__contains="\\\\")
 
 The above is now incorrect, and should be rewritten as::
 
     # Find text containing a single backslash
-    MyModel.objects.filter(text__contains='\\')
+    MyModel.objects.filter(text__contains="\\")
 
 Removed ENABLE_PSYCO setting
 ----------------------------
@@ -145,8 +145,8 @@ There are three elements to this transition:
   rushing to fix your code after the fact.  Just change your
   import statements like this::
 
-      from django import forms             # 0.95-style
-      from django import oldforms as forms # 0.96-style
+      from django import forms  # 0.95-style
+      from django import oldforms as forms  # 0.96-style
 
 * The next official release of Django will move the current
   ``django.newforms`` to ``django.forms``. This will be a
@@ -173,18 +173,14 @@ natural use of URLconfs. For example, this URLconf::
 
     from django.conf.urls.defaults import *
 
-    urlpatterns = patterns('',
-        ('^myview/$', 'mysite.myapp.views.myview')
-    )
+    urlpatterns = patterns("", ("^myview/$", "mysite.myapp.views.myview"))
 
 can now be rewritten as::
 
     from django.conf.urls.defaults import *
     from mysite.myapp.views import myview
 
-    urlpatterns = patterns('',
-        ('^myview/$', myview)
-    )
+    urlpatterns = patterns("", ("^myview/$", myview))
 
 One useful application of this can be seen when using decorators; this
 change allows you to apply decorators to views *in your
@@ -197,12 +193,10 @@ easily::
     from mysite.myapp.models import MyModel
 
     info = {
-        "queryset" : MyModel.objects.all(),
+        "queryset": MyModel.objects.all(),
     }
 
-    urlpatterns = patterns('',
-        ('^myview/$', login_required(object_list), info)
-    )
+    urlpatterns = patterns("", ("^myview/$", login_required(object_list), info))
 
 Note that both syntaxes (strings and callables) are valid, and will continue to
 be valid for the foreseeable future.

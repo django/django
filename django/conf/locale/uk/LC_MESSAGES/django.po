@@ -5,7 +5,7 @@
 # Boryslav Larin <brabadu@gmail.com>, 2011,2022
 # Denis Podlesniy <haos616@gmail.com>, 2016
 # Igor Melnyk, 2014-2015,2017
-# Illia Volochii <illia.volochii@gmail.com>, 2019,2021-2022
+# Illia Volochii <illia.volochii@gmail.com>, 2019,2021-2023
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kirill Gagarski <gagarin.gtn@gmail.com>, 2014
 # Max V. Stotsky <transifex@ms.pereslavl.ru>, 2014
@@ -21,9 +21,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:23-0500\n"
-"PO-Revision-Date: 2022-07-25 06:49+0000\n"
-"Last-Translator: Boryslav Larin <brabadu@gmail.com>\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-25 06:49+0000\n"
+"Last-Translator: Illia Volochii <illia.volochii@gmail.com>, 2019,2021-2023\n"
 "Language-Team: Ukrainian (http://www.transifex.com/django/django/language/"
 "uk/)\n"
 "MIME-Version: 1.0\n"
@@ -67,6 +67,9 @@ msgstr "Боснійська"
 
 msgid "Catalan"
 msgstr "Каталонська"
+
+msgid "Central Kurdish (Sorani)"
+msgstr "Центральнокурдська (сорані)"
 
 msgid "Czech"
 msgstr "Чеська"
@@ -547,6 +550,9 @@ msgstr "Булеве значення (True або False)"
 msgid "String (up to %(max_length)s)"
 msgstr "Рядок (до %(max_length)s)"
 
+msgid "String (unlimited)"
+msgstr "Рядок (необмежений)"
+
 msgid "Comma-separated integers"
 msgstr "Цілі, розділені комою"
 
@@ -690,10 +696,10 @@ msgid "Image"
 msgstr "Зображення"
 
 msgid "A JSON object"
-msgstr ""
+msgstr "JSON-об'єкт"
 
 msgid "Value must be valid JSON."
-msgstr ""
+msgstr "Значення має бути коректним JSON."
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
@@ -796,7 +802,7 @@ msgid "Enter a valid UUID."
 msgstr "Введіть коректне значення UUID,"
 
 msgid "Enter a valid JSON."
-msgstr ""
+msgstr "Введіть коректний JSON."
 
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
@@ -1239,8 +1245,8 @@ msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
 "including the “Referrer-Policy: no-referrer” header, please remove them. The "
 "CSRF protection requires the “Referer” header to do strict referer checking. "
-"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" …> for links to third-party sites."
+"If you’re concerned about privacy, use alternatives like <a "
+"rel=\"noreferrer\" …> for links to third-party sites."
 msgstr ""
 
 msgid ""
@@ -1325,20 +1331,20 @@ msgid ""
 "View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
 "target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
 msgstr ""
-"<a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" target="
-"\"_blank\" rel=\"noopener\">Нотатки релізу</a> for Django %(version)s"
+"<a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">Нотатки релізу</a> for Django %(version)s"
 
 #, python-format
 msgid ""
 "You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> is in your settings file and you have not configured any "
-"URLs."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
+"configured any URLs."
 msgstr ""
 "Ви бачите цю сторінку тому що змінна <a href=\"https://docs.djangoproject."
-"com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG</a> встановлена на <i>True</i> у вашому файлі конфігурації і ви не "
-"налаштували жодного URL."
+"com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG</a> встановлена на <i>True</i> у вашому файлі "
+"конфігурації і ви не налаштували жодного URL."
 
 msgid "Django Documentation"
 msgstr "Документація Django"

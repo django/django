@@ -1,6 +1,7 @@
 """
 Various complex queries that have been problematic in the past.
 """
+
 import datetime
 
 from django.db import models

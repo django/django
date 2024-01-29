@@ -16,6 +16,7 @@ from django.test.utils import (
     captured_stderr,
     captured_stdout,
 )
+from django.utils.version import PY312
 
 
 @contextmanager
@@ -657,9 +658,10 @@ class DiscoverRunnerTests(SimpleTestCase):
     @mock.patch("faulthandler.enable")
     def test_faulthandler_enabled_fileno(self, mocked_enable):
         # sys.stderr that is not an actual file.
-        with mock.patch(
-            "faulthandler.is_enabled", return_value=False
-        ), captured_stderr():
+        with (
+            mock.patch("faulthandler.is_enabled", return_value=False),
+            captured_stderr(),
+        ):
             DiscoverRunner(enable_faulthandler=True)
             mocked_enable.assert_called()
 
@@ -764,6 +766,22 @@ class DiscoverRunnerTests(SimpleTestCase):
                     result = runner.run_suite(suite)
                 failures = runner.suite_result(suite, result)
                 self.assertEqual(failures, expected_failures)
+
+    @unittest.skipUnless(PY312, "unittest --durations option requires Python 3.12")
+    def test_durations(self):
+        with captured_stderr() as stderr, captured_stdout():
+            runner = DiscoverRunner(durations=10)
+            suite = runner.build_suite(["test_runner_apps.simple.tests.SimpleCase1"])
+            runner.run_suite(suite)
+        self.assertIn("Slowest test durations", stderr.getvalue())
+
+    @unittest.skipUnless(PY312, "unittest --durations option requires Python 3.12")
+    def test_durations_debug_sql(self):
+        with captured_stderr() as stderr, captured_stdout():
+            runner = DiscoverRunner(durations=10, debug_sql=True)
+            suite = runner.build_suite(["test_runner_apps.simple.SimpleCase1"])
+            runner.run_suite(suite)
+        self.assertIn("Slowest test durations", stderr.getvalue())
 
 
 class DiscoverRunnerGetDatabasesTests(SimpleTestCase):

@@ -3,6 +3,7 @@
 # Translators:
 # Albin Larsson <albin.post@gmail.com>, 2022
 # Alex Nordlund <deep.alexander@gmail.com>, 2012
+# Anders Hovmöller <boxed@killingar.net>, 2023
 # Anders Jonsson <transifex@norsjovallen.se>, 2022
 # Andreas Pelme <andreas@pelme.se>, 2014,2021
 # Elias Johnstone <eli87as@gmail.com>, 2022
@@ -22,9 +23,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:23-0500\n"
-"PO-Revision-Date: 2022-07-25 06:49+0000\n"
-"Last-Translator: Elias Johnstone <eli87as@gmail.com>\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-25 06:49+0000\n"
+"Last-Translator: Anders Hovmöller <boxed@killingar.net>, 2023\n"
 "Language-Team: Swedish (http://www.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -65,6 +66,9 @@ msgstr "Bosniska"
 
 msgid "Catalan"
 msgstr "Katalanska"
+
+msgid "Central Kurdish (Sorani)"
+msgstr "Kurdiska (Sorani)"
 
 msgid "Czech"
 msgstr "Tjeckiska"
@@ -523,6 +527,9 @@ msgstr "Boolesk (antingen True eller False)"
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "Sträng (upp till %(max_length)s)"
+
+msgid "String (unlimited)"
+msgstr "Sträng (obegränsad)"
 
 msgid "Comma-separated integers"
 msgstr "Komma-separerade heltal"
@@ -1208,8 +1215,8 @@ msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
 "including the “Referrer-Policy: no-referrer” header, please remove them. The "
 "CSRF protection requires the “Referer” header to do strict referer checking. "
-"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" …> for links to third-party sites."
+"If you’re concerned about privacy, use alternatives like <a "
+"rel=\"noreferrer\" …> for links to third-party sites."
 msgstr ""
 "Om du använder <meta name=\"referrer\" content=\"no-referrer\">-taggen eller "
 "har med ”Referrer-Policy: no-referrer”, ta bort dem. CSRF-skyddet kräver "
@@ -1307,14 +1314,14 @@ msgstr ""
 #, python-format
 msgid ""
 "You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> is in your settings file and you have not configured any "
-"URLs."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
+"configured any URLs."
 msgstr ""
 "Du ser den här sidan eftersom <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> i din settings-fil och du har inte konfigurerat några URL:"
-"er."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> i din settings-fil och du har inte "
+"konfigurerat några URL:er."
 
 msgid "Django Documentation"
 msgstr "Djangodokumentation"

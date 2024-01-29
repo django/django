@@ -43,7 +43,7 @@ input[type="submit"], button {
         justify-content: flex-start;
     }
 
-    #branding h1 {
+    #site-name {
         margin: 0 0 8px;
         line-height: 1.2;
     }
@@ -104,13 +104,13 @@ input[type="submit"], button {
     }
 
     #changelist-search label {
-        line-height: 22px;
+        line-height: 1.375rem;
     }
 
     #toolbar form #searchbar {
         flex: 1 0 auto;
         width: 0;
-        height: 22px;
+        height: 1.375rem;
         margin: 0 10px 0 6px;
     }
 
@@ -174,6 +174,11 @@ input[type="submit"], button {
         font-size: 0.875rem;
     }
 
+    /*
+    Minifiers remove the default (text) "type" attribute from "input" HTML
+    tags. Add input:not([type]) to make the CSS stylesheet work the same.
+    */
+    .form-row input:not([type]),
     .form-row input[type=text],
     .form-row input[type=password],
     .form-row input[type=email],
@@ -186,23 +191,17 @@ input[type="submit"], button {
         box-sizing: border-box;
         margin: 0;
         padding: 6px 8px;
-        min-height: 36px;
+        min-height: 2.25rem;
         font-size: 0.875rem;
     }
 
     .form-row select {
-        height: 36px;
+        height: 2.25rem;
     }
 
     .form-row select[multiple] {
         height: auto;
         min-height: 0;
-    }
-
-    fieldset .fieldBox {
-        float: none;
-        margin: 0 -10px;
-        padding: 0 10px;
     }
 
     fieldset .fieldBox + .fieldBox {
@@ -243,22 +242,6 @@ input[type="submit"], button {
         padding: 7px;
     }
 
-    /* Related widget */
-
-    .related-widget-wrapper {
-        float: none;
-    }
-
-    .related-widget-wrapper-link + .selector {
-        max-width: calc(100% - 30px);
-        margin-right: 15px;
-    }
-
-    select + .related-widget-wrapper-link,
-    .related-widget-wrapper-link + .related-widget-wrapper-link {
-        margin-left: 10px;
-    }
-
     /* Selector */
 
     .selector {
@@ -276,7 +259,7 @@ input[type="submit"], button {
     }
 
     .selector .selector-filter input {
-        width: auto;
+        width: 100%;
         min-height: 0;
         flex: 1 1;
     }
@@ -298,7 +281,6 @@ input[type="submit"], button {
         width: 26px;
         height: 52px;
         padding: 2px 0;
-        margin: auto 15px;
         border-radius: 20px;
         transform: translateY(-10px);
     }
@@ -342,7 +324,6 @@ input[type="submit"], button {
         width: 52px;
         height: 26px;
         padding: 0 2px;
-        margin: 15px auto;
         transform: none;
     }
 
@@ -388,10 +369,6 @@ input[type="submit"], button {
 
     .help-tooltip, .selector .help-icon {
         display: none;
-    }
-
-    form .form-row p.datetime {
-        width: 100%;
     }
 
     .datetime input {
@@ -442,7 +419,7 @@ input[type="submit"], button {
         padding: 15px 20px;
     }
 
-    .login #branding h1 {
+    .login #site-name {
         margin: 0;
     }
 
@@ -474,12 +451,8 @@ input[type="submit"], button {
 @media (max-width: 767px) {
     /* Layout */
 
-    #header, #content, #footer {
+    #header, #content {
         padding: 15px;
-    }
-
-    #footer:empty {
-        padding: 0;
     }
 
     div.breadcrumbs {
@@ -564,13 +537,19 @@ input[type="submit"], button {
 
     .aligned .form-row,
     .aligned .form-row > div {
-        display: flex;
-        flex-wrap: wrap;
         max-width: 100vw;
     }
 
     .aligned .form-row > div {
         width: calc(100vw - 30px);
+    }
+
+    .flex-container {
+        flex-flow: column;
+    }
+
+    .flex-container.checkbox-row {
+        flex-flow: row;
     }
 
     textarea {
@@ -592,6 +571,7 @@ input[type="submit"], button {
 
     .aligned label {
         width: 100%;
+        min-width: auto;
         padding: 0 0 10px;
     }
 
@@ -604,10 +584,6 @@ input[type="submit"], button {
     .aligned .form-row textarea {
         flex: 1 1 auto;
         max-width: 100%;
-    }
-
-    .aligned .checkbox-row {
-        align-items: center;
     }
 
     .aligned .checkbox-row input {
@@ -628,7 +604,6 @@ input[type="submit"], button {
     }
 
     .aligned p.file-upload {
-        margin-left: 0;
         font-size: 0.8125rem;
     }
 
@@ -652,7 +627,8 @@ input[type="submit"], button {
         padding: 0;
     }
 
-    form .aligned ul {
+    form .aligned ul,
+    form .aligned ul.errorlist {
         margin-left: 0;
         padding-left: 0;
     }
@@ -691,23 +667,14 @@ input[type="submit"], button {
         align-self: center;
     }
 
-    select + .related-widget-wrapper-link,
-    .related-widget-wrapper-link + .related-widget-wrapper-link {
-        margin-left: 15px;
-    }
-
     /* Selector */
 
     .selector {
         flex-direction: column;
-    }
-
-    .selector > * {
-        float: none;
+        gap: 10px 0;
     }
 
     .selector-available, .selector-chosen {
-        margin-bottom: 0;
         flex: 1 1 auto;
     }
 
@@ -717,11 +684,9 @@ input[type="submit"], button {
 
     .selector ul.selector-chooser {
         display: block;
-        float: none;
         width: 52px;
         height: 26px;
         padding: 0 2px;
-        margin: 15px auto 20px;
         transform: none;
     }
 
@@ -957,7 +922,7 @@ input[type="submit"], button {
     .calendar-shortcuts {
         padding: 10px 0;
         font-size: 0.75rem;
-        line-height: 12px;
+        line-height: 0.75rem;
     }
 
     .calendar-shortcuts a {

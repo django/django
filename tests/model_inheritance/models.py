@@ -11,6 +11,7 @@ Model inheritance exists in two varieties:
 
 Both styles are demonstrated here.
 """
+
 from django.db import models
 
 #
@@ -106,6 +107,12 @@ class ItalianRestaurant(Restaurant):
     serves_gnocchi = models.BooleanField(default=False)
 
 
+class ItalianRestaurantCommonParent(ItalianRestaurant, Place):
+    place_ptr_two = models.OneToOneField(
+        Place, on_delete=models.CASCADE, parent_link=True
+    )
+
+
 class Supplier(Place):
     customers = models.ManyToManyField(Restaurant, related_name="provider")
 
@@ -185,4 +192,24 @@ class Child(Parent):
 
 
 class GrandChild(Child):
+    pass
+
+
+class CommonAncestor(models.Model):
+    id = models.IntegerField(primary_key=True, default=1)
+
+
+class FirstParent(CommonAncestor):
+    first_ancestor = models.OneToOneField(
+        CommonAncestor, models.CASCADE, primary_key=True, parent_link=True
+    )
+
+
+class SecondParent(CommonAncestor):
+    second_ancestor = models.OneToOneField(
+        CommonAncestor, models.CASCADE, primary_key=True, parent_link=True
+    )
+
+
+class CommonChild(FirstParent, SecondParent):
     pass

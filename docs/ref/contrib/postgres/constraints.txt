@@ -12,7 +12,7 @@ PostgreSQL supports additional data integrity constraints available from the
 ``ExclusionConstraint``
 =======================
 
-.. class:: ExclusionConstraint(*, name, expressions, index_type=None, condition=None, deferrable=None, include=None, opclasses=(), violation_error_message=None)
+.. class:: ExclusionConstraint(*, name, expressions, index_type=None, condition=None, deferrable=None, include=None, violation_error_code=None, violation_error_message=None)
 
     Creates an exclusion constraint in the database. Internally, PostgreSQL
     implements exclusion constraints using indexes. The default index type is
@@ -29,11 +29,6 @@ PostgreSQL supports additional data integrity constraints available from the
 
     Exclusion constraints are checked during the :ref:`model validation
     <validating-objects>`.
-
-    .. versionchanged:: 4.1
-
-        In older versions, exclusion constraints were not checked during model
-        validation.
 
 ``name``
 --------
@@ -52,9 +47,9 @@ second element is an SQL operator represented as a string. To avoid typos, you
 may use :class:`~django.contrib.postgres.fields.RangeOperators` which maps the
 operators with strings. For example::
 
-    expressions=[
-        ('timespan', RangeOperators.ADJACENT_TO),
-        (F('room'), RangeOperators.EQUAL),
+    expressions = [
+        ("timespan", RangeOperators.ADJACENT_TO),
+        (F("room"), RangeOperators.EQUAL),
     ]
 
 .. admonition:: Restrictions on operators.
@@ -65,15 +60,11 @@ The :class:`OpClass() <django.contrib.postgres.indexes.OpClass>` expression can
 be used to specify a custom `operator class`_ for the constraint expressions.
 For example::
 
-    expressions=[
-        (OpClass('circle', name='circle_ops'), RangeOperators.OVERLAPS),
+    expressions = [
+        (OpClass("circle", name="circle_ops"), RangeOperators.OVERLAPS),
     ]
 
 creates an exclusion constraint on ``circle`` using ``circle_ops``.
-
-.. versionchanged:: 4.1
-
-    Support for the ``OpClass()`` expression was added.
 
 .. _operator class: https://www.postgresql.org/docs/current/indexes-opclass.html
 
@@ -112,9 +103,9 @@ are ``Deferrable.DEFERRED`` or ``Deferrable.IMMEDIATE``. For example::
 
 
     ExclusionConstraint(
-        name='exclude_overlapping_deferred',
+        name="exclude_overlapping_deferred",
         expressions=[
-            ('timespan', RangeOperators.OVERLAPS),
+            ("timespan", RangeOperators.OVERLAPS),
         ],
         deferrable=Deferrable.DEFERRED,
     )
@@ -142,41 +133,18 @@ used for queries that select only included fields
 ``include`` is supported for GiST indexes. PostgreSQL 14+ also supports
 ``include`` for SP-GiST indexes.
 
-.. versionchanged:: 4.1
+``violation_error_code``
+------------------------
 
-    Support for covering exclusion constraints using SP-GiST indexes on
-    PostgreSQL 14+ was added.
+.. versionadded:: 5.0
 
-``opclasses``
--------------
+.. attribute:: ExclusionConstraint.violation_error_code
 
-.. attribute:: ExclusionConstraint.opclasses
-
-The names of the `PostgreSQL operator classes
-<https://www.postgresql.org/docs/current/indexes-opclass.html>`_ to use for
-this constraint. If you require a custom operator class, you must provide one
-for each expression in the constraint.
-
-For example::
-
-    ExclusionConstraint(
-        name='exclude_overlapping_opclasses',
-        expressions=[('circle', RangeOperators.OVERLAPS)],
-        opclasses=['circle_ops'],
-    )
-
-creates an exclusion constraint on ``circle`` using ``circle_ops``.
-
-.. deprecated:: 4.1
-
-    The ``opclasses`` parameter is deprecated in favor of using
-    :class:`OpClass() <django.contrib.postgres.indexes.OpClass>` in
-    :attr:`~ExclusionConstraint.expressions`.
+The error code used when ``ValidationError`` is raised during
+:ref:`model validation <validating-objects>`. Defaults to ``None``.
 
 ``violation_error_message``
 ---------------------------
-
-.. versionadded:: 4.1
 
 The error message used when ``ValidationError`` is raised during
 :ref:`model validation <validating-objects>`. Defaults to
@@ -193,22 +161,23 @@ taking canceled reservations into account::
     from django.db import models
     from django.db.models import Q
 
+
     class Room(models.Model):
         number = models.IntegerField()
 
 
     class Reservation(models.Model):
-        room = models.ForeignKey('Room', on_delete=models.CASCADE)
+        room = models.ForeignKey("Room", on_delete=models.CASCADE)
         timespan = DateTimeRangeField()
         cancelled = models.BooleanField(default=False)
 
         class Meta:
             constraints = [
                 ExclusionConstraint(
-                    name='exclude_overlapping_reservations',
+                    name="exclude_overlapping_reservations",
                     expressions=[
-                        ('timespan', RangeOperators.OVERLAPS),
-                        ('room', RangeOperators.EQUAL),
+                        ("timespan", RangeOperators.OVERLAPS),
+                        ("room", RangeOperators.EQUAL),
                     ],
                     condition=Q(cancelled=False),
                 ),
@@ -234,12 +203,12 @@ current/rangetypes.html#RANGETYPES-INCLUSIVITY>`_. For example::
 
 
     class TsTzRange(Func):
-        function = 'TSTZRANGE'
+        function = "TSTZRANGE"
         output_field = DateTimeRangeField()
 
 
     class Reservation(models.Model):
-        room = models.ForeignKey('Room', on_delete=models.CASCADE)
+        room = models.ForeignKey("Room", on_delete=models.CASCADE)
         start = models.DateTimeField()
         end = models.DateTimeField()
         cancelled = models.BooleanField(default=False)
@@ -247,10 +216,13 @@ current/rangetypes.html#RANGETYPES-INCLUSIVITY>`_. For example::
         class Meta:
             constraints = [
                 ExclusionConstraint(
-                    name='exclude_overlapping_reservations',
+                    name="exclude_overlapping_reservations",
                     expressions=[
-                        (TsTzRange('start', 'end', RangeBoundary()), RangeOperators.OVERLAPS),
-                        ('room', RangeOperators.EQUAL),
+                        (
+                            TsTzRange("start", "end", RangeBoundary()),
+                            RangeOperators.OVERLAPS,
+                        ),
+                        ("room", RangeOperators.EQUAL),
                     ],
                     condition=Q(cancelled=False),
                 ),

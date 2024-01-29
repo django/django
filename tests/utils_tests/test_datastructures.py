@@ -1,6 +1,7 @@
 """
 Tests for stuff in django.utils.datastructures.
 """
+
 import collections.abc
 import copy
 import pickle
@@ -101,6 +102,11 @@ class MultiValueDictTests(SimpleTestCase):
         d.setlist("lastname", ["Holovaty", "Willison"])
         self.assertEqual(d.getlist("lastname"), ["Holovaty", "Willison"])
         self.assertEqual(list(d.values()), ["Simon", "Developer", [], "Willison"])
+
+        d.setlistdefault("lastname", ["Doe"])
+        self.assertEqual(d.getlist("lastname"), ["Holovaty", "Willison"])
+        d.setlistdefault("newkey", ["Doe"])
+        self.assertEqual(d.getlist("newkey"), ["Doe"])
 
     def test_appendlist(self):
         d = MultiValueDict()

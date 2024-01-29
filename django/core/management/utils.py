@@ -135,7 +135,7 @@ def normalize_path_patterns(patterns):
     for pattern in patterns:
         for dir_suffix in dir_suffixes:
             if pattern.endswith(dir_suffix):
-                norm_patterns.append(pattern[: -len(dir_suffix)])
+                norm_patterns.append(pattern.removesuffix(dir_suffix))
                 break
         else:
             norm_patterns.append(pattern)

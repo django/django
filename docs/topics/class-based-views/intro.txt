@@ -63,20 +63,22 @@ something like::
 
     from django.http import HttpResponse
 
+
     def my_view(request):
-        if request.method == 'GET':
+        if request.method == "GET":
             # <view logic>
-            return HttpResponse('result')
+            return HttpResponse("result")
 
 In a class-based view, this would become::
 
     from django.http import HttpResponse
     from django.views import View
 
+
     class MyView(View):
         def get(self, request):
             # <view logic>
-            return HttpResponse('result')
+            return HttpResponse("result")
 
 Because Django's URL resolver expects to send the request and associated
 arguments to a callable function, not a class, class-based views have an
@@ -94,7 +96,7 @@ or raises :class:`~django.http.HttpResponseNotAllowed` if not::
     from myapp.views import MyView
 
     urlpatterns = [
-        path('about/', MyView.as_view()),
+        path("about/", MyView.as_view()),
     ]
 
 
@@ -116,6 +118,7 @@ and methods in the subclass. So that if your parent class had an attribute
     from django.http import HttpResponse
     from django.views import View
 
+
     class GreetingView(View):
         greeting = "Good Day"
 
@@ -131,7 +134,7 @@ Another option is to configure class attributes as keyword arguments to the
 :meth:`~django.views.generic.base.View.as_view` call in the URLconf::
 
     urlpatterns = [
-        path('about/', GreetingView.as_view(greeting="G'day")),
+        path("about/", GreetingView.as_view(greeting="G'day")),
     ]
 
 .. note::
@@ -185,16 +188,17 @@ A basic function-based view that handles forms may look something like this::
 
     from .forms import MyForm
 
+
     def myview(request):
         if request.method == "POST":
             form = MyForm(request.POST)
             if form.is_valid():
                 # <process form cleaned data>
-                return HttpResponseRedirect('/success/')
+                return HttpResponseRedirect("/success/")
         else:
-            form = MyForm(initial={'key': 'value'})
+            form = MyForm(initial={"key": "value"})
 
-        return render(request, 'form_template.html', {'form': form})
+        return render(request, "form_template.html", {"form": form})
 
 A similar class-based view might look like::
 
@@ -204,22 +208,23 @@ A similar class-based view might look like::
 
     from .forms import MyForm
 
+
     class MyFormView(View):
         form_class = MyForm
-        initial = {'key': 'value'}
-        template_name = 'form_template.html'
+        initial = {"key": "value"}
+        template_name = "form_template.html"
 
         def get(self, request, *args, **kwargs):
             form = self.form_class(initial=self.initial)
-            return render(request, self.template_name, {'form': form})
+            return render(request, self.template_name, {"form": form})
 
         def post(self, request, *args, **kwargs):
             form = self.form_class(request.POST)
             if form.is_valid():
                 # <process form cleaned data>
-                return HttpResponseRedirect('/success/')
+                return HttpResponseRedirect("/success/")
 
-            return render(request, self.template_name, {'form': form})
+            return render(request, self.template_name, {"form": form})
 
 This is a minimal case, but you can see that you would then have the option
 of customizing this view by overriding any of the class attributes, e.g.
@@ -246,8 +251,8 @@ this is in the URLconf where you deploy your view::
     from .views import VoteView
 
     urlpatterns = [
-        path('about/', login_required(TemplateView.as_view(template_name="secret.html"))),
-        path('vote/', permission_required('polls.can_vote')(VoteView.as_view())),
+        path("about/", login_required(TemplateView.as_view(template_name="secret.html"))),
+        path("vote/", permission_required("polls.can_vote")(VoteView.as_view())),
     ]
 
 This approach applies the decorator on a per-instance basis. If you
@@ -273,8 +278,9 @@ instance method. For example::
     from django.utils.decorators import method_decorator
     from django.views.generic import TemplateView
 
+
     class ProtectedView(TemplateView):
-        template_name = 'secret.html'
+        template_name = "secret.html"
 
         @method_decorator(login_required)
         def dispatch(self, *args, **kwargs):
@@ -283,9 +289,9 @@ instance method. For example::
 Or, more succinctly, you can decorate the class instead and pass the name
 of the method to be decorated as the keyword argument ``name``::
 
-    @method_decorator(login_required, name='dispatch')
+    @method_decorator(login_required, name="dispatch")
     class ProtectedView(TemplateView):
-        template_name = 'secret.html'
+        template_name = "secret.html"
 
 If you have a set of common decorators used in several places, you can define
 a list or tuple of decorators and use this instead of invoking
@@ -293,14 +299,16 @@ a list or tuple of decorators and use this instead of invoking
 
     decorators = [never_cache, login_required]
 
-    @method_decorator(decorators, name='dispatch')
-    class ProtectedView(TemplateView):
-        template_name = 'secret.html'
 
-    @method_decorator(never_cache, name='dispatch')
-    @method_decorator(login_required, name='dispatch')
+    @method_decorator(decorators, name="dispatch")
     class ProtectedView(TemplateView):
-        template_name = 'secret.html'
+        template_name = "secret.html"
+
+
+    @method_decorator(never_cache, name="dispatch")
+    @method_decorator(login_required, name="dispatch")
+    class ProtectedView(TemplateView):
+        template_name = "secret.html"
 
 The decorators will process a request in the order they are passed to the
 decorator. In the example, ``never_cache()`` will process the request before

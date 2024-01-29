@@ -3,6 +3,7 @@ A series of tests to establish that the command-line management tools work as
 advertised - especially with regards to the handling of the
 DJANGO_SETTINGS_MODULE and default settings.py files.
 """
+
 import os
 import re
 import shutil
@@ -32,7 +33,6 @@ from django.db.migrations.recorder import MigrationRecorder
 from django.test import LiveServerTestCase, SimpleTestCase, TestCase, override_settings
 from django.test.utils import captured_stderr, captured_stdout
 from django.urls import path
-from django.utils.version import PY39
 from django.views.static import serve
 
 from . import urls
@@ -107,7 +107,7 @@ class AdminScriptTestCase(SimpleTestCase):
                 paths.append(os.path.dirname(backend_dir))
         return paths
 
-    def run_test(self, args, settings_file=None, apps=None, umask=None):
+    def run_test(self, args, settings_file=None, apps=None, umask=-1):
         base_dir = os.path.dirname(self.test_dir)
         # The base dir for Django's tests is one level up.
         tests_dir = os.path.dirname(os.path.dirname(__file__))
@@ -136,12 +136,11 @@ class AdminScriptTestCase(SimpleTestCase):
             cwd=self.test_dir,
             env=test_environ,
             text=True,
-            # subprocess.run()'s umask was added in Python 3.9.
-            **({"umask": umask} if umask and PY39 else {}),
+            umask=umask,
         )
         return p.stdout, p.stderr
 
-    def run_django_admin(self, args, settings_file=None, umask=None):
+    def run_django_admin(self, args, settings_file=None, umask=-1):
         return self.run_test(["-m", "django", *args], settings_file, umask=umask)
 
     def run_manage(self, args, settings_file=None, manage_py=None):
@@ -759,7 +758,9 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         with open(os.path.join(app_path, "apps.py"), encoding="utf8") as f:
             content = f.read()
             self.assertIn("class こんにちはConfig(AppConfig)", content)
-            self.assertIn('name = "こんにちは"' if HAS_BLACK else "name = 'こんにちは'", content)
+            self.assertIn(
+                'name = "こんにちは"' if HAS_BLACK else "name = 'こんにちは'", content
+            )
 
     def test_builtin_command(self):
         """
@@ -1587,18 +1588,21 @@ class ManageRunserver(SimpleTestCase):
         call_command(self.cmd, addrport="7000")
         self.assertServerSettings("127.0.0.1", "7000")
 
-    @mock.patch("django.core.management.commands.runserver.run")
-    @mock.patch("django.core.management.base.BaseCommand.check_migrations")
-    def test_zero_ip_addr(self, *mocked_objects):
-        call_command(
-            "runserver",
-            addrport="0:8000",
-            use_reloader=False,
-            skip_checks=True,
-            stdout=self.output,
-        )
+    def test_zero_ip_addr(self):
+        self.cmd.addr = "0"
+        self.cmd._raw_ipv6 = False
+        self.cmd.on_bind("8000")
         self.assertIn(
             "Starting development server at http://0.0.0.0:8000/",
+            self.output.getvalue(),
+        )
+
+    def test_on_bind(self):
+        self.cmd.addr = "127.0.0.1"
+        self.cmd._raw_ipv6 = False
+        self.cmd.on_bind("14437")
+        self.assertIn(
+            "Starting development server at http://127.0.0.1:14437/",
             self.output.getvalue(),
         )
 
@@ -2378,7 +2382,6 @@ class ExecuteFromCommandLine(SimpleTestCase):
 
 @override_settings(ROOT_URLCONF="admin_scripts.urls")
 class StartProject(LiveServerTestCase, AdminScriptTestCase):
-
     available_apps = [
         "admin_scripts",
         "django.contrib.auth",
@@ -2445,6 +2448,28 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
             "Python module and cannot be used as a project name. Please try "
             "another name.",
         )
+        self.assertFalse(os.path.exists(testproject_dir))
+
+    def test_command_does_not_import(self):
+        """
+        startproject doesn't import modules (and cannot be fooled by a module
+        raising ImportError).
+        """
+        bad_name = "raises_import_error"
+        args = ["startproject", bad_name]
+        testproject_dir = os.path.join(self.test_dir, bad_name)
+
+        with open(os.path.join(self.test_dir, "raises_import_error.py"), "w") as f:
+            f.write("raise ImportError")
+
+        out, err = self.run_django_admin(args)
+        self.assertOutput(
+            err,
+            "CommandError: 'raises_import_error' conflicts with the name of an "
+            "existing Python module and cannot be used as a project name. Please try "
+            "another name.",
+        )
+        self.assertNoOutput(out)
         self.assertFalse(os.path.exists(testproject_dir))
 
     def test_simple_project_different_directory(self):
@@ -2812,7 +2837,6 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         sys.platform == "win32",
         "Windows only partially supports umasks and chmod.",
     )
-    @unittest.skipUnless(PY39, "subprocess.run()'s umask was added in Python 3.9.")
     def test_honor_umask(self):
         _, err = self.run_django_admin(["startproject", "testproject"], umask=0o077)
         self.assertNoOutput(err)

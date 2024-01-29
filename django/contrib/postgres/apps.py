@@ -1,8 +1,7 @@
-from psycopg2.extras import DateRange, DateTimeRange, DateTimeTZRange, NumericRange
-
 from django.apps import AppConfig
 from django.core.signals import setting_changed
 from django.db import connections
+from django.db.backends.postgresql.psycopg_any import RANGE_TYPES
 from django.db.backends.signals import connection_created
 from django.db.migrations.writer import MigrationWriter
 from django.db.models import CharField, OrderBy, TextField
@@ -20,8 +19,6 @@ from .lookups import (
 )
 from .serializers import RangeSerializer
 from .signals import register_type_handlers
-
-RANGE_TYPES = (DateRange, DateTimeRange, DateTimeTZRange, NumericRange)
 
 
 def uninstall_if_needed(setting, value, enter, **kwargs):

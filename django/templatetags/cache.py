@@ -87,7 +87,7 @@ def do_cache(parser, token):
     if len(tokens) < 3:
         raise TemplateSyntaxError("'%r' tag requires at least 2 arguments." % tokens[0])
     if len(tokens) > 3 and tokens[-1].startswith("using="):
-        cache_name = parser.compile_filter(tokens[-1][len("using=") :])
+        cache_name = parser.compile_filter(tokens[-1].removeprefix("using="))
         tokens = tokens[:-1]
     else:
         cache_name = None

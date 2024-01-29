@@ -22,11 +22,11 @@ html[data-theme="light"],
 
     --breadcrumbs-fg: #c4dce8;
     --breadcrumbs-link-fg: var(--body-bg);
-    --breadcrumbs-bg: var(--primary);
+    --breadcrumbs-bg: #264b5d;
 
-    --link-fg: #447e9b;
+    --link-fg: #417893;
     --link-hover-color: #036;
-    --link-selected-fg: #5b80b2;
+    --link-selected-fg: var(--secondary);
 
     --hairline-color: #e8e8e8;
     --border-color: #ccc;
@@ -42,10 +42,10 @@ html[data-theme="light"],
     --selected-row: #ffc;
 
     --button-fg: #fff;
-    --button-bg: var(--primary);
-    --button-hover-bg: #609ab6;
-    --default-button-bg: var(--secondary);
-    --default-button-hover-bg: #205067;
+    --button-bg: var(--secondary);
+    --button-hover-bg: #205067;
+    --default-button-bg: #205067;
+    --default-button-hover-bg: var(--secondary);
     --close-button-bg: #747474;
     --close-button-hover-bg: #333;
     --delete-button-bg: #ba2121;
@@ -56,8 +56,6 @@ html[data-theme="light"],
     --object-tools-hover-bg: var(--close-button-hover-bg);
 
     --font-family-primary:
-        -apple-system,
-        BlinkMacSystemFont,
         "Segoe UI",
         system-ui,
         Roboto,
@@ -194,7 +192,7 @@ li ul {
 
 li, dt, dd {
     font-size: 0.8125rem;
-    line-height: 20px;
+    line-height: 1.25rem;
 }
 
 dt {
@@ -308,7 +306,7 @@ table {
 
 td, th {
     font-size: 0.8125rem;
-    line-height: 16px;
+    line-height: 1rem;
     border-bottom: 1px solid var(--hairline-color);
     vertical-align: top;
     padding: 8px;
@@ -484,8 +482,13 @@ textarea {
     vertical-align: top;
 }
 
-input[type=text], input[type=password], input[type=email], input[type=url],
-input[type=number], input[type=tel], textarea, select, .vTextField {
+/*
+Minifiers remove the default (text) "type" attribute from "input" HTML tags.
+Add input:not([type]) to make the CSS stylesheet work the same.
+*/
+input:not([type]), input[type=text], input[type=password], input[type=email],
+input[type=url], input[type=number], input[type=tel], textarea, select,
+.vTextField {
     border: 1px solid var(--border-color);
     border-radius: 4px;
     padding: 5px 6px;
@@ -494,14 +497,18 @@ input[type=number], input[type=tel], textarea, select, .vTextField {
     background-color: var(--body-bg);
 }
 
-input[type=text]:focus, input[type=password]:focus, input[type=email]:focus,
-input[type=url]:focus, input[type=number]:focus, input[type=tel]:focus,
-textarea:focus, select:focus, .vTextField:focus {
+/*
+Minifiers remove the default (text) "type" attribute from "input" HTML tags.
+Add input:not([type]) to make the CSS stylesheet work the same.
+*/
+input:not([type]):focus, input[type=text]:focus, input[type=password]:focus,
+input[type=email]:focus, input[type=url]:focus, input[type=number]:focus,
+input[type=tel]:focus, textarea:focus, select:focus, .vTextField:focus {
     border-color: var(--body-quiet-color);
 }
 
 select {
-    height: 30px;
+    height: 1.875rem;
 }
 
 select[multiple] {
@@ -586,7 +593,7 @@ input[type=button][disabled].default {
     font-weight: 400;
     font-size: 0.8125rem;
     text-align: left;
-    background: var(--primary);
+    background: var(--header-bg);
     color: var(--header-link-color);
 }
 
@@ -722,6 +729,11 @@ div.breadcrumbs a:focus, div.breadcrumbs a:hover {
     background: url(../img/icon-viewlink.svg) 0 1px no-repeat;
 }
 
+.hidelink {
+    padding-left: 16px;
+    background: url(../img/icon-hidelink.svg) 0 1px no-repeat;
+}
+
 .addlink {
     padding-left: 16px;
     background: url(../img/icon-addlink.svg) 0 1px no-repeat;
@@ -761,7 +773,7 @@ a.deletelink:focus, a.deletelink:hover {
     display: block;
     float: left;
     margin-left: 5px;
-    height: 16px;
+    height: 1rem;
 }
 
 .object-tools a {
@@ -831,10 +843,6 @@ a.deletelink:focus, a.deletelink:hover {
     height: 100%;
 }
 
-#container > div {
-    flex-shrink: 0;
-}
-
 #container > .main {
     display: flex;
     flex: 1 0 auto;
@@ -879,9 +887,10 @@ a.deletelink:focus, a.deletelink:hover {
     margin-right: -300px;
 }
 
-#footer {
-    clear: both;
-    padding: 10px;
+@media (forced-colors: active) {
+  #content-related {
+      border: 1px solid;
+  }
 }
 
 /* COLUMN TYPES */
@@ -919,7 +928,6 @@ a.deletelink:focus, a.deletelink:hover {
     padding: 10px 40px;
     background: var(--header-bg);
     color: var(--header-color);
-    overflow: hidden;
 }
 
 #header a:link, #header a:visited, #logout-form button {
@@ -930,11 +938,17 @@ a.deletelink:focus, a.deletelink:hover {
     text-decoration: underline;
 }
 
+@media (forced-colors: active) {
+  #header {
+      border-bottom: 1px solid;
+  }
+}
+
 #branding {
     display: flex;
 }
 
-#branding h1 {
+#site-name {
     padding: 0;
     margin: 0;
     margin-inline-end: 20px;
@@ -943,7 +957,7 @@ a.deletelink:focus, a.deletelink:hover {
     color: var(--header-branding-color);
 }
 
-#branding h1 a:link, #branding h1 a:visited {
+#site-name a:link, #site-name a:visited {
     color: var(--accent);
 }
 
@@ -1059,8 +1073,8 @@ a.deletelink:focus, a.deletelink:hover {
 .delete-confirmation form .cancel-link {
     display: inline-block;
     vertical-align: middle;
-    height: 15px;
-    line-height: 15px;
+    height: 0.9375rem;
+    line-height: 0.9375rem;
     border-radius: 4px;
     padding: 10px 15px;
     color: var(--button-fg);
@@ -1090,6 +1104,9 @@ a.deletelink:focus, a.deletelink:hover {
 /* PAGINATOR */
 
 .paginator {
+    display: flex;
+    align-items: center;
+    gap: 4px;
     font-size: 0.8125rem;
     padding-top: 10px;
     padding-bottom: 10px;
@@ -1133,6 +1150,23 @@ a.deletelink:focus, a.deletelink:hover {
     background: var(--link-hover-color);
 }
 
+.paginator input {
+    margin-left: auto;
+}
+
 .base-svgs {
     display: none;
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+    color: var(--body-fg);
+    background-color: var(--body-bg);
 }

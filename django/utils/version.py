@@ -6,6 +6,9 @@ import sys
 
 from django.utils.regex_helper import _lazy_re_compile
 
+# Private, stable API for detecting the Python implementation.
+PYPY = sys.implementation.name == "pypy"
+
 # Private, stable API for detecting the Python version. PYXY means "Python X.Y
 # or later". So that third-party apps can use these values, each constant
 # should remain as long as the oldest supported Django version supports that
@@ -16,6 +19,7 @@ PY38 = sys.version_info >= (3, 8)
 PY39 = sys.version_info >= (3, 9)
 PY310 = sys.version_info >= (3, 10)
 PY311 = sys.version_info >= (3, 11)
+PY312 = sys.version_info >= (3, 12)
 
 
 def get_version(version=None):

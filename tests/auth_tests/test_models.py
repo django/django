@@ -1,5 +1,7 @@
 from unittest import mock
 
+from asgiref.sync import sync_to_async
+
 from django.conf.global_settings import PASSWORD_HASHERS
 from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
@@ -18,8 +20,6 @@ from django.db import connection, migrations
 from django.db.migrations.state import ModelState, ProjectState
 from django.db.models.signals import post_save
 from django.test import SimpleTestCase, TestCase, TransactionTestCase, override_settings
-from django.test.utils import ignore_warnings
-from django.utils.deprecation import RemovedInDjango51Warning
 
 from .models import CustomEmailField, IntegerUsernameUser
 
@@ -166,19 +166,6 @@ class UserManagerTestCase(TransactionTestCase):
                 is_staff=False,
             )
 
-    @ignore_warnings(category=RemovedInDjango51Warning)
-    def test_make_random_password(self):
-        allowed_chars = "abcdefg"
-        password = UserManager().make_random_password(5, allowed_chars)
-        self.assertEqual(len(password), 5)
-        for char in password:
-            self.assertIn(char, allowed_chars)
-
-    def test_make_random_password_warning(self):
-        msg = "BaseUserManager.make_random_password() is deprecated."
-        with self.assertWarnsMessage(RemovedInDjango51Warning, msg):
-            UserManager().make_random_password()
-
     def test_runpython_manager_methods(self):
         def forwards(apps, schema_editor):
             UserModel = apps.get_model("auth", "User")
@@ -307,6 +294,29 @@ class AbstractUserTestCase(TestCase):
                 "django.contrib.auth.password_validation.password_changed"
             ) as pw_changed:
                 user.check_password("foo")
+                self.assertEqual(pw_changed.call_count, 0)
+            self.assertNotEqual(initial_password, user.password)
+        finally:
+            hasher.iterations = old_iterations
+
+    @override_settings(PASSWORD_HASHERS=PASSWORD_HASHERS)
+    async def test_acheck_password_upgrade(self):
+        user = await sync_to_async(User.objects.create_user)(
+            username="user", password="foo"
+        )
+        initial_password = user.password
+        self.assertIs(await user.acheck_password("foo"), True)
+        hasher = get_hasher("default")
+        self.assertEqual("pbkdf2_sha256", hasher.algorithm)
+
+        old_iterations = hasher.iterations
+        try:
+            # Upgrade the password iterations.
+            hasher.iterations = old_iterations + 1
+            with mock.patch(
+                "django.contrib.auth.password_validation.password_changed"
+            ) as pw_changed:
+                self.assertIs(await user.acheck_password("foo"), True)
                 self.assertEqual(pw_changed.call_count, 0)
             self.assertNotEqual(initial_password, user.password)
         finally:
@@ -509,9 +519,7 @@ class TestCreateSuperUserSignals(TestCase):
     def setUp(self):
         self.signals_count = 0
         post_save.connect(self.post_save_listener, sender=User)
-
-    def tearDown(self):
-        post_save.disconnect(self.post_save_listener, sender=User)
+        self.addCleanup(post_save.disconnect, self.post_save_listener, sender=User)
 
     def test_create_user(self):
         User.objects.create_user("JohnDoe")
@@ -587,5 +595,5 @@ class PermissionTests(TestCase):
     def test_str(self):
         p = Permission.objects.get(codename="view_customemailfield")
         self.assertEqual(
-            str(p), "auth_tests | custom email field | Can view custom email field"
+            str(p), "Auth_Tests | custom email field | Can view custom email field"
         )

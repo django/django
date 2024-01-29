@@ -67,7 +67,6 @@ post_migrate_receiver = OneTimeReceiver(signals.post_migrate)
 
 
 class MigrateSignalTests(TransactionTestCase):
-
     available_apps = ["migrate_signals"]
 
     def test_call_time(self):

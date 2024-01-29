@@ -352,9 +352,9 @@ class HttpResponseTests(SimpleTestCase):
         h.headers["Content-Disposition"] = 'attachment; filename="%s"' % f
         # This one is triggering https://bugs.python.org/issue20747, that is Python
         # will itself insert a newline in the header
-        h.headers[
-            "Content-Disposition"
-        ] = 'attachment; filename="EdelRot_Blu\u0308te (3)-0.JPG"'
+        h.headers["Content-Disposition"] = (
+            'attachment; filename="EdelRot_Blu\u0308te (3)-0.JPG"'
+        )
 
     def test_newlines_in_headers(self):
         # Bug #10188: Do not allow newlines in headers (CR or LF)
@@ -720,15 +720,49 @@ class StreamingHttpResponseTests(SimpleTestCase):
             '<StreamingHttpResponse status_code=200, "text/html; charset=utf-8">',
         )
 
+    async def test_async_streaming_response(self):
+        async def async_iter():
+            yield b"hello"
+            yield b"world"
+
+        r = StreamingHttpResponse(async_iter())
+
+        chunks = []
+        async for chunk in r:
+            chunks.append(chunk)
+        self.assertEqual(chunks, [b"hello", b"world"])
+
+    def test_async_streaming_response_warning(self):
+        async def async_iter():
+            yield b"hello"
+            yield b"world"
+
+        r = StreamingHttpResponse(async_iter())
+
+        msg = (
+            "StreamingHttpResponse must consume asynchronous iterators in order to "
+            "serve them synchronously. Use a synchronous iterator instead."
+        )
+        with self.assertWarnsMessage(Warning, msg):
+            self.assertEqual(list(r), [b"hello", b"world"])
+
+    async def test_sync_streaming_response_warning(self):
+        r = StreamingHttpResponse(iter(["hello", "world"]))
+
+        msg = (
+            "StreamingHttpResponse must consume synchronous iterators in order to "
+            "serve them asynchronously. Use an asynchronous iterator instead."
+        )
+        with self.assertWarnsMessage(Warning, msg):
+            self.assertEqual(b"hello", await anext(aiter(r)))
+
 
 class FileCloseTests(SimpleTestCase):
     def setUp(self):
         # Disable the request_finished signal during this test
         # to avoid interfering with the database connection.
         request_finished.disconnect(close_old_connections)
-
-    def tearDown(self):
-        request_finished.connect(close_old_connections)
+        self.addCleanup(request_finished.connect, close_old_connections)
 
     def test_response(self):
         filename = os.path.join(os.path.dirname(__file__), "abc.txt")

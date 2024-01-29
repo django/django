@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="{% block stylesheet %}{% static "admin/css/base.css" %}{% endblock %}">
 {% block dark-mode-vars %}
   <link rel="stylesheet" href="{% static "admin/css/dark_mode.css" %}">
-  <script src="{% static "admin/js/theme.js" %}" defer></script>
+  <script src="{% static "admin/js/theme.js" %}"></script>
 {% endblock %}
 {% if not is_popup and is_nav_sidebar_enabled %}
   <link rel="stylesheet" href="{% static "admin/css/nav_sidebar.css" %}">
@@ -16,7 +16,7 @@
 {% if LANGUAGE_BIDI %}<link rel="stylesheet" href="{% block stylesheet_rtl %}{% static "admin/css/rtl.css" %}{% endblock %}">{% endif %}
 {% block extrahead %}{% endblock %}
 {% block responsive %}
-    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{% static "admin/css/responsive.css" %}">
     {% if LANGUAGE_BIDI %}<link rel="stylesheet" href="{% static "admin/css/responsive_rtl.css" %}">{% endif %}
 {% endblock %}
@@ -32,7 +32,7 @@
     {% if not is_popup %}
     <!-- Header -->
     {% block header %}
-    <div id="header">
+      <header id="header">
         <div id="branding">
         {% block branding %}{% endblock %}
         </div>
@@ -66,7 +66,7 @@
         {% endif %}
         {% endblock %}
         {% block nav-global %}{% endblock %}
-    </div>
+      </header>
     {% endblock %}
     <!-- END Header -->
     {% block nav-breadcrumbs %}
@@ -87,7 +87,7 @@
           {% include "admin/nav_sidebar.html" %}
         {% endblock %}
       {% endif %}
-      <div id="content-start" class="content" tabindex="-1">
+      <main id="content-start" class="content" tabindex="-1">
         {% block messages %}
           {% if messages %}
             <ul class="messagelist">{% for message in messages %}
@@ -108,9 +108,9 @@
           <br class="clear">
         </div>
         <!-- END Content -->
-        {% block footer %}<div id="footer"></div>{% endblock %}
-      </div>
+      </main>
     </div>
+    <footer id="footer">{% block footer %}{% endblock %}</footer>
 </div>
 <!-- END Container -->
 

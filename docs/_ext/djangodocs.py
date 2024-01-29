@@ -1,6 +1,7 @@
 """
 Sphinx plugins for Django documentation.
 """
+
 import json
 import os
 import re
@@ -118,26 +119,33 @@ class DjangoHTMLTranslator(HTMLTranslator):
         self.context.append(self.compact_p)
         self.compact_p = True
         # Needed by Sphinx.
-        if sphinx_version >= (4, 3):
-            self._table_row_indices.append(0)
-        else:
-            self._table_row_index = 0
+        self._table_row_indices.append(0)
         self.body.append(self.starttag(node, "table", CLASS="docutils"))
 
     def depart_table(self, node):
         self.compact_p = self.context.pop()
-        if sphinx_version >= (4, 3):
-            self._table_row_indices.pop()
+        self._table_row_indices.pop()
         self.body.append("</table>\n")
 
     def visit_desc_parameterlist(self, node):
         self.body.append("(")  # by default sphinx puts <big> around the "("
-        self.first_param = 1
         self.optional_param_level = 0
         self.param_separator = node.child_text_separator
-        self.required_params_left = sum(
+        # Counts 'parameter groups' being either a required parameter, or a set
+        # of contiguous optional ones.
+        required_params = [
             isinstance(c, addnodes.desc_parameter) for c in node.children
-        )
+        ]
+        # How many required parameters are left.
+        self.required_params_left = sum(required_params)
+        if sphinx_version < (7, 1):
+            self.first_param = 1
+        else:
+            self.is_first_param = True
+            self.params_left_at_level = 0
+            self.param_group_index = 0
+            self.list_is_required_param = required_params
+            self.multi_line_parameter_list = False
 
     def depart_desc_parameterlist(self, node):
         self.body.append(")")

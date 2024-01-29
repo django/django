@@ -2,23 +2,23 @@
 Django 4.1.4 release notes
 ==========================
 
-*Expected December 6, 2022*
+*December 6, 2022*
 
 Django 4.1.4 fixes several bugs in 4.1.3.
 
 Bugfixes
 ========
 
-* Fixed a regression in Django 4.1 that caused an unnecessary table rebuilt
-  when adding ``ManyToManyField`` on SQLite (:ticket:`34138`).
+* Fixed a regression in Django 4.1 that caused an unnecessary table rebuild
+  when adding a ``ManyToManyField`` on SQLite (:ticket:`34138`).
 
 * Fixed a bug in Django 4.1 that caused a crash of the sitemap index view with
   an empty :meth:`Sitemap.items() <django.contrib.sitemaps.Sitemap.items>` and
   a callable :attr:`~django.contrib.sitemaps.Sitemap.lastmod`
   (:ticket:`34088`).
 
-* Fixed a bug in Django 4.1 that caused a crash of ``acreate()``,
-  ``aget_or_create()``, and ``aupdate_or_create()`` asynchronous methods for
+* Fixed a bug in Django 4.1 that caused a crash using ``acreate()``,
+  ``aget_or_create()``, and ``aupdate_or_create()`` asynchronous methods of
   related managers (:ticket:`34139`).
 
 * Fixed a bug in Django 4.1 that caused a crash of ``QuerySet.bulk_create()``

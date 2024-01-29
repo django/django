@@ -1,9 +1,8 @@
-import asyncio
 import logging
 import sys
 from functools import wraps
 
-from asgiref.sync import sync_to_async
+from asgiref.sync import iscoroutinefunction, sync_to_async
 
 from django.conf import settings
 from django.core import signals
@@ -13,6 +12,7 @@ from django.core.exceptions import (
     RequestDataTooBig,
     SuspiciousOperation,
     TooManyFieldsSent,
+    TooManyFilesSent,
 )
 from django.http import Http404
 from django.http.multipartparser import MultiPartParserError
@@ -34,7 +34,7 @@ def convert_exception_to_response(get_response):
     no middleware leaks an exception and that the next middleware in the stack
     can rely on getting a response instead of an exception.
     """
-    if asyncio.iscoroutinefunction(get_response):
+    if iscoroutinefunction(get_response):
 
         @wraps(get_response)
         async def inner(request):
@@ -111,7 +111,7 @@ def response_for_exception(request, exc):
             exception=exc,
         )
     elif isinstance(exc, SuspiciousOperation):
-        if isinstance(exc, (RequestDataTooBig, TooManyFieldsSent)):
+        if isinstance(exc, (RequestDataTooBig, TooManyFieldsSent, TooManyFilesSent)):
             # POST data can't be accessed again, otherwise the original
             # exception would be raised.
             request._mark_post_parse_error()

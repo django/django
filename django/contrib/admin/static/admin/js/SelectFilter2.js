@@ -30,6 +30,9 @@ Requires core.js and SelectBox.js.
 
             // <div class="selector"> or <div class="selector stacked">
             const selector_div = quickElement('div', from_box.parentNode);
+            // Make sure the selector div is at the beginning so that the
+            // add link would be displayed to the right of the widget.
+            from_box.parentNode.prepend(selector_div);
             selector_div.className = is_stacked ? 'selector stacked' : 'selector';
 
             // <div class="selector-available">
@@ -207,7 +210,11 @@ Requires core.js and SelectBox.js.
             const selector = document.getElementById(field_id + '_selector_chosen');
             const warning = document.getElementById(field_id + '_list-footer-display-text');
             selector.className = selector.className.replace('selector-chosen--with-filtered', '');
-            warning.textContent = interpolate(gettext('%s selected options not visible'), [count]);
+            warning.textContent = interpolate(ngettext(
+                '%s selected option not visible',
+                '%s selected options not visible',
+                count
+            ), [count]);
             if(count > 0) {
                 selector.className += ' selector-chosen--with-filtered';
             }

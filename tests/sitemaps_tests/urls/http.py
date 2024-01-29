@@ -48,6 +48,22 @@ class XDefaultI18nSitemap(AlternatesI18nSitemap):
     x_default = True
 
 
+class ItemByLangSitemap(SimpleI18nSitemap):
+    def get_languages_for_item(self, item):
+        if item.name == "Only for PT":
+            return ["pt"]
+        return super().get_languages_for_item(item)
+
+
+class ItemByLangAlternatesSitemap(AlternatesI18nSitemap):
+    x_default = True
+
+    def get_languages_for_item(self, item):
+        if item.name == "Only for PT":
+            return ["pt"]
+        return super().get_languages_for_item(item)
+
+
 class EmptySitemap(Sitemap):
     changefreq = "never"
     priority = 0.5
@@ -168,6 +184,14 @@ xdefault_i18n_sitemaps = {
     "i18n-xdefault": XDefaultI18nSitemap,
 }
 
+item_by_lang_i18n_sitemaps = {
+    "i18n-item-by-lang": ItemByLangSitemap,
+}
+
+item_by_lang_alternates_i18n_sitemaps = {
+    "i18n-item-by-lang-alternates": ItemByLangAlternatesSitemap,
+}
+
 simple_sitemaps_not_callable = {
     "simple": SimpleSitemap(),
 }
@@ -254,11 +278,6 @@ urlpatterns = [
         "simple-not-callable/index.xml",
         views.index,
         {"sitemaps": simple_sitemaps_not_callable},
-    ),
-    path(
-        "simple/custom-index.xml",
-        views.index,
-        {"sitemaps": simple_sitemaps, "template_name": "custom_sitemap_index.xml"},
     ),
     path(
         "simple/custom-lastmod-index.xml",
@@ -356,6 +375,18 @@ urlpatterns = [
         "lastmod-sitemaps/ascending.xml",
         views.sitemap,
         {"sitemaps": sitemaps_lastmod_ascending},
+        name="django.contrib.sitemaps.views.sitemap",
+    ),
+    path(
+        "item-by-lang/i18n.xml",
+        views.sitemap,
+        {"sitemaps": item_by_lang_i18n_sitemaps},
+        name="django.contrib.sitemaps.views.sitemap",
+    ),
+    path(
+        "item-by-lang-alternates/i18n.xml",
+        views.sitemap,
+        {"sitemaps": item_by_lang_alternates_i18n_sitemaps},
         name="django.contrib.sitemaps.views.sitemap",
     ),
     path(

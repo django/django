@@ -131,11 +131,11 @@ class MigrationLoader:
                         "Migration %s in app %s has no Migration class"
                         % (migration_name, app_config.label)
                     )
-                self.disk_migrations[
-                    app_config.label, migration_name
-                ] = migration_module.Migration(
-                    migration_name,
-                    app_config.label,
+                self.disk_migrations[app_config.label, migration_name] = (
+                    migration_module.Migration(
+                        migration_name,
+                        app_config.label,
+                    )
                 )
 
     def get_migration(self, app_label, name_prefix):

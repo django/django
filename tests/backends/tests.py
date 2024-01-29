@@ -1,4 +1,5 @@
 """Tests related to django.db.backends that haven't been organized."""
+
 import datetime
 import threading
 import unittest
@@ -247,7 +248,6 @@ class SequenceResetTest(TestCase):
 # This test needs to run outside of a transaction, otherwise closing the
 # connection would implicitly rollback and cause problems during teardown.
 class ConnectionCreatedSignalTest(TransactionTestCase):
-
     available_apps = []
 
     # Unfortunately with sqlite3 the in-memory test database cannot be closed,
@@ -297,7 +297,6 @@ class EscapingChecksDebug(EscapingChecks):
 
 
 class BackendTestCase(TransactionTestCase):
-
     available_apps = ["backends"]
 
     def create_squares_with_executemany(self, args):
@@ -454,7 +453,7 @@ class BackendTestCase(TransactionTestCase):
         with connection.cursor() as cursor:
             self.assertIsInstance(cursor, CursorWrapper)
         # Both InterfaceError and ProgrammingError seem to be used when
-        # accessing closed cursor (psycopg2 has InterfaceError, rest seem
+        # accessing closed cursor (psycopg has InterfaceError, rest seem
         # to use ProgrammingError).
         with self.assertRaises(connection.features.closed_cursor_error_class):
             # cursor should be closed, so no queries should be possible.
@@ -462,12 +461,12 @@ class BackendTestCase(TransactionTestCase):
 
     @unittest.skipUnless(
         connection.vendor == "postgresql",
-        "Psycopg2 specific cursor.closed attribute needed",
+        "Psycopg specific cursor.closed attribute needed",
     )
     def test_cursor_contextmanager_closing(self):
         # There isn't a generic way to test that cursors are closed, but
-        # psycopg2 offers us a way to check that by closed attribute.
-        # So, run only on psycopg2 for that reason.
+        # psycopg offers us a way to check that by closed attribute.
+        # So, run only on psycopg for that reason.
         with connection.cursor() as cursor:
             self.assertIsInstance(cursor, CursorWrapper)
         self.assertTrue(cursor.closed)
@@ -597,7 +596,6 @@ class BackendTestCase(TransactionTestCase):
 # These tests aren't conditional because it would require differentiating
 # between MySQL+InnoDB and MySQL+MYISAM (something we currently can't do).
 class FkConstraintsTests(TransactionTestCase):
-
     available_apps = ["backends"]
 
     def setUp(self):
@@ -753,7 +751,6 @@ class FkConstraintsTests(TransactionTestCase):
 
 
 class ThreadTests(TransactionTestCase):
-
     available_apps = ["backends"]
 
     def test_default_connection_thread_local(self):
@@ -796,7 +793,8 @@ class ThreadTests(TransactionTestCase):
             # closed on teardown).
             for conn in connections_dict.values():
                 if conn is not connection and conn.allow_thread_sharing:
-                    conn.close()
+                    conn.validate_thread_sharing()
+                    conn._close()
                     conn.dec_thread_sharing()
 
     def test_connections_thread_local(self):

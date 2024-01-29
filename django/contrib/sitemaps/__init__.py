@@ -1,61 +1,8 @@
-import warnings
-from urllib.parse import urlencode
-from urllib.request import urlopen
-
 from django.apps import apps as django_apps
 from django.conf import settings
 from django.core import paginator
 from django.core.exceptions import ImproperlyConfigured
-from django.urls import NoReverseMatch, reverse
 from django.utils import translation
-from django.utils.deprecation import RemovedInDjango50Warning
-
-PING_URL = "https://www.google.com/webmasters/tools/ping"
-
-
-class SitemapNotFound(Exception):
-    pass
-
-
-def ping_google(sitemap_url=None, ping_url=PING_URL, sitemap_uses_https=True):
-    """
-    Alert Google that the sitemap for the current site has been updated.
-    If sitemap_url is provided, it should be an absolute path to the sitemap
-    for this site -- e.g., '/sitemap.xml'. If sitemap_url is not provided, this
-    function will attempt to deduce it by using urls.reverse().
-    """
-    sitemap_full_url = _get_sitemap_full_url(sitemap_url, sitemap_uses_https)
-    params = urlencode({"sitemap": sitemap_full_url})
-    urlopen("%s?%s" % (ping_url, params))
-
-
-def _get_sitemap_full_url(sitemap_url, sitemap_uses_https=True):
-    if not django_apps.is_installed("django.contrib.sites"):
-        raise ImproperlyConfigured(
-            "ping_google requires django.contrib.sites, which isn't installed."
-        )
-
-    if sitemap_url is None:
-        try:
-            # First, try to get the "index" sitemap URL.
-            sitemap_url = reverse("django.contrib.sitemaps.views.index")
-        except NoReverseMatch:
-            try:
-                # Next, try for the "global" sitemap URL.
-                sitemap_url = reverse("django.contrib.sitemaps.views.sitemap")
-            except NoReverseMatch:
-                pass
-
-    if sitemap_url is None:
-        raise SitemapNotFound(
-            "You didn't provide a sitemap_url, and the sitemap URL couldn't be "
-            "auto-detected."
-        )
-
-    Site = django_apps.get_model("sites.Site")
-    current_site = Site.objects.get_current()
-    scheme = "https" if sitemap_uses_https else "http"
-    return "%s://%s%s" % (scheme, current_site.domain, sitemap_url)
 
 
 class Sitemap:
@@ -92,6 +39,10 @@ class Sitemap:
             return attr(item)
         return attr
 
+    def get_languages_for_item(self, item):
+        """Languages for which this item is displayed."""
+        return self._languages()
+
     def _languages(self):
         if self.languages is not None:
             return self.languages
@@ -103,8 +54,8 @@ class Sitemap:
             # This is necessary to paginate with all languages already considered.
             items = [
                 (item, lang_code)
-                for lang_code in self._languages()
                 for item in self.items()
+                for lang_code in self.get_languages_for_item(item)
             ]
             return items
         return self.items()
@@ -129,17 +80,7 @@ class Sitemap:
 
     def get_protocol(self, protocol=None):
         # Determine protocol
-        if self.protocol is None and protocol is None:
-            warnings.warn(
-                "The default sitemap protocol will be changed from 'http' to "
-                "'https' in Django 5.0. Set Sitemap.protocol to silence this "
-                "warning.",
-                category=RemovedInDjango50Warning,
-                stacklevel=2,
-            )
-        # RemovedInDjango50Warning: when the deprecation ends, replace 'http'
-        # with 'https'.
-        return self.protocol or protocol or "http"
+        return self.protocol or protocol or "https"
 
     def get_domain(self, site=None):
         # Determine domain
@@ -201,7 +142,8 @@ class Sitemap:
             }
 
             if self.i18n and self.alternates:
-                for lang_code in self._languages():
+                item_languages = self.get_languages_for_item(item[0])
+                for lang_code in item_languages:
                     loc = f"{protocol}://{domain}{self._location(item, lang_code)}"
                     url_info["alternates"].append(
                         {
@@ -209,7 +151,7 @@ class Sitemap:
                             "lang_code": lang_code,
                         }
                     )
-                if self.x_default:
+                if self.x_default and settings.LANGUAGE_CODE in item_languages:
                     lang_code = settings.LANGUAGE_CODE
                     loc = f"{protocol}://{domain}{self._location(item, lang_code)}"
                     loc = loc.replace(f"/{lang_code}/", "/", 1)

@@ -56,9 +56,6 @@ class Command(BaseCommand):
         # 'table_name_filter' is a stealth option
         table_name_filter = options.get("table_name_filter")
 
-        def table2model(table_name):
-            return re.sub(r"[^a-zA-Z0-9]", "", table_name.title())
-
         with connection.cursor() as cursor:
             yield "# This is an auto-generated Django model module."
             yield "# You'll have to do the following manually to clean this up:"
@@ -78,18 +75,16 @@ class Command(BaseCommand):
             )
             yield "from %s import models" % self.db_module
             known_models = []
-            table_info = connection.introspection.get_table_list(cursor)
-
             # Determine types of tables and/or views to be introspected.
             types = {"t"}
             if options["include_partitions"]:
                 types.add("p")
             if options["include_views"]:
                 types.add("v")
+            table_info = connection.introspection.get_table_list(cursor)
+            table_info = {info.name: info for info in table_info if info.type in types}
 
-            for table_name in options["table"] or sorted(
-                info.name for info in table_info if info.type in types
-            ):
+            for table_name in options["table"] or sorted(name for name in table_info):
                 if table_name_filter is not None and callable(table_name_filter):
                     if not table_name_filter(table_name):
                         continue
@@ -127,7 +122,7 @@ class Command(BaseCommand):
                     yield "# The error was: %s" % e
                     continue
 
-                model_name = table2model(table_name)
+                model_name = self.normalize_table_name(table_name)
                 yield ""
                 yield ""
                 yield "class %s(models.Model):" % model_name
@@ -182,7 +177,7 @@ class Command(BaseCommand):
                         rel_to = (
                             "self"
                             if ref_db_table == table_name
-                            else table2model(ref_db_table)
+                            else self.normalize_table_name(ref_db_table)
                         )
                         if rel_to in known_models:
                             field_type = "%s(%s" % (rel_type, rel_to)
@@ -232,6 +227,10 @@ class Command(BaseCommand):
                     if field_type.startswith(("ForeignKey(", "OneToOneField(")):
                         field_desc += ", models.DO_NOTHING"
 
+                    # Add comment.
+                    if connection.features.supports_comments and row.comment:
+                        extra_params["db_comment"] = row.comment
+
                     if extra_params:
                         if not field_desc.endswith("("):
                             field_desc += ", "
@@ -242,14 +241,22 @@ class Command(BaseCommand):
                     if comment_notes:
                         field_desc += "  # " + " ".join(comment_notes)
                     yield "    %s" % field_desc
-                is_view = any(
-                    info.name == table_name and info.type == "v" for info in table_info
-                )
-                is_partition = any(
-                    info.name == table_name and info.type == "p" for info in table_info
-                )
+                comment = None
+                if info := table_info.get(table_name):
+                    is_view = info.type == "v"
+                    is_partition = info.type == "p"
+                    if connection.features.supports_comments:
+                        comment = info.comment
+                else:
+                    is_view = False
+                    is_partition = False
                 yield from self.get_meta(
-                    table_name, constraints, column_to_field_name, is_view, is_partition
+                    table_name,
+                    constraints,
+                    column_to_field_name,
+                    is_view,
+                    is_partition,
+                    comment,
                 )
 
     def normalize_col_name(self, col_name, used_column_names, is_relation):
@@ -265,7 +272,7 @@ class Command(BaseCommand):
 
         if is_relation:
             if new_name.endswith("_id"):
-                new_name = new_name[:-3]
+                new_name = new_name.removesuffix("_id")
             else:
                 field_params["db_column"] = col_name
 
@@ -312,6 +319,10 @@ class Command(BaseCommand):
 
         return new_name, field_params, field_notes
 
+    def normalize_table_name(self, table_name):
+        """Translate the table name to a Python-compatible model name."""
+        return re.sub(r"[^a-zA-Z0-9]", "", table_name.title())
+
     def get_field_type(self, connection, table_name, row):
         """
         Given the database connection, the table name, and the cursor row
@@ -328,8 +339,9 @@ class Command(BaseCommand):
             field_notes.append("This field type is a guess.")
 
         # Add max_length for all CharFields.
-        if field_type == "CharField" and row.internal_size:
-            field_params["max_length"] = int(row.internal_size)
+        if field_type == "CharField" and row.display_size:
+            if (size := int(row.display_size)) and size > 0:
+                field_params["max_length"] = size
 
         if field_type in {"CharField", "TextField"} and row.collation:
             field_params["db_collation"] = row.collation
@@ -353,7 +365,13 @@ class Command(BaseCommand):
         return field_type, field_params, field_notes
 
     def get_meta(
-        self, table_name, constraints, column_to_field_name, is_view, is_partition
+        self,
+        table_name,
+        constraints,
+        column_to_field_name,
+        is_view,
+        is_partition,
+        comment,
     ):
         """
         Return a sequence comprising the lines of code necessary
@@ -391,4 +409,6 @@ class Command(BaseCommand):
         if unique_together:
             tup = "(" + ", ".join(unique_together) + ",)"
             meta += ["        unique_together = %s" % tup]
+        if comment:
+            meta += [f"        db_table_comment = {comment!r}"]
         return meta

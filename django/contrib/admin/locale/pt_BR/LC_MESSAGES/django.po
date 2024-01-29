@@ -4,21 +4,24 @@
 # Allisson Azevedo <allisson@gmail.com>, 2014
 # Bruce de Sá <contato@publidex.com.br>, 2019
 # bruno.devpod <bruno.devpod@gmail.com>, 2014
-# Carlos Leite <caduado@gmail.com>, 2019
-# Carlos Leite <caduado@gmail.com>, 2019
-# Filipe Cifali Stangler <cifali.filipe@gmail.com>, 2016
+# Carlos C. Leite <caduado@gmail.com>, 2019
+# Carlos C. Leite <caduado@gmail.com>, 2019
+# Filipe Cifali <cifali.filipe@gmail.com>, 2016
 # dudanogueira <dudanogueira@gmail.com>, 2012
 # Elyézer Rezende <elyezermr@gmail.com>, 2013
 # Fábio C. Barrionuevo da Luz <bnafta@gmail.com>, 2015
 # Fabio Cerqueira <fabio@cerqueira.me>, 2019
 # Francisco Petry Rauber <xico.petry@gmail.com>, 2016
+# Gabriel da Mota <gabrielmotaa@hotmail.com>, 2023
 # Gladson <gladsonbrito@gmail.com>, 2013
 # Guilherme Ferreira <guilherme@uft.edu.br>, 2017
-# semente, 2012-2013
+# fa9e10542e458baef0599ae856e43651_13d2225, 2012-2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # João Paulo Andrade <joaopaulo.a.p@gmail.com>, 2018
+# Jonas Rodrigues, 2023
 # Lucas Infante <maccinza@gmail.com>, 2015
 # Luiz Boaretto <lboaretto@gmail.com>, 2017
+# Marssal Jr. <marssaljr@gmail.com>, 2022
 # Marcelo Moro Brondani <mbrondani@inf.ufsm.br>, 2018
 # Marco Rougeth <marco@rougeth.com>, 2015
 # Otávio Reis <otaviocha@gmail.com>, 2018
@@ -33,10 +36,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:10-0500\n"
-"PO-Revision-Date: 2022-07-25 07:05+0000\n"
-"Last-Translator: Tomaz Marcelino Cunha Neto <tomazmcn@gmail.com>\n"
-"Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 07:05+0000\n"
+"Last-Translator: Gabriel da Mota <gabrielmotaa@hotmail.com>, 2023\n"
+"Language-Team: Portuguese (Brazil) (http://app.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -203,6 +206,9 @@ msgstr "Nenhum"
 msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr "Pressione “Control”, ou “Command” no Mac, para selecionar mais de um."
 
+msgid "Select this object for an action - {}"
+msgstr "Selecione esse objeto para uma ação - {}"
+
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr "O {name} “{obj}” foi adicionado com sucesso."
@@ -280,12 +286,14 @@ msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s modificado com sucesso."
 msgstr[1] "%(count)s %(name)s modificados com sucesso."
+msgstr[2] "%(count)s %(name)s modificados com sucesso."
 
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s selecionado"
 msgstr[1] "Todos %(total_count)s selecionados"
+msgstr[2] "Todos %(total_count)s selecionados"
 
 #, python-format
 msgid "0 of %(cnt)s selected"
@@ -367,6 +375,9 @@ msgstr "Selecionar todos %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Limpar seleção"
 
+msgid "Breadcrumbs"
+msgstr "Migalhas de pão"
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "Modelos na aplicação %(name)s"
@@ -394,14 +405,17 @@ msgid "Change password"
 msgstr "Alterar senha"
 
 msgid "Please correct the error below."
-msgstr "Por favor corrija o erro abaixo "
-
-msgid "Please correct the errors below."
-msgstr "Por favor, corrija os erros abaixo."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Por favor corrija o erro abaixo."
+msgstr[1] "Por favor corrija os erros abaixo."
+msgstr[2] "Por favor corrija os erros abaixo."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Informe uma nova senha para o usuário <strong>%(username)s</strong>."
+
+msgid "Skip to main content"
+msgstr "Pule o conteúdo principal"
 
 msgid "Welcome,"
 msgstr "Bem-vindo(a),"
@@ -428,6 +442,12 @@ msgstr "Ver no site"
 msgid "Filter"
 msgstr "Filtro"
 
+msgid "Hide counts"
+msgstr "Esconder contagem"
+
+msgid "Show counts"
+msgstr "Mostrar contagem"
+
 msgid "Clear all filters"
 msgstr "Limpar todos os filtros"
 
@@ -440,6 +460,15 @@ msgstr "Prioridade da ordenação: %(priority_number)s"
 
 msgid "Toggle sorting"
 msgstr "Alternar ordenção"
+
+msgid "Toggle theme (current theme: auto)"
+msgstr "Alternar tema (tema atual: automático)"
+
+msgid "Toggle theme (current theme: light)"
+msgstr "Alternar tema (tema atual: claro)"
+
+msgid "Toggle theme (current theme: dark)"
+msgstr "Alternar tema (tema atual: escuro)"
 
 msgid "Delete"
 msgstr "Apagar"
@@ -527,6 +556,15 @@ msgstr "Minhas Ações"
 msgid "None available"
 msgstr "Nenhum disponível"
 
+msgid "Added:"
+msgstr "Adicionado:"
+
+msgid "Changed:"
+msgstr "Alterado:"
+
+msgid "Deleted:"
+msgstr "Apagado:"
+
 msgid "Unknown content"
 msgstr "Conteúdo desconhecido"
 
@@ -553,6 +591,9 @@ msgstr "Esqueceu sua senha ou nome de usuário?"
 msgid "Toggle navigation"
 msgstr "Alternar navegação"
 
+msgid "Sidebar"
+msgstr "Barra Lateral"
+
 msgid "Start typing to filter…"
 msgstr "Comece a digitar para filtrar…"
 
@@ -569,10 +610,10 @@ msgid "Action"
 msgstr "Ação"
 
 msgid "entry"
-msgstr ""
-
-msgid "entries"
-msgstr ""
+msgid_plural "entries"
+msgstr[0] "entrada"
+msgstr[1] "entradas"
+msgstr[2] "entradas"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -598,6 +639,7 @@ msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
 msgstr[0] "%(counter)s resultado"
 msgstr[1] "%(counter)s resultados"
+msgstr[2] "%(counter)s resultados"
 
 #, python-format
 msgid "%(full_result_count)s total"
@@ -632,7 +674,7 @@ msgstr "Excluir %(model)s selecionado"
 
 #, python-format
 msgid "View selected %(model)s"
-msgstr ""
+msgstr "Visualizar %(model)s selecionados"
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "Obrigado por passar algum tempo de qualidade com o site hoje."
@@ -733,6 +775,9 @@ msgstr "Endereço de email:"
 
 msgid "Reset my password"
 msgstr "Reinicializar minha senha"
+
+msgid "Select all objects on this page for an action"
+msgstr "Selecione todos os objetos nessa página para uma ação"
 
 msgid "All dates"
 msgstr "Todas as datas"

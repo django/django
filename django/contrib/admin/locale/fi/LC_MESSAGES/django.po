@@ -4,17 +4,17 @@
 # Aarni Koskela, 2015,2017,2020-2022
 # Antti Kaihola <antti.15+transifex@kaihola.fi>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Jiri Grönroos <jiri.gronroos@iki.fi>, 2021
+# Jiri Grönroos <jiri.gronroos@iki.fi>, 2021,2023
 # Klaus Dahlén, 2012
 # Nikolay Korotkiy <sikmir@disroot.org>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:10-0500\n"
-"PO-Revision-Date: 2022-07-25 07:05+0000\n"
-"Last-Translator: Aarni Koskela\n"
-"Language-Team: Finnish (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 07:05+0000\n"
+"Last-Translator: Jiri Grönroos <jiri.gronroos@iki.fi>, 2021,2023\n"
+"Language-Team: Finnish (http://app.transifex.com/django/django/language/"
 "fi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -183,6 +183,9 @@ msgstr ""
 " Pidä \"Ctrl\" (tai Macin \"Command\") pohjassa valitaksesi useita "
 "vaihtoehtoja."
 
+msgid "Select this object for an action - {}"
+msgstr ""
+
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr "{name} \"{obj}\" on lisätty."
@@ -339,9 +342,12 @@ msgstr "Valitse kaikki %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Tyhjennä valinta"
 
+msgid "Breadcrumbs"
+msgstr "Murupolut"
+
 #, python-format
 msgid "Models in the %(name)s application"
-msgstr "%(name)s -applikaation mallit"
+msgstr "Sovelluksen %(name)s mallit"
 
 msgid "Add"
 msgstr "Lisää"
@@ -366,14 +372,16 @@ msgid "Change password"
 msgstr "Vaihda salasana"
 
 msgid "Please correct the error below."
-msgstr "Korjaa alla oleva virhe."
-
-msgid "Please correct the errors below."
-msgstr "Korjaa alla olevat virheet."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Korjaa alla oleva virhe."
+msgstr[1] "Korjaa alla olevat virheet."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Syötä käyttäjän <strong>%(username)s</strong> uusi salasana."
+
+msgid "Skip to main content"
+msgstr "Siirry pääsisältöön"
 
 msgid "Welcome,"
 msgstr "Tervetuloa,"
@@ -382,7 +390,7 @@ msgid "View site"
 msgstr "Näytä sivusto"
 
 msgid "Documentation"
-msgstr "Ohjeita"
+msgstr "Dokumentaatio"
 
 msgid "Log out"
 msgstr "Kirjaudu ulos"
@@ -400,6 +408,12 @@ msgstr "Näytä lopputulos"
 msgid "Filter"
 msgstr "Suodatin"
 
+msgid "Hide counts"
+msgstr "Piilota lukumäärät"
+
+msgid "Show counts"
+msgstr "Näytä lukumäärät"
+
 msgid "Clear all filters"
 msgstr "Tyhjennä kaikki suodattimet"
 
@@ -412,6 +426,15 @@ msgstr "Järjestysprioriteetti: %(priority_number)s"
 
 msgid "Toggle sorting"
 msgstr "Kytke järjestäminen"
+
+msgid "Toggle theme (current theme: auto)"
+msgstr ""
+
+msgid "Toggle theme (current theme: light)"
+msgstr ""
+
+msgid "Toggle theme (current theme: dark)"
+msgstr ""
 
 msgid "Delete"
 msgstr "Poista"
@@ -499,6 +522,15 @@ msgstr "Omat tapahtumat"
 msgid "None available"
 msgstr "Ei yhtään"
 
+msgid "Added:"
+msgstr "Lisätty:"
+
+msgid "Changed:"
+msgstr "Muutettu:"
+
+msgid "Deleted:"
+msgstr "Poistettu:"
+
 msgid "Unknown content"
 msgstr "Tuntematon sisältö"
 
@@ -524,6 +556,9 @@ msgstr "Unohditko salasanasi tai käyttäjätunnuksesi?"
 msgid "Toggle navigation"
 msgstr "Kytke navigaatio"
 
+msgid "Sidebar"
+msgstr "Sivupalkki"
+
 msgid "Start typing to filter…"
 msgstr "Kirjoita suodattaaksesi..."
 
@@ -540,10 +575,9 @@ msgid "Action"
 msgstr "Tapahtuma"
 
 msgid "entry"
-msgstr "merkintä"
-
-msgid "entries"
-msgstr "merkinnät"
+msgid_plural "entries"
+msgstr[0] "merkintä"
+msgstr[1] "merkintää"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -689,7 +723,7 @@ msgstr "Kiitos vierailustasi sivuillamme!"
 
 #, python-format
 msgid "The %(site_name)s team"
-msgstr "%(site_name)s -sivuston ylläpitäjät"
+msgstr "Sivuston %(site_name)s ylläpitäjät"
 
 msgid ""
 "Forgotten your password? Enter your email address below, and we’ll email "
@@ -703,6 +737,9 @@ msgstr "Sähköpostiosoite:"
 
 msgid "Reset my password"
 msgstr "Nollaa salasanani"
+
+msgid "Select all objects on this page for an action"
+msgstr ""
 
 msgid "All dates"
 msgstr "Kaikki päivät"

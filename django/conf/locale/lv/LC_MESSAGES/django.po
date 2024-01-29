@@ -2,21 +2,25 @@
 #
 # Translators:
 # edgars <edgars.jekabsons@gmail.com>, 2011
-# Edgars Voroboks <edgars.voroboks@gmail.com>, 2017-2018,2022
+# Edgars Voroboks <edgars.voroboks@gmail.com>, 2023
+# Edgars Voroboks <edgars.voroboks@gmail.com>, 2017,2022
+# Edgars Voroboks <edgars.voroboks@gmail.com>, 2017-2018
 # Jannis Leidel <jannis@leidel.info>, 2011
 # krikulis <kristaps.kulis@gmail.com>, 2014
 # Māris Nartišs <maris.gis@gmail.com>, 2016
 # Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2021
 # Mārtiņš Šulcs <shulcsm@gmail.com>, 2018
+# Edgars Voroboks <edgars.voroboks@gmail.com>, 2018-2021
 # peterisb <pb@sungis.lv>, 2016-2017
+# Pēteris Caune, 2023
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:23-0500\n"
-"PO-Revision-Date: 2022-07-25 06:49+0000\n"
-"Last-Translator: Edgars Voroboks <edgars.voroboks@gmail.com>\n"
-"Language-Team: Latvian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 06:49+0000\n"
+"Last-Translator: Edgars Voroboks <edgars.voroboks@gmail.com>, 2023\n"
+"Language-Team: Latvian (http://app.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -57,6 +61,9 @@ msgstr "bosniešu"
 
 msgid "Catalan"
 msgstr "katalāņu"
+
+msgid "Central Kurdish (Sorani)"
+msgstr "centrālā kurdu (sorani)"
 
 msgid "Czech"
 msgstr "čehu"
@@ -149,7 +156,7 @@ msgid "Hungarian"
 msgstr "ungāru"
 
 msgid "Armenian"
-msgstr "Armēņu"
+msgstr "armēņu"
 
 msgid "Interlingua"
 msgstr "modernā latīņu"
@@ -298,6 +305,9 @@ msgstr "tatāru"
 msgid "Udmurt"
 msgstr "udmurtu"
 
+msgid "Uyghur"
+msgstr "uiguru"
+
 msgid "Ukrainian"
 msgstr "ukraiņu"
 
@@ -398,6 +408,15 @@ msgstr "Vērtībai jābūt reizinājumam no %(limit_value)s."
 
 #, python-format
 msgid ""
+"Ensure this value is a multiple of step size %(limit_value)s, starting from "
+"%(offset)s, e.g. %(offset)s, %(valid_value1)s, %(valid_value2)s, and so on."
+msgstr ""
+"Pārliecinieties, ka šī vērtība ir soļa lieluma %(limit_value)s reizinājums, "
+"sākot no %(offset)s, piem. %(offset)s, %(valid_value1)s, %(valid_value2)s, "
+"un tā tālāk."
+
+#, python-format
+msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
 "%(show_value)d)."
 msgid_plural ""
@@ -476,7 +495,7 @@ msgstr "%(model_name)s ar šādu lauka %(field_labels)s vērtību jau eksistē."
 
 #, python-format
 msgid "Constraint “%(name)s” is violated."
-msgstr "Konstante “%(name)s” ir pārkāpta."
+msgstr "Ierobežojums “%(name)s” ir pārkāpts."
 
 #, python-format
 msgid "Value %(value)r is not a valid choice."
@@ -512,11 +531,14 @@ msgid "“%(value)s” value must be either True, False, or None."
 msgstr "“%(value)s” vērtībai ir jābūt True, False vai None."
 
 msgid "Boolean (Either True or False)"
-msgstr "Boolean (True vai False)"
+msgstr "Boolean (vai nu True, vai False)"
 
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "Simbolu virkne (līdz pat %(max_length)s)"
+
+msgid "String (unlimited)"
+msgstr "Simbolu virkne (neierobežota)"
 
 msgid "Comma-separated integers"
 msgstr "Ar komatu atdalīti veselie skaitļi"
@@ -587,7 +609,7 @@ msgid "“%(value)s” value must be a float."
 msgstr "“%(value)s” vērtībai ir jābūt daļskaitlim."
 
 msgid "Floating point number"
-msgstr "Plūstošā punkta skaitlis"
+msgstr "Peldošā komata skaitlis"
 
 #, python-format
 msgid "“%(value)s” value must be an integer."
@@ -613,7 +635,7 @@ msgid "“%(value)s” value must be either None, True or False."
 msgstr "“%(value)s” vērtībai ir jābūt None, True vai False."
 
 msgid "Boolean (Either True, False or None)"
-msgstr "Boolean (jā, nē vai neviens)"
+msgstr "Boolean (vai nu True, False, vai None)"
 
 msgid "Positive big integer"
 msgstr "Liels pozitīvs vesels skaitlis"
@@ -766,7 +788,7 @@ msgid "Enter a complete value."
 msgstr "Ievadiet pilnu vērtību."
 
 msgid "Enter a valid UUID."
-msgstr "Ievadi derīgu UUID."
+msgstr "Ievadiet derīgu UUID."
 
 msgid "Enter a valid JSON."
 msgstr "Ievadiet korektu JSON."
@@ -802,7 +824,7 @@ msgstr[1] "Lūdzu iesniedziet vismaz %(num)d formu."
 msgstr[2] "Lūdzu iesniedziet vismaz %(num)d formas."
 
 msgid "Order"
-msgstr "Sakārtojums"
+msgstr "Kārtība"
 
 msgid "Delete"
 msgstr "Dzēst"
@@ -852,7 +874,7 @@ msgid "Currently"
 msgstr "Pašlaik"
 
 msgid "Change"
-msgstr "Izmainīt"
+msgstr "Mainīt"
 
 msgid "Unknown"
 msgstr "Nezināms"
@@ -1028,11 +1050,11 @@ msgstr "dec"
 
 msgctxt "abbrev. month"
 msgid "Jan."
-msgstr "Jan."
+msgstr "jan."
 
 msgctxt "abbrev. month"
 msgid "Feb."
-msgstr "Feb."
+msgstr "feb."
 
 msgctxt "abbrev. month"
 msgid "March"
@@ -1056,23 +1078,23 @@ msgstr "jūlijs"
 
 msgctxt "abbrev. month"
 msgid "Aug."
-msgstr "Aug."
+msgstr "aug."
 
 msgctxt "abbrev. month"
 msgid "Sept."
-msgstr "Sept."
+msgstr "sept."
 
 msgctxt "abbrev. month"
 msgid "Oct."
-msgstr "Okt."
+msgstr "okt."
 
 msgctxt "abbrev. month"
 msgid "Nov."
-msgstr "Nov."
+msgstr "nov."
 
 msgctxt "abbrev. month"
 msgid "Dec."
-msgstr "Dec."
+msgstr "dec."
 
 msgctxt "alt. month"
 msgid "January"
@@ -1209,8 +1231,8 @@ msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
 "including the “Referrer-Policy: no-referrer” header, please remove them. The "
 "CSRF protection requires the “Referer” header to do strict referer checking. "
-"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" …> for links to third-party sites."
+"If you’re concerned about privacy, use alternatives like <a "
+"rel=\"noreferrer\" …> for links to third-party sites."
 msgstr ""
 "Ja jūs izmantojat <meta name=\"referrer\" content=\"no-referrer\"> tagu vai "
 "iekļaujat “Referrer-Policy: no-referrer” headeri, lūdzu noņemiet tos. CSRF "
@@ -1310,14 +1332,14 @@ msgstr ""
 #, python-format
 msgid ""
 "You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> is in your settings file and you have not configured any "
-"URLs."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
+"configured any URLs."
 msgstr ""
 "Jūs redziet šo lapu, jo <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> ir iestatījumu failā un Jūs neesiet konfigurējis nevienu "
-"saiti."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> ir iestatījumu failā un Jūs neesiet "
+"konfigurējis nevienu saiti."
 
 msgid "Django Documentation"
 msgstr "Django Dokumentācija"
@@ -1335,4 +1357,4 @@ msgid "Django Community"
 msgstr "Django Komūna"
 
 msgid "Connect, get help, or contribute"
-msgstr "Pievienojaties, saņemiet palīdzību vai dodiet ieguldījumu"
+msgstr "Sazinieties, saņemiet palīdzību vai sniedziet ieguldījumu"

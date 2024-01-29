@@ -1,5 +1,6 @@
 from django.db import connection, models
 from django.db.models.functions import Lower
+from django.utils.functional import SimpleLazyObject
 
 
 class People(models.Model):
@@ -51,6 +52,11 @@ class SpecialName(models.Model):
         db_table = "inspectdb_special.table name"
 
 
+class PascalCaseName(models.Model):
+    class Meta:
+        db_table = "inspectdb_pascal.PascalCase"
+
+
 class ColumnTypes(models.Model):
     id = models.AutoField(primary_key=True)
     big_int_field = models.BigIntegerField()
@@ -89,7 +95,9 @@ class JSONFieldColumnType(models.Model):
         }
 
 
-test_collation = connection.features.test_collations.get("non_default")
+test_collation = SimpleLazyObject(
+    lambda: connection.features.test_collations.get("non_default")
+)
 
 
 class CharFieldDbCollation(models.Model):
@@ -104,6 +112,13 @@ class TextFieldDbCollation(models.Model):
 
     class Meta:
         required_db_features = {"supports_collation_on_textfield"}
+
+
+class CharFieldUnlimited(models.Model):
+    char_field = models.CharField(max_length=None)
+
+    class Meta:
+        required_db_features = {"supports_unlimited_charfield"}
 
 
 class UniqueTogether(models.Model):
@@ -132,3 +147,11 @@ class FuncUniqueConstraint(models.Model):
             )
         ]
         required_db_features = {"supports_expression_indexes"}
+
+
+class DbComment(models.Model):
+    rank = models.IntegerField(db_comment="'Rank' column comment")
+
+    class Meta:
+        db_table_comment = "Custom table comment"
+        required_db_features = {"supports_comments"}

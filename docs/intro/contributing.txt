@@ -27,8 +27,8 @@ For this tutorial, we expect that you have at least a basic understanding of
 how Django works. This means you should be comfortable going through the
 existing tutorials on :doc:`writing your first Django app</intro/tutorial01>`.
 In addition, you should have a good understanding of Python itself. But if you
-don't, `Dive Into Python`__ is a fantastic (and free) online book for
-beginning Python programmers.
+don't, `Dive Into Python`_ is a fantastic (and free) online book for beginning
+Python programmers.
 
 Those of you who are unfamiliar with version control systems and Trac will find
 that this tutorial and its links include just enough information to get started.
@@ -41,11 +41,13 @@ so that it can be of use to the widest audience.
 .. admonition:: Where to get help:
 
     If you're having trouble going through this tutorial, please post a message
-    to |django-developers| or drop by `#django-dev on irc.libera.chat`__ to
-    chat with other Django users who might be able to help.
+    on the `Django Forum`_, |django-developers|, or drop by
+    `#django-dev on irc.libera.chat`__ to chat with other Django users who
+    might be able to help.
 
-__ https://diveinto.org/python3/table-of-contents.html
 __ https://web.libera.chat/#django-dev
+.. _Dive Into Python: https://diveintopython3.net/
+.. _Django Forum: https://forum.djangoproject.com/
 
 What does this tutorial cover?
 ------------------------------
@@ -186,7 +188,11 @@ have to create a new virtual environment, :ref:`install the previously cloned
 local copy of Django in editable mode <intro-contributing-install-local-copy>`,
 and create a new Django project outside of your local copy of Django. You will
 immediately see any changes you make to Django in your new project, which is
-of great help when writing your first patch.
+of great help when writing your first patch, especially if testing any changes
+to the UI.
+
+You can follow the :doc:`tutorial</intro/tutorial01>` for help in creating a
+Django project.
 
 Running Django's test suite for the first time
 ==============================================
@@ -257,7 +263,8 @@ __ https://djangoci.com
     For this tutorial and the ticket we're working on, testing against SQLite
     is sufficient, however, it's possible (and sometimes necessary) to
     :ref:`run the tests using a different database
-    <running-unit-tests-settings>`.
+    <running-unit-tests-settings>`. When making UI changes, you will need to
+    :ref:`run the Selenium tests <running-selenium-tests>`.
 
 Working on a feature
 ====================
@@ -326,7 +333,7 @@ Navigate to Django's ``tests/shortcuts/`` folder and create a new file
 
     class MakeToastTests(SimpleTestCase):
         def test_make_toast(self):
-            self.assertEqual(make_toast(), 'toast')
+            self.assertEqual(make_toast(), "toast")
 
 This test checks that the ``make_toast()`` returns ``'toast'``.
 
@@ -343,7 +350,7 @@ This test checks that the ``make_toast()`` returns ``'toast'``.
     * After reading those, if you want something a little meatier to sink
       your teeth into, there's always the Python :mod:`unittest` documentation.
 
-__ https://diveinto.org/python3/unit-testing.html
+__ https://diveintopython3.net/unit-testing.html
 
 Running your new test
 ---------------------
@@ -357,7 +364,9 @@ that's really what happens. ``cd`` to the Django ``tests/`` directory and run:
     $ ./runtests.py shortcuts
 
 If the tests ran correctly, you should see one failure corresponding to the test
-method we added, with this error::
+method we added, with this error:
+
+.. code-block:: pytb
 
     ImportError: cannot import name 'make_toast' from 'django.shortcuts'
 
@@ -373,7 +382,7 @@ Navigate to the ``django/`` folder and open the ``shortcuts.py`` file. At the
 bottom, add::
 
     def make_toast():
-        return 'toast'
+        return "toast"
 
 Now we need to make sure that the test we wrote earlier passes, so we can see
 whether the code we added is working correctly. Again, navigate to the Django
@@ -407,7 +416,9 @@ Writing Documentation
 
 This is a new feature, so it should be documented. Open the file
 ``docs/topics/http/shortcuts.txt`` and add the following at the end of the
-file::
+file:
+
+.. code-block:: rst
 
     ``make_toast()``
     ================
@@ -421,7 +432,9 @@ file::
 Since this new feature will be in an upcoming release it is also added to the
 release notes for the next version of Django. Open the release notes for the
 latest version in ``docs/releases/``, which at time of writing is ``2.2.txt``.
-Add a note under the "Minor Features" header::
+Add a note under the "Minor Features" header:
+
+.. code-block:: rst
 
     :mod:`django.shortcuts`
     ~~~~~~~~~~~~~~~~~~~~~~~

@@ -1,6 +1,7 @@
 import json
 import os
 import re
+from pathlib import Path
 
 from django.apps import apps
 from django.conf import settings
@@ -14,6 +15,16 @@ from django.utils.translation.trans_real import DjangoTranslation
 from django.views.generic import View
 
 LANGUAGE_QUERY_PARAMETER = "language"
+
+
+def builtin_template_path(name):
+    """
+    Return a path to a builtin template.
+
+    Avoid calling this function at the module level or in a class-definition
+    because __file__ may not exist, e.g. in frozen environments.
+    """
+    return Path(__file__).parent / "templates" / name
 
 
 def set_language(request):
@@ -82,112 +93,6 @@ def get_formats():
         "DATETIME_INPUT_FORMATS",
     )
     return {attr: get_format(attr) for attr in FORMAT_SETTINGS}
-
-
-js_catalog_template = r"""
-{% autoescape off %}
-'use strict';
-{
-  const globals = this;
-  const django = globals.django || (globals.django = {});
-
-  {% if plural %}
-  django.pluralidx = function(n) {
-    const v = {{ plural }};
-    if (typeof v === 'boolean') {
-      return v ? 1 : 0;
-    } else {
-      return v;
-    }
-  };
-  {% else %}
-  django.pluralidx = function(count) { return (count == 1) ? 0 : 1; };
-  {% endif %}
-
-  /* gettext library */
-
-  django.catalog = django.catalog || {};
-  {% if catalog_str %}
-  const newcatalog = {{ catalog_str }};
-  for (const key in newcatalog) {
-    django.catalog[key] = newcatalog[key];
-  }
-  {% endif %}
-
-  if (!django.jsi18n_initialized) {
-    django.gettext = function(msgid) {
-      const value = django.catalog[msgid];
-      if (typeof value === 'undefined') {
-        return msgid;
-      } else {
-        return (typeof value === 'string') ? value : value[0];
-      }
-    };
-
-    django.ngettext = function(singular, plural, count) {
-      const value = django.catalog[singular];
-      if (typeof value === 'undefined') {
-        return (count == 1) ? singular : plural;
-      } else {
-        return value.constructor === Array ? value[django.pluralidx(count)] : value;
-      }
-    };
-
-    django.gettext_noop = function(msgid) { return msgid; };
-
-    django.pgettext = function(context, msgid) {
-      let value = django.gettext(context + '\x04' + msgid);
-      if (value.includes('\x04')) {
-        value = msgid;
-      }
-      return value;
-    };
-
-    django.npgettext = function(context, singular, plural, count) {
-      let value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
-      if (value.includes('\x04')) {
-        value = django.ngettext(singular, plural, count);
-      }
-      return value;
-    };
-
-    django.interpolate = function(fmt, obj, named) {
-      if (named) {
-        return fmt.replace(/%\(\w+\)s/g, function(match){return String(obj[match.slice(2,-2)])});
-      } else {
-        return fmt.replace(/%s/g, function(match){return String(obj.shift())});
-      }
-    };
-
-
-    /* formatting library */
-
-    django.formats = {{ formats_str }};
-
-    django.get_format = function(format_type) {
-      const value = django.formats[format_type];
-      if (typeof value === 'undefined') {
-        return format_type;
-      } else {
-        return value;
-      }
-    };
-
-    /* add to global namespace */
-    globals.pluralidx = django.pluralidx;
-    globals.gettext = django.gettext;
-    globals.ngettext = django.ngettext;
-    globals.gettext_noop = django.gettext_noop;
-    globals.pgettext = django.pgettext;
-    globals.npgettext = django.npgettext;
-    globals.interpolate = django.interpolate;
-    globals.get_format = django.get_format;
-
-    django.jsi18n_initialized = true;
-  }
-};
-{% endautoescape %}
-"""  # NOQA
 
 
 class JavaScriptCatalog(View):
@@ -308,7 +213,8 @@ class JavaScriptCatalog(View):
         def indent(s):
             return s.replace("\n", "\n  ")
 
-        template = Engine().from_string(js_catalog_template)
+        with builtin_template_path("i18n_catalog.js").open(encoding="utf-8") as fh:
+            template = Engine().from_string(fh.read())
         context["catalog_str"] = (
             indent(json.dumps(context["catalog"], sort_keys=True, indent=2))
             if context["catalog"]

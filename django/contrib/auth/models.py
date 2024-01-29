@@ -1,3 +1,5 @@
+from collections.abc import Iterable
+
 from django.apps import apps
 from django.contrib import auth
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
@@ -8,7 +10,6 @@ from django.core.mail import send_mail
 from django.db import models
 from django.db.models.manager import EmptyManager
 from django.utils import timezone
-from django.utils.itercompat import is_iterable
 from django.utils.translation import gettext_lazy as _
 
 from .validators import UnicodeUsernameValidator
@@ -315,7 +316,7 @@ class PermissionsMixin(models.Model):
         Return True if the user has each of the specified permissions. If
         object is passed, check if the user has all required perms for it.
         """
-        if not is_iterable(perm_list) or isinstance(perm_list, str):
+        if not isinstance(perm_list, Iterable) or isinstance(perm_list, str):
             raise ValueError("perm_list must be an iterable of permissions.")
         return all(self.has_perm(perm, obj) for perm in perm_list)
 
@@ -480,7 +481,7 @@ class AnonymousUser:
         return _user_has_perm(self, perm, obj=obj)
 
     def has_perms(self, perm_list, obj=None):
-        if not is_iterable(perm_list) or isinstance(perm_list, str):
+        if not isinstance(perm_list, Iterable) or isinstance(perm_list, str):
             raise ValueError("perm_list must be an iterable of permissions.")
         return all(self.has_perm(perm, obj) for perm in perm_list)
 

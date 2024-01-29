@@ -204,7 +204,6 @@ Arguments sent with this signal:
     The database alias being used.
 
 ``origin``
-    .. versionadded:: 4.1
 
     The origin of the deletion being the instance of a ``Model`` or
     ``QuerySet`` class.
@@ -234,7 +233,6 @@ Arguments sent with this signal:
     The database alias being used.
 
 ``origin``
-    .. versionadded:: 4.1
 
     The origin of the deletion being the instance of a ``Model`` or
     ``QuerySet`` class.
@@ -313,6 +311,7 @@ like this::
         # ...
         pass
 
+
     class Pizza(models.Model):
         # ...
         toppings = models.ManyToManyField(Topping)
@@ -321,13 +320,17 @@ If we connected a handler like this::
 
     from django.db.models.signals import m2m_changed
 
+
     def toppings_changed(sender, **kwargs):
         # Do something
         pass
 
+
     m2m_changed.connect(toppings_changed, sender=Pizza.toppings.through)
 
-and then did something like this::
+and then did something like this:
+
+.. code-block:: pycon
 
     >>> p = Pizza.objects.create(...)
     >>> t = Topping.objects.create(...)
@@ -357,7 +360,9 @@ Argument        Value
 ``using``       ``"default"`` (since the default router sends writes here)
 ==============  ============================================================
 
-And if we would then do something like this::
+And if we would then do something like this:
+
+.. code-block:: pycon
 
     >>> t.pizza_set.remove(p)
 
@@ -453,7 +458,7 @@ Arguments sent with this signal:
 ``plan``
     The migration plan that is going to be used for the migration run. While
     the plan is not public API, this allows for the rare cases when it is
-    necessary to know the plan. A plan is a list of two-tuples with the first
+    necessary to know the plan. A plan is a list of 2-tuples with the first
     item being the instance of a migration class and the second item showing
     if the migration was rolled back (``True``) or applied (``False``).
 
@@ -511,7 +516,7 @@ Arguments sent with this signal:
 ``plan``
     The migration plan that was used for the migration run. While the plan is
     not public API, this allows for the rare cases when it is necessary to
-    know the plan. A plan is a list of two-tuples with the first item being
+    know the plan. A plan is a list of 2-tuples with the first item being
     the instance of a migration class and the second item showing if the
     migration was rolled back (``True``) or applied (``False``).
 
@@ -527,9 +532,11 @@ For example, you could register a callback in an
     from django.apps import AppConfig
     from django.db.models.signals import post_migrate
 
+
     def my_callback(sender, **kwargs):
         # Your specific logic here
         pass
+
 
     class MyAppConfig(AppConfig):
         ...

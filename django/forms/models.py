@@ -2,6 +2,7 @@
 Helper functions for creating Form classes from Django models
 and database field objects.
 """
+
 from itertools import chain
 
 from django.core.exceptions import (
@@ -21,6 +22,7 @@ from django.forms.widgets import (
     RadioSelect,
     SelectMultiple,
 )
+from django.utils.choices import BaseChoiceIterator
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
@@ -146,6 +148,7 @@ def fields_for_model(
     field_classes=None,
     *,
     apply_limit_choices_to=True,
+    form_declared_fields=None,
 ):
     """
     Return a dictionary containing form fields for the given model.
@@ -176,7 +179,11 @@ def fields_for_model(
 
     ``apply_limit_choices_to`` is a boolean indicating if limit_choices_to
     should be applied to a field's queryset.
+
+    ``form_declared_fields`` is a dictionary of form fields created directly on
+    a form.
     """
+    form_declared_fields = form_declared_fields or {}
     field_dict = {}
     ignored = []
     opts = model._meta
@@ -203,6 +210,9 @@ def fields_for_model(
         if fields is not None and f.name not in fields:
             continue
         if exclude and f.name in exclude:
+            continue
+        if f.name in form_declared_fields:
+            field_dict[f.name] = form_declared_fields[f.name]
             continue
 
         kwargs = {}
@@ -310,6 +320,7 @@ class ModelFormMetaclass(DeclarativeFieldsMetaclass):
                 opts.field_classes,
                 # limit_choices_to will be applied during ModelForm.__init__().
                 apply_limit_choices_to=False,
+                form_declared_fields=new_class.declared_fields,
             )
 
             # make sure opts.fields doesn't specify an invalid field
@@ -319,8 +330,7 @@ class ModelFormMetaclass(DeclarativeFieldsMetaclass):
                 message = "Unknown field(s) (%s) specified for %s"
                 message %= (", ".join(missing_fields), opts.model.__name__)
                 raise FieldError(message)
-            # Override default model fields with any custom declared ones
-            # (plus, include all the other declared fields).
+            # Include all the other declared fields.
             fields.update(new_class.declared_fields)
         else:
             fields = new_class.declared_fields
@@ -756,7 +766,7 @@ class BaseModelFormSet(BaseFormSet, AltersData):
         """Save and return a new model instance for the given form."""
         return form.save(commit=commit)
 
-    def save_existing(self, form, instance, commit=True):
+    def save_existing(self, form, obj, commit=True):
         """Save and return an existing model instance for the given form."""
         return form.save(commit=commit)
 
@@ -821,9 +831,12 @@ class BaseModelFormSet(BaseFormSet, AltersData):
                 )
                 # Reduce Model instances to their primary key values
                 row_data = tuple(
-                    d._get_pk_val() if hasattr(d, "_get_pk_val")
-                    # Prevent "unhashable type: list" errors later on.
-                    else tuple(d) if isinstance(d, list) else d
+                    (
+                        d._get_pk_val()
+                        if hasattr(d, "_get_pk_val")
+                        # Prevent "unhashable type: list" errors later on.
+                        else tuple(d) if isinstance(d, list) else d
+                    )
                     for d in row_data
                 )
                 if row_data and None not in row_data:
@@ -1169,7 +1182,13 @@ class BaseInlineFormSet(BaseModelFormSet):
                 to_field = self.instance._meta.get_field(kwargs["to_field"])
             else:
                 to_field = self.instance._meta.pk
-            if to_field.has_default():
+
+            if to_field.has_default() and (
+                # Don't ignore a parent's auto-generated key if it's not the
+                # parent model's pk and form data is provided.
+                to_field.attname == self.fk.remote_field.model._meta.pk.name
+                or not form.data
+            ):
                 setattr(self.instance, to_field.attname, None)
 
         form.fields[name] = InlineForeignKeyField(self.instance, **kwargs)
@@ -1196,6 +1215,7 @@ def _get_foreign_key(parent_model, model, fk_name=None, can_fail=False):
         if len(fks_to_parent) == 1:
             fk = fks_to_parent[0]
             parent_list = parent_model._meta.get_parent_list()
+            parent_list.append(parent_model)
             if (
                 not isinstance(fk, ForeignKey)
                 or (
@@ -1221,6 +1241,7 @@ def _get_foreign_key(parent_model, model, fk_name=None, can_fail=False):
     else:
         # Try to discover what the ForeignKey from model to parent_model is
         parent_list = parent_model._meta.get_parent_list()
+        parent_list.append(parent_model)
         fks_to_parent = [
             f
             for f in opts.fields
@@ -1388,7 +1409,7 @@ class ModelChoiceIteratorValue:
         return self.value == other
 
 
-class ModelChoiceIterator:
+class ModelChoiceIterator(BaseChoiceIterator):
     def __init__(self, field):
         self.field = field
         self.queryset = field.queryset
@@ -1518,7 +1539,7 @@ class ModelChoiceField(ChoiceField):
         # the queryset.
         return self.iterator(self)
 
-    choices = property(_get_choices, ChoiceField._set_choices)
+    choices = property(_get_choices, ChoiceField.choices.fset)
 
     def prepare_value(self, value):
         if hasattr(value, "_meta"):

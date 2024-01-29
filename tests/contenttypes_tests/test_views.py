@@ -150,10 +150,8 @@ class ContentTypesViewsSiteRelTests(TestCase):
         """
         The shortcut view works if a model's ForeignKey to site is None.
         """
-        get_model.side_effect = (
-            lambda *args, **kwargs: MockSite
-            if args[0] == "sites.Site"
-            else ModelWithNullFKToSite
+        get_model.side_effect = lambda *args, **kwargs: (
+            MockSite if args[0] == "sites.Site" else ModelWithNullFKToSite
         )
 
         obj = ModelWithNullFKToSite.objects.create(title="title")
@@ -172,10 +170,8 @@ class ContentTypesViewsSiteRelTests(TestCase):
         site if it's attached to the object or to the domain of the first site
         found in the m2m relationship.
         """
-        get_model.side_effect = (
-            lambda *args, **kwargs: MockSite
-            if args[0] == "sites.Site"
-            else ModelWithM2MToSite
+        get_model.side_effect = lambda *args, **kwargs: (
+            MockSite if args[0] == "sites.Site" else ModelWithM2MToSite
         )
 
         # get_current_site() will lookup a Site object, so these must match the

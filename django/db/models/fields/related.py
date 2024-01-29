@@ -1,5 +1,6 @@
 import functools
 import inspect
+import warnings
 from functools import partial
 
 from django import forms
@@ -13,6 +14,7 @@ from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import CASCADE, SET_DEFAULT, SET_NULL
 from django.db.models.query_utils import PathInfo
 from django.db.models.utils import make_model_tuple
+from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
@@ -344,7 +346,6 @@ class RelatedField(FieldCacheMixin, Field):
         return None
 
     def contribute_to_class(self, cls, name, private_only=False, **kwargs):
-
         super().contribute_to_class(cls, name, private_only=private_only, **kwargs)
 
         self.opts = cls._meta
@@ -541,7 +542,6 @@ class ForeignObject(RelatedField):
         swappable=True,
         **kwargs,
     ):
-
         if rel is None:
             rel = self.rel_class(
                 self,
@@ -714,9 +714,7 @@ class ForeignObject(RelatedField):
                 "Related model %r cannot be resolved" % self.remote_field.model
             )
         related_fields = []
-        for index in range(len(self.from_fields)):
-            from_field_name = self.from_fields[index]
-            to_field_name = self.to_fields[index]
+        for from_field_name, to_field_name in zip(self.from_fields, self.to_fields):
             from_field = (
                 self
                 if from_field_name == RECURSIVE_RELATIONSHIP_CONSTANT
@@ -779,13 +777,31 @@ class ForeignObject(RelatedField):
         return attname, None
 
     def get_joining_columns(self, reverse_join=False):
+        warnings.warn(
+            "ForeignObject.get_joining_columns() is deprecated. Use "
+            "get_joining_fields() instead.",
+            RemovedInDjango60Warning,
+        )
         source = self.reverse_related_fields if reverse_join else self.related_fields
         return tuple(
             (lhs_field.column, rhs_field.column) for lhs_field, rhs_field in source
         )
 
     def get_reverse_joining_columns(self):
+        warnings.warn(
+            "ForeignObject.get_reverse_joining_columns() is deprecated. Use "
+            "get_reverse_joining_fields() instead.",
+            RemovedInDjango60Warning,
+        )
         return self.get_joining_columns(reverse_join=True)
+
+    def get_joining_fields(self, reverse_join=False):
+        return tuple(
+            self.reverse_related_fields if reverse_join else self.related_fields
+        )
+
+    def get_reverse_joining_fields(self):
+        return self.get_joining_fields(reverse_join=True)
 
     def get_extra_descriptor_filter(self, instance):
         """
@@ -857,7 +873,7 @@ class ForeignObject(RelatedField):
         return self.get_reverse_path_info()
 
     @classmethod
-    @functools.lru_cache(maxsize=None)
+    @functools.cache
     def get_class_lookups(cls):
         bases = inspect.getmro(cls)
         bases = bases[: bases.index(ForeignObject) + 1]
@@ -1164,6 +1180,9 @@ class ForeignKey(ForeignObject):
     def db_type(self, connection):
         return self.target_field.rel_db_type(connection=connection)
 
+    def cast_db_type(self, connection):
+        return self.target_field.cast_db_type(connection=connection)
+
     def db_parameters(self, connection):
         target_db_parameters = self.target_field.db_parameters(connection)
         return {
@@ -1428,6 +1447,14 @@ class ManyToManyField(RelatedField):
                     id="fields.W345",
                 )
             )
+        if self.db_comment:
+            warnings.append(
+                checks.Warning(
+                    "db_comment has no effect on ManyToManyField.",
+                    obj=self,
+                    id="fields.W346",
+                )
+            )
 
         return warnings
 
@@ -1608,7 +1635,6 @@ class ManyToManyField(RelatedField):
                     (source_field_name, source),
                     (target_field_name, target),
                 ):
-
                     possible_field_names = []
                     for f in through._meta.fields:
                         if (

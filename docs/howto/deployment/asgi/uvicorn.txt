@@ -2,15 +2,15 @@
 How to use Django with Uvicorn
 ==============================
 
-.. highlight:: bash
-
 Uvicorn_ is an ASGI server based on ``uvloop`` and ``httptools``, with an
 emphasis on speed.
 
 Installing Uvicorn
 ==================
 
-You can install Uvicorn with ``pip``::
+You can install Uvicorn with ``pip``:
+
+.. code-block:: shell
 
     python -m pip install uvicorn
 
@@ -22,7 +22,9 @@ applications. Uvicorn needs to be called with the location of a module
 containing an ASGI application object, followed by what the application is
 called (separated by a colon).
 
-For a typical Django project, invoking Uvicorn would look like::
+For a typical Django project, invoking Uvicorn would look like:
+
+.. code-block:: shell
 
     python -m uvicorn myproject.asgi:application
 
@@ -41,11 +43,15 @@ Deploying Django using Uvicorn and Gunicorn
 Gunicorn_ is a robust web server that implements process monitoring and automatic
 restarts. This can be useful when running Uvicorn in a production environment.
 
-To install Uvicorn and Gunicorn, use the following::
+To install Uvicorn and Gunicorn, use the following:
+
+.. code-block:: shell
 
     python -m pip install uvicorn gunicorn
 
-Then start Gunicorn using the Uvicorn worker class like this::
+Then start Gunicorn using the Uvicorn worker class like this:
+
+.. code-block:: shell
 
     python -m gunicorn myproject.asgi:application -k uvicorn.workers.UvicornWorker
 

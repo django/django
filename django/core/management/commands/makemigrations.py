@@ -72,7 +72,7 @@ class Command(BaseCommand):
             dest="check_changes",
             help=(
                 "Exit with a non-zero status if model changes are missing migrations "
-                "and don't actually write them."
+                "and don't actually write them. Implies --dry-run."
             ),
         )
         parser.add_argument(
@@ -114,6 +114,8 @@ class Command(BaseCommand):
             raise CommandError("The migration name must be a valid Python identifier.")
         self.include_header = options["include_header"]
         check_changes = options["check_changes"]
+        if check_changes:
+            self.dry_run = True
         self.scriptable = options["scriptable"]
         self.update = options["update"]
         # If logs and prompts are diverted to stderr, remove the ERROR style.
@@ -251,12 +253,12 @@ class Command(BaseCommand):
                 else:
                     self.log("No changes detected")
         else:
-            if check_changes:
-                sys.exit(1)
             if self.update:
                 self.write_to_last_migration_files(changes)
             else:
                 self.write_migration_files(changes)
+            if check_changes:
+                sys.exit(1)
 
     def write_to_last_migration_files(self, changes):
         loader = MigrationLoader(connections[DEFAULT_DB_ALIAS])
@@ -316,9 +318,8 @@ class Command(BaseCommand):
             )
             # Update name.
             previous_migration_path = MigrationWriter(leaf_migration).path
-            suggested_name = (
-                leaf_migration.name[:4] + "_" + leaf_migration.suggest_name()
-            )
+            name_fragment = self.migration_name or leaf_migration.suggest_name()
+            suggested_name = leaf_migration.name[:4] + f"_{name_fragment}"
             if leaf_migration.name == suggested_name:
                 new_name = leaf_migration.name + "_updated"
             else:
@@ -347,7 +348,7 @@ class Command(BaseCommand):
                     migration_string = self.get_relative_path(writer.path)
                     self.log("  %s\n" % self.style.MIGRATE_LABEL(migration_string))
                     for operation in migration.operations:
-                        self.log("    - %s" % operation.describe())
+                        self.log("    %s" % operation.formatted_description())
                     if self.scriptable:
                         self.stdout.write(migration_string)
                 if not self.dry_run:
@@ -455,7 +456,7 @@ class Command(BaseCommand):
                 for migration in merge_migrations:
                     self.log(self.style.MIGRATE_LABEL("  Branch %s" % migration.name))
                     for operation in migration.merged_operations:
-                        self.log("    - %s" % operation.describe())
+                        self.log("    %s" % operation.formatted_description())
             if questioner.ask_merge(app_label):
                 # If they still want to merge it, then write out an empty
                 # file depending on the migrations needing merging.

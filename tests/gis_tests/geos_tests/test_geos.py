@@ -1,6 +1,7 @@
 import ctypes
 import itertools
 import json
+import math
 import pickle
 import random
 from binascii import a2b_hex
@@ -241,6 +242,75 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         self.assertEqual(p0, "SRID=0;POINT (5 23)")
         self.assertNotEqual(p1, "SRID=0;POINT (5 23)")
 
+    @skipIf(geos_version_tuple() < (3, 12), "GEOS >= 3.12.0 is required")
+    def test_equals_identical(self):
+        tests = [
+            # Empty inputs of different types are not equals_identical.
+            ("POINT EMPTY", "LINESTRING EMPTY", False),
+            # Empty inputs of different dimensions are not equals_identical.
+            ("POINT EMPTY", "POINT Z EMPTY", False),
+            # Non-empty inputs of different dimensions are not equals_identical.
+            ("POINT Z (1 2 3)", "POINT M (1 2 3)", False),
+            ("POINT ZM (1 2 3 4)", "POINT Z (1 2 3)", False),
+            # Inputs with different structure are not equals_identical.
+            ("LINESTRING (1 1, 2 2)", "MULTILINESTRING ((1 1, 2 2))", False),
+            # Inputs with different types are not equals_identical.
+            (
+                "GEOMETRYCOLLECTION (LINESTRING (1 1, 2 2))",
+                "MULTILINESTRING ((1 1, 2 2))",
+                False,
+            ),
+            # Same lines are equals_identical.
+            ("LINESTRING M (1 1 0, 2 2 1)", "LINESTRING M (1 1 0, 2 2 1)", True),
+            # Different lines are not equals_identical.
+            ("LINESTRING M (1 1 0, 2 2 1)", "LINESTRING M (1 1 1, 2 2 1)", False),
+            # Same polygons are equals_identical.
+            ("POLYGON ((0 0, 1 0, 1 1, 0 0))", "POLYGON ((0 0, 1 0, 1 1, 0 0))", True),
+            # Different polygons are not equals_identical.
+            ("POLYGON ((0 0, 1 0, 1 1, 0 0))", "POLYGON ((1 0, 1 1, 0 0, 1 0))", False),
+            # Different polygons (number of holes) are not equals_identical.
+            (
+                "POLYGON ((0 0, 10 0, 10 10, 0 10, 0 0), (1 1, 2 1, 2 2, 1 1))",
+                (
+                    "POLYGON ((0 0, 10 0, 10 10, 0 10, 0 0), (1 1, 2 1, 2 2, 1 1), "
+                    "(3 3, 4 3, 4 4, 3 3))"
+                ),
+                False,
+            ),
+            # Same collections are equals_identical.
+            (
+                "MULTILINESTRING ((1 1, 2 2), (2 2, 3 3))",
+                "MULTILINESTRING ((1 1, 2 2), (2 2, 3 3))",
+                True,
+            ),
+            # Different collections (structure) are not equals_identical.
+            (
+                "MULTILINESTRING ((1 1, 2 2), (2 2, 3 3))",
+                "MULTILINESTRING ((2 2, 3 3), (1 1, 2 2))",
+                False,
+            ),
+        ]
+        for g1, g2, is_equal_identical in tests:
+            with self.subTest(g1=g1, g2=g2):
+                self.assertIs(
+                    fromstr(g1).equals_identical(fromstr(g2)), is_equal_identical
+                )
+
+    @skipIf(geos_version_tuple() < (3, 12), "GEOS >= 3.12.0 is required")
+    def test_infinite_values_equals_identical(self):
+        # Input with identical infinite values are equals_identical.
+        g1 = Point(x=float("nan"), y=math.inf)
+        g2 = Point(x=float("nan"), y=math.inf)
+        self.assertIs(g1.equals_identical(g2), True)
+
+    @mock.patch("django.contrib.gis.geos.libgeos.geos_version", lambda: b"3.11.0")
+    def test_equals_identical_geos_version(self):
+        g1 = fromstr("POINT (1 2 3)")
+        g2 = fromstr("POINT (1 2 3)")
+        msg = "GEOSGeometry.equals_identical() requires GEOS >= 3.12.0"
+        with self.assertRaisesMessage(GEOSException, msg):
+            g1.equals_identical(g2)
+
     def test_points(self):
         "Testing Point objects."
         prev = fromstr("POINT(0 0)")
@@ -393,7 +463,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             line.ewkt, "SRID=4326;LINESTRING (151.2607 -33.887, 144.963 -37.8143)"
         )
 
-    def _test_is_counterclockwise(self):
+    def test_is_counterclockwise(self):
         lr = LinearRing((0, 0), (1, 0), (0, 1), (0, 0))
         self.assertIs(lr.is_counterclockwise, True)
         lr.reverse()
@@ -402,11 +472,6 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         with self.assertRaisesMessage(ValueError, msg):
             LinearRing().is_counterclockwise
 
-    @skipIf(geos_version_tuple() < (3, 7), "GEOS >= 3.7.0 is required")
-    def test_is_counterclockwise(self):
-        self._test_is_counterclockwise()
-
-    @skipIf(geos_version_tuple() < (3, 7), "GEOS >= 3.7.0 is required")
     def test_is_counterclockwise_geos_error(self):
         with mock.patch("django.contrib.gis.geos.prototypes.cs_is_ccw") as mocked:
             mocked.return_value = 0
@@ -414,10 +479,6 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             msg = 'Error encountered in GEOS C function "GEOSCoordSeq_isCCW".'
             with self.assertRaisesMessage(GEOSException, msg):
                 LinearRing((0, 0), (1, 0), (0, 1), (0, 0)).is_counterclockwise
-
-    @mock.patch("django.contrib.gis.geos.libgeos.geos_version", lambda: b"3.6.9")
-    def test_is_counterclockwise_fallback(self):
-        self._test_is_counterclockwise()
 
     def test_multilinestring(self):
         "Testing MultiLineString objects."
@@ -892,8 +953,8 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             # Test conversion from custom to a known srid
             c2w = gdal.CoordTransform(
                 gdal.SpatialReference(
-                    "+proj=mill +lat_0=0 +lon_0=0 +x_0=0 +y_0=0 +R_A +ellps=WGS84 "
-                    "+datum=WGS84 +units=m +no_defs"
+                    "+proj=mill +lat_0=0 +lon_0=0 +x_0=0 +y_0=0 +R_A +datum=WGS84 "
+                    "+units=m +no_defs"
                 ),
                 gdal.SpatialReference(4326),
             )
@@ -1292,6 +1353,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
 
     def test_pickle(self):
         "Testing pickling and unpickling support."
+
         # Creating a list of test geometries for pickling,
         # and setting the SRID on some of them.
         def get_geoms(lst, srid=None):
@@ -1542,7 +1604,6 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         self.assertEqual(multipoint_2, normalized)
         self.assertNotEqual(multipoint, normalized)
 
-    @skipIf(geos_version_tuple() < (3, 8), "GEOS >= 3.8.0 is required")
     def test_make_valid(self):
         poly = GEOSGeometry("POLYGON((0 0, 0 23, 23 0, 23 23, 0 0))")
         self.assertIs(poly.valid, False)
@@ -1553,13 +1614,6 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         valid_poly2 = valid_poly.make_valid()
         self.assertIs(valid_poly2.valid, True)
         self.assertEqual(valid_poly, valid_poly2)
-
-    @mock.patch("django.contrib.gis.geos.libgeos.geos_version", lambda: b"3.7.3")
-    def test_make_valid_geos_version(self):
-        msg = "GEOSGeometry.make_valid() requires GEOS >= 3.8.0."
-        poly = GEOSGeometry("POLYGON((0 0, 0 23, 23 0, 23 23, 0 0))")
-        with self.assertRaisesMessage(GEOSException, msg):
-            poly.make_valid()
 
     def test_empty_point(self):
         p = Point(srid=4326)

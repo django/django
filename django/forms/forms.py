@@ -4,17 +4,13 @@ Form classes
 
 import copy
 import datetime
-import warnings
 
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
-from django.forms.fields import Field, FileField
+from django.forms.fields import Field
 from django.forms.utils import ErrorDict, ErrorList, RenderableFormMixin
 from django.forms.widgets import Media, MediaDefiningClass
 from django.utils.datastructures import MultiValueDict
-from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.functional import cached_property
-from django.utils.html import conditional_escape
-from django.utils.safestring import SafeString, mark_safe
 from django.utils.translation import gettext as _
 
 from .renderers import get_default_renderer
@@ -219,99 +215,6 @@ class BaseForm(RenderableFormMixin):
         # widgets split data over several HTML fields.
         return widget.value_from_datadict(self.data, self.files, html_name)
 
-    def _html_output(
-        self, normal_row, error_row, row_ender, help_text_html, errors_on_separate_row
-    ):
-        "Output HTML. Used by as_table(), as_ul(), as_p()."
-        warnings.warn(
-            "django.forms.BaseForm._html_output() is deprecated. "
-            "Please use .render() and .get_context() instead.",
-            RemovedInDjango50Warning,
-            stacklevel=2,
-        )
-        # Errors that should be displayed above all fields.
-        top_errors = self.non_field_errors().copy()
-        output, hidden_fields = [], []
-
-        for name, bf in self._bound_items():
-            field = bf.field
-            html_class_attr = ""
-            bf_errors = self.error_class(bf.errors)
-            if bf.is_hidden:
-                if bf_errors:
-                    top_errors.extend(
-                        [
-                            _("(Hidden field %(name)s) %(error)s")
-                            % {"name": name, "error": str(e)}
-                            for e in bf_errors
-                        ]
-                    )
-                hidden_fields.append(str(bf))
-            else:
-                # Create a 'class="..."' attribute if the row should have any
-                # CSS classes applied.
-                css_classes = bf.css_classes()
-                if css_classes:
-                    html_class_attr = ' class="%s"' % css_classes
-
-                if errors_on_separate_row and bf_errors:
-                    output.append(error_row % str(bf_errors))
-
-                if bf.label:
-                    label = conditional_escape(bf.label)
-                    label = bf.label_tag(label) or ""
-                else:
-                    label = ""
-
-                if field.help_text:
-                    help_text = help_text_html % field.help_text
-                else:
-                    help_text = ""
-
-                output.append(
-                    normal_row
-                    % {
-                        "errors": bf_errors,
-                        "label": label,
-                        "field": bf,
-                        "help_text": help_text,
-                        "html_class_attr": html_class_attr,
-                        "css_classes": css_classes,
-                        "field_name": bf.html_name,
-                    }
-                )
-
-        if top_errors:
-            output.insert(0, error_row % top_errors)
-
-        if hidden_fields:  # Insert any hidden fields in the last row.
-            str_hidden = "".join(hidden_fields)
-            if output:
-                last_row = output[-1]
-                # Chop off the trailing row_ender (e.g. '</td></tr>') and
-                # insert the hidden fields.
-                if not last_row.endswith(row_ender):
-                    # This can happen in the as_p() case (and possibly others
-                    # that users write): if there are only top errors, we may
-                    # not be able to conscript the last row for our purposes,
-                    # so insert a new, empty row.
-                    last_row = normal_row % {
-                        "errors": "",
-                        "label": "",
-                        "field": "",
-                        "help_text": "",
-                        "html_class_attr": html_class_attr,
-                        "css_classes": "",
-                        "field_name": "",
-                    }
-                    output.append(last_row)
-                output[-1] = last_row[: -len(row_ender)] + str_hidden + row_ender
-            else:
-                # If there aren't any rows in the output, just append the
-                # hidden fields.
-                output.append(str_hidden)
-        return mark_safe("\n".join(output))
-
     @property
     def template_name(self):
         return self.renderer.form_template_name
@@ -321,27 +224,16 @@ class BaseForm(RenderableFormMixin):
         hidden_fields = []
         top_errors = self.non_field_errors().copy()
         for name, bf in self._bound_items():
-            bf_errors = self.error_class(bf.errors, renderer=self.renderer)
             if bf.is_hidden:
-                if bf_errors:
+                if bf.errors:
                     top_errors += [
                         _("(Hidden field %(name)s) %(error)s")
                         % {"name": name, "error": str(e)}
-                        for e in bf_errors
+                        for e in bf.errors
                     ]
                 hidden_fields.append(bf)
             else:
-                errors_str = str(bf_errors)
-                # RemovedInDjango50Warning.
-                if not isinstance(errors_str, SafeString):
-                    warnings.warn(
-                        f"Returning a plain string from "
-                        f"{self.error_class.__name__} is deprecated. Please "
-                        f"customize via the template system instead.",
-                        RemovedInDjango50Warning,
-                    )
-                    errors_str = mark_safe(errors_str)
-                fields.append((bf, errors_str))
+                fields.append((bf, bf.errors))
         return {
             "form": self,
             "fields": fields,
@@ -437,13 +329,8 @@ class BaseForm(RenderableFormMixin):
     def _clean_fields(self):
         for name, bf in self._bound_items():
             field = bf.field
-            value = bf.initial if field.disabled else bf.data
             try:
-                if isinstance(field, FileField):
-                    value = field.clean(value, bf.initial)
-                else:
-                    value = field.clean(value)
-                self.cleaned_data[name] = value
+                self.cleaned_data[name] = field._clean_bound_field(bf)
                 if hasattr(self, "clean_%s" % name):
                     value = getattr(self, "clean_%s" % name)()
                     self.cleaned_data[name] = value

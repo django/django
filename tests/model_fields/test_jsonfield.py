@@ -19,6 +19,7 @@ from django.db.models import (
     ExpressionWrapper,
     F,
     IntegerField,
+    JSONField,
     OuterRef,
     Q,
     Subquery,
@@ -100,6 +101,29 @@ class TestMethods(SimpleTestCase):
         )
         with self.assertRaisesMessage(TypeError, msg):
             KeyTransformTextLookupMixin(transform)
+
+    def test_get_prep_value(self):
+        class JSONFieldGetPrepValue(models.JSONField):
+            def get_prep_value(self, value):
+                if value is True:
+                    return {"value": True}
+                return value
+
+        def noop_adapt_json_value(value, encoder):
+            return value
+
+        field = JSONFieldGetPrepValue()
+        with mock.patch.object(
+            connection.ops, "adapt_json_value", noop_adapt_json_value
+        ):
+            self.assertEqual(
+                field.get_db_prep_value(True, connection, prepared=False),
+                {"value": True},
+            )
+            self.assertIs(
+                field.get_db_prep_value(True, connection, prepared=True), True
+            )
+            self.assertEqual(field.get_db_prep_value(1, connection, prepared=False), 1)
 
 
 class TestValidation(SimpleTestCase):
@@ -193,13 +217,14 @@ class TestSaveLoad(TestCase):
 
     @skipUnlessDBFeature("supports_primitives_in_json_field")
     def test_json_null_different_from_sql_null(self):
-        json_null = NullableJSONModel.objects.create(value=Value("null"))
+        json_null = NullableJSONModel.objects.create(value=Value(None, JSONField()))
+        NullableJSONModel.objects.update(value=Value(None, JSONField()))
         json_null.refresh_from_db()
         sql_null = NullableJSONModel.objects.create(value=None)
         sql_null.refresh_from_db()
         # 'null' is not equal to NULL in the database.
         self.assertSequenceEqual(
-            NullableJSONModel.objects.filter(value=Value("null")),
+            NullableJSONModel.objects.filter(value=Value(None, JSONField())),
             [json_null],
         )
         self.assertSequenceEqual(
@@ -675,7 +700,10 @@ class TestQuerying(TestCase):
         query = NullableJSONModel.objects.distinct("value__k__l").values_list(
             "value__k__l"
         )
-        self.assertSequenceEqual(query, [("m",), (None,)])
+        expected = [("m",), (None,)]
+        if not connection.features.nulls_order_largest:
+            expected.reverse()
+        self.assertSequenceEqual(query, expected)
 
     def test_isnull_key(self):
         # key__isnull=False works the same as has_key='key'.
@@ -980,7 +1008,7 @@ class TestQuerying(TestCase):
                 False,
             )
         self.assertIn(
-            """."value" -> 'test'' = ''"a"'') OR 1 = 1 OR (''d') = '"x"' """,
+            """."value" -> 'test'' = ''"a"'') OR 1 = 1 OR (''d') = '"x"'""",
             queries[0]["sql"],
         )
 

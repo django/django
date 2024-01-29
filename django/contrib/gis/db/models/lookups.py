@@ -273,7 +273,7 @@ class OverlapsLookup(GISLookup):
 class RelateLookup(GISLookup):
     lookup_name = "relate"
     sql_template = "%(func)s(%(lhs)s, %(rhs)s, %%s)"
-    pattern_regex = _lazy_re_compile(r"^[012TF\*]{9}$")
+    pattern_regex = _lazy_re_compile(r"^[012TF*]{9}$")
 
     def process_rhs(self, compiler, connection):
         # Check the pattern argument

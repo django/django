@@ -1,6 +1,7 @@
 import argparse
 import ctypes
 import faulthandler
+import hashlib
 import io
 import itertools
 import logging
@@ -11,7 +12,6 @@ import random
 import sys
 import textwrap
 import unittest
-import warnings
 from collections import defaultdict
 from contextlib import contextmanager
 from importlib import import_module
@@ -28,9 +28,8 @@ from django.test.utils import setup_databases as _setup_databases
 from django.test.utils import setup_test_environment
 from django.test.utils import teardown_databases as _teardown_databases
 from django.test.utils import teardown_test_environment
-from django.utils.crypto import new_hash
 from django.utils.datastructures import OrderedSet
-from django.utils.deprecation import RemovedInDjango50Warning
+from django.utils.version import PY312
 
 try:
     import ipdb as pdb
@@ -287,6 +286,10 @@ failure and get a correct traceback.
         super().stopTest(test)
         self.events.append(("stopTest", self.test_index))
 
+    def addDuration(self, test, elapsed):
+        super().addDuration(test, elapsed)
+        self.events.append(("addDuration", self.test_index, elapsed))
+
     def addError(self, test, err):
         self.check_picklable(test, err)
         self.events.append(("addError", self.test_index, err))
@@ -403,6 +406,7 @@ def _init_worker(
     process_setup=None,
     process_setup_args=None,
     debug_mode=None,
+    used_aliases=None,
 ):
     """
     Switch to databases dedicated to this worker.
@@ -427,7 +431,8 @@ def _init_worker(
         django.setup()
         setup_test_environment(debug=debug_mode)
 
-    for alias in connections:
+    db_aliases = used_aliases if used_aliases is not None else connections
+    for alias in db_aliases:
         connection = connections[alias]
         if start_method == "spawn":
             # Restore initial settings in spawned processes.
@@ -488,13 +493,14 @@ class ParallelTestSuite(unittest.TestSuite):
         self.buffer = buffer
         self.initial_settings = None
         self.serialized_contents = None
+        self.used_aliases = None
         super().__init__()
 
     def run(self, result):
         """
-        Distribute test cases across workers.
+        Distribute TestCases across workers.
 
-        Return an identifier of each test case with its result in order to use
+        Return an identifier of each TestCase with its result in order to use
         imap_unordered to show results as soon as they're available.
 
         To minimize pickling errors when getting results from workers:
@@ -517,6 +523,7 @@ class ParallelTestSuite(unittest.TestSuite):
                 self.process_setup.__func__,
                 self.process_setup_args,
                 self.debug_mode,
+                self.used_aliases,
             ],
         )
         args = [
@@ -582,7 +589,7 @@ class Shuffler:
 
     @classmethod
     def _hash_text(cls, text):
-        h = new_hash(cls.hash_algorithm, usedforsecurity=False)
+        h = hashlib.new(cls.hash_algorithm, usedforsecurity=False)
         h.update(text.encode("utf-8"))
         return h.hexdigest()
 
@@ -657,9 +664,9 @@ class DiscoverRunner:
         timing=False,
         shuffle=False,
         logger=None,
+        durations=None,
         **kwargs,
     ):
-
         self.pattern = pattern
         self.top_level = top_level
         self.verbosity = verbosity
@@ -695,6 +702,7 @@ class DiscoverRunner:
         self.shuffle = shuffle
         self._shuffler = None
         self.logger = logger
+        self.durations = durations
 
     @classmethod
     def add_arguments(cls, parser):
@@ -794,6 +802,15 @@ class DiscoverRunner:
                 "unittest -k option."
             ),
         )
+        if PY312:
+            parser.add_argument(
+                "--durations",
+                dest="durations",
+                type=int,
+                default=None,
+                metavar="N",
+                help="Show the N slowest test cases (N=0 for all).",
+            )
 
     @property
     def shuffle_seed(self):
@@ -877,15 +894,8 @@ class DiscoverRunner:
         self.test_loader._top_level_dir = None
         return tests
 
-    def build_suite(self, test_labels=None, extra_tests=None, **kwargs):
-        if extra_tests is not None:
-            warnings.warn(
-                "The extra_tests argument is deprecated.",
-                RemovedInDjango50Warning,
-                stacklevel=2,
-            )
+    def build_suite(self, test_labels=None, **kwargs):
         test_labels = test_labels or ["."]
-        extra_tests = extra_tests or []
 
         discover_kwargs = {}
         if self.pattern is not None:
@@ -898,8 +908,6 @@ class DiscoverRunner:
         for label in test_labels:
             tests = self.load_tests_for_label(label, discover_kwargs)
             all_tests.extend(iter_test_cases(tests))
-
-        all_tests.extend(iter_test_cases(extra_tests))
 
         if self.tags or self.exclude_tags:
             if self.tags:
@@ -965,12 +973,15 @@ class DiscoverRunner:
             return PDBDebugResult
 
     def get_test_runner_kwargs(self):
-        return {
+        kwargs = {
             "failfast": self.failfast,
             "resultclass": self.get_resultclass(),
             "verbosity": self.verbosity,
             "buffer": self.buffer,
         }
+        if PY312:
+            kwargs["durations"] = self.durations
+        return kwargs
 
     def run_checks(self, databases):
         # Checks are run after database creation since some checks require
@@ -1030,7 +1041,7 @@ class DiscoverRunner:
             )
         return databases
 
-    def run_tests(self, test_labels, extra_tests=None, **kwargs):
+    def run_tests(self, test_labels, **kwargs):
         """
         Run the unit tests for all the test labels in the provided list.
 
@@ -1039,18 +1050,13 @@ class DiscoverRunner:
 
         Return the number of tests that failed.
         """
-        if extra_tests is not None:
-            warnings.warn(
-                "The extra_tests argument is deprecated.",
-                RemovedInDjango50Warning,
-                stacklevel=2,
-            )
         self.setup_test_environment()
-        suite = self.build_suite(test_labels, extra_tests)
+        suite = self.build_suite(test_labels)
         databases = self.get_databases(suite)
         suite.serialized_aliases = set(
             alias for alias, serialize in databases.items() if serialize
         )
+        suite.used_aliases = set(databases)
         with self.time_keeper.timed("Total database setup"):
             old_config = self.setup_databases(
                 aliases=databases,
@@ -1198,7 +1204,7 @@ def reorder_tests(tests, classes, reverse=False, shuffler=None):
 
 
 def partition_suite_by_case(suite):
-    """Partition a test suite by test case, preserving the order of tests."""
+    """Partition a test suite by TestCase, preserving the order of tests."""
     suite_class = type(suite)
     all_tests = iter_test_cases(suite)
     return [suite_class(tests) for _, tests in itertools.groupby(all_tests, type)]

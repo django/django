@@ -6,6 +6,7 @@ class Person(models.Model):
     last_name = models.CharField(max_length=100)
     birthday = models.DateField()
     defaults = models.TextField()
+    create_defaults = models.TextField()
 
 
 class DefaultPerson(models.Model):

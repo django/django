@@ -76,6 +76,15 @@ class CastTests(TestCase):
                 numbers = Author.objects.annotate(cast_int=Cast("alias", field_class()))
                 self.assertEqual(numbers.get().cast_int, 1)
 
+    def test_cast_to_integer_foreign_key(self):
+        numbers = Author.objects.annotate(
+            cast_fk=Cast(
+                models.Value("0"),
+                models.ForeignKey(Author, on_delete=models.SET_NULL),
+            )
+        )
+        self.assertEqual(numbers.get().cast_fk, 0)
+
     def test_cast_to_duration(self):
         duration = datetime.timedelta(days=1, seconds=2, microseconds=3)
         DTModel.objects.create(duration=duration)

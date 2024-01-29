@@ -1,4 +1,3 @@
-import tempfile
 from io import StringIO
 
 from django.contrib.gis import gdal
@@ -15,6 +14,7 @@ from django.contrib.gis.geos import (
     Polygon,
     fromstr,
 )
+from django.core.files.temp import NamedTemporaryFile
 from django.core.management import call_command
 from django.db import DatabaseError, NotSupportedError, connection
 from django.db.models import F, OuterRef, Subquery
@@ -31,6 +31,7 @@ from .models import (
     NonConcreteModel,
     PennsylvaniaCity,
     State,
+    ThreeDimensionalFeature,
     Track,
 )
 
@@ -232,7 +233,7 @@ class GeoModelTest(TestCase):
         self.assertIn('"point": "%s"' % houston.point.ewkt, result)
 
         # Reload now dumped data
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".json") as tmp:
+        with NamedTemporaryFile(mode="w", suffix=".json") as tmp:
             tmp.write(result)
             tmp.seek(0)
             call_command("loaddata", tmp.name, verbosity=0)
@@ -252,7 +253,13 @@ class GeoModelTest(TestCase):
         ]
         for klass in geometry_classes:
             g = klass(srid=4326)
-            feature = Feature.objects.create(name="Empty %s" % klass.__name__, geom=g)
+            model_class = Feature
+            if g.hasz:
+                if not connection.features.supports_3d_storage:
+                    continue
+                else:
+                    model_class = ThreeDimensionalFeature
+            feature = model_class.objects.create(name=f"Empty {klass.__name__}", geom=g)
             feature.refresh_from_db()
             if klass is LinearRing:
                 # LinearRing isn't representable in WKB, so GEOSGeomtry.wkb
@@ -645,18 +652,16 @@ class GeoQuerySetTest(TestCase):
         self.assertIsNone(State.objects.aggregate(MakeLine("poly"))["poly__makeline"])
         # Reference query:
         # SELECT AsText(ST_MakeLine(geoapp_city.point)) FROM geoapp_city;
-        ref_line = GEOSGeometry(
-            "LINESTRING(-95.363151 29.763374,-96.801611 32.782057,"
-            "-97.521157 34.464642,174.783117 -41.315268,-104.609252 38.255001,"
-            "-95.23506 38.971823,-87.650175 41.850385,-123.305196 48.462611)",
-            srid=4326,
-        )
-        # We check for equality with a tolerance of 10e-5 which is a lower bound
-        # of the precisions of ref_line coordinates
         line = City.objects.aggregate(MakeLine("point"))["point__makeline"]
-        self.assertTrue(
-            ref_line.equals_exact(line, tolerance=10e-5), "%s != %s" % (ref_line, line)
-        )
+        ref_points = City.objects.values_list("point", flat=True)
+        self.assertIsInstance(line, LineString)
+        self.assertEqual(len(line), ref_points.count())
+        # Compare pairs of manually sorted points, as the default ordering is
+        # flaky.
+        for point, ref_city in zip(sorted(line), sorted(ref_points)):
+            point_x, point_y = point
+            self.assertAlmostEqual(point_x, ref_city.x, 5)
+            self.assertAlmostEqual(point_y, ref_city.y, 5)
 
     @skipUnlessDBFeature("supports_union_aggr")
     def test_unionagg(self):

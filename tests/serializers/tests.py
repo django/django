@@ -1,4 +1,3 @@
-import pickle
 from datetime import datetime
 from functools import partialmethod
 from io import StringIO
@@ -6,12 +5,11 @@ from unittest import mock, skipIf
 
 from django.core import serializers
 from django.core.serializers import SerializerDoesNotExist
-from django.core.serializers.base import PickleSerializer, ProgressBar
+from django.core.serializers.base import ProgressBar
 from django.db import connection, transaction
 from django.http import HttpResponse
 from django.test import SimpleTestCase, override_settings, skipUnlessDBFeature
-from django.test.utils import Approximate, ignore_warnings
-from django.utils.deprecation import RemovedInDjango50Warning
+from django.test.utils import Approximate
 
 from .models import (
     Actor,
@@ -75,7 +73,7 @@ class SerializerRegistrationTests(SimpleTestCase):
         all_formats = set(serializers.get_serializer_formats())
         public_formats = set(serializers.get_public_serializer_formats())
 
-        self.assertIn("xml", all_formats),
+        self.assertIn("xml", all_formats)
         self.assertIn("xml", public_formats)
 
         self.assertIn("json2", all_formats)
@@ -279,14 +277,14 @@ class SerializersTestBase:
     def test_serialize_prefetch_related_m2m(self):
         # One query for the Article table and one for each prefetched m2m
         # field.
-        with self.assertNumQueries(3):
+        with self.assertNumQueries(4):
             serializers.serialize(
                 self.serializer_name,
-                Article.objects.prefetch_related("categories", "meta_data"),
+                Article.objects.prefetch_related("categories", "meta_data", "topics"),
             )
-        # One query for the Article table, and two m2m queries for each
+        # One query for the Article table, and three m2m queries for each
         # article.
-        with self.assertNumQueries(5):
+        with self.assertNumQueries(7):
             serializers.serialize(self.serializer_name, Article.objects.all())
 
     def test_serialize_with_null_pk(self):
@@ -411,7 +409,7 @@ class SerializersTestBase:
         self.assertEqual(self._get_field_values(child_data, "parent_data"), [])
 
     def test_serialize_only_pk(self):
-        with self.assertNumQueries(5) as ctx:
+        with self.assertNumQueries(7) as ctx:
             serializers.serialize(
                 self.serializer_name,
                 Article.objects.all(),
@@ -422,9 +420,11 @@ class SerializersTestBase:
         self.assertNotIn(connection.ops.quote_name("meta_data_id"), categories_sql)
         meta_data_sql = ctx[2]["sql"]
         self.assertNotIn(connection.ops.quote_name("kind"), meta_data_sql)
+        topics_data_sql = ctx[3]["sql"]
+        self.assertNotIn(connection.ops.quote_name("category_id"), topics_data_sql)
 
     def test_serialize_no_only_pk_with_natural_keys(self):
-        with self.assertNumQueries(5) as ctx:
+        with self.assertNumQueries(7) as ctx:
             serializers.serialize(
                 self.serializer_name,
                 Article.objects.all(),
@@ -436,6 +436,8 @@ class SerializersTestBase:
         # CategoryMetaData has natural_key().
         meta_data_sql = ctx[2]["sql"]
         self.assertIn(connection.ops.quote_name("kind"), meta_data_sql)
+        topics_data_sql = ctx[3]["sql"]
+        self.assertNotIn(connection.ops.quote_name("category_id"), topics_data_sql)
 
 
 class SerializerAPITests(SimpleTestCase):
@@ -463,7 +465,6 @@ class SerializerAPITests(SimpleTestCase):
 
 
 class SerializersTransactionTestBase:
-
     available_apps = ["serializers"]
 
     @skipUnlessDBFeature("supports_forward_references")
@@ -485,31 +486,6 @@ class SerializersTransactionTestBase:
         art_obj = Article.objects.all()[0]
         self.assertEqual(art_obj.categories.count(), 1)
         self.assertEqual(art_obj.author.name, "Agnes")
-
-
-class PickleSerializerTests(SimpleTestCase):
-    @ignore_warnings(category=RemovedInDjango50Warning)
-    def test_serializer_protocol(self):
-        serializer = PickleSerializer(protocol=3)
-        self.assertEqual(serializer.protocol, 3)
-        # If protocol is not provided, it defaults to pickle.HIGHEST_PROTOCOL
-        serializer = PickleSerializer()
-        self.assertEqual(serializer.protocol, pickle.HIGHEST_PROTOCOL)
-
-    @ignore_warnings(category=RemovedInDjango50Warning)
-    def test_serializer_loads_dumps(self):
-        serializer = PickleSerializer()
-        test_data = "test data"
-        dump = serializer.dumps(test_data)
-        self.assertEqual(serializer.loads(dump), test_data)
-
-    def test_serializer_warning(self):
-        msg = (
-            "PickleSerializer is deprecated due to its security risk. Use "
-            "JSONSerializer instead."
-        )
-        with self.assertRaisesMessage(RemovedInDjango50Warning, msg):
-            PickleSerializer()
 
 
 def register_tests(test_class, method_name, test_func, exclude=()):

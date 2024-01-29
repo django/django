@@ -12,7 +12,12 @@ from ..models import Article, Author
 class JSONObjectTests(TestCase):
     @classmethod
     def setUpTestData(cls):
-        Author.objects.create(name="Ivan Ivanov", alias="iivanov")
+        Author.objects.bulk_create(
+            [
+                Author(name="Ivan Ivanov", alias="iivanov"),
+                Author(name="Bertha Berthy", alias="bberthy"),
+            ]
+        )
 
     def test_empty(self):
         obj = Author.objects.annotate(json_object=JSONObject()).first()
@@ -87,6 +92,18 @@ class JSONObjectTests(TestCase):
         )
         obj = Article.objects.annotate(json_object=JSONObject(text=F("text"))).first()
         self.assertEqual(obj.json_object, {"text": "x" * 4000})
+
+    def test_order_by_key(self):
+        qs = Author.objects.annotate(attrs=JSONObject(alias=F("alias"))).order_by(
+            "attrs__alias"
+        )
+        self.assertQuerySetEqual(qs, Author.objects.order_by("alias"))
+
+    def test_order_by_nested_key(self):
+        qs = Author.objects.annotate(
+            attrs=JSONObject(nested=JSONObject(alias=F("alias")))
+        ).order_by("-attrs__nested__alias")
+        self.assertQuerySetEqual(qs, Author.objects.order_by("-alias"))
 
 
 @skipIfDBFeature("has_json_object_function")

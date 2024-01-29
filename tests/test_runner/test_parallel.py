@@ -4,7 +4,7 @@ import unittest
 
 from django.test import SimpleTestCase
 from django.test.runner import RemoteTestResult
-from django.utils.version import PY311
+from django.utils.version import PY311, PY312
 
 try:
     import tblib.pickling_support
@@ -41,7 +41,6 @@ class ParallelTestRunnerTest(SimpleTestCase):
 
 
 class SampleFailingSubtest(SimpleTestCase):
-
     # This method name doesn't begin with "test" to prevent test discovery
     # from seeing it.
     def dummy_test(self):
@@ -119,7 +118,11 @@ class RemoteTestResultTest(SimpleTestCase):
         subtest_test.run(result=result)
 
         events = result.events
-        self.assertEqual(len(events), 4)
+        # addDurations added in Python 3.12.
+        if PY312:
+            self.assertEqual(len(events), 5)
+        else:
+            self.assertEqual(len(events), 4)
         self.assertIs(result.wasSuccessful(), False)
 
         event = events[1]
@@ -134,3 +137,9 @@ class RemoteTestResultTest(SimpleTestCase):
 
         event = events[2]
         self.assertEqual(repr(event[3][1]), "AssertionError('2 != 1')")
+
+    @unittest.skipUnless(PY312, "unittest --durations option requires Python 3.12")
+    def test_add_duration(self):
+        result = RemoteTestResult()
+        result.addDuration(None, 2.3)
+        self.assertEqual(result.collectedDurations, [("None", 2.3)])

@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# BouRock, 2015-2022
+# BouRock, 2015-2023
 # BouRock, 2014-2015
 # Caner Başaran <basaran.caner@gmail.com>, 2013
 # Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2012
@@ -15,10 +15,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:10-0500\n"
-"PO-Revision-Date: 2022-07-25 07:05+0000\n"
-"Last-Translator: BouRock\n"
-"Language-Team: Turkish (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 07:05+0000\n"
+"Last-Translator: BouRock, 2015-2023\n"
+"Language-Team: Turkish (http://app.transifex.com/django/django/language/"
 "tr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -186,6 +186,9 @@ msgid "Hold down “Control”, or “Command” on a Mac, to select more than o
 msgstr ""
 "Birden fazla seçmek için “Ctrl” veya Mac’teki “Command” tuşuna basılı tutun."
 
+msgid "Select this object for an action - {}"
+msgstr "Bir eylem için bu nesneyi seç - {}"
+
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr "{name} “{obj}” başarılı olarak eklendi."
@@ -349,6 +352,9 @@ msgstr "Tüm %(total_count)s %(module_name)s nesnelerini seç"
 msgid "Clear selection"
 msgstr "Seçimi temizle"
 
+msgid "Breadcrumbs"
+msgstr "İçerik haritaları"
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "%(name)s uygulamasındaki modeller"
@@ -376,14 +382,16 @@ msgid "Change password"
 msgstr "Parolayı değiştir"
 
 msgid "Please correct the error below."
-msgstr "Lütfen aşağıdaki hataları düzeltin."
-
-msgid "Please correct the errors below."
-msgstr "Lütfen aşağıdaki hataları düzeltin."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Lütfen aşağıdaki hatayı düzeltin."
+msgstr[1] "Lütfen aşağıdaki hataları düzeltin."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "<strong>%(username)s</strong> kullanıcısı için yeni bir parola girin."
+
+msgid "Skip to main content"
+msgstr "Ana içeriğe atla"
 
 msgid "Welcome,"
 msgstr "Hoş Geldiniz,"
@@ -410,6 +418,12 @@ msgstr "Sitede görüntüle"
 msgid "Filter"
 msgstr "Süz"
 
+msgid "Hide counts"
+msgstr "Sayıları gizle"
+
+msgid "Show counts"
+msgstr "Sayıları göster"
+
 msgid "Clear all filters"
 msgstr "Tüm süzgeçleri temizle"
 
@@ -422,6 +436,15 @@ msgstr "Sıralama önceliği: %(priority_number)s"
 
 msgid "Toggle sorting"
 msgstr "Sıralamayı değiştir"
+
+msgid "Toggle theme (current theme: auto)"
+msgstr "Temayı değiştir (şu anki tema: otomatik)"
+
+msgid "Toggle theme (current theme: light)"
+msgstr "Temayı değiştir (şu anki tema: açık)"
+
+msgid "Toggle theme (current theme: dark)"
+msgstr "Temayı değiştir (şu anki tema: koyu)"
 
 msgid "Delete"
 msgstr "Sil"
@@ -509,6 +532,15 @@ msgstr "Eylemlerim"
 msgid "None available"
 msgstr "Mevcut değil"
 
+msgid "Added:"
+msgstr "Eklendi:"
+
+msgid "Changed:"
+msgstr "Değiştirildi:"
+
+msgid "Deleted:"
+msgstr "Silindi:"
+
 msgid "Unknown content"
 msgstr "Bilinmeyen içerik"
 
@@ -535,6 +567,9 @@ msgstr "Kullanıcı adınızı veya parolanızı mı unuttunuz?"
 msgid "Toggle navigation"
 msgstr "Gezinmeyi aç/kapat"
 
+msgid "Sidebar"
+msgstr "Kenar çubuğu"
+
 msgid "Start typing to filter…"
 msgstr "Süzmek için yazmaya başlayın..."
 
@@ -551,10 +586,9 @@ msgid "Action"
 msgstr "Eylem"
 
 msgid "entry"
-msgstr "giriş"
-
-msgid "entries"
-msgstr "girişler"
+msgid_plural "entries"
+msgstr[0] "giriş"
+msgstr[1] "giriş"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -714,6 +748,9 @@ msgstr "E-posta adresi:"
 
 msgid "Reset my password"
 msgstr "Parolamı sıfırla"
+
+msgid "Select all objects on this page for an action"
+msgstr "Bir eylem için bu sayfadaki tüm nesneleri seç"
 
 msgid "All dates"
 msgstr "Tüm tarihler"

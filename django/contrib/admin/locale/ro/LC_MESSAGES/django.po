@@ -2,7 +2,7 @@
 #
 # Translators:
 # Bogdan Mateescu, 2018-2019
-# Daniel Ursache-Dogariu, 2011
+# Daniel Ursache-Dogariu, 2011,2022
 # Denis Darii <denis.darii@gmail.com>, 2011,2014
 # Eugenol Man <neatusebastian@gmail.com>, 2020
 # Ionel Cristian Mărieș <ionel.mc@gmail.com>, 2012
@@ -13,9 +13,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-14 19:53+0200\n"
-"PO-Revision-Date: 2020-07-15 11:07+0000\n"
-"Last-Translator: Eugenol Man <neatusebastian@gmail.com>\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-25 07:05+0000\n"
+"Last-Translator: Daniel Ursache-Dogariu, 2011,2022\n"
 "Language-Team: Romanian (http://www.transifex.com/django/django/language/"
 "ro/)\n"
 "MIME-Version: 1.0\n"
@@ -26,6 +26,10 @@ msgstr ""
 "2:1));\n"
 
 #, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Elimină %(verbose_name_plural)s selectate"
+
+#, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "%(count)d %(items)s șterse cu succes."
 
@@ -34,11 +38,7 @@ msgid "Cannot delete %(name)s"
 msgstr "Nu se poate șterge %(name)s"
 
 msgid "Are you sure?"
-msgstr "Ești sigur?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Elimină %(verbose_name_plural)s selectate"
+msgstr "Sigur?"
 
 msgid "Administration"
 msgstr "Administrare"
@@ -74,7 +74,7 @@ msgid "No date"
 msgstr "Fără dată"
 
 msgid "Has date"
-msgstr "Are o dată"
+msgstr "Are dată"
 
 msgid "Empty"
 msgstr "Gol"
@@ -104,7 +104,7 @@ msgid "Addition"
 msgstr "Adăugare"
 
 msgid "Change"
-msgstr "Schimbă"
+msgstr "Schimbare"
 
 msgid "Deletion"
 msgstr "Ștergere"
@@ -130,7 +130,7 @@ msgid "action flag"
 msgstr "marcaj acțiune"
 
 msgid "change message"
-msgstr "schimbă mesaj"
+msgstr "mesaj schimbare"
 
 msgid "log entry"
 msgstr "intrare jurnal"
@@ -186,34 +186,40 @@ msgstr ""
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
-msgstr ""
+msgstr "{name} \"{obj}\" a fost adăugat cu succes."
 
 msgid "You may edit it again below."
-msgstr "O poți edita din nou mai jos."
+msgstr "Poți edita din nou mai jos."
 
 #, python-brace-format
 msgid ""
 "The {name} “{obj}” was added successfully. You may add another {name} below."
 msgstr ""
+"{name} \"{obj}\" a fost adăugat cu succes. Poți adăuga alt {name} mai jos."
 
 #, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may edit it again below."
 msgstr ""
+"{name} \"{obj}\" a fost modificat cu succes. Poți să editezi în continuare "
+"mai jos."
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully. You may edit it again below."
 msgstr ""
+"{name} \"{obj}\" a fost adăugat cu succes. Poți să editezi în continuare mai "
+"jos."
 
 #, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
 msgstr ""
+"{name} \"{obj}\" a fost modificat cu succes. Poți adăuga alt {name} mai jos."
 
 #, python-brace-format
 msgid "The {name} “{obj}” was changed successfully."
-msgstr ""
+msgstr "{name} \"{obj}\" a fost schimbat cu succes."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -270,8 +276,9 @@ msgstr "0 din %(cnt)s  selectat"
 msgid "Change history: %s"
 msgstr "Istoric schimbări: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -364,15 +371,18 @@ msgid "Change password"
 msgstr "Schimbă parola"
 
 msgid "Please correct the error below."
-msgstr "Corectați eroarea de mai jos."
-
-msgid "Please correct the errors below."
-msgstr "Corectați erorile de mai jos."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr ""
 "Introduceți o parolă nouă pentru utilizatorul <strong>%(username)s</strong>."
+
+msgid "Skip to main content"
+msgstr ""
 
 msgid "Welcome,"
 msgstr "Bun venit,"
@@ -385,6 +395,9 @@ msgstr "Documentație"
 
 msgid "Log out"
 msgstr "Deconectează-te"
+
+msgid "Breadcrumbs"
+msgstr ""
 
 #, python-format
 msgid "Add %(name)s"
@@ -411,6 +424,15 @@ msgstr "Prioritate sortare: %(priority_number)s"
 
 msgid "Toggle sorting"
 msgstr "Alternează sortarea"
+
+msgid "Toggle theme (current theme: auto)"
+msgstr ""
+
+msgid "Toggle theme (current theme: light)"
+msgstr ""
+
+msgid "Toggle theme (current theme: dark)"
+msgstr ""
 
 msgid "Delete"
 msgstr "Șterge"
@@ -519,6 +541,15 @@ msgid "Forgotten your password or username?"
 msgstr "Ați uitat parola sau utilizatorul ?"
 
 msgid "Toggle navigation"
+msgstr "Comutare navigație"
+
+msgid "Sidebar"
+msgstr ""
+
+msgid "Start typing to filter…"
+msgstr "Începeți să scrieți pentru filtrare..."
+
+msgid "Filter navigation items"
 msgstr ""
 
 msgid "Date/time"
@@ -529,6 +560,12 @@ msgstr "Utilizator"
 
 msgid "Action"
 msgstr "Acțiune"
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -585,8 +622,12 @@ msgstr "Adaugă alt %(model)s"
 msgid "Delete selected %(model)s"
 msgstr "Șterge %(model)s selectat"
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Mulţumiri pentru timpul petrecut astăzi pe sit."
+#, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr ""
 
 msgid "Log in again"
 msgstr "Reautentificare"

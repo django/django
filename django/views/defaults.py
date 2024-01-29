@@ -109,6 +109,7 @@ def bad_request(request, exception, template_name=ERROR_400_TEMPLATE_NAME):
     """
     try:
         template = loader.get_template(template_name)
+        body = template.render(request=request)
     except TemplateDoesNotExist:
         if template_name != ERROR_400_TEMPLATE_NAME:
             # Reraise if it's a missing custom template.
@@ -118,7 +119,7 @@ def bad_request(request, exception, template_name=ERROR_400_TEMPLATE_NAME):
         )
     # No exception content is passed to the template, to not disclose any
     # sensitive information.
-    return HttpResponseBadRequest(template.render())
+    return HttpResponseBadRequest(body)
 
 
 @requires_csrf_token

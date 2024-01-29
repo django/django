@@ -9,7 +9,7 @@ try:
         register_type_handlers,
     )
 except ImportError:
-    pass  # pyscogp2 isn't installed.
+    pass  # psycopg isn't installed.
 
 
 class OIDTests(PostgreSQLTestCase):
@@ -34,8 +34,9 @@ class OIDTests(PostgreSQLTestCase):
         self.assertOIDs(array_oids)
 
     def test_citext_values(self):
-        oids = get_citext_oids(connection.alias)
+        oids, citext_oids = get_citext_oids(connection.alias)
         self.assertOIDs(oids)
+        self.assertOIDs(citext_oids)
 
     def test_register_type_handlers_no_db(self):
         """Registering type handlers for the nodb connection does nothing."""

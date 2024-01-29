@@ -5,15 +5,16 @@
 # Flavio Curella <flavio.curella@gmail.com>, 2016
 # Mirco Grillo <mirco.grillomg@gmail.com>, 2018,2020
 # palmux <palmux@gmail.com>, 2015
+# Paolo Melchiorre <paolo@melchiorre.org>, 2023
 # Mattia Procopio <promat85@gmail.com>, 2015
 # Stefano Brentegani <sbrentegani@gmail.com>, 2015-2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-11 20:56+0200\n"
-"PO-Revision-Date: 2020-07-23 08:40+0000\n"
-"Last-Translator: Mirco Grillo <mirco.grillomg@gmail.com>\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-19 09:22+0000\n"
+"Last-Translator: Paolo Melchiorre <paolo@melchiorre.org>, 2023\n"
 "Language-Team: Italian (http://www.transifex.com/django/django/language/"
 "it/)\n"
 "MIME-Version: 1.0\n"
@@ -77,6 +78,9 @@ msgstr[0] ""
 msgstr[1] ""
 "La lista contiene %(show_value)d elementi, e dovrebbe contenerne al massimo "
 "%(limit_value)d."
+msgstr[2] ""
+"La lista contiene %(show_value)d elementi, e dovrebbe contenerne al massimo "
+"%(limit_value)d."
 
 #, python-format
 msgid ""
@@ -91,6 +95,9 @@ msgstr[0] ""
 msgstr[1] ""
 "La lista contiene %(show_value)d oggetti, e dovrebbe contenerne almeno "
 "%(limit_value)d."
+msgstr[2] ""
+"La lista contiene %(show_value)d oggetti, e dovrebbe contenerne almeno "
+"%(limit_value)d."
 
 #, python-format
 msgid "Some keys were missing: %(keys)s"
@@ -102,15 +109,14 @@ msgstr "Sono state fornite alcune chiavi sconosciute: %(keys)s"
 
 #, python-format
 msgid ""
-"Ensure that this range is completely less than or equal to %(limit_value)s."
+"Ensure that the upper bound of the range is not greater than %(limit_value)s."
 msgstr ""
-"Assicurati che questo intervallo sia interamente minore o uguale a "
+"Assicurarsi che il limite superiore dell'intervallo non sia maggiore di "
 "%(limit_value)s."
 
 #, python-format
 msgid ""
-"Ensure that this range is completely greater than or equal to "
-"%(limit_value)s."
+"Ensure that the lower bound of the range is not less than %(limit_value)s."
 msgstr ""
-"Assicurati che questo intervallo sia interamente maggiore o uguale a "
+"Assicurarsi che il limite inferiore dell'intervallo non sia inferiore a "
 "%(limit_value)s."
