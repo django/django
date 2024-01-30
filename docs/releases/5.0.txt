@@ -588,6 +588,11 @@ Miscellaneous
 
 * The minimum supported version of ``docutils`` is increased to 0.19.
 
+* Filtering querysets against overflowing integer values now always returns an
+  empty queryset. As a consequence, you may need to use ``ExpressionWrapper()``
+  to :ref:`explicitly wrap <using-f-with-annotations>` arithmetic against
+  integer fields in such cases.
+
 .. _deprecated-features-5.0:
 
 Features deprecated in 5.0
