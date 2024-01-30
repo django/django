@@ -49,7 +49,7 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-      - run: python -m pip install blacken-docs
+      - run: python -m pip install "black==23.12.1" blacken-docs
       - name: Build docs
         run: |
           cd docs
