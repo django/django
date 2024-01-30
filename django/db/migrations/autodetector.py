@@ -620,12 +620,11 @@ class MigrationAutodetector:
                                 rem_model_state.app_label,
                                 rem_model_state.name_lower,
                             )
-                            self.renamed_models_rel[renamed_models_rel_key] = (
-                                "%s.%s"
-                                % (
-                                    model_state.app_label,
-                                    model_state.name_lower,
-                                )
+                            self.renamed_models_rel[
+                                renamed_models_rel_key
+                            ] = "%s.%s" % (
+                                model_state.app_label,
+                                model_state.name_lower,
                             )
                             self.old_model_keys.remove((rem_app_label, rem_model_name))
                             self.old_model_keys.add((app_label, model_name))
@@ -1059,9 +1058,9 @@ class MigrationAutodetector:
                                 (rem_app_label, rem_model_name, rem_field_name)
                             )
                             old_field_keys.add((app_label, model_name, field_name))
-                            self.renamed_fields[app_label, model_name, field_name] = (
-                                rem_field_name
-                            )
+                            self.renamed_fields[
+                                app_label, model_name, field_name
+                            ] = rem_field_name
                             break
 
     def generate_renamed_fields(self):
@@ -1448,6 +1447,24 @@ class MigrationAutodetector:
                     ),
                 )
 
+    def _constraint_should_be_altered(self, old_constraints, new_constraints):
+        add_constraints, rem_constraints = [], []
+        # Don't alter constraint when:
+        # - violation_error_code changes
+        # - violation_error_message changes
+        for old_constraint in old_constraints:
+            old_constraint.violation_error_code = None
+            old_constraint.violation_error_message = None
+
+        for new_constraint in new_constraints:
+            new_constraint.violation_error_code = None
+            new_constraint.violation_error_message = None
+
+        add_constraints = [c for c in new_constraints if c not in old_constraints]
+        rem_constraints = [c for c in old_constraints if c not in new_constraints]
+
+        return add_constraints, rem_constraints
+
     def create_altered_constraints(self):
         option_name = operations.AddConstraint.option_name
         for app_label, model_name in sorted(self.kept_model_keys):
@@ -1456,11 +1473,20 @@ class MigrationAutodetector:
             )
             old_model_state = self.from_state.models[app_label, old_model_name]
             new_model_state = self.to_state.models[app_label, model_name]
+            # import pdb
 
-            old_constraints = old_model_state.options[option_name]
-            new_constraints = new_model_state.options[option_name]
-            add_constraints = [c for c in new_constraints if c not in old_constraints]
-            rem_constraints = [c for c in old_constraints if c not in new_constraints]
+            # pdb.set_trace()
+            old_constraints = old_model_state.options[
+                option_name
+            ]  # List of UniqueConstraints
+            new_constraints = new_model_state.options[
+                option_name
+            ]  # List of UniqueConstraints
+            # add_constraints = [c for c in new_constraints if c not in old_constraints]
+            # rem_constraints = [c for c in old_constraints if c not in new_constraints]
+            add_constraints, rem_constraints = self._constraint_should_be_altered(
+                old_constraints, new_constraints
+            )
 
             self.altered_constraints.update(
                 {
