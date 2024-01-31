@@ -674,7 +674,7 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
             ("Triangle Z", 1017, False),
             ("Point M", 2001, True),
             ("LineString M", 2002, True),
-            ("Polygon M", 2003, False),
+            ("Polygon M", 2003, True),
             ("MultiPoint M", 2004, False),
             ("MultiLineString M", 2005, False),
             ("MultiPolygon M", 2006, False),
@@ -689,7 +689,7 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
             ("Triangle M", 2017, False),
             ("Point ZM", 3001, True),
             ("LineString ZM", 3002, True),
-            ("Polygon ZM", 3003, False),
+            ("Polygon ZM", 3003, True),
             ("MultiPoint ZM", 3004, False),
             ("MultiLineString ZM", 3005, False),
             ("MultiPolygon ZM", 3006, False),
@@ -914,6 +914,34 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
         geom.set_measured(False)
         self.assertIs(geom.is_measured, False)
         self.assertIs(geom.m, None)
+
+    def test_polygon_m_dimension(self):
+        geom = OGRGeometry("POLYGON Z ((0 0 0, 10 0 0, 10 10 0, 0 10 0, 0 0 0))")
+        self.assertIs(geom.is_measured, False)
+        self.assertEqual(
+            geom.shell.wkt, "LINEARRING (0 0 0,10 0 0,10 10 0,0 10 0,0 0 0)"
+        )
+
+        geom = OGRGeometry("POLYGON M ((0 0 0, 10 0 0, 10 10 0, 0 10 0, 0 0 0))")
+        self.assertIs(geom.is_measured, True)
+        self.assertEqual(
+            geom.shell.wkt, "LINEARRING M (0 0 0,10 0 0,10 10 0,0 10 0,0 0 0)"
+        )
+
+        geom = OGRGeometry(
+            "POLYGON ZM ((0 0 0 1, 10 0 0 1, 10 10 0 1, 0 10 0 1, 0 0 0 1))"
+        )
+        self.assertIs(geom.is_measured, True)
+        self.assertEqual(
+            geom.shell.wkt,
+            "LINEARRING ZM (0 0 0 1,10 0 0 1,10 10 0 1,0 10 0 1,0 0 0 1)",
+        )
+
+        geom.set_measured(False)
+        self.assertEqual(geom.wkt, "POLYGON ((0 0 0,10 0 0,10 10 0,0 10 0,0 0 0))")
+        self.assertEqual(
+            geom.shell.wkt, "LINEARRING (0 0 0,10 0 0,10 10 0,0 10 0,0 0 0)"
+        )
 
 
 class DeprecationTests(SimpleTestCase):
