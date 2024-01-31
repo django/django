@@ -24,3 +24,7 @@ Bugfixes
   ``FilteredRelation()`` with querysets as right-hand sides (:ticket:`35135`).
   ``FilteredRelation()`` now raises a ``ValueError`` on querysets as right-hand
   sides.
+
+* Fixed a regression in Django 5.0 that caused a crash of the ``dumpdata``
+  management command when a base queryset used ``prefetch_related()``
+  (:ticket:`35159`).
