@@ -1588,10 +1588,6 @@ for example, this command:
 in combination with ``basic.tests.ModelTest.test_fail`` to find the minimal set of tests that
 cause the failure.
 
-.. admonition:: Python 3.5 and later
-
-    This feature is only available for Python 3.5 and later.
-
 .. django-admin-option:: --pair FAILING_TEST_CASE
 
 .. versionadded:: 5.1
