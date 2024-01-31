@@ -381,7 +381,7 @@ this base class::
             abstract = True
 
 If you use this directly in a subclass, ``objects`` will be the default
-manager if you declare no managers in the base class::
+manager if you declare no managers in the subclass::
 
     class ChildA(AbstractBase):
         # ...
