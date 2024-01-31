@@ -2771,11 +2771,15 @@ class AutodetectorTests(BaseAutodetectorTests):
         migration = changes["otherapp"][0]
         self.assertEqual(len(migration.operations), 1)
         # Right actions order?
-        self.assertOperationTypes(
-            changes, "otherapp", 0, ["CreateModel"]
+        self.assertOperationTypes(changes, "otherapp", 0, ["CreateModel"])
+        self.assertOperationAttributes(
+            changes,
+            "otherapp",
+            0,
+            0,
+            name="Author",
+            options={"constraints": [constraint]},
         )
-        self.assertOperationAttributes(changes, "otherapp", 0, 0, name="Author",
-                            options={"constraints": [constraint]})
 
     def test_add_constraints(self):
         """Test change detection of new constraints."""
@@ -4185,9 +4189,12 @@ class AutodetectorTests(BaseAutodetectorTests):
             name="Author",
             options={
                 "order_with_respect_to": "book",
-                "constraints": [models.CheckConstraint(
+                "constraints": [
+                    models.CheckConstraint(
                         check=models.Q(_order__gt=1), name="book_order_gt_1"
-                    )]},
+                    )
+                ],
+            },
         )
 
     def test_add_model_order_with_respect_to_index(self):
