@@ -57,6 +57,15 @@ def login_required(
     return actual_decorator
 
 
+def login_not_required(view_func):
+    """
+    Decorator for views that marks that the view is accessible by
+    unauthenticated users.
+    """
+    view_func.login_required = False
+    return view_func
+
+
 def permission_required(perm, login_url=None, raise_exception=False):
     """
     Decorator for views that checks whether a user has a particular permission

@@ -14,6 +14,7 @@ from django.contrib.auth.forms import (
     PasswordResetForm,
     SetPasswordForm,
 )
+from django.contrib.auth.mixins import LoginNotRequiredMixin
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured, ValidationError
@@ -62,7 +63,7 @@ class RedirectURLMixin:
         raise ImproperlyConfigured("No URL to redirect to. Provide a next_page.")
 
 
-class LoginView(RedirectURLMixin, FormView):
+class LoginView(RedirectURLMixin, LoginNotRequiredMixin, FormView):
     """
     Display the login form and handle the login action.
     """
@@ -210,7 +211,7 @@ class PasswordContextMixin:
         return context
 
 
-class PasswordResetView(PasswordContextMixin, FormView):
+class PasswordResetView(PasswordContextMixin, LoginNotRequiredMixin, FormView):
     email_template_name = "registration/password_reset_email.html"
     extra_email_context = None
     form_class = PasswordResetForm
@@ -244,12 +245,12 @@ class PasswordResetView(PasswordContextMixin, FormView):
 INTERNAL_RESET_SESSION_TOKEN = "_password_reset_token"
 
 
-class PasswordResetDoneView(PasswordContextMixin, TemplateView):
+class PasswordResetDoneView(PasswordContextMixin, LoginNotRequiredMixin, TemplateView):
     template_name = "registration/password_reset_done.html"
     title = _("Password reset sent")
 
 
-class PasswordResetConfirmView(PasswordContextMixin, FormView):
+class PasswordResetConfirmView(PasswordContextMixin, LoginNotRequiredMixin, FormView):
     form_class = SetPasswordForm
     post_reset_login = False
     post_reset_login_backend = None
@@ -335,7 +336,9 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
         return context
 
 
-class PasswordResetCompleteView(PasswordContextMixin, TemplateView):
+class PasswordResetCompleteView(
+    PasswordContextMixin, LoginNotRequiredMixin, TemplateView
+):
     template_name = "registration/password_reset_complete.html"
     title = _("Password reset complete")
 
