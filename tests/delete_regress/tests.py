@@ -30,6 +30,8 @@ from .models import (
     Login,
     OrderedPerson,
     OrgUnit,
+    Owner,
+    Owner2,
     Person,
     Photo,
     PlayedWith,
@@ -414,3 +416,16 @@ class SetQueryCountTests(TestCase):
         # 3 UPDATEs for SET of item values and one for DELETE locations.
         with self.assertNumQueries(4):
             location.delete()
+
+
+# Issue #35073
+class SetCallableTests(TestCase):
+    def test_set(self):
+        Owner.objects.create(name='a')
+        Owner.objects.all().delete()
+        self.assertEqual(list(Owner.objects.all()), [])
+
+    def test_set_default(self):
+        Owner2.objects.create(name='a')
+        Owner2.objects.all().delete()
+        self.assertEqual(list(Owner2.objects.all()), [])

@@ -151,3 +151,35 @@ class OrderedPerson(models.Model):
 
     class Meta:
         ordering = ["name"]
+
+
+# Models for #35073
+
+class Owner(models.Model):
+    name = models.CharField(max_length=32)
+
+    def __str__(self):
+        return self.name
+
+
+def get_default_owner():
+    return Owner.objects.get_or_create(name="default")[0]
+
+
+class Pet(models.Model):
+    owner = models.ForeignKey(Owner, models.SET(get_default_owner))
+
+
+class Owner2(models.Model):
+    name = models.CharField(max_length=32)
+
+    def __str__(self):
+        return self.name
+
+
+def get_default_owner2():
+    return Owner2.objects.get_or_create(name="default2")[0]
+
+
+class Pet2(models.Model):
+    owner = models.ForeignKey(Owner2, default=get_default_owner2, on_delete=models.SET_DEFAULT)
