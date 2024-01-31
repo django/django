@@ -280,9 +280,6 @@ Tests
   :meth:`~django.test.SimpleTestCase.assertInHTML` assertions now add haystacks
   to assertion error messages.
 
-* The Django test runner now supports a ``--screenshots`` option to save
-  screenshots for Selenium tests.
-
 * The :class:`~django.test.RequestFactory`,
   :class:`~django.test.AsyncRequestFactory`, :class:`~django.test.Client`, and
   :class:`~django.test.AsyncClient` classes now support the ``query_params``
