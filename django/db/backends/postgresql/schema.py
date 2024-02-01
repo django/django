@@ -255,6 +255,30 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 model, old_field, new_field, new_type, old_collation, new_collation
             )
 
+    def _need_to_add_new_index(self, old_field, new_field):
+        if not (old_field.db_index or old_field.unique) and (
+            new_field.db_index or new_field.unique
+        ):
+            return True
+
+    def _need_to_recreate_deleted_index(self, old_field, new_field, old_type, new_type):
+        if (
+            old_field.db_index
+            and not old_field.unique
+            and (
+                not new_field.db_index
+                or (new_field.unique and not new_field.primary_key)
+            )
+        ) or (
+            (old_field.db_index or old_field.unique)
+            and (
+                (old_type.startswith("varchar") and not new_type.startswith("varchar"))
+                or (old_type.startswith("text") and not new_type.startswith("text"))
+                or (old_type.startswith("citext") and not new_type.startswith("citext"))
+            )
+        ):
+            return True
+
     def _alter_field(
         self,
         model,
@@ -277,8 +301,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             strict,
         )
         # Added an index? Create any PostgreSQL-specific indexes.
-        if (not (old_field.db_index or old_field.unique) and new_field.db_index) or (
-            not old_field.unique and new_field.unique
+        if self._need_to_add_new_index(
+            old_field, new_field
+        ) or self._need_to_recreate_deleted_index(
+            old_field, new_field, old_type, new_type
         ):
             like_index_statement = self._create_like_index_sql(model, new_field)
             if like_index_statement is not None:
