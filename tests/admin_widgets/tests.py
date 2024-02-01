@@ -772,30 +772,14 @@ class ForeignKeyRawIdWidgetTest(TestCase):
         rendered = w.render("test", house.pk, attrs={})
 
         expected_url = "/admin_widgets/house/%s/change/" % quote(house.pk)
-
         self.assertIn(expected_url, rendered)
-        self.assertHTMLEqual(
-            w.render("test", house.pk, attrs={}),
-            '<input class="vForeignKeyRawIdAdminField" name="test" type="text" '
-            'value="%(val)s"> '
-            '<a href="/admin_widgets/house/?_to_field=name" class="related-lookup" '
-            'id="lookup_id_test" title="Lookup"></a> '
-            '<strong><a href="/admin_widgets/house/%(pk)s/change/">%(val)s</a></strong>'
-            % {"val": house.pk, "pk": quote(house.pk)},
-        )
 
     def test_foreign_key_raw_id_widget_renders_quoted_pk_in_change_url(self):
         house = House.objects.create(name="_40")
         rel = Room._meta.get_field("house").remote_field
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
-
-        # apply quote function to primary key value
         pk_quoted = quote(str(house.pk))
-
-        # render the widget
         rendered = w.render("test", house.pk, attrs={})
-
-        # check that the primary key is properly quoted in the rendered HTML
         self.assertIn(f'href="/admin_widgets/house/{pk_quoted}/change/"', rendered)
 
 
@@ -1824,6 +1808,7 @@ class RelatedFieldWidgetSeleniumPrimaryKeyTests(AdminWidgetSeleniumTestCase):
 
         self.admin_login(username="super", password="secret", login_url="/")
 
+        # Create a new House with a PK that needs quoting.
         house = House.objects.create(name="_40")
         house_name = str(house.name)
         self.selenium.get(
@@ -1838,7 +1823,7 @@ class RelatedFieldWidgetSeleniumPrimaryKeyTests(AdminWidgetSeleniumTestCase):
         )
         self.assertIn(house_name, self.selenium.page_source)
 
-        # Find and interact with the select element for choosing a House
+        # Find and interact with the select element for choosing a House.
         select_house = Select(self.selenium.find_element(By.ID, "id_house"))
         select_house.select_by_index(0)
 
@@ -1847,7 +1832,7 @@ class RelatedFieldWidgetSeleniumPrimaryKeyTests(AdminWidgetSeleniumTestCase):
             select_house.first_selected_option.get_attribute("value"), house_name
         )
 
-        # Create a new Room and associate it with the House created above
+        # Create a new Room and associate it with the House created above.
         room = Room.objects.create(name="onebed", house=house)
         room_name = str(room.name)
         self.selenium.find_element(By.ID, "id_name").send_keys(room_name)

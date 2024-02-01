@@ -6,7 +6,6 @@ QUnit.test('quote value', function(assert) {
     const result = encodeURIComponent('_40');
     const expected = '_5F40';
     assert.equal(result, expected, "expected _5F40");
-
 });
 
 function quoteSpecialChars(specialCharsList = ['c>h<e%e[s]e_40', 'on/ion?t@w$mw+', 'sa:la"m,i\nw;th=', '?_3A_40', 'qwerttyuiop12345', '?a=b']) {
@@ -44,7 +43,6 @@ QUnit.test('updateRelatedObjectLinks properly quotes URL value', function(assert
 
     assert.equal(href, expectedValue, 'URL value is properly quoted');
 });
-
 
 
 QUnit.test('decodeURIComponent is a function that decodes URI components', function(assert) {

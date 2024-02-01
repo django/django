@@ -6,8 +6,18 @@
     const $ = django.jQuery;
     let popupIndex = 0;
     const relatedWindows = [];
-    const QUOTE_MAP = {};
+    // QUOTE_MAP equivalent in JavaScript with static definitions
+    const QUOTE_MAP = {
+        '"': '_22', ':': '_3A', '/': '_2F', '_': '_5F', '#': '_23', '?': '_3F', 
+        ';': '_3B', '@': '_40', '&': '_26', '=': '_3D', '+': '_2B', ',': '_2C', 
+        '[': '_5B', ']': '_5D', '<': '_3C', '>': '_3E', '%': '_25', '\n': '_0A', '\\': '_5C'
+    };
+
+    // UNQUOTE_MAP equivalent in JavaScript with static definitions
     const UNQUOTE_MAP = {};
+    for (const [key, value] of Object.entries(QUOTE_MAP)) {
+        UNQUOTE_MAP[value] = key;
+    }
 
     function dismissChildPopups() {
         relatedWindows.forEach(function(win) {
@@ -197,72 +207,31 @@
         // escaping problematic characters.
         // This is the JavaScript equivalent to django.contrib.admin.utils.quote().
 
-        if(Object.keys(QUOTE_MAP).length === 0) {
-            const specialChars = '":/_#?;@&=+$,[]<>%\n\\';
-
-            for (let i = 0; i < specialChars.length; i++) {
-                const charCode = specialChars.charCodeAt(i);
-                // Line feed \n character
-                if (charCode === 10) {
-                    QUOTE_MAP[charCode] = '_0A';
-                } else {
-                    const encodedChar = '_' + charCode.toString(16).toUpperCase();
-                    QUOTE_MAP[charCode] = encodedChar;
-                }
-            }
-        }
-
-        if (typeof s === 'string') {
-            let result = '';
-            for (let i = 0; i < s.length; i++) {
-                const charCode = s.charCodeAt(i);
-                const encodedChar = QUOTE_MAP[charCode] || s[i];
-                result += encodedChar;
-            }
-            return result;
-        } else {
-            return s;
-        }
-
-
+        if (typeof s !== 'string') {return s;}
+        return s.split('_').map(part => {
+            return part.split('').map(char => {
+                const encodedChar = QUOTE_MAP[char.charCodeAt(0)];
+                return encodedChar || char;
+            }).join('');
+        });
     }
 
-
-
     function decodeURIComponent(s) {
-        if(Object.keys(UNQUOTE_MAP).length === 0 ) {
-            const specialChars = '":/_#?;@&=+$,[]<>%\n\\';
-
-            for (let i = 0; i < specialChars.length; i++) {
-                const charCode = specialChars.charCodeAt(i);
-                // Line feed \n character
-                if (charCode === 10) {
-                    UNQUOTE_MAP[charCode] = '_0A';
-                } else {
-                    const encodedChar = '_' + charCode.toString(16).toUpperCase();
-                    UNQUOTE_MAP[encodedChar] = String.fromCharCode(charCode);
-                }
+        if (typeof s !== 'string') {return s;}
+        let result = '';
+        let i = 0;
+        while (i < s.length) {
+            if (s[i] === '_' && i < s.length - 2) {
+                const encodedChar = s.substr(i, 3);
+                const decodedChar = UNQUOTE_MAP[encodedChar] || s[i];
+                result += decodedChar;
+                i += 3;
+            } else {
+                result += s[i];
+                i += 1;
             }
         }
-
-        if (typeof s === 'string') {
-            let result = '';
-            let i = 0;
-            while (i < s.length) {
-                if (s[i] === '_' && i < s.length - 2) {
-                    const encodedChar = s.substr(i, 3);
-                    const decodedChar = UNQUOTE_MAP[encodedChar] || s[i];
-                    result += decodedChar;
-                    i += 3;
-                } else {
-                    result += s[i];
-                    i += 1;
-                }
-            }
-            return result;
-        } else {
-            return s;
-        }
+        return result;
     }
 
     window.decodeURIComponent = decodeURIComponent;
