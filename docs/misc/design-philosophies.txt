@@ -254,10 +254,6 @@ enough programming-esque functionality, such as branching and looping, that is
 essential for making presentation-related decisions. The :ref:`Django Template
 Language (DTL) <template-language-intro>` aims to avoid advanced logic.
 
-The Django template system recognizes that templates are most often written by
-*designers*, not *programmers*, and therefore should not assume Python
-knowledge.
-
 Safety and security
 -------------------
 
