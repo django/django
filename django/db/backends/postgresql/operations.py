@@ -293,14 +293,27 @@ class DatabaseOperations(BaseDatabaseOperations):
         else:
             return ["DISTINCT"], []
 
-    def last_executed_query(self, cursor, sql, params):
-        if is_psycopg3:
-            # With psycopg3, use the _query attribute to get the executed query.
-            if hasattr(cursor, '_query'):
-                return cursor._query.decode() if isinstance(cursor._query, bytes) else cursor._query
-        else:
-            #With psycopg2, the executed query is in cursor.query
-            return cursor.query.decode() if cursor.query is not None else None
+    if is_psycopg3:
+
+        def last_executed_query(self, cursor, sql, params):
+            try:
+                # With psycopg3, use the _query attribute get the executed query
+                if hasattr(cursor, '_query'):
+                    query = cursor._query
+                    return query.decode() if isinstance(query, bytes) else query
+                else:
+                    return None
+            except errors.DataError:
+                return None
+
+    else:
+
+        def last_executed_query(self, cursor, sql, params):
+            # https://www.psycopg.org/docs/cursor.html#cursor.query
+            # The query attribute is a Psycopg extension to the DB API 2.0.
+            if cursor.query is not None:
+                return cursor.query.decode()
+            return None
 
     def return_insert_columns(self, fields):
         if not fields:
