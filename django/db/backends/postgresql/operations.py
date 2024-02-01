@@ -298,7 +298,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         def last_executed_query(self, cursor, sql, params):
             try:
                 # With psycopg3, use the _query attribute get the executed query
-                if hasattr(cursor, '_query'):
+                if hasattr(cursor, "_query"):
                     query = cursor._query
                     return query.decode() if isinstance(query, bytes) else query
                 else:
