@@ -763,6 +763,44 @@ email in the desired domain and if not, redirects to the login page::
 
 .. currentmodule:: django.contrib.auth.decorators
 
+The ``login_not_required`` decorator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. function:: login_not_required()
+
+    The ``login_not_required`` decorator can be used with the
+    ``LoginRequiredAuthenticationMiddleware``::
+
+        from django.contrib.auth.decorators import login_not_required
+
+
+        @login_not_required
+        def my_view(request): ...
+
+    This decorator indicates that the view is accessible to non-authenticated
+    users.
+
+.. currentmodule:: django.contrib.auth.mixins
+
+The ``LoginNotRequiredMixin`` mixin
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When using :doc:`class-based views </topics/class-based-views/index>`, the
+``LoginNotRequiredMixin`` can be used to achieve the same behavior as with the
+``login_not_required`` decorator.
+
+.. class:: LoginNotRequiredMixin
+
+    If a view uses this mixin, all requests by non-authenticated users will be
+    allowed to pass without any redirection to login::
+
+        from django.contrib.auth.mixins import LoginNotRequiredMixin
+
+
+        class MyView(LoginNotRequiredMixin, View): ...
+
+.. currentmodule:: django.contrib.auth.decorators
+
 The ``permission_required`` decorator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

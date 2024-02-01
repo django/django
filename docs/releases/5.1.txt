@@ -45,6 +45,12 @@ Minor features
 * The default iteration count for the PBKDF2 password hasher is increased from
   720,000 to 870,000.
 
+* The
+  :class:`~django.contrib.auth.middleware.LoginRequiredAuthenticationMiddleware`
+  is now available. It forces all views to require authentication by default.
+  The ``LoginNotRequiredMixin`` mixin and ``login_not_required`` decorator have
+  also been added.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
