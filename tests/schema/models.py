@@ -147,6 +147,20 @@ class IntegerPK(models.Model):
         db_table = "INTEGERPK"  # uppercase to ensure proper quoting
 
 
+class CharFieldPK(models.Model):
+    field1 = models.CharField(max_length=10, primary_key=True)
+
+    class Meta:
+        apps = new_apps
+
+
+class CharFieldPKUnique(models.Model):
+    field1 = models.CharField(max_length=10, primary_key=True, unique=True)
+
+    class Meta:
+        apps = new_apps
+
+
 class Note(models.Model):
     info = models.TextField()
     address = models.TextField(null=True)
