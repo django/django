@@ -464,3 +464,8 @@ class UniqueConstraint(BaseConstraint):
                     )
             except FieldError:
                 pass
+
+    def ddl_impacted_fields(self):
+        self.violation_error_code = None
+        self.violation_error_message = None
+        return self

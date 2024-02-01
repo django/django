@@ -1447,11 +1447,11 @@ class MigrationAutodetector:
                     ),
                 )
 
-    def _constraint_should_be_altered(self, old_constraints, new_constraints):
+    def _constraint_should_be_altered_2(self, old_constraints, new_constraints):
         add_constraints, rem_constraints = [], []
         # Don't alter constraint when:
-        # - violation_error_code changes
-        # - violation_error_message changes
+        # - only violation_error_code changes, and/or
+        # - only violation_error_message changes
         for old_constraint in old_constraints:
             old_constraint.violation_error_code = None
             old_constraint.violation_error_message = None
@@ -1465,6 +1465,16 @@ class MigrationAutodetector:
 
         return add_constraints, rem_constraints
 
+    def _constraint_should_be_altered(self, c, constraints):
+        mutable_constraint = c
+        mutable_constraint.violation_error_code = None
+        mutable_constraint.violation_error_message = None
+
+        if mutable_constraint in constraints:
+            return True
+        else:
+            return False
+
     def create_altered_constraints(self):
         option_name = operations.AddConstraint.option_name
         for app_label, model_name in sorted(self.kept_model_keys):
@@ -1473,20 +1483,31 @@ class MigrationAutodetector:
             )
             old_model_state = self.from_state.models[app_label, old_model_name]
             new_model_state = self.to_state.models[app_label, model_name]
-            # import pdb
 
-            # pdb.set_trace()
             old_constraints = old_model_state.options[
                 option_name
             ]  # List of UniqueConstraints
             new_constraints = new_model_state.options[
                 option_name
             ]  # List of UniqueConstraints
-            # add_constraints = [c for c in new_constraints if c not in old_constraints]
-            # rem_constraints = [c for c in old_constraints if c not in new_constraints]
-            add_constraints, rem_constraints = self._constraint_should_be_altered(
-                old_constraints, new_constraints
-            )
+            add_constraints = [c for c in new_constraints if c not in old_constraints]
+            rem_constraints = [c for c in old_constraints if c not in new_constraints]
+            # add_constraints, rem_constraints = self._constraint_should_be_altered(
+            #     old_constraints, new_constraints
+            # )
+            # add_constraints = [
+            #     c
+            #     for c in new_constraints
+            #     if self._constraint_should_be_altered(c, old_constraints)
+            # ]
+            # rem_constraints = [
+            #     c
+            #     for c in old_constraints
+            #     if self._constraint_should_be_altered(c, new_constraints)
+            # ]
+            import pdb
+
+            pdb.set_trace()
 
             self.altered_constraints.update(
                 {
