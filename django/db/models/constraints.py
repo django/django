@@ -89,6 +89,12 @@ class BaseConstraint:
         _, args, kwargs = self.deconstruct()
         return self.__class__(*args, **kwargs)
 
+    def only_ddl_impacted_fields(self):
+        mutable_self = self
+        mutable_self.violation_error_code = None
+        mutable_self.violation_error_message = None
+        return mutable_self
+
 
 class CheckConstraint(BaseConstraint):
     def __init__(
@@ -464,8 +470,3 @@ class UniqueConstraint(BaseConstraint):
                     )
             except FieldError:
                 pass
-
-    def ddl_impacted_fields(self):
-        self.violation_error_code = None
-        self.violation_error_message = None
-        return self
