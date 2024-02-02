@@ -1,4 +1,3 @@
-
 from django.core.files.storage.filesystem import FileSystemStorage
 
 
