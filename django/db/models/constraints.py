@@ -1,3 +1,4 @@
+import copy
 import warnings
 from enum import Enum
 from types import NoneType
@@ -90,7 +91,7 @@ class BaseConstraint:
         return self.__class__(*args, **kwargs)
 
     def only_ddl_impacted_fields(self):
-        mutable_self = self
+        mutable_self = copy.copy(self)
         mutable_self.violation_error_code = None
         mutable_self.violation_error_message = None
         return mutable_self

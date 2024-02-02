@@ -1447,6 +1447,12 @@ class MigrationAutodetector:
                     ),
                 )
 
+    def _altered_constraint_should_generate_migration(
+        self, old_constraints, new_constraints
+    ):
+        add_constraints, rem_constraints = [], []
+        return add_constraints, rem_constraints
+
     def create_altered_constraints(self):
         option_name = operations.AddConstraint.option_name
         for app_label, model_name in sorted(self.kept_model_keys):
@@ -1455,17 +1461,39 @@ class MigrationAutodetector:
             )
             old_model_state = self.from_state.models[app_label, old_model_name]
             new_model_state = self.to_state.models[app_label, model_name]
+            # import pdb
 
-            old_constraints = [
-                c.only_ddl_impacted_fields()
-                for c in old_model_state.options[option_name]
+            # pdb.set_trace()
+
+            old_constraints = old_model_state.options[option_name]
+            old_constraints_wo_violation_error = [
+                c.only_ddl_impacted_fields() for c in old_constraints
             ]
-            new_constraints = [
-                c.only_ddl_impacted_fields()
-                for c in new_model_state.options[option_name]
+            new_constraints = new_model_state.options[option_name]
+            new_constraints_wo_violation_error = [
+                c.only_ddl_impacted_fields() for c in new_constraints
             ]
-            add_constraints = [c for c in new_constraints if c not in old_constraints]
-            rem_constraints = [c for c in old_constraints if c not in new_constraints]
+            add_constraints = [
+                c
+                for c in new_constraints
+                if c.only_ddl_impacted_fields()
+                not in old_constraints_wo_violation_error
+            ]
+            rem_constraints = [
+                c
+                for c in old_constraints
+                if c.only_ddl_impacted_fields()
+                not in new_constraints_wo_violation_error
+            ]
+            # add_constraints = [c for c in new_constraints if c not in old_constraints]
+            # rem_constraints = [c for c in old_constraints if c not in new_constraints]
+
+            # (
+            #     add_constraints,
+            #     rem_constraints,
+            # ) = self._altered_constraint_should_generate_migration(
+            #     old_constraints, new_constraints
+            # )
 
             self.altered_constraints.update(
                 {
