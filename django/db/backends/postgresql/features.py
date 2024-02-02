@@ -105,6 +105,15 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                     },
                 }
             )
+        if self.uses_server_side_binding:
+            skips.update(
+                {
+                    "The actual query cannot be determined for server side bindings": {
+                        "backends.base.test_base.ExecuteWrapperTests."
+                        "test_wrapper_debug",
+                    }
+                },
+            )
         return skips
 
     @cached_property

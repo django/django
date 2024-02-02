@@ -89,6 +89,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                 "db_functions.math.test_round.RoundTests."
                 "test_integer_with_negative_precision",
             },
+            "The actual query cannot be determined on SQLite": {
+                "backends.base.test_base.ExecuteWrapperTests.test_wrapper_debug",
+            },
         }
         if self.connection.is_in_memory_db():
             skips.update(

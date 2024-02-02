@@ -296,9 +296,14 @@ class DatabaseOperations(BaseDatabaseOperations):
     if is_psycopg3:
 
         def last_executed_query(self, cursor, sql, params):
-            try:
-                return self.compose_sql(sql, params)
-            except errors.DataError:
+            if self.connection.features.uses_server_side_binding:
+                try:
+                    return self.compose_sql(sql, params)
+                except errors.DataError:
+                    return None
+            else:
+                if cursor._query and cursor._query.query is not None:
+                    return cursor._query.query.decode()
                 return None
 
     else:
