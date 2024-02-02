@@ -2,6 +2,7 @@ import functools
 import inspect
 import itertools
 import re
+import reprlib
 import sys
 import types
 import warnings
@@ -310,6 +311,9 @@ class SafeExceptionReporterFilter:
 class ExceptionReporter:
     """Organize and coordinate reporting on exceptions."""
 
+    repr_instance = reprlib.Repr(maxstring=4096, maxlist=1000)
+    MAX_VAR_SIZE_PRETTY_PRINT = 512 * 1024 # 512KB
+
     @property
     def html_template_path(self):
         return builtin_template_path("technical_500.html")
@@ -348,11 +352,15 @@ class ExceptionReporter:
             self.postmortem = self.exc_value.chain or [self.exc_value]
 
         frames = self.get_traceback_frames()
+
         for i, frame in enumerate(frames):
             if "vars" in frame:
                 frame_vars = []
                 for k, v in frame["vars"]:
-                    v = pprint(v)
+                    if sys.getsizeof(v) > self.MAX_VAR_SIZE_PRETTY_PRINT:
+                        v = self.repr_instance.repr(v)
+                    else:
+                        v = pprint(v)
                     # Trim large blobs of data
                     if len(v) > 4096:
                         v = "%s… <trimmed %d bytes string>" % (v[0:4096], len(v))
