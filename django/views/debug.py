@@ -6,12 +6,12 @@ import reprlib
 import sys
 import types
 import warnings
+from collections.abc import Sized
 from pathlib import Path
 
 from django.conf import settings
 from django.http import Http404, HttpResponse, HttpResponseNotFound
 from django.template import Context, Engine, TemplateDoesNotExist
-from django.template.defaultfilters import pprint
 from django.urls import resolve
 from django.utils import timezone
 from django.utils.datastructures import MultiValueDict
@@ -311,8 +311,16 @@ class SafeExceptionReporterFilter:
 class ExceptionReporter:
     """Organize and coordinate reporting on exceptions."""
 
-    repr_instance = reprlib.Repr(maxstring=4096, maxlist=1000)
-    MAX_VAR_SIZE_PRETTY_PRINT = 512 * 1024 # 512KB
+    repr_instance = reprlib.Repr()
+    repr_instance.indent = 2
+    repr_instance.maxdeque = 4096
+    repr_instance.maxstring = 4096
+    repr_instance.maxlist = 4096
+    repr_instance.maxset = 4096
+    repr_instance.maxdict = 4096
+    repr_instance.maxfrozenset = 4096
+    repr_instance.maxarray = 4096
+    repr_instance.maxother = 4096
 
     @property
     def html_template_path(self):
@@ -352,18 +360,13 @@ class ExceptionReporter:
             self.postmortem = self.exc_value.chain or [self.exc_value]
 
         frames = self.get_traceback_frames()
-
         for i, frame in enumerate(frames):
             if "vars" in frame:
                 frame_vars = []
                 for k, v in frame["vars"]:
-                    if sys.getsizeof(v) > self.MAX_VAR_SIZE_PRETTY_PRINT:
-                        v = self.repr_instance.repr(v)
-                    else:
-                        v = pprint(v)
-                    # Trim large blobs of data
-                    if len(v) > 4096:
-                        v = "%s… <trimmed %d bytes string>" % (v[0:4096], len(v))
+                    if isinstance(v, Sized) and len(v) > 4096:
+                        self.repr_instance.fillvalue = "...%d more" % (len(v) - 4096)
+                    v = self.repr_instance.repr(v)
                     frame_vars.append((k, v))
                 frame["vars"] = frame_vars
             frames[i] = frame
