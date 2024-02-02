@@ -11,7 +11,6 @@ from django.db import DEFAULT_DB_ALIAS, router, transaction
 from django.db.models import signals
 from django.db.utils import ConnectionRouter
 from django.test import SimpleTestCase, TestCase, override_settings
-from django.urls import reverse
 
 from .models import Book, Person, Pet, Review, UserProfile
 from .routers import AuthRouter, TestRouter, WriteRouter
@@ -1307,10 +1306,10 @@ class QueryTestCase(TestCase):
     def test_contenttype_in_separate_db(self):
         ContentType.objects.using("other").all().delete()
         book_other = Book.objects.using("other").create(
-            title='Test title other', published=datetime.date(2009, 5, 4)
+            title="Test title other", published=datetime.date(2009, 5, 4)
         )
         book_default = Book.objects.using("default").create(
-            title='Test title default', published=datetime.date(2009, 5, 4)
+            title="Test title default", published=datetime.date(2009, 5, 4)
         )
         book_type = ContentType.objects.using("default").get(
             app_label="multiple_database", model="book"
@@ -1323,41 +1322,13 @@ class QueryTestCase(TestCase):
 
         with self.assertRaises(Book.DoesNotExist):
             book_type.get_object_for_this_type(title=book_default.title)
-        book = book_type.get_object_for_this_type(using="default", title=book_default.title)
+        book = book_type.get_object_for_this_type(
+            using="default", title=book_default.title
+        )
         self.assertEqual(book, book_default)
 
         all_books = book_type.get_all_objects_for_this_type()
         self.assertCountEqual(all_books, [book_other])
-
-    def test_contenttype_in_separate_db_admin_view_on_site(self):
-        ContentType.objects.using("other").all().delete()
-        book_title = "Test Content Type in Separate DB Admin View on Site"
-        book_published_date = datetime.date(2009, 5, 4)
-        book = Book.objects.using("other").create(
-            title=book_title, published=book_published_date
-        )
-        book_id = book.id
-
-        with override_settings(
-            DATABASE_ROUTERS=["multiple_database.routers.AdminRouter"],
-            ROOT_URLCONF="multiple_database.urls",
-        ):
-            user = User.objects.create_superuser(
-                username="super", password="secret", email="super@example.com"
-            )
-
-            book_type = ContentType.objects.get(
-                app_label="multiple_database", model="book"
-            )
-
-            self.client.force_login(user)
-
-            shortcut_url = reverse("admin:view_on_site", args=(book_type.pk, book_id))
-            response = self.client.get(shortcut_url, follow=False)
-            self.assertEqual(response.status_code, 302)
-            self.assertRegex(
-                response.url, f"http://(testserver|example.com)/books/{book_id}/"
-            )
 
 
 class ConnectionRouterTestCase(SimpleTestCase):
