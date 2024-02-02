@@ -34,7 +34,11 @@ class AdminRouter:
         return "other"
 
     def db_for_write(self, model, **hints):
-        return DEFAULT_DB_ALIAS
+        if model._meta.app_label in ["auth", "sessions", "contenttypes"]:
+            return DEFAULT_DB_ALIAS
+        if instance:
+            return instance._state.db or "other"
+        return "other"
 
     def allow_relation(self, obj1, obj2, **hints):
         return obj1._state.db in ("default", "other") and obj2._state.db in (
