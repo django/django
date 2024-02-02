@@ -2,7 +2,6 @@ import functools
 import inspect
 import itertools
 import re
-import reprlib
 import sys
 import types
 import warnings
@@ -18,6 +17,7 @@ from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_str
 from django.utils.module_loading import import_string
 from django.utils.regex_helper import _lazy_re_compile
+from django.utils.repr import DjangoRepr
 from django.utils.version import PY311, get_docs_version
 from django.views.decorators.debug import coroutine_functions_to_sensitive_variables
 
@@ -311,16 +311,8 @@ class SafeExceptionReporterFilter:
 class ExceptionReporter:
     """Organize and coordinate reporting on exceptions."""
 
-    repr_instance = reprlib.Repr()
-    repr_instance.indent = 2
-    repr_instance.maxdeque = 4096
-    repr_instance.maxstring = 4096
-    repr_instance.maxlist = 4096
-    repr_instance.maxset = 4096
-    repr_instance.maxdict = 4096
-    repr_instance.maxfrozenset = 4096
-    repr_instance.maxarray = 4096
-    repr_instance.maxother = 4096
+    repr_instance = DjangoRepr()
+    PRINT_LIMIT = 4096
 
     @property
     def html_template_path(self):
@@ -341,6 +333,8 @@ class ExceptionReporter:
         self.template_info = getattr(self.exc_value, "template_debug", None)
         self.template_does_not_exist = False
         self.postmortem = None
+
+        self.repr_instance.config(limit=ExceptionReporter.PRINT_LIMIT)
 
     def _get_raw_insecure_uri(self):
         """
@@ -364,9 +358,22 @@ class ExceptionReporter:
             if "vars" in frame:
                 frame_vars = []
                 for k, v in frame["vars"]:
-                    if isinstance(v, Sized) and len(v) > 4096:
-                        self.repr_instance.fillvalue = "...%d more" % (len(v) - 4096)
-                    v = self.repr_instance.repr(v)
+                    try:
+                        # Check if there are any exceptions in __repr__ fn of the object
+                        v = repr(v)
+
+                        trim_msg = ""
+
+                        if isinstance(v, Sized) and len(v) > 4096:
+                            diff = len(v) - 4096
+                            trim_msg = "...<trimmed %d bytes string>" % diff
+
+                        v = self.repr_instance.repr(v)
+                        v += trim_msg
+
+                    except Exception as e:
+                        v = "Error in formatting: %s: %s" % (e.__class__.__name__, e)
+                    print(v)
                     frame_vars.append((k, v))
                 frame["vars"] = frame_vars
             frames[i] = frame

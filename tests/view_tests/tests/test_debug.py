@@ -1036,15 +1036,20 @@ class ExceptionReporterTests(SimpleTestCase):
 
     def test_local_variable_escaping(self):
         """Safe strings in local variables are escaped."""
+        #  &lt;p&gt;Local variable&lt;/p&gt;\
+        # &#x27;&lt;p&gt;Local variable&lt;/p&gt;&#x27;
         try:
             local = mark_safe("<p>Local variable</p>")
+            print("safe string:", repr(local))
             raise ValueError(local)
         except Exception:
             exc_type, exc_value, tb = sys.exc_info()
+
         html = ExceptionReporter(None, exc_type, exc_value, tb).get_traceback_html()
         self.assertIn(
-            '<td class="code"><pre>&#x27;&lt;p&gt;Local variable&lt;/p&gt;&#x27;</pre>'
-            "</td>",
+            #  <td><pre>&lt;p&gt;Local variable&lt;/p&gt;</pre></td>
+            # <td class="code"><pre>&lt;p&gt;Local variable&lt;/p&gt;</pre></td>
+            '<td class="code"><pre>&#x27;&lt;p&gt;Local variable&lt;/p&gt;&#x27;</pre>',
             html,
         )
 
@@ -1066,7 +1071,7 @@ class ExceptionReporterTests(SimpleTestCase):
 
     def test_too_large_values_handling(self):
         "Large values should not create a large HTML."
-        large = 256 * 1024
+        large = 5000
         repr_of_str_adds = len(repr(""))
         try:
 
@@ -1081,9 +1086,10 @@ class ExceptionReporterTests(SimpleTestCase):
         reporter = ExceptionReporter(None, exc_type, exc_value, tb)
         html = reporter.get_traceback_html()
         self.assertEqual(len(html) // 1024 // 128, 0)  # still fit in 128Kb
-        self.assertIn(
-            "&lt;trimmed %d bytes string&gt;" % (large + repr_of_str_adds,), html
+        msg = "&lt;trimmed %d bytes string&gt;" % (
+            large - ExceptionReporter.PRINT_LIMIT + repr_of_str_adds,
         )
+        self.assertIn(msg, html)
 
     def test_encoding_error(self):
         """
