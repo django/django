@@ -412,7 +412,11 @@ class BaseDatabaseSchemaEditor:
         """Return the sql and params for the field's database default."""
         from django.db.models.expressions import Value
 
-        sql = "%s" if isinstance(field.db_default, Value) else "(%s)"
+        sql = (
+            self._column_default_sql(field)
+            if isinstance(field.db_default, Value)
+            else "(%s)"
+        )
         query = Query(model=field.model)
         compiler = query.get_compiler(connection=self.connection)
         default_sql, params = compiler.compile(field.db_default)
