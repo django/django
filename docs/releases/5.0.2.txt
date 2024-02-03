@@ -32,3 +32,7 @@ Bugfixes
 * Fixed a regression in Django 5.0 that caused the ``request_finished`` signal to
   sometimes not be fired when running Django through an ASGI server, resulting
   in potential resource leaks (:ticket:`35059`).
+
+* Fixed a bug in Django 5.0 that caused a migration crash on MySQL when adding
+  a ``BinaryField``, ``TextField``, ``JSONField``, or ``GeometryField`` with a
+  ``db_default`` (:ticket:`35162`).
