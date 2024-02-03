@@ -5,9 +5,10 @@ from decimal import Decimal
 
 from django import forms
 from django.core.exceptions import ImproperlyConfigured
-from django.db import models
+from django.db import connection, models
 from django.forms.formsets import formset_factory
 from django.forms.models import (
+    BaseInlineFormSet,
     BaseModelFormSet,
     ModelForm,
     _get_foreign_key,
@@ -17,6 +18,7 @@ from django.forms.models import (
 from django.forms.renderers import DjangoTemplates
 from django.http import QueryDict
 from django.test import TestCase, skipUnlessDBFeature
+from django.test.utils import CaptureQueriesContext
 
 from .models import (
     AlternateBook,
@@ -1141,6 +1143,55 @@ class ModelFormsetTest(TestCase):
         message = "fk_name 'title' is not a ForeignKey to 'model_formsets.Author'."
         with self.assertRaisesMessage(ValueError, message):
             inlineformset_factory(Author, Book, fields="__all__", fk_name="title")
+
+    def test_inline_formsets_with_prefetch_related(self):
+        """
+        Override BaseInlineFormSet.get_instance_by_queryset_index and
+        BaseInlineFormSet.prepare_queryset (#18597).
+        """
+        author = Author.objects.create(pk=1, name="Charles Baudelaire")
+        Book.objects.create(pk=1, author=author, title="Les Paradis Artificiels")
+        Book.objects.create(pk=2, author=author, title="Les Fleurs du Mal")
+        Book.objects.create(pk=3, author=author, title="Flowers of Evil")
+
+        # Check the default issues one query
+        BookFormSet = inlineformset_factory(Author, Book, fields=["title"])
+
+        with CaptureQueriesContext(connection) as ctx:
+            formset = BookFormSet(instance=author)
+            self.assertEqual(len(formset.forms), 6)
+        self.assertEqual(len(ctx), 1)  # Only 1 query
+
+        # Override to use prefetch_related query
+        class PrefetchInlineFormSet(BaseInlineFormSet):
+            def get_instance_by_queryset_index(self, i):
+                # Use list() to evaluate the lazy queryset now
+                return list(self.get_queryset())[i]
+
+            def prepare_queryset(self, queryset):
+                if self.instance.pk:
+                    rel_name = self.fk.remote_field.get_accessor_name(model=self.model)
+                    queryset = getattr(self.instance, rel_name).get_queryset()
+                    if queryset is not None:
+                        return queryset
+                return super().prepare_queryset(queryset)
+
+        BookFormSet = inlineformset_factory(
+            Author, Book, fields=["title"], formset=PrefetchInlineFormSet
+        )
+        author_with_books = Author.objects.prefetch_related("book_set").get(
+            name="Charles Baudelaire"
+        )
+        with CaptureQueriesContext(connection) as ctx:
+            formset = BookFormSet(instance=author_with_books)
+            self.assertEqual(len(formset.forms), 6)
+        self.assertFalse(ctx.captured_queries)  # No queries, prefetch_related is used
+
+        # Again but without prefetch_related
+        with CaptureQueriesContext(connection) as ctx:
+            formset = BookFormSet(instance=author)
+            self.assertEqual(len(formset.forms), 6)
+        self.assertEqual(len(ctx), 1)  # Only 1 query
 
     def test_custom_pk(self):
         # We need to ensure that it is displayed
