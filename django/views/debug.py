@@ -5,12 +5,12 @@ import re
 import sys
 import types
 import warnings
-from collections.abc import Sized
 from pathlib import Path
 
 from django.conf import settings
 from django.http import Http404, HttpResponse, HttpResponseNotFound
 from django.template import Context, Engine, TemplateDoesNotExist
+from django.template.defaultfilters import pprint
 from django.urls import resolve
 from django.utils import timezone
 from django.utils.datastructures import MultiValueDict
@@ -358,18 +358,7 @@ class ExceptionReporter:
             if "vars" in frame:
                 frame_vars = []
                 for k, v in frame["vars"]:
-
-                    try:
-                        if isinstance(v, Sized) and len(v) > self.PRINT_LIMIT:
-                            diff = len(v) - self.PRINT_LIMIT
-                            self.repr_instance.fillvalue = (
-                                "...<trimmed %d bytes string>" % diff
-                            )
-                        v = self.repr_instance.repr(v)
-
-                    except Exception as e:
-                        v = "Error in formatting: %s: %s" % (e.__class__.__name__, e)
-
+                    v = pprint(v)
                     frame_vars.append((k, v))
                 frame["vars"] = frame_vars
             frames[i] = frame

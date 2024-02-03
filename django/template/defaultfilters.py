@@ -3,6 +3,7 @@
 import random as random_module
 import re
 import types
+from collections.abc import Sized
 from decimal import ROUND_HALF_UP, Context, Decimal, InvalidOperation, getcontext
 from functools import wraps
 from inspect import unwrap
@@ -16,6 +17,7 @@ from django.utils.html import avoid_wrapping, conditional_escape, escape, escape
 from django.utils.html import json_script as _json_script
 from django.utils.html import linebreaks, strip_tags
 from django.utils.html import urlize as _urlize
+from django.utils.repr import DjangoRepr
 from django.utils.safestring import SafeData, mark_safe
 from django.utils.text import Truncator, normalize_newlines, phone2numeric
 from django.utils.text import slugify as _slugify
@@ -966,3 +968,22 @@ def pluralize(value, arg="s"):
 def phone2numeric_filter(value):
     """Take a phone number and converts it in to its numerical equivalent."""
     return phone2numeric(value)
+
+
+PRINT_LIMIT = 4096
+repr_instance = DjangoRepr()
+repr_instance.config(PRINT_LIMIT)
+
+
+@register.filter(is_safe=True)
+def pprint(v):
+    try:
+        if isinstance(v, Sized) and len(v) > PRINT_LIMIT:
+            diff = len(v) - PRINT_LIMIT
+            repr_instance.fillvalue = "...<trimmed %d bytes string>" % diff
+        v = repr_instance.repr(v)
+
+    except Exception as e:
+        v = "Error in formatting: %s: %s" % (e.__class__.__name__, e)
+
+    return v
