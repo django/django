@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Natalia (Django Fellow), 2024
 # Omkar Parab, 2024
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2024-01-25 07:05+0000\n"
-"Last-Translator: Omkar Parab, 2024\n"
+"PO-Revision-Date: 2013-04-25 07:05+0000\n"
+"Last-Translator: Natalia (Django Fellow), 2024\n"
 "Language-Team: Marathi (http://app.transifex.com/django/django/language/"
 "mr/)\n"
 "MIME-Version: 1.0\n"
@@ -155,17 +156,17 @@ msgstr "जोडले."
 msgid "and"
 msgstr "आणि"
 
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr ""
+#, python-brace-format
+msgid "Changed {fields} for {name} “{object}”."
+msgstr "{name} “{object}” साठी {fields} बदलले. "
 
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr ""
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr "{fields} बदलले. "
 
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr ""
+#, python-brace-format
+msgid "Deleted {name} “{object}”."
+msgstr "{name} “{object}” घालवला"
 
 msgid "No fields changed."
 msgstr "कोणतेही रखाणे बदलले नाहीत."
@@ -179,34 +180,36 @@ msgstr "एकापेक्षा जास्त निवडण्यास�
 msgid "Select this object for an action - {}"
 msgstr ""
 
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully."
+msgstr "{name} “{obj}” यशस्वीरीत्या जोडले गेले आहे."
+
 msgid "You may edit it again below."
 msgstr "तुम्ही ते खाली पुन्हा संपादित करू शकता."
 
 #, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
-"below."
-msgstr ""
+"The {name} “{obj}” was added successfully. You may add another {name} below."
+msgstr "{name} “{obj}” यशस्वीरीत्या जोडले गेले आहे. तुम्ही खाली दुसरे {name} जोडू शकता."
 
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
-msgstr ""
+"The {name} “{obj}” was changed successfully. You may edit it again below."
+msgstr "{name} “{obj}” यशस्वीरीत्या बदलले गेले. तुम्ही त्याचे पुन्हा संपादन करू शकता."
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr "{name} \"{obj}\" यशस्वीरीत्या जोडले गेले आहे. तुम्ही त्याचे पुन्हा संपादन करू शकता."
+msgstr "{name} “{obj}” यशस्वीरीत्या जोडले गेले आहे. तुम्ही त्याचे पुन्हा संपादन करू शकता."
 
 #, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
-msgstr "{name} \"{obj}\" यशस्वीरीत्या जोडले गेले आहे. तुम्ही त्याचे पुन्हा संपादन करू शकता."
+msgstr "{name} “{obj}” यशस्वीरीत्या जोडले गेले आहे. तुम्ही खाली दुसरे {name} जोडू शकता."
 
 #, python-brace-format
 msgid "The {name} “{obj}” was changed successfully."
-msgstr "{name} \"{obj}\" यशस्वीरीत्या बदलले गेले आहे."
+msgstr "{name} “{obj}” यशस्वीरीत्या बदलले गेले आहे."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
