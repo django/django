@@ -30,6 +30,7 @@ class MigrationRecorder:
         if cls._migration_class is None:
 
             class Migration(models.Model):
+                id = models.IntegerField(primary_key=True)
                 app = models.CharField(max_length=255)
                 name = models.CharField(max_length=255)
                 applied = models.DateTimeField(default=now)
