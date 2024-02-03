@@ -1,6 +1,9 @@
 import os
 import re
 from importlib import import_module
+import logging
+
+from platformdirs import user_cache_dir
 
 from django import get_version
 from django.apps import apps
@@ -13,6 +16,8 @@ from django.db.migrations.serializer import Serializer, serializer_factory
 from django.utils.inspect import get_func_args
 from django.utils.module_loading import module_dir
 from django.utils.timezone import now
+
+logger = logging.getLogger("django.db.migrations.writer")
 
 
 class OperationWriter:
@@ -280,7 +285,14 @@ class MigrationWriter:
 
     @property
     def path(self):
-        return os.path.join(self.basedir, self.filename)
+        basedir = self.basedir
+        if not os.access(basedir, os.W_OK):
+            # dont use os.path.join to preserve the user_cache_dir path
+            # use splitdrive to remove the "C:" drive prefix on windows
+            old_basedir = basedir
+            basedir = user_cache_dir("django-db-migrations") + "/" + os.path.splitdrive(basedir)[1]
+            logger.info(f"writing migration files to {repr(basedir)} because the original path is not writable: {repr(old_basedir)}")
+        return os.path.join(basedir, self.filename)
 
     @classmethod
     def serialize(cls, value):
