@@ -1832,17 +1832,18 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
         end_datetime = timezone.make_aware(end_datetime)
         self.create_model(start_datetime, end_datetime)
         self.create_model(end_datetime, start_datetime)
-        melb = zoneinfo.ZoneInfo("Australia/Melbourne")
 
-        def assertDatetimeKind(kind):
-            truncated_start = truncate_to(start_datetime.astimezone(melb), kind, melb)
-            truncated_end = truncate_to(end_datetime.astimezone(melb), kind, melb)
+        def assertDatetimeKind(kind, tzinfo):
+            truncated_start = truncate_to(
+                start_datetime.astimezone(tzinfo), kind, tzinfo
+            )
+            truncated_end = truncate_to(end_datetime.astimezone(tzinfo), kind, tzinfo)
             queryset = DTModel.objects.annotate(
                 truncated=Trunc(
                     "start_datetime",
                     kind,
                     output_field=DateTimeField(),
-                    tzinfo=melb,
+                    tzinfo=tzinfo,
                 )
             ).order_by("start_datetime")
             self.assertSequenceEqual(
@@ -1853,15 +1854,17 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
                 ],
             )
 
-        def assertDatetimeToDateKind(kind):
-            truncated_start = truncate_to(start_datetime.astimezone(melb).date(), kind)
-            truncated_end = truncate_to(end_datetime.astimezone(melb).date(), kind)
+        def assertDatetimeToDateKind(kind, tzinfo):
+            truncated_start = truncate_to(
+                start_datetime.astimezone(tzinfo).date(), kind
+            )
+            truncated_end = truncate_to(end_datetime.astimezone(tzinfo).date(), kind)
             queryset = DTModel.objects.annotate(
                 truncated=Trunc(
                     "start_datetime",
                     kind,
                     output_field=DateField(),
-                    tzinfo=melb,
+                    tzinfo=tzinfo,
                 ),
             ).order_by("start_datetime")
             self.assertSequenceEqual(
@@ -1872,15 +1875,17 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
                 ],
             )
 
-        def assertDatetimeToTimeKind(kind):
-            truncated_start = truncate_to(start_datetime.astimezone(melb).time(), kind)
-            truncated_end = truncate_to(end_datetime.astimezone(melb).time(), kind)
+        def assertDatetimeToTimeKind(kind, tzinfo):
+            truncated_start = truncate_to(
+                start_datetime.astimezone(tzinfo).time(), kind
+            )
+            truncated_end = truncate_to(end_datetime.astimezone(tzinfo).time(), kind)
             queryset = DTModel.objects.annotate(
                 truncated=Trunc(
                     "start_datetime",
                     kind,
                     output_field=TimeField(),
-                    tzinfo=melb,
+                    tzinfo=tzinfo,
                 )
             ).order_by("start_datetime")
             self.assertSequenceEqual(
@@ -1891,6 +1896,10 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
                 ],
             )
 
+        timezones = [
+            zoneinfo.ZoneInfo("Australia/Melbourne"),
+            zoneinfo.ZoneInfo("Etc/GMT+10"),
+        ]
         date_truncations = ["year", "quarter", "month", "week", "day"]
         time_truncations = ["hour", "minute", "second"]
         tests = [
@@ -1900,8 +1909,13 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
         ]
         for assertion, truncations in tests:
             for truncation in truncations:
-                with self.subTest(assertion=assertion.__name__, truncation=truncation):
-                    assertion(truncation)
+                for tzinfo in timezones:
+                    with self.subTest(
+                        assertion=assertion.__name__,
+                        truncation=truncation,
+                        tzinfo=tzinfo.key,
+                    ):
+                        assertion(truncation, tzinfo)
 
         qs = DTModel.objects.filter(
             start_datetime__date=Trunc(
