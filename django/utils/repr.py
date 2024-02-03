@@ -12,9 +12,7 @@ class DjangoRepr(reprlib.Repr):
                 setattr(self, attr, limit)
 
     def repr_str(self, x, level):
-        if len(x) > self.maxstring:
-            return x[: self.maxstring] + self.gen_trim_msg(len(x))
-        return x[: self.maxstring]
+        return "'%s'" % (x[: self.maxstring] + self.gen_trim_msg(len(x)))
 
     def repr_instance(self, x, level):
         s = builtins.repr(x)

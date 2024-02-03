@@ -7,7 +7,6 @@ from decimal import ROUND_HALF_UP, Context, Decimal, InvalidOperation, getcontex
 from functools import wraps
 from inspect import unwrap
 from operator import itemgetter
-from pprint import pformat
 from urllib.parse import quote
 
 from django.utils import formats
@@ -967,12 +966,3 @@ def pluralize(value, arg="s"):
 def phone2numeric_filter(value):
     """Take a phone number and converts it in to its numerical equivalent."""
     return phone2numeric(value)
-
-
-@register.filter(is_safe=True)
-def pprint(value):
-    """A wrapper around pprint.pprint -- for debugging, really."""
-    try:
-        return pformat(value)
-    except Exception as e:
-        return "Error in formatting: %s: %s" % (e.__class__.__name__, e)

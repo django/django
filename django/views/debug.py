@@ -358,13 +358,13 @@ class ExceptionReporter:
             if "vars" in frame:
                 frame_vars = []
                 for k, v in frame["vars"]:
+
                     try:
                         if isinstance(v, Sized) and len(v) > self.PRINT_LIMIT:
                             diff = len(v) - self.PRINT_LIMIT
                             self.repr_instance.fillvalue = (
                                 "...<trimmed %d bytes string>" % diff
                             )
-
                         v = self.repr_instance.repr(v)
 
                     except Exception as e:
