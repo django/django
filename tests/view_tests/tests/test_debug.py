@@ -1036,19 +1036,16 @@ class ExceptionReporterTests(SimpleTestCase):
 
     def test_local_variable_escaping(self):
         """Safe strings in local variables are escaped."""
-        #  &lt;p&gt;Local variable&lt;/p&gt;\
-        # &#x27;&lt;p&gt;Local variable&lt;/p&gt;&#x27;
+
         try:
             local = mark_safe("<p>Local variable</p>")
-            print("safe string:", repr(local))
             raise ValueError(local)
+
         except Exception:
             exc_type, exc_value, tb = sys.exc_info()
 
         html = ExceptionReporter(None, exc_type, exc_value, tb).get_traceback_html()
         self.assertIn(
-            #  <td><pre>&lt;p&gt;Local variable&lt;/p&gt;</pre></td>
-            # <td class="code"><pre>&lt;p&gt;Local variable&lt;/p&gt;</pre></td>
             '<td class="code"><pre>&#x27;&lt;p&gt;Local variable&lt;/p&gt;&#x27;</pre>',
             html,
         )
@@ -1071,7 +1068,7 @@ class ExceptionReporterTests(SimpleTestCase):
 
     def test_too_large_values_handling(self):
         "Large values should not create a large HTML."
-        large = 5000
+        large = 256 * 1024
         repr_of_str_adds = len(repr(""))
         try:
 
@@ -1086,10 +1083,50 @@ class ExceptionReporterTests(SimpleTestCase):
         reporter = ExceptionReporter(None, exc_type, exc_value, tb)
         html = reporter.get_traceback_html()
         self.assertEqual(len(html) // 1024 // 128, 0)  # still fit in 128Kb
-        msg = "&lt;trimmed %d bytes string&gt;" % (
+        trim_msg = "&lt;trimmed %d bytes string&gt;" % (
             large - ExceptionReporter.PRINT_LIMIT + repr_of_str_adds,
         )
-        self.assertIn(msg, html)
+        self.assertIn(trim_msg, html)
+
+    def test_large_sizable_object(self):
+        """Large objects should not be rendered entirely"""
+        lg = list(range(1000 * 1000))
+        try:
+            lg["a"]
+        except TypeError:
+            exc_type, exc_value, tb = sys.exc_info()
+
+        reporter = ExceptionReporter(None, exc_type, exc_value, tb)
+        d = reporter.get_traceback_data()
+        vars = d["lastframe"]["vars"]
+
+        for k, v in vars:
+            if k == "lg":
+                i = v.index("...")
+
+                # Construct list with elements before trimming
+                ls = eval(v[:i] + "]")
+
+                # Check if length of trimmed list is our limit
+                self.assertEqual(len(ls), ExceptionReporter.PRINT_LIMIT)
+                break
+
+    def test_non_sizable_object(self):
+        """Non-sizable variables be handled with builtin repr"""
+        num = 10000000
+        try:
+            num["a"]
+        except TypeError:
+            exc_type, exc_value, tb = sys.exc_info()
+
+        reporter = ExceptionReporter(None, exc_type, exc_value, tb)
+        d = reporter.get_traceback_data()
+        vars = d["lastframe"]["vars"]
+
+        for k, v in vars:
+            if k == "a":
+                self.assertEqual(v, str(num))
+                break
 
     def test_encoding_error(self):
         """

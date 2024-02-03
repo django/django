@@ -359,21 +359,17 @@ class ExceptionReporter:
                 frame_vars = []
                 for k, v in frame["vars"]:
                     try:
-                        # Check if there are any exceptions in __repr__ fn of the object
-                        v = repr(v)
-
-                        trim_msg = ""
-
-                        if isinstance(v, Sized) and len(v) > 4096:
-                            diff = len(v) - 4096
-                            trim_msg = "...<trimmed %d bytes string>" % diff
+                        if isinstance(v, Sized) and len(v) > self.PRINT_LIMIT:
+                            diff = len(v) - self.PRINT_LIMIT
+                            self.repr_instance.fillvalue = (
+                                "...<trimmed %d bytes string>" % diff
+                            )
 
                         v = self.repr_instance.repr(v)
-                        v += trim_msg
 
                     except Exception as e:
                         v = "Error in formatting: %s: %s" % (e.__class__.__name__, e)
-                    print(v)
+
                     frame_vars.append((k, v))
                 frame["vars"] = frame_vars
             frames[i] = frame
