@@ -96,7 +96,33 @@ class GroupManager(models.Manager):
         return self.get(name=name)
 
 
-class Group(models.Model):
+class AbstarctGroup(models.Model):
+    '''
+    An abstract base class implementing a fully featured Group model.
+    '''
+
+
+    name = models.CharField(_("name"), max_length=150, unique=True)
+    permissions = models.ManyToManyField(
+        Permission,
+        verbose_name=_("permissions"),
+        blank=True,
+    )
+
+    objects = GroupManager()
+
+    class Meta:
+        verbose_name = _("group")
+        verbose_name_plural = _("groups")
+        abtract = True
+
+    def __str__(self):
+        return self.name
+
+    def natural_key(self):
+        return (self.name,)
+    
+class Group (AbstarctGroup):
     """
     Groups are a generic way of categorizing users to apply permissions, or
     some other label, to those users. A user can belong to any number of
@@ -113,25 +139,7 @@ class Group(models.Model):
     members-only portion of your site, or sending them members-only email
     messages.
     """
-
-    name = models.CharField(_("name"), max_length=150, unique=True)
-    permissions = models.ManyToManyField(
-        Permission,
-        verbose_name=_("permissions"),
-        blank=True,
-    )
-
-    objects = GroupManager()
-
-    class Meta:
-        verbose_name = _("group")
-        verbose_name_plural = _("groups")
-
-    def __str__(self):
-        return self.name
-
-    def natural_key(self):
-        return (self.name,)
+    pass
 
 
 class UserManager(BaseUserManager):
