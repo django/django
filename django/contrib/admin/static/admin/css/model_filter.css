@@ -1,0 +1,50 @@
+#model-filter {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 2px 5px;
+    margin: 5px 0;
+    border: 1px solid var(--border-color);
+    background-color: var(--darkened-bg);
+    color: var(--body-fg);
+    flex: 1;
+    min-width: 150px;
+    max-height: 2em;
+}
+
+#model-filter:focus {
+    border-color: var(--body-quiet-color);
+}
+
+#model-filter.no-results {
+    background: var(--message-error-bg);
+}
+
+.filterable-apps-table:not(#nav-sidebar) caption {
+    /* The captions were resized when using a filter.
+     This ensures that they keep their original width. */
+    width: calc(100% - 16px);
+}
+
+/* Styles only relevant to index pages */
+
+.admin-index-title {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1em;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 767px) {
+    .admin-index-title {
+        margin-bottom: 10px;
+    }
+}
+
+.admin-index-title h1 {
+    flex: 2;
+    margin-bottom: 0;
+}
+
+.admin-index-title #model-filter {
+    display: inline-block;
+}

@@ -11,8 +11,15 @@
 
 {% block nav-sidebar %}{% endblock %}
 
+{% block content_title %}
+<div class="admin-index-title">
+  {{ block.super }}
+  {% include "admin/model_filter.html" %}
+</div>
+{% endblock %}
+
 {% block content %}
-<div id="content-main">
+<div id="content-main" class="filterable-apps-table">
   {% include "admin/app_list.html" with app_list=app_list show_changelinks=True %}
 </div>
 {% endblock %}

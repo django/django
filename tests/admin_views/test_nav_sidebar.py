@@ -44,27 +44,36 @@ class AdminSidebarTests(TestCase):
         response = self.client.get(reverse("test_with_sidebar:index"))
         self.assertContains(response, '<div class="main" id="main">')
         self.assertNotContains(
-            response, '<nav class="sticky" id="nav-sidebar" aria-label="Sidebar">'
+            response,
+            '<nav class="sticky filterable-apps-table" id="nav-sidebar" '
+            'aria-label="Sidebar">',
         )
 
     def test_sidebar_disabled(self):
         response = self.client.get(reverse("test_without_sidebar:index"))
         self.assertNotContains(
-            response, '<nav class="sticky" id="nav-sidebar" aria-label="Sidebar">'
+            response,
+            '<nav class="sticky filterable-apps-table" id="nav-sidebar" '
+            'aria-label="Sidebar">',
         )
 
     def test_sidebar_unauthenticated(self):
         self.client.logout()
         response = self.client.get(reverse("test_with_sidebar:login"))
         self.assertNotContains(
-            response, '<nav class="sticky" id="nav-sidebar" aria-label="Sidebar">'
+            response,
+            '<nav class="sticky filterable-apps-table" id="nav-sidebar" '
+            'aria-label="Sidebar">',
         )
 
     def test_sidebar_aria_current_page(self):
         url = reverse("test_with_sidebar:auth_user_changelist")
         response = self.client.get(url)
         self.assertContains(
-            response, '<nav class="sticky" id="nav-sidebar" aria-label="Sidebar">'
+            response,
+            '<nav class="sticky '
+            'filterable-apps-table" id="nav-sidebar" '
+            'aria-label="Sidebar">',
         )
         self.assertContains(
             response, '<a href="%s" aria-current="page">Users</a>' % url
@@ -89,7 +98,9 @@ class AdminSidebarTests(TestCase):
         url = reverse("test_with_sidebar:auth_user_changelist")
         response = self.client.get(url)
         self.assertContains(
-            response, '<nav class="sticky" id="nav-sidebar" aria-label="Sidebar">'
+            response,
+            '<nav class="sticky filterable-apps-table" id="nav-sidebar" '
+            'aria-label="Sidebar">',
         )
         # Does not include aria-current attribute.
         self.assertContains(response, '<a href="%s">Users</a>' % url)
@@ -226,9 +237,9 @@ class SeleniumTests(AdminSeleniumTestCase):
             self.live_server_url + reverse("test_with_sidebar:auth_user_changelist")
         )
         filter_value_script = (
-            "return sessionStorage.getItem('django.admin.navSidebarFilterValue')"
+            "return sessionStorage.getItem('django.admin.modelFilterValue')"
         )
         self.assertIsNone(self.selenium.execute_script(filter_value_script))
-        filter_input = self.selenium.find_element(By.CSS_SELECTOR, "#nav-filter")
+        filter_input = self.selenium.find_element(By.CSS_SELECTOR, "#model-filter")
         filter_input.send_keys("users")
         self.assertEqual(self.selenium.execute_script(filter_value_script), "users")
