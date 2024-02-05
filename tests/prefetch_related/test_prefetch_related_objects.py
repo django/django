@@ -1,7 +1,16 @@
 from django.db.models import Prefetch, prefetch_related_objects
 from django.test import TestCase
 
-from .models import Author, Book, Reader
+from .models import (
+    Author,
+    Book,
+    Furniture,
+    House,
+    Person,
+    Reader,
+    Room,
+    Television,
+)
 
 
 class PrefetchRelatedObjectsTests(TestCase):
@@ -155,3 +164,38 @@ class PrefetchRelatedObjectsTests(TestCase):
 
         with self.assertNumQueries(0):
             self.assertCountEqual(book1.authors.all(), [self.author1, self.author2])
+
+    def test_prefetch_for_many_to_one_relation_and_to_attr(self):
+        # We have this setup that is traversed by nested prefetches,
+        # custom querysets and `to_attr`.
+        # M1.ForeignKey -> M2 <- 1_1.M3.ForeignKey -> M4
+        # We map these models and attributes to the test "House" schema:
+        # M1.ForeignKey : Furniture.room
+        # M2.reverse_1_1 : Room.television
+        # M3.ForeignKey : Television.owner
+        # M4: Person
+
+        # GIVEN five Models with one instance each
+        house = House.objects.create(name="Home sweet home", address="Earth")
+        room = Room.objects.create(name="bedroom", house=house)
+        tv_owner = Person.objects.create(name="Lucie")
+        tv = Television.objects.create(name="CinemaTV", owner=tv_owner, room=room)
+        furniture = Furniture.objects.create(name="bed", room=room)
+
+        # THEN prefetching from M1 to M4 should only trigger
+        # 3 DB queries.
+        with self.assertNumQueries(3):
+            qs = Furniture.objects.select_related("room").prefetch_related(
+                Prefetch(
+                    "room__television",
+                    queryset=Television.objects.prefetch_related(
+                        Prefetch(
+                            "owner",
+                            queryset=Person.objects.all(),
+                            to_attr="prefetched_owner",
+                        )
+                    ),
+                    to_attr="prefetched_television",
+                )
+            )
+            prefetched_furniture = qs.get(pk=furniture.pk)

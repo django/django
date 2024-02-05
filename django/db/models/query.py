@@ -2416,7 +2416,7 @@ def prefetch_related_objects(model_instances, *related_lookups):
                         new_obj = list(obj._prefetched_objects_cache.get(through_attr))
                     else:
                         try:
-                            new_obj = getattr(obj, through_attr)
+                            new_obj = getattr(obj, to_attr)
                         except exceptions.ObjectDoesNotExist:
                             continue
                     if new_obj is None:
