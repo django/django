@@ -93,9 +93,6 @@ class Item(models.Model):
     location_value = models.ForeignKey(
         Location, models.SET(42), default=1, db_constraint=False, related_name="+"
     )
-    location_default = models.ForeignKey(
-        Location, models.SET_DEFAULT, default=1, db_constraint=False, related_name="+"
-    )
 
 
 # Models for #16128
@@ -155,6 +152,7 @@ class OrderedPerson(models.Model):
 
 # Models for #35073
 
+
 class Owner(models.Model):
     name = models.CharField(max_length=32)
 
@@ -182,4 +180,6 @@ def get_default_owner2():
 
 
 class Pet2(models.Model):
-    owner = models.ForeignKey(Owner2, default=get_default_owner2, on_delete=models.SET_DEFAULT)
+    owner = models.ForeignKey(
+        Owner2, default=get_default_owner2, on_delete=models.SET_DEFAULT
+    )

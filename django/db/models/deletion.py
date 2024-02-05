@@ -77,9 +77,6 @@ def SET_DEFAULT(collector, field, sub_objs, using):
     collector.add_field_update(field, field.get_default(), sub_objs)
 
 
-SET_DEFAULT.lazy_sub_objs = True
-
-
 def DO_NOTHING(collector, field, sub_objs, using):
     pass
 
