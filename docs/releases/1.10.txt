@@ -732,8 +732,7 @@ custom lookup for it. For example::
     from django.db.models.lookups import Exact
 
 
-    class MyField(Field):
-        ...
+    class MyField(Field): ...
 
 
     class MyFieldExact(Exact):

@@ -208,8 +208,7 @@ will require a CSRF token to be inserted you should use the
 
   @cache_page(60 * 15)
   @csrf_protect
-  def my_view(request):
-      ...
+  def my_view(request): ...
 
 If you are using class-based views, you can refer to :ref:`Decorating
 class-based views<decorating-class-based-views>`.

@@ -309,7 +309,8 @@ views and use Django's generic views instead. To do so, open the
 
 
     def vote(request, question_id):
-        ...  # same as above, no changes needed.
+        # same as above, no changes needed.
+        ...
 
 Each generic view needs to know what model it will be acting upon. This is
 provided using either the ``model`` attribute (in this example, ``model =

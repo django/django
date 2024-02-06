@@ -1,6 +1,7 @@
 """
 PostGIS to GDAL conversion constant definitions
 """
+
 # Lookup to convert pixel type values from GDAL to PostGIS
 GDAL_TO_POSTGIS = [None, 4, 6, 5, 8, 7, 10, 11, None, None, None, None]
 

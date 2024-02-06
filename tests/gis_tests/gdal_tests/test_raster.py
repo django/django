@@ -102,8 +102,9 @@ class GDALRasterTests(SimpleTestCase):
         ]
         msg = "Geotransform must consist of 6 numeric values."
         for geotransform in error_geotransforms:
-            with self.subTest(i=geotransform), self.assertRaisesMessage(
-                ValueError, msg
+            with (
+                self.subTest(i=geotransform),
+                self.assertRaisesMessage(ValueError, msg),
             ):
                 rsmem.geotransform = geotransform
 

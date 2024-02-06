@@ -106,13 +106,18 @@ methods that allow you to get from a
 :class:`~django.contrib.contenttypes.models.ContentType` instance to the
 model it represents, or to retrieve objects from that model:
 
-.. method:: ContentType.get_object_for_this_type(**kwargs)
+.. method:: ContentType.get_object_for_this_type(using=None, **kwargs)
 
     Takes a set of valid :ref:`lookup arguments <field-lookups-intro>` for the
     model the :class:`~django.contrib.contenttypes.models.ContentType`
     represents, and does
     :meth:`a get() lookup <django.db.models.query.QuerySet.get>`
-    on that model, returning the corresponding object.
+    on that model, returning the corresponding object. The ``using`` argument
+    can be used to specify a different database than the default one.
+
+    .. versionchanged:: 5.1
+
+        The ``using`` argument was added.
 
 .. method:: ContentType.model_class()
 

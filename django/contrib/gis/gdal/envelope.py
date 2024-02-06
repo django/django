@@ -10,6 +10,7 @@
                            |          |
  Lower left (min_x, min_y) o----------+
 """
+
 from ctypes import Structure, c_double
 
 from django.contrib.gis.gdal.error import GDALException

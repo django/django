@@ -7,6 +7,7 @@ from unittest import mock
 
 from django.core.exceptions import FieldError
 from django.core.management.color import no_style
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import (
     DatabaseError,
     DataError,
@@ -640,9 +641,10 @@ class SchemaTests(TransactionTestCase):
         # Add the new field
         new_field = IntegerField(null=True)
         new_field.set_attributes_from_name("age")
-        with CaptureQueriesContext(
-            connection
-        ) as ctx, connection.schema_editor() as editor:
+        with (
+            CaptureQueriesContext(connection) as ctx,
+            connection.schema_editor() as editor,
+        ):
             editor.add_field(Author, new_field)
         drop_default_sql = editor.sql_alter_column_no_default % {
             "column": editor.quote_name(new_field.name),
@@ -2302,6 +2304,56 @@ class SchemaTests(TransactionTestCase):
         columns = self.column_classes(Author)
         self.assertEqual(columns["birth_year"][1].default, "1988")
 
+    @isolate_apps("schema")
+    def test_add_text_field_with_db_default(self):
+        class Author(Model):
+            description = TextField(db_default="(missing)")
+
+            class Meta:
+                app_label = "schema"
+
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        columns = self.column_classes(Author)
+        self.assertIn("(missing)", columns["description"][1].default)
+
+    @isolate_apps("schema")
+    def test_db_default_equivalent_sql_noop(self):
+        class Author(Model):
+            name = TextField(db_default=Value("foo"))
+
+            class Meta:
+                app_label = "schema"
+
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+
+        new_field = TextField(db_default="foo")
+        new_field.set_attributes_from_name("name")
+        new_field.model = Author
+        with connection.schema_editor() as editor, self.assertNumQueries(0):
+            editor.alter_field(Author, Author._meta.get_field("name"), new_field)
+
+    @isolate_apps("schema")
+    def test_db_default_output_field_resolving(self):
+        class Author(Model):
+            data = JSONField(
+                encoder=DjangoJSONEncoder,
+                db_default={
+                    "epoch": datetime.datetime(1970, 1, 1, tzinfo=datetime.timezone.utc)
+                },
+            )
+
+            class Meta:
+                app_label = "schema"
+
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+
+        author = Author.objects.create()
+        author.refresh_from_db()
+        self.assertEqual(author.data, {"epoch": "1970-01-01T00:00:00Z"})
+
     @skipUnlessDBFeature(
         "supports_column_check_constraints", "can_introspect_check_constraints"
     )
@@ -2483,9 +2535,10 @@ class SchemaTests(TransactionTestCase):
         with self.assertRaises(DatabaseError):
             self.column_classes(new_field.remote_field.through)
         # Add the field
-        with CaptureQueriesContext(
-            connection
-        ) as ctx, connection.schema_editor() as editor:
+        with (
+            CaptureQueriesContext(connection) as ctx,
+            connection.schema_editor() as editor,
+        ):
             editor.add_field(LocalAuthorWithM2M, new_field)
         # Table is not rebuilt.
         self.assertEqual(
@@ -2963,9 +3016,11 @@ class SchemaTests(TransactionTestCase):
         )
         # Redundant foreign key index is not added.
         self.assertEqual(
-            len(old_constraints) - 1
-            if connection.features.supports_partial_indexes
-            else len(old_constraints),
+            (
+                len(old_constraints) - 1
+                if connection.features.supports_partial_indexes
+                else len(old_constraints)
+            ),
             len(new_constraints),
         )
 

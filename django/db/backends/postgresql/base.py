@@ -226,9 +226,11 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         server_side_binding = conn_params.pop("server_side_binding", None)
         conn_params.setdefault(
             "cursor_factory",
-            ServerBindingCursor
-            if is_psycopg3 and server_side_binding is True
-            else Cursor,
+            (
+                ServerBindingCursor
+                if is_psycopg3 and server_side_binding is True
+                else Cursor
+            ),
         )
         if settings_dict["USER"]:
             conn_params["user"] = settings_dict["USER"]

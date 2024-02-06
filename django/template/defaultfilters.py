@@ -1,4 +1,5 @@
 """Default variable filters."""
+
 import random as random_module
 import re
 import types

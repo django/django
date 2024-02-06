@@ -5,6 +5,7 @@ Filters are specified in models with the "list_filter" option.
 Each filter subclass knows how to display a filter for a field that passes a
 certain test -- e.g. being a DateField or ForeignKey.
 """
+
 import datetime
 
 from django.contrib.admin.exceptions import NotRegistered

@@ -1392,8 +1392,9 @@ class BaseEmailBackendTests(HeadersCheckMixin):
         ):
             msg = "The %s setting must be a list of 2-tuples." % setting
             for value in tests:
-                with self.subTest(setting=setting, value=value), self.settings(
-                    **{setting: value}
+                with (
+                    self.subTest(setting=setting, value=value),
+                    self.settings(**{setting: value}),
                 ):
                     with self.assertRaisesMessage(ValueError, msg):
                         mail_func("subject", "content")

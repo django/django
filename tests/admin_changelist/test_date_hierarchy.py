@@ -90,7 +90,8 @@ class DateHierarchyTests(TestCase):
             {"year": 2017, "month": 12, "day": 0},
         )
         for invalid_query in tests:
-            with self.subTest(query=invalid_query), self.assertRaises(
-                IncorrectLookupParameters
+            with (
+                self.subTest(query=invalid_query),
+                self.assertRaises(IncorrectLookupParameters),
             ):
                 self.assertDateParams(invalid_query, None, None)

@@ -1581,7 +1581,7 @@ class OperationTests(OperationTestBase):
         self.assertEqual(len(new_state.models[app_label, "pony"].fields), 6)
         field = new_state.models[app_label, "pony"].fields["height"]
         self.assertEqual(field.default, models.NOT_PROVIDED)
-        self.assertEqual(field.db_default, Value(4))
+        self.assertEqual(field.db_default, 4)
         project_state.apps.get_model(app_label, "pony").objects.create(weight=4)
         self.assertColumnNotExists(table_name, "height")
         # Add field.
@@ -1632,7 +1632,7 @@ class OperationTests(OperationTestBase):
                 self.assertEqual(len(new_state.models[app_label, "pony"].fields), 6)
                 field = new_state.models[app_label, "pony"].fields["special_char"]
                 self.assertEqual(field.default, models.NOT_PROVIDED)
-                self.assertEqual(field.db_default, Value(db_default))
+                self.assertEqual(field.db_default, db_default)
                 self.assertColumnNotExists(table_name, "special_char")
                 with connection.schema_editor() as editor:
                     operation.database_forwards(
@@ -1700,7 +1700,7 @@ class OperationTests(OperationTestBase):
         self.assertEqual(len(new_state.models[app_label, "pony"].fields), 6)
         field = new_state.models[app_label, "pony"].fields["height"]
         self.assertEqual(field.default, 3)
-        self.assertEqual(field.db_default, Value(4))
+        self.assertEqual(field.db_default, 4)
         pre_pony_pk = (
             project_state.apps.get_model(app_label, "pony").objects.create(weight=4).pk
         )
@@ -2145,7 +2145,7 @@ class OperationTests(OperationTestBase):
         old_weight = project_state.models[app_label, "pony"].fields["weight"]
         self.assertIs(old_weight.db_default, models.NOT_PROVIDED)
         new_weight = new_state.models[app_label, "pony"].fields["weight"]
-        self.assertEqual(new_weight.db_default, Value(4.5))
+        self.assertEqual(new_weight.db_default, 4.5)
         with self.assertRaises(IntegrityError), transaction.atomic():
             project_state.apps.get_model(app_label, "pony").objects.create()
         # Alter field.
@@ -2187,7 +2187,7 @@ class OperationTests(OperationTestBase):
         self.assertIs(old_pink.db_default, models.NOT_PROVIDED)
         new_pink = new_state.models[app_label, "pony"].fields["pink"]
         self.assertIs(new_pink.default, models.NOT_PROVIDED)
-        self.assertEqual(new_pink.db_default, Value(4))
+        self.assertEqual(new_pink.db_default, 4)
         pony = project_state.apps.get_model(app_label, "pony").objects.create(weight=1)
         self.assertEqual(pony.pink, 3)
         # Alter field.
@@ -2217,7 +2217,7 @@ class OperationTests(OperationTestBase):
         old_green = project_state.models[app_label, "pony"].fields["green"]
         self.assertIs(old_green.db_default, models.NOT_PROVIDED)
         new_green = new_state.models[app_label, "pony"].fields["green"]
-        self.assertEqual(new_green.db_default, Value(4))
+        self.assertEqual(new_green.db_default, 4)
         old_pony = project_state.apps.get_model(app_label, "pony").objects.create(
             weight=1
         )
@@ -3614,15 +3614,17 @@ class OperationTests(OperationTestBase):
         operation.state_forwards(app_label, new_state)
         # Rename index.
         expected_queries = 1 if connection.features.can_rename_index else 2
-        with connection.schema_editor() as editor, self.assertNumQueries(
-            expected_queries
+        with (
+            connection.schema_editor() as editor,
+            self.assertNumQueries(expected_queries),
         ):
             operation.database_forwards(app_label, editor, project_state, new_state)
         self.assertIndexNameNotExists(table_name, "pony_pink_idx")
         self.assertIndexNameExists(table_name, "new_pony_test_idx")
         # Reversal.
-        with connection.schema_editor() as editor, self.assertNumQueries(
-            expected_queries
+        with (
+            connection.schema_editor() as editor,
+            self.assertNumQueries(expected_queries),
         ):
             operation.database_backwards(app_label, editor, new_state, project_state)
         self.assertIndexNameExists(table_name, "pony_pink_idx")
@@ -4281,9 +4283,10 @@ class OperationTests(OperationTestBase):
         )
         Pony = new_state.apps.get_model(app_label, "Pony")
         self.assertEqual(len(Pony._meta.constraints), 1)
-        with connection.schema_editor() as editor, CaptureQueriesContext(
-            connection
-        ) as ctx:
+        with (
+            connection.schema_editor() as editor,
+            CaptureQueriesContext(connection) as ctx,
+        ):
             operation.database_forwards(app_label, editor, project_state, new_state)
         Pony.objects.create(pink=1, weight=4.0)
         if connection.features.supports_deferrable_unique_constraints:
@@ -4342,9 +4345,10 @@ class OperationTests(OperationTestBase):
         )
         Pony = new_state.apps.get_model(app_label, "Pony")
         self.assertEqual(len(Pony._meta.constraints), 0)
-        with connection.schema_editor() as editor, CaptureQueriesContext(
-            connection
-        ) as ctx:
+        with (
+            connection.schema_editor() as editor,
+            CaptureQueriesContext(connection) as ctx,
+        ):
             operation.database_forwards(app_label, editor, project_state, new_state)
         # Constraint doesn't work.
         Pony.objects.create(pink=1, weight=4.0)
@@ -4405,9 +4409,10 @@ class OperationTests(OperationTestBase):
         )
         Pony = new_state.apps.get_model(app_label, "Pony")
         self.assertEqual(len(Pony._meta.constraints), 1)
-        with connection.schema_editor() as editor, CaptureQueriesContext(
-            connection
-        ) as ctx:
+        with (
+            connection.schema_editor() as editor,
+            CaptureQueriesContext(connection) as ctx,
+        ):
             operation.database_forwards(app_label, editor, project_state, new_state)
         Pony.objects.create(pink=1, weight=4.0)
         if connection.features.supports_covering_indexes:
@@ -4453,9 +4458,10 @@ class OperationTests(OperationTestBase):
         )
         Pony = new_state.apps.get_model(app_label, "Pony")
         self.assertEqual(len(Pony._meta.constraints), 0)
-        with connection.schema_editor() as editor, CaptureQueriesContext(
-            connection
-        ) as ctx:
+        with (
+            connection.schema_editor() as editor,
+            CaptureQueriesContext(connection) as ctx,
+        ):
             operation.database_forwards(app_label, editor, project_state, new_state)
         # Constraint doesn't work.
         Pony.objects.create(pink=1, weight=4.0)

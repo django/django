@@ -8,6 +8,7 @@ in the ``remote_field`` attribute of the field.
 They also act as reverse fields for the purposes of the Meta API because
 they're the closest concept currently available.
 """
+
 import warnings
 
 from django.core import exceptions

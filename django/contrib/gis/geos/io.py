@@ -3,6 +3,7 @@ Module that holds classes for performing I/O operations on GEOS geometry
 objects.  Specifically, this has Python implementations of WKB/WKT
 reader and writer classes.
 """
+
 from django.contrib.gis.geos.geometry import GEOSGeometry
 from django.contrib.gis.geos.prototypes.io import (
     WKBWriter,

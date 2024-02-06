@@ -404,8 +404,13 @@ class TemplateDetailView(BaseAdminDocsView):
             # Non-trivial TEMPLATES settings aren't supported (#24125).
             pass
         else:
-            # This doesn't account for template loaders (#24128).
-            for index, directory in enumerate(default_engine.dirs):
+            directories = list(default_engine.dirs)
+            for loader in default_engine.template_loaders:
+                if hasattr(loader, "get_dirs"):
+                    for dir_ in loader.get_dirs():
+                        if dir_ not in directories:
+                            directories.append(dir_)
+            for index, directory in enumerate(directories):
                 template_file = Path(safe_join(directory, template))
                 if template_file.exists():
                     template_contents = template_file.read_text()

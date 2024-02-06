@@ -217,9 +217,12 @@ class FormsFormsetTestCase(SimpleTestCase):
             [("Calexico", "100"), ("Any1", "42"), ("Any2", "101")]
         )
 
-        with mock.patch(
-            "django.forms.formsets.ManagementForm.is_valid", mocked_is_valid
-        ), mock.patch("django.forms.forms.BaseForm.full_clean", mocked_full_clean):
+        with (
+            mock.patch(
+                "django.forms.formsets.ManagementForm.is_valid", mocked_is_valid
+            ),
+            mock.patch("django.forms.forms.BaseForm.full_clean", mocked_full_clean),
+        ):
             self.assertTrue(formset.is_valid())
         self.assertEqual(is_valid_counter.call_count, 1)
         self.assertEqual(full_clean_counter.call_count, 4)

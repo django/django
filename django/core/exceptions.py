@@ -1,6 +1,7 @@
 """
 Global Django exception and warning classes.
 """
+
 import operator
 
 from django.utils.hashable import make_hashable

@@ -673,8 +673,8 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
             ("TIN Z", 1016, False),
             ("Triangle Z", 1017, False),
             ("Point M", 2001, True),
-            ("LineString M", 2002, False),
-            ("Polygon M", 2003, False),
+            ("LineString M", 2002, True),
+            ("Polygon M", 2003, True),
             ("MultiPoint M", 2004, False),
             ("MultiLineString M", 2005, False),
             ("MultiPolygon M", 2006, False),
@@ -688,8 +688,8 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
             ("TIN M", 2016, False),
             ("Triangle M", 2017, False),
             ("Point ZM", 3001, True),
-            ("LineString ZM", 3002, False),
-            ("Polygon ZM", 3003, False),
+            ("LineString ZM", 3002, True),
+            ("Polygon ZM", 3003, True),
             ("MultiPoint ZM", 3004, False),
             ("MultiLineString ZM", 3005, False),
             ("MultiPolygon ZM", 3006, False),
@@ -876,6 +876,72 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
         self.assertEqual(geom.geos.wkt, "POINT Z (1 2 3)")
         geom = OGRGeometry("POINT M (1 2 3)")
         self.assertEqual(geom.geos.wkt, "POINT (1 2)")
+
+    def test_centroid(self):
+        point = OGRGeometry("POINT (1 2 3)")
+        self.assertEqual(point.centroid.wkt, "POINT (1 2)")
+        linestring = OGRGeometry("LINESTRING (0 0 0, 1 1 1, 2 2 2)")
+        self.assertEqual(linestring.centroid.wkt, "POINT (1 1)")
+        polygon = OGRGeometry("POLYGON((0 0, 10 0, 10 10, 0 10, 0 0))")
+        self.assertEqual(polygon.centroid.wkt, "POINT (5 5)")
+        multipoint = OGRGeometry("MULTIPOINT (0 0,10 10)")
+        self.assertEqual(multipoint.centroid.wkt, "POINT (5 5)")
+        multilinestring = OGRGeometry(
+            "MULTILINESTRING ((0 0,0 10,0 20),(10 0,10 10,10 20))"
+        )
+        self.assertEqual(multilinestring.centroid.wkt, "POINT (5 10)")
+        multipolygon = OGRGeometry(
+            "MULTIPOLYGON(((0 0, 10 0, 10 10, 0 10, 0 0)),"
+            "((20 20, 20 30, 30 30, 30 20, 20 20)))"
+        )
+        self.assertEqual(multipolygon.centroid.wkt, "POINT (15 15)")
+        geometrycollection = OGRGeometry(
+            "GEOMETRYCOLLECTION (POINT (110 260),LINESTRING (110 0,110 60))"
+        )
+        self.assertEqual(geometrycollection.centroid.wkt, "POINT (110 30)")
+
+    def test_linestring_m_dimension(self):
+        geom = OGRGeometry("LINESTRING(0 1 2 10, 1 2 3 11, 2 3 4 12)")
+        self.assertIs(geom.is_measured, True)
+        self.assertEqual(geom.m, [10.0, 11.0, 12.0])
+        self.assertEqual(geom[0], (0.0, 1.0, 2.0, 10.0))
+
+        geom = OGRGeometry("LINESTRING M (0 1 10, 1 2 11)")
+        self.assertIs(geom.is_measured, True)
+        self.assertEqual(geom.m, [10.0, 11.0])
+        self.assertEqual(geom[0], (0.0, 1.0, 10.0))
+
+        geom.set_measured(False)
+        self.assertIs(geom.is_measured, False)
+        self.assertIs(geom.m, None)
+
+    def test_polygon_m_dimension(self):
+        geom = OGRGeometry("POLYGON Z ((0 0 0, 10 0 0, 10 10 0, 0 10 0, 0 0 0))")
+        self.assertIs(geom.is_measured, False)
+        self.assertEqual(
+            geom.shell.wkt, "LINEARRING (0 0 0,10 0 0,10 10 0,0 10 0,0 0 0)"
+        )
+
+        geom = OGRGeometry("POLYGON M ((0 0 0, 10 0 0, 10 10 0, 0 10 0, 0 0 0))")
+        self.assertIs(geom.is_measured, True)
+        self.assertEqual(
+            geom.shell.wkt, "LINEARRING M (0 0 0,10 0 0,10 10 0,0 10 0,0 0 0)"
+        )
+
+        geom = OGRGeometry(
+            "POLYGON ZM ((0 0 0 1, 10 0 0 1, 10 10 0 1, 0 10 0 1, 0 0 0 1))"
+        )
+        self.assertIs(geom.is_measured, True)
+        self.assertEqual(
+            geom.shell.wkt,
+            "LINEARRING ZM (0 0 0 1,10 0 0 1,10 10 0 1,0 10 0 1,0 0 0 1)",
+        )
+
+        geom.set_measured(False)
+        self.assertEqual(geom.wkt, "POLYGON ((0 0 0,10 0 0,10 10 0,0 10 0,0 0 0))")
+        self.assertEqual(
+            geom.shell.wkt, "LINEARRING (0 0 0,10 0 0,10 10 0,0 10 0,0 0 0)"
+        )
 
 
 class DeprecationTests(SimpleTestCase):

@@ -1,6 +1,7 @@
 """
 XML serializer.
 """
+
 import json
 from xml.dom import pulldom
 from xml.sax import handler

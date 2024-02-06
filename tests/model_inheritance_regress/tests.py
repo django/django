@@ -1,6 +1,7 @@
 """
 Regression tests for Model inheritance behavior.
 """
+
 import datetime
 from operator import attrgetter
 from unittest import expectedFailure

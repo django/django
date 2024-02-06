@@ -111,13 +111,11 @@ For example::
 
 
     @never_cache
-    def my_sync_view(request):
-        ...
+    def my_sync_view(request): ...
 
 
     @never_cache
-    async def my_async_view(request):
-        ...
+    async def my_async_view(request): ...
 
 Queries & the ORM
 -----------------
@@ -294,16 +292,14 @@ as either a direct wrapper or a decorator::
     from asgiref.sync import async_to_sync
 
 
-    async def get_data():
-        ...
+    async def get_data(): ...
 
 
     sync_get_data = async_to_sync(get_data)
 
 
     @async_to_sync
-    async def get_other_data():
-        ...
+    async def get_other_data(): ...
 
 The async function is run in the event loop for the current thread, if one is
 present. If there is no current event loop, a new event loop is spun up
@@ -334,8 +330,7 @@ as either a direct wrapper or a decorator::
 
 
     @sync_to_async
-    def sync_function():
-        ...
+    def sync_function(): ...
 
 Threadlocals and contextvars values are preserved across the boundary in both
 directions.
