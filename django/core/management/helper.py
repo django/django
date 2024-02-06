@@ -1,3 +1,5 @@
+from django import setup
+from django.apps import apps
 from django.utils.module_loading import import_string
 
 DJANGO_DEFAULT_IMPORTS = [
@@ -42,9 +44,6 @@ def get_objects(style):
         print(style.SUCCESS(x))
     return import_objects
 
-
-from django.apps import apps
-from django import setup
 
 if not apps.ready:
     setup()

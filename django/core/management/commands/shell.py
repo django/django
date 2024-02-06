@@ -5,9 +5,9 @@ import traceback
 
 from django.core.management import BaseCommand, CommandError
 from django.core.management.helper import (
-    get_objects,
-    get_apps_and_models,
     get_app_models,
+    get_apps_and_models,
+    get_objects,
 )
 from django.utils.datastructures import OrderedSet
 
