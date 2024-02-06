@@ -36,6 +36,17 @@ Issues under Django's security process
 All security issues have been handled under versions of Django's security
 process. These are listed below.
 
+February 6, 2024 - :cve:`2024-24680`
+------------------------------------
+
+Potential denial-of-service in ``intcomma`` template filter.
+`Full description
+<https://www.djangoproject.com/weblog/2024/feb/06/security-releases/>`__
+
+* Django 5.0 :commit:`(patch) <16a8fe18a3b81250f4fa57e3f93f0599dc4895bc>`
+* Django 4.2 :commit:`(patch) <572ea07e84b38ea8de0551f4b4eda685d91d09d2>`
+* Django 3.2 :commit:`(patch) <c1171ffbd570db90ca206c30f8e2b9f691243820>`
+
 November 1, 2023 - :cve:`2023-46695`
 ------------------------------------
 
