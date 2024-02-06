@@ -14,8 +14,10 @@ from django.db import (
     IntegrityError,
     OperationalError,
     connection,
+    migrations,
 )
 from django.db.backends.utils import truncate_name
+from django.db.migrations.state import ProjectState
 from django.db.models import (
     CASCADE,
     PROTECT,
@@ -5100,6 +5102,41 @@ class SchemaTests(TransactionTestCase):
             self.get_constraints_for_column(Tag, "slug"),
             ["schema_tag_slug_2c418ba3_like", "schema_tag_slug_key"],
         )
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    def test_handle_changing_primary_key(self):
+        # Create a model with two fields
+        operation1 = migrations.CreateModel(
+            "SimpleModel",
+            [
+                ("field1", SlugField(max_length=20, primary_key=True)),
+                ("field2", SlugField(max_length=20)),
+            ],
+        )
+        # Drop field1 primary key constraint - this doesn't fail
+        operation2 = migrations.AlterField(
+            "SimpleModel",
+            "field1",
+            SlugField(max_length=20, primary_key=False),
+        )
+        # Add a primary key constraint to field2 - this fails
+        operation3 = migrations.AlterField(
+            "SimpleModel",
+            "field2",
+            SlugField(max_length=20, primary_key=True),
+        )
+
+        project_state = ProjectState()
+        with connection.schema_editor() as editor:
+            new_state = project_state.clone()
+            operation1.state_forwards("migrtest", new_state)
+            operation1.database_forwards("migrtest", editor, project_state, new_state)
+            project_state, new_state = new_state, new_state.clone()
+            operation2.state_forwards("migrtest", new_state)
+            operation2.database_forwards("migrtest", editor, project_state, new_state)
+            project_state, new_state = new_state, new_state.clone()
+            operation3.state_forwards("migrtest", new_state)
+            operation3.database_forwards("migrtest", editor, project_state, new_state)
 
     def test_alter_field_add_index_to_integerfield(self):
         # Create the table and verify no initial indexes.
