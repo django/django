@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_not_required
 from django.contrib.auth.middleware import (
     AuthenticationMiddleware,
-    LoginRequiredAuthenticationMiddleware,
+    LoginRequiredMiddleware,
 )
 from django.contrib.auth.mixins import LoginNotRequiredMixin
 from django.contrib.auth.models import AnonymousUser, User
@@ -59,7 +59,7 @@ class TestAuthenticationMiddleware(TestCase):
         self.assertIs(auser, auser_second)
 
 
-class TestLoginRequiredAuthenticationMiddleware(TestCase):
+class TestLoginRequiredMiddleware(TestCase):
     class EmptyResponseBaseView(View):
         def get(self, request, *args, **kwargs):
             return HttpResponse()
@@ -81,9 +81,7 @@ class TestLoginRequiredAuthenticationMiddleware(TestCase):
         self.user = User.objects.create_user(
             "test_user", "test@example.com", "test_password"
         )
-        self.middleware = LoginRequiredAuthenticationMiddleware(
-            lambda req: HttpResponse()
-        )
+        self.middleware = LoginRequiredMiddleware(lambda req: HttpResponse())
         self.request = HttpRequest()
 
     def test_anonymous_access(self):

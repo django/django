@@ -769,7 +769,7 @@ The ``login_not_required`` decorator
 .. function:: login_not_required()
 
     The ``login_not_required`` decorator can be used with the
-    ``LoginRequiredAuthenticationMiddleware``::
+    ``LoginRequiredMiddleware``::
 
         from django.contrib.auth.decorators import login_not_required
 

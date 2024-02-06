@@ -38,14 +38,25 @@ class AuthenticationMiddleware(MiddlewareMixin):
         request.auser = partial(auser, request)
 
 
-class LoginRequiredAuthenticationMiddleware(AuthenticationMiddleware):
+class LoginRequiredMiddleware(MiddlewareMixin):
     """
-    Middleware that forces all views to require authentication by default.
+    Middleware that forces all views to require login by default.
 
     Views that have login_not_required decorator or LoginNotRequiredMixin mixin
     will be able to pass through without this validation. Otherwise, it will
     redirect user to login.
     """
+
+    def process_request(self, request):
+        if not hasattr(request, "user"):
+            raise ImproperlyConfigured(
+                "The Django login required middleware requires authentication "
+                "middleware to be installed. Edit your MIDDLEWARE setting to "
+                "insert "
+                "'django.contrib.sessions.middleware.AuthenticationMiddleware' "
+                "before "
+                "'django.contrib.auth.middleware.LoginRequiredMiddleware'."
+            )
 
     def process_view(self, request, view_func, view_args, view_kwargs):
         if request.user.is_authenticated:
