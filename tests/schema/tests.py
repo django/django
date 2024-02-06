@@ -79,6 +79,8 @@ from .models import (
     BookWithO2O,
     BookWithoutAuthor,
     BookWithSlug,
+    CharFieldPK,
+    CharFieldPKUnique,
     IntegerPK,
     Node,
     Note,
@@ -114,6 +116,8 @@ class SchemaTests(TransactionTestCase):
         BookWithLongName,
         BookWithO2O,
         BookWithSlug,
+        CharFieldPK,
+        CharFieldPKUnique,
         IntegerPK,
         Node,
         Note,
@@ -5101,6 +5105,89 @@ class SchemaTests(TransactionTestCase):
         self.assertEqual(
             self.get_constraints_for_column(Tag, "slug"),
             ["schema_tag_slug_2c418ba3_like", "schema_tag_slug_key"],
+        )
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    def test_charfield_primary_key_to_db_index(self):
+        # Create the table and verify initial indexes.
+        with connection.schema_editor() as editor:
+            editor.create_model(CharFieldPK)
+        self.assertEqual(
+            self.get_constraints_for_column(CharFieldPK, "field1"),
+            ["schema_charfieldpk_field1_0eb93b91_like", "schema_charfieldpk_pkey"],
+        )
+        # Alter to remove primary_key and set db_index=True
+        old_field1 = CharFieldPK._meta.get_field("field1")
+        new_field1 = CharField(db_index=True, primary_key=False)
+        new_field1.set_attributes_from_name("field1")
+        with connection.schema_editor() as editor:
+            editor.alter_field(CharFieldPK, old_field1, new_field1, strict=True)
+        self.assertEqual(
+            self.get_constraints_for_column(CharFieldPK, "field1"),
+            ["schema_charfieldpk_field1_0eb93b91", "schema_charfieldpk_field1_0eb93b91_like"],
+        )
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    def test_charfield_primary_key_to_unique(self):
+        # Create the table and verify initial indexes.
+        with connection.schema_editor() as editor:
+            editor.create_model(CharFieldPK)
+        self.assertEqual(
+            self.get_constraints_for_column(CharFieldPK, "field1"),
+            ["schema_charfieldpk_field1_0eb93b91_like", "schema_charfieldpk_pkey"],
+        )
+        # Alter to remove primary_key and set db_index=True
+        old_field1 = CharFieldPK._meta.get_field("field1")
+        new_field1 = CharField(unique=True, primary_key=False)
+        new_field1.set_attributes_from_name("field1")
+        new_field1.model = CharFieldPK
+        with connection.schema_editor() as editor:
+            editor.alter_field(CharFieldPK, old_field1, new_field1, strict=True)
+        self.assertEqual(
+            self.get_constraints_for_column(CharFieldPK, "field1"),
+            ["schema_charfieldpk_field1_0eb93b91_like", "schema_charfieldpk_field1_0eb93b91_uniq"],
+        )
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    def test_charfield_primary_key_to_db_index_and_unique(self):
+        # Create the table and verify initial indexes.
+        with connection.schema_editor() as editor:
+            editor.create_model(CharFieldPK)
+        self.assertEqual(
+            self.get_constraints_for_column(CharFieldPK, "field1"),
+            ["schema_charfieldpk_field1_0eb93b91_like", "schema_charfieldpk_pkey"],
+        )
+        # Alter to remove primary_key and set db_index=True
+        old_field1 = CharFieldPK._meta.get_field("field1")
+        new_field1 = CharField(unique=True, db_index=True, primary_key=False)
+        new_field1.set_attributes_from_name("field1")
+        new_field1.model = CharFieldPK
+        with connection.schema_editor() as editor:
+            editor.alter_field(CharFieldPK, old_field1, new_field1, strict=True)
+        self.assertEqual(
+            self.get_constraints_for_column(CharFieldPK, "field1"),
+            ["schema_charfieldpk_field1_0eb93b91_like", "schema_charfieldpk_field1_0eb93b91_uniq"],
+        )
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    def test_charfield_primary_key_unique_to_just_unique(self):
+        # Create the table and verify initial indexes.
+        with connection.schema_editor() as editor:
+            editor.create_model(CharFieldPKUnique)
+        self.assertEqual(
+            self.get_constraints_for_column(CharFieldPKUnique, "field1"),
+            ["schema_charfieldpkunique_field1_ffc9a22c_like", "schema_charfieldpkunique_pkey"],
+        )
+        # Alter to remove primary_key (but still unique)
+        old_field1 = CharFieldPKUnique._meta.get_field("field1")
+        new_field1 = CharField(unique=True, primary_key=False)
+        new_field1.set_attributes_from_name("field1")
+        new_field1.model = CharFieldPKUnique
+        with connection.schema_editor() as editor:
+            editor.alter_field(CharFieldPKUnique, old_field1, new_field1, strict=True)
+        self.assertEqual(
+            self.get_constraints_for_column(CharFieldPKUnique, "field1"),
+            ["schema_charfieldpkunique_field1_ffc9a22c_like", "schema_charfieldpkunique_field1_ffc9a22c_uniq"],
         )
 
     @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
