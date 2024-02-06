@@ -190,7 +190,7 @@ class ASGIHandler(base.BaseHandler):
             return
 
         async def process_request(request, send):
-            response = await self.run_get_response(request)
+            response = await self.run_get_response(request, scope)
             try:
                 await self.send_response(response, send)
             except asyncio.CancelledError:
@@ -206,7 +206,7 @@ class ASGIHandler(base.BaseHandler):
             # because it should not raise unexpected errors that would prevent
             # us from cancelling process_request().
             asyncio.create_task(self.listen_for_disconnect(receive)),
-            asyncio.create_task(process_request(request, send, scope)),
+            asyncio.create_task(process_request(request, send)),
         ]
         await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
         # Now wait on both tasks (they may have both finished by now).
