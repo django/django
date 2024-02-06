@@ -5205,6 +5205,24 @@ class SchemaTests(TransactionTestCase):
             ],
         )
 
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    def test_charfield_change_max_length_no_index_created(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        self.assertEqual(
+            self.get_constraints_for_column(Author, "name"),
+            [],
+        )
+        old_name = Author._meta.get_field("name")
+        new_name = CharField(max_length=20)
+        new_name.set_attributes_from_name("name")
+        with connection.schema_editor() as editor:
+            editor.alter_field(Author, old_name, new_name, strict=True)
+        self.assertEqual(
+            self.get_constraints_for_column(Author, "name"),
+            [],
+        )
+
     @isolate_apps("schema")
     @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
     def test_slugfields_change_primary_key(self):
