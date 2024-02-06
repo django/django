@@ -89,7 +89,7 @@ class TestUtilsText(SimpleTestCase):
 
         # Make a best effort to shorten to the desired length, but requesting
         # a length shorter than the ellipsis shouldn't break
-        self.assertEqual("…", text.Truncator("asdf").chars(0))
+        self.assertEqual("...", text.Truncator("asdf").chars(1, truncate="..."))
         # lazy strings are handled correctly
         self.assertEqual(
             text.Truncator(lazystr("The quick brown fox")).chars(10), "The quick…"
@@ -123,6 +123,8 @@ class TestUtilsText(SimpleTestCase):
             "…",
             truncator.chars(1, html=True),
         )
+        self.assertEqual("", truncator.chars(0, html=True))
+        self.assertEqual("", truncator.chars(-1, html=True))
         self.assertEqual(
             '<p id="par"><strong><em>The qu....</em></strong></p>',
             truncator.chars(10, "....", html=True),
@@ -206,6 +208,8 @@ class TestUtilsText(SimpleTestCase):
             lazystr("The quick brown fox jumped over the lazy dog.")
         )
         self.assertEqual("The quick brown fox…", truncator.words(4))
+        self.assertEqual("", truncator.words(0))
+        self.assertEqual("", truncator.words(-1))
 
     def test_truncate_html_words(self):
         truncator = text.Truncator(

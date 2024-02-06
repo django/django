@@ -104,6 +104,8 @@ class Truncator(SimpleLazyObject):
         """
         self._setup()
         length = int(num)
+        if length <= 0:
+            return ""
         text = unicodedata.normalize("NFC", self._wrapped)
 
         # Calculate the length to truncate to (max length - end_text length)
@@ -144,6 +146,8 @@ class Truncator(SimpleLazyObject):
         """
         self._setup()
         length = int(num)
+        if length <= 0:
+            return ""
         if html:
             return self._truncate_html(length, truncate, self._wrapped, length, True)
         return self._text_words(length, truncate)
