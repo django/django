@@ -5205,8 +5205,49 @@ class SchemaTests(TransactionTestCase):
             ],
         )
 
+    @isolate_apps("schema")
     @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
-    def test_handle_changing_primary_key(self):
+    def test_slugfields_change_primary_key(self):
+        class SimpleModel(Model):
+            field1 = SlugField(max_length=20, primary_key=True)
+            field2 = SlugField(max_length=20)
+
+            class Meta:
+                app_label = "schema"
+
+        with connection.schema_editor() as editor:
+            editor.create_model(SimpleModel)
+        self.assertEqual(
+            self.get_constraints_for_column(SimpleModel, "field1"),
+            [
+                "schema_simplemodel_field1_f07a3d6a_like",
+                "schema_simplemodel_pkey",
+            ],
+        )
+        # remove primary_key from field1
+        old_field1 = SimpleModel._meta.get_field("field1")
+        new_field1 = CharField(max_length=20, primary_key=False)
+        new_field1.set_attributes_from_name("field1")
+        with connection.schema_editor() as editor:
+            editor.alter_field(SimpleModel, old_field1, new_field1, strict=True)
+        self.assertEqual(self.get_constraints_for_column(SimpleModel, "field1"), [])
+        # add primary_key to field2
+        old_field2 = SimpleModel._meta.get_field("field2")
+        new_field2 = CharField(max_length=20, primary_key=True)
+        new_field2.set_attributes_from_name("field2")
+        new_field2.model = SimpleModel
+        with connection.schema_editor() as editor:
+            editor.alter_field(SimpleModel, old_field2, new_field2, strict=True)
+        self.assertEqual(
+            self.get_constraints_for_column(SimpleModel, "field2"),
+            [
+                "schema_simplemodel_field2_08772539_like",
+                "schema_simplemodel_field2_08772539_pk",
+            ],
+        )
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    def test_slugfields_change_primary_key_operations(self):
         # Create a model with two fields
         operation1 = migrations.CreateModel(
             "SimpleModel",
