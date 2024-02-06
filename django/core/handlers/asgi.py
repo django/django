@@ -206,7 +206,7 @@ class ASGIHandler(base.BaseHandler):
             # because it should not raise unexpected errors that would prevent
             # us from cancelling process_request().
             asyncio.create_task(self.listen_for_disconnect(receive)),
-            asyncio.create_task(process_request(request, send)),
+            asyncio.create_task(process_request(request, send, scope)),
         ]
         await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
         # Now wait on both tasks (they may have both finished by now).
@@ -246,9 +246,10 @@ class ASGIHandler(base.BaseHandler):
         # This should never happen.
         assert False, "Invalid ASGI message after request body: %s" % message["type"]
 
-    async def run_get_response(self, request):
+    async def run_get_response(self, request, scope):
         """Get async response."""
         # Use the async mode of BaseHandler.
+        set_script_prefix(get_script_prefix(scope))
         response = await self.get_response_async(request)
         response._handler_class = self.__class__
         # Increase chunk size on file responses (ASGI servers handles low-level
