@@ -2123,7 +2123,6 @@ class SeleniumTests(AdminSeleniumTestCase):
         ]
         for css_selector, ordering in cases:
             with self.subTest(ordering=ordering):
-                # self.selenium.get(self.live_server_url + changelist_url)
                 self.selenium.find_element(By.CSS_SELECTOR, css_selector).click()
                 expected = expected_from_queryset(
                     GrandChild.objects.all().order_by(*ordering)
