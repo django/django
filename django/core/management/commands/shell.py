@@ -4,6 +4,7 @@ import sys
 import traceback
 
 from django.core.management import BaseCommand, CommandError
+from django.core.management.helper import get_objects,get_apps_and_models,get_app_models
 from django.utils.datastructures import OrderedSet
 
 
@@ -56,9 +57,14 @@ class Command(BaseCommand):
 
     def python(self, options):
         import code
-
-        # Set up a dictionary to serve as the environment for the shell.
-        imported_objects = {}
+        my_models = {}
+        imported_objects = get_objects(self.style)
+        for app_mod, app_models in get_apps_and_models():
+            for mod in app_models:
+                if mod.__module__:
+                    my_models.setdefault(mod.__module__, [])
+                    my_models[mod.__module__].append(mod.__name__)
+        imported_objects.update(get_app_models(my_models,self.style))
 
         # We want to honor both $PYTHONSTARTUP and .pythonrc.py, so follow system
         # conventions and get $PYTHONSTARTUP first then .pythonrc.py.
