@@ -7,7 +7,7 @@ DJANGO_DEFAULT_IMPORTS = [
     "from django.conf import settings",
     "from django.contrib.auth import get_user_model",
     "from django.db import transaction",
-    "from django.db.modelfrom django.utils.module_loading import import_strings import Avg, Case, Count, F, Max, Min, Prefetch, Q, Sum, When",
+    "from django.db.models import Avg, Case, Count, F, Max, Min, Prefetch, Q, Sum, When",
     "from django.utils import timezone",
     "from django.urls import reverse",
     "from django.db.models import Exists, OuterRef, Subquery",
