@@ -177,7 +177,7 @@ class Command(BaseCommand):
                 module_names += str(key) + " "
         print(
             style.SUCCESS(
-                f"imported {default_modules_counter} default modules ({module_names})"
+                f"imported {default_modules_counter} default modules ({module_names[:-1]})"
             )
         )
         return import_objects
@@ -197,5 +197,7 @@ class Command(BaseCommand):
                     import_objects[x] = import_string(str(key) + "." + str(x))
                     model_counter += 1
                     model_names += str(x) + " "
-        print(style.SUCCESS(f"imported {model_counter} app models ({model_names})"))
+        print(
+            style.SUCCESS(f"imported {model_counter} app models ({model_names[:-1]})")
+        )
         return import_objects
