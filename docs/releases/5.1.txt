@@ -145,6 +145,12 @@ CSRF
 
 * ...
 
+oracle backends
+~~~~~~~~~~~~~~~
+
+* The new ``"pool"`` option is now supported in :setting:`OPTIONS` on
+  oracle to allow using connection pool.
+
 Decorators
 ~~~~~~~~~~
 

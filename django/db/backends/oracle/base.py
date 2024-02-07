@@ -14,6 +14,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db import IntegrityError
 from django.db.backends.base.base import BaseDatabaseWrapper
+from django.db.backends.oracle.oracledb_any import is_oracledb
 from django.db.backends.oracle.oracledb_any import oracledb as Database
 from django.db.backends.utils import debug_transaction
 from django.utils.asyncio import async_unsafe
@@ -230,6 +231,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     introspection_class = DatabaseIntrospection
     ops_class = DatabaseOperations
     validation_class = DatabaseValidation
+    _connection_pools = {}
+    is_pool = False
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -237,6 +240,35 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             "use_returning_into", True
         )
         self.features.can_return_columns_from_insert = use_returning_into
+
+    @property
+    def pool(self):
+        if not self.settings_dict["OPTIONS"].get("pool"):
+            return None
+
+        # Verify that we are not running with persistent connections
+        if self.settings_dict.get("CONN_MAX_AGE", 0) != 0:
+            raise ImproperlyConfigured(
+                """Pooling doesn't support persistent connections, unset
+                   conn_max_age"""
+            )
+        # Pooling feature is only supported for oracledb
+        if not is_oracledb:
+            raise ImproperlyConfigured("Not supported by cx_Oracle install oracledb")
+
+        if self.alias not in self._connection_pools:
+            connect_kwargs = self.get_connection_params()
+            del connect_kwargs["pool"]
+            self.is_pool = True
+            pool = Database.create_pool(
+                user=self.settings_dict["USER"],
+                password=self.settings_dict["PASSWORD"],
+                dsn=dsn(self.settings_dict),
+                **connect_kwargs,
+            )
+            self._connection_pools.setdefault(self.alias, pool)
+
+        return self._connection_pools[self.alias]
 
     def get_database_version(self):
         return self.oracle_version
@@ -249,6 +281,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     @async_unsafe
     def get_new_connection(self, conn_params):
+        if self.pool:
+            return self.pool.acquire()
         return Database.connect(
             user=self.settings_dict["USER"],
             password=self.settings_dict["PASSWORD"],
@@ -302,6 +336,16 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     @async_unsafe
     def create_cursor(self, name=None):
         return FormatStylePlaceholderCursor(self.connection, self)
+
+    def _close(self):
+        if self.connection is not None:
+            with self.wrap_database_errors:
+                if self.pool:
+                    # Return connection back to the pool for further use.
+                    self._connection_pools[self.alias].release(self.connection)
+                    self.connection = None
+                else:
+                    return self.connection.close()
 
     def _commit(self):
         if self.connection is not None:

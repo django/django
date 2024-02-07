@@ -69,6 +69,11 @@ class Tests(TestCase):
             connection.check_database_version_supported()
         self.assertTrue(mocked_get_database_version.called)
 
+    @unittest.skipUnless(connection.is_pool, "Pool specific tests")
+    def test_connect_pool_set_to_true(self):
+        test_pool = connection.settings_dict["OPTIONS"]["pool"]
+        self.assertTrue(test_pool)
+
 
 @unittest.skipUnless(connection.vendor == "oracle", "Oracle tests")
 class TransactionalTests(TransactionTestCase):
