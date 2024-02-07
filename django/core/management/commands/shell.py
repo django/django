@@ -177,7 +177,7 @@ class Command(BaseCommand):
                 module_names += str(key) + " "
         print(
             style.SUCCESS(
-                f"imported {default_modules_counter} default modules ({module_names[:-1]})"
+                f"imported {default_modules_counter} default objects ({module_names[:-1]})"
             )
         )
         return import_objects
