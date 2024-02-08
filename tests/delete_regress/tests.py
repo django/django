@@ -30,8 +30,6 @@ from .models import (
     Login,
     OrderedPerson,
     OrgUnit,
-    Owner,
-    Owner2,
     Person,
     Photo,
     PlayedWith,
@@ -417,14 +415,10 @@ class SetQueryCountTests(TestCase):
             location.delete()
 
 
-# Issue #35073
-class SetCallableTests(TestCase):
+class SetCallableCollectorDefaultTests(TestCase):
     def test_set(self):
-        Owner.objects.create(name="a")
-        Owner.objects.all().delete()
-        self.assertEqual(list(Owner.objects.all()), [])
-
-    def test_set_default(self):
-        Owner2.objects.create(name="a")
-        Owner2.objects.all().delete()
-        self.assertEqual(list(Owner2.objects.all()), [])
+        # Collector doesn't call callables used by models.SET and
+        # models.SET_DEFAULT if not necessary.
+        Toy.objects.create(name="test")
+        Toy.objects.all().delete()
+        self.assertSequenceEqual(Toy.objects.all(), [])

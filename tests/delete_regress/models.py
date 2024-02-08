@@ -150,36 +150,20 @@ class OrderedPerson(models.Model):
         ordering = ["name"]
 
 
-# Models for #35073
+def get_best_toy():
+    toy, _ = Toy.objects.get_or_create(name="best")
+    return toy
 
 
-class Owner(models.Model):
-    name = models.CharField(max_length=32)
-
-    def __str__(self):
-        return self.name
+def get_worst_toy():
+    toy, _ = Toy.objects.get_or_create(name="worst")
+    return toy
 
 
-def get_default_owner():
-    return Owner.objects.get_or_create(name="default")[0]
-
-
-class Pet(models.Model):
-    owner = models.ForeignKey(Owner, models.SET(get_default_owner))
-
-
-class Owner2(models.Model):
-    name = models.CharField(max_length=32)
-
-    def __str__(self):
-        return self.name
-
-
-def get_default_owner2():
-    return Owner2.objects.get_or_create(name="default2")[0]
-
-
-class Pet2(models.Model):
-    owner = models.ForeignKey(
-        Owner2, default=get_default_owner2, on_delete=models.SET_DEFAULT
+class Collector(models.Model):
+    best_toy = models.ForeignKey(
+        Toy, default=get_best_toy, on_delete=models.SET_DEFAULT, related_name="toys"
+    )
+    worst_toy = models.ForeignKey(
+        Toy, models.SET(get_worst_toy), related_name="bad_toys"
     )
