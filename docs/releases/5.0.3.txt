@@ -11,3 +11,7 @@ Bugfixes
 
 * Fixed a regression in Django 5.0.2 where ``intcomma`` template filter could
   return a leading comma for string representation of floats (:ticket:`35172`).
+
+* Fixed a bug in Django 5.0 that caused a crash of ``Signal.asend()`` and
+  ``asend_robust()`` when all receivers were asynchronous functions
+  (:ticket:`35174`).
