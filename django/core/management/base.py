@@ -271,6 +271,7 @@ class BaseCommand:
     def __init__(self, stdout=None, stderr=None, no_color=False, force_color=False):
         self.stdout = OutputWrapper(stdout or sys.stdout)
         self.stderr = OutputWrapper(stderr or sys.stderr)
+        self.no_color = no_color
         if no_color and force_color:
             raise CommandError("'no_color' and 'force_color' can't be used together.")
         if no_color:
@@ -442,6 +443,7 @@ class BaseCommand:
         if options["force_color"]:
             self.style = color_style(force_color=True)
         elif options["no_color"]:
+            self.no_color = options["no_color"]
             self.style = no_style()
             self.stderr.style_func = None
         if options.get("stdout"):
