@@ -9,4 +9,5 @@ Django 5.0.3 fixes several bugs in 5.0.2.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression in Django 5.0.2 where ``intcomma`` template filter could
+  return a leading comma for string representation of floats (:ticket:`35172`).
