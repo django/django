@@ -28,6 +28,7 @@ from django.core.management import (
 from django.core.management.commands.loaddata import Command as LoaddataCommand
 from django.core.management.commands.runserver import Command as RunserverCommand
 from django.core.management.commands.testserver import Command as TestserverCommand
+from django.core.management.utils import ELBOW_PREFIX
 from django.db import ConnectionHandler, connection
 from django.db.migrations.recorder import MigrationRecorder
 from django.test import LiveServerTestCase, SimpleTestCase, TestCase, override_settings
@@ -2398,6 +2399,25 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         self.assertOutput(err, "usage:")
         self.assertOutput(err, "You must provide a project name.")
 
+    def test_output_directory_structure(self):
+
+        dirs = {
+            "testproject": self.test_dir,
+            "testproject1": os.path.join(self.test_dir, "otherdirectory"),
+        }
+        for name_project, dir in dirs.items():
+            with self.subTest(name_project=name_project, dir=dir):
+                args = ["startproject", name_project]
+                if not os.path.exists(dir):
+                    os.mkdir(dir)
+                    args.append(dir)
+                out, err = self.run_django_admin(args)
+
+                # We only check for a subset of the directory structure
+                self.assertOutput(out, name_project)
+                self.assertIn(f"{ELBOW_PREFIX}manage.py", out)
+                self.assertNoOutput(err)
+
     def test_simple_project(self):
         "Make sure the startproject management command creates a project"
         args = ["startproject", "testproject"]
@@ -2871,6 +2891,21 @@ class StartApp(AdminScriptTestCase):
                     "sure the name is a valid identifier.".format(bad_name),
                 )
                 self.assertFalse(os.path.exists(testproject_dir))
+
+    def test_output_directory_structure(self):
+        dirs = {
+            "foo": self.test_dir,
+            "bar": os.path.join(self.test_dir, "otherdir"),
+        }
+        for name_app, dir in dirs.items():
+            with self.subTest(name_project=name_app, dir=dir):
+                args = ["startapp", name_app]
+                out, err = self.run_django_admin(args)
+
+                # We only check for a subset of the directory structure
+                self.assertOutput(out, name_app)
+                self.assertIn(f"{ELBOW_PREFIX}apps.py", out)
+                self.assertNoOutput(err)
 
     def test_importable_name(self):
         """
