@@ -69,7 +69,19 @@ class Command(BaseCommand):
     def ipython(self, options):
         from IPython import start_ipython
 
-        start_ipython(argv=[])
+        def run_ipython():
+            my_models = {}
+            imported_objects = self.get_objects(self.style)
+            for app_mod, app_models in self.get_apps_and_models():
+                for mod in app_models:
+                    if mod.__module__:
+                        my_models.setdefault(mod.__module__, [])
+                        my_models[mod.__module__].append(mod.__name__)
+            imported_objects.update(self.get_app_models(my_models, self.style))
+            start_ipython(argv=[], user_ns=imported_objects)
+            # Should we consider implementing this feature for the IPython Shell? If it's deemed necessary, I'll make an effort to begin working on it.
+
+        return run_ipython()
 
     def bpython(self, options):
         import bpython
