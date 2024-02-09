@@ -29,6 +29,18 @@ __all__ = [
     "make_naive",
 ]
 
+def now():
+    """
+    Return the current date in "YYYY-MM-DD" format.
+    """
+    # Get the current UTC time
+    current_time = datetime.utcnow()
+
+    # Format the date in "YYYY-MM-DD" format
+    formatted_date = current_time.strftime("%Y-%m-%d")
+
+    return formatted_date
+
 
 def get_fixed_timezone(offset):
     """Return a tzinfo instance with a fixed offset from UTC."""
