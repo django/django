@@ -740,12 +740,16 @@ class Model(AltersData, metaclass=ModelBase):
 
         # Clear cached relations.
         for field in self._meta.related_objects:
-            if field.is_cached(self):
+            if (fields is None or field.name in fields) and field.is_cached(self):
                 field.delete_cached_value(self)
 
         # Clear cached private relations.
         for field in self._meta.private_fields:
-            if field.is_relation and field.is_cached(self):
+            if (
+                (fields is None or field.name in fields)
+                and field.is_relation
+                and field.is_cached(self)
+            ):
                 field.delete_cached_value(self)
 
         self._state.db = db_instance._state.db
