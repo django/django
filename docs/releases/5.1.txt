@@ -32,7 +32,8 @@ Minor features
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :attr:`.ModelAdmin.list_display` now supports using ``__`` lookups to list
+  fields from related models.
 
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -78,10 +79,15 @@ Minor features
 * The new :meth:`.OGRGeometry.set_3d` method allows addition and removal of the
   ``Z`` coordinate dimension.
 
-* :class:`~django.contrib.gis.gdal.OGRGeometry` and
-  :class:`~django.contrib.gis.gdal.Point` now support measured geometries
-  via the new :attr:`.OGRGeometry.is_measured` and :attr:`.Point.m` properties,
-  and the :meth:`.OGRGeometry.set_measured` method.
+* :class:`~django.contrib.gis.gdal.OGRGeometry`,
+  :class:`~django.contrib.gis.gdal.Point`,
+  :class:`~django.contrib.gis.gdal.LineString`, and
+  :class:`~django.contrib.gis.gdal.Polygon` now support measured geometries
+  via the new :attr:`.OGRGeometry.is_measured` and ``m`` properties, and the
+  :meth:`.OGRGeometry.set_measured` method.
+
+* :attr:`.OGRGeometry.centroid` is now available on all supported geometry
+  types.
 
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -152,7 +158,8 @@ Email
 Error Reporting
 ~~~~~~~~~~~~~~~
 
-* ...
+* In order to improve accessibility, the technical 404 and 500 error pages now
+  use HTML landmark elements for the header, footer, and main content areas.
 
 File Storage
 ~~~~~~~~~~~~
@@ -231,6 +238,9 @@ Models
   reload a model's value. This can be used to lock the row before reloading or
   to select related objects.
 
+* The new ``"transaction_mode"`` option is now supported in :setting:`OPTIONS`
+  on SQLite to allow specifying the :ref:`sqlite-transaction-behavior`.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -270,9 +280,6 @@ Tests
   :meth:`~django.test.SimpleTestCase.assertNotContains`, and
   :meth:`~django.test.SimpleTestCase.assertInHTML` assertions now add haystacks
   to assertion error messages.
-
-* The Django test runner now supports a ``--screenshots`` option to save
-  screenshots for Selenium tests.
 
 * The :class:`~django.test.RequestFactory`,
   :class:`~django.test.AsyncRequestFactory`, :class:`~django.test.Client`, and
@@ -360,6 +367,11 @@ Miscellaneous
 * :meth:`.SimpleTestCase.assertURLEqual` and
   :meth:`~django.test.SimpleTestCase.assertInHTML` now add ``": "`` to the
   ``msg_prefix``. This is consistent with the behavior of other assertions.
+
+* ``django.utils.text.Truncator`` used by :tfilter:`truncatechars_html` and
+  :tfilter:`truncatewords_html` template filters now uses
+  :py:class:`html.parser.HTMLParser` subclasses. This results in a more robust
+  and faster operation, but there may be small differences in the output.
 
 .. _deprecated-features-5.1:
 

@@ -1,0 +1,13 @@
+===========================
+Django 4.2.11 release notes
+===========================
+
+*Expected March 4, 2024*
+
+Django 4.2.11 fixes a regression in 4.2.10.
+
+Bugfixes
+========
+
+* Fixed a regression in Django 4.2.10 where ``intcomma`` template filter could
+  return a leading comma for string representation of floats (:ticket:`35172`).

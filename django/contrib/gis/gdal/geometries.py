@@ -565,6 +565,14 @@ class OGRGeometry(GDALBase):
         """
         return self._geomgen(capi.geom_union, other)
 
+    @property
+    def centroid(self):
+        """Return the centroid (a Point) of this Polygon."""
+        # The centroid is a Point, create a geometry for this.
+        p = OGRGeometry(OGRGeomType("Point"))
+        capi.get_centroid(self.ptr, p.ptr)
+        return p
+
 
 # The subclasses for OGR Geometry.
 class Point(OGRGeometry):
@@ -617,10 +625,14 @@ class LineString(OGRGeometry):
     def __getitem__(self, index):
         "Return the Point at the given index."
         if 0 <= index < self.point_count:
-            x, y, z = c_double(), c_double(), c_double()
-            capi.get_point(self.ptr, index, byref(x), byref(y), byref(z))
+            x, y, z, m = c_double(), c_double(), c_double(), c_double()
+            capi.get_point(self.ptr, index, byref(x), byref(y), byref(z), byref(m))
+            if self.is_3d and self.is_measured:
+                return x.value, y.value, z.value, m.value
             if self.is_3d:
                 return x.value, y.value, z.value
+            if self.is_measured:
+                return x.value, y.value, m.value
             dim = self.coord_dim
             if dim == 1:
                 return (x.value,)
@@ -665,6 +677,12 @@ class LineString(OGRGeometry):
         if self.is_3d:
             return self._listarr(capi.getz)
 
+    @property
+    def m(self):
+        """Return the M coordinates in a list."""
+        if self.is_measured:
+            return self._listarr(capi.getm)
+
 
 # LinearRings are used in Polygons.
 class LinearRing(LineString):
@@ -707,14 +725,6 @@ class Polygon(OGRGeometry):
         "Return the number of Points in this Polygon."
         # Summing up the number of points in each ring of the Polygon.
         return sum(self[i].point_count for i in range(self.geom_count))
-
-    @property
-    def centroid(self):
-        "Return the centroid (a Point) of this Polygon."
-        # The centroid is a Point, create a geometry for this.
-        p = OGRGeometry(OGRGeomType("Point"))
-        capi.get_centroid(self.ptr, p.ptr)
-        return p
 
 
 # Geometry Collection base class.
@@ -789,10 +799,14 @@ GEO_CLASSES = {
     7: GeometryCollection,
     101: LinearRing,
     2001: Point,  # POINT M
+    2002: LineString,  # LINESTRING M
+    2003: Polygon,  # POLYGON M
     3001: Point,  # POINT ZM
+    3002: LineString,  # LINESTRING ZM
+    3003: Polygon,  # POLYGON ZM
     1 + OGRGeomType.wkb25bit: Point,  # POINT Z
-    2 + OGRGeomType.wkb25bit: LineString,
-    3 + OGRGeomType.wkb25bit: Polygon,
+    2 + OGRGeomType.wkb25bit: LineString,  # LINESTRING Z
+    3 + OGRGeomType.wkb25bit: Polygon,  # POLYGON Z
     4 + OGRGeomType.wkb25bit: MultiPoint,
     5 + OGRGeomType.wkb25bit: MultiLineString,
     6 + OGRGeomType.wkb25bit: MultiPolygon,

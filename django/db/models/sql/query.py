@@ -91,6 +91,8 @@ def get_children_from_q(q):
 
 
 def get_child_with_renamed_prefix(prefix, replacement, child):
+    from django.db.models.query import QuerySet
+
     if isinstance(child, Node):
         return rename_prefix_from_q(prefix, replacement, child)
     if isinstance(child, tuple):
@@ -105,6 +107,14 @@ def get_child_with_renamed_prefix(prefix, replacement, child):
         child = child.copy()
         if child.name.startswith(prefix + LOOKUP_SEP):
             child.name = child.name.replace(prefix, replacement, 1)
+    elif isinstance(child, QuerySet):
+        # QuerySet may contain OuterRef() references which cannot work properly
+        # without repointing to the filtered annotation and will spawn a
+        # different JOIN. Always raise ValueError instead of providing partial
+        # support in other cases.
+        raise ValueError(
+            "Passing a QuerySet within a FilteredRelation is not supported."
+        )
     elif hasattr(child, "resolve_expression"):
         child = child.copy()
         child.set_source_expressions(
@@ -686,6 +696,7 @@ class Query(BaseExpression):
         # except if the alias is the base table since it must be present in the
         # query on both sides.
         initial_alias = self.get_initial_alias()
+        rhs = rhs.clone()
         rhs.bump_prefix(self, exclude={initial_alias})
 
         # Work out how to relabel the rhs aliases, if necessary.

@@ -380,8 +380,8 @@ this base class::
         class Meta:
             abstract = True
 
-If you use this directly in a subclass, ``objects`` will be the default
-manager if you declare no managers in the base class::
+If you use this directly in a child class, ``objects`` will be the default
+manager if you declare no managers in the child class::
 
     class ChildA(AbstractBase):
         # ...

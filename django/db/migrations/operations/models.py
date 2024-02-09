@@ -342,6 +342,40 @@ class CreateModel(ModelOperation):
                         managers=self.managers,
                     ),
                 ]
+            elif isinstance(operation, AddConstraint):
+                return [
+                    CreateModel(
+                        self.name,
+                        fields=self.fields,
+                        options={
+                            **self.options,
+                            "constraints": [
+                                *self.options.get("constraints", []),
+                                operation.constraint,
+                            ],
+                        },
+                        bases=self.bases,
+                        managers=self.managers,
+                    ),
+                ]
+            elif isinstance(operation, RemoveConstraint):
+                options_constraints = [
+                    constraint
+                    for constraint in self.options.get("constraints", [])
+                    if constraint.name != operation.name
+                ]
+                return [
+                    CreateModel(
+                        self.name,
+                        fields=self.fields,
+                        options={
+                            **self.options,
+                            "constraints": options_constraints,
+                        },
+                        bases=self.bases,
+                        managers=self.managers,
+                    ),
+                ]
         return super().reduce(operation, app_label)
 
 

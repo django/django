@@ -93,9 +93,6 @@ class Item(models.Model):
     location_value = models.ForeignKey(
         Location, models.SET(42), default=1, db_constraint=False, related_name="+"
     )
-    location_default = models.ForeignKey(
-        Location, models.SET_DEFAULT, default=1, db_constraint=False, related_name="+"
-    )
 
 
 # Models for #16128
@@ -151,3 +148,22 @@ class OrderedPerson(models.Model):
 
     class Meta:
         ordering = ["name"]
+
+
+def get_best_toy():
+    toy, _ = Toy.objects.get_or_create(name="best")
+    return toy
+
+
+def get_worst_toy():
+    toy, _ = Toy.objects.get_or_create(name="worst")
+    return toy
+
+
+class Collector(models.Model):
+    best_toy = models.ForeignKey(
+        Toy, default=get_best_toy, on_delete=models.SET_DEFAULT, related_name="toys"
+    )
+    worst_toy = models.ForeignKey(
+        Toy, models.SET(get_worst_toy), related_name="bad_toys"
+    )

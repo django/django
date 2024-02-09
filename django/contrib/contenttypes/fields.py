@@ -280,7 +280,9 @@ class GenericForeignKey(FieldCacheMixin):
         if ct_id is not None:
             ct = self.get_content_type(id=ct_id, using=instance._state.db)
             try:
-                rel_obj = ct.get_object_for_this_type(pk=pk_val)
+                rel_obj = ct.get_object_for_this_type(
+                    using=instance._state.db, pk=pk_val
+                )
             except ObjectDoesNotExist:
                 pass
         self.set_cached_value(instance, rel_obj)

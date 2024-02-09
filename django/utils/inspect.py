@@ -16,13 +16,18 @@ def _get_callable_parameters(meth_or_func):
     return _get_func_parameters(func, remove_first=is_method)
 
 
+ARG_KINDS = frozenset(
+    {
+        inspect.Parameter.POSITIONAL_ONLY,
+        inspect.Parameter.KEYWORD_ONLY,
+        inspect.Parameter.POSITIONAL_OR_KEYWORD,
+    }
+)
+
+
 def get_func_args(func):
     params = _get_callable_parameters(func)
-    return [
-        param.name
-        for param in params
-        if param.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
-    ]
+    return [param.name for param in params if param.kind in ARG_KINDS]
 
 
 def get_func_full_args(func):

@@ -412,10 +412,13 @@ class BaseDatabaseSchemaEditor:
         """Return the sql and params for the field's database default."""
         from django.db.models.expressions import Value
 
-        sql = "%s" if isinstance(field.db_default, Value) else "(%s)"
+        db_default = field._db_default_expression
+        sql = (
+            self._column_default_sql(field) if isinstance(db_default, Value) else "(%s)"
+        )
         query = Query(model=field.model)
         compiler = query.get_compiler(connection=self.connection)
-        default_sql, params = compiler.compile(field.db_default)
+        default_sql, params = compiler.compile(db_default)
         if self.connection.features.requires_literal_defaults:
             # Some databases doesn't support parameterized defaults (Oracle,
             # SQLite). If this is the case, the individual schema backend
@@ -1636,6 +1639,14 @@ class BaseDatabaseSchemaEditor:
         ):
             old_kwargs.pop("to", None)
             new_kwargs.pop("to", None)
+        # db_default can take many form but result in the same SQL.
+        if (
+            old_kwargs.get("db_default")
+            and new_kwargs.get("db_default")
+            and self.db_default_sql(old_field) == self.db_default_sql(new_field)
+        ):
+            old_kwargs.pop("db_default")
+            new_kwargs.pop("db_default")
         return self.quote_name(old_field.column) != self.quote_name(
             new_field.column
         ) or (old_path, old_args, old_kwargs) != (new_path, new_args, new_kwargs)

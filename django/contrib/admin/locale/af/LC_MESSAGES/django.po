@@ -416,7 +416,7 @@ msgid "Show counts"
 msgstr "Wys tellings"
 
 msgid "Clear all filters"
-msgstr "Verwyder filters"
+msgstr "Verwyder alle filters"
 
 msgid "Remove from sorting"
 msgstr "Verwyder uit sortering"
@@ -642,6 +642,7 @@ msgstr "Wys gekose %(model)s"
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr ""
+"Dankie vir die kwaliteittyd wat u met die webwerf deurgebring het vandag."
 
 msgid "Log in again"
 msgstr "Meld weer aan"
