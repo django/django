@@ -2899,7 +2899,11 @@ class StartApp(AdminScriptTestCase):
         dirs = {
             "foo": self.test_dir,
             # Use a subdirectory so it is outside the PYTHONPATH.
-            "bar": os.path.join(self.test_dir, "apps/otherdir"),
+            "bar": (
+                os.path.join(self.test_dir, "apps/otherdir")
+                if os.name == "posix"
+                else os.path.join(self.test_dir, "apps\\otherdir")
+            ),
         }
         for name_app, dir in dirs.items():
             with self.subTest(name_app=name_app, dir=dir):

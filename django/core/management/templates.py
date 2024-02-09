@@ -4,7 +4,6 @@ import os
 import posixpath
 import shutil
 import stat
-import sys
 import tempfile
 from importlib.util import find_spec
 from urllib.request import build_opener
@@ -239,8 +238,6 @@ class TemplateCommand(BaseCommand):
         else:
             target = os.path.abspath(target)
 
-        # call needed to avoid windows encoding errors
-        sys.stdout.reconfigure(encoding="utf-8")
         self.stdout.write(f"Success! Created {name} at {target}.")
 
     def handle_template(self, template, subdir):
