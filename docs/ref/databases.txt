@@ -1079,7 +1079,7 @@ To use a connection pool with `oracledb`_, you can set the ``"pool"`` in the
     }
 
 You can pass all the parameters accepted by `create_pool()`_ through :setting:`OPTIONS` 
-part of your database configuration
+part of your database configuration::
 
     DATABASES = {
         "default": {
@@ -1087,9 +1087,9 @@ part of your database configuration
             # ...
             "OPTIONS": {
                 "pool": True,
-                "min": 1,
-                "max": 10,
-                #...
+                "min":1,
+                "max":10,
+                # ...
             },
         },
     }
