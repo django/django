@@ -1461,39 +1461,27 @@ class MigrationAutodetector:
             )
             old_model_state = self.from_state.models[app_label, old_model_name]
             new_model_state = self.to_state.models[app_label, model_name]
-            # import pdb
-
-            # pdb.set_trace()
 
             old_constraints = old_model_state.options[option_name]
-            old_constraints_wo_violation_error = [
+            old_constraints_only_ddl_impacted_fields = [
                 c.only_ddl_impacted_fields() for c in old_constraints
             ]
             new_constraints = new_model_state.options[option_name]
-            new_constraints_wo_violation_error = [
+            new_constraints_only_ddl_impacted_fields = [
                 c.only_ddl_impacted_fields() for c in new_constraints
             ]
             add_constraints = [
                 c
                 for c in new_constraints
                 if c.only_ddl_impacted_fields()
-                not in old_constraints_wo_violation_error
+                not in old_constraints_only_ddl_impacted_fields
             ]
             rem_constraints = [
                 c
                 for c in old_constraints
                 if c.only_ddl_impacted_fields()
-                not in new_constraints_wo_violation_error
+                not in new_constraints_only_ddl_impacted_fields
             ]
-            # add_constraints = [c for c in new_constraints if c not in old_constraints]
-            # rem_constraints = [c for c in old_constraints if c not in new_constraints]
-
-            # (
-            #     add_constraints,
-            #     rem_constraints,
-            # ) = self._altered_constraint_should_generate_migration(
-            #     old_constraints, new_constraints
-            # )
 
             self.altered_constraints.update(
                 {

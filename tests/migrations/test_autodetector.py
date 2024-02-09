@@ -2789,9 +2789,7 @@ class AutodetectorTests(BaseAutodetectorTests):
         added_constraint = models.CheckConstraint(
             check=models.Q(name__contains="Bob"), name="name_contains_bob"
         )
-        import pdb
 
-        pdb.set_trace()
         self.assertOperationAttributes(
             changes, "testapp", 0, 0, model_name="author", constraint=added_constraint
         )
