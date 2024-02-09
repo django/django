@@ -1447,12 +1447,6 @@ class MigrationAutodetector:
                     ),
                 )
 
-    def _altered_constraint_should_generate_migration(
-        self, old_constraints, new_constraints
-    ):
-        add_constraints, rem_constraints = [], []
-        return add_constraints, rem_constraints
-
     def create_altered_constraints(self):
         option_name = operations.AddConstraint.option_name
         for app_label, model_name in sorted(self.kept_model_keys):
