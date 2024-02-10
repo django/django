@@ -280,6 +280,8 @@ class TestModelDetailView(TestDataMixin, AdminDocsTestCase):
         self.assertContains(self.response, "<h3>Methods with arguments</h3>")
         self.assertContains(self.response, "<td>rename_company</td>")
         self.assertContains(self.response, "<td>dummy_function</td>")
+        self.assertContains(self.response, "<td>dummy_function_keyword_only_arg</td>")
+        self.assertContains(self.response, "<td>all_kinds_arg_function</td>")
         self.assertContains(self.response, "<td>suffix_company_name</td>")
 
     def test_methods_with_arguments_display_arguments(self):
@@ -287,6 +289,7 @@ class TestModelDetailView(TestDataMixin, AdminDocsTestCase):
         Methods with arguments should have their arguments displayed.
         """
         self.assertContains(self.response, "<td>new_name</td>")
+        self.assertContains(self.response, "<td>keyword_only_arg</td>")
 
     def test_methods_with_arguments_display_arguments_default_value(self):
         """
@@ -302,6 +305,7 @@ class TestModelDetailView(TestDataMixin, AdminDocsTestCase):
         self.assertContains(
             self.response, "<td>baz, rox, *some_args, **some_kwargs</td>"
         )
+        self.assertContains(self.response, "<td>position_only_arg, arg, kwarg</td>")
 
     def test_instance_of_property_methods_are_displayed(self):
         """Model properties are displayed as fields."""
