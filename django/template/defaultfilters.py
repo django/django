@@ -30,6 +30,9 @@ from .library import Library
 
 register = Library()
 
+# The number of characters that will be printed
+# before trimming while printing an exception in reports.
+EXCEPTION_PRINT_LIMIT = 4096
 
 #######################
 # STRING DECORATOR    #
@@ -970,16 +973,14 @@ def phone2numeric_filter(value):
     return phone2numeric(value)
 
 
-PRINT_LIMIT = 4096
-repr_instance = DjangoRepr()
-repr_instance.config(PRINT_LIMIT)
-
-
 @register.filter(is_safe=True)
 def pprint(v):
+    repr_instance = DjangoRepr()
+    repr_instance.config(limit=EXCEPTION_PRINT_LIMIT)
+
     try:
-        if isinstance(v, Sized) and len(v) > PRINT_LIMIT:
-            diff = len(v) - PRINT_LIMIT
+        if isinstance(v, Sized) and len(v) > EXCEPTION_PRINT_LIMIT:
+            diff = len(v) - EXCEPTION_PRINT_LIMIT
             repr_instance.fillvalue = "...<trimmed %d bytes string>" % diff
         v = repr_instance.repr(v)
 

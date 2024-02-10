@@ -17,6 +17,7 @@ from django.db import DatabaseError, connection
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import render
 from django.template import TemplateDoesNotExist
+from django.template.defaultfilters import EXCEPTION_PRINT_LIMIT
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.utils import LoggingCaptureMixin
 from django.urls import path, reverse
@@ -1084,7 +1085,7 @@ class ExceptionReporterTests(SimpleTestCase):
         html = reporter.get_traceback_html()
         self.assertEqual(len(html) // 1024 // 128, 0)  # still fit in 128Kb
         trim_msg = "&lt;trimmed %d bytes string&gt;" % (
-            large - ExceptionReporter.PRINT_LIMIT + repr_of_str_adds,
+            large - EXCEPTION_PRINT_LIMIT + repr_of_str_adds,
         )
         self.assertIn(trim_msg, html)
 
@@ -1108,7 +1109,7 @@ class ExceptionReporterTests(SimpleTestCase):
                 ls = eval(v[:i] + "]")
 
                 # Check if length of trimmed list is our limit
-                self.assertEqual(len(ls), ExceptionReporter.PRINT_LIMIT)
+                self.assertEqual(len(ls), EXCEPTION_PRINT_LIMIT)
                 break
 
     def test_non_sizable_object(self):

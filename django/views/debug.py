@@ -17,7 +17,6 @@ from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_str
 from django.utils.module_loading import import_string
 from django.utils.regex_helper import _lazy_re_compile
-from django.utils.repr import DjangoRepr
 from django.utils.version import PY311, get_docs_version
 from django.views.decorators.debug import coroutine_functions_to_sensitive_variables
 
@@ -311,9 +310,6 @@ class SafeExceptionReporterFilter:
 class ExceptionReporter:
     """Organize and coordinate reporting on exceptions."""
 
-    repr_instance = DjangoRepr()
-    PRINT_LIMIT = 4096
-
     @property
     def html_template_path(self):
         return builtin_template_path("technical_500.html")
@@ -333,8 +329,6 @@ class ExceptionReporter:
         self.template_info = getattr(self.exc_value, "template_debug", None)
         self.template_does_not_exist = False
         self.postmortem = None
-
-        self.repr_instance.config(limit=ExceptionReporter.PRINT_LIMIT)
 
     def _get_raw_insecure_uri(self):
         """
