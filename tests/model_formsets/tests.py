@@ -10,9 +10,11 @@ from django.forms.formsets import formset_factory
 from django.forms.models import (
     BaseModelFormSet,
     ModelForm,
-    InlineFormSet, ModelFormSet, _get_foreign_key,
-   
-    inlineformset_factory, modelformset_factory,
+    InlineFormSet,
+    ModelFormSet,
+    _get_foreign_key,
+    inlineformset_factory,
+    modelformset_factory,
 )
 from django.forms.renderers import DjangoTemplates
 from django.http import QueryDict
@@ -2054,7 +2056,9 @@ class ModelFormsetTest(TestCase):
 
     def test_edit_only(self):
         charles = Author.objects.create(name="Charles Baudelaire")
-        AuthorFormSet = self.make_model_formset(Author, fields="__all__", edit_only=True)
+        AuthorFormSet = self.make_model_formset(
+            Author, fields="__all__", edit_only=True
+        )
         data = {
             "form-TOTAL_FORMS": "2",
             "form-INITIAL_FORMS": "0",
@@ -2154,24 +2158,26 @@ class ModelFormsetTest(TestCase):
         self.assertEqual(Author.objects.count(), 2)
 
 
-class DeclarativeModelFormSetTest (ModelFormsetTest):
+class DeclarativeModelFormSetTest(ModelFormsetTest):
 
     def test_modelformset_factory_without_fields(self):
-        """ Regression for #19733 """
+        """Regression for #19733"""
 
         with self.assertRaises(ImproperlyConfigured):
             type("AuthorFormSet", (ModelFormSet,), {"model": Author})
 
     def make_model_formset(self, model, **kwargs):
-        DeclarativeModelFormSet = type("DeclarativeModelFormSet", (ModelFormSet,), {"model": model, **kwargs})
+        DeclarativeModelFormSet = type(
+            "DeclarativeModelFormSet", (ModelFormSet,), {"model": model, **kwargs}
+        )
         return DeclarativeModelFormSet
 
     def test_custom_queryset_init(self):
         """
         A queryset can be overridden in the formset's __init__() method.
         """
-        Author.objects.create(name='Charles Baudelaire')
-        Author.objects.create(name='Paul Verlaine')
+        Author.objects.create(name="Charles Baudelaire")
+        Author.objects.create(name="Paul Verlaine")
 
         class AuthorFormSet(ModelFormSet):
             model = Author
@@ -2179,7 +2185,7 @@ class DeclarativeModelFormSetTest (ModelFormsetTest):
 
             def __init__(self, *args, **kwargs):
                 super().__init__(*args, **kwargs)
-                self.queryset = Author.objects.filter(name__startswith='Charles')
+                self.queryset = Author.objects.filter(name__startswith="Charles")
 
         formset = AuthorFormSet()
         self.assertEqual(len(formset.get_queryset()), 1)
