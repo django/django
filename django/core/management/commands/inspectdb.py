@@ -4,6 +4,7 @@ import re
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.db.models.constants import LOOKUP_SEP
+from django.db.models.indexes import Index
 
 
 class Command(BaseCommand):
@@ -379,8 +380,10 @@ class Command(BaseCommand):
         to the given database table name.
         """
         unique_together = []
+        indexes = []
+        index_comments = []
         has_unsupported_constraint = False
-        for params in constraints.values():
+        for name, params in constraints.items():
             if params["unique"]:
                 columns = params["columns"]
                 if None in columns:
@@ -392,6 +395,32 @@ class Command(BaseCommand):
                     unique_together.append(
                         str(tuple(column_to_field_name[c] for c in columns))
                     )
+            elif params["index"] and not params["primary_key"]:
+                columns = params["columns"]
+                orders = params.get("orders", [""] * len(columns))
+
+                field_names = [
+                    (
+                        f'{"-" if order.lower() == "desc" else ""}'
+                        f"{column_to_field_name[column]}"
+                    )
+                    for column, order in zip(columns, orders)
+                ]
+                index_str = f"models.Index(fields={field_names!r}, name={name!r})"
+                comment = ""
+                if params["type"] not in ["btree", Index.suffix]:
+                    comment = f'Index type is {params["type"]}'
+                if params["type"] in ["rtree", "spatial"] and len(columns) == 1:
+                    # assume this is a default spatial index, so let's make a note
+                    # of it and continue
+                    index_comments.append(
+                        "Skipped default spatial index for "
+                        f"{column_to_field_name[columns[0]]}"
+                    )
+                    indexes.append("")
+                    continue
+                indexes.append(index_str)
+                index_comments.append(comment)
         if is_view:
             managed_comment = "  # Created from a view. Don't remove."
         elif is_partition:
@@ -411,4 +440,15 @@ class Command(BaseCommand):
             meta += ["        unique_together = %s" % tup]
         if comment:
             meta += [f"        db_table_comment = {comment!r}"]
+        if indexes:
+            meta.append("        indexes = (")
+            for line, comment in zip(indexes, index_comments):
+                if line:
+                    if comment:
+                        meta.append(f"            {line},  # {comment}")
+                    else:
+                        meta.append(f"            {line},")
+                else:
+                    meta.append(f"            # {comment}")
+            meta.append("        )")
         return meta

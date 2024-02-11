@@ -78,5 +78,6 @@ class SpatiaLiteIntrospection(DatabaseIntrospection):
                 "foreign_key": None,
                 "check": False,
                 "index": True,
+                "type": "rtree",  # spatial enabled indexes are of type rtree
             }
         return constraints

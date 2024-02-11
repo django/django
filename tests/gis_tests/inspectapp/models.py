@@ -21,3 +21,13 @@ class Fields3D(models.Model):
 
     class Meta:
         required_db_features = {"supports_3d_storage"}
+
+
+class Indexes(models.Model):
+    point = models.PointField()
+    name = models.CharField(max_length=5)
+    other = models.IntegerField()
+
+    class Meta:
+        required_db_features = {"supports_3d_storage"}
+        indexes = [models.Index(fields=["name", "other"], name="name_plus_other")]
