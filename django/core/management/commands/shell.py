@@ -79,7 +79,6 @@ class Command(BaseCommand):
                         my_models[mod.__module__].append(mod.__name__)
             imported_objects.update(self.get_app_models(my_models, self.style))
             start_ipython(argv=[], user_ns=imported_objects)
-            # Should we consider implementing this feature for the IPython Shell? If it's deemed necessary, I'll make an effort to begin working on it.
 
         return run_ipython()
 
@@ -187,9 +186,10 @@ class Command(BaseCommand):
                 import_objects[key] = import_string(val)
                 default_modules_counter += 1
                 module_names += str(key) + " "
+        module_names = module_names.strip()
         print(
             style.SUCCESS(
-                f"imported {default_modules_counter} default objects ({module_names[:-1]})"
+                f"imported {default_modules_counter} default objects ({module_names})"
             )
         )
         return import_objects
@@ -209,7 +209,6 @@ class Command(BaseCommand):
                     import_objects[x] = import_string(str(key) + "." + str(x))
                     model_counter += 1
                     model_names += str(x) + " "
-        print(
-            style.SUCCESS(f"imported {model_counter} app models ({model_names[:-1]})")
-        )
+        model_names = model_names.strip()
+        print(style.SUCCESS(f"imported {model_counter} app models ({model_names})"))
         return import_objects
