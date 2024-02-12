@@ -81,10 +81,11 @@ Minor features
 
 * :class:`~django.contrib.gis.gdal.OGRGeometry`,
   :class:`~django.contrib.gis.gdal.Point`,
-  :class:`~django.contrib.gis.gdal.LineString`, and
-  :class:`~django.contrib.gis.gdal.Polygon` now support measured geometries
-  via the new :attr:`.OGRGeometry.is_measured` and ``m`` properties, and the
-  :meth:`.OGRGeometry.set_measured` method.
+  :class:`~django.contrib.gis.gdal.LineString`,
+  :class:`~django.contrib.gis.gdal.Polygon`, and
+  :class:`~django.contrib.gis.gdal.GeometryCollection` and its subclasses now
+  support measured geometries via the new :attr:`.OGRGeometry.is_measured` and
+  ``m`` properties, and the :meth:`.OGRGeometry.set_measured` method.
 
 * :attr:`.OGRGeometry.centroid` is now available on all supported geometry
   types.

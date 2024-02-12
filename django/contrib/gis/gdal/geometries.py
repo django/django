@@ -801,14 +801,22 @@ GEO_CLASSES = {
     2001: Point,  # POINT M
     2002: LineString,  # LINESTRING M
     2003: Polygon,  # POLYGON M
+    2004: MultiPoint,  # MULTIPOINT M
+    2005: MultiLineString,  # MULTILINESTRING M
+    2006: MultiPolygon,  # MULTIPOLYGON M
+    2007: GeometryCollection,  # GEOMETRYCOLLECTION M
     3001: Point,  # POINT ZM
     3002: LineString,  # LINESTRING ZM
     3003: Polygon,  # POLYGON ZM
+    3004: MultiPoint,  # MULTIPOINT ZM
+    3005: MultiLineString,  # MULTILINESTRING ZM
+    3006: MultiPolygon,  # MULTIPOLYGON ZM
+    3007: GeometryCollection,  # GEOMETRYCOLLECTION ZM
     1 + OGRGeomType.wkb25bit: Point,  # POINT Z
     2 + OGRGeomType.wkb25bit: LineString,  # LINESTRING Z
     3 + OGRGeomType.wkb25bit: Polygon,  # POLYGON Z
-    4 + OGRGeomType.wkb25bit: MultiPoint,
-    5 + OGRGeomType.wkb25bit: MultiLineString,
-    6 + OGRGeomType.wkb25bit: MultiPolygon,
-    7 + OGRGeomType.wkb25bit: GeometryCollection,
+    4 + OGRGeomType.wkb25bit: MultiPoint,  # MULTIPOINT Z
+    5 + OGRGeomType.wkb25bit: MultiLineString,  # MULTILINESTRING Z
+    6 + OGRGeomType.wkb25bit: MultiPolygon,  # MULTIPOLYGON Z
+    7 + OGRGeomType.wkb25bit: GeometryCollection,  # GEOMETRYCOLLECTION Z
 }
