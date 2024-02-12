@@ -585,6 +585,7 @@ def all_valid(formsets):
     # List comprehension ensures is_valid() is called for all formsets.
     return all([formset.is_valid() for formset in formsets])
 
+
 # Declarative FormSet ################################
 
 
@@ -606,22 +607,22 @@ class FormSetMeta(type):
         )
 
         default_attrs = {
-            'form': attrs.get('form') or None,
-            'extra': 1,
-            'can_order': False,
-            'can_delete': False,
-            'min_num': attrs["min_num"],
-            'max_num': attrs["max_num"],
-            'absolute_max': attrs["max_num"] + DEFAULT_MAX_NUM,
-            'validate_min': False,
-            'validate_max': False,
+            "form": attrs.get("form") or None,
+            "extra": 1,
+            "can_order": False,
+            "can_delete": False,
+            "min_num": attrs["min_num"],
+            "max_num": attrs["max_num"],
+            "absolute_max": attrs["max_num"] + DEFAULT_MAX_NUM,
+            "validate_min": False,
+            "validate_max": False,
             "renderer": None,
         }
 
         for key, value in default_attrs.items():
             if key not in attrs.keys():
                 attrs.update({key: value})
-        
+
         if attrs["max_num"] > attrs["absolute_max"]:
             raise ValueError("'absolute_max' must be greater or equal to 'max_num'.")
 
@@ -633,6 +634,7 @@ class FormSet(BaseFormSet, metaclass=FormSetMeta):
     """
     Base class for which can be used to create formset classes
     """
+
     form: Any = None
 
     def __init__(

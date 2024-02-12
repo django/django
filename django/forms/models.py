@@ -16,7 +16,10 @@ from django.db.models.utils import AltersData
 from django.forms.fields import ChoiceField, Field
 from django.forms.forms import BaseForm, DeclarativeFieldsMetaclass
 from django.forms.formsets import (
-    BaseFormSet, FormSet, FormSetMeta, formset_factory,
+    BaseFormSet,
+    FormSet,
+    FormSetMeta,
+    formset_factory,
 )
 from django.forms.utils import ErrorList
 from django.forms.widgets import (
@@ -1118,7 +1121,7 @@ class ModelFormSetMeta(FormSetMeta):
             "labels",
             "help_texts",
             "error_messages",
-            "field_classes"
+            "field_classes",
         ]
 
         kwargs = {}
@@ -1135,13 +1138,14 @@ class ModelFormSetMeta(FormSetMeta):
 
         if attrs.get("model") is not None:
             form = modelform_factory(attrs.get("model"), **kwargs)
-            attrs.update({'form': form})
+            attrs.update({"form": form})
 
         return super(ModelFormSetMeta, cls).__new__(cls, name, bases, attrs)
 
 
 class ModelFormSet(BaseModelFormSet, FormSet, metaclass=ModelFormSetMeta):
     pass
+
 
 # InlineFormSets #############################################################
 
@@ -1422,18 +1426,20 @@ class InlineFormSetMeta(ModelFormSetMeta):
             return new_class
 
         # Find parent model
-        parent_model = attrs.get('parent_model', None)
-        fk_name = attrs.get('fk_name', None)
-        form = attrs.get('form', None)
+        parent_model = attrs.get("parent_model", None)
+        fk_name = attrs.get("fk_name", None)
+        form = attrs.get("form", None)
         for base in parents:
-            parent_model = parent_model or getattr(base, 'parent_model', None)
-            fk_name = fk_name or getattr(base, 'fk_name', None)
-            form = form or getattr(base, 'form', None)
+            parent_model = parent_model or getattr(base, "parent_model", None)
+            fk_name = fk_name or getattr(base, "fk_name", None)
+            form = form or getattr(base, "form", None)
 
         # enforce a max_num=1 when the foreign key
         # to the parent model is unique.
         if form and parent_model:
-            new_class.fk = _get_foreign_key(parent_model, form._meta.model, fk_name=fk_name)
+            new_class.fk = _get_foreign_key(
+                parent_model, form._meta.model, fk_name=fk_name
+            )
             if new_class.fk.unique:
                 new_class.max_num = 1
 
@@ -1446,6 +1452,7 @@ class InlineFormSetMeta(ModelFormSetMeta):
 
 class InlineFormSet(BaseInlineFormSet, ModelFormSet, metaclass=InlineFormSetMeta):
     pass
+
 
 # Fields #####################################################################
 

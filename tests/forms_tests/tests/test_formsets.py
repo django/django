@@ -2013,7 +2013,7 @@ class DeclarativeFormSetTestCase(FormsFormsetTestCase):
             data[prefixed(str(i), "votes")] = votes
 
         return formset_class(data, **kwargs)
-    
+
     def test_absolute_max_invalid_formset_declarative(self):
         """Test that the absolute_max is greater than max_num."""
         msg = "'absolute_max' must be greater or equal to 'max_num'."
