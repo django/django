@@ -15,11 +15,11 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_delete_sequence = "DROP SEQUENCE IF EXISTS %(sequence)s CASCADE"
 
     sql_create_index = (
-        "CREATE INDEX %(name)s ON %(table)s%(using)s "
+        "CREATE INDEX IF NOT EXISTS %(name)s ON %(table)s%(using)s "
         "(%(columns)s)%(include)s%(extra)s%(condition)s"
     )
     sql_create_index_concurrently = (
-        "CREATE INDEX CONCURRENTLY %(name)s ON %(table)s%(using)s "
+        "CREATE INDEX CONCURRENTLY IF NOT EXISTS %(name)s ON %(table)s%(using)s "
         "(%(columns)s)%(include)s%(extra)s%(condition)s"
     )
     sql_delete_index = "DROP INDEX IF EXISTS %(name)s"
@@ -295,13 +295,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             new_db_params,
             strict,
         )
-        # Added an index? Create any PostgreSQL-specific indexes.
-        if (not (old_field.db_index or old_field.unique) and new_field.db_index) or (
-            not old_field.unique and (not new_field.db_index or new_field._unique)
-        ):
-            like_index_statement = self._create_like_index_sql(model, new_field)
-            if like_index_statement is not None:
-                self.execute(like_index_statement)
+        # Create any PostgreSQL-specific indexes if needed.
+        like_index_statement = self._create_like_index_sql(model, new_field)
+        if like_index_statement is not None:
+            self.execute(like_index_statement)
 
         # Removed an index? Drop any PostgreSQL-specific indexes.
         if old_field.unique and not (new_field.db_index or new_field.unique):

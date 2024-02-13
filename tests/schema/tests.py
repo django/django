@@ -2992,7 +2992,10 @@ class SchemaTests(TransactionTestCase):
             with connection.schema_editor() as editor:
                 editor.alter_field(Author, Author._meta.get_field("name"), new_field)
         # One SQL statement is executed to alter the field.
-        self.assertEqual(len(cm.records), 1)
+        num_records = 1
+        if connection.vendor == "postgresql":
+            num_records = 2
+        self.assertEqual(len(cm.records), num_records)
 
     @isolate_apps("schema")
     def test_unique_and_reverse_m2m(self):
@@ -3025,7 +3028,10 @@ class SchemaTests(TransactionTestCase):
             with connection.schema_editor() as editor:
                 editor.alter_field(Tag, Tag._meta.get_field("slug"), new_field)
         # One SQL statement is executed to alter the field.
-        self.assertEqual(len(cm.records), 1)
+        num_records = 1
+        if connection.vendor == "postgresql":
+            num_records = 2
+        self.assertEqual(len(cm.records), num_records)
         # Ensure that the field is still unique.
         Tag.objects.create(title="foo", slug="foo")
         with self.assertRaises(IntegrityError):
@@ -5202,6 +5208,33 @@ class SchemaTests(TransactionTestCase):
             [
                 "schema_charfieldpkunique_field1_ffc9a22c_like",
                 "schema_charfieldpkunique_field1_ffc9a22c_uniq",
+            ],
+        )
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    def test_charfield_db_index_to_textfield_db_index(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(AuthorCharFieldWithIndex)
+        self.assertEqual(
+            self.get_constraints_for_column(AuthorCharFieldWithIndex, "char_field"),
+            [
+                "schema_authorcharfieldwithindex_char_field_06a11776",
+                "schema_authorcharfieldwithindex_char_field_06a11776_like",
+            ],
+        )
+        old_field = AuthorCharFieldWithIndex._meta.get_field("char_field")
+        new_field = TextField(db_index=True)
+        new_field.set_attributes_from_name("char_field")
+        new_field.model = AuthorCharFieldWithIndex
+        with connection.schema_editor() as editor:
+            editor.alter_field(
+                AuthorCharFieldWithIndex, old_field, new_field, strict=True
+            )
+        self.assertEqual(
+            self.get_constraints_for_column(AuthorCharFieldWithIndex, "char_field"),
+            [
+                "schema_authorcharfieldwithindex_char_field_06a11776",
+                "schema_authorcharfieldwithindex_char_field_06a11776_like",
             ],
         )
 
