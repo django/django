@@ -152,7 +152,9 @@ def setup_test_environment(debug=None):
     Template._render = instrumented_test_render
 
     saved_data.storages = copy.deepcopy(settings.STORAGES)
-    settings.STORAGES["default"]["BACKEND"] = "django.core.files.storage.FileSystemStorage"
+    settings.STORAGES["default"][
+        "BACKEND"
+    ] = "django.core.files.storage.FileSystemStorage"
     settings.STORAGES["default"]["OPTIONS"] = {"location": tempfile.mkdtemp()}
 
     mail.outbox = []
