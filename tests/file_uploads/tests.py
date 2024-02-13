@@ -876,6 +876,13 @@ class DirectoryCreationTests(SimpleTestCase):
                 "foo.txt", SimpleUploadedFile("foo.txt", b"x"), save=False
             )
 
+    @override_settings(
+        STORAGES={
+            DEFAULT_STORAGE_ALIAS: {
+                "BACKEND": "django.core.files.storage.FileSystemStorage",
+            }
+        }
+    )
     def test_not_a_directory(self):
         default_storage.delete(UPLOAD_TO)
         # Create a file with the upload directory name
