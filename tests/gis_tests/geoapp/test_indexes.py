@@ -60,7 +60,7 @@ class SchemaIndexesTests(TransactionTestCase):
             create_index_sql,
         )
         self.assertIn(
-            'CREATE INDEX "geoapp_schema_city_point_9ed70651_id" ',
+            'CREATE INDEX IF NOT EXISTS "geoapp_schema_city_point_9ed70651_id" ',
             create_index_sql,
         )
 
