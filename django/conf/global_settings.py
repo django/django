@@ -436,6 +436,7 @@ NUMBER_GROUPING = 0
 # Thousand separator symbol
 THOUSAND_SEPARATOR = ","
 
+# RemovedInDjango60Warning: Use the OPTION in the DATABASES dict instead.
 # The tablespaces to use for each model when not specified otherwise.
 DEFAULT_TABLESPACE = ""
 DEFAULT_INDEX_TABLESPACE = ""

@@ -1354,6 +1354,8 @@ This doesn't affect error messages sent to :setting:`ADMINS` and
 ``DEFAULT_INDEX_TABLESPACE``
 ----------------------------
 
+.. deprecated:: 5.1
+
 Default: ``''`` (Empty string)
 
 Default tablespace to use for indexes on fields that don't specify
@@ -1363,6 +1365,8 @@ one, if the backend supports it (see :doc:`/topics/db/tablespaces`).
 
 ``DEFAULT_TABLESPACE``
 ----------------------
+
+.. deprecated:: 5.1
 
 Default: ``''`` (Empty string)
 
