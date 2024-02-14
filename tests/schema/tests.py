@@ -2992,10 +2992,7 @@ class SchemaTests(TransactionTestCase):
             with connection.schema_editor() as editor:
                 editor.alter_field(Author, Author._meta.get_field("name"), new_field)
         # One SQL statement is executed to alter the field.
-        num_records = 1
-        if connection.vendor == "postgresql":
-            num_records = 2
-        self.assertEqual(len(cm.records), num_records)
+        self.assertEqual(len(cm.records), 1)
 
     @isolate_apps("schema")
     def test_unique_and_reverse_m2m(self):
@@ -3028,10 +3025,7 @@ class SchemaTests(TransactionTestCase):
             with connection.schema_editor() as editor:
                 editor.alter_field(Tag, Tag._meta.get_field("slug"), new_field)
         # One SQL statement is executed to alter the field.
-        num_records = 1
-        if connection.vendor == "postgresql":
-            num_records = 2
-        self.assertEqual(len(cm.records), num_records)
+        self.assertEqual(len(cm.records), 1)
         # Ensure that the field is still unique.
         Tag.objects.create(title="foo", slug="foo")
         with self.assertRaises(IntegrityError):

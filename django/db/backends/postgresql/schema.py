@@ -15,11 +15,11 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_delete_sequence = "DROP SEQUENCE IF EXISTS %(sequence)s CASCADE"
 
     sql_create_index = (
-        "CREATE INDEX IF NOT EXISTS %(name)s ON %(table)s%(using)s "
+        "CREATE INDEX %(name)s ON %(table)s%(using)s "
         "(%(columns)s)%(include)s%(extra)s%(condition)s"
     )
     sql_create_index_concurrently = (
-        "CREATE INDEX CONCURRENTLY IF NOT EXISTS %(name)s ON %(table)s%(using)s "
+        "CREATE INDEX CONCURRENTLY %(name)s ON %(table)s%(using)s "
         "(%(columns)s)%(include)s%(extra)s%(condition)s"
     )
     sql_delete_index = "DROP INDEX IF EXISTS %(name)s"
@@ -274,6 +274,25 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             [],
         )
 
+    def _need_to_add_new_index(self, old_field, new_field):
+        if not (old_field.db_index or old_field.unique) and (
+            new_field.db_index or new_field.unique
+        ):
+            return True
+
+    def _need_to_recreate_deleted_index(self, old_field, new_field, old_type, new_type):
+        if (
+            old_field.db_index
+            and not old_field.unique
+            and (
+                not new_field.db_index
+                or (new_field.unique and not new_field.primary_key)
+            )
+        ) or (
+            old_type != new_type and not new_field.unique and not old_field.primary_key
+        ):
+            return True
+
     def _alter_field(
         self,
         model,
@@ -295,10 +314,15 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             new_db_params,
             strict,
         )
-        # Create any PostgreSQL-specific indexes if needed.
-        like_index_statement = self._create_like_index_sql(model, new_field)
-        if like_index_statement is not None:
-            self.execute(like_index_statement)
+        # Added an index? Create any PostgreSQL-specific indexes.
+        if self._need_to_add_new_index(
+            old_field, new_field
+        ) or self._need_to_recreate_deleted_index(
+            old_field, new_field, old_type, new_type
+        ):
+            like_index_statement = self._create_like_index_sql(model, new_field)
+            if like_index_statement is not None:
+                self.execute(like_index_statement)
 
         # Removed an index? Drop any PostgreSQL-specific indexes.
         if old_field.unique and not (new_field.db_index or new_field.unique):
