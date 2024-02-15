@@ -3,8 +3,15 @@ from unittest import mock
 from django.conf import settings
 from django.db import connection, models
 from django.db.models.functions import Lower, Upper
-from django.test import SimpleTestCase, TestCase, override_settings, skipUnlessDBFeature
+from django.test import (
+    SimpleTestCase,
+    TestCase,
+    ignore_warnings,
+    override_settings,
+    skipUnlessDBFeature,
+)
 from django.test.utils import isolate_apps
+from django.utils.deprecation import RemovedInDjango60Warning
 
 from .models import Book, ChildModel1, ChildModel2
 
@@ -305,9 +312,10 @@ class SimpleIndexesTests(SimpleTestCase):
         )
 
 
-@override_settings(DEFAULT_TABLESPACE=None)
+@ignore_warnings(category=RemovedInDjango60Warning)
 class IndexesTests(TestCase):
     @skipUnlessDBFeature("supports_tablespaces")
+    @override_settings(DEFAULT_TABLESPACE=None)
     def test_db_tablespace(self):
         editor = connection.schema_editor()
         # Index with db_tablespace attribute.
@@ -346,6 +354,7 @@ class IndexesTests(TestCase):
         self.assertIn('"idx_tbls"', str(index.create_sql(Book, editor)).lower())
 
     @skipUnlessDBFeature("supports_tablespaces")
+    @override_settings(DEFAULT_TABLESPACE=None)
     def test_func_with_tablespace(self):
         # Functional index with db_tablespace attribute.
         index = models.Index(

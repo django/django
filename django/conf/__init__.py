@@ -22,6 +22,15 @@ ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
 DEFAULT_STORAGE_ALIAS = "default"
 STATICFILES_STORAGE_ALIAS = "staticfiles"
 
+# RemovedInDjango60Warning.
+FORMS_URLFIELD_ASSUME_HTTPS_DEPRECATED_MSG = (
+    "The FORMS_URLFIELD_ASSUME_HTTPS transitional setting is deprecated."
+)
+DEFAULT_TABLESPACE_DEPRECATED_MSG = "The DEFAULT_TABLESPACE setting is deprecated."
+DEFAULT_INDEX_TABLESPACE_DEPRECATED_MSG = (
+    "The DEFAULT_INDEX_TABLESPACE setting is deprecated."
+)
+
 
 class SettingsReference(str):
     """
@@ -182,6 +191,27 @@ class Settings:
                 setattr(self, setting, setting_value)
                 self._explicit_settings.add(setting)
 
+<<<<<<< HEAD
+=======
+        if self.is_overridden("FORMS_URLFIELD_ASSUME_HTTPS"):
+            warnings.warn(
+                FORMS_URLFIELD_ASSUME_HTTPS_DEPRECATED_MSG,
+                RemovedInDjango60Warning,
+            )
+
+        if self.is_overridden("DEFAULT_TABLESPACE"):
+            warnings.warn(
+                DEFAULT_TABLESPACE_DEPRECATED_MSG,
+                RemovedInDjango60Warning,
+            )
+
+        if self.is_overridden("DEFAULT_INDEX_TABLESPACE"):
+            warnings.warn(
+                DEFAULT_INDEX_TABLESPACE_DEPRECATED_MSG,
+                RemovedInDjango60Warning,
+            )
+
+>>>>>>> cd5bb1ea4a (deprecation warnings for the global settings)
         if hasattr(time, "tzset") and self.TIME_ZONE:
             # When we can, attempt to validate the timezone. If we can't find
             # this file, no check happens and it's harmless.
@@ -226,6 +256,24 @@ class UserSettingsHolder:
 
     def __setattr__(self, name, value):
         self._deleted.discard(name)
+<<<<<<< HEAD
+=======
+        if name == "FORMS_URLFIELD_ASSUME_HTTPS":
+            warnings.warn(
+                FORMS_URLFIELD_ASSUME_HTTPS_DEPRECATED_MSG,
+                RemovedInDjango60Warning,
+            )
+        if name == "DEFAULT_TABLESPACE":
+            warnings.warn(
+                DEFAULT_TABLESPACE_DEPRECATED_MSG,
+                RemovedInDjango60Warning,
+            )
+        if name == "DEFAULT_INDEX_TABLESPACE":
+            warnings.warn(
+                DEFAULT_INDEX_TABLESPACE_DEPRECATED_MSG,
+                RemovedInDjango60Warning,
+            )
+>>>>>>> cd5bb1ea4a (deprecation warnings for the global settings)
         super().__setattr__(name, value)
 
     def __delattr__(self, name):
