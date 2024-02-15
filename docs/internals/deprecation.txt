@@ -38,6 +38,42 @@ details on these changes.
 * Support for calling ``format_html()`` without passing args or kwargs will be
   removed.
 
+* Support for ``cx_Oracle`` will be removed.
+
+* ``BaseDatabaseOperations.field_cast_sql()`` will be removed.
+
+* The ``ChoicesMeta`` alias to ``django.db.models.enums.ChoicesType`` will be
+  removed.
+
+* The ``Prefetch.get_current_queryset()`` method will be removed.
+
+* The ``get_prefetch_queryset()`` method of related managers and descriptors
+  will be removed.
+
+* ``get_prefetcher()`` and ``prefetch_related_objects()`` will no longer
+  fallback to ``get_prefetch_queryset()``.
+
+* The ``FORMS_URLFIELD_ASSUME_HTTPS`` transitional setting will be removed.
+
+See the :ref:`Django 5.1 release notes <deprecated-features-5.1>` for more
+details on these changes.
+
+* The ``ModelAdmin.log_deletion()`` and ``LogEntryManager.log_action()``
+  methods will be removed.
+
+* The undocumented ``django.utils.itercompat.is_iterable()`` function and the
+  ``django.utils.itercompat`` module will be removed.
+
+* The ``django.contrib.gis.geoip2.GeoIP2.coords()`` method will be removed.
+
+* The ``django.contrib.gis.geoip2.GeoIP2.open()`` method will be removed.
+
+* Support for passing positional arguments to ``Model.save()`` and
+  ``Model.asave()`` will be removed.
+
+* The setter for ``django.contrib.gis.gdal.OGRGeometry.coord_dim`` will be
+  removed.
+
 .. _deprecation-removed-in-5.1:
 
 5.1

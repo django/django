@@ -6,14 +6,22 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.storage import FileSystemStorage
 from django.core.serializers.json import DjangoJSONEncoder
-from django.db import models
+from django.db import connection, models
+from django.db.models import F, Value
 from django.db.models.fields.files import ImageFieldFile
+from django.db.models.functions import Lower
+from django.utils.functional import SimpleLazyObject
 from django.utils.translation import gettext_lazy as _
 
 try:
     from PIL import Image
 except ImportError:
     Image = None
+
+
+test_collation = SimpleLazyObject(
+    lambda: connection.features.test_collations["virtual"]
+)
 
 
 class Foo(models.Model):
@@ -31,24 +39,18 @@ class Bar(models.Model):
 
 
 class Whiz(models.Model):
-    CHOICES = (
-        (
-            "Group 1",
-            (
-                (1, "First"),
-                (2, "Second"),
-            ),
+    CHOICES = {
+        "Group 1": {
+            1: "First",
+            2: "Second",
+        },
+        "Group 2": (
+            (3, "Third"),
+            (4, "Fourth"),
         ),
-        (
-            "Group 2",
-            (
-                (3, "Third"),
-                (4, "Fourth"),
-            ),
-        ),
-        (0, "Other"),
-        (5, _("translated")),
-    )
+        0: "Other",
+        5: _("translated"),
+    }
     c = models.IntegerField(choices=CHOICES, null=True)
 
 
@@ -61,7 +63,7 @@ WhizDelayed._meta.get_field("c").choices = Whiz.CHOICES
 
 
 class WhizIter(models.Model):
-    c = models.IntegerField(choices=iter(Whiz.CHOICES), null=True)
+    c = models.IntegerField(choices=iter(Whiz.CHOICES.items()), null=True)
 
 
 class WhizIterEmpty(models.Model):
@@ -75,12 +77,21 @@ class Choiceful(models.Model):
         HEART = 3, "Heart"
         CLUB = 4, "Club"
 
+    def get_choices():
+        return [(i, str(i)) for i in range(3)]
+
     no_choices = models.IntegerField(null=True)
     empty_choices = models.IntegerField(choices=(), null=True)
     with_choices = models.IntegerField(choices=[(1, "A")], null=True)
+    with_choices_dict = models.IntegerField(choices={1: "A"}, null=True)
+    with_choices_nested_dict = models.IntegerField(
+        choices={"Thing": {1: "A"}}, null=True
+    )
     empty_choices_bool = models.BooleanField(choices=())
     empty_choices_text = models.TextField(choices=())
     choices_from_enum = models.IntegerField(choices=Suit)
+    choices_from_iterator = models.IntegerField(choices=((i, str(i)) for i in range(3)))
+    choices_from_callable = models.IntegerField(choices=get_choices)
 
 
 class BigD(models.Model):
@@ -469,3 +480,115 @@ class UUIDChild(PrimaryKeyUUIDModel):
 
 class UUIDGrandchild(UUIDChild):
     pass
+
+
+class GeneratedModelFieldWithConverters(models.Model):
+    field = models.UUIDField()
+    field_copy = models.GeneratedField(
+        expression=F("field"),
+        output_field=models.UUIDField(),
+        db_persist=True,
+    )
+
+    class Meta:
+        required_db_features = {"supports_stored_generated_columns"}
+
+
+class GeneratedModel(models.Model):
+    a = models.IntegerField()
+    b = models.IntegerField()
+    field = models.GeneratedField(
+        expression=F("a") + F("b"),
+        output_field=models.IntegerField(),
+        db_persist=True,
+    )
+    fk = models.ForeignKey(Foo, on_delete=models.CASCADE, null=True, blank=True)
+
+    class Meta:
+        required_db_features = {"supports_stored_generated_columns"}
+
+
+class GeneratedModelVirtual(models.Model):
+    a = models.IntegerField()
+    b = models.IntegerField()
+    field = models.GeneratedField(
+        expression=F("a") + F("b"),
+        output_field=models.IntegerField(),
+        db_persist=False,
+    )
+    fk = models.ForeignKey(Foo, on_delete=models.CASCADE, null=True, blank=True)
+
+    class Meta:
+        required_db_features = {"supports_virtual_generated_columns"}
+
+
+class GeneratedModelParams(models.Model):
+    field = models.GeneratedField(
+        expression=Value("Constant", output_field=models.CharField(max_length=10)),
+        output_field=models.CharField(max_length=10),
+        db_persist=True,
+    )
+
+    class Meta:
+        required_db_features = {"supports_stored_generated_columns"}
+
+
+class GeneratedModelParamsVirtual(models.Model):
+    field = models.GeneratedField(
+        expression=Value("Constant", output_field=models.CharField(max_length=10)),
+        output_field=models.CharField(max_length=10),
+        db_persist=False,
+    )
+
+    class Meta:
+        required_db_features = {"supports_virtual_generated_columns"}
+
+
+class GeneratedModelOutputFieldDbCollation(models.Model):
+    name = models.CharField(max_length=10)
+    lower_name = models.GeneratedField(
+        expression=Lower("name"),
+        output_field=models.CharField(db_collation=test_collation, max_length=11),
+        db_persist=True,
+    )
+
+    class Meta:
+        required_db_features = {"supports_stored_generated_columns"}
+
+
+class GeneratedModelOutputFieldDbCollationVirtual(models.Model):
+    name = models.CharField(max_length=10)
+    lower_name = models.GeneratedField(
+        expression=Lower("name"),
+        db_persist=False,
+        output_field=models.CharField(db_collation=test_collation, max_length=11),
+    )
+
+    class Meta:
+        required_db_features = {"supports_virtual_generated_columns"}
+
+
+class GeneratedModelNull(models.Model):
+    name = models.CharField(max_length=10, null=True)
+    lower_name = models.GeneratedField(
+        expression=Lower("name"),
+        output_field=models.CharField(max_length=10),
+        db_persist=True,
+        null=True,
+    )
+
+    class Meta:
+        required_db_features = {"supports_stored_generated_columns"}
+
+
+class GeneratedModelNullVirtual(models.Model):
+    name = models.CharField(max_length=10, null=True)
+    lower_name = models.GeneratedField(
+        expression=Lower("name"),
+        output_field=models.CharField(max_length=10),
+        db_persist=False,
+        null=True,
+    )
+
+    class Meta:
+        required_db_features = {"supports_virtual_generated_columns"}

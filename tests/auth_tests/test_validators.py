@@ -150,12 +150,12 @@ class UserAttributeSimilarityValidatorTest(TestCase):
         self.assertIsNone(UserAttributeSimilarityValidator().validate("testclient"))
 
         with self.assertRaises(ValidationError) as cm:
-            UserAttributeSimilarityValidator().validate("testclient", user=user),
+            UserAttributeSimilarityValidator().validate("testclient", user=user)
         self.assertEqual(cm.exception.messages, [expected_error % "username"])
         self.assertEqual(cm.exception.error_list[0].code, "password_too_similar")
 
         with self.assertRaises(ValidationError) as cm:
-            UserAttributeSimilarityValidator().validate("example.com", user=user),
+            UserAttributeSimilarityValidator().validate("example.com", user=user)
         self.assertEqual(cm.exception.messages, [expected_error % "email address"])
 
         with self.assertRaises(ValidationError) as cm:
@@ -193,7 +193,7 @@ class UserAttributeSimilarityValidatorTest(TestCase):
                 return "foobar"
 
         with self.assertRaises(ValidationError) as cm:
-            UserAttributeSimilarityValidator().validate("foobar", user=TestUser()),
+            UserAttributeSimilarityValidator().validate("foobar", user=TestUser())
         self.assertEqual(
             cm.exception.messages, ["The password is too similar to the username."]
         )

@@ -121,3 +121,10 @@ class AbstractModel(models.Model):
 
 class ChildModel(AbstractModel):
     pass
+
+
+class JSONFieldModel(models.Model):
+    data = models.JSONField(null=True)
+
+    class Meta:
+        required_db_features = {"supports_json_field"}

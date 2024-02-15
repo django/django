@@ -2,8 +2,7 @@ from ctypes import c_void_p
 
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.error import GDALException
-from django.contrib.gis.gdal.prototypes import ds as vcapi
-from django.contrib.gis.gdal.prototypes import raster as rcapi
+from django.contrib.gis.gdal.prototypes import ds as capi
 from django.utils.encoding import force_bytes, force_str
 
 
@@ -49,16 +48,10 @@ class Driver(GDALBase):
                 name = dr_input
 
             # Attempting to get the GDAL/OGR driver by the string name.
-            for iface in (vcapi, rcapi):
-                driver = c_void_p(iface.get_driver_by_name(force_bytes(name)))
-                if driver:
-                    break
+            driver = c_void_p(capi.get_driver_by_name(force_bytes(name)))
         elif isinstance(dr_input, int):
             self.ensure_registered()
-            for iface in (vcapi, rcapi):
-                driver = iface.get_driver(dr_input)
-                if driver:
-                    break
+            driver = capi.get_driver(dr_input)
         elif isinstance(dr_input, c_void_p):
             driver = dr_input
         else:
@@ -81,23 +74,21 @@ class Driver(GDALBase):
         """
         Attempt to register all the data source drivers.
         """
-        # Only register all if the driver counts are 0 (or else all drivers
-        # will be registered over and over again)
-        if not vcapi.get_driver_count():
-            vcapi.register_all()
-        if not rcapi.get_driver_count():
-            rcapi.register_all()
+        # Only register all if the driver count is 0 (or else all drivers will
+        # be registered over and over again).
+        if not capi.get_driver_count():
+            capi.register_all()
 
     @classmethod
     def driver_count(cls):
         """
         Return the number of GDAL/OGR data source drivers registered.
         """
-        return vcapi.get_driver_count() + rcapi.get_driver_count()
+        return capi.get_driver_count()
 
     @property
     def name(self):
         """
         Return description/name string for this driver.
         """
-        return force_str(rcapi.get_driver_description(self.ptr))
+        return force_str(capi.get_driver_description(self.ptr))

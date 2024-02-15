@@ -25,10 +25,7 @@ class LiveServerBase(StaticLiveServerTestCase):
 
     @classmethod
     def setUpClass(cls):
-        # Override settings
-        cls.settings_override = override_settings(**TEST_SETTINGS)
-        cls.settings_override.enable()
-        cls.addClassCleanup(cls.settings_override.disable)
+        cls.enterClassContext(override_settings(**TEST_SETTINGS))
         super().setUpClass()
 
 

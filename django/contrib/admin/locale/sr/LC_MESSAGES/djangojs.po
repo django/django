@@ -9,10 +9,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-17 03:19-0500\n"
-"PO-Revision-Date: 2023-04-25 07:59+0000\n"
+"POT-Creation-Date: 2023-09-18 15:04-0300\n"
+"PO-Revision-Date: 2023-12-04 07:59+0000\n"
 "Last-Translator: Igor Jerosimić, 2021,2023\n"
-"Language-Team: Serbian (http://www.transifex.com/django/django/language/"
+"Language-Team: Serbian (http://app.transifex.com/django/django/language/"
 "sr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -245,6 +245,55 @@ msgstr "нов"
 msgctxt "abbrev. month December"
 msgid "Dec"
 msgstr "дец"
+
+msgid "Sunday"
+msgstr "недеља"
+
+msgid "Monday"
+msgstr "понедељак"
+
+msgid "Tuesday"
+msgstr "уторак"
+
+msgid "Wednesday"
+msgstr "среда"
+
+msgid "Thursday"
+msgstr "четвртак"
+
+msgid "Friday"
+msgstr "петак"
+
+msgid "Saturday"
+msgstr "субота"
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr "нед"
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr "пон"
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr "уто"
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr "сре"
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr "чет"
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr "пет"
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr "суб"
 
 msgctxt "one letter Sunday"
 msgid "S"

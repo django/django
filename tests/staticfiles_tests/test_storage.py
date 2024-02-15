@@ -361,6 +361,7 @@ class TestHashedFiles:
 
 @override_settings(
     STORAGES={
+        **settings.STORAGES,
         STATICFILES_STORAGE_ALIAS: {
             "BACKEND": "staticfiles_tests.storage.ExtraPatternsStorage",
         },
@@ -396,6 +397,7 @@ class TestExtraPatternsStorage(CollectionTestCase):
 
 @override_settings(
     STORAGES={
+        **settings.STORAGES,
         STATICFILES_STORAGE_ALIAS: {
             "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
         },
@@ -415,16 +417,15 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         with open(self._clear_filename, "w") as f:
             f.write("to be deleted in one test")
 
-        self.patched_settings = self.settings(
+        patched_settings = self.settings(
             STATICFILES_DIRS=settings.STATICFILES_DIRS + [temp_dir],
         )
-        self.patched_settings.enable()
+        patched_settings.enable()
+        self.addCleanup(patched_settings.disable)
         self.addCleanup(shutil.rmtree, temp_dir)
         self._manifest_strict = storage.staticfiles_storage.manifest_strict
 
     def tearDown(self):
-        self.patched_settings.disable()
-
         if os.path.exists(self._clear_filename):
             os.unlink(self._clear_filename)
 
@@ -561,6 +562,7 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
 
 @override_settings(
     STORAGES={
+        **settings.STORAGES,
         STATICFILES_STORAGE_ALIAS: {
             "BACKEND": "staticfiles_tests.storage.NoneHashStorage",
         },
@@ -576,6 +578,7 @@ class TestCollectionNoneHashStorage(CollectionTestCase):
 
 @override_settings(
     STORAGES={
+        **settings.STORAGES,
         STATICFILES_STORAGE_ALIAS: {
             "BACKEND": "staticfiles_tests.storage.NoPostProcessReplacedPathStorage",
         },
@@ -592,6 +595,7 @@ class TestCollectionNoPostProcessReplacedPaths(CollectionTestCase):
 
 @override_settings(
     STORAGES={
+        **settings.STORAGES,
         STATICFILES_STORAGE_ALIAS: {
             "BACKEND": "staticfiles_tests.storage.SimpleStorage",
         },
@@ -630,6 +634,7 @@ class JSModuleImportAggregationManifestStorage(storage.ManifestStaticFilesStorag
 
 @override_settings(
     STORAGES={
+        **settings.STORAGES,
         STATICFILES_STORAGE_ALIAS: {
             "BACKEND": (
                 "staticfiles_tests.test_storage."
@@ -696,13 +701,13 @@ class CustomManifestStorage(storage.ManifestStaticFilesStorage):
 
 class TestCustomManifestStorage(SimpleTestCase):
     def setUp(self):
-        self.manifest_path = Path(tempfile.mkdtemp())
-        self.addCleanup(shutil.rmtree, self.manifest_path)
+        manifest_path = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, manifest_path)
 
         self.staticfiles_storage = CustomManifestStorage(
-            manifest_location=self.manifest_path,
+            manifest_location=manifest_path,
         )
-        self.manifest_file = self.manifest_path / self.staticfiles_storage.manifest_name
+        self.manifest_file = manifest_path / self.staticfiles_storage.manifest_name
         # Manifest without paths.
         self.manifest = {"version": self.staticfiles_storage.manifest_version}
         with self.manifest_file.open("w") as manifest_file:
@@ -756,12 +761,9 @@ class TestStaticFilePermissions(CollectionTestCase):
 
     def setUp(self):
         self.umask = 0o027
-        self.old_umask = os.umask(self.umask)
+        old_umask = os.umask(self.umask)
+        self.addCleanup(os.umask, old_umask)
         super().setUp()
-
-    def tearDown(self):
-        os.umask(self.old_umask)
-        super().tearDown()
 
     # Don't run collectstatic command in this test class.
     def run_collectstatic(self, **kwargs):
@@ -811,6 +813,7 @@ class TestStaticFilePermissions(CollectionTestCase):
         FILE_UPLOAD_PERMISSIONS=0o655,
         FILE_UPLOAD_DIRECTORY_PERMISSIONS=0o765,
         STORAGES={
+            **settings.STORAGES,
             STATICFILES_STORAGE_ALIAS: {
                 "BACKEND": "staticfiles_tests.test_storage.CustomStaticFilesStorage",
             },
@@ -835,6 +838,7 @@ class TestStaticFilePermissions(CollectionTestCase):
 
 @override_settings(
     STORAGES={
+        **settings.STORAGES,
         STATICFILES_STORAGE_ALIAS: {
             "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
         },

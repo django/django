@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Andrej Marsetič, 2022
+# Andrej Marsetič, 2022-2023
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jure Cuhalev <gandalf@owca.info>, 2011
 # Primoz Verdnik <primoz.verdnik@gmail.com>, 2013-2014
@@ -11,10 +11,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-07 14:40+0200\n"
-"PO-Revision-Date: 2023-04-24 18:40+0000\n"
-"Last-Translator: Andrej Marsetič, 2022\n"
-"Language-Team: Slovenian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 18:40+0000\n"
+"Last-Translator: Andrej Marsetič, 2022-2023\n"
+"Language-Team: Slovenian (http://app.transifex.com/django/django/language/"
 "sl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -46,7 +46,7 @@ msgctxt "ordinal 2"
 msgid "{}nd"
 msgstr ""
 
-#. Translators: Ordinal format when value ends with 3, e.g. 83th, except 13.
+#. Translators: Ordinal format when value ends with 3, e.g. 83rd, except 13.
 msgctxt "ordinal 3"
 msgid "{}rd"
 msgstr ""
@@ -209,7 +209,7 @@ msgstr "včeraj"
 #. weeks'
 #, python-format
 msgid "%(delta)s ago"
-msgstr ""
+msgstr "pred %(delta)s"
 
 #. Translators: please keep a non-breaking space (U+00A0) between count
 #. and time unit.
@@ -278,7 +278,7 @@ msgstr[3] "čez %(count)s ur"
 #. weeks'
 #, python-format
 msgid "%(delta)s from now"
-msgstr ""
+msgstr "%(delta)sod zdaj"
 
 #. Translators: 'naturaltime-past' strings will be included in '%(delta)s ago'
 #, python-format
@@ -303,10 +303,10 @@ msgstr[3] "%(num)d mesecev"
 msgctxt "naturaltime-past"
 msgid "%(num)d week"
 msgid_plural "%(num)d weeks"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "%(num)d teden"
+msgstr[1] "%(num)d tedna"
+msgstr[2] "%(num)d tednov"
+msgstr[3] "%(num)d tednov"
 
 #, python-format
 msgctxt "naturaltime-past"

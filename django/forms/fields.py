@@ -15,9 +15,9 @@ from decimal import Decimal, DecimalException
 from io import BytesIO
 from urllib.parse import urlsplit, urlunsplit
 
+from django.conf import settings
 from django.core import validators
 from django.core.exceptions import ValidationError
-from django.db.models.enums import ChoicesMeta
 from django.forms.boundfield import BoundField
 from django.forms.utils import from_current_timezone, to_current_timezone
 from django.forms.widgets import (
@@ -42,6 +42,7 @@ from django.forms.widgets import (
     URLInput,
 )
 from django.utils import formats
+from django.utils.choices import normalize_choices
 from django.utils.dateparse import parse_datetime, parse_duration
 from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.duration import duration_string
@@ -259,6 +260,10 @@ class Field:
         result.error_messages = self.error_messages.copy()
         result.validators = self.validators[:]
         return result
+
+    def _clean_bound_field(self, bf):
+        value = bf.initial if self.disabled else bf.data
+        return self.clean(value)
 
 
 class CharField(Field):
@@ -693,6 +698,10 @@ class FileField(Field):
     def has_changed(self, initial, data):
         return not self.disabled and data is not None
 
+    def _clean_bound_field(self, bf):
+        value = bf.initial if self.disabled else bf.data
+        return self.clean(value, bf.initial)
+
 
 class ImageField(FileField):
     default_validators = [validators.validate_image_file_extension]
@@ -762,14 +771,19 @@ class URLField(CharField):
 
     def __init__(self, *, assume_scheme=None, **kwargs):
         if assume_scheme is None:
-            warnings.warn(
-                "The default scheme will be changed from 'http' to 'https' in Django "
-                "6.0. Pass the forms.URLField.assume_scheme argument to silence this "
-                "warning.",
-                RemovedInDjango60Warning,
-                stacklevel=2,
-            )
-            assume_scheme = "http"
+            if settings.FORMS_URLFIELD_ASSUME_HTTPS:
+                assume_scheme = "https"
+            else:
+                warnings.warn(
+                    "The default scheme will be changed from 'http' to 'https' in "
+                    "Django 6.0. Pass the forms.URLField.assume_scheme argument to "
+                    "silence this warning, or set the FORMS_URLFIELD_ASSUME_HTTPS "
+                    "transitional setting to True to opt into using 'https' as the new "
+                    "default scheme.",
+                    RemovedInDjango60Warning,
+                    stacklevel=2,
+                )
+                assume_scheme = "http"
         # RemovedInDjango60Warning: When the deprecation ends, replace with:
         # self.assume_scheme = assume_scheme or "https"
         self.assume_scheme = assume_scheme
@@ -861,14 +875,6 @@ class NullBooleanField(BooleanField):
         pass
 
 
-class CallableChoiceIterator:
-    def __init__(self, choices_func):
-        self.choices_func = choices_func
-
-    def __iter__(self):
-        yield from self.choices_func()
-
-
 class ChoiceField(Field):
     widget = Select
     default_error_messages = {
@@ -879,8 +885,6 @@ class ChoiceField(Field):
 
     def __init__(self, *, choices=(), **kwargs):
         super().__init__(**kwargs)
-        if isinstance(choices, ChoicesMeta):
-            choices = choices.choices
         self.choices = choices
 
     def __deepcopy__(self, memo):
@@ -888,21 +892,15 @@ class ChoiceField(Field):
         result._choices = copy.deepcopy(self._choices, memo)
         return result
 
-    def _get_choices(self):
+    @property
+    def choices(self):
         return self._choices
 
-    def _set_choices(self, value):
-        # Setting choices also sets the choices on the widget.
-        # choices can be any iterable, but we call list() on it because
-        # it will be consumed more than once.
-        if callable(value):
-            value = CallableChoiceIterator(value)
-        else:
-            value = list(value)
-
-        self._choices = self.widget.choices = value
-
-    choices = property(_get_choices, _set_choices)
+    @choices.setter
+    def choices(self, value):
+        # Setting choices on the field also sets the choices on the widget.
+        # Note that the property setter for the widget will re-normalize.
+        self._choices = self.widget.choices = normalize_choices(value)
 
     def to_python(self, value):
         """Return a string."""
@@ -1304,7 +1302,7 @@ class GenericIPAddressField(CharField):
         self.unpack_ipv4 = unpack_ipv4
         self.default_validators = validators.ip_address_validators(
             protocol, unpack_ipv4
-        )[0]
+        )
         super().__init__(**kwargs)
 
     def to_python(self, value):

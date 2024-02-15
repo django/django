@@ -608,8 +608,9 @@ entire site. You'll need to add
 Then, add the following required settings to your Django settings file:
 
 * :setting:`CACHE_MIDDLEWARE_ALIAS` -- The cache alias to use for storage.
-* :setting:`CACHE_MIDDLEWARE_SECONDS` -- The number of seconds each page should
-  be cached.
+* :setting:`CACHE_MIDDLEWARE_SECONDS` -- The integer number of seconds each
+  page should be cached.
+
 * :setting:`CACHE_MIDDLEWARE_KEY_PREFIX` -- If the cache is shared across
   multiple sites using the same Django installation, set this to the name of
   the site, or some other string that is unique to this Django instance, to
@@ -668,8 +669,7 @@ decorator that will automatically cache the view's response for you::
 
 
     @cache_page(60 * 15)
-    def my_view(request):
-        ...
+    def my_view(request): ...
 
 ``cache_page`` takes a single argument: the cache timeout, in seconds. In the
 above example, the result of the ``my_view()`` view will be cached for 15
@@ -699,8 +699,7 @@ which directs the decorator to use a specific cache (from your
 want::
 
     @cache_page(60 * 15, cache="special_cache")
-    def my_view(request):
-        ...
+    def my_view(request): ...
 
 You can also override the cache prefix on a per-view basis. ``cache_page``
 takes an optional keyword argument, ``key_prefix``,
@@ -708,8 +707,7 @@ which works in the same way as the :setting:`CACHE_MIDDLEWARE_KEY_PREFIX`
 setting for the middleware.  It can be used like this::
 
     @cache_page(60 * 15, key_prefix="site1")
-    def my_view(request):
-        ...
+    def my_view(request): ...
 
 The ``key_prefix`` and ``cache`` arguments may be specified together. The
 ``key_prefix`` argument and the :setting:`KEY_PREFIX <CACHES-KEY_PREFIX>`
@@ -872,9 +870,11 @@ Accessing the cache
     requests for the same alias in the same thread will return the same
     object.
 
+    .. code-block:: pycon
+
         >>> from django.core.cache import caches
-        >>> cache1 = caches['myalias']
-        >>> cache2 = caches['myalias']
+        >>> cache1 = caches["myalias"]
+        >>> cache2 = caches["myalias"]
         >>> cache1 is cache2
         True
 
@@ -906,11 +906,15 @@ The basic interface is:
 
 .. method:: cache.set(key, value, timeout=DEFAULT_TIMEOUT, version=None)
 
-    >>> cache.set('my_key', 'hello, world!', 30)
+.. code-block:: pycon
+
+    >>> cache.set("my_key", "hello, world!", 30)
 
 .. method:: cache.get(key, default=None, version=None)
 
-    >>> cache.get('my_key')
+.. code-block:: pycon
+
+    >>> cache.get("my_key")
     'hello, world!'
 
 ``key`` should be a ``str``, and ``value`` can be any picklable Python object.
@@ -1043,7 +1047,7 @@ of keys to be cleared:
 
 Finally, if you want to delete all the keys in the cache, use
 ``cache.clear()``.  Be careful with this; ``clear()`` will remove *everything*
-from the cache, not just the keys set by your application. :
+from the cache, not just the keys set by your application:
 
 .. code-block:: pycon
 
@@ -1099,6 +1103,8 @@ nonexistent cache key:
 
 You can close the connection to your cache with ``close()`` if implemented by
 the cache backend.
+
+.. code-block:: pycon
 
     >>> cache.close()
 
@@ -1334,8 +1340,7 @@ To do this in Django, use the convenient
 
 
     @vary_on_headers("User-Agent")
-    def my_view(request):
-        ...
+    def my_view(request): ...
 
 In this case, a caching mechanism (such as Django's own cache middleware) will
 cache a separate version of the page for each unique user-agent.
@@ -1349,8 +1354,7 @@ anything that was already in there.
 You can pass multiple headers to ``vary_on_headers()``::
 
     @vary_on_headers("User-Agent", "Cookie")
-    def my_view(request):
-        ...
+    def my_view(request): ...
 
 This tells downstream caches to vary on *both*, which means each combination of
 user-agent and cookie will get its own cache value. For example, a request with
@@ -1363,13 +1367,11 @@ Because varying on cookie is so common, there's a
 are equivalent::
 
     @vary_on_cookie
-    def my_view(request):
-        ...
+    def my_view(request): ...
 
 
     @vary_on_headers("Cookie")
-    def my_view(request):
-        ...
+    def my_view(request): ...
 
 The headers you pass to ``vary_on_headers`` are not case sensitive;
 ``"User-Agent"`` is the same thing as ``"user-agent"``.
@@ -1415,8 +1417,7 @@ decorator. Example::
 
 
     @cache_control(private=True)
-    def my_view(request):
-        ...
+    def my_view(request): ...
 
 This decorator takes care of sending out the appropriate HTTP header behind the
 scenes.
@@ -1455,8 +1456,7 @@ directive::
 
 
     @cache_control(max_age=3600)
-    def my_view(request):
-        ...
+    def my_view(request): ...
 
 (If you *do* use the caching middleware, it already sets the ``max-age`` with
 the value of the :setting:`CACHE_MIDDLEWARE_SECONDS` setting. In that case,
@@ -1486,8 +1486,7 @@ caches. Example::
 
 
     @never_cache
-    def myview(request):
-        ...
+    def myview(request): ...
 
 Order of ``MIDDLEWARE``
 =======================

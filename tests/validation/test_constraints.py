@@ -6,6 +6,7 @@ from .models import (
     ChildUniqueConstraintProduct,
     Product,
     UniqueConstraintConditionProduct,
+    UniqueConstraintNullsDistinctProduct,
     UniqueConstraintProduct,
 )
 
@@ -92,4 +93,26 @@ class PerformConstraintChecksTest(TestCase):
     def test_full_clean_with_partial_unique_constraints_disabled(self):
         UniqueConstraintConditionProduct.objects.create(name="product")
         product = UniqueConstraintConditionProduct(name="product")
+        product.full_clean(validate_constraints=False)
+
+    @skipUnlessDBFeature("supports_nulls_distinct_unique_constraints")
+    def test_full_clean_with_nulls_distinct_unique_constraints(self):
+        UniqueConstraintNullsDistinctProduct.objects.create(name=None)
+        product = UniqueConstraintNullsDistinctProduct(name=None)
+        with self.assertRaises(ValidationError) as cm:
+            product.full_clean()
+        self.assertEqual(
+            cm.exception.message_dict,
+            {
+                "name": [
+                    "Unique constraint nulls distinct product with this Name "
+                    "already exists."
+                ]
+            },
+        )
+
+    @skipUnlessDBFeature("supports_nulls_distinct_unique_constraints")
+    def test_full_clean_with_nulls_distinct_unique_constraints_disabled(self):
+        UniqueConstraintNullsDistinctProduct.objects.create(name=None)
+        product = UniqueConstraintNullsDistinctProduct(name=None)
         product.full_clean(validate_constraints=False)

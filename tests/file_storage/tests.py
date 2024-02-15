@@ -15,18 +15,9 @@ from django.conf import DEFAULT_STORAGE_ALIAS, STATICFILES_STORAGE_ALIAS
 from django.core.cache import cache
 from django.core.exceptions import SuspiciousFileOperation
 from django.core.files.base import ContentFile, File
-from django.core.files.storage import (
-    GET_STORAGE_CLASS_DEPRECATED_MSG,
-    FileSystemStorage,
-    InvalidStorageError,
-)
+from django.core.files.storage import FileSystemStorage, InvalidStorageError
 from django.core.files.storage import Storage as BaseStorage
-from django.core.files.storage import (
-    StorageHandler,
-    default_storage,
-    get_storage_class,
-    storages,
-)
+from django.core.files.storage import StorageHandler, default_storage, storages
 from django.core.files.uploadedfile import (
     InMemoryUploadedFile,
     SimpleUploadedFile,
@@ -35,11 +26,10 @@ from django.core.files.uploadedfile import (
 from django.db.models import FileField
 from django.db.models.fields.files import FileDescriptor
 from django.test import LiveServerTestCase, SimpleTestCase, TestCase, override_settings
-from django.test.utils import ignore_warnings, requires_tz_support
+from django.test.utils import requires_tz_support
 from django.urls import NoReverseMatch, reverse_lazy
 from django.utils import timezone
 from django.utils._os import symlinks_supported
-from django.utils.deprecation import RemovedInDjango51Warning
 
 from .models import (
     Storage,
@@ -50,51 +40,6 @@ from .models import (
 )
 
 FILE_SUFFIX_REGEX = "[A-Za-z0-9]{7}"
-
-
-class GetStorageClassTests(SimpleTestCase):
-    @ignore_warnings(category=RemovedInDjango51Warning)
-    def test_get_filesystem_storage(self):
-        """
-        get_storage_class returns the class for a storage backend name/path.
-        """
-        self.assertEqual(
-            get_storage_class("django.core.files.storage.FileSystemStorage"),
-            FileSystemStorage,
-        )
-
-    @ignore_warnings(category=RemovedInDjango51Warning)
-    def test_get_invalid_storage_module(self):
-        """
-        get_storage_class raises an error if the requested import don't exist.
-        """
-        with self.assertRaisesMessage(ImportError, "No module named 'storage'"):
-            get_storage_class("storage.NonexistentStorage")
-
-    @ignore_warnings(category=RemovedInDjango51Warning)
-    def test_get_nonexistent_storage_class(self):
-        """
-        get_storage_class raises an error if the requested class don't exist.
-        """
-        with self.assertRaises(ImportError):
-            get_storage_class("django.core.files.storage.NonexistentStorage")
-
-    @ignore_warnings(category=RemovedInDjango51Warning)
-    def test_get_nonexistent_storage_module(self):
-        """
-        get_storage_class raises an error if the requested module don't exist.
-        """
-        with self.assertRaisesMessage(
-            ImportError, "No module named 'django.core.files.nonexistent_storage'"
-        ):
-            get_storage_class(
-                "django.core.files.nonexistent_storage.NonexistentStorage"
-            )
-
-    def test_deprecation_warning(self):
-        msg = GET_STORAGE_CLASS_DEPRECATED_MSG
-        with self.assertRaisesMessage(RemovedInDjango51Warning, msg):
-            get_storage_class("django.core.files.storage.FileSystemStorage"),
 
 
 class FileSystemStorageTests(unittest.TestCase):
@@ -126,16 +71,10 @@ class FileStorageTests(SimpleTestCase):
 
     def setUp(self):
         self.temp_dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.temp_dir)
         self.storage = self.storage_class(
             location=self.temp_dir, base_url="/test_media_url/"
         )
-        # Set up a second temporary directory which is ensured to have a mixed
-        # case name.
-        self.temp_dir2 = tempfile.mkdtemp(suffix="aBc")
-
-    def tearDown(self):
-        shutil.rmtree(self.temp_dir)
-        shutil.rmtree(self.temp_dir2)
 
     def test_empty_location(self):
         """
@@ -469,14 +408,16 @@ class FileStorageTests(SimpleTestCase):
         """The storage backend should preserve case of filenames."""
         # Create a storage backend associated with the mixed case name
         # directory.
-        other_temp_storage = self.storage_class(location=self.temp_dir2)
+        temp_dir2 = tempfile.mkdtemp(suffix="aBc")
+        self.addCleanup(shutil.rmtree, temp_dir2)
+        other_temp_storage = self.storage_class(location=temp_dir2)
         # Ask that storage backend to store a file with a mixed case filename.
         mixed_case = "CaSe_SeNsItIvE"
         file = other_temp_storage.open(mixed_case, "w")
         file.write("storage contents")
         file.close()
         self.assertEqual(
-            os.path.join(self.temp_dir2, mixed_case),
+            os.path.join(temp_dir2, mixed_case),
             other_temp_storage.path(mixed_case),
         )
         other_temp_storage.delete(mixed_case)
@@ -972,9 +913,7 @@ class FieldCallableFileStorageTests(SimpleTestCase):
         self.temp_storage_location = tempfile.mkdtemp(
             suffix="filefield_callable_storage"
         )
-
-    def tearDown(self):
-        shutil.rmtree(self.temp_storage_location)
+        self.addCleanup(shutil.rmtree, self.temp_storage_location)
 
     def test_callable_base_class_error_raises(self):
         class NotStorage:
@@ -1048,11 +987,9 @@ class SlowFile(ContentFile):
 class FileSaveRaceConditionTest(SimpleTestCase):
     def setUp(self):
         self.storage_dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.storage_dir)
         self.storage = FileSystemStorage(self.storage_dir)
         self.thread = threading.Thread(target=self.save_file, args=["conflict"])
-
-    def tearDown(self):
-        shutil.rmtree(self.storage_dir)
 
     def save_file(self, name):
         name = self.storage.save(name, SlowFile(b"Data"))
@@ -1072,12 +1009,10 @@ class FileSaveRaceConditionTest(SimpleTestCase):
 class FileStoragePermissions(unittest.TestCase):
     def setUp(self):
         self.umask = 0o027
-        self.old_umask = os.umask(self.umask)
+        old_umask = os.umask(self.umask)
+        self.addCleanup(os.umask, old_umask)
         self.storage_dir = tempfile.mkdtemp()
-
-    def tearDown(self):
-        shutil.rmtree(self.storage_dir)
-        os.umask(self.old_umask)
+        self.addCleanup(shutil.rmtree, self.storage_dir)
 
     @override_settings(FILE_UPLOAD_PERMISSIONS=0o654)
     def test_file_upload_permissions(self):
@@ -1114,10 +1049,8 @@ class FileStoragePermissions(unittest.TestCase):
 class FileStoragePathParsing(SimpleTestCase):
     def setUp(self):
         self.storage_dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.storage_dir)
         self.storage = FileSystemStorage(self.storage_dir)
-
-    def tearDown(self):
-        shutil.rmtree(self.storage_dir)
 
     def test_directory_with_dot(self):
         """Regression test for #9610.
@@ -1150,11 +1083,9 @@ class FileStoragePathParsing(SimpleTestCase):
 
 class ContentFileStorageTestCase(unittest.TestCase):
     def setUp(self):
-        self.storage_dir = tempfile.mkdtemp()
-        self.storage = FileSystemStorage(self.storage_dir)
-
-    def tearDown(self):
-        shutil.rmtree(self.storage_dir)
+        storage_dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, storage_dir)
+        self.storage = FileSystemStorage(storage_dir)
 
     def test_content_saving(self):
         """
@@ -1175,10 +1106,8 @@ class FileLikeObjectTestCase(LiveServerTestCase):
 
     def setUp(self):
         self.temp_dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.temp_dir)
         self.storage = FileSystemStorage(location=self.temp_dir)
-
-    def tearDown(self):
-        shutil.rmtree(self.temp_dir)
 
     def test_urllib_request_urlopen(self):
         """

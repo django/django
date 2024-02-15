@@ -4,7 +4,7 @@ import warnings
 from asgiref.sync import iscoroutinefunction, markcoroutinefunction, sync_to_async
 
 
-class RemovedInDjango51Warning(DeprecationWarning):
+class RemovedInNextVersionWarning(DeprecationWarning):
     pass
 
 
@@ -12,7 +12,6 @@ class RemovedInDjango60Warning(PendingDeprecationWarning):
     pass
 
 
-RemovedInNextVersionWarning = RemovedInDjango51Warning
 RemovedAfterNextVersionWarning = RemovedInDjango60Warning
 
 
@@ -101,7 +100,13 @@ class MiddlewareMixin:
         if get_response is None:
             raise ValueError("get_response must be provided.")
         self.get_response = get_response
-        self._async_check()
+        # If get_response is a coroutine function, turns us into async mode so
+        # a thread is not consumed during a whole request.
+        self.async_mode = iscoroutinefunction(self.get_response)
+        if self.async_mode:
+            # Mark the class as async-capable, but do the actual switch inside
+            # __call__ to avoid swapping out dunder methods.
+            markcoroutinefunction(self)
         super().__init__()
 
     def __repr__(self):
@@ -114,19 +119,9 @@ class MiddlewareMixin:
             ),
         )
 
-    def _async_check(self):
-        """
-        If get_response is a coroutine function, turns us into async mode so
-        a thread is not consumed during a whole request.
-        """
-        if iscoroutinefunction(self.get_response):
-            # Mark the class as async-capable, but do the actual switch
-            # inside __call__ to avoid swapping out dunder methods
-            markcoroutinefunction(self)
-
     def __call__(self, request):
         # Exit out to async mode, if needed
-        if iscoroutinefunction(self):
+        if self.async_mode:
             return self.__acall__(request)
         response = None
         if hasattr(self, "process_request"):

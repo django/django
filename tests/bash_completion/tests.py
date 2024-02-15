@@ -1,6 +1,7 @@
 """
 A series of tests to establish that the command-line bash completion works.
 """
+
 import os
 import sys
 import unittest

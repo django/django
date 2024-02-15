@@ -82,11 +82,6 @@ For a class to be a lookup, it must follow the :ref:`Query Expression API
 <query-expression>`. :class:`~Lookup` and :class:`~Transform` naturally
 follow this API.
 
-.. versionchanged:: 4.2
-
-    Support for registering lookups on :class:`~django.db.models.Field`
-    instances was added.
-
 .. _query-expression:
 
 The Query Expression API
@@ -217,6 +212,14 @@ following methods:
 
         The name of this lookup, used to identify it on parsing query
         expressions. It cannot contain the string ``"__"``.
+
+    .. attribute:: prepare_rhs
+
+        Defaults to ``True``. When :attr:`rhs` is a plain value,
+        :attr:`prepare_rhs` determines whether it should be prepared for use as
+        a parameter in a query. In order to do so,
+        ``lhs.output_field.get_prep_value()`` is called if defined, or ``rhs``
+        is wrapped in :class:`Value() <django.db.models.Value>` otherwise.
 
     .. method:: process_lhs(compiler, connection, lhs=None)
 

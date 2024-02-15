@@ -71,6 +71,6 @@ class EmailFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         self.assertIsNone(f.clean(None))
 
     def test_emailfield_unable_to_set_strip_kwarg(self):
-        msg = "__init__() got multiple values for keyword argument 'strip'"
+        msg = "got multiple values for keyword argument 'strip'"
         with self.assertRaisesMessage(TypeError, msg):
             EmailField(strip=False)

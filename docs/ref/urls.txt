@@ -79,11 +79,6 @@ pattern (:py:func:`re.fullmatch` is used).
 The ``view``, ``kwargs`` and ``name`` arguments are the same as for
 :func:`~django.urls.path()`.
 
-.. versionchanged:: 2.2.25
-
-    In older versions, a full-match wasn't required for a ``route`` which ends
-    with ``$``.
-
 ``include()``
 =============
 

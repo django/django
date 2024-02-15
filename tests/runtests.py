@@ -26,13 +26,11 @@ else:
     from django.db import connection, connections
     from django.test import TestCase, TransactionTestCase
     from django.test.runner import get_max_test_processes, parallel_type
-    from django.test.selenium import SeleniumTestCaseBase
+    from django.test.selenium import SeleniumTestCase, SeleniumTestCaseBase
     from django.test.utils import NullTimeKeeper, TimeKeeper, get_runner
-    from django.utils.deprecation import (
-        RemovedInDjango51Warning,
-        RemovedInDjango60Warning,
-    )
+    from django.utils.deprecation import RemovedInDjango60Warning
     from django.utils.log import DEFAULT_LOGGING
+    from django.utils.version import PY312, PYPY
 
 try:
     import MySQLdb
@@ -44,22 +42,18 @@ else:
 
 # Make deprecation warnings errors to ensure no usage of deprecated features.
 warnings.simplefilter("error", RemovedInDjango60Warning)
-warnings.simplefilter("error", RemovedInDjango51Warning)
 # Make resource and runtime warning errors to ensure no usage of error prone
 # patterns.
 warnings.simplefilter("error", ResourceWarning)
 warnings.simplefilter("error", RuntimeWarning)
-# Ignore known warnings in test dependencies.
-warnings.filterwarnings(
-    "ignore", "'U' mode is deprecated", DeprecationWarning, module="docutils.io"
-)
 
 # Reduce garbage collection frequency to improve performance. Since CPython
 # uses refcounting, garbage collection only collects objects with cyclic
 # references, which are a minority, so the garbage collection threshold can be
 # larger than the default threshold of 700 allocations + deallocations without
 # much increase in memory usage.
-gc.set_threshold(100_000)
+if not PYPY:
+    gc.set_threshold(100_000)
 
 RUNTESTS_DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -73,6 +67,10 @@ tempfile.tempdir = os.environ["TMPDIR"] = TMPDIR
 
 # Removing the temporary TMPDIR.
 atexit.register(shutil.rmtree, TMPDIR)
+
+# Add variables enabling coverage to trace code in subprocesses.
+os.environ["RUNTESTS_DIR"] = RUNTESTS_DIR
+os.environ["COVERAGE_PROCESS_START"] = os.path.join(RUNTESTS_DIR, ".coveragerc")
 
 
 # This is a dict mapping RUNTESTS_DIR subdirectory to subdirectories of that
@@ -244,13 +242,6 @@ def setup_collect_tests(start_at, start_after, test_labels=None):
     settings.LOGGING = log_config
     settings.SILENCED_SYSTEM_CHECKS = [
         "fields.W342",  # ForeignKey(unique=True) -> OneToOneField
-        # django.contrib.postgres.fields.CICharField deprecated.
-        "fields.W905",
-        "postgres.W004",
-        # django.contrib.postgres.fields.CIEmailField deprecated.
-        "fields.W906",
-        # django.contrib.postgres.fields.CITextField deprecated.
-        "fields.W907",
     ]
 
     # Load all the ALWAYS_INSTALLED_APPS.
@@ -380,6 +371,7 @@ def django_tests(
     buffer,
     timing,
     shuffle,
+    durations=None,
 ):
     if parallel in {0, "auto"}:
         max_parallel = get_max_test_processes()
@@ -425,6 +417,7 @@ def django_tests(
         buffer=buffer,
         timing=timing,
         shuffle=shuffle,
+        durations=durations,
     )
     failures = test_runner.run_tests(test_labels)
     teardown_run_tests(state)
@@ -607,6 +600,11 @@ if __name__ == "__main__":
         help="A comma-separated list of browsers to run the Selenium tests against.",
     )
     parser.add_argument(
+        "--screenshots",
+        action="store_true",
+        help="Take screenshots during selenium tests to capture the user interface.",
+    )
+    parser.add_argument(
         "--headless",
         action="store_true",
         help="Run selenium tests in headless mode, if the browser supports the option.",
@@ -688,6 +686,15 @@ if __name__ == "__main__":
             "Same as unittest -k option. Can be used multiple times."
         ),
     )
+    if PY312:
+        parser.add_argument(
+            "--durations",
+            dest="durations",
+            type=int,
+            default=None,
+            metavar="N",
+            help="Show the N slowest test cases (N=0 for all).",
+        )
 
     options = parser.parse_args()
 
@@ -698,6 +705,10 @@ if __name__ == "__main__":
         )
     if using_selenium_hub and not options.external_host:
         parser.error("--selenium-hub and --external-host must be used together.")
+    if options.screenshots and not options.selenium:
+        parser.error("--screenshots require --selenium to be used.")
+    if options.screenshots and options.tags:
+        parser.error("--screenshots and --tag are mutually exclusive.")
 
     # Allow including a trailing slash on app_labels for tab completion convenience
     options.modules = [os.path.normpath(labels) for labels in options.modules]
@@ -747,6 +758,9 @@ if __name__ == "__main__":
             SeleniumTestCaseBase.external_host = options.external_host
         SeleniumTestCaseBase.headless = options.headless
         SeleniumTestCaseBase.browsers = options.selenium
+        if options.screenshots:
+            options.tags = ["screenshot"]
+            SeleniumTestCase.screenshots = options.screenshots
 
     if options.bisect:
         bisect_tests(
@@ -778,13 +792,14 @@ if __name__ == "__main__":
                 options.parallel,
                 options.tags,
                 options.exclude_tags,
-                getattr(options, "test_name_patterns", None),
+                options.test_name_patterns,
                 options.start_at,
                 options.start_after,
                 options.pdb,
                 options.buffer,
                 options.timing,
                 options.shuffle,
+                getattr(options, "durations", None),
             )
         time_keeper.print_results()
         if failures:

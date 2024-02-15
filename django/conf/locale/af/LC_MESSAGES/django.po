@@ -1,17 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# F Wolff <friedel@translate.org.za>, 2019-2020,2022
+# F Wolff <friedel@translate.org.za>, 2019-2020,2022-2023
 # Stephen Cox <stephencoxmail@gmail.com>, 2011-2012
 # unklphil <villiers.strauss@gmail.com>, 2014,2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:23-0500\n"
-"PO-Revision-Date: 2022-07-25 06:49+0000\n"
-"Last-Translator: F Wolff <friedel@translate.org.za>\n"
-"Language-Team: Afrikaans (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 06:49+0000\n"
+"Last-Translator: F Wolff <friedel@translate.org.za>, 2019-2020,2022-2023\n"
+"Language-Team: Afrikaans (http://app.transifex.com/django/django/language/"
 "af/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -26,7 +26,7 @@ msgid "Arabic"
 msgstr "Arabies"
 
 msgid "Algerian Arabic"
-msgstr ""
+msgstr "Algeriese Arabies"
 
 msgid "Asturian"
 msgstr "Asturies"
@@ -51,6 +51,9 @@ msgstr "Bosnies"
 
 msgid "Catalan"
 msgstr "Katalaans"
+
+msgid "Central Kurdish (Sorani)"
+msgstr ""
 
 msgid "Czech"
 msgstr "Tsjeggies"
@@ -292,6 +295,9 @@ msgstr "Tataars"
 msgid "Udmurt"
 msgstr "Oedmoerts"
 
+msgid "Uyghur"
+msgstr ""
+
 msgid "Ukrainian"
 msgstr "Oekraïens"
 
@@ -352,11 +358,15 @@ msgstr "Gee ’n geldige e-posadres."
 msgid ""
 "Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
 msgstr ""
+"Gee ’n geldige “slak” wat bestaan ​​uit letters, syfers, onderstreep of "
+"koppelteken."
 
 msgid ""
 "Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
+"Gee ’n geldige “slak” wat bestaan ​​uit Unicode-letters, syfers, onderstreep "
+"of koppelteken."
 
 msgid "Enter a valid IPv4 address."
 msgstr "Gee ’n geldige IPv4-adres."
@@ -387,6 +397,12 @@ msgstr "Maak seker dat hierdie waarde groter of gelyk is aan %(limit_value)s."
 msgid "Ensure this value is a multiple of step size %(limit_value)s."
 msgstr ""
 "Maak seker dat hierdie waarde ’n veelvoud is van stapgrootte %(limit_value)s."
+
+#, python-format
+msgid ""
+"Ensure this value is a multiple of step size %(limit_value)s, starting from "
+"%(offset)s, e.g. %(offset)s, %(valid_value1)s, %(valid_value2)s, and so on."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -503,6 +519,9 @@ msgstr "Boole (True of False)"
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "String (hoogstens %(max_length)s karakters)"
+
+msgid "String (unlimited)"
+msgstr "String (onbeperk)"
 
 msgid "Comma-separated integers"
 msgstr "Heelgetalle geskei met kommas"
@@ -827,6 +846,8 @@ msgid ""
 "%(datetime)s couldn’t be interpreted in time zone %(current_timezone)s; it "
 "may be ambiguous or it may not exist."
 msgstr ""
+"%(datetime)s kon nie in die tydsone %(current_timezone)s vertolk word nie; "
+"dit is dalk dubbelsinnig, of bestaan dalk nie."
 
 msgid "Clear"
 msgstr "Maak skoon"
@@ -1167,20 +1188,32 @@ msgid ""
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
+"U sien hierdie boodskap  omdat dié HTTPS-werf vereis dat u webblaaier ’n "
+"“Referer header” moet stuur, maar dit is nie gestuur nie. Hierdie header is "
+"vir sekuriteitsredes nodig om te verseker dat u blaaier nie deur derde "
+"partye gekaap is nie."
 
 msgid ""
 "If you have configured your browser to disable “Referer” headers, please re-"
 "enable them, at least for this site, or for HTTPS connections, or for “same-"
 "origin” requests."
 msgstr ""
+"As “Referer headers” in u blaaier gedeaktiveer is, heraktiveer hulle asb. "
+"ten minste vir dié werf, of vir HTTPS-verbindings, of vir “same-origin”-"
+"versoeke."
 
 msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
 "including the “Referrer-Policy: no-referrer” header, please remove them. The "
 "CSRF protection requires the “Referer” header to do strict referer checking. "
-"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" …> for links to third-party sites."
+"If you’re concerned about privacy, use alternatives like <a "
+"rel=\"noreferrer\" …> for links to third-party sites."
 msgstr ""
+"Indien u die <meta name=\"referrer\" content=\"no-referrer\">-etiket gebruik "
+"of die “Referrer-Policy: no-referrer” header gebruik, verwyder hulle asb. "
+"Die CSRF-beskerming vereis die “Referer” header om streng kontrole van die "
+"verwysende bladsy te doen. Indien u besorg is oor privaatheid, gebruik "
+"alternatiewe soos <a rel=\"noreferrer\" …> vir skakels na derdepartywebwerwe."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
@@ -1195,6 +1228,8 @@ msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
 "them, at least for this site, or for “same-origin” requests."
 msgstr ""
+"Indien koekies in u blaaier gedeaktiveer is, aktiveerder hulle asb. ten "
+"minste vir dié werf, of vir “same-origin”-versoeke."
 
 msgid "More information is available with DEBUG=True."
 msgstr "Meer inligting is beskikbaar met DEBUG=True."
@@ -1236,6 +1271,7 @@ msgstr "Geen %(verbose_name)s gevind vir die soektog"
 
 msgid "Page is not “last”, nor can it be converted to an int."
 msgstr ""
+"Bladsy is nie “last” nie, en dit kan nie omgeskakel word na ’n heelgetal nie."
 
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
@@ -1243,7 +1279,7 @@ msgstr "Ongeldige bladsy (%(page_number)s): %(message)s"
 
 #, python-format
 msgid "Empty list and “%(class_name)s.allow_empty” is False."
-msgstr ""
+msgstr "Leë lys en “%(class_name)s.allow_empty” is vals."
 
 msgid "Directory indexes are not allowed here."
 msgstr "Gidsindekse word nie hier toegelaat nie."
@@ -1271,13 +1307,14 @@ msgstr ""
 #, python-format
 msgid ""
 "You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> is in your settings file and you have not configured any "
-"URLs."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
+"configured any URLs."
 msgstr ""
 "U sien dié bladsy omdat <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> in die settings-lêer is en geen URL’e opgestel is nie."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> in die settings-lêer is en geen URL’e "
+"opgestel is nie."
 
 msgid "Django Documentation"
 msgstr "Django-dokumentasie"

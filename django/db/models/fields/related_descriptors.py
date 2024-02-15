@@ -63,6 +63,8 @@ and two directions (forward and reverse) for a total of six combinations.
    ``ReverseManyToManyDescriptor``, use ``ManyToManyDescriptor`` instead.
 """
 
+import warnings
+
 from asgiref.sync import sync_to_async
 
 from django.core.exceptions import FieldError
@@ -79,6 +81,7 @@ from django.db.models.lookups import GreaterThan, LessThanOrEqual
 from django.db.models.query import QuerySet
 from django.db.models.query_utils import DeferredAttribute
 from django.db.models.utils import AltersData, resolve_callables
+from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.functional import cached_property
 
 
@@ -153,8 +156,23 @@ class ForwardManyToOneDescriptor:
         return self.field.remote_field.model._base_manager.db_manager(hints=hints).all()
 
     def get_prefetch_queryset(self, instances, queryset=None):
+        warnings.warn(
+            "get_prefetch_queryset() is deprecated. Use get_prefetch_querysets() "
+            "instead.",
+            RemovedInDjango60Warning,
+            stacklevel=2,
+        )
         if queryset is None:
-            queryset = self.get_queryset()
+            return self.get_prefetch_querysets(instances)
+        return self.get_prefetch_querysets(instances, [queryset])
+
+    def get_prefetch_querysets(self, instances, querysets=None):
+        if querysets and len(querysets) != 1:
+            raise ValueError(
+                "querysets argument of get_prefetch_querysets() should have a length "
+                "of 1."
+            )
+        queryset = querysets[0] if querysets else self.get_queryset()
         queryset._add_hints(instance=instances[0])
 
         rel_obj_attr = self.field.get_foreign_related_value
@@ -427,8 +445,23 @@ class ReverseOneToOneDescriptor:
         return self.related.related_model._base_manager.db_manager(hints=hints).all()
 
     def get_prefetch_queryset(self, instances, queryset=None):
+        warnings.warn(
+            "get_prefetch_queryset() is deprecated. Use get_prefetch_querysets() "
+            "instead.",
+            RemovedInDjango60Warning,
+            stacklevel=2,
+        )
         if queryset is None:
-            queryset = self.get_queryset()
+            return self.get_prefetch_querysets(instances)
+        return self.get_prefetch_querysets(instances, [queryset])
+
+    def get_prefetch_querysets(self, instances, querysets=None):
+        if querysets and len(querysets) != 1:
+            raise ValueError(
+                "querysets argument of get_prefetch_querysets() should have a length "
+                "of 1."
+            )
+        queryset = querysets[0] if querysets else self.get_queryset()
         queryset._add_hints(instance=instances[0])
 
         rel_obj_attr = self.related.field.get_local_related_value
@@ -728,9 +761,23 @@ def create_reverse_many_to_one_manager(superclass, rel):
                 return self._apply_rel_filters(queryset)
 
         def get_prefetch_queryset(self, instances, queryset=None):
+            warnings.warn(
+                "get_prefetch_queryset() is deprecated. Use get_prefetch_querysets() "
+                "instead.",
+                RemovedInDjango60Warning,
+                stacklevel=2,
+            )
             if queryset is None:
-                queryset = super().get_queryset()
+                return self.get_prefetch_querysets(instances)
+            return self.get_prefetch_querysets(instances, [queryset])
 
+        def get_prefetch_querysets(self, instances, querysets=None):
+            if querysets and len(querysets) != 1:
+                raise ValueError(
+                    "querysets argument of get_prefetch_querysets() should have a "
+                    "length of 1."
+                )
+            queryset = querysets[0] if querysets else super().get_queryset()
             queryset._add_hints(instance=instances[0])
             queryset = queryset.using(queryset._db or self._db)
 
@@ -794,6 +841,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
 
         def create(self, **kwargs):
             self._check_fk_val()
+            self._remove_prefetched_objects()
             kwargs[self.field.name] = self.instance
             db = router.db_for_write(self.model, instance=self.instance)
             return super(RelatedManager, self.db_manager(db)).create(**kwargs)
@@ -1087,9 +1135,23 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                 return self._apply_rel_filters(queryset)
 
         def get_prefetch_queryset(self, instances, queryset=None):
+            warnings.warn(
+                "get_prefetch_queryset() is deprecated. Use get_prefetch_querysets() "
+                "instead.",
+                RemovedInDjango60Warning,
+                stacklevel=2,
+            )
             if queryset is None:
-                queryset = super().get_queryset()
+                return self.get_prefetch_querysets(instances)
+            return self.get_prefetch_querysets(instances, [queryset])
 
+        def get_prefetch_querysets(self, instances, querysets=None):
+            if querysets and len(querysets) != 1:
+                raise ValueError(
+                    "querysets argument of get_prefetch_querysets() should have a "
+                    "length of 1."
+                )
+            queryset = querysets[0] if querysets else super().get_queryset()
             queryset._add_hints(instance=instances[0])
             queryset = queryset.using(queryset._db or self._db)
             queryset = _filter_prefetch_queryset(
@@ -1118,7 +1180,10 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             return (
                 queryset,
                 lambda result: tuple(
-                    getattr(result, "_prefetch_related_val_%s" % f.attname)
+                    f.get_db_prep_value(
+                        getattr(result, f"_prefetch_related_val_{f.attname}"),
+                        connection,
+                    )
                     for f in fk.local_related_fields
                 ),
                 lambda inst: tuple(

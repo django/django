@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2023
 # Martijn Dekker <mcdutchie@hotmail.com>, 2012,2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Interlingua (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 18:45+0000\n"
+"Last-Translator: Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2023\n"
+"Language-Team: Interlingua (http://app.transifex.com/django/django/language/"
 "ia/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -24,7 +25,7 @@ msgid "The base GIS field."
 msgstr "Le campo GIS de base."
 
 msgid ""
-"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
+"The base Geometry field — maps to the OpenGIS Specification Geometry type."
 msgstr ""
 "Le campo Geometry de base. Corresponde al typo geometric del specification "
 "OpenGIS."
@@ -75,9 +76,6 @@ msgstr ""
 msgid "Delete all Features"
 msgstr "Deler tote le elementos"
 
-msgid "WKT debugging window:"
-msgstr "Fenestra pro debugging WKT:"
-
 msgid "Debugging window (serialized value)"
 msgstr "Fenestra pro debugging (valor serialisate)"
 
@@ -85,5 +83,5 @@ msgid "No feeds are registered."
 msgstr "Nulle syndication es registrate."
 
 #, python-format
-msgid "Slug %r isn't registered."
+msgid "Slug %r isn’t registered."
 msgstr "Le denotation %r non es registrate."

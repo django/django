@@ -448,6 +448,8 @@ can specify the field name suffixed with ``_id``. In this case, the value
 parameter is expected to contain the raw value of the foreign model's primary
 key. For example:
 
+.. code-block:: pycon
+
     >>> Entry.objects.filter(blog_id=4)
 
 If you pass an invalid keyword argument, a lookup function will raise
@@ -610,40 +612,42 @@ contained in a single :meth:`~django.db.models.query.QuerySet.filter` call.
     As the second (more permissive) query chains multiple filters, it performs
     multiple joins to the primary model, potentially yielding duplicates.
 
+    .. code-block:: pycon
+
         >>> from datetime import date
-        >>> beatles = Blog.objects.create(name='Beatles Blog')
-        >>> pop = Blog.objects.create(name='Pop Music Blog')
+        >>> beatles = Blog.objects.create(name="Beatles Blog")
+        >>> pop = Blog.objects.create(name="Pop Music Blog")
         >>> Entry.objects.create(
         ...     blog=beatles,
-        ...     headline='New Lennon Biography',
+        ...     headline="New Lennon Biography",
         ...     pub_date=date(2008, 6, 1),
         ... )
         <Entry: New Lennon Biography>
         >>> Entry.objects.create(
         ...     blog=beatles,
-        ...     headline='New Lennon Biography in Paperback',
+        ...     headline="New Lennon Biography in Paperback",
         ...     pub_date=date(2009, 6, 1),
         ... )
         <Entry: New Lennon Biography in Paperback>
         >>> Entry.objects.create(
         ...     blog=pop,
-        ...     headline='Best Albums of 2008',
+        ...     headline="Best Albums of 2008",
         ...     pub_date=date(2008, 12, 15),
         ... )
         <Entry: Best Albums of 2008>
         >>> Entry.objects.create(
         ...     blog=pop,
-        ...     headline='Lennon Would Have Loved Hip Hop',
+        ...     headline="Lennon Would Have Loved Hip Hop",
         ...     pub_date=date(2020, 4, 1),
         ... )
         <Entry: Lennon Would Have Loved Hip Hop>
         >>> Blog.objects.filter(
-        ...     entry__headline__contains='Lennon',
+        ...     entry__headline__contains="Lennon",
         ...     entry__pub_date__year=2008,
         ... )
         <QuerySet [<Blog: Beatles Blog>]>
         >>> Blog.objects.filter(
-        ...     entry__headline__contains='Lennon',
+        ...     entry__headline__contains="Lennon",
         ... ).filter(
         ...     entry__pub_date__year=2008,
         ... )
@@ -1085,15 +1089,6 @@ Unless you are sure you wish to work with SQL ``NULL`` values, consider setting
     Storing JSON scalar ``null`` does not violate :attr:`null=False
     <django.db.models.Field.null>`.
 
-.. versionchanged:: 4.2
-
-    Support for expressing JSON ``null`` using ``Value(None, JSONField())`` was
-    added.
-
-.. deprecated:: 4.2
-
-    Passing ``Value("null")`` to express JSON ``null`` is deprecated.
-
 .. fieldlookup:: jsonfield.key
 
 Key, index, and path transforms
@@ -1161,8 +1156,6 @@ To query for missing keys, use the ``isnull`` lookup:
 
 ``KT()`` expressions
 ~~~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 4.2
 
 .. module:: django.db.models.fields.json
 

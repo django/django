@@ -1,7 +1,8 @@
 from django.conf import settings
 from django.contrib.messages import constants, utils
+from django.utils.functional import SimpleLazyObject
 
-LEVEL_TAGS = utils.get_level_tags()
+LEVEL_TAGS = SimpleLazyObject(utils.get_level_tags)
 
 
 class Message:
@@ -31,6 +32,10 @@ class Message:
 
     def __str__(self):
         return str(self.message)
+
+    def __repr__(self):
+        extra_tags = f", extra_tags={self.extra_tags!r}" if self.extra_tags else ""
+        return f"Message(level={self.level}, message={self.message!r}{extra_tags})"
 
     @property
     def tags(self):

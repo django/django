@@ -75,7 +75,7 @@ These can't report on the internals of your code, but can provide a useful
 insight into your site's overall performance, including aspects that can't be
 adequately measured from within Django environment. Examples include:
 
-* `Yahoo's Yslow <http://yslow.org/>`_
+* `Yahoo's Yslow <https://yslow.org/>`_
 * `Google PageSpeed <https://developers.google.com/speed/>`_
 
 There are also several paid-for services that perform a similar analysis,

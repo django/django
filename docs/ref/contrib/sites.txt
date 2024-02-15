@@ -47,7 +47,7 @@ Why would you use sites? It's best explained through examples.
 Associating content with multiple sites
 ---------------------------------------
 
-The LJWorld.com_ and Lawrence.com_ sites are operated by the same news
+The LJWorld.com_ and Lawrence.com sites were operated by the same news
 organization -- the Lawrence Journal-World newspaper in Lawrence, Kansas.
 LJWorld.com focused on news, while Lawrence.com focused on local entertainment.
 But sometimes editors wanted to publish an article on *both* sites.
@@ -94,7 +94,6 @@ This accomplishes several things quite nicely:
           # ...
 
 .. _ljworld.com: https://www2.ljworld.com/
-.. _lawrence.com: http://www.lawrence.com/
 
 Associating content with a single site
 --------------------------------------
@@ -247,7 +246,7 @@ Getting the current domain for full URLs
 
 Django's ``get_absolute_url()`` convention is nice for getting your objects'
 URL without the domain name, but in some cases you might want to display the
-full URL -- with ``http://`` and the domain and everything -- for an object.
+full URL -- with ``https://`` and the domain and everything -- for an object.
 To do this, you can use the sites framework. An example:
 
 .. code-block:: pycon

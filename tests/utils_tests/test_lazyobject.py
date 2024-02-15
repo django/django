@@ -1,9 +1,10 @@
 import copy
 import pickle
 import sys
+import unittest
 import warnings
-from unittest import TestCase
 
+from django.test import TestCase
 from django.utils.functional import LazyObject, SimpleLazyObject, empty
 
 from .models import Category, CategoryInfo
@@ -20,7 +21,7 @@ class Foo:
         return self.foo == other.foo
 
 
-class LazyObjectTestCase(TestCase):
+class LazyObjectTestCase(unittest.TestCase):
     def lazy_wrap(self, wrapped_object):
         """
         Wrap the given object into a LazyObject

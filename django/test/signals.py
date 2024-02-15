@@ -13,7 +13,6 @@ from django.dispatch import Signal, receiver
 from django.utils import timezone
 from django.utils.formats import FORMAT_SETTINGS, reset_format_cache
 from django.utils.functional import empty
-from django.utils.module_loading import import_string
 
 template_rendered = Signal()
 
@@ -161,21 +160,6 @@ def localize_settings_changed(*, setting, **kwargs):
         reset_format_cache()
 
 
-# RemovedInDjango51Warning.
-@receiver(setting_changed)
-def file_storage_changed(*, setting, **kwargs):
-    if setting == "DEFAULT_FILE_STORAGE":
-        from django.conf import DEFAULT_STORAGE_ALIAS
-        from django.core.files.storage import default_storage, storages
-
-        try:
-            del storages.backends
-        except AttributeError:
-            pass
-        storages._storages[DEFAULT_STORAGE_ALIAS] = import_string(kwargs["value"])()
-        default_storage._wrapped = empty
-
-
 @receiver(setting_changed)
 def complex_setting_changed(*, enter, setting, **kwargs):
     if enter and setting in COMPLEX_OVERRIDE_SETTINGS:
@@ -199,24 +183,12 @@ def root_urlconf_changed(*, setting, **kwargs):
 @receiver(setting_changed)
 def static_storage_changed(*, setting, **kwargs):
     if setting in {
-        "STATICFILES_STORAGE",
         "STATIC_ROOT",
         "STATIC_URL",
     }:
         from django.contrib.staticfiles.storage import staticfiles_storage
 
         staticfiles_storage._wrapped = empty
-
-    # RemovedInDjango51Warning.
-    if setting == "STATICFILES_STORAGE":
-        from django.conf import STATICFILES_STORAGE_ALIAS
-        from django.core.files.storage import storages
-
-        try:
-            del storages.backends
-        except AttributeError:
-            pass
-        storages._storages[STATICFILES_STORAGE_ALIAS] = import_string(kwargs["value"])()
 
 
 @receiver(setting_changed)
@@ -228,6 +200,14 @@ def static_finders_changed(*, setting, **kwargs):
         from django.contrib.staticfiles.finders import get_finder
 
         get_finder.cache_clear()
+
+
+@receiver(setting_changed)
+def form_renderer_changed(*, setting, **kwargs):
+    if setting == "FORM_RENDERER":
+        from django.forms.renderers import get_default_renderer
+
+        get_default_renderer.cache_clear()
 
 
 @receiver(setting_changed)

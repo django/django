@@ -178,6 +178,12 @@ class DebugViewTests(SimpleTestCase):
         )
         self.assertContains(
             response,
+            "<code>technical404/ [name='my404']</code>",
+            status_code=404,
+            html=True,
+        )
+        self.assertContains(
+            response,
             "<p>The current path, <code>not-in-urls</code>, didn’t match any "
             "of these.</p>",
             status_code=404,
@@ -204,6 +210,9 @@ class DebugViewTests(SimpleTestCase):
 
     def test_technical_404(self):
         response = self.client.get("/technical404/")
+        self.assertContains(response, '<header id="summary">', status_code=404)
+        self.assertContains(response, '<main id="info">', status_code=404)
+        self.assertContains(response, '<footer id="explanation">', status_code=404)
         self.assertContains(
             response,
             '<pre class="exception_value">Testing technical 404.</pre>',
@@ -228,7 +237,7 @@ class DebugViewTests(SimpleTestCase):
         response = self.client.get("/classbased404/")
         self.assertContains(
             response,
-            "<th>Raised by:</th><td>view_tests.views.Http404View</td>",
+            '<th scope="row">Raised by:</th><td>view_tests.views.Http404View</td>',
             status_code=404,
             html=True,
         )
@@ -236,9 +245,12 @@ class DebugViewTests(SimpleTestCase):
     def test_technical_500(self):
         with self.assertLogs("django.request", "ERROR"):
             response = self.client.get("/raises500/")
+        self.assertContains(response, '<header id="summary">', status_code=500)
+        self.assertContains(response, '<main id="info">', status_code=500)
+        self.assertContains(response, '<footer id="explanation">', status_code=500)
         self.assertContains(
             response,
-            "<th>Raised during:</th><td>view_tests.views.raises500</td>",
+            '<th scope="row">Raised during:</th><td>view_tests.views.raises500</td>',
             status_code=500,
             html=True,
         )
@@ -255,7 +267,8 @@ class DebugViewTests(SimpleTestCase):
             response = self.client.get("/classbased500/")
         self.assertContains(
             response,
-            "<th>Raised during:</th><td>view_tests.views.Raises500View</td>",
+            '<th scope="row">Raised during:</th>'
+            "<td>view_tests.views.Raises500View</td>",
             status_code=500,
             html=True,
         )
@@ -332,14 +345,19 @@ class DebugViewTests(SimpleTestCase):
         with tempfile.NamedTemporaryFile(prefix=template_name) as tmpfile:
             tempdir = os.path.dirname(tmpfile.name)
             template_path = os.path.join(tempdir, template_name)
-            with override_settings(
-                TEMPLATES=[
-                    {
-                        "BACKEND": "django.template.backends.django.DjangoTemplates",
-                        "DIRS": [tempdir],
-                    }
-                ]
-            ), self.assertLogs("django.request", "ERROR"):
+            with (
+                override_settings(
+                    TEMPLATES=[
+                        {
+                            "BACKEND": (
+                                "django.template.backends.django.DjangoTemplates"
+                            ),
+                            "DIRS": [tempdir],
+                        }
+                    ]
+                ),
+                self.assertLogs("django.request", "ERROR"),
+            ):
                 response = self.client.get(
                     reverse(
                         "raises_template_does_not_exist", kwargs={"path": template_name}
@@ -392,7 +410,7 @@ class DebugViewTests(SimpleTestCase):
         """
         response = self.client.get("/")
         self.assertContains(
-            response, "Page not found <span>(404)</span>", status_code=404
+            response, "Page not found <small>(404)</small>", status_code=404
         )
 
     def test_template_encoding(self):
@@ -526,12 +544,12 @@ class ExceptionReporterTests(SimpleTestCase):
         self.assertIn(
             '<pre class="exception_value">Can&#x27;t find my keys</pre>', html
         )
-        self.assertIn("<th>Request Method:</th>", html)
-        self.assertIn("<th>Request URL:</th>", html)
+        self.assertIn('<th scope="row">Request Method:</th>', html)
+        self.assertIn('<th scope="row">Request URL:</th>', html)
         self.assertIn('<h3 id="user-info">USER</h3>', html)
         self.assertIn("<p>jacob</p>", html)
-        self.assertIn("<th>Exception Type:</th>", html)
-        self.assertIn("<th>Exception Value:</th>", html)
+        self.assertIn('<th scope="row">Exception Type:</th>', html)
+        self.assertIn('<th scope="row">Exception Value:</th>', html)
         self.assertIn("<h2>Traceback ", html)
         self.assertIn("<h2>Request information</h2>", html)
         self.assertNotIn("<p>Request data not supplied</p>", html)
@@ -549,11 +567,11 @@ class ExceptionReporterTests(SimpleTestCase):
         self.assertIn(
             '<pre class="exception_value">Can&#x27;t find my keys</pre>', html
         )
-        self.assertNotIn("<th>Request Method:</th>", html)
-        self.assertNotIn("<th>Request URL:</th>", html)
+        self.assertNotIn('<th scope="row">Request Method:</th>', html)
+        self.assertNotIn('<th scope="row">Request URL:</th>', html)
         self.assertNotIn('<h3 id="user-info">USER</h3>', html)
-        self.assertIn("<th>Exception Type:</th>", html)
-        self.assertIn("<th>Exception Value:</th>", html)
+        self.assertIn('<th scope="row">Exception Type:</th>', html)
+        self.assertIn('<th scope="row">Exception Value:</th>', html)
         self.assertIn("<h2>Traceback ", html)
         self.assertIn("<h2>Request information</h2>", html)
         self.assertIn("<p>Request data not supplied</p>", html)
@@ -598,10 +616,10 @@ class ExceptionReporterTests(SimpleTestCase):
         self.assertIn(
             '<pre class="exception_value">No exception message supplied</pre>', html
         )
-        self.assertIn("<th>Request Method:</th>", html)
-        self.assertIn("<th>Request URL:</th>", html)
-        self.assertNotIn("<th>Exception Type:</th>", html)
-        self.assertNotIn("<th>Exception Value:</th>", html)
+        self.assertIn('<th scope="row">Request Method:</th>', html)
+        self.assertIn('<th scope="row">Request URL:</th>', html)
+        self.assertNotIn('<th scope="row">Exception Type:</th>', html)
+        self.assertNotIn('<th scope="row">Exception Value:</th>', html)
         self.assertNotIn("<h2>Traceback ", html)
         self.assertIn("<h2>Request information</h2>", html)
         self.assertNotIn("<p>Request data not supplied</p>", html)
@@ -621,8 +639,8 @@ class ExceptionReporterTests(SimpleTestCase):
         self.assertIn(
             '<pre class="exception_value">Can&#x27;t find my keys</pre>', html
         )
-        self.assertIn("<th>Exception Type:</th>", html)
-        self.assertIn("<th>Exception Value:</th>", html)
+        self.assertIn('<th scope="row">Exception Type:</th>', html)
+        self.assertIn('<th scope="row">Exception Value:</th>', html)
         self.assertIn("<h2>Traceback ", html)
         self.assertIn("<h2>Request information</h2>", html)
         self.assertIn("<p>Request data not supplied</p>", html)
@@ -645,8 +663,8 @@ class ExceptionReporterTests(SimpleTestCase):
         html = reporter.get_traceback_html()
         self.assertInHTML("<h1>RuntimeError</h1>", html)
         self.assertIn('<pre class="exception_value">Oops</pre>', html)
-        self.assertIn("<th>Exception Type:</th>", html)
-        self.assertIn("<th>Exception Value:</th>", html)
+        self.assertIn('<th scope="row">Exception Type:</th>', html)
+        self.assertIn('<th scope="row">Exception Value:</th>', html)
         self.assertIn("<h2>Traceback ", html)
         self.assertIn("<h2>Request information</h2>", html)
         self.assertIn("<p>Request data not supplied</p>", html)
@@ -716,8 +734,8 @@ class ExceptionReporterTests(SimpleTestCase):
         html = reporter.get_traceback_html()
         self.assertInHTML("<h1>RuntimeError</h1>", html)
         self.assertIn('<pre class="exception_value">Oops</pre>', html)
-        self.assertIn("<th>Exception Type:</th>", html)
-        self.assertIn("<th>Exception Value:</th>", html)
+        self.assertIn('<th scope="row">Exception Type:</th>', html)
+        self.assertIn('<th scope="row">Exception Value:</th>', html)
         self.assertIn("<h2>Traceback ", html)
         self.assertInHTML('<li class="frame user">Traceback: None</li>', html)
         self.assertIn(
@@ -976,10 +994,10 @@ class ExceptionReporterTests(SimpleTestCase):
         self.assertIn(
             '<pre class="exception_value">I&#x27;m a little teapot</pre>', html
         )
-        self.assertIn("<th>Request Method:</th>", html)
-        self.assertIn("<th>Request URL:</th>", html)
-        self.assertNotIn("<th>Exception Type:</th>", html)
-        self.assertNotIn("<th>Exception Value:</th>", html)
+        self.assertIn('<th scope="row">Request Method:</th>', html)
+        self.assertIn('<th scope="row">Request URL:</th>', html)
+        self.assertNotIn('<th scope="row">Exception Type:</th>', html)
+        self.assertNotIn('<th scope="row">Exception Value:</th>', html)
         self.assertIn("<h2>Traceback ", html)
         self.assertIn("<h2>Request information</h2>", html)
         self.assertNotIn("<p>Request data not supplied</p>", html)
@@ -991,10 +1009,10 @@ class ExceptionReporterTests(SimpleTestCase):
         self.assertIn(
             '<pre class="exception_value">I&#x27;m a little teapot</pre>', html
         )
-        self.assertNotIn("<th>Request Method:</th>", html)
-        self.assertNotIn("<th>Request URL:</th>", html)
-        self.assertNotIn("<th>Exception Type:</th>", html)
-        self.assertNotIn("<th>Exception Value:</th>", html)
+        self.assertNotIn('<th scope="row">Request Method:</th>', html)
+        self.assertNotIn('<th scope="row">Request URL:</th>', html)
+        self.assertNotIn('<th scope="row">Exception Type:</th>', html)
+        self.assertNotIn('<th scope="row">Exception Value:</th>', html)
         self.assertIn("<h2>Traceback ", html)
         self.assertIn("<h2>Request information</h2>", html)
         self.assertIn("<p>Request data not supplied</p>", html)
@@ -1904,9 +1922,7 @@ class CustomExceptionReporterFilter(SafeExceptionReporterFilter):
 class CustomExceptionReporterFilterTests(SimpleTestCase):
     def setUp(self):
         get_default_exception_reporter_filter.cache_clear()
-
-    def tearDown(self):
-        get_default_exception_reporter_filter.cache_clear()
+        self.addCleanup(get_default_exception_reporter_filter.cache_clear)
 
     def test_setting_allows_custom_subclass(self):
         self.assertIsInstance(

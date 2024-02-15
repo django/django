@@ -247,6 +247,8 @@ Note that the ``--reverse`` option doesn't impact on ``--start-at`` or
 ``--start-after`` options. Moreover these options cannot be used with test
 labels.
 
+.. _running-selenium-tests:
+
 Running the Selenium tests
 --------------------------
 
@@ -269,6 +271,37 @@ faster and more stable. Add the ``--headless`` option to enable this mode.
 
 .. _selenium.webdriver: https://github.com/SeleniumHQ/selenium/tree/trunk/py/selenium/webdriver
 
+For testing changes to the admin UI, the selenium tests can be run with the
+``--screenshots`` option enabled. Screenshots will be saved to the
+``tests/screenshots/`` directory.
+
+To define when screenshots should be taken during a selenium test, the test
+class must use the ``@django.test.selenium.screenshot_cases`` decorator with a
+list of supported screenshot types (``"desktop_size"``, ``"mobile_size"``,
+``"small_screen_size"``, ``"rtl"``, and ``"dark"``). It can then call
+``self.take_screenshot("unique-screenshot-name")`` at the desired point to
+generate the screenshots. For example::
+
+    from django.test.selenium import SeleniumTestCase, screenshot_cases
+    from django.urls import reverse
+
+
+    class SeleniumTests(SeleniumTestCase):
+        @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark"])
+        def test_login_button_centered(self):
+            self.selenium.get(self.live_server_url + reverse("admin:login"))
+            self.take_screenshot("login")
+            ...
+
+This generates multiple screenshots of the login page - one for a desktop
+screen, one for a mobile screen, one for right-to-left languages on desktop,
+and one for the dark mode on desktop.
+
+.. versionchanged:: 5.1
+
+     The ``--screenshots`` option and ``@screenshot_cases`` decorator were
+     added.
+
 .. _running-unit-tests-dependencies:
 
 Running all the tests
@@ -281,8 +314,8 @@ dependencies:
 * :pypi:`argon2-cffi` 19.2.0+
 * :pypi:`asgiref` 3.7.0+ (required)
 * :pypi:`bcrypt`
-* :pypi:`colorama`
-* :pypi:`docutils`
+* :pypi:`colorama` 0.4.6+
+* :pypi:`docutils` 0.19+
 * :pypi:`geoip2`
 * :pypi:`Jinja2` 2.11+
 * :pypi:`numpy`

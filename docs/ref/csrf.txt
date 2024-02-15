@@ -18,7 +18,7 @@ The first defense against CSRF attacks is to ensure that GET requests (and other
 Requests via 'unsafe' methods, such as POST, PUT, and DELETE, can then be
 protected by the steps outlined in :ref:`using-csrf`.
 
-.. _Cross Site Request Forgeries: https://www.squarefree.com/securitytips/web-developers.html#CSRF
+.. _Cross Site Request Forgeries: https://owasp.org/www-community/attacks/csrf#overview
 
 .. _how-csrf-works:
 
@@ -170,6 +170,10 @@ class-based views<decorating-class-based-views>`.
             # ...
             return render(request, "a_template.html", c)
 
+    .. versionchanged:: 5.0
+
+        Support for wrapping asynchronous view functions was added.
+
 .. function:: requires_csrf_token(view)
 
     Normally the :ttag:`csrf_token` template tag will not work if
@@ -190,9 +194,17 @@ class-based views<decorating-class-based-views>`.
             # ...
             return render(request, "a_template.html", c)
 
+    .. versionchanged:: 5.0
+
+        Support for wrapping asynchronous view functions was added.
+
 .. function:: ensure_csrf_cookie(view)
 
     This decorator forces a view to send the CSRF cookie.
+
+    .. versionchanged:: 5.0
+
+        Support for wrapping asynchronous view functions was added.
 
 Settings
 ========

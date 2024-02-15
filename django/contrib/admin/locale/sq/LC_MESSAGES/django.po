@@ -8,10 +8,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-17 02:13-0600\n"
-"PO-Revision-Date: 2023-04-25 07:05+0000\n"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 07:05+0000\n"
 "Last-Translator: Besnik Bleta <besnik@programeshqip.org>, 2020,2022-2023\n"
-"Language-Team: Albanian (http://www.transifex.com/django/django/language/"
+"Language-Team: Albanian (http://app.transifex.com/django/django/language/"
 "sq/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -181,6 +181,9 @@ msgstr ""
 "Që të përzgjidhni më shumë se një, mbani të shtypur “Control”, ose “Command” "
 "në një Mac."
 
+msgid "Select this object for an action - {}"
+msgstr "Përzgjidheni këtë objekt për një veprim - {}"
+
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr "{name} “{obj}” u shtua me sukses."
@@ -340,6 +343,9 @@ msgstr "Përzgjidhni krejt %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Spastroje përzgjedhjen"
 
+msgid "Breadcrumbs"
+msgstr ""
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "Modele te aplikacioni %(name)s"
@@ -391,9 +397,6 @@ msgstr "Dokumentim"
 msgid "Log out"
 msgstr "Dilni"
 
-msgid "Breadcrumbs"
-msgstr ""
-
 #, python-format
 msgid "Add %(name)s"
 msgstr "Shto %(name)s"
@@ -406,6 +409,12 @@ msgstr "Shiheni në sajt"
 
 msgid "Filter"
 msgstr "Filtër"
+
+msgid "Hide counts"
+msgstr "Fshihi numrat"
+
+msgid "Show counts"
+msgstr "Shfaqi numrat"
 
 msgid "Clear all filters"
 msgstr "Spastroji krejt filtrat"
@@ -514,6 +523,15 @@ msgstr "Veprimet e mia"
 
 msgid "None available"
 msgstr "Asnjë i passhëm"
+
+msgid "Added:"
+msgstr "U shtua më:"
+
+msgid "Changed:"
+msgstr "U ndryshua më:"
+
+msgid "Deleted:"
+msgstr "U fshi më:"
 
 msgid "Unknown content"
 msgstr "Lëndë e panjohur"
@@ -725,6 +743,9 @@ msgstr "Adresë email:"
 
 msgid "Reset my password"
 msgstr "Ricakto fjalëkalimin tim"
+
+msgid "Select all objects on this page for an action"
+msgstr "Përzgjidhni për një veprim krejt objektet në këtë faqe"
 
 msgid "All dates"
 msgstr "Krejt datat"

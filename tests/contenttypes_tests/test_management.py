@@ -88,9 +88,10 @@ class RemoveStaleContentTypesTests(TestCase):
     def test_contenttypes_removed_in_installed_apps_without_models(self):
         ContentType.objects.create(app_label="empty_models", model="Fake 1")
         ContentType.objects.create(app_label="no_models", model="Fake 2")
-        with mock.patch(
-            "builtins.input", return_value="yes"
-        ), captured_stdout() as stdout:
+        with (
+            mock.patch("builtins.input", return_value="yes"),
+            captured_stdout() as stdout,
+        ):
             call_command("remove_stale_contenttypes", verbosity=2)
         self.assertNotIn(
             "Deleting stale content type 'empty_models | Fake 1'",
@@ -106,9 +107,10 @@ class RemoveStaleContentTypesTests(TestCase):
     def test_contenttypes_removed_for_apps_not_in_installed_apps(self):
         ContentType.objects.create(app_label="empty_models", model="Fake 1")
         ContentType.objects.create(app_label="no_models", model="Fake 2")
-        with mock.patch(
-            "builtins.input", return_value="yes"
-        ), captured_stdout() as stdout:
+        with (
+            mock.patch("builtins.input", return_value="yes"),
+            captured_stdout() as stdout,
+        ):
             call_command(
                 "remove_stale_contenttypes", include_stale_apps=True, verbosity=2
             )

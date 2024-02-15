@@ -464,9 +464,8 @@ Minor features
 * The :ref:`messages context processor <message-displaying>` now adds a
   dictionary of default levels under the name ``DEFAULT_MESSAGE_LEVELS``.
 
-* :class:`~django.contrib.messages.storage.base.Message` objects now have a
-  ``level_tag`` attribute that contains the string representation of the
-  message level.
+* :class:`~django.contrib.messages.Message` objects now have a ``level_tag``
+  attribute that contains the string representation of the message level.
 
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -779,8 +778,8 @@ Models
   an error (before that, it would either result in a database error or
   incorrect data).
 
-* You can use a single list for :attr:`~django.db.models.Options.index_together`
-  (rather than a list of lists) when specifying a single set of fields.
+* You can use a single list for ``index_together`` (rather than a list of
+  lists) when specifying a single set of fields.
 
 * Custom intermediate models having more than one foreign key to any of the
   models participating in a many-to-many relationship are now permitted,

@@ -1,9 +1,10 @@
 import datetime
+import inspect
 import sys
 import unittest
 from pathlib import Path
 from unittest import mock
-from urllib.parse import quote_plus
+from urllib.parse import quote, quote_plus
 
 from django.test import SimpleTestCase
 from django.utils.encoding import (
@@ -21,6 +22,7 @@ from django.utils.encoding import (
 )
 from django.utils.functional import SimpleLazyObject
 from django.utils.translation import gettext_lazy
+from django.utils.version import PYPY
 
 
 class TestEncodingUtils(SimpleTestCase):
@@ -42,9 +44,10 @@ class TestEncodingUtils(SimpleTestCase):
         self.assertIs(type(force_str(s)), str)
 
     def test_force_str_DjangoUnicodeDecodeError(self):
+        reason = "unexpected end of data" if PYPY else "invalid start byte"
         msg = (
-            "'utf-8' codec can't decode byte 0xff in position 0: invalid "
-            "start byte. You passed in b'\\xff' (<class 'bytes'>)"
+            f"'utf-8' codec can't decode byte 0xff in position 0: {reason}. "
+            "You passed in b'\\xff' (<class 'bytes'>)"
         )
         with self.assertRaisesMessage(DjangoUnicodeDecodeError, msg):
             force_str(b"\xff")
@@ -119,6 +122,24 @@ class TestEncodingUtils(SimpleTestCase):
             )
         except RecursionError:
             self.fail("Unexpected RecursionError raised.")
+
+    def test_repercent_broken_unicode_small_fragments(self):
+        data = b"test\xfctest\xfctest\xfc"
+        decoded_paths = []
+
+        def mock_quote(*args, **kwargs):
+            # The second frame is the call to repercent_broken_unicode().
+            decoded_paths.append(inspect.currentframe().f_back.f_locals["path"])
+            return quote(*args, **kwargs)
+
+        with mock.patch("django.utils.encoding.quote", mock_quote):
+            self.assertEqual(repercent_broken_unicode(data), b"test%FCtest%FCtest%FC")
+
+        # decode() is called on smaller fragment of the path each time.
+        self.assertEqual(
+            decoded_paths,
+            [b"test\xfctest\xfctest\xfc", b"test\xfctest\xfc", b"test\xfc"],
+        )
 
 
 class TestRFC3987IEncodingUtils(unittest.TestCase):

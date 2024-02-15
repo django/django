@@ -141,6 +141,7 @@ LANGUAGES = [
     ("tr", gettext_noop("Turkish")),
     ("tt", gettext_noop("Tatar")),
     ("udm", gettext_noop("Udmurt")),
+    ("ug", gettext_noop("Uyghur")),
     ("uk", gettext_noop("Ukrainian")),
     ("ur", gettext_noop("Urdu")),
     ("uz", gettext_noop("Uzbek")),
@@ -150,7 +151,7 @@ LANGUAGES = [
 ]
 
 # Languages using BiDi (right-to-left) layout
-LANGUAGES_BIDI = ["he", "ar", "ar-dz", "ckb", "fa", "ur"]
+LANGUAGES_BIDI = ["he", "ar", "ar-dz", "ckb", "fa", "ug", "ur"]
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
@@ -215,6 +216,11 @@ TEMPLATES = []
 # Default form rendering class.
 FORM_RENDERER = "django.forms.renderers.DjangoTemplates"
 
+# RemovedInDjango60Warning: It's a transitional setting helpful in early
+# adoption of "https" as the new default value of forms.URLField.assume_scheme.
+# Set to True to assume "https" during the Django 5.x release cycle.
+FORMS_URLFIELD_ASSUME_HTTPS = False
+
 # Default email address to use for various automated correspondence from
 # the site managers.
 DEFAULT_FROM_EMAIL = "webmaster@localhost"
@@ -266,9 +272,6 @@ SECRET_KEY = ""
 # List of secret keys used to verify the validity of signatures. This allows
 # secret key rotation.
 SECRET_KEY_FALLBACKS = []
-
-# Default file storage mechanism that holds media.
-DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
 
 STORAGES = {
     "default": {
@@ -624,9 +627,6 @@ FIXTURE_DIRS = []
 
 # A list of locations of additional static files
 STATICFILES_DIRS = []
-
-# The default file storage backend used during the build process
-STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
 
 # List of finder classes that know how to find static files in
 # various locations.

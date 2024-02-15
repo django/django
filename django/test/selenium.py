@@ -1,8 +1,11 @@
 import sys
 import unittest
 from contextlib import contextmanager
+from functools import wraps
+from pathlib import Path
 
-from django.test import LiveServerTestCase, tag
+from django.conf import settings
+from django.test import LiveServerTestCase, override_settings, tag
 from django.utils.functional import classproperty
 from django.utils.module_loading import import_string
 from django.utils.text import capfirst
@@ -98,10 +101,48 @@ class SeleniumTestCaseBase(type(LiveServerTestCase)):
         return self.import_webdriver(self.browser)(options=options)
 
 
+class ChangeWindowSize:
+    def __init__(self, width, height, selenium):
+        self.selenium = selenium
+        self.new_size = (width, height)
+
+    def __enter__(self):
+        self.old_size = self.selenium.get_window_size()
+        self.selenium.set_window_size(*self.new_size)
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.selenium.set_window_size(self.old_size["width"], self.old_size["height"])
+
+
 @tag("selenium")
 class SeleniumTestCase(LiveServerTestCase, metaclass=SeleniumTestCaseBase):
     implicit_wait = 10
     external_host = None
+    screenshots = False
+
+    @classmethod
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        if not cls.screenshots:
+            return
+
+        for name, func in list(cls.__dict__.items()):
+            if not hasattr(func, "_screenshot_cases"):
+                continue
+            # Remove the main test.
+            delattr(cls, name)
+            # Add separate tests for each screenshot type.
+            for screenshot_case in getattr(func, "_screenshot_cases"):
+
+                @wraps(func)
+                def test(self, *args, _func=func, _case=screenshot_case, **kwargs):
+                    with getattr(self, _case)():
+                        return _func(self, *args, **kwargs)
+
+                test.__name__ = f"{name}_{screenshot_case}"
+                test.__qualname__ = f"{test.__qualname__}_{screenshot_case}"
+                setattr(cls, test.__name__, test)
 
     @classproperty
     def live_server_url(cls):
@@ -117,6 +158,45 @@ class SeleniumTestCase(LiveServerTestCase, metaclass=SeleniumTestCaseBase):
         cls.selenium.implicitly_wait(cls.implicit_wait)
         super().setUpClass()
         cls.addClassCleanup(cls._quit_selenium)
+
+    @contextmanager
+    def desktop_size(self):
+        with ChangeWindowSize(1280, 720, self.selenium):
+            yield
+
+    @contextmanager
+    def small_screen_size(self):
+        with ChangeWindowSize(1024, 768, self.selenium):
+            yield
+
+    @contextmanager
+    def mobile_size(self):
+        with ChangeWindowSize(360, 800, self.selenium):
+            yield
+
+    @contextmanager
+    def rtl(self):
+        with self.desktop_size():
+            with override_settings(LANGUAGE_CODE=settings.LANGUAGES_BIDI[-1]):
+                yield
+
+    @contextmanager
+    def dark(self):
+        # Navigate to a page before executing a script.
+        self.selenium.get(self.live_server_url)
+        self.selenium.execute_script("localStorage.setItem('theme', 'dark');")
+        with self.desktop_size():
+            try:
+                yield
+            finally:
+                self.selenium.execute_script("localStorage.removeItem('theme');")
+
+    def take_screenshot(self, name):
+        if not self.screenshots:
+            return
+        path = Path.cwd() / "screenshots" / f"{self._testMethodName}-{name}.png"
+        path.parent.mkdir(exist_ok=True, parents=True)
+        self.selenium.save_screenshot(path)
 
     @classmethod
     def _quit_selenium(cls):
@@ -134,3 +214,15 @@ class SeleniumTestCase(LiveServerTestCase, metaclass=SeleniumTestCaseBase):
             yield
         finally:
             self.selenium.implicitly_wait(self.implicit_wait)
+
+
+def screenshot_cases(method_names):
+    if isinstance(method_names, str):
+        method_names = method_names.split(",")
+
+    def wrapper(func):
+        func._screenshot_cases = method_names
+        setattr(func, "tags", {"screenshot"}.union(getattr(func, "tags", set())))
+        return func
+
+    return wrapper

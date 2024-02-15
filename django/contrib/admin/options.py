@@ -2,8 +2,11 @@ import copy
 import enum
 import json
 import re
+import warnings
 from functools import partial, update_wrapper
+from urllib.parse import parse_qsl
 from urllib.parse import quote as urlquote
+from urllib.parse import urlparse
 
 from django import forms
 from django.conf import settings
@@ -52,6 +55,7 @@ from django.http.response import HttpResponseBase
 from django.template.response import SimpleTemplateResponse, TemplateResponse
 from django.urls import reverse
 from django.utils.decorators import method_decorator
+from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.html import format_html
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
@@ -463,7 +467,8 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
 
         relation_parts = []
         prev_field = None
-        for part in lookup.split(LOOKUP_SEP):
+        parts = lookup.split(LOOKUP_SEP)
+        for part in parts:
             try:
                 field = model._meta.get_field(part)
             except FieldDoesNotExist:
@@ -478,6 +483,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
                     model._meta.auto_field is None
                     or part not in getattr(prev_field, "to_fields", [])
                 )
+                and (field.is_relation or not field.primary_key)
             ):
                 relation_parts.append(part)
             if not getattr(field, "path_infos", None):
@@ -943,13 +949,12 @@ class ModelAdmin(BaseModelAdmin):
         """
         from django.contrib.admin.models import ADDITION, LogEntry
 
-        return LogEntry.objects.log_action(
+        return LogEntry.objects.log_actions(
             user_id=request.user.pk,
-            content_type_id=get_content_type_for_model(obj).pk,
-            object_id=obj.pk,
-            object_repr=str(obj),
+            queryset=[obj],
             action_flag=ADDITION,
             change_message=message,
+            single_object=True,
         )
 
     def log_change(self, request, obj, message):
@@ -960,13 +965,12 @@ class ModelAdmin(BaseModelAdmin):
         """
         from django.contrib.admin.models import CHANGE, LogEntry
 
-        return LogEntry.objects.log_action(
+        return LogEntry.objects.log_actions(
             user_id=request.user.pk,
-            content_type_id=get_content_type_for_model(obj).pk,
-            object_id=obj.pk,
-            object_repr=str(obj),
+            queryset=[obj],
             action_flag=CHANGE,
             change_message=message,
+            single_object=True,
         )
 
     def log_deletion(self, request, obj, object_repr):
@@ -976,6 +980,11 @@ class ModelAdmin(BaseModelAdmin):
 
         The default implementation creates an admin LogEntry object.
         """
+        warnings.warn(
+            "ModelAdmin.log_deletion() is deprecated. Use log_deletions() instead.",
+            RemovedInDjango60Warning,
+            stacklevel=2,
+        )
         from django.contrib.admin.models import DELETION, LogEntry
 
         return LogEntry.objects.log_action(
@@ -983,6 +992,31 @@ class ModelAdmin(BaseModelAdmin):
             content_type_id=get_content_type_for_model(obj).pk,
             object_id=obj.pk,
             object_repr=object_repr,
+            action_flag=DELETION,
+        )
+
+    def log_deletions(self, request, queryset):
+        """
+        Log that objects will be deleted. Note that this method must be called
+        before the deletion.
+
+        The default implementation creates admin LogEntry objects.
+        """
+        from django.contrib.admin.models import DELETION, LogEntry
+
+        # RemovedInDjango60Warning.
+        if type(self).log_deletion != ModelAdmin.log_deletion:
+            warnings.warn(
+                "The usage of log_deletion() is deprecated. Implement log_deletions() "
+                "instead.",
+                RemovedInDjango60Warning,
+                stacklevel=2,
+            )
+            return [self.log_deletion(request, obj, str(obj)) for obj in queryset]
+
+        return LogEntry.objects.log_actions(
+            user_id=request.user.pk,
+            queryset=queryset,
             action_flag=DELETION,
         )
 
@@ -1346,12 +1380,17 @@ class ModelAdmin(BaseModelAdmin):
             context,
         )
 
+    def _get_preserved_qsl(self, request, preserved_filters):
+        query_string = urlparse(request.build_absolute_uri()).query
+        return parse_qsl(query_string.replace(preserved_filters, ""))
+
     def response_add(self, request, obj, post_url_continue=None):
         """
         Determine the HttpResponse for the add_view stage.
         """
         opts = obj._meta
         preserved_filters = self.get_preserved_filters(request)
+        preserved_qsl = self._get_preserved_qsl(request, preserved_filters)
         obj_url = reverse(
             "admin:%s_%s_change" % (opts.app_label, opts.model_name),
             args=(quote(obj.pk),),
@@ -1409,7 +1448,11 @@ class ModelAdmin(BaseModelAdmin):
             if post_url_continue is None:
                 post_url_continue = obj_url
             post_url_continue = add_preserved_filters(
-                {"preserved_filters": preserved_filters, "opts": opts},
+                {
+                    "preserved_filters": preserved_filters,
+                    "preserved_qsl": preserved_qsl,
+                    "opts": opts,
+                },
                 post_url_continue,
             )
             return HttpResponseRedirect(post_url_continue)
@@ -1425,7 +1468,12 @@ class ModelAdmin(BaseModelAdmin):
             self.message_user(request, msg, messages.SUCCESS)
             redirect_url = request.path
             redirect_url = add_preserved_filters(
-                {"preserved_filters": preserved_filters, "opts": opts}, redirect_url
+                {
+                    "preserved_filters": preserved_filters,
+                    "preserved_qsl": preserved_qsl,
+                    "opts": opts,
+                },
+                redirect_url,
             )
             return HttpResponseRedirect(redirect_url)
 
@@ -1471,6 +1519,7 @@ class ModelAdmin(BaseModelAdmin):
 
         opts = self.opts
         preserved_filters = self.get_preserved_filters(request)
+        preserved_qsl = self._get_preserved_qsl(request, preserved_filters)
 
         msg_dict = {
             "name": opts.verbose_name,
@@ -1487,26 +1536,12 @@ class ModelAdmin(BaseModelAdmin):
             self.message_user(request, msg, messages.SUCCESS)
             redirect_url = request.path
             redirect_url = add_preserved_filters(
-                {"preserved_filters": preserved_filters, "opts": opts}, redirect_url
-            )
-            return HttpResponseRedirect(redirect_url)
-
-        elif "_saveasnew" in request.POST:
-            msg = format_html(
-                _(
-                    "The {name} “{obj}” was added successfully. You may edit it again "
-                    "below."
-                ),
-                **msg_dict,
-            )
-            self.message_user(request, msg, messages.SUCCESS)
-            redirect_url = reverse(
-                "admin:%s_%s_change" % (opts.app_label, opts.model_name),
-                args=(obj.pk,),
-                current_app=self.admin_site.name,
-            )
-            redirect_url = add_preserved_filters(
-                {"preserved_filters": preserved_filters, "opts": opts}, redirect_url
+                {
+                    "preserved_filters": preserved_filters,
+                    "preserved_qsl": preserved_qsl,
+                    "opts": opts,
+                },
+                redirect_url,
             )
             return HttpResponseRedirect(redirect_url)
 
@@ -1524,7 +1559,12 @@ class ModelAdmin(BaseModelAdmin):
                 current_app=self.admin_site.name,
             )
             redirect_url = add_preserved_filters(
-                {"preserved_filters": preserved_filters, "opts": opts}, redirect_url
+                {
+                    "preserved_filters": preserved_filters,
+                    "preserved_qsl": preserved_qsl,
+                    "opts": opts,
+                },
+                redirect_url,
             )
             return HttpResponseRedirect(redirect_url)
 
@@ -1720,9 +1760,9 @@ class ModelAdmin(BaseModelAdmin):
                 has_delete_permission = inline.has_delete_permission(request, obj)
             else:
                 # Disable all edit-permissions, and override formset settings.
-                has_add_permission = (
-                    has_change_permission
-                ) = has_delete_permission = False
+                has_add_permission = has_change_permission = has_delete_permission = (
+                    False
+                )
                 formset.extra = formset.max_num = 0
             has_view_permission = inline.has_view_permission(request, obj)
             prepopulated = dict(inline.get_prepopulated_fields(request, obj))
@@ -1857,9 +1897,11 @@ class ModelAdmin(BaseModelAdmin):
             form,
             list(fieldsets),
             # Clear prepopulated fields on a view-only form to avoid a crash.
-            self.get_prepopulated_fields(request, obj)
-            if add or self.has_change_permission(request, obj)
-            else {},
+            (
+                self.get_prepopulated_fields(request, obj)
+                if add or self.has_change_permission(request, obj)
+                else {}
+            ),
             readonly_fields,
             model_admin=self,
         )
@@ -2166,7 +2208,7 @@ class ModelAdmin(BaseModelAdmin):
             obj_display = str(obj)
             attr = str(to_field) if to_field else self.opts.pk.attname
             obj_id = obj.serializable_value(attr)
-            self.log_deletion(request, obj, obj_display)
+            self.log_deletions(request, [obj])
             self.delete_model(request, obj)
 
             return self.response_delete(request, obj_display, obj_id)

@@ -1,6 +1,7 @@
 """
 Regression tests for the Test Client, especially the customized assertions.
 """
+
 import itertools
 import os
 
@@ -80,85 +81,140 @@ class AssertContainsTests(SimpleTestCase):
         try:
             self.assertNotContains(response, "once")
         except AssertionError as e:
-            self.assertIn("Response should not contain 'once'", str(e))
+            self.assertIn(
+                "'once' unexpectedly found in the following response\n"
+                f"{response.content}",
+                str(e),
+            )
         try:
             self.assertNotContains(response, "once", msg_prefix="abc")
         except AssertionError as e:
-            self.assertIn("abc: Response should not contain 'once'", str(e))
+            self.assertIn(
+                "abc: 'once' unexpectedly found in the following response\n"
+                f"{response.content}",
+                str(e),
+            )
 
         try:
             self.assertContains(response, "never", 1)
         except AssertionError as e:
             self.assertIn(
-                "Found 0 instances of 'never' in response (expected 1)", str(e)
+                "Found 0 instances of 'never' (expected 1) in the following response\n"
+                f"{response.content}",
+                str(e),
             )
         try:
             self.assertContains(response, "never", 1, msg_prefix="abc")
         except AssertionError as e:
             self.assertIn(
-                "abc: Found 0 instances of 'never' in response (expected 1)", str(e)
+                "abc: Found 0 instances of 'never' (expected 1) in the following "
+                f"response\n{response.content}",
+                str(e),
             )
 
         try:
             self.assertContains(response, "once", 0)
         except AssertionError as e:
             self.assertIn(
-                "Found 1 instances of 'once' in response (expected 0)", str(e)
+                "Found 1 instances of 'once' (expected 0) in the following response\n"
+                f"{response.content}",
+                str(e),
             )
         try:
             self.assertContains(response, "once", 0, msg_prefix="abc")
         except AssertionError as e:
             self.assertIn(
-                "abc: Found 1 instances of 'once' in response (expected 0)", str(e)
+                "abc: Found 1 instances of 'once' (expected 0) in the following "
+                f"response\n{response.content}",
+                str(e),
             )
 
         try:
             self.assertContains(response, "once", 2)
         except AssertionError as e:
             self.assertIn(
-                "Found 1 instances of 'once' in response (expected 2)", str(e)
+                "Found 1 instances of 'once' (expected 2) in the following response\n"
+                f"{response.content}",
+                str(e),
             )
         try:
             self.assertContains(response, "once", 2, msg_prefix="abc")
         except AssertionError as e:
             self.assertIn(
-                "abc: Found 1 instances of 'once' in response (expected 2)", str(e)
+                "abc: Found 1 instances of 'once' (expected 2) in the following "
+                f"response\n{response.content}",
+                str(e),
             )
 
         try:
             self.assertContains(response, "twice", 1)
         except AssertionError as e:
             self.assertIn(
-                "Found 2 instances of 'twice' in response (expected 1)", str(e)
+                "Found 2 instances of 'twice' (expected 1) in the following response\n"
+                f"{response.content}",
+                str(e),
             )
         try:
             self.assertContains(response, "twice", 1, msg_prefix="abc")
         except AssertionError as e:
             self.assertIn(
-                "abc: Found 2 instances of 'twice' in response (expected 1)", str(e)
+                "abc: Found 2 instances of 'twice' (expected 1) in the following "
+                f"response\n{response.content}",
+                str(e),
             )
 
         try:
             self.assertContains(response, "thrice")
         except AssertionError as e:
-            self.assertIn("Couldn't find 'thrice' in response", str(e))
+            self.assertIn(
+                f"Couldn't find 'thrice' in the following response\n{response.content}",
+                str(e),
+            )
         try:
             self.assertContains(response, "thrice", msg_prefix="abc")
         except AssertionError as e:
-            self.assertIn("abc: Couldn't find 'thrice' in response", str(e))
+            self.assertIn(
+                "abc: Couldn't find 'thrice' in the following response\n"
+                f"{response.content}",
+                str(e),
+            )
 
         try:
             self.assertContains(response, "thrice", 3)
         except AssertionError as e:
             self.assertIn(
-                "Found 0 instances of 'thrice' in response (expected 3)", str(e)
+                "Found 0 instances of 'thrice' (expected 3) in the following response\n"
+                f"{response.content}",
+                str(e),
             )
         try:
             self.assertContains(response, "thrice", 3, msg_prefix="abc")
         except AssertionError as e:
             self.assertIn(
-                "abc: Found 0 instances of 'thrice' in response (expected 3)", str(e)
+                "abc: Found 0 instances of 'thrice' (expected 3) in the following "
+                f"response\n{response.content}",
+                str(e),
             )
+
+        long_content = (
+            b"This is a very very very very very very very very long message which "
+            b"exceedes the max limit of truncation."
+        )
+        response = HttpResponse(long_content)
+        msg = f"Couldn't find 'thrice' in the following response\n{long_content}"
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertContains(response, "thrice")
+
+        msg = (
+            "Found 1 instances of 'This' (expected 3) in the following response\n"
+            f"{long_content}"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertContains(response, "This", 3)
+
+        msg = f"'very' unexpectedly found in the following response\n{long_content}"
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertNotContains(response, "very")
 
     def test_unicode_contains(self):
         "Unicode characters can be found in template context"
@@ -1139,6 +1195,10 @@ class QueryStringTests(SimpleTestCase):
 
         # A POST-like request can pass a query string as part of the URL
         response = self.client.post("/request_data/?foo=whiz")
+        self.assertEqual(response.context["get-foo"], "whiz")
+        self.assertIsNone(response.context["post-foo"])
+
+        response = self.client.post("/request_data/", query_params={"foo": "whiz"})
         self.assertEqual(response.context["get-foo"], "whiz")
         self.assertIsNone(response.context["post-foo"])
 

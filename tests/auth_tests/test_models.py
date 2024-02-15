@@ -20,8 +20,6 @@ from django.db import connection, migrations
 from django.db.migrations.state import ModelState, ProjectState
 from django.db.models.signals import post_save
 from django.test import SimpleTestCase, TestCase, TransactionTestCase, override_settings
-from django.test.utils import ignore_warnings
-from django.utils.deprecation import RemovedInDjango51Warning
 
 from .models import CustomEmailField, IntegerUsernameUser
 
@@ -167,19 +165,6 @@ class UserManagerTestCase(TransactionTestCase):
                 password="test",
                 is_staff=False,
             )
-
-    @ignore_warnings(category=RemovedInDjango51Warning)
-    def test_make_random_password(self):
-        allowed_chars = "abcdefg"
-        password = UserManager().make_random_password(5, allowed_chars)
-        self.assertEqual(len(password), 5)
-        for char in password:
-            self.assertIn(char, allowed_chars)
-
-    def test_make_random_password_warning(self):
-        msg = "BaseUserManager.make_random_password() is deprecated."
-        with self.assertWarnsMessage(RemovedInDjango51Warning, msg):
-            UserManager().make_random_password()
 
     def test_runpython_manager_methods(self):
         def forwards(apps, schema_editor):
@@ -534,9 +519,7 @@ class TestCreateSuperUserSignals(TestCase):
     def setUp(self):
         self.signals_count = 0
         post_save.connect(self.post_save_listener, sender=User)
-
-    def tearDown(self):
-        post_save.disconnect(self.post_save_listener, sender=User)
+        self.addCleanup(post_save.disconnect, self.post_save_listener, sender=User)
 
     def test_create_user(self):
         User.objects.create_user("JohnDoe")

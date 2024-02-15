@@ -3,21 +3,24 @@ import re
 import tempfile
 import threading
 import unittest
+from contextlib import contextmanager
 from pathlib import Path
 from unittest import mock
 
-from django.db import NotSupportedError, connection, transaction
-from django.db.models import Aggregate, Avg, CharField, StdDev, Sum, Variance
-from django.db.utils import ConnectionHandler
-from django.test import (
-    TestCase,
-    TransactionTestCase,
-    override_settings,
-    skipIfDBFeature,
+from django.core.exceptions import ImproperlyConfigured
+from django.db import (
+    DEFAULT_DB_ALIAS,
+    NotSupportedError,
+    connection,
+    connections,
+    transaction,
 )
-from django.test.utils import isolate_apps
+from django.db.models import Aggregate, Avg, StdDev, Sum, Variance
+from django.db.utils import ConnectionHandler
+from django.test import SimpleTestCase, TestCase, TransactionTestCase, override_settings
+from django.test.utils import CaptureQueriesContext, isolate_apps
 
-from ..models import Author, Item, Object, Square
+from ..models import Item, Object, Square
 
 
 @unittest.skipUnless(connection.vendor == "sqlite", "SQLite tests")
@@ -106,9 +109,9 @@ class Tests(TestCase):
             connections["default"].close()
             self.assertTrue(os.path.isfile(os.path.join(tmp, "test.db")))
 
-    @mock.patch.object(connection, "get_database_version", return_value=(3, 20))
+    @mock.patch.object(connection, "get_database_version", return_value=(3, 26))
     def test_check_database_version_supported(self, mocked_get_database_version):
-        msg = "SQLite 3.21 or later is required (found 3.20)."
+        msg = "SQLite 3.27 or later is required (found 3.26)."
         with self.assertRaisesMessage(NotSupportedError, msg):
             connection.check_database_version_supported()
         self.assertTrue(mocked_get_database_version.called)
@@ -166,39 +169,6 @@ class SchemaTests(TransactionTestCase):
                 self.assertFalse(constraint_checks_enabled())
             self.assertFalse(constraint_checks_enabled())
         self.assertTrue(constraint_checks_enabled())
-
-    @skipIfDBFeature("supports_atomic_references_rename")
-    def test_field_rename_inside_atomic_block(self):
-        """
-        NotImplementedError is raised when a model field rename is attempted
-        inside an atomic block.
-        """
-        new_field = CharField(max_length=255, unique=True)
-        new_field.set_attributes_from_name("renamed")
-        msg = (
-            "Renaming the 'backends_author'.'name' column while in a "
-            "transaction is not supported on SQLite < 3.26 because it would "
-            "break referential integrity. Try adding `atomic = False` to the "
-            "Migration class."
-        )
-        with self.assertRaisesMessage(NotSupportedError, msg):
-            with connection.schema_editor(atomic=True) as editor:
-                editor.alter_field(Author, Author._meta.get_field("name"), new_field)
-
-    @skipIfDBFeature("supports_atomic_references_rename")
-    def test_table_rename_inside_atomic_block(self):
-        """
-        NotImplementedError is raised when a table rename is attempted inside
-        an atomic block.
-        """
-        msg = (
-            "Renaming the 'backends_author' table while in a transaction is "
-            "not supported on SQLite < 3.26 because it would break referential "
-            "integrity. Try adding `atomic = False` to the Migration class."
-        )
-        with self.assertRaisesMessage(NotSupportedError, msg):
-            with connection.schema_editor(atomic=True) as editor:
-                editor.alter_db_table(Author, "backends_author", "renamed_table")
 
 
 @unittest.skipUnless(connection.vendor == "sqlite", "Test only for SQLite")
@@ -260,11 +230,72 @@ class ThreadSharing(TransactionTestCase):
     available_apps = ["backends"]
 
     def test_database_sharing_in_threads(self):
+        thread_connections = []
+
         def create_object():
             Object.objects.create()
+            thread_connections.append(connections[DEFAULT_DB_ALIAS].connection)
 
-        create_object()
-        thread = threading.Thread(target=create_object)
-        thread.start()
-        thread.join()
-        self.assertEqual(Object.objects.count(), 2)
+        main_connection = connections[DEFAULT_DB_ALIAS].connection
+        try:
+            create_object()
+            thread = threading.Thread(target=create_object)
+            thread.start()
+            thread.join()
+            self.assertEqual(Object.objects.count(), 2)
+        finally:
+            for conn in thread_connections:
+                if conn is not main_connection:
+                    conn.close()
+
+
+@unittest.skipUnless(connection.vendor == "sqlite", "SQLite tests")
+class TestTransactionMode(SimpleTestCase):
+    databases = {"default"}
+
+    def test_default_transaction_mode(self):
+        with CaptureQueriesContext(connection) as captured_queries:
+            with transaction.atomic():
+                pass
+
+        begin_query, commit_query = captured_queries
+        self.assertEqual(begin_query["sql"], "BEGIN")
+        self.assertEqual(commit_query["sql"], "COMMIT")
+
+    def test_invalid_transaction_mode(self):
+        msg = (
+            "settings.DATABASES['default']['OPTIONS']['transaction_mode'] is "
+            "improperly configured to 'invalid'. Use one of 'DEFERRED', 'EXCLUSIVE', "
+            "'IMMEDIATE', or None."
+        )
+        with self.change_transaction_mode("invalid") as new_connection:
+            with self.assertRaisesMessage(ImproperlyConfigured, msg):
+                new_connection.ensure_connection()
+
+    def test_valid_transaction_modes(self):
+        valid_transaction_modes = ("deferred", "immediate", "exclusive")
+        for transaction_mode in valid_transaction_modes:
+            with (
+                self.subTest(transaction_mode=transaction_mode),
+                self.change_transaction_mode(transaction_mode) as new_connection,
+                CaptureQueriesContext(new_connection) as captured_queries,
+            ):
+                new_connection.set_autocommit(
+                    False, force_begin_transaction_with_broken_autocommit=True
+                )
+                new_connection.commit()
+                expected_transaction_mode = transaction_mode.upper()
+                begin_sql = captured_queries[0]["sql"]
+                self.assertEqual(begin_sql, f"BEGIN {expected_transaction_mode}")
+
+    @contextmanager
+    def change_transaction_mode(self, transaction_mode):
+        new_connection = connection.copy()
+        new_connection.settings_dict["OPTIONS"] = {
+            **new_connection.settings_dict["OPTIONS"],
+            "transaction_mode": transaction_mode,
+        }
+        try:
+            yield new_connection
+        finally:
+            new_connection.close()

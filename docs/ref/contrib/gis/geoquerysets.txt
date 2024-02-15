@@ -351,8 +351,6 @@ SpatiaLite  ``Intersects(poly, geom)``
 ``isempty``
 -----------
 
-.. versionadded:: 4.2
-
 *Availability*: `PostGIS <https://postgis.net/docs/ST_IsEmpty.html>`__
 
 Tests if the geometry is empty.
@@ -872,7 +870,7 @@ Example:
 
 .. class:: Collect(geo_field, filter=None)
 
-*Availability*: `PostGIS <https://postgis.net/docs/ST_Collect.html>`__,
+*Availability*: `PostGIS <https://postgis.net/docs/ST_Collect.html>`__, MySQL,
 SpatiaLite
 
 Returns a ``GEOMETRYCOLLECTION`` or a ``MULTI`` geometry object from the geometry
@@ -884,6 +882,10 @@ caring about dissolving boundaries.
 .. versionchanged:: 5.0
 
     Support for using the ``filter`` argument was added.
+
+.. versionchanged:: 5.1
+
+    MySQL 8.0.24+ support was added.
 
 ``Extent``
 ~~~~~~~~~~

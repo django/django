@@ -23,10 +23,6 @@ __ https://dev.maxmind.com/geoip/geolite2-free-geolocation-data
 __ https://db-ip.com/db/lite.php
 __ https://github.com/maxmind/libmaxminddb/
 
-.. versionchanged:: 4.2
-
-    Support for ``.mmdb`` files downloaded from DB-IP was added.
-
 Example
 =======
 
@@ -37,20 +33,28 @@ Here is an example of its usage:
     >>> from django.contrib.gis.geoip2 import GeoIP2
     >>> g = GeoIP2()
     >>> g.country("google.com")
-    {'country_code': 'US', 'country_name': 'United States'}
+    {'continent_code': 'NA',
+     'continent_name': 'North America',
+     'country_code': 'US',
+     'country_name': 'United States',
+     'is_in_european_union': False}
     >>> g.city("72.14.207.99")
-    {'city': 'Mountain View',
-    'continent_code': 'NA',
-    'continent_name': 'North America',
-    'country_code': 'US',
-    'country_name': 'United States',
-    'dma_code': 807,
-    'is_in_european_union': False,
-    'latitude': 37.419200897216797,
-    'longitude': -122.05740356445312,
-    'postal_code': '94043',
-    'region': 'CA',
-    'time_zone': 'America/Los_Angeles'}
+    {'accuracy_radius': 1000,
+     'city': 'Mountain View',
+     'continent_code': 'NA',
+     'continent_name': 'North America',
+     'country_code': 'US',
+     'country_name': 'United States',
+     'is_in_european_union': False,
+     'latitude': 37.419200897216797,
+     'longitude': -122.05740356445312,
+     'metro_code': 807,
+     'postal_code': '94043',
+     'region_code': 'CA',
+     'region_name': 'California',
+     'time_zone': 'America/Los_Angeles',
+     'dma_code': 807,
+     'region': 'CA'}
     >>> g.lat_lon("salon.com")
     (39.0437, -77.4875)
     >>> g.lon_lat("uh.edu")
@@ -104,13 +108,18 @@ Instantiating
 This classmethod instantiates the GeoIP object from the given database path
 and given cache setting.
 
+.. deprecated:: 5.1
+
+   Use the :class:`GeoIP2()` constructor instead.
+
 Querying
 --------
 
-All the following querying routines may take either a string IP address
-or a fully qualified domain name (FQDN). For example, both
-``'205.186.163.125'`` and ``'djangoproject.com'`` would be valid query
-parameters.
+All the following querying routines may take an instance of
+:class:`~ipaddress.IPv4Address` or :class:`~ipaddress.IPv6Address`, a string IP
+address, or a fully qualified domain name (FQDN). For example,
+``IPv4Address("205.186.163.125")``, ``"205.186.163.125"``, and
+``"djangoproject.com"`` would all be valid query parameters.
 
 .. method:: GeoIP2.city(query)
 
@@ -136,6 +145,10 @@ Coordinate Retrieval
 .. method:: GeoIP2.coords(query)
 
 Returns a coordinate tuple of (longitude, latitude).
+
+.. deprecated:: 5.1
+
+    Use :meth:`.GeoIP2.lon_lat` instead.
 
 .. method:: GeoIP2.lon_lat(query)
 

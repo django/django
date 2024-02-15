@@ -73,7 +73,7 @@ class ConcatPair(Func):
 
     function = "CONCAT"
 
-    def as_sqlite(self, compiler, connection, **extra_context):
+    def pipes_concat_sql(self, compiler, connection, **extra_context):
         coalesced = self.coalesce()
         return super(ConcatPair, coalesced).as_sql(
             compiler,
@@ -83,19 +83,21 @@ class ConcatPair(Func):
             **extra_context,
         )
 
+    as_sqlite = pipes_concat_sql
+
     def as_postgresql(self, compiler, connection, **extra_context):
-        copy = self.copy()
-        copy.set_source_expressions(
+        c = self.copy()
+        c.set_source_expressions(
             [
-                Cast(expression, TextField())
-                for expression in copy.get_source_expressions()
+                (
+                    expression
+                    if isinstance(expression.output_field, (CharField, TextField))
+                    else Cast(expression, TextField())
+                )
+                for expression in c.get_source_expressions()
             ]
         )
-        return super(ConcatPair, copy).as_sql(
-            compiler,
-            connection,
-            **extra_context,
-        )
+        return c.pipes_concat_sql(compiler, connection, **extra_context)
 
     def as_mysql(self, compiler, connection, **extra_context):
         # Use CONCAT_WS with an empty separator so that NULLs are ignored.
@@ -132,16 +134,20 @@ class Concat(Func):
     def __init__(self, *expressions, **extra):
         if len(expressions) < 2:
             raise ValueError("Concat must take at least two expressions")
-        paired = self._paired(expressions)
+        paired = self._paired(expressions, output_field=extra.get("output_field"))
         super().__init__(paired, **extra)
 
-    def _paired(self, expressions):
+    def _paired(self, expressions, output_field):
         # wrap pairs of expressions in successive concat functions
         # exp = [a, b, c, d]
         # -> ConcatPair(a, ConcatPair(b, ConcatPair(c, d))))
         if len(expressions) == 2:
-            return ConcatPair(*expressions)
-        return ConcatPair(expressions[0], self._paired(expressions[1:]))
+            return ConcatPair(*expressions, output_field=output_field)
+        return ConcatPair(
+            expressions[0],
+            self._paired(expressions[1:], output_field=output_field),
+            output_field=output_field,
+        )
 
 
 class Left(Func):
@@ -257,13 +263,14 @@ class Reverse(Transform):
     def as_oracle(self, compiler, connection, **extra_context):
         # REVERSE in Oracle is undocumented and doesn't support multi-byte
         # strings. Use a special subquery instead.
+        suffix = connection.features.bare_select_suffix
         sql, params = super().as_sql(
             compiler,
             connection,
             template=(
                 "(SELECT LISTAGG(s) WITHIN GROUP (ORDER BY n DESC) FROM "
-                "(SELECT LEVEL n, SUBSTR(%(expressions)s, LEVEL, 1) s "
-                "FROM DUAL CONNECT BY LEVEL <= LENGTH(%(expressions)s)) "
+                f"(SELECT LEVEL n, SUBSTR(%(expressions)s, LEVEL, 1) s{suffix} "
+                "CONNECT BY LEVEL <= LENGTH(%(expressions)s)) "
                 "GROUP BY %(expressions)s)"
             ),
             **extra_context,

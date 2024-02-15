@@ -11,8 +11,6 @@ Django provides convenient ways to access the default storage class:
 
 .. data:: storages
 
-    .. versionadded:: 4.2
-
     Storage instances as defined by :setting:`STORAGES`.
 
 .. class:: DefaultStorage
@@ -26,22 +24,6 @@ Django provides convenient ways to access the default storage class:
 
     :data:`~django.core.files.storage.default_storage` is an instance of the
     :class:`~django.core.files.storage.DefaultStorage`.
-
-.. function:: get_storage_class(import_path=None)
-
-    Returns a class or module which implements the storage API.
-
-    When called without the ``import_path`` parameter ``get_storage_class``
-    will return the default storage system as defined by ``default`` key in
-    :setting:`STORAGES`. If ``import_path`` is provided, ``get_storage_class``
-    will attempt to import the class or module from the given path and will
-    return it if successful. An exception will be raised if the import is
-    unsuccessful.
-
-    .. deprecated:: 4.2
-
-        The ``get_storage_class()`` function is deprecated. Use
-        :data:`storages` instead
 
 The ``FileSystemStorage`` class
 ===============================
@@ -87,8 +69,6 @@ The ``FileSystemStorage`` class
 
 The ``InMemoryStorage`` class
 =============================
-
-.. versionadded:: 4.2
 
 .. class:: InMemoryStorage(location=None, base_url=None, file_permissions_mode=None, directory_permissions_mode=None)
 

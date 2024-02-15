@@ -20,15 +20,15 @@ class RemoteUserTest(TestCase):
     known_user = "knownuser"
     known_user2 = "knownuser2"
 
-    def setUp(self):
-        self.patched_settings = modify_settings(
-            AUTHENTICATION_BACKENDS={"append": self.backend},
-            MIDDLEWARE={"append": self.middleware},
+    @classmethod
+    def setUpClass(cls):
+        cls.enterClassContext(
+            modify_settings(
+                AUTHENTICATION_BACKENDS={"append": cls.backend},
+                MIDDLEWARE={"append": cls.middleware},
+            )
         )
-        self.patched_settings.enable()
-
-    def tearDown(self):
-        self.patched_settings.disable()
+        super().setUpClass()
 
     def test_no_remote_user(self):
         """Users are not created when remote user is not specified."""

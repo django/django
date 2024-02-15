@@ -1293,81 +1293,6 @@ class OptimizerTests(SimpleTestCase):
             ],
         )
 
-    def test_create_model_remove_index_together_rename_index(self):
-        self.assertOptimizesTo(
-            [
-                migrations.CreateModel(
-                    name="Pony",
-                    fields=[
-                        ("weight", models.IntegerField()),
-                        ("age", models.IntegerField()),
-                    ],
-                    options={
-                        "index_together": [("age", "weight")],
-                    },
-                ),
-                migrations.RenameIndex(
-                    "Pony", new_name="idx_pony_age_weight", old_fields=("age", "weight")
-                ),
-            ],
-            [
-                migrations.CreateModel(
-                    name="Pony",
-                    fields=[
-                        ("weight", models.IntegerField()),
-                        ("age", models.IntegerField()),
-                    ],
-                    options={
-                        "indexes": [
-                            models.Index(
-                                fields=["age", "weight"], name="idx_pony_age_weight"
-                            ),
-                        ],
-                    },
-                ),
-            ],
-        )
-
-    def test_create_model_index_together_rename_index(self):
-        self.assertOptimizesTo(
-            [
-                migrations.CreateModel(
-                    name="Pony",
-                    fields=[
-                        ("weight", models.IntegerField()),
-                        ("age", models.IntegerField()),
-                        ("height", models.IntegerField()),
-                        ("rank", models.IntegerField()),
-                    ],
-                    options={
-                        "index_together": [("age", "weight"), ("height", "rank")],
-                    },
-                ),
-                migrations.RenameIndex(
-                    "Pony", new_name="idx_pony_age_weight", old_fields=("age", "weight")
-                ),
-            ],
-            [
-                migrations.CreateModel(
-                    name="Pony",
-                    fields=[
-                        ("weight", models.IntegerField()),
-                        ("age", models.IntegerField()),
-                        ("height", models.IntegerField()),
-                        ("rank", models.IntegerField()),
-                    ],
-                    options={
-                        "index_together": {("height", "rank")},
-                        "indexes": [
-                            models.Index(
-                                fields=["age", "weight"], name="idx_pony_age_weight"
-                            ),
-                        ],
-                    },
-                ),
-            ],
-        )
-
     def test_create_model_rename_index_no_old_fields(self):
         self.assertOptimizesTo(
             [
@@ -1398,6 +1323,69 @@ class OptimizerTests(SimpleTestCase):
                 ),
                 migrations.RenameIndex(
                     "Pony", new_name="idx_pony_age_new", old_name="idx_pony_age"
+                ),
+            ],
+        )
+
+    def test_create_model_add_constraint(self):
+        gt_constraint = models.CheckConstraint(
+            check=models.Q(weight__gt=0), name="pony_weight_gt_0"
+        )
+        self.assertOptimizesTo(
+            [
+                migrations.CreateModel(
+                    name="Pony",
+                    fields=[
+                        ("weight", models.IntegerField()),
+                    ],
+                ),
+                migrations.AddConstraint("Pony", gt_constraint),
+            ],
+            [
+                migrations.CreateModel(
+                    name="Pony",
+                    fields=[
+                        ("weight", models.IntegerField()),
+                    ],
+                    options={"constraints": [gt_constraint]},
+                ),
+            ],
+        )
+
+    def test_create_model_remove_constraint(self):
+        self.assertOptimizesTo(
+            [
+                migrations.CreateModel(
+                    name="Pony",
+                    fields=[
+                        ("weight", models.IntegerField()),
+                    ],
+                    options={
+                        "constraints": [
+                            models.CheckConstraint(
+                                check=models.Q(weight__gt=0), name="pony_weight_gt_0"
+                            ),
+                            models.UniqueConstraint(
+                                "weight", name="pony_weight_unique"
+                            ),
+                        ],
+                    },
+                ),
+                migrations.RemoveConstraint("Pony", "pony_weight_gt_0"),
+            ],
+            [
+                migrations.CreateModel(
+                    name="Pony",
+                    fields=[
+                        ("weight", models.IntegerField()),
+                    ],
+                    options={
+                        "constraints": [
+                            models.UniqueConstraint(
+                                "weight", name="pony_weight_unique"
+                            ),
+                        ]
+                    },
                 ),
             ],
         )

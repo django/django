@@ -144,35 +144,40 @@ class FileTests(unittest.TestCase):
         self.assertEqual(list(f), ["one\n", "two\n", "three"])
 
     def test_readable(self):
-        with tempfile.TemporaryFile() as temp, File(
-            temp, name="something.txt"
-        ) as test_file:
+        with (
+            tempfile.TemporaryFile() as temp,
+            File(temp, name="something.txt") as test_file,
+        ):
             self.assertTrue(test_file.readable())
         self.assertFalse(test_file.readable())
 
     def test_writable(self):
-        with tempfile.TemporaryFile() as temp, File(
-            temp, name="something.txt"
-        ) as test_file:
+        with (
+            tempfile.TemporaryFile() as temp,
+            File(temp, name="something.txt") as test_file,
+        ):
             self.assertTrue(test_file.writable())
         self.assertFalse(test_file.writable())
-        with tempfile.TemporaryFile("rb") as temp, File(
-            temp, name="something.txt"
-        ) as test_file:
+        with (
+            tempfile.TemporaryFile("rb") as temp,
+            File(temp, name="something.txt") as test_file,
+        ):
             self.assertFalse(test_file.writable())
 
     def test_seekable(self):
-        with tempfile.TemporaryFile() as temp, File(
-            temp, name="something.txt"
-        ) as test_file:
+        with (
+            tempfile.TemporaryFile() as temp,
+            File(temp, name="something.txt") as test_file,
+        ):
             self.assertTrue(test_file.seekable())
         self.assertFalse(test_file.seekable())
 
     def test_io_wrapper(self):
         content = "vive l'été\n"
-        with tempfile.TemporaryFile() as temp, File(
-            temp, name="something.txt"
-        ) as test_file:
+        with (
+            tempfile.TemporaryFile() as temp,
+            File(temp, name="something.txt") as test_file,
+        ):
             test_file.write(content.encode())
             test_file.seek(0)
             wrapper = TextIOWrapper(test_file, "utf-8", newline="\n")
@@ -199,6 +204,21 @@ class FileTests(unittest.TestCase):
             self.assertIs(locks.lock(f2, locks.LOCK_SH | locks.LOCK_NB), True)
             self.assertIs(locks.unlock(f1), True)
             self.assertIs(locks.unlock(f2), True)
+
+    def test_open_supports_full_signature(self):
+        called = False
+
+        def opener(path, flags):
+            nonlocal called
+            called = True
+            return os.open(path, flags)
+
+        file_path = Path(__file__).parent / "test.png"
+        with open(file_path) as f:
+            test_file = File(f)
+
+        with test_file.open(opener=opener):
+            self.assertIs(called, True)
 
 
 class NoNameFileTestCase(unittest.TestCase):

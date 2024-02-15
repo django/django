@@ -107,11 +107,11 @@ class CommonMiddlewareTest(SimpleTestCase):
         self.assertEqual(resp.url, "/slash/?test=slash/")
 
     @override_settings(APPEND_SLASH=True, DEBUG=True)
-    def test_append_slash_no_redirect_on_POST_in_DEBUG(self):
+    def test_append_slash_no_redirect_in_DEBUG(self):
         """
         While in debug mode, an exception is raised with a warning
-        when a failed attempt is made to POST, PUT, or PATCH to an URL which
-        would normally be redirected to a slashed version.
+        when a failed attempt is made to DELETE, POST, PUT, or PATCH to an URL
+        which would normally be redirected to a slashed version.
         """
         msg = "maintaining %s data. Change your form to point to testserver/slash/"
         request = self.rf.get("/slash")
@@ -124,6 +124,9 @@ class CommonMiddlewareTest(SimpleTestCase):
             CommonMiddleware(get_response_404)(request)
         request = self.rf.get("/slash")
         request.method = "PATCH"
+        with self.assertRaisesMessage(RuntimeError, msg % request.method):
+            CommonMiddleware(get_response_404)(request)
+        request = self.rf.delete("/slash")
         with self.assertRaisesMessage(RuntimeError, msg % request.method):
             CommonMiddleware(get_response_404)(request)
 
@@ -851,9 +854,9 @@ class GZipMiddlewareTest(SimpleTestCase):
     def setUp(self):
         self.req = self.request_factory.get("/")
         self.req.META["HTTP_ACCEPT_ENCODING"] = "gzip, deflate"
-        self.req.META[
-            "HTTP_USER_AGENT"
-        ] = "Mozilla/5.0 (Windows NT 5.1; rv:9.0.1) Gecko/20100101 Firefox/9.0.1"
+        self.req.META["HTTP_USER_AGENT"] = (
+            "Mozilla/5.0 (Windows NT 5.1; rv:9.0.1) Gecko/20100101 Firefox/9.0.1"
+        )
         self.resp = HttpResponse()
         self.resp.status_code = 200
         self.resp.content = self.compressible_string

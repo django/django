@@ -27,7 +27,7 @@ template system a programmer uses.
 Although Django comes with a full stack for convenience, the pieces of the
 stack are independent of another wherever possible.
 
-.. _`loose coupling and tight cohesion`: http://wiki.c2.com/?CouplingAndCohesion
+.. _`loose coupling and tight cohesion`: https://wiki.c2.com/?CouplingAndCohesion
 
 .. _less-code:
 
@@ -66,7 +66,7 @@ as possible.
 
     The `discussion of DRY on the Portland Pattern Repository`__
 
-    __ http://wiki.c2.com/?DontRepeatYourself
+    __ https://wiki.c2.com/?DontRepeatYourself
 
 .. _explicit-is-better-than-implicit:
 
@@ -253,10 +253,6 @@ The goal is not to invent a programming language. The goal is to offer just
 enough programming-esque functionality, such as branching and looping, that is
 essential for making presentation-related decisions. The :ref:`Django Template
 Language (DTL) <template-language-intro>` aims to avoid advanced logic.
-
-The Django template system recognizes that templates are most often written by
-*designers*, not *programmers*, and therefore should not assume Python
-knowledge.
 
 Safety and security
 -------------------

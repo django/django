@@ -997,6 +997,8 @@ databases don't allow ``LIMIT`` or ``OFFSET`` in the combined queries.
 Uses SQL's ``INTERSECT`` operator to return the shared elements of two or more
 ``QuerySet``\s. For example:
 
+.. code-block:: pycon
+
     >>> qs1.intersection(qs2, qs3)
 
 See :meth:`union` for some restrictions.
@@ -1149,14 +1151,20 @@ one-to-one.
 
 ``prefetch_related``, on the other hand, does a separate lookup for each
 relationship, and does the 'joining' in Python. This allows it to prefetch
-many-to-many and many-to-one objects, which cannot be done using
-``select_related``, in addition to the foreign key and one-to-one relationships
-that are supported by ``select_related``. It also supports prefetching of
-:class:`~django.contrib.contenttypes.fields.GenericRelation` and
-:class:`~django.contrib.contenttypes.fields.GenericForeignKey`, however, it
-must be restricted to a homogeneous set of results. For example, prefetching
-objects referenced by a ``GenericForeignKey`` is only supported if the query
-is restricted to one ``ContentType``.
+many-to-many, many-to-one, and
+:class:`~django.contrib.contenttypes.fields.GenericRelation` objects which
+cannot be done using ``select_related``, in addition to the foreign key and
+one-to-one relationships that are supported by ``select_related``. It also
+supports prefetching of
+:class:`~django.contrib.contenttypes.fields.GenericForeignKey`, however, the
+queryset for each ``ContentType`` must be provided in the ``querysets``
+parameter of :class:`~django.contrib.contenttypes.prefetch.GenericPrefetch`.
+
+.. versionchanged:: 5.0
+
+    Support for prefetching
+    :class:`~django.contrib.contenttypes.fields.GenericForeignKey` with
+    non-homogeneous set of results was added.
 
 For example, suppose you have these models::
 
@@ -1191,7 +1199,9 @@ item in the Pizza ``QuerySet``.
 
 We can reduce to just two queries using ``prefetch_related``:
 
-    >>> Pizza.objects.prefetch_related('toppings')
+.. code-block:: pycon
+
+    >>> Pizza.objects.prefetch_related("toppings")
 
 This implies a ``self.toppings.all()`` for each ``Pizza``; now each time
 ``self.toppings.all()`` is called, instead of having to go to the database for
@@ -1204,6 +1214,19 @@ results; these ``QuerySets`` are then used in the ``self.toppings.all()`` calls.
 
 The additional queries in ``prefetch_related()`` are executed after the
 ``QuerySet`` has begun to be evaluated and the primary query has been executed.
+
+Note that there is no mechanism to prevent another database query from altering
+the items in between the execution of the primary query and the additional
+queries, which could produce an inconsistent result. For example, if a
+``Pizza`` is deleted after the primary query has executed, its toppings will
+not be returned in the additional query, and it will seem like the pizza has no
+toppings:
+
+.. code-block:: pycon
+
+    >>> Pizza.objects.prefetch_related("toppings")
+    #  "Hawaiian" Pizza was deleted in another shell.
+    <QuerySet [<Pizza: Hawaiian ()>, <Pizza: Seafood (prawns, smoked salmon)>]>
 
 If you have an iterable of model instances, you can prefetch related attributes
 on those instances using the :func:`~django.db.models.prefetch_related_objects`
@@ -1222,7 +1245,9 @@ database.
     results, and retrieve data using a fresh database query. So, if you write
     the following:
 
-        >>> pizzas = Pizza.objects.prefetch_related('toppings')
+    .. code-block:: pycon
+
+        >>> pizzas = Pizza.objects.prefetch_related("toppings")
         >>> [list(pizza.toppings.filter(spicy=True)) for pizza in pizzas]
 
     ...then the fact that ``pizza.toppings.all()`` has been prefetched will not
@@ -1234,6 +1259,7 @@ database.
 
     Also, if you call the database-altering methods
     :meth:`~django.db.models.fields.related.RelatedManager.add`,
+    :meth:`~django.db.models.fields.related.RelatedManager.create`,
     :meth:`~django.db.models.fields.related.RelatedManager.remove`,
     :meth:`~django.db.models.fields.related.RelatedManager.clear` or
     :meth:`~django.db.models.fields.related.RelatedManager.set`, on
@@ -1282,7 +1308,9 @@ Chaining ``prefetch_related`` calls will accumulate the lookups that are
 prefetched. To clear any ``prefetch_related`` behavior, pass ``None`` as a
 parameter:
 
-   >>> non_prefetched = qs.prefetch_related(None)
+.. code-block:: pycon
+
+    >>> non_prefetched = qs.prefetch_related(None)
 
 One difference to note when using ``prefetch_related`` is that objects created
 by a query can be shared between the different objects that they are related to
@@ -1313,20 +1341,28 @@ the prefetch operation.
 In its simplest form ``Prefetch`` is equivalent to the traditional string based
 lookups:
 
+.. code-block:: pycon
+
     >>> from django.db.models import Prefetch
-    >>> Restaurant.objects.prefetch_related(Prefetch('pizzas__toppings'))
+    >>> Restaurant.objects.prefetch_related(Prefetch("pizzas__toppings"))
 
 You can provide a custom queryset with the optional ``queryset`` argument.
 This can be used to change the default ordering of the queryset:
 
+.. code-block:: pycon
+
     >>> Restaurant.objects.prefetch_related(
-    ...     Prefetch('pizzas__toppings', queryset=Toppings.objects.order_by('name')))
+    ...     Prefetch("pizzas__toppings", queryset=Toppings.objects.order_by("name"))
+    ... )
 
 Or to call :meth:`~django.db.models.query.QuerySet.select_related()` when
 applicable to reduce the number of queries even further:
 
+.. code-block:: pycon
+
     >>> Pizza.objects.prefetch_related(
-    ...     Prefetch('restaurants', queryset=Restaurant.objects.select_related('best_pizza')))
+    ...     Prefetch("restaurants", queryset=Restaurant.objects.select_related("best_pizza"))
+    ... )
 
 You can also assign the prefetched result to a custom attribute with the optional
 ``to_attr`` argument. The result will be stored directly in a list.
@@ -1334,32 +1370,42 @@ You can also assign the prefetched result to a custom attribute with the optiona
 This allows prefetching the same relation multiple times with a different
 ``QuerySet``; for instance:
 
+.. code-block:: pycon
+
     >>> vegetarian_pizzas = Pizza.objects.filter(vegetarian=True)
     >>> Restaurant.objects.prefetch_related(
-    ...     Prefetch('pizzas', to_attr='menu'),
-    ...     Prefetch('pizzas', queryset=vegetarian_pizzas, to_attr='vegetarian_menu'))
+    ...     Prefetch("pizzas", to_attr="menu"),
+    ...     Prefetch("pizzas", queryset=vegetarian_pizzas, to_attr="vegetarian_menu"),
+    ... )
 
 Lookups created with custom ``to_attr`` can still be traversed as usual by other
 lookups:
 
+.. code-block:: pycon
+
     >>> vegetarian_pizzas = Pizza.objects.filter(vegetarian=True)
     >>> Restaurant.objects.prefetch_related(
-    ...     Prefetch('pizzas', queryset=vegetarian_pizzas, to_attr='vegetarian_menu'),
-    ...     'vegetarian_menu__toppings')
+    ...     Prefetch("pizzas", queryset=vegetarian_pizzas, to_attr="vegetarian_menu"),
+    ...     "vegetarian_menu__toppings",
+    ... )
 
 Using ``to_attr`` is recommended when filtering down the prefetch result as it is
 less ambiguous than storing a filtered result in the related manager's cache:
+
+.. code-block:: pycon
 
     >>> queryset = Pizza.objects.filter(vegetarian=True)
     >>>
     >>> # Recommended:
     >>> restaurants = Restaurant.objects.prefetch_related(
-    ...     Prefetch('pizzas', queryset=queryset, to_attr='vegetarian_pizzas'))
+    ...     Prefetch("pizzas", queryset=queryset, to_attr="vegetarian_pizzas")
+    ... )
     >>> vegetarian_pizzas = restaurants[0].vegetarian_pizzas
     >>>
     >>> # Not recommended:
     >>> restaurants = Restaurant.objects.prefetch_related(
-    ...     Prefetch('pizzas', queryset=queryset))
+    ...     Prefetch("pizzas", queryset=queryset),
+    ... )
     >>> vegetarian_pizzas = restaurants[0].pizzas.all()
 
 Custom prefetching also works with single related relations like
@@ -1375,10 +1421,13 @@ where prefetching with a custom ``QuerySet`` is useful:
 * You want to use performance optimization techniques like
   :meth:`deferred fields <defer()>`:
 
-    >>> queryset = Pizza.objects.only('name')
+  .. code-block:: pycon
+
+    >>> queryset = Pizza.objects.only("name")
     >>>
     >>> restaurants = Restaurant.objects.prefetch_related(
-    ...     Prefetch('best_pizza', queryset=queryset))
+    ...     Prefetch("best_pizza", queryset=queryset)
+    ... )
 
 When using multiple databases, ``Prefetch`` will respect your choice of
 database. If the inner query does not specify a database, it will use the
@@ -1408,20 +1457,26 @@ database selected by the outer query. All of the following are valid:
 
     Take the following examples:
 
-       >>> prefetch_related('pizzas__toppings', 'pizzas')
+    .. code-block:: pycon
+
+       >>> prefetch_related("pizzas__toppings", "pizzas")
 
     This works even though it's unordered because ``'pizzas__toppings'``
     already contains all the needed information, therefore the second argument
     ``'pizzas'`` is actually redundant.
 
-        >>> prefetch_related('pizzas__toppings', Prefetch('pizzas', queryset=Pizza.objects.all()))
+    .. code-block:: pycon
+
+        >>> prefetch_related("pizzas__toppings", Prefetch("pizzas", queryset=Pizza.objects.all()))
 
     This will raise a ``ValueError`` because of the attempt to redefine the
     queryset of a previously seen lookup. Note that an implicit queryset was
     created to traverse ``'pizzas'`` as part of the ``'pizzas__toppings'``
     lookup.
 
-        >>> prefetch_related('pizza_list__toppings', Prefetch('pizzas', to_attr='pizza_list'))
+    .. code-block:: pycon
+
+        >>> prefetch_related("pizza_list__toppings", Prefetch("pizzas", to_attr="pizza_list"))
 
     This will trigger an ``AttributeError`` because ``'pizza_list'`` doesn't exist yet
     when ``'pizza_list__toppings'`` is being processed.
@@ -1709,6 +1764,11 @@ never defer the loading of the primary key. If you are using
 loading of the field that connects from the primary model to the related
 one, doing so will result in an error.
 
+Similarly, calling ``defer()`` (or its counterpart :meth:`only()`) including an
+argument from an aggregation (e.g. using the result of :meth:`annotate()`)
+doesn't make sense: doing so will raise an exception. The aggregated values
+will always be fetched into the resulting queryset.
+
 .. note::
 
     The ``defer()`` method (and its cousin, :meth:`only()`, below) are only for
@@ -1803,8 +1863,9 @@ All of the cautions in the note for the :meth:`defer` documentation apply to
 ``only()`` as well. Use it cautiously and only after exhausting your other
 options.
 
-Using :meth:`only` and omitting a field requested using :meth:`select_related`
-is an error as well.
+Using ``only()`` and omitting a field requested using :meth:`select_related` is
+an error as well. On the other hand, invoking ``only()`` without any arguments,
+will return every field (including annotations) fetched by the queryset.
 
 As with ``defer()``, you cannot access the non-loaded fields from asynchronous
 code and expect them to load. Instead, you will get a
@@ -1922,8 +1983,8 @@ them:
 The ``postgresql``, ``oracle``, and ``mysql`` database backends support
 ``select_for_update()``. However, MariaDB only supports the ``nowait``
 argument, MariaDB 10.6+ also supports the ``skip_locked`` argument, and MySQL
-8.0.1+ supports the ``nowait``, ``skip_locked``, and ``of`` arguments. The
-``no_key`` argument is only supported on PostgreSQL.
+supports the ``nowait``, ``skip_locked``, and ``of`` arguments. The ``no_key``
+argument is only supported on PostgreSQL.
 
 Passing ``nowait=True``, ``skip_locked=True``, ``no_key=True``, or ``of`` to
 ``select_for_update()`` using database backends that do not support these
@@ -2127,7 +2188,7 @@ can use :exc:`django.core.exceptions.ObjectDoesNotExist`  to handle
 ~~~~~~~~~~~~
 
 .. method:: create(**kwargs)
-.. method:: acreate(*args, **kwargs)
+.. method:: acreate(**kwargs)
 
 *Asynchronous version*: ``acreate()``
 
@@ -2341,11 +2402,6 @@ Like :meth:`get_or_create` and :meth:`create`, if you're using manually
 specified primary keys and an object needs to be created but the key already
 exists in the database, an :exc:`~django.db.IntegrityError` is raised.
 
-.. versionchanged:: 4.2
-
-    In older versions, ``update_or_create()`` didn't specify ``update_fields``
-    when calling :meth:`Model.save() <django.db.models.Model.save>`.
-
 .. versionchanged:: 5.0
 
     The ``create_defaults`` argument was added.
@@ -2376,10 +2432,10 @@ This has a number of caveats though:
 * The model's ``save()`` method will not be called, and the ``pre_save`` and
   ``post_save`` signals will not be sent.
 * It does not work with child models in a multi-table inheritance scenario.
-* If the model's primary key is an :class:`~django.db.models.AutoField`, the
-  primary key attribute can only be retrieved on certain databases (currently
-  PostgreSQL, MariaDB 10.5+, and SQLite 3.35+). On other databases, it will not
-  be set.
+* If the model's primary key is an :class:`~django.db.models.AutoField` and
+  ``ignore_conflicts`` is False, the primary key attribute can only be
+  retrieved on certain databases (currently PostgreSQL, MariaDB, and SQLite
+  3.35+). On other databases, it will not be set.
 * It does not work with many-to-many relationships.
 * It casts ``objs`` to a list, which fully evaluates ``objs`` if it's a
   generator. The cast allows inspecting all objects so that any objects with a
@@ -2405,7 +2461,7 @@ On databases that support it (all but Oracle), setting the ``ignore_conflicts``
 parameter to ``True`` tells the database to ignore failure to insert any rows
 that fail constraints such as duplicate unique values.
 
-On databases that support it (all except Oracle and SQLite < 3.24), setting the
+On databases that support it (all except Oracle), setting the
 ``update_conflicts`` parameter to ``True``, tells the database to update
 ``update_fields`` when a row insertion fails on conflicts. On PostgreSQL and
 SQLite, in addition to ``update_fields``, a list of ``unique_fields`` that may
@@ -2573,10 +2629,10 @@ evaluated will force it to evaluate again, repeating the query.
 long as ``chunk_size`` is given. Larger values will necessitate fewer queries
 to accomplish the prefetching at the cost of greater memory usage.
 
-.. note::
+.. versionchanged:: 5.0
 
-    ``aiterator()`` is *not* compatible with previous calls to
-    ``prefetch_related()``.
+    Support for ``aiterator()`` with previous calls to ``prefetch_related()``
+    was added.
 
 On some databases (e.g. Oracle, `SQLite
 <https://www.sqlite.org/limits.html#max_variable_number>`_), the maximum number
@@ -2763,7 +2819,7 @@ number of authors that have contributed blog entries:
 .. code-block:: pycon
 
     >>> from django.db.models import Count
-    >>> q = Blog.objects.aggregate(Count("entry"))
+    >>> Blog.objects.aggregate(Count("entry"))
     {'entry__count': 16}
 
 By using a keyword argument to specify the aggregate function, you can
@@ -2771,7 +2827,7 @@ control the name of the aggregation value that is returned:
 
 .. code-block:: pycon
 
-    >>> q = Blog.objects.aggregate(number_of_entries=Count("entry"))
+    >>> Blog.objects.aggregate(number_of_entries=Count("entry"))
     {'number_of_entries': 16}
 
 For an in-depth discussion of aggregation, see :doc:`the topic guide on
@@ -3068,6 +3124,10 @@ On some databases, flags may cause the query to be executed which could have
 adverse effects on your database. For example, the ``ANALYZE`` flag supported
 by MariaDB, MySQL 8.0.18+, and PostgreSQL could result in changes to data if
 there are triggers or if a function is called, even for a ``SELECT`` query.
+
+.. versionchanged:: 5.1
+
+    Support for the ``generic_plan`` option on PostgreSQL 16+ was added.
 
 .. _field-lookups:
 
@@ -3833,14 +3893,15 @@ documentation to learn how to create your aggregates.
     currently emulates these features using a text field. Attempts to use
     aggregation on date/time fields in SQLite will raise ``NotSupportedError``.
 
-.. admonition:: Empty queryset
+.. admonition:: Empty querysets or groups
 
-    Aggregation functions return ``None`` when used with an empty
-    ``QuerySet``. For example, the ``Sum`` aggregation function returns ``None``
-    instead of ``0`` if the ``QuerySet`` contains no entries. To return another
-    value instead, pass a value to the ``default`` argument. An exception is
-    ``Count``, which does return ``0`` if the ``QuerySet`` is empty. ``Count``
-    does not support the ``default`` argument.
+    Aggregation functions return ``None`` when used with an empty ``QuerySet``
+    or group. For example, the ``Sum`` aggregation function returns ``None``
+    instead of ``0`` if the ``QuerySet`` contains no entries or for any empty
+    group in a non-empty ``QuerySet``. To return another value instead, define
+    the ``default`` argument. ``Count`` is an exception to this behavior; it
+    returns ``0`` if the ``QuerySet`` is empty since ``Count`` does not support
+    the ``default`` argument.
 
 All aggregates have the following parameters in common:
 
@@ -3897,7 +3958,8 @@ by the aggregate.
 
     * Default alias: ``<field>__avg``
     * Return type: ``float`` if input is ``int``, otherwise same as input
-      field, or ``output_field`` if supplied
+      field, or ``output_field`` if supplied. If the queryset or grouping is
+      empty, ``default`` is returned.
 
     .. attribute:: distinct
 
@@ -3935,7 +3997,8 @@ by the aggregate.
     Returns the maximum value of the given expression.
 
     * Default alias: ``<field>__max``
-    * Return type: same as input field, or ``output_field`` if supplied
+    * Return type: same as input field, or ``output_field`` if supplied. If the
+      queryset or grouping is empty, ``default`` is returned.
 
 ``Min``
 ~~~~~~~
@@ -3945,7 +4008,8 @@ by the aggregate.
     Returns the minimum value of the given expression.
 
     * Default alias: ``<field>__min``
-    * Return type: same as input field, or ``output_field`` if supplied
+    * Return type: same as input field, or ``output_field`` if supplied. If the
+      queryset or grouping is empty, ``default`` is returned.
 
 ``StdDev``
 ~~~~~~~~~~
@@ -3956,7 +4020,8 @@ by the aggregate.
 
     * Default alias: ``<field>__stddev``
     * Return type: ``float`` if input is ``int``, otherwise same as input
-      field, or ``output_field`` if supplied
+      field, or ``output_field`` if supplied. If the queryset or grouping is
+      empty, ``default`` is returned.
 
     .. attribute:: sample
 
@@ -3972,7 +4037,8 @@ by the aggregate.
     Computes the sum of all values of the given expression.
 
     * Default alias: ``<field>__sum``
-    * Return type: same as input field, or ``output_field`` if supplied
+    * Return type: same as input field, or ``output_field`` if supplied. If the
+      queryset or grouping is empty, ``default`` is returned.
 
     .. attribute:: distinct
 
@@ -3989,7 +4055,8 @@ by the aggregate.
 
     * Default alias: ``<field>__variance``
     * Return type: ``float`` if input is ``int``, otherwise same as input
-      field, or ``output_field`` if supplied
+      field, or ``output_field`` if supplied. If the queryset or grouping is
+      empty, ``default`` is returned.
 
     .. attribute:: sample
 
@@ -4027,12 +4094,14 @@ The ``lookup`` argument describes the relations to follow and works the same
 as the string based lookups passed to
 :meth:`~django.db.models.query.QuerySet.prefetch_related()`. For example:
 
+.. code-block:: pycon
+
     >>> from django.db.models import Prefetch
-    >>> Question.objects.prefetch_related(Prefetch('choice_set')).get().choice_set.all()
+    >>> Question.objects.prefetch_related(Prefetch("choice_set")).get().choice_set.all()
     <QuerySet [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]>
     # This will only execute two queries regardless of the number of Question
     # and Choice objects.
-    >>> Question.objects.prefetch_related(Prefetch('choice_set'))
+    >>> Question.objects.prefetch_related(Prefetch("choice_set"))
     <QuerySet [<Question: What's up?>]>
 
 The ``queryset`` argument supplies a base ``QuerySet`` for the given lookup.
@@ -4040,17 +4109,21 @@ This is useful to further filter down the prefetch operation, or to call
 :meth:`~django.db.models.query.QuerySet.select_related()` from the prefetched
 relation, hence reducing the number of queries even further:
 
+.. code-block:: pycon
+
     >>> voted_choices = Choice.objects.filter(votes__gt=0)
     >>> voted_choices
     <QuerySet [<Choice: The sky>]>
-    >>> prefetch = Prefetch('choice_set', queryset=voted_choices)
+    >>> prefetch = Prefetch("choice_set", queryset=voted_choices)
     >>> Question.objects.prefetch_related(prefetch).get().choice_set.all()
     <QuerySet [<Choice: The sky>]>
 
 The ``to_attr`` argument sets the result of the prefetch operation to a custom
 attribute:
 
-    >>> prefetch = Prefetch('choice_set', queryset=voted_choices, to_attr='voted_choices')
+.. code-block:: pycon
+
+    >>> prefetch = Prefetch("choice_set", queryset=voted_choices, to_attr="voted_choices")
     >>> Question.objects.prefetch_related(prefetch).get().voted_choices
     [<Choice: The sky>]
     >>> Question.objects.prefetch_related(prefetch).get().choice_set.all()
@@ -4067,6 +4140,9 @@ attribute:
 ------------------------------
 
 .. function:: prefetch_related_objects(model_instances, *related_lookups)
+.. function:: aprefetch_related_objects(model_instances, *related_lookups)
+
+*Asynchronous version*: ``aprefetch_related_objects()``
 
 Prefetches the given lookups on an iterable of model instances. This is useful
 in code that receives a list of model instances as opposed to a ``QuerySet``;
@@ -4084,6 +4160,10 @@ lookups or :class:`Prefetch` objects you want to prefetch for. For example:
 When using multiple databases with ``prefetch_related_objects``, the prefetch
 query will use the database associated with the model instance. This can be
 overridden by using a custom queryset in a related lookup.
+
+.. versionchanged:: 5.0
+
+    ``aprefetch_related_objects()`` function was added.
 
 ``FilteredRelation()`` objects
 ------------------------------

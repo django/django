@@ -1,5 +1,6 @@
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType, ContentTypeManager
+from django.contrib.contenttypes.prefetch import GenericPrefetch
 from django.db import models
 from django.db.migrations.state import ProjectState
 from django.test import TestCase, override_settings
@@ -11,9 +12,7 @@ from .models import Author, ConcreteModel, FooWithUrl, ProxyModel
 class ContentTypesTests(TestCase):
     def setUp(self):
         ContentType.objects.clear_cache()
-
-    def tearDown(self):
-        ContentType.objects.clear_cache()
+        self.addCleanup(ContentType.objects.clear_cache)
 
     def test_lookup_cache(self):
         """
@@ -324,7 +323,22 @@ class ContentTypesMultidbTests(TestCase):
         db_for_read().
         """
         ContentType.objects.clear_cache()
-        with self.assertNumQueries(0, using="default"), self.assertNumQueries(
-            1, using="other"
+        with (
+            self.assertNumQueries(0, using="default"),
+            self.assertNumQueries(1, using="other"),
         ):
             ContentType.objects.get_for_model(Author)
+
+
+class GenericPrefetchTests(TestCase):
+    def test_values_queryset(self):
+        msg = "Prefetch querysets cannot use raw(), values(), and values_list()."
+        with self.assertRaisesMessage(ValueError, msg):
+            GenericPrefetch("question", [Author.objects.values("pk")])
+        with self.assertRaisesMessage(ValueError, msg):
+            GenericPrefetch("question", [Author.objects.values_list("pk")])
+
+    def test_raw_queryset(self):
+        msg = "Prefetch querysets cannot use raw(), values(), and values_list()."
+        with self.assertRaisesMessage(ValueError, msg):
+            GenericPrefetch("question", [Author.objects.raw("select pk from author")])

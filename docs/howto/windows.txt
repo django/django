@@ -2,7 +2,7 @@
 How to install Django on Windows
 ================================
 
-This document will guide you through installing Python 3.11 and Django on
+This document will guide you through installing Python 3.12 and Django on
 Windows. It also provides instructions for setting up a virtual environment,
 which makes it easier to work on Python projects. This is meant as a beginner's
 guide for users working on Django projects and does not reflect how Django
@@ -18,7 +18,7 @@ Install Python
 ==============
 
 Django is a Python web framework, thus requiring Python to be installed on your
-machine. At the time of writing, Python 3.11 is the latest version.
+machine. At the time of writing, Python 3.12 is the latest version.
 
 To install Python on your machine go to https://www.python.org/downloads/. The
 website should offer you a download button for the latest Python version.
@@ -103,12 +103,12 @@ terminal. In modern terminals this should work for both CMD and PowerShell. If
 for some reason this needs to be disabled, set the environmental variable
 :envvar:`DJANGO_COLORS` to ``nocolor``.
 
-On older Windows versions, or legacy terminals, :pypi:`colorama` must be
+On older Windows versions, or legacy terminals, :pypi:`colorama` 0.4.6+ must be
 installed to enable syntax coloring:
 
 .. code-block:: doscon
 
-    ...\> py -m pip install colorama
+    ...\> py -m pip install "colorama >= 0.4.6"
 
 See :ref:`syntax-coloring` for more information on color settings.
 

@@ -20,13 +20,15 @@ jobs:
     name: SQLite
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.12'
           cache: 'pip'
           cache-dependency-path: 'tests/requirements/py3.txt'
+      - name: Install libmemcached-dev for pylibmc
+        run: sudo apt-get install libmemcached-dev
       - name: Install and upgrade packaging tools
         run: python -m pip install --upgrade pip setuptools wheel
       - run: python -m pip install -r tests/requirements/py3.txt -e .
@@ -41,7 +43,7 @@ jobs:
     name: PostgreSQL
     services:
       postgres:
-        image: postgres:12-alpine
+        image: postgres:13-alpine
         env:
           POSTGRES_DB: django
           POSTGRES_USER: user
@@ -55,13 +57,15 @@ jobs:
           --health-retries 5
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.12'
           cache: 'pip'
           cache-dependency-path: 'tests/requirements/py3.txt'
+      - name: Install libmemcached-dev for pylibmc
+        run: sudo apt-get install libmemcached-dev
       - name: Install and upgrade packaging tools
         run: python -m pip install --upgrade pip setuptools wheel
       - run: python -m pip install -r tests/requirements/py3.txt -r tests/requirements/postgres.txt -e .

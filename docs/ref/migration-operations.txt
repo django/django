@@ -91,8 +91,6 @@ option on the ``Meta`` subclass).
 ``AlterModelTableComment``
 --------------------------
 
-.. versionadded:: 4.2
-
 .. class:: AlterModelTableComment(name, table_comment)
 
 Changes the model's table comment (the
@@ -249,7 +247,7 @@ Removes the index named ``name`` from the model with ``model_name``.
 Renames an index in the database table for the model with ``model_name``.
 Exactly one of ``old_name`` and ``old_fields`` can be provided. ``old_fields``
 is an iterable of the strings, often corresponding to fields of
-:attr:`~django.db.models.Options.index_together`.
+``index_together`` (pre-Django 5.1 option).
 
 On databases that don't support an index renaming statement (SQLite and MariaDB
 < 10.5.2), the operation will drop and recreate the index, which can be
@@ -477,6 +475,42 @@ operations.
 For an example using ``SeparateDatabaseAndState``, see
 :ref:`changing-a-manytomanyfield-to-use-a-through-model`.
 
+Operation category
+==================
+
+.. versionadded:: 5.1
+
+.. currentmodule:: django.db.migrations.operations.base
+
+.. class:: OperationCategory
+
+    Categories of migration operation used by the :djadmin:`makemigrations`
+    command to display meaningful symbols.
+
+    .. attribute:: ADDITION
+
+        *Symbol*: ``+``
+
+    .. attribute:: REMOVAL
+
+        *Symbol*: ``-``
+
+    .. attribute:: ALTERATION
+
+        *Symbol*: ``~``
+
+    .. attribute:: PYTHON
+
+        *Symbol*: ``p``
+
+    .. attribute:: SQL
+
+        *Symbol*: ``s``
+
+    .. attribute:: MIXED
+
+        *Symbol*: ``?``
+
 .. _writing-your-own-migration-operation:
 
 Writing your own
@@ -496,6 +530,10 @@ structure of an ``Operation`` looks like this::
 
         # If this is False, Django will refuse to reverse past this operation.
         reversible = False
+
+        # This categorizes the operation. The corresponding symbol will be
+        # displayed by the makemigrations command.
+        category = OperationCategory.ADDITION
 
         def __init__(self, arg1, arg2):
             # Operations are usually instantiated with arguments in migration
@@ -518,7 +556,7 @@ structure of an ``Operation`` looks like this::
             pass
 
         def describe(self):
-            # This is used to describe what the operation does in console output.
+            # This is used to describe what the operation does.
             return "Custom Operation"
 
         @property

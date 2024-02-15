@@ -11,7 +11,7 @@ from django.db.models import IntegerField, Sum, Value
 from django.test import TestCase, skipUnlessDBFeature
 
 from ..utils import FuncTestMixin
-from .models import City, Country, CountryWebMercator, State, Track
+from .models import City, Country, CountryWebMercator, ManyPointModel, State, Track
 
 
 class GISFunctionsTests(FuncTestMixin, TestCase):
@@ -119,6 +119,25 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
                 chicago_json,
             )
 
+    @skipUnlessDBFeature("has_AsGeoJSON_function")
+    def test_asgeojson_option_0(self):
+        p1 = Point(1, 1, srid=4326)
+        p2 = Point(-87.65018, 41.85039, srid=4326)
+        obj = ManyPointModel.objects.create(
+            point1=p1,
+            point2=p2,
+            point3=p2.transform(3857, clone=True),
+        )
+        self.assertJSONEqual(
+            ManyPointModel.objects.annotate(geojson=functions.AsGeoJSON("point3"))
+            .get(pk=obj.pk)
+            .geojson,
+            # GeoJSON without CRS.
+            json.loads(
+                '{"type":"Point","coordinates":[-9757173.40553877, 5138594.87034608]}'
+            ),
+        )
+
     @skipUnlessDBFeature("has_AsGML_function")
     def test_asgml(self):
         # Should throw a TypeError when trying to obtain GML from a
@@ -141,7 +160,7 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             )
         else:
             gml_regex = re.compile(
-                r'^<gml:Point srsName="EPSG:4326"><gml:coordinates>'
+                r'^<gml:Point srsName="(urn:ogc:def:crs:)?EPSG:4326"><gml:coordinates>'
                 r"-104\.60925\d+,38\.255001</gml:coordinates></gml:Point>"
             )
         self.assertTrue(gml_regex.match(ptown.gml))
@@ -239,7 +258,12 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             # num_seg is the number of segments per quarter circle.
             return (4 * num_seg) + 1
 
-        expected_areas = (169, 136) if connection.ops.postgis else (171, 126)
+        if connection.ops.postgis:
+            expected_areas = (169, 136)
+        elif connection.ops.spatialite:
+            expected_areas = (168, 135)
+        else:  # Oracle.
+            expected_areas = (171, 126)
         qs = Country.objects.annotate(
             circle=functions.BoundingCircle("mpoly")
         ).order_by("name")

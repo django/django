@@ -9,6 +9,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.core.files.storage import FileSystemStorage
 from django.db import models
+from django.utils import timezone
 
 
 class Section(models.Model):
@@ -66,6 +67,11 @@ class Article(models.Model):
     def model_month(self):
         return self.date.month
 
+    @property
+    @admin.display(description="Is from past?", boolean=True)
+    def model_property_is_from_past(self):
+        return self.date < timezone.now()
+
 
 class Book(models.Model):
     """
@@ -76,6 +82,9 @@ class Book(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return f"/books/{self.id}/"
 
 
 class Promo(models.Model):
@@ -1134,3 +1143,15 @@ class Traveler(models.Model):
         related_name="favorite_country_to_vacation_set",
         limit_choices_to={"continent": Country.ASIA},
     )
+
+
+class Square(models.Model):
+    side = models.IntegerField()
+    area = models.GeneratedField(
+        db_persist=True,
+        expression=models.F("side") * models.F("side"),
+        output_field=models.BigIntegerField(),
+    )
+
+    class Meta:
+        required_db_features = {"supports_stored_generated_columns"}

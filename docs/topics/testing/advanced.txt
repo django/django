@@ -32,9 +32,9 @@ restricted subset of the test client API:
   attributes must be supplied by the test itself if required
   for the view to function properly.
 
-.. versionchanged:: 4.2
+.. versionchanged:: 5.1
 
-    The ``headers`` parameter was added.
+    The ``query_params`` parameter was added.
 
 Example
 -------
@@ -89,9 +89,9 @@ difference being that it returns ``ASGIRequest`` instances rather than
 Arbitrary keyword arguments in ``defaults`` are added directly into the ASGI
 scope.
 
-.. versionchanged:: 4.2
+.. versionchanged:: 5.1
 
-    The ``headers`` parameter was added.
+    The ``query_params`` parameter was added.
 
 Testing class-based views
 =========================
@@ -533,7 +533,7 @@ behavior. This class defines the ``run_tests()`` entry point, plus a
 selection of other methods that are used by ``run_tests()`` to set up, execute
 and tear down the test suite.
 
-.. class:: DiscoverRunner(pattern='test*.py', top_level=None, verbosity=1, interactive=True, failfast=False, keepdb=False, reverse=False, debug_mode=False, debug_sql=False, parallel=0, tags=None, exclude_tags=None, test_name_patterns=None, pdb=False, buffer=False, enable_faulthandler=True, timing=True, shuffle=False, logger=None, **kwargs)
+.. class:: DiscoverRunner(pattern='test*.py', top_level=None, verbosity=1, interactive=True, failfast=False, keepdb=False, reverse=False, debug_mode=False, debug_sql=False, parallel=0, tags=None, exclude_tags=None, test_name_patterns=None, pdb=False, buffer=False, enable_faulthandler=True, timing=True, shuffle=False, logger=None, durations=None, **kwargs)
 
     ``DiscoverRunner`` will search for tests in any file matching ``pattern``.
 
@@ -570,9 +570,10 @@ and tear down the test suite.
 
     ``parallel`` specifies the number of processes.  If ``parallel`` is greater
     than ``1``, the test suite will run in ``parallel`` processes. If there are
-    fewer test cases than configured processes, Django will reduce the number
-    of processes accordingly. Each process gets its own database. This option
-    requires the third-party ``tblib`` package to display tracebacks correctly.
+    fewer test case classes than configured processes, Django will reduce the
+    number of processes accordingly. Each process gets its own database. This
+    option requires the third-party ``tblib`` package to display tracebacks
+    correctly.
 
     ``tags`` can be used to specify a set of :ref:`tags for filtering tests
     <topics-tagging-tests>`. May be combined with ``exclude_tags``.
@@ -613,6 +614,10 @@ and tear down the test suite.
     the console. The logger object will respect its logging level rather than
     the ``verbosity``.
 
+    ``durations`` will show a list of the N slowest test cases. Setting this
+    option to ``0`` will result in the duration for all tests being shown.
+    Requires Python 3.12+.
+
     Django may, from time to time, extend the capabilities of the test runner
     by adding new arguments. The ``**kwargs`` declaration allows for this
     expansion. If you subclass ``DiscoverRunner`` or write your own test
@@ -622,6 +627,10 @@ and tear down the test suite.
     Create or override an ``add_arguments(cls, parser)`` class method and add
     custom arguments by calling ``parser.add_argument()`` inside the method, so
     that the :djadmin:`test` command will be able to use those arguments.
+
+    .. versionadded:: 5.0
+
+        The ``durations`` argument was added.
 
 Attributes
 ~~~~~~~~~~
@@ -682,7 +691,7 @@ Methods
     label can take one of four forms:
 
     * ``path.to.test_module.TestCase.test_method`` -- Run a single test method
-      in a test case.
+      in a test case class.
     * ``path.to.test_module.TestCase`` -- Run all the test methods in a test
       case.
     * ``path.to.module`` -- Search for and run all tests in the named Python

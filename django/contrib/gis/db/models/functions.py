@@ -127,9 +127,11 @@ class SQLiteDecimalToFloatMixin:
         copy = self.copy()
         copy.set_source_expressions(
             [
-                Value(float(expr.value))
-                if hasattr(expr, "value") and isinstance(expr.value, Decimal)
-                else expr
+                (
+                    Value(float(expr.value))
+                    if hasattr(expr, "value") and isinstance(expr.value, Decimal)
+                    else expr
+                )
                 for expr in copy.get_source_expressions()
             ]
         )
@@ -195,8 +197,7 @@ class AsGeoJSON(GeoFunc):
             options = 1
         elif crs:
             options = 2
-        if options:
-            expressions.append(options)
+        expressions.append(options)
         super().__init__(*expressions, **extra)
 
     def as_oracle(self, compiler, connection, **extra_context):
@@ -275,6 +276,13 @@ class BoundingCircle(OracleToleranceMixin, GeomOutputGeoFunc):
             compiler, connection, **extra_context
         )
 
+    def as_sqlite(self, compiler, connection, **extra_context):
+        clone = self.copy()
+        clone.set_source_expressions([self.get_source_expressions()[0]])
+        return super(BoundingCircle, clone).as_sqlite(
+            compiler, connection, **extra_context
+        )
+
 
 class Centroid(OracleToleranceMixin, GeomOutputGeoFunc):
     arity = 1
@@ -343,9 +351,9 @@ class Distance(DistanceResultMixin, OracleToleranceMixin, GeoFunc):
     def as_sqlite(self, compiler, connection, **extra_context):
         if self.geo_field.geodetic(connection):
             # SpatiaLite returns NULL instead of zero on geodetic coordinates
-            extra_context[
-                "template"
-            ] = "COALESCE(%(function)s(%(expressions)s, %(spheroid)s), 0)"
+            extra_context["template"] = (
+                "COALESCE(%(function)s(%(expressions)s, %(spheroid)s), 0)"
+            )
             extra_context["spheroid"] = int(bool(self.spheroid))
         return super().as_sql(compiler, connection, **extra_context)
 

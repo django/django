@@ -53,8 +53,9 @@ Django version Python versions
 3.2            3.6, 3.7, 3.8, 3.9, 3.10 (added in 3.2.9)
 4.0            3.8, 3.9, 3.10
 4.1            3.8, 3.9, 3.10, 3.11 (added in 4.1.3)
-4.2            3.8, 3.9, 3.10, 3.11
+4.2            3.8, 3.9, 3.10, 3.11, 3.12 (added in 4.2.8)
 5.0            3.10, 3.11, 3.12
+5.1            3.10, 3.11, 3.12
 ============== ===============
 
 For each version of Python, only the latest micro release (A.B.C) is officially
@@ -63,9 +64,9 @@ download page <https://www.python.org/downloads/>`_.
 
 Typically, we will support a Python version up to and including the first
 Django LTS release whose security support ends after security support for that
-version of Python ends. For example, Python 3.3 security support ended
-September 2017 and Django 1.8 LTS security support ended April 2018. Therefore
-Django 1.8 is the last version to support Python 3.3.
+version of Python ends. For example, Python 3.9 security support ends in
+October 2025 and Django 4.2 LTS security support ends in April 2026. Therefore
+Django 4.2 is the last version to support Python 3.9.
 
 What Python version should I use with Django?
 =============================================

@@ -10,10 +10,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-17 03:19-0500\n"
-"PO-Revision-Date: 2023-04-25 07:59+0000\n"
+"POT-Creation-Date: 2023-09-18 15:04-0300\n"
+"PO-Revision-Date: 2023-12-04 07:59+0000\n"
 "Last-Translator: Shinya Okano <tokibito@gmail.com>, 2012,2014-2016,2023\n"
-"Language-Team: Japanese (http://www.transifex.com/django/django/language/"
+"Language-Team: Japanese (http://app.transifex.com/django/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -237,6 +237,55 @@ msgstr "11月"
 msgctxt "abbrev. month December"
 msgid "Dec"
 msgstr "12月"
+
+msgid "Sunday"
+msgstr "日曜日"
+
+msgid "Monday"
+msgstr "月曜日"
+
+msgid "Tuesday"
+msgstr "火曜日"
+
+msgid "Wednesday"
+msgstr "水曜日"
+
+msgid "Thursday"
+msgstr "木曜日"
+
+msgid "Friday"
+msgstr "金曜日"
+
+msgid "Saturday"
+msgstr "土曜日"
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr "日"
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr "月"
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr "火"
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr "水"
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr "木"
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr "金"
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr "土"
 
 msgctxt "one letter Sunday"
 msgid "S"

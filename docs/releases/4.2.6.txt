@@ -1,0 +1,50 @@
+==========================
+Django 4.2.6 release notes
+==========================
+
+*October 4, 2023*
+
+Django 4.2.6 fixes a security issue with severity "moderate" and several bugs
+in 4.2.5.
+
+CVE-2023-43665: Denial-of-service possibility in ``django.utils.text.Truncator``
+================================================================================
+
+Following the fix for :cve:`2019-14232`, the regular expressions used in the
+implementation of ``django.utils.text.Truncator``'s ``chars()`` and ``words()``
+methods (with ``html=True``) were revised and improved. However, these regular
+expressions still exhibited linear backtracking complexity, so when given a
+very long, potentially malformed HTML input, the evaluation would still be
+slow, leading to a potential denial of service vulnerability.
+
+The ``chars()`` and ``words()`` methods are used to implement the
+:tfilter:`truncatechars_html` and :tfilter:`truncatewords_html` template
+filters, which were thus also vulnerable.
+
+The input processed by ``Truncator``, when operating in HTML mode, has been
+limited to the first five million characters in order to avoid potential
+performance and memory issues.
+
+Bugfixes
+========
+
+* Fixed a regression in Django 4.2.5 where overriding the deprecated
+  ``DEFAULT_FILE_STORAGE`` and ``STATICFILES_STORAGE`` settings in tests caused
+  the main ``STORAGES`` to mutate (:ticket:`34821`).
+
+* Fixed a regression in Django 4.2 that caused unnecessary casting of string
+  based fields (``CharField``, ``EmailField``, ``TextField``, ``CICharField``,
+  ``CIEmailField``, and ``CITextField``) used with the ``__isnull`` lookup on
+  PostgreSQL. As a consequence, indexes using an ``__isnull`` expression or
+  condition created before Django 4.2 wouldn't be used by the query planner,
+  leading to a performance regression (:ticket:`34840`).
+
+  You may need to recreate such indexes created in your database with Django
+  4.2 to 4.2.5, as they contain unnecessary ``::text`` casting. Find candidate
+  indexes with this query:
+
+  .. code-block:: sql
+
+        SELECT indexname, indexdef
+        FROM pg_indexes
+        WHERE indexdef LIKE '%::text IS %NULL';

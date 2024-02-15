@@ -1,7 +1,9 @@
 import itertools
 import math
+import warnings
 
 from django.core.exceptions import EmptyResultSet, FullResultSet
+from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.models.expressions import Case, Expression, Func, Value, When
 from django.db.models.fields import (
     BooleanField,
@@ -13,6 +15,7 @@ from django.db.models.fields import (
 )
 from django.db.models.query_utils import RegisterLookupMixin
 from django.utils.datastructures import OrderedSet
+from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.functional import cached_property
 from django.utils.hashable import make_hashable
 
@@ -217,8 +220,22 @@ class BuiltinLookup(Lookup):
     def process_lhs(self, compiler, connection, lhs=None):
         lhs_sql, params = super().process_lhs(compiler, connection, lhs)
         field_internal_type = self.lhs.output_field.get_internal_type()
-        db_type = self.lhs.output_field.db_type(connection=connection)
-        lhs_sql = connection.ops.field_cast_sql(db_type, field_internal_type) % lhs_sql
+        if (
+            hasattr(connection.ops.__class__, "field_cast_sql")
+            and connection.ops.__class__.field_cast_sql
+            is not BaseDatabaseOperations.field_cast_sql
+        ):
+            warnings.warn(
+                (
+                    "The usage of DatabaseOperations.field_cast_sql() is deprecated. "
+                    "Implement DatabaseOperations.lookup_cast() instead."
+                ),
+                RemovedInDjango60Warning,
+            )
+            db_type = self.lhs.output_field.db_type(connection=connection)
+            lhs_sql = (
+                connection.ops.field_cast_sql(db_type, field_internal_type) % lhs_sql
+            )
         lhs_sql = (
             connection.ops.lookup_cast(self.lookup_name, field_internal_type) % lhs_sql
         )
@@ -251,11 +268,18 @@ class FieldGetDbPrepValueMixin:
             getattr(field, "get_db_prep_value", None)
             or self.lhs.output_field.get_db_prep_value
         )
+        if not self.get_db_prep_lookup_value_is_iterable:
+            value = [value]
         return (
             "%s",
-            [get_db_prep_value(v, connection, prepared=True) for v in value]
-            if self.get_db_prep_lookup_value_is_iterable
-            else [get_db_prep_value(value, connection, prepared=True)],
+            [
+                (
+                    v
+                    if hasattr(v, "as_sql")
+                    else get_db_prep_value(v, connection, prepared=True)
+                )
+                for v in value
+            ],
         )
 
 
@@ -454,6 +478,14 @@ class IntegerLessThanOrEqual(IntegerFieldOverflow, LessThanOrEqual):
 class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
     lookup_name = "in"
 
+    def get_refs(self):
+        refs = super().get_refs()
+        if self.rhs_is_direct_value():
+            for rhs in self.rhs:
+                if get_rhs_refs := getattr(rhs, "get_refs", None):
+                    refs |= get_rhs_refs()
+        return refs
+
     def get_prep_lookup(self):
         from django.db.models.sql.query import Query  # avoid circular import
 
@@ -607,6 +639,15 @@ class IsNull(BuiltinLookup):
             raise ValueError(
                 "The QuerySet value for an isnull lookup must be True or False."
             )
+        if isinstance(self.lhs, Value):
+            if self.lhs.value is None or (
+                self.lhs.value == ""
+                and connection.features.interprets_empty_strings_as_nulls
+            ):
+                result_exception = FullResultSet if self.rhs else EmptyResultSet
+            else:
+                result_exception = EmptyResultSet if self.rhs else FullResultSet
+            raise result_exception
         sql, params = self.process_lhs(compiler, connection)
         if self.rhs:
             return "%s IS NULL" % sql, params

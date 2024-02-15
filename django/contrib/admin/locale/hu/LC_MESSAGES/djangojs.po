@@ -1,8 +1,9 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# András Veres-Szentkirályi, 2016,2020-2021
+# András Veres-Szentkirályi, 2016,2020-2021,2023
 # Attila Nagy <>, 2012
+# Balázs R, 2023
 # Jannis Leidel <jannis@leidel.info>, 2011
 # János R, 2011
 # Máté Őry <orymate@iit.bme.hu>, 2012
@@ -11,10 +12,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-04-01 15:16+0000\n"
-"Last-Translator: András Veres-Szentkirályi\n"
-"Language-Team: Hungarian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2023-09-18 15:04-0300\n"
+"PO-Revision-Date: 2023-12-04 07:59+0000\n"
+"Last-Translator: András Veres-Szentkirályi, 2016,2020-2021,2023\n"
+"Language-Team: Hungarian (http://app.transifex.com/django/django/language/"
 "hu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -66,12 +67,22 @@ msgstr ""
 "Ez a kiválasztott %s listája. Eltávolíthat közülük, ha rákattint, majd a két "
 "doboz közti \"Eltávolítás\" nyílra kattint."
 
+#, javascript-format
+msgid "Type into this box to filter down the list of selected %s."
+msgstr "Írjon a mezőbe a kiválasztott %s szűréséhez."
+
 msgid "Remove all"
 msgstr "Összes törlése"
 
 #, javascript-format
 msgid "Click to remove all chosen %s at once."
 msgstr "Kattintson az összes %s eltávolításához."
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] "%s kiválasztott elem nem látható"
+msgstr[1] "%s kiválasztott elem nem látható"
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -233,6 +244,55 @@ msgstr "nov"
 msgctxt "abbrev. month December"
 msgid "Dec"
 msgstr "dec"
+
+msgid "Sunday"
+msgstr "vasárnap"
+
+msgid "Monday"
+msgstr "hétfő"
+
+msgid "Tuesday"
+msgstr "kedd"
+
+msgid "Wednesday"
+msgstr "szerda"
+
+msgid "Thursday"
+msgstr "csütörtök"
+
+msgid "Friday"
+msgstr "péntek"
+
+msgid "Saturday"
+msgstr "szombat"
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr "vas"
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr "hét"
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr "kedd"
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr "sze"
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr "csüt"
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr "pén"
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr "szo"
 
 msgctxt "one letter Sunday"
 msgid "S"

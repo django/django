@@ -177,8 +177,7 @@ filtered out of error reports in a production environment (that is, where
     do not provide any argument to the ``sensitive_variables`` decorator::
 
         @sensitive_variables()
-        def my_function():
-            ...
+        def my_function(): ...
 
     .. admonition:: When using multiple decorators
 
@@ -191,19 +190,7 @@ filtered out of error reports in a production environment (that is, where
             @sensitive_variables("user", "pw", "cc")
             @some_decorator
             @another_decorator
-            def process_info(user):
-                ...
-
-    .. warning::
-
-        Due to the machinery needed to cross the sync/async boundary,
-        :func:`~asgiref.sync.sync_to_async` and
-        :func:`~asgiref.sync.async_to_sync` are **not** compatible with
-        ``sensitive_variables()``.
-
-        If using these adapters with sensitive variables, ensure to audit
-        exception reporting, and consider implementing a :ref:`custom filter
-        <custom-error-reports>` if necessary.
+            def process_info(user): ...
 
     .. versionchanged:: 5.0
 
@@ -240,8 +227,7 @@ filtered out of error reports in a production environment (that is, where
     do not provide any argument to the ``sensitive_post_parameters`` decorator::
 
         @sensitive_post_parameters()
-        def my_view(request):
-            ...
+        def my_view(request): ...
 
     All POST parameters are systematically filtered out of error reports for
     certain :mod:`django.contrib.auth.views` views (``login``,
@@ -305,10 +291,6 @@ following attributes and methods:
             import re
 
             re.compile(r"API|TOKEN|KEY|SECRET|PASS|SIGNATURE|HTTP_COOKIE", flags=re.IGNORECASE)
-
-        .. versionchanged:: 4.2
-
-            ``HTTP_COOKIE`` was added.
 
     .. method:: is_active(request)
 

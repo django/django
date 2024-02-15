@@ -742,12 +742,7 @@ Generate migration files without Django version and timestamp header.
 .. django-admin-option:: --check
 
 Makes ``makemigrations`` exit with a non-zero status when model changes without
-migrations are detected.
-
-.. versionchanged:: 4.2
-
-    In older versions, the missing migrations were also created when using the
-    ``--check`` option.
+migrations are detected. Implies ``--dry-run``.
 
 .. django-admin-option:: --scriptable
 
@@ -755,8 +750,6 @@ Diverts log output and input prompts to ``stderr``, writing only paths of
 generated migration files to ``stdout``.
 
 .. django-admin-option:: --update
-
-.. versionadded:: 4.2
 
 Merges model changes into the latest migration and optimize the resulting
 operations.
@@ -1484,12 +1477,12 @@ override this by passing the desired number of processes, e.g.
 variable.
 
 Django distributes test cases — :class:`unittest.TestCase` subclasses — to
-subprocesses. If there are fewer test cases than configured processes, Django
-will reduce the number of processes accordingly.
+subprocesses. If there are fewer test case classes than configured processes,
+Django will reduce the number of processes accordingly.
 
-Each process gets its own database. You must ensure that different test cases
-don't access the same resources. For instance, test cases that touch the
-filesystem should create a temporary directory for their own use.
+Each process gets its own database. You must ensure that different test case
+classes don't access the same resources. For instance, test case classes that
+touch the filesystem should create a temporary directory for their own use.
 
 .. note::
 
@@ -1558,6 +1551,16 @@ tests, which allows it to print a traceback if the interpreter crashes. Pass
 .. django-admin-option:: --timing
 
 Outputs timings, including database setup and total run time.
+
+.. django-admin-option:: --durations N
+
+.. versionadded:: 5.0
+
+Shows the N slowest test cases (N=0 for all).
+
+.. admonition:: Python 3.12 and later
+
+    This feature is only available for Python 3.12 and later.
 
 ``testserver``
 --------------
@@ -1794,9 +1797,9 @@ allows for the following options by default:
 
 .. django-admin-option:: --pythonpath PYTHONPATH
 
-Adds the given filesystem path to the Python `import search path`_. If this
-isn't provided, ``django-admin`` will use the :envvar:`PYTHONPATH` environment
-variable.
+Adds the given filesystem path to the Python :py:data:`sys.path` module
+attribute. If this isn't provided, ``django-admin`` will use the
+:envvar:`PYTHONPATH` environment variable.
 
 This option is unnecessary in ``manage.py``, because it takes care of setting
 the Python path for you.
@@ -1806,8 +1809,6 @@ Example usage:
 .. console::
 
     django-admin migrate --pythonpath='/home/djangoprojects/myproject'
-
-.. _import search path: https://diveinto.org/python3/your-first-python-program.html#importsearchpath
 
 .. django-admin-option:: --settings SETTINGS
 
@@ -1921,7 +1922,7 @@ two third-party libraries are needed:
 
   .. code-block:: doscon
 
-    ...\> py -m pip install colorama
+    ...\> py -m pip install "colorama >= 0.4.6"
 
 * Install `ANSICON`_, a third-party tool that allows ``cmd.exe`` to process
   ANSI color codes. Django commands will detect its presence and will make use
@@ -2075,7 +2076,7 @@ Running management commands from your code
 
 .. function:: django.core.management.call_command(name, *args, **options)
 
-To call a management command from code use ``call_command``.
+To call a management command from code use ``call_command()``.
 
 ``name``
   the name of the command to call or a command object. Passing the name is

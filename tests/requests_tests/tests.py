@@ -3,7 +3,9 @@ from io import BytesIO
 from itertools import chain
 from urllib.parse import urlencode
 
-from django.core.exceptions import DisallowedHost
+from django.core.exceptions import BadRequest, DisallowedHost
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.core.files.uploadhandler import MemoryFileUploadHandler
 from django.core.handlers.wsgi import LimitedStream, WSGIRequest
 from django.http import (
     HttpHeaders,
@@ -11,10 +13,24 @@ from django.http import (
     RawPostDataException,
     UnreadablePostError,
 )
-from django.http.multipartparser import MultiPartParserError
+from django.http.multipartparser import MAX_TOTAL_HEADER_SIZE, MultiPartParserError
 from django.http.request import split_domain_port
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.client import BOUNDARY, MULTIPART_CONTENT, FakePayload
+
+
+class ErrorFileUploadHandler(MemoryFileUploadHandler):
+    def handle_raw_input(
+        self, input_data, META, content_length, boundary, encoding=None
+    ):
+        raise ValueError
+
+
+class CustomFileUploadHandler(MemoryFileUploadHandler):
+    def handle_raw_input(
+        self, input_data, META, content_length, boundary, encoding=None
+    ):
+        return ("_POST", "_FILES")
 
 
 class RequestsTests(SimpleTestCase):
@@ -369,10 +385,7 @@ class RequestsTests(SimpleTestCase):
         )
         self.assertEqual(request.POST, {"key": ["España"]})
 
-    def test_alternate_charset_POST(self):
-        """
-        Test a POST with non-utf-8 payload encoding.
-        """
+    def test_non_utf8_charset_POST_bad_request(self):
         payload = FakePayload(urlencode({"key": "España".encode("latin-1")}))
         request = WSGIRequest(
             {
@@ -382,7 +395,30 @@ class RequestsTests(SimpleTestCase):
                 "wsgi.input": payload,
             }
         )
-        self.assertEqual(request.POST, {"key": ["España"]})
+        msg = (
+            "HTTP requests with the 'application/x-www-form-urlencoded' content type "
+            "must be UTF-8 encoded."
+        )
+        with self.assertRaisesMessage(BadRequest, msg):
+            request.POST
+        with self.assertRaisesMessage(BadRequest, msg):
+            request.FILES
+
+    def test_utf8_charset_POST(self):
+        for charset in ["utf-8", "UTF-8"]:
+            with self.subTest(charset=charset):
+                payload = FakePayload(urlencode({"key": "España"}))
+                request = WSGIRequest(
+                    {
+                        "REQUEST_METHOD": "POST",
+                        "CONTENT_LENGTH": len(payload),
+                        "CONTENT_TYPE": (
+                            f"application/x-www-form-urlencoded; charset={charset}"
+                        ),
+                        "wsgi.input": payload,
+                    }
+                )
+                self.assertEqual(request.POST, {"key": ["España"]})
 
     def test_body_after_POST_multipart_form_data(self):
         """
@@ -470,6 +506,261 @@ class RequestsTests(SimpleTestCase):
             }
         )
         self.assertEqual(request.POST, {})
+
+    @override_settings(
+        FILE_UPLOAD_HANDLERS=["requests_tests.tests.ErrorFileUploadHandler"]
+    )
+    def test_POST_multipart_handler_error(self):
+        payload = FakePayload(
+            "\r\n".join(
+                [
+                    f"--{BOUNDARY}",
+                    'Content-Disposition: form-data; name="name"',
+                    "",
+                    "value",
+                    f"--{BOUNDARY}--",
+                ]
+            )
+        )
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "CONTENT_TYPE": MULTIPART_CONTENT,
+                "CONTENT_LENGTH": len(payload),
+                "wsgi.input": payload,
+            }
+        )
+        with self.assertRaises(ValueError):
+            request.POST
+
+    @override_settings(
+        FILE_UPLOAD_HANDLERS=["requests_tests.tests.CustomFileUploadHandler"]
+    )
+    def test_POST_multipart_handler_parses_input(self):
+        payload = FakePayload(
+            "\r\n".join(
+                [
+                    f"--{BOUNDARY}",
+                    'Content-Disposition: form-data; name="name"',
+                    "",
+                    "value",
+                    f"--{BOUNDARY}--",
+                ]
+            )
+        )
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "CONTENT_TYPE": MULTIPART_CONTENT,
+                "CONTENT_LENGTH": len(payload),
+                "wsgi.input": payload,
+            }
+        )
+        self.assertEqual(request.POST, "_POST")
+        self.assertEqual(request.FILES, "_FILES")
+
+    def test_request_methods_with_content(self):
+        for method in ["GET", "PUT", "DELETE"]:
+            with self.subTest(method=method):
+                payload = FakePayload(urlencode({"key": "value"}))
+                request = WSGIRequest(
+                    {
+                        "REQUEST_METHOD": method,
+                        "CONTENT_LENGTH": len(payload),
+                        "CONTENT_TYPE": "application/x-www-form-urlencoded",
+                        "wsgi.input": payload,
+                    }
+                )
+                self.assertEqual(request.POST, {})
+
+    def test_POST_content_type_json(self):
+        payload = FakePayload(
+            "\r\n".join(
+                [
+                    '{"pk": 1, "model": "store.book", "fields": {"name": "Mostly Ha',
+                    'rmless", "author": ["Douglas", Adams"]}}',
+                ]
+            )
+        )
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "CONTENT_TYPE": "application/json",
+                "CONTENT_LENGTH": len(payload),
+                "wsgi.input": payload,
+            }
+        )
+        self.assertEqual(request.POST, {})
+        self.assertEqual(request.FILES, {})
+
+    _json_payload = [
+        'Content-Disposition: form-data; name="JSON"',
+        "Content-Type: application/json",
+        "",
+        '{"pk": 1, "model": "store.book", "fields": {"name": "Mostly Harmless", '
+        '"author": ["Douglas", Adams"]}}',
+    ]
+
+    def test_POST_form_data_json(self):
+        payload = FakePayload(
+            "\r\n".join([f"--{BOUNDARY}", *self._json_payload, f"--{BOUNDARY}--"])
+        )
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "CONTENT_TYPE": MULTIPART_CONTENT,
+                "CONTENT_LENGTH": len(payload),
+                "wsgi.input": payload,
+            }
+        )
+        self.assertEqual(
+            request.POST,
+            {
+                "JSON": [
+                    '{"pk": 1, "model": "store.book", "fields": {"name": "Mostly '
+                    'Harmless", "author": ["Douglas", Adams"]}}'
+                ],
+            },
+        )
+
+    def test_POST_multipart_json(self):
+        payload = FakePayload(
+            "\r\n".join(
+                [
+                    f"--{BOUNDARY}",
+                    'Content-Disposition: form-data; name="name"',
+                    "",
+                    "value",
+                    f"--{BOUNDARY}",
+                    *self._json_payload,
+                    f"--{BOUNDARY}--",
+                ]
+            )
+        )
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "CONTENT_TYPE": MULTIPART_CONTENT,
+                "CONTENT_LENGTH": len(payload),
+                "wsgi.input": payload,
+            }
+        )
+        self.assertEqual(
+            request.POST,
+            {
+                "name": ["value"],
+                "JSON": [
+                    '{"pk": 1, "model": "store.book", "fields": {"name": "Mostly '
+                    'Harmless", "author": ["Douglas", Adams"]}}'
+                ],
+            },
+        )
+
+    def test_POST_multipart_json_csv(self):
+        payload = FakePayload(
+            "\r\n".join(
+                [
+                    f"--{BOUNDARY}",
+                    'Content-Disposition: form-data; name="name"',
+                    "",
+                    "value",
+                    f"--{BOUNDARY}",
+                    *self._json_payload,
+                    f"--{BOUNDARY}",
+                    'Content-Disposition: form-data; name="CSV"',
+                    "Content-Type: text/csv",
+                    "",
+                    "Framework,ID.Django,1.Flask,2.",
+                    f"--{BOUNDARY}--",
+                ]
+            )
+        )
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "CONTENT_TYPE": MULTIPART_CONTENT,
+                "CONTENT_LENGTH": len(payload),
+                "wsgi.input": payload,
+            }
+        )
+        self.assertEqual(
+            request.POST,
+            {
+                "name": ["value"],
+                "JSON": [
+                    '{"pk": 1, "model": "store.book", "fields": {"name": "Mostly '
+                    'Harmless", "author": ["Douglas", Adams"]}}'
+                ],
+                "CSV": ["Framework,ID.Django,1.Flask,2."],
+            },
+        )
+
+    def test_POST_multipart_with_file(self):
+        payload = FakePayload(
+            "\r\n".join(
+                [
+                    f"--{BOUNDARY}",
+                    'Content-Disposition: form-data; name="name"',
+                    "",
+                    "value",
+                    f"--{BOUNDARY}",
+                    *self._json_payload,
+                    f"--{BOUNDARY}",
+                    'Content-Disposition: form-data; name="File"; filename="test.csv"',
+                    "Content-Type: application/octet-stream",
+                    "",
+                    "Framework,ID",
+                    "Django,1",
+                    "Flask,2",
+                    f"--{BOUNDARY}--",
+                ]
+            )
+        )
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "CONTENT_TYPE": MULTIPART_CONTENT,
+                "CONTENT_LENGTH": len(payload),
+                "wsgi.input": payload,
+            }
+        )
+        self.assertEqual(
+            request.POST,
+            {
+                "name": ["value"],
+                "JSON": [
+                    '{"pk": 1, "model": "store.book", "fields": {"name": "Mostly '
+                    'Harmless", "author": ["Douglas", Adams"]}}'
+                ],
+            },
+        )
+        self.assertEqual(len(request.FILES), 1)
+        self.assertIsInstance((request.FILES["File"]), InMemoryUploadedFile)
+
+    def test_base64_invalid_encoding(self):
+        payload = FakePayload(
+            "\r\n".join(
+                [
+                    f"--{BOUNDARY}",
+                    'Content-Disposition: form-data; name="file"; filename="test.txt"',
+                    "Content-Type: application/octet-stream",
+                    "Content-Transfer-Encoding: base64",
+                    "",
+                    f"\r\nZsg£\r\n--{BOUNDARY}--",
+                ]
+            )
+        )
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "CONTENT_TYPE": MULTIPART_CONTENT,
+                "CONTENT_LENGTH": len(payload),
+                "wsgi.input": payload,
+            }
+        )
+        msg = "Could not decode base64 data."
+        with self.assertRaisesMessage(MultiPartParserError, msg):
+            request.POST
 
     def test_POST_binary_only(self):
         payload = b"\r\n\x01\x00\x00\x00ab\x00\x00\xcd\xcc,@"
@@ -671,6 +962,31 @@ class RequestsTests(SimpleTestCase):
         with self.assertRaisesMessage(MultiPartParserError, msg):
             request.POST
 
+    def test_multipart_with_header_fields_too_large(self):
+        payload = FakePayload(
+            "\r\n".join(
+                [
+                    "--boundary",
+                    'Content-Disposition: form-data; name="name"',
+                    "X-Long-Header: %s" % ("-" * (MAX_TOTAL_HEADER_SIZE + 1)),
+                    "",
+                    "value",
+                    "--boundary--",
+                ]
+            )
+        )
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "CONTENT_TYPE": "multipart/form-data; boundary=boundary",
+                "CONTENT_LENGTH": len(payload),
+                "wsgi.input": payload,
+            }
+        )
+        msg = "Request max total header size exceeded."
+        with self.assertRaisesMessage(MultiPartParserError, msg):
+            request.POST
+
     def test_POST_connection_error(self):
         """
         If wsgi.input.read() raises an exception while trying to read() the
@@ -694,18 +1010,31 @@ class RequestsTests(SimpleTestCase):
             request.body
 
     def test_set_encoding_clears_POST(self):
-        payload = FakePayload("name=Hello Günter")
+        payload = FakePayload(
+            "\r\n".join(
+                [
+                    f"--{BOUNDARY}",
+                    'Content-Disposition: form-data; name="name"',
+                    "",
+                    "Hello Günter",
+                    f"--{BOUNDARY}--",
+                    "",
+                ]
+            )
+        )
         request = WSGIRequest(
             {
                 "REQUEST_METHOD": "POST",
-                "CONTENT_TYPE": "application/x-www-form-urlencoded",
+                "CONTENT_TYPE": MULTIPART_CONTENT,
                 "CONTENT_LENGTH": len(payload),
                 "wsgi.input": payload,
             }
         )
         self.assertEqual(request.POST, {"name": ["Hello Günter"]})
         request.encoding = "iso-8859-16"
-        self.assertEqual(request.POST, {"name": ["Hello GĂŒnter"]})
+        # FIXME: POST should be accessible after changing the encoding
+        # (refs #14035).
+        # self.assertEqual(request.POST, {"name": ["Hello GĂŒnter"]})
 
     def test_set_encoding_clears_GET(self):
         payload = FakePayload("")
@@ -1013,10 +1342,37 @@ class HostValidationTests(SimpleTestCase):
         ):
             request.get_host()
 
-    def test_split_domain_port_removes_trailing_dot(self):
-        domain, port = split_domain_port("example.com.:8080")
-        self.assertEqual(domain, "example.com")
-        self.assertEqual(port, "8080")
+    def test_split_domain_port(self):
+        for host, expected in [
+            ("<invalid>", ("", "")),
+            ("<invalid>:8080", ("", "")),
+            ("example.com 8080", ("", "")),
+            ("example.com:invalid", ("", "")),
+            ("[::1]", ("[::1]", "")),
+            ("[::1]:8080", ("[::1]", "8080")),
+            ("[::ffff:127.0.0.1]", ("[::ffff:127.0.0.1]", "")),
+            ("[::ffff:127.0.0.1]:8080", ("[::ffff:127.0.0.1]", "8080")),
+            (
+                "[1851:0000:3238:DEF1:0177:0000:0000:0125]",
+                ("[1851:0000:3238:def1:0177:0000:0000:0125]", ""),
+            ),
+            (
+                "[1851:0000:3238:DEF1:0177:0000:0000:0125]:8080",
+                ("[1851:0000:3238:def1:0177:0000:0000:0125]", "8080"),
+            ),
+            ("127.0.0.1", ("127.0.0.1", "")),
+            ("127.0.0.1:8080", ("127.0.0.1", "8080")),
+            ("example.com", ("example.com", "")),
+            ("example.com:8080", ("example.com", "8080")),
+            ("example.com.", ("example.com", "")),
+            ("example.com.:8080", ("example.com", "8080")),
+            ("xn--n28h.test", ("xn--n28h.test", "")),
+            ("xn--n28h.test:8080", ("xn--n28h.test", "8080")),
+            ("subdomain.example.com", ("subdomain.example.com", "")),
+            ("subdomain.example.com:8080", ("subdomain.example.com", "8080")),
+        ]:
+            with self.subTest(host=host):
+                self.assertEqual(split_domain_port(host), expected)
 
 
 class BuildAbsoluteURITests(SimpleTestCase):

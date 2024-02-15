@@ -230,14 +230,6 @@ uploads:
    instance (in a single field), for example, even if the custom widget is used
    with a form field related to a model ``FileField``.
 
-.. versionchanged:: 3.2.19
-
-   In previous versions, there was no support for the ``allow_multiple_selected``
-   class attribute, and users were advised to create the widget with the HTML
-   attribute ``multiple`` set through the ``attrs`` argument. However, this
-   caused validation of the form field to be applied only to the last file
-   submitted, which could have adverse security implications.
-
 Upload Handlers
 ===============
 
@@ -346,7 +338,8 @@ list::
 
         @csrf_protect
         def _upload_file_view(request):
-            ...  # Process request
+            # Process request
+            ...
 
     If you are using a class-based view, you will need to use
     :func:`~django.views.decorators.csrf.csrf_exempt` on its
@@ -367,4 +360,5 @@ list::
 
             @method_decorator(csrf_protect)
             def post(self, request, *args, **kwargs):
-                ...  # Process request
+                # Process request
+                ...

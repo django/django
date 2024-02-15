@@ -532,7 +532,7 @@ This example illustrates all possible attributes and methods for a
 
         # AUTHOR LINK --One of the following three is optional. The framework
         # looks for them in this order. In each case, the URL should include
-        # the "http://" and domain name.
+        # the scheme (such as "https://") and domain name.
 
         def author_link(self, obj):
             """
@@ -735,7 +735,7 @@ This example illustrates all possible attributes and methods for a
 
         # ITEM AUTHOR LINK -- One of the following three is optional. The
         # framework looks for them in this order. In each case, the URL should
-        # include the "http://" and domain name.
+        # include the scheme (such as "https://") and domain name.
         #
         # If you specify this, you must specify item_author_name.
 

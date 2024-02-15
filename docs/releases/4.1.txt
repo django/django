@@ -317,7 +317,7 @@ Migrations
 * The new :class:`~django.db.migrations.operations.RenameIndex` operation
   allows renaming indexes defined in the
   :attr:`Meta.indexes <django.db.models.Options.indexes>` or
-  :attr:`~django.db.models.Options.index_together` options.
+  ``index_together`` options.
 
 * The migrations autodetector now generates
   :class:`~django.db.migrations.operations.RenameIndex` operations instead of
@@ -327,7 +327,7 @@ Migrations
 * The migrations autodetector now generates
   :class:`~django.db.migrations.operations.RenameIndex` operations instead of
   ``AlterIndexTogether`` and ``AddIndex``, when moving indexes defined in the
-  :attr:`Meta.index_together <django.db.models.Options.index_together>` to the
+  ``Meta.index_together`` to the
   :attr:`Meta.indexes <django.db.models.Options.indexes>`.
 
 Models
@@ -534,8 +534,9 @@ Miscellaneous
   on the :class:`~django.db.models.Model` instance to which they belong. *This
   change was reverted in Django 4.1.2.*
 
-* The Django test runner now returns a non-zero error code for unexpected
-  successes from tests marked with :py:func:`unittest.expectedFailure`.
+* :class:`~django.test.runner.DiscoverRunner` now returns a non-zero error code
+  for unexpected successes from tests marked with
+  :py:func:`unittest.expectedFailure`.
 
 * :class:`~django.middleware.csrf.CsrfViewMiddleware` no longer masks the CSRF
   cookie like it does the CSRF token in the DOM.

@@ -21,6 +21,7 @@
 # Kagami Sascha Rosylight <saschanaz@outlook.com>, 2017
 # Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2021
 # Seho Noh <iam@sehonoh.kr>, 2018
+# Seoeun(Sun☀️) Hong, 2023
 # Subin Choi <os1742@gmail.com>, 2016
 # Taesik Yoon <xotlr43@gmail.com>, 2015
 # 정훈 이, 2021
@@ -28,10 +29,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:23-0500\n"
-"PO-Revision-Date: 2021-12-25 06:49+0000\n"
-"Last-Translator: 정훈 이\n"
-"Language-Team: Korean (http://www.transifex.com/django/django/language/ko/)\n"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 06:49+0000\n"
+"Last-Translator: Seoeun(Sun☀️) Hong, 2023\n"
+"Language-Team: Korean (http://app.transifex.com/django/django/language/ko/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -70,6 +71,9 @@ msgstr "보스니아어"
 
 msgid "Catalan"
 msgstr "카탈로니아어"
+
+msgid "Central Kurdish (Sorani)"
+msgstr "중부 쿠르드어 (소라니어)"
 
 msgid "Czech"
 msgstr "체코어"
@@ -311,6 +315,9 @@ msgstr "타타르"
 msgid "Udmurt"
 msgstr "이제프스크"
 
+msgid "Uyghur"
+msgstr ""
+
 msgid "Ukrainian"
 msgstr "우크라이나어"
 
@@ -411,6 +418,12 @@ msgstr ""
 
 #, python-format
 msgid ""
+"Ensure this value is a multiple of step size %(limit_value)s, starting from "
+"%(offset)s, e.g. %(offset)s, %(valid_value1)s, %(valid_value2)s, and so on."
+msgstr ""
+
+#, python-format
+msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
 "%(show_value)d)."
 msgid_plural ""
@@ -471,7 +484,7 @@ msgstr "%(model_name)s의 %(field_labels)s 은/는 이미 존재합니다."
 
 #, python-format
 msgid "Constraint “%(name)s” is violated."
-msgstr ""
+msgstr "%(name)s을(를) 위반하였습니다."
 
 #, python-format
 msgid "Value %(value)r is not a valid choice."
@@ -514,6 +527,9 @@ msgstr "boolean(True 또는 False)"
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "문자열(%(max_length)s 글자까지)"
+
+msgid "String (unlimited)"
+msgstr ""
 
 msgid "Comma-separated integers"
 msgstr "정수(콤마로 구분)"
@@ -780,12 +796,12 @@ msgstr ""
 #, python-format
 msgid "Please submit at most %(num)d form."
 msgid_plural "Please submit at most %(num)d forms."
-msgstr[0] ""
+msgstr[0] "최대 %(num)d개의 양식을 제출하세요."
 
 #, python-format
 msgid "Please submit at least %(num)d form."
 msgid_plural "Please submit at least %(num)d forms."
-msgstr[0] ""
+msgstr[0] "최소 %(num)d개의 양식을 제출하세요."
 
 msgid "Order"
 msgstr "순서:"
@@ -1179,8 +1195,8 @@ msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
 "including the “Referrer-Policy: no-referrer” header, please remove them. The "
 "CSRF protection requires the “Referer” header to do strict referer checking. "
-"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" …> for links to third-party sites."
+"If you’re concerned about privacy, use alternatives like <a "
+"rel=\"noreferrer\" …> for links to third-party sites."
 msgstr ""
 "<meta name=\"referrer\" content=\"no-referrer\">태그나  'Referrer-Policy: no-"
 "referrer' 헤더를 포함하고 있다면, 제거해주시기 바랍니다. CSRF 방지를 위한 리"
@@ -1278,13 +1294,14 @@ msgstr ""
 #, python-format
 msgid ""
 "You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> is in your settings file and you have not configured any "
-"URLs."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
+"configured any URLs."
 msgstr ""
 "이 페이지는 어떤 URL도 지정되지 않았고, settings 파일에 <a href=\"https://"
-"docs.djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank"
-"\" rel=\"noopener\">DEBUG=True</a>가 설정되어 있을 때 표시됩니다."
+"docs.djangoproject.com/en/%(version)s/ref/settings/#debug\" "
+"target=\"_blank\" rel=\"noopener\">DEBUG=True</a>가 설정되어 있을 때 표시됩니"
+"다."
 
 msgid "Django Documentation"
 msgstr "Django 문서"

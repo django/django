@@ -49,7 +49,7 @@ the details of the attached photo:
     >>> car.photo.path
     '/media/cars/chevy.jpg'
     >>> car.photo.url
-    'http://media.example.com/cars/chevy.jpg'
+    'https://media.example.com/cars/chevy.jpg'
 
 This object -- ``car.photo`` in the example -- is a ``File`` object, which means
 it has all the methods and attributes described below.
@@ -272,7 +272,3 @@ use :data:`~django.core.files.storage.storages`::
 
     class MyModel(models.Model):
         upload = models.FileField(storage=select_storage)
-
-.. versionchanged:: 4.2
-
-    Support for ``storages`` was added.

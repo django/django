@@ -22,11 +22,11 @@ html[data-theme="light"],
 
     --breadcrumbs-fg: #c4dce8;
     --breadcrumbs-link-fg: var(--body-bg);
-    --breadcrumbs-bg: var(--primary);
+    --breadcrumbs-bg: #264b5d;
 
     --link-fg: #417893;
     --link-hover-color: #036;
-    --link-selected-fg: #5b80b2;
+    --link-selected-fg: var(--secondary);
 
     --hairline-color: #e8e8e8;
     --border-color: #ccc;
@@ -42,10 +42,10 @@ html[data-theme="light"],
     --selected-row: #ffc;
 
     --button-fg: #fff;
-    --button-bg: var(--primary);
-    --button-hover-bg: #609ab6;
-    --default-button-bg: var(--secondary);
-    --default-button-hover-bg: #205067;
+    --button-bg: var(--secondary);
+    --button-hover-bg: #205067;
+    --default-button-bg: #205067;
+    --default-button-hover-bg: var(--secondary);
     --close-button-bg: #747474;
     --close-button-hover-bg: #333;
     --delete-button-bg: #ba2121;
@@ -84,6 +84,8 @@ html[data-theme="light"],
         "Segoe UI Emoji",
         "Segoe UI Symbol",
         "Noto Color Emoji";
+
+    color-scheme: light;
 }
 
 html, body {
@@ -482,8 +484,13 @@ textarea {
     vertical-align: top;
 }
 
-input[type=text], input[type=password], input[type=email], input[type=url],
-input[type=number], input[type=tel], textarea, select, .vTextField {
+/*
+Minifiers remove the default (text) "type" attribute from "input" HTML tags.
+Add input:not([type]) to make the CSS stylesheet work the same.
+*/
+input:not([type]), input[type=text], input[type=password], input[type=email],
+input[type=url], input[type=number], input[type=tel], textarea, select,
+.vTextField {
     border: 1px solid var(--border-color);
     border-radius: 4px;
     padding: 5px 6px;
@@ -492,9 +499,13 @@ input[type=number], input[type=tel], textarea, select, .vTextField {
     background-color: var(--body-bg);
 }
 
-input[type=text]:focus, input[type=password]:focus, input[type=email]:focus,
-input[type=url]:focus, input[type=number]:focus, input[type=tel]:focus,
-textarea:focus, select:focus, .vTextField:focus {
+/*
+Minifiers remove the default (text) "type" attribute from "input" HTML tags.
+Add input:not([type]) to make the CSS stylesheet work the same.
+*/
+input:not([type]):focus, input[type=text]:focus, input[type=password]:focus,
+input[type=email]:focus, input[type=url]:focus, input[type=number]:focus,
+input[type=tel]:focus, textarea:focus, select:focus, .vTextField:focus {
     border-color: var(--body-quiet-color);
 }
 
@@ -584,7 +595,7 @@ input[type=button][disabled].default {
     font-weight: 400;
     font-size: 0.8125rem;
     text-align: left;
-    background: var(--primary);
+    background: var(--header-bg);
     color: var(--header-link-color);
 }
 
@@ -834,10 +845,6 @@ a.deletelink:focus, a.deletelink:hover {
     height: 100%;
 }
 
-#container > div {
-    flex-shrink: 0;
-}
-
 #container > .main {
     display: flex;
     flex: 1 0 auto;
@@ -882,9 +889,10 @@ a.deletelink:focus, a.deletelink:hover {
     margin-right: -300px;
 }
 
-#footer {
-    clear: both;
-    padding: 10px;
+@media (forced-colors: active) {
+  #content-related {
+      border: 1px solid;
+  }
 }
 
 /* COLUMN TYPES */
@@ -922,7 +930,6 @@ a.deletelink:focus, a.deletelink:hover {
     padding: 10px 40px;
     background: var(--header-bg);
     color: var(--header-color);
-    overflow: hidden;
 }
 
 #header a:link, #header a:visited, #logout-form button {
@@ -931,6 +938,12 @@ a.deletelink:focus, a.deletelink:hover {
 
 #header a:focus , #header a:hover {
     text-decoration: underline;
+}
+
+@media (forced-colors: active) {
+  #header {
+      border-bottom: 1px solid;
+  }
 }
 
 #branding {
@@ -1093,6 +1106,9 @@ a.deletelink:focus, a.deletelink:hover {
 /* PAGINATOR */
 
 .paginator {
+    display: flex;
+    align-items: center;
+    gap: 4px;
     font-size: 0.8125rem;
     padding-top: 10px;
     padding-bottom: 10px;
@@ -1134,6 +1150,10 @@ a.deletelink:focus, a.deletelink:hover {
 .paginator a:focus, .paginator a:hover {
     color: white;
     background: var(--link-hover-color);
+}
+
+.paginator input {
+    margin-left: auto;
 }
 
 .base-svgs {

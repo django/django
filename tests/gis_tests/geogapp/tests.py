@@ -1,6 +1,7 @@
 """
 Tests for geography support in PostGIS
 """
+
 import os
 
 from django.contrib.gis.db import models

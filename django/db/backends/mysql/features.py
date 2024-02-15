@@ -6,11 +6,11 @@ from django.utils.functional import cached_property
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     empty_fetchmany_value = ()
-    allows_group_by_selected_pks = True
     related_fields_match_type = True
     # MySQL doesn't support sliced subqueries with IN/ALL/ANY/SOME.
     allow_sliced_subqueries_with_in = False
     has_select_for_update = True
+    has_select_for_update_nowait = True
     supports_forward_references = False
     supports_regex_backreferencing = False
     supports_date_lookup_using_string = False
@@ -23,6 +23,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_temporal_subtraction = True
     supports_slicing_ordering_in_compound = True
     supports_index_on_text_field = False
+    supports_over_clause = True
+    supports_frame_range_fixed_distance = True
     supports_update_conflicts = True
     delete_can_self_reference_subquery = False
     create_test_procedure_without_params_sql = """
@@ -57,12 +59,15 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     order_by_nulls_first = True
     supports_logical_xor = True
 
+    supports_stored_generated_columns = True
+    supports_virtual_generated_columns = True
+
     @cached_property
     def minimum_database_version(self):
         if self.connection.mysql_is_mariadb:
-            return (10, 4)
+            return (10, 5)
         else:
-            return (8,)
+            return (8, 0, 11)
 
     @cached_property
     def test_collations(self):
@@ -80,6 +85,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             "ci": f"{charset}_general_ci",
             "non_default": f"{charset}_esperanto_ci",
             "swedish_ci": f"{charset}_swedish_ci",
+            "virtual": f"{charset}_esperanto_ci",
         }
 
     test_now_utc_template = "UTC_TIMESTAMP(6)"
@@ -114,28 +120,13 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             },
         }
         if self.connection.mysql_is_mariadb and (
-            10,
-            4,
-            3,
-        ) < self.connection.mysql_version < (10, 5, 2):
+            self.connection.mysql_version < (10, 5, 2)
+        ):
             skips.update(
                 {
                     "https://jira.mariadb.org/browse/MDEV-19598": {
                         "schema.tests.SchemaTests."
                         "test_alter_not_unique_field_to_primary_key",
-                    },
-                }
-            )
-        if self.connection.mysql_is_mariadb and (
-            10,
-            4,
-            12,
-        ) < self.connection.mysql_version < (10, 5):
-            skips.update(
-                {
-                    "https://jira.mariadb.org/browse/MDEV-22775": {
-                        "schema.tests.SchemaTests."
-                        "test_alter_pk_with_self_referential_field",
                     },
                 }
             )
@@ -184,11 +175,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     @cached_property
     def update_can_self_select(self):
-        return self.connection.mysql_is_mariadb and self.connection.mysql_version >= (
-            10,
-            3,
-            2,
-        )
+        return self.connection.mysql_is_mariadb
 
     @cached_property
     def can_introspect_foreign_keys(self):
@@ -207,11 +194,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     @cached_property
     def can_return_columns_from_insert(self):
-        return self.connection.mysql_is_mariadb and self.connection.mysql_version >= (
-            10,
-            5,
-            0,
-        )
+        return self.connection.mysql_is_mariadb
 
     can_return_rows_from_bulk_insert = property(
         operator.attrgetter("can_return_columns_from_insert")
@@ -224,16 +207,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def is_sql_auto_is_null_enabled(self):
         return self.connection.mysql_server_data["sql_auto_is_null"]
-
-    @cached_property
-    def supports_over_clause(self):
-        if self.connection.mysql_is_mariadb:
-            return True
-        return self.connection.mysql_version >= (8, 0, 2)
-
-    supports_frame_range_fixed_distance = property(
-        operator.attrgetter("supports_over_clause")
-    )
 
     @cached_property
     def supports_column_check_constraints(self):
@@ -255,20 +228,11 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     def has_select_for_update_skip_locked(self):
         if self.connection.mysql_is_mariadb:
             return self.connection.mysql_version >= (10, 6)
-        return self.connection.mysql_version >= (8, 0, 1)
-
-    @cached_property
-    def has_select_for_update_nowait(self):
-        if self.connection.mysql_is_mariadb:
-            return True
-        return self.connection.mysql_version >= (8, 0, 1)
+        return True
 
     @cached_property
     def has_select_for_update_of(self):
-        return (
-            not self.connection.mysql_is_mariadb
-            and self.connection.mysql_version >= (8, 0, 1)
-        )
+        return not self.connection.mysql_is_mariadb
 
     @cached_property
     def supports_explain_analyze(self):
@@ -319,7 +283,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             return False
         if self.connection.mysql_is_mariadb:
             return self.connection.mysql_version >= (10, 8)
-        return self.connection.mysql_version >= (8, 0, 1)
+        return True
 
     @cached_property
     def supports_expression_indexes(self):
@@ -349,3 +313,14 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         if self.connection.mysql_is_mariadb:
             return True
         return self.connection.mysql_version >= (8, 0, 13)
+
+    @cached_property
+    def has_native_uuid_field(self):
+        is_mariadb = self.connection.mysql_is_mariadb
+        return is_mariadb and self.connection.mysql_version >= (10, 7)
+
+    @cached_property
+    def allows_group_by_selected_pks(self):
+        if self.connection.mysql_is_mariadb:
+            return "ONLY_FULL_GROUP_BY" not in self.connection.sql_mode
+        return True

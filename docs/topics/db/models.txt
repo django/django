@@ -157,9 +157,12 @@ ones:
     <Field.blank>`, the field will be required.
 
 :attr:`~Field.choices`
-    A :term:`sequence` of 2-tuples to use as choices for this field. If this
-    is given, the default form widget will be a select box instead of the
-    standard text field and will limit choices to the choices given.
+    A :term:`sequence` of 2-value tuples, a :term:`mapping`, an
+    :ref:`enumeration type <field-choices-enum-types>`, or a callable (that
+    expects no arguments and returns any of the previous formats), to use as
+    choices for this field. If this is given, the default form widget will be a
+    select box instead of the standard text field and will limit choices to the
+    choices given.
 
     A choices list looks like this::
 
@@ -185,11 +188,11 @@ ones:
 
 
         class Person(models.Model):
-            SHIRT_SIZES = [
-                ("S", "Small"),
-                ("M", "Medium"),
-                ("L", "Large"),
-            ]
+            SHIRT_SIZES = {
+                "S": "Small",
+                "M": "Medium",
+                "L": "Large",
+            }
             name = models.CharField(max_length=60)
             shirt_size = models.CharField(max_length=1, choices=SHIRT_SIZES)
 
@@ -215,6 +218,10 @@ ones:
 
     Further examples are available in the :ref:`model field reference
     <field-choices>`.
+
+    .. versionchanged:: 5.0
+
+        Support for mappings and callables was added.
 
 :attr:`~Field.default`
     The default value for the field. This can be a value or a callable
@@ -861,9 +868,9 @@ to happen whenever you save an object. For example (see
         name = models.CharField(max_length=100)
         tagline = models.TextField()
 
-        def save(self, *args, **kwargs):
+        def save(self, **kwargs):
             do_something()
-            super().save(*args, **kwargs)  # Call the "real" save() method.
+            super().save(**kwargs)  # Call the "real" save() method.
             do_something_else()
 
 You can also prevent saving::
@@ -875,24 +882,23 @@ You can also prevent saving::
         name = models.CharField(max_length=100)
         tagline = models.TextField()
 
-        def save(self, *args, **kwargs):
+        def save(self, **kwargs):
             if self.name == "Yoko Ono's blog":
                 return  # Yoko shall never have her own blog!
             else:
-                super().save(*args, **kwargs)  # Call the "real" save() method.
+                super().save(**kwargs)  # Call the "real" save() method.
 
 It's important to remember to call the superclass method -- that's
-that ``super().save(*args, **kwargs)`` business -- to ensure
-that the object still gets saved into the database. If you forget to
-call the superclass method, the default behavior won't happen and the
-database won't get touched.
+that ``super().save(**kwargs)`` business -- to ensure that the object still
+gets saved into the database. If you forget to call the superclass method, the
+default behavior won't happen and the database won't get touched.
 
 It's also important that you pass through the arguments that can be
-passed to the model method -- that's what the ``*args, **kwargs`` bit
-does. Django will, from time to time, extend the capabilities of
-built-in model methods, adding new arguments. If you use ``*args,
-**kwargs`` in your method definitions, you are guaranteed that your
-code will automatically support those arguments when they are added.
+passed to the model method -- that's what the ``**kwargs`` bit does. Django
+will, from time to time, extend the capabilities of built-in model methods,
+adding new keyword arguments. If you use ``**kwargs`` in your method
+definitions, you are guaranteed that your code will automatically support those
+arguments when they are added.
 
 If you wish to update a field value in the :meth:`~Model.save` method, you may
 also want to have this field added to the ``update_fields`` keyword argument.
@@ -907,18 +913,13 @@ example::
         name = models.CharField(max_length=100)
         slug = models.TextField()
 
-        def save(
-            self, force_insert=False, force_update=False, using=None, update_fields=None
-        ):
+        def save(self, **kwargs):
             self.slug = slugify(self.name)
-            if update_fields is not None and "name" in update_fields:
+            if (
+                update_fields := kwargs.get("update_fields")
+            ) is not None and "name" in update_fields:
                 update_fields = {"slug"}.union(update_fields)
-            super().save(
-                force_insert=force_insert,
-                force_update=force_update,
-                using=using,
-                update_fields=update_fields,
-            )
+            super().save(**kwargs)
 
 See :ref:`ref-models-update-fields` for more details.
 

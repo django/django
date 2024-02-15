@@ -45,14 +45,12 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     @property
     def sql_rename_column(self):
-        # MariaDB >= 10.5.2 and MySQL >= 8.0.4 support an
-        # "ALTER TABLE ... RENAME COLUMN" statement.
-        if self.connection.mysql_is_mariadb:
-            if self.connection.mysql_version >= (10, 5, 2):
-                return super().sql_rename_column
-        elif self.connection.mysql_version >= (8, 0, 4):
-            return super().sql_rename_column
-        return "ALTER TABLE %(table)s CHANGE %(old_column)s %(new_column)s %(type)s"
+        is_mariadb = self.connection.mysql_is_mariadb
+        if is_mariadb and self.connection.mysql_version < (10, 5, 2):
+            # MariaDB < 10.5.2 doesn't support an
+            # "ALTER TABLE ... RENAME COLUMN" statement.
+            return "ALTER TABLE %(table)s CHANGE %(old_column)s %(new_column)s %(type)s"
+        return super().sql_rename_column
 
     def quote_value(self, value):
         self.connection.ensure_connection()
@@ -71,12 +69,22 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             and db_type.lower() in self.connection._limited_data_types
         )
 
+    def _is_text_or_blob(self, field):
+        db_type = field.db_type(self.connection)
+        return db_type and db_type.lower().endswith(("blob", "text"))
+
     def skip_default(self, field):
+        default_is_empty = self.effective_default(field) in ("", b"")
+        if default_is_empty and self._is_text_or_blob(field):
+            return True
         if not self._supports_limited_data_type_defaults:
             return self._is_limited_data_type(field)
         return False
 
     def skip_default_on_alter(self, field):
+        default_is_empty = self.effective_default(field) in ("", b"")
+        if default_is_empty and self._is_text_or_blob(field):
+            return True
         if self._is_limited_data_type(field) and not self.connection.mysql_is_mariadb:
             # MySQL doesn't support defaults for BLOB and TEXT in the
             # ALTER COLUMN statement.

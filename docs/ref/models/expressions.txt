@@ -76,33 +76,33 @@ Some examples
 
     # Annotate models with an aggregated value. Both forms
     # below are equivalent.
-    Company.objects.annotate(num_products=Count('products'))
-    Company.objects.annotate(num_products=Count(F('products')))
+    >>> Company.objects.annotate(num_products=Count("products"))
+    >>> Company.objects.annotate(num_products=Count(F("products")))
 
     # Aggregates can contain complex computations also
-    Company.objects.annotate(num_offerings=Count(F('products') + F('services')))
+    >>> Company.objects.annotate(num_offerings=Count(F("products") + F("services")))
 
     # Expressions can also be used in order_by(), either directly
-    Company.objects.order_by(Length('name').asc())
-    Company.objects.order_by(Length('name').desc())
+    >>> Company.objects.order_by(Length("name").asc())
+    >>> Company.objects.order_by(Length("name").desc())
     # or using the double underscore lookup syntax.
-    from django.db.models import CharField
-    from django.db.models.functions import Length
-    CharField.register_lookup(Length)
-    Company.objects.order_by('name__length')
+    >>> from django.db.models import CharField
+    >>> from django.db.models.functions import Length
+    >>> CharField.register_lookup(Length)
+    >>> Company.objects.order_by("name__length")
 
     # Boolean expression can be used directly in filters.
-    from django.db.models import Exists
-    Company.objects.filter(
-        Exists(Employee.objects.filter(company=OuterRef('pk'), salary__gt=10))
-    )
+    >>> from django.db.models import Exists, OuterRef
+    >>> Company.objects.filter(
+    ...     Exists(Employee.objects.filter(company=OuterRef("pk"), salary__gt=10))
+    ... )
 
     # Lookup expressions can also be used directly in filters
-    Company.objects.filter(GreaterThan(F('num_employees'), F('num_chairs')))
+    >>> Company.objects.filter(GreaterThan(F("num_employees"), F("num_chairs")))
     # or annotations.
-    Company.objects.annotate(
-        need_chairs=GreaterThan(F('num_employees'), F('num_chairs')),
-    )
+    >>> Company.objects.annotate(
+    ...     need_chairs=GreaterThan(F("num_employees"), F("num_chairs")),
+    ... )
 
 Built-in Expressions
 ====================
@@ -183,6 +183,28 @@ the field value of each one, and saving each one back to the database::
 * getting the database, rather than Python, to do work
 * reducing the number of queries some operations require
 
+.. _slicing-using-f:
+
+Slicing ``F()`` expressions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 5.1
+
+For string-based fields, text-based fields, and
+:class:`~django.contrib.postgres.fields.ArrayField`, you can use Python's
+array-slicing syntax. The indices are 0-based and the ``step`` argument to
+``slice`` is not supported. For example:
+
+.. code-block:: pycon
+
+    >>> # Replacing a name with a substring of itself.
+    >>> writer = Writers.objects.get(name="Priyansh")
+    >>> writer.name = F("name")[1:5]
+    >>> writer.save()
+    >>> writer.refresh_from_db()
+    >>> writer.name
+    'riya'
+
 .. _avoiding-race-conditions-using-f:
 
 Avoiding race conditions using ``F()``
@@ -257,10 +279,10 @@ primary key value rather than a model instance:
 
 .. code-block:: pycon
 
-    >> car = Company.objects.annotate(built_by=F('manufacturer'))[0]
-    >> car.manufacturer
+    >>> car = Company.objects.annotate(built_by=F("manufacturer"))[0]
+    >>> car.manufacturer
     <Manufacturer: Toyota>
-    >> car.built_by
+    >>> car.built_by
     3
 
 .. _using-f-to-sort-null-values:
@@ -281,8 +303,6 @@ is null) after companies that have been contacted::
 
 Using ``F()`` with logical operations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 4.2
 
 ``F()`` expressions that output ``BooleanField`` can be logically negated with
 the inversion operator ``~F()``. For example, to swap the activation status of
@@ -757,9 +777,7 @@ should avoid them if possible.
     your SQL with user-provided data.
 
     You also must not quote placeholders in the SQL string. This example is
-    vulnerable to SQL injection because of the quotes around ``%s``:
-
-    .. code-block:: pycon
+    vulnerable to SQL injection because of the quotes around ``%s``::
 
         RawSQL("select col from sometable where othercol = '%s'")  # unsafe!
 
@@ -783,7 +801,7 @@ instead they are part of the selected columns.
 
     .. attribute:: template
 
-        Defaults to ``%(expression)s OVER (%(window)s)'``. If only the
+        Defaults to ``%(expression)s OVER (%(window)s)``. If only the
         ``expression`` argument is provided, the window clause will be blank.
 
 The ``Window`` class is the main expression for an ``OVER`` clause.
@@ -876,11 +894,7 @@ from groups to be included:
     NotImplementedError: Heterogeneous disjunctive predicates against window functions
     are not implemented when performing conditional aggregation.
 
-.. versionchanged:: 4.2
-
-    Support for filtering against window functions was added.
-
-Among Django's built-in database backends, MySQL 8.0.2+, PostgreSQL, and Oracle
+Among Django's built-in database backends, MySQL, PostgreSQL, and Oracle
 support window expressions. Support for different window expression features
 varies among the different databases. For example, the options in
 :meth:`~django.db.models.Expression.asc` and
@@ -895,7 +909,7 @@ Frames
 For a window frame, you can choose either a range-based sequence of rows or an
 ordinary sequence of rows.
 
-.. class:: ValueRange(start=None, end=None)
+.. class:: ValueRange(start=None, end=None, exclusion=None)
 
     .. attribute:: frame_type
 
@@ -905,17 +919,47 @@ ordinary sequence of rows.
     the standard start and end points, such as ``CURRENT ROW`` and ``UNBOUNDED
     FOLLOWING``.
 
-.. class:: RowRange(start=None, end=None)
+    .. versionchanged:: 5.1
+
+        The ``exclusion`` argument was added.
+
+.. class:: RowRange(start=None, end=None, exclusion=None)
 
     .. attribute:: frame_type
 
         This attribute is set to ``'ROWS'``.
+
+    .. versionchanged:: 5.1
+
+        The ``exclusion`` argument was added.
 
 Both classes return SQL with the template:
 
 .. code-block:: sql
 
     %(frame_type)s BETWEEN %(start)s AND %(end)s
+
+.. class:: WindowFrameExclusion
+
+    .. versionadded:: 5.1
+
+    .. attribute:: CURRENT_ROW
+
+    .. attribute:: GROUP
+
+    .. attribute:: TIES
+
+    .. attribute:: NO_OTHERS
+
+The ``exclusion`` argument allows excluding rows
+(:attr:`~WindowFrameExclusion.CURRENT_ROW`), groups
+(:attr:`~WindowFrameExclusion.GROUP`), and ties
+(:attr:`~WindowFrameExclusion.TIES`) from the window frames on supported
+databases:
+
+.. code-block:: sql
+
+    %(frame_type)s BETWEEN %(start)s AND %(end)s EXCLUDE %(exclusion)s
 
 Frames narrow the rows that are used for computing the result. They shift from
 some start point to some specified end point. Frames can be used with and
@@ -929,9 +973,12 @@ SQL generated by the ORM and is by default ``UNBOUNDED FOLLOWING``. The default
 frame includes all rows from the partition to the last row in the set.
 
 The accepted values for the ``start`` and ``end`` arguments are ``None``, an
-integer, or zero. A negative integer for ``start`` results in ``N preceding``,
-while ``None`` yields ``UNBOUNDED PRECEDING``. For both ``start`` and ``end``,
-zero will return ``CURRENT ROW``. Positive integers are accepted for ``end``.
+integer, or zero. A negative integer for ``start`` results in ``N PRECEDING``,
+while ``None`` yields ``UNBOUNDED PRECEDING``. In ``ROWS`` mode, a positive
+integer can be used for ```start`` resulting in ``N FOLLOWING``. Positive
+integers are accepted for ``end`` and results in ``N FOLLOWING``. In ``ROWS``
+mode, a negative integer can be used for ```end`` resulting in ``N PRECEDING``.
+For both ``start`` and ``end``, zero will return ``CURRENT ROW``.
 
 There's a difference in what ``CURRENT ROW`` includes. When specified in
 ``ROWS`` mode, the frame starts or ends with the current row. When specified in
@@ -960,9 +1007,9 @@ with the average rating of a movie's two prior and two following peers:
 
 If the database supports it, you can specify the start and end points based on
 values of an expression in the partition. If the ``released`` field of the
-``Movie`` model stores the release month of each movies, this ``ValueRange``
+``Movie`` model stores the release month of each movie, this ``ValueRange``
 example annotates each movie with the average rating of a movie's peers
-released between twelve months before and twelve months after the each movie:
+released between twelve months before and twelve months after each movie:
 
 .. code-block:: pycon
 
@@ -975,6 +1022,11 @@ released between twelve months before and twelve months after the each movie:
     ...         frame=ValueRange(start=-12, end=12),
     ...     ),
     ... )
+
+.. versionchanged:: 5.1
+
+    Support for positive integer ``start`` and negative integer ``end`` was
+    added for ``RowRange``.
 
 .. currentmodule:: django.db.models
 
@@ -1099,10 +1151,6 @@ calling the appropriate methods on the wrapped expression.
         this expression. ``get_group_by_cols()`` should be called on any
         nested expressions. ``F()`` objects, in particular, hold a reference
         to a column.
-
-        .. versionchanged:: 4.2
-
-            The ``alias=None`` keyword argument was removed.
 
     .. method:: asc(nulls_first=None, nulls_last=None)
 

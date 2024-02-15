@@ -6,8 +6,10 @@ import uuid
 from django.db import models
 from django.template import Context, Template
 from django.test import SimpleTestCase
+from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.functional import Promise
 from django.utils.translation import gettext_lazy as _
+from django.utils.version import PY311
 
 
 class Suit(models.IntegerChoices):
@@ -186,6 +188,7 @@ class ChoicesTests(SimpleTestCase):
     def test_do_not_call_in_templates_member(self):
         # do_not_call_in_templates is not implicitly treated as a member.
         Special = models.IntegerChoices("Special", "do_not_call_in_templates")
+        self.assertIn("do_not_call_in_templates", Special.__members__)
         self.assertEqual(
             Special.do_not_call_in_templates.label,
             "Do Not Call In Templates",
@@ -195,6 +198,16 @@ class ChoicesTests(SimpleTestCase):
             Special.do_not_call_in_templates.name,
             "do_not_call_in_templates",
         )
+
+    def test_do_not_call_in_templates_nonmember(self):
+        self.assertNotIn("do_not_call_in_templates", Suit.__members__)
+        if PY311:
+            self.assertIs(Suit.do_not_call_in_templates, True)
+        else:
+            # Using @property on an enum does not behave as expected.
+            self.assertTrue(Suit.do_not_call_in_templates)
+            self.assertIsNot(Suit.do_not_call_in_templates, True)
+            self.assertIsInstance(Suit.do_not_call_in_templates, property)
 
 
 class Separator(bytes, models.Choices):
@@ -303,15 +316,17 @@ class CustomChoicesTests(SimpleTestCase):
             class Boolean(bool, models.Choices):
                 pass
 
-    def test_timezone_unsupported(self):
-        msg = "type 'datetime.timezone' is not an acceptable base type"
-        with self.assertRaisesMessage(TypeError, msg):
-
-            class Timezone(datetime.timezone, models.Choices):
-                pass
-
     def test_uuid_unsupported(self):
         with self.assertRaises(TypeError):
 
             class Identifier(uuid.UUID, models.Choices):
                 A = "972ce4eb-a95f-4a56-9339-68c208a76f18"
+
+
+class ChoicesMetaDeprecationTests(SimpleTestCase):
+    def test_deprecation_warning(self):
+        from django.db.models import enums
+
+        msg = "ChoicesMeta is deprecated in favor of ChoicesType."
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+            enums.ChoicesMeta

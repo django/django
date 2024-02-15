@@ -3,6 +3,7 @@ Bare-bones model
 
 This is a basic model with only two non-primary-key fields.
 """
+
 import uuid
 
 from django.db import models
@@ -38,6 +39,9 @@ class SelfRef(models.Model):
         related_name="+",
     )
     article = models.ForeignKey(Article, models.SET_NULL, null=True, blank=True)
+    article_cited = models.ForeignKey(
+        Article, models.SET_NULL, null=True, blank=True, related_name="cited"
+    )
 
     def __str__(self):
         # This method intentionally doesn't work for all cases - part

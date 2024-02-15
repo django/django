@@ -76,7 +76,7 @@ After the previous tutorials, our project should look like this:
             static/
                 polls/
                     images/
-                        background.gif
+                        background.png
                     style.css
             templates/
                 polls/
@@ -121,16 +121,17 @@ Python *packaging* refers to preparing your app in a specific format that can
 be easily installed and used. Django itself is packaged very much like
 this. For a small app like polls, this process isn't too difficult.
 
-#. First, create a parent directory for ``polls``, outside of your Django
+#. First, create a parent directory for the package, outside of your Django
    project. Call this directory ``django-polls``.
 
    .. admonition::  Choosing a name for your app
 
-       When choosing a name for your package, check resources like PyPI to avoid
-       naming conflicts with existing packages. It's often useful to prepend
-       ``django-`` to your module name when creating a package to distribute.
-       This helps others looking for Django apps identify your app as Django
-       specific.
+       When choosing a name for your package, check PyPI to avoid naming
+       conflicts with existing packages. We recommend using a ``django-``
+       prefix for package names, to identify your package as specific to
+       Django, and a corresponding ``django_`` prefix for your module name. For
+       example, the ``django-ratelimit`` package contains the
+       ``django_ratelimit`` module.
 
        Application labels (that is, the final part of the dotted path to
        application packages) *must* be unique in :setting:`INSTALLED_APPS`.
@@ -138,19 +139,35 @@ this. For a small app like polls, this process isn't too difficult.
        </ref/contrib/index>`, for example ``auth``, ``admin``, or
        ``messages``.
 
-#. Move the ``polls`` directory into the ``django-polls`` directory.
+#. Move the ``polls`` directory into ``django-polls`` directory, and rename it
+   to ``django_polls``.
+
+#. Edit ``django_polls/apps.py`` so that :attr:`~.AppConfig.name` refers to the
+   new module name and add :attr:`~.AppConfig.label` to give a short name for
+   the app:
+
+   .. code-block:: python
+       :caption: ``django-polls/django_polls/apps.py``
+
+       from django.apps import AppConfig
+
+
+       class PollsConfig(AppConfig):
+           default_auto_field = "django.db.models.BigAutoField"
+           name = "django_polls"
+           label = "polls"
 
 #. Create a file ``django-polls/README.rst`` with the following contents:
 
    .. code-block:: rst
        :caption: ``django-polls/README.rst``
 
-       =====
-       Polls
-       =====
+       ============
+       django-polls
+       ============
 
-       Polls is a Django app to conduct web-based polls. For each question,
-       visitors can choose between a fixed number of answers.
+       django-polls is a Django app to conduct web-based polls. For each
+       question, visitors can choose between a fixed number of answers.
 
        Detailed documentation is in the "docs" directory.
 
@@ -161,19 +178,18 @@ this. For a small app like polls, this process isn't too difficult.
 
            INSTALLED_APPS = [
                ...,
-               "polls",
+               "django_polls",
            ]
 
        2. Include the polls URLconf in your project urls.py like this::
 
-           path("polls/", include("polls.urls")),
+           path("polls/", include("django_polls.urls")),
 
-       3. Run ``python manage.py migrate`` to create the polls models.
+       3. Run ``python manage.py migrate`` to create the models.
 
-       4. Start the development server and visit http://127.0.0.1:8000/admin/
-          to create a poll (you'll need the Admin app enabled).
+       4. Start the development server and visit the admin to create a poll.
 
-       5. Visit http://127.0.0.1:8000/polls/ to participate in the poll.
+       5. Visit the ``/polls/`` URL to participate in the poll.
 
 #. Create a ``django-polls/LICENSE`` file. Choosing a license is beyond the
    scope of this tutorial, but suffice it to say that code released publicly
@@ -182,92 +198,76 @@ this. For a small app like polls, this process isn't too difficult.
    license. Just be aware that your licensing choice will affect who is able
    to use your code.
 
-#. Next we'll create ``pyproject.toml``, ``setup.cfg``, and ``setup.py`` files
-   which detail how to build and install the app. A full explanation of these
-   files is beyond the scope of this tutorial, but the `setuptools
-   documentation <https://setuptools.pypa.io/en/latest/>`_ has a good
-   explanation. Create the ``django-polls/pyproject.toml``,
-   ``django-polls/setup.cfg``, and ``django-polls/setup.py`` files with the
+#. Next we'll create the ``pyproject.toml`` file which details how to build and
+   install the app. A full explanation of this file is beyond the scope of this
+   tutorial, but the `Python Packaging User Guide
+   <https://packaging.python.org/guides/writing-pyproject-toml/>`_ has a good
+   explanation. Create the ``django-polls/pyproject.toml`` file with the
    following contents:
 
    .. code-block:: toml
-        :caption: ``django-polls/pyproject.toml``
+       :caption: ``django-polls/pyproject.toml``
 
-        [build-system]
-        requires = ['setuptools>=40.8.0']
-        build-backend = 'setuptools.build_meta'
+       [build-system]
+       requires = ["setuptools>=61.0"]
+       build-backend = "setuptools.build_meta"
 
-   .. code-block:: ini
-        :caption: ``django-polls/setup.cfg``
+       [project]
+       name = "django-polls"
+       version = "0.1"
+       dependencies = [
+           "django>=X.Y",  # Replace "X.Y" as appropriate
+       ]
+       description = "A Django app to conduct web-based polls."
+       readme = "README.rst"
+       requires-python = ">= 3.10"
+       authors = [
+           {name = "Your Name", email = "yourname@example.com"},
+       ]
+       classifiers = [
+           "Environment :: Web Environment",
+           "Framework :: Django",
+           "Framework :: Django :: X.Y",  # Replace "X.Y" as appropriate
+           "Intended Audience :: Developers",
+           "License :: OSI Approved :: BSD License",
+           "Operating System :: OS Independent",
+           "Programming Language :: Python",
+           "Programming Language :: Python :: 3",
+           "Programming Language :: Python :: 3 :: Only",
+           "Programming Language :: Python :: 3.10",
+           "Programming Language :: Python :: 3.11",
+           "Programming Language :: Python :: 3.12",
+           "Topic :: Internet :: WWW/HTTP",
+           "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+       ]
 
-        [metadata]
-        name = django-polls
-        version = 0.1
-        description = A Django app to conduct web-based polls.
-        long_description = file: README.rst
-        url = https://www.example.com/
-        author = Your Name
-        author_email = yourname@example.com
-        license = BSD-3-Clause  # Example license
-        classifiers =
-            Environment :: Web Environment
-            Framework :: Django
-            Framework :: Django :: X.Y  # Replace "X.Y" as appropriate
-            Intended Audience :: Developers
-            License :: OSI Approved :: BSD License
-            Operating System :: OS Independent
-            Programming Language :: Python
-            Programming Language :: Python :: 3
-            Programming Language :: Python :: 3 :: Only
-            Programming Language :: Python :: 3.10
-            Programming Language :: Python :: 3.11
-            Topic :: Internet :: WWW/HTTP
-            Topic :: Internet :: WWW/HTTP :: Dynamic Content
+       [project.urls]
+       Homepage = "https://www.example.com/"
 
-        [options]
-        include_package_data = true
-        packages = find:
-        python_requires = >=3.10
-        install_requires =
-            Django >= X.Y  # Replace "X.Y" as appropriate
-
-   .. code-block:: python
-        :caption: ``django-polls/setup.py``
-
-        from setuptools import setup
-
-        setup()
-
-#. Only Python modules and packages are included in the package by default. To
-   include additional files, we'll need to create a ``MANIFEST.in`` file. The
-   setuptools docs referred to in the previous step discuss this file in more
-   detail. To include the templates, the ``README.rst`` and our ``LICENSE``
-   file, create a file ``django-polls/MANIFEST.in`` with the following
-   contents:
+#. Many common files and Python modules and packages are included in the
+   package by default. To include additional files, we'll need to create a
+   ``MANIFEST.in`` file. To include the templates and static files, create a
+   file ``django-polls/MANIFEST.in`` with the following contents:
 
    .. code-block:: text
-       :caption: ``django-polls/MANIFEST.in``
+      :caption: ``django-polls/MANIFEST.in``
 
-       include LICENSE
-       include README.rst
-       recursive-include polls/static *
-       recursive-include polls/templates *
+      recursive-include django_polls/static *
+      recursive-include django_polls/templates *
 
 #. It's optional, but recommended, to include detailed documentation with your
    app. Create an empty directory ``django-polls/docs`` for future
-   documentation. Add an additional line to ``django-polls/MANIFEST.in``:
-
-   .. code-block:: text
-
-      recursive-include docs *
+   documentation.
 
    Note that the ``docs`` directory won't be included in your package unless
    you add some files to it. Many Django apps also provide their documentation
    online through sites like `readthedocs.org <https://readthedocs.org>`_.
 
-#. Try building your package with ``python setup.py sdist`` (run from inside
-   ``django-polls``). This creates a directory called ``dist`` and builds your
-   new package, ``django-polls-0.1.tar.gz``.
+#. Check that the :pypi:`build` package is installed (``python -m pip install
+   build``) and try building your package by running ``python -m build`` inside
+   ``django-polls``. This creates a directory called ``dist`` and builds your
+   new package into source and binary formats, ``django-polls-0.1.tar.gz`` and
+   ``django_polls-0.1-py3-none-any.whl``.
 
 For more information on packaging, see Python's `Tutorial on Packaging and
 Distributing Projects
@@ -298,14 +298,21 @@ working. We'll now fix this by installing our new ``django-polls`` package.
 
       python -m pip install --user django-polls/dist/django-polls-0.1.tar.gz
 
-#. With luck, your Django project should now work correctly again. Run the
-   server again to confirm this.
+#. Update ``mysite/settings.py`` to point to the new module name::
 
-#. To uninstall the package, use pip:
+    INSTALLED_APPS = [
+        "django_polls.apps.PollsConfig",
+        ...,
+    ]
 
-   .. code-block:: shell
+#. Update ``mysite/urls.py`` to point to the new module name::
 
-      python -m pip uninstall django-polls
+    urlpatterns = [
+        path("polls/", include("django_polls.urls")),
+        ...,
+    ]
+
+#. Run the development server to confirm the project continues to work.
 
 Publishing your app
 ===================
@@ -325,7 +332,7 @@ the world! If this wasn't just an example, you could now:
 Installing Python packages with a virtual environment
 =====================================================
 
-Earlier, we installed the polls app as a user library. This has some
+Earlier, we installed ``django-polls`` as a user library. This has some
 disadvantages:
 
 * Modifying the user libraries can affect other Python software on your system.

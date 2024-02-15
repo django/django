@@ -1,6 +1,7 @@
 """
 XML serializer.
 """
+
 import json
 from xml.dom import pulldom
 from xml.sax import handler
@@ -156,7 +157,10 @@ class Serializer(base.Serializer):
 
                 def queryset_iterator(obj, field):
                     return (
-                        getattr(obj, field.name).select_related().only("pk").iterator()
+                        getattr(obj, field.name)
+                        .select_related(None)
+                        .only("pk")
+                        .iterator()
                     )
 
             m2m_iter = getattr(obj, "_prefetched_objects_cache", {}).get(

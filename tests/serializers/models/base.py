@@ -4,6 +4,7 @@ Serialization
 ``django.core.serializers`` provides interfaces to converting Django
 ``QuerySet`` objects to and from "flat" data (i.e. strings).
 """
+
 from decimal import Decimal
 
 from django.db import models
@@ -60,7 +61,7 @@ class TopicManager(models.Manager):
 
 class Topic(models.Model):
     name = models.CharField(max_length=255)
-    category = models.ForeignKey(Category, models.CASCADE, null=True)
+    category = models.ForeignKey(Category, models.CASCADE)
     objects = TopicManager()
 
 

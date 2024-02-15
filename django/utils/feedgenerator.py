@@ -21,6 +21,7 @@ Sample usage:
 For definitions of the different versions of RSS, see:
 https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004/02/04/incompatible-rss
 """
+
 import datetime
 import email
 from io import StringIO

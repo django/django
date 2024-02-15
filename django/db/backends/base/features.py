@@ -27,6 +27,11 @@ class BaseDatabaseFeatures:
     # Does the backend allow inserting duplicate rows when a unique_together
     # constraint exists and some fields are nullable but not all of them?
     supports_partially_nullable_unique_constraints = True
+
+    # Does the backend supports specifying whether NULL values should be
+    # considered distinct in unique constraints?
+    supports_nulls_distinct_unique_constraints = False
+
     # Does the backend support initially deferrable unique constraints?
     supports_deferrable_unique_constraints = False
 
@@ -169,9 +174,6 @@ class BaseDatabaseFeatures:
 
     schema_editor_uses_clientside_param_binding = False
 
-    # Does it support operations requiring references rename in a transaction?
-    supports_atomic_references_rename = True
-
     # Can we issue more than one ALTER COLUMN clause in an ALTER TABLE?
     supports_combined_alters = False
 
@@ -261,6 +263,7 @@ class BaseDatabaseFeatures:
     # Does the backend support window expressions (expression OVER (...))?
     supports_over_clause = False
     supports_frame_range_fixed_distance = False
+    supports_frame_exclusion = False
     only_supports_unbounded_with_preceding_and_following = False
 
     # Does the backend support CAST with precision?
@@ -351,6 +354,11 @@ class BaseDatabaseFeatures:
     # Does the backend support column comments in ADD COLUMN statements?
     supports_comments_inline = False
 
+    # Does the backend support stored generated columns?
+    supports_stored_generated_columns = False
+    # Does the backend support virtual generated columns?
+    supports_virtual_generated_columns = False
+
     # Does the backend support the logical XOR operator?
     supports_logical_xor = False
 
@@ -366,6 +374,7 @@ class BaseDatabaseFeatures:
         "cs": None,  # Case-sensitive.
         "non_default": None,  # Non-default.
         "swedish_ci": None,  # Swedish case-insensitive.
+        "virtual": None,  # A collation that can be used for virtual columns.
     }
     # SQL template override for tests.aggregation.tests.NowUTC
     test_now_utc_template = None

@@ -1,6 +1,6 @@
 {% load i18n static %}
 {% if cl.search_fields %}
-<div id="toolbar"><form id="changelist-search" method="get">
+<div id="toolbar"><form id="changelist-search" method="get" role="search">
 <div><!-- DIV needed for valid HTML -->
 <label for="searchbar"><img src="{% static "admin/img/search.svg" %}" alt="Search"></label>
 <input type="text" size="40" name="{{ search_var }}" value="{{ cl.query }}" id="searchbar"{% if cl.search_help_text %} aria-describedby="searchbar_helptext"{% endif %}>

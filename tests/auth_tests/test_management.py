@@ -163,11 +163,9 @@ class ChangepasswordManagementCommandTestCase(TestCase):
 
     def setUp(self):
         self.stdout = StringIO()
+        self.addCleanup(self.stdout.close)
         self.stderr = StringIO()
-
-    def tearDown(self):
-        self.stdout.close()
-        self.stderr.close()
+        self.addCleanup(self.stderr.close)
 
     @mock.patch.object(getpass, "getpass", return_value="password")
     def test_get_pass(self, mock_get_pass):
@@ -967,6 +965,36 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
                 stdout=new_io,
                 stderr=new_io,
             )
+
+    def test_blank_email_allowed_non_interactive(self):
+        new_io = StringIO()
+
+        call_command(
+            "createsuperuser",
+            email="",
+            username="joe",
+            interactive=False,
+            stdout=new_io,
+            stderr=new_io,
+        )
+        self.assertEqual(new_io.getvalue().strip(), "Superuser created successfully.")
+        u = User.objects.get(username="joe")
+        self.assertEqual(u.email, "")
+
+    @mock.patch.dict(os.environ, {"DJANGO_SUPERUSER_EMAIL": ""})
+    def test_blank_email_allowed_non_interactive_environment_variable(self):
+        new_io = StringIO()
+
+        call_command(
+            "createsuperuser",
+            username="joe",
+            interactive=False,
+            stdout=new_io,
+            stderr=new_io,
+        )
+        self.assertEqual(new_io.getvalue().strip(), "Superuser created successfully.")
+        u = User.objects.get(username="joe")
+        self.assertEqual(u.email, "")
 
     def test_password_validation_bypass(self):
         """

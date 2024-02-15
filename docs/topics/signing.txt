@@ -120,10 +120,6 @@ generate signatures. You can use a different secret by passing it to the
     of additional values used to validate signed data, defaults to
     :setting:`SECRET_KEY_FALLBACKS`.
 
-    .. deprecated:: 4.2
-
-        Support for passing positional arguments is deprecated.
-
 Using the ``salt`` argument
 ---------------------------
 
@@ -208,10 +204,6 @@ created within a specified period of time:
         Checks if ``signed_obj`` was signed less than ``max_age`` seconds ago,
         otherwise raises ``SignatureExpired``. The ``max_age`` parameter can
         accept an integer or a :py:class:`datetime.timedelta` object.
-
-    .. deprecated:: 4.2
-
-        Support for passing positional arguments is deprecated.
 
 .. _signing-complex-data:
 

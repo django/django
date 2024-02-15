@@ -14,6 +14,7 @@ cache keys to prevent delivery of wrong content.
 An example: i18n middleware would need to distinguish caches by the
 "Accept-language" header.
 """
+
 import time
 from collections import defaultdict
 from hashlib import md5

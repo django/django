@@ -1,18 +1,20 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Abdulla Dlshad, 2023
+# Bakhtawar Barzan, 2021
 # Bakhtawar Barzan, 2021
 # kosar tofiq <kosar.belana@gmail.com>, 2020
 # pejar hewrami <gumle@protonmail.com>, 2020
-# Swara <swara09@gmail.com>, 2022
+# Swara <swara09@gmail.com>, 2022,2024
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-17 02:13-0600\n"
-"PO-Revision-Date: 2023-04-25 07:05+0000\n"
-"Last-Translator: Swara <swara09@gmail.com>, 2022\n"
-"Language-Team: Central Kurdish (http://www.transifex.com/django/django/"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2013-04-25 07:05+0000\n"
+"Last-Translator: Swara <swara09@gmail.com>, 2022,2024\n"
+"Language-Team: Central Kurdish (http://app.transifex.com/django/django/"
 "language/ckb/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -181,6 +183,9 @@ msgstr ""
 "پەنجە داگرە لەسەر “Control”، یاخود “Command” لەسەر ماک، بۆ هەڵبژاردنی "
 "دانەیەک زیاتر."
 
+msgid "Select this object for an action - {}"
+msgstr "ئەم تەنە هەڵبژێرە بۆ کردارێک - {}"
+
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr "{name} “{obj}” بەسەرکەوتوویی زیادکرا."
@@ -345,6 +350,9 @@ msgstr "هەموو %(total_count)s %(module_name)s هەڵبژێرە"
 msgid "Clear selection"
 msgstr "پاککردنەوەی هەڵبژاردن"
 
+msgid "Breadcrumbs"
+msgstr "وردەنان"
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "مۆدێلەکان لە بەرنامەی %(name)s"
@@ -373,15 +381,15 @@ msgstr "گۆڕینی تێپەڕەوشە"
 
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "تکایە ئەم هەڵەیەی خوارەوە ڕاست بکەرەوە."
+msgstr[1] "تکایە هەڵەکانی خوارەوە ڕاست بکەرەوە."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "تێپەڕەوشەی نوێ بۆ بەکارهێنەری <strong>%(username)s</strong> بنوسە"
 
 msgid "Skip to main content"
-msgstr ""
+msgstr "تێیپەڕێنە بۆ ناوەڕۆکی سەرەکی"
 
 msgid "Welcome,"
 msgstr "بەخێربێیت،"
@@ -395,9 +403,6 @@ msgstr "بەڵگەنامە"
 msgid "Log out"
 msgstr "چوونەدەرەوە"
 
-msgid "Breadcrumbs"
-msgstr ""
-
 #, python-format
 msgid "Add %(name)s"
 msgstr "زیادکردنی %(name)s"
@@ -410,6 +415,12 @@ msgstr "بینین لەسەر پێگە"
 
 msgid "Filter"
 msgstr "پاڵاوتن"
+
+msgid "Hide counts"
+msgstr "ژماردن بشارەوە"
+
+msgid "Show counts"
+msgstr "ژماردن پیشانبدە"
 
 msgid "Clear all filters"
 msgstr "پاکردنەوەی هەموو پاڵاوتنەکان"
@@ -425,13 +436,13 @@ msgid "Toggle sorting"
 msgstr "ڕیزکردنی پێچەوانە"
 
 msgid "Toggle theme (current theme: auto)"
-msgstr ""
+msgstr "گۆڕینی ڕووکار (ڕووکاری ئێستا: خۆکار)"
 
 msgid "Toggle theme (current theme: light)"
-msgstr ""
+msgstr "گۆڕینی ڕووکار (ڕووکاری ئێستا: ڕووناک)"
 
 msgid "Toggle theme (current theme: dark)"
-msgstr ""
+msgstr "گۆڕینی ڕووکار (ڕووکاری ئێستا: تاریک)"
 
 msgid "Delete"
 msgstr "سڕینەوە"
@@ -519,6 +530,15 @@ msgstr "کردارەکانم"
 msgid "None available"
 msgstr "هیچ شتيک بەردەست نییە"
 
+msgid "Added:"
+msgstr "زیادکرا:"
+
+msgid "Changed:"
+msgstr "گۆڕدرا:"
+
+msgid "Deleted:"
+msgstr "سڕایەوە:"
+
 msgid "Unknown content"
 msgstr "ناوەڕۆکی نەزانراو"
 
@@ -546,7 +566,7 @@ msgid "Toggle navigation"
 msgstr "کردنەوەو داخستنی ڕێنیشاندەر"
 
 msgid "Sidebar"
-msgstr ""
+msgstr "شریتی لاتەنیشت"
 
 msgid "Start typing to filter…"
 msgstr "دەست بکە بە نوسین بۆ پاڵاوتن..."
@@ -565,8 +585,8 @@ msgstr "کردار"
 
 msgid "entry"
 msgid_plural "entries"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "تۆمار"
+msgstr[1] "تۆمارەکان"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -727,6 +747,9 @@ msgstr "ناونیشانی ئیمەیڵ:"
 
 msgid "Reset my password"
 msgstr "دانانەوەی تێپەڕەوشەکەم"
+
+msgid "Select all objects on this page for an action"
+msgstr "هەموو تەنەکان لەم لاپەڕەیە بۆ کردارێک هەڵبژێرە"
 
 msgid "All dates"
 msgstr "هەموو بەروارەکان"

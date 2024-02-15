@@ -69,7 +69,7 @@ class RawIdCheckTests(CheckTestCase):
 
     def test_missing_field(self):
         class TestModelAdmin(ModelAdmin):
-            raw_id_fields = ("non_existent_field",)
+            raw_id_fields = ["non_existent_field"]
 
         self.assertIsInvalid(
             TestModelAdmin,
@@ -323,6 +323,24 @@ class FilterVerticalCheckTests(CheckTestCase):
         )
 
     @isolate_apps("modeladmin")
+    def test_invalid_reverse_m2m_field_with_related_name(self):
+        class Contact(Model):
+            pass
+
+        class Customer(Model):
+            contacts = ManyToManyField("Contact", related_name="customers")
+
+        class TestModelAdmin(ModelAdmin):
+            filter_vertical = ["customers"]
+
+        self.assertIsInvalid(
+            TestModelAdmin,
+            Contact,
+            "The value of 'filter_vertical[0]' must be a many-to-many field.",
+            "admin.E020",
+        )
+
+    @isolate_apps("modeladmin")
     def test_invalid_m2m_field_with_through(self):
         class Artist(Model):
             bands = ManyToManyField("Band", through="BandArtist")
@@ -380,6 +398,24 @@ class FilterHorizontalCheckTests(CheckTestCase):
         self.assertIsInvalid(
             TestModelAdmin,
             ValidationTestModel,
+            "The value of 'filter_horizontal[0]' must be a many-to-many field.",
+            "admin.E020",
+        )
+
+    @isolate_apps("modeladmin")
+    def test_invalid_reverse_m2m_field_with_related_name(self):
+        class Contact(Model):
+            pass
+
+        class Customer(Model):
+            contacts = ManyToManyField("Contact", related_name="customers")
+
+        class TestModelAdmin(ModelAdmin):
+            filter_horizontal = ["customers"]
+
+        self.assertIsInvalid(
+            TestModelAdmin,
+            Contact,
             "The value of 'filter_horizontal[0]' must be a many-to-many field.",
             "admin.E020",
         )
@@ -566,8 +602,21 @@ class ListDisplayTests(CheckTestCase):
             TestModelAdmin,
             ValidationTestModel,
             "The value of 'list_display[0]' refers to 'non_existent_field', "
-            "which is not a callable, an attribute of 'TestModelAdmin', "
-            "or an attribute or method on 'modeladmin.ValidationTestModel'.",
+            "which is not a callable or attribute of 'TestModelAdmin', "
+            "or an attribute, method, or field on 'modeladmin.ValidationTestModel'.",
+            "admin.E108",
+        )
+
+    def test_missing_related_field(self):
+        class TestModelAdmin(ModelAdmin):
+            list_display = ("band__non_existent_field",)
+
+        self.assertIsInvalid(
+            TestModelAdmin,
+            ValidationTestModel,
+            "The value of 'list_display[0]' refers to 'band__non_existent_field', "
+            "which is not a callable or attribute of 'TestModelAdmin', "
+            "or an attribute, method, or field on 'modeladmin.ValidationTestModel'.",
             "admin.E108",
         )
 
@@ -1267,6 +1316,45 @@ class FkNameCheckTests(CheckTestCase):
             inlines = [ValidationTestInline]
 
         self.assertIsValid(TestModelAdmin, ValidationTestModel)
+
+    def test_proxy_model(self):
+        class Reporter(Model):
+            pass
+
+        class ProxyJournalist(Reporter):
+            class Meta:
+                proxy = True
+
+        class Article(Model):
+            reporter = ForeignKey(ProxyJournalist, on_delete=CASCADE)
+
+        class ArticleInline(admin.TabularInline):
+            model = Article
+
+        class ReporterAdmin(admin.ModelAdmin):
+            inlines = [ArticleInline]
+
+        self.assertIsValid(ReporterAdmin, Reporter)
+
+    def test_proxy_model_fk_name(self):
+        class ReporterFkName(Model):
+            pass
+
+        class ProxyJournalistFkName(ReporterFkName):
+            class Meta:
+                proxy = True
+
+        class ArticleFkName(Model):
+            reporter = ForeignKey(ProxyJournalistFkName, on_delete=CASCADE)
+
+        class ArticleInline(admin.TabularInline):
+            model = ArticleFkName
+            fk_name = "reporter"
+
+        class ReporterAdmin(admin.ModelAdmin):
+            inlines = [ArticleInline]
+
+        self.assertIsValid(ReporterAdmin, ReporterFkName)
 
     def test_proxy_model_parent(self):
         class Parent(Model):

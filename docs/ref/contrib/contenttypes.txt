@@ -106,13 +106,18 @@ methods that allow you to get from a
 :class:`~django.contrib.contenttypes.models.ContentType` instance to the
 model it represents, or to retrieve objects from that model:
 
-.. method:: ContentType.get_object_for_this_type(**kwargs)
+.. method:: ContentType.get_object_for_this_type(using=None, **kwargs)
 
     Takes a set of valid :ref:`lookup arguments <field-lookups-intro>` for the
     model the :class:`~django.contrib.contenttypes.models.ContentType`
     represents, and does
     :meth:`a get() lookup <django.db.models.query.QuerySet.get>`
-    on that model, returning the corresponding object.
+    on that model, returning the corresponding object. The ``using`` argument
+    can be used to specify a different database than the default one.
+
+    .. versionchanged:: 5.1
+
+        The ``using`` argument was added.
 
 .. method:: ContentType.model_class()
 
@@ -590,3 +595,30 @@ information.
 
     Subclasses of :class:`GenericInlineModelAdmin` with stacked and tabular
     layouts, respectively.
+
+.. module:: django.contrib.contenttypes.prefetch
+
+``GenericPrefetch()``
+---------------------
+
+.. versionadded:: 5.0
+
+.. class:: GenericPrefetch(lookup, querysets=None, to_attr=None)
+
+This lookup is similar to ``Prefetch()`` and it should only be used on
+``GenericForeignKey``. The ``querysets`` argument accepts a list of querysets,
+each for a different ``ContentType``. This is useful for ``GenericForeignKey``
+with non-homogeneous set of results.
+
+.. code-block:: pycon
+
+    >>> from django.contrib.contenttypes.prefetch import GenericPrefetch
+    >>> bookmark = Bookmark.objects.create(url="https://www.djangoproject.com/")
+    >>> animal = Animal.objects.create(name="lion", weight=100)
+    >>> TaggedItem.objects.create(tag="great", content_object=bookmark)
+    >>> TaggedItem.objects.create(tag="awesome", content_object=animal)
+    >>> prefetch = GenericPrefetch(
+    ...     "content_object", [Bookmark.objects.all(), Animal.objects.only("name")]
+    ... )
+    >>> TaggedItem.objects.prefetch_related(prefetch).all()
+    <QuerySet [<TaggedItem: Great>, <TaggedItem: Awesome>]>

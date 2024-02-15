@@ -306,13 +306,13 @@ Sample usage:
     >>> from django.utils import feedgenerator
     >>> feed = feedgenerator.Rss201rev2Feed(
     ...     title="Poynter E-Media Tidbits",
-    ...     link="http://www.poynter.org/column.asp?id=31",
+    ...     link="https://www.poynter.org/tag/e-media-tidbits/",
     ...     description="A group blog by the sharpest minds in online media/journalism/publishing.",
     ...     language="en",
     ... )
     >>> feed.add_item(
     ...     title="Hello",
-    ...     link="http://www.holovaty.com/test/",
+    ...     link="https://www.holovaty.com/test/",
     ...     description="Testing.",
     ... )
     >>> with open("test.rss", "w") as fp:
@@ -469,8 +469,7 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
 
         class Person(models.Model):
             @cached_property
-            def friends(self):
-                ...
+            def friends(self): ...
 
     Note that as the method is now a property, in Python code it will need to
     be accessed appropriately::
@@ -552,8 +551,7 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
 
         # Or more succinctly:
         @keep_lazy(str)
-        def fancy_utility_function(s, *args, **kwargs):
-            ...
+        def fancy_utility_function(s, *args, **kwargs): ...
 
     The ``keep_lazy()`` decorator takes a number of extra arguments (``*args``)
     specifying the type(s) that the original function can return. A common
@@ -578,14 +576,12 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
 
         # Our previous example was:
         @keep_lazy(str)
-        def fancy_utility_function(s, *args, **kwargs):
-            ...
+        def fancy_utility_function(s, *args, **kwargs): ...
 
 
         # Which can be rewritten as:
         @keep_lazy_text
-        def fancy_utility_function(s, *args, **kwargs):
-            ...
+        def fancy_utility_function(s, *args, **kwargs): ...
 
 ``django.utils.html``
 =====================
@@ -685,10 +681,6 @@ escaping HTML.
     serialize the data. See :ref:`JSON serialization
     <serialization-formats-json>` for more details about this serializer.
 
-    .. versionchanged:: 4.2
-
-        The ``encoder`` argument was added.
-
 .. function:: strip_tags(value)
 
     Tries to remove anything that looks like an HTML tag from the string, that
@@ -741,8 +733,6 @@ escaping HTML.
     Outputs a string in the format ``Wdy, DD Mon YYYY HH:MM:SS GMT``.
 
 .. function:: content_disposition_header(as_attachment, filename)
-
-    .. versionadded:: 4.2
 
     Constructs a ``Content-Disposition`` HTTP header value from the given
     ``filename`` as specified by :rfc:`6266`. Returns ``None`` if

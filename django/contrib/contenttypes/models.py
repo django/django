@@ -174,20 +174,20 @@ class ContentType(models.Model):
         except LookupError:
             return None
 
-    def get_object_for_this_type(self, **kwargs):
+    def get_object_for_this_type(self, using=None, **kwargs):
         """
         Return an object of this type for the keyword arguments given.
         Basically, this is a proxy around this object_type's get_object() model
         method. The ObjectNotExist exception, if thrown, will not be caught,
         so code that calls this method should catch it.
         """
-        return self.model_class()._base_manager.using(self._state.db).get(**kwargs)
+        return self.model_class()._base_manager.using(using).get(**kwargs)
 
     def get_all_objects_for_this_type(self, **kwargs):
         """
         Return all objects of this type for the keyword arguments given.
         """
-        return self.model_class()._base_manager.using(self._state.db).filter(**kwargs)
+        return self.model_class()._base_manager.filter(**kwargs)
 
     def natural_key(self):
         return (self.app_label, self.model)

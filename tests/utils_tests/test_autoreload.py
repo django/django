@@ -238,6 +238,17 @@ class TestChildArguments(SimpleTestCase):
                     autoreload.get_child_arguments(), [exe_path, "runserver"]
                 )
 
+    @mock.patch("sys.warnoptions", [])
+    @mock.patch.dict(sys.modules, {"__main__": django.__main__})
+    def test_use_exe_when_main_spec(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            exe_path = Path(tmpdir) / "django-admin.exe"
+            exe_path.touch()
+            with mock.patch("sys.argv", [exe_path.with_suffix(""), "runserver"]):
+                self.assertEqual(
+                    autoreload.get_child_arguments(), [exe_path, "runserver"]
+                )
+
     @mock.patch("__main__.__spec__", None)
     @mock.patch("sys.warnoptions", [])
     @mock.patch("sys._xoptions", {})
@@ -304,13 +315,11 @@ class TestCommonRoots(SimpleTestCase):
 
 class TestSysPathDirectories(SimpleTestCase):
     def setUp(self):
-        self._directory = tempfile.TemporaryDirectory()
-        self.directory = Path(self._directory.name).resolve(strict=True).absolute()
+        _directory = tempfile.TemporaryDirectory()
+        self.addCleanup(_directory.cleanup)
+        self.directory = Path(_directory.name).resolve(strict=True).absolute()
         self.file = self.directory / "test"
         self.file.touch()
-
-    def tearDown(self):
-        self._directory.cleanup()
 
     def test_sys_paths_with_directories(self):
         with extend_sys_path(str(self.file)):
@@ -531,15 +540,13 @@ class ReloaderTests(SimpleTestCase):
     RELOADER_CLS = None
 
     def setUp(self):
-        self._tempdir = tempfile.TemporaryDirectory()
-        self.tempdir = Path(self._tempdir.name).resolve(strict=True).absolute()
+        _tempdir = tempfile.TemporaryDirectory()
+        self.tempdir = Path(_tempdir.name).resolve(strict=True).absolute()
         self.existing_file = self.ensure_file(self.tempdir / "test.py")
         self.nonexistent_file = (self.tempdir / "does_not_exist.py").absolute()
         self.reloader = self.RELOADER_CLS()
-
-    def tearDown(self):
-        self._tempdir.cleanup()
-        self.reloader.stop()
+        self.addCleanup(self.reloader.stop)
+        self.addCleanup(_tempdir.cleanup)
 
     def ensure_file(self, path):
         path.parent.mkdir(exist_ok=True, parents=True)

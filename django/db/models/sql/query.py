@@ -6,6 +6,7 @@ themselves do not have to (and could be backed by things other than SQL
 databases). The abstraction barrier only works one way: this module has to know
 all about the internals of models in order to get the information it needs.
 """
+
 import copy
 import difflib
 import functools
@@ -52,7 +53,7 @@ FORBIDDEN_ALIAS_PATTERN = _lazy_re_compile(r"['`\"\]\[;\s]|--|/\*|\*/")
 
 # Inspired from
 # https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
-EXPLAIN_OPTIONS_PATTERN = _lazy_re_compile(r"[\w\-]+")
+EXPLAIN_OPTIONS_PATTERN = _lazy_re_compile(r"[\w-]+")
 
 
 def get_field_names_from_opts(opts):
@@ -65,22 +66,69 @@ def get_field_names_from_opts(opts):
     )
 
 
+def get_paths_from_expression(expr):
+    if isinstance(expr, F):
+        yield expr.name
+    elif hasattr(expr, "flatten"):
+        for child in expr.flatten():
+            if isinstance(child, F):
+                yield child.name
+            elif isinstance(child, Q):
+                yield from get_children_from_q(child)
+
+
 def get_children_from_q(q):
     for child in q.children:
         if isinstance(child, Node):
             yield from get_children_from_q(child)
-        else:
-            yield child
+        elif isinstance(child, tuple):
+            lhs, rhs = child
+            yield lhs
+            if hasattr(rhs, "resolve_expression"):
+                yield from get_paths_from_expression(rhs)
+        elif hasattr(child, "resolve_expression"):
+            yield from get_paths_from_expression(child)
+
+
+def get_child_with_renamed_prefix(prefix, replacement, child):
+    from django.db.models.query import QuerySet
+
+    if isinstance(child, Node):
+        return rename_prefix_from_q(prefix, replacement, child)
+    if isinstance(child, tuple):
+        lhs, rhs = child
+        if lhs.startswith(prefix + LOOKUP_SEP):
+            lhs = lhs.replace(prefix, replacement, 1)
+        if not isinstance(rhs, F) and hasattr(rhs, "resolve_expression"):
+            rhs = get_child_with_renamed_prefix(prefix, replacement, rhs)
+        return lhs, rhs
+
+    if isinstance(child, F):
+        child = child.copy()
+        if child.name.startswith(prefix + LOOKUP_SEP):
+            child.name = child.name.replace(prefix, replacement, 1)
+    elif isinstance(child, QuerySet):
+        # QuerySet may contain OuterRef() references which cannot work properly
+        # without repointing to the filtered annotation and will spawn a
+        # different JOIN. Always raise ValueError instead of providing partial
+        # support in other cases.
+        raise ValueError(
+            "Passing a QuerySet within a FilteredRelation is not supported."
+        )
+    elif hasattr(child, "resolve_expression"):
+        child = child.copy()
+        child.set_source_expressions(
+            [
+                get_child_with_renamed_prefix(prefix, replacement, grand_child)
+                for grand_child in child.get_source_expressions()
+            ]
+        )
+    return child
 
 
 def rename_prefix_from_q(prefix, replacement, q):
     return Q.create(
-        [
-            rename_prefix_from_q(prefix, replacement, c)
-            if isinstance(c, Node)
-            else (c[0].replace(prefix, replacement, 1), c[1])
-            for c in q.children
-        ],
+        [get_child_with_renamed_prefix(prefix, replacement, c) for c in q.children],
         q.connector,
         q.negated,
     )
@@ -403,6 +451,7 @@ class Query(BaseExpression):
         # Store annotation mask prior to temporarily adding aggregations for
         # resolving purpose to facilitate their subsequent removal.
         refs_subquery = False
+        refs_window = False
         replacements = {}
         annotation_select_mask = self.annotation_select_mask
         for alias, aggregate_expr in aggregate_exprs.items():
@@ -415,9 +464,14 @@ class Query(BaseExpression):
             # Temporarily add aggregate to annotations to allow remaining
             # members of `aggregates` to resolve against each others.
             self.append_annotation_mask([alias])
+            aggregate_refs = aggregate.get_refs()
             refs_subquery |= any(
-                getattr(self.annotations[ref], "subquery", False)
-                for ref in aggregate.get_refs()
+                getattr(self.annotations[ref], "contains_subquery", False)
+                for ref in aggregate_refs
+            )
+            refs_window |= any(
+                getattr(self.annotations[ref], "contains_over_clause", True)
+                for ref in aggregate_refs
             )
             aggregate = aggregate.replace_expressions(replacements)
             self.annotations[alias] = aggregate
@@ -451,6 +505,7 @@ class Query(BaseExpression):
             or self.is_sliced
             or has_existing_aggregation
             or refs_subquery
+            or refs_window
             or qualify
             or self.distinct
             or self.combinator
@@ -478,17 +533,22 @@ class Query(BaseExpression):
                         self.model._meta.pk.get_col(inner_query.get_initial_alias()),
                     )
                 inner_query.default_cols = False
-                if not qualify:
+                if not qualify and not self.combinator:
                     # Mask existing annotations that are not referenced by
                     # aggregates to be pushed to the outer query unless
-                    # filtering against window functions is involved as it
-                    # requires complex realising.
+                    # filtering against window functions or if the query is
+                    # combined as both would require complex realiasing logic.
                     annotation_mask = set()
                     if isinstance(self.group_by, tuple):
                         for expr in self.group_by:
                             annotation_mask |= expr.get_refs()
                     for aggregate in aggregates.values():
                         annotation_mask |= aggregate.get_refs()
+                    # Avoid eliding expressions that might have an incidence on
+                    # the implicit grouping logic.
+                    for annotation_alias, annotation in self.annotation_select.items():
+                        if annotation.get_group_by_cols():
+                            annotation_mask.add(annotation_alias)
                     inner_query.set_annotation_mask(annotation_mask)
 
             # Add aggregates to the outer AggregateQuery. This requires making
@@ -636,6 +696,7 @@ class Query(BaseExpression):
         # except if the alias is the base table since it must be present in the
         # query on both sides.
         initial_alias = self.get_initial_alias()
+        rhs = rhs.clone()
         rhs.bump_prefix(self, exclude={initial_alias})
 
         # Work out how to relabel the rhs aliases, if necessary.
@@ -923,6 +984,8 @@ class Query(BaseExpression):
         relabelling any references to them in select columns and the where
         clause.
         """
+        if not change_map:
+            return self
         # If keys and values of change_map were to intersect, an alias might be
         # updated twice (e.g. T4 -> T5, T5 -> T6, so also T4 -> T6) depending
         # on their order in change_map.
@@ -1210,18 +1273,19 @@ class Query(BaseExpression):
             sql = "(%s)" % sql
         return sql, params
 
-    def resolve_lookup_value(self, value, can_reuse, allow_joins):
+    def resolve_lookup_value(self, value, can_reuse, allow_joins, summarize=False):
         if hasattr(value, "resolve_expression"):
             value = value.resolve_expression(
                 self,
                 reuse=can_reuse,
                 allow_joins=allow_joins,
+                summarize=summarize,
             )
         elif isinstance(value, (list, tuple)):
             # The items of the iterable may be expressions and therefore need
             # to be resolved independently.
             values = (
-                self.resolve_lookup_value(sub_value, can_reuse, allow_joins)
+                self.resolve_lookup_value(sub_value, can_reuse, allow_joins, summarize)
                 for sub_value in value
             )
             type_ = type(value)
@@ -1441,7 +1505,7 @@ class Query(BaseExpression):
             raise FieldError("Joined field references are not permitted in this query")
 
         pre_joins = self.alias_refcount.copy()
-        value = self.resolve_lookup_value(value, can_reuse, allow_joins)
+        value = self.resolve_lookup_value(value, can_reuse, allow_joins, summarize)
         used_joins = {
             k for k, v in self.alias_refcount.items() if v > pre_joins.get(k, 0)
         }
@@ -1604,7 +1668,6 @@ class Query(BaseExpression):
 
     def add_filtered_relation(self, filtered_relation, alias):
         filtered_relation.alias = alias
-        lookups = dict(get_children_from_q(filtered_relation.condition))
         relation_lookup_parts, relation_field_parts, _ = self.solve_lookup_type(
             filtered_relation.relation_name
         )
@@ -1613,7 +1676,7 @@ class Query(BaseExpression):
                 "FilteredRelation's relation_name cannot contain lookups "
                 "(got %r)." % filtered_relation.relation_name
             )
-        for lookup in chain(lookups):
+        for lookup in get_children_from_q(filtered_relation.condition):
             lookup_parts, lookup_field_parts, _ = self.solve_lookup_type(lookup)
             shift = 2 if not lookup_parts else 1
             lookup_field_path = lookup_field_parts[:-shift]
@@ -1656,7 +1719,7 @@ class Query(BaseExpression):
         path, names_with_path = [], []
         for pos, name in enumerate(names):
             cur_names_with_path = (name, [])
-            if name == "pk":
+            if name == "pk" and opts is not None:
                 name = opts.pk.name
 
             field = None

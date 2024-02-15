@@ -1756,10 +1756,7 @@ class ResolutionOrderI18NTests(SimpleTestCase):
     def setUp(self):
         super().setUp()
         activate("de")
-
-    def tearDown(self):
-        deactivate()
-        super().tearDown()
+        self.addCleanup(deactivate)
 
     def assertGettext(self, msgid, msgstr):
         result = gettext(msgid)

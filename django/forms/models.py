@@ -2,6 +2,7 @@
 Helper functions for creating Form classes from Django models
 and database field objects.
 """
+
 from itertools import chain
 
 from django.core.exceptions import (
@@ -21,6 +22,7 @@ from django.forms.widgets import (
     RadioSelect,
     SelectMultiple,
 )
+from django.utils.choices import BaseChoiceIterator
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
@@ -829,9 +831,12 @@ class BaseModelFormSet(BaseFormSet, AltersData):
                 )
                 # Reduce Model instances to their primary key values
                 row_data = tuple(
-                    d._get_pk_val() if hasattr(d, "_get_pk_val")
-                    # Prevent "unhashable type: list" errors later on.
-                    else tuple(d) if isinstance(d, list) else d
+                    (
+                        d._get_pk_val()
+                        if hasattr(d, "_get_pk_val")
+                        # Prevent "unhashable type: list" errors later on.
+                        else tuple(d) if isinstance(d, list) else d
+                    )
                     for d in row_data
                 )
                 if row_data and None not in row_data:
@@ -1210,6 +1215,7 @@ def _get_foreign_key(parent_model, model, fk_name=None, can_fail=False):
         if len(fks_to_parent) == 1:
             fk = fks_to_parent[0]
             parent_list = parent_model._meta.get_parent_list()
+            parent_list.append(parent_model)
             if (
                 not isinstance(fk, ForeignKey)
                 or (
@@ -1235,6 +1241,7 @@ def _get_foreign_key(parent_model, model, fk_name=None, can_fail=False):
     else:
         # Try to discover what the ForeignKey from model to parent_model is
         parent_list = parent_model._meta.get_parent_list()
+        parent_list.append(parent_model)
         fks_to_parent = [
             f
             for f in opts.fields
@@ -1402,7 +1409,7 @@ class ModelChoiceIteratorValue:
         return self.value == other
 
 
-class ModelChoiceIterator:
+class ModelChoiceIterator(BaseChoiceIterator):
     def __init__(self, field):
         self.field = field
         self.queryset = field.queryset
@@ -1532,7 +1539,7 @@ class ModelChoiceField(ChoiceField):
         # the queryset.
         return self.iterator(self)
 
-    choices = property(_get_choices, ChoiceField._set_choices)
+    choices = property(_get_choices, ChoiceField.choices.fset)
 
     def prepare_value(self, value):
         if hasattr(value, "_meta"):

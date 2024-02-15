@@ -27,8 +27,8 @@ For this tutorial, we expect that you have at least a basic understanding of
 how Django works. This means you should be comfortable going through the
 existing tutorials on :doc:`writing your first Django app</intro/tutorial01>`.
 In addition, you should have a good understanding of Python itself. But if you
-don't, `Dive Into Python`__ is a fantastic (and free) online book for
-beginning Python programmers.
+don't, `Dive Into Python`_ is a fantastic (and free) online book for beginning
+Python programmers.
 
 Those of you who are unfamiliar with version control systems and Trac will find
 that this tutorial and its links include just enough information to get started.
@@ -45,8 +45,8 @@ so that it can be of use to the widest audience.
     `#django-dev on irc.libera.chat`__ to chat with other Django users who
     might be able to help.
 
-__ https://diveinto.org/python3/table-of-contents.html
 __ https://web.libera.chat/#django-dev
+.. _Dive Into Python: https://diveintopython3.net/
 .. _Django Forum: https://forum.djangoproject.com/
 
 What does this tutorial cover?
@@ -188,7 +188,11 @@ have to create a new virtual environment, :ref:`install the previously cloned
 local copy of Django in editable mode <intro-contributing-install-local-copy>`,
 and create a new Django project outside of your local copy of Django. You will
 immediately see any changes you make to Django in your new project, which is
-of great help when writing your first patch.
+of great help when writing your first patch, especially if testing any changes
+to the UI.
+
+You can follow the :doc:`tutorial</intro/tutorial01>` for help in creating a
+Django project.
 
 Running Django's test suite for the first time
 ==============================================
@@ -259,7 +263,8 @@ __ https://djangoci.com
     For this tutorial and the ticket we're working on, testing against SQLite
     is sufficient, however, it's possible (and sometimes necessary) to
     :ref:`run the tests using a different database
-    <running-unit-tests-settings>`.
+    <running-unit-tests-settings>`. When making UI changes, you will need to
+    :ref:`run the Selenium tests <running-selenium-tests>`.
 
 Working on a feature
 ====================
@@ -345,7 +350,7 @@ This test checks that the ``make_toast()`` returns ``'toast'``.
     * After reading those, if you want something a little meatier to sink
       your teeth into, there's always the Python :mod:`unittest` documentation.
 
-__ https://diveinto.org/python3/unit-testing.html
+__ https://diveintopython3.net/unit-testing.html
 
 Running your new test
 ---------------------

@@ -67,13 +67,14 @@ def csrf_failure(request, reason="", template_name=CSRF_FAILURE_TEMPLATE_NAME):
     }
     try:
         t = loader.get_template(template_name)
+        body = t.render(request=request)
     except TemplateDoesNotExist:
         if template_name == CSRF_FAILURE_TEMPLATE_NAME:
             # If the default template doesn't exist, use the fallback template.
             with builtin_template_path("csrf_403.html").open(encoding="utf-8") as fh:
                 t = Engine().from_string(fh.read())
-            c = Context(c)
+            body = t.render(Context(c))
         else:
             # Raise if a developer-specified template doesn't exist.
             raise
-    return HttpResponseForbidden(t.render(c))
+    return HttpResponseForbidden(body)

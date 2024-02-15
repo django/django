@@ -77,16 +77,17 @@ meaning that if a migration fails to apply you will have to manually unpick
 the changes in order to try again (it's impossible to roll back to an
 earlier point).
 
-In addition, MySQL will fully rewrite tables for almost every schema operation
-and generally takes a time proportional to the number of rows in the table to
-add or remove columns. On slower hardware this can be worse than a minute per
-million rows - adding a few columns to a table with just a few million rows
-could lock your site up for over ten minutes.
+MySQL 8.0 introduced significant performance enhancements for
+`DDL operations`_, making them more efficient and reducing the need for full
+table rebuilds. However, it cannot guarantee a complete absence of locks or
+interruptions. In situations where locks are still necessary, the duration of
+these operations will be proportionate to the number of rows involved.
 
-Finally, MySQL has relatively small limits on name lengths for columns, tables
-and indexes, as well as a limit on the combined size of all columns an index
-covers. This means that indexes that are possible on other backends will
-fail to be created under MySQL.
+Finally, MySQL has a relatively small limit on the combined size of all columns
+an index covers. This means that indexes that are possible on other backends
+will fail to be created under MySQL.
+
+.. _DDL operations: https://dev.mysql.com/doc/refman/en/innodb-online-ddl-operations.html
 
 SQLite
 ------
@@ -117,7 +118,7 @@ field and remove a model - and then run :djadmin:`makemigrations`:
     $ python manage.py makemigrations
     Migrations for 'books':
       books/migrations/0003_auto.py:
-        - Alter field author on book
+        ~ Alter field author on book
 
 Your models will be scanned and compared to the versions currently
 contained in your migration files, and then a new set of migrations
@@ -783,14 +784,22 @@ Django can serialize the following:
 - ``LazyObject`` instances which wrap a serializable value.
 - Enumeration types (e.g. ``TextChoices`` or ``IntegerChoices``) instances.
 - Any Django field
-- Any function or method reference (e.g. ``datetime.datetime.today``) (must be in module's top-level scope)
+- Any function or method reference (e.g. ``datetime.datetime.today``) (must be
+  in module's top-level scope)
+
+  - Functions may be decorated if wrapped properly, i.e. using
+    :func:`functools.wraps`
+  - The :func:`functools.cache` and :func:`functools.lru_cache` decorators are
+    explicitly supported
+
 - Unbound methods used from within the class body
 - Any class reference (must be in module's top-level scope)
 - Anything with a custom ``deconstruct()`` method (:ref:`see below <custom-deconstruct-method>`)
 
-.. versionchanged:: 4.2
+.. versionchanged:: 5.0
 
-    Serialization support for ``enum.Flag`` was added.
+    Serialization support for functions decorated with :func:`functools.cache`
+    or :func:`functools.lru_cache` was added.
 
 Django cannot serialize:
 

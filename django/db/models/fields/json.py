@@ -1,5 +1,4 @@
 import json
-import warnings
 
 from django import forms
 from django.core import checks, exceptions
@@ -12,7 +11,6 @@ from django.db.models.lookups import (
     PostgresOperatorLookup,
     Transform,
 )
-from django.utils.deprecation import RemovedInDjango51Warning
 from django.utils.translation import gettext_lazy as _
 
 from . import Field
@@ -101,31 +99,10 @@ class JSONField(CheckFieldDefaultMixin, Field):
     def get_db_prep_value(self, value, connection, prepared=False):
         if not prepared:
             value = self.get_prep_value(value)
-        # RemovedInDjango51Warning: When the deprecation ends, replace with:
-        # if (
-        #     isinstance(value, expressions.Value)
-        #     and isinstance(value.output_field, JSONField)
-        # ):
-        #     value = value.value
-        # elif hasattr(value, "as_sql"): ...
-        if isinstance(value, expressions.Value):
-            if isinstance(value.value, str) and not isinstance(
-                value.output_field, JSONField
-            ):
-                try:
-                    value = json.loads(value.value, cls=self.decoder)
-                except json.JSONDecodeError:
-                    value = value.value
-                else:
-                    warnings.warn(
-                        "Providing an encoded JSON string via Value() is deprecated. "
-                        f"Use Value({value!r}, output_field=JSONField()) instead.",
-                        category=RemovedInDjango51Warning,
-                    )
-            elif isinstance(value.output_field, JSONField):
-                value = value.value
-            else:
-                return value
+        if isinstance(value, expressions.Value) and isinstance(
+            value.output_field, JSONField
+        ):
+            value = value.value
         elif hasattr(value, "as_sql"):
             return value
         return connection.ops.adapt_json_value(value, self.encoder)
@@ -333,6 +310,11 @@ class JSONExact(lookups.Exact):
             rhs %= tuple(func)
         return rhs, rhs_params
 
+    def as_oracle(self, compiler, connection):
+        lhs, lhs_params = self.process_lhs(compiler, connection)
+        rhs, rhs_params = self.process_rhs(compiler, connection)
+        return f"JSON_EQUAL({lhs}, {rhs})", (*lhs_params, *rhs_params)
+
 
 class JSONIContains(CaseInsensitiveMixin, lookups.IContains):
     pass
@@ -375,10 +357,13 @@ class KeyTransform(Transform):
     def as_oracle(self, compiler, connection):
         lhs, params, key_transforms = self.preprocess_lhs(compiler, connection)
         json_path = compile_json_path(key_transforms)
-        return (
-            "COALESCE(JSON_QUERY(%s, '%s'), JSON_VALUE(%s, '%s'))"
-            % ((lhs, json_path) * 2)
-        ), tuple(params) * 2
+        if connection.features.supports_primitives_in_json_field:
+            sql = (
+                "COALESCE(JSON_VALUE(%s, '%s'), JSON_QUERY(%s, '%s' DISALLOW SCALARS))"
+            )
+        else:
+            sql = "COALESCE(JSON_QUERY(%s, '%s'), JSON_VALUE(%s, '%s'))"
+        return sql % ((lhs, json_path) * 2), tuple(params) * 2
 
     def as_postgresql(self, compiler, connection):
         lhs, params, key_transforms = self.preprocess_lhs(compiler, connection)

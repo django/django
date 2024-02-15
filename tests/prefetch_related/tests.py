@@ -4,15 +4,18 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import NotSupportedError, connection
 from django.db.models import Prefetch, QuerySet, prefetch_related_objects
-from django.db.models.query import get_prefetcher
+from django.db.models.fields.related import ForwardManyToOneDescriptor
+from django.db.models.query import get_prefetcher, prefetch_one_level
 from django.db.models.sql import Query
 from django.test import (
     TestCase,
+    ignore_warnings,
     override_settings,
     skipIfDBFeature,
     skipUnlessDBFeature,
 )
 from django.test.utils import CaptureQueriesContext
+from django.utils.deprecation import RemovedInDjango60Warning
 
 from .models import (
     Article,
@@ -978,6 +981,31 @@ class CustomPrefetchTests(TestCase):
         with self.assertNumQueries(5):
             self.traverse_qs(list(houses), [["occupants", "houses", "main_room"]])
 
+    def test_nested_prefetch_related_with_duplicate_prefetch_and_depth(self):
+        people = Person.objects.prefetch_related(
+            Prefetch(
+                "houses__main_room",
+                queryset=Room.objects.filter(name="Dining room"),
+                to_attr="dining_room",
+            ),
+            "houses__main_room",
+        )
+        with self.assertNumQueries(4):
+            main_room = people[0].houses.all()[0]
+
+        people = Person.objects.prefetch_related(
+            "houses__main_room",
+            Prefetch(
+                "houses__main_room",
+                queryset=Room.objects.filter(name="Dining room"),
+                to_attr="dining_room",
+            ),
+        )
+        with self.assertNumQueries(4):
+            main_room = people[0].houses.all()[0]
+
+        self.assertEqual(main_room.main_room, self.room1_1)
+
     def test_values_queryset(self):
         msg = "Prefetch querysets cannot use raw(), values(), and values_list()."
         with self.assertRaisesMessage(ValueError, msg):
@@ -1592,8 +1620,9 @@ class MultiDbTests(TestCase):
         )
 
         # Explicit using on a different db.
-        with self.assertNumQueries(1, using="default"), self.assertNumQueries(
-            1, using="other"
+        with (
+            self.assertNumQueries(1, using="default"),
+            self.assertNumQueries(1, using="other"),
         ):
             prefetch = Prefetch(
                 "first_time_authors", queryset=Author.objects.using("default")
@@ -1671,7 +1700,7 @@ class Ticket21760Tests(TestCase):
 
     def test_bug(self):
         prefetcher = get_prefetcher(self.rooms[0], "house", "house")[0]
-        queryset = prefetcher.get_prefetch_queryset(list(Room.objects.all()))[0]
+        queryset = prefetcher.get_prefetch_querysets(list(Room.objects.all()))[0]
         self.assertNotIn(" JOIN ", str(queryset.query))
 
 
@@ -1969,3 +1998,57 @@ class PrefetchLimitTests(TestDataMixin, TestCase):
         )
         with self.assertRaisesMessage(NotSupportedError, msg):
             list(Book.objects.prefetch_related(Prefetch("authors", authors[1:])))
+
+
+class DeprecationTests(TestCase):
+    def test_get_current_queryset_warning(self):
+        msg = (
+            "Prefetch.get_current_queryset() is deprecated. Use "
+            "get_current_querysets() instead."
+        )
+        authors = Author.objects.all()
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+            self.assertEqual(
+                Prefetch("authors", authors).get_current_queryset(1),
+                authors,
+            )
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+            self.assertIsNone(Prefetch("authors").get_current_queryset(1))
+
+    @ignore_warnings(category=RemovedInDjango60Warning)
+    def test_prefetch_one_level_fallback(self):
+        class NoGetPrefetchQuerySetsDescriptor(ForwardManyToOneDescriptor):
+            def get_prefetch_queryset(self, instances, queryset=None):
+                if queryset is None:
+                    return super().get_prefetch_querysets(instances)
+                return super().get_prefetch_querysets(instances, [queryset])
+
+            def __getattribute__(self, name):
+                if name == "get_prefetch_querysets":
+                    raise AttributeError
+                return super().__getattribute__(name)
+
+        house = House.objects.create()
+        room = Room.objects.create(house=house)
+        house.main_room = room
+        house.save()
+
+        # prefetch_one_level() fallbacks to get_prefetch_queryset().
+        prefetcher = NoGetPrefetchQuerySetsDescriptor(Room._meta.get_field("house"))
+        obj_list, additional_lookups = prefetch_one_level(
+            [room],
+            prefetcher,
+            Prefetch("house", House.objects.all()),
+            0,
+        )
+        self.assertEqual(obj_list, [house])
+        self.assertEqual(additional_lookups, [])
+
+        obj_list, additional_lookups = prefetch_one_level(
+            [room],
+            prefetcher,
+            Prefetch("house"),
+            0,
+        )
+        self.assertEqual(obj_list, [house])
+        self.assertEqual(additional_lookups, [])

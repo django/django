@@ -227,9 +227,10 @@ def get_child_arguments():
     import __main__
 
     py_script = Path(sys.argv[0])
+    exe_entrypoint = py_script.with_suffix(".exe")
 
     args = [sys.executable] + ["-W%s" % o for o in sys.warnoptions]
-    if sys.implementation.name == "cpython":
+    if sys.implementation.name in ("cpython", "pypy"):
         args.extend(
             f"-X{key}" if value is True else f"-X{key}={value}"
             for key, value in sys._xoptions.items()
@@ -237,7 +238,7 @@ def get_child_arguments():
     # __spec__ is set when the server was started with the `-m` option,
     # see https://docs.python.org/3/reference/import.html#main-spec
     # __spec__ may not exist, e.g. when running in a Conda env.
-    if getattr(__main__, "__spec__", None) is not None:
+    if getattr(__main__, "__spec__", None) is not None and not exe_entrypoint.exists():
         spec = __main__.__spec__
         if (spec.name == "__main__" or spec.name.endswith(".__main__")) and spec.parent:
             name = spec.parent
@@ -248,7 +249,6 @@ def get_child_arguments():
     elif not py_script.exists():
         # sys.argv[0] may not exist for several reasons on Windows.
         # It may exist with a .exe extension or have a -script.py suffix.
-        exe_entrypoint = py_script.with_suffix(".exe")
         if exe_entrypoint.exists():
             # Should be executed directly, ignoring sys.executable.
             return [exe_entrypoint, *sys.argv[1:]]

@@ -1,6 +1,7 @@
 import datetime
 import decimal
 import json
+import warnings
 from importlib import import_module
 
 import sqlparse
@@ -10,6 +11,7 @@ from django.db import NotSupportedError, transaction
 from django.db.backends import utils
 from django.db.models.expressions import Col
 from django.utils import timezone
+from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.encoding import force_str
 
 
@@ -220,7 +222,21 @@ class BaseDatabaseOperations:
         it in a WHERE statement. The resulting string should contain a '%s'
         placeholder for the column being searched against.
         """
+        warnings.warn(
+            (
+                "DatabaseOperations.field_cast_sql() is deprecated use "
+                "DatabaseOperations.lookup_cast() instead."
+            ),
+            RemovedInDjango60Warning,
+        )
         return "%s"
+
+    def force_group_by(self):
+        """
+        Return a GROUP BY clause to use with a HAVING clause when no grouping
+        is specified.
+        """
+        return []
 
     def force_no_ordering(self):
         """
@@ -546,10 +562,6 @@ class BaseDatabaseOperations:
         """
         if value is None:
             return None
-        # Expression values are adapted by the database.
-        if hasattr(value, "resolve_expression"):
-            return value
-
         return str(value)
 
     def adapt_timefield_value(self, value):
@@ -559,10 +571,6 @@ class BaseDatabaseOperations:
         """
         if value is None:
             return None
-        # Expression values are adapted by the database.
-        if hasattr(value, "resolve_expression"):
-            return value
-
         if timezone.is_aware(value):
             raise ValueError("Django does not support timezone-aware times.")
         return str(value)
@@ -705,42 +713,50 @@ class BaseDatabaseOperations:
             "This backend does not support %s subtraction." % internal_type
         )
 
-    def window_frame_start(self, start):
-        if isinstance(start, int):
-            if start < 0:
-                return "%d %s" % (abs(start), self.PRECEDING)
-            elif start == 0:
+    def window_frame_value(self, value):
+        if isinstance(value, int):
+            if value == 0:
                 return self.CURRENT_ROW
-        elif start is None:
-            return self.UNBOUNDED_PRECEDING
-        raise ValueError(
-            "start argument must be a negative integer, zero, or None, but got '%s'."
-            % start
-        )
-
-    def window_frame_end(self, end):
-        if isinstance(end, int):
-            if end == 0:
-                return self.CURRENT_ROW
-            elif end > 0:
-                return "%d %s" % (end, self.FOLLOWING)
-        elif end is None:
-            return self.UNBOUNDED_FOLLOWING
-        raise ValueError(
-            "end argument must be a positive integer, zero, or None, but got '%s'."
-            % end
-        )
+            elif value < 0:
+                return "%d %s" % (abs(value), self.PRECEDING)
+            else:
+                return "%d %s" % (value, self.FOLLOWING)
 
     def window_frame_rows_start_end(self, start=None, end=None):
         """
         Return SQL for start and end points in an OVER clause window frame.
         """
-        if not self.connection.features.supports_over_clause:
-            raise NotSupportedError("This backend does not support window expressions.")
-        return self.window_frame_start(start), self.window_frame_end(end)
+        if isinstance(start, int) and isinstance(end, int) and start > end:
+            raise ValueError("start cannot be greater than end.")
+        if start is not None and not isinstance(start, int):
+            raise ValueError(
+                f"start argument must be an integer, zero, or None, but got '{start}'."
+            )
+        if end is not None and not isinstance(end, int):
+            raise ValueError(
+                f"end argument must be an integer, zero, or None, but got '{end}'."
+            )
+        start_ = self.window_frame_value(start) or self.UNBOUNDED_PRECEDING
+        end_ = self.window_frame_value(end) or self.UNBOUNDED_FOLLOWING
+        return start_, end_
 
     def window_frame_range_start_end(self, start=None, end=None):
-        start_, end_ = self.window_frame_rows_start_end(start, end)
+        if (start is not None and not isinstance(start, int)) or (
+            isinstance(start, int) and start > 0
+        ):
+            raise ValueError(
+                "start argument must be a negative integer, zero, or None, "
+                "but got '%s'." % start
+            )
+        if (end is not None and not isinstance(end, int)) or (
+            isinstance(end, int) and end < 0
+        ):
+            raise ValueError(
+                "end argument must be a positive integer, zero, or None, but got '%s'."
+                % end
+            )
+        start_ = self.window_frame_value(start) or self.UNBOUNDED_PRECEDING
+        end_ = self.window_frame_value(end) or self.UNBOUNDED_FOLLOWING
         features = self.connection.features
         if features.only_supports_unbounded_with_preceding_and_following and (
             (start and start < 0) or (end and end > 0)

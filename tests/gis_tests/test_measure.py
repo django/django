@@ -38,6 +38,10 @@ class DistanceTest(SimpleTestCase):
         with self.assertRaises(AttributeError):
             D(banana=100)
 
+    def test_init_invalid_area_only_units(self):
+        with self.assertRaises(AttributeError):
+            D(ha=100)
+
     def test_access(self):
         "Testing access in different units"
         d = D(m=100)
@@ -293,6 +297,13 @@ class AreaTest(unittest.TestCase):
         self.assertEqual(str(a2), "3.5 sq_km")
         self.assertEqual(repr(a1), "Area(sq_m=100.0)")
         self.assertEqual(repr(a2), "Area(sq_km=3.5)")
+
+    def test_hectare(self):
+        a = A(sq_m=10000)
+        self.assertEqual(a.ha, 1)
+
+    def test_hectare_unit_att_name(self):
+        self.assertEqual(A.unit_attname("Hectare"), "ha")
 
     def test_hash(self):
         a1 = A(sq_m=100)

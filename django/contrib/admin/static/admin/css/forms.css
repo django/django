@@ -24,6 +24,9 @@ form .form-row p {
 
 .flex-container {
     display: flex;
+}
+
+.form-multiline {
     flex-wrap: wrap;
 }
 
@@ -78,6 +81,7 @@ form ul.inline li {
 .aligned label {
     display: block;
     padding: 4px 10px 0 0;
+    min-width: 160px;
     width: 160px;
     word-wrap: break-word;
     line-height: 1;
@@ -190,14 +194,8 @@ fieldset .fieldBox {
     width: 200px;
 }
 
-form .wide p,
-form .wide ul.errorlist,
-form .wide input + p.help,
-form .wide input + div.help {
-    margin-left: 200px;
-}
-
 form .wide p.help,
+form .wide ul.errorlist,
 form .wide div.help {
     padding-left: 50px;
 }

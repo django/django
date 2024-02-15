@@ -2,10 +2,10 @@
 #
 # Translators:
 # Claude Paroz <claude@2xlibre.net>, 2014
-# Fery Setiawan <gembelweb@gmail.com>, 2015-2019,2021-2022
+# Fery Setiawan <gembelweb@gmail.com>, 2015-2019,2021-2023
 # Jannis Leidel <jannis@leidel.info>, 2011
 # M Asep Indrayana <me@drayanaindra.com>, 2015
-# oon arfiandwi <oon.arfiandwi@gmail.com>, 2016,2020
+# oon arfiandwi (OonID) <oon.arfiandwi@gmail.com>, 2016,2020
 # rodin <romihardiyanto@gmail.com>, 2011-2013
 # rodin <romihardiyanto@gmail.com>, 2013-2017
 # sag᠎e <laymonage@gmail.com>, 2019
@@ -14,10 +14,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:10-0500\n"
-"PO-Revision-Date: 2022-07-25 07:05+0000\n"
-"Last-Translator: Fery Setiawan <gembelweb@gmail.com>\n"
-"Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 07:05+0000\n"
+"Last-Translator: Fery Setiawan <gembelweb@gmail.com>, 2015-2019,2021-2023\n"
+"Language-Team: Indonesian (http://app.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -185,6 +185,9 @@ msgid "Hold down “Control”, or “Command” on a Mac, to select more than o
 msgstr ""
 "Tekan “Control”, atau “Command” pada Mac, untuk memilih lebih dari satu."
 
+msgid "Select this object for an action - {}"
+msgstr ""
+
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr "{name} “{obj}” berhasil ditambahkan."
@@ -343,6 +346,9 @@ msgstr "Pilih seluruh %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Bersihkan pilihan"
 
+msgid "Breadcrumbs"
+msgstr "Breadcrumbs"
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "Model pada aplikasi %(name)s"
@@ -370,14 +376,15 @@ msgid "Change password"
 msgstr "Ganti sandi"
 
 msgid "Please correct the error below."
-msgstr "Mohon perbaiki kesalahan di bawah ini."
-
-msgid "Please correct the errors below."
-msgstr "Perbaiki galat di bawah ini."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Harap perbaiki kesalahan dibawah."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Masukkan sandi baru untuk pengguna <strong>%(username)s</strong>."
+
+msgid "Skip to main content"
+msgstr "Lewati ke isi utama"
 
 msgid "Welcome,"
 msgstr "Selamat datang,"
@@ -404,6 +411,12 @@ msgstr "Lihat di situs"
 msgid "Filter"
 msgstr "Filter"
 
+msgid "Hide counts"
+msgstr ""
+
+msgid "Show counts"
+msgstr ""
+
 msgid "Clear all filters"
 msgstr "Hapus semua penyaringan"
 
@@ -416,6 +429,15 @@ msgstr "Prioritas pengurutan: %(priority_number)s"
 
 msgid "Toggle sorting"
 msgstr "Ubah pengurutan"
+
+msgid "Toggle theme (current theme: auto)"
+msgstr ""
+
+msgid "Toggle theme (current theme: light)"
+msgstr ""
+
+msgid "Toggle theme (current theme: dark)"
+msgstr ""
 
 msgid "Delete"
 msgstr "Hapus"
@@ -503,6 +525,15 @@ msgstr "Tindakan saya"
 msgid "None available"
 msgstr "Tidak ada yang tersedia"
 
+msgid "Added:"
+msgstr ""
+
+msgid "Changed:"
+msgstr ""
+
+msgid "Deleted:"
+msgstr ""
+
 msgid "Unknown content"
 msgstr "Konten tidak diketahui"
 
@@ -528,6 +559,9 @@ msgstr "Lupa nama pengguna atau sandi?"
 msgid "Toggle navigation"
 msgstr "Alihkan navigasi"
 
+msgid "Sidebar"
+msgstr "Sidebar"
+
 msgid "Start typing to filter…"
 msgstr "Mulai mengetik untuk menyaring..."
 
@@ -544,10 +578,8 @@ msgid "Action"
 msgstr "Aksi"
 
 msgid "entry"
-msgstr "masukan"
-
-msgid "entries"
-msgstr "masukan"
+msgid_plural "entries"
+msgstr[0] "masukan"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -710,6 +742,9 @@ msgstr "Alamat email:"
 
 msgid "Reset my password"
 msgstr "Setel ulang sandi saya"
+
+msgid "Select all objects on this page for an action"
+msgstr ""
 
 msgid "All dates"
 msgstr "Semua tanggal"

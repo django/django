@@ -338,24 +338,20 @@ Changing a custom field's base class
 You can't change the base class of a custom field because Django won't detect
 the change and make a migration for it. For example, if you start with::
 
-    class CustomCharField(models.CharField):
-        ...
+    class CustomCharField(models.CharField): ...
 
 and then decide that you want to use ``TextField`` instead, you can't change
 the subclass like this::
 
-    class CustomCharField(models.TextField):
-        ...
+    class CustomCharField(models.TextField): ...
 
 Instead, you must create a new custom field class and update your models to
 reference it::
 
-    class CustomCharField(models.CharField):
-        ...
+    class CustomCharField(models.CharField): ...
 
 
-    class CustomTextField(models.TextField):
-        ...
+    class CustomTextField(models.TextField): ...
 
 As discussed in :ref:`removing fields <migrations-removing-model-fields>`, you
 must retain the original ``CustomCharField`` class as long as you have
@@ -431,9 +427,7 @@ Django when the framework constructs the ``CREATE TABLE`` statements for your
 application -- that is, when you first create your tables. The methods are also
 called when constructing a ``WHERE`` clause that includes the model field --
 that is, when you retrieve data using QuerySet methods like ``get()``,
-``filter()``, and ``exclude()`` and have the model field as an argument. They
-are not called at any other time, so it can afford to execute slightly complex
-code, such as the ``connection.settings_dict`` check in the above example.
+``filter()``, and ``exclude()`` and have the model field as an argument.
 
 Some database column types accept parameters, such as ``CHAR(25)``, where the
 parameter ``25`` represents the maximum column length. In cases like these,

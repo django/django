@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Albin Larsson <albin.post@gmail.com>, 2022
+# Albin Larsson <albin.post@gmail.com>, 2022-2023
 # Alex Nordlund <deep.alexander@gmail.com>, 2012
 # Anders Hovmöller <boxed@killingar.net>, 2023
 # Andreas Pelme <andreas@pelme.se>, 2014
@@ -21,10 +21,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-17 02:13-0600\n"
-"PO-Revision-Date: 2023-04-25 07:05+0000\n"
-"Last-Translator: Anders Hovmöller <boxed@killingar.net>, 2023\n"
-"Language-Team: Swedish (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 07:05+0000\n"
+"Last-Translator: Albin Larsson <albin.post@gmail.com>, 2022-2023\n"
+"Language-Team: Swedish (http://app.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -192,6 +192,9 @@ msgid "Hold down “Control”, or “Command” on a Mac, to select more than o
 msgstr ""
 "Håll inne “Control”, eller “Command” på en Mac, för att välja fler än en."
 
+msgid "Select this object for an action - {}"
+msgstr ""
+
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr "Lade till {name} “{obj}”."
@@ -347,6 +350,9 @@ msgstr "Välj alla %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Rensa urval"
 
+msgid "Breadcrumbs"
+msgstr "Brödsmulor"
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "Modeller i applikationen %(name)s"
@@ -383,7 +389,7 @@ msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Ange nytt lösenord för användare <strong>%(username)s</strong>."
 
 msgid "Skip to main content"
-msgstr ""
+msgstr "Hoppa till huvudinnehållet"
 
 msgid "Welcome,"
 msgstr "Välkommen,"
@@ -397,9 +403,6 @@ msgstr "Dokumentation"
 msgid "Log out"
 msgstr "Logga ut"
 
-msgid "Breadcrumbs"
-msgstr ""
-
 #, python-format
 msgid "Add %(name)s"
 msgstr "Lägg till %(name)s"
@@ -412,6 +415,12 @@ msgstr "Visa på webbplats"
 
 msgid "Filter"
 msgstr "Filtrera"
+
+msgid "Hide counts"
+msgstr ""
+
+msgid "Show counts"
+msgstr ""
 
 msgid "Clear all filters"
 msgstr "Rensa alla filter"
@@ -427,13 +436,13 @@ msgid "Toggle sorting"
 msgstr "Ändra sorteringsordning"
 
 msgid "Toggle theme (current theme: auto)"
-msgstr ""
+msgstr "Växla tema (aktuellt tema: automatiskt)"
 
 msgid "Toggle theme (current theme: light)"
-msgstr ""
+msgstr "Växla tema (aktuellt tema: ljust)"
 
 msgid "Toggle theme (current theme: dark)"
-msgstr ""
+msgstr "Växla tema (aktuellt tema: mörkt)"
 
 msgid "Delete"
 msgstr "Radera"
@@ -521,6 +530,15 @@ msgstr "Mina händelser"
 msgid "None available"
 msgstr "Inga tillgängliga"
 
+msgid "Added:"
+msgstr ""
+
+msgid "Changed:"
+msgstr ""
+
+msgid "Deleted:"
+msgstr ""
+
 msgid "Unknown content"
 msgstr "Okänt innehåll"
 
@@ -548,7 +566,7 @@ msgid "Toggle navigation"
 msgstr "Växla navigering"
 
 msgid "Sidebar"
-msgstr ""
+msgstr "Sidopanel"
 
 msgid "Start typing to filter…"
 msgstr "Börja skriv för att filtrera..."
@@ -729,6 +747,9 @@ msgstr "E-postadress:"
 
 msgid "Reset my password"
 msgstr "Nollställ mitt lösenord"
+
+msgid "Select all objects on this page for an action"
+msgstr ""
 
 msgid "All dates"
 msgstr "Alla datum"

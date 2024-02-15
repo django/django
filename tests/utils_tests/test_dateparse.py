@@ -46,6 +46,7 @@ class DateParseTests(unittest.TestCase):
 
     def test_parse_datetime(self):
         valid_inputs = (
+            ("2012-04-23", datetime(2012, 4, 23)),
             ("2012-04-23T09:15:00", datetime(2012, 4, 23, 9, 15)),
             ("2012-4-9 4:8:16", datetime(2012, 4, 9, 4, 8, 16)),
             (

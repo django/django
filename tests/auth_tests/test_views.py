@@ -818,9 +818,9 @@ class LoginTest(AuthViewsTestCase):
         # Use POST request to log in
         SessionMiddleware(get_response).process_request(req)
         CsrfViewMiddleware(get_response).process_view(req, LoginView.as_view(), (), {})
-        req.META[
-            "SERVER_NAME"
-        ] = "testserver"  # Required to have redirect work in login view
+        req.META["SERVER_NAME"] = (
+            "testserver"  # Required to have redirect work in login view
+        )
         req.META["SERVER_PORT"] = 80
         resp = CsrfViewMiddleware(LoginView.as_view())(req)
         csrf_cookie = resp.cookies.get(settings.CSRF_COOKIE_NAME, None)
@@ -1361,7 +1361,10 @@ def get_perm(Model, perm):
 
 # Redirect in test_user_change_password will fail if session auth hash
 # isn't updated after password change (#21649)
-@override_settings(ROOT_URLCONF="auth_tests.urls_admin")
+@override_settings(
+    ROOT_URLCONF="auth_tests.urls_admin",
+    PASSWORD_HASHERS=["django.contrib.auth.hashers.MD5PasswordHasher"],
+)
 class ChangelistTests(AuthViewsTestCase):
     @classmethod
     def setUpTestData(cls):

@@ -4,6 +4,7 @@ Multi-part parsing for file uploads.
 Exposes one class, ``MultiPartParser``, which feeds chunks of uploaded data to
 file upload handlers for processing.
 """
+
 import base64
 import binascii
 import collections
@@ -41,6 +42,7 @@ RAW = "raw"
 FILE = "file"
 FIELD = "field"
 FIELD_TYPES = frozenset([FIELD, RAW])
+MAX_TOTAL_HEADER_SIZE = 1024
 
 
 class MultiPartParser:
@@ -682,21 +684,30 @@ def parse_boundary_stream(stream, max_header_size):
     """
     Parse one and exactly one stream that encapsulates a boundary.
     """
-    # Stream at beginning of header, look for end of header
-    # and parse it if found. The header must fit within one
-    # chunk.
-    chunk = stream.read(max_header_size)
 
-    # 'find' returns the top of these four bytes, so we'll
-    # need to munch them later to prevent them from polluting
-    # the payload.
-    header_end = chunk.find(b"\r\n\r\n")
+    # Look for the end of headers and if not found extend the search to double
+    # the size up to the MAX_TOTAL_HEADER_SIZE.
+    headers_chunk_size = 1024
+    while True:
+        if headers_chunk_size > max_header_size:
+            raise MultiPartParserError("Request max total header size exceeded.")
 
-    if header_end == -1:
-        # we find no header, so we just mark this fact and pass on
-        # the stream verbatim
+        # Stream at beginning of header, look for end of header and parse it if
+        # found. The header must fit within one chunk.
+        chunk = stream.read(headers_chunk_size)
+        # 'find' returns the top of these four bytes, so munch them later to
+        # prevent them from polluting the payload.
+        header_end = chunk.find(b"\r\n\r\n")
+        if header_end != -1:
+            break
+
+        # Find no header, mark this fact and pass on the stream verbatim.
         stream.unget(chunk)
-        return (RAW, {}, stream)
+        # No more data to read.
+        if len(chunk) < headers_chunk_size:
+            return (RAW, {}, stream)
+        # Double the chunk size.
+        headers_chunk_size *= 2
 
     header = chunk[:header_end]
 
@@ -740,4 +751,4 @@ class Parser:
         boundarystream = InterBoundaryIter(self._stream, self._separator)
         for sub_stream in boundarystream:
             # Iterate over each part
-            yield parse_boundary_stream(sub_stream, 1024)
+            yield parse_boundary_stream(sub_stream, MAX_TOTAL_HEADER_SIZE)

@@ -36,6 +36,50 @@ Issues under Django's security process
 All security issues have been handled under versions of Django's security
 process. These are listed below.
 
+February 6, 2024 - :cve:`2024-24680`
+------------------------------------
+
+Potential denial-of-service in ``intcomma`` template filter.
+`Full description
+<https://www.djangoproject.com/weblog/2024/feb/06/security-releases/>`__
+
+* Django 5.0 :commit:`(patch) <16a8fe18a3b81250f4fa57e3f93f0599dc4895bc>`
+* Django 4.2 :commit:`(patch) <572ea07e84b38ea8de0551f4b4eda685d91d09d2>`
+* Django 3.2 :commit:`(patch) <c1171ffbd570db90ca206c30f8e2b9f691243820>`
+
+November 1, 2023 - :cve:`2023-46695`
+------------------------------------
+
+Potential denial of service vulnerability in ``UsernameField`` on Windows.
+`Full description
+<https://www.djangoproject.com/weblog/2023/nov/01/security-releases/>`__
+
+* Django 4.2 :commit:`(patch) <048a9ebb6ea468426cb4e57c71572cbbd975517f>`
+* Django 4.1 :commit:`(patch) <4965bfdde2e5a5c883685019e57d123a3368a75e>`
+* Django 3.2 :commit:`(patch) <f9a7fb8466a7ba4857eaf930099b5258f3eafb2b>`
+
+October 4, 2023 - :cve:`2023-43665`
+-----------------------------------
+
+Denial-of-service possibility in ``django.utils.text.Truncator``.
+`Full description
+<https://www.djangoproject.com/weblog/2023/oct/04/security-releases/>`__
+
+* Django 4.2 :commit:`(patch) <be9c27c4d18c2e6a5be8af4e53c0797440794473>`
+* Django 4.1 :commit:`(patch) <c7b7024742250414e426ad49fb80db943e7ba4e8>`
+* Django 3.2 :commit:`(patch) <ccdade1a0262537868d7ca64374de3d957ca50c5>`
+
+September 4, 2023 - :cve:`2023-41164`
+-------------------------------------
+
+Potential denial of service vulnerability in
+``django.utils.encoding.uri_to_iri()``. `Full description
+<https://www.djangoproject.com/weblog/2023/sep/04/security-releases/>`__
+
+* Django 4.2 :commit:`(patch) <9c51b4dcfa0cefcb48231f4d71cafa80821f87b9>`
+* Django 4.1 :commit:`(patch) <ba00bc5ec6a7eff5e08be438f7b5b0e9574e8ff0>`
+* Django 3.2 :commit:`(patch) <6f030b1149bd8fa4ba90452e77cb3edc095ce54e>`
+
 July 3, 2023 - :cve:`2023-36053`
 --------------------------------
 

@@ -10,20 +10,20 @@
 # Harro van der Klauw <hvdklauw@gmail.com>, 2011-2012
 # Ilja Maas <iljamaas@dreamsolution.nl>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Jeffrey Gelens <jeffrey@noppo.pro>, 2011-2012,2014
+# 6a27f10aef159701c7a5ff07f0fb0a78_05545ed <bc5d401a7ecd9343dd5afac265ed8ab3_4845>, 2011-2012,2014
 # Michiel Overtoom <motoom@xs4all.nl>, 2014
 # Meteor0id, 2019-2020
 # 8de006b1b0894aab6aef71979dcd8bd6_5c6b207 <ff2658a8d8dbebbd9cc240b8c133a515_234097>, 2014-2015
 # Tino de Bruijn <tinodb@gmail.com>, 2013
-# Tonnes <tonnes.mb@gmail.com>, 2017,2019-2020,2022
+# Tonnes <tonnes.mb@gmail.com>, 2017,2019-2020,2022-2023
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:23-0500\n"
-"PO-Revision-Date: 2022-07-25 06:49+0000\n"
-"Last-Translator: Tonnes <tonnes.mb@gmail.com>\n"
-"Language-Team: Dutch (http://www.transifex.com/django/django/language/nl/)\n"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 06:49+0000\n"
+"Last-Translator: Tonnes <tonnes.mb@gmail.com>, 2017,2019-2020,2022-2023\n"
+"Language-Team: Dutch (http://app.transifex.com/django/django/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -62,6 +62,9 @@ msgstr "Bosnisch"
 
 msgid "Catalan"
 msgstr "Catalaans"
+
+msgid "Central Kurdish (Sorani)"
+msgstr "Centraal-Koerdisch (Sorani)"
 
 msgid "Czech"
 msgstr "Tsjechisch"
@@ -303,6 +306,9 @@ msgstr "Tataars"
 msgid "Udmurt"
 msgstr "Oedmoerts"
 
+msgid "Uyghur"
+msgstr "Oeigoers"
+
 msgid "Ukrainian"
 msgstr "Oekraïens"
 
@@ -403,6 +409,15 @@ msgstr "Zorg ervoor dat deze waarde minstens %(limit_value)s is."
 msgid "Ensure this value is a multiple of step size %(limit_value)s."
 msgstr ""
 "Zorg ervoor dat deze waarde een veelvoud is van stapgrootte %(limit_value)s."
+
+#, python-format
+msgid ""
+"Ensure this value is a multiple of step size %(limit_value)s, starting from "
+"%(offset)s, e.g. %(offset)s, %(valid_value1)s, %(valid_value2)s, and so on."
+msgstr ""
+"Zorg dat deze waarde een veelvoud is van stapgrootte %(limit_value)s, "
+"beginnend bij %(offset)s, bv. %(offset)s, %(valid_value1)s, "
+"%(valid_value2)s, enzovoort."
 
 #, python-format
 msgid ""
@@ -517,6 +532,9 @@ msgstr "Boolean (True of False)"
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "Tekenreeks (hooguit %(max_length)s)"
+
+msgid "String (unlimited)"
+msgstr "Tekenreeks (onbeperkt)"
 
 msgid "Comma-separated integers"
 msgstr "Komma-gescheiden gehele getallen"
@@ -1201,14 +1219,14 @@ msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
 "including the “Referrer-Policy: no-referrer” header, please remove them. The "
 "CSRF protection requires the “Referer” header to do strict referer checking. "
-"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" …> for links to third-party sites."
+"If you’re concerned about privacy, use alternatives like <a "
+"rel=\"noreferrer\" …> for links to third-party sites."
 msgstr ""
 "Als u de tag <meta name=\"referrer\" content=\"no-referrer\"> gebruikt of de "
 "header ‘Referrer-Policy: no-referrer’ opneemt, verwijder deze dan. De CSRF-"
 "bescherming vereist de ‘Referer’-header voor strenge referer-controle. Als u "
-"bezorgd bent om privacy, gebruik dan alternatieven zoals <a rel=\"noreferrer"
-"\" …> voor koppelingen naar websites van derden."
+"bezorgd bent om privacy, gebruik dan alternatieven zoals <a "
+"rel=\"noreferrer\" …> voor koppelingen naar websites van derden."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
@@ -1297,20 +1315,20 @@ msgid ""
 "View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
 "target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
 msgstr ""
-"<a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" target="
-"\"_blank\" rel=\"noopener\">Uitgaveopmerkingen</a> voor Django %(version)s "
-"weergeven"
+"<a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">Uitgaveopmerkingen</a> voor Django "
+"%(version)s weergeven"
 
 #, python-format
 msgid ""
 "You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> is in your settings file and you have not configured any "
-"URLs."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
+"configured any URLs."
 msgstr ""
 "U ziet deze pagina, omdat uw instellingenbestand <a href=\"https://docs."
-"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" rel="
-"\"noopener\">DEBUG=True</a> bevat en u geen URL's hebt geconfigureerd."
+"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> bevat en u geen URL's hebt geconfigureerd."
 
 msgid "Django Documentation"
 msgstr "Django-documentatie"

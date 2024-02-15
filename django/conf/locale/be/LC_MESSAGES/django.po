@@ -8,10 +8,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-17 02:13-0600\n"
-"PO-Revision-Date: 2023-04-25 06:49+0000\n"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 06:49+0000\n"
 "Last-Translator: znotdead <zhirafchik@gmail.com>, 2016-2017,2019-2021,2023\n"
-"Language-Team: Belarusian (http://www.transifex.com/django/django/language/"
+"Language-Team: Belarusian (http://app.transifex.com/django/django/language/"
 "be/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -297,6 +297,9 @@ msgstr "Татарская"
 msgid "Udmurt"
 msgstr "Удмурцкая"
 
+msgid "Uyghur"
+msgstr "Уйгурскі"
+
 msgid "Ukrainian"
 msgstr "Украінская"
 
@@ -396,6 +399,15 @@ msgstr "Значэньне мусіць быць большым або роўн�
 #, python-format
 msgid "Ensure this value is a multiple of step size %(limit_value)s."
 msgstr "Пераканайцеся, што гэта значэнне кратнае памеру кроку %(limit_value)s."
+
+#, python-format
+msgid ""
+"Ensure this value is a multiple of step size %(limit_value)s, starting from "
+"%(offset)s, e.g. %(offset)s, %(valid_value1)s, %(valid_value2)s, and so on."
+msgstr ""
+"Пераканайцеся, што гэта значэнне кратнае памеру кроку %(limit_value)s, "
+"пачынаючы з %(offset)s, напрыклад.  %(offset)s, %(valid_value1)s, "
+"%(valid_value2)s, і гэтак далей."
 
 #, python-format
 msgid ""
