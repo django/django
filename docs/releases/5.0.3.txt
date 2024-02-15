@@ -15,3 +15,8 @@ Bugfixes
 * Fixed a bug in Django 5.0 that caused a crash of ``Signal.asend()`` and
   ``asend_robust()`` when all receivers were asynchronous functions
   (:ticket:`35174`).
+
+* Fixed a regression in Django 5.0.1 where :meth:`.ModelAdmin.lookup_allowed`
+  would prevent filtering against foreign keys using lookups like ``__isnull``
+  when the field was not included in :attr:`.ModelAdmin.list_filter`
+  (:ticket:`35173`).
