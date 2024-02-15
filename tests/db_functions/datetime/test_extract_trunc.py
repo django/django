@@ -939,73 +939,74 @@ class DateFunctionTests(TestCase):
         self.create_model(start_datetime, end_datetime)
         self.create_model(end_datetime, start_datetime)
 
-        def test_datetime_kind(kind):
-            self.assertQuerySetEqual(
-                DTModel.objects.annotate(
-                    truncated=Trunc(
-                        "start_datetime", kind, output_field=DateTimeField()
-                    )
-                ).order_by("start_datetime"),
+        def assertDatetimeKind(kind):
+            truncated_start = truncate_to(start_datetime, kind)
+            truncated_end = truncate_to(end_datetime, kind)
+            queryset = DTModel.objects.annotate(
+                truncated=Trunc("start_datetime", kind, output_field=DateTimeField())
+            ).order_by("start_datetime")
+            self.assertSequenceEqual(
+                queryset.values_list("start_datetime", "truncated"),
                 [
-                    (start_datetime, truncate_to(start_datetime, kind)),
-                    (end_datetime, truncate_to(end_datetime, kind)),
+                    (start_datetime, truncated_start),
+                    (end_datetime, truncated_end),
                 ],
-                lambda m: (m.start_datetime, m.truncated),
             )
 
-        def test_date_kind(kind):
-            self.assertQuerySetEqual(
-                DTModel.objects.annotate(
-                    truncated=Trunc("start_date", kind, output_field=DateField())
-                ).order_by("start_datetime"),
+        def assertDateKind(kind):
+            truncated_start = truncate_to(start_datetime.date(), kind)
+            truncated_end = truncate_to(end_datetime.date(), kind)
+            queryset = DTModel.objects.annotate(
+                truncated=Trunc("start_date", kind, output_field=DateField())
+            ).order_by("start_datetime")
+            self.assertSequenceEqual(
+                queryset.values_list("start_datetime", "truncated"),
                 [
-                    (start_datetime, truncate_to(start_datetime.date(), kind)),
-                    (end_datetime, truncate_to(end_datetime.date(), kind)),
+                    (start_datetime, truncated_start),
+                    (end_datetime, truncated_end),
                 ],
-                lambda m: (m.start_datetime, m.truncated),
             )
 
-        def test_time_kind(kind):
-            self.assertQuerySetEqual(
-                DTModel.objects.annotate(
-                    truncated=Trunc("start_time", kind, output_field=TimeField())
-                ).order_by("start_datetime"),
+        def assertTimeKind(kind):
+            truncated_start = truncate_to(start_datetime.time(), kind)
+            truncated_end = truncate_to(end_datetime.time(), kind)
+            queryset = DTModel.objects.annotate(
+                truncated=Trunc("start_time", kind, output_field=TimeField())
+            ).order_by("start_datetime")
+            self.assertSequenceEqual(
+                queryset.values_list("start_datetime", "truncated"),
                 [
-                    (start_datetime, truncate_to(start_datetime.time(), kind)),
-                    (end_datetime, truncate_to(end_datetime.time(), kind)),
+                    (start_datetime, truncated_start),
+                    (end_datetime, truncated_end),
                 ],
-                lambda m: (m.start_datetime, m.truncated),
             )
 
-        def test_datetime_to_time_kind(kind):
-            self.assertQuerySetEqual(
-                DTModel.objects.annotate(
-                    truncated=Trunc("start_datetime", kind, output_field=TimeField()),
-                ).order_by("start_datetime"),
+        def assertDatetimeToTimeKind(kind):
+            truncated_start = truncate_to(start_datetime.time(), kind)
+            truncated_end = truncate_to(end_datetime.time(), kind)
+            queryset = DTModel.objects.annotate(
+                truncated=Trunc("start_datetime", kind, output_field=TimeField()),
+            ).order_by("start_datetime")
+            self.assertSequenceEqual(
+                queryset.values_list("start_datetime", "truncated"),
                 [
-                    (start_datetime, truncate_to(start_datetime.time(), kind)),
-                    (end_datetime, truncate_to(end_datetime.time(), kind)),
+                    (start_datetime, truncated_start),
+                    (end_datetime, truncated_end),
                 ],
-                lambda m: (m.start_datetime, m.truncated),
             )
 
-        test_date_kind("year")
-        test_date_kind("quarter")
-        test_date_kind("month")
-        test_date_kind("day")
-        test_time_kind("hour")
-        test_time_kind("minute")
-        test_time_kind("second")
-        test_datetime_kind("year")
-        test_datetime_kind("quarter")
-        test_datetime_kind("month")
-        test_datetime_kind("day")
-        test_datetime_kind("hour")
-        test_datetime_kind("minute")
-        test_datetime_kind("second")
-        test_datetime_to_time_kind("hour")
-        test_datetime_to_time_kind("minute")
-        test_datetime_to_time_kind("second")
+        date_truncations = ["year", "quarter", "month", "day"]
+        time_truncations = ["hour", "minute", "second"]
+        tests = [
+            (assertDateKind, date_truncations),
+            (assertTimeKind, time_truncations),
+            (assertDatetimeKind, [*date_truncations, *time_truncations]),
+            (assertDatetimeToTimeKind, time_truncations),
+        ]
+        for assertion, truncations in tests:
+            for truncation in truncations:
+                with self.subTest(assertion=assertion.__name__, truncation=truncation):
+                    assertion(truncation)
 
         qs = DTModel.objects.filter(
             start_datetime__date=Trunc(
@@ -1833,91 +1834,74 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
         self.create_model(end_datetime, start_datetime)
         melb = zoneinfo.ZoneInfo("Australia/Melbourne")
 
-        def test_datetime_kind(kind):
-            self.assertQuerySetEqual(
-                DTModel.objects.annotate(
-                    truncated=Trunc(
-                        "start_datetime",
-                        kind,
-                        output_field=DateTimeField(),
-                        tzinfo=melb,
-                    )
-                ).order_by("start_datetime"),
+        def assertDatetimeKind(kind):
+            truncated_start = truncate_to(start_datetime.astimezone(melb), kind, melb)
+            truncated_end = truncate_to(end_datetime.astimezone(melb), kind, melb)
+            queryset = DTModel.objects.annotate(
+                truncated=Trunc(
+                    "start_datetime",
+                    kind,
+                    output_field=DateTimeField(),
+                    tzinfo=melb,
+                )
+            ).order_by("start_datetime")
+            self.assertSequenceEqual(
+                queryset.values_list("start_datetime", "truncated"),
                 [
-                    (
-                        start_datetime,
-                        truncate_to(start_datetime.astimezone(melb), kind, melb),
-                    ),
-                    (
-                        end_datetime,
-                        truncate_to(end_datetime.astimezone(melb), kind, melb),
-                    ),
+                    (start_datetime, truncated_start),
+                    (end_datetime, truncated_end),
                 ],
-                lambda m: (m.start_datetime, m.truncated),
             )
 
-        def test_datetime_to_date_kind(kind):
-            self.assertQuerySetEqual(
-                DTModel.objects.annotate(
-                    truncated=Trunc(
-                        "start_datetime",
-                        kind,
-                        output_field=DateField(),
-                        tzinfo=melb,
-                    ),
-                ).order_by("start_datetime"),
+        def assertDatetimeToDateKind(kind):
+            truncated_start = truncate_to(start_datetime.astimezone(melb).date(), kind)
+            truncated_end = truncate_to(end_datetime.astimezone(melb).date(), kind)
+            queryset = DTModel.objects.annotate(
+                truncated=Trunc(
+                    "start_datetime",
+                    kind,
+                    output_field=DateField(),
+                    tzinfo=melb,
+                ),
+            ).order_by("start_datetime")
+            self.assertSequenceEqual(
+                queryset.values_list("start_datetime", "truncated"),
                 [
-                    (
-                        start_datetime,
-                        truncate_to(start_datetime.astimezone(melb).date(), kind),
-                    ),
-                    (
-                        end_datetime,
-                        truncate_to(end_datetime.astimezone(melb).date(), kind),
-                    ),
+                    (start_datetime, truncated_start),
+                    (end_datetime, truncated_end),
                 ],
-                lambda m: (m.start_datetime, m.truncated),
             )
 
-        def test_datetime_to_time_kind(kind):
-            self.assertQuerySetEqual(
-                DTModel.objects.annotate(
-                    truncated=Trunc(
-                        "start_datetime",
-                        kind,
-                        output_field=TimeField(),
-                        tzinfo=melb,
-                    )
-                ).order_by("start_datetime"),
+        def assertDatetimeToTimeKind(kind):
+            truncated_start = truncate_to(start_datetime.astimezone(melb).time(), kind)
+            truncated_end = truncate_to(end_datetime.astimezone(melb).time(), kind)
+            queryset = DTModel.objects.annotate(
+                truncated=Trunc(
+                    "start_datetime",
+                    kind,
+                    output_field=TimeField(),
+                    tzinfo=melb,
+                )
+            ).order_by("start_datetime")
+            self.assertSequenceEqual(
+                queryset.values_list("start_datetime", "truncated"),
                 [
-                    (
-                        start_datetime,
-                        truncate_to(start_datetime.astimezone(melb).time(), kind),
-                    ),
-                    (
-                        end_datetime,
-                        truncate_to(end_datetime.astimezone(melb).time(), kind),
-                    ),
+                    (start_datetime, truncated_start),
+                    (end_datetime, truncated_end),
                 ],
-                lambda m: (m.start_datetime, m.truncated),
             )
 
-        test_datetime_to_date_kind("year")
-        test_datetime_to_date_kind("quarter")
-        test_datetime_to_date_kind("month")
-        test_datetime_to_date_kind("week")
-        test_datetime_to_date_kind("day")
-        test_datetime_to_time_kind("hour")
-        test_datetime_to_time_kind("minute")
-        test_datetime_to_time_kind("second")
-        test_datetime_kind("year")
-        test_datetime_kind("quarter")
-        test_datetime_kind("month")
-        test_datetime_kind("week")
-        test_datetime_kind("day")
-        test_datetime_kind("hour")
-        test_datetime_kind("minute")
-        test_datetime_kind("second")
+        date_truncations = ["year", "quarter", "month", "week", "day"]
+        time_truncations = ["hour", "minute", "second"]
+        tests = [
+            (assertDatetimeToDateKind, date_truncations),
+            (assertDatetimeToTimeKind, time_truncations),
+            (assertDatetimeKind, [*date_truncations, *time_truncations]),
+        ]
+        for assertion, truncations in tests:
+            for truncation in truncations:
+                with self.subTest(assertion=assertion.__name__, truncation=truncation):
+                    assertion(truncation)
 
         qs = DTModel.objects.filter(
             start_datetime__date=Trunc(
