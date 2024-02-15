@@ -289,7 +289,12 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 or (new_field.unique and not new_field.primary_key)
             )
         ) or (
-            old_type != new_type and not new_field.unique and not old_field.primary_key
+            (old_field.db_index or old_field.unique)
+            and (
+                (old_type.startswith("varchar") and not new_type.startswith("varchar"))
+                or (old_type.startswith("text") and not new_type.startswith("text"))
+                or (old_type.startswith("citext") and not new_type.startswith("citext"))
+            )
         ):
             return True
 
