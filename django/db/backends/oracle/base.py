@@ -232,10 +232,10 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     ops_class = DatabaseOperations
     validation_class = DatabaseValidation
     _connection_pools = {}
-    is_pool = False
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.is_pool = self.settings_dict["OPTIONS"].get("pool")
         use_returning_into = self.settings_dict["OPTIONS"].get(
             "use_returning_into", True
         )
@@ -259,7 +259,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         if self.alias not in self._connection_pools:
             connect_kwargs = self.get_connection_params()
             del connect_kwargs["pool"]
-            self.is_pool = True
             pool = Database.create_pool(
                 user=self.settings_dict["USER"],
                 password=self.settings_dict["PASSWORD"],
