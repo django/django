@@ -32,9 +32,6 @@ def capfirst(x):
 
 
 # Set up regular expressions
-re_words = _lazy_re_compile(r"<[^>]+?>|([^<>\s]+)", re.S)
-re_chars = _lazy_re_compile(r"<[^>]+?>|(.)", re.S)
-re_tag = _lazy_re_compile(r"<(/)?(\S+?)(?:(\s*/)|\s.*?)?>", re.S)
 re_newlines = _lazy_re_compile(r"\r\n|\r")  # Used in normalize_newlines
 re_camel_case = _lazy_re_compile(r"(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|$)))")
 
