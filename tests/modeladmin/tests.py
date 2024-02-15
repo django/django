@@ -174,7 +174,19 @@ class ModelAdminTests(TestCase):
             pass
 
         ma = PlaceAdmin(Place, self.site)
-        self.assertIs(ma.lookup_allowed("country", "1", request), True)
+
+        cases = [
+            ("country", "1"),
+            ("country__exact", "1"),
+            ("country__id", "1"),
+            ("country__id__exact", "1"),
+            ("country__isnull", True),
+            ("country__isnull", False),
+            ("country__id__isnull", False),
+        ]
+        for lookup, lookup_value in cases:
+            with self.subTest(lookup=lookup):
+                self.assertIs(ma.lookup_allowed(lookup, lookup_value, request), True)
 
     @isolate_apps("modeladmin")
     def test_lookup_allowed_non_autofield_primary_key(self):
