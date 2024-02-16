@@ -154,7 +154,7 @@ class RelatedField(FieldCacheMixin, Field):
         return []
 
     def _check_related_query_name_is_valid(self):
-        if self.remote_field.is_hidden():
+        if self.remote_field.hidden:
             return []
         rel_query_name = self.related_query_name()
         errors = []
@@ -253,7 +253,7 @@ class RelatedField(FieldCacheMixin, Field):
         # If the field doesn't install a backward relation on the target model
         # (so `is_hidden` returns True), then there are no clashes to check
         # and we can skip these fields.
-        rel_is_hidden = self.remote_field.is_hidden()
+        rel_is_hidden = self.remote_field.hidden
         rel_name = self.remote_field.accessor_name  # i. e. "model_set"
         rel_query_name = self.related_query_name()  # i. e. "model"
         # i.e. "app_label.Model.field".
@@ -887,10 +887,7 @@ class ForeignObject(RelatedField):
     def contribute_to_related_class(self, cls, related):
         # Internal FK's - i.e., those with a related name ending with '+' -
         # and swapped models don't get a related descriptor.
-        if (
-            not self.remote_field.is_hidden()
-            and not related.related_model._meta.swapped
-        ):
+        if not self.remote_field.hidden and not related.related_model._meta.swapped:
             setattr(
                 cls._meta.concrete_model,
                 related.accessor_name,
@@ -1901,7 +1898,7 @@ class ManyToManyField(RelatedField):
             or self.remote_field.model == cls._meta.object_name
         ):
             self.remote_field.related_name = "%s_rel_+" % name
-        elif self.remote_field.is_hidden():
+        elif self.remote_field.hidden:
             # If the backwards relation is disabled, replace the original
             # related_name with one generated from the m2m field name. Django
             # still uses backwards relations internally and we need to avoid
@@ -1941,10 +1938,7 @@ class ManyToManyField(RelatedField):
     def contribute_to_related_class(self, cls, related):
         # Internal M2Ms (i.e., those with a related name ending with '+')
         # and swapped models don't get a related descriptor.
-        if (
-            not self.remote_field.is_hidden()
-            and not related.related_model._meta.swapped
-        ):
+        if not self.remote_field.hidden and not related.related_model._meta.swapped:
             setattr(
                 cls,
                 related.accessor_name,

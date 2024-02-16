@@ -269,7 +269,7 @@ class RelationTreeTests(SimpleTestCase):
             sorted(
                 field.related_query_name()
                 for field in Relation._meta._relation_tree
-                if not field.remote_field.field.remote_field.is_hidden()
+                if not field.remote_field.field.remote_field.hidden
             ),
             sorted(
                 [

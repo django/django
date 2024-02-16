@@ -187,7 +187,7 @@ class ForwardManyToOneDescriptor:
         # (related_name ends with a '+'). Refs #21410.
         # The check for len(...) == 1 is a special case that allows the query
         # to be join-less and smaller. Refs #21760.
-        if remote_field.is_hidden() or len(self.field.foreign_related_fields) == 1:
+        if remote_field.hidden or len(self.field.foreign_related_fields) == 1:
             query = {
                 "%s__in"
                 % related_field.name: {instance_attr(inst)[0] for inst in instances}

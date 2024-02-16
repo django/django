@@ -66,7 +66,8 @@ class ForeignObjectRel(FieldCacheMixin):
     # AttributeError
     @cached_property
     def hidden(self):
-        return self.is_hidden()
+        """Should the related object be hidden?"""
+        return bool(self.related_name) and self.related_name[-1] == "+"
 
     @cached_property
     def name(self):
@@ -190,10 +191,6 @@ class ForeignObjectRel(FieldCacheMixin):
         if ordering:
             qs = qs.order_by(*ordering)
         return (blank_choice if include_blank else []) + [(x.pk, str(x)) for x in qs]
-
-    def is_hidden(self):
-        """Should the related object be hidden?"""
-        return bool(self.related_name) and self.related_name[-1] == "+"
 
     def get_joining_columns(self):
         warnings.warn(
