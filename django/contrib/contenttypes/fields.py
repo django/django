@@ -11,6 +11,7 @@ from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
 from django.db import DEFAULT_DB_ALIAS, models, router, transaction
 from django.db.models import DO_NOTHING, ForeignObject, ForeignObjectRel
 from django.db.models.base import ModelBase, make_foreign_order_accessors
+from django.db.models.fields import Field
 from django.db.models.fields.mixins import FieldCacheMixin
 from django.db.models.fields.related import (
     ReverseManyToOneDescriptor,
@@ -24,7 +25,7 @@ from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.functional import cached_property
 
 
-class GenericForeignKey(FieldCacheMixin):
+class GenericForeignKey(FieldCacheMixin, Field):
     """
     Provide a generic many-to-one relation through the ``content_type`` and
     ``object_id`` fields.
@@ -33,35 +34,28 @@ class GenericForeignKey(FieldCacheMixin):
     ForwardManyToOneDescriptor) by adding itself as a model attribute.
     """
 
-    # Field flags
-    auto_created = False
-    concrete = False
-    editable = False
-    hidden = False
-
-    is_relation = True
     many_to_many = False
     many_to_one = True
     one_to_many = False
     one_to_one = False
-    related_model = None
-    remote_field = None
 
     def __init__(
         self, ct_field="content_type", fk_field="object_id", for_concrete_model=True
     ):
+        super().__init__(editable=False)
         self.ct_field = ct_field
         self.fk_field = fk_field
         self.for_concrete_model = for_concrete_model
-        self.editable = False
-        self.rel = None
-        self.column = None
+        self.is_relation = True
 
     def contribute_to_class(self, cls, name, **kwargs):
-        self.name = name
-        self.model = cls
-        cls._meta.add_field(self, private=True)
-        setattr(cls, name, self)
+        super().contribute_to_class(cls, name, private_only=True, **kwargs)
+        # GenericForeignKey is its own descriptor.
+        setattr(cls, self.attname, self)
+
+    def get_attname_column(self):
+        attname, column = super().get_attname_column()
+        return attname, None
 
     def get_filter_kwargs_for_object(self, obj):
         """See corresponding method on Field"""
@@ -77,28 +71,12 @@ class GenericForeignKey(FieldCacheMixin):
             self.ct_field: ContentType.objects.get_for_model(obj).pk,
         }
 
-    def __str__(self):
-        model = self.model
-        return "%s.%s" % (model._meta.label, self.name)
-
     def check(self, **kwargs):
         return [
             *self._check_field_name(),
             *self._check_object_id_field(),
             *self._check_content_type_field(),
         ]
-
-    def _check_field_name(self):
-        if self.name.endswith("_"):
-            return [
-                checks.Error(
-                    "Field names must not end with an underscore.",
-                    obj=self,
-                    id="fields.E001",
-                )
-            ]
-        else:
-            return []
 
     def _check_object_id_field(self):
         try:
