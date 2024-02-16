@@ -79,10 +79,7 @@ Retrieving all field instances of a model
 
     ``include_hidden``
         ``False`` by default. If set to ``True``, ``get_fields()`` will include
-        fields that are used to back other field's functionality. This will
-        also include any fields that have a ``related_name`` (such
-        as :class:`~django.db.models.ManyToManyField`, or
-        :class:`~django.db.models.ForeignKey`) that start with a "+".
+        :attr:`hidden fields <django.db.models.Field.hidden>`.
 
     .. code-block:: pycon
 
