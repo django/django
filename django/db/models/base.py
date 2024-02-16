@@ -1,5 +1,6 @@
 import copy
 import inspect
+import json
 import warnings
 from functools import partialmethod
 from itertools import chain
@@ -585,6 +586,17 @@ class Model(AltersData, metaclass=ModelBase):
         new._state.db = db
         return new
 
+    def to_dict(self):
+        model_dict = {}
+        for field in self._meta.fields:
+            field_name = field.name
+            field_value = getattr(self, field_name)
+            model_dict[field_name] = field_value
+        return model_dict
+
+    def to_json(self):
+        return json.dumps(self.to_dict())
+
     def __repr__(self):
         return "<%s: %s>" % (self.__class__.__name__, self)
 
@@ -1083,9 +1095,9 @@ class Model(AltersData, metaclass=ModelBase):
             and not force_insert
             and self._state.adding
             and (
-                (meta.pk.default and meta.pk.default is not NOT_PROVIDED)
-                or (meta.pk.db_default and meta.pk.db_default is not NOT_PROVIDED)
-            )
+            (meta.pk.default and meta.pk.default is not NOT_PROVIDED)
+            or (meta.pk.db_default and meta.pk.db_default is not NOT_PROVIDED)
+        )
         ):
             force_insert = True
         # If possible, try an UPDATE. If that doesn't update anything, do an INSERT.
