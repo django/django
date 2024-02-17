@@ -352,7 +352,7 @@ Once you're in the shell, explore the :doc:`database API </topics/db/queries>`:
 
 .. code-block:: pycon
 
-    >>> from polls.models import Choice, Question  # Import the model classes we just wrote.
+    # Django automatically imports models.
 
     # No questions are in the system yet.
     >>> Question.objects.all()
@@ -385,6 +385,10 @@ Once you're in the shell, explore the :doc:`database API </topics/db/queries>`:
     # objects.all() displays all the questions in the database.
     >>> Question.objects.all()
     <QuerySet [<Question: Question object (1)>]>
+
+.. versionchanged:: 5.2
+
+    Automatic importing of models in the shell was added.
 
 Wait a minute. ``<Question: Question object (1)>`` isn't a helpful
 representation of this object. Let's fix that by editing the ``Question`` model
@@ -442,8 +446,6 @@ Save these changes and start a new Python interactive shell by running
 ``python manage.py shell`` again:
 
 .. code-block:: pycon
-
-    >>> from polls.models import Choice, Question
 
     # Make sure our __str__() addition worked.
     >>> Question.objects.all()
