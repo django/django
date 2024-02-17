@@ -60,8 +60,9 @@ def SET(value):
         def set_on_delete(collector, field, sub_objs, using):
             collector.add_field_update(field, value, sub_objs)
 
+        set_on_delete.lazy_sub_objs = True
+
     set_on_delete.deconstruct = lambda: ("django.db.models.SET", (value,), {})
-    set_on_delete.lazy_sub_objs = True
     return set_on_delete
 
 
@@ -74,9 +75,6 @@ SET_NULL.lazy_sub_objs = True
 
 def SET_DEFAULT(collector, field, sub_objs, using):
     collector.add_field_update(field, field.get_default(), sub_objs)
-
-
-SET_DEFAULT.lazy_sub_objs = True
 
 
 def DO_NOTHING(collector, field, sub_objs, using):

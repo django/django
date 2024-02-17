@@ -1,6 +1,7 @@
 """
 Decorators for views based on HTTP headers.
 """
+
 import datetime
 from functools import wraps
 

@@ -322,6 +322,16 @@ For example, the ``'css/styles.css'`` file with this content:
 
     @import url("../admin/css/base.27e20196a850.css");
 
+.. admonition:: Usage of the ``integrity`` HTML attribute with local files
+
+    When using the optional ``integrity`` attribute within tags like
+    ``<script>`` or ``<link>``, its value should be calculated based on the
+    files as they are served, not as stored in the filesystem. This is
+    particularly important because depending on how static files are collected,
+    their checksum may have changed (for example when using
+    :djadmin:`collectstatic`). At the moment, there is no out-of-the-box
+    tooling available for this.
+
 You can change the location of the manifest file by using a custom
 ``ManifestStaticFilesStorage`` subclass that sets the ``manifest_storage``
 argument. For example::

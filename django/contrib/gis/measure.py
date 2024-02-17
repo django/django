@@ -347,8 +347,13 @@ class Distance(MeasureBase):
 class Area(MeasureBase):
     STANDARD_UNIT = AREA_PREFIX + Distance.STANDARD_UNIT
     # Getting the square units values and the alias dictionary.
-    UNITS = {"%s%s" % (AREA_PREFIX, k): v**2 for k, v in Distance.UNITS.items()}
-    ALIAS = {k: "%s%s" % (AREA_PREFIX, v) for k, v in Distance.ALIAS.items()}
+    UNITS = {"%s%s" % (AREA_PREFIX, k): v**2 for k, v in Distance.UNITS.items()} | {
+        "ha": 10000,
+    }
+    ALIAS = {k: "%s%s" % (AREA_PREFIX, v) for k, v in Distance.ALIAS.items()} | {
+        "hectare": "ha",
+    }
+
     LALIAS = {k.lower(): v for k, v in ALIAS.items()}
 
     def __truediv__(self, other):

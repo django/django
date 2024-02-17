@@ -1,9 +1,101 @@
+import collections.abc
 from unittest import mock
 
 from django.db.models import TextChoices
 from django.test import SimpleTestCase
-from django.utils.choices import CallableChoiceIterator, normalize_choices
+from django.utils.choices import (
+    BaseChoiceIterator,
+    CallableChoiceIterator,
+    flatten_choices,
+    normalize_choices,
+)
 from django.utils.translation import gettext_lazy as _
+
+
+class SimpleChoiceIterator(BaseChoiceIterator):
+    def __iter__(self):
+        return ((i, f"Item #{i}") for i in range(1, 4))
+
+
+class ChoiceIteratorTests(SimpleTestCase):
+    def test_not_implemented_error_on_missing_iter(self):
+        class InvalidChoiceIterator(BaseChoiceIterator):
+            pass  # Not overriding __iter__().
+
+        msg = "BaseChoiceIterator subclasses must implement __iter__()."
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            iter(InvalidChoiceIterator())
+
+    def test_eq(self):
+        unrolled = [(1, "Item #1"), (2, "Item #2"), (3, "Item #3")]
+        self.assertEqual(SimpleChoiceIterator(), unrolled)
+        self.assertEqual(unrolled, SimpleChoiceIterator())
+
+    def test_eq_instances(self):
+        self.assertEqual(SimpleChoiceIterator(), SimpleChoiceIterator())
+
+    def test_not_equal_subset(self):
+        self.assertNotEqual(SimpleChoiceIterator(), [(1, "Item #1"), (2, "Item #2")])
+
+    def test_not_equal_superset(self):
+        self.assertNotEqual(
+            SimpleChoiceIterator(),
+            [(1, "Item #1"), (2, "Item #2"), (3, "Item #3"), None],
+        )
+
+    def test_getitem(self):
+        choices = SimpleChoiceIterator()
+        for i, expected in [(0, (1, "Item #1")), (-1, (3, "Item #3"))]:
+            with self.subTest(index=i):
+                self.assertEqual(choices[i], expected)
+
+    def test_getitem_indexerror(self):
+        choices = SimpleChoiceIterator()
+        for i in (4, -4):
+            with self.subTest(index=i):
+                with self.assertRaises(IndexError) as ctx:
+                    choices[i]
+                self.assertTrue(str(ctx.exception).endswith("index out of range"))
+
+
+class FlattenChoicesTests(SimpleTestCase):
+    def test_empty(self):
+        def generator():
+            yield from ()
+
+        for choices in ({}, [], (), set(), frozenset(), generator(), None, ""):
+            with self.subTest(choices=choices):
+                result = flatten_choices(choices)
+                self.assertIsInstance(result, collections.abc.Generator)
+                self.assertEqual(list(result), [])
+
+    def test_non_empty(self):
+        choices = [
+            ("C", _("Club")),
+            ("D", _("Diamond")),
+            ("H", _("Heart")),
+            ("S", _("Spade")),
+        ]
+        result = flatten_choices(choices)
+        self.assertIsInstance(result, collections.abc.Generator)
+        self.assertEqual(list(result), choices)
+
+    def test_nested_choices(self):
+        choices = [
+            ("Audio", [("vinyl", _("Vinyl")), ("cd", _("CD"))]),
+            ("Video", [("vhs", _("VHS Tape")), ("dvd", _("DVD"))]),
+            ("unknown", _("Unknown")),
+        ]
+        expected = [
+            ("vinyl", _("Vinyl")),
+            ("cd", _("CD")),
+            ("vhs", _("VHS Tape")),
+            ("dvd", _("DVD")),
+            ("unknown", _("Unknown")),
+        ]
+        result = flatten_choices(choices)
+        self.assertIsInstance(result, collections.abc.Generator)
+        self.assertEqual(list(result), expected)
 
 
 class NormalizeFieldChoicesTests(SimpleTestCase):
@@ -84,7 +176,7 @@ class NormalizeFieldChoicesTests(SimpleTestCase):
 
         get_choices_spy.assert_not_called()
         self.assertIsInstance(output, CallableChoiceIterator)
-        self.assertEqual(list(output), self.expected)
+        self.assertEqual(output, self.expected)
         get_choices_spy.assert_called_once()
 
     def test_mapping(self):
@@ -134,7 +226,7 @@ class NormalizeFieldChoicesTests(SimpleTestCase):
 
         get_media_choices_spy.assert_not_called()
         self.assertIsInstance(output, CallableChoiceIterator)
-        self.assertEqual(list(output), self.expected_nested)
+        self.assertEqual(output, self.expected_nested)
         get_media_choices_spy.assert_called_once()
 
     def test_nested_mapping(self):
@@ -185,7 +277,7 @@ class NormalizeFieldChoicesTests(SimpleTestCase):
 
         get_choices_spy.assert_not_called()
         self.assertIsInstance(output, CallableChoiceIterator)
-        self.assertEqual(list(output), self.expected)
+        self.assertEqual(output, self.expected)
         get_choices_spy.assert_called_once()
 
     def test_iterable_non_canonical(self):
@@ -230,7 +322,7 @@ class NormalizeFieldChoicesTests(SimpleTestCase):
 
         get_media_choices_spy.assert_not_called()
         self.assertIsInstance(output, CallableChoiceIterator)
-        self.assertEqual(list(output), self.expected_nested)
+        self.assertEqual(output, self.expected_nested)
         get_media_choices_spy.assert_called_once()
 
     def test_nested_iterable_non_canonical(self):
@@ -294,12 +386,12 @@ class NormalizeFieldChoicesTests(SimpleTestCase):
     def test_unsupported_values_from_callable_returned_unmodified(self):
         for value in self.invalid_iterable + self.invalid_nested:
             with self.subTest(value=value):
-                self.assertEqual(list(normalize_choices(lambda: value)), value)
+                self.assertEqual(normalize_choices(lambda: value), value)
 
     def test_unsupported_values_from_iterator_returned_unmodified(self):
         for value in self.invalid_nested:
             with self.subTest(value=value):
                 self.assertEqual(
-                    list(normalize_choices((lambda: (yield from value))())),
+                    normalize_choices((lambda: (yield from value))()),
                     value,
                 )

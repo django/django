@@ -39,10 +39,12 @@ class SHA512Tests(TestCase):
                 "172d88798345a3a7666faf5f35a144c60812d3234dcd35f444624f2faee16857",
                 "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce"
                 "47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e",
-                "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce"
-                "47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e"
-                if connection.features.interprets_empty_strings_as_nulls
-                else None,
+                (
+                    "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce"
+                    "47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e"
+                    if connection.features.interprets_empty_strings_as_nulls
+                    else None
+                ),
             ],
         )
 

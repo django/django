@@ -3,6 +3,7 @@ Oracle database backend for Django.
 
 Requires oracledb: https://oracle.github.io/python-oracledb/
 """
+
 import datetime
 import decimal
 import os
@@ -300,7 +301,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     @async_unsafe
     def create_cursor(self, name=None):
-        return FormatStylePlaceholderCursor(self.connection)
+        return FormatStylePlaceholderCursor(self.connection, self)
 
     def _commit(self):
         if self.connection is not None:
@@ -365,11 +366,15 @@ class OracleParam:
             param = Oracle_datetime.from_datetime(param)
 
         string_size = 0
-        # Oracle doesn't recognize True and False correctly.
-        if param is True:
-            param = 1
-        elif param is False:
-            param = 0
+        has_boolean_data_type = (
+            cursor.database.features.supports_boolean_expr_in_select_clause
+        )
+        if not has_boolean_data_type:
+            # Oracle < 23c doesn't recognize True and False correctly.
+            if param is True:
+                param = 1
+            elif param is False:
+                param = 0
         if hasattr(param, "bind_parameter"):
             self.force_bytes = param.bind_parameter(cursor)
         elif isinstance(param, (Database.Binary, datetime.timedelta)):
@@ -386,9 +391,11 @@ class OracleParam:
             self.input_size = param.input_size
         elif string_size > 4000:
             # Mark any string param greater than 4000 characters as a CLOB.
-            self.input_size = Database.CLOB
+            self.input_size = Database.DB_TYPE_CLOB
         elif isinstance(param, datetime.datetime):
-            self.input_size = Database.TIMESTAMP
+            self.input_size = Database.DB_TYPE_TIMESTAMP
+        elif has_boolean_data_type and isinstance(param, bool):
+            self.input_size = Database.DB_TYPE_BOOLEAN
         else:
             self.input_size = None
 
@@ -426,9 +433,10 @@ class FormatStylePlaceholderCursor:
 
     charset = "utf-8"
 
-    def __init__(self, connection):
+    def __init__(self, connection, database):
         self.cursor = connection.cursor()
         self.cursor.outputtypehandler = self._output_type_handler
+        self.database = database
 
     @staticmethod
     def _output_number_converter(value):
@@ -446,7 +454,7 @@ class FormatStylePlaceholderCursor:
     def _output_type_handler(cursor, name, defaultType, length, precision, scale):
         """
         Called for each db column fetched from cursors. Return numbers as the
-        appropriate Python type.
+        appropriate Python type, and NCLOB with JSON as strings.
         """
         if defaultType == Database.NUMBER:
             if scale == -127:
@@ -476,6 +484,10 @@ class FormatStylePlaceholderCursor:
                 arraysize=cursor.arraysize,
                 outconverter=outconverter,
             )
+        # oracledb 2.0.0+ returns NLOB columns with IS JSON constraints as
+        # dicts. Use a no-op converter to avoid this.
+        elif defaultType == Database.DB_TYPE_NCLOB:
+            return cursor.var(Database.DB_TYPE_NCLOB, arraysize=cursor.arraysize)
 
     def _format_params(self, params):
         try:
@@ -528,14 +540,24 @@ class FormatStylePlaceholderCursor:
             # values. It can be used only in single query execute() because
             # executemany() shares the formatted query with each of the params
             # list. e.g. for input params = [0.75, 2, 0.75, 'sth', 0.75]
-            # params_dict = {0.75: ':arg0', 2: ':arg1', 'sth': ':arg2'}
+            # params_dict = {
+            #     (float, 0.75): ':arg0',
+            #     (int, 2): ':arg1',
+            #     (str, 'sth'): ':arg2',
+            # }
             # args = [':arg0', ':arg1', ':arg0', ':arg2', ':arg0']
             # params = {':arg0': 0.75, ':arg1': 2, ':arg2': 'sth'}
+            # The type of parameters in param_types keys is necessary to avoid
+            # unifying 0/1 with False/True.
+            param_types = [(type(param), param) for param in params]
             params_dict = {
-                param: ":arg%d" % i for i, param in enumerate(dict.fromkeys(params))
+                param_type: ":arg%d" % i
+                for i, param_type in enumerate(dict.fromkeys(param_types))
             }
-            args = [params_dict[param] for param in params]
-            params = {value: key for key, value in params_dict.items()}
+            args = [params_dict[param_type] for param_type in param_types]
+            params = {
+                placeholder: param for (_, param), placeholder in params_dict.items()
+            }
             query %= tuple(args)
         else:
             # Handle params as sequence

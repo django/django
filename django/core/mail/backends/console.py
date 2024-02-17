@@ -1,6 +1,7 @@
 """
 Email backend that writes messages to console instead of sending them.
 """
+
 import sys
 import threading
 

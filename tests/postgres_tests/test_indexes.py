@@ -143,12 +143,29 @@ class BTreeIndexTests(IndexTestMixin, PostgreSQLSimpleTestCase):
         self.assertEqual(BTreeIndex.suffix, "btree")
 
     def test_deconstruction(self):
-        index = BTreeIndex(fields=["title"], name="test_title_btree", fillfactor=80)
+        index = BTreeIndex(fields=["title"], name="test_title_btree")
+        path, args, kwargs = index.deconstruct()
+        self.assertEqual(path, "django.contrib.postgres.indexes.BTreeIndex")
+        self.assertEqual(args, ())
+        self.assertEqual(kwargs, {"fields": ["title"], "name": "test_title_btree"})
+
+        index = BTreeIndex(
+            fields=["title"],
+            name="test_title_btree",
+            fillfactor=80,
+            deduplicate_items=False,
+        )
         path, args, kwargs = index.deconstruct()
         self.assertEqual(path, "django.contrib.postgres.indexes.BTreeIndex")
         self.assertEqual(args, ())
         self.assertEqual(
-            kwargs, {"fields": ["title"], "name": "test_title_btree", "fillfactor": 80}
+            kwargs,
+            {
+                "fields": ["title"],
+                "name": "test_title_btree",
+                "fillfactor": 80,
+                "deduplicate_items": False,
+            },
         )
 
 
@@ -455,13 +472,18 @@ class SchemaTests(PostgreSQLTestCase):
         )
 
     def test_btree_parameters(self):
-        index_name = "integer_array_btree_fillfactor"
-        index = BTreeIndex(fields=["field"], name=index_name, fillfactor=80)
+        index_name = "integer_array_btree_parameters"
+        index = BTreeIndex(
+            fields=["field"], name=index_name, fillfactor=80, deduplicate_items=False
+        )
         with connection.schema_editor() as editor:
             editor.add_index(CharFieldModel, index)
         constraints = self.get_constraints(CharFieldModel._meta.db_table)
         self.assertEqual(constraints[index_name]["type"], BTreeIndex.suffix)
-        self.assertEqual(constraints[index_name]["options"], ["fillfactor=80"])
+        self.assertEqual(
+            constraints[index_name]["options"],
+            ["fillfactor=80", "deduplicate_items=off"],
+        )
         with connection.schema_editor() as editor:
             editor.remove_index(CharFieldModel, index)
         self.assertNotIn(

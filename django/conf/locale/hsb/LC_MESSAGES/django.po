@@ -6,10 +6,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-17 02:13-0600\n"
-"PO-Revision-Date: 2023-04-25 06:49+0000\n"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 06:49+0000\n"
 "Last-Translator: Michael Wolf <milupo@sorbzilla.de>, 2016-2023\n"
-"Language-Team: Upper Sorbian (http://www.transifex.com/django/django/"
+"Language-Team: Upper Sorbian (http://app.transifex.com/django/django/"
 "language/hsb/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -294,6 +294,9 @@ msgstr "Tataršćina"
 msgid "Udmurt"
 msgstr "Udmurtšćina"
 
+msgid "Uyghur"
+msgstr "Ujguršćina"
+
 msgid "Ukrainian"
 msgstr "Ukrainšćina"
 
@@ -392,6 +395,15 @@ msgstr "Zawěsćće, zo tuta hódnota je wjetša hač abo runja %(limit_value)s.
 msgid "Ensure this value is a multiple of step size %(limit_value)s."
 msgstr ""
 "Zawěsćće, zo tuta hódnota je množina kročeloweje wulkosće %(limit_value)s."
+
+#, python-format
+msgid ""
+"Ensure this value is a multiple of step size %(limit_value)s, starting from "
+"%(offset)s, e.g. %(offset)s, %(valid_value1)s, %(valid_value2)s, and so on."
+msgstr ""
+"Zawěsćće, zo tuta hódnota je mnoho króć kročeloweje wulkosće "
+"%(limit_value)s, započinajo z %(offset)s, na př. %(offset)s, "
+"%(valid_value1)s, %(valid_value2)s a tak dale."
 
 #, python-format
 msgid ""

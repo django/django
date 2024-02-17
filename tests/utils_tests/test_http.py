@@ -334,10 +334,9 @@ class HttpDateProcessingTests(unittest.TestCase):
         )
 
     @unittest.skipIf(platform.architecture()[0] == "32bit", "The Year 2038 problem.")
-    @mock.patch("django.utils.http.datetime.datetime")
+    @mock.patch("django.utils.http.datetime")
     def test_parsing_rfc850(self, mocked_datetime):
         mocked_datetime.side_effect = datetime
-        mocked_datetime.now = mock.Mock()
         now_1 = datetime(2019, 11, 6, 8, 49, 37, tzinfo=timezone.utc)
         now_2 = datetime(2020, 11, 6, 8, 49, 37, tzinfo=timezone.utc)
         now_3 = datetime(2048, 11, 6, 8, 49, 37, tzinfo=timezone.utc)

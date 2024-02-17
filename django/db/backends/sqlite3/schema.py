@@ -20,6 +20,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_delete_column = "ALTER TABLE %(table)s DROP COLUMN %(column)s"
     sql_create_unique = "CREATE UNIQUE INDEX %(name)s ON %(table)s (%(columns)s)"
     sql_delete_unique = "DROP INDEX %(name)s"
+    sql_alter_table_comment = None
+    sql_alter_column_comment = None
 
     def __enter__(self):
         # Some SQLite schema alterations need foreign key constraints to be
@@ -108,6 +110,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         mapping = {
             f.column: self.quote_name(f.column)
             for f in model._meta.local_concrete_fields
+            if f.generated is False
         }
         # This maps field names (not columns) for things like unique_together
         rename_mapping = {}
@@ -164,7 +167,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Remove any deleted fields
         if delete_field:
             del body[delete_field.name]
-            del mapping[delete_field.column]
+            mapping.pop(delete_field.column, None)
             # Remove any implicit M2M tables
             if (
                 delete_field.many_to_many

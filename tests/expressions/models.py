@@ -1,6 +1,7 @@
 """
 Tests for F() query expression syntax.
 """
+
 import uuid
 
 from django.db import models
@@ -106,3 +107,7 @@ class UUIDPK(models.Model):
 class UUID(models.Model):
     uuid = models.UUIDField(null=True)
     uuid_fk = models.ForeignKey(UUIDPK, models.CASCADE, null=True)
+
+
+class Text(models.Model):
+    name = models.TextField()

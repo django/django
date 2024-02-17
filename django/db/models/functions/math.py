@@ -47,9 +47,11 @@ class ATan2(NumericOutputFieldMixin, Func):
         clone = self.copy()
         clone.set_source_expressions(
             [
-                Cast(expression, FloatField())
-                if isinstance(expression.output_field, IntegerField)
-                else expression
+                (
+                    Cast(expression, FloatField())
+                    if isinstance(expression.output_field, IntegerField)
+                    else expression
+                )
                 for expression in self.get_source_expressions()[::-1]
             ]
         )

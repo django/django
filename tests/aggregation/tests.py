@@ -25,6 +25,7 @@ from django.db.models import (
     Subquery,
     Sum,
     TimeField,
+    Transform,
     Value,
     Variance,
     When,
@@ -1727,6 +1728,28 @@ class AggregateTestCase(TestCase):
             ordered=False,
         )
 
+    def test_order_by_aggregate_transform(self):
+        class Mod100(Mod, Transform):
+            def __init__(self, expr):
+                super().__init__(expr, 100)
+
+        sum_field = IntegerField()
+        sum_field.register_lookup(Mod100, "mod100")
+        publisher_pages = (
+            Book.objects.values("publisher")
+            .annotate(sum_pages=Sum("pages", output_field=sum_field))
+            .order_by("sum_pages__mod100")
+        )
+        self.assertQuerySetEqual(
+            publisher_pages,
+            [
+                {"publisher": self.p2.id, "sum_pages": 528},
+                {"publisher": self.p4.id, "sum_pages": 946},
+                {"publisher": self.p1.id, "sum_pages": 747},
+                {"publisher": self.p3.id, "sum_pages": 1482},
+            ],
+        )
+
     def test_empty_result_optimization(self):
         with self.assertNumQueries(0):
             self.assertEqual(
@@ -2126,6 +2149,15 @@ class AggregateTestCase(TestCase):
         qs = Publisher.objects.filter(pk__in=author_qs)
         self.assertCountEqual(qs, [self.p1, self.p2, self.p3, self.p4])
 
+    def test_having_with_no_group_by(self):
+        author_qs = (
+            Author.objects.values(static_value=Value("static-value"))
+            .annotate(sum=Sum("age"))
+            .filter(sum__gte=0)
+            .values_list("sum", flat=True)
+        )
+        self.assertEqual(list(author_qs), [337])
+
 
 class AggregateAnnotationPruningTests(TestCase):
     @classmethod
@@ -2260,6 +2292,27 @@ class AggregateAnnotationPruningTests(TestCase):
         self.assertEqual(sql.count("select"), 3, "Subquery wrapping required")
         self.assertEqual(aggregate, {"sum_total_books": 3})
 
+    def test_referenced_composed_subquery_requires_wrapping(self):
+        total_books_qs = (
+            Author.book_set.through.objects.values("author")
+            .filter(author=OuterRef("pk"))
+            .annotate(total=Count("book"))
+        )
+        with self.assertNumQueries(1) as ctx:
+            aggregate = (
+                Author.objects.annotate(
+                    total_books=Subquery(total_books_qs.values("total")),
+                    total_books_ref=F("total_books") / 1,
+                )
+                .values("pk", "total_books_ref")
+                .aggregate(
+                    sum_total_books=Sum("total_books_ref"),
+                )
+            )
+        sql = ctx.captured_queries[0]["sql"].lower()
+        self.assertEqual(sql.count("select"), 3, "Subquery wrapping required")
+        self.assertEqual(aggregate, {"sum_total_books": 3})
+
     @skipUnlessDBFeature("supports_over_clause")
     def test_referenced_window_requires_wrapping(self):
         total_books_qs = Book.objects.annotate(
@@ -2279,3 +2332,30 @@ class AggregateAnnotationPruningTests(TestCase):
             aggregate,
             {"sum_avg_publisher_pages": 1100.0, "books_count": 2},
         )
+
+    def test_aggregate_reference_lookup_rhs(self):
+        aggregates = Author.objects.annotate(
+            max_book_author=Max("book__authors"),
+        ).aggregate(count=Count("id", filter=Q(id=F("max_book_author"))))
+        self.assertEqual(aggregates, {"count": 1})
+
+    def test_aggregate_reference_lookup_rhs_iter(self):
+        aggregates = Author.objects.annotate(
+            max_book_author=Max("book__authors"),
+        ).aggregate(count=Count("id", filter=Q(id__in=[F("max_book_author"), 0])))
+        self.assertEqual(aggregates, {"count": 1})
+
+    def test_aggregate_combined_queries(self):
+        # Combined queries could have members in their values select mask while
+        # others have them in their annotation mask which makes annotation
+        # pruning complex to implement hence why it's not implemented.
+        qs = Author.objects.values(
+            "age",
+            other=Value(0),
+        ).union(
+            Book.objects.values(
+                age=Value(0),
+                other=Value(0),
+            )
+        )
+        self.assertEqual(qs.count(), 3)

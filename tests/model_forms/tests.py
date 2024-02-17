@@ -23,7 +23,9 @@ from django.forms.models import (
 from django.template import Context, Template
 from django.test import SimpleTestCase, TestCase, ignore_warnings, skipUnlessDBFeature
 from django.test.utils import isolate_apps
+from django.utils.choices import BlankChoiceIterator
 from django.utils.deprecation import RemovedInDjango60Warning
+from django.utils.version import PYPY
 
 from .models import (
     Article,
@@ -2012,6 +2014,38 @@ class ModelFormBasicTests(TestCase):
             ),
         )
 
+    @isolate_apps("model_forms")
+    def test_callable_choices_are_lazy(self):
+        call_count = 0
+
+        def get_animal_choices():
+            nonlocal call_count
+            call_count += 1
+            return [("LION", "Lion"), ("ZEBRA", "Zebra")]
+
+        class ZooKeeper(models.Model):
+            animal = models.CharField(
+                blank=True,
+                choices=get_animal_choices,
+                max_length=5,
+            )
+
+        class ZooKeeperForm(forms.ModelForm):
+            class Meta:
+                model = ZooKeeper
+                fields = ["animal"]
+
+        self.assertEqual(call_count, 0)
+        form = ZooKeeperForm()
+        self.assertEqual(call_count, 0)
+        self.assertIsInstance(form.fields["animal"].choices, BlankChoiceIterator)
+        self.assertEqual(call_count, 0)
+        self.assertEqual(
+            form.fields["animal"].choices,
+            models.BLANK_CHOICE_DASH + [("LION", "Lion"), ("ZEBRA", "Zebra")],
+        )
+        self.assertEqual(call_count, 1)
+
     def test_recleaning_model_form_instance(self):
         """
         Re-cleaning an instance that was added via a ModelForm shouldn't raise
@@ -2896,9 +2930,22 @@ class ModelOtherFieldTests(SimpleTestCase):
         msg = (
             "The default scheme will be changed from 'http' to 'https' in Django "
             "6.0. Pass the forms.URLField.assume_scheme argument to silence this "
-            "warning."
+            "warning, or set the FORMS_URLFIELD_ASSUME_HTTPS transitional setting to "
+            "True to opt into using 'https' as the new default scheme."
         )
         with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+
+            class HomepageForm(forms.ModelForm):
+                class Meta:
+                    model = Homepage
+                    fields = "__all__"
+
+    def test_url_modelform_assume_scheme_early_adopt_https(self):
+        msg = "The FORMS_URLFIELD_ASSUME_HTTPS transitional setting is deprecated."
+        with (
+            self.assertWarnsMessage(RemovedInDjango60Warning, msg),
+            self.settings(FORMS_URLFIELD_ASSUME_HTTPS=True),
+        ):
 
             class HomepageForm(forms.ModelForm):
                 class Meta:
@@ -2984,7 +3031,10 @@ class OtherModelFormTests(TestCase):
                 return ", ".join(c.name for c in obj.colours.all())
 
         field = ColorModelChoiceField(ColourfulItem.objects.prefetch_related("colours"))
-        with self.assertNumQueries(3):  # would be 4 if prefetch is ignored
+        # CPython calls ModelChoiceField.__len__() when coercing to tuple. PyPy
+        # doesn't call __len__() and so .count() isn't called on the QuerySet.
+        # The following would trigger an extra query if prefetch were ignored.
+        with self.assertNumQueries(2 if PYPY else 3):
             self.assertEqual(
                 tuple(field.choices),
                 (

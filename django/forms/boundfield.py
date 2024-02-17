@@ -296,9 +296,10 @@ class BoundField(RenderableFieldMixin):
             not attrs.get("aria-describedby")
             and not widget.attrs.get("aria-describedby")
             and self.field.help_text
-            and self.id_for_label
+            and not self.use_fieldset
+            and self.auto_id
         ):
-            attrs["aria-describedby"] = f"{self.id_for_label}_helptext"
+            attrs["aria-describedby"] = f"{self.auto_id}_helptext"
         return attrs
 
     @property

@@ -30,6 +30,7 @@ from django.core.exceptions import (
 )
 from django.core.paginator import InvalidPage
 from django.db.models import F, Field, ManyToOneRel, OrderBy
+from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import Combinable
 from django.urls import reverse
 from django.utils.deprecation import RemovedInDjango60Warning
@@ -356,9 +357,9 @@ class ChangeList:
         """
         Return the proper model field name corresponding to the given
         field_name to use for ordering. field_name may either be the name of a
-        proper model field or the name of a method (on the admin or model) or a
-        callable with the 'admin_order_field' attribute. Return None if no
-        proper model field name can be matched.
+        proper model field, possibly across relations, or the name of a method
+        (on the admin or model) or a callable with the 'admin_order_field'
+        attribute. Return None if no proper model field name can be matched.
         """
         try:
             field = self.lookup_opts.get_field(field_name)
@@ -371,7 +372,12 @@ class ChangeList:
             elif hasattr(self.model_admin, field_name):
                 attr = getattr(self.model_admin, field_name)
             else:
-                attr = getattr(self.model, field_name)
+                try:
+                    attr = getattr(self.model, field_name)
+                except AttributeError:
+                    if LOOKUP_SEP in field_name:
+                        return field_name
+                    raise
             if isinstance(attr, property) and hasattr(attr, "fget"):
                 attr = attr.fget
             return getattr(attr, "admin_order_field", None)

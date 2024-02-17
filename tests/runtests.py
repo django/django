@@ -26,11 +26,11 @@ else:
     from django.db import connection, connections
     from django.test import TestCase, TransactionTestCase
     from django.test.runner import get_max_test_processes, parallel_type
-    from django.test.selenium import SeleniumTestCaseBase
+    from django.test.selenium import SeleniumTestCase, SeleniumTestCaseBase
     from django.test.utils import NullTimeKeeper, TimeKeeper, get_runner
     from django.utils.deprecation import RemovedInDjango60Warning
     from django.utils.log import DEFAULT_LOGGING
-    from django.utils.version import PY312
+    from django.utils.version import PY312, PYPY
 
 try:
     import MySQLdb
@@ -52,7 +52,8 @@ warnings.simplefilter("error", RuntimeWarning)
 # references, which are a minority, so the garbage collection threshold can be
 # larger than the default threshold of 700 allocations + deallocations without
 # much increase in memory usage.
-gc.set_threshold(100_000)
+if not PYPY:
+    gc.set_threshold(100_000)
 
 RUNTESTS_DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -599,6 +600,11 @@ if __name__ == "__main__":
         help="A comma-separated list of browsers to run the Selenium tests against.",
     )
     parser.add_argument(
+        "--screenshots",
+        action="store_true",
+        help="Take screenshots during selenium tests to capture the user interface.",
+    )
+    parser.add_argument(
         "--headless",
         action="store_true",
         help="Run selenium tests in headless mode, if the browser supports the option.",
@@ -699,6 +705,10 @@ if __name__ == "__main__":
         )
     if using_selenium_hub and not options.external_host:
         parser.error("--selenium-hub and --external-host must be used together.")
+    if options.screenshots and not options.selenium:
+        parser.error("--screenshots require --selenium to be used.")
+    if options.screenshots and options.tags:
+        parser.error("--screenshots and --tag are mutually exclusive.")
 
     # Allow including a trailing slash on app_labels for tab completion convenience
     options.modules = [os.path.normpath(labels) for labels in options.modules]
@@ -748,6 +758,9 @@ if __name__ == "__main__":
             SeleniumTestCaseBase.external_host = options.external_host
         SeleniumTestCaseBase.headless = options.headless
         SeleniumTestCaseBase.browsers = options.selenium
+        if options.screenshots:
+            options.tags = ["screenshot"]
+            SeleniumTestCase.screenshots = options.screenshots
 
     if options.bisect:
         bisect_tests(

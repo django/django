@@ -1,6 +1,6 @@
-==========
-JavaScript
-==========
+===============
+JavaScript code
+===============
 
 While most of Django core is Python, the ``admin`` and ``gis`` contrib apps
 contain JavaScript code.

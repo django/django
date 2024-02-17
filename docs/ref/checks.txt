@@ -213,6 +213,8 @@ Model fields
   ``GeneratedField``\s.
 * **fields.E222**: ``<database>`` does not support persisted
   ``GeneratedField``\s.
+* **fields.E223**: ``GeneratedField.output_field`` has errors: ...
+* **fields.W224**: ``GeneratedField.output_field`` has warnings: ...
 * **fields.E900**: ``IPAddressField`` has been removed except for support in
   historical migrations.
 * **fields.W900**: ``IPAddressField`` has been deprecated. Support for it
@@ -730,9 +732,9 @@ with the admin site:
 * **admin.E106**: The value of ``<InlineModelAdmin class>.model`` must be a
   ``Model``.
 * **admin.E107**: The value of ``list_display`` must be a list or tuple.
-* **admin.E108**: The value of ``list_display[n]`` refers to ``<label>``,
-  which is not a callable, an attribute of ``<ModelAdmin class>``, or an
-  attribute or method on ``<model>``.
+* **admin.E108**: The value of ``list_display[n]`` refers to ``<label>``, which
+  is not a callable or attribute of ``<ModelAdmin class>``, or an attribute,
+  method, or field on ``<model>``.
 * **admin.E109**: The value of ``list_display[n]`` must not be a many-to-many
   field or a reverse foreign key.
 * **admin.E110**: The value of ``list_display_links`` must be a list, a tuple,
@@ -899,6 +901,8 @@ fields:
   instance so that it's not shared between all field instances. *This check was
   changed to* ``fields.E010`` *in Django 3.1*.
 * **postgres.W004**: Base field for array has warnings: ...
+
+.. _sites-system-checks:
 
 ``sites``
 ---------

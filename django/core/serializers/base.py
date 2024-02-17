@@ -1,6 +1,7 @@
 """
 Module for abstract serializer/unserializer base classes.
 """
+
 from io import StringIO
 
 from django.core.exceptions import ObjectDoesNotExist

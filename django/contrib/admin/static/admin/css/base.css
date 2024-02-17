@@ -84,6 +84,8 @@ html[data-theme="light"],
         "Segoe UI Emoji",
         "Segoe UI Symbol",
         "Noto Color Emoji";
+
+    color-scheme: light;
 }
 
 html, body {
@@ -102,7 +104,7 @@ body {
 /* LINKS */
 
 a:link, a:visited {
-    color: var(--body-fg);
+    color: var(--link-fg);
     text-decoration: none;
     transition: color 0.15s, background 0.15s;
 }
@@ -482,8 +484,13 @@ textarea {
     vertical-align: top;
 }
 
-input[type=text], input[type=password], input[type=email], input[type=url],
-input[type=number], input[type=tel], textarea, select, .vTextField {
+/*
+Minifiers remove the default (text) "type" attribute from "input" HTML tags.
+Add input:not([type]) to make the CSS stylesheet work the same.
+*/
+input:not([type]), input[type=text], input[type=password], input[type=email],
+input[type=url], input[type=number], input[type=tel], textarea, select,
+.vTextField {
     border: 1px solid var(--border-color);
     border-radius: 4px;
     padding: 5px 6px;
@@ -492,9 +499,13 @@ input[type=number], input[type=tel], textarea, select, .vTextField {
     background-color: var(--body-bg);
 }
 
-input[type=text]:focus, input[type=password]:focus, input[type=email]:focus,
-input[type=url]:focus, input[type=number]:focus, input[type=tel]:focus,
-textarea:focus, select:focus, .vTextField:focus {
+/*
+Minifiers remove the default (text) "type" attribute from "input" HTML tags.
+Add input:not([type]) to make the CSS stylesheet work the same.
+*/
+input:not([type]):focus, input[type=text]:focus, input[type=password]:focus,
+input[type=email]:focus, input[type=url]:focus, input[type=number]:focus,
+input[type=tel]:focus, textarea:focus, select:focus, .vTextField:focus {
     border-color: var(--body-quiet-color);
 }
 
@@ -878,9 +889,10 @@ a.deletelink:focus, a.deletelink:hover {
     margin-right: -300px;
 }
 
-#footer {
-    clear: both;
-    padding: 10px;
+@media (forced-colors: active) {
+  #content-related {
+      border: 1px solid;
+  }
 }
 
 /* COLUMN TYPES */
@@ -926,6 +938,12 @@ a.deletelink:focus, a.deletelink:hover {
 
 #header a:focus , #header a:hover {
     text-decoration: underline;
+}
+
+@media (forced-colors: active) {
+  #header {
+      border-bottom: 1px solid;
+  }
 }
 
 #branding {
@@ -1088,6 +1106,9 @@ a.deletelink:focus, a.deletelink:hover {
 /* PAGINATOR */
 
 .paginator {
+    display: flex;
+    align-items: center;
+    gap: 4px;
     font-size: 0.8125rem;
     padding-top: 10px;
     padding-bottom: 10px;
@@ -1129,6 +1150,10 @@ a.deletelink:focus, a.deletelink:hover {
 .paginator a:focus, .paginator a:hover {
     color: white;
     background: var(--link-hover-color);
+}
+
+.paginator input {
+    margin-left: auto;
 }
 
 .base-svgs {

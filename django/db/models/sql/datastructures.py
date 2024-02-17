@@ -2,6 +2,7 @@
 Useful auxiliary data structures for query construction. Not useful outside
 the SQL domain.
 """
+
 import warnings
 
 from django.core.exceptions import FullResultSet

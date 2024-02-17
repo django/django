@@ -107,6 +107,16 @@ thead th.sorted .text {
     border-left: none;
 }
 
+.paginator .end {
+    margin-left: 6px;
+    margin-right: 0;
+}
+
+.paginator input {
+    margin-left: 0;
+    margin-right: auto;
+}
+
 /* FORMS */
 
 .aligned label {
@@ -141,6 +151,7 @@ form ul.inline li {
 
 form .aligned p.help,
 form .aligned div.help {
+    margin-left: 0;
     margin-right: 160px;
     padding-right: 10px;
 }
@@ -154,17 +165,11 @@ form .aligned p.time div.help.timezonewarning {
     padding-right: 0;
 }
 
-form .wide p.help, form .wide div.help {
+form .wide p.help,
+form .wide ul.errorlist,
+form .wide div.help {
     padding-left: 0;
     padding-right: 50px;
-}
-
-form .wide p,
-form .wide ul.errorlist,
-form .wide input + p.help,
-form .wide input + div.help {
-    margin-right: 200px;
-    margin-left: 0px;
 }
 
 .submit-row {
@@ -192,12 +197,7 @@ fieldset .fieldBox {
     top: 0;
     left: auto;
     right: 10px;
-    background: url(../img/calendar-icons.svg) 0 -30px no-repeat;
-}
-
-.calendarbox .calendarnav-previous:focus,
-.calendarbox .calendarnav-previous:hover {
-    background-position: 0 -45px;
+    background: url(../img/calendar-icons.svg) 0 -15px no-repeat;
 }
 
 .calendarnav-next {
@@ -205,11 +205,6 @@ fieldset .fieldBox {
     right: auto;
     left: 10px;
     background: url(../img/calendar-icons.svg) 0 0 no-repeat;
-}
-
-.calendarbox .calendarnav-next:focus,
-.calendarbox .calendarnav-next:hover {
-    background-position: 0 -15px;
 }
 
 .calendar caption, .calendarbox h2 {
@@ -285,4 +280,8 @@ form .form-row p.datetime {
 .inline-related h3 span.delete label {
     margin-left: inherit;
     margin-right: 2px;
+}
+
+.selector .selector-chooser {
+    margin: 0;
 }

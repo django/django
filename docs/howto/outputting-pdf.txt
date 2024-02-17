@@ -15,7 +15,7 @@ printer-friendly NCAA tournament brackets, as PDF files, for people
 participating in a March Madness contest.
 
 .. _ReportLab: https://docs.reportlab.com/
-.. _kusports.com: http://www2.kusports.com/
+.. _kusports.com: https://www2.kusports.com/
 
 Install ReportLab
 =================

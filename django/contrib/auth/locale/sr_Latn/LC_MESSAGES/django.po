@@ -1,24 +1,24 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Igor Jerosimić, 2021
+# Igor Jerosimić, 2021,2023
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janos Guljas <janos@resenje.org>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-09-22 09:22+0000\n"
-"Last-Translator: Transifex Bot <>\n"
-"Language-Team: Serbian (Latin) (http://www.transifex.com/django/django/"
+"POT-Creation-Date: 2023-03-17 03:19-0500\n"
+"PO-Revision-Date: 2023-12-04 08:09+0000\n"
+"Last-Translator: Igor Jerosimić, 2021,2023\n"
+"Language-Team: Serbian (Latin) (http://app.transifex.com/django/django/"
 "language/sr@latin/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: sr@latin\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 msgid "Personal info"
 msgstr "Lični podaci"
@@ -41,7 +41,7 @@ msgid "Change password: %s"
 msgstr "Izmeni lozinku: %s"
 
 msgid "Authentication and Authorization"
-msgstr ""
+msgstr "Autentikacija i Autorizacija"
 
 msgid "password"
 msgstr "lozinka"
@@ -53,10 +53,10 @@ msgid "No password set."
 msgstr "Lozinka nije uneta."
 
 msgid "Invalid password format or unknown hashing algorithm."
-msgstr ""
+msgstr "Neispravan format lozinke ili nepoznat heš algoritam."
 
 msgid "The two password fields didn’t match."
-msgstr ""
+msgstr "Dva polja za lozinke se ne poklapaju."
 
 msgid "Password"
 msgstr "Lozinka"
@@ -65,7 +65,7 @@ msgid "Password confirmation"
 msgstr "Potvrda lozinke"
 
 msgid "Enter the same password as before, for verification."
-msgstr ""
+msgstr "Unesite istu lozinku kao malopre radi verifikacije."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user’s "
@@ -82,7 +82,7 @@ msgid "This account is inactive."
 msgstr "Ovaj nalog je neaktivan."
 
 msgid "Email"
-msgstr ""
+msgstr "I-mejl"
 
 msgid "New password"
 msgstr "Nova lozinka"
@@ -112,19 +112,19 @@ msgid "hash"
 msgstr "heš"
 
 msgid "variety"
-msgstr ""
+msgstr "varijanta"
 
 msgid "version"
-msgstr ""
+msgstr "verzija"
 
 msgid "memory cost"
-msgstr ""
+msgstr "memorijska zahtevnost"
 
 msgid "time cost"
-msgstr ""
+msgstr "vremenska zahtevnost"
 
 msgid "parallelism"
-msgstr ""
+msgstr "paralelizam"
 
 msgid "work factor"
 msgstr "faktor rada"
@@ -133,13 +133,13 @@ msgid "checksum"
 msgstr "suma za proveru"
 
 msgid "block size"
-msgstr ""
+msgstr "veličina bloka"
 
 msgid "name"
 msgstr "ime"
 
 msgid "content type"
-msgstr ""
+msgstr "tip sadržaja"
 
 msgid "codename"
 msgstr "šifra dozvole"
@@ -170,12 +170,14 @@ msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
 "each of their groups."
 msgstr ""
+"Grupe kojima pripada ovaj korisnik. Korisnik će dobiti sve dozvole koje su "
+"date grupama kojima pripada."
 
 msgid "user permissions"
 msgstr "korisničke dozvole"
 
 msgid "Specific permissions for this user."
-msgstr ""
+msgstr "Dozvole koje se odnose na ovog korisnika."
 
 msgid "username"
 msgstr "korisničko ime"
@@ -193,7 +195,7 @@ msgid "last name"
 msgstr "prezime"
 
 msgid "email address"
-msgstr ""
+msgstr "Adresa e-pošte:"
 
 msgid "staff status"
 msgstr "status člana posade"
@@ -263,8 +265,8 @@ msgid "Password reset on %(site_name)s"
 msgstr "Resetovanje lozinke na sajtu %(site_name)s"
 
 msgid ""
-"Enter a valid username. This value may contain only English letters, "
-"numbers, and @/./+/-/_ characters."
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
 msgstr ""
 
 msgid ""

@@ -1,8 +1,8 @@
-============================================
-Django 5.0 release notes - UNDER DEVELOPMENT
-============================================
+========================
+Django 5.0 release notes
+========================
 
-*Expected December 2023*
+*December 4, 2023*
 
 Welcome to Django 5.0!
 
@@ -61,7 +61,7 @@ For example, the template below:
     <div>
       {{ form.name.label_tag }}
       {% if form.name.help_text %}
-        <div class="helptext" id="{{ form.name.id_for_label }}_helptext">
+        <div class="helptext" id="{{ form.name.auto_id }}_helptext">
           {{ form.name.help_text|safe }}
         </div>
       {% endif %}
@@ -71,7 +71,7 @@ For example, the template below:
         <div class="col">
           {{ form.email.label_tag }}
           {% if form.email.help_text %}
-            <div class="helptext" id="{{ form.email.id_for_label }}_helptext">
+            <div class="helptext" id="{{ form.email.auto_id }}_helptext">
               {{ form.email.help_text|safe }}
             </div>
           {% endif %}
@@ -81,7 +81,7 @@ For example, the template below:
         <div class="col">
           {{ form.password.label_tag }}
           {% if form.password.help_text %}
-            <div class="helptext" id="{{ form.password.id_for_label }}_helptext">
+            <div class="helptext" id="{{ form.password.auto_id }}_helptext">
               {{ form.password.help_text|safe }}
             </div>
           {% endif %}
@@ -142,7 +142,11 @@ to create a field that is always computed from other fields. For example::
 
     class Square(models.Model):
         side = models.IntegerField()
-        area = models.GeneratedField(expression=F("side") * F("side"), db_persist=True)
+        area = models.GeneratedField(
+            expression=F("side") * F("side"),
+            output_field=models.BigIntegerField(),
+            db_persist=True,
+        )
 
 More options for declaring field choices
 ----------------------------------------
@@ -334,8 +338,8 @@ File Storage
 Forms
 ~~~~~
 
-* The new ``assume_scheme`` argument for :class:`~django.forms.URLField` allows
-  specifying a default URL scheme.
+* The new :attr:`~django.forms.URLField.assume_scheme` argument for
+  :class:`~django.forms.URLField` allows specifying a default URL scheme.
 
 * In order to improve accessibility, the following changes are made:
 
@@ -428,8 +432,9 @@ Tests
 
 * :class:`~django.test.AsyncClient` now supports the ``follow`` parameter.
 
-* The new :option:`test --durations` option allows showing the duration of the
-  slowest tests on Python 3.12+.
+* :class:`~django.test.runner.DiscoverRunner` now allows showing the duration
+  of the slowest tests using the :option:`test --durations` option (available
+  on Python 3.12+).
 
 Validators
 ~~~~~~~~~~
@@ -504,6 +509,12 @@ Django < 5.0 should be replaced with a ``UUIDField`` subclass backed by
         def db_type(self, connection):
             return "char(32)"
 
+        def get_db_prep_value(self, value, connection, prepared=False):
+            value = super().get_db_prep_value(value, connection, prepared)
+            if value is not None:
+                value = value.hex
+            return value
+
 For example::
 
     class MyModel(models.Model):
@@ -511,9 +522,7 @@ For example::
 
 Should become::
 
-    class Char32UUIDField(models.UUIDField):
-        def db_type(self, connection):
-            return "char(32)"
+    class Char32UUIDField(models.UUIDField): ...
 
 
     class MyModel(models.Model):
@@ -580,6 +589,11 @@ Miscellaneous
 
 * The minimum supported version of ``docutils`` is increased to 0.19.
 
+* Filtering querysets against overflowing integer values now always returns an
+  empty queryset. As a consequence, you may need to use ``ExpressionWrapper()``
+  to :ref:`explicitly wrap <using-f-with-annotations>` arithmetic against
+  integer fields in such cases.
+
 .. _deprecated-features-5.0:
 
 Features deprecated in 5.0
@@ -608,7 +622,11 @@ Miscellaneous
 * The ``ForeignObject.get_reverse_joining_columns()`` method is deprecated.
 
 * The default scheme for ``forms.URLField`` will change from ``"http"`` to
-  ``"https"`` in Django 6.0.
+  ``"https"`` in Django 6.0. Set :setting:`FORMS_URLFIELD_ASSUME_HTTPS`
+  transitional setting to ``True`` to opt into assuming ``"https"`` during the
+  Django 5.x release cycle.
+
+* ``FORMS_URLFIELD_ASSUME_HTTPS`` transitional setting is deprecated.
 
 * Support for calling ``format_html()`` without passing args or kwargs will be
   removed.

@@ -22,3 +22,8 @@ class TruncatecharsTests(SimpleTestCase):
             "truncatechars03", {"a": "Testing, testing"}
         )
         self.assertEqual(output, "Testing, testing")
+
+    @setup({"truncatechars04": "{{ a|truncatechars:3 }}"})
+    def test_truncatechars04(self):
+        output = self.engine.render_to_string("truncatechars04", {"a": "abc"})
+        self.assertEqual(output, "abc")

@@ -4,15 +4,15 @@
 # Aarni Koskela, 2015,2017,2020-2022
 # Antti Kaihola <antti.15+transifex@kaihola.fi>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Jiri Grönroos <jiri.gronroos@iki.fi>, 2021
+# Jiri Grönroos <jiri.gronroos@iki.fi>, 2021,2023
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:26-0500\n"
-"PO-Revision-Date: 2022-07-25 07:59+0000\n"
-"Last-Translator: Aarni Koskela\n"
-"Language-Team: Finnish (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2023-09-18 15:04-0300\n"
+"PO-Revision-Date: 2023-12-04 07:59+0000\n"
+"Last-Translator: Jiri Grönroos <jiri.gronroos@iki.fi>, 2021,2023\n"
+"Language-Team: Finnish (http://app.transifex.com/django/django/language/"
 "fi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -66,12 +66,22 @@ msgstr ""
 "allaolevasta laatikosta ja siirtämällä ne takaisin valitsemattomiin "
 "klikkamalla \"Poista\"-nuolta laatikoiden välillä."
 
+#, javascript-format
+msgid "Type into this box to filter down the list of selected %s."
+msgstr ""
+
 msgid "Remove all"
 msgstr "Poista kaikki"
 
 #, javascript-format
 msgid "Click to remove all chosen %s at once."
 msgstr "Klikkaa poistaaksesi kaikki valitut %s kerralla."
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -235,6 +245,55 @@ msgctxt "abbrev. month December"
 msgid "Dec"
 msgstr "Joulu"
 
+msgid "Sunday"
+msgstr "Sunnuntai"
+
+msgid "Monday"
+msgstr "Maanantai"
+
+msgid "Tuesday"
+msgstr "Tiistai"
+
+msgid "Wednesday"
+msgstr "Keskiviikko"
+
+msgid "Thursday"
+msgstr "Torstai"
+
+msgid "Friday"
+msgstr "Perjantai"
+
+msgid "Saturday"
+msgstr "Lauantai"
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr "Su"
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr "Ma"
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr "Ti"
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr "Ke"
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr "To"
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr "Pe"
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr "La"
+
 msgctxt "one letter Sunday"
 msgid "S"
 msgstr "Su"
@@ -262,12 +321,6 @@ msgstr "Pe"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "La"
-
-msgid ""
-"You have already submitted this form. Are you sure you want to submit it "
-"again?"
-msgstr ""
-"Olet jo lähettänyt tämän lomakkeen. Haluatko varmasti lähettää sen uudelleen?"
 
 msgid "Show"
 msgstr "Näytä"

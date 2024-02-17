@@ -1,7 +1,16 @@
 import operator
 
 from django.db import DatabaseError, NotSupportedError, connection
-from django.db.models import Exists, F, IntegerField, OuterRef, Subquery, Value
+from django.db.models import (
+    Exists,
+    F,
+    IntegerField,
+    OuterRef,
+    Subquery,
+    Transform,
+    Value,
+)
+from django.db.models.functions import Mod
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
 
@@ -321,6 +330,23 @@ class QuerySetSetOperationTests(TestCase):
             [6, 7, 8, 9, 0, 1, 2, 3, 4, 5],
             operator.itemgetter("num"),
         )
+
+    def test_order_by_annotation_transform(self):
+        class Mod2(Mod, Transform):
+            def __init__(self, expr):
+                super().__init__(expr, 2)
+
+        output_field = IntegerField()
+        output_field.register_lookup(Mod2, "mod2")
+        qs1 = Number.objects.annotate(
+            annotation=Value(1, output_field=output_field),
+        )
+        qs2 = Number.objects.annotate(
+            annotation=Value(2, output_field=output_field),
+        )
+        msg = "Ordering combined queries by transforms is not implemented."
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            list(qs1.union(qs2).order_by("annotation__mod2"))
 
     def test_union_with_select_related_and_order(self):
         e1 = ExtraInfo.objects.create(value=7, info="e1")

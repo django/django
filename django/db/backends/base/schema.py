@@ -112,7 +112,7 @@ class BaseDatabaseSchemaEditor:
 
     sql_create_unique = (
         "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s "
-        "UNIQUE (%(columns)s)%(deferrable)s"
+        "UNIQUE%(nulls_distinct)s (%(columns)s)%(deferrable)s"
     )
     sql_delete_unique = sql_delete_constraint
 
@@ -414,10 +414,13 @@ class BaseDatabaseSchemaEditor:
         """Return the sql and params for the field's database default."""
         from django.db.models.expressions import Value
 
-        sql = "%s" if isinstance(field.db_default, Value) else "(%s)"
+        db_default = field._db_default_expression
+        sql = (
+            self._column_default_sql(field) if isinstance(db_default, Value) else "(%s)"
+        )
         query = Query(model=field.model)
         compiler = query.get_compiler(connection=self.connection)
-        default_sql, params = compiler.compile(field.db_default)
+        default_sql, params = compiler.compile(db_default)
         if self.connection.features.requires_literal_defaults:
             # Some databases doesn't support parameterized defaults (Oracle,
             # SQLite). If this is the case, the individual schema backend
@@ -672,13 +675,14 @@ class BaseDatabaseSchemaEditor:
                 sql.rename_table_references(old_db_table, new_db_table)
 
     def alter_db_table_comment(self, model, old_db_table_comment, new_db_table_comment):
-        self.execute(
-            self.sql_alter_table_comment
-            % {
-                "table": self.quote_name(model._meta.db_table),
-                "comment": self.quote_value(new_db_table_comment or ""),
-            }
-        )
+        if self.sql_alter_table_comment and self.connection.features.supports_comments:
+            self.execute(
+                self.sql_alter_table_comment
+                % {
+                    "table": self.quote_name(model._meta.db_table),
+                    "comment": self.quote_value(new_db_table_comment or ""),
+                }
+            )
 
     def alter_db_tablespace(self, model, old_db_tablespace, new_db_tablespace):
         """Move a model's table between tablespaces."""
@@ -725,9 +729,9 @@ class BaseDatabaseSchemaEditor:
                 namespace, _ = split_identifier(model._meta.db_table)
                 definition += " " + self.sql_create_column_inline_fk % {
                     "name": self._fk_constraint_name(model, field, constraint_suffix),
-                    "namespace": "%s." % self.quote_name(namespace)
-                    if namespace
-                    else "",
+                    "namespace": (
+                        "%s." % self.quote_name(namespace) if namespace else ""
+                    ),
                     "column": self.quote_name(field.column),
                     "to_table": self.quote_name(to_table),
                     "to_column": self.quote_name(to_column),
@@ -747,9 +751,9 @@ class BaseDatabaseSchemaEditor:
         }
         self.execute(sql, params)
         # Drop the default if we need to
-        # (Django usually does not use in-database defaults)
         if (
-            not self.skip_default_on_alter(field)
+            field.db_default is NOT_PROVIDED
+            and not self.skip_default_on_alter(field)
             and self.effective_default(field) is not None
         ):
             changes_sql, params = self._alter_column_default_sql(
@@ -1644,6 +1648,14 @@ class BaseDatabaseSchemaEditor:
         ):
             old_kwargs.pop("to", None)
             new_kwargs.pop("to", None)
+        # db_default can take many form but result in the same SQL.
+        if (
+            old_kwargs.get("db_default")
+            and new_kwargs.get("db_default")
+            and self.db_default_sql(old_field) == self.db_default_sql(new_field)
+        ):
+            old_kwargs.pop("db_default")
+            new_kwargs.pop("db_default")
         return self.quote_name(old_field.column) != self.quote_name(
             new_field.column
         ) or (old_path, old_args, old_kwargs) != (new_path, new_args, new_kwargs)
@@ -1928,11 +1940,13 @@ class BaseDatabaseSchemaEditor:
         """Return all constraint names matching the columns and conditions."""
         if column_names is not None:
             column_names = [
-                self.connection.introspection.identifier_converter(
-                    truncate_name(name, self.connection.ops.max_name_length())
+                (
+                    self.connection.introspection.identifier_converter(
+                        truncate_name(name, self.connection.ops.max_name_length())
+                    )
+                    if self.connection.features.truncates_names
+                    else self.connection.introspection.identifier_converter(name)
                 )
-                if self.connection.features.truncates_names
-                else self.connection.introspection.identifier_converter(name)
                 for name in column_names
             ]
         with self.connection.cursor() as cursor:

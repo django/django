@@ -2,7 +2,7 @@
 #
 # Translators:
 # Branko Kokanovic <branko@kokanovic.org>, 2018-2019
-# Igor Jerosimić, 2019-2021
+# Igor Jerosimić, 2019-2021,2023
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janos Guljas <janos@resenje.org>, 2011-2012
 # Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2021
@@ -10,17 +10,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-11-24 16:29+0000\n"
-"Last-Translator: Mariusz Felisiak <felisiak.mariusz@gmail.com>\n"
-"Language-Team: Serbian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 06:49+0000\n"
+"Last-Translator: Igor Jerosimić, 2019-2021,2023\n"
+"Language-Team: Serbian (http://app.transifex.com/django/django/language/"
 "sr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: sr\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 msgid "Afrikaans"
 msgstr "африкански"
@@ -54,6 +54,9 @@ msgstr "босански"
 
 msgid "Catalan"
 msgstr "каталонски"
+
+msgid "Central Kurdish (Sorani)"
+msgstr "централнокурдски (сорани)"
 
 msgid "Czech"
 msgstr "чешки"
@@ -295,6 +298,9 @@ msgstr "татарски"
 msgid "Udmurt"
 msgstr "удмуртски"
 
+msgid "Uyghur"
+msgstr "Ујгури"
+
 msgid "Ukrainian"
 msgstr "украјински"
 
@@ -390,6 +396,19 @@ msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "Ова вредност мора бити већа од %(limit_value)s или тачно толико."
 
 #, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr "Ова вредност мора да умножак величине корака %(limit_value)s."
+
+#, python-format
+msgid ""
+"Ensure this value is a multiple of step size %(limit_value)s, starting from "
+"%(offset)s, e.g. %(offset)s, %(valid_value1)s, %(valid_value2)s, and so on."
+msgstr ""
+"Уверите се да је ова вредност вишекратник величине корака %(limit_value)s, "
+"почевши од %(offset)s, нпр. %(offset)s, %(valid_value1)s, %(valid_value2)s, "
+"и тако даље."
+
+#, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
 "%(show_value)d)."
@@ -468,6 +487,10 @@ msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr "%(model_name)s са пољем %(field_labels)s већ постоји."
 
 #, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr "Ограничење „%(name)s“ је прекршено."
+
+#, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Вредност %(value)r није валидна."
 
@@ -481,8 +504,8 @@ msgstr "Ово поље не може да остане празно."
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s са пољем %(field_label)s већ постоји."
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -508,6 +531,9 @@ msgstr "Булова вредност (True или False)"
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "Стринг са макс. дужином %(max_length)s"
+
+msgid "String (unlimited)"
+msgstr "Стринг (неограниченo)"
 
 msgid "Comma-separated integers"
 msgstr "Цели бројеви раздвојени запетама"
@@ -781,18 +807,18 @@ msgstr ""
 "настави."
 
 #, python-format
-msgid "Please submit at most %d form."
-msgid_plural "Please submit at most %d forms."
-msgstr[0] "Молим проследите највише %d форму."
-msgstr[1] "Молим проследите највише %d форме."
-msgstr[2] "Молим проследите највише %d форми."
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] "Молим проследите највише %(num)d форму."
+msgstr[1] "Молим проследите највише %(num)d форме."
+msgstr[2] "Молим проследите највише %(num)d форми."
 
 #, python-format
-msgid "Please submit at least %d form."
-msgid_plural "Please submit at least %d forms."
-msgstr[0] "Молим проследите најмање %d форму."
-msgstr[1] "Молим проследите најмање %d форме."
-msgstr[2] "Молим проследите најмање %d форми."
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] "Молим проследите најмање %(num)d форму."
+msgstr[1] "Молим проследите најмање %(num)d форме."
+msgstr[2] "Молим проследите најмање %(num)d форми."
 
 msgid "Order"
 msgstr "Редослед"
@@ -1196,21 +1222,21 @@ msgid ""
 "origin” requests."
 msgstr ""
 "Ако сте подесили интернет прегледач да не шаље \"Referer\" заглавља, поново "
-"их укључите, барем за овај сајт, или за HTTPS конекције, или за \"same-origin"
-"\" захтеве."
+"их укључите, барем за овај сајт, или за HTTPS конекције, или за \"same-"
+"origin\" захтеве."
 
 msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
 "including the “Referrer-Policy: no-referrer” header, please remove them. The "
 "CSRF protection requires the “Referer” header to do strict referer checking. "
-"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" …> for links to third-party sites."
+"If you’re concerned about privacy, use alternatives like <a "
+"rel=\"noreferrer\" …> for links to third-party sites."
 msgstr ""
 "Ако користите <meta name=\"referrer\" content=\"no-referrer\"> таг или "
 "\"Referrer-Policy: no-referrer\" заглавље, молимо да их уклоните. CSRF "
 "заштита захтева \"Referer\" заглавље да би се обавила стриктна \"referrer\" "
-"провера. Уколико вас брине приватност, користите алтернативе као <a rel="
-"\"noreferrer\" ...> за линкове ка другим сајтовима."
+"провера. Уколико вас брине приватност, користите алтернативе као <a "
+"rel=\"noreferrer\" ...> за линкове ка другим сајтовима."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
@@ -1303,13 +1329,14 @@ msgstr ""
 #, python-format
 msgid ""
 "You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> is in your settings file and you have not configured any "
-"URLs."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
+"configured any URLs."
 msgstr ""
 "Ова страна је приказана јер је <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> у вашим подешавањима и нисте конфигурисали ниједан URL."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> у вашим подешавањима и нисте конфигурисали "
+"ниједан URL."
 
 msgid "Django Documentation"
 msgstr "Ђанго документација"

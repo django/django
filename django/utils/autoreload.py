@@ -230,7 +230,7 @@ def get_child_arguments():
     exe_entrypoint = py_script.with_suffix(".exe")
 
     args = [sys.executable] + ["-W%s" % o for o in sys.warnoptions]
-    if sys.implementation.name == "cpython":
+    if sys.implementation.name in ("cpython", "pypy"):
         args.extend(
             f"-X{key}" if value is True else f"-X{key}={value}"
             for key, value in sys._xoptions.items()

@@ -273,8 +273,8 @@ See :doc:`/topics/cache`.
 
 Default: ``600``
 
-The default number of seconds to cache a page for the :ref:`cache middleware
-<the-per-site-cache>`.
+The default integer number of seconds to cache a page for the
+:ref:`cache middleware <the-per-site-cache>`.
 
 See :doc:`/topics/cache`.
 
@@ -422,8 +422,7 @@ A dotted path to the view function to be used when an incoming request is
 rejected by the :doc:`CSRF protection </ref/csrf>`. The function should have
 this signature::
 
-    def csrf_failure(request, reason=""):
-        ...
+    def csrf_failure(request, reason=""): ...
 
 where ``reason`` is a short message (intended for developers or logging, not
 for end users) indicating the reason the request was rejected. It should return
@@ -663,8 +662,10 @@ A string representing the time zone for this database connection or ``None``.
 This inner option of the :setting:`DATABASES` setting accepts the same values
 as the general :setting:`TIME_ZONE` setting.
 
-When :setting:`USE_TZ` is ``True`` and this option is set, reading datetimes
-from the database returns aware datetimes in this time zone instead of UTC.
+When :setting:`USE_TZ` is ``True``, reading datetimes from the database
+returns aware datetimes with the timezone set to this option's value if not
+``None``, or to UTC otherwise.
+
 When :setting:`USE_TZ` is ``False``, it is an error to set this option.
 
 * If the database backend doesn't support time zones (e.g. SQLite, MySQL,
@@ -687,13 +688,18 @@ When :setting:`USE_TZ` is ``False``, it is an error to set this option.
     third-party systems connect to the same database and expect to find
     datetimes in local time, then you must set this option.
 
-* If the database backend supports time zones (e.g. PostgreSQL), the
-  ``TIME_ZONE`` option is very rarely needed. It can be changed at any time;
-  the database takes care of converting datetimes to the desired time zone.
+* If the database backend supports time zones (e.g., PostgreSQL), then the
+  database connection's time zone is set to this value.
 
-  Setting the time zone of the database connection may be useful for running
-  raw SQL queries involving date/time functions provided by the database, such
-  as ``date_trunc``, because their results depend on the time zone.
+  Although setting the ``TIME_ZONE`` option is very rarely needed, there are
+  situations where it becomes necessary. Specifically, it's recommended to
+  match the general :setting:`TIME_ZONE` setting when dealing with raw queries
+  involving date/time functions like PostgreSQL's ``date_trunc()`` or
+  ``generate_series()``, especially when generating time-based series that
+  transition daylight savings.
+
+  This value can be changed at any time, the database will handle the
+  conversion of datetimes to the configured time zone.
 
   However, this has a downside: receiving all datetimes in local time makes
   datetime arithmetic more tricky — you must account for possible offset
@@ -1336,9 +1342,12 @@ See :ref:`Filtering error reports<filtering-error-reports>`.
 
 Default: ``'webmaster@localhost'``
 
-Default email address to use for various automated correspondence from the
-site manager(s). This doesn't include error messages sent to :setting:`ADMINS`
-and :setting:`MANAGERS`; for that, see :setting:`SERVER_EMAIL`.
+Default email address for automated correspondence from the site manager(s).
+This address is used in the ``From:`` header of outgoing emails and can take
+any format valid in the chosen email sending protocol.
+
+This doesn't affect error messages sent to :setting:`ADMINS` and
+:setting:`MANAGERS`. See :setting:`SERVER_EMAIL` for that.
 
 .. setting:: DEFAULT_INDEX_TABLESPACE
 
@@ -1380,7 +1389,7 @@ This is only used if ``CommonMiddleware`` is installed (see
 Default: ``'``:class:`django.core.mail.backends.smtp.EmailBackend`\ ``'``
 
 The backend to use for sending emails. For the list of available backends see
-:doc:`/topics/email`.
+:ref:`topic-email-backends`.
 
 .. setting:: EMAIL_FILE_PATH
 
@@ -1674,6 +1683,20 @@ renderers are:
 * ``'``:class:`django.forms.renderers.DjangoTemplates`\ ``'``
 * ``'``:class:`django.forms.renderers.Jinja2`\ ``'``
 * ``'``:class:`django.forms.renderers.TemplatesSetting`\ ``'``
+
+.. setting:: FORMS_URLFIELD_ASSUME_HTTPS
+
+``FORMS_URLFIELD_ASSUME_HTTPS``
+-------------------------------
+
+.. versionadded:: 5.0
+.. deprecated:: 5.0
+
+Default: ``False``
+
+Set this transitional setting to ``True`` to opt into using ``"https"`` as the
+new default value of :attr:`URLField.assume_scheme
+<django.forms.URLField.assume_scheme>` during the Django 5.x release cycle.
 
 .. setting:: FORMAT_MODULE_PATH
 
@@ -2082,7 +2105,7 @@ If you want to use ``{{ MEDIA_URL }}`` in your templates, add
 ``'django.template.context_processors.media'`` in the ``'context_processors'``
 option of :setting:`TEMPLATES`.
 
-Example: ``"http://media.example.com/"``
+Example: ``"https://media.example.com/"``
 
 .. warning::
 
@@ -2514,7 +2537,9 @@ example, to define a YAML serializer, use::
 Default: ``'root@localhost'``
 
 The email address that error messages come from, such as those sent to
-:setting:`ADMINS` and :setting:`MANAGERS`.
+:setting:`ADMINS` and :setting:`MANAGERS`. This address is used in the
+``From:`` header and can take any format valid in the chosen email sending
+protocol.
 
 .. admonition:: Why are my emails sent from a different address?
 
@@ -3464,7 +3489,7 @@ Default: ``None``
 
 URL to use when referring to static files located in :setting:`STATIC_ROOT`.
 
-Example: ``"static/"`` or ``"http://static.example.com/"``
+Example: ``"static/"`` or ``"https://static.example.com/"``
 
 If not ``None``, this will be used as the base path for
 :ref:`asset definitions<form-asset-paths>` (the ``Media`` class) and the
@@ -3635,6 +3660,7 @@ File uploads
 Forms
 -----
 * :setting:`FORM_RENDERER`
+* :setting:`FORMS_URLFIELD_ASSUME_HTTPS`
 
 Globalization (``i18n``/``l10n``)
 ---------------------------------

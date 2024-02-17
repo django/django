@@ -792,6 +792,52 @@ class FilteredRelationTests(TestCase):
         ).filter(my_books__isnull=True)
         self.assertSequenceEqual(qs, [])
 
+    def test_conditional_expression_rhs_contains_relation_name(self):
+        qs = Book.objects.annotate(
+            rel=FilteredRelation(
+                "editor",
+                condition=Q(id=1 * F("number_editor")),
+            )
+        ).filter(rel__isnull=True)
+        self.assertSequenceEqual(qs, [])
+
+    def test_conditional_expression_rhs_startswith_relation_name(self):
+        qs = Book.objects.annotate(
+            rel=FilteredRelation(
+                "editor",
+                condition=Q(id=1 * F("editor_number")),
+            )
+        ).filter(rel__isnull=True)
+        self.assertSequenceEqual(qs, [])
+
+    def test_conditional_expression_lhs_startswith_relation_name(self):
+        qs = Book.objects.annotate(
+            rel=FilteredRelation(
+                "editor",
+                condition=Q(editor_number__gt=1),
+            )
+        ).filter(rel__isnull=True)
+        self.assertSequenceEqual(qs, [])
+
+    def test_conditional_expression_lhs_contains_relation_name(self):
+        qs = Book.objects.annotate(
+            rel=FilteredRelation(
+                "editor",
+                condition=Q(number_editor__gt=1),
+            )
+        ).filter(rel__isnull=True)
+        self.assertSequenceEqual(qs, [])
+
+    def test_conditional_expression_does_not_support_queryset(self):
+        msg = "Passing a QuerySet within a FilteredRelation is not supported."
+        with self.assertRaisesMessage(ValueError, msg):
+            Author.objects.annotate(
+                poem_book=FilteredRelation(
+                    "book",
+                    condition=Q(book__in=Book.objects.filter(title__istartswith="a")),
+                ),
+            ).filter(poem_book__isnull=False)
+
 
 class FilteredRelationAggregationTests(TestCase):
     @classmethod

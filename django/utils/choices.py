@@ -1,10 +1,52 @@
 from collections.abc import Callable, Iterable, Iterator, Mapping
+from itertools import islice, tee, zip_longest
 
 from django.utils.functional import Promise
+
+__all__ = [
+    "BaseChoiceIterator",
+    "BlankChoiceIterator",
+    "CallableChoiceIterator",
+    "flatten_choices",
+    "normalize_choices",
+]
 
 
 class BaseChoiceIterator:
     """Base class for lazy iterators for choices."""
+
+    def __eq__(self, other):
+        if isinstance(other, Iterable):
+            return all(a == b for a, b in zip_longest(self, other, fillvalue=object()))
+        return super().__eq__(other)
+
+    def __getitem__(self, index):
+        if index < 0:
+            # Suboptimally consume whole iterator to handle negative index.
+            return list(self)[index]
+        try:
+            return next(islice(self, index, index + 1))
+        except StopIteration:
+            raise IndexError("index out of range") from None
+
+    def __iter__(self):
+        raise NotImplementedError(
+            "BaseChoiceIterator subclasses must implement __iter__()."
+        )
+
+
+class BlankChoiceIterator(BaseChoiceIterator):
+    """Iterator to lazily inject a blank choice."""
+
+    def __init__(self, choices, blank_choice):
+        self.choices = choices
+        self.blank_choice = blank_choice
+
+    def __iter__(self):
+        choices, other = tee(self.choices)
+        if not any(value in ("", None) for value, _ in flatten_choices(other)):
+            yield from self.blank_choice
+        yield from choices
 
 
 class CallableChoiceIterator(BaseChoiceIterator):
@@ -15,6 +57,15 @@ class CallableChoiceIterator(BaseChoiceIterator):
 
     def __iter__(self):
         yield from normalize_choices(self.func())
+
+
+def flatten_choices(choices):
+    """Flatten choices by removing nested values."""
+    for value_or_group, label_or_nested in choices or ():
+        if isinstance(label_or_nested, (list, tuple)):
+            yield from label_or_nested
+        else:
+            yield value_or_group, label_or_nested
 
 
 def normalize_choices(value, *, depth=0):

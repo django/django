@@ -2,6 +2,7 @@
 SQL functions reference lists:
 https://www.gaia-gis.it/gaia-sins/spatialite-sql-4.3.0.html
 """
+
 from django.contrib.gis.db import models
 from django.contrib.gis.db.backends.base.operations import BaseSpatialOperations
 from django.contrib.gis.db.backends.spatialite.adapter import SpatiaLiteAdapter
@@ -66,6 +67,7 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
 
     function_names = {
         "AsWKB": "St_AsBinary",
+        "BoundingCircle": "GEOSMinimumBoundingCircle",
         "ForcePolygonCW": "ST_ForceLHR",
         "FromWKB": "ST_GeomFromWKB",
         "FromWKT": "ST_GeomFromText",
@@ -80,9 +82,11 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
 
     @cached_property
     def unsupported_functions(self):
-        unsupported = {"BoundingCircle", "GeometryDistance", "IsEmpty", "MemSize"}
+        unsupported = {"GeometryDistance", "IsEmpty", "MemSize"}
         if not self.geom_lib_version():
             unsupported |= {"Azimuth", "GeoHash", "MakeValid"}
+        if self.spatial_version < (5, 1):
+            unsupported |= {"BoundingCircle"}
         return unsupported
 
     @cached_property

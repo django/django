@@ -2,16 +2,16 @@
 #
 # Translators:
 # Resul <resulsaparov@gmail.com>, 2020
-# Resul <resulsaparov@gmail.com>, 2022
+# Resul <resulsaparov@gmail.com>, 2022-2023
 # Welbeck Garli <welbeckgrlyw@gmail.com>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-17 03:19-0500\n"
-"PO-Revision-Date: 2023-04-25 08:09+0000\n"
-"Last-Translator: Resul <resulsaparov@gmail.com>, 2022\n"
-"Language-Team: Turkmen (http://www.transifex.com/django/django/language/"
+"PO-Revision-Date: 2023-12-04 08:09+0000\n"
+"Last-Translator: Resul <resulsaparov@gmail.com>, 2022-2023\n"
+"Language-Team: Turkmen (http://app.transifex.com/django/django/language/"
 "tk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -272,6 +272,8 @@ msgid ""
 "Enter a valid username. This value may contain only unaccented lowercase a-z "
 "and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
 msgstr ""
+"Dogry ulanyjy adyny giriziň. Bu bahada diňe aksentsiz kiçi a-z harplary we "
+"uly A-Z harplary, sanlar we @/./+/-/_ nyşanlary bolup biler."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "

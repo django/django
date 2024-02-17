@@ -8,6 +8,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     # Oracle crashes with "ORA-00932: inconsistent datatypes: expected - got
     # BLOB" when grouping by LOBs (#24096).
     allows_group_by_lob = False
+    # Although GROUP BY select index is supported by Oracle 23c+, it requires
+    # GROUP_BY_POSITION_ENABLED to be enabled to avoid backward compatibility
+    # issues. Introspection of this settings is not straightforward.
     allows_group_by_select_index = False
     interprets_empty_strings_as_nulls = True
     has_select_for_update = True
@@ -34,7 +37,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     requires_literal_defaults = True
     supports_default_keyword_in_bulk_insert = False
     closed_cursor_error_class = InterfaceError
-    bare_select_suffix = " FROM DUAL"
     # Select for update with limit can be achieved on Oracle, but not with the
     # current backend.
     supports_select_for_update_with_limit = False
@@ -76,16 +78,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_slicing_ordering_in_compound = True
     requires_compound_order_by_subquery = True
     allows_multiple_constraints_on_same_fields = False
-    supports_boolean_expr_in_select_clause = False
     supports_comparing_boolean_expr = False
     supports_json_field_contains = False
     supports_collation_on_textfield = False
-    test_collations = {
-        "ci": "BINARY_CI",
-        "cs": "BINARY",
-        "non_default": "SWEDISH_CI",
-        "swedish_ci": "SWEDISH_CI",
-    }
     test_now_utc_template = "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'"
 
     django_test_skips = {
@@ -99,12 +94,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             "test_trunc_week_before_1000",
             "db_functions.datetime.test_extract_trunc.DateFunctionWithTimeZoneTests."
             "test_trunc_week_before_1000",
-        },
-        "Oracle extracts seconds including fractional seconds (#33517).": {
-            "db_functions.datetime.test_extract_trunc.DateFunctionTests."
-            "test_extract_second_func_no_fractional",
-            "db_functions.datetime.test_extract_trunc.DateFunctionWithTimeZoneTests."
-            "test_extract_second_func_no_fractional",
         },
         "Oracle doesn't support bitwise XOR.": {
             "expressions.tests.ExpressionOperatorTests.test_lefthand_bitwise_xor",
@@ -124,6 +113,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         },
         "Oracle doesn't support comparing NCLOB to NUMBER.": {
             "generic_relations_regress.tests.GenericRelationTests.test_textlink_filter",
+        },
+        "Oracle doesn't support casting filters to NUMBER.": {
+            "lookup.tests.LookupQueryingTests.test_aggregate_combined_lookup",
         },
     }
     django_test_expected_failures = {
@@ -149,10 +141,21 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         }
 
     @cached_property
+    def test_collations(self):
+        return {
+            "ci": "BINARY_CI",
+            "cs": "BINARY",
+            "non_default": "SWEDISH_CI",
+            "swedish_ci": "SWEDISH_CI",
+            "virtual": "SWEDISH_CI" if self.supports_collation_on_charfield else None,
+        }
+
+    @cached_property
     def supports_collation_on_charfield(self):
+        sql = "SELECT CAST('a' AS VARCHAR2(4001))" + self.bare_select_suffix
         with self.connection.cursor() as cursor:
             try:
-                cursor.execute("SELECT CAST('a' AS VARCHAR2(4001)) FROM dual")
+                cursor.execute(sql)
             except DatabaseError as e:
                 if e.args[0].code == 910:
                     return False
@@ -162,3 +165,19 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def supports_primitives_in_json_field(self):
         return self.connection.oracle_version >= (21,)
+
+    @cached_property
+    def supports_frame_exclusion(self):
+        return self.connection.oracle_version >= (21,)
+
+    @cached_property
+    def supports_boolean_expr_in_select_clause(self):
+        return self.connection.oracle_version >= (23,)
+
+    @cached_property
+    def supports_aggregation_over_interval_types(self):
+        return self.connection.oracle_version >= (23,)
+
+    @cached_property
+    def bare_select_suffix(self):
+        return "" if self.connection.oracle_version >= (23,) else " FROM DUAL"

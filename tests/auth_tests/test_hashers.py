@@ -213,8 +213,9 @@ class TestUtilsHashPass(SimpleTestCase):
         with mock.patch.object(hasher, "rounds", 4):
             encoded = make_password("letmein", hasher="bcrypt")
 
-        with mock.patch.object(hasher, "rounds", 6), mock.patch.object(
-            hasher, "encode", side_effect=hasher.encode
+        with (
+            mock.patch.object(hasher, "rounds", 6),
+            mock.patch.object(hasher, "encode", side_effect=hasher.encode),
         ):
             hasher.harden_runtime("wrong_password", encoded)
 
@@ -388,8 +389,9 @@ class TestUtilsHashPass(SimpleTestCase):
         with mock.patch.object(hasher, "iterations", 1):
             encoded = make_password("letmein")
 
-        with mock.patch.object(hasher, "iterations", 6), mock.patch.object(
-            hasher, "encode", side_effect=hasher.encode
+        with (
+            mock.patch.object(hasher, "iterations", 6),
+            mock.patch.object(hasher, "encode", side_effect=hasher.encode),
         ):
             hasher.harden_runtime("wrong_password", encoded)
 
@@ -437,8 +439,9 @@ class TestUtilsHashPass(SimpleTestCase):
         hasher = get_hasher("default")
         encoded = make_password("letmein")
 
-        with mock.patch.object(hasher, "harden_runtime"), mock.patch.object(
-            hasher, "must_update", return_value=True
+        with (
+            mock.patch.object(hasher, "harden_runtime"),
+            mock.patch.object(hasher, "must_update", return_value=True),
         ):
             # Correct password supplied, no hardening needed
             check_password("letmein", encoded)

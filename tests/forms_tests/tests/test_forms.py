@@ -14,6 +14,7 @@ from django.forms import (
     DateField,
     DateTimeField,
     EmailField,
+    Field,
     FileField,
     FileInput,
     FloatField,
@@ -35,10 +36,9 @@ from django.forms import (
     TextInput,
     TimeField,
     ValidationError,
-    forms,
 )
 from django.forms.renderers import DjangoTemplates, get_default_renderer
-from django.forms.utils import ErrorList
+from django.forms.utils import ErrorDict, ErrorList
 from django.http import QueryDict
 from django.template import Context, Template
 from django.test import SimpleTestCase
@@ -1656,7 +1656,7 @@ class FormsTestCase(SimpleTestCase):
                     self._errors = e.update_error_dict(self._errors)
 
                 try:
-                    raise ValidationError({"code": forms.ErrorList(["Code error 3."])})
+                    raise ValidationError({"code": ErrorList(["Code error 3."])})
                 except ValidationError as e:
                     self._errors = e.update_error_dict(self._errors)
 
@@ -1680,7 +1680,7 @@ class FormsTestCase(SimpleTestCase):
         self.assertFalse(form.is_valid())
 
         # update_error_dict didn't lose track of the ErrorDict type.
-        self.assertIsInstance(form._errors, forms.ErrorDict)
+        self.assertIsInstance(form._errors, ErrorDict)
 
         self.assertEqual(
             dict(form.errors),
@@ -2738,7 +2738,7 @@ Options: <select multiple name="options" aria-invalid="true" required>
         self.assertNotIn("birthday", p.changed_data)
 
         # A field raising ValidationError is always in changed_data
-        class PedanticField(forms.Field):
+        class PedanticField(Field):
             def to_python(self, value):
                 raise ValidationError("Whatever")
 
@@ -2879,7 +2879,7 @@ Options: <select multiple name="options" aria-invalid="true" required>
                     microseconds,
                 )
 
-        class DateTimeForm(forms.Form):
+        class DateTimeForm(Form):
             dt = DateTimeField(initial=FakeTime().now, disabled=disabled)
 
         return DateTimeForm({})
@@ -2914,7 +2914,7 @@ Options: <select multiple name="options" aria-invalid="true" required>
         self.assertEqual(cleaned, bf.initial)
 
     def test_datetime_changed_data_callable_with_microseconds(self):
-        class DateTimeForm(forms.Form):
+        class DateTimeForm(Form):
             dt = DateTimeField(
                 initial=lambda: datetime.datetime(2006, 10, 25, 14, 30, 45, 123456),
                 disabled=True,
@@ -3095,6 +3095,100 @@ Options: <select multiple name="options" aria-invalid="true" required>
             'aria-describedby="id_password_helptext" id="id_password"><br>'
             '<span class="helptext" id="id_password_helptext">Wählen Sie mit Bedacht.'
             "</span></td></tr>",
+        )
+
+    def test_aria_describedby_custom_widget_id(self):
+        class UserRegistration(Form):
+            username = CharField(
+                max_length=255,
+                help_text="e.g., user@example.com",
+                widget=TextInput(attrs={"id": "custom-id"}),
+            )
+
+        f = UserRegistration()
+        self.assertHTMLEqual(
+            str(f),
+            '<div><label for="custom-id">Username:</label>'
+            '<div class="helptext" id="id_username_helptext">e.g., user@example.com'
+            '</div><input type="text" name="username" id="custom-id" maxlength="255" '
+            'required aria-describedby="id_username_helptext"></div>',
+        )
+
+    def test_fieldset_aria_describedby(self):
+        class FieldsetForm(Form):
+            checkbox = MultipleChoiceField(
+                choices=[("a", "A"), ("b", "B")],
+                widget=CheckboxSelectMultiple,
+                help_text="Checkbox help text",
+            )
+            radio = MultipleChoiceField(
+                choices=[("a", "A"), ("b", "B")],
+                widget=RadioSelect,
+                help_text="Radio help text",
+            )
+            datetime = SplitDateTimeField(help_text="Enter Date and Time")
+
+        f = FieldsetForm()
+        self.assertHTMLEqual(
+            str(f),
+            '<div><fieldset aria-describedby="id_checkbox_helptext">'
+            "<legend>Checkbox:</legend>"
+            '<div class="helptext" id="id_checkbox_helptext">Checkbox help text</div>'
+            '<div id="id_checkbox"><div>'
+            '<label for="id_checkbox_0"><input type="checkbox" name="checkbox" '
+            'value="a" id="id_checkbox_0" /> A</label>'
+            "</div><div>"
+            '<label for="id_checkbox_1"><input type="checkbox" name="checkbox" '
+            'value="b" id="id_checkbox_1" /> B</label>'
+            "</div></div></fieldset></div>"
+            '<div><fieldset aria-describedby="id_radio_helptext">'
+            "<legend>Radio:</legend>"
+            '<div class="helptext" id="id_radio_helptext">Radio help text</div>'
+            '<div id="id_radio"><div>'
+            '<label for="id_radio_0"><input type="radio" name="radio" value="a" '
+            'required id="id_radio_0" />A</label>'
+            "</div><div>"
+            '<label for="id_radio_1"><input type="radio" name="radio" value="b" '
+            'required id="id_radio_1" /> B</label>'
+            "</div></div></fieldset></div>"
+            '<div><fieldset aria-describedby="id_datetime_helptext">'
+            "<legend>Datetime:</legend>"
+            '<div class="helptext" id="id_datetime_helptext">Enter Date and Time</div>'
+            '<input type="text" name="datetime_0" required id="id_datetime_0" />'
+            '<input type="text" name="datetime_1" required id="id_datetime_1" />'
+            "</fieldset></div>",
+        )
+        f = FieldsetForm(auto_id=False)
+        # aria-describedby is not included.
+        self.assertIn("<fieldset>", str(f))
+        self.assertIn('<div class="helptext">', str(f))
+        f = FieldsetForm(auto_id="custom_%s")
+        # aria-describedby uses custom auto_id.
+        self.assertIn('fieldset aria-describedby="custom_checkbox_helptext"', str(f))
+        self.assertIn('<div class="helptext" id="custom_checkbox_helptext">', str(f))
+
+    def test_fieldset_custom_aria_describedby(self):
+        # aria-describedby set on widget results in aria-describedby being
+        # added to widget and not the <fieldset>.
+        class FieldsetForm(Form):
+            checkbox = MultipleChoiceField(
+                choices=[("a", "A"), ("b", "B")],
+                widget=CheckboxSelectMultiple(attrs={"aria-describedby": "custom-id"}),
+                help_text="Checkbox help text",
+            )
+
+        f = FieldsetForm()
+        self.assertHTMLEqual(
+            str(f),
+            "<div><fieldset><legend>Checkbox:</legend>"
+            '<div class="helptext" id="id_checkbox_helptext">Checkbox help text</div>'
+            '<div id="id_checkbox"><div>'
+            '<label for="id_checkbox_0"><input type="checkbox" name="checkbox" '
+            'value="a" aria-describedby="custom-id" id="id_checkbox_0" />A</label>'
+            "</div><div>"
+            '<label for="id_checkbox_1"><input type="checkbox" name="checkbox" '
+            'value="b" aria-describedby="custom-id" id="id_checkbox_1" />B</label>'
+            "</div></div></fieldset></div>",
         )
 
     def test_as_widget_custom_aria_describedby(self):
@@ -3476,8 +3570,8 @@ Options: <select multiple name="options" aria-invalid="true" required>
         )
 
     def test_filefield_initial_callable(self):
-        class FileForm(forms.Form):
-            file1 = forms.FileField(initial=lambda: "resume.txt")
+        class FileForm(Form):
+            file1 = FileField(initial=lambda: "resume.txt")
 
         f = FileForm({})
         self.assertEqual(f.errors, {})
@@ -3485,7 +3579,7 @@ Options: <select multiple name="options" aria-invalid="true" required>
 
     def test_filefield_with_fileinput_required(self):
         class FileForm(Form):
-            file1 = forms.FileField(widget=FileInput)
+            file1 = FileField(widget=FileInput)
 
         f = FileForm(auto_id=False)
         self.assertHTMLEqual(
@@ -3963,7 +4057,7 @@ Options: <select multiple name="options" aria-invalid="true" required>
                     return {}
                 return super().to_python(value)
 
-        class JSONForm(forms.Form):
+        class JSONForm(Form):
             json = CustomJSONField()
 
         form = JSONForm(data={"json": "{}"})

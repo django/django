@@ -83,6 +83,9 @@ class Book(models.Model):
     def __str__(self):
         return self.name
 
+    def get_absolute_url(self):
+        return f"/books/{self.id}/"
+
 
 class Promo(models.Model):
     name = models.CharField(max_length=100, verbose_name="¿Name?")
@@ -1147,6 +1150,7 @@ class Square(models.Model):
     area = models.GeneratedField(
         db_persist=True,
         expression=models.F("side") * models.F("side"),
+        output_field=models.BigIntegerField(),
     )
 
     class Meta:

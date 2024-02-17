@@ -5,6 +5,7 @@ import operator
 import uuid
 import warnings
 from base64 import b64decode, b64encode
+from collections.abc import Iterable
 from functools import partialmethod, total_ordering
 
 from django import forms
@@ -14,8 +15,14 @@ from django.core import checks, exceptions, validators
 from django.db import connection, connections, router
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.query_utils import DeferredAttribute, RegisterLookupMixin
+from django.db.utils import NotSupportedError
 from django.utils import timezone
-from django.utils.choices import CallableChoiceIterator, normalize_choices
+from django.utils.choices import (
+    BlankChoiceIterator,
+    CallableChoiceIterator,
+    flatten_choices,
+    normalize_choices,
+)
 from django.utils.datastructures import DictWrapper
 from django.utils.dateparse import (
     parse_date,
@@ -26,7 +33,6 @@ from django.utils.dateparse import (
 from django.utils.duration import duration_microseconds, duration_string
 from django.utils.functional import Promise, cached_property
 from django.utils.ipv6 import clean_ipv6_address
-from django.utils.itercompat import is_iterable
 from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy as _
 
@@ -211,12 +217,6 @@ class Field(RegisterLookupMixin):
         self.remote_field = rel
         self.is_relation = self.remote_field is not None
         self.default = default
-        if db_default is not NOT_PROVIDED and not hasattr(
-            db_default, "resolve_expression"
-        ):
-            from django.db.models.expressions import Value
-
-            db_default = Value(db_default)
         self.db_default = db_default
         self.editable = editable
         self.serialize = serialize
@@ -279,6 +279,8 @@ class Field(RegisterLookupMixin):
         Check if field name is valid, i.e. 1) does not end with an
         underscore, 2) does not contain "__" and 3) is not "pk".
         """
+        if self.name is None:
+            return []
         if self.name.endswith("_"):
             return [
                 checks.Error(
@@ -308,13 +310,13 @@ class Field(RegisterLookupMixin):
 
     @classmethod
     def _choices_is_value(cls, value):
-        return isinstance(value, (str, Promise)) or not is_iterable(value)
+        return isinstance(value, (str, Promise)) or not isinstance(value, Iterable)
 
     def _check_choices(self):
         if not self.choices:
             return []
 
-        if not is_iterable(self.choices) or isinstance(self.choices, str):
+        if not isinstance(self.choices, Iterable) or isinstance(self.choices, str):
             return [
                 checks.Error(
                     "'choices' must be a mapping (e.g. a dictionary) or an iterable "
@@ -398,7 +400,7 @@ class Field(RegisterLookupMixin):
                 continue
             connection = connections[db]
 
-            if not getattr(self.db_default, "allowed_default", False) and (
+            if not getattr(self._db_default_expression, "allowed_default", False) and (
                 connection.features.supports_expression_defaults
             ):
                 msg = f"{self.db_default} cannot be used in db_default."
@@ -984,7 +986,7 @@ class Field(RegisterLookupMixin):
             from django.db.models.expressions import DatabaseDefault
 
             if isinstance(value, DatabaseDefault):
-                return self.db_default
+                return self._db_default_expression
         return value
 
     def get_prep_value(self, value):
@@ -1037,6 +1039,17 @@ class Field(RegisterLookupMixin):
             return return_None
         return str  # return empty string
 
+    @cached_property
+    def _db_default_expression(self):
+        db_default = self.db_default
+        if db_default is not NOT_PROVIDED and not hasattr(
+            db_default, "resolve_expression"
+        ):
+            from django.db.models.expressions import Value
+
+            db_default = Value(db_default, self)
+        return db_default
+
     def get_choices(
         self,
         include_blank=True,
@@ -1049,14 +1062,9 @@ class Field(RegisterLookupMixin):
         as <select> choices for this field.
         """
         if self.choices is not None:
-            choices = list(self.choices)
             if include_blank:
-                blank_defined = any(
-                    choice in ("", None) for choice, _ in self.flatchoices
-                )
-                if not blank_defined:
-                    choices = blank_choice + choices
-            return choices
+                return BlankChoiceIterator(self.choices, blank_choice)
+            return self.choices
         rel_model = self.remote_field.model
         limit_choices_to = limit_choices_to or self.get_limit_choices_to()
         choice_func = operator.attrgetter(
@@ -1078,19 +1086,10 @@ class Field(RegisterLookupMixin):
         """
         return str(self.value_from_object(obj))
 
-    def _get_flatchoices(self):
+    @property
+    def flatchoices(self):
         """Flattened version of choices tuple."""
-        if self.choices is None:
-            return []
-        flat = []
-        for choice, value in self.choices:
-            if isinstance(value, (list, tuple)):
-                flat.extend(value)
-            else:
-                flat.append((choice, value))
-        return flat
-
-    flatchoices = property(_get_flatchoices)
+        return list(flatten_choices(self.choices))
 
     def save_form_data(self, instance, data):
         setattr(instance, self.name, data)
@@ -1147,6 +1146,10 @@ class Field(RegisterLookupMixin):
     def value_from_object(self, obj):
         """Return the value of this field in the given model instance."""
         return getattr(obj, self.attname)
+
+    def slice_expression(self, expression, start, length):
+        """Return a slice of this field."""
+        raise NotSupportedError("This field does not support slicing.")
 
 
 class BooleanField(Field):
@@ -1307,6 +1310,11 @@ class CharField(Field):
         if self.db_collation:
             kwargs["db_collation"] = self.db_collation
         return name, path, args, kwargs
+
+    def slice_expression(self, expression, start, length):
+        from django.db.models.functions import Substr
+
+        return Substr(expression, start, length)
 
 
 class CommaSeparatedIntegerField(CharField):
@@ -1593,10 +1601,13 @@ class DateTimeField(DateField):
                 # local time. This won't work during DST change, but we can't
                 # do much about it, so we let the exceptions percolate up the
                 # call stack.
+                try:
+                    name = f"{self.model.__name__}.{self.name}"
+                except AttributeError:
+                    name = "(unbound)"
                 warnings.warn(
-                    "DateTimeField %s.%s received a naive datetime "
-                    "(%s) while time zone support is active."
-                    % (self.model.__name__, self.name, value),
+                    f"DateTimeField {name} received a naive datetime ({value}) while "
+                    "time zone support is active.",
                     RuntimeWarning,
                 )
                 default_timezone = timezone.get_default_timezone()
@@ -2203,7 +2214,7 @@ class IPAddressField(Field):
 class GenericIPAddressField(Field):
     empty_strings_allowed = False
     description = _("IP address")
-    default_error_messages = {}
+    default_error_messages = {"invalid": _("Enter a valid %(protocol)s address.")}
 
     def __init__(
         self,
@@ -2216,11 +2227,9 @@ class GenericIPAddressField(Field):
     ):
         self.unpack_ipv4 = unpack_ipv4
         self.protocol = protocol
-        (
-            self.default_validators,
-            invalid_error_message,
-        ) = validators.ip_address_validators(protocol, unpack_ipv4)
-        self.default_error_messages["invalid"] = invalid_error_message
+        self.default_validators = validators.ip_address_validators(
+            protocol, unpack_ipv4
+        )
         kwargs["max_length"] = 39
         super().__init__(verbose_name, name, *args, **kwargs)
 
@@ -2500,6 +2509,11 @@ class TextField(Field):
         if self.db_collation:
             kwargs["db_collation"] = self.db_collation
         return name, path, args, kwargs
+
+    def slice_expression(self, expression, start, length):
+        from django.db.models.functions import Substr
+
+        return Substr(expression, start, length)
 
 
 class TimeField(DateTimeCheckMixin, Field):

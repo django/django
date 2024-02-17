@@ -68,9 +68,9 @@ class AcceptHeaderTests(TestCase):
 
     def test_accept_headers(self):
         request = HttpRequest()
-        request.META[
-            "HTTP_ACCEPT"
-        ] = "text/html, application/xhtml+xml,application/xml ;q=0.9,*/*;q=0.8"
+        request.META["HTTP_ACCEPT"] = (
+            "text/html, application/xhtml+xml,application/xml ;q=0.9,*/*;q=0.8"
+        )
         self.assertEqual(
             [str(accepted_type) for accepted_type in request.accepted_types],
             [
@@ -94,9 +94,9 @@ class AcceptHeaderTests(TestCase):
 
     def test_request_accepts_some(self):
         request = HttpRequest()
-        request.META[
-            "HTTP_ACCEPT"
-        ] = "text/html,application/xhtml+xml,application/xml;q=0.9"
+        request.META["HTTP_ACCEPT"] = (
+            "text/html,application/xhtml+xml,application/xml;q=0.9"
+        )
         self.assertIs(request.accepts("text/html"), True)
         self.assertIs(request.accepts("application/xhtml+xml"), True)
         self.assertIs(request.accepts("application/xml"), True)

@@ -36,6 +36,8 @@ class Book(models.Model):
         related_query_name="book",
     )
     editor = models.ForeignKey(Editor, models.CASCADE)
+    number_editor = models.IntegerField(default=-1)
+    editor_number = models.IntegerField(default=-2)
     generic_author = GenericRelation(Author)
     state = models.CharField(max_length=9, choices=STATES, default=AVAILABLE)
 

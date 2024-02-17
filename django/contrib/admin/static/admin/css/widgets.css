@@ -1,23 +1,23 @@
 /* SELECTOR (FILTER INTERFACE) */
 
 .selector {
-    width: 800px;
-    float: left;
     display: flex;
+    flex-grow: 1;
+    gap: 0 10px;
 }
 
 .selector select {
-    width: 380px;
     height: 17.2em;
     flex: 1 0 auto;
+    overflow: scroll;
+    width: 100%;
 }
 
 .selector-available, .selector-chosen {
-    width: 380px;
     text-align: center;
-    margin-bottom: 5px;
     display: flex;
     flex-direction: column;
+    flex: 1 1;
 }
 
 .selector-available h2, .selector-chosen h2 {
@@ -58,6 +58,7 @@
     font-size: 0.625rem;
     margin: 0;
     text-align: left;
+    display: flex;
 }
 
 .selector .selector-filter label,
@@ -69,11 +70,15 @@
     padding: 0;
     overflow: hidden;
     line-height: 1;
+    min-width: auto;
+}
+
+.selector-filter input {
+    flex-grow: 1;
 }
 
 .selector .selector-available input,
 .selector .selector-chosen input {
-    width: 320px;
     margin-left: 8px;
 }
 
@@ -82,7 +87,7 @@
     width: 22px;
     background-color: var(--selected-bg);
     border-radius: 10px;
-    margin: 0 5px;
+    margin: 0;
     padding: 0;
     transform: translateY(-17px);
 }
@@ -146,7 +151,7 @@ a.selector-chooseall, a.selector-clearall {
     display: inline-block;
     height: 16px;
     text-align: left;
-    margin: 1px auto 3px;
+    margin: 0 auto;
     overflow: hidden;
     font-weight: bold;
     line-height: 16px;
@@ -514,19 +519,9 @@ span.clearable-file-input label {
     background: url(../img/calendar-icons.svg) 0 0 no-repeat;
 }
 
-.calendarbox .calendarnav-previous:focus,
-.calendarbox .calendarnav-previous:hover {
-    background-position: 0 -15px;
-}
-
 .calendarnav-next {
     right: 10px;
-    background: url(../img/calendar-icons.svg) 0 -30px no-repeat;
-}
-
-.calendarbox .calendarnav-next:focus,
-.calendarbox .calendarnav-next:hover {
-    background-position: 0 -45px;
+    background: url(../img/calendar-icons.svg) 0 -15px no-repeat;
 }
 
 .calendar-cancel {
@@ -574,8 +569,11 @@ ul.timelist, .timelist li {
 
 /* RELATED WIDGET WRAPPER */
 .related-widget-wrapper {
-    float: left;       /* display properly in form rows with multiple fields */
-    overflow: hidden;  /* clear floated contents */
+    display: flex;
+    gap: 0 10px;
+    flex-grow: 1;
+    flex-wrap: wrap;
+    margin-bottom: 5px;
 }
 
 .related-widget-wrapper-link {
@@ -586,11 +584,6 @@ ul.timelist, .timelist li {
 .related-widget-wrapper-link:link {
     opacity: 1;
     filter: grayscale(0);
-}
-
-select + .related-widget-wrapper-link,
-.related-widget-wrapper-link + .related-widget-wrapper-link {
-    margin-left: 7px;
 }
 
 /* GIS MAPS */

@@ -15,6 +15,7 @@ from decimal import Decimal, DecimalException
 from io import BytesIO
 from urllib.parse import urlsplit, urlunsplit
 
+from django.conf import settings
 from django.core import validators
 from django.core.exceptions import ValidationError
 from django.forms.boundfield import BoundField
@@ -259,6 +260,10 @@ class Field:
         result.error_messages = self.error_messages.copy()
         result.validators = self.validators[:]
         return result
+
+    def _clean_bound_field(self, bf):
+        value = bf.initial if self.disabled else bf.data
+        return self.clean(value)
 
 
 class CharField(Field):
@@ -693,6 +698,10 @@ class FileField(Field):
     def has_changed(self, initial, data):
         return not self.disabled and data is not None
 
+    def _clean_bound_field(self, bf):
+        value = bf.initial if self.disabled else bf.data
+        return self.clean(value, bf.initial)
+
 
 class ImageField(FileField):
     default_validators = [validators.validate_image_file_extension]
@@ -762,14 +771,19 @@ class URLField(CharField):
 
     def __init__(self, *, assume_scheme=None, **kwargs):
         if assume_scheme is None:
-            warnings.warn(
-                "The default scheme will be changed from 'http' to 'https' in Django "
-                "6.0. Pass the forms.URLField.assume_scheme argument to silence this "
-                "warning.",
-                RemovedInDjango60Warning,
-                stacklevel=2,
-            )
-            assume_scheme = "http"
+            if settings.FORMS_URLFIELD_ASSUME_HTTPS:
+                assume_scheme = "https"
+            else:
+                warnings.warn(
+                    "The default scheme will be changed from 'http' to 'https' in "
+                    "Django 6.0. Pass the forms.URLField.assume_scheme argument to "
+                    "silence this warning, or set the FORMS_URLFIELD_ASSUME_HTTPS "
+                    "transitional setting to True to opt into using 'https' as the new "
+                    "default scheme.",
+                    RemovedInDjango60Warning,
+                    stacklevel=2,
+                )
+                assume_scheme = "http"
         # RemovedInDjango60Warning: When the deprecation ends, replace with:
         # self.assume_scheme = assume_scheme or "https"
         self.assume_scheme = assume_scheme
@@ -1288,7 +1302,7 @@ class GenericIPAddressField(CharField):
         self.unpack_ipv4 = unpack_ipv4
         self.default_validators = validators.ip_address_validators(
             protocol, unpack_ipv4
-        )[0]
+        )
         super().__init__(**kwargs)
 
     def to_python(self, value):

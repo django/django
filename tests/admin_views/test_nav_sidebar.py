@@ -42,7 +42,7 @@ class AdminSidebarTests(TestCase):
 
     def test_sidebar_not_on_index(self):
         response = self.client.get(reverse("test_with_sidebar:index"))
-        self.assertContains(response, '<main class="main" id="main">')
+        self.assertContains(response, '<div class="main" id="main">')
         self.assertNotContains(
             response, '<nav class="sticky" id="nav-sidebar" aria-label="Sidebar">'
         )
@@ -111,9 +111,10 @@ class AdminSidebarTests(TestCase):
         self.assertContains(response, '<tr class="model-héllo current-model">')
         self.assertContains(
             response,
-            '<th scope="row">'
+            '<th scope="row" id="admin_views-héllo">'
             '<a href="/test_sidebar/admin/admin_views/h%C3%A9llo/" aria-current="page">'
             "Héllos</a></th>",
+            html=True,
         )
 
 

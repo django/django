@@ -35,11 +35,6 @@
         background-position: calc(100% - 8px) 9px;
     }
 
-    [dir="rtl"] .related-widget-wrapper-link + .selector {
-        margin-right: 0;
-        margin-left: 15px;
-    }
-
     [dir="rtl"] .selector .selector-filter label {
         margin-right: 0;
         margin-left: 8px;
@@ -57,6 +52,22 @@
     [dir="rtl"] .dashboard .module table td a {
         padding-left: 0;
         padding-right: 16px;
+    }
+
+    [dir="rtl"] .selector-add {
+        background-position: 0 -80px;
+    }
+
+    [dir="rtl"] .selector-remove {
+        background-position: 0 -120px;
+    }
+
+    [dir="rtl"] .active.selector-add:focus, .active.selector-add:hover {
+        background-position: 0 -100px;
+    }
+
+    [dir="rtl"] .active.selector-remove:focus, .active.selector-remove:hover {
+        background-position: 0 -140px;
     }
 }
 
@@ -77,5 +88,24 @@
     [dir="rtl"] #changelist-filter {
         margin-left: 0;
         margin-right: 0;
+    }
+    [dir="rtl"] .aligned .vCheckboxLabel {
+        padding: 1px 5px 0 0;
+    }
+
+    [dir="rtl"] .selector-remove {
+        background-position: 0 0;
+    }
+
+    [dir="rtl"] .active.selector-remove:focus, .active.selector-remove:hover {
+        background-position: 0 -20px;
+    }
+
+    [dir="rtl"] .selector-add  {
+        background-position: 0 -40px;
+    }
+
+    [dir="rtl"] .active.selector-add:focus, .active.selector-add:hover {
+        background-position: 0 -60px;
     }
 }

@@ -594,7 +594,7 @@ required layout. For example:
 By default Django uses the ``"django/forms/field.html"`` template which is
 designed for use with the default ``"django/forms/div.html"`` form style.
 
-The default template can be customized by by setting
+The default template can be customized by setting
 :attr:`~django.forms.renderers.BaseRenderer.field_template_name` in your
 project-level :setting:`FORM_RENDERER`::
 
@@ -723,7 +723,7 @@ loop:
             {{ field.errors }}
             {{ field.label_tag }} {{ field }}
             {% if field.help_text %}
-              <p class="help" id="{{ field.id_for_label }}_helptext">
+              <p class="help" id="{{ field.auto_id }}_helptext">
                 {{ field.help_text|safe }}
               </p>
             {% endif %}

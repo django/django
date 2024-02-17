@@ -80,8 +80,9 @@ class DecimalFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
             "--0.12",
         )
         for value in values:
-            with self.subTest(value=value), self.assertRaisesMessage(
-                ValidationError, "'Enter a number.'"
+            with (
+                self.subTest(value=value),
+                self.assertRaisesMessage(ValidationError, "'Enter a number.'"),
             ):
                 f.clean(value)
 

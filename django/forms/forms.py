@@ -6,7 +6,7 @@ import copy
 import datetime
 
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
-from django.forms.fields import Field, FileField
+from django.forms.fields import Field
 from django.forms.utils import ErrorDict, ErrorList, RenderableFormMixin
 from django.forms.widgets import Media, MediaDefiningClass
 from django.utils.datastructures import MultiValueDict
@@ -224,18 +224,16 @@ class BaseForm(RenderableFormMixin):
         hidden_fields = []
         top_errors = self.non_field_errors().copy()
         for name, bf in self._bound_items():
-            bf_errors = self.error_class(bf.errors, renderer=self.renderer)
             if bf.is_hidden:
-                if bf_errors:
+                if bf.errors:
                     top_errors += [
                         _("(Hidden field %(name)s) %(error)s")
                         % {"name": name, "error": str(e)}
-                        for e in bf_errors
+                        for e in bf.errors
                     ]
                 hidden_fields.append(bf)
             else:
-                errors_str = str(bf_errors)
-                fields.append((bf, errors_str))
+                fields.append((bf, bf.errors))
         return {
             "form": self,
             "fields": fields,
@@ -331,13 +329,8 @@ class BaseForm(RenderableFormMixin):
     def _clean_fields(self):
         for name, bf in self._bound_items():
             field = bf.field
-            value = bf.initial if field.disabled else bf.data
             try:
-                if isinstance(field, FileField):
-                    value = field.clean(value, bf.initial)
-                else:
-                    value = field.clean(value)
-                self.cleaned_data[name] = value
+                self.cleaned_data[name] = field._clean_bound_field(bf)
                 if hasattr(self, "clean_%s" % name):
                     value = getattr(self, "clean_%s" % name)()
                     self.cleaned_data[name] = value

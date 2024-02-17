@@ -475,8 +475,8 @@ Tests
 * The new :setting:`MIGRATE <TEST_MIGRATE>` test database setting allows
   disabling of migrations during a test database creation.
 
-* Django test runner now supports a :option:`test --buffer` option to discard
-  output for passing tests.
+* :class:`~django.test.runner.DiscoverRunner` can now discard output for
+  passing tests using the :option:`test --buffer` option.
 
 * :class:`~django.test.runner.DiscoverRunner` now skips running the system
   checks on databases not :ref:`referenced by tests<testing-multi-db>`.

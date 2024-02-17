@@ -1,1 +1,2 @@
-psycopg[binary]>=3.1.8
+psycopg>=3.1.14; implementation_name == 'pypy'
+psycopg[binary]>=3.1.8; implementation_name != 'pypy'

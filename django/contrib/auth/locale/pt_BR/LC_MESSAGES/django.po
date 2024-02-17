@@ -5,17 +5,18 @@
 # Amanda Savluchinske <amandasavluchinske@gmail.com>, 2019
 # amcorreia <mutley.sandro@gmail.com>, 2018
 # Camilo B. Moreira <camilo.moreira@fatec.sp.gov.br>, 2017
-# Carlos Leite <caduado@gmail.com>, 2016
+# Carlos C. Leite <caduado@gmail.com>, 2016
 # Filipe Cifali <cifali.filipe@gmail.com>, 2016
 # Claudemiro Alves Feitosa Neto <dimiro1@gmail.com>, 2015
 # dudanogueira <dudanogueira@gmail.com>, 2012
 # dudanogueira <dudanogueira@gmail.com>, 2014
 # Eduardo Cereto Carvalho, 2013
 # Elyézer Rezende <elyezermr@gmail.com>, 2013
+# Evandro da Costa <evandrodacosta@gmail.com>, 2023
 # Fábio C. Barrionuevo da Luz <bnafta@gmail.com>, 2015
 # gilberto dos santos alves <gsavix@gmail.com>, 2013
-# semente, 2012
-# Guilherme, 2022
+# fa9e10542e458baef0599ae856e43651_13d2225, 2012
+# Guilherme <guilherme0xff@proton.me>, 2022
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Lucas Infante <maccinza@gmail.com>, 2015
 # Rafael Fontenelle <rffontenelle@gmail.com>, 2022
@@ -24,10 +25,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2022-04-25 08:09+0000\n"
-"Last-Translator: Guilherme, 2022\n"
-"Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
+"POT-Creation-Date: 2023-03-17 03:19-0500\n"
+"PO-Revision-Date: 2023-12-04 08:09+0000\n"
+"Last-Translator: Evandro da Costa <evandrodacosta@gmail.com>, 2023\n"
+"Language-Team: Portuguese (Brazil) (http://app.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -294,11 +295,11 @@ msgid "Password reset on %(site_name)s"
 msgstr "Redefinição de senha em %(site_name)s "
 
 msgid ""
-"Enter a valid username. This value may contain only English letters, "
-"numbers, and @/./+/-/_ characters."
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
 msgstr ""
-"Informe um nome de usuário válido. Este valor pode conter apenas letras, "
-"números e os seguintes caracteres @/./+/-/_."
+"Insira um nome de usuário válido. Este valor pode conter apenas letras, "
+"números e os caracteres @/./+/-/_."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "

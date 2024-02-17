@@ -1651,8 +1651,8 @@ class ModelStateTests(SimpleTestCase):
         field = models.ForeignKey(UnicodeModel, models.CASCADE)
         with self.assertRaisesMessage(
             ValueError,
-            'ModelState.fields cannot refer to a model class - "field.to" does. '
-            "Use a string reference instead.",
+            'Model fields in "ModelState.fields" cannot refer to a model class - '
+            '"app.Model.field.to" does. Use a string reference instead.',
         ):
             ModelState("app", "Model", [("field", field)])
 
@@ -1661,8 +1661,8 @@ class ModelStateTests(SimpleTestCase):
         field.remote_field.through = UnicodeModel
         with self.assertRaisesMessage(
             ValueError,
-            'ModelState.fields cannot refer to a model class - "field.through" does. '
-            "Use a string reference instead.",
+            'Model fields in "ModelState.fields" cannot refer to a model class - '
+            '"app.Model.field.through" does. Use a string reference instead.',
         ):
             ModelState("app", "Model", [("field", field)])
 

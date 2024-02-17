@@ -148,6 +148,8 @@ if validation has side effects, those side effects will only be triggered once.
 Returns a ``dict`` that maps fields to their original ``ValidationError``
 instances.
 
+.. code-block:: pycon
+
     >>> f.errors.as_data()
     {'sender': [ValidationError(['Enter a valid email address.'])],
     'subject': [ValidationError(['This field is required.'])]}
@@ -169,6 +171,8 @@ messages in ``Form.errors``.
 .. method:: Form.errors.as_json(escape_html=False)
 
 Returns the errors serialized as JSON.
+
+.. code-block:: pycon
 
     >>> f.errors.as_json()
     {"sender": [{"message": "Enter a valid email address.", "code": "invalid"}],
@@ -325,16 +329,22 @@ Checking which form data has changed
 Use the ``has_changed()`` method on your ``Form`` when you need to check if the
 form data has been changed from the initial data.
 
-    >>> data = {'subject': 'hello',
-    ...         'message': 'Hi there',
-    ...         'sender': 'foo@example.com',
-    ...         'cc_myself': True}
+.. code-block:: pycon
+
+    >>> data = {
+    ...     "subject": "hello",
+    ...     "message": "Hi there",
+    ...     "sender": "foo@example.com",
+    ...     "cc_myself": True,
+    ... }
     >>> f = ContactForm(data, initial=data)
     >>> f.has_changed()
     False
 
 When the form is submitted, we reconstruct it and provide the original data
 so that the comparison can be done:
+
+.. code-block:: pycon
 
     >>> f = ContactForm(request.POST, initial=data)
     >>> f.has_changed()
@@ -350,9 +360,12 @@ The ``changed_data`` attribute returns a list of the names of the fields whose
 values in the form's bound data (usually ``request.POST``) differ from what was
 provided in :attr:`~Form.initial`. It returns an empty list if no data differs.
 
+.. code-block:: pycon
+
     >>> f = ContactForm(request.POST, initial=data)
     >>> if f.has_changed():
     ...     print("The following fields changed: %s" % ", ".join(f.changed_data))
+    ...
     >>> f.changed_data
     ['subject', 'message']
 
@@ -896,7 +909,7 @@ It's possible to customize that character, or omit it entirely, using the
     <div><label for="id_for_cc_myself">Cc myself</label><input type="checkbox" name="cc_myself" id="id_for_cc_myself"></div>
     >>> f = ContactForm(auto_id="id_for_%s", label_suffix=" ->")
     >>> print(f)
-    <div><label for="id_for_subject">Subject:</label><input type="text" name="subject" maxlength="100" required id="id_for_subject"></div>
+    <div><label for="id_for_subject">Subject -&gt;</label><input type="text" name="subject" maxlength="100" required id="id_for_subject"></div>
     <div><label for="id_for_message">Message -&gt;</label><textarea name="message" cols="40" rows="10" required id="id_for_message"></textarea></div>
     <div><label for="id_for_sender">Sender -&gt;</label><input type="email" name="sender" required id="id_for_sender"></div>
     <div><label for="id_for_cc_myself">Cc myself -&gt;</label><input type="checkbox" name="cc_myself" id="id_for_cc_myself"></div>

@@ -20,7 +20,7 @@ except ImportError:
 
 
 test_collation = SimpleLazyObject(
-    lambda: connection.features.test_collations.get("non_default")
+    lambda: connection.features.test_collations["virtual"]
 )
 
 
@@ -482,10 +482,27 @@ class UUIDGrandchild(UUIDChild):
     pass
 
 
+class GeneratedModelFieldWithConverters(models.Model):
+    field = models.UUIDField()
+    field_copy = models.GeneratedField(
+        expression=F("field"),
+        output_field=models.UUIDField(),
+        db_persist=True,
+    )
+
+    class Meta:
+        required_db_features = {"supports_stored_generated_columns"}
+
+
 class GeneratedModel(models.Model):
     a = models.IntegerField()
     b = models.IntegerField()
-    field = models.GeneratedField(expression=F("a") + F("b"), db_persist=True)
+    field = models.GeneratedField(
+        expression=F("a") + F("b"),
+        output_field=models.IntegerField(),
+        db_persist=True,
+    )
+    fk = models.ForeignKey(Foo, on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
         required_db_features = {"supports_stored_generated_columns"}
@@ -494,7 +511,12 @@ class GeneratedModel(models.Model):
 class GeneratedModelVirtual(models.Model):
     a = models.IntegerField()
     b = models.IntegerField()
-    field = models.GeneratedField(expression=F("a") + F("b"), db_persist=False)
+    field = models.GeneratedField(
+        expression=F("a") + F("b"),
+        output_field=models.IntegerField(),
+        db_persist=False,
+    )
+    fk = models.ForeignKey(Foo, on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
         required_db_features = {"supports_virtual_generated_columns"}
@@ -503,6 +525,7 @@ class GeneratedModelVirtual(models.Model):
 class GeneratedModelParams(models.Model):
     field = models.GeneratedField(
         expression=Value("Constant", output_field=models.CharField(max_length=10)),
+        output_field=models.CharField(max_length=10),
         db_persist=True,
     )
 
@@ -513,6 +536,7 @@ class GeneratedModelParams(models.Model):
 class GeneratedModelParamsVirtual(models.Model):
     field = models.GeneratedField(
         expression=Value("Constant", output_field=models.CharField(max_length=10)),
+        output_field=models.CharField(max_length=10),
         db_persist=False,
     )
 
@@ -520,7 +544,7 @@ class GeneratedModelParamsVirtual(models.Model):
         required_db_features = {"supports_virtual_generated_columns"}
 
 
-class GeneratedModelOutputField(models.Model):
+class GeneratedModelOutputFieldDbCollation(models.Model):
     name = models.CharField(max_length=10)
     lower_name = models.GeneratedField(
         expression=Lower("name"),
@@ -529,13 +553,10 @@ class GeneratedModelOutputField(models.Model):
     )
 
     class Meta:
-        required_db_features = {
-            "supports_stored_generated_columns",
-            "supports_collation_on_charfield",
-        }
+        required_db_features = {"supports_stored_generated_columns"}
 
 
-class GeneratedModelOutputFieldVirtual(models.Model):
+class GeneratedModelOutputFieldDbCollationVirtual(models.Model):
     name = models.CharField(max_length=10)
     lower_name = models.GeneratedField(
         expression=Lower("name"),
@@ -544,16 +565,16 @@ class GeneratedModelOutputFieldVirtual(models.Model):
     )
 
     class Meta:
-        required_db_features = {
-            "supports_virtual_generated_columns",
-            "supports_collation_on_charfield",
-        }
+        required_db_features = {"supports_virtual_generated_columns"}
 
 
 class GeneratedModelNull(models.Model):
     name = models.CharField(max_length=10, null=True)
     lower_name = models.GeneratedField(
-        expression=Lower("name"), db_persist=True, null=True
+        expression=Lower("name"),
+        output_field=models.CharField(max_length=10),
+        db_persist=True,
+        null=True,
     )
 
     class Meta:
@@ -563,7 +584,10 @@ class GeneratedModelNull(models.Model):
 class GeneratedModelNullVirtual(models.Model):
     name = models.CharField(max_length=10, null=True)
     lower_name = models.GeneratedField(
-        expression=Lower("name"), db_persist=False, null=True
+        expression=Lower("name"),
+        output_field=models.CharField(max_length=10),
+        db_persist=False,
+        null=True,
     )
 
     class Meta:

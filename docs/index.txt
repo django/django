@@ -325,7 +325,7 @@ Learn about the development process for the Django project itself and about how
 you can contribute:
 
 * **Community:**
-  :doc:`How to get involved <internals/contributing/index>` |
+  :doc:`Contributing to Django <internals/contributing/index>` |
   :doc:`The release process <internals/release-process>` |
   :doc:`Team organization <internals/organization>` |
   :doc:`The Django source code repository <internals/git>` |

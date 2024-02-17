@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.migrations.operations.base import Operation
+from django.db.migrations.operations.base import Operation, OperationCategory
 from django.db.migrations.state import ModelState
 from django.db.migrations.utils import field_references, resolve_relation
 from django.db.models.options import normalize_together
@@ -41,6 +41,7 @@ class ModelOperation(Operation):
 class CreateModel(ModelOperation):
     """Create a model's table."""
 
+    category = OperationCategory.ADDITION
     serialization_expand_args = ["fields", "options", "managers"]
 
     def __init__(self, name, fields, options=None, bases=None, managers=None):
@@ -55,11 +56,11 @@ class CreateModel(ModelOperation):
         _check_for_duplicates(
             "bases",
             (
-                base._meta.label_lower
-                if hasattr(base, "_meta")
-                else base.lower()
-                if isinstance(base, str)
-                else base
+                (
+                    base._meta.label_lower
+                    if hasattr(base, "_meta")
+                    else base.lower() if isinstance(base, str) else base
+                )
                 for base in self.bases
             ),
         )
@@ -341,11 +342,47 @@ class CreateModel(ModelOperation):
                         managers=self.managers,
                     ),
                 ]
+            elif isinstance(operation, AddConstraint):
+                return [
+                    CreateModel(
+                        self.name,
+                        fields=self.fields,
+                        options={
+                            **self.options,
+                            "constraints": [
+                                *self.options.get("constraints", []),
+                                operation.constraint,
+                            ],
+                        },
+                        bases=self.bases,
+                        managers=self.managers,
+                    ),
+                ]
+            elif isinstance(operation, RemoveConstraint):
+                options_constraints = [
+                    constraint
+                    for constraint in self.options.get("constraints", [])
+                    if constraint.name != operation.name
+                ]
+                return [
+                    CreateModel(
+                        self.name,
+                        fields=self.fields,
+                        options={
+                            **self.options,
+                            "constraints": options_constraints,
+                        },
+                        bases=self.bases,
+                        managers=self.managers,
+                    ),
+                ]
         return super().reduce(operation, app_label)
 
 
 class DeleteModel(ModelOperation):
     """Drop a model's table."""
+
+    category = OperationCategory.REMOVAL
 
     def deconstruct(self):
         kwargs = {
@@ -381,6 +418,8 @@ class DeleteModel(ModelOperation):
 
 class RenameModel(ModelOperation):
     """Rename a model."""
+
+    category = OperationCategory.ALTERATION
 
     def __init__(self, old_name, new_name):
         self.old_name = old_name
@@ -499,6 +538,8 @@ class RenameModel(ModelOperation):
 
 
 class ModelOptionOperation(ModelOperation):
+    category = OperationCategory.ALTERATION
+
     def reduce(self, operation, app_label):
         if (
             isinstance(operation, (self.__class__, DeleteModel))
@@ -849,6 +890,8 @@ class IndexOperation(Operation):
 class AddIndex(IndexOperation):
     """Add an index on a model."""
 
+    category = OperationCategory.ADDITION
+
     def __init__(self, model_name, index):
         self.model_name = model_name
         if not index.name:
@@ -911,6 +954,8 @@ class AddIndex(IndexOperation):
 class RemoveIndex(IndexOperation):
     """Remove an index from a model."""
 
+    category = OperationCategory.REMOVAL
+
     def __init__(self, model_name, name):
         self.model_name = model_name
         self.name = name
@@ -953,6 +998,8 @@ class RemoveIndex(IndexOperation):
 
 class RenameIndex(IndexOperation):
     """Rename an index."""
+
+    category = OperationCategory.ALTERATION
 
     def __init__(self, model_name, new_name, old_name=None, old_fields=None):
         if not old_name and not old_fields:
@@ -1017,7 +1064,10 @@ class RenameIndex(IndexOperation):
                 from_model._meta.get_field(field).column for field in self.old_fields
             ]
             matching_index_name = schema_editor._constraint_names(
-                from_model, column_names=columns, index=True
+                from_model,
+                column_names=columns,
+                index=True,
+                unique=False,
             )
             if len(matching_index_name) != 1:
                 raise ValueError(
@@ -1101,6 +1151,7 @@ class RenameIndex(IndexOperation):
 
 
 class AddConstraint(IndexOperation):
+    category = OperationCategory.ADDITION
     option_name = "constraints"
 
     def __init__(self, model_name, constraint):
@@ -1151,6 +1202,7 @@ class AddConstraint(IndexOperation):
 
 
 class RemoveConstraint(IndexOperation):
+    category = OperationCategory.REMOVAL
     option_name = "constraints"
 
     def __init__(self, model_name, name):

@@ -266,6 +266,7 @@ class BaseDatabaseFeatures:
     # Does the backend support window expressions (expression OVER (...))?
     supports_over_clause = False
     supports_frame_range_fixed_distance = False
+    supports_frame_exclusion = False
     only_supports_unbounded_with_preceding_and_following = False
 
     # Does the backend support CAST with precision?
@@ -376,6 +377,7 @@ class BaseDatabaseFeatures:
         "cs": None,  # Case-sensitive.
         "non_default": None,  # Non-default.
         "swedish_ci": None,  # Swedish case-insensitive.
+        "virtual": None,  # A collation that can be used for virtual columns.
     }
     # SQL template override for tests.aggregation.tests.NowUTC
     test_now_utc_template = None

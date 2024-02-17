@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="{% block stylesheet %}{% static "admin/css/base.css" %}{% endblock %}">
 {% block dark-mode-vars %}
   <link rel="stylesheet" href="{% static "admin/css/dark_mode.css" %}">
-  <script src="{% static "admin/js/theme.js" %}" defer></script>
+  <script src="{% static "admin/js/theme.js" %}"></script>
 {% endblock %}
 {% if not is_popup and is_nav_sidebar_enabled %}
   <link rel="stylesheet" href="{% static "admin/css/nav_sidebar.css" %}">
@@ -81,13 +81,13 @@
     {% endblock %}
     {% endif %}
 
-    <main class="main" id="main">
+    <div class="main" id="main">
       {% if not is_popup and is_nav_sidebar_enabled %}
         {% block nav-sidebar %}
           {% include "admin/nav_sidebar.html" %}
         {% endblock %}
       {% endif %}
-      <div id="content-start" class="content" tabindex="-1">
+      <main id="content-start" class="content" tabindex="-1">
         {% block messages %}
           {% if messages %}
             <ul class="messagelist">{% for message in messages %}
@@ -108,9 +108,9 @@
           <br class="clear">
         </div>
         <!-- END Content -->
-        {% block footer %}<div id="footer"></div>{% endblock %}
-      </div>
-    </main>
+      </main>
+    </div>
+    <footer id="footer">{% block footer %}{% endblock %}</footer>
 </div>
 <!-- END Container -->
 

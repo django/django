@@ -14,10 +14,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-17 02:13-0600\n"
-"PO-Revision-Date: 2023-04-25 07:05+0000\n"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 07:05+0000\n"
 "Last-Translator: X Bello <xbello@gmail.com>, 2023\n"
-"Language-Team: Galician (http://www.transifex.com/django/django/language/"
+"Language-Team: Galician (http://app.transifex.com/django/django/language/"
 "gl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -186,6 +186,9 @@ msgstr ""
 " Para seleccionar máis dunha entrada, manteña premida a tecla “Control”, ou "
 "“Comando” nun Mac."
 
+msgid "Select this object for an action - {}"
+msgstr "Seleccione este obxeto para unha acción - {}"
+
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr "Engadiuse correctamente {name} “{obj}”."
@@ -344,6 +347,9 @@ msgstr "Seleccionar todos os %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Limpar selección"
 
+msgid "Breadcrumbs"
+msgstr "Migas de pan"
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "Modelos na aplicación %(name)s"
@@ -395,9 +401,6 @@ msgstr "Documentación"
 msgid "Log out"
 msgstr "Rematar sesión"
 
-msgid "Breadcrumbs"
-msgstr "Migas de pan"
-
 #, python-format
 msgid "Add %(name)s"
 msgstr "Engadir %(name)s"
@@ -410,6 +413,12 @@ msgstr "Ver no sitio"
 
 msgid "Filter"
 msgstr "Filtro"
+
+msgid "Hide counts"
+msgstr "Agochar contas"
+
+msgid "Show counts"
+msgstr "Amosar contas"
 
 msgid "Clear all filters"
 msgstr "Borrar tódolos filtros"
@@ -519,6 +528,15 @@ msgstr "As miñas accións"
 
 msgid "None available"
 msgstr "Ningunha dispoñíbel"
+
+msgid "Added:"
+msgstr "Engadido:"
+
+msgid "Changed:"
+msgstr "Modificado:"
+
+msgid "Deleted:"
+msgstr "Eliminado:"
 
 msgid "Unknown content"
 msgstr "Contido descoñecido"
@@ -730,6 +748,9 @@ msgstr "Enderezo de correo electrónico:"
 
 msgid "Reset my password"
 msgstr "Recuperar o meu contrasinal"
+
+msgid "Select all objects on this page for an action"
+msgstr "Seleccione tódolos obxetos desta páxina para unha acción"
 
 msgid "All dates"
 msgstr "Todas as datas"

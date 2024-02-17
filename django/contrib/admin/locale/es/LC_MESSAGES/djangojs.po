@@ -12,10 +12,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-17 03:19-0500\n"
-"PO-Revision-Date: 2023-04-25 07:59+0000\n"
+"POT-Creation-Date: 2023-09-18 15:04-0300\n"
+"PO-Revision-Date: 2023-12-04 07:59+0000\n"
 "Last-Translator: Uriel Medina <urimeba511@gmail.com>, 2020-2023\n"
-"Language-Team: Spanish (http://www.transifex.com/django/django/language/"
+"Language-Team: Spanish (http://app.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -83,9 +83,9 @@ msgstr "Haz clic para eliminar todos los %s elegidos"
 #, javascript-format
 msgid "%s selected option not visible"
 msgid_plural "%s selected options not visible"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%s opción seleccionada no visible"
+msgstr[1] "%s opciones seleccionadas no visibles"
+msgstr[2] "%s opciones seleccionadas no visibles"
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -251,6 +251,55 @@ msgstr "Nov"
 msgctxt "abbrev. month December"
 msgid "Dec"
 msgstr "Dic"
+
+msgid "Sunday"
+msgstr "Domingo"
+
+msgid "Monday"
+msgstr "Lunes"
+
+msgid "Tuesday"
+msgstr "Martes"
+
+msgid "Wednesday"
+msgstr "Miércoles"
+
+msgid "Thursday"
+msgstr "Jueves"
+
+msgid "Friday"
+msgstr "Viernes"
+
+msgid "Saturday"
+msgstr "Sábado"
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr "Dom"
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr "Lun"
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr "Mar"
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr "Mie"
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr "Jue"
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr "Vie"
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr "Sáb"
 
 msgctxt "one letter Sunday"
 msgid "S"

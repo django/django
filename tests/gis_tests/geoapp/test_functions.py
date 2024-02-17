@@ -122,7 +122,7 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
     @skipUnlessDBFeature("has_AsGeoJSON_function")
     def test_asgeojson_option_0(self):
         p1 = Point(1, 1, srid=4326)
-        p2 = Point(2, 2, srid=4326)
+        p2 = Point(-87.65018, 41.85039, srid=4326)
         obj = ManyPointModel.objects.create(
             point1=p1,
             point2=p2,
@@ -134,7 +134,7 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             .geojson,
             # GeoJSON without CRS.
             json.loads(
-                '{"type":"Point","coordinates":[222638.98158655,222684.20850554]}'
+                '{"type":"Point","coordinates":[-9757173.40553877, 5138594.87034608]}'
             ),
         )
 
@@ -258,7 +258,12 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             # num_seg is the number of segments per quarter circle.
             return (4 * num_seg) + 1
 
-        expected_areas = (169, 136) if connection.ops.postgis else (171, 126)
+        if connection.ops.postgis:
+            expected_areas = (169, 136)
+        elif connection.ops.spatialite:
+            expected_areas = (168, 135)
+        else:  # Oracle.
+            expected_areas = (171, 126)
         qs = Country.objects.annotate(
             circle=functions.BoundingCircle("mpoly")
         ).order_by("name")

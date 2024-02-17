@@ -1,4 +1,5 @@
 """Database functions that do comparisons or type conversions."""
+
 from django.db import NotSupportedError
 from django.db.models.expressions import Func, Value
 from django.db.models.fields import TextField
@@ -159,34 +160,39 @@ class JSONObject(Func):
             )
         return super().as_sql(compiler, connection, **extra_context)
 
-    def as_postgresql(self, compiler, connection, **extra_context):
-        copy = self.copy()
-        copy.set_source_expressions(
-            [
-                Cast(expression, TextField()) if index % 2 == 0 else expression
-                for index, expression in enumerate(copy.get_source_expressions())
-            ]
-        )
-        return super(JSONObject, copy).as_sql(
-            compiler,
-            connection,
-            function="JSONB_BUILD_OBJECT",
-            **extra_context,
-        )
-
-    def as_oracle(self, compiler, connection, **extra_context):
+    def as_native(self, compiler, connection, *, returning, **extra_context):
         class ArgJoiner:
             def join(self, args):
-                args = [" VALUE ".join(arg) for arg in zip(args[::2], args[1::2])]
-                return ", ".join(args)
+                pairs = zip(args[::2], args[1::2], strict=True)
+                return ", ".join([" VALUE ".join(pair) for pair in pairs])
 
         return self.as_sql(
             compiler,
             connection,
             arg_joiner=ArgJoiner(),
-            template="%(function)s(%(expressions)s RETURNING CLOB)",
+            template=f"%(function)s(%(expressions)s RETURNING {returning})",
             **extra_context,
         )
+
+    def as_postgresql(self, compiler, connection, **extra_context):
+        if not connection.features.is_postgresql_16:
+            copy = self.copy()
+            copy.set_source_expressions(
+                [
+                    Cast(expression, TextField()) if index % 2 == 0 else expression
+                    for index, expression in enumerate(copy.get_source_expressions())
+                ]
+            )
+            return super(JSONObject, copy).as_sql(
+                compiler,
+                connection,
+                function="JSONB_BUILD_OBJECT",
+                **extra_context,
+            )
+        return self.as_native(compiler, connection, returning="JSONB", **extra_context)
+
+    def as_oracle(self, compiler, connection, **extra_context):
+        return self.as_native(compiler, connection, returning="CLOB", **extra_context)
 
 
 class Least(Func):

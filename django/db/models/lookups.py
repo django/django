@@ -268,11 +268,18 @@ class FieldGetDbPrepValueMixin:
             getattr(field, "get_db_prep_value", None)
             or self.lhs.output_field.get_db_prep_value
         )
+        if not self.get_db_prep_lookup_value_is_iterable:
+            value = [value]
         return (
             "%s",
-            [get_db_prep_value(v, connection, prepared=True) for v in value]
-            if self.get_db_prep_lookup_value_is_iterable
-            else [get_db_prep_value(value, connection, prepared=True)],
+            [
+                (
+                    v
+                    if hasattr(v, "as_sql")
+                    else get_db_prep_value(v, connection, prepared=True)
+                )
+                for v in value
+            ],
         )
 
 
@@ -470,6 +477,14 @@ class IntegerLessThanOrEqual(IntegerFieldOverflow, LessThanOrEqual):
 @Field.register_lookup
 class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
     lookup_name = "in"
+
+    def get_refs(self):
+        refs = super().get_refs()
+        if self.rhs_is_direct_value():
+            for rhs in self.rhs:
+                if get_rhs_refs := getattr(rhs, "get_refs", None):
+                    refs |= get_rhs_refs()
+        return refs
 
     def get_prep_lookup(self):
         from django.db.models.sql.query import Query  # avoid circular import

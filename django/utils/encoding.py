@@ -9,15 +9,11 @@ from django.utils.functional import Promise
 
 
 class DjangoUnicodeDecodeError(UnicodeDecodeError):
-    def __init__(self, obj, *args):
-        self.obj = obj
-        super().__init__(*args)
-
     def __str__(self):
         return "%s. You passed in %r (%s)" % (
             super().__str__(),
-            self.obj,
-            type(self.obj),
+            self.object,
+            type(self.object),
         )
 
 
@@ -72,7 +68,7 @@ def force_str(s, encoding="utf-8", strings_only=False, errors="strict"):
         else:
             s = str(s)
     except UnicodeDecodeError as e:
-        raise DjangoUnicodeDecodeError(s, *e.args)
+        raise DjangoUnicodeDecodeError(*e.args) from None
     return s
 
 

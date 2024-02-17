@@ -64,12 +64,7 @@ class FuncTestMixin:
 
         vendor_impl = "as_" + connection.vendor
         __getattribute__original = Func.__getattribute__
-        self.func_patcher = mock.patch.object(
-            Func, "__getattribute__", __getattribute__
-        )
-        self.func_patcher.start()
+        func_patcher = mock.patch.object(Func, "__getattribute__", __getattribute__)
+        func_patcher.start()
+        self.addCleanup(func_patcher.stop)
         super().setUp()
-
-    def tearDown(self):
-        super().tearDown()
-        self.func_patcher.stop()

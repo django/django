@@ -524,11 +524,11 @@ class ProjectState:
             if model_state.options.get("proxy"):
                 proxy_models[model_key] = model_state
                 # Find a concrete model for the proxy.
-                concrete_models_mapping[
-                    model_key
-                ] = self._find_concrete_model_from_proxy(
-                    proxy_models,
-                    model_state,
+                concrete_models_mapping[model_key] = (
+                    self._find_concrete_model_from_proxy(
+                        proxy_models,
+                        model_state,
+                    )
                 )
             else:
                 concrete_models_mapping[model_key] = model_key
@@ -738,13 +738,15 @@ class ModelState:
             # Sanity-check that relation fields are NOT referring to a model class.
             if field.is_relation and hasattr(field.related_model, "_meta"):
                 raise ValueError(
-                    'ModelState.fields cannot refer to a model class - "%s.to" does. '
-                    "Use a string reference instead." % name
+                    'Model fields in "ModelState.fields" cannot refer to a model class '
+                    f'- "{self.app_label}.{self.name}.{name}.to" does. Use a string '
+                    "reference instead."
                 )
             if field.many_to_many and hasattr(field.remote_field.through, "_meta"):
                 raise ValueError(
-                    'ModelState.fields cannot refer to a model class - "%s.through" '
-                    "does. Use a string reference instead." % name
+                    'Model fields in "ModelState.fields" cannot refer to a model class '
+                    f'- "{self.app_label}.{self.name}.{name}.through" does. Use a '
+                    "string reference instead."
                 )
         # Sanity-check that indexes have their name set.
         for index in self.options["indexes"]:

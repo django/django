@@ -3,16 +3,17 @@
 # Translators:
 # András Veres-Szentkirályi, 2016,2018
 # Attila Nagy <>, 2012
+# Balázs R, 2023
 # Jannis Leidel <jannis@leidel.info>, 2011
-# János R (Hangya), 2012
+# János R, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-16 20:42+0100\n"
-"PO-Revision-Date: 2018-07-31 07:43+0000\n"
-"Last-Translator: András Veres-Szentkirályi\n"
-"Language-Team: Hungarian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 18:40+0000\n"
+"Last-Translator: Balázs R, 2023\n"
+"Language-Team: Hungarian (http://app.transifex.com/django/django/language/"
 "hu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -43,7 +44,7 @@ msgctxt "ordinal 2"
 msgid "{}nd"
 msgstr "{}."
 
-#. Translators: Ordinal format when value ends with 3, e.g. 83th, except 13.
+#. Translators: Ordinal format when value ends with 3, e.g. 83rd, except 13.
 msgctxt "ordinal 3"
 msgid "{}rd"
 msgstr "{}."
@@ -79,22 +80,10 @@ msgid "{}th"
 msgstr "{}."
 
 #, python-format
-msgid "%(value).1f million"
-msgid_plural "%(value).1f million"
-msgstr[0] "%(value)1f millió"
-msgstr[1] "%(value)1f millió"
-
-#, python-format
 msgid "%(value)s million"
 msgid_plural "%(value)s million"
 msgstr[0] "%(value)s millió"
 msgstr[1] "%(value)s millió"
-
-#, python-format
-msgid "%(value).1f billion"
-msgid_plural "%(value).1f billion"
-msgstr[0] "%(value)1f milliárd"
-msgstr[1] "%(value)1f milliárd"
 
 #, python-format
 msgid "%(value)s billion"
@@ -103,22 +92,10 @@ msgstr[0] " %(value)s milliárd"
 msgstr[1] " %(value)s milliárd"
 
 #, python-format
-msgid "%(value).1f trillion"
-msgid_plural "%(value).1f trillion"
-msgstr[0] "%(value)1f trilliárd"
-msgstr[1] "%(value)1f trilliárd"
-
-#, python-format
 msgid "%(value)s trillion"
 msgid_plural "%(value)s trillion"
 msgstr[0] "%(value)s billió"
 msgstr[1] "%(value)s billió"
-
-#, python-format
-msgid "%(value).1f quadrillion"
-msgid_plural "%(value).1f quadrillion"
-msgstr[0] "%(value).1f billiárd"
-msgstr[1] "%(value).1f billiárd"
 
 #, python-format
 msgid "%(value)s quadrillion"
@@ -127,22 +104,10 @@ msgstr[0] "%(value)s billiárd"
 msgstr[1] "%(value)s billiárd"
 
 #, python-format
-msgid "%(value).1f quintillion"
-msgid_plural "%(value).1f quintillion"
-msgstr[0] "%(value).1f trillió"
-msgstr[1] "%(value).1f trillió"
-
-#, python-format
 msgid "%(value)s quintillion"
 msgid_plural "%(value)s quintillion"
 msgstr[0] "%(value)s trillió"
 msgstr[1] "%(value)s trillió"
-
-#, python-format
-msgid "%(value).1f sextillion"
-msgid_plural "%(value).1f sextillion"
-msgstr[0] "%(value).1f trilliárd"
-msgstr[1] "%(value).1f trilliárd"
 
 #, python-format
 msgid "%(value)s sextillion"
@@ -151,22 +116,10 @@ msgstr[0] "%(value)s trilliárd"
 msgstr[1] "%(value)s trilliárd"
 
 #, python-format
-msgid "%(value).1f septillion"
-msgid_plural "%(value).1f septillion"
-msgstr[0] "%(value).1f kvadrillió"
-msgstr[1] "%(value).1f kvadrillió"
-
-#, python-format
 msgid "%(value)s septillion"
 msgid_plural "%(value)s septillion"
 msgstr[0] "%(value)s kvadrillió"
 msgstr[1] "%(value)s kvadrillió"
-
-#, python-format
-msgid "%(value).1f octillion"
-msgid_plural "%(value).1f octillion"
-msgstr[0] "%(value).1f kvadrilliárd"
-msgstr[1] "%(value).1f kvadrilliárd"
 
 #, python-format
 msgid "%(value)s octillion"
@@ -175,34 +128,16 @@ msgstr[0] "%(value)s kvadrilliárd"
 msgstr[1] "%(value)s kvadrilliárd"
 
 #, python-format
-msgid "%(value).1f nonillion"
-msgid_plural "%(value).1f nonillion"
-msgstr[0] "%(value).1f kvintillió"
-msgstr[1] "%(value).1f kvintillió"
-
-#, python-format
 msgid "%(value)s nonillion"
 msgid_plural "%(value)s nonillion"
 msgstr[0] "%(value)s kvintillió"
 msgstr[1] "%(value)s kvintillió"
 
 #, python-format
-msgid "%(value).1f decillion"
-msgid_plural "%(value).1f decillion"
-msgstr[0] "%(value).1f kvintilliárd"
-msgstr[1] "%(value).1f kvintilliárd"
-
-#, python-format
 msgid "%(value)s decillion"
 msgid_plural "%(value)s decillion"
 msgstr[0] "%(value)s kvintilliárd"
 msgstr[1] "%(value)s kvintilliárd"
-
-#, python-format
-msgid "%(value).1f googol"
-msgid_plural "%(value).1f googol"
-msgstr[0] "%(value).1f googol"
-msgstr[1] "%(value).1f googol"
 
 #, python-format
 msgid "%(value)s googol"
@@ -312,86 +247,86 @@ msgstr "%(delta)s múlva"
 #. Translators: 'naturaltime-past' strings will be included in '%(delta)s ago'
 #, python-format
 msgctxt "naturaltime-past"
-msgid "%d year"
-msgid_plural "%d years"
-msgstr[0] "%d évvel"
-msgstr[1] "%d évvel"
+msgid "%(num)d year"
+msgid_plural "%(num)d years"
+msgstr[0] "%(num)d évvel"
+msgstr[1] "%(num)d évvel"
 
 #, python-format
 msgctxt "naturaltime-past"
-msgid "%d month"
-msgid_plural "%d months"
-msgstr[0] "%d hónappal"
-msgstr[1] "%d hónappal"
+msgid "%(num)d month"
+msgid_plural "%(num)d months"
+msgstr[0] "%(num)d hónappal"
+msgstr[1] "%(num)d hónappal"
 
 #, python-format
 msgctxt "naturaltime-past"
-msgid "%d week"
-msgid_plural "%d weeks"
-msgstr[0] "%d héttel"
-msgstr[1] "%d héttel"
+msgid "%(num)d week"
+msgid_plural "%(num)d weeks"
+msgstr[0] "%(num)d héttel"
+msgstr[1] "%(num)d héttel"
 
 #, python-format
 msgctxt "naturaltime-past"
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d nappal"
-msgstr[1] "%d nappal"
+msgid "%(num)d day"
+msgid_plural "%(num)d days"
+msgstr[0] "%(num)d nappal"
+msgstr[1] "%(num)d nappal"
 
 #, python-format
 msgctxt "naturaltime-past"
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d órával"
-msgstr[1] "%d órával"
+msgid "%(num)d hour"
+msgid_plural "%(num)d hours"
+msgstr[0] "%(num)d órával"
+msgstr[1] "%(num)d órával"
 
 #, python-format
 msgctxt "naturaltime-past"
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d perccel"
-msgstr[1] "%d perccel"
+msgid "%(num)d minute"
+msgid_plural "%(num)d minutes"
+msgstr[0] "%(num)d perccel"
+msgstr[1] "%(num)d perccel"
 
 #. Translators: 'naturaltime-future' strings will be included in '%(delta)s
 #. from now'
 #, python-format
 msgctxt "naturaltime-future"
-msgid "%d year"
-msgid_plural "%d years"
-msgstr[0] "%d év"
-msgstr[1] "%d év"
+msgid "%(num)d year"
+msgid_plural "%(num)d years"
+msgstr[0] "%(num)d év"
+msgstr[1] "%(num)d év"
 
 #, python-format
 msgctxt "naturaltime-future"
-msgid "%d month"
-msgid_plural "%d months"
-msgstr[0] "%d hónap"
-msgstr[1] "%d hónap"
+msgid "%(num)d month"
+msgid_plural "%(num)d months"
+msgstr[0] "%(num)d hónap"
+msgstr[1] "%(num)d hónap"
 
 #, python-format
 msgctxt "naturaltime-future"
-msgid "%d week"
-msgid_plural "%d weeks"
-msgstr[0] "%d hét"
-msgstr[1] "%d hét"
+msgid "%(num)d week"
+msgid_plural "%(num)d weeks"
+msgstr[0] "%(num)d hét"
+msgstr[1] "%(num)d hét"
 
 #, python-format
 msgctxt "naturaltime-future"
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d nap"
-msgstr[1] "%d nap"
+msgid "%(num)d day"
+msgid_plural "%(num)d days"
+msgstr[0] "%(num)d nap"
+msgstr[1] "%(num)d nap"
 
 #, python-format
 msgctxt "naturaltime-future"
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d óra"
-msgstr[1] "%d óra"
+msgid "%(num)d hour"
+msgid_plural "%(num)d hours"
+msgstr[0] "%(num)d óra"
+msgstr[1] "%(num)d óra"
 
 #, python-format
 msgctxt "naturaltime-future"
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d perc"
-msgstr[1] "%d perc"
+msgid "%(num)d minute"
+msgid_plural "%(num)d minutes"
+msgstr[0] "%(num)d perc"
+msgstr[1] "%(num)d perc"

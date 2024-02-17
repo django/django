@@ -431,7 +431,7 @@ def _init_worker(
         django.setup()
         setup_test_environment(debug=debug_mode)
 
-    db_aliases = used_aliases or connections
+    db_aliases = used_aliases if used_aliases is not None else connections
     for alias in db_aliases:
         connection = connections[alias]
         if start_method == "spawn":

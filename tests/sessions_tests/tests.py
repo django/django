@@ -10,7 +10,7 @@ from pathlib import Path
 from unittest import mock
 
 from django.conf import settings
-from django.contrib.sessions.backends.base import UpdateError
+from django.contrib.sessions.backends.base import SessionBase, UpdateError
 from django.contrib.sessions.backends.cache import SessionStore as CacheSession
 from django.contrib.sessions.backends.cached_db import SessionStore as CacheDBSession
 from django.contrib.sessions.backends.db import SessionStore as DatabaseSession
@@ -49,12 +49,10 @@ class SessionTestsMixin:
 
     def setUp(self):
         self.session = self.backend()
-
-    def tearDown(self):
         # NB: be careful to delete any sessions created; stale sessions fill up
         # the /tmp (with some backends) and eventually overwhelm it after lots
         # of runs (think buildbots)
-        self.session.delete()
+        self.addCleanup(self.session.delete)
 
     def test_new_session(self):
         self.assertIs(self.session.modified, False)
@@ -532,6 +530,7 @@ class FileSessionTests(SessionTestsMixin, SimpleTestCase):
         # Do file session tests in an isolated directory, and kill it after we're done.
         self.original_session_file_path = settings.SESSION_FILE_PATH
         self.temp_session_store = settings.SESSION_FILE_PATH = self.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.temp_session_store)
         # Reset the file session backend's internal caches
         if hasattr(self.backend, "_storage_path"):
             del self.backend._storage_path
@@ -540,7 +539,6 @@ class FileSessionTests(SessionTestsMixin, SimpleTestCase):
     def tearDown(self):
         super().tearDown()
         settings.SESSION_FILE_PATH = self.original_session_file_path
-        shutil.rmtree(self.temp_session_store)
 
     def mkdtemp(self):
         return tempfile.mkdtemp()
@@ -929,3 +927,45 @@ class ClearSessionsCommandTests(SimpleTestCase):
         with self.settings(SESSION_ENGINE="sessions_tests.no_clear_expired"):
             with self.assertRaisesMessage(management.CommandError, msg):
                 management.call_command("clearsessions")
+
+
+class SessionBaseTests(SimpleTestCase):
+    not_implemented_msg = "subclasses of SessionBase must provide %s() method"
+
+    def setUp(self):
+        self.session = SessionBase()
+
+    def test_create(self):
+        msg = self.not_implemented_msg % "a create"
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            self.session.create()
+
+    def test_delete(self):
+        msg = self.not_implemented_msg % "a delete"
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            self.session.delete()
+
+    def test_exists(self):
+        msg = self.not_implemented_msg % "an exists"
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            self.session.exists(None)
+
+    def test_load(self):
+        msg = self.not_implemented_msg % "a load"
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            self.session.load()
+
+    def test_save(self):
+        msg = self.not_implemented_msg % "a save"
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            self.session.save()
+
+    def test_test_cookie(self):
+        self.assertIs(self.session.has_key(self.session.TEST_COOKIE_NAME), False)
+        self.session.set_test_cookie()
+        self.assertIs(self.session.test_cookie_worked(), True)
+        self.session.delete_test_cookie()
+        self.assertIs(self.session.has_key(self.session.TEST_COOKIE_NAME), False)
+
+    def test_is_empty(self):
+        self.assertIs(self.session.is_empty(), True)

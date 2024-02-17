@@ -106,7 +106,7 @@ Wire these new views into the ``polls.urls`` module by adding the following
     ]
 
 Take a look in your browser, at "/polls/34/". It'll run the ``detail()``
-method and display whatever ID you provide in the URL. Try
+function and display whatever ID you provide in the URL. Try
 "/polls/34/results/" and "/polls/34/vote/" too -- these will display the
 placeholder results and voting pages.
 
@@ -401,7 +401,7 @@ template, the link was partially hardcoded like this:
 
 The problem with this hardcoded, tightly-coupled approach is that it becomes
 challenging to change URLs on projects with a lot of templates. However, since
-you defined the name argument in the :func:`~django.urls.path` functions in
+you defined the ``name`` argument in the :func:`~django.urls.path` functions in
 the ``polls.urls`` module, you can remove a reliance on specific URL paths
 defined in your url configurations by using the ``{% url %}`` template tag:
 

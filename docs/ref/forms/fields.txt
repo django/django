@@ -173,13 +173,13 @@ field is initialized to a particular value. For example:
     >>> from django import forms
     >>> class CommentForm(forms.Form):
     ...     name = forms.CharField(initial="Your name")
-    ...     url = forms.URLField(initial="http://")
+    ...     url = forms.URLField(initial="https://")
     ...     comment = forms.CharField()
     ...
     >>> f = CommentForm(auto_id=False)
     >>> print(f)
     <div>Name:<input type="text" name="name" value="Your name" required></div>
-    <div>Url:<input type="url" name="url" value="http://" required></div>
+    <div>Url:<input type="url" name="url" value="https://" required></div>
     <div>Comment:<input type="text" name="comment" required></div>
 
 You may be thinking, why not just pass a dictionary of the initial values as
@@ -193,7 +193,7 @@ and the HTML output will include any validation errors:
     ...     url = forms.URLField()
     ...     comment = forms.CharField()
     ...
-    >>> default_data = {"name": "Your name", "url": "http://"}
+    >>> default_data = {"name": "Your name", "url": "https://"}
     >>> f = CommentForm(default_data, auto_id=False)
     >>> print(f)
     <div>Name:
@@ -201,7 +201,7 @@ and the HTML output will include any validation errors:
     </div>
     <div>Url:
       <ul class="errorlist"><li>Enter a valid URL.</li></ul>
-      <input type="url" name="url" value="http://" required aria-invalid="true">
+      <input type="url" name="url" value="https://" required aria-invalid="true">
     </div>
     <div>Comment:
       <ul class="errorlist"><li>This field is required.</li></ul>
@@ -219,7 +219,7 @@ validation if a particular field's value is not given. ``initial`` values are
 
     >>> class CommentForm(forms.Form):
     ...     name = forms.CharField(initial="Your name")
-    ...     url = forms.URLField(initial="http://")
+    ...     url = forms.URLField(initial="https://")
     ...     comment = forms.CharField()
     ...
     >>> data = {"name": "", "url": "", "comment": "Foo"}
@@ -283,9 +283,10 @@ fields. We've specified ``auto_id=False`` to simplify the output:
     <div>Sender:<div class="helptext">A valid email address, please.</div><input type="email" name="sender" required></div>
     <div>Cc myself:<input type="checkbox" name="cc_myself"></div>
 
-When a field has help text and :attr:`~django.forms.BoundField.id_for_label`
-returns a value, we associate ``help_text`` with the input using the
-``aria-describedby`` HTML attribute:
+When a field has help text it is associated with its input using the
+``aria-describedby`` HTML attribute. If the widget is rendered in a
+``<fieldset>`` then ``aria-describedby`` is added to this element, otherwise it
+is added to the widget's ``<input>``:
 
 .. code-block:: pycon
 
@@ -324,6 +325,10 @@ inside ``aria-describedby``:
 .. versionchanged:: 5.0
 
     ``aria-describedby`` was added to associate ``help_text`` with its input.
+
+.. versionchanged:: 5.1
+
+    ``aria-describedby`` support was added for ``<fieldset>``.
 
 ``error_messages``
 ------------------
@@ -1136,17 +1141,23 @@ For each field, we describe the default widget used if you don't specify
     * Error message keys: ``required``, ``invalid``
 
     Has the optional arguments ``max_length``, ``min_length``, ``empty_value``
-    which work just as they do for :class:`CharField`, and ``assume_scheme``
-    that defaults to ``"http"``.
+    which work just as they do for :class:`CharField`, and one more argument:
 
-    .. versionchanged:: 5.0
+    .. attribute:: assume_scheme
 
-        The ``assume_scheme`` argument was added.
+        .. versionadded:: 5.0
+
+        The scheme assumed for URLs provided without one. Defaults to
+        ``"http"``. For example, if ``assume_scheme`` is ``"https"`` and the
+        provided value is ``"example.com"``, the normalized value will be
+        ``"https://example.com"``.
 
     .. deprecated:: 5.0
 
         The default value for ``assume_scheme`` will change from ``"http"`` to
-        ``"https"`` in Django 6.0.
+        ``"https"`` in Django 6.0. Set :setting:`FORMS_URLFIELD_ASSUME_HTTPS`
+        transitional setting to ``True`` to opt into using ``"https"`` during
+        the Django 5.x release cycle.
 
 ``UUIDField``
 -------------
@@ -1183,11 +1194,13 @@ Slightly complex built-in ``Field`` classes
         The list of fields that should be used to validate the field's value (in
         the order in which they are provided).
 
+        .. code-block:: pycon
+
             >>> from django.forms import ComboField
             >>> f = ComboField(fields=[CharField(max_length=20), EmailField()])
-            >>> f.clean('test@example.com')
+            >>> f.clean("test@example.com")
             'test@example.com'
-            >>> f.clean('longemailaddress@example.com')
+            >>> f.clean("longemailaddress@example.com")
             Traceback (most recent call last):
             ...
             ValidationError: ['Ensure this value has at most 20 characters (it has 28).']

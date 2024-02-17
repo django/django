@@ -3,7 +3,9 @@
 # Translators:
 # HuanCheng Bai白宦成（Bestony） <xiqingongzi@gmail.com>, 2018
 # Fan Xu <xlivevil@aliyun.com>, 2022
+# jack yang, 2023
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Kaiqi Zhu, 2023
 # Kewei Ma <marknv.42@gmail.com>, 2016
 # Lele Long <schemacs@gmail.com>, 2011,2015
 # Liping Wang <lynn.config@gmail.com>, 2016
@@ -19,10 +21,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-17 03:19-0500\n"
-"PO-Revision-Date: 2023-04-25 07:59+0000\n"
-"Last-Translator: 高乐喆 <gaolezhe@outlook.com>, 2023\n"
-"Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
+"POT-Creation-Date: 2023-09-18 15:04-0300\n"
+"PO-Revision-Date: 2023-12-25 07:59+0000\n"
+"Last-Translator: jack yang, 2023\n"
+"Language-Team: Chinese (China) (http://app.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -88,7 +90,7 @@ msgstr "删除所有已选择的%s。"
 #, javascript-format
 msgid "%s selected option not visible"
 msgid_plural "%s selected options not visible"
-msgstr[0] ""
+msgstr[0] "%s所选选项不可见"
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -245,6 +247,55 @@ msgstr "十一月"
 msgctxt "abbrev. month December"
 msgid "Dec"
 msgstr "十二月"
+
+msgid "Sunday"
+msgstr "星期日"
+
+msgid "Monday"
+msgstr "星期一"
+
+msgid "Tuesday"
+msgstr "星期二"
+
+msgid "Wednesday"
+msgstr "星期三"
+
+msgid "Thursday"
+msgstr "星期四"
+
+msgid "Friday"
+msgstr "星期五"
+
+msgid "Saturday"
+msgstr "星期六"
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr "星期日"
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr "星期一"
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr "星期二"
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr "星期三"
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr "星期四"
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr "星期五"
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr "星期六"
 
 msgctxt "one letter Sunday"
 msgid "S"

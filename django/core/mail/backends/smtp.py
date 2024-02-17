@@ -1,4 +1,5 @@
 """SMTP email backend class."""
+
 import smtplib
 import ssl
 import threading
