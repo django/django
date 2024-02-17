@@ -599,24 +599,24 @@ class FormSetMeta(type):
         Initialize the attributes given to the FormSet class and adds the
         missing required argument and sets them to default values.
         """
-        attrs["min_num"] = (
-            DEFAULT_MIN_NUM if not attrs.get("min_num") else attrs.get("min_num")
-        )
-        attrs["max_num"] = (
-            DEFAULT_MAX_NUM if not attrs.get("max_num") else attrs.get("max_num")
-        )
+        if attrs.get("min_num") is None:
+            attrs["min_num"] = DEFAULT_MIN_NUM
+        if attrs.get("max_num") is None:
+            attrs["max_num"] = DEFAULT_MAX_NUM
+        formset = attrs.get("formset") or BaseFormSet
 
         default_attrs = {
             "form": attrs.get("form") or None,
             "extra": 1,
             "can_order": False,
             "can_delete": False,
-            "min_num": attrs["min_num"],
-            "max_num": attrs["max_num"],
+            "min_num": DEFAULT_MIN_NUM,
+            "max_num": DEFAULT_MAX_NUM,
             "absolute_max": attrs["max_num"] + DEFAULT_MAX_NUM,
             "validate_min": False,
             "validate_max": False,
-            "renderer": None,
+            "can_delete_extra": True,
+            "renderer": attrs.get("renderer")
         }
 
         for key, value in default_attrs.items():
@@ -626,7 +626,7 @@ class FormSetMeta(type):
         if attrs["max_num"] > attrs["absolute_max"]:
             raise ValueError("'absolute_max' must be greater or equal to 'max_num'.")
 
-        new_class = super(FormSetMeta, cls).__new__(cls, name, bases, attrs)
+        new_class = super(FormSetMeta, cls).__new__(cls, name, (formset,), attrs)
         return new_class
 
 
@@ -646,8 +646,16 @@ class FormSet(BaseFormSet, metaclass=FormSetMeta):
         initial=None,
         error_class=ErrorList,
         form_kwargs=None,
+        error_messages=None,
     ):
         """Initialize FormSet."""
         super().__init__(
-            data, files, auto_id, prefix, initial, error_class, form_kwargs
+            data,
+            files,
+            auto_id,
+            prefix,
+            initial,
+            error_class,
+            form_kwargs,
+            error_messages,
         )
