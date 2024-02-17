@@ -24,7 +24,7 @@ from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.functional import cached_property
 
 
-class GenericForeignKey(FieldCacheMixin):
+class GenericForeignKey(ForeignObject):
     """
     Provide a generic many-to-one relation through the ``content_type`` and
     ``object_id`` fields.
@@ -37,7 +37,6 @@ class GenericForeignKey(FieldCacheMixin):
     auto_created = False
     concrete = False
     editable = False
-    hidden = False
 
     is_relation = True
     many_to_many = False
@@ -77,28 +76,12 @@ class GenericForeignKey(FieldCacheMixin):
             self.ct_field: ContentType.objects.get_for_model(obj).pk,
         }
 
-    def __str__(self):
-        model = self.model
-        return "%s.%s" % (model._meta.label, self.name)
-
     def check(self, **kwargs):
         return [
             *self._check_field_name(),
             *self._check_object_id_field(),
             *self._check_content_type_field(),
         ]
-
-    def _check_field_name(self):
-        if self.name.endswith("_"):
-            return [
-                checks.Error(
-                    "Field names must not end with an underscore.",
-                    obj=self,
-                    id="fields.E001",
-                )
-            ]
-        else:
-            return []
 
     def _check_object_id_field(self):
         try:
