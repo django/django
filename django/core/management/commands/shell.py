@@ -3,8 +3,11 @@ import select
 import sys
 import traceback
 
+from django.apps import apps
+from django.apps.config import MODELS_MODULE_NAME
 from django.core.management import BaseCommand, CommandError
 from django.utils.datastructures import OrderedSet
+from django.utils.module_loading import import_string
 
 
 class Command(BaseCommand):
@@ -47,18 +50,23 @@ class Command(BaseCommand):
     def ipython(self, options):
         from IPython import start_ipython
 
-        start_ipython(argv=[])
+        try:
+            imported_objects = self.get_namespace(options, self.style)
+            start_ipython(argv=[], user_ns=imported_objects)
+        except ImportError:
+            traceback.format_exc()
 
     def bpython(self, options):
         import bpython
 
-        bpython.embed()
+        imported_objects = self.get_namespace(options, self.style)
+        bpython.embed(imported_objects)
 
     def python(self, options):
         import code
 
         # Set up a dictionary to serve as the environment for the shell.
-        imported_objects = {}
+        imported_objects = self.get_namespace(options, self.style)
 
         # We want to honor both $PYTHONSTARTUP and .pythonrc.py, so follow system
         # conventions and get $PYTHONSTARTUP first then .pythonrc.py.
@@ -110,6 +118,52 @@ class Command(BaseCommand):
 
         # Start the interactive interpreter.
         code.interact(local=imported_objects)
+
+    def get_app_name(self, app_module):
+        # implementation from django_extension
+        rparts = list(reversed(app_module.split(".")))
+        try:
+            try:
+                return rparts[rparts.index(MODELS_MODULE_NAME) + 1]
+            except ValueError:
+                return rparts[1]
+        except IndexError:
+            return app_module
+
+    def get_apps_and_models(self):
+        # get all apps and models
+        for app_conf in apps.get_app_configs():
+            if app_conf.models_module:
+                yield app_conf.models_module, app_conf.get_models()
+
+    def get_namespace(self, options, style):
+        """Override this method with import_items in order to import extra_things"""
+
+        imported_objects = {}
+
+        for app_module, app_models in self.get_apps_and_models():
+            if not app_models:
+                continue
+
+            for model in app_models:
+
+                if model.__module__:
+                    try:
+                        imported_objects[model.__name__] = import_string(
+                            "%s.%s" % (model.__module__, model.__name__)
+                        )
+                    except ImportError as e:
+                        if options.get("traceback"):
+                            traceback.print_exc()
+                        else:
+                            print(
+                                style.ERROR(
+                                    "Failed to import %s from %s, reason %s"
+                                    % (model.__name__, model.__module__, e)
+                                )
+                            )
+
+        return imported_objects
 
     def handle(self, **options):
         # Execute the command and exit.
