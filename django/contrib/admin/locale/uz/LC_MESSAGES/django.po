@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Quvonchek Bobojonov <moorfoinfo@gmail.com>, 2024
 # Alex Ibragimov, 2021
 # Anvar Ulugov <wasatiyatm@gmail.com>, 2020
 # Bedilbek Khamidov <bedilbek@gmail.com>, 2019
@@ -259,11 +260,11 @@ msgstr[0] ""
 
 #, python-format
 msgid "0 of %(cnt)s selected"
-msgstr ""
+msgstr "0 dan %(cnt)s tanlandi"
 
 #, python-format
 msgid "Change history: %s"
-msgstr ""
+msgstr "Oʻzgarishlar tarixi: %s"
 
 #. Translators: Model verbose name and instance
 #. representation, suitable to be an item in a
@@ -279,29 +280,29 @@ msgid ""
 msgstr ""
 
 msgid "Django site admin"
-msgstr ""
+msgstr "Django sayt administratori"
 
 msgid "Django administration"
-msgstr ""
+msgstr "Django administratori"
 
 msgid "Site administration"
-msgstr ""
+msgstr "Sayt administratori"
 
 msgid "Log in"
-msgstr ""
+msgstr "Tizimga kirish"
 
 #, python-format
 msgid "%(app)s administration"
 msgstr ""
 
 msgid "Page not found"
-msgstr ""
+msgstr "Sahifa topilmadi"
 
 msgid "We’re sorry, but the requested page could not be found."
-msgstr ""
+msgstr "Kechirasiz, lekin soʻralgan sahifani topib boʻlmadi."
 
 msgid "Home"
-msgstr ""
+msgstr "Asosiy"
 
 msgid "Server error"
 msgstr "Server xatoligi"
@@ -316,29 +317,31 @@ msgid ""
 "There’s been an error. It’s been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
+"Xatolik yuz berdi. Bu haqda sayt ma'murlariga xabar qilindi "
+"elektron pochta va tez orada tuzatilishi kerak. Sabr-toqatingiz uchun rahmat."
 
 msgid "Run the selected action"
 msgstr "Tanlangan faoliyatni ishga tushirish"
 
 msgid "Go"
-msgstr ""
+msgstr "Bajarish"
 
 msgid "Click here to select the objects across all pages"
-msgstr ""
+msgstr "Click here to select the objects across all pages"
 
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
-msgstr ""
+msgstr "Barcha %(total_count)s %(module_name)s ni tanlang"
 
 msgid "Clear selection"
-msgstr ""
+msgstr "Tanlashni tozalash"
 
 msgid "Breadcrumbs"
-msgstr ""
+msgstr "Ekmek qatlam"
 
 #, python-format
 msgid "Models in the %(name)s application"
-msgstr ""
+msgstr "%(name)s ilovasidagi modellar"
 
 msgid "Add"
 msgstr "Qo'shish"
@@ -347,12 +350,14 @@ msgid "View"
 msgstr "Ko'rish"
 
 msgid "You don’t have permission to view or edit anything."
-msgstr ""
+msgstr "Sizda biror narsani ko‘rish yoki tahrirlash uchun ruxsatingiz yo‘q."
 
 msgid ""
 "First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
 msgstr ""
+"Avval foydalanuvchi nomi va parolni kiriting. Keyin siz ko'proq foydalanuvchini tahrirlashingiz mumkin bo'ladi "
+"variantlar"
 
 msgid "Enter a username and password."
 msgstr "Username va parolni kiritish"
@@ -366,10 +371,10 @@ msgstr[0] ""
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
-msgstr ""
+msgstr "<strong>%(username)s</strong> foydalanuvchisi uchun yangi parolni kiriting."
 
 msgid "Skip to main content"
-msgstr ""
+msgstr "Asosiy tarkibga o'tish"
 
 msgid "Welcome,"
 msgstr "Xush kelibsiz,"
@@ -388,7 +393,7 @@ msgid "Add %(name)s"
 msgstr "%(name)sqo'shish"
 
 msgid "History"
-msgstr ""
+msgstr "Tarix"
 
 msgid "View on site"
 msgstr "Saytda ko'rish"
@@ -397,32 +402,32 @@ msgid "Filter"
 msgstr "Saralash"
 
 msgid "Hide counts"
-msgstr ""
+msgstr "Hisoblarni yashirish"
 
 msgid "Show counts"
-msgstr ""
+msgstr "Hisoblarni ko'rsatish"
 
 msgid "Clear all filters"
-msgstr ""
+msgstr "Barcha filtrlarni tozalang"
 
 msgid "Remove from sorting"
 msgstr "Tartiblashdan chiqarish"
 
 #, python-format
 msgid "Sorting priority: %(priority_number)s"
-msgstr ""
+msgstr "Tartiblash ustuvorligi: %(priority_number)s"
 
 msgid "Toggle sorting"
-msgstr ""
+msgstr "Tartiblashni almashtirish"
 
 msgid "Toggle theme (current theme: auto)"
-msgstr ""
+msgstr "Mavzuni almashtirish (joriy mavzu: avtomatik)"
 
 msgid "Toggle theme (current theme: light)"
-msgstr ""
+msgstr "Mavzuni almashtirish (joriy mavzu: yorug‘lik)"
 
 msgid "Toggle theme (current theme: dark)"
-msgstr ""
+msgstr "Mavzuni almashtirish (joriy mavzu: qorong'i)"
 
 msgid "Delete"
 msgstr "O'chirish"
@@ -447,16 +452,16 @@ msgid ""
 msgstr ""
 
 msgid "Objects"
-msgstr ""
+msgstr "Obyektlar"
 
 msgid "Yes, I’m sure"
-msgstr ""
+msgstr "Ha, ishonchliyman"
 
 msgid "No, take me back"
-msgstr ""
+msgstr "Yo‘q, meni qaytaring"
 
 msgid "Delete multiple objects"
-msgstr ""
+msgstr "Bir nechta obyektlarni o'chirish"
 
 #, python-format
 msgid ""
@@ -494,19 +499,19 @@ msgid "My actions"
 msgstr "Mening harakatlarim"
 
 msgid "None available"
-msgstr ""
+msgstr "Mavjud emas"
 
 msgid "Added:"
-msgstr ""
+msgstr "Qo'shilgan:"
 
 msgid "Changed:"
-msgstr ""
+msgstr "O'zgartirildi:"
 
 msgid "Deleted:"
-msgstr ""
+msgstr "Oʻchirildi:"
 
 msgid "Unknown content"
-msgstr ""
+msgstr "Noma'lum tarkib"
 
 msgid ""
 "Something’s wrong with your database installation. Make sure the appropriate "
@@ -521,7 +526,7 @@ msgid ""
 msgstr ""
 
 msgid "Forgotten your password or username?"
-msgstr ""
+msgstr "Parol yoki foydalanuvchi nomingizni unutdingizmi?"
 
 msgid "Toggle navigation"
 msgstr "Navigatsiyani almashtirish"
