@@ -235,11 +235,14 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.is_pool = self.settings_dict["OPTIONS"].get("pool")
         use_returning_into = self.settings_dict["OPTIONS"].get(
             "use_returning_into", True
         )
         self.features.can_return_columns_from_insert = use_returning_into
+
+    @property
+    def is_pool(self):
+        return self.settings_dict["OPTIONS"].get("pool")
 
     @property
     def pool(self):
