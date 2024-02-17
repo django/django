@@ -4,6 +4,7 @@ from migrations.test_base import OperationTestBase
 
 from django.db import IntegrityError, NotSupportedError, connection, transaction
 from django.db.migrations.state import ProjectState
+from django.db.migrations.writer import OperationWriter
 from django.db.models import CheckConstraint, Index, Q, UniqueConstraint
 from django.db.utils import ProgrammingError
 from django.test import modify_settings, override_settings
@@ -392,6 +393,25 @@ class CreateCollationTests(PostgreSQLTestCase):
                 )
         self.assertEqual(len(captured_queries), 1)
         self.assertIn("DROP COLLATION", captured_queries[0]["sql"])
+
+    def test_writer(self):
+        operation = CreateCollation(
+            "sample_collation",
+            "und-u-ks-level2",
+            provider="icu",
+            deterministic=False,
+        )
+        buff, imports = OperationWriter(operation, indentation=0).serialize()
+        self.assertEqual(imports, {"import django.contrib.postgres.operations"})
+        self.assertEqual(
+            buff,
+            "django.contrib.postgres.operations.CreateCollation(\n"
+            "    name='sample_collation',\n"
+            "    locale='und-u-ks-level2',\n"
+            "    provider='icu',\n"
+            "    deterministic=False,\n"
+            "),",
+        )
 
 
 @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific tests.")

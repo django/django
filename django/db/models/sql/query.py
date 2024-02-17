@@ -696,6 +696,7 @@ class Query(BaseExpression):
         # except if the alias is the base table since it must be present in the
         # query on both sides.
         initial_alias = self.get_initial_alias()
+        rhs = rhs.clone()
         rhs.bump_prefix(self, exclude={initial_alias})
 
         # Work out how to relabel the rhs aliases, if necessary.

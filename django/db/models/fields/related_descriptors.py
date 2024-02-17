@@ -75,7 +75,7 @@ from django.db import (
     router,
     transaction,
 )
-from django.db.models import Q, Window, signals
+from django.db.models import Manager, Q, Window, signals
 from django.db.models.functions import RowNumber
 from django.db.models.lookups import GreaterThan, LessThanOrEqual
 from django.db.models.query import QuerySet
@@ -1121,6 +1121,12 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             queryset._defer_next_filter = True
             return queryset._next_is_sticky().filter(**self.core_filters)
 
+        def get_prefetch_cache(self):
+            try:
+                return self.instance._prefetched_objects_cache[self.prefetch_cache_name]
+            except (AttributeError, KeyError):
+                return None
+
         def _remove_prefetched_objects(self):
             try:
                 self.instance._prefetched_objects_cache.pop(self.prefetch_cache_name)
@@ -1128,9 +1134,9 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                 pass  # nothing to clear from cache
 
         def get_queryset(self):
-            try:
-                return self.instance._prefetched_objects_cache[self.prefetch_cache_name]
-            except (AttributeError, KeyError):
+            if (cache := self.get_prefetch_cache()) is not None:
+                return cache
+            else:
                 queryset = super().get_queryset()
                 return self._apply_rel_filters(queryset)
 
@@ -1194,6 +1200,45 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                 self.prefetch_cache_name,
                 False,
             )
+
+        @property
+        def constrained_target(self):
+            # If the through relation's target field's foreign integrity is
+            # enforced, the query can be performed solely against the through
+            # table as the INNER JOIN'ing against target table is unnecessary.
+            if not self.target_field.db_constraint:
+                return None
+            db = router.db_for_read(self.through, instance=self.instance)
+            if not connections[db].features.supports_foreign_keys:
+                return None
+            hints = {"instance": self.instance}
+            manager = self.through._base_manager.db_manager(db, hints=hints)
+            filters = {self.source_field_name: self.instance.pk}
+            # Nullable target rows must be excluded as well as they would have
+            # been filtered out from an INNER JOIN.
+            if self.target_field.null:
+                filters["%s__isnull" % self.target_field_name] = False
+            return manager.filter(**filters)
+
+        def exists(self):
+            if (
+                superclass is Manager
+                and self.get_prefetch_cache() is None
+                and (constrained_target := self.constrained_target) is not None
+            ):
+                return constrained_target.exists()
+            else:
+                return super().exists()
+
+        def count(self):
+            if (
+                superclass is Manager
+                and self.get_prefetch_cache() is None
+                and (constrained_target := self.constrained_target) is not None
+            ):
+                return constrained_target.count()
+            else:
+                return super().count()
 
         def add(self, *objs, through_defaults=None):
             self._remove_prefetched_objects()

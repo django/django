@@ -2762,21 +2762,23 @@ class AutodetectorTests(BaseAutodetectorTests):
             },
         )
         changes = self.get_changes([], [author])
-        added_constraint = models.CheckConstraint(
+        constraint = models.CheckConstraint(
             check=models.Q(name__contains="Bob"), name="name_contains_bob"
         )
         # Right number of migrations?
         self.assertEqual(len(changes["otherapp"]), 1)
         # Right number of actions?
         migration = changes["otherapp"][0]
-        self.assertEqual(len(migration.operations), 2)
+        self.assertEqual(len(migration.operations), 1)
         # Right actions order?
-        self.assertOperationTypes(
-            changes, "otherapp", 0, ["CreateModel", "AddConstraint"]
-        )
-        self.assertOperationAttributes(changes, "otherapp", 0, 0, name="Author")
+        self.assertOperationTypes(changes, "otherapp", 0, ["CreateModel"])
         self.assertOperationAttributes(
-            changes, "otherapp", 0, 1, model_name="author", constraint=added_constraint
+            changes,
+            "otherapp",
+            0,
+            0,
+            name="Author",
+            options={"constraints": [constraint]},
         )
 
     def test_add_constraints(self):
@@ -4177,7 +4179,7 @@ class AutodetectorTests(BaseAutodetectorTests):
             changes,
             "testapp",
             0,
-            ["CreateModel", "AddConstraint"],
+            ["CreateModel"],
         )
         self.assertOperationAttributes(
             changes,
@@ -4185,7 +4187,14 @@ class AutodetectorTests(BaseAutodetectorTests):
             0,
             0,
             name="Author",
-            options={"order_with_respect_to": "book"},
+            options={
+                "order_with_respect_to": "book",
+                "constraints": [
+                    models.CheckConstraint(
+                        check=models.Q(_order__gt=1), name="book_order_gt_1"
+                    )
+                ],
+            },
         )
 
     def test_add_model_order_with_respect_to_index(self):

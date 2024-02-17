@@ -310,8 +310,8 @@ Model style
 
     class MyModel(models.Model):
         class Direction(models.TextChoices):
-            UP = U, "Up"
-            DOWN = D, "Down"
+            UP = "U", "Up"
+            DOWN = "D", "Down"
 
 Use of ``django.conf.settings``
 ===============================
