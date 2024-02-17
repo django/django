@@ -37,6 +37,32 @@ jobs:
       - name: Run tests
         run: python tests/runtests.py -v2
 
+  pyc-only:
+    runs-on: ubuntu-latest
+    name: Byte-compiled Django with no source files (only .pyc files)
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+      - name: Install libmemcached-dev for pylibmc
+        run: sudo apt-get install libmemcached-dev
+      - name: Install and upgrade packaging tools
+        run: python -m pip install --upgrade pip setuptools wheel
+      - run: python -m pip install .
+      - name: Prepare site-packages
+        run: |
+          SITE_PACKAGE_ROOT=$(python -c 'import site; print(site.getsitepackages()[0])')
+          echo $SITE_PACKAGE_ROOT
+          python -m compileall -b $SITE_PACKAGE_ROOT
+          find $SITE_PACKAGE_ROOT -name '*.py' -print -delete
+      - run: python -m pip install -r tests/requirements/py3.txt
+      - name: Run tests
+        run: python tests/runtests.py --verbosity=2
+
   pypy-sqlite:
     runs-on: ubuntu-latest
     name: Ubuntu, SQLite, PyPy3.10
