@@ -626,7 +626,7 @@ class FormSetMeta(type):
         if attrs["max_num"] > attrs["absolute_max"]:
             raise ValueError("'absolute_max' must be greater or equal to 'max_num'.")
 
-        new_class = super(FormSetMeta, cls).__new__(cls, name, (formset,), attrs)
+        new_class = super().__new__(cls, name, (formset,), attrs)
         return new_class
 
 
