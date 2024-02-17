@@ -1,10 +1,18 @@
 from unittest import mock
 
-from django.db import transaction
+from django.db import connection, transaction
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.utils.deprecation import RemovedInDjango60Warning
 
-from .models import Article, InheritedArticleA, InheritedArticleB, Publication, User
+from .models import (
+    Article,
+    InheritedArticleA,
+    InheritedArticleB,
+    NullablePublicationThrough,
+    NullableTargetArticle,
+    Publication,
+    User,
+)
 
 
 class ManyToManyTests(TestCase):
@@ -558,10 +566,16 @@ class ManyToManyTests(TestCase):
     def test_custom_default_manager_exists_count(self):
         a5 = Article.objects.create(headline="deleted")
         a5.publications.add(self.p2)
-        self.assertEqual(self.p2.article_set.count(), self.p2.article_set.all().count())
-        self.assertEqual(
-            self.p3.article_set.exists(), self.p3.article_set.all().exists()
-        )
+        with self.assertNumQueries(2) as ctx:
+            self.assertEqual(
+                self.p2.article_set.count(), self.p2.article_set.all().count()
+            )
+        self.assertIn("JOIN", ctx.captured_queries[0]["sql"])
+        with self.assertNumQueries(2) as ctx:
+            self.assertEqual(
+                self.p3.article_set.exists(), self.p3.article_set.all().exists()
+            )
+        self.assertIn("JOIN", ctx.captured_queries[0]["sql"])
 
     def test_get_prefetch_queryset_warning(self):
         articles = Article.objects.all()
@@ -582,3 +596,73 @@ class ManyToManyTests(TestCase):
                 instances=articles,
                 querysets=[Publication.objects.all(), Publication.objects.all()],
             )
+
+
+class ManyToManyQueryTests(TestCase):
+    """
+    SQL is optimized to reference the through table without joining against the
+    related table when using count() and exists() functions on a queryset for
+    many to many relations. The optimization applies to the case where there
+    are no filters.
+    """
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.article = Article.objects.create(
+            headline="Django lets you build Web apps easily"
+        )
+        cls.nullable_target_article = NullableTargetArticle.objects.create(
+            headline="The python is good"
+        )
+        NullablePublicationThrough.objects.create(
+            article=cls.nullable_target_article, publication=None
+        )
+
+    @skipUnlessDBFeature("supports_foreign_keys")
+    def test_count_join_optimization(self):
+        with self.assertNumQueries(1) as ctx:
+            self.article.publications.count()
+        self.assertNotIn("JOIN", ctx.captured_queries[0]["sql"])
+
+        with self.assertNumQueries(1) as ctx:
+            self.article.publications.count()
+        self.assertNotIn("JOIN", ctx.captured_queries[0]["sql"])
+        self.assertEqual(self.nullable_target_article.publications.count(), 0)
+
+    def test_count_join_optimization_disabled(self):
+        with (
+            mock.patch.object(connection.features, "supports_foreign_keys", False),
+            self.assertNumQueries(1) as ctx,
+        ):
+            self.article.publications.count()
+
+        self.assertIn("JOIN", ctx.captured_queries[0]["sql"])
+
+    @skipUnlessDBFeature("supports_foreign_keys")
+    def test_exists_join_optimization(self):
+        with self.assertNumQueries(1) as ctx:
+            self.article.publications.exists()
+        self.assertNotIn("JOIN", ctx.captured_queries[0]["sql"])
+
+        self.article.publications.prefetch_related()
+        with self.assertNumQueries(1) as ctx:
+            self.article.publications.exists()
+        self.assertNotIn("JOIN", ctx.captured_queries[0]["sql"])
+        self.assertIs(self.nullable_target_article.publications.exists(), False)
+
+    def test_exists_join_optimization_disabled(self):
+        with (
+            mock.patch.object(connection.features, "supports_foreign_keys", False),
+            self.assertNumQueries(1) as ctx,
+        ):
+            self.article.publications.exists()
+
+        self.assertIn("JOIN", ctx.captured_queries[0]["sql"])
+
+    def test_prefetch_related_no_queries_optimization_disabled(self):
+        qs = Article.objects.prefetch_related("publications")
+        article = qs.get()
+        with self.assertNumQueries(0):
+            article.publications.count()
+        with self.assertNumQueries(0):
+            article.publications.exists()
