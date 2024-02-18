@@ -1103,7 +1103,6 @@ class ModelFormSetMeta(FormSetMeta):
             "help_texts",
             "error_messages",
             "field_classes",
-            "edit_only",
         ]
         for key in default_modelform_factory_attrs:
             if key in attrs:
@@ -1143,6 +1142,7 @@ class ModelFormSetMeta(FormSetMeta):
                     kwargs.update({key: attrs.get(key)})
             ModelFormSet = formset_factory(form, formset, **kwargs)
             ModelFormSet.model = model
+            ModelFormSet.edit_only = attrs.get("edit_only")
             return ModelFormSet
         return super().__new__(cls, name, (formset,), attrs)
 
