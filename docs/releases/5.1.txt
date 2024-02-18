@@ -29,7 +29,7 @@ What's new in Django 5.1
 Database-level values for ``ForeignKey.on_delete``
 --------------------------------------------------
 
-:attr:`.ForeignKey.on_delete` now supports four extra values to specify
+:attr:`ForeignKey.on_delete` now supports four extra values to specify
 database-level actions:
 
 * ``DB_CASCADE`` - delete the referring object.
