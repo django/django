@@ -137,7 +137,7 @@ class BaseDatabaseFeatures:
     # which can't do it for MyISAM tables
     can_introspect_foreign_keys = True
 
-    # Features related to database level on delete
+    # Does the database support db level on delete set db default
     has_on_delete_db_default = True
 
     # Map fields which some backends may not be able to differentiate to the
