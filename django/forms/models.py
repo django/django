@@ -1110,9 +1110,16 @@ def modelformset_factory(
 
 
 class ModelFormSetMeta(FormSetMeta):
+    """Meta class for creating modelformset using Declarative Syntax."""
+
     def __new__(cls, name, bases, attrs):
+        """Initialize the attributes given to the ModelFormSet class."""
+        kwargs = {}
+        model = attrs.get("model") or None
+        kwargs.update({"model": model})
 
         default_modelform_factory_attrs = [
+            "model",
             "fields",
             "exclude",
             "formfield_callback",
@@ -1122,9 +1129,8 @@ class ModelFormSetMeta(FormSetMeta):
             "help_texts",
             "error_messages",
             "field_classes",
+            "edit_only",
         ]
-
-        kwargs = {}
         for key in default_modelform_factory_attrs:
             if key in attrs:
                 kwargs.update({key: attrs.get(key)})
@@ -1136,15 +1142,47 @@ class ModelFormSetMeta(FormSetMeta):
         else:
             kwargs.update({"form": form})
 
-        if attrs.get("model") is not None:
-            form = modelform_factory(attrs.get("model"), **kwargs)
+        if kwargs.get("model") is not None:
+            form = modelform_factory(**kwargs)
             attrs.update({"form": form})
+        if kwargs.get("model") is None and "form" in attrs:
+            model = attrs.get("form")._meta.model
+        
+        formset = attrs.get("formset") or BaseModelFormSet
 
-        return super(ModelFormSetMeta, cls).__new__(cls, name, bases, attrs)
+        default_formset_attrs = {
+            "extra",
+            "can_order",
+            "can_delete",
+            "min_num",
+            "max_num",
+            "absolute_max",
+            "validate_min",
+            "validate_max",
+            "can_delete_extra",
+            "renderer",
+        }
+        if (form := attrs.get("form")) is not None:
+            kwargs = {}
+            for key in default_formset_attrs:
+                if key in attrs:
+                    kwargs.update({key: attrs.get(key)})
+            ModelFormSet = formset_factory(form, formset, **kwargs)
+            ModelFormSet.model = model
+            return ModelFormSet
+        return super().__new__(cls, name, (formset,), attrs)
 
 
 class ModelFormSet(BaseModelFormSet, FormSet, metaclass=ModelFormSetMeta):
-    pass
+    """Base class for which can be used to create modelformset classes."""
+    def __init__(
+        self,
+        queryset=None,
+    ):
+        """Initialize ModelFormSet."""
+        super().__init__(
+            queryset,
+        )
 
 
 # InlineFormSets #############################################################
