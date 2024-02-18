@@ -195,8 +195,11 @@ class Command(BaseCommand):
                 )
             if self.verbosity > 0:
                 self.stdout.write("Pruning migrations:", self.style.MIGRATE_HEADING)
-            to_prune = set(executor.loader.applied_migrations) - set(
-                executor.loader.disk_migrations
+            to_prune = sorted(
+                migration
+                for migration in set(executor.loader.applied_migrations)
+                - set(executor.loader.disk_migrations)
+                if migration[0] == app_label
             )
             squashed_migrations_with_deleted_replaced_migrations = [
                 migration_key
@@ -222,9 +225,6 @@ class Command(BaseCommand):
                     )
                 )
             else:
-                to_prune = sorted(
-                    migration for migration in to_prune if migration[0] == app_label
-                )
                 if to_prune:
                     for migration in to_prune:
                         app, name = migration

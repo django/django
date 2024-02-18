@@ -361,6 +361,7 @@ postfix
 postgis
 postgres
 postgresql
+pragma
 pre
 precisions
 precomputation

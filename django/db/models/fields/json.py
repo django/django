@@ -310,6 +310,11 @@ class JSONExact(lookups.Exact):
             rhs %= tuple(func)
         return rhs, rhs_params
 
+    def as_oracle(self, compiler, connection):
+        lhs, lhs_params = self.process_lhs(compiler, connection)
+        rhs, rhs_params = self.process_rhs(compiler, connection)
+        return f"JSON_EQUAL({lhs}, {rhs})", (*lhs_params, *rhs_params)
+
 
 class JSONIContains(CaseInsensitiveMixin, lookups.IContains):
     pass
