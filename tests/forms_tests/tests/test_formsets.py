@@ -75,14 +75,15 @@ FavoriteDrinksFormSet = formset_factory(
     FavoriteDrinkForm, formset=BaseFavoriteDrinksFormSet, extra=3
 )
 
-# A declarative favorite drink formset that takes a list of favorite 
+
+# A declarative favorite drink formset that takes a list of favorite
 # drinks and raises an error if there are any duplicates.
 class DeclarativeFavoriteDrinkFormSet(FormSet):
-            """Declarative choice formset."""
+    """Declarative choice formset."""
 
-            form = FavoriteDrinkForm
-            formset = BaseFavoriteDrinksFormSet
-            extra = 3
+    form = FavoriteDrinkForm
+    formset = BaseFavoriteDrinksFormSet
+    extra = 3
 
 
 class CustomKwargForm(Form):
@@ -90,11 +91,13 @@ class CustomKwargForm(Form):
         self.custom_kwarg = custom_kwarg
         super().__init__(*args, **kwargs)
 
-class ChoiceExtra10FormSet(FormSet):
-            """Declarative choice formset."""
 
-            form = Choice
-            extra = 10
+class ChoiceExtra10FormSet(FormSet):
+    """Declarative choice formset."""
+
+    form = Choice
+    extra = 10
+
 
 class FormsetTestMixin:
     """A mixin to test declarative and factory formsets."""
@@ -113,7 +116,7 @@ class FormsetTestMixin:
         Make a formset from the given formset_class and formset_data.
 
         The data should be given as a list of (choice, votes) tuples.
-        """        
+        """
         formset_class = self.formset_class if not formset_class else formset_class
         kwargs.setdefault("prefix", "choices")
         kwargs.setdefault("auto_id", False)
@@ -312,6 +315,7 @@ class FormsetTestMixin:
                 {},
             ],
         )
+
     def test_min_num_displaying_more_than_one_blank_form(self, formset):
         """
         More than 1 empty form can also be displayed using formset_factory's
@@ -467,7 +471,7 @@ class FormsetTestMixin:
             '<li>Votes: <input type="number" name="choices-2-votes"></li>'
             '<li>Delete: <input type="checkbox" name="choices-2-DELETE"></li>',
         )
-    
+
     def test_formset_with_special_deletion(self, formset):
         # To delete something, set that form's special delete field to 'on'.
         # Let's go ahead and delete Fergie.
@@ -498,7 +502,7 @@ class FormsetTestMixin:
             [("test", "")],
             formset_class=ChoiceFormsetWithNonFormError,
         )
-        invalid_formset_non_form_errors_only.full_clean()       
+        invalid_formset_non_form_errors_only.full_clean()
 
         cases = {
             "FactoryFormsetTestCase": [
@@ -521,7 +525,10 @@ class FormsetTestMixin:
                     "<ChoiceFormSet: bound=True valid=Unknown total_forms=1>",
                 ),
                 (valid_formset, "<ChoiceFormSet: bound=True valid=True total_forms=1>"),
-                (invalid_formset, "<ChoiceFormSet: bound=True valid=False total_forms=1>"),
+                (
+                    invalid_formset,
+                    "<ChoiceFormSet: bound=True valid=False total_forms=1>",
+                ),
                 (
                     partially_invalid_formset,
                     "<ChoiceFormSet: bound=True valid=False total_forms=2>",
@@ -550,8 +557,14 @@ class FormsetTestMixin:
                     self.make_choiceformset([("test", 1)]),
                     "<DeclarativeChoiceFormSet: bound=True valid=Unknown total_forms=1>",
                 ),
-                (valid_formset, "<DeclarativeChoiceFormSet: bound=True valid=True total_forms=1>"),
-                (invalid_formset, "<DeclarativeChoiceFormSet: bound=True valid=False total_forms=1>"),
+                (
+                    valid_formset,
+                    "<DeclarativeChoiceFormSet: bound=True valid=True total_forms=1>",
+                ),
+                (
+                    invalid_formset,
+                    "<DeclarativeChoiceFormSet: bound=True valid=False total_forms=1>",
+                ),
                 (
                     partially_invalid_formset,
                     "<DeclarativeChoiceFormSet: bound=True valid=False total_forms=2>",
@@ -560,7 +573,7 @@ class FormsetTestMixin:
                     invalid_formset_non_form_errors_only,
                     "<ChoiceFormsetWithNonFormError: bound=True valid=False total_forms=1>",
                 ),
-            ]
+            ],
         }
         for formset, expected_repr in cases[f"{self.name}"]:
             with self.subTest(expected_repr=expected_repr):
@@ -573,7 +586,7 @@ class FormsetTestMixin:
             mocked_full_clean.assert_not_called()
             formset.is_valid()
             mocked_full_clean.assert_called()
-    
+
     def test_formset_total_error_count(self):
         """A valid formset should have 0 total errors."""
         data = [  # formset_data, expected error count
@@ -586,7 +599,7 @@ class FormsetTestMixin:
         for formset_data, expected_error_count in data:
             formset = self.make_choiceformset(formset_data)
             self.assertEqual(formset.total_error_count(), expected_error_count)
-    
+
     def test_html_safe(self):
         formset = self.make_choiceformset()
         self.assertTrue(hasattr(formset, "__html__"))
@@ -595,7 +608,7 @@ class FormsetTestMixin:
 
 class FactoryFormsetTestCase(SimpleTestCase, FormsetTestMixin):
     """A set of tests for formsets created with factories."""
-    
+
     formset_class = ChoiceFormSet
     name = "FactoryFormsetTestCase"
 
@@ -607,9 +620,10 @@ class FactoryFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         FormSet = formset_factory(CustomKwargForm, extra=2)
         formset = FormSet(form_kwargs={"custom_kwarg": 1})
         super().test_form_kwargs_formset(formset)
-    
+
     def test_form_kwargs_formset_dynamic(self):
         """Form kwargs can be passed dynamically in a formset."""
+
         class DynamicBaseFormSet(BaseFormSet):
             def get_form_kwargs(self, index):
                 return {"custom_kwarg": index}
@@ -619,7 +633,7 @@ class FactoryFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         )
         formset = DynamicFormSet(form_kwargs={"custom_kwarg": "ignored"})
         super().test_form_kwargs_formset_dynamic(formset)
-    
+
     def test_form_kwargs_empty_form(self):
         FormSet = formset_factory(CustomKwargForm)
         formset = FormSet(form_kwargs={"custom_kwarg": 1})
@@ -628,7 +642,7 @@ class FactoryFormsetTestCase(SimpleTestCase, FormsetTestMixin):
     def test_empty_permitted_ignored_empty_form(self):
         formset = ArticleFormSet(form_kwargs={"empty_permitted": False})
         self.assertIs(formset.empty_form.empty_permitted, True)
-    
+
     def test_displaying_more_than_one_blank_form(self):
         """
         More than 1 empty form can be displayed using formset_factory's
@@ -663,7 +677,7 @@ class FactoryFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         formset = ChoiceFormSet(data, auto_id=False, prefix="choices")
         self.assertTrue(formset.is_valid())
         self.assertEqual([form.cleaned_data for form in formset.forms], [{}, {}, {}])
-    
+
     def test_min_num_displaying_more_than_one_blank_form(self):
         """
         More than 1 empty form can also be displayed using formset_factory's
@@ -672,14 +686,15 @@ class FactoryFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         ChoiceFormSet = formset_factory(Choice, extra=1, min_num=1)
         formset = ChoiceFormSet(auto_id=False, prefix="choices")
         super().test_min_num_displaying_more_than_one_blank_form(formset)
-        
-        
+
     def test_min_num_displaying_more_than_one_blank_form_with_zero_extra(self):
         """More than 1 empty form can be displayed using min_num."""
         ChoiceFormSet = formset_factory(Choice, extra=0, min_num=3)
         formset = ChoiceFormSet(auto_id=False, prefix="choices")
-        super().test_min_num_displaying_more_than_one_blank_form_with_zero_extra(formset)
-    
+        super().test_min_num_displaying_more_than_one_blank_form_with_zero_extra(
+            formset
+        )
+
     def test_single_form_completed(self):
         """Just one form may be completed."""
         data = {
@@ -697,7 +712,7 @@ class FactoryFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         ChoiceFormSet = formset_factory(Choice, extra=3)
         formset = ChoiceFormSet(data, auto_id=False, prefix="choices")
         super().test_single_form_completed(formset)
-    
+
     def test_formset_validate_max_flag(self):
         """
         If validate_max is set and max_num is less than TOTAL_FORMS in the
@@ -718,7 +733,7 @@ class FactoryFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         ChoiceFormSet = formset_factory(Choice, extra=1, max_num=1, validate_max=True)
         formset = ChoiceFormSet(data, auto_id=False, prefix="choices")
         super().test_formset_validate_max_flag(formset)
-    
+
     def test_formset_validate_max_flag_custom_error(self):
         data = {
             "choices-TOTAL_FORMS": "2",
@@ -740,7 +755,7 @@ class FactoryFormsetTestCase(SimpleTestCase, FormsetTestMixin):
             },
         )
         super().test_formset_validate_max_flag_custom_error(formset)
-    
+
     def test_formset_validate_min_flag(self):
         """
         If validate_min is set and min_num is more than TOTAL_FORMS in the
@@ -761,7 +776,7 @@ class FactoryFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         ChoiceFormSet = formset_factory(Choice, extra=1, min_num=3, validate_min=True)
         formset = ChoiceFormSet(data, auto_id=False, prefix="choices")
         super().test_formset_validate_min_flag(formset)
-    
+
     def test_formset_validate_min_flag_custom_formatted_error(self):
         data = {
             "choices-TOTAL_FORMS": "2",
@@ -783,7 +798,7 @@ class FactoryFormsetTestCase(SimpleTestCase, FormsetTestMixin):
             },
         )
         super().test_formset_validate_min_flag_custom_formatted_error(formset)
-    
+
     def test_formset_validate_min_unchanged_forms(self):
         """
         min_num validation doesn't consider unchanged forms with initial data
@@ -806,7 +821,7 @@ class FactoryFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         ChoiceFormSet = formset_factory(Choice, min_num=2, validate_min=True)
         formset = ChoiceFormSet(data, auto_id=False, prefix="choices", initial=initial)
         super().test_formset_validate_min_unchanged_forms(formset)
-    
+
     def test_formset_validate_min_excludes_empty_forms(self):
         data = {
             "choices-TOTAL_FORMS": "2",
@@ -817,7 +832,7 @@ class FactoryFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         )
         formset = ChoiceFormSet(data, prefix="choices")
         super().test_formset_validate_min_excludes_empty_forms(formset)
-    
+
     def test_second_form_partially_filled_2(self):
         """A partially completed form is invalid."""
         data = {
@@ -835,7 +850,7 @@ class FactoryFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         ChoiceFormSet = formset_factory(Choice, extra=3)
         formset = ChoiceFormSet(data, auto_id=False, prefix="choices")
         super().test_second_form_partially_filled_2(formset)
-    
+
     def test_more_initial_data(self):
         """
         The extra argument works when the formset is pre-filled with initial
@@ -845,7 +860,7 @@ class FactoryFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         ChoiceFormSet = formset_factory(Choice, extra=3)
         formset = ChoiceFormSet(initial=initial, auto_id=False, prefix="choices")
         super().test_more_initial_data(formset)
-    
+
     def test_formset_with_deletion(self):
         """
         formset_factory's can_delete argument adds a boolean "delete" field to
@@ -859,7 +874,7 @@ class FactoryFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         ]
         formset = ChoiceFormSet(initial=initial, auto_id=False, prefix="choices")
         super().test_formset_with_deletion(formset)
-    
+
     def test_formset_with_special_deletion(self):
         # To delete something, set that form's special delete field to 'on'.
         # Let's go ahead and delete Fergie.
@@ -881,7 +896,7 @@ class FactoryFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         }
         formset = ChoiceFormSet(data, auto_id=False, prefix="choices")
         super().test_formset_with_special_deletion(formset)
-    
+
     def test_custom_renderer(self):
         """
         A custom renderer passed to a formset_factory() is passed to all forms
@@ -906,7 +921,7 @@ class FactoryFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         self.assertEqual(formset.management_form.renderer.__class__, Jinja2)
         self.assertEqual(formset.non_form_errors().renderer.__class__, Jinja2)
         self.assertEqual(formset.empty_form.renderer.__class__, Jinja2)
-    
+
     def test_form_default_renderer(self):
         """
         In the absence of a renderer passed to the formset_factory(),
@@ -1592,9 +1607,7 @@ class FactoryFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         self.assertTrue(formset)
 
     def test_formset_splitdatetimefield(self):
-        """
-        Formset works with SplitDateTimeField(initial=datetime.datetime.now).
-        """
+        """Formset works with SplitDateTimeField(initial=datetime.datetime.now)."""
 
         class SplitDateTimeForm(Form):
             when = SplitDateTimeField(initial=datetime.datetime.now)
@@ -1737,7 +1750,7 @@ class FactoryFormsetTestCase(SimpleTestCase, FormsetTestMixin):
             CheckForm, max_num=1, validate_max=True, can_delete=True
         )
         formset = CheckFormSet(data, prefix="check")
-        self.assertTrue(formset.is_valid())    
+        self.assertTrue(formset.is_valid())
 
     def test_formset_total_error_count_with_non_form_errors(self):
         data = {
@@ -1754,7 +1767,7 @@ class FactoryFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         self.assertEqual(formset.total_error_count(), 1)
         data["choices-1-votes"] = ""
         formset = ChoiceFormSet(data, auto_id=False, prefix="choices")
-        self.assertEqual(formset.total_error_count(), 2)    
+        self.assertEqual(formset.total_error_count(), 2)
 
     def test_can_delete_extra_formset_forms(self):
         ChoiceFormFormset = formset_factory(form=Choice, can_delete=True, extra=2)
@@ -1827,8 +1840,6 @@ class FactoryFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         self.assertEqual(
             ChoiceFormSet().template_name, "a/custom/formset/template.html"
         )
-
-    
 
 
 @jinja2_tests
@@ -2130,8 +2141,8 @@ class AllValidTests(SimpleTestCase):
 class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
     """A set of tests for formsets created in a declarative way."""
 
-    formset_class = DeclarativeChoiceFormSet   
-    name =  "DeclarativeFormsetTestCase"
+    formset_class = DeclarativeChoiceFormSet
+    name = "DeclarativeFormsetTestCase"
 
     def test_basic_formset(self):
         """
@@ -2149,7 +2160,7 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
 <div>Choice:<input type="text" name="choices-0-choice"></div>
 <div>Votes:<input type="number" name="choices-0-votes"></div>""",
         )
-    
+
     def test_form_kwargs_formset(self):
         """Test custom kwargs set in the instance to the underlying form."""
 
@@ -2161,7 +2172,7 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
 
         formset = DeclarativeFormSet(form_kwargs={"custom_kwarg": 1})
         super().test_form_kwargs_formset(formset)
-    
+
     def test_form_kwargs_formset_dynamic(self):
         """Form kwargs can be passed dynamically in a formset."""
 
@@ -2181,8 +2192,8 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
 
         formset = DynamicFormSet(form_kwargs={"custom_kwarg": "ignored"})
         super().test_form_kwargs_formset_dynamic(formset)
-    
-    def test_form_kwargs_empty_form(self):        
+
+    def test_form_kwargs_empty_form(self):
         class DeclarativeFormSet(FormSet):
             """A declarative formset."""
 
@@ -2190,22 +2201,23 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
 
         formset = DeclarativeFormSet(form_kwargs={"custom_kwarg": 1})
         super().test_form_kwargs_empty_form(formset)
-    
+
     def test_empty_permitted_ignored_empty_form(self):
         formset = DeclarativeArticleFormSet(form_kwargs={"empty_permitted": False})
         self.assertIs(formset.empty_form.empty_permitted, True)
-    
+
     def test_displaying_more_than_one_blank_form(self):
         """
         More than 1 empty form can be displayed using formset_factory's
         `extra` argument.
         """
+
         class DeclarativeChoiceFormSet(FormSet):
             """Declarative choice formset."""
 
             form = Choice
             extra = 3
-        
+
         formset = DeclarativeChoiceFormSet(auto_id=False, prefix="choices")
         self.assertHTMLEqual(
             "\n".join(form.as_ul() for form in formset.forms),
@@ -2235,42 +2247,46 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         self.assertTrue(formset.is_valid())
         self.assertEqual([form.cleaned_data for form in formset.forms], [{}, {}, {}])
 
-    
     def test_min_num_displaying_more_than_one_blank_form(self):
         """
         More than 1 empty form can also be displayed using formset_factory's
         min_num argument. It will (essentially) increment the extra argument.
         """
+
         class DeclarativeChoiceFormSet(FormSet):
             """Declarative choice formset."""
 
             form = Choice
             extra = 1
             min_num = 1
-            
+
         formset = DeclarativeChoiceFormSet(auto_id=False, prefix="choices")
         super().test_min_num_displaying_more_than_one_blank_form(formset)
-    
+
     def test_min_num_displaying_more_than_one_blank_form_with_zero_extra(self):
         """More than 1 empty form can be displayed using min_num."""
+
         class DeclarativeChoiceFormSet(FormSet):
             """Declarative choice formset."""
 
             form = Choice
             extra = 0
             min_num = 3
-        
+
         formset = DeclarativeChoiceFormSet(auto_id=False, prefix="choices")
-        super().test_min_num_displaying_more_than_one_blank_form_with_zero_extra(formset)
+        super().test_min_num_displaying_more_than_one_blank_form_with_zero_extra(
+            formset
+        )
 
     def test_single_form_completed(self):
         """Just one form may be completed."""
+
         class DeclarativeChoiceFormSet(FormSet):
             """Declarative choice formset."""
 
             form = Choice
             extra = 3
-        
+
         data = {
             "choices-TOTAL_FORMS": "3",  # the number of forms rendered
             "choices-INITIAL_FORMS": "0",  # the number of forms with initial data
@@ -2285,7 +2301,7 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         }
         formset = DeclarativeChoiceFormSet(data, auto_id=False, prefix="choices")
         super().test_single_form_completed(formset)
-    
+
     def test_formset_validate_max_flag(self):
         """
         If validate_max is set and max_num is less than TOTAL_FORMS in the
@@ -2293,6 +2309,7 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         irrelevant here (it's output as a hint for the client but its value
         in the returned data is not checked).
         """
+
         class DeclarativeChoiceFormSet(FormSet):
             """Declarative choice formset."""
 
@@ -2300,7 +2317,7 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
             extra = 1
             max_num = 1
             validate_max = True
-        
+
         data = {
             "choices-TOTAL_FORMS": "2",  # the number of forms rendered
             "choices-INITIAL_FORMS": "0",  # the number of forms with initial data
@@ -2313,7 +2330,7 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         }
         formset = DeclarativeChoiceFormSet(data, auto_id=False, prefix="choices")
         super().test_formset_validate_max_flag(formset)
-    
+
     def test_formset_validate_max_flag_custom_error(self):
         class DeclarativeChoiceFormSet(FormSet):
             """Declarative choice formset."""
@@ -2322,7 +2339,7 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
             extra = 1
             max_num = 1
             validate_max = True
-        
+
         data = {
             "choices-TOTAL_FORMS": "2",
             "choices-INITIAL_FORMS": "0",
@@ -2341,7 +2358,7 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
                 "too_many_forms": "Number of submitted forms should be at most %(num)d."
             },
         )
-        super().test_formset_validate_max_flag_custom_error(formset)    
+        super().test_formset_validate_max_flag_custom_error(formset)
 
     def test_formset_validate_min_flag(self):
         """
@@ -2350,6 +2367,7 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         irrelevant here (it's output as a hint for the client but its value
         in the returned data is not checked).
         """
+
         class DeclarativeChoiceFormSet(FormSet):
             """Declarative choice formset."""
 
@@ -2357,7 +2375,7 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
             extra = 1
             min_num = 3
             validate_min = True
-        
+
         data = {
             "choices-TOTAL_FORMS": "2",  # the number of forms rendered
             "choices-INITIAL_FORMS": "0",  # the number of forms with initial data
@@ -2370,7 +2388,7 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         }
         formset = DeclarativeChoiceFormSet(data, auto_id=False, prefix="choices")
         super().test_formset_validate_min_flag(formset)
-    
+
     def test_formset_validate_min_flag_custom_formatted_error(self):
         class DeclarativeChoiceFormSet(FormSet):
             """Declarative choice formset."""
@@ -2379,7 +2397,7 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
             extra = 1
             min_num = 3
             validate_min = True
-        
+
         data = {
             "choices-TOTAL_FORMS": "2",
             "choices-INITIAL_FORMS": "0",
@@ -2399,19 +2417,20 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
             },
         )
         super().test_formset_validate_min_flag_custom_formatted_error(formset)
-    
+
     def test_formset_validate_min_unchanged_forms(self):
         """
         min_num validation doesn't consider unchanged forms with initial data
         as "empty".
         """
+
         class DeclarativeChoiceFormSet(FormSet):
             """Declarative choice formset."""
 
             form = Choice
             min_num = 2
             validate_min = True
-        
+
         initial = [
             {"choice": "Zero", "votes": 0},
             {"choice": "One", "votes": 0},
@@ -2426,9 +2445,11 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
             "choices-1-choice": "One",
             "choices-1-votes": "1",  # changed from initial
         }
-        formset = DeclarativeChoiceFormSet(data, auto_id=False, prefix="choices", initial=initial)
+        formset = DeclarativeChoiceFormSet(
+            data, auto_id=False, prefix="choices", initial=initial
+        )
         super().test_formset_validate_min_unchanged_forms(formset)
-    
+
     def test_formset_validate_min_excludes_empty_forms(self):
         class DeclarativeChoiceFormSet(FormSet):
             """Declarative choice formset."""
@@ -2438,22 +2459,23 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
             min_num = 1
             validate_min = True
             can_delete = True
-        
+
         data = {
             "choices-TOTAL_FORMS": "2",
             "choices-INITIAL_FORMS": "0",
         }
         formset = DeclarativeChoiceFormSet(data, prefix="choices")
         super().test_formset_validate_min_excludes_empty_forms(formset)
-    
+
     def test_second_form_partially_filled_2(self):
         """A partially completed form is invalid."""
+
         class DeclarativeChoiceFormSet(FormSet):
             """Declarative choice formset."""
 
             form = Choice
             extra = 3
-        
+
         data = {
             "choices-TOTAL_FORMS": "3",  # the number of forms rendered
             "choices-INITIAL_FORMS": "0",  # the number of forms with initial data
@@ -2468,41 +2490,47 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         }
         formset = DeclarativeChoiceFormSet(data, auto_id=False, prefix="choices")
         super().test_second_form_partially_filled_2(formset)
-    
+
     def test_more_initial_data(self):
         """
         The extra argument works when the formset is pre-filled with initial
         data.
         """
+
         class DeclarativeChoiceFormSet(FormSet):
             """Declarative choice formset."""
 
             form = Choice
             extra = 3
-        
+
         initial = [{"choice": "Calexico", "votes": 100}]
-        formset = DeclarativeChoiceFormSet(initial=initial, auto_id=False, prefix="choices")
+        formset = DeclarativeChoiceFormSet(
+            initial=initial, auto_id=False, prefix="choices"
+        )
         super().test_more_initial_data(formset)
-    
+
     def test_formset_with_deletion(self):
         """
         formset_factory's can_delete argument adds a boolean "delete" field to
         each form. When that boolean field is True, the form will be in
         formset.deleted_forms.
         """
+
         class DeclarativeChoiceFormSet(FormSet):
             """Declarative choice formset."""
 
             form = Choice
-            can_delete=True
-        
+            can_delete = True
+
         initial = [
             {"choice": "Calexico", "votes": 100},
             {"choice": "Fergie", "votes": 900},
         ]
-        formset = DeclarativeChoiceFormSet(initial=initial, auto_id=False, prefix="choices")
+        formset = DeclarativeChoiceFormSet(
+            initial=initial, auto_id=False, prefix="choices"
+        )
         super().test_formset_with_deletion(formset)
-    
+
     def test_formset_with_special_deletion(self):
         # To delete something, set that form's special delete field to 'on'.
         # Let's go ahead and delete Fergie.
@@ -2510,8 +2538,8 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
             """Declarative choice formset."""
 
             form = Choice
-            can_delete=True
-        
+            can_delete = True
+
         data = {
             "choices-TOTAL_FORMS": "3",  # the number of forms rendered
             "choices-INITIAL_FORMS": "2",  # the number of forms with initial data
@@ -2529,7 +2557,7 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         }
         formset = DeclarativeChoiceFormSet(data, auto_id=False, prefix="choices")
         super().test_formset_with_special_deletion(formset)
-    
+
     def test_custom_renderer(self):
         """
         A custom renderer passed to a declarative formset is passed to all forms
@@ -2542,7 +2570,7 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
 
             form = Choice
             renderer = Jinja2()
-        
+
         data = {
             "choices-TOTAL_FORMS": "2",
             "choices-INITIAL_FORMS": "0",
@@ -2558,7 +2586,7 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         self.assertEqual(formset.management_form.renderer.__class__, Jinja2)
         self.assertEqual(formset.non_form_errors().renderer.__class__, Jinja2)
         self.assertEqual(formset.empty_form.renderer.__class__, Jinja2)
-    
+
     def test_form_default_renderer(self):
         """
         In the absence of a renderer passed to the declarative formset,
@@ -2570,7 +2598,7 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
 
         class ChoiceWithDefaultRenderer(Choice):
             default_renderer = CustomRenderer()
-        
+
         class DeclarativeChoiceFormSet(FormSet):
             """Declarative choice formset."""
 
@@ -2603,7 +2631,7 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
 
         class ChoiceWithDefaultRenderer(Choice):
             default_renderer = CustomRenderer
-        
+
         class DeclarativeChoiceFormSet(FormSet):
             """Declarative choice formset."""
 
@@ -2621,7 +2649,6 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         default_renderer = get_default_renderer()
         self.assertIsInstance(formset.renderer, type(default_renderer))
 
-
     def test_formset_with_deletion_remove_deletion_flag(self):
         """
         If a form is filled with something and can_delete is also checked, that
@@ -2631,7 +2658,7 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
 
         class CheckForm(Form):
             field = IntegerField(min_value=100)
-        
+
         class DeclarativeCheckFormSet(FormSet):
             """Declarative choice formset."""
 
@@ -2656,12 +2683,13 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         data["check-1-DELETE"] = ""
         formset = DeclarativeCheckFormSet(data, prefix="check")
         self.assertFalse(formset.is_valid())
-    
+
     def test_formset_with_deletion_invalid_deleted_form(self):
         """
         deleted_forms works on a valid formset even if a deleted form would
         have been invalid.
         """
+
         class DeclarativeFavoriteDrinkFormSet(FormSet):
             """Declarative choice formset."""
 
@@ -2681,7 +2709,7 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         self.assertTrue(formset.is_valid())
         self.assertEqual(formset._errors, [])
         self.assertEqual(len(formset.deleted_forms), 1)
-    
+
     def test_formset_with_deletion_custom_widget(self):
         class DeletionAttributeFormSet(BaseFormSet):
             deletion_widget = HiddenInput
@@ -2689,7 +2717,7 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         class DeletionMethodFormSet(BaseFormSet):
             def get_deletion_widget(self):
                 return HiddenInput(attrs={"class": "deletion"})
-        
+
         tests = [
             (DeletionAttributeFormSet, '<input type="hidden" name="form-0-DELETE">'),
             (
@@ -2699,13 +2727,14 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         ]
         for formset_class, delete_html in tests:
             with self.subTest(formset_class=formset_class.__name__):
+
                 class DeclarativeArticleFormSet(FormSet):
                     """Declarative choice formset."""
 
                     form = ArticleForm
                     formset = formset_class
                     can_delete = True
-                
+
                 formset = DeclarativeArticleFormSet(auto_id=False)
                 self.assertHTMLEqual(
                     "\n".join([form.as_ul() for form in formset.forms]),
@@ -2727,17 +2756,20 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         used as a secondary ordering criteria. In order to put something at the
         front of the list, you'd need to set its order to 0.
         """
+
         class DeclarativeChoiceFormSet(FormSet):
             """Declarative choice formset."""
 
             form = Choice
             can_order = True
-        
+
         initial = [
             {"choice": "Calexico", "votes": 100},
             {"choice": "Fergie", "votes": 900},
         ]
-        formset = DeclarativeChoiceFormSet(initial=initial, auto_id=False, prefix="choices")
+        formset = DeclarativeChoiceFormSet(
+            initial=initial, auto_id=False, prefix="choices"
+        )
         self.assertHTMLEqual(
             "\n".join(form.as_ul() for form in formset.forms),
             '<li>Choice: <input type="text" name="choices-0-choice" value="Calexico">'
@@ -2777,7 +2809,7 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
                 {"votes": 900, "ORDER": 2, "choice": "Fergie"},
             ],
         )
-    
+
     def test_formsets_with_ordering_custom_widget(self):
         class OrderingAttributeFormSet(BaseFormSet):
             ordering_widget = HiddenInput
@@ -2795,13 +2827,14 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         )
         for formset_class, order_html in tests:
             with self.subTest(formset_class=formset_class.__name__):
+
                 class DeclarativeArticleFormSet(FormSet):
                     """Declarative choice formset."""
 
                     form = ArticleForm
                     formset = formset_class
                     can_order = True
-                
+
                 formset = DeclarativeArticleFormSet(auto_id=False)
                 self.assertHTMLEqual(
                     "\n".join(form.as_ul() for form in formset.forms),
@@ -2811,18 +2844,19 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
                         "%s</li>" % order_html
                     ),
                 )
-    
+
     def test_empty_ordered_fields(self):
         """
         Ordering fields are allowed to be left blank. If they are left blank,
         they'll be sorted below everything else.
         """
+
         class DeclarativeChoiceFormSet(FormSet):
             """Declarative choice formset."""
 
             form = Choice
             can_order = True
-        
+
         data = {
             "choices-TOTAL_FORMS": "4",  # the number of forms rendered
             "choices-INITIAL_FORMS": "3",  # the number of forms with initial data
@@ -2855,12 +2889,13 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
 
     def test_ordering_blank_fieldsets(self):
         """Ordering works with blank fieldsets."""
+
         class DeclarativeChoiceFormSet(FormSet):
             """Declarative choice formset."""
 
             form = Choice
             can_order = True
-        
+
         data = {
             "choices-TOTAL_FORMS": "3",  # the number of forms rendered
             "choices-INITIAL_FORMS": "0",  # the number of forms with initial data
@@ -2873,19 +2908,22 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
 
     def test_formset_with_ordering_and_deletion(self):
         """FormSets with ordering + deletion."""
+
         class DeclarativeChoiceFormSet(FormSet):
             """Declarative choice formset."""
 
             form = Choice
             can_order = True
             can_delete = True
-        
+
         initial = [
             {"choice": "Calexico", "votes": 100},
             {"choice": "Fergie", "votes": 900},
             {"choice": "The Decemberists", "votes": 500},
         ]
-        formset = DeclarativeChoiceFormSet(initial=initial, auto_id=False, prefix="choices")
+        formset = DeclarativeChoiceFormSet(
+            initial=initial, auto_id=False, prefix="choices"
+        )
         self.assertHTMLEqual(
             "\n".join(form.as_ul() for form in formset.forms),
             '<li>Choice: <input type="text" name="choices-0-choice" value="Calexico">'
@@ -2955,13 +2993,14 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         Can get ordered_forms from a valid formset even if a deleted form
         would have been invalid.
         """
+
         class DeclarativeFavoriteDrinkFormSet(FormSet):
             """Declarative favorite drink formset."""
 
             form = FavoriteDrinkForm
             can_delete = True
             can_order = True
-        
+
         formset = DeclarativeFavoriteDrinkFormSet(
             {
                 "form-0-name": "",
@@ -3003,6 +3042,7 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
 
     def test_limiting_max_forms(self):
         """Limiting the maximum number of forms with max_num."""
+
         # When not passed, max_num will take a high default value, leaving the
         # number of forms only controlled by the value of the extra parameter.
         class LimitedDeclarativeDrinkFormSet(FormSet):
@@ -3010,7 +3050,7 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
 
             form = FavoriteDrinkForm
             extra = 3
-        
+
         formset = LimitedDeclarativeDrinkFormSet()
         self.assertHTMLEqual(
             "\n".join(str(form) for form in formset.forms),
@@ -3021,6 +3061,7 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
 <div><label for="id_form-2-name">Name:</label>
 <input type="text" name="form-2-name" id="id_form-2-name"></div>""",
         )
+
         # If max_num is 0 then no form is rendered at all.
         class LimitedDeclarativeDrinkFormSet(FormSet):
             """Limited declarative favorite drink formset."""
@@ -3028,7 +3069,7 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
             form = FavoriteDrinkForm
             extra = 3
             max_num = 0
-            
+
         formset = LimitedDeclarativeDrinkFormSet()
         self.assertEqual(formset.forms, [])
 
@@ -3039,7 +3080,7 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
             form = FavoriteDrinkForm
             extra = 5
             max_num = 2
-        
+
         formset = LimitedDeclarativeDrinkFormSet()
         self.assertHTMLEqual(
             "\n".join(str(form) for form in formset.forms),
@@ -3051,13 +3092,13 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
 
     def test_limiting_extra_lest_than_max_num(self):
         """max_num has no effect when extra is less than max_num."""
+
         class LimitedDeclarativeDrinkFormSet(FormSet):
             """Limited declarative favorite drink formset."""
 
             form = FavoriteDrinkForm
             extra = 1
             max_num = 2
-        
 
         formset = LimitedDeclarativeDrinkFormSet()
         self.assertHTMLEqual(
@@ -3075,7 +3116,7 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
 
             form = FavoriteDrinkForm
             extra = 1
-        
+
         formset = LimitedDeclarativeDrinkFormSet(initial=[{"name": "Fernet and Coke"}])
         self.assertHTMLEqual(
             "\n".join(str(form) for form in formset.forms),
@@ -3093,13 +3134,14 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         If max_num is 0 then no form is rendered at all, regardless of extra,
         unless initial data is present.
         """
+
         class LimitedDeclarativeDrinkFormSet(FormSet):
             """Limited declarative favorite drink formset."""
 
             form = FavoriteDrinkForm
             extra = 1
             max_num = 0
-                
+
         formset = LimitedDeclarativeDrinkFormSet()
         self.assertEqual(formset.forms, [])
 
@@ -3111,7 +3153,7 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
             form = FavoriteDrinkForm
             extra = 1
             max_num = 0
-        
+
         initial = [
             {"name": "Fernet and Coke"},
             {"name": "Bloody Mary"},
@@ -3135,6 +3177,7 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         More initial forms than max_num results in all initial forms being
         displayed (but no extra forms).
         """
+
         class LimitedDeclarativeDrinkFormSet(FormSet):
             """Limited declarative favorite drink formset."""
 
@@ -3184,7 +3227,7 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
 
             form = FavoriteDrinkForm
             absolute_max = 3000
-        
+
         data = {
             "form-TOTAL_FORMS": "2001",
             "form-INITIAL_FORMS": "0",
@@ -3210,6 +3253,7 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
             form = FavoriteDrinkForm
             max_num = 30
             absolute_max = 1000
+
         data = {
             "form-TOTAL_FORMS": "1001",
             "form-INITIAL_FORMS": "0",
@@ -3222,7 +3266,7 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
             formset.non_form_errors(),
             ["Please submit at most 30 forms."],
         )
-    
+
     def test_absolute_max_invalid(self):
         """Test that the absolute_max is greater than max_num."""
         msg = "'absolute_max' must be greater or equal to 'max_num'."
@@ -3245,13 +3289,14 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         One form from initial and extra=3 with max_num=2 results in the one
         initial form and one extra.
         """
+
         class LimitedDeclarativeDrinkFormSet(FormSet):
             """Limited declarative favorite drink formset."""
 
             form = FavoriteDrinkForm
             extra = 3
             max_num = 2
-                
+
         formset = LimitedDeclarativeDrinkFormSet(initial=[{"name": "Gin Tonic"}])
         self.assertHTMLEqual(
             "\n".join(str(form) for form in formset.forms),
@@ -3312,12 +3357,13 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
 
     def test_formset_iteration(self):
         """Formset instances are iterable."""
+
         class DeclarativeChoiceFormSet(FormSet):
             """Declarative choice formset."""
 
             form = Choice
-            extra = 3        
-        
+            extra = 3
+
         formset = DeclarativeChoiceFormSet()
         # An iterated formset yields formset.forms.
         forms = list(formset)
@@ -3335,7 +3381,7 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
 
             def __getitem__(self, idx):
                 return super().__getitem__(len(self) - idx - 1)
-        
+
         class DeclarativeChoiceFormSet(FormSet):
             """Declarative choice formset."""
 
@@ -3352,12 +3398,13 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
 
     def test_formset_nonzero(self):
         """A formsets without any forms evaluates as True."""
+
         class DeclarativeChoiceFormSet(FormSet):
             """Declarative choice formset."""
 
             form = Choice
             extra = 0
-        
+
         formset = DeclarativeChoiceFormSet()
         self.assertEqual(len(formset.forms), 0)
         self.assertTrue(formset)
@@ -3400,7 +3447,7 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
             def is_valid(self):
                 self.is_valid_called = True
                 return super().is_valid()
-        
+
         class DeclarativeAnotherChoiceFormSet(FormSet):
             """Declarative another choice formset."""
 
@@ -3424,11 +3471,13 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         _old_DEFAULT_MAX_NUM = formsets.DEFAULT_MAX_NUM
         try:
             formsets.DEFAULT_MAX_NUM = 2
+
             class DeclarativeChoiceFormSet(FormSet):
                 """Declarative choice formset."""
 
                 form = Choice
                 max_num = 1
+
             # someone fiddles with the mgmt form data...
             formset = DeclarativeChoiceFormSet(
                 {
@@ -3456,11 +3505,13 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
 
     def test_increase_hard_limit(self):
         """Can increase the built-in forms limit via a higher max_num."""
+
         class DeclarativeChoiceFormSet(FormSet):
             """Declarative choice formset."""
 
             form = Choice
             max_num = 4
+
         # reduce the default limit of 1000 temporarily for testing
         _old_DEFAULT_MAX_NUM = formsets.DEFAULT_MAX_NUM
         try:
@@ -3497,7 +3548,7 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         class BaseCustomFormSet(BaseFormSet):
             def clean(self):
                 raise ValidationError("This is a non-form error")
-        
+
         class DeclarativeChoiceFormSet(FormSet):
             """Declarative choice formset."""
 
@@ -3513,9 +3564,10 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         self.assertEqual(list(formset.non_form_errors()), ["This is a non-form error"])
 
     def test_validate_max_ignores_forms_marked_for_deletion(self):
+
         class CheckForm(Form):
             field = IntegerField()
-        
+
         class DeclarativeCheckFormSet(FormSet):
             """Declarative check formset."""
 
@@ -3621,9 +3673,10 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         self.assertIs(formset._should_delete_form(formset.forms[2]), False)
 
     def test_template_name_uses_renderer_value(self):
+
         class CustomRenderer(TemplatesSetting):
             formset_template_name = "a/custom/formset/template.html"
-        
+
         class DeclarativeChoiceFormSet(FormSet):
             """Declarative choice formset."""
 
@@ -3635,9 +3688,10 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         )
 
     def test_template_name_can_be_overridden(self):
+
         class CustomFormSet(BaseFormSet):
             template_name = "a/custom/formset/template.html"
-        
+
         class DeclarativeChoiceFormSet(FormSet):
             """Declarative choice formset."""
 
