@@ -1113,8 +1113,8 @@ part of your database configuration :setting:`DATABASES`::
             # ...
             "OPTIONS": {
                 "pool": True,
-                "min":1,
-                "max":10,
+                "min": 1,
+                "max": 10,
                 # ...
             },
         },
