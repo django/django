@@ -282,7 +282,7 @@ class BaseDatabaseOperations:
         statement.
         """
         if operation in ["CASCADE", "SET NULL", "RESTRICT", "SET DEFAULT"]:
-            return f" ON DELETE {operation} "
+            return f" ON DELETE {operation}"
         if operation == "":
             return ""
         raise NotImplementedError(f"ON DELETE {operation} is not supported.")

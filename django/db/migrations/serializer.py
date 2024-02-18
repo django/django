@@ -275,7 +275,7 @@ class PathSerializer(BaseSerializer):
 
 class DatabaseOnDeleteSerializer(BaseSerializer):
     def serialize(self):
-        return f"models.{self.value.__name__}", {}
+        return f"models.{self.value.__name__}", {"from django.db import models"}
 
 
 class RegexSerializer(BaseSerializer):

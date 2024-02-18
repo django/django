@@ -17,23 +17,26 @@ from .models import (
     B3,
     MR,
     A,
-    AnotherSetNullBaz,
+    AnotherGrandChildFKSetNull,
     Avatar,
     B,
-    Bar,
     Base,
-    Baz,
     Child,
+    ChildFKRestrict,
+    ChildFKSetNull,
+    ChildModel,
     DBDefaultsFK,
     DBLevelChild,
     DeleteBottom,
     DeleteTop,
     DiamondChild,
     DiamondParent,
-    Foo,
     GenericB1,
     GenericB2,
     GenericDeleteBottom,
+    GrandChild,
+    GrandChildFKRestrict,
+    GrandChildFKSetNull,
     HiddenUser,
     HiddenUserProfile,
     M,
@@ -44,15 +47,12 @@ from .models import (
     Origin,
     P,
     Parent,
+    ParentModel,
     R,
     RChild,
     RChildChild,
     Referrer,
-    RestrictBar,
-    RestrictBaz,
     S,
-    SetNullBar,
-    SetNullBaz,
     T,
     User,
     create_a,
@@ -822,81 +822,84 @@ class FastDeleteTests(TestCase):
 
 class DatabaseLevelOnDeleteTests(TestCase):
     def test_deletion_on_nested_cascades(self):
-        foo = Foo.objects.create()
-        bar = Bar.objects.create(foo=foo)
-        baz = Baz.objects.create(bar=bar)
+        parent = ParentModel.objects.create()
+        child = ChildModel.objects.create(parent_model=parent)
+        grand_child = GrandChild.objects.create(child_model=child)
 
-        foo.delete()
+        parent.delete()
 
-        with self.assertRaises(Bar.DoesNotExist):
-            bar.refresh_from_db()
-
-        with self.assertRaises(Baz.DoesNotExist):
-            baz.refresh_from_db()
+        self.assertIs(ChildModel.objects.filter(pk=child.pk).exists(), False)
+        self.assertIs(GrandChild.objects.filter(pk=grand_child.pk).exists(), False)
 
     def test_restricted_deletion(self):
-        foo = Foo.objects.create()
-        RestrictBar.objects.create(foo=foo)
+        parent = ParentModel.objects.create()
+        ChildFKRestrict.objects.create(parent_model=parent)
 
         with self.assertRaises(IntegrityError):
-            foo.delete()
+            parent.delete()
 
     def test_restricted_deletion_by_cascade(self):
-        foo = Foo.objects.create()
-        bar = Bar.objects.create(foo=foo)
-        RestrictBaz.objects.create(bar=bar)
+        parent = ParentModel.objects.create()
+        child = ChildModel.objects.create(parent_model=parent)
+        GrandChildFKRestrict.objects.create(child_model=child)
         with self.assertRaises(IntegrityError):
-            foo.delete()
+            parent.delete()
 
     def test_deletion_on_set_null(self):
-        foo = Foo.objects.create()
-        bar = SetNullBar.objects.create(foo=foo, another_field="Some Value")
-        foo.delete()
-        orphan_bar = SetNullBar.objects.get(pk=bar.pk)
-        self.assertEqual(bar.pk, orphan_bar.pk)
-        self.assertEqual(bar.another_field, orphan_bar.another_field)
-        self.assertNotEqual(bar.foo, orphan_bar.foo)
-        self.assertIsNone(orphan_bar.foo)
+        parent = ParentModel.objects.create()
+        child = ChildFKSetNull.objects.create(
+            parent_model=parent, another_field="Some Value"
+        )
+        parent.delete()
+        orphan_child = ChildFKSetNull.objects.get(pk=child.pk)
+        self.assertEqual(child.pk, orphan_child.pk)
+        self.assertEqual(child.another_field, orphan_child.another_field)
+        self.assertNotEqual(child.parent_model, orphan_child.parent_model)
+        self.assertIsNone(orphan_child.parent_model)
 
     def test_set_null_on_cascade_deletion(self):
-        foo = Foo.objects.create()
-        bar = Bar.objects.create(foo=foo)
-        baz = SetNullBaz.objects.create(bar=bar, another_field="Some Value")
-        foo.delete()
-        orphan_baz = SetNullBaz.objects.get(pk=baz.pk)
-        self.assertEqual(baz.pk, orphan_baz.pk)
-        self.assertEqual(baz.another_field, orphan_baz.another_field)
-        self.assertNotEqual(baz.bar, orphan_baz.bar)
-        self.assertIsNone(orphan_baz.bar)
+        parent = ParentModel.objects.create()
+        child = ChildModel.objects.create(parent_model=parent)
+        grand_child = GrandChildFKSetNull.objects.create(
+            child_model=child, another_field="Some Value"
+        )
+        parent.delete()
+        orphan_grand_child = GrandChildFKSetNull.objects.get(pk=grand_child.pk)
+        self.assertEqual(grand_child.pk, orphan_grand_child.pk)
+        self.assertEqual(grand_child.another_field, orphan_grand_child.another_field)
+        self.assertNotEqual(grand_child.child_model, orphan_grand_child.child_model)
+        self.assertIsNone(orphan_grand_child.child_model)
 
     def test_nested_set_null_on_deletion(self):
-        foo = Foo.objects.create()
-        bar = SetNullBar.objects.create(foo=foo)
-        baz = AnotherSetNullBaz.objects.create(setnullbar=bar)
-        foo.delete()
+        parent = ParentModel.objects.create()
+        child = ChildFKSetNull.objects.create(parent_model=parent)
+        grand_child = AnotherGrandChildFKSetNull.objects.create(child_fk_set_null=child)
+        parent.delete()
 
-        orphan_bar = SetNullBar.objects.get(pk=bar.pk)
-        self.assertEqual(bar.pk, orphan_bar.pk)
-        self.assertEqual(bar.another_field, orphan_bar.another_field)
-        self.assertNotEqual(bar.foo, orphan_bar.foo)
-        self.assertIsNone(orphan_bar.foo)
+        orphan_child = ChildFKSetNull.objects.get(pk=child.pk)
+        self.assertEqual(child.pk, orphan_child.pk)
+        self.assertEqual(child.another_field, orphan_child.another_field)
+        self.assertNotEqual(child.parent_model, orphan_child.parent_model)
+        self.assertIsNone(orphan_child.parent_model)
 
-        orphan_baz = AnotherSetNullBaz.objects.get(pk=baz.pk)
-        self.assertEqual(baz.pk, orphan_baz.pk)
-        self.assertEqual(baz.another_field, orphan_baz.another_field)
-        self.assertEqual(baz.setnullbar, orphan_baz.setnullbar)
-        self.assertIsNotNone(orphan_baz.setnullbar)
+        orphan_grand_child = AnotherGrandChildFKSetNull.objects.get(pk=grand_child.pk)
+        self.assertEqual(grand_child.pk, orphan_grand_child.pk)
+        self.assertEqual(grand_child.another_field, orphan_grand_child.another_field)
+        self.assertEqual(
+            grand_child.child_fk_set_null, orphan_grand_child.child_fk_set_null
+        )
+        self.assertIsNotNone(orphan_grand_child.child_fk_set_null)
 
     @skipUnlessDBFeature("has_on_delete_db_default")
     def test_foreign_key_db_default_exists(self):
         # Default parent exists
-        default_parent = Foo.objects.create(pk=1)
-        parent = Foo.objects.create(pk=2)
-        child1 = DBDefaultsFK.objects.create(language_code=parent)
+        default_parent = ParentModel.objects.create(pk=1)
+        parent = ParentModel.objects.create(pk=2)
+        child1 = DBDefaultsFK.objects.create(parent_model=parent)
         with self.assertNumQueries(1):
             parent.delete()
         child1.refresh_from_db()
-        self.assertEqual(child1.language_code, default_parent)
+        self.assertEqual(child1.parent_model, default_parent)
         child1.delete()
         default_parent.delete()
 
@@ -908,9 +911,9 @@ class DatabaseLevelOnDeleteTransactionTests(TransactionTestCase):
     def test_foreign_key_default_parent_deleted_before_parent(self):
         # Default parent does not exists
         # Default parent deleted before parent
-        default_parent = Foo.objects.create(pk=1)
-        parent = Foo.objects.create(pk=2)
-        child1 = DBDefaultsFK.objects.create(language_code=parent)
+        default_parent = ParentModel.objects.create(pk=1)
+        parent = ParentModel.objects.create(pk=2)
+        child1 = DBDefaultsFK.objects.create(parent_model=parent)
         default_parent.delete()
         with self.assertRaises(IntegrityError):
             parent.delete()
@@ -920,9 +923,9 @@ class DatabaseLevelOnDeleteTransactionTests(TransactionTestCase):
     def test_foreign_key_default_parent_deleted_after_parent(self):
         # Default parent does not exists
         # Default parent deleted after parent
-        default_parent = Foo.objects.create(pk=1)
-        parent = Foo.objects.create(pk=2)
-        child1 = DBDefaultsFK.objects.create(language_code=parent)
+        default_parent = ParentModel.objects.create(pk=1)
+        parent = ParentModel.objects.create(pk=2)
+        child1 = DBDefaultsFK.objects.create(parent_model=parent)
         parent.delete()
         with self.assertRaises(IntegrityError):
             default_parent.delete()
@@ -931,49 +934,51 @@ class DatabaseLevelOnDeleteTransactionTests(TransactionTestCase):
 
 class DatabaseLevelOnDeleteQueryAssertionTests(TestCase):
     def test_queries_on_nested_cascade(self):
-        foo = Foo.objects.create()
+        parent = ParentModel.objects.create()
 
         for i in range(3):
-            Bar.objects.create(foo=foo)
+            ChildModel.objects.create(parent_model=parent)
 
-        for bar in Bar.objects.all():
+        for child in ChildModel.objects.all():
             for i in range(3):
-                Baz.objects.create(bar=bar)
+                GrandChild.objects.create(child_model=child)
 
         # one is the deletion
         with self.assertNumQueries(1):
-            foo.delete()
+            parent.delete()
 
     def test_queries_on_nested_set_null(self):
-        foo = Foo.objects.create()
+        parent = ParentModel.objects.create()
 
         for i in range(3):
-            SetNullBar.objects.create(foo=foo)
+            ChildFKSetNull.objects.create(parent_model=parent)
 
-        for setnullbar in SetNullBar.objects.all():
+        for child_fk_set_null in ChildFKSetNull.objects.all():
             for i in range(3):
-                AnotherSetNullBaz.objects.create(setnullbar=setnullbar)
+                AnotherGrandChildFKSetNull.objects.create(
+                    child_fk_set_null=child_fk_set_null
+                )
 
         # one is the deletion
         with self.assertNumQueries(1):
-            foo.delete()
+            parent.delete()
 
     def test_queries_on_nested_set_null_cascade(self):
-        foo = Foo.objects.create()
+        parent = ParentModel.objects.create()
 
         for i in range(3):
-            Bar.objects.create(foo=foo)
+            ChildModel.objects.create(parent_model=parent)
 
-        for bar in Bar.objects.all():
+        for child in ChildModel.objects.all():
             for i in range(3):
-                SetNullBaz.objects.create(bar=bar)
+                GrandChildFKSetNull.objects.create(child_model=child)
 
         # one is the deletion
         with self.assertNumQueries(1):
-            foo.delete()
+            parent.delete()
 
     def test_queries_on_inherited_model(self):
-        gp = Foo.objects.create()
+        gp = ParentModel.objects.create()
         parent = NormalParent.objects.create(grandparent_ptr=gp)
         diamond_parent = DiamondParent.objects.create(gp_ptr=gp)
 
@@ -984,21 +989,18 @@ class DatabaseLevelOnDeleteQueryAssertionTests(TestCase):
         with self.assertNumQueries(1):
             gp.delete()
 
-        with self.assertRaises(NormalParent.DoesNotExist):
-            parent.refresh_from_db()
-
-        with self.assertRaises(DiamondParent.DoesNotExist):
-            diamond_parent.refresh_from_db()
-
-        with self.assertRaises(DiamondChild.DoesNotExist):
-            dc.refresh_from_db()
+        self.assertIs(NormalParent.objects.filter(pk=parent.pk).exists(), False)
+        self.assertIs(
+            DiamondParent.objects.filter(pk=diamond_parent.pk).exists(), False
+        )
+        self.assertIs(DiamondChild.objects.filter(pk=dc.pk).exists(), False)
 
     def test_restrict_on_inherited_model(self):
-        gp = Foo.objects.create()
+        gp = ParentModel.objects.create()
         child = DBLevelChild.objects.create(grandparent_ptr=gp)
 
         with transaction.atomic():
             with self.assertRaises(IntegrityError):
                 gp.delete()
 
-        child.refresh_from_db()
+        self.assertIs(DBLevelChild.objects.filter(pk=child.pk).exists(), True)
