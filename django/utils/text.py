@@ -23,8 +23,61 @@ def capfirst(x):
     return x[0].upper() + x[1:]
 
 
-# Set up regular expressions
-re_words = _lazy_re_compile(r"<[^>]+?>|([^<>\s]+)", re.S)
+# ----- Begin security-related performance workaround -----
+
+# We used to have, below
+#
+# re_words = _lazy_re_compile(r"<[^>]+?>|([^<>\s]+)", re.S)
+#
+# But it was shown that this regex, in the way we use it here, has some
+# catastrophic edge-case performance features. Namely, when it is applied to
+# text with only open brackets "<<<...". The class below provides the services
+# and correct answers for the use cases, but in these edge cases does it much
+# faster.
+re_notag = _lazy_re_compile(r"([^<>\s]+)", re.S)
+re_prt = _lazy_re_compile(r"<|([^<>\s]+)", re.S)
+
+
+class WordsRegex:
+    @staticmethod
+    def search(text, pos):
+        # Look for "<" or a non-tag word.
+        partial = re_prt.search(text, pos)
+        if partial is None or partial[1] is not None:
+            return partial
+
+        # "<" was found, look for a closing ">".
+        end = text.find(">", partial.end(0))
+        if end < 0:
+            # ">" cannot be found, look for a word.
+            return re_notag.search(text, pos + 1)
+        else:
+            # "<" followed by a ">" was found -- fake a match.
+            end += 1
+            return FakeMatch(text[partial.start(0) : end], end)
+
+
+class FakeMatch:
+    __slots__ = ["_text", "_end"]
+
+    def end(self, group=0):
+        assert group == 0, "This specific object takes only group=0"
+        return self._end
+
+    def __getitem__(self, group):
+        if group == 1:
+            return None
+        assert group == 0, "This specific object takes only group in {0,1}"
+        return self._text
+
+    def __init__(self, text, end):
+        self._text, self._end = text, end
+
+
+# ----- End security-related performance workaround -----
+
+# Set up regular expressions.
+re_words = WordsRegex
 re_chars = _lazy_re_compile(r"<[^>]+?>|(.)", re.S)
 re_tag = _lazy_re_compile(r"<(/)?(\S+?)(?:(\s*/)|\s.*?)?>", re.S)
 re_newlines = _lazy_re_compile(r"\r\n|\r")  # Used in normalize_newlines
