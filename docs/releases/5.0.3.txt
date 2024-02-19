@@ -29,3 +29,6 @@ Bugfixes
 * Fixed a regression in Django 5.0 that caused a crash when reloading a test
   database and a base queryset for a base manager used ``prefetch_related()``
   (:ticket:`35238`).
+
+* Fixed a bug in Django 5.0 where facet filters in the admin would crash on a
+  ``SimpleListFilter`` using a queryset without primary keys (:ticket:`35198`).
