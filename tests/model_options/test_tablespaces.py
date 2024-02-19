@@ -1,4 +1,3 @@
-from django.apps import apps
 from django.conf import settings
 from django.db import connection, models
 from django.test import TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature
@@ -41,10 +40,16 @@ class TablespacesTests(TransactionTestCase):
 
         class Article(models.Model):
             title = models.CharField(max_length=50, unique=True)
-            code = models.CharField(max_length=50, unique=True, db_tablespace=tablespace)
-            authors = models.ManyToManyField(Scientist, related_name="articles_written_set")
+            code = models.CharField(
+                max_length=50, unique=True, db_tablespace=tablespace
+            )
+            authors = models.ManyToManyField(
+                Scientist, related_name="articles_written_set"
+            )
             reviewers = models.ManyToManyField(
-                Scientist, related_name="articles_reviewed_set", db_tablespace=tablespace
+                Scientist,
+                related_name="articles_reviewed_set",
+                db_tablespace=tablespace,
             )
 
             class Meta:
@@ -77,7 +82,8 @@ class TablespacesTests(TransactionTestCase):
     @skipUnlessDBFeature("supports_tablespaces")
     @isolate_apps("model_options")
     def test_tablespace_for_model_with_default_index_tablespace(self):
-        with self.settings(DEFAULT_INDEX_TABLESPACE='default_index_tbsp'):
+        with self.settings(DEFAULT_INDEX_TABLESPACE="default_index_tbsp"):
+
             class Scientist(models.Model):
                 name = models.CharField(max_length=50)
 
@@ -102,10 +108,16 @@ class TablespacesTests(TransactionTestCase):
 
         class Article(models.Model):
             title = models.CharField(max_length=50, unique=True)
-            code = models.CharField(max_length=50, unique=True, db_tablespace="idx_tbsp")
-            authors = models.ManyToManyField(Scientist, related_name="articles_written_set")
+            code = models.CharField(
+                max_length=50, unique=True, db_tablespace="idx_tbsp"
+            )
+            authors = models.ManyToManyField(
+                Scientist, related_name="articles_written_set"
+            )
             reviewers = models.ManyToManyField(
-                Scientist, related_name="articles_reviewed_set", db_tablespace="idx_tbsp"
+                Scientist,
+                related_name="articles_reviewed_set",
+                db_tablespace="idx_tbsp",
             )
 
             class Meta:
@@ -121,7 +133,8 @@ class TablespacesTests(TransactionTestCase):
     @skipUnlessDBFeature("supports_tablespaces")
     @isolate_apps("model_options")
     def test_tablespace_for_indexed_field_with_default_index_tablespace(self):
-        with self.settings(DEFAULT_INDEX_TABLESPACE='default_index_tbsp'):
+        with self.settings(DEFAULT_INDEX_TABLESPACE="default_index_tbsp"):
+
             class Scientist(models.Model):
                 name = models.CharField(max_length=50)
 
@@ -130,10 +143,16 @@ class TablespacesTests(TransactionTestCase):
 
             class Article(models.Model):
                 title = models.CharField(max_length=50, unique=True)
-                code = models.CharField(max_length=50, unique=True, db_tablespace="idx_tbsp")
-                authors = models.ManyToManyField(Scientist, related_name="articles_written_set")
+                code = models.CharField(
+                    max_length=50, unique=True, db_tablespace="idx_tbsp"
+                )
+                authors = models.ManyToManyField(
+                    Scientist, related_name="articles_written_set"
+                )
                 reviewers = models.ManyToManyField(
-                    Scientist, related_name="articles_reviewed_set", db_tablespace="idx_tbsp"
+                    Scientist,
+                    related_name="articles_reviewed_set",
+                    db_tablespace="idx_tbsp",
                 )
 
                 class Meta:
@@ -158,10 +177,16 @@ class TablespacesTests(TransactionTestCase):
 
         class Article(models.Model):
             title = models.CharField(max_length=50, unique=True)
-            code = models.CharField(max_length=50, unique=True, db_tablespace="idx_tbsp")
-            authors = models.ManyToManyField(Scientist, related_name="articles_written_set")
+            code = models.CharField(
+                max_length=50, unique=True, db_tablespace="idx_tbsp"
+            )
+            authors = models.ManyToManyField(
+                Scientist, related_name="articles_written_set"
+            )
             reviewers = models.ManyToManyField(
-                Scientist, related_name="articles_reviewed_set", db_tablespace="idx_tbsp"
+                Scientist,
+                related_name="articles_reviewed_set",
+                db_tablespace="idx_tbsp",
             )
 
             class Meta:
@@ -198,7 +223,8 @@ class TablespacesTests(TransactionTestCase):
     @skipUnlessDBFeature("supports_tablespaces")
     @isolate_apps("model_options")
     def test_tablespace_for_many_to_many_field_with_default_index_tablespace(self):
-        with self.settings(DEFAULT_INDEX_TABLESPACE='default_index_tbsp'):
+        with self.settings(DEFAULT_INDEX_TABLESPACE="default_index_tbsp"):
+
             class Scientist(models.Model):
                 name = models.CharField(max_length=50)
 
@@ -207,10 +233,16 @@ class TablespacesTests(TransactionTestCase):
 
             class Article(models.Model):
                 title = models.CharField(max_length=50, unique=True)
-                code = models.CharField(max_length=50, unique=True, db_tablespace="idx_tbsp")
-                authors = models.ManyToManyField(Scientist, related_name="articles_written_set")
+                code = models.CharField(
+                    max_length=50, unique=True, db_tablespace="idx_tbsp"
+                )
+                authors = models.ManyToManyField(
+                    Scientist, related_name="articles_written_set"
+                )
                 reviewers = models.ManyToManyField(
-                    Scientist, related_name="articles_reviewed_set", db_tablespace="idx_tbsp"
+                    Scientist,
+                    related_name="articles_reviewed_set",
+                    db_tablespace="idx_tbsp",
                 )
 
                 class Meta:
