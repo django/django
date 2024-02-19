@@ -1251,6 +1251,18 @@ def connections_support_transactions(aliases=None):
     return all(conn.features.supports_transactions for conn in conns)
 
 
+def connections_support_savepoints(aliases=None):
+    """
+    Return whether or not all (or specified) connections support savepoints.
+    """
+    conns = (
+        connections.all()
+        if aliases is None
+        else (connections[alias] for alias in aliases)
+    )
+    return all(conn.features.uses_savepoints for conn in conns)
+
+
 class TestData:
     """
     Descriptor to provide TestCase instance isolation for attributes assigned
@@ -1326,9 +1338,16 @@ class TestCase(TransactionTestCase):
         return connections_support_transactions(cls.databases)
 
     @classmethod
+    def _databases_support_savepoints(cls):
+        return connections_support_savepoints(cls.databases)
+
+    @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        if not cls._databases_support_transactions():
+        if not (
+            cls._databases_support_transactions()
+            and cls._databases_support_savepoints()
+        ):
             return
         cls.cls_atomics = cls._enter_atomics()
 
@@ -1356,7 +1375,10 @@ class TestCase(TransactionTestCase):
 
     @classmethod
     def tearDownClass(cls):
-        if cls._databases_support_transactions():
+        if (
+            cls._databases_support_transactions()
+            and cls._databases_support_savepoints()
+        ):
             cls._rollback_atomics(cls.cls_atomics)
             for conn in connections.all(initialized_only=True):
                 conn.close()
@@ -1382,6 +1404,15 @@ class TestCase(TransactionTestCase):
         if self.reset_sequences:
             raise TypeError("reset_sequences cannot be used on TestCase instances")
         self.atomics = self._enter_atomics()
+        if not self._databases_support_savepoints():
+            if self.fixtures:
+                for db_name in self._databases_names(include_mirrors=False):
+                    call_command(
+                        "loaddata",
+                        *self.fixtures,
+                        **{"verbosity": 0, "database": db_name},
+                    )
+            self.setUpTestData()
 
     def _fixture_teardown(self):
         if not self._databases_support_transactions():
