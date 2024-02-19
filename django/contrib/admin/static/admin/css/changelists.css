@@ -11,6 +11,10 @@
     min-width: 0;
 }
 
+#changelist .changelist-form-container a {
+    text-decoration: underline;
+}
+
 #changelist table {
     width: 100%;
 }
@@ -48,6 +52,10 @@
     border-bottom: 1px solid var(--hairline-color);
     background: var(--body-bg);
     overflow: hidden;
+}
+
+#changelist .paginator a {
+    text-decoration : none;
 }
 
 /* CHANGELIST TABLES */
