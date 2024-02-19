@@ -219,6 +219,10 @@ class ForeignObjectRel(FieldCacheMixin):
         # example custom multicolumn joins currently have no remote field).
         self.field_name = None
 
+    @cached_property
+    def accessor_name(self):
+        return self.get_accessor_name()
+
     def get_accessor_name(self, model=None):
         # This method encapsulates the logic that decides what name to give an
         # accessor descriptor that retrieves related many-to-one or
@@ -252,7 +256,7 @@ class ForeignObjectRel(FieldCacheMixin):
         Return the name of the cache key to use for storing an instance of the
         forward model on the reverse model.
         """
-        return self.get_accessor_name()
+        return self.accessor_name
 
 
 class ManyToOneRel(ForeignObjectRel):

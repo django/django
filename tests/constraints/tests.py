@@ -365,6 +365,20 @@ class CheckConstraintTests(TestCase):
             constraint_with_pk.validate(ChildModel, ChildModel(id=1, age=1))
         constraint_with_pk.validate(ChildModel, ChildModel(pk=1, age=1), exclude={"pk"})
 
+    @skipUnlessDBFeature("supports_json_field")
+    def test_validate_jsonfield_exact(self):
+        data = {"release": "5.0.2", "version": "stable"}
+        json_exact_constraint = models.CheckConstraint(
+            check=models.Q(data__version="stable"),
+            name="only_stable_version",
+        )
+        json_exact_constraint.validate(JSONFieldModel, JSONFieldModel(data=data))
+
+        data = {"release": "5.0.2", "version": "not stable"}
+        msg = f"Constraint “{json_exact_constraint.name}” is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            json_exact_constraint.validate(JSONFieldModel, JSONFieldModel(data=data))
+
 
 class UniqueConstraintTests(TestCase):
     @classmethod

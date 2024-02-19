@@ -254,7 +254,7 @@ class RelatedField(FieldCacheMixin, Field):
         # (so `is_hidden` returns True), then there are no clashes to check
         # and we can skip these fields.
         rel_is_hidden = self.remote_field.is_hidden()
-        rel_name = self.remote_field.get_accessor_name()  # i. e. "model_set"
+        rel_name = self.remote_field.accessor_name  # i. e. "model_set"
         rel_query_name = self.related_query_name()  # i. e. "model"
         # i.e. "app_label.Model.field".
         field_name = "%s.%s" % (opts.label, self.name)
@@ -307,7 +307,7 @@ class RelatedField(FieldCacheMixin, Field):
                 clash_field.related_model._meta.label,
                 clash_field.field.name,
             )
-            if not rel_is_hidden and clash_field.get_accessor_name() == rel_name:
+            if not rel_is_hidden and clash_field.accessor_name == rel_name:
                 errors.append(
                     checks.Error(
                         f"Reverse accessor '{rel_opts.object_name}.{rel_name}' "
@@ -323,7 +323,7 @@ class RelatedField(FieldCacheMixin, Field):
                     )
                 )
 
-            if clash_field.get_accessor_name() == rel_query_name:
+            if clash_field.accessor_name == rel_query_name:
                 errors.append(
                     checks.Error(
                         "Reverse query name for '%s' clashes with reverse query name "
@@ -893,7 +893,7 @@ class ForeignObject(RelatedField):
         ):
             setattr(
                 cls._meta.concrete_model,
-                related.get_accessor_name(),
+                related.accessor_name,
                 self.related_accessor_class(related),
             )
             # While 'limit_choices_to' might be a callable, simply pass
@@ -1947,7 +1947,7 @@ class ManyToManyField(RelatedField):
         ):
             setattr(
                 cls,
-                related.get_accessor_name(),
+                related.accessor_name,
                 ManyToManyDescriptor(self.remote_field, reverse=True),
             )
 
