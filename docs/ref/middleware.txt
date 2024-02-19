@@ -495,6 +495,13 @@ Adds the ``user`` attribute, representing the currently-logged-in user, to
 every incoming ``HttpRequest`` object. See :ref:`Authentication in web requests
 <auth-web-requests>`.
 
+.. class:: LoginRequiredMiddleware
+
+This middleware forces all views to require login by default. Views that use
+the ``login_not_required`` decorator or ``LoginNotRequiredMixin`` mixin can
+bypass this validation. Otherwise, the middleware will redirect the user to
+login.
+
 .. class:: RemoteUserMiddleware
 
 Middleware for utilizing web server provided authentication. See
@@ -596,6 +603,10 @@ Here are some hints about the ordering of various Django middleware classes:
 #. :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`
 
    After ``SessionMiddleware``: uses session storage.
+
+#. :class:`~django.contrib.auth.middleware.LoginRequiredMiddleware`
+
+   After ``AuthenticationMiddleware``: uses user object.
 
 #. :class:`~django.contrib.messages.middleware.MessageMiddleware`
 

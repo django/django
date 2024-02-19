@@ -3,7 +3,11 @@ from functools import partial
 from django.contrib import auth
 from django.contrib.auth import load_backend
 from django.contrib.auth.backends import RemoteUserBackend
+from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import ImproperlyConfigured
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+from django.urls.exceptions import NoReverseMatch
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.functional import SimpleLazyObject
 
@@ -32,6 +36,49 @@ class AuthenticationMiddleware(MiddlewareMixin):
             )
         request.user = SimpleLazyObject(lambda: get_user(request))
         request.auser = partial(auser, request)
+
+
+class LoginRequiredMiddleware(MiddlewareMixin):
+    """
+    Middleware that forces all views to require login by default.
+
+    Views that have login_not_required decorator or LoginNotRequiredMixin mixin
+    will be able to pass through without this validation. Otherwise, it will
+    redirect user to login.
+    """
+
+    def process_request(self, request):
+        if not hasattr(request, "user"):
+            raise ImproperlyConfigured(
+                "The Django login required middleware requires authentication "
+                "middleware to be installed. Edit your MIDDLEWARE setting to "
+                "insert "
+                "'django.contrib.sessions.middleware.AuthenticationMiddleware' "
+                "before "
+                "'django.contrib.auth.middleware.LoginRequiredMiddleware'."
+            )
+
+    def process_view(self, request, view_func, view_args, view_kwargs):
+        if request.user.is_authenticated:
+            return None
+
+        view_class = getattr(view_func, "view_class", None)
+        if view_class and not getattr(view_class, "login_required", True):
+            return None
+
+        if not getattr(view_func, "login_required", True):
+            return None
+
+        try:
+            admin_url = reverse("admin:index")
+            if request.path.startswith(admin_url):
+                return HttpResponseRedirect(
+                    reverse("admin:login") + "?next=" + request.get_full_path()
+                )
+        except NoReverseMatch:
+            pass
+
+        return redirect_to_login(request.get_full_path())
 
 
 class RemoteUserMiddleware(MiddlewareMixin):

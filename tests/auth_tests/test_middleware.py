@@ -1,8 +1,15 @@
-from django.contrib.auth.middleware import AuthenticationMiddleware
-from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_not_required
+from django.contrib.auth.middleware import (
+    AuthenticationMiddleware,
+    LoginRequiredMiddleware,
+)
+from django.contrib.auth.mixins import LoginNotRequiredMixin
+from django.contrib.auth.models import AnonymousUser, User
+from django.contrib.auth.views import LoginView, PasswordChangeView
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpRequest, HttpResponse
 from django.test import TestCase
+from django.views import View
 
 
 class TestAuthenticationMiddleware(TestCase):
@@ -50,3 +57,79 @@ class TestAuthenticationMiddleware(TestCase):
         self.assertEqual(auser, self.user)
         auser_second = await self.request.auser()
         self.assertIs(auser, auser_second)
+
+
+class TestLoginRequiredMiddleware(TestCase):
+    class EmptyResponseBaseView(View):
+        def get(self, request, *args, **kwargs):
+            return HttpResponse()
+
+    class AView(EmptyResponseBaseView, LoginNotRequiredMixin):
+        pass
+
+    class BView(EmptyResponseBaseView):
+        pass
+
+    @login_not_required
+    def func_viewA(self, request):
+        return HttpResponse()
+
+    def func_viewB(self, request):
+        return HttpResponse()
+
+    def setUp(self):
+        self.user = User.objects.create_user(
+            "test_user", "test@example.com", "test_password"
+        )
+        self.middleware = LoginRequiredMiddleware(lambda req: HttpResponse())
+        self.request = HttpRequest()
+
+    def test_anonymous_access(self):
+        self.request.user = AnonymousUser()
+
+        # LoginView has LoginNotRequiredMixin mixin.
+        res = self.middleware.process_view(self.request, LoginView.as_view(), (), {})
+        self.assertIsNone(res)
+
+        # Aview has LoginNotRequiredMixin mixin.
+        res = self.middleware.process_view(self.request, self.AView.as_view(), (), {})
+        self.assertIsNone(res)
+
+        # func_viewA has login_not_required decorator.
+        res = self.middleware.process_view(self.request, self.func_viewA, (), {})
+        self.assertIsNone(res)
+
+        # PasswordChangeView requires authentication
+        res = self.middleware.process_view(
+            self.request, PasswordChangeView.as_view(), (), {}
+        )
+        self.assertEqual(res.status_code, 302)
+
+        # Bview requires authentication.
+        res = self.middleware.process_view(self.request, self.BView.as_view(), (), {})
+        self.assertEqual(res.status_code, 302)
+
+        # func_viewB requires authentication.
+        res = self.middleware.process_view(self.request, self.func_viewB, (), {})
+        self.assertEqual(res.status_code, 302)
+
+    def test_user_access(self):
+        self.request.user = self.user
+
+        # Middleware returns None for authenticated user
+        res = self.middleware.process_view(self.request, LoginView.as_view(), (), {})
+        self.assertIsNone(res)
+
+        res = self.middleware.process_view(self.request, self.AView.as_view(), (), {})
+        self.assertIsNone(res)
+
+        res = self.middleware.process_view(
+            self.request, PasswordChangeView.as_view(), (), {}
+        )
+        self.assertIsNone(res)
+
+        res = self.middleware.process_view(self.request, self.func_viewA, (), {})
+        self.assertIsNone(res)
+
+        res = self.middleware.process_view(self.request, self.func_viewB, (), {})
+        self.assertIsNone(res)
