@@ -1,16 +1,8 @@
 from django.apps import apps
 from django.conf import settings
-from django.db import connection
+from django.db import connection, models
 from django.test import TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature
-
-from .models.tablespaces import (
-    Article,
-    ArticleRef,
-    Authors,
-    Reviewers,
-    Scientist,
-    ScientistRef,
-)
+from django.test.utils import isolate_apps
 
 
 def sql_for_table(model):
@@ -25,27 +17,8 @@ def sql_for_index(model):
     )
 
 
-# We can't test the DEFAULT_TABLESPACE and DEFAULT_INDEX_TABLESPACE settings
-# because they're evaluated when the model class is defined. As a consequence,
-# @override_settings doesn't work, and the tests depend
 class TablespacesTests(TransactionTestCase):
     available_apps = ["model_options"]
-
-    def setUp(self):
-        # The unmanaged models need to be removed after the test in order to
-        # prevent bad interactions with the flush operation in other tests.
-        self._old_models = apps.app_configs["model_options"].models.copy()
-
-        for model in Article, Authors, Reviewers, Scientist:
-            model._meta.managed = True
-
-    def tearDown(self):
-        for model in Article, Authors, Reviewers, Scientist:
-            model._meta.managed = False
-
-        apps.app_configs["model_options"].models = self._old_models
-        apps.all_models["model_options"] = self._old_models
-        apps.clear_cache()
 
     def assertNumContains(self, haystack, needle, count):
         real_count = haystack.count(needle)
@@ -55,81 +28,223 @@ class TablespacesTests(TransactionTestCase):
             "Found %d instances of '%s', expected %d" % (real_count, needle, count),
         )
 
+    @skipIfDBFeature("supports_tablespaces")
+    @isolate_apps("model_options")
+    def test_tablespace_ignored_for_model_and_indexed_field(self):
+        tablespace = "tbl_tbsp"
+
+        class Scientist(models.Model):
+            name = models.CharField(max_length=50)
+
+            class Meta:
+                db_tablespace = tablespace
+
+        class Article(models.Model):
+            title = models.CharField(max_length=50, unique=True)
+            code = models.CharField(max_length=50, unique=True, db_tablespace=tablespace)
+            authors = models.ManyToManyField(Scientist, related_name="articles_written_set")
+            reviewers = models.ManyToManyField(
+                Scientist, related_name="articles_reviewed_set", db_tablespace=tablespace
+            )
+
+            class Meta:
+                db_tablespace = tablespace
+
+        scientist_table_sql = sql_for_table(Scientist)
+        scientist_index_sql = sql_for_index(Scientist)
+        self.assertNotIn(tablespace, scientist_table_sql)
+        self.assertNotIn(tablespace, scientist_index_sql)
+
+        article_table_sql = sql_for_table(Article)
+        article_index_sql = sql_for_index(Article)
+        self.assertNotIn(tablespace, article_table_sql)
+        self.assertNotIn(tablespace, article_index_sql)
+
     @skipUnlessDBFeature("supports_tablespaces")
+    @isolate_apps("model_options")
     def test_tablespace_for_model(self):
+        class Scientist(models.Model):
+            name = models.CharField(max_length=50)
+
+            class Meta:
+                db_tablespace = "tbl_tbsp"
+
         sql = sql_for_table(Scientist).lower()
-        if settings.DEFAULT_INDEX_TABLESPACE:
+
+        # 1 for the table + 1 for the index on the primary key
+        self.assertNumContains(sql, "tbl_tbsp", 2)
+
+    @skipUnlessDBFeature("supports_tablespaces")
+    @isolate_apps("model_options")
+    def test_tablespace_for_model_with_default_index_tablespace(self):
+        with self.settings(DEFAULT_INDEX_TABLESPACE='default_index_tbsp'):
+            class Scientist(models.Model):
+                name = models.CharField(max_length=50)
+
+                class Meta:
+                    db_tablespace = "tbl_tbsp"
+
+            sql = sql_for_table(Scientist).lower()
+
             # 1 for the table
             self.assertNumContains(sql, "tbl_tbsp", 1)
             # 1 for the index on the primary key
             self.assertNumContains(sql, settings.DEFAULT_INDEX_TABLESPACE, 1)
-        else:
-            # 1 for the table + 1 for the index on the primary key
-            self.assertNumContains(sql, "tbl_tbsp", 2)
-
-    @skipIfDBFeature("supports_tablespaces")
-    def test_tablespace_ignored_for_model(self):
-        # No tablespace-related SQL
-        self.assertEqual(sql_for_table(Scientist), sql_for_table(ScientistRef))
 
     @skipUnlessDBFeature("supports_tablespaces")
+    @isolate_apps("model_options")
     def test_tablespace_for_indexed_field(self):
-        sql = sql_for_table(Article).lower()
-        if settings.DEFAULT_INDEX_TABLESPACE:
-            # 1 for the table
-            self.assertNumContains(sql, "tbl_tbsp", 1)
-            # 1 for the primary key + 1 for the index on code
-            self.assertNumContains(sql, settings.DEFAULT_INDEX_TABLESPACE, 2)
-        else:
-            # 1 for the table + 1 for the primary key + 1 for the index on code
-            self.assertNumContains(sql, "tbl_tbsp", 3)
+        class Scientist(models.Model):
+            name = models.CharField(max_length=50)
 
-        # 1 for the index on reference
+            class Meta:
+                db_tablespace = "tbl_tbsp"
+
+        class Article(models.Model):
+            title = models.CharField(max_length=50, unique=True)
+            code = models.CharField(max_length=50, unique=True, db_tablespace="idx_tbsp")
+            authors = models.ManyToManyField(Scientist, related_name="articles_written_set")
+            reviewers = models.ManyToManyField(
+                Scientist, related_name="articles_reviewed_set", db_tablespace="idx_tbsp"
+            )
+
+            class Meta:
+                db_tablespace = "tbl_tbsp"
+
+        sql = sql_for_table(Article).lower()
+
+        # 1 for the table + 1 for the primary key + 1 for the index on title
+        self.assertNumContains(sql, "tbl_tbsp", 3)
+        # 1 for the index on code
         self.assertNumContains(sql, "idx_tbsp", 1)
 
-    @skipIfDBFeature("supports_tablespaces")
-    def test_tablespace_ignored_for_indexed_field(self):
-        # No tablespace-related SQL
-        self.assertEqual(sql_for_table(Article), sql_for_table(ArticleRef))
-
     @skipUnlessDBFeature("supports_tablespaces")
-    def test_tablespace_for_many_to_many_field(self):
-        sql = sql_for_table(Authors).lower()
-        # The join table of the ManyToManyField goes to the model's tablespace,
-        # and its indexes too, unless DEFAULT_INDEX_TABLESPACE is set.
-        if settings.DEFAULT_INDEX_TABLESPACE:
+    @isolate_apps("model_options")
+    def test_tablespace_for_indexed_field_with_default_index_tablespace(self):
+        with self.settings(DEFAULT_INDEX_TABLESPACE='default_index_tbsp'):
+            class Scientist(models.Model):
+                name = models.CharField(max_length=50)
+
+                class Meta:
+                    db_tablespace = "tbl_tbsp"
+
+            class Article(models.Model):
+                title = models.CharField(max_length=50, unique=True)
+                code = models.CharField(max_length=50, unique=True, db_tablespace="idx_tbsp")
+                authors = models.ManyToManyField(Scientist, related_name="articles_written_set")
+                reviewers = models.ManyToManyField(
+                    Scientist, related_name="articles_reviewed_set", db_tablespace="idx_tbsp"
+                )
+
+                class Meta:
+                    db_tablespace = "tbl_tbsp"
+
+            sql = sql_for_table(Article).lower()
             # 1 for the table
             self.assertNumContains(sql, "tbl_tbsp", 1)
-            # 1 for the primary key
-            self.assertNumContains(sql, settings.DEFAULT_INDEX_TABLESPACE, 1)
-        else:
-            # 1 for the table + 1 for the index on the primary key
-            self.assertNumContains(sql, "tbl_tbsp", 2)
+            # 1 for the primary key + 1 for the index on title
+            self.assertNumContains(sql, settings.DEFAULT_INDEX_TABLESPACE, 2)
+            # 1 for the index on code
+            self.assertNumContains(sql, "idx_tbsp", 1)
+
+    @skipUnlessDBFeature("supports_tablespaces")
+    @isolate_apps("model_options")
+    def test_tablespace_for_many_to_many_field(self):
+        class Scientist(models.Model):
+            name = models.CharField(max_length=50)
+
+            class Meta:
+                db_tablespace = "tbl_tbsp"
+
+        class Article(models.Model):
+            title = models.CharField(max_length=50, unique=True)
+            code = models.CharField(max_length=50, unique=True, db_tablespace="idx_tbsp")
+            authors = models.ManyToManyField(Scientist, related_name="articles_written_set")
+            reviewers = models.ManyToManyField(
+                Scientist, related_name="articles_reviewed_set", db_tablespace="idx_tbsp"
+            )
+
+            class Meta:
+                db_tablespace = "tbl_tbsp"
+
+        Authors = Article._meta.get_field("authors").remote_field.through
+        Reviewers = Article._meta.get_field("reviewers").remote_field.through
+
+        sql = sql_for_table(Authors).lower()
+        # The join table of the ManyToManyField goes to the model's tablespace,
+        # and its indexes too.
+        # 1 for the table + 1 for the index on the primary key
+        self.assertNumContains(sql, "tbl_tbsp", 2)
         self.assertNumContains(sql, "idx_tbsp", 0)
 
         sql = sql_for_index(Authors).lower()
         # The ManyToManyField declares no db_tablespace, its indexes go to
         # the model's tablespace, unless DEFAULT_INDEX_TABLESPACE is set.
-        if settings.DEFAULT_INDEX_TABLESPACE:
-            self.assertNumContains(sql, settings.DEFAULT_INDEX_TABLESPACE, 2)
-        else:
-            self.assertNumContains(sql, "tbl_tbsp", 2)
+        self.assertNumContains(sql, "tbl_tbsp", 2)
         self.assertNumContains(sql, "idx_tbsp", 0)
 
         sql = sql_for_table(Reviewers).lower()
         # The join table of the ManyToManyField goes to the model's tablespace,
-        # and its indexes too, unless DEFAULT_INDEX_TABLESPACE is set.
-        if settings.DEFAULT_INDEX_TABLESPACE:
-            # 1 for the table
-            self.assertNumContains(sql, "tbl_tbsp", 1)
-            # 1 for the primary key
-            self.assertNumContains(sql, settings.DEFAULT_INDEX_TABLESPACE, 1)
-        else:
-            # 1 for the table + 1 for the index on the primary key
-            self.assertNumContains(sql, "tbl_tbsp", 2)
+        # and its indexes too.
+        # 1 for the table + 1 for the index on the primary key
+        self.assertNumContains(sql, "tbl_tbsp", 2)
         self.assertNumContains(sql, "idx_tbsp", 0)
 
         sql = sql_for_index(Reviewers).lower()
         # The ManyToManyField declares db_tablespace, its indexes go there.
         self.assertNumContains(sql, "tbl_tbsp", 0)
         self.assertNumContains(sql, "idx_tbsp", 2)
+
+    @skipUnlessDBFeature("supports_tablespaces")
+    @isolate_apps("model_options")
+    def test_tablespace_for_many_to_many_field_with_default_index_tablespace(self):
+        with self.settings(DEFAULT_INDEX_TABLESPACE='default_index_tbsp'):
+            class Scientist(models.Model):
+                name = models.CharField(max_length=50)
+
+                class Meta:
+                    db_tablespace = "tbl_tbsp"
+
+            class Article(models.Model):
+                title = models.CharField(max_length=50, unique=True)
+                code = models.CharField(max_length=50, unique=True, db_tablespace="idx_tbsp")
+                authors = models.ManyToManyField(Scientist, related_name="articles_written_set")
+                reviewers = models.ManyToManyField(
+                    Scientist, related_name="articles_reviewed_set", db_tablespace="idx_tbsp"
+                )
+
+                class Meta:
+                    db_tablespace = "tbl_tbsp"
+
+            Authors = Article._meta.get_field("authors").remote_field.through
+            Reviewers = Article._meta.get_field("reviewers").remote_field.through
+
+            sql = sql_for_table(Authors).lower()
+            # The join table of the ManyToManyField goes to the model's tablespace,
+            # but its indexes go to DEFAULT_INDEX_TABLESPACE since it's set.
+            # 1 for the table
+            self.assertNumContains(sql, "tbl_tbsp", 1)
+            # 1 for the primary key
+            self.assertNumContains(sql, settings.DEFAULT_INDEX_TABLESPACE, 1)
+            self.assertNumContains(sql, "idx_tbsp", 0)
+
+            sql = sql_for_index(Authors).lower()
+            # The ManyToManyField declares no db_tablespace, so its indexes go
+            # to DEFAULT_INDEX_TABLESPACE since it's set.
+            self.assertNumContains(sql, settings.DEFAULT_INDEX_TABLESPACE, 2)
+            self.assertNumContains(sql, "idx_tbsp", 0)
+
+            sql = sql_for_table(Reviewers).lower()
+            # The join table of the ManyToManyField goes to the model's tablespace,
+            # and its indexes go to DEFAULT_INDEX_TABLESPACE since it's set.
+            # 1 for the table
+            self.assertNumContains(sql, "tbl_tbsp", 1)
+            # 1 for the primary key
+            self.assertNumContains(sql, settings.DEFAULT_INDEX_TABLESPACE, 1)
+            self.assertNumContains(sql, "idx_tbsp", 0)
+
+            sql = sql_for_index(Reviewers).lower()
+            # The ManyToManyField declares db_tablespace, so its indexes go there.
+            self.assertNumContains(sql, "tbl_tbsp", 0)
+            self.assertNumContains(sql, settings.DEFAULT_INDEX_TABLESPACE, 0)
+            self.assertNumContains(sql, "idx_tbsp", 2)
