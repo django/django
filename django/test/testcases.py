@@ -280,6 +280,8 @@ class SimpleTestCase(unittest.TestCase):
                 self.connection is None
                 and self.alias not in cls.databases
                 and self.alias != NO_DB_ALIAS
+                # Dynamically created connections are always allowed.
+                and self.alias in connections
             ):
                 # Connection has not yet been established, but the alias is not allowed.
                 message = cls._disallowed_database_msg % {
