@@ -77,7 +77,7 @@ class AdminScriptTestCase(SimpleTestCase):
             for s in exports:
                 if hasattr(settings, s):
                     o = getattr(settings, s)
-                    if not isinstance(o, (dict, tuple, list)):
+                    if not isinstance(o, (dict, tuple, list, bool)):
                         o = "'%s'" % o
                     settings_file.write("%s = %s\n" % (s, o))
 
