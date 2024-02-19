@@ -100,30 +100,32 @@ class TablespacesTests(TransactionTestCase):
     @skipUnlessDBFeature("supports_tablespaces")
     @isolate_apps("model_options")
     def test_tablespace_for_indexed_field(self):
-        class Scientist(models.Model):
-            name = models.CharField(max_length=50)
+        with self.settings(DEFAULT_INDEX_TABLESPACE=""):
 
-            class Meta:
-                db_tablespace = "tbl_tbsp"
+            class Scientist(models.Model):
+                name = models.CharField(max_length=50)
 
-        class Article(models.Model):
-            title = models.CharField(max_length=50, unique=True)
-            code = models.CharField(
-                max_length=50, unique=True, db_tablespace="idx_tbsp"
-            )
-            authors = models.ManyToManyField(
-                Scientist, related_name="articles_written_set"
-            )
-            reviewers = models.ManyToManyField(
-                Scientist,
-                related_name="articles_reviewed_set",
-                db_tablespace="idx_tbsp",
-            )
+                class Meta:
+                    db_tablespace = "tbl_tbsp"
 
-            class Meta:
-                db_tablespace = "tbl_tbsp"
+            class Article(models.Model):
+                title = models.CharField(max_length=50, unique=True)
+                code = models.CharField(
+                    max_length=50, unique=True, db_tablespace="idx_tbsp"
+                )
+                authors = models.ManyToManyField(
+                    Scientist, related_name="articles_written_set"
+                )
+                reviewers = models.ManyToManyField(
+                    Scientist,
+                    related_name="articles_reviewed_set",
+                    db_tablespace="idx_tbsp",
+                )
 
-        sql = sql_for_table(Article).lower()
+                class Meta:
+                    db_tablespace = "tbl_tbsp"
+
+            sql = sql_for_table(Article).lower()
 
         # 1 for the table + 1 for the primary key + 1 for the index on title
         self.assertNumContains(sql, "tbl_tbsp", 3)
