@@ -1,3 +1,0 @@
-[console_scripts]
-docutils = docutils.__main__:main
-

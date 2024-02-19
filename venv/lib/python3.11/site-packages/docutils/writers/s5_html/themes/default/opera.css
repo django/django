@@ -1,8 +1,0 @@
-/* This file has been placed in the public domain. */
-/* DO NOT CHANGE THESE unless you really want to break Opera Show */
-.slide {
-	visibility: visible !important;
-	position: static !important;
-	page-break-before: always;
-}
-#slide0 {page-break-before: avoid;}

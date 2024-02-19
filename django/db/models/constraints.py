@@ -90,6 +90,12 @@ class BaseConstraint:
         _, args, kwargs = self.deconstruct()
         return self.__class__(*args, **kwargs)
 
+    def only_ddl_impacted_fields(self):
+        mutable_self = copy.copy(self)
+        mutable_self.violation_error_code = None
+        mutable_self.violation_error_message = None
+        return mutable_self
+
 
 class CheckConstraint(BaseConstraint):
     def __init__(
