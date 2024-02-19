@@ -1,0 +1,18 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{anyfontsize}
+\usepackage{bm}
+\pagestyle{empty}
+<%= preamble %>
+
+\usepackage[active<%= tightpage %>]{preview}
+
+\begin{document}
+\begin{preview}
+\fontsize{<%= fontsize %>}{<%= baselineskip %>}\selectfont <%= math %>
+\end{preview}
+\end{document}

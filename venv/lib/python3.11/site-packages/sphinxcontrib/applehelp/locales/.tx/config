@@ -1,0 +1,10 @@
+[main]
+host = https://www.transifex.com
+
+[sphinx-1.sphinxcontrib-applehelp-pot]
+file_filter = <lang>/LC_MESSAGES/sphinxcontrib.applehelp.po
+minimum_perc = 0
+source_file = sphinxcontrib.applehelp.pot
+source_lang = en
+type = PO
+

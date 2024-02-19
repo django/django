@@ -1,0 +1,49 @@
+# Translations template for sphinxcontrib-htmlhelp.
+# Copyright (C) 2019 ORGANIZATION
+# This file is distributed under the same license as the
+# sphinxcontrib-htmlhelp project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2019.
+# 
+# Translators:
+# LAURENT Raphaël <laurent@ined.fr>, 2019
+# Jean-François B. <jfbu@free.fr>, 2019
+# Denis Bitouzé <dbitouze@wanadoo.fr>, 2021
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: sphinxcontrib-htmlhelp 1.0.0\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2019-02-15 00:45+0900\n"
+"PO-Revision-Date: 2019-02-14 15:47+0000\n"
+"Last-Translator: Denis Bitouzé <dbitouze@wanadoo.fr>, 2021\n"
+"Language-Team: French (https://www.transifex.com/sphinx-doc/teams/36659/fr/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.6.0\n"
+"Language: fr\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: sphinxcontrib/htmlhelp/__init__.py:147
+#, python-format
+msgid "You can now run HTML Help Workshop with the .htp file in %(outdir)s."
+msgstr ""
+"Vous pouvez maintenant exécuter HTML Help Workshop sur le fichier .htp dans "
+"%(outdir)s."
+
+#: sphinxcontrib/htmlhelp/__init__.py:203
+msgid "copying stopword list"
+msgstr "Copie de la liste des mots vides"
+
+#: sphinxcontrib/htmlhelp/__init__.py:218
+msgid "writing project file"
+msgstr "enregistrement du fichier de projet"
+
+#: sphinxcontrib/htmlhelp/__init__.py:246
+msgid "writing TOC file"
+msgstr "enregistrement du fichier de table des matières"
+
+#: sphinxcontrib/htmlhelp/__init__.py:268
+msgid "writing index file..."
+msgstr "enregistrement du fichier d'index..."

@@ -1,0 +1,147 @@
+Metadata-Version: 2.1
+Name: Sphinx
+Version: 7.2.6
+Summary: Python documentation generator
+Author-email: Georg Brandl <georg@python.org>
+Requires-Python: >=3.9
+Description-Content-Type: text/x-rst
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Console
+Classifier: Environment :: Web Environment
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Education
+Classifier: Intended Audience :: End Users/Desktop
+Classifier: Intended Audience :: Science/Research
+Classifier: Intended Audience :: System Administrators
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Programming Language :: Python :: Implementation :: PyPy
+Classifier: Framework :: Sphinx
+Classifier: Framework :: Sphinx :: Extension
+Classifier: Framework :: Sphinx :: Theme
+Classifier: Topic :: Documentation
+Classifier: Topic :: Documentation :: Sphinx
+Classifier: Topic :: Internet :: WWW/HTTP :: Site Management
+Classifier: Topic :: Printing
+Classifier: Topic :: Software Development
+Classifier: Topic :: Software Development :: Documentation
+Classifier: Topic :: Text Processing
+Classifier: Topic :: Text Processing :: General
+Classifier: Topic :: Text Processing :: Indexing
+Classifier: Topic :: Text Processing :: Markup
+Classifier: Topic :: Text Processing :: Markup :: HTML
+Classifier: Topic :: Text Processing :: Markup :: LaTeX
+Classifier: Topic :: Utilities
+Requires-Dist: sphinxcontrib-applehelp
+Requires-Dist: sphinxcontrib-devhelp
+Requires-Dist: sphinxcontrib-jsmath
+Requires-Dist: sphinxcontrib-htmlhelp>=2.0.0
+Requires-Dist: sphinxcontrib-serializinghtml>=1.1.9
+Requires-Dist: sphinxcontrib-qthelp
+Requires-Dist: Jinja2>=3.0
+Requires-Dist: Pygments>=2.14
+Requires-Dist: docutils>=0.18.1,<0.21
+Requires-Dist: snowballstemmer>=2.0
+Requires-Dist: babel>=2.9
+Requires-Dist: alabaster>=0.7,<0.8
+Requires-Dist: imagesize>=1.3
+Requires-Dist: requests>=2.25.0
+Requires-Dist: packaging>=21.0
+Requires-Dist: importlib-metadata>=4.8; python_version < '3.10'
+Requires-Dist: colorama>=0.4.5; sys_platform == 'win32'
+Requires-Dist: sphinxcontrib-websupport ; extra == "docs"
+Requires-Dist: flake8>=3.5.0 ; extra == "lint"
+Requires-Dist: flake8-simplify ; extra == "lint"
+Requires-Dist: isort ; extra == "lint"
+Requires-Dist: ruff ; extra == "lint"
+Requires-Dist: mypy>=0.990 ; extra == "lint"
+Requires-Dist: sphinx-lint ; extra == "lint"
+Requires-Dist: docutils-stubs ; extra == "lint"
+Requires-Dist: types-requests ; extra == "lint"
+Requires-Dist: pytest>=4.6 ; extra == "test"
+Requires-Dist: html5lib ; extra == "test"
+Requires-Dist: cython>=3.0 ; extra == "test"
+Requires-Dist: setuptools>=67.0 ; extra == "test"
+Requires-Dist: filelock ; extra == "test"
+Project-URL: Changelog, https://www.sphinx-doc.org/en/master/changes.html
+Project-URL: Code, https://github.com/sphinx-doc/sphinx
+Project-URL: Download, https://pypi.org/project/Sphinx/
+Project-URL: Homepage, https://www.sphinx-doc.org/
+Project-URL: Issue tracker, https://github.com/sphinx-doc/sphinx/issues
+Provides-Extra: docs
+Provides-Extra: lint
+Provides-Extra: test
+
+========
+ Sphinx
+========
+
+.. image:: https://img.shields.io/pypi/v/sphinx.svg
+   :target: https://pypi.org/project/Sphinx/
+   :alt: Package on PyPI
+
+.. image:: https://github.com/sphinx-doc/sphinx/actions/workflows/main.yml/badge.svg
+   :target: https://github.com/sphinx-doc/sphinx/actions/workflows/main.yml
+   :alt: Build Status
+
+.. image:: https://readthedocs.org/projects/sphinx/badge/?version=master
+   :target: https://www.sphinx-doc.org/
+   :alt: Documentation Status
+
+.. image:: https://img.shields.io/badge/License-BSD%202--Clause-blue.svg
+   :target: https://opensource.org/licenses/BSD-2-Clause
+   :alt: BSD 2 Clause
+
+**Sphinx makes it easy to create intelligent and beautiful documentation.**
+
+Sphinx uses reStructuredText as its markup language, and many of its strengths
+come from the power and straightforwardness of reStructuredText and its parsing
+and translating suite, the Docutils.
+
+Features
+========
+
+* **Output formats**: HTML, PDF, plain text, EPUB, TeX, manual pages, and more
+* **Extensive cross-references**: semantic markup and automatic links
+  for functions, classes, glossary terms and similar pieces of information
+* **Hierarchical structure**: easy definition of a document tree, with automatic
+  links to siblings, parents and children
+* **Automatic indices**: general index as well as a module index
+* **Code highlighting**: automatic highlighting using the Pygments highlighter
+* **Templating**: Flexible HTML output using the Jinja 2 templating engine
+* **Extension ecosystem**: Many extensions are available, for example for
+  automatic function documentation or working with Jupyter notebooks.
+* **Language Support**: Python, C, C++, JavaScript, mathematics, and many other
+  languages through extensions.
+
+For more information, refer to the `the documentation`_.
+
+Installation
+============
+
+The following command installs Sphinx from the `Python Package Index`_. You will
+need a working installation of Python and pip.
+
+.. code-block:: sh
+
+   pip install -U sphinx
+
+Contributing
+============
+
+We appreciate all contributions! Refer to `the contributors guide`_ for
+information.
+
+.. _the documentation: https://www.sphinx-doc.org/
+.. _the contributors guide: https://www.sphinx-doc.org/en/master/internals/contributing.html
+.. _Python Package Index: https://pypi.org/project/Sphinx/
+

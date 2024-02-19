@@ -1,0 +1,26 @@
+{%- macro toctree(navlist) -%}
+<ol>
+{%- for nav in navlist %}
+  <li>
+    <a href="{{ nav.refuri }}">{{ nav.text }}</a>
+    {%- if nav.children %}
+{{ toctree(nav.children)|indent(4, true) }}
+    {%- endif %}
+  </li>
+{%- endfor %}
+</ol>
+{%- endmacro -%}
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:epub="http://www.idpf.org/2007/ops" lang="{{ lang }}" xml:lang="{{ lang }}">
+  <head>
+    <title>{{ toc_locale }}</title>
+  </head>
+  <body>
+    <nav epub:type="toc">
+      <h1>{{ toc_locale }}</h1>
+{{ toctree(navlist)|indent(6, true) }}
+    </nav>
+  </body>
+</html>

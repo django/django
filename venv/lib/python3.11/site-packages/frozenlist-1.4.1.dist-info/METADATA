@@ -1,0 +1,420 @@
+Metadata-Version: 2.1
+Name: frozenlist
+Version: 1.4.1
+Summary: A list-like structure which implements collections.abc.MutableSequence
+Home-page: https://github.com/aio-libs/frozenlist
+Maintainer: aiohttp team <team@aiohttp.org>
+Maintainer-email: team@aiohttp.org
+License: Apache 2
+Project-URL: Chat: Matrix, https://matrix.to/#/#aio-libs:matrix.org
+Project-URL: Chat: Matrix Space, https://matrix.to/#/#aio-libs-space:matrix.org
+Project-URL: CI: Github Actions, https://github.com/aio-libs/frozenlist/actions
+Project-URL: Code of Conduct, https://github.com/aio-libs/.github/blob/master/CODE_OF_CONDUCT.md
+Project-URL: Coverage: codecov, https://codecov.io/github/aio-libs/frozenlist
+Project-URL: Docs: Changelog, https://github.com/aio-libs/frozenlist/blob/master/CHANGES.rst#changelog
+Project-URL: Docs: RTD, https://frozenlist.aio-libs.org
+Project-URL: GitHub: issues, https://github.com/aio-libs/frozenlist/issues
+Project-URL: GitHub: repo, https://github.com/aio-libs/frozenlist
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: POSIX
+Classifier: Operating System :: MacOS :: MacOS X
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Programming Language :: Cython
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Programming Language :: Python :: Implementation :: PyPy
+Requires-Python: >=3.8
+Description-Content-Type: text/x-rst
+License-File: LICENSE
+
+frozenlist
+==========
+
+.. image:: https://github.com/aio-libs/frozenlist/workflows/CI/badge.svg
+   :target: https://github.com/aio-libs/frozenlist/actions
+   :alt: GitHub status for master branch
+
+.. image:: https://codecov.io/gh/aio-libs/frozenlist/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/aio-libs/frozenlist
+   :alt: codecov.io status for master branch
+
+.. image:: https://img.shields.io/pypi/v/frozenlist.svg?logo=Python&logoColor=white
+   :target: https://pypi.org/project/frozenlist
+   :alt: frozenlist @ PyPI
+
+.. image:: https://readthedocs.org/projects/frozenlist/badge/?version=latest
+   :target: https://frozenlist.aio-libs.org
+   :alt: Read The Docs build status badge
+
+.. image:: https://img.shields.io/matrix/aio-libs:matrix.org?label=Discuss%20on%20Matrix%20at%20%23aio-libs%3Amatrix.org&logo=matrix&server_fqdn=matrix.org&style=flat
+   :target: https://matrix.to/#/%23aio-libs:matrix.org
+   :alt: Matrix Room — #aio-libs:matrix.org
+
+.. image:: https://img.shields.io/matrix/aio-libs-space:matrix.org?label=Discuss%20on%20Matrix%20at%20%23aio-libs-space%3Amatrix.org&logo=matrix&server_fqdn=matrix.org&style=flat
+   :target: https://matrix.to/#/%23aio-libs-space:matrix.org
+   :alt: Matrix Space — #aio-libs-space:matrix.org
+
+Introduction
+------------
+
+``frozenlist.FrozenList`` is a list-like structure which implements
+``collections.abc.MutableSequence``. The list is *mutable* until ``FrozenList.freeze``
+is called, after which list modifications raise ``RuntimeError``:
+
+
+>>> from frozenlist import FrozenList
+>>> fl = FrozenList([17, 42])
+>>> fl.append('spam')
+>>> fl.append('Vikings')
+>>> fl
+<FrozenList(frozen=False, [17, 42, 'spam', 'Vikings'])>
+>>> fl.freeze()
+>>> fl
+<FrozenList(frozen=True, [17, 42, 'spam', 'Vikings'])>
+>>> fl.frozen
+True
+>>> fl.append("Monty")
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "frozenlist/_frozenlist.pyx", line 97, in frozenlist._frozenlist.FrozenList.append
+    self._check_frozen()
+  File "frozenlist/_frozenlist.pyx", line 19, in frozenlist._frozenlist.FrozenList._check_frozen
+    raise RuntimeError("Cannot modify frozen list.")
+RuntimeError: Cannot modify frozen list.
+
+
+FrozenList is also hashable, but only when frozen. Otherwise it also throws a RuntimeError:
+
+
+>>> fl = FrozenList([17, 42, 'spam'])
+>>> hash(fl)
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "frozenlist/_frozenlist.pyx", line 111, in frozenlist._frozenlist.FrozenList.__hash__
+    raise RuntimeError("Cannot hash unfrozen list.")
+RuntimeError: Cannot hash unfrozen list.
+>>> fl.freeze()
+>>> hash(fl)
+3713081631934410656
+>>> dictionary = {fl: 'Vikings'} # frozen fl can be a dict key
+>>> dictionary
+{<FrozenList(frozen=True, [1, 2])>: 'Vikings'}
+
+
+Installation
+------------
+
+::
+
+   $ pip install frozenlist
+
+The library requires Python 3.8 or newer.
+
+
+Documentation
+-------------
+
+https://frozenlist.aio-libs.org
+
+Communication channels
+----------------------
+
+We have a *Matrix Space* `#aio-libs-space:matrix.org
+<https://matrix.to/#/%23aio-libs-space:matrix.org>`_ which is
+also accessible via Gitter.
+
+Requirements
+------------
+
+- Python >= 3.8
+
+License
+-------
+
+``frozenlist`` is offered under the Apache 2 license.
+
+Source code
+-----------
+
+The project is hosted on GitHub_
+
+Please file an issue in the `bug tracker
+<https://github.com/aio-libs/frozenlist/issues>`_ if you have found a bug
+or have some suggestions to improve the library.
+
+.. _GitHub: https://github.com/aio-libs/frozenlist
+
+=========
+Changelog
+=========
+
+..
+    You should *NOT* be adding new change log entries to this file, this
+    file is managed by towncrier. You *may* edit previous change logs to
+    fix problems like typo corrections or such.
+    To add a new change log entry, please see
+    https://pip.pypa.io/en/latest/development/contributing/#news-entries
+    we named the news folder "changes".
+
+    WARNING: Don't drop the next directive!
+
+.. towncrier release notes start
+
+1.4.1 (2023-12-15)
+==================
+
+Packaging updates and notes for downstreams
+-------------------------------------------
+
+- Declared Python 3.12 and PyPy 3.8-3.10 supported officially
+  in the distribution package metadata.
+
+
+  *Related issues and pull requests on GitHub:*
+  `#553 <https://github.com/aio-libs/yarl/issues/553>`__.
+
+- Replaced the packaging is replaced from an old-fashioned ``setup.py`` to an
+  in-tree `PEP 517 <https://peps.python.org/pep-517>`__ build backend -- by `@webknjaz <https://github.com/sponsors/webknjaz>`__.
+
+  Whenever the end-users or downstream packagers need to build ``frozenlist``
+  from source (a Git checkout or an sdist), they may pass a ``config_settings``
+  flag ``pure-python``. If this flag is not set, a C-extension will be built
+  and included into the distribution.
+
+  Here is how this can be done with ``pip``:
+
+  .. code-block:: console
+
+      $ python3 -m pip install . --config-settings=pure-python=
+
+  This will also work with ``-e | --editable``.
+
+  The same can be achieved via ``pypa/build``:
+
+  .. code-block:: console
+
+      $ python3 -m build --config-setting=pure-python=
+
+  Adding ``-w | --wheel`` can force ``pypa/build`` produce a wheel from source
+  directly, as opposed to building an ``sdist`` and then building from it.
+
+
+  *Related issues and pull requests on GitHub:*
+  `#560 <https://github.com/aio-libs/yarl/issues/560>`__.
+
+
+Contributor-facing changes
+--------------------------
+
+- It is now possible to request line tracing in Cython builds using the
+  ``with-cython-tracing`` `PEP 517 <https://peps.python.org/pep-517>`__ config setting
+  -- `@webknjaz <https://github.com/sponsors/webknjaz>`__.
+
+  This can be used in CI and development environment to measure coverage
+  on Cython modules, but is not normally useful to the end-users or
+  downstream packagers.
+
+  Here's a usage example:
+
+  .. code-block:: console
+
+      $ python3 -Im pip install . --config-settings=with-cython-tracing=true
+
+  For editable installs, this setting is on by default. Otherwise, it's
+  off unless requested explicitly.
+
+  The following produces C-files required for the Cython coverage
+  plugin to map the measurements back to the PYX-files:
+
+  .. code-block:: console
+
+      $ python -Im pip install -e .
+
+  Alternatively, the ``FROZENLIST_CYTHON_TRACING=1`` environment variable
+  can be set to do the same as the `PEP 517 <https://peps.python.org/pep-517>`__ config setting.
+
+
+  *Related issues and pull requests on GitHub:*
+  `#560 <https://github.com/aio-libs/yarl/issues/560>`__.
+
+- Coverage collection has been implemented for the Cython modules
+  -- by `@webknjaz <https://github.com/sponsors/webknjaz>`__.
+
+  It will also be reported to Codecov from any non-release CI jobs.
+
+
+  *Related issues and pull requests on GitHub:*
+  `#561 <https://github.com/aio-libs/yarl/issues/561>`__.
+
+- A step-by-step ``Release Guide`` guide has
+  been added, describing how to release *frozenlist* -- by `@webknjaz <https://github.com/sponsors/webknjaz>`__.
+
+  This is primarily targeting the maintainers.
+
+
+  *Related issues and pull requests on GitHub:*
+  `#563 <https://github.com/aio-libs/yarl/issues/563>`__.
+
+- Detailed ``Contributing Guidelines`` on
+  authoring the changelog fragments have been published in the
+  documentation -- by `@webknjaz <https://github.com/sponsors/webknjaz>`__.
+
+
+  *Related issues and pull requests on GitHub:*
+  `#564 <https://github.com/aio-libs/yarl/issues/564>`__.
+
+
+----
+
+
+1.4.0 (2023-07-12)
+==================
+
+The published source distribution package became buildable
+under Python 3.12.
+
+
+----
+
+
+Bugfixes
+--------
+
+- Removed an unused ``typing.Tuple`` import
+  `#411 <https://github.com/aio-libs/frozenlist/issues/411>`_
+
+
+Deprecations and Removals
+-------------------------
+
+- Dropped Python 3.7 support.
+  `#413 <https://github.com/aio-libs/frozenlist/issues/413>`_
+
+
+Misc
+----
+
+- `#410 <https://github.com/aio-libs/frozenlist/issues/410>`_, `#433 <https://github.com/aio-libs/frozenlist/issues/433>`_
+
+
+----
+
+
+1.3.3 (2022-11-08)
+==================
+
+- Fixed CI runs when creating a new release, where new towncrier versions
+  fail when the current version section is already present.
+
+
+----
+
+
+1.3.2 (2022-11-08)
+==================
+
+Misc
+----
+
+- Updated the CI runs to better check for test results and to avoid deprecated syntax. `#327 <https://github.com/aio-libs/frozenlist/issues/327>`_
+
+
+----
+
+
+1.3.1 (2022-08-02)
+==================
+
+The published source distribution package became buildable
+under Python 3.11.
+
+
+----
+
+
+1.3.0 (2022-01-18)
+==================
+
+Bugfixes
+--------
+
+- Do not install C sources with binary distributions.
+  `#250 <https://github.com/aio-libs/frozenlist/issues/250>`_
+
+
+Deprecations and Removals
+-------------------------
+
+- Dropped Python 3.6 support
+  `#274 <https://github.com/aio-libs/frozenlist/issues/274>`_
+
+
+----
+
+
+1.2.0 (2021-10-16)
+==================
+
+Features
+--------
+
+- ``FrozenList`` now supports being used as a generic type as per PEP 585, e.g. ``frozen_int_list: FrozenList[int]`` (requires Python 3.9 or newer).
+  `#172 <https://github.com/aio-libs/frozenlist/issues/172>`_
+- Added support for Python 3.10.
+  `#227 <https://github.com/aio-libs/frozenlist/issues/227>`_
+- Started shipping platform-specific wheels with the ``musl`` tag targeting typical Alpine Linux runtimes.
+  `#227 <https://github.com/aio-libs/frozenlist/issues/227>`_
+- Started shipping platform-specific arm64 wheels for Apple Silicon.
+  `#227 <https://github.com/aio-libs/frozenlist/issues/227>`_
+
+
+----
+
+
+1.1.1 (2020-11-14)
+==================
+
+Bugfixes
+--------
+
+- Provide x86 Windows wheels.
+  `#169 <https://github.com/aio-libs/frozenlist/issues/169>`_
+
+
+----
+
+
+1.1.0 (2020-10-13)
+==================
+
+Features
+--------
+
+- Add support for hashing of a frozen list.
+  `#136 <https://github.com/aio-libs/frozenlist/issues/136>`_
+
+- Support Python 3.8 and 3.9.
+
+- Provide wheels for ``aarch64``, ``i686``, ``ppc64le``, ``s390x`` architectures on
+  Linux as well as ``x86_64``.
+
+
+----
+
+
+1.0.0 (2019-11-09)
+==================
+
+Deprecations and Removals
+-------------------------
+
+- Dropped support for Python 3.5; only 3.6, 3.7 and 3.8 are supported going forward.
+  `#24 <https://github.com/aio-libs/frozenlist/issues/24>`_

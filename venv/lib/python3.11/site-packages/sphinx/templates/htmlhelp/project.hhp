@@ -1,0 +1,21 @@
+[OPTIONS]
+Binary TOC=No
+Binary Index=No
+Compiled file={{ outname }}.chm
+Contents file={{ outname }}.hhc
+Default Window={{ outname }}
+Default topic={{ root_doc }}
+Display compile progress=No
+Full text search stop list file={{ outname }}.stp
+Full-text search=Yes
+Index file={{ outname }}.hhk
+Language={{ "%#x"|format(lcid) }}
+Title={{ title }}
+
+[WINDOWS]
+{{ outname }}="{{ title }}","{{ outname }}.hhc","{{ outname }}.hhk","{{ root_doc }}","{{ root_doc }}",,,,,0x63520,220,0x10384e,[0,0,1024,768],,,,,,,0
+
+[FILES]
+{%- for filename in files %}
+{{ filename }}
+{%- endfor %}

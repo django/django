@@ -1,0 +1,131 @@
+%% ALPHANUMERIC LIST ITEMS
+%
+% change this info string if making any custom modification
+\ProvidesFile{sphinxlatexlists.sty}[2021/12/20 lists]
+
+% Provides support for this output mark-up from Sphinx latex writer:
+% - \sphinxsetlistlabels
+% - \sphinxlineitem
+% and for the maxlistdepth key of sphinxsetup
+% Dependencies: the \spx@opt@maxlistdepth from sphinx.sty
+
+% We need some helpers macros
+\newtoks\spx@lineitemlabel
+\long\def\sphinx@gobto@sphinxlineitem#1\sphinxlineitem{}
+% TeX/LaTeX has no (easy to use) built-in "peek-ahead" mechanism, but
+% we would like to know if next token is another \sphinxlineitem (this
+% can happen in glossary entries with multiple terms for same definition)
+% so we simply grab next token (assuming it is not {tokens} originally)
+\newcommand\sphinxlineitem[2]{%
+  % safe test of whether #2 is \sphinxlineitem
+  \sphinx@gobto@sphinxlineitem#2\@gobbletwo\sphinxlineitem\unless
+  \iftrue
+    % case with sphinxlineitem immediately followed by another \sphinxlineitem:
+    % accumulate successive terms until actual definition or sub-list is found
+    \spx@lineitemlabel\expandafter{\the\spx@lineitemlabel\strut#1\\}%
+  \else
+    % now issue the \item command with possibly multi-line contents
+    % these weird incantations with \kern are related to how LaTeX
+    % handles \item generally
+    \item[\kern\labelwidth\kern-\itemindent\kern-\leftmargin
+          {\parbox[t]{\dimexpr\linewidth+\leftmargin\relax}{%
+          \raggedright
+          \the\spx@lineitemlabel% accumulated terms before this one, CR separated
+          \strut#1}}% due to LaTeX internals no \par token allowed here,
+                    % but the \parbox will insert one tacitly at end
+          \kern-\labelsep]%
+    \spx@lineitemlabel{}%
+    % this causes the label to be typeset (filling up the line), clearing up
+    % things in case a nested list follows.
+    \leavevmode
+  \fi #2%
+}%
+
+
+\newcommand\sphinxsetlistlabels[5]
+{% #1 = style, #2 = enum, #3 = enumnext, #4 = prefix, #5 = suffix
+ % #2 and #3 are counters used by enumerate environment e.g. enumi, enumii.
+ % #1 is a macro such as \arabic or \alph
+ % prefix and suffix are strings (by default empty and a dot).
+ \@namedef{the#2}{#1{#2}}%
+ \@namedef{label#2}{#4\@nameuse{the#2}#5}%
+ \@namedef{p@#3}{\@nameuse{p@#2}#4\@nameuse{the#2}#5}%
+}%
+
+
+%% MAXLISTDEPTH
+%
+% remove LaTeX's cap on nesting depth if 'maxlistdepth' key used.
+% This is a hack, which works with the standard classes: it assumes \@toodeep
+% is always used in "true" branches: "\if ... \@toodeep \else .. \fi."
+
+% will force use the "false" branch (if there is one)
+\def\spx@toodeep@hack{\fi\iffalse}
+
+% do nothing if 'maxlistdepth' key not used or if package enumitem loaded.
+\ifnum\spx@opt@maxlistdepth=\z@\expandafter\@gobbletwo\fi
+\AtBeginDocument{%
+\@ifpackageloaded{enumitem}{\remove@to@nnil}{}%
+  \let\spx@toodeepORI\@toodeep
+  \def\@toodeep{%
+    \ifnum\@listdepth<\spx@opt@maxlistdepth\relax
+      \expandafter\spx@toodeep@hack
+    \else
+      \expandafter\spx@toodeepORI
+    \fi}%
+% define all missing \@list... macros
+  \count@\@ne
+  \loop
+     \ltx@ifundefined{@list\romannumeral\the\count@}
+       {\iffalse}{\iftrue\advance\count@\@ne}%
+  \repeat
+  \loop
+     \ifnum\count@>\spx@opt@maxlistdepth\relax\else
+       \expandafter\let
+         \csname @list\romannumeral\the\count@\expandafter\endcsname
+         \csname @list\romannumeral\the\numexpr\count@-\@ne\endcsname
+       % workaround 2.6--3.2d babel-french issue (fixed in 3.2e; no change needed)
+       \ltx@ifundefined{leftmargin\romannumeral\the\count@}
+       {\expandafter\let
+         \csname leftmargin\romannumeral\the\count@\expandafter\endcsname
+         \csname leftmargin\romannumeral\the\numexpr\count@-\@ne\endcsname}{}%
+     \advance\count@\@ne
+  \repeat
+% define all missing enum... counters and \labelenum... macros and \p@enum..
+  \count@\@ne
+  \loop
+     \ltx@ifundefined{c@enum\romannumeral\the\count@}
+       {\iffalse}{\iftrue\advance\count@\@ne}%
+  \repeat
+  \loop
+     \ifnum\count@>\spx@opt@maxlistdepth\relax\else
+       \newcounter{enum\romannumeral\the\count@}%
+       \expandafter\def
+         \csname labelenum\romannumeral\the\count@\expandafter\endcsname
+         \expandafter
+         {\csname theenum\romannumeral\the\numexpr\count@\endcsname.}%
+       \expandafter\def
+         \csname p@enum\romannumeral\the\count@\expandafter\endcsname
+         \expandafter
+         {\csname p@enum\romannumeral\the\numexpr\count@-\@ne\expandafter
+          \endcsname\csname theenum\romannumeral\the\numexpr\count@-\@ne\endcsname.}%
+     \advance\count@\@ne
+  \repeat
+% define all missing labelitem... macros
+  \count@\@ne
+  \loop
+     \ltx@ifundefined{labelitem\romannumeral\the\count@}
+     {\iffalse}{\iftrue\advance\count@\@ne}%
+  \repeat
+  \loop
+     \ifnum\count@>\spx@opt@maxlistdepth\relax\else
+       \expandafter\let
+         \csname labelitem\romannumeral\the\count@\expandafter\endcsname
+         \csname labelitem\romannumeral\the\numexpr\count@-\@ne\endcsname
+     \advance\count@\@ne
+  \repeat
+  \PackageInfo{sphinx}{maximal list depth extended to \spx@opt@maxlistdepth}%
+\@gobble\@nnil
+}
+
+\endinput

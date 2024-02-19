@@ -1,0 +1,21 @@
+%
+% sphinxmessages.sty
+%
+% message resources for Sphinx
+%
+\ProvidesPackage{sphinxmessages}[2019/01/04 v2.0 Localized LaTeX macros (Sphinx team)]
+
+\renewcommand{\literalblockcontinuedname}{<%= _('continued from previous page') | e %>}
+\renewcommand{\literalblockcontinuesname}{<%= _('continues on next page') | e %>}
+\renewcommand{\sphinxnonalphabeticalgroupname}{<%= _('Non-alphabetical') | e %>}
+\renewcommand{\sphinxsymbolsname}{<%= _('Symbols') | e %>}
+\renewcommand{\sphinxnumbersname}{<%= _('Numbers') | e %>}
+\def\pageautorefname{<%= _('page') | e %>}
+
+<%= addtocaptions %>{\renewcommand{\figurename}{<%= figurename[0] | e | eabbr %>}}
+\def\fnum@figure{\figurename\thefigure{}<%= figurename[1] | e %>}
+
+<%= addtocaptions %>{\renewcommand{\tablename}{<%= tablename[0] | e | eabbr %>}}
+\def\fnum@table{\tablename\thetable{}<%= tablename[1] | e %>}
+
+<%= addtocaptions %>{\renewcommand{\literalblockname}{<%= literalblockname[0].strip() %>}}

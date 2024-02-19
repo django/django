@@ -1,0 +1,765 @@
+/*
+ * traditional.css
+ * ~~~~~~~~~~~~~~~
+ *
+ * Sphinx stylesheet -- traditional docs.python.org theme.
+ *
+ * :copyright: Copyright 2007-2023 by the Sphinx team, see AUTHORS.
+ * :license: BSD, see LICENSE for details.
+ *
+ */
+
+body {
+    color: #000;
+    margin: 0;
+    padding: 0;
+}
+
+/* :::: LAYOUT :::: */
+
+div.documentwrapper {
+    float: left;
+    width: 100%;
+}
+
+div.bodywrapper {
+    margin: 0 {{ theme_sidebarwidth|todim }} 0 0;
+}
+
+div.body {
+    min-width: {{ theme_body_min_width|todim }};
+    max-width: {{ theme_body_max_width|todim }};
+    background-color: white;
+    padding: 0 20px 30px 20px;
+}
+
+div.sphinxsidebarwrapper {
+    border: 1px solid #99ccff;
+    padding: 10px;
+    margin: 10px 15px 10px 0;
+}
+
+div.sphinxsidebar {
+    float: right;
+    margin-left: -100%;
+    width: {{ theme_sidebarwidth|todim }};
+}
+
+div.clearer {
+    clear: both;
+}
+
+div.footer {
+    clear: both;
+    width: 100%;
+    background-color: #99ccff;
+    padding: 9px 0 9px 0;
+    text-align: center;
+}
+
+div.related {
+    background-color: #99ccff;
+    color: #333;
+    width: 100%;
+    height: 30px;
+    line-height: 30px;
+    border-bottom: 5px solid white;
+}
+
+div.related h3 {
+    display: none;
+}
+
+div.related ul {
+    margin: 0;
+    padding: 0 0 0 10px;
+    list-style: none;
+}
+
+div.related li {
+    display: inline;
+    font-weight: bold;
+}
+
+div.related li.right {
+    float: right;
+    margin-right: 5px;
+}
+
+/* ::: SIDEBAR :::: */
+div.sphinxsidebar h3 {
+    margin: 0;
+}
+
+div.sphinxsidebar h4 {
+    margin: 5px 0 0 0;
+}
+
+div.sphinxsidebar p.topless {
+    margin: 5px 10px 10px 10px;
+}
+
+div.sphinxsidebar ul {
+    margin: 10px;
+    margin-left: 15px;
+    padding: 0;
+}
+
+div.sphinxsidebar ul ul {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+div.sphinxsidebar form {
+    margin-top: 10px;
+}
+
+
+/* :::: SEARCH :::: */
+ul.search {
+    margin: 10px 0 0 20px;
+    padding: 0;
+}
+
+ul.search li {
+    padding: 5px 0 5px 20px;
+    background-image: url(file.png);
+    background-repeat: no-repeat;
+    background-position: 0 7px;
+}
+
+ul.search li a {
+    font-weight: bold;
+}
+
+ul.search li div.context {
+    color: #888;
+    margin: 2px 0 0 30px;
+    text-align: left;
+}
+
+ul.keywordmatches li.goodmatch a {
+    font-weight: bold;
+}
+
+/* :::: COMMON FORM STYLES :::: */
+
+div.actions {
+    border-top: 1px solid #aaa;
+    background-color: #ddd;
+    margin: 10px 0 0 -20px;
+    padding: 5px 0 5px 20px;
+}
+
+form dl {
+    color: #333;
+}
+
+form dt {
+    clear: both;
+    float: left;
+    min-width: 110px;
+    margin-right: 10px;
+    padding-top: 2px;
+}
+
+input#homepage {
+    display: none;
+}
+
+div.error {
+    margin: 5px 20px 0 0;
+    padding: 5px;
+    border: 1px solid #d00;
+    /*border: 2px solid #05171e;
+    background-color: #092835;
+    color: white;*/
+    font-weight: bold;
+}
+
+/* :::: INLINE COMMENTS :::: */
+
+div.inlinecommentswrapper {
+    float: right;
+    max-width: 40%;
+}
+
+div.commentmarker {
+    float: right;
+    background-image: url(style/comment.png);
+    background-repeat: no-repeat;
+    width: 25px;
+    height: 25px;
+    text-align: center;
+    padding-top: 3px;
+}
+
+div.nocommentmarker {
+    float: right;
+    background-image: url(style/nocomment.png);
+    background-repeat: no-repeat;
+    width: 25px;
+    height: 25px;
+}
+
+div.inlinecomments {
+    margin-left: 10px;
+    margin-bottom: 5px;
+    background-color: #eee;
+    border: 1px solid #ccc;
+    padding: 5px;
+}
+
+div.inlinecomment {
+    border-top: 1px solid #ccc;
+    padding-top: 5px;
+    margin-top: 5px;
+}
+
+.inlinecomments p {
+    margin: 5px 0 5px 0;
+}
+
+.inlinecomments .head {
+    font-weight: bold;
+}
+
+.inlinecomments .meta {
+    font-style: italic;
+}
+
+
+/* :::: COMMENTS :::: */
+
+div#comments h3 {
+    border-top: 1px solid #aaa;
+    padding: 5px 20px 5px 20px;
+    margin: 20px -20px 20px -20px;
+    background-color: #ddd;
+}
+
+/*
+div#comments {
+    background-color: #ccc;
+    margin: 40px -20px -30px -20px;
+    padding: 0 0 1px 0;
+}
+
+div#comments h4 {
+    margin: 30px 0 20px 0;
+    background-color: #aaa;
+    border-bottom: 1px solid #09232e;
+    color: #333;
+}
+
+div#comments form {
+    display: block;
+    margin: 0 0 0 20px;
+}
+
+div#comments textarea {
+    width: 98%;
+    height: 160px;
+}
+
+div#comments div.help {
+    margin: 20px 20px 10px 0;
+    background-color: #ccc;
+    color: #333;
+}
+
+div#comments div.help p {
+    margin: 0;
+    padding: 0 0 10px 0;
+}
+
+div#comments input, div#comments textarea {
+    font-family: 'Bitstream Vera Sans', 'Arial', sans-serif;
+    font-size: 13px;
+    color: black;
+    background-color: #aaa;
+    border: 1px solid #092835;
+}
+
+div#comments input[type="reset"],
+div#comments input[type="submit"] {
+    cursor: pointer;
+    font-weight: bold;
+    padding: 2px;
+    margin: 5px 5px 5px 0;
+    background-color: #666;
+    color: white;
+}
+
+div#comments div.comment {
+    margin: 10px 10px 10px 20px;
+    padding: 10px;
+    border: 1px solid #0f3646;
+    background-color: #aaa;
+    color: #333;
+}
+
+div#comments div.comment p {
+    margin: 5px 0 5px 0;
+}
+
+div#comments div.comment p.meta {
+    font-style: italic;
+    color: #444;
+    text-align: right;
+    margin: -5px 0 -5px 0;
+}
+
+div#comments div.comment h4 {
+    margin: -10px -10px 5px -10px;
+    padding: 3px;
+    font-size: 15px;
+    background-color: #888;
+    color: white;
+    border: 0;
+}
+
+div#comments div.comment pre,
+div#comments div.comment code {
+    background-color: #ddd;
+    color: #111;
+    border: none;
+}
+
+div#comments div.comment a {
+    color: #fff;
+    text-decoration: underline;
+}
+
+div#comments div.comment blockquote {
+    margin: 10px;
+    padding: 10px;
+    border-left: 1px solid #0f3646;
+    /*border: 1px solid #0f3646;
+    background-color: #071c25;*/
+}
+
+div#comments em.important {
+    color: #d00;
+    font-weight: bold;
+    font-style: normal;
+}*/
+
+/* :::: SUGGEST CHANGES :::: */
+div#suggest-changes-box input, div#suggest-changes-box textarea {
+    border: 1px solid #ccc;
+    background-color: white;
+    color: black;
+}
+
+div#suggest-changes-box textarea {
+    width: 99%;
+    height: 400px;
+}
+
+
+/* :::: PREVIEW :::: */
+div.preview {
+    background-image: url(style/preview.png);
+    padding: 0 20px 20px 20px;
+    margin-bottom: 30px;
+}
+
+
+/* :::: INDEX PAGE :::: */
+
+table.contentstable {
+    width: 90%;
+}
+
+table.contentstable p.biglink {
+    line-height: 150%;
+}
+
+a.biglink {
+    font-size: 1.5em;
+}
+
+span.linkdescr {
+    font-style: italic;
+    padding-top: 5px;
+}
+
+/* :::: GENINDEX STYLES :::: */
+
+table.indextable td {
+    text-align: left;
+    vertical-align: top;
+}
+
+table.indextable ul {
+    margin-top: 0;
+    margin-bottom: 0;
+    list-style-type: none;
+}
+
+table.indextable > tbody > tr > td > ul {
+    padding-left: 0em;
+}
+
+table.indextable tr.pcap {
+    height: 10px;
+}
+
+table.indextable tr.cap {
+    margin-top: 10px;
+    background-color: #f2f2f2;
+}
+
+img.toggler {
+    margin-right: 3px;
+    margin-top: 3px;
+    cursor: pointer;
+}
+
+/* :::: DOMAIN MODULE INDEX STYLES :::: */
+
+table.modindextable td {
+    padding: 2px;
+    border-collapse: collapse;
+}
+
+/* :::: GLOBAL STYLES :::: */
+
+p.subhead {
+    font-weight: bold;
+    margin-top: 20px;
+}
+
+a:link:active           { color: #ff0000; }
+a:link:hover            { background-color: #bbeeff; }
+a:visited:hover         { background-color: #bbeeff; }
+a:visited               { color: #551a8b; }
+a:link                  { color: #0000bb; }
+
+div.body h1,
+div.body h2,
+div.body h3,
+div.body h4,
+div.body h5,
+div.body h6 {
+    font-family: avantgarde, sans-serif;
+    font-weight: bold;
+}
+
+div.body h1 { font-size: 180%; }
+div.body h2 { font-size: 150%; }
+div.body h3 { font-size: 120%; }
+div.body h4 { font-size: 120%; }
+
+a.headerlink,
+a.headerlink,
+a.headerlink,
+a.headerlink,
+a.headerlink,
+a.headerlink {
+    color: #c60f0f;
+    font-size: 0.8em;
+    padding: 0 4px 0 4px;
+    text-decoration: none;
+    visibility: hidden;
+}
+
+*:hover > a.headerlink,
+*:hover > a.headerlink,
+*:hover > a.headerlink,
+*:hover > a.headerlink,
+*:hover > a.headerlink,
+*:hover > a.headerlink {
+    visibility: visible;
+}
+
+a.headerlink:hover,
+a.headerlink:hover,
+a.headerlink:hover,
+a.headerlink:hover,
+a.headerlink:hover,
+a.headerlink:hover {
+    background-color: #c60f0f;
+    color: white;
+}
+
+div.body p, div.body dd, div.body li {
+    text-align: justify;
+}
+
+div.body td {
+    text-align: left;
+}
+
+ul.fakelist {
+    list-style: none;
+    margin: 10px 0 10px 20px;
+    padding: 0;
+}
+
+/* "Footnotes" heading */
+p.rubric {
+    margin-top: 30px;
+    font-weight: bold;
+}
+
+/* "Topics" */
+
+nav.contents,
+aside.topic,
+div.topic {
+    background-color: #eee;
+    border: 1px solid #ccc;
+    padding: 0 7px 0 7px;
+    margin: 10px 0 10px 0;
+}
+
+p.topic-title {
+    font-size: 1.1em;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+/* Admonitions */
+
+div.admonition {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding: 7px;
+}
+
+div.admonition dt {
+    font-weight: bold;
+}
+
+div.admonition dd {
+    margin-bottom: 10px;
+}
+
+div.admonition dl {
+    margin-bottom: 0;
+}
+
+div.admonition p {
+    display: inline;
+}
+
+div.seealso {
+    background-color: #ffc;
+    border: 1px solid #ff6;
+}
+
+div.warning {
+    background-color: #ffe4e4;
+    border: 1px solid #f66;
+}
+
+div.note {
+    background-color: #eee;
+    border: 1px solid #ccc;
+}
+
+p.admonition-title {
+    margin: 0px 10px 5px 0px;
+    font-weight: bold;
+    display: inline;
+}
+
+p.admonition-title:after {
+    content: ":";
+}
+
+div.body p.centered {
+    text-align: center;
+    margin-top: 25px;
+}
+
+table.docutils {
+    border: 0;
+}
+
+table caption span.caption-number {
+    font-style: italic;
+}
+
+table caption span.caption-text {
+}
+
+table.docutils td, table.docutils th {
+    padding: 0 8px 2px 0;
+    border-top: 0;
+    border-left: 0;
+    border-right: 0;
+    border-bottom: 1px solid #aaa;
+}
+
+table.field-list td, table.field-list th {
+    border: 0 !important;
+}
+
+table.footnote td, table.footnote th {
+    border: 0 !important;
+}
+
+dl {
+    margin-bottom: 15px;
+    clear: both;
+}
+
+dd p {
+    margin-top: 0px;
+}
+
+dd ul, dd table {
+    margin-bottom: 10px;
+}
+
+dd {
+    margin-top: 3px;
+    margin-bottom: 10px;
+    margin-left: 30px;
+}
+
+dl.glossary dt {
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+th {
+    text-align: left;
+    padding-right: 5px;
+}
+
+pre {
+    font-family: monospace;
+    padding: 5px;
+    border-left: none;
+    border-right: none;
+}
+
+code {
+    font-family: monospace;
+    background-color: #ecf0f3;
+    padding: 0 1px 0 1px;
+}
+
+code.descname {
+    background-color: transparent;
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+code.descclassname {
+    background-color: transparent;
+}
+
+code.xref, a code {
+    background-color: transparent;
+    font-weight: bold;
+}
+
+.footnote:target  { background-color: #ffa }
+
+.line-block {
+    display: block;
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+.line-block .line-block {
+    margin-top: 0;
+    margin-bottom: 0;
+    margin-left: 1.5em;
+}
+
+h1 code, h2 code, h3 code, h4 code, h5 code, h6 code {
+    background-color: transparent;
+}
+
+.optional {
+    font-size: 1.3em;
+}
+
+.sig-paren {
+    font-size: larger;
+}
+
+.versionmodified {
+    font-style: italic;
+}
+
+/* :::: PRINT :::: */
+@media print {
+    div.documentwrapper {
+        width: 100%;
+    }
+
+    div.body {
+        margin: 0;
+    }
+
+    div.sphinxsidebar,
+    div.related,
+    div.footer,
+    div#comments div.new-comment-box,
+    #top-link {
+        display: none;
+    }
+}
+
+.viewcode-link {
+    float: right;
+}
+
+.viewcode-back {
+    float: right;
+    font-family: serif;
+}
+
+div.viewcode-block:target {
+    background-color: #f4debf;
+    border-top: 1px solid #ac9;
+    border-bottom: 1px solid #ac9;
+    margin: -1px -10px;
+    padding: 0 10px;
+}
+
+div.code-block-caption {
+    background-color: #cceeff;
+}
+
+div.code-block-caption span.caption-number {
+    padding: 0.1em 0.3em;
+    font-style: italic;
+}
+
+div.code-block-caption span.caption-text {
+}
+
+div.literal-block-wrapper {
+    padding: 1em 1em 0;
+}
+
+div.literal-block-wrapper pre {
+    margin: 0;
+}
+
+div.figure p.caption span.caption-number,
+figcaption span.caption-number {
+    font-style: italic;
+}
+
+div.figure p.caption span.caption-text,
+figcaption span.caption-text {
+}
+
+/* :::: MATH DISPLAY :::: */
+
+div.body div.math p {
+    text-align: center;
+}
+
+span.eqno {
+    float: right;
+}

@@ -1,0 +1,100 @@
+# Translations template for sphinxcontrib-applehelp.
+# Copyright (C) 2019 ORGANIZATION
+# This file is distributed under the same license as the
+# sphinxcontrib-applehelp project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2019.
+# 
+# Translators:
+# Tumpal Gemelli, 2019
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: sphinxcontrib-applehelp 1.0.0\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2019-01-20 16:59+0900\n"
+"PO-Revision-Date: 2019-01-20 07:59+0000\n"
+"Last-Translator: Tumpal Gemelli, 2019\n"
+"Language-Team: Indonesian (https://www.transifex.com/sphinx-doc/teams/36659/id/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.6.0\n"
+"Language: id\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: sphinxcontrib/applehelp/__init__.py:39
+msgid "Help indexer failed"
+msgstr "indexer Bantuan gagal"
+
+#: sphinxcontrib/applehelp/__init__.py:43
+msgid "Code signing failed"
+msgstr "Signing kode gagal"
+
+#: sphinxcontrib/applehelp/__init__.py:52
+#, python-format
+msgid ""
+"The help book is in %(outdir)s.\n"
+"Note that won't be able to view it unless you put it in ~/Library/Documentation/Help or install it in your application bundle."
+msgstr ""
+"Buku bantuan terdapat di %(outdir)s.\n"
+"Catatan bahwa tidak dapat melihatnya kecuali anda menyimpannya di  ~/Library/Documentation/Help atau memasangnya pada bundle aplikasi anda."
+
+#: sphinxcontrib/applehelp/__init__.py:79
+msgid "You must set applehelp_bundle_id before building Apple Help output"
+msgstr ""
+"Anda harus mengatur applehelp_bundle_id sebelum dapat membagun keluaran "
+"Apple Help"
+
+#: sphinxcontrib/applehelp/__init__.py:96
+msgid "copying localized files"
+msgstr ""
+
+#: sphinxcontrib/applehelp/__init__.py:123
+msgid "writing Info.plist"
+msgstr ""
+
+#: sphinxcontrib/applehelp/__init__.py:161
+msgid "copying icon... "
+msgstr "menyalin icon... "
+
+#: sphinxcontrib/applehelp/__init__.py:165
+#, python-format
+msgid "cannot copy icon file %r: %s"
+msgstr "tidak dapat menyalin berkas icon %r: %s"
+
+#: sphinxcontrib/applehelp/__init__.py:167
+msgid "building access page"
+msgstr ""
+
+#: sphinxcontrib/applehelp/__init__.py:177
+msgid "generating help index"
+msgstr ""
+
+#: sphinxcontrib/applehelp/__init__.py:201
+#, python-format
+msgid ""
+"you will need to index this help book with:\n"
+"  %s"
+msgstr ""
+"anda akan perlu mengindeks buku bantuan ini dengan :\n"
+"  %s"
+
+#: sphinxcontrib/applehelp/__init__.py:207
+#: sphinxcontrib/applehelp/__init__.py:232
+#, python-format
+msgid "Command not found: %s"
+msgstr "Tidak ditemukan perintah: %s"
+
+#: sphinxcontrib/applehelp/__init__.py:211
+msgid "signing help book"
+msgstr ""
+
+#: sphinxcontrib/applehelp/__init__.py:226
+#, python-format
+msgid ""
+"you will need to sign this help book with:\n"
+"  %s"
+msgstr ""
+"anda akan perlu sign buku bantuan ini dengan:\n"
+"  %s"

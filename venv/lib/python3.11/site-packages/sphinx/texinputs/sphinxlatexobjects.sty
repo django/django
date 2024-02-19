@@ -1,0 +1,365 @@
+%% MODULE RELEASE DATA AND OBJECT DESCRIPTIONS
+%
+% change this info string if making any custom modification
+\ProvidesFile{sphinxlatexobjects.sty}[2023/07/23 documentation environments]
+
+% Provides support for this output mark-up from Sphinx latex writer:
+%
+% - environments
+%
+%   - fulllineitems
+%   - productionlist
+%   - optionlist
+%   - DUlineblock (also "lineblock")
+%
+% - macros
+%
+%   - \DUrole
+%   - various legacy support macros related to author and release
+%     data of documented objects and modules.
+
+% \moduleauthor{name}{email}
+\newcommand{\moduleauthor}[2]{}
+
+% \sectionauthor{name}{email}
+\newcommand{\sectionauthor}[2]{}
+
+% Allow the release number to be specified independently of the
+% \date{}.  This allows the date to reflect the document's date and
+% release to specify the release that is documented.
+%
+\newcommand{\py@release}{\releasename\space\version}
+\newcommand{\version}{}% part of \py@release, used by title page and headers
+% \releaseinfo is used on titlepage (sphinxmanual.cls, sphinxhowto.cls)
+\newcommand{\releaseinfo}{}
+\newcommand{\setreleaseinfo}[1]{\renewcommand{\releaseinfo}{#1}}
+% this is inserted via template and #1=release config variable
+\newcommand{\release}[1]{\renewcommand{\version}{#1}}
+% this is defined by template to 'releasename' latex_elements key
+\newcommand{\releasename}{}
+% Fix issue in case release and releasename deliberately left blank
+\newcommand{\sphinxheadercomma}{, }% used in fancyhdr header definition
+\newcommand{\sphinxifemptyorblank}[1]{%
+% test after one expansion of macro #1 if contents is empty or spaces
+     \if&\expandafter\@firstofone\detokenize\expandafter{#1}&%
+     \expandafter\@firstoftwo\else\expandafter\@secondoftwo\fi}%
+\AtBeginDocument {%
+   \sphinxifemptyorblank{\releasename}
+     {\sphinxifemptyorblank{\version}{\let\sphinxheadercomma\empty}{}}
+     {}%
+}%
+
+% Allow specification of the author's address separately from the
+% author's name.  This can be used to format them differently, which
+% is a good thing.
+%
+\newcommand{\py@authoraddress}{}
+\newcommand{\authoraddress}[1]{\renewcommand{\py@authoraddress}{#1}}
+
+% {fulllineitems} is the main environment for object descriptions.
+%
+% With 4.0.0 \pysigline (and \pysiglinewithargsret), used in a fulllineitems
+% environment the #1 will already be of the width which is computed here, i.e.
+% the available width on line, so the \makebox becomes a bit superfluous
+\newcommand{\py@itemnewline}[1]{% macro used as \makelabel in fulllineitems
+% Memo: this presupposes \itemindent is 0pt
+  \kern\labelsep  % because \@labels core latex box does \hskip-\labelsep
+  \makebox[\dimexpr\linewidth+\labelwidth\relax][l]{#1}%
+  \kern-\labelsep % because at end of \@labels box there is \hskip\labelsep
+}
+
+\newenvironment{fulllineitems}{%
+  \begin{list}{}{\labelwidth \leftmargin
+                 \rightmargin \z@ \topsep -\parskip \partopsep \parskip
+                 \itemsep -\parsep
+                 \let\makelabel=\py@itemnewline}%
+}{\end{list}}
+
+% Signatures, possibly multi-line
+%
+% For legacy reasons Sphinx uses LaTeX \list and \item's for signatures
+% This is delicate:
+% - the actual item label is not typeset immediately by \item but later as part
+% of the \everypar which will be triggered by either next paragraph or a manual
+% \leavevmode, or if nothing in-between by the next \item,
+% - \begingroup <set-up>\item[foo] <setup>\endgroup leads to errors,
+% - vertical space depends on \parskip and \itemsep values in somewhat
+% subtle manners.
+%
+% Since the 2022/01/13 version things are simpler as \parskip is simply set
+% to zero during execution of \pysigline/\pysiglinewithargsret
+%
+% Parameter for separation via \itemsep of multiple signatures with common desc
+\newlength\sphinxsignaturesep
+\setlength\sphinxsignaturesep{\smallskipamount}
+% latex.py outputs mark-up like this:
+% \pysigstartsignatures <signatures> \pysigstopsignatures <actual desc>
+\newcommand{\pysigstartsignatures}{%
+   % store current \parskip and \itemsep
+   \edef\pysig@restore@itemsep@and@parskip{%
+       \itemsep\the\itemsep\relax
+       \parskip\the\parskip\relax
+   }%
+   % set them to control the spacing between signatures sharing common desc
+   \parskip\z@skip
+   \itemsep\sphinxsignaturesep
+}
+\newcommand{\pysigstopsignatures}{%
+% 1) encourage a pagebreak in an attempt to try to avoid last
+% signature ending up separated from description (due to voodoo next)
+\penalty-100
+% 2) some voodoo to separate last signature from description in a manner
+% robust with respect to the latter being itself a LaTeX list object
+\leavevmode\par\kern-\baselineskip\item[\strut]
+%
+   \leavevmode
+   % it is important \leavevmode was issued before the \parskip reset, and
+   % it is also needed for the case of an object desc itself a LaTeX \list
+   % now restore \itemsep and \parskip
+   \pysig@restore@itemsep@and@parskip
+}
+% Each signature is rendered as NAME<SPACE>[TPLIST]<SPACE>(ARGLIST) where the
+% size of <SPACE> is parametrized by \sphinxsignaturelistskip (0pt by default).
+\newlength\sphinxsignaturelistskip
+\setlength\sphinxsignaturelistskip{0pt}
+\newcommand{\pysigtypelistopen}{\hskip\sphinxsignaturelistskip\sphinxcode{[}}
+\newcommand{\pysigtypelistclose}{\sphinxcode{]}}
+\newcommand{\pysigarglistopen}{\hskip\sphinxsignaturelistskip\sphinxcode{(}}
+\newcommand{\pysigarglistclose}{\sphinxcode{)}}
+%
+% Use a \parbox to accommodate long argument list in signatures
+% LaTeX did not imagine that an \item label could need multi-line rendering
+\newlength{\py@argswidth}
+\newcommand{\py@sigparams}[2]{%
+  % The \py@argswidth has been computed in \pysiglinewithargsret to make the
+  % argument list use full available width
+  \parbox[t]{\py@argswidth}{\raggedright #1\pysigarglistclose#2\strut}%
+  % final strut is to help get correct vertical separation
+}
+\newcommand{\py@sigparamswithtypelist}[3]{%
+  % similar to \py@sigparams but with different delimiters and an additional
+  % type parameters list given as #1, the argument list as #2 and the return
+  % annotation as #3
+  \parbox[t]{\py@argswidth}{%
+    \raggedright #1\pysigtypelistclose%
+    \pysigarglistopen#2\pysigarglistclose%
+    #3\strut}%
+}
+
+\newcommand{\pysigline}[1]{%
+  % as \py@argswidth is available, we use it but no "args" here
+  % the \relax\relax is because \py@argswidth is a "skip" variable
+  % this will make the label occupy the full available linewidth
+  \py@argswidth=\dimexpr\linewidth+\labelwidth\relax\relax
+  \item[{\parbox[t]{\py@argswidth}{\raggedright #1\strut}}]
+  \pysigadjustitemsep
+}
+\newcommand{\pysiglinewithargsret}[3]{%
+  % as #1 may contain a footnote using \label we need to make \label
+  % a no-op here to avoid LaTeX complaining about duplicates
+\let\spx@label\label\let\label\@gobble
+  \settowidth{\py@argswidth}{#1\pysigarglistopen}%
+\let\label\spx@label
+  \py@argswidth=\dimexpr\linewidth+\labelwidth-\py@argswidth\relax\relax
+  \item[{#1\pysigarglistopen\py@sigparams{#2}{#3}\strut}]
+  \pysigadjustitemsep
+}
+\newcommand{\pysiglinewithargsretwithtypelist}[4]{
+% #1 = name, #2 = typelist, #3 = arglist, #4 = retann
+\let\spx@label\label\let\label\@gobble
+  \settowidth{\py@argswidth}{#1\pysigtypelistopen}%
+\let\label\spx@label
+  \py@argswidth=\dimexpr\linewidth+\labelwidth-\py@argswidth\relax\relax
+  \item[{#1\pysigtypelistopen\py@sigparamswithtypelist{#2}{#3}{#4}\strut}]
+  \pysigadjustitemsep
+}
+
+\def\sphinxoptionalextraspace{0.5mm}
+\newcommand{\pysigwithonelineperarg}[3]{%
+  % render each argument on its own line
+  \item[#1\pysigarglistopen\strut]
+  \leavevmode\par\nopagebreak
+  % this relies on \pysigstartsignatures having set \parskip to zero
+  \begingroup
+     \let\sphinxparamcomma\sphinxparamcommaoneperline
+     \def\sphinxoptionalhook{\ifvmode\else\kern\sphinxoptionalextraspace\relax\fi}%
+     % The very first \sphinxparam should not emit a \par hence a complication
+     % with a group and global definition here as it may occur in a \sphinxoptional
+     \global\let\spx@sphinxparam\sphinxparam
+     \gdef\sphinxparam{\gdef\sphinxparam{\par\spx@sphinxparam}\spx@sphinxparam}%
+  #2\par
+  \endgroup
+  \global\let\sphinxparam\spx@sphinxparam
+  % fulllineitems sets \labelwidth to be like \leftmargin
+  \nopagebreak\noindent\kern-\labelwidth\pysigarglistclose{#3}
+  \pysigadjustitemsep
+}
+\newcommand{\pysigwithonelineperargwithonelinepertparg}[4]{
+  % #1 = name, #2 = typelist, #3 = arglist, #4 = retann
+  % render each type parameter and argument on its own line
+  \item[#1\pysigtypelistopen\strut]
+  \leavevmode\par\nopagebreak
+  \begingroup
+     \let\sphinxparamcomma\sphinxparamcommaoneperline
+     % \sphinxtypeparam is treated similarly to \sphinxparam but since
+     % \sphinxoptional is not accepted in a type parameters list, we do
+     % not need the hook or the global definition
+     \let\spx@sphinxtypeparam\sphinxtypeparam
+     \def\sphinxtypeparam{\def\sphinxtypeparam{\par\spx@sphinxtypeparam}\spx@sphinxtypeparam}%
+  #2\par
+  \endgroup
+  \nopagebreak\noindent\kern-\labelwidth\pysigtypelistclose%
+  % render the rest of the signature like in \pysigwithonelineperarg
+  \pysigarglistopen\strut\par\nopagebreak
+  \begingroup
+     \let\sphinxparamcomma\sphinxparamcommaoneperline
+     \def\sphinxoptionalhook{\ifvmode\else\kern\sphinxoptionalextraspace\relax\fi}%
+     \global\let\spx@sphinxparam\sphinxparam
+     \gdef\sphinxparam{\gdef\sphinxparam{\par\spx@sphinxparam}\spx@sphinxparam}%
+  #3\par
+  \endgroup
+  \global\let\sphinxparam\spx@sphinxparam
+  \nopagebreak\noindent\kern-\labelwidth\pysigarglistclose{#4}
+  \pysigadjustitemsep
+}
+\newcommand{\pysiglinewithargsretwithonelinepertparg}[4]{
+  % #1 = name, #2 = typelist, #3 = arglist, #4 = retann
+  % render each type parameter on its own line but the arguments list inline
+  \item[#1\pysigtypelistopen\strut]
+  \leavevmode\par\nopagebreak
+  \begingroup
+     \let\sphinxparamcomma\sphinxparamcommaoneperline
+     % \sphinxtypeparam is treated similarly to \sphinxparam but since
+     % \sphinxoptional is not accepted in a type parameters list, we do
+     % not need the hook or the global definition
+     \let\spx@sphinxtypeparam\sphinxtypeparam
+     \def\sphinxtypeparam{\def\sphinxtypeparam{\par\spx@sphinxtypeparam}\spx@sphinxtypeparam}%
+  #2\par
+  \endgroup
+  \nopagebreak\noindent\kern-\labelwidth\pysigtypelistclose%
+  % render the arguments list on one line
+  \pysigarglistopen#3\pysigarglistclose#4\strut
+  \pysigadjustitemsep
+}
+\newcommand{\pysigwithonelineperargwithtypelist}[4]{
+  % #1 = name, #2 = typelist, #3 = arglist, #4 = retann
+  % render the type parameters list on one line, but each argument is rendered on its own line
+\let\spx@label\label\let\label\@gobble
+  \settowidth{\py@argswidth}{#1\pysigtypelistopen}%
+\let\label\spx@label
+  \py@argswidth=\dimexpr\linewidth+\labelwidth-\py@argswidth\relax\relax
+  \item[{#1\pysigtypelistopen\parbox[t]{\py@argswidth}{%
+    \raggedright #2\pysigtypelistclose\pysigarglistopen\strut}\strut}]
+  % render the rest of the signature like in \pysigwithonelineperarg
+  \begingroup
+     \let\sphinxparamcomma\sphinxparamcommaoneperline
+     \def\sphinxoptionalhook{\ifvmode\else\kern\sphinxoptionalextraspace\relax\fi}%
+     \global\let\spx@sphinxparam\sphinxparam
+     \gdef\sphinxparam{\gdef\sphinxparam{\par\spx@sphinxparam}\spx@sphinxparam}%
+  #3\par
+  \endgroup
+  \global\let\sphinxparam\spx@sphinxparam
+  \nopagebreak\noindent\kern-\labelwidth\pysigarglistclose{#4}
+  \pysigadjustitemsep
+}
+\newcommand{\pysigadjustitemsep}{%
+  % adjust \itemsep to control the separation with the next signature
+  % sharing common description
+  \ifsphinxsigismultiline
+  % inside a multiline signature, no extra vertical spacing
+  % ("multiline" here does not refer to possibly long
+  %  list of arguments, but to a cpp domain feature)
+      \itemsep\z@skip
+  \else
+      \itemsep\sphinxsignaturesep
+  \fi
+}
+\newif\ifsphinxsigismultiline
+\newcommand{\pysigstartmultiline}{\sphinxsigismultilinetrue}%
+\newcommand{\pysigstopmultiline}{\sphinxsigismultilinefalse\itemsep\sphinxsignaturesep}%
+
+% Production lists
+%
+\newenvironment{productionlist}{%
+%  \def\sphinxoptional##1{{\Large[}##1{\Large]}}
+  \def\production##1##2{\\\sphinxcode{\sphinxupquote{##1}}&::=&\sphinxcode{\sphinxupquote{##2}}}%
+  \def\productioncont##1{\\& &\sphinxcode{\sphinxupquote{##1}}}%
+  \parindent=2em
+  \indent
+  \setlength{\LTpre}{0pt}%
+  \setlength{\LTpost}{0pt}%
+  \begin{longtable}[l]{lcl}
+}{%
+  \end{longtable}
+}
+
+% Definition lists; requested by AMK for HOWTO documents.  Probably useful
+% elsewhere as well, so keep in in the general style support.
+%
+\newenvironment{definitions}{%
+  \begin{description}%
+  \def\term##1{\item[{##1}]\mbox{}\\*[0mm]}%
+}{%
+  \end{description}%
+}
+
+%% FROM DOCTUTILS LATEX WRITER
+%
+% The following is stuff copied from docutils' latex writer.
+%
+\newcommand{\optionlistlabel}[1]{\normalfont\bfseries #1 \hfill}% \bf deprecated
+\newenvironment{optionlist}[1]
+{\begin{list}{}
+  {\setlength{\labelwidth}{#1}%
+   \setlength{\rightmargin}{1cm}%
+   \setlength{\leftmargin}{\rightmargin}%
+   \addtolength{\leftmargin}{\labelwidth}%
+   \addtolength{\leftmargin}{\labelsep}%
+   \renewcommand{\makelabel}{\optionlistlabel}}%
+}{\end{list}}
+
+\newlength{\lineblockindentation}
+\setlength{\lineblockindentation}{2.5em}
+\newenvironment{lineblock}[1]
+{\begin{list}{}
+  {\setlength{\partopsep}{\parskip}%
+   \addtolength{\partopsep}{\baselineskip}%
+   \topsep0pt\itemsep0.15\baselineskip\parsep0pt
+   \leftmargin#1\relax}%
+ \raggedright}
+{\end{list}}
+
+% From docutils.writers.latex2e
+% inline markup (custom roles)
+% \DUrole{#1}{#2} tries \DUrole#1{#2}
+\providecommand*{\DUrole}[2]{%
+  \ifcsname DUrole\detokenize{#1}\endcsname
+    \csname DUrole\detokenize{#1}\endcsname{#2}%
+  \else% backwards compatibility: try \docutilsrole#1{#2}
+    \ifcsname docutilsrole\detokenize{#1}\endcsname
+      \csname docutilsrole\detokenize{#1}\endcsname{#2}%
+    \else
+      #2%
+    \fi
+  \fi
+}
+
+\providecommand*{\DUprovidelength}[2]{%
+  \ifdefined#1\else\newlength{#1}\setlength{#1}{#2}\fi
+}
+
+\DUprovidelength{\DUlineblockindent}{2.5em}
+\ifdefined\DUlineblock\else
+  \newenvironment{DUlineblock}[1]{%
+    \list{}{\setlength{\partopsep}{\parskip}%
+            \addtolength{\partopsep}{\baselineskip}%
+            \setlength{\topsep}{0pt}%
+            \setlength{\itemsep}{0.15\baselineskip}%
+            \setlength{\parsep}{0pt}%
+            \setlength{\leftmargin}{#1}}%
+    \raggedright
+  }
+  {\endlist}
+\fi
+
+\endinput

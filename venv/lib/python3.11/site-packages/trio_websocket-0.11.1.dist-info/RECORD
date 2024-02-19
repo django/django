@@ -1,0 +1,12 @@
+trio_websocket-0.11.1.dist-info/INSTALLER,sha256=zuuue4knoyJ-UwPPXg8fezS7VCrXJQrAP7zeNuwvFQg,4
+trio_websocket-0.11.1.dist-info/LICENSE,sha256=LV4_xQa2yHrZO3e5qnYAmlj-pyvl-1bmgDvAjLKIeZk,1080
+trio_websocket-0.11.1.dist-info/METADATA,sha256=Wfoq7OgqTI3E0IPrNtrLoqHrkxab0-sHSbGOpyuoYdk,4674
+trio_websocket-0.11.1.dist-info/RECORD,,
+trio_websocket-0.11.1.dist-info/WHEEL,sha256=yQN5g4mg4AybRjkgi-9yy4iQEFibGQmlz78Pik5Or-A,92
+trio_websocket-0.11.1.dist-info/top_level.txt,sha256=Q1lPttKnadThXspRJagWH0QGxlu9GKeG1ae5iO2aPAM,15
+trio_websocket/__init__.py,sha256=ovn1M3CuhTW2IFD8nXwSA3kFGS8gLE3yqhlvGvYxNqU,434
+trio_websocket/__pycache__/__init__.cpython-311.pyc,,
+trio_websocket/__pycache__/_impl.cpython-311.pyc,,
+trio_websocket/__pycache__/_version.cpython-311.pyc,,
+trio_websocket/_impl.py,sha256=jx4dBUsxCRk8rew7k5v1JRDIiFd0NftKf0KcytLLDVI,57128
+trio_websocket/_version.py,sha256=3TWkE7T0Jt_0JSXR8Em3yqaM443tlkkxCPdXvSdnzBM,23

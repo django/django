@@ -1,0 +1,37 @@
+Metadata-Version: 2.1
+Name: Babel
+Version: 2.14.0
+Summary: Internationalization utilities
+Home-page: https://babel.pocoo.org/
+Author: Armin Ronacher
+Author-email: armin.ronacher@active-4.com
+Maintainer: Aarni Koskela
+Maintainer-email: akx@iki.fi
+License: BSD-3-Clause
+Project-URL: Source, https://github.com/python-babel/babel
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Web Environment
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Programming Language :: Python :: Implementation :: PyPy
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.7
+License-File: LICENSE
+Requires-Dist: pytz >=2015.7 ; python_version < "3.9"
+Provides-Extra: dev
+Requires-Dist: pytest >=6.0 ; extra == 'dev'
+Requires-Dist: pytest-cov ; extra == 'dev'
+Requires-Dist: freezegun ~=1.0 ; extra == 'dev'
+
+A collection of tools for internationalizing Python applications.

@@ -1,0 +1,854 @@
+%% COLOURED BOXES
+%
+% change this info string if making any custom modification
+\ProvidesPackage{sphinxpackageboxes}[2023/03/19 v6.2.0 advanced colored boxes]
+% Optionally executes \RequirePackage for:
+%
+% - pict2e.  Ideally we would like to use the v0.4a 2020/08/16 release of this
+%   package as it allows dimensional arguments to its \moveto, \lineto, etc...
+%   Or we could use extra package "picture".  We opt for custom wrappers
+%   \spx@moveto, \spx@lineto, ..., working with old versions.
+%
+% - ellipse.  This package extends pict2e with elliptical arcs.  Its author
+%   Daan Leijen also has contributed package longfbox which is part of
+%   TeXLive.  Had I known about it, I would perhaps have based Sphinx CSS on
+%   top of longfbox at least partly.  But this would not have spared me all
+%   the work in sphinx.sty, which was a long walk until 6.2.0 version.
+%   Besides I don't need the breakable boxes from longfbox, as Sphinx has
+%   its own rather advanced layer on top of framed.  I would need to check if
+%   some thorny color issues solved by Sphinx (and not by tcolorbox) at page
+%   breaks are solved by longfbox as well.  (I have not tested)
+
+%   At 6.2.0 refactoring, we do not wait for at begin document to try to load
+%   pict2e.  Actually since 6.0.0 the default is for code-blocks to use
+%   rounded boxes, and the only reason since then to wait "at begin document"
+%   was to check if user had reverted that default and in fact pict2e was not
+%   needed.  But with \sphinxbox, we can not know for sure even in that case
+%   that pict2e is not needed.  And even back then it would have been possible
+%   to user to try to employ \sphinxsetup via raw directive in document body
+%   and require some rounded corners (which was thus impossible to satisfy).
+%   Time to be much simpler and attempt unconditionally to load pict2e
+%   immediately.  This will also have advantage that we can use
+%   \@ifpackageloaded{pict2e} and not have to query and save its setting later
+%   at begin document.
+\IfFileExists{pict2e.sty}
+   {\RequirePackage{pict2e}}
+   {\PackageWarningNoLine{sphinx}{%
+     The package pict2e is required for rounded boxes.\MessageBreak
+     It does not seem to be available on your system.\MessageBreak
+     Options for setting radii will be ignored%
+    }%
+    % Formerly a \sphinxbuildwarning was issued but if we did that now it
+    % would mean that the produced PDF will always have a red banner near its
+    % end about pict2e not being available if indeed it is not available, even
+    % if user has reverted the default and dropped rounded corners.  Formerly
+    % the serious warning was done after having checked at begin document that
+    % indeed a rounded corner option had been used.  As we drop the check now,
+    % let's be more discrete and simply duplicate the earlier warning to make
+    % it visible near end of compilation log and console output.
+    \AtEndDocument{\PackageWarningNoLine{sphinx}{%
+     The package pict2e is required for rounded boxes.\MessageBreak
+     As it does not seem to be available on your system,\MessageBreak
+     options setting radii have all been ignored}}%
+   }%
+
+\IfFileExists{ellipse.sty}
+   {\RequirePackage{ellipse}}
+   {\PackageWarningNoLine{sphinx}{%
+     The package ellipse is required for elliptical corners.\MessageBreak
+     It does not seem to be available on your system.\MessageBreak
+     All non-straight corners will use circle arcs.%
+    }%
+    \AtEndDocument{\PackageWarningNoLine{sphinx}{%
+     The package ellipse is required for elliptical corners.\MessageBreak
+     As it does not seem to be available on your system,\MessageBreak
+     all non-straight corners have used circle arcs.}}%
+   }%
+
+% The pict2e release v0.4b of 2020/09/30 does not allocate scratch dimen
+% register \@tempdimd which ellipse package uses.  Thus ellipse package is
+% broken since (written on March 20, 2023).  Simply allocate the register
+% ourself to fix that, pending some upstream fix.
+\@ifpackageloaded{ellipse}{\ifdefined\@tempdimd\else\newdimen\@tempdimd\fi}{}
+
+% Provides box registers \spx@tempboxa, \spx@tempboxb usable in other places
+\newbox\spx@tempboxa
+\newbox\spx@tempboxb
+
+%%%%%%%%%%%%%%%%
+% Internal registers, conditionals, colors to be configured by each caller
+% via a preliminary "setup" call
+%
+\newif\ifspx@boxes@withshadow
+\newif\ifspx@boxes@insetshadow
+\newif\ifspx@boxes@withbackgroundcolor
+\newif\ifspx@boxes@withshadowcolor
+\newif\ifspx@boxes@withbordercolor
+\newif\ifspx@boxes@shadowinbbox
+%
+\newdimen\spx@boxes@border
+\newdimen\spx@boxes@border@top
+\newdimen\spx@boxes@border@right
+\newdimen\spx@boxes@border@bottom
+\newdimen\spx@boxes@border@left
+%
+\newdimen\spx@boxes@padding@top
+\newdimen\spx@boxes@padding@right
+\newdimen\spx@boxes@padding@bottom
+\newdimen\spx@boxes@padding@left
+%
+\newdimen\spx@boxes@shadow@xoffset
+\newdimen\spx@boxes@shadow@yoffset
+%
+\newdimen\spx@boxes@radius@topleft@x
+\newdimen\spx@boxes@radius@topright@x
+\newdimen\spx@boxes@radius@bottomright@x
+\newdimen\spx@boxes@radius@bottomleft@x
+\newdimen\spx@boxes@radius@topleft@y
+\newdimen\spx@boxes@radius@topright@y
+\newdimen\spx@boxes@radius@bottomright@y
+\newdimen\spx@boxes@radius@bottomleft@y
+%
+% These colors will be set to colors defined appropriately by caller of
+% \spx@boxes@fcolorbox@setup macro
+% spx@boxes@bordercolor
+% spx@boxes@backgroundcolor
+% spx@boxes@shadowcolor
+% spx@boxes@textcolor
+
+%%%%%%%%%%%%%%%%
+% "setup" macro
+%
+% It must be called prior to \spx@boxes@fcolorbox for parameters of the latter
+% to be initialized.
+%
+% It also prepares \spx@boxes@fcolorbox to expand to one of
+% \spx@boxes@fcolorbox@rectangle or \spx@boxes@fcolorbox@rounded depending on
+% the configuration and availability of the pict2e package.
+%
+% The #1 is one of: pre, topic, warning, danger, etc....
+%
+% We delay until here the parsing of radii options to extract x and y
+% components.
+\def\spx@boxes@setradii#1 #2 #3\@nnil#4#5{%
+  #4\dimexpr#1\relax
+  #5\dimexpr#2\relax
+  \ifdim#5=-\maxdimen#5#4\fi
+  % if one of them is zero or negative set both to zero
+  \ifdim#4>\z@\else#4\z@#5\z@\fi
+  \ifdim#5>\z@\else#4\z@#5\z@\fi
+}%
+% if ellipse.sty is not available ignore the second component of all radii
+% specifications, use circle arcs with radius the x component
+\@ifpackageloaded{ellipse}
+   {}
+   {\def\spx@boxes@setradii#1 #2 #3\@nnil#4#5{#4\dimexpr#1\relax #5#4}}
+
+% Using \dimexpr for maximal user input flexibility.
+\def\spx@boxes@fcolorbox@setup#1{%
+  \spx@boxes@border@top   \dimexpr\@nameuse{spx@#1@border@top}\relax
+  \spx@boxes@border@right \dimexpr\@nameuse{spx@#1@border@right}\relax
+  \spx@boxes@border@bottom\dimexpr\@nameuse{spx@#1@border@bottom}\relax
+  \spx@boxes@border@left  \dimexpr\@nameuse{spx@#1@border@left}\relax
+  \spx@boxes@border       \dimexpr\@nameuse{spx@#1@border}\relax
+  %
+  \spx@boxes@padding@top   \dimexpr\@nameuse{spx@#1@padding@top}\relax
+  \spx@boxes@padding@right \dimexpr\@nameuse{spx@#1@padding@right}\relax
+  \spx@boxes@padding@bottom\dimexpr\@nameuse{spx@#1@padding@bottom}\relax
+  \spx@boxes@padding@left  \dimexpr\@nameuse{spx@#1@padding@left}\relax
+  %
+  \edef\spx@temp{\csname spx@#1@radius@topleft\endcsname\space}%
+  \expandafter
+        \spx@boxes@setradii
+        \spx@temp
+        {-\maxdimen}
+        \@nnil
+        \spx@boxes@radius@topleft@x\spx@boxes@radius@topleft@y
+  \edef\spx@temp{\csname spx@#1@radius@topright\endcsname\space}%
+  \expandafter
+        \spx@boxes@setradii
+        \spx@temp
+        {-\maxdimen}
+        \@nnil
+        \spx@boxes@radius@topright@x\spx@boxes@radius@topright@y
+  \edef\spx@temp{\csname spx@#1@radius@bottomright\endcsname\space}%
+  \expandafter
+        \spx@boxes@setradii
+        \spx@temp
+        {-\maxdimen}
+        \@nnil
+        \spx@boxes@radius@bottomright@x\spx@boxes@radius@bottomright@y
+  \edef\spx@temp{\csname spx@#1@radius@bottomleft\endcsname\space}%
+  \expandafter
+        \spx@boxes@setradii
+        \spx@temp
+        {-\maxdimen}
+        \@nnil
+        \spx@boxes@radius@bottomleft@x\spx@boxes@radius@bottomleft@y
+  %
+  \@nameuse{ifspx@#1@withshadow}%
+     \spx@boxes@withshadowtrue
+     \spx@boxes@shadow@xoffset \dimexpr\@nameuse{spx@#1@shadow@xoffset}\relax
+     \spx@boxes@shadow@yoffset \dimexpr\@nameuse{spx@#1@shadow@yoffset}\relax
+  \else
+     \spx@boxes@withshadowfalse
+  \fi
+  % not nesting in previous to avoid TeX conditional subtleties
+  \@nameuse{ifspx@#1@insetshadow}%
+     \spx@boxes@insetshadowtrue
+  \else
+     \spx@boxes@insetshadowfalse
+  \fi
+  %
+  \@nameuse{ifspx@#1@withbordercolor}%
+    \spx@boxes@withbordercolortrue
+    \sphinxcolorlet{spx@boxes@bordercolor}{sphinx#1BorderColor}%
+  \else
+    \spx@boxes@withbordercolorfalse
+  \fi
+  %
+  \@nameuse{ifspx@#1@withbackgroundcolor}%
+    \spx@boxes@withbackgroundcolortrue
+    \sphinxcolorlet{spx@boxes@backgroundcolor}{sphinx#1BgColor}%
+  \else
+    \spx@boxes@withbackgroundcolorfalse
+  \fi
+  %
+  \@nameuse{ifspx@#1@withshadowcolor}%
+    \spx@boxes@withshadowcolortrue
+    \sphinxcolorlet{spx@boxes@shadowcolor}{sphinx#1ShadowColor}%
+  \else
+    \spx@boxes@withshadowcolorfalse
+  \fi
+  % Display elements pre, topic, warning et al. by default do not include
+  % shadow in box (legacy; and only topic actually uses a shadow per default)
+  % This may be refactored still more in future, but this 6.2.0 extra helped
+  % reduce workload from code-blocks (pre), contents (topic) and admonitions.
+  % As this conditional is a priori false and should only be changed locally
+  % (by \sphinxbox), this line is actually superfluous.
+  \spx@boxes@shadowinbboxfalse
+  \spx@boxes@fcolorbox@setup@fcolorbox
+}
+\@ifpackageloaded{pict2e}
+{%  pict2e is available and loaded
+ \def\spx@boxes@fcolorbox@setup@fcolorbox{%
+  \if1% use rounded boxes only if needed (rx>0 iff ry>0)
+    \ifdim\spx@boxes@radius@topleft@x    >\z@0\fi
+    \ifdim\spx@boxes@radius@topright@x   >\z@0\fi
+    \ifdim\spx@boxes@radius@bottomright@x>\z@0\fi
+    \ifdim\spx@boxes@radius@bottomleft@x >\z@0\fi
+    1\def\spx@boxes@fcolorbox{\spx@boxes@fcolorbox@rectangle}%
+  \else
+    \def\spx@boxes@fcolorbox{\spx@boxes@fcolorbox@rounded}%
+  \fi
+ }% end of definition of setup@fcolorbox in case of presence of pict2e
+}%
+{% pict2e could not be loaded, we must always use fcolorbox@rectangle
+ \def\spx@boxes@fcolorbox@setup@fcolorbox{%
+    \def\spx@boxes@fcolorbox{\spx@boxes@fcolorbox@rectangle}%
+ }% end of definition of setup@fcolorbox in case of absence of pict2e
+}% end of "no pict2e" branch
+
+%%%%%%%%%%%%%%%%
+% Support of box-decoration-break=slice
+%
+% 6.2.0 has renamed and moved this here from sphinxlatexliterals.sty,
+% to facilitate supporting box-decoration-break=slice for all directives,
+% not only code-block.
+%
+% It also modified when these post actions are executed, in order
+% for openboth to be able to trigger usage of fcolorbox@rectangle.
+% So now openbottom and opentop also take advantage of this possible
+% optimization.
+\def\spx@boxes@fcolorbox@setup@openbottom{%
+    \spx@boxes@border@bottom     \z@
+    \spx@boxes@radius@bottomright@x\z@ \spx@boxes@radius@bottomright@y\z@
+    \spx@boxes@radius@bottomleft@x \z@ \spx@boxes@radius@bottomleft@y \z@
+    \spx@boxes@fcolorbox@setup@fcolorbox
+}%
+\def\spx@boxes@fcolorbox@setup@opentop{%
+    \spx@boxes@border@top     \z@
+    \spx@boxes@radius@topright@x\z@ \spx@boxes@radius@topright@y\z@
+    \spx@boxes@radius@topleft@x \z@ \spx@boxes@radius@topleft@y \z@
+    \spx@boxes@fcolorbox@setup@fcolorbox
+}%
+\def\spx@boxes@fcolorbox@setup@openboth{%
+    \spx@boxes@border@top     \z@
+    \spx@boxes@border@bottom  \z@
+    \spx@boxes@radius@bottomright@x\z@ \spx@boxes@radius@bottomright@y\z@
+    \spx@boxes@radius@bottomleft@x \z@ \spx@boxes@radius@bottomleft@y \z@
+    \spx@boxes@radius@topright@x\z@ \spx@boxes@radius@topright@y\z@
+    \spx@boxes@radius@topleft@x \z@ \spx@boxes@radius@topleft@y \z@
+    \def\spx@boxes@fcolorbox{\spx@boxes@fcolorbox@rectangle}%
+}%
+
+%%%%%%%%%%%%%%%%
+% \sphinxbox (added at 6.2.0)
+%
+% For an inline box, possibly rounded.
+\newcommand\sphinxbox[1][]{% #1 stands for the options, they are... optional!
+  % \leavevmode makes sure TeX switches to paragraph mode, which is necessary
+  % if this is first in a paragraph or a list element.  The \sphinxAtStartPar
+  % mechanism also ensures this automatically, if not redefined, but not with
+  % lualatex as then it is by default doing nothing.
+  \leavevmode
+  \begingroup
+    \ifcsname spx@boxes@sphinxbox@isnested\endcsname
+        % nested boxes reset all box options to be as the \sphinxboxsetup
+        % defaults, before applying their specific options
+        \spx@boxes@sphinxbox@reset
+    \else
+        % top layer box, toggle the nested flag
+        \csname spx@boxes@sphinxbox@isnested\endcsname
+    \fi
+    % we do not use \sphinxboxsetup as it is a user command extending the
+    % "reset" storage
+    \setkeys{sphinxbox}{#1}%
+    \spx@boxes@fcolorbox@setup{box}%
+    \spx@boxes@shadowinbboxtrue% inline sphinx boxes include shadow in bbox
+    \ifspx@box@withtextcolor\color{sphinxboxTextColor}\fi
+    %
+    % MEMO: the fcolorbox@{rectangle,rounded} draw the contents (which here
+    % will be encapsulated as \box\z@) last, i.e.  after shadow, background,
+    % and border and their color commands.  The \reset@color from naked
+    % top-level \color commands in argument (which can not arise from Sphinx
+    % mark-up anyhow) would end up being placed via color.sty \aftergroup core
+    % mechanism in token stream after \spx@boxes@sphinxbox@a (which is the
+    % first \aftergroup) hence after the box contents with its unbalanced
+    % color pushes is shipped to PDF.  So the missing color pop specials are
+    % inserted then in correct order at correct place (after the \endgroup at
+    % end of \spx@boxes@sphinxbox@a but this is not relevant) and do not end
+    % up causing havoc in push/pop pairs (and all this happens on same page).
+    %
+    % There is thus no reason here to go to the trouble to add an extra
+    % \color@begingroup/\color@endgroup or like pair to encapsulate the caught
+    % contents in order for the \box\z@ to contain as many color pop's as it
+    % has color pushes.  But as this is subtle, this comment was added for
+    % future maintenance.  Actually even if the contents were not drawn last,
+    % their (purely theoretical, as Sphinx mark-up can not create it) missing
+    % color pop's would not have caused trouble I guess as long as the color
+    % insertions for shadow, background, border are correctly balanced.
+    \setbox0\hbox\bgroup\aftergroup\spx@boxes@sphinxbox@a
+    \afterassignment\spx@box@TeXextras
+    \let\next=%
+}
+\def\spx@boxes@sphinxbox@a{\spx@boxes@fcolorbox{%
+    \ifspx@opt@box@addstrut\strut\fi\box\z@}\endgroup}
+
+\newcommand\newsphinxbox[2][]{%
+   \newcommand#2[1][]{\sphinxbox[#1,##1]}%
+}
+% Let's catch \renewsphinxbox[...]{\sphinxbox} which would cause \sphinxbox
+% to fall into infinite looping on use.
+\newcommand\renewsphinxbox[2][]{%
+   \in@{#2}{\sphinxbox}%
+   \ifin@
+      \PackageWarning{sphinx}{Attempt to \string\renewsphinxbox\space
+        the \string\sphinxbox\space command\MessageBreak
+        itself.  This is not allowed and will be ignored.\MessageBreak
+        Reported}%
+   \else
+     \renewcommand#2[1][]{\sphinxbox[#1,##1]}%
+   \fi
+}
+
+%%%%%%%%%%%%%%%%
+% MACROS
+%
+% \spx@boxes@fcolorbox expands either to \spx@boxes@fcolorbox@rectangle
+% or \spx@boxes@fcolorbox@rounded depending on preliminary set-up.
+%
+% This is decided by the "setup" which must have been executed by the caller.
+% Let's give it some (thus unneeded) default fall-back for clarity.
+\def\spx@boxes@fcolorbox{\spx@boxes@fcolorbox@rectangle}
+%
+% A macro \spx@boxes@fcolorbox@setuphook used to be executed at start of the
+% \hbox constructs (rectangle or rounded).  This was used until 6.2.0 for the
+% support of pre_box-decoration-break option, hence was really an internal
+% non-public macro.  As it is not needed anymore, with some hesitation it got
+% entirely removed at 6.2.0 on the occasion of a refactoring of interactions of
+% this file with sphinxlatexliterals.sty.  Besides its name should have been
+% rather something such as \spx@boxes@fcolorbox@atstartofhbox.
+%
+% After "setup", \spx@boxes@fcolorbox expands to one of:
+%
+% - \spx@boxes@fcolorbox@rectangle (4 padding parameters, 4 border widths, 2 shadow widths,
+%   and three colours: background, border and shadow; same as in CSS styling)
+%
+%   It branches to one of:
+%   - \spx@boxes@fcolorbox@externalshadow
+%   - \spx@boxes@fcolorbox@insetshadow    (same concept of "inset" as in CSS styling)
+%
+% - \spx@boxes@fcolorbox@rounded: rounded corners using the picture environment
+%   and pict2e package for its low-weight interface to PDF graphics operations
+
+% MEMO: we have also successfully tested usage of tcolorbox.sty (its \tcbox) but
+% decided to use pict2e.sty for the following reasons:
+% 1- PDF build was observed to be an order of magnitude faster,
+% 2- the boxes we can do with pict2e appear to be fancy enough,
+%    almost matching what one can see in HTML renderings,
+% 2- orders of magnitude smaller dependency (tcolorbox uses the pgf TeX
+%    framework), although on Ubuntu it seems texlive-pictures is
+%    needed which also contains the whole of pgf/TikZ... so this point
+%    is a bit moot...
+
+% For code-blocks, attachments of caption and continuation hints are done
+% exactly as prior to extension of Sphinx via this package, whether the box
+% has straight or rounded corners.  The vertical space occupied is the same,
+% if nothing else is changed (perhaps in future the title itself could be also
+% rendered in a rounded box?)
+
+%%%%%%%%
+%//// \spx@boxes@fcolorbox@rectangle
+%
+% This box will have the same baseline as its argument (which is typeset in
+% horizontal mode).  It takes into account four border widths parameters, four
+% padding parameters, two shadow widths (each possibly negative), and three
+% colors: background, border and shadow.  Its boundary box takes into account
+% border and padding.  Width of shadow is taken into account if the boolean
+% \ifspx@boxes@shadowinbbox is \iftrue.  The "setup" sets it to \iffalse.
+% Prior to 6.2.0, shadow size was included in bbox but the callers manually
+% removed it by extra steps.  The \sphinxbox command sets it to \iftrue after
+% the "setup".
+%
+% It is up to the caller to take extra steps if the border and padding must go
+% into margin as well (see sphinxlatexliterals.sty for how this is done in
+% \spx@verb@FrameCommand).
+%
+% In usage as a "FrameCommand" with framed.sty, the argument will already be a
+% collection of TeX boxes (and interline glues).
+%
+% This was designed so that the parameters configured by "setup" are
+% interpreted as they would be as CSS properties in an HTML context.
+\long\def\spx@boxes@fcolorbox@rectangle#1{%
+  \hbox\bgroup
+  \setbox\spx@tempboxa
+   \hbox{\kern\dimexpr\spx@boxes@border@left+\spx@boxes@padding@left\relax
+         {#1}%
+         \kern\dimexpr\spx@boxes@padding@right+\spx@boxes@border@right\relax}%
+  \ht\spx@tempboxa
+     \dimexpr\ht\spx@tempboxa+\spx@boxes@border@top+\spx@boxes@padding@top\relax
+  \dp\spx@tempboxa
+     \dimexpr\dp\spx@tempboxa+\spx@boxes@padding@bottom+\spx@boxes@border@bottom\relax
+  \ifspx@boxes@insetshadow
+     \expandafter\spx@boxes@fcolorbox@insetshadow
+  \else
+     \expandafter\spx@boxes@fcolorbox@externalshadow
+  \fi
+}
+
+% external shadow
+\def\spx@boxes@fcolorbox@externalshadow{%
+  % reserve space to external shadow if on left
+  \ifspx@boxes@withshadow
+   \ifspx@boxes@shadowinbbox
+    \ifdim\spx@boxes@shadow@xoffset<\z@\kern-\spx@boxes@shadow@xoffset\fi
+   \fi
+  \fi
+  % BACKGROUND
+  % draw background and move back to reference point
+  \ifspx@boxes@withbackgroundcolor
+   {\color{spx@boxes@backgroundcolor}%
+    \vrule\@height\ht\spx@tempboxa
+          \@depth\dp\spx@tempboxa
+          \@width\wd\spx@tempboxa
+    \kern-\wd\spx@tempboxa
+    }%
+  \fi
+  % BOX SHADOW
+  % draw shadow and move back to reference point
+  \ifspx@boxes@withshadow
+  \vbox{%
+    \moveright\spx@boxes@shadow@xoffset
+    \hbox{\lower\spx@boxes@shadow@yoffset
+          \vbox{\ifspx@boxes@withshadowcolor
+                    \color{spx@boxes@shadowcolor}%
+                \else
+                    % 6.2.0: guard against a manually inserted \color command in
+                    % contents which could leak at a page break to the shadow
+                    \normalcolor
+                \fi
+                \ifdim\spx@boxes@shadow@yoffset<\z@
+                  \hrule\@height-\spx@boxes@shadow@yoffset
+                  \kern\spx@boxes@shadow@yoffset
+                \fi
+                \setbox\spx@tempboxb\hb@xt@\wd\spx@tempboxa{%
+                 \ifdim\spx@boxes@shadow@xoffset<\z@\vrule\@width-\spx@boxes@shadow@xoffset\fi
+                 \hss
+                 \ifdim\spx@boxes@shadow@xoffset>\z@\vrule\@width\spx@boxes@shadow@xoffset\fi
+                 }%
+                \ht\spx@tempboxb\ht\spx@tempboxa
+                \dp\spx@tempboxb\dp\spx@tempboxa
+                \box\spx@tempboxb
+                \ifdim\spx@boxes@shadow@yoffset>\z@
+                  \kern-\spx@boxes@shadow@yoffset
+                  \hrule\@height\spx@boxes@shadow@yoffset
+                \fi
+                \kern-\dp\spx@tempboxa
+               }% end of \vbox, attention it will have zero depth if yoffset>0
+          \kern-\wd\spx@tempboxa
+          \ifdim\spx@boxes@shadow@xoffset>\z@
+            \kern-\spx@boxes@shadow@xoffset
+          \fi
+         }% end of \hbox, attention its depth is only yoffset if yoffset>0
+       }% end of \vbox
+  \fi % end of shadow drawing, and we are back to horizontal reference point
+  % BOX BORDER
+  \vbox{\ifspx@boxes@withbordercolor
+            \color{spx@boxes@bordercolor}%
+        \else
+            % 6.2.0: guard against a \color command in contents whose effect
+            % could leak to border at a pagebreak
+            \normalcolor
+        \fi
+        \hrule\@height\spx@boxes@border@top
+           \kern-\spx@boxes@border@top
+        \setbox\spx@tempboxb\hb@xt@\wd\spx@tempboxa
+                  {\vrule\@width\spx@boxes@border@left
+                   \hss\vrule\@width\spx@boxes@border@right
+                  }%
+            \ht\spx@tempboxb\ht\spx@tempboxa
+            \dp\spx@tempboxb\dp\spx@tempboxa
+        \box\spx@tempboxb
+        \kern-\spx@boxes@border@bottom
+        \hrule\@height\spx@boxes@border@bottom
+        \kern-\dp\spx@tempboxa
+       }% attention this box has zero depth due to \hrule at bottom
+  % step back to horizontal reference point
+  \kern-\wd\spx@tempboxa
+  % end of border drawing
+  % CONTENTS
+  % adjust the total depth to include the bottom shadow
+  \ifspx@boxes@withshadow
+    \ifdim\spx@boxes@shadow@yoffset>\z@
+      \dp\spx@tempboxa\dimexpr\dp\spx@tempboxa+\spx@boxes@shadow@yoffset\relax
+    \fi
+  \fi
+  \box\spx@tempboxa
+  % include lateral shadow in total width
+  \ifspx@boxes@withshadow
+   \ifspx@boxes@shadowinbbox
+    \ifdim\spx@boxes@shadow@xoffset>\z@\kern\spx@boxes@shadow@xoffset\fi
+   \fi
+  \fi
+  \egroup
+}
+
+% inset shadow
+%
+% The parameters signs are interpreted as in CSS styling.
+\def\spx@boxes@fcolorbox@insetshadow{%
+  % BACKGROUND
+  % draw background and move back to reference point
+  \ifspx@boxes@withbackgroundcolor
+   {\color{spx@boxes@backgroundcolor}%
+    \vrule\@height\ht\spx@tempboxa
+          \@depth\dp\spx@tempboxa
+          \@width\wd\spx@tempboxa
+    \kern-\wd\spx@tempboxa
+    }%
+  \fi
+  % BOX SHADOW
+  % draw shadow and move back to reference point
+  \ifspx@boxes@withshadow
+    \hbox{\vbox{\ifspx@boxes@withshadowcolor
+                    \color{spx@boxes@shadowcolor}%
+                \else
+                    % 6.2.0: guard against a manually inserted \color command in
+                    % contents which could leak at a page break to the shadow
+                    \normalcolor
+                \fi
+% NOTA BENE
+% We deliberately draw shadow partially under an area later covered by frame
+% with the idea to avoid anti-aliasing problems but in fact this may be a bad
+% idea with border is thin.
+% This may need some extra testing with PDF viewers... reports welcome!
+                \ifdim\spx@boxes@shadow@yoffset>\z@
+                  \hrule\@height\dimexpr\spx@boxes@border@top+\spx@boxes@shadow@yoffset\relax
+                  \kern-\spx@boxes@shadow@yoffset
+                  \kern-\spx@boxes@border@top
+                \fi
+                \setbox\spx@tempboxb\hb@xt@\wd\spx@tempboxa{%
+                 \ifdim\spx@boxes@shadow@xoffset>\z@
+                  \vrule\@width\dimexpr\spx@boxes@border@left+\spx@boxes@shadow@xoffset\relax\fi
+                 \hss
+                 \ifdim\spx@boxes@shadow@xoffset<\z@
+                  \vrule\@width\dimexpr-\spx@boxes@shadow@xoffset+\spx@boxes@border@right\relax\fi
+                 }%
+                \ht\spx@tempboxb\ht\spx@tempboxa
+                \dp\spx@tempboxb\dp\spx@tempboxa
+                \box\spx@tempboxb
+                \ifdim\spx@boxes@shadow@yoffset<\z@
+                  \kern\spx@boxes@shadow@yoffset
+                  \kern-\spx@boxes@border@bottom
+                  \hrule\@height\dimexpr-\spx@boxes@shadow@yoffset+\spx@boxes@border@bottom\relax
+                \fi
+                \kern-\dp\spx@tempboxa
+               }% end of \vbox, attention it will have zero depth if yoffset<0
+          \kern-\wd\spx@tempboxa
+         }% end of \hbox, attention its depth is only |yoffset| if yoffset<0
+  \fi % end of inset shadow drawing, and we are back to horizontal reference point
+  % BOX BORDER
+  \vbox{\ifspx@boxes@withbordercolor
+            \color{spx@boxes@bordercolor}%
+        \else
+            % 6.2.0: guard against a \color command in contents whose effect
+            % could leak to border at a pagebreak
+            \normalcolor
+        \fi
+        \hrule\@height\spx@boxes@border@top
+           \kern-\spx@boxes@border@top
+        \setbox\spx@tempboxb\hb@xt@\wd\spx@tempboxa
+                  {\vrule\@width\spx@boxes@border@left
+                   \hss\vrule\@width\spx@boxes@border@right
+                  }%
+            \ht\spx@tempboxb\ht\spx@tempboxa
+            \dp\spx@tempboxb\dp\spx@tempboxa
+        \box\spx@tempboxb
+        \kern-\spx@boxes@border@bottom
+        \hrule\@height\spx@boxes@border@bottom
+        \kern-\dp\spx@tempboxa
+       }% attention this box has zero depth due to \hrule at bottom
+  % step back to horizontal reference point
+  \kern-\wd\spx@tempboxa
+  % end of border drawing
+  % CONTENTS
+  \box\spx@tempboxa
+  \egroup
+}
+
+% let's abort input if pict2e package could not be loaded.
+% To be extra safe we also alias @rounded to @rectangle but
+% a priori the architecture is done so that @rounded will never
+% be called in that case by other Sphinx LaTeX components.
+\@ifpackageloaded{pict2e}
+  {}
+  {\def\spx@boxes@fcolorbox@rounded{\spx@boxes@fcolorbox@rectangle}%
+   \endinput
+  }
+
+% we proceed now in the context of pict2e being available and loaded
+% (TeX being a macro-expansion based language it would have
+%  swallowed all the coming definitions even if pict2e
+%  had in fact not been loaded... but we aborted the input above)
+%%%%%%%%
+%//// \spx@boxes@fcolorbox@rounded
+%
+% Prior to 6.2.0, a constant border-width was applied as the border was
+% obtained as a \strokepath.  This allowed 4 distinct radii but not to vary the
+% border widths.  Now the border is drawn by two \fillpath operation, the first
+% one filling up to external border, the second one actually filling for the
+% background paradoxically on top of it, up to internal border path.
+%
+% This 6.2.0 abandonment of \strokepath allowed great simplification in
+% supporting opentop, openbottom and openboth situations, and it can
+% allow automatic support of openleft and openright analogs.
+%
+% And 6.2.0 also implements elliptical arcs thanks to ellipse package,
+% which extends pict2e.
+
+% Currently, inset shadow is not supported.
+%
+% Prior to 6.2.0 an inset shadow triggered the rectangle variant, so we never
+% ended here, but now it is simply ignored.  This change does not appear to me
+% to be breaking, as it changes output only for conf.py's specifying both
+% rounded corners and an inset shadow and the documentation said it was
+% incompatible.
+
+% wrappers for pict2e usage if old
+% Better not to copy over 2020 pict2e definitions in case
+% something internal changes
+% However our wrappers will work ONLY with dimensional inputs
+% No need to pre-expand the arguments
+% Braces in case the expression uses parentheses
+\def\spx@moveto(#1,#2){\moveto({\strip@pt\dimexpr#1\relax},{\strip@pt\dimexpr#2\relax})}
+\def\spx@lineto(#1,#2){\lineto({\strip@pt\dimexpr#1\relax},{\strip@pt\dimexpr#2\relax})}
+% attention here the [N] becomes mandatory
+% \circlearc[<N>]{<X>}{<Y>}{<RAD>}{<ANGLE1>}{<ANGLE2>}
+\def\spx@circlearc[#1]#2#3#4%#5#6
+   {\circlearc[#1]{\strip@pt\dimexpr#2\relax}%
+                  {\strip@pt\dimexpr#3\relax}%
+                  {\strip@pt\dimexpr#4\relax}%
+   }
+% attention here too the [N] becomes mandatory
+% the core path macro of ellipse.sty.  Thanks to Daan Leijen, author of this
+% package.
+% \elliparc [<initial>]{<center-x>}{<center-y>}{<x-rad>}{<y-rad>}{<start-angle>}{<end-angle>}
+% maybe this wrapper is unneeded but I don't have real time to check
+\def\spx@elliparc[#1]#2#3#4#5%#6#7
+   {\elliparc[#1]{\strip@pt\dimexpr#2\relax}%
+                 {\strip@pt\dimexpr#3\relax}%
+                 {\strip@pt\dimexpr#4\relax}%
+                 {\strip@pt\dimexpr#5\relax}%
+   }
+
+% Macro whose execution prepares a path to be either stroked or filled
+% Only fill operation is used at 6.2.0.  The radii are given by the set box
+% parameters, but the width and height are in \spx@width and \spx@height.  A
+% \put command will be used for appropriate shifts.
+% 6.2.0 adds elliptical corners!
+% But I feel perhaps I need to think about how x-radius and y-radius should
+% interact with border-width.  So consider output WIP for time being.
+\def\spx@boxes@border@defpath{%
+  \spx@moveto(\spx@boxes@radius@bottomleft@x,\z@)% our \spx@moveto is a bit rigid
+                                                 % and we must use \z@ not 0 here
+  \spx@lineto(\spx@width-\spx@boxes@radius@bottomright@x,\z@)%
+  % x and y radii are either both positive or both zero
+  % probably not needed to actually guard against the latter case,
+  % let's do it nevertheless
+  \ifdim\spx@boxes@radius@bottomright@x>\z@
+    \ifdim\spx@boxes@radius@bottomright@x=\spx@boxes@radius@bottomright@y
+      \spx@circlearc[2]{\spx@width-\spx@boxes@radius@bottomright@x}%
+                       {\spx@boxes@radius@bottomright@y}%
+                       {\spx@boxes@radius@bottomright@x}{-90}{0}%
+    \else
+      \spx@elliparc[2]{\spx@width-\spx@boxes@radius@bottomright@x}%
+                      {\spx@boxes@radius@bottomright@y}%
+                      {\spx@boxes@radius@bottomright@x}
+                      {\spx@boxes@radius@bottomright@y}{-90}{0}%
+    \fi
+  \fi
+  \spx@lineto(\spx@width,%
+              \spx@height-\spx@boxes@radius@topright@y)%
+  \ifdim\spx@boxes@radius@topright@x>\z@
+    \ifdim\spx@boxes@radius@topright@x=\spx@boxes@radius@topright@y
+      \spx@circlearc[2]{\spx@width-\spx@boxes@radius@topright@x}
+                       {\spx@height-\spx@boxes@radius@topright@y}%
+                       {\spx@boxes@radius@topright@x}{0}{90}%
+    \else
+      \spx@elliparc[2]{\spx@width-\spx@boxes@radius@topright@x}
+                      {\spx@height-\spx@boxes@radius@topright@y}%
+                      {\spx@boxes@radius@topright@x}%
+                      {\spx@boxes@radius@topright@y}{0}{90}%
+    \fi
+  \fi
+  \spx@lineto(\spx@boxes@radius@topleft@x,\spx@height)%
+  \ifdim\spx@boxes@radius@topleft@x>\z@
+    \ifdim\spx@boxes@radius@topleft@x=\spx@boxes@radius@topleft@y
+      \spx@circlearc[2]{\spx@boxes@radius@topleft@x}%
+                       {\spx@height-\spx@boxes@radius@topleft@y}%
+                       {\spx@boxes@radius@topleft@x}{90}{180}%
+    \else
+      \spx@elliparc[2]{\spx@boxes@radius@topleft@x}%
+                      {\spx@height-\spx@boxes@radius@topleft@y}%
+                      {\spx@boxes@radius@topleft@x}%
+                      {\spx@boxes@radius@topleft@y}{90}{180}%
+    \fi
+  \fi
+  \spx@lineto(\z@,\spx@boxes@radius@bottomleft@y)%
+  \ifdim\spx@boxes@radius@bottomleft@x>\z@
+    \ifdim\spx@boxes@radius@bottomleft@x=\spx@boxes@radius@bottomleft@y
+      \spx@circlearc[2]{\spx@boxes@radius@bottomleft@x}%
+                       {\spx@boxes@radius@bottomleft@y}%
+                       {\spx@boxes@radius@bottomleft@x}{180}{270}%
+    \else
+      \spx@elliparc[2]{\spx@boxes@radius@bottomleft@x}%
+                      {\spx@boxes@radius@bottomleft@y}%
+                      {\spx@boxes@radius@bottomleft@x}%
+                      {\spx@boxes@radius@bottomleft@y}{180}{270}%
+    \fi
+  \fi
+}% end of definition of \spx@boxes@border@defpath
+
+% The customization of the various parameters must have been done via an
+% appropriate call to \spx@boxes@fcolorbox@setup, which will have set up
+% \spx@boxes@fcolorbox to expand to \spx@boxes@fcolorbox@rounded, and will
+% have set its various parameters.
+%
+\long\def\spx@boxes@fcolorbox@rounded #1{%
+  \hbox{%
+   \ifspx@boxes@withshadow
+     \ifspx@boxes@insetshadow
+       \spx@boxes@withshadowfalse % ignore inset shadow
+     \fi
+   \fi
+   % reserve space to external shadow if on left
+   \ifspx@boxes@withshadow
+    \ifspx@boxes@shadowinbbox
+     \ifdim\spx@boxes@shadow@xoffset<\z@\kern-\spx@boxes@shadow@xoffset\fi
+    \fi
+   \fi
+   \vbox{%
+     % adjust vertical bbox
+     \ifspx@boxes@withshadow
+       \ifdim\spx@boxes@shadow@yoffset<\z@
+           \kern-\spx@boxes@shadow@yoffset
+       \fi
+     \fi
+     \setlength{\unitlength}{1pt}%
+     \setbox\spx@tempboxa
+     \hbox{\kern\dimexpr\spx@boxes@border@left+\spx@boxes@padding@left\relax
+           {#1}%
+           \kern\dimexpr\spx@boxes@padding@right+\spx@boxes@border@right\relax}%
+     \ht\spx@tempboxa
+     \dimexpr\ht\spx@tempboxa+\spx@boxes@border@top+\spx@boxes@padding@top\relax
+     \dp\spx@tempboxa
+     \dimexpr\dp\spx@tempboxa+\spx@boxes@padding@bottom+\spx@boxes@border@bottom\relax
+     \edef\spx@width{\number\wd\spx@tempboxa sp}%
+     \edef\spx@height{\number\dimexpr\ht\spx@tempboxa+\dp\spx@tempboxa sp}%
+     \hbox{%
+   \begin{picture}%
+      % \strip@pt\dimexpr to work around "old" LaTeX picture limitation
+      % (we could use the "picture" package, this would add another dependency)
+      (\strip@pt\dimexpr\spx@width\relax,\strip@pt\dimexpr\spx@height\relax)%
+      \spx@boxes@border@defpath
+      \ifspx@boxes@withshadow
+              \ifspx@boxes@withshadowcolor
+                 \color{spx@boxes@shadowcolor}%
+              \else
+                 % 6.2.0: here and elsewhere guard against a manually inserted
+                 % \color command in contents which could leak to the shadow
+                 % to the shadow
+                 \normalcolor
+              \fi
+              \put(\strip@pt\spx@boxes@shadow@xoffset,%
+                   \strip@pt\dimexpr-\spx@boxes@shadow@yoffset\relax)
+                   {\fillpath}%
+      \fi
+      \spx@boxes@border@defpath% must be redone after each \fillpath! (even if
+                               % was in a  \put)
+      \ifspx@boxes@withbordercolor
+         \color{spx@boxes@bordercolor}%
+      \else
+         \normalcolor
+      \fi
+      \fillpath
+      \ifspx@boxes@withbackgroundcolor
+         \color{spx@boxes@backgroundcolor}%
+      \else
+         \color{white}%
+      \fi
+      \edef\spx@width{\number\dimexpr\spx@width-\spx@boxes@border@left
+                                               -\spx@boxes@border@right sp}%
+      \edef\spx@height{\number\dimexpr\spx@height-\spx@boxes@border@top
+                                                 -\spx@boxes@border@bottom sp}%
+      % redefine a path (in relative coordinates) matching the area delimited
+      % by the internal borders
+      \spx@boxes@border@defpath
+      % use \put to shift, and fill it with background color
+      \put(\strip@pt\spx@boxes@border@left,\strip@pt\spx@boxes@border@bottom)
+          {\fillpath}%
+   \end{picture}}% end of picture \hbox in \vbox
+   % back-up vertically for outputting the contents
+   \kern-\dimexpr\ht\spx@tempboxa+\dp\spx@tempboxa\relax
+     % adjust vertical bbox
+     \ifspx@boxes@withshadow
+       \ifdim\spx@boxes@shadow@yoffset>\z@
+           \dp\spx@tempboxa\dimexpr\dp\spx@tempboxa+\spx@boxes@shadow@yoffset\relax
+       \fi
+     \fi
+   % inhibit TeX's "line skip" adjustment when piling up hboxes in a vbox
+   \nointerlineskip
+   \box\spx@tempboxa
+   }% end of \vbox
+  % include lateral shadow in total width
+  \ifspx@boxes@withshadow
+   \ifspx@boxes@shadowinbbox
+    \ifdim\spx@boxes@shadow@xoffset>\z@\kern\spx@boxes@shadow@xoffset\fi
+   \fi
+  \fi
+  }% end of \hbox
+}%
+
+
+\endinput

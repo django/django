@@ -1,0 +1,23 @@
+{#
+    classic/layout.html
+    ~~~~~~~~~~~~~~~~~~~
+
+    Sphinx layout template for the classic theme.
+
+    :copyright: Copyright 2007-2023 by the Sphinx team, see AUTHORS.
+    :license: BSD, see LICENSE for details.
+#}
+{%- extends "basic/layout.html" %}
+
+{%- block scripts %}
+    {{ super() }}
+    {% if theme_collapsiblesidebar|tobool %}
+    <script src="{{ pathto('_static/sidebar.js', 1) }}"></script>
+    {% endif %}
+{%- endblock %}
+
+{%- block sidebarextra %}{% if theme_collapsiblesidebar|tobool %}
+<div id="sidebarbutton" title="{{ _('Collapse sidebar') }}">
+<span>{{ '»' if theme_rightsidebar|tobool else '«' }}</span>
+</div>
+{% endif %}{% endblock %}

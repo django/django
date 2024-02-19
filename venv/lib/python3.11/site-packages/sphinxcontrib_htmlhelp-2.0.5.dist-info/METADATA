@@ -1,0 +1,65 @@
+Metadata-Version: 2.1
+Name: sphinxcontrib-htmlhelp
+Version: 2.0.5
+Summary: sphinxcontrib-htmlhelp is a sphinx extension which renders HTML help files
+Author-email: Georg Brandl <georg@python.org>
+Requires-Python: >=3.9
+Description-Content-Type: text/x-rst
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Console
+Classifier: Environment :: Web Environment
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Education
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Framework :: Sphinx
+Classifier: Framework :: Sphinx :: Extension
+Classifier: Topic :: Documentation
+Classifier: Topic :: Documentation :: Sphinx
+Classifier: Topic :: Text Processing
+Classifier: Topic :: Utilities
+Requires-Dist: flake8 ; extra == "lint"
+Requires-Dist: mypy ; extra == "lint"
+Requires-Dist: docutils-stubs ; extra == "lint"
+Requires-Dist: Sphinx>=5 ; extra == "standalone"
+Requires-Dist: pytest ; extra == "test"
+Requires-Dist: html5lib ; extra == "test"
+Project-URL: Changelog, https://www.sphinx-doc.org/en/master/changes.html
+Project-URL: Code, https://github.com/sphinx-doc/sphinxcontrib-htmlhelp
+Project-URL: Download, https://pypi.org/project/sphinxcontrib-htmlhelp/
+Project-URL: Homepage, https://www.sphinx-doc.org/
+Project-URL: Issue tracker, https://github.com/sphinx-doc/sphinx/issues
+Provides-Extra: lint
+Provides-Extra: standalone
+Provides-Extra: test
+
+======================
+sphinxcontrib-htmlhelp
+======================
+
+sphinxcontrib-htmlhelp is a sphinx extension which renders HTML help files.
+
+For more details, please visit http://www.sphinx-doc.org/.
+
+Installing
+==========
+
+Install from PyPI::
+
+   pip install -U sphinxcontrib-htmlhelp
+
+Contributing
+============
+
+See `CONTRIBUTING.rst`__
+
+.. __: https://github.com/sphinx-doc/sphinx/blob/master/CONTRIBUTING.rst
+

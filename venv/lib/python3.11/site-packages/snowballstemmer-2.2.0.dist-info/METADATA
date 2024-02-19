@@ -1,0 +1,163 @@
+Metadata-Version: 2.1
+Name: snowballstemmer
+Version: 2.2.0
+Summary: This package provides 29 stemmers for 28 languages generated from Snowball algorithms.
+Home-page: https://github.com/snowballstem/snowball
+Author: Snowball Developers
+Author-email: snowball-discuss@lists.tartarus.org
+License: BSD-3-Clause
+Keywords: stemmer
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Natural Language :: Arabic
+Classifier: Natural Language :: Basque
+Classifier: Natural Language :: Catalan
+Classifier: Natural Language :: Danish
+Classifier: Natural Language :: Dutch
+Classifier: Natural Language :: English
+Classifier: Natural Language :: Finnish
+Classifier: Natural Language :: French
+Classifier: Natural Language :: German
+Classifier: Natural Language :: Greek
+Classifier: Natural Language :: Hindi
+Classifier: Natural Language :: Hungarian
+Classifier: Natural Language :: Indonesian
+Classifier: Natural Language :: Irish
+Classifier: Natural Language :: Italian
+Classifier: Natural Language :: Lithuanian
+Classifier: Natural Language :: Nepali
+Classifier: Natural Language :: Norwegian
+Classifier: Natural Language :: Portuguese
+Classifier: Natural Language :: Romanian
+Classifier: Natural Language :: Russian
+Classifier: Natural Language :: Serbian
+Classifier: Natural Language :: Spanish
+Classifier: Natural Language :: Swedish
+Classifier: Natural Language :: Tamil
+Classifier: Natural Language :: Turkish
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 2.6
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.4
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Programming Language :: Python :: Implementation :: PyPy
+Classifier: Topic :: Database
+Classifier: Topic :: Internet :: WWW/HTTP :: Indexing/Search
+Classifier: Topic :: Text Processing :: Indexing
+Classifier: Topic :: Text Processing :: Linguistic
+Description-Content-Type: text/x-rst
+License-File: COPYING
+
+Snowball stemming library collection for Python
+===============================================
+
+Python 3 (>= 3.3) is supported.  We no longer actively support Python 2 as
+the Python developers stopped supporting it at the start of 2020.  Snowball
+2.1.0 was the last release to officially support Python 2.
+
+What is Stemming?
+-----------------
+
+Stemming maps different forms of the same word to a common "stem" - for
+example, the English stemmer maps *connection*, *connections*, *connective*,
+*connected*, and *connecting* to *connect*.  So a searching for *connected*
+would also find documents which only have the other forms.
+
+This stem form is often a word itself, but this is not always the case as this
+is not a requirement for text search systems, which are the intended field of
+use.  We also aim to conflate words with the same meaning, rather than all
+words with a common linguistic root (so *awe* and *awful* don't have the same
+stem), and over-stemming is more problematic than under-stemming so we tend not
+to stem in cases that are hard to resolve.  If you want to always reduce words
+to a root form and/or get a root form which is itself a word then Snowball's
+stemming algorithms likely aren't the right answer.
+
+How to use library
+------------------
+
+The ``snowballstemmer`` module has two functions.
+
+The ``snowballstemmer.algorithms`` function returns a list of available
+algorithm names.
+
+The ``snowballstemmer.stemmer`` function takes an algorithm name and returns a
+``Stemmer`` object.
+
+``Stemmer`` objects have a ``Stemmer.stemWord(word)`` method and a
+``Stemmer.stemWords(word[])`` method.
+
+.. code-block:: python
+
+   import snowballstemmer
+
+   stemmer = snowballstemmer.stemmer('english');
+   print(stemmer.stemWords("We are the world".split()));
+
+Automatic Acceleration
+----------------------
+
+`PyStemmer <https://pypi.org/project/PyStemmer/>`_ is a wrapper module for
+Snowball's ``libstemmer_c`` and should provide results 100% compatible to
+**snowballstemmer**.
+
+**PyStemmer** is faster because it wraps generated C versions of the stemmers;
+**snowballstemmer** uses generate Python code and is slower but offers a pure
+Python solution.
+
+If PyStemmer is installed, ``snowballstemmer.stemmer`` returns a ``PyStemmer``
+``Stemmer`` object which provides the same ``Stemmer.stemWord()`` and
+``Stemmer.stemWords()`` methods.
+
+Benchmark
+~~~~~~~~~
+
+This is a crude benchmark which measures the time for running each stemmer on
+every word in its sample vocabulary (10,787,583 words over 26 languages).  It's
+not a realistic test of normal use as a real application would do much more
+than just stemming.  It's also skewed towards the stemmers which do more work
+per word and towards those with larger sample vocabularies.
+
+* Python 2.7 + **snowballstemmer** : 13m00s (15.0 * PyStemmer)
+* Python 3.7 + **snowballstemmer** : 12m19s (14.2 * PyStemmer)
+* PyPy 7.1.1 (Python 2.7.13) + **snowballstemmer** : 2m14s (2.6 * PyStemmer)
+* PyPy 7.1.1 (Python 3.6.1) + **snowballstemmer** : 1m46s (2.0 * PyStemmer)
+* Python 2.7 + **PyStemmer** : 52s
+
+For reference the equivalent test for C runs in 9 seconds.
+
+These results are for Snowball 2.0.0.  They're likely to evolve over time as
+the code Snowball generates for both Python and C continues to improve (for
+a much older test over a different set of stemmers using Python 2.7,
+**snowballstemmer** was 30 times slower than **PyStemmer**, or 9 times slower
+with **PyPy**).
+
+The message to take away is that if you're stemming a lot of words you should
+either install **PyStemmer** (which **snowballstemmer** will then automatically
+use for you as described above) or use PyPy.
+
+The TestApp example
+-------------------
+
+The ``testapp.py`` example program allows you to run any of the stemmers
+on a sample vocabulary.
+
+Usage::
+
+   testapp.py <algorithm> "sentences ... "
+
+.. code-block:: bash
+
+   $ python testapp.py English "sentences... "
+
+

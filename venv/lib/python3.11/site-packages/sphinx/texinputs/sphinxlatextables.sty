@@ -1,0 +1,1246 @@
+%% TABLES (WITH SUPPORT FOR MERGED CELLS OF GENERAL CONTENTS)
+%
+% change this info string if making any custom modification
+\ProvidesFile{sphinxlatextables.sty}[2022/08/15 tables]%
+
+% Provides support for this output mark-up from Sphinx latex writer
+% and table templates:
+%
+% - the tabulary and longtable environments from the eponymous packages
+% - the varwidth environment
+% - the >{} etc mark-up possible in tabularcolumns is from array package
+%     which is loaded by longtable and tabulary
+% - \X, \Y, T column types; others (L, C, R, J) are from tabulary package
+% - \sphinxaftertopcaption
+% - \sphinxatlongtableend
+% - \sphinxatlongtablestart
+% - \sphinxattableend
+% - \sphinxattablestart
+% - \sphinxcapstartof
+% - \sphinxcolwidth
+% - \sphinxlongtablecapskipadjust
+% - \sphinxmultirow
+% - \sphinxstartmulticolumn
+% - \sphinxstopmulticolumn
+% - \sphinxtablestrut
+% - \sphinxthecaptionisattop
+% - \sphinxthelongtablecaptionisattop
+% - \sphinxhline
+% - \sphinxcline
+% - \sphinxvlinecrossing
+% - \sphinxfixclines
+% - \sphinxtoprule
+% - \sphinxmidrule
+% - \sphinxbottomrule
+% - \sphinxtableatstartofbodyhook
+% - \sphinxtableafterendhook
+% - \sphinxthistablewithglobalstyle
+% - \sphinxthistablewithbooktabsstyle
+% - \sphinxthistablewithborderlessstyle
+% - \sphinxthistablewithstandardstyle
+% - \sphinxthistablewithcolorrowsstyle
+% - \sphinxthistablewithnocolorrowsstyle
+% - \sphinxthistablewithvlinesstyle
+% - \sphinxthistablewithnovlinesstyle
+%
+% Executes \RequirePackage for:
+%
+% - tabulary
+% - longtable
+% - varwidth
+% - colortbl
+% - booktabs if 'booktabs' in latex_table_style
+%
+% Extends tabulary and longtable via patches and custom macros to support
+% merged cells possibly containing code-blocks in complex tables
+
+\RequirePackage{tabulary}
+% tabulary has a bug with its re-definition of \multicolumn in its first pass
+% which is not \long. But now Sphinx does not use LaTeX's \multicolumn but its
+% own macro. Hence we don't even need to patch tabulary. See
+% sphinxpackagemulticell.sty
+% X or S (Sphinx) may have meanings if some table package is loaded hence
+% \X was chosen to avoid possibility of conflict
+\newcolumntype{\X}[2]{p{\dimexpr
+      (\linewidth-\spx@arrayrulewidth)*#1/#2-\tw@\tabcolsep-\spx@arrayrulewidth\relax}}
+\newcolumntype{\Y}[1]{p{\dimexpr
+      #1\dimexpr\linewidth-\spx@arrayrulewidth\relax-\tw@\tabcolsep-\spx@arrayrulewidth\relax}}
+% \spx@arrayrulewidth is used internally and its meaning will be set according
+% to the table type; no extra user code should modify it.  In particular any
+% \setlength{\spx@arrayrulewidth}{...} may break all of LaTeX... (really...)
+\def\spx@arrayrulewidth{\arrayrulewidth}% 5.3.0, to be adjusted by each table
+% using here T (for Tabulary) feels less of a problem than the X could be
+\newcolumntype{T}{J}%
+% For tables allowing pagebreaks
+\RequirePackage{longtable}
+% User interface to set-up whitespace before and after tables:
+\newcommand*\sphinxtablepre {0pt}%
+\newcommand*\sphinxtablepost{\medskipamount}%
+% Space from caption baseline to top of table or frame of literal-block
+\newcommand*\sphinxbelowcaptionspace{.5\sphinxbaselineskip}%
+% as one can not use \baselineskip from inside longtable (it is zero there)
+% we need \sphinxbaselineskip, which defaults to \baselineskip
+\def\sphinxbaselineskip{\baselineskip}%
+% The following is to ensure that, whether tabular(y) or longtable:
+% - if a caption is on top of table:
+%   a) the space between its last baseline and the top rule of table is
+%      exactly \sphinxbelowcaptionspace
+%   b) the space from last baseline of previous text to first baseline of
+%      caption is exactly \parskip+\baselineskip+ height of a strut.
+%   c) the caption text will wrap at width \LTcapwidth (4in)
+% - make sure this works also if "caption" package is loaded by user
+%   (with its width or margin option taking place of \LTcapwidth role)
+% TODO: obtain same for caption of literal block: a) & c) DONE, b) TO BE DONE
+%
+% To modify space below such top caption, adjust \sphinxbelowcaptionspace
+% To add or remove space above such top caption, adjust \sphinxtablepre:
+%   notice that \abovecaptionskip, \belowcaptionskip, \LTpre are **ignored**
+% A. Table with longtable
+\def\sphinxatlongtablestart
+   {\par
+    \vskip\parskip
+    \vskip\dimexpr\sphinxtablepre\relax % adjust vertical position
+    \vbox{}% get correct baseline from above
+    \LTpre\z@skip\LTpost\z@skip % set to zero longtable's own skips
+    \edef\sphinxbaselineskip{\dimexpr\the\dimexpr\baselineskip\relax\relax}%
+   }%
+% Compatibility with caption package
+\def\sphinxthelongtablecaptionisattop{%
+    \spx@ifcaptionpackage{\noalign{\vskip-\belowcaptionskip}}{}%
+}%
+% Achieves exactly \sphinxbelowcaptionspace below longtable caption
+\def\sphinxlongtablecapskipadjust
+   {\dimexpr-\dp\strutbox
+            -\spx@ifcaptionpackage{\abovecaptionskip}{\sphinxbaselineskip}%
+            +\sphinxbelowcaptionspace\relax}%
+\def\sphinxatlongtableend{\@nobreakfalse % latex3/latex2e#173
+    \prevdepth\z@\vskip\sphinxtablepost\relax}%
+% B. Table with tabular or tabulary
+\def\sphinxattablestart{\par\vskip\dimexpr\sphinxtablepre\relax}%
+\let\sphinxattableend\sphinxatlongtableend
+% This is used by tabular and tabulary templates
+\newcommand*\sphinxcapstartof[1]{%
+   \vskip\parskip
+   \vbox{}% force baselineskip for good positioning by capstart of hyperanchor
+   % hyperref puts the anchor 6pt above this baseline; in case of caption
+   % this baseline will be \ht\strutbox above first baseline of caption
+   \def\@captype{#1}%
+   \capstart
+% move back vertically, as tabular (or its caption) will compensate
+   \vskip-\baselineskip\vskip-\parskip
+}%
+\def\sphinxthecaptionisattop{% locate it after \sphinxcapstartof
+    \spx@ifcaptionpackage
+      {\caption@setposition{t}%
+       \vskip\baselineskip\vskip\parskip % undo those from \sphinxcapstartof
+       \vskip-\belowcaptionskip          % anticipate caption package skip
+       % caption package uses a \vbox, not a \vtop, so "single line" case
+       % gives different result from "multi-line" without this:
+       \nointerlineskip
+      }%
+      {}%
+}%
+\def\sphinxthecaptionisatbottom{% (not finalized; for template usage)
+    \spx@ifcaptionpackage{\caption@setposition{b}}{}%
+}%
+% The aim of \sphinxcaption is to apply to tabular(y) the maximal width
+% of caption as done by longtable
+\def\sphinxtablecapwidth{\LTcapwidth}%
+\newcommand\sphinxcaption{\@dblarg\spx@caption}%
+\long\def\spx@caption[#1]#2{%
+   \noindent\hb@xt@\linewidth{\hss
+      \vtop{\@tempdima\dimexpr\sphinxtablecapwidth\relax
+% don't exceed linewidth for the caption width
+            \ifdim\@tempdima>\linewidth\hsize\linewidth\else\hsize\@tempdima\fi
+% longtable ignores \abovecaptionskip/\belowcaptionskip, so do the same here
+            \abovecaptionskip\sphinxabovecaptionskip % \z@skip
+            \belowcaptionskip\sphinxbelowcaptionskip % \z@skip
+            \caption[{#1}]%
+               {\strut\ignorespaces#2\ifhmode\unskip\@finalstrut\strutbox\fi}%
+           }\hss}%
+   \par\prevdepth\dp\strutbox
+}%
+\def\sphinxabovecaptionskip{\z@skip}% Do not use! Flagged for removal
+\def\sphinxbelowcaptionskip{\z@skip}% Do not use! Flagged for removal
+% This wrapper of \abovecaptionskip is used in sphinxVerbatim for top
+% caption, and with another value in sphinxVerbatimintable
+% TODO: To unify space above caption of a code-block with the one above
+%       caption of a table/longtable, \abovecaptionskip must not be used
+%       This auxiliary will get renamed and receive a different meaning
+%       in future.
+\def\spx@abovecaptionskip{\abovecaptionskip}%
+% Achieve \sphinxbelowcaptionspace below a caption located above a tabular
+% or a tabulary
+\newcommand\sphinxaftertopcaption
+{%
+   \spx@ifcaptionpackage
+     {\par\prevdepth\dp\strutbox\nobreak\vskip-\abovecaptionskip}{\nobreak}%
+   \vskip\dimexpr\sphinxbelowcaptionspace\relax
+   \vskip-\baselineskip\vskip-\parskip
+}%
+% varwidth is crucial for our handling of general contents in merged cells
+\RequirePackage{varwidth}
+% but addition of a compatibility patch with hyperref is needed
+% (tested with varwidth v 0.92  Mar 2009)
+\AtBeginDocument {%
+    \let\@@vwid@Hy@raisedlink\Hy@raisedlink
+    \long\def\@vwid@Hy@raisedlink#1{\@vwid@wrap{\@@vwid@Hy@raisedlink{#1}}}%
+    \edef\@vwid@setup{%
+      \let\noexpand\Hy@raisedlink\noexpand\@vwid@Hy@raisedlink % HYPERREF !
+      \unexpanded\expandafter{\@vwid@setup}}%
+}%
+
+% NOTA BENE: since the multicolumn and multirow code was written Sphinx
+% decided to prefix non public internal macros by \spx@ and in fact all
+% such macros here should now be prefixed by \spx@table@, but doing the
+% update is delayed to later. (written at 5.3.0)
+
+%%%%%%%%%%%%%%%%%%%%%
+% --- MULTICOLUMN ---
+% standard LaTeX's \multicolumn
+% 1. does not allow verbatim contents,
+% 2. interacts very poorly with tabulary.
+%
+% It is needed to write own macros for Sphinx: to allow code-blocks in merged
+% cells rendered by tabular/longtable, and to allow multi-column cells with
+% paragraphs to be taken into account sanely by tabulary algorithm for column
+% widths.
+%
+% This requires quite a bit of hacking. First, in Sphinx, the multi-column
+% contents will *always* be wrapped in a varwidth environment. The issue
+% becomes to pass it the correct target width. We must trick tabulary into
+% believing the multicolumn is simply separate columns, else tabulary does not
+% incorporate the contents in its algorithm. But then we must clear the
+% vertical rules...
+%
+% configuration of tabulary
+\setlength{\tymin}{3\fontcharwd\font`0 }% minimal width of "squeezed" columns
+\setlength{\tymax}{10000pt}% allow enough room for paragraphs to "compete"
+% we need access to tabulary's final computed width. \@tempdima is too volatile
+% to hope it has kept tabulary's value when \sphinxcolwidth needs it.
+\newdimen\sphinx@TY@tablewidth
+\def\tabulary{%
+  \def\TY@final{\sphinx@TY@tablewidth\@tempdima\tabular}%
+  \let\endTY@final\endtabular
+  \TY@tabular}%
+% next hack is needed only if user has set latex_use_latex_multicolumn to True:
+% it fixes tabulary's bug with \multicolumn defined "short" in first pass. (if
+% upstream tabulary adds a \long, our extra one causes no harm)
+\def\sphinx@tempa #1\def\multicolumn#2#3#4#5#6#7#8#9\sphinx@tempa
+   {\def\TY@tab{#1\long\def\multicolumn####1####2####3{\multispan####1\relax}#9}}%
+\expandafter\sphinx@tempa\TY@tab\sphinx@tempa
+%
+% TN. 1: as \omit is never executed, Sphinx multicolumn does not need to worry
+% like standard multicolumn about |l| vs l|. On the other hand it assumes
+% columns are separated by a | ... (if not it will add extraneous
+% \arrayrulewidth space for each column separation in its estimate of available
+% width).
+%
+% Update at 5.3.0: code uses \spx@arrayrulewidth which is kept in sync with the
+% table column specification (aka preamble):
+% - no | in preamble:             \spx@arrayrulewidth -> \z@
+% - at least a | in the preamble: \spx@arrayrulewidth -> \arrayrulewidth
+% This is used for computation of merged cells widths.  Mixed preambles using
+% at least a | but not using it for all columns (as can be obtained via the
+% tabularcolumns directive) may cause some merged cells contents to be slightly
+% shifted to the left as they assume merged columns are | separated where in
+% fact they perhaps are not.
+%
+% TN. 1b: as Sphinx multicolumn uses neither \omit nor \span, it can not
+% (easily) get rid of extra macros from >{...} or <{...} between columns. At
+% least, it has been made compatible with colortbl's \columncolor.
+%
+% TN. 2: tabulary's second pass is handled like tabular/longtable's single
+% pass, with the difference that we hacked \TY@final to set in
+% \sphinx@TY@tablewidth the final target width as computed by tabulary. This is
+% needed only to handle columns with a "horizontal" specifier: "p" type columns
+% (inclusive of tabulary's LJRC) holds the target column width in the
+% \linewidth dimension.
+%
+% TN. 3: use of \begin{sphinxmulticolumn}...\end{sphinxmulticolumn} mark-up
+% would need some hacking around the fact that groups can not span across table
+% cells (the code does inserts & tokens, see TN1b). It was decided to keep it
+% simple with \sphinxstartmulticolumn...\sphinxstopmulticolumn.
+%
+% MEMO about nesting: if sphinxmulticolumn is encountered in a nested tabular
+% inside a tabulary it will think to be at top level in the tabulary. But
+% Sphinx generates no nested tables, and if some LaTeX macro uses internally a
+% tabular this will not have a \sphinxstartmulticolumn within it!
+%
+% 5.3.0 adds a check for multirow as single-row multi-column will allow a row
+% colour but multi-row multi-column should not.
+% Attention that this assumes \sphinxstartmulticolumn is always followed
+% in latex mark-up either by \sphinxmultirow or \begin (from \begin{varwidth}).
+\def\sphinxstartmulticolumn#1#2{%
+    \ifx\sphinxmultirow#2%
+        \gdef\spx@table@hackCT@inmergedcell{\spx@table@hackCT@nocolor}%
+    \else
+        \global\let\spx@table@hackCT@inmergedcell\spx@@table@hackCT@inmergedcell
+    \fi
+    \sphinx@startmulticolumn{#1}#2%
+}%
+\def\sphinx@startmulticolumn{%
+    \ifx\equation$% $ tabulary's first pass
+        \expandafter\sphinx@TYI@start@multicolumn
+    \else % either not tabulary or tabulary's second pass
+        \expandafter\sphinx@start@multicolumn
+    \fi
+}%
+\def\sphinxstopmulticolumn{%
+    \ifx\equation$% $ tabulary's first pass
+        \expandafter\sphinx@TYI@stop@multicolumn
+    \else % either not tabulary or tabulary's second pass
+        \ignorespaces
+    \fi
+}%
+\def\sphinx@TYI@start@multicolumn#1{%
+    % use \gdef always to avoid stack space build up
+    \gdef\sphinx@tempa{#1}\begingroup\setbox\z@\hbox\bgroup
+}%
+\def\sphinx@TYI@stop@multicolumn{\egroup % varwidth was used with \tymax
+    \xdef\sphinx@tempb{\the\dimexpr\wd\z@/\sphinx@tempa}% per column width
+    \endgroup
+    \expandafter\sphinx@TYI@multispan\expandafter{\sphinx@tempa}%
+}%
+\def\sphinx@TYI@multispan #1{%
+    \kern\sphinx@tempb\ignorespaces % the per column occupied width
+    \ifnum#1>\@ne % repeat, taking into account subtleties of TeX's & ...
+      \expandafter\sphinx@TYI@multispan@next\expandafter{\the\numexpr#1-\@ne\expandafter}%
+    \fi
+}%
+\def\sphinx@TYI@multispan@next{&\relax\sphinx@TYI@multispan}%
+%
+% Now the branch handling either the second pass of tabulary or the single pass
+% of tabular/longtable. This is the delicate part where we gather the
+% dimensions from the p columns either set-up by tabulary or by user p column
+% or Sphinx \X, \Y columns. The difficulty is that to get the said width, the
+% template must be inserted (other hacks would be horribly complicated except
+% if we rewrote crucial parts of LaTeX's \@array !) and we can not do
+% \omit\span like standard \multicolumn's easy approach. Thus we must cancel
+% the \vrule separators. Also, perhaps the column specifier is of the l, c, r
+% type, then we attempt an ad hoc rescue to give varwidth a reasonable target
+% width.
+\def\sphinx@start@multicolumn#1{%
+    \gdef\sphinx@multiwidth{0pt}\gdef\sphinx@tempa{#1}\sphinx@multispan{#1}%
+}%
+\def\sphinx@multispan #1{%
+    \ifnum#1=\@ne\expandafter\sphinx@multispan@end
+            \else\expandafter\sphinx@multispan@next
+    \fi {#1}%
+}%
+\def\sphinx@multispan@next #1{%
+    % trick to recognize L, C, R, J or p, m, b type columns
+    \ifdim\baselineskip>\z@
+       \gdef\sphinx@tempb{\linewidth}%
+    \else
+    % if in an l, r, c type column, try and hope for the best
+       \xdef\sphinx@tempb{\the\dimexpr(\ifx\TY@final\@undefined\linewidth\else
+            \sphinx@TY@tablewidth\fi-\spx@arrayrulewidth)/\sphinx@tempa
+            -\tw@\tabcolsep-\spx@arrayrulewidth\relax}%
+    \fi
+    \noindent\kern\sphinx@tempb\relax
+    \xdef\sphinx@multiwidth
+           {\the\dimexpr\sphinx@multiwidth+\sphinx@tempb+\tw@\tabcolsep+\spx@arrayrulewidth}%
+    \spx@table@hackCT@fixcolorpanel
+    % silence a | column separator in our merged cell
+    \spx@table@hackCT@inhibitvline
+    % prevent column colours to interfere with our multi-column but allow row
+    % colour (we can't obey a \cellcolor as it has not be seen yet at this stage)
+    \spx@table@hackCT@inmergedcell&\relax
+    % repeat
+    \expandafter\sphinx@multispan\expandafter{\the\numexpr#1-\@ne}%
+}%
+\def\sphinx@multispan@end#1{%
+    % first, trace back our steps horizontally
+    \noindent\kern-\dimexpr\sphinx@multiwidth\relax
+    % and now we set the final computed width for the varwidth environment
+    \ifdim\baselineskip>\z@
+       \xdef\sphinx@multiwidth{\the\dimexpr\sphinx@multiwidth+\linewidth}%
+    \else
+       \xdef\sphinx@multiwidth{\the\dimexpr\sphinx@multiwidth+
+         (\ifx\TY@final\@undefined\linewidth\else
+          \sphinx@TY@tablewidth\fi-\spx@arrayrulewidth)/\sphinx@tempa
+          -\tw@\tabcolsep-\spx@arrayrulewidth\relax}%
+    \fi
+    % last cell of the multi-column
+    \aftergroup\spx@table@hackCT@fixcolorpanel
+    \aftergroup\spx@table@hackCT@inmergedcell
+}%
+\newcommand*\sphinxcolwidth[2]{%
+  % this dimension will always be used for varwidth, and serves as maximum
+  % width when cells are merged either via multirow or multicolumn or both,
+  % as always their contents is wrapped in varwidth environment.
+  \ifnum#1>\@ne % multi-column (and possibly also multi-row)
+  % we wrote our own multicolumn code especially to handle that (and allow
+  % verbatim contents)
+   \ifx\equation$%$
+       \tymax % first pass of tabulary (cf MEMO above regarding nesting)
+   \else % the \@gobble thing is for compatibility with standard \multicolumn
+       \sphinx@multiwidth\@gobble{#1/#2}%
+   \fi
+  \else % single column multirow
+   \ifx\TY@final\@undefined % not a tabulary.
+    \ifdim\baselineskip>\z@
+        % in a p{..} type column, \linewidth is the target box width
+        \linewidth
+    \else
+        % l, c, r columns. Do our best.
+        \dimexpr(\linewidth-\spx@arrayrulewidth)/#2-
+                \tw@\tabcolsep-\spx@arrayrulewidth\relax
+    \fi
+   \else % in tabulary
+    \ifx\equation$%$% first pass
+        \tymax % it is set to a big value so that paragraphs can express themselves
+    \else
+     % second pass.
+     \ifdim\baselineskip>\z@
+         \linewidth % in a L, R, C, J column or a p, \X, \Y ...
+     \else
+         % we have hacked \TY@final to put in \sphinx@TY@tablewidth the table width
+         \dimexpr(\sphinx@TY@tablewidth-\spx@arrayrulewidth)/#2-
+                 \tw@\tabcolsep-\spx@arrayrulewidth\relax
+     \fi
+    \fi
+   \fi
+  \fi
+}%
+% fallback default in case user has set latex_use_latex_multicolumn to True:
+% \sphinxcolwidth will use this only inside LaTeX's standard \multicolumn
+\def\sphinx@multiwidth #1#2{\dimexpr % #1 to gobble the \@gobble (!)
+    (\ifx\TY@final\@undefined\linewidth\else\sphinx@TY@tablewidth\fi
+     -\spx@arrayrulewidth)*#2-\tw@\tabcolsep-\spx@arrayrulewidth\relax}%
+
+% \spx@table@hackCT@inhibitvline
+% packages like colortbl add group levels, we need to "climb back up" to be
+% able to hack the \vline and also the colortbl inserted tokens.  The hack
+% sets the \arrayrulewidth to \z@ to inhibit a | separator at right end
+% of the cell, if present (our code does not use \omit so can not avoid the
+% \vline insertion, but setting its width to zero makes it do nothing).
+% Some subtlety with colour panels must be taken care of.
+\def\spx@table@hackCT@inhibitvline{\ifnum\currentgrouptype=6\relax
+    \kern\spx@arrayrulewidth % will be compensated by extra colour panel left overhang
+    \arrayrulewidth\z@% trick to inhibit the {\vrule width \arrayrulewidth}
+    \else\aftergroup\spx@table@hackCT@inhibitvline\fi}%
+
+% hacking around colour matters
+% Sphinx 1.6 comment:
+% It turns out \CT@row@color is not expanded contrarily to \CT@column@color
+% during LaTeX+colortbl preamble preparation, hence it would be possible for
+% \CT@setup to discard only the column color and choose to obey or not
+% row color and cell color. It would even be possible to propagate cell color
+% to row color for the duration of the Sphinx multicolumn... the (provisional?)
+% choice has been made to cancel the colortbl colours for the multicolumn
+% duration.
+% Sphinx 5.3.0 comment:
+% - colortbl has no mechanism to disable colour background in a given cell:
+%   \cellcolor triggers one more \color, but has no possibility to revert
+%   a previously emitted \color, only to override it via an additional \color
+% - prior to 5.3.0, Sphinx did not officially support colour in tables,
+%   but it did have a mechanism to protect merged cells from being partly
+%   covered by colour panels at various places.  At 5.3.0 this mechanism
+%   is relaxed a bit to allow row colour for a single-row merged cell.
+%
+% fixcolorpanel
+\def\spx@table@hackCT@fixcolorpanel{\ifnum\currentgrouptype=6\relax
+    \edef\spx@table@leftcolorpanelextra
+    % \edef as \arrayrulewidth will be set to \z@ next,
+    % hence also \spx@arrayrulewidth...
+         {\sphinxcolorpanelextraoverhang+\the\spx@arrayrulewidth}%
+    \else\aftergroup\spx@table@hackCT@fixcolorpanel\fi}%
+%
+% inmergedcell
+% \spx@table@hackCT@inmergedcell will be locally set to either this
+% \spx@@table@hackCT@inmergedcell or to \spx@table@hackCT@nocolor
+% "\let\spx@original@CT@setup\CT@setup" is done after loading colortbl
+\def\spx@@table@hackCT@inmergedcell{\ifnum\currentgrouptype=6\relax
+    \let\CT@setup\spx@CT@setup@inmergedcell
+    \else\aftergroup\spx@@table@hackCT@inmergedcell\fi
+}%
+\newif\ifspx@table@inmergedcell
+\def\spx@CT@setup@inmergedcell #1\endgroup{%
+    % - obey only row color and disable effect of \sphinxcolorblend
+    % - turn on the inmergedcell boolean to signal to \CT@row@color
+    \spx@original@CT@setup
+    \spx@table@inmergedcelltrue % needed by \CT@row@color
+    % deactivate effect of \sphinxcolorblend if it happened at all
+    \ifdefined\blendcolors\blendcolors{}\fi
+    \CT@row@color
+    \CT@do@color
+    \global\let\CT@cell@color\relax
+    \endgroup
+}%
+%
+% nocolor
+\def\spx@table@hackCT@nocolor{\ifnum\currentgrouptype=6\relax
+% sadly \CT@column@color is possibly already expanded so we can't
+% simply do \let\CT@column@color\relax etc...
+% admittedly we could perhaps hack \CT@color but well
+    \let\CT@setup\spx@CT@setup@nocolor
+    \else\aftergroup\spx@table@hackCT@nocolor\fi
+}
+\def\spx@CT@setup@nocolor#1\endgroup{%
+        \global\let\CT@cell@color\relax
+    % the above fix was added at 5.3.0
+    % formerly a \cellcolor added by a raw latex directive in the merged cell
+    % would have caused colour to apply to the *next* cell after the merged
+    % one; we don't support \cellcolor from merged cells contents anyhow.
+    \endgroup}
+%
+% norowcolor
+\def\spx@table@hackCT@norowcolor{%
+% a bit easier although merged cells complicate the matter as they do need
+% to keep the rowcolor; and we can't know yet if we are in a merged cell
+    \ifnum\currentgrouptype=6\relax
+       \ifx\CT@row@color\relax
+       \else
+           \let\spx@saved@CT@row@color\CT@row@color
+           \def\CT@row@color{%
+             \ifspx@table@inmergedcell\expandafter\spx@saved@CT@row@color\fi
+           }%
+       \fi
+    \else\aftergroup\spx@table@hackCT@norowcolor\fi
+}
+%
+% \sphinxcolorblend
+\def\spx@table@hackCT@colorblend{%
+    \ifnum\currentgrouptype=6\relax
+        \expandafter\blendcolors\spx@colorblendparam
+        % merged cells will do a \blendcolors{} to cancel the effet
+        % we can not know here yet if in merged cell as the boolean
+        % \ifspx@table@inmergedcell is not yet updated
+    \else
+      \aftergroup\spx@table@hackCT@colorblend
+    \fi
+}
+\def\sphinxcolorblend#1{\gdef\spx@colorblendparam{{#1}}\spx@table@hackCT@colorblend}
+% Either xcolor.sty exists on user system and has been loaded by sphinx.sty,
+% or it does not exist, so we can use \@ifpackageloaded without delaying.
+\@ifpackageloaded{xcolor}%
+  {}%
+  {\def\sphinxcolorblend#1{%
+\PackageWarning{sphinx}{This table uses \string\sphinxcolorblend\space
+  but xcolor is not in\MessageBreak
+  the TeX/LaTeX installation, the command will be\MessageBreak
+  ignored in this and the next tables}%
+   \global\let\sphinxcolorblend\@gobble
+   \sphinxbuildwarning{colorblend}%
+   }%
+  }
+
+
+%%%%%%%%%%%%%%%%%%
+% --- MULTIROW ---
+% standard \multirow
+% 1. does not allow verbatim contents,
+% 2. does not allow blank lines in its argument,
+% 3. its * specifier means to typeset "horizontally" which is very
+%    bad for paragraph content. 2016 version has = specifier but it
+%    must be used with p type columns only, else results are bad,
+% 4. it requires manual intervention if the contents is too long to fit
+%    in the asked-for number of rows.
+% 5. colour panels (either from \rowcolor or \columncolor) will hide
+%    the bottom part of multirow text, hence manual tuning is needed
+%    to put the multirow insertion at the _bottom_.
+%
+% The Sphinx solution consists in always having contents wrapped
+% in a varwidth environment so that it makes sense to estimate how many
+% lines it will occupy, and then ensure by insertion of suitable struts
+% that the table rows have the needed height. The needed mark-up is done
+% by LaTeX writer, which has its own id for the merged cells.
+%
+% The colour issue is "solved" by clearing colour panels in all cells,
+% whether or not the multirow is single-column or multi-column.
+%
+% MEMO at 5.3.0: to allow a multirow cell in a single column to react to
+% \columncolor correctly, it seems only way is that the contents
+% are inserted by bottom cell (this is mentioned in multirow.sty doc, too).
+% Sphinx could at Python level "move" the contents to that cell.  But the
+% mechanism used here via \sphinxtablestrut to enlarge rows to make room for
+% the contents if needed becomes more challenging yet, because \sphinxtablestrut
+% mark-up will be parsed by TeX *before* it sees the contents of the merged
+% cell.. So it seems the best way would be to actually store the contents into
+% some owned-by-Sphinx box storage which needs to be globally allocated to
+% that usage ; then we need multiple such boxes, say at least 5 to cover
+% 99% or use case.  Or perhaps some trick with storing in a \vbox and recovering
+% via some \vsplit but this becomes complicated... perhaps in future.
+%
+% In passing we obtain baseline alignements across rows (only if
+% \arraystretch is 1, as LaTeX's does not obey \arraystretch in "p"
+% multi-line contents, only first and last line...)
+%
+% TODO: examine the situation with \arraystretch > 1. The \extrarowheight
+% is hopeless for multirow anyhow, it makes baseline alignment strictly
+% impossible.
+\newcommand\sphinxmultirow[2]{\begingroup
+  % #1 = nb of spanned rows, #2 = Sphinx id of "cell", #3 = contents
+  % but let's fetch #3 in a way allowing verbatim contents !
+  \def\sphinx@nbofrows{#1}\def\sphinx@cellid{#2}%
+  \afterassignment\sphinx@multirow\let\next=
+}%
+\def\sphinx@multirow {%
+  \setbox\z@\hbox\bgroup\aftergroup\sphinx@@multirow\strut
+}%
+\def\sphinx@@multirow {%
+% MEMO: we could check status of \CT@cell@color here, but unfortunately we
+% can't know the exact height which will be covered by the cells in total
+% (it may be more than our \box\z@ dimensions).  We could use an \fcolorbox
+% wrapper on \box\z@ but this will not extend precisely to the bottom rule.
+%
+% Only solution if we want to obey a raw \cellcolor, or a \columncolor, seems
+% to delay unboxing the gathered contents as part of the bottom row with
+% a suitable vertical adjustment...
+%
+  % The contents, which is a varwidth environment, has been captured in
+  % \box0 (a \hbox).
+  % We have with \sphinx@cellid an assigned unique id. The goal is to give
+  % about the same height to all the involved rows.
+  % For this Sphinx will insert a \sphinxtablestrut{cell_id} mark-up
+  % in LaTeX file and the expansion of the latter will do the suitable thing.
+  \dimen@\dp\z@
+  \dimen\tw@\ht\@arstrutbox
+  \advance\dimen@\dimen\tw@
+  \advance\dimen\tw@\dp\@arstrutbox
+  \count@=\dimen@       % type conversion dim -> int
+  \count\tw@=\dimen\tw@
+  \divide\count@\count\tw@ % TeX division truncates
+  \advance\dimen@-\count@\dimen\tw@
+  % 1300sp is about 0.02pt. For comparison a rule default width is 0.4pt.
+  % (note that if \count@ holds 0, surely \dimen@>1300sp)
+  \ifdim\dimen@>1300sp \advance\count@\@ne \fi
+  % now \count@ holds the count L of needed "lines"
+  % and \sphinx@nbofrows holds the number N of rows
+  % we have L >= 1 and N >= 1
+  % if L is a multiple of N, ... clear what to do !
+  % else write L = qN + r, 1 <= r < N and we will
+  % arrange for each row to have enough space for:
+  %     q+1 "lines" in each of the first r rows
+  %       q "lines" in each of the (N-r) bottom rows
+  % for a total of (q+1) * r + q * (N-r) = q * N + r = L
+  % It is possible that q == 0.
+  \count\tw@\count@
+  % the TeX division truncates
+  \divide\count\tw@\sphinx@nbofrows\relax
+  \count4\count\tw@ % q
+  \multiply\count\tw@\sphinx@nbofrows\relax
+  \advance\count@-\count\tw@ % r
+  \expandafter\xdef\csname sphinx@tablestrut_\sphinx@cellid\endcsname
+     {\noexpand\sphinx@tablestrut{\the\count4}{\the\count@}{\sphinx@cellid}}%
+  \dp\z@\z@
+  % this will use the real height if it is >\ht\@arstrutbox
+  \sphinxtablestrut{\sphinx@cellid}\box\z@
+  \endgroup % group was opened in \sphinxmultirow
+}%
+\newcommand*\sphinxtablestrut[1]{%
+  % #1 is a "cell_id", i.e. the id of a merged group of table cells
+  \csname sphinx@tablestrut_#1\endcsname
+}%
+% LaTeX typesets the table row by row, hence each execution can do
+% an update for the next row.
+\newcommand*\sphinx@tablestrut[3]{\begingroup
+  % #1 = q, #2 = (initially) r, #3 = cell_id, q+1 lines in first r rows
+  % if #2 = 0, create space for max(q,1) table lines
+  % if #2 > 0, create space for q+1 lines and decrement #2
+  \leavevmode
+  \count@#1\relax
+  \ifnum#2=\z@
+    \ifnum\count@=\z@\count@\@ne\fi
+  \else
+    % next row will be with a #2 decremented by one
+    \expandafter\xdef\csname sphinx@tablestrut_#3\endcsname
+      {\noexpand\sphinx@tablestrut{#1}{\the\numexpr#2-\@ne}{#3}}%
+   \advance\count@\@ne
+  \fi
+  \vrule\@height\ht\@arstrutbox
+        \@depth\dimexpr\count@\ht\@arstrutbox+\count@\dp\@arstrutbox-\ht\@arstrutbox\relax
+        \@width\z@
+  \endgroup
+  % we need this to avoid colour panels hiding bottom parts of multirow text
+  \spx@table@hackCT@nocolor
+}%
+
+%%%%%%%%%%%%%%%%%%
+% --- STYLING ---
+%
+
+%
+% Support for colour in table
+%
+% Core LaTeX package (very old, part of texlive-latex-base on Debian distr.)
+% providing \columncolor, \rowcolor, \cellcolor and \arrayrulecolor.
+\RequirePackage{colortbl}
+\let\spx@original@CT@setup\CT@setup
+
+% LaTeX's \cline has **strong** deficiencies
+% ******************************************
+% We work around them via an added \sphinxfixclines{number of columns} in the
+% table mark-up, and also extra mark-up \sphinxvlinecrossing{col no} for
+% crossings not contiguous to any cline.  To fix the gap at left extremity of a
+% \cline, we redefine the core LaTeX \c@line because this avoids adjoining a
+% small square with potential PDF viewer anti-aliasing issues.  We waited
+% after loading colortbl because it also redefines \c@line for it to obey the
+% colour set by \arrayrulecolor.
+% MEMO: booktabs package does *not* redefine \@cline so we are safe here.
+\def\@cline#1-#2\@nil{%
+  \omit
+  \@multicnt#1%
+  \advance\@multispan\m@ne
+  \ifnum\@multicnt=\@ne\@firstofone{&\omit}\fi
+  \@multicnt#2%
+  \advance\@multicnt-#1%
+  \advance\@multispan\@ne
+  {\CT@arc@
+% start of Sphinx modification
+  \ifnum#1>\@ne\kern-\spx@arrayrulewidth\fi% fix gap at join with vertical lines
+% end of Sphinx modification
+%    Comments:
+%
+%    If we had the information whether the previous column ended with a | or
+%    not, we could decide what to do here.  Alternatively the mark-up could
+%    use either original \cline or the one modified as here depending on case.
+%    One wonders why LaTeX does not provide itself the alternative as a
+%    complement to \cline, to use on case by case basis.
+%    Here we handle both at same time via using the \spx@arrayrulewidth which
+%    will be \z@ if no | at all so will induce here nothing.
+%
+%    As a result Sphinx basically supports well only tables having either all
+%    columns |-separated, or no | at all, as it uses \spx@arrayrrulewidth in
+%    all columns (here and in multicolumn code).
+%
+%    We also considered a method not modifying \c@line but it requires too
+%    much extra mark-up from Python LaTeX writer and/or extra LaTeX coding.
+% back to LaTeX+colortbl code
+  \leaders\hrule\@height\arrayrulewidth\hfill}%
+  \cr
+% the last one will need to be compensated, this is job of \sphinxclines
+  \noalign{\vskip-\arrayrulewidth}%
+}
+\def\spx@table@fixvlinejoin{%
+  {\CT@arc@ % this is the color command set up by \arrayrulecolor
+   \vrule\@height\arrayrulewidth
+% side remark: LaTeX has only a single \arrayrulewidth for all kinds
+% for cell borders in table, horizontal or vertical...
+         \@depth\z@
+         \@width\spx@arrayrulewidth
+  }%
+}
+% Sphinx LaTeX writer issues one such for each vertical line separating two
+% contiguous multirow cells; i.e. those crossings which can are not already
+% taken care of by our modified at left extremity \cline.
+% One could imagine a more \...crossingS (plural) receiving a comma delimited
+% list, which would simplify the mark-up but this would complexify both the
+% Python and the LaTeX coding.
+\def\sphinxtablevlinecrossing#1{%
+  \sphinxtabledecrementrownum
+  \omit
+  \@multispan{#1}%
+  \hfill
+  \spx@table@fixvlinejoin
+  \cr
+  \noalign{\vskip-\arrayrulewidth}%
+}
+% This "fixclines" is also needed if no \sphinxcline emitted and is useful
+% even in extreme case with no \sphinxvlinecrossing either, to give correct
+% height to multirow extending across all table width assuming other rows are
+% separated generally by an \hline, so as to keep coherent line spacing.
+%
+% It is designed to work ok even if no | separators are in the table (because
+% \spx@table@fixvlinejoin uses \spx@arrayrulewidth which is \z@ in that case).
+\def\sphinxtablefixclines#1{% #1 is the number of columns of the table
+  \sphinxtabledecrementrownum
+  \omit
+  \spx@table@fixvlinejoin% unneeded if first \cline started at column 1 but does
+                         % not hurt; fills small gap at left-bordered table
+  \@multispan{#1}%
+  \hfill
+  \spx@table@fixvlinejoin% fill small gap at right-bordered table
+  \cr
+  % this final one does NO \vskip-\arrayrulewidth... that's the whole point
+}
+%%%% end of \cline workarounds
+
+%
+% - passing option "table" to xcolor also loads colortbl but we needed to
+%   load color or xcolor prior to the handling of the options
+%
+% - the \rowcolors command from [table]{xcolor} has various problems:
+%
+%   *  it is rigid and does not out-of-the-box allow a more complex scheme
+%   such as colorA+colorB+colorC+colorB+colorC+colorB+colorC...  suitable to
+%   distinguish a header row.
+%
+%   *  its code does not export the used colour, an information which we may
+%   need for example to colourize the rule via \arrayrulecolor in the
+%   appropriate manner, for example to colourize the booktabs induced vertical
+%   whitespace to avoid gaps (if one wants to).
+%
+%   *  incompatibility with tabulary: the output depends on parity of total
+%   number of rows!
+%
+%   *  problems with longtable: the caption will receive a background colour
+%   panel, if we do not deactivate the \rowcolors action during definition of
+%   the headers and footers; this requires extra mark-up.  Besides if we
+%   deactivate using \hiderowcolors during header and footer formation, the
+%   parity of the body rows is shifted, \rownum is even, not odd, at first body
+%   row.  And setting \rownum at start of first body row is too late for
+%   influencing the colour.
+%
+%   *  it has a global impact and must be reset at each table.  We can not
+%   issue it only once and it provides no public interface (without @) to
+%   cancel its effect conveniently (\hiderowcolors can only be used from
+%   *inside* a table.)
+%
+%   *  its core mechanism which increments the row count is triggered
+%   if a \cline is encountered... so this offsets the alternating colours...
+%   ... or not if there are two \cline's in the row...
+%   (as we will use same mechanism we have to correct this increment).
+%
+% So we need our own code.
+
+% Provide \rownum and rownum LaTeX counter (code copied from colortbl v1.0f)
+\ltx@ifundefined{rownum}{%
+  \ltx@ifundefined{c@rownum}%
+       {\newcount\rownum\let\c@rownum\rownum}%
+       {\let\rownum\c@rownum}%
+  }%
+{\let\c@rownum\rownum}
+\providecommand\therownum{\arabic{rownum}}
+
+% extra overhang for color panels to avoid visual artifacts in pdf viewers
+% (particularly if borderless)
+\def\sphinxcolorpanelextraoverhang{0.1pt}
+\def\spx@table@leftcolorpanelextra {\sphinxcolorpanelextraoverhang}
+\def\spx@table@rightcolorpanelextra{\sphinxcolorpanelextraoverhang}
+% the macro to which \CT@row@color will be set for coloured rows, serves both
+% in header and body, the colours must have been defined at time of use
+\def\spx@table@CT@row@color{\ifspx@table@inmergedcell
+                              \CT@color{sphinxTableMergeColor}%
+                            \else
+                              \CT@color{sphinxTableRowColor}%
+                            \fi
+                            \@tempdimb\dimexpr\col@sep+\spx@table@leftcolorpanelextra\relax
+                            \@tempdimc\dimexpr\col@sep+\spx@table@rightcolorpanelextra\relax
+                           }%
+% used by itself this will influence a single row if \CT@everycr is the
+% colortbl one, to influences all rows the \CT@everycr must be modified (see
+% below)
+\def\sphinxrowcolorON {\global\let\CT@row@color\spx@table@CT@row@color}%
+% this one turns off row colours until the next \sphinxrowcolorON
+\def\sphinxrowcolorOFF{\global\let\CT@row@color\relax}%
+% this one inhibits the row colour in one cell only (can be used as
+% >{\sphinxnorowcolor} for turning off row colours in a given column)
+\def\sphinxnorowcolor{\spx@table@hackCT@norowcolor}%
+
+% \sphinxtoprule (or rather \sphinxtabletoprulehook) will be modified by
+% the colorrows class to execute this one: 
+\def\spx@table@@toprule@rowcolorON{%
+        \noalign{%
+          % Because of tabulary 2-pass system, the colour set-up at end of table
+          % would contaminate the header colours at start of table, so must reset
+          % them here.  We want all header rows to obey same colours, so we don't
+          % use original \CT@everycr which sets \CT@row@color to \relax.
+          \global\CT@everycr{\the\everycr}%
+          \global\sphinxcolorlet{sphinxTableRowColor}{sphinxTableRowColorHeader}%
+          \global\sphinxcolorlet{sphinxTableMergeColor}{\sphinxTableMergeColorHeader}%
+          \sphinxrowcolorON
+         }%
+}%
+
+% \sphinxtableatstartofbodyhook will be modified by colorrows class to
+% execute this one; it starts the alternating colours and triggers increment
+% or \rownum count at each new row (the xcolor base method for \rowcolors)
+\def\spx@table@@startbodycolorrows{%
+    \noalign{%
+       \global\CT@everycr{% Nota Bene: in a longtable with \hline the \everycr is
+                          % done two extra times! but 2 is even, so this is ok
+          \noalign{\global\advance\rownum\@ne % the xcolor \rowcolors base trick
+% MEMO: colortbl \CT@row@color is expanded *after* the cell contents have been
+% gathered and measured, so it can't be used to expose e.g. the colour to the
+% cell contents macro code.  Of course if it is known how the colour is chosen
+% the procedure could be done from inside the cell.  Simpler to expose the colour
+% in a public name sphinxTableRowColor at start of the row in this \noalign.
+                   \sphinxSwitchCaseRowColor\rownum
+                  }%
+          \the\everycr
+       }%
+       \global\rownum\@ne % is done from inside table so ok with tabulary two passes
+       \sphinxSwitchCaseRowColor\rownum % set up color for the first body row
+       \sphinxrowcolorON  % has been done from \sphinxtoprule location but let's do
+                          % it again in case  \sphinxtabletoprulehook has been used
+                          % to inhibit colours in the header rows
+    }% end of noalign contents
+}
+% set the colours according to row parity; a priori #1 is \rownum, but
+% the macro has been designed to be usable in user level added code
+\def\sphinxSwitchCaseRowColor#1{%
+  \ifodd#1\relax
+    \global\sphinxcolorlet{sphinxTableRowColor}{sphinxTableRowColorOdd}%
+    \global\sphinxcolorlet{sphinxTableMergeColor}{\sphinxTableMergeColorOdd}%
+  \else
+    \global\sphinxcolorlet{sphinxTableRowColor}{sphinxTableRowColorEven}%
+    \global\sphinxcolorlet{sphinxTableMergeColor}{\sphinxTableMergeColorEven}%
+  \fi
+}
+
+% each \cline or \cmidrule (booktabs) consumes one \cr, offsetting the \rownum
+% parity; so this macro serves to compensate and must be added to each such
+% \cline or \cmidrule (see below)
+\def\spx@table@@decrementrownum{\noalign{\global\advance\rownum\m@ne}}
+\let\sphinxtabledecrementrownum\@empty
+
+% \sphinxtableafterendhook will be modified by colorrows class to execute
+% this after the table
+\def\spx@table@resetcolortbl{%
+    \sphinxrowcolorOFF
+    \spx@table@reset@CTeverycr
+% this last bit is done in order for the \sphinxbottomrule from the "foot"
+% longtable template to be able to use same code as the \sphinxbottomrule
+% at end of table body; see \sphinxbooktabsspecialbottomrule code
+    \global\rownum\z@
+}
+\def\spx@table@reset@CTeverycr{%
+% we should probably be more cautious and not hard-code here the colortbl
+% set-up; so the macro is defined without @ to fac
+    \global\CT@everycr{\noalign{\global\let\CT@row@color\relax}\the\everycr}%
+}
+
+% At last the style macros \sphinxthistablewithstandardstyle etc...
+
+% They are executed before the table environments in a scope limiting
+% wrapper "savenotes" environment.
+%
+% 0) colour support is enacted via adding code to three hooks:
+%    - \sphinxtabletoprulehook       (implicit from \sphinxtoprule expansion)
+%    - \sphinxtableatstartofbodyhook (explicit from table templates)
+%    - \sphinxtableafterendhook      (explicit from table templates)
+%    additionally special adjustment must be made in \sphinxcline
+%
+\def\sphinxtoprule{\spx@toprule\sphinxtabletoprulehook}
+% \spx@toprule is what is defined by the standard, booktabs and borderless
+% styles.
+% The colorrows class will prepend \spx@table@toprule@rowcolorON into
+% \sphinxtabletoprulehook which a priori is \@empty but can contain user added
+% extra code, and is executed after \spx@toprule.
+\let\sphinxtabletoprulehook      \@empty
+\let\sphinxtableatstartofbodyhook\@empty
+\let\sphinxtableafterendhook     \@empty
+%
+% 1) we manage these three hooks in a way allowing a custom user extra wrapper
+% environment from a container class to use them as entry point for some
+% custom code.  The container code is done first, prior to table templates.
+% So, the style macros will *prepend* the needed color-code to the existing
+% custom user code, so the custom user code can override them.  The custom
+% user code should not redefine any of the 3 \sphinxtable...hook macros via a
+% \global\def, but their contents can use \gdef.  In fact they probably need
+% to for the first two hooks which are executed from inside the table and
+% a priori need their code to be in a \noalign which limits scope.
+%
+% 2) the table templates and LaTeX writer code make it so that only
+% one of either
+%      \sphinxthistablewithcolorrowsstyle,
+% or   \sphinxthistablewithnocolorrowsstyle
+% will be inserted explicitly depending on local :class: for table.
+% The global 'colorrows' style in latex_table_style translates at bottom
+% of this file into code for inserting \sphinxthistablewithcolorrowsstyle
+% at end of \sphinxthistablewithglobalstyle.  So it is impossible
+% to have first \sphinxthistablewithnocolorrowsstyle, then
+% \sphinxthistablewithcolorrowsstyle.  Nevertheless we have written
+% the code so that in this case colorrows would indeed activate (except
+% if it was already executed before as it self-annihilates).
+
+% standard style
+\def\sphinxthistablewithstandardstyle{%
+    % Those two are produced by the latex writer
+    \def\sphinxhline      {\hline}%
+    % \sphinxtabledecrementrownum is a no-op which is redefined by colorrows
+    % to correct the \rownum increment induced by \cline in colorrows regime
+    \def\sphinxcline      {\sphinxtabledecrementrownum\cline}%
+    % LaTeX's \cline needs fixing
+    \let\sphinxvlinecrossing\sphinxtablevlinecrossing
+    \let\sphinxfixclines    \sphinxtablefixclines
+    % Those three are inserted by the table templates
+    \def\spx@toprule      {\hline}%
+    \def\sphinxmidrule    {\hline}%
+    \def\sphinxbottomrule {\hline}%
+    % Do not tamper with this internal
+    \def\spx@arrayrulewidth{\arrayrulewidth}%
+}
+
+% booktabs style
+% The \@xcmidrule patch below will do beyond its main stuff
+%     \sphinxadjustcmidrulebelowsep
+% Indeed the poor booktabs spacing with \cmidrule (if \sphinxbooktabscmidrule
+% defined below is overwritten to use it) is quite awful.  Do
+%     \let\sphinxadjustcmidrulebelowsep\empty
+% if you prefer booktabs defaults.
+\def\sphinxadjustcmidrulebelowsep{\belowrulesep=\aboverulesep}
+\AtBeginDocument{% patch booktabs to avoid extra vertical space from
+                 % consecutive \sphinxcline, if defined to use \cmidrule
+  \ifdefined\@xcmidrule
+    \let\spx@original@@xcmidrule\@xcmidrule
+    \def\@xcmidrule{\sphinxadjustcmidrulebelowsep
+                    % if we don't do that, two \sphinxcline in the same row
+                    % will cause the second short rule to be shifted down
+                    \ifx\@tempa\sphinxcline\let\@tempa\cmidrule\fi
+                    \spx@original@@xcmidrule}%
+  \fi
+}
+% wrappers to allow customization, e.g. via a container class
+% the top, mid, bottom definitions are in fact overwritten (later, below)
+% byt more complex ones needed to handle booktabs+colorrows context
+\def\sphinxbooktabstoprule   {\toprule}
+\def\sphinxbooktabsmidrule   {\midrule}
+\def\sphinxbooktabsbottomrule{\bottomrule}
+%
+\let\sphinxbooktabscmidrule  \@gobble % i.e. draw no short rules at all!
+% You can redefine this to use \cmidrule with various options, such
+% as \cmidrule(lr), but:
+% Attention, if you want this to use \cmidrule (or \cline) you must,
+% if the table uses row colours,
+% also include the \sphinxtabledecrementrownum token like e.g. this
+%     \def\sphinxbooktabscmidrule{\sphinxtabledecrementrownum\cmidrule(lr)}
+% and it must be first due to internals of the \cmidrule usage of \futurelet.
+
+\def\sphinxthistablewithbooktabsstyle{%
+    \let\sphinxhline\@empty % there is no wrapper macro here so if you want to change that
+                            % you will have to redefine \sphinxthistablewithbooktabsstyle
+    \def\sphinxcline     {\sphinxbooktabscmidrule}% defaults to give \@gobble
+    \let\sphinxvlinecrossing\@gobble % no | in a booktabs-style table !
+    \let\sphinxfixclines    \@gobble % should not be used with booktabs + \cmidrule
+    \def\spx@toprule     {\sphinxbooktabstoprule}%
+    \def\sphinxmidrule   {\sphinxbooktabsmidrule}%
+    \def\sphinxbottomrule{\sphinxbooktabsbottomrule}%
+    \def\spx@arrayrulewidth{\z@}%
+}
+\AtBeginDocument{\@ifpackageloaded{booktabs}%
+    {}%
+    {\def\sphinxthistablewithbooktabsstyle{%
+    \PackageWarning{sphinx}{%
+Add \string\usepackage{booktabs} to the preamble to allow\MessageBreak
+local use of booktabs table style}%
+    \sphinxbuildwarning{booktabs}%
+    \sphinxthistablewithstandardstyle
+    }}%
+}%
+
+% borderless style
+\def\sphinxthistablewithborderlessstyle{%
+    \let\sphinxhline      \@empty
+    \let\sphinxcline      \@gobble
+    \let\sphinxvlinecrossing\@gobble
+    \let\sphinxfixclines    \@gobble
+    \let\spx@toprule      \@empty
+    \let\sphinxmidrule    \@empty
+    \let\sphinxbottomrule \@empty
+    \def\spx@arrayrulewidth{\z@}%
+}%
+
+% colorrows style
+%
+\let\sphinxifthistablewithcolorrowsTF\@secondoftwo
+\def\sphinxthistablewithcolorrowsstyle{%
+    \let\sphinxifthistablewithcolorrowsTF\@firstoftwo
+% this is defined to auto-silence itself (in the surrounding scope-limiting
+% environment) after one execution ("colorrows" can never follow "nocolorrows")
+    \let\sphinxthistablewithcolorrowsstyle\@empty
+%
+    \let\spx@table@toprule@rowcolorON  \spx@table@@toprule@rowcolorON
+    \let\spx@table@startbodycolorrows  \spx@table@@startbodycolorrows
+    \let\sphinxtabledecrementrownum    \spx@table@@decrementrownum
+% Is it the best choice to "prepend" to existing code there?
+    \spx@prepend\spx@table@toprule@rowcolorON\to\sphinxtabletoprulehook
+    \spx@prepend\spx@table@startbodycolorrows\to\sphinxtableatstartofbodyhook
+%
+% this one is not set to \@empty by nocolorrows, because it looks harmless
+% to execute it always, as it simply resets to standard colortbl state after
+% the table; so we don't need an @@ version for this one
+    \spx@prepend\spx@table@resetcolortbl\to\sphinxtableafterendhook
+}
+\def\spx@prepend#1\to#2{% attention about using this only with #2 "storage macro"
+    \toks@{#1}%
+    \toks@\expandafter\expandafter\expandafter{\expandafter\the\expandafter\toks@#2}%
+    \edef#2{\the\toks@}%
+}%
+
+\def\sphinxthistablewithnocolorrowsstyle{%
+    \let\sphinxifthistablewithcolorrowsTF\@secondoftwo
+% rather than trying to remove the code added by 'colorrows' style, we 
+% simply make it no-op, without even checking if really it was activated.
+    \let\spx@table@toprule@rowcolorON\@empty
+    \let\spx@table@startbodycolorrows\@empty
+    \let\sphinxtabledecrementrownum  \@empty
+% we don't worry about \sphinxtableafterendhook as the \spx@table@resetcolortbl
+% done at end can not do harm; and we could also have not bothered with the
+% \sphinxtabledecrementrownum as its \rownum decrement, if active, is harmless
+% in non-colorrows context
+}
+
+% (not so easy) implementation of the booktabscolorgaps option.  This option
+% defaults to true and is not officially documented, as already colorrows is
+% only opt-in, so it is there only as a "turn-off" switch, but if nobody
+% complains in next few months, it will probably be removed altogether at
+% 6.0.0.  The reason it exists is because of longtable aspeces described
+% below.
+%
+% As it is used via \sphinxsetup booktabscolorgaps status is not known here
+% and may change locally.  So it must be implemented via delayed or
+% conditional code.
+%
+% We do not know the order of execution of \sphinxthistablewithbooktabsstyle
+% versus \sphinxthistablewithcolorrows: if booktabs is global option it
+% will be executed first; but if colorrows is global option and not booktabs
+% then colorrows will be executed first via \sphinxthistablewithglobalstyle
+%
+% Modifying things from locations such as \sphinxtabletoprulehook which are
+% executed within the table is not convenient as it must use \global
+% but then we would have to undo this after the table.
+%
+% So what we do is to prepare booktabs specific macros to incorporate
+% a conditional to check the colorrows status.  We must each time check
+% both if colorrows is activated and if colorgaps is.  We do this via
+% macros without @ so they can be used easily in customization code.
+% When and if booktabscolorgaps option is removed, we can then replace
+% \sphinxifbooktabswithcolorgapsTF by \sphinxifthistablewithcolorrowsTF
+\def\sphinxifbooktabswithcolorgapsTF{%
+    \if1\ifspx@opt@booktabscolorgaps
+        \sphinxifthistablewithcolorrowsTF{1}{0}%
+        \else0\fi
+         \expandafter\@firstoftwo
+    \else\expandafter\@secondoftwo
+    \fi
+}
+% as this is done without "@" it can be relatively easily be overwritten
+% by user in customization code
+\def\sphinxbooktabstoprule{%
+    \sphinxifbooktabswithcolorgapsTF
+    {\sphinxbooktabsspecialtoprule}%
+    {\toprule}%
+}%
+\def\sphinxbooktabscolorgapsoverhang{0.1pt}% avoid pixel/rounding effects
+% auxiliary fork
+\long\def\spx@table@crazyfork
+     #1\endfirsthead\endhead\sphinxtableatstartofbodyhook#2#3\@nil{#2}
+% we fetch the next token to check if there is a header or not
+% this is a bit fragile as it relies on the table templates
+% and it assumes this token #1 is never braced...
+% let's make this \long in case #1 is \par (should not be)
+\long\def\sphinxbooktabsspecialtoprule\sphinxtabletoprulehook#1{%
+    \specialrule{\heavyrulewidth}{\abovetopsep}{\z@}%
+    % this macro contains colour init code (and defines sphinxTableRowColor)
+    \sphinxtabletoprulehook
+    % unfortunately colortbl provides no way to save/restore the
+    % \arrayrulecolor status, we have to code it ourselves
+    \noalign{\global\let\spx@@saved@CT@arc@\CT@arc@
+% \@declaredcolor is not \long.  Although #1 can probably never be \par with
+% our templates, let's be cautious and not use the creazyfork inside the \color
+                  \spx@table@crazyfork
+% this crazy code checks if #1 is one of \endfirsthead, \endhead or
+% \sphinxtableatstartofbodyhook, as criterion for table with no header
+             #1\endhead\sphinxtableatstartofbodyhook\@secondoftwo
+             \endfirsthead#1\sphinxtableatstartofbodyhook\@secondoftwo
+             \endfirsthead\endhead#1\@secondoftwo
+             \endfirsthead\endhead\sphinxtableatstartofbodyhook\@firstoftwo
+                  \@nil
+             {\gdef\CT@arc@{\color{sphinxTableRowColor}}}%
+             {\gdef\CT@arc@{\color{sphinxTableRowColorOdd}}}%
+            }% end of \noalign
+    % \specialrule uses \noalign itself
+    \specialrule{\dimexpr\belowrulesep+\sphinxbooktabscolorgapsoverhang\relax}%
+                {\z@}{-\sphinxbooktabscolorgapsoverhang}%
+    \noalign{\global\let\CT@arc@\spx@@saved@CT@arc@}%
+    #1% let's not forget to re-insert this #1 in token stream
+      % fortunately longtable's \endfirsthead/\endhead are not delimiters but
+      % are really tokens awaiting expansion...
+}%
+\def\sphinxbooktabsmidrule{%
+   \sphinxifbooktabswithcolorgapsTF
+   {\sphinxbooktabsspecialmidrule}%
+   {\midrule}%
+}%
+\def\sphinxbooktabsspecialmidrule{%
+   \noalign{\global\let\spx@@saved@CT@arc@\CT@arc@
+            \gdef\CT@arc@{\color{sphinxTableRowColor}}% this is RowColorHeader
+   }%
+   \specialrule{\dimexpr\aboverulesep+\sphinxbooktabscolorgapsoverhang\relax\relax}%
+               {-\sphinxbooktabscolorgapsoverhang}{\z@}%
+   \noalign{\global\let\CT@arc@\spx@@saved@CT@arc@}%
+   \specialrule{\lightrulewidth}{\z@}{\z@}%
+   \noalign{\gdef\CT@arc@{\color{sphinxTableRowColorOdd}}}%
+   \specialrule{\dimexpr\belowrulesep+\sphinxbooktabscolorgapsoverhang\relax\relax}%
+               {\z@}{-\sphinxbooktabscolorgapsoverhang}%
+   \noalign{\global\let\CT@arc@\spx@@saved@CT@arc@}%
+}%
+\def\sphinxbooktabsbottomrule{%
+   \sphinxifbooktabswithcolorgapsTF
+   {\sphinxbooktabsspecialbottomrule}%
+   {\bottomrule}%
+}%
+% The colour here is already updated because of the \\ before so we must
+% execute again the colour selection code, but this is not too complicated.
+% What is annoying though is that \sphinxbottomrule in the longtable context
+% appears both in the "foot" part and after the last body row.  For the first
+% occurrence the \rownum could be arbitrary if it had not been reset by each
+% table using it via the \sphinxtableafterendhook (see above).  This avoids
+% having to modify the longtable template.  But as \rownum is thus 0 in the
+% "foot", the \sphinxSwitchCaseRowColor has to know how to handle negative
+% inputs (in fact the -1 value), the Sphinx definition has no issue with that
+% but any redefinition must be aware of this constraint.
+\def\sphinxbooktabsspecialbottomrule{%
+   \noalign{\global\let\spx@@saved@CT@arc@\CT@arc@
+            \sphinxSwitchCaseRowColor{\numexpr\rownum-\@ne\relax}%
+            \gdef\CT@arc@{\color{sphinxTableRowColor}}%
+   }%
+   \specialrule{\dimexpr\aboverulesep+\sphinxbooktabscolorgapsoverhang\relax}%
+               {-\sphinxbooktabscolorgapsoverhang}{\z@}%
+   \noalign{\global\let\CT@arc@\spx@@saved@CT@arc@}%
+   \specialrule{\heavyrulewidth}{\z@}{\belowbottomsep}%
+}%
+%
+% MEMO: with longtable \sphinxtoprule, \sphinxmidrule and \sphinxbottomrule
+% are evaluated at time of constructing the headers and footers as boxes
+% (already typeset material and expanded macros; \sphinxbottomrule is also
+% evaluated at very end of table body, i.e. "normally").  So the used colour
+% to fill the booktabs gaps is decided during the headers and footers
+% construction by longtable.  Actually they are expanded twice: in firsthead
+% then in head, respectively in foot and lastfoot.  But in current design the
+% header row colours are fixed, not alternating, so there is at least no
+% coherence issue there.
+
+% The \spx@arrayrulewidth is used for some complex matters of merged
+% cells size computations.
+% tabularcolumns argument will override any global or local style and
+% trigger the appropriate adjustment of \spx@arrayrulewidth.
+% Notice that this will be bad if the table uses booktabs style
+% but anyhow table with booktabs should not use any | separator.
+\def\sphinxthistablewithvlinesstyle{%
+    \def\spx@arrayrulewidth{\arrayrulewidth}%
+    \let\sphinxvlinecrossing\sphinxtablevlinecrossing
+    \let\sphinxfixclines    \sphinxtablefixclines
+}%
+\def\sphinxthistablewithnovlinesstyle{%
+    \def\spx@arrayrulewidth{\z@}%
+    \let\sphinxvlinecrossing\@gobble
+    % let's not bother to modify \sphinxfixclines, it works fine and is
+    % useful in standard style + no vline (only hlines and clines);
+    % besides, only one of vline or novline style macro is executed
+}%
+
+% default is the standard style
+\def\sphinxthistablewithglobalstyle{\sphinxthistablewithstandardstyle}
+
+\ifspx@opt@booktabs
+    \RequirePackage{booktabs}
+    \def\sphinxthistablewithglobalstyle{\sphinxthistablewithbooktabsstyle}
+\fi
+\ifspx@opt@borderless
+    \def\sphinxthistablewithglobalstyle{\sphinxthistablewithborderlessstyle}
+\fi
+% colorrows appends to the current globalstyle (standard, booktabs, or borderless)
+\ifspx@opt@colorrows % let the globalstyle trigger the colorrows style on top of it
+    \expandafter\def\expandafter\sphinxthistablewithglobalstyle\expandafter
+    {\sphinxthistablewithglobalstyle
+     \sphinxthistablewithcolorrowsstyle
+    }
+\fi
+
+
+\endinput

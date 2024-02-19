@@ -1,0 +1,48 @@
+# Translations template for sphinxcontrib-htmlhelp.
+# Copyright (C) 2019 ORGANIZATION
+# This file is distributed under the same license as the
+# sphinxcontrib-htmlhelp project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2019.
+# 
+# Translators:
+# Tumpal Gemelli, 2019
+# oon arfiandwi <oon.arfiandwi@gmail.com>, 2019
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: sphinxcontrib-htmlhelp 1.0.0\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2019-02-15 00:45+0900\n"
+"PO-Revision-Date: 2019-02-14 15:47+0000\n"
+"Last-Translator: oon arfiandwi <oon.arfiandwi@gmail.com>, 2019\n"
+"Language-Team: Indonesian (https://www.transifex.com/sphinx-doc/teams/36659/id/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.6.0\n"
+"Language: id\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: sphinxcontrib/htmlhelp/__init__.py:147
+#, python-format
+msgid "You can now run HTML Help Workshop with the .htp file in %(outdir)s."
+msgstr ""
+"Anda sekarang dapat menjalankan HTML Help Workshop dengan berkas .htp di "
+"%(outdir)s."
+
+#: sphinxcontrib/htmlhelp/__init__.py:203
+msgid "copying stopword list"
+msgstr "menyalin daftar kata henti"
+
+#: sphinxcontrib/htmlhelp/__init__.py:218
+msgid "writing project file"
+msgstr "menulis berkas proyek"
+
+#: sphinxcontrib/htmlhelp/__init__.py:246
+msgid "writing TOC file"
+msgstr "menulis berkas TOC"
+
+#: sphinxcontrib/htmlhelp/__init__.py:268
+msgid "writing index file..."
+msgstr "menulis berkas indeks..."

@@ -1,0 +1,69 @@
+%% INDEX, BIBLIOGRAPHY, APPENDIX, TABLE OF CONTENTS
+%
+% change this info string if making any custom modification
+\ProvidesFile{sphinxlatexindbibtoc.sty}[2021/01/27 index, bib., toc]
+
+% Provides support for this output mark-up from Sphinx latex writer:
+%
+% - environments: (backup defaults or get redefined)
+%
+%   - sphinxtheindex (direct mark-up or via python.ist or sphinx.xdy)
+%   - sphinxthebibliography
+%
+% - macros: (defines defaults)
+%
+%   - \sphinxmaketitle
+%   - \sphinxtableofcontents
+%   - \sphinxnonalphabeticalgroupname
+%   - \sphinxsymbolsname
+%   - \sphinxnumbersname
+%   - \sphinxcite
+%
+% Requires:
+\RequirePackage{makeidx}
+
+% fix the double index and bibliography on the table of contents
+% in jsclasses (Japanese standard document classes)
+\ifx\@jsc@uplatextrue\@undefined\else
+  \renewenvironment{sphinxtheindex}
+    {\cleardoublepage\phantomsection
+     \begin{theindex}}
+    {\end{theindex}}
+
+  \renewenvironment{sphinxthebibliography}[1]
+    {\cleardoublepage% \phantomsection % not needed here since TeXLive 2010's hyperref
+     \begin{thebibliography}{#1}}
+    {\end{thebibliography}}
+\fi
+
+% disable \@chappos in Appendix in pTeX
+\ifx\kanjiskip\@undefined\else
+  \let\py@OldAppendix=\appendix
+  \renewcommand{\appendix}{
+    \py@OldAppendix
+    \gdef\@chappos{}
+  }
+\fi
+
+% make commands known to non-Sphinx document classes
+\providecommand*{\sphinxmaketitle}{\maketitle}
+\providecommand*{\sphinxtableofcontents}{\tableofcontents}
+\ltx@ifundefined{sphinxthebibliography}
+ {\newenvironment
+  {sphinxthebibliography}{\begin{thebibliography}}{\end{thebibliography}}%
+ }
+ {}% else clause of \ltx@ifundefined
+\ltx@ifundefined{sphinxtheindex}
+ {\newenvironment{sphinxtheindex}{\begin{theindex}}{\end{theindex}}}%
+ {}% else clause of \ltx@ifundefined
+
+% for usage with xindy: this string gets internationalized in preamble
+\newcommand*{\sphinxnonalphabeticalgroupname}{}
+% redefined in preamble, headings for makeindex produced index
+\newcommand*{\sphinxsymbolsname}{}
+\newcommand*{\sphinxnumbersname}{}
+
+\protected\def\sphinxcite{\cite}
+
+
+\endinput

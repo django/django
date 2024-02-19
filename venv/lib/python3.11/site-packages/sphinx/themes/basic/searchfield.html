@@ -1,0 +1,23 @@
+{#
+    basic/searchfield.html
+    ~~~~~~~~~~~~~~~~~~~~~~
+
+    Sphinx sidebar template: search field.
+    This component is similar to searchbox.html but does not include an
+    extra heading ("Quick search"). Instead, it uses a placeholder text
+    in the search field.
+
+    :copyright: Copyright 2007-2022 by the Sphinx team, see AUTHORS.
+    :license: BSD, see LICENSE for details.
+#}
+{%- if pagename != "search" and builder != "singlehtml" %}
+<div id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="{{ pathto('search') }}" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="{{ _('Go') }}" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+{%- endif %}

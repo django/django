@@ -1,0 +1,41 @@
+# Translations template for sphinxcontrib-htmlhelp.
+# Copyright (C) 2019 ORGANIZATION
+# This file is distributed under the same license as the
+# sphinxcontrib-htmlhelp project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2019.
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: sphinxcontrib-htmlhelp 1.0.0\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2019-02-15 00:45+0900\n"
+"PO-Revision-Date: 2019-02-14 15:47+0000\n"
+"Language-Team: Swedish (https://www.transifex.com/sphinx-doc/teams/36659/sv/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.6.0\n"
+"Language: sv\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: sphinxcontrib/htmlhelp/__init__.py:147
+#, python-format
+msgid "You can now run HTML Help Workshop with the .htp file in %(outdir)s."
+msgstr ""
+
+#: sphinxcontrib/htmlhelp/__init__.py:203
+msgid "copying stopword list"
+msgstr ""
+
+#: sphinxcontrib/htmlhelp/__init__.py:218
+msgid "writing project file"
+msgstr ""
+
+#: sphinxcontrib/htmlhelp/__init__.py:246
+msgid "writing TOC file"
+msgstr ""
+
+#: sphinxcontrib/htmlhelp/__init__.py:268
+msgid "writing index file..."
+msgstr ""

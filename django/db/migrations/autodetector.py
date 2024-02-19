@@ -620,11 +620,12 @@ class MigrationAutodetector:
                                 rem_model_state.app_label,
                                 rem_model_state.name_lower,
                             )
-                            self.renamed_models_rel[
-                                renamed_models_rel_key
-                            ] = "%s.%s" % (
-                                model_state.app_label,
-                                model_state.name_lower,
+                            self.renamed_models_rel[renamed_models_rel_key] = (
+                                "%s.%s"
+                                % (
+                                    model_state.app_label,
+                                    model_state.name_lower,
+                                )
                             )
                             self.old_model_keys.remove((rem_app_label, rem_model_name))
                             self.old_model_keys.add((app_label, model_name))
@@ -1058,9 +1059,9 @@ class MigrationAutodetector:
                                 (rem_app_label, rem_model_name, rem_field_name)
                             )
                             old_field_keys.add((app_label, model_name, field_name))
-                            self.renamed_fields[
-                                app_label, model_name, field_name
-                            ] = rem_field_name
+                            self.renamed_fields[app_label, model_name, field_name] = (
+                                rem_field_name
+                            )
                             break
 
     def generate_renamed_fields(self):
@@ -1457,25 +1458,9 @@ class MigrationAutodetector:
             new_model_state = self.to_state.models[app_label, model_name]
 
             old_constraints = old_model_state.options[option_name]
-            old_constraints_only_ddl_impacted_fields = [
-                c.only_ddl_impacted_fields() for c in old_constraints
-            ]
             new_constraints = new_model_state.options[option_name]
-            new_constraints_only_ddl_impacted_fields = [
-                c.only_ddl_impacted_fields() for c in new_constraints
-            ]
-            add_constraints = [
-                c
-                for c in new_constraints
-                if c.only_ddl_impacted_fields()
-                not in old_constraints_only_ddl_impacted_fields
-            ]
-            rem_constraints = [
-                c
-                for c in old_constraints
-                if c.only_ddl_impacted_fields()
-                not in new_constraints_only_ddl_impacted_fields
-            ]
+            add_constraints = [c for c in new_constraints if c not in old_constraints]
+            rem_constraints = [c for c in old_constraints if c not in new_constraints]
 
             self.altered_constraints.update(
                 {

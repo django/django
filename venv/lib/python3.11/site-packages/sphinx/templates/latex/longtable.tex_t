@@ -1,0 +1,74 @@
+\begin{savenotes}
+\sphinxatlongtablestart
+\sphinxthistablewithglobalstyle
+<% if 'booktabs' in table.styles -%>
+\sphinxthistablewithbooktabsstyle
+<% endif -%>
+<% if 'borderless' in table.styles -%>
+\sphinxthistablewithborderlessstyle
+<% endif -%>
+<% if 'standard' in table.styles -%>
+\sphinxthistablewithstandardstyle
+<% endif -%>
+<% if 'vlines' in table.styles -%>
+\sphinxthistablewithvlinesstyle
+<% endif -%>
+<% if 'novlines' in table.styles -%>
+\sphinxthistablewithnovlinesstyle
+<% endif -%>
+<% if 'colorrows' in table.styles -%>
+\sphinxthistablewithcolorrowsstyle
+<% endif -%>
+<% if 'nocolorrows' in table.styles -%>
+\sphinxthistablewithnocolorrowsstyle
+<% endif -%>
+\makeatletter
+<%- if table.align in ('center', 'default') %>
+  \LTleft \@totalleftmargin plus1fill
+  \LTright\dimexpr\columnwidth-\@totalleftmargin-\linewidth\relax plus1fill
+<%- elif table.align == 'left' %>
+  \LTleft \@totalleftmargin
+  \LTright\dimexpr\columnwidth-\@totalleftmargin-\linewidth\relax plus1fill
+<%- elif table.align == 'right' %>
+  \LTleft \@totalleftmargin plus1fill
+  \LTright\dimexpr\columnwidth-\@totalleftmargin-\linewidth\relax
+<%- endif %>
+\makeatother
+\begin{longtable}<%= table.get_colspec() %>
+<%- if table.caption -%>
+\sphinxthelongtablecaptionisattop
+\caption{<%= ''.join(table.caption) %>\strut}<%= labels %>\\*[\sphinxlongtablecapskipadjust]
+<% elif labels -%>
+\noalign{\phantomsection<%= labels %>}%
+<% endif -%>
+\sphinxtoprule
+<%= ''.join(table.header) -%>
+<%- if table.header -%>
+\sphinxmidrule
+<% endif -%>
+\endfirsthead
+
+\multicolumn{<%= table.colcount %>}{c}{\sphinxnorowcolor
+    \makebox[0pt]{\sphinxtablecontinued{\tablename\ \thetable{} \textendash{} <%= _('continued from previous page') %>}}%
+}\\
+\sphinxtoprule
+<%= ''.join(table.header) -%>
+<%- if table.header -%>
+\sphinxmidrule
+<% endif -%>
+\endhead
+
+\sphinxbottomrule
+\multicolumn{<%= table.colcount %>}{r}{\sphinxnorowcolor
+    \makebox[0pt][r]{\sphinxtablecontinued{<%= _('continues on next page') %>}}%
+}\\
+\endfoot
+
+\endlastfoot
+\sphinxtableatstartofbodyhook
+<%= ''.join(table.body) -%>
+\sphinxbottomrule
+\end{longtable}
+\sphinxtableafterendhook
+\sphinxatlongtableend
+\end{savenotes}

@@ -1,0 +1,26 @@
+/*
+ * language_data.js
+ * ~~~~~~~~~~~~~~~~
+ *
+ * This script contains the language-specific data used by searchtools.js,
+ * namely the list of stopwords, stemmer, scorer and splitter.
+ *
+ * :copyright: Copyright 2007-2023 by the Sphinx team, see AUTHORS.
+ * :license: BSD, see LICENSE for details.
+ *
+ */
+
+var stopwords = {{ search_language_stop_words }};
+
+{% if search_language_stemming_code %}
+/* Non-minified version is copied as a separate JS file, is available */
+{{ search_language_stemming_code|safe }}
+{% endif -%}
+
+{% if search_scorer_tool %}
+{{ search_scorer_tool|safe }}
+{% endif -%}
+
+{% if search_word_splitter_code %}
+{{ search_word_splitter_code }}
+{% endif -%}

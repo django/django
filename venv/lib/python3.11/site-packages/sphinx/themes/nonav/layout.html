@@ -1,0 +1,23 @@
+{#
+    nonav/layout.html
+    ~~~~~~~~~~~~~~~~
+
+    Sphinx layout template for the any help system theme.
+
+    :copyright: Copyright 2007-2023 by the Sphinx team, see AUTHORS.
+    :license: BSD, see LICENSE for details.
+#}
+{%- extends "basic/layout.html" %}
+
+{%- block doctype -%}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+  "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+{%- endblock -%}
+{# add only basic navigation links #}
+{% block sidebar1 %}{% endblock %}
+{% block sidebar2 %}{% endblock %}
+{% block relbar1 %}{% endblock %}
+{% block relbar2 %}{% endblock %}
+{% block linktags %}{% endblock %}
+{% block footer %}{% endblock %}
+

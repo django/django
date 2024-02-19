@@ -1,0 +1,13 @@
+const DOCUMENTATION_OPTIONS = {
+    VERSION: '{{ release|e }}',
+    LANGUAGE: '{{ language }}',
+    COLLAPSE_INDEX: false,
+    BUILDER: '{{ builder }}',
+    FILE_SUFFIX: '{{ file_suffix }}',
+    LINK_SUFFIX: '{{ link_suffix }}',
+    HAS_SOURCE: {{ has_source|lower }},
+    SOURCELINK_SUFFIX: '{{ sourcelink_suffix }}',
+    NAVIGATION_WITH_KEYS: {{ 'true' if theme_navigation_with_keys|tobool else 'false'}},
+    SHOW_SEARCH_SUMMARY: {{ 'true' if show_search_summary else 'false' }},
+    ENABLE_SEARCH_SHORTCUTS: {{ 'true' if theme_enable_search_shortcuts|tobool else 'false'}},
+};

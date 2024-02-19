@@ -1,0 +1,24 @@
+{%- macro sitemap(name, docname) -%}
+<OBJECT type="text/sitemap">
+    <param name="Name" value="{{ name|e }}">
+    <param name="Local" value="{{ docname|e }}{{ suffix }}">
+</OBJECT>
+{%- endmacro -%}
+
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<HTML>
+<HEAD>
+<meta name="GENERATOR" content="Microsoft&reg; HTML Help Workshop 4.1">
+<!-- Sitemap 1.0 -->
+</HEAD><BODY>
+<OBJECT type="text/site properties">
+        <param name="Window Styles" value="0x801227">
+        <param name="ImageType" value="Folder">
+</OBJECT>
+<UL>
+<LI> {{ sitemap(short_title, master_doc) }}
+{%- for indexname, indexcls, content, collapse in domain_indices %}
+<LI> {{ sitemap(indexcls.localname, indexname) }}
+{%- endfor %}
+{{ body }}
+</UL></BODY></HTML>

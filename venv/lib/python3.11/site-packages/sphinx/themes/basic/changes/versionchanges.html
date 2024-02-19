@@ -1,0 +1,33 @@
+{% macro entries(changes) %}
+<ul>{% for entry, docname, lineno in changes %}
+<li><a href="rst/{{ docname }}.html#L{{ lineno-10 }}" target="src">{{ entry }}</a></li>
+{% endfor %}</ul>
+{% endmacro -%}
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+  "http://www.w3.org/TR/html4/loose.dtd">
+<html{% if language is not none %} lang="{{ language }}"{% endif %}>
+  <head>
+    <link rel="stylesheet" href="default.css">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>{% trans version=version|e, docstitle=docstitle|e %}Changes in Version {{ version }} &#8212; {{ docstitle }}{% endtrans %}</title>
+  </head>
+  <body>
+    <div class="document">
+      <div class="body">
+    <h1>{% trans version=version|e %}Automatically generated list of changes in version {{ version }}{% endtrans %}</h1>
+    <h2>{{ _('Library changes') }}</h2>
+    {% for modname, changes in libchanges %}
+    <h4>{{ modname }}</h4>
+    {{ entries(changes) }}
+    {% endfor %}
+    <h2>{{ _('C API changes') }}</h2>
+    {{ entries(apichanges) }}
+    <h2>{{ _('Other changes') }}</h2>
+    {% for (fn, title), changes in otherchanges %}
+    <h4>{{ title }} <span style="font-size: 50%">({{ fn }})</span></h4>
+    {{ entries(changes) }}
+    {% endfor %}
+      </div>
+    </div>
+  </body>
+</html>

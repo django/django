@@ -1,0 +1,53 @@
+[OPTIONS]
+Binary TOC=No
+Binary Index=No
+Compiled file={{ outname }}.chm
+Contents file={{ outname }}.hhc
+Default Window={{ outname }}
+Default topic={{ master_doc }}
+Display compile progress=No
+Full text search stop list file={{ outname }}.stp
+Full-text search=Yes
+Index file={{ outname }}.hhk
+Language={{ "%#x"|format(lcid) }}
+Title={{ title }}
+
+{#
+# The magical numbers in the long line under [WINDOWS] set most of the
+# user-visible features (visible buttons, tabs, etc).
+# About 0x10384e:  This defines the buttons in the help viewer.  The
+# following defns are taken from htmlhelp.h.  Not all possibilities
+# actually work, and not all those that work are available from the Help
+# Workshop GUI.  In particular, the Zoom/Font button works and is not
+# available from the GUI.  The ones we're using are marked with 'x':
+#
+#    0x000002   Hide/Show   x
+#    0x000004   Back        x
+#    0x000008   Forward     x
+#    0x000010   Stop
+#    0x000020   Refresh
+#    0x000040   Home        x
+#    0x000080   Forward
+#    0x000100   Back
+#    0x000200   Notes
+#    0x000400   Contents
+#    0x000800   Locate      x
+#    0x001000   Options     x
+#    0x002000   Print       x
+#    0x004000   Index
+#    0x008000   Search
+#    0x010000   History
+#    0x020000   Favorites
+#    0x040000   Jump 1
+#    0x080000   Jump 2
+#    0x100000   Zoom/Font   x
+#    0x200000   TOC Next
+#    0x400000   TOC Prev
+-#}
+[WINDOWS]
+{{ outname }}="{{ title }}","{{ outname }}.hhc","{{ outname }}.hhk","{{ master_doc }}","{{ master_doc }}",,,,,0x63520,220,0x10384e,[0,0,1024,768],,,,,,,0
+
+[FILES]
+{%- for filename in files %}
+{{ filename }}
+{%- endfor %}

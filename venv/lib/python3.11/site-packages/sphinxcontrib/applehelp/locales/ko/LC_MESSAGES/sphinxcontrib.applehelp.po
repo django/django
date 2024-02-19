@@ -1,0 +1,94 @@
+# Translations template for sphinxcontrib-applehelp.
+# Copyright (C) 2019 ORGANIZATION
+# This file is distributed under the same license as the
+# sphinxcontrib-applehelp project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2019.
+# 
+# Translators:
+# YT H <dev@theYT.net>, 2019
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: sphinxcontrib-applehelp 1.0.0\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2019-01-20 16:59+0900\n"
+"PO-Revision-Date: 2019-01-20 07:59+0000\n"
+"Last-Translator: YT H <dev@theYT.net>, 2019\n"
+"Language-Team: Korean (https://www.transifex.com/sphinx-doc/teams/36659/ko/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.6.0\n"
+"Language: ko\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: sphinxcontrib/applehelp/__init__.py:39
+msgid "Help indexer failed"
+msgstr "도움말 인덱서 실패"
+
+#: sphinxcontrib/applehelp/__init__.py:43
+msgid "Code signing failed"
+msgstr "코드 서명 실패"
+
+#: sphinxcontrib/applehelp/__init__.py:52
+#, python-format
+msgid ""
+"The help book is in %(outdir)s.\n"
+"Note that won't be able to view it unless you put it in ~/Library/Documentation/Help or install it in your application bundle."
+msgstr ""
+"도움말 책은 %(outdir)s에 있습니다.\n"
+"이것을 ~/Library/Documentation/Help에 넣거나 응용 프로그램 번들에 설치해야만 볼 수 있다는 점에 주의하십시오."
+
+#: sphinxcontrib/applehelp/__init__.py:79
+msgid "You must set applehelp_bundle_id before building Apple Help output"
+msgstr "Apple 도움말을 작성하기 전에 applehelp_bundle_id를 설정해야 합니다"
+
+#: sphinxcontrib/applehelp/__init__.py:96
+msgid "copying localized files"
+msgstr "지역화 된 파일 복사 중"
+
+#: sphinxcontrib/applehelp/__init__.py:123
+msgid "writing Info.plist"
+msgstr "Info.plist 파일 쓰는 중"
+
+#: sphinxcontrib/applehelp/__init__.py:161
+msgid "copying icon... "
+msgstr "아이콘 복사 중…"
+
+#: sphinxcontrib/applehelp/__init__.py:165
+#, python-format
+msgid "cannot copy icon file %r: %s"
+msgstr "아이콘 파일 %r을(를) 복사할 수 없습니다: %s"
+
+#: sphinxcontrib/applehelp/__init__.py:167
+msgid "building access page"
+msgstr "접근 페이지 빌드 중"
+
+#: sphinxcontrib/applehelp/__init__.py:177
+msgid "generating help index"
+msgstr "도움말 인덱스 생성 중"
+
+#: sphinxcontrib/applehelp/__init__.py:201
+#, python-format
+msgid ""
+"you will need to index this help book with:\n"
+"  %s"
+msgstr "다음 명령으로 이 도움말 책을 색인화해야 합니다: %s"
+
+#: sphinxcontrib/applehelp/__init__.py:207
+#: sphinxcontrib/applehelp/__init__.py:232
+#, python-format
+msgid "Command not found: %s"
+msgstr "명령을 찾을 수 없습니다: %s"
+
+#: sphinxcontrib/applehelp/__init__.py:211
+msgid "signing help book"
+msgstr "도움말 책을 서명하는 중"
+
+#: sphinxcontrib/applehelp/__init__.py:226
+#, python-format
+msgid ""
+"you will need to sign this help book with:\n"
+"  %s"
+msgstr "다음 명령으로 이 도움말 책을 서명해야 합니다: %s"

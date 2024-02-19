@@ -1,0 +1,122 @@
+%% NUMBERING OF FIGURES, TABLES, AND LITERAL BLOCKS
+%
+% change this info string if making any custom modification
+\ProvidesFile{sphinxlatexnumfig.sty}[2021/01/27 numbering]
+
+% Requires: remreset (old LaTeX only)
+% relates to numfig and numfig_secnum_depth configuration variables
+
+% LaTeX 2018-04-01 and later provides \@removefromreset
+\ltx@ifundefined{@removefromreset}
+    {\RequirePackage{remreset}}
+    {}% avoid warning
+% Everything is delayed to \begin{document} to allow hyperref patches into
+%   \newcounter to solve duplicate label problems for internal hyperlinks to
+%   code listings (literalblock counter).  User or extension re-definitions of
+%   \theliteralblock, et al., thus have also to be delayed. (changed at 3.5.0)
+\AtBeginDocument{%
+\ltx@ifundefined{c@chapter}
+   {\newcounter{literalblock}}%
+   {\newcounter{literalblock}[chapter]%
+    \def\theliteralblock{\ifnum\c@chapter>\z@\arabic{chapter}.\fi
+                         \arabic{literalblock}}%
+    }%
+\ifspx@opt@nonumfigreset
+    \ltx@ifundefined{c@chapter}{}{%
+      \@removefromreset{figure}{chapter}%
+      \@removefromreset{table}{chapter}%
+      \@removefromreset{literalblock}{chapter}%
+      \ifspx@opt@mathnumfig
+        \@removefromreset{equation}{chapter}%
+      \fi
+    }%
+    \def\thefigure{\arabic{figure}}%
+    \def\thetable {\arabic{table}}%
+    \def\theliteralblock{\arabic{literalblock}}%
+    \ifspx@opt@mathnumfig
+      \def\theequation{\arabic{equation}}%
+    \fi
+\else
+\let\spx@preAthefigure\@empty
+\let\spx@preBthefigure\@empty
+% \ifspx@opt@usespart  % <-- LaTeX writer could pass such a 'usespart' boolean
+%                      %     as sphinx.sty package option
+% If document uses \part, (triggered in Sphinx by latex_toplevel_sectioning)
+% LaTeX core per default does not reset chapter or section
+% counters at each part.
+% But if we modify this, we need to redefine \thechapter, \thesection to
+% include the part number and this will cause problems in table of contents
+% because of too wide numbering. Simplest is to do nothing.
+% \fi
+\ifnum\spx@opt@numfigreset>0
+    \ltx@ifundefined{c@chapter}
+      {}
+      {\g@addto@macro\spx@preAthefigure{\ifnum\c@chapter>\z@\arabic{chapter}.}%
+       \g@addto@macro\spx@preBthefigure{\fi}}%
+\fi
+\ifnum\spx@opt@numfigreset>1
+    \@addtoreset{figure}{section}%
+    \@addtoreset{table}{section}%
+    \@addtoreset{literalblock}{section}%
+    \ifspx@opt@mathnumfig
+      \@addtoreset{equation}{section}%
+    \fi%
+    \g@addto@macro\spx@preAthefigure{\ifnum\c@section>\z@\arabic{section}.}%
+    \g@addto@macro\spx@preBthefigure{\fi}%
+\fi
+\ifnum\spx@opt@numfigreset>2
+    \@addtoreset{figure}{subsection}%
+    \@addtoreset{table}{subsection}%
+    \@addtoreset{literalblock}{subsection}%
+    \ifspx@opt@mathnumfig
+      \@addtoreset{equation}{subsection}%
+    \fi%
+    \g@addto@macro\spx@preAthefigure{\ifnum\c@subsection>\z@\arabic{subsection}.}%
+    \g@addto@macro\spx@preBthefigure{\fi}%
+\fi
+\ifnum\spx@opt@numfigreset>3
+    \@addtoreset{figure}{subsubsection}%
+    \@addtoreset{table}{subsubsection}%
+    \@addtoreset{literalblock}{subsubsection}%
+    \ifspx@opt@mathnumfig
+      \@addtoreset{equation}{subsubsection}%
+    \fi%
+    \g@addto@macro\spx@preAthefigure{\ifnum\c@subsubsection>\z@\arabic{subsubsection}.}%
+    \g@addto@macro\spx@preBthefigure{\fi}%
+\fi
+\ifnum\spx@opt@numfigreset>4
+    \@addtoreset{figure}{paragraph}%
+    \@addtoreset{table}{paragraph}%
+    \@addtoreset{literalblock}{paragraph}%
+    \ifspx@opt@mathnumfig
+      \@addtoreset{equation}{paragraph}%
+    \fi%
+    \g@addto@macro\spx@preAthefigure{\ifnum\c@subparagraph>\z@\arabic{subparagraph}.}%
+    \g@addto@macro\spx@preBthefigure{\fi}%
+\fi
+\ifnum\spx@opt@numfigreset>5
+    \@addtoreset{figure}{subparagraph}%
+    \@addtoreset{table}{subparagraph}%
+    \@addtoreset{literalblock}{subparagraph}%
+    \ifspx@opt@mathnumfig
+      \@addtoreset{equation}{subparagraph}%
+    \fi%
+    \g@addto@macro\spx@preAthefigure{\ifnum\c@subsubparagraph>\z@\arabic{subsubparagraph}.}%
+    \g@addto@macro\spx@preBthefigure{\fi}%
+\fi
+\expandafter\g@addto@macro
+\expandafter\spx@preAthefigure\expandafter{\spx@preBthefigure}%
+\let\thefigure\spx@preAthefigure
+\let\thetable\spx@preAthefigure
+\let\theliteralblock\spx@preAthefigure
+\g@addto@macro\thefigure{\arabic{figure}}%
+\g@addto@macro\thetable{\arabic{table}}%
+\g@addto@macro\theliteralblock{\arabic{literalblock}}%
+  \ifspx@opt@mathnumfig
+    \let\theequation\spx@preAthefigure
+    \g@addto@macro\theequation{\arabic{equation}}%
+  \fi
+\fi
+}% end of big \AtBeginDocument
+
+\endinput

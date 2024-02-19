@@ -1,0 +1,10 @@
+[main]
+host = https://www.transifex.com
+
+[sphinx-1.sphinxcontrib-htmlhelp-pot]
+file_filter = <lang>/LC_MESSAGES/sphinxcontrib.htmlhelp.po
+minimum_perc = 0
+source_file = sphinxcontrib.htmlhelp.pot
+source_lang = en
+type = PO
+

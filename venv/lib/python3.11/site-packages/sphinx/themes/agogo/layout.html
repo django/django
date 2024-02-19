@@ -1,0 +1,104 @@
+{#
+    agogo/layout.html
+    ~~~~~~~~~~~~~~~~~
+
+    Sphinx layout template for the agogo theme, originally written
+    by Andi Albrecht.
+
+    :copyright: Copyright 2007-2023 by the Sphinx team, see AUTHORS.
+    :license: BSD, see LICENSE for details.
+#}
+{%- extends "basic/layout.html" %}
+
+{% block header %}
+    <div class="header-wrapper" role="banner">
+      <div class="header">
+        {%- if logo_url %}
+          <p class="logo"><a href="{{ pathto(root_doc)|e }}">
+            <img class="logo" src="{{ logo_url|e }}" alt="Logo"/>
+          </a></p>
+        {%- endif %}
+        {%- block headertitle %}
+        <div class="headertitle"><a
+          href="{{ pathto(root_doc)|e }}">{{ shorttitle|e }}</a></div>
+        {%- endblock %}
+        <div class="rel" role="navigation" aria-label="related navigation">
+          {%- for rellink in rellinks|reverse %}
+          <a href="{{ pathto(rellink[0])|e }}" title="{{ rellink[1]|striptags|e }}"
+             {{ accesskey(rellink[2]) }}>{{ rellink[3] }}</a>
+          {%- if not loop.last %}{{ reldelim2 }}{% endif %}
+          {%- endfor %}
+        </div>
+       </div>
+    </div>
+{% endblock %}
+
+{%- macro agogo_sidebar() %}
+          {%- block sidebartoc %}
+          <h3>{{ _('Table of Contents') }}</h3>
+          {{ toctree(includehidden=True) }}
+          {%- endblock %}
+          {%- block sidebarsearch %}
+          <div role="search">
+            <h3 style="margin-top: 1.5em;">{{ _('Search') }}</h3>
+            <form class="search" action="{{ pathto('search') }}" method="get">
+                <input type="text" name="q" />
+                <input type="submit" value="{{ _('Go') }}" />
+            </form>
+          </div>
+          {%- endblock %}
+{% endmacro %}
+
+{% block content %}
+    <div class="content-wrapper">
+      <div class="content">
+        {%- if not theme_rightsidebar|tobool %}
+        <div class="sidebar">
+          {{ agogo_sidebar() }}
+        </div>
+        {%- endif %}
+        <div class="document">
+          {%- block document %}
+            {{ super() }}
+          {%- endblock %}
+        </div>
+        {%- if theme_rightsidebar|tobool %}
+        <div class="sidebar">
+          {{ agogo_sidebar() }}
+        </div>
+        {%- endif %}
+        <div class="clearer"></div>
+      </div>
+    </div>
+{% endblock %}
+
+{% block footer %}
+    <div class="footer-wrapper">
+      <div class="footer">
+        <div class="left">
+          <div role="navigation" aria-label="related navigaton">
+            {%- for rellink in rellinks|reverse %}
+            <a href="{{ pathto(rellink[0])|e }}" title="{{ rellink[1]|striptags|e }}"
+              {{ accesskey(rellink[2]) }}>{{ rellink[3] }}</a>
+            {%- if not loop.last %}{{ reldelim2 }}{% endif %}
+            {%- endfor %}
+          </div>
+          <div role="note" aria-label="source link">
+            {%- if show_source and has_source and sourcename %}
+              <br/>
+              <a href="{{ pathto('_sources/' + sourcename, true)|e }}"
+                rel="nofollow">{{ _('Show Source') }}</a>
+            {%- endif %}
+          </div>
+        </div>
+
+        <div class="right">
+          {{ super() }}
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+{% endblock %}
+
+{% block relbar1 %}{% endblock %}
+{% block relbar2 %}{% endblock %}

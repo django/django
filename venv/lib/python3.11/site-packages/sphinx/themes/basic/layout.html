@@ -1,0 +1,220 @@
+{#
+    basic/layout.html
+    ~~~~~~~~~~~~~~~~~
+
+    Master layout template for Sphinx themes.
+
+    :copyright: Copyright 2007-2023 by the Sphinx team, see AUTHORS.
+    :license: BSD, see LICENSE for details.
+#}
+{%- block doctype -%}
+<!DOCTYPE html>
+{%- endblock %}
+{%- set reldelim1 = reldelim1 is not defined and ' &#187;' or reldelim1 %}
+{%- set reldelim2 = reldelim2 is not defined and ' |' or reldelim2 %}
+{%- set render_sidebar = (not embedded) and (not theme_nosidebar|tobool) and
+                         (sidebars != []) %}
+{# URL root should never be #, then all links are fragments #}
+{%- if not embedded and docstitle %}
+  {%- set titlesuffix = " &#8212; "|safe + docstitle|e %}
+{%- else %}
+  {%- set titlesuffix = "" %}
+{%- endif %}
+
+{%- macro relbar() %}
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>{{ _('Navigation') }}</h3>
+      <ul>
+        {%- for rellink in rellinks %}
+        <li class="right" {% if loop.first %}style="margin-right: 10px"{% endif %}>
+          <a href="{{ pathto(rellink[0])|e }}" title="{{ rellink[1]|striptags|e }}"
+             {{ accesskey(rellink[2]) }}>{{ rellink[3] }}</a>
+          {%- if not loop.first %}{{ reldelim2 }}{% endif %}</li>
+        {%- endfor %}
+        {%- block rootrellink %}
+        <li class="nav-item nav-item-0"><a href="{{ pathto(root_doc)|e }}">{{ shorttitle|e }}</a>{{ reldelim1 }}</li>
+        {%- endblock %}
+        {%- for parent in parents %}
+          <li class="nav-item nav-item-{{ loop.index }}"><a href="{{ parent.link|e }}" {% if loop.last %}{{ accesskey("U") }}{% endif %}>{{ parent.title }}</a>{{ reldelim1 }}</li>
+        {%- endfor %}
+        <li class="nav-item nav-item-this"><a href="{{ link|e }}">{{ title }}</a></li>
+        {%- block relbaritems %} {% endblock %}
+      </ul>
+    </div>
+{%- endmacro %}
+
+{%- macro sidebar() %}
+      {%- if render_sidebar %}
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+          {%- block sidebarlogo %}
+          {%- if logo_url %}
+            <p class="logo"><a href="{{ pathto(root_doc)|e }}">
+              <img class="logo" src="{{ logo_url|e }}" alt="Logo"/>
+            </a></p>
+          {%- endif %}
+          {%- endblock %}
+          {%- if sidebars != None %}
+            {#- new style sidebar: explicitly include/exclude templates #}
+            {%- for sidebartemplate in sidebars %}
+            {%- include sidebartemplate %}
+            {%- endfor %}
+          {%- else %}
+            {#- old style sidebars: using blocks -- should be deprecated #}
+            {%- block sidebartoc %}
+            {%- include "localtoc.html" %}
+            {%- endblock %}
+            {%- block sidebarrel %}
+            {%- include "relations.html" %}
+            {%- endblock %}
+            {%- block sidebarsourcelink %}
+            {%- include "sourcelink.html" %}
+            {%- endblock %}
+            {%- if customsidebar %}
+            {%- include customsidebar %}
+            {%- endif %}
+            {%- block sidebarsearch %}
+            {%- include "searchbox.html" %}
+            {%- endblock %}
+          {%- endif %}
+        </div>
+        {%- block sidebarextra %}{%- endblock %}
+      </div>
+      {%- endif %}
+{%- endmacro %}
+
+{%- macro script() %}
+    {%- for js in script_files %}
+    {{ js_tag(js) }}
+    {%- endfor %}
+{%- endmacro %}
+
+{%- macro css() %}
+    {%- for css in css_files %}
+      {%- if css|attr("filename") %}
+    {{ css_tag(css) }}
+      {%- else %}
+    <link rel="stylesheet" href="{{ pathto(css, 1)|e }}" type="text/css" />
+      {%- endif %}
+    {%- endfor %}
+{%- endmacro %}
+
+{%- if html_tag %}
+{{ html_tag }}
+{%- else %}
+<html{% if language is not none %} lang="{{ language }}"{% endif %} data-content_root="{{ content_root }}">
+{%- endif %}
+  <head>
+    <meta charset="{{ encoding }}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    {{- metatags }}
+    {%- block htmltitle %}
+    <title>{{ title|striptags|e }}{{ titlesuffix }}</title>
+    {%- endblock %}
+    {%- block css %}
+    {{- css() }}
+    {%- endblock %}
+    {%- if not embedded %}
+    {%- block scripts %}
+    {{- script() }}
+    {%- endblock %}
+    {%- if pageurl %}
+    <link rel="canonical" href="{{ pageurl|e }}" />
+    {%- endif %}
+    {%- if use_opensearch %}
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="{% trans docstitle=docstitle|e %}Search within {{ docstitle }}{% endtrans %}"
+          href="{{ pathto('_static/opensearch.xml', 1) }}"/>
+    {%- endif %}
+    {%- if favicon_url %}
+    <link rel="icon" href="{{ favicon_url|e }}"/>
+    {%- endif %}
+    {%- endif %}
+{%- block linktags %}
+    {%- if hasdoc('about') %}
+    <link rel="author" title="{{ _('About these documents') }}" href="{{ pathto('about') }}" />
+    {%- endif %}
+    {%- if hasdoc('genindex') %}
+    <link rel="index" title="{{ _('Index') }}" href="{{ pathto('genindex') }}" />
+    {%- endif %}
+    {%- if hasdoc('search') %}
+    <link rel="search" title="{{ _('Search') }}" href="{{ pathto('search') }}" />
+    {%- endif %}
+    {%- if hasdoc('copyright') %}
+    <link rel="copyright" title="{{ _('Copyright') }}" href="{{ pathto('copyright') }}" />
+    {%- endif %}
+    {%- if next %}
+    <link rel="next" title="{{ next.title|striptags|e }}" href="{{ next.link|e }}" />
+    {%- endif %}
+    {%- if prev %}
+    <link rel="prev" title="{{ prev.title|striptags|e }}" href="{{ prev.link|e }}" />
+    {%- endif %}
+{%- endblock %}
+{%- block extrahead %} {% endblock %}
+  </head>
+  {%- block body_tag %}<body>{% endblock %}
+{%- block header %}{% endblock %}
+
+{%- block relbar1 %}{{ relbar() }}{% endblock %}
+
+{%- block content %}
+  {%- block sidebar1 %} {# possible location for sidebar #} {% endblock %}
+
+    <div class="document">
+  {%- block document %}
+      <div class="documentwrapper">
+      {%- if render_sidebar %}
+        <div class="bodywrapper">
+      {%- endif %}
+          <div class="body" role="main">
+            {% block body %} {% endblock %}
+            <div class="clearer"></div>
+          </div>
+      {%- if render_sidebar %}
+        </div>
+      {%- endif %}
+      </div>
+  {%- endblock %}
+
+  {%- block sidebar2 %}{{ sidebar() }}{% endblock %}
+      <div class="clearer"></div>
+    </div>
+{%- endblock %}
+
+{%- block relbar2 %}{{ relbar() }}{% endblock %}
+
+{%- macro copyright_block() %}
+  {%- if hasdoc('copyright') %}
+    {%- set copyright_prefix = '<a href="' + pathto('copyright') + '">' + _('Copyright') + '</a>' -%}
+  {%- else %}
+    {%- set copyright_prefix = _('Copyright') %}
+  {%- endif %}
+  {%- if copyright is iterable and copyright is not string %}
+    {% for copyright_line in copyright %}
+      {% trans trimmed copyright_prefix=copyright_prefix, copyright=copyright_line|e %}
+        &#169; {{ copyright_prefix }} {{ copyright }}.
+      {% endtrans %}
+      {%- if not loop.last %}<br/>{%- endif %}
+    {% endfor %}
+  {%- else %}
+    {% trans trimmed copyright_prefix=copyright_prefix, copyright=copyright|e %}
+      &#169; {{ copyright_prefix }} {{ copyright }}.
+    {% endtrans %}
+  {%- endif %}
+{%- endmacro %}
+
+{%- block footer %}
+    <div class="footer" role="contentinfo">
+    {%- if show_copyright %}
+        {{- copyright_block() -}}
+    {%- endif %}
+    {%- if last_updated %}
+      {% trans last_updated=last_updated|e %}Last updated on {{ last_updated }}.{% endtrans %}
+    {%- endif %}
+    {%- if show_sphinx %}
+      {% trans sphinx_version=sphinx_version|e %}Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> {{ sphinx_version }}.{% endtrans %}
+    {%- endif %}
+    </div>
+{%- endblock %}
+  </body>
+</html>

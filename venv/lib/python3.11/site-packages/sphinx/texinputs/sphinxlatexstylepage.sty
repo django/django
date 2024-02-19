@@ -1,0 +1,79 @@
+%% PAGE STYLING
+%
+% change this info string if making any custom modification
+\ProvidesFile{sphinxlatexstylepage.sty}[2021/01/27 page styling]
+
+% Separate paragraphs by space by default.
+\IfFileExists{parskip-2001-04-09.sty}% since September 2018 TeXLive update
+% new parskip.sty, but let it rollback to old one.
+% hopefully TeX installation not broken and LaTeX kernel not too old
+   {\RequirePackage{parskip}[=v1]}
+% standard one from 1989. Admittedly \section of article/book gives possibly
+% anomalous spacing, but we can't require September 2018 release for some time.
+   {\RequirePackage{parskip}}
+
+% Style parameters and macros used by most documents here
+\raggedbottom
+\sloppy
+\hbadness = 5000                % don't print trivial gripes
+
+% Require package fancyhdr except under memoir class
+\@ifclassloaded{memoir}{}{\RequirePackage{fancyhdr}}
+% Use \pagestyle{normal} as the primary pagestyle for text.
+% Redefine the 'normal' header/footer style when using "fancyhdr" package:
+\@ifpackageloaded{fancyhdr}{%
+  \ltx@ifundefined{c@chapter}
+  {% no \chapter, "howto" (non-Japanese) docclass
+   \fancypagestyle{plain}{
+    \fancyhf{}
+    \fancyfoot[C]{{\py@HeaderFamily\thepage}}
+    \renewcommand{\headrulewidth}{0pt}
+    \renewcommand{\footrulewidth}{0pt}
+   }
+   % Same as 'plain', this way we can use it in template
+   % FIXME: shouldn't this have a running header with Name and Release like 'manual'?
+   \fancypagestyle{normal}{
+    \fancyhf{}
+    \fancyfoot[C]{{\py@HeaderFamily\thepage}}
+    \renewcommand{\headrulewidth}{0pt}
+    \renewcommand{\footrulewidth}{0pt}
+   }
+  }%
+  {% classes with \chapter command
+   \fancypagestyle{normal}{
+    \fancyhf{}
+    \fancyfoot[RO]{{\py@HeaderFamily\thepage}}
+    \fancyfoot[LO]{{\py@HeaderFamily\nouppercase{\rightmark}}}
+    \fancyhead[RO]{{\py@HeaderFamily \@title\sphinxheadercomma\py@release}}
+    \if@twoside
+     \fancyfoot[LE]{{\py@HeaderFamily\thepage}}
+     \fancyfoot[RE]{{\py@HeaderFamily\nouppercase{\leftmark}}}
+     \fancyhead[LE]{{\py@HeaderFamily \@title\sphinxheadercomma\py@release}}
+    \fi
+    \renewcommand{\headrulewidth}{0.4pt}
+    \renewcommand{\footrulewidth}{0.4pt}
+    % define chaptermark with \@chappos when \@chappos is available for Japanese
+    \ltx@ifundefined{@chappos}{}
+      {\def\chaptermark##1{\markboth{\@chapapp\space\thechapter\space\@chappos\space ##1}{}}}
+    }
+  % Update the plain style so we get the page number & footer line,
+  % but not a chapter or section title.  This is to keep the first
+  % page of a chapter `clean.'
+   \fancypagestyle{plain}{
+    \fancyhf{}
+    \fancyfoot[RO]{{\py@HeaderFamily\thepage}}
+    \if@twoside\fancyfoot[LE]{{\py@HeaderFamily\thepage}}\fi
+    \renewcommand{\headrulewidth}{0pt}
+    \renewcommand{\footrulewidth}{0.4pt}
+    }
+   }
+  }
+  {% no fancyhdr: memoir class
+   % Provide default for 'normal' style simply as an alias of 'plain' style
+   % This way we can use \pagestyle{normal} in LaTeX template
+   \def\ps@normal{\ps@plain}
+   % Users of memoir class are invited to redefine 'normal' style in preamble
+  }
+
+
+\endinput
