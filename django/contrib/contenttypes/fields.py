@@ -187,7 +187,7 @@ class GenericForeignKey(FieldCacheMixin, Field):
         fk_dict = defaultdict(set)
         # We need one instance for each group in order to get the right db:
         instance_dict = {}
-        ct_attname = self.model._meta.get_field(self.ct_field).get_attname()
+        ct_attname = self.model._meta.get_field(self.ct_field).attname
         for instance in instances:
             # We avoid looking for values if either ct_id or fkey value is None
             ct_id = getattr(instance, ct_attname)
@@ -240,7 +240,7 @@ class GenericForeignKey(FieldCacheMixin, Field):
         # content type ID here, and later when the actual instance is needed,
         # use ContentType.objects.get_for_id(), which has a global cache.
         f = self.model._meta.get_field(self.ct_field)
-        ct_id = getattr(instance, f.get_attname(), None)
+        ct_id = getattr(instance, f.attname, None)
         pk_val = getattr(instance, self.fk_field)
 
         rel_obj = self.get_cached_value(instance, default=None)

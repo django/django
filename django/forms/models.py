@@ -1140,7 +1140,7 @@ class BaseInlineFormSet(BaseModelFormSet):
         if self.fk.remote_field.field_name != self.fk.remote_field.model._meta.pk.name:
             fk_value = getattr(self.instance, self.fk.remote_field.field_name)
             fk_value = getattr(fk_value, "pk", fk_value)
-        setattr(form.instance, self.fk.get_attname(), fk_value)
+        setattr(form.instance, self.fk.attname, fk_value)
         return form
 
     @classmethod

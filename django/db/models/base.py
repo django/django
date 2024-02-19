@@ -1925,7 +1925,7 @@ class Model(AltersData, metaclass=ModelBase):
         errors = []
 
         for f in cls._meta.local_fields:
-            _, column_name = f.get_attname_column()
+            column_name = f.column
 
             # Ensure the column name is not already in use.
             if column_name and column_name in used_column_names:
@@ -1972,7 +1972,7 @@ class Model(AltersData, metaclass=ModelBase):
         errors = []
         property_names = cls._meta._property_names
         related_field_accessors = (
-            f.get_attname()
+            f.attname
             for f in cls._meta._get_fields(reverse=False)
             if f.is_relation and f.related_model is not None
         )
@@ -2320,13 +2320,11 @@ class Model(AltersData, metaclass=ModelBase):
             return errors
 
         for f in cls._meta.local_fields:
-            _, column_name = f.get_attname_column()
-
             # Check if auto-generated name for the field is too long
             # for the database.
             if (
                 f.db_column is None
-                and column_name is not None
+                and (column_name := f.column) is not None
                 and len(column_name) > allowed_len
             ):
                 errors.append(
@@ -2348,10 +2346,9 @@ class Model(AltersData, metaclass=ModelBase):
             # Check if auto-generated name for the M2M field is too long
             # for the database.
             for m2m in f.remote_field.through._meta.local_fields:
-                _, rel_name = m2m.get_attname_column()
                 if (
                     m2m.db_column is None
-                    and rel_name is not None
+                    and (rel_name := m2m.column) is not None
                     and len(rel_name) > allowed_len
                 ):
                     errors.append(
