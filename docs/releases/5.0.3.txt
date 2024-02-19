@@ -24,3 +24,7 @@ Bugfixes
 * Fixed a regression in Django 5.0 that caused a crash of
   ``@sensitive_variables`` and ``@sensitive_post_parameters`` decorators on
   functions loaded from ``.pyc`` files (:ticket:`35187`).
+
+* Fixed a regression in Django 5.0 that caused a crash when reloading a test
+  database and a base queryset for a base manager used ``prefetch_related()``
+  (:ticket:`35238`).
