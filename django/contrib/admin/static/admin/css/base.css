@@ -105,15 +105,17 @@ body {
 
 a:link, a:visited {
     color: var(--link-fg);
-    text-decoration: none;
+    text-decoration: underline;
     transition: color 0.15s, background 0.15s;
 }
 
 a:focus, a:hover {
     color: var(--link-hover-color);
+    text-decoration: underline;
 }
 
 a:focus {
+    text-decoration: underline;
     text-decoration: underline;
 }
 
@@ -123,7 +125,7 @@ a img {
 
 a.section:link, a.section:visited {
     color: var(--header-link-color);
-    text-decoration: none;
+    text-decoration: underline;
 }
 
 a.section:focus, a.section:hover {
