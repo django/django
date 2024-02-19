@@ -292,6 +292,33 @@ class TestUtilsText(SimpleTestCase):
         truncator = text.Truncator("foo</p>")
         self.assertEqual("foo</p>", truncator.words(3, html=True))
 
+        # Only open brackets.
+        truncator = text.Truncator("<" * 60_000)
+        self.assertEqual(truncator.words(1, html=True), "&lt;…")
+
+        # Tags with special chars in attrs.
+        truncator = text.Truncator(
+            """<i style="margin: 5%; font: *;">Hello, my dear lady!</i>"""
+        )
+        self.assertEqual(
+            """<i style="margin: 5%; font: *;">Hello, my dear…</i>""",
+            truncator.words(3, html=True),
+        )
+
+        # Tags with special non-latin chars in attrs.
+        truncator = text.Truncator("""<p data-x="א">Hello, my dear lady!</p>""")
+        self.assertEqual(
+            """<p data-x="א">Hello, my dear…</p>""",
+            truncator.words(3, html=True),
+        )
+
+        # Misplaced brackets.
+        truncator = text.Truncator("hello >< world")
+        self.assertEqual(truncator.words(1, html=True), "hello…")
+        self.assertEqual(truncator.words(2, html=True), "hello &gt;…")
+        self.assertEqual(truncator.words(3, html=True), "hello &gt;&lt;…")
+        self.assertEqual(truncator.words(4, html=True), "hello &gt;&lt; world")
+
     @patch("django.utils.text.Truncator.MAX_LENGTH_HTML", 10_000)
     def test_truncate_words_html_size_limit(self):
         max_len = text.Truncator.MAX_LENGTH_HTML
