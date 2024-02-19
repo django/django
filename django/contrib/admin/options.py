@@ -1033,7 +1033,10 @@ class ModelAdmin(BaseModelAdmin):
 
     @staticmethod
     def _get_action_description(func, name):
-        return getattr(func, "short_description", capfirst(name.replace("_", " ")))
+        try:
+            return func.short_description
+        except AttributeError:
+            return capfirst(name.replace("_", " "))
 
     def _get_base_actions(self):
         """Return the list of actions, prior to any request-based filtering."""
