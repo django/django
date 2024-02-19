@@ -524,7 +524,7 @@ class ReverseOneToOneDescriptor:
         if rel_obj is None:
             raise self.RelatedObjectDoesNotExist(
                 "%s has no %s."
-                % (instance.__class__.__name__, self.related.get_accessor_name())
+                % (instance.__class__.__name__, self.related.accessor_name)
             )
         else:
             return rel_obj
@@ -564,7 +564,7 @@ class ReverseOneToOneDescriptor:
                 % (
                     value,
                     instance._meta.object_name,
-                    self.related.get_accessor_name(),
+                    self.related.accessor_name,
                     self.related.related_model._meta.object_name,
                 )
             )
@@ -652,7 +652,7 @@ class ReverseManyToOneDescriptor:
     def _get_set_deprecation_msg_params(self):
         return (
             "reverse side of a related set",
-            self.rel.get_accessor_name(),
+            self.rel.accessor_name,
         )
 
     def __set__(self, instance, value):
@@ -1019,7 +1019,7 @@ class ManyToManyDescriptor(ReverseManyToOneDescriptor):
         return (
             "%s side of a many-to-many set"
             % ("reverse" if self.reverse else "forward"),
-            self.rel.get_accessor_name() if self.reverse else self.field.name,
+            self.rel.accessor_name if self.reverse else self.field.name,
         )
 
 
