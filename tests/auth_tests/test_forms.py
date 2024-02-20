@@ -16,6 +16,7 @@ from django.contrib.auth.forms import (
     UserCreationForm,
     UsernameField,
 )
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_login_failed
 from django.contrib.sites.models import Site
@@ -54,6 +55,9 @@ class TestDataMixin:
         cls.u4 = User.objects.create(username="empty_password", password="")
         cls.u5 = User.objects.create(username="unmanageable_password", password="$")
         cls.u6 = User.objects.create(username="unknown_password", password="foo$bar")
+        cls.u7 = User.objects.create(
+            username="unusable_password", password=make_password(None)
+        )
 
 
 class BaseUserCreationFormTest(TestDataMixin, TestCase):
@@ -918,9 +922,7 @@ class UserChangeFormTest(TestDataMixin, TestCase):
         MyUserForm({})
 
     def test_unusable_password(self):
-        user = User.objects.get(username="empty_password")
-        user.set_unusable_password()
-        user.save()
+        user = User.objects.get(username="unusable_password")
         form = UserChangeForm(instance=user)
         self.assertIn(_("No password set."), form.as_table())
 
