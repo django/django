@@ -558,6 +558,28 @@ class URLResolver:
                                 url_pattern.pattern.converters,
                             ),
                         )
+                        for name in url_pattern.reverse_dict:
+                            if not isinstance(name, str):
+                                for (
+                                        matches,
+                                        pat,
+                                        defaults,
+                                        converters,
+                                ) in url_pattern.reverse_dict.getlist(name):
+                                    new_matches = normalize(p_pattern + pat)
+                                    lookups.appendlist(
+                                        name,
+                                        (
+                                            new_matches,
+                                            p_pattern + pat,
+                                            {**defaults, **url_pattern.default_kwargs},
+                                            {
+                                                **self.pattern.converters,
+                                                **url_pattern.pattern.converters,
+                                                **converters,
+                                            },
+                                        ),
+                                    )
                 else:  # url_pattern is a URLResolver.
                     url_pattern._populate()
                     if url_pattern.app_name:
