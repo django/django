@@ -561,10 +561,10 @@ class URLResolver:
                         for name in url_pattern.reverse_dict:
                             if not isinstance(name, str):
                                 for (
-                                        matches,
-                                        pat,
-                                        defaults,
-                                        converters,
+                                    matches,
+                                    pat,
+                                    defaults,
+                                    converters,
                                 ) in url_pattern.reverse_dict.getlist(name):
                                     new_matches = normalize(p_pattern + pat)
                                     lookups.appendlist(
