@@ -436,7 +436,7 @@ class IndexesTests(TestCase):
             fk_2 = models.ForeignKey(Target, models.CASCADE, related_name="target_2")
 
             class Meta:
-                constraints = [
+                indexes = [
                     models.Index(
                         fields=["id"],
                         include=["fk_1_id", "fk_2"],

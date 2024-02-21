@@ -74,6 +74,7 @@ create a real version. Add the following to ``polls/views.py``:
 .. code-block:: python
     :caption: ``polls/views.py``
 
+    from django.db.models import F
     from django.http import HttpResponse, HttpResponseRedirect
     from django.shortcuts import get_object_or_404, render
     from django.urls import reverse
@@ -97,7 +98,7 @@ create a real version. Add the following to ``polls/views.py``:
                 },
             )
         else:
-            selected_choice.votes += 1
+            selected_choice.votes = F("votes") + 1
             selected_choice.save()
             # Always return an HttpResponseRedirect after successfully dealing
             # with POST data. This prevents data from being posted twice if a
@@ -122,6 +123,9 @@ This code includes a few things we haven't covered yet in this tutorial:
   ``choice`` wasn't provided in POST data. The above code checks for
   :exc:`KeyError` and redisplays the question form with an error
   message if ``choice`` isn't given.
+
+* ``F("votes") + 1`` :ref:`instructs the database
+  <avoiding-race-conditions-using-f>` to increase the vote count by 1.
 
 * After incrementing the choice count, the code returns an
   :class:`~django.http.HttpResponseRedirect` rather than a normal
@@ -189,19 +193,6 @@ Now, create a ``polls/results.html`` template:
 Now, go to ``/polls/1/`` in your browser and vote in the question. You should see a
 results page that gets updated each time you vote. If you submit the form
 without having chosen a choice, you should see the error message.
-
-.. note::
-    The code for our ``vote()`` view does have a small problem. It first gets
-    the ``selected_choice`` object from the database, then computes the new
-    value of ``votes``, and then saves it back to the database. If two users of
-    your website try to vote at *exactly the same time*, this might go wrong:
-    The same value, let's say 42, will be retrieved for ``votes``. Then, for
-    both users the new value of 43 is computed and saved, but 44 would be the
-    expected value.
-
-    This is called a *race condition*. If you are interested, you can read
-    :ref:`avoiding-race-conditions-using-f` to learn how you can solve this
-    issue.
 
 Use generic views: Less code is better
 ======================================

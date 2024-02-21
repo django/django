@@ -941,6 +941,30 @@ To enable the JSON1 extension you can follow the instruction on
 .. _JSON1 extension: https://www.sqlite.org/json1.html
 .. _the wiki page: https://code.djangoproject.com/wiki/JSON1Extension
 
+.. _sqlite-init-command:
+
+Setting pragma options
+----------------------
+
+.. versionadded:: 5.1
+
+`Pragma options`_ can be set upon connection by using the ``init_command`` in
+the :setting:`OPTIONS` part of your database configuration in
+:setting:`DATABASES`. The example below shows how to enable extra durability of
+synchronous writes and change the ``cache_size``::
+
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            # ...
+            "OPTIONS": {
+                "init_command": "PRAGMA synchronous=3; PRAGMA cache_size=2000;",
+            },
+        }
+    }
+
+.. _Pragma options: https://www.sqlite.org/pragma.html
+
 .. _oracle-notes:
 
 Oracle notes

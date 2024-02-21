@@ -473,9 +473,7 @@ class OneToOneTests(TestCase):
         self.assertFalse(
             hasattr(
                 Target,
-                HiddenPointer._meta.get_field(
-                    "target"
-                ).remote_field.get_accessor_name(),
+                HiddenPointer._meta.get_field("target").remote_field.accessor_name,
             )
         )
 

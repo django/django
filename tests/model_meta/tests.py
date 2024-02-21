@@ -222,6 +222,17 @@ class GetFieldByNameTests(OptionsBaseTests):
             opts.apps.models_ready = True
 
 
+class VerboseNameRawTests(SimpleTestCase):
+    def test_string(self):
+        # Clear cached property.
+        Relation._meta.__dict__.pop("verbose_name_raw", None)
+        self.assertEqual(Relation._meta.verbose_name_raw, "relation")
+
+    def test_gettext(self):
+        Person._meta.__dict__.pop("verbose_name_raw", None)
+        self.assertEqual(Person._meta.verbose_name_raw, "Person")
+
+
 class RelationTreeTests(SimpleTestCase):
     all_models = (Relation, AbstractPerson, BasePerson, Person, ProxyPerson, Relating)
 
@@ -258,7 +269,7 @@ class RelationTreeTests(SimpleTestCase):
             sorted(
                 field.related_query_name()
                 for field in Relation._meta._relation_tree
-                if not field.remote_field.field.remote_field.is_hidden()
+                if not field.remote_field.field.remote_field.hidden
             ),
             sorted(
                 [

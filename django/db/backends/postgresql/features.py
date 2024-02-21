@@ -106,13 +106,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                     "test_group_by_nested_expression_with_params",
                 }
             )
-        if not is_psycopg3:
-            expected_failures.update(
-                {
-                    "constraints.tests.CheckConstraintTests."
-                    "test_validate_jsonfield_exact",
-                }
-            )
         return expected_failures
 
     @cached_property
