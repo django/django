@@ -115,7 +115,10 @@ Minor features
 :mod:`django.contrib.sessions`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :class:`django.contrib.sessions.backends.cached_db.SessionStore` now handles
+  exceptions when storing session information in the cache, logging proper
+  error messages with their traceback via the newly added
+  :ref:`sessions logger <django-contrib-sessions-logger>`.
 
 :mod:`django.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
