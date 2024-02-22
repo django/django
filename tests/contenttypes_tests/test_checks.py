@@ -122,10 +122,10 @@ class GenericForeignKeyTests(SimpleTestCase):
 
         with mock.patch.object(GenericForeignKey, "check") as check:
             checks.run_checks(app_configs=self.apps.get_app_configs())
-        check.assert_called_once_with()
+        check.assert_called_once_with(databases=None)
 
 
-@isolate_apps("contenttypes_tests")
+@isolate_apps("contenttypes_tests", attr_name="apps")
 class GenericRelationTests(SimpleTestCase):
     def test_valid_generic_relationship(self):
         class TaggedItem(models.Model):
@@ -252,6 +252,19 @@ class GenericRelationTests(SimpleTestCase):
                 )
             ],
         )
+
+    def test_generic_relation_checks_are_performed(self):
+        class TaggedItem(models.Model):
+            content_type = models.ForeignKey(ContentType, models.CASCADE)
+            object_id = models.PositiveIntegerField()
+            content_object = GenericForeignKey()
+
+        class InvalidBookmark(models.Model):
+            tags_ = GenericRelation("TaggedItem")
+
+        with mock.patch.object(GenericRelation, "check") as check:
+            checks.run_checks(app_configs=self.apps.get_app_configs())
+        check.assert_called_once_with(databases=None)
 
 
 @isolate_apps("contenttypes_tests", attr_name="apps")
