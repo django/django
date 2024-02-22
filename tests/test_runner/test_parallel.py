@@ -113,6 +113,7 @@ class RemoteTestResultTest(SimpleTestCase):
         with self.assertRaisesMessage(TypeError, msg):
             result._confirm_picklable(not_unpicklable_error)
 
+    @unittest.skipUnless(tblib is not None, "requires tblib to be installed")
     def test_unpicklable_subtest(self):
         result = RemoteTestResult()
         subtest_test = SampleFailingSubtest(methodName="pickle_error_test")
