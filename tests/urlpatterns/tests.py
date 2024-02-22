@@ -4,10 +4,20 @@ import uuid
 from django.core.exceptions import ImproperlyConfigured
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
-from django.urls import NoReverseMatch, Resolver404, path, re_path, resolve, reverse
+from django.urls import (
+    NoReverseMatch,
+    Resolver404,
+    path,
+    re_path,
+    register_converter,
+    resolve,
+    reverse,
+)
+from django.urls.converters import IntConverter
+from django.utils.deprecation import RemovedInDjango60Warning
 from django.views import View
 
-from .converters import DynamicConverter
+from .converters import Base64Converter, DynamicConverter
 from .views import empty_view
 
 included_kwargs = {"base": b"hello", "value": b"world"}
@@ -192,6 +202,28 @@ class SimplifiedURLTests(SimpleTestCase):
         msg = "URL route 'foo/<nonexistent:var>/' uses invalid converter 'nonexistent'."
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             path("foo/<nonexistent:var>/", empty_view)
+
+    def test_warning_override_default_converter(self):
+        # RemovedInDjango60Warning: when the deprecation ends, replace with
+        # msg = "Converter 'int' is already registered."
+        # with self.assertRaisesMessage(ValueError, msg):
+        msg = (
+            "Converter 'int' is already registered. Support for overriding registered "
+            "converters is deprecated and will be removed in Django 6.0."
+        )
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+            register_converter(IntConverter, "int")
+
+    def test_warning_override_converter(self):
+        # RemovedInDjango60Warning: when the deprecation ends, replace with
+        # msg = "Converter 'base64' is already registered."
+        # with self.assertRaisesMessage(ValueError, msg):
+        msg = (
+            "Converter 'base64' is already registered. Support for overriding "
+            "registered converters is deprecated and will be removed in Django 6.0."
+        )
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+            register_converter(Base64Converter, "base64")
 
     def test_invalid_view(self):
         msg = "view must be a callable or a list/tuple in the case of include()."

@@ -419,6 +419,9 @@ Miscellaneous
 * Setting ``django.contrib.gis.gdal.OGRGeometry.coord_dim`` is deprecated. Use
   :meth:`~django.contrib.gis.gdal.OGRGeometry.set_3d` instead.
 
+* Overriding existing converters with ``django.urls.register_converter()`` is
+  deprecated.
+
 Features removed in 5.1
 =======================
 
