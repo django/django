@@ -974,7 +974,7 @@ def phone2numeric_filter(value):
 
 
 @register.filter(is_safe=True)
-def pprint(v):
+def pprint(value):
     repr_instance = DjangoRepr()
     repr_instance.config(limit=EXCEPTION_PRINT_LIMIT)
 

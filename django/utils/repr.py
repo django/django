@@ -5,7 +5,7 @@ import reprlib
 class DjangoRepr(reprlib.Repr):
 
     def config(self, limit):
-        """Sets maximum print length for all data structures using the given value"""
+        """Set maximum print length for all data structures to `limit`."""
         self.limit = limit
         for attr in dir(self):
             if attr.startswith("max") and attr != "maxlevel":
