@@ -25,6 +25,7 @@ from django.urls.converters import IntConverter
 from django.utils.functional import SimpleLazyObject
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.safestring import mark_safe
+from django.utils.text import DebugRepr
 from django.utils.version import PY311
 from django.views.debug import (
     CallableSettingWrapper,
@@ -1282,6 +1283,40 @@ class ExceptionReporterTests(SimpleTestCase):
                 request = factory.get(url)
                 reporter = ExceptionReporter(request, None, None, None)
                 self.assertEqual(reporter._get_raw_insecure_uri(), expected)
+
+
+class DebugReprTests(SimpleTestCase):
+
+    overload = EXCEPTION_PRINT_LIMIT + 100
+    repr_instance = DebugRepr(limit=EXCEPTION_PRINT_LIMIT)
+
+    def test_string_trim(self):
+        """A string longer than limit is trimmed"""
+        long_str = "A" * self.overload
+        trimmed_str = self.repr_instance.print(long_str)
+        self.assertIn("trimmed 100 bytes string", trimmed_str)
+
+    def test_list_trim(self):
+        """A list longer than limit is trimmed"""
+        long_list = ["A"] * self.overload
+        trimmed_list = self.repr_instance.print(long_list)
+        self.assertIn("trimmed 100 bytes string", trimmed_list)
+
+    def test_set_trim(self):
+        """A set with elements more than limit is trimmed"""
+        long_set = set()
+        for i in range(self.overload):
+            long_set.add(i)
+        trimmed_set = self.repr_instance.print(long_set)
+        self.assertIn("trimmed 100 bytes string", trimmed_set)
+
+    def test_dict_trim(self):
+        """A dictionary with keys more than limit is trimmed"""
+        long_dict = {}
+        for i in range(self.overload):
+            long_dict[i] = 1
+        trimmed_dict = self.repr_instance.print(long_dict)
+        self.assertIn("trimmed 100 bytes string", trimmed_dict)
 
 
 class PlainTextReportTests(SimpleTestCase):
