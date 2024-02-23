@@ -4,6 +4,7 @@ import re
 import reprlib
 import secrets
 import unicodedata
+from collections.abc import Sized
 from gzip import GzipFile
 from gzip import compress as gzip_compress
 from io import BytesIO
@@ -501,6 +502,12 @@ class DebugRepr(reprlib.Repr):
         if len(s) > self.maxother:
             return s[: self.maxother] + self.gen_trim_msg(len(s))
         return s
+
+    def print(self, value):
+        if isinstance(value, Sized) and len(value) > self.limit:
+            length = len(value)
+            self.fillvalue = self.gen_trim_msg(length)
+        return self.repr(value)
 
     def gen_trim_msg(self, length):
         if length <= self.limit:

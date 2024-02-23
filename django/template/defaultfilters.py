@@ -3,7 +3,6 @@
 import random as random_module
 import re
 import types
-from collections.abc import Sized
 from decimal import ROUND_HALF_UP, Context, Decimal, InvalidOperation, getcontext
 from functools import wraps
 from inspect import unwrap
@@ -978,9 +977,6 @@ def pprint(value):
     repr_instance = DebugRepr(limit=EXCEPTION_PRINT_LIMIT)
 
     try:
-        if isinstance(value, Sized) and len(value) > EXCEPTION_PRINT_LIMIT:
-            diff = len(value) - EXCEPTION_PRINT_LIMIT
-            repr_instance.fillvalue = "...<trimmed %d bytes string>" % diff
         value = repr_instance.repr(value)
 
     except Exception as e:
