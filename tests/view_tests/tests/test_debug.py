@@ -1287,25 +1287,25 @@ class ExceptionReporterTests(SimpleTestCase):
 
 class DebugReprTests(SimpleTestCase):
 
-    overload = EXCEPTION_PRINT_LIMIT + 100
+    limit_overflow = EXCEPTION_PRINT_LIMIT + 100
     repr_instance = DebugRepr(limit=EXCEPTION_PRINT_LIMIT)
 
     def test_string_trim(self):
         """A string longer than limit is trimmed"""
-        long_str = "A" * self.overload
+        long_str = "A" * self.limit_overflow
         trimmed_str = self.repr_instance.print(long_str)
         self.assertIn("trimmed 100 bytes string", trimmed_str)
 
     def test_list_trim(self):
         """A list longer than limit is trimmed"""
-        long_list = ["A"] * self.overload
+        long_list = ["A"] * self.limit_overflow
         trimmed_list = self.repr_instance.print(long_list)
         self.assertIn("trimmed 100 bytes string", trimmed_list)
 
     def test_set_trim(self):
         """A set with elements more than limit is trimmed"""
         long_set = set()
-        for i in range(self.overload):
+        for i in range(self.limit_overflow):
             long_set.add(i)
         trimmed_set = self.repr_instance.print(long_set)
         self.assertIn("trimmed 100 bytes string", trimmed_set)
@@ -1313,7 +1313,7 @@ class DebugReprTests(SimpleTestCase):
     def test_dict_trim(self):
         """A dictionary with keys more than limit is trimmed"""
         long_dict = {}
-        for i in range(self.overload):
+        for i in range(self.limit_overflow):
             long_dict[i] = 1
         trimmed_dict = self.repr_instance.print(long_dict)
         self.assertIn("trimmed 100 bytes string", trimmed_dict)
