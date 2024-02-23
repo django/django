@@ -1,5 +1,7 @@
+import builtins
 import gzip
 import re
+import reprlib
 import secrets
 import unicodedata
 from gzip import GzipFile
@@ -469,3 +471,38 @@ def _format_lazy(format_string, *args, **kwargs):
 
 
 format_lazy = lazy(_format_lazy, str)
+
+
+class DebugRepr(reprlib.Repr):
+
+    def __init__(self, limit):
+        """Sets maximum print length for all data structures using the given value"""
+        self.maxlevel = limit
+        self.maxtuple = limit
+        self.maxlist = limit
+        self.maxarray = limit
+        self.maxdict = limit
+        self.maxset = limit
+        self.maxfrozenset = limit
+        self.maxdeque = limit
+        self.maxstring = limit
+        self.maxlong = limit
+        self.maxother = limit
+        self.limit = limit
+
+        self.fillvalue = ""
+        self.indent = 2
+
+    def repr_str(self, x, level):
+        return "'%s'" % (x[: self.maxstring] + self.gen_trim_msg(len(x)))
+
+    def repr_instance(self, x, level):
+        s = builtins.repr(x)
+        if len(s) > self.maxother:
+            return s[: self.maxother] + self.gen_trim_msg(len(s))
+        return s
+
+    def gen_trim_msg(self, length):
+        if length <= self.limit:
+            return ""
+        return "...<trimmed %d bytes string>" % (length - self.limit)

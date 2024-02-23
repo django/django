@@ -17,9 +17,8 @@ from django.utils.html import avoid_wrapping, conditional_escape, escape, escape
 from django.utils.html import json_script as _json_script
 from django.utils.html import linebreaks, strip_tags
 from django.utils.html import urlize as _urlize
-from django.utils.repr import DjangoRepr
 from django.utils.safestring import SafeData, mark_safe
-from django.utils.text import Truncator, normalize_newlines, phone2numeric
+from django.utils.text import DebugRepr, Truncator, normalize_newlines, phone2numeric
 from django.utils.text import slugify as _slugify
 from django.utils.text import wrap
 from django.utils.timesince import timesince, timeuntil
@@ -975,16 +974,16 @@ def phone2numeric_filter(value):
 
 @register.filter(is_safe=True)
 def pprint(value):
-    repr_instance = DjangoRepr()
-    repr_instance.config(limit=EXCEPTION_PRINT_LIMIT)
+    """A wrapper with custom Repr implementation for debugging."""
+    repr_instance = DebugRepr(limit=EXCEPTION_PRINT_LIMIT)
 
     try:
-        if isinstance(v, Sized) and len(v) > EXCEPTION_PRINT_LIMIT:
-            diff = len(v) - EXCEPTION_PRINT_LIMIT
+        if isinstance(value, Sized) and len(value) > EXCEPTION_PRINT_LIMIT:
+            diff = len(value) - EXCEPTION_PRINT_LIMIT
             repr_instance.fillvalue = "...<trimmed %d bytes string>" % diff
-        v = repr_instance.repr(v)
+        value = repr_instance.repr(value)
 
     except Exception as e:
-        v = "Error in formatting: %s: %s" % (e.__class__.__name__, e)
+        value = "Error in formatting: %s: %s" % (e.__class__.__name__, e)
 
-    return v
+    return value
