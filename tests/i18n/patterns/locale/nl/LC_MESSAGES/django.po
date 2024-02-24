@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-28 11:48+0000\n"
+"POT-Creation-Date: 2024-03-01 21:18+0000\n"
 "PO-Revision-Date: 2011-06-14 16:16+0100\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,22 +18,26 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: urls/default.py:11
-msgid "^translated/$"
-msgstr "^vertaald/$"
+msgid "translated/"
+msgstr "vertaald/"
 
-#: urls/default.py:13
+#: urls/default.py:12
+msgid "^translated-regex/$"
+msgstr "^vertaald-regex/$"
+
+#: urls/default.py:14
 msgid "^translated/(?P<slug>[\\w-]+)/$"
 msgstr "^vertaald/(?P<slug>[\\w-]+)/$"
 
-#: urls/default.py:24
+#: urls/default.py:25
 msgid "^with-arguments/(?P<argument>[\\w-]+)/(?:(?P<optional>[\\w-]+).html)?$"
 msgstr ""
 
-#: urls/default.py:28
+#: urls/default.py:29
 msgid "^users/$"
 msgstr "^gebruikers/$"
 
-#: urls/default.py:30 urls/wrong.py:7
+#: urls/default.py:31 urls/wrong.py:7
 msgid "^account/"
 msgstr "^profiel/"
 
