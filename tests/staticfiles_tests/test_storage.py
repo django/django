@@ -22,7 +22,7 @@ from .settings import TEST_ROOT
 
 def hashed_file_path(test, path):
     fullpath = test.render_template(test.static_template_snippet(path))
-    return fullpath.replace(settings.STATIC_URL, "")
+    return fullpath.removeprefix(settings.STATIC_URL)
 
 
 class TestHashedFiles:
@@ -558,6 +558,32 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         manifest_content, manifest_hash = storage.staticfiles_storage.load_manifest()
         self.assertEqual(manifest_hash, "")
         self.assertEqual(manifest_content, {"dummy.txt": "dummy.txt"})
+
+
+@override_settings(
+    STATIC_URL="/",
+    STORAGES={
+        **settings.STORAGES,
+        STATICFILES_STORAGE_ALIAS: {
+            "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
+        },
+    },
+)
+class TestCollectionManifestStorageStaticUrlSlash(CollectionTestCase):
+    run_collectstatic_in_setUp = False
+    hashed_file_path = hashed_file_path
+
+    def test_protocol_relative_url_ignored(self):
+        with override_settings(
+            STATICFILES_DIRS=[os.path.join(TEST_ROOT, "project", "static_url_slash")],
+            STATICFILES_FINDERS=["django.contrib.staticfiles.finders.FileSystemFinder"],
+        ):
+            self.run_collectstatic()
+        relpath = self.hashed_file_path("ignored.css")
+        self.assertEqual(relpath, "ignored.61707f5f4942.css")
+        with storage.staticfiles_storage.open(relpath) as relfile:
+            content = relfile.read()
+            self.assertIn(b"//foobar", content)
 
 
 @override_settings(

@@ -221,7 +221,7 @@ class HashedFilesMixin:
             url = matches["url"]
 
             # Ignore absolute/protocol-relative and data-uri URLs.
-            if re.match(r"^[a-z]+:", url):
+            if re.match(r"^[a-z]+:", url) or url.startswith("//"):
                 return matched
 
             # Ignore absolute URLs that don't point to a static file (dynamic
