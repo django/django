@@ -128,9 +128,6 @@ def get_ns_resolver(ns_pattern, resolver, converters):
 
 
 class LocaleRegexDescriptor:
-    def __init__(self, attr):
-        self.attr = attr
-
     def __get__(self, instance, cls=None):
         """
         Return a compiled regular expression based on the active language.
@@ -140,14 +137,22 @@ class LocaleRegexDescriptor:
         # As a performance optimization, if the given regex string is a regular
         # string (not a lazily-translated string proxy), compile it once and
         # avoid per-language compilation.
-        pattern = getattr(instance, self.attr)
+        pattern = instance._regex
         if isinstance(pattern, str):
-            instance.__dict__["regex"] = instance._compile(pattern)
+            instance.__dict__["regex"] = self._compile(pattern)
             return instance.__dict__["regex"]
         language_code = get_language()
         if language_code not in instance._regex_dict:
-            instance._regex_dict[language_code] = instance._compile(str(pattern))
+            instance._regex_dict[language_code] = self._compile(str(pattern))
         return instance._regex_dict[language_code]
+
+    def _compile(self, regex):
+        try:
+            return re.compile(regex)
+        except re.error as e:
+            raise ImproperlyConfigured(
+                f'"{regex}" is not a valid regular expression: {e}'
+            ) from e
 
 
 class CheckURLMixin:
@@ -186,7 +191,7 @@ class CheckURLMixin:
 
 
 class RegexPattern(CheckURLMixin):
-    regex = LocaleRegexDescriptor("_regex")
+    regex = LocaleRegexDescriptor()
 
     def __init__(self, regex, name=None, is_endpoint=False):
         self._regex = regex
@@ -232,15 +237,6 @@ class RegexPattern(CheckURLMixin):
         else:
             return []
 
-    def _compile(self, regex):
-        """Compile and return the given regular expression."""
-        try:
-            return re.compile(regex)
-        except re.error as e:
-            raise ImproperlyConfigured(
-                '"%s" is not a valid regular expression: %s' % (regex, e)
-            ) from e
-
     def __str__(self):
         return str(self._regex)
 
@@ -250,7 +246,7 @@ _PATH_PARAMETER_COMPONENT_RE = _lazy_re_compile(
 )
 
 
-def _route_to_regex(route, is_endpoint=False):
+def _route_to_regex(route, is_endpoint):
     """
     Convert a path pattern into a regular expression. Return the regular
     expression and a dictionary mapping the capture names to the converters.
@@ -296,15 +292,36 @@ def _route_to_regex(route, is_endpoint=False):
     return "".join(parts), converters
 
 
+class LocaleRegexRouteDescriptor:
+    def __get__(self, instance, cls=None):
+        """
+        Return a compiled regular expression based on the active language.
+        """
+        if instance is None:
+            return self
+        # As a performance optimization, if the given route is a regular string
+        # (not a lazily-translated string proxy), compile it once and avoid
+        # per-language compilation.
+        if isinstance(instance._route, str):
+            instance.__dict__["regex"] = re.compile(instance._regex)
+            return instance.__dict__["regex"]
+        language_code = get_language()
+        if language_code not in instance._regex_dict:
+            instance._regex_dict[language_code] = re.compile(
+                _route_to_regex(str(instance._route), instance._is_endpoint)[0]
+            )
+        return instance._regex_dict[language_code]
+
+
 class RoutePattern(CheckURLMixin):
-    regex = LocaleRegexDescriptor("_route")
+    regex = LocaleRegexRouteDescriptor()
 
     def __init__(self, route, name=None, is_endpoint=False):
         self._route = route
+        self._regex, self.converters = _route_to_regex(str(route), is_endpoint)
         self._regex_dict = {}
         self._is_endpoint = is_endpoint
         self.name = name
-        self.converters = _route_to_regex(str(route), is_endpoint)[1]
 
     def match(self, path):
         match = self.regex.search(path)
@@ -355,9 +372,6 @@ class RoutePattern(CheckURLMixin):
         if open_bracket_counter > 0:
             warnings.append(Warning(msg % (self.describe(), "<"), id="urls.W010"))
         return warnings
-
-    def _compile(self, route):
-        return re.compile(_route_to_regex(route, self._is_endpoint)[0])
 
     def __str__(self):
         return str(self._route)
