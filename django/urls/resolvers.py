@@ -169,12 +169,11 @@ class CheckURLMixin:
         """
         Check that the pattern does not begin with a forward slash.
         """
-        regex_pattern = self.regex.pattern
         if not settings.APPEND_SLASH:
             # Skip check as it can be useful to start a URL pattern with a slash
             # when APPEND_SLASH=False.
             return []
-        if regex_pattern.startswith(("/", "^/", "^\\/")) and not regex_pattern.endswith(
+        if self._regex.startswith(("/", "^/", "^\\/")) and not self._regex.endswith(
             "/"
         ):
             warning = Warning(
@@ -224,8 +223,7 @@ class RegexPattern(CheckURLMixin):
         return warnings
 
     def _check_include_trailing_dollar(self):
-        regex_pattern = self.regex.pattern
-        if regex_pattern.endswith("$") and not regex_pattern.endswith(r"\$"):
+        if self._regex.endswith("$") and not self._regex.endswith(r"\$"):
             return [
                 Warning(
                     "Your URL pattern {} uses include with a route ending with a '$'. "
