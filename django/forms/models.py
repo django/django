@@ -1120,7 +1120,7 @@ class ModelFormSetMeta(FormSetMeta):
             attrs.update({"form": form})
         if kwargs.get("model") is None and "form" in attrs:
             model = attrs.get("form")._meta.model
-        
+
         formset = attrs.get("formset") or BaseModelFormSet
 
         default_formset_attrs = {
@@ -1149,6 +1149,7 @@ class ModelFormSetMeta(FormSetMeta):
 
 class ModelFormSet(BaseModelFormSet, FormSet, metaclass=ModelFormSetMeta):
     """Base class for which can be used to create modelformset classes."""
+
     def __init__(
         self,
         queryset=None,
