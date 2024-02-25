@@ -2109,7 +2109,7 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         with self.subTest(max_num=None):
             with self.assertRaisesMessage(ValueError, msg):
 
-                class DeclarativeFavoriteAbsoluteMaxNumFormSet(FormSet):
+                class DeclarativeInvalidMaxNoneFormSet(FormSet):
                     form = FavoriteDrinkForm
                     max_num = None
                     absolute_max = 30
@@ -2117,7 +2117,7 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         with self.subTest(max_num=31):
             with self.assertRaisesMessage(ValueError, msg):
 
-                class DeclarativeFavoriteAbsoluteMaxNumFormSet(FormSet):
+                class DeclarativeInvalidMax31FormSet(FormSet):
                     form = FavoriteDrinkForm
                     max_num = 31
                     absolute_max = 30
