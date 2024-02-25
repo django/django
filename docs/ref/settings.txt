@@ -1710,6 +1710,10 @@ for project locales. If not ``None``, Django will check for a ``formats.py``
 file, under the directory named as the current locale, and will use the
 formats defined in this file.
 
+The name of the directory containing the format definitions is expected to be
+named using :term:`locale name` notation, for example ``de``, ``pt_BR``,
+``en_US``, etc.
+
 For example, if :setting:`FORMAT_MODULE_PATH` is set to ``mysite.formats``,
 and current language is ``en`` (English), Django will expect a directory tree
 like:

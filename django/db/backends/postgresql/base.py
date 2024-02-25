@@ -190,9 +190,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def get_connection_params(self):
         settings_dict = self.settings_dict
         # None may be used to connect to the default 'postgres' db
-        if settings_dict["NAME"] == "" and not settings_dict.get("OPTIONS", {}).get(
-            "service"
-        ):
+        if settings_dict["NAME"] == "" and not settings_dict["OPTIONS"].get("service"):
             raise ImproperlyConfigured(
                 "settings.DATABASES is improperly configured. "
                 "Please supply the NAME or OPTIONS['service'] value."
@@ -215,7 +213,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             }
         elif settings_dict["NAME"] is None:
             # Connect to the default 'postgres' db.
-            settings_dict.get("OPTIONS", {}).pop("service", None)
+            settings_dict["OPTIONS"].pop("service", None)
             conn_params = {"dbname": "postgres", **settings_dict["OPTIONS"]}
         else:
             conn_params = {**settings_dict["OPTIONS"]}
@@ -300,7 +298,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def ensure_role(self):
         if self.connection is None:
             return False
-        if new_role := self.settings_dict.get("OPTIONS", {}).get("assume_role"):
+        if new_role := self.settings_dict["OPTIONS"].get("assume_role"):
             with self.connection.cursor() as cursor:
                 sql = self.ops.compose_sql("SET ROLE %s", [new_role])
                 cursor.execute(sql)
@@ -324,8 +322,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def create_cursor(self, name=None):
         if name:
             if is_psycopg3 and (
-                self.settings_dict.get("OPTIONS", {}).get("server_side_binding")
-                is not True
+                self.settings_dict["OPTIONS"].get("server_side_binding") is not True
             ):
                 # psycopg >= 3 forces the usage of server-side bindings for
                 # named cursors so a specialized class that implements

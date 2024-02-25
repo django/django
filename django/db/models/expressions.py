@@ -1204,8 +1204,7 @@ class RawSQL(Expression):
         if query.model:
             for parent in query.model._meta.get_parent_list():
                 for parent_field in parent._meta.local_fields:
-                    _, column_name = parent_field.get_attname_column()
-                    if column_name.lower() in self.sql.lower():
+                    if parent_field.column.lower() in self.sql.lower():
                         query.resolve_ref(
                             parent_field.name, allow_joins, reuse, summarize
                         )

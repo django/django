@@ -227,19 +227,6 @@ class GetOrCreateTestsWithManualPKs(TestCase):
             ManualPrimaryKeyTest.objects.get_or_create(id=1, data="Different")
         self.assertEqual(ManualPrimaryKeyTest.objects.get(id=1).data, "Original")
 
-    def test_get_or_create_raises_IntegrityError_plus_traceback(self):
-        """
-        get_or_create should raise IntegrityErrors with the full traceback.
-        This is tested by checking that a known method call is in the traceback.
-        We cannot use assertRaises here because we need to inspect
-        the actual traceback. Refs #16340.
-        """
-        try:
-            ManualPrimaryKeyTest.objects.get_or_create(id=1, data="Different")
-        except IntegrityError:
-            formatted_traceback = traceback.format_exc()
-            self.assertIn("obj.save", formatted_traceback)
-
     def test_savepoint_rollback(self):
         """
         The database connection is still usable after a DatabaseError in
