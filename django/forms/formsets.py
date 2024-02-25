@@ -616,7 +616,7 @@ class FormSetMeta(type):
             "validate_min": False,
             "validate_max": False,
             "can_delete_extra": True,
-            "renderer": attrs.get("renderer")
+            "renderer": attrs.get("renderer"),
         }
 
         for key, value in default_attrs.items():
