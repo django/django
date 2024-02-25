@@ -1557,7 +1557,8 @@ class ModelFormsetTestMixin:
         self.assertFalse(formset.is_valid())
 
     def test_inlineformset_with_null_fk(self):
-        # inlineformset factory and declarative tests with fk having null=True. see #9462.
+        # inlineformset factory and declarative tests
+        # with fk having null=True. see #9462.
         # create some data that will exhibit the issue
         team = Team.objects.create(name="Red Vipers")
         Player(name="Timmy").save()
