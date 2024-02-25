@@ -721,9 +721,6 @@ class FormsetTestMixin:
         form's errors shouldn't make the entire formset invalid since it's
         going to be deleted.
         """
-        # class CheckFormMinValue(Form):
-        #     field = IntegerField(min_value=100)
-
         data = {
             "check-TOTAL_FORMS": "3",  # the number of forms rendered
             "check-INITIAL_FORMS": "2",  # the number of forms with initial data
