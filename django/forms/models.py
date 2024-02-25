@@ -1110,8 +1110,8 @@ class ModelFormSetMeta(FormSetMeta):
                 attrs.pop(key)
 
         form = ModelForm
-        if attrs.get("form") is not None:
-            kwargs.update({"form": attrs.get("form")})
+        if (passed_form := attrs.get("form")) is not None:
+            kwargs.update({"form": passed_form})
         else:
             kwargs.update({"form": form})
 
