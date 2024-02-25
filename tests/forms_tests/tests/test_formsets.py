@@ -2200,7 +2200,7 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
 
 
 @jinja2_tests
-class Jinja2FormsFormsetTestCase(SimpleTestCase, FormsetTestMixin):
+class Jinja2FormsFormsetTestCase(FactoryFormsetTestCase, DeclarativeFormsetTestCase):
     pass
 
 
