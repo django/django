@@ -59,7 +59,7 @@ class SchemaTests(PostgreSQLTestCase):
             constraint_name, self.get_constraints(RangesModel._meta.db_table)
         )
         constraint = CheckConstraint(
-            check=Q(ints__contained_by=NumericRange(10, 30)),
+            condition=Q(ints__contained_by=NumericRange(10, 30)),
             name=constraint_name,
         )
         with connection.schema_editor() as editor:
@@ -71,7 +71,7 @@ class SchemaTests(PostgreSQLTestCase):
 
     def test_check_constraint_array_contains(self):
         constraint = CheckConstraint(
-            check=Q(field__contains=[1]),
+            condition=Q(field__contains=[1]),
             name="array_contains",
         )
         msg = f"Constraint “{constraint.name}” is violated."
@@ -81,7 +81,7 @@ class SchemaTests(PostgreSQLTestCase):
 
     def test_check_constraint_array_length(self):
         constraint = CheckConstraint(
-            check=Q(field__len=1),
+            condition=Q(field__len=1),
             name="array_length",
         )
         msg = f"Constraint “{constraint.name}” is violated."
@@ -95,7 +95,7 @@ class SchemaTests(PostgreSQLTestCase):
             constraint_name, self.get_constraints(RangesModel._meta.db_table)
         )
         constraint = CheckConstraint(
-            check=Q(dates__contains=F("dates_inner")),
+            condition=Q(dates__contains=F("dates_inner")),
             name=constraint_name,
         )
         with connection.schema_editor() as editor:
@@ -119,7 +119,7 @@ class SchemaTests(PostgreSQLTestCase):
             constraint_name, self.get_constraints(RangesModel._meta.db_table)
         )
         constraint = CheckConstraint(
-            check=Q(timestamps__contains=F("timestamps_inner")),
+            condition=Q(timestamps__contains=F("timestamps_inner")),
             name=constraint_name,
         )
         with connection.schema_editor() as editor:
@@ -139,7 +139,7 @@ class SchemaTests(PostgreSQLTestCase):
 
     def test_check_constraint_range_contains(self):
         constraint = CheckConstraint(
-            check=Q(ints__contains=(1, 5)),
+            condition=Q(ints__contains=(1, 5)),
             name="ints_contains",
         )
         msg = f"Constraint “{constraint.name}” is violated."
@@ -148,7 +148,7 @@ class SchemaTests(PostgreSQLTestCase):
 
     def test_check_constraint_range_lower_upper(self):
         constraint = CheckConstraint(
-            check=Q(ints__startswith__gte=0) & Q(ints__endswith__lte=99),
+            condition=Q(ints__startswith__gte=0) & Q(ints__endswith__lte=99),
             name="ints_range_lower_upper",
         )
         msg = f"Constraint “{constraint.name}” is violated."
@@ -160,12 +160,12 @@ class SchemaTests(PostgreSQLTestCase):
 
     def test_check_constraint_range_lower_with_nulls(self):
         constraint = CheckConstraint(
-            check=Q(ints__isnull=True) | Q(ints__startswith__gte=0),
+            condition=Q(ints__isnull=True) | Q(ints__startswith__gte=0),
             name="ints_optional_positive_range",
         )
         constraint.validate(RangesModel, RangesModel())
         constraint = CheckConstraint(
-            check=Q(ints__startswith__gte=0),
+            condition=Q(ints__startswith__gte=0),
             name="ints_positive_range",
         )
         constraint.validate(RangesModel, RangesModel())

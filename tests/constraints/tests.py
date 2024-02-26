@@ -123,104 +123,108 @@ class CheckConstraintTests(TestCase):
         check1 = models.Q(price__gt=models.F("discounted_price"))
         check2 = models.Q(price__lt=models.F("discounted_price"))
         self.assertEqual(
-            models.CheckConstraint(check=check1, name="price"),
-            models.CheckConstraint(check=check1, name="price"),
+            models.CheckConstraint(condition=check1, name="price"),
+            models.CheckConstraint(condition=check1, name="price"),
         )
-        self.assertEqual(models.CheckConstraint(check=check1, name="price"), mock.ANY)
-        self.assertNotEqual(
-            models.CheckConstraint(check=check1, name="price"),
-            models.CheckConstraint(check=check1, name="price2"),
+        self.assertEqual(
+            models.CheckConstraint(condition=check1, name="price"), mock.ANY
         )
         self.assertNotEqual(
-            models.CheckConstraint(check=check1, name="price"),
-            models.CheckConstraint(check=check2, name="price"),
+            models.CheckConstraint(condition=check1, name="price"),
+            models.CheckConstraint(condition=check1, name="price2"),
         )
-        self.assertNotEqual(models.CheckConstraint(check=check1, name="price"), 1)
         self.assertNotEqual(
-            models.CheckConstraint(check=check1, name="price"),
+            models.CheckConstraint(condition=check1, name="price"),
+            models.CheckConstraint(condition=check2, name="price"),
+        )
+        self.assertNotEqual(models.CheckConstraint(condition=check1, name="price"), 1)
+        self.assertNotEqual(
+            models.CheckConstraint(condition=check1, name="price"),
             models.CheckConstraint(
-                check=check1, name="price", violation_error_message="custom error"
+                condition=check1, name="price", violation_error_message="custom error"
             ),
         )
         self.assertNotEqual(
             models.CheckConstraint(
-                check=check1, name="price", violation_error_message="custom error"
+                condition=check1, name="price", violation_error_message="custom error"
             ),
             models.CheckConstraint(
-                check=check1, name="price", violation_error_message="other custom error"
+                condition=check1,
+                name="price",
+                violation_error_message="other custom error",
             ),
         )
         self.assertEqual(
             models.CheckConstraint(
-                check=check1, name="price", violation_error_message="custom error"
+                condition=check1, name="price", violation_error_message="custom error"
             ),
             models.CheckConstraint(
-                check=check1, name="price", violation_error_message="custom error"
+                condition=check1, name="price", violation_error_message="custom error"
             ),
         )
         self.assertNotEqual(
-            models.CheckConstraint(check=check1, name="price"),
+            models.CheckConstraint(condition=check1, name="price"),
             models.CheckConstraint(
-                check=check1, name="price", violation_error_code="custom_code"
+                condition=check1, name="price", violation_error_code="custom_code"
             ),
         )
         self.assertEqual(
             models.CheckConstraint(
-                check=check1, name="price", violation_error_code="custom_code"
+                condition=check1, name="price", violation_error_code="custom_code"
             ),
             models.CheckConstraint(
-                check=check1, name="price", violation_error_code="custom_code"
+                condition=check1, name="price", violation_error_code="custom_code"
             ),
         )
 
     def test_repr(self):
         constraint = models.CheckConstraint(
-            check=models.Q(price__gt=models.F("discounted_price")),
+            condition=models.Q(price__gt=models.F("discounted_price")),
             name="price_gt_discounted_price",
         )
         self.assertEqual(
             repr(constraint),
-            "<CheckConstraint: check=(AND: ('price__gt', F(discounted_price))) "
+            "<CheckConstraint: condition=(AND: ('price__gt', F(discounted_price))) "
             "name='price_gt_discounted_price'>",
         )
 
     def test_repr_with_violation_error_message(self):
         constraint = models.CheckConstraint(
-            check=models.Q(price__lt=1),
+            condition=models.Q(price__lt=1),
             name="price_lt_one",
             violation_error_message="More than 1",
         )
         self.assertEqual(
             repr(constraint),
-            "<CheckConstraint: check=(AND: ('price__lt', 1)) name='price_lt_one' "
+            "<CheckConstraint: condition=(AND: ('price__lt', 1)) name='price_lt_one' "
             "violation_error_message='More than 1'>",
         )
 
     def test_repr_with_violation_error_code(self):
         constraint = models.CheckConstraint(
-            check=models.Q(price__lt=1),
+            condition=models.Q(price__lt=1),
             name="price_lt_one",
             violation_error_code="more_than_one",
         )
         self.assertEqual(
             repr(constraint),
-            "<CheckConstraint: check=(AND: ('price__lt', 1)) name='price_lt_one' "
+            "<CheckConstraint: condition=(AND: ('price__lt', 1)) name='price_lt_one' "
             "violation_error_code='more_than_one'>",
         )
 
     def test_invalid_check_types(self):
-        msg = "CheckConstraint.check must be a Q instance or boolean expression."
+        msg = "CheckConstraint.condition must be a Q instance or boolean expression."
         with self.assertRaisesMessage(TypeError, msg):
-            models.CheckConstraint(check=models.F("discounted_price"), name="check")
+            models.CheckConstraint(condition=models.F("discounted_price"), name="check")
 
     def test_deconstruction(self):
         check = models.Q(price__gt=models.F("discounted_price"))
         name = "price_gt_discounted_price"
-        constraint = models.CheckConstraint(check=check, name=name)
+        constraint = models.CheckConstraint(condition=check, name=name)
         path, args, kwargs = constraint.deconstruct()
         self.assertEqual(path, "django.db.models.CheckConstraint")
         self.assertEqual(args, ())
-        self.assertEqual(kwargs, {"check": check, "name": name})
+        self.assertEqual(kwargs, {"condition": check, "name": name})
 
     @skipUnlessDBFeature("supports_table_check_constraints")
     def test_database_constraint(self):
@@ -255,7 +259,7 @@ class CheckConstraintTests(TestCase):
 
     def test_validate(self):
         check = models.Q(price__gt=models.F("discounted_price"))
-        constraint = models.CheckConstraint(check=check, name="price")
+        constraint = models.CheckConstraint(condition=check, name="price")
         # Invalid product.
         invalid_product = Product(price=10, discounted_price=42)
         with self.assertRaises(ValidationError):
@@ -276,7 +280,7 @@ class CheckConstraintTests(TestCase):
     def test_validate_custom_error(self):
         check = models.Q(price__gt=models.F("discounted_price"))
         constraint = models.CheckConstraint(
-            check=check,
+            condition=check,
             name="price",
             violation_error_message="discount is fake",
             violation_error_code="fake_discount",
@@ -290,7 +294,7 @@ class CheckConstraintTests(TestCase):
 
     def test_validate_boolean_expressions(self):
         constraint = models.CheckConstraint(
-            check=models.expressions.ExpressionWrapper(
+            condition=models.expressions.ExpressionWrapper(
                 models.Q(price__gt=500) | models.Q(price__lt=500),
                 output_field=models.BooleanField(),
             ),
@@ -304,7 +308,7 @@ class CheckConstraintTests(TestCase):
 
     def test_validate_rawsql_expressions_noop(self):
         constraint = models.CheckConstraint(
-            check=models.expressions.RawSQL(
+            condition=models.expressions.RawSQL(
                 "price < %s OR price > %s",
                 (500, 500),
                 output_field=models.BooleanField(),
@@ -320,7 +324,7 @@ class CheckConstraintTests(TestCase):
     def test_validate_nullable_field_with_none(self):
         # Nullable fields should be considered valid on None values.
         constraint = models.CheckConstraint(
-            check=models.Q(price__gte=0),
+            condition=models.Q(price__gte=0),
             name="positive_price",
         )
         constraint.validate(Product, Product())
@@ -328,7 +332,7 @@ class CheckConstraintTests(TestCase):
     @skipIfDBFeature("supports_comparing_boolean_expr")
     def test_validate_nullable_field_with_isnull(self):
         constraint = models.CheckConstraint(
-            check=models.Q(price__gte=0) | models.Q(price__isnull=True),
+            condition=models.Q(price__gte=0) | models.Q(price__isnull=True),
             name="positive_price",
         )
         constraint.validate(Product, Product())
@@ -336,11 +340,11 @@ class CheckConstraintTests(TestCase):
     @skipUnlessDBFeature("supports_json_field")
     def test_validate_nullable_jsonfield(self):
         is_null_constraint = models.CheckConstraint(
-            check=models.Q(data__isnull=True),
+            condition=models.Q(data__isnull=True),
             name="nullable_data",
         )
         is_not_null_constraint = models.CheckConstraint(
-            check=models.Q(data__isnull=False),
+            condition=models.Q(data__isnull=False),
             name="nullable_data",
         )
         is_null_constraint.validate(JSONFieldModel, JSONFieldModel(data=None))
@@ -354,7 +358,7 @@ class CheckConstraintTests(TestCase):
 
     def test_validate_pk_field(self):
         constraint_with_pk = models.CheckConstraint(
-            check=~models.Q(pk=models.F("age")),
+            condition=~models.Q(pk=models.F("age")),
             name="pk_not_age_check",
         )
         constraint_with_pk.validate(ChildModel, ChildModel(pk=1, age=2))
@@ -369,7 +373,7 @@ class CheckConstraintTests(TestCase):
     def test_validate_jsonfield_exact(self):
         data = {"release": "5.0.2", "version": "stable"}
         json_exact_constraint = models.CheckConstraint(
-            check=models.Q(data__version="stable"),
+            condition=models.Q(data__version="stable"),
             name="only_stable_version",
         )
         json_exact_constraint.validate(JSONFieldModel, JSONFieldModel(data=data))
@@ -378,6 +382,19 @@ class CheckConstraintTests(TestCase):
         msg = f"Constraint “{json_exact_constraint.name}” is violated."
         with self.assertRaisesMessage(ValidationError, msg):
             json_exact_constraint.validate(JSONFieldModel, JSONFieldModel(data=data))
+
+    def test_check_deprecation(self):
+        msg = "CheckConstraint.check is deprecated in favor of `.condition`."
+        condition = models.Q(foo="bar")
+        with self.assertWarnsRegex(RemovedInDjango60Warning, msg):
+            constraint = models.CheckConstraint(name="constraint", check=condition)
+        with self.assertWarnsRegex(RemovedInDjango60Warning, msg):
+            self.assertIs(constraint.check, condition)
+        other_condition = models.Q(something="else")
+        with self.assertWarnsRegex(RemovedInDjango60Warning, msg):
+            constraint.check = other_condition
+        with self.assertWarnsRegex(RemovedInDjango60Warning, msg):
+            self.assertIs(constraint.check, other_condition)
 
 
 class UniqueConstraintTests(TestCase):

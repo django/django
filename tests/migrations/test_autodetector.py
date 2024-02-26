@@ -287,7 +287,7 @@ class AutodetectorTests(BaseAutodetectorTests):
         {
             "constraints": [
                 models.CheckConstraint(
-                    check=models.Q(name__contains="Bob"), name="name_contains_bob"
+                    condition=models.Q(name__contains="Bob"), name="name_contains_bob"
                 )
             ]
         },
@@ -2756,14 +2756,15 @@ class AutodetectorTests(BaseAutodetectorTests):
             {
                 "constraints": [
                     models.CheckConstraint(
-                        check=models.Q(name__contains="Bob"), name="name_contains_bob"
+                        condition=models.Q(name__contains="Bob"),
+                        name="name_contains_bob",
                     )
                 ]
             },
         )
         changes = self.get_changes([], [author])
         constraint = models.CheckConstraint(
-            check=models.Q(name__contains="Bob"), name="name_contains_bob"
+            condition=models.Q(name__contains="Bob"), name="name_contains_bob"
         )
         # Right number of migrations?
         self.assertEqual(len(changes["otherapp"]), 1)
@@ -2789,7 +2790,7 @@ class AutodetectorTests(BaseAutodetectorTests):
         self.assertNumberMigrations(changes, "testapp", 1)
         self.assertOperationTypes(changes, "testapp", 0, ["AddConstraint"])
         added_constraint = models.CheckConstraint(
-            check=models.Q(name__contains="Bob"), name="name_contains_bob"
+            condition=models.Q(name__contains="Bob"), name="name_contains_bob"
         )
         self.assertOperationAttributes(
             changes, "testapp", 0, 0, model_name="author", constraint=added_constraint
@@ -2838,7 +2839,7 @@ class AutodetectorTests(BaseAutodetectorTests):
             {
                 "constraints": [
                     models.CheckConstraint(
-                        check=models.Q(type__in=book_types.keys()),
+                        condition=models.Q(type__in=book_types.keys()),
                         name="book_type_check",
                     ),
                 ],
@@ -2854,7 +2855,7 @@ class AutodetectorTests(BaseAutodetectorTests):
             {
                 "constraints": [
                     models.CheckConstraint(
-                        check=models.Q(("type__in", tuple(book_types))),
+                        condition=models.Q(("type__in", tuple(book_types))),
                         name="book_type_check",
                     ),
                 ],
@@ -4168,7 +4169,7 @@ class AutodetectorTests(BaseAutodetectorTests):
                 "order_with_respect_to": "book",
                 "constraints": [
                     models.CheckConstraint(
-                        check=models.Q(_order__gt=1), name="book_order_gt_1"
+                        condition=models.Q(_order__gt=1), name="book_order_gt_1"
                     ),
                 ],
             },
@@ -4191,7 +4192,7 @@ class AutodetectorTests(BaseAutodetectorTests):
                 "order_with_respect_to": "book",
                 "constraints": [
                     models.CheckConstraint(
-                        check=models.Q(_order__gt=1), name="book_order_gt_1"
+                        condition=models.Q(_order__gt=1), name="book_order_gt_1"
                     )
                 ],
             },
@@ -4241,7 +4242,7 @@ class AutodetectorTests(BaseAutodetectorTests):
                 {
                     "constraints": [
                         models.CheckConstraint(
-                            check=models.Q(_order__gt=1),
+                            condition=models.Q(_order__gt=1),
                             name="book_order_gt_1",
                         ),
                     ]

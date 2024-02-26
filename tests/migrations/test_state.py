@@ -1887,7 +1887,9 @@ class ModelStateTests(SimpleTestCase):
 
             class Meta:
                 constraints = [
-                    models.CheckConstraint(check=models.Q(size__gt=1), name="size_gt_1")
+                    models.CheckConstraint(
+                        condition=models.Q(size__gt=1), name="size_gt_1"
+                    )
                 ]
 
         state = ModelState.from_model(ModelWithConstraints)

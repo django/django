@@ -1208,7 +1208,7 @@ class OptimizerTests(SimpleTestCase):
 
     def test_add_remove_constraint(self):
         gt_constraint = models.CheckConstraint(
-            check=models.Q(pink__gt=2), name="constraint_pony_pink_gt_2"
+            condition=models.Q(pink__gt=2), name="constraint_pony_pink_gt_2"
         )
         self.assertOptimizesTo(
             [
@@ -1329,7 +1329,7 @@ class OptimizerTests(SimpleTestCase):
 
     def test_create_model_add_constraint(self):
         gt_constraint = models.CheckConstraint(
-            check=models.Q(weight__gt=0), name="pony_weight_gt_0"
+            condition=models.Q(weight__gt=0), name="pony_weight_gt_0"
         )
         self.assertOptimizesTo(
             [
@@ -1363,7 +1363,8 @@ class OptimizerTests(SimpleTestCase):
                     options={
                         "constraints": [
                             models.CheckConstraint(
-                                check=models.Q(weight__gt=0), name="pony_weight_gt_0"
+                                condition=models.Q(weight__gt=0),
+                                name="pony_weight_gt_0",
                             ),
                             models.UniqueConstraint(
                                 "weight", name="pony_weight_unique"

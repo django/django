@@ -134,19 +134,54 @@ class BaseConstraint:
 
 
 class CheckConstraint(BaseConstraint):
+    # RemovedInDjango60Warning: when the deprecation ends, replace with
+    # def __init__(
+    #  self, *, condition, name, violation_error_code=None, violation_error_message=None
+    # )
     def __init__(
-        self, *, check, name, violation_error_code=None, violation_error_message=None
+        self,
+        *,
+        name,
+        condition=None,
+        check=None,
+        violation_error_code=None,
+        violation_error_message=None,
     ):
-        self.check = check
-        if not getattr(check, "conditional", False):
+        if check is not None:
+            warnings.warn(
+                "CheckConstraint.check is deprecated in favor of `.condition`.",
+                RemovedInDjango60Warning,
+                stacklevel=2,
+            )
+            condition = check
+        self.condition = condition
+        if not getattr(condition, "conditional", False):
             raise TypeError(
-                "CheckConstraint.check must be a Q instance or boolean expression."
+                "CheckConstraint.condition must be a Q instance or boolean expression."
             )
         super().__init__(
             name=name,
             violation_error_code=violation_error_code,
             violation_error_message=violation_error_message,
         )
+
+    def _get_check(self):
+        warnings.warn(
+            "CheckConstraint.check is deprecated in favor of `.condition`.",
+            RemovedInDjango60Warning,
+            stacklevel=2,
+        )
+        return self.condition
+
+    def _set_check(self, value):
+        warnings.warn(
+            "CheckConstraint.check is deprecated in favor of `.condition`.",
+            RemovedInDjango60Warning,
+            stacklevel=2,
+        )
+        self.condition = value
+
+    check = property(_get_check, _set_check)
 
     def _check(self, model, connection):
         errors = []
@@ -167,10 +202,10 @@ class CheckConstraint(BaseConstraint):
             )
         else:
             references = set()
-            check = self.check
-            if isinstance(check, Q):
-                references.update(model._get_expr_references(check))
-            if any(isinstance(expr, RawSQL) for expr in check.flatten()):
+            condition = self.condition
+            if isinstance(condition, Q):
+                references.update(model._get_expr_references(condition))
+            if any(isinstance(expr, RawSQL) for expr in condition.flatten()):
                 errors.append(
                     checks.Warning(
                         f"Check constraint {self.name!r} contains RawSQL() expression "
@@ -185,7 +220,7 @@ class CheckConstraint(BaseConstraint):
 
     def _get_check_sql(self, model, schema_editor):
         query = Query(model=model, alias_cols=False)
-        where = query.build_where(self.check)
+        where = query.build_where(self.condition)
         compiler = query.get_compiler(connection=schema_editor.connection)
         sql, params = where.as_sql(compiler, schema_editor.connection)
         return sql % tuple(schema_editor.quote_value(p) for p in params)
@@ -204,7 +239,7 @@ class CheckConstraint(BaseConstraint):
     def validate(self, model, instance, exclude=None, using=DEFAULT_DB_ALIAS):
         against = instance._get_field_value_map(meta=model._meta, exclude=exclude)
         try:
-            if not Q(self.check).check(against, using=using):
+            if not Q(self.condition).check(against, using=using):
                 raise ValidationError(
                     self.get_violation_error_message(), code=self.violation_error_code
                 )
@@ -212,9 +247,9 @@ class CheckConstraint(BaseConstraint):
             pass
 
     def __repr__(self):
-        return "<%s: check=%s name=%s%s%s>" % (
+        return "<%s: condition=%s name=%s%s%s>" % (
             self.__class__.__qualname__,
-            self.check,
+            self.condition,
             repr(self.name),
             (
                 ""
@@ -233,7 +268,7 @@ class CheckConstraint(BaseConstraint):
         if isinstance(other, CheckConstraint):
             return (
                 self.name == other.name
-                and self.check == other.check
+                and self.condition == other.condition
                 and self.violation_error_code == other.violation_error_code
                 and self.violation_error_message == other.violation_error_message
             )
@@ -241,7 +276,7 @@ class CheckConstraint(BaseConstraint):
 
     def deconstruct(self):
         path, args, kwargs = super().deconstruct()
-        kwargs["check"] = self.check
+        kwargs["condition"] = self.condition
         return path, args, kwargs
 
 
