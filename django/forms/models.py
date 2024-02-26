@@ -4,6 +4,7 @@ and database field objects.
 """
 
 from itertools import chain
+from typing import Any
 
 from django.core.exceptions import (
     NON_FIELD_ERRORS,
@@ -1139,8 +1140,8 @@ class ModelFormSetMeta(FormSetMeta):
         if kwargs.get("model") is not None:
             form = modelform_factory(**kwargs)
             attrs.update({"form": form})
-        if kwargs.get("model") is None and "form" in attrs:
-            model = attrs.get("form")._meta.model
+        if kwargs.get("model") is None and (form := attrs.get("form")) is not None:
+            model = form._meta.model
 
         formset = attrs.get("formset") or BaseModelFormSet
 
@@ -1170,6 +1171,8 @@ class ModelFormSetMeta(FormSetMeta):
 
 class ModelFormSet(BaseModelFormSet, FormSet, metaclass=ModelFormSetMeta):
     """Base class for which can be used to create modelformset classes."""
+
+    form: Any = None
 
     def __init__(
         self,
@@ -1462,8 +1465,8 @@ class InlineFormSetMeta(ModelFormSetMeta):
         parent_model = attrs.get("parent_model", None)
         fk_name = attrs.get("fk_name", None)
 
-        if attrs.get("model") is None and "form" in attrs:
-            attrs.update({"model": attrs.get("form")._meta.model})
+        if attrs.get("model") is None and (form := attrs.get("form")) is not None:
+            attrs.update({"model": form._meta.model})
 
         default_modelformset_attrs = {
             "form",
@@ -1506,6 +1509,8 @@ class InlineFormSetMeta(ModelFormSetMeta):
 
 class InlineFormSet(BaseInlineFormSet, ModelFormSet, metaclass=InlineFormSetMeta):
     """Base class for which can be used to create inlineformset classes."""
+
+    form: Any = None
 
     def __init__(
         self,

@@ -599,6 +599,9 @@ class FormSetMeta(type):
         Initialize the attributes given to the FormSet class and adds the
         missing required argument and sets them to default values.
         """
+        if "form" not in set(attrs):
+            raise TypeError("FormSet() missing 1 required positional argument: 'form'.")
+
         if attrs.get("min_num") is None:
             attrs["min_num"] = DEFAULT_MIN_NUM
         if attrs.get("max_num") is None:
@@ -606,7 +609,7 @@ class FormSetMeta(type):
         formset = attrs.get("formset") or BaseFormSet
 
         default_attrs = {
-            "form": attrs.get("form") or None,
+            "form": attrs.get("form"),
             "extra": 1,
             "can_order": False,
             "can_delete": False,

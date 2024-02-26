@@ -1755,6 +1755,10 @@ class FactoryFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         finally:
             formsets.DEFAULT_MAX_NUM = _old_DEFAULT_MAX_NUM
 
+    def test_no_form_argument_error(self):
+        with self.assertRaises(TypeError):
+            formset_factory(extra=1)
+
 
 class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
     """A set of tests of formset created with declarative syntax."""
@@ -2197,6 +2201,12 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
             self.assertEqual(len(formset.forms), 4)
         finally:
             formsets.DEFAULT_MAX_NUM = _old_DEFAULT_MAX_NUM
+
+    def test_no_form_argument_error(self):
+        with self.assertRaises(TypeError):
+
+            class DeclarativeInvalid(FormSet):
+                extra = 1
 
 
 @jinja2_tests
