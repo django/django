@@ -2,9 +2,10 @@
 Django 3.2.25 release notes
 ===========================
 
-*Expected March 4, 2024*
+*March 4, 2024*
 
-Django 3.2.25 fixes a regression in 3.2.24.
+Django 3.2.25 fixes a security issue with severity "moderate" and a regression
+in 3.2.24.
 
 Bugfixes
 ========
