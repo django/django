@@ -393,6 +393,9 @@ Miscellaneous
   :py:class:`html.parser.HTMLParser` subclasses. This results in a more robust
   and faster operation, but there may be small differences in the output.
 
+* The undocumented ``django.urls.converters.get_converter()`` function is
+  removed.
+
 .. _deprecated-features-5.1:
 
 Features deprecated in 5.1
