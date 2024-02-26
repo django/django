@@ -2,9 +2,10 @@
 Django 4.2.11 release notes
 ===========================
 
-*Expected March 4, 2024*
+*March 4, 2024*
 
-Django 4.2.11 fixes a regression in 4.2.10.
+Django 4.2.11 fixes a security issue with severity "moderate" and a regression
+in 4.2.10.
 
 Bugfixes
 ========
