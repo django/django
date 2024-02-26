@@ -100,7 +100,7 @@ def is_pickable(obj):
     """
     try:
         pickle.loads(pickle.dumps(obj))
-    except (AttributeError, TypeError):
+    except (AttributeError, TypeError, pickle.PickleError):
         return False
     return True
 
