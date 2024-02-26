@@ -5,9 +5,12 @@
      data-inline-formset="{{ inline_admin_formset.inline_formset_data }}">
 <fieldset class="module {{ inline_admin_formset.classes }}">
   {% if inline_admin_formset.formset.max_num == 1 %}
-    <h2>{{ inline_admin_formset.opts.verbose_name|capfirst }}</h2>
+    <legend><h2>{{ inline_admin_formset.opts.verbose_name|capfirst }}</h2></legend>
   {% else %}
-    <h2>{{ inline_admin_formset.opts.verbose_name_plural|capfirst }}</h2>
+    <legend><h2>{{ inline_admin_formset.opts.verbose_name_plural|capfirst }}</h2></legend>
+  {% endif %}
+  {% if inline_admin_formset.is_collapsible %}
+    <details><summary>{% translate "Fields" context "form fields" %}</summary>
   {% endif %}
 {{ inline_admin_formset.formset.management_form }}
 {{ inline_admin_formset.formset.non_form_errors }}
@@ -25,5 +28,8 @@
   {% if inline_admin_form.needs_explicit_pk_field %}{{ inline_admin_form.pk_field.field }}{% endif %}
   {% if inline_admin_form.fk_field %}{{ inline_admin_form.fk_field.field }}{% endif %}
 </div>{% endfor %}
+  {% if inline_admin_formset.is_collapsible %}
+    </details>
+  {% endif %}
 </fieldset>
 </div>

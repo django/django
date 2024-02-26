@@ -6,9 +6,12 @@
 {{ inline_admin_formset.formset.management_form }}
 <fieldset class="module {{ inline_admin_formset.classes }}">
    {% if inline_admin_formset.formset.max_num == 1 %}
-     <h2>{{ inline_admin_formset.opts.verbose_name|capfirst }}</h2>
+     <legend><h2>{{ inline_admin_formset.opts.verbose_name|capfirst }}</h2></legend>
    {% else %}
-     <h2>{{ inline_admin_formset.opts.verbose_name_plural|capfirst }}</h2>
+     <legend><h2>{{ inline_admin_formset.opts.verbose_name_plural|capfirst }}</h2></legend>
+   {% endif %}
+   {% if inline_admin_formset.is_collapsible %}
+    <details><summary>{% translate "Fields" context "form fields" %}</summary>
    {% endif %}
    {{ inline_admin_formset.formset.non_form_errors }}
    <table>
@@ -61,6 +64,9 @@
      {% endfor %}
      </tbody>
    </table>
+  {% if inline_admin_formset.is_collapsible %}
+    </details>
+  {% endif %}
 </fieldset>
   </div>
 </div>

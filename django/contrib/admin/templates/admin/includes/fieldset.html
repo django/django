@@ -1,5 +1,11 @@
+{% load i18n %}
 <fieldset class="module aligned {{ fieldset.classes }}">
-    {% if fieldset.name %}<h2>{{ fieldset.name }}</h2>{% endif %}
+    {% if fieldset.name %}
+        <legend><h3>{{ fieldset.name }}</h3></legend>
+    {% endif %}
+    {% if fieldset.is_collapsible %}
+        <details><summary>{% translate "Fields" context "form fields" %}</summary>
+    {% endif %}
     {% if fieldset.description %}
         <div class="description">{{ fieldset.description|safe }}</div>
     {% endif %}
@@ -31,4 +37,7 @@
             {% if not line.fields|length == 1 %}</div>{% endif %}
         </div>
     {% endfor %}
+    {% if fieldset.is_collapsible %}
+        </details>
+    {% endif %}
 </fieldset>
