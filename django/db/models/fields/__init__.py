@@ -929,9 +929,7 @@ class Field(RegisterLookupMixin):
     def db_tablespace(self):
         return (
             self._db_tablespace
-            or settings.DATABASES[connection.alias]["OPTIONS"].get(
-                "DEFAULT_INDEX_TABLESPACE"
-            )
+            or settings.DATABASES[connection.alias].get("DEFAULT_INDEX_TABLESPACE")
             or settings.DEFAULT_INDEX_TABLESPACE
         )
 

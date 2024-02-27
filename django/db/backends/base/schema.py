@@ -300,10 +300,8 @@ class BaseDatabaseSchemaEditor:
             ),
         }
         db_tablespace = None
-        if settings.DATABASES[self.connection.alias]["OPTIONS"].get(
-            "DEFAULT_TABLESPACE"
-        ):
-            db_tablespace = settings.DATABASES[self.connection.alias]["OPTIONS"][
+        if settings.DATABASES[self.connection.alias].get("DEFAULT_TABLESPACE"):
+            db_tablespace = settings.DATABASES[self.connection.alias][
                 "DEFAULT_TABLESPACE"
             ]
         elif model._meta.db_tablespace:
@@ -375,9 +373,7 @@ class BaseDatabaseSchemaEditor:
         # Optionally add the tablespace if it's an implicitly indexed column.
         tablespace = (
             field.db_tablespace
-            or settings.DATABASES[self.connection.alias]["OPTIONS"].get(
-                "DEFAULT_TABLESPACE"
-            )
+            or settings.DATABASES[self.connection.alias].get("DEFAULT_TABLESPACE")
             or model._meta.db_tablespace
         )
         if (
@@ -1553,15 +1549,15 @@ class BaseDatabaseSchemaEditor:
 
     def _get_index_tablespace_sql(self, model, fields, db_tablespace=None):
         if db_tablespace is None:
-            db_options = settings.DATABASES[self.connection.alias]["OPTIONS"]
+            db_settings = settings.DATABASES[self.connection.alias]
             if len(fields) == 1 and fields[0].db_tablespace:
                 db_tablespace = fields[0].db_tablespace
-            elif db_options.get("DEFAULT_INDEX_TABLESPACE"):
-                db_tablespace = db_options["DEFAULT_INDEX_TABLESPACE"]
+            elif db_settings.get("DEFAULT_INDEX_TABLESPACE"):
+                db_tablespace = db_settings["DEFAULT_INDEX_TABLESPACE"]
             elif settings.DEFAULT_INDEX_TABLESPACE:
                 db_tablespace = settings.DEFAULT_INDEX_TABLESPACE
-            elif db_options.get("DEFAULT_TABLESPACE"):
-                db_tablespace = db_options["DEFAULT_TABLESPACE"]
+            elif db_settings.get("DEFAULT_TABLESPACE"):
+                db_tablespace = db_settings["DEFAULT_TABLESPACE"]
             elif model._meta.db_tablespace:
                 db_tablespace = model._meta.db_tablespace
         if db_tablespace is not None:
