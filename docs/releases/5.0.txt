@@ -347,6 +347,8 @@ Forms
     screen readers to associate form fields with their help text.
   * Invalid form fields now include the ``aria-invalid="true"`` HTML attribute.
 
+* The Inconsistent Behavior of SelectDateWidget._parse_date_fmt() is fixed.
+
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
 

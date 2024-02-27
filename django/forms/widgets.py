@@ -9,6 +9,7 @@ from collections import defaultdict
 from graphlib import CycleError, TopologicalSorter
 from itertools import chain
 
+from django.conf import settings
 from django.forms.utils import to_current_timezone
 from django.templatetags.static import static
 from django.utils import formats
@@ -18,7 +19,7 @@ from django.utils.formats import get_format
 from django.utils.html import format_html, html_safe
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.safestring import mark_safe
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, get_language
 
 from .renderers import get_default_renderer
 
@@ -1163,8 +1164,12 @@ class SelectDateWidget(Widget):
         return {"year": year, "month": month, "day": day}
 
     @staticmethod
-    def _parse_date_fmt():
-        fmt = get_format("DATE_FORMAT")
+    def _parse_date_fmt(lang=None, use_l10n=None):
+        fmt = get_format(
+            "DATE_FORMAT",
+            lang=get_language(), 
+            use_l10n=getattr(settings, 'USE_L10N')
+        )
         escaped = False
         for char in fmt:
             if escaped:
