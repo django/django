@@ -862,34 +862,35 @@ class BaseModelFormSet(BaseFormSet, AltersData):
             uclass, lookup, field, unique_for = date_check
             for form in valid_forms:
                 # see if we have data for both fields
-                if (
+                if not (
                     form.cleaned_data
                     and form.cleaned_data[field] is not None
                     and form.cleaned_data[unique_for] is not None
                 ):
-                    # if it's a date lookup we need to get the data for all the fields
-                    if lookup == "date":
-                        date = form.cleaned_data[unique_for]
-                        date_data = (date.year, date.month, date.day)
-                    # otherwise it's just the attribute on the date/datetime
-                    # object
-                    else:
-                        date_data = (getattr(form.cleaned_data[unique_for], lookup),)
-                    data = (form.cleaned_data[field],) + date_data
-                    # if we've already seen it then we have a uniqueness failure
-                    if data in seen_data:
-                        # poke error messages into the right places and mark
-                        # the form as invalid
-                        errors.append(self.get_date_error_message(date_check))
-                        form._errors[NON_FIELD_ERRORS] = self.error_class(
-                            [self.get_form_error()],
-                            renderer=self.renderer,
-                        )
-                        # Remove the data from the cleaned_data dict since it
-                        # was invalid.
-                        del form.cleaned_data[field]
-                    # mark the data as seen
-                    seen_data.add(data)
+                    continue
+                # if it's a date lookup we need to get the data for all the fields
+                if lookup == "date":
+                    date = form.cleaned_data[unique_for]
+                    date_data = (date.year, date.month, date.day)
+                # otherwise it's just the attribute on the date/datetime
+                # object
+                else:
+                    date_data = (getattr(form.cleaned_data[unique_for], lookup),)
+                data = (form.cleaned_data[field],) + date_data
+                # if we've already seen it then we have a uniqueness failure
+                if data in seen_data:
+                    # poke error messages into the right places and mark
+                    # the form as invalid
+                    errors.append(self.get_date_error_message(date_check))
+                    form._errors[NON_FIELD_ERRORS] = self.error_class(
+                        [self.get_form_error()],
+                        renderer=self.renderer,
+                    )
+                    # Remove the data from the cleaned_data dict since it
+                    # was invalid.
+                    del form.cleaned_data[field]
+                # mark the data as seen
+                seen_data.add(data)
 
         if errors:
             raise ValidationError(errors)

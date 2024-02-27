@@ -197,18 +197,20 @@ def media_property(cls):
 
         # Get the media definition for this class
         definition = getattr(cls, "Media", None)
-        if definition:
-            extend = getattr(definition, "extend", True)
-            if extend:
-                if extend is True:
-                    m = base
-                else:
-                    m = Media()
-                    for medium in extend:
-                        m += base[medium]
-                return m + Media(definition)
+        if not definition:
+            return base
+
+        extend = getattr(definition, "extend", True)
+        if not extend:
             return Media(definition)
-        return base
+
+        if extend is True:
+            m = base
+        else:
+            m = Media()
+            for medium in extend:
+                m += base[medium]
+        return m + Media(definition)
 
     return property(_media)
 
