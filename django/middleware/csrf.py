@@ -204,7 +204,6 @@ class CsrfViewMiddleware(MiddlewareMixin):
         # request.  This will be relevant when both decorator and middleware
         # are used.
         request.csrf_processing_done = True
-        return None
 
     def _reject(self, request, reason):
         response = _get_failure_view()(request, reason=reason)

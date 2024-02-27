@@ -64,14 +64,15 @@ class CommonMiddleware(MiddlewareMixin):
         Return True if settings.APPEND_SLASH is True and appending a slash to
         the request path turns an invalid path into a valid one.
         """
-        if settings.APPEND_SLASH and not request.path_info.endswith("/"):
-            urlconf = getattr(request, "urlconf", None)
-            if not is_valid_path(request.path_info, urlconf):
-                match = is_valid_path("%s/" % request.path_info, urlconf)
-                if match:
-                    view = match.func
-                    return getattr(view, "should_append_slash", True)
-        return False
+        if not settings.APPEND_SLASH and request.path_info.endswith("/"):
+            return False
+
+        urlconf = getattr(request, "urlconf", None)
+        if not is_valid_path(request.path_info, urlconf):
+            match = is_valid_path("%s/" % request.path_info, urlconf)
+            if match:
+                view = match.func
+                return getattr(view, "should_append_slash", True)
 
     def get_full_path_with_slash(self, request):
         """
@@ -109,7 +110,7 @@ class CommonMiddleware(MiddlewareMixin):
 
         # Add the Content-Length header to non-streaming responses if not
         # already set.
-        if not response.streaming and not response.has_header("Content-Length"):
+        if not (response.streaming and response.has_header("Content-Length")):
             response.headers["Content-Length"] = str(len(response.content))
 
         return response

@@ -27,9 +27,8 @@ class LocaleMiddleware(MiddlewareMixin):
         )
         language_from_path = translation.get_language_from_path(request.path_info)
         if (
-            not language_from_path
-            and i18n_patterns_used
-            and not prefixed_default_language
+                not (language_from_path and prefixed_default_language)
+                and i18n_patterns_used
         ):
             language = settings.LANGUAGE_CODE
         translation.activate(language)
