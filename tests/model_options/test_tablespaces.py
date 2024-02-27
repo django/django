@@ -154,7 +154,7 @@ class DefaultTablespaceTests(TransactionTestCase):
     def test_default_tablespace(self):
         tablespace = "default_tablespace"
         databases = copy.deepcopy(settings.DATABASES)
-        databases["default"]["OPTIONS"]["DEFAULT_TABLESPACE"] = tablespace
+        databases["default"]["DEFAULT_TABLESPACE"] = tablespace
         with self.settings(DATABASES=databases):
 
             class ScientistRef(models.Model):
@@ -170,7 +170,7 @@ class DefaultTablespaceTests(TransactionTestCase):
     def test_default_index_tablespace(self):
         index_tablespace = "default_index_tablespace"
         databases = copy.deepcopy(settings.DATABASES)
-        databases["default"]["OPTIONS"]["DEFAULT_INDEX_TABLESPACE"] = index_tablespace
+        databases["default"]["DEFAULT_INDEX_TABLESPACE"] = index_tablespace
         with self.settings(DATABASES=databases):
 
             class ScientistRef(models.Model):
