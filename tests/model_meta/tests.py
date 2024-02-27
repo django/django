@@ -325,14 +325,18 @@ class RelationTreeTests(SimpleTestCase):
         )
 
 
-class ParentListTests(SimpleTestCase):
-    def test_get_parent_list(self):
-        self.assertEqual(CommonAncestor._meta.get_parent_list(), [])
-        self.assertEqual(FirstParent._meta.get_parent_list(), [CommonAncestor])
-        self.assertEqual(SecondParent._meta.get_parent_list(), [CommonAncestor])
+class AllParentsTests(SimpleTestCase):
+    def test_all_parents(self):
+        self.assertEqual(CommonAncestor._meta.all_parents, ())
+        self.assertEqual(FirstParent._meta.all_parents, (CommonAncestor,))
+        self.assertEqual(SecondParent._meta.all_parents, (CommonAncestor,))
         self.assertEqual(
-            Child._meta.get_parent_list(), [FirstParent, SecondParent, CommonAncestor]
+            Child._meta.all_parents,
+            (FirstParent, SecondParent, CommonAncestor),
         )
+
+    def test_get_parent_list(self):
+        self.assertEqual(Child._meta.get_parent_list(), list(Child._meta.all_parents))
 
 
 class PropertyNamesTests(SimpleTestCase):

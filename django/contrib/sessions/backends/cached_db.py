@@ -2,11 +2,15 @@
 Cached, database-backed sessions.
 """
 
+import logging
+
 from django.conf import settings
 from django.contrib.sessions.backends.db import SessionStore as DBStore
 from django.core.cache import caches
 
 KEY_PREFIX = "django.contrib.sessions.cached_db"
+
+logger = logging.getLogger("django.contrib.sessions")
 
 
 class SessionStore(DBStore):
@@ -52,7 +56,10 @@ class SessionStore(DBStore):
 
     def save(self, must_create=False):
         super().save(must_create)
-        self._cache.set(self.cache_key, self._session, self.get_expiry_age())
+        try:
+            self._cache.set(self.cache_key, self._session, self.get_expiry_age())
+        except Exception:
+            logger.exception("Error saving to cache (%s)", self._cache)
 
     def delete(self, session_key=None):
         super().delete(session_key)

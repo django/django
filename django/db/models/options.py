@@ -692,16 +692,24 @@ class Options:
                 return res
         return []
 
-    def get_parent_list(self):
+    @cached_property
+    def all_parents(self):
         """
-        Return all the ancestors of this model as a list ordered by MRO.
+        Return all the ancestors of this model as a tuple ordered by MRO.
         Useful for determining if something is an ancestor, regardless of lineage.
         """
         result = OrderedSet(self.parents)
         for parent in self.parents:
-            for ancestor in parent._meta.get_parent_list():
+            for ancestor in parent._meta.all_parents:
                 result.add(ancestor)
-        return list(result)
+        return tuple(result)
+
+    def get_parent_list(self):
+        """
+        Return all the ancestors of this model as a list ordered by MRO.
+        Backward compatibility method.
+        """
+        return list(self.all_parents)
 
     def get_ancestor_link(self, ancestor):
         """

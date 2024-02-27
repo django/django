@@ -1202,7 +1202,7 @@ class RawSQL(Expression):
     ):
         # Resolve parents fields used in raw SQL.
         if query.model:
-            for parent in query.model._meta.get_parent_list():
+            for parent in query.model._meta.all_parents:
                 for parent_field in parent._meta.local_fields:
                     if parent_field.column.lower() in self.sql.lower():
                         query.resolve_ref(

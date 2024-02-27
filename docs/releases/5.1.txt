@@ -115,7 +115,10 @@ Minor features
 :mod:`django.contrib.sessions`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :class:`django.contrib.sessions.backends.cached_db.SessionStore` now handles
+  exceptions when storing session information in the cache, logging proper
+  error messages with their traceback via the newly added
+  :ref:`sessions logger <django-contrib-sessions-logger>`.
 
 :mod:`django.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -415,6 +418,9 @@ Miscellaneous
 
 * Setting ``django.contrib.gis.gdal.OGRGeometry.coord_dim`` is deprecated. Use
   :meth:`~django.contrib.gis.gdal.OGRGeometry.set_3d` instead.
+
+* Overriding existing converters with ``django.urls.register_converter()`` is
+  deprecated.
 
 Features removed in 5.1
 =======================

@@ -1368,7 +1368,7 @@ class Model(AltersData, metaclass=ModelBase):
         constraints = []
         if include_meta_constraints:
             constraints = [(self.__class__, self._meta.total_unique_constraints)]
-        for parent_class in self._meta.get_parent_list():
+        for parent_class in self._meta.all_parents:
             if parent_class._meta.unique_together:
                 unique_togethers.append(
                     (parent_class, parent_class._meta.unique_together)
@@ -1397,7 +1397,7 @@ class Model(AltersData, metaclass=ModelBase):
         # the list of checks.
 
         fields_with_class = [(self.__class__, self._meta.local_fields)]
-        for parent_class in self._meta.get_parent_list():
+        for parent_class in self._meta.all_parents:
             fields_with_class.append((parent_class, parent_class._meta.local_fields))
 
         for model_class, fields in fields_with_class:
@@ -1546,7 +1546,7 @@ class Model(AltersData, metaclass=ModelBase):
 
     def get_constraints(self):
         constraints = [(self.__class__, self._meta.constraints)]
-        for parent_class in self._meta.get_parent_list():
+        for parent_class in self._meta.all_parents:
             if parent_class._meta.constraints:
                 constraints.append((parent_class, parent_class._meta.constraints))
         return constraints
@@ -1855,7 +1855,7 @@ class Model(AltersData, metaclass=ModelBase):
         used_fields = {}  # name or attname -> field
 
         # Check that multi-inheritance doesn't cause field name shadowing.
-        for parent in cls._meta.get_parent_list():
+        for parent in cls._meta.all_parents:
             for f in parent._meta.local_fields:
                 clash = used_fields.get(f.name) or used_fields.get(f.attname) or None
                 if clash:
@@ -1875,7 +1875,7 @@ class Model(AltersData, metaclass=ModelBase):
         # Check that fields defined in the model don't clash with fields from
         # parents, including auto-generated fields like multi-table inheritance
         # child accessors.
-        for parent in cls._meta.get_parent_list():
+        for parent in cls._meta.all_parents:
             for f in parent._meta.get_fields():
                 if f not in used_fields:
                     used_fields[f.name] = f
