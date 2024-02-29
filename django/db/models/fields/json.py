@@ -89,6 +89,9 @@ class JSONField(CheckFieldDefaultMixin, Field):
         if isinstance(expression, KeyTransform) and not isinstance(value, str):
             return value
         try:
+            # PostgreSQL database save json return dict
+            if isinstance(value, dict):
+                return value
             return json.loads(value, cls=self.decoder)
         except json.JSONDecodeError:
             return value
