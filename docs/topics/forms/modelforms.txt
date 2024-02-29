@@ -838,6 +838,7 @@ Method 2: Using ``ModelFormSet`` class
     >>> class AuthorFormSet(models.ModelFormSet):
     ...     model = Author
     ...     fields = ("name", "title")
+    ...
 
 Using the declarative syntax, you're able to define the formset directly as a class, 
 similar to how you declare models.
@@ -1314,6 +1315,7 @@ Method 2: Using ``InlineFormSet`` class
     ...     parent_model = Author
     ...     model = Book
     ...     fields = ("title",)
+    ...
     >>> author = Author.objects.get(name="Mike Royko")
     >>> formset = BookFormSet(instance=author)
 

@@ -71,7 +71,7 @@ Declarative ``FormSet``
 
         >>> from django.forms import formsets
         >>> from myapp.forms import MyForm
-        
+
         >>> class MyFormSet(formsets.FormSet):
         ...     form = MyForm
         ...     extra = 2
@@ -84,5 +84,6 @@ Declarative ``FormSet``
         ...     absolute_max = 15
         ...     can_delete_extra = False
         ...     renderer = None
-           
-        
+        ...
+   
+

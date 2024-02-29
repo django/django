@@ -290,6 +290,7 @@ Declarative ``ModelFormSet``
         ...     absolute_max = 15
         ...     can_delete_extra = False
         ...     widgets = {"field1": TextInput(), "field2": Textarea()}
+        ...
 
     The same arguments that can be passed to the ``modelformset_factory`` function 
     can also be passed to the declarative syntax.
@@ -304,8 +305,9 @@ Declarative ``ModelFormSet``
         >>> from myapp.forms import PostForm
 
         >>> class PostFormSet(models.ModelFormSet):
-        ...     form = PostForm # Specify the form class
+        ...     form = PostForm  # Specify the form class
         ...     extra = 2
+        ...
 
 Creating Inline Formsets
 ========================
@@ -350,3 +352,4 @@ Declarative ``InlineFormSet``
         ...     model = Book
         ...     extra = 1
         ...     fields = "__all__"
+        ...

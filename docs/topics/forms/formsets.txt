@@ -36,6 +36,7 @@ Method 2: Using ``FormSet`` class
     >>> from django.forms import formsets
     >>> class ArticleFormSet(formsets.FormSet):
     ...     form = ArticleForm
+    ...
 
 Using the declarative syntax, you're able to define the formset directly as a class, 
 similar to how you declare models.
@@ -463,19 +464,22 @@ override the default ``clean`` method and will have the similar results as above
     ...         for form in self.forms:
     ...             if self.can_delete and self._should_delete_form(form):
     ...                 continue
-    ...             title = form.cleaned_data.get('title')
+    ...             title = form.cleaned_data.get("title")
     ...             if title in titles:
-    ...                 raise forms.ValidationError("Articles in a set must have distinct titles.")
+    ...                 raise forms.ValidationError(
+    ...                     "Articles in a set must have distinct titles."
+    ...                 )
     ...             titles.append(title)
+    ...
 
     >>> data = {
-    ...     'form-TOTAL_FORMS': '2',
-    ...     'form-INITIAL_FORMS': '0',
-    ...     'form-MAX_NUM_FORMS': '',
-    ...     'form-0-title': 'Test',
-    ...     'form-0-pub_date': '1904-06-16',
-    ...     'form-1-title': 'Test',
-    ...     'form-1-pub_date': '1912-06-23',
+    ...     "form-TOTAL_FORMS": "2",
+    ...     "form-INITIAL_FORMS": "0",
+    ...     "form-MAX_NUM_FORMS": "",
+    ...     "form-0-title": "Test",
+    ...     "form-0-pub_date": "1904-06-16",
+    ...     "form-1-title": "Test",
+    ...     "form-1-pub_date": "1912-06-23",
     ... }
     >>> formset = ArticleFormSet(data)
     >>> formset.is_valid()
@@ -890,10 +894,12 @@ Similar to the above method you just have to override the default ``add_fields``
     ...     def add_fields(self, form, index):
     ...         super().add_fields(form, index)
     ...         form.fields["my_field"] = forms.CharField()
+    ...
 
     >>> formset = ArticleFormSet()
     >>> for form in formset:
     ...     print(form.as_table())
+    ...
     <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" id="id_form-0-title"></td></tr>
     <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" id="id_form-0-pub_date"></td></tr>
     <tr><th><label for="id_form-0-my_field">My field:</label></th><td><input type="text" name="form-0-my_field" id="id_form-0-my_field"></td></tr>
