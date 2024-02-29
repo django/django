@@ -271,7 +271,7 @@ Declarative ``ModelFormSet``
     See the following example which shows how to create AuthorFormSet from
     ``Author`` model::
 
-    .. code-block:: python
+    .. code-block:: pycon
 
         >>> from django.forms import models
         >>> from myapp.models import Author
@@ -298,7 +298,7 @@ Declarative ``ModelFormSet``
     and fields, as they can be inferred from the form class. As shown in the 
     example below:
 
-    .. code-block:: python
+    .. code-block:: pycon
 
         >>> from django.forms import models
         >>> from myapp.forms import PostForm
@@ -340,7 +340,7 @@ Declarative ``InlineFormSet``
     The Declarative ``InlineFormSet`` class takes the same arguments as the 
     :func:`inlineformset_factory` function.
 
-    .. code-block:: python
+    .. code-block:: pycon
 
         >>> from django.forms import models
         >>> from myapp.models import Author, Book

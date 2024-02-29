@@ -67,7 +67,7 @@ Declarative ``FormSet``
 
     Example of a declarative formset:
 
-    .. code-block:: python
+    .. code-block:: pycon
 
         >>> from django.forms import formsets
         >>> from myapp.forms import MyForm
