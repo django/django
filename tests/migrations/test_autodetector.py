@@ -1351,6 +1351,27 @@ class AutodetectorTests(BaseAutodetectorTests):
         self.assertOperationFieldAttributes(changes, "testapp", 0, 1, auto_now_add=True)
         self.assertOperationFieldAttributes(changes, "testapp", 0, 2, auto_now_add=True)
 
+    def test_remove_primary_key_attribute(self):
+        initial_state = ModelState(
+            "testapp",
+            "Author",
+            [
+                ("pkfield", models.IntegerField(primary_key=True)),
+            ],
+        )
+        updated_state = ModelState(
+            "testapp",
+            "Author",
+            [
+                ("id", models.BigAutoField()),
+                ("pkfield", models.IntegerField(primary_key=False)),
+            ],
+        )
+        changes = self.get_changes([initial_state], [updated_state])
+        self.assertOperationFieldAttributes(
+            changes, "testapp", 0, 0, default=models.NOT_PROVIDED
+        )
+
     @mock.patch(
         "django.db.migrations.questioner.MigrationQuestioner.ask_auto_now_add_addition"
     )
