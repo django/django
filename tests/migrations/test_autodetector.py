@@ -1368,6 +1368,8 @@ class AutodetectorTests(BaseAutodetectorTests):
             ],
         )
         changes = self.get_changes([initial_state], [updated_state])
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(changes, "testapp", 0, ["AlterField", "AddField"])
         self.assertOperationFieldAttributes(
             changes, "testapp", 0, 0, default=models.NOT_PROVIDED
         )
