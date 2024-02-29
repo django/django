@@ -19,7 +19,7 @@ class from a Django model.
 
 For example:
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> from django.forms import ModelForm
     >>> from myapp.models import Article
@@ -339,7 +339,7 @@ can accept an existing model instance as the keyword argument ``instance``; if
 this is supplied, ``save()`` will update that instance. If it's not supplied,
 ``save()`` will create a new instance of the specified model:
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> from myapp.models import Article
     >>> from myapp.forms import ArticleForm
@@ -394,7 +394,7 @@ Django adds a ``save_m2m()`` method to your ``ModelForm`` subclass. After
 you've manually saved the instance produced by the form, you can invoke
 ``save_m2m()`` to save the many-to-many form data. For example:
 
-.. code-block:: pycon
+.. code-block:: python
 
     # Create a form instance with POST data.
     >>> f = AuthorForm(request.POST)
@@ -415,7 +415,7 @@ Calling ``save_m2m()`` is only required if you use ``save(commit=False)``.
 When you use a ``save()`` on a form, all data -- including many-to-many data --
 is saved without the need for any additional method calls. For example:
 
-.. code-block:: pycon
+.. code-block:: python
 
     # Create a form instance with POST data.
     >>> a = Author()
@@ -712,7 +712,7 @@ inheriting them. This is useful if you need to declare extra fields or extra
 methods on a parent class for use in a number of forms derived from models.
 For example, using the previous ``ArticleForm`` class:
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> class EnhancedArticleForm(ArticleForm):
     ...     def clean_pub_date(self): ...
@@ -724,7 +724,7 @@ some extra validation and cleaning for the ``pub_date`` field.
 You can also subclass the parent's ``Meta`` inner class if you want to change
 the ``Meta.fields`` or ``Meta.exclude`` lists:
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> class RestrictedArticleForm(EnhancedArticleForm):
     ...     class Meta(ArticleForm.Meta):
@@ -762,7 +762,7 @@ specifying an ``initial`` parameter when instantiating the form. Initial
 values provided this way will override both initial values from the form field
 and values from an attached model instance. For example:
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> article = Article.objects.get(pk=1)
     >>> article.headline
@@ -781,7 +781,7 @@ You can create forms from a given model using the standalone function
 definition. This may be more convenient if you do not have many customizations
 to make:
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> from django.forms import modelform_factory
     >>> from myapp.models import Book
@@ -790,7 +790,7 @@ to make:
 This can also be used to make modifications to existing forms, for example by
 specifying the widgets to be used for a given field:
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> from django.forms import Textarea
     >>> Form = modelform_factory(Book, form=BookForm, widgets={"title": Textarea()})
@@ -802,7 +802,7 @@ documentation.
 
 ... or enable localization for specific fields:
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> Form = modelform_factory(Author, form=AuthorForm, localized_fields=["birth_date"])
 
@@ -815,26 +815,53 @@ Model formsets
 
 Like :doc:`regular formsets </topics/forms/formsets>`, Django provides a couple
 of enhanced formset classes to make working with Django models more
-convenient. Let's reuse the ``Author`` model from above:
+convenient. To create a model formset out of the ``Author`` model from above, 
+you have two options:
 
-.. code-block:: pycon
+Method 1: Using ``modelformset_factory``
+----------------------------------------
+
+.. code-block:: python
 
     >>> from django.forms import modelformset_factory
     >>> from myapp.models import Author
     >>> AuthorFormSet = modelformset_factory(Author, fields=["name", "title"])
 
+
+Method 2: Using ``ModelFormSet`` class
+--------------------------------------
+
+.. code-block:: python
+
+    >>> from django.forms import models
+    >>> from myapp.models import Author
+    >>> class AuthorFormSet(models.ModelFormSet):
+    ...     model = Author
+    ...     fields = ("name", "title")
+
+Using the declarative syntax, you're able to define the formset directly as a class, 
+similar to how you declare models.
+
+.. note::
+
+    When creating model formsets, you have the flexibility to customize their 
+    behavior by overriding methods. This can be done on either ``BaseModelFormSet`` 
+    or ``ModelFormSet``, depending on the method you choose to use.
+    It's important to note that both approaches end up giving you the same end results.
+
+
 Using ``fields`` restricts the formset to use only the given fields.
 Alternatively, you can take an "opt-out" approach, specifying which fields to
 exclude:
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> AuthorFormSet = modelformset_factory(Author, exclude=["birth_date"])
 
 This will create a formset that is capable of working with the data associated
 with the ``Author`` model. It works just like a regular formset:
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> formset = AuthorFormSet()
     >>> print(formset)
@@ -860,23 +887,6 @@ with the ``Author`` model. It works just like a regular formset:
     generated by a formset factory will contain a parent link field (by default
     ``<parent_model_name>_ptr``) instead of an ``id`` field.
 
-Alternate method to declare a ModelFormSet
-------------------------------------------
-
-.. class:: models.ModelFormSet
-
-Apart from using ```modelformset_factory`` you can also use the declarative syntax
-to instantiate new `FormSet` objects associated with a model.
-
-    >>> from django.forms import models
-    >>> from myapp.models import Author
-    >>> class AuthorFormSet(models.ModelFormSet):
-    ...     model = Author
-    ...     fields =('name', 'title')
-
-This will create a formset that is capable of working with the data associated
-with the ``Author`` model, which is similar to the previous example.
-
 Changing the queryset
 ---------------------
 
@@ -885,7 +895,7 @@ queryset that includes all objects in the model (e.g.,
 ``Author.objects.all()``). You can override this behavior by using the
 ``queryset`` argument:
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> formset = AuthorFormSet(queryset=Author.objects.filter(name__startswith="O"))
 
@@ -903,7 +913,7 @@ Alternatively, you can create a subclass that sets ``self.queryset`` in
 
 Then, pass your ``BaseAuthorFormSet`` class to the factory function:
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> AuthorFormSet = modelformset_factory(
     ...     Author, fields=["name", "title"], formset=BaseAuthorFormSet
@@ -912,7 +922,7 @@ Then, pass your ``BaseAuthorFormSet`` class to the factory function:
 If you want to return a formset that doesn't include *any* preexisting
 instances of the model, you can specify an empty QuerySet:
 
-.. code-block:: pycon
+.. code-block:: python
 
    >>> AuthorFormSet(queryset=Author.objects.none())
 
@@ -949,7 +959,7 @@ customize the ``ModelForm``’s widget class for a particular field. This
 works the same way as the ``widgets`` dictionary on the inner ``Meta``
 class of a ``ModelForm`` works:
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> AuthorFormSet = modelformset_factory(
     ...     Author,
@@ -991,7 +1001,7 @@ Saving objects in the formset
 As with a ``ModelForm``, you can save the data as a model object. This is done
 with the formset's ``save()`` method:
 
-.. code-block:: pycon
+.. code-block:: python
 
     # Create a formset instance with POST data.
     >>> formset = AuthorFormSet(request.POST)
@@ -1011,7 +1021,7 @@ model forms, in `Selecting the fields to use`_.
 
 Pass ``commit=False`` to return the unsaved model instances:
 
-.. code-block:: pycon
+.. code-block:: python
 
     # don't save to the database
     >>> instances = formset.save(commit=False)
@@ -1043,7 +1053,7 @@ extra forms displayed.
 
 ``max_num`` does not prevent existing objects from being displayed:
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> Author.objects.order_by("name")
     <QuerySet [<Author: Charles Baudelaire>, <Author: Paul Verlaine>, <Author: Walt Whitman>]>
@@ -1062,7 +1072,7 @@ If the value of ``max_num`` is greater than the number of existing related
 objects, up to ``extra`` additional blank forms will be added to the formset,
 so long as the total number of forms does not exceed ``max_num``:
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> AuthorFormSet = modelformset_factory(Author, fields=["name"], max_num=4, extra=2)
     >>> formset = AuthorFormSet(queryset=Author.objects.order_by("name"))
@@ -1085,7 +1095,7 @@ Preventing new objects creation
 Using the ``edit_only`` parameter, you can prevent creation of any new
 objects:
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> AuthorFormSet = modelformset_factory(
     ...     Author,
@@ -1282,14 +1292,41 @@ you have these two models::
         title = models.CharField(max_length=100)
 
 If you want to create a formset that allows you to edit books belonging to
-a particular author, you could do this:
+a particular author, you have two options:
 
-.. code-block:: pycon
+Method 1: Using ``inlineformset_factory``
+-----------------------------------------
+
+.. code-block:: python
 
     >>> from django.forms import inlineformset_factory
     >>> BookFormSet = inlineformset_factory(Author, Book, fields=["title"])
     >>> author = Author.objects.get(name="Mike Royko")
     >>> formset = BookFormSet(instance=author)
+
+Method 2: Using ``InlineFormSet`` class
+---------------------------------------
+
+.. code-block:: python
+
+    >>> from django.forms import models
+    >>> class BookFormSet(models.InlineFormSet):
+    ...     parent_model = Author
+    ...     model = Book
+    ...     fields = ("title",)
+    >>> author = Author.objects.get(name="Mike Royko")
+    >>> formset = BookFormSet(instance=author)
+
+Using the declarative syntax, you're able to define the formset directly as a class, 
+similar to how you declare models.
+
+.. note::
+
+    When creating inline formsets, you have the flexibility to customize their 
+    behavior by overriding methods. This can be done on either ``BaseInlineFormSet`` 
+    or ``InlineFormSet``, depending on the method you choose to use.
+    It's important to note that both approaches end up giving you the same end results.
+
 
 ``BookFormSet``'s :ref:`prefix <formset-prefix>` is ``'book_set'``
 (``<model name>_set`` ). If ``Book``'s ``ForeignKey`` to ``Author`` has a
@@ -1305,23 +1342,6 @@ a particular author, you could do this:
 
     :ref:`Manually rendered can_delete and can_order
     <manually-rendered-can-delete-and-can-order>`.
-
-Alternate method to declare a InlineFormSet
--------------------------------------------
-
-.. class:: models.InlineFormSet
-
-Apart from using ```inlineformset_factory`` you can also use the declarative syntax
-to instantiate new `FormSet` objects associated with a related model.
-
-    >>> from django.forms import models
-    >>> class BookFormSet(models.InlineFormSet):
-    ...     parent_model = Author
-    ...     model = Book
-    ...     fields =('title',)
-
-This will create a formset that is capable of working with the data associated
-with the ``Book`` model, which is similar to the previous example.
 
 Overriding methods on an ``InlineFormSet``
 ------------------------------------------
@@ -1348,7 +1368,7 @@ See also :ref:`model-formsets-overriding-clean`.
 Then when you create your inline formset, pass in the optional argument
 ``formset``:
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> from django.forms import inlineformset_factory
     >>> BookFormSet = inlineformset_factory(
@@ -1380,7 +1400,7 @@ the following model::
 To resolve this, you can use ``fk_name`` to
 :func:`~django.forms.models.inlineformset_factory`:
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> FriendshipFormSet = inlineformset_factory(
     ...     Friend, Friendship, fk_name="from_friend", fields=["to_friend", "length_in_months"]

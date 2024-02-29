@@ -181,6 +181,9 @@ Model form factory functions
 
 .. currentmodule:: django.forms.models
 
+Creating Model Forms
+====================
+
 ``modelform_factory``
 ---------------------
 
@@ -223,6 +226,11 @@ Model form factory functions
     more information. Omitting any definition of the fields to use will result
     in an :exc:`~django.core.exceptions.ImproperlyConfigured` exception.
 
+Creating Model Formsets
+=======================
+
+There are two ways to create model formsets in Django:
+
 ``modelformset_factory``
 ------------------------
 
@@ -246,25 +254,63 @@ Model form factory functions
 
     See :ref:`model-formsets` for example usage.
 
-``ModelFormSet class reference``
-================================
+Declarative ``ModelFormSet``
+----------------------------
 
-``objects``
------------
+.. class:: ModelFormSet
 
-.. attribute:: ModelFromSet.objects
+    A BaseModelFormSet subclass that allows declarative declaration of model formsets.
 
-    The :class:`~django.forms.models.ModelFormSet` class is used to create the
-    ``Formset`` from the given ``model`` using a declarative syntax.
+    .. versionadded:: 5.1
+
+    Returns a ``ModelFormSet`` class for the given ``model`` class.
+
+    The same arguments that can be passed to the ``modelformset_factory`` function 
+    can also be passed to the declarative syntax.
+    
     See the following example which shows how to create AuthorFormSet from
-    `Author` model::
+    ``Author`` model::
 
-        from django.forms import models
-        from myapp.models import Author
+    .. code-block:: python
 
-        class AuthorFormSet(mdoels.ModelFromSet):
-            model = Author
-            fields = '__all__'
+        >>> from django.forms import models
+        >>> from myapp.models import Author
+
+        >>> class AuthorFormSet(models.ModelFormSet):
+        ...     model = Author
+        ...     fields = ["field1", "field2"]
+        ...     exclude = ["field3"]
+        ...     extra = 2
+        ...     can_order = True
+        ...     can_delete = True
+        ...     max_num = 10
+        ...     validate_max = True
+        ...     min_num = 3
+        ...     validate_min = True
+        ...     absolute_max = 15
+        ...     can_delete_extra = False
+        ...     widgets = {"field1": TextInput(), "field2": Textarea()}
+
+    The same arguments that can be passed to the ``modelformset_factory`` function 
+    can also be passed to the declarative syntax.
+
+    You can also create your model formset without explicitly specifying the model 
+    and fields, as they can be inferred from the form class. As shown in the 
+    example below:
+
+    .. code-block:: python
+
+        >>> from django.forms import models
+        >>> from myapp.forms import PostForm
+
+        >>> class PostFormSet(models.ModelFormSet):
+        ...     form = PostForm # Specify the form class
+        ...     extra = 2
+
+Creating Inline Formsets
+========================
+
+There are two ways to create inline formsets in Django:
 
 ``inlineformset_factory``
 -------------------------
@@ -280,23 +326,27 @@ Model form factory functions
 
     See :ref:`inline-formsets` for example usage.
 
-``InlineFormSet class reference``
-=================================
+Declarative ``InlineFormSet``
+-----------------------------
 
-``objects``
------------
+.. class:: InlineFormSet
 
-.. attribute:: InlineFormSet.objects
+    A BaseInlineFormSet subclass that allows declarative declaration of model formsets.
 
-    The :class:`~django.forms.models.InlineFormSet` class is used to create the
-    ``Formset`` from the given related ``model`` using a declarative syntax.
-    See the following example which shows how to create BookFormSet from
-    `Book` model which is related to the `AUthor` model::
+    .. versionadded:: 5.1
 
-        from django.forms import models
-        from myapp.models import Author, Book
+    Returns a ``InlineFormSet`` class for the given ``parent_model`` and ``model`` class.
 
-        class AuthorFormSet(mdoels.ModelFromSet):
-            parent_model = Author
-            model = Book
-            fields = '__all__'
+    The Declarative ``InlineFormSet`` class takes the same arguments as the 
+    :func:`inlineformset_factory` function.
+
+    .. code-block:: python
+
+        >>> from django.forms import models
+        >>> from myapp.models import Author, Book
+
+        >>> class BookFormSet(models.InlineFormSet):
+        ...     parent_model = Author
+        ...     model = Book
+        ...     extra = 1
+        ...     fields = "__all__"

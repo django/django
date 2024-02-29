@@ -4,17 +4,11 @@ Formsets
 
 .. currentmodule:: django.forms.formsets
 
-Making a FormSet
-================
-
-Method 1: Using `formset_factory`
----------------------------------
-
 A formset is a layer of abstraction to work with multiple forms on the same
 page. It can be best compared to a data grid. Let's say you have the following
 form:
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> from django import forms
     >>> class ArticleForm(forms.Form):
@@ -23,18 +17,44 @@ form:
     ...
 
 You might want to allow the user to create several articles at once. To create
-a formset out of an ``ArticleForm`` you would do:
+a formset out of an ``ArticleForm``, you have two options:
 
-.. code-block:: pycon
+Method 1: Using ``formset_factory``
+===================================
+
+.. code-block:: python
 
     >>> from django.forms import formset_factory
     >>> ArticleFormSet = formset_factory(ArticleForm)
 
-You now have created a formset class named ``ArticleFormSet``.
-Instantiating the formset gives you the ability to iterate over the forms
-in the formset and display them as you would with a regular form:
 
-.. code-block:: pycon
+Method 2: Using ``FormSet`` class
+=================================
+
+.. code-block:: python
+
+    >>> from django.forms import formsets
+    >>> class ArticleFormSet(formsets.FormSet):
+    ...     form = ArticleForm
+
+Using the declarative syntax, you're able to define the formset directly as a class, 
+similar to how you declare models.
+
+.. note::
+
+    When creating formsets, you have the flexibility to customize their behavior by 
+    overriding methods. This can be done on either ``BaseFormSet`` or ``FormSet``, 
+    depending on the method you choose to use.
+    It's important to note that both approaches end up giving you the same end results, 
+    and remember that it's necessary to provide the ``form`` argument when defining 
+    the ``Formset`` class, just like with ``formset_factory``.
+
+
+Regardless of which option you choose, you have now created a formset class 
+named ``ArticleFormSet``. Instantiating the formset gives you the ability to iterate 
+over the forms in the formset and display them as you would with a regular form:
+
+.. code-block:: python
 
     >>> formset = ArticleFormSet()
     >>> for form in formset:
@@ -48,7 +68,7 @@ that is displayed is controlled by the ``extra`` parameter. By default,
 :func:`~django.forms.formsets.formset_factory` defines one extra form; the
 following example will create a formset class to display two blank forms:
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> ArticleFormSet = formset_factory(ArticleForm, extra=2)
 
@@ -56,31 +76,6 @@ Formsets can be iterated and indexed, accessing forms in the order they were
 created. You can reorder the forms by overriding the default
 :meth:`iteration <object.__iter__>` and
 :meth:`indexing <object.__getitem__>` behavior if needed.
-
-Method 2: Using ``FormSet`` class
----------------------------------
-
-You can use the ``FormSet`` class to declare a formset in same way you declare models.
-This is alternative method to using ``formset_factory`` to make the formset class.
-
-To create a formset out of an ``ArticleForm`` you would do::
-
-    >>> from django.forms import formsets
-    >>> class ArticleFormSet(formsets.FormSet):
-    ...     form = ArticleForm
-
-.. note::
-    It is compulsory to pass the form argument while declaring the Formset class. Similar to
-    how it's compulsory to pass form as first argument to ``formset_factory``.
-
-You now have created a formset named ``ArticleFormSet``, which is similar to how to create
-it using the ``formset_factory``. You can use it in the same way as the previous example::
-
-    >>> formset = ArticleFormSet()
-    >>> for form in formset:
-    ...     print(form.as_table())
-    <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" id="id_form-0-title"></td></tr>
-    <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" id="id_form-0-pub_date"></td></tr>
 
 .. _formsets-initial-data:
 
@@ -93,7 +88,7 @@ telling the formset how many additional forms to show in addition to the
 number of forms it generates from the initial data. Let's take a look at an
 example:
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> import datetime
     >>> from django.forms import formset_factory
@@ -139,7 +134,7 @@ Limiting the maximum number of forms
 The ``max_num`` parameter to :func:`~django.forms.formsets.formset_factory`
 gives you the ability to limit the number of forms the formset will display:
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> from django.forms import formset_factory
     >>> from myapp.forms import ArticleForm
@@ -181,7 +176,7 @@ The ``absolute_max`` parameter to :func:`.formset_factory` allows limiting the
 number of forms that can be instantiated when supplying ``POST`` data. This
 protects against memory exhaustion attacks using forged ``POST`` requests:
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> from django.forms.formsets import formset_factory
     >>> from myapp.forms import ArticleForm
@@ -203,8 +198,6 @@ When ``absolute_max`` is ``None``, it defaults to ``max_num + 1000``. (If
 
 If ``absolute_max`` is less than ``max_num``, a ``ValueError`` will be raised.
 
-.. _formset-validation:
-
 Formset validation
 ==================
 
@@ -212,7 +205,7 @@ Validation with a formset is almost identical to a regular ``Form``. There is
 an ``is_valid`` method on the formset to provide a convenient way to validate
 all forms in the formset:
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> from django.forms import formset_factory
     >>> from myapp.forms import ArticleForm
@@ -229,7 +222,7 @@ We passed in no data to the formset which is resulting in a valid form. The
 formset is smart enough to ignore extra forms that were not changed. If we
 provide an invalid article:
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> data = {
     ...     "form-TOTAL_FORMS": "2",
@@ -259,7 +252,7 @@ validation may be incorrect when adding and deleting forms.
 To check how many errors there are in the formset, we can use the
 ``total_error_count`` method:
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> # Using the previous example
     >>> formset.errors
@@ -272,7 +265,7 @@ To check how many errors there are in the formset, we can use the
 We can also check if form data differs from the initial data (i.e. the form was
 sent without any data):
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> data = {
     ...     "form-TOTAL_FORMS": "1",
@@ -295,7 +288,7 @@ data is required for the ``ManagementForm``. This form is used by the formset
 to manage the collection of forms contained in the formset. If you don't
 provide this management data, the formset will be invalid:
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> data = {
     ...     "form-0-title": "Test",
@@ -364,7 +357,7 @@ respectively.
 For example, here is the default error message when the
 management form is missing:
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> formset = ArticleFormSet({})
     >>> formset.is_valid()
@@ -374,7 +367,7 @@ management form is missing:
 
 And here is a custom error message:
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> formset = ArticleFormSet(
     ...     {}, error_messages={"missing_management_form": "Sorry, something went wrong."}
@@ -387,13 +380,13 @@ And here is a custom error message:
 Custom formset validation
 -------------------------
 
-Method 1: using BaseModelFormSet
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Method 1: Using BaseFormSet
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A formset has a ``clean`` method similar to the one on a ``Form`` class. This
 is where you define your own validation that works at the formset level:
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> from django.core.exceptions import ValidationError
     >>> from django.forms import BaseFormSet
@@ -447,12 +440,14 @@ help distinguish them from form-specific errors. For example,
         <li>Articles in a set must have distinct titles.</li>
     </ul>
 
-Method 2: using FormSet Class
+Method 2: Using FormSet Class
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Instead of using ```formset_factory`` you can use the `FormSet` Class to make
+Instead of using ```formset_factory`` you can use the ``FormSet`` Class to make
 your formset, and then you can directly define a method inside the class this will
 override the default ``clean`` method and will have the similar results as above.::
+
+.. code-block:: python
 
     >>> from django.forms import formsets
     >>> from myapp.forms import ArticleForm
@@ -544,8 +539,6 @@ to the :ref:`formsets-error-messages` argument.
     to protect against memory exhaustion attacks using forged POST requests.
     See :ref:`formsets-absolute-max`.
 
-.. _validate_min:
-
 ``validate_min``
 ----------------
 
@@ -599,7 +592,7 @@ Default: ``False``
 
 Lets you create a formset with the ability to order:
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> from django.forms import formset_factory
     >>> from myapp.forms import ArticleForm
@@ -628,7 +621,7 @@ and is an ``forms.IntegerField``. For the forms that came from the initial
 data it automatically assigned them a numeric value. Let's look at what will
 happen when the user changes these values:
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> data = {
     ...     "form-TOTAL_FORMS": "3",
@@ -674,7 +667,7 @@ Default: :class:`~django.forms.NumberInput`
 Set ``ordering_widget`` to specify the widget class to be used with
 ``can_order``:
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> from django.forms import BaseFormSet, formset_factory
     >>> from myapp.forms import ArticleForm
@@ -694,7 +687,7 @@ Set ``ordering_widget`` to specify the widget class to be used with
 Override ``get_ordering_widget()`` if you need to provide a widget instance for
 use with ``can_order``:
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> from django.forms import BaseFormSet, formset_factory
     >>> from myapp.forms import ArticleForm
@@ -716,7 +709,7 @@ Default: ``False``
 
 Lets you create a formset with the ability to select forms for deletion:
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> from django.forms import formset_factory
     >>> from myapp.forms import ArticleForm
@@ -744,7 +737,7 @@ Similar to ``can_order`` this adds a new field to each form named ``DELETE``
 and is a ``forms.BooleanField``. When data comes through marking any of the
 delete fields you can access them with ``deleted_forms``:
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> data = {
     ...     "form-TOTAL_FORMS": "3",
@@ -780,7 +773,7 @@ automatically. You'll need to call ``delete()`` on each of the
 <django.forms.models.BaseModelFormSet.deleted_objects>` to actually delete
 them:
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> instances = formset.save(commit=False)
     >>> for obj in formset.deleted_objects:
@@ -807,7 +800,7 @@ Default: :class:`~django.forms.CheckboxInput`
 Set ``deletion_widget`` to specify the widget class to be used with
 ``can_delete``:
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> from django.forms import BaseFormSet, formset_factory
     >>> from myapp.forms import ArticleForm
@@ -827,7 +820,7 @@ Set ``deletion_widget`` to specify the widget class to be used with
 Override ``get_deletion_widget()`` if you need to provide a widget instance for
 use with ``can_delete``:
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> from django.forms import BaseFormSet, formset_factory
     >>> from myapp.forms import ArticleForm
@@ -855,15 +848,15 @@ remove the option to delete extra forms.
 Adding additional fields to a formset
 =====================================
 
-Method 1: using BaseModelFormSet
---------------------------------
+Method 1: Using BaseFormSet
+---------------------------
 
 If you need to add additional fields to the formset this can be easily
 accomplished. The formset base class provides an ``add_fields`` method. You
 can override this method to add your own fields or even redefine the default
 fields/attributes of the order and deletion fields:
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> from django.forms import BaseFormSet
     >>> from django.forms import formset_factory
@@ -883,11 +876,13 @@ fields/attributes of the order and deletion fields:
     <div><label for="id_form-0-pub_date">Pub date:</label><input type="text" name="form-0-pub_date" id="id_form-0-pub_date"></div>
     <div><label for="id_form-0-my_field">My field:</label><input type="text" name="form-0-my_field" id="id_form-0-my_field"></div>
 
-Method 2: using the Formset Class
+Method 2: Using the Formset Class
 ---------------------------------
 
-Additional fields can also be easily added while using the `FormSet` class.
+Additional fields can also be easily added while using the ``FormSet`` class.
 Similar to the above method you just have to override the default ``add_fields`` method::
+
+.. code-block:: python
 
     >>> from django.forms import formsets
     >>> from myapp.forms import ArticleForm
@@ -911,7 +906,7 @@ Passing custom parameters to formset forms
 Sometimes your form class takes custom parameters, like ``MyArticleForm``.
 You can pass this parameter when instantiating the formset:
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> from django.forms import BaseFormSet
     >>> from django.forms import formset_factory
@@ -931,7 +926,7 @@ base class provides a ``get_form_kwargs`` method. The method takes a single
 argument - the index of the form in the formset. The index is ``None`` for the
 :ref:`empty_form`:
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> from django.forms import BaseFormSet
     >>> from django.forms import formset_factory
