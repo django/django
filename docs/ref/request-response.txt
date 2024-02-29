@@ -913,7 +913,7 @@ Methods
 
     Sets a header unless it has already been set.
 
-.. method:: HttpResponse.set_cookie(key, value='', max_age=None, expires=None, path='/', domain=None, secure=False, httponly=False, samesite=None)
+.. method:: HttpResponse.set_cookie(key, value='', max_age=None, expires=None, path='/', domain=None, secure=False, httponly=False, samesite=None, partitioned=False)
 
     Sets a cookie. The parameters are the same as in the
     :class:`~http.cookies.Morsel` cookie object in the Python standard library.
@@ -946,9 +946,12 @@ Methods
 
       Use ``samesite='None'`` (string) to explicitly state that this cookie is
       sent with all same-site and cross-site requests.
+    * Use ``partitioned=True`` if you want to opt a cookie into partitioned
+      storage, with a separate cookie jar per top-level site.
 
     .. _HttpOnly: https://owasp.org/www-community/HttpOnly
     .. _SameSite: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite
+    .. _Partitioned: https://developer.mozilla.org/en-US/docs/Web/Privacy/Privacy_sandbox/Partitioned_cookies
 
     .. warning::
 
