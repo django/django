@@ -122,6 +122,15 @@ class SetCookieTests(SimpleTestCase):
         with self.assertRaisesMessage(ValueError, msg):
             HttpResponse().set_cookie("example", samesite="invalid")
 
+    def test_partitioned_cookie(self):
+        response = HttpResponse()
+        response.set_cookie("example", partitioned=True)
+        example_cookie = response.cookies["example"]
+        self.assertIn(
+            "; %s" % cookies.Morsel._reserved["partitioned"], str(example_cookie)
+        )
+        self.assertIs(example_cookie["partitioned"], True)
+
 
 class DeleteCookieTests(SimpleTestCase):
     def test_default(self):
