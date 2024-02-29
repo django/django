@@ -1268,7 +1268,7 @@ subclass::
     ======  ====================
     Prefix  Lookup
     ======  ====================
-    ^       :lookup:`startswith`
+    ^       :lookup:`istartswith`
     =       :lookup:`iexact`
     @       :lookup:`search`
     None    :lookup:`icontains`
