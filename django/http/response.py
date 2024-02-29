@@ -221,6 +221,7 @@ class HttpResponseBase:
         secure=False,
         httponly=False,
         samesite=None,
+        partitioned=False,
     ):
         """
         Set a cookie.
@@ -273,6 +274,8 @@ class HttpResponseBase:
             if samesite.lower() not in ("lax", "none", "strict"):
                 raise ValueError('samesite must be "lax", "none", or "strict".')
             self.cookies[key]["samesite"] = samesite
+        if partitioned:
+            self.cookies[key]["partitioned"] = True
 
     def setdefault(self, key, value):
         """Set a header unless it has already been set."""
