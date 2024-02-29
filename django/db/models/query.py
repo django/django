@@ -788,7 +788,7 @@ class QuerySet(AltersData):
         # model to detect the inheritance pattern ConcreteGrandParent ->
         # MultiTableParent -> ProxyChild. Simply checking self.model._meta.proxy
         # would not identify that case as involving multiple tables.
-        for parent in self.model._meta.get_parent_list():
+        for parent in self.model._meta.all_parents:
             if parent._meta.concrete_model is not self.model._meta.concrete_model:
                 raise ValueError("Can't bulk create a multi-table inherited model")
         if not objs:

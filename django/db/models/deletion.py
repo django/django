@@ -305,13 +305,11 @@ class Collector:
         if not collect_related:
             return
 
-        if keep_parents:
-            parents = set(model._meta.get_parent_list())
         model_fast_deletes = defaultdict(list)
         protected_objects = defaultdict(list)
         for related in get_candidate_relations_to_delete(model._meta):
             # Preserve parent reverse relationships if keep_parents=True.
-            if keep_parents and related.model in parents:
+            if keep_parents and related.model in model._meta.all_parents:
                 continue
             field = related.field
             on_delete = field.remote_field.on_delete
