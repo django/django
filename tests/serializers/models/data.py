@@ -210,10 +210,6 @@ class EmailPKData(models.Model):
     data = models.EmailField(primary_key=True)
 
 
-# class FilePKData(models.Model):
-#    data = models.FileField(primary_key=True)
-
-
 class FilePathPKData(models.Model):
     data = models.FilePathField(primary_key=True)
 
@@ -224,10 +220,6 @@ class FloatPKData(models.Model):
 
 class IntegerPKData(models.Model):
     data = models.IntegerField(primary_key=True)
-
-
-# class ImagePKData(models.Model):
-#    data = models.ImageField(primary_key=True)
 
 
 class GenericIPAddressPKData(models.Model):
