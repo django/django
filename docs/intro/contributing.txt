@@ -235,6 +235,16 @@ failed. Both of these are considered to be test failures. Meanwhile, ``x`` and
 ``s`` indicated expected failures and skipped tests, respectively. Dots indicate
 passing tests.
 
+========= ===========
+Character Test Status
+========= ===========
+E         Raised Error
+F         Assertion Failure
+x         Expected Failure
+s         Skipped Test
+.         Test Passed
+========= ===========
+
 Skipped tests are typically due to missing external libraries required to run
 the test; see :ref:`running-unit-tests-dependencies` for a list of dependencies
 and be sure to install any for tests related to the changes you are making (we
