@@ -422,6 +422,9 @@ Miscellaneous
 * Overriding existing converters with ``django.urls.register_converter()`` is
   deprecated.
 
+* The ``check`` keyword argument of ``CheckConstraint`` is deprecated in favor
+  of ``condition``.
+
 Features removed in 5.1
 =======================
 

@@ -17,7 +17,7 @@ from django.contrib.admin.options import IncorrectLookupParameters, ShowFacets
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured
-from django.db import connection
+from django.db import connection, models
 from django.test import RequestFactory, SimpleTestCase, TestCase, override_settings
 
 from .models import Book, Bookmark, Department, Employee, ImprovedBook, TaggedItem
@@ -154,6 +154,30 @@ class EmployeeNameCustomDividerFilter(FieldListFilter):
         return [self.lookup_kwarg]
 
 
+class DepartmentOwnershipListFilter(SimpleListFilter):
+    title = "Department Ownership"
+    parameter_name = "department_ownership"
+
+    def lookups(self, request, model_admin):
+        return [
+            ("DEV_OWNED", "Owned by Dev Department"),
+            ("OTHER", "Other"),
+        ]
+
+    def queryset(self, request, queryset):
+        queryset = queryset.annotate(
+            owned_book_count=models.Count(
+                "employee__department",
+                filter=models.Q(employee__department__code="DEV"),
+            ),
+        )
+
+        if self.value() == "DEV_OWNED":
+            return queryset.filter(owned_book_count__gt=0)
+        elif self.value() == "OTHER":
+            return queryset.filter(owned_book_count=0)
+
+
 class CustomUserAdmin(UserAdmin):
     list_filter = ("books_authored", "books_contributed")
 
@@ -229,6 +253,7 @@ class DecadeFilterBookAdmin(ModelAdmin):
         ("author__email", AllValuesFieldListFilter),
         ("contributors", RelatedOnlyFieldListFilter),
         ("category", EmptyFieldListFilter),
+        DepartmentOwnershipListFilter,
     )
     ordering = ("-id",)
 
@@ -336,6 +361,14 @@ class ListFiltersTests(TestCase):
         cls.bob = User.objects.create_user("bob", "bob@example.com")
         cls.lisa = User.objects.create_user("lisa", "lisa@example.com")
 
+        # Departments
+        cls.dev = Department.objects.create(code="DEV", description="Development")
+        cls.design = Department.objects.create(code="DSN", description="Design")
+
+        # Employees
+        cls.john = Employee.objects.create(name="John Blue", department=cls.dev)
+        cls.jack = Employee.objects.create(name="Jack Red", department=cls.design)
+
         # Books
         cls.djangonaut_book = Book.objects.create(
             title="Djangonaut: an art of living",
@@ -345,6 +378,7 @@ class ListFiltersTests(TestCase):
             date_registered=cls.today,
             availability=True,
             category="non-fiction",
+            employee=cls.john,
         )
         cls.bio_book = Book.objects.create(
             title="Django: a biography",
@@ -354,6 +388,7 @@ class ListFiltersTests(TestCase):
             no=207,
             availability=False,
             category="fiction",
+            employee=cls.john,
         )
         cls.django_book = Book.objects.create(
             title="The Django Book",
@@ -363,6 +398,7 @@ class ListFiltersTests(TestCase):
             date_registered=cls.today,
             no=103,
             availability=True,
+            employee=cls.jack,
         )
         cls.guitar_book = Book.objects.create(
             title="Guitar for dummies",
@@ -373,14 +409,6 @@ class ListFiltersTests(TestCase):
             category="",
         )
         cls.guitar_book.contributors.set([cls.bob, cls.lisa])
-
-        # Departments
-        cls.dev = Department.objects.create(code="DEV", description="Development")
-        cls.design = Department.objects.create(code="DSN", description="Design")
-
-        # Employees
-        cls.john = Employee.objects.create(name="John Blue", department=cls.dev)
-        cls.jack = Employee.objects.create(name="Jack Red", department=cls.design)
 
     def assertChoicesDisplay(self, choices, expected_displays):
         for choice, expected_display in zip(choices, expected_displays, strict=True):
@@ -905,6 +933,7 @@ class ListFiltersTests(TestCase):
             filterspec.lookup_choices,
             [
                 (self.djangonaut_book.pk, "Djangonaut: an art of living"),
+                (self.bio_book.pk, "Django: a biography"),
                 (self.django_book.pk, "The Django Book"),
             ],
         )
@@ -1407,6 +1436,8 @@ class ListFiltersTests(TestCase):
             ["All", "bob (1)", "lisa (1)", "??? (3)"],
             # EmptyFieldListFilter.
             ["All", "Empty (2)", "Not empty (2)"],
+            # SimpleListFilter with join relations.
+            ["All", "Owned by Dev Department (2)", "Other (2)"],
         ]
         for filterspec, expected_displays in zip(filters, tests, strict=True):
             with self.subTest(filterspec.__class__.__name__):
@@ -1482,6 +1513,8 @@ class ListFiltersTests(TestCase):
             ["All", "bob (0)", "lisa (0)", "??? (2)"],
             # EmptyFieldListFilter.
             ["All", "Empty (0)", "Not empty (2)"],
+            # SimpleListFilter with join relations.
+            ["All", "Owned by Dev Department (2)", "Other (0)"],
         ]
         for filterspec, expected_displays in zip(filters, tests, strict=True):
             with self.subTest(filterspec.__class__.__name__):
@@ -1525,6 +1558,8 @@ class ListFiltersTests(TestCase):
             ["All", "bob", "lisa", "???"],
             # EmptyFieldListFilter.
             ["All", "Empty", "Not empty"],
+            # SimpleListFilter with join relations.
+            ["All", "Owned by Dev Department", "Other"],
         ]
         for filterspec, expected_displays in zip(filters, tests, strict=True):
             with self.subTest(filterspec.__class__.__name__):
