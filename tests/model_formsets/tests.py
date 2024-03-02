@@ -2158,6 +2158,11 @@ class FactoryModelFormsetTest(TestCase, ModelFormsetTestMixin):
         formset = FormSet(data, instance=person)
         self.assertTrue(formset.is_valid())
 
+    def test_no_model_argument_error(self):
+        msg = "modelformset_factory() missing 1 required positional argument: 'model'"
+        with self.assertRaisesMessage(TypeError, msg):
+            modelformset_factory(fields="__all__")
+
 
 class DeclarativeModelFormsetTest(TestCase, ModelFormsetTestMixin):
     """A set of tests of modelformsets created with declarative syntax."""
@@ -2596,6 +2601,13 @@ class DeclarativeModelFormsetTest(TestCase, ModelFormsetTestMixin):
         }
         formset = DeclarativeMembershipFormInlineSet(data, instance=person)
         self.assertTrue(formset.is_valid())
+
+    def test_no_model_argument_error(self):
+        msg = "ModelFormSet() missing 1 required positional argument: 'model'"
+        with self.assertRaisesMessage(TypeError, msg):
+
+            class DeclarativeInvalidFormSet(ModelFormSet):
+                fields = "__all__"
 
 
 class TestModelFormsetOverridesTroughFormMeta(TestCase):

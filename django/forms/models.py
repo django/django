@@ -1110,6 +1110,11 @@ class ModelFormSetMeta(FormSetMeta):
 
     def __new__(cls, name, bases, attrs):
         """Initialize the attributes given to the ModelFormSet class."""
+        if "model" not in set(attrs):
+            raise TypeError(
+                "ModelFormSet() missing 1 required positional argument: 'model'"
+            )
+
         kwargs = {}
         model = attrs.get("model") or None
         kwargs.update({"model": model})
@@ -1173,6 +1178,7 @@ class ModelFormSet(BaseModelFormSet, FormSet, metaclass=ModelFormSetMeta):
     """Base class for which can be used to create modelformset classes."""
 
     form: Any = None
+    model: Any = None
 
     def __init__(
         self,
@@ -1511,6 +1517,7 @@ class InlineFormSet(BaseInlineFormSet, ModelFormSet, metaclass=InlineFormSetMeta
     """Base class for which can be used to create inlineformset classes."""
 
     form: Any = None
+    model: Any = None
 
     def __init__(
         self,
