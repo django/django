@@ -744,56 +744,120 @@ class QuerySet(AltersData):
             return OnConflict.UPDATE
         return None
 
+    def _prepare_parent_obj(self, obj, parent_model):
+        parent_obj = None
+        if not hasattr(obj, "_mt_processed"):
+            print(
+                f"Préparation de l'objet parent pour le modèle"
+                f" {parent_model} et l'objet {obj}"
+            )
+            parent_obj = parent_model()
+            for field in parent_model._meta.local_fields:
+                if hasattr(obj, field.name):
+                    setattr(parent_obj, field.name, getattr(obj, field.name))
+                    print(
+                        f"Préparation de l'objet parent pour le modèle {parent_model} "
+                        f"et l'objet {obj}"
+                    )
+
+            # obj._mt_processed = True
+        return parent_obj
+
+    def _associate_and_prepare_child_objs(
+        self, objs, inserted_parents_dict, parent_models
+    ):
+        print("Association et préparation des objets enfants")
+        from django.db import models
+
+        child_objs = []
+        for obj_index, obj in enumerate(objs):
+            # Éviter de traiter à nouveau les objets déjà marqués
+            if hasattr(obj, "_mt_processed"):
+                print(f"L'objet {obj} a déjà été traité")
+                continue
+
+            for parent_model in parent_models:
+                parent_obj = inserted_parents_dict[parent_model][
+                    obj_index
+                ]  # Récupérer l'objet parent correspondant
+                print(
+                    f"Association de l'objet parent {parent_obj} "
+                    f"au modèle {parent_model}"
+                )
+                for field in obj._meta.fields:
+                    # Gérer l'association pour chaque type de champ parent potentiel
+                    if (
+                        isinstance(field, models.OneToOneField)
+                        and field.remote_field.model == parent_model
+                    ):
+                        setattr(obj, field.name, parent_obj)
+                        print(
+                            f"Champ {field.name} associé à {parent_obj} "
+                            f"pour l'objet {obj}"
+                        )
+                        break
+
+            obj._mt_processed = (
+                True  # Marquer l'objet pour éviter le traitement récursif
+            )
+            child_objs.append(obj)
+        return child_objs
+
     def _bulk_create_multi_table(
         self,
         objs,
-        batch_size,
-        ignore_conflicts,
-        update_conflicts,
-        update_fields,
-        unique_fields,
+        batch_size=None,
+        ignore_conflicts=False,
+        update_conflicts=False,
+        update_fields=None,
+        unique_fields=None,
     ):
-        # Vérification de la capacité de retour des IDs
-        connection = connections[self.db]
-        can_return_ids = connection.features.can_return_rows_from_bulk_insert
+        print("Début de la création en masse multi-table")
+        # connection = connections[self.db]
+        # can_return_ids = connection.features.can_return_rows_from_bulk_insert
 
-        # Traiter les modèles parents
-        parent_model = None
+        parent_models = set()
         for obj in objs:
             for parent in obj._meta.get_parent_list():
-                parent_model = parent._meta.concrete_model
-                break
-            if parent_model:
-                break
+                parent_models.add(parent._meta.concrete_model)
 
-        if not parent_model:
+        if not parent_models:
             raise ValueError("No parent model found")
 
-        # Créer et insérer les objets parents
-        parent_objs = []
-        for obj in objs:
-            parent_obj = parent_model()
-            for field in parent_model._meta.local_fields:
-                setattr(parent_obj, field.name, getattr(obj, field.name))
-            parent_objs.append(parent_obj)
+        # Préparer et insérer les objets parents pour chaque modèle parent
+        inserted_parents_dict = {}
+        for parent_model in parent_models:
+            parent_objs = [
+                self._prepare_parent_obj(obj, parent_model)
+                for obj in objs
+                if self._prepare_parent_obj(obj, parent_model) is not None
+            ]
+            print("parent_objs=", parent_objs)
+            inserted_parents = parent_model.objects.bulk_create(
+                parent_objs, batch_size, ignore_conflicts
+            )
+            inserted_parents_dict[parent_model] = inserted_parents
+            print(
+                f"Objets parents insérés pour le modèle "
+                f"{parent_model}: {inserted_parents}"
+            )
 
-        # Insérer les parents
-        parent_model.objects.bulk_create(parent_objs, batch_size, ignore_conflicts)
-
-        # Associer les IDs parent aux objets enfant et préparer pour l'insertion
-        if can_return_ids:
-            for parent_obj, obj in zip(parent_objs, objs):
-                setattr(obj, parent_model._meta.model_name + "_ptr", parent_obj)
-
-        # Insérer les modèles enfants
-        self.model.objects.bulk_create(
-            objs,
-            batch_size,
-            ignore_conflicts,
-            update_conflicts,
-            update_fields,
-            unique_fields,
+        # Associer les objets parents aux objets enfants et insérer les enfants
+        child_objs = self._associate_and_prepare_child_objs(
+            objs, inserted_parents_dict, parent_models
         )
+        if child_objs:
+            ch = self.model.objects.bulk_create(
+                child_objs,
+                batch_size,
+                ignore_conflicts,
+                update_conflicts,
+                update_fields,
+                unique_fields,
+            )
+            print(f"Objets enfants insérées: {ch}")
+        else:
+            print("Aucun objet enfant à insérer")
 
     def bulk_create(
         self,
