@@ -15,7 +15,7 @@ from django.core.exceptions import (
 from django.db.models.utils import AltersData
 from django.forms.fields import ChoiceField, Field
 from django.forms.forms import BaseForm, DeclarativeFieldsMetaclass
-from django.forms.formsets import BaseFormSet, FormSet, FormSetMeta, formset_factory
+from django.forms.formsets import BaseFormSet, FormSetMeta, formset_factory
 from django.forms.utils import ErrorList
 from django.forms.widgets import (
     HiddenInput,
