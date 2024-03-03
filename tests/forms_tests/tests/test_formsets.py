@@ -1778,8 +1778,10 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         """A declarative custom kwarg dynamic formset."""
 
         form = CustomKwargForm
-        formset = DynamicBaseFormSet
         extra = 2
+
+        def get_form_kwargs(self, index):
+            return {"custom_kwarg": index}
 
     class DeclarativeCustomKwargFormSet(FormSet):
         """A declarative custom kwarg formset."""
@@ -1875,8 +1877,16 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         """A declarative favorite drink formset."""
 
         form = FavoriteDrinkForm
-        formset = BaseFavoriteDrinksFormSet
         extra = 3
+
+        def clean(self):
+            seen_drinks = []
+
+            for drink in self.cleaned_data:
+                if drink["name"] in seen_drinks:
+                    raise ValidationError("You may only specify a drink once.")
+
+                seen_drinks.append(drink["name"])
 
     class DeclarativeFavoriteExtra3FormSet(FormSet):
         """Declarative favorite drink formset."""
@@ -1942,8 +1952,13 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         """Declarative choice formset."""
 
         form = Choice
-        formset = BaseReverseFormSet
         extra = 3
+
+        def __iter__(self):
+            return reversed(self.forms)
+
+        def __getitem__(self, idx):
+            return super().__getitem__(len(self) - idx - 1)
 
     class DeclarativeChoiceExtra0FormSet(FormSet):
         """Declarative choice formset."""
@@ -1965,7 +1980,9 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         """A declarative choice formset."""
 
         form = Choice
-        formset = BaseCustomFormSet
+
+        def clean(self):
+            raise ValidationError("This is a non-form error")
 
     class DeclarativeCheckMaxValidateFormSet(FormSet):
         """A declarative check formset."""
@@ -1999,8 +2016,9 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
     class DeclarativeChoiceCustomFormSet(FormSet):
         """A declarative choice formset."""
 
+        template_name = "a/custom/formset/template.html"
+
         form = Choice
-        formset = CustomFormSet
 
     class DeclarativeChoiceJinjaFormSet(FormSet):
         """A declarative choice formset."""
