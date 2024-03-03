@@ -8,6 +8,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.forms.formsets import formset_factory
 from django.forms.models import (
+    BaseInlineFormSet,
     BaseModelFormSet,
     InlineFormSet,
     ModelForm,
@@ -97,6 +98,12 @@ class PoemFormSave2(forms.ModelForm):
         return poem
 
 
+class PoemFormField(ModelForm):
+    class Meta:
+        model = Poem
+        fields = ("name",)
+
+
 class SimpleArrayField(forms.CharField):
     """A proxy for django.contrib.postgres.forms.SimpleArrayField."""
 
@@ -111,6 +118,18 @@ class BookFormArrayField(forms.ModelForm):
     class Meta:
         model = Book
         fields = ("title",)
+
+
+class CustomInlineFormSet(BaseInlineFormSet):
+    """A custom base inline formset."""
+
+    def clean(self):
+        """Clean method."""
+        super().clean()
+        for form in self.forms:
+            lowered_name = form.cleaned_data["name"].lower()
+            form.cleaned_data["name"] = lowered_name
+            form.instance.name = lowered_name
 
 
 class DeletionTestsMixin:
@@ -1966,6 +1985,19 @@ class ModelFormsetTestMixin:
         self.assertEqual(charles.name, "Shawn Dong")
         self.assertEqual(Author.objects.count(), 2)
 
+    def test_custom_clean_poem_formset(self):
+        """A custom clean poem formset."""
+        data = {"name": "AN UPPERCASE NAME"}
+        data = {
+            "poems-INITIAL_FORMS": "0",
+            "poems-TOTAL_FORMS": "1",
+            "poems-0-name": "AN UPPERCASE NAME",
+        }
+        formset = self.poem_custom_inlineformset(data=data, prefix="poems")
+        formset.full_clean()
+        self.assertTrue(formset.is_valid())
+        self.assertEqual(formset.forms[0].clean().get("name"), "an uppercase name")
+
 
 class FactoryModelFormsetTest(TestCase, ModelFormsetTestMixin):
     """A set of tests of modelformsets and inlineformset.
@@ -2104,6 +2136,9 @@ class FactoryModelFormsetTest(TestCase, ModelFormsetTestMixin):
         fields="__all__",
         edit_only=True,
     )
+    poem_custom_inlineformset = inlineformset_factory(
+        Poet, Poem, form=PoemFormField, formset=CustomInlineFormSet
+    )
 
     def test_modelformset_without_fields(self):
         """Regression for #19733."""
@@ -2159,9 +2194,40 @@ class FactoryModelFormsetTest(TestCase, ModelFormsetTestMixin):
         self.assertTrue(formset.is_valid())
 
     def test_no_model_argument_error(self):
+        """Test that modelformset can not be created without a model argument."""
         msg = "modelformset_factory() missing 1 required positional argument: 'model'"
         with self.assertRaisesMessage(TypeError, msg):
             modelformset_factory(fields="__all__")
+
+    def test_no_model_but_form_argument_error(self):
+        """
+        Test that modelformset can not be created without a model argument,
+        even if you pass a form argument.
+        """
+        msg = "modelformset_factory() missing 1 required positional argument: 'model'"
+        with self.assertRaisesMessage(TypeError, msg):
+            modelformset_factory(form=PoetForm)
+
+    def test_model_no_fields_or_exclude_arguments_error(self):
+        """
+        Test that modelformset can not be created if you pass a model but
+        without fields or exclude arguments or a form.
+        """
+        with self.assertRaises(ImproperlyConfigured):
+            modelformset_factory(model=Post)
+
+    def test_no_parent_model_inline_argument_error(self):
+        """Test that inlineformset can not be created without a parent_model."""
+        msg = "inlineformset_factory() missing 1 required positional "
+        "argument: 'parent_model'"
+        with self.assertRaisesMessage(TypeError, msg):
+            inlineformset_factory(model=Poem, form=PoemFormSave)
+
+    def test_no_model_inline_argument_error(self):
+        """Test that inlineformset can not be created without a model argument."""
+        msg = "inlineformset_factory() missing 1 required positional argument: 'model'"
+        with self.assertRaisesMessage(TypeError, msg):
+            inlineformset_factory(parent_model=Poet, form=PoemFormSave)
 
 
 class DeclarativeModelFormsetTest(TestCase, ModelFormsetTestMixin):
@@ -2256,7 +2322,10 @@ class DeclarativeModelFormsetTest(TestCase, ModelFormsetTestMixin):
     class DeclarativeAuthorFormSetCustomBase(ModelFormSet):
         model = Author
         fields = "__all__"
-        formset = BaseAuthorFormSet
+
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.queryset = Author.objects.filter(name__startswith="Charles")
 
     class DeclarativeBetterAuthorFormSet(ModelFormSet):
         model = BetterAuthor
@@ -2486,6 +2555,19 @@ class DeclarativeModelFormsetTest(TestCase, ModelFormsetTestMixin):
         fields = "__all__"
         edit_only = True
 
+    class DeclarativeCustomPoemInlineFormSet(InlineFormSet):
+        """A declarative custom poem inlineformset."""
+
+        parent_model = Poet
+        model = Poem
+        form = PoemFormField
+
+        def clean(self):
+            """Clean method."""
+            for comment in self.cleaned_data:
+                comment["name"] = comment["name"].lower()
+            super().clean()
+
     # modelformsets
     author_formset_extra_3 = DeclarativeAuthorFormSetExtra3
     author_formset_delete_false = DeclarativeAuthorFormSetDeleteFalse
@@ -2539,6 +2621,7 @@ class DeclarativeModelFormsetTest(TestCase, ModelFormsetTestMixin):
     book_arrayfield_inlineformset = DeclarativeBookArrayFieldInlineSet
     book_inlineformset_extra_0 = DeclarativeBookInlineSetExtra0
     book_inlineformset_edit_only = DeclarativeBookEditOnlyInlineSet
+    poem_custom_inlineformset = DeclarativeCustomPoemInlineFormSet
 
     def test_modelformset_without_fields(self):
         """Regression for #19733."""
@@ -2603,11 +2686,51 @@ class DeclarativeModelFormsetTest(TestCase, ModelFormsetTestMixin):
         self.assertTrue(formset.is_valid())
 
     def test_no_model_argument_error(self):
+        """Test that modelformset can not be created without a model argument."""
         msg = "ModelFormSet() missing 1 required positional argument: 'model'"
         with self.assertRaisesMessage(TypeError, msg):
 
             class DeclarativeInvalidFormSet(ModelFormSet):
                 fields = "__all__"
+
+    def test_no_model_but_form_argument_error(self):
+        """
+        Test that modelformset can not be created without a model argument,
+        even if you pass a form argument.
+        """
+        msg = "ModelFormSet() missing 1 required positional argument: 'model'"
+        with self.assertRaisesMessage(TypeError, msg):
+
+            class DeclarativeInvalidFormSet(ModelFormSet):
+                form = PoetForm
+
+    def test_model_no_fields_or_exclude_arguments_error(self):
+        """
+        Test that modelformset can not be created if you pass a model but
+        without fields or exclude arguments or a form.
+        """
+        with self.assertRaises(ImproperlyConfigured):
+
+            class DeclarativeInvalidFormSet(ModelFormSet):
+                model = Post
+
+    def test_no_parent_model_inline_argument_error(self):
+        """Test that inlineformset can not be created without a parent_model."""
+        msg = "InlineFormSet() missing 1 required positional argument: 'parent_model'"
+        with self.assertRaisesMessage(TypeError, msg):
+
+            class DeclarativeInvalidInlineFormSet(InlineFormSet):
+                model = Poem
+                form = PoemFormSave
+
+    def test_no_model_inline_argument_error(self):
+        """Test that inlineformset can not be created without a model argument."""
+        msg = "InlineFormSet() missing 1 required positional argument: 'model'"
+        with self.assertRaisesMessage(TypeError, msg):
+
+            class DeclarativeInvalidInlineFormSet(InlineFormSet):
+                parent_model = Poet
+                form = PoemFormSave
 
 
 class TestModelFormsetOverridesTroughFormMeta(TestCase):

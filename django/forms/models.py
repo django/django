@@ -1116,11 +1116,17 @@ class ModelFormSetMeta(FormSetMeta):
             )
 
         kwargs = {}
-        model = attrs.get("model") or None
-        kwargs.update({"model": model})
+
+        form = ModelForm
+        if (passed_form := attrs.get("form")) is not None:
+            kwargs.update({"form": passed_form})
+            if hasattr(passed_form, "Meta"):
+                kwargs.update({"fields": passed_form._meta.fields})
+                kwargs.update({"exclude": passed_form._meta.exclude})
+        else:
+            kwargs.update({"form": form})
 
         default_modelform_factory_attrs = [
-            "model",
             "fields",
             "exclude",
             "formfield_callback",
@@ -1136,45 +1142,24 @@ class ModelFormSetMeta(FormSetMeta):
                 kwargs.update({key: attrs.get(key)})
                 attrs.pop(key)
 
-        form = ModelForm
-        if (passed_form := attrs.get("form")) is not None:
-            kwargs.update({"form": passed_form})
-        else:
-            kwargs.update({"form": form})
-
-        if kwargs.get("model") is not None:
-            form = modelform_factory(**kwargs)
+        if (model := attrs.get("model")) is not None:
+            form = modelform_factory(model, **kwargs)
             attrs.update({"form": form})
-        if kwargs.get("model") is None and (form := attrs.get("form")) is not None:
-            model = form._meta.model
-
-        formset = attrs.get("formset") or BaseModelFormSet
 
         default_formset_attrs = {
-            "extra",
-            "can_order",
-            "can_delete",
-            "min_num",
-            "max_num",
-            "absolute_max",
-            "validate_min",
-            "validate_max",
-            "can_delete_extra",
-            "renderer",
+            "form": ModelForm,
+            "formset": BaseModelFormSet,
+            "extra": 1,
+            "can_delete_extra": True,
         }
-        if (form := attrs.get("form")) is not None:
-            kwargs = {}
-            for key in default_formset_attrs:
-                if key in attrs:
-                    kwargs.update({key: attrs.get(key)})
-            ModelFormSet = formset_factory(form, formset, **kwargs)
-            ModelFormSet.model = model
-            ModelFormSet.edit_only = attrs.get("edit_only")
-            return ModelFormSet
-        return super().__new__(cls, name, (formset,), attrs)
+        for key, value in default_formset_attrs.items():
+            if key not in attrs.keys():
+                attrs.update({key: value})
+
+        return super().__new__(cls, name, bases, attrs)
 
 
-class ModelFormSet(BaseModelFormSet, FormSet, metaclass=ModelFormSetMeta):
+class ModelFormSet(BaseModelFormSet, metaclass=ModelFormSetMeta):
     """Base class for which can be used to create modelformset classes."""
 
     form: Any = None
@@ -1460,56 +1445,37 @@ class InlineFormSetMeta(ModelFormSetMeta):
 
     def __new__(cls, name, bases, attrs):
         """Initialize the attributes given to the InlineFormSet class."""
-        kwargs = {
+        if "parent_model" not in set(attrs):
+            raise TypeError(
+                "InlineFormSet() missing 1 required positional argument: 'parent_model'"
+            )
+        if "model" not in set(attrs):
+            raise TypeError(
+                "InlineFormSet() missing 1 required positional argument: 'model'"
+            )
+
+        parent_model = attrs.get("parent_model", None)
+        model = attrs.get("model", None)
+        fk_name = attrs.get("fk_name", None)
+
+        default_formset_attrs = {
             "form": ModelForm,
             "formset": BaseInlineFormSet,
             "extra": 3,
             "can_delete": True,
             "can_delete_extra": True,
         }
+        for key, value in default_formset_attrs.items():
+            if key not in attrs.keys():
+                attrs.update({key: value})
 
-        parent_model = attrs.get("parent_model", None)
-        fk_name = attrs.get("fk_name", None)
-
-        if attrs.get("model") is None and (form := attrs.get("form")) is not None:
-            attrs.update({"model": form._meta.model})
-
-        default_modelformset_attrs = {
-            "form",
-            "formfield_callback",
-            "formset",
-            "extra",
-            "can_delete",
-            "can_order",
-            "fields",
-            "exclude",
-            "min_num",
-            "max_num",
-            "widgets",
-            "validate_min",
-            "validate_max",
-            "localized_fields",
-            "labels",
-            "help_texts",
-            "error_messages",
-            "field_classes",
-            "absolute_max",
-            "can_delete_extra",
-            "renderer",
-            "edit_only",
-        }
-
-        for key in default_modelformset_attrs:
-            if key in attrs:
-                kwargs.update({key: attrs.get(key)})
-
-        if (model := attrs.get("model")) is not None and parent_model is not None:
+        if model is not None and parent_model is not None:
             fk = _get_foreign_key(parent_model, model, fk_name=fk_name)
             if fk.unique:
-                kwargs.update({"max_num": 1})
-            InlineFormSet = modelformset_factory(model, **kwargs)
-            InlineFormSet.fk = fk
-            return InlineFormSet
+                attrs.update({"max_num": 1})
+            ModelFormSet = super().__new__(cls, name, bases, attrs)
+            ModelFormSet.fk = fk
+            return ModelFormSet
         return super().__new__(cls, name, bases, attrs)
 
 
@@ -1518,6 +1484,7 @@ class InlineFormSet(BaseInlineFormSet, ModelFormSet, metaclass=InlineFormSetMeta
 
     form: Any = None
     model: Any = None
+    parent_model: Any = None
 
     def __init__(
         self,
