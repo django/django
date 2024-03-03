@@ -249,6 +249,15 @@ to Django's code, the entire test suite **should** pass. If you get failures or
 errors make sure you've followed all of the previous steps properly. See
 :ref:`running-unit-tests` for more information.
 
+If the entire test suite passes, your output should contain something similar to the following:
+
+.. code-block:: text
+
+    ----------------------------------------------------------------------
+    Ran 16875 tests in 68.716s
+
+    OK (skipped=1259, expected failures=5)
+
 Note that the latest Django "main" branch may not always be stable. When
 developing against "main", you can check `Django's continuous integration
 builds`__ to determine if the failures are specific to your machine or if they
