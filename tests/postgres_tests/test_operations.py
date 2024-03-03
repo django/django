@@ -496,7 +496,7 @@ class AddConstraintNotValidTests(OperationTestBase):
     def test_add(self):
         table_name = f"{self.app_label}_pony"
         constraint_name = "pony_pink_gte_check"
-        constraint = CheckConstraint(check=Q(pink__gte=4), name=constraint_name)
+        constraint = CheckConstraint(condition=Q(pink__gte=4), name=constraint_name)
         operation = AddConstraintNotValid("Pony", constraint=constraint)
         project_state, new_state = self.make_test_state(self.app_label, operation)
         self.assertEqual(
@@ -549,7 +549,7 @@ class ValidateConstraintTests(OperationTestBase):
 
     def test_validate(self):
         constraint_name = "pony_pink_gte_check"
-        constraint = CheckConstraint(check=Q(pink__gte=4), name=constraint_name)
+        constraint = CheckConstraint(condition=Q(pink__gte=4), name=constraint_name)
         operation = AddConstraintNotValid("Pony", constraint=constraint)
         project_state, new_state = self.make_test_state(self.app_label, operation)
         Pony = new_state.apps.get_model(self.app_label, "Pony")

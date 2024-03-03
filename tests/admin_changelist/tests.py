@@ -1443,7 +1443,7 @@ class ChangeListTests(TestCase):
                             ["field_3", "related_4_id"],
                         )
                     ],
-                    models.CheckConstraint(check=models.Q(id__gt=0), name="foo"),
+                    models.CheckConstraint(condition=models.Q(id__gt=0), name="foo"),
                     models.UniqueConstraint(
                         fields=["field_5"],
                         condition=models.Q(id__gt=10),

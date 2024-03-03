@@ -441,7 +441,7 @@ class OperationTests(OperationTestBase):
     def test_create_model_with_constraint(self):
         where = models.Q(pink__gt=2)
         check_constraint = models.CheckConstraint(
-            check=where, name="test_constraint_pony_pink_gt_2"
+            condition=where, name="test_constraint_pony_pink_gt_2"
         )
         operation = migrations.CreateModel(
             "Pony",
@@ -484,13 +484,13 @@ class OperationTests(OperationTestBase):
     def test_create_model_with_boolean_expression_in_check_constraint(self):
         app_label = "test_crmobechc"
         rawsql_constraint = models.CheckConstraint(
-            check=models.expressions.RawSQL(
+            condition=models.expressions.RawSQL(
                 "price < %s", (1000,), output_field=models.BooleanField()
             ),
             name=f"{app_label}_price_lt_1000_raw",
         )
         wrapper_constraint = models.CheckConstraint(
-            check=models.expressions.ExpressionWrapper(
+            condition=models.expressions.ExpressionWrapper(
                 models.Q(price__gt=500) | models.Q(price__lt=500),
                 output_field=models.BooleanField(),
             ),
@@ -3858,7 +3858,7 @@ class OperationTests(OperationTestBase):
         project_state = self.set_up_test_model("test_addconstraint")
         gt_check = models.Q(pink__gt=2)
         gt_constraint = models.CheckConstraint(
-            check=gt_check, name="test_add_constraint_pony_pink_gt_2"
+            condition=gt_check, name="test_add_constraint_pony_pink_gt_2"
         )
         gt_operation = migrations.AddConstraint("Pony", gt_constraint)
         self.assertEqual(
@@ -3901,7 +3901,7 @@ class OperationTests(OperationTestBase):
         # Add another one.
         lt_check = models.Q(pink__lt=100)
         lt_constraint = models.CheckConstraint(
-            check=lt_check, name="test_add_constraint_pony_pink_lt_100"
+            condition=lt_check, name="test_add_constraint_pony_pink_lt_100"
         )
         lt_operation = migrations.AddConstraint("Pony", lt_constraint)
         lt_operation.state_forwards("test_addconstraint", new_state)
@@ -3981,8 +3981,8 @@ class OperationTests(OperationTestBase):
             ),
         ]
         for check, valid, invalid in checks:
-            with self.subTest(check=check, valid=valid, invalid=invalid):
-                constraint = models.CheckConstraint(check=check, name="constraint")
+            with self.subTest(condition=check, valid=valid, invalid=invalid):
+                constraint = models.CheckConstraint(condition=check, name="constraint")
                 operation = migrations.AddConstraint("Author", constraint)
                 to_state = from_state.clone()
                 operation.state_forwards(app_label, to_state)
@@ -4006,7 +4006,7 @@ class OperationTests(OperationTestBase):
         constraint_name = "add_constraint_or"
         from_state = self.set_up_test_model(app_label)
         check = models.Q(pink__gt=2, weight__gt=2) | models.Q(weight__lt=0)
-        constraint = models.CheckConstraint(check=check, name=constraint_name)
+        constraint = models.CheckConstraint(condition=check, name=constraint_name)
         operation = migrations.AddConstraint("Pony", constraint)
         to_state = from_state.clone()
         operation.state_forwards(app_label, to_state)
@@ -4040,7 +4040,7 @@ class OperationTests(OperationTestBase):
         ]
         from_state = self.apply_operations(app_label, ProjectState(), operations)
         constraint = models.CheckConstraint(
-            check=models.Q(read=(100 - models.F("unread"))),
+            condition=models.Q(read=(100 - models.F("unread"))),
             name="test_addconstraint_combinable_sum_100",
         )
         operation = migrations.AddConstraint("Book", constraint)
@@ -4058,11 +4058,11 @@ class OperationTests(OperationTestBase):
             "test_removeconstraint",
             constraints=[
                 models.CheckConstraint(
-                    check=models.Q(pink__gt=2),
+                    condition=models.Q(pink__gt=2),
                     name="test_remove_constraint_pony_pink_gt_2",
                 ),
                 models.CheckConstraint(
-                    check=models.Q(pink__lt=100),
+                    condition=models.Q(pink__lt=100),
                     name="test_remove_constraint_pony_pink_lt_100",
                 ),
             ],

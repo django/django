@@ -83,15 +83,29 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     test_now_utc_template = "STATEMENT_TIMESTAMP() AT TIME ZONE 'UTC'"
     insert_test_table_with_defaults = "INSERT INTO {} DEFAULT VALUES"
 
-    django_test_skips = {
-        "opclasses are PostgreSQL only.": {
-            "indexes.tests.SchemaIndexesNotPostgreSQLTests."
-            "test_create_index_ignores_opclasses",
-        },
-        "PostgreSQL requires casting to text.": {
-            "lookup.tests.LookupTests.test_textfield_exact_null",
-        },
-    }
+    @cached_property
+    def django_test_skips(self):
+        skips = {
+            "opclasses are PostgreSQL only.": {
+                "indexes.tests.SchemaIndexesNotPostgreSQLTests."
+                "test_create_index_ignores_opclasses",
+            },
+            "PostgreSQL requires casting to text.": {
+                "lookup.tests.LookupTests.test_textfield_exact_null",
+            },
+        }
+        if self.connection.settings_dict["OPTIONS"].get("pool"):
+            skips.update(
+                {
+                    "Pool does implicit health checks": {
+                        "backends.base.test_base.ConnectionHealthChecksTests."
+                        "test_health_checks_enabled",
+                        "backends.base.test_base.ConnectionHealthChecksTests."
+                        "test_set_autocommit_health_checks_enabled",
+                    },
+                }
+            )
+        return skips
 
     @cached_property
     def django_test_expected_failures(self):

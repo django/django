@@ -77,6 +77,14 @@ class ExclusionConstraint(BaseConstraint):
             expressions.append(expression)
         return ExpressionList(*expressions).resolve_expression(query)
 
+    def _check(self, model, connection):
+        references = set()
+        for expr, _ in self.expressions:
+            if isinstance(expr, str):
+                expr = F(expr)
+            references.update(model._get_expr_references(expr))
+        return self._check_references(model, references)
+
     def _get_condition_sql(self, compiler, schema_editor, query):
         if self.condition is None:
             return None

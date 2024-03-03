@@ -2791,7 +2791,7 @@ class SchemaTests(TransactionTestCase):
         self.isolated_local_models = [DurationModel]
         constraint_name = "duration_gte_5_minutes"
         constraint = CheckConstraint(
-            check=Q(duration__gt=datetime.timedelta(minutes=5)),
+            condition=Q(duration__gt=datetime.timedelta(minutes=5)),
             name=constraint_name,
         )
         DurationModel._meta.constraints = [constraint]
@@ -2821,7 +2821,7 @@ class SchemaTests(TransactionTestCase):
         self.isolated_local_models = [JSONConstraintModel]
         constraint_name = "check_only_stable_version"
         constraint = CheckConstraint(
-            check=Q(data__version="stable"),
+            condition=Q(data__version="stable"),
             name=constraint_name,
         )
         JSONConstraintModel._meta.constraints = [constraint]
@@ -2845,7 +2845,7 @@ class SchemaTests(TransactionTestCase):
             editor.create_model(Author)
         # Add the custom check constraint
         constraint = CheckConstraint(
-            check=Q(height__gte=0), name="author_height_gte_0_check"
+            condition=Q(height__gte=0), name="author_height_gte_0_check"
         )
         custom_constraint_name = constraint.name
         Author._meta.constraints = [constraint]
@@ -3256,7 +3256,9 @@ class SchemaTests(TransactionTestCase):
         "supports_column_check_constraints", "can_introspect_check_constraints"
     )
     def test_composed_check_constraint_with_fk(self):
-        constraint = CheckConstraint(check=Q(author__gt=0), name="book_author_check")
+        constraint = CheckConstraint(
+            condition=Q(author__gt=0), name="book_author_check"
+        )
         self._test_composed_constraint_with_fk(constraint)
 
     @skipUnlessDBFeature("allows_multiple_constraints_on_same_fields")
