@@ -1,0 +1,12 @@
+==========================
+Django 5.0.4 release notes
+==========================
+
+*Expected April 2, 2024*
+
+Django 5.0.4 fixes several bugs in 5.0.3.
+
+Bugfixes
+========
+
+* ...
