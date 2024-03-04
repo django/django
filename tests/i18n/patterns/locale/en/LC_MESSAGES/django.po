@@ -17,16 +17,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: urls/default.py:11
-#, fuzzy
-#| msgid "^translated/$"
 msgid "translated/"
-msgstr "^translated/$"
+msgstr "translated/"
 
 #: urls/default.py:12
-#, fuzzy
-#| msgid "^translated/$"
 msgid "^translated-regex/$"
-msgstr "^translated/$"
+msgstr "^translated-regex/$"
 
 #: urls/default.py:14
 msgid "^translated/(?P<slug>[\\w-]+)/$"
@@ -53,7 +49,5 @@ msgid "^register-without-slash$"
 msgstr ""
 
 #: urls/namespace.py:11
-#, fuzzy
-#| msgid "^register/$"
 msgid "register-as-path/"
-msgstr "^register/$"
+msgstr "register-as-path/"
