@@ -9,4 +9,7 @@ Django 5.0.4 fixes several bugs in 5.0.3.
 Bugfixes
 ========
 
-* ...
+* Fixed a bug in Django 5.0 that caused a crash of ``Model.full_clean()`` on
+  fields with expressions in ``db_default``. As a consequence,
+  ``Model.full_clean()`` no longer validates for empty values in fields with
+  ``db_default`` (:ticket:`35223`).
