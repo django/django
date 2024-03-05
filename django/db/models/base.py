@@ -30,7 +30,7 @@ from django.db.models import NOT_PROVIDED, ExpressionWrapper, IntegerField, Max,
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.constraints import CheckConstraint, UniqueConstraint
 from django.db.models.deletion import CASCADE, Collector
-from django.db.models.expressions import RawSQL
+from django.db.models.expressions import DatabaseDefault, RawSQL
 from django.db.models.fields.related import (
     ForeignObjectRel,
     OneToOneField,
@@ -1567,6 +1567,9 @@ class Model(AltersData, metaclass=ModelBase):
             # is responsible for making sure they have a valid value.
             raw_value = getattr(self, f.attname)
             if f.blank and raw_value in f.empty_values:
+                continue
+            # Skip validation for empty fields when db_default is used.
+            if isinstance(raw_value, DatabaseDefault):
                 continue
             try:
                 setattr(self, f.attname, f.clean(raw_value, self))
