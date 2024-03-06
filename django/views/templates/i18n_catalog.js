@@ -42,7 +42,15 @@
       if (typeof value === 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
-        return value.constructor === Array ? value[django.pluralidx(count)] : value;
+        if (value.constructor === Array) {
+          const text = value[django.pluralidx(count)];
+
+          if (typeof text === 'undefined') {
+            return (count == 1) ? singular : plural;
+          } else {
+            return text;
+          }
+        }
       }
     };
 
