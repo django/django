@@ -55,8 +55,8 @@ Mergers hold the following prerogatives:
   enough to require the use of the `DEP process`_) reaches one of its
   implementation milestones and is intended to merge.
 
-.. _`minor change`: https://github.com/django/deps/blob/main/accepted/0010-new-governance.rst#terminology
-.. _`major change`: https://github.com/django/deps/blob/main/accepted/0010-new-governance.rst#terminology
+.. _`minor change`: https://github.com/django/deps/blob/main/final/0010-new-governance.rst#terminology
+.. _`major change`: https://github.com/django/deps/blob/main/final/0010-new-governance.rst#terminology
 
 Membership
 ----------
@@ -294,4 +294,4 @@ Changes to this document require the use of the `DEP process`_, with
 modifications described in `DEP 0010`_.
 
 .. _`DEP process`: https://github.com/django/deps/blob/main/final/0001-dep-process.rst
-.. _`DEP 0010`: https://github.com/django/deps/blob/main/accepted/0010-new-governance.rst#changing-this-governance-process
+.. _`DEP 0010`: https://github.com/django/deps/blob/main/final/0010-new-governance.rst#changing-this-governance-process
