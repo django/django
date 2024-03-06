@@ -599,6 +599,11 @@ class UniqueConstraint(BaseConstraint):
         return path, self.expressions, kwargs
 
     def validate(self, model, instance, exclude=None, using=DEFAULT_DB_ALIAS):
+        try:
+            from django.contrib.postgres.indexes import OpClass
+        except ImportError:
+            OpClass = None
+
         queryset = model._default_manager.using(using)
         if self.fields:
             lookup_kwargs = {}
@@ -643,6 +648,10 @@ class UniqueConstraint(BaseConstraint):
                 # Ignore ordering.
                 if isinstance(expr, OrderBy):
                     expr = expr.expression
+                # Remove OpClass because it only has sense during the constraint
+                # creation.
+                if OpClass is not None and isinstance(expr, OpClass):
+                    expr = expr.get_source_expressions()[0]
                 expressions.append(Exact(expr, expr.replace_expressions(replacements)))
             queryset = queryset.filter(*expressions)
         model_class_pk = instance._get_pk_val(model._meta)
