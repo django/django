@@ -948,7 +948,7 @@ Methods
       sent with all same-site and cross-site requests.
 
     .. _HttpOnly: https://owasp.org/www-community/HttpOnly
-    .. _SameSite: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite
+    .. _SameSite: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie#samesitesamesite-value
 
     .. warning::
 
