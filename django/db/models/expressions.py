@@ -175,7 +175,7 @@ class BaseExpression:
     _output_field_resolved_to_none = False
     # Can the expression be used in a WHERE clause?
     filterable = True
-    # Can the expression can be used as a source expression in Window?
+    # Can the expression be used as a source expression in Window?
     window_compatible = False
     # Can the expression be used as a database default value?
     allowed_default = False
