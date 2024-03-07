@@ -36,6 +36,17 @@ Issues under Django's security process
 All security issues have been handled under versions of Django's security
 process. These are listed below.
 
+March 4, 2024 - :cve:`2024-27351`
+---------------------------------
+
+Potential regular expression denial-of-service in
+``django.utils.text.Truncator.words()``. `Full description
+<https://www.djangoproject.com/weblog/2024/mar/04/security-releases/>`__
+
+* Django 5.0 :commit:`(patch) <3394fc6132436eca89e997083bae9985fb7e761e>`
+* Django 4.2 :commit:`(patch) <3c9a2771cc80821e041b16eb36c1c37af5349d4a>`
+* Django 3.2 :commit:`(patch) <072963e4c4d0b3a7a8c5412bc0c7d27d1a9c3521>`
+
 February 6, 2024 - :cve:`2024-24680`
 ------------------------------------
 

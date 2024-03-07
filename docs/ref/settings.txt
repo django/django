@@ -3349,7 +3349,7 @@ Possible values for the setting are:
     Modern browsers provide a more secure default policy for the ``SameSite``
     flag and will assume ``Lax`` for cookies without an explicit value set.
 
-.. _SameSite: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite
+.. _SameSite: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie#samesitesamesite-value
 
 .. setting:: SESSION_COOKIE_SECURE
 

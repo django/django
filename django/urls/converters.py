@@ -68,11 +68,11 @@ def register_converter(converter, type_name):
     REGISTERED_CONVERTERS[type_name] = converter()
     get_converters.cache_clear()
 
+    from django.urls.resolvers import _route_to_regex
+
+    _route_to_regex.cache_clear()
+
 
 @functools.cache
 def get_converters():
     return {**DEFAULT_CONVERTERS, **REGISTERED_CONVERTERS}
-
-
-def get_converter(raw_converter):
-    return get_converters()[raw_converter]

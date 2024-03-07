@@ -52,6 +52,11 @@ Minor features
   form save. This is now available in the admin when visiting the user creation
   and password change pages.
 
+* :func:`~.django.contrib.auth.decorators.login_required`,
+  :func:`~.django.contrib.auth.decorators.permission_required`, and
+  :func:`~.django.contrib.auth.decorators.user_passes_test` decorators now
+  support wrapping asynchronous view functions.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -406,6 +411,9 @@ Miscellaneous
   :tfilter:`truncatewords_html` template filters now uses
   :py:class:`html.parser.HTMLParser` subclasses. This results in a more robust
   and faster operation, but there may be small differences in the output.
+
+* The undocumented ``django.urls.converters.get_converter()`` function is
+  removed.
 
 .. _deprecated-features-5.1:
 
