@@ -388,9 +388,10 @@ class BaseCache:
     async def aclose(self, **kwargs):
         pass
 
+    def check(self):
+        return []
 
 memcached_error_chars_re = _lazy_re_compile(r"[\x00-\x20\x7f]")
-
 
 def memcache_key_warnings(key):
     if len(key) > MEMCACHE_MAX_KEY_LENGTH:
