@@ -33,7 +33,13 @@
       if (typeof value === 'undefined') {
         return msgid;
       } else {
-        return (typeof value === 'string') ? value : value[0];
+        if (typeof value === 'string') {
+          return value;
+        }
+
+        const text = value[0];
+
+        return typeof text === 'string' ? text : msgid;
       }
     };
 
@@ -42,7 +48,17 @@
       if (typeof value === 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
-        return value.constructor === Array ? value[django.pluralidx(count)] : value;
+        if (value.constructor === Array) {
+          const text = value[django.pluralidx(count)];
+
+          if (typeof text === 'undefined') {
+            return (count == 1) ? singular : plural;
+          } else {
+            return text;
+          }
+        }
+
+        return value;
       }
     };
 
