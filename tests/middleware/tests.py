@@ -6,7 +6,6 @@ from io import BytesIO
 from unittest import mock
 from urllib.parse import quote
 
-from django.conf import settings
 from django.core import mail
 from django.core.exceptions import PermissionDenied
 from django.http import (
@@ -750,10 +749,8 @@ class XFrameOptionsMiddlewareTest(SimpleTestCase):
         If the X_FRAME_OPTIONS setting is not set then it defaults to
         DENY.
         """
-        with override_settings(X_FRAME_OPTIONS=None):
-            del settings.X_FRAME_OPTIONS  # restored by override_settings
-            r = XFrameOptionsMiddleware(get_response_empty)(HttpRequest())
-            self.assertEqual(r.headers["X-Frame-Options"], "DENY")
+        r = XFrameOptionsMiddleware(get_response_empty)(HttpRequest())
+        self.assertEqual(r.headers["X-Frame-Options"], "DENY")
 
     def test_dont_set_if_set(self):
         """

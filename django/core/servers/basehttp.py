@@ -40,7 +40,7 @@ def get_internal_wsgi_application():
     """
     from django.conf import settings
 
-    app_path = getattr(settings, "WSGI_APPLICATION")
+    app_path = settings.WSGI_APPLICATION
     if app_path is None:
         return get_wsgi_application()
 
