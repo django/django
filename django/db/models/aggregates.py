@@ -20,6 +20,7 @@ __all__ = [
     "StdDev",
     "Sum",
     "Variance",
+    "JsonObject"
 ]
 
 
@@ -209,3 +210,9 @@ class Variance(NumericOutputFieldMixin, Aggregate):
 
     def _get_repr_options(self):
         return {**super()._get_repr_options(), "sample": self.function == "VAR_SAMP"}
+
+
+class JsonObject(Aggregate):
+    name = "JsonObject"
+    function = "JSON_OBJECTAGG"
+    allow_distinct = True

@@ -29,7 +29,7 @@ from django.db.models import (
     Value,
     Variance,
     When,
-    Window,
+    Window, JsonObject,
 )
 from django.db.models.expressions import Func, RawSQL
 from django.db.models.functions import (
@@ -675,6 +675,13 @@ class AggregateTestCase(TestCase):
         # Selected author ages are 57 and 46
         age_sum = distinct_authors.aggregate(Sum("age"))
         self.assertEqual(age_sum["age__sum"], 103)
+
+    def test_json_object_empty_aggregate(self):
+        """
+        An empty result should return an empty JSON object.
+        """
+        author_ages = Author.objects.filter(book__in=[]).aggregate(JsonObject("age"))
+        self.assertEqual(author_ages["age__json_object"], "{}")
 
     def test_filtering(self):
         p = Publisher.objects.create(name="Expensive Publisher", num_awards=0)
