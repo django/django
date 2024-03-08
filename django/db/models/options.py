@@ -204,8 +204,8 @@ class Options:
             # App label/class name interpolation for names of constraints and
             # indexes.
             if not self.abstract:
-                self.constraints = self._format_names_with_class(cls, self.constraints)
-                self.indexes = self._format_names_with_class(cls, self.indexes)
+                self.constraints = self._format_names(self.constraints)
+                self.indexes = self._format_names(self.indexes)
 
             # verbose_name_plural is a special case because it uses a 's'
             # by default.
@@ -231,16 +231,13 @@ class Options:
                 self.db_table, connection.ops.max_name_length()
             )
 
-    def _format_names_with_class(self, cls, objs):
+    def _format_names(self, objs):
         """App label/class name interpolation for object names."""
-        names = {
-            "app_label": cls._meta.app_label.lower(),
-            "class": cls.__name__.lower(),
-        }
+        names = {"app_label": self.app_label.lower(), "class": self.model_name}
         new_objs = []
         for obj in objs:
             obj = obj.clone()
-            obj.name = obj.name % names
+            obj.name %= names
             new_objs.append(obj)
         return new_objs
 
