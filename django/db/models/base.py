@@ -691,8 +691,8 @@ class Model(AltersData, metaclass=ModelBase):
             self._prefetched_objects_cache = {}
         else:
             prefetched_objects_cache = getattr(self, "_prefetched_objects_cache", ())
-            fields = list(fields)
-            for field in list(fields):
+            fields = set(fields)
+            for field in fields.copy():
                 if field in prefetched_objects_cache:
                     del prefetched_objects_cache[field]
                     fields.remove(field)
@@ -717,11 +717,11 @@ class Model(AltersData, metaclass=ModelBase):
         if fields is not None:
             db_instance_qs = db_instance_qs.only(*fields)
         elif deferred_fields:
-            fields = [
+            fields = {
                 f.attname
                 for f in self._meta.concrete_fields
                 if f.attname not in deferred_fields
-            ]
+            }
             db_instance_qs = db_instance_qs.only(*fields)
 
         db_instance = db_instance_qs.get()
