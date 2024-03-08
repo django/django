@@ -265,7 +265,7 @@ determining `when to use geography data type over geometry data type
 <https://postgis.net/docs/using_postgis_dbmanagement.html#PostGIS_GeographyVSGeometry>`_.
 
 .. rubric:: Footnotes
-.. [#fnogc] OpenGIS Consortium, Inc., `Simple Feature Specification For SQL <https://www.ogc.org/standards/sfs>`_.
+.. [#fnogc] OpenGIS Consortium, Inc., `Simple Feature Specification For SQL <https://www.ogc.org/standard/sfs/>`_.
 .. [#fnogcsrid] *See id.* at Ch. 2.3.8, p. 39 (Geometry Values and Spatial Reference Systems).
 .. [#fnsrid] Typically, SRID integer corresponds to an EPSG (`European Petroleum Survey Group <https://epsg.org/>`_) identifier.  However, it may also be associated with custom projections defined in spatial database's spatial reference systems table.
 .. [#fnthematic] Terry A. Slocum, Robert B. McMaster, Fritz C. Kessler, & Hugh H. Howard, *Thematic Cartography and Geographic Visualization* (Prentice Hall, 2nd edition), at Ch. 7.1.3.

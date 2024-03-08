@@ -26,7 +26,7 @@ from django.utils.http import RFC3986_SUBDELIMS, escape_leading_slashes
 from django.utils.regex_helper import _lazy_re_compile, normalize
 from django.utils.translation import get_language
 
-from .converters import get_converter
+from .converters import get_converters
 from .exceptions import NoReverseMatch, Resolver404
 from .utils import get_callable
 
@@ -128,9 +128,6 @@ def get_ns_resolver(ns_pattern, resolver, converters):
 
 
 class LocaleRegexDescriptor:
-    def __init__(self, attr):
-        self.attr = attr
-
     def __get__(self, instance, cls=None):
         """
         Return a compiled regular expression based on the active language.
@@ -140,14 +137,22 @@ class LocaleRegexDescriptor:
         # As a performance optimization, if the given regex string is a regular
         # string (not a lazily-translated string proxy), compile it once and
         # avoid per-language compilation.
-        pattern = getattr(instance, self.attr)
+        pattern = instance._regex
         if isinstance(pattern, str):
-            instance.__dict__["regex"] = instance._compile(pattern)
+            instance.__dict__["regex"] = self._compile(pattern)
             return instance.__dict__["regex"]
         language_code = get_language()
         if language_code not in instance._regex_dict:
-            instance._regex_dict[language_code] = instance._compile(str(pattern))
+            instance._regex_dict[language_code] = self._compile(str(pattern))
         return instance._regex_dict[language_code]
+
+    def _compile(self, regex):
+        try:
+            return re.compile(regex)
+        except re.error as e:
+            raise ImproperlyConfigured(
+                f'"{regex}" is not a valid regular expression: {e}'
+            ) from e
 
 
 class CheckURLMixin:
@@ -164,12 +169,11 @@ class CheckURLMixin:
         """
         Check that the pattern does not begin with a forward slash.
         """
-        regex_pattern = self.regex.pattern
         if not settings.APPEND_SLASH:
             # Skip check as it can be useful to start a URL pattern with a slash
             # when APPEND_SLASH=False.
             return []
-        if regex_pattern.startswith(("/", "^/", "^\\/")) and not regex_pattern.endswith(
+        if self._regex.startswith(("/", "^/", "^\\/")) and not self._regex.endswith(
             "/"
         ):
             warning = Warning(
@@ -186,7 +190,7 @@ class CheckURLMixin:
 
 
 class RegexPattern(CheckURLMixin):
-    regex = LocaleRegexDescriptor("_regex")
+    regex = LocaleRegexDescriptor()
 
     def __init__(self, regex, name=None, is_endpoint=False):
         self._regex = regex
@@ -219,8 +223,7 @@ class RegexPattern(CheckURLMixin):
         return warnings
 
     def _check_include_trailing_dollar(self):
-        regex_pattern = self.regex.pattern
-        if regex_pattern.endswith("$") and not regex_pattern.endswith(r"\$"):
+        if self._regex.endswith("$") and not self._regex.endswith(r"\$"):
             return [
                 Warning(
                     "Your URL pattern {} uses include with a route ending with a '$'. "
@@ -232,15 +235,6 @@ class RegexPattern(CheckURLMixin):
         else:
             return []
 
-    def _compile(self, regex):
-        """Compile and return the given regular expression."""
-        try:
-            return re.compile(regex)
-        except re.error as e:
-            raise ImproperlyConfigured(
-                '"%s" is not a valid regular expression: %s' % (regex, e)
-            ) from e
-
     def __str__(self):
         return str(self._regex)
 
@@ -249,62 +243,83 @@ _PATH_PARAMETER_COMPONENT_RE = _lazy_re_compile(
     r"<(?:(?P<converter>[^>:]+):)?(?P<parameter>[^>]+)>"
 )
 
+whitespace_set = frozenset(string.whitespace)
 
-def _route_to_regex(route, is_endpoint=False):
+
+@functools.lru_cache
+def _route_to_regex(route, is_endpoint):
     """
     Convert a path pattern into a regular expression. Return the regular
     expression and a dictionary mapping the capture names to the converters.
     For example, 'foo/<int:pk>' returns '^foo\\/(?P<pk>[0-9]+)'
     and {'pk': <django.urls.converters.IntConverter>}.
     """
-    original_route = route
     parts = ["^"]
+    all_converters = get_converters()
     converters = {}
-    while True:
-        match = _PATH_PARAMETER_COMPONENT_RE.search(route)
-        if not match:
-            parts.append(re.escape(route))
-            break
-        elif not set(match.group()).isdisjoint(string.whitespace):
+    previous_end = 0
+    for match_ in _PATH_PARAMETER_COMPONENT_RE.finditer(route):
+        if not whitespace_set.isdisjoint(match_[0]):
             raise ImproperlyConfigured(
-                "URL route '%s' cannot contain whitespace in angle brackets "
-                "<…>." % original_route
+                f"URL route {route!r} cannot contain whitespace in angle brackets <…>."
             )
-        parts.append(re.escape(route[: match.start()]))
-        route = route[match.end() :]
-        parameter = match["parameter"]
+        # Default to make converter "str" if unspecified (parameter always
+        # matches something).
+        raw_converter, parameter = match_.groups(default="str")
         if not parameter.isidentifier():
             raise ImproperlyConfigured(
-                "URL route '%s' uses parameter name %r which isn't a valid "
-                "Python identifier." % (original_route, parameter)
+                f"URL route {route!r} uses parameter name {parameter!r} which "
+                "isn't a valid Python identifier."
             )
-        raw_converter = match["converter"]
-        if raw_converter is None:
-            # If a converter isn't specified, the default is `str`.
-            raw_converter = "str"
         try:
-            converter = get_converter(raw_converter)
+            converter = all_converters[raw_converter]
         except KeyError as e:
             raise ImproperlyConfigured(
-                "URL route %r uses invalid converter %r."
-                % (original_route, raw_converter)
+                f"URL route {route!r} uses invalid converter {raw_converter!r}."
             ) from e
         converters[parameter] = converter
-        parts.append("(?P<" + parameter + ">" + converter.regex + ")")
+
+        start, end = match_.span()
+        parts.append(re.escape(route[previous_end:start]))
+        previous_end = end
+        parts.append(f"(?P<{parameter}>{converter.regex})")
+
+    parts.append(re.escape(route[previous_end:]))
     if is_endpoint:
         parts.append(r"\Z")
     return "".join(parts), converters
 
 
+class LocaleRegexRouteDescriptor:
+    def __get__(self, instance, cls=None):
+        """
+        Return a compiled regular expression based on the active language.
+        """
+        if instance is None:
+            return self
+        # As a performance optimization, if the given route is a regular string
+        # (not a lazily-translated string proxy), compile it once and avoid
+        # per-language compilation.
+        if isinstance(instance._route, str):
+            instance.__dict__["regex"] = re.compile(instance._regex)
+            return instance.__dict__["regex"]
+        language_code = get_language()
+        if language_code not in instance._regex_dict:
+            instance._regex_dict[language_code] = re.compile(
+                _route_to_regex(str(instance._route), instance._is_endpoint)[0]
+            )
+        return instance._regex_dict[language_code]
+
+
 class RoutePattern(CheckURLMixin):
-    regex = LocaleRegexDescriptor("_route")
+    regex = LocaleRegexRouteDescriptor()
 
     def __init__(self, route, name=None, is_endpoint=False):
         self._route = route
+        self._regex, self.converters = _route_to_regex(str(route), is_endpoint)
         self._regex_dict = {}
         self._is_endpoint = is_endpoint
         self.name = name
-        self.converters = _route_to_regex(str(route), is_endpoint)[1]
 
     def match(self, path):
         match = self.regex.search(path)
@@ -355,9 +370,6 @@ class RoutePattern(CheckURLMixin):
         if open_bracket_counter > 0:
             warnings.append(Warning(msg % (self.describe(), "<"), id="urls.W010"))
         return warnings
-
-    def _compile(self, route):
-        return re.compile(_route_to_regex(route, self._is_endpoint)[0])
 
     def __str__(self):
         return str(self._route)

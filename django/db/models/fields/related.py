@@ -264,9 +264,8 @@ class RelatedField(FieldCacheMixin, Field):
         # model_set and it clashes with Target.model_set.
         potential_clashes = rel_opts.fields + rel_opts.many_to_many
         for clash_field in potential_clashes:
-            # i.e. "app_label.Target.model_set".
-            clash_name = "%s.%s" % (rel_opts.label, clash_field.name)
             if not rel_is_hidden and clash_field.name == rel_name:
+                clash_name = f"{rel_opts.label}.{clash_field.name}"
                 errors.append(
                     checks.Error(
                         f"Reverse accessor '{rel_opts.object_name}.{rel_name}' "
@@ -283,6 +282,7 @@ class RelatedField(FieldCacheMixin, Field):
                 )
 
             if clash_field.name == rel_query_name:
+                clash_name = f"{rel_opts.label}.{clash_field.name}"
                 errors.append(
                     checks.Error(
                         "Reverse query name for '%s' clashes with field name '%s'."
@@ -302,12 +302,10 @@ class RelatedField(FieldCacheMixin, Field):
         # Model.m2m accessor.
         potential_clashes = (r for r in rel_opts.related_objects if r.field is not self)
         for clash_field in potential_clashes:
-            # i.e. "app_label.Model.m2m".
-            clash_name = "%s.%s" % (
-                clash_field.related_model._meta.label,
-                clash_field.field.name,
-            )
             if not rel_is_hidden and clash_field.accessor_name == rel_name:
+                clash_name = (
+                    f"{clash_field.related_model._meta.label}.{clash_field.field.name}"
+                )
                 errors.append(
                     checks.Error(
                         f"Reverse accessor '{rel_opts.object_name}.{rel_name}' "
@@ -324,6 +322,9 @@ class RelatedField(FieldCacheMixin, Field):
                 )
 
             if clash_field.accessor_name == rel_query_name:
+                clash_name = (
+                    f"{clash_field.related_model._meta.label}.{clash_field.field.name}"
+                )
                 errors.append(
                     checks.Error(
                         "Reverse query name for '%s' clashes with reverse query name "
