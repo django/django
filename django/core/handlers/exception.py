@@ -116,6 +116,11 @@ def response_for_exception(request, exc):
             # exception would be raised.
             request._mark_post_parse_error()
 
+        if isinstance(exc, RequestDataTooBig):
+            status_code = 413
+        else:
+            status_code = 400
+
         # The request logger receives events for any problematic request
         # The security logger receives events for all SuspiciousOperations
         security_logger = logging.getLogger(
@@ -124,15 +129,15 @@ def response_for_exception(request, exc):
         security_logger.error(
             str(exc),
             exc_info=exc,
-            extra={"status_code": 400, "request": request},
+            extra={"status_code": status_code, "request": request},
         )
         if settings.DEBUG:
             response = debug.technical_500_response(
-                request, *sys.exc_info(), status_code=400
+                request, *sys.exc_info(), status_code=status_code
             )
         else:
             response = get_exception_response(
-                request, get_resolver(get_urlconf()), 400, exc
+                request, get_resolver(get_urlconf()), status_code, exc
             )
 
     else:
