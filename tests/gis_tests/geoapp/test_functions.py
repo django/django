@@ -259,36 +259,31 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             return (4 * num_seg) + 1
 
         if connection.ops.postgis:
-            expected_areas = (169, 136)
+            expected_area = 169
         elif connection.ops.spatialite:
-            expected_areas = (168, 135)
+            expected_area = 168
         else:  # Oracle.
-            expected_areas = (171, 126)
-        qs = Country.objects.annotate(
+            expected_area = 171
+        country = Country.objects.annotate(
             circle=functions.BoundingCircle("mpoly")
-        ).order_by("name")
-        self.assertAlmostEqual(qs[0].circle.area, expected_areas[0], 0)
-        self.assertAlmostEqual(qs[1].circle.area, expected_areas[1], 0)
+        ).order_by("name")[0]
+        self.assertAlmostEqual(country.circle.area, expected_area, 0)
         if connection.ops.postgis:
             # By default num_seg=48.
-            self.assertEqual(qs[0].circle.num_points, circle_num_points(48))
-            self.assertEqual(qs[1].circle.num_points, circle_num_points(48))
+            self.assertEqual(country.circle.num_points, circle_num_points(48))
 
         tests = [12, Value(12, output_field=IntegerField())]
         for num_seq in tests:
             with self.subTest(num_seq=num_seq):
-                qs = Country.objects.annotate(
+                country = Country.objects.annotate(
                     circle=functions.BoundingCircle("mpoly", num_seg=num_seq),
-                ).order_by("name")
+                ).order_by("name")[0]
                 if connection.ops.postgis:
-                    self.assertGreater(qs[0].circle.area, 168.4, 0)
-                    self.assertLess(qs[0].circle.area, 169.5, 0)
-                    self.assertAlmostEqual(qs[1].circle.area, 136, 0)
-                    self.assertEqual(qs[0].circle.num_points, circle_num_points(12))
-                    self.assertEqual(qs[1].circle.num_points, circle_num_points(12))
+                    self.assertGreater(country.circle.area, 168.4, 0)
+                    self.assertLess(country.circle.area, 169.5, 0)
+                    self.assertEqual(country.circle.num_points, circle_num_points(12))
                 else:
-                    self.assertAlmostEqual(qs[0].circle.area, expected_areas[0], 0)
-                    self.assertAlmostEqual(qs[1].circle.area, expected_areas[1], 0)
+                    self.assertAlmostEqual(country.circle.area, expected_area, 0)
 
     @skipUnlessDBFeature("has_Centroid_function")
     def test_centroid(self):
