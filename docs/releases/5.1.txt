@@ -101,6 +101,11 @@ Minor features
 * :attr:`.OGRGeometry.centroid` is now available on all supported geometry
   types.
 
+* :class:`FromWKB() <django.contrib.gis.db.models.functions.FromWKB>` and
+  :class:`FromWKT() <django.contrib.gis.db.models.functions.FromWKT>` functions
+  now support the optional ``srid`` argument (except for Oracle where it is
+  ignored).
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
