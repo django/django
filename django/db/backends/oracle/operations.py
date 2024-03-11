@@ -676,6 +676,24 @@ END;
             for field in fields
             if field
         ]
+        if (
+            self.connection.features.supports_bulk_insert_with_multiple_rows
+            # A workaround with UNION of SELECTs is required for models without
+            # any fields.
+            and field_placeholders
+        ):
+            placeholder_rows_sql = []
+            for row in placeholder_rows:
+                placeholders_row = (
+                    field_placeholder % placeholder
+                    for field_placeholder, placeholder in zip(
+                        field_placeholders, row, strict=True
+                    )
+                )
+                placeholder_rows_sql.append(placeholders_row)
+            return super().bulk_insert_sql(fields, placeholder_rows_sql)
+        # Oracle < 23c doesn't support inserting multiple rows in a single
+        # statement, use UNION of SELECTs as a workaround.
         query = []
         for row in placeholder_rows:
             select = []
