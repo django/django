@@ -54,10 +54,16 @@ class ReadOnlyPasswordHashWidget(forms.Widget):
                 for key, value_ in hasher.safe_summary(value).items():
                     summary.append({"label": gettext(key), "value": value_})
         context["summary"] = summary
+        context["usable_password"] = len(summary) > 1
         return context
 
     def id_for_label(self, id_):
         return None
+
+    class Media:
+        css = {
+            "all": ("admin/css/widgets.css",),
+        }
 
 
 class ReadOnlyPasswordHashField(forms.Field):
@@ -253,9 +259,8 @@ class UserChangeForm(forms.ModelForm):
     password = ReadOnlyPasswordHashField(
         label=_("Password"),
         help_text=_(
-            "Raw passwords are not stored, so there is no way to see this "
-            "user’s password, but you can change or unset the password using "
-            '<a href="{}">this form</a>.'
+            "Raw passwords are not stored, so there is no way to see "
+            "the user’s password."
         ),
     )
 
@@ -271,11 +276,8 @@ class UserChangeForm(forms.ModelForm):
             if self.instance and not self.instance.has_usable_password():
                 password.help_text = _(
                     "Enable password-based authentication for this user by setting a "
-                    'password using <a href="{}">this form</a>.'
+                    "password."
                 )
-            password.help_text = password.help_text.format(
-                f"../../{self.instance.pk}/password/"
-            )
         user_permissions = self.fields.get("user_permissions")
         if user_permissions:
             user_permissions.queryset = user_permissions.queryset.select_related(

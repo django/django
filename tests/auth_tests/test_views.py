@@ -1442,7 +1442,8 @@ class ChangelistTests(MessagesTestMixin, AuthViewsTestCase):
         response = self.client.get(user_change_url)
         # Test the link inside password field help_text.
         rel_link = re.search(
-            r'change or unset the password using <a href="([^"]*)">this form</a>',
+            r'<a class="button change-password-btn" href="([^"]*)">'
+            r"Change or unset password</a>",
             response.content.decode(),
         )[1]
         self.assertEqual(urljoin(user_change_url, rel_link), password_change_url)
@@ -1538,7 +1539,7 @@ class ChangelistTests(MessagesTestMixin, AuthViewsTestCase):
         response = self.client.get(user_change_url)
         # Test the link inside password field help_text.
         rel_link = re.search(
-            r'by setting a password using <a href="([^"]*)">this form</a>',
+            r'<a class="button change-password-btn" href="([^"]*)">Set password</a>',
             response.content.decode(),
         )[1]
         self.assertEqual(urljoin(user_change_url, rel_link), password_change_url)

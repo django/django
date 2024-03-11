@@ -1027,24 +1027,27 @@ class UserChangeFormTest(TestDataMixin, TestCase):
         cases = [
             (
                 "testclient",
-                'you can change or unset the password using <a href="(.*?)">',
+                "Raw passwords are not stored, so there is no way to see "
+                "the user’s password.",
             ),
             (
                 "unusable_password",
-                "Enable password-based authentication for this user by setting "
-                'a password using <a href="(.*?)">this form</a>.',
+                "Enable password-based authentication for this user by setting a "
+                "password.",
             ),
         ]
+        find_link = r'<a class="button change-password-btn" href="([^"]*)">'
         for username, expected_help_text in cases:
             with self.subTest(username=username):
                 user = User.objects.get(username=username)
                 form = UserChangeForm(data={}, instance=user)
                 password_help_text = form.fields["password"].help_text
-                matches = re.search(expected_help_text, password_help_text)
+                self.assertEqual(password_help_text, expected_help_text)
 
+                matches = re.search(find_link, form.as_p())
                 url_prefix = f"admin:{user._meta.app_label}_{user._meta.model_name}"
                 # URL to UserChangeForm in admin via to_field (instead of pk).
-                user_change_url = reverse(f"{url_prefix}_change", args=(user.username,))
+                user_change_url = reverse(f"{url_prefix}_change", args=(user.pk,))
                 joined_url = urllib.parse.urljoin(user_change_url, matches.group(1))
 
                 pw_change_url = reverse(
@@ -1342,15 +1345,15 @@ class ReadOnlyPasswordHashTest(SimpleTestCase):
             "pbkdf2_sha256$100000$a6Pucb1qSFcD$WmCkn9Hqidj48NVe5x0FEM6A9YiOqQcl/83m2Z5u"
             "dm0="
         )
-        self.assertHTMLEqual(
-            widget.render("name", value, {"id": "id_password"}),
-            '<div id="id_password">'
+        self.assertInHTML(
+            "<div>"
             "    <strong>algorithm</strong>: <bdi>pbkdf2_sha256</bdi>"
             "    <strong>iterations</strong>: <bdi>100000</bdi>"
             "    <strong>salt</strong>: <bdi>a6Pucb******</bdi>"
             "    <strong>hash</strong>: "
             "       <bdi>WmCkn9**************************************</bdi>"
             "</div>",
+            widget.render("name", value, {"id": "id_password"}),
         )
 
     def test_readonly_field_has_changed(self):
