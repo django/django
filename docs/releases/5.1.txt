@@ -57,6 +57,12 @@ Minor features
   :func:`~.django.contrib.auth.decorators.user_passes_test` decorators now
   support wrapping asynchronous view functions.
 
+* ``ReadOnlyPasswordHashWidget`` now includes a button to reset the user's
+  password, which replaces the link previously embedded in the
+  ``ReadOnlyPasswordHashField``'s help text, improving the overall
+  accessibility of the
+  :class:`~django.contrib.auth.forms.UserChangeForm`.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
