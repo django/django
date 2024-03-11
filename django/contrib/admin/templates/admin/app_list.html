@@ -8,7 +8,7 @@
           {% if app.app_url %}
             <a href="{{ app.app_url }}" class="section" title="{% blocktranslate with name=app.name %}Models in the {{ name }} application{% endblocktranslate %}">{{ app.name }}</a>
           {% else %}
-            {{ app.name }}
+            <span class="section">{{ app.name }}</span>
           {% endif %}
         </caption>
         {% for model in app.models %}
