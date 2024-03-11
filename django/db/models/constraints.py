@@ -15,7 +15,13 @@ from django.db.utils import DEFAULT_DB_ALIAS
 from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.translation import gettext_lazy as _
 
-__all__ = ["BaseConstraint", "CheckConstraint", "Deferrable", "UniqueConstraint"]
+__all__ = [
+    "BaseConstraint",
+    "CheckConstraint",
+    "Deferrable",
+    "UniqueConstraint",
+    "PrimaryKeyConstraint",
+]
 
 
 class BaseConstraint:
@@ -675,3 +681,99 @@ class UniqueConstraint(BaseConstraint):
                     )
             except FieldError:
                 pass
+
+
+class PrimaryKeyConstraint(BaseConstraint):
+    def __init__(
+        self,
+        fields=(),
+        name=None,
+        violation_error_code=None,
+        violation_error_message=None,
+    ):
+        if not name:
+            raise ValueError("A primary key constraint must be named.")
+        if not fields:
+            raise ValueError(
+                "At least one field is required to define a primary key constraint."
+            )
+
+        self.fields = tuple(fields)
+        super().__init__(
+            name=name,
+            violation_error_code=violation_error_code,
+            violation_error_message=violation_error_message,
+        )
+
+    def constraint_sql(self, model, schema_editor):
+        return schema_editor._primary_key_constraint_sql(self.fields)
+
+    def create_sql(self, model, schema_editor):
+        return schema_editor._create_primary_key_sql(model, self.fields)
+
+    def remove_sql(self, model, schema_editor):
+        return schema_editor._delete_primary_key_sql(model, self.name)
+
+    def __eq__(self, other):
+        if isinstance(other, PrimaryKeyConstraint):
+            return (
+                self.fields == other.fields
+                and self.name == other.name
+                and self.violation_error_code == other.violation_error_code
+                and self.violation_error_message == other.violation_error_message
+            )
+        return super().__eq__(other)
+
+    def __repr__(self):
+        return "<%s:%s%s%s%s>" % (
+            self.__class__.__qualname__,
+            "" if not self.fields else " fields=%s" % repr(self.fields),
+            " name=%s" % repr(self.name),
+            (
+                ""
+                if self.violation_error_code is None
+                else " violation_error_code=%r" % self.violation_error_code
+            ),
+            (
+                ""
+                if self.violation_error_message is None
+                or self.violation_error_message == self.default_violation_error_message
+                else " violation_error_message=%r" % self.violation_error_message
+            ),
+        )
+
+    def deconstruct(self):
+        path, args, kwargs = super().deconstruct()
+        if self.fields:
+            kwargs["fields"] = self.fields
+        return path, args, kwargs
+
+    def validate(self, model, instance, exclude=None, using=DEFAULT_DB_ALIAS):
+        queryset = model._default_manager.using(using)
+        lookup_kwargs = {}
+
+        for field_name in self.fields:
+            field = model._meta.get_field(field_name)
+            lookup_value = getattr(instance, field.attname)
+            lookup_kwargs[field.name] = lookup_value
+
+        if queryset.filter(**lookup_kwargs).exists():
+            raise ValidationError(
+                self.get_violation_error_message(),
+                code=self.violation_error_code,
+            )
+
+    def _check(self, model, connection):
+        errors = []
+
+        if any(field for field in model._meta.fields if field.primary_key):
+            errors.append(
+                checks.Error(
+                    "primary_key=True must not be set if a primary key "
+                    "constraint is defined.",
+                    obj=model,
+                    id="models.E042",
+                )
+            )
+
+        return errors

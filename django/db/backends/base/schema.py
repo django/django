@@ -105,6 +105,7 @@ class BaseDatabaseSchemaEditor:
     sql_check_constraint = "CHECK (%(check)s)"
     sql_delete_constraint = "ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
     sql_constraint = "CONSTRAINT %(name)s %(constraint)s"
+    sql_primary_key_constraint = "PRIMARY KEY (%(columns)s)"
 
     sql_create_check = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s CHECK (%(check)s)"
     sql_delete_check = sql_delete_constraint
@@ -1200,7 +1201,7 @@ class BaseDatabaseSchemaEditor:
         # Changed to become primary key?
         if self._field_became_primary_key(old_field, new_field):
             # Make the new one
-            self.execute(self._create_primary_key_sql(model, new_field))
+            self.execute(self._create_primary_key_sql(model, [new_field]))
             # Update all referencing columns
             rels_to_update.extend(_related_non_m2m_objects(old_field, new_field))
         # Handle our type alters on the other end of rels from the PK stuff above
@@ -1962,6 +1963,11 @@ class BaseDatabaseSchemaEditor:
                     result.append(name)
         return result
 
+    def _primary_key_constraint_sql(self, fields):
+        return self.sql_primary_key_constraint % {
+            "columns": ", ".join(self.quote_name(field) for field in fields)
+        }
+
     def _delete_primary_key(self, model, strict=False):
         constraint_names = self._constraint_names(model, primary_key=True)
         if strict and len(constraint_names) != 1:
@@ -1975,16 +1981,15 @@ class BaseDatabaseSchemaEditor:
         for constraint_name in constraint_names:
             self.execute(self._delete_primary_key_sql(model, constraint_name))
 
-    def _create_primary_key_sql(self, model, field):
+    def _create_primary_key_sql(self, model, fields):
+        columns = [field.column for field in fields]
         return Statement(
             self.sql_create_pk,
             table=Table(model._meta.db_table, self.quote_name),
             name=self.quote_name(
-                self._create_index_name(
-                    model._meta.db_table, [field.column], suffix="_pk"
-                )
+                self._create_index_name(model._meta.db_table, columns, suffix="_pk")
             ),
-            columns=Columns(model._meta.db_table, [field.column], self.quote_name),
+            columns=Columns(model._meta.db_table, columns, self.quote_name),
         )
 
     def _delete_primary_key_sql(self, model, name):

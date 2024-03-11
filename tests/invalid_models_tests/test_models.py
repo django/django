@@ -2804,3 +2804,53 @@ class ConstraintsTests(TestCase):
                 ]
 
         self.assertEqual(Bar.check(databases=self.databases), [])
+
+    def test_primary_key_constraint_with_primary_key_set_to_true(self):
+        class Model(models.Model):
+            id_1 = models.IntegerField(primary_key=True)
+            id_2 = models.IntegerField()
+
+            class Meta:
+                constraints = [
+                    models.PrimaryKeyConstraint(
+                        fields=("id_1", "id_2"), name="model_pk"
+                    ),
+                ]
+
+        errors = Model.check(databases=self.databases)
+        expected_errors = [
+            Error(
+                "primary_key=True must not be set if a primary key "
+                "constraint is defined.",
+                obj=Model,
+                id="models.E042",
+            ),
+        ]
+        self.assertCountEqual(errors, expected_errors)
+
+    def test_primary_key_constraint_with_multiple_instances(self):
+        class Model(models.Model):
+            id_1 = models.IntegerField()
+            id_2 = models.IntegerField()
+            id_3 = models.IntegerField()
+            id_4 = models.IntegerField()
+
+            class Meta:
+                constraints = [
+                    models.PrimaryKeyConstraint(
+                        fields=("id_1", "id_2"), name="model_1_pk"
+                    ),
+                    models.PrimaryKeyConstraint(
+                        fields=("id_3", "id_4"), name="model_2_pk"
+                    ),
+                ]
+
+        errors = Model.check(databases=self.databases)
+        expected_errors = [
+            Error(
+                "The model cannot have more than one primary key constraint.",
+                obj=Model,
+                id="models.E043",
+            ),
+        ]
+        self.assertCountEqual(errors, expected_errors)

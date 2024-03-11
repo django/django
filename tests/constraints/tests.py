@@ -19,6 +19,7 @@ from .models import (
     UniqueConstraintDeferrable,
     UniqueConstraintInclude,
     UniqueConstraintProduct,
+    ModelPKConstraint,
 )
 
 
@@ -1229,3 +1230,184 @@ class UniqueConstraintTests(TestCase):
         msg = "A unique constraint must be named."
         with self.assertRaisesMessage(ValueError, msg):
             models.UniqueConstraint(fields=["field"])
+
+
+class PrimaryKeyConstraintTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.obj = ModelPKConstraint.objects.create(id_1=1, id_2=2)
+
+    def test_eq(self):
+        self.assertEqual(
+            models.PrimaryKeyConstraint(fields=("field_1", "field_2"), name="table_pk"),
+            models.PrimaryKeyConstraint(fields=("field_1", "field_2"), name="table_pk"),
+        )
+        self.assertEqual(
+            models.PrimaryKeyConstraint(
+                fields=("field_1", "field_2"),
+                name="table_pk",
+                violation_error_code="custom_code",
+            ),
+            models.PrimaryKeyConstraint(
+                fields=("field_1", "field_2"),
+                name="table_pk",
+                violation_error_code="custom_code",
+            ),
+        )
+        self.assertEqual(
+            models.PrimaryKeyConstraint(
+                fields=("field_1", "field_2"),
+                name="table_pk",
+                violation_error_message="custom message",
+            ),
+            models.PrimaryKeyConstraint(
+                fields=("field_1", "field_2"),
+                name="table_pk",
+                violation_error_message="custom message",
+            ),
+        )
+        self.assertEqual(
+            models.PrimaryKeyConstraint(
+                fields=("field_1", "field_2"),
+                name="table_pk",
+                violation_error_code="custom_code",
+                violation_error_message="custom message",
+            ),
+            models.PrimaryKeyConstraint(
+                fields=("field_1", "field_2"),
+                name="table_pk",
+                violation_error_code="custom_code",
+                violation_error_message="custom message",
+            ),
+        )
+        self.assertNotEqual(
+            models.PrimaryKeyConstraint(fields=("field_1", "field_2"), name="table_pk"),
+            models.PrimaryKeyConstraint(fields=("field_2", "field_1"), name="table_pk"),
+        )
+        self.assertNotEqual(
+            models.PrimaryKeyConstraint(fields=("field_1", "field_2"), name="table_pk"),
+            models.PrimaryKeyConstraint(fields=("field_3", "field_4"), name="table_pk"),
+        )
+        self.assertNotEqual(
+            models.PrimaryKeyConstraint(
+                fields=("field_1", "field_2"), name="table_1_pk"
+            ),
+            models.PrimaryKeyConstraint(
+                fields=("field_1", "field_2"), name="table_2_pk"
+            ),
+        )
+        self.assertNotEqual(
+            models.PrimaryKeyConstraint(
+                fields=("field_1", "field_2"),
+                name="table_1_pk",
+                violation_error_code="custom_code_1",
+            ),
+            models.PrimaryKeyConstraint(
+                fields=("field_1", "field_2"),
+                name="table_1_pk",
+                violation_error_code="custom_code_2",
+            ),
+        )
+        self.assertNotEqual(
+            models.PrimaryKeyConstraint(
+                fields=("field_1", "field_2"),
+                name="table_1_pk",
+                violation_error_message="custom message 1",
+            ),
+            models.PrimaryKeyConstraint(
+                fields=("field_1", "field_2"),
+                name="table_1_pk",
+                violation_error_message="custom message 2",
+            ),
+        )
+
+    def test_repr(self):
+        constraint = models.PrimaryKeyConstraint(
+            fields=("field_1", "field_2"), name="table_pk"
+        )
+        self.assertEqual(
+            repr(constraint),
+            "<PrimaryKeyConstraint: fields=('field_1', 'field_2') name='table_pk'>",
+        )
+
+    def test_repr_with_violation_error_code(self):
+        constraint = models.PrimaryKeyConstraint(
+            fields=("field_1", "field_2"),
+            name="table_pk",
+            violation_error_code="custom_code",
+        )
+        self.assertEqual(
+            repr(constraint),
+            "<PrimaryKeyConstraint: fields=('field_1', 'field_2') "
+            "name='table_pk' violation_error_code='custom_code'>",
+        )
+
+    def test_repr_with_violation_error_message(self):
+        constraint = models.PrimaryKeyConstraint(
+            fields=("field_1", "field_2"),
+            name="table_pk",
+            violation_error_message="custom message",
+        )
+        self.assertEqual(
+            repr(constraint),
+            "<PrimaryKeyConstraint: fields=('field_1', 'field_2') "
+            "name='table_pk' violation_error_message='custom message'>",
+        )
+
+    def test_deconstruction(self):
+        fields = ["field_1", "field_2"]
+        name = "table_pk"
+        constraint = models.PrimaryKeyConstraint(fields=fields, name=name)
+        path, args, kwargs = constraint.deconstruct()
+        self.assertEqual(path, "django.db.models.PrimaryKeyConstraint")
+        self.assertEqual(args, ())
+        self.assertEqual(kwargs, {"fields": tuple(fields), "name": name})
+
+    def test_database_constraint(self):
+        ModelPKConstraint.objects.create(id_1=3, id_2=4)
+        with self.assertRaises(IntegrityError):
+            ModelPKConstraint.objects.create(id_1=1, id_2=2)
+
+    def test_model_validation(self):
+        ModelPKConstraint(id_1=3, id_2=4).validate_constraints()
+        msg = "Constraint “model_pk_constraint_pk” is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            ModelPKConstraint(id_1=1, id_2=2).validate_constraints()
+
+    def test_primary_key_columns(self):
+        constraints = get_constraints(ModelPKConstraint._meta.db_table)
+        self.assertEqual(
+            constraints,
+            {
+                "__primary__": {
+                    "columns": ["id_1", "id_2"],
+                    "primary_key": True,
+                    "unique": False,
+                    "foreign_key": None,
+                    "check": False,
+                    "index": False,
+                }
+            },
+        )
+
+    def test_model_pk(self):
+        self.assertEqual((1, 2), self.obj.pk)
+
+        meta_pk = self.obj._meta.pk
+        self.assertEqual(2, len(meta_pk))
+        self.assertEqual("id_1", meta_pk[0].attname)
+        self.assertEqual("id_2", meta_pk[1].attname)
+
+        self.assertFalse(hasattr(self.obj, "id"))
+        self.assertTrue(hasattr(self.obj, "id_1"))
+        self.assertTrue(hasattr(self.obj, "id_2"))
+
+    def test_init(self):
+        msg = "A primary key constraint must be named."
+        with self.assertRaisesMessage(ValueError, msg):
+            models.PrimaryKeyConstraint(fields=["id_1", "id_2"])
+
+        msg = "At least one field is required to define a primary key constraint."
+        for fields in (None, (), [], tuple()):
+            with self.assertRaisesMessage(ValueError, msg):
+                models.PrimaryKeyConstraint(fields=fields, name="table_pk")

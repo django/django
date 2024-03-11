@@ -96,7 +96,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 self.alter_field(model, old_field, new_field, strict)
                 # Restore a primary key, if needed.
                 if new_field.primary_key:
-                    self.execute(self._create_primary_key_sql(model, new_field))
+                    self.execute(self._create_primary_key_sql(model, [new_field]))
             else:
                 raise
 

@@ -128,3 +128,15 @@ class JSONFieldModel(models.Model):
 
     class Meta:
         required_db_features = {"supports_json_field"}
+
+
+class ModelPKConstraint(models.Model):
+    id_1 = models.IntegerField()
+    id_2 = models.IntegerField()
+
+    class Meta:
+        constraints = [
+            models.PrimaryKeyConstraint(
+                fields=("id_1", "id_2"), name="model_pk_constraint_pk"
+            ),
+        ]

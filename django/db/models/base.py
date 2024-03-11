@@ -26,7 +26,14 @@ from django.db import (
     router,
     transaction,
 )
-from django.db.models import NOT_PROVIDED, ExpressionWrapper, IntegerField, Max, Value
+from django.db.models import (
+    NOT_PROVIDED,
+    ExpressionWrapper,
+    IntegerField,
+    Max,
+    Value,
+    PrimaryKeyConstraint,
+)
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import CASCADE, Collector
 from django.db.models.expressions import DatabaseDefault
@@ -652,6 +659,12 @@ class Model(AltersData, metaclass=ModelBase):
 
     def _get_pk_val(self, meta=None):
         meta = meta or self._meta
+
+        # If the model defines a PrimaryKeyConstraint, meta.pk is a tuple.
+        if isinstance(meta.pk, tuple):
+            pks = (getattr(self, field.attname) for field in meta.pk)
+            return tuple(pks)
+
         return getattr(self, meta.pk.attname)
 
     def _set_pk_val(self, value):
@@ -1669,6 +1682,7 @@ class Model(AltersData, metaclass=ModelBase):
                 *cls._check_model_name_db_lookup_clashes(),
                 *cls._check_property_name_related_field_accessor_clashes(),
                 *cls._check_single_primary_key(),
+                *cls._check_single_pk_constraint(),
             )
             errors.extend(clash_errors)
             # If there are field name clashes, hide consequent column name
@@ -1690,6 +1704,9 @@ class Model(AltersData, metaclass=ModelBase):
     def _check_default_pk(cls):
         if (
             not cls._meta.abstract
+            # If the model defines a PrimaryKeyConstraint, the check should be skipped,
+            # since there's no default primary key.
+            and not cls._get_pk_constraint()
             and cls._meta.pk.auto_created
             and
             # Inherited PKs are checked in parents models.
@@ -1838,9 +1855,15 @@ class Model(AltersData, metaclass=ModelBase):
     @classmethod
     def _check_id_field(cls):
         """Check if `id` field is a primary key."""
+        # If the model defines a PrimaryKeyConstraint, the check should be skipped,
+        # since primary_key=True can't be set on any fields (including `id`).
+        if cls._get_pk_constraint():
+            return []
+
         fields = [
             f for f in cls._meta.local_fields if f.name == "id" and f != cls._meta.pk
         ]
+
         # fields is empty or consists of the invalid "id" field
         if fields and not fields[0].primary_key and cls._meta.pk.name == "id":
             return [
@@ -2007,6 +2030,33 @@ class Model(AltersData, metaclass=ModelBase):
                 )
             )
         return errors
+
+    @classmethod
+    def _check_single_pk_constraint(cls):
+        errors = []
+
+        if sum(1 for _ in cls._get_pk_constraints()) > 1:
+            errors.append(
+                checks.Error(
+                    "The model cannot have more than one primary key constraint.",
+                    obj=cls,
+                    id="models.E043",
+                )
+            )
+
+        return errors
+
+    @classmethod
+    def _get_pk_constraints(cls):
+        return (
+            constraint
+            for constraint in cls._meta.constraints
+            if isinstance(constraint, PrimaryKeyConstraint)
+        )
+
+    @classmethod
+    def _get_pk_constraint(cls):
+        return next(cls._get_pk_constraints(), None)
 
     @classmethod
     def _check_unique_together(cls):

@@ -310,6 +310,9 @@ class Options:
                     field = already_created[0]
                 field.primary_key = True
                 self.setup_pk(field)
+            elif pk := model._get_pk_constraint():
+                # If the model defines a PrimaryKeyConstraint, meta.pk is a tuple.
+                self.pk = tuple(model._meta.get_field(field) for field in pk.fields)
             else:
                 pk_class = self._get_default_pk_class()
                 auto = pk_class(verbose_name="ID", primary_key=True, auto_created=True)
