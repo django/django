@@ -669,18 +669,20 @@ END;
         return self._get_no_autofield_sequence_name(table) if row is None else row[0]
 
     def bulk_insert_sql(self, fields, placeholder_rows):
+        field_placeholders = [
+            BulkInsertMapper.types.get(
+                getattr(field, "target_field", field).get_internal_type(), "%s"
+            )
+            for field in fields
+            if field
+        ]
         query = []
         for row in placeholder_rows:
             select = []
             for i, placeholder in enumerate(row):
                 # A model without any fields has fields=[None].
                 if fields[i]:
-                    internal_type = getattr(
-                        fields[i], "target_field", fields[i]
-                    ).get_internal_type()
-                    placeholder = (
-                        BulkInsertMapper.types.get(internal_type, "%s") % placeholder
-                    )
+                    placeholder = field_placeholders[i] % placeholder
                 # Add columns aliases to the first select to avoid "ORA-00918:
                 # column ambiguously defined" when two or more columns in the
                 # first select have the same value.
