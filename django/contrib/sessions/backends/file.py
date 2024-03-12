@@ -190,9 +190,6 @@ class SessionStore(SessionBase):
         except OSError:
             pass
 
-    def clean(self):
-        pass
-
     @classmethod
     def clear_expired(cls):
         storage_path = cls._get_storage_path()
