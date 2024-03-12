@@ -816,8 +816,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
             *self._check_list_editable(admin_obj),
             *self._check_search_fields(admin_obj),
             *self._check_date_hierarchy(admin_obj),
-            *self._check_action_permission_methods(admin_obj),
-            *self._check_actions_uniqueness(admin_obj),
+            *self._check_actions(admin_obj),
         ]
 
     def _check_save_as(self, obj):
@@ -1195,13 +1194,12 @@ class ModelAdminChecks(BaseModelAdminChecks):
                 else:
                     return []
 
-    def _check_action_permission_methods(self, obj):
-        """
-        Actions with an allowed_permission attribute require the ModelAdmin to
-        implement a has_<perm>_permission() method for each permission.
-        """
-        actions = obj._get_base_actions()
+    def _check_actions(self, obj):
         errors = []
+        actions = obj._get_base_actions()
+
+        # Actions with an allowed_permission attribute require the ModelAdmin
+        # to implement a has_<perm>_permission() method for each permission.
         for func, name, _ in actions:
             if not hasattr(func, "allowed_permissions"):
                 continue
@@ -1220,12 +1218,8 @@ class ModelAdminChecks(BaseModelAdminChecks):
                             id="admin.E129",
                         )
                     )
-        return errors
-
-    def _check_actions_uniqueness(self, obj):
-        """Check that every action has a unique __name__."""
-        errors = []
-        names = collections.Counter(name for _, name, _ in obj._get_base_actions())
+        # Names need to be unique.
+        names = collections.Counter(name for _, name, _ in actions)
         for name, count in names.items():
             if count > 1:
                 errors.append(

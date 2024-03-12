@@ -270,7 +270,7 @@ class OperationTests(OperationTestCase):
         Neighborhood = self.current_state.apps.get_model("gis", "Neighborhood")
         poly = Polygon(((0, 0), (0, 1), (1, 1), (1, 0), (0, 0)))
         constraint = models.CheckConstraint(
-            check=models.Q(geom=poly),
+            condition=models.Q(geom=poly),
             name="geom_within_constraint",
         )
         Neighborhood._meta.constraints = [constraint]

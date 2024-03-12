@@ -769,18 +769,24 @@ class FileFieldStorageTests(TestCase):
 
     def test_duplicate_filename(self):
         # Multiple files with the same name get _(7 random chars) appended to them.
-        objs = [Storage() for i in range(2)]
-        for o in objs:
-            o.normal.save("multiple_files.txt", ContentFile("Same Content"))
-        try:
-            names = [o.normal.name for o in objs]
-            self.assertEqual(names[0], "tests/multiple_files.txt")
-            self.assertRegex(
-                names[1], "tests/multiple_files_%s.txt" % FILE_SUFFIX_REGEX
-            )
-        finally:
-            for o in objs:
-                o.delete()
+        tests = [
+            ("multiple_files", "txt"),
+            ("multiple_files_many_extensions", "tar.gz"),
+        ]
+        for filename, extension in tests:
+            with self.subTest(filename=filename):
+                objs = [Storage() for i in range(2)]
+                for o in objs:
+                    o.normal.save(f"{filename}.{extension}", ContentFile("Content"))
+                try:
+                    names = [o.normal.name for o in objs]
+                    self.assertEqual(names[0], f"tests/{filename}.{extension}")
+                    self.assertRegex(
+                        names[1], f"tests/{filename}_{FILE_SUFFIX_REGEX}.{extension}"
+                    )
+                finally:
+                    for o in objs:
+                        o.delete()
 
     def test_file_truncation(self):
         # Given the max_length is limited, when multiple files get uploaded

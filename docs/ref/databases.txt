@@ -245,6 +245,31 @@ database configuration in :setting:`DATABASES`::
         },
     }
 
+.. _postgresql-pool:
+
+Connection pool
+---------------
+
+.. versionadded:: 5.1
+
+To use a connection pool with `psycopg`_, you can either set ``"pool"`` in the
+:setting:`OPTIONS` part of your database configuration in :setting:`DATABASES`
+to be a dict to be passed to :class:`~psycopg:psycopg_pool.ConnectionPool`, or
+to ``True`` to use the ``ConnectionPool`` defaults::
+
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            # ...
+            "OPTIONS": {
+                "pool": True,
+            },
+        },
+    }
+
+This option requires ``psycopg[pool]`` or :pypi:`psycopg-pool` to be installed
+and is ignored with ``psycopg2``.
+
 .. _database-server-side-parameters-binding:
 
 Server-side parameters binding

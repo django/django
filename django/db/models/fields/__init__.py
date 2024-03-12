@@ -916,7 +916,7 @@ class Field(RegisterLookupMixin):
             return [self.from_db_value]
         return []
 
-    @property
+    @cached_property
     def unique(self):
         return self._unique or self.primary_key
 

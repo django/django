@@ -12,15 +12,15 @@ class Product(models.Model):
         }
         constraints = [
             models.CheckConstraint(
-                check=models.Q(price__gt=models.F("discounted_price")),
+                condition=models.Q(price__gt=models.F("discounted_price")),
                 name="price_gt_discounted_price",
             ),
             models.CheckConstraint(
-                check=models.Q(price__gt=0),
+                condition=models.Q(price__gt=0),
                 name="%(app_label)s_%(class)s_price_gt_0",
             ),
             models.CheckConstraint(
-                check=models.Q(
+                condition=models.Q(
                     models.Q(unit__isnull=True) | models.Q(unit__in=["μg/mL", "ng/mL"])
                 ),
                 name="unicode_unit_list",
@@ -113,7 +113,7 @@ class AbstractModel(models.Model):
         }
         constraints = [
             models.CheckConstraint(
-                check=models.Q(age__gte=18),
+                condition=models.Q(age__gte=18),
                 name="%(app_label)s_%(class)s_adult",
             ),
         ]

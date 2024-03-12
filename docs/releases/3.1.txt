@@ -388,7 +388,7 @@ Models
   ``OneToOneField`` emulates the behavior of the SQL constraint ``ON DELETE
   RESTRICT``.
 
-* :attr:`.CheckConstraint.check` now supports boolean expressions.
+* ``CheckConstraint.check`` now supports boolean expressions.
 
 * The :meth:`.RelatedManager.add`, :meth:`~.RelatedManager.create`, and
   :meth:`~.RelatedManager.set` methods now accept callables as values in the

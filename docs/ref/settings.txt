@@ -1710,6 +1710,10 @@ for project locales. If not ``None``, Django will check for a ``formats.py``
 file, under the directory named as the current locale, and will use the
 formats defined in this file.
 
+The name of the directory containing the format definitions is expected to be
+named using :term:`locale name` notation, for example ``de``, ``pt_BR``,
+``en_US``, etc.
+
 For example, if :setting:`FORMAT_MODULE_PATH` is set to ``mysite.formats``,
 and current language is ``en`` (English), Django will expect a directory tree
 like:
@@ -3345,7 +3349,7 @@ Possible values for the setting are:
     Modern browsers provide a more secure default policy for the ``SameSite``
     flag and will assume ``Lax`` for cookies without an explicit value set.
 
-.. _SameSite: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite
+.. _SameSite: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie#samesitesamesite-value
 
 .. setting:: SESSION_COOKIE_SECURE
 

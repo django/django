@@ -28,9 +28,8 @@ from django.db import (
 )
 from django.db.models import NOT_PROVIDED, ExpressionWrapper, IntegerField, Max, Value
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.constraints import CheckConstraint, UniqueConstraint
 from django.db.models.deletion import CASCADE, Collector
-from django.db.models.expressions import RawSQL
+from django.db.models.expressions import DatabaseDefault
 from django.db.models.fields.related import (
     ForeignObjectRel,
     OneToOneField,
@@ -692,8 +691,8 @@ class Model(AltersData, metaclass=ModelBase):
             self._prefetched_objects_cache = {}
         else:
             prefetched_objects_cache = getattr(self, "_prefetched_objects_cache", ())
-            fields = list(fields)
-            for field in list(fields):
+            fields = set(fields)
+            for field in fields.copy():
                 if field in prefetched_objects_cache:
                     del prefetched_objects_cache[field]
                     fields.remove(field)
@@ -718,11 +717,11 @@ class Model(AltersData, metaclass=ModelBase):
         if fields is not None:
             db_instance_qs = db_instance_qs.only(*fields)
         elif deferred_fields:
-            fields = [
+            fields = {
                 f.attname
                 for f in self._meta.concrete_fields
                 if f.attname not in deferred_fields
-            ]
+            }
             db_instance_qs = db_instance_qs.only(*fields)
 
         db_instance = db_instance_qs.get()
@@ -741,12 +740,16 @@ class Model(AltersData, metaclass=ModelBase):
 
         # Clear cached relations.
         for field in self._meta.related_objects:
-            if field.is_cached(self):
+            if (fields is None or field.name in fields) and field.is_cached(self):
                 field.delete_cached_value(self)
 
         # Clear cached private relations.
         for field in self._meta.private_fields:
-            if field.is_relation and field.is_cached(self):
+            if (
+                (fields is None or field.name in fields)
+                and field.is_relation
+                and field.is_cached(self)
+            ):
                 field.delete_cached_value(self)
 
         self._state.db = db_instance._state.db
@@ -1368,7 +1371,7 @@ class Model(AltersData, metaclass=ModelBase):
         constraints = []
         if include_meta_constraints:
             constraints = [(self.__class__, self._meta.total_unique_constraints)]
-        for parent_class in self._meta.get_parent_list():
+        for parent_class in self._meta.all_parents:
             if parent_class._meta.unique_together:
                 unique_togethers.append(
                     (parent_class, parent_class._meta.unique_together)
@@ -1397,7 +1400,7 @@ class Model(AltersData, metaclass=ModelBase):
         # the list of checks.
 
         fields_with_class = [(self.__class__, self._meta.local_fields)]
-        for parent_class in self._meta.get_parent_list():
+        for parent_class in self._meta.all_parents:
             fields_with_class.append((parent_class, parent_class._meta.local_fields))
 
         for model_class, fields in fields_with_class:
@@ -1546,7 +1549,7 @@ class Model(AltersData, metaclass=ModelBase):
 
     def get_constraints(self):
         constraints = [(self.__class__, self._meta.constraints)]
-        for parent_class in self._meta.get_parent_list():
+        for parent_class in self._meta.all_parents:
             if parent_class._meta.constraints:
                 constraints.append((parent_class, parent_class._meta.constraints))
         return constraints
@@ -1634,6 +1637,9 @@ class Model(AltersData, metaclass=ModelBase):
             # is responsible for making sure they have a valid value.
             raw_value = getattr(self, f.attname)
             if f.blank and raw_value in f.empty_values:
+                continue
+            # Skip validation for empty fields when db_default is used.
+            if isinstance(raw_value, DatabaseDefault):
                 continue
             try:
                 setattr(self, f.attname, f.clean(raw_value, self))
@@ -1855,7 +1861,7 @@ class Model(AltersData, metaclass=ModelBase):
         used_fields = {}  # name or attname -> field
 
         # Check that multi-inheritance doesn't cause field name shadowing.
-        for parent in cls._meta.get_parent_list():
+        for parent in cls._meta.all_parents:
             for f in parent._meta.local_fields:
                 clash = used_fields.get(f.name) or used_fields.get(f.attname) or None
                 if clash:
@@ -1875,7 +1881,7 @@ class Model(AltersData, metaclass=ModelBase):
         # Check that fields defined in the model don't clash with fields from
         # parents, including auto-generated fields like multi-table inheritance
         # child accessors.
-        for parent in cls._meta.get_parent_list():
+        for parent in cls._meta.all_parents:
             for f in parent._meta.get_fields():
                 if f not in used_fields:
                     used_fields[f.name] = f
@@ -1925,7 +1931,7 @@ class Model(AltersData, metaclass=ModelBase):
         errors = []
 
         for f in cls._meta.local_fields:
-            _, column_name = f.get_attname_column()
+            column_name = f.column
 
             # Ensure the column name is not already in use.
             if column_name and column_name in used_column_names:
@@ -1972,7 +1978,7 @@ class Model(AltersData, metaclass=ModelBase):
         errors = []
         property_names = cls._meta._property_names
         related_field_accessors = (
-            f.get_attname()
+            f.attname
             for f in cls._meta._get_fields(reverse=False)
             if f.is_relation and f.related_model is not None
         )
@@ -2320,13 +2326,11 @@ class Model(AltersData, metaclass=ModelBase):
             return errors
 
         for f in cls._meta.local_fields:
-            _, column_name = f.get_attname_column()
-
             # Check if auto-generated name for the field is too long
             # for the database.
             if (
                 f.db_column is None
-                and column_name is not None
+                and (column_name := f.column) is not None
                 and len(column_name) > allowed_len
             ):
                 errors.append(
@@ -2348,10 +2352,9 @@ class Model(AltersData, metaclass=ModelBase):
             # Check if auto-generated name for the M2M field is too long
             # for the database.
             for m2m in f.remote_field.through._meta.local_fields:
-                _, rel_name = m2m.get_attname_column()
                 if (
                     m2m.db_column is None
-                    and rel_name is not None
+                    and (rel_name := m2m.column) is not None
                     and len(rel_name) > allowed_len
                 ):
                     errors.append(
@@ -2393,213 +2396,8 @@ class Model(AltersData, metaclass=ModelBase):
             if not router.allow_migrate_model(db, cls):
                 continue
             connection = connections[db]
-            if not (
-                connection.features.supports_table_check_constraints
-                or "supports_table_check_constraints" in cls._meta.required_db_features
-            ) and any(
-                isinstance(constraint, CheckConstraint)
-                for constraint in cls._meta.constraints
-            ):
-                errors.append(
-                    checks.Warning(
-                        "%s does not support check constraints."
-                        % connection.display_name,
-                        hint=(
-                            "A constraint won't be created. Silence this "
-                            "warning if you don't care about it."
-                        ),
-                        obj=cls,
-                        id="models.W027",
-                    )
-                )
-            if not (
-                connection.features.supports_partial_indexes
-                or "supports_partial_indexes" in cls._meta.required_db_features
-            ) and any(
-                isinstance(constraint, UniqueConstraint)
-                and constraint.condition is not None
-                for constraint in cls._meta.constraints
-            ):
-                errors.append(
-                    checks.Warning(
-                        "%s does not support unique constraints with "
-                        "conditions." % connection.display_name,
-                        hint=(
-                            "A constraint won't be created. Silence this "
-                            "warning if you don't care about it."
-                        ),
-                        obj=cls,
-                        id="models.W036",
-                    )
-                )
-            if not (
-                connection.features.supports_deferrable_unique_constraints
-                or "supports_deferrable_unique_constraints"
-                in cls._meta.required_db_features
-            ) and any(
-                isinstance(constraint, UniqueConstraint)
-                and constraint.deferrable is not None
-                for constraint in cls._meta.constraints
-            ):
-                errors.append(
-                    checks.Warning(
-                        "%s does not support deferrable unique constraints."
-                        % connection.display_name,
-                        hint=(
-                            "A constraint won't be created. Silence this "
-                            "warning if you don't care about it."
-                        ),
-                        obj=cls,
-                        id="models.W038",
-                    )
-                )
-            if not (
-                connection.features.supports_covering_indexes
-                or "supports_covering_indexes" in cls._meta.required_db_features
-            ) and any(
-                isinstance(constraint, UniqueConstraint) and constraint.include
-                for constraint in cls._meta.constraints
-            ):
-                errors.append(
-                    checks.Warning(
-                        "%s does not support unique constraints with non-key "
-                        "columns." % connection.display_name,
-                        hint=(
-                            "A constraint won't be created. Silence this "
-                            "warning if you don't care about it."
-                        ),
-                        obj=cls,
-                        id="models.W039",
-                    )
-                )
-            if not (
-                connection.features.supports_expression_indexes
-                or "supports_expression_indexes" in cls._meta.required_db_features
-            ) and any(
-                isinstance(constraint, UniqueConstraint)
-                and constraint.contains_expressions
-                for constraint in cls._meta.constraints
-            ):
-                errors.append(
-                    checks.Warning(
-                        "%s does not support unique constraints on "
-                        "expressions." % connection.display_name,
-                        hint=(
-                            "A constraint won't be created. Silence this "
-                            "warning if you don't care about it."
-                        ),
-                        obj=cls,
-                        id="models.W044",
-                    )
-                )
-            if not (
-                connection.features.supports_nulls_distinct_unique_constraints
-                or (
-                    "supports_nulls_distinct_unique_constraints"
-                    in cls._meta.required_db_features
-                )
-            ) and any(
-                isinstance(constraint, UniqueConstraint)
-                and constraint.nulls_distinct is not None
-                for constraint in cls._meta.constraints
-            ):
-                errors.append(
-                    checks.Warning(
-                        "%s does not support unique constraints with "
-                        "nulls distinct." % connection.display_name,
-                        hint=(
-                            "A constraint won't be created. Silence this "
-                            "warning if you don't care about it."
-                        ),
-                        obj=cls,
-                        id="models.W047",
-                    )
-                )
-            fields = set(
-                chain.from_iterable(
-                    (*constraint.fields, *constraint.include)
-                    for constraint in cls._meta.constraints
-                    if isinstance(constraint, UniqueConstraint)
-                )
-            )
-            references = set()
             for constraint in cls._meta.constraints:
-                if isinstance(constraint, UniqueConstraint):
-                    if (
-                        connection.features.supports_partial_indexes
-                        or "supports_partial_indexes"
-                        not in cls._meta.required_db_features
-                    ) and isinstance(constraint.condition, Q):
-                        references.update(
-                            cls._get_expr_references(constraint.condition)
-                        )
-                    if (
-                        connection.features.supports_expression_indexes
-                        or "supports_expression_indexes"
-                        not in cls._meta.required_db_features
-                    ) and constraint.contains_expressions:
-                        for expression in constraint.expressions:
-                            references.update(cls._get_expr_references(expression))
-                elif isinstance(constraint, CheckConstraint):
-                    if (
-                        connection.features.supports_table_check_constraints
-                        or "supports_table_check_constraints"
-                        not in cls._meta.required_db_features
-                    ):
-                        if isinstance(constraint.check, Q):
-                            references.update(
-                                cls._get_expr_references(constraint.check)
-                            )
-                        if any(
-                            isinstance(expr, RawSQL)
-                            for expr in constraint.check.flatten()
-                        ):
-                            errors.append(
-                                checks.Warning(
-                                    f"Check constraint {constraint.name!r} contains "
-                                    f"RawSQL() expression and won't be validated "
-                                    f"during the model full_clean().",
-                                    hint=(
-                                        "Silence this warning if you don't care about "
-                                        "it."
-                                    ),
-                                    obj=cls,
-                                    id="models.W045",
-                                ),
-                            )
-            for field_name, *lookups in references:
-                # pk is an alias that won't be found by opts.get_field.
-                if field_name != "pk":
-                    fields.add(field_name)
-                if not lookups:
-                    # If it has no lookups it cannot result in a JOIN.
-                    continue
-                try:
-                    if field_name == "pk":
-                        field = cls._meta.pk
-                    else:
-                        field = cls._meta.get_field(field_name)
-                    if not field.is_relation or field.many_to_many or field.one_to_many:
-                        continue
-                except FieldDoesNotExist:
-                    continue
-                # JOIN must happen at the first lookup.
-                first_lookup = lookups[0]
-                if (
-                    hasattr(field, "get_transform")
-                    and hasattr(field, "get_lookup")
-                    and field.get_transform(first_lookup) is None
-                    and field.get_lookup(first_lookup) is None
-                ):
-                    errors.append(
-                        checks.Error(
-                            "'constraints' refers to the joined field '%s'."
-                            % LOOKUP_SEP.join([field_name] + lookups),
-                            obj=cls,
-                            id="models.E041",
-                        )
-                    )
-            errors.extend(cls._check_local_fields(fields, "constraints"))
+                errors.extend(constraint._check(cls, connection))
         return errors
 
 

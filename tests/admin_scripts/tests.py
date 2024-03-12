@@ -33,6 +33,7 @@ from django.db.migrations.recorder import MigrationRecorder
 from django.test import LiveServerTestCase, SimpleTestCase, TestCase, override_settings
 from django.test.utils import captured_stderr, captured_stdout
 from django.urls import path
+from django.utils.version import PY313
 from django.views.static import serve
 
 from . import urls
@@ -1901,10 +1902,16 @@ class CommandTypes(AdminScriptTestCase):
         ]
         for option in expected_options:
             self.assertOutput(out, f"[{option}]")
-        self.assertOutput(out, "--option_a OPTION_A, -a OPTION_A")
-        self.assertOutput(out, "--option_b OPTION_B, -b OPTION_B")
-        self.assertOutput(out, "--option_c OPTION_C, -c OPTION_C")
-        self.assertOutput(out, "-v {0,1,2,3}, --verbosity {0,1,2,3}")
+        if PY313:
+            self.assertOutput(out, "--option_a, -a OPTION_A")
+            self.assertOutput(out, "--option_b, -b OPTION_B")
+            self.assertOutput(out, "--option_c, -c OPTION_C")
+            self.assertOutput(out, "-v, --verbosity {0,1,2,3}")
+        else:
+            self.assertOutput(out, "--option_a OPTION_A, -a OPTION_A")
+            self.assertOutput(out, "--option_b OPTION_B, -b OPTION_B")
+            self.assertOutput(out, "--option_c OPTION_C, -c OPTION_C")
+            self.assertOutput(out, "-v {0,1,2,3}, --verbosity {0,1,2,3}")
 
     def test_color_style(self):
         style = color.no_style()

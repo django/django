@@ -175,7 +175,7 @@ class BaseExpression:
     _output_field_resolved_to_none = False
     # Can the expression be used in a WHERE clause?
     filterable = True
-    # Can the expression can be used as a source expression in Window?
+    # Can the expression be used as a source expression in Window?
     window_compatible = False
     # Can the expression be used as a database default value?
     allowed_default = False
@@ -1202,10 +1202,9 @@ class RawSQL(Expression):
     ):
         # Resolve parents fields used in raw SQL.
         if query.model:
-            for parent in query.model._meta.get_parent_list():
+            for parent in query.model._meta.all_parents:
                 for parent_field in parent._meta.local_fields:
-                    _, column_name = parent_field.get_attname_column()
-                    if column_name.lower() in self.sql.lower():
+                    if parent_field.column.lower() in self.sql.lower():
                         query.resolve_ref(
                             parent_field.name, allow_joins, reuse, summarize
                         )

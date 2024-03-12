@@ -504,7 +504,7 @@ class InlineAdminForm(AdminForm):
             # in parents.)
             any(
                 parent._meta.auto_field or not parent._meta.model._meta.pk.editable
-                for parent in self.form._meta.model._meta.get_parent_list()
+                for parent in self.form._meta.model._meta.all_parents
             )
         )
 
