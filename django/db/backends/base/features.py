@@ -385,9 +385,24 @@ class BaseDatabaseFeatures:
     # A set of dotted paths to tests in Django's test suite that are expected
     # to fail on this database.
     django_test_expected_failures = set()
+
     # A map of reasons to sets of dotted paths to tests in Django's test suite
     # that should be skipped for this database.
-    django_test_skips = {}
+    @cached_property
+    def django_test_skips(self):
+        skips = {}
+        if self.connection.settings_dict["OPTIONS"].get("pool"):
+            skips.update(
+                {
+                    "Pool does implicit health checks": {
+                        "backends.base.test_base.ConnectionHealthChecksTests."
+                        "test_health_checks_enabled",
+                        "backends.base.test_base.ConnectionHealthChecksTests."
+                        "test_set_autocommit_health_checks_enabled",
+                    },
+                }
+            )
+        return skips
 
     def __init__(self, connection):
         self.connection = connection

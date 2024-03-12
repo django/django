@@ -255,9 +255,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 """Pooling doesn't support persistent connections, unset
                    conn_max_age"""
             )
-        # Pooling feature is only supported for oracledb
-        if not is_oracledb:
-            raise ImproperlyConfigured("Not supported by cx_Oracle install oracledb")
 
         if self.alias not in self._connection_pools:
             connect_kwargs = self.get_connection_params()
@@ -272,10 +269,21 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
         return self._connection_pools[self.alias]
 
+    def close_pool(self):
+        if self.pool:
+            self.pool.close()
+            del self._connection_pools[self.alias]
+
     def get_database_version(self):
         return self.oracle_version
 
     def get_connection_params(self):
+        # Pooling feature is only supported for oracledb
+        if self.is_pool and not is_oracledb:
+            raise ImproperlyConfigured(
+                "Pooling Not supported by cx_Oracle install oracledb"
+            )
+
         conn_params = self.settings_dict["OPTIONS"].copy()
         if "use_returning_into" in conn_params:
             del conn_params["use_returning_into"]
@@ -339,16 +347,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def create_cursor(self, name=None):
         return FormatStylePlaceholderCursor(self.connection, self)
 
-    def _close(self):
-        if self.connection is not None:
-            with self.wrap_database_errors:
-                if self.pool:
-                    # Return connection back to the pool for further use.
-                    self._connection_pools[self.alias].release(self.connection)
-                    self.connection = None
-                else:
-                    return self.connection.close()
-
     def _commit(self):
         if self.connection is not None:
             with debug_transaction(self, "COMMIT"), wrap_oracle_errors():
@@ -379,12 +377,20 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             cursor.execute("SET CONSTRAINTS ALL DEFERRED")
 
     def is_usable(self):
+        if self.connection is None:
+            return False
         try:
             self.connection.ping()
         except Database.Error:
             return False
         else:
             return True
+
+    def close_if_health_check_failed(self):
+        if self.pool:
+            # The pool only returns healthy connections.
+            return
+        return super().close_if_health_check_failed()
 
     @cached_property
     def oracle_version(self):

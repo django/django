@@ -1109,7 +1109,7 @@ Example of a full DSN string::
 
 .. _oracle-pool:
 
-Connection Pool
+Connection pool
 ---------------
 
 .. versionadded:: 5.1

@@ -62,6 +62,10 @@ class BaseDatabaseCreation:
         self._create_test_db(verbosity, autoclobber, keepdb)
 
         self.connection.close()
+
+        if self.connection.is_pool:
+            self.connection.close_pool()
+
         settings.DATABASES[self.connection.alias]["NAME"] = test_database_name
         self.connection.settings_dict["NAME"] = test_database_name
 
