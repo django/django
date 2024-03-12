@@ -179,28 +179,23 @@ class GenerateFilenameStorageTests(SimpleTestCase):
         storage = AWSS3Storage()
         folder = "not/a/folder/"
 
-        f = FileField(upload_to=folder, storage=storage)
+        def upload_to_cb(instance, filename):
+            # Return a non-normalized path on purpose.
+            return folder + filename
+
         key = "my-file-key\\with odd characters"
         data = ContentFile("test")
         expected_key = AWSS3Storage.prefix + folder + key
 
-        # Simulate call to f.save()
-        result_key = f.generate_filename(None, key)
-        self.assertEqual(result_key, expected_key)
-
-        result_key = storage.save(result_key, data)
-        self.assertEqual(result_key, expected_key)
-
-        # Repeat test with a callable.
-        def upload_to(instance, filename):
-            # Return a non-normalized path on purpose.
-            return folder + filename
-
-        f = FileField(upload_to=upload_to, storage=storage)
-
-        # Simulate call to f.save()
-        result_key = f.generate_filename(None, key)
-        self.assertEqual(result_key, expected_key)
-
-        result_key = storage.save(result_key, data)
-        self.assertEqual(result_key, expected_key)
+        cases = [
+            folder,  # Simple string.
+            upload_to_cb,  # Callable.
+        ]
+        for upload_to in cases:
+            with self.subTest(upload_to=upload_to):
+                f = FileField(upload_to=upload_to, storage=storage)
+                # Simulate call to f.save()
+                result_key = f.generate_filename(None, key)
+                self.assertEqual(result_key, expected_key)
+                result_key = storage.save(result_key, data)
+                self.assertEqual(result_key, expected_key)
