@@ -1,5 +1,7 @@
 import os
 
+from file_utils.tests import ValidateFileNameMixin
+
 from django.core.exceptions import SuspiciousFileOperation
 from django.core.files.base import ContentFile
 from django.core.files.storage import FileSystemStorage, Storage
@@ -37,11 +39,22 @@ class AWSS3Storage(Storage):
         return self.prefix + self.get_valid_name(filename)
 
 
-class GenerateFilenameStorageTests(SimpleTestCase):
+class FileSystemStorageGenerateFilenameTests(ValidateFileNameMixin, SimpleTestCase):
+
+    def do_call(self, name):
+        return FileSystemStorage().generate_filename(name)
+
+
+class FileSystemStorageGetAvailableNameTests(SimpleTestCase):
+
     def test_storage_dangerous_paths(self):
         candidates = [
             ("/tmp/..", ".."),
+            ("\\tmp\\..", ".."),
             ("/tmp/.", "."),
+            ("\\tmp\\.", "."),
+            ("..", ".."),
+            (".", "."),
             ("", ""),
         ]
         s = FileSystemStorage()
@@ -50,11 +63,11 @@ class GenerateFilenameStorageTests(SimpleTestCase):
             with self.subTest(file_name=file_name):
                 with self.assertRaisesMessage(SuspiciousFileOperation, msg % base_name):
                     s.get_available_name(file_name)
-                with self.assertRaisesMessage(SuspiciousFileOperation, msg % base_name):
-                    s.generate_filename(file_name)
 
     def test_storage_dangerous_paths_dir_name(self):
         candidates = [
+            ("../path", ".."),
+            ("..\\path", ".."),
             ("tmp/../path", "tmp/.."),
             ("tmp\\..\\path", "tmp/.."),
             ("/tmp/../path", "/tmp/.."),
@@ -66,8 +79,9 @@ class GenerateFilenameStorageTests(SimpleTestCase):
             with self.subTest(file_name=file_name):
                 with self.assertRaisesMessage(SuspiciousFileOperation, msg):
                     s.get_available_name(file_name)
-                with self.assertRaisesMessage(SuspiciousFileOperation, msg):
-                    s.generate_filename(file_name)
+
+
+class FileFieldGenerateFilenameTests(SimpleTestCase):
 
     def test_filefield_dangerous_filename(self):
         candidates = [
