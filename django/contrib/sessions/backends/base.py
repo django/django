@@ -76,8 +76,7 @@ class SessionBase:
         if key in self._session:
             return self._session[key]
         else:
-            self.modified = True
-            self._session[key] = value
+            self[key] = value
             return value
 
     def set_test_cookie(self):
