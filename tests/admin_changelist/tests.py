@@ -1692,6 +1692,20 @@ class ChangeListTests(TestCase):
         cl = m.get_changelist_instance(request)
         self.assertEqual(cl.get_ordering_field_columns(), {2: "asc"})
 
+    def test_search_bar_autofocus_on_popup(self):
+        self.client.force_login(self.superuser)
+        url = reverse("admin:auth_user_changelist")
+        for data, autofocus_expected in (
+            (None, False),
+            ({IS_POPUP_VAR: "1"}, True),
+        ):
+            with self.subTest(data=data):
+                response = self.client.get(url, data=data)
+                if autofocus_expected:
+                    self.assertContains(response, 'id="searchbar" autofocus')
+                else:
+                    self.assertNotContains(response, 'id="searchbar" autofocus')
+
 
 class GetAdminLogTests(TestCase):
     def test_custom_user_pk_not_named_id(self):
