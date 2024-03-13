@@ -1621,11 +1621,12 @@ class SQLCompiler:
         # tuples with integers and strings. Flatten them out into strings.
         format_ = self.query.explain_info.format
         output_formatter = json.dumps if format_ and format_.lower() == "json" else str
-        for row in result[0]:
-            if not isinstance(row, str):
-                yield " ".join(output_formatter(c) for c in row)
-            else:
-                yield row
+        for row in result:
+            for value in row:
+                if not isinstance(value, str):
+                    yield " ".join([output_formatter(c) for c in value])
+                else:
+                    yield value
 
 
 class SQLInsertCompiler(SQLCompiler):
