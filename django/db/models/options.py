@@ -26,6 +26,7 @@ IMMUTABLE_WARNING = (
 DEFAULT_NAMES = (
     "verbose_name",
     "verbose_name_plural",
+    "name_plural",
     "db_table",
     "db_table_comment",
     "ordering",
@@ -108,6 +109,7 @@ class Options:
         self.model_name = None
         self.verbose_name = None
         self.verbose_name_plural = None
+        self.name_plural = None
         self.db_table = ""
         self.db_table_comment = ""
         self.ordering = []
@@ -177,6 +179,7 @@ class Options:
         self.object_name = cls.__name__
         self.model_name = self.object_name.lower()
         self.verbose_name = camel_case_to_spaces(self.object_name)
+        self.name_plural = self.object_name + "s"
 
         # Store the original user-defined values for each option,
         # for use when serializing the model definition

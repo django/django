@@ -1098,11 +1098,14 @@ classes, with exactly the same values for the attributes (including
 To work around this problem, when you are using
 :attr:`~django.db.models.ForeignKey.related_name` or
 :attr:`~django.db.models.ForeignKey.related_query_name` in an abstract base
-class (only), part of the value should contain ``'%(app_label)s'`` and
-``'%(class)s'``.
+class (only), part of the value should contain ``'%(app_label)s'`` and either
+``'%(class)s'`` or ``'%(class_plural)s'``.
 
 - ``'%(class)s'`` is replaced by the lowercased name of the child class that
   the field is used in.
+- ``'%(class_plural)s'`` is by default equivalent to ``'%(class)ss'``,
+  but may be overridden in child models to support irregular plurals with the
+  :attr:`~django.db.models.Options.name_plural` Meta option.
 - ``'%(app_label)s'`` is replaced by the lowercased name of the app the child
   class is contained within. Each installed application name must be unique and
   the model class names within each app must also be unique, therefore the
@@ -1117,7 +1120,7 @@ For example, given an app ``common/models.py``::
         m2m = models.ManyToManyField(
             OtherModel,
             related_name="%(app_label)s_%(class)s_related",
-            related_query_name="%(app_label)s_%(class)ss",
+            related_query_name="%(app_label)s_%(class_plural)s",
         )
 
         class Meta:
@@ -1137,7 +1140,8 @@ Along with another app ``rare/models.py``::
 
 
     class ChildB(Base):
-        pass
+        class Meta:
+            name_plural = "children"
 
 The reverse name of the ``common.ChildA.m2m`` field will be
 ``common_childa_related`` and the reverse query name will be ``common_childas``.
@@ -1145,7 +1149,7 @@ The reverse name of the ``common.ChildB.m2m`` field will be
 ``common_childb_related`` and the reverse query name will be
 ``common_childbs``. Finally, the reverse name of the ``rare.ChildB.m2m`` field
 will be ``rare_childb_related`` and the reverse query name will be
-``rare_childbs``. It's up to you how you use the ``'%(class)s'`` and
+``rare_children``. It's up to you how you use the ``'%(class)s'``/``'%(class_plural)s'`` and
 ``'%(app_label)s'`` portion to construct your related name or related query name
 but if you forget to use it, Django will raise errors when you perform system
 checks (or run :djadmin:`migrate`).

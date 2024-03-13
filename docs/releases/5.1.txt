@@ -266,6 +266,11 @@ Models
 * The new ``"transaction_mode"`` option is now supported in :setting:`OPTIONS`
   on SQLite to allow specifying the :ref:`sqlite-transaction-behavior`.
 
+* The new :attr:`~django.db.models.Options.name_plural` Meta option and its
+  corresponding ``'%(class_plural)s'`` substitution support specifying
+  irregular plural names for the :ref:`related names of
+  abstract base models <abstract-related-name>`.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

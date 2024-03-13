@@ -493,6 +493,19 @@ not be looking at your Django code. For example::
 
     If this isn't given, Django will use :attr:`~Options.verbose_name` + ``"s"``.
 
+``name_plural``
+-----------------------
+
+.. versionadded:: 5.1
+.. attribute:: Options.name_plural
+
+    The plural name used by the ``'%(class_plural)s'`` substitution in the
+    :ref:`related names of abstract base models <abstract-related-name>`::
+
+        name_plural = "stored_batteries"
+
+    If this isn't given, Django will use the lowercased class name + ``"s"``.
+
 Read-only ``Meta`` attributes
 =============================
 

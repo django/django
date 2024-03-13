@@ -106,6 +106,15 @@ class ModelInheritanceTests(TestCase):
         with self.assertRaisesMessage(FieldError, msg):
             Post.objects.filter(attached_comment_set__is_spam=True)
 
+    def test_model_with_overridden_distinct_related_query_name(self):
+        self.assertSequenceEqual(
+            Post.objects.filter(attached_model_inheritance_theses__is_public=True), []
+        )
+
+        msg = "Cannot resolve keyword 'attached_model_inheritance_thesiss' into field."
+        with self.assertRaisesMessage(FieldError, msg):
+            Post.objects.filter(attached_model_inheritance_thesiss__is_public=True)
+
     def test_meta_fields_and_ordering(self):
         # Make sure Restaurant and ItalianRestaurant have the right fields in
         # the right order.

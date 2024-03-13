@@ -56,7 +56,7 @@ class Attachment(models.Model):
         Post,
         models.CASCADE,
         related_name="attached_%(class)s_set",
-        related_query_name="attached_%(app_label)s_%(class)ss",
+        related_query_name="attached_%(app_label)s_%(class_plural)s",
     )
     content = models.TextField()
 
@@ -70,6 +70,13 @@ class Comment(Attachment):
 
 class Link(Attachment):
     url = models.URLField()
+
+
+class Thesis(Attachment):
+    is_public = models.BooleanField(default=False)
+
+    class Meta:
+        name_plural = "theses"
 
 
 #
