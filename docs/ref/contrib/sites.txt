@@ -36,7 +36,19 @@ try to get the current site by comparing the
 :attr:`~django.contrib.sites.models.Site.domain` with the host name from
 the :meth:`request.get_host() <django.http.HttpRequest.get_host>` method.
 
-How you use this is up to you, but Django uses it in a couple of ways
+Historically, the original implementation of "sites" required adding a SITE_ID
+in the settings file. This method implied that you would be running multiple
+application/web servers, each with a potentially different :setting:`SITE_ID`.
+Even today, if you opt to specify the :setting:`SITE_ID` in the settings file,
+it will require multiple app/web servers (to support multiple
+``SITE_IDs``). The newer
+:func:`~django.contrib.sites.shortcuts.get_current_site` function, by comparing
+the domain in every request, enables the ability to serve multiple sites from
+one app instance. To take advantage of this modernized design, it is generally
+recommended to omit :setting:`SITE_ID` from your settings file and use
+``get_current_site(request)``.
+
+How you use "sites" is up to you, but Django uses it in a couple of ways
 automatically via a couple of conventions.
 
 Example usage
@@ -269,7 +281,7 @@ To enable the sites framework, follow these steps:
 
 #. Add ``'django.contrib.sites'`` to your :setting:`INSTALLED_APPS` setting.
 
-#. Define a :setting:`SITE_ID` setting::
+#. (optional) Define a :setting:`SITE_ID` setting::
 
     SITE_ID = 1
 
@@ -506,6 +518,10 @@ Finally, to avoid repetitive fallback code, the framework provides a
     based on the request. It looks up the current site based on
     :meth:`request.get_host() <django.http.HttpRequest.get_host>` if the
     :setting:`SITE_ID` setting is not defined.
+
+    If :setting:`SITE_ID` is defined, it takes precedence. Therefore, to
+    leverage the full capabilities of ``get_current_site(request)`` to
+    process a ``request``, remove :setting:`SITE_ID` from settings.
 
     Both a domain and a port may be returned by :meth:`request.get_host()
     <django.http.HttpRequest.get_host>` when the Host header has a port
