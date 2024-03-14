@@ -1718,11 +1718,11 @@ relation works.
 
 .. attribute:: ForeignKey.on_delete
 
-    When an object referenced by a :class:`ForeignKey` is deleted, Django will
-    emulate the behavior of the SQL constraint specified by the
-    :attr:`on_delete` argument. For example, if you have a nullable
-    :class:`ForeignKey` and you want it to be set null when the referenced
-    object is deleted::
+    When an object referenced by a :class:`ForeignKey` is deleted, the
+    referring objects need updating. The :attr:`on_delete` argument specifies
+    how this is done, and whether Django or your database makes the updates. For
+    example, if you have a nullable :class:`ForeignKey` and you want Django to set
+    it to ``None`` when the referenced object is deleted::
 
         user = models.ForeignKey(
             User,
@@ -1731,11 +1731,16 @@ relation works.
             null=True,
         )
 
-    ``on_delete`` doesn't create an SQL constraint in the database. Support for
-    database-level cascade options :ticket:`may be implemented later <21961>`.
+The possible values for :attr:`~ForeignKey.on_delete` are listed below. Import
+them from :mod:`django.db.models`. The ``DB_*`` variants use the database to
+prevent deletions or update referring objects, whilst the other values make
+Django perform the relevant actions. The database variants are normally more
+efficient because they require less data to be fetched, but they don’t call
+any custom methods or send any signals.
 
-The possible values for :attr:`~ForeignKey.on_delete` are found in
-:mod:`django.db.models`:
+.. versionchanged:: 5.1
+
+    Support for ``DB_*`` variants of on_delete attribute was added
 
 * .. attribute:: CASCADE
 
@@ -1833,6 +1838,45 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
     Take no action. If your database backend enforces referential
     integrity, this will cause an :exc:`~django.db.IntegrityError` unless
     you manually add an SQL ``ON DELETE`` constraint to the database field.
+
+* .. attribute:: DB_CASCADE
+
+    .. versionadded:: 5.1
+
+    Cascade deletes. Database-level version of :attr:`CASCADE`: the database
+    deletes referred-to rows and the one containing the ``ForeignKey``.
+
+* .. attribute:: DB_RESTRICT
+
+    .. versionadded:: 5.1
+
+    Prevent deletion of the referenced object by raising
+    :class:`~django.db.IntegrityError`. Database-level version of
+    :attr:`RESTRICT`.
+
+* .. attribute:: DB_SET_NULL
+
+    .. versionadded:: 5.1
+
+    Set the :class:`ForeignKey` value to ``null``; this is only possible if
+    :attr:`~Field.null` is ``True``. Database-level version of
+    :attr:`SET_NULL`.
+
+* .. attribute:: DB_SET_DEFAULT
+
+    .. versionadded:: 5.1
+
+    Set the :class:`ForeignKey` value to its :attr:`Field.db_default` value, which
+    must be set. If a row in the referenced table is deleted, the foreign key
+    values in the referencing table will be updated to their
+    :attr:`Field.db_default` values.
+
+.. admonition:: ``DB_SET_DEFAULT`` on MySQL and MariaDB
+
+    ``DB_SET_DEFAULT`` is not supported on MySQL and MariaDB, due to lack of
+    support in InnoDB (and NDB). See the foreign key documentation for
+    `MySQL <https://dev.mysql.com/doc/refman/en/create-table-foreign-keys.html>`__
+    and `MariaDB <https://mariadb.com/kb/en/foreign-keys/>`__.
 
 .. attribute:: ForeignKey.limit_choices_to
 
