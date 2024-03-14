@@ -3,7 +3,6 @@ from unittest import mock
 
 from django.core.exceptions import ImproperlyConfigured
 from django.db import DatabaseError, NotSupportedError, ProgrammingError, connection
-from django.db.backends.oracle.oracledb_any import is_oracledb
 from django.db.models import BooleanField
 from django.test import TestCase, TransactionTestCase
 
@@ -12,6 +11,9 @@ from ..models import Square, VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
 
 @unittest.skipUnless(connection.vendor == "oracle", "Oracle tests")
 class Tests(TestCase):
+
+    from django.db.backends.oracle.oracledb_any import is_oracledb
+
     def test_quote_name(self):
         """'%' chars are escaped for query execution."""
         name = '"SOME%NAME"'
