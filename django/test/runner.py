@@ -707,6 +707,11 @@ class DiscoverRunner:
     @classmethod
     def add_arguments(cls, parser):
         parser.add_argument(
+            "--failfast",
+            action="store_true",
+            help="Stops the test suite after the first failure.",
+        )
+        parser.add_argument(
             "-t",
             "--top-level-directory",
             dest="top_level",

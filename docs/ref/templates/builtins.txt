@@ -2141,7 +2141,8 @@ For example:
 
     {{ value|iriencode }}
 
-If ``value`` is ``"?test=1&me=2"``, the output will be ``"?test=1&amp;me=2"``.
+If ``value`` is ``"?test=I ♥ Django"``, the output will be
+``"?test=I%20%E2%99%A5%20Django"``.
 
 .. templatefilter:: join
 
