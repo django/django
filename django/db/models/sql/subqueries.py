@@ -32,13 +32,25 @@ class DeleteQuery(Query):
         """
         # number of objects deleted
         num_deleted = 0
-        field = self.get_meta().pk
+        pk = self.get_meta().pk
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
             self.clear_where()
-            self.add_filter(
-                f"{field.attname}__in",
-                pk_list[offset : offset + GET_ITERATOR_CHUNK_SIZE],
-            )
+            batch = pk_list[offset : offset + GET_ITERATOR_CHUNK_SIZE]
+
+            if isinstance(pk, tuple):
+                from django.db.models import Q
+
+                ors = Q()
+                for pk_tuple in batch:
+                    ands = Q()
+                    for field, value in zip(pk, pk_tuple):
+                        ands &= Q(**{field.attname: value})
+                    ors |= ands
+
+                self.add_q(ors)
+            else:
+                self.add_filter(f"{pk.attname}__in", batch)
+
             num_deleted += self.do_query(
                 self.get_meta().db_table, self.where, using=using
             )

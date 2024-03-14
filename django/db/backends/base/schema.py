@@ -117,8 +117,8 @@ class BaseDatabaseSchemaEditor:
     sql_delete_unique = sql_delete_constraint
 
     sql_create_fk = (
-        "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s FOREIGN KEY (%(column)s) "
-        "REFERENCES %(to_table)s (%(to_column)s)%(deferrable)s"
+        "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s FOREIGN KEY (%(columns)s) "
+        "REFERENCES %(to_table)s (%(to_columns)s)%(deferrable)s"
     )
     sql_create_inline_fk = None
     sql_create_column_inline_fk = None
@@ -230,11 +230,16 @@ class BaseDatabaseSchemaEditor:
             params.extend(extra_params)
             # FK.
             if field.remote_field and field.db_constraint:
-                to_table = field.remote_field.model._meta.db_table
-                to_column = field.remote_field.model._meta.get_field(
-                    field.remote_field.field_name
-                ).column
-                if self.sql_create_inline_fk:
+                to_meta = field.remote_field.model._meta
+                to_table = to_meta.db_table
+                field_name = field.remote_field.field_name
+                to_column = (
+                    None
+                    if isinstance(field_name, tuple)
+                    else to_meta.get_field(field_name).column
+                )
+
+                if to_column and self.sql_create_inline_fk:
                     definition += " " + self.sql_create_inline_fk % {
                         "to_table": self.quote_name(to_table),
                         "to_column": self.quote_name(to_column),
@@ -242,7 +247,7 @@ class BaseDatabaseSchemaEditor:
                 elif self.connection.features.supports_foreign_keys:
                     self.deferred_sql.append(
                         self._create_fk_sql(
-                            model, field, "_fk_%(to_table)s_%(to_column)s"
+                            model, field, "_fk_%(to_table)s_%(to_columns)s"
                         )
                     )
             # Add the SQL to our big list.
@@ -718,7 +723,7 @@ class BaseDatabaseSchemaEditor:
             and self.connection.features.supports_foreign_keys
             and field.db_constraint
         ):
-            constraint_suffix = "_fk_%(to_table)s_%(to_column)s"
+            constraint_suffix = "_fk_%(to_table)s_%(to_columns)s"
             # Add FK constraint inline, if supported.
             if self.sql_create_column_inline_fk:
                 to_table = field.remote_field.model._meta.db_table
@@ -1239,7 +1244,7 @@ class BaseDatabaseSchemaEditor:
             and new_field.db_constraint
         ):
             self.execute(
-                self._create_fk_sql(model, new_field, "_fk_%(to_table)s_%(to_column)s")
+                self._create_fk_sql(model, new_field, "_fk_%(to_table)s_%(to_columns)s")
             )
         # Rebuild FKs that pointed to us if we previously had to drop them
         if drop_foreign_keys:
@@ -1676,11 +1681,15 @@ class BaseDatabaseSchemaEditor:
     def _create_fk_sql(self, model, field, suffix):
         table = Table(model._meta.db_table, self.quote_name)
         name = self._fk_constraint_name(model, field, suffix)
-        column = Columns(model._meta.db_table, [field.column], self.quote_name)
+        columns = Columns(
+            model._meta.db_table,
+            [f.column for f in field.local_related_fields],
+            self.quote_name,
+        )
         to_table = Table(field.target_field.model._meta.db_table, self.quote_name)
-        to_column = Columns(
+        to_columns = Columns(
             field.target_field.model._meta.db_table,
-            [field.target_field.column],
+            [f.column for f in field.foreign_related_fields],
             self.quote_name,
         )
         deferrable = self.connection.ops.deferrable_sql()
@@ -1688,9 +1697,9 @@ class BaseDatabaseSchemaEditor:
             self.sql_create_fk,
             table=table,
             name=name,
-            column=column,
+            columns=columns,
             to_table=to_table,
-            to_column=to_column,
+            to_columns=to_columns,
             deferrable=deferrable,
         )
 
@@ -1700,9 +1709,9 @@ class BaseDatabaseSchemaEditor:
 
         return ForeignKeyName(
             model._meta.db_table,
-            [field.column],
+            [f.column for f in field.local_related_fields],
             split_identifier(field.target_field.model._meta.db_table)[1],
-            [field.target_field.column],
+            [f.column for f in field.foreign_related_fields],
             suffix,
             create_fk_name,
         )

@@ -1365,6 +1365,7 @@ class PrimaryKeyConstraintTests(TestCase):
 
     def test_database_constraint(self):
         ModelPKConstraint.objects.create(id_1=3, id_2=4)
+        ModelPKConstraint.objects.create(pk=(5, 6))
         with self.assertRaises(IntegrityError):
             ModelPKConstraint.objects.create(id_1=1, id_2=2)
 
@@ -1373,6 +1374,13 @@ class PrimaryKeyConstraintTests(TestCase):
         msg = "Constraint “model_pk_constraint_pk” is violated."
         with self.assertRaisesMessage(ValidationError, msg):
             ModelPKConstraint(id_1=1, id_2=2).validate_constraints()
+
+    def test_model_get(self):
+        obj = ModelPKConstraint.objects.get(id_1=1, id_2=2)
+        self.assertEqual(obj, self.obj)
+
+        obj = ModelPKConstraint.objects.get(pk=(1, 2))
+        self.assertEqual(obj, self.obj)
 
     def test_primary_key_columns(self):
         constraints = get_constraints(ModelPKConstraint._meta.db_table)

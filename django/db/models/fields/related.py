@@ -632,6 +632,10 @@ class ForeignObject(RelatedField):
         foreign_fields = {f.name for f in self.foreign_related_fields}
         has_unique_constraint = any(u <= foreign_fields for u in unique_foreign_fields)
 
+        pk = self.remote_field.model._meta.pk
+        if isinstance(pk, tuple) and foreign_fields == set(f.name for f in pk):
+            return []
+
         if not has_unique_constraint and len(self.foreign_related_fields) > 1:
             field_combination = ", ".join(
                 "'%s'" % rel_field.name for rel_field in self.foreign_related_fields
@@ -946,6 +950,7 @@ class ForeignKey(ForeignObject):
         parent_link=False,
         to_field=None,
         db_constraint=True,
+        from_fields=None,
         **kwargs,
     ):
         try:
@@ -965,7 +970,14 @@ class ForeignKey(ForeignObject):
             # For backwards compatibility purposes, we need to *try* and set
             # the to_field during FK construction. It won't be guaranteed to
             # be correct until contribute_to_class is called. Refs #12190.
-            to_field = to_field or (to._meta.pk and to._meta.pk.name)
+            if not to_field and (pk := to._meta.pk):
+                # If the target model defines a PrimaryKeyConstraint, meta.pk is a
+                # tuple.
+                if isinstance(pk, tuple):
+                    to_field = tuple(f.attname for f in pk)
+                else:
+                    to_field = pk.name
+
         if not callable(on_delete):
             raise TypeError("on_delete must be callable.")
 
@@ -980,6 +992,8 @@ class ForeignKey(ForeignObject):
             on_delete=on_delete,
         )
         kwargs.setdefault("db_index", True)
+        from_fields = from_fields or [RECURSIVE_RELATIONSHIP_CONSTANT]
+        to_fields = to_field if isinstance(to_field, tuple) else [to_field]
 
         super().__init__(
             to,
@@ -987,8 +1001,8 @@ class ForeignKey(ForeignObject):
             related_name=related_name,
             related_query_name=related_query_name,
             limit_choices_to=limit_choices_to,
-            from_fields=[RECURSIVE_RELATIONSHIP_CONSTANT],
-            to_fields=[to_field],
+            from_fields=from_fields,
+            to_fields=to_fields,
             **kwargs,
         )
         self.db_constraint = db_constraint

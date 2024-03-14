@@ -671,7 +671,13 @@ class Model(AltersData, metaclass=ModelBase):
         for parent_link in self._meta.parents.values():
             if parent_link and parent_link != self._meta.pk:
                 setattr(self, parent_link.target_field.attname, value)
-        return setattr(self, self._meta.pk.attname, value)
+
+        # If the model defines a PrimaryKeyConstraint, meta.pk is a tuple.
+        if isinstance(self._meta.pk, tuple):
+            for pk, val in zip(self._meta.pk, tuple(value)):
+                setattr(self, pk.attname, val)
+        else:
+            setattr(self, self._meta.pk.attname, value)
 
     pk = property(_get_pk_val, _set_pk_val)
 

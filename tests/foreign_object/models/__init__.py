@@ -2,6 +2,7 @@ from .article import Article, ArticleIdea, ArticleTag, ArticleTranslation, NewsA
 from .customers import Address, Contact, Customer
 from .empty_join import SlugPage
 from .person import Country, Friendship, Group, Membership, Person
+from .tenant import Tenant, TenantUser, TenantUserComment
 
 __all__ = [
     "Address",
@@ -18,4 +19,7 @@ __all__ = [
     "NewsArticle",
     "Person",
     "SlugPage",
+    "Tenant",
+    "TenantUser",
+    "TenantUserComment",
 ]
