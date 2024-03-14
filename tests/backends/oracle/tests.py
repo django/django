@@ -11,9 +11,6 @@ from ..models import Square, VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
 
 @unittest.skipUnless(connection.vendor == "oracle", "Oracle tests")
 class Tests(TestCase):
-
-    from django.db.backends.oracle.oracledb_any import is_oracledb
-
     def test_quote_name(self):
         """'%' chars are escaped for query execution."""
         name = '"SOME%NAME"'
@@ -129,13 +126,6 @@ class Tests(TestCase):
                 conn_max_age"""
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             new_connection.pool
-
-    @unittest.skipIf(is_oracledb, "pool with cx_Oracle test")
-    def test_connect_pool_setting_ignored_for_cx_Oracle(self):
-        new_connection = connection.copy()
-        msg = "Pooling Not supported by cx_Oracle install oracledb"
-        with self.assertRaisesMessage(ImproperlyConfigured, msg):
-            new_connection.connect()
 
 
 @unittest.skipUnless(connection.vendor == "oracle", "Oracle tests")
