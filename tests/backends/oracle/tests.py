@@ -78,14 +78,11 @@ class Tests(TestCase):
 
     @unittest.skipUnless(connection.is_pool, "Pool specific tests")
     def test_connect_pool(self):
-        from django.db.backends.oracle.base import Database
 
         new_connection = connection.copy()
         new_connection.settings_dict["OPTIONS"]["pool"] = {
             "min": 0,
             "max": 2,
-            "wait_timeout": 5000,
-            "getmode": Database.POOL_GETMODE_TIMEDWAIT,
         }
         self.assertIsNotNone(new_connection.pool)
 
