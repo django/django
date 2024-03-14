@@ -125,7 +125,7 @@ msgid "Description"
 msgstr "描述"
 
 msgid "Methods with arguments"
-msgstr "方法和参数"
+msgstr "带参数方法"
 
 msgid "Method"
 msgstr "方法"
