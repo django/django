@@ -36,7 +36,19 @@ try to get the current site by comparing the
 :attr:`~django.contrib.sites.models.Site.domain` with the host name from
 the :meth:`request.get_host() <django.http.HttpRequest.get_host>` method.
 
-How you use this is up to you, but Django uses it in a couple of ways
+Historically, the original implementation of "sites" required adding a SITE_ID
+in the settings file. This method implied that you would be running multiple
+application/web instances, each with a potentially different :setting:`SITE_ID`.
+Even today, if you opt to specify the :setting:`SITE_ID` in the settings file,
+it will require multiple app/web deployments (to support multiple
+``SITE_IDs``). The newer
+:func:`~django.contrib.sites.shortcuts.get_current_site` function, by comparing
+the domain in every request, enables the ability to serve multiple sites from
+one app instance. To take advantage of this modernized design, omit
+:setting:`SITE_ID` from your settings file and use
+``get_current_site(request)``.
+
+How you use "sites" is up to you, but Django uses it in a couple of ways
 automatically via a couple of conventions.
 
 Example usage
@@ -269,11 +281,14 @@ To enable the sites framework, follow these steps:
 
 #. Add ``'django.contrib.sites'`` to your :setting:`INSTALLED_APPS` setting.
 
-#. Define a :setting:`SITE_ID` setting::
+#. Define a :setting:`SITE_ID` setting.\*::
 
     SITE_ID = 1
 
 #. Run :djadmin:`migrate`.
+
+\*Although not in every case. See "Installation Scenarios" in the next
+section.
 
 ``django.contrib.sites`` registers a
 :data:`~django.db.models.signals.post_migrate` signal handler which creates a
@@ -282,10 +297,37 @@ will also be created after Django creates the test database. To set the
 correct name and domain for your project, you can use a :ref:`data migration
 <data-migrations>`.
 
-In order to serve different sites in production, you'd create a separate
-settings file with each ``SITE_ID`` (perhaps importing from a common settings
-file to avoid duplicating shared settings) and then specify the appropriate
-:envvar:`DJANGO_SETTINGS_MODULE` for each site.
+In order to serve different sites in production, one option is to create a
+separate settings file with each ``SITE_ID`` (perhaps importing from a common
+settings file to avoid duplicating shared settings) and then specify the
+appropriate :envvar:`DJANGO_SETTINGS_MODULE` for each site.
+
+Installation Scenarios
+============================
+
+Scenario 1. As discussed below in "How Django uses the sites framework",
+enabling the framework is strongly encouraged because Django takes advantage
+of it in a few places. Frequently a Django installation is powering only a
+single site. For those cases, define a :setting:`SITE_ID` setting::
+
+    SITE_ID = 1
+
+Scenario 2. When planning to leverage the sites framework the way it is
+intended (with multiple domains) you may still set the :setting:`SITE_ID`
+as before, but since there can only be one :setting:`SITE_ID` in the
+settings file it requires launching multiple instances of your app, which
+increases the complexity of deployments. To be able to host multiple domains
+simultaneously without multiple deployments, it is advantageous to omit the
+:setting:`SITE_ID` setting, and use ``get_current_site(request)``. The
+absence of a :setting:`SITE_ID` variable may create difficulties in local
+development environments, and CI tests, both of which depend on "sites" being
+functional. Consider defining settings this way::
+
+    if CI or LOCAL_DEVELOPMENT:
+        SITE_ID = 1
+
+(Be sure to assign a value to either CI or LOCAL_DEVELOPMENT, in those
+environments.)
 
 Caching the current ``Site`` object
 ===================================
@@ -506,6 +548,10 @@ Finally, to avoid repetitive fallback code, the framework provides a
     based on the request. It looks up the current site based on
     :meth:`request.get_host() <django.http.HttpRequest.get_host>` if the
     :setting:`SITE_ID` setting is not defined.
+
+    If :setting:`SITE_ID` is defined, it takes precedence. Therefore, to
+    utilize the full capabilities of ``get_current_site(request)`` to
+    process a ``request``, remove :setting:`SITE_ID` from settings.
 
     Both a domain and a port may be returned by :meth:`request.get_host()
     <django.http.HttpRequest.get_host>` when the Host header has a port
