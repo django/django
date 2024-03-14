@@ -117,6 +117,17 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         "Oracle doesn't support casting filters to NUMBER.": {
             "lookup.tests.LookupQueryingTests.test_aggregate_combined_lookup",
         },
+        "Pooling does not supports persistent connection": {
+            "backends.base.test_base.ConnectionHealthChecksTests."
+            "test_health_checks_enabled",
+            "backends.base.test_base.ConnectionHealthChecksTests."
+            "test_health_checks_enabled_errors_occurred",
+            "backends.base.test_base.ConnectionHealthChecksTests."
+            "test_health_checks_disabled",
+            "backends.base.test_base.ConnectionHealthChecksTests."
+            "test_set_autocommit_health_checks_enabled",
+            "servers.tests.LiveServerTestCloseConnectionTest.test_closes_connections",
+        },
     }
     django_test_expected_failures = {
         # A bug in Django/oracledb with respect to string handling (#23843).

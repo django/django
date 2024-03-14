@@ -253,7 +253,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         if self.settings_dict.get("CONN_MAX_AGE", 0) != 0:
             raise ImproperlyConfigured(
                 """Pooling doesn't support persistent connections, unset
-                   conn_max_age"""
+                conn_max_age"""
             )
 
         if self.alias not in self._connection_pools:
