@@ -78,7 +78,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_slicing_ordering_in_compound = True
     requires_compound_order_by_subquery = True
     allows_multiple_constraints_on_same_fields = False
-    supports_comparing_boolean_expr = False
     supports_json_field_contains = False
     supports_collation_on_textfield = False
     test_now_utc_template = "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'"
@@ -172,6 +171,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     @cached_property
     def supports_boolean_expr_in_select_clause(self):
+        return self.connection.oracle_version >= (23,)
+
+    @cached_property
+    def supports_comparing_boolean_expr(self):
         return self.connection.oracle_version >= (23,)
 
     @cached_property
