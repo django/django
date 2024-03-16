@@ -13,3 +13,7 @@ Bugfixes
   fields with expressions in ``db_default``. As a consequence,
   ``Model.full_clean()`` no longer validates for empty values in fields with
   ``db_default`` (:ticket:`35223`).
+
+* Fixed a regression in Django 5.0 where the ``AdminFileWidget`` could be
+  rendered with two ``id`` attributes on the "Clear" checkbox
+  (:ticket:`35273`).
