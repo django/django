@@ -719,8 +719,14 @@ class ModelState:
     """
 
     def __init__(
-        self, app_label, name, fields, options=None, bases=None, managers=None,
-        metaclass=None
+        self,
+        app_label,
+        name,
+        fields,
+        options=None,
+        bases=None,
+        managers=None,
+        metaclass=None,
     ):
         self.app_label = app_label
         self.name = name
@@ -932,7 +938,7 @@ class ModelState:
             options=dict(self.options),
             bases=self.bases,
             managers=list(self.managers),
-            metaclass=self.metaclass
+            metaclass=self.metaclass,
         )
 
     def render(self, apps):

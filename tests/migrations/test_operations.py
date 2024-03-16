@@ -3594,41 +3594,77 @@ class OperationTests(OperationTestBase):
         """
 
         project_state = self.set_up_test_model("test_almotb", mti_model=True)
-        operation = migrations.AlterModelBases("shetlandpony", bases=(models.Model,Mixin,))
-        self.assertEqual(operation.describe(), "Update shetlandpony bases to {}".format((models.Model,Mixin,)))
+        operation = migrations.AlterModelBases(
+            "shetlandpony",
+            bases=(
+                models.Model,
+                Mixin,
+            ),
+        )
+        self.assertEqual(
+            operation.describe(),
+            "Update shetlandpony bases to {}".format(
+                (
+                    models.Model,
+                    Mixin,
+                )
+            ),
+        )
 
         # Test the state alteration
         new_state = project_state.clone()
         operation.state_forwards("test_almotb", new_state)
-        self.assertEqual(new_state.models["test_almotb", "shetlandpony"].bases, (models.Model,Mixin,))
+        self.assertEqual(
+            new_state.models["test_almotb", "shetlandpony"].bases,
+            (
+                models.Model,
+                Mixin,
+            ),
+        )
 
         # And deconstruction
         definition = operation.deconstruct()
         self.assertEqual(definition[0], "AlterModelBases")
-        self.assertEqual(definition[1], ('shetlandpony',))
-        self.assertEqual(definition[2], {'bases': (models.Model,Mixin, )})
+        self.assertEqual(definition[1], ("shetlandpony",))
+        self.assertEqual(
+            definition[2],
+            {
+                "bases": (
+                    models.Model,
+                    Mixin,
+                )
+            },
+        )
 
     def test_alter_model_metaclass(self):
         """
         Tests the AlterModelMetaclass operation.
         """
+
         class CustomModelBase(models.base.ModelBase):
             pass
 
         project_state = self.set_up_test_model("test_almotb", mti_model=True)
-        operation = migrations.AlterModelMetaclass("shetlandpony", metaclass=CustomModelBase)
-        self.assertEqual(operation.describe(), "Update shetlandpony metaclass to {}".format(CustomModelBase))
+        operation = migrations.AlterModelMetaclass(
+            "shetlandpony", metaclass=CustomModelBase
+        )
+        self.assertEqual(
+            operation.describe(),
+            "Update shetlandpony metaclass to {}".format(CustomModelBase),
+        )
 
         # Test the state alteration
         new_state = project_state.clone()
         operation.state_forwards("test_almotb", new_state)
-        self.assertEqual(new_state.models["test_almotb", "shetlandpony"].metaclass, CustomModelBase)
+        self.assertEqual(
+            new_state.models["test_almotb", "shetlandpony"].metaclass, CustomModelBase
+        )
 
         # And deconstruction
         definition = operation.deconstruct()
         self.assertEqual(definition[0], "AlterModelMetaclass")
-        self.assertEqual(definition[1], ('shetlandpony',))
-        self.assertEqual(definition[2], {'metaclass': CustomModelBase})
+        self.assertEqual(definition[1], ("shetlandpony",))
+        self.assertEqual(definition[2], {"metaclass": CustomModelBase})
 
     def test_rename_index(self):
         app_label = "test_rnin"

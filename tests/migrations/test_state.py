@@ -490,7 +490,6 @@ class StateTests(SimpleTestCase):
         self.assertEqual(ModelState.from_model(Author).bases, (Alpha, models.Model))
         self.assertEqual(ModelState.from_model(Author).metaclass, AuthorBase)
 
-
     def test_render_model_with_multiple_inheritance(self):
         class Foo(models.Model):
             class Meta:

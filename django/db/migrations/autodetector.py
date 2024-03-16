@@ -1718,12 +1718,16 @@ class MigrationAutodetector:
             from_model = self.from_state.models.get((app_label, model_name))
             if not from_model:
                 continue
-            from_metaclass_name = from_model.metaclass if (
-                isinstance(from_model.metaclass, str)) else (
-                from_model.metaclass.__name__)
-            to_metaclass_name = to_model.metaclass if (
-                isinstance(to_model.metaclass, str)) else (
-                to_model.metaclass.__name__)
+            from_metaclass_name = (
+                from_model.metaclass
+                if (isinstance(from_model.metaclass, str))
+                else (from_model.metaclass.__name__)
+            )
+            to_metaclass_name = (
+                to_model.metaclass
+                if (isinstance(to_model.metaclass, str))
+                else (to_model.metaclass.__name__)
+            )
             if from_metaclass_name == to_metaclass_name:
                 continue
             self.add_operation(
@@ -1731,7 +1735,7 @@ class MigrationAutodetector:
                 operations.AlterModelMetaclass(
                     name=to_model.name,
                     metaclass=to_model.metaclass,
-                )
+                ),
             )
 
     def generate_altered_bases(self):
@@ -1743,14 +1747,12 @@ class MigrationAutodetector:
                 continue
             self.add_operation(
                 app_label,
-                operations.AlterModelBases(
-                    name=to_model.name,
-                    bases=to_model.bases
-                )
+                operations.AlterModelBases(name=to_model.name, bases=to_model.bases),
             )
             if changed_to_bases[0] is models.Model:
-                pk_field_name = [key for key, value in from_model.fields.items() if
-                                 value.primary_key][0]
+                pk_field_name = [
+                    key for key, value in from_model.fields.items() if value.primary_key
+                ][0]
                 self.add_operation(
                     app_label,
                     operations.AlterField(
@@ -1760,16 +1762,15 @@ class MigrationAutodetector:
                             auto_created=True,
                             primary_key=True,
                             serialize=False,
-                            verbose_name='ID',
+                            verbose_name="ID",
                         ),
                     ),
                 )
-                self.add_operation(app_label, operations.RenameField(
-                    to_model.name,
-                    pk_field_name,
-                    'id'
-                ))
-                self.new_field_keys.remove((app_label, model_name, 'id'))
+                self.add_operation(
+                    app_label,
+                    operations.RenameField(to_model.name, pk_field_name, "id"),
+                )
+                self.new_field_keys.remove((app_label, model_name, "id"))
                 self.old_field_keys.remove((app_label, model_name, pk_field_name))
 
     def generate_altered_options(self):
