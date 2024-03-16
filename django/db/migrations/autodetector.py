@@ -169,7 +169,6 @@ class MigrationAutodetector:
             self.old_bases.add((app_label, model_name, model_state.bases))
             self.old_metaclass.add((app_label, model_name, model_state.metaclass))
 
-
         for (app_label, model_name), model_state in self.to_state.models.items():
             if not model_state.options.get("managed", True):
                 self.new_unmanaged_keys.add((app_label, model_name))
@@ -1720,9 +1719,11 @@ class MigrationAutodetector:
             if not from_model:
                 continue
             from_metaclass_name = from_model.metaclass if (
-                isinstance(from_model.metaclass, str)) else from_model.metaclass.__name__
+                isinstance(from_model.metaclass, str)) else (
+                from_model.metaclass.__name__)
             to_metaclass_name = to_model.metaclass if (
-                isinstance(to_model.metaclass, str)) else to_model.metaclass.__name__
+                isinstance(to_model.metaclass, str)) else (
+                to_model.metaclass.__name__)
             if from_metaclass_name == to_metaclass_name:
                 continue
             self.add_operation(
@@ -1748,7 +1749,8 @@ class MigrationAutodetector:
                 )
             )
             if changed_to_bases[0] is models.Model:
-                pk_field_name = [key for key, value in from_model.fields.items() if value.primary_key][0]
+                pk_field_name = [key for key, value in from_model.fields.items() if
+                                 value.primary_key][0]
                 self.add_operation(
                     app_label,
                     operations.AlterField(
@@ -1769,7 +1771,6 @@ class MigrationAutodetector:
                 ))
                 self.new_field_keys.remove((app_label, model_name, 'id'))
                 self.old_field_keys.remove((app_label, model_name, pk_field_name))
-
 
     def generate_altered_options(self):
         """

@@ -17,6 +17,7 @@ def _check_for_duplicates(arg_name, objs):
             )
         used_vals.add(val)
 
+
 def _check_bases_for_duplicates(bases):
     _check_for_duplicates(
         "bases",
@@ -57,7 +58,8 @@ class CreateModel(ModelOperation):
     category = OperationCategory.ADDITION
     serialization_expand_args = ["fields", "options", "managers"]
 
-    def __init__(self, name, fields, options=None, bases=None, managers=None, metaclass=None):
+    def __init__(self, name, fields, options=None, bases=None, managers=None,
+                 metaclass=None):
         self.fields = fields
         self.options = options or {}
         self.bases = bases or (models.Model,)

@@ -4370,13 +4370,15 @@ class AutodetectorTests(BaseAutodetectorTests):
     def test_remove_bases(self):
         A = ModelState("app", "A", [("a_id", models.AutoField(primary_key=True))])
         B = ModelState(
-            "app", "B", [("a_ptr_id", models.OneToOneField("app.A", models.CASCADE, primary_key=True))],
+            "app", "B", [("a_ptr_id", models.OneToOneField
+            ("app.A", models.CASCADE, primary_key=True))],
             bases=("app.A",)
         )
         ChangedB = ModelState("app", "B", [("id", models.AutoField(primary_key=True))])
         changes = self.get_changes([A, B], [A, ChangedB])
         self.assertNumberMigrations(changes, 'app', 1)
-        self.assertOperationTypes(changes, 'app', 0, ["AlterModelBases", "RenameField", "AlterField"])
+        self.assertOperationTypes(changes, 'app', 0,
+                                  ["AlterModelBases", "RenameField", "AlterField"])
         self.assertOperationAttributes(changes, 'app', 0, 0, name="B")
         self.assertOperationAttributes(changes, 'app', 0, 0, bases=(models.Model, ))
 
@@ -4410,7 +4412,8 @@ class AutodetectorTests(BaseAutodetectorTests):
         class AuthorBetaBase(BetaBase, type(models.Model)):
             pass
 
-        Author = ModelState("app", "author", [], bases=(Alpha, models.Model), metaclass=AuthorAlphaBase)
+        Author = ModelState("app", "author", [],
+                            bases=(Alpha, models.Model), metaclass=AuthorAlphaBase)
         AuthorChanged = ModelState("app", "author", [], bases=(Beta, models.Model), metaclass=AuthorBetaBase)
         changes = self.get_changes([Author], [AuthorChanged])
         self.assertNumberMigrations(changes, 'app', 1)
