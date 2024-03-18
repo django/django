@@ -307,6 +307,9 @@ Templates
   example, to generate a link to the next page while keeping any filtering
   options in place.
 
+* :ref:`Template engines <field-checking>` now implement a ``check()`` method
+  that is already registered with the check framework.
+
 Tests
 ~~~~~
 
