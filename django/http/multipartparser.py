@@ -163,7 +163,7 @@ class MultiPartParser:
 
         # Create the data structures to be used later.
         self._post = QueryDict(mutable=True)
-        self._files = MultiValueDict(mutable=True)
+        self._files = MultiValueDict()
 
         # Instantiate the parser and stream:
         stream = LazyStream(ChunkIter(self._input_data, self._chunk_size))

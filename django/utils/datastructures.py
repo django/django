@@ -69,9 +69,11 @@ class MultiValueDict(dict):
     single name-value pairs.
     """
 
+    _mutable = True
+
     def __init__(self, key_to_list_mapping=(), mutable=True):
-        self._mutable = mutable
         super().__init__(key_to_list_mapping)
+        self._mutable = mutable
 
     def __repr__(self):
         return "<%s: %s>" % (self.__class__.__name__, super().__repr__())
@@ -117,7 +119,7 @@ class MultiValueDict(dict):
         self.__dict__.update(obj_dict)
 
     def _assert_mutable(self):
-        if hasattr(self, '_mutable') and not self._mutable:
+        if not self._mutable:
             raise AttributeError("This MultiValueDict instance is immutable")
 
     def get(self, key, default=None):
