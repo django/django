@@ -1053,21 +1053,28 @@ class RequestsTests(SimpleTestCase):
         """
         MultiPartParser.parse() leaves request.FILES immutable.
         """
-        payload = FakePayload("\r\n".join([
-            '--boundary',
-            'Content-Disposition: form-data; name="upload_file"; filename="asd.txt"',
-            'Content-Type: text/plain',
-            '',
-            'asd',
-            '--boundary--',
-        ]))
-        request = WSGIRequest({
-            'REQUEST_METHOD': 'POST',
-            'CONTENT_TYPE': 'multipart/form-data; boundary=boundary',
-            'CONTENT_LENGTH': len(payload),
-            'wsgi.input': payload,
-        })
-        self.assertTrue('upload_file' in request.FILES)
+        content_disposition = 'form-data; name="upload_file"; filename="asd.txt"'
+        payload = FakePayload(
+            "\r\n".join(
+                [
+                    "--boundary",
+                    f"Content-Disposition: {content_disposition}",
+                    "Content-Type: text/plain",
+                    "",
+                    "asd",
+                    "--boundary--",
+                ]
+            )
+        )
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "CONTENT_TYPE": "multipart/form-data; boundary=boundary",
+                "CONTENT_LENGTH": len(payload),
+                "wsgi.input": payload,
+            }
+        )
+        self.assertTrue("upload_file" in request.FILES)
         self.assertFalse(request.FILES._mutable)
 
     def test_FILES_connection_error(self):
