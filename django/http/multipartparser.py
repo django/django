@@ -18,7 +18,7 @@ from django.core.exceptions import (
     TooManyFilesSent,
 )
 from django.core.files.uploadhandler import SkipFile, StopFutureHandlers, StopUpload
-from django.utils.datastructures import ImmutableMultiValueDict, MultiValueDict
+from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_str
 from django.utils.http import parse_header_parameters
 from django.utils.regex_helper import _lazy_re_compile
@@ -50,7 +50,7 @@ class MultiPartParser:
     An RFC 7578 multipart/form-data parser.
 
     ``MultiPartParser.parse()`` reads the input stream in ``chunk_size`` chunks
-    and returns a tuple of ``(QueryDict(POST), ImmutableMultiValueDict(FILES))``.
+    and returns a tuple of ``(QueryDict(POST), MultiValueDict(FILES))``.
     """
 
     boundary_re = _lazy_re_compile(r"[ -~]{0,200}[!-~]")
@@ -132,7 +132,7 @@ class MultiPartParser:
 
     def _parse(self):
         """
-        Parse the POST data and break it into a FILES ImmutableMultiValueDict
+        Parse the POST data and break it into a FILES MultiValueDict
         and a POST QueryDict.
 
         Return a tuple containing the POST and FILES dictionary, respectively.
@@ -145,7 +145,7 @@ class MultiPartParser:
         # HTTP spec says that Content-Length >= 0 is valid
         # handling content-length == 0 before continuing
         if self._content_length == 0:
-            return QueryDict(encoding=self._encoding), ImmutableMultiValueDict()
+            return QueryDict(encoding=self._encoding), MultiValueDict(mutable=False)
 
         # See if any of the handlers take care of the parsing.
         # This allows overriding everything if need be.
@@ -163,7 +163,7 @@ class MultiPartParser:
 
         # Create the data structures to be used later.
         self._post = QueryDict(mutable=True)
-        self._files = ImmutableMultiValueDict(mutable=True)
+        self._files = MultiValueDict(mutable=True)
 
         # Instantiate the parser and stream:
         stream = LazyStream(ChunkIter(self._input_data, self._chunk_size))
