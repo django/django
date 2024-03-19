@@ -71,18 +71,13 @@ class Tests(TestCase):
         self.assertTrue(mocked_get_database_version.called)
 
     @unittest.skipUnless(connection.is_pool, "Pool specific tests")
-    def test_connect_pool_set_to_true(self):
+    def test_pool_set_to_true(self):
         test_pool = connection.settings_dict["OPTIONS"]["pool"]
         self.assertTrue(test_pool)
 
     @unittest.skipUnless(connection.is_pool, "Pool specific tests")
     def test_connect_pool(self):
-
         new_connection = connection.copy()
-        new_connection.settings_dict["OPTIONS"]["pool"] = {
-            "min": 0,
-            "max": 2,
-        }
         self.assertIsNotNone(new_connection.pool)
 
         connections = []
@@ -122,8 +117,7 @@ class Tests(TestCase):
     def test_pooling_not_support_persistent_connections(self):
         new_connection = connection.copy()
         new_connection.settings_dict["CONN_MAX_AGE"] = 10
-        msg = """Pooling doesn't support persistent connections, unset
-                conn_max_age"""
+        msg = "Pooling doesn't support persistent connections."
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             new_connection.pool
 

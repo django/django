@@ -246,19 +246,20 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     @property
     def pool(self):
-        if not self.settings_dict["OPTIONS"].get("pool"):
+        if not self.is_pool:
             return None
 
         # Verify that we are not running with persistent connections
         if self.settings_dict.get("CONN_MAX_AGE", 0) != 0:
             raise ImproperlyConfigured(
-                """Pooling doesn't support persistent connections, unset
-                conn_max_age"""
+                "Pooling doesn't support persistent connections."
             )
 
         if self.alias not in self._connection_pools:
             connect_kwargs = self.get_connection_params()
             del connect_kwargs["pool"]
+            if not connect_kwargs.get("max"):
+                connect_kwargs["max"] = 4
             pool = Database.create_pool(
                 user=self.settings_dict["USER"],
                 password=self.settings_dict["PASSWORD"],
