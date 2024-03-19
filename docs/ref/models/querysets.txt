@@ -1460,10 +1460,7 @@ instance and returns a boolean.
 
     >>> # Only books with odd ids will have author prefetched.
     >>> Book.objects.prefetch_related(
-    ...     Prefetch(
-    ...         "author",
-    ...         filter_callback=lambda b: bool(b.id % 2)
-    ...     ),
+    ...     Prefetch("author", filter_callback=lambda b: bool(b.id % 2)),
     ... )
 
 .. note::
@@ -4157,10 +4154,7 @@ The ``filter_callback`` argument limits the prefetch operation to a subset of in
 
     >>> # Only books with odd ids will have author prefetched.
     >>> Book.objects.prefetch_related(
-    ...     Prefetch(
-    ...         "author",
-    ...         filter_callback=lambda b: bool(b.id % 2)
-    ...     ),
+    ...     Prefetch("author", filter_callback=lambda b: bool(b.id % 2)),
     ... )
 
 ``prefetch_related_objects()``
