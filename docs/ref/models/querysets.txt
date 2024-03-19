@@ -1451,6 +1451,21 @@ database selected by the outer query. All of the following are valid:
     ...     Prefetch("pizzas__toppings", queryset=Toppings.objects.using("replica")),
     ... ).using("cold-storage")
 
+You can also prefetch only for a subset of the current nesting level instances
+with the optional ``filter_callback`` argument.
+The value of this argument, if not None, should be a function that takes an
+instance and returns a boolean.
+
+.. code-block:: pycon
+
+    >>> # Only books with odd ids will have author prefetched.
+    >>> Book.objects.prefetch_related(
+    ...     Prefetch(
+    ...         "author",
+    ...         filter_callback=lambda b: bool(b.id % 2)
+    ...     ),
+    ... )
+
 .. note::
 
     The ordering of lookups matters.
@@ -4085,7 +4100,7 @@ combine them using operators such as ``|`` (``OR``), ``&`` (``AND``), and ``^``
 ``Prefetch()`` objects
 ----------------------
 
-.. class:: Prefetch(lookup, queryset=None, to_attr=None)
+.. class:: Prefetch(lookup, queryset=None, to_attr=None, filter_callback=None)
 
 The ``Prefetch()`` object can be used to control the operation of
 :meth:`~django.db.models.query.QuerySet.prefetch_related()`.
@@ -4135,6 +4150,18 @@ attribute:
     provide a significant speed improvement over traditional
     ``prefetch_related`` calls which store the cached result within a
     ``QuerySet`` instance.
+
+The ``filter_callback`` argument limits the prefetch operation to a subset of instances:
+
+.. code-block:: pycon
+
+    >>> # Only books with odd ids will have author prefetched.
+    >>> Book.objects.prefetch_related(
+    ...     Prefetch(
+    ...         "author",
+    ...         filter_callback=lambda b: bool(b.id % 2)
+    ...     ),
+    ... )
 
 ``prefetch_related_objects()``
 ------------------------------

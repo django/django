@@ -275,6 +275,9 @@ Models
 * The new ``"transaction_mode"`` option is now supported in :setting:`OPTIONS`
   on SQLite to allow specifying the :ref:`sqlite-transaction-behavior`.
 
+* The new ``filter_callback`` field of :class:`~django.db.models.query.Prefetch`
+  enables prefetching related objects only for a subset of instances.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
