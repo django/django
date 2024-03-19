@@ -2191,7 +2191,7 @@ class RawQuerySet:
 
 
 class Prefetch:
-    def __init__(self, lookup, queryset=None, to_attr=None):
+    def __init__(self, lookup, queryset=None, to_attr=None, filter_callback=None):
         # `prefetch_through` is the path we traverse to perform the prefetch.
         self.prefetch_through = lookup
         # `prefetch_to` is the path to the attribute that stores the result.
@@ -2213,6 +2213,7 @@ class Prefetch:
 
         self.queryset = queryset
         self.to_attr = to_attr
+        self.filter_callback = filter_callback
 
     def __getstate__(self):
         obj_dict = self.__dict__.copy()
@@ -2532,6 +2533,13 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
 
     # The 'values to be matched' must be hashable as they will be used
     # in a dictionary.
+
+    if lookup.filter_callback is not None:
+        instances = [
+            instance for instance in instances if lookup.filter_callback(instance)
+        ]
+    if len(instances) == 0:
+        return [], ()
 
     if hasattr(prefetcher, "get_prefetch_querysets"):
         (
