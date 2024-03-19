@@ -3,7 +3,7 @@ from django.db.models.query import ModelIterable, RawQuerySet
 
 
 class GenericPrefetch(Prefetch):
-    def __init__(self, lookup, querysets=None, to_attr=None):
+    def __init__(self, lookup, querysets=None, to_attr=None, filter_callback=None):
         for queryset in querysets:
             if queryset is not None and (
                 isinstance(queryset, RawQuerySet)
@@ -16,7 +16,7 @@ class GenericPrefetch(Prefetch):
                     "Prefetch querysets cannot use raw(), values(), and values_list()."
                 )
         self.querysets = querysets
-        super().__init__(lookup, to_attr=to_attr)
+        super().__init__(lookup, to_attr=to_attr, filter_callback=filter_callback)
 
     def __getstate__(self):
         obj_dict = self.__dict__.copy()
