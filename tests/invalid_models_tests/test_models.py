@@ -2811,11 +2811,7 @@ class ConstraintsTests(TestCase):
             id_2 = models.IntegerField()
 
             class Meta:
-                constraints = [
-                    models.PrimaryKeyConstraint(
-                        fields=("id_1", "id_2"), name="model_pk"
-                    ),
-                ]
+                primary_key = ("id_1", "id_2")
 
         errors = Model.check(databases=self.databases)
         expected_errors = [
@@ -2828,50 +2824,20 @@ class ConstraintsTests(TestCase):
         ]
         self.assertCountEqual(errors, expected_errors)
 
-    def test_primary_key_constraint_with_multiple_constraints(self):
-        class Model(models.Model):
-            id_1 = models.IntegerField()
-            id_2 = models.IntegerField()
-            id_3 = models.IntegerField()
-            id_4 = models.IntegerField()
-
-            class Meta:
-                constraints = [
-                    models.PrimaryKeyConstraint(
-                        fields=("id_1", "id_2"), name="model_1_pk"
-                    ),
-                    models.PrimaryKeyConstraint(
-                        fields=("id_3", "id_4"), name="model_2_pk"
-                    ),
-                    models.PrimaryKeyConstraint(
-                        fields=("id_5", "id_6"), name="model_3_pk"
-                    ),
-                ]
-
-        errors = Model.check(databases=self.databases)
-        expected_errors = [
-            Error(
-                "The model cannot have more than one primary key constraint.",
-                obj=Model,
-                id="models.E043",
-            ),
-        ]
-        self.assertCountEqual(errors, expected_errors)
-
     def test_primary_key_constraint_with_fk(self):
         class Foo(models.Model):
             id_1 = models.IntegerField()
             id_2 = models.IntegerField()
 
             class Meta:
-                constraints = [
-                    models.PrimaryKeyConstraint(fields=("id_1", "id_2"), name="foo_pk"),
-                ]
+                primary_key = ("id_1", "id_2")
 
         class Bar(models.Model):
             id_1 = models.IntegerField()
             id_2 = models.IntegerField()
-            fk = models.ForeignKey(Foo, on_delete=models.CASCADE, from_fields=["id_1", "id_2"])
+            fk = models.ForeignKey(
+                Foo, on_delete=models.CASCADE, from_fields=["id_1", "id_2"]
+            )
 
         errors = Bar.check(databases=self.databases)
         self.assertCountEqual(errors, [])

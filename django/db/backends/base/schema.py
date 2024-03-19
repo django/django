@@ -274,6 +274,12 @@ class BaseDatabaseSchemaEditor:
             constraint.constraint_sql(model, self)
             for constraint in model._meta.constraints
         ]
+
+        if model._meta.primary_key:
+            constraints.append(
+                self._primary_key_constraint_sql(model._meta.primary_key)
+            )
+
         sql = self.sql_create_table % {
             "table": self.quote_name(model._meta.db_table),
             "definition": ", ".join(
@@ -489,6 +495,7 @@ class BaseDatabaseSchemaEditor:
         the given `model`.
         """
         sql, params = self.table_sql(model)
+        print(sql, self.deferred_sql)
         # Prevent using [] as params, in the case a literal '%' is used in the
         # definition.
         self.execute(sql, params or None)

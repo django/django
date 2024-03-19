@@ -135,8 +135,4 @@ class ModelPKConstraint(models.Model):
     id_2 = models.IntegerField()
 
     class Meta:
-        constraints = [
-            models.PrimaryKeyConstraint(
-                fields=("id_1", "id_2"), name="model_pk_constraint_pk"
-            ),
-        ]
+        primary_key = ("id_1", "id_2")

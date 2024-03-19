@@ -32,7 +32,6 @@ from django.db.models import (
     IntegerField,
     Max,
     Value,
-    PrimaryKeyConstraint,
 )
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import CASCADE, Collector
@@ -672,7 +671,7 @@ class Model(AltersData, metaclass=ModelBase):
             if parent_link and parent_link != self._meta.pk:
                 setattr(self, parent_link.target_field.attname, value)
 
-        # If the model defines a PrimaryKeyConstraint, meta.pk is a tuple.
+        # If the model defines Meta.primary_key, meta.pk is a tuple.
         if isinstance(self._meta.pk, tuple):
             for pk, val in zip(self._meta.pk, tuple(value)):
                 setattr(self, pk.attname, val)
@@ -1096,6 +1095,8 @@ class Model(AltersData, metaclass=ModelBase):
             pk_val = meta.pk.get_pk_value_on_save(self)
             setattr(self, meta.pk.attname, pk_val)
         pk_set = pk_val is not None
+        if isinstance(pk_val, tuple):
+            pk_set = all(f is not None for f in pk_val)
         if not pk_set and (force_update or update_fields):
             raise ValueError("Cannot force an update in save() with no primary key.")
         updated = False
@@ -1152,6 +1153,14 @@ class Model(AltersData, metaclass=ModelBase):
                 for f in meta.local_concrete_fields
                 if not f.generated and (pk_set or f is not meta.auto_field)
             ]
+            print(
+                "auto",
+                self,
+                meta,
+                meta.auto_field,
+                fields[-1] is meta.auto_field if fields else None,
+                pk_set,
+            )
             returning_fields = meta.db_returning_fields
             results = self._do_insert(
                 cls._base_manager, using, fields, returning_fields, raw
@@ -1688,7 +1697,6 @@ class Model(AltersData, metaclass=ModelBase):
                 *cls._check_model_name_db_lookup_clashes(),
                 *cls._check_property_name_related_field_accessor_clashes(),
                 *cls._check_single_primary_key(),
-                *cls._check_single_pk_constraint(),
             )
             errors.extend(clash_errors)
             # If there are field name clashes, hide consequent column name
@@ -1710,9 +1718,9 @@ class Model(AltersData, metaclass=ModelBase):
     def _check_default_pk(cls):
         if (
             not cls._meta.abstract
-            # If the model defines a PrimaryKeyConstraint, the check should be skipped,
+            # If the model defines Meta.primary_key, the check should be skipped,
             # since there's no default primary key.
-            and not cls._get_pk_constraint()
+            and not cls._meta.primary_key
             and cls._meta.pk.auto_created
             and
             # Inherited PKs are checked in parents models.
@@ -1861,9 +1869,9 @@ class Model(AltersData, metaclass=ModelBase):
     @classmethod
     def _check_id_field(cls):
         """Check if `id` field is a primary key."""
-        # If the model defines a PrimaryKeyConstraint, the check should be skipped,
+        # If the model defines Meta.primary_key, the check should be skipped,
         # since primary_key=True can't be set on any fields (including `id`).
-        if cls._get_pk_constraint():
+        if cls._meta.primary_key:
             return []
 
         fields = [
@@ -2036,33 +2044,6 @@ class Model(AltersData, metaclass=ModelBase):
                 )
             )
         return errors
-
-    @classmethod
-    def _check_single_pk_constraint(cls):
-        errors = []
-
-        if sum(1 for _ in cls._get_pk_constraints()) > 1:
-            errors.append(
-                checks.Error(
-                    "The model cannot have more than one primary key constraint.",
-                    obj=cls,
-                    id="models.E043",
-                )
-            )
-
-        return errors
-
-    @classmethod
-    def _get_pk_constraints(cls):
-        return (
-            constraint
-            for constraint in cls._meta.constraints
-            if isinstance(constraint, PrimaryKeyConstraint)
-        )
-
-    @classmethod
-    def _get_pk_constraint(cls):
-        return next(cls._get_pk_constraints(), None)
 
     @classmethod
     def _check_unique_together(cls):

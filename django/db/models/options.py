@@ -24,6 +24,7 @@ IMMUTABLE_WARNING = (
 )
 
 DEFAULT_NAMES = (
+    "primary_key",
     "verbose_name",
     "verbose_name_plural",
     "db_table",
@@ -106,6 +107,7 @@ class Options:
         self.base_manager_name = None
         self.default_manager_name = None
         self.model_name = None
+        self.primary_key = None
         self.verbose_name = None
         self.verbose_name_plural = None
         self.db_table = ""
@@ -296,7 +298,14 @@ class Options:
             self.order_with_respect_to = None
 
         if self.pk is None:
-            if self.parents:
+            if self.primary_key:
+                fields = list(self.parents.values())
+                fields.extend(self.local_fields)
+                fields = {field.attname: field for field in fields}
+                self.pk = tuple(
+                    fields[field] for field in self.primary_key if field in fields
+                )
+            elif self.parents:
                 # Promote the first parent link in lieu of adding yet another
                 # field.
                 field = next(iter(self.parents.values()))
@@ -310,10 +319,6 @@ class Options:
                     field = already_created[0]
                 field.primary_key = True
                 self.setup_pk(field)
-            elif pk := model._get_pk_constraint():
-                # If the model defines a PrimaryKeyConstraint, set meta.pk to a tuple.
-                fields = {f.attname: f for f in self.model._meta.local_fields}
-                self.pk = tuple(fields[field] for field in pk.fields if field in fields)
             else:
                 pk_class = self._get_default_pk_class()
                 auto = pk_class(verbose_name="ID", primary_key=True, auto_created=True)

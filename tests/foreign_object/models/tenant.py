@@ -10,11 +10,7 @@ class TenantUser(models.Model):
     id = models.IntegerField()
 
     class Meta:
-        constraints = [
-            models.PrimaryKeyConstraint(
-                fields=("tenant_id", "id"), name="tenant_user_pk"
-            ),
-        ]
+        primary_key = ("tenant_id", "id")
 
 
 class TenantUserComment(models.Model):
@@ -29,8 +25,4 @@ class TenantUserComment(models.Model):
     )
 
     class Meta:
-        constraints = [
-            models.PrimaryKeyConstraint(
-                fields=("tenant_id", "id"), name="tenant_user_comment_pk"
-            ),
-        ]
+        primary_key = ("tenant_id", "id")

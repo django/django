@@ -2794,6 +2794,11 @@ class AutoFieldMixin:
         ]
 
     def _check_primary_key(self):
+        # If the model defines Meta.primary_key, primary_key=True can't be set on
+        # any field (including AutoFields).
+        if self.model._meta.primary_key:
+            return []
+
         if not self.primary_key:
             return [
                 checks.Error(
@@ -2808,7 +2813,7 @@ class AutoFieldMixin:
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
         del kwargs["blank"]
-        kwargs["primary_key"] = True
+        kwargs["primary_key"] = self.primary_key
         return name, path, args, kwargs
 
     def validate(self, value, model_instance):
