@@ -229,6 +229,14 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         body_copy["__module__"] = model.__module__
         new_model = type("New%s" % model._meta.object_name, model.__bases__, body_copy)
 
+        # Remove the automatically recreated default primary key, if it has
+        # been deleted.
+        if delete_field and delete_field.attname == new_model._meta.pk.attname:
+            auto_pk = new_model._meta.pk
+            delattr(new_model, auto_pk.attname)
+            new_model._meta.local_fields.remove(auto_pk)
+            new_model.pk = None
+
         # Create a new table with the updated schema.
         self.create_model(new_model)
 

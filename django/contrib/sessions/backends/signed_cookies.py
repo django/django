@@ -23,12 +23,18 @@ class SessionStore(SessionBase):
             self.create()
         return {}
 
+    async def aload(self):
+        return self.load()
+
     def create(self):
         """
         To create a new key, set the modified flag so that the cookie is set
         on the client for the current request.
         """
         self.modified = True
+
+    async def acreate(self):
+        return self.create()
 
     def save(self, must_create=False):
         """
@@ -39,6 +45,9 @@ class SessionStore(SessionBase):
         self._session_key = self._get_session_key()
         self.modified = True
 
+    async def asave(self, must_create=False):
+        return self.save(must_create=must_create)
+
     def exists(self, session_key=None):
         """
         This method makes sense when you're talking to a shared resource, but
@@ -46,6 +55,9 @@ class SessionStore(SessionBase):
         cookie.
         """
         return False
+
+    async def aexists(self, session_key=None):
+        return self.exists(session_key=session_key)
 
     def delete(self, session_key=None):
         """
@@ -57,12 +69,18 @@ class SessionStore(SessionBase):
         self._session_cache = {}
         self.modified = True
 
+    async def adelete(self, session_key=None):
+        return self.delete(session_key=session_key)
+
     def cycle_key(self):
         """
         Keep the same data but with a new key. Call save() and it will
         automatically save a cookie with a new key at the end of the request.
         """
         self.save()
+
+    async def acycle_key(self):
+        return self.cycle_key()
 
     def _get_session_key(self):
         """
@@ -78,4 +96,8 @@ class SessionStore(SessionBase):
 
     @classmethod
     def clear_expired(cls):
+        pass
+
+    @classmethod
+    async def aclear_expired(cls):
         pass

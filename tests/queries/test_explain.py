@@ -96,6 +96,15 @@ class ExplainTests(TestCase):
                     option = "{} {}".format(name.upper(), "true" if value else "false")
                     self.assertIn(option, captured_queries[0]["sql"])
 
+    def test_multi_page_text_explain(self):
+        if "TEXT" not in connection.features.supported_explain_formats:
+            self.skipTest("This backend does not support TEXT format.")
+
+        base_qs = Tag.objects.order_by()
+        qs = base_qs.filter(name="test").union(*[base_qs for _ in range(100)])
+        result = qs.explain(format="text")
+        self.assertGreaterEqual(result.count("\n"), 100)
+
     def test_option_sql_injection(self):
         qs = Tag.objects.filter(name="test")
         options = {"SUMMARY true) SELECT 1; --": True}

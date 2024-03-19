@@ -34,17 +34,6 @@ option.
     Constraints are checked during the :ref:`model validation
     <validating-objects>`.
 
-.. admonition:: Validation of Constraints with ``JSONField``
-
-    Constraints containing :class:`~django.db.models.JSONField` may not raise
-    validation errors as key, index, and path transforms have many
-    database-specific caveats. This :ticket:`may be fully supported later
-    <34059>`.
-
-    You should always check that there are no log messages, in the
-    ``django.db.models`` logger, like *"Got a database error calling check() on
-    …"* to confirm it's validated properly.
-
 ``BaseConstraint``
 ==================
 
@@ -131,10 +120,10 @@ ensures the age field is never less than 18.
             name="age_gte_18_and_others",
         )
 
-.. admonition:: Oracle
+.. admonition:: Oracle < 23c
 
-    Checks with nullable fields on Oracle must include a condition allowing for
-    ``NULL`` values in order for :meth:`validate() <BaseConstraint.validate>`
+    Checks with nullable fields on Oracle < 23c must include a condition
+    allowing for ``NULL`` values in order for :meth:`~BaseConstraint.validate`
     to behave the same as check constraints validation. For example, if ``age``
     is a nullable field::
 

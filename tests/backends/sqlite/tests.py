@@ -137,7 +137,7 @@ class Tests(TestCase):
                 value = cursor.fetchone()[0]
                 self.assertEqual(value, 2000)
         finally:
-            connections["default"].close()
+            connections["default"]._close()
 
 
 @unittest.skipUnless(connection.vendor == "sqlite", "SQLite tests")
@@ -321,4 +321,4 @@ class TestTransactionMode(SimpleTestCase):
         try:
             yield new_connection
         finally:
-            new_connection.close()
+            new_connection._close()
