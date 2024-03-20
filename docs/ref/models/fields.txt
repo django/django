@@ -798,6 +798,15 @@ Any combination of these options will result in an error.
     instead of a ``DateField`` and deciding how to handle the conversion from
     datetime to date at display time.
 
+.. warning:: Always use :class:`DateField` with a ``datetime.date`` instance.
+
+    If you have a ``datetime.datetime`` instance, it's recommended to convert
+    it to a ``datetime.date`` first. If you don't, :class:`DateField` will
+    localize the ``datetime.datetime`` to the :ref:`default timezone
+    <default-current-time-zone>` and convert it to a ``datetime.date``
+    instance, removing its time component. This is true for both storage and
+    comparison.
+
 ``DateTimeField``
 -----------------
 
@@ -809,6 +818,16 @@ Takes the same extra arguments as :class:`DateField`.
 The default form widget for this field is a single
 :class:`~django.forms.DateTimeInput`. The admin uses two separate
 :class:`~django.forms.TextInput` widgets with JavaScript shortcuts.
+
+.. warning:: Always use :class:`DateTimeField` with a ``datetime.datetime``
+    instance.
+
+    If you have a ``datetime.date`` instance, it's recommended to convert it to
+    a ``datetime.datetime`` first. If you don't, :class:`DateTimeField` will
+    use midnight in the :ref:`default timezone <default-current-time-zone>` for
+    the time component. This is true for both storage and comparison. To
+    compare the date portion of a :class:`DateTimeField` with a
+    ``datetime.date`` instance, use the :lookup:`date` lookup.
 
 ``DecimalField``
 ----------------
