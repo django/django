@@ -368,9 +368,9 @@ def teardown_databases(old_config, verbosity, parallel=0, keepdb=False):
                     )
             connection.creation.destroy_test_db(old_name, verbosity, keepdb)
 
-            # When we keep the database and have serialized content, we need to roll back the data
-            # at the end of the test suite. When using a parallelized test, the data must be restored
-            # per clone.
+            # When we keep the database and have serialized content, we need to
+            # roll back the data at the end of the test suite. When using a
+            # parallelized test, the data must be restored per clone.
             if keepdb and hasattr(connection, "_test_serialized_contents"):
                 serialized_data = connection._test_serialized_contents
                 old_settings = dict(connection.settings_dict)
