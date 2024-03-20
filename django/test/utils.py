@@ -378,7 +378,9 @@ def teardown_databases(old_config, verbosity, parallel=0, keepdb=False):
                 if parallel > 1:
                     for index in range(parallel):
                         connection.settings_dict["NAME"] = test_database_name
-                        settings_dict = connection.creation.get_test_db_clone_settings(str(index + 1))
+                        settings_dict = connection.creation.get_test_db_clone_settings(
+                            str(index + 1)
+                        )
                         connection.settings_dict.update(settings_dict)
                         connection.close()
                         connection.creation.deserialize_db_from_string(serialized_data)
@@ -389,7 +391,6 @@ def teardown_databases(old_config, verbosity, parallel=0, keepdb=False):
                 # Reset the connection settings
                 connection.settings_dict.update(old_settings)
                 connection.close()
-
 
 
 def get_runner(settings, test_runner_class=None):
