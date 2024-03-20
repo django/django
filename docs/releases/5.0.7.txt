@@ -21,6 +21,18 @@ The :meth:`~django.contrib.auth.backends.ModelBackend.authenticate()` method
 allowed remote attackers to enumerate users via a timing attack involving login
 requests for users with unusable passwords.
 
+CVE-2024-39330: Potential directory-traversal via ``Storage.save()``
+====================================================================
+
+Derived classes of the :class:`~django.core.files.storage.Storage` base class
+which override :meth:`generate_filename()
+<django.core.files.storage.Storage.generate_filename()>` without replicating
+the file path validations existing in the parent class, allowed for potential
+directory-traversal via certain inputs when calling :meth:`save()
+<django.core.files.storage.Storage.save()>`.
+
+Built-in ``Storage`` sub-classes were not affected by this vulnerability.
+
 Bugfixes
 ========
 
