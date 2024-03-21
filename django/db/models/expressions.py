@@ -5,6 +5,7 @@ import inspect
 from collections import defaultdict
 from decimal import Decimal
 from enum import Enum
+from itertools import chain
 from types import NoneType
 from uuid import UUID
 
@@ -597,10 +598,16 @@ _connector_combinations = [
     },
     # Numeric with NULL.
     {
-        connector: [
-            (field_type, NoneType, field_type),
-            (NoneType, field_type, field_type),
-        ]
+        connector: list(
+            chain.from_iterable(
+                [(field_type, NoneType, field_type), (NoneType, field_type, field_type)]
+                for field_type in (
+                    fields.IntegerField,
+                    fields.DecimalField,
+                    fields.FloatField,
+                )
+            )
+        )
         for connector in (
             Combinable.ADD,
             Combinable.SUB,
@@ -609,7 +616,6 @@ _connector_combinations = [
             Combinable.MOD,
             Combinable.POW,
         )
-        for field_type in (fields.IntegerField, fields.DecimalField, fields.FloatField)
     },
     # Date/DateTimeField/DurationField/TimeField.
     {
