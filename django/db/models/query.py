@@ -2296,7 +2296,8 @@ def prefetch_related_objects(model_instances, *related_lookups):
     # We need to be able to dynamically add to the list of prefetch_related
     # lookups that we look up (see below).  So we need some book keeping to
     # ensure we don't do duplicate work.
-    done_queries = {"": model_instances}  # dictionary of things like 'foo__bar': [results]
+    # dictionary of things like 'foo__bar': [results]
+    done_queries = {"": model_instances}
 
     auto_lookups = set()  # we add to this as we go through.
     followed_descriptors = set()  # recursion protection
