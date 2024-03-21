@@ -26,7 +26,7 @@ class CreateExtension(Operation):
             return
         if not self.extension_exists(schema_editor, self.name):
             schema_editor.execute(
-                "CREATE EXTENSION IF NOT EXISTS %s"
+                "CREATE EXTENSION IF NOT EXISTS %s SCHEMA pg_catalog"
                 % schema_editor.quote_name(self.name)
             )
         # Clear cached, stale oids.
