@@ -1463,6 +1463,23 @@ instance and returns a boolean.
     ...     Prefetch("author", filter_callback=lambda b: bool(b.id % 2)),
     ... )
 
+You can also use a callback after prefetching one level
+with the optional ``post_prefetch_callback`` argument.
+The value of this argument, if not None, should be a function that takes
+as argument a lookup (``Prefetch``) and the done_queries dict of
+``prefetch_related_objects``.
+
+.. code-block:: pycon
+
+    >>> total_number_of_distinct_authors = None
+    >>> def fill_total_number_of_distinct_authors(lookup, done_queries):
+    ...     nonlocal total_number_of_distinct_authors
+    ...     total_number_of_distinct_authors = len(done_queries[lookup.prefetch_to])
+    ...
+    >>> Book.objects.prefetch_related(
+    ...     Prefetch("author", post_prefetch_callback=fill_total_number_of_distinct_authors),
+    ... )
+
 .. note::
 
     The ordering of lookups matters.
@@ -4097,7 +4114,7 @@ combine them using operators such as ``|`` (``OR``), ``&`` (``AND``), and ``^``
 ``Prefetch()`` objects
 ----------------------
 
-.. class:: Prefetch(lookup, queryset=None, to_attr=None, filter_callback=None)
+.. class:: Prefetch(lookup, queryset=None, to_attr=None, filter_callback=None, post_prefetch_callback=None)
 
 The ``Prefetch()`` object can be used to control the operation of
 :meth:`~django.db.models.query.QuerySet.prefetch_related()`.
@@ -4155,6 +4172,20 @@ The ``filter_callback`` argument limits the prefetch operation to a subset of in
     >>> # Only books with odd ids will have author prefetched.
     >>> Book.objects.prefetch_related(
     ...     Prefetch("author", filter_callback=lambda b: bool(b.id % 2)),
+    ... )
+
+The ``post_prefetch_callback`` argument enables post-processing
+after intermediate or final prefetches:
+
+.. code-block:: pycon
+
+    >>> total_number_of_distinct_authors = None
+    >>> def fill_total_number_of_distinct_authors(lookup, done_queries):
+    ...     nonlocal total_number_of_distinct_authors
+    ...     total_number_of_distinct_authors = len(done_queries[lookup.prefetch_to])
+    ...
+    >>> Book.objects.prefetch_related(
+    ...     Prefetch("author", post_prefetch_callback=fill_total_number_of_distinct_authors),
     ... )
 
 ``prefetch_related_objects()``
