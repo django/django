@@ -2191,7 +2191,14 @@ class RawQuerySet:
 
 
 class Prefetch:
-    def __init__(self, lookup, queryset=None, to_attr=None, filter_callback=None):
+    def __init__(
+        self,
+        lookup,
+        queryset=None,
+        to_attr=None,
+        filter_callback=None,
+        post_prefetch_callback=None,
+    ):
         # `prefetch_through` is the path we traverse to perform the prefetch.
         self.prefetch_through = lookup
         # `prefetch_to` is the path to the attribute that stores the result.
@@ -2214,6 +2221,7 @@ class Prefetch:
         self.queryset = queryset
         self.to_attr = to_attr
         self.filter_callback = filter_callback
+        self.post_prefetch_callback = post_prefetch_callback
 
     def __getstate__(self):
         obj_dict = self.__dict__.copy()
@@ -2288,7 +2296,7 @@ def prefetch_related_objects(model_instances, *related_lookups):
     # We need to be able to dynamically add to the list of prefetch_related
     # lookups that we look up (see below).  So we need some book keeping to
     # ensure we don't do duplicate work.
-    done_queries = {}  # dictionary of things like 'foo__bar': [results]
+    done_queries = {"": model_instances}  # dictionary of things like 'foo__bar': [results]
 
     auto_lookups = set()  # we add to this as we go through.
     followed_descriptors = set()  # recursion protection
@@ -2297,6 +2305,8 @@ def prefetch_related_objects(model_instances, *related_lookups):
     while all_lookups:
         lookup = all_lookups.pop()
         if lookup.prefetch_to in done_queries:
+            if lookup.post_prefetch_callback:
+                lookup.post_prefetch_callback(lookup, done_queries)
             if lookup.queryset is not None:
                 raise ValueError(
                     "'%s' lookup was already seen with a different queryset. "
@@ -2429,6 +2439,8 @@ def prefetch_related_objects(model_instances, *related_lookups):
                     else:
                         new_obj_list.append(new_obj)
                 obj_list = new_obj_list
+        if lookup.post_prefetch_callback:
+            lookup.post_prefetch_callback(lookup, done_queries)
 
 
 async def aprefetch_related_objects(model_instances, *related_lookups):
