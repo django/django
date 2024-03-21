@@ -194,16 +194,20 @@ class PrefetchRelatedObjectsTests(TestCase):
         books = list(Book.objects.filter(id__in=(self.book1.id, self.book2.id)))
         total_distinct_authors_number = None
 
-        def post_prefetch_callback(lookup, done_queries):
+        def fill_total_distinct_authors_number(lookup, done_queries):
             nonlocal total_distinct_authors_number
-            total_distinct_authors_number = len(done_queries[lookup.prefetch_to])
+            # Beware of many-many relationships with implicit through
+            # since it can fill done_queries with repeated objects.
+            total_distinct_authors_number = len(
+                set((author.id for author in done_queries[lookup.prefetch_to]))
+            )
 
         with self.assertNumQueries(1):
             prefetch_related_objects(
                 books,
                 Prefetch(
                     "authors",
-                    post_prefetch_callback=post_prefetch_callback,
+                    post_prefetch_callback=fill_total_distinct_authors_number,
                 ),
             )
         self.assertEqual(total_distinct_authors_number, 3)

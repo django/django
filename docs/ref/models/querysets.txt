@@ -1471,13 +1471,17 @@ as argument a lookup (``Prefetch``) and the done_queries dict of
 
 .. code-block:: pycon
 
-    >>> total_number_of_distinct_authors = None
-    >>> def fill_total_number_of_distinct_authors(lookup, done_queries):
-    ...     nonlocal total_number_of_distinct_authors
-    ...     total_number_of_distinct_authors = len(done_queries[lookup.prefetch_to])
+    >>> total_distinct_authors_number = None
+    >>> def fill_total_distinct_authors_number(lookup, done_queries):
+    ...     global total_distinct_authors_number
+    ...     # Beware of many-many relationships with implicit through
+    ...     # since it can fill done_queries with repeated objects.
+    ...     total_distinct_authors_number = len(
+    ...         set((author.id for author in done_queries[lookup.prefetch_to]))
+    ...     )
     ...
     >>> Book.objects.prefetch_related(
-    ...     Prefetch("author", post_prefetch_callback=fill_total_number_of_distinct_authors),
+    ...     Prefetch("author", post_prefetch_callback=fill_total_distinct_authors_number),
     ... )
 
 .. note::
@@ -4179,13 +4183,17 @@ after intermediate or final prefetches:
 
 .. code-block:: pycon
 
-    >>> total_number_of_distinct_authors = None
-    >>> def fill_total_number_of_distinct_authors(lookup, done_queries):
-    ...     nonlocal total_number_of_distinct_authors
-    ...     total_number_of_distinct_authors = len(done_queries[lookup.prefetch_to])
+    >>> total_distinct_authors_number = None
+    >>> def fill_total_distinct_authors_number(lookup, done_queries):
+    ...     global total_distinct_authors_number
+    ...     # Beware of many-many relationships with implicit through
+    ...     # since it can fill done_queries with repeated objects.
+    ...     total_distinct_authors_number = len(
+    ...         set((author.id for author in done_queries[lookup.prefetch_to]))
+    ...     )
     ...
     >>> Book.objects.prefetch_related(
-    ...     Prefetch("author", post_prefetch_callback=fill_total_number_of_distinct_authors),
+    ...     Prefetch("author", post_prefetch_callback=fill_total_distinct_authors_number),
     ... )
 
 ``prefetch_related_objects()``
