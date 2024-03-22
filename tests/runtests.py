@@ -136,7 +136,7 @@ def get_test_modules(gis_enabled):
                     continue
                 test_module = f.name
                 if dirname:
-                    test_module = dirname + "." + test_module
+                    test_module = f"{dirname}.{test_module}"
                 yield test_module
 
 
