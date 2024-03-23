@@ -105,7 +105,7 @@ class BaseDatabaseSchemaEditor:
     sql_check_constraint = "CHECK (%(check)s)"
     sql_delete_constraint = "ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
     sql_constraint = "CONSTRAINT %(name)s %(constraint)s"
-    sql_primary_key_constraint = "PRIMARY KEY (%(columns)s)"
+    sql_pk_constraint = "PRIMARY KEY (%(columns)s)"
 
     sql_create_check = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s CHECK (%(check)s)"
     sql_delete_check = sql_delete_constraint
@@ -271,9 +271,7 @@ class BaseDatabaseSchemaEditor:
         ]
 
         if model._meta.primary_key:
-            constraints.append(
-                self._primary_key_constraint_sql(model._meta.primary_key)
-            )
+            constraints.append(self._pk_constraint_sql(model._meta.primary_key))
 
         sql = self.sql_create_table % {
             "table": self.quote_name(model._meta.db_table),
@@ -1706,9 +1704,9 @@ class BaseDatabaseSchemaEditor:
 
         return ForeignKeyName(
             model._meta.db_table,
-            [f.column for f in field.local_related_fields],
+            [field.column],
             split_identifier(field.target_field.model._meta.db_table)[1],
-            [f.column for f in field.foreign_related_fields],
+            [field.target_field.column],
             suffix,
             create_fk_name,
         )
@@ -1969,8 +1967,8 @@ class BaseDatabaseSchemaEditor:
                     result.append(name)
         return result
 
-    def _primary_key_constraint_sql(self, fields):
-        return self.sql_primary_key_constraint % {
+    def _pk_constraint_sql(self, fields):
+        return self.sql_pk_constraint % {
             "columns": ", ".join(self.quote_name(field) for field in fields)
         }
 
