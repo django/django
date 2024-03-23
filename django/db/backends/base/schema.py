@@ -117,8 +117,8 @@ class BaseDatabaseSchemaEditor:
     sql_delete_unique = sql_delete_constraint
 
     sql_create_fk = (
-        "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s FOREIGN KEY (%(columns)s) "
-        "REFERENCES %(to_table)s (%(to_columns)s)%(deferrable)s"
+        "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s FOREIGN KEY (%(column)s) "
+        "REFERENCES %(to_table)s (%(to_column)s)%(deferrable)s"
     )
     sql_create_inline_fk = None
     sql_create_column_inline_fk = None
@@ -230,16 +230,12 @@ class BaseDatabaseSchemaEditor:
             params.extend(extra_params)
             # FK.
             if field.remote_field and field.db_constraint:
-                to_meta = field.remote_field.model._meta
-                to_table = to_meta.db_table
-                field_name = field.remote_field.field_name
-                to_column = (
-                    None
-                    if isinstance(field_name, tuple)
-                    else to_meta.get_field(field_name).column
-                )
+                to_table = field.remote_field.model._meta.db_table
+                to_column = field.remote_field.model._meta.get_field(
+                    field.remote_field.field_name
+                ).column
 
-                if to_column and self.sql_create_inline_fk:
+                if self.sql_create_inline_fk:
                     definition += " " + self.sql_create_inline_fk % {
                         "to_table": self.quote_name(to_table),
                         "to_column": self.quote_name(to_column),
@@ -247,7 +243,7 @@ class BaseDatabaseSchemaEditor:
                 elif self.connection.features.supports_foreign_keys:
                     self.deferred_sql.append(
                         self._create_fk_sql(
-                            model, field, "_fk_%(to_table)s_%(to_columns)s"
+                            model, field, "_fk_%(to_table)s_%(to_column)s"
                         )
                     )
             # Add the SQL to our big list.
@@ -495,7 +491,6 @@ class BaseDatabaseSchemaEditor:
         the given `model`.
         """
         sql, params = self.table_sql(model)
-        print(sql, self.deferred_sql)
         # Prevent using [] as params, in the case a literal '%' is used in the
         # definition.
         self.execute(sql, params or None)
