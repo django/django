@@ -359,24 +359,36 @@ are returned unchanged.
 ``FromWKB``
 ===========
 
-.. class:: FromWKB(expression, **extra)
+.. class:: FromWKB(expression, srid=0, **extra)
 
 *Availability*: MariaDB, `MySQL
 <https://dev.mysql.com/doc/refman/en/gis-wkb-functions.html#function_st-geomfromwkb>`__,
 Oracle, `PostGIS <https://postgis.net/docs/ST_GeomFromWKB.html>`__, SpatiaLite
 
-Creates geometry from `Well-known binary (WKB)`_ representation.
+Creates geometry from `Well-known binary (WKB)`_ representation. The optional
+``srid`` argument allows to specify the SRID of the resulting geometry.
+``srid`` is ignored on Oracle.
+
+.. versionchanged:: 5.1
+
+    The ``srid`` argument was added.
 
 ``FromWKT``
 ===========
 
-.. class:: FromWKT(expression, **extra)
+.. class:: FromWKT(expression, srid=0, **extra)
 
 *Availability*: MariaDB, `MySQL
 <https://dev.mysql.com/doc/refman/en/gis-wkt-functions.html#function_st-geomfromtext>`__,
 Oracle, `PostGIS <https://postgis.net/docs/ST_GeomFromText.html>`__, SpatiaLite
 
-Creates geometry from `Well-known text (WKT)`_ representation.
+Creates geometry from `Well-known text (WKT)`_ representation. The optional
+``srid`` argument allows to specify the SRID of the resulting geometry.
+``srid`` is ignored on Oracle.
+
+.. versionchanged:: 5.1
+
+    The ``srid`` argument was added.
 
 ``GeoHash``
 ===========

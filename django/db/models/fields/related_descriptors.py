@@ -195,6 +195,9 @@ class ForwardManyToOneDescriptor:
         else:
             query = {"%s__in" % self.field.related_query_name(): instances}
         queryset = queryset.filter(**query)
+        # There can be only one object prefetched for each instance so clear
+        # ordering if the query allows it without side effects.
+        queryset.query.clear_ordering()
 
         # Since we're going to assign directly in the cache,
         # we must manage the reverse relation cache manually.
@@ -469,6 +472,9 @@ class ReverseOneToOneDescriptor:
         instances_dict = {instance_attr(inst): inst for inst in instances}
         query = {"%s__in" % self.related.field.name: instances}
         queryset = queryset.filter(**query)
+        # There can be only one object prefetched for each instance so clear
+        # ordering if the query allows it without side effects.
+        queryset.query.clear_ordering()
 
         # Since we're going to assign directly in the cache,
         # we must manage the reverse relation cache manually.

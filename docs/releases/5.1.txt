@@ -101,6 +101,11 @@ Minor features
 * :attr:`.OGRGeometry.centroid` is now available on all supported geometry
   types.
 
+* :class:`FromWKB() <django.contrib.gis.db.models.functions.FromWKB>` and
+  :class:`FromWKT() <django.contrib.gis.db.models.functions.FromWKT>` functions
+  now support the optional ``srid`` argument (except for Oracle where it is
+  ignored).
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -124,6 +129,10 @@ Minor features
   exceptions when storing session information in the cache, logging proper
   error messages with their traceback via the newly added
   :ref:`sessions logger <django-contrib-sessions-logger>`.
+
+* :class:`django.contrib.sessions.backends.base.SessionBase` and all built-in
+  session engines now provide async API. The new asynchronous methods all have
+  ``a`` prefixed names, e.g. ``aget()``, ``akeys()``, or ``acycle_key()``.
 
 :mod:`django.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

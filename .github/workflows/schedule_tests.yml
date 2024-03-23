@@ -55,10 +55,10 @@ jobs:
       - run: python -m pip install .
       - name: Prepare site-packages
         run: |
-          SITE_PACKAGE_ROOT=$(python -c 'import site; print(site.getsitepackages()[0])')
-          echo $SITE_PACKAGE_ROOT
-          python -m compileall -b $SITE_PACKAGE_ROOT
-          find $SITE_PACKAGE_ROOT -name '*.py' -print -delete
+          DJANGO_PACKAGE_ROOT=$(python -c 'import site; print(site.getsitepackages()[0])')/django
+          echo $DJANGO_PACKAGE_ROOT
+          python -m compileall -b $DJANGO_PACKAGE_ROOT
+          find $DJANGO_PACKAGE_ROOT -name '*.py' -print -delete
       - run: python -m pip install -r tests/requirements/py3.txt
       - name: Run tests
         run: python tests/runtests.py --verbosity=2

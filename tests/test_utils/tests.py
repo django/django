@@ -2158,7 +2158,8 @@ class AllowedDatabaseQueriesTests(SimpleTestCase):
             # closed on teardown).
             for conn in connections_dict.values():
                 if conn is not connection and conn.allow_thread_sharing:
-                    conn.close()
+                    conn.validate_thread_sharing()
+                    conn._close()
                     conn.dec_thread_sharing()
 
     def test_allowed_database_copy_queries(self):
@@ -2169,7 +2170,8 @@ class AllowedDatabaseQueriesTests(SimpleTestCase):
                 cursor.execute(sql)
                 self.assertEqual(cursor.fetchone()[0], 1)
         finally:
-            new_connection.close()
+            new_connection.validate_thread_sharing()
+            new_connection._close()
 
 
 class DatabaseAliasTests(SimpleTestCase):
