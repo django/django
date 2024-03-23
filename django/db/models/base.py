@@ -1864,7 +1864,6 @@ class Model(AltersData, metaclass=ModelBase):
         fields = [
             f for f in cls._meta.local_fields if f.name == "id" and f != cls._meta.pk
         ]
-
         # fields is empty or consists of the invalid "id" field
         if fields and not fields[0].primary_key and cls._meta.pk.name == "id":
             return [
