@@ -2,7 +2,7 @@ from django.db import models
 
 
 class Tenant(models.Model):
-    id = models.AutoField(primary_key=True)
+    pass
 
 
 class TenantUser(models.Model):
