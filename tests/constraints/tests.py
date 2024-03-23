@@ -19,7 +19,6 @@ from .models import (
     UniqueConstraintDeferrable,
     UniqueConstraintInclude,
     UniqueConstraintProduct,
-    ModelPKConstraint,
 )
 
 
