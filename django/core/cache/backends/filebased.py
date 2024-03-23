@@ -2,6 +2,7 @@
 import glob
 import os
 import pickle
+import pathlib
 import random
 import tempfile
 import time
@@ -11,7 +12,7 @@ from hashlib import md5
 from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
 from django.core.files import locks
 from django.core.files.move import file_move_safe
-
+from django.core.checks import Warning
 
 class FileBasedCache(BaseCache):
     cache_suffix = ".djcache"
@@ -168,3 +169,21 @@ class FileBasedCache(BaseCache):
             os.path.join(self._dir, fname)
             for fname in glob.glob1(self._dir, "*%s" % self.cache_suffix)
         ]
+
+    @classmethod
+    def check(cls, cache, paths, name, alias_name='default'):
+        cache_path = pathlib.Path(cache._dir).resolve()
+        if any(path == cache_path for path in paths):
+            relation = "matches"
+        elif any(path in cache_path.parents for path in paths):
+            relation = "is inside"
+        elif any(cache_path in path.parents for path in paths):
+            relation = "contains"
+        else:
+            return None
+
+        return Warning(
+                    f"Your '{alias_name}' cache configuration might expose your cache "
+                    f"or lead to corruption of your data because its LOCATION "
+                    f"{relation} {name}.", id="caches.W002",
+                )
