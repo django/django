@@ -1741,7 +1741,7 @@ class Model(AltersData, metaclass=ModelBase):
     def _check_composite_pk(cls):
         errors = []
 
-        if isinstance(cls._meta.pk, tuple) and any(
+        if cls._meta.primary_key and any(
             field for field in cls._meta.fields if field.primary_key
         ):
             errors.append(
