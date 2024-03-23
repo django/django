@@ -665,8 +665,6 @@ class Model(AltersData, metaclass=ModelBase):
             if parent_link and parent_link != self._meta.pk:
                 setattr(self, parent_link.target_field.attname, value)
 
-        # If the model defines Meta.primary_key, both _meta.pk
-        # and model.pk are tuples.
         if isinstance(self._meta.pk, tuple):
             for pk, val in zip(self._meta.pk, tuple(value)):
                 setattr(self, pk.attname, val)

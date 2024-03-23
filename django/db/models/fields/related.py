@@ -631,7 +631,9 @@ class ForeignObject(RelatedField):
             # If the model defines Meta.primary_key and the foreign key refers to it,
             # the check should be skipped.
             pk = self.remote_field.model._meta.pk
-            if isinstance(pk, tuple) and foreign_fields == set(f.name for f in pk):
+            if isinstance(pk, tuple) and foreign_fields == set(
+                field.name for field in pk
+            ):
                 return []
 
         if not has_unique_constraint:
@@ -969,7 +971,11 @@ class ForeignKey(ForeignObject):
             # the to_field during FK construction. It won't be guaranteed to
             # be correct until contribute_to_class is called. Refs #12190.
             pk = to._meta.pk
-            to_field = to_field or (tuple(f.name for f in pk) if isinstance(pk, tuple) else (pk and pk.name))
+            to_field = to_field or (
+                tuple(field.name for field in pk)
+                if isinstance(pk, tuple)
+                else (pk and pk.name)
+            )
 
         if not callable(on_delete):
             raise TypeError("on_delete must be callable.")
