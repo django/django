@@ -1697,6 +1697,7 @@ class Model(AltersData, metaclass=ModelBase):
                 *cls._check_constraints(databases),
                 *cls._check_default_pk(),
                 *cls._check_db_table_comment(databases),
+                *cls._check_composite_pk(),
             ]
 
         return errors
@@ -1735,6 +1736,24 @@ class Model(AltersData, metaclass=ModelBase):
                 ),
             ]
         return []
+
+    @classmethod
+    def _check_composite_pk(cls):
+        errors = []
+
+        if isinstance(cls._meta.pk, tuple) and any(
+            field for field in cls._meta.fields if field.primary_key
+        ):
+            errors.append(
+                checks.Error(
+                    "primary_key=True must not be set if Meta.primary_key "
+                    "is defined.",
+                    obj=cls,
+                    id="models.E042",
+                )
+            )
+
+        return errors
 
     @classmethod
     def _check_db_table_comment(cls, databases):

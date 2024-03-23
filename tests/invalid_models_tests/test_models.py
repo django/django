@@ -2816,7 +2816,7 @@ class ConstraintsTests(TestCase):
 
         self.assertEqual(Bar.check(databases=self.databases), [])
 
-    def test_primary_key_constraint_with_primary_key_set_to_true(self):
+    def test_composite_pk_with_primary_key_set_to_true(self):
         class Model(models.Model):
             id_1 = models.IntegerField(primary_key=True)
             id_2 = models.IntegerField()
@@ -2824,31 +2824,13 @@ class ConstraintsTests(TestCase):
             class Meta:
                 primary_key = ("id_1", "id_2")
 
-        errors = Model.check(databases=self.databases)
-        expected_errors = [
-            Error(
-                "primary_key=True must not be set if a primary key "
-                "constraint is defined.",
-                obj=Model,
-                id="models.E042",
-            ),
-        ]
-        self.assertCountEqual(errors, expected_errors)
-
-    def test_primary_key_constraint_with_fk(self):
-        class Foo(models.Model):
-            id_1 = models.IntegerField()
-            id_2 = models.IntegerField()
-
-            class Meta:
-                primary_key = ("id_1", "id_2")
-
-        class Bar(models.Model):
-            id_1 = models.IntegerField()
-            id_2 = models.IntegerField()
-            fk = models.ForeignKey(
-                Foo, on_delete=models.CASCADE, from_fields=["id_1", "id_2"]
-            )
-
-        errors = Bar.check(databases=self.databases)
-        self.assertCountEqual(errors, [])
+        self.assertEqual(
+            Model.check(databases=self.databases),
+            [
+                Error(
+                    "primary_key=True must not be set if Meta.primary_key is defined.",
+                    obj=Model,
+                    id="models.E042",
+                ),
+            ],
+        )

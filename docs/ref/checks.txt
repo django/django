@@ -416,8 +416,8 @@ Models
 * **models.W040**: ``<database>`` does not support indexes with non-key
   columns.
 * **models.E041**: ``constraints`` refers to the joined field ``<field name>``.
-* **models.E042**: primary_key=True must not be set if a primary key
-  constraint is defined.
+* **models.E042**: primary_key=True must not be set if Meta.primary_key
+  is defined.
 * **models.W042**: Auto-created primary key used when not defining a primary
   key type, by default ``django.db.models.AutoField``.
 * **models.W043**: ``<database>`` does not support indexes on expressions.
