@@ -7,7 +7,7 @@ class Tenant(models.Model):
 
 class TenantUser(models.Model):
     tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE)
-    id = models.IntegerField()
+    id = models.SmallIntegerField()
 
     class Meta:
         primary_key = ("tenant_id", "id")
@@ -15,8 +15,8 @@ class TenantUser(models.Model):
 
 class TenantUserComment(models.Model):
     tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE)
-    id = models.IntegerField()
-    user_id = models.IntegerField()
+    id = models.SmallIntegerField()
+    user_id = models.SmallIntegerField()
     user = models.ForeignObject(
         TenantUser,
         on_delete=models.CASCADE,
