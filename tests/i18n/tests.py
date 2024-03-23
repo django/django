@@ -1351,6 +1351,23 @@ class FormattingTests(SimpleTestCase):
                 self.assertEqual(template2.render(context), output2)
                 self.assertEqual(template3.render(context), output3)
 
+    def test_unlocalize_honor_date_settings(self):
+        filter_template = Template(
+            "{% load l10n %}Localized: {{ date }}. Unlocalized: {{ date|unlocalize }}."
+        )
+        tag_template = Template(
+            "{% load l10n %}Localized: {{ date }}. {% localize off %}Unlocalized: "
+            "{{ date }}{% endlocalize %}."
+        )
+        context = Context({"date": datetime.date(2024, 12, 15)})
+        expected_result = "Localized: 15. Dezember 2024. Unlocalized: 15-12-2024."
+        with (
+            translation.override("de", deactivate=True),
+            self.settings(DATE_FORMAT="j-m-Y"),
+        ):
+            self.assertEqual(filter_template.render(context), expected_result)
+            self.assertEqual(tag_template.render(context), expected_result)
+
     def test_localized_off_numbers(self):
         """A string representation is returned for unlocalized numbers."""
         template = Template(
