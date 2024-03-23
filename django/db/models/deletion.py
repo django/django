@@ -515,8 +515,8 @@ class Collector:
         for model, instances in self.data.items():
             for instance in instances:
                 pk = model._meta.pk
-                pks = pk if isinstance(pk, tuple) else (pk,)
-                for f in pks:
-                    setattr(instance, f.attname, None)
+                fields = pk if isinstance(pk, tuple) else (pk,)
+                for field in fields:
+                    setattr(instance, field.attname, None)
 
         return sum(deleted_counter.values()), dict(deleted_counter)

@@ -26,13 +26,7 @@ from django.db import (
     router,
     transaction,
 )
-from django.db.models import (
-    NOT_PROVIDED,
-    ExpressionWrapper,
-    IntegerField,
-    Max,
-    Value,
-)
+from django.db.models import NOT_PROVIDED, ExpressionWrapper, IntegerField, Max, Value
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import CASCADE, Collector
 from django.db.models.expressions import DatabaseDefault
@@ -659,10 +653,10 @@ class Model(AltersData, metaclass=ModelBase):
     def _get_pk_val(self, meta=None):
         meta = meta or self._meta
 
-        # If the model defines a PrimaryKeyConstraint, meta.pk is a tuple.
+        # If the model defines Meta.primary_key, both _meta.pk
+        # and model.pk are tuples.
         if isinstance(meta.pk, tuple):
-            pks = (getattr(self, field.attname) for field in meta.pk)
-            return tuple(pks)
+            return tuple(getattr(self, field.attname) for field in meta.pk)
 
         return getattr(self, meta.pk.attname)
 
@@ -671,7 +665,8 @@ class Model(AltersData, metaclass=ModelBase):
             if parent_link and parent_link != self._meta.pk:
                 setattr(self, parent_link.target_field.attname, value)
 
-        # If the model defines Meta.primary_key, meta.pk is a tuple.
+        # If the model defines Meta.primary_key, both _meta.pk
+        # and model.pk are tuples.
         if isinstance(self._meta.pk, tuple):
             for pk, val in zip(self._meta.pk, tuple(value)):
                 setattr(self, pk.attname, val)
@@ -1153,14 +1148,6 @@ class Model(AltersData, metaclass=ModelBase):
                 for f in meta.local_concrete_fields
                 if not f.generated and (pk_set or f is not meta.auto_field)
             ]
-            print(
-                "auto",
-                self,
-                meta,
-                meta.auto_field,
-                fields[-1] is meta.auto_field if fields else None,
-                pk_set,
-            )
             returning_fields = meta.db_returning_fields
             results = self._do_insert(
                 cls._base_manager, using, fields, returning_fields, raw

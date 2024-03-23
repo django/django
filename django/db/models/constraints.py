@@ -15,12 +15,7 @@ from django.db.utils import DEFAULT_DB_ALIAS
 from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.translation import gettext_lazy as _
 
-__all__ = [
-    "BaseConstraint",
-    "CheckConstraint",
-    "Deferrable",
-    "UniqueConstraint",
-]
+__all__ = ["BaseConstraint", "CheckConstraint", "Deferrable", "UniqueConstraint"]
 
 
 class BaseConstraint:
