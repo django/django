@@ -234,7 +234,6 @@ class BaseDatabaseSchemaEditor:
                 to_column = field.remote_field.model._meta.get_field(
                     field.remote_field.field_name
                 ).column
-
                 if self.sql_create_inline_fk:
                     definition += " " + self.sql_create_inline_fk % {
                         "to_table": self.quote_name(to_table),
@@ -725,7 +724,7 @@ class BaseDatabaseSchemaEditor:
             and self.connection.features.supports_foreign_keys
             and field.db_constraint
         ):
-            constraint_suffix = "_fk_%(to_table)s_%(to_columns)s"
+            constraint_suffix = "_fk_%(to_table)s_%(to_column)s"
             # Add FK constraint inline, if supported.
             if self.sql_create_column_inline_fk:
                 to_table = field.remote_field.model._meta.db_table
@@ -1246,7 +1245,7 @@ class BaseDatabaseSchemaEditor:
             and new_field.db_constraint
         ):
             self.execute(
-                self._create_fk_sql(model, new_field, "_fk_%(to_table)s_%(to_columns)s")
+                self._create_fk_sql(model, new_field, "_fk_%(to_table)s_%(to_column)s")
             )
         # Rebuild FKs that pointed to us if we previously had to drop them
         if drop_foreign_keys:
@@ -1683,15 +1682,11 @@ class BaseDatabaseSchemaEditor:
     def _create_fk_sql(self, model, field, suffix):
         table = Table(model._meta.db_table, self.quote_name)
         name = self._fk_constraint_name(model, field, suffix)
-        columns = Columns(
-            model._meta.db_table,
-            [f.column for f in field.local_related_fields],
-            self.quote_name,
-        )
+        column = Columns(model._meta.db_table, [field.column], self.quote_name)
         to_table = Table(field.target_field.model._meta.db_table, self.quote_name)
-        to_columns = Columns(
+        to_column = Columns(
             field.target_field.model._meta.db_table,
-            [f.column for f in field.foreign_related_fields],
+            [field.target_field.column],
             self.quote_name,
         )
         deferrable = self.connection.ops.deferrable_sql()
@@ -1699,9 +1694,9 @@ class BaseDatabaseSchemaEditor:
             self.sql_create_fk,
             table=table,
             name=name,
-            columns=columns,
+            column=column,
             to_table=to_table,
-            to_columns=to_columns,
+            to_column=to_column,
             deferrable=deferrable,
         )
 
