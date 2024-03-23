@@ -270,6 +270,9 @@ class BaseDatabaseSchemaEditor:
             for constraint in model._meta.constraints
         ]
 
+        # If the model defines Meta.primary_key, add the primary key constraint
+        # to the table definition.
+        # It's expected primary_key=True isn't set on any fields.
         if model._meta.primary_key:
             constraints.append(self._pk_constraint_sql(model._meta.primary_key))
 
