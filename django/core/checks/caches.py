@@ -58,16 +58,16 @@ def check_file_based_cache_is_absolute(app_configs, **kwargs):
     for alias, config in settings.CACHES.items():
         if config.get("BACKEND").endswith("FileBasedCache"):
             alias_name = alias
-            location = config
+            location = config.get("LOCATION")
 
     if (
-        alias_name is not None
-        and not pathlib.Path(location.get("LOCATION")).is_absolute()
+        location is not None
+        and not pathlib.Path(location).is_absolute()
     ):
-        return Warning(
+        return [Warning(
             f"Your '{alias_name}' cache LOCATION path is relative. Use an "
             f"absolute path instead.",
             id="caches.W003",
-        )
+        )]
 
     return []
