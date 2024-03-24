@@ -172,7 +172,7 @@ class FileBasedCache(BaseCache):
         ]
 
     @classmethod
-    def check(cls, cache, paths, name, alias_name='default'):
+    def check(cls, cache, paths, name, alias_name="default"):
         cache_path = pathlib.Path(cache._dir).resolve()
         if any(path == cache_path for path in paths):
             relation = "matches"
@@ -184,7 +184,8 @@ class FileBasedCache(BaseCache):
             return None
 
         return Warning(
-                    f"Your '{alias_name}' cache configuration might expose your cache "
-                    f"or lead to corruption of your data because its LOCATION "
-                    f"{relation} {name}.", id="caches.W002",
-                )
+            f"Your '{alias_name}' cache configuration might expose your cache "
+            f"or lead to corruption of your data because its LOCATION "
+            f"{relation} {name}.",
+            id="caches.W002",
+        )

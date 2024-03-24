@@ -22,9 +22,9 @@ def check_default_cache_is_configured(app_configs, **kwargs):
 @register(Tags.caches, deploy=True)
 def check_cache_location_not_exposed(app_configs, **kwargs):
     cache = None
-    alias_name = ''
+    alias_name = ""
     for alias, config in settings.CACHES.items():
-        if config.get('BACKEND').endswith("FileBasedCache"):
+        if config.get("BACKEND").endswith("FileBasedCache"):
             cache = caches[alias]
             alias_name = alias
 
@@ -56,12 +56,14 @@ def check_file_based_cache_is_absolute(app_configs, **kwargs):
     alias_name = None
     location = None
     for alias, config in settings.CACHES.items():
-        if config.get('BACKEND').endswith("FileBasedCache"):
+        if config.get("BACKEND").endswith("FileBasedCache"):
             alias_name = alias
             location = config
 
-    if (alias_name is not None and
-            not pathlib.Path(location.get("LOCATION")).is_absolute()):
+    if (
+        alias_name is not None
+        and not pathlib.Path(location.get("LOCATION")).is_absolute()
+    ):
         return Warning(
             f"Your '{alias_name}' cache LOCATION path is relative. Use an "
             f"absolute path instead.",
