@@ -1,8 +1,8 @@
 "File-based cache backend"
 import glob
 import os
-import pickle
 import pathlib
+import pickle
 import random
 import tempfile
 import time
@@ -10,9 +10,9 @@ import zlib
 from hashlib import md5
 
 from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
+from django.core.checks import Warning
 from django.core.files import locks
 from django.core.files.move import file_move_safe
-from django.core.checks import Warning
 
 class FileBasedCache(BaseCache):
     cache_suffix = ".djcache"
