@@ -1,5 +1,4 @@
 import pathlib
-import json
 
 from django.conf import settings
 from django.core.cache import DEFAULT_CACHE_ALIAS, caches

@@ -394,6 +394,7 @@ class BaseCache:
             "configured correctly."
         )
 
+
 memcached_error_chars_re = _lazy_re_compile(r"[\x00-\x20\x7f]")
 
 

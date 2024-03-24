@@ -14,6 +14,7 @@ from django.core.checks import Warning
 from django.core.files import locks
 from django.core.files.move import file_move_safe
 
+
 class FileBasedCache(BaseCache):
     cache_suffix = ".djcache"
     pickle_protocol = pickle.HIGHEST_PROTOCOL
