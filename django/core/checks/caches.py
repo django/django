@@ -64,10 +64,12 @@ def check_file_based_cache_is_absolute(app_configs, **kwargs):
         location is not None
         and not pathlib.Path(location).is_absolute()
     ):
-        return [Warning(
-            f"Your '{alias_name}' cache LOCATION path is relative. Use an "
-            f"absolute path instead.",
-            id="caches.W003",
-        )]
+        return [
+            Warning(
+                f"Your '{alias_name}' cache LOCATION path is relative. Use an "
+                f"absolute path instead.",
+                id="caches.W003",
+            )
+        ]
 
     return []
