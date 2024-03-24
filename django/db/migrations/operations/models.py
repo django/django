@@ -84,6 +84,8 @@ class CreateModel(ModelOperation):
             kwargs["bases"] = self.bases
         if self.managers and self.managers != [("objects", models.Manager())]:
             kwargs["managers"] = self.managers
+        if self.metaclass and self.metaclass != models.base.ModelBase:
+            kwargs["metaclass"] = self.metaclass.__class__.__qualname__
         return (self.__class__.__qualname__, [], kwargs)
 
     def state_forwards(self, app_label, state):
@@ -133,6 +135,13 @@ class CreateModel(ModelOperation):
                 and resolve_relation(base, app_label) == reference_model_tuple
             ):
                 return True
+
+        if (
+            self.metaclass is not models.base.ModelBase
+            and isinstance(self.metaclass, str)
+            and resolve_relation(self.metaclass, app_label) == reference_model_tuple
+        ):
+            return True
 
         # Check we have no FKs/M2Ms with it
         for _name, field in self.fields:

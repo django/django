@@ -961,10 +961,16 @@ class ModelState:
         body["Meta"] = meta
         body["__module__"] = "__fake__"
 
+        metaclass = (
+            apps.get_model(self.metaclass)
+            if isinstance(self.metaclass, str)
+            else self.metaclass
+        )
+
         # Restore managers
         body.update(self.construct_managers())
         # Then, make a Model object (apps.register_model is called in __new__)
-        return self.metaclass(self.name, bases, body)
+        return metaclass(self.name, bases, body)
 
     def get_index_by_name(self, name):
         for index in self.options["indexes"]:
