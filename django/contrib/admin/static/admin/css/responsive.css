@@ -171,7 +171,7 @@ input[type="submit"], button {
     /* Forms */
 
     label {
-        font-size: 0.875rem;
+        font-size: 1rem;
     }
 
     /*
@@ -192,7 +192,7 @@ input[type="submit"], button {
         margin: 0;
         padding: 6px 8px;
         min-height: 2.25rem;
-        font-size: 0.875rem;
+        font-size: 1rem;
     }
 
     .form-row select {
