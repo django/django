@@ -187,7 +187,7 @@ class Q(tree.Node):
         expressions = list(self.flatten())
         f_references = {expr.name for expr in expressions if isinstance(expr, F)}
         q_references = {
-            child[0].split(LOOKUP_SEP)[0]
+            child[0].split(LOOKUP_SEP, 1)[0]
             for expr in expressions
             if isinstance(expr, Q)
             for child in expr.children
