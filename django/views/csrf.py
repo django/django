@@ -23,7 +23,11 @@ def csrf_failure(request, reason="", template_name=CSRF_FAILURE_TEMPLATE_NAME):
     """
     Default view used when request fails CSRF protection
     """
-    from django.middleware.csrf import REASON_NO_CSRF_COOKIE, REASON_NO_REFERER
+    from django.middleware.csrf import (
+        REASON_BAD_ORIGIN,
+        REASON_NO_CSRF_COOKIE,
+        REASON_NO_REFERER,
+    )
 
     c = {
         "title": _("Forbidden"),
@@ -61,6 +65,16 @@ def csrf_failure(request, reason="", template_name=CSRF_FAILURE_TEMPLATE_NAME):
             "re-enable them, at least for this site, or for “same-origin” "
             "requests."
         ),
+        "bad_origin": reason.split(" - ")[0] == REASON_BAD_ORIGIN.split(" - ")[0],
+        "forwarded_may_fix": (
+            request.headers.get("X-Forwarded-Proto", "") == "https"
+            and not request.is_secure()
+            or request.headers.get("Origin", "").endswith(
+                f'://{request.headers.get("X-Forwarded-Host", "")}'
+            )
+        ),
+        "x_forwarded_proto": request.headers.get("X-Forwarded-Proto"),
+        "x_forwarded_host": request.headers.get("X-Forwarded-Host"),
         "DEBUG": settings.DEBUG,
         "docs_version": get_docs_version(),
         "more": _("More information is available with DEBUG=True."),

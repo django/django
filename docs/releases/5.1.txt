@@ -167,7 +167,8 @@ Cache
 CSRF
 ~~~~
 
-* ...
+* The error messaging is improved when ``Origin`` checking fails,
+  including better hints when likely proxy headers are detected.
 
 Database backends
 ~~~~~~~~~~~~~~~~~
