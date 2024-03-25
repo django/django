@@ -99,8 +99,8 @@ support setting ``login_url`` or ``redirect_field_name`` via the
 Moving model between apps
 -------------------------
 
-The migration framework now auto-detect moving models between apps and
-supports doing so without database operations if associated database table
+The migration framework now auto-detects moving models between apps and
+supports doing so without database operations if a moved model's database table
 remains the same.
 
 Minor features
