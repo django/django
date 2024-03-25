@@ -26,7 +26,10 @@ logger = logging.getLogger("django.security.csrf")
 # This matches if any character is not in CSRF_ALLOWED_CHARS.
 invalid_token_chars_re = _lazy_re_compile("[^a-zA-Z0-9]")
 
-REASON_BAD_ORIGIN = "Origin checking failed - %s does not match any trusted origins."
+REASON_DISALLOWED_HOST = "Host is not allowed."
+REASON_BAD_ORIGIN = (
+    "Origin checking failed - %r does not match %r or any other trusted origins."
+)
 REASON_NO_REFERER = "Referer checking failed - no Referer."
 REASON_BAD_REFERER = "Referer checking failed - %s does not match any trusted origins."
 REASON_NO_CSRF_COOKIE = "CSRF cookie not set."
@@ -268,19 +271,10 @@ class CsrfViewMiddleware(MiddlewareMixin):
             # Set the Vary header since content varies with the CSRF cookie.
             patch_vary_headers(response, ("Cookie",))
 
-    def _origin_verified(self, request):
+    def _origin_verified(self, request, host_origin):
         request_origin = request.META["HTTP_ORIGIN"]
-        try:
-            good_host = request.get_host()
-        except DisallowedHost:
-            pass
-        else:
-            good_origin = "%s://%s" % (
-                "https" if request.is_secure() else "http",
-                good_host,
-            )
-            if request_origin == good_origin:
-                return True
+        if request_origin == host_origin:
+            return True
         if request_origin in self.allowed_origins_exact:
             return True
         try:
@@ -434,9 +428,17 @@ class CsrfViewMiddleware(MiddlewareMixin):
         # Reject the request if the Origin header doesn't match an allowed
         # value.
         if "HTTP_ORIGIN" in request.META:
-            if not self._origin_verified(request):
+            try:
+                host_origin = "%s://%s" % (
+                    "https" if request.is_secure() else "http",
+                    request.get_host(),
+                )
+            except DisallowedHost:
+                return self._reject(request, REASON_DISALLOWED_HOST)
+            if not self._origin_verified(request, host_origin):
                 return self._reject(
-                    request, REASON_BAD_ORIGIN % request.META["HTTP_ORIGIN"]
+                    request,
+                    REASON_BAD_ORIGIN % (request.META["HTTP_ORIGIN"], host_origin),
                 )
         elif request.is_secure():
             # If the Origin header wasn't provided, reject HTTPS requests if

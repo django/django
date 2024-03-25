@@ -130,7 +130,7 @@ class CsrfViewTests(SimpleTestCase):
         from django.views.csrf import Path
 
         with mock.patch.object(Path, "open") as m:
-            csrf_failure(mock.MagicMock(), mock.Mock())
+            csrf_failure(mock.MagicMock(), "Example reason")
             m.assert_called_once_with(encoding="utf-8")
 
     @override_settings(DEBUG=True)
