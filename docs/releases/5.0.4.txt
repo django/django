@@ -17,3 +17,7 @@ Bugfixes
 * Fixed a regression in Django 5.0 where the ``AdminFileWidget`` could be
   rendered with two ``id`` attributes on the "Clear" checkbox
   (:ticket:`35273`).
+
+* Fixed a bug in Django 5.0 that caused a migration crash on PostgreSQL 15+
+  when adding a partial ``UniqueConstraint`` with ``nulls_distinct``
+  (:ticket:`35329`).
