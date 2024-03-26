@@ -1139,7 +1139,7 @@ part of your database configuration :setting:`DATABASES`::
             "ENGINE": "django.db.backends.oracle",
             # ...
             "OPTIONS": {
-                "pool" = { 
+                "pool": {
                     "min": 1,
                     "max": 10,
                     # ...
