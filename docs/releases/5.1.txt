@@ -210,7 +210,10 @@ Error Reporting
 File Storage
 ~~~~~~~~~~~~
 
-* ...
+* The :attr:`~django.core.files.storage.FileSystemStorage.allow_overwrite`
+  parameter has been added to
+  :class:`~django.core.files.storage.FileSystemStorage`, to allow saving new
+  files over existing ones.
 
 File Uploads
 ~~~~~~~~~~~~
@@ -466,6 +469,12 @@ Miscellaneous
 
 * The ``check`` keyword argument of ``CheckConstraint`` is deprecated in favor
   of ``condition``.
+
+* The undocumented ``OS_OPEN_FLAGS`` property of
+  :class:`~django.core.files.storage.FileSystemStorage` has been deprecated.
+  To allow overwriting files in storage, set the new
+  :attr:`~django.core.files.storage.FileSystemStorage.allow_overwrite` option
+  to ``True`` instead.
 
 Features removed in 5.1
 =======================
