@@ -76,7 +76,7 @@ class Tests(TestCase):
         self.assertTrue(test_pool)
 
     @unittest.skipUnless(connection.is_pool, "Pool specific tests")
-    def test_connect_pool(self):
+    def test_pool_reuse(self):
         new_connection = connection.copy()
         self.assertIsNotNone(new_connection.pool)
 

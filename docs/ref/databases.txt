@@ -1115,7 +1115,9 @@ Connection pool
 .. versionadded:: 5.1
 
 To use a connection pool with `oracledb`_, you can set the ``"pool"`` in the
-:setting:`OPTIONS` part of your database configuration in :setting:`DATABASES`::
+:setting:`OPTIONS` part of your database configuration in :setting:`DATABASES`
+to ``True`` to use the `oracledb`_ `create_pool()`_  defaults or to a dict to 
+be passed to `create_pool()`_ ::
 
     DATABASES = {
         "default": {
@@ -1137,10 +1139,11 @@ part of your database configuration :setting:`DATABASES`::
             "ENGINE": "django.db.backends.oracle",
             # ...
             "OPTIONS": {
-                "pool": True,
-                "min": 1,
-                "max": 10,
-                # ...
+                "pool" = { 
+                    "min": 1,
+                    "max": 10,
+                    # ...
+                }
             },
         },
     }

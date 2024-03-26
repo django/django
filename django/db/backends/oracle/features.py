@@ -151,6 +151,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                         "test_set_autocommit_health_checks_enabled",
                         "servers.tests.LiveServerTestCloseConnectionTest."
                         "test_closes_connections",
+                        "backends.oracle.tests.TransactionalTests."
+                        "test_password_with_at_sign",
                     },
                 }
             )

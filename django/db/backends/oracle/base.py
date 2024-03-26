@@ -257,9 +257,18 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
         if self.alias not in self._connection_pools:
             connect_kwargs = self.get_connection_params()
-            del connect_kwargs["pool"]
-            if not connect_kwargs.get("max"):
+            pool_options = connect_kwargs["pool"]
+
+            if pool_options is True:
                 connect_kwargs["max"] = 4
+            else:
+                for key, val in pool_options.items():
+                    connect_kwargs[key] = val
+                if not connect_kwargs.get("max"):
+                    connect_kwargs["max"] = 4
+
+            del connect_kwargs["pool"]
+
             pool = Database.create_pool(
                 user=self.settings_dict["USER"],
                 password=self.settings_dict["PASSWORD"],
