@@ -511,7 +511,7 @@ msgid ""
 "%(allowed_extensions)s."
 msgstr ""
 "A extensão de arquivo “%(extension)s” não é permitida. As extensões válidas "
-"são: %(allowed_extensions)s ."
+"são: %(allowed_extensions)s."
 
 msgid "Null characters are not allowed."
 msgstr "Caracteres nulos não são permitidos."
