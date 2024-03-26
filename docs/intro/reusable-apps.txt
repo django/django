@@ -314,6 +314,72 @@ working. We'll now fix this by installing our new ``django-polls`` package.
 
 #. Run the development server to confirm the project continues to work.
 
+Testing your app
+================
+
+Since we moved the ``polls`` directory out of the project, we don't have the
+project's ``settings.py`` and ``urls.py`` anymore. We need another way to
+configure our app in order to test it.
+
+#. First create a ``tests`` directory and move the tests over from the
+   ``polls`` directory. Because the tests now reside in a different module the
+   relative import ``from .models import Poll`` has to be changed to
+   ``from polls.models import Poll``.
+
+#. Now create a ``settings.py`` inside the ``tests`` folder which will contain
+   only the settings required to test the application.
+
+   .. code-block:: python
+       :caption: ``tests/settings.py``
+
+       from django.urls import include, path
+
+       SECRET_KEY = "fake-key"
+
+       INSTALLED_APPS = [
+           "polls",
+           # adding tests allows us to define models inside the tests package
+           # "tests",
+       ]
+
+       DATABASES = {
+           "default": {
+               "ENGINE": "django.db.backends.sqlite3",
+               "NAME": ":memory:",
+           }
+       }
+
+       TEMPLATES = [
+           {
+               "BACKEND": "django.template.backends.django.DjangoTemplates",
+               "APP_DIRS": True,
+           },
+       ]
+
+       ROOT_URLCONF = "tests.urls"
+
+#. Because the test involves views, a :setting:`ROOT_URLCONF` that includes our
+   app is needed. Create an appropriate ``urls.py`` inside the ``tests``
+   directory.
+
+   .. code-block:: python
+       :caption: ``tests/urls.py``
+
+       from django.urls import include, path
+
+       urlpatterns = [
+           path("polls/", include("polls.urls")),
+       ]
+
+#. Now run the tests.
+
+   .. code-block:: shell
+
+        python -m django test --settings=tests.settings tests
+
+For more information on testing reusable applications see :ref:`Advanced
+testing topics <testing-reusable-applications>`.
+
 Publishing your app
 ===================
 
