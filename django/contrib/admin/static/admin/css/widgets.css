@@ -591,3 +591,10 @@ ul.timelist, .timelist li {
     width: 600px;
     height: 400px;
 }
+
+/* READ-ONLY-PASSWORD WIDGET */
+
+.read-only-password > div + div {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
