@@ -749,6 +749,7 @@ class ManagerTest(SimpleTestCase):
         "values",
         "values_list",
         "update",
+        "update_returning",
         "reverse",
         "defer",
         "only",
@@ -780,6 +781,7 @@ class ManagerTest(SimpleTestCase):
         "alatest",
         "aupdate",
         "aupdate_or_create",
+        "aupdate_returning",
     ]
 
     def test_manager_methods(self):
