@@ -104,20 +104,9 @@ class FileSystemStorage(Storage, StorageSettingsMixin):
 
                 # This is a normal uploadedfile that we can stream.
                 else:
-                    # The combination of O_CREAT and O_EXCL makes os.open() raise
-                    # OSError if the file already exists before it's opened.
-                    OS_OPEN_FLAGS = (
-                        os.O_WRONLY
-                        | os.O_CREAT
-                        | os.O_EXCL
-                        | getattr(os, "O_BINARY", 0)
-                    )
-
-                    if self.ALLOW_OVERWRITE:
-                        open_flags = OS_OPEN_FLAGS & ~os.O_EXCL
-                    else:
-                        open_flags = OS_OPEN_FLAGS
-                    # The current umask value is masked out by os.open!
+                    open_flags = os.O_WRONLY | os.O_CREAT | getattr(os, "O_BINARY", 0)
+                    if not self.ALLOW_OVERWRITE:
+                        open_flags |= os.O_EXCL
                     fd = os.open(full_path, open_flags, 0o666)
                     _file = None
                     try:
