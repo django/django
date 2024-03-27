@@ -21,9 +21,7 @@ class FileSystemStorage(Storage, StorageSettingsMixin):
     Standard filesystem storage
     """
 
-    # The combination of O_CREAT and O_EXCL makes os.open() raise OSError if
-    # the file already exists before it's opened.
-    OS_OPEN_FLAGS = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_BINARY", 0)
+    ALLOW_OVERWRITE = False
 
     def __init__(
         self,
@@ -98,12 +96,18 @@ class FileSystemStorage(Storage, StorageSettingsMixin):
             try:
                 # This file has a file path that we can move.
                 if hasattr(content, "temporary_file_path"):
-                    file_move_safe(content.temporary_file_path(), full_path)
+                    file_move_safe(
+                        content.temporary_file_path(),
+                        full_path,
+                        allow_overwrite=self.ALLOW_OVERWRITE,
+                    )
 
                 # This is a normal uploadedfile that we can stream.
                 else:
-                    # The current umask value is masked out by os.open!
-                    fd = os.open(full_path, self.OS_OPEN_FLAGS, 0o666)
+                    open_flags = os.O_WRONLY | os.O_CREAT | getattr(os, "O_BINARY", 0)
+                    if not self.ALLOW_OVERWRITE:
+                        open_flags |= os.O_EXCL
+                    fd = os.open(full_path, open_flags, 0o666)
                     _file = None
                     try:
                         locks.lock(fd, locks.LOCK_EX)
