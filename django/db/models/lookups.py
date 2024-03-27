@@ -572,7 +572,6 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
         return "".join(in_clause_elements), params
 
 
-@Field.register_lookup
 class TupleIn(In):
     lookup_name = "tuple_in"
 

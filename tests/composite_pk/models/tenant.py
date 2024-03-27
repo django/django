@@ -5,7 +5,7 @@ class Tenant(models.Model):
     pass
 
 
-class TenantUser(models.Model):
+class User(models.Model):
     tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE)
     id = models.SmallIntegerField()
 
@@ -13,12 +13,12 @@ class TenantUser(models.Model):
         primary_key = ("tenant_id", "id")
 
 
-class TenantUserComment(models.Model):
+class Comment(models.Model):
     tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE)
     id = models.SmallIntegerField()
     user_id = models.SmallIntegerField()
     user = models.ForeignObject(
-        TenantUser,
+        User,
         on_delete=models.CASCADE,
         from_fields=("tenant_id", "user_id"),
         to_fields=("tenant_id", "id"),

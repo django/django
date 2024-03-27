@@ -1,7 +1,7 @@
-from .tenant import Tenant, TenantUser, TenantUserComment
+from .tenant import Tenant, User, Comment
 
 __all__ = [
     "Tenant",
-    "TenantUser",
-    "TenantUserComment",
+    "User",
+    "Comment",
 ]
