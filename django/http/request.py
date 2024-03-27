@@ -7,18 +7,14 @@ from urllib.parse import parse_qsl, quote, urlencode, urljoin, urlsplit
 from django.conf import settings
 from django.core import signing
 from django.core.exceptions import (
-    BadRequest,
     DisallowedHost,
     ImproperlyConfigured,
     RequestDataTooBig,
     TooManyFieldsSent,
 )
 from django.core.files import uploadhandler
-from django.http.multipartparser import (
-    MultiPartParser,
-    MultiPartParserError,
-    TooManyFilesSent,
-)
+from django.http import parsers
+from django.http.multipartparser import MultiPartParser
 from django.utils.datastructures import (
     CaseInsensitiveMapping,
     ImmutableList,
@@ -73,6 +69,11 @@ class HttpRequest:
         self.resolver_match = None
         self.content_type = None
         self.content_params = None
+        self._parsers = [
+            parsers.FormParser,
+            parsers.MultiPartParser,
+            parsers.JSONParser,
+        ]
 
     def __repr__(self):
         if self.method is None or not self.get_full_path():
@@ -352,49 +353,52 @@ class HttpRequest:
         self._post = QueryDict()
         self._files = MultiValueDict()
 
-    def _load_post_and_files(self):
-        """Populate self._post and self._files if the content-type is a form type"""
-        if self.method != "POST":
+    def _load_post_and_files(
+        self, data_attr="_post", parser_list=None, methods=("POST",)
+    ):
+        if methods and self.method not in methods:
             self._post, self._files = (
                 QueryDict(encoding=self._encoding),
                 MultiValueDict(),
             )
             return
         if self._read_started and not hasattr(self, "_body"):
-            self._mark_post_parse_error()
+            setattr(self, data_attr, QueryDict())
+            self._files = MultiValueDict()
             return
 
-        if self.content_type == "multipart/form-data":
-            if hasattr(self, "_body"):
-                # Use already read data
-                data = BytesIO(self._body)
-            else:
-                data = self
+        if parser_list is None:
+            parser_list = [parsers.FormParser, parsers.MultiPartParser]
+        selected_parser = None
+        for parser in parser_list:
+            if parser.can_handle(self.content_type):
+                selected_parser = parser
+                break
+
+        if selected_parser:
+            parser = selected_parser(self)
             try:
-                self._post, self._files = self.parse_file_upload(self.META, data)
-            except (MultiPartParserError, TooManyFilesSent):
+                if self.content_type == "multipart/form-data":
+                    parser.parsers = (parser(self) for parser in parser_list)
+                    data, self._files = parser.parse(None)
+                else:
+                    data, self._files = parser.parse(self.body)
+                setattr(self, data_attr, data)
+            except Exception as e:
+                # TODO 'application/x-www-form-urlencoded' didn't do this.
                 # An error occurred while parsing POST data. Since when
                 # formatting the error the request handler might access
                 # self.POST, set self._post and self._file to prevent
                 # attempts to parse POST data again.
-                self._mark_post_parse_error()
-                raise
-        elif self.content_type == "application/x-www-form-urlencoded":
-            # According to RFC 1866, the "application/x-www-form-urlencoded"
-            # content type does not have a charset and should be always treated
-            # as UTF-8.
-            if self._encoding is not None and self._encoding.lower() != "utf-8":
-                raise BadRequest(
-                    "HTTP requests with the 'application/x-www-form-urlencoded' "
-                    "content type must be UTF-8 encoded."
-                )
-            self._post = QueryDict(self.body, encoding="utf-8")
-            self._files = MultiValueDict()
+                data_attr = QueryDict()
+                self._files = MultiValueDict()
+                raise e
         else:
-            self._post, self._files = (
+            data, self._files = (
                 QueryDict(encoding=self._encoding),
                 MultiValueDict(),
             )
+            setattr(self, data_attr, data)
 
     def close(self):
         if hasattr(self, "_files"):
@@ -428,6 +432,29 @@ class HttpRequest:
 
     def readlines(self):
         return list(self)
+
+    @property
+    def parsers(self):
+        return self._parsers
+
+    @parsers.setter
+    def parsers(self, parsers):
+        if hasattr(self, "_data") or hasattr(self, "_files"):
+            raise AttributeError(
+                "You cannot change parsers after processing the request's content."
+            )
+        self._parsers = parsers
+
+    # TODO should this property be on [WSGI|ASGI]Request?
+    @property
+    def data(self):
+        if not hasattr(self, "_data"):
+            self._load_post_and_files("_data", self.parsers, methods=None)
+        return self._data
+
+    @data.setter
+    def data(self, data):
+        self._data = data
 
 
 class HttpHeaders(CaseInsensitiveMapping):
