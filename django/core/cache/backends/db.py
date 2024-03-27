@@ -3,40 +3,39 @@ import base64
 import pickle
 from datetime import datetime, timezone
 
+from django.apps import apps
 from django.conf import settings
 from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
 from django.db import DatabaseError, connections, models, router, transaction
+from django.db.models import Q
 from django.utils.timezone import now as tz_now
-
-
-class Options:
-    """A class that will quack like a Django model _meta class.
-
-    This allows cache operations to be controlled by the router
-    """
-
-    def __init__(self, table):
-        self.db_table = table
-        self.app_label = "django_cache"
-        self.model_name = "cacheentry"
-        self.verbose_name = "cache entry"
-        self.verbose_name_plural = "cache entries"
-        self.object_name = "CacheEntry"
-        self.abstract = False
-        self.managed = True
-        self.proxy = False
-        self.swapped = False
 
 
 class BaseDatabaseCache(BaseCache):
     def __init__(self, table, params):
         super().__init__(params)
         self._table = table
+        self.cache_model_class = self._get_cache_entry_model(self._table)
 
-        class CacheEntry:
-            _meta = Options(table)
+    def _get_cache_entry_model(self, table):
+        try:
+            model = apps.get_registered_model("django_cache", "cacheentry")
+            if table == model._meta.db_table:
+                return model
+            del apps.all_models["django_cache"]["cacheentry"]
+        except (LookupError, KeyError):
+            pass
 
-        self.cache_model_class = CacheEntry
+        class CacheEntry(models.Model):
+            cache_key = models.CharField(max_length=255, unique=True, primary_key=True)
+            value = models.TextField()
+            expires = models.DateTimeField(db_index=True)
+
+            class Meta:
+                app_label = "django_cache"
+                db_table = table
+
+        return CacheEntry
 
 
 class DatabaseCache(BaseDatabaseCache):
@@ -61,33 +60,15 @@ class DatabaseCache(BaseDatabaseCache):
 
         db = router.db_for_read(self.cache_model_class)
         connection = connections[db]
-        quote_name = connection.ops.quote_name
-        table = quote_name(self._table)
-
-        with connection.cursor() as cursor:
-            cursor.execute(
-                "SELECT %s, %s, %s FROM %s WHERE %s IN (%s)"
-                % (
-                    quote_name("cache_key"),
-                    quote_name("value"),
-                    quote_name("expires"),
-                    table,
-                    quote_name("cache_key"),
-                    ", ".join(["%s"] * len(key_map)),
-                ),
-                list(key_map),
-            )
-            rows = cursor.fetchall()
+        rows = (
+            self.cache_model_class.objects.using(db)
+            .filter(cache_key__in=list(key_map))
+            .values_list("cache_key", "value", "expires")
+        )
 
         result = {}
         expired_keys = []
-        expression = models.Expression(output_field=models.DateTimeField())
-        converters = connection.ops.get_db_converters(
-            expression
-        ) + expression.get_db_converters(connection)
         for key, value, expires in rows:
-            for converter in converters:
-                expires = converter(expires, expression, connection)
             if expires < tz_now():
                 expired_keys.append(key)
             else:
@@ -233,25 +214,14 @@ class DatabaseCache(BaseDatabaseCache):
 
     def has_key(self, key, version=None):
         key = self.make_and_validate_key(key, version=version)
-
         db = router.db_for_read(self.cache_model_class)
-        connection = connections[db]
-        quote_name = connection.ops.quote_name
+        now = tz_now().replace(microsecond=0)
 
-        now = tz_now().replace(microsecond=0, tzinfo=None)
-
-        with connection.cursor() as cursor:
-            cursor.execute(
-                "SELECT %s FROM %s WHERE %s = %%s and %s > %%s"
-                % (
-                    quote_name("cache_key"),
-                    quote_name(self._table),
-                    quote_name("cache_key"),
-                    quote_name("expires"),
-                ),
-                [key, connection.ops.adapt_datetimefield_value(now)],
-            )
-            return cursor.fetchone() is not None
+        return (
+            self.cache_model_class.objects.using(db)
+            .filter(Q(cache_key=key) & Q(expires__gt=now))
+            .exists()
+        )
 
     def _cull(self, db, cursor, now, num):
         if self._cull_frequency == 0:
