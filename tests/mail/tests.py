@@ -1062,11 +1062,11 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             ),
             # Address with long display name and unicode domain.
             (
-                ("To Example very long" * 4, "to@exampl€.com"),
+                ("To Example very long" * 4, "to@examplе.com"),
                 "utf-8",
                 "To Example very longTo Example very longTo Example very longT"
                 "o Example very\n"
-                " long <to@xn--exampl-nc1c.com>",
+                " long <to@xn--exampl-8of.com>",
             ),
         ):
             with self.subTest(email_address=email_address, encoding=encoding):
