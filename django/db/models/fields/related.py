@@ -773,6 +773,21 @@ class ForeignObject(RelatedField):
         attname, column = super().get_attname_column()
         return attname, None
 
+    def _get_joining_fields(self, source):
+        joining_fields = []
+        for lhs_field, rhs_field in source:
+            if hasattr(lhs_field, "component_fields") and hasattr(
+                rhs_field, "component_fields"
+            ):
+                joining_fields.extend(
+                    self._get_joining_fields(
+                        zip(lhs_field.component_fields, rhs_field.component_fields)
+                    )
+                )
+            else:
+                joining_fields.append((lhs_field, rhs_field))
+        return joining_fields
+
     def get_joining_columns(self, reverse_join=False):
         warnings.warn(
             "ForeignObject.get_joining_columns() is deprecated. Use "
@@ -780,9 +795,10 @@ class ForeignObject(RelatedField):
             RemovedInDjango60Warning,
         )
         source = self.reverse_related_fields if reverse_join else self.related_fields
-        return tuple(
-            (lhs_field.column, rhs_field.column) for lhs_field, rhs_field in source
-        )
+        joining_columns = []
+        for lhs_field, rhs_field in self._get_joining_fields(source):
+            joining_columns.append((lhs_field.column, rhs_field.column))
+        return tuple(joining_columns)
 
     def get_reverse_joining_columns(self):
         warnings.warn(
@@ -793,9 +809,8 @@ class ForeignObject(RelatedField):
         return self.get_joining_columns(reverse_join=True)
 
     def get_joining_fields(self, reverse_join=False):
-        return tuple(
-            self.reverse_related_fields if reverse_join else self.related_fields
-        )
+        source = self.reverse_related_fields if reverse_join else self.related_fields
+        return tuple(self._get_joining_fields(source))
 
     def get_reverse_joining_fields(self):
         return self.get_joining_fields(reverse_join=True)
@@ -1145,6 +1160,35 @@ class ForeignKey(ForeignObject):
 
     def get_prep_value(self, value):
         return self.target_field.get_prep_value(value)
+
+    def contribute_to_class(self, cls, name, private_only=False):
+        from .composite import CompositeField
+
+        super().contribute_to_class(cls, name, private_only)
+        remote_name = self.remote_field.field_name
+        if remote_name:
+            if not isinstance(self.remote_field.model, str):
+                remote_field = self.remote_field.model._meta.get_field(remote_name)
+                if isinstance(remote_field, CompositeField):
+                    self.contribute_component_fields(cls)
+
+    def contribute_component_fields(self, cls):
+        from .composite import CompositeField
+
+        field = self.target_field
+        if isinstance(field, CompositeField):
+            new_field = CompositeField(
+                **dict(zip(field.component_names, field.component_fields)),
+                db_index=True,
+            )
+            new_field.contribute_to_class(cls, field.attname)
+
+    @property
+    def composite(self):
+        from .composite import CompositeField
+
+        field = self.target_field
+        return isinstance(field, CompositeField)
 
     def contribute_to_related_class(self, cls, related):
         super().contribute_to_related_class(cls, related)

@@ -790,7 +790,11 @@ class Query(BaseExpression):
     def _get_defer_select_mask(self, opts, mask, select_mask=None):
         if select_mask is None:
             select_mask = {}
-        select_mask[opts.pk] = {}
+        if hasattr(opts.pk, "component_fields"):
+            for field in opts.pk.component_fields:
+                select_mask[field] = {}
+        else:
+            select_mask[opts.pk] = {}
         # All concrete fields that are not part of the defer mask must be
         # loaded. If a relational field is encountered it gets added to the
         # mask for it be considered if `select_related` and the cycle continues
@@ -836,7 +840,11 @@ class Query(BaseExpression):
     def _get_only_select_mask(self, opts, mask, select_mask=None):
         if select_mask is None:
             select_mask = {}
-        select_mask[opts.pk] = {}
+        if hasattr(opts.pk, "component_fields"):
+            for field in opts.pk.component_fields:
+                select_mask[field] = {}
+        else:
+            select_mask[opts.pk] = {}
         # Only include fields mentioned in the mask.
         for field_name, field_mask in mask.items():
             field = opts.get_field(field_name)
@@ -1817,6 +1825,49 @@ class Query(BaseExpression):
                 break
         return path, final_field, targets, names[pos + 1 :]
 
+    def _expand_components(self, final_field, prefix=None, lookup_sep=LOOKUP_SEP):
+        result = []
+        for field in final_field.component_fields:
+            if hasattr(field, "component_fields"):
+                result.extend(
+                    self.expand_components(field, prefix=prefix, lookup_sep=lookup_sep)
+                )
+            elif prefix:
+                result.append(prefix + lookup_sep + field.name)
+            else:
+                result.append(field.name)
+        return result
+
+    def expand_components(self, name):
+        flatten_names = (name,)
+
+        if name in self.annotations:
+            return
+
+        if self.extra and name in self.extra:
+            return
+
+        lookup_splitted = name.split(LOOKUP_SEP)
+        _, final_field, _, lookup_parts = self.names_to_path(
+            lookup_splitted, self.model._meta
+        )
+        if lookup_parts:
+            return flatten_names
+        if hasattr(final_field, "component_fields"):
+            path_prefix = LOOKUP_SEP.join(lookup_splitted[0:-1])
+            flatten_names = tuple(
+                self._expand_components(final_field, prefix=path_prefix)
+            )
+        elif lookup_splitted[-1] == "pk":
+            path_prefix = LOOKUP_SEP.join(lookup_splitted[0:-1])
+            name = (
+                path_prefix + LOOKUP_SEP + final_field.name
+                if path_prefix
+                else final_field.name
+            )
+            flatten_names = (name,)
+        return flatten_names
+
     def setup_joins(
         self,
         names,
@@ -2243,18 +2294,23 @@ class Query(BaseExpression):
         If 'ordering' is empty, clear all ordering from the query.
         """
         errors = []
+        flatten_ordering = []
         for item in ordering:
+            flatten_ordering.append(item)
             if isinstance(item, str):
                 if item == "?":
                     continue
+                desc = item.startswith("-")
                 item = item.removeprefix("-")
-                if item in self.annotations:
-                    continue
-                if self.extra and item in self.extra:
-                    continue
                 # names_to_path() validates the lookup. A descriptive
                 # FieldError will be raise if it's not.
-                self.names_to_path(item.split(LOOKUP_SEP), self.model._meta)
+                items = self.expand_components(item)
+                if items is None:
+                    continue
+                items = ["-" + i for i in items] if desc else items
+                flatten_ordering.pop()
+                flatten_ordering.extend(items)
+
             elif not hasattr(item, "resolve_expression"):
                 errors.append(item)
             if getattr(item, "contains_aggregate", False):
@@ -2265,7 +2321,7 @@ class Query(BaseExpression):
         if errors:
             raise FieldError("Invalid order_by arguments: %s" % errors)
         if ordering:
-            self.order_by += ordering
+            self.order_by += tuple(flatten_ordering)
         else:
             self.default_ordering = False
 
@@ -2384,16 +2440,29 @@ class Query(BaseExpression):
         # splitting and handling when computing the SQL column names (as part of
         # get_columns()).
         existing, defer = self.deferred_loading
+
+        flatten_fields = set()
+        for field_name in field_names:
+            expanded = (field_name,)
+            if isinstance(field_name, str):
+                try:
+                    expanded = self.expand_components(field_name)
+                except FieldError:
+                    pass
+            if expanded is None:
+                expanded = (field_name,)
+            flatten_fields.update(expanded)
+
         if defer:
             # Add to existing deferred names.
-            self.deferred_loading = existing.union(field_names), True
+            self.deferred_loading = existing.union(flatten_fields), True
         else:
             # Remove names from the set of any existing "immediate load" names.
-            if new_existing := existing.difference(field_names):
+            if new_existing := existing.difference(flatten_fields):
                 self.deferred_loading = new_existing, False
             else:
                 self.clear_deferred_loading()
-                if new_only := set(field_names).difference(existing):
+                if new_only := set(flatten_fields).difference(existing):
                     self.deferred_loading = new_only, True
 
     def add_immediate_loading(self, field_names):
@@ -2412,13 +2481,25 @@ class Query(BaseExpression):
             field_names.remove("pk")
             field_names.add(self.get_meta().pk.name)
 
+        flatten_fields = set()
+        for field_name in field_names:
+            expanded = (field_name,)
+            if isinstance(field_name, str):
+                try:
+                    expanded = self.expand_components(field_name)
+                except FieldError:
+                    pass
+            if expanded is None:
+                expanded = (field_name,)
+            flatten_fields.update(expanded)
+
         if defer:
             # Remove any existing deferred names from the current set before
             # setting the new names.
-            self.deferred_loading = field_names.difference(existing), False
+            self.deferred_loading = flatten_fields.difference(existing), False
         else:
             # Replace any existing "immediate load" field names.
-            self.deferred_loading = frozenset(field_names), False
+            self.deferred_loading = frozenset(flatten_fields), False
 
     def set_annotation_mask(self, names):
         """Set the mask of annotations that will be returned by the SELECT."""

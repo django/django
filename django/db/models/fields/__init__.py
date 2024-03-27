@@ -172,6 +172,7 @@ class Field(RegisterLookupMixin):
     one_to_one = None
     related_model = None
     generated = False
+    composite = False
 
     descriptor_class = DeferredAttribute
 
@@ -653,6 +654,8 @@ class Field(RegisterLookupMixin):
             path = path.replace("django.db.models.fields.json", "django.db.models")
         elif path.startswith("django.db.models.fields.proxy"):
             path = path.replace("django.db.models.fields.proxy", "django.db.models")
+        elif path.startswith("django.db.models.fields.composite"):
+            path = path.replace("django.db.models.fields.composite", "django.db.models")
         elif path.startswith("django.db.models.fields"):
             path = path.replace("django.db.models.fields", "django.db.models")
         # Return basic info - other fields should override this.
@@ -946,8 +949,8 @@ class Field(RegisterLookupMixin):
         If private_only is True, create a separate instance of this field
         for every subclass of cls, even if cls is not an abstract model.
         """
-        self.set_attributes_from_name(name)
         self.model = cls
+        self.set_attributes_from_name(name)
         cls._meta.add_field(self, private=private_only)
         if self.column:
             setattr(cls, self.attname, self.descriptor_class(self))

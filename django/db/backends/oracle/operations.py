@@ -578,6 +578,12 @@ END;
         else:
             return "TABLESPACE %s" % self.quote_name(tablespace)
 
+    def tuple_operation(self, expression):
+        """
+        Oracle doesn't support Exact for tuple
+        """
+        return False
+
     def adapt_datefield_value(self, value):
         """
         Transform a date value to an object compatible with what is expected

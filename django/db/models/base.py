@@ -463,6 +463,25 @@ class Model(AltersData, metaclass=ModelBase):
         opts = self._meta
         _setattr = setattr
         _DEFERRED = DEFERRED
+        _NOTPRESENT = object()
+        seen_attname = {}
+        field_conflicts = []
+
+        def see_field(field, name=None):
+            if hasattr(field, "component_names"):
+                for name in field.component_names:
+                    if name in seen_attname:
+                        field_conflicts.append((name, field.name))
+                    seen_attname[name] = field.name
+                return
+            if name is None and hasattr(field, "attname"):
+                name = field.attname
+            if name is not None:
+                if name in seen_attname:
+                    field_conflicts.append((name, seen_attname[name]))
+                else:
+                    seen_attname[name] = field.name
+
         if opts.abstract:
             raise TypeError("Abstract models cannot be instantiated.")
 
@@ -488,6 +507,8 @@ class Model(AltersData, metaclass=ModelBase):
             for val, field in zip(args, fields_iter):
                 if val is _DEFERRED:
                     continue
+                # presume concrete fields won't conflict
+                seen_attname[field.attname] = field.name
                 _setattr(self, field.attname, val)
         else:
             # Slower, kwargs-ready version.
@@ -495,6 +516,7 @@ class Model(AltersData, metaclass=ModelBase):
             for val, field in zip(args, fields_iter):
                 if val is _DEFERRED:
                     continue
+                see_field(field)
                 _setattr(self, field.attname, val)
                 if kwargs.pop(field.name, NOT_PROVIDED) is not NOT_PROVIDED:
                     raise TypeError(
@@ -517,22 +539,15 @@ class Model(AltersData, metaclass=ModelBase):
                         rel_obj = kwargs.pop(field.name)
                         is_related_object = True
                     except KeyError:
-                        try:
-                            # Object instance wasn't passed in -- must be an ID.
-                            val = kwargs.pop(field.attname)
-                        except KeyError:
-                            val = field.get_default()
+                        # Object instance wasn't passed in -- must be an ID.
+                        val = kwargs.pop(field.attname, _NOTPRESENT)
                 else:
-                    try:
-                        val = kwargs.pop(field.attname)
-                    except KeyError:
-                        # This is done with an exception rather than the
-                        # default argument on pop because we don't want
-                        # get_default() to be evaluated, and then not used.
-                        # Refs #12057.
-                        val = field.get_default()
+                    # This is done with _NOTPRESENT  because we don't want
+                    # get_default() to be evaluated, and then not used.
+                    # Refs #12057.
+                    val = kwargs.pop(field.attname, _NOTPRESENT)
             else:
-                val = field.get_default()
+                val = _NOTPRESENT
 
             if is_related_object:
                 # If we are passed a related instance, set it using the
@@ -542,6 +557,12 @@ class Model(AltersData, metaclass=ModelBase):
                 if rel_obj is not _DEFERRED:
                     _setattr(self, field.name, rel_obj)
             else:
+                if val is _NOTPRESENT:
+                    if field.attname in seen_attname:
+                        continue
+                    val = field.get_default()
+                elif val is not DEFERRED:
+                    see_field(field)
                 if val is not _DEFERRED:
                     _setattr(self, field.attname, val)
 
@@ -556,11 +577,12 @@ class Model(AltersData, metaclass=ModelBase):
                         _setattr(self, prop, value)
                 else:
                     try:
-                        opts.get_field(prop)
+                        field = opts.get_field(prop)
                     except FieldDoesNotExist:
                         unexpected += (prop,)
                     else:
                         if value is not _DEFERRED:
+                            see_field(field, prop)
                             _setattr(self, prop, value)
             if unexpected:
                 unexpected_names = ", ".join(repr(n) for n in unexpected)
@@ -568,6 +590,13 @@ class Model(AltersData, metaclass=ModelBase):
                     f"{cls.__name__}() got unexpected keyword arguments: "
                     f"{unexpected_names}"
                 )
+        if field_conflicts:
+            field_names = ", ".join(repr(n) for n, _ in field_conflicts)
+            composite_names = ", ".join(repr(n) for n, _ in field_conflicts)
+            raise TypeError(
+                f"{cls.__qualname__}() set field {field_names} "
+                f"twice, via field {composite_names}."
+            )
         super().__init__()
         post_init.send(sender=cls, instance=self)
 

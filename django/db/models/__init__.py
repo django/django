@@ -38,6 +38,7 @@ from django.db.models.expressions import (
 )
 from django.db.models.fields import *  # NOQA
 from django.db.models.fields import __all__ as fields_all
+from django.db.models.fields.composite import CompositeField
 from django.db.models.fields.files import FileField, ImageField
 from django.db.models.fields.generated import GeneratedField
 from django.db.models.fields.json import JSONField
@@ -93,6 +94,7 @@ __all__ += [
     "Window",
     "WindowFrame",
     "WindowFrameExclusion",
+    "CompositeField",
     "FileField",
     "ImageField",
     "GeneratedField",

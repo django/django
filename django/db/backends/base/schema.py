@@ -1652,7 +1652,7 @@ class BaseDatabaseSchemaEditor:
         ) or (old_path, old_args, old_kwargs) != (new_path, new_args, new_kwargs)
 
     def _field_should_be_indexed(self, model, field):
-        return field.db_index and not field.unique
+        return field.db_index and not field.unique and not field.composite
 
     def _field_became_primary_key(self, old_field, new_field):
         return not old_field.primary_key and new_field.primary_key

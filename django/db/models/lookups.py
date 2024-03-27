@@ -4,7 +4,14 @@ import warnings
 
 from django.core.exceptions import EmptyResultSet, FullResultSet
 from django.db.backends.base.operations import BaseDatabaseOperations
-from django.db.models.expressions import Case, Expression, Func, Value, When
+from django.db.models.expressions import (
+    Case,
+    Expression,
+    ExpressionList,
+    Func,
+    Value,
+    When,
+)
 from django.db.models.fields import (
     BooleanField,
     CharField,
@@ -385,6 +392,32 @@ class Exact(FieldGetDbPrepValueMixin, BuiltinLookup):
         return super().as_sql(compiler, connection)
 
 
+class TupleExact(Exact):
+    def get_prep_lookup(self):
+        if not isinstance(self.lhs, ExpressionList):
+            raise ValueError(
+                "The lhs for a tuple exact lookup must be expression list."
+            )
+        return super().get_prep_lookup()
+
+    def as_sql(self, compiler, connection):
+        from django.db.models.sql.where import AND, WhereNode
+
+        if not connection.ops.tuple_operation(self):
+            lhs = self.lhs.get_source_expressions()
+            if len(lhs) != len(self.rhs):
+                raise ValueError(
+                    f"The QuerySet value for an exact lookup must have the same "
+                    f"arity for lhs and rhs ({len(lhs)} != {len(self.rhs)})"
+                )
+            exprs = [
+                Exact(lhs, rhs)
+                for lhs, rhs in zip(self.lhs.get_source_expressions(), self.rhs)
+            ]
+            return compiler.compile(WhereNode(exprs, connector=AND))
+        return super().as_sql(compiler, connection)
+
+
 @Field.register_lookup
 class IExact(BuiltinLookup):
     lookup_name = "iexact"
@@ -533,7 +566,17 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
             and len(self.rhs) > max_in_list_size
         ):
             return self.split_parameter_list_as_sql(compiler, connection)
+        if isinstance(self.lhs, ExpressionList) and not connection.ops.tuple_operation(
+            self
+        ):
+            return self.split_exact_as_sql(compiler, connection)
         return super().as_sql(compiler, connection)
+
+    def split_exact_as_sql(self, compiler, connection):
+        from django.db.models.sql.where import OR, WhereNode
+
+        exprs = [TupleExact(self.lhs, rhs) for rhs in self.rhs]
+        return compiler.compile(WhereNode(exprs, connector=OR))
 
     def split_parameter_list_as_sql(self, compiler, connection):
         # This is a special case for databases which limit the number of
