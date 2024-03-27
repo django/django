@@ -65,7 +65,7 @@ class TestHashedFiles:
 
     def test_path_ignored_completely(self):
         relpath = self.hashed_file_path("cached/css/ignored.css")
-        self.assertEqual(relpath, "cached/css/ignored.55e7c226dda1.css")
+        self.assertEqual(relpath, "cached/css/ignored.55e07d2ecdda.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
             self.assertIn(b"#foobar", content)
@@ -125,6 +125,15 @@ class TestHashedFiles:
             self.assertNotIn(b"/static/cached/styles.css", content)
             self.assertIn(b"/static/cached/styles.5e0040571e1a.css", content)
             self.assertNotIn(b"/static/styles_root.css", content)
+            self.assertIn(b"/static/styles_root.401f2509a628.css", content)
+            self.assertIn(b"/static/cached/img/relative.acae32e4532b.png", content)
+        self.assertPostCondition()
+
+    def test_adding_static_url(self):
+        relpath = self.hashed_file_path("cached/absolute_no_static.css")
+        self.assertEqual(relpath, "cached/absolute_no_static.3aa61bcbb5df.css")
+        with storage.staticfiles_storage.open(relpath) as relfile:
+            content = relfile.read()
             self.assertIn(b"/static/styles_root.401f2509a628.css", content)
             self.assertIn(b"/static/cached/img/relative.acae32e4532b.png", content)
         self.assertPostCondition()
@@ -674,7 +683,7 @@ class TestCollectionJSModuleImportAggregationManifestStorage(CollectionTestCase)
 
     def test_module_import(self):
         relpath = self.hashed_file_path("cached/module.js")
-        self.assertEqual(relpath, "cached/module.55fd6938fbc5.js")
+        self.assertEqual(relpath, "cached/module.cb3c6fa62fa1.js")
         tests = [
             # Relative imports.
             b'import testConst from "./module_test.477bbebe77f0.js";',
@@ -682,6 +691,7 @@ class TestCollectionJSModuleImportAggregationManifestStorage(CollectionTestCase)
             b'import { firstConst, secondConst } from "./module_test.477bbebe77f0.js";',
             # Absolute import.
             b'import rootConst from "/static/absolute_root.5586327fe78c.js";',
+            b'import secondRootConst from "/static/absolute_root.5586327fe78c.js";',
             # Dynamic import.
             b'const dynamicModule = import("./module_test.477bbebe77f0.js");',
             # Creating a module object.
@@ -701,7 +711,7 @@ class TestCollectionJSModuleImportAggregationManifestStorage(CollectionTestCase)
 
     def test_aggregating_modules(self):
         relpath = self.hashed_file_path("cached/module.js")
-        self.assertEqual(relpath, "cached/module.55fd6938fbc5.js")
+        self.assertEqual(relpath, "cached/module.cb3c6fa62fa1.js")
         tests = [
             b'export * from "./module_test.477bbebe77f0.js";',
             b'export { testConst } from "./module_test.477bbebe77f0.js";',
