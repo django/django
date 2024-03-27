@@ -4,7 +4,7 @@ import posixpath
 from django import forms
 from django.core import checks
 from django.core.files.base import File
-from django.core.files.images import ImageFile
+from django.core.files.images import ImageFile, get_image_dimensions
 from django.core.files.storage import Storage, default_storage
 from django.core.files.utils import validate_file_name
 from django.db.models import signals
@@ -12,6 +12,15 @@ from django.db.models.fields import Field
 from django.db.models.query_utils import DeferredAttribute
 from django.db.models.utils import AltersData
 from django.utils.translation import gettext_lazy as _
+
+
+class _FieldFilePassthrough:
+
+    def __init__(self, *, name, content):
+        # name and content are of the same type as
+        # name and content on FieldFile.save
+        self.name = name
+        self.content = content
 
 
 class FieldFile(File, AltersData):
@@ -91,7 +100,29 @@ class FieldFile(File, AltersData):
     def save(self, name, content, save=True):
         name = self.field.generate_filename(self.instance, name)
         self.name = self.storage.save(name, content, max_length=self.field.max_length)
-        setattr(self.instance, self.field.attname, self.name)
+
+        # Part of the fix for #8307
+        # Prior behavior was to always set the descriptor using the string returned
+        # from the storage backend, which resulted in the string being converted
+        # back to an FieldFile/ImageFieldFile when accessed. This resulted in a storage
+        # read in the case of ImageFieldFile.
+        # In general, a storage backend can change the contents of a file. In
+        # this specific case, it's possible that the width and height values will
+        # differ.
+        # If the user's storage backend does this and the user wants to ensure that
+        # the width and height values are correct, they can explicitly force the
+        # descriptor to recalculate the width and height values by re-setting the
+        # the value of the descriptor, e.g.
+        # obj.photo = obj.photo
+        # or explicitly calling Model.photo.update_image_dimensions(obj)
+        setattr(
+            self.instance,
+            self.field.attname,
+            _FieldFilePassthrough(
+                name=self.name,
+                content=content,
+            ),
+        )
         self._committed = True
 
         # Save the object because it has changed, unless save is False
@@ -218,6 +249,9 @@ class FileDescriptor(DeferredAttribute):
         return instance.__dict__[self.field.attname]
 
     def __set__(self, instance, value):
+        if isinstance(value, _FieldFilePassthrough):
+            value = value.name
+
         instance.__dict__[self.field.attname] = value
 
 
@@ -364,6 +398,7 @@ class ImageFileDescriptor(FileDescriptor):
 
     def __set__(self, instance, value):
         previous_file = instance.__dict__.get(self.field.attname)
+
         super().__set__(instance, value)
 
         # To prevent recalculating image dimensions when we are instantiating
@@ -376,10 +411,22 @@ class ImageFileDescriptor(FileDescriptor):
         # Assignment happening outside of Model.__init__() will trigger the
         # update right here.
         if previous_file is not None:
-            self.field.update_dimension_fields(instance, force=True)
+
+            # Content is explictly passed to update_dimensions_fields so that
+            # it can use the current value of the file if necessary
+            content = (
+                value.content if isinstance(value, _FieldFilePassthrough) else None
+            )
+
+            self.field.update_dimension_fields(
+                instance,
+                force=True,
+                content=content,
+            )
 
 
 class ImageFieldFile(ImageFile, FieldFile):
+
     def delete(self, save=True):
         # Clear the image dimensions cache
         if hasattr(self, "_dimensions_cache"):
@@ -445,7 +492,27 @@ class ImageField(FileField):
         if not cls._meta.abstract and (self.width_field or self.height_field):
             signals.post_init.connect(self.update_dimension_fields, sender=cls)
 
-    def update_dimension_fields(self, instance, force=False, *args, **kwargs):
+    def _update_dimension_fields_from_content(self, instance, content):
+        if isinstance(content, ImageFile):
+            width = content.width
+            height = content.height
+        else:
+            # This is supposed to be an instance of django's File object if the
+            # user follows docs
+            close = content.closed
+            content.open()
+            width, height = get_image_dimensions(content, close=close)
+
+        # Update the width and height fields.
+        if self.width_field:
+            setattr(instance, self.width_field, width)
+        if self.height_field:
+            setattr(instance, self.height_field, height)
+
+    # Why does this accept *args and **kwargs? Seems an oversight
+    def update_dimension_fields(
+        self, instance, force=False, content=None, *args, **kwargs
+    ):
         """
         Update field's width and height fields, if defined.
 
@@ -464,13 +531,20 @@ class ImageField(FileField):
         if not has_dimension_fields or self.attname not in instance.__dict__:
             return
 
+        # In the case that the descriptor was explicitly informed of the content,
+        # directly use that content to update the dimension fields.
+        # This avoids a double-read. See #8307
+        if content is not None:
+            self._update_dimension_fields_from_content(instance, content=content)
+            return
+
         # getattr will call the ImageFileDescriptor's __get__ method, which
         # coerces the assigned value into an instance of self.attr_class
-        # (ImageFieldFile in this case).
-        file = getattr(instance, self.attname)
+        # (ImageFieldFile in this case) or None.
+        field_file = getattr(instance, self.attname)
 
         # Nothing to update if we have no file and not being forced to update.
-        if not file and not force:
+        if not field_file and not force:
             return
 
         dimension_fields_filled = not (
@@ -487,10 +561,9 @@ class ImageField(FileField):
         if dimension_fields_filled and not force:
             return
 
-        # file should be an instance of ImageFieldFile or should be None.
-        if file:
-            width = file.width
-            height = file.height
+        if field_file:
+            width = field_file.width
+            height = field_file.height
         else:
             # No file, so clear dimensions fields.
             width = None

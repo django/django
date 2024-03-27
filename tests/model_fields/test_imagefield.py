@@ -16,6 +16,7 @@ except ImproperlyConfigured:
 
 if Image:
     from .models import (
+        NoReadImageModel,
         Person,
         PersonDimensionsFirst,
         PersonTwoImages,
@@ -469,3 +470,32 @@ class TwoImageFieldTests(ImageFieldTestMixin, TestCase):
         # Dimensions were recalculated, and hence file should have opened.
         self.assertIs(p.mugshot.was_opened, True)
         self.assertIs(p.headshot.was_opened, True)
+
+
+@skipIf(Image is None, "Pillow is required to test ImageField")
+class NoReadTests(ImageFieldTestMixin, TestCase):
+
+    NoReadImageModel = NoReadImageModel
+
+    def test_width_height_correct_name_mangling_correct(self):
+
+        instance1 = self.NoReadImageModel()
+
+        instance1.testimage.save("mug", self.file1)
+
+        self.assertEqual(instance1.width, 4)
+        self.assertEqual(instance1.height, 8)
+
+        instance1.save()
+
+        self.assertEqual(instance1.width, 4)
+        self.assertEqual(instance1.height, 8)
+
+        instance2 = self.NoReadImageModel()
+        instance2.testimage.save("mug", self.file1)
+        instance2.save()
+
+        self.assertNotEqual(instance1.testimage.name, instance2.testimage.name)
+
+        self.assertEqual(instance1.width, instance2.width)
+        self.assertEqual(instance1.height, instance2.height)

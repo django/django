@@ -13,6 +13,8 @@ from django.db.models.functions import Lower
 from django.utils.functional import SimpleLazyObject
 from django.utils.translation import gettext_lazy as _
 
+from .storage import NoReadFileSystemStorage
+
 try:
     from PIL import Image
 except ImportError:
@@ -372,6 +374,22 @@ if Image:
             height_field="headshot_height",
             width_field="headshot_width",
         )
+
+    class NoReadImageModel(models.Model):
+        """
+        Model that defines an ImageField with a storage backend that does not
+        support reading.
+
+        This supports a test to avoid a double-read performance problem."""
+
+        testimage = models.ImageField(
+            upload_to="tests",
+            storage=NoReadFileSystemStorage(),
+            width_field="width",
+            height_field="height",
+        )
+        width = models.IntegerField()
+        height = models.IntegerField()
 
 
 class CustomJSONDecoder(json.JSONDecoder):
