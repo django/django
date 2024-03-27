@@ -44,6 +44,13 @@ from django.db.models.fields.json import JSONField
 from django.db.models.fields.proxy import OrderWrt
 from django.db.models.indexes import *  # NOQA
 from django.db.models.indexes import __all__ as indexes_all
+from django.db.models.lazy import (
+    FETCH_ONE,
+    FETCH_PEERS,
+    RAISE,
+    lazy_mode,
+    set_default_lazy_mode,
+)
 from django.db.models.lookups import Lookup, Transform
 from django.db.models.manager import Manager
 from django.db.models.query import Prefetch, QuerySet, prefetch_related_objects
@@ -98,6 +105,11 @@ __all__ += [
     "GeneratedField",
     "JSONField",
     "OrderWrt",
+    "FETCH_ONE",
+    "FETCH_PEERS",
+    "RAISE",
+    "lazy_mode",
+    "set_default_lazy_mode",
     "Lookup",
     "Transform",
     "Manager",

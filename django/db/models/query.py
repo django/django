@@ -5,6 +5,7 @@ The main QuerySet implementation. This provides the public API for the ORM.
 import copy
 import operator
 import warnings
+import weakref
 from itertools import chain, islice
 
 from asgiref.sync import sync_to_async
@@ -120,6 +121,8 @@ class ModelIterable(BaseIterable):
             )
             for field, related_objs in queryset._known_related_objects.items()
         ]
+        peers = []
+        first_obj = None
         for row in compiler.results_iter(results):
             obj = model_cls.from_db(
                 db, init_list, row[model_fields_start:model_fields_end]
@@ -142,6 +145,17 @@ class ModelIterable(BaseIterable):
                     pass  # May happen in qs1 | qs2 scenarios.
                 else:
                     setattr(obj, field.name, rel_obj)
+
+            # Create peers, but only for >1 result, to save memory.
+            if first_obj is None:
+                first_obj = obj
+            else:
+                if not peers:
+                    peers.append(weakref.ref(first_obj))
+                    first_obj._state.peers = peers
+                    first_obj = True
+                peers.append(weakref.ref(obj))
+                obj._state.peers = peers
 
             yield obj
 

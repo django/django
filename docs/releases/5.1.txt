@@ -26,6 +26,46 @@ only officially support the latest release of each series.
 What's new in Django 5.1
 ========================
 
+Lazy-loading modes
+------------------
+
+The lazy-loading behavior of model fields is now configurable, with three
+possible modes:
+
+1. ``FETCH_ONE`` fetches the missing field for the current instance only.
+2. ``FETCH_PEERS`` fetches the missing field for all instances that came from
+   the same ``QuerySet``. This mode fixes most cases of the “N+1 queries
+   problem”.
+3. ``RAISE`` raises a ``LazyFieldAccess`` exception. This mode is useful for
+   strictly limiting queries in performance-critical applications.
+
+``FETCH_ONE`` represents Django’s existing behavior and remains the default.
+Modes apply to deferred fields, foreign keys, reverse foreign key accessors,
+and generic foreign keys.
+
+Configure the global default lazy mode with ``set_lazy_mode``:
+
+.. code-block:: python
+
+    from django.db.models import set_default_lazy_mode, FETCH_PEERS
+
+    # Reduce most instances of N+1 queries to 2 queries
+    set_default_lazy_mode(FETCH_PEERS)
+
+Or, override the mode for a section with ``lazy_mode``, which acts as both a
+function decorator and context manager:
+
+.. code-block:: python
+
+    from django.db.models import lazy_mode, RAISE
+
+
+    def dashboard(request):
+        chart = get_chart_data(request)
+        # Raise an exception for queries executed during template rendering
+        with lazy_mode(RAISE):
+            return render(request, "dashboard.html", {"chart": chart})
+
 Minor features
 --------------
 
