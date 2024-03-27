@@ -133,13 +133,13 @@ class LayerMapTest(TestCase):
                 # because the Interstate model's `length` field has decimal_places=2.
                 self.assertAlmostEqual(feat.get("Length"), float(istate.length), 2)
 
-            for p1, p2 in zip(feat.geom, istate.path):
+            for p1, p2 in zip(feat.geom, istate.path, strict=True):
                 self.assertAlmostEqual(p1[0], p2[0], 6)
                 self.assertAlmostEqual(p1[1], p2[1], 6)
 
     def county_helper(self, county_feat=True):
         "Helper function for ensuring the integrity of the mapped County models."
-        for name, n, st in zip(NAMES, NUMS, STATES):
+        for name, n, st in zip(NAMES, NUMS, STATES, strict=True):
             # Should only be one record b/c of `unique` keyword.
             c = County.objects.get(name=name)
             self.assertEqual(n, len(c.mpoly))

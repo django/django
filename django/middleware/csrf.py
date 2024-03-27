@@ -63,7 +63,9 @@ def _mask_cipher_secret(secret):
     """
     mask = _get_new_csrf_string()
     chars = CSRF_ALLOWED_CHARS
-    pairs = zip((chars.index(x) for x in secret), (chars.index(x) for x in mask))
+    pairs = zip(
+        (chars.index(x) for x in secret), (chars.index(x) for x in mask), strict=True
+    )
     cipher = "".join(chars[(x + y) % len(chars)] for x, y in pairs)
     return mask + cipher
 
@@ -77,7 +79,9 @@ def _unmask_cipher_token(token):
     mask = token[:CSRF_SECRET_LENGTH]
     token = token[CSRF_SECRET_LENGTH:]
     chars = CSRF_ALLOWED_CHARS
-    pairs = zip((chars.index(x) for x in token), (chars.index(x) for x in mask))
+    pairs = zip(
+        (chars.index(x) for x in token), (chars.index(x) for x in mask), strict=True
+    )
     return "".join(chars[x - y] for x, y in pairs)  # Note negative values are ok
 
 

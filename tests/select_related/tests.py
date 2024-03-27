@@ -28,7 +28,7 @@ class SelectRelatedTests(TestCase):
         assert len(names) == len(models), (names, models)
 
         parent = None
-        for name, model in zip(names, models):
+        for name, model in zip(names, models, strict=True):
             try:
                 obj = model.objects.get(name=name)
             except model.DoesNotExist:

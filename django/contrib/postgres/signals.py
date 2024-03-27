@@ -38,7 +38,7 @@ if is_psycopg3:
             return
 
         oids, array_oids = get_hstore_oids(connection.alias)
-        for oid, array_oid in zip(oids, array_oids):
+        for oid, array_oid in zip(oids, array_oids, strict=True):
             ti = TypeInfo("hstore", oid, array_oid)
             hstore.register_hstore(ti, connection.connection)
 

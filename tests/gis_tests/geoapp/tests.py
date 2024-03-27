@@ -622,7 +622,7 @@ class GeoQuerySetTest(TestCase):
 
         qs = City.objects.filter(name__in=("Houston", "Dallas"))
         extent = qs.aggregate(Extent("point"))["point__extent"]
-        for val, exp in zip(extent, expected):
+        for val, exp in zip(extent, expected, strict=True):
             self.assertAlmostEqual(exp, val, 4)
         self.assertIsNone(
             City.objects.filter(name=("Smalltown")).aggregate(Extent("point"))[
@@ -658,7 +658,7 @@ class GeoQuerySetTest(TestCase):
         self.assertEqual(len(line), ref_points.count())
         # Compare pairs of manually sorted points, as the default ordering is
         # flaky.
-        for point, ref_city in zip(sorted(line), sorted(ref_points)):
+        for point, ref_city in zip(sorted(line), sorted(ref_points), strict=True):
             point_x, point_y = point
             self.assertAlmostEqual(point_x, ref_city.x, 5)
             self.assertAlmostEqual(point_y, ref_city.y, 5)
@@ -750,5 +750,5 @@ class GeoQuerySetTest(TestCase):
         list(NonConcreteModel.objects.all())
 
     def test_values_srid(self):
-        for c, v in zip(City.objects.all(), City.objects.values()):
+        for c, v in zip(City.objects.all(), City.objects.values(), strict=True):
             self.assertEqual(c.point.srid, v["point"].srid)

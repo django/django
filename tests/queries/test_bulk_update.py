@@ -77,7 +77,7 @@ class BulkUpdateNoteTests(TestCase):
 
     def test_foreign_keys_do_not_lookup(self):
         self.create_tags()
-        for note, tag in zip(self.notes, self.tags):
+        for note, tag in zip(self.notes, self.tags, strict=True):
             note.tag = tag
         with self.assertNumQueries(1):
             Note.objects.bulk_update(self.notes, ["tag"])

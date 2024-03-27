@@ -152,7 +152,7 @@ class RasterFieldTest(TransactionTestCase):
             0.0,
             -9.459646421449934e-06,
         ]
-        for val, exp in zip(r.rast.geotransform, expected):
+        for val, exp in zip(r.rast.geotransform, expected, strict=True):
             self.assertAlmostEqual(exp, val)
 
     def test_verbose_name_arg(self):
@@ -254,7 +254,7 @@ class RasterFieldTest(TransactionTestCase):
                 len(combo_values),
                 "Number of lookup names and values should be the same",
             )
-            combos = [x for x in zip(combo_keys, combo_values) if x[1]]
+            combos = [x for x in zip(combo_keys, combo_values, strict=True) if x[1]]
             self.assertEqual(
                 [(n, x) for n, x in enumerate(combos) if x in combos[:n]],
                 [],

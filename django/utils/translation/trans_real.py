@@ -103,7 +103,7 @@ class TranslationCatalog:
 
     def update(self, trans):
         # Merge if plural function is the same, else prepend.
-        for cat, plural in zip(self._catalogs, self._plurals):
+        for cat, plural in zip(self._catalogs, self._plurals, strict=True):
             if trans.plural.__code__ == plural.__code__:
                 cat.update(trans._catalog)
                 break
@@ -120,7 +120,7 @@ class TranslationCatalog:
         return default
 
     def plural(self, msgid, num):
-        for cat, plural in zip(self._catalogs, self._plurals):
+        for cat, plural in zip(self._catalogs, self._plurals, strict=True):
             tmsg = cat.get((msgid, plural(num)))
             if tmsg is not None:
                 return tmsg

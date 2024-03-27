@@ -47,7 +47,7 @@ class ChoicesType(EnumType):
             # assignment in enum's classdict.
             dict.__setitem__(classdict, key, value)
         cls = super().__new__(metacls, classname, bases, classdict, **kwds)
-        for member, label in zip(cls.__members__.values(), labels):
+        for member, label in zip(cls.__members__.values(), labels, strict=True):
             member._label_ = label
         return enum.unique(cls)
 
