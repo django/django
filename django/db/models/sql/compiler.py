@@ -293,6 +293,8 @@ class SQLCompiler:
         col_idx = 1
         for col, alias in select:
             try:
+                if self.query.combinator:
+                    col.alias = 'combined'
                 sql, params = self.compile(col)
             except EmptyResultSet:
                 empty_result_set_value = getattr(
@@ -307,7 +309,7 @@ class SQLCompiler:
                 sql, params = self.compile(Value(True))
             else:
                 sql, params = col.select_format(self, sql, params)
-            if alias is None and with_col_aliases:
+            if alias is None and with_col_aliases and not self.query.combinator:
                 alias = f"col{col_idx}"
                 col_idx += 1
             ret.append((col, (sql, params), alias))
@@ -627,6 +629,7 @@ class SQLCompiler:
             *((braces.format(sql), args) for sql, args in parts)
         )
         result = [" {} ".format(combinator_sql).join(sql_parts)]
+        result = ["({}) AS combined".format(sql) for sql in result]
         params = []
         for part in args_parts:
             params.extend(part)
@@ -797,7 +800,7 @@ class SQLCompiler:
 
                 out_cols = []
                 for _, (s_sql, s_params), alias in self.select + extra_select:
-                    if alias:
+                    if alias and not combinator:
                         s_sql = "%s AS %s" % (
                             s_sql,
                             self.connection.ops.quote_name(alias),
@@ -806,11 +809,18 @@ class SQLCompiler:
                     out_cols.append(s_sql)
 
                 result += [", ".join(out_cols)]
-                if from_:
+                if from_ and not combinator:
                     result += ["FROM", *from_]
                 elif self.connection.features.bare_select_suffix:
                     result += [self.connection.features.bare_select_suffix]
                 params.extend(f_params)
+
+                if combinator:
+                    combinator_sql, combinator_params = self.get_combinator_sql(
+                        combinator, self.query.combinator_all
+                    )
+                    result += ["FROM", *combinator_sql]
+                    params += combinator_params
 
                 if self.query.select_for_update and features.has_select_for_update:
                     if (
