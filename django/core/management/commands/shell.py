@@ -3,8 +3,30 @@ import select
 import sys
 import traceback
 
+from django.apps import apps
 from django.core.management import BaseCommand, CommandError
 from django.utils.datastructures import OrderedSet
+from django.utils.module_loading import import_string
+
+CHANGED_IMPORTS = [
+    {"cache": "django.core.cache.cache"},
+    {"settings": "django.conf.settings"},
+    {"get_user_model": "django.contrib.auth.get_user_model"},
+    {"transaction": "django.db.transaction"},
+    {"Avg": "django.db.models.Avg"},
+    {"Case": "django.db.models.Case"},
+    {"Count": "django.db.models.Count"},
+    {"F": "django.db.models.F"},
+    {"Max": "django.db.models.Max"},
+    {"Min": "django.db.models.Min"},
+    {"Prefetch": "django.db.models.Prefetch"},
+    {"Q": "django.db.models.Q"},
+    {"Sum": "django.db.models.Sum"},
+    {"When": "django.db.models.When"},
+    {"timezone": "django.utils.timezone"},
+    {"reverse": "django.urls.reverse"},
+    {"Exists": "django.db.models.Exists"},
+]
 
 
 class Command(BaseCommand):
@@ -47,7 +69,18 @@ class Command(BaseCommand):
     def ipython(self, options):
         from IPython import start_ipython
 
-        start_ipython(argv=[])
+        def run_ipython():
+            my_models = {}
+            imported_objects = self.get_objects(self.style)
+            for app_mod, app_models in self.get_apps_and_models():
+                for mod in app_models:
+                    if mod.__module__:
+                        my_models.setdefault(mod.__module__, [])
+                        my_models[mod.__module__].append(mod.__name__)
+            imported_objects.update(self.get_app_models(my_models, self.style))
+            start_ipython(argv=[], user_ns=imported_objects)
+
+        return run_ipython()
 
     def bpython(self, options):
         import bpython
@@ -57,8 +90,14 @@ class Command(BaseCommand):
     def python(self, options):
         import code
 
-        # Set up a dictionary to serve as the environment for the shell.
-        imported_objects = {}
+        my_models = {}
+        imported_objects = self.get_objects(self.style)
+        for app_mod, app_models in self.get_apps_and_models():
+            for mod in app_models:
+                if mod.__module__:
+                    my_models.setdefault(mod.__module__, [])
+                    my_models[mod.__module__].append(mod.__name__)
+        imported_objects.update(self.get_app_models(my_models, self.style))
 
         # We want to honor both $PYTHONSTARTUP and .pythonrc.py, so follow system
         # conventions and get $PYTHONSTARTUP first then .pythonrc.py.
@@ -137,3 +176,39 @@ class Command(BaseCommand):
             except ImportError:
                 pass
         raise CommandError("Couldn't import {} interface.".format(shell))
+
+    def get_objects(self, style):
+        import_objects = {}
+        default_modules_counter = 0
+        module_names = ""
+        for x in CHANGED_IMPORTS:
+            for key, val in x.items():
+                import_objects[key] = import_string(val)
+                default_modules_counter += 1
+                module_names += str(key) + " "
+        module_names = module_names.strip()
+        print(
+            style.SUCCESS(
+                f"imported {default_modules_counter} default objects ({module_names})"
+            )
+        )
+        return import_objects
+
+    def get_apps_and_models(self):
+        for app in apps.get_app_configs():
+            if app.models_module:
+                yield app.models_module, app.get_models()
+
+    def get_app_models(self, load_models, style):
+        import_objects = {}
+        model_counter = 0
+        model_names = ""
+        for key, val in load_models.items():
+            if len(val) >= 1:
+                for x in val:
+                    import_objects[x] = import_string(str(key) + "." + str(x))
+                    model_counter += 1
+                    model_names += str(x) + " "
+        model_names = model_names.strip()
+        print(style.SUCCESS(f"imported {model_counter} app models ({model_names})"))
+        return import_objects
