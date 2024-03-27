@@ -11,7 +11,9 @@ import logging
 import socket
 import socketserver
 import sys
+import time
 from collections import deque
+from http import HTTPStatus
 from wsgiref import simple_server
 
 from django.core.exceptions import ImproperlyConfigured
@@ -181,6 +183,24 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler):
         # Short-circuit parent method to not call socket.getfqdn
         return self.client_address[0]
 
+    def log_request(self, code="-", size="-"):
+        if isinstance(code, HTTPStatus):
+            code = code.value
+        response_time = time.time() - self.request_start_time
+        if response_time < 1:
+            response_time = int(response_time * 1000)
+            response_time = f"{response_time}ms"
+        else:
+            response_time = f"{response_time:.2f}s"
+
+        self.log_message(
+            '"%s" %s %s %s',
+            self.requestline,
+            str(code),
+            str(size),
+            response_time,
+        )
+
     def log_message(self, format, *args):
         extra = {
             "request": self.request,
@@ -236,16 +256,15 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler):
     def handle_one_request(self):
         """Copy of WSGIRequestHandler.handle() but with different ServerHandler"""
         self.raw_requestline = self.rfile.readline(65537)
+        self.request_start_time = time.time()
         if len(self.raw_requestline) > 65536:
             self.requestline = ""
             self.request_version = ""
             self.command = ""
             self.send_error(414)
             return
-
         if not self.parse_request():  # An error code has been sent, just exit
             return
-
         handler = ServerHandler(
             self.rfile, self.wfile, self.get_stderr(), self.get_environ()
         )
