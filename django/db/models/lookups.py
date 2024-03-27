@@ -4,14 +4,7 @@ import warnings
 
 from django.core.exceptions import EmptyResultSet, FullResultSet
 from django.db.backends.base.operations import BaseDatabaseOperations
-from django.db.models.expressions import (
-    Case,
-    Expression,
-    Func,
-    Value,
-    When,
-    ExpressionList,
-)
+from django.db.models.expressions import Case, Expression, Func, Value, When
 from django.db.models.fields import (
     BooleanField,
     CharField,

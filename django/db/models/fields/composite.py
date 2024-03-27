@@ -1,4 +1,4 @@
-from django.db.models import Field, ExpressionList
+from django.db.models import Field
 from django.db.models.expressions import Col, Expression
 from django.db.models.lookups import TupleExact, TupleIn
 from django.db.models.signals import class_prepared

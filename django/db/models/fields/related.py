@@ -952,7 +952,6 @@ class ForeignKey(ForeignObject):
         parent_link=False,
         to_field=None,
         db_constraint=True,
-        from_fields=None,
         **kwargs,
     ):
         try:
@@ -972,12 +971,7 @@ class ForeignKey(ForeignObject):
             # For backwards compatibility purposes, we need to *try* and set
             # the to_field during FK construction. It won't be guaranteed to
             # be correct until contribute_to_class is called. Refs #12190.
-            pk = to._meta.pk
-            to_field = to_field or (
-                tuple(field.name for field in pk)
-                if isinstance(pk, tuple)
-                else (pk and pk.name)
-            )
+            to_field = to_field or (to._meta.pk and to._meta.pk.name)
 
         if not callable(on_delete):
             raise TypeError("on_delete must be callable.")

@@ -1,6 +1,7 @@
 import copy
 import inspect
 import warnings
+from collections.abc import Iterable
 from functools import partialmethod
 from itertools import chain
 
@@ -1077,7 +1078,7 @@ class Model(AltersData, metaclass=ModelBase):
             pk_val = meta.pk.get_pk_value_on_save(self)
             setattr(self, meta.pk.attname, pk_val)
         pk_set = pk_val is not None
-        if isinstance(pk_val, tuple):
+        if isinstance(pk_val, Iterable):
             pk_set = all(f is not None for f in pk_val)
         if not pk_set and (force_update or update_fields):
             raise ValueError("Cannot force an update in save() with no primary key.")
