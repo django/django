@@ -35,6 +35,18 @@ Minor features
 * :attr:`.ModelAdmin.list_display` now supports using ``__`` lookups to list
   fields from related models.
 
+* Form fields in the change form are now shown below their respective labels
+  instead of next to them.
+
+* Help text in the change form is now shown after the field label and before
+  the field input.
+
+* Validation errors in the change form are now shown after the help text and
+  before the field input.
+
+* The ``.related-widget-wrapper`` class now stretches to occupy 100% of the
+  available width.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
