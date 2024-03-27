@@ -594,7 +594,7 @@ ul.timelist, .timelist li {
 
 /* READ-ONLY-PASSWORD WIDGET */
 
-.read-only-password  > div + div {
+.read-only-password > div + div {
     margin-top: 10px;
     margin-bottom: 10px;
 }
