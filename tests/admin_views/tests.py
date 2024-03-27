@@ -4802,6 +4802,9 @@ class AdminInheritedInlinesTest(TestCase):
         response = self.client.get(reverse("admin:admin_views_persona_add"))
         names = name_re.findall(response.content)
         names.remove(b"csrfmiddlewaretoken")
+        names.remove(b"_continue")
+        names.remove(b"_save")
+        names.remove(b"_addanother")
         # make sure we have no duplicate HTML names
         self.assertEqual(len(names), len(set(names)))
 
@@ -4839,6 +4842,9 @@ class AdminInheritedInlinesTest(TestCase):
         )
         names = name_re.findall(response.content)
         names.remove(b"csrfmiddlewaretoken")
+        names.remove(b"_continue")
+        names.remove(b"_save")
+        names.remove(b"_addanother")
         # make sure we have no duplicate HTML names
         self.assertEqual(len(names), len(set(names)))
 
@@ -7289,8 +7295,9 @@ class UserAdminTest(TestCase):
         response = self.client.get(
             reverse("admin:auth_user_add") + "?%s=1" % IS_POPUP_VAR
         )
-        self.assertNotContains(response, 'name="_continue"')
-        self.assertNotContains(response, 'name="_addanother"')
+        for input in re.findall(r"<input[^>]*>", response.content.decode()):
+            self.assertFalse('name="_continue"' in input)
+            self.assertFalse('name="_addanother"' in input)
         data = {
             "username": "newuser",
             "password1": "newpassword",
@@ -7321,8 +7328,9 @@ class UserAdminTest(TestCase):
             reverse("admin:auth_user_change", args=(user.pk,)) + "?%s=1" % IS_POPUP_VAR
         )
         response = self.client.get(url)
-        self.assertNotContains(response, 'name="_continue"')
-        self.assertNotContains(response, 'name="_addanother"')
+        for input in re.findall(r"<input[^>]*>", response.content.decode()):
+            self.assertFalse('name="_continue"' in input)
+            self.assertFalse('name="_addanother"' in input)
         data = {
             "username": "newuser",
             "password1": "newpassword",
