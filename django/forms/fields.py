@@ -17,7 +17,7 @@ from urllib.parse import urlsplit, urlunsplit
 
 from django.conf import settings
 from django.core import validators
-from django.core.exceptions import ValidationError
+from django.core.exceptions import FieldDoesNotExist, ValidationError
 from django.forms.boundfield import BoundField
 from django.forms.utils import from_current_timezone, to_current_timezone
 from django.forms.widgets import (
@@ -638,6 +638,9 @@ class FileField(Field):
             "Ensure this filename has at most %(max)d characters (it has %(length)d).",
             "max",
         ),
+        "filepath_too_long": _(
+            "The filename is too long. Rename the file to something shorter."
+        ),
         "contradiction": _(
             "Please either submit a file or check the clear checkbox, not both."
         ),
@@ -646,6 +649,12 @@ class FileField(Field):
     def __init__(self, *, max_length=None, allow_empty_file=False, **kwargs):
         self.max_length = max_length
         self.allow_empty_file = allow_empty_file
+
+        # `_model_instance` and `_model_field_name` are set automatically on
+        # ModelForms to enable validation of the full filepath against the
+        # FileField's max_length limit on the model.
+        self._model_instance = None
+        self._model_field_name = None
         super().__init__(**kwargs)
 
     def to_python(self, data):
@@ -664,6 +673,19 @@ class FileField(Field):
             raise ValidationError(
                 self.error_messages["max_length"], code="max_length", params=params
             )
+        if self._model_instance is not None and self._model_field_name is not None:
+            instance = self._model_instance
+            try:
+                field = instance._meta.get_field(self._model_field_name)
+            except FieldDoesNotExist:
+                instance, field = None, None
+            if field is not None and instance is not None:
+                candidate_filepath = field.generate_filename(instance, file_name)
+                if len(candidate_filepath) > field.max_length:
+                    raise ValidationError(
+                        self.error_messages["filepath_too_long"],
+                        code="filepath_too_long",
+                    )
         if not file_name:
             raise ValidationError(self.error_messages["invalid"], code="invalid")
         if not self.allow_empty_file and not file_size:

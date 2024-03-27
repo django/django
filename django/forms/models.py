@@ -12,7 +12,7 @@ from django.core.exceptions import (
     ValidationError,
 )
 from django.db.models.utils import AltersData
-from django.forms.fields import ChoiceField, Field
+from django.forms.fields import ChoiceField, Field, FileField
 from django.forms.forms import BaseForm, DeclarativeFieldsMetaclass
 from django.forms.formsets import BaseFormSet, formset_factory
 from django.forms.utils import ErrorList
@@ -384,8 +384,16 @@ class BaseModelForm(BaseForm, AltersData):
             use_required_attribute=use_required_attribute,
             renderer=renderer,
         )
-        for formfield in self.fields.values():
+
+        for name, formfield in self.fields.items():
             apply_limit_choices_to_to_formfield(formfield)
+
+            # Pass the model instance to FileField so that validation can
+            # take the full file path (as determined by
+            # `FileField.upload_to` on the model) into account.
+            if isinstance(formfield, FileField):
+                formfield._model_instance = self.instance
+                formfield._model_field_name = name
 
     def _get_validation_exclusions(self):
         """

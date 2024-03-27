@@ -400,7 +400,7 @@ be ignored in favor of the value from the form's initial data.
 .. versionadded:: 5.0
 
 The ``template_name`` argument allows a custom template to be used when the
-field is rendered with :meth:`~django.forms.BoundField.as_field_group`. By 
+field is rendered with :meth:`~django.forms.BoundField.as_field_group`. By
 default this value is set to ``"django/forms/field.html"``. Can be changed per
 field by overriding this attribute or more generally by overriding the default
 template, see also :ref:`overriding-built-in-field-templates`.
@@ -688,6 +688,12 @@ For each field, we describe the default widget used if you don't specify
     The ``max_length`` error refers to the length of the filename. In the error
     message for that key, ``%(max)d`` will be replaced with the maximum filename
     length and ``%(length)d`` will be replaced with the current filename length.
+
+    When used in a :class:`ModelForm`, the ``FileField`` will validate
+    the full length of the file path, taking into account any ``upload_to``
+    parameter that may have been supplied to the
+    :class:`~django.db.models.FileField` on the model, instead of just
+    validating the length of the filename supplied by the user.
 
 ``FilePathField``
 -----------------

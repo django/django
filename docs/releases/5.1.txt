@@ -212,6 +212,11 @@ Forms
   fieldsets with their help text, the form fieldset now includes the
   ``aria-describedby`` HTML attribute.
 
+* :class:`~django.forms.ModelForm` will now validate the full length of
+  a file path, taking into account any ``upload_to`` parameter passed to the
+  :class:`~django.db.models.FileField`, instead of just validating the filename
+  provided by the user.
+
 Generic Views
 ~~~~~~~~~~~~~
 

@@ -4,6 +4,7 @@ import unittest
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.validators import validate_image_file_extension
+from django.db import models
 from django.forms import FileField, FileInput
 from django.test import SimpleTestCase
 
@@ -119,6 +120,27 @@ class FileFieldTest(SimpleTestCase):
 
     def test_file_picklable(self):
         self.assertIsInstance(pickle.loads(pickle.dumps(FileField())), FileField)
+
+    def test_filefield_instance_validation(self):
+        """
+        Test that FileField correctly validates the full filepath (as
+        provided by `FileField.generate_filename()` on the model) against
+        max_length if `FileField._model_instance` is set.
+        """
+
+        class InvalidPathModel(models.Model):
+            file = models.FileField(
+                upload_to=lambda x, y: f"{'x' * 100}/{y}", max_length=100
+            )
+
+        field = FileField()
+        field._model_instance = InvalidPathModel()
+        field._model_field_name = "file"
+        with self.assertRaisesMessage(
+            ValidationError,
+            "The filename is too long. Rename the file to something shorter.",
+        ):
+            field.clean(SimpleUploadedFile("test.txt", b"test"))
 
 
 class MultipleFileInput(FileInput):
