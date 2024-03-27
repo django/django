@@ -104,13 +104,9 @@ class Storage:
         Validate the filename by calling get_valid_name() and return a filename
         to be passed to the save() method.
         """
-        filename = str(filename).replace("\\", "/")
         # `filename` may include a path as returned by FileField.upload_to.
+        filename = validate_file_name(filename, allow_relative_path=True)
         dirname, filename = os.path.split(filename)
-        if ".." in pathlib.PurePath(dirname).parts:
-            raise SuspiciousFileOperation(
-                "Detected path traversal attempt in '%s'" % dirname
-            )
         return os.path.normpath(os.path.join(dirname, self.get_valid_name(filename)))
 
     def path(self, name):
