@@ -224,6 +224,7 @@ In this example, default settings are taken from ``myapp_defaults``, and the
 ``myapp_defaults``::
 
     from django.conf import settings
+
     from myapp import myapp_defaults
 
     settings.configure(default_settings=myapp_defaults, DEBUG=True)
@@ -285,6 +286,7 @@ settings and populate Django's application registry. For example::
 
     import django
     from django.conf import settings
+
     from myapp import myapp_defaults
 
     settings.configure(default_settings=myapp_defaults, DEBUG=True)

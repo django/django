@@ -215,6 +215,7 @@ Comparing ``count`` to 1 isn't always the correct rule. This code looks
 sophisticated, but will produce incorrect results for some languages::
 
     from django.utils.translation import ngettext
+
     from myapp.models import Report
 
     count = Report.objects.count()

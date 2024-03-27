@@ -37,8 +37,9 @@ The view can be constructed using a ``FormView``:
 .. code-block:: python
     :caption: ``views.py``
 
-    from myapp.forms import ContactForm
     from django.views.generic.edit import FormView
+
+    from .forms import ContactForm
 
 
     class ContactFormView(FormView):
@@ -120,7 +121,8 @@ here; we don't have to write any logic ourselves:
 
     from django.urls import reverse_lazy
     from django.views.generic.edit import CreateView, DeleteView, UpdateView
-    from myapp.models import Author
+
+    from .models import Author
 
 
     class AuthorCreateView(CreateView):
@@ -156,7 +158,8 @@ Finally, we hook these new views into the URLconf:
     :caption: ``urls.py``
 
     from django.urls import path
-    from myapp.views import AuthorCreateView, AuthorDeleteView, AuthorUpdateView
+
+    from .views import AuthorCreateView, AuthorDeleteView, AuthorUpdateView
 
     urlpatterns = [
         # ...
@@ -215,7 +218,8 @@ to edit, and override
 
     from django.contrib.auth.mixins import LoginRequiredMixin
     from django.views.generic.edit import CreateView
-    from myapp.models import Author
+
+    from .models import Author
 
 
     class AuthorCreateView(LoginRequiredMixin, CreateView):
@@ -240,6 +244,7 @@ works with an API-based workflow as well as 'normal' form POSTs::
 
     from django.http import JsonResponse
     from django.views.generic.edit import CreateView
+
     from myapp.models import Author
 
 

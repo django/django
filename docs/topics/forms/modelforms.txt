@@ -526,7 +526,7 @@ For example, if you want the ``CharField`` for the ``name`` attribute of
 ``<input type="text">``, you can override the field's widget::
 
     from django.forms import ModelForm, Textarea
-    from myapp.models import Author
+    from .models import Author
 
 
     class AuthorForm(ModelForm):
@@ -574,7 +574,7 @@ For example, if you wanted to use ``MySlugFormField`` for the ``slug``
 field, you could do the following::
 
     from django.forms import ModelForm
-    from myapp.models import Article
+    from .models import Article
 
 
     class ArticleForm(ModelForm):
@@ -588,7 +588,7 @@ field, you could do the following::
 or::
 
     from django.forms import ModelForm
-    from myapp.models import Article
+    from .models import Article
 
 
     def formfield_for_dbfield(db_field, **kwargs):
@@ -611,7 +611,7 @@ If you want to specify a field's validators, you can do so by defining
 the field declaratively and setting its ``validators`` parameter::
 
     from django.forms import CharField, ModelForm
-    from myapp.models import Article
+    from .models import Article
 
 
     class ArticleForm(ModelForm):
@@ -865,7 +865,7 @@ Alternatively, you can create a subclass that sets ``self.queryset`` in
 ``__init__``::
 
     from django.forms import BaseModelFormSet
-    from myapp.models import Author
+    from .models import Author
 
 
     class BaseAuthorFormSet(BaseModelFormSet):
@@ -1076,7 +1076,7 @@ formset to edit ``Author`` model instances::
 
     from django.forms import modelformset_factory
     from django.shortcuts import render
-    from myapp.models import Author
+    from .models import Author
 
 
     def manage_authors(request):
@@ -1145,7 +1145,7 @@ formset::
 
     from django.forms import modelformset_factory
     from django.shortcuts import render
-    from myapp.models import Author
+    from .models import Author
 
 
     def manage_authors(request):
