@@ -1145,6 +1145,20 @@ class Traveler(models.Model):
     )
 
 
+class Transitionstate(models.Model):
+    label = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.label
+
+
+class Transition(models.Model):
+    source = models.ManyToManyField(Transitionstate, related_name="transition_source")
+    target = models.ForeignKey(
+        Transitionstate, on_delete=models.CASCADE, related_name="transition_target"
+    )
+
+
 class Square(models.Model):
     side = models.IntegerField()
     area = models.GeneratedField(
