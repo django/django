@@ -1774,6 +1774,13 @@ class OverrideSettingsTests(SimpleTestCase):
         with self.assertRaises(NoReverseMatch):
             reverse("second")
 
+    @override_settings(
+        STORAGES={
+            "default": {
+                "BACKEND": "django.core.files.storage.FileSystemStorage",
+            },
+        }
+    )
     def test_override_media_root(self):
         """
         Overriding the MEDIA_ROOT setting should be reflected in the
@@ -1783,6 +1790,13 @@ class OverrideSettingsTests(SimpleTestCase):
         with self.settings(MEDIA_ROOT="test_value"):
             self.assertEqual(default_storage.base_location, "test_value")
 
+    @override_settings(
+        STORAGES={
+            "default": {
+                "BACKEND": "django.core.files.storage.FileSystemStorage",
+            },
+        }
+    )
     def test_override_media_url(self):
         """
         Overriding the MEDIA_URL setting should be reflected in the

@@ -114,7 +114,14 @@ class TestMiscFinder(SimpleTestCase):
             [os.path.join(TEST_ROOT, "project", "documents")],
         )
 
-    @override_settings(MEDIA_ROOT="")
+    @override_settings(
+        MEDIA_ROOT="",
+        STORAGES={
+            "default": {
+                "BACKEND": "django.core.files.storage.FileSystemStorage",
+            },
+        },
+    )
     def test_location_empty(self):
         msg = (
             "The storage backend of the staticfiles finder "

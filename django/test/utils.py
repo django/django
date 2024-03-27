@@ -1,9 +1,11 @@
 import collections
+import copy
 import gc
 import logging
 import os
 import re
 import sys
+import tempfile
 import time
 import warnings
 from contextlib import contextmanager
@@ -149,6 +151,12 @@ def setup_test_environment(debug=None):
     saved_data.template_render = Template._render
     Template._render = instrumented_test_render
 
+    saved_data.storages = copy.deepcopy(settings.STORAGES)
+    settings.STORAGES["default"][
+        "BACKEND"
+    ] = "django.core.files.storage.FileSystemStorage"
+    settings.STORAGES["default"]["OPTIONS"] = {"location": tempfile.mkdtemp()}
+
     mail.outbox = []
 
     deactivate()
@@ -165,6 +173,7 @@ def teardown_test_environment():
     settings.DEBUG = saved_data.debug
     settings.EMAIL_BACKEND = saved_data.email_backend
     Template._render = saved_data.template_render
+    settings.STORAGES = saved_data.storages
 
     del _TestState.saved_data
     del mail.outbox

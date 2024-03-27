@@ -92,6 +92,13 @@ class TestFindStatic(TestDefaults, CollectionTestCase):
         self.assertIn("project", lines[0])
         self.assertIn("apps", lines[1])
 
+    @override_settings(
+        STORAGES={
+            "default": {
+                "BACKEND": "django.core.files.storage.FileSystemStorage",
+            },
+        }
+    )
     def test_all_files_more_verbose(self):
         """
         findstatic returns all candidate files if run without --first and -v2.
