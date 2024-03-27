@@ -36,10 +36,9 @@ class ReadOnlyPasswordHashWidget(forms.Widget):
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
+        usable_password = value and not value.startswith(UNUSABLE_PASSWORD_PREFIX)
         summary = []
-        if not value or value.startswith(UNUSABLE_PASSWORD_PREFIX):
-            summary.append({"label": gettext("No password set.")})
-        else:
+        if usable_password:
             try:
                 hasher = identify_hasher(value)
             except ValueError:
@@ -53,14 +52,14 @@ class ReadOnlyPasswordHashWidget(forms.Widget):
             else:
                 for key, value_ in hasher.safe_summary(value).items():
                     summary.append({"label": gettext(key), "value": value_})
-        context["summary"] = summary
-        context["usable_password"] = value and not value.startswith(
-            UNUSABLE_PASSWORD_PREFIX
-        )
-        if context["usable_password"]:
-            context["button_label"] = _("Change or unset password")
         else:
-            context["button_label"] = _("Set password")
+            summary.append({"label": gettext("No password set.")})
+
+        context["summary"] = summary
+        context["usable_password"] = usable_password
+        context["button_label"] = (
+            _("Change or unset password") if usable_password else _("Set password")
+        )
         return context
 
     def id_for_label(self, id_):
