@@ -61,7 +61,6 @@ class CompositeField(Field):
         return self.cached_col
 
     def get_lookup(self, lookup_name):
-        print("get_lookup", self.model)
         if lookup_name == "exact":
             return TupleExact
         elif lookup_name == "in":

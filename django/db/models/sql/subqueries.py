@@ -35,7 +35,6 @@ class DeleteQuery(Query):
         field = self.get_meta().pk
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
             self.clear_where()
-            print("delete_batch", self.model, field.attname)
             self.add_filter(
                 f"{field.attname}__in",
                 pk_list[offset : offset + GET_ITERATOR_CHUNK_SIZE],

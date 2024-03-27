@@ -1389,7 +1389,6 @@ class Query(BaseExpression):
             lookup_class = lhs.get_lookup(lookup_name)
             if not lookup_class:
                 return
-        print("build_lookup", lookup_class)
         lookup = lookup_class(lhs, rhs)
         # Interpret '__exact=None' as the sql 'is NULL'; otherwise, reject all
         # uses of None as a query value unless the lookup supports it.
