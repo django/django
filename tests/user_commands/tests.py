@@ -1,6 +1,8 @@
 import os
+import tempfile
 from argparse import ArgumentDefaultsHelpFormatter
 from io import StringIO
+from pathlib import Path
 from unittest import mock
 
 from admin_scripts.tests import AdminScriptTestCase
@@ -10,7 +12,12 @@ from django.core import management
 from django.core.checks import Tags
 from django.core.management import BaseCommand, CommandError, find_commands
 from django.core.management.utils import (
+    BRANCH_PREFIX,
+    ELBOW_PREFIX,
+    SPACE_PREFIX,
+    TEE_PREFIX,
     find_command,
+    get_directory_tree,
     get_random_secret_key,
     is_ignored_path,
     normalize_path_patterns,
@@ -535,3 +542,74 @@ class UtilsTests(SimpleTestCase):
     def test_normalize_path_patterns_truncates_wildcard_base(self):
         expected = [os.path.normcase(p) for p in ["foo/bar", "bar/*/"]]
         self.assertEqual(normalize_path_patterns(["foo/bar/*", "bar/*/"]), expected)
+
+    def test_get_directory_tree(self):
+        from django.utils.termcolors import colorize
+
+        def format_dir(x):
+            return colorize(x, fg="blue", opts=["bold"])
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            subdir = Path(tmpdir) / "foo/bar/"
+            subdir.mkdir(exist_ok=True, parents=True)
+            [
+                Path(tmpdir).joinpath("file1.txt").touch(),
+                Path(tmpdir).joinpath("file2.txt").touch(),
+                Path(tmpdir).joinpath("foo/foo1.txt").touch(),
+                Path(tmpdir).joinpath("foo/foo2.txt").touch(),
+                Path(tmpdir).joinpath("foo/bar/bar1.txt").touch(),
+                Path(tmpdir).joinpath("foo/bar/bar2.txt").touch(),
+            ]
+            expected = [
+                format_dir(Path(tmpdir).name),
+                f"{TEE_PREFIX}file1.txt",
+                f"{TEE_PREFIX}file2.txt",
+                f"{ELBOW_PREFIX}{format_dir('foo')}",
+                f"{SPACE_PREFIX}{TEE_PREFIX}{format_dir('bar')}",
+                f"{SPACE_PREFIX}{BRANCH_PREFIX}{TEE_PREFIX}bar1.txt",
+                f"{SPACE_PREFIX}{BRANCH_PREFIX}{ELBOW_PREFIX}bar2.txt",
+                f"{SPACE_PREFIX}{TEE_PREFIX}foo1.txt",
+                f"{SPACE_PREFIX}{ELBOW_PREFIX}foo2.txt",
+            ]
+            self.assertListEqual(
+                list(get_directory_tree(tmpdir, force_color=True)), expected
+            )
+
+    def test_get_directory_tree_max_depth(self):
+        from django.utils.termcolors import colorize
+
+        def format_dir(x):
+            return colorize(x, fg="blue", opts=["bold"])
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            subdir = Path(tmpdir) / "foo/bar/"
+            subdir.mkdir(exist_ok=True, parents=True)
+            [
+                Path(tmpdir).joinpath("file1.txt").touch(),
+                Path(tmpdir).joinpath("file2.txt").touch(),
+                Path(tmpdir).joinpath("foo/foo1.txt").touch(),
+                Path(tmpdir).joinpath("foo/foo2.txt").touch(),
+                Path(tmpdir).joinpath("foo/bar/bar1.txt").touch(),
+                Path(tmpdir).joinpath("foo/bar/bar2.txt").touch(),
+            ]
+            expected = [
+                format_dir(Path(tmpdir).name),
+                f"{TEE_PREFIX}file1.txt",
+                f"{TEE_PREFIX}file2.txt",
+                f"{ELBOW_PREFIX}{format_dir('foo')}",
+                f"{SPACE_PREFIX}{TEE_PREFIX}{format_dir('bar')}",
+                f"{SPACE_PREFIX}{TEE_PREFIX}foo1.txt",
+                f"{SPACE_PREFIX}{ELBOW_PREFIX}foo2.txt",
+            ]
+            self.assertListEqual(
+                list(get_directory_tree(tmpdir, max_depth=2, force_color=True)),
+                expected,
+            )
+
+    def test_get_directory_tree_fail_not_dir(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmpfile = Path(tmpdir).joinpath("file.txt")
+            tmpfile.touch()
+
+            with self.assertRaises(CommandError):
+                list(get_directory_tree(tmpfile.name))
