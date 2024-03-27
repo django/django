@@ -54,7 +54,7 @@ class ReadOnlyPasswordHashWidget(forms.Widget):
                 for key, value_ in hasher.safe_summary(value).items():
                     summary.append({"label": gettext(key), "value": value_})
         context["summary"] = summary
-        context["usable_password"] = not value.startswith(UNUSABLE_PASSWORD_PREFIX)
+        context["usable_password"] = value and not value.startswith(UNUSABLE_PASSWORD_PREFIX)
         if context["usable_password"]:
             context["button_label"] = _("Change or unset password")
         else:
