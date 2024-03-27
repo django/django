@@ -9,7 +9,7 @@ from django.db import (
     ProgrammingError,
     connection,
 )
-from django.db.models import FileField, Value
+from django.db.models import Excluded, F, FileField, Q, Value
 from django.db.models.functions import Lower, Now
 from django.test import (
     TestCase,
@@ -840,3 +840,172 @@ class BulkCreateTests(TestCase):
                 {"rank": 2, "name": "d"},
             ],
         )
+
+    @skipUnlessDBFeature("supports_update_conflicts_with_condition")
+    def test_bulk_create_with_q_expression(self):
+        initial_items = [
+            UpsertConflict(number=1, rank=1, name="John"),
+            UpsertConflict(number=2, rank=3, name="Mary"),
+        ]
+        UpsertConflict.objects.bulk_create(initial_items)
+        updated_items = [
+            UpsertConflict(number=1, rank=3, name="Steve"),
+            UpsertConflict(number=2, rank=2, name="Olivia"),
+        ]
+        UpsertConflict.objects.bulk_create(
+            updated_items,
+            update_conflicts=True,
+            update_fields=["name", "rank"],
+            unique_fields=["number"],
+            condition=Q(rank__lt=3),
+        )
+        self.assertEqual(UpsertConflict.objects.get(number=1).name, "Steve")
+        self.assertEqual(UpsertConflict.objects.get(number=2).name, "Mary")
+
+    @skipUnlessDBFeature("supports_update_conflicts_with_condition")
+    def test_bulk_create_with_f_expression(self):
+        initial_items = [
+            UpsertConflict(number=1, rank=1, name="John"),
+            UpsertConflict(number=2, rank=4, name="Mary"),
+        ]
+        UpsertConflict.objects.bulk_create(initial_items)
+        updated_items = [
+            UpsertConflict(number=1, rank=3, name="Steve"),
+            UpsertConflict(number=2, rank=4, name="Olivia"),
+        ]
+        UpsertConflict.objects.bulk_create(
+            updated_items,
+            update_conflicts=True,
+            update_fields=["name", "rank"],
+            unique_fields=["number"],
+            condition=Q(rank__lt=F("number") + 1),
+        )
+        self.assertEqual(UpsertConflict.objects.get(number=1).name, "Steve")
+        self.assertEqual(UpsertConflict.objects.get(number=2).name, "Mary")
+
+    @skipUnlessDBFeature("supports_update_conflicts_with_condition")
+    def test_bulk_create_with_complex_condition(self):
+        initial_items = [
+            UpsertConflict(number=1, rank=3, name="John"),
+            UpsertConflict(number=2, rank=2, name="Mary"),
+            UpsertConflict(number=3, rank=6, name="Alice"),
+            UpsertConflict(number=4, rank=7, name="Bob"),
+        ]
+        UpsertConflict.objects.bulk_create(initial_items)
+        updated_items = [
+            UpsertConflict(number=1, rank=1, name="Steve"),
+            UpsertConflict(number=2, rank=2, name="Olivia"),
+            UpsertConflict(number=3, rank=3, name="Emma"),
+            UpsertConflict(number=4, rank=4, name="Lucas"),
+        ]
+        UpsertConflict.objects.bulk_create(
+            updated_items,
+            update_conflicts=True,
+            update_fields=["name", "rank"],
+            unique_fields=["number"],
+            condition=Q(rank__gt=F("number") + 1) & ~Q(name__startswith="A")
+            | Q(number__gt=3),
+        )
+        self.assertEqual(UpsertConflict.objects.get(number=1).name, "Steve")
+        self.assertEqual(UpsertConflict.objects.get(number=2).name, "Mary")
+        self.assertEqual(UpsertConflict.objects.get(number=3).name, "Alice")
+        self.assertEqual(UpsertConflict.objects.get(number=4).name, "Lucas")
+
+    @skipUnlessDBFeature(
+        "supports_update_conflicts_with_condition",
+        "supports_excluded_expression",
+    )
+    def test_bulk_create_with_excluded_expression(self):
+        initial_items = [
+            UpsertConflict(number=1, rank=3, name="John"),
+            UpsertConflict(number=2, rank=2, name="Mary"),
+        ]
+        UpsertConflict.objects.bulk_create(initial_items)
+        updated_items = [
+            UpsertConflict(number=1, rank=4, name="Steve"),
+            UpsertConflict(number=2, rank=1, name="Olivia"),
+        ]
+        UpsertConflict.objects.bulk_create(
+            updated_items,
+            update_conflicts=True,
+            update_fields=["name", "rank"],
+            unique_fields=["number"],
+            condition=Q(rank__lt=Excluded("rank")),
+        )
+        self.assertEqual(UpsertConflict.objects.get(number=1).name, "Steve")
+        self.assertEqual(UpsertConflict.objects.get(number=2).name, "Mary")
+
+    @skipUnlessDBFeature(
+        "supports_update_conflicts_with_condition",
+        "supports_excluded_expression",
+    )
+    def test_bulk_create_with_complex_excluded_expression(self):
+        initial_items = [
+            UpsertConflict(number=1, rank=3, name="John"),
+            UpsertConflict(number=2, rank=5, name="Mary"),
+            UpsertConflict(number=3, rank=4, name="EmmaAlice"),
+        ]
+        UpsertConflict.objects.bulk_create(initial_items)
+        updated_items = [
+            UpsertConflict(number=1, rank=5, name="Steve"),
+            UpsertConflict(number=2, rank=4, name="Olivia"),
+            UpsertConflict(number=3, rank=6, name="Emma"),
+        ]
+        UpsertConflict.objects.bulk_create(
+            updated_items,
+            update_conflicts=True,
+            update_fields=["name", "rank"],
+            unique_fields=["number"],
+            condition=(
+                Q(rank__gt=F("number") + 1) & Q(rank__lt=Excluded("rank"))
+                | Q(name__startswith=Excluded("name"))
+            ),
+        )
+        self.assertEqual(UpsertConflict.objects.get(number=1).name, "Steve")
+        self.assertEqual(UpsertConflict.objects.get(number=2).name, "Mary")
+        self.assertEqual(UpsertConflict.objects.get(number=3).name, "Emma")
+
+    @skipUnlessDBFeature(
+        "supports_update_conflicts_with_condition",
+        "supports_excluded_expression",
+    )
+    def test_bulk_create_with_arithmetic_excluded_expression(self):
+        initial_items = [
+            UpsertConflict(number=1, rank=5, name="John"),
+            UpsertConflict(number=2, rank=2, name="Mary"),
+        ]
+        UpsertConflict.objects.bulk_create(initial_items)
+        updated_items = [
+            UpsertConflict(number=1, rank=3, name="Steve"),
+            UpsertConflict(number=2, rank=4, name="Olivia"),
+        ]
+        UpsertConflict.objects.bulk_create(
+            updated_items,
+            update_conflicts=True,
+            update_fields=["name", "rank"],
+            unique_fields=["number"],
+            condition=Q(rank__gt=Excluded("rank") + 1),
+        )
+        self.assertEqual(UpsertConflict.objects.get(number=1).name, "Steve")
+        self.assertEqual(UpsertConflict.objects.get(number=2).name, "Mary")
+
+    @skipUnlessDBFeature(
+        "supports_update_conflicts", "supports_update_conflicts_with_condition"
+    )
+    @skipIfDBFeature("supports_excluded_expression")
+    def test_excluded_not_supported(self):
+        bulk_create_kwargs = {
+            "update_conflicts": True,
+            "update_fields": ["name", "rank"],
+            "condition": Q(rank__lt=Excluded("rank")),
+        }
+        if connection.features.supports_update_conflicts_with_target:
+            bulk_create_kwargs["unique_fields"] = ["number"]
+        msg = (
+            f"{connection.vendor} doesn't support partial updating rows on "
+            "conflicts during INSERT"
+        )
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            UpsertConflict.objects.bulk_create(
+                [UpsertConflict(number=1, rank=1, name="Steve")], **bulk_create_kwargs
+            )

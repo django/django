@@ -2409,8 +2409,8 @@ exists in the database, an :exc:`~django.db.IntegrityError` is raised.
 ``bulk_create()``
 ~~~~~~~~~~~~~~~~~
 
-.. method:: bulk_create(objs, batch_size=None, ignore_conflicts=False, update_conflicts=False, update_fields=None, unique_fields=None)
-.. method:: abulk_create(objs, batch_size=None, ignore_conflicts=False, update_conflicts=False, update_fields=None, unique_fields=None)
+.. method:: bulk_create(objs, batch_size=None, ignore_conflicts=False, update_conflicts=False, update_fields=None, unique_fields=None, condition=None)
+.. method:: abulk_create(objs, batch_size=None, ignore_conflicts=False, update_conflicts=False, update_fields=None, unique_fields=None, condition=None)
 
 *Asynchronous version*: ``abulk_create()``
 
@@ -2470,10 +2470,52 @@ be in conflict must be provided.
 Enabling the ``ignore_conflicts`` parameter disables setting the primary key on
 each model instance (if the database normally supports it).
 
+**Advanced Usage: Conditional Updates with** ``condition``
+
+The ``condition`` parameter, allows specifying a
+conditional SQL WHERE clause for bulk insert operations involving conflict
+resolution. This feature is supported by PostgreSQL and SQLite backends 
+(from SQLite version 3.42.0). ``condition`` accepts Django's ``F``, ``Q``, 
+and ``Excluded`` expressions.
+
+The ``Excluded`` class, extends Django's ``F`` 
+class and is specifically designed to handle conflict resolution in bulk insert 
+operations. Unlike ``F`` expressions, which reference fields in the existing 
+database, ``Excluded`` refers to values in the proposed data for insertion. 
+Moreover, similar to ``F`` expressions, ``Excluded`` supports arithmetic and logical
+operations, making it particularly useful in ``bulk_create(..., update_conflicts=True)``
+scenarios where complex conditions are required.
+
+Example:
+
+.. code-block:: pycon
+
+    >>> from django.db.models import F, Q, Excluded
+    >>> from your_app.models import Item
+    # Conditional update with Excluded
+    >>> updated_items = [Item(id=1, rank=4), Item(id=2, rank=3)]
+    >>> Item.objects.bulk_create(
+    ...     updated_items,
+    ...     update_conflicts=True,
+    ...     update_fields=["rank"],
+    ...     unique_fields=["id"],
+    ...     condition=(Q(rank__gt=F("rank") + 1) | Q(rank__lt=Excluded("rank") - 1)),
+    ... )
+
+In this example, rows are updated if ``rank`` is greater than ``rank + 1`` in the database, 
+or less than the proposed value for ``rank`` minus 1 (``Excluded("rank") - 1``).
+
+The rest of the ``bulk_create()`` method's functionality remains the same as in previous versions:
+
 .. versionchanged:: 5.0
 
     In older versions, enabling the ``update_conflicts`` parameter prevented
     setting the primary key on each model instance.
+
+.. versionchanged:: 5.1
+
+   Added the ``condition`` parameter and the ``Excluded`` class to ``bulk_create()``
+   and ``abulk_create()`` methods for conditional updates during bulk insert operations.
 
 .. warning::
 

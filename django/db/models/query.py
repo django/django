@@ -701,7 +701,12 @@ class QuerySet(AltersData):
             obj._prepare_related_fields_for_save(operation_name="bulk_create")
 
     def _check_bulk_create_options(
-        self, ignore_conflicts, update_conflicts, update_fields, unique_fields
+        self,
+        ignore_conflicts,
+        update_conflicts,
+        update_fields,
+        unique_fields,
+        condition,
     ):
         if ignore_conflicts and update_conflicts:
             raise ValueError(
@@ -734,6 +739,11 @@ class QuerySet(AltersData):
                 raise ValueError(
                     "Unique fields that can trigger the upsert must be provided."
                 )
+            if condition and not db_features.supports_update_conflicts_with_condition:
+                raise NotSupportedError(
+                    "This database backend does not support "
+                    "conditional updates in bulk_create."
+                )
             # Updating primary keys and non-concrete fields is forbidden.
             if any(not f.concrete or f.many_to_many for f in update_fields):
                 raise ValueError(
@@ -762,6 +772,7 @@ class QuerySet(AltersData):
         update_conflicts=False,
         update_fields=None,
         unique_fields=None,
+        condition=None,
     ):
         """
         Insert each of the instances into the database. Do *not* call
@@ -807,6 +818,7 @@ class QuerySet(AltersData):
             update_conflicts,
             update_fields,
             unique_fields,
+            condition,
         )
         self._for_write = True
         fields = [f for f in opts.concrete_fields if not f.generated]
@@ -822,6 +834,7 @@ class QuerySet(AltersData):
                     on_conflict=on_conflict,
                     update_fields=update_fields,
                     unique_fields=unique_fields,
+                    condition=condition,
                 )
                 for obj_with_pk, results in zip(objs_with_pk, returned_columns):
                     for result, field in zip(results, opts.db_returning_fields):
@@ -839,6 +852,7 @@ class QuerySet(AltersData):
                     on_conflict=on_conflict,
                     update_fields=update_fields,
                     unique_fields=unique_fields,
+                    condition=condition,
                 )
                 connection = connections[self.db]
                 if (
@@ -862,6 +876,7 @@ class QuerySet(AltersData):
         update_conflicts=False,
         update_fields=None,
         unique_fields=None,
+        condition=None,
     ):
         return await sync_to_async(self.bulk_create)(
             objs=objs,
@@ -870,6 +885,7 @@ class QuerySet(AltersData):
             update_conflicts=update_conflicts,
             update_fields=update_fields,
             unique_fields=unique_fields,
+            condition=condition,
         )
 
     def bulk_update(self, objs, fields, batch_size=None):
@@ -1829,6 +1845,7 @@ class QuerySet(AltersData):
         on_conflict=None,
         update_fields=None,
         unique_fields=None,
+        condition=None,
     ):
         """
         Insert a new record for the given model. This provides an interface to
@@ -1842,6 +1859,7 @@ class QuerySet(AltersData):
             on_conflict=on_conflict,
             update_fields=update_fields,
             unique_fields=unique_fields,
+            condition=condition,
         )
         query.insert_values(fields, objs, raw=raw)
         return query.get_compiler(using=using).execute_sql(returning_fields)
@@ -1857,6 +1875,7 @@ class QuerySet(AltersData):
         on_conflict=None,
         update_fields=None,
         unique_fields=None,
+        condition=None,
     ):
         """
         Helper method for bulk_create() to insert objs one batch at a time.
@@ -1879,6 +1898,7 @@ class QuerySet(AltersData):
                         on_conflict=on_conflict,
                         update_fields=update_fields,
                         unique_fields=unique_fields,
+                        condition=condition,
                         returning_fields=self.model._meta.db_returning_fields,
                     )
                 )
@@ -1890,6 +1910,7 @@ class QuerySet(AltersData):
                     on_conflict=on_conflict,
                     update_fields=update_fields,
                     unique_fields=unique_fields,
+                    condition=condition,
                 )
         return inserted_rows
 
