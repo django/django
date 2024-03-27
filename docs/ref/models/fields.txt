@@ -820,6 +820,13 @@ The default form widget for this field is a single
 :class:`~django.forms.DateTimeInput`. The admin uses two separate
 :class:`~django.forms.TextInput` widgets with JavaScript shortcuts.
 
+.. warning::
+
+    ``datetime.date`` instances used with :class:`DateTimeField` will use
+    midnight as their time component. This is true for both storage and
+    comparison. To compare the date portion of a :class:`DateTimeField` with a
+    ``datetime.date`` instance, use the :lookup:`date` lookup.
+
 ``DecimalField``
 ----------------
 
