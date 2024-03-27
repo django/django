@@ -16,7 +16,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
 from django.core.management.base import CommandError, SystemCheckError
-from django.test import SimpleTestCase, TransactionTestCase, skipUnlessDBFeature
+from django.test import SimpleTestCase, TransactionTestCase
 from django.test.runner import (
     DiscoverRunner,
     Shuffler,
@@ -943,7 +943,6 @@ class SetupDatabasesTests(unittest.TestCase):
         )
 
 
-@skipUnlessDBFeature("supports_sequence_reset")
 class AutoIncrementResetTest(TransactionTestCase):
     """
     Creating the same models in different test methods receive the same PK
