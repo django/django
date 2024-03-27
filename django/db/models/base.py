@@ -652,24 +652,13 @@ class Model(AltersData, metaclass=ModelBase):
 
     def _get_pk_val(self, meta=None):
         meta = meta or self._meta
-
-        # If the model defines Meta.primary_key, both _meta.pk
-        # and model.pk are tuples.
-        if isinstance(meta.pk, tuple):
-            return tuple(getattr(self, field.attname) for field in meta.pk)
-
         return getattr(self, meta.pk.attname)
 
     def _set_pk_val(self, value):
         for parent_link in self._meta.parents.values():
             if parent_link and parent_link != self._meta.pk:
                 setattr(self, parent_link.target_field.attname, value)
-
-        if isinstance(self._meta.pk, tuple):
-            for pk, val in zip(self._meta.pk, tuple(value)):
-                setattr(self, pk.attname, val)
-        else:
-            setattr(self, self._meta.pk.attname, value)
+        return setattr(self, self._meta.pk.attname, value)
 
     pk = property(_get_pk_val, _set_pk_val)
 

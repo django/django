@@ -615,6 +615,16 @@ class ForeignObject(RelatedField):
         if not self.foreign_related_fields:
             return []
 
+        # If a model defines Meta.primary_key and a foreign key refers to it,
+        # the check should be skipped (since primary keys are unique).
+        pk = self.remote_field.model._meta.primary_key
+        if pk:
+            pk = set(pk)
+            if pk == {f.attname for f in self.foreign_related_fields}:
+                return []
+            elif pk == {f.name for f in self.foreign_related_fields}:
+                return []
+
         has_unique_constraint = any(
             rel_field.unique for rel_field in self.foreign_related_fields
         )
@@ -627,14 +637,6 @@ class ForeignObject(RelatedField):
                 frozenset(uc.fields) <= foreign_fields
                 for uc in remote_opts.total_unique_constraints
             )
-
-            # If the model defines Meta.primary_key and the foreign key refers to it,
-            # the check should be skipped.
-            pk = self.remote_field.model._meta.pk
-            if isinstance(pk, tuple) and foreign_fields == set(
-                field.name for field in pk
-            ):
-                return []
 
         if not has_unique_constraint:
             if len(self.foreign_related_fields) > 1:

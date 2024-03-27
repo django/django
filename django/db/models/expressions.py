@@ -312,6 +312,7 @@ class BaseExpression:
         output_field = self._resolve_output_field()
         if output_field is None:
             self._output_field_resolved_to_none = True
+            print("output_field", self)
             raise FieldError("Cannot resolve expression type, unknown output_field")
         return output_field
 

@@ -4,7 +4,14 @@ import warnings
 
 from django.core.exceptions import EmptyResultSet, FullResultSet
 from django.db.backends.base.operations import BaseDatabaseOperations
-from django.db.models.expressions import Case, Expression, Func, Value, When
+from django.db.models.expressions import (
+    Case,
+    Expression,
+    Func,
+    Value,
+    When,
+    ExpressionList,
+)
 from django.db.models.fields import (
     BooleanField,
     CharField,
@@ -385,6 +392,20 @@ class Exact(FieldGetDbPrepValueMixin, BuiltinLookup):
         return super().as_sql(compiler, connection)
 
 
+class TupleExact(Exact):
+    lookup_name = "tuple_exact"
+
+    def as_sql(self, compiler, connection):
+        from django.db.models.sql.where import AND, WhereNode
+
+        exprs = [
+            Exact(lhs, rhs)
+            for lhs, rhs in zip(self.lhs.get_source_expressions(), self.rhs)
+        ]
+
+        return compiler.compile(WhereNode(exprs, connector=AND))
+
+
 @Field.register_lookup
 class IExact(BuiltinLookup):
     lookup_name = "iexact"
@@ -556,6 +577,42 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
             params.extend(sqls_params)
         in_clause_elements.append(")")
         return "".join(in_clause_elements), params
+
+
+@Field.register_lookup
+class TupleIn(In):
+    lookup_name = "tuple_in"
+
+    def get_prep_lookup(self):
+        try:
+            lhs = list(self.lhs)
+        except TypeError:
+            raise ValueError(f"lhs={self.lhs} is not iterable")
+        try:
+            rhs = list(self.rhs)
+        except TypeError:
+            raise ValueError(f"rhs={self.rhs} is not iterable")
+
+        if not all(len(values) == len(lhs) for values in rhs):
+            raise ValueError(f"rhs={rhs} must match lhs={lhs}")
+
+        return super().get_prep_lookup()
+
+    def as_sql(self, compiler, connection):
+        from django.db.models.sql.where import WhereNode, AND, OR
+
+        exprs = []
+        lhs = self.lhs.get_source_expressions()
+
+        for rhs in self.rhs:
+            exprs.append(
+                WhereNode(
+                    [Exact(col, value) for col, value in zip(lhs, rhs)],
+                    connector=AND,
+                )
+            )
+
+        return compiler.compile(WhereNode(exprs, connector=OR))
 
 
 class PatternLookup(BuiltinLookup):

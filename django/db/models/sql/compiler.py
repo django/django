@@ -549,6 +549,7 @@ class SQLCompiler:
         if vendor_impl:
             sql, params = vendor_impl(self, self.connection)
         else:
+            print("compile", node)
             sql, params = node.as_sql(self, self.connection)
         return sql, params
 

@@ -514,8 +514,11 @@ class Collector:
 
         for model, instances in self.data.items():
             for instance in instances:
-                pk = model._meta.pk
-                fields = pk if isinstance(pk, tuple) else (pk,)
+                try:
+                    fields = iter(model._meta.pk)
+                except TypeError:
+                    fields = (model._meta.pk,)
+
                 for field in fields:
                     setattr(instance, field.attname, None)
 
