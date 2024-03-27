@@ -170,6 +170,12 @@ For example, ``UniqueConstraint(fields=['room', 'date'],
 name='unique_booking')`` ensures each room can only be booked once for each
 date.
 
+If a :class:`~django.core.exceptions.ValidationError` is raised during a
+model's :meth:`validate_constraints() <Model.validate_constraints>` it will be
+classified as a field-error for ``fields`` listing only a single field;
+for ``fields`` listing multiple fields it will be classified as a
+:attr:`non-field-error <django.core.exceptions.NON_FIELD_ERRORS>`.
+
 ``condition``
 -------------
 

@@ -10,6 +10,7 @@ from django.db.models import (
 )
 from django.db.models.expressions import NegatedExpression, RawSQL
 from django.db.models.functions import Lower
+from django.db.models.lookups import Exact, IsNull
 from django.db.models.sql.where import NothingNode
 from django.test import SimpleTestCase, TestCase
 
@@ -262,6 +263,30 @@ class QTests(SimpleTestCase):
                     Q.create(items, connector=connector),
                     Q(*items, _connector=connector),
                 )
+
+    def test_referenced_base_fields(self):
+        # Make sure Q.referenced_base_fields retrieves all base fields from both
+        # filters and F expressions
+        q = Q(
+            1,
+            Q(field_1=1) & Q(field_2=1),
+            Exact(F("field_3"), IsNull(F("field_4"), True)),
+            Exact(Q(field_5=F("field_6")), True),
+            field_2=1,
+            field_7__lookup=True,
+        )
+        self.assertEqual(
+            q.referenced_base_fields,
+            {
+                "field_1",
+                "field_2",
+                "field_3",
+                "field_4",
+                "field_5",
+                "field_6",
+                "field_7",
+            },
+        )
 
 
 class QCheckTests(TestCase):
