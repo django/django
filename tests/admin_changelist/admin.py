@@ -48,6 +48,7 @@ class ChildAdmin(admin.ModelAdmin):
     list_display = ["name", "parent"]
     list_per_page = 10
     list_filter = ["parent", "age"]
+    search_fields = ["age__exact"]
 
     def get_queryset(self, request):
         return super().get_queryset(request).select_related("parent")
