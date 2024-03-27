@@ -26,6 +26,13 @@ only officially support the latest release of each series.
 What's new in Django 5.1
 ========================
 
+Moving model between apps
+-------------------------
+
+The migration framework now auto-detects moving models between apps and
+supports doing so without database operations if a moved model's database table
+remains the same.
+
 Minor features
 --------------
 
