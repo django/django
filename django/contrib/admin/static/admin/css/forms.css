@@ -76,6 +76,12 @@ form ul.inline li {
     padding-right: 7px;
 }
 
+/* FIELDSETS */
+
+fieldset legend {
+    inline-size: 100%;
+}
+
 /* ALIGNED FIELDSETS */
 
 .aligned label {
@@ -209,35 +215,25 @@ form div.help ul {
     width: 450px;
 }
 
-/* COLLAPSED FIELDSETS */
+/* COLLAPSIBLE FIELDSETS */
 
-fieldset.collapsed * {
-    display: none;
-}
-
-fieldset.collapsed h2, fieldset.collapsed {
-    display: block;
-}
-
-fieldset.collapsed {
-    border: 1px solid var(--hairline-color);
-    border-radius: 4px;
-    overflow: hidden;
-}
-
-fieldset.collapsed h2 {
-    background: var(--darkened-bg);
-    color: var(--body-quiet-color);
-}
-
-fieldset .collapse-toggle {
+.collapse h3 {
+    margin: 0;
+    padding: 8px;
+    font-weight: 400;
+    font-size: 0.8125rem;
+    text-align: left;
+    background: var(--header-bg);
     color: var(--header-link-color);
 }
 
-fieldset.collapsed .collapse-toggle {
-    background: transparent;
-    display: inline;
-    color: var(--link-fg);
+.collapse details {
+    font-size: 0.8125rem;
+    padding: 10px;
+}
+
+.collapse details[open] summary {
+    padding-bottom: 10px;
 }
 
 /* MONOSPACE TEXTAREAS */
