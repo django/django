@@ -252,7 +252,7 @@ class BaseForm(RenderableFormMixin):
             self.error_class(error_class="nonfield", renderer=self.renderer),
         )
 
-    def add_error(self, field, error):
+    def add_error(self, field, error, field_id=None):
         """
         Update the content of `self._errors`.
 
@@ -298,7 +298,10 @@ class BaseForm(RenderableFormMixin):
                         error_class="nonfield", renderer=self.renderer
                     )
                 else:
-                    self._errors[field] = self.error_class(renderer=self.renderer)
+                    self._errors[field] = self.error_class(
+                        renderer=self.renderer,
+                        field_id=field_id,
+                    )
             self._errors[field].extend(error_list)
             if field in self.cleaned_data:
                 del self.cleaned_data[field]
@@ -335,7 +338,7 @@ class BaseForm(RenderableFormMixin):
                     value = getattr(self, "clean_%s" % name)()
                     self.cleaned_data[name] = value
             except ValidationError as e:
-                self.add_error(name, e)
+                self.add_error(name, e, bf.auto_id)
 
     def _clean_form(self):
         try:

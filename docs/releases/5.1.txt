@@ -208,9 +208,15 @@ File Uploads
 Forms
 ~~~~~
 
-* In order to improve accessibility and enable screen readers to associate
-  fieldsets with their help text, the form fieldset now includes the
-  ``aria-describedby`` HTML attribute.
+* In order to improve accessibility the following changes are made:
+
+    * Fieldset are associated with their help text by inclusion of the
+      ``aria-describedby`` HTML attribute.
+
+    * From fields are associated with their error messages with
+      ``aria-describedby``. To support this
+      :class:`~django.forms.ErrorList` now accepts a ``field_id`` and the
+      default ``ErrorList`` template now includes an ``id`` HTML attribute.
 
 Generic Views
 ~~~~~~~~~~~~~

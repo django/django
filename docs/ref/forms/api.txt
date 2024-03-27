@@ -991,9 +991,13 @@ How errors are displayed
 
 If you render a bound ``Form`` object, the act of rendering will automatically
 run the form's validation if it hasn't already happened, and the HTML output
-will include the validation errors as a ``<ul class="errorlist">`` near the
-field. The particular positioning of the error messages depends on the output
-method you're using:
+will include the validation errors as a ``<ul class="errorlist">``.
+
+Validation errors are associated with their input using the
+``aria-describedby`` HTML attribute where a field has an ``auto_id`` and a
+custom ``aria-describedby`` is not provided. If the widget is rendered in a
+``<fieldset>`` then ``aria-describedby`` is added to this element, otherwise it
+is added to the widget's ``<input>``:
 
 .. code-block:: pycon
 
@@ -1003,29 +1007,42 @@ method you're using:
     ...     "sender": "invalid email address",
     ...     "cc_myself": True,
     ... }
-    >>> f = ContactForm(data, auto_id=False)
+    >>> f = ContactForm(data)
     >>> print(f)
-    <div>Subject:
-      <ul class="errorlist"><li>This field is required.</li></ul>
-      <input type="text" name="subject" maxlength="100" required aria-invalid="true">
+    <div>
+      <label for="id_subject">Subject:</label>
+      <ul class="errorlist" id="id_subject_error"><li>This field is required.</li></ul>
+      <input type="text" name="subject" maxlength="100" required aria-invalid="true" aria-describedby="id_subject_error" id="id_subject">
     </div>
-    <div>Message:
+    <div>
+      <label for="id_message">Message:</label>
       <textarea name="message" cols="40" rows="10" required>Hi there</textarea>
     </div>
-    <div>Sender:
-      <ul class="errorlist"><li>Enter a valid email address.</li></ul>
-      <input type="email" name="sender" value="invalid email address" required aria-invalid="true">
+    <div>
+      <label for="id_sender">Sender:</label>
+      <ul class="errorlist" id="id_sender_error"><li>Enter a valid email address.</li></ul>
+      <input type="email" name="sender" value="invalid email address" maxlength="320" required aria-invalid="true" aria-describedby="id_sender_error" id="id_sender">
     </div>
-    <div>Cc myself:
-      <input type="checkbox" name="cc_myself" checked>
+    <div>
+        <label for="id_cc_myself">Cc myself:</label>
+        <input type="checkbox" name="cc_myself" id="id_cc_myself" checked>
     </div>
+
+If a custom ``aria-describedby`` is provided when defining the widget this will
+be used in place of the default value. Consideration will need to be given how
+to associate errors with their inputs to allow these descriptions to be read to
+screen reader users.
+
+.. versionadded:: 5.1
+
+    ``aria-describedby`` was added to associate errors with its input.
 
 .. _ref-forms-error-list-format:
 
 Customizing the error list format
 ---------------------------------
 
-.. class:: ErrorList(initlist=None, error_class=None, renderer=None)
+.. class:: ErrorList(initlist=None, error_class=None, renderer=None, field_id=None)
 
     By default, forms use ``django.forms.utils.ErrorList`` to format validation
     errors. ``ErrorList`` is a list like object where ``initlist`` is the
@@ -1042,6 +1059,13 @@ Customizing the error list format
         Specifies the :doc:`renderer <renderers>` to use for ``ErrorList``.
         Defaults to ``None`` which means to use the default renderer
         specified by the :setting:`FORM_RENDERER` setting.
+
+    .. attribute:: field_id
+
+        An ``id`` for the field for which the errors relate. This allows an
+        HTML ``id`` attribute to be added in the error template and is useful
+        to associate the errors with the field. The default template uses the
+        format ``id="{{ field_id }}_error"``.
 
     .. attribute:: template_name
 
@@ -1097,6 +1121,10 @@ Customizing the error list format
     overriding the :attr:`.template_name` attribute or more generally by
     overriding the default template, see also
     :ref:`overriding-built-in-form-templates`.
+
+    .. versionadded:: 5.1
+
+        The ``field_id`` attributed was added.
 
 More granular output
 ====================
@@ -1428,7 +1456,7 @@ Methods of ``BoundField``
 
     .. versionadded:: 5.0
 
-    The render method is called by ``as_field_group``. All arguments are 
+    The render method is called by ``as_field_group``. All arguments are
     optional and default to:
 
     * ``template_name``: :attr:`.BoundField.template_name`
