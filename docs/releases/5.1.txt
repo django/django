@@ -266,6 +266,11 @@ Models
   :class:`~django.db.models.TextField`, or
   :class:`~django.contrib.postgres.fields.ArrayField` can now be :ref:`sliced
   <slicing-using-f>`.
+* :attr:`~django.db.models.UniqueConstraint.violation_error_code` and 
+  :attr:`~django.db.models.UniqueConstraint.violation_error_message` will now show the custom
+  code and message if set, also for :class:`~django.db.models.UniqueConstraint`\s with
+  :attr:`~django.db.models.UniqueConstraint.fields` and without a.fields` and without a
+  :attr:`~django.db.models.UniqueConstraint.condition`
 
 * The new ``from_queryset`` argument of :meth:`.Model.refresh_from_db` and
   :meth:`.Model.arefresh_from_db`  allows customizing the queryset used to

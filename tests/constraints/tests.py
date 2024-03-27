@@ -400,7 +400,7 @@ class CheckConstraintTests(TestCase):
 class UniqueConstraintTests(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.p1 = UniqueConstraintProduct.objects.create(name="p1", color="red")
+        cls.p1 = UniqueConstraintProduct.objects.create(name="p1", color="red", age=42)
         cls.p2 = UniqueConstraintProduct.objects.create(name="p2")
 
     def test_eq(self):
@@ -833,9 +833,18 @@ class UniqueConstraintTests(TestCase):
         UniqueConstraintConditionProduct(
             name=obj1.name, color="blue"
         ).validate_constraints()
+
         msg = "Constraint “name_without_color_uniq” is violated."
         with self.assertRaisesMessage(ValidationError, msg):
             UniqueConstraintConditionProduct(name=obj2.name).validate_constraints()
+
+        msg = "Custom message"
+        with self.assertRaisesMessage(ValidationError, msg) as cm:
+            UniqueConstraintProduct(
+                color=self.p1.color,
+                age=self.p1.age,
+            ).validate_constraints()
+        self.assertEqual(cm.exception.error_dict["__all__"][0].code, "custom_code")
 
     def test_model_validation_constraint_no_code_error(self):
         class ValidateNoCodeErrorConstraint(UniqueConstraint):
@@ -858,6 +867,15 @@ class UniqueConstraintTests(TestCase):
             NoCodeErrorConstraintModel(name="test").validate_constraints()
 
     def test_validate(self):
+        constraint = UniqueConstraintProduct._meta.constraints[1]
+        msg = "Custom message"
+        non_unique_product = UniqueConstraintProduct(
+            color=self.p1.color,
+            age=self.p1.age,
+        )
+        with self.assertRaisesMessage(ValidationError, msg) as cm:
+            constraint.validate(UniqueConstraintProduct, non_unique_product)
+        self.assertEqual(cm.exception.code, "custom_code")
         constraint = UniqueConstraintProduct._meta.constraints[0]
         msg = "Unique constraint product with this Name and Color already exists."
         non_unique_product = UniqueConstraintProduct(
