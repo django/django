@@ -197,6 +197,10 @@ point to the latest or stable version of the documentation, e.g. ``/en/stable/``
 Writing style
 =============
 
+Prefer plain language where possible. Avoid jargon and technical terms unless
+they are necessary. Keep sentences short and to the point. Use the active voice
+where possible.
+
 When using pronouns in reference to a hypothetical person, such as "a user with
 a session cookie", gender-neutral pronouns (they/their/them) should be used.
 Instead of:
@@ -608,6 +612,41 @@ See :ref:`Localizing the Django documentation <translating-documentation>` if
 you'd like to help translate the documentation into another language.
 
 .. _django-admin-manpage:
+
+Accessibility in documentation
+==============================
+
+See :doc:`/internals/contributing/writing-code/accessibility` for our project guidelines. For documentation
+specifically, guide readers to use accessible patterns.
+
+* Include enough code so examples are accessible by default. For example:
+
+  * :class:`django.forms.ImageField` usage should
+    acknowledge the need for alt text.
+  * :class:`django.forms.URLField` to create an HTML link should
+    provision for link text.
+  * ``<html>`` elements must have a ``lang`` attribute.
+  * ``<img>`` elements must have an ``alt`` attribute, set with an appropriate
+    description or left empty for decorative images.
+
+* When there are multiple ways to achieve a result, make sure the accessible
+  option is the most prominent. For example:
+
+  * Forms should showcase use of :meth:`.Form.as_div` over alternatives.
+  * :class:`django.core.paginator.Paginator` examples should
+    demonstrate pagination links before “Load more” patterns.
+
+* Document common accessibility considerations. For example:
+
+  * When creating or storing documents such as :doc:`/howto/outputting-pdf`,
+    mention the need for accessible alternatives.
+  * For operations with timeouts, mention `relevant accessibility guidelines <https://www.w3.org/WAI/WCAG22/Understanding/timeouts.html>`_.
+
+* Use appropriate semantic HTML elements and attributes. For example:
+
+  * Use headings instead of bold text.
+  * Add landmark elements where needed.
+  * Only use ARIA attributes if there are no alternatives.
 
 ``django-admin`` man page
 =========================
