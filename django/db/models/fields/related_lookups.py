@@ -1,3 +1,5 @@
+from itertools import chain
+
 from django.db.models.lookups import (
     Exact,
     GreaterThan,
@@ -12,6 +14,7 @@ from django.db.models.lookups import (
 class MultiColSource:
     contains_aggregate = False
     contains_over_clause = False
+    constrains_nulls = False
 
     def __init__(self, alias, targets, sources, field):
         self.targets, self.sources, self.field, self.alias = (
@@ -35,6 +38,14 @@ class MultiColSource:
 
     def resolve_expression(self, *args, **kwargs):
         return self
+
+    def exclude_nulls(self, nullable_aliases):
+        return list(
+            chain.from_iterable(
+                target.get_col(self.alias).exclude_nulls(nullable_aliases)
+                for target in self.targets
+            )
+        )
 
 
 def get_normalized_value(value, lhs):

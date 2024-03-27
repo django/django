@@ -1,10 +1,20 @@
 import itertools
 import math
 import warnings
+from collections.abc import Iterator
 
-from django.core.exceptions import EmptyResultSet, FullResultSet
+from django.core.exceptions import EmptyResultSet, FieldError, FullResultSet
 from django.db.backends.base.operations import BaseDatabaseOperations
-from django.db.models.expressions import Case, Expression, Func, Value, When
+from django.db.models.constants import LOOKUP_SEP
+from django.db.models.expressions import (
+    BaseExpression,
+    Case,
+    Expression,
+    F,
+    Func,
+    Value,
+    When,
+)
 from django.db.models.fields import (
     BooleanField,
     CharField,
@@ -18,6 +28,85 @@ from django.utils.datastructures import OrderedSet
 from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.functional import cached_property
 from django.utils.hashable import make_hashable
+
+
+class UnresolvedLookup(BaseExpression):
+    output_field = BooleanField()
+
+    def __init__(self, lookup, value):
+        name, *parts = lookup.split(LOOKUP_SEP)
+        self.origin = F(name)
+        self.parts = parts
+        self.value = value
+        super().__init__()
+
+    def get_source_expressions(self):
+        return [self.origin, self.value]
+
+    def set_source_expressions(self, exprs):
+        self.origin, self.value = exprs
+
+    def resolve_expression(
+        self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False
+    ):
+        lookup = LOOKUP_SEP.join([self.origin.name, *self.parts])
+        if not lookup:
+            raise FieldError("Cannot parse keyword query %r" % self.field.name)
+
+        lookups, parts, reffed_expression = query.solve_lookup_type(lookup, summarize)
+        if not allow_joins and len(parts) > 1:
+            raise FieldError("Joined field references are not permitted in this query")
+
+        pre_joins = query.alias_refcount.copy()
+        value = query.resolve_lookup_value(self.value, reuse, allow_joins, summarize)
+        used_joins = {
+            k for k, v in query.alias_refcount.items() if v > pre_joins.get(k, 0)
+        }
+
+        if reffed_expression:
+            return query.build_lookup(lookups, reffed_expression, value)
+
+        opts = query.get_meta()
+        alias = query.get_initial_alias()
+        join_info = query.setup_joins(
+            parts,
+            opts,
+            alias,
+            can_reuse=reuse,
+            # XXX: allow_many is problematic and should probably be passed to resolve_expression.
+            allow_many=True,
+        )
+
+        # Update used_joins before trimming since they are reused to determine
+        # which joins could be later promoted to INNER.
+        used_joins.update(join_info.joins)
+        targets, alias, join_list = query.trim_joins(
+            join_info.targets, join_info.joins, join_info.path
+        )
+        if reuse is not None:
+            reuse.update(join_list)
+
+        if join_info.final_field.is_relation:
+            if len(targets) == 1:
+                col = query._get_col(targets[0], join_info.final_field, alias)
+            else:
+                from django.db.models.fields.related_lookups import MultiColSource
+
+                col = MultiColSource(
+                    alias, targets, join_info.targets, join_info.final_field
+                )
+        else:
+            col = query._get_col(targets[0], join_info.final_field, alias)
+
+        # Prevent iterator from being consumed by check_related_objects()
+        if isinstance(value, Iterator):
+            value = list(value)
+        query.check_related_objects(join_info.final_field, value, join_info.opts)
+
+        lookup = query.build_lookup(lookups, col, value)
+        lookup._used_joins = used_joins
+        lookup._lookup_joins = join_info.joins
+        return lookup
 
 
 class Lookup(Expression):
@@ -192,6 +281,14 @@ class Lookup(Expression):
     def allowed_default(self):
         return self.lhs.allowed_default and self.rhs.allowed_default
 
+    def exclude_nulls(self, nullable_aliases):
+        if self.can_use_none_as_rhs and self.rhs is None:
+            return []
+        conditions = self.lhs.exclude_nulls(nullable_aliases)
+        if exclude_rhs_nulls := getattr(self.rhs, "exclude_nulls", None):
+            conditions.extend(exclude_rhs_nulls(nullable_aliases))
+        return conditions
+
 
 class Transform(RegisterLookupMixin, Func):
     """
@@ -205,6 +302,9 @@ class Transform(RegisterLookupMixin, Func):
     @property
     def lhs(self):
         return self.get_source_expressions()[0]
+
+    def exclude_nulls(self, nullable_aliases):
+        return self.lhs.exclude_nulls(nullable_aliases)
 
     def get_bilateral_transforms(self):
         if hasattr(self.lhs, "get_bilateral_transforms"):
@@ -633,6 +733,13 @@ class Range(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
 class IsNull(BuiltinLookup):
     lookup_name = "isnull"
     prepare_rhs = False
+
+    @property
+    def constrains_nulls(self):
+        return self.rhs is True
+
+    def exclude_nulls(self, nullable_aliases):
+        return []
 
     def as_sql(self, compiler, connection):
         if not isinstance(self.rhs, bool):
