@@ -37,8 +37,8 @@ class UniqueConstraintProduct(models.Model):
             models.UniqueConstraint(
                 fields=["name", "color"],
                 name="name_color_uniq",
-                # Custom message and error code are ignored.
                 violation_error_code="custom_code",
+                # Custom message is ignored.
                 violation_error_message="Custom message",
             )
         ]
