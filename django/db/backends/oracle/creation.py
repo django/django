@@ -212,6 +212,7 @@ class DatabaseCreation(BaseDatabaseCreation):
             "SAVED_PASSWORD"
         ]
         self.connection.close()
+        self.connection.close_pool()
         parameters = self._get_test_db_params()
         with self._maindb_connection.cursor() as cursor:
             if self._test_user_create():

@@ -47,6 +47,7 @@ class BaseDatabaseWrapper:
     introspection_class = None
     ops_class = None
     validation_class = BaseDatabaseValidation
+    is_pool = None
 
     queries_limit = 9000
 

@@ -137,6 +137,25 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                     },
                 }
             )
+        if self.connection.settings_dict["OPTIONS"].get("pool"):
+            skips.update(
+                {
+                    "Pooling does not supports persistent connection": {
+                        "backends.base.test_base.ConnectionHealthChecksTests."
+                        "test_health_checks_enabled",
+                        "backends.base.test_base.ConnectionHealthChecksTests."
+                        "test_health_checks_enabled_errors_occurred",
+                        "backends.base.test_base.ConnectionHealthChecksTests."
+                        "test_health_checks_disabled",
+                        "backends.base.test_base.ConnectionHealthChecksTests."
+                        "test_set_autocommit_health_checks_enabled",
+                        "servers.tests.LiveServerTestCloseConnectionTest."
+                        "test_closes_connections",
+                        "backends.oracle.tests.TransactionalTests."
+                        "test_password_with_at_sign",
+                    },
+                }
+            )
         return skips
 
     @cached_property
