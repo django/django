@@ -82,6 +82,18 @@ class CompositePKTests(BaseTestCase):
         self.assertEqual(comment_pk["columns"], ["tenant_id", "id"])
         self.assertTrue(comment_pk["primary_key"])
 
+    @unittest.skipUnless(connection.vendor == "sqlite", "SQLite specific test")
+    def test_pk_constraints_in_sqlite(self):
+        user_constraints = get_constraints(User._meta.db_table)
+        user_pk = user_constraints["__primary__"]
+        self.assertEqual(user_pk["columns"], ["tenant_id", "id"])
+        self.assertTrue(user_pk["primary_key"])
+
+        comment_constraints = get_constraints(Comment._meta.db_table)
+        comment_pk = comment_constraints["__primary__"]
+        self.assertEqual(comment_pk["columns"], ["tenant_id", "id"])
+        self.assertTrue(comment_pk["primary_key"])
+
 
 class CompositePKDeleteTests(BaseTestCase):
     """
