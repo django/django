@@ -318,8 +318,9 @@ class CompositePKCreateTests(BaseTestCase):
     def test_create_user(self):
         u = User._meta.db_table
         test_cases = [
-            ({"tenant": self.tenant, "id": 1111}, 1111),
-            ({"pk": (self.tenant.id, 1112)}, 1112),
+            ({"tenant": self.tenant, "id": 2412}, 2412),
+            ({"tenant_id": self.tenant.id, "id": 5316}, 5316),
+            ({"pk": (self.tenant.id, 7424)}, 7424),
         ]
 
         for kwargs, value in test_cases:
