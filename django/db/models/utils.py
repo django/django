@@ -71,6 +71,16 @@ class AltersData:
 
 
 def is_pk_set(pk):
+    """
+    >>> is_pk_set(1)
+    True
+    >>> is_pk_set(None)
+    False
+    >>> is_pk_set((1, 1))
+    True
+    >>> is_pk_set((1, None))
+    False
+    """
     if pk is None:
         return False
     if isinstance(pk, Iterable):
