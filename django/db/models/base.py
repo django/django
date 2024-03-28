@@ -48,7 +48,7 @@ from django.db.models.signals import (
     pre_init,
     pre_save,
 )
-from django.db.models.utils import AltersData, make_model_tuple, is_pk_set
+from django.db.models.utils import AltersData, is_pk_set, make_model_tuple
 from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.encoding import force_str
 from django.utils.hashable import make_hashable
