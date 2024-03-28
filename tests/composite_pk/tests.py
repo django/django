@@ -387,21 +387,26 @@ class CompositePKCreateTests(TestCase):
     @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific test")
     def test_create_user_with_autofield_in_postgresql(self):
         u = User._meta.db_table
+        test_cases = [
+            {"tenant": self.tenant},
+            {"tenant_id": self.tenant.id},
+        ]
 
-        with CaptureQueriesContext(connection) as context:
-            obj = User.objects.create(tenant=self.tenant)
+        for fields in test_cases:
+            with CaptureQueriesContext(connection) as context:
+                obj = User.objects.create(**fields)
 
-        self.assertEqual(obj.tenant_id, self.tenant.id)
-        self.assertIsInstance(obj.id, int)
-        self.assertGreater(obj.id, 0)
-        self.assertEqual(obj.pk, (self.tenant.id, obj.id))
-        self.assertEqual(len(context.captured_queries), 1)
-        self.assertEqual(
-            context.captured_queries[0]["sql"],
-            f'INSERT INTO "{u}" ("tenant_id") '
-            f"VALUES ({self.tenant.id}) "
-            f'RETURNING "{u}"."id"',
-        )
+            self.assertEqual(obj.tenant_id, self.tenant.id)
+            self.assertIsInstance(obj.id, int)
+            self.assertGreater(obj.id, 0)
+            self.assertEqual(obj.pk, (self.tenant.id, obj.id))
+            self.assertEqual(len(context.captured_queries), 1)
+            self.assertEqual(
+                context.captured_queries[0]["sql"],
+                f'INSERT INTO "{u}" ("tenant_id") '
+                f"VALUES ({self.tenant.id}) "
+                f'RETURNING "{u}"."id"',
+            )
 
 
 class CompositePKFilterTests(BaseTestCase):
