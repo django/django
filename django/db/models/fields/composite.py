@@ -22,9 +22,6 @@ class CompositeAttribute:
         self.field = field
 
     def __get__(self, instance, cls=None):
-        if instance is None:
-            return self
-
         return tuple(
             getattr(instance, field_name) for field_name in self.field.field_names
         )
