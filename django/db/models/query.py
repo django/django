@@ -30,8 +30,8 @@ from django.db.models.sql.constants import CURSOR, GET_ITERATOR_CHUNK_SIZE
 from django.db.models.utils import (
     AltersData,
     create_namedtuple_class,
-    resolve_callables,
     is_pk_set,
+    resolve_callables,
 )
 from django.utils import timezone
 from django.utils.deprecation import RemovedInDjango60Warning
