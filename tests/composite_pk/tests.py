@@ -7,7 +7,7 @@ from django.db.models.sql import Query
 from django.test import TestCase
 from django.test.utils import CaptureQueriesContext
 
-from .models import Tenant, User, Comment
+from .models import Comment, Tenant, User
 
 
 class BaseTestCase(TestCase):

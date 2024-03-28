@@ -1,4 +1,4 @@
-from .tenant import Tenant, User, Comment
+from .tenant import Comment, Tenant, User
 
 __all__ = [
     "Tenant",
