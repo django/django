@@ -1076,8 +1076,8 @@ class Model(AltersData, metaclass=ModelBase):
         pk_val = self._get_pk_val(meta)
         if isinstance(pk_val, Iterable):
             pk_set = not any(value is None for value in pk_val)
-            if pk_set:
-                for field, value in zip(meta.pk, pk_val):
+            for field, value in zip(meta.pk, pk_val):
+                if value is not None:
                     setattr(self, field.attname, value)
         else:
             if pk_val is None:

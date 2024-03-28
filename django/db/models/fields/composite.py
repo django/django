@@ -24,12 +24,8 @@ class CompositeAttribute:
     def __get__(self, instance, cls=None):
         if instance is None:
             return self
-        data = instance.__dict__
-        field_name = self.field.attname
-        if field_name not in data:
-            fields = tuple(getattr(instance, name) for name in self.field.field_names)
-            data[field_name] = fields
-        return data[field_name]
+
+        return tuple(getattr(instance, name) for name in self.field.field_names)
 
 
 class CompositeField(Field):

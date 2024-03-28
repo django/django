@@ -1,5 +1,4 @@
 import unittest
-from unittest import skipUnless
 
 from django.db import connection
 from django.db.models.query import MAX_GET_RESULTS
@@ -37,6 +36,14 @@ class CompositePKTests(BaseTestCase):
         self.assertEqual(self.comment.user_id, self.user.id)
         self.assertEqual(self.comment.tenant_id, self.tenant.id)
         self.assertEqual(self.comment.pk, (self.comment.tenant_id, self.comment.id))
+
+    def test_model_pk_updates(self):
+        user = User.objects.get(pk=self.user.pk)
+        self.assertEqual(user.pk, (self.tenant.id, self.user.id))
+        user.tenant_id = 9831
+        self.assertEqual(user.pk, (9831, self.user.id))
+        user.id = 4321
+        self.assertEqual(user.pk, (9831, 4321))
 
 
 class CompositePKDeleteTests(BaseTestCase):
