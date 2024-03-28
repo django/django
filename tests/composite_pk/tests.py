@@ -125,7 +125,8 @@ class CompositePKDeleteTests(BaseTestCase):
         self.assertEqual(
             context.captured_queries[2]["sql"],
             f'DELETE FROM "{c}" '
-            f'WHERE ("{c}"."tenant_id" = {self.tenant.id} AND "{c}"."user_id" = {self.user.id})',
+            f'WHERE ("{c}"."tenant_id" = {self.tenant.id} '
+            f'AND "{c}"."user_id" = {self.user.id})',
         )
         self.assertEqual(
             context.captured_queries[3]["sql"],
@@ -134,7 +135,8 @@ class CompositePKDeleteTests(BaseTestCase):
         self.assertEqual(
             context.captured_queries[4]["sql"],
             f'DELETE FROM "{u}" '
-            f'WHERE ("{u}"."tenant_id" = {self.tenant.id} AND "{u}"."id" = {self.user.id})',
+            f'WHERE ("{u}"."tenant_id" = {self.tenant.id} '
+            f'AND "{u}"."id" = {self.user.id})',
         )
         self.assertEqual(
             context.captured_queries[5]["sql"],
@@ -166,12 +168,14 @@ class CompositePKDeleteTests(BaseTestCase):
         self.assertEqual(
             context.captured_queries[1]["sql"],
             f'DELETE FROM "{c}" '
-            f'WHERE ("{c}"."tenant_id" = {self.tenant.id} AND "{c}"."user_id" = {self.user.id})',
+            f'WHERE ("{c}"."tenant_id" = {self.tenant.id} '
+            f'AND "{c}"."user_id" = {self.user.id})',
         )
         self.assertEqual(
             context.captured_queries[2]["sql"],
             f'DELETE FROM "{u}" '
-            f'WHERE ("{u}"."tenant_id" = {self.tenant.id} AND "{u}"."id" = {self.user.id})',
+            f'WHERE ("{u}"."tenant_id" = {self.tenant.id} '
+            f'AND "{u}"."id" = {self.user.id})',
         )
 
     def test_delete_user_by_pk(self):
@@ -194,17 +198,20 @@ class CompositePKDeleteTests(BaseTestCase):
             context.captured_queries[0]["sql"],
             f'SELECT "{u}"."tenant_id", "{u}"."id" '
             f'FROM "{u}" '
-            f'WHERE ("{u}"."tenant_id" = {self.tenant.id} AND "{u}"."id" = {self.user.id})',
+            f'WHERE ("{u}"."tenant_id" = {self.tenant.id} '
+            f'AND "{u}"."id" = {self.user.id})',
         )
         self.assertEqual(
             context.captured_queries[1]["sql"],
             f'DELETE FROM "{c}" '
-            f'WHERE ("{c}"."tenant_id" = {self.tenant.id} AND "{c}"."user_id" = {self.user.id})',
+            f'WHERE ("{c}"."tenant_id" = {self.tenant.id} '
+            f'AND "{c}"."user_id" = {self.user.id})',
         )
         self.assertEqual(
             context.captured_queries[2]["sql"],
             f'DELETE FROM "{u}" '
-            f'WHERE ("{u}"."tenant_id" = {self.tenant.id} AND "{u}"."id" = {self.user.id})',
+            f'WHERE ("{u}"."tenant_id" = {self.tenant.id} '
+            f'AND "{u}"."id" = {self.user.id})',
         )
 
 
@@ -253,7 +260,8 @@ class CompositePKGetTests(BaseTestCase):
                     context.captured_queries[0]["sql"],
                     f'SELECT "{u}"."tenant_id", "{u}"."id" '
                     f'FROM "{u}" '
-                    f'WHERE ("{u}"."tenant_id" = {self.tenant.id} AND "{u}"."id" = {self.user.id}) '
+                    f'WHERE ("{u}"."tenant_id" = {self.tenant.id} '
+                    f'AND "{u}"."id" = {self.user.id}) '
                     f"LIMIT {MAX_GET_RESULTS}",
                 )
 
@@ -294,7 +302,8 @@ class CompositePKGetTests(BaseTestCase):
             context.captured_queries[0]["sql"],
             f'SELECT "{c}"."tenant_id", "{c}"."id", "{c}"."user_id" '
             f'FROM "{c}" '
-            f'WHERE ("{c}"."tenant_id" = {self.tenant.id} AND "{c}"."id" = {self.comment.id}) '
+            f'WHERE ("{c}"."tenant_id" = {self.tenant.id} '
+            f'AND "{c}"."id" = {self.comment.id}) '
             f"LIMIT {MAX_GET_RESULTS}",
         )
 
@@ -337,7 +346,8 @@ class CompositePKGetTests(BaseTestCase):
             context.captured_queries[0]["sql"],
             f'SELECT "{c}"."tenant_id", "{c}"."id", "{c}"."user_id" '
             f'FROM "{c}" '
-            f'WHERE ("{c}"."tenant_id" = {self.tenant.id} AND "{c}"."user_id" = {self.user.id}) '
+            f'WHERE ("{c}"."tenant_id" = {self.tenant.id} '
+            f'AND "{c}"."user_id" = {self.user.id}) '
             f"LIMIT {MAX_GET_RESULTS}",
         )
 
@@ -354,8 +364,10 @@ class CompositePKGetTests(BaseTestCase):
             context.captured_queries[0]["sql"],
             f'SELECT "{c}"."tenant_id", "{c}"."id", "{c}"."user_id" '
             f'FROM "{c}" '
-            f'INNER JOIN "{u}" ON ("{c}"."tenant_id" = "{u}"."tenant_id" AND "{c}"."user_id" = "{u}"."id") '
-            f'WHERE ("{u}"."tenant_id" = {self.tenant.id} AND "{u}"."id" = {self.user.id}) '
+            f'INNER JOIN "{u}" ON ("{c}"."tenant_id" = "{u}"."tenant_id" '
+            f'AND "{c}"."user_id" = "{u}"."id") '
+            f'WHERE ("{u}"."tenant_id" = {self.tenant.id} '
+            f'AND "{u}"."id" = {self.user.id}) '
             f"LIMIT {MAX_GET_RESULTS}",
         )
 
@@ -480,7 +492,8 @@ class CompositePKCreateTests(TestCase):
         self.assertEqual(
             context.captured_queries[0]["sql"],
             f'INSERT INTO "{u}" ("tenant_id", "id") '
-            f"VALUES ({self.tenant.id}, 8361), ({self.tenant.id}, 2819), ({self.tenant.id}, 9136) "
+            f"VALUES ({self.tenant.id}, 8361), ({self.tenant.id}, 2819), "
+            f"({self.tenant.id}, 9136) "
             f'RETURNING "{u}"."id"',
         )
         self.assertEqual(
@@ -514,7 +527,8 @@ class CompositePKFilterTests(BaseTestCase):
                     context.captured_queries[0]["sql"],
                     'SELECT COUNT(*) AS "__count" '
                     f'FROM "{u}" '
-                    f'WHERE ("{u}"."tenant_id" = {self.tenant.id} AND "{u}"."id" = {self.user.id})',
+                    f'WHERE ("{u}"."tenant_id" = {self.tenant.id} '
+                    f'AND "{u}"."id" = {self.user.id})',
                 )
 
 
