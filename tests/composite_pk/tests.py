@@ -70,14 +70,15 @@ class CompositePKTests(BaseTestCase):
         with self.assertRaises(Exception):
             Comment.objects.create(tenant=self.tenant, id=self.comment.id)
 
-    def test_pk_constraints(self):
-        user_pk = get_constraints(User._meta.db_table)["composite_pk_user_pkey"]
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific test")
+    def test_pk_constraints_in_postgresql(self):
+        user_constraints = get_constraints(User._meta.db_table)
+        user_pk = user_constraints["composite_pk_user_pkey"]
         self.assertEqual(user_pk["columns"], ["tenant_id", "id"])
         self.assertTrue(user_pk["primary_key"])
 
-        comment_pk = get_constraints(Comment._meta.db_table)[
-            "composite_pk_comment_pkey"
-        ]
+        comment_constraints = get_constraints(Comment._meta.db_table)
+        comment_pk = comment_constraints["composite_pk_comment_pkey"]
         self.assertEqual(comment_pk["columns"], ["tenant_id", "id"])
         self.assertTrue(comment_pk["primary_key"])
 
