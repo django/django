@@ -13,6 +13,10 @@ class Cols(Expression):
     def get_source_expressions(self):
         return [Col(self.alias, target) for target in self.targets]
 
+    def set_source_expressions(self, exprs):
+        assert all(isinstance(expr, Col) for expr in exprs)
+        assert len(exprs) == len(self.targets)
+
     def __iter__(self):
         return iter(self.get_source_expressions())
 
