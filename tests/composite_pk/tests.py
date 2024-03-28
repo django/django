@@ -1,3 +1,6 @@
+import unittest
+from unittest import skipUnless
+
 from django.db import connection
 from django.db.models.query import MAX_GET_RESULTS
 from django.db.models.query_utils import PathInfo
@@ -319,7 +322,8 @@ class CompositePKCreateTests(BaseTestCase):
     Test the .create() method of composite_pk models.
     """
 
-    def test_create_user(self):
+    @unittest.skipUnless(connection.vendor == "sqlite", "SQLite specific test")
+    def test_create_user_sqlite(self):
         u = User._meta.db_table
         test_cases = [
             ({"tenant": self.tenant, "id": 2412}, 2412),
@@ -330,13 +334,41 @@ class CompositePKCreateTests(BaseTestCase):
         for kwargs, value in test_cases:
             with self.subTest(kwargs=kwargs):
                 with CaptureQueriesContext(connection) as context:
-                    User.objects.create(**kwargs)
+                    obj = User.objects.create(**kwargs)
 
+                self.assertEqual(obj.tenant_id, self.tenant.id)
+                self.assertEqual(obj.id, value)
+                self.assertEqual(obj.pk, (self.tenant.id, value))
                 self.assertEqual(len(context.captured_queries), 1)
                 self.assertEqual(
                     context.captured_queries[0]["sql"],
                     f'INSERT INTO "{u}" ("tenant_id", "id") '
                     f"VALUES ({self.tenant.id}, {value})",
+                )
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific test")
+    def test_create_user_postgresql(self):
+        u = User._meta.db_table
+        test_cases = [
+            ({"tenant": self.tenant, "id": 5231}, 5231),
+            ({"tenant_id": self.tenant.id, "id": 6123}, 6123),
+            ({"pk": (self.tenant.id, 3513)}, 3513),
+        ]
+
+        for kwargs, value in test_cases:
+            with self.subTest(kwargs=kwargs):
+                with CaptureQueriesContext(connection) as context:
+                    obj = User.objects.create(**kwargs)
+
+                self.assertEqual(obj.tenant_id, self.tenant.id)
+                self.assertEqual(obj.id, value)
+                self.assertEqual(obj.pk, (self.tenant.id, value))
+                self.assertEqual(len(context.captured_queries), 1)
+                self.assertEqual(
+                    context.captured_queries[0]["sql"],
+                    f'INSERT INTO "{u}" ("tenant_id", "id") '
+                    f"VALUES ({self.tenant.id}, {value}) "
+                    f'RETURNING "{u}"."id"',
                 )
 
 

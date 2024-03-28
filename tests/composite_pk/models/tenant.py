@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, connection
 
 
 class Tenant(models.Model):
@@ -7,7 +7,11 @@ class Tenant(models.Model):
 
 class User(models.Model):
     tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE)
-    id = models.SmallIntegerField()
+    # SQLite doesn't support non-primary auto fields.
+    if connection.vendor == "sqlite":
+        id = models.SmallIntegerField()
+    else:
+        id = models.SmallAutoField()
 
     class Meta:
         primary_key = ("tenant_id", "id")
