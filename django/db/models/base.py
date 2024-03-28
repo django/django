@@ -1,7 +1,6 @@
 import copy
 import inspect
 import warnings
-from collections.abc import Iterable
 from functools import partialmethod
 from itertools import chain
 
