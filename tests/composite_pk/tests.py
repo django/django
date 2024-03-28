@@ -5,7 +5,7 @@ from django.db.models.query import MAX_GET_RESULTS
 from django.db.models.query_utils import PathInfo
 from django.db.models.sql import Query
 from django.test import TestCase
-from django.test.utils import CaptureQueriesContext, tag
+from django.test.utils import CaptureQueriesContext
 
 from .models import Tenant, User, Comment
 
@@ -335,7 +335,7 @@ class CompositePKGetTests(BaseTestCase):
 
 class CompositePKCreateTests(TestCase):
     """
-    Test the .create() method of composite_pk models.
+    Test the .create(), .bulk_create() method of composite_pk models.
     """
 
     maxDiff = None
@@ -416,6 +416,52 @@ class CompositePKCreateTests(TestCase):
                 f"VALUES ({self.tenant.id}) "
                 f'RETURNING "{u}"."id"',
             )
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific test")
+    def test_bulk_create_user_in_postgresql(self):
+        u = User._meta.db_table
+        objs = [
+            User(tenant=self.tenant, id=8361),
+            User(tenant_id=self.tenant.id, id=2819),
+            User(pk=(self.tenant.id, 9136)),
+            User(tenant=self.tenant),
+            User(tenant_id=self.tenant.id),
+        ]
+
+        with CaptureQueriesContext(connection) as context:
+            result = User.objects.bulk_create(objs)
+
+        obj_1, obj_2, obj_3, obj_4, obj_5 = result
+        self.assertEqual(obj_1.tenant_id, self.tenant.id)
+        self.assertEqual(obj_1.id, 8361)
+        self.assertEqual(obj_1.pk, (obj_1.tenant_id, obj_1.id))
+        self.assertEqual(obj_2.tenant_id, self.tenant.id)
+        self.assertEqual(obj_2.id, 2819)
+        self.assertEqual(obj_2.pk, (obj_2.tenant_id, obj_2.id))
+        self.assertEqual(obj_3.tenant_id, self.tenant.id)
+        self.assertEqual(obj_3.id, 9136)
+        self.assertEqual(obj_3.pk, (obj_3.tenant_id, obj_3.id))
+        self.assertEqual(obj_4.tenant_id, self.tenant.id)
+        self.assertIsInstance(obj_4.id, int)
+        self.assertGreater(obj_4.id, 0)
+        self.assertEqual(obj_4.pk, (obj_4.tenant_id, obj_4.id))
+        self.assertEqual(obj_5.tenant_id, self.tenant.id)
+        self.assertIsInstance(obj_5.id, int)
+        self.assertGreater(obj_5.id, obj_4.id)
+        self.assertEqual(obj_5.pk, (obj_5.tenant_id, obj_5.id))
+        self.assertEqual(len(context.captured_queries), 2)
+        self.assertEqual(
+            context.captured_queries[0]["sql"],
+            f'INSERT INTO "{u}" ("tenant_id", "id") '
+            f"VALUES ({self.tenant.id}, 8361), ({self.tenant.id}, 2819), ({self.tenant.id}, 9136) "
+            f'RETURNING "{u}"."id"',
+        )
+        self.assertEqual(
+            context.captured_queries[1]["sql"],
+            f'INSERT INTO "{u}" ("tenant_id") '
+            f"VALUES ({self.tenant.id}), ({self.tenant.id}) "
+            f'RETURNING "{u}"."id"',
+        )
 
 
 class CompositePKFilterTests(BaseTestCase):

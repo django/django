@@ -1,5 +1,6 @@
 import functools
 from collections import namedtuple
+from collections.abc import Iterable
 
 
 def make_model_tuple(model):
@@ -67,3 +68,12 @@ class AltersData:
                         break
 
         super().__init_subclass__(**kwargs)
+
+
+def is_pk_set(pk):
+    if pk is None:
+        return False
+    if isinstance(pk, Iterable):
+        return not any(value is None for value in pk)
+
+    return True

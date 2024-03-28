@@ -31,6 +31,7 @@ from django.db.models.utils import (
     AltersData,
     create_namedtuple_class,
     resolve_callables,
+    is_pk_set,
 )
 from django.utils import timezone
 from django.utils.deprecation import RemovedInDjango60Warning
@@ -813,7 +814,9 @@ class QuerySet(AltersData):
         objs = list(objs)
         self._prepare_for_bulk_create(objs)
         with transaction.atomic(using=self.db, savepoint=False):
-            objs_with_pk, objs_without_pk = partition(lambda o: o.pk is None, objs)
+            objs_with_pk, objs_without_pk = partition(
+                lambda o: not is_pk_set(o.pk), objs
+            )
             if objs_with_pk:
                 returned_columns = self._batched_insert(
                     objs_with_pk,
