@@ -46,8 +46,11 @@ class CompositePKTests(BaseTestCase):
         self.assertEqual(user.pk, (9831, self.user.id))
         user.id = 4321
         self.assertEqual(user.pk, (9831, 4321))
+        user.pk = (9132, 3521)
+        self.assertEqual(user.tenant_id, 9132)
+        self.assertEqual(user.id, 3521)
 
-    def test_composite_field_in_fields(self):
+    def test_composite_pk_in_fields(self):
         fields = {f.name for f in User._meta.get_fields()}
         self.assertEqual(fields, {"id", "tenant", "composite_pk"})
 
@@ -420,7 +423,7 @@ class CompositePKFilterTests(BaseTestCase):
     Test the .filter() method of composite_pk models.
     """
 
-    def test_filter_user_by_pk(self):
+    def test_filter_and_count_user_by_pk(self):
         u = User._meta.db_table
         test_cases = [
             {"pk": self.user.pk},
