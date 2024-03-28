@@ -51,7 +51,7 @@ class CompositeField(Field):
         return self.get_attname(), self.db_column
 
     def __iter__(self):
-        return self.fields
+        return iter(self.fields)
 
     @cached_property
     def cached_col(self):

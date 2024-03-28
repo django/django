@@ -3,7 +3,7 @@ from django.db.models.query import MAX_GET_RESULTS
 from django.db.models.query_utils import PathInfo
 from django.db.models.sql import Query
 from django.test import TestCase
-from django.test.utils import CaptureQueriesContext
+from django.test.utils import CaptureQueriesContext, tag
 
 from .models import Tenant, User, Comment
 
@@ -221,8 +221,8 @@ class CompositePKGetTests(BaseTestCase):
             ({"tenant__pk": self.tenant.id}, "tenant_id", self.tenant.id),
         ]
 
-        for lookup, col, val in test_cases:
-            with self.subTest(lookup=lookup, col=col, val=val):
+        for lookup, column, value in test_cases:
+            with self.subTest(lookup=lookup, column=column, value=value):
                 with CaptureQueriesContext(connection) as context:
                     obj = User.objects.get(**lookup)
 
@@ -232,7 +232,7 @@ class CompositePKGetTests(BaseTestCase):
                     context.captured_queries[0]["sql"],
                     f'SELECT "{u}"."tenant_id", "{u}"."id" '
                     f'FROM "{u}" '
-                    f'WHERE "{u}"."{col}" = {val} '
+                    f'WHERE "{u}"."{column}" = {value} '
                     f"LIMIT {MAX_GET_RESULTS}",
                 )
 
@@ -264,8 +264,8 @@ class CompositePKGetTests(BaseTestCase):
             ({"tenant__pk": self.tenant.id}, "tenant_id", self.tenant.id),
         ]
 
-        for lookup, col, val in test_cases:
-            with self.subTest(lookup=lookup, col=col, val=val):
+        for lookup, column, value in test_cases:
+            with self.subTest(lookup=lookup, column=column, value=value):
                 with CaptureQueriesContext(connection) as context:
                     obj = Comment.objects.get(**lookup)
 
@@ -275,7 +275,7 @@ class CompositePKGetTests(BaseTestCase):
                     context.captured_queries[0]["sql"],
                     f'SELECT "{c}"."tenant_id", "{c}"."id", "{c}"."user_id" '
                     f'FROM "{c}" '
-                    f'WHERE "{c}"."{col}" = {val} '
+                    f'WHERE "{c}"."{column}" = {value} '
                     f"LIMIT {MAX_GET_RESULTS}",
                 )
 
@@ -312,6 +312,27 @@ class CompositePKGetTests(BaseTestCase):
             f'WHERE ("{u}"."tenant_id" = {self.tenant.id} AND "{u}"."id" = {self.user.id}) '
             f"LIMIT {MAX_GET_RESULTS}",
         )
+
+
+class CompositePKCreateTests(BaseTestCase):
+    def test_create_user(self):
+        u = User._meta.db_table
+        test_cases = [
+            ({"tenant": self.tenant, "id": 1111}, 1111),
+            ({"pk": (self.tenant.id, 1112)}, 1112),
+        ]
+
+        for kwargs, value in test_cases:
+            with self.subTest(kwargs=kwargs):
+                with CaptureQueriesContext(connection) as context:
+                    User.objects.create(**kwargs)
+
+                self.assertEqual(len(context.captured_queries), 1)
+                self.assertEqual(
+                    context.captured_queries[0]["sql"],
+                    f'INSERT INTO "{u}" ("tenant_id", "id") '
+                    f"VALUES ({self.tenant.id}, {value})",
+                )
 
 
 class NamesToPathTests(TestCase):
