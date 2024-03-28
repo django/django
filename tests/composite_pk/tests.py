@@ -340,6 +340,33 @@ class CompositePKCreateTests(BaseTestCase):
                 )
 
 
+class CompositePKFilterTests(BaseTestCase):
+    """
+    Test the .filter() method of composite_pk models.
+    """
+
+    def test_filter_user_by_pk(self):
+        u = User._meta.db_table
+        test_cases = [
+            {"pk": self.user.pk},
+            {"pk": (self.tenant.id, self.user.id)},
+        ]
+
+        for lookup in test_cases:
+            with self.subTest(lookup=lookup):
+                with CaptureQueriesContext(connection) as context:
+                    result = User.objects.filter(**lookup).count()
+
+                self.assertEqual(result, 1)
+                self.assertEqual(len(context.captured_queries), 1)
+                self.assertEqual(
+                    context.captured_queries[0]["sql"],
+                    'SELECT COUNT(*) AS "__count" '
+                    f'FROM "{u}" '
+                    f'WHERE ("{u}"."tenant_id" = {self.tenant.id} AND "{u}"."id" = {self.user.id})',
+                )
+
+
 class NamesToPathTests(TestCase):
     def test_id(self):
         query = Query(User)
