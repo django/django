@@ -317,13 +317,19 @@ class CompositePKGetTests(BaseTestCase):
         )
 
 
-class CompositePKCreateTests(BaseTestCase):
+class CompositePKCreateTests(TestCase):
     """
     Test the .create() method of composite_pk models.
     """
 
+    maxDiff = None
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.tenant = Tenant.objects.create()
+
     @unittest.skipUnless(connection.vendor == "sqlite", "SQLite specific test")
-    def test_create_user_sqlite(self):
+    def test_create_user_in_sqlite(self):
         u = User._meta.db_table
         test_cases = [
             ({"tenant": self.tenant, "id": 2412}, 2412),
@@ -331,23 +337,23 @@ class CompositePKCreateTests(BaseTestCase):
             ({"pk": (self.tenant.id, 7424)}, 7424),
         ]
 
-        for kwargs, value in test_cases:
-            with self.subTest(kwargs=kwargs):
+        for fields, user_id in test_cases:
+            with self.subTest(fields=fields, user_id=user_id):
                 with CaptureQueriesContext(connection) as context:
-                    obj = User.objects.create(**kwargs)
+                    obj = User.objects.create(**fields)
 
                 self.assertEqual(obj.tenant_id, self.tenant.id)
-                self.assertEqual(obj.id, value)
-                self.assertEqual(obj.pk, (self.tenant.id, value))
+                self.assertEqual(obj.id, user_id)
+                self.assertEqual(obj.pk, (self.tenant.id, user_id))
                 self.assertEqual(len(context.captured_queries), 1)
                 self.assertEqual(
                     context.captured_queries[0]["sql"],
                     f'INSERT INTO "{u}" ("tenant_id", "id") '
-                    f"VALUES ({self.tenant.id}, {value})",
+                    f"VALUES ({self.tenant.id}, {user_id})",
                 )
 
     @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific test")
-    def test_create_user_postgresql(self):
+    def test_create_user_in_postgresql(self):
         u = User._meta.db_table
         test_cases = [
             ({"tenant": self.tenant, "id": 5231}, 5231),
@@ -355,21 +361,40 @@ class CompositePKCreateTests(BaseTestCase):
             ({"pk": (self.tenant.id, 3513)}, 3513),
         ]
 
-        for kwargs, value in test_cases:
-            with self.subTest(kwargs=kwargs):
+        for fields, user_id in test_cases:
+            with self.subTest(fields=fields, user_id=user_id):
                 with CaptureQueriesContext(connection) as context:
-                    obj = User.objects.create(**kwargs)
+                    obj = User.objects.create(**fields)
 
                 self.assertEqual(obj.tenant_id, self.tenant.id)
-                self.assertEqual(obj.id, value)
-                self.assertEqual(obj.pk, (self.tenant.id, value))
+                self.assertEqual(obj.id, user_id)
+                self.assertEqual(obj.pk, (self.tenant.id, user_id))
                 self.assertEqual(len(context.captured_queries), 1)
                 self.assertEqual(
                     context.captured_queries[0]["sql"],
                     f'INSERT INTO "{u}" ("tenant_id", "id") '
-                    f"VALUES ({self.tenant.id}, {value}) "
+                    f"VALUES ({self.tenant.id}, {user_id}) "
                     f'RETURNING "{u}"."id"',
                 )
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific test")
+    def test_create_user_with_autofield_in_postgresql(self):
+        u = User._meta.db_table
+
+        with CaptureQueriesContext(connection) as context:
+            obj = User.objects.create(tenant=self.tenant)
+
+        self.assertEqual(obj.tenant_id, self.tenant.id)
+        self.assertIsInstance(obj.id, int)
+        self.assertGreater(obj.id, 0)
+        self.assertEqual(obj.pk, (self.tenant.id, obj.id))
+        self.assertEqual(len(context.captured_queries), 1)
+        self.assertEqual(
+            context.captured_queries[0]["sql"],
+            f'INSERT INTO "{u}" ("tenant_id") '
+            f"VALUES ({self.tenant.id}) "
+            f'RETURNING "{u}"."id"',
+        )
 
 
 class CompositePKFilterTests(BaseTestCase):
