@@ -53,6 +53,8 @@ class CompositePKTests(BaseTestCase):
     def test_composite_pk_in_fields(self):
         fields = {f.name for f in User._meta.get_fields()}
         self.assertEqual(fields, {"id", "tenant", "composite_pk"})
+        fields = {f.name for f in Comment._meta.get_fields()}
+        self.assertEqual(fields, {"id", "tenant", "user_id", "user", "composite_pk"})
 
     def test_error_on_pk_conflict(self):
         with self.assertRaises(Exception):
