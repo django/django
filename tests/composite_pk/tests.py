@@ -387,7 +387,7 @@ class CompositePKGetTests(BaseTestCase):
 
 class CompositePKCreateTests(TestCase):
     """
-    Test the .create(), .bulk_create() method of composite_pk models.
+    Test the .create(), .save(), .bulk_create() methods of composite_pk models.
     """
 
     maxDiff = None
@@ -468,6 +468,14 @@ class CompositePKCreateTests(TestCase):
                 f"VALUES ({self.tenant.id}) "
                 f'RETURNING "{u}"."id"',
             )
+
+    def test_save_user(self):
+        user = User(tenant=self.tenant, id=9241)
+        user.save()
+        self.assertEqual(user.tenant_id, self.tenant.id)
+        self.assertEqual(user.tenant, self.tenant)
+        self.assertEqual(user.id, 9241)
+        self.assertEqual(user.pk, (self.tenant.id, 9241))
 
     @unittest.skipUnless(connection.vendor == "sqlite", "SQLite specific test")
     def test_bulk_create_users_in_sqlite(self):

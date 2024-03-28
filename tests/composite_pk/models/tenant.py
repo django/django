@@ -19,7 +19,11 @@ class User(models.Model):
 
 class Comment(models.Model):
     tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE)
-    id = models.SmallIntegerField()
+    # SQLite doesn't support non-primary auto fields.
+    if connection.vendor == "sqlite":
+        id = models.SmallIntegerField()
+    else:
+        id = models.SmallAutoField()
     user_id = models.SmallIntegerField()
     user = models.ForeignObject(
         User,
