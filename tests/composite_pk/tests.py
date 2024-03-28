@@ -568,6 +568,7 @@ class CompositePKUpdateTests(BaseTestCase):
 
         self.assertEqual(result, 1)
         self.assertFalse(User.objects.filter(pk=self.user.pk).exists())
+        self.assertEqual(User.objects.all().count(), 1)
         user = User.objects.get(pk=(self.tenant.id, 8341))
         self.assertEqual(user.tenant, self.tenant)
         self.assertEqual(user.tenant_id, self.tenant.id)
@@ -579,6 +580,25 @@ class CompositePKUpdateTests(BaseTestCase):
             'SET "id" = 8341 '
             f'WHERE ("{u}"."tenant_id" = {self.tenant.id} '
             f'AND "{u}"."id" = {self.user.id})',
+        )
+
+    def test_save_comment(self):
+        c = Comment._meta.db_table
+        comment = Comment.objects.get(pk=self.comment.pk)
+        comment.user = User.objects.create(tenant=self.tenant, id=8214)
+
+        with CaptureQueriesContext(connection) as context:
+            comment.save()
+
+        self.assertEqual(Comment.objects.all().count(), 1)
+        self.assertEqual(len(context.captured_queries), 1)
+        self.assertEqual(
+            context.captured_queries[0]["sql"],
+            f'UPDATE "{c}" '
+            f'SET "tenant_id" = {self.tenant.id}, "id" = {self.comment.id}, '
+            f'"user_id" = 8214 '
+            f'WHERE ("{c}"."tenant_id" = {self.tenant.id} '
+            f'AND "{c}"."id" = {self.comment.id})',
         )
 
 
