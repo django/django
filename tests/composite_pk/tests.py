@@ -20,18 +20,15 @@ class BaseTestCase(TestCase):
 
 class CompositePKTests(BaseTestCase):
     def test_fields(self):
-        # tenant
         self.assertIsInstance(self.tenant.pk, int)
         self.assertGreater(self.tenant.id, 0)
         self.assertEqual(self.tenant.pk, self.tenant.id)
 
-        # user
         self.assertIsInstance(self.user.id, int)
         self.assertGreater(self.user.id, 0)
         self.assertEqual(self.user.tenant_id, self.tenant.id)
         self.assertEqual(self.user.pk, (self.user.tenant_id, self.user.id))
 
-        # comment
         self.assertIsInstance(self.comment.id, int)
         self.assertGreater(self.comment.id, 0)
         self.assertEqual(self.comment.user_id, self.user.id)
@@ -39,7 +36,11 @@ class CompositePKTests(BaseTestCase):
         self.assertEqual(self.comment.pk, (self.comment.tenant_id, self.comment.id))
 
 
-class DeleteTests(BaseTestCase):
+class CompositePKDeleteTests(BaseTestCase):
+    """
+    Test the .delete() method of composite_pk models.
+    """
+
     def test_delete_tenant_by_pk(self):
         t = Tenant._meta.db_table
         u = User._meta.db_table
@@ -161,19 +162,79 @@ class DeleteTests(BaseTestCase):
         )
 
 
-class GetTests(BaseTestCase):
-    def test_get(self):
-        # Tenant
-        self.assertEqual(Tenant.objects.get(pk=self.tenant.pk), self.tenant)
-        self.assertEqual(Tenant.objects.get(id=self.tenant.id), self.tenant)
+class CompositePKGetTests(BaseTestCase):
+    """
+    Test the .get() method of composite_pk models.
+    """
 
-        # TenantUser
-        self.assertEqual(User.objects.get(pk=(self.tenant.id, self.user.id)), self.user)
-        self.assertEqual(User.objects.get(pk=self.user.pk), self.user)
-        self.assertEqual(User.objects.get(id=self.user.id), self.user)
-        self.assertEqual(User.objects.get(tenant_id=self.tenant.id), self.user)
-        self.assertEqual(User.objects.get(tenant__id=self.tenant.id), self.user)
-        self.assertEqual(User.objects.get(tenant__pk=self.tenant.pk), self.user)
+    def test_get_tenant_by_pk(self):
+        t = Tenant._meta.db_table
+        test_cases = [
+            {"id": self.tenant.id},
+            {"pk": self.tenant.pk},
+        ]
+
+        for lookup in test_cases:
+            with self.subTest(lookup=lookup):
+                with CaptureQueriesContext(connection) as context:
+                    obj = Tenant.objects.get(**lookup)
+
+                self.assertEqual(obj, self.tenant)
+                self.assertEqual(len(context.captured_queries), 1)
+                self.assertEqual(
+                    context.captured_queries[0]["sql"],
+                    f'SELECT "{t}"."id" '
+                    f'FROM "{t}" '
+                    f'WHERE "{t}"."id" = {self.tenant.id} '
+                    f"LIMIT {MAX_GET_RESULTS}",
+                )
+
+    def test_get_user_by_pk(self):
+        u = User._meta.db_table
+        test_cases = [
+            {"pk": (self.tenant.id, self.user.id)},
+            {"pk": self.user.pk},
+        ]
+
+        for lookup in test_cases:
+            with self.subTest(lookup=lookup):
+                with CaptureQueriesContext(connection) as context:
+                    obj = User.objects.get(**lookup)
+
+                self.assertEqual(obj, self.user)
+                self.assertEqual(len(context.captured_queries), 1)
+                self.assertEqual(
+                    context.captured_queries[0]["sql"],
+                    f'SELECT "{u}"."tenant_id", "{u}"."id" '
+                    f'FROM "{u}" '
+                    f'WHERE ("{u}"."tenant_id" = {self.tenant.id} AND "{u}"."id" = {self.user.id}) '
+                    f"LIMIT {MAX_GET_RESULTS}",
+                )
+
+    def test_get_user_by_field(self):
+        u = User._meta.db_table
+        test_cases = [
+            ({"id": self.user.id}, "id", self.user.id),
+            ({"tenant": self.tenant}, "tenant_id", self.tenant.id),
+            ({"tenant_id": self.tenant.id}, "tenant_id", self.tenant.id),
+            ({"tenant__id": self.tenant.id}, "tenant_id", self.tenant.id),
+            ({"tenant__pk": self.tenant.id}, "tenant_id", self.tenant.id),
+        ]
+
+        for lookup, col, val in test_cases:
+            with self.subTest(lookup=lookup, col=col, val=val):
+                with CaptureQueriesContext(connection) as context:
+                    obj = User.objects.get(**lookup)
+
+                self.assertEqual(obj, self.user)
+                self.assertEqual(len(context.captured_queries), 1)
+                self.assertEqual(
+                    context.captured_queries[0]["sql"],
+                    f'SELECT "{u}"."tenant_id", "{u}"."id" '
+                    f'FROM "{u}" '
+                    f'WHERE "{u}"."{col}" = {val} '
+                    f"LIMIT {MAX_GET_RESULTS}",
+                )
 
     def test_get_comment_by_pk(self):
         c = Comment._meta.db_table
