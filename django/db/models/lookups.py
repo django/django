@@ -591,7 +591,7 @@ class TupleIn(In):
         return super().get_prep_lookup()
 
     def as_sql(self, compiler, connection):
-        from django.db.models.sql.where import WhereNode, AND, OR
+        from django.db.models.sql.where import AND, OR, WhereNode
 
         exprs = []
         lhs = self.lhs.get_source_expressions()
