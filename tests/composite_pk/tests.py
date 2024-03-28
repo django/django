@@ -555,6 +555,33 @@ class CompositePKCreateTests(TestCase):
         )
 
 
+class CompositePKUpdateTests(BaseTestCase):
+    """
+    Test the .update(), .save(), .bulk_update() methods of composite_pk models.
+    """
+
+    def test_update_user(self):
+        u = User._meta.db_table
+
+        with CaptureQueriesContext(connection) as context:
+            result = User.objects.filter(pk=self.user.pk).update(id=8341)
+
+        self.assertEqual(result, 1)
+        self.assertFalse(User.objects.filter(pk=self.user.pk).exists())
+        user = User.objects.get(pk=(self.tenant.id, 8341))
+        self.assertEqual(user.tenant, self.tenant)
+        self.assertEqual(user.tenant_id, self.tenant.id)
+        self.assertEqual(user.id, 8341)
+        self.assertEqual(len(context.captured_queries), 1)
+        self.assertEqual(
+            context.captured_queries[0]["sql"],
+            f'UPDATE "{u}" '
+            'SET "id" = 8341 '
+            f'WHERE ("{u}"."tenant_id" = {self.tenant.id} '
+            f'AND "{u}"."id" = {self.user.id})',
+        )
+
+
 class CompositePKFilterTests(BaseTestCase):
     """
     Test the .filter() method of composite_pk models.
