@@ -25,7 +25,9 @@ class CompositeAttribute:
         if instance is None:
             return self
 
-        return tuple(getattr(instance, field_name) for field_name in self.field.field_names)
+        return tuple(
+            getattr(instance, field_name) for field_name in self.field.field_names
+        )
 
     def __set__(self, instance, values):
         for field_name, value in zip(self.field.field_names, values):
