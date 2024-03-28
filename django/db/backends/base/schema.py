@@ -1208,7 +1208,7 @@ class BaseDatabaseSchemaEditor:
         # Changed to become primary key?
         if self._field_became_primary_key(old_field, new_field):
             # Make the new one
-            self.execute(self._create_primary_key_sql(model, [new_field]))
+            self.execute(self._create_primary_key_sql(model, new_field))
             # Update all referencing columns
             rels_to_update.extend(_related_non_m2m_objects(old_field, new_field))
         # Handle our type alters on the other end of rels from the PK stuff above
@@ -1988,15 +1988,16 @@ class BaseDatabaseSchemaEditor:
         for constraint_name in constraint_names:
             self.execute(self._delete_primary_key_sql(model, constraint_name))
 
-    def _create_primary_key_sql(self, model, fields):
-        columns = [field.column for field in fields]
+    def _create_primary_key_sql(self, model, field):
         return Statement(
             self.sql_create_pk,
             table=Table(model._meta.db_table, self.quote_name),
             name=self.quote_name(
-                self._create_index_name(model._meta.db_table, columns, suffix="_pk")
+                self._create_index_name(
+                    model._meta.db_table, [field.column], suffix="_pk"
+                )
             ),
-            columns=Columns(model._meta.db_table, columns, self.quote_name),
+            columns=Columns(model._meta.db_table, [field.column], self.quote_name),
         )
 
     def _delete_primary_key_sql(self, model, name):
