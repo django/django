@@ -1532,8 +1532,7 @@ class Query(BaseExpression):
             # Prevent iterator from being consumed by check_related_objects()
             if isinstance(value, Iterator):
                 value = list(value)
-            if not isinstance(join_info.final_field, tuple):
-                self.check_related_objects(join_info.final_field, value, join_info.opts)
+            self.check_related_objects(join_info.final_field, value, join_info.opts)
 
             # split_exclude() needs to know which joins were generated for the
             # lookup parts
@@ -1550,10 +1549,7 @@ class Query(BaseExpression):
         if can_reuse is not None:
             can_reuse.update(join_list)
 
-        if (
-            not isinstance(join_info.final_field, tuple)
-            and join_info.final_field.is_relation
-        ):
+        if join_info.final_field.is_relation:
             if len(targets) == 1:
                 col = self._get_col(targets[0], join_info.final_field, alias)
             else:
@@ -1722,16 +1718,8 @@ class Query(BaseExpression):
         path, names_with_path = [], []
         for pos, name in enumerate(names):
             cur_names_with_path = (name, [])
-
-            # If the model defines Meta.primary_key,
-            # the pk lookups may resolve to multiple fields.
             if name == "pk" and opts is not None:
-                if isinstance(opts.pk, tuple):
-                    targets = opts.pk
-                    final_field = opts.pk
-                    continue
-                else:
-                    name = opts.pk.name
+                name = opts.pk.name
 
             field = None
             filtered_relation = None

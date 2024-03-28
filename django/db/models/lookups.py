@@ -386,8 +386,6 @@ class Exact(FieldGetDbPrepValueMixin, BuiltinLookup):
 
 
 class TupleExact(Exact):
-    lookup_name = "tuple_exact"
-
     def as_sql(self, compiler, connection):
         from django.db.models.sql.where import AND, WhereNode
 
@@ -573,8 +571,6 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
 
 
 class TupleIn(In):
-    lookup_name = "tuple_in"
-
     def get_prep_lookup(self):
         try:
             lhs = list(self.lhs)
