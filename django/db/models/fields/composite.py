@@ -60,9 +60,6 @@ class CompositeField(Field):
     def cached_col(self):
         return Cols(self.model._meta.db_table, self.fields, self)
 
-    def get_col(self, alias, output_field=None):
-        return self.cached_col
-
     def get_lookup(self, lookup_name):
         if lookup_name == "exact":
             return TupleExact

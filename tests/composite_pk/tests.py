@@ -601,7 +601,8 @@ class CompositePKUpdateTests(BaseTestCase):
             f'AND "{c}"."id" = {self.comment.id})',
         )
 
-    def test_bulk_update_comments(self):
+    @unittest.skipUnless(connection.vendor == "sqlite", "SQLite specific test")
+    def test_bulk_update_comments_in_sqlite(self):
         c = Comment._meta.db_table
         user_1 = User.objects.create(pk=(self.tenant.id, 1352))
         user_2 = User.objects.create(pk=(self.tenant.id, 9314))
