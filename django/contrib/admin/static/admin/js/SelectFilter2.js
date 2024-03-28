@@ -52,17 +52,13 @@ Requires core.js and SelectBox.js.
                 )
             );
 
+            // If the widget has an add link, move it next to title_available
             const add_new_obj_link = from_box.parentElement.querySelector('.add-related');
             if (add_new_obj_link) {
-                quickElement(
-                    'a', title_available, 'Add',
-                    'class', 'addlink',
-                    'href', add_new_obj_link.href,
-                    'data-popup', 'yes',
-                    'style', 'float: right;',
-                    'title', gettext(add_new_obj_link.title)
-                );
-                add_new_obj_link.style.display = 'none';
+                title_available.appendChild(add_new_obj_link);
+                add_new_obj_link.style.float = 'right';
+                add_new_obj_link.classList.add('addlink');
+                add_new_obj_link.innerHTML = 'Add';
             }
 
             const filter_p = quickElement('p', selector_available, '', 'id', field_id + '_filter');
