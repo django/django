@@ -315,6 +315,10 @@ class CompositePKGetTests(BaseTestCase):
 
 
 class CompositePKCreateTests(BaseTestCase):
+    """
+    Test the .create() method of composite_pk models.
+    """
+
     def test_create_user(self):
         u = User._meta.db_table
         test_cases = [
