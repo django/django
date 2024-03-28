@@ -1074,15 +1074,9 @@ class Model(AltersData, metaclass=ModelBase):
             ]
 
         pk_val = self._get_pk_val(meta)
-
-        if isinstance(pk_val, Iterable):
-            for field, value in zip(meta.pk, pk_val):
-                if value is not None:
-                    setattr(self, field.attname, value)
-        elif pk_val is None:
+        if pk_val is None:
             pk_val = meta.pk.get_pk_value_on_save(self)
             setattr(self, meta.pk.attname, pk_val)
-
         pk_set = is_pk_set(pk_val)
         if not pk_set and (force_update or update_fields):
             raise ValueError("Cannot force an update in save() with no primary key.")

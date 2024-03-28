@@ -469,6 +469,36 @@ class CompositePKCreateTests(TestCase):
                 f'RETURNING "{u}"."id"',
             )
 
+    @unittest.skipUnless(connection.vendor == "sqlite", "SQLite specific test")
+    def test_bulk_create_users_in_sqlite(self):
+        u = User._meta.db_table
+        objs = [
+            User(tenant=self.tenant, id=8291),
+            User(tenant_id=self.tenant.id, id=4021),
+            User(pk=(self.tenant.id, 8214)),
+        ]
+
+        with CaptureQueriesContext(connection) as context:
+            result = User.objects.bulk_create(objs)
+
+        obj_1, obj_2, obj_3 = result
+        self.assertEqual(obj_1.tenant_id, self.tenant.id)
+        self.assertEqual(obj_1.id, 8291)
+        self.assertEqual(obj_1.pk, (obj_1.tenant_id, obj_1.id))
+        self.assertEqual(obj_2.tenant_id, self.tenant.id)
+        self.assertEqual(obj_2.id, 4021)
+        self.assertEqual(obj_2.pk, (obj_2.tenant_id, obj_2.id))
+        self.assertEqual(obj_3.tenant_id, self.tenant.id)
+        self.assertEqual(obj_3.id, 8214)
+        self.assertEqual(obj_3.pk, (obj_3.tenant_id, obj_3.id))
+        self.assertEqual(len(context.captured_queries), 1)
+        self.assertEqual(
+            context.captured_queries[0]["sql"],
+            f'INSERT INTO "{u}" ("tenant_id", "id") '
+            f"VALUES ({self.tenant.id}, 8291), ({self.tenant.id}, 4021), "
+            f"({self.tenant.id}, 8214)",
+        )
+
     @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific test")
     def test_bulk_create_users_in_postgresql(self):
         u = User._meta.db_table
