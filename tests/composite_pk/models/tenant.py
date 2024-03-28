@@ -26,6 +26,7 @@ class Comment(models.Model):
         on_delete=models.CASCADE,
         from_fields=("tenant_id", "user_id"),
         to_fields=("tenant_id", "id"),
+        related_name="+",
     )
 
     class Meta:

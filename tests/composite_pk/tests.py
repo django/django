@@ -30,20 +30,26 @@ class CompositePKTests(BaseTestCase):
         self.assertGreater(self.user.id, 0)
         self.assertEqual(self.user.tenant_id, self.tenant.id)
         self.assertEqual(self.user.pk, (self.user.tenant_id, self.user.id))
+        self.assertEqual(self.user.composite_pk, self.user.pk)
 
         self.assertIsInstance(self.comment.id, int)
         self.assertGreater(self.comment.id, 0)
         self.assertEqual(self.comment.user_id, self.user.id)
         self.assertEqual(self.comment.tenant_id, self.tenant.id)
         self.assertEqual(self.comment.pk, (self.comment.tenant_id, self.comment.id))
+        self.assertEqual(self.comment.composite_pk, self.comment.pk)
 
-    def test_model_pk_updates(self):
+    def test_pk_updated_if_field_updated(self):
         user = User.objects.get(pk=self.user.pk)
         self.assertEqual(user.pk, (self.tenant.id, self.user.id))
         user.tenant_id = 9831
         self.assertEqual(user.pk, (9831, self.user.id))
         user.id = 4321
         self.assertEqual(user.pk, (9831, 4321))
+
+    def test_composite_field_in_fields(self):
+        fields = {f.name for f in User._meta.get_fields()}
+        self.assertEqual(fields, {"id", "tenant", "composite_pk"})
 
 
 class CompositePKDeleteTests(BaseTestCase):
@@ -451,8 +457,8 @@ class NamesToPathTests(TestCase):
         path, final_field, targets, rest = query.names_to_path(["pk"], User._meta)
 
         self.assertEqual(path, [])
-        self.assertEqual(final_field, User._meta.get_field("_pk"))
-        self.assertEqual(targets, (User._meta.get_field("_pk"),))
+        self.assertEqual(final_field, User._meta.get_field("composite_pk"))
+        self.assertEqual(targets, (User._meta.get_field("composite_pk"),))
         self.assertEqual(rest, [])
 
     def test_tenant_id(self):

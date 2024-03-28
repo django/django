@@ -301,7 +301,7 @@ class Options:
         if self.pk is None:
             if self.primary_key:
                 pk = CompositeField(*self.primary_key)
-                model.add_to_class("_pk", pk)
+                model.add_to_class("composite_pk", pk)
             elif self.parents:
                 # Promote the first parent link in lieu of adding yet another
                 # field.
