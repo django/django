@@ -612,10 +612,11 @@ class CompositePKUpdateTests(BaseTestCase):
         comment_1.user = user_2
         comment_2.user = user_2
         comment_3.user = user_2
-        comments = [comment_1, comment_2, comment_3]
 
         with CaptureQueriesContext(connection) as context:
-            result = Comment.objects.bulk_update(comments, ["user_id"])
+            result = Comment.objects.bulk_update(
+                [comment_1, comment_2, comment_3], ["user_id"]
+            )
 
         self.assertEqual(result, 3)
         self.assertEqual(len(context.captured_queries), 1)
