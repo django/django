@@ -32,7 +32,7 @@ from django.db.models.expressions import (
 )
 from django.db.models.fields import Field
 from django.db.models.fields.related_lookups import MultiColSource
-from django.db.models.lookups import Lookup, TupleExact
+from django.db.models.lookups import Lookup
 from django.db.models.query_utils import (
     Q,
     check_rel_lookup_compatibility,
@@ -1389,6 +1389,7 @@ class Query(BaseExpression):
             lookup_class = lhs.get_lookup(lookup_name)
             if not lookup_class:
                 return
+
         lookup = lookup_class(lhs, rhs)
         # Interpret '__exact=None' as the sql 'is NULL'; otherwise, reject all
         # uses of None as a query value unless the lookup supports it.
