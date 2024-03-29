@@ -2141,6 +2141,9 @@ class IntegerField(Field):
         if value is None:
             return value
         try:
+            if isinstance(value, float):
+                if value%1 != 0:
+                    raise TypeError
             return int(value)
         except (TypeError, ValueError):
             raise exceptions.ValidationError(

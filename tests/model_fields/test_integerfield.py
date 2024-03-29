@@ -275,6 +275,15 @@ class ValidationTests(SimpleTestCase):
         with self.assertRaises(ValidationError):
             f.clean("a", None)
 
+    def test_integerfield_raises_error_on_inconvertible_float(self):
+        f = models.IntegerField()
+        with self.assertRaises(ValidationError):
+            f.clean(1.2, None)
+
+    def test_integerfield_cleans_convertible_float(self):
+        f = models.IntegerField()
+        self.assertEqual(f.clean(2.0, None), 2)
+
     def test_choices_validation_supports_named_groups(self):
         f = models.IntegerField(choices=(("group", ((10, "A"), (20, "B"))), (30, "C")))
         self.assertEqual(10, f.clean(10, None))
