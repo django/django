@@ -1,6 +1,5 @@
 import functools
 from collections import namedtuple
-from collections.abc import Iterable
 
 
 def make_model_tuple(model):
