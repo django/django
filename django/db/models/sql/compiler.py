@@ -8,6 +8,7 @@ from django.core.exceptions import EmptyResultSet, FieldError, FullResultSet
 from django.db import DatabaseError, NotSupportedError
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import F, OrderBy, RawSQL, Ref, Value
+from django.db.models.fields.composite import CompositeField
 from django.db.models.functions import Cast, Random
 from django.db.models.lookups import Lookup
 from django.db.models.query_utils import select_related_descend
@@ -1003,6 +1004,10 @@ class SQLCompiler:
             alias = self.query.join_parent_model(opts, model, start_alias, seen_models)
             column = field.get_col(alias)
             result.append(column)
+        if not result:
+            for field in select_mask:
+                if isinstance(field, CompositeField):
+                    result.extend(field.cached_col)
         return result
 
     def get_distinct(self):

@@ -65,14 +65,14 @@ class CompositePKFilterTests(TestCase):
 
     def test_filter_comments_by_user_and_order_by_pk_desc(self):
         user = User.objects.create(pk=(self.tenant.id, 8316))
-        comment_1 = Comment.objects.create(pk=(self.tenant.id, 7234), user=user)
-        comment_2 = Comment.objects.create(pk=(self.tenant.id, 3571), user=user)
+        comment_1 = Comment.objects.create(pk=(self.tenant.id, 3571), user=user)
+        comment_2 = Comment.objects.create(pk=(self.tenant.id, 7234), user=user)
         comment_3 = Comment.objects.create(pk=(self.tenant.id, 1035), user=user)
 
         with CaptureQueriesContext(connection) as context:
             result = list(Comment.objects.filter(user=user).order_by("-pk"))
 
-        self.assertEqual(result, [comment_1, comment_2, comment_3])
+        self.assertEqual(result, [comment_2, comment_1, comment_3])
         self.assertEqual(len(context.captured_queries), 1)
         if connection.vendor in ("sqlite", "postgresql"):
             c = Comment._meta.db_table

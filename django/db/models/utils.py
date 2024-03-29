@@ -83,7 +83,7 @@ def is_pk_set(pk):
     """
     if pk is None:
         return False
-    if isinstance(pk, Iterable):
+    if isinstance(pk, tuple):
         return not any(value is None for value in pk)
 
     return True

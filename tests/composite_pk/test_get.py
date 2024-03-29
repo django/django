@@ -173,3 +173,20 @@ class CompositePKGetTests(TestCase):
                 f'AND "{u}"."id" = {self.user.id}) '
                 f"LIMIT {MAX_GET_RESULTS}",
             )
+
+    def test_get_comment_by_pk_only_pk(self):
+        with CaptureQueriesContext(connection) as context:
+            obj = Comment.objects.only("pk").get(pk=self.comment.pk)
+
+        self.assertEqual(obj, self.comment)
+        self.assertEqual(len(context.captured_queries), 1)
+        if connection.vendor in ("sqlite", "postgresql"):
+            c = Comment._meta.db_table
+            self.assertEqual(
+                context.captured_queries[0]["sql"],
+                f'SELECT "{c}"."tenant_id", "{c}"."id" '
+                f'FROM "{c}" '
+                f'WHERE ("{c}"."tenant_id" = {self.tenant.id} '
+                f'AND "{c}"."id" = {self.user.id}) '
+                f"LIMIT {MAX_GET_RESULTS}",
+            )
