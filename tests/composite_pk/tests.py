@@ -230,6 +230,31 @@ class CompositePKDeleteTests(BaseTestCase):
                 f'AND "{u}"."id" = {self.user.id})',
             )
 
+    def test_delete_comments_by_user(self):
+        c = Comment._meta.db_table
+        user = User.objects.create(pk=(self.tenant.id, 8259))
+        comment_1 = Comment.objects.create(pk=(self.tenant.id, 1923), user=user)
+        comment_2 = Comment.objects.create(pk=(self.tenant.id, 8123), user=user)
+        comment_3 = Comment.objects.create(pk=(self.tenant.id, 8219), user=user)
+
+        with CaptureQueriesContext(connection) as context:
+            result = Comment.objects.filter(user=user).delete()
+
+        self.assertEqual(result, (3, {"composite_pk.Comment": 3}))
+
+        self.assertFalse(Comment.objects.filter(id=comment_1.id).exists())
+        self.assertFalse(Comment.objects.filter(id=comment_2.id).exists())
+        self.assertFalse(Comment.objects.filter(id=comment_3.id).exists())
+
+        self.assertEqual(len(context.captured_queries), 1)
+        if connection.vendor in ("sqlite", "postgresql"):
+            self.assertEqual(
+                context.captured_queries[0]["sql"],
+                f'DELETE FROM "{c}" '
+                f'WHERE ("{c}"."tenant_id" = {self.tenant.id} '
+                f'AND "{c}"."user_id" = 8259)',
+            )
+
 
 class CompositePKGetTests(BaseTestCase):
     """
