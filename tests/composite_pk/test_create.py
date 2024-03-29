@@ -9,8 +9,8 @@ from .models import Tenant, User
 
 class CompositePKCreateTests(TestCase):
     """
-    Test the .create(), .save(), .bulk_create(), .get_or_create() methods of
-    composite_pk models.
+    Test the .create(), .save(), .bulk_create(), .get_or_create(), .update_or_create()
+    methods of composite_pk models.
     """
 
     maxDiff = None
@@ -185,3 +185,12 @@ class CompositePKCreateTests(TestCase):
         self.assertEqual(user.pk, (self.tenant.id, 8314))
         self.assertEqual(user.tenant_id, self.tenant.id)
         self.assertEqual(user.id, 8314)
+
+    def test_update_or_create_user_by_pk(self):
+        user, created = User.objects.update_or_create(pk=(self.tenant.id, 2931))
+
+        self.assertTrue(created)
+        self.assertEqual(1, User.objects.all().count())
+        self.assertEqual(user.pk, (self.tenant.id, 2931))
+        self.assertEqual(user.tenant_id, self.tenant.id)
+        self.assertEqual(user.id, 2931)
