@@ -1,5 +1,10 @@
 from django.db import connection, models
 
+# SQLite doesn't support non-primary auto fields.
+ID = (
+    models.SmallIntegerField if connection.vendor == "sqlite" else models.SmallAutoField
+)
+
 
 class Tenant(models.Model):
     pass
@@ -7,11 +12,7 @@ class Tenant(models.Model):
 
 class User(models.Model):
     tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE)
-    # SQLite doesn't support non-primary auto fields.
-    if connection.vendor == "sqlite":
-        id = models.SmallIntegerField()
-    else:
-        id = models.SmallAutoField()
+    id = ID(unique=True)
 
     class Meta:
         primary_key = ("tenant_id", "id")
@@ -19,11 +20,7 @@ class User(models.Model):
 
 class Comment(models.Model):
     tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE)
-    # SQLite doesn't support non-primary auto fields.
-    if connection.vendor == "sqlite":
-        id = models.SmallIntegerField()
-    else:
-        id = models.SmallAutoField()
+    id = ID(unique=True)
     user_id = models.SmallIntegerField()
     user = models.ForeignObject(
         User,
