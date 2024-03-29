@@ -197,3 +197,31 @@ class CompositePKGetTests(TestCase):
         self.assertFalse(created)
         self.assertEqual(1, User.objects.all().count())
         self.assertEqual(user, self.user)
+
+    def test_lookup_errors(self):
+        with self.assertRaisesMessage(
+            ValueError, "The right-hand side of TupleExact lookups must be an iterable"
+        ):
+            Comment.objects.get(pk=1)
+        with self.assertRaisesMessage(
+            ValueError,
+            "The left-hand side and right-hand side of TupleExact "
+            "lookups must have the same number of elements",
+        ):
+            Comment.objects.get(pk=(1, 2, 3))
+        with self.assertRaisesMessage(
+            ValueError, "The right-hand side of TupleIn lookups must be an iterable"
+        ):
+            Comment.objects.get(pk__in=1)
+        with self.assertRaisesMessage(
+            ValueError,
+            "The right-hand side of TupleIn lookups must be an iterable "
+            "of iterables",
+        ):
+            Comment.objects.get(pk__in=(1, 2, 3))
+        with self.assertRaisesMessage(
+            ValueError,
+            "The left-hand side and right-hand side of TupleIn lookups must "
+            "have the same number of elements",
+        ):
+            Comment.objects.get(pk__in=((1, 2, 3),))

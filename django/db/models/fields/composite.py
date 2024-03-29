@@ -1,8 +1,77 @@
+from collections.abc import Iterable
+
 from django.db.models import Field
 from django.db.models.expressions import Col, Expression
-from django.db.models.lookups import TupleExact, TupleIn
+from django.db.models.lookups import Exact, In
 from django.db.models.signals import class_prepared
 from django.utils.functional import cached_property
+
+
+class TupleExact(Exact):
+    def get_prep_lookup(self):
+        if not isinstance(self.lhs, Cols):
+            raise ValueError(
+                "The left-hand side of TupleExact lookups must be an instance of Cols"
+            )
+        if not isinstance(self.rhs, Iterable):
+            raise ValueError(
+                "The right-hand side of TupleExact lookups must be an iterable"
+            )
+        if len(list(self.lhs)) != len(list(self.rhs)):
+            raise ValueError(
+                "The left-hand side and right-hand side of TupleExact lookups must "
+                "have the same number of elements"
+            )
+
+        return super().get_prep_lookup()
+
+    def as_sql(self, compiler, connection):
+        from django.db.models.sql.where import AND, WhereNode
+
+        cols = self.lhs.get_source_expressions()
+        exprs = [Exact(col, val) for col, val in zip(cols, self.rhs)]
+
+        return compiler.compile(WhereNode(exprs, connector=AND))
+
+
+class TupleIn(In):
+    def get_prep_lookup(self):
+        if not isinstance(self.lhs, Cols):
+            raise ValueError(
+                "The left-hand side of TupleIn lookups must be an instance of Cols"
+            )
+        if not isinstance(self.rhs, Iterable):
+            raise ValueError(
+                "The right-hand side of TupleIn lookups must be an iterable"
+            )
+        if not all(isinstance(vals, Iterable) for vals in self.rhs):
+            raise ValueError(
+                "The right-hand side of TupleIn lookups must be an iterable of "
+                "iterables"
+            )
+        lhs_len = len(list(self.lhs))
+        if not all(lhs_len == len(list(vals)) for vals in self.rhs):
+            raise ValueError(
+                "The left-hand side and right-hand side of TupleIn lookups must "
+                "have the same number of elements"
+            )
+
+        return super().get_prep_lookup()
+
+    def as_sql(self, compiler, connection):
+        from django.db.models.sql.where import AND, OR, WhereNode
+
+        exprs = []
+        cols = self.lhs.get_source_expressions()
+
+        for vals in self.rhs:
+            exprs.append(
+                WhereNode(
+                    [Exact(col, val) for col, val in zip(cols, vals)], connector=AND
+                )
+            )
+
+        return compiler.compile(WhereNode(exprs, connector=OR))
 
 
 class Cols(Expression):
