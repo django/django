@@ -7,7 +7,8 @@ from .models import Comment, Tenant, User
 
 class CompositePKFilterTests(TestCase):
     """
-    Test the .filter() method of composite_pk models.
+    Test the .filter(), .order_by(), .first(), .last(), .latest(), .earliest(),
+    .exclude() methods of composite_pk models.
     """
 
     maxDiff = None
@@ -110,3 +111,25 @@ class CompositePKFilterTests(TestCase):
         self.assertEqual(qs.order_by("pk", "user").last(), objs[2])
         self.assertEqual(qs.order_by("-pk", "user").first(), objs[2])
         self.assertEqual(qs.order_by("-pk", "user").last(), objs[1])
+
+    def test_filter_comments_by_user_and_exclude_by_pk(self):
+        user = User.objects.create(pk=(self.tenant.id, 2491))
+        comment_1 = Comment.objects.create(pk=(self.tenant.id, 9214), user=user)
+        comment_2 = Comment.objects.create(pk=(self.tenant.id, 3512), user=user)
+        comment_3 = Comment.objects.create(pk=(self.tenant.id, 7313), user=user)
+
+        with CaptureQueriesContext(connection) as context:
+            comments = list(Comment.objects.filter(user=user).exclude(pk=comment_2.pk))
+
+        self.assertEqual(comments, [comment_1, comment_3])
+        self.assertEqual(len(context.captured_queries), 1)
+        if connection.vendor in ("sqlite", "postgresql"):
+            c = Comment._meta.db_table
+            self.assertEqual(
+                context.captured_queries[0]["sql"],
+                f'SELECT "{c}"."tenant_id", "{c}"."id", "{c}"."user_id" '
+                f'FROM "{c}" WHERE ('
+                f'("{c}"."tenant_id" = {self.tenant.id} AND "{c}"."user_id" = 2491) '
+                f"AND NOT ("
+                f'("{c}"."tenant_id" = {self.tenant.id} AND "{c}"."id" = 3512)))',
+            )
