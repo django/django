@@ -84,3 +84,22 @@ class CompositePKFilterTests(TestCase):
                 f'AND "{c}"."user_id" = 8316) '
                 f'ORDER BY "{c}"."tenant_id", "{c}"."id" DESC',
             )
+
+    def test_filter_comments_by_user_and_order_by_pk(self):
+        user = User.objects.create(pk=(self.tenant.id, 9314))
+        objs = [
+            Comment.objects.create(pk=(self.tenant.id, 3931), user=user),
+            Comment.objects.create(pk=(self.tenant.id, 2912), user=user),
+            Comment.objects.create(pk=(self.tenant.id, 5312), user=user),
+        ]
+
+        self.assertEqual(Comment.objects.filter(user=user).latest("pk"), objs[2])
+        self.assertEqual(Comment.objects.filter(user=user).earliest("pk"), objs[1])
+        self.assertEqual(Comment.objects.filter(user=user).latest("-pk"), objs[1])
+        self.assertEqual(Comment.objects.filter(user=user).earliest("-pk"), objs[2])
+        self.assertEqual(
+            Comment.objects.filter(user=user).order_by("pk").first(), objs[1]
+        )
+        self.assertEqual(
+            Comment.objects.filter(user=user).order_by("pk").last(), objs[2]
+        )

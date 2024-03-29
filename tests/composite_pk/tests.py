@@ -90,12 +90,22 @@ class CompositePKTests(TestCase):
         self.assertEqual(comment_pk["columns"], ["tenant_id", "id"])
         self.assertTrue(comment_pk["primary_key"])
 
-    def test_comments_in_bulk(self):
+    def test_in_bulk(self):
+        """
+        Test the .in_bulk() method of composite_pk models.
+        """
         result = Comment.objects.in_bulk()
         self.assertEqual(result, {self.comment.pk: self.comment})
 
         result = Comment.objects.in_bulk([self.comment.pk])
         self.assertEqual(result, {self.comment.pk: self.comment})
+
+    def test_iterator(self):
+        """
+        Test the .iterator() method of composite_pk models.
+        """
+        result = list(Comment.objects.iterator())
+        self.assertEqual(result, [self.comment])
 
 
 class NamesToPathTests(TestCase):
