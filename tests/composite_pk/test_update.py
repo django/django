@@ -9,7 +9,8 @@ from .models import Comment, Tenant, User
 
 class CompositePKUpdateTests(TestCase):
     """
-    Test the .update(), .save(), .bulk_update() methods of composite_pk models.
+    Test the .update(), .save(), .bulk_update(), .update_or_create() methods of
+    composite_pk models.
     """
 
     maxDiff = None
@@ -95,3 +96,12 @@ class CompositePKUpdateTests(TestCase):
             f'OR ("{c}"."tenant_id" = {self.tenant.id} AND "{c}"."id" = 8314) '
             f'OR ("{c}"."tenant_id" = {self.tenant.id} AND "{c}"."id" = 9214))',
         )
+
+    def test_update_or_create_user_by_pk(self):
+        user, created = User.objects.update_or_create(pk=self.user.pk)
+
+        self.assertFalse(created)
+        self.assertEqual(1, User.objects.all().count())
+        self.assertEqual(user.pk, self.user.pk)
+        self.assertEqual(user.tenant_id, self.tenant.id)
+        self.assertEqual(user.id, self.user.id)
