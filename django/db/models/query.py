@@ -30,7 +30,6 @@ from django.db.models.sql.constants import CURSOR, GET_ITERATOR_CHUNK_SIZE
 from django.db.models.utils import (
     AltersData,
     create_namedtuple_class,
-    is_pk_set,
     resolve_callables,
 )
 from django.utils import timezone
@@ -814,9 +813,7 @@ class QuerySet(AltersData):
         objs = list(objs)
         self._prepare_for_bulk_create(objs)
         with transaction.atomic(using=self.db, savepoint=False):
-            objs_with_pk, objs_without_pk = partition(
-                lambda o: not is_pk_set(o.pk), objs
-            )
+            objs_with_pk, objs_without_pk = partition(lambda o: o.pk is None, objs)
             if objs_with_pk:
                 returned_columns = self._batched_insert(
                     objs_with_pk,

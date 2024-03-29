@@ -105,9 +105,14 @@ class CompositeAttribute:
         self.field = field
 
     def __get__(self, instance, cls=None):
-        return tuple(
+        values = tuple(
             getattr(instance, field_name) for field_name in self.field.field_names
         )
+
+        if all(value is None for value in values):
+            return None
+
+        return values
 
     def __set__(self, instance, values):
         if values is None:

@@ -47,7 +47,7 @@ from django.db.models.signals import (
     pre_init,
     pre_save,
 )
-from django.db.models.utils import AltersData, is_pk_set, make_model_tuple
+from django.db.models.utils import AltersData, make_model_tuple
 from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.encoding import force_str
 from django.utils.hashable import make_hashable
@@ -1076,7 +1076,7 @@ class Model(AltersData, metaclass=ModelBase):
         if pk_val is None:
             pk_val = meta.pk.get_pk_value_on_save(self)
             setattr(self, meta.pk.attname, pk_val)
-        pk_set = is_pk_set(pk_val)
+        pk_set = pk_val is not None
         if not pk_set and (force_update or update_fields):
             raise ValueError("Cannot force an update in save() with no primary key.")
         updated = False
