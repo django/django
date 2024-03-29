@@ -980,6 +980,12 @@ class SQLCompiler:
         # be used by local fields.
         seen_models = {None: start_alias}
 
+        select_mask_fields = []
+        for field in select_mask or {}:
+            select_mask_fields.extend(
+                field.fields if isinstance(field, CompositeField) else [field]
+            )
+
         for field in opts.concrete_fields:
             model = field.model._meta.concrete_model
             # A proxy model will have a different model and concrete_model. We
@@ -999,15 +1005,11 @@ class SQLCompiler:
                 # parent model data is already present in the SELECT clause,
                 # and we want to avoid reloading the same data again.
                 continue
-            if select_mask and field not in select_mask:
+            if select_mask and field not in select_mask_fields:
                 continue
             alias = self.query.join_parent_model(opts, model, start_alias, seen_models)
             column = field.get_col(alias)
             result.append(column)
-        if not result:
-            for field in select_mask:
-                if isinstance(field, CompositeField):
-                    result.extend(field.cached_col)
         return result
 
     def get_distinct(self):
