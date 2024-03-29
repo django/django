@@ -8,7 +8,7 @@ from .models import Comment, Tenant, User
 
 class CompositePKGetTests(TestCase):
     """
-    Test the .get() method of composite_pk models.
+    Test the .get(), .get_or_create() methods of composite_pk models.
     """
 
     maxDiff = None
@@ -190,3 +190,10 @@ class CompositePKGetTests(TestCase):
                 f'AND "{c}"."id" = {self.user.id}) '
                 f"LIMIT {MAX_GET_RESULTS}",
             )
+
+    def test_get_or_create_user_by_pk(self):
+        user, created = User.objects.get_or_create(pk=self.user.pk)
+
+        self.assertFalse(created)
+        self.assertEqual(1, User.objects.all().count())
+        self.assertEqual(user, self.user)

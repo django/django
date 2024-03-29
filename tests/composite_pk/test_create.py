@@ -180,8 +180,8 @@ class CompositePKCreateTests(TestCase):
     def test_get_or_create_user_by_pk(self):
         user, created = User.objects.get_or_create(pk=(self.tenant.id, 8314))
 
+        self.assertTrue(created)
+        self.assertEqual(1, User.objects.all().count())
         self.assertEqual(user.pk, (self.tenant.id, 8314))
         self.assertEqual(user.tenant_id, self.tenant.id)
         self.assertEqual(user.id, 8314)
-        self.assertTrue(created)
-        self.assertEqual(1, User.objects.all().count())
