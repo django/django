@@ -100,19 +100,22 @@ class Cols(Expression):
         return iter(self.get_source_expressions())
 
 
+def is_pk_not_set(pk):
+    return pk is None or (isinstance(pk, tuple) and any(f is None for f in pk))
+
+
+def is_pk_set(pk):
+    return not is_pk_not_set(pk)
+
+
 class CompositeAttribute:
     def __init__(self, field):
         self.field = field
 
     def __get__(self, instance, cls=None):
-        values = tuple(
+        return tuple(
             getattr(instance, field_name) for field_name in self.field.field_names
         )
-
-        if all(value is None for value in values):
-            return None
-
-        return values
 
     def __set__(self, instance, values):
         if values is None:
