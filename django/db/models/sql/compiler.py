@@ -981,7 +981,7 @@ class SQLCompiler:
         seen_models = {None: start_alias}
 
         select_mask_fields = set()
-        for field in select_mask or {}:
+        for field in select_mask:
             select_mask_fields.update(
                 field.fields if isinstance(field, CompositeField) else [field]
             )
