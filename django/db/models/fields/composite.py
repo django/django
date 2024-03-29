@@ -17,6 +17,16 @@ class Cols(Expression):
         assert all(isinstance(expr, Col) for expr in exprs)
         assert len(exprs) == len(self.targets)
 
+    def as_sql(self, compiler, connection):
+        sqls = []
+        cols = self.get_source_expressions()
+
+        for col in cols:
+            sql, _ = col.as_sql(compiler, connection)
+            sqls.append(sql)
+
+        return ", ".join(sqls), []
+
     def __iter__(self):
         return iter(self.get_source_expressions())
 
