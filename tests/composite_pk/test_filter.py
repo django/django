@@ -62,3 +62,25 @@ class CompositePKFilterTests(TestCase):
                 f'AND "{c}"."user_id" = 2491) '
                 f'ORDER BY "{c}"."tenant_id", "{c}"."id" ASC',
             )
+
+    def test_filter_comments_by_user_and_order_by_pk_desc(self):
+        c = Comment._meta.db_table
+        user = User.objects.create(pk=(self.tenant.id, 8316))
+        comment_1 = Comment.objects.create(pk=(self.tenant.id, 7234), user=user)
+        comment_2 = Comment.objects.create(pk=(self.tenant.id, 3571), user=user)
+        comment_3 = Comment.objects.create(pk=(self.tenant.id, 1035), user=user)
+
+        with CaptureQueriesContext(connection) as context:
+            result = list(Comment.objects.filter(user=user).order_by("-pk"))
+
+        self.assertEqual(result, [comment_1, comment_2, comment_3])
+        self.assertEqual(len(context.captured_queries), 1)
+        if connection.vendor in ("sqlite", "postgresql"):
+            self.assertEqual(
+                context.captured_queries[0]["sql"],
+                f'SELECT "{c}"."tenant_id", "{c}"."id", "{c}"."user_id" '
+                f'FROM "{c}" '
+                f'WHERE ("{c}"."tenant_id" = {self.tenant.id} '
+                f'AND "{c}"."user_id" = 8316) '
+                f'ORDER BY "{c}"."tenant_id", "{c}"."id" DESC',
+            )
