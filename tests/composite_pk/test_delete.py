@@ -7,7 +7,7 @@ from .models import Comment, Tenant, User
 
 class CompositePKDeleteTests(TestCase):
     """
-    Test the .delete() method of composite_pk models.
+    Test the .delete(), .exists() methods of composite_pk models.
     """
 
     maxDiff = None

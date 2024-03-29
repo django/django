@@ -138,3 +138,19 @@ class CompositePKFilterTests(TestCase):
                 f'("{c}"."tenant_id" = {self.tenant.id} AND "{c}"."id" = 3512))) '
                 f'ORDER BY "{c}"."tenant_id", "{c}"."id" DESC',
             )
+
+    def test_contains_comment(self):
+        with CaptureQueriesContext(connection) as context:
+            result = Comment.objects.contains(self.comment)
+
+        self.assertTrue(result)
+        self.assertEqual(len(context.captured_queries), 1)
+        if connection.vendor in ("sqlite", "postgresql"):
+            c = Comment._meta.db_table
+            self.assertEqual(
+                context.captured_queries[0]["sql"],
+                f'SELECT 1 AS "a" '
+                f'FROM "{c}" '
+                f'WHERE ("{c}"."tenant_id" = {self.tenant.id} AND "{c}"."id" = 1) '
+                f"LIMIT 1",
+            )
