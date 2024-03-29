@@ -11,15 +11,15 @@ class TupleExact(Exact):
     def get_prep_lookup(self):
         if not isinstance(self.lhs, Cols):
             raise ValueError(
-                "The left-hand side of TupleExact lookups must be an instance of Cols"
+                "The left-hand side of the 'exact' lookup must be an instance of Cols"
             )
         if not isinstance(self.rhs, Iterable):
             raise ValueError(
-                "The right-hand side of TupleExact lookups must be an iterable"
+                "The right-hand side of the 'exact' lookup must be an iterable"
             )
         if len(list(self.lhs)) != len(list(self.rhs)):
             raise ValueError(
-                "The left-hand side and right-hand side of TupleExact lookups must "
+                "The left-hand side and right-hand side of the 'exact' lookup must "
                 "have the same number of elements"
             )
 
@@ -38,21 +38,21 @@ class TupleIn(In):
     def get_prep_lookup(self):
         if not isinstance(self.lhs, Cols):
             raise ValueError(
-                "The left-hand side of TupleIn lookups must be an instance of Cols"
+                "The left-hand side of the 'in' lookup must be an instance of Cols"
             )
         if not isinstance(self.rhs, Iterable):
             raise ValueError(
-                "The right-hand side of TupleIn lookups must be an iterable"
+                "The right-hand side of the 'in' lookup must be an iterable"
             )
         if not all(isinstance(vals, Iterable) for vals in self.rhs):
             raise ValueError(
-                "The right-hand side of TupleIn lookups must be an iterable of "
+                "The right-hand side of the 'in' lookup must be an iterable of "
                 "iterables"
             )
-        lhs_len = len(list(self.lhs))
-        if not all(lhs_len == len(list(vals)) for vals in self.rhs):
+        lhs_len = len(tuple(self.lhs))
+        if not all(lhs_len == len(tuple(vals)) for vals in self.rhs):
             raise ValueError(
-                "The left-hand side and right-hand side of TupleIn lookups must "
+                "The left-hand side and right-hand side of the 'in' lookup must "
                 "have the same number of elements"
             )
 
