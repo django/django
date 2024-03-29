@@ -1311,6 +1311,52 @@ Then when you create your inline formset, pass in the optional argument
     >>> author = Author.objects.get(name="Mike Royko")
     >>> formset = BookFormSet(instance=author)
 
+.. _inline-formset-interaction-with-prefetching:
+
+Interaction with prefetching
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 5.1
+
+The default ``InlineFormSet`` will trigger an extra query to fetch related objects
+even if :meth:`~django.db.models.query.QuerySet.prefetch_related` was used on
+the main instance. You'll need to create a subclass to take advantage of
+``prefetch_related`` for an inline formset. For example::
+
+    class PrefetchInlineFormSet(BaseInlineFormSet):
+        def get_instance_by_queryset_index(self, i):
+            # Use list() to evaluate the lazy queryset now
+            return list(self.get_queryset())[i]
+
+        def prepare_queryset(self, queryset):
+            if self.instance.pk:
+                rel_name = self.fk.remote_field.get_accessor_name(model=self.model)
+                queryset = getattr(self.instance, rel_name).get_queryset()
+                if queryset is not None:
+                    return queryset
+            return super().prepare_queryset(queryset)
+
+Note that you'll also need to ensure that the related object has a default
+ordering. Otherwise a new query will be triggered anyway to ensure that all
+formsets constructed have the same form order. For example::
+
+    class Book(models.Model):
+        ...
+
+        class Meta:
+            ordering = ["title"]
+
+With the new subclass, and a default ordering, you can pass in an instance that
+uses ``prefetch_related`` to skip an extra query for all related objects.
+
+.. code-block:: pycon
+
+    >>> BookFormSet = inlineformset_factory(
+    ...     Author, Book, fields=["title"], formset=PrefetchInlineFormSet
+    ... )
+    >>> author_with_books = Author.objects.prefetch_related("book_set").get(name="Mike Royko")
+    >>> formset = BookFormSet(instance=author_with_books)
+
 More than one foreign key to the same model
 -------------------------------------------
 
