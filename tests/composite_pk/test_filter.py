@@ -119,7 +119,11 @@ class CompositePKFilterTests(TestCase):
         comment_3 = Comment.objects.create(pk=(self.tenant.id, 7313), user=user)
 
         with CaptureQueriesContext(connection) as context:
-            comments = list(Comment.objects.filter(user=user).exclude(pk=comment_2.pk))
+            comments = list(
+                Comment.objects.filter(user=user)
+                .exclude(pk=comment_2.pk)
+                .order_by("-pk")
+            )
 
         self.assertEqual(comments, [comment_1, comment_3])
         self.assertEqual(len(context.captured_queries), 1)
@@ -131,5 +135,6 @@ class CompositePKFilterTests(TestCase):
                 f'FROM "{c}" WHERE ('
                 f'("{c}"."tenant_id" = {self.tenant.id} AND "{c}"."user_id" = 2491) '
                 f"AND NOT ("
-                f'("{c}"."tenant_id" = {self.tenant.id} AND "{c}"."id" = 3512)))',
+                f'("{c}"."tenant_id" = {self.tenant.id} AND "{c}"."id" = 3512))) '
+                f'ORDER BY "{c}"."tenant_id", "{c}"."id" DESC',
             )
