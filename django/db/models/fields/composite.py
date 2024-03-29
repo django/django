@@ -110,6 +110,9 @@ class CompositeAttribute:
         )
 
     def __set__(self, instance, values):
+        if values is None:
+            values = (None,) * len(self.field.field_names)
+
         for field_name, value in zip(self.field.field_names, values):
             setattr(instance, field_name, value)
 

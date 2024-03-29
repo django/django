@@ -514,12 +514,6 @@ class Collector:
 
         for model, instances in self.data.items():
             for instance in instances:
-                try:
-                    fields = iter(model._meta.pk)
-                except TypeError:
-                    fields = (model._meta.pk,)
-
-                for field in fields:
-                    setattr(instance, field.attname, None)
+                setattr(instance, model._meta.pk.attname, None)
 
         return sum(deleted_counter.values()), dict(deleted_counter)
