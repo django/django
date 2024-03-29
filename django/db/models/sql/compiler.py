@@ -980,9 +980,9 @@ class SQLCompiler:
         # be used by local fields.
         seen_models = {None: start_alias}
 
-        select_mask_fields = []
+        select_mask_fields = set()
         for field in select_mask or {}:
-            select_mask_fields.extend(
+            select_mask_fields.update(
                 field.fields if isinstance(field, CompositeField) else [field]
             )
 
