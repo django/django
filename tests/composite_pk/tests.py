@@ -31,14 +31,14 @@ class CompositePKTests(TestCase):
         self.assertGreater(self.user.id, 0)
         self.assertEqual(self.user.tenant_id, self.tenant.id)
         self.assertEqual(self.user.pk, (self.user.tenant_id, self.user.id))
-        self.assertEqual(self.user.composite_pk, self.user.pk)
+        self.assertEqual(self.user.primary_key, self.user.pk)
 
         self.assertIsInstance(self.comment.id, int)
         self.assertGreater(self.comment.id, 0)
         self.assertEqual(self.comment.user_id, self.user.id)
         self.assertEqual(self.comment.tenant_id, self.tenant.id)
         self.assertEqual(self.comment.pk, (self.comment.tenant_id, self.comment.id))
-        self.assertEqual(self.comment.composite_pk, self.comment.pk)
+        self.assertEqual(self.comment.primary_key, self.comment.pk)
 
     def test_pk_updated_if_field_updated(self):
         user = User.objects.get(pk=self.user.pk)
@@ -53,11 +53,11 @@ class CompositePKTests(TestCase):
 
     def test_composite_pk_in_fields(self):
         user_fields = {f.name for f in User._meta.get_fields()}
-        self.assertEqual(user_fields, {"id", "tenant", "composite_pk"})
+        self.assertEqual(user_fields, {"id", "tenant", "primary_key"})
 
         comment_fields = {f.name for f in Comment._meta.get_fields()}
         self.assertEqual(
-            comment_fields, {"id", "tenant", "user_id", "user", "composite_pk"}
+            comment_fields, {"id", "tenant", "user_id", "user", "primary_key"}
         )
 
     def test_error_on_pk_conflict(self):
@@ -123,8 +123,8 @@ class NamesToPathTests(TestCase):
         path, final_field, targets, rest = query.names_to_path(["pk"], User._meta)
 
         self.assertEqual(path, [])
-        self.assertEqual(final_field, User._meta.get_field("composite_pk"))
-        self.assertEqual(targets, (User._meta.get_field("composite_pk"),))
+        self.assertEqual(final_field, User._meta.get_field("primary_key"))
+        self.assertEqual(targets, (User._meta.get_field("primary_key"),))
         self.assertEqual(rest, [])
 
     def test_tenant_id(self):
