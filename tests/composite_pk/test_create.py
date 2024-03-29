@@ -20,7 +20,6 @@ class CompositePKCreateTests(TestCase):
 
     @unittest.skipUnless(connection.vendor == "sqlite", "SQLite specific test")
     def test_create_user_in_sqlite(self):
-        u = User._meta.db_table
         test_cases = [
             ({"tenant": self.tenant, "id": 2412}, 2412),
             ({"tenant_id": self.tenant.id, "id": 5316}, 5316),
@@ -36,6 +35,7 @@ class CompositePKCreateTests(TestCase):
                 self.assertEqual(obj.id, user_id)
                 self.assertEqual(obj.pk, (self.tenant.id, user_id))
                 self.assertEqual(len(context.captured_queries), 1)
+                u = User._meta.db_table
                 self.assertEqual(
                     context.captured_queries[0]["sql"],
                     f'INSERT INTO "{u}" ("tenant_id", "id") '
@@ -44,7 +44,6 @@ class CompositePKCreateTests(TestCase):
 
     @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific test")
     def test_create_user_in_postgresql(self):
-        u = User._meta.db_table
         test_cases = [
             ({"tenant": self.tenant, "id": 5231}, 5231),
             ({"tenant_id": self.tenant.id, "id": 6123}, 6123),
@@ -60,6 +59,7 @@ class CompositePKCreateTests(TestCase):
                 self.assertEqual(obj.id, user_id)
                 self.assertEqual(obj.pk, (self.tenant.id, user_id))
                 self.assertEqual(len(context.captured_queries), 1)
+                u = User._meta.db_table
                 self.assertEqual(
                     context.captured_queries[0]["sql"],
                     f'INSERT INTO "{u}" ("tenant_id", "id") '
@@ -69,7 +69,6 @@ class CompositePKCreateTests(TestCase):
 
     @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific test")
     def test_create_user_with_autofield_in_postgresql(self):
-        u = User._meta.db_table
         test_cases = [
             {"tenant": self.tenant},
             {"tenant_id": self.tenant.id},
@@ -84,6 +83,7 @@ class CompositePKCreateTests(TestCase):
             self.assertGreater(obj.id, 0)
             self.assertEqual(obj.pk, (self.tenant.id, obj.id))
             self.assertEqual(len(context.captured_queries), 1)
+            u = User._meta.db_table
             self.assertEqual(
                 context.captured_queries[0]["sql"],
                 f'INSERT INTO "{u}" ("tenant_id") '
@@ -101,7 +101,6 @@ class CompositePKCreateTests(TestCase):
 
     @unittest.skipUnless(connection.vendor == "sqlite", "SQLite specific test")
     def test_bulk_create_users_in_sqlite(self):
-        u = User._meta.db_table
         objs = [
             User(tenant=self.tenant, id=8291),
             User(tenant_id=self.tenant.id, id=4021),
@@ -122,6 +121,7 @@ class CompositePKCreateTests(TestCase):
         self.assertEqual(obj_3.id, 8214)
         self.assertEqual(obj_3.pk, (obj_3.tenant_id, obj_3.id))
         self.assertEqual(len(context.captured_queries), 1)
+        u = User._meta.db_table
         self.assertEqual(
             context.captured_queries[0]["sql"],
             f'INSERT INTO "{u}" ("tenant_id", "id") '
@@ -131,7 +131,6 @@ class CompositePKCreateTests(TestCase):
 
     @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific test")
     def test_bulk_create_users_in_postgresql(self):
-        u = User._meta.db_table
         objs = [
             User(tenant=self.tenant, id=8361),
             User(tenant_id=self.tenant.id, id=2819),
@@ -162,6 +161,7 @@ class CompositePKCreateTests(TestCase):
         self.assertGreater(obj_5.id, obj_4.id)
         self.assertEqual(obj_5.pk, (obj_5.tenant_id, obj_5.id))
         self.assertEqual(len(context.captured_queries), 2)
+        u = User._meta.db_table
         self.assertEqual(
             context.captured_queries[0]["sql"],
             f'INSERT INTO "{u}" ("tenant_id", "id") '

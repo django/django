@@ -20,7 +20,6 @@ class CompositePKGetTests(TestCase):
         cls.comment = Comment.objects.create(tenant=cls.tenant, id=1, user=cls.user)
 
     def test_get_tenant_by_pk(self):
-        t = Tenant._meta.db_table
         test_cases = [
             {"id": self.tenant.id},
             {"pk": self.tenant.pk},
@@ -34,6 +33,7 @@ class CompositePKGetTests(TestCase):
                 self.assertEqual(obj, self.tenant)
                 self.assertEqual(len(context.captured_queries), 1)
                 if connection.vendor in ("sqlite", "postgresql"):
+                    t = Tenant._meta.db_table
                     self.assertEqual(
                         context.captured_queries[0]["sql"],
                         f'SELECT "{t}"."id" '
@@ -43,7 +43,6 @@ class CompositePKGetTests(TestCase):
                     )
 
     def test_get_user_by_pk(self):
-        u = User._meta.db_table
         test_cases = [
             {"pk": (self.tenant.id, self.user.id)},
             {"pk": self.user.pk},
@@ -57,6 +56,7 @@ class CompositePKGetTests(TestCase):
                 self.assertEqual(obj, self.user)
                 self.assertEqual(len(context.captured_queries), 1)
                 if connection.vendor in ("sqlite", "postgresql"):
+                    u = User._meta.db_table
                     self.assertEqual(
                         context.captured_queries[0]["sql"],
                         f'SELECT "{u}"."tenant_id", "{u}"."id" '
@@ -67,7 +67,6 @@ class CompositePKGetTests(TestCase):
                     )
 
     def test_get_user_by_field(self):
-        u = User._meta.db_table
         test_cases = [
             ({"id": self.user.id}, "id", self.user.id),
             ({"tenant": self.tenant}, "tenant_id", self.tenant.id),
@@ -84,6 +83,7 @@ class CompositePKGetTests(TestCase):
                 self.assertEqual(obj, self.user)
                 self.assertEqual(len(context.captured_queries), 1)
                 if connection.vendor in ("sqlite", "postgresql"):
+                    u = User._meta.db_table
                     self.assertEqual(
                         context.captured_queries[0]["sql"],
                         f'SELECT "{u}"."tenant_id", "{u}"."id" '
@@ -93,14 +93,13 @@ class CompositePKGetTests(TestCase):
                     )
 
     def test_get_comment_by_pk(self):
-        c = Comment._meta.db_table
-
         with CaptureQueriesContext(connection) as context:
             obj = Comment.objects.get(pk=(self.tenant.id, self.comment.id))
 
         self.assertEqual(obj, self.comment)
         self.assertEqual(len(context.captured_queries), 1)
         if connection.vendor in ("sqlite", "postgresql"):
+            c = Comment._meta.db_table
             self.assertEqual(
                 context.captured_queries[0]["sql"],
                 f'SELECT "{c}"."tenant_id", "{c}"."id", "{c}"."user_id" '
@@ -111,7 +110,6 @@ class CompositePKGetTests(TestCase):
             )
 
     def test_get_comment_by_field(self):
-        c = Comment._meta.db_table
         test_cases = [
             ({"id": self.comment.id}, "id", self.comment.id),
             ({"user_id": self.user.id}, "user_id", self.user.id),
@@ -130,6 +128,7 @@ class CompositePKGetTests(TestCase):
                 self.assertEqual(obj, self.comment)
                 self.assertEqual(len(context.captured_queries), 1)
                 if connection.vendor in ("sqlite", "postgresql"):
+                    c = Comment._meta.db_table
                     self.assertEqual(
                         context.captured_queries[0]["sql"],
                         f'SELECT "{c}"."tenant_id", "{c}"."id", "{c}"."user_id" '
@@ -139,14 +138,13 @@ class CompositePKGetTests(TestCase):
                     )
 
     def test_get_comment_by_user(self):
-        c = Comment._meta.db_table
-
         with CaptureQueriesContext(connection) as context:
             obj = Comment.objects.get(user=self.user)
 
         self.assertEqual(obj, self.comment)
         self.assertEqual(len(context.captured_queries), 1)
         if connection.vendor in ("sqlite", "postgresql"):
+            c = Comment._meta.db_table
             self.assertEqual(
                 context.captured_queries[0]["sql"],
                 f'SELECT "{c}"."tenant_id", "{c}"."id", "{c}"."user_id" '
@@ -157,15 +155,14 @@ class CompositePKGetTests(TestCase):
             )
 
     def test_get_comment_by_user_pk(self):
-        c = Comment._meta.db_table
-        u = User._meta.db_table
-
         with CaptureQueriesContext(connection) as context:
             obj = Comment.objects.get(user__pk=self.user.pk)
 
         self.assertEqual(obj, self.comment)
         self.assertEqual(len(context.captured_queries), 1)
         if connection.vendor in ("sqlite", "postgresql"):
+            c = Comment._meta.db_table
+            u = User._meta.db_table
             self.assertEqual(
                 context.captured_queries[0]["sql"],
                 f'SELECT "{c}"."tenant_id", "{c}"."id", "{c}"."user_id" '

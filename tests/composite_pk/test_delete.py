@@ -43,7 +43,6 @@ class CompositePKDeleteTests(TestCase):
             t = Tenant._meta.db_table
             u = User._meta.db_table
             c = Comment._meta.db_table
-
             self.assertEqual(
                 context.captured_queries[0]["sql"],
                 f'SELECT "{t}"."id" FROM "{t}" WHERE "{t}"."id" = {self.tenant.id}',
@@ -76,9 +75,6 @@ class CompositePKDeleteTests(TestCase):
             )
 
     def test_delete_user_by_id(self):
-        u = User._meta.db_table
-        c = Comment._meta.db_table
-
         with CaptureQueriesContext(connection) as context:
             result = User.objects.filter(id=self.user.id).delete()
 
@@ -92,6 +88,8 @@ class CompositePKDeleteTests(TestCase):
 
         self.assertEqual(len(context.captured_queries), 3)
         if connection.vendor in ("sqlite", "postgresql"):
+            u = User._meta.db_table
+            c = Comment._meta.db_table
             self.assertEqual(
                 context.captured_queries[0]["sql"],
                 f'SELECT "{u}"."tenant_id", "{u}"."id" '
@@ -112,9 +110,6 @@ class CompositePKDeleteTests(TestCase):
             )
 
     def test_delete_user_by_pk(self):
-        u = User._meta.db_table
-        c = Comment._meta.db_table
-
         with CaptureQueriesContext(connection) as context:
             result = User.objects.filter(pk=self.user.pk).delete()
 
@@ -128,6 +123,8 @@ class CompositePKDeleteTests(TestCase):
 
         self.assertEqual(len(context.captured_queries), 3)
         if connection.vendor in ("sqlite", "postgresql"):
+            u = User._meta.db_table
+            c = Comment._meta.db_table
             self.assertEqual(
                 context.captured_queries[0]["sql"],
                 f'SELECT "{u}"."tenant_id", "{u}"."id" '
@@ -149,7 +146,6 @@ class CompositePKDeleteTests(TestCase):
             )
 
     def test_delete_comments_by_user(self):
-        c = Comment._meta.db_table
         user = User.objects.create(pk=(self.tenant.id, 8259))
         comment_1 = Comment.objects.create(pk=(self.tenant.id, 1923), user=user)
         comment_2 = Comment.objects.create(pk=(self.tenant.id, 8123), user=user)
@@ -166,6 +162,7 @@ class CompositePKDeleteTests(TestCase):
 
         self.assertEqual(len(context.captured_queries), 1)
         if connection.vendor in ("sqlite", "postgresql"):
+            c = Comment._meta.db_table
             self.assertEqual(
                 context.captured_queries[0]["sql"],
                 f'DELETE FROM "{c}" '

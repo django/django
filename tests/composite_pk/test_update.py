@@ -21,8 +21,6 @@ class CompositePKUpdateTests(TestCase):
         cls.comment = Comment.objects.create(tenant=cls.tenant, id=1, user=cls.user)
 
     def test_update_user(self):
-        u = User._meta.db_table
-
         with CaptureQueriesContext(connection) as context:
             result = User.objects.filter(pk=self.user.pk).update(id=8341)
 
@@ -35,6 +33,7 @@ class CompositePKUpdateTests(TestCase):
         self.assertEqual(user.id, 8341)
         self.assertEqual(len(context.captured_queries), 1)
         if connection.vendor in ("sqlite", "postgresql"):
+            u = User._meta.db_table
             self.assertEqual(
                 context.captured_queries[0]["sql"],
                 f'UPDATE "{u}" '
@@ -44,7 +43,6 @@ class CompositePKUpdateTests(TestCase):
             )
 
     def test_save_comment(self):
-        c = Comment._meta.db_table
         comment = Comment.objects.get(pk=self.comment.pk)
         comment.user = User.objects.create(tenant=self.tenant, id=8214)
 
@@ -54,6 +52,7 @@ class CompositePKUpdateTests(TestCase):
         self.assertEqual(Comment.objects.all().count(), 1)
         self.assertEqual(len(context.captured_queries), 1)
         if connection.vendor in ("sqlite", "postgresql"):
+            c = Comment._meta.db_table
             self.assertEqual(
                 context.captured_queries[0]["sql"],
                 f'UPDATE "{c}" '
@@ -65,7 +64,6 @@ class CompositePKUpdateTests(TestCase):
 
     @unittest.skipUnless(connection.vendor == "sqlite", "SQLite specific test")
     def test_bulk_update_comments_in_sqlite(self):
-        c = Comment._meta.db_table
         user_1 = User.objects.create(pk=(self.tenant.id, 1352))
         user_2 = User.objects.create(pk=(self.tenant.id, 9314))
         comment_1 = Comment.objects.create(pk=(self.tenant.id, 1934), user=user_1)
@@ -82,6 +80,7 @@ class CompositePKUpdateTests(TestCase):
 
         self.assertEqual(result, 3)
         self.assertEqual(len(context.captured_queries), 1)
+        c = Comment._meta.db_table
         self.assertEqual(
             context.captured_queries[0]["sql"],
             f'UPDATE "{c}" '

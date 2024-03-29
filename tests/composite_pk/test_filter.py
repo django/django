@@ -19,7 +19,6 @@ class CompositePKFilterTests(TestCase):
         cls.comment = Comment.objects.create(tenant=cls.tenant, id=1, user=cls.user)
 
     def test_filter_and_count_user_by_pk(self):
-        u = User._meta.db_table
         test_cases = [
             {"pk": self.user.pk},
             {"pk": (self.tenant.id, self.user.id)},
@@ -33,6 +32,7 @@ class CompositePKFilterTests(TestCase):
                 self.assertEqual(result, 1)
                 self.assertEqual(len(context.captured_queries), 1)
                 if connection.vendor in ("sqlite", "postgresql"):
+                    u = User._meta.db_table
                     self.assertEqual(
                         context.captured_queries[0]["sql"],
                         'SELECT COUNT(*) AS "__count" '
@@ -42,7 +42,6 @@ class CompositePKFilterTests(TestCase):
                     )
 
     def test_filter_comments_by_user_and_order_by_pk_asc(self):
-        c = Comment._meta.db_table
         user = User.objects.create(pk=(self.tenant.id, 2491))
         comment_1 = Comment.objects.create(pk=(self.tenant.id, 9471), user=user)
         comment_2 = Comment.objects.create(pk=(self.tenant.id, 5128), user=user)
@@ -54,6 +53,7 @@ class CompositePKFilterTests(TestCase):
         self.assertEqual(result, [comment_3, comment_2, comment_1])
         self.assertEqual(len(context.captured_queries), 1)
         if connection.vendor in ("sqlite", "postgresql"):
+            c = Comment._meta.db_table
             self.assertEqual(
                 context.captured_queries[0]["sql"],
                 f'SELECT "{c}"."tenant_id", "{c}"."id", "{c}"."user_id" '
@@ -64,7 +64,6 @@ class CompositePKFilterTests(TestCase):
             )
 
     def test_filter_comments_by_user_and_order_by_pk_desc(self):
-        c = Comment._meta.db_table
         user = User.objects.create(pk=(self.tenant.id, 8316))
         comment_1 = Comment.objects.create(pk=(self.tenant.id, 7234), user=user)
         comment_2 = Comment.objects.create(pk=(self.tenant.id, 3571), user=user)
@@ -76,6 +75,7 @@ class CompositePKFilterTests(TestCase):
         self.assertEqual(result, [comment_1, comment_2, comment_3])
         self.assertEqual(len(context.captured_queries), 1)
         if connection.vendor in ("sqlite", "postgresql"):
+            c = Comment._meta.db_table
             self.assertEqual(
                 context.captured_queries[0]["sql"],
                 f'SELECT "{c}"."tenant_id", "{c}"."id", "{c}"."user_id" '
