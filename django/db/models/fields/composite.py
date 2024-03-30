@@ -162,7 +162,7 @@ class CompositeField(Field):
 
 def resolve_fields(signal, sender):
     meta = sender._meta
-    for field in meta.local_fields:
+    for field in meta.private_fields:
         if isinstance(field, CompositeField) and field.fields is None:
             try:
                 field.fields = tuple(meta.get_field(name) for name in field.field_names)
