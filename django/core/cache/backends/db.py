@@ -223,6 +223,59 @@ class DatabaseCache(BaseDatabaseCache):
             .exists()
         )
 
+    def set_many(self, data, timeout=DEFAULT_TIMEOUT, version=None, chunk_size=100):
+        db = router.db_for_write(self.cache_model_class)
+        connection = connections[db]
+        unique_fields = None
+        if connection.features.supports_update_conflicts_with_target:
+            unique_fields = ("cache_key",)
+
+        with transaction.atomic():
+            objs = []
+            timeout = self.get_backend_timeout(timeout)
+            db = router.db_for_write(self.cache_model_class)
+            connection = connections[db]
+            for key, value in data.items():
+                key = self.make_and_validate_key(key, version=version)
+                pickled = pickle.dumps(value, self.pickle_protocol)
+                b64encoded = base64.b64encode(pickled).decode("latin1")
+                if timeout is None:
+                    exp = datetime.max
+                    if settings.USE_TZ:
+                        exp = exp.replace(tzinfo=timezone.utc)
+                else:
+                    tz = timezone.utc if settings.USE_TZ else None
+                    exp = datetime.fromtimestamp(timeout, tz=tz)
+                exp = exp.replace(microsecond=0)
+                obj = self.cache_model_class(
+                    cache_key=key, value=b64encoded, expires=exp
+                )
+                objs.append(obj)
+
+                if len(objs) == chunk_size:
+                    self.cache_model_class.objects.bulk_create(
+                        objs,
+                        update_conflicts=True,
+                        update_fields=(
+                            "value",
+                            "expires",
+                        ),
+                        unique_fields=unique_fields,
+                    )
+                    objs = []
+
+            if objs:
+                self.cache_model_class.objects.bulk_create(
+                    objs,
+                    update_conflicts=True,
+                    update_fields=(
+                        "value",
+                        "expires",
+                    ),
+                    unique_fields=unique_fields,
+                )
+        return []
+
     def _cull(self, db, cursor, now, num):
         if self._cull_frequency == 0:
             self.clear()
