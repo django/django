@@ -21,3 +21,6 @@ Bugfixes
 * Fixed a bug in Django 5.0 that caused a migration crash on PostgreSQL 15+
   when adding a partial ``UniqueConstraint`` with ``nulls_distinct``
   (:ticket:`35329`).
+
+* Fixed a crash in Django 5.0 when performing queries involving table aliases
+  and lookups on a ``GeneratedField`` of the aliased table (:ticket:`35344`).
