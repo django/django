@@ -1,5 +1,6 @@
 from collections.abc import Iterable
 
+from django.core.exceptions import FieldDoesNotExist
 from django.db.models import Field
 from django.db.models.expressions import Col, Expression
 from django.db.models.lookups import Exact, In
@@ -135,8 +136,8 @@ class CompositeField(Field):
         self.field_names = args
         self.fields = None
 
-    def contribute_to_class(self, cls, name, private_only=False):
-        super().contribute_to_class(cls, name, private_only)
+    def contribute_to_class(self, cls, name, **_):
+        super().contribute_to_class(cls, name, private_only=True)
         cls._meta.pk = self
         setattr(cls, self.attname, self.descriptor_class(self))
 
@@ -159,13 +160,14 @@ class CompositeField(Field):
         return super().get_lookup(lookup_name)
 
 
-def resolve_columns(*args, **kwargs):
-    cls = kwargs.pop("sender")
-    for field in cls._meta.local_fields:
+def resolve_fields(signal, sender):
+    meta = sender._meta
+    for field in meta.local_fields:
         if isinstance(field, CompositeField) and field.fields is None:
-            field.fields = tuple(
-                cls._meta.get_field(name) for name in field.field_names
-            )
+            try:
+                field.fields = tuple(meta.get_field(name) for name in field.field_names)
+            except FieldDoesNotExist:
+                continue
 
 
-class_prepared.connect(resolve_columns)
+class_prepared.connect(resolve_fields)
