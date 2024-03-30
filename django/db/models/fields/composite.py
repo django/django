@@ -160,8 +160,8 @@ class CompositeField(Field):
         return super().get_lookup(lookup_name)
 
 
-def resolve_fields(signal, sender):
-    meta = sender._meta
+def resolve_fields(*args, **kwargs):
+    meta = kwargs["sender"]._meta
     for field in meta.private_fields:
         if isinstance(field, CompositeField) and field.fields is None:
             try:
