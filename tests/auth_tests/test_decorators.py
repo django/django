@@ -1,7 +1,5 @@
 from asyncio import iscoroutinefunction
 
-from asgiref.sync import sync_to_async
-
 from django.conf import settings
 from django.contrib.auth import models
 from django.contrib.auth.decorators import (
@@ -374,7 +372,7 @@ class UserPassesTestDecoratorTest(TestCase):
 
     def test_decorator_async_test_func(self):
         async def async_test_func(user):
-            return await sync_to_async(user.has_perms)(["auth_tests.add_customuser"])
+            return await user.ahas_perms(["auth_tests.add_customuser"])
 
         @user_passes_test(async_test_func)
         def sync_view(request):
@@ -410,7 +408,7 @@ class UserPassesTestDecoratorTest(TestCase):
 
     async def test_decorator_async_view_async_test_func(self):
         async def async_test_func(user):
-            return await sync_to_async(user.has_perms)(["auth_tests.add_customuser"])
+            return await user.ahas_perms(["auth_tests.add_customuser"])
 
         @user_passes_test(async_test_func)
         async def async_view(request):
