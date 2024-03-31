@@ -29,6 +29,19 @@ class CustomUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
+    async def acreate_user(self, email, date_of_birth, password=None, **fields):
+        """See create_user()"""
+        if not email:
+            raise ValueError("Users must have an email address")
+
+        user = self.model(
+            email=self.normalize_email(email), date_of_birth=date_of_birth, **fields
+        )
+
+        user.set_password(password)
+        await user.asave(using=self._db)
+        return user
+
     def create_superuser(self, email, password, date_of_birth, **fields):
         u = self.create_user(
             email, password=password, date_of_birth=date_of_birth, **fields
