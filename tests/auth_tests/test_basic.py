@@ -44,6 +44,12 @@ class BasicTestCase(TestCase):
         u2 = User.objects.create_user("testuser2", "test2@example.com")
         self.assertFalse(u2.has_usable_password())
 
+    async def test_acreate(self):
+        u = await User.objects.acreate_user("testuser", "test@example.com", "testpw")
+        self.assertTrue(u.has_usable_password())
+        self.assertFalse(u.check_password("bad"))
+        self.assertTrue(u.check_password("testpw"))
+
     def test_unicode_username(self):
         User.objects.create_user("jörg")
         User.objects.create_user("Григорий")
@@ -69,6 +75,15 @@ class BasicTestCase(TestCase):
     def test_superuser(self):
         "Check the creation and properties of a superuser"
         super = User.objects.create_superuser("super", "super@example.com", "super")
+        self.assertTrue(super.is_superuser)
+        self.assertTrue(super.is_active)
+        self.assertTrue(super.is_staff)
+
+    async def test_asuperuser(self):
+        "Check the creation and properties of a superuser"
+        super = await User.objects.acreate_superuser(
+            "super", "super@example.com", "super"
+        )
         self.assertTrue(super.is_superuser)
         self.assertTrue(super.is_active)
         self.assertTrue(super.is_staff)
