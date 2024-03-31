@@ -790,9 +790,16 @@ utility methods:
         email address.
 
     .. method:: models.BaseUserManager.get_by_natural_key(username)
+    .. method:: models.BaseUserManager.aget_by_natural_key(username)
+
+        *Asynchronous version*: ``aget_by_natural_key()``
 
         Retrieves a user instance using the contents of the field
         nominated by ``USERNAME_FIELD``.
+
+        .. versionchanged:: 5.2
+
+            ``aget_by_natural_key()`` method was added.
 
 Extending Django's default ``User``
 -----------------------------------
@@ -1186,3 +1193,25 @@ Finally, specify the custom model as the default user model for your project
 using the :setting:`AUTH_USER_MODEL` setting in your ``settings.py``::
 
     AUTH_USER_MODEL = "customauth.MyUser"
+
+.. _writing-authentication-backends-async-interface:
+
+Adding an async interface
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 5.2
+
+To optimize performance when called from an async context authentication,
+backends can implement async versions of each function - ``aget_user(user_id)``
+and ``aauthenticate(request, **credentials)``. When an authentication backend
+extends ``BaseBackend`` and async versions of these functions are not provided,
+they will be automatically synthesized with ``sync_to_async``. This has
+:ref:`performance penalties <async_performance>`.
+
+While an async interface is optional, a synchronous interface is always
+required. There is no automatic synthesis for a synchronous interface if an
+async interface is implemented.
+
+Django's out-of-the-box authentication backends have native async support. If
+these native backends are extended take special care to make sure the async
+versions of modified functions are modified as well.

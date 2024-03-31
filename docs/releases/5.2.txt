@@ -52,6 +52,36 @@ Minor features
 * The default iteration count for the PBKDF2 password hasher is increased from
   870,000 to 1,000,000.
 
+* The following new asynchronous methods on are now provided, using an ``a``
+  prefix:
+
+  * :meth:`.UserManager.acreate_user`
+  * :meth:`.UserManager.acreate_superuser`
+  * :meth:`.BaseUserManager.aget_by_natural_key`
+  * :meth:`.User.aget_user_permissions()`
+  * :meth:`.User.aget_all_permissions()`
+  * :meth:`.User.aget_group_permissions()`
+  * :meth:`.User.ahas_perm()`
+  * :meth:`.User.ahas_perms()`
+  * :meth:`.User.ahas_module_perms()`
+  * :meth:`.User.aget_user_permissions()`
+  * :meth:`.User.aget_group_permissions()`
+  * :meth:`.User.ahas_perm()`
+  * :meth:`.ModelBackend.aauthenticate()`
+  * :meth:`.ModelBackend.aget_user_permissions()`
+  * :meth:`.ModelBackend.aget_group_permissions()`
+  * :meth:`.ModelBackend.aget_all_permissions()`
+  * :meth:`.ModelBackend.ahas_perm()`
+  * :meth:`.ModelBackend.ahas_module_perms()`
+  * :meth:`.RemoteUserBackend.aauthenticate()`
+  * :meth:`.RemoteUserBackend.aconfigure_user()`
+
+* Auth backends can now provide async implementations which are used when
+  calling async auth functions (e.g.
+  :func:`~.django.contrib.auth.aauthenticate`) to reduce context-switching which
+  improves performance. See :ref:`adding an async interface
+  <writing-authentication-backends-async-interface>` for more details.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
