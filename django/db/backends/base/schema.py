@@ -317,9 +317,9 @@ class BaseDatabaseSchemaEditor:
             if default_value is not None:
                 column_default = "DEFAULT " + self._column_default_sql(field)
                 if self.connection.features.requires_literal_defaults:
-                    # Some databases can't take defaults as a parameter (Oracle).
-                    # If this is the case, the individual schema backend should
-                    # implement prepare_default().
+                    # Some databases can't take defaults as a parameter
+                    # (Oracle, SQLite). If this is the case, the individual
+                    # schema backend should implement prepare_default().
                     yield column_default % self.prepare_default(default_value)
                 else:
                     yield column_default
@@ -333,7 +333,9 @@ class BaseDatabaseSchemaEditor:
         ):
             null = True
         if field.generated:
-            yield self._column_generated_sql(field)
+            generated_sql, generated_params = self._column_generated_sql(field)
+            params.extend(generated_params)
+            yield generated_sql
         elif not null:
             yield "NOT NULL"
         elif not self.connection.features.implied_column_null:
@@ -420,7 +422,7 @@ class BaseDatabaseSchemaEditor:
         compiler = query.get_compiler(connection=self.connection)
         default_sql, params = compiler.compile(db_default)
         if self.connection.features.requires_literal_defaults:
-            # Some databases doesn't support parameterized defaults (Oracle,
+            # Some databases don't support parameterized defaults (Oracle,
             # SQLite). If this is the case, the individual schema backend
             # should implement prepare_default().
             default_sql %= tuple(self.prepare_default(p) for p in params)
@@ -431,9 +433,10 @@ class BaseDatabaseSchemaEditor:
         """Return the SQL to use in a GENERATED ALWAYS clause."""
         expression_sql, params = field.generated_sql(self.connection)
         persistency_sql = "STORED" if field.db_persist else "VIRTUAL"
-        if params:
+        if self.connection.features.requires_literal_defaults:
             expression_sql = expression_sql % tuple(self.quote_value(p) for p in params)
-        return f"GENERATED ALWAYS AS ({expression_sql}) {persistency_sql}"
+            params = ()
+        return f"GENERATED ALWAYS AS ({expression_sql}) {persistency_sql}", params
 
     @staticmethod
     def _effective_default(field):
@@ -484,7 +487,7 @@ class BaseDatabaseSchemaEditor:
         """
         sql, params = self.table_sql(model)
         # Prevent using [] as params, in the case a literal '%' is used in the
-        # definition.
+        # definition on backends that don't support parametrized DDL.
         self.execute(sql, params or None)
 
         if self.connection.features.supports_comments:
@@ -746,7 +749,9 @@ class BaseDatabaseSchemaEditor:
             "column": self.quote_name(field.column),
             "definition": definition,
         }
-        self.execute(sql, params)
+        # Prevent using [] as params, in the case a literal '%' is used in the
+        # definition on backends that don't support parametrized DDL.
+        self.execute(sql, params or None)
         # Drop the default if we need to
         if (
             field.db_default is NOT_PROVIDED
