@@ -197,13 +197,23 @@ Methods
         been called for this user.
 
     .. method:: get_user_permissions(obj=None)
+    .. method:: aget_user_permissions(obj=None)
+
+        *Asynchronous version*: ``aget_user_permissions()``
 
         Returns a set of permission strings that the user has directly.
 
         If ``obj`` is passed in, only returns the user permissions for this
         specific object.
 
+        .. versionchanged:: 5.2
+
+            ``aget_user_permissions()`` method was added.
+
     .. method:: get_group_permissions(obj=None)
+    .. method:: aget_group_permissions(obj=None)
+
+        *Asynchronous version*: ``aget_group_permissions()``
 
         Returns a set of permission strings that the user has, through their
         groups.
@@ -211,7 +221,14 @@ Methods
         If ``obj`` is passed in, only returns the group permissions for
         this specific object.
 
+        .. versionchanged:: 5.2
+
+            ``aget_group_permissions()`` method was added.
+
     .. method:: get_all_permissions(obj=None)
+    .. method:: aget_all_permissions(obj=None)
+
+        *Asynchronous version*: ``aget_all_permissions()``
 
         Returns a set of permission strings that the user has, both through
         group and user permissions.
@@ -219,7 +236,14 @@ Methods
         If ``obj`` is passed in, only returns the permissions for this
         specific object.
 
+        .. versionchanged:: 5.2
+
+            ``aget_all_permissions()`` method was added.
+
     .. method:: has_perm(perm, obj=None)
+    .. method:: ahas_perm(perm, obj=None)
+
+        *Asynchronous version*: ``ahas_perm()``
 
         Returns ``True`` if the user has the specified permission, where perm
         is in the format ``"<app label>.<permission codename>"``. (see
@@ -230,7 +254,14 @@ Methods
         If ``obj`` is passed in, this method won't check for a permission for
         the model, but for this specific object.
 
+        .. versionchanged:: 5.2
+
+            ``ahas_perm()`` method was added.
+
     .. method:: has_perms(perm_list, obj=None)
+    .. method:: ahas_perms(perm_list, obj=None)
+
+        *Asynchronous version*: ``ahas_perms()``
 
         Returns ``True`` if the user has each of the specified permissions,
         where each perm is in the format
@@ -241,12 +272,23 @@ Methods
         If ``obj`` is passed in, this method won't check for permissions for
         the model, but for the specific object.
 
+        .. versionchanged:: 5.2
+
+            ``ahas_perms()`` method was added.
+
     .. method:: has_module_perms(package_name)
+    .. method:: ahas_module_perms(package_name)
+
+        *Asynchronous version*: ``ahas_module_perms()``
 
         Returns ``True`` if the user has any permissions in the given package
         (the Django app label). If the user is inactive, this method will
         always return ``False``. For an active superuser, this method will
         always return ``True``.
+
+        .. versionchanged:: 5.2
+
+            ``ahas_module_perms()`` method was added.
 
     .. method:: email_user(subject, message, from_email=None, **kwargs)
 
@@ -264,6 +306,9 @@ Manager methods
     by :class:`~django.contrib.auth.models.BaseUserManager`):
 
     .. method:: create_user(username, email=None, password=None, **extra_fields)
+    .. method:: acreate_user(username, email=None, password=None, **extra_fields)
+
+        *Asynchronous version*: ``acreate_user()``
 
         Creates, saves and returns a :class:`~django.contrib.auth.models.User`.
 
@@ -285,10 +330,21 @@ Manager methods
 
         See :ref:`Creating users <topics-auth-creating-users>` for example usage.
 
+        .. versionchanged:: 5.2
+
+            ``acreate_user()`` method was added.
+
     .. method:: create_superuser(username, email=None, password=None, **extra_fields)
+    .. method:: acreate_superuser(username, email=None, password=None, **extra_fields)
+
+        *Asynchronous version*: ``acreate_superuser()``
 
         Same as :meth:`create_user`, but sets :attr:`~models.User.is_staff` and
         :attr:`~models.User.is_superuser` to ``True``.
+
+        .. versionchanged:: 5.2
+
+            ``acreate_superuser()`` method was added.
 
     .. method:: with_perm(perm, is_active=True, include_superusers=True, backend=None, obj=None)
 
@@ -499,22 +555,50 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
     methods. By default, it will reject any user and provide no permissions.
 
     .. method:: get_user_permissions(user_obj, obj=None)
+    .. method:: aget_user_permissions(user_obj, obj=None)
+
+        *Asynchronous version*: ``aget_user_permissions()``
 
         Returns an empty set.
+
+        .. versionchanged:: 5.2
+
+            ``aget_user_permissions()`` function was added.
 
     .. method:: get_group_permissions(user_obj, obj=None)
+    .. method:: aget_group_permissions(user_obj, obj=None)
+
+        *Asynchronous version*: ``aget_group_permissions()``
 
         Returns an empty set.
 
+        .. versionchanged:: 5.2
+
+            ``aget_group_permissions()`` function was added.
+
     .. method:: get_all_permissions(user_obj, obj=None)
+    .. method:: aget_all_permissions(user_obj, obj=None)
+
+        *Asynchronous version*: ``aget_all_permissions()``
 
         Uses :meth:`get_user_permissions` and :meth:`get_group_permissions` to
         get the set of permission strings the ``user_obj`` has.
 
+        .. versionchanged:: 5.2
+
+            ``aget_all_permissions()`` function was added.
+
     .. method:: has_perm(user_obj, perm, obj=None)
+    .. method:: ahas_perm(user_obj, perm, obj=None)
+
+        *Asynchronous version*: ``ahas_perm()``
 
         Uses :meth:`get_all_permissions` to check if ``user_obj`` has the
         permission string ``perm``.
+
+        .. versionchanged:: 5.2
+
+            ``ahas_perm()`` function was added.
 
 .. class:: ModelBackend
 
@@ -539,6 +623,9 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
     unlike others methods it returns an empty queryset if ``obj is not None``.
 
     .. method:: authenticate(request, username=None, password=None, **kwargs)
+    .. method:: aauthenticate(request, username=None, password=None, **kwargs)
+
+        *Asynchronous version*: ``aauthenticate()``
 
         Tries to authenticate ``username`` with ``password`` by calling
         :meth:`User.check_password
@@ -552,37 +639,76 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
         if it wasn't provided to :func:`~django.contrib.auth.authenticate`
         (which passes it on to the backend).
 
+        .. versionchanged:: 5.2
+
+            ``aauthenticate()`` function was added.
+
     .. method:: get_user_permissions(user_obj, obj=None)
+    .. method:: aget_user_permissions(user_obj, obj=None)
+
+        *Asynchronous version*: ``aget_user_permissions()``
 
         Returns the set of permission strings the ``user_obj`` has from their
         own user permissions. Returns an empty set if
         :attr:`~django.contrib.auth.models.AbstractBaseUser.is_anonymous` or
         :attr:`~django.contrib.auth.models.CustomUser.is_active` is ``False``.
 
+        .. versionchanged:: 5.2
+
+            ``aget_user_permissions()`` function was added.
+
     .. method:: get_group_permissions(user_obj, obj=None)
+    .. method:: aget_group_permissions(user_obj, obj=None)
+
+        *Asynchronous version*: ``aget_group_permissions()``
 
         Returns the set of permission strings the ``user_obj`` has from the
         permissions of the groups they belong. Returns an empty set if
         :attr:`~django.contrib.auth.models.AbstractBaseUser.is_anonymous` or
         :attr:`~django.contrib.auth.models.CustomUser.is_active`  is ``False``.
 
+        .. versionchanged:: 5.2
+
+            ``aget_group_permissions()`` function was added.
+
     .. method:: get_all_permissions(user_obj, obj=None)
+    .. method:: aget_all_permissions(user_obj, obj=None)
+
+        *Asynchronous version*: ``aget_all_permissions()``
 
         Returns the set of permission strings the ``user_obj`` has, including both
         user permissions and group permissions. Returns an empty set if
         :attr:`~django.contrib.auth.models.AbstractBaseUser.is_anonymous` or
         :attr:`~django.contrib.auth.models.CustomUser.is_active` is ``False``.
+    
+        .. versionchanged:: 5.2
+
+            ``aget_all_permissions()`` function was added.
 
     .. method:: has_perm(user_obj, perm, obj=None)
+    .. method:: ahas_perm(user_obj, perm, obj=None)
+
+        *Asynchronous version*: ``ahas_perm()``
 
         Uses :meth:`get_all_permissions` to check if ``user_obj`` has the
         permission string ``perm``. Returns ``False`` if the user is not
         :attr:`~django.contrib.auth.models.CustomUser.is_active`.
 
+        .. versionchanged:: 5.2
+
+            ``ahas_perm()`` function was added.
+
     .. method:: has_module_perms(user_obj, app_label)
+    .. method:: ahas_module_perms(user_obj, app_label)
+
+        *Asynchronous version*: ``ahas_module_perms()``
 
         Returns whether the ``user_obj`` has any permissions on the app
         ``app_label``.
+
+        .. versionchanged:: 5.2
+
+            ``ahas_module_perms()`` function was added.
 
     .. method:: user_can_authenticate()
 
@@ -637,6 +763,9 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
         created if not already in the database  Defaults to ``True``.
 
     .. method:: authenticate(request, remote_user)
+    .. method:: aauthenticate(request, remote_user)
+
+        *Asynchronous version*: ``aauthenticate()``
 
         The username passed as ``remote_user`` is considered trusted. This
         method returns the user object with the given username, creating a new
@@ -651,6 +780,10 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
         if it wasn't provided to :func:`~django.contrib.auth.authenticate`
         (which passes it on to the backend).
 
+        .. versionchanged:: 5.2
+
+            ``aauthenticate()`` function was added.
+
     .. method:: clean_username(username)
 
         Performs any cleaning on the ``username`` (e.g. stripping LDAP DN
@@ -658,12 +791,17 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
         the cleaned username.
 
     .. method:: configure_user(request, user, created=True)
+    .. method:: aconfigure_user(request, user, created=True)
+
+        *Asynchronous version*: ``aconfigure_user()``
 
         Configures the user on each authentication attempt. This method is
         called immediately after fetching or creating the user being
         authenticated, and can be used to perform custom setup actions, such as
         setting the user's groups based on attributes in an LDAP directory.
-        Returns the user object.
+        Returns the user object. When fetching or creating an user is called
+        from a synchronous context, ``configure_user`` is called,
+        ``aconfigure_user`` is called from async contexts.
 
         The setup can be performed either once when the user is created
         (``created`` is ``True``) or on existing users (``created`` is
@@ -673,6 +811,10 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
         ``request`` is an :class:`~django.http.HttpRequest` and may be ``None``
         if it wasn't provided to :func:`~django.contrib.auth.authenticate`
         (which passes it on to the backend).
+
+        .. versionchanged:: 5.2
+
+            ``aconfigure_user()`` function was added.
 
     .. method:: user_can_authenticate()
 
