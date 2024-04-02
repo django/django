@@ -298,6 +298,7 @@ class QuerySet(AltersData):
         self._db = using
         self._hints = hints or {}
         self._query = query or sql.Query(self.model)
+        self._query.queryset = self
         self._result_cache = None
         self._sticky_filter = False
         self._for_write = False
@@ -1921,6 +1922,7 @@ class QuerySet(AltersData):
         c._known_related_objects = self._known_related_objects
         c._iterable_class = self._iterable_class
         c._fields = self._fields
+        c._query.queryset = c
         return c
 
     def _fetch_all(self):

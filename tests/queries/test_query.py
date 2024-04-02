@@ -160,6 +160,11 @@ class TestQuery(SimpleTestCase):
         with self.assertRaisesMessage(TypeError, msg):
             query.build_where(Func(output_field=CharField()))
 
+    def test_use_correct_db(self):
+        qs = Item.objects.using("other")
+        query = Query(Item, queryset=qs)
+        self.assertEqual(query.db, "other")
+
 
 class TestQueryNoModel(TestCase):
     def test_rawsql_annotation(self):
