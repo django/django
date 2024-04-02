@@ -24,3 +24,7 @@ Bugfixes
 
 * Fixed a crash in Django 5.0 when performing queries involving table aliases
   and lookups on a ``GeneratedField`` of the aliased table (:ticket:`35344`).
+
+* Fixed a bug in Django 5.0 that caused a migration crash when adding a
+  ``GeneratedField`` relying on the ``__contains`` or ``__icontains``
+  lookups or using a ``Value`` containing a ``"%"`` (:ticket:`35336`).
