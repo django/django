@@ -198,9 +198,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         return self.normalize_name(for_name + "_" + suffix)
 
     def prepare_default(self, value):
-        # Replace % with %% as %-formatting is applied in
-        # FormatStylePlaceholderCursor._fix_for_params().
-        return self.quote_value(value).replace("%", "%%")
+        return self.quote_value(value)
 
     def _field_should_be_indexed(self, model, field):
         create_index = super()._field_should_be_indexed(model, field)
