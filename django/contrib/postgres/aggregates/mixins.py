@@ -17,13 +17,10 @@ class OrderableAggMixin:
         return super().resolve_expression(*args, **kwargs)
 
     def get_source_expressions(self):
-        if self.order_by is not None:
-            return super().get_source_expressions() + [self.order_by]
-        return super().get_source_expressions()
+        return super().get_source_expressions() + [self.order_by]
 
     def set_source_expressions(self, exprs):
-        if isinstance(exprs[-1], OrderByList):
-            *exprs, self.order_by = exprs
+        *exprs, self.order_by = exprs
         return super().set_source_expressions(exprs)
 
     def as_sql(self, compiler, connection):
