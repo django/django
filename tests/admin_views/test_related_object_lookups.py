@@ -80,9 +80,6 @@ class SeleniumTests(AdminSeleniumTestCase):
     def test_related_object_update_with_camel_casing(self):
         from selenium.webdriver.common.by import By
 
-        def _get_HTML_inside_element_by_id(id_):
-            return self.selenium.find_element(By.ID, id_).get_attribute("innerHTML")
-
         add_url = reverse("admin:admin_views_camelcaserelatedmodel_add")
         self.selenium.get(self.live_server_url + add_url)
         interesting_name = "A test name"
@@ -105,15 +102,17 @@ class SeleniumTests(AdminSeleniumTestCase):
 
         # Check that both the "Available" m2m box and the "Fk" dropdown now
         # include the newly added CamelCaseModel instance.
+        fk_dropdown = self.selenium.find_element(By.ID, "id_fk")
         self.assertHTMLEqual(
-            self.selenium.find_element(By.ID, "id_fk"),
+            fk_dropdown.get_attribute("innerHTML"),
             f"""
             <option value="" selected="">---------</option>
             <option value="1" selected>{interesting_name}</option>
             """,
         )
+        m2m_box = self.selenium.find_element(By.ID, "id_m2m_from")
         self.assertHTMLEqual(
-            self.selenium.find_element(By.ID, "id_m2m_from"),
+            m2m_box.get_attribute("innerHTML"),
             f"""
             <option value="1">{interesting_name}</option>
             """,
