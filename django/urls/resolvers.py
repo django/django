@@ -26,7 +26,7 @@ from django.utils.http import RFC3986_SUBDELIMS, escape_leading_slashes
 from django.utils.regex_helper import _lazy_re_compile, normalize
 from django.utils.translation import get_language
 
-from .converters import get_converter
+from .converters import get_converters
 from .exceptions import NoReverseMatch, Resolver404
 from .utils import get_callable
 
@@ -243,7 +243,10 @@ _PATH_PARAMETER_COMPONENT_RE = _lazy_re_compile(
     r"<(?:(?P<converter>[^>:]+):)?(?P<parameter>[^>]+)>"
 )
 
+whitespace_set = frozenset(string.whitespace)
 
+
+@functools.lru_cache
 def _route_to_regex(route, is_endpoint):
     """
     Convert a path pattern into a regular expression. Return the regular
@@ -251,40 +254,37 @@ def _route_to_regex(route, is_endpoint):
     For example, 'foo/<int:pk>' returns '^foo\\/(?P<pk>[0-9]+)'
     and {'pk': <django.urls.converters.IntConverter>}.
     """
-    original_route = route
     parts = ["^"]
+    all_converters = get_converters()
     converters = {}
-    while True:
-        match = _PATH_PARAMETER_COMPONENT_RE.search(route)
-        if not match:
-            parts.append(re.escape(route))
-            break
-        elif not set(match.group()).isdisjoint(string.whitespace):
+    previous_end = 0
+    for match_ in _PATH_PARAMETER_COMPONENT_RE.finditer(route):
+        if not whitespace_set.isdisjoint(match_[0]):
             raise ImproperlyConfigured(
-                "URL route '%s' cannot contain whitespace in angle brackets "
-                "<…>." % original_route
+                f"URL route {route!r} cannot contain whitespace in angle brackets <…>."
             )
-        parts.append(re.escape(route[: match.start()]))
-        route = route[match.end() :]
-        parameter = match["parameter"]
+        # Default to make converter "str" if unspecified (parameter always
+        # matches something).
+        raw_converter, parameter = match_.groups(default="str")
         if not parameter.isidentifier():
             raise ImproperlyConfigured(
-                "URL route '%s' uses parameter name %r which isn't a valid "
-                "Python identifier." % (original_route, parameter)
+                f"URL route {route!r} uses parameter name {parameter!r} which "
+                "isn't a valid Python identifier."
             )
-        raw_converter = match["converter"]
-        if raw_converter is None:
-            # If a converter isn't specified, the default is `str`.
-            raw_converter = "str"
         try:
-            converter = get_converter(raw_converter)
+            converter = all_converters[raw_converter]
         except KeyError as e:
             raise ImproperlyConfigured(
-                "URL route %r uses invalid converter %r."
-                % (original_route, raw_converter)
+                f"URL route {route!r} uses invalid converter {raw_converter!r}."
             ) from e
         converters[parameter] = converter
-        parts.append("(?P<" + parameter + ">" + converter.regex + ")")
+
+        start, end = match_.span()
+        parts.append(re.escape(route[previous_end:start]))
+        previous_end = end
+        parts.append(f"(?P<{parameter}>{converter.regex})")
+
+    parts.append(re.escape(route[previous_end:]))
     if is_endpoint:
         parts.append(r"\Z")
     return "".join(parts), converters

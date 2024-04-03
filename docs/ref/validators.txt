@@ -183,6 +183,12 @@ to, or in lieu of custom ``field.clean()`` methods.
 
         .. _valid URI schemes: https://www.iana.org/assignments/uri-schemes/uri-schemes.xhtml
 
+        .. warning::
+
+            Values starting with ``file:///`` will not pass validation even
+            when the ``file`` scheme is provided. Valid values must contain a
+            host.
+
     .. attribute:: max_length
 
         The maximum length of values that could be considered valid. Defaults

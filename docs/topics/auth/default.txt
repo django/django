@@ -617,6 +617,10 @@ The ``login_required`` decorator
     :func:`django.contrib.admin.views.decorators.staff_member_required`
     decorator a useful alternative to ``login_required()``.
 
+.. versionchanged:: 5.1
+
+    Support for wrapping asynchronous view functions was added.
+
 .. currentmodule:: django.contrib.auth.mixins
 
 The ``LoginRequiredMixin`` mixin
@@ -713,6 +717,11 @@ email in the desired domain and if not, redirects to the login page::
 
         @user_passes_test(email_check, login_url="/login/")
         def my_view(request): ...
+
+    .. versionchanged:: 5.1
+
+        Support for wrapping asynchronous view functions and using asynchronous
+        test callables was added.
 
 .. currentmodule:: django.contrib.auth.mixins
 
@@ -817,6 +826,10 @@ The ``permission_required`` decorator
     This also avoids a redirect loop when :class:`.LoginView`'s
     ``redirect_authenticated_user=True`` and the logged-in user doesn't have
     all of the required permissions.
+
+.. versionchanged:: 5.1
+
+    Support for wrapping asynchronous view functions was added.
 
 .. currentmodule:: django.contrib.auth.mixins
 

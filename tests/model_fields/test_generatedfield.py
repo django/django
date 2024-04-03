@@ -123,7 +123,12 @@ class BaseGeneratedFieldTests(SimpleTestCase):
                 db_persist=True,
             )
 
-        col = Square._meta.get_field("area").get_col("alias")
+        field = Square._meta.get_field("area")
+
+        col = field.get_col("alias")
+        self.assertIsInstance(col.output_field, IntegerField)
+
+        col = field.get_col("alias", field)
         self.assertIsInstance(col.output_field, IntegerField)
 
         class FloatSquare(Model):
@@ -134,7 +139,12 @@ class BaseGeneratedFieldTests(SimpleTestCase):
                 output_field=FloatField(),
             )
 
-        col = FloatSquare._meta.get_field("area").get_col("alias")
+        field = FloatSquare._meta.get_field("area")
+
+        col = field.get_col("alias")
+        self.assertIsInstance(col.output_field, FloatField)
+
+        col = field.get_col("alias", field)
         self.assertIsInstance(col.output_field, FloatField)
 
     @isolate_apps("model_fields")

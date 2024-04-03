@@ -36,10 +36,9 @@ class ReadOnlyPasswordHashWidget(forms.Widget):
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
+        usable_password = value and not value.startswith(UNUSABLE_PASSWORD_PREFIX)
         summary = []
-        if not value or value.startswith(UNUSABLE_PASSWORD_PREFIX):
-            summary.append({"label": gettext("No password set.")})
-        else:
+        if usable_password:
             try:
                 hasher = identify_hasher(value)
             except ValueError:
@@ -53,7 +52,12 @@ class ReadOnlyPasswordHashWidget(forms.Widget):
             else:
                 for key, value_ in hasher.safe_summary(value).items():
                     summary.append({"label": gettext(key), "value": value_})
+        else:
+            summary.append({"label": gettext("No password set.")})
         context["summary"] = summary
+        context["button_label"] = (
+            _("Reset password") if usable_password else _("Set password")
+        )
         return context
 
     def id_for_label(self, id_):
@@ -253,9 +257,8 @@ class UserChangeForm(forms.ModelForm):
     password = ReadOnlyPasswordHashField(
         label=_("Password"),
         help_text=_(
-            "Raw passwords are not stored, so there is no way to see this "
-            "user’s password, but you can change or unset the password using "
-            '<a href="{}">this form</a>.'
+            "Raw passwords are not stored, so there is no way to see "
+            "the user’s password."
         ),
     )
 
@@ -271,11 +274,8 @@ class UserChangeForm(forms.ModelForm):
             if self.instance and not self.instance.has_usable_password():
                 password.help_text = _(
                     "Enable password-based authentication for this user by setting a "
-                    'password using <a href="{}">this form</a>.'
+                    "password."
                 )
-            password.help_text = password.help_text.format(
-                f"../../{self.instance.pk}/password/"
-            )
         user_permissions = self.fields.get("user_permissions")
         if user_permissions:
             user_permissions.queryset = user_permissions.queryset.select_related(

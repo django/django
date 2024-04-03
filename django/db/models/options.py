@@ -1,6 +1,5 @@
 import bisect
 import copy
-import inspect
 from collections import defaultdict
 
 from django.apps import apps
@@ -203,10 +202,9 @@ class Options:
             self.unique_together = normalize_together(self.unique_together)
             # App label/class name interpolation for names of constraints and
             # indexes.
-            if not getattr(cls._meta, "abstract", False):
-                for attr_name in {"constraints", "indexes"}:
-                    objs = getattr(self, attr_name, [])
-                    setattr(self, attr_name, self._format_names_with_class(cls, objs))
+            if not self.abstract:
+                self.constraints = self._format_names(self.constraints)
+                self.indexes = self._format_names(self.indexes)
 
             # verbose_name_plural is a special case because it uses a 's'
             # by default.
@@ -232,15 +230,13 @@ class Options:
                 self.db_table, connection.ops.max_name_length()
             )
 
-    def _format_names_with_class(self, cls, objs):
+    def _format_names(self, objs):
         """App label/class name interpolation for object names."""
+        names = {"app_label": self.app_label.lower(), "class": self.model_name}
         new_objs = []
         for obj in objs:
             obj = obj.clone()
-            obj.name = obj.name % {
-                "app_label": cls._meta.app_label.lower(),
-                "class": cls.__name__.lower(),
-            }
+            obj.name %= names
             new_objs.append(obj)
         return new_objs
 
@@ -972,11 +968,15 @@ class Options:
     @cached_property
     def _property_names(self):
         """Return a set of the names of the properties defined on the model."""
-        names = []
-        for name in dir(self.model):
-            attr = inspect.getattr_static(self.model, name)
-            if isinstance(attr, property):
-                names.append(name)
+        names = set()
+        seen = set()
+        for klass in self.model.__mro__:
+            names |= {
+                name
+                for name, value in klass.__dict__.items()
+                if isinstance(value, property) and name not in seen
+            }
+            seen |= set(klass.__dict__)
         return frozenset(names)
 
     @cached_property

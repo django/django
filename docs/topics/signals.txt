@@ -307,7 +307,7 @@ error instance is returned in the tuple pair for the receiver that raised the er
 The tracebacks are present on the ``__traceback__`` attribute of the errors
 returned when calling ``send_robust()``.
 
-``asend()`` is similar as ``send()``, but it is coroutine that must be
+``asend()`` is similar to ``send()``, but it is a coroutine that must be
 awaited::
 
     async def asend_pizza(self, toppings, size):

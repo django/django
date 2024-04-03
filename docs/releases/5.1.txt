@@ -52,6 +52,17 @@ Minor features
   form save. This is now available in the admin when visiting the user creation
   and password change pages.
 
+* :func:`~.django.contrib.auth.decorators.login_required`,
+  :func:`~.django.contrib.auth.decorators.permission_required`, and
+  :func:`~.django.contrib.auth.decorators.user_passes_test` decorators now
+  support wrapping asynchronous view functions.
+
+* ``ReadOnlyPasswordHashWidget`` now includes a button to reset the user's
+  password, which replaces the link previously embedded in the
+  ``ReadOnlyPasswordHashField``'s help text, improving the overall
+  accessibility of the
+  :class:`~django.contrib.auth.forms.UserChangeForm`.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -96,6 +107,11 @@ Minor features
 * :attr:`.OGRGeometry.centroid` is now available on all supported geometry
   types.
 
+* :class:`FromWKB() <django.contrib.gis.db.models.functions.FromWKB>` and
+  :class:`FromWKT() <django.contrib.gis.db.models.functions.FromWKT>` functions
+  now support the optional ``srid`` argument (except for Oracle where it is
+  ignored).
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -119,6 +135,10 @@ Minor features
   exceptions when storing session information in the cache, logging proper
   error messages with their traceback via the newly added
   :ref:`sessions logger <django-contrib-sessions-logger>`.
+
+* :class:`django.contrib.sessions.backends.base.SessionBase` and all built-in
+  session engines now provide async API. The new asynchronous methods all have
+  ``a`` prefixed names, e.g. ``aget()``, ``akeys()``, or ``acycle_key()``.
 
 :mod:`django.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -293,6 +313,9 @@ Templates
   example, to generate a link to the next page while keeping any filtering
   options in place.
 
+* :ref:`Template engines <field-checking>` now implement a ``check()`` method
+  that is already registered with the check framework.
+
 Tests
 ~~~~~
 
@@ -392,6 +415,9 @@ Miscellaneous
   :tfilter:`truncatewords_html` template filters now uses
   :py:class:`html.parser.HTMLParser` subclasses. This results in a more robust
   and faster operation, but there may be small differences in the output.
+
+* The undocumented ``django.urls.converters.get_converter()`` function is
+  removed.
 
 .. _deprecated-features-5.1:
 

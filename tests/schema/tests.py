@@ -54,7 +54,16 @@ from django.db.models import (
     Value,
 )
 from django.db.models.fields.json import KT, KeyTextTransform
-from django.db.models.functions import Abs, Cast, Collate, Lower, Random, Round, Upper
+from django.db.models.functions import (
+    Abs,
+    Cast,
+    Collate,
+    Concat,
+    Lower,
+    Random,
+    Round,
+    Upper,
+)
 from django.db.models.indexes import IndexExpression
 from django.db.transaction import TransactionManagementError, atomic
 from django.test import TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature
@@ -885,6 +894,39 @@ class SchemaTests(TransactionTestCase):
 
         with connection.schema_editor() as editor:
             editor.create_model(GeneratedFieldOutputFieldModel)
+
+    @isolate_apps("schema")
+    @skipUnlessDBFeature("supports_stored_generated_columns")
+    def test_add_generated_field_contains(self):
+        class GeneratedFieldContainsModel(Model):
+            text = TextField(default="foo")
+            generated = GeneratedField(
+                expression=Concat("text", Value("%")),
+                db_persist=True,
+                output_field=TextField(),
+            )
+
+            class Meta:
+                app_label = "schema"
+
+        with connection.schema_editor() as editor:
+            editor.create_model(GeneratedFieldContainsModel)
+
+        field = GeneratedField(
+            expression=Q(text__icontains="FOO"),
+            db_persist=True,
+            output_field=BooleanField(),
+        )
+        field.contribute_to_class(GeneratedFieldContainsModel, "contains_foo")
+
+        with connection.schema_editor() as editor:
+            editor.add_field(GeneratedFieldContainsModel, field)
+
+        obj = GeneratedFieldContainsModel.objects.create()
+        obj.refresh_from_db()
+        self.assertEqual(obj.text, "foo")
+        self.assertEqual(obj.generated, "foo%")
+        self.assertIs(obj.contains_foo, True)
 
     @isolate_apps("schema")
     def test_add_auto_field(self):
@@ -3624,6 +3666,38 @@ class SchemaTests(TransactionTestCase):
             Author.objects.create(name="", height=1, weight=None)
         with self.assertRaises(IntegrityError):
             Author.objects.create(name="", height=None, weight=1)
+        with connection.schema_editor() as editor:
+            editor.remove_constraint(Author, constraint)
+        constraints = self.get_constraints(Author._meta.db_table)
+        self.assertNotIn(constraint.name, constraints)
+
+    @skipUnlessDBFeature(
+        "supports_nulls_distinct_unique_constraints",
+        "supports_partial_indexes",
+    )
+    def test_unique_constraint_nulls_distinct_condition(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        constraint = UniqueConstraint(
+            fields=["height", "weight"],
+            name="un_height_weight_start_A",
+            condition=Q(name__startswith="A"),
+            nulls_distinct=False,
+        )
+        with connection.schema_editor() as editor:
+            editor.add_constraint(Author, constraint)
+        Author.objects.create(name="Adam", height=None, weight=None)
+        Author.objects.create(name="Avocado", height=1, weight=None)
+        Author.objects.create(name="Adrian", height=None, weight=1)
+        with self.assertRaises(IntegrityError):
+            Author.objects.create(name="Alex", height=None, weight=None)
+        Author.objects.create(name="Bob", height=None, weight=None)
+        with self.assertRaises(IntegrityError):
+            Author.objects.create(name="Alex", height=1, weight=None)
+        Author.objects.create(name="Bill", height=None, weight=None)
+        with self.assertRaises(IntegrityError):
+            Author.objects.create(name="Alex", height=None, weight=1)
+        Author.objects.create(name="Celine", height=None, weight=1)
         with connection.schema_editor() as editor:
             editor.remove_constraint(Author, constraint)
         constraints = self.get_constraints(Author._meta.db_table)

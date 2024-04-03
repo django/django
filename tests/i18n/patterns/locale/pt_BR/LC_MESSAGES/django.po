@@ -50,7 +50,5 @@ msgid "^register-without-slash$"
 msgstr ""
 
 #: urls/namespace.py:11
-#, fuzzy
-#| msgid "^register/$"
 msgid "register-as-path/"
-msgstr "^registre-se/$"
+msgstr "registre-se-caminho/"

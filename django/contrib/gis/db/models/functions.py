@@ -367,15 +367,28 @@ class ForcePolygonCW(GeomOutputGeoFunc):
 
 
 class FromWKB(GeoFunc):
-    output_field = GeometryField(srid=0)
-    arity = 1
+    arity = 2
     geom_param_pos = ()
 
+    def __init__(self, expression, srid=0, **extra):
+        expressions = [
+            expression,
+            self._handle_param(srid, "srid", int),
+        ]
+        if "output_field" not in extra:
+            extra["output_field"] = GeometryField(srid=srid)
+        super().__init__(*expressions, **extra)
 
-class FromWKT(GeoFunc):
-    output_field = GeometryField(srid=0)
-    arity = 1
-    geom_param_pos = ()
+    def as_oracle(self, compiler, connection, **extra_context):
+        # Oracle doesn't support the srid parameter.
+        source_expressions = self.get_source_expressions()
+        clone = self.copy()
+        clone.set_source_expressions(source_expressions[:1])
+        return super(FromWKB, clone).as_sql(compiler, connection, **extra_context)
+
+
+class FromWKT(FromWKB):
+    pass
 
 
 class GeoHash(GeoFunc):
