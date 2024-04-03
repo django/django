@@ -1,3 +1,4 @@
+from django.core.exceptions import FullResultSet
 from django.db.models.expressions import OrderByList
 
 
@@ -24,9 +25,23 @@ class OrderableAggMixin:
         return super().set_source_expressions(exprs)
 
     def as_sql(self, compiler, connection):
-        if self.order_by is not None:
-            order_by_sql, order_by_params = compiler.compile(self.order_by)
-        else:
-            order_by_sql, order_by_params = "", ()
-        sql, sql_params = super().as_sql(compiler, connection, ordering=order_by_sql)
-        return sql, (*sql_params, *order_by_params)
+        *source_exprs, filtering_expr, ordering_expr = self.get_source_expressions()
+
+        order_by_sql = ""
+        order_by_params = []
+        if ordering_expr is not None:
+            order_by_sql, order_by_params = compiler.compile(ordering_expr)
+
+        filter_params = []
+        if filtering_expr is not None:
+            try:
+                _, filter_params = compiler.compile(filtering_expr)
+            except FullResultSet:
+                pass
+
+        source_params = []
+        for source_expr in source_exprs:
+            source_params += compiler.compile(source_expr)[1]
+
+        sql, _ = super().as_sql(compiler, connection, ordering=order_by_sql)
+        return sql, (*source_params, *order_by_params, *filter_params)
