@@ -218,3 +218,16 @@ class FilteredAggregateTests(TestCase):
             max_rating=Max("rating", filter=~Q(rating__in=[]))
         )
         self.assertEqual(aggregate, {"max_rating": 4.5})
+
+    def test_filtered_aggregate_datetime(self):
+        self.assertEqual(
+            Publisher.objects.aggregate(
+                max_filtered_pubdate=Max(
+                    "book__pubdate",
+                    filter=Q(book__price__gte=Decimal("29")),
+                ),
+            ),
+            {
+                "max_filtered_pubdate": datetime.date(2008, 6, 23),
+            },
+        )
