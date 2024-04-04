@@ -571,7 +571,7 @@ operations:
     This only handles the migrations part - you will still need to handle other
     aspects of the move such as changing all existing references to the model
     to point to its new location yourself. In fact, you will probably need to
-    handle these before running makemigrations, for Django to be able to load
+    handle these before running :djadmin:`makemigrations`, for Django to be able to load
     the apps.
 
 .. _data-migrations:
