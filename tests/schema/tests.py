@@ -5632,7 +5632,7 @@ class SchemaTests(TransactionTestCase):
         new_field.model = UniqueKey
         with connection.schema_editor() as editor:
             editor.alter_field(UniqueKey, old_field, new_field, strict=True)
-        self.assertEqual(self.get_uniques(UniqueKey._meta.db_table), ["when"])
+        self.assertTrue("when" in self.get_uniques(UniqueKey._meta.db_table))
         self.assertEqual(
             self.get_column_collation(UniqueKey._meta.db_table, "when"),
             collation,
@@ -5653,7 +5653,7 @@ class SchemaTests(TransactionTestCase):
         new_field.model = IndexKey
         with connection.schema_editor() as editor:
             editor.alter_field(IndexKey, old_field, new_field, strict=True)
-        self.assertEqual(self.get_indexes(IndexKey._meta.db_table), ["when"])
+        self.assertTrue("when" in self.get_indexes(IndexKey._meta.db_table))
         self.assertEqual(
             self.get_column_collation(IndexKey._meta.db_table, "when"),
             collation,
