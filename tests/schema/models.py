@@ -200,6 +200,28 @@ class Thing(models.Model):
         return self.when
 
 
+class UniqueKey(models.Model):
+    when = models.CharField(max_length=1, unique=True)
+
+    class Meta:
+        apps = new_apps
+        db_table = "drop_unique"
+
+    def __str__(self):
+        return self.when
+
+
+class IndexKey(models.Model):
+    when = models.CharField(max_length=1, db_index=True)
+
+    class Meta:
+        apps = new_apps
+        db_table = "drop_index"
+
+    def __str__(self):
+        return self.when
+
+
 class UniqueTest(models.Model):
     year = models.IntegerField()
     slug = models.SlugField(unique=False)
