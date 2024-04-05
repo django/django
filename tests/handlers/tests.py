@@ -335,11 +335,13 @@ class AsyncHandlerRequestTests(SimpleTestCase):
         self.assertEqual(request.script_name, "/root")
         self.assertEqual(request.path_info, "/somepath/")
 
-    @override_settings(FORCE_SCRIPT_NAME="/FORCED_PREFIX/")
+    @override_settings(FORCE_SCRIPT_NAME="/FORCED_PREFIX")
     def test_force_script_name(self):
         async_request_factory = AsyncRequestFactory()
-        request = async_request_factory.request(**{"path": "/somepath/"})
+        request = async_request_factory.request(**{"path": "/FORCED_PREFIX/somepath/"})
         self.assertEqual(request.path, "/FORCED_PREFIX/somepath/")
+        self.assertEqual(request.script_name, "/FORCED_PREFIX")
+        self.assertEqual(request.path_info, "/somepath/")
 
     async def test_sync_streaming(self):
         response = await self.async_client.get("/streaming/")
