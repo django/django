@@ -91,12 +91,33 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 self._alter_field_type_workaround(model, old_field, new_field)
             # If a collation is changing on a primary key, drop the primary key
             # first.
-            elif "ORA-43923" in description and old_field.primary_key:
-                self._delete_primary_key(model, strict=True)
+            elif "ORA-43923" in description:
+                # If primary key exists, delete it.
+                if old_field.primary_key:
+                    self._delete_primary_key(model, strict=True)
+
+                # If unique key exists, delete it.
+                if old_field.unique:
+                    self._delete_unique_key(model, old_field.column)
+
+                # if indexed field, drop index.
+                if old_field.db_index:
+                    self._delete_index(model, old_field.column)
+
+                # Alter the field collation.
                 self.alter_field(model, old_field, new_field, strict)
+
                 # Restore a primary key, if needed.
                 if new_field.primary_key:
                     self.execute(self._create_primary_key_sql(model, new_field))
+
+                # Restore unique constraint, if needed.
+                if new_field.unique:
+                    self.execute(self._create_unique_sql(model, [new_field]))
+
+                # Restore index, if needed.
+                if new_field.db_index:
+                    self.execute(self._create_index_sql(model, fields=[new_field]))
             else:
                 raise
 
