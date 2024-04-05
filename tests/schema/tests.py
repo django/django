@@ -58,8 +58,8 @@ from django.db.models.functions import (
     Abs,
     Cast,
     Collate,
-    Concat,
     Lower,
+    LPad,
     Random,
     Round,
     Upper,
@@ -907,7 +907,7 @@ class SchemaTests(TransactionTestCase):
         class GeneratedFieldContainsModel(Model):
             text = TextField(default="foo")
             generated = GeneratedField(
-                expression=Concat("text", Value("%")),
+                expression=LPad("text", 5, Value("%")),
                 db_persist=True,
                 output_field=TextField(),
             )
@@ -931,7 +931,7 @@ class SchemaTests(TransactionTestCase):
         obj = GeneratedFieldContainsModel.objects.create()
         obj.refresh_from_db()
         self.assertEqual(obj.text, "foo")
-        self.assertEqual(obj.generated, "foo%")
+        self.assertEqual(obj.generated, "%%foo")
         self.assertIs(obj.contains_foo, True)
 
     @isolate_apps("schema")
