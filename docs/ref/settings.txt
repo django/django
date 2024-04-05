@@ -1667,7 +1667,7 @@ the server-provided value of ``SCRIPT_NAME``, which may be a rewritten version
 of the preferred value or not supplied at all. It is also used by
 :func:`django.setup()` to set the URL resolver script prefix outside of the
 request/response cycle (e.g. in management commands and standalone scripts) to
-generate correct URLs when ``SCRIPT_NAME`` is not ``/``.
+generate correct URLs when ``FORCE_SCRIPT_NAME`` is provided.
 
 .. setting:: FORM_RENDERER
 
