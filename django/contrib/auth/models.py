@@ -1,6 +1,7 @@
 from collections.abc import Iterable
 
 from django.apps import apps
+from django.conf import settings
 from django.contrib import auth
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.hashers import make_password
@@ -96,7 +97,7 @@ class GroupManager(models.Manager):
         return self.get(name=name)
 
 
-class Group(models.Model):
+class AbstractGroup(models.Model):
     """
     Groups are a generic way of categorizing users to apply permissions, or
     some other label, to those users. A user can belong to any number of
@@ -126,12 +127,18 @@ class Group(models.Model):
     class Meta:
         verbose_name = _("group")
         verbose_name_plural = _("groups")
+        abstract = True
 
     def __str__(self):
         return self.name
 
     def natural_key(self):
         return (self.name,)
+
+
+class Group(AbstractGroup):
+    class Meta(AbstractGroup.Meta):
+        swappable = "AUTH_GROUP_MODEL"
 
 
 class UserManager(BaseUserManager):
@@ -255,7 +262,7 @@ class PermissionsMixin(models.Model):
         ),
     )
     groups = models.ManyToManyField(
-        Group,
+        settings.AUTH_GROUP_MODEL,
         verbose_name=_("groups"),
         blank=True,
         help_text=_(

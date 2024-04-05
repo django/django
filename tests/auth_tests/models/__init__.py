@@ -1,3 +1,4 @@
+from .custom_group import CustomGroup
 from .custom_permissions import CustomPermissionsUser
 from .custom_user import CustomUser, CustomUserWithoutIsActiveField, ExtensionUser
 from .invalid_models import CustomUserNonUniqueUsername
@@ -15,6 +16,7 @@ from .with_unique_constraint import CustomUserWithUniqueConstraint
 
 __all__ = (
     "CustomEmailField",
+    "CustomGroup",
     "CustomPermissionsUser",
     "CustomUser",
     "CustomUserNonUniqueUsername",

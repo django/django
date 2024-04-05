@@ -524,6 +524,7 @@ CACHE_MIDDLEWARE_ALIAS = "default"
 ##################
 
 AUTH_USER_MODEL = "auth.User"
+AUTH_GROUP_MODEL = "auth.Group"
 
 AUTHENTICATION_BACKENDS = ["django.contrib.auth.backends.ModelBackend"]
 

@@ -1,15 +1,15 @@
 from asgiref.sync import sync_to_async
 
 from django.conf import settings
-from django.contrib.auth import aget_user, get_user, get_user_model
-from django.contrib.auth.models import AnonymousUser, User
+from django.contrib.auth import aget_user, get_group_model, get_user, get_user_model
+from django.contrib.auth.models import AnonymousUser, Group, User
 from django.core.exceptions import ImproperlyConfigured
 from django.db import IntegrityError
 from django.http import HttpRequest
 from django.test import TestCase, override_settings
 from django.utils import translation
 
-from .models import CustomUser
+from .models import CustomGroup, CustomUser
 
 
 class BasicTestCase(TestCase):
@@ -122,6 +122,34 @@ class BasicTestCase(TestCase):
         with translation.override("es"):
             self.assertEqual(User._meta.verbose_name, "usuario")
             self.assertEqual(User._meta.verbose_name_plural, "usuarios")
+
+    def test_get_group_model(self):
+        "The current group model can be retrieved"
+        self.assertEqual(get_group_model(), Group)
+
+    @override_settings(AUTH_GROUP_MODEL="auth_tests.CustomGroup")
+    def test_swappable_group(self):
+        "The current group model can be swapped out for another"
+        self.assertEqual(get_group_model(), CustomGroup)
+        with self.assertRaises(AttributeError):
+            Group.objects.all()
+
+    @override_settings(AUTH_GROUP_MODEL="badsetting")
+    def test_swappable_group_bad_setting(self):
+        "The alternate group setting must point to something in the format app.model"
+        msg = "AUTH_GROUP_MODEL must be of the form 'app_label.model_name'"
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            get_group_model()
+
+    @override_settings(AUTH_GROUP_MODEL="thismodel.doesntexist")
+    def test_swappable_group_nonexistent_model(self):
+        "The current group model must point to an installed model"
+        msg = (
+            "AUTH_GROUP_MODEL refers to model 'thismodel.doesntexist' "
+            "that has not been installed"
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            get_group_model()
 
 
 class TestGetUser(TestCase):

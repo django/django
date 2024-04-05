@@ -307,6 +307,10 @@ class Command(BaseCommand):
                             leaf_migration.dependencies.append(
                                 ("__setting__", "AUTH_USER_MODEL")
                             )
+                        elif settings.AUTH_GROUP_MODEL == dependency.setting:
+                            leaf_migration.dependencies.append(
+                                ("__setting__", "AUTH_GROUP_MODEL")
+                            )
                         else:
                             leaf_migration.dependencies.append(dependency)
                     elif dependency[0] != migration.app_label:

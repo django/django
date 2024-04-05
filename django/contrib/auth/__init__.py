@@ -197,6 +197,20 @@ def get_user_model():
         )
 
 
+def get_group_model():
+    try:
+        return django_apps.get_model(settings.AUTH_GROUP_MODEL, require_ready=False)
+    except ValueError:
+        raise ImproperlyConfigured(
+            "AUTH_GROUP_MODEL must be of the form 'app_label.model_name'"
+        )
+    except LookupError:
+        raise ImproperlyConfigured(
+            "AUTH_GROUP_MODEL refers to model '%s' that has not been installed"
+            % settings.AUTH_GROUP_MODEL
+        )
+
+
 def get_user(request):
     """
     Return the user model instance associated with the given request session.

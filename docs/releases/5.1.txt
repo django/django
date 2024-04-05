@@ -63,6 +63,8 @@ Minor features
   accessibility of the
   :class:`~django.contrib.auth.forms.UserChangeForm`.
 
+* :class:`~django.contrib.auth.models.Group` is now swappable.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

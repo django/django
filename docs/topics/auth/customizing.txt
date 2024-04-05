@@ -1191,3 +1191,14 @@ Finally, specify the custom model as the default user model for your project
 using the :setting:`AUTH_USER_MODEL` setting in your ``settings.py``::
 
     AUTH_USER_MODEL = "customauth.MyUser"
+
+.. _auth-custom-group:
+
+Substituting a custom ``Group`` model
+=====================================
+
+Similar to the :class:`~django.contrib.auth.models.User` model,
+you can also override the :class:`~django.contrib.auth.models.Group` model
+by providing a value for the :setting:`AUTH_GROUP_MODEL` setting::
+
+    AUTH_GROUP_MODEL = "customauth.MyGroup"

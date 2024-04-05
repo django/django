@@ -1474,6 +1474,15 @@ class MigrateTests(MigrationTestBase):
             recorder.record_unapplied("migrations2", "0002_second")
             recorder.record_unapplied("migrations2", "0001_squashed_0002")
 
+    @override_settings(
+        INSTALLED_APPS=["django.contrib.auth", "django.contrib.contenttypes"],
+        MIGRATION_MODULES={"migrations": "django.contrib.auth.migrations"},
+    )
+    def test_no_changes_detected_in_auth(self):
+        out = io.StringIO()
+        call_command("makemigrations", "auth", dry_run=True, stdout=out, verbosity=2)
+        self.assertEqual("No changes detected in app 'auth'\n", out.getvalue())
+
 
 class MakeMigrationsTests(MigrationTestBase):
     """
