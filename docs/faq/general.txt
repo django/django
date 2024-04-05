@@ -85,13 +85,6 @@ Django includes code from the Python standard library. Python is distributed
 under a permissive open source license. :source:`A copy of the Python license
 <LICENSE.python>` is included with Django for compliance with Python's terms.
 
-Which sites use Django?
-=======================
-
-`DjangoSites.org`_ features a constantly growing list of Django-powered sites.
-
-.. _DjangoSites.org: https://djangosites.org
-
 .. _faq-mtv:
 
 Django appears to be a MVC framework, but you call the Controller the "view", and the View the "template". How come you don't use the standard names?
