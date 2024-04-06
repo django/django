@@ -1253,21 +1253,21 @@ class SQLCompiler:
 
         if restricted:
             related_fields = [
-                (o.field, o.related_model)
+                (o, o.field, o.related_model)
                 for o in opts.related_objects
                 if o.field.unique and not o.many_to_many
             ]
-            for related_field, model in related_fields:
-                related_select_mask = select_mask.get(related_field) or {}
+            for related_object, related_field, model in related_fields:
                 if not select_related_descend(
                     related_field,
                     restricted,
                     requested,
-                    related_select_mask,
+                    select_mask,
                     reverse=True,
                 ):
                     continue
 
+                related_select_mask = select_mask.get(related_object) or {}
                 related_field_name = related_field.related_query_name()
                 fields_found.add(related_field_name)
 

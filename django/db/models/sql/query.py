@@ -815,19 +815,17 @@ class Query(BaseExpression):
             if filtered_relation := self._filtered_relations.get(field_name):
                 relation = opts.get_field(filtered_relation.relation_name)
                 field_select_mask = select_mask.setdefault((field_name, relation), {})
-                field = relation.field
             else:
-                reverse_rel = opts.get_field(field_name)
+                relation = opts.get_field(field_name)
                 # While virtual fields such as many-to-many and generic foreign
                 # keys cannot be effectively deferred we've historically
                 # allowed them to be passed to QuerySet.defer(). Ignore such
                 # field references until a layer of validation at mask
                 # alteration time will be implemented eventually.
-                if not hasattr(reverse_rel, "field"):
+                if not hasattr(relation, "field"):
                     continue
-                field = reverse_rel.field
-                field_select_mask = select_mask.setdefault(field, {})
-            related_model = field.model._meta.concrete_model
+                field_select_mask = select_mask.setdefault(relation, {})
+            related_model = relation.related_model._meta.concrete_model
             self._get_defer_select_mask(
                 related_model._meta, field_mask, field_select_mask
             )
@@ -840,13 +838,7 @@ class Query(BaseExpression):
         # Only include fields mentioned in the mask.
         for field_name, field_mask in mask.items():
             field = opts.get_field(field_name)
-            # Retrieve the actual field associated with reverse relationships
-            # as that's what is expected in the select mask.
-            if field in opts.related_objects:
-                field_key = field.field
-            else:
-                field_key = field
-            field_select_mask = select_mask.setdefault(field_key, {})
+            field_select_mask = select_mask.setdefault(field, {})
             if field_mask:
                 if not field.is_relation:
                     raise FieldError(next(iter(field_mask)))
