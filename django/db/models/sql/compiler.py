@@ -1259,11 +1259,10 @@ class SQLCompiler:
             ]
             for related_object, related_field, model in related_fields:
                 if not select_related_descend(
-                    related_field,
+                    related_object,
                     restricted,
                     requested,
                     select_mask,
-                    reverse=True,
                 ):
                     continue
 
@@ -1280,7 +1279,7 @@ class SQLCompiler:
                     "model": model,
                     "field": related_field,
                     "reverse": True,
-                    "local_setter": related_field.remote_field.set_cached_value,
+                    "local_setter": related_object.set_cached_value,
                     "remote_setter": related_field.set_cached_value,
                     "from_parent": from_parent,
                 }
@@ -1296,7 +1295,7 @@ class SQLCompiler:
                     select_fields.append(len(select))
                     select.append((col, None))
                 klass_info["select_fields"] = select_fields
-                next = requested.get(related_field.related_query_name(), {})
+                next = requested.get(related_field_name, {})
                 next_klass_infos = self.get_related_selections(
                     select,
                     related_select_mask,

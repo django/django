@@ -340,38 +340,37 @@ class RegisterLookupMixin:
     _unregister_class_lookup = classmethod(_unregister_class_lookup)
 
 
-def select_related_descend(field, restricted, requested, select_mask, reverse=False):
+def select_related_descend(field, restricted, requested, select_mask):
     """
-    Return True if this field should be used to descend deeper for
-    select_related() purposes. Used by both the query construction code
-    (compiler.get_related_selections()) and the model instance creation code
-    (compiler.klass_info).
+    Return whether `field` should be used to descend deeper for
+    `select_related()` purposes.
 
     Arguments:
-     * field - the field to be checked
-     * restricted - a boolean field, indicating if the field list has been
-       manually restricted using a requested clause)
-     * requested - The select_related() dictionary.
-     * select_mask - the dictionary of selected fields.
-     * reverse - boolean, True if we are checking a reverse select related
+     * `field` - the field to be checked. Can be either a `Field` or
+       `ForeignObjectRel` instance.
+     * `restricted` - a boolean field, indicating if the field list has been
+       manually restricted using a select_related() clause.
+     * `requested` - the select_related() dictionary.
+     * `select_mask` - the dictionary of selected fields.
     """
+    # Only relationships can be descended.
     if not field.remote_field:
         return False
-    if field.remote_field.parent_link and not reverse:
+    # Forward MTI parent links should not be explicitly descended as they are
+    # always JOIN'ed against (unless excluded by `select_mask`).
+    if getattr(field.remote_field, "parent_link", False):
         return False
-    if restricted:
-        if reverse and field.related_query_name() not in requested:
-            return False
-        if not reverse and field.name not in requested:
-            return False
-    if not restricted and field.null:
+    # When `select_related()` is used without a `*requested` mask all
+    # relationships are descended unless they are nullable.
+    if not restricted:
+        return not field.null
+    # When `select_related(*requested)` is used only fields that are part of
+    # `requested` should be descended.
+    if field.name not in requested:
         return False
-    if (
-        restricted
-        and select_mask
-        and field.name in requested
-        and field not in select_mask
-    ):
+    # Prevent invalid usages of `select_related()` and `only()`/`defer()` such
+    # as `select_related("a").only("b")` and `select_related("a").defer("a")`.
+    if select_mask and field not in select_mask:
         raise FieldError(
             f"Field {field.model._meta.object_name}.{field.name} cannot be both "
             "deferred and traversed using select_related at the same time."
