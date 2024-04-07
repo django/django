@@ -31,6 +31,25 @@ and only officially support the latest release of each series.
 What's new in Django 5.2
 ========================
 
+Composite Primary Keys
+----------------------
+
+The new :class:`django.db.models.CompositePrimaryKey` allows tables to be
+created with a primary key consisting of multiple fields.
+
+To use a composite primary key, when creating a model set the ``pk`` field to
+be a ``CompositePrimaryKey``::
+
+    from django.db import models
+
+
+    class Release(models.Model):
+        pk = models.CompositePrimaryKey("version", "name")
+        version = models.IntegerField()
+        name = models.CharField(max_length=20)
+
+See :doc:`/topics/composite-primary-key` for more details.
+
 Minor features
 --------------
 
