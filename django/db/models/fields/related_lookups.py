@@ -1,5 +1,6 @@
 from django.db import NotSupportedError
 from django.db.models.expressions import ColPairs
+from django.db.models.fields import composite
 from django.db.models.fields.tuple_lookups import TupleIn, tuple_lookups
 from django.db.models.lookups import (
     Exact,
@@ -19,7 +20,7 @@ def get_normalized_value(value, lhs):
         if not value._is_pk_set():
             raise ValueError("Model instances passed to related filters must be saved.")
         value_list = []
-        sources = lhs.output_field.path_infos[-1].target_fields
+        sources = composite.unnest(lhs.output_field.path_infos[-1].target_fields)
         for source in sources:
             while not isinstance(value, source.model) and source.remote_field:
                 source = source.remote_field.model._meta.get_field(
@@ -30,7 +31,8 @@ def get_normalized_value(value, lhs):
             except AttributeError:
                 # A case like Restaurant.objects.filter(place=restaurant_instance),
                 # where place is a OneToOneField and the primary key of Restaurant.
-                return (value.pk,)
+                pk = value.pk
+                return pk if isinstance(pk, tuple) else (pk,)
         return tuple(value_list)
     if not isinstance(value, tuple):
         return (value,)
@@ -74,10 +76,6 @@ class RelatedIn(In):
 
     def as_sql(self, compiler, connection):
         if isinstance(self.lhs, ColPairs):
-            # For multicolumn lookups we need to build a multicolumn where clause.
-            # This clause is either a SubqueryConstraint (for values that need
-            # to be compiled to SQL) or an OR-combined list of
-            # (col1 = val1 AND col2 = val2 AND ...) clauses.
             from django.db.models.sql.where import SubqueryConstraint
 
             if self.rhs_is_direct_value():

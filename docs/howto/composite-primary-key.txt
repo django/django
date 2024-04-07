@@ -1,0 +1,146 @@
+=====================================
+How to define a composite primary key
+=====================================
+
+.. versionadded:: 5.2
+
+In Django, each model has a primary key. By default, this primary key consists
+of a single field.
+
+In most cases, a single primary key should suffice. In database design,
+however, defining a primary key consisting of multiple fields is sometimes
+necessary.
+
+To define a composite primary key, set the model's ``pk`` to an instance of
+``CompositePrimaryKey``:
+
+.. code-block:: pycon
+
+    class Product(models.Model):
+        name = models.CharField(max_length=100)
+
+    class Order(models.Model):
+        reference = models.CharField(max_length=20, primary_key=True)
+
+    class OrderLineItem(models.Model):
+        pk = models.CompositePrimaryKey("product_id", "order_id")
+        product = models.ForeignKey(Product, on_delete=models.CASCADE)
+        order = models.ForeignKey(Order, on_delete=models.CASCADE)
+        quantity = models.IntegerField()
+
+This will instruct Django to create a composite primary key
+(``PRIMARY KEY (product_id, order_id)``) when creating the table.
+
+Composite primary keys are represented with ``tuple``\s:
+
+.. code-block:: pycon
+
+    >>> product = Product.objects.create(name="apple")
+    >>> order = Order.objects.create(reference="A755H")
+    >>> item = OrderLineItem.objects.create(product=product, order=order, quantity=1)
+    >>> item.pk
+    (1, "A755H")
+
+You can assign a ``tuple`` to a composite primary key. This sets the associated
+field values.
+
+.. code-block:: pycon
+
+    >>> item = OrderLineItem(pk=(2, "B142C"))
+    >>> item.pk
+    (2, "B142C")
+    >>> item.product_id
+    2
+    >>> item.order_id
+    "B142C"
+
+Or filter composite ``pk``\s by ``tuple``\s:
+
+.. code-block:: pycon
+
+    >>> OrderLineItem.objects.filter(pk=(1, "A755H")).count()
+    1
+
+Migrating to a composite primary key
+====================================
+
+Django doesn't support migrating to, or from, a composite primary key after the
+table is created.
+
+If you would like to migrate an existing table from a single primary key to a
+composite primary key, follow your database backend's instructions to do so.
+
+Once the composite primary key is in place, add the ``CompositePrimaryKey``
+field to your model. This allows Django to recognize and handle the composite
+primary key appropriately.
+
+While migration operations (e.g. ``AddField``, ``AlterField``) on
+primary key fields are not supported, ``makemigrations`` will still detect
+changes.
+
+In order to avoid errors, it's recommended to apply such migrations with
+``--fake``.
+
+Alternatively, :class:`.SeparateDatabaseAndState` may be used to execute
+the backend-specific migrations and Django-generated migrations in
+a single operation.
+
+Composite primary keys and relations
+====================================
+
+:ref:`Relationship fields <relationship-fields>`, including
+:ref:`generic relations <generic-relations>` do not support composite primary
+keys.
+
+For example, given the ``OrderLineItem`` model, we cannot do:
+
+.. code-block:: pycon
+
+    class Foo(models.Model):
+        item = models.ForeignKey(OrderLineItem, on_delete=models.CASCADE)
+
+Because ``ForeignKey`` currently cannot reference models with composite primary
+keys.
+
+To work around this limitation, ``ForeignObject`` can be used as an
+alternative:
+
+.. code-block:: pycon
+
+    class Foo(models.Model):
+        item_order_id = models.IntegerField()
+        item_product_id = models.CharField(max_length=20)
+        item = models.ForeignObject(
+            OrderLineItem,
+            on_delete=models.CASCADE,
+            from_fields=("item_order_id", "item_product_id"),
+            to_fields=("order_id", "product_id"),
+        )
+
+``ForeignObject`` is much like ``ForeignKey``, except that it doesn't create
+any columns (e.g. ``item_id``), foreign key constraints or indexes in the
+database.
+
+.. warning::
+
+    ``ForeignObject`` is an internal API. Use it at your own risk.
+
+Composite primary keys and database functions
+=============================================
+
+Many database functions only accept a single field.
+
+.. code-block:: sql
+
+    COUNT("order_id")  -- OK
+    COUNT("product_id", "order_id")  -- ERROR
+
+These database functions cannot be used with composite primary keys, as
+composite primary keys are a proxy to multiple fields.
+
+.. code-block:: pycon
+
+    Count("order_id")  -- OK
+    Count("pk")  -- ERROR
+    Count("foo_set__id")  -- OK
+    Count("foo_set")  -- ERROR

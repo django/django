@@ -84,6 +84,7 @@ from .models import (
     FieldOverridePost,
     FilteredManager,
     FooAccount,
+    FooBarCompositePK,
     FoodDelivery,
     FunkyTag,
     Gallery,
@@ -4048,6 +4049,72 @@ class AdminViewStringPrimaryKeyTest(TestCase):
 
         self.assertEqual(response.status_code, 302)  # temporary redirect
         self.assertIn("/123_2Fhistory/", response.headers["location"])  # PK is quoted
+
+
+@override_settings(ROOT_URLCONF="admin_views.urls")
+class AdminViewCompositePKTests(TestCase):
+    FOOBAR = "foobarcompositepk"
+    CHANGE_VIEW = "admin:admin_views_%s_change"
+    HISTORY_VIEW = "admin:admin_views_%s_history"
+    DELETE_VIEW = "admin:admin_views_%s_delete"
+    CHANGELIST_VIEW = "admin:admin_views_%s_changelist"
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.foobar = FooBarCompositePK.objects.create(
+            foo="f,o,o", bar="b-a-r", title="a"
+        )
+        cls.foobar_ct = ContentType.objects.get_for_model(FooBarCompositePK)
+        cls.superuser = User.objects.create_superuser(
+            username="super", password="secret", email="super@example.com"
+        )
+
+    def setUp(self):
+        self.client.force_login(self.superuser)
+
+    def test_foobar_history_view(self):
+        viewname = self.HISTORY_VIEW % (self.FOOBAR,)
+        url = reverse(viewname, args=(quote(self.foobar.pk),))
+        response = self.client.get(url)
+        self.assertContains(response, escape(self.foobar.pk))
+
+    def test_foobar_history_view_redirects_if_does_not_exist(self):
+        viewname = self.HISTORY_VIEW % (self.FOOBAR,)
+        url = reverse(viewname, args=("1,2,3",))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+
+    def test_foobar_change_view(self):
+        viewname = self.CHANGE_VIEW % (self.FOOBAR,)
+        url = reverse(viewname, args=(quote(self.foobar.pk),))
+        response = self.client.get(url)
+        self.assertContains(response, escape(self.foobar.pk))
+
+        response = self.client.post(
+            url, {"foo": self.foobar.foo, "bar": self.foobar.bar, "title": "b"}
+        )
+        self.assertRedirects(response, reverse(self.CHANGELIST_VIEW % (self.FOOBAR,)))
+        self.assertEqual(
+            LogEntry.objects.filter(content_type=self.foobar_ct).count(), 0
+        )
+
+    def test_foobar_change_view_redirects_if_does_not_exist(self):
+        viewname = self.CHANGE_VIEW % (self.FOOBAR,)
+        url = reverse(viewname, args=("f,o,o",))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+
+    def test_foobar_delete_view(self):
+        viewname = self.DELETE_VIEW % (self.FOOBAR,)
+        url = reverse(viewname, args=(quote(self.foobar.pk),))
+        response = self.client.get(url)
+        self.assertContains(response, escape(self.foobar.pk))
+
+    def test_foobar_delete_view_redirects_if_does_not_exist(self):
+        viewname = self.DELETE_VIEW % (self.FOOBAR,)
+        url = reverse(viewname, args=("1,2",))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
 
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
