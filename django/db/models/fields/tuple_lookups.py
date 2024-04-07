@@ -250,6 +250,8 @@ class TupleIn(TupleLookupMixin, In):
 
     def check_rhs_select_length_equals_lhs_length(self):
         len_rhs = len(self.rhs.select)
+        if len_rhs == 1 and isinstance(self.rhs.select[0], ColPairs):
+            len_rhs = len(self.rhs.select[0])
         len_lhs = len(self.lhs)
         if len_rhs != len_lhs:
             lhs_str = self.get_lhs_str()
@@ -304,7 +306,13 @@ class TupleIn(TupleLookupMixin, In):
         return root.as_sql(compiler, connection)
 
     def as_subquery(self, compiler, connection):
-        return compiler.compile(In(self.lhs, self.rhs))
+        lhs = self.lhs
+        rhs = self.rhs
+        if isinstance(lhs, ColPairs):
+            rhs = rhs.clone()
+            rhs.set_values([source.name for source in lhs.sources])
+            lhs = Tuple(lhs)
+        return compiler.compile(In(lhs, rhs))
 
 
 tuple_lookups = {

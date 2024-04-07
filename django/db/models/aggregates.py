@@ -3,7 +3,8 @@ Classes to represent the definitions of aggregate functions.
 """
 
 from django.core.exceptions import FieldError, FullResultSet
-from django.db.models.expressions import Case, Func, Star, Value, When
+from django.db import NotSupportedError
+from django.db.models.expressions import Case, ColPairs, Func, Star, Value, When
 from django.db.models.fields import IntegerField
 from django.db.models.functions.comparison import Coalesce
 from django.db.models.functions.mixins import (
@@ -173,6 +174,22 @@ class Count(Aggregate):
         if isinstance(expression, Star) and filter is not None:
             raise ValueError("Star cannot be used with filter. Please specify a field.")
         super().__init__(expression, filter=filter, **extra)
+
+    def resolve_expression(self, *args, **kwargs):
+        result = super().resolve_expression(*args, **kwargs)
+        expr = result.source_expressions[0]
+
+        # In case of composite primary keys, count the first column.
+        if isinstance(expr, ColPairs):
+            if self.distinct:
+                raise NotSupportedError(
+                    "COUNT(DISTINCT) doesn't support composite primary keys"
+                )
+
+            cols = expr.get_cols()
+            return Count(cols[0], filter=result.filter)
+
+        return result
 
 
 class Max(Aggregate):
