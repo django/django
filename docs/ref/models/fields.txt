@@ -700,6 +700,15 @@ or :class:`~django.forms.NullBooleanSelect` if :attr:`null=True <Field.null>`.
 The default value of ``BooleanField`` is ``None`` when :attr:`Field.default`
 isn't defined.
 
+``CompositePrimaryKey``
+-----------------------
+
+.. class:: CompositePrimaryKey(*field_names, **options)
+
+A virtual field used for defining a composite primary key.
+
+See :doc:`/howto/composite-primary-key` for usage details.
+
 ``CharField``
 -------------
 

@@ -1,0 +1,114 @@
+=====================================
+How to define a composite primary key
+=====================================
+
+In Django, each model has a primary key.
+By default, this primary key consists of a single field.
+
+In most cases, a single-field primary key should suffice.
+In database design, however, defining a primary key that consists of multiple
+fields is sometimes necessary.
+
+To define a composite primary key, add the ``models.CompositePrimaryKey``
+field to your model:
+
+.. code-block:: pycon
+
+    class Tenant(models.Model):
+        pass
+
+    class User(models.Model):
+        pk = models.CompositePrimaryKey("tenant_id", "id")
+        tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE)
+        id = models.IntegerField()
+
+This will instruct Django to create a composite ``PRIMARY KEY`` constraint
+instead of a single-field primary key.
+
+It's possible to define a composite primary key consisting of a single field.
+This is practically the same as setting ``primary_key=True`` on the field.
+
+.. code-block:: pycon
+
+    class Model(models.Model):
+        pk = models.CompositePrimaryKey("id")
+        id = models.IntegerField()
+
+Migrating to a composite primary key
+====================================
+
+As of now, Django doesn't offer built-in support for the migration of primary
+keys.
+
+This means once a table is created, its primary key cannot be changed via
+Django's migration operations.
+
+If you would like to migrate an existing table from a single primary key to a
+composite primary key, follow your database backend's instructions to do so.
+
+Once the composite primary key is in place, add the ``CompositePrimaryKey``
+field to your model. This allows Django to recognize and handle the composite
+primary key appropriately.
+
+.. note::
+
+    While migration operations (e.g. ``AddField``, ``AlterField``) on
+    primary key fields are not supported, ``makemigrations`` will still detect
+    changes.
+
+    In order to avoid errors, it's recommended to apply such migrations with
+    ``--fake``.
+
+How to define a composite foreign key
+=====================================
+
+At the moment, ``ForeignKey`` doesn't support composite primary keys.
+For the time being, the ``ForeignObject`` field can be used as an alternative:
+
+.. code-block:: pycon
+
+    class Comment(models.Model):
+        pk = models.CompositePrimaryKey("tenant_id", "id")
+        tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE)
+        id = models.IntegerField()
+        user_id = models.IntegerField()
+        user = models.ForeignObject(
+            User,
+            on_delete=models.CASCADE,
+            from_fields=("tenant_id", "user_id"),
+            to_fields=("tenant_id", "id"),
+        )
+
+.. warning::
+
+    ``ForeignObject`` is an internal API. The work to provide a public API for
+    composite foreign keys is still under progress. Use it at your own risk.
+
+Composite primary keys and generic relations
+============================================
+
+The composite primary key feature is still in its infancy, it doesn't
+support generic relations yet.
+
+The work to add composite primary key support to generic relations
+hasn't started yet.
+
+Composite primary keys and database functions
+=============================================
+
+The database functions may not work with composite primary keys.
+
+This is because most database functions accept a single field only.
+
+.. code-block:: sql
+
+    COUNT("id")  -- ✓ OK
+    COUNT("tenant_id", "id")  -- 𐄂 ERROR
+
+So, unless the database function accepts multiple fields, don't
+use it with a composite primary key directly.
+
+.. code-block:: pycon
+
+    Count("comment_set__id")  -- ✓ OK
+    Count("comment_set")  -- 𐄂 ERROR

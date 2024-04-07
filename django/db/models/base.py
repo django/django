@@ -30,6 +30,7 @@ from django.db.models import NOT_PROVIDED, ExpressionWrapper, IntegerField, Max,
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import CASCADE, Collector
 from django.db.models.expressions import DatabaseDefault
+from django.db.models.fields.composite import CompositePrimaryKey
 from django.db.models.fields.related import (
     ForeignObjectRel,
     OneToOneField,
@@ -508,7 +509,12 @@ class Model(AltersData, metaclass=ModelBase):
         for field in fields_iter:
             is_related_object = False
             # Virtual field
-            if field.attname not in kwargs and field.column is None or field.generated:
+            if (
+                field.attname not in kwargs
+                and field.column is None
+                or field.generated
+                or isinstance(field, CompositePrimaryKey)
+            ):
                 continue
             if kwargs:
                 if isinstance(field.remote_field, ForeignObjectRel):
@@ -1098,7 +1104,7 @@ class Model(AltersData, metaclass=ModelBase):
         if pk_val is None:
             pk_val = meta.pk.get_pk_value_on_save(self)
             setattr(self, meta.pk.attname, pk_val)
-        pk_set = pk_val is not None
+        pk_set = meta.pk.is_set(pk_val)
         if not pk_set and (force_update or update_fields):
             raise ValueError("Cannot force an update in save() with no primary key.")
         updated = False
@@ -1431,6 +1437,11 @@ class Model(AltersData, metaclass=ModelBase):
                 name = f.name
                 if name in exclude:
                     continue
+                if isinstance(f, CompositePrimaryKey):
+                    names = tuple(field.name for field in f.fields)
+                    if all(name not in exclude for name in names):
+                        unique_checks.append((model_class, names))
+                    continue
                 if f.unique:
                     unique_checks.append((model_class, (name,)))
                 if f.unique_for_date and f.unique_for_date not in exclude:
@@ -1705,6 +1716,7 @@ class Model(AltersData, metaclass=ModelBase):
                 *cls._check_constraints(databases),
                 *cls._check_default_pk(),
                 *cls._check_db_table_comment(databases),
+                *cls._check_composite_pk(),
             ]
 
         return errors
@@ -1740,6 +1752,49 @@ class Model(AltersData, metaclass=ModelBase):
                 ),
             ]
         return []
+
+    @classmethod
+    def _check_composite_pk(cls):
+        errors = []
+        meta = cls._meta
+        pk = meta.pk
+
+        if not isinstance(pk, CompositePrimaryKey):
+            return errors
+
+        seen_columns = {}
+
+        for field_name in pk.field_names:
+            hint = None
+
+            try:
+                field = meta.get_field(field_name)
+            except FieldDoesNotExist:
+                field = None
+
+            if not field:
+                hint = "'%s' is not a valid field." % (field_name,)
+            elif not field.column:
+                hint = "'%s' field has no column." % (field_name,)
+            elif field.null:
+                hint = "'%s' field may not set 'null=True'." % (field_name,)
+            else:
+                if alias := seen_columns.get(field.column):
+                    hint = "'%s' is an alias of '%s'." % (field_name, alias)
+                seen_columns[field.column] = field_name
+
+            if hint:
+                errors.append(
+                    checks.Error(
+                        "'%s' cannot be included in the composite primary key."
+                        % (field_name,),
+                        hint=hint,
+                        obj=cls,
+                        id="models.E042",
+                    )
+                )
+
+        return errors
 
     @classmethod
     def _check_db_table_comment(cls, databases):

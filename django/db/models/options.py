@@ -8,6 +8,7 @@ from django.core.exceptions import FieldDoesNotExist, ImproperlyConfigured
 from django.core.signals import setting_changed
 from django.db import connections
 from django.db.models import AutoField, Manager, OrderWrt, UniqueConstraint
+from django.db.models.fields.composite import unnest_composite_fields
 from django.db.models.query_utils import PathInfo
 from django.utils.datastructures import ImmutableList, OrderedSet
 from django.utils.functional import cached_property
@@ -972,6 +973,10 @@ class Options:
                 and not constraint.contains_expressions
             )
         ]
+
+    @cached_property
+    def pk_fields(self):
+        return unnest_composite_fields([self.pk])
 
     @cached_property
     def _property_names(self):

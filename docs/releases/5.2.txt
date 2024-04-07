@@ -31,6 +31,16 @@ and only officially support the latest release of each series.
 What's new in Django 5.2
 ========================
 
+Composite Primary Keys
+----------------------
+
+Django 5.2 introduces composite primary key support.
+
+The new :class:`django.db.models.CompositePrimaryKey` class enables developers
+to create composite primary keys directly in Django.
+
+See :doc:`/howto/composite-primary-key` for usage details.
+
 Minor features
 --------------
 

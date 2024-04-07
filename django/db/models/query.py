@@ -793,8 +793,12 @@ class QuerySet(AltersData):
         fields = [f for f in opts.concrete_fields if not f.generated]
         objs = list(objs)
         self._prepare_for_bulk_create(objs)
+
+        def is_pk_set(obj):
+            return opts.pk.is_set(obj.pk)
+
         with transaction.atomic(using=self.db, savepoint=False):
-            objs_with_pk, objs_without_pk = partition(lambda o: o.pk is None, objs)
+            objs_without_pk, objs_with_pk = partition(is_pk_set, objs)
             if objs_with_pk:
                 returned_columns = self._batched_insert(
                     objs_with_pk,
