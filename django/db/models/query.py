@@ -171,11 +171,14 @@ class RawModelIterable(BaseIterable):
                     "Raw query must include the primary key"
                 )
             fields = [self.queryset.model_fields.get(c) for c in self.queryset.columns]
-            converters = compiler.get_converters(
-                [f.get_col(f.model._meta.db_table) if f else None for f in fields]
-            )
+            cols = [f.get_col(f.model._meta.db_table) if f else None for f in fields]
+            converters = compiler.get_converters(cols)
             if converters:
                 query_iterator = compiler.apply_converters(query_iterator, converters)
+            if compiler.has_composite_fields(cols):
+                query_iterator = compiler.composite_fields_to_tuples(
+                    query_iterator, cols
+                )
             for values in query_iterator:
                 # Associate fields to values
                 model_init_values = [values[pos] for pos in model_init_pos]
