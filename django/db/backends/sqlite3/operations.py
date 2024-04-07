@@ -8,12 +8,15 @@ from django.conf import settings
 from django.core.exceptions import FieldError
 from django.db import DatabaseError, NotSupportedError, models
 from django.db.backends.base.operations import BaseDatabaseOperations
+from django.db.models import DateTimeField, JSONField, UUIDField
 from django.db.models.constants import OnConflict
-from django.db.models.expressions import Col
+from django.db.models.expressions import Col, Func, Value
+from django.db.models.functions import Cast
 from django.utils import timezone
 from django.utils.dateparse import parse_date, parse_datetime, parse_time
 from django.utils.functional import cached_property
 
+from ...models.fields.json import KeyTextTransform
 from .base import Database
 
 
@@ -431,3 +434,24 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def force_group_by(self):
         return ["GROUP BY TRUE"] if Database.sqlite_version_info < (3, 39) else []
+
+    def prepare_join_composite_pk_on_json_array(self, lhs, rhs, index):
+        json_array = Cast(rhs, JSONField())
+        json_element = KeyTextTransform(index, json_array)
+
+        if isinstance(lhs.field, UUIDField):
+            json_element = Func(
+                json_element,
+                Value("-"),
+                Value(""),
+                function="REPLACE",
+                output_field=UUIDField(),
+            )
+        if json_element.field != lhs.field:
+            json_element = Cast(json_element, lhs.field)
+        if isinstance(lhs.field, DateTimeField):
+            # If joining DateTimeField in SQLite,
+            # make sure strftime is applied to the left side as well.
+            lhs = Cast(lhs, DateTimeField())
+
+        return lhs, json_element
