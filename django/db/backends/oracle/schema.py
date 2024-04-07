@@ -211,6 +211,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         return create_index
 
     def _is_identity_column(self, table_name, column_name):
+        if not column_name:
+            return False
         with self.connection.cursor() as cursor:
             cursor.execute(
                 """

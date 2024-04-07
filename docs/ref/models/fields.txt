@@ -707,6 +707,23 @@ or :class:`~django.forms.NullBooleanSelect` if :attr:`null=True <Field.null>`.
 The default value of ``BooleanField`` is ``None`` when :attr:`Field.default`
 isn't defined.
 
+``CompositePrimaryKey``
+-----------------------
+
+.. versionadded:: 5.2
+
+.. class:: CompositePrimaryKey(*field_names, **options)
+
+A virtual field used for defining a composite primary key.
+
+This field must be defined as the model's ``pk`` field. If present, Django will
+create the underlying model table with a composite primary key.
+
+The ``*field_names`` argument is a list of positional field names that compose
+the primary key.
+
+See :doc:`/topics/composite-primary-key` for more details.
+
 ``CharField``
 -------------
 
@@ -1614,6 +1631,8 @@ not an instance of ``UUID``.
     :lookup:`iendswith` lookups on PostgreSQL don't work for values without
     hyphens, because PostgreSQL and MariaDB 10.7+ store them in a hyphenated
     uuid datatype type.
+
+.. _relationship-fields:
 
 Relationship fields
 ===================
