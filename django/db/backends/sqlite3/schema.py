@@ -6,7 +6,7 @@ from django.db import NotSupportedError
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.backends.ddl_references import Statement
 from django.db.backends.utils import strip_quotes
-from django.db.models import NOT_PROVIDED, UniqueConstraint
+from django.db.models import NOT_PROVIDED, CompositePrimaryKey, UniqueConstraint
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
@@ -104,6 +104,13 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             f.name: f.clone() if is_self_referential(f) else f
             for f in model._meta.local_concrete_fields
         }
+
+        # Since CompositePrimaryKey is not a concrete field (column is None),
+        # it's not copied by default.
+        pk = model._meta.pk
+        if isinstance(pk, CompositePrimaryKey):
+            body[pk.name] = pk.clone()
+
         # Since mapping might mix column names and default values,
         # its values must be already quoted.
         mapping = {
@@ -296,6 +303,12 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Special-case implicit M2M tables.
         if field.many_to_many and field.remote_field.through._meta.auto_created:
             self.create_model(field.remote_field.through)
+        elif isinstance(field, CompositePrimaryKey):
+            # If a CompositePrimaryKey field was added, the existing primary key field
+            # had to be altered too, resulting in an AddField, AlterField migration.
+            # The table cannot be re-created on AddField, it would result in a
+            # duplicate primary key error.
+            return
         elif (
             # Primary keys and unique fields are not supported in ALTER TABLE
             # ADD COLUMN.

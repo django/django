@@ -64,6 +64,8 @@ from .models import (
     FieldOverridePost,
     FilteredManager,
     FooAccount,
+    FooBarCompositePK,
+    FooCompositePK,
     FoodDelivery,
     FunkyTag,
     Gadget,
@@ -1199,6 +1201,8 @@ site.register(
     search_fields=["name"],
 )
 site.register(ModelWithStringPrimaryKey)
+site.register(FooBarCompositePK)
+site.register(FooCompositePK)
 site.register(Color)
 site.register(Thing, ThingAdmin)
 site.register(Actor)
