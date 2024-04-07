@@ -12,6 +12,7 @@ from django.db.backends.postgresql.psycopg_any import (
 )
 from django.db.backends.utils import split_tzname_delta
 from django.db.models.constants import OnConflict
+from django.db.models.fields.json import JSONField, KeyTextTransform
 from django.db.models.functions import Cast
 from django.utils.regex_helper import _lazy_re_compile
 
@@ -413,3 +414,13 @@ class DatabaseOperations(BaseDatabaseOperations):
             rhs_expr = Cast(rhs_expr, lhs_field)
 
         return lhs_expr, rhs_expr
+
+    def prepare_join_composite_pk_on_json_array(self, lhs, rhs, index):
+        # e.g. `a`.`id` = ((`b`.`object_id`)::jsonb ->> 0)::integer
+        json_array = Cast(rhs, JSONField())
+        json_element = KeyTextTransform(index, json_array)
+
+        if json_element.field != lhs.field:
+            json_element = Cast(json_element, lhs.field)
+
+        return lhs, json_element

@@ -804,3 +804,9 @@ class BaseDatabaseOperations:
         rhs_expr = Col(rhs_table, rhs_field)
 
         return lhs_expr, rhs_expr
+
+    def prepare_join_composite_pk_on_json_array(self, lhs, rhs, index):
+        raise NotImplementedError(
+            "subclasses of BaseDatabaseOperations may require a "
+            "prepare_join_composite_pk_on_json_array() method"
+        )
