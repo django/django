@@ -993,12 +993,16 @@ class Model(AltersData, metaclass=ModelBase):
         for a single table.
         """
         meta = cls._meta
-        non_pks = [f for f in meta.local_concrete_fields if not f.primary_key]
+        non_pks_non_generated = [
+            f
+            for f in meta.local_concrete_fields
+            if not f.primary_key and not f.generated
+        ]
 
         if update_fields:
-            non_pks = [
+            non_pks_non_generated = [
                 f
-                for f in non_pks
+                for f in non_pks_non_generated
                 if f.name in update_fields or f.attname in update_fields
             ]
 
@@ -1030,7 +1034,7 @@ class Model(AltersData, metaclass=ModelBase):
                     None,
                     (getattr(self, f.attname) if raw else f.pre_save(self, False)),
                 )
-                for f in non_pks
+                for f in non_pks_non_generated
             ]
             forced_update = update_fields or force_update
             updated = self._do_update(
