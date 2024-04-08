@@ -207,6 +207,12 @@ class GeneratedFieldTestMixin:
         m.refresh_from_db()
         self.assertEqual(m.field, 8)
 
+    def test_save_model_with_pk(self):
+        m = self.base_model(pk=1, a=1, b=2)
+        m.save()
+        m = self._refresh_if_needed(m)
+        self.assertEqual(m.field, 3)
+
     def test_save_model_with_foreign_key(self):
         fk_object = Foo.objects.create(a="abc", d=Decimal("12.34"))
         m = self.base_model(a=1, b=2, fk=fk_object)
