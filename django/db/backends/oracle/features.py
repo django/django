@@ -116,6 +116,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                 "expressions_window.tests.WindowFunctionTests."
                 "test_row_number_no_ordering",
             },
+            "Oracle doesn't support changing collations on indexed columns (#33671).": {
+                "migrations.test_operations.OperationTests."
+                "test_alter_field_pk_fk_db_collation",
+            },
             "Oracle doesn't support comparing NCLOB to NUMBER.": {
                 "generic_relations_regress.tests.GenericRelationTests."
                 "test_textlink_filter",
