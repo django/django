@@ -2219,7 +2219,7 @@ prepared to handle the exception if you are using manual primary keys.
 
 *Asynchronous version*: ``aget_or_create()``
 
-A convenience method for looking up an object with the given ``kwargs`` (may be
+A convenient method for looking up an object with the given ``kwargs`` (it may be
 empty if your model has defaults for all fields), creating one if necessary.
 
 Returns a tuple of ``(object, created)``, where ``object`` is the retrieved or
@@ -2261,7 +2261,7 @@ found, ``get_or_create()`` returns a tuple of that object and ``False``.
 You can specify more complex conditions for the retrieved object by chaining
 ``get_or_create()`` with ``filter()`` and using :class:`Q objects
 <django.db.models.Q>`. For example, to retrieve Robert or Bob Marley if either
-exists, and create the latter otherwise::
+exists or create the latter otherwise::
 
     from django.db.models import Q
 
@@ -2294,8 +2294,8 @@ If you have a field named ``defaults`` and want to use it as an exact lookup in
 
     Foo.objects.get_or_create(defaults__exact="bar", defaults={"defaults": "baz"})
 
-The ``get_or_create()`` method has similar error behavior to :meth:`create()`
-when you're using manually specified primary keys. If an object needs to be
+The ``get_or_create()`` method has a similar error behavior to :meth:`create()`
+when using manually specified primary keys. If an object needs to be
 created and the key already exists in the database, an
 :exc:`~django.db.IntegrityError` will be raised.
 
@@ -2308,7 +2308,7 @@ whenever a request to a page has a side effect on your data. For more, see
 .. warning::
 
   You can use ``get_or_create()`` through :class:`~django.db.models.ManyToManyField`
-  attributes and reverse relations. In that case you will restrict the queries
+  attributes and reverse relations. In that case, you will restrict the queries
   inside the context of that relation. That could lead you to some integrity
   problems if you don't use it consistently.
 
