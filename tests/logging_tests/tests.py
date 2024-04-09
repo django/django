@@ -1,6 +1,7 @@
 import logging
 from contextlib import contextmanager
 from io import StringIO
+from unittest import mock
 
 from admin_scripts.tests import AdminScriptTestCase
 
@@ -482,7 +483,12 @@ class AdminEmailHandlerTest(SimpleTestCase):
             None,
             None,
         )
-        handler.emit(record)
+        with mock.patch.object(
+            handler,
+            "format_subject",
+            side_effect=AssertionError("Should not be called"),
+        ):
+            handler.emit(record)
         self.assertEqual(len(mail.outbox), 0)
 
 
