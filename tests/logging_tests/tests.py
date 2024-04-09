@@ -470,6 +470,21 @@ class AdminEmailHandlerTest(SimpleTestCase):
         self.assertIn('<div id="traceback">', body_html)
         self.assertNotIn("<form", body_html)
 
+    @override_settings(ADMINS=[])
+    def test_emit_no_admins(self):
+        handler = AdminEmailHandler()
+        record = self.logger.makeRecord(
+            "name",
+            logging.ERROR,
+            "function",
+            "lno",
+            "message",
+            None,
+            None,
+        )
+        handler.emit(record)
+        self.assertEqual(len(mail.outbox), 0)
+
 
 class SettingsConfigTest(AdminScriptTestCase):
     """
