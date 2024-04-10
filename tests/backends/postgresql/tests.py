@@ -241,7 +241,7 @@ class Tests(TestCase):
         new_connection.settings_dict["OPTIONS"]["pool"] = {
             "min_size": 0,
             "max_size": 2,
-            "timeout": 0.1,
+            "timeout": 5,
         }
         self.assertIsNotNone(new_connection.pool)
 
