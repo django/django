@@ -84,6 +84,19 @@ You'll need a few things before getting started:
        username = __token__
        password = # A project token.
 
+* Access to Django's project on `Transifex
+  <https://app.transifex.com/django/django/>`_, with a Manager role. Generate
+  an API Token in the `user setting section
+  <https://app.transifex.com/user/settings/api/>`_ and set up your
+  ``$HOME/.transifexrc`` file like this:
+
+  .. code-block:: ini
+     :caption: ``~/.transifexrc``
+
+     [https://www.transifex.com]
+       rest_hostname = https://rest.api.transifex.com
+       token = # API token
+
 * Access to the ``djangoproject.com`` server to upload files.
 
 * Access to the admin on ``djangoproject.com`` as a "Site maintainer".
@@ -129,18 +142,43 @@ any time leading up to the actual release:
 #. Double-check that the release notes index has a link to the notes
    for the new release; this will be in ``docs/releases/index.txt``.
 
-#. If this is a feature release, ensure translations from Transifex have been
-   integrated. This is typically done by a separate translation's manager
-   rather than the releaser, but here are the steps. Provided you have an
-   account on Transifex:
+#. If this is a :term:`feature release`, ensure translations from Transifex
+   have been integrated. This is typically done by a separate translation's
+   manager rather than the releaser, but here are the steps. This process is a
+   bit lengthy so be sure to set aside 4-10 hours to do this, and ideally plan
+   for this task one or two days ahead of the release day.
+
+   In addition to having a configured Transifex account, the
+   `tx CLI <https://developers.transifex.com/docs/cli>`_ should be available in
+   your ``PATH``. Then, you can fetch all the translations by running:
 
    .. code-block:: shell
 
         $ python scripts/manage_translations.py fetch
 
-   and then commit the changed/added files (both ``.po`` and ``.mo``).
-   Sometimes there are validation errors which need to be debugged, so avoid
-   doing this task immediately before a release is needed.
+   This command takes some time to run. When done, carefully inspect the output
+   for potential errors and/or warnings. If there are some, you will need to
+   debug and resolve them on a case by case basis.
+
+   The recently fetched translations need some manual adjusting. First of all,
+   the ``PO-Revision-Date`` values must be manually bumped to be later than
+   ``POT-Creation-Date``. You can use a command similar to this to bulk update
+   all the ``.po`` files (compare the diff against the relevant stable branch):
+
+   .. code-block:: shell
+
+        $ git diff --name-only stable/5.0.x | grep "\.po"  | xargs sed -ri "s/PO-Revision-Date: [0-9\-]+ /PO-Revision-Date: $(date -I) /g"
+
+   All the new ``.po`` files should be manually and carefully inspected to
+   avoid committing a change in a file without any new translations. Also,
+   there shouldn't be any changes in the "plural forms": if there are any
+   (usually Spanish and French report changes for this) those will need
+   reverting.
+
+   Lastly, commit the changed/added files (both ``.po`` and ``.mo``) and create
+   a new PR targeting the stable branch of the corresponding release (example
+   `PR updating translations for 4.2
+   <https://github.com/django/django/pull/16715>`_).
 
 #. :ref:`Update the django-admin manual page <django-admin-manpage>`:
 
@@ -404,9 +442,10 @@ Now you're ready to actually put the release out there. To do this:
 
    Create new ``DocumentRelease`` objects for each language that has an entry
    for the previous release. Update djangoproject.com's `robots.docs.txt`__
-   file by copying entries from ``manage_translations.py robots_txt`` from the
-   current stable branch in the ``django-docs-translations`` repository. For
-   example, when releasing Django 4.2:
+   file by copying the result generated from running the command
+   ``manage_translations.py robots_txt`` in the current stable branch from the
+   `django-docs-translations repository`__. For example, when releasing Django
+   4.2:
 
    .. code-block:: shell
 
@@ -415,6 +454,7 @@ Now you're ready to actually put the release out there. To do this:
         $ python manage_translations.py robots_txt
 
    __ https://github.com/django/djangoproject.com/blob/main/djangoproject/static/robots.docs.txt
+   __ https://github.com/django/django-docs-translations
 
 #. Post the release announcement to the |django-announce|, |django-developers|,
    |django-users| mailing lists, and the Django Forum. This should include a
@@ -447,9 +487,14 @@ You're almost done! All that's left to do now is:
 
    __ https://github.com/django/code.djangoproject.com/blob/main/trac-env/conf/trac.ini
 
-#. If it's a final release, update the current stable branch and remove the
-   pre-release branch in the `Django release process
-   <https://code.djangoproject.com/#Djangoreleaseprocess>`_ on Trac.
+#. If this was a final release:
+
+   #. Update the current stable branch and remove the pre-release branch in the
+      `Django release process
+      <https://code.djangoproject.com/#Djangoreleaseprocess>`_ on Trac.
+
+   #. Update djangoproject.com's download page (`example PR
+      <https://github.com/django/djangoproject.com/pull/1444>`__).
 
 #. If this was a security release, update :doc:`/releases/security` with
    details of the issues addressed.
@@ -466,7 +511,8 @@ need to be done by the releaser.
 #. Create a new ``DocumentRelease`` object in the ``docs.djangoproject.com``
    database for the new version's docs, and update the
    ``docs/fixtures/doc_releases.json`` JSON fixture, so people without access
-   to the production DB can still run an up-to-date copy of the docs site.
+   to the production DB can still run an up-to-date copy of the docs site
+   (`example PR <https://github.com/django/djangoproject.com/pull/1446>`__).
 
 #. Create a stub release note for the new feature version. Use the stub from
    the previous feature release version or copy the contents from the previous
