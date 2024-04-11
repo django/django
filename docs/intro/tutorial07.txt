@@ -199,7 +199,7 @@ Here's what it looks like at this point:
 By default, Django displays the ``str()`` of each object. But sometimes it'd be
 more helpful if we could display individual fields. To do that, use the
 :attr:`~django.contrib.admin.ModelAdmin.list_display` admin option, which is a
-tuple of field names to display, as columns, on the change list page for the
+list of field names to display, as columns, on the change list page for the
 object:
 
 .. code-block:: python
