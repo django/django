@@ -13,6 +13,6 @@ Bugfixes
   creating an instance of a model with a ``GeneratedField`` and providing a
   primary key (:ticket:`35350`).
 
-* Fixed a crash in Django 5.0 when validating email max line lengths with
-  content decoded using the ``surrogateescape`` error handling scheme,
-  particularly in Python versions 3.11.9+ and 3.12.3+ (:ticket:`35361`).
+* Fixed a compatibility issue encountered in Python 3.11.9+ and 3.12.3+ when
+  validating email max line lengths with content decoded using the
+  ``surrogateescape`` error handling scheme (:ticket:`35361`).
