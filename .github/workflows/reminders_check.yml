@@ -14,4 +14,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check reminders and notify users
-        uses: agrc/reminder-action@v1
+        uses: agrc/reminder-action@e59091b4e9705a6108120cb50823108df35b5392
