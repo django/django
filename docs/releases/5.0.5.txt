@@ -23,3 +23,7 @@ Bugfixes
 
 * Allowed importing ``aprefetch_related_objects`` from ``django.db.models``
   (:ticket:`35392`).
+
+* Fixed a bug in Django 5.0 that caused a migration crash when a
+  ``GeneratedField`` was added before any of the referenced fields from its
+  ``expression`` definition (:ticket:`35359`).
