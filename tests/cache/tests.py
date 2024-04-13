@@ -1811,6 +1811,14 @@ class RedisCacheTests(BaseCacheTests, TestCase):
             cache.incr("number")
             self.assertEqual(mocked_get_client.call_args.kwargs, {"write": True})
 
+    def test_incr_check_key(self):
+        with self.assertRaises(ValueError):
+            cache.incr("check_key")
+
+    def test_incr_not_check_key(self):
+        value = cache.incr("not_check_key", check_key=False)
+        self.assertEqual(value, 1)
+
     def test_cache_client_class(self):
         self.assertIs(cache._class, RedisCacheClient)
         self.assertIsInstance(cache._cache, RedisCacheClient)
