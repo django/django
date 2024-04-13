@@ -53,7 +53,7 @@ def render_flatpage(request, f):
     # If registration is required for accessing this page, and the user isn't
     # logged in, redirect to the login page.
     if f.registration_required and not request.user.is_authenticated:
-        from django.contrib.auth.views import redirect_to_login
+        from django.contrib.auth.utils import redirect_to_login
 
         return redirect_to_login(request.path)
     if f.template_name:

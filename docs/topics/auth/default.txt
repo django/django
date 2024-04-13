@@ -1595,7 +1595,7 @@ implementation details see :ref:`using-the-views`.
 Helper functions
 ----------------
 
-.. currentmodule:: django.contrib.auth.views
+.. currentmodule:: django.contrib.auth.utils
 
 .. function:: redirect_to_login(next, login_url=None, redirect_field_name='next')
 

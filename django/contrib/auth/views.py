@@ -1,5 +1,3 @@
-from urllib.parse import urlparse, urlunparse
-
 from django.conf import settings
 
 # Avoid shadowing the login() and logout() views below.
@@ -15,9 +13,12 @@ from django.contrib.auth.forms import (
     SetPasswordForm,
 )
 from django.contrib.auth.tokens import default_token_generator
+
+# For backwards compatibility with Django < 5.1
+from django.contrib.auth.utils import redirect_to_login  # NOQA: F401
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured, ValidationError
-from django.http import HttpResponseRedirect, QueryDict
+from django.http import HttpResponseRedirect
 from django.shortcuts import resolve_url
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
@@ -174,21 +175,6 @@ def logout_then_login(request, login_url=None):
     """
     login_url = resolve_url(login_url or settings.LOGIN_URL)
     return LogoutView.as_view(next_page=login_url)(request)
-
-
-def redirect_to_login(next, login_url=None, redirect_field_name=REDIRECT_FIELD_NAME):
-    """
-    Redirect the user to the login page, passing the given 'next' page.
-    """
-    resolved_url = resolve_url(login_url or settings.LOGIN_URL)
-
-    login_url_parts = list(urlparse(resolved_url))
-    if redirect_field_name:
-        querystring = QueryDict(login_url_parts[4], mutable=True)
-        querystring[redirect_field_name] = next
-        login_url_parts[4] = querystring.urlencode(safe="/")
-
-    return HttpResponseRedirect(urlunparse(login_url_parts))
 
 
 # Class-based password reset views

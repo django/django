@@ -15,12 +15,12 @@ from django.contrib.auth.forms import (
     SetPasswordForm,
 )
 from django.contrib.auth.models import Permission, User
+from django.contrib.auth.utils import redirect_to_login
 from django.contrib.auth.views import (
     INTERNAL_RESET_SESSION_TOKEN,
     LoginView,
     RedirectURLMixin,
     logout_then_login,
-    redirect_to_login,
 )
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.messages import Message

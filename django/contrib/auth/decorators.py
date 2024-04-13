@@ -6,6 +6,7 @@ from asgiref.sync import async_to_sync, sync_to_async
 
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.contrib.auth.utils import redirect_to_login
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import resolve_url
 
@@ -31,8 +32,6 @@ def user_passes_test(
                 not login_netloc or login_netloc == current_netloc
             ):
                 path = request.get_full_path()
-            from django.contrib.auth.views import redirect_to_login
-
             return redirect_to_login(path, resolved_login_url, redirect_field_name)
 
         if asyncio.iscoroutinefunction(view_func):
