@@ -1803,14 +1803,6 @@ class RedisCacheTests(BaseCacheTests, TestCase):
     def incr_decr_type_error(self):
         return self.lib.ResponseError
 
-    def test_incr_write_connection(self):
-        cache.set("number", 42)
-        with mock.patch(
-            "django.core.cache.backends.redis.RedisCacheClient.get_client"
-        ) as mocked_get_client:
-            cache.incr("number")
-            self.assertEqual(mocked_get_client.call_args.kwargs, {"write": True})
-
     def test_incr_check_key(self):
         with self.assertRaises(ValueError):
             cache.incr("check_key")
@@ -1818,6 +1810,14 @@ class RedisCacheTests(BaseCacheTests, TestCase):
     def test_incr_not_check_key(self):
         value = cache.incr("not_check_key", check_key=False)
         self.assertEqual(value, 1)
+
+    def test_incr_write_connection(self):
+        cache.set("number", 42)
+        with mock.patch(
+            "django.core.cache.backends.redis.RedisCacheClient.get_client"
+        ) as mocked_get_client:
+            cache.incr("number")
+            self.assertEqual(mocked_get_client.call_args.kwargs, {"write": True})
 
     def test_cache_client_class(self):
         self.assertIs(cache._class, RedisCacheClient)
