@@ -1,5 +1,6 @@
 from django.db import DatabaseError, InterfaceError
 from django.db.backends.base.features import BaseDatabaseFeatures
+from django.db.backends.oracle.oracledb_any import is_oracledb
 from django.utils.functional import cached_property
 
 
@@ -80,48 +81,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_json_field_contains = False
     supports_collation_on_textfield = False
     test_now_utc_template = "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'"
-
-    django_test_skips = {
-        "Oracle doesn't support SHA224.": {
-            "db_functions.text.test_sha224.SHA224Tests.test_basic",
-            "db_functions.text.test_sha224.SHA224Tests.test_transform",
-        },
-        "Oracle doesn't correctly calculate ISO 8601 week numbering before "
-        "1583 (the Gregorian calendar was introduced in 1582).": {
-            "db_functions.datetime.test_extract_trunc.DateFunctionTests."
-            "test_trunc_week_before_1000",
-            "db_functions.datetime.test_extract_trunc.DateFunctionWithTimeZoneTests."
-            "test_trunc_week_before_1000",
-        },
-        "Oracle extracts seconds including fractional seconds (#33517).": {
-            "db_functions.datetime.test_extract_trunc.DateFunctionTests."
-            "test_extract_second_func_no_fractional",
-            "db_functions.datetime.test_extract_trunc.DateFunctionWithTimeZoneTests."
-            "test_extract_second_func_no_fractional",
-        },
-        "Oracle doesn't support bitwise XOR.": {
-            "expressions.tests.ExpressionOperatorTests.test_lefthand_bitwise_xor",
-            "expressions.tests.ExpressionOperatorTests.test_lefthand_bitwise_xor_null",
-            "expressions.tests.ExpressionOperatorTests."
-            "test_lefthand_bitwise_xor_right_null",
-        },
-        "Oracle requires ORDER BY in row_number, ANSI:SQL doesn't.": {
-            "expressions_window.tests.WindowFunctionTests.test_row_number_no_ordering",
-        },
-        "Raises ORA-00600: internal error code.": {
-            "model_fields.test_jsonfield.TestQuerying.test_usage_in_subquery",
-        },
-        "Oracle doesn't support changing collations on indexed columns (#33671).": {
-            "migrations.test_operations.OperationTests."
-            "test_alter_field_pk_fk_db_collation",
-        },
-        "Oracle doesn't support comparing NCLOB to NUMBER.": {
-            "generic_relations_regress.tests.GenericRelationTests.test_textlink_filter",
-        },
-        "Oracle doesn't support casting filters to NUMBER.": {
-            "lookup.tests.LookupQueryingTests.test_aggregate_combined_lookup",
-        },
-    }
     django_test_expected_failures = {
         # A bug in Django/oracledb with respect to string handling (#23843).
         "annotations.tests.NonAggregateAnnotationTestCase.test_custom_functions",
@@ -131,6 +90,64 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     insert_test_table_with_defaults = (
         "INSERT INTO {} VALUES (DEFAULT, DEFAULT, DEFAULT)"
     )
+
+    @cached_property
+    def django_test_skips(self):
+        skips = {
+            "Oracle doesn't support SHA224.": {
+                "db_functions.text.test_sha224.SHA224Tests.test_basic",
+                "db_functions.text.test_sha224.SHA224Tests.test_transform",
+            },
+            "Oracle doesn't correctly calculate ISO 8601 week numbering before "
+            "1583 (the Gregorian calendar was introduced in 1582).": {
+                "db_functions.datetime.test_extract_trunc.DateFunctionTests."
+                "test_trunc_week_before_1000",
+                "db_functions.datetime.test_extract_trunc."
+                "DateFunctionWithTimeZoneTests.test_trunc_week_before_1000",
+            },
+            "Oracle extracts seconds including fractional seconds (#33517).": {
+                "db_functions.datetime.test_extract_trunc.DateFunctionTests."
+                "test_extract_second_func_no_fractional",
+                "db_functions.datetime.test_extract_trunc."
+                "DateFunctionWithTimeZoneTests.test_extract_second_func_no_fractional",
+            },
+            "Oracle doesn't support bitwise XOR.": {
+                "expressions.tests.ExpressionOperatorTests.test_lefthand_bitwise_xor",
+                "expressions.tests.ExpressionOperatorTests."
+                "test_lefthand_bitwise_xor_null",
+                "expressions.tests.ExpressionOperatorTests."
+                "test_lefthand_bitwise_xor_right_null",
+            },
+            "Oracle requires ORDER BY in row_number, ANSI:SQL doesn't.": {
+                "expressions_window.tests.WindowFunctionTests."
+                "test_row_number_no_ordering",
+            },
+            "Raises ORA-00600: internal error code.": {
+                "model_fields.test_jsonfield.TestQuerying.test_usage_in_subquery",
+            },
+            "Oracle doesn't support changing collations on indexed columns (#33671).": {
+                "migrations.test_operations.OperationTests."
+                "test_alter_field_pk_fk_db_collation",
+            },
+            "Oracle doesn't support comparing NCLOB to NUMBER.": {
+                "generic_relations_regress.tests.GenericRelationTests."
+                "test_textlink_filter",
+            },
+            "Oracle doesn't support casting filters to NUMBER.": {
+                "lookup.tests.LookupQueryingTests.test_aggregate_combined_lookup",
+            },
+        }
+        if is_oracledb and self.connection.oracledb_version >= (2, 1, 2):
+            skips.update(
+                {
+                    "python-oracledb 2.1.2+ no longer hides 'ORA-1403: no data found' "
+                    "exceptions raised in database triggers.": {
+                        "backends.oracle.tests.TransactionalTests."
+                        "test_hidden_no_data_found_exception"
+                    },
+                },
+            )
+        return skips
 
     @cached_property
     def introspected_field_types(self):

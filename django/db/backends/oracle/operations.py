@@ -286,6 +286,8 @@ END;
         columns = []
         for param in returning_params:
             value = param.get_value()
+            # Can be removed when cx_Oracle is no longer supported and
+            # python-oracle 2.1.2 becomes the minimum supported version.
             if value == []:
                 raise DatabaseError(
                     "The database did not return a new row id. Probably "
