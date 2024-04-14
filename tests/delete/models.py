@@ -61,7 +61,9 @@ class A(models.Model):
     cascade_nullable = models.ForeignKey(
         R, models.CASCADE, null=True, related_name="cascade_nullable_set"
     )
-    db_cascade = models.ForeignKey(R, models.DB_CASCADE, null=True, related_name="db_cascade_set")
+    db_cascade = models.ForeignKey(
+        R, models.DB_CASCADE, null=True, related_name="db_cascade_set"
+    )
     protect = models.ForeignKey(
         R, models.PROTECT, null=True, related_name="protect_set"
     )

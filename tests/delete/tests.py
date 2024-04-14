@@ -342,7 +342,6 @@ class OnDeleteTests(TestCase):
         self.assertFalse(R.objects.filter(pk=a.db_restrict_id).exists())
 
 
-
 class DeletionTests(TestCase):
     def test_sliced_queryset(self):
         msg = "Cannot use 'limit' or 'offset' with delete()."
