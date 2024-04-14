@@ -1391,7 +1391,7 @@ class SQLCompiler:
         def _get_parent_klass_info(klass_info):
             concrete_model = klass_info["model"]._meta.concrete_model
             for parent_model, parent_link in concrete_model._meta.parents.items():
-                parent_list = parent_model._meta.get_parent_list()
+                all_parents = parent_model._meta.all_parents
                 yield {
                     "model": parent_model,
                     "field": parent_link,
@@ -1402,7 +1402,7 @@ class SQLCompiler:
                         # Selected columns from a model or its parents.
                         if (
                             self.select[select_index][0].target.model == parent_model
-                            or self.select[select_index][0].target.model in parent_list
+                            or self.select[select_index][0].target.model in all_parents
                         )
                     ],
                 }
@@ -1621,11 +1621,12 @@ class SQLCompiler:
         # tuples with integers and strings. Flatten them out into strings.
         format_ = self.query.explain_info.format
         output_formatter = json.dumps if format_ and format_.lower() == "json" else str
-        for row in result[0]:
-            if not isinstance(row, str):
-                yield " ".join(output_formatter(c) for c in row)
-            else:
-                yield row
+        for row in result:
+            for value in row:
+                if not isinstance(value, str):
+                    yield " ".join([output_formatter(c) for c in value])
+                else:
+                    yield value
 
 
 class SQLInsertCompiler(SQLCompiler):

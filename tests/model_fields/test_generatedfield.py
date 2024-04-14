@@ -123,7 +123,12 @@ class BaseGeneratedFieldTests(SimpleTestCase):
                 db_persist=True,
             )
 
-        col = Square._meta.get_field("area").get_col("alias")
+        field = Square._meta.get_field("area")
+
+        col = field.get_col("alias")
+        self.assertIsInstance(col.output_field, IntegerField)
+
+        col = field.get_col("alias", field)
         self.assertIsInstance(col.output_field, IntegerField)
 
         class FloatSquare(Model):
@@ -134,7 +139,12 @@ class BaseGeneratedFieldTests(SimpleTestCase):
                 output_field=FloatField(),
             )
 
-        col = FloatSquare._meta.get_field("area").get_col("alias")
+        field = FloatSquare._meta.get_field("area")
+
+        col = field.get_col("alias")
+        self.assertIsInstance(col.output_field, FloatField)
+
+        col = field.get_col("alias", field)
         self.assertIsInstance(col.output_field, FloatField)
 
     @isolate_apps("model_fields")
@@ -196,6 +206,12 @@ class GeneratedFieldTestMixin:
         m.save()
         m.refresh_from_db()
         self.assertEqual(m.field, 8)
+
+    def test_save_model_with_pk(self):
+        m = self.base_model(pk=1, a=1, b=2)
+        m.save()
+        m = self._refresh_if_needed(m)
+        self.assertEqual(m.field, 3)
 
     def test_save_model_with_foreign_key(self):
         fk_object = Foo.objects.create(a="abc", d=Decimal("12.34"))

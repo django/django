@@ -1,6 +1,7 @@
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 
 class Relation(models.Model):
@@ -123,6 +124,9 @@ class Person(BasePerson):
 
     # GR fields
     generic_relation_concrete = GenericRelation(Relation)
+
+    class Meta:
+        verbose_name = _("Person")
 
 
 class ProxyPerson(Person):

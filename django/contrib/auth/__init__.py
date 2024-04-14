@@ -269,4 +269,6 @@ def update_session_auth_hash(request, user):
 
 async def aupdate_session_auth_hash(request, user):
     """See update_session_auth_hash()."""
-    return await sync_to_async(update_session_auth_hash)(request, user)
+    await request.session.acycle_key()
+    if hasattr(user, "get_session_auth_hash") and request.user == user:
+        await request.session.aset(HASH_SESSION_KEY, user.get_session_auth_hash())

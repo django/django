@@ -74,6 +74,11 @@ details on these changes.
 * The setter for ``django.contrib.gis.gdal.OGRGeometry.coord_dim`` will be
   removed.
 
+* ``django.urls.register_converter()`` will no longer allow overriding existing
+  converters.
+
+* The ``check`` keyword argument of ``CheckConstraint`` will be removed.
+
 .. _deprecation-removed-in-5.1:
 
 5.1

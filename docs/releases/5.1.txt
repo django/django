@@ -57,6 +57,23 @@ Minor features
 * The default iteration count for the PBKDF2 password hasher is increased from
   720,000 to 870,000.
 
+* :class:`~django.contrib.auth.forms.BaseUserCreationForm` and
+  :class:`~django.contrib.auth.forms.AdminPasswordChangeForm` now support
+  disabling password-based authentication by setting an unusable password on
+  form save. This is now available in the admin when visiting the user creation
+  and password change pages.
+
+* :func:`~.django.contrib.auth.decorators.login_required`,
+  :func:`~.django.contrib.auth.decorators.permission_required`, and
+  :func:`~.django.contrib.auth.decorators.user_passes_test` decorators now
+  support wrapping asynchronous view functions.
+
+* ``ReadOnlyPasswordHashWidget`` now includes a button to reset the user's
+  password, which replaces the link previously embedded in the
+  ``ReadOnlyPasswordHashField``'s help text, improving the overall
+  accessibility of the
+  :class:`~django.contrib.auth.forms.UserChangeForm`.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -101,6 +118,11 @@ Minor features
 * :attr:`.OGRGeometry.centroid` is now available on all supported geometry
   types.
 
+* :class:`FromWKB() <django.contrib.gis.db.models.functions.FromWKB>` and
+  :class:`FromWKT() <django.contrib.gis.db.models.functions.FromWKT>` functions
+  now support the optional ``srid`` argument (except for Oracle where it is
+  ignored).
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -120,7 +142,14 @@ Minor features
 :mod:`django.contrib.sessions`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :class:`django.contrib.sessions.backends.cached_db.SessionStore` now handles
+  exceptions when storing session information in the cache, logging proper
+  error messages with their traceback via the newly added
+  :ref:`sessions logger <django-contrib-sessions-logger>`.
+
+* :class:`django.contrib.sessions.backends.base.SessionBase` and all built-in
+  session engines now provide async API. The new asynchronous methods all have
+  ``a`` prefixed names, e.g. ``aget()``, ``akeys()``, or ``acycle_key()``.
 
 :mod:`django.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -163,6 +192,9 @@ Database backends
 * ``"init_command"`` option is now supported in :setting:`OPTIONS` on SQLite
   to allow specifying :ref:`pragma options <sqlite-init-command>` to set upon
   connection.
+
+* ``"pool"`` option is now supported in :setting:`OPTIONS` on PostgreSQL to
+  allow using :ref:`connection pools <postgresql-pool>`.
 
 Decorators
 ~~~~~~~~~~
@@ -292,6 +324,9 @@ Templates
   example, to generate a link to the next page while keeping any filtering
   options in place.
 
+* :ref:`Template engines <field-checking>` now implement a ``check()`` method
+  that is already registered with the check framework.
+
 Tests
 ~~~~~
 
@@ -392,6 +427,9 @@ Miscellaneous
   :py:class:`html.parser.HTMLParser` subclasses. This results in a more robust
   and faster operation, but there may be small differences in the output.
 
+* The undocumented ``django.urls.converters.get_converter()`` function is
+  removed.
+
 .. _deprecated-features-5.1:
 
 Features deprecated in 5.1
@@ -420,6 +458,12 @@ Miscellaneous
 
 * Setting ``django.contrib.gis.gdal.OGRGeometry.coord_dim`` is deprecated. Use
   :meth:`~django.contrib.gis.gdal.OGRGeometry.set_3d` instead.
+
+* Overriding existing converters with ``django.urls.register_converter()`` is
+  deprecated.
+
+* The ``check`` keyword argument of ``CheckConstraint`` is deprecated in favor
+  of ``condition``.
 
 Features removed in 5.1
 =======================

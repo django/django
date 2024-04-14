@@ -393,9 +393,15 @@ UTC on storage, and from UTC to the connection's time zone on retrieval.
 
 As a consequence, if you're using PostgreSQL, you can switch between ``USE_TZ
 = False`` and ``USE_TZ = True`` freely. The database connection's time zone
-will be set to :setting:`TIME_ZONE` or ``UTC`` respectively, so that Django
-obtains correct datetimes in all cases. You don't need to perform any data
-conversions.
+will be set to :setting:`DATABASE-TIME_ZONE` or ``UTC`` respectively, so that
+Django obtains correct datetimes in all cases. You don't need to perform any
+data conversions.
+
+.. admonition:: Time zone settings
+
+    The :setting:`time zone <DATABASE-TIME_ZONE>` configured for the connection
+    in the :setting:`DATABASES` setting is distinct from the general
+    :setting:`TIME_ZONE` setting.
 
 Other databases
 ~~~~~~~~~~~~~~~

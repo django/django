@@ -359,7 +359,7 @@ class ModelDetailView(BaseAdminDocsView):
                 "app_label": rel.related_model._meta.app_label,
                 "object_name": rel.related_model._meta.object_name,
             }
-            accessor = rel.get_accessor_name()
+            accessor = rel.accessor_name
             fields.append(
                 {
                     "name": "%s.all" % accessor,

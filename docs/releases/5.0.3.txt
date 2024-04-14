@@ -2,9 +2,18 @@
 Django 5.0.3 release notes
 ==========================
 
-*Expected March 4, 2024*
+*March 4, 2024*
 
-Django 5.0.3 fixes several bugs in 5.0.2.
+Django 5.0.3 fixes a security issue with severity "moderate" and several bugs
+in 5.0.2.
+
+CVE-2024-27351: Potential regular expression denial-of-service in ``django.utils.text.Truncator.words()``
+=========================================================================================================
+
+``django.utils.text.Truncator.words()`` method (with ``html=True``) and
+:tfilter:`truncatewords_html` template filter were subject to a potential
+regular expression denial-of-service attack using a suitably crafted string
+(follow up to :cve:`2019-14232` and :cve:`2023-43665`).
 
 Bugfixes
 ========
@@ -24,3 +33,10 @@ Bugfixes
 * Fixed a regression in Django 5.0 that caused a crash of
   ``@sensitive_variables`` and ``@sensitive_post_parameters`` decorators on
   functions loaded from ``.pyc`` files (:ticket:`35187`).
+
+* Fixed a regression in Django 5.0 that caused a crash when reloading a test
+  database and a base queryset for a base manager used ``prefetch_related()``
+  (:ticket:`35238`).
+
+* Fixed a bug in Django 5.0 where facet filters in the admin would crash on a
+  ``SimpleListFilter`` using a queryset without primary keys (:ticket:`35198`).

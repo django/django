@@ -173,7 +173,7 @@ class Product(models.Model):
         }
         constraints = [
             models.CheckConstraint(
-                check=models.Q(price__gt=models.F("discounted_price")),
+                condition=models.Q(price__gt=models.F("discounted_price")),
                 name="price_gt_discounted_price_validation",
             ),
         ]

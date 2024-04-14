@@ -403,8 +403,8 @@ def check_rel_lookup_compatibility(model, target_opts, field):
     def check(opts):
         return (
             model._meta.concrete_model == opts.concrete_model
-            or opts.concrete_model in model._meta.get_parent_list()
-            or model in opts.get_parent_list()
+            or opts.concrete_model in model._meta.all_parents
+            or model in opts.all_parents
         )
 
     # If the field is a primary key, then doing a query against the field's

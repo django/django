@@ -1,6 +1,7 @@
 import difflib
 import json
 import logging
+import pickle
 import posixpath
 import sys
 import threading
@@ -90,6 +91,18 @@ def to_list(value):
     if not isinstance(value, list):
         value = [value]
     return value
+
+
+def is_pickable(obj):
+    """
+    Returns true if the object can be dumped and loaded through the pickle
+    module.
+    """
+    try:
+        pickle.loads(pickle.dumps(obj))
+    except (AttributeError, TypeError, pickle.PickleError):
+        return False
+    return True
 
 
 def assert_and_parse_html(self, html, user_msg, msg):
@@ -280,6 +293,8 @@ class SimpleTestCase(unittest.TestCase):
                 self.connection is None
                 and self.alias not in cls.databases
                 and self.alias != NO_DB_ALIAS
+                # Dynamically created connections are always allowed.
+                and self.alias in connections
             ):
                 # Connection has not yet been established, but the alias is not allowed.
                 message = cls._disallowed_database_msg % {
@@ -300,6 +315,23 @@ class SimpleTestCase(unittest.TestCase):
         include a call to super().setUp().
         """
         self._setup_and_call(result)
+
+    def __getstate__(self):
+        """
+        Make SimpleTestCase picklable for parallel tests using subtests.
+        """
+        state = super().__dict__
+        # _outcome and _subtest cannot be tested on picklability, since they
+        # contain the TestCase itself, leading to an infinite recursion.
+        if state["_outcome"]:
+            pickable_state = {"_outcome": None, "_subtest": None}
+            for key, value in state.items():
+                if key in pickable_state or not is_pickable(value):
+                    continue
+                pickable_state[key] = value
+            return pickable_state
+
+        return state
 
     def debug(self):
         """Perform the same as __call__(), without catching the exception."""
