@@ -1,5 +1,6 @@
 from django.db import DatabaseError, InterfaceError
 from django.db.backends.base.features import BaseDatabaseFeatures
+from django.db.backends.oracle.oracledb_any import is_oracledb
 from django.utils.functional import cached_property
 
 
@@ -136,6 +137,16 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                         "test_usage_in_subquery",
                     },
                 }
+            )
+        if is_oracledb and self.connection.oracledb_version >= (2, 1, 2):
+            skips.update(
+                {
+                    "python-oracledb 2.1.2+ no longer hides 'ORA-1403: no data found' "
+                    "exceptions raised in database triggers.": {
+                        "backends.oracle.tests.TransactionalTests."
+                        "test_hidden_no_data_found_exception"
+                    },
+                },
             )
         return skips
 
