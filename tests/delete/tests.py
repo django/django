@@ -321,6 +321,27 @@ class OnDeleteTests(TestCase):
         self.assertFalse(GenericB2.objects.exists())
         self.assertFalse(GenericDeleteBottom.objects.exists())
 
+    def test_db_restrict_path_db_cascade_direct(self):
+        a = create_a("db_restrict")
+        a.db_restrict.p = P.objects.create()
+        a.db_restrict.save()
+        a.db_cascade_p = a.db_restrict.p
+        a.save()
+        a.db_restrict.p.delete()
+        self.assertFalse(A.objects.filter(name="db_restrict").exists())
+        self.assertFalse(R.objects.filter(pk=a.db_restrict_id).exists())
+
+    def test_db_restrict_path_cascade_direct(self):
+        a = create_a("db_restrict")
+        a.db_restrict.p = P.objects.create()
+        a.db_restrict.save()
+        a.cascade_p = a.db_restrict.p
+        a.save()
+        a.db_restrict.p.delete()
+        self.assertFalse(A.objects.filter(name="db_restrict").exists())
+        self.assertFalse(R.objects.filter(pk=a.db_restrict_id).exists())
+
+
 
 class DeletionTests(TestCase):
     def test_sliced_queryset(self):

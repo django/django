@@ -61,11 +61,15 @@ class A(models.Model):
     cascade_nullable = models.ForeignKey(
         R, models.CASCADE, null=True, related_name="cascade_nullable_set"
     )
+    db_cascade = models.ForeignKey(R, models.DB_CASCADE, null=True, related_name="db_cascade_set")
     protect = models.ForeignKey(
         R, models.PROTECT, null=True, related_name="protect_set"
     )
     restrict = models.ForeignKey(
         R, models.RESTRICT, null=True, related_name="restrict_set"
+    )
+    db_restrict = models.ForeignKey(
+        R, models.DB_RESTRICT, null=True, related_name="db_restrict_set"
     )
     donothing = models.ForeignKey(
         R, models.DO_NOTHING, null=True, related_name="donothing_set"
@@ -76,6 +80,9 @@ class A(models.Model):
     )
     cascade_p = models.ForeignKey(
         P, models.CASCADE, related_name="cascade_p_set", null=True
+    )
+    db_cascade_p = models.ForeignKey(
+        P, models.DB_CASCADE, related_name="db_cascade_p_set", null=True
     )
 
     # A OneToOneField is just a ForeignKey unique=True, so we don't duplicate
@@ -101,8 +108,10 @@ def create_a(name):
         "setdefault_none",
         "cascade",
         "cascade_nullable",
+        "db_cascade",
         "protect",
         "restrict",
+        "db_restrict",
         "donothing",
         "o2o_setnull",
     ):
