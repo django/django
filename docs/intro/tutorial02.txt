@@ -463,7 +463,7 @@ Let's also add a custom method to this model:
     class Question(models.Model):
         # ...
         def was_published_recently(self):
-            return self.pub_date >= timezone.now() - datetime.timedelta(days=1)
+            return self.pub_date >= timezone.now().date() - datetime.timedelta(days=1)
 
 Note the addition of ``import datetime`` and ``from django.utils import
 timezone``, to reference Python's standard :mod:`datetime` module and Django's
