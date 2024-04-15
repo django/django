@@ -8,6 +8,11 @@ from django.test import TestCase, TransactionTestCase
 
 from ..models import Square, VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
 
+try:
+    from django.db.backends.oracle.oracledb_any import is_oracledb
+except ImportError:
+    is_oracledb = False
+
 
 @unittest.skipUnless(connection.vendor == "oracle", "Oracle tests")
 class Tests(TestCase):
@@ -119,7 +124,14 @@ class Tests(TestCase):
         new_connection.settings_dict["CONN_MAX_AGE"] = 10
         msg = "Pooling doesn't support persistent connections."
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
-            new_connection.pool
+            new_connection.connect()
+
+    @unittest.skipIf(connection.is_oracledb, "Pool specific tests")
+    def test_cx_Oracle_not_support_pooling(self):
+        new_connection = connection.copy()
+        msg = "Pooling Not supported by cx_Oracle. Use python-oracledb instead"
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            new_connection.connect()
 
 
 @unittest.skipUnless(connection.vendor == "oracle", "Oracle tests")
