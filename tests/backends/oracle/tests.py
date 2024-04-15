@@ -8,10 +8,11 @@ from django.test import TestCase, TransactionTestCase
 
 from ..models import Square, VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
 
-try:
-    from django.db.backends.oracle.oracledb_any import is_oracledb
-except ImportError:
-    is_oracledb = False
+if connection.vendor == "oracle":
+    try:
+        from django.db.backends.oracle.oracledb_any import is_oracledb
+    except ImportError:
+        is_oracledb = False
 
 
 @unittest.skipUnless(connection.vendor == "oracle", "Oracle tests")
