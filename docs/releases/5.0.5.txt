@@ -1,0 +1,18 @@
+==========================
+Django 5.0.5 release notes
+==========================
+
+*Expected May 6, 2024*
+
+Django 5.0.5 fixes several bugs in 5.0.4.
+
+Bugfixes
+========
+
+* Fixed a bug in Django 5.0 that caused a crash of ``Model.save()`` when
+  creating an instance of a model with a ``GeneratedField`` and providing a
+  primary key (:ticket:`35350`).
+
+* Fixed a compatibility issue encountered in Python 3.11.9+ and 3.12.3+ when
+  validating email max line lengths with content decoded using the
+  ``surrogateescape`` error handling scheme (:ticket:`35361`).

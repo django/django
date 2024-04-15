@@ -329,6 +329,7 @@ class RelatedFieldWidgetWrapper(forms.Widget):
             "name": name,
             "url_params": url_params,
             "model": rel_opts.verbose_name,
+            "model_name": rel_opts.model_name,
             "can_add_related": self.can_add_related,
             "can_change_related": self.can_change_related,
             "can_delete_related": self.can_delete_related,

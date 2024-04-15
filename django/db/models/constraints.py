@@ -200,7 +200,11 @@ class CheckConstraint(BaseConstraint):
                     id="models.W027",
                 )
             )
-        else:
+        elif (
+            connection.features.supports_table_check_constraints
+            or "supports_table_check_constraints"
+            not in model._meta.required_db_features
+        ):
             references = set()
             condition = self.condition
             if isinstance(condition, Q):

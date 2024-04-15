@@ -1023,34 +1023,42 @@ class UserChangeFormTest(TestDataMixin, TestCase):
         self.assertEqual(form.initial["password"], form["password"].value())
 
     @override_settings(ROOT_URLCONF="auth_tests.urls_admin")
-    def test_link_to_password_reset_in_helptext_via_to_field(self):
+    def test_link_to_password_reset_in_user_change_form(self):
         cases = [
             (
                 "testclient",
-                'you can change or unset the password using <a href="(.*?)">',
+                "Raw passwords are not stored, so there is no way to see "
+                "the user’s password.",
+                "Reset password",
             ),
             (
                 "unusable_password",
-                "Enable password-based authentication for this user by setting "
-                'a password using <a href="(.*?)">this form</a>.',
+                "Enable password-based authentication for this user by setting a "
+                "password.",
+                "Set password",
             ),
         ]
-        for username, expected_help_text in cases:
+        password_reset_link = r'<a class="button" href="([^"]*)">([^<]*)</a>'
+        for username, expected_help_text, expected_button_label in cases:
             with self.subTest(username=username):
                 user = User.objects.get(username=username)
                 form = UserChangeForm(data={}, instance=user)
                 password_help_text = form.fields["password"].help_text
-                matches = re.search(expected_help_text, password_help_text)
+                self.assertEqual(password_help_text, expected_help_text)
 
+                matches = re.search(password_reset_link, form.as_p())
+                self.assertIsNotNone(matches)
+                self.assertEqual(len(matches.groups()), 2)
                 url_prefix = f"admin:{user._meta.app_label}_{user._meta.model_name}"
                 # URL to UserChangeForm in admin via to_field (instead of pk).
-                user_change_url = reverse(f"{url_prefix}_change", args=(user.username,))
+                user_change_url = reverse(f"{url_prefix}_change", args=(user.pk,))
                 joined_url = urllib.parse.urljoin(user_change_url, matches.group(1))
 
                 pw_change_url = reverse(
                     f"{url_prefix}_password_change", args=(user.pk,)
                 )
                 self.assertEqual(joined_url, pw_change_url)
+                self.assertEqual(matches.group(2), expected_button_label)
 
     def test_custom_form(self):
         class CustomUserChangeForm(UserChangeForm):
@@ -1345,11 +1353,14 @@ class ReadOnlyPasswordHashTest(SimpleTestCase):
         self.assertHTMLEqual(
             widget.render("name", value, {"id": "id_password"}),
             '<div id="id_password">'
+            "  <p>"
             "    <strong>algorithm</strong>: <bdi>pbkdf2_sha256</bdi>"
             "    <strong>iterations</strong>: <bdi>100000</bdi>"
             "    <strong>salt</strong>: <bdi>a6Pucb******</bdi>"
             "    <strong>hash</strong>: "
             "       <bdi>WmCkn9**************************************</bdi>"
+            "  </p>"
+            '  <p><a class="button" href="../password/">Reset password</a></p>'
             "</div>",
         )
 

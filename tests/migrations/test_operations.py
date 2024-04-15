@@ -5115,6 +5115,15 @@ class OperationTests(OperationTestBase):
                     collected_sql = "\n".join(editor.collected_sql)
                     self.assertEqual(collected_sql.count(";"), 1)
 
+    def test_run_sql_backward_reverse_sql_required(self):
+        operation = migrations.RunSQL(sql=migrations.RunSQL.noop)
+        msg = "You cannot reverse this operation"
+        with (
+            connection.schema_editor() as editor,
+            self.assertRaisesMessage(NotImplementedError, msg),
+        ):
+            operation.database_backwards("test_runsql", editor, None, None)
+
     def test_run_python(self):
         """
         Tests the RunPython operation
@@ -5237,6 +5246,11 @@ class OperationTests(OperationTestBase):
         self.assertIs(False, operation.reduce(operation, []))
         elidable_operation = migrations.RunPython(inner_method, elidable=True)
         self.assertEqual(elidable_operation.reduce(operation, []), [operation])
+
+    def test_run_python_invalid_reverse_code(self):
+        msg = "RunPython must be supplied with callable arguments"
+        with self.assertRaisesMessage(ValueError, msg):
+            migrations.RunPython(code=migrations.RunPython.noop, reverse_code="invalid")
 
     def test_run_python_atomic(self):
         """
