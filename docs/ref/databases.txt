@@ -1114,10 +1114,9 @@ Connection pool
 
 .. versionadded:: 5.1
 
-To use a connection pool with `oracledb`_, you can set the ``"pool"`` in the
+To use a connection pool with `oracledb`_, you can set ``"pool"`` in the
 :setting:`OPTIONS` part of your database configuration in :setting:`DATABASES`
-to ``True`` to use the `oracledb`_ `create_pool()`_  defaults or to a dict to 
-be passed to `create_pool()`_ ::
+to ``True`` to use the `create_pool()`_ defaults::
 
     DATABASES = {
         "default": {
@@ -1131,8 +1130,9 @@ be passed to `create_pool()`_ ::
 
 .. _`oracledb`: https://oracle.github.io/python-oracledb/
 
-You can pass all the parameters accepted by `create_pool()`_ through :setting:`OPTIONS`
-part of your database configuration :setting:`DATABASES`::
+You can also set ``"pool"`` in the :setting:`OPTIONS` part of your database 
+configuration in :setting:`DATABASES` to be a dict to be passed to oracledb 
+`create_pool()`_  to pass all the parameters accepted by `create_pool()`_::
 
     DATABASES = {
         "default": {

@@ -140,7 +140,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         if self.connection.settings_dict["OPTIONS"].get("pool"):
             skips.update(
                 {
-                    "Pooling does not supports persistent connection": {
+                    "Pooling does not support persistent connections": {
                         "backends.base.test_base.ConnectionHealthChecksTests."
                         "test_health_checks_enabled",
                         "backends.base.test_base.ConnectionHealthChecksTests."
