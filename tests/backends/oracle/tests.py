@@ -125,9 +125,9 @@ class Tests(TestCase):
         new_connection.settings_dict["CONN_MAX_AGE"] = 10
         msg = "Pooling doesn't support persistent connections."
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
-            new_connection.connect()
+            new_connection.pool
 
-    @unittest.skipIf(connection.is_oracledb, "Pool specific tests")
+    @unittest.skipIf(is_oracledb, "cx_oracle specific tests")
     def test_cx_Oracle_not_support_pooling(self):
         new_connection = connection.copy()
         msg = "Pooling isn't supported by cx_Oracle. Use python-oracledb instead"
