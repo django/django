@@ -455,7 +455,7 @@ body.popup .submit-row {
 
 .inline-group .tabular td.original p {
     position: absolute;
-    left: 0;
+    inset-inline-start: 0;
     height: 1.1em;
     padding: 2px 9px;
     overflow: hidden;
