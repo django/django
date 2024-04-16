@@ -191,6 +191,26 @@ class SeleniumTestCase(LiveServerTestCase, metaclass=SeleniumTestCaseBase):
             finally:
                 self.selenium.execute_script("localStorage.removeItem('theme');")
 
+    def set_emulated_media(self, features, media=""):
+        if self.browser != "chrome":
+            self.skipTest("Emulated media controls are only supported on Chrome.")
+        # Chrome Dev Tools Protocol Emulation.setEmulatedMedia
+        # https://chromedevtools.github.io/devtools-protocol/1-3/Emulation/#method-setEmulatedMedia
+        self.selenium.execute_cdp_cmd(
+            "Emulation.setEmulatedMedia", {"media": media, "features": features}
+        )
+
+    @contextmanager
+    def high_contrast(self):
+        self.set_emulated_media(features=[{"name": "forced-colors", "value": "active"}])
+        with self.desktop_size():
+            try:
+                yield
+            finally:
+                self.set_emulated_media(
+                    features=[{"name": "forced-colors", "value": "none"}]
+                )
+
     def take_screenshot(self, name):
         if not self.screenshots:
             return
