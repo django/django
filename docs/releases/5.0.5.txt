@@ -16,3 +16,7 @@ Bugfixes
 * Fixed a compatibility issue encountered in Python 3.11.9+ and 3.12.3+ when
   validating email max line lengths with content decoded using the
   ``surrogateescape`` error handling scheme (:ticket:`35361`).
+
+* Fixed a bug in Django 5.0 that caused a crash when applying migrations
+  including alterations to ``GeneratedField`` such as setting ``db_index=True``
+  on SQLite (:ticket:`35373`).

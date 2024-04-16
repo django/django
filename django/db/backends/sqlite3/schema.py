@@ -150,6 +150,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             body.pop(old_field.name, None)
             mapping.pop(old_field.column, None)
             body[new_field.name] = new_field
+            rename_mapping[old_field.name] = new_field.name
+            if new_field.generated:
+                continue
             if old_field.null and not new_field.null:
                 if new_field.db_default is NOT_PROVIDED:
                     default = self.prepare_default(self.effective_default(new_field))
@@ -162,7 +165,6 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 mapping[new_field.column] = case_sql
             else:
                 mapping[new_field.column] = self.quote_name(old_field.column)
-            rename_mapping[old_field.name] = new_field.name
         # Remove any deleted fields
         if delete_field:
             del body[delete_field.name]
