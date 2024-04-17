@@ -123,6 +123,9 @@ Minor features
 * :class:`~django.contrib.postgres.indexes.BTreeIndex` now supports the
   ``deduplicate_items`` parameter.
 
+* :class:`~django.contrib.postgres.operations.AddIndexConcurrently` now
+  supports the ``if_not_exists`` parameter.
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

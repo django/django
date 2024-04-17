@@ -159,12 +159,13 @@ PostgreSQL supports the ``CONCURRENTLY`` option to ``CREATE INDEX`` and
 This option is useful for adding or removing an index in a live production
 database.
 
-.. class:: AddIndexConcurrently(model_name, index)
+.. class:: AddIndexConcurrently(model_name, index, if_not_exists=False)
 
     Like :class:`~django.db.migrations.operations.AddIndex`, but creates an
-    index with the ``CONCURRENTLY`` option. This has a few caveats to be aware
-    of when using this option, see `the PostgreSQL documentation of building
-    indexes concurrently <https://www.postgresql.org/docs/current/
+    index with the ``CONCURRENTLY`` option with an optional IF NOT EXISTS.
+    This has a few caveats to be aware of when using this option, see `the
+    PostgreSQL documentation of building indexes concurrently
+    <https://www.postgresql.org/docs/current/
     sql-createindex.html#SQL-CREATEINDEX-CONCURRENTLY>`_.
 
 .. class:: RemoveIndexConcurrently(model_name, name)

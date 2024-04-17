@@ -123,6 +123,10 @@ class AddIndexConcurrently(NotInTransactionMixin, AddIndex):
     atomic = False
     category = OperationCategory.ADDITION
 
+    def __init__(self, model_name, index, if_not_exists=False):
+        self.if_not_exists = if_not_exists
+        super().__init__(model_name, index)
+
     def describe(self):
         return "Concurrently create index %s on field(s) %s of model %s" % (
             self.index.name,
@@ -134,7 +138,9 @@ class AddIndexConcurrently(NotInTransactionMixin, AddIndex):
         self._ensure_not_in_transaction(schema_editor)
         model = to_state.apps.get_model(app_label, self.model_name)
         if self.allow_migrate_model(schema_editor.connection.alias, model):
-            schema_editor.add_index(model, self.index, concurrently=True)
+            schema_editor.add_index(
+                model, self.index, concurrently=True, if_not_exists=self.if_not_exists
+            )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         self._ensure_not_in_transaction(schema_editor)

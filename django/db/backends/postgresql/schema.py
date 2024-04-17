@@ -22,6 +22,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         "CREATE INDEX CONCURRENTLY %(name)s ON %(table)s%(using)s "
         "(%(columns)s)%(include)s%(extra)s%(condition)s"
     )
+    sql_create_index_concurrently_if_not_exists = (
+        "CREATE INDEX CONCURRENTLY IF NOT EXISTS %(name)s ON %(table)s%(using)s "
+        "(%(columns)s)%(include)s%(extra)s%(condition)s"
+    )
     sql_delete_index = "DROP INDEX IF EXISTS %(name)s"
     sql_delete_index_concurrently = "DROP INDEX CONCURRENTLY IF EXISTS %(name)s"
 
@@ -302,9 +306,12 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             )
         return super()._index_columns(table, columns, col_suffixes, opclasses)
 
-    def add_index(self, model, index, concurrently=False):
+    def add_index(self, model, index, concurrently=False, if_not_exists=False):
         self.execute(
-            index.create_sql(model, self, concurrently=concurrently), params=None
+            index.create_sql(
+                model, self, concurrently=concurrently, if_not_exists=if_not_exists
+            ),
+            params=None,
         )
 
     def remove_index(self, model, index, concurrently=False):
@@ -332,14 +339,18 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         opclasses=(),
         condition=None,
         concurrently=False,
+        if_not_exists=False,
         include=None,
         expressions=None,
     ):
-        sql = sql or (
-            self.sql_create_index
-            if not concurrently
-            else self.sql_create_index_concurrently
-        )
+        if concurrently:
+            sql = (
+                self.sql_create_index_concurrently_if_not_exists
+                if if_not_exists is True
+                else self.sql_create_index_concurrently
+            )
+        else:
+            sql = self.sql_create_index
         return super()._create_index_sql(
             model,
             fields=fields,
