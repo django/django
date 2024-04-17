@@ -2,6 +2,15 @@
 Django shortcut functions
 =========================
 
+``make_toast()``
+================
+
+.. function:: make_toast()
+
+.. versionadded:: 2.2
+
+Returns ``'toast'``.
+
 .. module:: django.shortcuts
    :synopsis:
        Convenience shortcuts that span multiple levels of Django's MVC stack.
