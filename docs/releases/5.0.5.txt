@@ -20,3 +20,7 @@ Bugfixes
 * Fixed a bug in Django 5.0 that caused a crash when applying migrations
   including alterations to ``GeneratedField`` such as setting ``db_index=True``
   on SQLite (:ticket:`35373`).
+
+* Fixed a regression in Django 4.2 where multiple checkboxes in the admin would
+  be centered on narrower screen widths (:ticket:`34994`) or have misaligned
+  labels (:ticket:`35386`).
