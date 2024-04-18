@@ -193,7 +193,8 @@ Bear in mind that when reversed, this is actually adding a field to a model.
 The operation is reversible (apart from any data loss, which is irreversible)
 if the field is nullable or if it has a default value that can be used to
 populate the recreated column. If the field is not nullable and does not have a
-default value, the operation is irreversible.
+default value, it will ask to provide a default value to populate existing
+rows when migrating backwards.
 
 .. admonition:: PostgreSQL
 
