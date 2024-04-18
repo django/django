@@ -548,7 +548,8 @@ message guidelines <committing-guidelines>` and write a message like:
 
     Fixed #99999 -- Added a shortcut function to make toast.
 
-Once the commit message is added close the window,  It will automatically save the message.
+To save the commit message and exit the text editor type ``:wq``. 
+
 
 Pushing the commit and making a pull request
 ============================================
