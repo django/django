@@ -1363,7 +1363,7 @@ class AutodetectorTests(BaseAutodetectorTests):
             "testapp",
             "Author",
             [
-                ("id", models.BigAutoField()),
+                ("id", models.AutoField(primary_key=True)),
                 ("pkfield", models.IntegerField(primary_key=False)),
             ],
         )
