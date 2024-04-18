@@ -172,10 +172,6 @@ class DatabaseOperations(BaseDatabaseOperations):
             else:
                 lookup = "%s::text"
 
-        # Use UPPER(x) for case-insensitive lookups; it's faster.
-        if lookup_type in ("iexact", "icontains", "istartswith", "iendswith"):
-            lookup = "UPPER(%s)" % lookup
-
         return lookup
 
     def no_limit_value(self):

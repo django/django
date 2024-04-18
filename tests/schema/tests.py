@@ -913,7 +913,7 @@ class SchemaTests(TransactionTestCase):
             editor.create_model(GeneratedFieldContainsModel)
 
         field = GeneratedField(
-            expression=Q(text__contains="foo"),
+            expression=Q(text__icontains="FOO"),
             db_persist=True,
             output_field=BooleanField(),
         )
