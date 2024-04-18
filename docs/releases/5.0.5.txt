@@ -24,3 +24,4 @@ Bugfixes
 * Allowed importing ``aprefetch_related_objects`` from ``django.db.models``
   (:ticket:`35392`).
 * Made reverse RemoveField handle non-nullable columns (:ticket:`26739`).
+  on SQLite (:ticket:`35373`).

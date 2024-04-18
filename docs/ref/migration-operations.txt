@@ -185,7 +185,11 @@ defaults and always applies them in the Django ORM code.
 ``RemoveField``
 ---------------
 
-.. class:: RemoveField(model_name, name)
+.. class:: RemoveField(model_name, name, default=NOT_PROVIDED)
+
+.. versionchanged:: 5.1
+
+    Support for the ``default`` argument was added.
 
 Removes a field from a model.
 
@@ -194,7 +198,8 @@ The operation is reversible (apart from any data loss, which is irreversible)
 if the field is nullable or if it has a default value that can be used to
 populate the recreated column. If the field is not nullable and does not have a
 default value, it will ask to provide a default value to populate existing
-rows when migrating backwards.
+rows and make operation reversible. If the default value is not provided, the
+operation will be irreversible.
 
 .. admonition:: PostgreSQL
 
