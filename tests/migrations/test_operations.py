@@ -1957,8 +1957,7 @@ class OperationTests(OperationTestBase):
         # an error.
         if connection.vendor != "mysql":
             with self.assertRaises(IntegrityError):
-                atomic_rename = connection.features.supports_atomic_references_rename
-                with connection.schema_editor(atomic=atomic_rename) as editor:
+                with connection.schema_editor() as editor:
                     operation.database_backwards(
                         "test_rmflnn", editor, new_state, project_state
                     )
