@@ -157,7 +157,7 @@ class RemoveField(FieldOperation):
     """Remove a field from a model."""
 
     category = OperationCategory.REMOVAL
-    
+
     def __init__(self, model_name, name, default=NOT_PROVIDED):
         self.default = default
         super().__init__(model_name, name)
