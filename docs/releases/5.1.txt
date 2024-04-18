@@ -281,11 +281,10 @@ Models
 * The new ``"transaction_mode"`` option is now supported in :setting:`OPTIONS`
   on SQLite to allow specifying the :ref:`sqlite-transaction-behavior`.
 
-* The :class:`~django.db.models.RemoveField` operation now supports default
-  values for non-nullable fields. This default value will make the
-  :class:`~django.db.models.RemoveField` operation with a non-nullable field
-  reversible. If the default value is not provided, the operation will be
-  irreversible.
+* The ``RemoveField`` operation now supports default values for non-nullable
+  fields. This default value will make the ``RemoveField`` operation with a
+  non-nullable field reversible. If the default value is not provided,
+  the operation will be irreversible.
 
 
 Requests and Responses
