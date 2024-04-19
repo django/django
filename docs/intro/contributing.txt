@@ -541,16 +541,14 @@ To commit the changes:
 
     $ git commit
 
-This opens up a text editor to type the commit message. Follow the :ref:`commit
-message guidelines <committing-guidelines>` and write a message like:
+This opens up a text editor to type the commit message.The editor will open in command mode. To switch from command mode to ``INSERT MODE`` type lower case ``i``.
+Once you are done with writing the commit message, to go back to command mode hit the ESC button.
+To save the commit message and exit the text editor type ``:wq`` in the command mode.
+Follow the :ref:`commit message guidelines <committing-guidelines>` and write a message like:
 
 .. code-block:: text
 
     Fixed #99999 -- Added a shortcut function to make toast.
-
-To save the commit message and exit the text editor type ``:wq``.
-This is a test fix
-
 
 Pushing the commit and making a pull request
 ============================================
