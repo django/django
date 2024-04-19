@@ -12,7 +12,3 @@ Bugfixes
 * Fixed a crash in Django 4.2 when validating email max line lengths with
   content decoded using the ``surrogateescape`` error handling scheme
   (:ticket:`35361`).
-
-* Fixed a regression in Django 4.2 where multiple checkboxes in the admin would
-  be centered on narrower screen widths (:ticket:`34994`) or have misaligned
-  labels (:ticket:`35386`).
