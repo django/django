@@ -2,11 +2,6 @@
 Django shortcut functions
 =========================
 
-``make_toast()``
-================
-
-.. function:: make_toast()
-
 .. versionadded:: 2.2
 
 Returns ``'toast'``.
