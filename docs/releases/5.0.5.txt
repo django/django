@@ -20,3 +20,6 @@ Bugfixes
 * Fixed a bug in Django 5.0 that caused a crash when applying migrations
   including alterations to ``GeneratedField`` such as setting ``db_index=True``
   on SQLite (:ticket:`35373`).
+
+* Allowed importing ``aprefetch_related_objects`` from ``django.db.models``
+  (:ticket:`35392`).
