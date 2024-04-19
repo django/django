@@ -4,8 +4,6 @@ Django shortcut functions
 
 .. versionadded:: 2.2
 
-Returns ``'toast'``.
-
 .. module:: django.shortcuts
    :synopsis:
        Convenience shortcuts that span multiple levels of Django's MVC stack.
