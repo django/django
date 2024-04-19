@@ -190,5 +190,3 @@ def resolve_url(to, *args, **kwargs):
     return to
 
 
-def make_toast():
-    return 'This is a function to make toast'
