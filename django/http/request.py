@@ -348,6 +348,16 @@ class HttpRequest:
             self._stream = BytesIO(self._body)
         return self._body
 
+    @property
+    def JSON(self):
+        if self.content_type != 'application/json':
+            Raise ValueError('Content type is not application/json')
+        #decoding and converting json data into dict format
+        decoded = self.body.decode('utf-8')
+        json_dict = json.dumps(decoded)
+
+        return json_dict        
+
     def _mark_post_parse_error(self):
         self._post = QueryDict()
         self._files = MultiValueDict()
