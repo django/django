@@ -761,14 +761,6 @@ class SQLCompiler:
                 # (see docstring of get_from_clause() for details).
                 from_, f_params = self.get_from_clause()
                 try:
-                    if combinator and self.where is not None:
-                        children = []
-                        for child in self.where.children:
-                            child = child.copy()
-                            child.lhs = child.lhs.copy()
-                            child.lhs.alias = 'combined_{}'.format(self.query.combined_count)
-                            children.append(child)
-                        self.where.children = children
                     where, w_params = (
                         self.compile(self.where) if self.where is not None else ("", [])
                     )

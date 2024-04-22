@@ -1660,6 +1660,14 @@ class Query(BaseExpression):
             )
             joinpromoter.add_votes(needed_inner)
             if child_clause:
+                if self.combinator:
+                    children = []
+                    for child in child_clause.children:
+                        child = child.copy()
+                        child.lhs = child.lhs.copy()
+                        child.lhs.alias = 'combined_{}'.format(self.combined_count)
+                        children.append(child)
+                    child_clause.children = children
                 target_clause.add(child_clause, connector)
         if update_join_types:
             needed_inner = joinpromoter.update_join_types(self)
