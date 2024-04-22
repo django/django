@@ -272,6 +272,7 @@ class Query(BaseExpression):
 
     # Set combination attributes.
     combinator = None
+    combined_count = 0
     combinator_all = False
     combined_queries = ()
 

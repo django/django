@@ -293,8 +293,6 @@ class SQLCompiler:
         col_idx = 1
         for col, alias in select:
             try:
-                if self.query.combinator:
-                    col.alias = 'combined'
                 sql, params = self.compile(col)
             except EmptyResultSet:
                 empty_result_set_value = getattr(
@@ -309,6 +307,7 @@ class SQLCompiler:
                 sql, params = self.compile(Value(True))
             else:
                 sql, params = col.select_format(self, sql, params)
+
             if alias is None and with_col_aliases and not self.query.combinator:
                 alias = f"col{col_idx}"
                 col_idx += 1
@@ -592,7 +591,7 @@ class SQLCompiler:
                             *self.query.annotation_select,
                         )
                     )
-                part_sql, part_args = compiler.as_sql(with_col_aliases=True)
+                part_sql, part_args = compiler.as_sql(with_col_aliases=False)
                 if compiler.query.combinator:
                     # Wrap in a subquery if wrapping in parentheses isn't
                     # supported.
@@ -629,7 +628,7 @@ class SQLCompiler:
             *((braces.format(sql), args) for sql, args in parts)
         )
         result = [" {} ".format(combinator_sql).join(sql_parts)]
-        result = ["({}) AS combined".format(sql) for sql in result]
+        result = ["({}) AS combined_{}".format(sql, self.query.combined_count) for sql in result]
         params = []
         for part in args_parts:
             params.extend(part)
@@ -750,28 +749,30 @@ class SQLCompiler:
             with_limit_offset = with_limits and self.query.is_sliced
             combinator = self.query.combinator
             features = self.connection.features
-            if combinator:
-                if not getattr(features, "supports_select_{}".format(combinator)):
-                    raise NotSupportedError(
-                        "{} is not supported on this database backend.".format(
-                            combinator
-                        )
-                    )
-                result, params = self.get_combinator_sql(
-                    combinator, self.query.combinator_all
-                )
-            elif self.qualify:
+            if self.qualify:
                 result, params = self.get_qualify_sql()
                 order_by = None
             else:
+                result = ["SELECT"]
+                params = []
+                    
                 distinct_fields, distinct_params = self.get_distinct()
                 # This must come after 'select', 'ordering', and 'distinct'
                 # (see docstring of get_from_clause() for details).
                 from_, f_params = self.get_from_clause()
                 try:
+                    if combinator and self.where is not None:
+                        children = []
+                        for child in self.where.children:
+                            child = child.copy()
+                            child.lhs = child.lhs.copy()
+                            child.lhs.alias = 'combined_{}'.format(self.query.combined_count)
+                            children.append(child)
+                        self.where.children = children
                     where, w_params = (
                         self.compile(self.where) if self.where is not None else ("", [])
                     )
+                        
                 except EmptyResultSet:
                     if self.elide_empty:
                         raise
@@ -787,8 +788,7 @@ class SQLCompiler:
                     )
                 except FullResultSet:
                     having, h_params = "", []
-                result = ["SELECT"]
-                params = []
+
 
                 if self.query.distinct:
                     distinct_result, distinct_params = self.connection.ops.distinct_sql(
@@ -805,6 +805,8 @@ class SQLCompiler:
                             s_sql,
                             self.connection.ops.quote_name(alias),
                         )
+                    elif combinator:
+                        s_sql = '"%s".%s' % ('combined_{}'.format(self.query.combined_count), s_sql.split('.')[-1])
                     params.extend(s_params)
                     out_cols.append(s_sql)
 
