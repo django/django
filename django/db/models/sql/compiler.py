@@ -628,7 +628,10 @@ class SQLCompiler:
             *((braces.format(sql), args) for sql, args in parts)
         )
         result = [" {} ".format(combinator_sql).join(sql_parts)]
-        result = ["({}) AS combined_{}".format(sql, self.query.combined_count) for sql in result]
+        result = [
+            "({}) AS combined_{}".format(sql, self.query.combined_count)
+            for sql in result
+        ]
         params = []
         for part in args_parts:
             params.extend(part)
@@ -755,7 +758,7 @@ class SQLCompiler:
             else:
                 result = ["SELECT"]
                 params = []
-                    
+
                 distinct_fields, distinct_params = self.get_distinct()
                 # This must come after 'select', 'ordering', and 'distinct'
                 # (see docstring of get_from_clause() for details).
@@ -764,7 +767,7 @@ class SQLCompiler:
                     where, w_params = (
                         self.compile(self.where) if self.where is not None else ("", [])
                     )
-                        
+
                 except EmptyResultSet:
                     if self.elide_empty:
                         raise
@@ -780,7 +783,6 @@ class SQLCompiler:
                     )
                 except FullResultSet:
                     having, h_params = "", []
-
 
                 if self.query.distinct:
                     distinct_result, distinct_params = self.connection.ops.distinct_sql(
@@ -798,7 +800,10 @@ class SQLCompiler:
                             self.connection.ops.quote_name(alias),
                         )
                     elif combinator:
-                        s_sql = '"%s".%s' % ('combined_{}'.format(self.query.combined_count), s_sql.split('.')[-1])
+                        s_sql = '"%s".%s' % (
+                            'combined_{}'.format(self.query.combined_count),
+                            s_sql.split('.')[-1]
+                        )
                     params.extend(s_params)
                     out_cols.append(s_sql)
 
