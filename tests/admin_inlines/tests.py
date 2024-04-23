@@ -2058,7 +2058,7 @@ class SeleniumTests(AdminSeleniumTestCase):
             with self.subTest(url=url_name):
                 self.selenium.get(self.live_server_url + reverse(url_name))
                 # First inline shows the verbose_name.
-                available, chosen = self.selenium.find_elements(bla
+                available, chosen = self.selenium.find_elements(
                     By.CSS_SELECTOR, css_selector % 0
                 )
                 self.assertEqual(available.text, "AVAILABLE ATTENDANT")
