@@ -122,7 +122,6 @@ class TestInline(TestDataMixin, TestCase):
         response = self.client.get(
             reverse("admin:admin_inlines_uuidparent_change", args=(uuidparent.id,))
         )
-        print(response.content)
         self.assertContains(response, '<input type="hidden" name="uuidchild_set-0-id"')
 
     def test_many_to_many_inlines(self):
