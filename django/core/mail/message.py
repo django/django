@@ -282,7 +282,7 @@ class EmailMessage:
             msg["Message-ID"] = make_msgid(domain=DNS_NAME)
 
         if "Auto-Submitted" not in self.extra_headers:
-            # Default to adding the Auto-Submitted : auto-generated header
+            # Default to adding the Auto-Submitted: auto-generated header
             self.extra_headers["Auto-Submitted"] = "auto-generated"
 
         for name, value in self.extra_headers.items():
@@ -441,14 +441,10 @@ class EmailMessage:
 class NoAutoSubmittedHeaderEmailMessage(EmailMessage):
     """
     A version of EmailMessage that does not have the default
-    Auto-Submitted : auto-generated header attached to it.
+    Auto-Submitted: auto-generated header attached to it.
     """
 
     def message(self):
-        """
-        This removes the default Auto-Submitted : auto-generated
-        header from the message
-        """
         msg = super().message()
         if "Auto-Submitted" in msg:
             del msg["Auto-Submitted"]

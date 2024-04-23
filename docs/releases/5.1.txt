@@ -195,6 +195,10 @@ Email
 
 * :class:`<django.core.mail.EmailMessage>` now attaches a default header of "Auto-Submitted : auto-generated"
   to outgoing emails. You can opt-out of this by using :class:`<django.core.mail.NoAutoSubmittedHeaderEmailMessage>`
+* :class:`<django.core.mail.EmailMessage>` now attaches a default header of "Auto-Submitted: auto-generated"
+  to outgoing emails. You can opt-out of this by using :class:`<django.core.mail.NoAutoSubmittedHeaderEmailMessage>`
+* :class:`~django.core.mail.EmailMessage` now attaches a default header of "Auto-Submitted: auto-generated"
+  to outgoing emails. You can opt-out of this by using :class:`~django.core.mail.NoAutoSubmittedHeaderEmailMessage`
   which does not attach this default header.
 
 Error Reporting
