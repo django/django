@@ -55,6 +55,8 @@ from .models import (
     Teacher,
     Title,
     TitleCollection,
+    UUIDChild,
+    UUIDParent,
 )
 
 site = admin.AdminSite(name="admin")
@@ -418,6 +420,16 @@ class ShowInlineChildInline(admin.StackedInline):
     model = ShowInlineChild
 
 
+class UUIDChildInline(admin.StackedInline):
+    model = UUIDChild
+    exclude = ("id",)
+
+
+class UUIDParentModelAdmin(admin.ModelAdmin):
+    model = UUIDParent
+    inlines = [UUIDChildInline]
+
+
 class ShowInlineParentAdmin(admin.ModelAdmin):
     def get_inlines(self, request, obj):
         if obj is not None and obj.show_inlines:
@@ -459,6 +471,8 @@ site.register(CourseProxy, ClassAdminStackedVertical)
 site.register(CourseProxy1, ClassAdminTabularVertical)
 site.register(CourseProxy2, ClassAdminTabularHorizontal)
 site.register(ShowInlineParent, ShowInlineParentAdmin)
+site.register(UUIDParent, UUIDParentModelAdmin)
+
 # Used to test hidden fields in tabular and stacked inlines.
 site2 = admin.AdminSite(name="tabular_inline_hidden_field_admin")
 site2.register(SomeParentModel, inlines=[ChildHiddenFieldTabularInline])

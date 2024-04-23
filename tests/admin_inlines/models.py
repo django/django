@@ -3,6 +3,7 @@ Testing of admin inline formsets.
 """
 
 import random
+import uuid
 
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
@@ -378,3 +379,14 @@ class BothVerboseNameProfile(Profile):
     class Meta:
         verbose_name = "Model with both - name"
         verbose_name_plural = "Model with both - plural name"
+
+
+class UUIDParent(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
+    title = models.CharField(max_length=128)
+
+
+class UUIDChild(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
+    title = models.CharField(max_length=128)
+    parent = models.ForeignKey(UUIDParent, on_delete=models.CASCADE)
