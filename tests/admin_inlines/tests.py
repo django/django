@@ -42,10 +42,10 @@ from .models import (
     SomeChildModel,
     SomeParentModel,
     Teacher,
+    UUIDChild,
+    UUIDParent,
     VerboseNamePluralProfile,
     VerboseNameProfile,
-    UUIDParent,
-    UUIDChild,
 )
 
 INLINE_CHANGELINK_HTML = 'class="inlinechangelink">Change</a>'
@@ -2058,7 +2058,7 @@ class SeleniumTests(AdminSeleniumTestCase):
             with self.subTest(url=url_name):
                 self.selenium.get(self.live_server_url + reverse(url_name))
                 # First inline shows the verbose_name.
-                available, chosen = self.selenium.find_elements(
+                available, chosen = self.selenium.find_elements(bla
                     By.CSS_SELECTOR, css_selector % 0
                 )
                 self.assertEqual(available.text, "AVAILABLE ATTENDANT")
