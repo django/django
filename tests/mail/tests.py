@@ -19,6 +19,7 @@ from django.core.mail import (
     DNS_NAME,
     EmailMessage,
     EmailMultiAlternatives,
+    NoAutoSubmittedHeaderEmailMessage,
     mail_admins,
     mail_managers,
     send_mail,
@@ -448,6 +449,18 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             headers={"Reply-To": "reply_to@example.com"},
         ).message()
         self.assertEqual(message["Reply-To"], "reply_to@example.com")
+
+    def test_default_auto_generated_header(self):
+        message = EmailMessage(
+            "Subject", "Content", "from@example.com", ["to@example.com"]
+        ).message()
+        self.assertEqual(message["Auto-Submitted"], "auto-generated")
+
+    def test_no_default_auto_generated_header(self):
+        message = NoAutoSubmittedHeaderEmailMessage(
+            "Subject", "Content", "from@example.com", ["to@example.com"]
+        ).message()
+        self.assertNotIn("Auto-Submitted", message)
 
     def test_multiple_message_call(self):
         """
