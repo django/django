@@ -14,4 +14,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check comments and create reminders
-        uses: agrc/create-reminder-action@v1
+        uses: agrc/create-reminder-action@922893a5705067719c4c4751843962f56aabf5eb
