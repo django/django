@@ -8,8 +8,12 @@ from decimal import Decimal
 
 from django.utils import six
 from django.utils.functional import Promise
-from django.utils.six.moves.urllib.parse import quote, unquote
 
+try:
+    from urllib.parse import quote, unquote  # For Python 3
+except ImportError:
+    from urllib import quote, unquote  # For Python 2
+    
 if six.PY3:
     from urllib.parse import unquote_to_bytes
 
