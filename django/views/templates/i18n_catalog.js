@@ -36,7 +36,7 @@
     }
 
     // if value in catalog is an array and index is present, return the array index if exists
-    if (value && value.constructor === Array && index != undefined) {
+    if (value && value.constructor === Array && index !== undefined) {
       const text = value[index];
 
       if (typeof text === 'string' && text) {
