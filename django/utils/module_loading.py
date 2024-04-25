@@ -13,6 +13,11 @@ def cached_import(module_path, class_name):
         and getattr(spec, "_initializing", False) is False
     ):
         module = import_module(module_path)
+    if not hasattr(module, class_name):
+        try:
+            import_module(f"{module_path}.{class_name}")
+        except ImportError:
+            pass
     return getattr(module, class_name)
 
 
