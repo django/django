@@ -43,7 +43,7 @@ The CSRF protection is based on the following things:
    a mask. The mask is generated randomly on every call to ``get_token()``, so
    the form field value is different each time.
 
-   This part is done by the template tag.
+   This part is done by the :ttag:`csrf_token` template tag.
 
 #. For all incoming requests that are not using HTTP GET, HEAD, OPTIONS or
    TRACE, a CSRF cookie must be present, and the 'csrfmiddlewaretoken' field
