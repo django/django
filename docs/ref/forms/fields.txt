@@ -7,7 +7,7 @@ Form fields
 
 .. currentmodule:: django.forms
 
-.. class:: Field(**kwargs)
+.. class:: Field
 
 When you create a ``Form`` class, the most important part is defining the
 fields of the form. Each field has custom validation logic, along with a few
