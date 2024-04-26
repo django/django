@@ -131,7 +131,7 @@ class MIMEMixin:
         lines that begin with 'From '. See bug #13433 for details.
         """
         fp = StringIO()
-        g = generator.Generator(fp, mangle_from_=False)
+        g = generator.Generator(fp, mangle_from_=False, maxheaderlen=0)
         g.flatten(self, unixfrom=unixfrom, linesep=linesep)
         return fp.getvalue()
 
@@ -144,7 +144,7 @@ class MIMEMixin:
         lines that begin with 'From '. See bug #13433 for details.
         """
         fp = BytesIO()
-        g = generator.BytesGenerator(fp, mangle_from_=False)
+        g = generator.BytesGenerator(fp, mangle_from_=False, maxheaderlen=0)
         g.flatten(self, unixfrom=unixfrom, linesep=linesep)
         return fp.getvalue()
 

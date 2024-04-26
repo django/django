@@ -894,6 +894,21 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         )
         self.assertNotIn(b">From the future", email.message().as_bytes())
 
+    def test_long_address_folding(self):
+        # Ticket #35378
+        # should encode long addresses with special characters using
+        # 7bit Content-Transfer-Encoding
+        msg = EmailMessage(
+            "Subject",
+            "Long address with special characters",
+            "from@example.com",
+            ['"Người nhận a very very long, name" <to@example.com>']
+        )
+        s = msg.message().as_bytes()
+        self.assertIn(b"Content-Transfer-Encoding: 7bit", s)
+        s = msg.message().as_string()
+        self.assertIn("Content-Transfer-Encoding: 7bit", s)
+
     def test_dont_base64_encode(self):
         # Ticket #3472
         # Shouldn't use Base64 encoding at all
