@@ -902,7 +902,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             "Subject",
             "Long address with special characters",
             "from@example.com",
-            ['"Người nhận a very very long, name" <to@example.com>']
+            ['"Người nhận a very very long, name" <to@example.com>'],
         )
         s = msg.message().as_bytes()
         self.assertIn(b"Content-Transfer-Encoding: 7bit", s)
