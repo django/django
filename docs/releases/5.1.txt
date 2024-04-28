@@ -425,6 +425,10 @@ Miscellaneous
 
 * The minimum supported version of SQLite is increased from 3.27.0 to 3.31.0.
 
+* :class:`~django.db.models.FileField` now raises a
+  :class:`~django.core.exceptions.FieldError` when saving a file without a
+  ``name``.
+
 .. _deprecated-features-5.1:
 
 Features deprecated in 5.1
