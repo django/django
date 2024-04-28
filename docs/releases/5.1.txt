@@ -419,6 +419,8 @@ Miscellaneous
 * The undocumented ``django.urls.converters.get_converter()`` function is
   removed.
 
+* The minimum supported version of SQLite is increased from 3.27.0 to 3.31.0.
+
 .. _deprecated-features-5.1:
 
 Features deprecated in 5.1
