@@ -248,6 +248,13 @@ Migrations
   <django.db.migrations.operations.base.OperationCategory>` used by the
   :djadmin:`makemigrations` to display a meaningful symbol for the operation.
 
+* The :class:`~django.db.migrations.operations.RemoveField` operation now
+  supports providing one-off default values for non-nullable fields. This
+  default value will make the
+  :class:`~django.db.migrations.operations.RemoveField` operation with a
+  non-nullable field reversible. If the default value is not provided, the
+  operation will be irreversible.
+
 Models
 ~~~~~~
 
@@ -280,12 +287,6 @@ Models
 
 * The new ``"transaction_mode"`` option is now supported in :setting:`OPTIONS`
   on SQLite to allow specifying the :ref:`sqlite-transaction-behavior`.
-
-* The ``RemoveField`` operation now supports default values for non-nullable
-  fields. This default value will make the ``RemoveField`` operation with a
-  non-nullable field reversible. If the default value is not provided,
-  the operation will be irreversible.
-
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~

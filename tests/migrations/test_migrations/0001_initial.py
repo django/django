@@ -13,6 +13,7 @@ class Migration(migrations.Migration):
                 ("slug", models.SlugField(null=True)),
                 ("age", models.IntegerField(default=0)),
                 ("silly_field", models.BooleanField(default=False)),
+                ("price", models.IntegerField(db_default=100)),
             ],
         ),
         migrations.CreateModel(

@@ -1917,7 +1917,7 @@ class MakeMigrationsTests(MigrationTestBase):
 
         input_msg = (
             "It is not recommended to remove a non-nullable field 'name' from "
-            "'author' without a default; "
+            "'author' without providing a default."
             "This is because the database needs something to populate existing "
             "rows when migrating backwards.\n"
             "Please select a fix:\n"

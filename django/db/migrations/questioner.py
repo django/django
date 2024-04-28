@@ -224,7 +224,7 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
         if not self.dry_run:
             choice = self._choice_input(
                 f"It is not recommended to remove a non-nullable field '{field_name}' "
-                f"from '{model_name}' without a default; "
+                f"from '{model_name}' without providing a default."
                 f"This is because the database needs something to populate existing "
                 f"rows when migrating backwards.\n"
                 f"Please select a fix:",

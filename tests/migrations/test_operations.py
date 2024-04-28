@@ -1942,7 +1942,6 @@ class OperationTests(OperationTestBase):
         Tests the RemoveField operation with explicit default
         """
         project_state = self.set_up_test_model("test_rmflnn")
-        # Test the state alteration
         operation = migrations.RemoveField("Pony", "weight")
         new_state = project_state.clone()
         Pony = project_state.apps.get_model("test_rmflnn.Pony")
@@ -1952,7 +1951,6 @@ class OperationTests(OperationTestBase):
         with connection.schema_editor() as editor:
             operation.database_forwards("test_rmflnn", editor, project_state, new_state)
 
-        # And test reversal
         # MySQL populates NOT NULL cols with implicit defaults instead of raising
         # an error.
         if connection.vendor != "mysql":
@@ -1969,7 +1967,6 @@ class OperationTests(OperationTestBase):
             )
         self.assertEqual(Pony.objects.get().weight, 42)
 
-        # And deconstruction
         definition = operation.deconstruct()
         self.assertEqual(
             definition[2], {"model_name": "Pony", "name": "weight", "default": 42}

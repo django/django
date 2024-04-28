@@ -198,8 +198,8 @@ The operation is reversible (apart from any data loss, which is irreversible)
 if the field is nullable or if it has a default value that can be used to
 populate the recreated column. If the field is not nullable and does not have a
 default value, it will ask to provide a default value to populate existing
-rows and make operation reversible. If the default value is not provided, the
-operation will be irreversible.
+rows and make the operation reversible. If the default value is not provided,
+the operation will be irreversible.
 
 .. admonition:: PostgreSQL
 
