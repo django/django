@@ -1342,13 +1342,13 @@ following optional arguments:
 
 .. attribute:: ImageField.height_field
 
-    Name of a model field which will be auto-populated with the height of the
-    image each time the model instance is saved.
+    Name of a model field which is auto-populated with the height of the image
+    each time an image object is set.
 
 .. attribute:: ImageField.width_field
 
-    Name of a model field which will be auto-populated with the width of the
-    image each time the model instance is saved.
+    Name of a model field which is auto-populated with the width of the image
+    each time an image object is set.
 
 Requires the `Pillow`_ library.
 
