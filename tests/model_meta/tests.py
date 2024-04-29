@@ -3,7 +3,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 from django.core.exceptions import FieldDoesNotExist
 from django.db.models import CharField, Field, ForeignObjectRel, ManyToManyField
 from django.db.models.options import EMPTY_RELATION_TREE, IMMUTABLE_WARNING
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, override_settings
 
 from .models import (
     AbstractPerson,
@@ -16,6 +16,7 @@ from .models import (
     Relating,
     Relation,
     SecondParent,
+    Swappable,
 )
 from .results import TEST_RESULTS
 
@@ -231,6 +232,31 @@ class VerboseNameRawTests(SimpleTestCase):
     def test_gettext(self):
         Person._meta.__dict__.pop("verbose_name_raw", None)
         self.assertEqual(Person._meta.verbose_name_raw, "Person")
+
+
+class SwappedTests(SimpleTestCase):
+    def test_plain_model_none(self):
+        self.assertIsNone(Relation._meta.swapped)
+
+    def test_unset(self):
+        self.assertIsNone(Swappable._meta.swapped)
+
+    def test_set_and_unset(self):
+        with override_settings(MODEL_META_TESTS_SWAPPED="model_meta.Relation"):
+            self.assertEqual(Swappable._meta.swapped, "model_meta.Relation")
+        self.assertIsNone(Swappable._meta.swapped)
+
+    def test_setting_none(self):
+        with override_settings(MODEL_META_TESTS_SWAPPED=None):
+            self.assertIsNone(Swappable._meta.swapped)
+
+    def test_setting_non_label(self):
+        with override_settings(MODEL_META_TESTS_SWAPPED="not-a-label"):
+            self.assertEqual(Swappable._meta.swapped, "not-a-label")
+
+    def test_setting_self(self):
+        with override_settings(MODEL_META_TESTS_SWAPPED="model_meta.swappable"):
+            self.assertIsNone(Swappable._meta.swapped)
 
 
 class RelationTreeTests(SimpleTestCase):
