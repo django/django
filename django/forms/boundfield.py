@@ -298,6 +298,7 @@ class BoundField(RenderableFieldMixin):
             and self.field.help_text
             and not self.use_fieldset
             and self.auto_id
+            and not self.is_hidden
         ):
             attrs["aria-describedby"] = f"{self.auto_id}_helptext"
         return attrs
