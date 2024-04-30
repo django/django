@@ -182,6 +182,9 @@ Database backends
   to allow specifying :ref:`pragma options <sqlite-init-command>` to set upon
   connection.
 
+* ``"transaction_mode"`` option is now supported in :setting:`OPTIONS` on
+  SQLite to allow specifying the :ref:`sqlite-transaction-behavior`.
+
 * ``"pool"`` option is now supported in :setting:`OPTIONS` on PostgreSQL to
   allow using :ref:`connection pools <postgresql-pool>`.
 
@@ -277,9 +280,6 @@ Models
   :meth:`.Model.arefresh_from_db`  allows customizing the queryset used to
   reload a model's value. This can be used to lock the row before reloading or
   to select related objects.
-
-* The new ``"transaction_mode"`` option is now supported in :setting:`OPTIONS`
-  on SQLite to allow specifying the :ref:`sqlite-transaction-behavior`.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
