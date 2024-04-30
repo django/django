@@ -2114,7 +2114,7 @@ SQL equivalent:
             2
         )
 
-   .. versionchanged:: 5.0
+    .. versionchanged:: 5.0
 
         In older versions, on databases without native support for the SQL
         ``XOR`` operator, ``XOR`` returned rows that were matched by exactly
