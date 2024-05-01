@@ -382,6 +382,21 @@ class SchemaTests(PostgreSQLTestCase):
             editor.remove_index(Scene, index)
         self.assertNotIn(index_name, self.get_constraints(Scene._meta.db_table))
 
+    def test_gin_index_with_lower(self):
+        index_name = "lower_op_class_gin"
+        index = GinIndex(OpClass(Lower("scene"), name="gin_trgm_ops"), name=index_name)
+        with connection.schema_editor() as editor:
+            editor.add_index(Scene, index)
+        with editor.connection.cursor() as cursor:
+            cursor.execute(self.get_opclass_query, [index_name])
+            self.assertCountEqual(cursor.fetchall(), [("gin_trgm_ops", index_name)])
+        constraints = self.get_constraints(Scene._meta.db_table)
+        self.assertIn(index_name, constraints)
+        self.assertIn(constraints[index_name]["type"], GinIndex.suffix)
+        with connection.schema_editor() as editor:
+            editor.remove_index(Scene, index)
+        self.assertNotIn(index_name, self.get_constraints(Scene._meta.db_table))
+
     def test_cast_search_vector_gin_index(self):
         index_name = "cast_search_vector_gin"
         index = GinIndex(Cast("field", SearchVectorField()), name=index_name)
