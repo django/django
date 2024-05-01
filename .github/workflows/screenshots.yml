@@ -47,8 +47,14 @@ jobs:
       - name: Optimize screenshots
         run: oxipng --interlace=0 --opt=4 --strip=safe tests/screenshots/*.png
 
+      - name: Organize screenshots
+        run: |
+          mkdir --parents "/tmp/screenshots/${{ github.event.pull_request.head.sha }}"
+          mv tests/screenshots/* "/tmp/screenshots/${{ github.event.pull_request.head.sha }}/"
+
       - name: Upload screenshots
         uses: actions/upload-artifact@v4
         with:
           name: screenshots-${{ github.event.pull_request.head.sha }}
-          path: tests/screenshots/
+          path: /tmp/screenshots/
+          if-no-files-found: error

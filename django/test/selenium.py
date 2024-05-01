@@ -142,6 +142,8 @@ class SeleniumTestCase(LiveServerTestCase, metaclass=SeleniumTestCaseBase):
 
                 test.__name__ = f"{name}_{screenshot_case}"
                 test.__qualname__ = f"{test.__qualname__}_{screenshot_case}"
+                test._screenshot_name = name
+                test._screenshot_case = screenshot_case
                 setattr(cls, test.__name__, test)
 
     @classproperty
@@ -214,7 +216,9 @@ class SeleniumTestCase(LiveServerTestCase, metaclass=SeleniumTestCaseBase):
     def take_screenshot(self, name):
         if not self.screenshots:
             return
-        path = Path.cwd() / "screenshots" / f"{self._testMethodName}-{name}.png"
+        test = getattr(self, self._testMethodName)
+        filename = f"{test._screenshot_name}--{name}--{test._screenshot_case}.png"
+        path = Path.cwd() / "screenshots" / filename
         path.parent.mkdir(exist_ok=True, parents=True)
         self.selenium.save_screenshot(path)
 
