@@ -30,14 +30,10 @@ jobs:
       - name: Install and upgrade packaging tools
         run: python -m pip install --upgrade pip setuptools wheel
       - run: python -m pip install -r tests/requirements/py3.txt -e .
+
       - name: Run Selenium tests with screenshots
-        id: generate-screenshots
         working-directory: ./tests/
-        run: |
-          python -Wall runtests.py --verbosity 2 --noinput --selenium=chrome --headless --screenshots --settings=test_sqlite --parallel 2
-          echo "date=$(date)" >> $GITHUB_OUTPUT
-          echo "🖼️ **Screenshots created**" >> $GITHUB_STEP_SUMMARY
-          echo "Generated screenshots for ${{ github.event.pull_request.head.sha }} at $(date)" >> $GITHUB_STEP_SUMMARY
+        run: python -Wall runtests.py --verbosity=2 --noinput --selenium=chrome --headless --screenshots --settings=test_sqlite --parallel=2
 
       - name: Upload screenshots
         uses: actions/upload-artifact@v4
