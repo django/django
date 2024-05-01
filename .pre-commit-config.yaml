@@ -11,6 +11,7 @@ repos:
         additional_dependencies:
         - black==24.2.0
         files: 'docs/.*\.txt$'
+        args: ["--rst-literal-block"]
   - repo: https://github.com/PyCQA/isort
     rev: 5.13.2
     hooks:
