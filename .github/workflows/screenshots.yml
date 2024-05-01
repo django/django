@@ -35,6 +35,18 @@ jobs:
         working-directory: ./tests/
         run: python -Wall runtests.py --verbosity=2 --noinput --selenium=chrome --headless --screenshots --settings=test_sqlite --parallel=2
 
+      - name: Cache oxipng
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/
+          key: ${{ runner.os }}-cargo
+
+      - name: Install oxipng
+        run: which oxipng || cargo install oxipng
+
+      - name: Optimize screenshots
+        run: oxipng --interlace=0 --opt=4 --strip=safe tests/screenshots/*.png
+
       - name: Upload screenshots
         uses: actions/upload-artifact@v4
         with:
