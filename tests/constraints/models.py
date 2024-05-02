@@ -63,6 +63,20 @@ class UniqueConstraintConditionProduct(models.Model):
         ]
 
 
+class UniqueConstraintSingleFieldConditionProduct(models.Model):
+    name = models.CharField(max_length=255)
+
+    class Meta:
+        required_db_features = {"supports_partial_indexes"}
+        constraints = [
+            models.UniqueConstraint(
+                fields=["name"],
+                name="unique_non_empty_string_name",
+                condition=~models.Q(name=""),
+            ),
+        ]
+
+
 class UniqueConstraintDeferrable(models.Model):
     name = models.CharField(max_length=255)
     shelf = models.CharField(max_length=31)

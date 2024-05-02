@@ -1571,6 +1571,11 @@ class Model(AltersData, metaclass=ModelBase):
                     if (
                         getattr(e, "code", None) == "unique"
                         and len(constraint.fields) == 1
+                        and (
+                            constraint.condition is None
+                            or set(constraint.fields)
+                            == constraint.condition.referenced_base_fields
+                        )
                     ):
                         errors.setdefault(constraint.fields[0], []).append(e)
                     else:

@@ -84,7 +84,7 @@ class PerformConstraintChecksTest(TestCase):
             cm.exception.message_dict,
             {
                 "__all__": [
-                    "Constraint “name_without_color_uniq_validation” is violated."
+                    "Constraint “name_without_color_uniq_validation” is violated.",
                 ]
             },
         )

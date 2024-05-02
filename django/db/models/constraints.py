@@ -674,8 +674,8 @@ class UniqueConstraint(BaseConstraint):
                     against, using=using
                 ):
                     raise ValidationError(
-                        self.get_violation_error_message(),
-                        code=self.violation_error_code,
+                        message=self.get_violation_error_message(),
+                        code=self.violation_error_code or "unique",
                     )
             except FieldError:
                 pass
