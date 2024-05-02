@@ -3,6 +3,7 @@ import operator
 from datetime import datetime
 
 from django.conf import settings
+from django.core.exceptions import FieldError
 from django.db.backends.ddl_references import (
     Columns,
     Expressions,
@@ -832,6 +833,7 @@ class BaseDatabaseSchemaEditor:
         old_type = old_db_params["type"]
         new_db_params = new_field.db_parameters(connection=self.connection)
         new_type = new_db_params["type"]
+        modifying_generated_field = False
         if (old_type is None and old_field.remote_field is None) or (
             new_type is None and new_field.remote_field is None
         ):
@@ -870,13 +872,19 @@ class BaseDatabaseSchemaEditor:
                 "through= on M2M fields)" % (old_field, new_field)
             )
         elif old_field.generated != new_field.generated or (
-            new_field.generated
-            and (
-                old_field.db_persist != new_field.db_persist
-                or old_field.generated_sql(self.connection)
-                != new_field.generated_sql(self.connection)
-            )
+            new_field.generated and old_field.db_persist != new_field.db_persist
         ):
+            modifying_generated_field = True
+        elif new_field.generated:
+            try:
+                old_field_sql = old_field.generated_sql(self.connection)
+            except FieldError:
+                # Field used in a generated field was renamed.
+                modifying_generated_field = True
+            else:
+                new_field_sql = new_field.generated_sql(self.connection)
+                modifying_generated_field = old_field_sql != new_field_sql
+        if modifying_generated_field:
             raise ValueError(
                 f"Modifying GeneratedFields is not supported - the field {new_field} "
                 "must be removed and re-added with the new definition."

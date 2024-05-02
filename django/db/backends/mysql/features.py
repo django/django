@@ -173,6 +173,18 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                     },
                 }
             )
+        if not self.connection.mysql_is_mariadb:
+            skips.update(
+                {
+                    "MySQL doesn't allow renaming columns referenced by generated "
+                    "columns": {
+                        "migrations.test_operations.OperationTests."
+                        "test_invalid_generated_field_changes_on_rename_stored",
+                        "migrations.test_operations.OperationTests."
+                        "test_invalid_generated_field_changes_on_rename_virtual",
+                    },
+                }
+            )
         return skips
 
     @cached_property
