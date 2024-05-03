@@ -603,7 +603,7 @@ information.
 
 .. versionadded:: 5.0
 
-.. class:: GenericPrefetch(lookup, querysets=None, to_attr=None)
+.. class:: GenericPrefetch(lookup, querysets, to_attr=None)
 
 This lookup is similar to ``Prefetch()`` and it should only be used on
 ``GenericForeignKey``. The ``querysets`` argument accepts a list of querysets,

@@ -30,3 +30,6 @@ Bugfixes
 
 * Fixed a bug in Django 5.0 that caused a migration crash when altering a
   ``GeneratedField`` referencing a renamed field (:ticket:`35422`).
+
+* Fixed a bug in Django 5.0 where the ``querysets`` argument of
+  ``GenericPrefetch`` was not required (:ticket:`35426`).
