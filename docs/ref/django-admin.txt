@@ -584,7 +584,7 @@ Updates the message files for all available languages.
 .. django-admin-option:: --extension EXTENSIONS, -e EXTENSIONS
 
 Specifies a list of file extensions to examine (default: ``html``, ``txt``,
-``py`` or ``js`` if :option:`--domain` is ``js``).
+``py`` or ``js`` if :option:`--domain` is ``djangojs``).
 
 Example usage:
 
