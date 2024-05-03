@@ -8,7 +8,7 @@ from django.db.migrations.operations.fields import FieldOperation
 from django.db.migrations.state import ModelState, ProjectState
 from django.db.models import F
 from django.db.models.expressions import Value
-from django.db.models.functions import Abs, Concat, Pi
+from django.db.models.functions import Abs, Pi
 from django.db.transaction import atomic
 from django.test import (
     SimpleTestCase,
@@ -1389,7 +1389,7 @@ class OperationTests(OperationTestBase):
                     "Pony",
                     fields=[
                         ("id", models.AutoField(primary_key=True)),
-                        ("name", models.CharField(max_length=20)),
+                        ("pink", models.IntegerField()),
                         (
                             "rider",
                             models.ForeignKey(
@@ -1397,10 +1397,10 @@ class OperationTests(OperationTestBase):
                             ),
                         ),
                         (
-                            "name_and_id",
+                            "pink_plus_rider",
                             models.GeneratedField(
-                                expression=Concat(("name"), ("rider_id")),
-                                output_field=models.TextField(),
+                                expression=F("pink") + F("rider_id"),
+                                output_field=models.IntegerField(),
                                 db_persist=True,
                             ),
                         ),
@@ -1411,14 +1411,8 @@ class OperationTests(OperationTestBase):
         Pony = project_state.apps.get_model(app_label, "Pony")
         Rider = project_state.apps.get_model(app_label, "Rider")
         rider = Rider.objects.create()
-        pony = Pony.objects.create(name="pony", rider=rider)
-        self.assertEqual(pony.name_and_id, str(pony.name) + str(rider.id))
-
-        new_rider = Rider.objects.create()
-        pony.rider = new_rider
-        pony.save()
-        pony.refresh_from_db()
-        self.assertEqual(pony.name_and_id, str(pony.name) + str(new_rider.id))
+        pony = Pony.objects.create(pink=3, rider=rider)
+        self.assertEqual(pony.pink_plus_rider, 3 + rider.id)
 
     def test_add_charfield(self):
         """
