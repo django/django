@@ -150,10 +150,6 @@ class-based views<decorating-class-based-views>`.
         def my_view(request):
             return HttpResponse("Hello world")
 
-    .. versionchanged:: 5.0
-
-        Support for wrapping asynchronous view functions was added.
-
 .. function:: csrf_protect(view)
 
     Decorator that provides the protection of ``CsrfViewMiddleware`` to a view.
@@ -169,10 +165,6 @@ class-based views<decorating-class-based-views>`.
             c = {}
             # ...
             return render(request, "a_template.html", c)
-
-    .. versionchanged:: 5.0
-
-        Support for wrapping asynchronous view functions was added.
 
 .. function:: requires_csrf_token(view)
 
@@ -194,17 +186,9 @@ class-based views<decorating-class-based-views>`.
             # ...
             return render(request, "a_template.html", c)
 
-    .. versionchanged:: 5.0
-
-        Support for wrapping asynchronous view functions was added.
-
 .. function:: ensure_csrf_cookie(view)
 
     This decorator forces a view to send the CSRF cookie.
-
-    .. versionchanged:: 5.0
-
-        Support for wrapping asynchronous view functions was added.
 
 Settings
 ========

@@ -107,10 +107,6 @@ Signals can be sent either synchronously or asynchronously, and receivers will
 automatically be adapted to the correct call-style. See :ref:`sending signals
 <sending-signals>` for more information.
 
-.. versionchanged:: 5.0
-
-    Support for asynchronous receivers was added.
-
 .. _connecting-receiver-functions:
 
 Connecting receiver functions
@@ -329,10 +325,6 @@ receiver. In addition, async receivers are executed concurrently using
 
 All built-in signals, except those in the async request-response cycle, are
 dispatched using :meth:`Signal.send`.
-
-.. versionchanged:: 5.0
-
-    Support for asynchronous signals was added.
 
 Disconnecting signals
 =====================
