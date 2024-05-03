@@ -3,6 +3,7 @@
 # Translators:
 # HuanCheng Bai白宦成（Bestony） <xiqingongzi@gmail.com>, 2018
 # Fan Xu <xlivevil@aliyun.com>, 2022
+# jack yang, 2023
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kaiqi Zhu, 2023
 # Kewei Ma <marknv.42@gmail.com>, 2016
@@ -21,8 +22,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-18 15:04-0300\n"
-"PO-Revision-Date: 2023-12-04 07:59+0000\n"
-"Last-Translator: Kaiqi Zhu, 2023\n"
+"PO-Revision-Date: 2023-12-25 07:59+0000\n"
+"Last-Translator: jack yang, 2023\n"
 "Language-Team: Chinese (China) (http://app.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -248,53 +249,53 @@ msgid "Dec"
 msgstr "十二月"
 
 msgid "Sunday"
-msgstr ""
+msgstr "星期日"
 
 msgid "Monday"
-msgstr ""
+msgstr "星期一"
 
 msgid "Tuesday"
-msgstr ""
+msgstr "星期二"
 
 msgid "Wednesday"
-msgstr ""
+msgstr "星期三"
 
 msgid "Thursday"
-msgstr ""
+msgstr "星期四"
 
 msgid "Friday"
-msgstr ""
+msgstr "星期五"
 
 msgid "Saturday"
-msgstr ""
+msgstr "星期六"
 
 msgctxt "abbrev. day Sunday"
 msgid "Sun"
-msgstr ""
+msgstr "星期日"
 
 msgctxt "abbrev. day Monday"
 msgid "Mon"
-msgstr ""
+msgstr "星期一"
 
 msgctxt "abbrev. day Tuesday"
 msgid "Tue"
-msgstr ""
+msgstr "星期二"
 
 msgctxt "abbrev. day Wednesday"
 msgid "Wed"
-msgstr ""
+msgstr "星期三"
 
 msgctxt "abbrev. day Thursday"
 msgid "Thur"
-msgstr ""
+msgstr "星期四"
 
 msgctxt "abbrev. day Friday"
 msgid "Fri"
-msgstr ""
+msgstr "星期五"
 
 msgctxt "abbrev. day Saturday"
 msgid "Sat"
-msgstr ""
+msgstr "星期六"
 
 msgctxt "one letter Sunday"
 msgid "S"

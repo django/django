@@ -154,7 +154,7 @@ class RelatedField(FieldCacheMixin, Field):
         return []
 
     def _check_related_query_name_is_valid(self):
-        if self.remote_field.is_hidden():
+        if self.remote_field.hidden:
             return []
         rel_query_name = self.related_query_name()
         errors = []
@@ -253,8 +253,8 @@ class RelatedField(FieldCacheMixin, Field):
         # If the field doesn't install a backward relation on the target model
         # (so `is_hidden` returns True), then there are no clashes to check
         # and we can skip these fields.
-        rel_is_hidden = self.remote_field.is_hidden()
-        rel_name = self.remote_field.get_accessor_name()  # i. e. "model_set"
+        rel_is_hidden = self.remote_field.hidden
+        rel_name = self.remote_field.accessor_name  # i. e. "model_set"
         rel_query_name = self.related_query_name()  # i. e. "model"
         # i.e. "app_label.Model.field".
         field_name = "%s.%s" % (opts.label, self.name)
@@ -264,9 +264,8 @@ class RelatedField(FieldCacheMixin, Field):
         # model_set and it clashes with Target.model_set.
         potential_clashes = rel_opts.fields + rel_opts.many_to_many
         for clash_field in potential_clashes:
-            # i.e. "app_label.Target.model_set".
-            clash_name = "%s.%s" % (rel_opts.label, clash_field.name)
             if not rel_is_hidden and clash_field.name == rel_name:
+                clash_name = f"{rel_opts.label}.{clash_field.name}"
                 errors.append(
                     checks.Error(
                         f"Reverse accessor '{rel_opts.object_name}.{rel_name}' "
@@ -283,6 +282,7 @@ class RelatedField(FieldCacheMixin, Field):
                 )
 
             if clash_field.name == rel_query_name:
+                clash_name = f"{rel_opts.label}.{clash_field.name}"
                 errors.append(
                     checks.Error(
                         "Reverse query name for '%s' clashes with field name '%s'."
@@ -302,12 +302,10 @@ class RelatedField(FieldCacheMixin, Field):
         # Model.m2m accessor.
         potential_clashes = (r for r in rel_opts.related_objects if r.field is not self)
         for clash_field in potential_clashes:
-            # i.e. "app_label.Model.m2m".
-            clash_name = "%s.%s" % (
-                clash_field.related_model._meta.label,
-                clash_field.field.name,
-            )
-            if not rel_is_hidden and clash_field.get_accessor_name() == rel_name:
+            if not rel_is_hidden and clash_field.accessor_name == rel_name:
+                clash_name = (
+                    f"{clash_field.related_model._meta.label}.{clash_field.field.name}"
+                )
                 errors.append(
                     checks.Error(
                         f"Reverse accessor '{rel_opts.object_name}.{rel_name}' "
@@ -323,7 +321,10 @@ class RelatedField(FieldCacheMixin, Field):
                     )
                 )
 
-            if clash_field.get_accessor_name() == rel_query_name:
+            if clash_field.accessor_name == rel_query_name:
+                clash_name = (
+                    f"{clash_field.related_model._meta.label}.{clash_field.field.name}"
+                )
                 errors.append(
                     checks.Error(
                         "Reverse query name for '%s' clashes with reverse query name "
@@ -614,60 +615,56 @@ class ForeignObject(RelatedField):
         if not self.foreign_related_fields:
             return []
 
-        unique_foreign_fields = {
-            frozenset([f.name])
-            for f in self.remote_field.model._meta.get_fields()
-            if getattr(f, "unique", False)
-        }
-        unique_foreign_fields.update(
-            {frozenset(ut) for ut in self.remote_field.model._meta.unique_together}
+        has_unique_constraint = any(
+            rel_field.unique for rel_field in self.foreign_related_fields
         )
-        unique_foreign_fields.update(
-            {
-                frozenset(uc.fields)
-                for uc in self.remote_field.model._meta.total_unique_constraints
-            }
-        )
-        foreign_fields = {f.name for f in self.foreign_related_fields}
-        has_unique_constraint = any(u <= foreign_fields for u in unique_foreign_fields)
-
-        if not has_unique_constraint and len(self.foreign_related_fields) > 1:
-            field_combination = ", ".join(
-                "'%s'" % rel_field.name for rel_field in self.foreign_related_fields
+        if not has_unique_constraint:
+            foreign_fields = {f.name for f in self.foreign_related_fields}
+            remote_opts = self.remote_field.model._meta
+            has_unique_constraint = any(
+                frozenset(ut) <= foreign_fields for ut in remote_opts.unique_together
+            ) or any(
+                frozenset(uc.fields) <= foreign_fields
+                for uc in remote_opts.total_unique_constraints
             )
-            model_name = self.remote_field.model.__name__
-            return [
-                checks.Error(
-                    "No subset of the fields %s on model '%s' is unique."
-                    % (field_combination, model_name),
-                    hint=(
-                        "Mark a single field as unique=True or add a set of "
-                        "fields to a unique constraint (via unique_together "
-                        "or a UniqueConstraint (without condition) in the "
-                        "model Meta.constraints)."
-                    ),
-                    obj=self,
-                    id="fields.E310",
+
+        if not has_unique_constraint:
+            if len(self.foreign_related_fields) > 1:
+                field_combination = ", ".join(
+                    f"'{rel_field.name}'" for rel_field in self.foreign_related_fields
                 )
-            ]
-        elif not has_unique_constraint:
-            field_name = self.foreign_related_fields[0].name
-            model_name = self.remote_field.model.__name__
-            return [
-                checks.Error(
-                    "'%s.%s' must be unique because it is referenced by "
-                    "a foreign key." % (model_name, field_name),
-                    hint=(
-                        "Add unique=True to this field or add a "
-                        "UniqueConstraint (without condition) in the model "
-                        "Meta.constraints."
-                    ),
-                    obj=self,
-                    id="fields.E311",
-                )
-            ]
-        else:
-            return []
+                model_name = self.remote_field.model.__name__
+                return [
+                    checks.Error(
+                        f"No subset of the fields {field_combination} on model "
+                        f"'{model_name}' is unique.",
+                        hint=(
+                            "Mark a single field as unique=True or add a set of "
+                            "fields to a unique constraint (via unique_together "
+                            "or a UniqueConstraint (without condition) in the "
+                            "model Meta.constraints)."
+                        ),
+                        obj=self,
+                        id="fields.E310",
+                    )
+                ]
+            else:
+                field_name = self.foreign_related_fields[0].name
+                model_name = self.remote_field.model.__name__
+                return [
+                    checks.Error(
+                        f"'{model_name}.{field_name}' must be unique because it is "
+                        "referenced by a foreign key.",
+                        hint=(
+                            "Add unique=True to this field or add a "
+                            "UniqueConstraint (without condition) in the model "
+                            "Meta.constraints."
+                        ),
+                        obj=self,
+                        id="fields.E311",
+                    )
+                ]
+        return []
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
@@ -887,13 +884,10 @@ class ForeignObject(RelatedField):
     def contribute_to_related_class(self, cls, related):
         # Internal FK's - i.e., those with a related name ending with '+' -
         # and swapped models don't get a related descriptor.
-        if (
-            not self.remote_field.is_hidden()
-            and not related.related_model._meta.swapped
-        ):
+        if not self.remote_field.hidden and not related.related_model._meta.swapped:
             setattr(
                 cls._meta.concrete_model,
-                related.get_accessor_name(),
+                related.accessor_name,
                 self.related_accessor_class(related),
             )
             # While 'limit_choices_to' might be a callable, simply pass
@@ -1901,7 +1895,7 @@ class ManyToManyField(RelatedField):
             or self.remote_field.model == cls._meta.object_name
         ):
             self.remote_field.related_name = "%s_rel_+" % name
-        elif self.remote_field.is_hidden():
+        elif self.remote_field.hidden:
             # If the backwards relation is disabled, replace the original
             # related_name with one generated from the m2m field name. Django
             # still uses backwards relations internally and we need to avoid
@@ -1941,13 +1935,10 @@ class ManyToManyField(RelatedField):
     def contribute_to_related_class(self, cls, related):
         # Internal M2Ms (i.e., those with a related name ending with '+')
         # and swapped models don't get a related descriptor.
-        if (
-            not self.remote_field.is_hidden()
-            and not related.related_model._meta.swapped
-        ):
+        if not self.remote_field.hidden and not related.related_model._meta.swapped:
             setattr(
                 cls,
-                related.get_accessor_name(),
+                related.accessor_name,
                 ManyToManyDescriptor(self.remote_field, reverse=True),
             )
 

@@ -1975,7 +1975,7 @@ Row # Value Rank Calculation  Relative Rank
 
 .. class:: Rank(*expressions, **extra)
 
-Comparable to ``RowNumber``, this function ranks rows in the window. The
+Comparable to :class:`RowNumber`, this function ranks rows in the window. The
 computed rank contains gaps. Use :class:`DenseRank` to compute rank without
 gaps.
 

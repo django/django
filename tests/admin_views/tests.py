@@ -5764,7 +5764,7 @@ class SeleniumTests(AdminSeleniumTestCase):
             title="A Long Title", published=True, slug="a-long-title"
         )
 
-    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark"])
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
     def test_login_button_centered(self):
         from selenium.webdriver.common.by import By
 
@@ -6070,7 +6070,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertEqual(slug1, "this-is-the-main-name-the-best-2012-02-18")
         self.assertEqual(slug2, "option-two-this-is-the-main-name-the-best")
 
-    @screenshot_cases(["desktop_size", "mobile_size", "dark"])
+    @screenshot_cases(["desktop_size", "mobile_size", "dark", "high_contrast"])
     def test_collapsible_fieldset(self):
         """
         The 'collapse' class in fieldsets definition allows to
@@ -6093,7 +6093,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
         self.take_screenshot("expanded")
 
-    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark"])
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
     def test_selectbox_height_collapsible_fieldset(self):
         from selenium.webdriver.common.by import By
 
@@ -6121,7 +6121,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
         self.take_screenshot("selectbox-collapsible")
 
-    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark"])
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
     def test_selectbox_height_not_collapsible_fieldset(self):
         from selenium.webdriver.common.by import By
 
@@ -6152,7 +6152,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
         self.take_screenshot("selectbox-non-collapsible")
 
-    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark"])
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
     def test_first_field_focus(self):
         """JavaScript-assisted auto-focus on first usable form field."""
         from selenium.webdriver.common.by import By

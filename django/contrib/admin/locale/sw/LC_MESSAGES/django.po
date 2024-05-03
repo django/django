@@ -2,6 +2,7 @@
 #
 # Translators:
 # Antony Owino <aowino@googlemail.com>, 2023
+# DOREEN WANYAMA, 2023
 # Machaku, 2013-2014
 # Machaku, 2016
 # Millicent  Atieno Obwanda <atienoobwanda@gmail.com>, 2023
@@ -11,8 +12,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 07:05+0000\n"
-"Last-Translator: Natalia (Django Fellow), 2023\n"
+"PO-Revision-Date: 2023-12-25 07:05+0000\n"
+"Last-Translator: DOREEN WANYAMA, 2023\n"
 "Language-Team: Swahili (http://app.transifex.com/django/django/language/"
 "sw/)\n"
 "MIME-Version: 1.0\n"
@@ -250,7 +251,7 @@ msgstr "Badilisha %s"
 
 #, python-format
 msgid "View %s"
-msgstr ""
+msgstr "Muonekano %s"
 
 msgid "Database error"
 msgstr "Hitilafu katika hifadhidata"
@@ -358,7 +359,7 @@ msgid "Add"
 msgstr "Ongeza"
 
 msgid "View"
-msgstr ""
+msgstr "Muonekano"
 
 msgid "You don’t have permission to view or edit anything."
 msgstr "Huna ruhusa ya kutazama au kuhariri kitu chochote"
@@ -378,8 +379,8 @@ msgstr "Badilisha nywila"
 
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Tafadhali sahihisha kosa lifuatalo."
+msgstr[1] "Tafadhali sahihisha makosa yafuatayo"
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
@@ -582,8 +583,8 @@ msgstr "Tendo"
 
 msgid "entry"
 msgid_plural "entries"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "ingizo"
+msgstr[1] "maingizo"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "

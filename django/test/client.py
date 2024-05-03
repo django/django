@@ -817,7 +817,14 @@ class ClientMixin:
         return session
 
     async def asession(self):
-        return await sync_to_async(lambda: self.session)()
+        engine = import_module(settings.SESSION_ENGINE)
+        cookie = self.cookies.get(settings.SESSION_COOKIE_NAME)
+        if cookie:
+            return engine.SessionStore(cookie.value)
+        session = engine.SessionStore()
+        await session.asave()
+        self.cookies[settings.SESSION_COOKIE_NAME] = session.session_key
+        return session
 
     def login(self, **credentials):
         """
@@ -893,7 +900,7 @@ class ClientMixin:
 
         await alogin(request, user, backend)
         # Save the session values.
-        await sync_to_async(request.session.save)()
+        await request.session.asave()
         self._set_login_cookies(request)
 
     def _set_login_cookies(self, request):

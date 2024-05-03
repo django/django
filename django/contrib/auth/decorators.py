@@ -1,5 +1,8 @@
+import asyncio
 from functools import wraps
 from urllib.parse import urlparse
+
+from asgiref.sync import async_to_sync, sync_to_async
 
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
@@ -17,10 +20,7 @@ def user_passes_test(
     """
 
     def decorator(view_func):
-        @wraps(view_func)
-        def _wrapper_view(request, *args, **kwargs):
-            if test_func(request.user):
-                return view_func(request, *args, **kwargs)
+        def _redirect_to_login(request):
             path = request.build_absolute_uri()
             resolved_login_url = resolve_url(login_url or settings.LOGIN_URL)
             # If the login url is the same scheme and net location then just
@@ -35,7 +35,32 @@ def user_passes_test(
 
             return redirect_to_login(path, resolved_login_url, redirect_field_name)
 
-        return _wrapper_view
+        if asyncio.iscoroutinefunction(view_func):
+
+            async def _view_wrapper(request, *args, **kwargs):
+                auser = await request.auser()
+                if asyncio.iscoroutinefunction(test_func):
+                    test_pass = await test_func(auser)
+                else:
+                    test_pass = await sync_to_async(test_func)(auser)
+
+                if test_pass:
+                    return await view_func(request, *args, **kwargs)
+                return _redirect_to_login(request)
+
+        else:
+
+            def _view_wrapper(request, *args, **kwargs):
+                if asyncio.iscoroutinefunction(test_func):
+                    test_pass = async_to_sync(test_func)(request.user)
+                else:
+                    test_pass = test_func(request.user)
+
+                if test_pass:
+                    return view_func(request, *args, **kwargs)
+                return _redirect_to_login(request)
+
+        return wraps(view_func)(_view_wrapper)
 
     return decorator
 
@@ -64,19 +89,36 @@ def permission_required(perm, login_url=None, raise_exception=False):
     If the raise_exception parameter is given the PermissionDenied exception
     is raised.
     """
+    if isinstance(perm, str):
+        perms = (perm,)
+    else:
+        perms = perm
 
-    def check_perms(user):
-        if isinstance(perm, str):
-            perms = (perm,)
+    def decorator(view_func):
+        if asyncio.iscoroutinefunction(view_func):
+
+            async def check_perms(user):
+                # First check if the user has the permission (even anon users).
+                if await sync_to_async(user.has_perms)(perms):
+                    return True
+                # In case the 403 handler should be called raise the exception.
+                if raise_exception:
+                    raise PermissionDenied
+                # As the last resort, show the login form.
+                return False
+
         else:
-            perms = perm
-        # First check if the user has the permission (even anon users)
-        if user.has_perms(perms):
-            return True
-        # In case the 403 handler should be called raise the exception
-        if raise_exception:
-            raise PermissionDenied
-        # As the last resort, show the login form
-        return False
 
-    return user_passes_test(check_perms, login_url=login_url)
+            def check_perms(user):
+                # First check if the user has the permission (even anon users).
+                if user.has_perms(perms):
+                    return True
+                # In case the 403 handler should be called raise the exception.
+                if raise_exception:
+                    raise PermissionDenied
+                # As the last resort, show the login form.
+                return False
+
+        return user_passes_test(check_perms, login_url=login_url)(view_func)
+
+    return decorator

@@ -703,7 +703,7 @@ app label and migration name you want to squash up to, and it'll get to work:
    - 0002_some_change
    - 0003_another_change
    - 0004_undo_something
-  Do you wish to proceed? [yN] y
+  Do you wish to proceed? [y/N] y
   Optimizing...
     Optimized from 12 operations to 7 operations.
   Created new squashed migration /home/andrew/Programs/DjangoTest/test/migrations/0001_squashed_0004_undo_something.py

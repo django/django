@@ -1,0 +1,17 @@
+name: Create reminders
+
+on:
+  issue_comment:
+    types: [created, edited]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  reminders:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check comments and create reminders
+        uses: agrc/create-reminder-action@922893a5705067719c4c4751843962f56aabf5eb

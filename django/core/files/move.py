@@ -13,20 +13,6 @@ from django.core.files import locks
 __all__ = ["file_move_safe"]
 
 
-def _samefile(src, dst):
-    # Macintosh, Unix.
-    if hasattr(os.path, "samefile"):
-        try:
-            return os.path.samefile(src, dst)
-        except OSError:
-            return False
-
-    # All other platforms: check for same pathname.
-    return os.path.normcase(os.path.abspath(src)) == os.path.normcase(
-        os.path.abspath(dst)
-    )
-
-
 def file_move_safe(
     old_file_name, new_file_name, chunk_size=1024 * 64, allow_overwrite=False
 ):
@@ -40,16 +26,18 @@ def file_move_safe(
     ``FileExistsError``.
     """
     # There's no reason to move if we don't have to.
-    if _samefile(old_file_name, new_file_name):
-        return
+    try:
+        if os.path.samefile(old_file_name, new_file_name):
+            return
+    except OSError:
+        pass
+
+    if not allow_overwrite and os.access(new_file_name, os.F_OK):
+        raise FileExistsError(
+            f"Destination file {new_file_name} exists and allow_overwrite is False."
+        )
 
     try:
-        if not allow_overwrite and os.access(new_file_name, os.F_OK):
-            raise FileExistsError(
-                "Destination file %s exists and allow_overwrite is False."
-                % new_file_name
-            )
-
         os.rename(old_file_name, new_file_name)
         return
     except OSError:

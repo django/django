@@ -436,7 +436,7 @@ class IndexesTests(TestCase):
             fk_2 = models.ForeignKey(Target, models.CASCADE, related_name="target_2")
 
             class Meta:
-                constraints = [
+                indexes = [
                     models.Index(
                         fields=["id"],
                         include=["fk_1_id", "fk_2"],
@@ -1343,6 +1343,17 @@ class OtherModelTests(SimpleTestCase):
             ],
         )
 
+    def test_inherited_overriden_property_no_clash(self):
+        class Cheese:
+            @property
+            def filling_id(self):
+                pass
+
+        class Sandwich(Cheese, models.Model):
+            filling = models.ForeignKey("self", models.CASCADE)
+
+        self.assertEqual(Sandwich.check(), [])
+
     def test_single_primary_key(self):
         class Model(models.Model):
             foo = models.IntegerField(primary_key=True)
@@ -1855,7 +1866,9 @@ class ConstraintsTests(TestCase):
 
             class Meta:
                 constraints = [
-                    models.CheckConstraint(check=models.Q(age__gte=18), name="is_adult")
+                    models.CheckConstraint(
+                        condition=models.Q(age__gte=18), name="is_adult"
+                    )
                 ]
 
         errors = Model.check(databases=self.databases)
@@ -1880,7 +1893,9 @@ class ConstraintsTests(TestCase):
             class Meta:
                 required_db_features = {"supports_table_check_constraints"}
                 constraints = [
-                    models.CheckConstraint(check=models.Q(age__gte=18), name="is_adult")
+                    models.CheckConstraint(
+                        condition=models.Q(age__gte=18), name="is_adult"
+                    )
                 ]
 
         self.assertEqual(Model.check(databases=self.databases), [])
@@ -1892,7 +1907,7 @@ class ConstraintsTests(TestCase):
                 constraints = [
                     models.CheckConstraint(
                         name="name",
-                        check=models.Q(missing_field=2),
+                        condition=models.Q(missing_field=2),
                     ),
                 ]
 
@@ -1919,7 +1934,7 @@ class ConstraintsTests(TestCase):
 
             class Meta:
                 constraints = [
-                    models.CheckConstraint(name="name", check=models.Q(parents=3)),
+                    models.CheckConstraint(name="name", condition=models.Q(parents=3)),
                 ]
 
         self.assertEqual(
@@ -1942,7 +1957,7 @@ class ConstraintsTests(TestCase):
                 constraints = [
                     models.CheckConstraint(
                         name="name",
-                        check=models.Q(model__isnull=True),
+                        condition=models.Q(model__isnull=True),
                     ),
                 ]
 
@@ -1964,7 +1979,7 @@ class ConstraintsTests(TestCase):
 
             class Meta:
                 constraints = [
-                    models.CheckConstraint(name="name", check=models.Q(m2m=2)),
+                    models.CheckConstraint(name="name", condition=models.Q(m2m=2)),
                 ]
 
         self.assertEqual(
@@ -1992,7 +2007,7 @@ class ConstraintsTests(TestCase):
                 constraints = [
                     models.CheckConstraint(
                         name="name",
-                        check=models.Q(fk_1_id=2) | models.Q(fk_2=2),
+                        condition=models.Q(fk_1_id=2) | models.Q(fk_2=2),
                     ),
                 ]
 
@@ -2007,7 +2022,7 @@ class ConstraintsTests(TestCase):
                 constraints = [
                     models.CheckConstraint(
                         name="name",
-                        check=models.Q(pk__gt=5) & models.Q(age__gt=models.F("pk")),
+                        condition=models.Q(pk__gt=5) & models.Q(age__gt=models.F("pk")),
                     ),
                 ]
 
@@ -2023,7 +2038,7 @@ class ConstraintsTests(TestCase):
 
             class Meta:
                 constraints = [
-                    models.CheckConstraint(name="name", check=models.Q(field1=1)),
+                    models.CheckConstraint(name="name", condition=models.Q(field1=1)),
                 ]
 
         self.assertEqual(
@@ -2053,20 +2068,21 @@ class ConstraintsTests(TestCase):
                 constraints = [
                     models.CheckConstraint(
                         name="name1",
-                        check=models.Q(
+                        condition=models.Q(
                             field1__lt=models.F("parent__field1")
                             + models.F("parent__field2")
                         ),
                     ),
                     models.CheckConstraint(
-                        name="name2", check=models.Q(name=Lower("parent__name"))
+                        name="name2", condition=models.Q(name=Lower("parent__name"))
                     ),
                     models.CheckConstraint(
-                        name="name3", check=models.Q(parent__field3=models.F("field1"))
+                        name="name3",
+                        condition=models.Q(parent__field3=models.F("field1")),
                     ),
                     models.CheckConstraint(
                         name="name4",
-                        check=models.Q(name=Lower("previous__name")),
+                        condition=models.Q(name=Lower("previous__name")),
                     ),
                 ]
 
@@ -2100,7 +2116,7 @@ class ConstraintsTests(TestCase):
                 constraints = [
                     models.CheckConstraint(
                         name="name",
-                        check=models.Q(
+                        condition=models.Q(
                             (
                                 models.Q(name="test")
                                 & models.Q(field1__lt=models.F("parent__field1"))
@@ -2136,16 +2152,18 @@ class ConstraintsTests(TestCase):
             class Meta:
                 required_db_features = {"supports_table_check_constraints"}
                 constraints = [
-                    models.CheckConstraint(check=models.Q(id__gt=0), name="q_check"),
                     models.CheckConstraint(
-                        check=models.ExpressionWrapper(
+                        condition=models.Q(id__gt=0), name="q_check"
+                    ),
+                    models.CheckConstraint(
+                        condition=models.ExpressionWrapper(
                             models.Q(price__gt=20),
                             output_field=models.BooleanField(),
                         ),
                         name="expression_wrapper_check",
                     ),
                     models.CheckConstraint(
-                        check=models.expressions.RawSQL(
+                        condition=models.expressions.RawSQL(
                             "id = 0",
                             params=(),
                             output_field=models.BooleanField(),
@@ -2153,7 +2171,7 @@ class ConstraintsTests(TestCase):
                         name="raw_sql_check",
                     ),
                     models.CheckConstraint(
-                        check=models.Q(
+                        condition=models.Q(
                             models.ExpressionWrapper(
                                 models.Q(
                                     models.expressions.RawSQL(

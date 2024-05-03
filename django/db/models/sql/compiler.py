@@ -1253,21 +1253,20 @@ class SQLCompiler:
 
         if restricted:
             related_fields = [
-                (o.field, o.related_model)
+                (o, o.field, o.related_model)
                 for o in opts.related_objects
                 if o.field.unique and not o.many_to_many
             ]
-            for related_field, model in related_fields:
-                related_select_mask = select_mask.get(related_field) or {}
+            for related_object, related_field, model in related_fields:
                 if not select_related_descend(
-                    related_field,
+                    related_object,
                     restricted,
                     requested,
-                    related_select_mask,
-                    reverse=True,
+                    select_mask,
                 ):
                     continue
 
+                related_select_mask = select_mask.get(related_object) or {}
                 related_field_name = related_field.related_query_name()
                 fields_found.add(related_field_name)
 
@@ -1280,7 +1279,7 @@ class SQLCompiler:
                     "model": model,
                     "field": related_field,
                     "reverse": True,
-                    "local_setter": related_field.remote_field.set_cached_value,
+                    "local_setter": related_object.set_cached_value,
                     "remote_setter": related_field.set_cached_value,
                     "from_parent": from_parent,
                 }
@@ -1296,7 +1295,7 @@ class SQLCompiler:
                     select_fields.append(len(select))
                     select.append((col, None))
                 klass_info["select_fields"] = select_fields
-                next = requested.get(related_field.related_query_name(), {})
+                next = requested.get(related_field_name, {})
                 next_klass_infos = self.get_related_selections(
                     select,
                     related_select_mask,
@@ -1391,7 +1390,7 @@ class SQLCompiler:
         def _get_parent_klass_info(klass_info):
             concrete_model = klass_info["model"]._meta.concrete_model
             for parent_model, parent_link in concrete_model._meta.parents.items():
-                parent_list = parent_model._meta.get_parent_list()
+                all_parents = parent_model._meta.all_parents
                 yield {
                     "model": parent_model,
                     "field": parent_link,
@@ -1402,7 +1401,7 @@ class SQLCompiler:
                         # Selected columns from a model or its parents.
                         if (
                             self.select[select_index][0].target.model == parent_model
-                            or self.select[select_index][0].target.model in parent_list
+                            or self.select[select_index][0].target.model in all_parents
                         )
                     ],
                 }
@@ -1621,11 +1620,12 @@ class SQLCompiler:
         # tuples with integers and strings. Flatten them out into strings.
         format_ = self.query.explain_info.format
         output_formatter = json.dumps if format_ and format_.lower() == "json" else str
-        for row in result[0]:
-            if not isinstance(row, str):
-                yield " ".join(output_formatter(c) for c in row)
-            else:
-                yield row
+        for row in result:
+            for value in row:
+                if not isinstance(value, str):
+                    yield " ".join([output_formatter(c) for c in value])
+                else:
+                    yield value
 
 
 class SQLInsertCompiler(SQLCompiler):

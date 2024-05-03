@@ -119,7 +119,7 @@ The ``ENABLE_PSYCO`` setting no longer exists. If your settings file includes
 ``ENABLE_PSYCO`` it will have no effect; to use Psyco_, we recommend
 writing a middleware class to activate it.
 
-.. _psyco: http://psyco.sourceforge.net/
+.. _psyco: https://psyco.sourceforge.net/
 
 What's new in 0.96?
 ===================

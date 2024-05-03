@@ -287,8 +287,8 @@ class ConstraintNameTests(TestCase):
         class Model(models.Model):
             class Meta:
                 constraints = [
-                    models.CheckConstraint(check=models.Q(id__gt=0), name="foo"),
-                    models.CheckConstraint(check=models.Q(id__lt=100), name="foo"),
+                    models.CheckConstraint(condition=models.Q(id__gt=0), name="foo"),
+                    models.CheckConstraint(condition=models.Q(id__lt=100), name="foo"),
                 ]
 
         self.assertEqual(
@@ -303,7 +303,7 @@ class ConstraintNameTests(TestCase):
         )
 
     def test_collision_in_different_models(self):
-        constraint = models.CheckConstraint(check=models.Q(id__gt=0), name="foo")
+        constraint = models.CheckConstraint(condition=models.Q(id__gt=0), name="foo")
 
         class Model1(models.Model):
             class Meta:
@@ -328,7 +328,7 @@ class ConstraintNameTests(TestCase):
         class AbstractModel(models.Model):
             class Meta:
                 constraints = [
-                    models.CheckConstraint(check=models.Q(id__gt=0), name="foo")
+                    models.CheckConstraint(condition=models.Q(id__gt=0), name="foo")
                 ]
                 abstract = True
 
@@ -354,7 +354,7 @@ class ConstraintNameTests(TestCase):
             class Meta:
                 constraints = [
                     models.CheckConstraint(
-                        check=models.Q(id__gt=0), name="%(app_label)s_%(class)s_foo"
+                        condition=models.Q(id__gt=0), name="%(app_label)s_%(class)s_foo"
                     ),
                 ]
                 abstract = True
@@ -370,7 +370,7 @@ class ConstraintNameTests(TestCase):
     @modify_settings(INSTALLED_APPS={"append": "basic"})
     @isolate_apps("basic", "check_framework", kwarg_name="apps")
     def test_collision_across_apps(self, apps):
-        constraint = models.CheckConstraint(check=models.Q(id__gt=0), name="foo")
+        constraint = models.CheckConstraint(condition=models.Q(id__gt=0), name="foo")
 
         class Model1(models.Model):
             class Meta:
@@ -397,7 +397,7 @@ class ConstraintNameTests(TestCase):
     @isolate_apps("basic", "check_framework", kwarg_name="apps")
     def test_no_collision_across_apps_interpolation(self, apps):
         constraint = models.CheckConstraint(
-            check=models.Q(id__gt=0), name="%(app_label)s_%(class)s_foo"
+            condition=models.Q(id__gt=0), name="%(app_label)s_%(class)s_foo"
         )
 
         class Model1(models.Model):

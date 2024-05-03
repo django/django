@@ -415,16 +415,6 @@ body.popup .submit-row {
     width: 100%;
 }
 
-.inline-related fieldset.module h3 {
-    margin: 0;
-    padding: 2px 5px 3px 5px;
-    font-size: 0.6875rem;
-    text-align: left;
-    font-weight: bold;
-    background: #bcd;
-    color: var(--body-bg);
-}
-
 .inline-group .tabular fieldset.module {
     border: none;
 }

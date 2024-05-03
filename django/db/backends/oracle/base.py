@@ -19,6 +19,7 @@ from django.db.backends.utils import debug_transaction
 from django.utils.asyncio import async_unsafe
 from django.utils.encoding import force_bytes, force_str
 from django.utils.functional import cached_property
+from django.utils.version import get_version_tuple
 
 
 def _setup_environment(environ):
@@ -344,6 +345,10 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def oracle_version(self):
         with self.temporary_connection():
             return tuple(int(x) for x in self.connection.version.split("."))
+
+    @cached_property
+    def oracledb_version(self):
+        return get_version_tuple(Database.__version__)
 
 
 class OracleParam:

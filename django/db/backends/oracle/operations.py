@@ -295,6 +295,8 @@ END;
         columns = []
         for param in returning_params:
             value = param.get_value()
+            # Can be removed when cx_Oracle is no longer supported and
+            # python-oracle 2.1.2 becomes the minimum supported version.
             if value == []:
                 raise DatabaseError(
                     "The database did not return a new row id. Probably "
@@ -347,9 +349,10 @@ END;
     def lookup_cast(self, lookup_type, internal_type=None):
         if lookup_type in ("iexact", "icontains", "istartswith", "iendswith"):
             return "UPPER(%s)"
-        if (
-            lookup_type != "isnull" and internal_type in ("BinaryField", "TextField")
-        ) or (lookup_type == "exact" and internal_type == "JSONField"):
+        if lookup_type != "isnull" and internal_type in (
+            "BinaryField",
+            "TextField",
+        ):
             return "DBMS_LOB.SUBSTR(%s)"
         return "%s"
 
@@ -668,18 +671,38 @@ END;
         return self._get_no_autofield_sequence_name(table) if row is None else row[0]
 
     def bulk_insert_sql(self, fields, placeholder_rows):
+        field_placeholders = [
+            BulkInsertMapper.types.get(
+                getattr(field, "target_field", field).get_internal_type(), "%s"
+            )
+            for field in fields
+            if field
+        ]
+        if (
+            self.connection.features.supports_bulk_insert_with_multiple_rows
+            # A workaround with UNION of SELECTs is required for models without
+            # any fields.
+            and field_placeholders
+        ):
+            placeholder_rows_sql = []
+            for row in placeholder_rows:
+                placeholders_row = (
+                    field_placeholder % placeholder
+                    for field_placeholder, placeholder in zip(
+                        field_placeholders, row, strict=True
+                    )
+                )
+                placeholder_rows_sql.append(placeholders_row)
+            return super().bulk_insert_sql(fields, placeholder_rows_sql)
+        # Oracle < 23c doesn't support inserting multiple rows in a single
+        # statement, use UNION of SELECTs as a workaround.
         query = []
         for row in placeholder_rows:
             select = []
             for i, placeholder in enumerate(row):
                 # A model without any fields has fields=[None].
                 if fields[i]:
-                    internal_type = getattr(
-                        fields[i], "target_field", fields[i]
-                    ).get_internal_type()
-                    placeholder = (
-                        BulkInsertMapper.types.get(internal_type, "%s") % placeholder
-                    )
+                    placeholder = field_placeholders[i] % placeholder
                 # Add columns aliases to the first select to avoid "ORA-00918:
                 # column ambiguously defined" when two or more columns in the
                 # first select have the same value.

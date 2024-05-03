@@ -84,6 +84,8 @@ html[data-theme="light"],
         "Segoe UI Emoji",
         "Segoe UI Symbol",
         "Noto Color Emoji";
+
+    color-scheme: light;
 }
 
 html, body {

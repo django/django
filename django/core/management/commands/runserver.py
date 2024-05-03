@@ -8,6 +8,7 @@ from datetime import datetime
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from django.core.servers.basehttp import WSGIServer, get_internal_wsgi_application, run
+from django.db import connections
 from django.utils import autoreload
 from django.utils.regex_helper import _lazy_re_compile
 
@@ -134,6 +135,9 @@ class Command(BaseCommand):
         # Need to check migrations here, so can't use the
         # requires_migrations_check attribute.
         self.check_migrations()
+        # Close all connections opened during migration checking.
+        for conn in connections.all(initialized_only=True):
+            conn.close()
 
         try:
             handler = self.get_handler(*args, **options)
