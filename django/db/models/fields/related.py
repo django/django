@@ -509,7 +509,8 @@ class RelatedField(FieldCacheMixin, Field):
             )
         return target_fields[0]
 
-    def get_cache_name(self):
+    @cached_property
+    def cache_name(self):
         return self.name
 
 

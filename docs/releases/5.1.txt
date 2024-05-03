@@ -474,6 +474,8 @@ Miscellaneous
   overwriting files in storage, set the new
   :attr:`~django.core.files.storage.FileSystemStorage.allow_overwrite` option
   to ``True`` instead.
+* The ``get_cache_name()`` method of ``FieldCacheMixin`` is deprecated in favor
+  of the ``cache_name`` cached property.
 
 Features removed in 5.1
 =======================
