@@ -82,6 +82,8 @@ details on these changes.
 * The ``OS_OPEN_FLAGS`` attribute of
   :class:`~django.core.files.storage.FileSystemStorage` will be removed.
 
+* The ``get_cache_name()`` method of ``FieldCacheMixin`` will be removed.
+
 .. _deprecation-removed-in-5.1:
 
 5.1
