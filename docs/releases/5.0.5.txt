@@ -29,4 +29,4 @@ Bugfixes
   ``expression`` definition (:ticket:`35359`).
 
 * Fixed a bug in Django 5.0 that caused a migration crash when altering a
-  ``GeneratedField`` referencing a rename field (:ticket:`35422`).
+  ``GeneratedField`` referencing a renamed field (:ticket:`35422`).
