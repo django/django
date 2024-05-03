@@ -688,7 +688,7 @@ class AsyncRequestFactory(RequestFactory):
     Once you have a request object you can pass it to any view function,
     including synchronous ones. The reason we have a separate class here is:
     a) this makes ASGIRequest subclasses, and
-    b) AsyncTestClient can subclass it.
+    b) AsyncClient can subclass it.
     """
 
     def _base_scope(self, **request):
