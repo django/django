@@ -192,10 +192,6 @@ filtered out of error reports in a production environment (that is, where
             @another_decorator
             def process_info(user): ...
 
-    .. versionchanged:: 5.0
-
-        Support for wrapping ``async`` functions was added.
-
 .. function:: sensitive_post_parameters(*parameters)
 
     If one of your views receives an :class:`~django.http.HttpRequest` object
@@ -234,10 +230,6 @@ filtered out of error reports in a production environment (that is, where
     ``password_reset_confirm``, ``password_change``, and ``add_view`` and
     ``user_change_password`` in the ``auth`` admin) to prevent the leaking of
     sensitive information such as user passwords.
-
-    .. versionchanged:: 5.0
-
-        Support for wrapping ``async`` functions was added.
 
 .. _custom-error-reports:
 

@@ -839,10 +839,6 @@ subclass::
 
           full_name = property(my_property)
 
-      .. versionchanged:: 5.0
-
-        Support for ``boolean`` attribute on properties was added.
-
     * The field names in ``list_display`` will also appear as CSS classes in
       the HTML output, in the form of ``column-<field_name>`` on each ``<th>``
       element. This can be used to set column widths in a CSS file for example.
@@ -1028,16 +1024,12 @@ subclass::
 
 .. attribute:: ModelAdmin.show_facets
 
-    .. versionadded:: 5.0
-
     Controls whether facet counts are displayed for filters in the admin
     changelist. Defaults to :attr:`.ShowFacets.ALLOW`.
 
     When displayed, facet counts update in line with currently applied filters.
 
     .. class:: ShowFacets
-
-        .. versionadded:: 5.0
 
         Enum of allowed values for :attr:`.ModelAdmin.show_facets`.
 
@@ -1895,10 +1887,6 @@ templates used by the :class:`ModelAdmin` views:
     Override this method to customize the lookups permitted for your
     :class:`~django.contrib.admin.ModelAdmin` subclass.
 
-    .. versionchanged:: 5.0
-
-        The ``request`` argument was added.
-
 .. method:: ModelAdmin.has_view_permission(request, obj=None)
 
     Should return ``True`` if viewing ``obj`` is permitted, ``False`` otherwise.
@@ -2159,10 +2147,6 @@ in your own admin JavaScript without including a second copy, you can use the
 forms or widgets depending on ``django.jQuery`` must specify
 ``js=['admin/js/jquery.init.js', …]`` when :ref:`declaring form media assets
 <assets-as-a-static-definition>`.
-
-.. versionchanged:: 5.0
-
-    jQuery was upgraded from 3.6.4 to 3.7.1.
 
 The :class:`ModelAdmin` class requires jQuery by default, so there is no need
 to add jQuery to your ``ModelAdmin``’s list of media resources unless you have
@@ -2879,10 +2863,6 @@ Templates can override or extend base admin templates as described in
     The text to put at the top of each admin page, as a ``<div>`` (a string).
     By default, this is "Django administration".
 
-    .. versionchanged:: 5.0
-
-        In older versions, ``site_header`` was using an ``<h1>`` tag.
-
 .. attribute:: AdminSite.site_title
 
     The text to put at the end of each admin page's ``<title>`` (a string). By
@@ -3054,14 +3034,10 @@ Templates can override or extend base admin templates as described in
 
 .. method:: AdminSite.get_model_admin(model)
 
-    .. versionadded:: 5.0
-
     Returns an admin class for the given model class. Raises
     ``django.contrib.admin.exceptions.NotRegistered`` if a model isn't registered.
 
 .. method:: AdminSite.get_log_entries(request)
-
-    .. versionadded:: 5.0
 
     Returns a queryset for the related
     :class:`~django.contrib.admin.models.LogEntry` instances, shown on the site

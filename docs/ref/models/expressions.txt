@@ -1053,8 +1053,6 @@ calling the appropriate methods on the wrapped expression.
 
     .. attribute:: allowed_default
 
-        .. versionadded:: 5.0
-
         Tells Django that this expression can be used in
         :attr:`Field.db_default`. Defaults to ``False``.
 

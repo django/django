@@ -155,10 +155,6 @@ Authenticating users
         this. Rather if you're looking for a way to login a user, use the
         :class:`~django.contrib.auth.views.LoginView`.
 
-    .. versionchanged:: 5.0
-
-        ``aauthenticate()`` function was added.
-
 .. _topic-authorization:
 
 Permissions and Authorization
@@ -401,10 +397,6 @@ Or in an asynchronous view::
         # Do something for anonymous users.
         ...
 
-.. versionchanged:: 5.0
-
-    The :meth:`.HttpRequest.auser` method was added.
-
 .. _how-to-log-a-user-in:
 
 How to log a user in
@@ -445,10 +437,6 @@ If you have an authenticated user you want to attach to the current session
             else:
                 # Return an 'invalid login' error message.
                 ...
-
-    .. versionchanged:: 5.0
-
-        ``alogin()`` function was added.
 
 Selecting the authentication backend
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -504,10 +492,6 @@ How to log a user out
     to put anything into the session that will be available to the user
     immediately after logging out, do that *after* calling
     :func:`django.contrib.auth.logout()`.
-
-    .. versionchanged:: 5.0
-
-        ``alogout()`` function was added.
 
 Limiting access to logged-in users
 ----------------------------------
@@ -999,10 +983,6 @@ function.
                     update_session_auth_hash(request, form.user)
             else:
                 ...
-
-    .. versionchanged:: 5.0
-
-        ``aupdate_session_auth_hash()`` function was added.
 
 .. note::
 

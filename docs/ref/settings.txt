@@ -1689,7 +1689,6 @@ renderers are:
 ``FORMS_URLFIELD_ASSUME_HTTPS``
 -------------------------------
 
-.. versionadded:: 5.0
 .. deprecated:: 5.0
 
 Default: ``False``
@@ -2922,10 +2921,6 @@ when parsing ISO 8601 formatted strings, where timezone information will always
 be retained if present.
 
 See also :setting:`TIME_ZONE` and :setting:`USE_I18N`.
-
-.. versionchanged:: 5.0
-
-    In older versions, the default value is ``False``.
 
 .. setting:: USE_X_FORWARDED_HOST
 

@@ -27,10 +27,6 @@ interacting with end users.
 Time zone support is enabled by default. To disable it, set :setting:`USE_TZ =
 False <USE_TZ>` in your settings file.
 
-.. versionchanged:: 5.0
-
-    In older version, time zone support was disabled by default.
-
 Time zone support uses :mod:`zoneinfo`, which is part of the Python standard
 library from Python 3.9.
 

@@ -257,8 +257,6 @@ value of the geometry.
 ``ClosestPoint``
 ================
 
-.. versionadded:: 5.0
-
 .. class:: ClosestPoint(expr1, expr2, **extra)
 
 *Availability*: `PostGIS <https://postgis.net/docs/ST_ClosestPoint.html>`__,

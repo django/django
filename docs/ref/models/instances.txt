@@ -580,10 +580,6 @@ which returns ``NULL``. In such cases it is possible to revert to the old
 algorithm by setting the :attr:`~django.db.models.Options.select_on_save`
 option to ``True``.
 
-.. versionchanged:: 5.0
-
-    The ``Field.db_default`` parameter was added.
-
 .. _ref-models-force-insert:
 
 Forcing an INSERT or UPDATE
@@ -615,11 +611,6 @@ errors that are difficult to track down. This feature is for advanced use
 only.
 
 Using ``update_fields`` will force an update similarly to ``force_update``.
-
-.. versionchanged:: 5.0
-
-    Support for passing a tuple of parent classes to ``force_insert`` was
-    added.
 
 .. _ref-models-field-updates-using-f-expressions:
 

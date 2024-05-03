@@ -138,10 +138,6 @@ the choices are:
   provide a well-known inventory of values, such as currencies, countries,
   languages, time zones, etc.
 
-.. versionchanged:: 5.0
-
-    Support for mappings and callables was added.
-
 Generally, it's best to define choices inside a model class, and to
 define a suitably-named constant for each value::
 
@@ -372,10 +368,6 @@ There are some additional caveats to be aware of:
 
         __empty__ = _("(Unknown)")
 
-.. versionchanged:: 5.0
-
-    Support for using enumeration types directly in the ``choices`` was added.
-
 ``db_column``
 -------------
 
@@ -404,8 +396,6 @@ looking at your Django code. For example::
 
 ``db_default``
 --------------
-
-.. versionadded:: 5.0
 
 .. attribute:: Field.db_default
 
@@ -1234,8 +1224,6 @@ when :attr:`~django.forms.Field.localize` is ``False`` or
 
 ``GeneratedField``
 ------------------
-
-.. versionadded:: 5.0
 
 .. class:: GeneratedField(expression, output_field, db_persist=None, **kwargs)
 
