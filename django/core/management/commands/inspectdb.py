@@ -1,5 +1,6 @@
 import keyword
 import re
+from collections import namedtuple
 
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS, connections
@@ -84,6 +85,19 @@ class Command(BaseCommand):
                 types.add("v")
             table_info = connection.introspection.get_table_list(cursor)
             table_info = {info.name: info for info in table_info if info.type in types}
+            table_inspects = []
+            TableInspect = namedtuple(
+                "TableInspect",
+                (
+                    "table_name",
+                    "relations",
+                    "constraints",
+                    "primary_key_columns",
+                    "primary_key_column",
+                    "unique_columns",
+                    "table_description",
+                ),
+            )
 
             for table_name in options["table"] or sorted(name for name in table_info):
                 if table_name_filter is not None and callable(table_name_filter):
@@ -118,11 +132,54 @@ class Command(BaseCommand):
                     table_description = connection.introspection.get_table_description(
                         cursor, table_name
                     )
+                    table_inspects.append(
+                        TableInspect(
+                            table_name=table_name,
+                            relations=relations,
+                            constraints=constraints,
+                            primary_key_columns=primary_key_columns,
+                            primary_key_column=primary_key_column,
+                            unique_columns=unique_columns,
+                            table_description=table_description,
+                        )
+                    )
                 except Exception as e:
                     yield "# Unable to inspect table '%s'" % table_name
                     yield "# The error was: %s" % e
                     continue
 
+            for table_inspect in table_inspects:
+                table_name, table_description = (
+                    table_inspect.table_name,
+                    table_inspect.table_description,
+                )
+
+                def is_postgres_row(row):
+                    field_type, _, _ = self.get_field_type(connection, table_name, row)
+                    return field_type.startswith("postgres.fields.")
+
+                if any(is_postgres_row(row) for row in table_description):
+                    yield "from django.contrib import postgres"
+                    break
+
+            for table_inspect in table_inspects:
+                (
+                    table_name,
+                    relations,
+                    constraints,
+                    primary_key_columns,
+                    primary_key_column,
+                    unique_columns,
+                    table_description,
+                ) = (
+                    table_inspect.table_name,
+                    table_inspect.relations,
+                    table_inspect.constraints,
+                    table_inspect.primary_key_columns,
+                    table_inspect.primary_key_column,
+                    table_inspect.unique_columns,
+                    table_inspect.table_description,
+                )
                 model_name = self.normalize_table_name(table_name)
                 yield ""
                 yield ""
@@ -362,6 +419,16 @@ class Command(BaseCommand):
             else:
                 field_params["max_digits"] = row.precision
                 field_params["decimal_places"] = row.scale
+
+        serial_fields = {
+            "postgres.fields.SerialField": "AutoField",
+            "postgres.fields.SmallSerialField": "SmallAutoField",
+            "postgres.fields.BigSerialField": "BigAutoField",
+        }
+
+        if connection.vendor == "postgresql" and field_type in serial_fields:
+            auto_field = serial_fields[field_type]
+            field_notes.append(f"You may want to consider using {auto_field} instead.")
 
         return field_type, field_params, field_notes
 

@@ -1,9 +1,17 @@
 from django.db import models
-from django.db.models import NOT_PROVIDED
-from django.db.models.expressions import DatabaseDefault
+from django.db.models.expressions import DatabaseDefault, Expression
 from django.utils.translation import gettext_lazy as _
 
 __all__ = ("BigSerialField", "SmallSerialField", "SerialField")
+
+
+class NextSerialSequence(Expression):
+    allowed_default = True
+
+    def as_sql(self, compiler, connection):
+        table = self.field.model._meta.db_table
+        column = self.field.column
+        return "nextval(pg_get_serial_sequence(%s, %s))", [table, column]
 
 
 class SerialFieldMixin:
@@ -11,6 +19,7 @@ class SerialFieldMixin:
 
     def __init__(self, *args, **kwargs):
         default = DatabaseDefault()
+        db_default = NextSerialSequence(self)
 
         if not kwargs.setdefault("blank", True):
             raise ValueError(f"{self.__class__.__name__} must be blank.")
@@ -18,7 +27,7 @@ class SerialFieldMixin:
             raise ValueError(f"{self.__class__.__name__} must not be null.")
         if kwargs.setdefault("default", default) is not default:
             raise ValueError(f"{self.__class__.__name__} cannot have a default.")
-        if kwargs.get("db_default", NOT_PROVIDED) is not NOT_PROVIDED:
+        if kwargs.setdefault("db_default", db_default) is not db_default:
             raise ValueError(
                 f"{self.__class__.__name__} cannot have a database default."
             )
@@ -28,6 +37,7 @@ class SerialFieldMixin:
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
         del kwargs["default"]
+        del kwargs["db_default"]
         return name, path, args, kwargs
 
     def get_prep_value(self, value):
