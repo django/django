@@ -47,7 +47,8 @@ Minor features
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The default iteration count for the PBKDF2 password hasher is increased from
+  870,000 to 1,000,000.
 
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
