@@ -238,7 +238,7 @@ class TemplateCommand(BaseCommand):
         else:
             target = os.path.abspath(target)
 
-        self.stdout.write(f"Success! Created {name} at {target}.")
+        self.stdout.write(f"Success! Created {name} at {target}.", self.style.SUCCESS)
 
     def handle_template(self, template, subdir):
         """
