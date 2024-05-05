@@ -656,7 +656,24 @@ inheritance list.
     ``is_active`` flag on a user, but the default
     :setting:`AUTHENTICATION_BACKENDS` reject inactive users.
 
+.. _disable-login-required-middleware-for-views:
+
 .. currentmodule:: django.contrib.auth.decorators
+
+The ``login_not_required`` decorator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 5.1
+
+When :class:`~django.contrib.auth.middleware.LoginRequiredMiddleware` is
+installed, all views require authentication by default. Some views, such as the
+login view, may need to disable this behavior.
+
+.. function:: login_not_required()
+
+    Allows unauthenticated requests without redirecting to the login page when
+    :class:`~django.contrib.auth.middleware.LoginRequiredMiddleware` is
+    installed.
 
 Limiting access to logged-in users that pass a test
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
