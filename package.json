@@ -9,8 +9,9 @@
     "npm": ">=1.3.0"
   },
   "devDependencies": {
-    "eslint": "^8.56.0",
+    "eslint": "^9.2.0",
     "puppeteer": "^22.2.0",
+    "globals": "^15.1.0",
     "grunt": "^1.6.1",
     "grunt-cli": "^1.4.3",
     "grunt-contrib-qunit": "^8.0.1",
