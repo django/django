@@ -58,8 +58,9 @@ class UUIDPrefetchRelated(TestCase):
         toy_ball = Toy(pet_id=pet.id, name="Ball")
         toy_bone = Toy(pet_id=str(pet.id), name="Bone")
         prefetch_related_objects([toy_ball, toy_bone], "pet")
-        self.assertEqual(pet, toy_ball.pet)
-        self.assertEqual(pet, toy_bone.pet)
+        with self.assertNumQueries(0):
+            self.assertEqual(pet, toy_ball.pet)
+            self.assertEqual(pet, toy_bone.pet)
 
 
 class UUIDPrefetchRelatedLookups(TestCase):
