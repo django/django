@@ -868,6 +868,10 @@ The following checks are performed on the default
   for its builtin permission names to be at most 100 characters.
 * **auth.E012**: The permission codenamed ``<codename>`` of model ``<model>``
   is longer than 100 characters.
+* **auth.E013**: In order to use
+  :class:`django.contrib.auth.middleware.LoginRequiredMiddleware`,
+  :class:`django.contrib.auth.middleware.AuthenticationMiddleware` must be
+  defined before it in MIDDLEWARE.
 
 ``contenttypes``
 ----------------

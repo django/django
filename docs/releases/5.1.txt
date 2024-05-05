@@ -26,6 +26,20 @@ only officially support the latest release of each series.
 What's new in Django 5.1
 ========================
 
+Middleware to require authentication by default
+-----------------------------------------------
+
+The new :class:`~django.contrib.auth.middleware.LoginRequiredMiddleware`
+redirects all unauthenticated requests to a login page. Views can allow
+unauthenticated requests by using the new
+:func:`~django.contrib.auth.decorators.login_not_required` decorator.
+
+The :class:`~django.contrib.auth.middleware.LoginRequiredMiddleware` respects
+the ``login_url`` and ``redirect_field_name`` values set via the
+:func:`~.django.contrib.auth.decorators.login_required` decorator, but does not
+support setting ``login_url`` or ``redirect_field_name`` via the
+:class:`~django.contrib.auth.mixins.LoginRequiredMixin`.
+
 Minor features
 --------------
 

@@ -495,6 +495,58 @@ Adds the ``user`` attribute, representing the currently-logged-in user, to
 every incoming ``HttpRequest`` object. See :ref:`Authentication in web requests
 <auth-web-requests>`.
 
+.. class:: LoginRequiredMiddleware
+
+.. versionadded:: 5.1
+
+Redirects all unauthenticated requests to a login page. For admin views, this
+redirects to the admin login. For all other views, this will redirect to
+:setting:`settings.LOGIN_URL <LOGIN_URL>`. This can be customized by using the
+:func:`~.django.contrib.auth.decorators.login_required` decorator and setting
+``login_url`` or ``redirect_field_name`` for the view. For example::
+
+    @method_decorator(
+        login_required(login_url="/login/", redirect_field_name="redirect_to"),
+        name="dispatch",
+    )
+    class MyView(View):
+        pass
+
+
+    @login_required(login_url="/login/", redirect_field_name="redirect_to")
+    def my_view(request): ...
+
+Views using the :func:`~django.contrib.auth.decorators.login_not_required`
+decorator are exempt from this requirement.
+
+.. admonition:: Ensure that your login view does not require a login.
+
+    To prevent infinite redirects, ensure you have
+    :ref:`enabled unauthenticated requests
+    <disable-login-required-middleware-for-views>` to your login view.
+
+**Methods and Attributes**
+
+.. attribute:: redirect_field_name
+
+    Defaults to ``"next"``.
+
+.. method:: get_login_url()
+
+    Returns the URL that unauthenticated requests will be redirected to. If
+    defined, this returns the ``login_url`` set on the
+    :func:`~.django.contrib.auth.decorators.login_required` decorator. Defaults
+    to :setting:`settings.LOGIN_URL <LOGIN_URL>`.
+
+.. method:: get_redirect_field_name()
+
+    Returns the name of the query parameter that contains the URL the user
+    should be redirected to after a successful login. If defined, this returns
+    the ``redirect_field_name`` set on the
+    :func:`~.django.contrib.auth.decorators.login_required` decorator. Defaults
+    to :attr:`redirect_field_name`. If ``None`` is returned, a query parameter
+    won't be added.
+
 .. class:: RemoteUserMiddleware
 
 Middleware for utilizing web server provided authentication. See
@@ -596,6 +648,12 @@ Here are some hints about the ordering of various Django middleware classes:
 #. :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`
 
    After ``SessionMiddleware``: uses session storage.
+
+#. :class:`~django.contrib.auth.middleware.LoginRequiredMiddleware`
+
+   .. versionadded:: 5.1
+
+   After ``AuthenticationMiddleware``: uses user object.
 
 #. :class:`~django.contrib.messages.middleware.MessageMiddleware`
 

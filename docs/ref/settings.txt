@@ -3060,8 +3060,9 @@ Default: ``'/accounts/login/'``
 The URL or :ref:`named URL pattern <naming-url-patterns>` where requests are
 redirected for login when using the
 :func:`~django.contrib.auth.decorators.login_required` decorator,
-:class:`~django.contrib.auth.mixins.LoginRequiredMixin`, or
-:class:`~django.contrib.auth.mixins.AccessMixin`.
+:class:`~django.contrib.auth.mixins.LoginRequiredMixin`,
+:class:`~django.contrib.auth.mixins.AccessMixin`, or when
+:class:`~django.contrib.auth.middleware.LoginRequiredMiddleware` is installed.
 
 .. setting:: LOGOUT_REDIRECT_URL
 
