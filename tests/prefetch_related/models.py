@@ -306,6 +306,11 @@ class Pet(models.Model):
     people = models.ManyToManyField(Person, related_name="pets")
 
 
+class Toy(models.Model):
+    pet = models.ForeignKey(Pet, models.CASCADE, related_name="toys")
+    name = models.CharField(max_length=20)
+
+
 class Flea(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     current_room = models.ForeignKey(

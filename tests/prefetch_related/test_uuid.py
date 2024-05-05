@@ -1,6 +1,7 @@
+from django.db.models import prefetch_related_objects
 from django.test import TestCase
 
-from .models import Flea, House, Person, Pet, Room
+from .models import Flea, House, Person, Pet, Room, Toy
 
 
 class UUIDPrefetchRelated(TestCase):
@@ -51,6 +52,16 @@ class UUIDPrefetchRelated(TestCase):
             Pet.objects.prefetch_related("fleas_hosted").values_list("id", flat=True),
             [pet.id],
         )
+
+    def test_prefetch_related_objects_str_as_uuid_fk(self):
+        pet = Pet.objects.create(name="Fifi")
+        toy_ball = Toy(pet_id=pet.id, name="Ball")
+        toy_bone = Toy(pet_id=str(pet.id), name="Bone")
+        prefetch_related_objects(
+            [toy_ball, toy_bone], "pet"
+        )
+        self.assertEqual(pet, toy_ball.pet)
+        self.assertEqual(pet, toy_bone.pet)
 
 
 class UUIDPrefetchRelatedLookups(TestCase):
