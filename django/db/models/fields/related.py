@@ -766,7 +766,7 @@ class ForeignObject(RelatedField):
                 ):
                     ret.append(instance.pk)
                     continue
-            ret.append(getattr(instance, field.attname))
+            ret.append(field.to_python(getattr(instance, field.attname)))
         return tuple(ret)
 
     def get_attname_column(self):
