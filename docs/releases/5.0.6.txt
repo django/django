@@ -2,11 +2,6 @@
 Django 5.0.6 release notes
 ==========================
 
-*Expected June 4th, 2024*
+*May 7, 2024*
 
-Django 5.0.6 fixes several bugs in 5.0.5.
-
-Bugfixes
-========
-
-* ...
+Django 5.0.6 fixes a packaging error in 5.0.5.
