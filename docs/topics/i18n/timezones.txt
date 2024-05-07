@@ -9,7 +9,10 @@ Overview
 
 When support for time zones is enabled, Django stores datetime information in
 UTC in the database, uses time-zone-aware datetime objects internally, and
-translates them to the end user's time zone in templates and forms.
+converts them to the end user's time zone in forms. Templates will use the
+:ref:`default time zone <default-current-time-zone>`, but this can be updated
+to the end user's time zone through the use of :ref:`filters and tags
+<time-zones-in-templates>`.
 
 This is handy if your users live in more than one time zone and you want to
 display datetime information according to each user's wall clock.
