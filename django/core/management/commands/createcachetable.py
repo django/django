@@ -30,6 +30,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--database",
             default=DEFAULT_DB_ALIAS,
+            choices=tuple(connections),
             help="Nominates a database onto which the cache tables will be "
             'installed. Defaults to the "default" database.',
         )
