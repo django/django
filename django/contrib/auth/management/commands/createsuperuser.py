@@ -11,7 +11,7 @@ from django.contrib.auth.management import get_default_username
 from django.contrib.auth.password_validation import validate_password
 from django.core import exceptions
 from django.core.management.base import BaseCommand, CommandError
-from django.db import DEFAULT_DB_ALIAS
+from django.db import DEFAULT_DB_ALIAS, connections
 from django.utils.functional import cached_property
 from django.utils.text import capfirst
 
@@ -56,6 +56,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--database",
             default=DEFAULT_DB_ALIAS,
+            choices=tuple(connections),
             help='Specifies the database to use. Default is "default".',
         )
         for field_name in self.UserModel.REQUIRED_FIELDS:
