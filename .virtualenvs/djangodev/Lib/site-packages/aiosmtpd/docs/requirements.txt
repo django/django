@@ -1,0 +1,6 @@
+-r ../../requirements.txt
+
+### Sphinx deps
+sphinx==7.2.6
+sphinx-autofixture==0.4.0
+sphinx_rtd_theme==2.0.0

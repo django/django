@@ -1,0 +1,11 @@
+_argon2_cffi_bindings/__init__.py,sha256=Gm_s_NmP0nyKhjkqPk-5gq6aluEEO6YziCY8cZzs30k,92
+_argon2_cffi_bindings/__pycache__/__init__.cpython-312.pyc,,
+_argon2_cffi_bindings/__pycache__/_ffi_build.cpython-312.pyc,,
+_argon2_cffi_bindings/_ffi.pyd,sha256=LHT5PPJFHMvV7q8LTQd26yhWzVilzHJ5AxvmpiqD568,53248
+_argon2_cffi_bindings/_ffi_build.py,sha256=GWyfVuQ-48rPhhdo2rjDc_tr1QYsRo2fPTqYzr_5xSk,6316
+argon2_cffi_bindings-21.2.0.dist-info/INSTALLER,sha256=zuuue4knoyJ-UwPPXg8fezS7VCrXJQrAP7zeNuwvFQg,4
+argon2_cffi_bindings-21.2.0.dist-info/LICENSE,sha256=WrxzxDB5_M_mxNxxCvLftKWaZTmxQ0I29u-MdbAVDWE,1103
+argon2_cffi_bindings-21.2.0.dist-info/METADATA,sha256=Zoe40TTiS4EwkPh7nbOWc1pHzu6HMeQCGTjsV17A_Mk,6705
+argon2_cffi_bindings-21.2.0.dist-info/RECORD,,
+argon2_cffi_bindings-21.2.0.dist-info/WHEEL,sha256=g0Gp_9X_YiwOuaF1hZMQNaS1qKUg2WIXRJjlZWggGSw,100
+argon2_cffi_bindings-21.2.0.dist-info/top_level.txt,sha256=WyRJzxvIv58cyvTye2AsVz50Lw0hDxUYBuCH1rUb_tg,27

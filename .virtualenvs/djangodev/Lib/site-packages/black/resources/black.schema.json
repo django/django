@@ -1,0 +1,154 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/psf/black/blob/main/black/resources/black.schema.json",
+  "$comment": "tool.black table in pyproject.toml",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "code": {
+      "type": "string",
+      "description": "Format the code passed in as a string."
+    },
+    "line-length": {
+      "type": "integer",
+      "description": "How many characters per line to allow.",
+      "default": 88
+    },
+    "target-version": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "py33",
+          "py34",
+          "py35",
+          "py36",
+          "py37",
+          "py38",
+          "py39",
+          "py310",
+          "py311",
+          "py312",
+          "py313"
+        ]
+      },
+      "description": "Python versions that should be supported by Black's output. You should include all versions that your code supports. By default, Black will infer target versions from the project metadata in pyproject.toml. If this does not yield conclusive results, Black will use per-file auto-detection."
+    },
+    "pyi": {
+      "type": "boolean",
+      "description": "Format all input files like typing stubs regardless of file extension. This is useful when piping source on standard input.",
+      "default": false
+    },
+    "ipynb": {
+      "type": "boolean",
+      "description": "Format all input files like Jupyter Notebooks regardless of file extension. This is useful when piping source on standard input.",
+      "default": false
+    },
+    "python-cell-magics": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "When processing Jupyter Notebooks, add the given magic to the list of known python-magics (capture, prun, pypy, python, python3, time, timeit). Useful for formatting cells with custom python magics."
+    },
+    "skip-source-first-line": {
+      "type": "boolean",
+      "description": "Skip the first line of the source code.",
+      "default": false
+    },
+    "skip-string-normalization": {
+      "type": "boolean",
+      "description": "Don't normalize string quotes or prefixes.",
+      "default": false
+    },
+    "skip-magic-trailing-comma": {
+      "type": "boolean",
+      "description": "Don't use trailing commas as a reason to split lines.",
+      "default": false
+    },
+    "preview": {
+      "type": "boolean",
+      "description": "Enable potentially disruptive style changes that may be added to Black's main functionality in the next major release.",
+      "default": false
+    },
+    "unstable": {
+      "type": "boolean",
+      "description": "Enable potentially disruptive style changes that have known bugs or are not currently expected to make it into the stable style Black's next major release. Implies --preview.",
+      "default": false
+    },
+    "enable-unstable-feature": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "hex_codes_in_unicode_sequences",
+          "string_processing",
+          "hug_parens_with_braces_and_square_brackets",
+          "unify_docstring_detection",
+          "no_normalize_fmt_skip_whitespace",
+          "wrap_long_dict_values_in_parens",
+          "multiline_string_handling",
+          "typed_params_trailing_comma",
+          "is_simple_lookup_for_doublestar_expression",
+          "docstring_check_for_newline",
+          "remove_redundant_guard_parens",
+          "parens_for_long_if_clauses_in_case_block"
+        ]
+      },
+      "description": "Enable specific features included in the `--unstable` style. Requires `--preview`. No compatibility guarantees are provided on the behavior or existence of any unstable features."
+    },
+    "check": {
+      "type": "boolean",
+      "description": "Don't write the files back, just return the status. Return code 0 means nothing would change. Return code 1 means some files would be reformatted. Return code 123 means there was an internal error.",
+      "default": false
+    },
+    "diff": {
+      "type": "boolean",
+      "description": "Don't write the files back, just output a diff to indicate what changes Black would've made. They are printed to stdout so capturing them is simple.",
+      "default": false
+    },
+    "color": {
+      "type": "boolean",
+      "description": "Show (or do not show) colored diff. Only applies when --diff is given.",
+      "default": false
+    },
+    "fast": {
+      "type": "boolean",
+      "description": "By default, Black performs an AST safety check after formatting your code. The --fast flag turns off this check and the --safe flag explicitly enables it. [default: --safe]",
+      "default": false
+    },
+    "required-version": {
+      "type": "string",
+      "description": "Require a specific version of Black to be running. This is useful for ensuring that all contributors to your project are using the same version, because different versions of Black may format code a little differently. This option can be set in a configuration file for consistent results across environments."
+    },
+    "exclude": {
+      "type": "string",
+      "description": "A regular expression that matches files and directories that should be excluded on recursive searches. An empty value means no paths are excluded. Use forward slashes for directories on all platforms (Windows, too). By default, Black also ignores all paths listed in .gitignore. Changing this value will override all default exclusions. [default: /(\\.direnv|\\.eggs|\\.git|\\.hg|\\.ipynb_checkpoints|\\.mypy_cache|\\.nox|\\.pytest_cache|\\.ruff_cache|\\.tox|\\.svn|\\.venv|\\.vscode|__pypackages__|_build|buck-out|build|dist|venv)/]"
+    },
+    "extend-exclude": {
+      "type": "string",
+      "description": "Like --exclude, but adds additional files and directories on top of the default values instead of overriding them."
+    },
+    "force-exclude": {
+      "type": "string",
+      "description": "Like --exclude, but files and directories matching this regex will be excluded even when they are passed explicitly as arguments. This is useful when invoking Black programmatically on changed files, such as in a pre-commit hook or editor plugin."
+    },
+    "include": {
+      "type": "string",
+      "description": "A regular expression that matches files and directories that should be included on recursive searches. An empty value means all files are included regardless of the name. Use forward slashes for directories on all platforms (Windows, too). Overrides all exclusions, including from .gitignore and command line options.",
+      "default": "(\\.pyi?|\\.ipynb)$"
+    },
+    "workers": {
+      "type": "integer",
+      "description": "When Black formats multiple files, it may use a process pool to speed up formatting. This option controls the number of parallel workers. This can also be specified via the BLACK_NUM_WORKERS environment variable. Defaults to the number of CPUs in the system."
+    },
+    "quiet": {
+      "type": "boolean",
+      "description": "Stop emitting all non-critical output. Error messages will still be emitted (which can silenced by 2>/dev/null).",
+      "default": false
+    },
+    "verbose": {
+      "type": "boolean",
+      "description": "Emit messages about files that were not changed or were ignored due to exclusion patterns. If Black is using a configuration file, a message detailing which one it is using will be emitted.",
+      "default": false
+    }
+  }
+}

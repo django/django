@@ -1,0 +1,486 @@
+/* CSS3_ style sheet for the output of Docutils HTML5 writer.  */
+/* Generic responsive design for all screen sizes.                         */
+/*                                                                         */
+/* :Author: Günter Milde                                                   */
+/*                                                                         */
+/* :Id: $Id: responsive.css 9615 2024-04-06 13:28:15Z milde $                                                               */
+/* :Copyright: © 2021 Günter Milde.                                        */
+/* :License: Released under the terms of the `2-Clause BSD license`_,      */
+/*    in short:                                                            */
+/*                                                                         */
+/*    Copying and distribution of this file, with or without modification, */
+/*    are permitted in any medium without royalty provided the copyright   */
+/*    notice and this notice are preserved.                                */
+/*                                                                         */
+/*    This file is offered as-is, without any warranty.                    */
+/*                                                                         */
+/* .. _2-Clause BSD license: http://www.spdx.org/licenses/BSD-2-Clause     */
+/* .. _CSS3: https://www.w3.org/Style/CSS/                                 */
+
+/* Note:                                                                   */
+/* This style sheet is provisional:                                        */
+/* the API is not settled and may change with any minor Docutils version.  */
+
+
+
+/* General Settings */
+/* ================ */
+
+
+* { box-sizing: border-box; }
+
+body {
+  background-color: #fafaf6;
+  margin: auto;
+  --field-indent: 6.6em; /* indent of fields in field lists */
+  --sidebar-margin-right: 0; /* adapted in media queries below */
+}
+main {
+  counter-reset: figure table;
+}
+body > * {
+  background-color: white;
+  line-height: 1.6;
+  padding: 0.5rem calc(29% - 7.2rem); /* go from 5% to 15% (8.15em/54em) */
+  margin: auto;
+  max-width: 100rem;
+}
+sup, sub { /* avoid additional inter-line space for lines with sup/sub */
+  line-height: 1;
+}
+
+/* Vertical Space (Parskip) */
+p, ol, ul, dl, li,
+.topic,
+.footnote, .citation,
+div > math,
+table {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+h1, h2, h3, h4, h5, h6,
+dl > dd, details > p:last-child {
+  margin-bottom: 0.5em;
+}
+
+/* Indented Blocks */
+blockquote, figure, .topic {
+  margin: 1em 2%;
+  padding-left: 1em;
+}
+div.line-block div.line-block,
+pre, dd, dl.option-list {
+  margin-left: calc(2% + 1em);
+}
+
+/* Object styling */
+/* ============== */
+
+footer, header {
+  font-size: small;
+}
+
+/* Frontmatter */
+div.dedication {
+  padding: 0;
+  margin: 1.4em 0;
+  font-style: italic;
+  font-size: large;
+}
+.dedication p.topic-title {
+  display: none;
+}
+
+blockquote p.attribution,
+.topic p.attribution {
+  text-align: right;
+}
+
+/* Table of Contents */
+nav.contents ul {
+  padding-left: 1em;
+}
+ul.auto-toc > li > p { /* hanging indent */
+  padding-left: 1em;
+  text-indent: -1em;
+}
+main > nav.contents  ul:not(.auto-toc) {
+  list-style-type: square;
+}
+main > nav.contents  ul ul:not(.auto-toc) {
+  list-style-type: disc;
+}
+main > nav.contents  ul ul ul:not(.auto-toc) {
+  list-style-type: '\2B29\ ';
+}
+main > nav.contents  ul ul ul ul:not(.auto-toc) {
+  list-style-type: '\2B1D\ ';
+}
+main > nav.contents  ul ul ul ul ul:not(.auto-toc) {
+  list-style-type: '\2B2A\ ';
+}
+nav.contents ul > li::marker {
+  color: grey;
+}
+
+/* Transitions */
+hr {
+  margin: 1em 10%;
+}
+
+/* Lists */
+
+dl.field-list.narrow, dl.docinfo, dl.option-list {
+  --field-indent: 2.4em;
+}
+
+ul, ol {
+  padding-left: 1.1em; /* indent by bullet width (Firefox, DejaVu fonts) */
+}
+dl.field-list > dd,
+dl.docinfo > dd {
+  margin-left: var(--field-indent); /* adapted in media queries or HTML */
+}
+dl.option-list > dd {
+  margin-left: 20%;
+}
+/* run-in: start field-body on same line after long field names */
+dl.field-list.run-in > dd p {
+  display: block;
+}
+/* "description style" like in most dictionaries, encyclopedias etc. */
+dl.description {
+  display: flow-root;
+}
+dl.description > dt {
+  clear: left;
+  float: left;
+  margin: 0;
+  padding: 0;
+  padding-right: 0.3em;
+  font-weight: bold;
+}
+dl.description > dd:after {
+  display: table;
+  content: "";
+  clear: left; /* clearfix for empty descriptions */
+}
+/* start lists nested in description/field lists on new line */
+dd > dl:first-child,
+dd > ul:first-child,
+dd > ol:first-child {
+  clear: left;
+}
+
+/* disclosures */
+details { padding-left: 1em; }
+summary { margin-left: -1em; }
+
+/* Footnotes and Citations */
+.footnote {
+  font-size: small;
+}
+
+/* Images, Figures, and Tables */
+figcaption,
+table > caption {
+  /*   font-size: small; */
+  font-style: italic;
+}
+figcaption > .legend {
+  font-size: small;
+  font-style: initial;
+}
+figure.numbered > figcaption > p:before {
+  counter-increment: figure;
+  content: "Figure " counter(figure) ": ";
+  font-weight: bold;
+  font-style: initial;
+}
+
+table tr {
+  text-align: left;
+  vertical-align: baseline;
+}
+table.booktabs { /* "booktabs" style (no vertical lines) */
+  border-top: 2px solid;
+  border-bottom: 2px solid;
+}
+table.booktabs * {
+  border: 0;
+}
+table.booktabs th {
+  border-bottom: thin solid;
+}
+table.numbered > caption:before {
+  counter-increment: table;
+  content: "Table " counter(table) ": ";
+  font-weight: bold;
+  font-style: initial;
+}
+
+/* Admonitions and System Messages */
+.admonition,
+div.system-message {
+  border: thin solid silver;
+  margin: 1em 2%;
+  padding: 0.5em 1em;
+}
+.caution p.admonition-title,
+.attention p.admonition-title,
+.danger p.admonition-title,
+.warning p.admonition-title,
+div.error {
+  color: maroon;
+}
+div.system-message > p > span.literal {
+  overflow-wrap: break-word;
+}
+
+/* Literal and Code */
+pre.literal-block, pre.doctest{
+  padding: 0.2em;
+  overflow-x: auto;
+}
+.literal-block, .doctest, span.literal {
+  background-color: #f6f9f8;
+}
+.system-message span.literal {
+  background-color: inherit;
+}
+
+/* basic highlighting: for a complete scheme, see */
+/* https://docutils.sourceforge.io/sandbox/stylesheets/ */
+pre.code .comment, code .comment { color: #5C6576 }
+pre.code .keyword, code .keyword { color: #3B0D06; font-weight: bold }
+pre.code .literal.string, code .literal.string { color: #0C5404 }
+pre.code .name.builtin, code .name.builtin { color: #352B84 }
+pre.code .deleted, code .deleted { background-color: #DEB0A1}
+pre.code .inserted, code .inserted { background-color: #A3D289}
+
+/* Hyperlink References */
+a {
+  text-decoration: none; /* for chromium */
+  /* Wrap links at any place, if this is the only way to prevent overflow */
+  overflow-wrap: break-word;
+}
+.contents a, a.toc-backref, a.citation-reference {
+  overflow-wrap: inherit;
+}
+/* Undecorated Links (see also minimal.css) */
+/* a.citation-reference, */
+.citation a.fn-backref {
+  color: inherit;
+}
+a:hover {
+  text-decoration: underline;
+}
+*:hover > a.toc-backref:after,
+.topic-title:hover > a:after {
+  content: " \2191"; /* ↑ UPWARDS ARROW */
+  color: grey;
+}
+*:hover > a.self-link:after {
+  content: "\1F517"; /* LINK SYMBOL */
+  color: grey;
+  font-size: smaller;
+  margin-left: 0.2em;
+}
+/* highlight specific targets of the current URL */
+section:target > h2, section:target > h3, section:target > h4,
+section:target > h5, section:target > h6,
+span:target + h2, span:target + h3, span:target + h4,
+span:target + h5, span:target + h6,
+dt:target, span:target,
+.contents :target,
+.contents:target > .topic-title,
+[role="doc-biblioentry"]:target > .label,
+[role="doc-biblioref"]:target,
+[role="note"]:target, /* Docutils 0.18 ... 0.19 */
+[role="doc-footnote"]:target, /* Docutils >= 0.20 */
+[role="doc-noteref"]:target {
+  background-color: #d2e6ec;
+}
+
+/* Block Alignment */
+/* Let content flow to the side of aligned images and figures */
+
+/* no floats around this elements */
+footer, header, hr,
+h1, h2, h3 {
+  clear: both;
+}
+
+img.align-left,
+svg.align-left,
+video.align-left,
+figure.align-left,
+div.align-left,
+table.align-left {
+  margin-left: 0;
+  padding-left: 0;
+  margin-right: 0.5em;
+  clear: left;
+  float: left;
+}
+img.align-right,
+svg.align-right,
+video.align-right,
+figure.align-right,
+div.align-right,
+table.align-right {
+  margin-left: 0.5em;
+  margin-right: 0;
+  clear: right;
+  float: right;
+}
+
+/* Margin Elements */
+/* see below for screen size dependent rules */
+.sidebar,
+.marginal,
+.admonition.marginal {
+  max-width: 40%;
+  border: none;
+  background-color: #efefea;
+  margin: 0.5em var(--sidebar-margin-right) 0.5em 1em;
+  padding: 0.5em;
+  padding-left: 0.7em;
+  clear: right;
+  float: right;
+  font-size: small;
+}
+.sidebar {
+  width: 40%;
+}
+
+/* Adaptive page layout */
+/* ==================== */
+
+@media (max-width: 30em) {
+  /* Smaller margins and no floating elements for small screens */
+  /* (main text less than 40 characters/line) */
+  body > * {
+    padding: 0.5rem 5%;
+    line-height: 1.4
+  }
+  .sidebar,
+  .marginal,
+  .admonition.marginal {
+    width: auto;
+    max-width: 100%;
+    float: none;
+  }
+  dl.option-list,
+  pre {
+    margin-left: 0;
+  }
+  body {
+    --field-indent: 4em;
+  }
+  pre, pre * {
+  font-size: 0.9em;
+  /* overflow: auto; */
+  }
+}
+
+@media (min-width: 54em) {
+  /* Move ToC to the left */
+  /* Main text width before: 70% ≙ 35em ≙ 75…95 chrs (Dejavu/Times) */
+  /*                  after:      ≳ 30em ≙ 54…70 chrs (Dejavu/Times) */
+  body.with-toc {
+    padding-left: 8%;
+  }
+  body.with-toc > * {
+    margin-left: 0;
+    padding-left: 22rem; /* fallback for webkit */
+    padding-left: min(22%, 22rem);
+    padding-right: 7%;
+  }
+  main > nav.contents { /* global ToC */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: min(25%, 25em);
+    height: 100vh;
+    margin: 0;
+    background-color: #fafaf6;
+    padding: 1em 2% 0 2%;
+    overflow: auto;
+  }
+  main > nav.contents > * {
+    padding-left: 0;
+    line-height: 1.4;
+  }
+  main > nav.contents a {
+  color: inherit;
+  }
+}
+
+@media (min-width: 70em) {
+  body {
+    --field-indent: 9em;
+  }
+}
+
+@media (min-width: 77em) {
+  /* Move marginalia to 6rem from right border       */
+  /* .sidebar,                                       */
+  /* .marginal,                                      */
+  /* .admonition.marginal {                          */
+  /*   margin-right: calc(6rem - 15%);               */
+  /* }                                               */
+  /* BUG: margin is calculated for break point width */
+  /* workaround: variable + many breakpoints         */
+  body > * {
+    padding-left: 18%;
+    padding-right: 28%; /* fallback for webkit */
+    padding-right: min(28%, 28rem);
+    --sidebar-margin-right: -20rem;
+  }
+  /* limit main text to ~ 50em ≙ 85…100 characters DejaVu rsp. …120 Times */
+  body.with-toc > * {
+    padding-left: min(22%, 22rem);
+    padding-right: calc(78% - 50rem); /* fallback for webkit */
+    padding-right: min(78% - 50rem, 28rem);
+    --sidebar-margin-right: 0;
+  }
+}
+
+@media (min-width: 85em) {
+  body.with-toc > * {
+    --sidebar-margin-right: -9rem;
+  }
+}
+
+@media (min-width: 90em) {
+  /* move marginalia into the margin */
+  body > * {
+    padding-left: min(22%, 22rem);
+    --sidebar-margin-right: -23rem;
+  }
+  body.with-toc > * {
+    --sidebar-margin-right: -14rem;
+  }
+}
+
+@media (min-width: 99em) {
+  /* move marginalia out of main text area */
+  body.with-toc > * {
+    --sidebar-margin-right: -20rem;
+  }
+  body > *, body.with-toc > * { /* for webkit */
+    padding-left: 22rem;
+    padding-right: 28rem;
+  }
+  .admonition.marginal,
+  .marginal {
+    width: 40%; /* make marginal figures, ... "full width" */
+  }
+}
+
+@media (min-width: 104em) {
+  body.with-toc > * {
+    --sidebar-margin-right: -23rem;
+  }
+}
