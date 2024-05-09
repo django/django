@@ -83,7 +83,7 @@ class SeleniumTestCaseBase(type(LiveServerTestCase)):
         options = self.import_options(self.browser)()
         if self.headless:
             match self.browser:
-                case "chrome":
+                case "chrome" | "edge":
                     options.add_argument("--headless=new")
                 case "firefox":
                     options.add_argument("-headless")
@@ -194,10 +194,12 @@ class SeleniumTestCase(LiveServerTestCase, metaclass=SeleniumTestCaseBase):
                 self.selenium.execute_script("localStorage.removeItem('theme');")
 
     def set_emulated_media(self, features, media=""):
-        if self.browser != "chrome":
-            self.skipTest("Emulated media controls are only supported on Chrome.")
-        # Chrome Dev Tools Protocol Emulation.setEmulatedMedia
-        # https://chromedevtools.github.io/devtools-protocol/1-3/Emulation/#method-setEmulatedMedia
+        if self.browser not in {"chrome", "edge"}:
+            self.skipTest(
+                "Emulation.setEmulatedMedia is only supported on Chromium and "
+                "Chrome-based browsers. See https://chromedevtools.github.io/devtools-"
+                "protocol/1-3/Emulation/#method-setEmulatedMedia for more details."
+            )
         self.selenium.execute_cdp_cmd(
             "Emulation.setEmulatedMedia", {"media": media, "features": features}
         )
