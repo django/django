@@ -84,14 +84,12 @@ form ul.inline li {
     min-width: 160px;
     width: 160px;
     word-wrap: break-word;
-    line-height: 1;
 }
 
 .aligned label:not(.vCheckboxLabel):after {
     content: '';
     display: inline-block;
     vertical-align: middle;
-    height: 1.625rem;
 }
 
 .aligned label + p, .aligned .checkbox-row + div.help, .aligned label + div.readonly {
