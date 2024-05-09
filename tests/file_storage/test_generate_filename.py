@@ -60,7 +60,7 @@ class StorageGenerateFilenameTests(SimpleTestCase):
         for name, expected in candidates:
             with self.subTest(name=name):
                 result = storage.generate_filename(name)
-                self.assertEqual(result, expected)
+                self.assertEqual(result, os.path.normpath(expected))
 
 
 class FileSystemStorageGenerateFilenameTests(StorageGenerateFilenameTests):
