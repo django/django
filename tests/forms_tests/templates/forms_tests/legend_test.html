@@ -1,7 +1,0 @@
-{% for field in form %}
-  {% if field.widget_type == 'radioselect' %}
-    {{ field.legend_tag }}
-  {% else %}
-    {{ field.label_tag }}
-  {% endif %}
-{% endfor %}

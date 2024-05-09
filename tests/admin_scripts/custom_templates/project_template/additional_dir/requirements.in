@@ -1,5 +1,0 @@
-# Should not be processed by `black`.
-Django<4.2
-environs[django]
-psycopg2-binary
-django-extensions

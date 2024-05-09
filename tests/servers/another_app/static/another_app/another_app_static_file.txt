@@ -1,1 +1,0 @@
-static file from another_app
