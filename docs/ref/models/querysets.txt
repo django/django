@@ -4158,6 +4158,9 @@ lookups or :class:`Prefetch` objects you want to prefetch for. For example:
     >>> restaurants = fetch_top_restaurants_from_cache()  # A list of Restaurants
     >>> prefetch_related_objects(restaurants, "pizzas__toppings")
 
+Validating primary keys may be necessary on
+:ref:`unfetched model instances <caching-and-querysets>`.
+
 When using multiple databases with ``prefetch_related_objects``, the prefetch
 query will use the database associated with the model instance. This can be
 overridden by using a custom queryset in a related lookup.

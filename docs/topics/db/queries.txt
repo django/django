@@ -896,6 +896,40 @@ reuse it:
     >>> print([p.headline for p in queryset])  # Evaluate the query set.
     >>> print([p.pub_date for p in queryset])  # Reuse the cache from the evaluation.
 
+.. admonition:: Validate unfetched instances before comparing to the cache
+
+    Because the result cache consists of Python objects, you need may need to
+    validate unfetched instances to obtain the correct Python type for the
+    primary key.
+
+    .. code-block:: pycon
+
+        from django.db import models
+
+        class DailyEntry(models.Model):
+            day = models.DateField(primary_key=True)
+            headline = models.CharField(max_length=255)
+
+            def __str__(self):
+                return f"{self.headline} ({self.day})"
+
+        >>> from datetime import date
+        >>> entry1 = DailyEntry.objects.create(
+                day=date(2020, 1, 1),
+                headline="Happy New Year!",
+            )
+        >>> entry2 = DailyEntry(day="2020-01-01", headline="Happy New Year!")
+        >>> all_entries = DailyEntry.objects.all()
+        >>> all_entries.contains(entry2)
+        True
+        >>> list(all_entries)  # Populate cache.
+        [<DailyEntry: Happy New Year! (2020-01-01)>]
+        >>> all_entries.contains(entry2)
+        False
+        >>> entry2.full_clean(validate_unique=False)
+        >>> all_entries.contains(entry2)
+        True
+
 When ``QuerySet``\s are not cached
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
