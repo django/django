@@ -50,22 +50,46 @@ There are a lot of details, so please read on.
 Prerequisites
 =============
 
-You'll need a few things before getting started:
+You'll need a few things before getting started. If this is your first release,
+you'll need to coordinate with another releaser to get all these things lined
+up, and write to the Ops mailing list requesting the required access and
+permissions.
 
-* A GPG key. If the key you want to use is not your default signing key, you'll
-  need to add ``-u you@example.com`` to every GPG signing command below, where
-  ``you@example.com`` is the email address associated with the key you want to
-  use. You will also need to add ``-i you@example.com`` to the ``twine`` call.
+* A Unix environment with these tools installed (in alphabetical order):
 
-* An install of some required Python packages:
+  * bash
+  * git
+  * GPG
+  * make
+  * man
+  * hashing tools (typically ``md5sum``, ``sha1sum``, and ``sha256sum`` on
+    Linux, or ``md5`` and ``shasum`` on macOS)
+  * python
+  * ssh
+
+* A GPG key pair. Ensure that the private part of this key is securely stored.
+  The public part needs to be uploaded to your GitHub account, and also to the
+  Jenkins server running the "confirm release" job.
+
+  .. admonition:: More than one GPG key
+
+    If the key you want to use is not your default signing key, you'll need to
+    add ``-u you@example.com`` to every GPG signing command shown below, where
+    ``you@example.com`` is the email address associated with the key you want
+    to use.
+
+* A clean Python virtual environment per Django version being released, with
+  these required Python packages installed:
 
   .. code-block:: shell
 
       $ python -m pip install wheel twine
 
-* Access to Django's project on PyPI. Create a project-scoped token following
-  the `official documentation <https://pypi.org/help/#apitoken>`_ and set up
-  your ``$HOME/.pypirc`` file like this:
+* Access to `Django's project on PyPI <https://pypi.org/project/Django/>`_ to
+  upload binaries, ideally with extra permissions to `yank a release
+  <https://pypi.org/help/#yanked>`_ if necessary. Create a project-scoped token
+  following the `official documentation <https://pypi.org/help/#apitoken>`_
+  and set up your ``$HOME/.pypirc`` file like this:
 
   .. code-block:: ini
      :caption: ``~/.pypirc``
@@ -84,7 +108,7 @@ You'll need a few things before getting started:
        username = __token__
        password = # A project token.
 
-* Access to Django's project on `Transifex
+* Access to `Django's project on Transifex
   <https://app.transifex.com/django/django/>`_, with a Manager role. Generate
   an API Token in the `user setting section
   <https://app.transifex.com/user/settings/api/>`_ and set up your
@@ -97,33 +121,69 @@ You'll need a few things before getting started:
        rest_hostname = https://rest.api.transifex.com
        token = # API token
 
-* Access to the ``djangoproject.com`` server to upload files.
+* Access to the ``djangoproject.com`` server to upload files (using ``scp``).
 
-* Access to the admin on ``djangoproject.com`` as a "Site maintainer".
+* Access to the Django admin on ``djangoproject.com`` as a "Site maintainer".
 
-* Access to post to ``django-announce``.
+* Access to create a post in the `Django Forum - Announcements category
+  <https://forum.djangoproject.com/c/announcements/7>`_ and to  send emails to
+  the following mailing lists:
 
-* If this is a security release, access to the pre-notification distribution
-  list.
+  * `django-users <https://groups.google.com/g/django-users/>`_
+  * `django-developers <https://groups.google.com/g/django-developers/>`_
+  * `django-announce <https://groups.google.com/g/django-announce/>`_
 
-If this is your first release, you'll need to coordinate with another releaser
-to get all these things lined up.
+* Access to the ``django-security`` repo in GitHub. Among other things, this
+  provides access to the pre-notification distribution list (needed for
+  security release preparation tasks).
 
 Pre-release tasks
 =================
 
 A few items need to be taken care of before even beginning the release process.
 This stuff starts about a week before the release; most of it can be done
-any time leading up to the actual release:
+any time leading up to the actual release.
 
-#. If this is a security release, send out pre-notification **one week** before
-   the release. The template for that email and a list of the recipients are in
-   the private ``django-security`` GitHub wiki. BCC the pre-notification
-   recipients. Sign the email with the key you'll use for the release and
-   include `CVE IDs <https://cveform.mitre.org/>`_ (requested with Vendor:
-   djangoproject, Product: django) and patches for each issue being fixed.
-   Also, :ref:`notify django-announce <security-disclosure>` of the upcoming
-   security release.
+10 (or more) days before a security release
+-------------------------------------------
+
+#. Request the `CVE IDs <https://cveform.mitre.org/>`_  for the security
+   issue(s) being released. One CVE ID per issue, requested with
+   ``Vendor: djangoproject`` and ``Product: django``.
+
+#. Generate the relevant (private) patch(es) using ``git format-patch``, one
+   for the ``main`` branch and one for each stable branch being patched.
+
+A week before a security release
+--------------------------------
+
+#. Send out pre-notification exactly **one week** before the security release.
+   The template for that email and a list of the recipients are in the private
+   ``django-security`` GitHub wiki. BCC the pre-notification recipients and be
+   sure to include the relevant CVE IDs. Attach all the relevant patches
+   (targeting ``main`` and the stable branches) and sign the email text with
+   the key you'll use for the release, with a command like:
+
+   .. code-block:: shell
+
+      $ gpg --clearsign --digest-algo SHA256 prenotification-email.txt
+
+#. :ref:`Notify django-announce <security-disclosure>` of the upcoming
+   security release with a general message such as:
+
+   .. code-block:: text
+
+    Notice of upcoming Django security releases (3.2.24, 4.2.10 and 5.0.2)
+
+    Django versions 5.0.2, 4.2.10, and 3.2.24 will be released on Tuesday,
+    February 6th, 2024 around 1500 UTC. They will fix one security defect
+    with severity "moderate".
+
+    For details of severity levels, see:
+    https://docs.djangoproject.com/en/dev/internals/security/#how-django-discloses-security-issues
+
+A few days before any release
+-----------------------------
 
 #. As the release approaches, watch Trac to make sure no release blockers
    are left for the upcoming release.
@@ -214,13 +274,10 @@ any time leading up to the actual release:
     $ git checkout -b stable/4.2.x origin/stable/4.1.x
     $ git push origin stable/4.2.x:stable/4.2.x
 
-Preparing for release
-=====================
-
-Write the announcement blog post for the release. You can enter it into the
-admin at any time and mark it as inactive. Here are a few examples: `example
-security release announcement`__, `example regular release announcement`__,
-`example pre-release announcement`__.
+#. Write the announcement blog post for the release. You can enter it into the
+   admin at any time and mark it as inactive. Here are a few examples: `example
+   security release announcement`__, `example regular release announcement`__,
+   `example pre-release announcement`__.
 
 __ https://www.djangoproject.com/weblog/2013/feb/19/security/
 __ https://www.djangoproject.com/weblog/2012/mar/23/14/
@@ -229,15 +286,32 @@ __ https://www.djangoproject.com/weblog/2012/nov/27/15-beta-1/
 Actually rolling the release
 ============================
 
-OK, this is the fun part, where we actually push out a release!
+OK, this is the fun part, where we actually push out a release! If you're
+issuing **multiple releases**, repeat these steps for each release.
 
 #. Check `Jenkins`__ is green for the version(s) you're putting out. You
-   probably shouldn't issue a release until it's green.
+   probably shouldn't issue a release until it's green, and you should make
+   sure that the latest green run includes the changes that you are releasing.
 
    __ https://djangoci.com
 
+#. Cleanup the release notes for this release. Make these changes in ``main``
+   and backport to all branches where the release notes for a particular
+   version are located.
+
+   #. For a feature release, remove the ``UNDER DEVELOPMENT`` header at the top
+      of the release notes, remove the ``Expected`` prefix and update the
+      release date, if necessary (:commit:`example commit
+      <1994a2643881a9e3f9fa8d3e0794c1a9933a1831>`).
+
+   #. For a patch release, remove the ``Expected`` prefix and update the
+      release date for all releases, if necessary (:commit:`example commit
+      <34a503162fe222033a1cd3249bccad014fcd1d20>`).
+
 #. A release always begins from a release branch, so you should make sure
-   you're on a stable branch and up-to-date. For example:
+   you're on an up-to-date stable branch. Also, you should have available a
+   clean and dedicated virtual environment per version being released. For
+   example:
 
    .. code-block:: shell
 
@@ -265,19 +339,19 @@ OK, this is the fun part, where we actually push out a release!
    that the commit is a security fix and that an announcement will follow
    (:commit:`example security commit <bf39978a53f117ca02e9a0c78b76664a41a54745>`).
 
-#. For a feature release, remove the ``UNDER DEVELOPMENT`` header at the
-   top of the release notes and add the release date on the next line. For a
-   patch release, remove the ``Expected`` prefix and update the release date,
-   if necessary. Make this change on all branches where the release notes for a
-   particular version are located.
-
 #. Update the version number in ``django/__init__.py`` for the release.
    Please see `notes on setting the VERSION tuple`_ below for details
-   on ``VERSION``.
+   on ``VERSION`` (:commit:`example commit
+   <2719a7f8c161233f45d34b624a9df9392c86cc1b>`).
 
-#. If this is a pre-release package, update the "Development Status" trove
-   classifier in ``setup.cfg`` to reflect this. Otherwise, make sure the
-   classifier is set to ``Development Status :: 5 - Production/Stable``.
+   #. If this is a pre-release package also update the "Development Status"
+      trove classifier in ``setup.cfg`` to reflect this. An ``rc`` pre-release
+      should not change the trove classifier (:commit:`example commit for alpha
+      release <eeeacc52a967234e920c001b7908c4acdfd7a848>`, :commit:`example
+      commit for beta release <25fec8940b24107e21314ab6616e18ce8dec1c1c>`).
+
+   #. Otherwise, make sure the classifier is set to
+      ``Development Status :: 5 - Production/Stable``.
 
 #. Tag the release using ``git tag``. For example:
 
@@ -285,9 +359,14 @@ OK, this is the fun part, where we actually push out a release!
 
         $ git tag --sign --message="Tag 4.1.1" 4.1.1
 
-   You can check your work by running ``git tag --verify <tag>``.
+   You can check your work running ``git tag --verify <tag>``.
 
-#. Push your work, including the tag: ``git push --tags``.
+#. Push your work and the new tag:
+
+   .. code-block:: shell
+
+        $ git push
+        $ git push --tags
 
 #. Make sure you have an absolutely clean tree by running ``git clean -dfx``.
 
@@ -364,12 +443,19 @@ OK, this is the fun part, where we actually push out a release!
    ``Django-<version>.checksum.txt.asc`` which you can then verify using ``gpg
    --verify Django-<version>.checksum.txt.asc``.
 
-If you're issuing multiple releases, repeat these steps for each release.
-
 Making the release(s) available to the public
 =============================================
 
 Now you're ready to actually put the release out there. To do this:
+
+#. Upload the checksum file(s):
+
+   .. code-block:: shell
+
+        $ scp Django-A.B.C.checksum.txt.asc djangoproject.com:/home/www/www/media/pgp/Django-A.B.C.checksum.txt
+
+   (If this is a security release, what follows should be done 15 minutes
+   before the announced release time, no sooner.)
 
 #. Upload the release package(s) to the djangoproject server, replacing
    A.B. with the appropriate version number, e.g. 4.1 for a 4.1.x release:
@@ -378,34 +464,42 @@ Now you're ready to actually put the release out there. To do this:
 
         $ scp Django-* djangoproject.com:/home/www/www/media/releases/A.B
 
-   If this is the alpha release of a new series, you will need to create the
-   directory A.B.
-
-#. Upload the checksum file(s):
-
-   .. code-block:: shell
-
-        $ scp Django-A.B.C.checksum.txt.asc djangoproject.com:/home/www/www/media/pgp/Django-A.B.C.checksum.txt
+   If this is the alpha release of a new series, you will need to create
+   **first** the directory A.B.
 
 #. Test that the release packages install correctly using ``pip``. Here's one
-   method:
+   simple method (this just tests that the binaries are available, that they
+   install correctly, and that migrations and the development server start, but
+   it'll catch silly mistakes):
 
    .. code-block:: shell
 
         $ RELEASE_VERSION='4.1.1'
         $ MAJOR_VERSION=`echo $RELEASE_VERSION| cut -c 1-3`
 
-        $ python -m venv django-pip
-        $ . django-pip/bin/activate
+        $ python -m venv django-pip-tarball
+        $ . django-pip-tarball/bin/activate
         $ python -m pip install https://www.djangoproject.com/m/releases/$MAJOR_VERSION/Django-$RELEASE_VERSION.tar.gz
+        $ django-admin startproject test_tarball
+        $ cd test_tarball
+        $ ./manage.py --help  # Ensure executable bits
+        $ python manage.py migrate
+        $ python manage.py runserver
+        <CTRL+C>
         $ deactivate
+        $ cd .. && rm -rf test_tarball && rm -rf django-pip-tarball
+
         $ python -m venv django-pip-wheel
         $ . django-pip-wheel/bin/activate
         $ python -m pip install https://www.djangoproject.com/m/releases/$MAJOR_VERSION/Django-$RELEASE_VERSION-py3-none-any.whl
+        $ django-admin startproject test_wheel
+        $ cd test_wheel
+        $ ./manage.py --help  # Ensure executable bits
+        $ python manage.py migrate
+        $ python manage.py runserver
+        <CTRL+C>
         $ deactivate
-
-   This just tests that the tarballs are available (i.e. redirects are up) and
-   that they install correctly, but it'll catch silly mistakes.
+        $ cd .. && rm -rf test_wheel && rm -rf django-pip-wheel
 
 #. Run the `confirm-release`__ build on Jenkins to verify the checksum file(s)
    (e.g. use ``4.2rc1`` for
@@ -418,7 +512,7 @@ Now you're ready to actually put the release out there. To do this:
 
    .. code-block:: shell
 
-       $ twine upload -s dist/*
+       $ twine upload dist/*
 
 #. Go to the `Add release page in the admin`__, enter the new release number
    exactly as it appears in the name of the tarball
