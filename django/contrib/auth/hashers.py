@@ -570,7 +570,7 @@ class ScryptPasswordHasher(BasePasswordHasher):
     algorithm = "scrypt"
     block_size = 8
     maxmem = 0
-    parallelism = 1
+    parallelism = 5
     work_factor = 2**14
 
     def encode(self, password, salt, n=None, r=None, p=None):
