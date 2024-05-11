@@ -650,8 +650,8 @@ class TestUtilsHashPassScrypt(SimpleTestCase):
         encoded = make_password("lètmein", "seasalt", "scrypt")
         self.assertEqual(
             encoded,
-            "scrypt$16384$seasalt$8$1$Qj3+9PPyRjSJIebHnG81TMjsqtaIGxNQG/aEB/NY"
-            "afTJ7tibgfYz71m0ldQESkXFRkdVCBhhY8mx7rQwite/Pw==",
+            "scrypt$16384$seasalt$8$5$ECMIUp+LMxMSK8xB/IVyba+KYGTI7FTnet025q/1f"
+            "/vBAVnnP3hdYqJuRi+mJn6ji6ze3Fbb7JEFPKGpuEf5vw==",
         )
         self.assertIs(is_password_usable(encoded), True)
         self.assertIs(check_password("lètmein", encoded), True)
