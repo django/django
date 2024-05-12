@@ -244,6 +244,7 @@ class SpGistIndex(PostgresIndex):
 
 class OpClass(Func):
     template = "%(expressions)s %(name)s"
+    constraint_validation_compatible = False
 
     def __init__(self, expression, name):
         super().__init__(expression, name=name)

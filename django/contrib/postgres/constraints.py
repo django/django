@@ -1,6 +1,5 @@
 from types import NoneType
 
-from django.contrib.postgres.indexes import OpClass
 from django.core.exceptions import ValidationError
 from django.db import DEFAULT_DB_ALIAS, NotSupportedError
 from django.db.backends.ddl_references import Expressions, Statement, Table
@@ -208,12 +207,10 @@ class ExclusionConstraint(BaseConstraint):
                         if isinstance(expr, F) and expr.name in exclude:
                             return
             rhs_expression = expression.replace_expressions(replacements)
-            # Remove OpClass because it only has sense during the constraint
-            # creation.
-            if isinstance(expression, OpClass):
-                expression = expression.get_source_expressions()[0]
-            if isinstance(rhs_expression, OpClass):
-                rhs_expression = rhs_expression.get_source_expressions()[0]
+            if hasattr(expression, "get_expression_for_validation"):
+                expression = expression.get_expression_for_validation()
+            if hasattr(rhs_expression, "get_expression_for_validation"):
+                rhs_expression = rhs_expression.get_expression_for_validation()
             lookup = PostgresOperatorLookup(lhs=expression, rhs=rhs_expression)
             lookup.postgres_operator = operator
             lookups.append(lookup)
