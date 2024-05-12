@@ -88,9 +88,10 @@ under a permissive open source license. :source:`A copy of the Python license
 Which sites use Django?
 =======================
 
-`DjangoSites.org`_ features a constantly growing list of Django-powered sites.
+`BuiltWithDjango.com`_ features a constantly growing list of Django-powered
+sites.
 
-.. _DjangoSites.org: https://djangosites.org
+.. _BuiltWithDjango.com: https://builtwithdjango.com/projects/
 
 .. _faq-mtv:
 
