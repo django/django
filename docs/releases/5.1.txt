@@ -281,6 +281,10 @@ Models
   reload a model's value. This can be used to lock the row before reloading or
   to select related objects.
 
+* The new :attr:`.Expression.constraint_validation_compatible` attribute allows
+  specifying that the expression should be ignored during a constraint
+  validation.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

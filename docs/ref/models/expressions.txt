@@ -1058,6 +1058,15 @@ calling the appropriate methods on the wrapped expression.
         Tells Django that this expression can be used in
         :attr:`Field.db_default`. Defaults to ``False``.
 
+    .. attribute:: constraint_validation_compatible
+
+        .. versionadded:: 5.1
+
+        Tells Django that this expression can be used during a constraint
+        validation. Expressions with ``constraint_validation_compatible`` set
+        to ``False`` must have only one source expression. Defaults to
+        ``True``.
+
     .. attribute:: contains_aggregate
 
         Tells Django that this expression contains an aggregate and that a

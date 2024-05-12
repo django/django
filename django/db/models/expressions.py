@@ -180,6 +180,8 @@ class BaseExpression:
     window_compatible = False
     # Can the expression be used as a database default value?
     allowed_default = False
+    # Can the expression be used during a constraint validation?
+    constraint_validation_compatible = True
 
     def __init__(self, output_field=None):
         if output_field is not None:
@@ -483,6 +485,20 @@ class BaseExpression:
         if hasattr(self.output_field, "select_format"):
             return self.output_field.select_format(compiler, sql, params)
         return sql, params
+
+    def get_expression_for_validation(self):
+        # Ignore expressions that cannot be used during a constraint validation.
+        if not getattr(self, "constraint_validation_compatible", True):
+            try:
+                (expression,) = self.get_source_expressions()
+            except ValueError as e:
+                raise ValueError(
+                    "Expressions with constraint_validation_compatible set to False "
+                    "must have only one source expression."
+                ) from e
+            else:
+                return expression
+        return self
 
 
 @deconstructible
@@ -1716,6 +1732,7 @@ class Exists(Subquery):
 class OrderBy(Expression):
     template = "%(expression)s %(ordering)s"
     conditional = False
+    constraint_validation_compatible = False
 
     def __init__(self, expression, descending=False, nulls_first=None, nulls_last=None):
         if nulls_first and nulls_last:
