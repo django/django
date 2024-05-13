@@ -1780,7 +1780,7 @@ class SchemaTests(TransactionTestCase):
                 any("ADD CONSTRAINT" in query["sql"] for query in ctx.captured_queries)
             )
         else:
-            self.assertTrue(
+            self.assertFalse(
                 any("DROP CONSTRAINT" in query["sql"] for query in ctx.captured_queries)
             )
 
