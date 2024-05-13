@@ -20,7 +20,15 @@ repos:
     rev: 7.0.0
     hooks:
       - id: flake8
-  - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v9.2.0
+  - repo: local
     hooks:
-      - id: eslint
+    - id: eslint
+      name: eslint
+      language: node
+      additional_dependencies:
+      - 'eslint@9.2.0'
+      - '@eslint/js@9.2.0'
+      - 'globals@15.2.0'
+      entry: eslint
+      types_or:
+      - javascript
