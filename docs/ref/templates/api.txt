@@ -201,12 +201,37 @@ Once you have a compiled :class:`Template` object, you can render a context
 with it. You can reuse the same template to render it several times with
 different contexts.
 
-.. class:: Context(dict_=None)
+.. class:: Context(dict_=None, autoescape=True, use_l10n=None, use_tz=None)
 
     The constructor of ``django.template.Context`` takes an optional argument —
     a dictionary mapping variable names to variable values.
 
-    For details, see :ref:`playing-with-context` below.
+    Three optional keyword arguments can also be specified:
+
+    * ``autoescape`` controls whether HTML autoescaping is enabled.
+
+      It defaults to ``True``.
+
+      .. warning::
+
+          Only set it to ``False`` if you're rendering non-HTML templates!
+
+    * ``use_l10n`` overrides whether values will be localized by default. If
+      set to ``True`` numbers and dates will be formatted based on locale.
+
+      It defaults to ``None``.
+
+      See :ref:`topic-l10n-templates` for details.
+
+    * ``use_tz`` overrides whether dates are converted to the local time when
+      rendered in a template. If set to ``True`` all dates will be rendered
+      using the local timezone. This takes precedence over :setting:`USE_TZ`.
+
+      It defaults to ``None``.
+
+      See :ref:`time-zones-in-templates` for details.
+
+    For example usage, see :ref:`playing-with-context` below.
 
 .. method:: Template.render(context)
 
@@ -610,9 +635,9 @@ against ``dict``::
 Using ``RequestContext``
 ------------------------
 
-.. class:: RequestContext(request, dict_=None, processors=None)
+.. class:: RequestContext(request, dict_=None, processors=None, use_l10n=None, use_tz=None, autoescape=True)
 
-Django comes with a special ``Context`` class,
+Django comes with a special :class:`~django.template.Context` class,
 ``django.template.RequestContext``, that acts slightly differently from the
 normal ``django.template.Context``. The first difference is that it takes an
 :class:`~django.http.HttpRequest` as its first argument. For example::
