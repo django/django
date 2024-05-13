@@ -1771,22 +1771,17 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(Book, old_field, new_field, strict=True)
 
         if connection.features.requires_fk_constraints_to_be_recreated:
-            self.assertIs(
+            self.assertTrue(
                 any(
                     "DROP FOREIGN KEY" in query["sql"] for query in ctx.captured_queries
-                ),
-                True,
+                )
             )
-            self.assertIs(
-                any("ADD CONSTRAINT" in query["sql"] for query in ctx.captured_queries),
-                True,
+            self.assertTrue(
+                any("ADD CONSTRAINT" in query["sql"] for query in ctx.captured_queries)
             )
         else:
-            self.assertIs(
-                any(
-                    "DROP CONSTRAINT" in query["sql"] for query in ctx.captured_queries
-                ),
-                False,
+            self.assertTrue(
+                any("DROP CONSTRAINT" in query["sql"] for query in ctx.captured_queries)
             )
 
     @skipUnlessDBFeature("supports_foreign_keys", "can_introspect_foreign_keys")
