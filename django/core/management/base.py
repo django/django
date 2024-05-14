@@ -345,7 +345,7 @@ class BaseCommand:
             parser,
             "--traceback",
             action="store_true",
-            help="Raise on CommandError exceptions.",
+            help="Display a full stack trace on CommandError exceptions.",
         )
         self.add_base_argument(
             parser,
