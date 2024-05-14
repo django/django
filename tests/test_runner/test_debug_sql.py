@@ -3,7 +3,7 @@ from io import StringIO
 
 from django.db import connection
 from django.test import TestCase
-from django.test.runner import DiscoverRunner
+from django.test.runner import DebugSQLTextTestResult, DiscoverRunner
 from django.utils.version import PY311
 
 from .models import Person
@@ -151,3 +151,55 @@ class TestDebugSQL(unittest.TestCase):
             "(test_runner.test_debug_sql.TestDebugSQL.ErrorSetUpTestDataTest)",
             output,
         )
+
+    def test_parse_sql_logs(self):
+        result = DebugSQLTextTestResult(
+            stream=StringIO(), descriptions=False, verbosity=0
+        )
+        log_lines = [
+            "(0.001) SELECT * FROM test_runner_person WHERE id = %s; "
+            "args=(1,); alias=default",
+            "(0.002) UPDATE test_runner_person SET name = %s WHERE id = %s; "
+            "args=('runner', 1); alias=default",
+        ]
+        expected_output = [
+            {
+                "duration": "0.001",
+                "sql": "SELECT * FROM test_runner_person WHERE id = %s",
+                "params": "(1,)",
+                "alias": "default",
+            },
+            {
+                "duration": "0.002",
+                "sql": "UPDATE test_runner_person SET name = %s WHERE id = %s",
+                "params": "('runner', 1)",
+                "alias": "default",
+            },
+        ]
+        self.assertEqual(result._parse_sql_logs(log_lines), expected_output)
+
+    def test_format_sql_logs(self):
+        result = DebugSQLTextTestResult(
+            stream=StringIO(), descriptions=False, verbosity=0
+        )
+        log_entries = [
+            {
+                "duration": "0.001",
+                "sql": "SELECT * FROM test_runner_person WHERE id = %s",
+                "params": "(1,)",
+                "alias": "default",
+            },
+            {
+                "duration": "0.002",
+                "sql": "UPDATE test_runner_person SET name = %s WHERE id = %s",
+                "params": "('runner', 1)",
+                "alias": "default",
+            },
+        ]
+        expected_output = (
+            "\n(0.001)\nSELECT *\nFROM test_runner_person\nWHERE id = %s;\n\n"
+            "args=(1,);\n\nalias=default\n\n"
+            "(0.002)\nUPDATE test_runner_person\nSET name = %s\nWHERE id = %s;\n\n"
+            "args=('runner', 1);\n\nalias=default\n"
+        )
+        self.assertEqual(result._format_sql_logs(log_entries), expected_output)

@@ -9,6 +9,7 @@ import multiprocessing
 import os
 import pickle
 import random
+import re
 import sys
 import textwrap
 import unittest
@@ -96,9 +97,32 @@ class DebugSQLTextTestResult(unittest.TextTestResult):
             self.stream.writeln(self.separator2)
             self.stream.writeln(err)
             self.stream.writeln(self.separator2)
-            self.stream.writeln(
-                sqlparse.format(sql_debug, reindent=True, keyword_case="upper")
-            )
+            parsed_sql_logs = self._parse_sql_logs(sql_debug.splitlines())
+            self.stream.writeln(self._format_sql_logs(parsed_sql_logs))
+
+    def _parse_sql_logs(self, log_lines):
+        log_pattern = re.compile(
+            r"\((\d+\.\d{3})\) (.*?); args=(.*?); alias=(.*?)(?:,|\s*$)"
+        )
+        return [
+            {
+                "duration": match.group(1),
+                "sql": match.group(2),
+                "params": match.group(3),
+                "alias": match.group(4),
+            }
+            for log in log_lines
+            if (match := log_pattern.match(log))
+        ]
+
+    def _format_sql_logs(self, log_entries):
+        return "".join(
+            f"\n({log['duration']})\n"
+            f"{sqlparse.format(log['sql'], reindent=True, keyword_case='upper')};\n\n"
+            f"args={log['params']};\n\n"
+            f"alias={log['alias']}\n"
+            for log in log_entries
+        )
 
 
 class PDBDebugResult(unittest.TextTestResult):
