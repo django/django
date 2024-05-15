@@ -3927,7 +3927,7 @@ class AdminViewStringPrimaryKeyTest(TestCase):
                 )
 
     def test_deleteconfirmation_link(self):
-        """ "
+        """
         The link from the delete confirmation page referring back to the
         changeform of the object should be quoted.
         """
