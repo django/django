@@ -2652,7 +2652,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
             urls.urlpatterns = old_urlpatterns
 
     def test_project_template_tarball_url(self):
-        """ "
+        """
         Startproject management command handles project template tar/zip balls
         from non-canonical urls.
         """
