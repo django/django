@@ -14,7 +14,7 @@
             // Repopulate HTML select box from cache
             const box = document.getElementById(id);
             const scroll_value_from_top = box.scrollTop;
-            box.innerHTML = '';
+            box.innerText = '';
             for (const node of SelectBox.cache[id]) {
                 if (node.displayed) {
                     const new_option = new Option(node.text, node.value, false, false);
