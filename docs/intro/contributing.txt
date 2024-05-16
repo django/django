@@ -71,7 +71,7 @@ It contains lots of great information and is a must read for anyone who'd like
 to become a regular contributor to Django. If you've got questions, it's
 probably got the answers.
 
-.. admonition:: Python 3 required!
+.. admonition:: Python version 3.10 or higher required!
 
     The current version of Django doesn't support Python 2.7. Get Python 3 at
     `Python's download page <https://www.python.org/downloads/>`_ or with your
