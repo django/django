@@ -35,6 +35,11 @@ The ``FileSystemStorage`` class
     :class:`~django.core.files.storage.Storage` and provides implementations
     for all the public methods thereof.
 
+    .. note::
+
+        The ``FileSystemStorage.delete()`` method will not raise an exception
+        if the given file name does not exist.
+
     .. attribute:: location
 
         Absolute path to the directory that will hold the files.
@@ -54,11 +59,6 @@ The ``FileSystemStorage`` class
 
         The file system permissions that the directory will receive when it is
         saved. Defaults to :setting:`FILE_UPLOAD_DIRECTORY_PERMISSIONS`.
-
-    .. note::
-
-        The ``FileSystemStorage.delete()`` method will not raise
-        an exception if the given file name does not exist.
 
     .. method:: get_created_time(name)
 
