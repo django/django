@@ -289,8 +289,8 @@ In the ``polls/urls.py`` file include the following code:
         path("", views.index, name="index"),
     ]
 
-The next step is to point the root URLconf at the ``polls.urls`` module. In
-``mysite/urls.py``, add an import for ``django.urls.include`` and insert an
+The next step is to point the root URLconf at the ``polls.urls`` module. Go back into the project root directory ``/mysite/``, and open the file 
+``mysite/urls.py``. Here, add an import for ``django.urls.include`` and insert an
 :func:`~django.urls.include` in the ``urlpatterns`` list, so you have:
 
 .. code-block:: python
