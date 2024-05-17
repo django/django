@@ -40,14 +40,27 @@ class OracleGISSchemaEditor(DatabaseSchemaEditor):
             return super().quote_value(str(value))
         return super().quote_value(value)
 
+    def _field_indexes_sql(self, model, field):
+        if isinstance(field, GeometryField) and field.spatial_index:
+            return [
+                self.sql_add_spatial_index
+                % {
+                    "index": self.quote_name(
+                        self._create_spatial_index_name(model, field)
+                    ),
+                    "table": self.quote_name(model._meta.db_table),
+                    "column": self.quote_name(field.column),
+                }
+            ]
+        return super()._field_indexes_sql(model, field)
+
     def column_sql(self, model, field, include_default=False):
         column_sql = super().column_sql(model, field, include_default)
         if isinstance(field, GeometryField):
-            db_table = model._meta.db_table
             self.geometry_sql.append(
                 self.sql_add_geometry_metadata
                 % {
-                    "table": self.geo_quote_name(db_table),
+                    "table": self.geo_quote_name(model._meta.db_table),
                     "column": self.geo_quote_name(field.column),
                     "dim0": field._extent[0],
                     "dim1": field._extent[1],
@@ -57,17 +70,6 @@ class OracleGISSchemaEditor(DatabaseSchemaEditor):
                     "srid": field.srid,
                 }
             )
-            if field.spatial_index:
-                self.geometry_sql.append(
-                    self.sql_add_spatial_index
-                    % {
-                        "index": self.quote_name(
-                            self._create_spatial_index_name(model, field)
-                        ),
-                        "table": self.quote_name(db_table),
-                        "column": self.quote_name(field.column),
-                    }
-                )
         return column_sql
 
     def create_model(self, model):
