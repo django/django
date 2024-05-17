@@ -10,10 +10,6 @@ logger = logging.getLogger("django.contrib.gis")
 class MySQLGISSchemaEditor(DatabaseSchemaEditor):
     sql_add_spatial_index = "CREATE SPATIAL INDEX %(index)s ON %(table)s(%(column)s)"
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.geometry_sql = []
-
     def skip_default(self, field):
         # Geometry fields are stored as BLOB/TEXT, for which MySQL < 8.0.13
         # doesn't support defaults.
@@ -29,29 +25,29 @@ class MySQLGISSchemaEditor(DatabaseSchemaEditor):
             return super().quote_value(str(value))
         return super().quote_value(value)
 
-    def column_sql(self, model, field, include_default=False):
-        column_sql = super().column_sql(model, field, include_default)
-        # MySQL doesn't support spatial indexes on NULL columns
+    def _field_indexes_sql(self, model, field):
         if isinstance(field, GeometryField) and field.spatial_index and not field.null:
+            with self.connection.cursor() as cursor:
+                supports_spatial_index = (
+                    self.connection.introspection.supports_spatial_index(
+                        cursor, model._meta.db_table
+                    )
+                )
             qn = self.connection.ops.quote_name
-            db_table = model._meta.db_table
-            self.geometry_sql.append(
-                self.sql_add_spatial_index
-                % {
-                    "index": qn(self._create_spatial_index_name(model, field)),
-                    "table": qn(db_table),
-                    "column": qn(field.column),
-                }
-            )
-        return column_sql
-
-    def create_model(self, model):
-        super().create_model(model)
-        self.create_spatial_indexes()
-
-    def add_field(self, model, field):
-        super().add_field(model, field)
-        self.create_spatial_indexes()
+            sql = self.sql_add_spatial_index % {
+                "index": qn(self._create_spatial_index_name(model, field)),
+                "table": qn(model._meta.db_table),
+                "column": qn(field.column),
+            }
+            if supports_spatial_index:
+                return [sql]
+            else:
+                logger.error(
+                    f"Cannot create SPATIAL INDEX {sql}. Only MyISAM, Aria, and InnoDB "
+                    f"support them.",
+                )
+                return []
+        return super()._field_indexes_sql(model, field)
 
     def remove_field(self, model, field):
         if isinstance(field, GeometryField) and field.spatial_index and not field.null:
@@ -70,14 +66,3 @@ class MySQLGISSchemaEditor(DatabaseSchemaEditor):
 
     def _create_spatial_index_name(self, model, field):
         return "%s_%s_id" % (model._meta.db_table, field.column)
-
-    def create_spatial_indexes(self):
-        for sql in self.geometry_sql:
-            try:
-                self.execute(sql)
-            except OperationalError:
-                logger.error(
-                    f"Cannot create SPATIAL INDEX {sql}. Only MyISAM, Aria, and InnoDB "
-                    f"support them.",
-                )
-        self.geometry_sql = []
