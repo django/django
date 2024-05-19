@@ -27,7 +27,7 @@ class ListFilter:
     title = None  # Human-readable title to appear in the right sidebar.
     template = "admin/filter.html"
 
-    def __init__(self, request, params, model, model_admin):
+    def __init__(self, request, params, model, model_admin) -> None:
         self.request = request
         # This dictionary will eventually contain the request's query string
         # parameters actually used by this filter.

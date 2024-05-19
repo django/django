@@ -17,7 +17,7 @@ class AdminAuthenticationForm(AuthenticationForm):
     }
     required_css_class = "required"
 
-    def confirm_login_allowed(self, user):
+    def confirm_login_allowed(self, user) -> None:
         super().confirm_login_allowed(user)
         if not user.is_staff:
             raise ValidationError(
