@@ -44,7 +44,7 @@ class AdminForm:
         prepopulated_fields,
         readonly_fields=None,
         model_admin=None,
-    ):
+    ) -> None:
         self.form, self.fieldsets = form, fieldsets
         self.prepopulated_fields = [
             {"field": form[field_name], "dependencies": [form[f] for f in dependencies]}
@@ -55,7 +55,7 @@ class AdminForm:
             readonly_fields = ()
         self.readonly_fields = readonly_fields
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             f"<{self.__class__.__qualname__}: "
             f"form={self.form.__class__.__qualname__} "
@@ -106,7 +106,7 @@ class Fieldset:
         classes=(),
         description=None,
         model_admin=None,
-    ):
+    ) -> None:
         self.form = form
         self.name, self.fields = name, fields
         self.classes = " ".join(classes)
@@ -163,7 +163,7 @@ class Fieldline:
 
 
 class AdminField:
-    def __init__(self, form, field, is_first):
+    def __init__(self, form, field, is_first) -> None:
         self.field = form[field]  # A django.forms.BoundField instance
         self.is_first = is_first  # Whether this field is first on the line
         self.is_checkbox = isinstance(self.field.field.widget, forms.CheckboxInput)
@@ -193,7 +193,7 @@ class AdminField:
 
 
 class AdminReadonlyField:
-    def __init__(self, form, field, is_first, model_admin=None):
+    def __init__(self, form, field, is_first, model_admin=None) -> None:
         # Make self.field look a little bit like a field. This means that
         # {{ field.name }} must be a useful class name to identify the field.
         # For convenience, store other field-related data here too.
@@ -316,7 +316,7 @@ class InlineAdminFormSet:
         has_change_permission=True,
         has_delete_permission=True,
         has_view_permission=True,
-    ):
+    ) -> None:
         self.opts = inline
         self.formset = formset
         self.fieldsets = fieldsets
@@ -418,7 +418,7 @@ class InlineAdminFormSet:
                     "help_text": form_field.help_text,
                 }
 
-    def inline_formset_data(self):
+    def inline_formset_data(self) -> str:
         verbose_name = self.opts.verbose_name
         return json.dumps(
             {
