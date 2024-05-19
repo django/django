@@ -13,7 +13,7 @@ MODELS_MODULE_NAME = "models"
 class AppConfig:
     """Class representing a Django application and its configuration."""
 
-    def __init__(self, app_name, app_module):
+    def __init__(self, app_name, app_module) -> None:
         # Full Python path to the application e.g. 'django.contrib.admin'.
         self.name = app_name
 
@@ -55,7 +55,7 @@ class AppConfig:
         # None to prevent accidental access before import_models() runs.
         self.models = None
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<%s: %s>" % (self.__class__.__name__, self.label)
 
     @cached_property

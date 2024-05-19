@@ -12,7 +12,7 @@ class SimpleAdminConfig(AppConfig):
     name = "django.contrib.admin"
     verbose_name = _("Administration")
 
-    def ready(self):
+    def ready(self) -> None:
         checks.register(check_dependencies, checks.Tags.admin)
         checks.register(check_admin_app, checks.Tags.admin)
 
@@ -22,6 +22,6 @@ class AdminConfig(SimpleAdminConfig):
 
     default = True
 
-    def ready(self):
+    def ready(self) -> None:
         super().ready()
         self.module.autodiscover()

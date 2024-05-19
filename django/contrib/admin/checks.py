@@ -16,7 +16,7 @@ from django.template.backends.django import DjangoTemplates
 from django.utils.module_loading import import_string
 
 
-def _issubclass(cls, classinfo):
+def _issubclass(cls, classinfo) -> bool:
     """
     issubclass() variant that doesn't raise an exception if cls isn't a
     class.
@@ -27,7 +27,7 @@ def _issubclass(cls, classinfo):
         return False
 
 
-def _contains_subclass(class_path, candidate_paths):
+def _contains_subclass(class_path, candidate_paths) -> bool:
     """
     Return whether or not a dotted class path (or a subclass of that class) is
     found in a list of candidate paths.
@@ -44,7 +44,7 @@ def _contains_subclass(class_path, candidate_paths):
     return False
 
 
-def check_admin_app(app_configs, **kwargs):
+def check_admin_app(app_configs, **kwargs) -> list:
     from django.contrib.admin.sites import all_sites
 
     errors = []
@@ -53,7 +53,7 @@ def check_admin_app(app_configs, **kwargs):
     return errors
 
 
-def check_dependencies(**kwargs):
+def check_dependencies(**kwargs) -> list:
     """
     Check that the admin's dependencies are correctly installed.
     """
@@ -175,7 +175,7 @@ def check_dependencies(**kwargs):
 
 
 class BaseModelAdminChecks:
-    def check(self, admin_obj, **kwargs):
+    def check(self, admin_obj, **kwargs) -> list:
         return [
             *self._check_autocomplete_fields(admin_obj),
             *self._check_raw_id_fields(admin_obj),

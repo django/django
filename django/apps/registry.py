@@ -17,7 +17,7 @@ class Apps:
     It also keeps track of models, e.g. to provide reverse relations.
     """
 
-    def __init__(self, installed_apps=()):
+    def __init__(self, installed_apps=()) -> None:
         # installed_apps is set to None when creating the main registry
         # because it cannot be populated at that point. Other registries must
         # provide a list of installed apps and are populated immediately.
@@ -58,7 +58,7 @@ class Apps:
         if installed_apps is not None:
             self.populate(installed_apps)
 
-    def populate(self, installed_apps=None):
+    def populate(self, installed_apps=None) -> None:
         """
         Load application configurations and models.
 
@@ -126,7 +126,7 @@ class Apps:
             self.ready = True
             self.ready_event.set()
 
-    def check_apps_ready(self):
+    def check_apps_ready(self) -> None:
         """Raise an exception if all apps haven't been imported yet."""
         if not self.apps_ready:
             from django.conf import settings
@@ -137,7 +137,7 @@ class Apps:
             settings.INSTALLED_APPS
             raise AppRegistryNotReady("Apps aren't loaded yet.")
 
-    def check_models_ready(self):
+    def check_models_ready(self) -> None:
         """Raise an exception if all models haven't been imported yet."""
         if not self.models_ready:
             raise AppRegistryNotReady("Models aren't loaded yet.")
