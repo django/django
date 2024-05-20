@@ -1,4 +1,5 @@
 import json
+from itertools import chain
 
 from django import forms
 from django.contrib.admin.utils import (
@@ -18,6 +19,7 @@ from django.db.models.fields.related import (
 from django.forms.utils import flatatt
 from django.template.defaultfilters import capfirst, linebreaksbr
 from django.urls import NoReverseMatch, reverse
+from django.utils.functional import cached_property
 from django.utils.html import conditional_escape, format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext
@@ -113,6 +115,21 @@ class Fieldset:
         self.description = description
         self.model_admin = model_admin
         self.readonly_fields = readonly_fields
+
+    @cached_property
+    def id(self):
+        fields_list = []
+        for fields in self.fields:
+            if not hasattr(fields, "__iter__") or isinstance(fields, str):
+                fields_list.append([fields])
+            else:
+                fields_list.append(fields)
+        field_labels = [
+            self.form[field].id_for_label
+            for field in chain.from_iterable(fields_list)
+            if field in self.form.fields and self.form[field].id_for_label is not None
+        ]
+        return f"fieldset-id-{'-'.join(field_labels)}"
 
     @property
     def media(self):

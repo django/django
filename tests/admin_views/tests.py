@@ -517,6 +517,59 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         # started with 3 articles, one was deleted.
         self.assertEqual(Section.objects.latest("id").article_set.count(), 2)
 
+    def test_unique_fieldset_id(self):
+        add_url = reverse("admin:admin_views_mainprepopulated_add")
+        response = self.client.get(add_url)
+        self.assertContains(
+            response,
+            'id="relatedprepopulated_set-fieldset"',
+            count=1,
+        )
+        self.assertContains(
+            response,
+            'id="relatedprepopulated_set-2-fieldset"',
+            count=1,
+        )
+        self.assertContains(
+            response,
+            'id="relatedprepopulated_set-3-fieldset"',
+            count=1,
+        )
+        self.assertContains(
+            response,
+            'id="relatedprepopulated_set-4-fieldset"',
+            count=1,
+        )
+        self.assertContains(
+            response,
+            'id="fieldset-id-id_pubdate-id_status-id_name-id_slug1-id_slug2-id_slug3"',
+            count=1,
+        )
+        self.assertContains(
+            response,
+            'id="fieldset-id-id_relatedprepopulated_set-4-0-parent-'
+            "id_relatedprepopulated_set-4-0-name-"
+            "id_relatedprepopulated_set-4-0-fk-"
+            "id_relatedprepopulated_set-4-0-m2m-"
+            "id_relatedprepopulated_set-4-0-pubdate-"
+            "id_relatedprepopulated_set-4-0-status-"
+            "id_relatedprepopulated_set-4-0-slug1-"
+            'id_relatedprepopulated_set-4-0-slug2"',
+            count=1,
+        )
+        self.assertContains(
+            response,
+            'id="fieldset-id-id_relatedprepopulated_set-4-__prefix__-parent-'
+            "id_relatedprepopulated_set-4-__prefix__-name-"
+            "id_relatedprepopulated_set-4-__prefix__-fk-"
+            "id_relatedprepopulated_set-4-__prefix__-m2m-"
+            "id_relatedprepopulated_set-4-__prefix__-pubdate-"
+            "id_relatedprepopulated_set-4-__prefix__-status-"
+            "id_relatedprepopulated_set-4-__prefix__-slug1-"
+            'id_relatedprepopulated_set-4-__prefix__-slug2"',
+            count=1,
+        )
+
     def test_change_list_column_field_classes(self):
         response = self.client.get(reverse("admin:admin_views_article_changelist"))
         # callables display the callable name.
