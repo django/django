@@ -219,6 +219,10 @@ fieldset {
     border-top: 1px solid var(--hairline-color);
 }
 
+details summary {
+    cursor: pointer;
+}
+
 blockquote {
     font-size: 0.6875rem;
     color: #777;
