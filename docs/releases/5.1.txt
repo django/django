@@ -425,6 +425,9 @@ Miscellaneous
   when the fieldset has a name and use the ``collapse`` class, now includes
   ``<details>`` and ``<summary>`` elements.
 
+* The JavaScript file ``collapse.js`` is removed since it is no longer needed
+  in the Django admin site.
+
 * :meth:`.SimpleTestCase.assertURLEqual` and
   :meth:`~django.test.SimpleTestCase.assertInHTML` now add ``": "`` to the
   ``msg_prefix``. This is consistent with the behavior of other assertions.
