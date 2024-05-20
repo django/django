@@ -4,6 +4,7 @@
      data-inline-type="stacked"
      data-inline-formset="{{ inline_admin_formset.inline_formset_data }}">
 <fieldset class="module {{ inline_admin_formset.classes }}" aria-labelledby="{{ inline_admin_formset.formset.prefix }}-heading">
+  {% if inline_admin_formset.is_collapsible %}<details><summary>{% endif %}
   <h2 id="{{ inline_admin_formset.formset.prefix }}-heading" class="inline-heading">
   {% if inline_admin_formset.formset.max_num == 1 %}
     {{ inline_admin_formset.opts.verbose_name|capfirst }}
@@ -11,6 +12,7 @@
     {{ inline_admin_formset.opts.verbose_name_plural|capfirst }}
   {% endif %}
   </h2>
+  {% if inline_admin_formset.is_collapsible %}</summary>{% endif %}
 {{ inline_admin_formset.formset.management_form }}
 {{ inline_admin_formset.formset.non_form_errors }}
 
@@ -31,5 +33,6 @@
   {% if inline_admin_form.needs_explicit_pk_field %}{{ inline_admin_form.pk_field.field }}{% endif %}
   {% if inline_admin_form.fk_field %}{{ inline_admin_form.fk_field.field }}{% endif %}
 </div>{% endfor %}
+  {% if inline_admin_formset.is_collapsible %}</details>{% endif %}
 </fieldset>
 </div>

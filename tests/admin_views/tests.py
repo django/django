@@ -1939,7 +1939,6 @@ class AdminJavaScriptTest(TestCase):
             self.assertContains(response, "vendor/jquery/jquery.min.js")
             self.assertContains(response, "prepopulate.js")
             self.assertContains(response, "actions.js")
-            self.assertContains(response, "collapse.js")
             self.assertContains(response, "inlines.js")
         with override_settings(DEBUG=True):
             response = self.client.get(reverse("admin:admin_views_section_add"))
@@ -1947,7 +1946,6 @@ class AdminJavaScriptTest(TestCase):
             self.assertNotContains(response, "vendor/jquery/jquery.min.js")
             self.assertContains(response, "prepopulate.js")
             self.assertContains(response, "actions.js")
-            self.assertContains(response, "collapse.js")
             self.assertContains(response, "inlines.js")
 
 
@@ -6086,11 +6084,8 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
         self.assertFalse(self.selenium.find_element(By.ID, "id_title").is_displayed())
         self.take_screenshot("collapsed")
-        self.selenium.find_elements(By.LINK_TEXT, "Show")[0].click()
+        self.selenium.find_elements(By.TAG_NAME, "summary")[0].click()
         self.assertTrue(self.selenium.find_element(By.ID, "id_title").is_displayed())
-        self.assertEqual(
-            self.selenium.find_element(By.ID, "fieldsetcollapser0").text, "Hide"
-        )
         self.take_screenshot("expanded")
 
     @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
@@ -6104,7 +6099,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
         url = self.live_server_url + reverse("admin7:admin_views_pizza_add")
         self.selenium.get(url)
-        self.selenium.find_elements(By.ID, "fieldsetcollapser0")[0].click()
+        self.selenium.find_elements(By.TAG_NAME, "summary")[0].click()
         from_filter_box = self.selenium.find_element(By.ID, "id_toppings_filter")
         from_box = self.selenium.find_element(By.ID, "id_toppings_from")
         to_filter_box = self.selenium.find_element(By.ID, "id_toppings_filter_selected")
