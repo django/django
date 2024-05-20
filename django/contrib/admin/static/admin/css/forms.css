@@ -76,6 +76,20 @@ form ul.inline li {
     padding-right: 7px;
 }
 
+/* FIELDSETS */
+
+fieldset .fieldset-heading,
+fieldset .inline-heading,
+:not(.inline-related) .collapse summary {
+    border: 1px solid var(--header-bg);
+    margin: 0;
+    padding: 8px;
+    font-weight: 400;
+    font-size: 0.8125rem;
+    background: var(--header-bg);
+    color: var(--header-link-color);
+}
+
 /* ALIGNED FIELDSETS */
 
 .aligned label {
@@ -207,35 +221,16 @@ form div.help ul {
     width: 450px;
 }
 
-/* COLLAPSED FIELDSETS */
+/* COLLAPSIBLE FIELDSETS */
 
-fieldset.collapsed * {
-    display: none;
-}
-
-fieldset.collapsed h2, fieldset.collapsed {
-    display: block;
-}
-
-fieldset.collapsed {
-    border: 1px solid var(--hairline-color);
-    border-radius: 4px;
-    overflow: hidden;
-}
-
-fieldset.collapsed h2 {
-    background: var(--darkened-bg);
-    color: var(--body-quiet-color);
-}
-
-fieldset .collapse-toggle {
-    color: var(--header-link-color);
-}
-
-fieldset.collapsed .collapse-toggle {
+.collapse summary .fieldset-heading,
+.collapse summary .inline-heading {
     background: transparent;
+    border: none;
+    color: currentColor;
     display: inline;
-    color: var(--link-fg);
+    margin: 0;
+    padding: 0;
 }
 
 /* MONOSPACE TEXTAREAS */
@@ -387,14 +382,16 @@ body.popup .submit-row {
     position: relative;
 }
 
-.inline-related h3 {
+.inline-related h4,
+.inline-related:not(.tabular) .collapse summary {
     margin: 0;
     color: var(--body-quiet-color);
     padding: 5px;
     font-size: 0.8125rem;
     background: var(--darkened-bg);
-    border-top: 1px solid var(--hairline-color);
-    border-bottom: 1px solid var(--hairline-color);
+    border: 1px solid var(--hairline-color);
+    border-left-color: var(--darkened-bg);
+    border-right-color: var(--darkened-bg);
 }
 
 .inline-related h3 span.delete {

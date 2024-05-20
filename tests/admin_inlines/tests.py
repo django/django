@@ -4,7 +4,9 @@ from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.auth.models import Permission, User
 from django.contrib.contenttypes.models import ContentType
 from django.test import RequestFactory, TestCase, override_settings
+from django.test.selenium import screenshot_cases
 from django.urls import reverse
+from django.utils.translation import gettext
 
 from .admin import InnerInline
 from .admin import site as admin_site
@@ -1790,6 +1792,10 @@ class TestInlineWithFieldsets(TestDataMixin, TestCase):
             if "tabular" in inline_admin_formset.opts.template:
                 continue
 
+            if "collapse" in inline_admin_formset.classes:
+                formset_heading = f"<summary>{formset_heading}</summary>"
+                self.assertContains(response, formset_heading, html=True, count=1)
+
             # Headings for every formset (the amount depends on `extra`).
             for y, inline_admin_form in enumerate(inline_admin_formset):
                 y_plus_one = y + 1
@@ -1813,6 +1819,12 @@ class TestInlineWithFieldsets(TestDataMixin, TestCase):
                             f"Details</h4>"
                         )
                         self.assertContains(response, fieldset_heading)
+                        if "collapse" in fieldset.classes:
+                            self.assertContains(
+                                response,
+                                f"<summary>{fieldset_heading}</summary>",
+                                html=True,
+                            )
                         self.assertContains(response, f'id="{heading_id}"', count=1)
 
                     else:
@@ -2182,10 +2194,11 @@ class SeleniumTests(AdminSeleniumTestCase):
             "form#profilecollection_form tr.dynamic-profile_set#profile_set-2", 1
         )
 
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
     def test_collapsed_inlines(self):
         from selenium.webdriver.common.by import By
 
-        # Collapsed inlines have SHOW/HIDE links.
+        # Collapsed inlines use details and summary elements.
         self.admin_login(username="super", password="secret")
         self.selenium.get(
             self.live_server_url + reverse("admin:admin_inlines_author_add")
@@ -2195,19 +2208,21 @@ class SeleniumTests(AdminSeleniumTestCase):
             "#id_nonautopkbook_set-0-title",
             "#id_nonautopkbook_set-2-0-title",
         ]
-        show_links = self.selenium.find_elements(By.LINK_TEXT, "SHOW")
-        self.assertEqual(len(show_links), 3)
+        summaries = self.selenium.find_elements(By.TAG_NAME, "summary")
+        self.assertEqual(len(summaries), 3)
+        self.take_screenshot("loaded")
         for show_index, field_name in enumerate(test_fields, 0):
             self.wait_until_invisible(field_name)
-            show_links[show_index].click()
+            summaries[show_index].click()
             self.wait_until_visible(field_name)
-        hide_links = self.selenium.find_elements(By.LINK_TEXT, "HIDE")
-        self.assertEqual(len(hide_links), 2)
+        self.take_screenshot("expanded")
         for hide_index, field_name in enumerate(test_fields, 0):
             self.wait_until_visible(field_name)
-            hide_links[hide_index].click()
+            summaries[hide_index].click()
             self.wait_until_invisible(field_name)
+        self.take_screenshot("collapsed")
 
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
     def test_added_stacked_inline_with_collapsed_fields(self):
         from selenium.webdriver.common.by import By
 
@@ -2215,20 +2230,22 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.selenium.get(
             self.live_server_url + reverse("admin:admin_inlines_teacher_add")
         )
-        self.selenium.find_element(By.LINK_TEXT, "Add another Child").click()
+        add_text = gettext("Add another %(verbose_name)s") % {"verbose_name": "Child"}
+        self.selenium.find_element(By.LINK_TEXT, add_text).click()
         test_fields = ["#id_child_set-0-name", "#id_child_set-1-name"]
-        show_links = self.selenium.find_elements(By.LINK_TEXT, "SHOW")
-        self.assertEqual(len(show_links), 2)
+        summaries = self.selenium.find_elements(By.TAG_NAME, "summary")
+        self.assertEqual(len(summaries), 3)
+        self.take_screenshot("loaded")
         for show_index, field_name in enumerate(test_fields, 0):
             self.wait_until_invisible(field_name)
-            show_links[show_index].click()
+            summaries[show_index].click()
             self.wait_until_visible(field_name)
-        hide_links = self.selenium.find_elements(By.LINK_TEXT, "HIDE")
-        self.assertEqual(len(hide_links), 2)
+        self.take_screenshot("expanded")
         for hide_index, field_name in enumerate(test_fields, 0):
             self.wait_until_visible(field_name)
-            hide_links[hide_index].click()
+            summaries[hide_index].click()
             self.wait_until_invisible(field_name)
+        self.take_screenshot("collapsed")
 
     def assertBorder(self, element, border):
         width, style, color = border.split(" ")
@@ -2264,9 +2281,9 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.wait_until_visible("#id_dummy")
         self.selenium.find_element(By.ID, "id_dummy").send_keys(1)
         fields = ["id_inner5stacked_set-0-dummy", "id_inner5tabular_set-0-dummy"]
-        show_links = self.selenium.find_elements(By.LINK_TEXT, "SHOW")
+        summaries = self.selenium.find_elements(By.TAG_NAME, "summary")
         for show_index, field_name in enumerate(fields):
-            show_links[show_index].click()
+            summaries[show_index].click()
             self.wait_until_visible("#" + field_name)
             self.selenium.find_element(By.ID, field_name).send_keys(1)
 
@@ -2304,49 +2321,40 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.selenium.get(
             self.live_server_url + reverse("admin:admin_inlines_holder5_add")
         )
-        stacked_inline_formset_selector = (
-            "div#inner5stacked_set-group fieldset.module.collapse"
+        stacked_inline_details_selector = (
+            "div#inner5stacked_set-group fieldset.module.collapse details"
         )
-        tabular_inline_formset_selector = (
-            "div#inner5tabular_set-group fieldset.module.collapse"
+        tabular_inline_details_selector = (
+            "div#inner5tabular_set-group fieldset.module.collapse details"
         )
         # Inlines without errors, both inlines collapsed
         self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
         self.assertCountSeleniumElements(
-            stacked_inline_formset_selector + ".collapsed", 1
+            stacked_inline_details_selector + ":not([open])", 1
         )
         self.assertCountSeleniumElements(
-            tabular_inline_formset_selector + ".collapsed", 1
+            tabular_inline_details_selector + ":not([open])", 1
         )
-        show_links = self.selenium.find_elements(By.LINK_TEXT, "SHOW")
-        self.assertEqual(len(show_links), 2)
+        summaries = self.selenium.find_elements(By.TAG_NAME, "summary")
+        self.assertEqual(len(summaries), 2)
 
         # Inlines with errors, both inlines expanded
         test_fields = ["#id_inner5stacked_set-0-dummy", "#id_inner5tabular_set-0-dummy"]
         for show_index, field_name in enumerate(test_fields):
-            show_links[show_index].click()
+            summaries[show_index].click()
             self.wait_until_visible(field_name)
             self.selenium.find_element(By.ID, field_name[1:]).send_keys(1)
-        hide_links = self.selenium.find_elements(By.LINK_TEXT, "HIDE")
-        self.assertEqual(len(hide_links), 2)
         for hide_index, field_name in enumerate(test_fields):
-            hide_link = hide_links[hide_index]
+            summary = summaries[hide_index]
             self.selenium.execute_script(
-                "window.scrollTo(0, %s);" % hide_link.location["y"]
+                "window.scrollTo(0, %s);" % summary.location["y"]
             )
-            hide_link.click()
+            summary.click()
             self.wait_until_invisible(field_name)
         with self.wait_page_loaded():
             self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
-        with self.disable_implicit_wait():
-            self.assertCountSeleniumElements(
-                stacked_inline_formset_selector + ".collapsed", 0
-            )
-            self.assertCountSeleniumElements(
-                tabular_inline_formset_selector + ".collapsed", 0
-            )
-        self.assertCountSeleniumElements(stacked_inline_formset_selector, 1)
-        self.assertCountSeleniumElements(tabular_inline_formset_selector, 1)
+        self.assertCountSeleniumElements(stacked_inline_details_selector, 0)
+        self.assertCountSeleniumElements(tabular_inline_details_selector, 0)
 
     def test_inlines_verbose_name(self):
         """

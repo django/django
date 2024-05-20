@@ -565,10 +565,6 @@ input[type="submit"], button {
         padding-top: 15px;
     }
 
-    fieldset.collapsed .form-row {
-        display: none;
-    }
-
     .aligned label {
         width: 100%;
         min-width: auto;

@@ -1,7 +1,9 @@
 {% with prefix=fieldset.formset.prefix|default:"fieldset" id_prefix=id_prefix|default:"0" id_suffix=id_suffix|default:"0" name=fieldset.name|default:""|slugify %}
 <fieldset class="module aligned {{ fieldset.classes }}"{% if name %} aria-labelledby="{{ prefix }}-{{ id_prefix}}-{{ name }}-{{ id_suffix }}-heading"{% endif %}>
     {% if name %}
+        {% if fieldset.is_collapsible %}<details><summary>{% endif %}
         <h{{ heading_level|default:2 }} id="{{ prefix }}-{{ id_prefix}}-{{ name }}-{{ id_suffix }}-heading" class="fieldset-heading">{{ fieldset.name }}</h{{ heading_level|default:2 }}>
+        {% if fieldset.is_collapsible %}</summary>{% endif %}
     {% endif %}
     {% if fieldset.description %}
         <div class="description">{{ fieldset.description|safe }}</div>
@@ -34,5 +36,6 @@
             {% if not line.fields|length == 1 %}</div>{% endif %}
         </div>
     {% endfor %}
+    {% if name and fieldset.is_collapsible %}</details>{% endif %}
 </fieldset>
 {% endwith %}
