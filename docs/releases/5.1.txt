@@ -211,9 +211,8 @@ File Storage
 ~~~~~~~~~~~~
 
 * The :attr:`~django.core.files.storage.FileSystemStorage.allow_overwrite`
-  parameter has been added to
-  :class:`~django.core.files.storage.FileSystemStorage`, to allow saving new
-  files over existing ones.
+  parameter of :class:`~django.core.files.storage.FileSystemStorage` allows
+  saving new files over existing ones.
 
 File Uploads
 ~~~~~~~~~~~~
@@ -471,8 +470,8 @@ Miscellaneous
   of ``condition``.
 
 * The undocumented ``OS_OPEN_FLAGS`` property of
-  :class:`~django.core.files.storage.FileSystemStorage` has been deprecated.
-  To allow overwriting files in storage, set the new
+  :class:`~django.core.files.storage.FileSystemStorage` is deprecated. To allow
+  overwriting files in storage, set the new
   :attr:`~django.core.files.storage.FileSystemStorage.allow_overwrite` option
   to ``True`` instead.
 
