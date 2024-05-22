@@ -383,7 +383,7 @@ if Image:
 
         mugshot = models.ImageField(
             upload_to="tests",
-            storage=NoReadFileSystemStorage(),
+            storage=NoReadFileSystemStorage(temp_storage_dir),
             width_field="mugshot_width",
             height_field="mugshot_height",
         )
