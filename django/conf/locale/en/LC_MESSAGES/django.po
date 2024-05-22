@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -448,6 +448,10 @@ msgstr ""
 msgid "Enter a valid value."
 msgstr ""
 
+#: core/validators.py:70
+msgid "Enter a valid domain name."
+msgstr ""
+
 #: core/validators.py:104 forms/fields.py:759
 msgid "Enter a valid URL."
 msgstr ""
@@ -472,16 +476,22 @@ msgid ""
 "hyphens."
 msgstr ""
 
-#: core/validators.py:279 core/validators.py:306
-msgid "Enter a valid IPv4 address."
+#: core/validators.py:327 core/validators.py:336 core/validators.py:350
+#: db/models/fields/__init__.py:2219
+#, python-format
+msgid "Enter a valid %(protocol)s address."
 msgstr ""
 
-#: core/validators.py:286 core/validators.py:307
-msgid "Enter a valid IPv6 address."
+#: core/validators.py:329
+msgid "IPv4"
 msgstr ""
 
-#: core/validators.py:298 core/validators.py:305
-msgid "Enter a valid IPv4 or IPv6 address."
+#: core/validators.py:338 utils/ipv6.py:30
+msgid "IPv6"
+msgstr ""
+
+#: core/validators.py:352
+msgid "IPv4 or IPv6"
 msgstr ""
 
 #: core/validators.py:341
