@@ -49,11 +49,6 @@ Minor features
 * :attr:`.ModelAdmin.list_display` now supports using ``__`` lookups to list
   fields from related models.
 
-:mod:`django.contrib.admindocs`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -79,11 +74,6 @@ Minor features
   ``ReadOnlyPasswordHashField``'s help text, improving the overall
   accessibility of the
   :class:`~django.contrib.auth.forms.UserChangeForm`.
-
-:mod:`django.contrib.contenttypes`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
 
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -129,21 +119,11 @@ Minor features
   now support the optional ``srid`` argument (except for Oracle where it is
   ignored).
 
-:mod:`django.contrib.messages`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * :class:`~django.contrib.postgres.indexes.BTreeIndex` now supports the
   ``deduplicate_items`` parameter.
-
-:mod:`django.contrib.redirects`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
 
 :mod:`django.contrib.sessions`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -156,41 +136,6 @@ Minor features
 * :class:`django.contrib.sessions.backends.base.SessionBase` and all built-in
   session engines now provide async API. The new asynchronous methods all have
   ``a`` prefixed names, e.g. ``aget()``, ``akeys()``, or ``acycle_key()``.
-
-:mod:`django.contrib.sitemaps`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.sites`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.staticfiles`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.syndication`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-Asynchronous views
-~~~~~~~~~~~~~~~~~~
-
-* ...
-
-Cache
-~~~~~
-
-* ...
-
-CSRF
-~~~~
-
-* ...
 
 Database backends
 ~~~~~~~~~~~~~~~~~
@@ -205,16 +150,6 @@ Database backends
 * ``"pool"`` option is now supported in :setting:`OPTIONS` on PostgreSQL to
   allow using :ref:`connection pools <postgresql-pool>`.
 
-Decorators
-~~~~~~~~~~
-
-* ...
-
-Email
-~~~~~
-
-* ...
-
 Error Reporting
 ~~~~~~~~~~~~~~~
 
@@ -228,32 +163,12 @@ File Storage
   parameter of :class:`~django.core.files.storage.FileSystemStorage` allows
   saving new files over existing ones.
 
-File Uploads
-~~~~~~~~~~~~
-
-* ...
-
 Forms
 ~~~~~
 
 * In order to improve accessibility and enable screen readers to associate
   fieldsets with their help text, the form fieldset now includes the
   ``aria-describedby`` HTML attribute.
-
-Generic Views
-~~~~~~~~~~~~~
-
-* ...
-
-Internationalization
-~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-Logging
-~~~~~~~
-
-* ...
 
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
@@ -304,26 +219,6 @@ Models
   specifying that the expression should be ignored during a constraint
   validation.
 
-Requests and Responses
-~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-Security
-~~~~~~~~
-
-* ...
-
-Serialization
-~~~~~~~~~~~~~
-
-* ...
-
-Signals
-~~~~~~~
-
-* ...
-
 Templates
 ~~~~~~~~~
 
@@ -364,16 +259,6 @@ Tests
 * In order to enforce test isolation, database connections inside threads are
   no longer allowed in :class:`~django.test.SimpleTestCase`.
 
-URLs
-~~~~
-
-* ...
-
-Utilities
-~~~~~~~~~
-
-* ...
-
 Validators
 ~~~~~~~~~~
 
@@ -386,14 +271,6 @@ Validators
 
 Backwards incompatible changes in 5.1
 =====================================
-
-Database backend API
---------------------
-
-This section describes changes that may be needed in third-party database
-backends.
-
-* ...
 
 :mod:`django.contrib.gis`
 -------------------------
