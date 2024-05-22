@@ -7,8 +7,8 @@ Django 5.1 release notes - UNDER DEVELOPMENT
 Welcome to Django 5.1!
 
 These release notes cover the :ref:`new features <whats-new-5.1>`, as well as
-some :ref:`backwards incompatible changes <backwards-incompatible-5.1>` you'll
-want to be aware of when upgrading from Django 5.0 or earlier. We've
+some :ref:`backwards incompatible changes <backwards-incompatible-5.1>` you
+should be aware of when upgrading from Django 5.0 or earlier. We've
 :ref:`begun the deprecation process for some features
 <deprecated-features-5.1>`.
 
@@ -25,6 +25,63 @@ only officially support the latest release of each series.
 
 What's new in Django 5.1
 ========================
+
+``{% query_string %}`` template tag
+-----------------------------------
+
+Django 5.1 introduces the :ttag:`{% query_string %} <query_string>` template
+tag, simplifying the modification of query parameters in URLs, making it easier
+to generate links that maintain existing query parameters while adding or
+changing specific ones.
+
+For instance, navigating pagination and query strings in templates can be
+cumbersome. Consider this template fragment that dynamically generates a URL
+for navigating to the next page within a paginated view:
+
+.. code-block:: html+django
+
+    {# Linebreaks added for readability, this should be one, long line. #}
+    <a href="?{% for key, values in request.GET.iterlists %}
+      {% if key != "page" %}
+        {% for value in values %}
+          {{ key }}={{ value }}&amp;
+        {% endfor %}
+      {% endif %}
+    {% endfor %}page={{ page.next_page_number }}">Next page</a>
+
+When switching to using this new template tag, the above magically becomes:
+
+.. code-block:: html+django
+
+    <a href="{% query_string page=page.next_page_number %}">Next page</a>
+
+PostgreSQL Connection Pools
+---------------------------
+
+Django 5.1 also introduces :ref:`connection pool <postgresql-pool>` support for
+PostgreSQL. As the time to establish a new connection can be relatively long,
+keeping connections open can reduce latency.
+
+To use a connection pool with `psycopg`_, you can set the ``"pool"`` option
+inside :setting:`OPTIONS` to be a dict to be passed to
+:class:`~psycopg:psycopg_pool.ConnectionPool`, or to ``True`` to use the
+``ConnectionPool`` defaults::
+
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            # ...
+            "OPTIONS": {
+                "pool": {
+                    "min_size": 2,
+                    "max_size": 4,
+                    "timeout": 10,
+                }
+            },
+        },
+    }
+
+.. _psycopg: https://www.psycopg.org/
 
 Middleware to require authentication by default
 -----------------------------------------------
@@ -55,8 +112,8 @@ Minor features
 * The default iteration count for the PBKDF2 password hasher is increased from
   720,000 to 870,000.
 
-* In order to follow OWASP recommendations, the default ``parallelism`` of the
-  ``ScryptPasswordHasher`` is increased from 1 to 5.
+* The default ``parallelism`` of the ``ScryptPasswordHasher`` is 
+  increased from 1 to 5, to follow OWASP recommendations.
 
 * :class:`~django.contrib.auth.forms.BaseUserCreationForm` and
   :class:`~django.contrib.auth.forms.AdminPasswordChangeForm` now support
@@ -91,9 +148,9 @@ Minor features
   ``continent_name``, and ``is_in_european_union`` values.
 
 * :meth:`.GeoIP2.city` now exposes the ``accuracy_radius`` and ``region_name``
-  values. In addition the ``dma_code`` and ``region`` values are now exposed as
-  ``metro_code`` and ``region_code``, but the previous keys are also retained
-  for backward compatibility.
+  values. In addition, the ``dma_code`` and ``region`` values are now exposed
+  as ``metro_code`` and ``region_code``, but the previous keys are also
+  retained for backward compatibility.
 
 * :class:`~django.contrib.gis.measure.Area` now supports the ``ha`` unit.
 
@@ -160,7 +217,7 @@ File Storage
 ~~~~~~~~~~~~
 
 * The :attr:`~django.core.files.storage.FileSystemStorage.allow_overwrite`
-  parameter of :class:`~django.core.files.storage.FileSystemStorage` allows
+  parameter of :class:`~django.core.files.storage.FileSystemStorage` now allows
   saving new files over existing ones.
 
 Forms
@@ -173,8 +230,8 @@ Forms
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
-* :djadmin:`makemigrations` command now displays meaningful symbols for each
-  operation to highlight :class:`operation categories
+* The :djadmin:`makemigrations` command now displays meaningful symbols for
+  each operation to highlight :class:`operation categories
   <django.db.migrations.operations.base.OperationCategory>`.
 
 Migrations
@@ -225,11 +282,6 @@ Templates
 * Custom tags may now set extra data on the ``Parser`` object that will later
   be made available on the ``Template`` instance. Such data may be used, for
   example, by the template loader, or other template clients.
-
-* The new :ttag:`{% query_string %} <query_string>` template tag allows
-  changing a :class:`~django.http.QueryDict` instance for use in links, for
-  example, to generate a link to the next page while keeping any filtering
-  options in place.
 
 * :ref:`Template engines <field-checking>` now implement a ``check()`` method
   that is already registered with the check framework.
@@ -382,6 +434,7 @@ Miscellaneous
   overwriting files in storage, set the new
   :attr:`~django.core.files.storage.FileSystemStorage.allow_overwrite` option
   to ``True`` instead.
+
 * The ``get_cache_name()`` method of ``FieldCacheMixin`` is deprecated in favor
   of the ``cache_name`` cached property.
 
