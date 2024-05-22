@@ -280,9 +280,15 @@ class EmailMessage:
         if "message-id" not in header_names:
             # Use cached DNS_NAME for performance
             msg["Message-ID"] = make_msgid(domain=DNS_NAME)
+
+        if "Auto-Submitted" not in self.extra_headers:
+            # Default to adding the Auto-Submitted: auto-generated header
+            self.extra_headers["Auto-Submitted"] = "auto-generated"
+
         for name, value in self.extra_headers.items():
             if name.lower() != "from":  # From is already handled
                 msg[name] = value
+
         return msg
 
     def recipients(self):
@@ -430,6 +436,20 @@ class EmailMessage:
             except KeyError:
                 value = ", ".join(str(v) for v in values)
             msg[header] = value
+
+
+class NoAutoSubmittedHeaderEmailMessage(EmailMessage):
+    """
+    A version of EmailMessage that does not have the default
+    Auto-Submitted: auto-generated header attached to it.
+    """
+
+    def message(self):
+        msg = super().message()
+        if "Auto-Submitted" in msg:
+            del msg["Auto-Submitted"]
+
+        return msg
 
 
 class EmailMultiAlternatives(EmailMessage):
