@@ -8,7 +8,7 @@ from functools import partial
 from http import HTTPStatus
 from importlib import import_module
 from io import BytesIO, IOBase
-from urllib.parse import unquote_to_bytes, urljoin, urlparse, urlsplit
+from urllib.parse import unquote_to_bytes, urljoin, urlsplit
 
 from asgiref.sync import sync_to_async
 
@@ -458,11 +458,7 @@ class RequestFactory:
         return json.dumps(data, cls=self.json_encoder) if should_encode else data
 
     def _get_path(self, parsed):
-        path = parsed.path
-        # If there are parameters, add them
-        if parsed.params:
-            path += ";" + parsed.params
-        path = unquote_to_bytes(path)
+        path = unquote_to_bytes(parsed.path)
         # Replace the behavior where non-ASCII values in the WSGI environ are
         # arbitrarily decoded with ISO-8859-1.
         # Refs comment in `get_bytes_from_wsgi()`.
@@ -647,7 +643,7 @@ class RequestFactory:
         **extra,
     ):
         """Construct an arbitrary HTTP request."""
-        parsed = urlparse(str(path))  # path can be lazy
+        parsed = urlsplit(str(path))  # path can be lazy
         data = force_bytes(data, settings.DEFAULT_CHARSET)
         r = {
             "PATH_INFO": self._get_path(parsed),
@@ -671,8 +667,7 @@ class RequestFactory:
         # If QUERY_STRING is absent or empty, we want to extract it from the URL.
         if not r.get("QUERY_STRING"):
             # WSGI requires latin-1 encoded strings. See get_path_info().
-            query_string = parsed[4].encode().decode("iso-8859-1")
-            r["QUERY_STRING"] = query_string
+            r["QUERY_STRING"] = parsed.query.encode().decode("iso-8859-1")
         return self.request(**r)
 
 
@@ -748,7 +743,7 @@ class AsyncRequestFactory(RequestFactory):
         **extra,
     ):
         """Construct an arbitrary HTTP request."""
-        parsed = urlparse(str(path))  # path can be lazy.
+        parsed = urlsplit(str(path))  # path can be lazy.
         data = force_bytes(data, settings.DEFAULT_CHARSET)
         s = {
             "method": method,
@@ -772,7 +767,7 @@ class AsyncRequestFactory(RequestFactory):
         else:
             # If QUERY_STRING is absent or empty, we want to extract it from
             # the URL.
-            s["query_string"] = parsed[4]
+            s["query_string"] = parsed.query
         if headers:
             extra.update(HttpHeaders.to_asgi_names(headers))
         s["headers"] += [

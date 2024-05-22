@@ -4,7 +4,7 @@ import re
 import unittest
 import zoneinfo
 from unittest import mock
-from urllib.parse import parse_qsl, urljoin, urlparse
+from urllib.parse import parse_qsl, urljoin, urlsplit
 
 from django import forms
 from django.contrib import admin
@@ -357,7 +357,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
                             **save_option,
                         },
                     )
-                    parsed_url = urlparse(response.url)
+                    parsed_url = urlsplit(response.url)
                     self.assertEqual(parsed_url.query, qsl)
 
     def test_change_query_string_persists(self):
@@ -386,7 +386,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
                             **save_option,
                         },
                     )
-                    parsed_url = urlparse(response.url)
+                    parsed_url = urlsplit(response.url)
                     self.assertEqual(parsed_url.query, qsl)
 
     def test_basic_edit_GET(self):
@@ -8032,11 +8032,11 @@ class AdminKeepChangeListFiltersTests(TestCase):
         Assert that two URLs are equal despite the ordering
         of their querystring. Refs #22360.
         """
-        parsed_url1 = urlparse(url1)
+        parsed_url1 = urlsplit(url1)
         path1 = parsed_url1.path
         parsed_qs1 = dict(parse_qsl(parsed_url1.query))
 
-        parsed_url2 = urlparse(url2)
+        parsed_url2 = urlsplit(url2)
         path2 = parsed_url2.path
         parsed_qs2 = dict(parse_qsl(parsed_url2.query))
 

@@ -21,7 +21,7 @@ from urllib.parse import (
     urljoin,
     urlparse,
     urlsplit,
-    urlunparse,
+    urlunsplit,
 )
 from urllib.request import url2pathname
 
@@ -541,11 +541,9 @@ class SimpleTestCase(unittest.TestCase):
         def normalize(url):
             """Sort the URL's query string parameters."""
             url = str(url)  # Coerce reverse_lazy() URLs.
-            scheme, netloc, path, params, query, fragment = urlparse(url)
+            scheme, netloc, path, query, fragment = urlsplit(url)
             query_parts = sorted(parse_qsl(query))
-            return urlunparse(
-                (scheme, netloc, path, params, urlencode(query_parts), fragment)
-            )
+            return urlunsplit((scheme, netloc, path, urlencode(query_parts), fragment))
 
         if msg_prefix:
             msg_prefix += ": "
@@ -1637,11 +1635,11 @@ class FSFilesHandler(WSGIHandler):
         * the host is provided as part of the base_url
         * the request's path isn't under the media path (or equal)
         """
-        return path.startswith(self.base_url[2]) and not self.base_url[1]
+        return path.startswith(self.base_url.path) and not self.base_url.netloc
 
     def file_path(self, url):
         """Return the relative path to the file on disk for the given URL."""
-        relative_url = url.removeprefix(self.base_url[2])
+        relative_url = url.removeprefix(self.base_url.path)
         return url2pathname(relative_url)
 
     def get_response(self, request):

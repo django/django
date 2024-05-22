@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from email.utils import formatdate
 from urllib.parse import quote, unquote
 from urllib.parse import urlencode as original_urlencode
-from urllib.parse import urlparse
+from urllib.parse import urlsplit
 
 from django.utils.datastructures import MultiValueDict
 from django.utils.regex_helper import _lazy_re_compile
@@ -271,11 +271,11 @@ def url_has_allowed_host_and_scheme(url, allowed_hosts, require_https=False):
 
 def _url_has_allowed_host_and_scheme(url, allowed_hosts, require_https=False):
     # Chrome considers any URL with more than two slashes to be absolute, but
-    # urlparse is not so flexible. Treat any url with three slashes as unsafe.
+    # urlsplit is not so flexible. Treat any url with three slashes as unsafe.
     if url.startswith("///"):
         return False
     try:
-        url_info = urlparse(url)
+        url_info = urlsplit(url)
     except ValueError:  # e.g. invalid IPv6 addresses
         return False
     # Forbid URLs like http:///example.com - with a scheme, but without a hostname.
