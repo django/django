@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-17 03:19-0500\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -31,13 +31,26 @@ msgstr ""
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr ""
 
+#: contrib/auth/admin.py:177
+msgid "Conflicting form data submitted. Please try again."
+msgstr ""
+
 #: contrib/auth/admin.py:168
 msgid "Password changed successfully."
+msgstr ""
+
+#: contrib/auth/admin.py:187
+msgid "Password-based authentication was disabled."
 msgstr ""
 
 #: contrib/auth/admin.py:189
 #, python-format
 msgid "Change password: %s"
+msgstr ""
+
+#: contrib/auth/admin.py:210
+#, python-format
+msgid "Set password: %s"
 msgstr ""
 
 #: contrib/auth/apps.py:16
@@ -60,8 +73,23 @@ msgstr ""
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr ""
 
+#: contrib/auth/forms.py:59
+msgid "Reset password"
+msgstr ""
+
+#: contrib/auth/forms.py:59
+msgid "Set password"
+msgstr ""
+
 #: contrib/auth/forms.py:91 contrib/auth/forms.py:379 contrib/auth/forms.py:457
 msgid "The two password fields didn’t match."
+msgstr ""
+
+#: contrib/auth/forms.py:107
+msgid ""
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
 msgstr ""
 
 #: contrib/auth/forms.py:94 contrib/auth/forms.py:166 contrib/auth/forms.py:201
@@ -77,10 +105,26 @@ msgstr ""
 msgid "Enter the same password as before, for verification."
 msgstr ""
 
-#: contrib/auth/forms.py:168
+#: contrib/auth/forms.py:133
+msgid "Password-based authentication"
+msgstr ""
+
+#: contrib/auth/forms.py:136
+msgid "Enabled"
+msgstr ""
+
+#: contrib/auth/forms.py:136
+msgid "Disabled"
+msgstr ""
+
+#: contrib/auth/forms.py:260
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user’s "
-"password, but you can change the password using <a href=\"{}\">this form</a>."
+"Raw passwords are not stored, so there is no way to see the user’s password."
+msgstr ""
+
+#: contrib/auth/forms.py:276
+msgid ""
+"Enable password-based authentication for this user by setting a password."
 msgstr ""
 
 #: contrib/auth/forms.py:208
@@ -112,10 +156,6 @@ msgstr ""
 
 #: contrib/auth/forms.py:429
 msgid "Old password"
-msgstr ""
-
-#: contrib/auth/forms.py:469
-msgid "Password (again)"
 msgstr ""
 
 #: contrib/auth/hashers.py:327 contrib/auth/hashers.py:420
