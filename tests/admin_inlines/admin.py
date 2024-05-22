@@ -40,6 +40,8 @@ from .models import (
     OutfitItem,
     ParentModelWithCustomPk,
     Person,
+    Photo,
+    Photographer,
     Poll,
     Profile,
     ProfileCollection,
@@ -95,6 +97,57 @@ class AuthorAdmin(admin.ModelAdmin):
         EditablePKBookTabularInline,
         EditablePKBookStackedInline,
         NonAutoPKBookChildTabularInline,
+    ]
+
+
+class PhotoInlineMixin:
+    model = Photo
+    extra = 2
+    fieldsets = [
+        (None, {"fields": ["image", "title"]}),
+        (
+            "Details",
+            {"fields": ["description", "creation_date"], "classes": ["collapse"]},
+        ),
+        (
+            "Details",  # Fieldset name intentionally duplicated
+            {"fields": ["update_date", "updated_by"]},
+        ),
+    ]
+
+
+class PhotoTabularInline(PhotoInlineMixin, admin.TabularInline):
+    pass
+
+
+class PhotoStackedExtra2Inline(PhotoInlineMixin, admin.StackedInline):
+    pass
+
+
+class PhotoStackedExtra3Inline(PhotoInlineMixin, admin.StackedInline):
+    extra = 3
+
+
+class PhotoStackedCollapsibleInline(PhotoInlineMixin, admin.StackedInline):
+    fieldsets = []
+    classes = ["collapse"]
+
+
+class PhotographerAdmin(admin.ModelAdmin):
+    fieldsets = [
+        (None, {"fields": ["firstname", "fullname"]}),
+        ("Advanced options", {"fields": ["nationality", "residency"]}),
+        (
+            "Advanced options",  # Fieldset name intentionally duplicated
+            {"fields": ["siblings", "children"], "classes": ["collapse"]},
+        ),
+    ]
+    inlines = [
+        PhotoTabularInline,
+        PhotoTabularInline,
+        PhotoStackedExtra2Inline,
+        PhotoStackedExtra3Inline,
+        PhotoStackedCollapsibleInline,
     ]
 
 
@@ -454,6 +507,7 @@ site.register(Teacher, TeacherAdmin)
 site.register(Chapter, inlines=[FootNoteNonEditableInlineCustomForm])
 site.register(OutfitItem, inlines=[WeaknessInlineCustomForm])
 site.register(Person, inlines=[AuthorTabularInline, FashonistaStackedInline])
+site.register(Photographer, PhotographerAdmin)
 site.register(Course, ClassAdminStackedHorizontal)
 site.register(CourseProxy, ClassAdminStackedVertical)
 site.register(CourseProxy1, ClassAdminTabularVertical)

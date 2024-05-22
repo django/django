@@ -180,6 +180,27 @@ class ShoppingWeakness(models.Model):
     item = models.ForeignKey(OutfitItem, models.CASCADE)
 
 
+# Models for #35189
+
+
+class Photographer(Person):
+    fullname = models.CharField(max_length=100)
+    nationality = models.CharField(max_length=100)
+    residency = models.CharField(max_length=100)
+    siblings = models.IntegerField()
+    children = models.IntegerField()
+
+
+class Photo(models.Model):
+    photographer = models.ForeignKey(Photographer, on_delete=models.CASCADE)
+    image = models.CharField(max_length=100)
+    title = models.CharField(max_length=100)
+    description = models.TextField()
+    creation_date = models.DateField()
+    update_date = models.DateField()
+    updated_by = models.CharField(max_length=100)
+
+
 # Models for #13510
 
 
