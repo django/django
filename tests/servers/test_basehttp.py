@@ -1,5 +1,6 @@
 from io import BytesIO
 from socketserver import ThreadingMixIn
+from unittest.mock import patch
 
 from django.core.handlers.wsgi import WSGIRequest
 from django.core.servers.basehttp import WSGIRequestHandler, WSGIServer
@@ -39,16 +40,42 @@ class WSGIRequestHandlerTestCase(SimpleTestCase):
             for status_code in status_codes:
                 # The correct level gets the message.
                 with self.assertLogs("django.server", level.upper()) as cm:
-                    handler.log_message("GET %s %s", "A", str(status_code))
-                self.assertIn("GET A %d" % status_code, cm.output[0])
+                    handler.log_message("GET %s %s %s", "A", str(status_code), "200ms")
+                self.assertIn("GET A %d %s" % (status_code, "200ms"), cm.output[0])
                 # Incorrect levels don't have any messages.
                 for wrong_level in level_status_codes:
                     if wrong_level != level:
                         with self.assertLogs("django.server", "INFO") as cm:
-                            handler.log_message("GET %s %s", "A", str(status_code))
+                            handler.log_message(
+                                "GET %s %s %s", "A", str(status_code), "200ms"
+                            )
                         self.assertNotEqual(
                             cm.records[0].levelname, wrong_level.upper()
                         )
+
+    def test_log_request(self):
+        request = WSGIRequest(self.request_factory.get("/").environ)
+        request.makefile = lambda *args, **kwargs: BytesIO()
+        handler = WSGIRequestHandler(request, "192.168.0.2", None)
+
+        handler.requestline = "GET /"
+        response_times = [
+            (0.010, "10ms"),
+            (0.500, "500ms"),
+            (1.901, "1.90s"),
+            (3.932, "3.93s"),
+        ]
+        code = 200
+        size = 200
+
+        for response_time in response_times:
+            with patch("time.time", return_value=response_time[0] * 2):
+                handler.request_start_time = response_time[0]
+                with self.assertLogs("django.server") as cm:
+                    handler.log_request(code, size)
+                    self.assertIn(
+                        f'"GET /" {code} {size} {response_time[1]}', cm.output[0]
+                    )
 
     def test_https(self):
         request = WSGIRequest(self.request_factory.get("/").environ)
