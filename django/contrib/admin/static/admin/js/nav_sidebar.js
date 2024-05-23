@@ -54,6 +54,14 @@
                 }
                 // show/hide parent <TR>
                 o.node.parentNode.parentNode.style.display = displayValue;
+                // hide the parent app module if it has no visible rows
+                const parent_module = o.node.closest('div.module');
+                if (parent_module.querySelectorAll('tr:not([style*="display: none"])').length === 0) {
+                    parent_module.style.display = 'none';
+                }
+                else {
+                    parent_module.style.display = '';
+                }
             }
             if (!filterValue || matches) {
                 event.target.classList.remove('no-results');

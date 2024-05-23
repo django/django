@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.admin.tests import AdminSeleniumTestCase
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Group, User
 from django.test import TestCase, override_settings
 from django.urls import path, reverse
 
@@ -19,6 +19,7 @@ site_with_sidebar = AdminSiteWithSidebar(name="test_with_sidebar")
 site_without_sidebar = AdminSiteWithoutSidebar(name="test_without_sidebar")
 
 site_with_sidebar.register(User)
+site_with_sidebar.register(Group)
 site_with_sidebar.register(Héllo)
 
 urlpatterns = [
@@ -222,6 +223,9 @@ class SeleniumTests(AdminSeleniumTestCase):
     def test_sidebar_filter_persists(self):
         from selenium.webdriver.common.by import By
 
+        self.selenium.execute_script(
+            "sessionStorage.removeItem('django.admin.navSidebarFilterValue')"
+        )
         self.selenium.get(
             self.live_server_url + reverse("test_with_sidebar:auth_user_changelist")
         )
@@ -232,3 +236,28 @@ class SeleniumTests(AdminSeleniumTestCase):
         filter_input = self.selenium.find_element(By.CSS_SELECTOR, "#nav-filter")
         filter_input.send_keys("users")
         self.assertEqual(self.selenium.execute_script(filter_value_script), "users")
+
+    def test_sidebar_filter_filters(self):
+        from selenium.webdriver.common.by import By
+
+        self.selenium.get(
+            self.live_server_url + reverse("test_with_sidebar:auth_user_changelist")
+        )
+        filter_input = self.selenium.find_element(By.CSS_SELECTOR, "#nav-filter")
+        auth_user = self.selenium.find_element(By.CSS_SELECTOR, "#auth-user")
+        auth_group = self.selenium.find_element(By.CSS_SELECTOR, "#auth-group")
+        admin_views_hello = self.selenium.find_element(
+            By.CSS_SELECTOR, "#admin_views-héllo"
+        )
+        admin_views_module = self.selenium.find_element(
+            By.CSS_SELECTOR, ".app-admin_views.module"
+        )
+        self.assertTrue(auth_user.is_displayed())
+        self.assertTrue(auth_group.is_displayed())
+        self.assertTrue(admin_views_hello.is_displayed())
+        self.assertTrue(admin_views_module.is_displayed())
+        filter_input.send_keys("users")
+        self.assertTrue(auth_user.is_displayed())
+        self.assertFalse(auth_group.is_displayed())
+        self.assertFalse(admin_views_hello.is_displayed())
+        self.assertFalse(admin_views_module.is_displayed())
