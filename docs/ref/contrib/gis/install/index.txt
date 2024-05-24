@@ -56,7 +56,7 @@ supported versions, and any notes for each of the supported database backends:
 ==================  ==============================  ==================  =========================================
 Database            Library Requirements            Supported Versions  Notes
 ==================  ==============================  ==================  =========================================
-PostgreSQL          GEOS, GDAL, PROJ, PostGIS       13+                 Requires PostGIS.
+PostgreSQL          GEOS, GDAL, PROJ, PostGIS       14+                 Requires PostGIS.
 MySQL               GEOS, GDAL                      8.0.11+             :ref:`Limited functionality <mysql-spatial-limitations>`.
 Oracle              GEOS, GDAL                      19+                 XE not supported.
 SQLite              GEOS, GDAL, PROJ, SpatiaLite    3.31.0+             Requires SpatiaLite 4.3+
@@ -300,7 +300,7 @@ Summary:
 
 .. code-block:: shell
 
-    $ sudo port install postgresql13-server
+    $ sudo port install postgresql14-server
     $ sudo port install geos
     $ sudo port install proj6
     $ sudo port install postgis3
@@ -314,14 +314,14 @@ Summary:
 
     .. code-block:: shell
 
-        export PATH=/opt/local/bin:/opt/local/lib/postgresql13/bin
+        export PATH=/opt/local/bin:/opt/local/lib/postgresql14/bin
 
     In addition, add the ``DYLD_FALLBACK_LIBRARY_PATH`` setting so that
     the libraries can be found by Python:
 
     .. code-block:: shell
 
-        export DYLD_FALLBACK_LIBRARY_PATH=/opt/local/lib:/opt/local/lib/postgresql13
+        export DYLD_FALLBACK_LIBRARY_PATH=/opt/local/lib:/opt/local/lib/postgresql14
 
 __ https://www.macports.org/
 

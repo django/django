@@ -1,7 +1,7 @@
 from types import NoneType
 
 from django.core.exceptions import ValidationError
-from django.db import DEFAULT_DB_ALIAS, NotSupportedError
+from django.db import DEFAULT_DB_ALIAS
 from django.db.backends.ddl_references import Expressions, Statement, Table
 from django.db.models import BaseConstraint, Deferrable, F, Q
 from django.db.models.expressions import Exists, ExpressionList
@@ -114,7 +114,6 @@ class ExclusionConstraint(BaseConstraint):
         )
 
     def create_sql(self, model, schema_editor):
-        self.check_supported(schema_editor)
         return Statement(
             "ALTER TABLE %(table)s ADD %(constraint)s",
             table=Table(model._meta.db_table, schema_editor.quote_name),
@@ -127,17 +126,6 @@ class ExclusionConstraint(BaseConstraint):
             model,
             schema_editor.quote_name(self.name),
         )
-
-    def check_supported(self, schema_editor):
-        if (
-            self.include
-            and self.index_type.lower() == "spgist"
-            and not schema_editor.connection.features.supports_covering_spgist_indexes
-        ):
-            raise NotSupportedError(
-                "Covering exclusion constraints using an SP-GiST index "
-                "require PostgreSQL 14+."
-            )
 
     def deconstruct(self):
         path, args, kwargs = super().deconstruct()
