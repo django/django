@@ -238,6 +238,17 @@ backends.
 
 * ...
 
+:mod:`django.contrib.gis`
+-------------------------
+
+* Support for PostGIS 3.0 is removed.
+
+Dropped support for PostgreSQL 13
+---------------------------------
+
+Upstream support for PostgreSQL 13 ends in November 2025. Django 5.2 supports
+PostgreSQL 14 and higher.
+
 Miscellaneous
 -------------
 
