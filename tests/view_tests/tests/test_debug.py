@@ -100,13 +100,13 @@ class DebugViewTests(SimpleTestCase):
         # When DEBUG=True, technical_500_template() is called.
         with self.assertLogs("django.security", "WARNING"):
             response = self.client.get("/raises400/")
-        self.assertContains(response, '<div class="context" id="', status_code=400)
+        self.assertContains(response, '<details class="context" id="', status_code=400)
 
     def test_400_bad_request(self):
         # When DEBUG=True, technical_500_template() is called.
         with self.assertLogs("django.request", "WARNING") as cm:
             response = self.client.get("/raises400_bad_request/")
-        self.assertContains(response, '<div class="context" id="', status_code=400)
+        self.assertContains(response, '<details class="context" id="', status_code=400)
         self.assertEqual(
             cm.records[0].getMessage(),
             "Malformed request syntax: /raises400_bad_request/",
@@ -293,9 +293,11 @@ class DebugViewTests(SimpleTestCase):
             # We look for a HTML fragment of the form
             # '<div class="context" id="c38123208">',
             # not '<div class="context" id="c38,123,208"'.
-            self.assertContains(response, '<div class="context" id="', status_code=500)
+            self.assertContains(
+                response, '<details class="context" id="', status_code=500
+            )
             match = re.search(
-                b'<div class="context" id="(?P<id>[^"]+)">', response.content
+                b'<details class="context" id="(?P<id>[^"]+)">', response.content
             )
             self.assertIsNotNone(match)
             id_repr = match["id"]
@@ -497,13 +499,13 @@ class NonDjangoTemplatesDebugViewTests(SimpleTestCase):
         # When DEBUG=True, technical_500_template() is called.
         with self.assertLogs("django.security", "WARNING"):
             response = self.client.get("/raises400/")
-        self.assertContains(response, '<div class="context" id="', status_code=400)
+        self.assertContains(response, '<details class="context" id="', status_code=400)
 
     def test_400_bad_request(self):
         # When DEBUG=True, technical_500_template() is called.
         with self.assertLogs("django.request", "WARNING") as cm:
             response = self.client.get("/raises400_bad_request/")
-        self.assertContains(response, '<div class="context" id="', status_code=400)
+        self.assertContains(response, '<details class="context" id="', status_code=400)
         self.assertEqual(
             cm.records[0].getMessage(),
             "Malformed request syntax: /raises400_bad_request/",
@@ -524,7 +526,7 @@ class NonDjangoTemplatesDebugViewTests(SimpleTestCase):
         )
         with self.assertLogs("django.request", "ERROR"):
             response = self.client.get(url)
-        self.assertContains(response, '<div class="context" id="', status_code=500)
+        self.assertContains(response, '<details class="context" id="', status_code=500)
 
 
 class ExceptionReporterTests(SimpleTestCase):
@@ -785,7 +787,7 @@ class ExceptionReporterTests(SimpleTestCase):
         self.assertEqual(
             2, html.count(implicit_exc.format("&lt;p&gt;Second exception&lt;/p&gt;"))
         )
-        self.assertEqual(10, html.count("&lt;p&gt;Final exception&lt;/p&gt;"))
+        self.assertEqual(11, html.count("&lt;p&gt;Final exception&lt;/p&gt;"))
 
         text = reporter.get_traceback_text()
         self.assertIn(explicit_exc.format("<p>Top level</p>"), text)
