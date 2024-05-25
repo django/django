@@ -21,6 +21,12 @@ class Reference:
         """
         return False
 
+    def references_index(self, table, index):
+        """
+        Return whether or not this instance references the specified index.
+        """
+        return False
+
     def rename_table_references(self, old_table, new_table):
         """
         Rename all references to the old_name to the new_table.
@@ -51,6 +57,9 @@ class Table(Reference):
 
     def references_table(self, table):
         return self.table == table
+
+    def references_index(self, table, index):
+        return self.references_table(table) and str(self) == index
 
     def rename_table_references(self, old_table, new_table):
         if self.table == old_table:
@@ -204,6 +213,12 @@ class Statement(Reference):
     def references_column(self, table, column):
         return any(
             hasattr(part, "references_column") and part.references_column(table, column)
+            for part in self.parts.values()
+        )
+
+    def references_index(self, table, index):
+        return any(
+            hasattr(part, "references_index") and part.references_index(table, index)
             for part in self.parts.values()
         )
 
