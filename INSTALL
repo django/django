@@ -1,8 +1,26 @@
-Thanks for downloading Django.
 
-To install it, make sure you have Python 3.10 or greater installed. Then run
-this command from the command prompt:
+import openai
 
-    python -m pip install .
+openai.api_key = 'your_openai_api_key_here'
 
-For more detailed instructions, see docs/intro/install.txt.
+def ask_gpt(prompt):
+    response = openai.Completion.create(
+        engine="text-davinci-003",
+        prompt=prompt,
+        max_tokens=150
+    )
+    return response.choices[0].text.strip()
+
+print("Welcome to Water GPT! Start chatting with the bot or type 'exit' to end the conversation.")
+
+while True:
+    user_input = input("You: ")
+    
+    if user_input.lower() == 'exit':
+        print("Water GPT: Goodbye!")
+        break
+    
+    prompt = f"You: {user_input}\nWater GPT:"
+    answer = ask_gpt(prompt)
+    
+    print(f"Water GPT: {answer}")
