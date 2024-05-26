@@ -22,7 +22,11 @@ class BaseUserManager(models.Manager):
     @classmethod
     def normalize_email(cls, email):
         """
-        Normalize the email address by lowercasing the domain part of it.
+        Normalize the email address by:
+        - Lowercasing the domain.
+        - Lowercasing Gmail address entirely.
+        - Ignoring dots in the local part for Gmail addresses.
+        - Ignoring anything after a plus sign in the local part for Gmail addresses.
         """
         email = email or ""
         try:
@@ -30,7 +34,19 @@ class BaseUserManager(models.Manager):
         except ValueError:
             pass
         else:
-            email = email_name + "@" + domain_part.lower()
+            # Normalize the domain part by lowercasing it
+            domain_part = domain_part.lower()
+
+            if domain_part in ['gmail.com', 'googlemail.com']:
+                # Remove dots from the local part
+                email_name = email_name.replace('.', '')
+                # Remove everything after a plus sign in the local part
+                email_name = re.split(r'\+|\*', email_name)[0]
+                # Lowercasing the local part
+                email_name = email_name.lower()
+
+            # Reconstruct the normalized email address
+            email = f"{email_name}@{domain_part}"
         return email
 
     def get_by_natural_key(self, username):
