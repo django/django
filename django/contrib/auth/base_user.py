@@ -4,6 +4,7 @@ not in INSTALLED_APPS.
 """
 
 import unicodedata
+import re
 
 from django.conf import settings
 from django.contrib.auth import password_validation
