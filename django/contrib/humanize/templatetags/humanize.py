@@ -24,12 +24,14 @@ register = template.Library()
 def ordinal(value):
     """
     Convert an integer to its ordinal as a string. 1 is '1st', 2 is '2nd',
-    3 is '3rd', etc. Works for any integer.
+    3 is '3rd', etc. Works for any non-negative integer.
     """
     try:
         value = int(value)
     except (TypeError, ValueError):
         return value
+    if value < 0:
+        return str(value)
     if value % 100 in (11, 12, 13):
         # Translators: Ordinal format for 11 (11th), 12 (12th), and 13 (13th).
         value = pgettext("ordinal 11, 12, 13", "{}th").format(value)
