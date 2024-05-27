@@ -943,6 +943,8 @@ class ForeignKey(ForeignObject):
         parent_link=False,
         to_field=None,
         db_constraint=True,
+        from_fields=None,
+        to_fields=None,
         **kwargs,
     ):
         try:
@@ -984,8 +986,12 @@ class ForeignKey(ForeignObject):
             related_name=related_name,
             related_query_name=related_query_name,
             limit_choices_to=limit_choices_to,
-            from_fields=[RECURSIVE_RELATIONSHIP_CONSTANT],
-            to_fields=[to_field],
+            from_fields=(
+                [RECURSIVE_RELATIONSHIP_CONSTANT]
+                if from_fields is None
+                else from_fields
+            ),
+            to_fields=[to_field] if to_fields is None else to_fields,
             **kwargs,
         )
         self.db_constraint = db_constraint
@@ -1046,8 +1052,9 @@ class ForeignKey(ForeignObject):
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
-        del kwargs["to_fields"]
-        del kwargs["from_fields"]
+        if len(kwargs["from_fields"]) == len(kwargs["to_fields"]) <= 1:
+            del kwargs["to_fields"]
+            del kwargs["from_fields"]
         # Handle the simpler arguments
         if self.db_index:
             del kwargs["db_index"]
@@ -1115,10 +1122,14 @@ class ForeignKey(ForeignObject):
         return related_fields
 
     def get_attname(self):
+        if len(self.from_fields) > 1:
+            return self.name
         return "%s_id" % self.name
 
     def get_attname_column(self):
         attname = self.get_attname()
+        if len(self.from_fields) > 1:
+            return attname, None
         column = self.db_column or attname
         return attname, column
 
@@ -1145,6 +1156,8 @@ class ForeignKey(ForeignObject):
         return self.target_field.get_db_prep_value(value, connection, prepared)
 
     def get_prep_value(self, value):
+        if len(self.from_fields) > 1:
+            return super().get_prep_value(value)
         return self.target_field.get_prep_value(value)
 
     def contribute_to_related_class(self, cls, related):
