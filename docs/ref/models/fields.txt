@@ -1937,6 +1937,26 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
     uses the primary key of the related object. If you reference a different
     field, that field must have ``unique=True``.
 
+.. attribute:: ForeignKey.to_fields
+
+    The fields on the remote side of the composite foreign key.
+
+    If ``to_fields`` is set, :attr:`from_fields` must be set too.
+
+    A composite foreign key is similar to a regular foreign key, except that
+    Django doesn't create any columns implicitly - the columns have to be
+    defined with ``from_fields`` and ``to_fields`` explicitly instead.
+
+.. attribute:: ForeignKey.from_fields
+
+    The fields on the local side of the composite foreign key.
+
+    If ``from_fields`` is set, :attr:`to_fields` must be set too.
+
+    A composite foreign key is similar to a regular foreign key, except that
+    Django doesn't create any columns implicitly - the columns have to be
+    defined with ``from_fields`` and ``to_fields`` explicitly instead.
+
 .. attribute:: ForeignKey.db_constraint
 
     Controls whether or not a constraint should be created in the database for

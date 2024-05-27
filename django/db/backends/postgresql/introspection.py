@@ -199,10 +199,14 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     ORDER BY cols.arridx
                 ),
                 c.contype,
-                (SELECT fkc.relname || '.' || fka.attname
-                FROM pg_attribute AS fka
-                JOIN pg_class AS fkc ON fka.attrelid = fkc.oid
-                WHERE fka.attrelid = c.confrelid AND fka.attnum = c.confkey[1]),
+                array(
+                    SELECT fkc.relname || '.' || fka.attname
+                    FROM unnest(c.confkey) WITH ORDINALITY cols(colid, arridx)
+                    JOIN pg_attribute AS fka ON cols.colid = fka.attnum
+                    JOIN pg_class AS fkc ON fka.attrelid = fkc.oid
+                    WHERE fka.attrelid = c.confrelid
+                    ORDER BY cols.arridx
+                ),
                 cl.reloptions
             FROM pg_constraint AS c
             JOIN pg_class AS cl ON c.conrelid = cl.oid
@@ -211,11 +215,16 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             [table_name],
         )
         for constraint, columns, kind, used_cols, options in cursor.fetchall():
+            foreign_key = None
+            if kind == "f":
+                cols = tuple(tuple(col.split(".", 1)) for col in used_cols)
+                foreign_key = tuple([cols[0][0]] + [col[1] for col in cols])
+
             constraints[constraint] = {
                 "columns": columns,
                 "primary_key": kind == "p",
                 "unique": kind in ["p", "u"],
-                "foreign_key": tuple(used_cols.split(".", 1)) if kind == "f" else None,
+                "foreign_key": foreign_key,
                 "check": kind == "c",
                 "index": False,
                 "definition": None,
