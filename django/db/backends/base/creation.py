@@ -337,12 +337,23 @@ class BaseDatabaseCreation:
         from unittest import expectedFailure, skip
 
         for test_name in self.connection.features.django_test_expected_failures:
+            # test_method_name might actually be a class.
+            # And either way, test_case_name might actually be a module.
             test_case_name, _, test_method_name = test_name.rpartition(".")
             test_app = test_name.split(".")[0]
             # Importing a test app that isn't installed raises RuntimeError.
             if test_app in settings.INSTALLED_APPS:
-                test_case = import_string(test_case_name)
-                test_method = getattr(test_case, test_method_name)
+                # test_case_name might be a module. The undocumented behavior
+                # of import_string when given a module is to silently succeed
+                # if it has already been imported.
+                try:
+                    test_case = import_string(test_case_name)
+                except ImportError:
+                    # Explicitly import the class (test_name)
+                    test_method = import_string(test_name)
+                    test_case = sys.modules.get(test_name.rpartition(".")[0])
+                else:
+                    test_method = getattr(test_case, test_method_name)
                 setattr(test_case, test_method_name, expectedFailure(test_method))
         for reason, tests in self.connection.features.django_test_skips.items():
             for test_name in tests:
@@ -350,8 +361,13 @@ class BaseDatabaseCreation:
                 test_app = test_name.split(".")[0]
                 # Importing a test app that isn't installed raises RuntimeError.
                 if test_app in settings.INSTALLED_APPS:
-                    test_case = import_string(test_case_name)
-                    test_method = getattr(test_case, test_method_name)
+                    try:
+                        test_case = import_string(test_case_name)
+                    except ImportError:
+                        test_method = import_string(test_name)
+                        test_case = sys.modules.get(test_name.rpartition(".")[0])
+                    else:
+                        test_method = getattr(test_case, test_method_name)
                     setattr(test_case, test_method_name, skip(reason)(test_method))
 
     def sql_table_creation_suffix(self):
