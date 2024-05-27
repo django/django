@@ -3,8 +3,8 @@ This module allows importing AbstractBaseUser even when django.contrib.auth is
 not in INSTALLED_APPS.
 """
 
-import unicodedata
 import re
+import unicodedata
 
 from django.conf import settings
 from django.contrib.auth import password_validation
@@ -38,11 +38,11 @@ class BaseUserManager(models.Manager):
             # Normalize the domain part by lowercasing it
             domain_part = domain_part.lower()
 
-            if domain_part in ['gmail.com', 'googlemail.com']:
+            if domain_part in ["gmail.com", "googlemail.com"]:
                 # Remove dots from the local part
-                email_name = email_name.replace('.', '')
+                email_name = email_name.replace(".", "")
                 # Remove everything after a plus sign in the local part
-                email_name = re.split(r'\+|\*', email_name)[0]
+                email_name = re.split(r"\+|\*", email_name)[0]
                 # Lowercasing the local part
                 email_name = email_name.lower()
 
