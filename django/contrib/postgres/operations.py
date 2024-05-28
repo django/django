@@ -198,7 +198,7 @@ class CollationOperation(Operation):
         if self.deterministic is False:
             args["deterministic"] = "false"
         schema_editor.execute(
-            "CREATE COLLATION %(name)s (%(args)s)"
+            "CREATE COLLATION IF NOT EXISTS %(name)s (%(args)s)"
             % {
                 "name": schema_editor.quote_name(self.name),
                 "args": ", ".join(
