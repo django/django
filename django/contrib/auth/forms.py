@@ -154,14 +154,14 @@ class SetPasswordMixin:
         if not usable_password:
             return self.cleaned_data
 
-        if not password1:
+        if not password1 and password1_field_name not in self.errors:
             error = ValidationError(
                 self.fields[password1_field_name].error_messages["required"],
                 code="required",
             )
             self.add_error(password1_field_name, error)
 
-        if not password2:
+        if not password2 and password2_field_name not in self.errors:
             error = ValidationError(
                 self.fields[password2_field_name].error_messages["required"],
                 code="required",
