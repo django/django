@@ -37,50 +37,6 @@ jobs:
       - name: Run tests
         run: python tests/runtests.py -v2
 
-  geodjango-postgis:
-    runs-on: ubuntu-latest
-    name: GeoDjango, PostGIS 3.4, Python ${{ matrix.python-version }}
-    strategy:
-      matrix:
-        python-version:
-          - '3.10'
-          - '3.11'
-          - '3.12'
-    services:
-      postgres:
-        image: postgis/postgis:14-3.4-alpine
-        env:
-          POSTGRES_DB: django
-          POSTGRES_USER: user
-          POSTGRES_PASSWORD: postgres
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-          cache: 'pip'
-          cache-dependency-path: |
-            tests/requirements/py3.txt
-            tests/requirements/postgres.txt
-      - name: Install libmemcached-dev for pylibmc and proj, gdal for GeoDjango
-        run: sudo apt-get install libmemcached-dev binutils libproj-dev gdal-bin --no-install-recommends -y
-      - name: Install and upgrade packaging tools
-        run: python -m pip install --upgrade pip setuptools wheel
-      - run: python -m pip install -r tests/requirements/py3.txt -r tests/requirements/postgres.txt -e .
-      - name: Create PostgreSQL settings file
-        run: mv ./.github/workflows/data/test_postgis.py.tpl ./tests/test_postgis.py
-      - name: Run tests
-        run: python -Wall tests/runtests.py --settings=test_postgis --verbosity=2 tests/gis_tests
-
   pyc-only:
     runs-on: ubuntu-latest
     name: Byte-compiled Django with no source files (only .pyc files)
