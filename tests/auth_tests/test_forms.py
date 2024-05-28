@@ -60,6 +60,21 @@ class TestDataMixin:
         )
 
 
+class ExtraValidationFormMixin:
+    def __init__(self, *args, failing_fields=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.failing_fields = failing_fields or {}
+
+    def failing_helper(self, field_name):
+        if field_name in self.failing_fields:
+            errors = [
+                ValidationError(error, code="invalid")
+                for error in self.failing_fields[field_name]
+            ]
+            raise ValidationError(errors)
+        return self.cleaned_data[field_name]
+
+
 class BaseUserCreationFormTest(TestDataMixin, TestCase):
     def test_user_already_exists(self):
         data = {
@@ -323,6 +338,22 @@ class BaseUserCreationFormTest(TestDataMixin, TestCase):
             "Your password can’t be too similar to your other personal information."
             "</li></ul>",
         )
+
+    def test_password_extra_validations(self):
+        class ExtraValidationForm(ExtraValidationFormMixin, BaseUserCreationForm):
+            def clean_password1(self):
+                return self.failing_helper("password1")
+
+            def clean_password2(self):
+                return self.failing_helper("password2")
+
+        data = {"username": "extra", "password1": "abc", "password2": "abc"}
+        for fields in (["password1"], ["password2"], ["password1", "password2"]):
+            with self.subTest(fields=fields):
+                errors = {field: [f"Extra validation for {field}."] for field in fields}
+                form = ExtraValidationForm(data, failing_fields=errors)
+                self.assertIs(form.is_valid(), False)
+                self.assertDictEqual(form.errors, errors)
 
     @override_settings(
         AUTH_PASSWORD_VALIDATORS=[
@@ -864,6 +895,27 @@ class SetPasswordFormTest(TestDataMixin, TestCase):
                 self.assertEqual(
                     form.fields[field_name].widget.attrs["autocomplete"], autocomplete
                 )
+
+    def test_password_extra_validations(self):
+        class ExtraValidationForm(ExtraValidationFormMixin, SetPasswordForm):
+            def clean_new_password1(self):
+                return self.failing_helper("new_password1")
+
+            def clean_new_password2(self):
+                return self.failing_helper("new_password2")
+
+        user = User.objects.get(username="testclient")
+        data = {"new_password1": "abc", "new_password2": "abc"}
+        for fields in (
+            ["new_password1"],
+            ["new_password2"],
+            ["new_password1", "new_password2"],
+        ):
+            with self.subTest(fields=fields):
+                errors = {field: [f"Extra validation for {field}."] for field in fields}
+                form = ExtraValidationForm(user, data, failing_fields=errors)
+                self.assertIs(form.is_valid(), False)
+                self.assertDictEqual(form.errors, errors)
 
 
 class PasswordChangeFormTest(TestDataMixin, TestCase):
@@ -1455,6 +1507,23 @@ class AdminPasswordChangeFormTest(TestDataMixin, TestCase):
         self.assertEqual(form.cleaned_data["password1"], data["password1"])
         self.assertEqual(form.cleaned_data["password2"], data["password2"])
         self.assertEqual(form.changed_data, ["password"])
+
+    def test_password_extra_validations(self):
+        class ExtraValidationForm(ExtraValidationFormMixin, AdminPasswordChangeForm):
+            def clean_password1(self):
+                return self.failing_helper("password1")
+
+            def clean_password2(self):
+                return self.failing_helper("password2")
+
+        user = User.objects.get(username="testclient")
+        data = {"username": "extra", "password1": "abc", "password2": "abc"}
+        for fields in (["password1"], ["password2"], ["password1", "password2"]):
+            with self.subTest(fields=fields):
+                errors = {field: [f"Extra validation for {field}."] for field in fields}
+                form = ExtraValidationForm(user, data, failing_fields=errors)
+                self.assertIs(form.is_valid(), False)
+                self.assertDictEqual(form.errors, errors)
 
     def test_non_matching_passwords(self):
         user = User.objects.get(username="testclient")
