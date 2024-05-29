@@ -380,7 +380,7 @@ Then, ``full_clean()`` will check unique constraints on your model.
                         raise ValidationError(
                             {
                                 "status": _(
-                                    "Set status to draft if there is not a " "publication date."
+                                    "Set status to draft if there is not a publication date."
                                 ),
                             }
                         )
