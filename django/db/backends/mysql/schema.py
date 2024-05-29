@@ -11,9 +11,6 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_alter_column_type = "MODIFY %(column)s %(type)s%(collation)s%(comment)s"
     sql_alter_column_no_default_null = "ALTER COLUMN %(column)s SET DEFAULT NULL"
 
-    # No 'CASCADE' which works as a no-op in MySQL but is undocumented
-    sql_delete_column = "ALTER TABLE %(table)s DROP COLUMN %(column)s"
-
     sql_delete_unique = "ALTER TABLE %(table)s DROP INDEX %(name)s"
     sql_create_column_inline_fk = (
         ", ADD CONSTRAINT %(name)s FOREIGN KEY (%(column)s) "
