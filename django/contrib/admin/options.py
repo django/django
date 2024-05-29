@@ -6,7 +6,7 @@ import warnings
 from functools import partial, update_wrapper
 from urllib.parse import parse_qsl
 from urllib.parse import quote as urlquote
-from urllib.parse import urlparse
+from urllib.parse import urlsplit
 
 from django import forms
 from django.conf import settings
@@ -1384,7 +1384,7 @@ class ModelAdmin(BaseModelAdmin):
         )
 
     def _get_preserved_qsl(self, request, preserved_filters):
-        query_string = urlparse(request.build_absolute_uri()).query
+        query_string = urlsplit(request.build_absolute_uri()).query
         return parse_qsl(query_string.replace(preserved_filters, ""))
 
     def response_add(self, request, obj, post_url_continue=None):
