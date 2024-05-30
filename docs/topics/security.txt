@@ -57,7 +57,7 @@ Content Security Policy (CSP)
 It's widely recommended to add a Content Security Policy (CSP) to your website
 in order to protect the website and its users from XSS attacks as mentioned in
 the previous chapter. CSP defines which source servers that are allowed to embed
-content such as scripts, stylesheets, images and fonts into your webpages.
+content such as scripts, stylesheets, images and fonts into your web pages.
 
 CSP is defined by one or more HTTP headers sent from the web server. The headers
 follow a special format, informing the browser about which sources it is allowed
