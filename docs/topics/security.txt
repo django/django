@@ -55,19 +55,19 @@ Content Security Policy (CSP)
 =============================
 
 It's widely recommended to add a Content Security Policy (CSP) to your website
-in order to protect the website and its users from XSS attacks as mentioned in
-the previous chapter. CSP defines which source servers that are allowed to embed
-content such as scripts, stylesheets, images and fonts into your web pages.
+in order to protect from for instance XSS attacks. CSP defines which source
+domains that are allowed to embed content such as scripts, stylesheets, images
+and fonts into your web pages.
 
-CSP is defined by one or more HTTP headers sent from the web server. The headers
+CSP consists of one or more HTTP headers sent from the web server. The headers
 follow a special format, informing the browser about which sources it is allowed
-to fetch content from for this particular domain.
+to fetch content from for this particular domain. This allows you to mitigate a
+wide range of attacks.
 
-This allows you to mitigate a wide range of attacks. For instance, an attacker
-could try to sneak in code for an XSS attack that would embed a malicious
-JavaScript to spy on the user. By adding CSP headers, your web server will
-inform the user's browser that such a script is never acceptable in the first
-place.
+For instance, an attacker could try to sneak in code for an XSS attack that 
+would embed a malicious JavaScript, image or font into your web page. By adding
+CSP headers, your web server will inform the user's browser that such a content
+file is never acceptable in the first place.
 
 CSP can be enabled by adding an external Django package, providing a middleware
 and an easy configuration layer **or** by configuring your HTTP server to add
@@ -111,8 +111,6 @@ HSTS for supported browsers.
 
 Be very careful with marking views with the ``csrf_exempt`` decorator unless
 it is absolutely necessary.
-
-
 
 .. _sql-injection-protection:
 
