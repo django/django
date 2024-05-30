@@ -904,8 +904,8 @@ preferred language as a string. Example: ``en-us``. See
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``{% get_current_language_bidi as LANGUAGE_BIDI %}`` returns the current
-locale's direction. If ``True``, it's a right-to-left language, e.g. Hebrew,
-Arabic. If ``False`` it's a left-to-right language, e.g. English, French,
+locale's direction. If ``True``, it's a right-to-left language, e.g. Arabic,
+Hebrew. If ``False`` it's a left-to-right language, e.g. English, French,
 German, etc.
 
 .. _template-translation-vars:

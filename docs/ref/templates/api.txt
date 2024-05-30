@@ -749,7 +749,7 @@ variables:
 
 * ``LANGUAGES`` -- The value of the :setting:`LANGUAGES` setting.
 * ``LANGUAGE_BIDI`` -- ``True`` if the current language is a right-to-left
-  language, e.g. Hebrew, Arabic. ``False`` if it's a left-to-right language,
+  language, e.g. Arabic, Hebrew. ``False`` if it's a left-to-right language,
   e.g. English, French, German.
 * ``LANGUAGE_CODE`` -- ``request.LANGUAGE_CODE``, if it exists. Otherwise,
   the value of the :setting:`LANGUAGE_CODE` setting.
