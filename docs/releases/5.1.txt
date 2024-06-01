@@ -106,11 +106,6 @@ Minor features
 * :attr:`.ModelAdmin.list_display` now supports using ``__`` lookups to list
   fields from related models.
 
-:mod:`django.contrib.admindocs`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
