@@ -1,11 +1,4 @@
-import os
-
-from django.template import (
-    Context,
-    Template,
-    TemplateSyntaxError,
-    TemplateDoesNotExist,
-    loader)
+from django.template import loader
 from django.test import SimpleTestCase
 
 context = {
