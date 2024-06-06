@@ -1,5 +1,7 @@
-from asgiref.local import Local
+from collections import deque
 
+from asgiref.local import Local
+from asgiref.sync import async_to_sync
 from django.conf import settings as django_settings
 from django.utils.functional import cached_property
 
@@ -39,6 +41,8 @@ class BaseConnectionHandler:
     def __init__(self, settings=None):
         self._settings = settings
         self._connections = Local(self.thread_critical)
+        self._async_connections = Local(thread_critical=False)
+        self._async_connections.connections = deque()
 
     @cached_property
     def settings(self):
@@ -80,6 +84,19 @@ class BaseConnectionHandler:
             if not initialized_only or hasattr(self._connections, alias)
         ]
 
+    @property
+    def async_connections(self):
+        return self._async_connections.connections
+
+    @property
+    def last_async_connection(self):
+        try:
+            return self.async_connections[0]
+        except IndexError:
+            raise RuntimeError("No async connections have been created.")
+
     def close_all(self):
         for conn in self.all(initialized_only=True):
             conn.close()
+        for conn in self.async_connections:
+            async_to_sync(conn.aclose)()

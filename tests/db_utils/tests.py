@@ -1,6 +1,7 @@
 """Tests for django.db.utils."""
 
 import unittest
+from unittest.mock import patch, AsyncMock
 
 from django.core.exceptions import ImproperlyConfigured
 from django.db import DEFAULT_DB_ALIAS, ProgrammingError, connection
@@ -58,6 +59,25 @@ class ConnectionHandlerTests(SimpleTestCase):
         )
         with self.assertRaisesMessage(ConnectionDoesNotExist, msg):
             conns["nonexistent"]
+
+    @patch("django.db.backends.dummy.base.DatabaseWrapper.aclose", create=True, new_callable=AsyncMock)
+    async def test_new_connection(self, database_wrapper):
+        conns = ConnectionHandler(
+            {
+                DEFAULT_DB_ALIAS: {"ENGINE": "django.db.backends.dummy"}
+            }
+        )
+        with self.assertRaises(RuntimeError):
+            conns.last_async_connection
+
+        async with conns.new_connection():
+            conn1 = conns.last_async_connection
+            async with conns.new_connection():
+                conn2 = conns.last_async_connection
+                self.assertNotEqual(conn1, conn2)
+
+        with self.assertRaises(RuntimeError):
+            conns.last_async_connection
 
 
 class DatabaseErrorWrapperTests(TestCase):

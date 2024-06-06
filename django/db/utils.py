@@ -1,5 +1,6 @@
 import pkgutil
 from importlib import import_module
+from contextlib import asynccontextmanager
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -192,6 +193,16 @@ class ConnectionHandler(BaseConnectionHandler):
         db = self.settings[alias]
         backend = load_backend(db["ENGINE"])
         return backend.DatabaseWrapper(db, alias)
+
+    @asynccontextmanager
+    async def new_connection(self, using=DEFAULT_DB_ALIAS):
+        conn = self.create_connection(using)
+        self.async_connections.appendleft(conn)
+        try:
+            yield conn
+        finally:
+            await conn.aclose()
+            self.async_connections.popleft()
 
 
 class ConnectionRouter:

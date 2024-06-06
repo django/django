@@ -1,3 +1,5 @@
+from asgiref.sync import async_to_sync
+
 from django.core import signals
 from django.db.utils import (
     DEFAULT_DB_ALIAS,
@@ -36,6 +38,8 @@ __all__ = [
 
 connections = ConnectionHandler()
 
+new_connection = connections.new_connection
+
 router = ConnectionRouter()
 
 # For backwards compatibility. Prefer connections['default'] instead.
@@ -56,6 +60,8 @@ signals.request_started.connect(reset_queries)
 def close_old_connections(**kwargs):
     for conn in connections.all(initialized_only=True):
         conn.close_if_unusable_or_obsolete()
+    for conn in connections.async_connections:
+        async_to_sync(conn.aclose_if_unusable_or_obsolete)()
 
 
 signals.request_started.connect(close_old_connections)
