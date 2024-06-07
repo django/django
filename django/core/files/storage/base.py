@@ -56,6 +56,13 @@ class Storage:
         exists) to the filename.
         """
         return "%s_%s%s" % (file_root, get_random_string(7), file_ext)
+    
+    def seprarate_dirname_filename(self, filename): 
+        """
+        Return a tuple of dirname and filename.
+        This method can be overridden to customize how the filename is split.
+        """
+        return os.path.split(filename)
 
     def get_available_name(self, name, max_length=None):
         """
@@ -105,7 +112,7 @@ class Storage:
         """
         filename = str(filename).replace("\\", "/")
         # `filename` may include a path as returned by FileField.upload_to.
-        dirname, filename = os.path.split(filename)
+        dirname, filename = self.seprarate_dirname_filename(filename)
         if ".." in pathlib.PurePath(dirname).parts:
             raise SuspiciousFileOperation(
                 "Detected path traversal attempt in '%s'" % dirname
