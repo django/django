@@ -56,7 +56,7 @@ class Storage:
         exists) to the filename.
         """
         return "%s_%s%s" % (file_root, get_random_string(7), file_ext)
-    
+
     def seprarate_dirname_filename(self, filename):
         """
         Return a tuple of dirname and filename.
