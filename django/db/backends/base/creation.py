@@ -382,3 +382,129 @@ class BaseDatabaseCreation:
         # to the default database instead of the appropriate clone.
         self.connection.settings_dict.update(settings_dict)
         self.connection.close()
+
+
+class AsyncBaseDatabaseCreation(BaseDatabaseCreation):
+    async def _anodb_cursor(self):
+        return await self.connection._anodb_cursor()
+
+    async def _acreate_test_db(self, verbosity, autoclobber, keepdb=False):
+        """
+        Internal implementation - create the test db tables.
+        """
+        test_database_name = self._get_test_db_name()
+        test_db_params = {
+            "dbname": self.connection.ops.quote_name(test_database_name),
+            "suffix": self.sql_table_creation_suffix(),
+        }
+        # Create the test database and connect to it.
+        async with self._anodb_cursor() as cursor:
+            try:
+                self._execute_create_test_db(cursor, test_db_params, keepdb)
+            except Exception as e:
+                # if we want to keep the db, then no need to do any of the below,
+                # just return and skip it all.
+                if keepdb:
+                    return test_database_name
+
+                self.log("Got an error creating the test database: %s" % e)
+                if not autoclobber:
+                    confirm = input(
+                        "Type 'yes' if you would like to try deleting the test "
+                        "database '%s', or 'no' to cancel: " % test_database_name
+                    )
+                if autoclobber or confirm == "yes":
+                    try:
+                        if verbosity >= 1:
+                            self.log(
+                                "Destroying old test database for alias %s..."
+                                % (
+                                    self._get_database_display_str(
+                                        verbosity, test_database_name
+                                    ),
+                                )
+                            )
+                        cursor.execute("DROP DATABASE %(dbname)s" % test_db_params)
+                        self._execute_create_test_db(cursor, test_db_params, keepdb)
+                    except Exception as e:
+                        self.log("Got an error recreating the test database: %s" % e)
+                        sys.exit(2)
+                else:
+                    self.log("Tests cancelled.")
+                    sys.exit(1)
+
+        return test_database_name
+
+    async def acreate_test_db(
+        self, verbosity=1, autoclobber=False, serialize=True, keepdb=False
+    ):
+        """
+        Create a test database, prompting the user for confirmation if the
+        database already exists. Return the name of the test database created.
+        """
+        # Don't import django.core.management if it isn't needed.
+        from django.core.management import call_command
+
+        test_database_name = self._get_test_db_name()
+
+        if verbosity >= 1:
+            action = "Creating"
+            if keepdb:
+                action = "Using existing"
+
+            self.log(
+                "%s test database for alias %s..."
+                % (
+                    action,
+                    self._get_database_display_str(verbosity, test_database_name),
+                )
+            )
+
+        # We could skip this call if keepdb is True, but we instead
+        # give it the keepdb param. This is to handle the case
+        # where the test DB doesn't exist, in which case we need to
+        # create it, then just not destroy it. If we instead skip
+        # this, we will get an exception.
+        await self._acreate_test_db(verbosity, autoclobber, keepdb)
+
+        await self.connection.aclose()
+        settings.DATABASES[self.connection.alias]["NAME"] = test_database_name
+        self.connection.settings_dict["NAME"] = test_database_name
+
+        try:
+            if self.connection.settings_dict["TEST"]["MIGRATE"] is False:
+                # Disable migrations for all apps.
+                old_migration_modules = settings.MIGRATION_MODULES
+                settings.MIGRATION_MODULES = {
+                    app.label: None for app in apps.get_app_configs()
+                }
+            # We report migrate messages at one level lower than that
+            # requested. This ensures we don't get flooded with messages during
+            # testing (unless you really ask to be flooded).
+            call_command(
+                "migrate",
+                verbosity=max(verbosity - 1, 0),
+                interactive=False,
+                database=self.connection.alias,
+                run_syncdb=True,
+            )
+        finally:
+            if self.connection.settings_dict["TEST"]["MIGRATE"] is False:
+                settings.MIGRATION_MODULES = old_migration_modules
+
+        # We then serialize the current state of the database into a string
+        # and store it on the connection. This slightly horrific process is so people
+        # who are testing on databases without transactions or who are using
+        # a TransactionTestCase still get a clean database on every test run.
+        if serialize:
+            self.connection._test_serialized_contents = self.serialize_db_to_string()
+
+        call_command("createcachetable", database=self.connection.alias)
+
+        # Ensure a connection for the side effect of initializing the test database.
+        self.connection.ensure_connection()
+
+        if os.environ.get("RUNNING_DJANGOS_TEST_SUITE") == "true":
+            self.mark_expected_failures_and_skips()
+
+        return test_database_name

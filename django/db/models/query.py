@@ -145,6 +145,73 @@ class ModelIterable(BaseIterable):
 
             yield obj
 
+    def __aiter__(self):
+        async def generator():
+            queryset = self.queryset
+            connection = connections.last_async_connection
+            db = connection.alias
+            compiler = queryset.query.get_compiler(connection=connection)
+            # Execute the query. This will also fill compiler.select, klass_info,
+            # and annotations.
+            results = await compiler.aexecute_sql(
+                chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size
+            )
+            select, klass_info, annotation_col_map = (
+                compiler.select,
+                compiler.klass_info,
+                compiler.annotation_col_map,
+            )
+            model_cls = klass_info["model"]
+            select_fields = klass_info["select_fields"]
+            model_fields_start, model_fields_end = select_fields[0], select_fields[-1] + 1
+            init_list = [
+                f[0].target.attname for f in select[model_fields_start:model_fields_end]
+            ]
+            related_populators = get_related_populators(klass_info, select, db)
+            known_related_objects = [
+                (
+                    field,
+                    related_objs,
+                    operator.attrgetter(
+                        *[
+                            (
+                                field.attname
+                                if from_field == "self"
+                                else queryset.model._meta.get_field(from_field).attname
+                            )
+                            for from_field in field.from_fields
+                        ]
+                    ),
+                )
+                for field, related_objs in queryset._known_related_objects.items()
+            ]
+            for row in (await compiler.aresults_iter(results)):
+                obj = await model_cls.afrom_db(
+                    db, init_list, row[model_fields_start:model_fields_end]
+                )
+                for rel_populator in related_populators:
+                    rel_populator.populate(row, obj)
+                if annotation_col_map:
+                    for attr_name, col_pos in annotation_col_map.items():
+                        setattr(obj, attr_name, row[col_pos])
+
+                # Add the known related objects to the model.
+                for field, rel_objs, rel_getter in known_related_objects:
+                    # Avoid overwriting objects loaded by, e.g., select_related().
+                    if field.is_cached(obj):
+                        continue
+                    rel_obj_id = rel_getter(obj)
+                    try:
+                        rel_obj = rel_objs[rel_obj_id]
+                    except KeyError:
+                        pass  # May happen in qs1 | qs2 scenarios.
+                    else:
+                        setattr(obj, field.name, rel_obj)
+
+                yield obj
+
+        return generator()
+
 
 class RawModelIterable(BaseIterable):
     """
@@ -404,7 +471,7 @@ class QuerySet(AltersData):
         # Remember, __aiter__ itself is synchronous, it's the thing it returns
         # that is async!
         async def generator():
-            await sync_to_async(self._fetch_all)()
+            await self._afetch_all()
             for item in self._result_cache:
                 yield item
 
@@ -549,7 +616,7 @@ class QuerySet(AltersData):
         """
         if chunk_size <= 0:
             raise ValueError("Chunk size must be strictly positive.")
-        use_chunked_fetch = not connections[self.db].settings_dict.get(
+        use_chunked_fetch = not connections.async_connections[self.db].settings_dict.get(
             "DISABLE_SERVER_SIDE_CURSORS"
         )
         iterable = self._iterable_class(
@@ -680,7 +747,19 @@ class QuerySet(AltersData):
         return obj
 
     async def acreate(self, **kwargs):
-        return await sync_to_async(self.create)(**kwargs)
+        reverse_one_to_one_fields = frozenset(kwargs).intersection(
+            self.model._meta._reverse_one_to_one_field_names
+        )
+        if reverse_one_to_one_fields:
+            raise ValueError(
+                "The following fields do not exist in this model: %s"
+                % ", ".join(reverse_one_to_one_fields)
+            )
+
+        obj = self.model(**kwargs)
+        self._for_write = True
+        await obj.asave(force_insert=True)
+        return obj
 
     def _prepare_for_bulk_create(self, objs):
         from django.db.models.expressions import DatabaseDefault
@@ -1280,6 +1359,26 @@ class QuerySet(AltersData):
     _update.alters_data = True
     _update.queryset_only = False
 
+    async def _aupdate(self, values):
+        """
+        A version of update() that accepts field objects instead of field names.
+        Used primarily for model saving and not intended for use by general
+        code (it requires too much poking around at model internals to be
+        useful at that level).
+        """
+        if self.query.is_sliced:
+            raise TypeError("Cannot update a query once a slice has been taken.")
+        query = self.query.chain(sql.UpdateQuery)
+        query.add_update_fields(values)
+        # Clear any annotations so that they won't be present in subqueries.
+        query.annotations = {}
+        self._result_cache = None
+        conn = connections.last_async_connection
+        return await (query.get_compiler(connection=conn)).execute_sql(CURSOR)
+
+    _aupdate.alters_data = True
+    _aupdate.queryset_only = False
+
     def exists(self):
         """
         Return True if the QuerySet would have any results, False otherwise.
@@ -1289,7 +1388,9 @@ class QuerySet(AltersData):
         return bool(self._result_cache)
 
     async def aexists(self):
-        return await sync_to_async(self.exists)()
+        if self._result_cache is None:
+            return await self.query.ahas_results()
+        return bool(self._result_cache)
 
     def contains(self, obj):
         """
@@ -1849,6 +1950,35 @@ class QuerySet(AltersData):
     _insert.alters_data = True
     _insert.queryset_only = False
 
+    async def _ainsert(
+        self,
+        objs,
+        fields,
+        returning_fields=None,
+        raw=False,
+        on_conflict=None,
+        update_fields=None,
+        unique_fields=None,
+    ):
+        """
+        Insert a new record for the given model. This provides an interface to
+        the InsertQuery class and is how Model.save() is implemented.
+        """
+        self._for_write = True
+        query = sql.InsertQuery(
+            self.model,
+            on_conflict=on_conflict,
+            update_fields=update_fields,
+            unique_fields=unique_fields,
+        )
+        query.insert_values(fields, objs, raw=raw)
+        conn = connections.last_async_connection
+        compiler = query.get_compiler(connection=conn)
+        return await compiler.aexecute_sql(returning_fields)
+
+    _ainsert.alters_data = True
+    _ainsert.queryset_only = False
+
     def _batched_insert(
         self,
         objs,
@@ -1926,6 +2056,12 @@ class QuerySet(AltersData):
     def _fetch_all(self):
         if self._result_cache is None:
             self._result_cache = list(self._iterable_class(self))
+        if self._prefetch_related_lookups and not self._prefetch_done:
+            self._prefetch_related_objects()
+
+    async def _afetch_all(self):
+        if self._result_cache is None:
+            self._result_cache = [instance async for instance in self._iterable_class(self)]
         if self._prefetch_related_lookups and not self._prefetch_done:
             self._prefetch_related_objects()
 
@@ -2115,6 +2251,12 @@ class RawQuerySet:
         if self._prefetch_related_lookups and not self._prefetch_done:
             self._prefetch_related_objects()
 
+    async def _afetch_all(self):
+        if self._result_cache is None:
+            self._result_cache = list(await self.aiterator())
+        if self._prefetch_related_lookups and not self._prefetch_done:
+            self._prefetch_related_objects()
+
     def __len__(self):
         self._fetch_all()
         return len(self._result_cache)
@@ -2130,8 +2272,9 @@ class RawQuerySet:
     def __aiter__(self):
         # Remember, __aiter__ itself is synchronous, it's the thing it returns
         # that is async!
+        breakpoint()
         async def generator():
-            await sync_to_async(self._fetch_all)()
+            await self._afetch_all()
             for item in self._result_cache:
                 yield item
 

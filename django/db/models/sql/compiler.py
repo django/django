@@ -1529,12 +1529,40 @@ class SQLCompiler:
                 rows = map(tuple, rows)
         return rows
 
+    async def aresults_iter(
+        self,
+        results=None,
+        tuple_expected=False,
+        chunked_fetch=False,
+        chunk_size=GET_ITERATOR_CHUNK_SIZE,
+    ):
+        """Return an iterator over the results from executing this query."""
+        if results is None:
+            results = await self.aexecute_sql(
+                MULTI, chunked_fetch=chunked_fetch, chunk_size=chunk_size
+            )
+        fields = [s[0] for s in self.select[0 : self.col_count]]
+        converters = self.get_converters(fields)
+        rows = chain.from_iterable(results)
+        if converters:
+            rows = self.apply_converters(rows, converters)
+            if tuple_expected:
+                rows = map(tuple, rows)
+        return rows
+
     def has_results(self):
         """
         Backends (e.g. NoSQL) can override this in order to use optimized
         versions of "query has any results."
         """
         return bool(self.execute_sql(SINGLE))
+
+    async def ahas_results(self):
+        """
+        Backends (e.g. NoSQL) can override this in order to use optimized
+        versions of "query has any results."
+        """
+        return bool((await self.aexecute_sql(SINGLE)))
 
     def execute_sql(
         self, result_type=MULTI, chunked_fetch=False, chunk_size=GET_ITERATOR_CHUNK_SIZE
@@ -1600,6 +1628,72 @@ class SQLCompiler:
             # before going any further. Use chunked_fetch if requested,
             # unless the database doesn't support it.
             return list(result)
+        return result
+
+    async def aexecute_sql(
+        self, result_type=MULTI, chunked_fetch=False, chunk_size=GET_ITERATOR_CHUNK_SIZE
+    ):
+        """
+        Run the query against the database and return the result(s). The
+        return value is a single data item if result_type is SINGLE, or an
+        iterator over the results if the result_type is MULTI.
+
+        result_type is either MULTI (use fetchmany() to retrieve all rows),
+        SINGLE (only retrieve a single row), or None. In this last case, the
+        cursor is returned if any query is executed, since it's used by
+        subclasses such as InsertQuery). It's possible, however, that no query
+        is needed, as the filters describe an empty set. In that case, None is
+        returned, to avoid any unnecessary database interaction.
+        """
+        result_type = result_type or NO_RESULTS
+        try:
+            sql, params = self.as_sql()
+            if not sql:
+                raise EmptyResultSet
+        except EmptyResultSet:
+            if result_type == MULTI:
+                return aiter([])
+            else:
+                return
+        if chunked_fetch:
+            cursor = await self.connection.achunked_cursor()
+        else:
+            cursor = await self.connection.acursor()
+        try:
+            await cursor.execute(sql, params)
+        except Exception:
+            # Might fail for server-side cursors (e.g. connection closed)
+            await cursor.close()
+            raise
+
+        if result_type == CURSOR:
+            # Give the caller the cursor to process and close.
+            return cursor
+        if result_type == SINGLE:
+            try:
+                val = await cursor.fetchone()
+                if val:
+                    return val[0 : self.col_count]
+                return val
+            finally:
+                # done with the cursor
+                await cursor.close()
+        if result_type == NO_RESULTS:
+            await cursor.close()
+            return
+
+        result = cursor_aiter(
+            cursor,
+            self.connection.features.empty_fetchmany_value,
+            self.col_count if self.has_extra_select else None,
+            chunk_size,
+        )
+        if not chunked_fetch or not self.connection.features.can_use_chunked_reads:
+            # If we are using non-chunked reads, we return the same data
+            # structure as normally, but ensure it is all read into memory
+            # before going any further. Use chunked_fetch if requested,
+            # unless the database doesn't support it.
+            return [r async for r in result]
         return result
 
     def as_subquery_condition(self, alias, columns, compiler):
@@ -1841,6 +1935,52 @@ class SQLInsertCompiler(SQLCompiler):
                 assert len(self.query.objs) == 1
                 rows = [
                     self.connection.ops.fetch_returned_insert_columns(
+                        cursor,
+                        self.returning_params,
+                    )
+                ]
+                cols = [field.get_col(opts.db_table) for field in self.returning_fields]
+            else:
+                cols = [opts.pk.get_col(opts.db_table)]
+                rows = [
+                    (
+                        self.connection.ops.last_insert_id(
+                            cursor,
+                            opts.db_table,
+                            opts.pk.column,
+                        ),
+                    )
+                ]
+        converters = self.get_converters(cols)
+        if converters:
+            rows = list(self.apply_converters(rows, converters))
+        return rows
+
+    async def aexecute_sql(self, returning_fields=None):
+        assert not (
+            returning_fields
+            and len(self.query.objs) != 1
+            and not self.connection.features.can_return_rows_from_bulk_insert
+        )
+        opts = self.query.get_meta()
+        self.returning_fields = returning_fields
+        cols = []
+        cursor = await self.connection.acursor()
+        async with cursor:
+            for sql, params in self.as_sql():
+                await cursor.execute(sql, params)
+            if not self.returning_fields:
+                return []
+            if (
+                self.connection.features.can_return_rows_from_bulk_insert
+                and len(self.query.objs) > 1
+            ):
+                rows = await self.connection.ops.afetch_returned_insert_rows(cursor)
+                cols = [field.get_col(opts.db_table) for field in self.returning_fields]
+            elif self.connection.features.can_return_columns_from_insert:
+                assert len(self.query.objs) == 1
+                rows = [
+                    await self.connection.ops.afetch_returned_insert_columns(
                         cursor,
                         self.returning_params,
                     )
@@ -2108,3 +2248,18 @@ def cursor_iter(cursor, sentinel, col_count, itersize):
             yield rows if col_count is None else [r[:col_count] for r in rows]
     finally:
         cursor.close()
+
+
+async def cursor_aiter(cursor, sentinel, col_count, itersize):
+    """
+    Yield blocks of rows from a cursor and ensure the cursor is closed when
+    done.
+    """
+    try:
+        while True:
+            rows = await cursor.fetchmany(itersize)
+            if rows == sentinel:
+                break
+            yield rows if col_count is None else [r[:col_count] for r in rows]
+    finally:
+        await cursor.close()

@@ -659,6 +659,12 @@ class Query(BaseExpression):
         compiler = q.get_compiler(using=using)
         return compiler.has_results()
 
+    async def ahas_results(self):
+        conn = connections.last_async_connection
+        q = self.exists()
+        compiler = q.get_compiler(connection=conn)
+        return await compiler.ahas_results()
+
     def explain(self, using, format=None, **options):
         q = self.clone()
         for option_name in options:

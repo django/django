@@ -215,6 +215,13 @@ class BaseDatabaseOperations:
         """
         return cursor.fetchone()
 
+    async def afetch_returned_insert_columns(self, cursor, returning_params):
+        """
+        Given a cursor object that has just performed an INSERT...RETURNING
+        statement into a table, return the newly created data.
+        """
+        return await cursor.fetchone()
+
     def field_cast_sql(self, db_type, internal_type):
         """
         Given a column type (e.g. 'BLOB', 'VARCHAR') and an internal type
@@ -471,6 +478,16 @@ class BaseDatabaseOperations:
             with self.connection.cursor() as cursor:
                 for sql in sql_list:
                     cursor.execute(sql)
+
+    async def aexecute_sql_flush(self, sql_list):
+        """Execute a list of SQL statements to flush the database."""
+        with transaction.atomic(
+            using=self.connection.alias,
+            savepoint=self.connection.features.can_rollback_ddl,
+        ):
+            with self.connection.cursor() as cursor:
+                for sql in sql_list:
+                    await cursor.execute(sql)
 
     def sequence_reset_by_name_sql(self, style, sequences):
         """

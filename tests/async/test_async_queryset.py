@@ -4,7 +4,7 @@ from datetime import datetime
 
 from asgiref.sync import async_to_sync, sync_to_async
 
-from django.db import NotSupportedError, connection
+from django.db import NotSupportedError, connection, new_connection
 from django.db.models import Prefetch, Sum
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
@@ -13,22 +13,24 @@ from .models import RelatedModel, SimpleModel
 
 class AsyncQuerySetTest(TestCase):
     @classmethod
-    def setUpTestData(cls):
-        cls.s1 = SimpleModel.objects.create(
-            field=1,
-            created=datetime(2022, 1, 1, 0, 0, 0),
-        )
-        cls.s2 = SimpleModel.objects.create(
-            field=2,
-            created=datetime(2022, 1, 1, 0, 0, 1),
-        )
-        cls.s3 = SimpleModel.objects.create(
-            field=3,
-            created=datetime(2022, 1, 1, 0, 0, 2),
-        )
-        cls.r1 = RelatedModel.objects.create(simple=cls.s1)
-        cls.r2 = RelatedModel.objects.create(simple=cls.s2)
-        cls.r3 = RelatedModel.objects.create(simple=cls.s3)
+    @async_to_sync
+    async def setUpTestData(cls):
+        async with new_connection():
+            cls.s1 = await SimpleModel.objects.acreate(
+                field=1,
+                created=datetime(2022, 1, 1, 0, 0, 0),
+            )
+            cls.s2 = await SimpleModel.objects.acreate(
+                field=2,
+                created=datetime(2022, 1, 1, 0, 0, 1),
+            )
+            cls.s3 = await SimpleModel.objects.acreate(
+                field=3,
+                created=datetime(2022, 1, 1, 0, 0, 2),
+            )
+            cls.r1 = await RelatedModel.objects.acreate(simple=cls.s1)
+            cls.r2 = await RelatedModel.objects.acreate(simple=cls.s2)
+            cls.r3 = await RelatedModel.objects.acreate(simple=cls.s3)
 
     @staticmethod
     def _get_db_feature(connection_, feature_name):
@@ -39,15 +41,17 @@ class AsyncQuerySetTest(TestCase):
 
     async def test_async_iteration(self):
         results = []
-        async for m in SimpleModel.objects.order_by("pk"):
-            results.append(m)
+        async with new_connection():
+            async for m in SimpleModel.objects.order_by("pk"):
+                results.append(m)
         self.assertEqual(results, [self.s1, self.s2, self.s3])
 
     async def test_aiterator(self):
-        qs = SimpleModel.objects.aiterator()
-        results = []
-        async for m in qs:
-            results.append(m)
+        async with new_connection():
+            qs = SimpleModel.objects.aiterator()
+            results = []
+            async for m in qs:
+                results.append(m)
         self.assertCountEqual(results, [self.s1, self.s2, self.s3])
 
     async def test_aiterator_prefetch_related(self):
