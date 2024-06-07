@@ -728,7 +728,7 @@ def unordered_list(value, autoescape=True):
 def add(value, arg):
     """Add the arg to the value."""
     try:
-        return int(value) + int(arg)
+        return float(value) + float(arg)
     except (ValueError, TypeError):
         try:
             return value + arg
