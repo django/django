@@ -57,7 +57,7 @@ class Storage:
         """
         return "%s_%s%s" % (file_root, get_random_string(7), file_ext)
     
-    def seprarate_dirname_filename(self, filename): 
+    def seprarate_dirname_filename(self, filename):
         """
         Return a tuple of dirname and filename.
         This method can be overridden to customize how the filename is split.
