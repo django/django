@@ -222,10 +222,25 @@ and put the following Python code in it:
     def index(request):
         return HttpResponse("Hello, world. You're at the polls index.")
 
-This is the simplest view possible in Django. To call the view, we need to map
-it to a URL - and for this we need a URLconf.
+This is the most basic view possible in Django. To access it in a browser, we
+need to map it to a URL - and for this we need to define a URL configuration,
+or "URLconf" for short. These URL configurations are defined inside each
+Django app, and they are Python files named ``urls.py``.
 
-To create a URLconf in the polls directory, create a file called ``urls.py``.
+To define a URLconf for the ``polls`` app, create a file ``polls/urls.py``
+with the following content:
+
+.. code-block:: python
+    :caption: ``polls/urls.py``
+
+    from django.urls import path
+
+    from . import views
+
+    urlpatterns = [
+        path("", views.index, name="index"),
+    ]
+
 Your app directory should now look like:
 
 .. code-block:: text
@@ -241,21 +256,9 @@ Your app directory should now look like:
         urls.py
         views.py
 
-In the ``polls/urls.py`` file include the following code:
-
-.. code-block:: python
-    :caption: ``polls/urls.py``
-
-    from django.urls import path
-
-    from . import views
-
-    urlpatterns = [
-        path("", views.index, name="index"),
-    ]
-
-The next step is to point the root URLconf at the ``polls.urls`` module. In
-``mysite/urls.py``, add an import for ``django.urls.include`` and insert an
+The next step is to configure the global URLconf in the ``mysite`` project to
+include the URLconf defined in ``polls.urls``. To do this, add an import for
+``django.urls.include`` in ``mysite/urls.py`` and insert an
 :func:`~django.urls.include` in the ``urlpatterns`` list, so you have:
 
 .. code-block:: python
