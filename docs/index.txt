@@ -27,7 +27,7 @@ Are you new to Django or to programming? This is the place to start!
 
 * **Advanced Tutorials:**
   :doc:`How to write reusable apps <intro/reusable-apps>` |
-  :doc:`Writing your first patch for Django <intro/contributing>`
+  :doc:`Writing your first contribution to Django <intro/contributing>`
 
 Getting help
 ============
