@@ -251,7 +251,15 @@ class RequestContext(Context):
         processors = template.engine.template_context_processors + self._processors
         updates = {}
         for processor in processors:
-            updates.update(processor(self.request))
+            context = processor(self.request)
+            try:
+                updates.update(context)
+            except TypeError as e:
+                raise TypeError(
+                    f"Context processor {processor.__qualname__} didn't return a "
+                    "dictionary."
+                ) from e
+
         self.dicts[self._processors_index] = updates
 
         try:

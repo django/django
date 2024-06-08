@@ -16,7 +16,3 @@ Formset API reference. For introductory material about formsets, see the
     Returns a ``FormSet`` class for the given ``form`` class.
 
     See :doc:`formsets </topics/forms/formsets>` for example usage.
-
-    .. versionchanged:: 4.0
-
-        The ``renderer`` argument was added.

@@ -88,9 +88,10 @@ under a permissive open source license. :source:`A copy of the Python license
 Which sites use Django?
 =======================
 
-`DjangoSites.org`_ features a constantly growing list of Django-powered sites.
+`BuiltWithDjango.com`_ features a constantly growing list of Django-powered
+sites.
 
-.. _DjangoSites.org: https://djangosites.org
+.. _BuiltWithDjango.com: https://builtwithdjango.com/projects/
 
 .. _faq-mtv:
 
@@ -195,7 +196,9 @@ It's difficult to give an official citation format, for two reasons: citation
 formats can vary wildly between publications, and citation standards for
 software are still a matter of some debate.
 
-For example, `APA style`_,  would dictate something like::
+For example, `APA style`_,  would dictate something like:
+
+.. code-block:: text
 
     Django (Version 1.5) [Computer Software]. (2013). Retrieved from https://www.djangoproject.com/.
 

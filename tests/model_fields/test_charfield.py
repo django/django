@@ -75,11 +75,11 @@ class ValidationTests(SimpleTestCase):
             f.clean("not a", None)
 
     def test_enum_choices_cleans_valid_string(self):
-        f = models.CharField(choices=self.Choices.choices, max_length=1)
+        f = models.CharField(choices=self.Choices, max_length=1)
         self.assertEqual(f.clean("c", None), "c")
 
     def test_enum_choices_invalid_input(self):
-        f = models.CharField(choices=self.Choices.choices, max_length=1)
+        f = models.CharField(choices=self.Choices, max_length=1)
         msg = "Value 'a' is not a valid choice."
         with self.assertRaisesMessage(ValidationError, msg):
             f.clean("a", None)
@@ -89,3 +89,18 @@ class ValidationTests(SimpleTestCase):
         msg = "This field cannot be null."
         with self.assertRaisesMessage(ValidationError, msg):
             f.clean(None, None)
+
+    def test_callable_choices(self):
+        def get_choices():
+            return {str(i): f"Option {i}" for i in range(3)}
+
+        f = models.CharField(max_length=1, choices=get_choices)
+
+        for i in get_choices():
+            with self.subTest(i=i):
+                self.assertEqual(i, f.clean(i, None))
+
+        with self.assertRaises(ValidationError):
+            f.clean("A", None)
+        with self.assertRaises(ValidationError):
+            f.clean("3", None)

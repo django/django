@@ -69,6 +69,11 @@ class TwoFields(models.Model):
     name = models.CharField(max_length=15, null=True)
 
 
+class FieldsWithDbColumns(models.Model):
+    rank = models.IntegerField(unique=True, db_column="rAnK")
+    name = models.CharField(max_length=15, null=True, db_column="oTheRNaMe")
+
+
 class UpsertConflict(models.Model):
     number = models.IntegerField(unique=True)
     rank = models.IntegerField()

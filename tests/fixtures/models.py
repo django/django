@@ -101,9 +101,15 @@ class ProxySpy(Spy):
         proxy = True
 
 
+class VisaManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().prefetch_related("permissions")
+
+
 class Visa(models.Model):
     person = models.ForeignKey(Person, models.CASCADE)
     permissions = models.ManyToManyField(Permission, blank=True)
+    objects = VisaManager()
 
     def __str__(self):
         return "%s %s" % (

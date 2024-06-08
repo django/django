@@ -1,18 +1,20 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# NullIsNot0 <nullisnot0@inbox.lv>, 2017
+# Edgars Voroboks <edgars.voroboks@gmail.com>, 2023
+# Edgars Voroboks <edgars.voroboks@gmail.com>, 2017,2022
 # Jannis Leidel <jannis@leidel.info>, 2011
-# NullIsNot0 <nullisnot0@inbox.lv>, 2020-2021
+# Edgars Voroboks <edgars.voroboks@gmail.com>, 2020-2021
 # peterisb <pb@sungis.lv>, 2016
+# Pēteris Caune, 2023
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-01-25 22:47+0000\n"
-"Last-Translator: NullIsNot0 <nullisnot0@inbox.lv>\n"
-"Language-Team: Latvian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2023-09-18 15:04-0300\n"
+"PO-Revision-Date: 2023-12-04 07:59+0000\n"
+"Last-Translator: Edgars Voroboks <edgars.voroboks@gmail.com>, 2023\n"
+"Language-Team: Latvian (http://app.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -31,8 +33,8 @@ msgid ""
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
 msgstr ""
 "Šis ir saraksts ar pieejamajiem %s. Tev ir jāizvēlas atbilstošās vērtības "
-"atzīmējot izvēlēs zemāk esošajā sarakstā un pēc tam spiežot pogu \"Izvēlēties"
-"\", lai pārvietotu starp izvēļu sarakstiem."
+"atzīmējot izvēlēs zemāk esošajā sarakstā un pēc tam spiežot pogu "
+"\"Izvēlēties\", lai pārvietotu starp izvēļu sarakstiem."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -68,12 +70,23 @@ msgstr ""
 "atzīmējot izvēlēs zemāk esošajā sarakstā un pēc tam spiežot pogu \"Izņemt\", "
 "lai izņemtu no izvēlēto ierakstu saraksta."
 
+#, javascript-format
+msgid "Type into this box to filter down the list of selected %s."
+msgstr "Rakstiet šajā laukā, lai filtrētu atlasīto %s sarakstu."
+
 msgid "Remove all"
 msgstr "Izņemt visu"
 
 #, javascript-format
 msgid "Click to remove all chosen %s at once."
 msgstr "Izvēlies, lai izņemtu visas %s izvēles vienā reizē."
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] "%s atlasītās opcijas nav redzamas"
+msgstr[1] "%s atlasītā opcija nav redzama"
+msgstr[2] "%s atlasītās opcijas nav redzamas"
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -237,6 +250,55 @@ msgstr "Nov"
 msgctxt "abbrev. month December"
 msgid "Dec"
 msgstr "Dec"
+
+msgid "Sunday"
+msgstr "Svētdiena"
+
+msgid "Monday"
+msgstr "Pirmdiena"
+
+msgid "Tuesday"
+msgstr "Otrdiena"
+
+msgid "Wednesday"
+msgstr "Trešdiena"
+
+msgid "Thursday"
+msgstr "Ceturtdiena"
+
+msgid "Friday"
+msgstr "Piektdiena"
+
+msgid "Saturday"
+msgstr "Sestdiena"
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr "Sv"
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr "Pr"
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr "Ot"
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr "Tr"
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr "Ce"
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr "Pi"
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr "Se"
 
 msgctxt "one letter Sunday"
 msgid "S"

@@ -1,5 +1,5 @@
 import re
-from urllib.parse import urlparse
+from urllib.parse import urlsplit
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
@@ -46,19 +46,18 @@ class CommonMiddleware(MiddlewareMixin):
 
         # Check for a redirect based on settings.PREPEND_WWW
         host = request.get_host()
-        must_prepend = settings.PREPEND_WWW and host and not host.startswith("www.")
-        redirect_url = ("%s://www.%s" % (request.scheme, host)) if must_prepend else ""
 
-        # Check if a slash should be appended
-        if self.should_redirect_with_slash(request):
-            path = self.get_full_path_with_slash(request)
-        else:
-            path = request.get_full_path()
+        if settings.PREPEND_WWW and host and not host.startswith("www."):
+            # Check if we also need to append a slash so we can do it all
+            # with a single redirect. (This check may be somewhat expensive,
+            # so we only do it if we already know we're sending a redirect,
+            # or in process_response if we get a 404.)
+            if self.should_redirect_with_slash(request):
+                path = self.get_full_path_with_slash(request)
+            else:
+                path = request.get_full_path()
 
-        # Return a redirect if necessary
-        if redirect_url or path != request.get_full_path():
-            redirect_url += path
-            return self.response_redirect_class(redirect_url)
+            return self.response_redirect_class(f"{request.scheme}://www.{host}{path}")
 
     def should_redirect_with_slash(self, request):
         """
@@ -79,12 +78,12 @@ class CommonMiddleware(MiddlewareMixin):
         Return the full path of the request with a trailing slash appended.
 
         Raise a RuntimeError if settings.DEBUG is True and request.method is
-        POST, PUT, or PATCH.
+        DELETE, POST, PUT, or PATCH.
         """
         new_path = request.get_full_path(force_append_slash=True)
         # Prevent construction of scheme relative urls.
         new_path = escape_leading_slashes(new_path)
-        if settings.DEBUG and request.method in ("POST", "PUT", "PATCH"):
+        if settings.DEBUG and request.method in ("DELETE", "POST", "PUT", "PATCH"):
             raise RuntimeError(
                 "You called this URL via %(method)s, but the URL doesn't end "
                 "in a slash and you have APPEND_SLASH set. Django can't "
@@ -172,7 +171,7 @@ class BrokenLinkEmailsMiddleware(MiddlewareMixin):
 
         # The referer is equal to the current URL, ignoring the scheme (assumed
         # to be a poorly implemented bot).
-        parsed_referer = urlparse(referer)
+        parsed_referer = urlsplit(referer)
         if parsed_referer.netloc in ["", domain] and parsed_referer.path == uri:
             return True
 

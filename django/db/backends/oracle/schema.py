@@ -11,15 +11,13 @@ from django.utils.duration import duration_iso_string
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
-
     sql_create_column = "ALTER TABLE %(table)s ADD %(column)s %(definition)s"
-    sql_alter_column_type = "MODIFY %(column)s %(type)s"
+    sql_alter_column_type = "MODIFY %(column)s %(type)s%(collation)s"
     sql_alter_column_null = "MODIFY %(column)s NULL"
     sql_alter_column_not_null = "MODIFY %(column)s NOT NULL"
     sql_alter_column_default = "MODIFY %(column)s DEFAULT %(default)s"
     sql_alter_column_no_default = "MODIFY %(column)s DEFAULT NULL"
     sql_alter_column_no_default_null = sql_alter_column_no_default
-    sql_alter_column_collate = "MODIFY %(column)s %(type)s%(collation)s"
 
     sql_delete_column = "ALTER TABLE %(table)s DROP COLUMN %(column)s"
     sql_create_column_inline_fk = (
@@ -34,7 +32,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         elif isinstance(value, datetime.timedelta):
             return "'%s'" % duration_iso_string(value)
         elif isinstance(value, str):
-            return "'%s'" % value.replace("'", "''").replace("%", "%%")
+            return "'%s'" % value.replace("'", "''")
         elif isinstance(value, (bytes, bytearray, memoryview)):
             return "'%s'" % value.hex()
         elif isinstance(value, bool):
@@ -91,6 +89,14 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             elif "ORA-30673" in description and old_field.primary_key:
                 self._delete_primary_key(model, strict=True)
                 self._alter_field_type_workaround(model, old_field, new_field)
+            # If a collation is changing on a primary key, drop the primary key
+            # first.
+            elif "ORA-43923" in description and old_field.primary_key:
+                self._delete_primary_key(model, strict=True)
+                self.alter_field(model, old_field, new_field, strict)
+                # Restore a primary key, if needed.
+                if new_field.primary_key:
+                    self.execute(self._create_primary_key_sql(model, new_field))
             else:
                 raise
 
@@ -117,7 +123,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Add it
         self.add_field(model, new_temp_field)
         # Explicit data type conversion
-        # https://docs.oracle.com/en/database/oracle/oracle-database/18/sqlrf
+        # https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf
         # /Data-Type-Comparison-Rules.html#GUID-D0C5A47E-6F93-4C2D-9E49-4F2B86B359DD
         new_value = self.quote_name(old_field.column)
         old_type = old_field.db_type(self.connection)
@@ -161,7 +167,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                         self._create_fk_sql(rel.related_model, rel.field, "_fk")
                     )
 
-    def _alter_column_type_sql(self, model, old_field, new_field, new_type):
+    def _alter_column_type_sql(
+        self, model, old_field, new_field, new_type, old_collation, new_collation
+    ):
         auto_field_types = {"AutoField", "BigAutoField", "SmallAutoField"}
         # Drop the identity if migrating away from AutoField.
         if (
@@ -170,7 +178,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             and self._is_identity_column(model._meta.db_table, new_field.column)
         ):
             self._drop_identity(model._meta.db_table, new_field.column)
-        return super()._alter_column_type_sql(model, old_field, new_field, new_type)
+        return super()._alter_column_type_sql(
+            model, old_field, new_field, new_type, old_collation, new_collation
+        )
 
     def normalize_name(self, name):
         """
@@ -234,9 +244,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             )
             return cursor.fetchone()[0]
 
-    def _alter_column_collation_sql(self, model, new_field, new_type, new_collation):
-        if new_collation is None:
-            new_collation = self._get_default_collation(model._meta.db_table)
-        return super()._alter_column_collation_sql(
-            model, new_field, new_type, new_collation
-        )
+    def _collate_sql(self, collation, old_collation=None, table_name=None):
+        if collation is None and old_collation is not None:
+            collation = self._get_default_collation(table_name)
+        return super()._collate_sql(collation, old_collation, table_name)

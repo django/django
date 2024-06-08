@@ -1,4 +1,4 @@
-from django.forms import Textarea
+from django.forms import CharField, Form, Textarea
 from django.utils.safestring import mark_safe
 
 from .base import WidgetTest
@@ -61,4 +61,18 @@ class TextareaTest(WidgetTest):
                 '<textarea rows="10" cols="40" name="msg">pre &quot;quoted&quot; value'
                 "</textarea>"
             ),
+        )
+
+    def test_fieldset(self):
+        class TestForm(Form):
+            template_name = "forms_tests/use_fieldset.html"
+            field = CharField(widget=self.widget)
+
+        form = TestForm()
+        self.assertIs(self.widget.use_fieldset, False)
+        self.assertHTMLEqual(
+            '<div><label for="id_field">Field:</label>'
+            '<textarea cols="40" id="id_field" name="field" '
+            'required rows="10"></textarea></div>',
+            form.render(),
         )

@@ -4,15 +4,20 @@ from unittest import mock
 
 from django.db import connection, transaction
 from django.db.models import (
+    BooleanField,
     Case,
     Count,
     DecimalField,
+    ExpressionWrapper,
     F,
     FilteredRelation,
     Q,
     Sum,
+    Value,
     When,
 )
+from django.db.models.functions import Concat
+from django.db.models.lookups import Exact, IStartsWith
 from django.test import TestCase
 from django.test.testcases import skipUnlessDBFeature
 
@@ -70,7 +75,7 @@ class FilteredRelationTests(TestCase):
             .order_by("pk", "book_join__pk")
         )
         with self.assertNumQueries(1):
-            self.assertQuerysetEqual(
+            self.assertQuerySetEqual(
                 qs,
                 [
                     (self.author1, self.book1, self.editor_a, self.author1),
@@ -90,7 +95,7 @@ class FilteredRelationTests(TestCase):
             .select_related("author_join", "editor_join")
             .order_by("pk")
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [
                 (self.book1, self.author1, self.editor_a),
@@ -120,7 +125,7 @@ class FilteredRelationTests(TestCase):
             .order_by("pk")
         )
         with self.assertNumQueries(1):
-            self.assertQuerysetEqual(
+            self.assertQuerySetEqual(
                 qs,
                 [
                     (self.book1, self.author1),
@@ -143,7 +148,7 @@ class FilteredRelationTests(TestCase):
                 .order_by("pk")
             )
             with self.assertNumQueries(1):
-                self.assertQuerysetEqual(
+                self.assertQuerySetEqual(
                     qs,
                     [
                         (self.book1, self.author1),
@@ -155,7 +160,7 @@ class FilteredRelationTests(TestCase):
                 )
 
     def test_without_join(self):
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             Author.objects.annotate(
                 book_alice=FilteredRelation(
                     "book", condition=Q(book__title__iexact="poem by alice")
@@ -209,6 +214,34 @@ class FilteredRelationTests(TestCase):
                 connection.ops.quote_name("filtered_relation_book")
             ),
             str(queryset.query),
+        )
+
+    def test_multiple(self):
+        qs = (
+            Author.objects.annotate(
+                book_title_alice=FilteredRelation(
+                    "book", condition=Q(book__title__contains="Alice")
+                ),
+                book_title_jane=FilteredRelation(
+                    "book", condition=Q(book__title__icontains="Jane")
+                ),
+            )
+            .filter(name="Jane")
+            .values("book_title_alice__title", "book_title_jane__title")
+        )
+        empty = "" if connection.features.interprets_empty_strings_as_nulls else None
+        self.assertCountEqual(
+            qs,
+            [
+                {
+                    "book_title_alice__title": empty,
+                    "book_title_jane__title": "The book by Jane A",
+                },
+                {
+                    "book_title_alice__title": empty,
+                    "book_title_jane__title": "The book by Jane B",
+                },
+            ],
         )
 
     def test_with_multiple_filter(self):
@@ -380,7 +413,7 @@ class FilteredRelationTests(TestCase):
     def test_defer(self):
         # One query for the list and one query for the deferred title.
         with self.assertNumQueries(2):
-            self.assertQuerysetEqual(
+            self.assertQuerySetEqual(
                 Author.objects.annotate(
                     book_alice=FilteredRelation(
                         "book", condition=Q(book__title__iexact="poem by alice")
@@ -430,7 +463,7 @@ class FilteredRelationTests(TestCase):
             .order_by("pk", "book_editor_worked_with__pk")
         )
         with self.assertNumQueries(1):
-            self.assertQuerysetEqual(
+            self.assertQuerySetEqual(
                 qs,
                 [
                     (self.author1, self.editor_a),
@@ -539,7 +572,7 @@ class FilteredRelationTests(TestCase):
             )
             .order_by("author", "book_title", "preferred_by_author_pk")
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [
                 ("Alice", "The book by Alice", None),
@@ -566,7 +599,7 @@ class FilteredRelationTests(TestCase):
             .order_by("pk", "author_favorite_book_editor__pk")
         )
         with self.assertNumQueries(1):
-            self.assertQuerysetEqual(
+            self.assertQuerySetEqual(
                 qs,
                 [
                     (self.book1, self.editor_b),
@@ -600,6 +633,26 @@ class FilteredRelationTests(TestCase):
                     condition=Q(book__author__name__icontains="book"),
                 ),
             )
+
+    def test_condition_with_exact_lookup_outside_relation_name(self):
+        qs = Author.objects.annotate(
+            book_editor=FilteredRelation(
+                "book__editor",
+                condition=Q(book__author__name="book"),
+            ),
+        ).filter(book_editor__isnull=True)
+        self.assertEqual(qs.count(), 4)
+
+    def test_condition_with_func_and_lookup_outside_relation_name(self):
+        qs = Author.objects.annotate(
+            book_editor=FilteredRelation(
+                "book__editor",
+                condition=Q(
+                    book__title=Concat(Value("The book by "), F("book__author__name"))
+                ),
+            ),
+        ).filter(book_editor__isnull=False)
+        self.assertEqual(qs.count(), 1)
 
     def test_condition_deeper_relation_name(self):
         msg = (
@@ -656,6 +709,134 @@ class FilteredRelationTests(TestCase):
         self.assertEqual(
             FilteredRelation("book", condition=Q(book__title="b")), mock.ANY
         )
+
+    def test_conditional_expression(self):
+        qs = Author.objects.annotate(
+            the_book=FilteredRelation("book", condition=Q(Value(False))),
+        ).filter(the_book__isnull=False)
+        self.assertSequenceEqual(qs, [])
+
+    def test_expression_outside_relation_name(self):
+        qs = Author.objects.annotate(
+            book_editor=FilteredRelation(
+                "book__editor",
+                condition=Q(
+                    Exact(F("book__author__name"), "Alice"),
+                    Value(True),
+                    book__title__startswith="Poem",
+                ),
+            ),
+        ).filter(book_editor__isnull=False)
+        self.assertSequenceEqual(qs, [self.author1])
+
+    def test_conditional_expression_with_case(self):
+        qs = Book.objects.annotate(
+            alice_author=FilteredRelation(
+                "author",
+                condition=Q(
+                    Case(When(author__name="Alice", then=True), default=False),
+                ),
+            ),
+        ).filter(alice_author__isnull=False)
+        self.assertCountEqual(qs, [self.book1, self.book4])
+
+    def test_conditional_expression_outside_relation_name(self):
+        tests = [
+            Q(Case(When(book__author__name="Alice", then=True), default=False)),
+            Q(
+                ExpressionWrapper(
+                    Q(Value(True), Exact(F("book__author__name"), "Alice")),
+                    output_field=BooleanField(),
+                ),
+            ),
+        ]
+        for condition in tests:
+            with self.subTest(condition=condition):
+                qs = Author.objects.annotate(
+                    book_editor=FilteredRelation("book__editor", condition=condition),
+                ).filter(book_editor__isnull=True)
+                self.assertSequenceEqual(qs, [self.author2, self.author2])
+
+    def test_conditional_expression_with_lookup(self):
+        lookups = [
+            Q(book__title__istartswith="poem"),
+            Q(IStartsWith(F("book__title"), "poem")),
+        ]
+        for condition in lookups:
+            with self.subTest(condition=condition):
+                qs = Author.objects.annotate(
+                    poem_book=FilteredRelation("book", condition=condition)
+                ).filter(poem_book__isnull=False)
+                self.assertSequenceEqual(qs, [self.author1])
+
+    def test_conditional_expression_with_expressionwrapper(self):
+        qs = Author.objects.annotate(
+            poem_book=FilteredRelation(
+                "book",
+                condition=Q(
+                    ExpressionWrapper(
+                        Q(Exact(F("book__title"), "Poem by Alice")),
+                        output_field=BooleanField(),
+                    ),
+                ),
+            ),
+        ).filter(poem_book__isnull=False)
+        self.assertSequenceEqual(qs, [self.author1])
+
+    def test_conditional_expression_with_multiple_fields(self):
+        qs = Author.objects.annotate(
+            my_books=FilteredRelation(
+                "book__author",
+                condition=Q(Exact(F("book__author__name"), F("book__author__name"))),
+            ),
+        ).filter(my_books__isnull=True)
+        self.assertSequenceEqual(qs, [])
+
+    def test_conditional_expression_rhs_contains_relation_name(self):
+        qs = Book.objects.annotate(
+            rel=FilteredRelation(
+                "editor",
+                condition=Q(id=1 * F("number_editor")),
+            )
+        ).filter(rel__isnull=True)
+        self.assertSequenceEqual(qs, [])
+
+    def test_conditional_expression_rhs_startswith_relation_name(self):
+        qs = Book.objects.annotate(
+            rel=FilteredRelation(
+                "editor",
+                condition=Q(id=1 * F("editor_number")),
+            )
+        ).filter(rel__isnull=True)
+        self.assertSequenceEqual(qs, [])
+
+    def test_conditional_expression_lhs_startswith_relation_name(self):
+        qs = Book.objects.annotate(
+            rel=FilteredRelation(
+                "editor",
+                condition=Q(editor_number__gt=1),
+            )
+        ).filter(rel__isnull=True)
+        self.assertSequenceEqual(qs, [])
+
+    def test_conditional_expression_lhs_contains_relation_name(self):
+        qs = Book.objects.annotate(
+            rel=FilteredRelation(
+                "editor",
+                condition=Q(number_editor__gt=1),
+            )
+        ).filter(rel__isnull=True)
+        self.assertSequenceEqual(qs, [])
+
+    def test_conditional_expression_does_not_support_queryset(self):
+        msg = "Passing a QuerySet within a FilteredRelation is not supported."
+        with self.assertRaisesMessage(ValueError, msg):
+            Author.objects.annotate(
+                poem_book=FilteredRelation(
+                    "book",
+                    condition=Q(book__in=Book.objects.filter(title__istartswith="a")),
+                ),
+            ).filter(poem_book__isnull=False)
 
 
 class FilteredRelationAggregationTests(TestCase):
@@ -763,6 +944,47 @@ class FilteredRelationAggregationTests(TestCase):
         self.assertEqual(qs.count(), 1)
         self.assertSequenceEqual(
             qs.annotate(total=Count("pk")).values("total"), [{"total": 1}]
+        )
+
+    def test_condition_spans_join(self):
+        self.assertSequenceEqual(
+            Book.objects.annotate(
+                contains_editor_author=FilteredRelation(
+                    "author", condition=Q(author__name__icontains=F("editor__name"))
+                )
+            ).filter(
+                contains_editor_author__isnull=False,
+            ),
+            [self.book1],
+        )
+
+    def test_condition_spans_join_chained(self):
+        self.assertSequenceEqual(
+            Book.objects.annotate(
+                contains_editor_author=FilteredRelation(
+                    "author", condition=Q(author__name__icontains=F("editor__name"))
+                ),
+                contains_editor_author_ref=FilteredRelation(
+                    "author",
+                    condition=Q(author__name=F("contains_editor_author__name")),
+                ),
+            ).filter(
+                contains_editor_author_ref__isnull=False,
+            ),
+            [self.book1],
+        )
+
+    def test_condition_self_ref(self):
+        self.assertSequenceEqual(
+            Book.objects.annotate(
+                contains_author=FilteredRelation(
+                    "author",
+                    condition=Q(title__icontains=F("author__name")),
+                )
+            ).filter(
+                contains_author__isnull=False,
+            ),
+            [self.book1],
         )
 
 

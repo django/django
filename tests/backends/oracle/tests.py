@@ -43,8 +43,9 @@ class Tests(TestCase):
         An 'almost right' datetime works with configured NLS parameters
         (#18465).
         """
+        suffix = connection.features.bare_select_suffix
         with connection.cursor() as cursor:
-            query = "select 1 from dual where '1936-12-29 00:00' < sysdate"
+            query = f"SELECT 1{suffix} WHERE '1936-12-29 00:00' < SYSDATE"
             # The query succeeds without errors - pre #18465 this
             # wasn't the case.
             cursor.execute(query)
@@ -103,6 +104,8 @@ class TransactionalTests(TransactionTestCase):
                 cursor.execute('DROP TRIGGER "TRG_NO_DATA_FOUND"')
 
     def test_password_with_at_sign(self):
+        from django.db.backends.oracle.base import Database
+
         old_password = connection.settings_dict["PASSWORD"]
         connection.settings_dict["PASSWORD"] = "p@ssword"
         try:
@@ -110,8 +113,8 @@ class TransactionalTests(TransactionTestCase):
                 '/"p@ssword"@',
                 connection.client.connect_string(connection.settings_dict),
             )
-            with self.assertRaises(DatabaseError) as context:
-                connection.cursor()
+            with self.assertRaises(Database.DatabaseError) as context:
+                connection.connect()
             # Database exception: "ORA-01017: invalid username/password" is
             # expected.
             self.assertIn("ORA-01017", context.exception.args[0].message)

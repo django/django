@@ -1,6 +1,7 @@
 """
 Unit tests for reverse URL lookups.
 """
+
 import pickle
 import sys
 import threading
@@ -89,7 +90,7 @@ resolve_test_data = (
         "mixed-args",
         views.empty_view,
         (),
-        {"arg2": "37"},
+        {"extra": True, "arg2": "37"},
     ),
     (
         "/included/mixed_args/42/37/",
@@ -1455,7 +1456,7 @@ class RequestURLconfTests(SimpleTestCase):
 
 
 class ErrorHandlerResolutionTests(SimpleTestCase):
-    """Tests for handler400, handler404 and handler500"""
+    """Tests for handler400, handler403, handler404 and handler500"""
 
     def setUp(self):
         urlconf = "urlpatterns_reverse.urls_error_handlers"
@@ -1464,12 +1465,12 @@ class ErrorHandlerResolutionTests(SimpleTestCase):
         self.callable_resolver = URLResolver(RegexPattern(r"^$"), urlconf_callables)
 
     def test_named_handlers(self):
-        for code in [400, 404, 500]:
+        for code in [400, 403, 404, 500]:
             with self.subTest(code=code):
                 self.assertEqual(self.resolver.resolve_error_handler(code), empty_view)
 
     def test_callable_handlers(self):
-        for code in [400, 404, 500]:
+        for code in [400, 403, 404, 500]:
             with self.subTest(code=code):
                 self.assertEqual(
                     self.callable_resolver.resolve_error_handler(code), empty_view
@@ -1552,6 +1553,16 @@ class ResolverMatchTests(SimpleTestCase):
             "ResolverMatch(func=urlpatterns_reverse.views.empty_view, "
             "args=('42', '37'), kwargs={}, url_name='no-kwargs', app_names=[], "
             "namespaces=[], route='^no_kwargs/([0-9]+)/([0-9]+)/$')",
+        )
+
+    def test_repr_extra_kwargs(self):
+        self.assertEqual(
+            repr(resolve("/mixed_args/1986/11/")),
+            "ResolverMatch(func=urlpatterns_reverse.views.empty_view, args=(), "
+            "kwargs={'arg2': '11', 'extra': True}, url_name='mixed-args', "
+            "app_names=[], namespaces=[], "
+            "route='^mixed_args/([0-9]+)/(?P<arg2>[0-9]+)/$', "
+            "captured_kwargs={'arg2': '11'}, extra_kwargs={'extra': True})",
         )
 
     @override_settings(ROOT_URLCONF="urlpatterns_reverse.reverse_lazy_urls")
@@ -1758,3 +1769,18 @@ class LookaheadTests(SimpleTestCase):
             with self.subTest(name=name, kwargs=kwargs):
                 with self.assertRaises(NoReverseMatch):
                     reverse(name, kwargs=kwargs)
+
+
+@override_settings(ROOT_URLCONF="urlpatterns_reverse.urls")
+class ReverseResolvedTests(SimpleTestCase):
+    def test_rereverse(self):
+        match = resolve("/resolved/12/")
+        self.assertEqual(
+            reverse(match.url_name, args=match.args, kwargs=match.kwargs),
+            "/resolved/12/",
+        )
+        match = resolve("/resolved-overridden/12/url/")
+        self.assertEqual(
+            reverse(match.url_name, args=match.args, kwargs=match.captured_kwargs),
+            "/resolved-overridden/12/url/",
+        )

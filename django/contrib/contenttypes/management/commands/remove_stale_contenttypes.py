@@ -3,11 +3,13 @@ import itertools
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from django.core.management import BaseCommand
-from django.db import DEFAULT_DB_ALIAS, router
+from django.db import DEFAULT_DB_ALIAS, connections, router
 from django.db.models.deletion import Collector
 
 
 class Command(BaseCommand):
+    help = "Deletes stale content types in the database."
+
     def add_arguments(self, parser):
         parser.add_argument(
             "--noinput",
@@ -19,6 +21,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--database",
             default=DEFAULT_DB_ALIAS,
+            choices=tuple(connections),
             help='Nominates the database to use. Defaults to the "default" database.',
         )
         parser.add_argument(
@@ -72,18 +75,18 @@ class Command(BaseCommand):
                                 )
                     content_type_display = "\n".join(ct_info)
                     self.stdout.write(
-                        """Some content types in your database are stale and can be deleted.
-Any objects that depend on these content types will also be deleted.
-The content types and dependent objects that would be deleted are:
-
-%s
-
-This list doesn't include any cascade deletions to data outside of Django's
-models (uncommon).
-
-Are you sure you want to delete these content types?
-If you're unsure, answer 'no'."""
-                        % content_type_display
+                        "Some content types in your database are stale and can be "
+                        "deleted.\n"
+                        "Any objects that depend on these content types will also be "
+                        "deleted.\n"
+                        "The content types and dependent objects that would be deleted "
+                        "are:\n\n"
+                        f"{content_type_display}\n\n"
+                        "This list doesn't include any cascade deletions to data "
+                        "outside of Django\n"
+                        "models (uncommon).\n\n"
+                        "Are you sure you want to delete these content types?\n"
+                        "If you're unsure, answer 'no'."
                     )
                     ok_to_delete = input("Type 'yes' to continue, or 'no' to cancel: ")
                 else:

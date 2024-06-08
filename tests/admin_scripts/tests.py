@@ -3,6 +3,7 @@ A series of tests to establish that the command-line management tools work as
 advertised - especially with regards to the handling of the
 DJANGO_SETTINGS_MODULE and default settings.py files.
 """
+
 import os
 import re
 import shutil
@@ -32,7 +33,7 @@ from django.db.migrations.recorder import MigrationRecorder
 from django.test import LiveServerTestCase, SimpleTestCase, TestCase, override_settings
 from django.test.utils import captured_stderr, captured_stdout
 from django.urls import path
-from django.utils.version import PY39
+from django.utils.version import PY313
 from django.views.static import serve
 
 from . import urls
@@ -107,7 +108,7 @@ class AdminScriptTestCase(SimpleTestCase):
                 paths.append(os.path.dirname(backend_dir))
         return paths
 
-    def run_test(self, args, settings_file=None, apps=None, umask=None):
+    def run_test(self, args, settings_file=None, apps=None, umask=-1):
         base_dir = os.path.dirname(self.test_dir)
         # The base dir for Django's tests is one level up.
         tests_dir = os.path.dirname(os.path.dirname(__file__))
@@ -136,12 +137,11 @@ class AdminScriptTestCase(SimpleTestCase):
             cwd=self.test_dir,
             env=test_environ,
             text=True,
-            # subprocess.run()'s umask was added in Python 3.9.
-            **({"umask": umask} if umask and PY39 else {}),
+            umask=umask,
         )
         return p.stdout, p.stderr
 
-    def run_django_admin(self, args, settings_file=None, umask=None):
+    def run_django_admin(self, args, settings_file=None, umask=-1):
         return self.run_test(["-m", "django", *args], settings_file, umask=umask)
 
     def run_manage(self, args, settings_file=None, manage_py=None):
@@ -759,7 +759,9 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         with open(os.path.join(app_path, "apps.py"), encoding="utf8") as f:
             content = f.read()
             self.assertIn("class こんにちはConfig(AppConfig)", content)
-            self.assertIn('name = "こんにちは"' if HAS_BLACK else "name = 'こんにちは'", content)
+            self.assertIn(
+                'name = "こんにちは"' if HAS_BLACK else "name = 'こんにちは'", content
+            )
 
     def test_builtin_command(self):
         """
@@ -1587,6 +1589,24 @@ class ManageRunserver(SimpleTestCase):
         call_command(self.cmd, addrport="7000")
         self.assertServerSettings("127.0.0.1", "7000")
 
+    def test_zero_ip_addr(self):
+        self.cmd.addr = "0"
+        self.cmd._raw_ipv6 = False
+        self.cmd.on_bind("8000")
+        self.assertIn(
+            "Starting development server at http://0.0.0.0:8000/",
+            self.output.getvalue(),
+        )
+
+    def test_on_bind(self):
+        self.cmd.addr = "127.0.0.1"
+        self.cmd._raw_ipv6 = False
+        self.cmd.on_bind("14437")
+        self.assertIn(
+            "Starting development server at http://127.0.0.1:14437/",
+            self.output.getvalue(),
+        )
+
     @unittest.skipUnless(socket.has_ipv6, "platform doesn't support IPv6")
     def test_runner_addrport_ipv6(self):
         call_command(self.cmd, addrport="", use_ipv6=True)
@@ -1882,10 +1902,16 @@ class CommandTypes(AdminScriptTestCase):
         ]
         for option in expected_options:
             self.assertOutput(out, f"[{option}]")
-        self.assertOutput(out, "--option_a OPTION_A, -a OPTION_A")
-        self.assertOutput(out, "--option_b OPTION_B, -b OPTION_B")
-        self.assertOutput(out, "--option_c OPTION_C, -c OPTION_C")
-        self.assertOutput(out, "-v {0,1,2,3}, --verbosity {0,1,2,3}")
+        if PY313:
+            self.assertOutput(out, "--option_a, -a OPTION_A")
+            self.assertOutput(out, "--option_b, -b OPTION_B")
+            self.assertOutput(out, "--option_c, -c OPTION_C")
+            self.assertOutput(out, "-v, --verbosity {0,1,2,3}")
+        else:
+            self.assertOutput(out, "--option_a OPTION_A, -a OPTION_A")
+            self.assertOutput(out, "--option_b OPTION_B, -b OPTION_B")
+            self.assertOutput(out, "--option_c OPTION_C, -c OPTION_C")
+            self.assertOutput(out, "-v {0,1,2,3}, --verbosity {0,1,2,3}")
 
     def test_color_style(self):
         style = color.no_style()
@@ -2275,6 +2301,35 @@ class Discovery(SimpleTestCase):
             self.assertEqual(out.getvalue().strip(), "simple_app")
 
 
+class CommandDBOptionChoiceTests(SimpleTestCase):
+    def test_invalid_choice_db_option(self):
+        expected_error = (
+            "Error: argument --database: invalid choice: "
+            "'deflaut' (choose from 'default', 'other')"
+        )
+        args = [
+            "changepassword",
+            "createsuperuser",
+            "remove_stale_contenttypes",
+            "check",
+            "createcachetable",
+            "dbshell",
+            "flush",
+            "dumpdata",
+            "inspectdb",
+            "loaddata",
+            "showmigrations",
+            "sqlflush",
+            "sqlmigrate",
+            "sqlsequencereset",
+            "migrate",
+        ]
+
+        for arg in args:
+            with self.assertRaisesMessage(CommandError, expected_error):
+                call_command(arg, "--database", "deflaut", verbosity=0)
+
+
 class ArgumentOrder(AdminScriptTestCase):
     """Tests for 2-stage argument parsing scheme.
 
@@ -2363,7 +2418,6 @@ class ExecuteFromCommandLine(SimpleTestCase):
 
 @override_settings(ROOT_URLCONF="admin_scripts.urls")
 class StartProject(LiveServerTestCase, AdminScriptTestCase):
-
     available_apps = [
         "admin_scripts",
         "django.contrib.auth",
@@ -2432,6 +2486,28 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         )
         self.assertFalse(os.path.exists(testproject_dir))
 
+    def test_command_does_not_import(self):
+        """
+        startproject doesn't import modules (and cannot be fooled by a module
+        raising ImportError).
+        """
+        bad_name = "raises_import_error"
+        args = ["startproject", bad_name]
+        testproject_dir = os.path.join(self.test_dir, bad_name)
+
+        with open(os.path.join(self.test_dir, "raises_import_error.py"), "w") as f:
+            f.write("raise ImportError")
+
+        out, err = self.run_django_admin(args)
+        self.assertOutput(
+            err,
+            "CommandError: 'raises_import_error' conflicts with the name of an "
+            "existing Python module and cannot be used as a project name. Please try "
+            "another name.",
+        )
+        self.assertNoOutput(out)
+        self.assertFalse(os.path.exists(testproject_dir))
+
     def test_simple_project_different_directory(self):
         """
         The startproject management command creates a project in a specific
@@ -2467,6 +2543,23 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, "additional_dir")))
+
+    def test_custom_project_template_non_python_files_not_formatted(self):
+        template_path = os.path.join(custom_templates_dir, "project_template")
+        args = ["startproject", "--template", template_path, "customtestproject"]
+        testproject_dir = os.path.join(self.test_dir, "customtestproject")
+
+        _, err = self.run_django_admin(args)
+        self.assertNoOutput(err)
+        with open(
+            os.path.join(template_path, "additional_dir", "requirements.in")
+        ) as f:
+            expected = f.read()
+        with open(
+            os.path.join(testproject_dir, "additional_dir", "requirements.in")
+        ) as f:
+            result = f.read()
+        self.assertEqual(expected, result)
 
     def test_template_dir_with_trailing_slash(self):
         "Ticket 17475: Template dir passed has a trailing path separator"
@@ -2559,7 +2652,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
             urls.urlpatterns = old_urlpatterns
 
     def test_project_template_tarball_url(self):
-        """ "
+        """
         Startproject management command handles project template tar/zip balls
         from non-canonical urls.
         """
@@ -2780,7 +2873,6 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         sys.platform == "win32",
         "Windows only partially supports umasks and chmod.",
     )
-    @unittest.skipUnless(PY39, "subprocess.run()'s umask was added in Python 3.9.")
     def test_honor_umask(self):
         _, err = self.run_django_admin(["startproject", "testproject"], umask=0o077)
         self.assertNoOutput(err)

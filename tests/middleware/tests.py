@@ -3,6 +3,7 @@ import random
 import re
 import struct
 from io import BytesIO
+from unittest import mock
 from urllib.parse import quote
 
 from django.conf import settings
@@ -36,7 +37,6 @@ def get_response_404(request):
 
 @override_settings(ROOT_URLCONF="middleware.urls")
 class CommonMiddlewareTest(SimpleTestCase):
-
     rf = RequestFactory()
 
     @override_settings(APPEND_SLASH=True)
@@ -80,7 +80,11 @@ class CommonMiddlewareTest(SimpleTestCase):
         """
         request = self.rf.get("/slash")
         r = CommonMiddleware(get_response_empty).process_request(request)
+        self.assertIsNone(r)
+        response = HttpResponseNotFound()
+        r = CommonMiddleware(get_response_empty).process_response(request, response)
         self.assertEqual(r.status_code, 301)
+        self.assertEqual(r.url, "/slash/")
 
     @override_settings(APPEND_SLASH=True)
     def test_append_slash_redirect_querystring(self):
@@ -103,11 +107,11 @@ class CommonMiddlewareTest(SimpleTestCase):
         self.assertEqual(resp.url, "/slash/?test=slash/")
 
     @override_settings(APPEND_SLASH=True, DEBUG=True)
-    def test_append_slash_no_redirect_on_POST_in_DEBUG(self):
+    def test_append_slash_no_redirect_in_DEBUG(self):
         """
         While in debug mode, an exception is raised with a warning
-        when a failed attempt is made to POST, PUT, or PATCH to an URL which
-        would normally be redirected to a slashed version.
+        when a failed attempt is made to DELETE, POST, PUT, or PATCH to an URL
+        which would normally be redirected to a slashed version.
         """
         msg = "maintaining %s data. Change your form to point to testserver/slash/"
         request = self.rf.get("/slash")
@@ -120,6 +124,9 @@ class CommonMiddlewareTest(SimpleTestCase):
             CommonMiddleware(get_response_404)(request)
         request = self.rf.get("/slash")
         request.method = "PATCH"
+        with self.assertRaisesMessage(RuntimeError, msg % request.method):
+            CommonMiddleware(get_response_404)(request)
+        request = self.rf.delete("/slash")
         with self.assertRaisesMessage(RuntimeError, msg % request.method):
             CommonMiddleware(get_response_404)(request)
 
@@ -164,6 +171,9 @@ class CommonMiddlewareTest(SimpleTestCase):
         # Use 4 slashes because of RequestFactory behavior.
         request = self.rf.get("////evil.com/security")
         r = CommonMiddleware(get_response_404).process_request(request)
+        self.assertIsNone(r)
+        response = HttpResponseNotFound()
+        r = CommonMiddleware(get_response_404).process_response(request, response)
         self.assertEqual(r.status_code, 301)
         self.assertEqual(r.url, "/%2Fevil.com/security/")
         r = CommonMiddleware(get_response_404)(request)
@@ -354,6 +364,9 @@ class CommonMiddlewareTest(SimpleTestCase):
         request = self.rf.get("/slash")
         request.META["QUERY_STRING"] = "drink=café"
         r = CommonMiddleware(get_response_empty).process_request(request)
+        self.assertIsNone(r)
+        response = HttpResponseNotFound()
+        r = CommonMiddleware(get_response_empty).process_response(request, response)
         self.assertEqual(r.status_code, 301)
 
     def test_response_redirect_class(self):
@@ -379,7 +392,6 @@ class CommonMiddlewareTest(SimpleTestCase):
     MANAGERS=[("PHD", "PHB@dilbert.com")],
 )
 class BrokenLinkEmailsMiddlewareTest(SimpleTestCase):
-
     rf = RequestFactory()
 
     def setUp(self):
@@ -630,7 +642,7 @@ class ConditionalGetMiddlewareTest(SimpleTestCase):
     def test_not_modified_headers(self):
         """
         The 304 Not Modified response should include only the headers required
-        by section 4.1 of RFC 7232, Last-Modified, and the cookies.
+        by RFC 9110 Section 15.4.5, Last-Modified, and the cookies.
         """
 
         def get_response(req):
@@ -679,7 +691,7 @@ class ConditionalGetMiddlewareTest(SimpleTestCase):
 
         response = ConditionalGetMiddleware(self.get_response)(self.req)
         etag = response.headers["ETag"]
-        put_request = self.request_factory.put("/", HTTP_IF_MATCH=etag)
+        put_request = self.request_factory.put("/", headers={"if-match": etag})
         conditional_get_response = ConditionalGetMiddleware(get_200_response)(
             put_request
         )
@@ -842,9 +854,9 @@ class GZipMiddlewareTest(SimpleTestCase):
     def setUp(self):
         self.req = self.request_factory.get("/")
         self.req.META["HTTP_ACCEPT_ENCODING"] = "gzip, deflate"
-        self.req.META[
-            "HTTP_USER_AGENT"
-        ] = "Mozilla/5.0 (Windows NT 5.1; rv:9.0.1) Gecko/20100101 Firefox/9.0.1"
+        self.req.META["HTTP_USER_AGENT"] = (
+            "Mozilla/5.0 (Windows NT 5.1; rv:9.0.1) Gecko/20100101 Firefox/9.0.1"
+        )
         self.resp = HttpResponse()
         self.resp.status_code = 200
         self.resp.content = self.compressible_string
@@ -885,6 +897,28 @@ class GZipMiddlewareTest(SimpleTestCase):
 
         r = GZipMiddleware(get_stream_response)(self.req)
         self.assertEqual(self.decompress(b"".join(r)), b"".join(self.sequence))
+        self.assertEqual(r.get("Content-Encoding"), "gzip")
+        self.assertFalse(r.has_header("Content-Length"))
+
+    async def test_compress_async_streaming_response(self):
+        """
+        Compression is performed on responses with async streaming content.
+        """
+
+        async def get_stream_response(request):
+            async def iterator():
+                for chunk in self.sequence:
+                    yield chunk
+
+            resp = StreamingHttpResponse(iterator())
+            resp["Content-Type"] = "text/html; charset=UTF-8"
+            return resp
+
+        r = await GZipMiddleware(get_stream_response)(self.req)
+        self.assertEqual(
+            self.decompress(b"".join([chunk async for chunk in r])),
+            b"".join(self.sequence),
+        )
         self.assertEqual(r.get("Content-Encoding"), "gzip")
         self.assertFalse(r.has_header("Content-Length"))
 
@@ -968,11 +1002,46 @@ class GZipMiddlewareTest(SimpleTestCase):
         ConditionalGetMiddleware from recognizing conditional matches
         on gzipped content).
         """
-        r1 = GZipMiddleware(self.get_response)(self.req)
-        r2 = GZipMiddleware(self.get_response)(self.req)
+
+        class DeterministicGZipMiddleware(GZipMiddleware):
+            max_random_bytes = 0
+
+        r1 = DeterministicGZipMiddleware(self.get_response)(self.req)
+        r2 = DeterministicGZipMiddleware(self.get_response)(self.req)
         self.assertEqual(r1.content, r2.content)
         self.assertEqual(self.get_mtime(r1.content), 0)
         self.assertEqual(self.get_mtime(r2.content), 0)
+
+    def test_random_bytes(self):
+        """A random number of bytes is added to mitigate the BREACH attack."""
+        with mock.patch(
+            "django.utils.text.secrets.randbelow", autospec=True, return_value=3
+        ):
+            r = GZipMiddleware(self.get_response)(self.req)
+        # The fourth byte of a gzip stream contains flags.
+        self.assertEqual(r.content[3], gzip.FNAME)
+        # A 3 byte filename "aaa" and a null byte are added.
+        self.assertEqual(r.content[10:14], b"aaa\x00")
+        self.assertEqual(self.decompress(r.content), self.compressible_string)
+
+    def test_random_bytes_streaming_response(self):
+        """A random number of bytes is added to mitigate the BREACH attack."""
+
+        def get_stream_response(request):
+            resp = StreamingHttpResponse(self.sequence)
+            resp["Content-Type"] = "text/html; charset=UTF-8"
+            return resp
+
+        with mock.patch(
+            "django.utils.text.secrets.randbelow", autospec=True, return_value=3
+        ):
+            r = GZipMiddleware(get_stream_response)(self.req)
+            content = b"".join(r)
+        # The fourth byte of a gzip stream contains flags.
+        self.assertEqual(content[3], gzip.FNAME)
+        # A 3 byte filename "aaa" and a null byte are added.
+        self.assertEqual(content[10:14], b"aaa\x00")
+        self.assertEqual(self.decompress(content), b"".join(self.sequence))
 
 
 class ETagGZipMiddlewareTest(SimpleTestCase):
@@ -993,7 +1062,7 @@ class ETagGZipMiddlewareTest(SimpleTestCase):
             response.headers["ETag"] = '"eggs"'
             return response
 
-        request = self.rf.get("/", HTTP_ACCEPT_ENCODING="gzip, deflate")
+        request = self.rf.get("/", headers={"accept-encoding": "gzip, deflate"})
         gzip_response = GZipMiddleware(get_response)(request)
         self.assertEqual(gzip_response.headers["ETag"], 'W/"eggs"')
 
@@ -1007,7 +1076,7 @@ class ETagGZipMiddlewareTest(SimpleTestCase):
             response.headers["ETag"] = 'W/"eggs"'
             return response
 
-        request = self.rf.get("/", HTTP_ACCEPT_ENCODING="gzip, deflate")
+        request = self.rf.get("/", headers={"accept-encoding": "gzip, deflate"})
         gzip_response = GZipMiddleware(get_response)(request)
         self.assertEqual(gzip_response.headers["ETag"], 'W/"eggs"')
 
@@ -1017,17 +1086,17 @@ class ETagGZipMiddlewareTest(SimpleTestCase):
         """
 
         def get_response(req):
-            response = HttpResponse(self.compressible_string)
-            return response
+            return HttpResponse(self.compressible_string)
 
         def get_cond_response(req):
             return ConditionalGetMiddleware(get_response)(req)
 
-        request = self.rf.get("/", HTTP_ACCEPT_ENCODING="gzip, deflate")
+        request = self.rf.get("/", headers={"accept-encoding": "gzip, deflate"})
         response = GZipMiddleware(get_cond_response)(request)
         gzip_etag = response.headers["ETag"]
         next_request = self.rf.get(
-            "/", HTTP_ACCEPT_ENCODING="gzip, deflate", HTTP_IF_NONE_MATCH=gzip_etag
+            "/",
+            headers={"accept-encoding": "gzip, deflate", "if-none-match": gzip_etag},
         )
         next_response = ConditionalGetMiddleware(get_response)(next_request)
         self.assertEqual(next_response.status_code, 304)

@@ -143,6 +143,41 @@ class FileResponseTests(SimpleTestCase):
                     '%s; filename="%s"' % (header_disposition, header_filename),
                 )
 
+    def test_content_disposition_escaping(self):
+        # fmt: off
+        tests = [
+            (
+                'multi-part-one";\" dummy".txt',
+                r"multi-part-one\";\" dummy\".txt"
+            ),
+        ]
+        # fmt: on
+        # Non-escape sequence backslashes are path segments on Windows, and are
+        # eliminated by an os.path.basename() check in FileResponse.
+        if sys.platform != "win32":
+            # fmt: off
+            tests += [
+                (
+                    'multi-part-one\\";\" dummy".txt',
+                    r"multi-part-one\\\";\" dummy\".txt"
+                ),
+                (
+                    'multi-part-one\\";\\\" dummy".txt',
+                    r"multi-part-one\\\";\\\" dummy\".txt"
+                )
+            ]
+            # fmt: on
+        for filename, escaped in tests:
+            with self.subTest(filename=filename, escaped=escaped):
+                response = FileResponse(
+                    io.BytesIO(b"binary content"), filename=filename, as_attachment=True
+                )
+                response.close()
+                self.assertEqual(
+                    response.headers["Content-Disposition"],
+                    f'attachment; filename="{escaped}"',
+                )
+
     def test_content_disposition_buffer(self):
         response = FileResponse(io.BytesIO(b"binary content"))
         self.assertFalse(response.has_header("Content-Disposition"))
@@ -218,8 +253,10 @@ class FileResponseTests(SimpleTestCase):
         """
         test_tuples = (
             (".tar.gz", "application/gzip"),
+            (".tar.br", "application/x-brotli"),
             (".tar.bz2", "application/x-bzip"),
             (".tar.xz", "application/x-xz"),
+            (".tar.Z", "application/x-compress"),
         )
         for extension, mimetype in test_tuples:
             with self.subTest(ext=extension):

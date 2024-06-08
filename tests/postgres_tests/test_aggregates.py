@@ -1,20 +1,20 @@
-from django.db import connection
+from django.db import transaction
 from django.db.models import (
     CharField,
     F,
     Func,
     IntegerField,
+    JSONField,
     OuterRef,
     Q,
     Subquery,
     Value,
+    Window,
 )
 from django.db.models.fields.json import KeyTextTransform, KeyTransform
-from django.db.models.functions import Cast, Concat, Substr
-from django.test import skipUnlessDBFeature
-from django.test.utils import Approximate, ignore_warnings
+from django.db.models.functions import Cast, Concat, LPad, Substr
+from django.test.utils import Approximate
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango50Warning
 
 from . import PostgreSQLTestCase
 from .models import AggregateTestModel, HotelReservation, Room, StatTestModel
@@ -82,36 +82,34 @@ class TestGeneralAggregate(PostgreSQLTestCase):
             ]
         )
 
-    @ignore_warnings(category=RemovedInDjango50Warning)
     def test_empty_result_set(self):
         AggregateTestModel.objects.all().delete()
         tests = [
-            (ArrayAgg("char_field"), []),
-            (ArrayAgg("integer_field"), []),
-            (ArrayAgg("boolean_field"), []),
-            (BitAnd("integer_field"), None),
-            (BitOr("integer_field"), None),
-            (BoolAnd("boolean_field"), None),
-            (BoolOr("boolean_field"), None),
-            (JSONBAgg("integer_field"), []),
-            (StringAgg("char_field", delimiter=";"), ""),
+            ArrayAgg("char_field"),
+            ArrayAgg("integer_field"),
+            ArrayAgg("boolean_field"),
+            BitAnd("integer_field"),
+            BitOr("integer_field"),
+            BoolAnd("boolean_field"),
+            BoolOr("boolean_field"),
+            JSONBAgg("integer_field"),
+            StringAgg("char_field", delimiter=";"),
+            BitXor("integer_field"),
         ]
-        if connection.features.has_bit_xor:
-            tests.append((BitXor("integer_field"), None))
-        for aggregation, expected_result in tests:
+        for aggregation in tests:
             with self.subTest(aggregation=aggregation):
                 # Empty result with non-execution optimization.
                 with self.assertNumQueries(0):
                     values = AggregateTestModel.objects.none().aggregate(
                         aggregation=aggregation,
                     )
-                    self.assertEqual(values, {"aggregation": expected_result})
+                    self.assertEqual(values, {"aggregation": None})
                 # Empty result when query must be executed.
                 with self.assertNumQueries(1):
                     values = AggregateTestModel.objects.aggregate(
                         aggregation=aggregation,
                     )
-                    self.assertEqual(values, {"aggregation": expected_result})
+                    self.assertEqual(values, {"aggregation": None})
 
     def test_default_argument(self):
         AggregateTestModel.objects.all().delete()
@@ -123,14 +121,18 @@ class TestGeneralAggregate(PostgreSQLTestCase):
             (BitOr("integer_field", default=0), 0),
             (BoolAnd("boolean_field", default=False), False),
             (BoolOr("boolean_field", default=False), False),
-            (JSONBAgg("integer_field", default=Value('["<empty>"]')), ["<empty>"]),
+            (JSONBAgg("integer_field", default=["<empty>"]), ["<empty>"]),
+            (
+                JSONBAgg("integer_field", default=Value(["<empty>"], JSONField())),
+                ["<empty>"],
+            ),
+            (StringAgg("char_field", delimiter=";", default="<empty>"), "<empty>"),
             (
                 StringAgg("char_field", delimiter=";", default=Value("<empty>")),
                 "<empty>",
             ),
+            (BitXor("integer_field", default=0), 0),
         ]
-        if connection.features.has_bit_xor:
-            tests.append((BitXor("integer_field", default=0), 0))
         for aggregation, expected_result in tests:
             with self.subTest(aggregation=aggregation):
                 # Empty result with non-execution optimization.
@@ -140,64 +142,11 @@ class TestGeneralAggregate(PostgreSQLTestCase):
                     )
                     self.assertEqual(values, {"aggregation": expected_result})
                 # Empty result when query must be executed.
-                with self.assertNumQueries(1):
+                with transaction.atomic(), self.assertNumQueries(1):
                     values = AggregateTestModel.objects.aggregate(
                         aggregation=aggregation,
                     )
                     self.assertEqual(values, {"aggregation": expected_result})
-
-    def test_convert_value_deprecation(self):
-        AggregateTestModel.objects.all().delete()
-        queryset = AggregateTestModel.objects.all()
-
-        with self.assertWarnsMessage(
-            RemovedInDjango50Warning, ArrayAgg.deprecation_msg
-        ):
-            queryset.aggregate(aggregation=ArrayAgg("boolean_field"))
-
-        with self.assertWarnsMessage(
-            RemovedInDjango50Warning, JSONBAgg.deprecation_msg
-        ):
-            queryset.aggregate(aggregation=JSONBAgg("integer_field"))
-
-        with self.assertWarnsMessage(
-            RemovedInDjango50Warning, StringAgg.deprecation_msg
-        ):
-            queryset.aggregate(aggregation=StringAgg("char_field", delimiter=";"))
-
-        # No warnings raised if default argument provided.
-        self.assertEqual(
-            queryset.aggregate(aggregation=ArrayAgg("boolean_field", default=None)),
-            {"aggregation": None},
-        )
-        self.assertEqual(
-            queryset.aggregate(aggregation=JSONBAgg("integer_field", default=None)),
-            {"aggregation": None},
-        )
-        self.assertEqual(
-            queryset.aggregate(
-                aggregation=StringAgg("char_field", delimiter=";", default=None),
-            ),
-            {"aggregation": None},
-        )
-        self.assertEqual(
-            queryset.aggregate(
-                aggregation=ArrayAgg("boolean_field", default=Value([]))
-            ),
-            {"aggregation": []},
-        )
-        self.assertEqual(
-            queryset.aggregate(
-                aggregation=JSONBAgg("integer_field", default=Value("[]"))
-            ),
-            {"aggregation": []},
-        )
-        self.assertEqual(
-            queryset.aggregate(
-                aggregation=StringAgg("char_field", delimiter=";", default=Value("")),
-            ),
-            {"aggregation": ""},
-        )
 
     def test_array_agg_charfield(self):
         values = AggregateTestModel.objects.aggregate(arrayagg=ArrayAgg("char_field"))
@@ -286,6 +235,16 @@ class TestGeneralAggregate(PostgreSQLTestCase):
         )
         self.assertEqual(values, {"arrayagg": ["en", "pl"]})
 
+    def test_array_agg_filter_and_ordering_params(self):
+        values = AggregateTestModel.objects.aggregate(
+            arrayagg=ArrayAgg(
+                "char_field",
+                filter=Q(json_field__has_key="lang"),
+                ordering=LPad(Cast("integer_field", CharField()), 2, Value("0")),
+            )
+        )
+        self.assertEqual(values, {"arrayagg": ["Foo2", "Foo4"]})
+
     def test_array_agg_filter(self):
         values = AggregateTestModel.objects.aggregate(
             arrayagg=ArrayAgg("integer_field", filter=Q(integer_field__gt=0)),
@@ -306,6 +265,49 @@ class TestGeneralAggregate(PostgreSQLTestCase):
             .values_list("array", flat=True)
         )
         self.assertCountEqual(qs.get(), [1, 2])
+
+    def test_array_agg_filter_index(self):
+        aggr1 = AggregateTestModel.objects.create(integer_field=1)
+        aggr2 = AggregateTestModel.objects.create(integer_field=2)
+        StatTestModel.objects.bulk_create(
+            [
+                StatTestModel(related_field=aggr1, int1=1, int2=0),
+                StatTestModel(related_field=aggr1, int1=2, int2=1),
+                StatTestModel(related_field=aggr2, int1=3, int2=0),
+                StatTestModel(related_field=aggr2, int1=4, int2=1),
+            ]
+        )
+        qs = (
+            AggregateTestModel.objects.filter(pk__in=[aggr1.pk, aggr2.pk])
+            .annotate(
+                array=ArrayAgg("stattestmodel__int1", filter=Q(stattestmodel__int2=0))
+            )
+            .annotate(array_value=F("array__0"))
+            .values_list("array_value", flat=True)
+        )
+        self.assertCountEqual(qs, [1, 3])
+
+    def test_array_agg_filter_slice(self):
+        aggr1 = AggregateTestModel.objects.create(integer_field=1)
+        aggr2 = AggregateTestModel.objects.create(integer_field=2)
+        StatTestModel.objects.bulk_create(
+            [
+                StatTestModel(related_field=aggr1, int1=1, int2=0),
+                StatTestModel(related_field=aggr1, int1=2, int2=1),
+                StatTestModel(related_field=aggr2, int1=3, int2=0),
+                StatTestModel(related_field=aggr2, int1=4, int2=1),
+                StatTestModel(related_field=aggr2, int1=5, int2=0),
+            ]
+        )
+        qs = (
+            AggregateTestModel.objects.filter(pk__in=[aggr1.pk, aggr2.pk])
+            .annotate(
+                array=ArrayAgg("stattestmodel__int1", filter=Q(stattestmodel__int2=0))
+            )
+            .annotate(array_value=F("array__1_2"))
+            .values_list("array_value", flat=True)
+        )
+        self.assertCountEqual(qs, [[], [5]])
 
     def test_bit_and_general(self):
         values = AggregateTestModel.objects.filter(integer_field__in=[0, 1]).aggregate(
@@ -343,7 +345,6 @@ class TestGeneralAggregate(PostgreSQLTestCase):
         )
         self.assertEqual(values, {"bitor": 0})
 
-    @skipUnlessDBFeature("has_bit_xor")
     def test_bit_xor_general(self):
         AggregateTestModel.objects.create(integer_field=3)
         values = AggregateTestModel.objects.filter(
@@ -351,14 +352,12 @@ class TestGeneralAggregate(PostgreSQLTestCase):
         ).aggregate(bitxor=BitXor("integer_field"))
         self.assertEqual(values, {"bitxor": 2})
 
-    @skipUnlessDBFeature("has_bit_xor")
     def test_bit_xor_on_only_true_values(self):
         values = AggregateTestModel.objects.filter(
             integer_field=1,
         ).aggregate(bitxor=BitXor("integer_field"))
         self.assertEqual(values, {"bitxor": 1})
 
-    @skipUnlessDBFeature("has_bit_xor")
     def test_bit_xor_on_only_false_values(self):
         values = AggregateTestModel.objects.filter(
             integer_field=0,
@@ -668,6 +667,31 @@ class TestGeneralAggregate(PostgreSQLTestCase):
             qs.first().integers,
             inner_qs.values_list("integer_field", flat=True),
         )
+
+    def test_window(self):
+        self.assertCountEqual(
+            AggregateTestModel.objects.annotate(
+                integers=Window(
+                    expression=ArrayAgg("char_field"),
+                    partition_by=F("integer_field"),
+                )
+            ).values("integers", "char_field"),
+            [
+                {"integers": ["Foo1", "Foo3"], "char_field": "Foo1"},
+                {"integers": ["Foo1", "Foo3"], "char_field": "Foo3"},
+                {"integers": ["Foo2"], "char_field": "Foo2"},
+                {"integers": ["Foo4"], "char_field": "Foo4"},
+            ],
+        )
+
+    def test_values_list(self):
+        tests = [ArrayAgg("integer_field"), JSONBAgg("integer_field")]
+        for aggregation in tests:
+            with self.subTest(aggregation=aggregation):
+                self.assertCountEqual(
+                    AggregateTestModel.objects.values_list(aggregation),
+                    [([0],), ([1],), ([2],), ([0],)],
+                )
 
 
 class TestAggregateDistinct(PostgreSQLTestCase):

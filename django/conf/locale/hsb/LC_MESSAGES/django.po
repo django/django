@@ -1,22 +1,22 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Michael Wolf <milupo@sorbzilla.de>, 2016-2021
+# Michael Wolf <milupo@sorbzilla.de>, 2016-2023
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-11-23 23:48+0000\n"
-"Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
-"Language-Team: Upper Sorbian (http://www.transifex.com/django/django/"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 06:49+0000\n"
+"Last-Translator: Michael Wolf <milupo@sorbzilla.de>, 2016-2023\n"
+"Language-Team: Upper Sorbian (http://app.transifex.com/django/django/"
 "language/hsb/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: hsb\n"
-"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n"
-"%100==4 ? 2 : 3);\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || "
+"n%100==4 ? 2 : 3);\n"
 
 msgid "Afrikaans"
 msgstr "Afrikaanšćina"
@@ -50,6 +50,9 @@ msgstr "Bosnišćina"
 
 msgid "Catalan"
 msgstr "Katalanšćina"
+
+msgid "Central Kurdish (Sorani)"
+msgstr "Centralna kurdišćina (Sorani)"
 
 msgid "Czech"
 msgstr "Čěšćina"
@@ -291,6 +294,9 @@ msgstr "Tataršćina"
 msgid "Udmurt"
 msgstr "Udmurtšćina"
 
+msgid "Uyghur"
+msgstr "Ujguršćina"
+
 msgid "Ukrainian"
 msgstr "Ukrainšćina"
 
@@ -386,6 +392,20 @@ msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "Zawěsćće, zo tuta hódnota je wjetša hač abo runja %(limit_value)s."
 
 #, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr ""
+"Zawěsćće, zo tuta hódnota je množina kročeloweje wulkosće %(limit_value)s."
+
+#, python-format
+msgid ""
+"Ensure this value is a multiple of step size %(limit_value)s, starting from "
+"%(offset)s, e.g. %(offset)s, %(valid_value1)s, %(valid_value2)s, and so on."
+msgstr ""
+"Zawěsćće, zo tuta hódnota je mnoho króć kročeloweje wulkosće "
+"%(limit_value)s, započinajo z %(offset)s, na př. %(offset)s, "
+"%(valid_value1)s, %(valid_value2)s a tak dale."
+
+#, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
 "%(show_value)d)."
@@ -473,6 +493,10 @@ msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr "%(model_name)s z tutym %(field_labels)s hižo eksistuje."
 
 #, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr "Wobmjezowanje \"%(name)s\" je překročene."
+
+#, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Hódnota %(value)r płaćiwa wólba njeje."
 
@@ -486,8 +510,8 @@ msgstr "Tute polo njesmě prózdne być."
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s z tutym %(field_label)s hižo eksistuje."
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -512,6 +536,9 @@ msgstr "Boolean (pak True pak False)"
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "Znamješkowy rjećazk (hač  %(max_length)s)"
+
+msgid "String (unlimited)"
+msgstr "Znamješkowy rjećazk (njewobmjezowany)"
 
 msgid "Comma-separated integers"
 msgstr "Cyłe ličby dźělene přez komu"
@@ -791,20 +818,20 @@ msgstr ""
 "Móžeće zmylkowu rozprawu spisać, jeli problem dale eksistuje."
 
 #, python-format
-msgid "Please submit at most %d form."
-msgid_plural "Please submit at most %d forms."
-msgstr[0] "Prošu wotpósćelće maksimalnje %d formular."
-msgstr[1] "Prošu wotpósćelće maksimalnje %d formularaj."
-msgstr[2] "Prošu wotpósćelće maksimalnje %d formulary."
-msgstr[3] "Prošu wotpósćelće maksimalnje %d formularow."
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] "Prošu wotposćelće maksimalnje %(num)d formular."
+msgstr[1] "Prošu wotposćelće maksimalnje %(num)d formularaj."
+msgstr[2] "Prošu wotposćelće maksimalnje %(num)d formulary."
+msgstr[3] "Prošu wotposćelće maksimalnje %(num)d formularow."
 
 #, python-format
-msgid "Please submit at least %d form."
-msgid_plural "Please submit at least %d forms."
-msgstr[0] "Prošu wotpósćelće minimalnje %d formular."
-msgstr[1] "Prošu wotpósćelće minimalnje %d formularaj."
-msgstr[2] "Prošu wotpósćelće minimalnje %d formulary."
-msgstr[3] "Prošu wotpósćelće minimalnje %d formularow."
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] "Prošu zapodajće znajmjeńša %(num)d formu."
+msgstr[1] "Prošu zapodajće znajmjeńša %(num)d formje."
+msgstr[2] "Prošu zapodajće znajmjeńša %(num)d formy."
+msgstr[3] "Prošu zapodajće znajmjeńša %(num)d formow."
 
 msgid "Order"
 msgstr "Porjad"
@@ -1222,8 +1249,8 @@ msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
 "including the “Referrer-Policy: no-referrer” header, please remove them. The "
 "CSRF protection requires the “Referer” header to do strict referer checking. "
-"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" …> for links to third-party sites."
+"If you’re concerned about privacy, use alternatives like <a "
+"rel=\"noreferrer\" …> for links to third-party sites."
 msgstr ""
 "Jeli značku  wužiwaće abo hłowu „Referrer-Policy: no-referrer“ zapřijimaće, "
 "wotstrońće je prošu. CSRF-škit trjeba hłowu „Referer“ , zo by striktnu "
@@ -1322,13 +1349,14 @@ msgstr ""
 #, python-format
 msgid ""
 "You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> is in your settings file and you have not configured any "
-"URLs."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
+"configured any URLs."
 msgstr ""
 "Widźiće tutu stronu, dokelž <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> je we wašej dataji nastajenjow a njejsće URL skonfigurował."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> je we wašej dataji nastajenjow a njejsće URL "
+"skonfigurował."
 
 msgid "Django Documentation"
 msgstr "Dokumentacija Django"

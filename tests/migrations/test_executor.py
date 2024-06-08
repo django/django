@@ -405,9 +405,9 @@ class ExecutorTests(MigrationTestBase):
             migrations_apps = executor.loader.project_state(
                 ("migrations", "0001_initial"),
             ).apps
-            global_apps.get_app_config("migrations").models[
-                "author"
-            ] = migrations_apps.get_model("migrations", "author")
+            global_apps.get_app_config("migrations").models["author"] = (
+                migrations_apps.get_model("migrations", "author")
+            )
             try:
                 migration = executor.loader.get_migration("auth", "0001_initial")
                 self.assertIs(executor.detect_soft_applied(None, migration)[0], True)

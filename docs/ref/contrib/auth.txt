@@ -67,14 +67,14 @@ Fields
 
     .. attribute:: is_staff
 
-        Boolean. Designates whether this user can access the admin site.
+        Boolean. Allows this user to access the admin site.
 
     .. attribute:: is_active
 
-        Boolean. Designates whether this user account should be considered
-        active. We recommend that you set this flag to ``False`` instead of
-        deleting accounts; that way, if your applications have any foreign keys
-        to users, the foreign keys won't break.
+        Boolean. Marks this user account as active. We recommend that you set
+        this flag to ``False`` instead of deleting accounts. That way, if your
+        applications have any foreign keys to users, the foreign keys won't
+        break.
 
         This doesn't necessarily control whether or not the user can log in.
         Authentication backends aren't required to check for the ``is_active``
@@ -94,8 +94,8 @@ Fields
 
     .. attribute:: is_superuser
 
-        Boolean. Designates that this user has all permissions without
-        explicitly assigning them.
+        Boolean. Treats this user as having all permissions without assigning
+        any permission to it in particular.
 
     .. attribute:: last_login
 
@@ -103,8 +103,7 @@ Fields
 
     .. attribute:: date_joined
 
-        A datetime designating when the account was created. Is set to the
-        current date/time by default when the account is created.
+        The date/time when the account was created.
 
 Attributes
 ----------
@@ -166,6 +165,9 @@ Methods
         were used.
 
     .. method:: check_password(raw_password)
+    .. method:: acheck_password(raw_password)
+
+        *Asynchronous version*: ``acheck_password()``
 
         Returns ``True`` if the given raw string is the correct password for
         the user. (This takes care of the password hashing in making the
@@ -181,6 +183,12 @@ Methods
 
         You may need this if authentication for your application takes place
         against an existing external source such as an LDAP directory.
+
+        .. admonition:: Password reset restriction
+
+            Users having an unusable password will not able to request a
+            password reset email via
+            :class:`~django.contrib.auth.views.PasswordResetView`.
 
     .. method:: has_usable_password()
 
@@ -666,10 +674,6 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
         if it wasn't provided to :func:`~django.contrib.auth.authenticate`
         (which passes it on to the backend).
 
-        .. versionchanged:: 4.1
-
-            The ``created`` argument was added.
-
     .. method:: user_can_authenticate()
 
         Returns whether the user is allowed to authenticate. This method
@@ -690,6 +694,9 @@ Utility functions
 .. currentmodule:: django.contrib.auth
 
 .. function:: get_user(request)
+.. function:: aget_user(request)
+
+    *Asynchronous version*: ``aget_user()``
 
     Returns the user model instance associated with the given ``request``’s
     session.
@@ -699,10 +706,14 @@ Utility functions
     ``get_user()`` method to retrieve the user model instance and then verifies
     the session by calling the user model's
     :meth:`~django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash`
-    method.
+    method. If the verification fails and :setting:`SECRET_KEY_FALLBACKS` are
+    provided, it verifies the session against each fallback key using
+    :meth:`~django.contrib.auth.models.AbstractBaseUser.\
+    get_session_auth_fallback_hash`.
 
     Returns an instance of :class:`~django.contrib.auth.models.AnonymousUser`
     if the authentication backend stored in the session is no longer in
     :setting:`AUTHENTICATION_BACKENDS`, if a user isn't returned by the
     backend's ``get_user()`` method, or if the session auth hash doesn't
     validate.
+

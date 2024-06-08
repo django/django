@@ -3,6 +3,7 @@
 # Translators:
 # Abe Estrada, 2011-2013
 # Claude Paroz <claude@2xlibre.net>, 2020
+# Gustavo López Hernández, 2022
 # Jesús Bautista <jesbam98@gmail.com>, 2019-2020
 # Sergio Benitez <sb@sergio.bz>, 2021
 # zodman <zodman@gmail.com>, 2011
@@ -10,9 +11,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-02-17 03:02+0000\n"
-"Last-Translator: Sergio Benitez <sb@sergio.bz>\n"
+"POT-Creation-Date: 2022-05-17 05:23-0500\n"
+"PO-Revision-Date: 2022-07-25 06:49+0000\n"
+"Last-Translator: Gustavo López Hernández\n"
 "Language-Team: Spanish (Mexico) (http://www.transifex.com/django/django/"
 "language/es_MX/)\n"
 "MIME-Version: 1.0\n"
@@ -210,6 +211,9 @@ msgstr "Mongol"
 msgid "Marathi"
 msgstr ""
 
+msgid "Malay"
+msgstr ""
+
 msgid "Burmese"
 msgstr "burmés"
 
@@ -386,6 +390,10 @@ msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "Asegúrese de que este valor sea mayor o igual a %(limit_value)s."
 
 #, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr ""
+
+#, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
 "%(show_value)d)."
@@ -453,6 +461,10 @@ msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr ""
 
 #, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr ""
+
+#, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "El valor %(value)r no es una opción válida."
 
@@ -466,8 +478,8 @@ msgstr "Este campo no puede estar en blanco."
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "Ya existe un/a %(model_name)s con este/a %(field_label)s."
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -500,12 +512,16 @@ msgid ""
 "“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
+"“%(value)s” : el valor tiene un formato de fecha inválido. Debería estar en "
+"el formato YYYY-MM-DD."
 
 #, python-format
 msgid ""
 "“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
+"“%(value)s” : el valor tiene el formato correcto (YYYY-MM-DD) pero es una "
+"fecha inválida."
 
 msgid "Date (without time)"
 msgstr "Fecha (sin hora)"
@@ -515,6 +531,8 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
+"'%(value)s' tiene un formato de fecha no válido. Este valor debe estar en el "
+"formato AAAA-MM-DD HH:MM[:ss[.uuuuuu]][TZ]."
 
 #, python-format
 msgid ""
@@ -638,7 +656,7 @@ msgstr "El valor debe ser JSON válido"
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr ""
+msgstr "La instancia de %(model)s con %(field)s %(value)r no existe."
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Clave foránea (el tipo está determinado por el campo relacionado)"
@@ -648,11 +666,11 @@ msgstr "Relación uno-a-uno"
 
 #, python-format
 msgid "%(from)s-%(to)s relationship"
-msgstr ""
+msgstr "Relación %(from)s - %(to)s "
 
 #, python-format
 msgid "%(from)s-%(to)s relationships"
-msgstr ""
+msgstr "Relaciones  %(from)s - %(to)s"
 
 msgid "Many-to-many relationship"
 msgstr "Relación muchos-a-muchos"
@@ -683,7 +701,7 @@ msgstr "Introduzca una duración válida."
 
 #, python-brace-format
 msgid "The number of days must be between {min_days} and {max_days}."
-msgstr ""
+msgstr "La cantidad de días debe tener valores entre {min_days} y {max_days}."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr ""
@@ -725,10 +743,10 @@ msgid "Enter a complete value."
 msgstr "Ingrese un valor completo."
 
 msgid "Enter a valid UUID."
-msgstr ""
+msgstr "Ingrese un UUID válido."
 
 msgid "Enter a valid JSON."
-msgstr ""
+msgstr "Ingresa un JSON válido."
 
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
@@ -736,7 +754,7 @@ msgstr ":"
 
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
-msgstr ""
+msgstr "(Campo oculto %(name)s) %(error)s"
 
 #, python-format
 msgid ""
@@ -745,14 +763,14 @@ msgid ""
 msgstr ""
 
 #, python-format
-msgid "Please submit at most %d form."
-msgid_plural "Please submit at most %d forms."
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
 msgstr[0] ""
 msgstr[1] ""
 
 #, python-format
-msgid "Please submit at least %d form."
-msgid_plural "Please submit at least %d forms."
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
 msgstr[0] ""
 msgstr[1] ""
 
@@ -1092,40 +1110,40 @@ msgid ", "
 msgstr ","
 
 #, python-format
-msgid "%d year"
-msgid_plural "%d years"
-msgstr[0] "%d año"
-msgstr[1] "%d años"
+msgid "%(num)d year"
+msgid_plural "%(num)d years"
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
-msgid "%d month"
-msgid_plural "%d months"
-msgstr[0] "%d mes"
-msgstr[1] "%d meses"
+msgid "%(num)d month"
+msgid_plural "%(num)d months"
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
-msgid "%d week"
-msgid_plural "%d weeks"
-msgstr[0] "%d semana"
-msgstr[1] "%d semanas"
+msgid "%(num)d week"
+msgid_plural "%(num)d weeks"
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d día"
-msgstr[1] "%d días"
+msgid "%(num)d day"
+msgid_plural "%(num)d days"
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d hora"
-msgstr[1] "%d horas"
+msgid "%(num)d hour"
+msgid_plural "%(num)d hours"
+msgstr[0] "%(num)d hora"
+msgstr[1] "%(num)d horas"
 
 #, python-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d minuto"
-msgstr[1] "%d minutos"
+msgid "%(num)d minute"
+msgid_plural "%(num)d minutes"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "Forbidden"
 msgstr "Prohibido"
@@ -1135,7 +1153,7 @@ msgstr ""
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a “Referer "
-"header” to be sent by your Web browser, but none was sent. This header is "
+"header” to be sent by your web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""

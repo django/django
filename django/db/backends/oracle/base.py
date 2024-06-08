@@ -1,8 +1,9 @@
 """
 Oracle database backend for Django.
 
-Requires cx_Oracle: https://oracle.github.io/python-cx_Oracle/
+Requires oracledb: https://oracle.github.io/python-oracledb/
 """
+
 import datetime
 import decimal
 import os
@@ -13,9 +14,12 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db import IntegrityError
 from django.db.backends.base.base import BaseDatabaseWrapper
+from django.db.backends.oracle.oracledb_any import oracledb as Database
+from django.db.backends.utils import debug_transaction
 from django.utils.asyncio import async_unsafe
 from django.utils.encoding import force_bytes, force_str
 from django.utils.functional import cached_property
+from django.utils.version import get_version_tuple
 
 
 def _setup_environment(environ):
@@ -48,12 +52,8 @@ _setup_environment(
 )
 
 
-try:
-    import cx_Oracle as Database
-except ImportError as e:
-    raise ImproperlyConfigured("Error loading cx_Oracle module: %s" % e)
-
-# Some of these import cx_Oracle, so import them after checking if it's installed.
+# Some of these import oracledb, so import them after checking if it's
+# installed.
 from .client import DatabaseClient  # NOQA
 from .creation import DatabaseCreation  # NOQA
 from .features import DatabaseFeatures  # NOQA
@@ -69,7 +69,7 @@ def wrap_oracle_errors():
     try:
         yield
     except Database.DatabaseError as e:
-        # cx_Oracle raises a cx_Oracle.DatabaseError exception with the
+        # oracledb raises a oracledb.DatabaseError exception with the
         # following attributes and values:
         #  code = 2091
         #  message = 'ORA-02091: transaction rolled back
@@ -302,11 +302,11 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     @async_unsafe
     def create_cursor(self, name=None):
-        return FormatStylePlaceholderCursor(self.connection)
+        return FormatStylePlaceholderCursor(self.connection, self)
 
     def _commit(self):
         if self.connection is not None:
-            with wrap_oracle_errors():
+            with debug_transaction(self, "COMMIT"), wrap_oracle_errors():
                 return self.connection.commit()
 
     # Oracle doesn't support releasing savepoints. But we fake them when query
@@ -342,13 +342,13 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             return True
 
     @cached_property
-    def cx_oracle_version(self):
-        return tuple(int(x) for x in Database.version.split("."))
-
-    @cached_property
     def oracle_version(self):
         with self.temporary_connection():
             return tuple(int(x) for x in self.connection.version.split("."))
+
+    @cached_property
+    def oracledb_version(self):
+        return get_version_tuple(Database.__version__)
 
 
 class OracleParam:
@@ -371,11 +371,15 @@ class OracleParam:
             param = Oracle_datetime.from_datetime(param)
 
         string_size = 0
-        # Oracle doesn't recognize True and False correctly.
-        if param is True:
-            param = 1
-        elif param is False:
-            param = 0
+        has_boolean_data_type = (
+            cursor.database.features.supports_boolean_expr_in_select_clause
+        )
+        if not has_boolean_data_type:
+            # Oracle < 23c doesn't recognize True and False correctly.
+            if param is True:
+                param = 1
+            elif param is False:
+                param = 0
         if hasattr(param, "bind_parameter"):
             self.force_bytes = param.bind_parameter(cursor)
         elif isinstance(param, (Database.Binary, datetime.timedelta)):
@@ -392,9 +396,11 @@ class OracleParam:
             self.input_size = param.input_size
         elif string_size > 4000:
             # Mark any string param greater than 4000 characters as a CLOB.
-            self.input_size = Database.CLOB
+            self.input_size = Database.DB_TYPE_CLOB
         elif isinstance(param, datetime.datetime):
-            self.input_size = Database.TIMESTAMP
+            self.input_size = Database.DB_TYPE_TIMESTAMP
+        elif has_boolean_data_type and isinstance(param, bool):
+            self.input_size = Database.DB_TYPE_BOOLEAN
         else:
             self.input_size = None
 
@@ -432,9 +438,10 @@ class FormatStylePlaceholderCursor:
 
     charset = "utf-8"
 
-    def __init__(self, connection):
+    def __init__(self, connection, database):
         self.cursor = connection.cursor()
         self.cursor.outputtypehandler = self._output_type_handler
+        self.database = database
 
     @staticmethod
     def _output_number_converter(value):
@@ -452,7 +459,7 @@ class FormatStylePlaceholderCursor:
     def _output_type_handler(cursor, name, defaultType, length, precision, scale):
         """
         Called for each db column fetched from cursors. Return numbers as the
-        appropriate Python type.
+        appropriate Python type, and NCLOB with JSON as strings.
         """
         if defaultType == Database.NUMBER:
             if scale == -127:
@@ -482,6 +489,10 @@ class FormatStylePlaceholderCursor:
                 arraysize=cursor.arraysize,
                 outconverter=outconverter,
             )
+        # oracledb 2.0.0+ returns NLOB columns with IS JSON constraints as
+        # dicts. Use a no-op converter to avoid this.
+        elif defaultType == Database.DB_TYPE_NCLOB:
+            return cursor.var(Database.DB_TYPE_NCLOB, arraysize=cursor.arraysize)
 
     def _format_params(self, params):
         try:
@@ -517,7 +528,7 @@ class FormatStylePlaceholderCursor:
             return [p.force_bytes for p in params]
 
     def _fix_for_params(self, query, params, unify_by_values=False):
-        # cx_Oracle wants no trailing ';' for SQL statements.  For PL/SQL, it
+        # oracledb wants no trailing ';' for SQL statements.  For PL/SQL, it
         # it does want a trailing ';' but not a trailing '/'.  However, these
         # characters must be included in the original query in case the query
         # is being passed to SQL*Plus.
@@ -528,25 +539,35 @@ class FormatStylePlaceholderCursor:
         elif hasattr(params, "keys"):
             # Handle params as dict
             args = {k: ":%s" % k for k in params}
-            query = query % args
+            query %= args
         elif unify_by_values and params:
             # Handle params as a dict with unified query parameters by their
             # values. It can be used only in single query execute() because
             # executemany() shares the formatted query with each of the params
             # list. e.g. for input params = [0.75, 2, 0.75, 'sth', 0.75]
-            # params_dict = {0.75: ':arg0', 2: ':arg1', 'sth': ':arg2'}
+            # params_dict = {
+            #     (float, 0.75): ':arg0',
+            #     (int, 2): ':arg1',
+            #     (str, 'sth'): ':arg2',
+            # }
             # args = [':arg0', ':arg1', ':arg0', ':arg2', ':arg0']
             # params = {':arg0': 0.75, ':arg1': 2, ':arg2': 'sth'}
+            # The type of parameters in param_types keys is necessary to avoid
+            # unifying 0/1 with False/True.
+            param_types = [(type(param), param) for param in params]
             params_dict = {
-                param: ":arg%d" % i for i, param in enumerate(dict.fromkeys(params))
+                param_type: ":arg%d" % i
+                for i, param_type in enumerate(dict.fromkeys(param_types))
             }
-            args = [params_dict[param] for param in params]
-            params = {value: key for key, value in params_dict.items()}
-            query = query % tuple(args)
+            args = [params_dict[param_type] for param_type in param_types]
+            params = {
+                placeholder: param for (_, param), placeholder in params_dict.items()
+            }
+            query %= tuple(args)
         else:
             # Handle params as sequence
             args = [(":arg%d" % i) for i in range(len(params))]
-            query = query % tuple(args)
+            query %= tuple(args)
         return query, self._format_params(params)
 
     def execute(self, query, params=None):

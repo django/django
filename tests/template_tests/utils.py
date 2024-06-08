@@ -1,5 +1,5 @@
-import functools
 import os
+from functools import wraps
 
 from django.template.engine import Engine
 from django.test.utils import override_settings
@@ -46,7 +46,7 @@ def setup(templates, *args, test_once=False):
         # Make Engine.get_default() raise an exception to ensure that tests
         # are properly isolated from Django's global settings.
         @override_settings(TEMPLATES=None)
-        @functools.wraps(func)
+        @wraps(func)
         def inner(self):
             # Set up custom template tag libraries if specified
             libraries = getattr(self, "libraries", {})

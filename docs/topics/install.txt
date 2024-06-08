@@ -79,8 +79,9 @@ databases with Django.
 In addition to a database backend, you'll need to make sure your Python
 database bindings are installed.
 
-* If you're using PostgreSQL, you'll need the `psycopg2`_ package. Refer to the
-  :ref:`PostgreSQL notes <postgresql-notes>` for further details.
+* If you're using PostgreSQL, you'll need the `psycopg`_ or `psycopg2`_
+  package. Refer to the :ref:`PostgreSQL notes <postgresql-notes>` for further
+  details.
 
 * If you're using MySQL or MariaDB, you'll need a :ref:`DB API driver
   <mysql-db-api-drivers>` like ``mysqlclient``. See :ref:`notes for the MySQL
@@ -89,9 +90,9 @@ database bindings are installed.
 * If you're using SQLite you might want to read the :ref:`SQLite backend notes
   <sqlite-notes>`.
 
-* If you're using Oracle, you'll need a copy of cx_Oracle_, but please
-  read the :ref:`notes for the Oracle backend <oracle-notes>` for details
-  regarding supported versions of both Oracle and ``cx_Oracle``.
+* If you're using Oracle, you'll need to install oracledb_, but please read the
+  :ref:`notes for the Oracle backend <oracle-notes>` for details regarding
+  supported versions of both Oracle and ``oracledb``.
 
 * If you're using an unofficial 3rd party backend, please consult the
   documentation provided for any additional requirements.
@@ -111,9 +112,10 @@ database queries, Django will need permission to create a test database.
 .. _PostgreSQL: https://www.postgresql.org/
 .. _MariaDB: https://mariadb.org/
 .. _MySQL: https://www.mysql.com/
+.. _psycopg: https://www.psycopg.org/psycopg3/
 .. _psycopg2: https://www.psycopg.org/
 .. _SQLite: https://www.sqlite.org/
-.. _cx_Oracle: https://oracle.github.io/python-cx_Oracle/
+.. _oracledb: https://oracle.github.io/python-oracledb/
 .. _Oracle: https://www.oracle.com/
 
 .. _install-django-code:

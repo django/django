@@ -10,7 +10,6 @@ def add_book(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("migration_test_data_persistence", "0001_initial")]
 
     operations = [

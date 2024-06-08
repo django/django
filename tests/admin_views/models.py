@@ -9,6 +9,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.core.files.storage import FileSystemStorage
 from django.db import models
+from django.utils import timezone
 
 
 class Section(models.Model):
@@ -66,6 +67,11 @@ class Article(models.Model):
     def model_month(self):
         return self.date.month
 
+    @property
+    @admin.display(description="Is from past?", boolean=True)
+    def model_property_is_from_past(self):
+        return self.date < timezone.now()
+
 
 class Book(models.Model):
     """
@@ -76,6 +82,9 @@ class Book(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return f"/books/{self.id}/"
 
 
 class Promo(models.Model):
@@ -1098,3 +1107,63 @@ class Box(models.Model):
     next_box = models.ForeignKey(
         "self", null=True, on_delete=models.SET_NULL, blank=True
     )
+
+
+class Country(models.Model):
+    NORTH_AMERICA = "North America"
+    SOUTH_AMERICA = "South America"
+    EUROPE = "Europe"
+    ASIA = "Asia"
+    OCEANIA = "Oceania"
+    ANTARCTICA = "Antarctica"
+
+    CONTINENT_CHOICES = [
+        (NORTH_AMERICA, NORTH_AMERICA),
+        (SOUTH_AMERICA, SOUTH_AMERICA),
+        (EUROPE, EUROPE),
+        (ASIA, ASIA),
+        (OCEANIA, OCEANIA),
+        (ANTARCTICA, ANTARCTICA),
+    ]
+    name = models.CharField(max_length=80)
+    continent = models.CharField(max_length=13, choices=CONTINENT_CHOICES)
+
+    def __str__(self):
+        return self.name
+
+
+class Traveler(models.Model):
+    born_country = models.ForeignKey(Country, models.CASCADE)
+    living_country = models.ForeignKey(
+        Country, models.CASCADE, related_name="living_country_set"
+    )
+    favorite_country_to_vacation = models.ForeignKey(
+        Country,
+        models.CASCADE,
+        related_name="favorite_country_to_vacation_set",
+        limit_choices_to={"continent": Country.ASIA},
+    )
+
+
+class Square(models.Model):
+    side = models.IntegerField()
+    area = models.GeneratedField(
+        db_persist=True,
+        expression=models.F("side") * models.F("side"),
+        output_field=models.BigIntegerField(),
+    )
+
+    class Meta:
+        required_db_features = {"supports_stored_generated_columns"}
+
+
+class CamelCaseModel(models.Model):
+    interesting_name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.interesting_name
+
+
+class CamelCaseRelatedModel(models.Model):
+    m2m = models.ManyToManyField(CamelCaseModel, related_name="m2m")
+    fk = models.ForeignKey(CamelCaseModel, on_delete=models.CASCADE, related_name="fk")

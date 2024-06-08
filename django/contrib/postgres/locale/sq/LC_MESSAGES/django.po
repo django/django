@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Besnik Bleta <besnik@programeshqip.org>, 2023
 # Besnik Bleta <besnik@programeshqip.org>, 2017-2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-11 20:56+0200\n"
-"PO-Revision-Date: 2020-05-12 20:01+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-19 09:22+0000\n"
+"Last-Translator: Besnik Bleta <besnik@programeshqip.org>, 2023\n"
 "Language-Team: Albanian (http://www.transifex.com/django/django/language/"
 "sq/)\n"
 "MIME-Version: 1.0\n"
@@ -96,12 +97,14 @@ msgstr "Janë dhënë kyçe të panjohur: %(keys)s"
 
 #, python-format
 msgid ""
-"Ensure that this range is completely less than or equal to %(limit_value)s."
-msgstr "Sigurohuni që ky interval është më pak ose baras me %(limit_value)s."
+"Ensure that the upper bound of the range is not greater than %(limit_value)s."
+msgstr ""
+"Garantoni që kufiri i sipërm i intervalit të mos jetë më i madh se "
+"%(limit_value)s."
 
 #, python-format
 msgid ""
-"Ensure that this range is completely greater than or equal to "
-"%(limit_value)s."
+"Ensure that the lower bound of the range is not less than %(limit_value)s."
 msgstr ""
-"Sigurohuni që ky interval është më i madh ose baras me %(limit_value)s."
+"Garantoni që kufiri i poshtëm i intervalit të mos jetë më i vogël se "
+"%(limit_value)s."

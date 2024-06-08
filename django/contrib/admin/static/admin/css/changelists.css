@@ -90,7 +90,7 @@
 }
 
 #toolbar #searchbar {
-    height: 19px;
+    height: 1.1875rem;
     border: 1px solid var(--border-color);
     padding: 2px 5px;
     margin: 0;
@@ -139,6 +139,12 @@
     margin: 0 0 0 30px;
 }
 
+@media (forced-colors: active) {
+  #changelist-filter {
+      border: 1px solid;
+  }
+}
+
 #changelist-filter h2 {
     font-size: 0.875rem;
     text-transform: uppercase;
@@ -148,10 +154,33 @@
     border-bottom: none;
 }
 
-#changelist-filter h3 {
+#changelist-filter h3,
+#changelist-filter details summary {
     font-weight: 400;
     padding: 0 15px;
     margin-bottom: 10px;
+}
+
+#changelist-filter details summary > * {
+    display: inline;
+}
+
+#changelist-filter details > summary {
+    list-style-type: none;
+}
+
+#changelist-filter details > summary::-webkit-details-marker {
+    display: none;
+}
+
+#changelist-filter details > summary::before {
+    content: '→';
+    font-weight: bold;
+    color: var(--link-hover-color);
+}
+
+#changelist-filter details[open] > summary::before {
+    content: '↓';
 }
 
 #changelist-filter ul {
@@ -192,35 +221,32 @@
     color: var(--link-hover-color);
 }
 
-#changelist-filter #changelist-filter-clear a {
+#changelist-filter #changelist-filter-extra-actions {
     font-size: 0.8125rem;
-    padding-bottom: 10px;
+    margin-bottom: 10px;
     border-bottom: 1px solid var(--hairline-color);
 }
 
 /* DATE DRILLDOWN */
 
-.change-list ul.toplinks {
-    display: block;
-    float: left;
-    padding: 0;
-    margin: 0;
-    width: 100%;
-}
-
-.change-list ul.toplinks li {
-    padding: 3px 6px;
+.change-list .toplinks {
+    display: flex;
+    padding-bottom: 5px;
+    flex-wrap: wrap;
+    gap: 3px 17px;
     font-weight: bold;
-    list-style-type: none;
-    display: inline-block;
 }
 
-.change-list ul.toplinks .date-back a {
+.change-list .toplinks a {
+    font-size: 0.8125rem;
+}
+
+.change-list .toplinks .date-back {
     color: var(--body-quiet-color);
 }
 
-.change-list ul.toplinks .date-back a:focus,
-.change-list ul.toplinks .date-back a:hover {
+.change-list .toplinks .date-back:focus,
+.change-list .toplinks .date-back:hover {
     color: var(--link-hover-color);
 }
 
@@ -235,8 +261,23 @@
     vertical-align: baseline;
 }
 
-#changelist table tbody tr.selected {
+/* Once the :has() pseudo-class is supported by all browsers, the tr.selected
+   selector and the JS adding the class can be removed. */
+#changelist tbody tr.selected {
     background-color: var(--selected-row);
+}
+
+#changelist tbody tr:has(.action-select:checked) {
+    background-color: var(--selected-row);
+}
+
+@media (forced-colors: active) {
+    #changelist tbody tr.selected {
+        background-color: SelectedItem;
+    }
+    #changelist tbody tr:has(.action-select:checked) {
+        background-color: SelectedItem;
+    }
 }
 
 #changelist .actions {
@@ -244,7 +285,7 @@
     background: var(--body-bg);
     border-top: none;
     border-bottom: none;
-    line-height: 24px;
+    line-height: 1.5rem;
     color: var(--body-quiet-color);
     width: 100%;
 }
@@ -263,7 +304,7 @@
 
 #changelist .actions select {
     vertical-align: top;
-    height: 24px;
+    height: 1.5rem;
     color: var(--body-fg);
     border: 1px solid var(--border-color);
     border-radius: 4px;
@@ -290,7 +331,7 @@
     background: var(--body-bg);
     box-shadow: 0 -15px 20px -10px rgba(0, 0, 0, 0.15) inset;
     cursor: pointer;
-    height: 24px;
+    height: 1.5rem;
     line-height: 1;
     padding: 4px 8px;
     margin: 0;

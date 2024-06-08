@@ -79,3 +79,7 @@ class BaseConnectionHandler:
             # If initialized_only is True, return only initialized connections.
             if not initialized_only or hasattr(self._connections, alias)
         ]
+
+    def close_all(self):
+        for conn in self.all(initialized_only=True):
+            conn.close()

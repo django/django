@@ -7,8 +7,8 @@ TIME_FORMAT = "H:i"
 DATETIME_FORMAT = "j F Y H:i"
 YEAR_MONTH_FORMAT = "F Y"
 MONTH_DAY_FORMAT = "j F"
-SHORT_DATE_FORMAT = "j N Y"
-SHORT_DATETIME_FORMAT = "j N Y H:i"
+SHORT_DATE_FORMAT = "d/m/Y"
+SHORT_DATETIME_FORMAT = "d/m/Y H:i"
 FIRST_DAY_OF_WEEK = 1  # Monday
 
 # The *_INPUT_FORMATS strings use the Python strftime format syntax,
@@ -16,17 +16,11 @@ FIRST_DAY_OF_WEEK = 1  # Monday
 DATE_INPUT_FORMATS = [
     "%d/%m/%Y",  # '25/10/2006'
     "%d/%m/%y",  # '25/10/06'
-    "%d.%m.%Y",  # Swiss [fr_CH] '25.10.2006'
-    "%d.%m.%y",  # Swiss [fr_CH] '25.10.06'
-    # '%d %B %Y', '%d %b %Y', # '25 octobre 2006', '25 oct. 2006'
 ]
 DATETIME_INPUT_FORMATS = [
     "%d/%m/%Y %H:%M:%S",  # '25/10/2006 14:30:59'
     "%d/%m/%Y %H:%M:%S.%f",  # '25/10/2006 14:30:59.000200'
     "%d/%m/%Y %H:%M",  # '25/10/2006 14:30'
-    "%d.%m.%Y %H:%M:%S",  # Swiss [fr_CH), '25.10.2006 14:30:59'
-    "%d.%m.%Y %H:%M:%S.%f",  # Swiss (fr_CH), '25.10.2006 14:30:59.000200'
-    "%d.%m.%Y %H:%M",  # Swiss (fr_CH), '25.10.2006 14:30'
 ]
 DECIMAL_SEPARATOR = ","
 THOUSAND_SEPARATOR = "\xa0"  # non-breaking space

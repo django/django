@@ -1,10 +1,11 @@
+import sys
 from datetime import date
 
 from django.forms import DateField, Form, SelectDateWidget
-from django.test import ignore_warnings, override_settings
+from django.test import override_settings
 from django.utils import translation
 from django.utils.dates import MONTHS_AP
-from django.utils.deprecation import RemovedInDjango50Warning
+from django.utils.version import PYPY
 
 from .base import WidgetTest
 
@@ -542,32 +543,28 @@ class SelectDateWidgetTest(WidgetTest):
             "13-08-0001",
         )
 
-    # RemovedInDjango50Warning: When the deprecation ends, remove
-    # @ignore_warnings and USE_L10N=False. The test should remain because
-    # format-related settings will take precedence over locale-dictated
-    # formats.
-    @ignore_warnings(category=RemovedInDjango50Warning)
-    @override_settings(USE_L10N=False, DATE_INPUT_FORMATS=["%d.%m.%Y"])
+    @override_settings(DATE_INPUT_FORMATS=["%d.%m.%Y"])
     def test_custom_input_format(self):
         w = SelectDateWidget(years=("0001", "1899", "2009", "2010"))
-        for values, expected_value in (
-            (("0001", "8", "13"), "13.08.0001"),
-            (("1899", "7", "11"), "11.07.1899"),
-            (("2009", "3", "7"), "07.03.2009"),
-        ):
-            with self.subTest(values=values):
-                data = {
-                    "field_%s" % field: value
-                    for field, value in zip(("year", "month", "day"), values)
-                }
-                self.assertEqual(
-                    w.value_from_datadict(data, {}, "field"), expected_value
-                )
-                expected_dict = {
-                    field: int(value)
-                    for field, value in zip(("year", "month", "day"), values)
-                }
-                self.assertEqual(w.format_value(expected_value), expected_dict)
+        with translation.override(None):
+            for values, expected_value in (
+                (("0001", "8", "13"), "13.08.0001"),
+                (("1899", "7", "11"), "11.07.1899"),
+                (("2009", "3", "7"), "07.03.2009"),
+            ):
+                with self.subTest(values=values):
+                    data = {
+                        "field_%s" % field: value
+                        for field, value in zip(("year", "month", "day"), values)
+                    }
+                    self.assertEqual(
+                        w.value_from_datadict(data, {}, "field"), expected_value
+                    )
+                    expected_dict = {
+                        field: int(value)
+                        for field, value in zip(("year", "month", "day"), values)
+                    }
+                    self.assertEqual(w.format_value(expected_value), expected_dict)
 
     def test_format_value(self):
         valid_formats = [
@@ -615,6 +612,11 @@ class SelectDateWidgetTest(WidgetTest):
             ((None, "12", "1"), None),
             (("2000", None, "1"), None),
             (("2000", "12", None), None),
+            (
+                (str(sys.maxsize + 1), "12", "1"),
+                # PyPy does not raise OverflowError.
+                f"{sys.maxsize + 1}-12-1" if PYPY else "0-0-0",
+            ),
         ]
         for values, expected in tests:
             with self.subTest(values=values):
@@ -706,4 +708,47 @@ class SelectDateWidgetTest(WidgetTest):
             </select>
             """
             ),
+        )
+
+    def test_fieldset(self):
+        class TestForm(Form):
+            template_name = "forms_tests/use_fieldset.html"
+            field = DateField(widget=self.widget)
+
+        form = TestForm()
+        self.assertIs(self.widget.use_fieldset, True)
+        self.assertHTMLEqual(
+            '<div><fieldset><legend for="id_field_month">Field:</legend>'
+            '<select name="field_month" required id="id_field_month">'
+            '<option value="1">January</option><option value="2">February</option>'
+            '<option value="3">March</option><option value="4">April</option>'
+            '<option value="5">May</option><option value="6">June</option>'
+            '<option value="7">July</option><option value="8">August</option>'
+            '<option value="9">September</option><option value="10">October</option>'
+            '<option value="11">November</option><option value="12">December</option>'
+            '</select><select name="field_day" required id="id_field_day">'
+            '<option value="1">1</option><option value="2">2</option>'
+            '<option value="3">3</option><option value="4">4</option>'
+            '<option value="5">5</option><option value="6">6</option>'
+            '<option value="7">7</option><option value="8">8</option>'
+            '<option value="9">9</option><option value="10">10</option>'
+            '<option value="11">11</option><option value="12">12</option>'
+            '<option value="13">13</option><option value="14">14</option>'
+            '<option value="15">15</option><option value="16">16</option>'
+            '<option value="17">17</option><option value="18">18</option>'
+            '<option value="19">19</option><option value="20">20</option>'
+            '<option value="21">21</option><option value="22">22</option>'
+            '<option value="23">23</option><option value="24">24</option>'
+            '<option value="25">25</option><option value="26">26</option>'
+            '<option value="27">27</option><option value="28">28</option>'
+            '<option value="29">29</option><option value="30">30</option>'
+            '<option value="31">31</option></select>'
+            '<select name="field_year" required id="id_field_year">'
+            '<option value="2007">2007</option><option value="2008">2008</option>'
+            '<option value="2009">2009</option><option value="2010">2010</option>'
+            '<option value="2011">2011</option><option value="2012">2012</option>'
+            '<option value="2013">2013</option><option value="2014">2014</option>'
+            '<option value="2015">2015</option><option value="2016">2016</option>'
+            "</select></fieldset></div>",
+            form.render(),
         )

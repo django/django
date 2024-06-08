@@ -36,7 +36,7 @@ class BadHeaderError(ValueError):
     pass
 
 
-# Header names that contain structured address data (RFC #5322)
+# Header names that contain structured address data (RFC 5322).
 ADDRESS_HEADERS = {
     "from",
     "sender",
@@ -97,6 +97,8 @@ def sanitize_address(addr, encoding):
             domain = token.domain or ""
     else:
         nm, address = addr
+        if "@" not in address:
+            raise ValueError(f'Invalid address "{address}"')
         localpart, domain = address.rsplit("@", 1)
 
     address_parts = nm + localpart + domain
@@ -166,7 +168,8 @@ class SafeMIMEText(MIMEMixin, MIMEText):
     def set_payload(self, payload, charset=None):
         if charset == "utf-8" and not isinstance(charset, Charset.Charset):
             has_long_lines = any(
-                len(line.encode()) > RFC5322_EMAIL_LINE_LENGTH_LIMIT
+                len(line.encode(errors="surrogateescape"))
+                > RFC5322_EMAIL_LINE_LENGTH_LIMIT
                 for line in payload.splitlines()
             )
             # Quoted-Printable encoding has the side effect of shortening long
@@ -382,8 +385,8 @@ class EmailMessage:
             encoding = self.encoding or settings.DEFAULT_CHARSET
             attachment = SafeMIMEText(content, subtype, encoding)
         elif basetype == "message" and subtype == "rfc822":
-            # Bug #18967: per RFC2046 s5.2.1, message/rfc822 attachments
-            # must not be base64 encoded.
+            # Bug #18967: Per RFC 2046 Section 5.2.1, message/rfc822
+            # attachments must not be base64 encoded.
             if isinstance(content, EmailMessage):
                 # convert content into an email.Message first
                 content = content.message()

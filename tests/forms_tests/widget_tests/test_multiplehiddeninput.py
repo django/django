@@ -1,4 +1,5 @@
-from django.forms import MultipleHiddenInput
+from django.forms import Form, MultipleChoiceField, MultipleHiddenInput
+from django.utils.datastructures import MultiValueDict
 
 from .base import WidgetTest
 
@@ -103,4 +104,20 @@ class MultipleHiddenInputTest(WidgetTest):
                 '<input type="hidden" name="letters" value="b" id="hideme_1">\n'
                 '<input type="hidden" name="letters" value="c" id="hideme_2">'
             ),
+        )
+
+    def test_fieldset(self):
+        class TestForm(Form):
+            template_name = "forms_tests/use_fieldset.html"
+            composers = MultipleChoiceField(
+                choices=[("J", "John Lennon"), ("P", "Paul McCartney")],
+                widget=MultipleHiddenInput,
+            )
+
+        form = TestForm(MultiValueDict({"composers": ["J", "P"]}))
+        self.assertIs(self.widget.use_fieldset, False)
+        self.assertHTMLEqual(
+            '<input type="hidden" name="composers" value="J" id="id_composers_0">'
+            '<input type="hidden" name="composers" value="P" id="id_composers_1">',
+            form.render(),
         )

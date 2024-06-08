@@ -2,17 +2,18 @@
 #
 # Translators:
 # Aleksa Cukovic` <aleksacukovic1@gmail.com>, 2020
-# Igor Jerosimić, 2019-2021
+# Danijela Popović, 2022
+# Igor Jerosimić, 2019-2021,2023
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janos Guljas <janos@resenje.org>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-11-18 23:38+0000\n"
-"Last-Translator: Igor Jerosimić\n"
-"Language-Team: Serbian (Latin) (http://www.transifex.com/django/django/"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 06:49+0000\n"
+"Last-Translator: Igor Jerosimić, 2019-2021,2023\n"
+"Language-Team: Serbian (Latin) (http://app.transifex.com/django/django/"
 "language/sr@latin/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -53,6 +54,9 @@ msgstr "bosanski"
 
 msgid "Catalan"
 msgstr "katalonski"
+
+msgid "Central Kurdish (Sorani)"
+msgstr "centralnokurdski (sorani)"
 
 msgid "Czech"
 msgstr "češki"
@@ -294,6 +298,9 @@ msgstr "tatarski"
 msgid "Udmurt"
 msgstr "udmurtski"
 
+msgid "Uyghur"
+msgstr ""
+
 msgid "Ukrainian"
 msgstr "ukrajinski"
 
@@ -389,6 +396,16 @@ msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "Ova vrednost mora biti veća od %(limit_value)s ili tačno toliko."
 
 #, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr "Ova vrednost mora da umnožak veličine koraka %(limit_value)s."
+
+#, python-format
+msgid ""
+"Ensure this value is a multiple of step size %(limit_value)s, starting from "
+"%(offset)s, e.g. %(offset)s, %(valid_value1)s, %(valid_value2)s, and so on."
+msgstr ""
+
+#, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
 "%(show_value)d)."
@@ -467,6 +484,10 @@ msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr "%(model_name)s sa poljem %(field_labels)s već postoji."
 
 #, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr "Ograničenje „%(name)s“ je prekršeno."
+
+#, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Vrednost %(value)r nije validna."
 
@@ -480,8 +501,8 @@ msgstr "Ovo polje ne može da ostane prazno."
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s sa ovom vrednošću %(field_label)s već postoji."
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -508,6 +529,9 @@ msgstr "Bulova vrednost (True ili False)"
 msgid "String (up to %(max_length)s)"
 msgstr "String (najviše %(max_length)s znakova)"
 
+msgid "String (unlimited)"
+msgstr "String (neograničeno)"
+
 msgid "Comma-separated integers"
 msgstr "Celi brojevi razdvojeni zapetama"
 
@@ -524,6 +548,8 @@ msgid ""
 "“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
+"Vrednost “%(value)s” ima odgovarajući format (GGGG-MM-DD), ali nije validan "
+"datum."
 
 msgid "Date (without time)"
 msgstr "Datum (bez vremena)"
@@ -533,19 +559,23 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
+"Vrednost “%(value)s” je u nevažećem formatu. Mora se uneti u formatu YYYY-MM-"
+"DD HH:MM[:ss[.uuuuuu]][TZ]."
 
 #, python-format
 msgid ""
 "“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
+"Vrednost “%(value)s” je u odgovarajućem formatu (YYYY-MM-DD HH:MM[:ss[."
+"uuuuuu]][TZ]), ali nije validna vrednost za datum i vreme."
 
 msgid "Date (with time)"
 msgstr "Datum (sa vremenom)"
 
 #, python-format
 msgid "“%(value)s” value must be a decimal number."
-msgstr ""
+msgstr "Vrednost “%(value)s” mora biti decimalni broj."
 
 msgid "Decimal number"
 msgstr "Decimalni broj"
@@ -555,6 +585,8 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
 "uuuuuu] format."
 msgstr ""
+"Vrednost “%(value)s” nije u odgovarajućem formatu. Mora biti u formatu [DD] "
+"[[HH:]MM:]ss[.uuuuuu]."
 
 msgid "Duration"
 msgstr "Vremenski interval"
@@ -567,14 +599,14 @@ msgstr "Putanja fajla"
 
 #, python-format
 msgid "“%(value)s” value must be a float."
-msgstr ""
+msgstr "Vrednost “%(value)s” value mora biti tipa float."
 
 msgid "Floating point number"
 msgstr "Broj sa pokrenom zapetom"
 
 #, python-format
 msgid "“%(value)s” value must be an integer."
-msgstr ""
+msgstr "Vrednost “%(value)s” mora biti ceo broj."
 
 msgid "Integer"
 msgstr "Ceo broj"
@@ -593,7 +625,7 @@ msgstr "IP adresa"
 
 #, python-format
 msgid "“%(value)s” value must be either None, True or False."
-msgstr ""
+msgstr "Vrednost “%(value)s” mora biti None, True ili False."
 
 msgid "Boolean (Either True, False or None)"
 msgstr "Bulova vrednost (True, False ili None)"
@@ -619,12 +651,16 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
+"Vrednost “%(value)s” nije u odgovarajućem formatu. Mora biti u formatu HH:"
+"MM[:ss[.uuuuuu]]."
 
 #, python-format
 msgid ""
 "“%(value)s” value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
+"Vrednost “%(value)s” je u odgovarajućem formatu (HH:MM[:ss[.uuuuuu]]), ali "
+"nije validna vrednost za vreme."
 
 msgid "Time"
 msgstr "Vreme"
@@ -637,7 +673,7 @@ msgstr "Sirovi binarni podaci"
 
 #, python-format
 msgid "“%(value)s” is not a valid UUID."
-msgstr ""
+msgstr "Vrednost “%(value)s” nije validan UUID (jedinstveni ID)."
 
 msgid "Universally unique identifier"
 msgstr "Univerzalno jedinstveni identifikator"
@@ -656,7 +692,7 @@ msgstr "Vrednost mora biti ispravni JSON."
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr ""
+msgstr "Instanca modela %(model)s sa vrednošću %(field)s %(value)r ne postoji."
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Strani ključ (tip određuje referentno polje)"
@@ -666,11 +702,11 @@ msgstr "Relacija jedan na jedan"
 
 #, python-format
 msgid "%(from)s-%(to)s relationship"
-msgstr ""
+msgstr "Relacija %(from)s-%(to)s"
 
 #, python-format
 msgid "%(from)s-%(to)s relationships"
-msgstr ""
+msgstr "Relacije %(from)s-%(to)s"
 
 msgid "Many-to-many relationship"
 msgstr "Relacija više na više"
@@ -717,8 +753,11 @@ msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
 msgid_plural ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
 msgstr[0] ""
+"Ime fajla ne može imati više od %(max)d karaktera (trenutno ima %(length)d)."
 msgstr[1] ""
+"Ime fajla ne može imati više od %(max)d karaktera (trenutno ima %(length)d)."
 msgstr[2] ""
+"Ime fajla ne može imati više od %(max)d karaktera (trenutno ima %(length)d)."
 
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr "Može se samo poslati fajl ili izbrisati, ne oba."
@@ -753,7 +792,7 @@ msgstr ":"
 
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
-msgstr ""
+msgstr "(Skriveno polje %(name)s) %(error)s"
 
 #, python-format
 msgid ""
@@ -765,18 +804,18 @@ msgstr ""
 "nastavi."
 
 #, python-format
-msgid "Please submit at most %d form."
-msgid_plural "Please submit at most %d forms."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] "Molim prosledite najviše %(num)d formular."
+msgstr[1] "Molim prosledite najviše %(num)d formulara."
+msgstr[2] "Molim prosledite najviše %(num)d formulara."
 
 #, python-format
-msgid "Please submit at least %d form."
-msgid_plural "Please submit at least %d forms."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] " Molim prosledite najmanje %(num)d formular."
+msgstr[1] " Molim prosledite najmanje %(num)d formulara."
+msgstr[2] " Molim prosledite najmanje %(num)d formulara."
 
 msgid "Order"
 msgstr "Redosled"
@@ -812,13 +851,15 @@ msgstr "Odabrana vrednost nije među ponuđenima. Odaberite jednu od ponuđenih.
 
 #, python-format
 msgid "“%(pk)s” is not a valid value."
-msgstr ""
+msgstr "\"%(pk)s\" nije ispravna vrednost."
 
 #, python-format
 msgid ""
 "%(datetime)s couldn’t be interpreted in time zone %(current_timezone)s; it "
 "may be ambiguous or it may not exist."
 msgstr ""
+"Vreme %(datetime)s se ne može protumačiti u vremenskoj zoni "
+"%(current_timezone)s; možda je dvosmisleno ili ne postoji."
 
 msgid "Clear"
 msgstr "Očisti"
@@ -1122,37 +1163,37 @@ msgstr[2] "%(num)d godina"
 #, python-format
 msgid "%(num)d month"
 msgid_plural "%(num)d months"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(num)d mesec"
+msgstr[1] "%(num)d meseca"
+msgstr[2] "%(num)d meseci"
 
 #, python-format
 msgid "%(num)d week"
 msgid_plural "%(num)d weeks"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(num)d nedelja"
+msgstr[1] "%(num)d nedelje"
+msgstr[2] "%(num)d nedelja"
 
 #, python-format
 msgid "%(num)d day"
 msgid_plural "%(num)d days"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(num)d dan"
+msgstr[1] "%(num)d dana"
+msgstr[2] "%(num)d dana"
 
 #, python-format
 msgid "%(num)d hour"
 msgid_plural "%(num)d hours"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(num)d sat"
+msgstr[1] "%(num)d sata"
+msgstr[2] "%(num)d sati"
 
 #, python-format
 msgid "%(num)d minute"
 msgid_plural "%(num)d minutes"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(num)d minut"
+msgstr[1] "%(num)d minuta"
+msgstr[2] "%(num)d minuta"
 
 msgid "Forbidden"
 msgstr "Zabranjeno"
@@ -1166,6 +1207,10 @@ msgid ""
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
+"Ova poruka je prikazana jer ovaj HTTPS sajt zahteva da \"Referer header\" "
+"bude poslat od strane vašeg internet pregledača, što trenutno nije slučaj. "
+"Pomenuto zaglavlje je potrebno iz bezbedonosnih razloga, da bi se osiguralo "
+"da vaš pregledač nije pod kontrolom trećih lica."
 
 msgid ""
 "If you have configured your browser to disable “Referer” headers, please re-"
@@ -1180,9 +1225,14 @@ msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
 "including the “Referrer-Policy: no-referrer” header, please remove them. The "
 "CSRF protection requires the “Referer” header to do strict referer checking. "
-"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" …> for links to third-party sites."
+"If you’re concerned about privacy, use alternatives like <a "
+"rel=\"noreferrer\" …> for links to third-party sites."
 msgstr ""
+"Ako koristite <meta name=\"referrer\" content=\"no-referrer\"> tag ili "
+"\"Referrer-Policy: no-referrer\" zaglavlje, molimo da ih uklonite. CSRF "
+"zaštita zahteva \"Referer\" zaglavlje da bi se obavila striktna \"referrer\" "
+"provera. Ukoliko vas brine privatnost, koristite alternative kao <a "
+"rel=\"noreferrer\" ...> za linkove ka drugim sajtovima."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
@@ -1275,13 +1325,14 @@ msgstr ""
 #, python-format
 msgid ""
 "You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> is in your settings file and you have not configured any "
-"URLs."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
+"configured any URLs."
 msgstr ""
 "Ova strana je prikazana jer je <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> u vašim podešavanjima i niste konfigurisali nijedan URL."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> u vašim podešavanjima i niste konfigurisali "
+"nijedan URL."
 
 msgid "Django Documentation"
 msgstr "Đango dokumentacija"

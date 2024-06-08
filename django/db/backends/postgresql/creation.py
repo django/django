@@ -1,9 +1,8 @@
 import sys
 
-from psycopg2 import errorcodes
-
 from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.base.creation import BaseDatabaseCreation
+from django.db.backends.postgresql.psycopg_any import errors
 from django.db.backends.utils import strip_quotes
 
 
@@ -46,7 +45,7 @@ class DatabaseCreation(BaseDatabaseCreation):
                 return
             super()._execute_create_test_db(cursor, parameters, keepdb)
         except Exception as e:
-            if getattr(e.__cause__, "pgcode", "") != errorcodes.DUPLICATE_DATABASE:
+            if not isinstance(e.__cause__, errors.DuplicateDatabase):
                 # All errors except "database already exists" cancel tests.
                 self.log("Got an error creating the test database: %s" % e)
                 sys.exit(2)
@@ -59,6 +58,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         # CREATE DATABASE ... WITH TEMPLATE ... requires closing connections
         # to the template database.
         self.connection.close()
+        self.connection.close_pool()
 
         source_database_name = self.connection.settings_dict["NAME"]
         target_database_name = self.get_test_db_clone_settings(suffix)["NAME"]
@@ -85,3 +85,7 @@ class DatabaseCreation(BaseDatabaseCreation):
                 except Exception as e:
                     self.log("Got an error cloning the test database: %s" % e)
                     sys.exit(2)
+
+    def _destroy_test_db(self, test_database_name, verbosity):
+        self.connection.close_pool()
+        return super()._destroy_test_db(test_database_name, verbosity)

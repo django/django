@@ -21,7 +21,7 @@ class NullFkTests(TestCase):
         self.assertEqual(c.post, p)
         self.assertIsNone(Comment.objects.select_related().get(id=c2.id).post)
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Comment.objects.select_related("post__forum__system_info").all(),
             [
                 (c1.id, "My first comment", "<Post: First Post>"),
@@ -35,7 +35,7 @@ class NullFkTests(TestCase):
             Comment.objects.select_related("post").filter(post__isnull=True)[0].post
         )
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Comment.objects.select_related("post__forum__system_info__system_details"),
             [
                 (c1.id, "My first comment", "<Post: First Post>"),

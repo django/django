@@ -1,26 +1,27 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Igor Jerosimić, 2023
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janos Guljas <janos@resenje.org>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Serbian (Latin) (http://www.transifex.com/django/django/"
-"language/sr%40latin/)\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2023-12-04 20:19+0000\n"
+"Last-Translator: Igor Jerosimić, 2023\n"
+"Language-Team: Serbian (Latin) (http://app.transifex.com/django/django/"
+"language/sr@latin/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: sr@latin\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 msgid "Administrative Documentation"
-msgstr ""
+msgstr "Administrativna dokumentacija"
 
 msgid "Home"
 msgstr "Početna"
@@ -39,6 +40,10 @@ msgid ""
 "click the link and add it to your bookmarks. Now you can select the "
 "bookmarklet from any page in the site."
 msgstr ""
+"Da biste instalirali obeleživače, prevucite vezu na traku sa alatkama za "
+"obeleživače ili kliknite desnim tasterom miša na vezu i dodajte je u "
+"obeleživače. Sada možete da izaberete bookmarklet sa bilo koje stranice na "
+"sajtu."
 
 msgid "Documentation for this page"
 msgstr "Dokumentacija za ovu stranicu"
@@ -54,7 +59,7 @@ msgid "Tags"
 msgstr "Tagovi"
 
 msgid "List of all the template tags and their functions."
-msgstr ""
+msgstr "Lista svih oznaka šablona i njihovih funkcija."
 
 msgid "Filters"
 msgstr "Filteri"
@@ -63,6 +68,8 @@ msgid ""
 "Filters are actions which can be applied to variables in a template to alter "
 "the output."
 msgstr ""
+"Filteri su radnje koje se mogu primeniti na promenljive u šablonu da bi se "
+"promenio izlaz."
 
 msgid "Models"
 msgstr "Modeli"
@@ -72,6 +79,8 @@ msgid ""
 "associated fields. Each model has a list of fields which can be accessed as "
 "template variables"
 msgstr ""
+"Modeli su opisi svih objekata u sistemu i njihovih povezanih polja. Svaki "
+"model ima listu polja kojima se može pristupiti kao promenljive šablona"
 
 msgid "Views"
 msgstr "Vjuevi"
@@ -90,8 +99,8 @@ msgstr ""
 
 #, python-format
 msgid ""
-"The admin documentation system requires Python's <a href=\"%(link)s"
-"\">docutils</a> library."
+"The admin documentation system requires Python’s <a "
+"href=\"%(link)s\">docutils</a> library."
 msgstr ""
 
 #, python-format
@@ -141,12 +150,12 @@ msgid "Template: %(name)s"
 msgstr ""
 
 #, python-format
-msgid "Template: \"%(name)s\""
+msgid "Template: <q>%(name)s</q>"
 msgstr ""
 
 #. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
-msgid "Search path for template \"%(name)s\":"
+msgid "Search path for template <q>%(name)s</q>:"
 msgstr ""
 
 msgid "(does not exist)"

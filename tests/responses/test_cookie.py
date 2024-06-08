@@ -1,5 +1,6 @@
 import time
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
+from email.utils import format_datetime as format_datetime_rfc5322
 from http import cookies
 
 from django.http import HttpResponse
@@ -49,12 +50,18 @@ class SetCookieTests(SimpleTestCase):
     def test_far_expiration(self):
         """Cookie will expire when a distant expiration time is provided."""
         response = HttpResponse()
-        response.set_cookie("datetime", expires=datetime(2038, 1, 1, 4, 5, 6))
+        future_datetime = datetime(
+            date.today().year + 2, 1, 1, 4, 5, 6, tzinfo=timezone.utc
+        )
+        response.set_cookie("datetime", expires=future_datetime)
         datetime_cookie = response.cookies["datetime"]
         self.assertIn(
             datetime_cookie["expires"],
             # assertIn accounts for slight time dependency (#23450)
-            ("Fri, 01 Jan 2038 04:05:06 GMT", "Fri, 01 Jan 2038 04:05:07 GMT"),
+            (
+                format_datetime_rfc5322(future_datetime, usegmt=True),
+                format_datetime_rfc5322(future_datetime.replace(second=7), usegmt=True),
+            ),
         )
 
     def test_max_age_expiration(self):

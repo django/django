@@ -44,7 +44,7 @@ class ExtraRegressTests(TestCase):
             ]
         )
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [("Second Revision", "First Revision")],
             transform=lambda r: (r.title, r.base.title),
@@ -52,7 +52,7 @@ class ExtraRegressTests(TestCase):
 
         # Queryset to search for string in title:
         qs2 = RevisionableModel.objects.filter(title__contains="Revision")
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs2,
             [
                 ("First Revision", "First Revision"),
@@ -63,7 +63,7 @@ class ExtraRegressTests(TestCase):
         )
 
         # Following queryset should return the most recent revision:
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs & qs2,
             [("Second Revision", "First Revision")],
             transform=lambda r: (r.title, r.base.title),
@@ -139,7 +139,7 @@ class ExtraRegressTests(TestCase):
         but then removes the reference because of an optimization. The table
         should still be present because of the extra() call.
         """
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             (
                 Order.objects.extra(
                     where=["username=%s"], params=["fred"], tables=["auth_user"]

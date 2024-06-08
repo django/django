@@ -5,6 +5,7 @@ from unittest import skipIf
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files import File
 from django.core.files.images import ImageFile
+from django.db.models import signals
 from django.test import TestCase
 from django.test.testcases import SerializeMixin
 
@@ -17,6 +18,7 @@ if Image:
     from .models import (
         Person,
         PersonDimensionsFirst,
+        PersonNoReadImage,
         PersonTwoImages,
         PersonWithHeight,
         PersonWithHeightAndWidth,
@@ -29,7 +31,7 @@ else:
         pass
 
     PersonWithHeight = PersonWithHeightAndWidth = PersonDimensionsFirst = Person
-    PersonTwoImages = Person
+    PersonTwoImages = PersonNoReadImage = Person
 
 
 class ImageFieldTestMixin(SerializeMixin):
@@ -54,20 +56,13 @@ class ImageFieldTestMixin(SerializeMixin):
         if os.path.exists(temp_storage_dir):
             shutil.rmtree(temp_storage_dir)
         os.mkdir(temp_storage_dir)
-
+        self.addCleanup(shutil.rmtree, temp_storage_dir)
         file_path1 = os.path.join(os.path.dirname(__file__), "4x8.png")
         self.file1 = self.File(open(file_path1, "rb"), name="4x8.png")
-
+        self.addCleanup(self.file1.close)
         file_path2 = os.path.join(os.path.dirname(__file__), "8x4.png")
         self.file2 = self.File(open(file_path2, "rb"), name="8x4.png")
-
-    def tearDown(self):
-        """
-        Removes temp directory and all its contents.
-        """
-        self.file1.close()
-        self.file2.close()
-        shutil.rmtree(temp_storage_dir)
+        self.addCleanup(self.file2.close)
 
     def check_dimensions(self, instance, width, height, field_name="mugshot"):
         """
@@ -328,6 +323,20 @@ class ImageFieldNoDimensionsTests(ImageFieldTwoDimensionsTests):
 
     PersonModel = Person
 
+    def test_post_init_not_connected(self):
+        person_model_id = id(self.PersonModel)
+        self.assertNotIn(
+            person_model_id,
+            [sender_id for (_, sender_id), *_ in signals.post_init.receivers],
+        )
+
+    def test_save_does_not_close_file(self):
+        p = self.PersonModel(name="Joe")
+        p.mugshot.save("mug", self.file1)
+        with p.mugshot as f:
+            # Underlying file object wasn’t closed.
+            self.assertEqual(f.tell(), 0)
+
 
 @skipIf(Image is None, "Pillow is required to test ImageField")
 class ImageFieldOneDimensionTests(ImageFieldTwoDimensionsTests):
@@ -461,3 +470,28 @@ class TwoImageFieldTests(ImageFieldTestMixin, TestCase):
         # Dimensions were recalculated, and hence file should have opened.
         self.assertIs(p.mugshot.was_opened, True)
         self.assertIs(p.headshot.was_opened, True)
+
+
+@skipIf(Image is None, "Pillow is required to test ImageField")
+class NoReadTests(ImageFieldTestMixin, TestCase):
+    def test_width_height_correct_name_mangling_correct(self):
+        instance1 = PersonNoReadImage()
+
+        instance1.mugshot.save("mug", self.file1)
+
+        self.assertEqual(instance1.mugshot_width, 4)
+        self.assertEqual(instance1.mugshot_height, 8)
+
+        instance1.save()
+
+        self.assertEqual(instance1.mugshot_width, 4)
+        self.assertEqual(instance1.mugshot_height, 8)
+
+        instance2 = PersonNoReadImage()
+        instance2.mugshot.save("mug", self.file1)
+        instance2.save()
+
+        self.assertNotEqual(instance1.mugshot.name, instance2.mugshot.name)
+
+        self.assertEqual(instance1.mugshot_width, instance2.mugshot_width)
+        self.assertEqual(instance1.mugshot_height, instance2.mugshot_height)

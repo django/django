@@ -1,5 +1,7 @@
+import multiprocessing
 import sys
 from io import StringIO
+from unittest import skipIf
 
 from django.apps import apps
 from django.core import checks
@@ -361,6 +363,11 @@ class CheckFrameworkReservedNamesTests(SimpleTestCase):
         self.assertEqual(errors, expected)
 
 
+@skipIf(
+    multiprocessing.get_start_method() == "spawn",
+    "Spawning reimports modules, overwriting my_check.did_run to False, making this "
+    "test useless.",
+)
 class ChecksRunDuringTests(SimpleTestCase):
     databases = "__all__"
 

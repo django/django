@@ -1,13 +1,13 @@
 import unittest
-from unittest import mock
 
 from migrations.test_base import OperationTestBase
 
 from django.db import IntegrityError, NotSupportedError, connection, transaction
 from django.db.migrations.state import ProjectState
+from django.db.migrations.writer import OperationWriter
 from django.db.models import CheckConstraint, Index, Q, UniqueConstraint
 from django.db.utils import ProgrammingError
-from django.test import modify_settings, override_settings, skipUnlessDBFeature
+from django.test import modify_settings, override_settings
 from django.test.utils import CaptureQueriesContext
 
 from . import PostgreSQLTestCase
@@ -59,6 +59,10 @@ class AddIndexConcurrentlyTests(OperationTestBase):
         self.assertEqual(
             operation.describe(),
             "Concurrently create index pony_pink_idx on field(s) pink of model Pony",
+        )
+        self.assertEqual(
+            operation.formatted_description(),
+            "+ Concurrently create index pony_pink_idx on field(s) pink of model Pony",
         )
         operation.state_forwards(self.app_label, new_state)
         self.assertEqual(
@@ -155,6 +159,10 @@ class RemoveIndexConcurrentlyTests(OperationTestBase):
             operation.describe(),
             "Concurrently remove index pony_pink_idx from Pony",
         )
+        self.assertEqual(
+            operation.formatted_description(),
+            "- Concurrently remove index pony_pink_idx from Pony",
+        )
         operation.state_forwards(self.app_label, new_state)
         self.assertEqual(
             len(new_state.models[self.app_label, "pony"].options["indexes"]), 0
@@ -191,6 +199,9 @@ class CreateExtensionTests(PostgreSQLTestCase):
     @override_settings(DATABASE_ROUTERS=[NoMigrationRouter()])
     def test_no_allow_migrate(self):
         operation = CreateExtension("tablefunc")
+        self.assertEqual(
+            operation.formatted_description(), "+ Creates extension tablefunc"
+        )
         project_state = ProjectState()
         new_state = project_state.clone()
         # Don't create an extension.
@@ -288,6 +299,7 @@ class CreateCollationTests(PostgreSQLTestCase):
         operation = CreateCollation("C_test", locale="C")
         self.assertEqual(operation.migration_name_fragment, "create_collation_c_test")
         self.assertEqual(operation.describe(), "Create collation C_test")
+        self.assertEqual(operation.formatted_description(), "+ Create collation C_test")
         project_state = ProjectState()
         new_state = project_state.clone()
         # Create a collation.
@@ -318,7 +330,6 @@ class CreateCollationTests(PostgreSQLTestCase):
         self.assertEqual(args, [])
         self.assertEqual(kwargs, {"name": "C_test", "locale": "C"})
 
-    @skipUnlessDBFeature("supports_non_deterministic_collations")
     def test_create_non_deterministic_collation(self):
         operation = CreateCollation(
             "case_insensitive_test",
@@ -383,26 +394,24 @@ class CreateCollationTests(PostgreSQLTestCase):
         self.assertEqual(len(captured_queries), 1)
         self.assertIn("DROP COLLATION", captured_queries[0]["sql"])
 
-    def test_nondeterministic_collation_not_supported(self):
+    def test_writer(self):
         operation = CreateCollation(
-            "case_insensitive_test",
+            "sample_collation",
+            "und-u-ks-level2",
             provider="icu",
-            locale="und-u-ks-level2",
             deterministic=False,
         )
-        project_state = ProjectState()
-        new_state = project_state.clone()
-        msg = "Non-deterministic collations require PostgreSQL 12+."
-        with connection.schema_editor(atomic=False) as editor:
-            with mock.patch(
-                "django.db.backends.postgresql.features.DatabaseFeatures."
-                "supports_non_deterministic_collations",
-                False,
-            ):
-                with self.assertRaisesMessage(NotSupportedError, msg):
-                    operation.database_forwards(
-                        self.app_label, editor, project_state, new_state
-                    )
+        buff, imports = OperationWriter(operation, indentation=0).serialize()
+        self.assertEqual(imports, {"import django.contrib.postgres.operations"})
+        self.assertEqual(
+            buff,
+            "django.contrib.postgres.operations.CreateCollation(\n"
+            "    name='sample_collation',\n"
+            "    locale='und-u-ks-level2',\n"
+            "    provider='icu',\n"
+            "    deterministic=False,\n"
+            "),",
+        )
 
 
 @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific tests.")
@@ -441,6 +450,7 @@ class RemoveCollationTests(PostgreSQLTestCase):
         operation = RemoveCollation("C_test", locale="C")
         self.assertEqual(operation.migration_name_fragment, "remove_collation_c_test")
         self.assertEqual(operation.describe(), "Remove collation C_test")
+        self.assertEqual(operation.formatted_description(), "- Remove collation C_test")
         project_state = ProjectState()
         new_state = project_state.clone()
         # Remove a collation.
@@ -486,12 +496,16 @@ class AddConstraintNotValidTests(OperationTestBase):
     def test_add(self):
         table_name = f"{self.app_label}_pony"
         constraint_name = "pony_pink_gte_check"
-        constraint = CheckConstraint(check=Q(pink__gte=4), name=constraint_name)
+        constraint = CheckConstraint(condition=Q(pink__gte=4), name=constraint_name)
         operation = AddConstraintNotValid("Pony", constraint=constraint)
         project_state, new_state = self.make_test_state(self.app_label, operation)
         self.assertEqual(
             operation.describe(),
             f"Create not valid constraint {constraint_name} on model Pony",
+        )
+        self.assertEqual(
+            operation.formatted_description(),
+            f"+ Create not valid constraint {constraint_name} on model Pony",
         )
         self.assertEqual(
             operation.migration_name_fragment,
@@ -535,7 +549,7 @@ class ValidateConstraintTests(OperationTestBase):
 
     def test_validate(self):
         constraint_name = "pony_pink_gte_check"
-        constraint = CheckConstraint(check=Q(pink__gte=4), name=constraint_name)
+        constraint = CheckConstraint(condition=Q(pink__gte=4), name=constraint_name)
         operation = AddConstraintNotValid("Pony", constraint=constraint)
         project_state, new_state = self.make_test_state(self.app_label, operation)
         Pony = new_state.apps.get_model(self.app_label, "Pony")
@@ -552,6 +566,10 @@ class ValidateConstraintTests(OperationTestBase):
         self.assertEqual(
             operation.describe(),
             f"Validate constraint {constraint_name} on model Pony",
+        )
+        self.assertEqual(
+            operation.formatted_description(),
+            f"~ Validate constraint {constraint_name} on model Pony",
         )
         self.assertEqual(
             operation.migration_name_fragment,

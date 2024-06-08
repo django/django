@@ -1,6 +1,7 @@
 """
 Regression tests for the Test Client, especially the customized assertions.
 """
+
 import itertools
 import os
 
@@ -80,85 +81,140 @@ class AssertContainsTests(SimpleTestCase):
         try:
             self.assertNotContains(response, "once")
         except AssertionError as e:
-            self.assertIn("Response should not contain 'once'", str(e))
+            self.assertIn(
+                "'once' unexpectedly found in the following response\n"
+                f"{response.content}",
+                str(e),
+            )
         try:
             self.assertNotContains(response, "once", msg_prefix="abc")
         except AssertionError as e:
-            self.assertIn("abc: Response should not contain 'once'", str(e))
+            self.assertIn(
+                "abc: 'once' unexpectedly found in the following response\n"
+                f"{response.content}",
+                str(e),
+            )
 
         try:
             self.assertContains(response, "never", 1)
         except AssertionError as e:
             self.assertIn(
-                "Found 0 instances of 'never' in response (expected 1)", str(e)
+                "Found 0 instances of 'never' (expected 1) in the following response\n"
+                f"{response.content}",
+                str(e),
             )
         try:
             self.assertContains(response, "never", 1, msg_prefix="abc")
         except AssertionError as e:
             self.assertIn(
-                "abc: Found 0 instances of 'never' in response (expected 1)", str(e)
+                "abc: Found 0 instances of 'never' (expected 1) in the following "
+                f"response\n{response.content}",
+                str(e),
             )
 
         try:
             self.assertContains(response, "once", 0)
         except AssertionError as e:
             self.assertIn(
-                "Found 1 instances of 'once' in response (expected 0)", str(e)
+                "Found 1 instances of 'once' (expected 0) in the following response\n"
+                f"{response.content}",
+                str(e),
             )
         try:
             self.assertContains(response, "once", 0, msg_prefix="abc")
         except AssertionError as e:
             self.assertIn(
-                "abc: Found 1 instances of 'once' in response (expected 0)", str(e)
+                "abc: Found 1 instances of 'once' (expected 0) in the following "
+                f"response\n{response.content}",
+                str(e),
             )
 
         try:
             self.assertContains(response, "once", 2)
         except AssertionError as e:
             self.assertIn(
-                "Found 1 instances of 'once' in response (expected 2)", str(e)
+                "Found 1 instances of 'once' (expected 2) in the following response\n"
+                f"{response.content}",
+                str(e),
             )
         try:
             self.assertContains(response, "once", 2, msg_prefix="abc")
         except AssertionError as e:
             self.assertIn(
-                "abc: Found 1 instances of 'once' in response (expected 2)", str(e)
+                "abc: Found 1 instances of 'once' (expected 2) in the following "
+                f"response\n{response.content}",
+                str(e),
             )
 
         try:
             self.assertContains(response, "twice", 1)
         except AssertionError as e:
             self.assertIn(
-                "Found 2 instances of 'twice' in response (expected 1)", str(e)
+                "Found 2 instances of 'twice' (expected 1) in the following response\n"
+                f"{response.content}",
+                str(e),
             )
         try:
             self.assertContains(response, "twice", 1, msg_prefix="abc")
         except AssertionError as e:
             self.assertIn(
-                "abc: Found 2 instances of 'twice' in response (expected 1)", str(e)
+                "abc: Found 2 instances of 'twice' (expected 1) in the following "
+                f"response\n{response.content}",
+                str(e),
             )
 
         try:
             self.assertContains(response, "thrice")
         except AssertionError as e:
-            self.assertIn("Couldn't find 'thrice' in response", str(e))
+            self.assertIn(
+                f"Couldn't find 'thrice' in the following response\n{response.content}",
+                str(e),
+            )
         try:
             self.assertContains(response, "thrice", msg_prefix="abc")
         except AssertionError as e:
-            self.assertIn("abc: Couldn't find 'thrice' in response", str(e))
+            self.assertIn(
+                "abc: Couldn't find 'thrice' in the following response\n"
+                f"{response.content}",
+                str(e),
+            )
 
         try:
             self.assertContains(response, "thrice", 3)
         except AssertionError as e:
             self.assertIn(
-                "Found 0 instances of 'thrice' in response (expected 3)", str(e)
+                "Found 0 instances of 'thrice' (expected 3) in the following response\n"
+                f"{response.content}",
+                str(e),
             )
         try:
             self.assertContains(response, "thrice", 3, msg_prefix="abc")
         except AssertionError as e:
             self.assertIn(
-                "abc: Found 0 instances of 'thrice' in response (expected 3)", str(e)
+                "abc: Found 0 instances of 'thrice' (expected 3) in the following "
+                f"response\n{response.content}",
+                str(e),
             )
+
+        long_content = (
+            b"This is a very very very very very very very very long message which "
+            b"exceedes the max limit of truncation."
+        )
+        response = HttpResponse(long_content)
+        msg = f"Couldn't find 'thrice' in the following response\n{long_content}"
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertContains(response, "thrice")
+
+        msg = (
+            "Found 1 instances of 'This' (expected 3) in the following response\n"
+            f"{long_content}"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertContains(response, "This", 3)
+
+        msg = f"'very' unexpectedly found in the following response\n{long_content}"
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertNotContains(response, "very")
 
     def test_unicode_contains(self):
         "Unicode characters can be found in template context"
@@ -601,6 +657,7 @@ class AssertRedirectsTests(SimpleTestCase):
         for method in methods:
             with self.subTest(method=method):
                 req_method = getattr(self.client, method)
+                # HTTP_REDIRECT in "extra".
                 response = req_method(
                     "/redirect_based_on_extra_headers_1/",
                     follow=False,
@@ -613,360 +670,19 @@ class AssertRedirectsTests(SimpleTestCase):
                     status_code=302,
                     target_status_code=302,
                 )
-
-
-@override_settings(ROOT_URLCONF="test_client_regress.urls")
-class AssertFormErrorTests(SimpleTestCase):
-    def test_unknown_form(self):
-        "An assertion is raised if the form name is unknown"
-        post_data = {
-            "text": "Hello World",
-            "email": "not an email address",
-            "value": 37,
-            "single": "b",
-            "multi": ("b", "c", "e"),
-        }
-        response = self.client.post("/form_view/", post_data)
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "Invalid POST Template")
-
-        msg = "The form 'wrong_form' was not used to render the response"
-        with self.assertRaisesMessage(AssertionError, msg):
-            self.assertFormError(response, "wrong_form", "some_field", "Some error.")
-        with self.assertRaisesMessage(AssertionError, "abc: " + msg):
-            self.assertFormError(
-                response, "wrong_form", "some_field", "Some error.", msg_prefix="abc"
-            )
-
-    def test_unknown_field(self):
-        "An assertion is raised if the field name is unknown"
-        post_data = {
-            "text": "Hello World",
-            "email": "not an email address",
-            "value": 37,
-            "single": "b",
-            "multi": ("b", "c", "e"),
-        }
-        response = self.client.post("/form_view/", post_data)
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "Invalid POST Template")
-
-        msg = (
-            "The form <TestForm bound=True, valid=False, "
-            "fields=(text;email;value;single;multi)> does not contain the field "
-            "'some_field'."
-        )
-        with self.assertRaisesMessage(AssertionError, msg):
-            self.assertFormError(response, "form", "some_field", "Some error.")
-        with self.assertRaisesMessage(AssertionError, "abc: " + msg):
-            self.assertFormError(
-                response, "form", "some_field", "Some error.", msg_prefix="abc"
-            )
-
-    def test_noerror_field(self):
-        "An assertion is raised if the field doesn't have any errors"
-        post_data = {
-            "text": "Hello World",
-            "email": "not an email address",
-            "value": 37,
-            "single": "b",
-            "multi": ("b", "c", "e"),
-        }
-        response = self.client.post("/form_view/", post_data)
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "Invalid POST Template")
-
-        msg = (
-            "The errors of field 'value' on form <TestForm bound=True, valid=False, "
-            "fields=(text;email;value;single;multi)> don't match."
-        )
-        with self.assertRaisesMessage(AssertionError, msg):
-            self.assertFormError(response, "form", "value", "Some error.")
-        with self.assertRaisesMessage(AssertionError, "abc: " + msg):
-            self.assertFormError(
-                response, "form", "value", "Some error.", msg_prefix="abc"
-            )
-
-    def test_unknown_error(self):
-        "An assertion is raised if the field doesn't contain the provided error"
-        post_data = {
-            "text": "Hello World",
-            "email": "not an email address",
-            "value": 37,
-            "single": "b",
-            "multi": ("b", "c", "e"),
-        }
-        response = self.client.post("/form_view/", post_data)
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "Invalid POST Template")
-
-        msg = (
-            "The errors of field 'email' on form <TestForm bound=True, valid=False, "
-            "fields=(text;email;value;single;multi)> don't match."
-        )
-        with self.assertRaisesMessage(AssertionError, msg):
-            self.assertFormError(response, "form", "email", "Some error.")
-        with self.assertRaisesMessage(AssertionError, "abc: " + msg):
-            self.assertFormError(
-                response, "form", "email", "Some error.", msg_prefix="abc"
-            )
-
-    def test_unknown_nonfield_error(self):
-        """
-        An assertion is raised if the form's non field errors doesn't contain
-        the provided error.
-        """
-        post_data = {
-            "text": "Hello World",
-            "email": "not an email address",
-            "value": 37,
-            "single": "b",
-            "multi": ("b", "c", "e"),
-        }
-        response = self.client.post("/form_view/", post_data)
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "Invalid POST Template")
-
-        msg = (
-            "The non-field errors of form <TestForm bound=True, valid=False, "
-            "fields=(text;email;value;single;multi)> don't match."
-        )
-        with self.assertRaisesMessage(AssertionError, msg):
-            self.assertFormError(response, "form", None, "Some error.")
-        with self.assertRaisesMessage(AssertionError, "abc: " + msg):
-            self.assertFormError(
-                response, "form", None, "Some error.", msg_prefix="abc"
-            )
-
-
-@override_settings(ROOT_URLCONF="test_client_regress.urls")
-class AssertFormsetErrorTests(SimpleTestCase):
-    msg_prefixes = [("", {}), ("abc: ", {"msg_prefix": "abc"})]
-
-    def setUp(self):
-        """Makes response object for testing field and non-field errors"""
-        # For testing field and non-field errors
-        self.response_form_errors = self.getResponse(
-            {
-                "form-TOTAL_FORMS": "2",
-                "form-INITIAL_FORMS": "2",
-                "form-0-text": "Raise non-field error",
-                "form-0-email": "not an email address",
-                "form-0-value": 37,
-                "form-0-single": "b",
-                "form-0-multi": ("b", "c", "e"),
-                "form-1-text": "Hello World",
-                "form-1-email": "email@domain.com",
-                "form-1-value": 37,
-                "form-1-single": "b",
-                "form-1-multi": ("b", "c", "e"),
-            }
-        )
-        # For testing non-form errors
-        self.response_nonform_errors = self.getResponse(
-            {
-                "form-TOTAL_FORMS": "2",
-                "form-INITIAL_FORMS": "2",
-                "form-0-text": "Hello World",
-                "form-0-email": "email@domain.com",
-                "form-0-value": 37,
-                "form-0-single": "b",
-                "form-0-multi": ("b", "c", "e"),
-                "form-1-text": "Hello World",
-                "form-1-email": "email@domain.com",
-                "form-1-value": 37,
-                "form-1-single": "b",
-                "form-1-multi": ("b", "c", "e"),
-            }
-        )
-
-    def getResponse(self, post_data):
-        response = self.client.post("/formset_view/", post_data)
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "Invalid POST Template")
-        return response
-
-    def test_unknown_formset(self):
-        "An assertion is raised if the formset name is unknown"
-        for prefix, kwargs in self.msg_prefixes:
-            msg = (
-                prefix
-                + "The formset 'wrong_formset' was not used to render the response"
-            )
-            with self.assertRaisesMessage(AssertionError, msg):
-                self.assertFormsetError(
-                    self.response_form_errors,
-                    "wrong_formset",
-                    0,
-                    "Some_field",
-                    "Some error.",
-                    **kwargs,
+                # HTTP_REDIRECT in "headers".
+                response = req_method(
+                    "/redirect_based_on_extra_headers_1/",
+                    follow=False,
+                    headers={"redirect": "val"},
                 )
-
-    def test_unknown_field(self):
-        "An assertion is raised if the field name is unknown"
-        for prefix, kwargs in self.msg_prefixes:
-            msg = (
-                f"{prefix}The form 0 of formset <TestFormFormSet: bound=True "
-                f"valid=False total_forms=2> does not contain the field 'Some_field'."
-            )
-            with self.assertRaisesMessage(AssertionError, msg):
-                self.assertFormsetError(
-                    self.response_form_errors,
-                    "my_formset",
-                    0,
-                    "Some_field",
-                    "Some error.",
-                    **kwargs,
+                self.assertRedirects(
+                    response,
+                    "/redirect_based_on_extra_headers_2/",
+                    fetch_redirect_response=True,
+                    status_code=302,
+                    target_status_code=302,
                 )
-
-    def test_no_error_field(self):
-        "An assertion is raised if the field doesn't have any errors"
-        for prefix, kwargs in self.msg_prefixes:
-            msg = (
-                f"{prefix}The errors of field 'value' on form 1 of formset "
-                f"<TestFormFormSet: bound=True valid=False total_forms=2> don't match."
-            )
-            with self.assertRaisesMessage(AssertionError, msg):
-                self.assertFormsetError(
-                    self.response_form_errors,
-                    "my_formset",
-                    1,
-                    "value",
-                    "Some error.",
-                    **kwargs,
-                )
-
-    def test_unknown_error(self):
-        "An assertion is raised if the field doesn't contain the specified error"
-        for prefix, kwargs in self.msg_prefixes:
-            msg = (
-                f"{prefix}The errors of field 'email' on form 0 of formset "
-                f"<TestFormFormSet: bound=True valid=False total_forms=2> don't match."
-            )
-            with self.assertRaisesMessage(AssertionError, msg):
-                self.assertFormsetError(
-                    self.response_form_errors,
-                    "my_formset",
-                    0,
-                    "email",
-                    "Some error.",
-                    **kwargs,
-                )
-
-    def test_field_error(self):
-        "No assertion is raised if the field contains the provided error"
-        error_msg = ["Enter a valid email address."]
-        for prefix, kwargs in self.msg_prefixes:
-            self.assertFormsetError(
-                self.response_form_errors, "my_formset", 0, "email", error_msg, **kwargs
-            )
-
-    def test_no_nonfield_error(self):
-        """
-        An assertion is raised if the formsets non-field errors doesn't contain
-        any errors.
-        """
-        for prefix, kwargs in self.msg_prefixes:
-            msg = (
-                f"{prefix}The non-field errors of form 1 of formset <TestFormFormSet: "
-                f"bound=True valid=False total_forms=2> don't match."
-            )
-            with self.assertRaisesMessage(AssertionError, msg):
-                self.assertFormsetError(
-                    self.response_form_errors,
-                    "my_formset",
-                    1,
-                    None,
-                    "Some error.",
-                    **kwargs,
-                )
-
-    def test_unknown_nonfield_error(self):
-        """
-        An assertion is raised if the formsets non-field errors doesn't contain
-        the provided error.
-        """
-        for prefix, kwargs in self.msg_prefixes:
-            msg = (
-                f"{prefix}The non-field errors of form 0 of formset <TestFormFormSet: "
-                f"bound=True valid=False total_forms=2> don't match."
-            )
-            with self.assertRaisesMessage(AssertionError, msg):
-                self.assertFormsetError(
-                    self.response_form_errors,
-                    "my_formset",
-                    0,
-                    None,
-                    "Some error.",
-                    **kwargs,
-                )
-
-    def test_nonfield_error(self):
-        """
-        No assertion is raised if the formsets non-field errors contains the
-        provided error.
-        """
-        for prefix, kwargs in self.msg_prefixes:
-            self.assertFormsetError(
-                self.response_form_errors,
-                "my_formset",
-                0,
-                None,
-                "Non-field error.",
-                **kwargs,
-            )
-
-    def test_no_nonform_error(self):
-        """
-        An assertion is raised if the formsets non-form errors doesn't contain
-        any errors.
-        """
-        for prefix, kwargs in self.msg_prefixes:
-            msg = (
-                f"{prefix}The non-form errors of formset <TestFormFormSet: bound=True "
-                f"valid=False total_forms=2> don't match"
-            )
-            with self.assertRaisesMessage(AssertionError, msg):
-                self.assertFormsetError(
-                    self.response_form_errors,
-                    "my_formset",
-                    None,
-                    None,
-                    "Some error.",
-                    **kwargs,
-                )
-
-    def test_unknown_nonform_error(self):
-        """
-        An assertion is raised if the formsets non-form errors doesn't contain
-        the provided error.
-        """
-        for prefix, kwargs in self.msg_prefixes:
-            msg = (
-                f"{prefix}The non-form errors of formset <TestFormFormSet: bound=True "
-                f"valid=False total_forms=2> don't match"
-            )
-            with self.assertRaisesMessage(AssertionError, msg):
-                self.assertFormsetError(
-                    self.response_nonform_errors,
-                    "my_formset",
-                    None,
-                    None,
-                    "Some error.",
-                    **kwargs,
-                )
-
-    def test_nonform_error(self):
-        """
-        No assertion is raised if the formsets non-form errors contains the
-        provided error.
-        """
-        msg = "Forms in a set must have distinct email addresses."
-        for prefix, kwargs in self.msg_prefixes:
-            self.assertFormsetError(
-                self.response_nonform_errors, "my_formset", None, None, msg, **kwargs
-            )
 
 
 @override_settings(ROOT_URLCONF="test_client_regress.urls")
@@ -1482,6 +1198,10 @@ class QueryStringTests(SimpleTestCase):
         self.assertEqual(response.context["get-foo"], "whiz")
         self.assertIsNone(response.context["post-foo"])
 
+        response = self.client.post("/request_data/", query_params={"foo": "whiz"})
+        self.assertEqual(response.context["get-foo"], "whiz")
+        self.assertIsNone(response.context["post-foo"])
+
         # POST data provided in the URL augments actual form data
         response = self.client.post("/request_data/?foo=whiz", data={"foo": "bang"})
         self.assertEqual(response.context["get-foo"], "whiz")
@@ -1582,14 +1302,18 @@ class UploadedFileEncodingTest(SimpleTestCase):
 class RequestHeadersTest(SimpleTestCase):
     def test_client_headers(self):
         "A test client can receive custom headers"
-        response = self.client.get("/check_headers/", HTTP_X_ARG_CHECK="Testing 123")
+        response = self.client.get(
+            "/check_headers/", headers={"x-arg-check": "Testing 123"}
+        )
         self.assertEqual(response.content, b"HTTP_X_ARG_CHECK: Testing 123")
         self.assertEqual(response.status_code, 200)
 
     def test_client_headers_redirect(self):
         "Test client headers are preserved through redirects"
         response = self.client.get(
-            "/check_headers_redirect/", follow=True, HTTP_X_ARG_CHECK="Testing 123"
+            "/check_headers_redirect/",
+            follow=True,
+            headers={"x-arg-check": "Testing 123"},
         )
         self.assertEqual(response.content, b"HTTP_X_ARG_CHECK: Testing 123")
         self.assertRedirects(

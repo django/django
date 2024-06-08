@@ -1,5 +1,5 @@
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.forms import ClearableFileInput, MultiWidget
+from django.forms import ClearableFileInput, FileField, Form, MultiWidget
 
 from .base import WidgetTest
 
@@ -17,7 +17,8 @@ class FakeFieldFile:
 
 
 class ClearableFileInputTest(WidgetTest):
-    widget = ClearableFileInput()
+    def setUp(self):
+        self.widget = ClearableFileInput()
 
     def test_clear_input_renders(self):
         """
@@ -110,6 +111,31 @@ class ClearableFileInputTest(WidgetTest):
             ),
         )
 
+    def test_render_checked(self):
+        self.widget.checked = True
+        self.check_html(
+            self.widget,
+            "myfile",
+            FakeFieldFile(),
+            html=(
+                'Currently: <a href="something">something</a>'
+                '<input type="checkbox" name="myfile-clear" id="myfile-clear_id" '
+                "checked>"
+                '<label for="myfile-clear_id">Clear</label><br>Change: '
+                '<input type="file" name="myfile" checked>'
+            ),
+        )
+
+    def test_render_no_disabled(self):
+        class TestForm(Form):
+            clearable_file = FileField(
+                widget=self.widget, initial=FakeFieldFile(), required=False
+            )
+
+        form = TestForm()
+        with self.assertNoLogs("django.template", "DEBUG"):
+            form.render()
+
     def test_render_as_subwidget(self):
         """A ClearableFileInput as a subwidget of MultiWidget."""
         widget = MultiWidget(widgets=(self.widget,))
@@ -138,6 +164,7 @@ class ClearableFileInputTest(WidgetTest):
             name="myfile",
         )
         self.assertIs(value, False)
+        self.assertIs(self.widget.checked, True)
 
     def test_clear_input_checked_returns_false_only_if_not_required(self):
         """
@@ -154,6 +181,7 @@ class ClearableFileInputTest(WidgetTest):
             name="myfile",
         )
         self.assertEqual(value, field)
+        self.assertIs(widget.checked, True)
 
     def test_html_does_not_mask_exceptions(self):
         """
@@ -207,3 +235,33 @@ class ClearableFileInputTest(WidgetTest):
         self.assertIs(
             widget.value_omitted_from_data({"field-clear": "y"}, {}, "field"), False
         )
+
+    def test_fieldset(self):
+        class TestForm(Form):
+            template_name = "forms_tests/use_fieldset.html"
+            field = FileField(widget=self.widget)
+            with_file = FileField(widget=self.widget, initial=FakeFieldFile())
+            clearable_file = FileField(
+                widget=self.widget, initial=FakeFieldFile(), required=False
+            )
+
+        form = TestForm()
+        self.assertIs(self.widget.use_fieldset, False)
+        self.assertHTMLEqual(
+            '<div><label for="id_field">Field:</label>'
+            '<input id="id_field" name="field" type="file" required></div>'
+            '<div><label for="id_with_file">With file:</label>Currently: '
+            '<a href="something">something</a><br>Change:<input type="file" '
+            'name="with_file" id="id_with_file"></div>'
+            '<div><label for="id_clearable_file">Clearable file:</label>'
+            'Currently: <a href="something">something</a><input '
+            'type="checkbox" name="clearable_file-clear" id="clearable_file-clear_id">'
+            '<label for="clearable_file-clear_id">Clear</label><br>Change:'
+            '<input type="file" name="clearable_file" id="id_clearable_file"></div>',
+            form.render(),
+        )
+
+    def test_multiple_error(self):
+        msg = "ClearableFileInput doesn't support uploading multiple files."
+        with self.assertRaisesMessage(ValueError, msg):
+            ClearableFileInput(attrs={"multiple": True})

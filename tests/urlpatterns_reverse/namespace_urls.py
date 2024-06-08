@@ -23,7 +23,10 @@ urlpatterns = [
     path("resolver_match/", views.pass_resolver_match_view, name="test-resolver-match"),
     re_path(r"^\+\\\$\*/$", views.empty_view, name="special-view"),
     re_path(
-        r"^mixed_args/([0-9]+)/(?P<arg2>[0-9]+)/$", views.empty_view, name="mixed-args"
+        r"^mixed_args/([0-9]+)/(?P<arg2>[0-9]+)/$",
+        views.empty_view,
+        {"extra": True},
+        name="mixed-args",
     ),
     re_path(r"^no_kwargs/([0-9]+)/([0-9]+)/$", views.empty_view, name="no-kwargs"),
     re_path(

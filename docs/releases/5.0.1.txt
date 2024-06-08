@@ -1,0 +1,38 @@
+==========================
+Django 5.0.1 release notes
+==========================
+
+*January 2, 2024*
+
+Django 5.0.1 fixes several bugs in 5.0.
+
+Bugfixes
+========
+
+* Reallowed, following a regression in Django 5.0, using a foreign key to a
+  model with a primary key that is not ``AutoField`` in
+  :attr:`.ModelAdmin.list_filter` (:ticket:`35020`).
+
+* Fixed a long standing bug in handling the ``RETURNING INTO`` clause that
+  caused a crash when creating a model instance with a ``GeneratedField`` which
+  ``output_field`` had backend-specific converters (:ticket:`35024`).
+
+* Fixed a regression in Django 5.0 that caused a crash of ``Model.save()`` for
+  models with both ``GeneratedField`` and ``ForeignKey`` fields
+  (:ticket:`35019`).
+
+* Fixed a bug in Django 5.0 that caused a migration crash on Oracle < 23c when
+  adding a ``GeneratedField`` with ``output_field=BooleanField``
+  (:ticket:`35018`).
+
+* Fixed a regression in Django 5.0 where admin fields on the same line could
+  overflow the page and become non-interactive (:ticket:`35012`).
+
+* Added compatibility for ``oracledb`` 2.0.0 (:ticket:`35054`).
+
+* Fixed a regression in Django 5.0 where querysets referenced incorrect field
+  names from ``FilteredRelation()`` (:ticket:`35050`).
+
+* Fixed a regression in Django 5.0 that caused a system check crash when
+  ``ModelAdmin.filter_horizontal`` or ``filter_vertical`` contained a reverse
+  many-to-many relation with ``related_name`` (:ticket:`35056`).

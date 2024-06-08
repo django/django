@@ -1,0 +1,21 @@
+==========================
+Django 4.2.4 release notes
+==========================
+
+*August 1, 2023*
+
+Django 4.2.4 fixes several bugs in 4.2.3.
+
+Bugfixes
+========
+
+* Fixed a regression in Django 4.2 that caused a crash of
+  ``QuerySet.aggregate()`` with aggregates referencing window functions
+  (:ticket:`34717`).
+
+* Fixed a regression in Django 4.2 that caused a crash when grouping by a
+  reference in a subquery (:ticket:`34748`).
+
+* Fixed a regression in Django 4.2 that caused aggregation over query that
+  uses explicit grouping by multi-valued annotations to group against the wrong
+  columns (:ticket:`34750`).

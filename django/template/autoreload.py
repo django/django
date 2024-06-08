@@ -17,7 +17,7 @@ def get_template_directories():
         if not isinstance(backend, DjangoTemplates):
             continue
 
-        items.update(cwd / to_path(dir) for dir in backend.engine.dirs)
+        items.update(cwd / to_path(dir) for dir in backend.engine.dirs if dir)
 
         for loader in backend.engine.template_loaders:
             if not hasattr(loader, "get_dirs"):
@@ -25,15 +25,22 @@ def get_template_directories():
             items.update(
                 cwd / to_path(directory)
                 for directory in loader.get_dirs()
-                if not is_django_path(directory)
+                if directory and not is_django_path(directory)
             )
     return items
 
 
 def reset_loaders():
+    from django.forms.renderers import get_default_renderer
+
     for backend in engines.all():
         if not isinstance(backend, DjangoTemplates):
             continue
+        for loader in backend.engine.template_loaders:
+            loader.reset()
+
+    backend = getattr(get_default_renderer(), "engine", None)
+    if isinstance(backend, DjangoTemplates):
         for loader in backend.engine.template_loaders:
             loader.reset()
 

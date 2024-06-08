@@ -1,4 +1,5 @@
 """Tests for jslex."""
+
 # originally from https://bitbucket.org/ned/jslex
 
 from django.test import SimpleTestCase

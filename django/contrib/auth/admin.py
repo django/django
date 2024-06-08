@@ -66,7 +66,7 @@ class UserAdmin(admin.ModelAdmin):
             None,
             {
                 "classes": ("wide",),
-                "fields": ("username", "password1", "password2"),
+                "fields": ("username", "usable_password", "password1", "password2"),
             },
         ),
     )
@@ -106,10 +106,12 @@ class UserAdmin(admin.ModelAdmin):
             ),
         ] + super().get_urls()
 
-    def lookup_allowed(self, lookup, value):
+    # RemovedInDjango60Warning: when the deprecation ends, replace with:
+    # def lookup_allowed(self, lookup, value, request):
+    def lookup_allowed(self, lookup, value, request=None):
         # Don't allow lookups involving passwords.
         return not lookup.startswith("password") and super().lookup_allowed(
-            lookup, value
+            lookup, value, request
         )
 
     @sensitive_post_parameters_m
@@ -138,7 +140,7 @@ class UserAdmin(admin.ModelAdmin):
             raise PermissionDenied
         if extra_context is None:
             extra_context = {}
-        username_field = self.model._meta.get_field(self.model.USERNAME_FIELD)
+        username_field = self.opts.get_field(self.model.USERNAME_FIELD)
         defaults = {
             "auto_populated_fields": (),
             "username_help_text": username_field.help_text,
@@ -155,17 +157,34 @@ class UserAdmin(admin.ModelAdmin):
             raise Http404(
                 _("%(name)s object with primary key %(key)r does not exist.")
                 % {
-                    "name": self.model._meta.verbose_name,
+                    "name": self.opts.verbose_name,
                     "key": escape(id),
                 }
             )
         if request.method == "POST":
             form = self.change_password_form(user, request.POST)
             if form.is_valid():
-                form.save()
+                # If disabling password-based authentication was requested
+                # (via the form field `usable_password`), the submit action
+                # must be "unset-password". This check is most relevant when
+                # the admin user has two submit buttons available (for example
+                # when Javascript is disabled).
+                valid_submission = (
+                    form.cleaned_data["set_usable_password"]
+                    or "unset-password" in request.POST
+                )
+                if not valid_submission:
+                    msg = gettext("Conflicting form data submitted. Please try again.")
+                    messages.error(request, msg)
+                    return HttpResponseRedirect(request.get_full_path())
+
+                user = form.save()
                 change_message = self.construct_change_message(request, form, None)
                 self.log_change(request, user, change_message)
-                msg = gettext("Password changed successfully.")
+                if user.has_usable_password():
+                    msg = gettext("Password changed successfully.")
+                else:
+                    msg = gettext("Password-based authentication was disabled.")
                 messages.success(request, msg)
                 update_session_auth_hash(request, form.user)
                 return HttpResponseRedirect(
@@ -183,11 +202,15 @@ class UserAdmin(admin.ModelAdmin):
             form = self.change_password_form(user)
 
         fieldsets = [(None, {"fields": list(form.base_fields)})]
-        adminForm = admin.helpers.AdminForm(form, fieldsets, {})
+        admin_form = admin.helpers.AdminForm(form, fieldsets, {})
 
+        if user.has_usable_password():
+            title = _("Change password: %s")
+        else:
+            title = _("Set password: %s")
         context = {
-            "title": _("Change password: %s") % escape(user.get_username()),
-            "adminForm": adminForm,
+            "title": title % escape(user.get_username()),
+            "adminForm": admin_form,
             "form_url": form_url,
             "form": form,
             "is_popup": (IS_POPUP_VAR in request.POST or IS_POPUP_VAR in request.GET),
@@ -197,7 +220,7 @@ class UserAdmin(admin.ModelAdmin):
             "has_delete_permission": False,
             "has_change_permission": True,
             "has_absolute_url": False,
-            "opts": self.model._meta,
+            "opts": self.opts,
             "original": user,
             "save_as": False,
             "show_save": True,

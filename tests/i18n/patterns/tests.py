@@ -8,7 +8,7 @@ from django.template import Context, Template
 from django.test import SimpleTestCase, override_settings
 from django.test.client import RequestFactory
 from django.test.utils import override_script_prefix
-from django.urls import clear_url_caches, reverse, translate_url
+from django.urls import clear_url_caches, resolve, reverse, translate_url
 from django.utils import translation
 
 
@@ -52,10 +52,8 @@ class URLTestCaseBase(SimpleTestCase):
     def setUp(self):
         # Make sure the cache is empty before we are doing our tests.
         clear_url_caches()
-
-    def tearDown(self):
         # Make sure we will leave an empty cache for other testcases.
-        clear_url_caches()
+        self.addCleanup(clear_url_caches)
 
 
 class URLPrefixTests(URLTestCaseBase):
@@ -137,12 +135,16 @@ class URLTranslationTests(URLTestCaseBase):
         with translation.override("en"):
             self.assertEqual(reverse("no-prefix-translated"), "/translated/")
             self.assertEqual(
+                reverse("no-prefix-translated-regex"), "/translated-regex/"
+            )
+            self.assertEqual(
                 reverse("no-prefix-translated-slug", kwargs={"slug": "yeah"}),
                 "/translated/yeah/",
             )
 
         with translation.override("nl"):
             self.assertEqual(reverse("no-prefix-translated"), "/vertaald/")
+            self.assertEqual(reverse("no-prefix-translated-regex"), "/vertaald-regex/")
             self.assertEqual(
                 reverse("no-prefix-translated-slug", kwargs={"slug": "yeah"}),
                 "/vertaald/yeah/",
@@ -150,6 +152,9 @@ class URLTranslationTests(URLTestCaseBase):
 
         with translation.override("pt-br"):
             self.assertEqual(reverse("no-prefix-translated"), "/traduzidos/")
+            self.assertEqual(
+                reverse("no-prefix-translated-regex"), "/traduzidos-regex/"
+            )
             self.assertEqual(
                 reverse("no-prefix-translated-slug", kwargs={"slug": "yeah"}),
                 "/traduzidos/yeah/",
@@ -182,7 +187,7 @@ class URLTranslationTests(URLTestCaseBase):
                 "/nl/profiel/registreren-als-pad/",
             )
             self.assertEqual(translation.get_language(), "en")
-            # URL with parameters.
+            # re_path() URL with parameters.
             self.assertEqual(
                 translate_url("/en/with-arguments/regular-argument/", "nl"),
                 "/nl/with-arguments/regular-argument/",
@@ -193,10 +198,38 @@ class URLTranslationTests(URLTestCaseBase):
                 ),
                 "/nl/with-arguments/regular-argument/optional.html",
             )
+            # path() URL with parameter.
+            self.assertEqual(
+                translate_url("/en/path-with-arguments/regular-argument/", "nl"),
+                "/nl/path-with-arguments/regular-argument/",
+            )
 
         with translation.override("nl"):
             self.assertEqual(translate_url("/nl/gebruikers/", "en"), "/en/users/")
             self.assertEqual(translation.get_language(), "nl")
+
+    def test_reverse_translated_with_captured_kwargs(self):
+        with translation.override("en"):
+            match = resolve("/translated/apo/")
+        # Links to the same page in other languages.
+        tests = [
+            ("nl", "/vertaald/apo/"),
+            ("pt-br", "/traduzidos/apo/"),
+        ]
+        for lang, expected_link in tests:
+            with translation.override(lang):
+                self.assertEqual(
+                    reverse(
+                        match.url_name, args=match.args, kwargs=match.captured_kwargs
+                    ),
+                    expected_link,
+                )
+
+    def test_locale_not_interepreted_as_regex(self):
+        with translation.override("e("):
+            # Would previously error:
+            # re.error: missing ), unterminated subpattern at position 1
+            reverse("users")
 
 
 class URLNamespaceTests(URLTestCaseBase):
@@ -229,29 +262,39 @@ class URLRedirectTests(URLTestCaseBase):
         self.assertEqual(response.status_code, 200)
 
     def test_en_redirect(self):
-        response = self.client.get("/account/register/", HTTP_ACCEPT_LANGUAGE="en")
+        response = self.client.get(
+            "/account/register/", headers={"accept-language": "en"}
+        )
         self.assertRedirects(response, "/en/account/register/")
 
         response = self.client.get(response.headers["location"])
         self.assertEqual(response.status_code, 200)
 
     def test_en_redirect_wrong_url(self):
-        response = self.client.get("/profiel/registreren/", HTTP_ACCEPT_LANGUAGE="en")
+        response = self.client.get(
+            "/profiel/registreren/", headers={"accept-language": "en"}
+        )
         self.assertEqual(response.status_code, 404)
 
     def test_nl_redirect(self):
-        response = self.client.get("/profiel/registreren/", HTTP_ACCEPT_LANGUAGE="nl")
+        response = self.client.get(
+            "/profiel/registreren/", headers={"accept-language": "nl"}
+        )
         self.assertRedirects(response, "/nl/profiel/registreren/")
 
         response = self.client.get(response.headers["location"])
         self.assertEqual(response.status_code, 200)
 
     def test_nl_redirect_wrong_url(self):
-        response = self.client.get("/account/register/", HTTP_ACCEPT_LANGUAGE="nl")
+        response = self.client.get(
+            "/account/register/", headers={"accept-language": "nl"}
+        )
         self.assertEqual(response.status_code, 404)
 
     def test_pt_br_redirect(self):
-        response = self.client.get("/conta/registre-se/", HTTP_ACCEPT_LANGUAGE="pt-br")
+        response = self.client.get(
+            "/conta/registre-se/", headers={"accept-language": "pt-br"}
+        )
         self.assertRedirects(response, "/pt-br/conta/registre-se/")
 
         response = self.client.get(response.headers["location"])
@@ -259,7 +302,9 @@ class URLRedirectTests(URLTestCaseBase):
 
     def test_pl_pl_redirect(self):
         # language from outside of the supported LANGUAGES list
-        response = self.client.get("/account/register/", HTTP_ACCEPT_LANGUAGE="pl-pl")
+        response = self.client.get(
+            "/account/register/", headers={"accept-language": "pl-pl"}
+        )
         self.assertRedirects(response, "/en/account/register/")
 
         response = self.client.get(response.headers["location"])
@@ -272,7 +317,9 @@ class URLRedirectTests(URLTestCaseBase):
         ],
     )
     def test_custom_redirect_class(self):
-        response = self.client.get("/account/register/", HTTP_ACCEPT_LANGUAGE="en")
+        response = self.client.get(
+            "/account/register/", headers={"accept-language": "en"}
+        )
         self.assertRedirects(response, "/en/account/register/", 301)
 
 
@@ -291,7 +338,9 @@ class URLVaryAcceptLanguageTests(URLTestCaseBase):
         The redirect to a prefixed URL depends on 'Accept-Language' and
         'Cookie', but once prefixed no header is set.
         """
-        response = self.client.get("/account/register/", HTTP_ACCEPT_LANGUAGE="en")
+        response = self.client.get(
+            "/account/register/", headers={"accept-language": "en"}
+        )
         self.assertRedirects(response, "/en/account/register/")
         self.assertEqual(response.get("Vary"), "Accept-Language, Cookie")
 
@@ -307,19 +356,19 @@ class URLRedirectWithoutTrailingSlashTests(URLTestCaseBase):
     """
 
     def test_not_prefixed_redirect(self):
-        response = self.client.get("/not-prefixed", HTTP_ACCEPT_LANGUAGE="en")
+        response = self.client.get("/not-prefixed", headers={"accept-language": "en"})
         self.assertRedirects(response, "/not-prefixed/", 301)
 
     def test_en_redirect(self):
         response = self.client.get(
-            "/account/register", HTTP_ACCEPT_LANGUAGE="en", follow=True
+            "/account/register", headers={"accept-language": "en"}, follow=True
         )
         # We only want one redirect, bypassing CommonMiddleware
         self.assertEqual(response.redirect_chain, [("/en/account/register/", 302)])
         self.assertRedirects(response, "/en/account/register/", 302)
 
         response = self.client.get(
-            "/prefixed.xml", HTTP_ACCEPT_LANGUAGE="en", follow=True
+            "/prefixed.xml", headers={"accept-language": "en"}, follow=True
         )
         self.assertRedirects(response, "/en/prefixed.xml", 302)
 
@@ -332,13 +381,13 @@ class URLRedirectWithoutTrailingSlashSettingTests(URLTestCaseBase):
 
     @override_settings(APPEND_SLASH=False)
     def test_not_prefixed_redirect(self):
-        response = self.client.get("/not-prefixed", HTTP_ACCEPT_LANGUAGE="en")
+        response = self.client.get("/not-prefixed", headers={"accept-language": "en"})
         self.assertEqual(response.status_code, 404)
 
     @override_settings(APPEND_SLASH=False)
     def test_en_redirect(self):
         response = self.client.get(
-            "/account/register-without-slash", HTTP_ACCEPT_LANGUAGE="en"
+            "/account/register-without-slash", headers={"accept-language": "en"}
         )
         self.assertRedirects(response, "/en/account/register-without-slash", 302)
 
@@ -392,6 +441,27 @@ class URLResponseTests(URLTestCaseBase):
         self.assertEqual(response.context["LANGUAGE_CODE"], "nl")
 
 
+@override_settings(ROOT_URLCONF="i18n.urls_default_unprefixed", LANGUAGE_CODE="nl")
+class URLPrefixedFalseTranslatedTests(URLTestCaseBase):
+    def test_translated_path_unprefixed_language_other_than_accepted_header(self):
+        response = self.client.get("/gebruikers/", headers={"accept-language": "en"})
+        self.assertEqual(response.status_code, 200)
+
+    def test_translated_path_unprefixed_language_other_than_cookie_language(self):
+        self.client.cookies.load({settings.LANGUAGE_COOKIE_NAME: "en"})
+        response = self.client.get("/gebruikers/")
+        self.assertEqual(response.status_code, 200)
+
+    def test_translated_path_prefixed_language_other_than_accepted_header(self):
+        response = self.client.get("/en/users/", headers={"accept-language": "nl"})
+        self.assertEqual(response.status_code, 200)
+
+    def test_translated_path_prefixed_language_other_than_cookie_language(self):
+        self.client.cookies.load({settings.LANGUAGE_COOKIE_NAME: "nl"})
+        response = self.client.get("/en/users/")
+        self.assertEqual(response.status_code, 200)
+
+
 class URLRedirectWithScriptAliasTests(URLTestCaseBase):
     """
     #21579 - LocaleMiddleware should respect the script prefix.
@@ -401,7 +471,7 @@ class URLRedirectWithScriptAliasTests(URLTestCaseBase):
         prefix = "/script_prefix"
         with override_script_prefix(prefix):
             response = self.client.get(
-                "/prefixed/", HTTP_ACCEPT_LANGUAGE="en", SCRIPT_NAME=prefix
+                "/prefixed/", headers={"accept-language": "en"}, SCRIPT_NAME=prefix
             )
             self.assertRedirects(
                 response, "%s/en/prefixed/" % prefix, target_status_code=404

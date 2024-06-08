@@ -17,7 +17,6 @@ else:
 
 @skipIf(jinja2 is None, "this test requires jinja2")
 class Jinja2Tests(TemplateStringsTests):
-
     engine_class = Jinja2
     backend_name = "jinja2"
     options = {

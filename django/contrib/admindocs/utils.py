@@ -101,6 +101,9 @@ ROLES = {
 
 
 def create_reference_role(rolename, urlbase):
+    # Views and template names are case-sensitive.
+    is_case_sensitive = rolename in ["template", "view"]
+
     def _role(name, rawtext, text, lineno, inliner, options=None, content=None):
         if options is None:
             options = {}
@@ -111,7 +114,7 @@ def create_reference_role(rolename, urlbase):
                 urlbase
                 % (
                     inliner.document.settings.link_base,
-                    text.lower(),
+                    text if is_case_sensitive else text.lower(),
                 )
             ),
             **options,

@@ -6,25 +6,27 @@ from django.utils.functional import cached_property
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     empty_fetchmany_value = ()
-    allows_group_by_pk = True
     related_fields_match_type = True
     # MySQL doesn't support sliced subqueries with IN/ALL/ANY/SOME.
     allow_sliced_subqueries_with_in = False
     has_select_for_update = True
+    has_select_for_update_nowait = True
     supports_forward_references = False
     supports_regex_backreferencing = False
     supports_date_lookup_using_string = False
     supports_timezones = False
     requires_explicit_null_ordering_when_grouping = True
-    can_release_savepoints = True
     atomic_transactions = False
     can_clone_databases = True
+    supports_comments = True
+    supports_comments_inline = True
     supports_temporal_subtraction = True
-    supports_select_intersection = False
-    supports_select_difference = False
     supports_slicing_ordering_in_compound = True
     supports_index_on_text_field = False
+    supports_over_clause = True
+    supports_frame_range_fixed_distance = True
     supports_update_conflicts = True
+    delete_can_self_reference_subquery = False
     create_test_procedure_without_params_sql = """
         CREATE PROCEDURE test_procedure ()
         BEGIN
@@ -39,50 +41,54 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             SET V_I = P_I;
         END;
     """
+    create_test_table_with_composite_primary_key = """
+        CREATE TABLE test_table_composite_pk (
+            column_1 INTEGER NOT NULL,
+            column_2 INTEGER NOT NULL,
+            PRIMARY KEY(column_1, column_2)
+        )
+    """
     # Neither MySQL nor MariaDB support partial indexes.
     supports_partial_indexes = False
     # COLLATE must be wrapped in parentheses because MySQL treats COLLATE as an
     # indexed expression.
     collate_as_index_expression = True
+    insert_test_table_with_defaults = "INSERT INTO {} () VALUES ()"
 
     supports_order_by_nulls_modifier = False
     order_by_nulls_first = True
     supports_logical_xor = True
 
+    supports_stored_generated_columns = True
+    supports_virtual_generated_columns = True
+
     @cached_property
     def minimum_database_version(self):
         if self.connection.mysql_is_mariadb:
-            return (10, 2)
+            return (10, 5)
         else:
-            return (5, 7)
-
-    @cached_property
-    def bare_select_suffix(self):
-        if (
-            self.connection.mysql_is_mariadb and self.connection.mysql_version < (10, 4)
-        ) or (
-            not self.connection.mysql_is_mariadb
-            and self.connection.mysql_version < (8,)
-        ):
-            return " FROM DUAL"
-        return ""
+            return (8, 0, 11)
 
     @cached_property
     def test_collations(self):
         charset = "utf8"
-        if self.connection.mysql_is_mariadb and self.connection.mysql_version >= (
-            10,
-            6,
+        if (
+            self.connection.mysql_is_mariadb
+            and self.connection.mysql_version >= (10, 6)
+        ) or (
+            not self.connection.mysql_is_mariadb
+            and self.connection.mysql_version >= (8, 0, 30)
         ):
-            # utf8 is an alias for utf8mb3 in MariaDB 10.6+.
+            # utf8 is an alias for utf8mb3 in MariaDB 10.6+ and MySQL 8.0.30+.
             charset = "utf8mb3"
         return {
             "ci": f"{charset}_general_ci",
             "non_default": f"{charset}_esperanto_ci",
             "swedish_ci": f"{charset}_swedish_ci",
+            "virtual": f"{charset}_esperanto_ci",
         }
 
-    test_now_utc_template = "UTC_TIMESTAMP"
+    test_now_utc_template = "UTC_TIMESTAMP(6)"
 
     @cached_property
     def django_test_skips(self):
@@ -105,45 +111,17 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             "scalar value but it's not implemented (#25287).": {
                 "expressions.tests.FTimeDeltaTests.test_durationfield_multiply_divide",
             },
+            "UPDATE ... ORDER BY syntax on MySQL/MariaDB does not support ordering by"
+            "related fields.": {
+                "update.tests.AdvancedTests."
+                "test_update_ordered_by_inline_m2m_annotation",
+                "update.tests.AdvancedTests.test_update_ordered_by_m2m_annotation",
+                "update.tests.AdvancedTests.test_update_ordered_by_m2m_annotation_desc",
+            },
         }
-        if "ONLY_FULL_GROUP_BY" in self.connection.sql_mode:
-            skips.update(
-                {
-                    "GROUP BY optimization does not work properly when "
-                    "ONLY_FULL_GROUP_BY mode is enabled on MySQL, see #31331.": {
-                        "aggregation.tests.AggregateTestCase."
-                        "test_aggregation_subquery_annotation_multivalued",
-                        "annotations.tests.NonAggregateAnnotationTestCase."
-                        "test_annotation_aggregate_with_m2o",
-                    },
-                }
-            )
-        if not self.connection.mysql_is_mariadb and self.connection.mysql_version < (
-            8,
-        ):
-            skips.update(
-                {
-                    "Casting to datetime/time is not supported by MySQL < 8.0. "
-                    "(#30224)": {
-                        "aggregation.tests.AggregateTestCase."
-                        "test_aggregation_default_using_time_from_python",
-                        "aggregation.tests.AggregateTestCase."
-                        "test_aggregation_default_using_datetime_from_python",
-                    },
-                    "MySQL < 8.0 returns string type instead of datetime/time. "
-                    "(#30224)": {
-                        "aggregation.tests.AggregateTestCase."
-                        "test_aggregation_default_using_time_from_database",
-                        "aggregation.tests.AggregateTestCase."
-                        "test_aggregation_default_using_datetime_from_database",
-                    },
-                }
-            )
         if self.connection.mysql_is_mariadb and (
-            10,
-            4,
-            3,
-        ) < self.connection.mysql_version < (10, 5, 2):
+            self.connection.mysql_version < (10, 5, 2)
+        ):
             skips.update(
                 {
                     "https://jira.mariadb.org/browse/MDEV-19598": {
@@ -152,24 +130,43 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                     },
                 }
             )
-        if self.connection.mysql_is_mariadb and (
-            10,
-            4,
-            12,
-        ) < self.connection.mysql_version < (10, 5):
-            skips.update(
-                {
-                    "https://jira.mariadb.org/browse/MDEV-22775": {
-                        "schema.tests.SchemaTests."
-                        "test_alter_pk_with_self_referential_field",
-                    },
-                }
-            )
         if not self.supports_explain_analyze:
             skips.update(
                 {
                     "MariaDB and MySQL >= 8.0.18 specific.": {
                         "queries.test_explain.ExplainTests.test_mysql_analyze",
+                    },
+                }
+            )
+        if "ONLY_FULL_GROUP_BY" in self.connection.sql_mode:
+            skips.update(
+                {
+                    "GROUP BY cannot contain nonaggregated column when "
+                    "ONLY_FULL_GROUP_BY mode is enabled on MySQL, see #34262.": {
+                        "aggregation.tests.AggregateTestCase."
+                        "test_group_by_nested_expression_with_params",
+                    },
+                }
+            )
+        if self.connection.mysql_version < (8, 0, 31):
+            skips.update(
+                {
+                    "Nesting of UNIONs at the right-hand side is not supported on "
+                    "MySQL < 8.0.31": {
+                        "queries.test_qs_combinators.QuerySetSetOperationTests."
+                        "test_union_nested"
+                    },
+                }
+            )
+        if not self.connection.mysql_is_mariadb:
+            skips.update(
+                {
+                    "MySQL doesn't allow renaming columns referenced by generated "
+                    "columns": {
+                        "migrations.test_operations.OperationTests."
+                        "test_invalid_generated_field_changes_on_rename_stored",
+                        "migrations.test_operations.OperationTests."
+                        "test_invalid_generated_field_changes_on_rename_virtual",
                     },
                 }
             )
@@ -190,11 +187,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     @cached_property
     def update_can_self_select(self):
-        return self.connection.mysql_is_mariadb and self.connection.mysql_version >= (
-            10,
-            3,
-            2,
-        )
+        return self.connection.mysql_is_mariadb
 
     @cached_property
     def can_introspect_foreign_keys(self):
@@ -213,11 +206,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     @cached_property
     def can_return_columns_from_insert(self):
-        return self.connection.mysql_is_mariadb and self.connection.mysql_version >= (
-            10,
-            5,
-            0,
-        )
+        return self.connection.mysql_is_mariadb
 
     can_return_rows_from_bulk_insert = property(
         operator.attrgetter("can_return_columns_from_insert")
@@ -232,16 +221,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         return self.connection.mysql_server_data["sql_auto_is_null"]
 
     @cached_property
-    def supports_over_clause(self):
-        if self.connection.mysql_is_mariadb:
-            return True
-        return self.connection.mysql_version >= (8, 0, 2)
-
-    supports_frame_range_fixed_distance = property(
-        operator.attrgetter("supports_over_clause")
-    )
-
-    @cached_property
     def supports_column_check_constraints(self):
         if self.connection.mysql_is_mariadb:
             return True
@@ -254,28 +233,18 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def can_introspect_check_constraints(self):
         if self.connection.mysql_is_mariadb:
-            version = self.connection.mysql_version
-            return version >= (10, 3, 10)
+            return True
         return self.connection.mysql_version >= (8, 0, 16)
 
     @cached_property
     def has_select_for_update_skip_locked(self):
         if self.connection.mysql_is_mariadb:
             return self.connection.mysql_version >= (10, 6)
-        return self.connection.mysql_version >= (8, 0, 1)
-
-    @cached_property
-    def has_select_for_update_nowait(self):
-        if self.connection.mysql_is_mariadb:
-            return True
-        return self.connection.mysql_version >= (8, 0, 1)
+        return True
 
     @cached_property
     def has_select_for_update_of(self):
-        return (
-            not self.connection.mysql_is_mariadb
-            and self.connection.mysql_version >= (8, 0, 1)
-        )
+        return not self.connection.mysql_is_mariadb
 
     @cached_property
     def supports_explain_analyze(self):
@@ -315,26 +284,55 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         return not self.connection.mysql_is_mariadb
 
     @cached_property
-    def supports_json_field(self):
-        if self.connection.mysql_is_mariadb:
-            return True
-        return self.connection.mysql_version >= (5, 7, 8)
-
-    @cached_property
     def can_introspect_json_field(self):
         if self.connection.mysql_is_mariadb:
-            return self.supports_json_field and self.can_introspect_check_constraints
-        return self.supports_json_field
+            return self.can_introspect_check_constraints
+        return True
 
     @cached_property
     def supports_index_column_ordering(self):
+        if self._mysql_storage_engine != "InnoDB":
+            return False
         if self.connection.mysql_is_mariadb:
             return self.connection.mysql_version >= (10, 8)
-        return self.connection.mysql_version >= (8, 0, 1)
+        return True
 
     @cached_property
     def supports_expression_indexes(self):
         return (
             not self.connection.mysql_is_mariadb
+            and self._mysql_storage_engine != "MyISAM"
             and self.connection.mysql_version >= (8, 0, 13)
         )
+
+    @cached_property
+    def supports_select_intersection(self):
+        is_mariadb = self.connection.mysql_is_mariadb
+        return is_mariadb or self.connection.mysql_version >= (8, 0, 31)
+
+    supports_select_difference = property(
+        operator.attrgetter("supports_select_intersection")
+    )
+
+    @cached_property
+    def can_rename_index(self):
+        if self.connection.mysql_is_mariadb:
+            return self.connection.mysql_version >= (10, 5, 2)
+        return True
+
+    @cached_property
+    def supports_expression_defaults(self):
+        if self.connection.mysql_is_mariadb:
+            return True
+        return self.connection.mysql_version >= (8, 0, 13)
+
+    @cached_property
+    def has_native_uuid_field(self):
+        is_mariadb = self.connection.mysql_is_mariadb
+        return is_mariadb and self.connection.mysql_version >= (10, 7)
+
+    @cached_property
+    def allows_group_by_selected_pks(self):
+        if self.connection.mysql_is_mariadb:
+            return "ONLY_FULL_GROUP_BY" not in self.connection.sql_mode
+        return True

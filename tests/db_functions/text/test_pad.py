@@ -35,7 +35,7 @@ class PadTests(TestCase):
         for function, padded_name in tests:
             with self.subTest(function=function):
                 authors = Author.objects.annotate(padded_name=function)
-                self.assertQuerysetEqual(
+                self.assertQuerySetEqual(
                     authors, [padded_name], lambda a: a.padded_name, ordered=False
                 )
 
@@ -51,7 +51,7 @@ class PadTests(TestCase):
         Author.objects.create(name="Rhonda", alias="john_smith")
         Author.objects.create(name="♥♣♠", alias="bytes")
         authors = Author.objects.annotate(filled=LPad("name", Length("alias")))
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             authors.order_by("alias"),
             ["  ♥♣♠", "    Rhonda"],
             lambda a: a.filled,

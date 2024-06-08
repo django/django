@@ -2,6 +2,7 @@
  This module houses the GEOS ctypes prototype functions for the
  topological operations on geometries.
 """
+
 from ctypes import c_double, c_int
 
 from django.contrib.gis.geos.libgeos import GEOM_PTR, GEOSFuncFactory

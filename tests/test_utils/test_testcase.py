@@ -1,10 +1,32 @@
+import pickle
 from functools import wraps
 
 from django.db import IntegrityError, connections, transaction
 from django.test import TestCase, skipUnlessDBFeature
-from django.test.testcases import DatabaseOperationForbidden, TestData
+from django.test.testcases import (
+    DatabaseOperationForbidden,
+    SimpleTestCase,
+    TestData,
+    is_pickable,
+)
 
 from .models import Car, Person, PossessedCar
+
+
+class UnpicklableObject:
+    def __getstate__(self):
+        raise pickle.PickleError("cannot be pickled for testing reasons")
+
+
+class TestSimpleTestCase(SimpleTestCase):
+    def test_is_picklable_with_non_picklable_properties(self):
+        """ParallelTestSuite requires that all TestCases are picklable."""
+        self.non_picklable = lambda: 0
+        self.assertEqual(self, pickle.loads(pickle.dumps(self)))
+
+    def test_is_picklable_with_non_picklable_object(self):
+        unpicklable_obj = UnpicklableObject()
+        self.assertEqual(is_pickable(unpicklable_obj), False)
 
 
 class TestTestCase(TestCase):
@@ -41,6 +63,7 @@ class TestTestCase(TestCase):
         with self.assertRaisesMessage(DatabaseOperationForbidden, message):
             Car.objects.using("other").get()
 
+    @skipUnlessDBFeature("supports_transactions")
     def test_reset_sequences(self):
         old_reset_sequences = self.reset_sequences
         self.reset_sequences = True
@@ -61,6 +84,10 @@ def assert_no_queries(test):
     return inner
 
 
+# On databases with no transaction support (for instance, MySQL with the MyISAM
+# engine), setUpTestData() is called before each test, so there is no need to
+# clone class level test data.
+@skipUnlessDBFeature("supports_transactions")
 class TestDataTests(TestCase):
     # setUpTestData re-assignment are also wrapped in TestData.
     jim_douglas = None

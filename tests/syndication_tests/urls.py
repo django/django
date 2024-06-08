@@ -4,6 +4,17 @@ from . import feeds
 
 urlpatterns = [
     path("syndication/rss2/", feeds.TestRss2Feed()),
+    path(
+        "syndication/rss2/with-callable-object/", feeds.TestRss2FeedWithCallableObject()
+    ),
+    path(
+        "syndication/rss2/with-decorated-methods/",
+        feeds.TestRss2FeedWithDecoratedMethod(),
+    ),
+    path(
+        "syndication/rss2/with-wrong-decorated-methods/",
+        feeds.TestRss2FeedWithWrongDecoratedMethod(),
+    ),
     path("syndication/rss2/articles/<int:entry_id>/", feeds.TestGetObjectFeed()),
     path(
         "syndication/rss2/guid_ispermalink_true/",

@@ -11,10 +11,8 @@ test_srs = (
         "auth_srid": 4326,
         # Only the beginning, because there are differences depending on installed libs
         "srtext": 'GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84"',
-        # +ellps=WGS84 has been removed in the 4326 proj string in proj-4.8
         "proj_re": (
-            r"\+proj=longlat (\+ellps=WGS84 )?(\+datum=WGS84 |\+towgs84=0,0,0,0,0,0,0 )"
-            r"\+no_defs ?"
+            r"\+proj=longlat (\+datum=WGS84 |\+towgs84=0,0,0,0,0,0,0 )\+no_defs ?"
         ),
         "spheroid": "WGS 84",
         "name": "WGS 84",

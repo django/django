@@ -5,16 +5,16 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janno Liivak <jannolii@gmail.com>, 2013-2015
 # madisvain <madisvain@gmail.com>, 2011
-# Martin Pajuste <martinpajuste@gmail.com>, 2015
+# Martin <martinpajuste@gmail.com>, 2015
 # Ragnar Rebase <rrebase@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-12-28 02:37+0000\n"
-"Last-Translator: Ragnar Rebase <rrebase@gmail.com>\n"
-"Language-Team: Estonian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 18:45+0000\n"
+"Last-Translator: Ragnar Rebase <rrebase@gmail.com>, 2019\n"
+"Language-Team: Estonian (http://app.transifex.com/django/django/language/"
 "et/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -76,9 +76,6 @@ msgstr "Geomeetria teisendamisel geomeetria vormivälja SRID-ks tekkis viga."
 
 msgid "Delete all Features"
 msgstr "Kustuta kõik Vahendid"
-
-msgid "WKT debugging window:"
-msgstr "WKT silumisaken:"
 
 msgid "Debugging window (serialized value)"
 msgstr "Siluri aken (järjestikväärtus)"

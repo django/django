@@ -418,6 +418,22 @@ class I18nBlockTransTagTests(SimpleTestCase):
 
     @setup(
         {
+            "i18n_asvar_safestring": (
+                "{% load i18n %}"
+                "{% blocktranslate asvar the_title %}"
+                "{{title}}other text"
+                "{% endblocktranslate %}"
+                "{{ the_title }}"
+            )
+        }
+    )
+    def test_i18n_asvar_safestring(self):
+        context = {"title": "<Main Title>"}
+        output = self.engine.render_to_string("i18n_asvar_safestring", context=context)
+        self.assertEqual(output, "&lt;Main Title&gt;other text")
+
+    @setup(
+        {
             "template": (
                 "{% load i18n %}{% blocktranslate asvar %}Yes{% endblocktranslate %}"
             )

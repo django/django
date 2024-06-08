@@ -11,7 +11,7 @@ from django.db.models import IntegerField, Sum, Value
 from django.test import TestCase, skipUnlessDBFeature
 
 from ..utils import FuncTestMixin
-from .models import City, Country, CountryWebMercator, State, Track
+from .models import City, Country, CountryWebMercator, ManyPointModel, State, Track
 
 
 class GISFunctionsTests(FuncTestMixin, TestCase):
@@ -119,6 +119,25 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
                 chicago_json,
             )
 
+    @skipUnlessDBFeature("has_AsGeoJSON_function")
+    def test_asgeojson_option_0(self):
+        p1 = Point(1, 1, srid=4326)
+        p2 = Point(-87.65018, 41.85039, srid=4326)
+        obj = ManyPointModel.objects.create(
+            point1=p1,
+            point2=p2,
+            point3=p2.transform(3857, clone=True),
+        )
+        self.assertJSONEqual(
+            ManyPointModel.objects.annotate(geojson=functions.AsGeoJSON("point3"))
+            .get(pk=obj.pk)
+            .geojson,
+            # GeoJSON without CRS.
+            json.loads(
+                '{"type":"Point","coordinates":[-9757173.40553877, 5138594.87034608]}'
+            ),
+        )
+
     @skipUnlessDBFeature("has_AsGML_function")
     def test_asgml(self):
         # Should throw a TypeError when trying to obtain GML from a
@@ -141,7 +160,7 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             )
         else:
             gml_regex = re.compile(
-                r'^<gml:Point srsName="EPSG:4326"><gml:coordinates>'
+                r'^<gml:Point srsName="(urn:ogc:def:crs:)?EPSG:4326"><gml:coordinates>'
                 r"-104\.60925\d+,38\.255001</gml:coordinates></gml:Point>"
             )
         self.assertTrue(gml_regex.match(ptown.gml))
@@ -239,32 +258,32 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             # num_seg is the number of segments per quarter circle.
             return (4 * num_seg) + 1
 
-        expected_areas = (169, 136) if connection.ops.postgis else (171, 126)
-        qs = Country.objects.annotate(
+        if connection.ops.postgis:
+            expected_area = 169
+        elif connection.ops.spatialite:
+            expected_area = 168
+        else:  # Oracle.
+            expected_area = 171
+        country = Country.objects.annotate(
             circle=functions.BoundingCircle("mpoly")
-        ).order_by("name")
-        self.assertAlmostEqual(qs[0].circle.area, expected_areas[0], 0)
-        self.assertAlmostEqual(qs[1].circle.area, expected_areas[1], 0)
+        ).order_by("name")[0]
+        self.assertAlmostEqual(country.circle.area, expected_area, 0)
         if connection.ops.postgis:
             # By default num_seg=48.
-            self.assertEqual(qs[0].circle.num_points, circle_num_points(48))
-            self.assertEqual(qs[1].circle.num_points, circle_num_points(48))
+            self.assertEqual(country.circle.num_points, circle_num_points(48))
 
         tests = [12, Value(12, output_field=IntegerField())]
         for num_seq in tests:
             with self.subTest(num_seq=num_seq):
-                qs = Country.objects.annotate(
+                country = Country.objects.annotate(
                     circle=functions.BoundingCircle("mpoly", num_seg=num_seq),
-                ).order_by("name")
+                ).order_by("name")[0]
                 if connection.ops.postgis:
-                    self.assertGreater(qs[0].circle.area, 168.4, 0)
-                    self.assertLess(qs[0].circle.area, 169.5, 0)
-                    self.assertAlmostEqual(qs[1].circle.area, 136, 0)
-                    self.assertEqual(qs[0].circle.num_points, circle_num_points(12))
-                    self.assertEqual(qs[1].circle.num_points, circle_num_points(12))
+                    self.assertGreater(country.circle.area, 168.4, 0)
+                    self.assertLess(country.circle.area, 169.5, 0)
+                    self.assertEqual(country.circle.num_points, circle_num_points(12))
                 else:
-                    self.assertAlmostEqual(qs[0].circle.area, expected_areas[0], 0)
-                    self.assertAlmostEqual(qs[1].circle.area, expected_areas[1], 0)
+                    self.assertAlmostEqual(country.circle.area, expected_area, 0)
 
     @skipUnlessDBFeature("has_Centroid_function")
     def test_centroid(self):
@@ -326,6 +345,28 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
         ).get(name="Foo")
         self.assertEqual(rhr_rings, st.force_polygon_cw.coords)
 
+    @skipUnlessDBFeature("has_FromWKB_function")
+    def test_fromwkb(self):
+        g = Point(56.811078, 60.608647)
+        pt1, pt2 = City.objects.values_list(
+            functions.FromWKB(Value(g.wkb.tobytes())),
+            functions.FromWKB(Value(g.wkb.tobytes()), srid=4326),
+        )[0]
+        self.assertIs(g.equals_exact(pt1, 0.00001), True)
+        self.assertIsNone(pt1.srid)
+        self.assertEqual(pt2.srid, 4326)
+
+    @skipUnlessDBFeature("has_FromWKT_function")
+    def test_fromwkt(self):
+        g = Point(56.811078, 60.608647)
+        pt1, pt2 = City.objects.values_list(
+            functions.FromWKT(Value(g.wkt)),
+            functions.FromWKT(Value(g.wkt), srid=4326),
+        )[0]
+        self.assertIs(g.equals_exact(pt1, 0.00001), True)
+        self.assertIsNone(pt1.srid)
+        self.assertEqual(pt2.srid, 4326)
+
     @skipUnlessDBFeature("has_GeoHash_function")
     def test_geohash(self):
         # Reference query:
@@ -370,6 +411,18 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
                 self.assertIsNone(c.inter)
             else:
                 self.assertIs(c.inter.empty, True)
+
+    @skipUnlessDBFeature("supports_empty_geometries", "has_IsEmpty_function")
+    def test_isempty(self):
+        empty = City.objects.create(name="Nowhere", point=Point(srid=4326))
+        City.objects.create(name="Somewhere", point=Point(6.825, 47.1, srid=4326))
+        self.assertSequenceEqual(
+            City.objects.annotate(isempty=functions.IsEmpty("point")).filter(
+                isempty=True
+            ),
+            [empty],
+        )
+        self.assertSequenceEqual(City.objects.filter(point__isempty=True), [empty])
 
     @skipUnlessDBFeature("has_IsValid_function")
     def test_isvalid(self):
@@ -425,6 +478,18 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             ValueError, "AreaField only accepts Area measurement objects."
         ):
             qs.get(area__lt=500000)
+
+    @skipUnlessDBFeature("has_ClosestPoint_function")
+    def test_closest_point(self):
+        qs = Country.objects.annotate(
+            closest_point=functions.ClosestPoint("mpoly", functions.Centroid("mpoly"))
+        )
+        for country in qs:
+            self.assertIsInstance(country.closest_point, Point)
+            self.assertEqual(
+                country.mpoly.intersection(country.closest_point),
+                country.closest_point,
+            )
 
     @skipUnlessDBFeature("has_LineLocatePoint_function")
     def test_line_locate_point(self):

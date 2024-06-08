@@ -1,7 +1,9 @@
 """Compare two HTML documents."""
+
 import html
 from html.parser import HTMLParser
 
+from django.utils.html import VOID_ELEMENTS
 from django.utils.regex_helper import _lazy_re_compile
 
 # ASCII whitespace is U+0009 TAB, U+000A LF, U+000C FF, U+000D CR, or U+0020
@@ -200,27 +202,6 @@ class HTMLParseError(Exception):
 
 
 class Parser(HTMLParser):
-    # https://html.spec.whatwg.org/#void-elements
-    SELF_CLOSING_TAGS = {
-        "area",
-        "base",
-        "br",
-        "col",
-        "embed",
-        "hr",
-        "img",
-        "input",
-        "link",
-        "meta",
-        "param",
-        "source",
-        "track",
-        "wbr",
-        # Deprecated tags
-        "frame",
-        "spacer",
-    }
-
     def __init__(self):
         super().__init__()
         self.root = RootElement()
@@ -248,14 +229,14 @@ class Parser(HTMLParser):
 
     def handle_startendtag(self, tag, attrs):
         self.handle_starttag(tag, attrs)
-        if tag not in self.SELF_CLOSING_TAGS:
+        if tag not in VOID_ELEMENTS:
             self.handle_endtag(tag)
 
     def handle_starttag(self, tag, attrs):
         attrs = normalize_attributes(attrs)
         element = Element(tag, attrs)
         self.current.append(element)
-        if tag not in self.SELF_CLOSING_TAGS:
+        if tag not in VOID_ELEMENTS:
             self.open_tags.append(element)
         self.element_positions[element] = self.getpos()
 

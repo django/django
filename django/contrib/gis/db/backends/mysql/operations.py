@@ -32,6 +32,11 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
         return self.geom_func_prefix + "GeomFromText"
 
     @cached_property
+    def collect(self):
+        if self.connection.features.supports_collect_aggr:
+            return self.geom_func_prefix + "Collect"
+
+    @cached_property
     def gis_operators(self):
         operators = {
             "bbcontains": SpatialOperator(
@@ -54,13 +59,23 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
             operators["relate"] = SpatialOperator(func="ST_Relate")
         return operators
 
-    disallowed_aggregates = (
-        models.Collect,
-        models.Extent,
-        models.Extent3D,
-        models.MakeLine,
-        models.Union,
-    )
+    @cached_property
+    def disallowed_aggregates(self):
+        disallowed_aggregates = [
+            models.Extent,
+            models.Extent3D,
+            models.MakeLine,
+            models.Union,
+        ]
+        is_mariadb = self.connection.mysql_is_mariadb
+        if is_mariadb or self.connection.mysql_version < (8, 0, 24):
+            disallowed_aggregates.insert(0, models.Collect)
+        return tuple(disallowed_aggregates)
+
+    function_names = {
+        "FromWKB": "ST_GeomFromWKB",
+        "FromWKT": "ST_GeomFromText",
+    }
 
     @cached_property
     def unsupported_functions(self):
@@ -70,8 +85,10 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
             "AsSVG",
             "Azimuth",
             "BoundingCircle",
+            "ClosestPoint",
             "ForcePolygonCW",
             "GeometryDistance",
+            "IsEmpty",
             "LineLocatePoint",
             "MakeValid",
             "MemSize",
@@ -86,8 +103,6 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
         if self.connection.mysql_is_mariadb:
             unsupported.remove("PointOnSurface")
             unsupported.update({"GeoHash", "IsValid"})
-        elif self.connection.mysql_version < (5, 7, 5):
-            unsupported.update({"AsGeoJSON", "GeoHash", "IsValid"})
         return unsupported
 
     def geo_db_type(self, f):
@@ -123,3 +138,6 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
                 return geom
 
         return converter
+
+    def spatial_aggregate_name(self, agg_name):
+        return getattr(self, agg_name.lower())

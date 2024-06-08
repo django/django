@@ -165,7 +165,7 @@ class Apps:
             raise LookupError(message)
 
     # This method is performance-critical at least for Django's test suite.
-    @functools.lru_cache(maxsize=None)
+    @functools.cache
     def get_models(self, include_auto_created=False, include_swapped=False):
         """
         Return a list of all installed models.
@@ -261,7 +261,7 @@ class Apps:
         candidates = []
         for app_config in self.app_configs.values():
             if object_name.startswith(app_config.name):
-                subpath = object_name[len(app_config.name) :]
+                subpath = object_name.removeprefix(app_config.name)
                 if subpath == "" or subpath[0] == ".":
                     candidates.append(app_config)
         if candidates:
@@ -280,14 +280,14 @@ class Apps:
             raise LookupError("Model '%s.%s' not registered." % (app_label, model_name))
         return model
 
-    @functools.lru_cache(maxsize=None)
+    @functools.cache
     def get_swappable_settings_name(self, to_string):
         """
         For a given model string (e.g. "auth.User"), return the name of the
         corresponding settings name if it refers to a swappable model. If the
         referred model is not swappable, return None.
 
-        This method is decorated with lru_cache because it's performance
+        This method is decorated with @functools.cache because it's performance
         critical when it comes to migrations. Since the swappable settings don't
         change after Django has loaded the settings, there is no reason to get
         the respective settings attribute over and over again.
@@ -373,6 +373,7 @@ class Apps:
 
         This is mostly used in tests.
         """
+        self.get_swappable_settings_name.cache_clear()
         # Call expire cache on each model. This will purge
         # the relation tree and the fields cache.
         self.get_models.cache_clear()

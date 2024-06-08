@@ -1,17 +1,18 @@
-import re
 from functools import update_wrapper
 from weakref import WeakSet
 
 from django.apps import apps
 from django.conf import settings
 from django.contrib.admin import ModelAdmin, actions
+from django.contrib.admin.exceptions import AlreadyRegistered, NotRegistered
 from django.contrib.admin.views.autocomplete import AutocompleteJsonView
 from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.contrib.auth.decorators import login_not_required
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models.base import ModelBase
 from django.http import Http404, HttpResponsePermanentRedirect, HttpResponseRedirect
 from django.template.response import TemplateResponse
-from django.urls import NoReverseMatch, Resolver404, resolve, reverse
+from django.urls import NoReverseMatch, Resolver404, resolve, reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.utils.functional import LazyObject
 from django.utils.module_loading import import_string
@@ -26,14 +27,6 @@ from django.views.i18n import JavaScriptCatalog
 all_sites = WeakSet()
 
 
-class AlreadyRegistered(Exception):
-    pass
-
-
-class NotRegistered(Exception):
-    pass
-
-
 class AdminSite:
     """
     An AdminSite object encapsulates an instance of the Django admin application, ready
@@ -46,7 +39,7 @@ class AdminSite:
     # Text to put at the end of each page's <title>.
     site_title = gettext_lazy("Django site admin")
 
-    # Text to put in each page's <h1>.
+    # Text to put in each page's <div id="site-name">.
     site_header = gettext_lazy("Django administration")
 
     # Text to put at the top of the admin index page.
@@ -121,12 +114,12 @@ class AdminSite:
                     % model.__name__
                 )
 
-            if model in self._registry:
-                registered_admin = str(self._registry[model])
+            if self.is_registered(model):
+                registered_admin = str(self.get_model_admin(model))
                 msg = "The model %s is already registered " % model.__name__
                 if registered_admin.endswith(".ModelAdmin"):
                     # Most likely registered without a ModelAdmin subclass.
-                    msg += "in app %r." % re.sub(r"\.ModelAdmin$", "", registered_admin)
+                    msg += "in app %r." % registered_admin.removesuffix(".ModelAdmin")
                 else:
                     msg += "with %r." % registered_admin
                 raise AlreadyRegistered(msg)
@@ -157,7 +150,7 @@ class AdminSite:
         if isinstance(model_or_iterable, ModelBase):
             model_or_iterable = [model_or_iterable]
         for model in model_or_iterable:
-            if model not in self._registry:
+            if not self.is_registered(model):
                 raise NotRegistered("The model %s is not registered" % model.__name__)
             del self._registry[model]
 
@@ -166,6 +159,12 @@ class AdminSite:
         Check if a model class is registered with this `AdminSite`.
         """
         return model in self._registry
+
+    def get_model_admin(self, model):
+        try:
+            return self._registry[model]
+        except KeyError:
+            raise NotRegistered(f"The model {model.__name__} is not registered.")
 
     def add_action(self, action, name=None):
         """
@@ -261,6 +260,8 @@ class AdminSite:
                 return self.admin_view(view, cacheable)(*args, **kwargs)
 
             wrapper.admin_site = self
+            # Used by LoginRequiredMiddleware.
+            wrapper.login_url = reverse_lazy("admin:login", current_app=self.name)
             return update_wrapper(wrapper, view)
 
         # Admin-site-wide views.
@@ -337,6 +338,7 @@ class AdminSite:
             "available_apps": self.get_app_list(request),
             "is_popup": False,
             "is_nav_sidebar_enabled": self.enable_nav_sidebar,
+            "log_entries": self.get_log_entries(request),
         }
 
     def password_change(self, request, extra_context=None):
@@ -403,6 +405,7 @@ class AdminSite:
         return LogoutView.as_view(**defaults)(request)
 
     @method_decorator(never_cache)
+    @login_not_required
     def login(self, request, extra_context=None):
         """
         Display the login form for the given HttpRequest.
@@ -453,7 +456,9 @@ class AdminSite:
                 pass
             else:
                 if getattr(match.func, "should_append_slash", True):
-                    return HttpResponsePermanentRedirect("%s/" % request.path)
+                    return HttpResponsePermanentRedirect(
+                        request.get_full_path(force_append_slash=True)
+                    )
         raise Http404
 
     def _build_app_dict(self, request, label=None):
@@ -588,6 +593,11 @@ class AdminSite:
             or ["admin/%s/app_index.html" % app_label, "admin/app_index.html"],
             context,
         )
+
+    def get_log_entries(self, request):
+        from django.contrib.admin.models import LogEntry
+
+        return LogEntry.objects.select_related("content_type", "user")
 
 
 class DefaultAdminSite(LazyObject):

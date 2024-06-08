@@ -2,15 +2,15 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Ramiro Morales, 2014-2016,2020-2021
+# Ramiro Morales, 2014-2016,2020-2023
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-03-21 12:54+0000\n"
-"Last-Translator: Ramiro Morales\n"
-"Language-Team: Spanish (Argentina) (http://www.transifex.com/django/django/"
+"POT-Creation-Date: 2023-09-18 15:04-0300\n"
+"PO-Revision-Date: 2023-12-04 07:59+0000\n"
+"Last-Translator: Ramiro Morales, 2014-2016,2020-2023\n"
+"Language-Team: Spanish (Argentina) (http://app.transifex.com/django/django/"
 "language/es_AR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -64,6 +64,10 @@ msgstr ""
 "activándolos en la lista de abajo y luego haciendo click en la flecha "
 "\"Eliminar\" ubicada entre las dos listas."
 
+#, javascript-format
+msgid "Type into this box to filter down the list of selected %s."
+msgstr "Escriba en este cuadro para filtrar la lista de %s seleccionados/as."
+
 msgid "Remove all"
 msgstr "Eliminar todos/as"
 
@@ -71,10 +75,18 @@ msgstr "Eliminar todos/as"
 msgid "Click to remove all chosen %s at once."
 msgstr "Haga clic para deselecionar todos/as los/as %s."
 
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] "%s opción seleccionada no visible"
+msgstr[1] "%s opciones seleccionadas no visibles"
+msgstr[2] "%s opciones seleccionadas no visibles"
+
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] "%(sel)s de %(cnt)s seleccionado/a"
 msgstr[1] "%(sel)s de %(cnt)s seleccionados/as"
+msgstr[2] "%(sel)s de %(cnt)s seleccionados/as"
 
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
@@ -125,6 +137,9 @@ msgstr[0] ""
 msgstr[1] ""
 "Nota: Ud. se encuentra en una zona horaria que está %s horas adelantada "
 "respecto a la del servidor."
+msgstr[2] ""
+"Nota: Ud. se encuentra en una zona horaria que está %s horas adelantada "
+"respecto a la del servidor."
 
 #, javascript-format
 msgid "Note: You are %s hour behind server time."
@@ -133,6 +148,9 @@ msgstr[0] ""
 "Nota: Ud. se encuentra en una zona horaria que está %s hora atrasada "
 "respecto a la del servidor."
 msgstr[1] ""
+"Nota: Ud. se encuentra en una zona horaria que está %s horas atrasada "
+"respecto a la del servidor."
+msgstr[2] ""
 "Nota: Ud. se encuentra en una zona horaria que está %s horas atrasada "
 "respecto a la del servidor."
 
@@ -158,40 +176,40 @@ msgid "Tomorrow"
 msgstr "Mañana"
 
 msgid "January"
-msgstr "Enero"
+msgstr "enero"
 
 msgid "February"
-msgstr "Febrero"
+msgstr "febrero"
 
 msgid "March"
-msgstr "Marzo"
+msgstr "marzo"
 
 msgid "April"
-msgstr "Abril"
+msgstr "abril"
 
 msgid "May"
-msgstr "Mayo"
+msgstr "mayo"
 
 msgid "June"
-msgstr "Junio"
+msgstr "junio"
 
 msgid "July"
-msgstr "Julio"
+msgstr "julio"
 
 msgid "August"
-msgstr "Agosto"
+msgstr "agosto"
 
 msgid "September"
-msgstr "Setiembre"
+msgstr "setiembre"
 
 msgid "October"
-msgstr "Octubre"
+msgstr "octubre"
 
 msgid "November"
-msgstr "Noviembre"
+msgstr "noviembre"
 
 msgid "December"
-msgstr "Diciembre"
+msgstr "diciembre"
 
 msgctxt "abbrev. month January"
 msgid "Jan"
@@ -240,6 +258,55 @@ msgstr "Nov"
 msgctxt "abbrev. month December"
 msgid "Dec"
 msgstr "Dic"
+
+msgid "Sunday"
+msgstr "domingo"
+
+msgid "Monday"
+msgstr "lunes"
+
+msgid "Tuesday"
+msgstr "martes"
+
+msgid "Wednesday"
+msgstr "miércoles"
+
+msgid "Thursday"
+msgstr "jueves"
+
+msgid "Friday"
+msgstr "viernes"
+
+msgid "Saturday"
+msgstr "sábado"
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr "dom"
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr "lun"
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr "mar"
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr "mié"
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr "jue"
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr "vie"
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr "sáb"
 
 msgctxt "one letter Sunday"
 msgid "S"

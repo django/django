@@ -62,6 +62,7 @@ class GeoExpressionsTests(TestCase):
         )
         qs = (
             City.objects.values("name")
+            .order_by("name")
             .annotate(
                 distance=Min(
                     functions.Distance("multifields__point", multi_field.city.point)

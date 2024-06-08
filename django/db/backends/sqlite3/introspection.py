@@ -91,7 +91,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         interface.
         """
         cursor.execute(
-            "PRAGMA table_info(%s)" % self.connection.ops.quote_name(table_name)
+            "PRAGMA table_xinfo(%s)" % self.connection.ops.quote_name(table_name)
         )
         table_info = cursor.fetchall()
         if not table_info:
@@ -119,8 +119,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             FieldInfo(
                 name,
                 data_type,
-                None,
                 get_field_size(data_type),
+                None,
                 None,
                 None,
                 not notnull,
@@ -129,7 +129,13 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 pk == 1,
                 name in json_columns,
             )
-            for cid, name, data_type, notnull, default, pk in table_info
+            for cid, name, data_type, notnull, default, pk, hidden in table_info
+            if hidden
+            in [
+                0,  # Normal column.
+                2,  # Virtual generated column.
+                3,  # Stored generated column.
+            ]
         ]
 
     def get_sequences(self, cursor, table_name, table_fields=()):
@@ -156,15 +162,11 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             ) in cursor.fetchall()
         }
 
-    def get_primary_key_column(self, cursor, table_name):
-        """Return the column name of the primary key for the given table."""
+    def get_primary_key_columns(self, cursor, table_name):
         cursor.execute(
             "PRAGMA table_info(%s)" % self.connection.ops.quote_name(table_name)
         )
-        for _, name, *_, pk in cursor.fetchall():
-            if pk:
-                return name
-        return None
+        return [name for _, name, *_, pk in cursor.fetchall() if pk]
 
     def _parse_column_or_constraint_definition(self, tokens, columns):
         token = None
@@ -372,14 +374,14 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 if orders is not None:
                     constraints[index]["orders"] = orders
         # Get the PK
-        pk_column = self.get_primary_key_column(cursor, table_name)
-        if pk_column:
+        pk_columns = self.get_primary_key_columns(cursor, table_name)
+        if pk_columns:
             # SQLite doesn't actually give a name to the PK constraint,
             # so we invent one. This is fine, as the SQLite backend never
             # deletes PK constraints by name, as you can't delete constraints
             # in SQLite; we remake the table with a new PK instead.
             constraints["__primary__"] = {
-                "columns": [pk_column],
+                "columns": pk_columns,
                 "primary_key": True,
                 "unique": False,  # It's not actually a unique constraint.
                 "foreign_key": None,

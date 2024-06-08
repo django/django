@@ -5,6 +5,7 @@ URLResolver is the main class here. Its resolve() method takes a URL (as
 a string) and returns a ResolverMatch object which provides access to all
 attributes of the resolved URL match.
 """
+
 import functools
 import inspect
 import re
@@ -18,14 +19,14 @@ from asgiref.local import Local
 from django.conf import settings
 from django.core.checks import Error, Warning
 from django.core.checks.urls import check_resolver
-from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
+from django.core.exceptions import ImproperlyConfigured
 from django.utils.datastructures import MultiValueDict
 from django.utils.functional import cached_property
 from django.utils.http import RFC3986_SUBDELIMS, escape_leading_slashes
 from django.utils.regex_helper import _lazy_re_compile, normalize
 from django.utils.translation import get_language
 
-from .converters import get_converter
+from .converters import get_converters
 from .exceptions import NoReverseMatch, Resolver404
 from .utils import get_callable
 
@@ -41,6 +42,8 @@ class ResolverMatch:
         namespaces=None,
         route=None,
         tried=None,
+        captured_kwargs=None,
+        extra_kwargs=None,
     ):
         self.func = func
         self.args = args
@@ -48,6 +51,8 @@ class ResolverMatch:
         self.url_name = url_name
         self.route = route
         self.tried = tried
+        self.captured_kwargs = captured_kwargs
+        self.extra_kwargs = extra_kwargs
 
         # If a URLRegexResolver doesn't have a namespace or app_name, it passes
         # in an empty value.
@@ -78,7 +83,7 @@ class ResolverMatch:
             func = self._func_path
         return (
             "ResolverMatch(func=%s, args=%r, kwargs=%r, url_name=%r, "
-            "app_names=%r, namespaces=%r, route=%r)"
+            "app_names=%r, namespaces=%r, route=%r%s%s)"
             % (
                 func,
                 self.args,
@@ -87,6 +92,12 @@ class ResolverMatch:
                 self.app_names,
                 self.namespaces,
                 self.route,
+                (
+                    f", captured_kwargs={self.captured_kwargs!r}"
+                    if self.captured_kwargs
+                    else ""
+                ),
+                f", extra_kwargs={self.extra_kwargs!r}" if self.extra_kwargs else "",
             )
         )
 
@@ -100,12 +111,12 @@ def get_resolver(urlconf=None):
     return _get_cached_resolver(urlconf)
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def _get_cached_resolver(urlconf=None):
     return URLResolver(RegexPattern(r"^/"), urlconf)
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def get_ns_resolver(ns_pattern, resolver, converters):
     # Build a namespaced resolver for the given parent URLconf pattern.
     # This makes it possible to have captured parameters in the parent
@@ -117,9 +128,6 @@ def get_ns_resolver(ns_pattern, resolver, converters):
 
 
 class LocaleRegexDescriptor:
-    def __init__(self, attr):
-        self.attr = attr
-
     def __get__(self, instance, cls=None):
         """
         Return a compiled regular expression based on the active language.
@@ -129,14 +137,22 @@ class LocaleRegexDescriptor:
         # As a performance optimization, if the given regex string is a regular
         # string (not a lazily-translated string proxy), compile it once and
         # avoid per-language compilation.
-        pattern = getattr(instance, self.attr)
+        pattern = instance._regex
         if isinstance(pattern, str):
-            instance.__dict__["regex"] = instance._compile(pattern)
+            instance.__dict__["regex"] = self._compile(pattern)
             return instance.__dict__["regex"]
         language_code = get_language()
         if language_code not in instance._regex_dict:
-            instance._regex_dict[language_code] = instance._compile(str(pattern))
+            instance._regex_dict[language_code] = self._compile(str(pattern))
         return instance._regex_dict[language_code]
+
+    def _compile(self, regex):
+        try:
+            return re.compile(regex)
+        except re.error as e:
+            raise ImproperlyConfigured(
+                f'"{regex}" is not a valid regular expression: {e}'
+            ) from e
 
 
 class CheckURLMixin:
@@ -153,12 +169,11 @@ class CheckURLMixin:
         """
         Check that the pattern does not begin with a forward slash.
         """
-        regex_pattern = self.regex.pattern
         if not settings.APPEND_SLASH:
             # Skip check as it can be useful to start a URL pattern with a slash
             # when APPEND_SLASH=False.
             return []
-        if regex_pattern.startswith(("/", "^/", "^\\/")) and not regex_pattern.endswith(
+        if self._regex.startswith(("/", "^/", "^\\/")) and not self._regex.endswith(
             "/"
         ):
             warning = Warning(
@@ -175,7 +190,7 @@ class CheckURLMixin:
 
 
 class RegexPattern(CheckURLMixin):
-    regex = LocaleRegexDescriptor("_regex")
+    regex = LocaleRegexDescriptor()
 
     def __init__(self, regex, name=None, is_endpoint=False):
         self._regex = regex
@@ -208,8 +223,7 @@ class RegexPattern(CheckURLMixin):
         return warnings
 
     def _check_include_trailing_dollar(self):
-        regex_pattern = self.regex.pattern
-        if regex_pattern.endswith("$") and not regex_pattern.endswith(r"\$"):
+        if self._regex.endswith("$") and not self._regex.endswith(r"\$"):
             return [
                 Warning(
                     "Your URL pattern {} uses include with a route ending with a '$'. "
@@ -221,15 +235,6 @@ class RegexPattern(CheckURLMixin):
         else:
             return []
 
-    def _compile(self, regex):
-        """Compile and return the given regular expression."""
-        try:
-            return re.compile(regex)
-        except re.error as e:
-            raise ImproperlyConfigured(
-                '"%s" is not a valid regular expression: %s' % (regex, e)
-            ) from e
-
     def __str__(self):
         return str(self._regex)
 
@@ -238,62 +243,83 @@ _PATH_PARAMETER_COMPONENT_RE = _lazy_re_compile(
     r"<(?:(?P<converter>[^>:]+):)?(?P<parameter>[^>]+)>"
 )
 
+whitespace_set = frozenset(string.whitespace)
 
-def _route_to_regex(route, is_endpoint=False):
+
+@functools.lru_cache
+def _route_to_regex(route, is_endpoint):
     """
     Convert a path pattern into a regular expression. Return the regular
     expression and a dictionary mapping the capture names to the converters.
     For example, 'foo/<int:pk>' returns '^foo\\/(?P<pk>[0-9]+)'
     and {'pk': <django.urls.converters.IntConverter>}.
     """
-    original_route = route
     parts = ["^"]
+    all_converters = get_converters()
     converters = {}
-    while True:
-        match = _PATH_PARAMETER_COMPONENT_RE.search(route)
-        if not match:
-            parts.append(re.escape(route))
-            break
-        elif not set(match.group()).isdisjoint(string.whitespace):
+    previous_end = 0
+    for match_ in _PATH_PARAMETER_COMPONENT_RE.finditer(route):
+        if not whitespace_set.isdisjoint(match_[0]):
             raise ImproperlyConfigured(
-                "URL route '%s' cannot contain whitespace in angle brackets "
-                "<…>." % original_route
+                f"URL route {route!r} cannot contain whitespace in angle brackets <…>."
             )
-        parts.append(re.escape(route[: match.start()]))
-        route = route[match.end() :]
-        parameter = match["parameter"]
+        # Default to make converter "str" if unspecified (parameter always
+        # matches something).
+        raw_converter, parameter = match_.groups(default="str")
         if not parameter.isidentifier():
             raise ImproperlyConfigured(
-                "URL route '%s' uses parameter name %r which isn't a valid "
-                "Python identifier." % (original_route, parameter)
+                f"URL route {route!r} uses parameter name {parameter!r} which "
+                "isn't a valid Python identifier."
             )
-        raw_converter = match["converter"]
-        if raw_converter is None:
-            # If a converter isn't specified, the default is `str`.
-            raw_converter = "str"
         try:
-            converter = get_converter(raw_converter)
+            converter = all_converters[raw_converter]
         except KeyError as e:
             raise ImproperlyConfigured(
-                "URL route %r uses invalid converter %r."
-                % (original_route, raw_converter)
+                f"URL route {route!r} uses invalid converter {raw_converter!r}."
             ) from e
         converters[parameter] = converter
-        parts.append("(?P<" + parameter + ">" + converter.regex + ")")
+
+        start, end = match_.span()
+        parts.append(re.escape(route[previous_end:start]))
+        previous_end = end
+        parts.append(f"(?P<{parameter}>{converter.regex})")
+
+    parts.append(re.escape(route[previous_end:]))
     if is_endpoint:
         parts.append(r"\Z")
     return "".join(parts), converters
 
 
+class LocaleRegexRouteDescriptor:
+    def __get__(self, instance, cls=None):
+        """
+        Return a compiled regular expression based on the active language.
+        """
+        if instance is None:
+            return self
+        # As a performance optimization, if the given route is a regular string
+        # (not a lazily-translated string proxy), compile it once and avoid
+        # per-language compilation.
+        if isinstance(instance._route, str):
+            instance.__dict__["regex"] = re.compile(instance._regex)
+            return instance.__dict__["regex"]
+        language_code = get_language()
+        if language_code not in instance._regex_dict:
+            instance._regex_dict[language_code] = re.compile(
+                _route_to_regex(str(instance._route), instance._is_endpoint)[0]
+            )
+        return instance._regex_dict[language_code]
+
+
 class RoutePattern(CheckURLMixin):
-    regex = LocaleRegexDescriptor("_route")
+    regex = LocaleRegexRouteDescriptor()
 
     def __init__(self, route, name=None, is_endpoint=False):
         self._route = route
+        self._regex, self.converters = _route_to_regex(str(route), is_endpoint)
         self._regex_dict = {}
         self._is_endpoint = is_endpoint
         self.name = name
-        self.converters = _route_to_regex(str(route), is_endpoint)[1]
 
     def match(self, path):
         match = self.regex.search(path)
@@ -310,7 +336,10 @@ class RoutePattern(CheckURLMixin):
         return None
 
     def check(self):
-        warnings = self._check_pattern_startswith_slash()
+        warnings = [
+            *self._check_pattern_startswith_slash(),
+            *self._check_pattern_unmatched_angle_brackets(),
+        ]
         route = self._route
         if "(?P<" in route or route.startswith("^") or route.endswith("$"):
             warnings.append(
@@ -323,8 +352,24 @@ class RoutePattern(CheckURLMixin):
             )
         return warnings
 
-    def _compile(self, route):
-        return re.compile(_route_to_regex(route, self._is_endpoint)[0])
+    def _check_pattern_unmatched_angle_brackets(self):
+        warnings = []
+        msg = "Your URL pattern %s has an unmatched '%s' bracket."
+        brackets = re.findall(r"[<>]", str(self._route))
+        open_bracket_counter = 0
+        for bracket in brackets:
+            if bracket == "<":
+                open_bracket_counter += 1
+            elif bracket == ">":
+                open_bracket_counter -= 1
+                if open_bracket_counter < 0:
+                    warnings.append(
+                        Warning(msg % (self.describe(), ">"), id="urls.W010")
+                    )
+                    open_bracket_counter = 0
+        if open_bracket_counter > 0:
+            warnings.append(Warning(msg % (self.describe(), "<"), id="urls.W010"))
+        return warnings
 
     def __str__(self):
         return str(self._route)
@@ -338,7 +383,7 @@ class LocalePrefixPattern:
     @property
     def regex(self):
         # This is only used by reverse() and cached in _reverse_dict.
-        return re.compile(self.language_prefix)
+        return re.compile(re.escape(self.language_prefix))
 
     @property
     def language_prefix(self):
@@ -351,7 +396,7 @@ class LocalePrefixPattern:
     def match(self, path):
         language_prefix = self.language_prefix
         if path.startswith(language_prefix):
-            return path[len(language_prefix) :], (), {}
+            return path.removeprefix(language_prefix), (), {}
         return None
 
     def check(self):
@@ -416,11 +461,17 @@ class URLPattern:
     def resolve(self, path):
         match = self.pattern.match(path)
         if match:
-            new_path, args, kwargs = match
-            # Pass any extra_kwargs as **kwargs.
-            kwargs.update(self.default_args)
+            new_path, args, captured_kwargs = match
+            # Pass any default args as **kwargs.
+            kwargs = {**captured_kwargs, **self.default_args}
             return ResolverMatch(
-                self.callback, args, kwargs, self.pattern.name, route=str(self.pattern)
+                self.callback,
+                args,
+                kwargs,
+                self.pattern.name,
+                route=str(self.pattern),
+                captured_kwargs=captured_kwargs,
+                extra_kwargs=self.default_args,
             )
 
     @cached_property
@@ -479,39 +530,7 @@ class URLResolver:
         messages = []
         for pattern in self.url_patterns:
             messages.extend(check_resolver(pattern))
-        messages.extend(self._check_custom_error_handlers())
         return messages or self.pattern.check()
-
-    def _check_custom_error_handlers(self):
-        messages = []
-        # All handlers take (request, exception) arguments except handler500
-        # which takes (request).
-        for status_code, num_parameters in [(400, 2), (403, 2), (404, 2), (500, 1)]:
-            try:
-                handler = self.resolve_error_handler(status_code)
-            except (ImportError, ViewDoesNotExist) as e:
-                path = getattr(self.urlconf_module, "handler%s" % status_code)
-                msg = (
-                    "The custom handler{status_code} view '{path}' could not be "
-                    "imported."
-                ).format(status_code=status_code, path=path)
-                messages.append(Error(msg, hint=str(e), id="urls.E008"))
-                continue
-            signature = inspect.signature(handler)
-            args = [None] * num_parameters
-            try:
-                signature.bind(*args)
-            except TypeError:
-                msg = (
-                    "The custom handler{status_code} view '{path}' does not "
-                    "take the correct number of arguments ({args})."
-                ).format(
-                    status_code=status_code,
-                    path=handler.__module__ + "." + handler.__qualname__,
-                    args="request, exception" if num_parameters == 2 else "request",
-                )
-                messages.append(Error(msg, id="urls.E007"))
-        return messages
 
     def _populate(self):
         # Short-circuit if called recursively in this thread to prevent
@@ -528,8 +547,7 @@ class URLResolver:
             language_code = get_language()
             for url_pattern in reversed(self.url_patterns):
                 p_pattern = url_pattern.pattern.regex.pattern
-                if p_pattern.startswith("^"):
-                    p_pattern = p_pattern[1:]
+                p_pattern = p_pattern.removeprefix("^")
                 if isinstance(url_pattern, URLPattern):
                     self._callback_strs.add(url_pattern.lookup_str)
                     bits = normalize(url_pattern.pattern.regex.pattern)
@@ -631,8 +649,7 @@ class URLResolver:
         """Join two routes, without the starting ^ in the second route."""
         if not route1:
             return route2
-        if route2.startswith("^"):
-            route2 = route2[1:]
+        route2 = route2.removeprefix("^")
         return route1 + route2
 
     def _is_callback(self, name):
@@ -678,6 +695,11 @@ class URLResolver:
                             [self.namespace] + sub_match.namespaces,
                             self._join_route(current_route, sub_match.route),
                             tried,
+                            captured_kwargs=sub_match.captured_kwargs,
+                            extra_kwargs={
+                                **self.default_kwargs,
+                                **sub_match.extra_kwargs,
+                            },
                         )
                     tried.append([pattern])
             raise Resolver404({"tried": tried, "path": new_path})
@@ -737,7 +759,14 @@ class URLResolver:
                 else:
                     if set(kwargs).symmetric_difference(params).difference(defaults):
                         continue
-                    if any(kwargs.get(k, v) != v for k, v in defaults.items()):
+                    matches = True
+                    for k, v in defaults.items():
+                        if k in params:
+                            continue
+                        if kwargs.get(k, v) != v:
+                            matches = False
+                            break
+                    if not matches:
                         continue
                     candidate_subs = kwargs
                 # Convert the candidate subs to text using Converter.to_url().

@@ -116,6 +116,7 @@ class BaseDatabaseCreation:
         Designed only for test runner usage; will not handle large
         amounts of data.
         """
+
         # Iteratively return every object for all models to serialize.
         def get_objects():
             from django.db.migrations.loader import MigrationLoader
@@ -134,7 +135,10 @@ class BaseDatabaseCreation:
                             queryset = model._base_manager.using(
                                 self.connection.alias,
                             ).order_by(model._meta.pk.name)
-                            yield from queryset.iterator()
+                            chunk_size = (
+                                2000 if queryset._prefetch_related_lookups else None
+                            )
+                            yield from queryset.iterator(chunk_size=chunk_size)
 
         # Serialize to a string
         out = StringIO()

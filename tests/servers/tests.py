@@ -1,10 +1,12 @@
 """
 Tests for django.core.servers.
 """
+
 import errno
 import os
 import socket
 import threading
+import unittest
 from http.client import HTTPConnection
 from urllib.error import HTTPError
 from urllib.parse import urlencode
@@ -12,7 +14,7 @@ from urllib.request import urlopen
 
 from django.conf import settings
 from django.core.servers.basehttp import ThreadedWSGIServer, WSGIServer
-from django.db import DEFAULT_DB_ALIAS, connections
+from django.db import DEFAULT_DB_ALIAS, connection, connections
 from django.test import LiveServerTestCase, override_settings
 from django.test.testcases import LiveServerThread, QuietWSGIRequestHandler
 
@@ -29,7 +31,6 @@ TEST_SETTINGS = {
 
 @override_settings(ROOT_URLCONF="servers.urls", **TEST_SETTINGS)
 class LiveServerBase(LiveServerTestCase):
-
     available_apps = [
         "servers",
         "django.contrib.auth",
@@ -55,7 +56,6 @@ class CloseConnectionTestServer(ThreadedWSGIServer):
 
 
 class CloseConnectionTestLiveServerThread(LiveServerThread):
-
     server_class = CloseConnectionTestServer
 
     def _create_server(self, connections_override=None):
@@ -63,7 +63,6 @@ class CloseConnectionTestLiveServerThread(LiveServerThread):
 
 
 class LiveServerTestCloseConnectionTest(LiveServerBase):
-
     server_thread_class = CloseConnectionTestLiveServerThread
 
     @classmethod
@@ -99,7 +98,7 @@ class LiveServerTestCloseConnectionTest(LiveServerBase):
         self.assertIsNotNone(conn.connection)
         with self.urlopen("/model_view/") as f:
             # The server can access the database.
-            self.assertEqual(f.read().splitlines(), [b"jane", b"robert"])
+            self.assertCountEqual(f.read().splitlines(), [b"jane", b"robert"])
         # Wait for the server's request thread to close the connection.
         # A timeout of 0.1 seconds should be more than enough. If the wait
         # times out, the assertion after should fail.
@@ -107,8 +106,35 @@ class LiveServerTestCloseConnectionTest(LiveServerBase):
         self.assertIsNone(conn.connection)
 
 
+@unittest.skipUnless(connection.vendor == "sqlite", "SQLite specific test.")
+class LiveServerInMemoryDatabaseLockTest(LiveServerBase):
+    def test_in_memory_database_lock(self):
+        """
+        With a threaded LiveServer and an in-memory database, an error can
+        occur when 2 requests reach the server and try to lock the database
+        at the same time, if the requests do not share the same database
+        connection.
+        """
+        conn = self.server_thread.connections_override[DEFAULT_DB_ALIAS]
+        source_connection = conn.connection
+        # Open a connection to the database.
+        conn.connect()
+        # Create a transaction to lock the database.
+        cursor = conn.cursor()
+        cursor.execute("BEGIN IMMEDIATE TRANSACTION")
+        try:
+            with self.urlopen("/create_model_instance/") as f:
+                self.assertEqual(f.status, 200)
+        except HTTPError:
+            self.fail("Unexpected error due to a database lock.")
+        finally:
+            # Release the transaction.
+            cursor.execute("ROLLBACK")
+            source_connection.close()
+
+
 class FailingLiveServerThread(LiveServerThread):
-    def _create_server(self):
+    def _create_server(self, connections_override=None):
         raise RuntimeError("Error creating server.")
 
 
@@ -150,7 +176,7 @@ class LiveServerAddress(LiveServerBase):
 
 
 class LiveServerSingleThread(LiveServerThread):
-    def _create_server(self):
+    def _create_server(self, connections_override=None):
         return WSGIServer(
             (self.host, self.port), QuietWSGIRequestHandler, allow_reuse_address=False
         )
@@ -320,7 +346,7 @@ class LiveServerDatabase(LiveServerBase):
         Fixtures are properly loaded and visible to the live server thread.
         """
         with self.urlopen("/model_view/") as f:
-            self.assertEqual(f.read().splitlines(), [b"jane", b"robert"])
+            self.assertCountEqual(f.read().splitlines(), [b"jane", b"robert"])
 
     def test_database_writes(self):
         """
@@ -328,7 +354,7 @@ class LiveServerDatabase(LiveServerBase):
         """
         with self.urlopen("/create_model_instance/"):
             pass
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Person.objects.order_by("pk"),
             ["jane", "robert", "emily"],
             lambda b: b.name,
@@ -351,12 +377,15 @@ class LiveServerPort(LiveServerBase):
                 return
             # Unexpected error.
             raise
-        self.assertNotEqual(
-            self.live_server_url,
-            TestCase.live_server_url,
-            f"Acquired duplicate server addresses for server threads: "
-            f"{self.live_server_url}",
-        )
+        try:
+            self.assertNotEqual(
+                self.live_server_url,
+                TestCase.live_server_url,
+                f"Acquired duplicate server addresses for server threads: "
+                f"{self.live_server_url}",
+            )
+        finally:
+            TestCase.doClassCleanups()
 
     def test_specified_port_bind(self):
         """LiveServerTestCase.port customizes the server's port."""
@@ -367,12 +396,15 @@ class LiveServerPort(LiveServerBase):
         TestCase.port = s.getsockname()[1]
         s.close()
         TestCase._start_server_thread()
-        self.assertEqual(
-            TestCase.port,
-            TestCase.server_thread.port,
-            f"Did not use specified port for LiveServerTestCase thread: "
-            f"{TestCase.port}",
-        )
+        try:
+            self.assertEqual(
+                TestCase.port,
+                TestCase.server_thread.port,
+                f"Did not use specified port for LiveServerTestCase thread: "
+                f"{TestCase.port}",
+            )
+        finally:
+            TestCase.doClassCleanups()
 
 
 class LiveServerThreadedTests(LiveServerBase):

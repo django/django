@@ -104,6 +104,9 @@ class SessionStore(SessionBase):
             self._session_key = None
         return session_data
 
+    async def aload(self):
+        return self.load()
+
     def create(self):
         while True:
             self._session_key = self._get_new_session_key()
@@ -113,6 +116,9 @@ class SessionStore(SessionBase):
                 continue
             self.modified = True
             return
+
+    async def acreate(self):
+        return self.create()
 
     def save(self, must_create=False):
         if self.session_key is None:
@@ -177,8 +183,14 @@ class SessionStore(SessionBase):
         except (EOFError, OSError):
             pass
 
+    async def asave(self, must_create=False):
+        return self.save(must_create=must_create)
+
     def exists(self, session_key):
         return os.path.exists(self._key_to_file(session_key))
+
+    async def aexists(self, session_key):
+        return self.exists(session_key)
 
     def delete(self, session_key=None):
         if session_key is None:
@@ -190,8 +202,8 @@ class SessionStore(SessionBase):
         except OSError:
             pass
 
-    def clean(self):
-        pass
+    async def adelete(self, session_key=None):
+        return self.delete(session_key=session_key)
 
     @classmethod
     def clear_expired(cls):
@@ -201,10 +213,14 @@ class SessionStore(SessionBase):
         for session_file in os.listdir(storage_path):
             if not session_file.startswith(file_prefix):
                 continue
-            session_key = session_file[len(file_prefix) :]
+            session_key = session_file.removeprefix(file_prefix)
             session = cls(session_key)
             # When an expired session is loaded, its file is removed, and a
             # new file is immediately created. Prevent this by disabling
             # the create() method.
             session.create = lambda: None
             session.load()
+
+    @classmethod
+    async def aclear_expired(cls):
+        cls.clear_expired()

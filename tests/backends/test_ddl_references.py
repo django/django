@@ -166,16 +166,22 @@ class ForeignKeyNameTests(IndexNameTests):
 
 
 class MockReference:
-    def __init__(self, representation, referenced_tables, referenced_columns):
+    def __init__(
+        self, representation, referenced_tables, referenced_columns, referenced_indexes
+    ):
         self.representation = representation
         self.referenced_tables = referenced_tables
         self.referenced_columns = referenced_columns
+        self.referenced_indexes = referenced_indexes
 
     def references_table(self, table):
         return table in self.referenced_tables
 
     def references_column(self, table, column):
         return (table, column) in self.referenced_columns
+
+    def references_index(self, table, index):
+        return (table, index) in self.referenced_indexes
 
     def rename_table_references(self, old_table, new_table):
         if old_table in self.referenced_tables:
@@ -195,32 +201,43 @@ class MockReference:
 class StatementTests(SimpleTestCase):
     def test_references_table(self):
         statement = Statement(
-            "", reference=MockReference("", {"table"}, {}), non_reference=""
+            "", reference=MockReference("", {"table"}, {}, {}), non_reference=""
         )
         self.assertIs(statement.references_table("table"), True)
         self.assertIs(statement.references_table("other"), False)
 
     def test_references_column(self):
         statement = Statement(
-            "", reference=MockReference("", {}, {("table", "column")}), non_reference=""
+            "",
+            reference=MockReference("", {}, {("table", "column")}, {}),
+            non_reference="",
         )
         self.assertIs(statement.references_column("table", "column"), True)
         self.assertIs(statement.references_column("other", "column"), False)
 
+    def test_references_index(self):
+        statement = Statement(
+            "",
+            reference=MockReference("", {}, {}, {("table", "index")}),
+            non_reference="",
+        )
+        self.assertIs(statement.references_index("table", "index"), True)
+        self.assertIs(statement.references_index("other", "index"), False)
+
     def test_rename_table_references(self):
-        reference = MockReference("", {"table"}, {})
+        reference = MockReference("", {"table"}, {}, {})
         statement = Statement("", reference=reference, non_reference="")
         statement.rename_table_references("table", "other")
         self.assertEqual(reference.referenced_tables, {"other"})
 
     def test_rename_column_references(self):
-        reference = MockReference("", {}, {("table", "column")})
+        reference = MockReference("", {}, {("table", "column")}, {})
         statement = Statement("", reference=reference, non_reference="")
         statement.rename_column_references("table", "column", "other")
         self.assertEqual(reference.referenced_columns, {("table", "other")})
 
     def test_repr(self):
-        reference = MockReference("reference", {}, {})
+        reference = MockReference("reference", {}, {}, {})
         statement = Statement(
             "%(reference)s - %(non_reference)s",
             reference=reference,
@@ -229,7 +246,7 @@ class StatementTests(SimpleTestCase):
         self.assertEqual(repr(statement), "<Statement 'reference - non_reference'>")
 
     def test_str(self):
-        reference = MockReference("reference", {}, {})
+        reference = MockReference("reference", {}, {}, {})
         statement = Statement(
             "%(reference)s - %(non_reference)s",
             reference=reference,

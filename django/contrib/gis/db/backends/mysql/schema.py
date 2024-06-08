@@ -9,7 +9,6 @@ logger = logging.getLogger("django.contrib.gis")
 
 class MySQLGISSchemaEditor(DatabaseSchemaEditor):
     sql_add_spatial_index = "CREATE SPATIAL INDEX %(index)s ON %(table)s(%(column)s)"
-    sql_drop_spatial_index = "DROP INDEX %(index)s ON %(table)s"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -56,11 +55,8 @@ class MySQLGISSchemaEditor(DatabaseSchemaEditor):
 
     def remove_field(self, model, field):
         if isinstance(field, GeometryField) and field.spatial_index:
-            qn = self.connection.ops.quote_name
-            sql = self.sql_drop_spatial_index % {
-                "index": qn(self._create_spatial_index_name(model, field)),
-                "table": qn(model._meta.db_table),
-            }
+            index_name = self._create_spatial_index_name(model, field)
+            sql = self._delete_index_sql(model, index_name)
             try:
                 self.execute(sql)
             except OperationalError:
@@ -81,8 +77,7 @@ class MySQLGISSchemaEditor(DatabaseSchemaEditor):
                 self.execute(sql)
             except OperationalError:
                 logger.error(
-                    "Cannot create SPATIAL INDEX %s. Only MyISAM and (as of "
-                    "MySQL 5.7.5) InnoDB support them.",
-                    sql,
+                    f"Cannot create SPATIAL INDEX {sql}. Only MyISAM, Aria, and InnoDB "
+                    f"support them.",
                 )
         self.geometry_sql = []

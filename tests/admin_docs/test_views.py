@@ -27,7 +27,7 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
         self.assertContains(response, "<h1>Documentation</h1>", html=True)
         self.assertContains(
             response,
-            '<h1 id="site-name"><a href="/admin/">Django administration</a></h1>',
+            '<div id="site-name"><a href="/admin/">Django administration</a></div>',
         )
         self.client.logout()
         response = self.client.get(reverse("django-admindocs-docroot"), follow=True)
@@ -138,6 +138,12 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
             html=True,
         )
 
+    def test_template_detail_loader(self):
+        response = self.client.get(
+            reverse("django-admindocs-templates", args=["view_for_loader_test.html"])
+        )
+        self.assertContains(response, "view_for_loader_test.html</code></li>")
+
     def test_missing_docutils(self):
         utils.docutils_is_available = False
         try:
@@ -148,12 +154,12 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
                 '<a href="https://docutils.sourceforge.io/">docutils</a> '
                 "library.</h3>"
                 "<p>Please ask your administrators to install "
-                '<a href="https://docutils.sourceforge.io/">docutils</a>.</p>',
+                '<a href="https://pypi.org/project/docutils/">docutils</a>.</p>',
                 html=True,
             )
             self.assertContains(
                 response,
-                '<h1 id="site-name"><a href="/admin/">Django administration</a></h1>',
+                '<div id="site-name"><a href="/admin/">Django administration</a></div>',
             )
         finally:
             utils.docutils_is_available = True
@@ -240,6 +246,20 @@ class TestModelDetailView(TestDataMixin, AdminDocsTestCase):
                 reverse("django-admindocs-models-detail", args=["admin_docs", "Person"])
             )
 
+    def test_table_headers(self):
+        tests = [
+            ("Method", 1),
+            ("Arguments", 1),
+            ("Description", 2),
+            ("Field", 1),
+            ("Type", 1),
+            ("Method", 1),
+        ]
+        for table_header, count in tests:
+            self.assertContains(
+                self.response, f'<th scope="col">{table_header}</th>', count=count
+            )
+
     def test_method_excludes(self):
         """
         Methods that begin with strings defined in
@@ -260,6 +280,8 @@ class TestModelDetailView(TestDataMixin, AdminDocsTestCase):
         self.assertContains(self.response, "<h3>Methods with arguments</h3>")
         self.assertContains(self.response, "<td>rename_company</td>")
         self.assertContains(self.response, "<td>dummy_function</td>")
+        self.assertContains(self.response, "<td>dummy_function_keyword_only_arg</td>")
+        self.assertContains(self.response, "<td>all_kinds_arg_function</td>")
         self.assertContains(self.response, "<td>suffix_company_name</td>")
 
     def test_methods_with_arguments_display_arguments(self):
@@ -267,6 +289,7 @@ class TestModelDetailView(TestDataMixin, AdminDocsTestCase):
         Methods with arguments should have their arguments displayed.
         """
         self.assertContains(self.response, "<td>new_name</td>")
+        self.assertContains(self.response, "<td>keyword_only_arg</td>")
 
     def test_methods_with_arguments_display_arguments_default_value(self):
         """
@@ -282,6 +305,7 @@ class TestModelDetailView(TestDataMixin, AdminDocsTestCase):
         self.assertContains(
             self.response, "<td>baz, rox, *some_args, **some_kwargs</td>"
         )
+        self.assertContains(self.response, "<td>position_only_arg, arg, kwarg</td>")
 
     def test_instance_of_property_methods_are_displayed(self):
         """Model properties are displayed as fields."""
@@ -445,6 +469,16 @@ class TestFieldType(unittest.TestCase):
         self.assertEqual(
             views.get_readable_field_data_type(fields.BooleanField()),
             "Boolean (Either True or False)",
+        )
+
+    def test_char_fields(self):
+        self.assertEqual(
+            views.get_readable_field_data_type(fields.CharField(max_length=255)),
+            "String (up to 255)",
+        )
+        self.assertEqual(
+            views.get_readable_field_data_type(fields.CharField()),
+            "String (unlimited)",
         )
 
     def test_custom_fields(self):

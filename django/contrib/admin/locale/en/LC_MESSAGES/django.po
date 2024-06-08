@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -14,22 +14,22 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/admin/actions.py:16
+#: contrib/admin/actions.py:17
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr ""
 
-#: contrib/admin/actions.py:46
+#: contrib/admin/actions.py:54
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr ""
 
-#: contrib/admin/actions.py:55 contrib/admin/options.py:1897
+#: contrib/admin/actions.py:64 contrib/admin/options.py:2177
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr ""
 
-#: contrib/admin/actions.py:57 contrib/admin/options.py:1899
+#: contrib/admin/actions.py:66 contrib/admin/options.py:2179
 msgid "Are you sure?"
 msgstr ""
 
@@ -37,325 +37,325 @@ msgstr ""
 msgid "Administration"
 msgstr ""
 
-#: contrib/admin/filters.py:108 contrib/admin/filters.py:213
-#: contrib/admin/filters.py:249 contrib/admin/filters.py:284
-#: contrib/admin/filters.py:403 contrib/admin/filters.py:469
+#: contrib/admin/filters.py:153 contrib/admin/filters.py:295
+#: contrib/admin/filters.py:364 contrib/admin/filters.py:432
+#: contrib/admin/filters.py:607 contrib/admin/filters.py:701
 msgid "All"
 msgstr ""
 
-#: contrib/admin/filters.py:250
+#: contrib/admin/filters.py:365
 msgid "Yes"
 msgstr ""
 
-#: contrib/admin/filters.py:251
+#: contrib/admin/filters.py:366
 msgid "No"
 msgstr ""
 
-#: contrib/admin/filters.py:262
+#: contrib/admin/filters.py:380
 msgid "Unknown"
 msgstr ""
 
-#: contrib/admin/filters.py:332
+#: contrib/admin/filters.py:490
 msgid "Any date"
 msgstr ""
 
-#: contrib/admin/filters.py:333
+#: contrib/admin/filters.py:492
 msgid "Today"
 msgstr ""
 
-#: contrib/admin/filters.py:337
+#: contrib/admin/filters.py:499
 msgid "Past 7 days"
 msgstr ""
 
-#: contrib/admin/filters.py:341
+#: contrib/admin/filters.py:506
 msgid "This month"
 msgstr ""
 
-#: contrib/admin/filters.py:345
+#: contrib/admin/filters.py:513
 msgid "This year"
 msgstr ""
 
-#: contrib/admin/filters.py:353
+#: contrib/admin/filters.py:523
 msgid "No date"
 msgstr ""
 
-#: contrib/admin/filters.py:354
+#: contrib/admin/filters.py:524
 msgid "Has date"
 msgstr ""
 
-#: contrib/admin/filters.py:470
+#: contrib/admin/filters.py:702
 msgid "Empty"
 msgstr ""
 
-#: contrib/admin/filters.py:471
+#: contrib/admin/filters.py:703
 msgid "Not empty"
 msgstr ""
 
-#: contrib/admin/forms.py:13
+#: contrib/admin/forms.py:14
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
 "that both fields may be case-sensitive."
 msgstr ""
 
-#: contrib/admin/helpers.py:23
+#: contrib/admin/helpers.py:30
 msgid "Action:"
 msgstr ""
 
-#: contrib/admin/helpers.py:350
+#: contrib/admin/helpers.py:428
 #, python-format
 msgid "Add another %(verbose_name)s"
 msgstr ""
 
-#: contrib/admin/helpers.py:353
+#: contrib/admin/helpers.py:432
 msgid "Remove"
 msgstr ""
 
-#: contrib/admin/models.py:17
+#: contrib/admin/models.py:18
 msgid "Addition"
 msgstr ""
 
-#: contrib/admin/models.py:18 contrib/admin/templates/admin/app_list.html:28
+#: contrib/admin/models.py:19 contrib/admin/templates/admin/app_list.html:28
 #: contrib/admin/templates/admin/edit_inline/stacked.html:16
 #: contrib/admin/templates/admin/edit_inline/tabular.html:36
-#: contrib/admin/templates/admin/widgets/related_widget_wrapper.html:11
 msgid "Change"
 msgstr ""
 
-#: contrib/admin/models.py:19
+#: contrib/admin/models.py:20
 msgid "Deletion"
 msgstr ""
 
-#: contrib/admin/models.py:41
+#: contrib/admin/models.py:50
 msgid "action time"
 msgstr ""
 
-#: contrib/admin/models.py:48
+#: contrib/admin/models.py:57
 msgid "user"
 msgstr ""
 
-#: contrib/admin/models.py:53
+#: contrib/admin/models.py:62
 msgid "content type"
 msgstr ""
 
-#: contrib/admin/models.py:56
+#: contrib/admin/models.py:66
 msgid "object id"
 msgstr ""
 
-#. Translators: 'repr' means representation (https://docs.python.org/library/functions.html#repr)
-#: contrib/admin/models.py:58
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/library/functions.html#repr)
+#: contrib/admin/models.py:69
 msgid "object repr"
 msgstr ""
 
-#: contrib/admin/models.py:59
+#: contrib/admin/models.py:71
 msgid "action flag"
 msgstr ""
 
-#: contrib/admin/models.py:61
+#: contrib/admin/models.py:74
 msgid "change message"
 msgstr ""
 
-#: contrib/admin/models.py:66
+#: contrib/admin/models.py:79
 msgid "log entry"
 msgstr ""
 
-#: contrib/admin/models.py:67
+#: contrib/admin/models.py:80
 msgid "log entries"
 msgstr ""
 
-#: contrib/admin/models.py:76
+#: contrib/admin/models.py:89
 #, python-format
 msgid "Added “%(object)s”."
 msgstr ""
 
-#: contrib/admin/models.py:78
+#: contrib/admin/models.py:91
 #, python-format
 msgid "Changed “%(object)s” — %(changes)s"
 msgstr ""
 
-#: contrib/admin/models.py:83
+#: contrib/admin/models.py:96
 #, python-format
 msgid "Deleted “%(object)s.”"
 msgstr ""
 
-#: contrib/admin/models.py:85
+#: contrib/admin/models.py:98
 msgid "LogEntry Object"
 msgstr ""
 
-#: contrib/admin/models.py:111
+#: contrib/admin/models.py:127
 #, python-brace-format
 msgid "Added {name} “{object}”."
 msgstr ""
 
-#: contrib/admin/models.py:113
+#: contrib/admin/models.py:132
 msgid "Added."
 msgstr ""
 
-#: contrib/admin/models.py:117 contrib/admin/options.py:2132
+#: contrib/admin/models.py:140 contrib/admin/options.py:2433
 msgid "and"
 msgstr ""
 
-#: contrib/admin/models.py:121
+#: contrib/admin/models.py:147
 #, python-brace-format
 msgid "Changed {fields} for {name} “{object}”."
 msgstr ""
 
-#: contrib/admin/models.py:125
+#: contrib/admin/models.py:153
 #, python-brace-format
 msgid "Changed {fields}."
 msgstr ""
 
-#: contrib/admin/models.py:129
+#: contrib/admin/models.py:163
 #, python-brace-format
 msgid "Deleted {name} “{object}”."
 msgstr ""
 
-#: contrib/admin/models.py:132
+#: contrib/admin/models.py:169
 msgid "No fields changed."
 msgstr ""
 
-#: contrib/admin/options.py:202 contrib/admin/options.py:234
+#: contrib/admin/options.py:243 contrib/admin/options.py:287
 msgid "None"
 msgstr ""
 
-#: contrib/admin/options.py:280
+#: contrib/admin/options.py:339
 msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr ""
 
-#: contrib/admin/options.py:1232 contrib/admin/options.py:1256
+#: contrib/admin/options.py:995
+msgid "Select this object for an action - {}"
+msgstr ""
+
+#: contrib/admin/options.py:1405 contrib/admin/options.py:1434
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr ""
 
-#: contrib/admin/options.py:1234
+#: contrib/admin/options.py:1407
 msgid "You may edit it again below."
 msgstr ""
 
-#: contrib/admin/options.py:1246
+#: contrib/admin/options.py:1420
 #, python-brace-format
 msgid ""
 "The {name} “{obj}” was added successfully. You may add another {name} below."
 msgstr ""
 
-#: contrib/admin/options.py:1296
+#: contrib/admin/options.py:1482
 #, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may edit it again below."
 msgstr ""
 
-#: contrib/admin/options.py:1306
-#, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr ""
-
-#: contrib/admin/options.py:1319
+#: contrib/admin/options.py:1516
 #, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
 msgstr ""
 
-#: contrib/admin/options.py:1331
+#: contrib/admin/options.py:1533
 #, python-brace-format
 msgid "The {name} “{obj}” was changed successfully."
 msgstr ""
 
-#: contrib/admin/options.py:1408 contrib/admin/options.py:1738
+#: contrib/admin/options.py:1611 contrib/admin/options.py:1996
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
 
-#: contrib/admin/options.py:1427
+#: contrib/admin/options.py:1631
 msgid "No action selected."
 msgstr ""
 
-#: contrib/admin/options.py:1452
+#: contrib/admin/options.py:1662
 #, python-format
 msgid "The %(name)s “%(obj)s” was deleted successfully."
 msgstr ""
 
-#: contrib/admin/options.py:1538
+#: contrib/admin/options.py:1764
 #, python-format
 msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
 msgstr ""
 
-#: contrib/admin/options.py:1633
+#: contrib/admin/options.py:1875
 #, python-format
 msgid "Add %s"
 msgstr ""
 
-#: contrib/admin/options.py:1635
+#: contrib/admin/options.py:1877
 #, python-format
 msgid "Change %s"
 msgstr ""
 
-#: contrib/admin/options.py:1637
+#: contrib/admin/options.py:1879
 #, python-format
 msgid "View %s"
 msgstr ""
 
-#: contrib/admin/options.py:1716
+#: contrib/admin/options.py:1966
 msgid "Database error"
 msgstr ""
 
-#: contrib/admin/options.py:1785
+#: contrib/admin/options.py:2056
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] ""
 msgstr[1] ""
 
-#: contrib/admin/options.py:1816
+#: contrib/admin/options.py:2087
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] ""
 msgstr[1] ""
 
-#: contrib/admin/options.py:1824
+#: contrib/admin/options.py:2093
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr ""
 
-#: contrib/admin/options.py:1944
+#: contrib/admin/options.py:2235
 #, python-format
 msgid "Change history: %s"
 msgstr ""
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
-#: contrib/admin/options.py:2125
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
+#: contrib/admin/options.py:2427
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr ""
 
-#: contrib/admin/options.py:2134
+#: contrib/admin/options.py:2436
 #, python-format
 msgid ""
 "Deleting %(class_name)s %(instance)s would require deleting the following "
 "protected related objects: %(related_objects)s"
 msgstr ""
 
-#: contrib/admin/sites.py:48 contrib/admin/templates/admin/base_site.html:3
+#: contrib/admin/sites.py:39 contrib/admin/templates/admin/base_site.html:3
 msgid "Django site admin"
 msgstr ""
 
-#: contrib/admin/sites.py:51 contrib/admin/templates/admin/base_site.html:6
+#: contrib/admin/sites.py:42 contrib/admin/templates/admin/base_site.html:6
 msgid "Django administration"
 msgstr ""
 
-#: contrib/admin/sites.py:54
+#: contrib/admin/sites.py:45
 msgid "Site administration"
 msgstr ""
 
-#: contrib/admin/sites.py:402 contrib/admin/templates/admin/login.html:63
+#: contrib/admin/sites.py:422 contrib/admin/templates/admin/login.html:63
 #: contrib/admin/templates/registration/password_reset_complete.html:15
-#: contrib/admin/tests.py:135
+#: contrib/admin/tests.py:143
 msgid "Log in"
 msgstr ""
 
-#: contrib/admin/sites.py:547
+#: contrib/admin/sites.py:577
 #, python-format
 msgid "%(app)s administration"
 msgstr ""
@@ -370,18 +370,18 @@ msgid "We’re sorry, but the requested page could not be found."
 msgstr ""
 
 #: contrib/admin/templates/admin/500.html:6
-#: contrib/admin/templates/admin/app_index.html:9
+#: contrib/admin/templates/admin/app_index.html:10
 #: contrib/admin/templates/admin/auth/user/change_password.html:10
-#: contrib/admin/templates/admin/base.html:66
+#: contrib/admin/templates/admin/base.html:76
 #: contrib/admin/templates/admin/change_form.html:18
-#: contrib/admin/templates/admin/change_list.html:31
+#: contrib/admin/templates/admin/change_list.html:32
 #: contrib/admin/templates/admin/delete_confirmation.html:14
 #: contrib/admin/templates/admin/delete_selected_confirmation.html:14
 #: contrib/admin/templates/admin/invalid_setup.html:6
 #: contrib/admin/templates/admin/object_history.html:6
 #: contrib/admin/templates/registration/logged_out.html:4
-#: contrib/admin/templates/registration/password_change_done.html:6
-#: contrib/admin/templates/registration/password_change_form.html:7
+#: contrib/admin/templates/registration/password_change_done.html:13
+#: contrib/admin/templates/registration/password_change_form.html:14
 #: contrib/admin/templates/registration/password_reset_complete.html:6
 #: contrib/admin/templates/registration/password_reset_confirm.html:7
 #: contrib/admin/templates/registration/password_reset_done.html:6
@@ -428,13 +428,17 @@ msgstr ""
 msgid "Clear selection"
 msgstr ""
 
+#: contrib/admin/templates/admin/app_index.html:8
+#: contrib/admin/templates/admin/base.html:73
+msgid "Breadcrumbs"
+msgstr ""
+
 #: contrib/admin/templates/admin/app_list.html:8
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr ""
 
 #: contrib/admin/templates/admin/app_list.html:19
-#: contrib/admin/templates/admin/widgets/related_widget_wrapper.html:18
 msgid "Add"
 msgstr ""
 
@@ -460,50 +464,66 @@ msgstr ""
 
 #: contrib/admin/templates/admin/auth/user/change_password.html:14
 #: contrib/admin/templates/admin/auth/user/change_password.html:52
-#: contrib/admin/templates/admin/base.html:53
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:4
+#: contrib/admin/templates/admin/base.html:57
+#: contrib/admin/templates/registration/password_change_done.html:4
+#: contrib/admin/templates/registration/password_change_form.html:5
 msgid "Change password"
 msgstr ""
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:25
-#: contrib/admin/templates/admin/change_form.html:43
-#: contrib/admin/templates/admin/change_list.html:51
-#: contrib/admin/templates/admin/login.html:23
-#: contrib/admin/templates/registration/password_change_form.html:18
-msgid "Please correct the error below."
+#: contrib/admin/templates/admin/auth/user/change_password.html:18
+msgid "Set password"
 msgstr ""
 
 #: contrib/admin/templates/admin/auth/user/change_password.html:25
 #: contrib/admin/templates/admin/change_form.html:43
-#: contrib/admin/templates/admin/change_list.html:51
+#: contrib/admin/templates/admin/change_list.html:52
 #: contrib/admin/templates/admin/login.html:23
-#: contrib/admin/templates/registration/password_change_form.html:18
-msgid "Please correct the errors below."
-msgstr ""
+#: contrib/admin/templates/registration/password_change_form.html:25
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
+msgstr[1] ""
 
 #: contrib/admin/templates/admin/auth/user/change_password.html:29
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr ""
 
-#: contrib/admin/templates/admin/base.html:39
+#: contrib/admin/templates/admin/auth/user/change_password.html:35
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+
+#: contrib/admin/templates/admin/auth/user/change_password.html:71
+msgid "Disable password-based authentication"
+msgstr ""
+
+#: contrib/admin/templates/admin/auth/user/change_password.html:73
+msgid "Enable password-based authentication"
+msgstr ""
+
+#: contrib/admin/templates/admin/base.html:28
+msgid "Skip to main content"
+msgstr ""
+
+#: contrib/admin/templates/admin/base.html:43
 msgid "Welcome,"
 msgstr ""
 
-#: contrib/admin/templates/admin/base.html:44
+#: contrib/admin/templates/admin/base.html:48
 msgid "View site"
 msgstr ""
 
-#: contrib/admin/templates/admin/base.html:49
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:4
+#: contrib/admin/templates/admin/base.html:53
+#: contrib/admin/templates/registration/password_change_done.html:4
+#: contrib/admin/templates/registration/password_change_form.html:5
 msgid "Documentation"
 msgstr ""
 
-#: contrib/admin/templates/admin/base.html:55
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:4
+#: contrib/admin/templates/admin/base.html:61
+#: contrib/admin/templates/registration/password_change_done.html:7
+#: contrib/admin/templates/registration/password_change_form.html:8
 msgid "Log out"
 msgstr ""
 
@@ -524,34 +544,53 @@ msgstr ""
 msgid "View on site"
 msgstr ""
 
-#: contrib/admin/templates/admin/change_list.html:76
+#: contrib/admin/templates/admin/change_list.html:77
 msgid "Filter"
 msgstr ""
 
-#: contrib/admin/templates/admin/change_list.html:78
+#: contrib/admin/templates/admin/change_list.html:80
+msgid "Hide counts"
+msgstr ""
+
+#: contrib/admin/templates/admin/change_list.html:81
+msgid "Show counts"
+msgstr ""
+
+#: contrib/admin/templates/admin/change_list.html:84
 msgid "Clear all filters"
 msgstr ""
 
-#: contrib/admin/templates/admin/change_list_results.html:17
+#: contrib/admin/templates/admin/change_list_results.html:16
 msgid "Remove from sorting"
 msgstr ""
 
-#: contrib/admin/templates/admin/change_list_results.html:18
+#: contrib/admin/templates/admin/change_list_results.html:17
 #, python-format
 msgid "Sorting priority: %(priority_number)s"
 msgstr ""
 
-#: contrib/admin/templates/admin/change_list_results.html:19
+#: contrib/admin/templates/admin/change_list_results.html:18
 msgid "Toggle sorting"
 msgstr ""
 
+#: contrib/admin/templates/admin/color_theme_toggle.html:3
+msgid "Toggle theme (current theme: auto)"
+msgstr ""
+
+#: contrib/admin/templates/admin/color_theme_toggle.html:4
+msgid "Toggle theme (current theme: light)"
+msgstr ""
+
+#: contrib/admin/templates/admin/color_theme_toggle.html:5
+msgid "Toggle theme (current theme: dark)"
+msgstr ""
+
 #: contrib/admin/templates/admin/delete_confirmation.html:18
-#: contrib/admin/templates/admin/submit_line.html:7
-#: contrib/admin/templates/admin/widgets/related_widget_wrapper.html:25
+#: contrib/admin/templates/admin/submit_line.html:14
 msgid "Delete"
 msgstr ""
 
-#: contrib/admin/templates/admin/delete_confirmation.html:24
+#: contrib/admin/templates/admin/delete_confirmation.html:25
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -559,32 +598,32 @@ msgid ""
 "following types of objects:"
 msgstr ""
 
-#: contrib/admin/templates/admin/delete_confirmation.html:31
+#: contrib/admin/templates/admin/delete_confirmation.html:30
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
 "following protected related objects:"
 msgstr ""
 
-#: contrib/admin/templates/admin/delete_confirmation.html:38
+#: contrib/admin/templates/admin/delete_confirmation.html:35
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
 msgstr ""
 
-#: contrib/admin/templates/admin/delete_confirmation.html:40
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:39
+#: contrib/admin/templates/admin/delete_confirmation.html:37
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:31
 msgid "Objects"
 msgstr ""
 
-#: contrib/admin/templates/admin/delete_confirmation.html:47
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:50
+#: contrib/admin/templates/admin/delete_confirmation.html:44
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:42
 msgid "Yes, I’m sure"
 msgstr ""
 
-#: contrib/admin/templates/admin/delete_confirmation.html:48
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:51
+#: contrib/admin/templates/admin/delete_confirmation.html:45
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:43
 msgid "No, take me back"
 msgstr ""
 
@@ -600,14 +639,14 @@ msgid ""
 "types of objects:"
 msgstr ""
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:30
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:26
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
 "protected related objects:"
 msgstr ""
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:37
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:29
 #, python-format
 msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
@@ -618,7 +657,7 @@ msgstr ""
 msgid "Delete?"
 msgstr ""
 
-#: contrib/admin/templates/admin/filter.html:2
+#: contrib/admin/templates/admin/filter.html:4
 #, python-format
 msgid " By %(filter_title)s "
 msgstr ""
@@ -639,7 +678,19 @@ msgstr ""
 msgid "None available"
 msgstr ""
 
-#: contrib/admin/templates/admin/index.html:42
+#: contrib/admin/templates/admin/index.html:33
+msgid "Added:"
+msgstr ""
+
+#: contrib/admin/templates/admin/index.html:33
+msgid "Changed:"
+msgstr ""
+
+#: contrib/admin/templates/admin/index.html:33
+msgid "Deleted:"
+msgstr ""
+
+#: contrib/admin/templates/admin/index.html:43
 msgid "Unknown content"
 msgstr ""
 
@@ -665,6 +716,10 @@ msgstr ""
 msgid "Toggle navigation"
 msgstr ""
 
+#: contrib/admin/templates/admin/nav_sidebar.html:3
+msgid "Sidebar"
+msgstr ""
+
 #: contrib/admin/templates/admin/nav_sidebar.html:5
 msgid "Start typing to filter…"
 msgstr ""
@@ -685,7 +740,13 @@ msgstr ""
 msgid "Action"
 msgstr ""
 
-#: contrib/admin/templates/admin/object_history.html:38
+#: contrib/admin/templates/admin/object_history.html:49
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] ""
+msgstr[1] ""
+
+#: contrib/admin/templates/admin/object_history.html:52
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
@@ -721,39 +782,44 @@ msgstr[1] ""
 msgid "%(full_result_count)s total"
 msgstr ""
 
-#: contrib/admin/templates/admin/submit_line.html:9
+#: contrib/admin/templates/admin/submit_line.html:5
 msgid "Save as new"
 msgstr ""
 
-#: contrib/admin/templates/admin/submit_line.html:10
+#: contrib/admin/templates/admin/submit_line.html:6
 msgid "Save and add another"
 msgstr ""
 
-#: contrib/admin/templates/admin/submit_line.html:11
+#: contrib/admin/templates/admin/submit_line.html:7
 msgid "Save and continue editing"
 msgstr ""
 
-#: contrib/admin/templates/admin/submit_line.html:11
+#: contrib/admin/templates/admin/submit_line.html:7
 msgid "Save and view"
 msgstr ""
 
-#: contrib/admin/templates/admin/submit_line.html:12
+#: contrib/admin/templates/admin/submit_line.html:10
 msgid "Close"
 msgstr ""
 
-#: contrib/admin/templates/admin/widgets/related_widget_wrapper.html:10
+#: contrib/admin/templates/admin/widgets/related_widget_wrapper.html:11
 #, python-format
 msgid "Change selected %(model)s"
 msgstr ""
 
-#: contrib/admin/templates/admin/widgets/related_widget_wrapper.html:17
+#: contrib/admin/templates/admin/widgets/related_widget_wrapper.html:19
 #, python-format
 msgid "Add another %(model)s"
 msgstr ""
 
-#: contrib/admin/templates/admin/widgets/related_widget_wrapper.html:24
+#: contrib/admin/templates/admin/widgets/related_widget_wrapper.html:27
 #, python-format
 msgid "Delete selected %(model)s"
+msgstr ""
+
+#: contrib/admin/templates/admin/widgets/related_widget_wrapper.html:34
+#, python-format
+msgid "View selected %(model)s"
 msgstr ""
 
 #: contrib/admin/templates/registration/logged_out.html:10
@@ -764,23 +830,23 @@ msgstr ""
 msgid "Log in again"
 msgstr ""
 
-#: contrib/admin/templates/registration/password_change_done.html:7
-#: contrib/admin/templates/registration/password_change_form.html:8
+#: contrib/admin/templates/registration/password_change_done.html:14
+#: contrib/admin/templates/registration/password_change_form.html:15
 msgid "Password change"
 msgstr ""
 
-#: contrib/admin/templates/registration/password_change_done.html:12
+#: contrib/admin/templates/registration/password_change_done.html:19
 msgid "Your password was changed."
 msgstr ""
 
-#: contrib/admin/templates/registration/password_change_form.html:23
+#: contrib/admin/templates/registration/password_change_form.html:30
 msgid ""
 "Please enter your old password, for security’s sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
 
-#: contrib/admin/templates/registration/password_change_form.html:51
-#: contrib/admin/templates/registration/password_reset_confirm.html:31
+#: contrib/admin/templates/registration/password_change_form.html:58
+#: contrib/admin/templates/registration/password_reset_confirm.html:37
 msgid "Change my password"
 msgstr ""
 
@@ -804,15 +870,15 @@ msgid ""
 "correctly."
 msgstr ""
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:23
+#: contrib/admin/templates/registration/password_reset_confirm.html:24
 msgid "New password:"
 msgstr ""
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:28
+#: contrib/admin/templates/registration/password_reset_confirm.html:31
 msgid "Confirm password:"
 msgstr ""
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:37
+#: contrib/admin/templates/registration/password_reset_confirm.html:43
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
@@ -860,49 +926,53 @@ msgid ""
 "instructions for setting a new one."
 msgstr ""
 
-#: contrib/admin/templates/registration/password_reset_form.html:20
+#: contrib/admin/templates/registration/password_reset_form.html:21
 msgid "Email address:"
 msgstr ""
 
-#: contrib/admin/templates/registration/password_reset_form.html:23
+#: contrib/admin/templates/registration/password_reset_form.html:27
 msgid "Reset my password"
 msgstr ""
 
-#: contrib/admin/templatetags/admin_list.py:391
+#: contrib/admin/templatetags/admin_list.py:100
+msgid "Select all objects on this page for an action"
+msgstr ""
+
+#: contrib/admin/templatetags/admin_list.py:434
 msgid "All dates"
 msgstr ""
 
-#: contrib/admin/views/main.py:103
+#: contrib/admin/views/main.py:147
 #, python-format
 msgid "Select %s"
 msgstr ""
 
-#: contrib/admin/views/main.py:105
+#: contrib/admin/views/main.py:149
 #, python-format
 msgid "Select %s to change"
 msgstr ""
 
-#: contrib/admin/views/main.py:107
+#: contrib/admin/views/main.py:151
 #, python-format
 msgid "Select %s to view"
 msgstr ""
 
-#: contrib/admin/widgets.py:87
+#: contrib/admin/widgets.py:98
 msgid "Date:"
 msgstr ""
 
-#: contrib/admin/widgets.py:88
+#: contrib/admin/widgets.py:99
 msgid "Time:"
 msgstr ""
 
-#: contrib/admin/widgets.py:150
+#: contrib/admin/widgets.py:163
 msgid "Lookup"
 msgstr ""
 
-#: contrib/admin/widgets.py:340
+#: contrib/admin/widgets.py:389
 msgid "Currently:"
 msgstr ""
 
-#: contrib/admin/widgets.py:341
+#: contrib/admin/widgets.py:390
 msgid "Change:"
 msgstr ""

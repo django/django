@@ -10,10 +10,12 @@ import operator
 import os
 import re
 import uuid
+import warnings
 from decimal import Decimal, DecimalException
 from io import BytesIO
 from urllib.parse import urlsplit, urlunsplit
 
+from django.conf import settings
 from django.core import validators
 from django.core.exceptions import ValidationError
 from django.forms.boundfield import BoundField
@@ -40,7 +42,9 @@ from django.forms.widgets import (
     URLInput,
 )
 from django.utils import formats
+from django.utils.choices import normalize_choices
 from django.utils.dateparse import parse_datetime, parse_duration
+from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.duration import duration_string
 from django.utils.ipv6 import clean_ipv6_address
 from django.utils.regex_helper import _lazy_re_compile
@@ -106,6 +110,7 @@ class Field:
         localize=False,
         disabled=False,
         label_suffix=None,
+        template_name=None,
     ):
         # required -- Boolean that specifies whether the field is required.
         #             True by default.
@@ -163,6 +168,7 @@ class Field:
         self.error_messages = messages
 
         self.validators = [*self.default_validators, *validators]
+        self.template_name = template_name
 
         super().__init__()
 
@@ -255,6 +261,10 @@ class Field:
         result.validators = self.validators[:]
         return result
 
+    def _clean_bound_field(self, bf):
+        value = bf.initial if self.disabled else bf.data
+        return self.clean(value)
+
 
 class CharField(Field):
     def __init__(
@@ -299,8 +309,8 @@ class IntegerField(Field):
     }
     re_decimal = _lazy_re_compile(r"\.0*\s*$")
 
-    def __init__(self, *, max_value=None, min_value=None, **kwargs):
-        self.max_value, self.min_value = max_value, min_value
+    def __init__(self, *, max_value=None, min_value=None, step_size=None, **kwargs):
+        self.max_value, self.min_value, self.step_size = max_value, min_value, step_size
         if kwargs.get("localize") and self.widget == NumberInput:
             # Localized number input is not well supported on most browsers
             kwargs.setdefault("widget", super().widget)
@@ -310,6 +320,10 @@ class IntegerField(Field):
             self.validators.append(validators.MaxValueValidator(max_value))
         if min_value is not None:
             self.validators.append(validators.MinValueValidator(min_value))
+        if step_size is not None:
+            self.validators.append(
+                validators.StepValueValidator(step_size, offset=min_value)
+            )
 
     def to_python(self, value):
         """
@@ -335,6 +349,8 @@ class IntegerField(Field):
                 attrs["min"] = self.min_value
             if self.max_value is not None:
                 attrs["max"] = self.max_value
+            if self.step_size is not None:
+                attrs["step"] = self.step_size
         return attrs
 
 
@@ -369,7 +385,11 @@ class FloatField(IntegerField):
     def widget_attrs(self, widget):
         attrs = super().widget_attrs(widget)
         if isinstance(widget, NumberInput) and "step" not in widget.attrs:
-            attrs.setdefault("step", "any")
+            if self.step_size is not None:
+                step = str(self.step_size)
+            else:
+                step = "any"
+            attrs.setdefault("step", step)
         return attrs
 
 
@@ -601,6 +621,9 @@ class EmailField(CharField):
     default_validators = [validators.validate_email]
 
     def __init__(self, **kwargs):
+        # The default maximum length of an email is 320 characters per RFC 3696
+        # section 3.
+        kwargs.setdefault("max_length", 320)
         super().__init__(strip=True, **kwargs)
 
 
@@ -669,13 +692,15 @@ class FileField(Field):
             return initial
         return super().clean(data)
 
-    def bound_data(self, data, initial):
-        if data in (None, FILE_INPUT_CONTRADICTION):
-            return initial
-        return data
+    def bound_data(self, _, initial):
+        return initial
 
     def has_changed(self, initial, data):
         return not self.disabled and data is not None
+
+    def _clean_bound_field(self, bf):
+        value = bf.initial if self.disabled else bf.data
+        return self.clean(value, bf.initial)
 
 
 class ImageField(FileField):
@@ -744,19 +769,36 @@ class URLField(CharField):
     }
     default_validators = [validators.URLValidator()]
 
-    def __init__(self, **kwargs):
+    def __init__(self, *, assume_scheme=None, **kwargs):
+        if assume_scheme is None:
+            if settings.FORMS_URLFIELD_ASSUME_HTTPS:
+                assume_scheme = "https"
+            else:
+                warnings.warn(
+                    "The default scheme will be changed from 'http' to 'https' in "
+                    "Django 6.0. Pass the forms.URLField.assume_scheme argument to "
+                    "silence this warning, or set the FORMS_URLFIELD_ASSUME_HTTPS "
+                    "transitional setting to True to opt into using 'https' as the new "
+                    "default scheme.",
+                    RemovedInDjango60Warning,
+                    stacklevel=2,
+                )
+                assume_scheme = "http"
+        # RemovedInDjango60Warning: When the deprecation ends, replace with:
+        # self.assume_scheme = assume_scheme or "https"
+        self.assume_scheme = assume_scheme
         super().__init__(strip=True, **kwargs)
 
     def to_python(self, value):
         def split_url(url):
             """
-            Return a list of url parts via urlparse.urlsplit(), or raise
+            Return a list of url parts via urlsplit(), or raise
             ValidationError for some malformed URLs.
             """
             try:
                 return list(urlsplit(url))
             except ValueError:
-                # urlparse.urlsplit can raise a ValueError with some
+                # urlsplit can raise a ValueError with some
                 # misformatted URLs.
                 raise ValidationError(self.error_messages["invalid"], code="invalid")
 
@@ -764,8 +806,8 @@ class URLField(CharField):
         if value:
             url_fields = split_url(value)
             if not url_fields[0]:
-                # If no URL scheme given, assume http://
-                url_fields[0] = "http"
+                # If no URL scheme given, add a scheme.
+                url_fields[0] = self.assume_scheme
             if not url_fields[1]:
                 # Assume that if no domain is provided, that the path segment
                 # contains the domain.
@@ -833,14 +875,6 @@ class NullBooleanField(BooleanField):
         pass
 
 
-class CallableChoiceIterator:
-    def __init__(self, choices_func):
-        self.choices_func = choices_func
-
-    def __iter__(self):
-        yield from self.choices_func()
-
-
 class ChoiceField(Field):
     widget = Select
     default_error_messages = {
@@ -858,21 +892,15 @@ class ChoiceField(Field):
         result._choices = copy.deepcopy(self._choices, memo)
         return result
 
-    def _get_choices(self):
+    @property
+    def choices(self):
         return self._choices
 
-    def _set_choices(self, value):
-        # Setting choices also sets the choices on the widget.
-        # choices can be any iterable, but we call list() on it because
-        # it will be consumed more than once.
-        if callable(value):
-            value = CallableChoiceIterator(value)
-        else:
-            value = list(value)
-
-        self._choices = self.widget.choices = value
-
-    choices = property(_get_choices, _set_choices)
+    @choices.setter
+    def choices(self, value):
+        # Setting choices on the field also sets the choices on the widget.
+        # Note that the property setter for the widget will re-normalize.
+        self._choices = self.widget.choices = normalize_choices(value)
 
     def to_python(self, value):
         """Return a string."""
@@ -1274,7 +1302,7 @@ class GenericIPAddressField(CharField):
         self.unpack_ipv4 = unpack_ipv4
         self.default_validators = validators.ip_address_validators(
             protocol, unpack_ipv4
-        )[0]
+        )
         super().__init__(**kwargs)
 
     def to_python(self, value):

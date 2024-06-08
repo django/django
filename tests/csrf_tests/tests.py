@@ -23,8 +23,6 @@ from django.middleware.csrf import (
     rotate_token,
 )
 from django.test import SimpleTestCase, override_settings
-from django.test.utils import ignore_warnings
-from django.utils.deprecation import RemovedInDjango50Warning
 from django.views.decorators.csrf import csrf_exempt, requires_csrf_token
 
 from .views import (
@@ -45,7 +43,6 @@ MASKED_TEST_SECRET2 = "2JgchWvM1tpxT2lfz9aydoXW9yT1DN3NdLiejYxOOlzzV4nhBbYqmqZYb
 
 
 class CsrfFunctionTestMixin:
-
     # This method depends on _unmask_cipher_token() being correct.
     def assertMaskedSecretCorrect(self, masked_secret, secret):
         """Test that a string is a valid masked version of a secret."""
@@ -712,25 +709,21 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         response = mw.process_view(req, post_form_view, (), {})
         self.assertContains(response, malformed_referer_msg, status_code=403)
         # missing scheme
-        # >>> urlparse('//example.com/')
-        # ParseResult(
-        #   scheme='', netloc='example.com', path='/', params='', query='', fragment='',
-        # )
+        # >>> urlsplit('//example.com/')
+        # SplitResult(scheme='', netloc='example.com', path='/', query='', fragment='')
         req.META["HTTP_REFERER"] = "//example.com/"
         self._check_referer_rejects(mw, req)
         response = mw.process_view(req, post_form_view, (), {})
         self.assertContains(response, malformed_referer_msg, status_code=403)
         # missing netloc
-        # >>> urlparse('https://')
-        # ParseResult(
-        #   scheme='https', netloc='', path='', params='', query='', fragment='',
-        # )
+        # >>> urlsplit('https://')
+        # SplitResult(scheme='https', netloc='', path='', query='', fragment='')
         req.META["HTTP_REFERER"] = "https://"
         self._check_referer_rejects(mw, req)
         response = mw.process_view(req, post_form_view, (), {})
         self.assertContains(response, malformed_referer_msg, status_code=403)
         # Invalid URL
-        # >>> urlparse('https://[')
+        # >>> urlsplit('https://[')
         # ValueError: Invalid IPv6 URL
         req.META["HTTP_REFERER"] = "https://["
         self._check_referer_rejects(mw, req)
@@ -860,7 +853,7 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         """
         ensure_csrf_cookie() doesn't log warnings (#19436).
         """
-        with self.assertNoLogs("django.request", "WARNING"):
+        with self.assertNoLogs("django.security.csrf", "WARNING"):
             req = self._get_request()
             ensure_csrf_cookie_view(req)
 
@@ -982,7 +975,7 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
     @override_settings(ALLOWED_HOSTS=["www.example.com"])
     def test_bad_origin_cannot_be_parsed(self):
         """
-        A POST request with an origin that can't be parsed by urlparse() is
+        A POST request with an origin that can't be parsed by urlsplit() is
         rejected.
         """
         req = self._get_POST_request_with_token()
@@ -1494,31 +1487,3 @@ class CsrfInErrorHandlingViewsTests(CsrfFunctionTestMixin, SimpleTestCase):
         token2 = response.content.decode("ascii")
         secret2 = _unmask_cipher_token(token2)
         self.assertMaskedSecretCorrect(token1, secret2)
-
-
-@ignore_warnings(category=RemovedInDjango50Warning)
-class CsrfCookieMaskedTests(CsrfFunctionTestMixin, SimpleTestCase):
-    @override_settings(CSRF_COOKIE_MASKED=True)
-    def test_get_token_csrf_cookie_not_set(self):
-        request = HttpRequest()
-        self.assertNotIn("CSRF_COOKIE", request.META)
-        self.assertNotIn("CSRF_COOKIE_NEEDS_UPDATE", request.META)
-        token = get_token(request)
-        cookie = request.META["CSRF_COOKIE"]
-        self.assertEqual(len(cookie), CSRF_TOKEN_LENGTH)
-        unmasked_cookie = _unmask_cipher_token(cookie)
-        self.assertMaskedSecretCorrect(token, unmasked_cookie)
-        self.assertIs(request.META["CSRF_COOKIE_NEEDS_UPDATE"], True)
-
-    @override_settings(CSRF_COOKIE_MASKED=True)
-    def test_rotate_token(self):
-        request = HttpRequest()
-        request.META["CSRF_COOKIE"] = MASKED_TEST_SECRET1
-        self.assertNotIn("CSRF_COOKIE_NEEDS_UPDATE", request.META)
-        rotate_token(request)
-        # The underlying secret was changed.
-        cookie = request.META["CSRF_COOKIE"]
-        self.assertEqual(len(cookie), CSRF_TOKEN_LENGTH)
-        unmasked_cookie = _unmask_cipher_token(cookie)
-        self.assertNotEqual(unmasked_cookie, TEST_SECRET)
-        self.assertIs(request.META["CSRF_COOKIE_NEEDS_UPDATE"], True)

@@ -22,13 +22,11 @@ For example::
 
     from django.contrib.postgres.operations import HStoreExtension
 
+
     class Migration(migrations.Migration):
         ...
 
-        operations = [
-            HStoreExtension(),
-            ...
-        ]
+        operations = [HStoreExtension(), ...]
 
 The operation skips adding the extension if it already exists.
 
@@ -124,16 +122,18 @@ For example, to create a collation for German phone book ordering::
 
     from django.contrib.postgres.operations import CreateCollation
 
+
     class Migration(migrations.Migration):
         ...
 
         operations = [
             CreateCollation(
-                'german_phonebook',
-                provider='icu',
-                locale='und-u-ks-level2',
+                "case_insensitive",
+                provider="icu",
+                locale="und-u-ks-level2",
+                deterministic=False,
             ),
-            ...
+            ...,
         ]
 
 .. class:: CreateCollation(name, locale, *, provider='libc', deterministic=True)
@@ -150,10 +150,6 @@ For example, to create a collation for German phone book ordering::
     When reversed this is creating a collation with the provided ``locale``,
     ``provider``, and ``deterministic`` arguments. Therefore, ``locale`` is
     required to make this operation reversible.
-
-.. admonition:: Restrictions
-
-    Non-deterministic collations are supported only on PostgreSQL 12+.
 
 Concurrent index operations
 ===========================
@@ -185,8 +181,6 @@ database.
 
 Adding constraints without enforcing validation
 ===============================================
-
-.. versionadded:: 4.0
 
 PostgreSQL supports the ``NOT VALID`` option with the ``ADD CONSTRAINT``
 statement to add check constraints without enforcing validation on existing

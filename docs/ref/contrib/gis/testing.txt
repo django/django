@@ -46,7 +46,9 @@ Create database user
 ~~~~~~~~~~~~~~~~~~~~
 
 To make a database user with the ability to create databases, use the
-following command::
+following command:
+
+.. code-block:: shell
 
     $ createuser --createdb -R -S <user_name>
 
@@ -54,19 +56,25 @@ The ``-R -S`` flags indicate that we do not want the user to have the ability
 to create additional users (roles) or to be a superuser, respectively.
 
 Alternatively, you may alter an existing user's role from the SQL shell
-(assuming this is done from an existing superuser account)::
+(assuming this is done from an existing superuser account):
+
+.. code-block:: psql
 
     postgres# ALTER ROLE <user_name> CREATEDB NOSUPERUSER NOCREATEROLE;
 
 Create database superuser
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This may be done at the time the user is created, for example::
+This may be done at the time the user is created, for example:
+
+.. code-block:: shell
 
     $ createuser --superuser <user_name>
 
 Or you may alter the user's role from the SQL shell (assuming this
-is done from an existing superuser account)::
+is done from an existing superuser account):
+
+.. code-block:: psql
 
     postgres# ALTER ROLE <user_name> SUPERUSER;
 
@@ -98,26 +106,30 @@ that can be used to run the entire Django test suite, including those
 in :mod:`django.contrib.gis`::
 
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.contrib.gis.db.backends.postgis',
-            'NAME': 'geodjango',
-            'USER': 'geodjango',
+        "default": {
+            "ENGINE": "django.contrib.gis.db.backends.postgis",
+            "NAME": "geodjango",
+            "USER": "geodjango",
         },
-        'other': {
-            'ENGINE': 'django.contrib.gis.db.backends.postgis',
-            'NAME': 'other',
-            'USER': 'geodjango',
+        "other": {
+            "ENGINE": "django.contrib.gis.db.backends.postgis",
+            "NAME": "other",
+            "USER": "geodjango",
         },
     }
 
-    SECRET_KEY = 'django_tests_secret_key'
+    SECRET_KEY = "django_tests_secret_key"
 
 Assuming the settings above were in a ``postgis.py`` file in the same
 directory as ``runtests.py``, then all Django and GeoDjango tests would
-be performed when executing the command::
+be performed when executing the command:
+
+.. code-block:: shell
 
     $ ./runtests.py --settings=postgis
 
-To run only the GeoDjango test suite, specify ``gis_tests``::
+To run only the GeoDjango test suite, specify ``gis_tests``:
+
+.. code-block:: shell
 
     $ ./runtests.py --settings=postgis gis_tests

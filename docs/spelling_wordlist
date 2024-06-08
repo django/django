@@ -20,7 +20,6 @@ args
 async
 atomicity
 auth
-autoclobber
 autocommit
 autocomplete
 autocompletion
@@ -41,6 +40,7 @@ backends
 backport
 backported
 backports
+backtick
 backtraces
 balancer
 basename
@@ -119,6 +119,7 @@ datetimes
 declaratively
 decrementing
 deduplicates
+deduplication
 deepcopy
 deferrable
 deprecations
@@ -137,6 +138,7 @@ dimensioned
 discoverable
 Disqus
 distro
+django
 djangoproject
 dm
 docstring
@@ -171,6 +173,7 @@ filesystem
 filesystems
 flatpage
 flatpages
+focusable
 fooapp
 formatter
 formatters
@@ -214,7 +217,6 @@ hstore
 html
 https
 Hypercorn
-ie
 ies
 iframe
 Igbo
@@ -235,6 +237,7 @@ iterable
 iterables
 iteratively
 ize
+Jazzband
 Jinja
 jQuery
 Jupyter
@@ -247,7 +250,6 @@ kilometre
 Koziarski
 kwarg
 kwargs
-Kyngesburye
 Kyrgyz
 latin
 lawrence
@@ -306,8 +308,6 @@ multitenancy
 multithreaded
 multithreading
 multivalued
-myapp
-mysite
 mysql
 mysqlclient
 naïve
@@ -329,6 +329,7 @@ OGC
 OGR
 ons
 orderable
+Orca
 Orléans
 orm
 Outdim
@@ -360,15 +361,18 @@ postfix
 postgis
 postgres
 postgresql
+pragma
 pre
 precisions
 precomputation
 preconfigured
+preescaped
 prefetch
 prefetched
 prefetches
 prefetching
 preload
+preloaded
 prepend
 prepended
 prepending
@@ -388,7 +392,6 @@ psycopg
 Punycode
 Puthraya
 pyformat
-pysqlite
 pythonic
 qs
 queryset
@@ -415,7 +418,8 @@ redisplay
 redisplayed
 redisplaying
 redisplays
-refactorings
+reenable
+reescape
 referer
 referers
 reflow
@@ -454,7 +458,6 @@ serializability
 serializable
 serializer
 serializers
-sessionid
 shapefile
 shapefiles
 sharding
@@ -462,7 +465,7 @@ sitewide
 sliceable
 SMTP
 solaris
-Solr
+Sorani
 sortable
 Spectre
 Springmeyer
@@ -471,9 +474,6 @@ stacktrace
 stateful
 staticfile
 staticfiles
-stderr
-stdlib
-stdout
 storages
 stylesheet
 stylesheets
@@ -590,9 +590,9 @@ util
 utils
 Uvicorn
 uWSGI
+Uyghur
 validator
 validators
-validsite
 variadic
 vendored
 virtualized

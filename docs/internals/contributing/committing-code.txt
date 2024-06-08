@@ -16,8 +16,8 @@ requests.
 
 When committing a pull request, make sure each individual commit matches the
 commit guidelines described below. Contributors are expected to provide the
-best pull requests possible. In practice however, mergers - who will likely be
-more familiar with the commit guidelines - may decide to bring a commit up to
+best pull requests possible. In practice mergers - who will likely be more
+familiar with the commit guidelines - may decide to bring a commit up to
 standard themselves.
 
 You may want to have Jenkins or GitHub actions test the pull request with one
@@ -27,7 +27,9 @@ Selenium. See the `CI wiki page`_ for instructions.
 .. _CI wiki page: https://code.djangoproject.com/wiki/CI
 
 If you find yourself checking out pull requests locally more often, this git
-alias will be helpful::
+alias will be helpful:
+
+.. code-block:: ini
 
     [alias]
         pr = !sh -c \"git fetch upstream pull/${1}/head:pr/${1} && git checkout pr/${1}\"
@@ -107,14 +109,14 @@ Django's Git repository:
   discuss the situation with the team.
 
 * For any medium-to-big changes, where "medium-to-big" is according to
-  your judgment, please bring things up on the |django-developers|
-  mailing list before making the change.
+  your judgment, please bring things up on the `Django Forum`_ or
+  |django-developers| mailing list before making the change.
 
-  If you bring something up on |django-developers| and nobody responds,
-  please don't take that to mean your idea is great and should be
-  implemented immediately because nobody contested it. Everyone doesn't always
-  have a lot of time to read mailing list discussions immediately, so you may
-  have to wait a couple of days before getting a response.
+  If you bring something up and nobody responds, please don't take that
+  to mean your idea is great and should be implemented immediately because
+  nobody contested it. Everyone doesn't always have a lot of time to read
+  mailing list discussions immediately, so you may have to wait a couple of
+  days before getting a response.
 
 * Write detailed commit messages in the past tense, not present tense.
 
@@ -138,7 +140,7 @@ Django's Git repository:
   Credit the contributors in the commit message: "Thanks A for the report and B
   for review." Use git's `Co-Authored-By`_ as appropriate.
 
-  .. _Co-Authored-By: https://docs.github.com/en/github/committing-changes-to-your-project/creating-and-editing-commits/creating-a-commit-with-multiple-authors
+  .. _Co-Authored-By: https://docs.github.com/en/pull-requests/committing-changes-to-your-project/creating-and-editing-commits/creating-a-commit-with-multiple-authors
 
 * For commits to a branch, prefix the commit message with the branch name.
   For example: "[1.4.x] Fixed #xxxxx -- Added support for mind reading."
@@ -211,7 +213,7 @@ Nobody's perfect; mistakes will be committed.
 But try very hard to ensure that mistakes don't happen. Just because we have a
 reversion policy doesn't relax your responsibility to aim for the highest
 quality possible. Really: double-check your work, or have it checked by
-another merger, **before** you commit it in the first place!
+another merger **before** you commit it in the first place!
 
 When a mistaken commit is discovered, please follow these guidelines:
 
@@ -225,15 +227,15 @@ When a mistaken commit is discovered, please follow these guidelines:
 
 * If the original author can't be reached (within a reasonable amount
   of time -- a day or so) and the problem is severe -- crashing bug,
-  major test failures, etc. -- then ask for objections on the
-  |django-developers| mailing list then revert if there are none.
+  major test failures, etc. -- then ask for objections on the `Django Forum`_
+  or |django-developers| mailing list then revert if there are none.
 
 * If the problem is small (a feature commit after feature freeze,
   say), wait it out.
 
 * If there's a disagreement between the merger and the reverter-to-be then try
-  to work it out on the |django-developers| mailing list. If an agreement can't
-  be reached then it should be put to a vote.
+  to work it out on the `Django Forum`_ or |django-developers| mailing list. If
+  an agreement can't be reached then it should be put to a vote.
 
 * If the commit introduced a confirmed, disclosed security
   vulnerability then the commit may be reverted immediately without
@@ -247,3 +249,4 @@ When a mistaken commit is discovered, please follow these guidelines:
   do a reverse push: ``git push upstream :feature_antigravity``.
 
 .. _ticket tracker: https://code.djangoproject.com/
+.. _Django Forum: https://forum.djangoproject.com/

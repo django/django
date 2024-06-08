@@ -33,16 +33,16 @@ called ``blog``, which provides the templates ``blog/post.html`` and
 
     INSTALLED_APPS = [
         ...,
-        'blog',
+        "blog",
         ...,
     ]
 
     TEMPLATES = [
         {
-            'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'DIRS': [BASE_DIR / 'templates'],
-            'APP_DIRS': True,
-            ...
+            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "DIRS": [BASE_DIR / "templates"],
+            "APP_DIRS": True,
+            # ...
         },
     ]
 
@@ -77,9 +77,9 @@ First, make sure your template settings are checking inside app directories::
 
     TEMPLATES = [
         {
-            ...,
-            'APP_DIRS': True,
-            ...
+            # ...
+            "APP_DIRS": True,
+            # ...
         },
     ]
 
@@ -112,7 +112,7 @@ For example, you can use this technique to add a custom logo to the
 ``admin/base_site.html`` template:
 
     .. code-block:: html+django
-       :caption: templates/admin/base_site.html
+       :caption: ``templates/admin/base_site.html``
 
         {% extends "admin/base_site.html" %}
 

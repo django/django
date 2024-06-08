@@ -1,6 +1,7 @@
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 
 class Relation(models.Model):
@@ -124,6 +125,9 @@ class Person(BasePerson):
     # GR fields
     generic_relation_concrete = GenericRelation(Relation)
 
+    class Meta:
+        verbose_name = _("Person")
+
 
 class ProxyPerson(Person):
     class Meta:
@@ -135,7 +139,6 @@ class PersonThroughProxySubclass(ProxyPerson):
 
 
 class Relating(models.Model):
-
     # ForeignKey to BasePerson
     baseperson = models.ForeignKey(
         BasePerson, models.CASCADE, related_name="relating_baseperson"
@@ -161,6 +164,11 @@ class Relating(models.Model):
     # ManyToManyField to Person
     people = models.ManyToManyField(Person, related_name="relating_people")
     people_hidden = models.ManyToManyField(Person, related_name="+")
+
+
+class Swappable(models.Model):
+    class Meta:
+        swappable = "MODEL_META_TESTS_SWAPPED"
 
 
 # ParentListTests models

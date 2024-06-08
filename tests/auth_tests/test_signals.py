@@ -30,14 +30,13 @@ class SignalTestCase(TestCase):
         self.logged_out = []
         self.login_failed = []
         signals.user_logged_in.connect(self.listener_login)
+        self.addCleanup(signals.user_logged_in.disconnect, self.listener_login)
         signals.user_logged_out.connect(self.listener_logout)
+        self.addCleanup(signals.user_logged_out.disconnect, self.listener_logout)
         signals.user_login_failed.connect(self.listener_login_failed)
-
-    def tearDown(self):
-        """Disconnect the listeners"""
-        signals.user_logged_in.disconnect(self.listener_login)
-        signals.user_logged_out.disconnect(self.listener_logout)
-        signals.user_login_failed.disconnect(self.listener_login_failed)
+        self.addCleanup(
+            signals.user_login_failed.disconnect, self.listener_login_failed
+        )
 
     def test_login(self):
         # Only a successful login will trigger the success signal.
@@ -60,13 +59,13 @@ class SignalTestCase(TestCase):
     def test_logout_anonymous(self):
         # The log_out function will still trigger the signal for anonymous
         # users.
-        self.client.get("/logout/next_page/")
+        self.client.post("/logout/next_page/")
         self.assertEqual(len(self.logged_out), 1)
         self.assertIsNone(self.logged_out[0])
 
     def test_logout(self):
         self.client.login(username="testclient", password="password")
-        self.client.get("/logout/next_page/")
+        self.client.post("/logout/next_page/")
         self.assertEqual(len(self.logged_out), 1)
         self.assertEqual(self.logged_out[0].username, "testclient")
 

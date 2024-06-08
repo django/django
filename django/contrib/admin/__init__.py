@@ -15,6 +15,7 @@ from django.contrib.admin.options import (
     HORIZONTAL,
     VERTICAL,
     ModelAdmin,
+    ShowFacets,
     StackedInline,
     TabularInline,
 )
@@ -42,6 +43,7 @@ __all__ = [
     "AllValuesFieldListFilter",
     "EmptyFieldListFilter",
     "RelatedOnlyFieldListFilter",
+    "ShowFacets",
     "autodiscover",
 ]
 

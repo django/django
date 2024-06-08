@@ -33,10 +33,10 @@ First, you must add the
 :class:`django.contrib.auth.middleware.AuthenticationMiddleware`::
 
     MIDDLEWARE = [
-        '...',
-        'django.contrib.auth.middleware.AuthenticationMiddleware',
-        'django.contrib.auth.middleware.RemoteUserMiddleware',
-        '...',
+        "...",
+        "django.contrib.auth.middleware.AuthenticationMiddleware",
+        "django.contrib.auth.middleware.RemoteUserMiddleware",
+        "...",
     ]
 
 Next, you must replace the :class:`~django.contrib.auth.backends.ModelBackend`
@@ -44,7 +44,7 @@ with :class:`~django.contrib.auth.backends.RemoteUserBackend` in the
 :setting:`AUTHENTICATION_BACKENDS` setting::
 
     AUTHENTICATION_BACKENDS = [
-        'django.contrib.auth.backends.RemoteUserBackend',
+        "django.contrib.auth.backends.RemoteUserBackend",
     ]
 
 With this setup, ``RemoteUserMiddleware`` will detect the username in
@@ -81,8 +81,9 @@ If your authentication mechanism uses a custom HTTP header and not
 
     from django.contrib.auth.middleware import RemoteUserMiddleware
 
+
     class CustomHeaderMiddleware(RemoteUserMiddleware):
-        header = 'HTTP_AUTHUSER'
+        header = "HTTP_AUTHUSER"
 
 .. warning::
 

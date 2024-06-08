@@ -34,17 +34,24 @@ from django.db.models.expressions import (
     When,
     Window,
     WindowFrame,
+    WindowFrameExclusion,
 )
 from django.db.models.fields import *  # NOQA
 from django.db.models.fields import __all__ as fields_all
 from django.db.models.fields.files import FileField, ImageField
+from django.db.models.fields.generated import GeneratedField
 from django.db.models.fields.json import JSONField
 from django.db.models.fields.proxy import OrderWrt
 from django.db.models.indexes import *  # NOQA
 from django.db.models.indexes import __all__ as indexes_all
 from django.db.models.lookups import Lookup, Transform
 from django.db.models.manager import Manager
-from django.db.models.query import Prefetch, QuerySet, prefetch_related_objects
+from django.db.models.query import (
+    Prefetch,
+    QuerySet,
+    aprefetch_related_objects,
+    prefetch_related_objects,
+)
 from django.db.models.query_utils import FilteredRelation, Q
 
 # Imports that would create circular imports if sorted
@@ -90,8 +97,10 @@ __all__ += [
     "When",
     "Window",
     "WindowFrame",
+    "WindowFrameExclusion",
     "FileField",
     "ImageField",
+    "GeneratedField",
     "JSONField",
     "OrderWrt",
     "Lookup",
@@ -100,6 +109,7 @@ __all__ += [
     "Prefetch",
     "Q",
     "QuerySet",
+    "aprefetch_related_objects",
     "prefetch_related_objects",
     "DEFERRED",
     "Model",

@@ -14,6 +14,7 @@ from django.forms import (
     DateField,
     DateTimeField,
     EmailField,
+    Field,
     FileField,
     FileInput,
     FloatField,
@@ -35,10 +36,9 @@ from django.forms import (
     TextInput,
     TimeField,
     ValidationError,
-    forms,
 )
 from django.forms.renderers import DjangoTemplates, get_default_renderer
-from django.forms.utils import ErrorList
+from django.forms.utils import ErrorDict, ErrorList
 from django.http import QueryDict
 from django.template import Context, Template
 from django.test import SimpleTestCase
@@ -129,9 +129,12 @@ class FormsTestCase(SimpleTestCase):
 
         self.assertHTMLEqual(
             "\n".join(form_output),
-            """<input type="text" name="first_name" value="John" id="id_first_name" required>
-<input type="text" name="last_name" value="Lennon" id="id_last_name" required>
-<input type="text" name="birthday" value="1940-10-9" id="id_birthday" required>""",
+            '<input type="text" name="first_name" value="John" id="id_first_name" '
+            "required>"
+            '<input type="text" name="last_name" value="Lennon" id="id_last_name" '
+            "required>"
+            '<input type="text" name="birthday" value="1940-10-9" id="id_birthday" '
+            "required>",
         )
 
         form_output = []
@@ -149,17 +152,21 @@ class FormsTestCase(SimpleTestCase):
         )
         self.assertHTMLEqual(
             str(p),
-            """
-            <tr><th><label for="id_first_name">First name:</label></th><td>
-            <input type="text" name="first_name" value="John" id="id_first_name"
-                required></td></tr>
-            <tr><th><label for="id_last_name">Last name:</label></th><td>
-            <input type="text" name="last_name" value="Lennon" id="id_last_name"
-                required></td></tr>
-            <tr><th><label for="id_birthday">Birthday:</label></th><td>
-            <input type="text" name="birthday" value="1940-10-9" id="id_birthday"
-                required></td></tr>
-            """,
+            '<div><label for="id_first_name">First name:</label><input type="text" '
+            'name="first_name" value="John" required id="id_first_name"></div><div>'
+            '<label for="id_last_name">Last name:</label><input type="text" '
+            'name="last_name" value="Lennon" required id="id_last_name"></div><div>'
+            '<label for="id_birthday">Birthday:</label><input type="text" '
+            'name="birthday" value="1940-10-9" required id="id_birthday"></div>',
+        )
+        self.assertHTMLEqual(
+            p.as_div(),
+            '<div><label for="id_first_name">First name:</label><input type="text" '
+            'name="first_name" value="John" required id="id_first_name"></div><div>'
+            '<label for="id_last_name">Last name:</label><input type="text" '
+            'name="last_name" value="Lennon" required id="id_last_name"></div><div>'
+            '<label for="id_birthday">Birthday:</label><input type="text" '
+            'name="birthday" value="1940-10-9" required id="id_birthday"></div>',
         )
 
     def test_empty_dict(self):
@@ -173,51 +180,72 @@ class FormsTestCase(SimpleTestCase):
         self.assertEqual(p.cleaned_data, {})
         self.assertHTMLEqual(
             str(p),
-            """<tr><th><label for="id_first_name">First name:</label></th><td>
-<ul class="errorlist"><li>This field is required.</li></ul>
-<input type="text" name="first_name" id="id_first_name" required></td></tr>
-<tr><th><label for="id_last_name">Last name:</label></th>
-<td><ul class="errorlist"><li>This field is required.</li></ul>
-<input type="text" name="last_name" id="id_last_name" required></td></tr>
-<tr><th><label for="id_birthday">Birthday:</label></th><td>
-<ul class="errorlist"><li>This field is required.</li></ul>
-<input type="text" name="birthday" id="id_birthday" required></td></tr>""",
+            '<div><label for="id_first_name">First name:</label>'
+            '<ul class="errorlist"><li>This field is required.</li></ul>'
+            '<input type="text" name="first_name" aria-invalid="true" required '
+            'id="id_first_name"></div>'
+            '<div><label for="id_last_name">Last name:</label>'
+            '<ul class="errorlist"><li>This field is required.</li></ul>'
+            '<input type="text" name="last_name" aria-invalid="true" required '
+            'id="id_last_name"></div><div>'
+            '<label for="id_birthday">Birthday:</label>'
+            '<ul class="errorlist"><li>This field is required.</li></ul>'
+            '<input type="text" name="birthday" aria-invalid="true" required '
+            'id="id_birthday"></div>',
         )
         self.assertHTMLEqual(
             p.as_table(),
             """<tr><th><label for="id_first_name">First name:</label></th><td>
 <ul class="errorlist"><li>This field is required.</li></ul>
-<input type="text" name="first_name" id="id_first_name" required></td></tr>
-<tr><th><label for="id_last_name">Last name:</label></th>
+<input type="text" name="first_name" id="id_first_name" aria-invalid="true" required>
+</td></tr><tr><th><label for="id_last_name">Last name:</label></th>
 <td><ul class="errorlist"><li>This field is required.</li></ul>
-<input type="text" name="last_name" id="id_last_name" required></td></tr>
-<tr><th><label for="id_birthday">Birthday:</label></th>
+<input type="text" name="last_name" id="id_last_name" aria-invalid="true" required>
+</td></tr><tr><th><label for="id_birthday">Birthday:</label></th>
 <td><ul class="errorlist"><li>This field is required.</li></ul>
-<input type="text" name="birthday" id="id_birthday" required></td></tr>""",
+<input type="text" name="birthday" id="id_birthday" aria-invalid="true" required>
+</td></tr>""",
         )
         self.assertHTMLEqual(
             p.as_ul(),
             """<li><ul class="errorlist"><li>This field is required.</li></ul>
 <label for="id_first_name">First name:</label>
-<input type="text" name="first_name" id="id_first_name" required></li>
-<li><ul class="errorlist"><li>This field is required.</li></ul>
+<input type="text" name="first_name" id="id_first_name" aria-invalid="true" required>
+</li><li><ul class="errorlist"><li>This field is required.</li></ul>
 <label for="id_last_name">Last name:</label>
-<input type="text" name="last_name" id="id_last_name" required></li>
-<li><ul class="errorlist"><li>This field is required.</li></ul>
+<input type="text" name="last_name" id="id_last_name" aria-invalid="true" required>
+</li><li><ul class="errorlist"><li>This field is required.</li></ul>
 <label for="id_birthday">Birthday:</label>
-<input type="text" name="birthday" id="id_birthday" required></li>""",
+<input type="text" name="birthday" id="id_birthday" aria-invalid="true" required>
+</li>""",
         )
         self.assertHTMLEqual(
             p.as_p(),
             """<ul class="errorlist"><li>This field is required.</li></ul>
 <p><label for="id_first_name">First name:</label>
-<input type="text" name="first_name" id="id_first_name" required></p>
-<ul class="errorlist"><li>This field is required.</li></ul>
+<input type="text" name="first_name" id="id_first_name" aria-invalid="true" required>
+</p><ul class="errorlist"><li>This field is required.</li></ul>
 <p><label for="id_last_name">Last name:</label>
-<input type="text" name="last_name" id="id_last_name" required></p>
-<ul class="errorlist"><li>This field is required.</li></ul>
+<input type="text" name="last_name" id="id_last_name" aria-invalid="true" required>
+</p><ul class="errorlist"><li>This field is required.</li></ul>
 <p><label for="id_birthday">Birthday:</label>
-<input type="text" name="birthday" id="id_birthday" required></p>""",
+<input type="text" name="birthday" id="id_birthday" aria-invalid="true" required>
+</p>""",
+        )
+        self.assertHTMLEqual(
+            p.as_div(),
+            '<div><label for="id_first_name">First name:</label>'
+            '<ul class="errorlist"><li>This field is required.</li></ul>'
+            '<input type="text" name="first_name" aria-invalid="true" required '
+            'id="id_first_name"></div>'
+            '<div><label for="id_last_name">Last name:</label>'
+            '<ul class="errorlist"><li>This field is required.</li></ul>'
+            '<input type="text" name="last_name" aria-invalid="true" required '
+            'id="id_last_name"></div><div>'
+            '<label for="id_birthday">Birthday:</label>'
+            '<ul class="errorlist"><li>This field is required.</li></ul>'
+            '<input type="text" name="birthday" aria-invalid="true" required '
+            'id="id_birthday"></div>',
         )
 
     def test_empty_querydict_args(self):
@@ -240,12 +268,12 @@ class FormsTestCase(SimpleTestCase):
 
         self.assertHTMLEqual(
             str(p),
-            """<tr><th><label for="id_first_name">First name:</label></th><td>
-<input type="text" name="first_name" id="id_first_name" required></td></tr>
-<tr><th><label for="id_last_name">Last name:</label></th><td>
-<input type="text" name="last_name" id="id_last_name" required></td></tr>
-<tr><th><label for="id_birthday">Birthday:</label></th><td>
-<input type="text" name="birthday" id="id_birthday" required></td></tr>""",
+            '<div><label for="id_first_name">First name:</label><input type="text" '
+            'name="first_name" id="id_first_name" required></div><div><label '
+            'for="id_last_name">Last name:</label><input type="text" name="last_name" '
+            'id="id_last_name" required></div><div><label for="id_birthday">'
+            'Birthday:</label><input type="text" name="birthday" id="id_birthday" '
+            "required></div>",
         )
         self.assertHTMLEqual(
             p.as_table(),
@@ -273,6 +301,15 @@ class FormsTestCase(SimpleTestCase):
 <input type="text" name="last_name" id="id_last_name" required></p>
 <p><label for="id_birthday">Birthday:</label>
 <input type="text" name="birthday" id="id_birthday" required></p>""",
+        )
+        self.assertHTMLEqual(
+            p.as_div(),
+            '<div><label for="id_first_name">First name:</label><input type="text" '
+            'name="first_name" id="id_first_name" required></div><div><label '
+            'for="id_last_name">Last name:</label><input type="text" name="last_name" '
+            'id="id_last_name" required></div><div><label for="id_birthday">'
+            'Birthday:</label><input type="text" name="birthday" id="id_birthday" '
+            "required></div>",
         )
 
     def test_unicode_values(self):
@@ -322,6 +359,17 @@ class FormsTestCase(SimpleTestCase):
             '<p><label for="id_birthday">Birthday:</label> '
             '<input type="text" name="birthday" value="1940-10-9" id="id_birthday" '
             "required></p>",
+        )
+        self.assertHTMLEqual(
+            p.as_div(),
+            '<div><label for="id_first_name">First name:</label>'
+            '<input type="text" name="first_name" value="John" id="id_first_name" '
+            'required></div><div><label for="id_last_name">Last name:</label>'
+            '<input type="text" name="last_name"'
+            'value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" '
+            'id="id_last_name" required></div><div><label for="id_birthday">'
+            'Birthday:</label><input type="text" name="birthday" value="1940-10-9" '
+            'id="id_birthday" required></div>',
         )
 
         p = Person({"last_name": "Lennon"})
@@ -439,6 +487,15 @@ class FormsTestCase(SimpleTestCase):
 <p><label for="birthday_id">Birthday:</label>
 <input type="text" name="birthday" id="birthday_id" required></p>""",
         )
+        self.assertHTMLEqual(
+            p.as_div(),
+            '<div><label for="first_name_id">First name:</label><input type="text" '
+            'name="first_name" id="first_name_id" required></div><div><label '
+            'for="last_name_id">Last name:</label><input type="text" '
+            'name="last_name" id="last_name_id" required></div><div><label '
+            'for="birthday_id">Birthday:</label><input type="text" name="birthday" '
+            'id="birthday_id" required></div>',
+        )
 
     def test_auto_id_true(self):
         # If auto_id is any True value whose str() does not contain '%s', the "id"
@@ -498,7 +555,8 @@ class FormsTestCase(SimpleTestCase):
 
         f = SignupForm(auto_id=False)
         self.assertHTMLEqual(
-            str(f["email"]), '<input type="email" name="email" required>'
+            str(f["email"]),
+            '<input type="email" name="email" maxlength="320" required>',
         )
         self.assertHTMLEqual(
             str(f["get_spam"]), '<input type="checkbox" name="get_spam" required>'
@@ -507,7 +565,8 @@ class FormsTestCase(SimpleTestCase):
         f = SignupForm({"email": "test@example.com", "get_spam": True}, auto_id=False)
         self.assertHTMLEqual(
             str(f["email"]),
-            '<input type="email" name="email" value="test@example.com" required>',
+            '<input type="email" name="email" maxlength="320" value="test@example.com" '
+            "required>",
         )
         self.assertHTMLEqual(
             str(f["get_spam"]),
@@ -532,14 +591,16 @@ class FormsTestCase(SimpleTestCase):
             {"email": "test@example.com", "get_spam": "False"}, auto_id=False
         )
         self.assertHTMLEqual(
-            str(f["get_spam"]), '<input type="checkbox" name="get_spam" required>'
+            str(f["get_spam"]),
+            '<input type="checkbox" name="get_spam" aria-invalid="true" required>',
         )
 
         f = SignupForm(
             {"email": "test@example.com", "get_spam": "false"}, auto_id=False
         )
         self.assertHTMLEqual(
-            str(f["get_spam"]), '<input type="checkbox" name="get_spam" required>'
+            str(f["get_spam"]),
+            '<input type="checkbox" name="get_spam" aria-invalid="true" required>',
         )
 
         # A value of '0' should be interpreted as a True value (#16820)
@@ -746,6 +807,15 @@ class FormsTestCase(SimpleTestCase):
 <div><label><input type="radio" name="language" value="J" required> Java</label></div>
 </div></li>""",
         )
+        # Need an auto_id to generate legend.
+        self.assertHTMLEqual(
+            f.render(f.template_name_div),
+            '<div> Name: <input type="text" name="name" required></div><div><fieldset>'
+            'Language:<div><div><label><input type="radio" name="language" value="P" '
+            'required> Python</label></div><div><label><input type="radio" '
+            'name="language" value="J" required> Java</label></div></div></fieldset>'
+            "</div>",
+        )
 
         # Regarding auto_id and <label>, RadioSelect is a special case. Each
         # radio button gets a distinct ID, formed by appending an underscore
@@ -812,6 +882,16 @@ class FormsTestCase(SimpleTestCase):
             </div></p>
             """,
         )
+        self.assertHTMLEqual(
+            f.render(f.template_name_div),
+            '<div><label for="id_name">Name:</label><input type="text" name="name" '
+            'required id="id_name"></div><div><fieldset><legend>Language:</legend>'
+            '<div id="id_language"><div><label for="id_language_0"><input '
+            'type="radio" name="language" value="P" required id="id_language_0">'
+            'Python</label></div><div><label for="id_language_1"><input type="radio" '
+            'name="language" value="J" required id="id_language_1">Java</label></div>'
+            "</div></fieldset></div>",
+        )
 
     def test_form_with_iterable_boundfield(self):
         class BeatleForm(Form):
@@ -828,10 +908,12 @@ class FormsTestCase(SimpleTestCase):
         f = BeatleForm(auto_id=False)
         self.assertHTMLEqual(
             "\n".join(str(bf) for bf in f["name"]),
-            """<label><input type="radio" name="name" value="john" required> John</label>
-<label><input type="radio" name="name" value="paul" required> Paul</label>
-<label><input type="radio" name="name" value="george" required> George</label>
-<label><input type="radio" name="name" value="ringo" required> Ringo</label>""",
+            '<label><input type="radio" name="name" value="john" required> John</label>'
+            '<label><input type="radio" name="name" value="paul" required> Paul</label>'
+            '<label><input type="radio" name="name" value="george" required> George'
+            "</label>"
+            '<label><input type="radio" name="name" value="ringo" required> Ringo'
+            "</label>",
         )
         self.assertHTMLEqual(
             "\n".join("<div>%s</div>" % bf for bf in f["name"]),
@@ -1022,6 +1104,14 @@ class FormsTestCase(SimpleTestCase):
             '<option value="P">Paul McCartney</option>'
             "</select></p>",
         )
+        self.assertHTMLEqual(
+            f.render(f.template_name_div),
+            '<div><label for="id_name">Name:</label><input type="text" name="name" '
+            'required id="id_name"></div><div><label for="id_composers">Composers:'
+            '</label><select name="composers" required id="id_composers" multiple>'
+            '<option value="J">John Lennon</option><option value="P">Paul McCartney'
+            "</option></select></div>",
+        )
 
     def test_multiple_checkbox_render(self):
         f = SongForm()
@@ -1063,6 +1153,16 @@ class FormsTestCase(SimpleTestCase):
             '<input type="checkbox" name="composers" value="P" '
             'id="id_composers_1">Paul McCartney</label></div>'
             "</div></p>",
+        )
+        self.assertHTMLEqual(
+            f.render(f.template_name_div),
+            '<div><label for="id_name">Name:</label><input type="text" name="name" '
+            'required id="id_name"></div><div><fieldset><legend>Composers:</legend>'
+            '<div id="id_composers"><div><label for="id_composers_0"><input '
+            'type="checkbox" name="composers" value="J" id="id_composers_0">'
+            'John Lennon</label></div><div><label for="id_composers_1"><input '
+            'type="checkbox" name="composers" value="P" id="id_composers_1">'
+            "Paul McCartney</label></div></div></fieldset></div>",
         )
 
     def test_form_with_disabled_fields(self):
@@ -1317,13 +1417,13 @@ class FormsTestCase(SimpleTestCase):
             <tr><th>&lt;em&gt;Special&lt;/em&gt; Field:</th><td>
             <ul class="errorlist">
             <li>Something&#x27;s wrong with &#x27;Nothing to escape&#x27;</li></ul>
-            <input type="text" name="special_name" value="Nothing to escape" required>
-            </td></tr>
+            <input type="text" name="special_name" value="Nothing to escape"
+            aria-invalid="true" required></td></tr>
             <tr><th><em>Special</em> Field:</th><td>
             <ul class="errorlist">
             <li>'<b>Nothing to escape</b>' is a safe string</li></ul>
             <input type="text" name="special_safe_name" value="Nothing to escape"
-                required></td></tr>
+            aria-invalid="true" required></td></tr>
             """,
         )
         f = EscapingForm(
@@ -1340,13 +1440,14 @@ class FormsTestCase(SimpleTestCase):
             "Something&#x27;s wrong with &#x27;Should escape &lt; &amp; &gt; and "
             "&lt;script&gt;alert(&#x27;xss&#x27;)&lt;/script&gt;&#x27;</li></ul>"
             '<input type="text" name="special_name" value="Should escape &lt; &amp; '
-            '&gt; and &lt;script&gt;alert(&#x27;xss&#x27;)&lt;/script&gt;" required>'
-            "</td></tr>"
+            '&gt; and &lt;script&gt;alert(&#x27;xss&#x27;)&lt;/script&gt;" '
+            'aria-invalid="true" required></td></tr>'
             "<tr><th><em>Special</em> Field:</th><td>"
             '<ul class="errorlist">'
             "<li>'<b><i>Do not escape</i></b>' is a safe string</li></ul>"
             '<input type="text" name="special_safe_name" '
-            'value="&lt;i&gt;Do not escape&lt;/i&gt;" required></td></tr>',
+            'value="&lt;i&gt;Do not escape&lt;/i&gt;" aria-invalid="true" required>'
+            "</td></tr>",
         )
 
     def test_validating_multiple_fields(self):
@@ -1448,11 +1549,12 @@ class FormsTestCase(SimpleTestCase):
             f.as_table(),
             """<tr><th>Username:</th><td>
 <ul class="errorlist"><li>This field is required.</li></ul>
-<input type="text" name="username" maxlength="10" required></td></tr>
+<input type="text" name="username" maxlength="10" aria-invalid="true" required>
+</td></tr>
 <tr><th>Password1:</th><td><ul class="errorlist"><li>This field is required.</li></ul>
-<input type="password" name="password1" required></td></tr>
+<input type="password" name="password1" aria-invalid="true" required></td></tr>
 <tr><th>Password2:</th><td><ul class="errorlist"><li>This field is required.</li></ul>
-<input type="password" name="password2" required></td></tr>""",
+<input type="password" name="password2" aria-invalid="true" required></td></tr>""",
         )
         self.assertEqual(f.errors["username"], ["This field is required."])
         self.assertEqual(f.errors["password1"], ["This field is required."])
@@ -1491,6 +1593,14 @@ class FormsTestCase(SimpleTestCase):
             <li>Password1: <input type="password" name="password1" required></li>
             <li>Password2: <input type="password" name="password2" required></li>
             """,
+        )
+        self.assertHTMLEqual(
+            f.render(f.template_name_div),
+            '<ul class="errorlist nonfield"><li>Please make sure your passwords match.'
+            '</li></ul><div>Username: <input type="text" name="username" '
+            'value="adrian" maxlength="10" required></div><div>Password1: <input '
+            'type="password" name="password1" required></div><div>Password2: <input '
+            'type="password" name="password2" required></div>',
         )
 
         f = UserRegistration(
@@ -1546,7 +1656,7 @@ class FormsTestCase(SimpleTestCase):
                     self._errors = e.update_error_dict(self._errors)
 
                 try:
-                    raise ValidationError({"code": forms.ErrorList(["Code error 3."])})
+                    raise ValidationError({"code": ErrorList(["Code error 3."])})
                 except ValidationError as e:
                     self._errors = e.update_error_dict(self._errors)
 
@@ -1570,7 +1680,7 @@ class FormsTestCase(SimpleTestCase):
         self.assertFalse(form.is_valid())
 
         # update_error_dict didn't lose track of the ErrorDict type.
-        self.assertIsInstance(form._errors, forms.ErrorDict)
+        self.assertIsInstance(form._errors, ErrorDict)
 
         self.assertEqual(
             dict(form.errors),
@@ -1648,6 +1758,12 @@ class FormsTestCase(SimpleTestCase):
             '<ul class="errorlist nonfield"><li>Form error</li>'
             "<li>(Hidden field hidden_input) This field is required.</li></ul>"
             '<p><input type="hidden" name="hidden_input" id="id_hidden_input"></p>',
+        )
+        self.assertHTMLEqual(
+            f.render(f.template_name_div),
+            '<ul class="errorlist nonfield"><li>Form error</li>'
+            "<li>(Hidden field hidden_input) This field is required.</li></ul>"
+            '<div><input type="hidden" name="hidden_input" id="id_hidden_input"></div>',
         )
 
     def test_dynamic_construction(self):
@@ -1893,6 +2009,13 @@ class FormsTestCase(SimpleTestCase):
             <input type="hidden" name="hidden_text"></p>
             """,
         )
+        self.assertHTMLEqual(
+            p.as_div(),
+            '<div>First name: <input type="text" name="first_name" required></div>'
+            '<div>Last name: <input type="text" name="last_name" required></div><div>'
+            'Birthday: <input type="text" name="birthday" required><input '
+            'type="hidden" name="hidden_text"></div>',
+        )
 
         # With auto_id set, a HiddenInput still gets an ID, but it doesn't get a label.
         p = Person(auto_id="id_%s")
@@ -1925,6 +2048,15 @@ class FormsTestCase(SimpleTestCase):
 <p><label for="id_birthday">Birthday:</label>
 <input type="text" name="birthday" id="id_birthday" required>
 <input type="hidden" name="hidden_text" id="id_hidden_text"></p>""",
+        )
+        self.assertHTMLEqual(
+            p.as_div(),
+            '<div><label for="id_first_name">First name:</label><input type="text" '
+            'name="first_name" id="id_first_name" required></div><div><label '
+            'for="id_last_name">Last name:</label><input type="text" name="last_name" '
+            'id="id_last_name" required></div><div><label for="id_birthday">Birthday:'
+            '</label><input type="text" name="birthday" id="id_birthday" required>'
+            '<input type="hidden" name="hidden_text" id="id_hidden_text"></div>',
         )
 
         # If a field with a HiddenInput has errors, the as_table() and as_ul() output
@@ -1976,6 +2108,15 @@ class FormsTestCase(SimpleTestCase):
             <input type="hidden" name="hidden_text"></p>
             """,
         )
+        self.assertHTMLEqual(
+            p.as_div(),
+            '<ul class="errorlist nonfield"><li>(Hidden field hidden_text) This field '
+            'is required.</li></ul><div>First name: <input type="text" '
+            'name="first_name" value="John" required></div><div>Last name: <input '
+            'type="text" name="last_name" value="Lennon" required></div><div>'
+            'Birthday: <input type="text" name="birthday" value="1940-10-9" required>'
+            '<input type="hidden" name="hidden_text"></div>',
+        )
 
         # A corner case: It's possible for a form to have only HiddenInputs.
         class TestForm(Form):
@@ -1993,6 +2134,15 @@ class FormsTestCase(SimpleTestCase):
         )
         self.assertHTMLEqual(
             p.as_p(), '<input type="hidden" name="foo"><input type="hidden" name="bar">'
+        )
+
+    def test_hidden_widget_does_not_have_aria_describedby(self):
+        class TestForm(Form):
+            hidden_text = CharField(widget=HiddenInput, help_text="Help Text")
+
+        f = TestForm()
+        self.assertEqual(
+            str(f), '<input type="hidden" name="hidden_text" id="id_hidden_text">'
         )
 
     def test_field_order(self):
@@ -2107,8 +2257,10 @@ class FormsTestCase(SimpleTestCase):
         p = UserRegistration(auto_id=False)
         self.assertHTMLEqual(
             p.as_ul(),
-            """<li>Username: <input type="text" name="username" maxlength="10" required></li>
-<li>Password: <input type="password" name="password" maxlength="10" required></li>""",
+            '<li>Username: <input type="text" name="username" maxlength="10" required>'
+            "</li>"
+            '<li>Password: <input type="password" name="password" maxlength="10" '
+            "required></li>",
         )
 
     def test_specifying_labels(self):
@@ -2198,8 +2350,9 @@ class FormsTestCase(SimpleTestCase):
         p = UserRegistration(auto_id=False)
         self.assertHTMLEqual(
             p.as_ul(),
-            """<li>Username: <input type="text" name="username" maxlength="10" required></li>
-<li>Password: <input type="password" name="password" required></li>""",
+            '<li>Username: <input type="text" name="username" maxlength="10" required>'
+            "</li>"
+            '<li>Password: <input type="password" name="password" required></li>',
         )
         p = UserRegistration(auto_id="id_%s")
         self.assertHTMLEqual(
@@ -2281,17 +2434,17 @@ class FormsTestCase(SimpleTestCase):
         self.assertHTMLEqual(
             p.as_ul(),
             """<li><ul class="errorlist"><li>This field is required.</li></ul>
-Username: <input type="text" name="username" maxlength="10" required></li>
-<li><ul class="errorlist"><li>This field is required.</li></ul>
-Password: <input type="password" name="password" required></li>""",
+Username: <input type="text" name="username" maxlength="10" aria-invalid="true"
+required></li><li><ul class="errorlist"><li>This field is required.</li></ul>
+Password: <input type="password" name="password" aria-invalid="true" required></li>""",
         )
         p = UserRegistration({"username": ""}, auto_id=False)
         self.assertHTMLEqual(
             p.as_ul(),
             """<li><ul class="errorlist"><li>This field is required.</li></ul>
-Username: <input type="text" name="username" maxlength="10" required></li>
-<li><ul class="errorlist"><li>This field is required.</li></ul>
-Password: <input type="password" name="password" required></li>""",
+Username: <input type="text" name="username" maxlength="10" aria-invalid="true"
+required></li><li><ul class="errorlist"><li>This field is required.</li></ul>
+Password: <input type="password" name="password" aria-invalid="true" required></li>""",
         )
         p = UserRegistration({"username": "foo"}, auto_id=False)
         self.assertHTMLEqual(
@@ -2300,7 +2453,8 @@ Password: <input type="password" name="password" required></li>""",
             <li>Username: <input type="text" name="username" value="foo" maxlength="10"
                 required></li>
             <li><ul class="errorlist"><li>This field is required.</li></ul>
-            Password: <input type="password" name="password" required></li>
+            Password: <input type="password" name="password" aria-invalid="true"
+            required></li>
             """,
         )
 
@@ -2347,9 +2501,9 @@ Password: <input type="password" name="password" required></li>""",
         self.assertHTMLEqual(
             p.as_ul(),
             """<li><ul class="errorlist"><li>This field is required.</li></ul>
-Username: <input type="text" name="username" maxlength="10" required></li>
-<li><ul class="errorlist"><li>This field is required.</li></ul>
-Password: <input type="password" name="password" required></li>""",
+Username: <input type="text" name="username" maxlength="10" aria-invalid="true"
+required></li><li><ul class="errorlist"><li>This field is required.</li></ul>
+Password: <input type="password" name="password" aria-invalid="true" required></li>""",
         )
         p = UserRegistration(
             {"username": ""}, initial={"username": "django"}, auto_id=False
@@ -2357,9 +2511,9 @@ Password: <input type="password" name="password" required></li>""",
         self.assertHTMLEqual(
             p.as_ul(),
             """<li><ul class="errorlist"><li>This field is required.</li></ul>
-Username: <input type="text" name="username" maxlength="10" required></li>
-<li><ul class="errorlist"><li>This field is required.</li></ul>
-Password: <input type="password" name="password" required></li>""",
+Username: <input type="text" name="username" maxlength="10" aria-invalid="true"
+required></li><li><ul class="errorlist"><li>This field is required.</li></ul>
+Password: <input type="password" name="password" aria-invalid="true" required></li>""",
         )
         p = UserRegistration(
             {"username": "foo"}, initial={"username": "django"}, auto_id=False
@@ -2370,7 +2524,8 @@ Password: <input type="password" name="password" required></li>""",
             <li>Username: <input type="text" name="username" value="foo" maxlength="10"
                 required></li>
             <li><ul class="errorlist"><li>This field is required.</li></ul>
-            Password: <input type="password" name="password" required></li>
+            Password: <input type="password" name="password" aria-invalid="true"
+            required></li>
             """,
         )
 
@@ -2449,11 +2604,11 @@ Password: <input type="password" name="password" required></li>""",
         self.assertHTMLEqual(
             p.as_ul(),
             """<li><ul class="errorlist"><li>This field is required.</li></ul>
-Username: <input type="text" name="username" maxlength="10" required></li>
-<li><ul class="errorlist"><li>This field is required.</li></ul>
-Password: <input type="password" name="password" required></li>
-<li><ul class="errorlist"><li>This field is required.</li></ul>
-Options: <select multiple name="options" required>
+Username: <input type="text" name="username" maxlength="10" aria-invalid="true"
+required></li><li><ul class="errorlist"><li>This field is required.</li></ul>
+Password: <input type="password" name="password" aria-invalid="true"
+required></li><li><ul class="errorlist"><li>This field is required.</li></ul>
+Options: <select multiple name="options" aria-invalid="true" required>
 <option value="f">foo</option>
 <option value="b">bar</option>
 <option value="w">whiz</option>
@@ -2465,11 +2620,11 @@ Options: <select multiple name="options" required>
         self.assertHTMLEqual(
             p.as_ul(),
             """<li><ul class="errorlist"><li>This field is required.</li></ul>
-            Username: <input type="text" name="username" maxlength="10" required></li>
+Username: <input type="text" name="username" maxlength="10" aria-invalid="true"
+required></li><li><ul class="errorlist"><li>This field is required.</li></ul>
+Password: <input type="password" name="password" aria-invalid="true" required></li>
 <li><ul class="errorlist"><li>This field is required.</li></ul>
-Password: <input type="password" name="password" required></li>
-<li><ul class="errorlist"><li>This field is required.</li></ul>
-Options: <select multiple name="options" required>
+Options: <select multiple name="options" aria-invalid="true" required>
 <option value="f">foo</option>
 <option value="b">bar</option>
 <option value="w">whiz</option>
@@ -2486,8 +2641,8 @@ Options: <select multiple name="options" required>
             <li>Username: <input type="text" name="username" value="foo" maxlength="10"
                 required></li>
             <li><ul class="errorlist"><li>This field is required.</li></ul>
-            Password: <input type="password" name="password" required></li>
-            <li>Options: <select multiple name="options" required>
+            Password: <input type="password" name="password" aria-invalid="true"
+            required></li><li>Options: <select multiple name="options" required>
             <option value="f" selected>foo</option>
             <option value="b" selected>bar</option>
             <option value="w">whiz</option>
@@ -2592,7 +2747,7 @@ Options: <select multiple name="options" required>
         self.assertNotIn("birthday", p.changed_data)
 
         # A field raising ValidationError is always in changed_data
-        class PedanticField(forms.Field):
+        class PedanticField(Field):
             def to_python(self, value):
                 raise ValidationError("Whatever")
 
@@ -2733,7 +2888,7 @@ Options: <select multiple name="options" required>
                     microseconds,
                 )
 
-        class DateTimeForm(forms.Form):
+        class DateTimeForm(Form):
             dt = DateTimeField(initial=FakeTime().now, disabled=disabled)
 
         return DateTimeForm({})
@@ -2768,7 +2923,7 @@ Options: <select multiple name="options" required>
         self.assertEqual(cleaned, bf.initial)
 
     def test_datetime_changed_data_callable_with_microseconds(self):
-        class DateTimeForm(forms.Form):
+        class DateTimeForm(Form):
             dt = DateTimeField(
                 initial=lambda: datetime.datetime(2006, 10, 25, 14, 30, 45, 123456),
                 disabled=True,
@@ -2811,16 +2966,24 @@ Options: <select multiple name="options" required>
             <br>
             <span class="helptext">Wählen Sie mit Bedacht.</span></td></tr>""",
         )
+        self.assertHTMLEqual(
+            p.as_div(),
+            '<div>Username: <div class="helptext">e.g., user@example.com</div>'
+            '<input type="text" name="username" maxlength="10" required></div>'
+            '<div>Password: <div class="helptext">Wählen Sie mit Bedacht.</div>'
+            '<input type="password" name="password" required></div>',
+        )
 
         # The help text is displayed whether or not data is provided for the form.
         p = UserRegistration({"username": "foo"}, auto_id=False)
         self.assertHTMLEqual(
             p.as_ul(),
-            """<li>Username: <input type="text" name="username" value="foo" maxlength="10" required>
-<span class="helptext">e.g., user@example.com</span></li>
-<li><ul class="errorlist"><li>This field is required.</li></ul>
-Password: <input type="password" name="password" required>
-<span class="helptext">Wählen Sie mit Bedacht.</span></li>""",
+            '<li>Username: <input type="text" name="username" value="foo" '
+            'maxlength="10" required>'
+            '<span class="helptext">e.g., user@example.com</span></li>'
+            '<li><ul class="errorlist"><li>This field is required.</li></ul>'
+            'Password: <input type="password" name="password" aria-invalid="true" '
+            'required><span class="helptext">Wählen Sie mit Bedacht.</span></li>',
         )
 
         # help_text is not displayed for hidden fields. It can be used for documentation
@@ -2875,6 +3038,177 @@ Password: <input type="password" name="password" required>
             '<input type="password" name="password" required><br>'
             '<span class="helptext">Help text is <strong>escaped</strong>.</span>'
             "</td></tr>",
+        )
+
+    def test_widget_attrs_custom_aria_describedby(self):
+        # aria-describedby provided to the widget overrides the default.
+
+        class UserRegistration(Form):
+            username = CharField(
+                max_length=255,
+                help_text="e.g., user@example.com",
+                widget=TextInput(attrs={"aria-describedby": "custom-description"}),
+            )
+            password = CharField(
+                widget=PasswordInput, help_text="Wählen Sie mit Bedacht."
+            )
+
+        p = UserRegistration()
+        self.assertHTMLEqual(
+            p.as_div(),
+            '<div><label for="id_username">Username:</label>'
+            '<div class="helptext" id="id_username_helptext">e.g., user@example.com'
+            '</div><input type="text" name="username" maxlength="255" required '
+            'aria-describedby="custom-description" id="id_username">'
+            "</div><div>"
+            '<label for="id_password">Password:</label>'
+            '<div class="helptext" id="id_password_helptext">Wählen Sie mit Bedacht.'
+            '</div><input type="password" name="password" required '
+            'aria-describedby="id_password_helptext" id="id_password"></div>',
+        )
+        self.assertHTMLEqual(
+            p.as_ul(),
+            '<li><label for="id_username">Username:</label><input type="text" '
+            'name="username" maxlength="255" required '
+            'aria-describedby="custom-description" id="id_username">'
+            '<span class="helptext" id="id_username_helptext">e.g., user@example.com'
+            "</span></li><li>"
+            '<label for="id_password">Password:</label>'
+            '<input type="password" name="password" required '
+            'aria-describedby="id_password_helptext" id="id_password">'
+            '<span class="helptext" id="id_password_helptext">Wählen Sie mit Bedacht.'
+            "</span></li>",
+        )
+        self.assertHTMLEqual(
+            p.as_p(),
+            '<p><label for="id_username">Username:</label><input type="text" '
+            'name="username" maxlength="255" required '
+            'aria-describedby="custom-description" id="id_username">'
+            '<span class="helptext" id="id_username_helptext">e.g., user@example.com'
+            "</span></p><p>"
+            '<label for="id_password">Password:</label>'
+            '<input type="password" name="password" required '
+            'aria-describedby="id_password_helptext" id="id_password">'
+            '<span class="helptext" id="id_password_helptext">Wählen Sie mit Bedacht.'
+            "</span></p>",
+        )
+        self.assertHTMLEqual(
+            p.as_table(),
+            '<tr><th><label for="id_username">Username:</label></th><td>'
+            '<input type="text" name="username" maxlength="255" required '
+            'aria-describedby="custom-description" id="id_username"><br>'
+            '<span class="helptext" id="id_username_helptext">e.g., user@example.com'
+            "</span></td></tr><tr><th>"
+            '<label for="id_password">Password:</label></th><td>'
+            '<input type="password" name="password" required '
+            'aria-describedby="id_password_helptext" id="id_password"><br>'
+            '<span class="helptext" id="id_password_helptext">Wählen Sie mit Bedacht.'
+            "</span></td></tr>",
+        )
+
+    def test_aria_describedby_custom_widget_id(self):
+        class UserRegistration(Form):
+            username = CharField(
+                max_length=255,
+                help_text="e.g., user@example.com",
+                widget=TextInput(attrs={"id": "custom-id"}),
+            )
+
+        f = UserRegistration()
+        self.assertHTMLEqual(
+            str(f),
+            '<div><label for="custom-id">Username:</label>'
+            '<div class="helptext" id="id_username_helptext">e.g., user@example.com'
+            '</div><input type="text" name="username" id="custom-id" maxlength="255" '
+            'required aria-describedby="id_username_helptext"></div>',
+        )
+
+    def test_fieldset_aria_describedby(self):
+        class FieldsetForm(Form):
+            checkbox = MultipleChoiceField(
+                choices=[("a", "A"), ("b", "B")],
+                widget=CheckboxSelectMultiple,
+                help_text="Checkbox help text",
+            )
+            radio = MultipleChoiceField(
+                choices=[("a", "A"), ("b", "B")],
+                widget=RadioSelect,
+                help_text="Radio help text",
+            )
+            datetime = SplitDateTimeField(help_text="Enter Date and Time")
+
+        f = FieldsetForm()
+        self.assertHTMLEqual(
+            str(f),
+            '<div><fieldset aria-describedby="id_checkbox_helptext">'
+            "<legend>Checkbox:</legend>"
+            '<div class="helptext" id="id_checkbox_helptext">Checkbox help text</div>'
+            '<div id="id_checkbox"><div>'
+            '<label for="id_checkbox_0"><input type="checkbox" name="checkbox" '
+            'value="a" id="id_checkbox_0" /> A</label>'
+            "</div><div>"
+            '<label for="id_checkbox_1"><input type="checkbox" name="checkbox" '
+            'value="b" id="id_checkbox_1" /> B</label>'
+            "</div></div></fieldset></div>"
+            '<div><fieldset aria-describedby="id_radio_helptext">'
+            "<legend>Radio:</legend>"
+            '<div class="helptext" id="id_radio_helptext">Radio help text</div>'
+            '<div id="id_radio"><div>'
+            '<label for="id_radio_0"><input type="radio" name="radio" value="a" '
+            'required id="id_radio_0" />A</label>'
+            "</div><div>"
+            '<label for="id_radio_1"><input type="radio" name="radio" value="b" '
+            'required id="id_radio_1" /> B</label>'
+            "</div></div></fieldset></div>"
+            '<div><fieldset aria-describedby="id_datetime_helptext">'
+            "<legend>Datetime:</legend>"
+            '<div class="helptext" id="id_datetime_helptext">Enter Date and Time</div>'
+            '<input type="text" name="datetime_0" required id="id_datetime_0" />'
+            '<input type="text" name="datetime_1" required id="id_datetime_1" />'
+            "</fieldset></div>",
+        )
+        f = FieldsetForm(auto_id=False)
+        # aria-describedby is not included.
+        self.assertIn("<fieldset>", str(f))
+        self.assertIn('<div class="helptext">', str(f))
+        f = FieldsetForm(auto_id="custom_%s")
+        # aria-describedby uses custom auto_id.
+        self.assertIn('fieldset aria-describedby="custom_checkbox_helptext"', str(f))
+        self.assertIn('<div class="helptext" id="custom_checkbox_helptext">', str(f))
+
+    def test_fieldset_custom_aria_describedby(self):
+        # aria-describedby set on widget results in aria-describedby being
+        # added to widget and not the <fieldset>.
+        class FieldsetForm(Form):
+            checkbox = MultipleChoiceField(
+                choices=[("a", "A"), ("b", "B")],
+                widget=CheckboxSelectMultiple(attrs={"aria-describedby": "custom-id"}),
+                help_text="Checkbox help text",
+            )
+
+        f = FieldsetForm()
+        self.assertHTMLEqual(
+            str(f),
+            "<div><fieldset><legend>Checkbox:</legend>"
+            '<div class="helptext" id="id_checkbox_helptext">Checkbox help text</div>'
+            '<div id="id_checkbox"><div>'
+            '<label for="id_checkbox_0"><input type="checkbox" name="checkbox" '
+            'value="a" aria-describedby="custom-id" id="id_checkbox_0" />A</label>'
+            "</div><div>"
+            '<label for="id_checkbox_1"><input type="checkbox" name="checkbox" '
+            'value="b" aria-describedby="custom-id" id="id_checkbox_1" />B</label>'
+            "</div></div></fieldset></div>",
+        )
+
+    def test_as_widget_custom_aria_describedby(self):
+        class FoodForm(Form):
+            intl_name = CharField(help_text="The food's international name.")
+
+        form = FoodForm({"intl_name": "Rendang"})
+        self.assertHTMLEqual(
+            form["intl_name"].as_widget(attrs={"aria-describedby": "some_custom_id"}),
+            '<input type="text" name="intl_name" value="Rendang"'
+            'aria-describedby="some_custom_id" required id="id_intl_name">',
         )
 
     def test_subclassing_forms(self):
@@ -3189,7 +3523,7 @@ Password: <input type="password" name="password" required>
             f.as_table(),
             "<tr><th>File1:</th><td>"
             '<ul class="errorlist"><li>This field is required.</li></ul>'
-            '<input type="file" name="file1" required></td></tr>',
+            '<input type="file" name="file1" aria-invalid="true" required></td></tr>',
         )
 
         f = FileForm(
@@ -3199,7 +3533,7 @@ Password: <input type="password" name="password" required>
             f.as_table(),
             "<tr><th>File1:</th><td>"
             '<ul class="errorlist"><li>The submitted file is empty.</li></ul>'
-            '<input type="file" name="file1" required></td></tr>',
+            '<input type="file" name="file1" aria-invalid="true" required></td></tr>',
         )
 
         f = FileForm(
@@ -3210,7 +3544,7 @@ Password: <input type="password" name="password" required>
             "<tr><th>File1:</th><td>"
             '<ul class="errorlist"><li>No file was submitted. Check the '
             "encoding type on the form.</li></ul>"
-            '<input type="file" name="file1" required></td></tr>',
+            '<input type="file" name="file1" aria-invalid="true" required></td></tr>',
         )
 
         f = FileForm(
@@ -3245,8 +3579,8 @@ Password: <input type="password" name="password" required>
         )
 
     def test_filefield_initial_callable(self):
-        class FileForm(forms.Form):
-            file1 = forms.FileField(initial=lambda: "resume.txt")
+        class FileForm(Form):
+            file1 = FileField(initial=lambda: "resume.txt")
 
         f = FileForm({})
         self.assertEqual(f.errors, {})
@@ -3254,7 +3588,7 @@ Password: <input type="password" name="password" required>
 
     def test_filefield_with_fileinput_required(self):
         class FileForm(Form):
-            file1 = forms.FileField(widget=FileInput)
+            file1 = FileField(widget=FileInput)
 
         f = FileForm(auto_id=False)
         self.assertHTMLEqual(
@@ -3375,8 +3709,8 @@ Password: <input type="password" name="password" required>
             <li class="required error"><ul class="errorlist">
             <li>This field is required.</li></ul>
             <label class="required" for="id_name">Name:</label>
-            <input type="text" name="name" id="id_name" required></li>
-            <li class="required">
+            <input type="text" name="name" id="id_name" aria-invalid="true" required>
+            </li><li class="required">
             <label class="required" for="id_is_cool">Is cool:</label>
             <select name="is_cool" id="id_is_cool">
             <option value="unknown" selected>Unknown</option>
@@ -3384,11 +3718,12 @@ Password: <input type="password" name="password" required>
             <option value="false">No</option>
             </select></li>
             <li><label for="id_email">Email:</label>
-            <input type="email" name="email" id="id_email"></li>
+            <input type="email" name="email" id="id_email" maxlength="320"></li>
             <li class="required error"><ul class="errorlist">
             <li>This field is required.</li></ul>
             <label class="required" for="id_age">Age:</label>
-            <input type="number" name="age" id="id_age" required></li>""",
+            <input type="number" name="age" id="id_age" aria-invalid="true" required>
+            </li>""",
         )
 
         self.assertHTMLEqual(
@@ -3397,8 +3732,8 @@ Password: <input type="password" name="password" required>
             <ul class="errorlist"><li>This field is required.</li></ul>
             <p class="required error">
             <label class="required" for="id_name">Name:</label>
-            <input type="text" name="name" id="id_name" required></p>
-            <p class="required">
+            <input type="text" name="name" id="id_name" aria-invalid="true" required>
+            </p><p class="required">
             <label class="required" for="id_is_cool">Is cool:</label>
             <select name="is_cool" id="id_is_cool">
             <option value="unknown" selected>Unknown</option>
@@ -3406,11 +3741,11 @@ Password: <input type="password" name="password" required>
             <option value="false">No</option>
             </select></p>
             <p><label for="id_email">Email:</label>
-            <input type="email" name="email" id="id_email"></p>
+            <input type="email" name="email" id="id_email" maxlength="320"></p>
             <ul class="errorlist"><li>This field is required.</li></ul>
             <p class="required error"><label class="required" for="id_age">Age:</label>
-            <input type="number" name="age" id="id_age" required></p>
-            """,
+            <input type="number" name="age" id="id_age" aria-invalid="true" required>
+            </p>""",
         )
 
         self.assertHTMLEqual(
@@ -3418,7 +3753,7 @@ Password: <input type="password" name="password" required>
             """<tr class="required error">
 <th><label class="required" for="id_name">Name:</label></th>
 <td><ul class="errorlist"><li>This field is required.</li></ul>
-<input type="text" name="name" id="id_name" required></td></tr>
+<input type="text" name="name" id="id_name" aria-invalid="true" required></td></tr>
 <tr class="required"><th><label class="required" for="id_is_cool">Is cool:</label></th>
 <td><select name="is_cool" id="id_is_cool">
 <option value="unknown" selected>Unknown</option>
@@ -3426,10 +3761,27 @@ Password: <input type="password" name="password" required>
 <option value="false">No</option>
 </select></td></tr>
 <tr><th><label for="id_email">Email:</label></th><td>
-<input type="email" name="email" id="id_email"></td></tr>
+<input type="email" name="email" id="id_email" maxlength="320"></td></tr>
 <tr class="required error"><th><label class="required" for="id_age">Age:</label></th>
 <td><ul class="errorlist"><li>This field is required.</li></ul>
-<input type="number" name="age" id="id_age" required></td></tr>""",
+<input type="number" name="age" id="id_age" aria-invalid="true" required></td></tr>""",
+        )
+        self.assertHTMLEqual(
+            p.as_div(),
+            '<div class="required error"><label for="id_name" class="required">Name:'
+            '</label><ul class="errorlist"><li>This field is required.</li></ul>'
+            '<input type="text" name="name" required id="id_name" '
+            'aria-invalid="true" /></div>'
+            '<div class="required"><label for="id_is_cool" class="required">Is cool:'
+            '</label><select name="is_cool" id="id_is_cool">'
+            '<option value="unknown" selected>Unknown</option>'
+            '<option value="true">Yes</option><option value="false">No</option>'
+            '</select></div><div><label for="id_email">Email:</label>'
+            '<input type="email" name="email" id="id_email" maxlength="320"/></div>'
+            '<div class="required error"><label for="id_age" class="required">Age:'
+            '</label><ul class="errorlist"><li>This field is required.</li></ul>'
+            '<input type="number" name="age" required id="id_age" '
+            'aria-invalid="true" /></div>',
         )
 
     def test_label_has_required_css_class(self):
@@ -3714,7 +4066,7 @@ Password: <input type="password" name="password" required>
                     return {}
                 return super().to_python(value)
 
-        class JSONForm(forms.Form):
+        class JSONForm(Form):
             json = CustomJSONField()
 
         form = JSONForm(data={"json": "{}"})
@@ -4027,6 +4379,13 @@ Password: <input type="password" name="password" required>
 <input id="id_first_name" name="first_name" type="text" value="John" required>
 <input id="id_last_name" name="last_name" type="hidden"></td></tr>""",
         )
+        self.assertHTMLEqual(
+            p.as_div(),
+            '<ul class="errorlist nonfield"><li>(Hidden field last_name) This field '
+            'is required.</li></ul><div><label for="id_first_name">First name:</label>'
+            '<input id="id_first_name" name="first_name" type="text" value="John" '
+            'required><input id="id_last_name" name="last_name" type="hidden"></div>',
+        )
 
     def test_error_list_with_non_field_errors_has_correct_class(self):
         class Person(Form):
@@ -4076,6 +4435,15 @@ Password: <input type="password" name="password" required>
             </td></tr>
             """,
         )
+        self.assertHTMLEqual(
+            p.as_div(),
+            '<ul class="errorlist nonfield"><li>Generic validation error</li></ul>'
+            '<div><label for="id_first_name">First name:</label><input '
+            'id="id_first_name" name="first_name" type="text" value="John" required>'
+            '</div><div><label for="id_last_name">Last name:</label><input '
+            'id="id_last_name" name="last_name" type="text" value="Lennon" required>'
+            "</div>",
+        )
 
     def test_error_escaping(self):
         class TestForm(Form):
@@ -4095,7 +4463,8 @@ Password: <input type="password" name="password" required>
             "<li>(Hidden field hidden) Foo &amp; &quot;bar&quot;!</li></ul></li>"
             '<li><ul class="errorlist"><li>Foo &amp; &quot;bar&quot;!</li></ul>'
             '<label for="id_visible">Visible:</label> '
-            '<input type="text" name="visible" value="b" id="id_visible" required>'
+            '<input type="text" name="visible" aria-invalid="true" value="b" '
+            'id="id_visible" required>'
             '<input type="hidden" name="hidden" value="a" id="id_hidden"></li>',
         )
 
@@ -4271,6 +4640,16 @@ Password: <input type="password" name="password" required>
             '<option value="J">Java</option>'
             "</select></td></tr>",
         )
+        self.assertHTMLEqual(
+            form.render(form.template_name_div),
+            '<div><label for="id_f1">F1:</label><input id="id_f1" maxlength="30" '
+            'name="f1" type="text" required></div><div><label for="id_f2">F2:</label>'
+            '<input id="id_f2" maxlength="30" name="f2" type="text"></div><div><label '
+            'for="id_f3">F3:</label><textarea cols="40" id="id_f3" name="f3" '
+            'rows="10" required></textarea></div><div><label for="id_f4">F4:</label>'
+            '<select id="id_f4" name="f4"><option value="P">Python</option>'
+            '<option value="J">Java</option></select></div>',
+        )
 
     def test_use_required_attribute_false(self):
         class MyForm(Form):
@@ -4321,6 +4700,16 @@ Password: <input type="password" name="password" required>
             '<option value="P">Python</option>'
             '<option value="J">Java</option>'
             "</select></td></tr>",
+        )
+        self.assertHTMLEqual(
+            form.render(form.template_name_div),
+            '<div><label for="id_f1">F1:</label> <input id="id_f1" maxlength="30" '
+            'name="f1" type="text"></div><div><label for="id_f2">F2:</label>'
+            '<input id="id_f2" maxlength="30" name="f2" type="text"></div><div>'
+            '<label for="id_f3">F3:</label> <textarea cols="40" id="id_f3" name="f3" '
+            'rows="10"></textarea></div><div><label for="id_f4">F4:</label>'
+            '<select id="id_f4" name="f4"><option value="P">Python</option>'
+            '<option value="J">Java</option></select></div>',
         )
 
     def test_only_hidden_fields(self):
@@ -4390,6 +4779,22 @@ Password: <input type="password" name="password" required>
             '<legend number="9999" for="id_first_name">First name:</legend>',
         )
 
+    def test_remove_cached_field(self):
+        class TestForm(Form):
+            name = CharField(max_length=10)
+
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, **kwargs)
+                # Populate fields cache.
+                [field for field in self]
+                # Removed cached field.
+                del self.fields["name"]
+
+        f = TestForm({"name": "abcde"})
+
+        with self.assertRaises(KeyError):
+            f["name"]
+
 
 @jinja2_tests
 class Jinja2FormsTestCase(FormsTestCase):
@@ -4397,7 +4802,8 @@ class Jinja2FormsTestCase(FormsTestCase):
 
 
 class CustomRenderer(DjangoTemplates):
-    pass
+    form_template_name = "forms_tests/form_snippet.html"
+    field_template_name = "forms_tests/custom_field.html"
 
 
 class RendererTests(SimpleTestCase):
@@ -4529,10 +4935,12 @@ class TemplateTests(SimpleTestCase):
             "</label></p>"
             '<ul class="errorlist"><li>This field is required.</li></ul><p>'
             "<label>Password: "
-            '<input type="password" name="password1" required></label></p>'
+            '<input type="password" name="password1" aria-invalid="true" required>'
+            "</label></p>"
             '<ul class="errorlist"><li>This field is required.</li></ul>'
             "<p><label>Password (again): "
-            '<input type="password" name="password2" required></label></p>'
+            '<input type="password" name="password2" aria-invalid="true" required>'
+            "</label></p>"
             '<input type="submit" required>'
             "</form>",
         )
@@ -4567,7 +4975,10 @@ class TemplateTests(SimpleTestCase):
         # Form gives each field an "id" attribute.
         t = Template(
             "<form>"
-            "<p>{{ form.username.label_tag }} {{ form.username }}</p>"
+            "<p>{{ form.username.label_tag }} {{ form.username }}"
+            '<span {% if form.username.id_for_label %}id="'
+            '{{ form.username.id_for_label }}_helptext"{% endif %}>'
+            "{{ form.username.help_text}}</span></p>"
             "<p>{{ form.password1.label_tag }} {{ form.password1 }}</p>"
             "<p>{{ form.password2.label_tag }} {{ form.password2 }}</p>"
             '<input type="submit" required>'
@@ -4577,7 +4988,8 @@ class TemplateTests(SimpleTestCase):
             t.render(Context({"form": f})),
             "<form>"
             "<p>Username: "
-            '<input type="text" name="username" maxlength="10" required></p>'
+            '<input type="text" name="username" maxlength="10" required>'
+            "<span>Good luck picking a username that doesn't already exist.</span></p>"
             '<p>Password1: <input type="password" name="password1" required></p>'
             '<p>Password2: <input type="password" name="password2" required></p>'
             '<input type="submit" required>'
@@ -4589,7 +5001,9 @@ class TemplateTests(SimpleTestCase):
             "<form>"
             '<p><label for="id_username">Username:</label>'
             '<input id="id_username" type="text" name="username" maxlength="10" '
-            "required></p>"
+            'aria-describedby="id_username_helptext" required>'
+            '<span id="id_username_helptext">'
+            "Good luck picking a username that doesn't already exist.</span></p>"
             '<p><label for="id_password1">Password1:</label>'
             '<input type="password" name="password1" id="id_password1" required></p>'
             '<p><label for="id_password2">Password2:</label>'
@@ -4626,7 +5040,7 @@ class TemplateTests(SimpleTestCase):
             "<form>"
             '<p><legend for="id_username">Username:</legend>'
             '<input id="id_username" type="text" name="username" maxlength="10" '
-            "required></p>"
+            'aria-describedby="id_username_helptext" required></p>'
             '<p><legend for="id_password1">Password1:</legend>'
             '<input type="password" name="password1" id="id_password1" required></p>'
             '<p><legend for="id_password2">Password2:</legend>'
@@ -4748,9 +5162,7 @@ class TemplateTests(SimpleTestCase):
 
             t = Template(
                 '<form method="post">'
-                "<table>"
                 "{{ form }}"
-                "</table>"
                 '<input type="submit" required>'
                 "</form>"
             )
@@ -4760,14 +5172,12 @@ class TemplateTests(SimpleTestCase):
         self.assertHTMLEqual(
             my_function("GET", {}),
             '<form method="post">'
-            "<table>"
-            "<tr><th>Username:</th><td>"
-            '<input type="text" name="username" maxlength="10" required></td></tr>'
-            "<tr><th>Password1:</th><td>"
-            '<input type="password" name="password1" required></td></tr>'
-            "<tr><th>Password2:</th><td>"
-            '<input type="password" name="password2" required></td></tr>'
-            "</table>"
+            "<div>Username:"
+            '<input type="text" name="username" maxlength="10" required></div>'
+            "<div>Password1:"
+            '<input type="password" name="password1" required></div>'
+            "<div>Password2:"
+            '<input type="password" name="password2" required></div>'
             '<input type="submit" required>'
             "</form>",
         )
@@ -4782,18 +5192,16 @@ class TemplateTests(SimpleTestCase):
                 },
             ),
             '<form method="post">'
-            "<table>"
-            '<tr><td colspan="2"><ul class="errorlist nonfield">'
-            "<li>Please make sure your passwords match.</li></ul></td></tr>"
-            '<tr><th>Username:</th><td><ul class="errorlist">'
+            '<ul class="errorlist nonfield">'
+            "<li>Please make sure your passwords match.</li></ul>"
+            '<div>Username:<ul class="errorlist">'
             "<li>Ensure this value has at most 10 characters (it has 23).</li></ul>"
-            '<input type="text" name="username" '
-            'value="this-is-a-long-username" maxlength="10" required></td></tr>'
-            "<tr><th>Password1:</th><td>"
-            '<input type="password" name="password1" required></td></tr>'
-            "<tr><th>Password2:</th><td>"
-            '<input type="password" name="password2" required></td></tr>'
-            "</table>"
+            '<input type="text" name="username" aria-invalid="true" '
+            'value="this-is-a-long-username" maxlength="10" required></div>'
+            "<div>Password1:"
+            '<input type="password" name="password1" required></div>'
+            "<div>Password2:"
+            '<input type="password" name="password2" required></div>'
             '<input type="submit" required>'
             "</form>",
         )
@@ -4811,9 +5219,58 @@ class TemplateTests(SimpleTestCase):
             "('username', 'adrian')]",
         )
 
+    def test_custom_field_template(self):
+        class MyForm(Form):
+            first_name = CharField(template_name="forms_tests/custom_field.html")
+
+        f = MyForm()
+        self.assertHTMLEqual(
+            f.render(),
+            '<div><label for="id_first_name">First name:</label><p>Custom Field<p>'
+            '<input type="text" name="first_name" required id="id_first_name"></div>',
+        )
+
+    def test_custom_field_render_template(self):
+        class MyForm(Form):
+            first_name = CharField()
+
+        f = MyForm()
+        self.assertHTMLEqual(
+            f["first_name"].render(template_name="forms_tests/custom_field.html"),
+            '<label for="id_first_name">First name:</label><p>Custom Field<p>'
+            '<input type="text" name="first_name" required id="id_first_name">',
+        )
+
 
 class OverrideTests(SimpleTestCase):
-    def test_use_custom_template(self):
+    @override_settings(FORM_RENDERER="forms_tests.tests.test_forms.CustomRenderer")
+    def test_custom_renderer_template_name(self):
+        class Person(Form):
+            first_name = CharField()
+
+        t = Template("{{ form }}")
+        html = t.render(Context({"form": Person()}))
+        expected = """
+        <div class="fieldWrapper"><label for="id_first_name">First name:</label>
+        <input type="text" name="first_name" required id="id_first_name"></div>
+        """
+        self.assertHTMLEqual(html, expected)
+
+    @override_settings(FORM_RENDERER="forms_tests.tests.test_forms.CustomRenderer")
+    def test_custom_renderer_field_template_name(self):
+        class Person(Form):
+            first_name = CharField()
+
+        t = Template("{{ form.first_name.as_field_group }}")
+        html = t.render(Context({"form": Person()}))
+        expected = """
+        <label for="id_first_name">First name:</label>
+        <p>Custom Field<p>
+        <input type="text" name="first_name" required id="id_first_name">
+        """
+        self.assertHTMLEqual(html, expected)
+
+    def test_per_form_template_name(self):
         class Person(Form):
             first_name = CharField()
             template_name = "forms_tests/form_snippet.html"
@@ -4842,10 +5299,12 @@ class OverrideTests(SimpleTestCase):
             '<p>Name: <input type="text" name="name" maxlength="50"></p>'
             '<div class="errorlist">'
             '<div class="error">Enter a valid email address.</div></div>'
-            '<p>Email: <input type="email" name="email" value="invalid" required></p>'
-            '<div class="errorlist">'
+            "<p>Email: "
+            '<input type="email" name="email" value="invalid" maxlength="320" '
+            'aria-invalid="true" required></p><div class="errorlist">'
             '<div class="error">This field is required.</div></div>'
-            '<p>Comment: <input type="text" name="comment" required></p>',
+            '<p>Comment: <input type="text" name="comment" aria-invalid="true" '
+            "required></p>",
         )
 
     def test_cyclic_context_boundfield_render(self):
@@ -4855,7 +5314,7 @@ class OverrideTests(SimpleTestCase):
 
         f = FirstNameForm()
         try:
-            self.assertInHTML("<th>1</th>", f.render())
+            f.render()
         except RecursionError:
             self.fail("Cyclic reference in BoundField.render().")
 

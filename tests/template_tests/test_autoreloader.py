@@ -56,6 +56,32 @@ class TemplateReloadTests(SimpleTestCase):
         self.assertIsNone(autoreload.template_changed(None, Path(__file__)))
         mock_reset.assert_not_called()
 
+    @mock.patch("django.forms.renderers.get_default_renderer")
+    def test_form_template_reset_template_change(self, mock_renderer):
+        template_path = Path(__file__).parent / "templates" / "index.html"
+        self.assertIs(autoreload.template_changed(None, template_path), True)
+        mock_renderer.assert_called_once()
+
+    @mock.patch("django.template.loaders.cached.Loader.reset")
+    def test_form_template_reset_template_change_reset_call(self, mock_loader_reset):
+        template_path = Path(__file__).parent / "templates" / "index.html"
+        self.assertIs(autoreload.template_changed(None, template_path), True)
+        mock_loader_reset.assert_called_once()
+
+    @override_settings(FORM_RENDERER="django.forms.renderers.TemplatesSetting")
+    @mock.patch("django.template.loaders.cached.Loader.reset")
+    def test_form_template_reset_template_change_no_djangotemplates(
+        self, mock_loader_reset
+    ):
+        template_path = Path(__file__).parent / "templates" / "index.html"
+        self.assertIs(autoreload.template_changed(None, template_path), True)
+        mock_loader_reset.assert_not_called()
+
+    @mock.patch("django.forms.renderers.get_default_renderer")
+    def test_form_template_reset_non_template_change(self, mock_renderer):
+        self.assertIsNone(autoreload.template_changed(None, Path(__file__)))
+        mock_renderer.assert_not_called()
+
     def test_watch_for_template_changes(self):
         mock_reloader = mock.MagicMock()
         autoreload.watch_for_template_changes(mock_reloader)
@@ -80,6 +106,17 @@ class TemplateReloadTests(SimpleTestCase):
     def test_reset_all_loaders(self, mock_reset):
         autoreload.reset_loaders()
         self.assertEqual(mock_reset.call_count, 2)
+
+    @override_settings(
+        TEMPLATES=[
+            {
+                "DIRS": [""],
+                "BACKEND": "django.template.backends.django.DjangoTemplates",
+            }
+        ]
+    )
+    def test_template_dirs_ignore_empty_path(self):
+        self.assertEqual(autoreload.get_template_directories(), set())
 
     @override_settings(
         TEMPLATES=[

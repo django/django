@@ -36,13 +36,13 @@ class StaticFilesHandlerMixin:
         * the host is provided as part of the base_url
         * the request's path isn't under the media path (or equal)
         """
-        return path.startswith(self.base_url[2]) and not self.base_url[1]
+        return path.startswith(self.base_url.path) and not self.base_url.netloc
 
     def file_path(self, url):
         """
         Return the relative path to the media file on disk for the given URL.
         """
-        relative_url = url[len(self.base_url[2]) :]
+        relative_url = url.removeprefix(self.base_url.path)
         return url2pathname(relative_url)
 
     def serve(self, request):
@@ -99,3 +99,17 @@ class ASGIStaticFilesHandler(StaticFilesHandlerMixin, ASGIHandler):
             return await super().__call__(scope, receive, send)
         # Hand off to the main app
         return await self.application(scope, receive, send)
+
+    async def get_response_async(self, request):
+        response = await super().get_response_async(request)
+        response._resource_closers.append(request.close)
+        # FileResponse is not async compatible.
+        if response.streaming and not response.is_async:
+            _iterator = response.streaming_content
+
+            async def awrapper():
+                for part in await sync_to_async(list)(_iterator):
+                    yield part
+
+            response.streaming_content = awrapper()
+        return response

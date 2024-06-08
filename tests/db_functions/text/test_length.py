@@ -14,7 +14,7 @@ class LengthTests(TestCase):
             name_length=Length("name"),
             alias_length=Length("alias"),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             authors.order_by("name"),
             [(10, 6), (6, None)],
             lambda a: (a.name_length, a.alias_length),
@@ -26,7 +26,7 @@ class LengthTests(TestCase):
         Author.objects.create(name="John Smith", alias="smithj1")
         Author.objects.create(name="Rhonda", alias="ronny")
         authors = Author.objects.order_by(Length("name"), Length("alias"))
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             authors,
             [
                 ("Rhonda", "ronny"),
@@ -41,6 +41,6 @@ class LengthTests(TestCase):
             Author.objects.create(name="John Smith", alias="smithj")
             Author.objects.create(name="Rhonda")
             authors = Author.objects.filter(name__length__gt=7)
-            self.assertQuerysetEqual(
+            self.assertQuerySetEqual(
                 authors.order_by("name"), ["John Smith"], lambda a: a.name
             )

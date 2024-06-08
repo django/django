@@ -71,8 +71,8 @@ Bugfixes
 * Made ``migrations.RunSQL`` no longer require percent sign escaping. This is
   now consistent with ``cursor.execute()`` (:ticket:`23426`).
 
-* Made the :setting:`SERIALIZE <TEST_SERIALIZE>` entry in the
-  :setting:`TEST <DATABASE-TEST>` dictionary usable (:ticket:`23421`).
+* Made the ``SERIALIZE`` entry in the :setting:`TEST <DATABASE-TEST>`
+  dictionary usable (:ticket:`23421`).
 
 * Fixed bug in migrations that prevented foreign key constraints to unmanaged
   models with a custom primary key (:ticket:`23415`).

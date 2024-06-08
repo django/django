@@ -21,12 +21,13 @@ As mentioned above, an example of a wrapper is a query execution blocker. It
 could look like this::
 
     def blocker(*args):
-        raise Exception('No database access allowed here.')
+        raise Exception("No database access allowed here.")
 
 And it would be used in a view to block queries from the template like so::
 
     from django.db import connection
     from django.shortcuts import render
+
 
     def my_view(request):
         context = {...}  # Code to generate context with all data.
@@ -55,33 +56,33 @@ Using the parameters, a slightly more complex version of the blocker could
 include the connection name in the error message::
 
     def blocker(execute, sql, params, many, context):
-        alias = context['connection'].alias
+        alias = context["connection"].alias
         raise Exception("Access to database '{}' blocked here".format(alias))
 
 For a more complete example, a query logger could look like this::
 
     import time
 
-    class QueryLogger:
 
+    class QueryLogger:
         def __init__(self):
             self.queries = []
 
         def __call__(self, execute, sql, params, many, context):
-            current_query = {'sql': sql, 'params': params, 'many': many}
+            current_query = {"sql": sql, "params": params, "many": many}
             start = time.monotonic()
             try:
                 result = execute(sql, params, many, context)
             except Exception as e:
-                current_query['status'] = 'error'
-                current_query['exception'] = e
+                current_query["status"] = "error"
+                current_query["exception"] = e
                 raise
             else:
-                current_query['status'] = 'ok'
+                current_query["status"] = "ok"
                 return result
             finally:
                 duration = time.monotonic() - start
-                current_query['duration'] = duration
+                current_query["duration"] = duration
                 self.queries.append(current_query)
 
 To use this, you would create a logger object and install it as a wrapper::

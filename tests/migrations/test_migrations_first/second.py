@@ -2,7 +2,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("migrations", "thefirst"),
         ("migrations2", "0002_second"),

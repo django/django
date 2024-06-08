@@ -33,7 +33,7 @@
               #  OFTReal returns floats, all else returns string.
               val = field.value
 """
-from ctypes import byref
+
 from pathlib import Path
 
 from django.contrib.gis.gdal.base import GDALBase
@@ -54,21 +54,22 @@ class DataSource(GDALBase):
 
     def __init__(self, ds_input, ds_driver=False, write=False, encoding="utf-8"):
         # The write flag.
-        if write:
-            self._write = 1
-        else:
-            self._write = 0
+        self._write = capi.GDAL_OF_UPDATE if write else capi.GDAL_OF_READONLY
         # See also https://gdal.org/development/rfc/rfc23_ogr_unicode.html
         self.encoding = encoding
 
         Driver.ensure_registered()
 
         if isinstance(ds_input, (str, Path)):
-            # The data source driver is a void pointer.
-            ds_driver = Driver.ptr_type()
             try:
-                # OGROpen will auto-detect the data source type.
-                ds = capi.open_ds(force_bytes(ds_input), self._write, byref(ds_driver))
+                # GDALOpenEx will auto-detect the data source type.
+                ds = capi.open_ds(
+                    force_bytes(ds_input),
+                    self._write | capi.GDAL_OF_VECTOR,
+                    None,
+                    None,
+                    None,
+                )
             except GDALException:
                 # Making the error message more clear rather than something
                 # like "Invalid pointer returned from OGROpen".
@@ -82,7 +83,8 @@ class DataSource(GDALBase):
 
         if ds:
             self.ptr = ds
-            self.driver = Driver(ds_driver)
+            driver = capi.get_dataset_driver(ds)
+            self.driver = Driver(driver)
         else:
             # Raise an exception if the returned pointer is NULL
             raise GDALException('Invalid data source file "%s"' % ds_input)

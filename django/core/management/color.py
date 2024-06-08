@@ -11,8 +11,15 @@ from django.utils import termcolors
 try:
     import colorama
 
-    colorama.init()
-except (ImportError, OSError):
+    # Avoid initializing colorama in non-Windows platforms.
+    colorama.just_fix_windows_console()
+except (
+    AttributeError,  # colorama <= 0.4.6.
+    ImportError,  # colorama is not installed.
+    # If just_fix_windows_console() accesses sys.stdout with
+    # WSGIRestrictedStdout.
+    OSError,
+):
     HAS_COLORAMA = False
 else:
     HAS_COLORAMA = True
@@ -48,7 +55,7 @@ def supports_color():
 
     return is_a_tty and (
         sys.platform != "win32"
-        or HAS_COLORAMA
+        or (HAS_COLORAMA and getattr(colorama, "fixed_windows_console", False))
         or "ANSICON" in os.environ
         or
         # Windows Terminal supports VT codes.
@@ -96,7 +103,7 @@ def make_style(config_string=""):
     return style
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def no_style():
     """
     Return a Style object with no color scheme.

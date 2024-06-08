@@ -4,17 +4,19 @@ on:
   pull_request_target:
     types: [opened]
 
+permissions:
+  pull-requests: write
+
 jobs:
   build:
     name: Hello new contributor
     runs-on: ubuntu-latest
     steps:
-      # Pinned to v2.0
-      - uses: deborah-digges/new-pull-request-comment-action@224c179a9e23f65ec50ff3240b8716369dc415d7
+      - uses: actions/first-interaction@v1
         with:
-          access-token: ${{ secrets.GITHUB_TOKEN }}
-          message: |
-            Hello @{}! Thank you for your contribution 💪
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          pr-message: |
+            Hello! Thank you for your contribution 💪
 
             As it's your first contribution be sure to check out the [patch review checklist](https://docs.djangoproject.com/en/dev/internals/contributing/writing-code/submitting-patches/#patch-review-checklist).
 

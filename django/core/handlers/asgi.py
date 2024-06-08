@@ -1,7 +1,9 @@
+import asyncio
 import logging
 import sys
 import tempfile
 import traceback
+from contextlib import aclosing
 
 from asgiref.sync import ThreadSensitiveContext, sync_to_async
 
@@ -24,6 +26,15 @@ from django.utils.functional import cached_property
 logger = logging.getLogger("django.request")
 
 
+def get_script_prefix(scope):
+    """
+    Return the script prefix to use from either the scope or a setting.
+    """
+    if settings.FORCE_SCRIPT_NAME:
+        return settings.FORCE_SCRIPT_NAME
+    return scope.get("root_path", "") or ""
+
+
 class ASGIRequest(HttpRequest):
     """
     Custom request subclass that decodes from an ASGI-standard request dict
@@ -39,21 +50,13 @@ class ASGIRequest(HttpRequest):
         self._post_parse_error = False
         self._read_started = False
         self.resolver_match = None
-        self.script_name = self.scope.get("root_path", "")
-        if self.script_name and scope["path"].startswith(self.script_name):
+        self.path = scope["path"]
+        self.script_name = get_script_prefix(scope)
+        if self.script_name:
             # TODO: Better is-prefix checking, slash handling?
-            self.path_info = scope["path"][len(self.script_name) :]
+            self.path_info = scope["path"].removeprefix(self.script_name)
         else:
             self.path_info = scope["path"]
-        # The Django path is different from ASGI scope path args, it should
-        # combine with script name.
-        if self.script_name:
-            self.path = "%s/%s" % (
-                self.script_name.rstrip("/"),
-                self.path_info.replace("/", "", 1),
-            )
-        else:
-            self.path = scope["path"]
         # HTTP basics.
         self.method = self.scope["method"].upper()
         # Ensure query string is encoded correctly.
@@ -128,6 +131,10 @@ class ASGIRequest(HttpRequest):
     def COOKIES(self):
         return parse_cookie(self.META.get("HTTP_COOKIE", ""))
 
+    def close(self):
+        super().close()
+        self._stream.close()
+
 
 class ASGIHandler(base.BaseHandler):
     """Handler for ASGI requests."""
@@ -164,24 +171,83 @@ class ASGIHandler(base.BaseHandler):
         except RequestAborted:
             return
         # Request is complete and can be served.
-        set_script_prefix(self.get_script_prefix(scope))
-        await sync_to_async(signals.request_started.send, thread_sensitive=True)(
-            sender=self.__class__, scope=scope
-        )
+        set_script_prefix(get_script_prefix(scope))
+        await signals.request_started.asend(sender=self.__class__, scope=scope)
         # Get the request and check for basic issues.
         request, error_response = self.create_request(scope, body_file)
         if request is None:
+            body_file.close()
             await self.send_response(error_response, send)
+            await sync_to_async(error_response.close)()
             return
-        # Get the response, using the async mode of BaseHandler.
+
+        async def process_request(request, send):
+            response = await self.run_get_response(request)
+            try:
+                await self.send_response(response, send)
+            except asyncio.CancelledError:
+                # Client disconnected during send_response (ignore exception).
+                pass
+
+            return response
+
+        # Try to catch a disconnect while getting response.
+        tasks = [
+            # Check the status of these tasks and (optionally) terminate them
+            # in this order. The listen_for_disconnect() task goes first
+            # because it should not raise unexpected errors that would prevent
+            # us from cancelling process_request().
+            asyncio.create_task(self.listen_for_disconnect(receive)),
+            asyncio.create_task(process_request(request, send)),
+        ]
+        await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
+        # Now wait on both tasks (they may have both finished by now).
+        for task in tasks:
+            if task.done():
+                try:
+                    task.result()
+                except RequestAborted:
+                    # Ignore client disconnects.
+                    pass
+                except AssertionError:
+                    body_file.close()
+                    raise
+            else:
+                # Allow views to handle cancellation.
+                task.cancel()
+                try:
+                    await task
+                except asyncio.CancelledError:
+                    # Task re-raised the CancelledError as expected.
+                    pass
+
+        try:
+            response = tasks[1].result()
+        except asyncio.CancelledError:
+            await signals.request_finished.asend(sender=self.__class__)
+        else:
+            await sync_to_async(response.close)()
+
+        body_file.close()
+
+    async def listen_for_disconnect(self, receive):
+        """Listen for disconnect from the client."""
+        message = await receive()
+        if message["type"] == "http.disconnect":
+            raise RequestAborted()
+        # This should never happen.
+        assert False, "Invalid ASGI message after request body: %s" % message["type"]
+
+    async def run_get_response(self, request):
+        """Get async response."""
+        # Use the async mode of BaseHandler.
         response = await self.get_response_async(request)
         response._handler_class = self.__class__
         # Increase chunk size on file responses (ASGI servers handles low-level
         # chunking).
         if isinstance(response, FileResponse):
             response.block_size = self.chunk_size
-        # Send the response.
-        await self.send_response(response, send)
+        return response
 
     async def read_body(self, receive):
         """Reads an HTTP body from an ASGI connection."""
@@ -192,6 +258,7 @@ class ASGIHandler(base.BaseHandler):
         while True:
             message = await receive()
             if message["type"] == "http.disconnect":
+                body_file.close()
                 # Early client disconnect.
                 raise RequestAborted()
             # Add a body chunk from the message, if provided.
@@ -257,19 +324,22 @@ class ASGIHandler(base.BaseHandler):
         )
         # Streaming responses need to be pinned to their iterator.
         if response.streaming:
-            # Access `__iter__` and not `streaming_content` directly in case
-            # it has been overridden in a subclass.
-            for part in response:
-                for chunk, _ in self.chunk_bytes(part):
-                    await send(
-                        {
-                            "type": "http.response.body",
-                            "body": chunk,
-                            # Ignore "more" as there may be more parts; instead,
-                            # use an empty final closing message with False.
-                            "more_body": True,
-                        }
-                    )
+            # - Consume via `__aiter__` and not `streaming_content` directly, to
+            #   allow mapping of a sync iterator.
+            # - Use aclosing() when consuming aiter.
+            #   See https://github.com/python/cpython/commit/6e8dcda
+            async with aclosing(aiter(response)) as content:
+                async for part in content:
+                    for chunk, _ in self.chunk_bytes(part):
+                        await send(
+                            {
+                                "type": "http.response.body",
+                                "body": chunk,
+                                # Ignore "more" as there may be more parts; instead,
+                                # use an empty final closing message with False.
+                                "more_body": True,
+                            }
+                        )
             # Final closing message.
             await send({"type": "http.response.body"})
         # Other responses just need chunking.
@@ -283,7 +353,6 @@ class ASGIHandler(base.BaseHandler):
                         "more_body": not last,
                     }
                 )
-        await sync_to_async(response.close, thread_sensitive=True)()
 
     @classmethod
     def chunk_bytes(cls, data):
@@ -301,11 +370,3 @@ class ASGIHandler(base.BaseHandler):
                 (position + cls.chunk_size) >= len(data),
             )
             position += cls.chunk_size
-
-    def get_script_prefix(self, scope):
-        """
-        Return the script prefix to use from either the scope or a setting.
-        """
-        if settings.FORCE_SCRIPT_NAME:
-            return settings.FORCE_SCRIPT_NAME
-        return scope.get("root_path", "") or ""

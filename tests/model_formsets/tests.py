@@ -6,12 +6,15 @@ from decimal import Decimal
 from django import forms
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
+from django.forms.formsets import formset_factory
 from django.forms.models import (
     BaseModelFormSet,
+    ModelForm,
     _get_foreign_key,
     inlineformset_factory,
     modelformset_factory,
 )
+from django.forms.renderers import DjangoTemplates
 from django.http import QueryDict
 from django.test import TestCase, skipUnlessDBFeature
 
@@ -1660,7 +1663,7 @@ class ModelFormsetTest(TestCase):
 
         PlayerInlineFormSet = inlineformset_factory(Team, Player, fields="__all__")
         formset = PlayerInlineFormSet()
-        self.assertQuerysetEqual(formset.get_queryset(), [])
+        self.assertQuerySetEqual(formset.get_queryset(), [])
 
         formset = PlayerInlineFormSet(instance=team)
         players = formset.get_queryset()
@@ -2066,6 +2069,36 @@ class ModelFormsetTest(TestCase):
         formset.save()
         self.assertCountEqual(Author.objects.all(), [charles, walt])
 
+    def test_edit_only_formset_factory_with_basemodelformset(self):
+        charles = Author.objects.create(name="Charles Baudelaire")
+
+        class AuthorForm(forms.ModelForm):
+            class Meta:
+                model = Author
+                fields = "__all__"
+
+        class BaseAuthorFormSet(BaseModelFormSet):
+            def __init__(self, *args, **kwargs):
+                self.model = Author
+                super().__init__(*args, **kwargs)
+
+        AuthorFormSet = formset_factory(AuthorForm, formset=BaseAuthorFormSet)
+        data = {
+            "form-TOTAL_FORMS": "2",
+            "form-INITIAL_FORMS": "1",
+            "form-MAX_NUM_FORMS": "0",
+            "form-0-id": charles.pk,
+            "form-0-name": "Shawn Dong",
+            "form-1-name": "Walt Whitman",
+        }
+        formset = AuthorFormSet(data)
+        self.assertIs(formset.is_valid(), True)
+        formset.save()
+        self.assertEqual(Author.objects.count(), 2)
+        charles.refresh_from_db()
+        self.assertEqual(charles.name, "Shawn Dong")
+        self.assertEqual(Author.objects.count(), 2)
+
 
 class TestModelFormsetOverridesTroughFormMeta(TestCase):
     def test_modelformset_factory_widgets(self):
@@ -2334,3 +2367,44 @@ class TestModelFormsetOverridesTroughFormMeta(TestCase):
         BookFormSet = modelformset_factory(Author, fields="__all__", renderer=renderer)
         formset = BookFormSet()
         self.assertEqual(formset.renderer, renderer)
+
+    def test_modelformset_factory_default_renderer(self):
+        class CustomRenderer(DjangoTemplates):
+            pass
+
+        class ModelFormWithDefaultRenderer(ModelForm):
+            default_renderer = CustomRenderer()
+
+        BookFormSet = modelformset_factory(
+            Author, form=ModelFormWithDefaultRenderer, fields="__all__"
+        )
+        formset = BookFormSet()
+        self.assertEqual(
+            formset.forms[0].renderer, ModelFormWithDefaultRenderer.default_renderer
+        )
+        self.assertEqual(
+            formset.empty_form.renderer, ModelFormWithDefaultRenderer.default_renderer
+        )
+        self.assertIsInstance(formset.renderer, DjangoTemplates)
+
+    def test_inlineformset_factory_default_renderer(self):
+        class CustomRenderer(DjangoTemplates):
+            pass
+
+        class ModelFormWithDefaultRenderer(ModelForm):
+            default_renderer = CustomRenderer()
+
+        BookFormSet = inlineformset_factory(
+            Author,
+            Book,
+            form=ModelFormWithDefaultRenderer,
+            fields="__all__",
+        )
+        formset = BookFormSet()
+        self.assertEqual(
+            formset.forms[0].renderer, ModelFormWithDefaultRenderer.default_renderer
+        )
+        self.assertEqual(
+            formset.empty_form.renderer, ModelFormWithDefaultRenderer.default_renderer
+        )
+        self.assertIsInstance(formset.renderer, DjangoTemplates)

@@ -55,6 +55,7 @@ Attributes
 
         from django.db import models
 
+
         class Person(models.Model):
             # Add manager with another name
             people = models.Manager()

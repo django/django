@@ -1,6 +1,7 @@
 """
 Upload handlers to test the upload API.
 """
+
 import os
 from tempfile import NamedTemporaryFile
 
@@ -55,7 +56,7 @@ class TraversalUploadHandler(FileUploadHandler):
     """A handler with potential directory-traversal vulnerability."""
 
     def __init__(self, request=None):
-        from .views import UPLOAD_TO
+        from .tests import UPLOAD_TO
 
         super().__init__(request)
         self.upload_dir = UPLOAD_TO

@@ -64,13 +64,11 @@ upgrade instructions in older versions of the documentation.
 Security enhancements
 ---------------------
 
-Several features of the django-secure_ third-party library have been
+Several features of the :pypi:`django-secure` third-party library have been
 integrated into Django. :class:`django.middleware.security.SecurityMiddleware`
 provides several security enhancements to the request/response cycle. The new
 :option:`check --deploy` option allows you to check your production settings
 file for ways to increase the security of your site.
-
-.. _django-secure: https://pypi.org/project/django-secure/
 
 New PostgreSQL specific functionality
 -------------------------------------
@@ -696,7 +694,9 @@ Assigning unsaved objects to relations raises an error
 .. note::
 
     To more easily allow in-memory usage of models, this change was reverted in
-    Django 1.8.4 and replaced with a check during ``model.save()``. For example::
+    Django 1.8.4 and replaced with a check during ``model.save()``. For example:
+
+    .. code-block:: pycon
 
         >>> book = Book.objects.create(name="Django")
         >>> book.author = Author(name="John")
@@ -713,7 +713,9 @@ Assigning unsaved objects to a :class:`~django.db.models.ForeignKey`,
 :class:`~django.db.models.OneToOneField` now raises a :exc:`ValueError`.
 
 Previously, the assignment of an unsaved object would be silently ignored.
-For example::
+For example:
+
+.. code-block:: pycon
 
     >>> book = Book.objects.create(name="Django")
     >>> book.author = Author(name="John")
@@ -724,7 +726,9 @@ For example::
     >>> book.author
     >>>
 
-Now, an error will be raised to prevent data loss::
+Now, an error will be raised to prevent data loss:
+
+.. code-block:: pycon
 
     >>> book.author = Author(name="john")
     Traceback (most recent call last):
@@ -790,7 +794,9 @@ Querying for model lookups now checks if the object passed is of correct type
 and raises a :exc:`ValueError` if not. Previously, Django didn't care if the
 object was of correct type; it just used the object's related field attribute
 (e.g. ``id``) for the lookup. Now, an error is raised to prevent incorrect
-lookups::
+lookups:
+
+.. code-block:: pycon
 
     >>> book = Book.objects.create(name="Django")
     >>> book = Book.objects.filter(author=book)
@@ -802,16 +808,20 @@ lookups::
 --------------------------------------------
 
 ``select_related()`` now validates that the given fields actually exist.
-Previously, nonexistent fields were silently ignored. Now, an error is raised::
+Previously, nonexistent fields were silently ignored. Now, an error is raised:
 
-    >>> book = Book.objects.select_related('nonexistent_field')
+.. code-block:: pycon
+
+    >>> book = Book.objects.select_related("nonexistent_field")
     Traceback (most recent call last):
     ...
     FieldError: Invalid field name(s) given in select_related: 'nonexistent_field'
 
-The validation also makes sure that the given field is relational::
+The validation also makes sure that the given field is relational:
 
-    >>> book = Book.objects.select_related('name')
+.. code-block:: pycon
+
+    >>> book = Book.objects.select_related("name")
     Traceback (most recent call last):
     ...
     FieldError: Non-relational field given in select_related: 'name'
@@ -884,9 +894,9 @@ for users who haven't logged in, you can run this query::
 
     UserModel = get_user_model()
     if issubclass(UserModel, AbstractBaseUser):
-        UserModel._default_manager.filter(
-            last_login=models.F('date_joined')
-        ).update(last_login=None)
+        UserModel._default_manager.filter(last_login=models.F("date_joined")).update(
+            last_login=None
+        )
 
 :mod:`django.contrib.gis`
 -------------------------
@@ -966,7 +976,9 @@ returns the relationship as ``django.db.models.fields.related.ManyToOneRel``
 is set to the target of the relationship instead of the source. The source
 model is accessible on the ``related_model`` attribute instead.
 
-Consider this example from the tutorial in Django 1.8::
+Consider this example from the tutorial in Django 1.8:
+
+.. code-block:: pycon
 
     >>> p = Poll.objects.get(pk=1)
     >>> p._meta.get_all_related_objects()
@@ -976,7 +988,9 @@ Consider this example from the tutorial in Django 1.8::
     >>> p._meta.get_all_related_objects()[0].related_model
     <class 'polls.models.Choice'>
 
-and compare it to the behavior on older versions::
+and compare it to the behavior on older versions:
+
+.. code-block:: pycon
 
     >>> p._meta.get_all_related_objects()
     [<RelatedObject: polls:choice related to poll>]
@@ -987,7 +1001,7 @@ To access the source model, you can use a pattern like this to write code that
 will work with both Django 1.8 and older versions::
 
     for relation in opts.get_all_related_objects():
-        to_model = getattr(relation, 'related_model', relation.model)
+        to_model = getattr(relation, "related_model", relation.model)
 
 Also note that ``get_all_related_objects()`` is deprecated in 1.8.
 
@@ -1232,8 +1246,9 @@ and will be removed in Django 1.10. You can simply remove the
 In the olden days of Django, it was encouraged to reference views as strings
 in ``urlpatterns``::
 
-    urlpatterns = patterns('',
-        url('^$', 'myapp.views.myview'),
+    urlpatterns = patterns(
+        "",
+        url("^$", "myapp.views.myview"),
     )
 
 and Django would magically import ``myapp.views.myview`` internally and turn
@@ -1242,9 +1257,10 @@ referencing many views from the same module, the ``patterns()`` function takes
 a required initial ``prefix`` argument which is prepended to all
 views-as-strings in that set of ``urlpatterns``::
 
-    urlpatterns = patterns('myapp.views',
-        url('^$', 'myview'),
-        url('^other/$', 'otherview'),
+    urlpatterns = patterns(
+        "myapp.views",
+        url("^$", "myview"),
+        url("^other/$", "otherview"),
     )
 
 In the modern era, we have updated the tutorial to instead recommend importing
@@ -1259,9 +1275,10 @@ written (and is better written) as::
 
     from myapp import views
 
-    urlpatterns = patterns('',
-        url('^$', views.myview),
-        url('^other/$', views.otherview),
+    urlpatterns = patterns(
+        "",
+        url("^$", views.myview),
+        url("^other/$", views.otherview),
     )
 
 Thus ``patterns()`` serves little purpose and is a burden when teaching new users
@@ -1274,8 +1291,8 @@ Updating your code is as simple as ensuring that ``urlpatterns`` is a list of
     from myapp import views
 
     urlpatterns = [
-        url('^$', views.myview),
-        url('^other/$', views.otherview),
+        url("^$", views.myview),
+        url("^other/$", views.otherview),
     ]
 
 Passing a string as ``view`` to ``django.conf.urls.url()``
@@ -1338,8 +1355,12 @@ the ``url`` that references :func:`django.contrib.sitemaps.views.sitemap`::
 
     from django.contrib.sitemaps.views import sitemap
 
-    url(r'^sitemap\.xml$', sitemap, {'sitemaps': sitemaps},
-        name='django.contrib.sitemaps.views.sitemap')
+    url(
+        r"^sitemap\.xml$",
+        sitemap,
+        {"sitemaps": sitemaps},
+        name="django.contrib.sitemaps.views.sitemap",
+    )
 
 to ensure compatibility when reversing by Python path is removed in Django 1.10.
 
@@ -1434,11 +1455,11 @@ Old :tfilter:`unordered_list` syntax
 An older (pre-1.0), more restrictive and verbose input format for the
 :tfilter:`unordered_list` template filter has been deprecated::
 
-    ['States', [['Kansas', [['Lawrence', []], ['Topeka', []]]], ['Illinois', []]]]
+    ["States", [["Kansas", [["Lawrence", []], ["Topeka", []]]], ["Illinois", []]]]
 
 Using the new syntax, this becomes::
 
-    ['States', ['Kansas', ['Lawrence', 'Topeka'], 'Illinois']]
+    ["States", ["Kansas", ["Lawrence", "Topeka"], "Illinois"]]
 
 ``django.forms.Field._has_changed()``
 -------------------------------------
@@ -1483,9 +1504,7 @@ in your project.
 The ``django.utils.checksums`` module has been deprecated and will be removed
 in Django 1.10. The functionality it provided (validating checksum using the
 Luhn algorithm) was undocumented and not used in Django. The module has been
-moved to the `django-localflavor`_ package (version 1.1+).
-
-.. _django-localflavor: https://pypi.org/project/django-localflavor/
+moved to the :pypi:`django-localflavor` package (version 1.1+).
 
 ``InlineAdminForm.original_content_type_id``
 --------------------------------------------

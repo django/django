@@ -45,12 +45,12 @@ Python style
 
 * Unless otherwise specified, follow :pep:`8`.
 
-  Use `flake8`_ to check for problems in this area. Note that our ``setup.cfg``
-  file contains some excluded files (deprecated modules we don't care about
-  cleaning up and some third-party code that Django vendors) as well as some
-  excluded errors that we don't consider as gross violations. Remember that
-  :pep:`8` is only a guide, so respect the style of the surrounding code as a
-  primary goal.
+  Use :pypi:`flake8` to check for problems in this area. Note that our
+  ``setup.cfg`` file contains some excluded files (deprecated modules we don't
+  care about cleaning up and some third-party code that Django vendors) as well
+  as some excluded errors that we don't consider as gross violations. Remember
+  that :pep:`8` is only a guide, so respect the style of the surrounding code
+  as a primary goal.
 
   An exception to :pep:`8` is our rules on line lengths. Don't limit lines of
   code to 79 characters if it means the code looks significantly uglier or is
@@ -68,20 +68,20 @@ Python style
   guide, f-strings should use only plain variable and property access, with
   prior local variable assignment for more complex cases::
 
-    # Allowed
-    f'hello {user}'
-    f'hello {user.name}'
-    f'hello {self.user.name}'
+    # Allowed
+    f"hello {user}"
+    f"hello {user.name}"
+    f"hello {self.user.name}"
 
     # Disallowed
-    f'hello {get_user()}'
-    f'you are {user.age * 365.25} days old'
+    f"hello {get_user()}"
+    f"you are {user.age * 365.25} days old"
 
     # Allowed with local variable assignment
     user = get_user()
-    f'hello {user}'
+    f"hello {user}"
     user_days_old = user.age * 365.25
-    f'you are {user_days_old} days old'
+    f"you are {user_days_old} days old"
 
   f-strings should not be used for any string that may require translation,
   including error and logging messages. In general ``format()`` is more
@@ -127,17 +127,12 @@ Python style
         """
         ...
 
-.. versionchanged:: 4.0.3
-
-    All Python code in Django was reformatted with `black`_.
-
 .. _coding-style-imports:
 
 Imports
 =======
 
-* Use `isort <https://github.com/PyCQA/isort#readme>`_ to automate import
-  sorting using the guidelines below.
+* Use :pypi:`isort` to automate import sorting using the guidelines below.
 
   Quick start:
 
@@ -171,7 +166,7 @@ Imports
   For example (comments are for explanatory purposes only):
 
   .. code-block:: python
-      :caption: django/contrib/admin/example.py
+      :caption: ``django/contrib/admin/example.py``
 
       # future
       from __future__ import unicode_literals
@@ -186,7 +181,10 @@ Imports
       # Django
       from django.http import Http404
       from django.http.response import (
-          Http404, HttpResponse, HttpResponseNotAllowed, StreamingHttpResponse,
+          Http404,
+          HttpResponse,
+          HttpResponseNotAllowed,
+          StreamingHttpResponse,
           cookie,
       )
 
@@ -199,13 +197,13 @@ Imports
       except ImportError:
           yaml = None
 
-      CONSTANT = 'foo'
+      CONSTANT = "foo"
 
 
-      class Example:
-          # ...
+      class Example: ...
 
-* Use convenience imports whenever available. For example, do this::
+* Use convenience imports whenever available. For example, do this
+  ::
 
       from django.views import View
 
@@ -216,20 +214,149 @@ Imports
 Template style
 ==============
 
-* In Django template code, put one (and only one) space between the curly
-  brackets and the tag contents.
+Follow the below rules in Django template code.
+
+* ``{% extends %}`` should be the first non-comment line.
 
   Do this:
 
   .. code-block:: html+django
 
-      {{ foo }}
+      {% extends "base.html" %}
+
+      {% block content %}
+        <h1 class="font-semibold text-xl">
+          {{ pages.title }}
+        </h1>
+      {% endblock content %}
+
+  Or this:
+
+  .. code-block:: html+django
+
+      {# This is a comment #}
+      {% extends "base.html" %}
+
+      {% block content %}
+        <h1 class="font-semibold text-xl">
+          {{ pages.title }}
+        </h1>
+      {% endblock content %}
 
   Don't do this:
 
   .. code-block:: html+django
 
-      {{foo}}
+      {% load i18n %}
+      {% extends "base.html" %}
+
+      {% block content %}
+        <h1 class="font-semibold text-xl">
+          {{ pages.title }}
+        </h1>
+      {% endblock content %}
+
+* Put exactly one space between ``{{``, variable contents, and ``}}``.
+
+  Do this:
+
+  .. code-block:: html+django
+
+      {{ user }}
+
+  Don't do this:
+
+  .. code-block:: html+django
+
+      {{user}}
+
+* In ``{% load ... %}``, list libraries in alphabetical order.
+
+  Do this:
+
+  .. code-block:: html+django
+
+      {% load i18n l10 tz %}
+
+  Don't do this:
+
+  .. code-block:: html+django
+
+      {% load l10 i18n tz %}
+
+* Put exactly one space between ``{%``, tag contents, and ``%}``.
+
+  Do this:
+
+  .. code-block:: html+django
+
+      {% load humanize %}
+
+  Don't do this:
+
+  .. code-block:: html+django
+
+      {%load humanize%}
+
+* Put the ``{% block %}`` tag name in the ``{% endblock %}`` tag if it is not
+  on the same line.
+
+  Do this:
+
+  .. code-block:: html+django
+
+      {% block header %}
+
+        Code goes here
+
+      {% endblock header %}
+
+  Don't do this:
+
+  .. code-block:: html+django
+
+      {% block header %}
+
+        Code goes here
+
+      {% endblock %}
+
+* Inside curly braces, separate tokens by single spaces, except for around the
+  ``.`` for attribute access and the ``|`` for a filter.
+
+  Do this:
+
+  .. code-block:: html+django
+
+    {% if user.name|lower == "admin" %}
+
+  Don't do this:
+
+  .. code-block:: html+django
+
+    {% if user . name | lower  ==  "admin" %}
+
+    {{ user.name | upper }}
+
+* Within a template using ``{% extends %}``, avoid indenting top-level
+  ``{% block %}`` tags.
+
+  Do this:
+
+  .. code-block:: html+django
+
+      {% extends "base.html" %}
+
+      {% block content %}
+
+  Don't do this:
+
+  .. code-block:: html+django
+
+      {% extends "base.html" %}
+
+        {% block content %}
+        ...
 
 View style
 ==========
@@ -239,13 +366,11 @@ View style
 
   Do this::
 
-      def my_view(request, foo):
-          # ...
+      def my_view(request, foo): ...
 
   Don't do this::
 
-      def my_view(req, foo):
-          # ...
+      def my_view(req, foo): ...
 
 Model style
 ===========
@@ -275,21 +400,13 @@ Model style
           last_name = models.CharField(max_length=40)
 
           class Meta:
-              verbose_name_plural = 'people'
+              verbose_name_plural = "people"
 
   Don't do this::
 
       class Person(models.Model):
-          first_name = models.CharField(max_length=20)
-          last_name = models.CharField(max_length=40)
           class Meta:
-              verbose_name_plural = 'people'
-
-  Don't do this, either::
-
-      class Person(models.Model):
-          class Meta:
-              verbose_name_plural = 'people'
+              verbose_name_plural = "people"
 
           first_name = models.CharField(max_length=20)
           last_name = models.CharField(max_length=40)
@@ -306,16 +423,23 @@ Model style
   * Any custom methods
 
 * If ``choices`` is defined for a given model field, define each choice as a
-  list of tuples, with an all-uppercase name as a class attribute on the model.
+  mapping, with an all-uppercase name as a class attribute on the model.
   Example::
 
     class MyModel(models.Model):
-        DIRECTION_UP = 'U'
-        DIRECTION_DOWN = 'D'
-        DIRECTION_CHOICES = [
-            (DIRECTION_UP, 'Up'),
-            (DIRECTION_DOWN, 'Down'),
-        ]
+        DIRECTION_UP = "U"
+        DIRECTION_DOWN = "D"
+        DIRECTION_CHOICES = {
+            DIRECTION_UP: "Up",
+            DIRECTION_DOWN: "Down",
+        }
+
+  Alternatively, consider using :ref:`field-choices-enum-types`::
+
+    class MyModel(models.Model):
+        class Direction(models.TextChoices):
+            UP = "U", "Up"
+            DOWN = "D", "Down"
 
 Use of ``django.conf.settings``
 ===============================
@@ -330,7 +454,7 @@ as follows::
 
     from django.conf import settings
 
-    settings.configure({}, SOME_SETTING='foo')
+    settings.configure({}, SOME_SETTING="foo")
 
 However, if any setting is accessed before the ``settings.configure`` line,
 this will not work. (Internally, ``settings`` is a ``LazyObject`` which
@@ -360,8 +484,8 @@ Miscellaneous
   documentation </topics/i18n/index>` for details.
 
 * Remove ``import`` statements that are no longer used when you change code.
-  `flake8`_ will identify these imports for you. If an unused import needs to
-  remain for backwards-compatibility, mark the end of with ``# NOQA`` to
+  :pypi:`flake8` will identify these imports for you. If an unused import needs
+  to remain for backwards-compatibility, mark the end of with ``# NOQA`` to
   silence the flake8 warning.
 
 * Systematically remove all trailing whitespaces from your code as those
@@ -384,4 +508,3 @@ For details about the JavaScript code style used by Django, see
 
 .. _black: https://black.readthedocs.io/en/stable/
 .. _editorconfig: https://editorconfig.org/
-.. _flake8: https://pypi.org/project/flake8/

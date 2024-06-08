@@ -9,7 +9,7 @@ class DatabaseClient(BaseDatabaseClient):
     @classmethod
     def settings_to_cmd_args_env(cls, settings_dict, parameters):
         args = [cls.executable_name]
-        options = settings_dict.get("OPTIONS", {})
+        options = settings_dict["OPTIONS"]
 
         host = settings_dict.get("HOST")
         port = settings_dict.get("PORT")
@@ -32,9 +32,9 @@ class DatabaseClient(BaseDatabaseClient):
             args += ["-h", host]
         if port:
             args += ["-p", str(port)]
+        args.extend(parameters)
         if dbname:
             args += [dbname]
-        args.extend(parameters)
 
         env = {}
         if passwd:

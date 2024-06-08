@@ -16,7 +16,7 @@ class ArrayMaxLengthValidator(MaxLengthValidator):
         "%(limit_value)d.",
         "List contains %(show_value)d items, it should contain no more than "
         "%(limit_value)d.",
-        "limit_value",
+        "show_value",
     )
 
 
@@ -26,7 +26,7 @@ class ArrayMinLengthValidator(MinLengthValidator):
         "%(limit_value)d.",
         "List contains %(show_value)d items, it should contain no fewer than "
         "%(limit_value)d.",
-        "limit_value",
+        "show_value",
     )
 
 
@@ -78,7 +78,7 @@ class RangeMaxValueValidator(MaxValueValidator):
         return a.upper is None or a.upper > b
 
     message = _(
-        "Ensure that this range is completely less than or equal to %(limit_value)s."
+        "Ensure that the upper bound of the range is not greater than %(limit_value)s."
     )
 
 
@@ -87,5 +87,5 @@ class RangeMinValueValidator(MinValueValidator):
         return a.lower is None or a.lower < b
 
     message = _(
-        "Ensure that this range is completely greater than or equal to %(limit_value)s."
+        "Ensure that the lower bound of the range is not less than %(limit_value)s."
     )

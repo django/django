@@ -108,6 +108,9 @@ class UpdateQuery(Query):
         called add_update_targets() to hint at the extra information here.
         """
         for field, model, val in values_seq:
+            # Omit generated fields.
+            if field.generated:
+                continue
             if hasattr(val, "resolve_expression"):
                 # Resolve expressions here so that annotations are no longer needed
                 val = val.resolve_expression(self, allow_joins=False, for_save=True)
@@ -134,7 +137,7 @@ class UpdateQuery(Query):
             query = UpdateQuery(model)
             query.values = values
             if self.related_ids is not None:
-                query.add_filter("pk__in", self.related_ids)
+                query.add_filter("pk__in", self.related_ids[model])
             result.append(query)
         return result
 

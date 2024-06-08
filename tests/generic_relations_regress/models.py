@@ -64,12 +64,14 @@ class CharLink(models.Model):
     content_type = models.ForeignKey(ContentType, models.CASCADE)
     object_id = models.CharField(max_length=100)
     content_object = GenericForeignKey()
+    value = models.CharField(max_length=250)
 
 
 class TextLink(models.Model):
     content_type = models.ForeignKey(ContentType, models.CASCADE)
     object_id = models.TextField()
     content_object = GenericForeignKey()
+    value = models.CharField(max_length=250)
 
 
 class OddRelation1(models.Model):
@@ -104,22 +106,15 @@ class Company(models.Model):
     links = GenericRelation(Link)
 
 
-# For testing #13085 fix, we also use Note model defined above
-class Developer(models.Model):
-    name = models.CharField(max_length=15)
-
-
 class Team(models.Model):
     name = models.CharField(max_length=15)
-    members = models.ManyToManyField(Developer)
 
     def __len__(self):
-        return self.members.count()
+        return 0
 
 
 class Guild(models.Model):
     name = models.CharField(max_length=15)
-    members = models.ManyToManyField(Developer)
 
     def __bool__(self):
         return False

@@ -4,6 +4,7 @@ from django.core.checks.security import base, csrf, sessions
 from django.core.management.utils import get_random_secret_key
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
+from django.views.generic import View
 
 
 class CheckSessionCookieSecureTest(SimpleTestCase):
@@ -592,8 +593,9 @@ class CheckReferrerPolicyTest(SimpleTestCase):
             ("strict-origin", "origin"),
         )
         for value in tests:
-            with self.subTest(value=value), override_settings(
-                SECURE_REFERRER_POLICY=value
+            with (
+                self.subTest(value=value),
+                override_settings(SECURE_REFERRER_POLICY=value),
             ):
                 self.assertEqual(base.check_referrer_policy(None), [])
 
@@ -607,6 +609,9 @@ class CheckReferrerPolicyTest(SimpleTestCase):
 
 def failure_view_with_invalid_signature():
     pass
+
+
+good_class_based_csrf_failure_view = View.as_view()
 
 
 class CSRFFailureViewTest(SimpleTestCase):
@@ -638,6 +643,14 @@ class CSRFFailureViewTest(SimpleTestCase):
             [Error(msg, id="security.E101")],
         )
 
+    @override_settings(
+        CSRF_FAILURE_VIEW=(
+            "check_framework.test_security.good_class_based_csrf_failure_view"
+        ),
+    )
+    def test_failure_view_valid_class_based(self):
+        self.assertEqual(csrf.check_csrf_failure_view(None), [])
+
 
 class CheckCrossOriginOpenerPolicyTest(SimpleTestCase):
     @override_settings(
@@ -651,8 +664,11 @@ class CheckCrossOriginOpenerPolicyTest(SimpleTestCase):
     def test_with_coop(self):
         tests = ["same-origin", "same-origin-allow-popups", "unsafe-none"]
         for value in tests:
-            with self.subTest(value=value), override_settings(
-                SECURE_CROSS_ORIGIN_OPENER_POLICY=value,
+            with (
+                self.subTest(value=value),
+                override_settings(
+                    SECURE_CROSS_ORIGIN_OPENER_POLICY=value,
+                ),
             ):
                 self.assertEqual(base.check_cross_origin_opener_policy(None), [])
 

@@ -1,8 +1,7 @@
-from django.contrib.messages import constants, get_level, set_level
+from django.contrib.messages import Message, constants, get_level, set_level
 from django.contrib.messages.api import MessageFailure
 from django.contrib.messages.constants import DEFAULT_LEVELS
 from django.contrib.messages.storage import default_storage
-from django.contrib.messages.storage.base import Message
 from django.http import HttpRequest, HttpResponse
 from django.test import modify_settings, override_settings
 from django.urls import reverse
@@ -32,31 +31,32 @@ class BaseTests:
         "error": constants.ERROR,
     }
 
-    def setUp(self):
-        self.settings_override = override_settings(
-            TEMPLATES=[
-                {
-                    "BACKEND": "django.template.backends.django.DjangoTemplates",
-                    "DIRS": [],
-                    "APP_DIRS": True,
-                    "OPTIONS": {
-                        "context_processors": (
-                            "django.contrib.auth.context_processors.auth",
-                            "django.contrib.messages.context_processors.messages",
-                        ),
-                    },
-                }
-            ],
-            ROOT_URLCONF="messages_tests.urls",
-            MESSAGE_TAGS={},
-            MESSAGE_STORAGE="%s.%s"
-            % (self.storage_class.__module__, self.storage_class.__name__),
-            SESSION_SERIALIZER="django.contrib.sessions.serializers.JSONSerializer",
+    @classmethod
+    def setUpClass(cls):
+        cls.enterClassContext(
+            override_settings(
+                TEMPLATES=[
+                    {
+                        "BACKEND": "django.template.backends.django.DjangoTemplates",
+                        "DIRS": [],
+                        "APP_DIRS": True,
+                        "OPTIONS": {
+                            "context_processors": (
+                                "django.contrib.auth.context_processors.auth",
+                                "django.contrib.messages.context_processors.messages",
+                            ),
+                        },
+                    }
+                ],
+                ROOT_URLCONF="messages_tests.urls",
+                MESSAGE_TAGS={},
+                MESSAGE_STORAGE=(
+                    f"{cls.storage_class.__module__}.{cls.storage_class.__name__}"
+                ),
+                SESSION_SERIALIZER="django.contrib.sessions.serializers.JSONSerializer",
+            )
         )
-        self.settings_override.enable()
-
-    def tearDown(self):
-        self.settings_override.disable()
+        super().setUpClass()
 
     def get_request(self):
         return HttpRequest()

@@ -6,9 +6,10 @@ and conversions. Here are some tests.
 import unittest
 
 from django.contrib.gis.measure import A, Area, D, Distance
+from django.test import SimpleTestCase
 
 
-class DistanceTest(unittest.TestCase):
+class DistanceTest(SimpleTestCase):
     "Testing the Distance object"
 
     def test_init(self):
@@ -36,6 +37,10 @@ class DistanceTest(unittest.TestCase):
         "Testing initialization from invalid units"
         with self.assertRaises(AttributeError):
             D(banana=100)
+
+    def test_init_invalid_area_only_units(self):
+        with self.assertRaises(AttributeError):
+            D(ha=100)
 
     def test_access(self):
         "Testing access in different units"
@@ -156,6 +161,13 @@ class DistanceTest(unittest.TestCase):
         for nm, att in unit_tuple:
             with self.subTest(nm=nm):
                 self.assertEqual(att, D.unit_attname(nm))
+
+    def test_unit_att_name_invalid(self):
+        msg = "Unknown unit type: invalid-unit-name"
+        with self.assertRaisesMessage(AttributeError, msg):
+            D.unit_attname("invalid-unit-name")
+        with self.assertRaisesMessage(AttributeError, msg):
+            A.unit_attname("invalid-unit-name")
 
     def test_hash(self):
         d1 = D(m=99)
@@ -286,6 +298,13 @@ class AreaTest(unittest.TestCase):
         self.assertEqual(repr(a1), "Area(sq_m=100.0)")
         self.assertEqual(repr(a2), "Area(sq_km=3.5)")
 
+    def test_hectare(self):
+        a = A(sq_m=10000)
+        self.assertEqual(a.ha, 1)
+
+    def test_hectare_unit_att_name(self):
+        self.assertEqual(A.unit_attname("Hectare"), "ha")
+
     def test_hash(self):
         a1 = A(sq_m=100)
         a2 = A(sq_m=1000000)
@@ -293,18 +312,3 @@ class AreaTest(unittest.TestCase):
         self.assertEqual(hash(a2), hash(a3))
         self.assertNotEqual(hash(a1), hash(a2))
         self.assertNotEqual(hash(a1), hash(a3))
-
-
-def suite():
-    s = unittest.TestSuite()
-    s.addTest(unittest.makeSuite(DistanceTest))
-    s.addTest(unittest.makeSuite(AreaTest))
-    return s
-
-
-def run(verbosity=2):
-    unittest.TextTestRunner(verbosity=verbosity).run(suite())
-
-
-if __name__ == "__main__":
-    run()

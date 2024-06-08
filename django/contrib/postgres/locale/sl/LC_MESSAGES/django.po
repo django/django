@@ -1,23 +1,24 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Primož Verdnik <primoz.verdnik@gmail.com>, 2017
-# zejn <zejn@kiberpipa.org>, 2016
+# Andrej Marsetič, 2022
+# Primoz Verdnik <primoz.verdnik@gmail.com>, 2017
+# zejn <zelo.zejn+transifex@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-11 20:56+0200\n"
-"PO-Revision-Date: 2020-05-12 20:01+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-19 09:22+0000\n"
+"Last-Translator: Andrej Marsetič, 2022\n"
 "Language-Team: Slovenian (http://www.transifex.com/django/django/language/"
 "sl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: sl\n"
-"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n"
-"%100==4 ? 2 : 3);\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || "
+"n%100==4 ? 2 : 3);\n"
 
 msgid "PostgreSQL extensions"
 msgstr "PostgreSQL razširitve"
@@ -34,7 +35,7 @@ msgstr "Preslikava nizev v nize/null"
 
 #, python-format
 msgid "The value of “%(key)s” is not a string or null."
-msgstr ""
+msgstr "Vrednost \"%(key)s\" ni niz ali ničelna vrednost."
 
 msgid "Could not load JSON data."
 msgstr "Ni bilo mogoče naložiti JSON podatkov."
@@ -110,11 +111,10 @@ msgstr "Navedeni so bili nekateri neznani ključi: %(keys)s"
 
 #, python-format
 msgid ""
-"Ensure that this range is completely less than or equal to %(limit_value)s."
-msgstr "Poskrbite, da bo to območje manj ali enako kot %(limit_value)s."
+"Ensure that the upper bound of the range is not greater than %(limit_value)s."
+msgstr ""
 
 #, python-format
 msgid ""
-"Ensure that this range is completely greater than or equal to "
-"%(limit_value)s."
-msgstr "Poskrbite, da bo to območje večje ali enako %(limit_value)s."
+"Ensure that the lower bound of the range is not less than %(limit_value)s."
+msgstr ""

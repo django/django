@@ -2,6 +2,7 @@
  This module houses the GEOS ctypes prototype functions for the
  unary and binary predicate operations on geometries.
 """
+
 from ctypes import c_byte, c_char_p, c_double
 
 from django.contrib.gis.geos.libgeos import GEOM_PTR, GEOSFuncFactory
@@ -38,6 +39,7 @@ geos_equals = BinaryPredicate("GEOSEquals")
 geos_equalsexact = BinaryPredicate(
     "GEOSEqualsExact", argtypes=[GEOM_PTR, GEOM_PTR, c_double]
 )
+geos_equalsidentical = BinaryPredicate("GEOSEqualsIdentical")
 geos_intersects = BinaryPredicate("GEOSIntersects")
 geos_overlaps = BinaryPredicate("GEOSOverlaps")
 geos_relatepattern = BinaryPredicate(

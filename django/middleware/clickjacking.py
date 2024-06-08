@@ -16,10 +16,10 @@ class XFrameOptionsMiddleware(MiddlewareMixin):
     Do not set the header if it's already set or if the response contains
     a xframe_options_exempt value set to True.
 
-    By default, set the X-Frame-Options header to 'SAMEORIGIN', meaning the
-    response can only be loaded on a frame within the same site. To prevent the
-    response from being loaded in a frame in any site, set X_FRAME_OPTIONS in
-    your project's Django settings to 'DENY'.
+    By default, set the X-Frame-Options header to 'DENY', meaning the response
+    cannot be displayed in a frame, regardless of the site attempting to do so.
+    To enable the response to be loaded on a frame within the same site, set
+    X_FRAME_OPTIONS in your project's Django settings to 'SAMEORIGIN'.
     """
 
     def process_response(self, request, response):

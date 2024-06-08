@@ -1,8 +1,7 @@
 import copy
 import itertools
 import operator
-import warnings
-from functools import total_ordering, wraps
+from functools import wraps
 
 
 class cached_property:
@@ -23,16 +22,7 @@ class cached_property:
             "__set_name__() on it."
         )
 
-    def __init__(self, func, name=None):
-        from django.utils.deprecation import RemovedInDjango50Warning
-
-        if name is not None:
-            warnings.warn(
-                "The name argument is deprecated as it's unnecessary as of "
-                "Python 3.6.",
-                RemovedInDjango50Warning,
-                stacklevel=2,
-            )
+    def __init__(self, func):
         self.real_func = func
         self.__doc__ = getattr(func, "__doc__")
 
@@ -92,7 +82,6 @@ def lazy(func, *resultclasses):
     function is evaluated on every access.
     """
 
-    @total_ordering
     class __proxy__(Promise):
         """
         Encapsulate a function call and act as a proxy for methods that are
@@ -100,102 +89,15 @@ def lazy(func, *resultclasses):
         until one of the methods on the result is called.
         """
 
-        __prepared = False
-
         def __init__(self, args, kw):
-            self.__args = args
-            self.__kw = kw
-            if not self.__prepared:
-                self.__prepare_class__()
-            self.__class__.__prepared = True
+            self._args = args
+            self._kw = kw
 
         def __reduce__(self):
             return (
                 _lazy_proxy_unpickle,
-                (func, self.__args, self.__kw) + resultclasses,
+                (func, self._args, self._kw) + resultclasses,
             )
-
-        def __repr__(self):
-            return repr(self.__cast())
-
-        @classmethod
-        def __prepare_class__(cls):
-            for resultclass in resultclasses:
-                for type_ in resultclass.mro():
-                    for method_name in type_.__dict__:
-                        # All __promise__ return the same wrapper method, they
-                        # look up the correct implementation when called.
-                        if hasattr(cls, method_name):
-                            continue
-                        meth = cls.__promise__(method_name)
-                        setattr(cls, method_name, meth)
-            cls._delegate_bytes = bytes in resultclasses
-            cls._delegate_text = str in resultclasses
-            if cls._delegate_bytes and cls._delegate_text:
-                raise ValueError(
-                    "Cannot call lazy() with both bytes and text return types."
-                )
-            if cls._delegate_text:
-                cls.__str__ = cls.__text_cast
-            elif cls._delegate_bytes:
-                cls.__bytes__ = cls.__bytes_cast
-
-        @classmethod
-        def __promise__(cls, method_name):
-            # Builds a wrapper around some magic method
-            def __wrapper__(self, *args, **kw):
-                # Automatically triggers the evaluation of a lazy value and
-                # applies the given magic method of the result type.
-                res = func(*self.__args, **self.__kw)
-                return getattr(res, method_name)(*args, **kw)
-
-            return __wrapper__
-
-        def __text_cast(self):
-            return func(*self.__args, **self.__kw)
-
-        def __bytes_cast(self):
-            return bytes(func(*self.__args, **self.__kw))
-
-        def __bytes_cast_encoded(self):
-            return func(*self.__args, **self.__kw).encode()
-
-        def __cast(self):
-            if self._delegate_bytes:
-                return self.__bytes_cast()
-            elif self._delegate_text:
-                return self.__text_cast()
-            else:
-                return func(*self.__args, **self.__kw)
-
-        def __str__(self):
-            # object defines __str__(), so __prepare_class__() won't overload
-            # a __str__() method from the proxied class.
-            return str(self.__cast())
-
-        def __eq__(self, other):
-            if isinstance(other, Promise):
-                other = other.__cast()
-            return self.__cast() == other
-
-        def __lt__(self, other):
-            if isinstance(other, Promise):
-                other = other.__cast()
-            return self.__cast() < other
-
-        def __hash__(self):
-            return hash(self.__cast())
-
-        def __mod__(self, rhs):
-            if self._delegate_text:
-                return str(self) % rhs
-            return self.__cast() % rhs
-
-        def __add__(self, other):
-            return self.__cast() + other
-
-        def __radd__(self, other):
-            return other + self.__cast()
 
         def __deepcopy__(self, memo):
             # Instances of this class are effectively immutable. It's just a
@@ -203,6 +105,89 @@ def lazy(func, *resultclasses):
             # complicated for copying.
             memo[id(self)] = self
             return self
+
+        def __cast(self):
+            return func(*self._args, **self._kw)
+
+        # Explicitly wrap methods which are defined on object and hence would
+        # not have been overloaded by the loop over resultclasses below.
+
+        def __repr__(self):
+            return repr(self.__cast())
+
+        def __str__(self):
+            return str(self.__cast())
+
+        def __eq__(self, other):
+            if isinstance(other, Promise):
+                other = other.__cast()
+            return self.__cast() == other
+
+        def __ne__(self, other):
+            if isinstance(other, Promise):
+                other = other.__cast()
+            return self.__cast() != other
+
+        def __lt__(self, other):
+            if isinstance(other, Promise):
+                other = other.__cast()
+            return self.__cast() < other
+
+        def __le__(self, other):
+            if isinstance(other, Promise):
+                other = other.__cast()
+            return self.__cast() <= other
+
+        def __gt__(self, other):
+            if isinstance(other, Promise):
+                other = other.__cast()
+            return self.__cast() > other
+
+        def __ge__(self, other):
+            if isinstance(other, Promise):
+                other = other.__cast()
+            return self.__cast() >= other
+
+        def __hash__(self):
+            return hash(self.__cast())
+
+        def __format__(self, format_spec):
+            return format(self.__cast(), format_spec)
+
+        # Explicitly wrap methods which are required for certain operations on
+        # int/str objects to function correctly.
+
+        def __add__(self, other):
+            return self.__cast() + other
+
+        def __radd__(self, other):
+            return other + self.__cast()
+
+        def __mod__(self, other):
+            return self.__cast() % other
+
+        def __mul__(self, other):
+            return self.__cast() * other
+
+    # Add wrappers for all methods from resultclasses which haven't been
+    # wrapped explicitly above.
+    for resultclass in resultclasses:
+        for type_ in resultclass.mro():
+            for method_name in type_.__dict__:
+                # All __promise__ return the same wrapper method, they look up
+                # the correct implementation when called.
+                if hasattr(__proxy__, method_name):
+                    continue
+
+                # Builds a wrapper around some method. Pass method_name to
+                # avoid issues due to late binding.
+                def __wrapper__(self, *args, __method_name=method_name, **kw):
+                    # Automatically triggers the evaluation of a lazy value and
+                    # applies the given method of the result type.
+                    result = func(*self._args, **self._kw)
+                    return getattr(result, __method_name)(*args, **kw)
+
+                setattr(__proxy__, method_name, __wrapper__)
 
     @wraps(func)
     def __wrapper__(*args, **kw):

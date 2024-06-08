@@ -21,6 +21,9 @@ class Category(models.Model):
     slug = models.SlugField(max_length=20)
     url = models.CharField("The URL", max_length=40)
 
+    class Meta:
+        ordering = ("pk",)
+
     def __str__(self):
         return self.name
 
@@ -460,7 +463,7 @@ class Photo(models.Model):
         self._savecount = 0
 
     def save(self, force_insert=False, force_update=False):
-        super().save(force_insert, force_update)
+        super().save(force_insert=force_insert, force_update=force_update)
         self._savecount += 1
 
 
