@@ -20,7 +20,6 @@ from django.core.exceptions import (
 )
 from django.db import (
     DJANGO_VERSION_PICKLE_KEY,
-    DatabaseError,
     connection,
     connections,
     router,
@@ -48,6 +47,7 @@ from django.db.models.signals import (
     pre_save,
 )
 from django.db.models.utils import AltersData, make_model_tuple
+from django.db.utils import NoRowsAffected
 from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.encoding import force_str
 from django.utils.hashable import make_hashable
@@ -1112,9 +1112,9 @@ class Model(AltersData, metaclass=ModelBase):
                 base_qs, using, pk_val, values, update_fields, forced_update
             )
             if force_update and not updated:
-                raise DatabaseError("Forced update did not affect any rows.")
+                raise NoRowsAffected("Forced update did not affect any rows.")
             if update_fields and not updated:
-                raise DatabaseError("Save with update_fields did not affect any rows.")
+                raise NoRowsAffected("Save with update_fields did not affect any rows.")
         if not updated:
             if meta.order_with_respect_to:
                 # If this is a model with an order_with_respect_to

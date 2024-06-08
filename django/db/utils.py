@@ -26,6 +26,10 @@ class DatabaseError(Error):
     pass
 
 
+class NoRowsAffected(DatabaseError):
+    pass
+
+
 class DataError(DatabaseError):
     pass
 
