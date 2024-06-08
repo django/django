@@ -7,7 +7,7 @@ from django.forms.widgets import CheckboxSelectMultiple
 from django.template import Context, Template
 from django.test import TestCase
 
-from .models import Article, Author, Book, Category, Writer
+from .models import Article, Author, Book, Category, ExplicitPK, Writer
 
 
 class ModelChoiceFieldTests(TestCase):
@@ -78,6 +78,12 @@ class ModelChoiceFieldTests(TestCase):
         f = forms.ModelChoiceField(Category.objects.all(), to_field_name="slug")
         self.assertEqual(f.clean(self.c1.slug), self.c1)
         self.assertEqual(f.clean(self.c1), self.c1)
+
+    def test_model_choice_null_characters(self):
+        f = forms.ModelChoiceField(queryset=ExplicitPK.objects.all())
+        msg = "Null characters are not allowed."
+        with self.assertRaisesMessage(ValidationError, msg):
+            f.clean("\x00something")
 
     def test_choices(self):
         f = forms.ModelChoiceField(
