@@ -224,15 +224,7 @@ Don't worry, you're not expected to read them every time Django makes one, but
 they're designed to be human-editable in case you want to manually tweak how
 Django changes things.
 
-There's a command that will run the migrations for you and manage your database
-schema automatically - that's called :djadmin:`migrate`.
-
-If you're interested, you can also run
-:djadmin:`python manage.py check <check>`; this checks for any problems in
-your project without making migrations or touching the database.
-
-Now, run :djadmin:`migrate` again to create those model tables in your
-database:
+Now, run :djadmin:`migrate` again to create those model tables in your database:
 
 .. console::
 
@@ -242,6 +234,10 @@ database:
     Running migrations:
       Rendering model states... DONE
       Applying polls.0001_initial... OK
+
+If you're interested, you can also run
+:djadmin:`python manage.py check <check>`; this checks for any problems in
+your project without making migrations or touching the database.
 
 The :djadmin:`migrate` command takes all the migrations that haven't been
 applied (Django tracks which ones are applied using a special table in your
