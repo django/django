@@ -224,7 +224,7 @@ Don't worry, you're not expected to read them every time Django makes one, but
 they're designed to be human-editable in case you want to manually tweak how
 Django changes things.
 
-Now, run :djadmin:`migrate` again to create those model tables in your database:
+Now, run :djadmin:`migrate` to create those model tables in your database:
 
 .. console::
 
