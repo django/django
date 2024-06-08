@@ -37,7 +37,9 @@ Minor features
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The ``admin/base.html`` template now has a new block
+  :ref:`extrabody <extrabody>` for adding custom code before the closing
+  ``</body>`` tag.
 
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
