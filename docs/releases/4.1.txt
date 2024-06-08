@@ -190,22 +190,6 @@ Minor features
 * :class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage` now
   replaces paths to CSS source map references with their hashed counterparts.
 
-:mod:`django.contrib.syndication`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-Cache
-~~~~~
-
-* :func:`~django.views.decorators.cache.cache_page` decorator now accepts a
-  callable for ``key_prefix``.
-
-CSRF
-~~~~
-
-* ...
-
 Database backends
 ~~~~~~~~~~~~~~~~~
 

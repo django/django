@@ -705,9 +705,9 @@ setting for the middleware.  It can be used like this::
     @cache_page(60 * 15, key_prefix="site1")
     def my_view(request): ...
 
-The ``key_prefix`` may be either a string, or a callable which receives the
-request object and returns the key prefix. This allows you to generate a key
-prefix dynamically, for example to enable per-user caching::
+The ``key_prefix`` may be either a string, a callable or a dotted path to a callable
+which receives the request object and returns the key prefix. This allows you to
+generate a key prefix dynamically, for example to enable per-user caching::
 
     def per_user_cache_prefixer(request):
         if request.user.is_authenticated:
@@ -739,7 +739,7 @@ Additionally, ``cache_page`` automatically sets ``Cache-Control`` and
 ``Expires`` headers in the response which affect :ref:`downstream caches
 <downstream-caches>`.
 
-.. versionchanged:: 4.1
+.. versionchanged:: 5.1
 
     Support for callable ``key_prefix`` was added.
 

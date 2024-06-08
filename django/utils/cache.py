@@ -24,6 +24,7 @@ from django.core.cache import caches
 from django.http import HttpResponse, HttpResponseNotModified
 from django.utils.http import http_date, parse_etags, parse_http_date_safe, quote_etag
 from django.utils.log import log_response
+from django.utils.module_loading import import_string
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.timezone import get_current_timezone_name
 from django.utils.translation import get_language
@@ -384,16 +385,32 @@ def get_cache_key(request, key_prefix=None, method="GET", cache=None):
     If there isn't a headerlist stored, return None, indicating that the page
     needs to be rebuilt.
     """
-    if key_prefix is None:
-        key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
-    cache_key = _generate_cache_header_key(key_prefix, request)
+    _key_prefix = get_key_prefix(request, key_prefix)
+
+    cache_key = _generate_cache_header_key(_key_prefix, request)
     if cache is None:
         cache = caches[settings.CACHE_MIDDLEWARE_ALIAS]
     headerlist = cache.get(cache_key)
     if headerlist is not None:
-        return _generate_cache_key(request, method, headerlist, key_prefix)
+        return _generate_cache_key(request, method, headerlist, _key_prefix)
     else:
         return None
+
+
+def get_key_prefix(request, key_prefix):
+    """
+    Returns the KEY_PREFIX to use for the cache. The key prefix can be defined by a
+    constant, a callable, or a dotted path to a function that returns the key prefix.
+    """
+    _key_prefix = key_prefix
+    if _key_prefix is None:
+        _key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
+    if callable(_key_prefix):
+        return _key_prefix(request)
+    if isinstance(_key_prefix, str) and "." in _key_prefix:
+        key_prefix_callable = import_string(_key_prefix)
+        return key_prefix_callable(request)
+    return _key_prefix
 
 
 def learn_cache_key(request, response, cache_timeout=None, key_prefix=None, cache=None):
@@ -409,11 +426,10 @@ def learn_cache_key(request, response, cache_timeout=None, key_prefix=None, cach
     cache, this just means that we have to build the response once to get at
     the Vary header and so at the list of headers to use for the cache key.
     """
-    if key_prefix is None:
-        key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
+    _key_prefix = get_key_prefix(request, key_prefix)
     if cache_timeout is None:
         cache_timeout = settings.CACHE_MIDDLEWARE_SECONDS
-    cache_key = _generate_cache_header_key(key_prefix, request)
+    cache_key = _generate_cache_header_key(_key_prefix, request)
     if cache is None:
         cache = caches[settings.CACHE_MIDDLEWARE_ALIAS]
     if response.has_header("Vary"):
@@ -429,12 +445,12 @@ def learn_cache_key(request, response, cache_timeout=None, key_prefix=None, cach
                 headerlist.append("HTTP_" + header)
         headerlist.sort()
         cache.set(cache_key, headerlist, cache_timeout)
-        return _generate_cache_key(request, request.method, headerlist, key_prefix)
+        return _generate_cache_key(request, request.method, headerlist, _key_prefix)
     else:
         # if there is no Vary header, we still need a cache key
         # for the request.build_absolute_uri()
         cache.set(cache_key, [], cache_timeout)
-        return _generate_cache_key(request, request.method, [], key_prefix)
+        return _generate_cache_key(request, request.method, [], _key_prefix)
 
 
 def _to_tuple(s):

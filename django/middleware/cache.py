@@ -49,6 +49,7 @@ from django.conf import settings
 from django.core.cache import DEFAULT_CACHE_ALIAS, caches
 from django.utils.cache import (
     get_cache_key,
+    get_key_prefix,
     get_max_age,
     has_vary_header,
     learn_cache_key,
@@ -56,12 +57,6 @@ from django.utils.cache import (
 )
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.http import parse_http_date_safe
-
-
-def _get_key_prefix(key_prefix, request):
-    if callable(key_prefix):
-        key_prefix = key_prefix(request)
-    return key_prefix
 
 
 class UpdateCacheMiddleware(MiddlewareMixin):
@@ -78,7 +73,7 @@ class UpdateCacheMiddleware(MiddlewareMixin):
         super().__init__(get_response)
         self.cache_timeout = settings.CACHE_MIDDLEWARE_SECONDS
         self.page_timeout = None
-        self.key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
+        self.key_prefix = None
         self.cache_alias = settings.CACHE_MIDDLEWARE_ALIAS
 
     @property
@@ -124,7 +119,7 @@ class UpdateCacheMiddleware(MiddlewareMixin):
                 return response
         patch_response_headers(response, timeout)
         if timeout and response.status_code == 200:
-            key_prefix = _get_key_prefix(self.key_prefix, request)
+            key_prefix = get_key_prefix(request, self.key_prefix)
             if key_prefix is None:
                 return response
             cache_key = learn_cache_key(
@@ -150,7 +145,7 @@ class FetchFromCacheMiddleware(MiddlewareMixin):
 
     def __init__(self, get_response):
         super().__init__(get_response)
-        self.key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
+        self.key_prefix = None
         self.cache_alias = settings.CACHE_MIDDLEWARE_ALIAS
 
     @property
@@ -166,7 +161,7 @@ class FetchFromCacheMiddleware(MiddlewareMixin):
             request._cache_update_cache = False
             return None  # Don't bother checking the cache.
 
-        key_prefix = _get_key_prefix(self.key_prefix, request)
+        key_prefix = get_key_prefix(request, self.key_prefix)
         if key_prefix is None:
             request._cache_update_cache = False
             return None
