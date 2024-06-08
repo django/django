@@ -6,6 +6,7 @@ import sys
 from datetime import datetime
 
 from django.conf import settings
+from django.contrib.staticfiles.handlers import StaticFilesHandler
 from django.core.management.base import BaseCommand, CommandError
 from django.core.servers.basehttp import WSGIServer, get_internal_wsgi_application, run
 from django.db import connections
@@ -65,6 +66,18 @@ class Command(BaseCommand):
             action="store_true",
             help="Skip system checks.",
         )
+        parser.add_argument(
+            "--nostatic",
+            action="store_false",
+            dest="use_static_handler",
+            help="Tells Django to NOT automatically serve static files at STATIC_URL.",
+        )
+        parser.add_argument(
+            "--insecure",
+            action="store_true",
+            dest="insecure_serving",
+            help="Allows serving static files even if DEBUG is False.",
+        )
 
     def execute(self, *args, **options):
         if options["no_color"]:
@@ -75,8 +88,18 @@ class Command(BaseCommand):
         super().execute(*args, **options)
 
     def get_handler(self, *args, **options):
-        """Return the default WSGI handler for the runner."""
-        return get_internal_wsgi_application()
+        """
+        Return the default WSGI handler for the runner, or `StaticFilesHandler` if
+        either of --nostatic/--insecure is passed
+        """
+        handler = get_internal_wsgi_application()
+
+        use_static_handler = options["use_static_handler"]
+        insecure_serving = options["insecure_serving"]
+        if use_static_handler and (settings.DEBUG or insecure_serving):
+            handler = StaticFilesHandler(handler)
+
+        return handler
 
     def handle(self, *args, **options):
         if not settings.DEBUG and not settings.ALLOWED_HOSTS:
