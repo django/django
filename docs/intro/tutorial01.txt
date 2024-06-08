@@ -290,7 +290,7 @@ In the ``polls/urls.py`` file include the following code:
         path("", views.index, name="index"),
     ]
 
-The ``mysite`` project needs a way to find the ``polls/urls.py``file 
+The ``mysite`` project needs a way to find the ``polls/urls.py`` file 
 that we just created.
 
 In ``mysite/urls.py``, add an import for ``django.urls.include`` and 
