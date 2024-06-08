@@ -525,6 +525,7 @@ class I18NViewTests(SimpleTestCase):
 
 @override_settings(ROOT_URLCONF="view_tests.urls")
 class I18nSeleniumTests(SeleniumTestCase):
+    browser = "firefox"
     # The test cases use fixtures & translations from these apps.
     available_apps = [
         "django.contrib.admin",
