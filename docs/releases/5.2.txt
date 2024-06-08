@@ -279,4 +279,5 @@ Features deprecated in 5.2
 Miscellaneous
 -------------
 
-* ...
+* The ``all`` argument for the ``django.contrib.staticfiles.finders.find()``
+  function is deprecated in favor of the ``find_all`` argument.
