@@ -1,4 +1,5 @@
 import mimetypes
+from collections import namedtuple
 from email import charset as Charset
 from email import encoders as Encoders
 from email import generator, message_from_string
@@ -190,6 +191,10 @@ class SafeMIMEMultipart(MIMEMixin, MIMEMultipart):
         MIMEMultipart.__setitem__(self, name, val)
 
 
+Alternative = namedtuple("Alternative", ["content", "mimetype"])
+EmailAttachment = namedtuple("Attachment", ["filename", "content", "mimetype"])
+
+
 class EmailMessage:
     """A container for email information."""
 
@@ -338,7 +343,7 @@ class EmailMessage:
                         # actually binary, read() raises a UnicodeDecodeError.
                         mimetype = DEFAULT_ATTACHMENT_MIME_TYPE
 
-            self.attachments.append((filename, content, mimetype))
+            self.attachments.append(EmailAttachment(filename, content, mimetype))
 
     def attach_file(self, path, mimetype=None):
         """
@@ -471,13 +476,15 @@ class EmailMultiAlternatives(EmailMessage):
             cc,
             reply_to,
         )
-        self.alternatives = alternatives or []
+        self.alternatives = [
+            Alternative(*alternative) for alternative in (alternatives or [])
+        ]
 
     def attach_alternative(self, content, mimetype):
         """Attach an alternative content representation."""
         if content is None or mimetype is None:
             raise ValueError("Both content and mimetype must be provided.")
-        self.alternatives.append((content, mimetype))
+        self.alternatives.append(Alternative(content, mimetype))
 
     def _create_message(self, msg):
         return self._create_attachments(self._create_alternatives(msg))
@@ -492,5 +499,9 @@ class EmailMultiAlternatives(EmailMessage):
             if self.body:
                 msg.attach(body_msg)
             for alternative in self.alternatives:
-                msg.attach(self._create_mime_attachment(*alternative))
+                msg.attach(
+                    self._create_mime_attachment(
+                        alternative.content, alternative.mimetype
+                    )
+                )
         return msg

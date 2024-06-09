@@ -133,7 +133,15 @@ Decorators
 Email
 ~~~~~
 
-* ...
+* Tuple items of :class:`EmailMessage.attachments
+  <django.core.mail.EmailMessage>` and
+  :class:`EmailMultiAlternatives.attachments
+  <django.core.mail.EmailMultiAlternatives>` are now named tuples, as opposed
+  to regular tuples.
+
+* :attr:`EmailMultiAlternatives.alternatives
+  <django.core.mail.EmailMultiAlternatives.alternatives>` is now a list of
+  named tuples, as opposed to regular tuples.
 
 Error Reporting
 ~~~~~~~~~~~~~~~

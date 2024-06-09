@@ -550,6 +550,18 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         msg.attach("example.txt", "Text file content", "text/plain")
         self.assertIn(html_content, msg.message().as_string())
 
+    def test_alternatives(self):
+        msg = EmailMultiAlternatives()
+        html_content = "<p>This is <strong>html</strong></p>"
+        mime_type = "text/html"
+        msg.attach_alternative(html_content, mime_type)
+
+        self.assertEqual(msg.alternatives[0][0], html_content)
+        self.assertEqual(msg.alternatives[0].content, html_content)
+
+        self.assertEqual(msg.alternatives[0][1], mime_type)
+        self.assertEqual(msg.alternatives[0].mimetype, mime_type)
+
     def test_none_body(self):
         msg = EmailMessage("subject", None, "from@example.com", ["to@example.com"])
         self.assertEqual(msg.body, "")
@@ -626,6 +638,22 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         )
 
     def test_attachments(self):
+        msg = EmailMessage()
+        file_name = "example.txt"
+        file_content = "Text file content"
+        mime_type = "text/plain"
+        msg.attach(file_name, file_content, mime_type)
+
+        self.assertEqual(msg.attachments[0][0], file_name)
+        self.assertEqual(msg.attachments[0].filename, file_name)
+
+        self.assertEqual(msg.attachments[0][1], file_content)
+        self.assertEqual(msg.attachments[0].content, file_content)
+
+        self.assertEqual(msg.attachments[0][2], mime_type)
+        self.assertEqual(msg.attachments[0].mimetype, mime_type)
+
+    def test_decoded_attachments(self):
         """Regression test for #9367"""
         headers = {"Date": "Fri, 09 Nov 2001 01:08:47 -0000", "Message-ID": "foo"}
         subject, from_email, to = "hello", "from@example.com", "to@example.com"
@@ -645,14 +673,14 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         self.assertEqual(payload[0].get_content_type(), "multipart/alternative")
         self.assertEqual(payload[1].get_content_type(), "application/pdf")
 
-    def test_attachments_two_tuple(self):
+    def test_decoded_attachments_two_tuple(self):
         msg = EmailMessage(attachments=[("filename1", "content1")])
         filename, content, mimetype = self.get_decoded_attachments(msg)[0]
         self.assertEqual(filename, "filename1")
         self.assertEqual(content, b"content1")
         self.assertEqual(mimetype, "application/octet-stream")
 
-    def test_attachments_MIMEText(self):
+    def test_decoded_attachments_MIMEText(self):
         txt = MIMEText("content1")
         msg = EmailMessage(attachments=[txt])
         payload = msg.message().get_payload()
