@@ -1,0 +1,31 @@
+Browser Bar Integration via OpenSearch
+=======================================
+
+Django supports browser bar integration through the OpenSearch description. This allows users to add your site's search functionality to their browser's search bar.
+
+Creating the OpenSearch Description File
+----------------------------------------
+
+To enable this feature, create an OpenSearch description XML file and serve it from your Django application. Below is an example of what the OpenSearch description file might look like:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
+    <ShortName>Your Site Name</ShortName>
+    <Description>Search Your Site</Description>
+    <Url type="text/html" template="https://www.yoursite.com/search?q={searchTerms}" />
+    <Image height="16" width="16" type="image/x-icon">https://www.yoursite.com/favicon.ico</Image>
+    <InputEncoding>UTF-8</InputEncoding>
+</OpenSearchDescription>
+
+Ensure that the URL in the `template` attribute correctly points to your site's search endpoint.
+
+Integrating OpenSearch with Your Site
+-------------------------------------
+
+To inform browsers about the availability of the OpenSearch description file, add a link tag to your site's HTML <head> section:
+
+<link rel="search" type="application/opensearchdescription+xml" href="/path/to/opensearch.xml" title="Your Site Name">
+
+Replace `/path/to/opensearch.xml` with the actual path to your OpenSearch description file.
+
+For more details on the OpenSearch specification, refer to the OpenSearch documentation at http://www.opensearch.org/Specifications/OpenSearch/1.1.
