@@ -31,18 +31,36 @@ class EmailBackend(BaseEmailBackend):
         **kwargs,
     ):
         super().__init__(fail_silently=fail_silently)
-        self.host = host or settings.EMAIL_HOST
-        self.port = port or settings.EMAIL_PORT
-        self.username = settings.EMAIL_HOST_USER if username is None else username
-        self.password = settings.EMAIL_HOST_PASSWORD if password is None else password
+        self.host = host or settings.EMAIL_PROVIDERS["default"]["HOST"]
+        self.port = port or settings.EMAIL_PROVIDERS["default"]["PORT"]
+        self.username = (
+            settings.EMAIL_PROVIDERS["default"]["HOST_USER"]
+            if username is None
+            else username
+        )
+        self.password = (
+            settings.EMAIL_PROVIDERS["default"]["HOST_PASSWORD"]
+            if password is None
+            else password
+        )
         self.use_tls = settings.EMAIL_USE_TLS if use_tls is None else use_tls
         self.use_ssl = settings.EMAIL_USE_SSL if use_ssl is None else use_ssl
+        # self.use_tls = (
+        #     settings.EMAIL_PROVIDERS["default"]["USE_TLS"]
+        #     if use_tls is None else use_tls
+        # )
+        # self.use_ssl = (
+        #     settings.EMAIL_PROVIDERS["default"]["USE_SSL"]
+        #     if use_ssl is None else use_ssl
+        # )
         self.timeout = settings.EMAIL_TIMEOUT if timeout is None else timeout
         self.ssl_keyfile = (
-            settings.EMAIL_SSL_KEYFILE if ssl_keyfile is None else ssl_keyfile
+            settings.EMAIL_PROVIDERS["default"]["SSL_KEYFILE"]
+            if ssl_keyfile is None else ssl_keyfile
         )
         self.ssl_certfile = (
-            settings.EMAIL_SSL_CERTFILE if ssl_certfile is None else ssl_certfile
+            settings.EMAIL_PROVIDERS["default"]["SSL_CERTFILE"]
+            if ssl_certfile is None else ssl_certfile
         )
         if self.use_ssl and self.use_tls:
             raise ValueError(

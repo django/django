@@ -22,10 +22,51 @@ from django.utils.functional import LazyObject, empty
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
 DEFAULT_STORAGE_ALIAS = "default"
 STATICFILES_STORAGE_ALIAS = "staticfiles"
+DEFAULT_EMAIL_PROVIDER_ALIAS = "default"
 
 # RemovedInDjango60Warning.
 FORMS_URLFIELD_ASSUME_HTTPS_DEPRECATED_MSG = (
     "The FORMS_URLFIELD_ASSUME_HTTPS transitional setting is deprecated."
+)
+EMAIL_BACKEND_DEPRECATED_MSG = (
+    "The EMAIL_BACKEND setting is deprecated. "
+    "Use EMAIL_PROVIDER[\"default\"][\"BACKEND\"] instead."
+)
+EMAIL_HOST_DEPRECATED_MSG = (
+    "The EMAIL_HOST setting is deprecated. "
+    "Use EMAIL_PROVIDER[\"default\"][\"HOST\"] instead."
+)
+EMAIL_PORT_DEPRECATED_MSG = (
+    "The EMAIL_PORT setting is deprecated. "
+    "Use EMAIL_PROVIDER[\"default\"][\"PORT\"] instead."
+)
+EMAIL_USE_LOCALTIME_DEPRECATED_MSG = (
+    "The EMAIL_USE_LOCALTIME setting is deprecated. "
+    "Use EMAIL_PROVIDER[\"default\"][\"USE_LOCALTIME\"] instead."
+)
+EMAIL_HOST_USER_DEPRECATED_MSG = (
+    "The EMAIL_HOST_USER setting is deprecated. "
+    "Use EMAIL_PROVIDER[\"default\"][\"HOST_USER\"] instead."
+)
+EMAIL_HOST_PASSWORD_DEPRECATED_MSG = (
+    "The EMAIL_HOST_PASSWORD setting is deprecated. "
+    "Use EMAIL_PROVIDER[\"default\"][\"HOST_PASSWORD\"] instead."
+)
+EMAIL_USE_TLS_DEPRECATED_MSG = (
+    "The EMAIL_USE_TLS setting is deprecated. "
+    "Use EMAIL_PROVIDER[\"default\"][\"USE_TLS\"] instead."
+)
+EMAIL_USE_SSL_DEPRECATED_MSG = (
+    "The EMAIL_USE_SSL setting is deprecated. "
+    "Use EMAIL_PROVIDER[\"default\"][\"USE_SSL\"] instead."
+)
+EMAIL_SSL_CERTFILE_DEPRECATED_MSG = (
+    "The EMAIL_SSL_CERTFILE setting is deprecated. "
+    "Use EMAIL_PROVIDER[\"default\"][\"SSL_CERTFILE\"] instead."
+)
+EMAIL_SSL_KEYFILE_DEPRECATED_MSG = (
+    "The EMAIL_SSL_KEYFILE setting is deprecated. "
+    "Use EMAIL_PROVIDER[\"default\"][\"SSL_KEYFILE\"] instead."
 )
 
 
@@ -192,6 +233,58 @@ class Settings:
                 RemovedInDjango60Warning,
             )
 
+        if self.is_overridden("EMAIL_BACKEND"):
+            warnings.warn(
+                EMAIL_BACKEND_DEPRECATED_MSG,
+                RemovedInDjango60Warning,
+            )
+
+        if self.is_overridden("EMAIL_HOST"):
+            warnings.warn(
+                EMAIL_HOST_DEPRECATED_MSG,
+                RemovedInDjango60Warning,
+            )
+        if self.is_overridden("EMAIL_PORT"):
+            warnings.warn(
+                EMAIL_PORT_DEPRECATED_MSG,
+                RemovedInDjango60Warning,
+            )
+        if self.is_overridden("EMAIL_USE_LOCALTIME"):
+            warnings.warn(
+                EMAIL_USE_LOCALTIME_DEPRECATED_MSG,
+                RemovedInDjango60Warning,
+            )
+        if self.is_overridden("EMAIL_HOST_USER"):
+            warnings.warn(
+                EMAIL_HOST_USER_DEPRECATED_MSG,
+                RemovedInDjango60Warning,
+            )
+        if self.is_overridden("EMAIL_HOST_PASSWORD"):
+            warnings.warn(
+                EMAIL_HOST_PASSWORD_DEPRECATED_MSG,
+                RemovedInDjango60Warning,
+            )
+        if self.is_overridden("EMAIL_USE_TLS"):
+            warnings.warn(
+                EMAIL_USE_TLS_DEPRECATED_MSG,
+                RemovedInDjango60Warning,
+            )
+        if self.is_overridden("EMAIL_USE_SSL"):
+            warnings.warn(
+                EMAIL_USE_SSL_DEPRECATED_MSG,
+                RemovedInDjango60Warning,
+            )
+        if self.is_overridden("EMAIL_SSL_CERTFILE"):
+            warnings.warn(
+                EMAIL_SSL_CERTFILE_DEPRECATED_MSG,
+                RemovedInDjango60Warning,
+            )
+        if self.is_overridden("EMAIL_SSL_KEYFILE"):
+            warnings.warn(
+                EMAIL_SSL_KEYFILE_DEPRECATED_MSG,
+                RemovedInDjango60Warning,
+            )
+
         if hasattr(time, "tzset") and self.TIME_ZONE:
             # When we can, attempt to validate the timezone. If we can't find
             # this file, no check happens and it's harmless.
@@ -242,6 +335,31 @@ class UserSettingsHolder:
                 RemovedInDjango60Warning,
             )
         super().__setattr__(name, value)
+        if name == "EMAIL_PROVIDERS":
+            self.EMAIL_PROVIDERS.setdefault(
+                DEFAULT_EMAIL_PROVIDER_ALIAS,
+                {"BACKEND": "django.core.mail.backends.smtp.EmailBackend"},
+            )
+            self.EMAIL_PROVIDERS.setdefault(
+                DEFAULT_EMAIL_PROVIDER_ALIAS,
+                {"HOST": "localhost"},
+            )
+            self.EMAIL_PROVIDERS.setdefault(
+                DEFAULT_EMAIL_PROVIDER_ALIAS,
+                {"PORT": 25},
+            )
+            self.EMAIL_PROVIDERS.setdefault(
+                DEFAULT_EMAIL_PROVIDER_ALIAS,
+                {"USE_LOCALTIME": False},
+            )
+            self.EMAIL_PROVIDERS.setdefault(
+                DEFAULT_EMAIL_PROVIDER_ALIAS,
+                {"USE_TLS": False},
+            )
+            self.EMAIL_PROVIDERS.setdefault(
+                DEFAULT_EMAIL_PROVIDER_ALIAS,
+                {"USE_SSL": False},
+            )
 
     def __delattr__(self, name):
         self._deleted.add(name)

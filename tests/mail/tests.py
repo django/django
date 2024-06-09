@@ -14,6 +14,7 @@ from smtplib import SMTP, SMTPException
 from ssl import SSLError
 from unittest import mock, skipUnless
 
+from django.conf import settings
 from django.core import mail
 from django.core.mail import (
     DNS_NAME,
@@ -835,8 +836,14 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             )
         self.assertIsInstance(mail.get_connection(), locmem.EmailBackend)
 
+
     @override_settings(
-        EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+        EMAIL_PROVIDERS={
+            "default": dict(
+                settings.EMAIL_PROVIDERS["default"],
+                BACKEND="django.core.mail.backends.locmem.EmailBackend",
+            ),
+        },
         ADMINS=[("nobody", "nobody@example.com")],
         MANAGERS=[("nobody", "nobody@example.com")],
     )
@@ -1146,11 +1153,18 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
 @requires_tz_support
 class MailTimeZoneTests(SimpleTestCase):
     @override_settings(
-        EMAIL_USE_LOCALTIME=False, USE_TZ=True, TIME_ZONE="Africa/Algiers"
+        EMAIL_PROVIDERS={
+            "default": dict(
+                settings.EMAIL_PROVIDERS["default"],
+                USE_LOCALTIME=False,
+            ),
+        },
+        USE_TZ=True,
+        TIME_ZONE="Africa/Algiers",
     )
     def test_date_header_utc(self):
         """
-        EMAIL_USE_LOCALTIME=False creates a datetime in UTC.
+        EMAIL_PROVIDERS[...]["USE_LOCALTIME"]=False creates a datetime in UTC.
         """
         email = EmailMessage(
             "Subject", "Body", "bounce@example.com", ["to@example.com"]
@@ -1158,11 +1172,18 @@ class MailTimeZoneTests(SimpleTestCase):
         self.assertTrue(email.message()["Date"].endswith("-0000"))
 
     @override_settings(
-        EMAIL_USE_LOCALTIME=True, USE_TZ=True, TIME_ZONE="Africa/Algiers"
+        EMAIL_PROVIDERS={
+            "default": dict(
+                settings.EMAIL_PROVIDERS["default"],
+                USE_LOCALTIME=True,
+            ),
+        },
+        USE_TZ=True,
+        TIME_ZONE="Africa/Algiers",
     )
     def test_date_header_localtime(self):
         """
-        EMAIL_USE_LOCALTIME=True creates a datetime in the local time zone.
+        EMAIL_PROVIDERS[...]["USE_LOCALTIME"]=True creates a datetime in the local time zone.
         """
         email = EmailMessage(
             "Subject", "Body", "bounce@example.com", ["to@example.com"]
@@ -1205,7 +1226,12 @@ class BaseEmailBackendTests(HeadersCheckMixin):
 
     @classmethod
     def setUpClass(cls):
-        cls.enterClassContext(override_settings(EMAIL_BACKEND=cls.email_backend))
+        cls.enterClassContext(override_settings(EMAIL_PROVIDERS={
+            "default": dict(
+                settings.EMAIL_PROVIDERS["default"],
+                BACKEND=cls.email_backend,
+            ),
+        }))
         super().setUpClass()
 
     def assertStartsWith(self, first, second):
@@ -1761,8 +1787,14 @@ class SMTPBackendTestsBase(SimpleTestCase):
             port=port,
         )
         cls._settings_override = override_settings(
-            EMAIL_HOST=cls.smtp_controller.hostname,
-            EMAIL_PORT=cls.smtp_controller.port,
+            EMAIL_PROVIDERS={
+                "default": dict(
+                    settings.EMAIL_PROVIDERS["default"],
+                    BACKEND="django.core.mail.backends.smtp.EmailBackend",
+                    HOST=cls.smtp_controller.hostname,
+                    PORT=cls.smtp_controller.port,
+                ),
+            }
         )
         cls._settings_override.enable()
         cls.addClassCleanup(cls._settings_override.disable)
@@ -1790,8 +1822,13 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         return self.smtp_handler.mailbox
 
     @override_settings(
-        EMAIL_HOST_USER="not empty username",
-        EMAIL_HOST_PASSWORD="not empty password",
+        EMAIL_PROVIDERS={
+            "default": dict(
+                settings.EMAIL_PROVIDERS["default"],
+                HOST_USER="not empty username",
+                HOST_PASSWORD="not empty password",
+            ),
+        }
     )
     def test_email_authentication_use_settings(self):
         backend = smtp.EmailBackend()
@@ -1799,8 +1836,13 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         self.assertEqual(backend.password, "not empty password")
 
     @override_settings(
-        EMAIL_HOST_USER="not empty username",
-        EMAIL_HOST_PASSWORD="not empty password",
+        EMAIL_PROVIDERS={
+            "default": dict(
+                settings.EMAIL_PROVIDERS["default"],
+                HOST_USER="not empty username",
+                HOST_PASSWORD="not empty password",
+            ),
+        }
     )
     def test_email_authentication_override_settings(self):
         backend = smtp.EmailBackend(username="username", password="password")
@@ -1808,8 +1850,13 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         self.assertEqual(backend.password, "password")
 
     @override_settings(
-        EMAIL_HOST_USER="not empty username",
-        EMAIL_HOST_PASSWORD="not empty password",
+        EMAIL_PROVIDERS={
+            "default": dict(
+                settings.EMAIL_PROVIDERS["default"],
+                HOST_USER="not empty username",
+                HOST_PASSWORD="not empty password",
+            ),
+        }
     )
     def test_email_disabled_authentication(self):
         backend = smtp.EmailBackend(username="", password="")
@@ -1846,7 +1893,15 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         backend.connection = mock.Mock(spec=object())
         self.assertIs(backend.open(), False)
 
-    @override_settings(EMAIL_USE_TLS=True)
+    @override_settings(
+        EMAIL_USE_TLS=True,
+        EMAIL_PROVIDERS={
+            "default": dict(
+                settings.EMAIL_PROVIDERS["default"],
+                USE_TLS=True,
+            ),
+        }
+    )
     def test_email_tls_use_settings(self):
         backend = smtp.EmailBackend()
         self.assertTrue(backend.use_tls)
@@ -1868,12 +1923,28 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         with self.assertRaisesMessage(ValueError, msg):
             smtp.EmailBackend(use_ssl=True, use_tls=True)
 
-    @override_settings(EMAIL_USE_SSL=True)
+    @override_settings(
+        EMAIL_USE_SSL=True,
+        EMAIL_PROVIDERS={
+            "default": dict(
+                settings.EMAIL_PROVIDERS["default"],
+                USE_SSL=True,
+            )
+        }
+    )
     def test_email_ssl_use_settings(self):
         backend = smtp.EmailBackend()
         self.assertTrue(backend.use_ssl)
 
-    @override_settings(EMAIL_USE_SSL=True)
+    @override_settings(
+        EMAIL_USE_SSL=True,
+        EMAIL_PROVIDERS={
+            "default": dict(
+                settings.EMAIL_PROVIDERS["default"],
+                USE_SSL=True,
+            )
+        }
+    )
     def test_email_ssl_override_settings(self):
         backend = smtp.EmailBackend(use_ssl=False)
         self.assertFalse(backend.use_ssl)
@@ -1882,12 +1953,28 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         backend = smtp.EmailBackend()
         self.assertFalse(backend.use_ssl)
 
-    @override_settings(EMAIL_SSL_CERTFILE="foo")
+    @override_settings(
+        EMAIL_SSL_CERTFILE="foo",
+        EMAIL_PROVIDERS={
+            "default": dict(
+                settings.EMAIL_PROVIDERS["default"],
+                SSL_CERTFILE="foo",
+            ),
+        }
+    )
     def test_email_ssl_certfile_use_settings(self):
         backend = smtp.EmailBackend()
         self.assertEqual(backend.ssl_certfile, "foo")
 
-    @override_settings(EMAIL_SSL_CERTFILE="foo")
+    @override_settings(
+        EMAIL_SSL_CERTFILE="foo",
+        EMAIL_PROVIDERS={
+            "default": dict(
+                settings.EMAIL_PROVIDERS["default"],
+                SSL_CERTFILE="foo",
+            ),
+        }
+    )
     def test_email_ssl_certfile_override_settings(self):
         backend = smtp.EmailBackend(ssl_certfile="bar")
         self.assertEqual(backend.ssl_certfile, "bar")
@@ -1896,7 +1983,15 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         backend = smtp.EmailBackend()
         self.assertIsNone(backend.ssl_certfile)
 
-    @override_settings(EMAIL_SSL_KEYFILE="foo")
+    @override_settings(
+        EMAIL_SSL_KEYFILE="foo",
+        EMAIL_PROVIDERS={
+            "default": dict(
+                settings.EMAIL_PROVIDERS["default"],
+                SSL_KEYFILE="foo",
+            )
+        }
+    )
     def test_email_ssl_keyfile_use_settings(self):
         backend = smtp.EmailBackend()
         self.assertEqual(backend.ssl_keyfile, "foo")
@@ -1910,7 +2005,15 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         backend = smtp.EmailBackend()
         self.assertIsNone(backend.ssl_keyfile)
 
-    @override_settings(EMAIL_USE_TLS=True)
+    @override_settings(
+        EMAIL_USE_TLS=True,
+        # EMAIL_PROVIDERS={
+        #     "default": dict(
+        #         settings.EMAIL_PROVIDERS["default"],
+        #         USE_TLS=True,
+        #     ),
+        # }
+    )
     def test_email_tls_attempts_starttls(self):
         backend = smtp.EmailBackend()
         self.assertTrue(backend.use_tls)
@@ -1920,7 +2023,15 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
             with backend:
                 pass
 
-    @override_settings(EMAIL_USE_SSL=True)
+    @override_settings(
+        EMAIL_USE_SSL=True,
+        EMAIL_PROVIDERS={
+            "default": dict(
+                settings.EMAIL_PROVIDERS["default"],
+                USE_SSL=True,
+            ),
+        }
+    )
     def test_email_ssl_attempts_ssl_connection(self):
         backend = smtp.EmailBackend()
         self.assertTrue(backend.use_ssl)
