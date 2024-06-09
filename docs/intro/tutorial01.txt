@@ -151,30 +151,7 @@ Now that the server's running, visit http://127.0.0.1:8000/ with your web
 browser. You'll see a "Congratulations!" page, with a rocket taking off.
 It worked!
 
-.. admonition:: Changing the port
-
-    By default, the :djadmin:`runserver` command starts the development server
-    on the internal IP at port 8000.
-
-    If you want to change the server's port, pass
-    it as a command-line argument. For instance, this command starts the server
-    on port 8080:
-
-    .. console::
-
-        $ python manage.py runserver 8080
-
-    If you want to change the server's IP, pass it along with the port. For
-    example, to listen on all available public IPs (which is useful if you are
-    running Vagrant or want to show off your work on other computers on the
-    network), use:
-
-    .. console::
-
-        $ python manage.py runserver 0.0.0.0:8000
-
-    Full docs for the development server can be found in the
-    :djadmin:`runserver` reference.
+(To serve the site on a different port, see the :djadmin:`runserver` reference.)
 
 .. admonition:: Automatic reloading of :djadmin:`runserver`
 
