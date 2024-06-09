@@ -151,10 +151,6 @@ Now's a good time to note: **don't** use this server in anything resembling a
 production environment. It's intended only for use while developing. (We're in
 the business of making web frameworks, not web servers.)
 
-Now that the server's running, visit http://127.0.0.1:8000/ with your web
-browser. You'll see a "Congratulations!" page, with a rocket taking off.
-It worked!
-
 (To serve the site on a different port, see the :djadmin:`runserver` reference.)
 
 .. admonition:: Automatic reloading of :djadmin:`runserver`
