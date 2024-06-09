@@ -35,12 +35,16 @@ from django.db.models.utils import (
 from django.utils import timezone
 from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.functional import cached_property, partition
+from django.utils.regex_helper import _lazy_re_compile
 
 # The maximum number of results to fetch in a get() query.
 MAX_GET_RESULTS = 21
 
 # The maximum number of items to display in a QuerySet.__repr__
 REPR_OUTPUT_SIZE = 20
+
+# Comments are forbidden inside comments.
+COMMENT_FORBIDDEN_PATTERN = _lazy_re_compile(r"/\*|\*/")
 
 
 class BaseIterable:
@@ -1786,12 +1790,13 @@ class QuerySet(AltersData):
     def comment(self, message):
         """Add a comment to the query."""
         clone = self._clone()
-        if "/*" in message or "*/" in message:
+        if COMMENT_FORBIDDEN_PATTERN.search(message):
             raise ValueError(
                 "Cannot pass strings containing /* or */ to comment(). "
                 "Escape or strip these delimiters before calling comment()."
             )
-        clone.query.comments = (*clone.query.comments, message)
+        commented_message = f"/* {message} */"
+        clone.query.comments = (*clone.query.comments, commented_message)
         return clone
 
     ###################################

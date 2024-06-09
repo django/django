@@ -4612,6 +4612,11 @@ class SqlCommentsInQueriesTests(TestCase):
         self.assertIn("SELECT /* ! STRAIGHT_JOIN */ ", captured_queries[0]["sql"])
         self.assertIn("SELECT /*  */ /* some comment */ ", captured_queries[1]["sql"])
 
+    def test_select_count(self):
+        with CaptureQueriesContext(connection) as captured_queries:
+            NamedCategory.objects.comment("COUNT").count()
+        self.assertIn("SELECT /* COUNT */ COUNT", captured_queries[0]["sql"])
+
     def test_comment_before_distinct(self):
         with CaptureQueriesContext(connection) as captured_queries:
             list(NamedCategory.objects.comment("DISTINCT").all().distinct())
@@ -4654,3 +4659,17 @@ class SqlCommentsInQueriesTests(TestCase):
 
             with self.subTest(comment), self.assertRaisesMessage(ValueError, msg):
                 NamedCategory.objects.comment(comment)
+
+    def test_delete(self):
+        with CaptureQueriesContext(connection) as captured_queries:
+            NamedCategory.objects.create(name="test")
+            NamedCategory.objects.comment("DELETE 1").all().delete()
+
+            NamedCategory.objects.create(name="test")
+            NamedCategory.objects.comment("DELETE 2").all().delete()
+        self.assertIn("DELETE FROM /* DELETE 1 */", captured_queries[1]["sql"])
+
+    def test_insert(self):
+        with CaptureQueriesContext(connection) as captured_queries:
+            NamedCategory.objects.comment("INSERT").create(name="test")
+        self.assertIn("INSERT INTO /* INSERT */", captured_queries[0]["sql"])
