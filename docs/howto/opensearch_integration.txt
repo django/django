@@ -12,7 +12,7 @@ To implement this feature, follow these steps:
 
     Create an XML file named `opensearch.xml` with the following content:
 
-    ```xml
+    ``` XML
     <?xml version="1.0" encoding="UTF-8"?>
     <OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
         <ShortName>Your Site Name</ShortName>
@@ -36,7 +36,7 @@ To implement this feature, follow these steps:
 
     Add the following `<link>` tag to the `<head>` section of your site's HTML:
 
-    ```html
+    ```HTML
     <link rel="search" type="application/opensearchdescription+xml" href="/opensearch.xml" title="Your Site Name">
     ```
 
@@ -46,6 +46,6 @@ To implement this feature, follow these steps:
 
     Verify that your OpenSearch integration works by adding your site's search engine to a browser. Different browsers have different methods to add OpenSearch plugins, so consult the browser's documentation for specifics.
 
-By following these steps, users will be able to add your site's search functionality to their browser search bar, providing a more integrated and seamless search experience.
+Following these steps, users can add your site's search functionality to their browser search bar, providing a more integrated and seamless search experience.
 
-For more details on the OpenSearch standard, you can refer to the [OpenSearch documentation](http://www.opensearch.org/Specifications/OpenSearch/1.1).
+For more details on the OpenSearch standard, refer to the [OpenSearch documentation](http://www.opensearch.org/Specifications/OpenSearch/1.1).
