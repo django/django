@@ -715,9 +715,9 @@ generate a key prefix dynamically, for example to enable per-user caching::
         else:
             return "anon"
 
+
     @cache_page(60 * 60, key_prefix=per_user_cache_prefixer)
-    def my_view(request):
-        ...
+    def my_view(request): ...
 
 The callable may also return ``None`` to skip caching::
 
@@ -727,9 +727,9 @@ The callable may also return ``None`` to skip caching::
             return None
         return "prefix1"
 
+
     @cache_page(60 * 60 * 24, key_prefix=selective_cache_prefixer)
-    def my_view(request):
-        ...
+    def my_view(request): ...
 
 The ``key_prefix`` and ``cache`` arguments may be specified together. The
 ``key_prefix`` argument and the :setting:`KEY_PREFIX <CACHES-KEY_PREFIX>`
