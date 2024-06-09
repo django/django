@@ -138,6 +138,10 @@ You'll see the following output on the command line:
     Ignore the warning about unapplied database migrations for now; we'll deal
     with the database shortly.
 
+Now that the server's running, visit http://127.0.0.1:8000/ with your web
+browser. You'll see a "Congratulations!" page, with a rocket taking off.
+It worked!
+
 You've started the Django development server, a lightweight web server written
 purely in Python. We've included this with Django so you can develop things
 rapidly, without having to deal with configuring a production server -- such as
@@ -146,10 +150,6 @@ Apache -- until you're ready for production.
 Now's a good time to note: **don't** use this server in anything resembling a
 production environment. It's intended only for use while developing. (We're in
 the business of making web frameworks, not web servers.)
-
-Now that the server's running, visit http://127.0.0.1:8000/ with your web
-browser. You'll see a "Congratulations!" page, with a rocket taking off.
-It worked!
 
 (To serve the site on a different port, see the :djadmin:`runserver` reference.)
 
