@@ -32,7 +32,6 @@ you quickly accomplish common tasks.
    windows
    writing-migrations
    delete-app
-   opensearch-integration
 
 .. seealso::
 
