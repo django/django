@@ -322,10 +322,6 @@ inside ``aria-describedby``:
     >>> print(f["username"])
     <input type="text" name="username" aria-describedby="custom-description id_username_helptext" maxlength="255" id="id_username" required>
 
-.. versionchanged:: 5.0
-
-    ``aria-describedby`` was added to associate ``help_text`` with its input.
-
 .. versionchanged:: 5.1
 
     ``aria-describedby`` support was added for ``<fieldset>``.
@@ -396,8 +392,6 @@ be ignored in favor of the value from the form's initial data.
 -----------------
 
 .. attribute:: Field.template_name
-
-.. versionadded:: 5.0
 
 The ``template_name`` argument allows a custom template to be used when the
 field is rendered with :meth:`~django.forms.BoundField.as_field_group`. By 
@@ -512,12 +506,6 @@ For each field, we describe the default widget used if you don't specify
         This field normalizes choices to strings, so if choices are required in
         other data types, such as integers or booleans, consider using
         :class:`TypedChoiceField` instead.
-
-    .. versionchanged:: 5.0
-
-        Support for mappings and using
-        :ref:`enumeration types <field-choices-enum-types>` directly in
-        ``choices`` was added.
 
 ``DateField``
 -------------
@@ -1144,8 +1132,6 @@ For each field, we describe the default widget used if you don't specify
     which work just as they do for :class:`CharField`, and one more argument:
 
     .. attribute:: assume_scheme
-
-        .. versionadded:: 5.0
 
         The scheme assumed for URLs provided without one. Defaults to
         ``"http"``. For example, if ``assume_scheme`` is ``"https"`` and the

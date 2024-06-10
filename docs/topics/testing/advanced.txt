@@ -628,10 +628,6 @@ and tear down the test suite.
     custom arguments by calling ``parser.add_argument()`` inside the method, so
     that the :djadmin:`test` command will be able to use those arguments.
 
-    .. versionadded:: 5.0
-
-        The ``durations`` argument was added.
-
 Attributes
 ~~~~~~~~~~
 

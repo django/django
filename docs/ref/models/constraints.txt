@@ -60,8 +60,6 @@ constraint.
 ``violation_error_code``
 ------------------------
 
-.. versionadded:: 5.0
-
 .. attribute:: BaseConstraint.violation_error_code
 
 The error code used when ``ValidationError`` is raised during
@@ -263,8 +261,6 @@ creates a unique index on ``username`` using ``varchar_pattern_ops``.
 ``nulls_distinct``
 ------------------
 
-.. versionadded:: 5.0
-
 .. attribute:: UniqueConstraint.nulls_distinct
 
 Whether rows containing ``NULL`` values covered by the unique constraint should
@@ -283,8 +279,6 @@ PostgreSQL 15+.
 
 ``violation_error_code``
 ------------------------
-
-.. versionadded:: 5.0
 
 .. attribute:: UniqueConstraint.violation_error_code
 

@@ -2301,6 +2301,35 @@ class Discovery(SimpleTestCase):
             self.assertEqual(out.getvalue().strip(), "simple_app")
 
 
+class CommandDBOptionChoiceTests(SimpleTestCase):
+    def test_invalid_choice_db_option(self):
+        expected_error = (
+            "Error: argument --database: invalid choice: "
+            "'deflaut' (choose from 'default', 'other')"
+        )
+        args = [
+            "changepassword",
+            "createsuperuser",
+            "remove_stale_contenttypes",
+            "check",
+            "createcachetable",
+            "dbshell",
+            "flush",
+            "dumpdata",
+            "inspectdb",
+            "loaddata",
+            "showmigrations",
+            "sqlflush",
+            "sqlmigrate",
+            "sqlsequencereset",
+            "migrate",
+        ]
+
+        for arg in args:
+            with self.assertRaisesMessage(CommandError, expected_error):
+                call_command(arg, "--database", "deflaut", verbosity=0)
+
+
 class ArgumentOrder(AdminScriptTestCase):
     """Tests for 2-stage argument parsing scheme.
 
@@ -2623,7 +2652,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
             urls.urlpatterns = old_urlpatterns
 
     def test_project_template_tarball_url(self):
-        """ "
+        """
         Startproject management command handles project template tar/zip balls
         from non-canonical urls.
         """

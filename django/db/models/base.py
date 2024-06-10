@@ -1088,6 +1088,7 @@ class Model(AltersData, metaclass=ModelBase):
         if (
             not raw
             and not force_insert
+            and not force_update
             and self._state.adding
             and (
                 (meta.pk.default and meta.pk.default is not NOT_PROVIDED)

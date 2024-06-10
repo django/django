@@ -1,4 +1,4 @@
-from django.db import connection, transaction
+from django.db import transaction
 from django.db.models import (
     CharField,
     F,
@@ -13,7 +13,6 @@ from django.db.models import (
 )
 from django.db.models.fields.json import KeyTextTransform, KeyTransform
 from django.db.models.functions import Cast, Concat, LPad, Substr
-from django.test import skipUnlessDBFeature
 from django.test.utils import Approximate
 from django.utils import timezone
 
@@ -95,9 +94,8 @@ class TestGeneralAggregate(PostgreSQLTestCase):
             BoolOr("boolean_field"),
             JSONBAgg("integer_field"),
             StringAgg("char_field", delimiter=";"),
+            BitXor("integer_field"),
         ]
-        if connection.features.has_bit_xor:
-            tests.append(BitXor("integer_field"))
         for aggregation in tests:
             with self.subTest(aggregation=aggregation):
                 # Empty result with non-execution optimization.
@@ -133,9 +131,8 @@ class TestGeneralAggregate(PostgreSQLTestCase):
                 StringAgg("char_field", delimiter=";", default=Value("<empty>")),
                 "<empty>",
             ),
+            (BitXor("integer_field", default=0), 0),
         ]
-        if connection.features.has_bit_xor:
-            tests.append((BitXor("integer_field", default=0), 0))
         for aggregation, expected_result in tests:
             with self.subTest(aggregation=aggregation):
                 # Empty result with non-execution optimization.
@@ -348,7 +345,6 @@ class TestGeneralAggregate(PostgreSQLTestCase):
         )
         self.assertEqual(values, {"bitor": 0})
 
-    @skipUnlessDBFeature("has_bit_xor")
     def test_bit_xor_general(self):
         AggregateTestModel.objects.create(integer_field=3)
         values = AggregateTestModel.objects.filter(
@@ -356,14 +352,12 @@ class TestGeneralAggregate(PostgreSQLTestCase):
         ).aggregate(bitxor=BitXor("integer_field"))
         self.assertEqual(values, {"bitxor": 2})
 
-    @skipUnlessDBFeature("has_bit_xor")
     def test_bit_xor_on_only_true_values(self):
         values = AggregateTestModel.objects.filter(
             integer_field=1,
         ).aggregate(bitxor=BitXor("integer_field"))
         self.assertEqual(values, {"bitxor": 1})
 
-    @skipUnlessDBFeature("has_bit_xor")
     def test_bit_xor_on_only_false_values(self):
         values = AggregateTestModel.objects.filter(
             integer_field=0,

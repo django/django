@@ -16,6 +16,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--database",
             default=DEFAULT_DB_ALIAS,
+            choices=tuple(connections),
             help=(
                 "Nominates a database onto which to open a shell. Defaults to the "
                 '"default" database.'

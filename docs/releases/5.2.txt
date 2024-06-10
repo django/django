@@ -1,0 +1,265 @@
+============================================
+Django 5.2 release notes - UNDER DEVELOPMENT
+============================================
+
+*Expected April 2025*
+
+Welcome to Django 5.2!
+
+These release notes cover the :ref:`new features <whats-new-5.2>`, as well as
+some :ref:`backwards incompatible changes <backwards-incompatible-5.2>` you
+should be aware of when upgrading from Django 5.1 or earlier. We've
+:ref:`begun the deprecation process for some features
+<deprecated-features-5.2>`.
+
+See the :doc:`/howto/upgrade-version` guide if you're updating an existing
+project.
+
+Django 5.2 is designated as a :term:`long-term support release
+<Long-term support release>`. It will receive security updates for at least
+three years after its release. Support for the previous LTS, Django 4.2, will
+end in April 2026.
+
+Python compatibility
+====================
+
+Django 5.2 supports Python 3.10, 3.11, 3.12, and 3.13. We **highly recommend**
+and only officially support the latest release of each series.
+
+.. _whats-new-5.2:
+
+What's new in Django 5.2
+========================
+
+Minor features
+--------------
+
+:mod:`django.contrib.admin`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.admindocs`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.auth`
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The default iteration count for the PBKDF2 password hasher is increased from
+  870,000 to 1,000,000.
+
+:mod:`django.contrib.contenttypes`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.gis`
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.messages`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.postgres`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.redirects`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sessions`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sitemaps`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sites`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.staticfiles`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.syndication`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Asynchronous views
+~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Cache
+~~~~~
+
+* ...
+
+CSRF
+~~~~
+
+* ...
+
+Database backends
+~~~~~~~~~~~~~~~~~
+
+* ...
+
+Decorators
+~~~~~~~~~~
+
+* ...
+
+Email
+~~~~~
+
+* ...
+
+Error Reporting
+~~~~~~~~~~~~~~~
+
+* ...
+
+File Storage
+~~~~~~~~~~~~
+
+* ...
+
+File Uploads
+~~~~~~~~~~~~
+
+* ...
+
+Forms
+~~~~~
+
+* ...
+
+Generic Views
+~~~~~~~~~~~~~
+
+* ...
+
+Internationalization
+~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Logging
+~~~~~~~
+
+* ...
+
+Management Commands
+~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Migrations
+~~~~~~~~~~
+
+* ...
+
+Models
+~~~~~~
+
+* ...
+
+Requests and Responses
+~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Security
+~~~~~~~~
+
+* ...
+
+Serialization
+~~~~~~~~~~~~~
+
+* ...
+
+Signals
+~~~~~~~
+
+* ...
+
+Templates
+~~~~~~~~~
+
+* ...
+
+Tests
+~~~~~
+
+* ...
+
+URLs
+~~~~
+
+* ...
+
+Utilities
+~~~~~~~~~
+
+* ...
+
+Validators
+~~~~~~~~~~
+
+* ...
+
+.. _backwards-incompatible-5.2:
+
+Backwards incompatible changes in 5.2
+=====================================
+
+Database backend API
+--------------------
+
+This section describes changes that may be needed in third-party database
+backends.
+
+* ...
+
+:mod:`django.contrib.gis`
+-------------------------
+
+* Support for PostGIS 3.0 is removed.
+
+Dropped support for PostgreSQL 13
+---------------------------------
+
+Upstream support for PostgreSQL 13 ends in November 2025. Django 5.2 supports
+PostgreSQL 14 and higher.
+
+Miscellaneous
+-------------
+
+* ...
+
+.. _deprecated-features-5.2:
+
+Features deprecated in 5.2
+==========================
+
+Miscellaneous
+-------------
+
+* ...

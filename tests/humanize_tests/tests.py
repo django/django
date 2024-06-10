@@ -55,6 +55,9 @@ class HumanizeTests(SimpleTestCase):
             "102",
             "103",
             "111",
+            "-0",
+            "-1",
+            "-105",
             "something else",
             None,
         )
@@ -70,6 +73,9 @@ class HumanizeTests(SimpleTestCase):
             "102nd",
             "103rd",
             "111th",
+            "0th",
+            "-1",
+            "-105",
             "something else",
             None,
         )

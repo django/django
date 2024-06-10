@@ -6,7 +6,7 @@ import warnings
 from functools import partial, update_wrapper
 from urllib.parse import parse_qsl
 from urllib.parse import quote as urlquote
-from urllib.parse import urlparse
+from urllib.parse import urlsplit
 
 from django import forms
 from django.conf import settings
@@ -1384,7 +1384,7 @@ class ModelAdmin(BaseModelAdmin):
         )
 
     def _get_preserved_qsl(self, request, preserved_filters):
-        query_string = urlparse(request.build_absolute_uri()).query
+        query_string = urlsplit(request.build_absolute_uri()).query
         return parse_qsl(query_string.replace(preserved_filters, ""))
 
     def response_add(self, request, obj, post_url_continue=None):
@@ -2398,8 +2398,6 @@ class InlineModelAdmin(BaseModelAdmin):
         js = ["vendor/jquery/jquery%s.js" % extra, "jquery.init.js", "inlines.js"]
         if self.filter_vertical or self.filter_horizontal:
             js.extend(["SelectBox.js", "SelectFilter2.js"])
-        if self.classes and "collapse" in self.classes:
-            js.append("collapse.js")
         return forms.Media(js=["admin/js/%s" % url for url in js])
 
     def get_extra(self, request, obj=None, **kwargs):

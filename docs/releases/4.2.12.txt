@@ -2,7 +2,7 @@
 Django 4.2.12 release notes
 ===========================
 
-*Expected May 6, 2024*
+*May 6, 2024*
 
 Django 4.2.12 fixes a compatibility issue with Python 3.11.9+ and 3.12.3+.
 

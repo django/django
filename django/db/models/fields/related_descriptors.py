@@ -210,7 +210,7 @@ class ForwardManyToOneDescriptor:
             rel_obj_attr,
             instance_attr,
             True,
-            self.field.get_cache_name(),
+            self.field.cache_name,
             False,
         )
 
@@ -486,7 +486,7 @@ class ReverseOneToOneDescriptor:
             rel_obj_attr,
             instance_attr,
             True,
-            self.related.get_cache_name(),
+            self.related.cache_name,
             False,
         )
 
@@ -744,7 +744,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
         def _remove_prefetched_objects(self):
             try:
                 self.instance._prefetched_objects_cache.pop(
-                    self.field.remote_field.get_cache_name()
+                    self.field.remote_field.cache_name
                 )
             except (AttributeError, KeyError):
                 pass  # nothing to clear from cache
@@ -760,7 +760,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
                 )
             try:
                 return self.instance._prefetched_objects_cache[
-                    self.field.remote_field.get_cache_name()
+                    self.field.remote_field.cache_name
                 ]
             except (AttributeError, KeyError):
                 queryset = super().get_queryset()
@@ -798,7 +798,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
                 if not self.field.is_cached(rel_obj):
                     instance = instances_dict[rel_obj_attr(rel_obj)]
                     setattr(rel_obj, self.field.name, instance)
-            cache_name = self.field.remote_field.get_cache_name()
+            cache_name = self.field.remote_field.cache_name
             return queryset, rel_obj_attr, instance_attr, False, cache_name, False
 
         def add(self, *objs, bulk=True):

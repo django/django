@@ -1,0 +1,12 @@
+==========================
+Django 5.0.7 release notes
+==========================
+
+*Expected July 9, 2024*
+
+Django 5.0.7 fixes several bugs in 5.0.6.
+
+Bugfixes
+========
+
+* ...

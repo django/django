@@ -33,25 +33,13 @@ a :class:`django.http.HttpResponseNotAllowed` if the conditions are not met.
 
     Note that request methods should be in uppercase.
 
-    .. versionchanged:: 5.0
-
-        Support for wrapping asynchronous view functions was added.
-
 .. function:: require_GET()
 
     Decorator to require that a view only accepts the GET method.
 
-    .. versionchanged:: 5.0
-
-        Support for wrapping asynchronous view functions was added.
-
 .. function:: require_POST()
 
     Decorator to require that a view only accepts the POST method.
-
-    .. versionchanged:: 5.0
-
-        Support for wrapping asynchronous view functions was added.
 
 .. function:: require_safe()
 
@@ -66,10 +54,6 @@ a :class:`django.http.HttpResponseNotAllowed` if the conditions are not met.
         requests exactly like GET requests in your views. Since some software,
         such as link checkers, rely on HEAD requests, you might prefer
         using ``require_safe`` instead of ``require_GET``.
-
-    .. versionchanged:: 5.0
-
-        Support for wrapping asynchronous view functions was added.
 
 Conditional view processing
 ===========================
@@ -87,10 +71,6 @@ control caching behavior on particular views.
     headers; see
     :doc:`conditional view processing </topics/conditional-view-processing>`.
 
-    .. versionchanged:: 5.0
-
-        Support for wrapping asynchronous view functions was added.
-
 .. module:: django.views.decorators.gzip
 
 GZip compression
@@ -105,10 +85,6 @@ compression on a per-view basis.
     It sets the ``Vary`` header accordingly, so that caches will base their
     storage on the ``Accept-Encoding`` header.
 
-    .. versionchanged:: 5.0
-
-        Support for wrapping asynchronous view functions was added.
-
 .. module:: django.views.decorators.vary
 
 Vary headers
@@ -119,20 +95,12 @@ caching based on specific request headers.
 
 .. function:: vary_on_cookie(func)
 
-    .. versionchanged:: 5.0
-
-        Support for wrapping asynchronous view functions was added.
-
 .. function:: vary_on_headers(*headers)
 
     The ``Vary`` header defines which request headers a cache mechanism should take
     into account when building its cache key.
 
     See :ref:`using vary headers <using-vary-headers>`.
-
-    .. versionchanged:: 5.0
-
-        Support for wrapping asynchronous view functions was added.
 
 .. module:: django.views.decorators.cache
 
@@ -149,10 +117,6 @@ client-side caching.
     :func:`~django.utils.cache.patch_cache_control` for the details of the
     transformation.
 
-    .. versionchanged:: 5.0
-
-        Support for wrapping asynchronous view functions was added.
-
 .. function:: never_cache(view_func)
 
     This decorator adds an ``Expires`` header to the current date/time.
@@ -162,10 +126,6 @@ client-side caching.
     should never be cached.
 
     Each header is only added if it isn't already set.
-
-    .. versionchanged:: 5.0
-
-        Support for wrapping asynchronous view functions was added.
 
 .. module:: django.views.decorators.common
 
@@ -180,6 +140,3 @@ customization of :class:`~django.middleware.common.CommonMiddleware` behavior.
     This decorator allows individual views to be excluded from
     :setting:`APPEND_SLASH` URL normalization.
 
-    .. versionchanged:: 5.0
-
-        Support for wrapping asynchronous view functions was added.

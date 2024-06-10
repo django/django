@@ -4,8 +4,25 @@ from types import MethodType
 from django.apps import apps
 from django.conf import settings
 from django.core import checks
+from django.utils.module_loading import import_string
 
 from .management import _get_builtin_permissions
+
+
+def _subclass_index(class_path, candidate_paths):
+    """
+    Return the index of dotted class path (or a subclass of that class) in a
+    list of candidate paths. If it does not exist, return -1.
+    """
+    cls = import_string(class_path)
+    for index, path in enumerate(candidate_paths):
+        try:
+            candidate_cls = import_string(path)
+            if issubclass(candidate_cls, cls):
+                return index
+        except (ImportError, TypeError):
+            continue
+    return -1
 
 
 def check_user_model(app_configs=None, **kwargs):
@@ -217,4 +234,29 @@ def check_models_permissions(app_configs=None, **kwargs):
                 )
             codenames.add(codename)
 
+    return errors
+
+
+def check_middleware(app_configs, **kwargs):
+    errors = []
+
+    login_required_index = _subclass_index(
+        "django.contrib.auth.middleware.LoginRequiredMiddleware",
+        settings.MIDDLEWARE,
+    )
+
+    if login_required_index != -1:
+        auth_index = _subclass_index(
+            "django.contrib.auth.middleware.AuthenticationMiddleware",
+            settings.MIDDLEWARE,
+        )
+        if auth_index == -1 or auth_index > login_required_index:
+            errors.append(
+                checks.Error(
+                    "In order to use django.contrib.auth.middleware."
+                    "LoginRequiredMiddleware, django.contrib.auth.middleware."
+                    "AuthenticationMiddleware must be defined before it in MIDDLEWARE.",
+                    id="auth.E013",
+                )
+            )
     return errors

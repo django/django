@@ -4,15 +4,16 @@ import warnings
 from asgiref.sync import iscoroutinefunction, markcoroutinefunction, sync_to_async
 
 
-class RemovedInNextVersionWarning(DeprecationWarning):
+class RemovedInDjango60Warning(DeprecationWarning):
     pass
 
 
-class RemovedInDjango60Warning(PendingDeprecationWarning):
+class RemovedInDjango61Warning(PendingDeprecationWarning):
     pass
 
 
-RemovedAfterNextVersionWarning = RemovedInDjango60Warning
+RemovedInNextVersionWarning = RemovedInDjango60Warning
+RemovedAfterNextVersionWarning = RemovedInDjango61Warning
 
 
 class warn_about_renamed_method:

@@ -3,7 +3,7 @@ import itertools
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from django.core.management import BaseCommand
-from django.db import DEFAULT_DB_ALIAS, router
+from django.db import DEFAULT_DB_ALIAS, connections, router
 from django.db.models.deletion import Collector
 
 
@@ -21,6 +21,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--database",
             default=DEFAULT_DB_ALIAS,
+            choices=tuple(connections),
             help='Nominates the database to use. Defaults to the "default" database.',
         )
         parser.add_argument(

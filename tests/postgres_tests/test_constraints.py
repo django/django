@@ -4,7 +4,7 @@ from unittest import mock
 from django.contrib.postgres.indexes import OpClass
 from django.core.checks import Error
 from django.core.exceptions import ValidationError
-from django.db import IntegrityError, NotSupportedError, connection, transaction
+from django.db import IntegrityError, connection, transaction
 from django.db.models import (
     CASCADE,
     CharField,
@@ -265,6 +265,19 @@ class SchemaTests(PostgreSQLTestCase):
             editor.remove_constraint(Scene, constraint)
         self.assertNotIn(constraint.name, self.get_constraints(Scene._meta.db_table))
         Scene.objects.create(scene="ScEnE 10", setting="Sir Bedemir's Castle")
+
+    def test_opclass_func_validate_constraints(self):
+        constraint_name = "test_opclass_func_validate_constraints"
+        constraint = UniqueConstraint(
+            OpClass(Lower("scene"), name="text_pattern_ops"),
+            name="test_opclass_func_validate_constraints",
+        )
+        Scene.objects.create(scene="First scene")
+        # Non-unique scene.
+        msg = f"Constraint “{constraint_name}” is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint.validate(Scene, Scene(scene="first Scene"))
+        constraint.validate(Scene, Scene(scene="second Scene"))
 
 
 class ExclusionConstraintTests(PostgreSQLTestCase):
@@ -984,7 +997,6 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         RangesModel.objects.create(ints=(10, 19))
         RangesModel.objects.create(ints=(51, 60))
 
-    @skipUnlessDBFeature("supports_covering_spgist_indexes")
     def test_range_adjacent_spgist_include(self):
         constraint_name = "ints_adjacent_spgist_include"
         self.assertNotIn(
@@ -1021,7 +1033,6 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             editor.add_constraint(RangesModel, constraint)
         self.assertIn(constraint_name, self.get_constraints(RangesModel._meta.db_table))
 
-    @skipUnlessDBFeature("supports_covering_spgist_indexes")
     def test_range_adjacent_spgist_include_condition(self):
         constraint_name = "ints_adjacent_spgist_include_condition"
         self.assertNotIn(
@@ -1054,7 +1065,6 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             editor.add_constraint(RangesModel, constraint)
         self.assertIn(constraint_name, self.get_constraints(RangesModel._meta.db_table))
 
-    @skipUnlessDBFeature("supports_covering_spgist_indexes")
     def test_range_adjacent_spgist_include_deferrable(self):
         constraint_name = "ints_adjacent_spgist_include_deferrable"
         self.assertNotIn(
@@ -1070,27 +1080,6 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         with connection.schema_editor() as editor:
             editor.add_constraint(RangesModel, constraint)
         self.assertIn(constraint_name, self.get_constraints(RangesModel._meta.db_table))
-
-    def test_spgist_include_not_supported(self):
-        constraint_name = "ints_adjacent_spgist_include_not_supported"
-        constraint = ExclusionConstraint(
-            name=constraint_name,
-            expressions=[("ints", RangeOperators.ADJACENT_TO)],
-            index_type="spgist",
-            include=["id"],
-        )
-        msg = (
-            "Covering exclusion constraints using an SP-GiST index require "
-            "PostgreSQL 14+."
-        )
-        with connection.schema_editor() as editor:
-            with mock.patch(
-                "django.db.backends.postgresql.features.DatabaseFeatures."
-                "supports_covering_spgist_indexes",
-                False,
-            ):
-                with self.assertRaisesMessage(NotSupportedError, msg):
-                    editor.add_constraint(RangesModel, constraint)
 
     def test_range_adjacent_opclass(self):
         constraint_name = "ints_adjacent_opclass"
@@ -1174,7 +1163,6 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             editor.add_constraint(RangesModel, constraint)
         self.assertIn(constraint_name, self.get_constraints(RangesModel._meta.db_table))
 
-    @skipUnlessDBFeature("supports_covering_spgist_indexes")
     def test_range_adjacent_spgist_opclass_include(self):
         constraint_name = "ints_adjacent_spgist_opclass_include"
         self.assertNotIn(

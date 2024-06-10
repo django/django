@@ -83,7 +83,7 @@ class SeleniumTestCaseBase(type(LiveServerTestCase)):
         options = self.import_options(self.browser)()
         if self.headless:
             match self.browser:
-                case "chrome":
+                case "chrome" | "edge":
                     options.add_argument("--headless=new")
                 case "firefox":
                     options.add_argument("-headless")
@@ -142,6 +142,8 @@ class SeleniumTestCase(LiveServerTestCase, metaclass=SeleniumTestCaseBase):
 
                 test.__name__ = f"{name}_{screenshot_case}"
                 test.__qualname__ = f"{test.__qualname__}_{screenshot_case}"
+                test._screenshot_name = name
+                test._screenshot_case = screenshot_case
                 setattr(cls, test.__name__, test)
 
     @classproperty
@@ -191,13 +193,24 @@ class SeleniumTestCase(LiveServerTestCase, metaclass=SeleniumTestCaseBase):
             finally:
                 self.selenium.execute_script("localStorage.removeItem('theme');")
 
-    def set_emulated_media(self, features, media=""):
-        if self.browser != "chrome":
-            self.skipTest("Emulated media controls are only supported on Chrome.")
-        # Chrome Dev Tools Protocol Emulation.setEmulatedMedia
-        # https://chromedevtools.github.io/devtools-protocol/1-3/Emulation/#method-setEmulatedMedia
-        self.selenium.execute_cdp_cmd(
-            "Emulation.setEmulatedMedia", {"media": media, "features": features}
+    def set_emulated_media(self, *, media=None, features=None):
+        if self.browser not in {"chrome", "edge"}:
+            self.skipTest(
+                "Emulation.setEmulatedMedia is only supported on Chromium and "
+                "Chrome-based browsers. See https://chromedevtools.github.io/devtools-"
+                "protocol/1-3/Emulation/#method-setEmulatedMedia for more details."
+            )
+        params = {}
+        if media is not None:
+            params["media"] = media
+        if features is not None:
+            params["features"] = features
+
+        # Not using .execute_cdp_cmd() as it isn't supported by the remote web driver
+        # when using --selenium-hub.
+        self.selenium.execute(
+            driver_command="executeCdpCommand",
+            params={"cmd": "Emulation.setEmulatedMedia", "params": params},
         )
 
     @contextmanager
@@ -214,7 +227,9 @@ class SeleniumTestCase(LiveServerTestCase, metaclass=SeleniumTestCaseBase):
     def take_screenshot(self, name):
         if not self.screenshots:
             return
-        path = Path.cwd() / "screenshots" / f"{self._testMethodName}-{name}.png"
+        test = getattr(self, self._testMethodName)
+        filename = f"{test._screenshot_name}--{name}--{test._screenshot_case}.png"
+        path = Path.cwd() / "screenshots" / filename
         path.parent.mkdir(exist_ok=True, parents=True)
         self.selenium.save_screenshot(path)
 

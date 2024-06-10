@@ -792,13 +792,13 @@ class URLField(CharField):
     def to_python(self, value):
         def split_url(url):
             """
-            Return a list of url parts via urlparse.urlsplit(), or raise
+            Return a list of url parts via urlsplit(), or raise
             ValidationError for some malformed URLs.
             """
             try:
                 return list(urlsplit(url))
             except ValueError:
-                # urlparse.urlsplit can raise a ValueError with some
+                # urlsplit can raise a ValueError with some
                 # misformatted URLs.
                 raise ValidationError(self.error_messages["invalid"], code="invalid")
 
