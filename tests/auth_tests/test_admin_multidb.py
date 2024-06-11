@@ -42,13 +42,17 @@ class MultiDatabaseTests(TestCase):
                 email="test@test.org",
             )
 
+    def tearDown(self):
+        # Reset the routers' state between each test
+        Router.target_db = None
+
     @mock.patch("django.contrib.auth.admin.transaction")
     def test_add_view(self, mock):
         for db in self.databases:
             with self.subTest(db_connection=db):
                 Router.target_db = db
                 self.client.force_login(self.superusers[db])
-                self.client.post(
+                response = self.client.post(
                     reverse("test_adminsite:auth_user_add"),
                     {
                         "username": "some_user",
@@ -56,4 +60,19 @@ class MultiDatabaseTests(TestCase):
                         "password2": "helloworld",
                     },
                 )
+                self.assertEqual(response.status_code, 302)
                 mock.atomic.assert_called_with(using=db)
+
+    @mock.patch("django.contrib.auth.admin.transaction")
+    def test_read_only_methods_add_view(self, mock):
+        for db in self.databases:
+            for method in {"get", "options", "head", "trace"}:
+                with self.subTest(db_connection=db, method=method):
+                    mock.mock_reset()
+                    Router.target_db = db
+                    self.client.force_login(self.superusers[db])
+                    response = getattr(self.client, method)(
+                        reverse("test_adminsite:auth_user_add")
+                    )
+                    self.assertEqual(response.status_code, 200)
+                    mock.atomic.assert_not_called()
