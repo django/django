@@ -515,14 +515,17 @@ pass the translatable string as argument to another function, you can wrap
 this function inside a lazy call yourself. For example::
 
     from django.utils.functional import lazy
-    from django.utils.safestring import mark_safe
     from django.utils.translation import gettext_lazy as _
 
-    mark_safe_lazy = lazy(mark_safe, str)
+    # Simple function to return lowercased version of the lazy string.
+    def to_lower(lazy_string):
+        return lazy_string.lower()
+
+    to_lower_lazy = lazy(to_lower, str)
 
 And then later::
 
-    lazy_string = mark_safe_lazy(_("<p>My <strong>string!</strong></p>"))
+    lazy_string = to_lower_lazy(_("<h6>My <strong>STRING!</strong></h6>"))
 
 Localized names of languages
 ----------------------------
