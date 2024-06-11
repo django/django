@@ -847,7 +847,9 @@ class ModelFormBaseTest(TestCase):
         self.assertEqual(m1.mode, mode)
 
     def test_renderer_kwarg(self):
-        custom = object()
+        from django.forms.renderers import BaseRenderer
+
+        custom = type("custom", (BaseRenderer,), {})()
         self.assertIs(ProductForm(renderer=custom).renderer, custom)
 
     def test_default_splitdatetime_field(self):
