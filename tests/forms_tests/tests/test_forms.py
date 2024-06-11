@@ -8,6 +8,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.validators import MaxValueValidator, RegexValidator
 from django.forms import (
     BooleanField,
+    BoundField,
     CharField,
     CheckboxSelectMultiple,
     ChoiceField,
@@ -5328,4 +5329,32 @@ class OverrideTests(SimpleTestCase):
             str(f),
             '<label for="id_name" class="required">Name:</label>'
             '<legend class="required">Language:</legend>',
+        )
+
+    def test_custom_boundfield(self):
+        class CustomBoundField(BoundField):
+
+            def label_tag(self, contents=None, attrs=None, label_suffix=None, tag=None):
+                attrs = attrs or {}
+                attrs["class"] = "custom-class"
+                return super().label_tag(contents, attrs, label_suffix, tag)
+
+        class CustomBoundField2(BoundField):
+
+            def label_tag(self, contents=None, attrs=None, label_suffix=None, tag=None):
+                attrs = attrs or {}
+                attrs["class"] = "custom-class-2"
+                return super().label_tag(contents, attrs, label_suffix, tag)
+
+        class CustomFrameworkForm(FrameworkForm):
+            name = CharField(bound_field_class=CustomBoundField)
+
+            template_name = "forms_tests/legend_test.html"
+            bound_field_class = CustomBoundField2
+
+        f = CustomFrameworkForm()
+        self.assertHTMLEqual(
+            str(f),
+            '<label for="id_name" class="custom-class">Name:</label>'
+            '<legend class="custom-class-2">Language:</legend>',
         )

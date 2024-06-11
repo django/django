@@ -934,6 +934,29 @@ When set to ``True`` (the default), required form fields will have the
 ``use_required_attribute=False`` to avoid incorrect browser validation when
 adding and deleting forms from a formset.
 
+.. attribute:: Form.bound_field_class
+
+Allows you set a different :class:`~django.forms.BoundField` class to use for the form. This
+allows to override, for instance, :meth:`~django.forms.BoundField.label_tag`/
+:meth:`~django.forms.BoundField.legend_tag` to use in templates.
+
+.. code-block:: pycon
+
+   >>> class CustomBoundField(BoundField):
+   ...     def label_tag(self, contents=None, attrs=None, label_suffix=None, tag=None):
+   ...         attrs = attrs or {}
+   ...         attrs["class"] = "custom-class"
+   ...         return super().label_tag(contents, attrs, label_suffix, tag)
+   ... class UserForm(forms.Form):
+   ...     bound_field_class = CustomBoundField
+   ...     name = CharField()
+   ...
+   >>> f = UserForm()
+   >>> print(f["username"].label_tag)
+   <label for="id_name" class="custom-class">Name:</label>
+
+.. versionchanged:: 5.1
+
 Configuring the rendering of a form's widgets
 ---------------------------------------------
 
@@ -1416,7 +1439,7 @@ Methods of ``BoundField``
 
 .. method:: BoundField.render(template_name=None, context=None, renderer=None)
 
-    The render method is called by ``as_field_group``. All arguments are 
+    The render method is called by ``as_field_group``. All arguments are
     optional and default to:
 
     * ``template_name``: :attr:`.BoundField.template_name`
