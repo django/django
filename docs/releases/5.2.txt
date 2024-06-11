@@ -50,6 +50,38 @@ be a ``CompositePrimaryKey``::
 
 See :doc:`/topics/composite-primary-key` for more details.
 
+Simplified usage of :class:`~django.forms.BoundField`
+-----------------------------------------------------
+
+Prior to 5.2, it was necessary to override :meth:`.Field.get_bound_field()` to
+use custom :class:`~django.forms.BoundField`. Django now supports specifying a
+:class:`~django.forms.BoundField` class to use at a project, form and
+field level::
+
+    from django.forms import Form
+    from django.forms.boundfield import BoundField
+    from django.forms.renderers import DjangoTemplates
+
+
+    class BoundFieldWithCssClass(BoundField):
+        def css_classes(self, extra_classes=None):
+            return super().css_classes("user-form")
+
+
+    class CustomForm(Form):
+        # Override per-form.
+        bound_field_class = BoundFieldWithCssClass
+
+        # Or per-field.
+        name = CharField(bound_field_class=BoundFieldWithCssClass)
+
+
+    # Alternatively, set bound_field_class on your custom FORM_RENDERER.
+    class CustomRenderer(DjangoTemplates):
+        bound_field_class = BoundFieldWithCssClass
+
+See :ref:`custom-boundfield` for more details.
+
 Minor features
 --------------
 

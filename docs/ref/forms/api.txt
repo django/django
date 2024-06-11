@@ -934,6 +934,30 @@ When set to ``True`` (the default), required form fields will have the
 ``use_required_attribute=False`` to avoid incorrect browser validation when
 adding and deleting forms from a formset.
 
+.. attribute:: Form.bound_field_class
+
+.. versionadded:: 5.2
+
+Specify a :class:`~django.forms.BoundField` class to be used on the form. For
+example::
+
+    from django import forms
+
+
+    class CustomBoundField(forms.BoundField):
+        def label_tag(self, contents=None, attrs=None, label_suffix=None, tag=None):
+            attrs = attrs or {}
+            attrs["class"] = "wide"
+            return super().label_tag(contents, attrs, label_suffix, tag)
+
+
+    class MyForm(forms.Form):
+        bound_field_class = CustomBoundField
+
+This takes precedence over :attr:`.BaseRenderer.bound_field_class`.
+
+See :ref:`custom-boundfield` for examples of overriding a ``BoundField``.
+
 Configuring the rendering of a form's widgets
 ---------------------------------------------
 
@@ -1124,6 +1148,12 @@ they're not the only way a form object can be displayed.
    :class:`Form` instance.
 
    The ``__str__()`` method of this object displays the HTML for this field.
+
+   You can use :attr:`.Form.bound_field_class` and
+   :attr:`.Field.bound_field_class` to use a different ``BoundField`` class
+   per-form or per-field.
+
+   See :ref:`custom-boundfield` for examples of overriding a ``BoundField``.
 
 To retrieve a single ``BoundField``, use dictionary lookup syntax on your form
 using the field's name as the key:
@@ -1464,25 +1494,33 @@ Methods of ``BoundField``
         >>> print(bound_form["subject"].value())
         hi
 
+.. _custom-boundfield:
+
 Customizing ``BoundField``
 ==========================
 
-If you need to access some additional information about a form field in a
-template and using a subclass of :class:`~django.forms.Field` isn't
-sufficient, consider also customizing :class:`~django.forms.BoundField`.
+There are multiple ways to use a custom :class:`.BoundField`:
 
-A custom form field can override ``get_bound_field()``:
+* A project can define a project-wide :class:`.BoundField` class using
+  :attr:`.BaseRenderer.bound_field_class` and :setting:`FORM_RENDERER`.
 
-.. method:: Field.get_bound_field(form, field_name)
+* A form can override :attr:`.Form.bound_field_class` or set the constructor
+  ``bound_field_class`` argument in the constructor.
 
-    Takes an instance of :class:`~django.forms.Form` and the name of the field.
-    The return value will be used when accessing the field in a template. Most
-    likely it will be an instance of a subclass of
-    :class:`~django.forms.BoundField`.
+* A custom form field can override :attr:`.Field.bound_field_class` or set the
+  ``bound_field_class`` argument in the constructor.
 
-If you have a ``GPSCoordinatesField``, for example, and want to be able to
+* Lastly, a custom form field can override :meth:`.Field.get_bound_field()`
+  though any of the previous options is preferred.
+
+You may want to use a custom :class:`.BoundField` if you need to access some
+additional information about a form field in a template and using a subclass of
+:class:`~django.forms.Field` isn't sufficient.
+
+For example, if you have a ``GPSCoordinatesField``, and want to be able to
 access additional information about the coordinates in a template, this could
 be implemented as follows::
+
 
     class GPSCoordinatesBoundField(BoundField):
         @property
@@ -1499,11 +1537,35 @@ be implemented as follows::
 
 
     class GPSCoordinatesField(Field):
-        def get_bound_field(self, form, field_name):
-            return GPSCoordinatesBoundField(form, self, field_name)
+        bound_field_class = GPSCoordinatesBoundField
 
 Now you can access the country in a template with
 ``{{ form.coordinates.country }}``.
+
+You may also want to customize the default form field template rendering. For
+example, you can override :meth:`.BoundField.label_tag` to add a custom class::
+
+   class StyledLabelBoundField(BoundField):
+       def label_tag(self, contents=None, attrs=None, label_suffix=None, tag=None):
+           attrs = attrs or {}
+           attrs["class"] = "wide"
+           return super().label_tag(contents, attrs, label_suffix, tag)
+
+
+   class UserForm(forms.Form):
+       bound_field_class = StyledLabelBoundField
+       name = CharField()
+
+This would update the default form rendering:
+
+.. code-block:: pycon
+
+   >>> f = UserForm()
+   >>> print(f["name"].label_tag)
+   <label for="id_name" class="wide">Name:</label>
+
+A project can define a project-wise ``BoundField`` class using
+:attr:`.BaseRenderer.bound_field_class` and a custom :setting:`FORM_RENDERER`.
 
 .. _binding-uploaded-files:
 

@@ -65,6 +65,17 @@ should return a rendered templates (as a string) or raise
 
         Defaults to ``"django/forms/field.html"``
 
+    .. attribute:: bound_field_class
+
+        .. versionadded:: 5.2
+
+        The default :class:`~django.forms.BoundField` to use when rendering
+        forms. If not overridden by :attr:`.Form.bound_field_class` or
+        :attr:`.Field.bound_field_class`, this is the ``BoundField`` class that
+        gets used during rendering.
+
+        Defaults to :class:`django.forms.BoundField`.
+
     .. method:: get_template(template_name)
 
         Subclasses must implement this method with the appropriate template

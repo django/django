@@ -8,6 +8,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.validators import MaxValueValidator, RegexValidator
 from django.forms import (
     BooleanField,
+    BoundField,
     CharField,
     CheckboxSelectMultiple,
     ChoiceField,
@@ -5385,3 +5386,117 @@ class OverrideTests(SimpleTestCase):
             '<label for="id_name" class="required">Name:</label>'
             '<legend class="required">Language:</legend>',
         )
+
+
+class BoundFieldWithoutColon(BoundField):
+    def label_tag(self, contents=None, attrs=None, label_suffix=None, tag=None):
+        return super().label_tag(
+            contents=contents, attrs=attrs, label_suffix="", tag=None
+        )
+
+
+class BoundFieldWithTwoColons(BoundField):
+    def label_tag(self, contents=None, attrs=None, label_suffix=None, tag=None):
+        return super().label_tag(
+            contents=contents, attrs=attrs, label_suffix="::", tag=None
+        )
+
+
+class BoundFieldWithCustomClass(BoundField):
+    def label_tag(self, contents=None, attrs=None, label_suffix=None, tag=None):
+        attrs = attrs or {}
+        attrs["class"] = "custom-class"
+        return super().label_tag(contents, attrs, label_suffix, tag)
+
+
+class BoundFieldOverrideRenderer(DjangoTemplates):
+    bound_field_class = BoundFieldWithoutColon
+
+
+@override_settings(
+    FORM_RENDERER="forms_tests.tests.test_forms.BoundFieldOverrideRenderer"
+)
+class CustomBoundFieldTest(SimpleTestCase):
+    def test_renderer_custom_bound_field(self):
+        t = Template("{{ form }}")
+        html = t.render(Context({"form": Person()}))
+        expected = """
+            <div><label for="id_first_name">First name</label>
+            <input type="text" name="first_name" required
+            id="id_first_name"></div>
+            <div><label for="id_last_name">Last name</label>
+            <input type="text" name="last_name" required
+            id="id_last_name"></div><div>
+            <label for="id_birthday">Birthday</label>
+            <input type="text" name="birthday" required
+            id="id_birthday"></div>"""
+        self.assertHTMLEqual(html, expected)
+
+    def test_form_custom_boundfield(self):
+        class CustomBoundFieldPerson(Person):
+            bound_field_class = BoundFieldWithTwoColons
+
+        with self.subTest("form's BoundField takes over renderer's BoundField"):
+            t = Template("{{ form }}")
+            html = t.render(Context({"form": CustomBoundFieldPerson()}))
+            expected = """
+                <div><label for="id_first_name">First name::</label>
+                <input type="text" name="first_name" required
+                id="id_first_name"></div>
+                <div><label for="id_last_name">Last name::</label>
+                <input type="text" name="last_name" required
+                id="id_last_name"></div><div>
+                <label for="id_birthday">Birthday::</label>
+                <input type="text" name="birthday" required
+                id="id_birthday"></div>"""
+            self.assertHTMLEqual(html, expected)
+
+        with self.subTest("Constructor argument takes over class property"):
+            t = Template("{{ form }}")
+            html = t.render(
+                Context(
+                    {
+                        "form": CustomBoundFieldPerson(
+                            bound_field_class=BoundFieldWithCustomClass
+                        )
+                    }
+                )
+            )
+            expected = """
+                <div><label class="custom-class" for="id_first_name">First name:</label>
+                <input type="text" name="first_name" required
+                id="id_first_name"></div>
+                <div><label class="custom-class" for="id_last_name">Last name:</label>
+                <input type="text" name="last_name" required
+                id="id_last_name"></div><div>
+                <label class="custom-class" for="id_birthday">Birthday:</label>
+                <input type="text" name="birthday" required
+                id="id_birthday"></div>"""
+            self.assertHTMLEqual(html, expected)
+
+    def test_field_custom_bound_field(self):
+        class BoundFieldWithTwoColonsCharField(CharField):
+            bound_field_class = BoundFieldWithTwoColons
+
+        class CustomFieldBoundFieldPerson(Person):
+            bound_field_class = BoundField
+
+            first_name = BoundFieldWithTwoColonsCharField()
+            last_name = BoundFieldWithTwoColonsCharField(
+                bound_field_class=BoundFieldWithCustomClass
+            )
+
+        html = Template("{{ form }}").render(
+            Context({"form": CustomFieldBoundFieldPerson()})
+        )
+        expected = """
+            <div><label for="id_first_name">First name::</label>
+            <input type="text" name="first_name" required
+            id="id_first_name"></div>
+            <div><label class="custom-class" for="id_last_name">Last name:</label>
+            <input type="text" name="last_name" required
+            id="id_last_name"></div><div>
+            <label for="id_birthday">Birthday:</label>
+            <input type="text" name="birthday" required
+            id="id_birthday"></div>"""
+        self.assertHTMLEqual(html, expected)
