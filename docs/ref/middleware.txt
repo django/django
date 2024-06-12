@@ -153,6 +153,9 @@ header, the middleware adds one if needed. If the response has an ``ETag`` or
 ``If-Modified-Since``, the response is replaced by an
 :class:`~django.http.HttpResponseNotModified`.
 
+You can handle conditional GET operations with individual views using the
+:func:`~django.views.decorators.http.conditional_page()` decorator.
+
 Locale middleware
 -----------------
 
