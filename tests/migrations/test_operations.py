@@ -1345,6 +1345,89 @@ class OperationTests(OperationTestBase):
         ponyrider = PonyRider.objects.create()
         ponyrider.riders.add(jockey)
 
+    def test_rename_m2m_field_with_2_references(self):
+        app_label = "test_rename_multiple_references"
+        project_state = self.apply_operations(
+            app_label,
+            ProjectState(),
+            operations=[
+                migrations.CreateModel(
+                    name="Person",
+                    fields=[
+                        (
+                            "id",
+                            models.BigAutoField(
+                                auto_created=True,
+                                primary_key=True,
+                                serialize=False,
+                                verbose_name="ID",
+                            ),
+                        ),
+                        ("name", models.CharField(max_length=255)),
+                    ],
+                ),
+                migrations.CreateModel(
+                    name="Relation",
+                    fields=[
+                        (
+                            "id",
+                            models.BigAutoField(
+                                auto_created=True,
+                                primary_key=True,
+                                serialize=False,
+                                verbose_name="ID",
+                            ),
+                        ),
+                        (
+                            "child",
+                            models.ForeignKey(
+                                on_delete=models.CASCADE,
+                                related_name="relations_as_child",
+                                to="test_rename_multiple_references.person",
+                            ),
+                        ),
+                        (
+                            "parent",
+                            models.ForeignKey(
+                                on_delete=models.CASCADE,
+                                related_name="relations_as_parent",
+                                to="test_rename_multiple_references.person",
+                            ),
+                        ),
+                    ],
+                ),
+                migrations.AddField(
+                    model_name="person",
+                    name="parents_or_children",
+                    field=models.ManyToManyField(
+                        blank=True,
+                        through="test_rename_multiple_references.Relation",
+                        to="test_rename_multiple_references.person",
+                    ),
+                ),
+            ],
+        )
+        Person = project_state.apps.get_model(app_label, "Person")
+        Relation = project_state.apps.get_model(app_label, "Relation")
+
+        person1 = Person.objects.create(name="John Doe")
+        person2 = Person.objects.create(name="Jane Smith")
+        Relation.objects.create(child=person2, parent=person1)
+
+        self.assertTableExists(app_label + "_person")
+        self.assertTableNotExists(app_label + "_personfoo")
+
+        self.apply_operations(
+            app_label,
+            project_state,
+            operations=[
+                migrations.RenameModel(old_name="Person", new_name="PersonFoo"),
+            ],
+        )
+
+        self.assertTableNotExists(app_label + "_person")
+        self.assertTableExists(app_label + "_personfoo")
+
     def test_add_field(self):
         """
         Tests the AddField operation.
