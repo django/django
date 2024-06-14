@@ -6,7 +6,7 @@ This document will guide you through installing Python 3.12 and Django on
 Windows. It also provides instructions for setting up a virtual environment,
 which makes it easier to work on Python projects. This is meant as a beginner's
 guide for users working on Django projects and does not reflect how Django
-should be installed when developing patches for Django itself.
+should be installed when developing changes for Django itself.
 
 The steps in this guide have been tested with Windows 10. In other
 versions, the steps would be similar. You will need to be familiar with using

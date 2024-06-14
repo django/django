@@ -948,7 +948,7 @@ class RelatedFieldWidgetWrapperTests(SimpleTestCase):
         output = wrapper.render("stream", "value")
         expected = """
         <div class="related-widget-wrapper" data-model-ref="releaseevent">
-          <select name="stream">
+          <select name="stream" data-context="available-source">
           </select>
           <a class="related-widget-wrapper-link add-related" id="add_id_stream"
              data-popup="yes" title="Add another release event"

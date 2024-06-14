@@ -23,6 +23,7 @@ from django.forms.widgets import (
     SelectMultiple,
 )
 from django.utils.choices import BaseChoiceIterator
+from django.utils.hashable import make_hashable
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
@@ -834,8 +835,8 @@ class BaseModelFormSet(BaseFormSet, AltersData):
                     (
                         d._get_pk_val()
                         if hasattr(d, "_get_pk_val")
-                        # Prevent "unhashable type: list" errors later on.
-                        else tuple(d) if isinstance(d, list) else d
+                        # Prevent "unhashable type" errors later on.
+                        else make_hashable(d)
                     )
                     for d in row_data
                 )
