@@ -3664,14 +3664,14 @@ Forms
 
 Globalization (``i18n``/``l10n``)
 ---------------------------------
-* :setting:`DATE_FORMAT`
-* :setting:`DATE_INPUT_FORMATS`
-* :setting:`DATETIME_FORMAT`
-* :setting:`DATETIME_INPUT_FORMATS`
-* :setting:`DECIMAL_SEPARATOR`
+
+.. _settings-i18n:
+
+Internationalization (``i18n``)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 * :setting:`FIRST_DAY_OF_WEEK`
 * :setting:`FORMAT_MODULE_PATH`
-* :setting:`LANGUAGE_CODE`
 * :setting:`LANGUAGE_COOKIE_AGE`
 * :setting:`LANGUAGE_COOKIE_DOMAIN`
 * :setting:`LANGUAGE_COOKIE_HTTPONLY`
@@ -3682,6 +3682,21 @@ Globalization (``i18n``/``l10n``)
 * :setting:`LANGUAGES`
 * :setting:`LANGUAGES_BIDI`
 * :setting:`LOCALE_PATHS`
+* :setting:`TIME_ZONE`
+* :setting:`USE_I18N`
+* :setting:`USE_TZ`
+
+.. _settings-l10n:
+
+Localization (``l10n``)
+~~~~~~~~~~~~~~~~~~~~~~~
+
+* :setting:`DATE_FORMAT`
+* :setting:`DATE_INPUT_FORMATS`
+* :setting:`DATETIME_FORMAT`
+* :setting:`DATETIME_INPUT_FORMATS`
+* :setting:`DECIMAL_SEPARATOR`
+* :setting:`LANGUAGE_CODE`
 * :setting:`MONTH_DAY_FORMAT`
 * :setting:`NUMBER_GROUPING`
 * :setting:`SHORT_DATE_FORMAT`
@@ -3689,10 +3704,7 @@ Globalization (``i18n``/``l10n``)
 * :setting:`THOUSAND_SEPARATOR`
 * :setting:`TIME_FORMAT`
 * :setting:`TIME_INPUT_FORMATS`
-* :setting:`TIME_ZONE`
-* :setting:`USE_I18N`
 * :setting:`USE_THOUSAND_SEPARATOR`
-* :setting:`USE_TZ`
 * :setting:`YEAR_MONTH_FORMAT`
 
 HTTP
