@@ -1,10 +1,8 @@
 """Functions for use in URLsconfs."""
 
 from functools import partial
-from importlib import import_module
-
+from typing import Union, Tuple, Callable, Dict, Optional, List
 from django.core.exceptions import ImproperlyConfigured
-
 from .resolvers import (
     LocalePrefixPattern,
     RegexPattern,
@@ -14,29 +12,39 @@ from .resolvers import (
 )
 
 
-def include(arg, namespace=None):
+def include(arg: Union[str, Tuple], namespace: Optional[str] = None) -> Tuple:
+    """
+    Include another URLconf module, optionally providing a namespace.
+
+    :param arg: A string or a tuple containing the URLconf module and an optional app_name.
+    :param namespace: An optional namespace for the included URLconf.
+    :return: A tuple containing the URLconf module, app_name, and namespace.
+    :raises ImproperlyConfigured: If the provided arguments are invalid.
+    """
     app_name = None
     if isinstance(arg, tuple):
         # Callable returning a namespace hint.
         try:
             urlconf_module, app_name = arg
         except ValueError:
-            if namespace:
-                raise ImproperlyConfigured(
-                    "Cannot override the namespace for a dynamic module that "
-                    "provides a namespace."
-                )
             raise ImproperlyConfigured(
                 "Passing a %d-tuple to include() is not supported. Pass a "
                 "2-tuple containing the list of patterns and app_name, and "
                 "provide the namespace argument to include() instead." % len(arg)
+            )
+        if namespace:
+            raise ImproperlyConfigured(
+                "Cannot override the namespace for a dynamic module that "
+                "provides a namespace."
             )
     else:
         # No namespace hint - use manually provided namespace.
         urlconf_module = arg
 
     if isinstance(urlconf_module, str):
+        from importlib import import_module
         urlconf_module = import_module(urlconf_module)
+        
     patterns = getattr(urlconf_module, "urlpatterns", urlconf_module)
     app_name = getattr(urlconf_module, "app_name", app_name)
     if namespace and not app_name:
@@ -48,7 +56,7 @@ def include(arg, namespace=None):
         )
     namespace = namespace or app_name
     # Make sure the patterns can be iterated through (without this, some
-    # testcases will break).
+    # test cases will break).
     if isinstance(patterns, (list, tuple)):
         for url_pattern in patterns:
             pattern = getattr(url_pattern, "pattern", None)
@@ -59,7 +67,24 @@ def include(arg, namespace=None):
     return (urlconf_module, app_name, namespace)
 
 
-def _path(route, view, kwargs=None, name=None, Pattern=None):
+def _path(
+    route: str,
+    view: Union[Callable, List, Tuple],
+    kwargs: Optional[Dict] = None,
+    name: Optional[str] = None,
+    Pattern: type = RoutePattern
+) -> Union[URLPattern, URLResolver]:
+    """
+    Create a URL pattern or resolver.
+
+    :param route: The URL pattern as a string.
+    :param view: The view function or a list/tuple for include().
+    :param kwargs: Additional arguments to pass to the view.
+    :param name: The name of the URL pattern.
+    :param Pattern: The pattern class to use (RoutePattern or RegexPattern).
+    :return: A URLPattern or URLResolver instance.
+    :raises TypeError: If the arguments are of incorrect types.
+    """
     from django.views import View
 
     if kwargs is not None and not isinstance(kwargs, dict):
@@ -94,3 +119,4 @@ def _path(route, view, kwargs=None, name=None, Pattern=None):
 
 path = partial(_path, Pattern=RoutePattern)
 re_path = partial(_path, Pattern=RegexPattern)
+
