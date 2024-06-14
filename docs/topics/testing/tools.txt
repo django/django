@@ -2136,6 +2136,34 @@ and contents::
             # Verify that the subject of the first message is correct.
             self.assertEqual(mail.outbox[0].subject, "Subject here")
 
+Here is another example testing the content of an email with
+:ref:`multiple content types <topic-alternative-content-types>`::
+
+    from django.core import mail
+    from django.core.mail import EmailMultiAlternatives
+    from django.test import TestCase
+
+
+    class EmailTest(TestCase):
+        def test_send_email(self):
+            # Send message.
+            text_part = "Here is the message."
+            html_part = "<strong>Here is the message.</strong>"
+            msg = EmailMultiAlternatives(
+                "Subject here",
+                text_part,
+                "from@example.com",
+                ["to@example.com"],
+            )
+            msg.attach_alternative(html_part, "text/html")
+            msg.send()
+
+            # Verify that the text content for the first message is correct.
+            self.assertEqual(mail.outbox[0].body, text_part)
+
+            # Verify that the HTML content for the first message is correct.
+            self.assertEqual(mail.outbox[0].alternatives[0][0], html_part)
+
 As noted :ref:`previously <emptying-test-outbox>`, the test outbox is emptied
 at the start of every test in a Django ``*TestCase``. To empty the outbox
 manually, assign the empty list to ``mail.outbox``::

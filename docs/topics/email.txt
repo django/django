@@ -379,6 +379,8 @@ The class has the following methods:
   For MIME types starting with :mimetype:`text/`, binary data is handled as in
   ``attach()``.
 
+.. _topic-alternative-content-types:
+
 Sending alternative content types
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
