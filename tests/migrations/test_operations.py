@@ -1346,7 +1346,7 @@ class OperationTests(OperationTestBase):
         ponyrider.riders.add(jockey)
 
     def test_rename_m2m_field_with_2_references(self):
-        app_label = "test_rename_multiple_references"
+        app_label = "test_rename_many_refs"
         project_state = self.apply_operations(
             app_label,
             ProjectState(),
@@ -1383,7 +1383,7 @@ class OperationTests(OperationTestBase):
                             models.ForeignKey(
                                 on_delete=models.CASCADE,
                                 related_name="relations_as_child",
-                                to="test_rename_multiple_references.person",
+                                to=f"{app_label}.person",
                             ),
                         ),
                         (
@@ -1391,7 +1391,7 @@ class OperationTests(OperationTestBase):
                             models.ForeignKey(
                                 on_delete=models.CASCADE,
                                 related_name="relations_as_parent",
-                                to="test_rename_multiple_references.person",
+                                to=f"{app_label}.person",
                             ),
                         ),
                     ],
@@ -1401,8 +1401,8 @@ class OperationTests(OperationTestBase):
                     name="parents_or_children",
                     field=models.ManyToManyField(
                         blank=True,
-                        through="test_rename_multiple_references.Relation",
-                        to="test_rename_multiple_references.person",
+                        through=f"{app_label}.Relation",
+                        to=f"{app_label}.person",
                     ),
                 ),
             ],
@@ -1415,18 +1415,18 @@ class OperationTests(OperationTestBase):
         Relation.objects.create(child=person2, parent=person1)
 
         self.assertTableExists(app_label + "_person")
-        self.assertTableNotExists(app_label + "_personfoo")
+        self.assertTableNotExists(app_label + "_other")
 
         self.apply_operations(
             app_label,
             project_state,
             operations=[
-                migrations.RenameModel(old_name="Person", new_name="PersonFoo"),
+                migrations.RenameModel(old_name="Person", new_name="Other"),
             ],
         )
 
         self.assertTableNotExists(app_label + "_person")
-        self.assertTableExists(app_label + "_personfoo")
+        self.assertTableExists(app_label + "_other")
 
     def test_add_field(self):
         """
