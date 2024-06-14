@@ -2331,7 +2331,7 @@ class SchemaTests(TransactionTestCase):
         self.assertForeignKeyExists(Book, "author_id", "schema_author", "renamed")
 
     @isolate_apps("schema")
-    def test_remove_primary_key_from_model(self):
+    def test_remove_primary_key_field_so_model_is_empty(self):
         class Author(Model):
             name = CharField(max_length=255, primary_key=True)
 
