@@ -243,15 +243,16 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         self.create_model(new_model)
 
         # Copy data from the old table into the new table
-        self.execute(
-            "INSERT INTO %s (%s) SELECT %s FROM %s"
-            % (
-                self.quote_name(new_model._meta.db_table),
-                ", ".join(self.quote_name(x) for x in mapping),
-                ", ".join(mapping.values()),
-                self.quote_name(model._meta.db_table),
+        if mapping:
+            self.execute(
+                "INSERT INTO %s (%s) SELECT %s FROM %s"
+                % (
+                    self.quote_name(new_model._meta.db_table),
+                    ", ".join(self.quote_name(x) for x in mapping),
+                    ", ".join(mapping.values()),
+                    self.quote_name(model._meta.db_table),
+                )
             )
-        )
 
         # Delete the old table to make way for the new
         self.delete_model(model, handle_autom2m=False)
