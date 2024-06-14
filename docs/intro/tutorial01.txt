@@ -76,7 +76,7 @@ work, see :ref:`troubleshooting-django-admin`.
     Put your code in some directory **outside** of the document root, such as
     :file:`/home/mycode`.
 
-Let's look at what :djadmin:`startproject` created:
+The :djadmin:`startproject` command should put together the :file:`mysite` directory like this.
 
 .. code-block:: text
 
@@ -88,6 +88,8 @@ Let's look at what :djadmin:`startproject` created:
             urls.py
             asgi.py
             wsgi.py
+
+As we proceed through the tutorial we will take closer look at these files, their purpose and function will become clearer then.
 
 The development server
 ======================
