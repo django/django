@@ -12,6 +12,8 @@ from django.db.migrations.optimizer import MigrationOptimizer
 from django.db.migrations.writer import MigrationWriter
 from django.utils.version import get_docs_version
 from django.db.migrations.operations.base import OperationCategory
+from django.db.migrations.operations.fields import FieldOperation
+from django.db.migrations.operations.models import ModelOperation
 
 
 class Command(BaseCommand):
@@ -40,7 +42,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--ignore-dependencies",
             "--ignore-deps",
-            action="store_false",
+            action="store_true",
             dest="ignore_dependencies",
             help="Ignore dependencies, except for those included in the"
             " initial migration.",
@@ -150,11 +152,6 @@ class Command(BaseCommand):
         # We need to take all dependencies from the first migration in the list
         # as it may be 0002 depending on 0001
         first_migration = True
-        ignore_restricted_categories = set([
-            OperationCategory.ADDITION,
-            OperationCategory.ALTERATION
-        ])
-
 
         for smigration in migrations_to_squash:
             if smigration.replaces:
@@ -164,30 +161,29 @@ class Command(BaseCommand):
                     "topics/migrations/#squashing-migrations" % get_docs_version()
                 )
 
-
             if not first_migration and ignore_dependencies:
-                filtered_operations = []
-
-                for operation in smigration.operations:
-                    if (operation.category in ignore_restricted_categories
-                    and isinstance(operation.field, models.fields.related.RelatedField)):
-                        #and operation field app_label != app_label:
-                        continue
-
-                    filtered_operations.append(operation)
+                filtered_operations = self.filter_multi_app_operations(
+                    smigration.app_label, smigration.operations
+                )
 
                 operations.extend(filtered_operations)
-                continue
-
-            operations.extend(smigration.operations)
+            else:
+                operations.extend(smigration.operations)
 
             for dependency in smigration.dependencies:
                 if isinstance(dependency, SwappableTuple):
                     if settings.AUTH_USER_MODEL == dependency.setting:
                         dependencies.add(("__setting__", "AUTH_USER_MODEL"))
-                    else:
+                    elif (
+                        not ignore_dependencies
+                        and not first_migration
+                        and dependency.setting.split(".")[0] == smigration.app_label
+                    ):
                         dependencies.add(dependency)
-                elif dependency[0] != smigration.app_label or first_migration:
+                elif (
+                    not ignore_dependencies
+                    and (dependency[0] != smigration.app_label or first_migration)
+                ) or (ignore_dependencies and first_migration):
                     dependencies.add(dependency)
 
             first_migration = False
@@ -285,6 +281,42 @@ class Command(BaseCommand):
                             '"black" command. You can call it manually.'
                         )
                     )
+
+    def _is_multiapp_operation(self, app_label, operation):
+        return self._is_multiapp_field_operation(
+            app_label, operation
+        ) or self._is_multiapp_model_operation(app_label, operation)
+
+    def _is_multiapp_field_operation(self, app_label, operation):
+        return (
+            isinstance(operation, FieldOperation)
+            and isinstance(operation.field, models.fields.related.RelatedField)
+            and operation.field.related_model.split(".")[0] != app_label
+        )
+
+    def _is_multiapp_model_operation(self, app_label, operation):
+        if isinstance(operation, ModelOperation):
+            for field in operation.fields:
+                if (
+                    isinstance(field[-1], models.fields.related.RelatedField)
+                    and not field[-1].related_model.split(".")[0] != app_label
+                ):
+                    return True
+
+    def filter_multi_app_operations(self, app_label, operations):
+        filtered_operations = []
+        ignore_restricted_categories = set(
+            [OperationCategory.ADDITION, OperationCategory.ALTERATION]
+        )
+
+        for operation in operations:
+            if (operation.category not in ignore_restricted_categories) or (
+                operation.category in ignore_restricted_categories
+                and not self._is_multiapp_operation(app_label, operation)
+            ):
+                filtered_operations.append(operation)
+
+        return filtered_operations
 
     def find_migration(self, loader, app_label, name):
         try:
