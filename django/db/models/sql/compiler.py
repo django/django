@@ -816,6 +816,29 @@ class SQLCompiler:
                             )
                         out_cols.append(s_sql)
                     
+                    # check other combinators qs have same col names
+                    for inner_compiler_ in self.get_combinator_compilers()[1:]:
+                        inner_compiler_.as_sql(with_col_aliases=False)  # define select, extra_select
+                        out_cols_ = []
+                        for _, (s_sql, s_params), alias in inner_compiler_.select + inner_compiler_.extra_select:
+                            if alias:
+                                s_sql = '"%s".%s' % (
+                                    'combined_{}'.format(self.query.combined_count),
+                                    self.connection.ops.quote_name(alias),
+                                )
+                            else:
+                                s_sql = '"%s".%s' % (
+                                    'combined_{}'.format(self.query.combined_count),
+                                    s_sql.split('.')[-1]
+                                )
+                            out_cols_.append(s_sql)
+                            
+                        if set(out_cols).difference(set(out_cols_)):
+                            raise ValueError(
+                                f"SELECTs of {combinator} do not have the same column names"
+                            )
+                    
+                    
                 for _, (s_sql, s_params), alias in self.select + self.extra_select:
                     if combinator:
                         if not s_params:
