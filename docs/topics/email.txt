@@ -380,26 +380,43 @@ The class has the following methods:
   ``attach()``.
 
 Sending alternative content types
+---------------------------------
+
+Sending multiple content versions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 It can be useful to include multiple versions of the content in an email; the
 classic example is to send both text and HTML versions of a message. With
-Django's email library, you can do this using the ``EmailMultiAlternatives``
-class. This subclass of :class:`~django.core.mail.EmailMessage` has an
-``attach_alternative()`` method for including extra versions of the message
-body in the email. All the other methods (including the class initialization)
-are inherited directly from :class:`~django.core.mail.EmailMessage`.
+Django's email library, you can do this using the
+:class:`~django.core.mail.EmailMultiAlternatives` class.
 
-To send a text and HTML combination, you could write::
+.. class:: EmailMultiAlternatives
 
-    from django.core.mail import EmailMultiAlternatives
+    A subclass of :class:`~django.core.mail.EmailMessage` that has an
+    additional ``attach_alternative()`` method for including extra versions of
+    the message body in the email. All the other methods (including the class
+    initialization) are inherited directly from
+    :class:`~django.core.mail.EmailMessage`.
 
-    subject, from_email, to = "hello", "from@example.com", "to@example.com"
-    text_content = "This is an important message."
-    html_content = "<p>This is an <strong>important</strong> message.</p>"
-    msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
-    msg.attach_alternative(html_content, "text/html")
-    msg.send()
+    .. method:: attach_alternative(content, mimetype)
+
+        Attach an alternative representation of the message body in the email.
+
+        For example, to send a text and HTML combination, you could write::
+
+            from django.core.mail import EmailMultiAlternatives
+
+            subject = "hello"
+            from_email = "from@example.com"
+            to = "to@example.com"
+            text_content = "This is an important message."
+            html_content = "<p>This is an <strong>important</strong> message.</p>"
+            msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
+
+Updating the default content type
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 By default, the MIME type of the ``body`` parameter in an
 :class:`~django.core.mail.EmailMessage` is ``"text/plain"``. It is good
