@@ -367,3 +367,17 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             )
             row = cursor.fetchone()
             return row[0] if row else None
+
+    def skip_default(self, field):
+        return field.get_internal_type() in {
+            "SerialField",
+            "BigSerialField",
+            "SmallSerialField",
+        }
+
+    def skip_default_on_alter(self, field):
+        return field.get_internal_type() in {
+            "SerialField",
+            "BigSerialField",
+            "SmallSerialField",
+        }

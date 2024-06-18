@@ -1,6 +1,7 @@
 import copy
 import functools
 import re
+import unittest
 from unittest import mock
 
 from django.apps import apps
@@ -4956,6 +4957,72 @@ class AutodetectorTests(BaseAutodetectorTests):
         self.assertNumberMigrations(changes, "testapp", 1)
         self.assertOperationTypes(changes, "testapp", 0, ["CreateModel"])
         self.assertOperationAttributes(changes, "testapp", 0, 0, name="Book")
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @mock.patch(
+        "django.db.migrations.questioner.MigrationQuestioner.ask_not_null_addition"
+    )
+    def test_add_serial_field(self, mocked_ask_method):
+        from django.contrib.postgres.fields import SerialField
+
+        before = [
+            ModelState(
+                "app",
+                "foo",
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                ],
+            ),
+        ]
+        after = [
+            ModelState(
+                "app",
+                "foo",
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    ("bar", SerialField()),
+                ],
+            ),
+        ]
+
+        changes = self.get_changes(before, after)
+        self.assertEqual(mocked_ask_method.call_count, 0)
+        self.assertNumberMigrations(changes, "app", 1)
+        self.assertOperationTypes(changes, "app", 0, ["AddField"])
+        self.assertOperationAttributes(
+            changes, "app", 0, 0, name="bar", model_name="foo"
+        )
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    def test_remove_serial_field(self):
+        from django.contrib.postgres.fields import SerialField
+
+        before = [
+            ModelState(
+                "app",
+                "foo",
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    ("bar", SerialField()),
+                ],
+            ),
+        ]
+        after = [
+            ModelState(
+                "app",
+                "foo",
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                ],
+            ),
+        ]
+
+        changes = self.get_changes(before, after)
+        self.assertNumberMigrations(changes, "app", 1)
+        self.assertOperationTypes(changes, "app", 0, ["RemoveField"])
+        self.assertOperationAttributes(
+            changes, "app", 0, 0, name="bar", model_name="foo"
+        )
 
 
 class MigrationSuggestNameTests(SimpleTestCase):
