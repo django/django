@@ -2270,9 +2270,6 @@ class Query(BaseExpression):
         else:
             self.default_ordering = False
 
-    def clear_filters(self):
-        self.where = WhereNode()
-
     def clear_ordering(self, force=False, clear_default=True):
         """
         Remove any ordering settings if the current query allows it without

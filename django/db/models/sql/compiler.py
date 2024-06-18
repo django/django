@@ -795,13 +795,11 @@ class SQLCompiler:
                 out_cols = []
                 for _, (s_sql, s_params), alias in self.select + extra_select:
                     if combinator:
-                        if alias:
-                            s_sql = alias
-                            s_params = []
-                        s_sql = '"%s".%s' % (
-                            'combined_{}'.format(self.query.combined_count),
-                            s_sql.split('.')[-1]
-                        )
+                        if not s_params:
+                            s_sql = '"%s"."%s"' % (
+                                'combined_{}'.format(self.query.combined_count),
+                                s_sql.split('.')[-1]
+                            )
                     if alias:
                         s_sql = "%s AS %s" % (
                             s_sql,

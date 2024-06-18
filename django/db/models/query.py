@@ -1524,7 +1524,7 @@ class QuerySet(AltersData):
         # Clear limits and ordering so they can be reapplied
         clone.query.clear_ordering(force=True)
         clone.query.clear_limits()
-        clone.query.clear_filters()
+        clone.query.clear_where()
         clone.query.combined_queries = (inner_query,) + tuple(
             qs.query for qs in other_qs
         )
