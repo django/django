@@ -796,7 +796,7 @@ class SQLCompiler:
                 for _, (s_sql, s_params), alias in self.select + extra_select:
                     if combinator:
                         if not s_params:
-                            s_sql = '"%s"."%s"' % (
+                            s_sql = '"%s".%s' % (
                                 'combined_{}'.format(self.query.combined_count),
                                 s_sql.split('.')[-1]
                             )
