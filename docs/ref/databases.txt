@@ -115,7 +115,7 @@ below for information on how to set up your database correctly.
 PostgreSQL notes
 ================
 
-Django supports PostgreSQL 13 and higher. `psycopg`_ 3.1.8+ or `psycopg2`_
+Django supports PostgreSQL 14 and higher. `psycopg`_ 3.1.8+ or `psycopg2`_
 2.8.4+ is required, though the latest `psycopg`_ 3.1.8+ is recommended.
 
 .. note::
@@ -812,7 +812,7 @@ appropriate typecasting.
 SQLite notes
 ============
 
-Django supports SQLite 3.27.0 and later.
+Django supports SQLite 3.31.0 and later.
 
 SQLite_ provides an excellent development alternative for applications that
 are predominantly read-only or require a smaller installation footprint. As

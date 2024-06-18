@@ -60,6 +60,21 @@ class TestDataMixin:
         )
 
 
+class ExtraValidationFormMixin:
+    def __init__(self, *args, failing_fields=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.failing_fields = failing_fields or {}
+
+    def failing_helper(self, field_name):
+        if field_name in self.failing_fields:
+            errors = [
+                ValidationError(error, code="invalid")
+                for error in self.failing_fields[field_name]
+            ]
+            raise ValidationError(errors)
+        return self.cleaned_data[field_name]
+
+
 class BaseUserCreationFormTest(TestDataMixin, TestCase):
     def test_user_already_exists(self):
         data = {
@@ -323,6 +338,22 @@ class BaseUserCreationFormTest(TestDataMixin, TestCase):
             "Your password can’t be too similar to your other personal information."
             "</li></ul>",
         )
+
+    def test_password_extra_validations(self):
+        class ExtraValidationForm(ExtraValidationFormMixin, BaseUserCreationForm):
+            def clean_password1(self):
+                return self.failing_helper("password1")
+
+            def clean_password2(self):
+                return self.failing_helper("password2")
+
+        data = {"username": "extra", "password1": "abc", "password2": "abc"}
+        for fields in (["password1"], ["password2"], ["password1", "password2"]):
+            with self.subTest(fields=fields):
+                errors = {field: [f"Extra validation for {field}."] for field in fields}
+                form = ExtraValidationForm(data, failing_fields=errors)
+                self.assertIs(form.is_valid(), False)
+                self.assertDictEqual(form.errors, errors)
 
     @override_settings(
         AUTH_PASSWORD_VALIDATORS=[
@@ -865,6 +896,27 @@ class SetPasswordFormTest(TestDataMixin, TestCase):
                     form.fields[field_name].widget.attrs["autocomplete"], autocomplete
                 )
 
+    def test_password_extra_validations(self):
+        class ExtraValidationForm(ExtraValidationFormMixin, SetPasswordForm):
+            def clean_new_password1(self):
+                return self.failing_helper("new_password1")
+
+            def clean_new_password2(self):
+                return self.failing_helper("new_password2")
+
+        user = User.objects.get(username="testclient")
+        data = {"new_password1": "abc", "new_password2": "abc"}
+        for fields in (
+            ["new_password1"],
+            ["new_password2"],
+            ["new_password1", "new_password2"],
+        ):
+            with self.subTest(fields=fields):
+                errors = {field: [f"Extra validation for {field}."] for field in fields}
+                form = ExtraValidationForm(user, data, failing_fields=errors)
+                self.assertIs(form.is_valid(), False)
+                self.assertDictEqual(form.errors, errors)
+
 
 class PasswordChangeFormTest(TestDataMixin, TestCase):
     def test_incorrect_password(self):
@@ -1023,34 +1075,42 @@ class UserChangeFormTest(TestDataMixin, TestCase):
         self.assertEqual(form.initial["password"], form["password"].value())
 
     @override_settings(ROOT_URLCONF="auth_tests.urls_admin")
-    def test_link_to_password_reset_in_helptext_via_to_field(self):
+    def test_link_to_password_reset_in_user_change_form(self):
         cases = [
             (
                 "testclient",
-                'you can change or unset the password using <a href="(.*?)">',
+                "Raw passwords are not stored, so there is no way to see "
+                "the user’s password.",
+                "Reset password",
             ),
             (
                 "unusable_password",
-                "Enable password-based authentication for this user by setting "
-                'a password using <a href="(.*?)">this form</a>.',
+                "Enable password-based authentication for this user by setting a "
+                "password.",
+                "Set password",
             ),
         ]
-        for username, expected_help_text in cases:
+        password_reset_link = r'<a class="button" href="([^"]*)">([^<]*)</a>'
+        for username, expected_help_text, expected_button_label in cases:
             with self.subTest(username=username):
                 user = User.objects.get(username=username)
                 form = UserChangeForm(data={}, instance=user)
                 password_help_text = form.fields["password"].help_text
-                matches = re.search(expected_help_text, password_help_text)
+                self.assertEqual(password_help_text, expected_help_text)
 
+                matches = re.search(password_reset_link, form.as_p())
+                self.assertIsNotNone(matches)
+                self.assertEqual(len(matches.groups()), 2)
                 url_prefix = f"admin:{user._meta.app_label}_{user._meta.model_name}"
                 # URL to UserChangeForm in admin via to_field (instead of pk).
-                user_change_url = reverse(f"{url_prefix}_change", args=(user.username,))
+                user_change_url = reverse(f"{url_prefix}_change", args=(user.pk,))
                 joined_url = urllib.parse.urljoin(user_change_url, matches.group(1))
 
                 pw_change_url = reverse(
                     f"{url_prefix}_password_change", args=(user.pk,)
                 )
                 self.assertEqual(joined_url, pw_change_url)
+                self.assertEqual(matches.group(2), expected_button_label)
 
     def test_custom_form(self):
         class CustomUserChangeForm(UserChangeForm):
@@ -1345,11 +1405,14 @@ class ReadOnlyPasswordHashTest(SimpleTestCase):
         self.assertHTMLEqual(
             widget.render("name", value, {"id": "id_password"}),
             '<div id="id_password">'
+            "  <p>"
             "    <strong>algorithm</strong>: <bdi>pbkdf2_sha256</bdi>"
             "    <strong>iterations</strong>: <bdi>100000</bdi>"
             "    <strong>salt</strong>: <bdi>a6Pucb******</bdi>"
             "    <strong>hash</strong>: "
             "       <bdi>WmCkn9**************************************</bdi>"
+            "  </p>"
+            '  <p><a class="button" href="../password/">Reset password</a></p>'
             "</div>",
         )
 
@@ -1444,6 +1507,23 @@ class AdminPasswordChangeFormTest(TestDataMixin, TestCase):
         self.assertEqual(form.cleaned_data["password1"], data["password1"])
         self.assertEqual(form.cleaned_data["password2"], data["password2"])
         self.assertEqual(form.changed_data, ["password"])
+
+    def test_password_extra_validations(self):
+        class ExtraValidationForm(ExtraValidationFormMixin, AdminPasswordChangeForm):
+            def clean_password1(self):
+                return self.failing_helper("password1")
+
+            def clean_password2(self):
+                return self.failing_helper("password2")
+
+        user = User.objects.get(username="testclient")
+        data = {"username": "extra", "password1": "abc", "password2": "abc"}
+        for fields in (["password1"], ["password2"], ["password1", "password2"]):
+            with self.subTest(fields=fields):
+                errors = {field: [f"Extra validation for {field}."] for field in fields}
+                form = ExtraValidationForm(user, data, failing_fields=errors)
+                self.assertIs(form.is_valid(), False)
+                self.assertDictEqual(form.errors, errors)
 
     def test_non_matching_passwords(self):
         user = User.objects.get(username="testclient")

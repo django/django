@@ -32,7 +32,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db import connection
 from django.http import HttpRequest, HttpResponse
 from django.middleware.csrf import CsrfViewMiddleware, get_token
-from django.test import Client, TestCase, override_settings
+from django.test import Client, TestCase, modify_settings, override_settings
 from django.test.client import RedirectCycleError
 from django.urls import NoReverseMatch, reverse, reverse_lazy
 from django.utils.http import urlsafe_base64_encode
@@ -472,6 +472,29 @@ class PasswordResetTest(AuthViewsTestCase):
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             self.client.get("/reset/missing_parameters/")
 
+    @modify_settings(
+        MIDDLEWARE={"append": "django.contrib.auth.middleware.LoginRequiredMiddleware"}
+    )
+    def test_access_under_login_required_middleware(self):
+        reset_urls = [
+            reverse("password_reset"),
+            reverse("password_reset_done"),
+            reverse("password_reset_confirm", kwargs={"uidb64": "abc", "token": "def"}),
+            reverse("password_reset_complete"),
+        ]
+
+        for url in reset_urls:
+            with self.subTest(url=url):
+                response = self.client.get(url)
+                self.assertEqual(response.status_code, 200)
+
+        response = self.client.post(
+            "/password_reset/", {"email": "staffmember@example.com"}
+        )
+        self.assertRedirects(
+            response, "/password_reset/done/", fetch_redirect_response=False
+        )
+
 
 @override_settings(AUTH_USER_MODEL="auth_tests.CustomUser")
 class CustomUserPasswordResetTest(AuthViewsTestCase):
@@ -659,6 +682,38 @@ class ChangePasswordTest(AuthViewsTestCase):
         )
         self.assertRedirects(
             response, "/password_reset/", fetch_redirect_response=False
+        )
+
+    @modify_settings(
+        MIDDLEWARE={"append": "django.contrib.auth.middleware.LoginRequiredMiddleware"}
+    )
+    def test_access_under_login_required_middleware(self):
+        response = self.client.post(
+            "/password_change/",
+            {
+                "old_password": "password",
+                "new_password1": "password1",
+                "new_password2": "password1",
+            },
+        )
+        self.assertRedirects(
+            response,
+            settings.LOGIN_URL + "?next=/password_change/",
+            fetch_redirect_response=False,
+        )
+
+        self.login()
+
+        response = self.client.post(
+            "/password_change/",
+            {
+                "old_password": "password",
+                "new_password1": "password1",
+                "new_password2": "password1",
+            },
+        )
+        self.assertRedirects(
+            response, "/password_change/done/", fetch_redirect_response=False
         )
 
 
@@ -903,6 +958,13 @@ class LoginTest(AuthViewsTestCase):
     def test_login_redirect_url_overrides_get_default_redirect_url(self):
         response = self.login(url="/login/get_default_redirect_url/?next=/test/")
         self.assertRedirects(response, "/test/", fetch_redirect_response=False)
+
+    @modify_settings(
+        MIDDLEWARE={"append": "django.contrib.auth.middleware.LoginRequiredMiddleware"}
+    )
+    def test_access_under_login_required_middleware(self):
+        response = self.client.get(reverse("login"))
+        self.assertEqual(response.status_code, 200)
 
 
 class LoginURLSettings(AuthViewsTestCase):
@@ -1355,6 +1417,22 @@ class LogoutTest(AuthViewsTestCase):
         self.assertContains(response, "Logged out")
         self.confirm_logged_out()
 
+    @modify_settings(
+        MIDDLEWARE={"append": "django.contrib.auth.middleware.LoginRequiredMiddleware"}
+    )
+    def test_access_under_login_required_middleware(self):
+        response = self.client.post("/logout/")
+        self.assertRedirects(
+            response,
+            settings.LOGIN_URL + "?next=/logout/",
+            fetch_redirect_response=False,
+        )
+
+        self.login()
+
+        response = self.client.post("/logout/")
+        self.assertEqual(response.status_code, 200)
+
 
 def get_perm(Model, perm):
     ct = ContentType.objects.get_for_model(Model)
@@ -1442,7 +1520,7 @@ class ChangelistTests(MessagesTestMixin, AuthViewsTestCase):
         response = self.client.get(user_change_url)
         # Test the link inside password field help_text.
         rel_link = re.search(
-            r'change or unset the password using <a href="([^"]*)">this form</a>',
+            r'<a class="button" href="([^"]*)">Reset password</a>',
             response.content.decode(),
         )[1]
         self.assertEqual(urljoin(user_change_url, rel_link), password_change_url)
@@ -1538,7 +1616,7 @@ class ChangelistTests(MessagesTestMixin, AuthViewsTestCase):
         response = self.client.get(user_change_url)
         # Test the link inside password field help_text.
         rel_link = re.search(
-            r'by setting a password using <a href="([^"]*)">this form</a>',
+            r'<a class="button" href="([^"]*)">Set password</a>',
             response.content.decode(),
         )[1]
         self.assertEqual(urljoin(user_change_url, rel_link), password_change_url)

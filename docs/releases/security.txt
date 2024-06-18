@@ -1381,7 +1381,7 @@ Versions affected
 
 * Django 1.2 :commit:`(patch) <7f84657b6b2243cc787bdb9f296710c8d13ad0bd>`
 
-October 9, 2009 - :cve:`2009-3965`
+October 9, 2009 - :cve:`2009-3695`
 ----------------------------------
 
 Denial-of-service via pathological regular expression performance. `Full

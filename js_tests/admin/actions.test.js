@@ -1,4 +1,4 @@
-/* global QUnit */
+/* global QUnit, Actions */
 'use strict';
 
 QUnit.module('admin.actions', {

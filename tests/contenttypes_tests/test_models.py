@@ -331,6 +331,14 @@ class ContentTypesMultidbTests(TestCase):
 
 
 class GenericPrefetchTests(TestCase):
+    def test_querysets_required(self):
+        msg = (
+            "GenericPrefetch.__init__() missing 1 required "
+            "positional argument: 'querysets'"
+        )
+        with self.assertRaisesMessage(TypeError, msg):
+            GenericPrefetch("question")
+
     def test_values_queryset(self):
         msg = "Prefetch querysets cannot use raw(), values(), and values_list()."
         with self.assertRaisesMessage(ValueError, msg):

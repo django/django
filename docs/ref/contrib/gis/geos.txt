@@ -484,8 +484,6 @@ return a boolean.
 
 .. method:: GEOSGeometry.equals_identical(other)
 
-    .. versionadded:: 5.0
-
     Returns ``True`` if the two geometries are point-wise equivalent by
     checking that the structure, ordering, and values of all vertices are
     identical in all dimensions. ``NaN`` values are considered to be equal to

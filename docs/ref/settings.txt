@@ -1667,7 +1667,7 @@ the server-provided value of ``SCRIPT_NAME``, which may be a rewritten version
 of the preferred value or not supplied at all. It is also used by
 :func:`django.setup()` to set the URL resolver script prefix outside of the
 request/response cycle (e.g. in management commands and standalone scripts) to
-generate correct URLs when ``SCRIPT_NAME`` is not ``/``.
+generate correct URLs when ``FORCE_SCRIPT_NAME`` is provided.
 
 .. setting:: FORM_RENDERER
 
@@ -1689,7 +1689,6 @@ renderers are:
 ``FORMS_URLFIELD_ASSUME_HTTPS``
 -------------------------------
 
-.. versionadded:: 5.0
 .. deprecated:: 5.0
 
 Default: ``False``
@@ -2923,10 +2922,6 @@ be retained if present.
 
 See also :setting:`TIME_ZONE` and :setting:`USE_I18N`.
 
-.. versionchanged:: 5.0
-
-    In older versions, the default value is ``False``.
-
 .. setting:: USE_X_FORWARDED_HOST
 
 ``USE_X_FORWARDED_HOST``
@@ -3060,8 +3055,9 @@ Default: ``'/accounts/login/'``
 The URL or :ref:`named URL pattern <naming-url-patterns>` where requests are
 redirected for login when using the
 :func:`~django.contrib.auth.decorators.login_required` decorator,
-:class:`~django.contrib.auth.mixins.LoginRequiredMixin`, or
-:class:`~django.contrib.auth.mixins.AccessMixin`.
+:class:`~django.contrib.auth.mixins.LoginRequiredMixin`,
+:class:`~django.contrib.auth.mixins.AccessMixin`, or when
+:class:`~django.contrib.auth.middleware.LoginRequiredMiddleware` is installed.
 
 .. setting:: LOGOUT_REDIRECT_URL
 
@@ -3668,14 +3664,14 @@ Forms
 
 Globalization (``i18n``/``l10n``)
 ---------------------------------
-* :setting:`DATE_FORMAT`
-* :setting:`DATE_INPUT_FORMATS`
-* :setting:`DATETIME_FORMAT`
-* :setting:`DATETIME_INPUT_FORMATS`
-* :setting:`DECIMAL_SEPARATOR`
+
+.. _settings-i18n:
+
+Internationalization (``i18n``)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 * :setting:`FIRST_DAY_OF_WEEK`
 * :setting:`FORMAT_MODULE_PATH`
-* :setting:`LANGUAGE_CODE`
 * :setting:`LANGUAGE_COOKIE_AGE`
 * :setting:`LANGUAGE_COOKIE_DOMAIN`
 * :setting:`LANGUAGE_COOKIE_HTTPONLY`
@@ -3686,6 +3682,21 @@ Globalization (``i18n``/``l10n``)
 * :setting:`LANGUAGES`
 * :setting:`LANGUAGES_BIDI`
 * :setting:`LOCALE_PATHS`
+* :setting:`TIME_ZONE`
+* :setting:`USE_I18N`
+* :setting:`USE_TZ`
+
+.. _settings-l10n:
+
+Localization (``l10n``)
+~~~~~~~~~~~~~~~~~~~~~~~
+
+* :setting:`DATE_FORMAT`
+* :setting:`DATE_INPUT_FORMATS`
+* :setting:`DATETIME_FORMAT`
+* :setting:`DATETIME_INPUT_FORMATS`
+* :setting:`DECIMAL_SEPARATOR`
+* :setting:`LANGUAGE_CODE`
 * :setting:`MONTH_DAY_FORMAT`
 * :setting:`NUMBER_GROUPING`
 * :setting:`SHORT_DATE_FORMAT`
@@ -3693,10 +3704,7 @@ Globalization (``i18n``/``l10n``)
 * :setting:`THOUSAND_SEPARATOR`
 * :setting:`TIME_FORMAT`
 * :setting:`TIME_INPUT_FORMATS`
-* :setting:`TIME_ZONE`
-* :setting:`USE_I18N`
 * :setting:`USE_THOUSAND_SEPARATOR`
-* :setting:`USE_TZ`
 * :setting:`YEAR_MONTH_FORMAT`
 
 HTTP

@@ -575,7 +575,9 @@ configured:
 
 * **templates.E001**: You have ``'APP_DIRS': True`` in your
   :setting:`TEMPLATES` but also specify ``'loaders'`` in ``OPTIONS``. Either
-  remove ``APP_DIRS`` or remove the ``'loaders'`` option.
+  remove ``APP_DIRS`` or remove the ``'loaders'`` option. *This check is
+  removed in Django 5.1 as system checks may now raise*
+  ``ImproperlyConfigured`` *instead.*
 * **templates.E002**: ``string_if_invalid`` in :setting:`TEMPLATES`
   :setting:`OPTIONS <TEMPLATES-OPTIONS>` must be a string but got: ``{value}``
   (``{type}``).
@@ -866,6 +868,10 @@ The following checks are performed on the default
   for its builtin permission names to be at most 100 characters.
 * **auth.E012**: The permission codenamed ``<codename>`` of model ``<model>``
   is longer than 100 characters.
+* **auth.E013**: In order to use
+  :class:`django.contrib.auth.middleware.LoginRequiredMiddleware`,
+  :class:`django.contrib.auth.middleware.AuthenticationMiddleware` must be
+  defined before it in MIDDLEWARE.
 
 ``contenttypes``
 ----------------

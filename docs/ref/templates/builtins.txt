@@ -1957,8 +1957,6 @@ For example:
 ``escapeseq``
 -------------
 
-.. versionadded:: 5.0
-
 Applies the :tfilter:`escape` filter to each element of a sequence. Useful in
 conjunction with other filters that operate on sequences, such as
 :tfilter:`join`. For example:
@@ -2726,10 +2724,6 @@ Newlines in the HTML content will be preserved.
     resource-intensive and impact service performance. ``truncatechars_html``
     limits input to the first five million characters.
 
-.. versionchanged:: 3.2.22
-
-    In older versions, strings over five million characters were processed.
-
 .. templatefilter:: truncatewords
 
 ``truncatewords``
@@ -2777,10 +2771,6 @@ Newlines in the HTML content will be preserved.
     Processing large, potentially malformed HTML strings can be
     resource-intensive and impact service performance. ``truncatewords_html``
     limits input to the first five million characters.
-
-.. versionchanged:: 3.2.22
-
-    In older versions, strings over five million characters were processed.
 
 .. templatefilter:: unordered_list
 

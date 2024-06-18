@@ -29,7 +29,6 @@ from django.core.mail.message import BadHeaderError, sanitize_address
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import requires_tz_support
 from django.utils.translation import gettext_lazy
-from django.utils.version import PY311
 
 try:
     from aiosmtpd.controller import Controller
@@ -91,6 +90,37 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         self.assertEqual(message.get_payload(), "Content")
         self.assertEqual(message["From"], "from@example.com")
         self.assertEqual(message["To"], "to@example.com")
+
+    @mock.patch("django.core.mail.message.MIMEText.set_payload")
+    def test_nonascii_as_string_with_ascii_charset(self, mock_set_payload):
+        """Line length check should encode the payload supporting `surrogateescape`.
+
+        Following https://github.com/python/cpython/issues/76511, newer
+        versions of Python (3.11.9, 3.12.3 and 3.13) ensure that a message's
+        payload is encoded with the provided charset and `surrogateescape` is
+        used as the error handling strategy.
+
+        This test is heavily based on the test from the fix for the bug above.
+        Line length checks in SafeMIMEText's set_payload should also use the
+        same error handling strategy to avoid errors such as:
+
+        UnicodeEncodeError: 'utf-8' codec can't encode <...>: surrogates not allowed
+
+        """
+
+        def simplified_set_payload(instance, payload, charset):
+            instance._payload = payload
+
+        mock_set_payload.side_effect = simplified_set_payload
+
+        text = (
+            "Text heavily based in Python's text for non-ascii messages: Föö bär"
+        ).encode("iso-8859-1")
+        body = text.decode("ascii", errors="surrogateescape")
+        email = EmailMessage("Subject", body, "from@example.com", ["to@example.com"])
+        message = email.message()
+        mock_set_payload.assert_called_once()
+        self.assertEqual(message.get_payload(decode=True), text)
 
     def test_multiple_recipients(self):
         email = EmailMessage(
@@ -791,13 +821,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
                 filebased.EmailBackend,
             )
 
-        if sys.platform == "win32" and not PY311:
-            msg = (
-                "_getfullpathname: path should be string, bytes or os.PathLike, not "
-                "object"
-            )
-        else:
-            msg = "expected str, bytes or os.PathLike object, not object"
+        msg = " not object"
         with self.assertRaisesMessage(TypeError, msg):
             mail.get_connection(
                 "django.core.mail.backends.filebased.EmailBackend", file_path=object()

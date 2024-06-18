@@ -140,7 +140,8 @@ class GenericForeignKey(FieldCacheMixin, Field):
             else:
                 return []
 
-    def get_cache_name(self):
+    @cached_property
+    def cache_name(self):
         return self.name
 
     def get_content_type(self, obj=None, id=None, using=None, model=None):

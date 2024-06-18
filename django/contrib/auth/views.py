@@ -1,4 +1,4 @@
-from urllib.parse import urlparse, urlunparse
+from urllib.parse import urlsplit, urlunsplit
 
 from django.conf import settings
 
@@ -7,7 +7,7 @@ from django.contrib.auth import REDIRECT_FIELD_NAME, get_user_model
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth import update_session_auth_hash
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_not_required, login_required
 from django.contrib.auth.forms import (
     AuthenticationForm,
     PasswordChangeForm,
@@ -62,6 +62,7 @@ class RedirectURLMixin:
         raise ImproperlyConfigured("No URL to redirect to. Provide a next_page.")
 
 
+@method_decorator(login_not_required, name="dispatch")
 class LoginView(RedirectURLMixin, FormView):
     """
     Display the login form and handle the login action.
@@ -182,13 +183,13 @@ def redirect_to_login(next, login_url=None, redirect_field_name=REDIRECT_FIELD_N
     """
     resolved_url = resolve_url(login_url or settings.LOGIN_URL)
 
-    login_url_parts = list(urlparse(resolved_url))
+    login_url_parts = list(urlsplit(resolved_url))
     if redirect_field_name:
-        querystring = QueryDict(login_url_parts[4], mutable=True)
+        querystring = QueryDict(login_url_parts[3], mutable=True)
         querystring[redirect_field_name] = next
-        login_url_parts[4] = querystring.urlencode(safe="/")
+        login_url_parts[3] = querystring.urlencode(safe="/")
 
-    return HttpResponseRedirect(urlunparse(login_url_parts))
+    return HttpResponseRedirect(urlunsplit(login_url_parts))
 
 
 # Class-based password reset views
@@ -210,6 +211,7 @@ class PasswordContextMixin:
         return context
 
 
+@method_decorator(login_not_required, name="dispatch")
 class PasswordResetView(PasswordContextMixin, FormView):
     email_template_name = "registration/password_reset_email.html"
     extra_email_context = None
@@ -244,11 +246,13 @@ class PasswordResetView(PasswordContextMixin, FormView):
 INTERNAL_RESET_SESSION_TOKEN = "_password_reset_token"
 
 
+@method_decorator(login_not_required, name="dispatch")
 class PasswordResetDoneView(PasswordContextMixin, TemplateView):
     template_name = "registration/password_reset_done.html"
     title = _("Password reset sent")
 
 
+@method_decorator(login_not_required, name="dispatch")
 class PasswordResetConfirmView(PasswordContextMixin, FormView):
     form_class = SetPasswordForm
     post_reset_login = False
@@ -335,6 +339,7 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
         return context
 
 
+@method_decorator(login_not_required, name="dispatch")
 class PasswordResetCompleteView(PasswordContextMixin, TemplateView):
     template_name = "registration/password_reset_complete.html"
     title = _("Password reset complete")
