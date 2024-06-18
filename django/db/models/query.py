@@ -231,9 +231,12 @@ class ValuesListIterable(BaseIterable):
                 *query.values_select,
                 *query.annotation_select,
             ]
+            names = [
+                *names,
+                *(f for f in query.combinator_select if f not in names),
+            ]
             fields = [
                 *queryset._fields,
-                *(f for f in query.annotation_select if f not in queryset._fields),
             ]
             if fields != names:
                 # Reorder according to fields.
@@ -1163,7 +1166,6 @@ class QuerySet(AltersData):
 
     def delete(self):
         """Delete the records in the current QuerySet."""
-        self._not_support_combined_queries("delete")
         if self.query.is_sliced:
             raise TypeError("Cannot use 'limit' or 'offset' with delete().")
         if self.query.distinct_fields:
@@ -1472,7 +1474,6 @@ class QuerySet(AltersData):
         Return a new QuerySet instance with the args ANDed to the existing
         set.
         """
-        self._not_support_combined_queries("filter")
         return self._filter_or_exclude(False, args, kwargs)
 
     def exclude(self, *args, **kwargs):
@@ -1480,7 +1481,6 @@ class QuerySet(AltersData):
         Return a new QuerySet instance with NOT (args) ANDed to the existing
         set.
         """
-        self._not_support_combined_queries("exclude")
         return self._filter_or_exclude(True, args, kwargs)
 
     def _filter_or_exclude(self, negate, args, kwargs):
@@ -1525,6 +1525,15 @@ class QuerySet(AltersData):
         clone.query.clear_ordering(force=True)
         clone.query.clear_limits()
         clone.query.clear_where()
+        clone.query.clear_annotations()
+        clone.query.select = tuple()
+        clone.query.combinator_select = (
+            (
+                *inner_query.extra_select,
+                *inner_query.values_select,
+                *inner_query.annotation_select,
+            )
+        )
         clone.query.combined_queries = (inner_query,) + tuple(
             qs.query for qs in other_qs
         )
@@ -1628,14 +1637,12 @@ class QuerySet(AltersData):
         Return a query set in which the returned objects have been annotated
         with extra data or aggregations.
         """
-        self._not_support_combined_queries("annotate")
         return self._annotate(args, kwargs, select=True)
 
     def alias(self, *args, **kwargs):
         """
         Return a query set with added aliases for extra data or aggregations.
         """
-        self._not_support_combined_queries("alias")
         return self._annotate(args, kwargs, select=False)
 
     def _annotate(self, args, kwargs, select=True):
@@ -1707,7 +1714,6 @@ class QuerySet(AltersData):
         """
         Return a new QuerySet instance that will select only distinct results.
         """
-        self._not_support_combined_queries("distinct")
         if self.query.is_sliced:
             raise TypeError(
                 "Cannot create distinct fields once a slice has been taken."
@@ -1748,7 +1754,6 @@ class QuerySet(AltersData):
         The only exception to this is if None is passed in as the only
         parameter, in which case removal all deferrals.
         """
-        self._not_support_combined_queries("defer")
         if self._fields is not None:
             raise TypeError("Cannot call defer() after .values() or .values_list()")
         clone = self._chain()
@@ -1764,7 +1769,6 @@ class QuerySet(AltersData):
         method and that are not already specified as deferred are loaded
         immediately when the queryset is evaluated.
         """
-        self._not_support_combined_queries("only")
         if self._fields is not None:
             raise TypeError("Cannot call only() after .values() or .values_list()")
         if fields == (None,):

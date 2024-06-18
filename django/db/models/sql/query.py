@@ -275,6 +275,7 @@ class Query(BaseExpression):
     combined_count = 0
     combinator_all = False
     combined_queries = ()
+    combinator_select = ()
 
     # These are for extensions. The contents are more or less appended verbatim
     # to the appropriate clause.
@@ -1203,6 +1204,9 @@ class Query(BaseExpression):
             )
             self.set_annotation_mask(annotation_mask)
         self.annotations[alias] = annotation
+
+    def clear_annotations(self):
+        self.annotations = {}
 
     def resolve_expression(self, query, *args, **kwargs):
         clone = self.clone()

@@ -168,6 +168,7 @@ class WhereNode(tree.Node):
                 if self.negated:
                     raise FullResultSet
                 else:
+                    sql, params = compiler.compile(child)
                     raise EmptyResultSet
             if full_needed == 0:
                 if self.negated:

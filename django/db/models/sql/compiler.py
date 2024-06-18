@@ -86,10 +86,10 @@ class SQLCompiler:
         self.where, self.having, self.qualify = self.query.where.split_having_qualify(
             must_group_by=self.query.group_by is not None
         )
-        extra_select = self.get_extra_select(order_by, self.select)
-        self.has_extra_select = bool(extra_select)
-        group_by = self.get_group_by(self.select + extra_select, order_by)
-        return extra_select, order_by, group_by
+        self.extra_select = self.get_extra_select(order_by, self.select)
+        self.has_extra_select = bool(self.extra_select)
+        group_by = self.get_group_by(self.select + self.extra_select, order_by)
+        return self.extra_select, order_by, group_by
 
     def get_group_by(self, select, order_by):
         """
@@ -553,12 +553,31 @@ class SQLCompiler:
             sql, params = node.as_sql(self, self.connection)
         return sql, params
 
-    def get_combinator_sql(self, combinator, all):
-        features = self.connection.features
+    def get_combinator_compilers(self):
         compilers = [
             query.get_compiler(self.using, self.connection, self.elide_empty)
             for query in self.query.combined_queries
         ]
+        # for compiler in compilers:
+        #     # If the columns list is limited, then all combined queries
+        #     # must have the same columns list. Set the selects defined on
+        #     # the query on all combined queries, if not already set.
+        #     if not compiler.query.values_select and self.query.values_select:
+        #         compiler.query = compiler.query.clone()
+        #         compiler.query.set_values(
+        #             (
+        #                 *self.query.extra_select,
+        #                 *self.query.values_select,
+        #                 *self.query.annotation_select,
+        #                 *self.query.combinator_select,
+        #             )
+        #         )
+
+        return compilers
+
+    def get_combinator_sql(self, combinator, all):
+        compilers = self.get_combinator_compilers()
+        features = self.connection.features
         if not features.supports_slicing_ordering_in_compound:
             for compiler in compilers:
                 if compiler.query.is_sliced:
@@ -579,18 +598,6 @@ class SQLCompiler:
         parts = ()
         for compiler in compilers:
             try:
-                # If the columns list is limited, then all combined queries
-                # must have the same columns list. Set the selects defined on
-                # the query on all combined queries, if not already set.
-                if not compiler.query.values_select and self.query.values_select:
-                    compiler.query = compiler.query.clone()
-                    compiler.query.set_values(
-                        (
-                            *self.query.extra_select,
-                            *self.query.values_select,
-                            *self.query.annotation_select,
-                        )
-                    )
                 part_sql, part_args = compiler.as_sql(with_col_aliases=False)
                 if compiler.query.combinator:
                     # Wrap in a subquery if wrapping in parentheses isn't
@@ -744,7 +751,7 @@ class SQLCompiler:
         refcounts_before = self.query.alias_refcount.copy()
         try:
             combinator = self.query.combinator
-            extra_select, order_by, group_by = self.pre_sql_setup(
+            _, order_by, group_by = self.pre_sql_setup(
                 with_col_aliases=with_col_aliases or bool(combinator),
             )
             for_update_part = None
@@ -793,7 +800,23 @@ class SQLCompiler:
                     params += distinct_params
 
                 out_cols = []
-                for _, (s_sql, s_params), alias in self.select + extra_select:
+                if combinator:
+                    inner_compiler = self.get_combinator_compilers()[0]
+                    inner_compiler.as_sql(with_col_aliases=False)  # define select, extra_select
+                    for _, (s_sql, s_params), alias in inner_compiler.select + inner_compiler.extra_select:
+                        if alias:
+                            s_sql = '"%s".%s' % (
+                                'combined_{}'.format(self.query.combined_count),
+                                self.connection.ops.quote_name(alias),
+                            )
+                        else:
+                            s_sql = '"%s".%s' % (
+                                'combined_{}'.format(self.query.combined_count),
+                                s_sql.split('.')[-1]
+                            )
+                        out_cols.append(s_sql)
+                    
+                for _, (s_sql, s_params), alias in self.select + self.extra_select:
                     if combinator:
                         if not s_params:
                             s_sql = '"%s".%s' % (
@@ -928,7 +951,7 @@ class SQLCompiler:
             if for_update_part and not features.for_update_after_from:
                 result.append(for_update_part)
 
-            if self.query.subquery and extra_select:
+            if self.query.subquery and self.extra_select:
                 # If the query is used as a subquery, the extra selects would
                 # result in more columns than the left-hand side expression is
                 # expecting. This can happen when a subquery uses a combination
