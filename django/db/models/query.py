@@ -1519,11 +1519,13 @@ class QuerySet(AltersData):
 
     def _combinator_query(self, combinator, *other_qs, all=False):
         # Clone the query to inherit the select list and everything
+        inner_query = self.query.clone()
         clone = self._chain()
         # Clear limits and ordering so they can be reapplied
         clone.query.clear_ordering(force=True)
         clone.query.clear_limits()
-        clone.query.combined_queries = (self.query,) + tuple(
+        clone.query.clear_filters()
+        clone.query.combined_queries = (inner_query,) + tuple(
             qs.query for qs in other_qs
         )
         clone.query.combinator = combinator
