@@ -70,7 +70,12 @@ Minor features
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new fields :class:`~django.contrib.postgres.fields.SerialField`,
+  :class:`~django.contrib.postgres.fields.BigSerialField` and
+  :class:`~django.contrib.postgres.fields.SmallSerialField` are automatically
+  incrementing integer fields that use the PostgreSQL ``serial`` type. These
+  are similar to :class:`~django.db.models.AutoField` except that they do not
+  have to be a primary key, and are not limited to a single instance per model.
 
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
