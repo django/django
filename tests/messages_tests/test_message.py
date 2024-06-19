@@ -1,8 +1,5 @@
 from django.contrib.messages import constants, restrictions
-from django.contrib.messages.restrictions import (
-    AmountRestriction,
-    TimeRestriction,
-)
+from django.contrib.messages.restrictions import AmountRestriction, TimeRestriction
 from django.contrib.messages.storage.base import Message
 from django.test import TestCase
 
@@ -77,6 +74,7 @@ class MessageTest(TestCase):
                 AmountRestriction(2),
                 AmountRestriction(3),
             ]
+
         def get_msg():
             return Message(
                 constants.INFO, "Test message", restrictions=get_restrictions()
