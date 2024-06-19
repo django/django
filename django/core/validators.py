@@ -401,7 +401,7 @@ class BaseValidator:
 
     def __init__(self, limit_value, message=None):
         self.limit_value = limit_value
-        if message:
+        if message is not None:
             self.message = message
 
     def __call__(self, value):
