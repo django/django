@@ -180,11 +180,7 @@ form .aligned table p {
 }
 
 .aligned .vCheckboxLabel {
-    float: none;
-    width: auto;
-    display: inline-block;
-    vertical-align: -3px;
-    padding: 0 0 5px 5px;
+    padding: 1px 0 0 5px;
 }
 
 .aligned .vCheckboxLabel + p.help,
