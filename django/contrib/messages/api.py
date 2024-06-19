@@ -19,7 +19,9 @@ class MessageFailure(Exception):
     pass
 
 
-def add_message(request, level, message, extra_tags="", fail_silently=False, restrictions=[]):
+def add_message(
+    request, level, message, extra_tags="", fail_silently=False, restrictions=[]
+):
     """
     Attempt to add a message to the request using the 'messages' app.
     """
@@ -37,7 +39,7 @@ def add_message(request, level, message, extra_tags="", fail_silently=False, res
                 "django.contrib.messages.middleware.MessageMiddleware"
             )
     else:
-        return messages.add(level, message, extra_tags, restrictions = restrictions)
+        return messages.add(level, message, extra_tags, restrictions=restrictions)
 
 
 def get_messages(request):

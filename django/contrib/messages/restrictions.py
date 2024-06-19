@@ -2,7 +2,7 @@ import time as time_provider
 
 
 class Restriction:
-    JSON_SEPARATOR = '@'
+    JSON_SEPARATOR = "@"
 
     def __init__(self, name):
         self.type = name
@@ -11,7 +11,7 @@ class Restriction:
         """
         indicates whether given message should be removed
         """
-        raise NotImplementedError ()
+        raise NotImplementedError()
 
     def on_display(self):
         """
@@ -33,18 +33,19 @@ class Restriction:
         raise NotImplementedError
 
     def __cmp__(self, other):
-        if self.__eq__(other): return 0
+        if self.__eq__(other):
+            return 0
         return -1
 
 
 class TimeRestriction(Restriction):
-    JSON_TYPE_CODE = 't'
+    JSON_TYPE_CODE = "t"
 
     def __init__(self, seconds):
         """
         seconds - expiration time since now
         """
-        Restriction.__init__(self, 'time')
+        Restriction.__init__(self, "time")
         created = time_provider.time()
         self.expires = created + int(seconds)
 
@@ -64,7 +65,7 @@ class TimeRestriction(Restriction):
         return self.expires
 
     def to_json(self):
-        return '%s%s%s' % (self.JSON_TYPE_CODE, self.JSON_SEPARATOR, self.expires)
+        return "%s%s%s" % (self.JSON_TYPE_CODE, self.JSON_SEPARATOR, self.expires)
 
     @classmethod
     def from_json_param(cls, expirity_time):
@@ -73,13 +74,12 @@ class TimeRestriction(Restriction):
         return ret
 
 
-
 class AmountRestriction(Restriction):
-    JSON_TYPE_CODE = 'a'
+    JSON_TYPE_CODE = "a"
 
     def __init__(self, amount):
         assert int(amount) >= 0
-        Restriction.__init__(self, 'amount')
+        Restriction.__init__(self, "amount")
         self.can_be_shown = int(amount)
 
     def on_display(self):
@@ -89,7 +89,9 @@ class AmountRestriction(Restriction):
         return int(self.can_be_shown) <= 0
 
     def __eq__(self, other):
-        return self.type == other.type and not bool(self.can_be_shown ^ other.can_be_shown)
+        return self.type == other.type and not bool(
+            self.can_be_shown ^ other.can_be_shown
+        )
 
     def __hash__(self):
         return self.can_be_shown
@@ -98,7 +100,7 @@ class AmountRestriction(Restriction):
         return self.to_json()
 
     def to_json(self):
-        return '%s%s%s' % (self.JSON_TYPE_CODE, self.JSON_SEPARATOR, self.can_be_shown)
+        return "%s%s%s" % (self.JSON_TYPE_CODE, self.JSON_SEPARATOR, self.can_be_shown)
 
     @classmethod
     def from_json_param(cls, amount):

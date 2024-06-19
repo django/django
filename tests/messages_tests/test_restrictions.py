@@ -1,16 +1,19 @@
-from django.test import TestCase
 from django.contrib.messages import restrictions
 from django.contrib.messages.restrictions import AmountRestriction, TimeRestriction
+from django.test import TestCase
 
 from .time_provider import TestTimeProvider
 
-restrictions.time_provider = TestTimeProvider ()
+restrictions.time_provider = TestTimeProvider()
+
 
 class RestrictionsTest(TestCase):
     def __check_expired(self, amount_restriction, iterations_amount):
         """
-        Checks whether after iterations_amount of on_displayate given restriction will become expired
-        But before iterations_amount given amount_restriction must not indicate is_expired
+        Checks whether after iterations_amount of on_display given
+        restriction will become expired
+        But before iterations_amount given amount_restriction must
+        not indicate is_expired
         """
         for i in range(iterations_amount):
             self.assertFalse(amount_restriction.is_expired())

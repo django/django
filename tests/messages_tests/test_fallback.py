@@ -91,7 +91,10 @@ class FallbackTests(BaseTests, SimpleTestCase):
         cookie_storage = self.get_cookie_storage(storage)
         session_storage = self.get_session_storage(storage)
         # Set initial cookie and session data.
-        set_cookie_data(cookie_storage, [Message(constants.INFO, "cookie"), CookieStorage.not_finished])
+        set_cookie_data(
+            cookie_storage,
+            [Message(constants.INFO, "cookie"), CookieStorage.not_finished],
+        )
         set_session_data(session_storage, [Message(constants.INFO, "session")])
         # When updating, previously used but no longer needed backends are
         # flushed.

@@ -1,20 +1,24 @@
 from django.conf import settings
-from django.contrib.messages import constants, utils, restrictions as res
+from django.contrib.messages import constants
+from django.contrib.messages import restrictions as res
+from django.contrib.messages import utils
 from django.utils.functional import SimpleLazyObject
 
 LEVEL_TAGS = SimpleLazyObject(utils.get_level_tags)
 
 
 class RestrictionsContainer(list):
-    res_map = {res.AmountRestriction.JSON_TYPE_CODE: res.AmountRestriction,
-                res.TimeRestriction.JSON_TYPE_CODE: res.TimeRestriction}
+    res_map = {
+        res.AmountRestriction.JSON_TYPE_CODE: res.AmountRestriction,
+        res.TimeRestriction.JSON_TYPE_CODE: res.TimeRestriction,
+    }
 
     def to_json_obj(self):
         return [r.to_json() for r in self]
 
     @classmethod
     def create_from_josn(cls, enc_restrictions):
-        #set_trace()
+        # set_trace()
         ret = []
         for r in enc_restrictions:
             restriction_type, values = r.split(res.Restriction.JSON_SEPARATOR)
@@ -24,6 +28,7 @@ class RestrictionsContainer(list):
     def __eq__(self, other):
         return set(self) == set(other)
 
+
 class Message:
     """
     Represent an actual message that can be stored in any of the supported
@@ -31,7 +36,7 @@ class Message:
     or template.
     """
 
-    def __init__(self, level, message, extra_tags=None, restrictions = []):
+    def __init__(self, level, message, extra_tags=None, restrictions=[]):
         self.level = int(level)
         self.message = message
         self.extra_tags = extra_tags
@@ -51,7 +56,11 @@ class Message:
     def __eq__(self, other):
         if not isinstance(other, Message):
             return NotImplemented
-        return self.level == other.level and self.message == other.message and self.restrictions == other.restrictions
+        return (
+            self.level == other.level
+            and self.message == other.message
+            and self.restrictions == other.restrictions
+        )
 
     def __str__(self):
         return str(self.message)
@@ -73,12 +82,14 @@ class Message:
 
     def active(self):
         for r in self.restrictions:
-            if r.is_expired(): return False
+            if r.is_expired():
+                return False
         return True
 
     def on_display(self):
         for r in self.restrictions:
             r.on_display()
+
 
 class BaseStorage:
     """
@@ -96,12 +107,15 @@ class BaseStorage:
         super().__init__(*args, **kwargs)
 
     def __len__(self):
-        # in case that there was a call for render template which would cause iterating throught messages,
-        # and then (e.g. in some middleware, would be call for iterating through messages (e.g. by iterating of context['messages'])
-        # TODO: implement a way to access messages without affecting calling __iter__ method
+        # in case that there was a call for render template which would
+        # cause iterating throught messages,
+        # and then (e.g. in some middleware, would be call for iterating
+        # through messages (e.g. by iterating of context['messages'])
+        # TODO: implement a way to access messages without affecting
+        # calling __iter__ method
         all_msgs = set(self._loaded_messages + self._queued_messages)
         return len(all_msgs)
-        #return len(self._loaded_messages) + len(self._queued_messages)
+        # return len(self._loaded_messages) + len(self._queued_messages)
 
     def __iter__(self):
         if not self.used:
@@ -120,7 +134,8 @@ class BaseStorage:
             for x in active_messages:
                 if isinstance(x, Message):
                     x.on_display()
-            # self._queued_messages.extend(m for m in active_messages if m not in self._queued_messages)
+            # self._queued_messages.extend(m for m in active_messages
+            # if m not in self._queued_messages)
             self._queued_messages = active_messages
         return iter(self._queued_messages)
 
@@ -131,7 +146,7 @@ class BaseStorage:
         return f"<{self.__class__.__qualname__}: request={self.request!r}>"
 
     def filter_store(self, messages, response, *args, **kwargs):
-        ''' stores only active messages from given messages in storage '''
+        """stores only active messages from given messages in storage"""
         filtered_messages = [x for x in messages if x.active()]
         return self._store(filtered_messages, response, *args, **kwargs)
 
@@ -190,7 +205,8 @@ class BaseStorage:
         If the backend has yet to be iterated, store previously stored messages
         again. Otherwise, only store messages added after the last iteration.
         """
-        # if used or used and added, then _queued_messages contains all messages that should be saved
+        # if used or used and added,
+        # then _queued_messages contains all messages that should be saved
         # if added, then save: all messages currently stored and added ones
         self._prepare_messages(self._queued_messages)
         if self.used:
@@ -214,7 +230,9 @@ class BaseStorage:
             return
         # Add the message.
         self.added_new = True
-        message = Message(level, message, extra_tags=extra_tags, restrictions=restrictions)
+        message = Message(
+            level, message, extra_tags=extra_tags, restrictions=restrictions
+        )
         self._queued_messages.append(message)
 
     def _get_level(self):
