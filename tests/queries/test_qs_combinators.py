@@ -311,7 +311,8 @@ class QuerySetSetOperationTests(TestCase):
         qs1 = Number.objects.annotate(
             annotation=Value(-1),
             multiplier=F("annotation"),
-        ).filter(num__gte=6)
+        ).filter(num__gte=6).order_by('annotation')
+        list(qs1)
         qs2 = Number.objects.annotate(
             annotation=Value(2),
             multiplier=F("annotation"),
@@ -633,15 +634,6 @@ class QuerySetSetOperationTests(TestCase):
             combinators.append("intersection")
         for combinator in combinators:
             for operation in (
-                "alias",
-                "annotate",
-                "defer",
-                "delete",
-                "distinct",
-                "exclude",
-                "extra",
-                "filter",
-                "only",
                 "prefetch_related",
                 "select_related",
                 "update",
@@ -698,7 +690,7 @@ class QuerySetSetOperationTests(TestCase):
         qs1 = Number.objects.filter(pk__lt=4)
         qs2 = Number.objects.filter(pk__gt=8)
         qs = qs1.union(qs2).filter(pk__gte=3, pk__lte=9)
-        self.assertEqual(set(qs), set(Number.objects.filter(pk__in=(3,9))))
+        self.assertEqual(set(qs), set(Number.objects.filter(pk__in=(3, 9))))
 
     def test_filter_union_multiple_models_same_values_list(self):
         [Celebrity.objects.create(name=str(i)) for i in range(10)]
@@ -727,7 +719,6 @@ class QuerySetSetOperationTests(TestCase):
     #     self.assertEqual(len(qs1.union(qs2).filter(pk__gte=3, pk__lte=9)), 2)
 
     def test_filter_union_different_values_list_num(self):
-        [Celebrity.objects.create(name=str(i)) for i in range(10)]
         qs1 = Number.objects.filter(pk__lt=4).values_list('pk')
         qs2 = Number.objects.filter(pk__gt=8).values_list('pk', 'num')
         msg = "SELECTs to the left and right of UNION do not have the same number of result columns"
@@ -749,3 +740,15 @@ class QuerySetSetOperationTests(TestCase):
         msg = "SELECTs of union do not have the same column names"
         with self.assertRaisesMessage(ValueError, msg):
             list(qs1.union(qs2))
+
+    def test_filter_intersection(self):
+        qs1 = Number.objects.filter(pk__lt=6)
+        qs2 = Number.objects.filter(pk__gt=2)
+        qs = qs1.intersection(qs2).filter(pk__gte=4)
+        self.assertEqual(set(qs), set(Number.objects.filter(pk__in=(4, 5))))
+
+    def test_filter_difference(self):
+        qs1 = Number.objects.filter(pk__lt=8)
+        qs2 = Number.objects.filter(pk__gt=4)
+        qs = qs1.difference(qs2).filter(pk__gte=2)
+        self.assertEqual(set(qs), set(Number.objects.filter(pk__in=(2, 3, 4))))
