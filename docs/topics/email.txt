@@ -397,11 +397,27 @@ Django's email library, you can do this using the
 
 .. class:: EmailMultiAlternatives
 
-    A subclass of :class:`~django.core.mail.EmailMessage` that allows
-    additional versions of the message body in the email via the
-    ``attach_alternative()`` method. This directly inherits all methods
-    (including the class initialization) from
-    :class:`~django.core.mail.EmailMessage`.
+    A subclass of :class:`EmailMessage` that allows additional versions of the
+    message body in the email via the :meth:`attach_alternative` method. This
+    directly inherits all methods (including the class initialization) from
+    :class:`EmailMessage`.
+
+    .. attribute:: alternatives
+
+        A list of named tuples with attributes ``(content, mimetype)``. This is
+        particularly useful in tests::
+
+            self.assertEqual(len(msg.alternatives), 1)
+            self.assertEqual(msg.alternatives[0].content, html_content)
+            self.assertEqual(msg.alternatives[0].mimetype, "text/html")
+
+        Alternatives should only be added using the :meth:`attach_alternative`
+        method.
+
+        .. versionchanged:: 5.2
+
+            In older versions, ``alternatives`` was a list of regular tuples,
+            as opposed to named tuples.
 
     .. method:: attach_alternative(content, mimetype)
 
@@ -419,24 +435,6 @@ Django's email library, you can do this using the
             msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
             msg.attach_alternative(html_content, "text/html")
             msg.send()
-
-    .. attribute:: alternatives
-
-        A list of named tuples with attributes ``(content, mimetype)``. This is
-        particularly useful in tests::
-
-            self.assertEqual(len(msg.alternatives), 1)
-            self.assertEqual(msg.alternatives[0].content, html_content)
-            self.assertEqual(msg.alternatives[0].mimetype, "text/html")
-
-        Alternatives should only be added using the
-        :meth:`~django.core.mail.EmailMultiAlternatives.attach_alternative`
-        method.
-
-        .. versionchanged:: 5.2
-
-            In older versions, ``alternatives`` was a list of regular tuples, as opposed
-            to named tuples.
 
 Updating the default content type
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
