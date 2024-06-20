@@ -84,6 +84,8 @@ html[data-theme="light"],
         "Segoe UI Emoji",
         "Segoe UI Symbol",
         "Noto Color Emoji";
+
+    color-scheme: light;
 }
 
 html, body {
@@ -102,7 +104,7 @@ body {
 /* LINKS */
 
 a:link, a:visited {
-    color: var(--body-fg);
+    color: var(--link-fg);
     text-decoration: none;
     transition: color 0.15s, background 0.15s;
 }
@@ -215,6 +217,10 @@ fieldset {
     padding: 0;
     border: none;
     border-top: 1px solid var(--hairline-color);
+}
+
+details summary {
+    cursor: pointer;
 }
 
 blockquote {
@@ -891,11 +897,6 @@ a.deletelink:focus, a.deletelink:hover {
   #content-related {
       border: 1px solid;
   }
-}
-
-#footer {
-    clear: both;
-    padding: 10px;
 }
 
 /* COLUMN TYPES */

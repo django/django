@@ -155,10 +155,6 @@ Authenticating users
         this. Rather if you're looking for a way to login a user, use the
         :class:`~django.contrib.auth.views.LoginView`.
 
-    .. versionchanged:: 5.0
-
-        ``aauthenticate()`` function was added.
-
 .. _topic-authorization:
 
 Permissions and Authorization
@@ -401,10 +397,6 @@ Or in an asynchronous view::
         # Do something for anonymous users.
         ...
 
-.. versionchanged:: 5.0
-
-    The :meth:`.HttpRequest.auser` method was added.
-
 .. _how-to-log-a-user-in:
 
 How to log a user in
@@ -445,10 +437,6 @@ If you have an authenticated user you want to attach to the current session
             else:
                 # Return an 'invalid login' error message.
                 ...
-
-    .. versionchanged:: 5.0
-
-        ``alogin()`` function was added.
 
 Selecting the authentication backend
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -505,10 +493,6 @@ How to log a user out
     immediately after logging out, do that *after* calling
     :func:`django.contrib.auth.logout()`.
 
-    .. versionchanged:: 5.0
-
-        ``alogout()`` function was added.
-
 Limiting access to logged-in users
 ----------------------------------
 
@@ -553,8 +537,7 @@ The ``login_required`` decorator
 
 
         @login_required
-        def my_view(request):
-            ...
+        def my_view(request): ...
 
     :func:`~django.contrib.auth.decorators.login_required` does the following:
 
@@ -575,8 +558,7 @@ The ``login_required`` decorator
 
 
         @login_required(redirect_field_name="my_redirect_field")
-        def my_view(request):
-            ...
+        def my_view(request): ...
 
     Note that if you provide a value to ``redirect_field_name``, you will most
     likely need to customize your login template as well, since the template
@@ -590,8 +572,7 @@ The ``login_required`` decorator
 
 
         @login_required(login_url="/accounts/login/")
-        def my_view(request):
-            ...
+        def my_view(request): ...
 
     Note that if you don't specify the ``login_url`` parameter, you'll need to
     ensure that the :setting:`settings.LOGIN_URL <LOGIN_URL>` and your login
@@ -619,6 +600,10 @@ The ``login_required`` decorator
     authorization check that the built-in views use), you may find the
     :func:`django.contrib.admin.views.decorators.staff_member_required`
     decorator a useful alternative to ``login_required()``.
+
+.. versionchanged:: 5.1
+
+    Support for wrapping asynchronous view functions was added.
 
 .. currentmodule:: django.contrib.auth.mixins
 
@@ -655,7 +640,24 @@ inheritance list.
     ``is_active`` flag on a user, but the default
     :setting:`AUTHENTICATION_BACKENDS` reject inactive users.
 
+.. _disable-login-required-middleware-for-views:
+
 .. currentmodule:: django.contrib.auth.decorators
+
+The ``login_not_required`` decorator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 5.1
+
+When :class:`~django.contrib.auth.middleware.LoginRequiredMiddleware` is
+installed, all views require authentication by default. Some views, such as the
+login view, may need to disable this behavior.
+
+.. function:: login_not_required()
+
+    Allows unauthenticated requests without redirecting to the login page when
+    :class:`~django.contrib.auth.middleware.LoginRequiredMiddleware` is
+    installed.
 
 Limiting access to logged-in users that pass a test
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -688,8 +690,7 @@ email in the desired domain and if not, redirects to the login page::
 
 
         @user_passes_test(email_check)
-        def my_view(request):
-            ...
+        def my_view(request): ...
 
     :func:`~django.contrib.auth.decorators.user_passes_test` takes a required
     argument: a callable that takes a
@@ -716,8 +717,12 @@ email in the desired domain and if not, redirects to the login page::
     For example::
 
         @user_passes_test(email_check, login_url="/login/")
-        def my_view(request):
-            ...
+        def my_view(request): ...
+
+    .. versionchanged:: 5.1
+
+        Support for wrapping asynchronous view functions and using asynchronous
+        test callables was added.
 
 .. currentmodule:: django.contrib.auth.mixins
 
@@ -761,8 +766,7 @@ email in the desired domain and if not, redirects to the login page::
                     return self.request.user.username.startswith("django")
 
 
-            class MyView(TestMixin1, TestMixin2, View):
-                ...
+            class MyView(TestMixin1, TestMixin2, View): ...
 
         If ``TestMixin1`` would call ``super()`` and take that result into
         account, ``TestMixin1`` wouldn't work standalone anymore.
@@ -782,8 +786,7 @@ The ``permission_required`` decorator
 
 
         @permission_required("polls.add_choice")
-        def my_view(request):
-            ...
+        def my_view(request): ...
 
     Just like the :meth:`~django.contrib.auth.models.User.has_perm` method,
     permission names take the form ``"<app label>.<permission codename>"``
@@ -800,8 +803,7 @@ The ``permission_required`` decorator
 
 
         @permission_required("polls.add_choice", login_url="/loginpage/")
-        def my_view(request):
-            ...
+        def my_view(request): ...
 
     As in the :func:`~django.contrib.auth.decorators.login_required` decorator,
     ``login_url`` defaults to :setting:`settings.LOGIN_URL <LOGIN_URL>`.
@@ -820,12 +822,15 @@ The ``permission_required`` decorator
 
         @login_required
         @permission_required("polls.add_choice", raise_exception=True)
-        def my_view(request):
-            ...
+        def my_view(request): ...
 
     This also avoids a redirect loop when :class:`.LoginView`'s
     ``redirect_authenticated_user=True`` and the logged-in user doesn't have
     all of the required permissions.
+
+.. versionchanged:: 5.1
+
+    Support for wrapping asynchronous view functions was added.
 
 .. currentmodule:: django.contrib.auth.mixins
 
@@ -978,10 +983,6 @@ function.
                     update_session_auth_hash(request, form.user)
             else:
                 ...
-
-    .. versionchanged:: 5.0
-
-        ``aupdate_session_auth_hash()`` function was added.
 
 .. note::
 
@@ -1608,7 +1609,7 @@ Helper functions
       Defaults to :setting:`settings.LOGIN_URL <LOGIN_URL>` if not supplied.
 
     * ``redirect_field_name``: The name of a ``GET`` field containing the
-      URL to redirect to after log out. Overrides ``next`` if the given
+      URL to redirect to after login. Overrides ``next`` if the given
       ``GET`` parameter is passed.
 
 .. _built-in-auth-forms:
@@ -1632,9 +1633,17 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
 
 .. class:: AdminPasswordChangeForm
 
-    A form used in the admin interface to change a user's password.
+    A form used in the admin interface to change a user's password, including
+    the ability to set an :meth:`unusable password
+    <django.contrib.auth.models.User.set_unusable_password>`, which blocks the
+    user from logging in with password-based authentication.
 
     Takes the ``user`` as the first positional argument.
+
+    .. versionchanged:: 5.1
+
+        Option to disable (or reenable) password-based authentication was
+        added.
 
 .. class:: AuthenticationForm
 
@@ -1726,12 +1735,21 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
     A :class:`~django.forms.ModelForm` for creating a new user. This is the
     recommended base class if you need to customize the user creation form.
 
-    It has three fields: ``username`` (from the user model), ``password1``,
-    and ``password2``. It verifies that ``password1`` and ``password2`` match,
-    validates the password using
+    It has four fields: ``username`` (from the user model), ``password1``,
+    ``password2``, and ``usable_password`` (the latter is enabled by default).
+    If ``usable_password`` is enabled, it verifies that ``password1`` and
+    ``password2`` are non empty and match, validates the password using
     :func:`~django.contrib.auth.password_validation.validate_password`, and
     sets the user's password using
     :meth:`~django.contrib.auth.models.User.set_password()`.
+    If ``usable_password`` is disabled, no password validation is done, and
+    password-based authentication is disabled for the user by calling
+    :meth:`~django.contrib.auth.models.User.set_unusable_password()`.
+
+    .. versionchanged:: 5.1
+
+        Option to create users with disabled password-based authentication was
+        added.
 
 .. class:: UserCreationForm
 
@@ -1846,6 +1864,8 @@ You should see a link to "Users" in the "Auth"
 section of the main admin index page. The "Add user" admin page is different
 than standard admin pages in that it requires you to choose a username and
 password before allowing you to edit the rest of the user's fields.
+Alternatively, on this page, you can choose a username and disable
+password-based authentication for the user.
 
 Also note: if you want a user account to be able to create users using the
 Django admin site, you'll need to give them permission to add users *and*
@@ -1867,4 +1887,4 @@ Changing passwords
 User passwords are not displayed in the admin (nor stored in the database), but
 the :doc:`password storage details </topics/auth/passwords>` are displayed.
 Included in the display of this information is a link to
-a password change form that allows admins to change user passwords.
+a password change form that allows admins to change or unset user passwords.

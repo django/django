@@ -2,6 +2,7 @@
 Base classes for writing management commands (named commands which can
 be executed through ``django-admin`` or ``manage.py``).
 """
+
 import argparse
 import os
 import sys
@@ -344,7 +345,7 @@ class BaseCommand:
             parser,
             "--traceback",
             action="store_true",
-            help="Raise on CommandError exceptions.",
+            help="Display a full stack trace on CommandError exceptions.",
         )
         self.add_base_argument(
             parser,
@@ -528,9 +529,11 @@ class BaseCommand:
                 if issues:
                     visible_issue_count += len(issues)
                     formatted = (
-                        self.style.ERROR(str(e))
-                        if e.is_serious()
-                        else self.style.WARNING(str(e))
+                        (
+                            self.style.ERROR(str(e))
+                            if e.is_serious()
+                            else self.style.WARNING(str(e))
+                        )
                         for e in issues
                     )
                     formatted = "\n".join(sorted(formatted))
@@ -543,11 +546,15 @@ class BaseCommand:
             if visible_issue_count:
                 footer += "\n"
             footer += "System check identified %s (%s silenced)." % (
-                "no issues"
-                if visible_issue_count == 0
-                else "1 issue"
-                if visible_issue_count == 1
-                else "%s issues" % visible_issue_count,
+                (
+                    "no issues"
+                    if visible_issue_count == 0
+                    else (
+                        "1 issue"
+                        if visible_issue_count == 1
+                        else "%s issues" % visible_issue_count
+                    )
+                ),
                 len(all_issues) - visible_issue_count,
             )
 

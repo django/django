@@ -830,6 +830,22 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             )
         self.assertEqual(len(warning_list), 0)
 
+    def test_dumpdata_objects_with_prefetch_related(self):
+        management.call_command(
+            "loaddata", "fixture6.json", "fixture8.json", verbosity=0
+        )
+        with self.assertNumQueries(5):
+            self._dumpdata_assert(
+                ["fixtures.visa"],
+                '[{"fields": {"permissions": [["add_user", "auth", "user"]],'
+                '"person": ["Stephane Grappelli"]},'
+                '"model": "fixtures.visa", "pk": 2},'
+                '{"fields": {"permissions": [], "person": ["Prince"]},'
+                '"model": "fixtures.visa", "pk": 3}]',
+                natural_foreign_keys=True,
+                primary_keys="2,3",
+            )
+
     def test_compress_format_loading(self):
         # Load fixture 4 (compressed), using format specification
         management.call_command("loaddata", "fixture4.json", verbosity=0)

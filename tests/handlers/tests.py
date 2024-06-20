@@ -16,9 +16,7 @@ class HandlerTests(SimpleTestCase):
 
     def setUp(self):
         request_started.disconnect(close_old_connections)
-
-    def tearDown(self):
-        request_started.connect(close_old_connections)
+        self.addCleanup(request_started.connect, close_old_connections)
 
     def test_middleware_initialized(self):
         handler = WSGIHandler()
@@ -150,11 +148,9 @@ class SignalsTests(SimpleTestCase):
         self.signals = []
         self.signaled_environ = None
         request_started.connect(self.register_started)
+        self.addCleanup(request_started.disconnect, self.register_started)
         request_finished.connect(self.register_finished)
-
-    def tearDown(self):
-        request_started.disconnect(self.register_started)
-        request_finished.disconnect(self.register_finished)
+        self.addCleanup(request_finished.disconnect, self.register_finished)
 
     def register_started(self, **kwargs):
         self.signals.append("started")
@@ -244,8 +240,9 @@ class HandlerRequestTests(SimpleTestCase):
             ("/no_response_cbv/", "handlers.views.NoResponse.__call__"),
         )
         for url, view in tests:
-            with self.subTest(url=url), self.assertRaisesMessage(
-                ValueError, msg % view
+            with (
+                self.subTest(url=url),
+                self.assertRaisesMessage(ValueError, msg % view),
             ):
                 self.client.get(url)
 
@@ -329,11 +326,22 @@ class AsyncHandlerRequestTests(SimpleTestCase):
         with self.assertRaisesMessage(ValueError, msg):
             await self.async_client.get("/unawaited/")
 
-    @override_settings(FORCE_SCRIPT_NAME="/FORCED_PREFIX/")
+    def test_root_path(self):
+        async_request_factory = AsyncRequestFactory()
+        request = async_request_factory.request(
+            **{"path": "/root/somepath/", "root_path": "/root"}
+        )
+        self.assertEqual(request.path, "/root/somepath/")
+        self.assertEqual(request.script_name, "/root")
+        self.assertEqual(request.path_info, "/somepath/")
+
+    @override_settings(FORCE_SCRIPT_NAME="/FORCED_PREFIX")
     def test_force_script_name(self):
         async_request_factory = AsyncRequestFactory()
-        request = async_request_factory.request(**{"path": "/somepath/"})
+        request = async_request_factory.request(**{"path": "/FORCED_PREFIX/somepath/"})
         self.assertEqual(request.path, "/FORCED_PREFIX/somepath/")
+        self.assertEqual(request.script_name, "/FORCED_PREFIX")
+        self.assertEqual(request.path_info, "/somepath/")
 
     async def test_sync_streaming(self):
         response = await self.async_client.get("/streaming/")

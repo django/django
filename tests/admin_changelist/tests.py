@@ -42,6 +42,7 @@ from .admin import (
     EmptyValueChildAdmin,
     EventAdmin,
     FilteredChildAdmin,
+    GrandChildAdmin,
     GroupAdmin,
     InvitationAdmin,
     NoListDisplayLinksParentAdmin,
@@ -61,6 +62,7 @@ from .models import (
     CustomIdUser,
     Event,
     Genre,
+    GrandChild,
     Group,
     Invitation,
     Membership,
@@ -74,15 +76,15 @@ from .models import (
 )
 
 
-def build_tbody_html(obj, href, extra_fields):
+def build_tbody_html(obj, href, field_name, extra_fields):
     return (
         "<tbody><tr>"
         '<td class="action-checkbox">'
         '<input type="checkbox" name="_selected_action" value="{}" '
         'class="action-select" aria-label="Select this object for an action - {}"></td>'
-        '<th class="field-name"><a href="{}">name</a></th>'
+        '<th class="field-name"><a href="{}">{}</a></th>'
         "{}</tr></tbody>"
-    ).format(obj.pk, str(obj), href, extra_fields)
+    ).format(obj.pk, str(obj), href, field_name, extra_fields)
 
 
 @override_settings(ROOT_URLCONF="admin_changelist.urls")
@@ -245,13 +247,31 @@ class ChangeListTests(TestCase):
         table_output = template.render(context)
         link = reverse("admin:admin_changelist_child_change", args=(new_child.id,))
         row_html = build_tbody_html(
-            new_child, link, '<td class="field-parent nowrap">-</td>'
+            new_child, link, "name", '<td class="field-parent nowrap">-</td>'
         )
         self.assertNotEqual(
             table_output.find(row_html),
             -1,
             "Failed to find expected row element: %s" % table_output,
         )
+
+    def test_result_list_empty_changelist_value_blank_string(self):
+        new_child = Child.objects.create(name="", parent=None)
+        request = self.factory.get("/child/")
+        request.user = self.superuser
+        m = ChildAdmin(Child, custom_site)
+        cl = m.get_changelist_instance(request)
+        cl.formset = None
+        template = Template(
+            "{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}"
+        )
+        context = Context({"cl": cl, "opts": Child._meta})
+        table_output = template.render(context)
+        link = reverse("admin:admin_changelist_child_change", args=(new_child.id,))
+        row_html = build_tbody_html(
+            new_child, link, "-", '<td class="field-parent nowrap">-</td>'
+        )
+        self.assertInHTML(row_html, table_output)
 
     def test_result_list_set_empty_value_display_on_admin_site(self):
         """
@@ -272,7 +292,7 @@ class ChangeListTests(TestCase):
         table_output = template.render(context)
         link = reverse("admin:admin_changelist_child_change", args=(new_child.id,))
         row_html = build_tbody_html(
-            new_child, link, '<td class="field-parent nowrap">???</td>'
+            new_child, link, "name", '<td class="field-parent nowrap">???</td>'
         )
         self.assertNotEqual(
             table_output.find(row_html),
@@ -299,6 +319,7 @@ class ChangeListTests(TestCase):
         row_html = build_tbody_html(
             new_child,
             link,
+            "name",
             '<td class="field-age_display">&amp;dagger;</td>'
             '<td class="field-age">-empty-</td>',
         )
@@ -327,7 +348,10 @@ class ChangeListTests(TestCase):
         table_output = template.render(context)
         link = reverse("admin:admin_changelist_child_change", args=(new_child.id,))
         row_html = build_tbody_html(
-            new_child, link, '<td class="field-parent nowrap">%s</td>' % new_parent
+            new_child,
+            link,
+            "name",
+            '<td class="field-parent nowrap">%s</td>' % new_parent,
         )
         self.assertNotEqual(
             table_output.find(row_html),
@@ -1419,7 +1443,7 @@ class ChangeListTests(TestCase):
                             ["field_3", "related_4_id"],
                         )
                     ],
-                    models.CheckConstraint(check=models.Q(id__gt=0), name="foo"),
+                    models.CheckConstraint(condition=models.Q(id__gt=0), name="foo"),
                     models.UniqueConstraint(
                         fields=["field_5"],
                         condition=models.Q(id__gt=10),
@@ -1611,6 +1635,62 @@ class ChangeListTests(TestCase):
                 self.assertContains(
                     response, f'0 results (<a href="{href}">1 total</a>)'
                 )
+
+    def test_list_display_related_field(self):
+        parent = Parent.objects.create(name="I am your father")
+        child = Child.objects.create(name="I am your child", parent=parent)
+        GrandChild.objects.create(name="I am your grandchild", parent=child)
+        request = self._mocked_authenticated_request("/grandchild/", self.superuser)
+
+        m = GrandChildAdmin(GrandChild, custom_site)
+        response = m.changelist_view(request)
+        self.assertContains(response, parent.name)
+        self.assertContains(response, child.name)
+
+    def test_list_display_related_field_null(self):
+        GrandChild.objects.create(name="I am parentless", parent=None)
+        request = self._mocked_authenticated_request("/grandchild/", self.superuser)
+
+        m = GrandChildAdmin(GrandChild, custom_site)
+        response = m.changelist_view(request)
+        self.assertContains(response, '<td class="field-parent__name">-</td>')
+        self.assertContains(response, '<td class="field-parent__parent__name">-</td>')
+
+    def test_list_display_related_field_ordering(self):
+        parent_a = Parent.objects.create(name="Alice")
+        parent_z = Parent.objects.create(name="Zara")
+        Child.objects.create(name="Alice's child", parent=parent_a)
+        Child.objects.create(name="Zara's child", parent=parent_z)
+
+        class ChildAdmin(admin.ModelAdmin):
+            list_display = ["name", "parent__name"]
+            list_per_page = 1
+
+        m = ChildAdmin(Child, custom_site)
+
+        # Order ascending.
+        request = self._mocked_authenticated_request("/grandchild/?o=1", self.superuser)
+        response = m.changelist_view(request)
+        self.assertContains(response, parent_a.name)
+        self.assertNotContains(response, parent_z.name)
+
+        # Order descending.
+        request = self._mocked_authenticated_request(
+            "/grandchild/?o=-1", self.superuser
+        )
+        response = m.changelist_view(request)
+        self.assertNotContains(response, parent_a.name)
+        self.assertContains(response, parent_z.name)
+
+    def test_list_display_related_field_ordering_fields(self):
+        class ChildAdmin(admin.ModelAdmin):
+            list_display = ["name", "parent__name"]
+            ordering = ["parent__name"]
+
+        m = ChildAdmin(Child, custom_site)
+        request = self._mocked_authenticated_request("/", self.superuser)
+        cl = m.get_changelist_instance(request)
+        self.assertEqual(cl.get_ordering_field_columns(), {2: "asc"})
 
 
 class GetAdminLogTests(TestCase):
@@ -1993,3 +2073,58 @@ class SeleniumTests(AdminSeleniumTestCase):
                 By.CSS_SELECTOR, "[data-filter-title='It\\'s OK']"
             ).get_attribute("open")
         )
+
+    def test_list_display_ordering(self):
+        from selenium.webdriver.common.by import By
+
+        parent_a = Parent.objects.create(name="Parent A")
+        child_l = Child.objects.create(name="Child L", parent=None)
+        child_m = Child.objects.create(name="Child M", parent=parent_a)
+        GrandChild.objects.create(name="Grandchild X", parent=child_m)
+        GrandChild.objects.create(name="Grandchild Y", parent=child_l)
+        GrandChild.objects.create(name="Grandchild Z", parent=None)
+
+        self.admin_login(username="super", password="secret")
+        changelist_url = reverse("admin:admin_changelist_grandchild_changelist")
+        self.selenium.get(self.live_server_url + changelist_url)
+
+        def find_result_row_texts():
+            table = self.selenium.find_element(By.ID, "result_list")
+            # Drop header from the result list
+            return [row.text for row in table.find_elements(By.TAG_NAME, "tr")][1:]
+
+        def expected_from_queryset(qs):
+            return [
+                " ".join("-" if i is None else i for i in item)
+                for item in qs.values_list(
+                    "name", "parent__name", "parent__parent__name"
+                )
+            ]
+
+        cases = [
+            # Order ascending by `name`.
+            ("th.sortable.column-name", ("name",)),
+            # Order descending by `name`.
+            ("th.sortable.column-name", ("-name",)),
+            # Order ascending by `parent__name`.
+            ("th.sortable.column-parent__name", ("parent__name", "-name")),
+            # Order descending by `parent__name`.
+            ("th.sortable.column-parent__name", ("-parent__name", "-name")),
+            # Order ascending by `parent__parent__name`.
+            (
+                "th.sortable.column-parent__parent__name",
+                ("parent__parent__name", "-parent__name", "-name"),
+            ),
+            # Order descending by `parent__parent__name`.
+            (
+                "th.sortable.column-parent__parent__name",
+                ("-parent__parent__name", "-parent__name", "-name"),
+            ),
+        ]
+        for css_selector, ordering in cases:
+            with self.subTest(ordering=ordering):
+                self.selenium.find_element(By.CSS_SELECTOR, css_selector).click()
+                expected = expected_from_queryset(
+                    GrandChild.objects.all().order_by(*ordering)
+                )
+                self.assertEqual(find_result_row_texts(), expected)

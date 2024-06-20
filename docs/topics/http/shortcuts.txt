@@ -239,10 +239,6 @@ Note: As with ``get()``, a
 :class:`~django.core.exceptions.MultipleObjectsReturned` exception
 will be raised if more than one object is found.
 
-.. versionchanged:: 5.0
-
-    ``aget_object_or_404()`` function was added.
-
 ``get_list_or_404()``
 =====================
 
@@ -291,6 +287,3 @@ This example is equivalent to::
         if not my_objects:
             raise Http404("No MyModel matches the given query.")
 
-.. versionchanged:: 5.0
-
-    ``aget_list_or_404()`` function was added.

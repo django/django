@@ -431,11 +431,6 @@ application registry.
     It must be called explicitly in other cases, for instance in plain Python
     scripts.
 
-    .. versionchanged:: 5.0
-
-        Raises a ``RuntimeWarning`` when apps interact with the database before
-        the app registry has been fully populated.
-
 .. currentmodule:: django.apps
 
 The application registry is initialized in three stages. At each stage, Django

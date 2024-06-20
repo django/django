@@ -7,11 +7,12 @@ from django.contrib.admin import ModelAdmin, actions
 from django.contrib.admin.exceptions import AlreadyRegistered, NotRegistered
 from django.contrib.admin.views.autocomplete import AutocompleteJsonView
 from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.contrib.auth.decorators import login_not_required
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models.base import ModelBase
 from django.http import Http404, HttpResponsePermanentRedirect, HttpResponseRedirect
 from django.template.response import TemplateResponse
-from django.urls import NoReverseMatch, Resolver404, resolve, reverse
+from django.urls import NoReverseMatch, Resolver404, resolve, reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.utils.functional import LazyObject
 from django.utils.module_loading import import_string
@@ -259,6 +260,8 @@ class AdminSite:
                 return self.admin_view(view, cacheable)(*args, **kwargs)
 
             wrapper.admin_site = self
+            # Used by LoginRequiredMiddleware.
+            wrapper.login_url = reverse_lazy("admin:login", current_app=self.name)
             return update_wrapper(wrapper, view)
 
         # Admin-site-wide views.
@@ -402,6 +405,7 @@ class AdminSite:
         return LogoutView.as_view(**defaults)(request)
 
     @method_decorator(never_cache)
+    @login_not_required
     def login(self, request, extra_context=None):
         """
         Display the login form for the given HttpRequest.

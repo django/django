@@ -29,7 +29,6 @@ from django.core.mail.message import BadHeaderError, sanitize_address
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import requires_tz_support
 from django.utils.translation import gettext_lazy
-from django.utils.version import PY311
 
 try:
     from aiosmtpd.controller import Controller
@@ -91,6 +90,37 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         self.assertEqual(message.get_payload(), "Content")
         self.assertEqual(message["From"], "from@example.com")
         self.assertEqual(message["To"], "to@example.com")
+
+    @mock.patch("django.core.mail.message.MIMEText.set_payload")
+    def test_nonascii_as_string_with_ascii_charset(self, mock_set_payload):
+        """Line length check should encode the payload supporting `surrogateescape`.
+
+        Following https://github.com/python/cpython/issues/76511, newer
+        versions of Python (3.11.9, 3.12.3 and 3.13) ensure that a message's
+        payload is encoded with the provided charset and `surrogateescape` is
+        used as the error handling strategy.
+
+        This test is heavily based on the test from the fix for the bug above.
+        Line length checks in SafeMIMEText's set_payload should also use the
+        same error handling strategy to avoid errors such as:
+
+        UnicodeEncodeError: 'utf-8' codec can't encode <...>: surrogates not allowed
+
+        """
+
+        def simplified_set_payload(instance, payload, charset):
+            instance._payload = payload
+
+        mock_set_payload.side_effect = simplified_set_payload
+
+        text = (
+            "Text heavily based in Python's text for non-ascii messages: Föö bär"
+        ).encode("iso-8859-1")
+        body = text.decode("ascii", errors="surrogateescape")
+        email = EmailMessage("Subject", body, "from@example.com", ["to@example.com"])
+        message = email.message()
+        mock_set_payload.assert_called_once()
+        self.assertEqual(message.get_payload(decode=True), text)
 
     def test_multiple_recipients(self):
         email = EmailMessage(
@@ -520,6 +550,18 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         msg.attach("example.txt", "Text file content", "text/plain")
         self.assertIn(html_content, msg.message().as_string())
 
+    def test_alternatives(self):
+        msg = EmailMultiAlternatives()
+        html_content = "<p>This is <strong>html</strong></p>"
+        mime_type = "text/html"
+        msg.attach_alternative(html_content, mime_type)
+
+        self.assertEqual(msg.alternatives[0][0], html_content)
+        self.assertEqual(msg.alternatives[0].content, html_content)
+
+        self.assertEqual(msg.alternatives[0][1], mime_type)
+        self.assertEqual(msg.alternatives[0].mimetype, mime_type)
+
     def test_none_body(self):
         msg = EmailMessage("subject", None, "from@example.com", ["to@example.com"])
         self.assertEqual(msg.body, "")
@@ -596,6 +638,22 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         )
 
     def test_attachments(self):
+        msg = EmailMessage()
+        file_name = "example.txt"
+        file_content = "Text file content"
+        mime_type = "text/plain"
+        msg.attach(file_name, file_content, mime_type)
+
+        self.assertEqual(msg.attachments[0][0], file_name)
+        self.assertEqual(msg.attachments[0].filename, file_name)
+
+        self.assertEqual(msg.attachments[0][1], file_content)
+        self.assertEqual(msg.attachments[0].content, file_content)
+
+        self.assertEqual(msg.attachments[0][2], mime_type)
+        self.assertEqual(msg.attachments[0].mimetype, mime_type)
+
+    def test_decoded_attachments(self):
         """Regression test for #9367"""
         headers = {"Date": "Fri, 09 Nov 2001 01:08:47 -0000", "Message-ID": "foo"}
         subject, from_email, to = "hello", "from@example.com", "to@example.com"
@@ -615,14 +673,14 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         self.assertEqual(payload[0].get_content_type(), "multipart/alternative")
         self.assertEqual(payload[1].get_content_type(), "application/pdf")
 
-    def test_attachments_two_tuple(self):
+    def test_decoded_attachments_two_tuple(self):
         msg = EmailMessage(attachments=[("filename1", "content1")])
         filename, content, mimetype = self.get_decoded_attachments(msg)[0]
         self.assertEqual(filename, "filename1")
         self.assertEqual(content, b"content1")
         self.assertEqual(mimetype, "application/octet-stream")
 
-    def test_attachments_MIMEText(self):
+    def test_decoded_attachments_MIMEText(self):
         txt = MIMEText("content1")
         msg = EmailMessage(attachments=[txt])
         payload = msg.message().get_payload()
@@ -791,13 +849,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
                 filebased.EmailBackend,
             )
 
-        if sys.platform == "win32" and not PY311:
-            msg = (
-                "_getfullpathname: path should be string, bytes or os.PathLike, not "
-                "object"
-            )
-        else:
-            msg = "expected str, bytes or os.PathLike object, not object"
+        msg = " not object"
         with self.assertRaisesMessage(TypeError, msg):
             mail.get_connection(
                 "django.core.mail.backends.filebased.EmailBackend", file_path=object()
@@ -1172,12 +1224,10 @@ class PythonGlobalState(SimpleTestCase):
 class BaseEmailBackendTests(HeadersCheckMixin):
     email_backend = None
 
-    def setUp(self):
-        self.settings_override = override_settings(EMAIL_BACKEND=self.email_backend)
-        self.settings_override.enable()
-
-    def tearDown(self):
-        self.settings_override.disable()
+    @classmethod
+    def setUpClass(cls):
+        cls.enterClassContext(override_settings(EMAIL_BACKEND=cls.email_backend))
+        super().setUpClass()
 
     def assertStartsWith(self, first, second):
         if not first.startswith(second):
@@ -1394,8 +1444,9 @@ class BaseEmailBackendTests(HeadersCheckMixin):
         ):
             msg = "The %s setting must be a list of 2-tuples." % setting
             for value in tests:
-                with self.subTest(setting=setting, value=value), self.settings(
-                    **{setting: value}
+                with (
+                    self.subTest(setting=setting, value=value),
+                    self.settings(**{setting: value}),
                 ):
                     with self.assertRaisesMessage(ValueError, msg):
                         mail_func("subject", "content")
@@ -1575,12 +1626,9 @@ class FileBackendTests(BaseEmailBackendTests, SimpleTestCase):
         super().setUp()
         self.tmp_dir = self.mkdtemp()
         self.addCleanup(shutil.rmtree, self.tmp_dir)
-        self._settings_override = override_settings(EMAIL_FILE_PATH=self.tmp_dir)
-        self._settings_override.enable()
-
-    def tearDown(self):
-        self._settings_override.disable()
-        super().tearDown()
+        _settings_override = override_settings(EMAIL_FILE_PATH=self.tmp_dir)
+        _settings_override.enable()
+        self.addCleanup(_settings_override.disable)
 
     def mkdtemp(self):
         return tempfile.mkdtemp()
@@ -1754,10 +1802,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
     def setUp(self):
         super().setUp()
         self.smtp_handler.flush_mailbox()
-
-    def tearDown(self):
-        self.smtp_handler.flush_mailbox()
-        super().tearDown()
+        self.addCleanup(self.smtp_handler.flush_mailbox)
 
     def flush_mailbox(self):
         self.smtp_handler.flush_mailbox()

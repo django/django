@@ -3,6 +3,7 @@ A series of tests to establish that the command-line management tools work as
 advertised - especially with regards to the handling of the
 DJANGO_SETTINGS_MODULE and default settings.py files.
 """
+
 import os
 import re
 import shutil
@@ -32,6 +33,7 @@ from django.db.migrations.recorder import MigrationRecorder
 from django.test import LiveServerTestCase, SimpleTestCase, TestCase, override_settings
 from django.test.utils import captured_stderr, captured_stdout
 from django.urls import path
+from django.utils.version import PY313
 from django.views.static import serve
 
 from . import urls
@@ -757,7 +759,9 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         with open(os.path.join(app_path, "apps.py"), encoding="utf8") as f:
             content = f.read()
             self.assertIn("class こんにちはConfig(AppConfig)", content)
-            self.assertIn('name = "こんにちは"' if HAS_BLACK else "name = 'こんにちは'", content)
+            self.assertIn(
+                'name = "こんにちは"' if HAS_BLACK else "name = 'こんにちは'", content
+            )
 
     def test_builtin_command(self):
         """
@@ -1898,10 +1902,16 @@ class CommandTypes(AdminScriptTestCase):
         ]
         for option in expected_options:
             self.assertOutput(out, f"[{option}]")
-        self.assertOutput(out, "--option_a OPTION_A, -a OPTION_A")
-        self.assertOutput(out, "--option_b OPTION_B, -b OPTION_B")
-        self.assertOutput(out, "--option_c OPTION_C, -c OPTION_C")
-        self.assertOutput(out, "-v {0,1,2,3}, --verbosity {0,1,2,3}")
+        if PY313:
+            self.assertOutput(out, "--option_a, -a OPTION_A")
+            self.assertOutput(out, "--option_b, -b OPTION_B")
+            self.assertOutput(out, "--option_c, -c OPTION_C")
+            self.assertOutput(out, "-v, --verbosity {0,1,2,3}")
+        else:
+            self.assertOutput(out, "--option_a OPTION_A, -a OPTION_A")
+            self.assertOutput(out, "--option_b OPTION_B, -b OPTION_B")
+            self.assertOutput(out, "--option_c OPTION_C, -c OPTION_C")
+            self.assertOutput(out, "-v {0,1,2,3}, --verbosity {0,1,2,3}")
 
     def test_color_style(self):
         style = color.no_style()
@@ -2291,6 +2301,35 @@ class Discovery(SimpleTestCase):
             self.assertEqual(out.getvalue().strip(), "simple_app")
 
 
+class CommandDBOptionChoiceTests(SimpleTestCase):
+    def test_invalid_choice_db_option(self):
+        expected_error = (
+            "Error: argument --database: invalid choice: "
+            "'deflaut' (choose from 'default', 'other')"
+        )
+        args = [
+            "changepassword",
+            "createsuperuser",
+            "remove_stale_contenttypes",
+            "check",
+            "createcachetable",
+            "dbshell",
+            "flush",
+            "dumpdata",
+            "inspectdb",
+            "loaddata",
+            "showmigrations",
+            "sqlflush",
+            "sqlmigrate",
+            "sqlsequencereset",
+            "migrate",
+        ]
+
+        for arg in args:
+            with self.assertRaisesMessage(CommandError, expected_error):
+                call_command(arg, "--database", "deflaut", verbosity=0)
+
+
 class ArgumentOrder(AdminScriptTestCase):
     """Tests for 2-stage argument parsing scheme.
 
@@ -2613,7 +2652,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
             urls.urlpatterns = old_urlpatterns
 
     def test_project_template_tarball_url(self):
-        """ "
+        """
         Startproject management command handles project template tar/zip balls
         from non-canonical urls.
         """

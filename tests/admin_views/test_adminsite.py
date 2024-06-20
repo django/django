@@ -11,8 +11,19 @@ site = admin.AdminSite(name="test_adminsite")
 site.register(User)
 site.register(Article)
 
+
+class CustomAdminSite(admin.AdminSite):
+    site_title = "Custom title"
+    site_header = "Custom site"
+
+
+custom_site = CustomAdminSite(name="test_custom_adminsite")
+custom_site.register(User)
+
+
 urlpatterns = [
     path("test_admin/admin/", site.urls),
+    path("test_custom_admin/admin/", custom_site.urls),
 ]
 
 
@@ -42,6 +53,13 @@ class SiteEachContextTest(TestCase):
         self.assertEqual(ctx["site_title"], "Django site admin")
         self.assertEqual(ctx["site_url"], "/")
         self.assertIs(ctx["has_permission"], True)
+
+    def test_custom_admin_titles(self):
+        request = self.request_factory.get(reverse("test_custom_adminsite:index"))
+        request.user = self.u1
+        ctx = custom_site.each_context(request)
+        self.assertEqual(ctx["site_title"], "Custom title")
+        self.assertEqual(ctx["site_header"], "Custom site")
 
     def test_each_context_site_url_with_script_name(self):
         request = self.request_factory.get(

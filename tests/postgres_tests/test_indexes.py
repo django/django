@@ -1,5 +1,3 @@
-from unittest import mock
-
 from django.contrib.postgres.indexes import (
     BloomIndex,
     BrinIndex,
@@ -11,10 +9,9 @@ from django.contrib.postgres.indexes import (
     PostgresIndex,
     SpGistIndex,
 )
-from django.db import NotSupportedError, connection
+from django.db import connection
 from django.db.models import CharField, F, Index, Q
 from django.db.models.functions import Cast, Collate, Length, Lower
-from django.test import skipUnlessDBFeature
 from django.test.utils import register_lookup
 
 from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase
@@ -143,12 +140,29 @@ class BTreeIndexTests(IndexTestMixin, PostgreSQLSimpleTestCase):
         self.assertEqual(BTreeIndex.suffix, "btree")
 
     def test_deconstruction(self):
-        index = BTreeIndex(fields=["title"], name="test_title_btree", fillfactor=80)
+        index = BTreeIndex(fields=["title"], name="test_title_btree")
+        path, args, kwargs = index.deconstruct()
+        self.assertEqual(path, "django.contrib.postgres.indexes.BTreeIndex")
+        self.assertEqual(args, ())
+        self.assertEqual(kwargs, {"fields": ["title"], "name": "test_title_btree"})
+
+        index = BTreeIndex(
+            fields=["title"],
+            name="test_title_btree",
+            fillfactor=80,
+            deduplicate_items=False,
+        )
         path, args, kwargs = index.deconstruct()
         self.assertEqual(path, "django.contrib.postgres.indexes.BTreeIndex")
         self.assertEqual(args, ())
         self.assertEqual(
-            kwargs, {"fields": ["title"], "name": "test_title_btree", "fillfactor": 80}
+            kwargs,
+            {
+                "fields": ["title"],
+                "name": "test_title_btree",
+                "fillfactor": 80,
+                "deduplicate_items": False,
+            },
         )
 
 
@@ -455,13 +469,18 @@ class SchemaTests(PostgreSQLTestCase):
         )
 
     def test_btree_parameters(self):
-        index_name = "integer_array_btree_fillfactor"
-        index = BTreeIndex(fields=["field"], name=index_name, fillfactor=80)
+        index_name = "integer_array_btree_parameters"
+        index = BTreeIndex(
+            fields=["field"], name=index_name, fillfactor=80, deduplicate_items=False
+        )
         with connection.schema_editor() as editor:
             editor.add_index(CharFieldModel, index)
         constraints = self.get_constraints(CharFieldModel._meta.db_table)
         self.assertEqual(constraints[index_name]["type"], BTreeIndex.suffix)
-        self.assertEqual(constraints[index_name]["options"], ["fillfactor=80"])
+        self.assertEqual(
+            constraints[index_name]["options"],
+            ["fillfactor=80", "deduplicate_items=off"],
+        )
         with connection.schema_editor() as editor:
             editor.remove_index(CharFieldModel, index)
         self.assertNotIn(
@@ -618,7 +637,6 @@ class SchemaTests(PostgreSQLTestCase):
             index_name, self.get_constraints(TextFieldModel._meta.db_table)
         )
 
-    @skipUnlessDBFeature("supports_covering_spgist_indexes")
     def test_spgist_include(self):
         index_name = "scene_spgist_include_setting"
         index = SpGistIndex(name=index_name, fields=["scene"], include=["setting"])
@@ -630,20 +648,6 @@ class SchemaTests(PostgreSQLTestCase):
         self.assertEqual(constraints[index_name]["columns"], ["scene", "setting"])
         with connection.schema_editor() as editor:
             editor.remove_index(Scene, index)
-        self.assertNotIn(index_name, self.get_constraints(Scene._meta.db_table))
-
-    def test_spgist_include_not_supported(self):
-        index_name = "spgist_include_exception"
-        index = SpGistIndex(fields=["scene"], name=index_name, include=["setting"])
-        msg = "Covering SP-GiST indexes require PostgreSQL 14+."
-        with self.assertRaisesMessage(NotSupportedError, msg):
-            with mock.patch(
-                "django.db.backends.postgresql.features.DatabaseFeatures."
-                "supports_covering_spgist_indexes",
-                False,
-            ):
-                with connection.schema_editor() as editor:
-                    editor.add_index(Scene, index)
         self.assertNotIn(index_name, self.get_constraints(Scene._meta.db_table))
 
     def test_custom_suffix(self):

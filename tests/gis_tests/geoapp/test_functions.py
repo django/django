@@ -258,32 +258,32 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             # num_seg is the number of segments per quarter circle.
             return (4 * num_seg) + 1
 
-        expected_areas = (169, 136) if connection.ops.postgis else (171, 126)
-        qs = Country.objects.annotate(
+        if connection.ops.postgis:
+            expected_area = 169
+        elif connection.ops.spatialite:
+            expected_area = 168
+        else:  # Oracle.
+            expected_area = 171
+        country = Country.objects.annotate(
             circle=functions.BoundingCircle("mpoly")
-        ).order_by("name")
-        self.assertAlmostEqual(qs[0].circle.area, expected_areas[0], 0)
-        self.assertAlmostEqual(qs[1].circle.area, expected_areas[1], 0)
+        ).order_by("name")[0]
+        self.assertAlmostEqual(country.circle.area, expected_area, 0)
         if connection.ops.postgis:
             # By default num_seg=48.
-            self.assertEqual(qs[0].circle.num_points, circle_num_points(48))
-            self.assertEqual(qs[1].circle.num_points, circle_num_points(48))
+            self.assertEqual(country.circle.num_points, circle_num_points(48))
 
         tests = [12, Value(12, output_field=IntegerField())]
         for num_seq in tests:
             with self.subTest(num_seq=num_seq):
-                qs = Country.objects.annotate(
+                country = Country.objects.annotate(
                     circle=functions.BoundingCircle("mpoly", num_seg=num_seq),
-                ).order_by("name")
+                ).order_by("name")[0]
                 if connection.ops.postgis:
-                    self.assertGreater(qs[0].circle.area, 168.4, 0)
-                    self.assertLess(qs[0].circle.area, 169.5, 0)
-                    self.assertAlmostEqual(qs[1].circle.area, 136, 0)
-                    self.assertEqual(qs[0].circle.num_points, circle_num_points(12))
-                    self.assertEqual(qs[1].circle.num_points, circle_num_points(12))
+                    self.assertGreater(country.circle.area, 168.4, 0)
+                    self.assertLess(country.circle.area, 169.5, 0)
+                    self.assertEqual(country.circle.num_points, circle_num_points(12))
                 else:
-                    self.assertAlmostEqual(qs[0].circle.area, expected_areas[0], 0)
-                    self.assertAlmostEqual(qs[1].circle.area, expected_areas[1], 0)
+                    self.assertAlmostEqual(country.circle.area, expected_area, 0)
 
     @skipUnlessDBFeature("has_Centroid_function")
     def test_centroid(self):
@@ -348,20 +348,24 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
     @skipUnlessDBFeature("has_FromWKB_function")
     def test_fromwkb(self):
         g = Point(56.811078, 60.608647)
-        g2 = City.objects.values_list(
+        pt1, pt2 = City.objects.values_list(
             functions.FromWKB(Value(g.wkb.tobytes())),
-            flat=True,
+            functions.FromWKB(Value(g.wkb.tobytes()), srid=4326),
         )[0]
-        self.assertIs(g.equals_exact(g2, 0.00001), True)
+        self.assertIs(g.equals_exact(pt1, 0.00001), True)
+        self.assertIsNone(pt1.srid)
+        self.assertEqual(pt2.srid, 4326)
 
     @skipUnlessDBFeature("has_FromWKT_function")
     def test_fromwkt(self):
         g = Point(56.811078, 60.608647)
-        g2 = City.objects.values_list(
+        pt1, pt2 = City.objects.values_list(
             functions.FromWKT(Value(g.wkt)),
-            flat=True,
+            functions.FromWKT(Value(g.wkt), srid=4326),
         )[0]
-        self.assertIs(g.equals_exact(g2, 0.00001), True)
+        self.assertIs(g.equals_exact(pt1, 0.00001), True)
+        self.assertIsNone(pt1.srid)
+        self.assertEqual(pt2.srid, 4326)
 
     @skipUnlessDBFeature("has_GeoHash_function")
     def test_geohash(self):

@@ -183,6 +183,28 @@ the field value of each one, and saving each one back to the database::
 * getting the database, rather than Python, to do work
 * reducing the number of queries some operations require
 
+.. _slicing-using-f:
+
+Slicing ``F()`` expressions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 5.1
+
+For string-based fields, text-based fields, and
+:class:`~django.contrib.postgres.fields.ArrayField`, you can use Python's
+array-slicing syntax. The indices are 0-based and the ``step`` argument to
+``slice`` is not supported. For example:
+
+.. code-block:: pycon
+
+    >>> # Replacing a name with a substring of itself.
+    >>> writer = Writers.objects.get(name="Priyansh")
+    >>> writer.name = F("name")[1:5]
+    >>> writer.save()
+    >>> writer.refresh_from_db()
+    >>> writer.name
+    'riya'
+
 .. _avoiding-race-conditions-using-f:
 
 Avoiding race conditions using ``F()``
@@ -1031,10 +1053,17 @@ calling the appropriate methods on the wrapped expression.
 
     .. attribute:: allowed_default
 
-        .. versionadded:: 5.0
-
         Tells Django that this expression can be used in
         :attr:`Field.db_default`. Defaults to ``False``.
+
+    .. attribute:: constraint_validation_compatible
+
+        .. versionadded:: 5.1
+
+        Tells Django that this expression can be used during a constraint
+        validation. Expressions with ``constraint_validation_compatible`` set
+        to ``False`` must have only one source expression. Defaults to
+        ``True``.
 
     .. attribute:: contains_aggregate
 

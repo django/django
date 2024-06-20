@@ -397,7 +397,7 @@ Function                              PostGIS  Oracle         MariaDB      MySQL
 :class:`AsWKB`                        X        X              X            X           X
 :class:`AsWKT`                        X        X              X            X           X
 :class:`Azimuth`                      X                                                X (LWGEOM/RTTOPO)
-:class:`BoundingCircle`               X        X
+:class:`BoundingCircle`               X        X                                       X (≥ 5.1)
 :class:`Centroid`                     X        X              X            X           X
 :class:`ClosestPoint`                 X                                                X
 :class:`Difference`                   X        X              X            X           X
@@ -431,20 +431,20 @@ Aggregate Functions
 -------------------
 
 The following table provides a summary of what GIS-specific aggregate functions
-are available on each spatial backend. Please note that MySQL does not
+are available on each spatial backend. Please note that MariaDB does not
 support any of these aggregates, and is thus excluded from the table.
 
 .. currentmodule:: django.contrib.gis.db.models
 
-=======================  =======  ======  ==========
-Aggregate                PostGIS  Oracle  SpatiaLite
-=======================  =======  ======  ==========
-:class:`Collect`         X                X
-:class:`Extent`          X        X       X
+=======================  =======  ======  ============  ==========
+Aggregate                PostGIS  Oracle  MySQL         SpatiaLite
+=======================  =======  ======  ============  ==========
+:class:`Collect`         X                X (≥ 8.0.24)  X
+:class:`Extent`          X        X                     X
 :class:`Extent3D`        X
-:class:`MakeLine`        X                X
-:class:`Union`           X        X       X
-=======================  =======  ======  ==========
+:class:`MakeLine`        X                              X
+:class:`Union`           X        X                     X
+=======================  =======  ======  ============  ==========
 
 .. rubric:: Footnotes
 .. [#fnwkt] *See* Open Geospatial Consortium, Inc., `OpenGIS Simple Feature Specification For SQL <https://portal.ogc.org/files/?artifact_id=829>`_, Document 99-049 (May 5, 1999), at  Ch. 3.2.5, p. 3-11 (SQL Textual Representation of Geometry).

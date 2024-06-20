@@ -6,6 +6,7 @@ themselves do not have to (and could be backed by things other than SQL
 databases). The abstraction barrier only works one way: this module has to know
 all about the internals of models in order to get the information it needs.
 """
+
 import copy
 import difflib
 import functools
@@ -90,6 +91,8 @@ def get_children_from_q(q):
 
 
 def get_child_with_renamed_prefix(prefix, replacement, child):
+    from django.db.models.query import QuerySet
+
     if isinstance(child, Node):
         return rename_prefix_from_q(prefix, replacement, child)
     if isinstance(child, tuple):
@@ -104,6 +107,14 @@ def get_child_with_renamed_prefix(prefix, replacement, child):
         child = child.copy()
         if child.name.startswith(prefix + LOOKUP_SEP):
             child.name = child.name.replace(prefix, replacement, 1)
+    elif isinstance(child, QuerySet):
+        # QuerySet may contain OuterRef() references which cannot work properly
+        # without repointing to the filtered annotation and will spawn a
+        # different JOIN. Always raise ValueError instead of providing partial
+        # support in other cases.
+        raise ValueError(
+            "Passing a QuerySet within a FilteredRelation is not supported."
+        )
     elif hasattr(child, "resolve_expression"):
         child = child.copy()
         child.set_source_expressions(
@@ -685,6 +696,7 @@ class Query(BaseExpression):
         # except if the alias is the base table since it must be present in the
         # query on both sides.
         initial_alias = self.get_initial_alias()
+        rhs = rhs.clone()
         rhs.bump_prefix(self, exclude={initial_alias})
 
         # Work out how to relabel the rhs aliases, if necessary.
@@ -779,46 +791,44 @@ class Query(BaseExpression):
         if select_mask is None:
             select_mask = {}
         select_mask[opts.pk] = {}
-        # All concrete fields that are not part of the defer mask must be
-        # loaded. If a relational field is encountered it gets added to the
-        # mask for it be considered if `select_related` and the cycle continues
-        # by recursively calling this function.
-        for field in opts.concrete_fields:
+        # All concrete fields and related objects that are not part of the
+        # defer mask must be included. If a relational field is encountered it
+        # gets added to the mask for it be considered if `select_related` and
+        # the cycle continues by recursively calling this function.
+        for field in opts.concrete_fields + opts.related_objects:
             field_mask = mask.pop(field.name, None)
-            field_att_mask = mask.pop(field.attname, None)
+            field_att_mask = None
+            if field_attname := getattr(field, "attname", None):
+                field_att_mask = mask.pop(field_attname, None)
             if field_mask is None and field_att_mask is None:
                 select_mask.setdefault(field, {})
             elif field_mask:
                 if not field.is_relation:
                     raise FieldError(next(iter(field_mask)))
+                # Virtual fields such as many-to-many and generic foreign keys
+                # cannot be effectively deferred. Historically, they were
+                # allowed to be passed to QuerySet.defer(). Ignore such field
+                # references until a layer of validation at mask alteration
+                # time is eventually implemented.
+                if field.many_to_many:
+                    continue
                 field_select_mask = select_mask.setdefault(field, {})
-                related_model = field.remote_field.model._meta.concrete_model
+                related_model = field.related_model._meta.concrete_model
                 self._get_defer_select_mask(
                     related_model._meta, field_mask, field_select_mask
                 )
-        # Remaining defer entries must be references to reverse relationships.
-        # The following code is expected to raise FieldError if it encounters
-        # a malformed defer entry.
+        # Remaining defer entries must be references to filtered relations
+        # otherwise they are surfaced as missing field errors.
         for field_name, field_mask in mask.items():
             if filtered_relation := self._filtered_relations.get(field_name):
                 relation = opts.get_field(filtered_relation.relation_name)
                 field_select_mask = select_mask.setdefault((field_name, relation), {})
-                field = relation.field
+                related_model = relation.related_model._meta.concrete_model
+                self._get_defer_select_mask(
+                    related_model._meta, field_mask, field_select_mask
+                )
             else:
-                reverse_rel = opts.get_field(field_name)
-                # While virtual fields such as many-to-many and generic foreign
-                # keys cannot be effectively deferred we've historically
-                # allowed them to be passed to QuerySet.defer(). Ignore such
-                # field references until a layer of validation at mask
-                # alteration time will be implemented eventually.
-                if not hasattr(reverse_rel, "field"):
-                    continue
-                field = reverse_rel.field
-                field_select_mask = select_mask.setdefault(field, {})
-            related_model = field.model._meta.concrete_model
-            self._get_defer_select_mask(
-                related_model._meta, field_mask, field_select_mask
-            )
+                opts.get_field(field_name)
         return select_mask
 
     def _get_only_select_mask(self, opts, mask, select_mask=None):
@@ -828,13 +838,7 @@ class Query(BaseExpression):
         # Only include fields mentioned in the mask.
         for field_name, field_mask in mask.items():
             field = opts.get_field(field_name)
-            # Retrieve the actual field associated with reverse relationships
-            # as that's what is expected in the select mask.
-            if field in opts.related_objects:
-                field_key = field.field
-            else:
-                field_key = field
-            field_select_mask = select_mask.setdefault(field_key, {})
+            field_select_mask = select_mask.setdefault(field, {})
             if field_mask:
                 if not field.is_relation:
                     raise FieldError(next(iter(field_mask)))
@@ -972,6 +976,8 @@ class Query(BaseExpression):
         relabelling any references to them in select columns and the where
         clause.
         """
+        if not change_map:
+            return self
         # If keys and values of change_map were to intersect, an alias might be
         # updated twice (e.g. T4 -> T5, T5 -> T6, so also T4 -> T6) depending
         # on their order in change_map.

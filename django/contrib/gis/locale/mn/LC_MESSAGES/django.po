@@ -4,6 +4,7 @@
 # Baskhuu Lodoikhuu <baskhuujacara@gmail.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2023
+# Turmunkh Batkhuyag, 2023
 # Zorig, 2014,2016
 # Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2011-2012,2015
 # Баясгалан Цэвлээ <bayasaa_7672@yahoo.com>, 2011,2015
@@ -12,8 +13,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 18:45+0000\n"
-"Last-Translator: Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2023\n"
+"PO-Revision-Date: 2023-12-24 18:45+0000\n"
+"Last-Translator: Turmunkh Batkhuyag, 2023\n"
 "Language-Team: Mongolian (http://app.transifex.com/django/django/language/"
 "mn/)\n"
 "MIME-Version: 1.0\n"
@@ -53,7 +54,7 @@ msgid "Multi polygon"
 msgstr "Олон өнцөгтийн олонлог"
 
 msgid "Geometry collection"
-msgstr "Дүрсний цуглуулга"
+msgstr "Геометрийн цуглуулга"
 
 msgid "Extent Aggregate Field"
 msgstr "Aggregate талбарыг өргөтгөх"
@@ -62,20 +63,19 @@ msgid "Raster Field"
 msgstr "Растер талбар"
 
 msgid "No geometry value provided."
-msgstr "Дүрс оруулаагүй байна."
+msgstr "Геометрийн утгыг өгөөгүй."
 
 msgid "Invalid geometry value."
-msgstr "Буруу дүрс байна."
+msgstr "Буруу геометрийн утга байна."
 
 msgid "Invalid geometry type."
-msgstr "Дүрсийн төрөл буруу байна."
+msgstr "Геометер төрөл буруу байна."
 
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
 msgstr ""
-"An error occurred when transforming the geometry to the SRID дүрсний форм "
-"талбарын SRID утгыг хөрвүүлэхэд алдаа гарлаа."
+"Геометрийг геометрийн форм талбарын SRID болгон хувиргах үед алдаа гарлаа."
 
 msgid "Delete all Features"
 msgstr "Бүх онцлогүүдыг устгах"

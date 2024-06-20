@@ -1,3 +1,4 @@
+import ipaddress
 import itertools
 import pathlib
 from unittest import mock, skipUnless
@@ -25,15 +26,20 @@ def build_geoip_path(*parts):
 )
 class GeoLite2Test(SimpleTestCase):
     fqdn = "sky.uk"
-    ipv4 = "2.125.160.216"
-    ipv6 = "::ffff:027d:a0d8"
+    ipv4_str = "2.125.160.216"
+    ipv6_str = "::ffff:027d:a0d8"
+    ipv4_addr = ipaddress.ip_address(ipv4_str)
+    ipv6_addr = ipaddress.ip_address(ipv6_str)
+    query_values = (fqdn, ipv4_str, ipv6_str, ipv4_addr, ipv6_addr)
 
     @classmethod
     def setUpClass(cls):
         # Avoid referencing __file__ at module level.
         cls.enterClassContext(override_settings(GEOIP_PATH=build_geoip_path()))
         # Always mock host lookup to avoid test breakage if DNS changes.
-        cls.enterClassContext(mock.patch("socket.gethostbyname", return_value=cls.ipv4))
+        cls.enterClassContext(
+            mock.patch("socket.gethostbyname", return_value=cls.ipv4_str)
+        )
 
         super().setUpClass()
 
@@ -44,17 +50,11 @@ class GeoLite2Test(SimpleTestCase):
         g2 = GeoIP2(settings.GEOIP_PATH, GeoIP2.MODE_AUTO)
         # Path provided as a string.
         g3 = GeoIP2(str(settings.GEOIP_PATH))
-        for g in (g1, g2, g3):
-            self.assertTrue(g._country)
-            self.assertTrue(g._city)
-
         # Only passing in the location of one database.
         g4 = GeoIP2(settings.GEOIP_PATH / settings.GEOIP_CITY, country="")
-        self.assertTrue(g4._city)
-        self.assertIsNone(g4._country)
         g5 = GeoIP2(settings.GEOIP_PATH / settings.GEOIP_COUNTRY, city="")
-        self.assertTrue(g5._country)
-        self.assertIsNone(g5._city)
+        for g in (g1, g2, g3, g4, g5):
+            self.assertTrue(g._reader)
 
         # Improper parameters.
         bad_params = (23, "foo", 15.23)
@@ -70,7 +70,7 @@ class GeoLite2Test(SimpleTestCase):
 
     def test_no_database_file(self):
         invalid_path = pathlib.Path(__file__).parent.joinpath("data/invalid").resolve()
-        msg = f"Could not load a database from {invalid_path}."
+        msg = "Path must be a valid database or directory containing databases."
         with self.assertRaisesMessage(GeoIP2Exception, msg):
             GeoIP2(invalid_path)
 
@@ -86,7 +86,10 @@ class GeoLite2Test(SimpleTestCase):
 
         functions += (g.country, g.country_code, g.country_name)
         values = (123, 123.45, b"", (), [], {}, set(), frozenset(), GeoIP2)
-        msg = "GeoIP query must be a string, not type"
+        msg = (
+            "GeoIP query must be a string or instance of IPv4Address or IPv6Address, "
+            "not type"
+        )
         for function, value in itertools.product(functions, values):
             with self.subTest(function=function.__qualname__, type=type(value)):
                 with self.assertRaisesMessage(TypeError, msg):
@@ -94,13 +97,35 @@ class GeoLite2Test(SimpleTestCase):
 
     def test_country(self):
         g = GeoIP2(city="<invalid>")
-        for query in (self.fqdn, self.ipv4, self.ipv6):
+        self.assertIs(g._metadata.database_type.endswith("Country"), True)
+        for query in self.query_values:
             with self.subTest(query=query):
                 self.assertEqual(
                     g.country(query),
                     {
+                        "continent_code": "EU",
+                        "continent_name": "Europe",
                         "country_code": "GB",
                         "country_name": "United Kingdom",
+                        "is_in_european_union": False,
+                    },
+                )
+                self.assertEqual(g.country_code(query), "GB")
+                self.assertEqual(g.country_name(query), "United Kingdom")
+
+    def test_country_using_city_database(self):
+        g = GeoIP2(country="<invalid>")
+        self.assertIs(g._metadata.database_type.endswith("City"), True)
+        for query in self.query_values:
+            with self.subTest(query=query):
+                self.assertEqual(
+                    g.country(query),
+                    {
+                        "continent_code": "EU",
+                        "continent_name": "Europe",
+                        "country_code": "GB",
+                        "country_name": "United Kingdom",
+                        "is_in_european_union": False,
                     },
                 )
                 self.assertEqual(g.country_code(query), "GB")
@@ -108,23 +133,29 @@ class GeoLite2Test(SimpleTestCase):
 
     def test_city(self):
         g = GeoIP2(country="<invalid>")
-        for query in (self.fqdn, self.ipv4, self.ipv6):
+        self.assertIs(g._metadata.database_type.endswith("City"), True)
+        for query in self.query_values:
             with self.subTest(query=query):
                 self.assertEqual(
                     g.city(query),
                     {
+                        "accuracy_radius": 100,
                         "city": "Boxford",
                         "continent_code": "EU",
                         "continent_name": "Europe",
                         "country_code": "GB",
                         "country_name": "United Kingdom",
-                        "dma_code": None,
                         "is_in_european_union": False,
                         "latitude": 51.75,
                         "longitude": -1.25,
+                        "metro_code": None,
                         "postal_code": "OX1",
-                        "region": "ENG",
+                        "region_code": "ENG",
+                        "region_name": "England",
                         "time_zone": "Europe/London",
+                        # Kept for backward compatibility.
+                        "dma_code": None,
+                        "region": "ENG",
                     },
                 )
 
@@ -139,8 +170,11 @@ class GeoLite2Test(SimpleTestCase):
                 self.assertEqual(
                     g.country(query),
                     {
+                        "continent_code": "EU",
+                        "continent_name": "Europe",
                         "country_code": "GB",
                         "country_name": "United Kingdom",
+                        "is_in_european_union": False,
                     },
                 )
                 self.assertEqual(g.country_code(query), "GB")
@@ -159,44 +193,22 @@ class GeoLite2Test(SimpleTestCase):
 
     def test_del(self):
         g = GeoIP2()
-        city = g._city
-        country = g._country
-        self.assertIs(city._db_reader.closed, False)
-        self.assertIs(country._db_reader.closed, False)
+        reader = g._reader
+        self.assertIs(reader._db_reader.closed, False)
         del g
-        self.assertIs(city._db_reader.closed, True)
-        self.assertIs(country._db_reader.closed, True)
+        self.assertIs(reader._db_reader.closed, True)
 
     def test_repr(self):
         g = GeoIP2()
-        meta = g._reader.metadata()
-        version = "%s.%s" % (
-            meta.binary_format_major_version,
-            meta.binary_format_minor_version,
-        )
-        country_path = g._country_file
-        city_path = g._city_file
-        expected = (
-            '<GeoIP2 [v%(version)s] _country_file="%(country)s", _city_file="%(city)s">'
-            % {
-                "version": version,
-                "country": country_path,
-                "city": city_path,
-            }
-        )
-        self.assertEqual(repr(g), expected)
-
-    def test_check_query(self):
-        g = GeoIP2()
-        self.assertEqual(g._check_query(self.ipv4), self.ipv4)
-        self.assertEqual(g._check_query(self.ipv6), self.ipv6)
-        self.assertEqual(g._check_query(self.fqdn), self.ipv4)
+        m = g._metadata
+        version = f"{m.binary_format_major_version}.{m.binary_format_minor_version}"
+        self.assertEqual(repr(g), f"<GeoIP2 [v{version}] _path='{g._path}'>")
 
     def test_coords_deprecation_warning(self):
         g = GeoIP2()
         msg = "GeoIP2.coords() is deprecated. Use GeoIP2.lon_lat() instead."
         with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
-            e1, e2 = g.coords(self.ipv4)
+            e1, e2 = g.coords(self.ipv4_str)
         self.assertIsInstance(e1, float)
         self.assertIsInstance(e2, float)
 
@@ -204,8 +216,7 @@ class GeoLite2Test(SimpleTestCase):
         msg = "GeoIP2.open() is deprecated. Use GeoIP2() instead."
         with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
             g = GeoIP2.open(settings.GEOIP_PATH, GeoIP2.MODE_AUTO)
-        self.assertTrue(g._country)
-        self.assertTrue(g._city)
+        self.assertTrue(g._reader)
 
 
 @skipUnless(HAS_GEOIP2, "GeoIP2 is required.")
@@ -226,7 +237,7 @@ class ErrorTest(SimpleTestCase):
                 GeoIP2()
 
     def test_unsupported_database(self):
-        msg = "Unable to recognize database edition: GeoLite2-ASN"
+        msg = "Unable to handle database edition: GeoLite2-ASN"
         with self.settings(GEOIP_PATH=build_geoip_path("GeoLite2-ASN-Test.mmdb")):
             with self.assertRaisesMessage(GeoIP2Exception, msg):
                 GeoIP2()

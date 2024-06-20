@@ -261,6 +261,10 @@ class Field:
         result.validators = self.validators[:]
         return result
 
+    def _clean_bound_field(self, bf):
+        value = bf.initial if self.disabled else bf.data
+        return self.clean(value)
+
 
 class CharField(Field):
     def __init__(
@@ -694,6 +698,10 @@ class FileField(Field):
     def has_changed(self, initial, data):
         return not self.disabled and data is not None
 
+    def _clean_bound_field(self, bf):
+        value = bf.initial if self.disabled else bf.data
+        return self.clean(value, bf.initial)
+
 
 class ImageField(FileField):
     default_validators = [validators.validate_image_file_extension]
@@ -784,13 +792,13 @@ class URLField(CharField):
     def to_python(self, value):
         def split_url(url):
             """
-            Return a list of url parts via urlparse.urlsplit(), or raise
+            Return a list of url parts via urlsplit(), or raise
             ValidationError for some malformed URLs.
             """
             try:
                 return list(urlsplit(url))
             except ValueError:
-                # urlparse.urlsplit can raise a ValueError with some
+                # urlsplit can raise a ValueError with some
                 # misformatted URLs.
                 raise ValidationError(self.error_messages["invalid"], code="invalid")
 

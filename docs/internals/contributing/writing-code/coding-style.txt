@@ -132,8 +132,7 @@ Python style
 Imports
 =======
 
-* Use `isort <https://github.com/PyCQA/isort#readme>`_ to automate import
-  sorting using the guidelines below.
+* Use :pypi:`isort` to automate import sorting using the guidelines below.
 
   Quick start:
 
@@ -201,8 +200,7 @@ Imports
       CONSTANT = "foo"
 
 
-      class Example:
-          ...
+      class Example: ...
 
 * Use convenience imports whenever available. For example, do this
   ::
@@ -216,20 +214,149 @@ Imports
 Template style
 ==============
 
-* In Django template code, put one (and only one) space between the curly
-  brackets and the tag contents.
+Follow the below rules in Django template code.
+
+* ``{% extends %}`` should be the first non-comment line.
 
   Do this:
 
   .. code-block:: html+django
 
-      {{ foo }}
+      {% extends "base.html" %}
+
+      {% block content %}
+        <h1 class="font-semibold text-xl">
+          {{ pages.title }}
+        </h1>
+      {% endblock content %}
+
+  Or this:
+
+  .. code-block:: html+django
+
+      {# This is a comment #}
+      {% extends "base.html" %}
+
+      {% block content %}
+        <h1 class="font-semibold text-xl">
+          {{ pages.title }}
+        </h1>
+      {% endblock content %}
 
   Don't do this:
 
   .. code-block:: html+django
 
-      {{foo}}
+      {% load i18n %}
+      {% extends "base.html" %}
+
+      {% block content %}
+        <h1 class="font-semibold text-xl">
+          {{ pages.title }}
+        </h1>
+      {% endblock content %}
+
+* Put exactly one space between ``{{``, variable contents, and ``}}``.
+
+  Do this:
+
+  .. code-block:: html+django
+
+      {{ user }}
+
+  Don't do this:
+
+  .. code-block:: html+django
+
+      {{user}}
+
+* In ``{% load ... %}``, list libraries in alphabetical order.
+
+  Do this:
+
+  .. code-block:: html+django
+
+      {% load i18n l10 tz %}
+
+  Don't do this:
+
+  .. code-block:: html+django
+
+      {% load l10 i18n tz %}
+
+* Put exactly one space between ``{%``, tag contents, and ``%}``.
+
+  Do this:
+
+  .. code-block:: html+django
+
+      {% load humanize %}
+
+  Don't do this:
+
+  .. code-block:: html+django
+
+      {%load humanize%}
+
+* Put the ``{% block %}`` tag name in the ``{% endblock %}`` tag if it is not
+  on the same line.
+
+  Do this:
+
+  .. code-block:: html+django
+
+      {% block header %}
+
+        Code goes here
+
+      {% endblock header %}
+
+  Don't do this:
+
+  .. code-block:: html+django
+
+      {% block header %}
+
+        Code goes here
+
+      {% endblock %}
+
+* Inside curly braces, separate tokens by single spaces, except for around the
+  ``.`` for attribute access and the ``|`` for a filter.
+
+  Do this:
+
+  .. code-block:: html+django
+
+    {% if user.name|lower == "admin" %}
+
+  Don't do this:
+
+  .. code-block:: html+django
+
+    {% if user . name | lower  ==  "admin" %}
+
+    {{ user.name | upper }}
+
+* Within a template using ``{% extends %}``, avoid indenting top-level
+  ``{% block %}`` tags.
+
+  Do this:
+
+  .. code-block:: html+django
+
+      {% extends "base.html" %}
+
+      {% block content %}
+
+  Don't do this:
+
+  .. code-block:: html+django
+
+      {% extends "base.html" %}
+
+        {% block content %}
+        ...
 
 View style
 ==========
@@ -239,13 +366,11 @@ View style
 
   Do this::
 
-      def my_view(request, foo):
-          ...
+      def my_view(request, foo): ...
 
   Don't do this::
 
-      def my_view(req, foo):
-          ...
+      def my_view(req, foo): ...
 
 Model style
 ===========
@@ -313,8 +438,8 @@ Model style
 
     class MyModel(models.Model):
         class Direction(models.TextChoices):
-            UP = U, "Up"
-            DOWN = D, "Down"
+            UP = "U", "Up"
+            DOWN = "D", "Down"
 
 Use of ``django.conf.settings``
 ===============================

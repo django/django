@@ -163,11 +163,9 @@ class ChangepasswordManagementCommandTestCase(TestCase):
 
     def setUp(self):
         self.stdout = StringIO()
+        self.addCleanup(self.stdout.close)
         self.stderr = StringIO()
-
-    def tearDown(self):
-        self.stdout.close()
-        self.stderr.close()
+        self.addCleanup(self.stderr.close)
 
     @mock.patch.object(getpass, "getpass", return_value="password")
     def test_get_pass(self, mock_get_pass):
@@ -1530,7 +1528,7 @@ class CreatePermissionsMultipleDatabasesTests(TestCase):
 
     def test_set_permissions_fk_to_using_parameter(self):
         Permission.objects.using("other").delete()
-        with self.assertNumQueries(6, using="other") as captured_queries:
+        with self.assertNumQueries(4, using="other") as captured_queries:
             create_permissions(apps.get_app_config("auth"), verbosity=0, using="other")
         self.assertIn("INSERT INTO", captured_queries[-1]["sql"].upper())
         self.assertGreater(Permission.objects.using("other").count(), 0)

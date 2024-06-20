@@ -1291,7 +1291,7 @@ class AggregateTestCase(TestCase):
 
             def as_sql(self, compiler, connection):
                 copy = self.copy()
-                copy.set_source_expressions(copy.get_source_expressions()[0:1])
+                copy.set_source_expressions(copy.get_source_expressions()[0:1] + [None])
                 return super(MyMax, copy).as_sql(compiler, connection)
 
         with self.assertRaisesMessage(TypeError, "Complex aggregates require an alias"):

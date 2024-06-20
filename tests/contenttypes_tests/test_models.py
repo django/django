@@ -12,9 +12,7 @@ from .models import Author, ConcreteModel, FooWithUrl, ProxyModel
 class ContentTypesTests(TestCase):
     def setUp(self):
         ContentType.objects.clear_cache()
-
-    def tearDown(self):
-        ContentType.objects.clear_cache()
+        self.addCleanup(ContentType.objects.clear_cache)
 
     def test_lookup_cache(self):
         """
@@ -325,13 +323,22 @@ class ContentTypesMultidbTests(TestCase):
         db_for_read().
         """
         ContentType.objects.clear_cache()
-        with self.assertNumQueries(0, using="default"), self.assertNumQueries(
-            1, using="other"
+        with (
+            self.assertNumQueries(0, using="default"),
+            self.assertNumQueries(1, using="other"),
         ):
             ContentType.objects.get_for_model(Author)
 
 
 class GenericPrefetchTests(TestCase):
+    def test_querysets_required(self):
+        msg = (
+            "GenericPrefetch.__init__() missing 1 required "
+            "positional argument: 'querysets'"
+        )
+        with self.assertRaisesMessage(TypeError, msg):
+            GenericPrefetch("question")
+
     def test_values_queryset(self):
         msg = "Prefetch querysets cannot use raw(), values(), and values_list()."
         with self.assertRaisesMessage(ValueError, msg):

@@ -1,6 +1,7 @@
 import logging
 from contextlib import contextmanager
 from io import StringIO
+from unittest import mock
 
 from admin_scripts.tests import AdminScriptTestCase
 
@@ -466,9 +467,29 @@ class AdminEmailHandlerTest(SimpleTestCase):
         msg = mail.outbox[0]
         self.assertEqual(msg.subject, "[Django] ERROR: message")
         self.assertEqual(len(msg.alternatives), 1)
-        body_html = str(msg.alternatives[0][0])
+        body_html = str(msg.alternatives[0].content)
         self.assertIn('<div id="traceback">', body_html)
         self.assertNotIn("<form", body_html)
+
+    @override_settings(ADMINS=[])
+    def test_emit_no_admins(self):
+        handler = AdminEmailHandler()
+        record = self.logger.makeRecord(
+            "name",
+            logging.ERROR,
+            "function",
+            "lno",
+            "message",
+            None,
+            None,
+        )
+        with mock.patch.object(
+            handler,
+            "format_subject",
+            side_effect=AssertionError("Should not be called"),
+        ):
+            handler.emit(record)
+        self.assertEqual(len(mail.outbox), 0)
 
 
 class SettingsConfigTest(AdminScriptTestCase):
@@ -579,19 +600,17 @@ args=(sys.stdout,)
 [formatter_simple]
 format=%(message)s
 """
-        self.temp_file = NamedTemporaryFile()
-        self.temp_file.write(logging_conf.encode())
-        self.temp_file.flush()
+        temp_file = NamedTemporaryFile()
+        temp_file.write(logging_conf.encode())
+        temp_file.flush()
+        self.addCleanup(temp_file.close)
         self.write_settings(
             "settings.py",
             sdict={
                 "LOGGING_CONFIG": '"logging.config.fileConfig"',
-                "LOGGING": 'r"%s"' % self.temp_file.name,
+                "LOGGING": 'r"%s"' % temp_file.name,
             },
         )
-
-    def tearDown(self):
-        self.temp_file.close()
 
     def test_custom_logging(self):
         out, err = self.run_manage(["check"])

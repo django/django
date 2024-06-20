@@ -13,6 +13,8 @@ from django.db.models.functions import Lower
 from django.utils.functional import SimpleLazyObject
 from django.utils.translation import gettext_lazy as _
 
+from .storage import NoReadFileSystemStorage
+
 try:
     from PIL import Image
 except ImportError:
@@ -373,6 +375,21 @@ if Image:
             width_field="headshot_width",
         )
 
+    class PersonNoReadImage(models.Model):
+        """
+        Model that defines an ImageField with a storage backend that does not
+        support reading.
+        """
+
+        mugshot = models.ImageField(
+            upload_to="tests",
+            storage=NoReadFileSystemStorage(temp_storage_dir),
+            width_field="mugshot_width",
+            height_field="mugshot_height",
+        )
+        mugshot_width = models.IntegerField()
+        mugshot_height = models.IntegerField()
+
 
 class CustomJSONDecoder(json.JSONDecoder):
     def __init__(self, object_hook=None, *args, **kwargs):
@@ -502,7 +519,7 @@ class GeneratedModel(models.Model):
         output_field=models.IntegerField(),
         db_persist=True,
     )
-    fk = models.ForeignKey(Foo, on_delete=models.CASCADE, null=True)
+    fk = models.ForeignKey(Foo, on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
         required_db_features = {"supports_stored_generated_columns"}
@@ -516,7 +533,7 @@ class GeneratedModelVirtual(models.Model):
         output_field=models.IntegerField(),
         db_persist=False,
     )
-    fk = models.ForeignKey(Foo, on_delete=models.CASCADE, null=True)
+    fk = models.ForeignKey(Foo, on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
         required_db_features = {"supports_virtual_generated_columns"}

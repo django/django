@@ -58,8 +58,6 @@ For examples, see the :doc:`Pagination topic guide </topics/pagination>`.
 
 .. attribute:: Paginator.error_messages
 
-    .. versionadded:: 5.0
-
     The ``error_messages`` argument lets you override the default messages that
     the paginator will raise. Pass in a dictionary with keys matching the error
     messages you want to override. Available error message keys are:

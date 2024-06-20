@@ -109,9 +109,11 @@ class ModelIterable(BaseIterable):
                 related_objs,
                 operator.attrgetter(
                     *[
-                        field.attname
-                        if from_field == "self"
-                        else queryset.model._meta.get_field(from_field).attname
+                        (
+                            field.attname
+                            if from_field == "self"
+                            else queryset.model._meta.get_field(from_field).attname
+                        )
                         for from_field in field.from_fields
                     ]
                 ),
@@ -786,7 +788,7 @@ class QuerySet(AltersData):
         # model to detect the inheritance pattern ConcreteGrandParent ->
         # MultiTableParent -> ProxyChild. Simply checking self.model._meta.proxy
         # would not identify that case as involving multiple tables.
-        for parent in self.model._meta.get_parent_list():
+        for parent in self.model._meta.all_parents:
             if parent._meta.concrete_model is not self.model._meta.concrete_model:
                 raise ValueError("Can't bulk create a multi-table inherited model")
         if not objs:
@@ -1183,11 +1185,11 @@ class QuerySet(AltersData):
 
         collector = Collector(using=del_query.db, origin=self)
         collector.collect(del_query)
-        deleted, _rows_count = collector.delete()
+        num_deleted, num_deleted_per_model = collector.delete()
 
         # Clear the result cache, in case this QuerySet gets reused.
         self._result_cache = None
-        return deleted, _rows_count
+        return num_deleted, num_deleted_per_model
 
     delete.alters_data = True
     delete.queryset_only = True
@@ -1391,9 +1393,7 @@ class QuerySet(AltersData):
         clone._iterable_class = (
             NamedValuesListIterable
             if named
-            else FlatValuesListIterable
-            if flat
-            else ValuesListIterable
+            else FlatValuesListIterable if flat else ValuesListIterable
         )
         return clone
 
@@ -1659,9 +1659,11 @@ class QuerySet(AltersData):
         if names is None:
             names = set(
                 chain.from_iterable(
-                    (field.name, field.attname)
-                    if hasattr(field, "attname")
-                    else (field.name,)
+                    (
+                        (field.name, field.attname)
+                        if hasattr(field, "attname")
+                        else (field.name,)
+                    )
                     for field in self.model._meta.get_fields()
                 )
             )
@@ -2184,8 +2186,7 @@ class RawQuerySet:
         converter = connections[self.db].introspection.identifier_converter
         model_fields = {}
         for field in self.model._meta.fields:
-            name, column = field.get_attname_column()
-            model_fields[converter(column)] = field
+            model_fields[converter(field.column)] = field
         return model_fields
 
 

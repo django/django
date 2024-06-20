@@ -35,9 +35,11 @@ class SHA1Tests(TestCase):
                 "0781e0745a2503e6ded05ed5bc554c421d781b0c",
                 "198d15ea139de04060caf95bc3e0ec5883cba881",
                 "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                "da39a3ee5e6b4b0d3255bfef95601890afd80709"
-                if connection.features.interprets_empty_strings_as_nulls
-                else None,
+                (
+                    "da39a3ee5e6b4b0d3255bfef95601890afd80709"
+                    if connection.features.interprets_empty_strings_as_nulls
+                    else None
+                ),
             ],
         )
 

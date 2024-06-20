@@ -1,4 +1,3 @@
-from django.db import NotSupportedError
 from django.db.models import Func, Index
 from django.utils.functional import cached_property
 
@@ -117,20 +116,27 @@ class BrinIndex(PostgresIndex):
 class BTreeIndex(PostgresIndex):
     suffix = "btree"
 
-    def __init__(self, *expressions, fillfactor=None, **kwargs):
+    def __init__(self, *expressions, fillfactor=None, deduplicate_items=None, **kwargs):
         self.fillfactor = fillfactor
+        self.deduplicate_items = deduplicate_items
         super().__init__(*expressions, **kwargs)
 
     def deconstruct(self):
         path, args, kwargs = super().deconstruct()
         if self.fillfactor is not None:
             kwargs["fillfactor"] = self.fillfactor
+        if self.deduplicate_items is not None:
+            kwargs["deduplicate_items"] = self.deduplicate_items
         return path, args, kwargs
 
     def get_with_params(self):
         with_params = []
         if self.fillfactor is not None:
             with_params.append("fillfactor = %d" % self.fillfactor)
+        if self.deduplicate_items is not None:
+            with_params.append(
+                "deduplicate_items = %s" % ("on" if self.deduplicate_items else "off")
+            )
         return with_params
 
 
@@ -227,16 +233,10 @@ class SpGistIndex(PostgresIndex):
             with_params.append("fillfactor = %d" % self.fillfactor)
         return with_params
 
-    def check_supported(self, schema_editor):
-        if (
-            self.include
-            and not schema_editor.connection.features.supports_covering_spgist_indexes
-        ):
-            raise NotSupportedError("Covering SP-GiST indexes require PostgreSQL 14+.")
-
 
 class OpClass(Func):
     template = "%(expressions)s %(name)s"
+    constraint_validation_compatible = False
 
     def __init__(self, expression, name):
         super().__init__(expression, name=name)

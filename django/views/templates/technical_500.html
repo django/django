@@ -5,12 +5,12 @@
   <meta name="robots" content="NONE,NOARCHIVE">
   <title>{% if exception_type %}{{ exception_type }}{% else %}Report{% endif %}
          {% if request %} at {{ request.path_info }}{% endif %}</title>
-  <style type="text/css">
+  <style>
     html * { padding:0; margin:0; }
     body * { padding:10px 20px; }
     body * * { padding:0; }
-    body { font:small sans-serif; background-color:#fff; color:#000; }
-    body>div { border-bottom:1px solid #ddd; }
+    body { font-family: sans-serif; background-color:#fff; color:#000; }
+    body > :where(header, main, footer) { border-bottom:1px solid #ddd; }
     h1 { font-weight:normal; }
     h2 { margin-bottom:.8em; }
     h3 { margin:1em 0 .5em 0; }
@@ -21,7 +21,7 @@
     tbody td, tbody th { vertical-align:top; padding:2px 3px; }
     thead th {
       padding:1px 6px 1px 3px; background:#fefefe; text-align:left;
-      font-weight:normal; font-size:11px; border:1px solid #ddd;
+      font-weight:normal; font-size: 0.6875rem; border:1px solid #ddd;
     }
     tbody th { width:12em; text-align:right; color:#666; padding-right:.5em; }
     table.vars { margin:5px 10px 2px 40px; width: auto; }
@@ -47,6 +47,8 @@
     .user div.commands a { color: black; }
     #summary { background: #ffc; }
     #summary h2 { font-weight: normal; color: #666; }
+    #info { padding: 0; }
+    #info > * { padding:10px 20px; }
     #explanation { background:#eee; }
     #template, #template-not-exist { background:#f6f6f6; }
     #template-not-exist ul { margin: 0 0 10px 20px; }
@@ -59,9 +61,9 @@
     #requestinfo h3 { margin-bottom:-1em; }
     .error { background: #ffc; }
     .specific { color:#cc3300; font-weight:bold; }
-    h2 span.commands { font-size:.7em; font-weight:normal; }
+    h2 span.commands { font-size: 0.7rem; font-weight:normal; }
     span.commands a:link {color:#5E5694;}
-    pre.exception_value { font-family: sans-serif; color: #575757; font-size: 1.5em; margin: 10px 0 10px 0; }
+    pre.exception_value { font-family: sans-serif; color: #575757; font-size: 1.5rem; margin: 10px 0 10px 0; }
     .append-bottom { margin-bottom: 10px; }
     .fname { user-select: all; }
   </style>
@@ -97,67 +99,69 @@
   {% endif %}
 </head>
 <body>
-<div id="summary">
+<header id="summary">
   <h1>{% if exception_type %}{{ exception_type }}{% else %}Report{% endif %}
       {% if request %} at {{ request.path_info }}{% endif %}</h1>
   <pre class="exception_value">{% if exception_value %}{{ exception_value|force_escape }}{% if exception_notes %}{{ exception_notes }}{% endif %}{% else %}No exception message supplied{% endif %}</pre>
   <table class="meta">
 {% if request %}
     <tr>
-      <th>Request Method:</th>
+      <th scope="row">Request Method:</th>
       <td>{{ request.META.REQUEST_METHOD }}</td>
     </tr>
     <tr>
-      <th>Request URL:</th>
+      <th scope="row">Request URL:</th>
       <td>{{ request_insecure_uri }}</td>
     </tr>
 {% endif %}
     <tr>
-      <th>Django Version:</th>
+      <th scope="row">Django Version:</th>
       <td>{{ django_version_info }}</td>
     </tr>
 {% if exception_type %}
     <tr>
-      <th>Exception Type:</th>
+      <th scope="row">Exception Type:</th>
       <td>{{ exception_type }}</td>
     </tr>
 {% endif %}
 {% if exception_type and exception_value %}
     <tr>
-      <th>Exception Value:</th>
+      <th scope="row">Exception Value:</th>
       <td><pre>{{ exception_value|force_escape }}</pre></td>
     </tr>
 {% endif %}
 {% if lastframe %}
     <tr>
-      <th>Exception Location:</th>
+      <th scope="row">Exception Location:</th>
       <td><span class="fname">{{ lastframe.filename }}</span>, line {{ lastframe.lineno }}, in {{ lastframe.function }}</td>
     </tr>
 {% endif %}
 {% if raising_view_name %}
     <tr>
-      <th>Raised during:</th>
+      <th scope="row">Raised during:</th>
       <td>{{ raising_view_name }}</td>
     </tr>
 {% endif %}
     <tr>
-      <th>Python Executable:</th>
+      <th scope="row">Python Executable:</th>
       <td>{{ sys_executable }}</td>
     </tr>
     <tr>
-      <th>Python Version:</th>
+      <th scope="row">Python Version:</th>
       <td>{{ sys_version_info }}</td>
     </tr>
     <tr>
-      <th>Python Path:</th>
-      <td><pre>{{ sys_path|pprint }}</pre></td>
+      <th scope="row">Python Path:</th>
+      <td><pre><code>{{ sys_path|pprint }}</code></pre></td>
     </tr>
     <tr>
-      <th>Server time:</th>
+      <th scope="row">Server time:</th>
       <td>{{server_time|date:"r"}}</td>
     </tr>
   </table>
-</div>
+</header>
+
+<main id="info">
 {% if unicode_hint %}
 <div id="unicode-hint">
     <h2>Unicode error hint</h2>
@@ -195,11 +199,11 @@
       {% if template_info.bottom != template_info.total %} cut-bottom{% endif %}">
    {% for source_line in template_info.source_lines %}
    {% if source_line.0 == template_info.line %}
-   <tr class="error"><th>{{ source_line.0 }}</th>
+   <tr class="error"><th scope="row">{{ source_line.0 }}</th>
      <td>{{ template_info.before }}<span class="specific">{{ template_info.during }}</span>{{ template_info.after }}</td>
    </tr>
    {% else %}
-      <tr><th>{{ source_line.0 }}</th>
+      <tr><th scope="row">{{ source_line.0 }}</th>
       <td>{{ source_line.1 }}</td></tr>
    {% endif %}
    {% endfor %}
@@ -266,8 +270,8 @@
             <table class="vars" id="v{{ frame.id }}">
               <thead>
                 <tr>
-                  <th>Variable</th>
-                  <th>Value</th>
+                  <th scope="col">Variable</th>
+                  <th scope="col">Value</th>
                 </tr>
               </thead>
               <tbody>
@@ -354,8 +358,8 @@ Exception Value: {{ exception_value|force_escape }}{% if exception_notes %}{{ ex
     <table class="req">
       <thead>
         <tr>
-          <th>Variable</th>
-          <th>Value</th>
+          <th scope="col">Variable</th>
+          <th scope="col">Value</th>
         </tr>
       </thead>
       <tbody>
@@ -376,8 +380,8 @@ Exception Value: {{ exception_value|force_escape }}{% if exception_notes %}{{ ex
     <table class="req">
       <thead>
         <tr>
-          <th>Variable</th>
-          <th>Value</th>
+          <th scope="col">Variable</th>
+          <th scope="col">Value</th>
         </tr>
       </thead>
       <tbody>
@@ -398,8 +402,8 @@ Exception Value: {{ exception_value|force_escape }}{% if exception_notes %}{{ ex
     <table class="req">
       <thead>
         <tr>
-          <th>Variable</th>
-          <th>Value</th>
+          <th scope="col">Variable</th>
+          <th scope="col">Value</th>
         </tr>
       </thead>
       <tbody>
@@ -420,8 +424,8 @@ Exception Value: {{ exception_value|force_escape }}{% if exception_notes %}{{ ex
     <table class="req">
       <thead>
         <tr>
-          <th>Variable</th>
-          <th>Value</th>
+          <th scope="col">Variable</th>
+          <th scope="col">Value</th>
         </tr>
       </thead>
       <tbody>
@@ -441,8 +445,8 @@ Exception Value: {{ exception_value|force_escape }}{% if exception_notes %}{{ ex
   <table class="req">
     <thead>
       <tr>
-        <th>Variable</th>
-        <th>Value</th>
+        <th scope="col">Variable</th>
+        <th scope="col">Value</th>
       </tr>
     </thead>
     <tbody>
@@ -463,8 +467,8 @@ Exception Value: {{ exception_value|force_escape }}{% if exception_notes %}{{ ex
   <table class="req">
     <thead>
       <tr>
-        <th>Setting</th>
-        <th>Value</th>
+        <th scope="col">Setting</th>
+        <th scope="col">Value</th>
       </tr>
     </thead>
     <tbody>
@@ -478,14 +482,16 @@ Exception Value: {{ exception_value|force_escape }}{% if exception_notes %}{{ ex
   </table>
 
 </div>
+</main>
+
 {% if not is_email %}
-  <div id="explanation">
+  <footer id="explanation">
     <p>
       You’re seeing this error because you have <code>DEBUG = True</code> in your
       Django settings file. Change that to <code>False</code>, and Django will
       display a standard page generated by the handler for this status code.
     </p>
-  </div>
+  </footer>
 {% endif %}
 </body>
 </html>

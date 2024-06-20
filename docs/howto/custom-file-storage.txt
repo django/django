@@ -14,8 +14,7 @@ You'll need to follow these steps:
         from django.core.files.storage import Storage
 
 
-        class MyStorage(Storage):
-            ...
+        class MyStorage(Storage): ...
 
 #. Django must be able to instantiate your storage system without any arguments.
    This means that any settings should be taken from ``django.conf.settings``::
@@ -132,7 +131,7 @@ to refer to a specific storage throughout Django, to a dictionary of settings
 for that specific storage backend. The settings in the inner dictionaries are
 described fully in the :setting:`STORAGES` documentation.
 
-Storages are then accessed by alias from from the
+Storages are then accessed by alias from the
 :data:`django.core.files.storage.storages` dictionary::
 
     from django.core.files.storage import storages

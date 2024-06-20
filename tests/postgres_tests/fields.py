@@ -2,6 +2,7 @@
 Indirection layer for PostgreSQL-specific fields, so the tests don't fail when
 run with a backend other than PostgreSQL.
 """
+
 import enum
 
 from django.db import models

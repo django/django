@@ -84,24 +84,24 @@ upcoming security release, as well as the severity of the issues. This is to
 aid organizations that need to ensure they have staff available to handle
 triaging our announcement and upgrade Django as needed. Severity levels are:
 
-**High**:
+* **High**
 
-* Remote code execution
-* SQL injection
+  * Remote code execution
+  * SQL injection
 
-**Moderate**:
+* **Moderate**
 
-* Cross site scripting (XSS)
-* Cross site request forgery (CSRF)
-* Denial-of-service attacks
-* Broken authentication
+  * Cross site scripting (XSS)
+  * Cross site request forgery (CSRF)
+  * Denial-of-service attacks
+  * Broken authentication
 
-**Low**:
+* **Low**
 
-* Sensitive data exposure
-* Broken session management
-* Unvalidated redirects/forwards
-* Issues requiring an uncommon configuration option
+  * Sensitive data exposure
+  * Broken session management
+  * Unvalidated redirects/forwards
+  * Issues requiring an uncommon configuration option
 
 Second, we notify a list of :ref:`people and organizations
 <security-notifications>`, primarily composed of operating-system vendors and

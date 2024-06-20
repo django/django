@@ -1564,8 +1564,9 @@ class AggregationTests(TestCase):
             "django.db.connection.features.allows_group_by_selected_pks_on_model",
             return_value=True,
         ):
-            with mock.patch.object(Book._meta, "managed", False), mock.patch.object(
-                Author._meta, "managed", False
+            with (
+                mock.patch.object(Book._meta, "managed", False),
+                mock.patch.object(Author._meta, "managed", False),
             ):
                 _, _, grouping = qs.query.get_compiler(using="default").pre_sql_setup()
                 self.assertEqual(len(grouping), 2)

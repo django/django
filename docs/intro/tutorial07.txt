@@ -174,8 +174,7 @@ tabular way of displaying inline related objects. To use it, change the
 .. code-block:: python
     :caption: ``polls/admin.py``
 
-    class ChoiceInline(admin.TabularInline):
-        ...
+    class ChoiceInline(admin.TabularInline): ...
 
 With that ``TabularInline`` (instead of ``StackedInline``), the
 related objects are displayed in a more compact, table-based format:
@@ -200,7 +199,7 @@ Here's what it looks like at this point:
 By default, Django displays the ``str()`` of each object. But sometimes it'd be
 more helpful if we could display individual fields. To do that, use the
 :attr:`~django.contrib.admin.ModelAdmin.list_display` admin option, which is a
-tuple of field names to display, as columns, on the change list page for the
+list of field names to display, as columns, on the change list page for the
 object:
 
 .. code-block:: python
@@ -368,6 +367,9 @@ a section of code like:
 
     {% block branding %}
     <div id="site-name"><a href="{% url 'admin:index' %}">Polls Administration</a></div>
+    {% if user.is_anonymous %}
+      {% include "admin/color_theme_toggle.html" %}
+    {% endif %}
     {% endblock %}
 
 We use this approach to teach you how to override templates. In an actual

@@ -9,7 +9,6 @@ logger = logging.getLogger("django.contrib.gis")
 
 class MySQLGISSchemaEditor(DatabaseSchemaEditor):
     sql_add_spatial_index = "CREATE SPATIAL INDEX %(index)s ON %(table)s(%(column)s)"
-    sql_drop_spatial_index = "DROP INDEX %(index)s ON %(table)s"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -55,12 +54,9 @@ class MySQLGISSchemaEditor(DatabaseSchemaEditor):
         self.create_spatial_indexes()
 
     def remove_field(self, model, field):
-        if isinstance(field, GeometryField) and field.spatial_index:
-            qn = self.connection.ops.quote_name
-            sql = self.sql_drop_spatial_index % {
-                "index": qn(self._create_spatial_index_name(model, field)),
-                "table": qn(model._meta.db_table),
-            }
+        if isinstance(field, GeometryField) and field.spatial_index and not field.null:
+            index_name = self._create_spatial_index_name(model, field)
+            sql = self._delete_index_sql(model, index_name)
             try:
                 self.execute(sql)
             except OperationalError:

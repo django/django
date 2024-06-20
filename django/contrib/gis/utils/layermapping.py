@@ -488,9 +488,13 @@ class LayerMapping:
         if necessary (for example if the model field is MultiPolygonField while
         the mapped shapefile only contains Polygons).
         """
+        # Measured geometries are not yet supported by GeoDjango models.
+        if geom.is_measured:
+            geom.set_measured(False)
+
         # Downgrade a 3D geom to a 2D one, if necessary.
-        if self.coord_dim != geom.coord_dim:
-            geom.coord_dim = self.coord_dim
+        if self.coord_dim == 2 and geom.is_3d:
+            geom.set_3d(False)
 
         if self.make_multi(geom.geom_type, model_field):
             # Constructing a multi-geometry type to contain the single geometry

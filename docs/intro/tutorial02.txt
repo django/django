@@ -241,8 +241,8 @@ You should see something similar to the following:
 
     Migrations for 'polls':
       polls/migrations/0001_initial.py
-        - Create model Question
-        - Create model Choice
+        + Create model Question
+        + Create model Choice
 
 By running ``makemigrations``, you're telling Django that you've made
 some changes to your models (in this case, you've made new ones) and that
@@ -515,8 +515,8 @@ Save these changes and start a new Python interactive shell by running
     # Give the Question a couple of Choices. The create call constructs a new
     # Choice object, does the INSERT statement, adds the choice to the set
     # of available choices and returns the new Choice object. Django creates
-    # a set to hold the "other side" of a ForeignKey relation
-    # (e.g. a question's choice) which can be accessed via the API.
+    # a set (defined as "choice_set") to hold the "other side" of a ForeignKey
+    # relation (e.g. a question's choice) which can be accessed via the API.
     >>> q = Question.objects.get(pk=1)
 
     # Display any choices from the related object set -- none so far.

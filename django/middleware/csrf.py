@@ -4,10 +4,11 @@ Cross Site Request Forgery Middleware.
 This module provides a middleware that implements protection
 against request forgeries from other sites.
 """
+
 import logging
 import string
 from collections import defaultdict
-from urllib.parse import urlparse
+from urllib.parse import urlsplit
 
 from django.conf import settings
 from django.core.exceptions import DisallowedHost, ImproperlyConfigured
@@ -173,7 +174,7 @@ class CsrfViewMiddleware(MiddlewareMixin):
     @cached_property
     def csrf_trusted_origins_hosts(self):
         return [
-            urlparse(origin).netloc.lstrip("*")
+            urlsplit(origin).netloc.lstrip("*")
             for origin in settings.CSRF_TRUSTED_ORIGINS
         ]
 
@@ -189,7 +190,7 @@ class CsrfViewMiddleware(MiddlewareMixin):
         """
         allowed_origin_subdomains = defaultdict(list)
         for parsed in (
-            urlparse(origin)
+            urlsplit(origin)
             for origin in settings.CSRF_TRUSTED_ORIGINS
             if "*" in origin
         ):
@@ -283,7 +284,7 @@ class CsrfViewMiddleware(MiddlewareMixin):
         if request_origin in self.allowed_origins_exact:
             return True
         try:
-            parsed_origin = urlparse(request_origin)
+            parsed_origin = urlsplit(request_origin)
         except ValueError:
             return False
         request_scheme = parsed_origin.scheme
@@ -299,7 +300,7 @@ class CsrfViewMiddleware(MiddlewareMixin):
             raise RejectRequest(REASON_NO_REFERER)
 
         try:
-            referer = urlparse(referer)
+            referer = urlsplit(referer)
         except ValueError:
             raise RejectRequest(REASON_MALFORMED_REFERER)
 

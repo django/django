@@ -584,7 +584,7 @@ Updates the message files for all available languages.
 .. django-admin-option:: --extension EXTENSIONS, -e EXTENSIONS
 
 Specifies a list of file extensions to examine (default: ``html``, ``txt``,
-``py`` or ``js`` if :option:`--domain` is ``js``).
+``py`` or ``js`` if :option:`--domain` is ``djangojs``).
 
 Example usage:
 
@@ -1554,8 +1554,6 @@ Outputs timings, including database setup and total run time.
 
 .. django-admin-option:: --durations N
 
-.. versionadded:: 5.0
-
 Shows the N slowest test cases (N=0 for all).
 
 .. admonition:: Python 3.12 and later
@@ -1797,9 +1795,9 @@ allows for the following options by default:
 
 .. django-admin-option:: --pythonpath PYTHONPATH
 
-Adds the given filesystem path to the Python `import search path`_. If this
-isn't provided, ``django-admin`` will use the :envvar:`PYTHONPATH` environment
-variable.
+Adds the given filesystem path to the Python :py:data:`sys.path` module
+attribute. If this isn't provided, ``django-admin`` will use the
+:envvar:`PYTHONPATH` environment variable.
 
 This option is unnecessary in ``manage.py``, because it takes care of setting
 the Python path for you.
@@ -1809,8 +1807,6 @@ Example usage:
 .. console::
 
     django-admin migrate --pythonpath='/home/djangoprojects/myproject'
-
-.. _import search path: https://diveinto.org/python3/your-first-python-program.html#importsearchpath
 
 .. django-admin-option:: --settings SETTINGS
 

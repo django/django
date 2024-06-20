@@ -133,20 +133,20 @@ class DatabaseCreation(BaseDatabaseCreation):
         credentials in the SAVED_USER/SAVED_PASSWORD key in the settings dict.
         """
         real_settings = settings.DATABASES[self.connection.alias]
-        real_settings["SAVED_USER"] = self.connection.settings_dict[
-            "SAVED_USER"
-        ] = self.connection.settings_dict["USER"]
+        real_settings["SAVED_USER"] = self.connection.settings_dict["SAVED_USER"] = (
+            self.connection.settings_dict["USER"]
+        )
         real_settings["SAVED_PASSWORD"] = self.connection.settings_dict[
             "SAVED_PASSWORD"
         ] = self.connection.settings_dict["PASSWORD"]
         real_test_settings = real_settings["TEST"]
         test_settings = self.connection.settings_dict["TEST"]
-        real_test_settings["USER"] = real_settings["USER"] = test_settings[
-            "USER"
-        ] = self.connection.settings_dict["USER"] = parameters["user"]
-        real_settings["PASSWORD"] = self.connection.settings_dict[
-            "PASSWORD"
-        ] = parameters["password"]
+        real_test_settings["USER"] = real_settings["USER"] = test_settings["USER"] = (
+            self.connection.settings_dict["USER"]
+        ) = parameters["user"]
+        real_settings["PASSWORD"] = self.connection.settings_dict["PASSWORD"] = (
+            parameters["password"]
+        )
 
     def set_as_test_mirror(self, primary_settings_dict):
         """

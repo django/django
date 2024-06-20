@@ -3,7 +3,8 @@ import posixpath
 
 from django import forms
 from django.core import checks
-from django.core.files.base import File
+from django.core.exceptions import FieldError
+from django.core.files.base import ContentFile, File
 from django.core.files.images import ImageFile
 from django.core.files.storage import Storage, default_storage
 from django.core.files.utils import validate_file_name
@@ -12,6 +13,7 @@ from django.db.models.fields import Field
 from django.db.models.query_utils import DeferredAttribute
 from django.db.models.utils import AltersData
 from django.utils.translation import gettext_lazy as _
+from django.utils.version import PY311
 
 
 class FieldFile(File, AltersData):
@@ -88,10 +90,13 @@ class FieldFile(File, AltersData):
     # to further manipulate the underlying file, as well as update the
     # associated model instance.
 
+    def _set_instance_attribute(self, name, content):
+        setattr(self.instance, self.field.attname, name)
+
     def save(self, name, content, save=True):
         name = self.field.generate_filename(self.instance, name)
         self.name = self.storage.save(name, content, max_length=self.field.max_length)
-        setattr(self.instance, self.field.attname, self.name)
+        self._set_instance_attribute(self.name, content)
         self._committed = True
 
         # Save the object because it has changed, unless save is False
@@ -312,6 +317,15 @@ class FileField(Field):
 
     def pre_save(self, model_instance, add):
         file = super().pre_save(model_instance, add)
+        if file.name is None and file._file is not None:
+            exc = FieldError(
+                f"File for {self.name} must have "
+                "the name attribute specified to be saved."
+            )
+            if PY311 and isinstance(file._file, ContentFile):
+                exc.add_note("Pass a 'name' argument to ContentFile.")
+            raise exc
+
         if file and not file._committed:
             # Commit the file to storage prior to saving the model
             file.save(file.name, file.file, save=False)
@@ -380,6 +394,12 @@ class ImageFileDescriptor(FileDescriptor):
 
 
 class ImageFieldFile(ImageFile, FieldFile):
+    def _set_instance_attribute(self, name, content):
+        setattr(self.instance, self.field.attname, content)
+        # Update the name in case generate_filename() or storage.save() changed
+        # it, but bypass the descriptor to avoid re-reading the file.
+        self.instance.__dict__[self.field.attname] = self.name
+
     def delete(self, save=True):
         # Clear the image dimensions cache
         if hasattr(self, "_dimensions_cache"):

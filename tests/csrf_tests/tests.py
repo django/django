@@ -709,25 +709,21 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         response = mw.process_view(req, post_form_view, (), {})
         self.assertContains(response, malformed_referer_msg, status_code=403)
         # missing scheme
-        # >>> urlparse('//example.com/')
-        # ParseResult(
-        #   scheme='', netloc='example.com', path='/', params='', query='', fragment='',
-        # )
+        # >>> urlsplit('//example.com/')
+        # SplitResult(scheme='', netloc='example.com', path='/', query='', fragment='')
         req.META["HTTP_REFERER"] = "//example.com/"
         self._check_referer_rejects(mw, req)
         response = mw.process_view(req, post_form_view, (), {})
         self.assertContains(response, malformed_referer_msg, status_code=403)
         # missing netloc
-        # >>> urlparse('https://')
-        # ParseResult(
-        #   scheme='https', netloc='', path='', params='', query='', fragment='',
-        # )
+        # >>> urlsplit('https://')
+        # SplitResult(scheme='https', netloc='', path='', query='', fragment='')
         req.META["HTTP_REFERER"] = "https://"
         self._check_referer_rejects(mw, req)
         response = mw.process_view(req, post_form_view, (), {})
         self.assertContains(response, malformed_referer_msg, status_code=403)
         # Invalid URL
-        # >>> urlparse('https://[')
+        # >>> urlsplit('https://[')
         # ValueError: Invalid IPv6 URL
         req.META["HTTP_REFERER"] = "https://["
         self._check_referer_rejects(mw, req)
@@ -979,7 +975,7 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
     @override_settings(ALLOWED_HOSTS=["www.example.com"])
     def test_bad_origin_cannot_be_parsed(self):
         """
-        A POST request with an origin that can't be parsed by urlparse() is
+        A POST request with an origin that can't be parsed by urlsplit() is
         rejected.
         """
         req = self._get_POST_request_with_token()

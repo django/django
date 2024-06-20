@@ -24,12 +24,14 @@ register = template.Library()
 def ordinal(value):
     """
     Convert an integer to its ordinal as a string. 1 is '1st', 2 is '2nd',
-    3 is '3rd', etc. Works for any integer.
+    3 is '3rd', etc. Works for any non-negative integer.
     """
     try:
         value = int(value)
     except (TypeError, ValueError):
         return value
+    if value < 0:
+        return str(value)
     if value % 100 in (11, 12, 13):
         # Translators: Ordinal format for 11 (11th), 12 (12th), and 13 (13th).
         value = pgettext("ordinal 11, 12, 13", "{}th").format(value)
@@ -75,12 +77,15 @@ def intcomma(value, use_l10n=True):
             return intcomma(value, False)
         else:
             return number_format(value, use_l10n=True, force_grouping=True)
-    orig = str(value)
-    new = re.sub(r"^(-?\d+)(\d{3})", r"\g<1>,\g<2>", orig)
-    if orig == new:
-        return new
-    else:
-        return intcomma(new, use_l10n)
+    result = str(value)
+    match = re.match(r"-?\d+", result)
+    if match:
+        prefix = match[0]
+        prefix_with_commas = re.sub(r"\d{3}", r"\g<0>,", prefix[::-1])[::-1]
+        # Remove a leading comma, if needed.
+        prefix_with_commas = re.sub(r"^(-?),", r"\1", prefix_with_commas)
+        result = prefix_with_commas + result[len(prefix) :]
+    return result
 
 
 # A tuple of standard large number to their converters

@@ -6,7 +6,7 @@ import warnings
 from functools import partial, update_wrapper
 from urllib.parse import parse_qsl
 from urllib.parse import quote as urlquote
-from urllib.parse import urlparse
+from urllib.parse import urlsplit
 
 from django import forms
 from django.conf import settings
@@ -467,31 +467,33 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
 
         relation_parts = []
         prev_field = None
-        for part in lookup.split(LOOKUP_SEP):
+        parts = lookup.split(LOOKUP_SEP)
+        for part in parts:
             try:
                 field = model._meta.get_field(part)
             except FieldDoesNotExist:
                 # Lookups on nonexistent fields are ok, since they're ignored
                 # later.
                 break
+            if not prev_field or (
+                prev_field.is_relation
+                and field not in model._meta.parents.values()
+                and field is not model._meta.auto_field
+                and (
+                    model._meta.auto_field is None
+                    or part not in getattr(prev_field, "to_fields", [])
+                )
+                and (field.is_relation or not field.primary_key)
+            ):
+                relation_parts.append(part)
             if not getattr(field, "path_infos", None):
                 # This is not a relational field, so further parts
                 # must be transforms.
                 break
-            if (
-                not prev_field
-                or (field.is_relation and field not in model._meta.parents.values())
-                or (
-                    prev_field.is_relation
-                    and model._meta.auto_field is None
-                    and part not in getattr(prev_field, "to_fields", [])
-                )
-            ):
-                relation_parts.append(part)
             prev_field = field
             model = field.path_infos[-1].to_opts.model
 
-        if not relation_parts:
+        if len(relation_parts) <= 1:
             # Either a local field filter, or no fields at all.
             return True
         valid_lookups = {self.date_hierarchy}
@@ -1031,7 +1033,10 @@ class ModelAdmin(BaseModelAdmin):
 
     @staticmethod
     def _get_action_description(func, name):
-        return getattr(func, "short_description", capfirst(name.replace("_", " ")))
+        try:
+            return func.short_description
+        except AttributeError:
+            return capfirst(name.replace("_", " "))
 
     def _get_base_actions(self):
         """Return the list of actions, prior to any request-based filtering."""
@@ -1379,7 +1384,7 @@ class ModelAdmin(BaseModelAdmin):
         )
 
     def _get_preserved_qsl(self, request, preserved_filters):
-        query_string = urlparse(request.build_absolute_uri()).query
+        query_string = urlsplit(request.build_absolute_uri()).query
         return parse_qsl(query_string.replace(preserved_filters, ""))
 
     def response_add(self, request, obj, post_url_continue=None):
@@ -1758,9 +1763,9 @@ class ModelAdmin(BaseModelAdmin):
                 has_delete_permission = inline.has_delete_permission(request, obj)
             else:
                 # Disable all edit-permissions, and override formset settings.
-                has_add_permission = (
-                    has_change_permission
-                ) = has_delete_permission = False
+                has_add_permission = has_change_permission = has_delete_permission = (
+                    False
+                )
                 formset.extra = formset.max_num = 0
             has_view_permission = inline.has_view_permission(request, obj)
             prepopulated = dict(inline.get_prepopulated_fields(request, obj))
@@ -1895,9 +1900,11 @@ class ModelAdmin(BaseModelAdmin):
             form,
             list(fieldsets),
             # Clear prepopulated fields on a view-only form to avoid a crash.
-            self.get_prepopulated_fields(request, obj)
-            if add or self.has_change_permission(request, obj)
-            else {},
+            (
+                self.get_prepopulated_fields(request, obj)
+                if add or self.has_change_permission(request, obj)
+                else {}
+            ),
             readonly_fields,
             model_admin=self,
         )
@@ -2391,8 +2398,6 @@ class InlineModelAdmin(BaseModelAdmin):
         js = ["vendor/jquery/jquery%s.js" % extra, "jquery.init.js", "inlines.js"]
         if self.filter_vertical or self.filter_horizontal:
             js.extend(["SelectBox.js", "SelectFilter2.js"])
-        if self.classes and "collapse" in self.classes:
-            js.append("collapse.js")
         return forms.Media(js=["admin/js/%s" % url for url in js])
 
     def get_extra(self, request, obj=None, **kwargs):

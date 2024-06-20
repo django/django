@@ -362,14 +362,8 @@ Tests
   references, and entity references that refer to the same character as
   equivalent.
 
-* Django test runner now supports headless mode for selenium tests on supported
-  browsers. Add the ``--headless`` option to enable this mode.
-
-* Django test runner now supports ``--start-at`` and ``--start-after`` options
-  to run tests starting from a specific top-level module.
-
-* Django test runner now supports a ``--pdb`` option to spawn a debugger at
-  each error or failure.
+* :class:`~django.test.runner.DiscoverRunner` can now spawn a debugger at each
+  error or failure using the :option:`test --pdb` option.
 
 .. _backwards-incompatible-3.0:
 

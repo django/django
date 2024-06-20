@@ -5,6 +5,7 @@ from asgiref.sync import async_to_sync, iscoroutinefunction
 from django.contrib.admindocs.middleware import XViewMiddleware
 from django.contrib.auth.middleware import (
     AuthenticationMiddleware,
+    LoginRequiredMiddleware,
     RemoteUserMiddleware,
 )
 from django.contrib.flatpages.middleware import FlatpageFallbackMiddleware
@@ -34,6 +35,7 @@ from django.utils.deprecation import MiddlewareMixin
 class MiddlewareMixinTests(SimpleTestCase):
     middlewares = [
         AuthenticationMiddleware,
+        LoginRequiredMiddleware,
         BrokenLinkEmailsMiddleware,
         CacheMiddleware,
         CommonMiddleware,

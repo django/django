@@ -20,7 +20,6 @@ class OracleGISSchemaEditor(DatabaseSchemaEditor):
         "CREATE INDEX %(index)s ON %(table)s(%(column)s) "
         "INDEXTYPE IS MDSYS.SPATIAL_INDEX"
     )
-    sql_drop_spatial_index = "DROP INDEX %(index)s"
     sql_clear_geometry_table_metadata = (
         "DELETE FROM USER_SDO_GEOM_METADATA WHERE TABLE_NAME = %(table)s"
     )
@@ -98,14 +97,8 @@ class OracleGISSchemaEditor(DatabaseSchemaEditor):
                 }
             )
             if field.spatial_index:
-                self.execute(
-                    self.sql_drop_spatial_index
-                    % {
-                        "index": self.quote_name(
-                            self._create_spatial_index_name(model, field)
-                        ),
-                    }
-                )
+                index_name = self._create_spatial_index_name(model, field)
+                self.execute(self._delete_index_sql(model, index_name))
         super().remove_field(model, field)
 
     def run_geometry_sql(self):

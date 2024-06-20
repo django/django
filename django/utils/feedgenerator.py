@@ -21,8 +21,10 @@ Sample usage:
 For definitions of the different versions of RSS, see:
 https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004/02/04/incompatible-rss
 """
+
 import datetime
 import email
+import mimetypes
 from io import StringIO
 from urllib.parse import urlparse
 
@@ -56,6 +58,53 @@ def get_tag_uri(url, date):
     return "tag:%s%s:%s/%s" % (bits.hostname, d, bits.path, bits.fragment)
 
 
+def _guess_stylesheet_mimetype(url):
+    """
+    Return the given stylesheet's mimetype tuple, using a slightly custom
+    version of Python's mimetypes.guess_type().
+    """
+    mimetypedb = mimetypes.MimeTypes()
+
+    # The official mimetype for XSLT files is technically `application/xslt+xml`
+    # but as of 2024 almost no browser supports that (they all expect text/xsl).
+    # On top of that, windows seems to assume that the type for xsl is text/xml.
+    mimetypedb.readfp(StringIO("text/xsl\txsl\ntext/xsl\txslt"))
+
+    return mimetypedb.guess_type(url)
+
+
+class Stylesheet:
+    """An RSS stylesheet"""
+
+    def __init__(self, url, mimetype="", media="screen"):
+        self._url = url
+        self._mimetype = mimetype
+        self.media = media
+
+    # Using a property to delay the evaluation of self._url as late as possible
+    # in case of a lazy object (like reverse_lazy(...) for example).
+    @property
+    def url(self):
+        return iri_to_uri(self._url)
+
+    @property
+    def mimetype(self):
+        if self._mimetype == "":
+            return _guess_stylesheet_mimetype(self.url)[0]
+        return self._mimetype
+
+    def __str__(self):
+        data = [f'href="{self.url}"']
+        if self.mimetype is not None:
+            data.append(f'type="{self.mimetype}"')
+        if self.media is not None:
+            data.append(f'media="{self.media}"')
+        return " ".join(data)
+
+    def __repr__(self):
+        return repr((self.url, self.mimetype, self.media))
+
+
 class SyndicationFeed:
     "Base class for all syndication feeds. Subclasses should provide write()"
 
@@ -74,12 +123,24 @@ class SyndicationFeed:
         feed_copyright=None,
         feed_guid=None,
         ttl=None,
+        stylesheets=None,
         **kwargs,
     ):
         def to_str(s):
             return str(s) if s is not None else s
 
+        def to_stylesheet(s):
+            return s if isinstance(s, Stylesheet) else Stylesheet(s)
+
         categories = categories and [str(c) for c in categories]
+
+        if stylesheets is not None:
+            if isinstance(stylesheets, (Stylesheet, str)):
+                raise TypeError(
+                    f"stylesheets should be a list, not {stylesheets.__class__}"
+                )
+            stylesheets = [to_stylesheet(s) for s in stylesheets]
+
         self.feed = {
             "title": to_str(title),
             "link": iri_to_uri(link),
@@ -94,6 +155,7 @@ class SyndicationFeed:
             "feed_copyright": to_str(feed_copyright),
             "id": feed_guid or link,
             "ttl": to_str(ttl),
+            "stylesheets": stylesheets,
             **kwargs,
         }
         self.items = []
@@ -165,6 +227,12 @@ class SyndicationFeed:
         """
         pass
 
+    def add_stylesheets(self, handler):
+        """
+        Add stylesheet(s) to the feed. Called from write().
+        """
+        pass
+
     def item_attributes(self, item):
         """
         Return extra attributes to place on each item (i.e. item/entry) element.
@@ -227,6 +295,9 @@ class RssFeed(SyndicationFeed):
     def write(self, outfile, encoding):
         handler = SimplerXMLGenerator(outfile, encoding, short_empty_elements=True)
         handler.startDocument()
+        # Any stylesheet must come after the start of the document but before any tag.
+        # https://www.w3.org/Style/styling-XML.en.html
+        self.add_stylesheets(handler)
         handler.startElement("rss", self.rss_attributes())
         handler.startElement("channel", self.root_attributes())
         self.add_root_elements(handler)
@@ -245,6 +316,10 @@ class RssFeed(SyndicationFeed):
             handler.startElement("item", self.item_attributes(item))
             self.add_item_elements(handler, item)
             handler.endElement("item")
+
+    def add_stylesheets(self, handler):
+        for stylesheet in self.feed["stylesheets"] or []:
+            handler.processingInstruction("xml-stylesheet", stylesheet)
 
     def add_root_elements(self, handler):
         handler.addQuickElement("title", self.feed["title"])

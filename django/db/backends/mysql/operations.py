@@ -290,11 +290,6 @@ class DatabaseOperations(BaseDatabaseOperations):
     def pk_default_value(self):
         return "NULL"
 
-    def bulk_insert_sql(self, fields, placeholder_rows):
-        placeholder_rows_sql = (", ".join(row) for row in placeholder_rows)
-        values_sql = ", ".join("(%s)" % sql for sql in placeholder_rows_sql)
-        return "VALUES " + values_sql
-
     def combine_expression(self, connector, sub_expressions):
         if connector == "^":
             return "POW(%s)" % ",".join(sub_expressions)

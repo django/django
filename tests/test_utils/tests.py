@@ -1,5 +1,6 @@
 import os
 import sys
+import threading
 import unittest
 import warnings
 from io import StringIO
@@ -156,7 +157,9 @@ class SkippingTestCase(SimpleTestCase):
         )
 
 
-class SkippingClassTestCase(TestCase):
+class SkippingClassTestCase(TransactionTestCase):
+    available_apps = []
+
     def test_skip_class_unless_db_feature(self):
         @skipUnlessDBFeature("__class__")
         class NotSkippedTests(TestCase):
@@ -181,9 +184,11 @@ class SkippingClassTestCase(TestCase):
         except unittest.SkipTest:
             self.fail("SkipTest should not be raised here.")
         result = unittest.TextTestRunner(stream=StringIO()).run(test_suite)
-        # PY312: Python 3.12.1+ no longer includes skipped tests in the number
-        # of running tests.
-        self.assertEqual(result.testsRun, 1 if sys.version_info >= (3, 12, 1) else 3)
+        # PY312: Python 3.12.1 does not include skipped tests in the number of
+        # running tests.
+        self.assertEqual(
+            result.testsRun, 1 if sys.version_info[:3] == (3, 12, 1) else 3
+        )
         self.assertEqual(len(result.skipped), 2)
         self.assertEqual(result.skipped[0][1], "Database has feature(s) __class__")
         self.assertEqual(result.skipped[1][1], "Database has feature(s) __class__")
@@ -2093,6 +2098,29 @@ class DisallowedDatabaseQueriesTests(SimpleTestCase):
         with self.assertRaisesMessage(DatabaseOperationForbidden, expected_message):
             next(Car.objects.iterator())
 
+    def test_disallowed_thread_database_connection(self):
+        expected_message = (
+            "Database threaded connections to 'default' are not allowed in "
+            "SimpleTestCase subclasses. Either subclass TestCase or TransactionTestCase"
+            " to ensure proper test isolation or add 'default' to "
+            "test_utils.tests.DisallowedDatabaseQueriesTests.databases to "
+            "silence this failure."
+        )
+
+        exceptions = []
+
+        def thread_func():
+            try:
+                Car.objects.first()
+            except DatabaseOperationForbidden as e:
+                exceptions.append(e)
+
+        t = threading.Thread(target=thread_func)
+        t.start()
+        t.join()
+        self.assertEqual(len(exceptions), 1)
+        self.assertEqual(exceptions[0].args[0], expected_message)
+
 
 class AllowedDatabaseQueriesTests(SimpleTestCase):
     databases = {"default"}
@@ -2102,6 +2130,48 @@ class AllowedDatabaseQueriesTests(SimpleTestCase):
 
     def test_allowed_database_chunked_cursor_queries(self):
         next(Car.objects.iterator(), None)
+
+    def test_allowed_threaded_database_queries(self):
+        connections_dict = {}
+
+        def thread_func():
+            # Passing django.db.connection between threads doesn't work while
+            # connections[DEFAULT_DB_ALIAS] does.
+            from django.db import connections
+
+            connection = connections["default"]
+
+            next(Car.objects.iterator(), None)
+
+            # Allow thread sharing so the connection can be closed by the main
+            # thread.
+            connection.inc_thread_sharing()
+            connections_dict[id(connection)] = connection
+
+        try:
+            t = threading.Thread(target=thread_func)
+            t.start()
+            t.join()
+        finally:
+            # Finish by closing the connections opened by the other threads
+            # (the connection opened in the main thread will automatically be
+            # closed on teardown).
+            for conn in connections_dict.values():
+                if conn is not connection and conn.allow_thread_sharing:
+                    conn.validate_thread_sharing()
+                    conn._close()
+                    conn.dec_thread_sharing()
+
+    def test_allowed_database_copy_queries(self):
+        new_connection = connection.copy("dynamic_connection")
+        try:
+            with new_connection.cursor() as cursor:
+                sql = f"SELECT 1{new_connection.features.bare_select_suffix}"
+                cursor.execute(sql)
+                self.assertEqual(cursor.fetchone()[0], 1)
+        finally:
+            new_connection.validate_thread_sharing()
+            new_connection._close()
 
 
 class DatabaseAliasTests(SimpleTestCase):
