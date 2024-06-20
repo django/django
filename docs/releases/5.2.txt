@@ -37,7 +37,9 @@ Minor features
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The ``admin/base.html`` template now has a new block
+  :ref:`extrabody <extrabody>` for adding custom code before the closing
+  ``</body>`` tag.
 
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -98,7 +100,10 @@ Minor features
 :mod:`django.contrib.syndication`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* All :class:`~django.utils.feedgenerator.SyndicationFeed` classes now support
+  a ``stylesheets`` attribute. If specified, an ``<? xml-stylesheet ?>``
+  processing instruction will be added to the top of the document for each
+  stylesheet in the given list. See :ref:`feed-stylesheets` for more details.
 
 Asynchronous views
 ~~~~~~~~~~~~~~~~~~
@@ -128,7 +133,15 @@ Decorators
 Email
 ~~~~~
 
-* ...
+* Tuple items of :class:`EmailMessage.attachments
+  <django.core.mail.EmailMessage>` and
+  :class:`EmailMultiAlternatives.attachments
+  <django.core.mail.EmailMultiAlternatives>` are now named tuples, as opposed
+  to regular tuples.
+
+* :attr:`EmailMultiAlternatives.alternatives
+  <django.core.mail.EmailMultiAlternatives.alternatives>` is now a list of
+  named tuples, as opposed to regular tuples.
 
 Error Reporting
 ~~~~~~~~~~~~~~~

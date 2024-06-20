@@ -2827,6 +2827,32 @@ linked to the document in ``{% block dark-mode-vars %}``.
 
 .. _prefers-color-scheme: https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme
 
+.. _extrabody:
+
+``extrabody`` block
+===================
+
+.. versionadded:: 5.2
+
+You can add custom HTML, JavaScript, or other content to appear just before the
+closing ``</body>`` tag of templates that extend ``admin/base.html`` by
+extending the ``extrabody`` block. For example, if you want an alert to appear
+on page load you could add a ``admin/base.html`` template override to your
+project:
+
+.. code-block:: html+django
+
+    {% extends 'admin/base.html' %}
+
+    {% block extrabody %}
+        {{ block.super }}
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                window.alert('Welcome!');
+            });
+        </script>
+    {% endblock extrabody %}
+
 ``AdminSite`` objects
 =====================
 

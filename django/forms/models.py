@@ -11,6 +11,7 @@ from django.core.exceptions import (
     ImproperlyConfigured,
     ValidationError,
 )
+from django.core.validators import ProhibitNullCharactersValidator
 from django.db.models.utils import AltersData
 from django.forms.fields import ChoiceField, Field
 from django.forms.forms import BaseForm, DeclarativeFieldsMetaclass
@@ -1487,6 +1488,10 @@ class ModelChoiceField(ChoiceField):
         self.limit_choices_to = limit_choices_to  # limit the queryset later.
         self.to_field_name = to_field_name
 
+    def validate_no_null_characters(self, value):
+        non_null_character_validator = ProhibitNullCharactersValidator()
+        return non_null_character_validator(value)
+
     def get_limit_choices_to(self):
         """
         Return ``limit_choices_to`` for this form field.
@@ -1551,6 +1556,7 @@ class ModelChoiceField(ChoiceField):
     def to_python(self, value):
         if value in self.empty_values:
             return None
+        self.validate_no_null_characters(value)
         try:
             key = self.to_field_name or "pk"
             if isinstance(value, self.queryset.model):
@@ -1631,6 +1637,7 @@ class ModelMultipleChoiceField(ModelChoiceField):
                 code="invalid_list",
             )
         for pk in value:
+            self.validate_no_null_characters(pk)
             try:
                 self.queryset.filter(**{key: pk})
             except (ValueError, TypeError):

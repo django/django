@@ -1746,6 +1746,10 @@ class AdminCustomTemplateTests(AdminViewBasicTestCase):
         response = self.client.get(reverse("admin:admin_views_section_add"))
         self.assertContains(response, "bodyclass_consistency_check ")
 
+    def test_extended_extrabody(self):
+        response = self.client.get(reverse("admin:admin_views_section_add"))
+        self.assertContains(response, "extrabody_check\n</body>")
+
     def test_change_password_template(self):
         user = User.objects.get(username="super")
         response = self.client.get(
