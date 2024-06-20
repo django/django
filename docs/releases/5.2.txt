@@ -143,6 +143,10 @@ Email
   <django.core.mail.EmailMultiAlternatives.alternatives>` is now a list of
   named tuples, as opposed to regular tuples.
 
+* The new :meth:`~django.core.mail.EmailMultiAlternatives.body_contains` method
+  returns a boolean indicating whether a provided text is contained in the
+  email ``body`` and in all attached MIME type ``text/*`` alternatives.
+
 Error Reporting
 ~~~~~~~~~~~~~~~
 

@@ -436,6 +436,26 @@ Django's email library, you can do this using the
             msg.attach_alternative(html_content, "text/html")
             msg.send()
 
+    .. method:: body_contains(text)
+
+        .. versionadded:: 5.2
+
+        Returns a boolean indicating whether the provided ``text`` is
+        contained in the email ``body`` and in all attached MIME type
+        ``text/*`` alternatives.
+
+        This can be useful when testing emails. For example::
+
+            def test_contains_email_content(self):
+                subject = "Hello World"
+                from_email = "from@example.com"
+                to = "to@example.com"
+                msg = EmailMultiAlternatives(subject, "I am content.", from_email, [to])
+                msg.attach_alternative("<p>I am content.</p>", "text/html")
+
+                self.assertIs(msg.body_contains("I am content"), True)
+                self.assertIs(msg.body_contains("<p>I am content.</p>"), False)
+
 Updating the default content type
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
