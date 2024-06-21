@@ -260,7 +260,6 @@ class Query(BaseExpression):
     select_for_update_of = ()
     select_for_no_key_update = False
     select_related = False
-    has_select_fields = False
     # Arbitrary limit for select_related to prevents infinite recursion.
     max_depth = 5
     # Holds the selects defined by a call to values() or values_list()
@@ -2448,11 +2447,14 @@ class Query(BaseExpression):
             self.extra_select_mask = set(names)
         self._extra_select_cache = None
 
+    @property
+    def has_select_fields(self):
+        return self.selected is not None
+
     def set_values(self, fields):
         self.select_related = False
         self.clear_deferred_loading()
         self.clear_select_fields()
-        self.has_select_fields = True
 
         selected = {}
         if fields:
