@@ -401,7 +401,7 @@ class SQLCompiler:
                     expr = F(ref)
                 if transforms:
                     for name in transforms:
-                        expr = self.query.try_transform(expr, name)
+                        expr = self.query.try_transform(expr, name, transforms)
                 if isinstance(expr, Value):
                     # output_field must be resolved for constants.
                     expr = Cast(expr, expr.output_field)
