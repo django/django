@@ -565,8 +565,7 @@ class Query(BaseExpression):
                         col_alias = f"__col{index}"
                         col_ref = Ref(col_alias, col)
                         col_refs[col] = col_ref
-                        inner_query.annotations[col_alias] = col
-                        inner_query.append_annotation_mask([col_alias])
+                        inner_query.add_annotation(col, col_alias)
                     replacements[col] = col_ref
                 outer_query.annotations[alias] = aggregate.replace_expressions(
                     replacements
