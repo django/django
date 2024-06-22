@@ -32,6 +32,14 @@ matches the version you installed by executing:
 
     ...\> py --version
 
+.. admonition:: ``py`` is not recognized or found
+
+    Depending on how you've installed Python (such as via the Microsoft Store),
+    ``py`` may not be available in the command prompt.
+
+    You will then need to use ``python`` instead of ``py`` when entering
+    commands.
+
 .. seealso::
 
     For more details, see :doc:`python:using/windows` documentation.
