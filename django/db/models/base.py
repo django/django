@@ -1421,8 +1421,9 @@ class Model(AltersData, metaclass=ModelBase):
                     continue
                 if isinstance(f, CompositePrimaryKey):
                     names = tuple(field.name for field in f.fields)
-                    if any(name in exclude for name in names):
-                        continue
+                    if all(name not in exclude for name in names):
+                        unique_checks.append((model_class, names))
+                    continue
                 if f.unique:
                     unique_checks.append((model_class, (name,)))
                 if f.unique_for_date and f.unique_for_date not in exclude:
