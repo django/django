@@ -4,7 +4,7 @@ import re
 import unittest
 import zoneinfo
 from unittest import mock
-from urllib.parse import parse_qsl, urljoin, urlparse
+from urllib.parse import parse_qsl, urljoin, urlsplit
 
 from django import forms
 from django.contrib import admin
@@ -357,7 +357,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
                             **save_option,
                         },
                     )
-                    parsed_url = urlparse(response.url)
+                    parsed_url = urlsplit(response.url)
                     self.assertEqual(parsed_url.query, qsl)
 
     def test_change_query_string_persists(self):
@@ -386,7 +386,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
                             **save_option,
                         },
                     )
-                    parsed_url = urlparse(response.url)
+                    parsed_url = urlsplit(response.url)
                     self.assertEqual(parsed_url.query, qsl)
 
     def test_basic_edit_GET(self):
@@ -1746,6 +1746,10 @@ class AdminCustomTemplateTests(AdminViewBasicTestCase):
         response = self.client.get(reverse("admin:admin_views_section_add"))
         self.assertContains(response, "bodyclass_consistency_check ")
 
+    def test_extended_extrabody(self):
+        response = self.client.get(reverse("admin:admin_views_section_add"))
+        self.assertContains(response, "extrabody_check\n</body>")
+
     def test_change_password_template(self):
         user = User.objects.get(username="super")
         response = self.client.get(
@@ -1939,7 +1943,6 @@ class AdminJavaScriptTest(TestCase):
             self.assertContains(response, "vendor/jquery/jquery.min.js")
             self.assertContains(response, "prepopulate.js")
             self.assertContains(response, "actions.js")
-            self.assertContains(response, "collapse.js")
             self.assertContains(response, "inlines.js")
         with override_settings(DEBUG=True):
             response = self.client.get(reverse("admin:admin_views_section_add"))
@@ -1947,7 +1950,6 @@ class AdminJavaScriptTest(TestCase):
             self.assertNotContains(response, "vendor/jquery/jquery.min.js")
             self.assertContains(response, "prepopulate.js")
             self.assertContains(response, "actions.js")
-            self.assertContains(response, "collapse.js")
             self.assertContains(response, "inlines.js")
 
 
@@ -3927,7 +3929,7 @@ class AdminViewStringPrimaryKeyTest(TestCase):
                 )
 
     def test_deleteconfirmation_link(self):
-        """ "
+        """
         The link from the delete confirmation page referring back to the
         changeform of the object should be quoted.
         """
@@ -5764,7 +5766,7 @@ class SeleniumTests(AdminSeleniumTestCase):
             title="A Long Title", published=True, slug="a-long-title"
         )
 
-    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark"])
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
     def test_login_button_centered(self):
         from selenium.webdriver.common.by import By
 
@@ -6070,7 +6072,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertEqual(slug1, "this-is-the-main-name-the-best-2012-02-18")
         self.assertEqual(slug2, "option-two-this-is-the-main-name-the-best")
 
-    @screenshot_cases(["desktop_size", "mobile_size", "dark"])
+    @screenshot_cases(["desktop_size", "mobile_size", "dark", "high_contrast"])
     def test_collapsible_fieldset(self):
         """
         The 'collapse' class in fieldsets definition allows to
@@ -6086,14 +6088,11 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
         self.assertFalse(self.selenium.find_element(By.ID, "id_title").is_displayed())
         self.take_screenshot("collapsed")
-        self.selenium.find_elements(By.LINK_TEXT, "Show")[0].click()
+        self.selenium.find_elements(By.TAG_NAME, "summary")[0].click()
         self.assertTrue(self.selenium.find_element(By.ID, "id_title").is_displayed())
-        self.assertEqual(
-            self.selenium.find_element(By.ID, "fieldsetcollapser0").text, "Hide"
-        )
         self.take_screenshot("expanded")
 
-    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark"])
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
     def test_selectbox_height_collapsible_fieldset(self):
         from selenium.webdriver.common.by import By
 
@@ -6104,7 +6103,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
         url = self.live_server_url + reverse("admin7:admin_views_pizza_add")
         self.selenium.get(url)
-        self.selenium.find_elements(By.ID, "fieldsetcollapser0")[0].click()
+        self.selenium.find_elements(By.TAG_NAME, "summary")[0].click()
         from_filter_box = self.selenium.find_element(By.ID, "id_toppings_filter")
         from_box = self.selenium.find_element(By.ID, "id_toppings_from")
         to_filter_box = self.selenium.find_element(By.ID, "id_toppings_filter_selected")
@@ -6121,7 +6120,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
         self.take_screenshot("selectbox-collapsible")
 
-    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark"])
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
     def test_selectbox_height_not_collapsible_fieldset(self):
         from selenium.webdriver.common.by import By
 
@@ -6152,7 +6151,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
         self.take_screenshot("selectbox-non-collapsible")
 
-    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark"])
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
     def test_first_field_focus(self):
         """JavaScript-assisted auto-focus on first usable form field."""
         from selenium.webdriver.common.by import By
@@ -8037,11 +8036,11 @@ class AdminKeepChangeListFiltersTests(TestCase):
         Assert that two URLs are equal despite the ordering
         of their querystring. Refs #22360.
         """
-        parsed_url1 = urlparse(url1)
+        parsed_url1 = urlsplit(url1)
         path1 = parsed_url1.path
         parsed_qs1 = dict(parse_qsl(parsed_url1.query))
 
-        parsed_url2 = urlparse(url2)
+        parsed_url2 = urlsplit(url2)
         path2 = parsed_url2.path
         parsed_qs2 = dict(parse_qsl(parsed_url2.query))
 

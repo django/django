@@ -1856,8 +1856,11 @@ class ModelStateTests(SimpleTestCase):
         class Child2(Abstract):
             pass
 
+        abstract_state = ModelState.from_model(Abstract)
         child1_state = ModelState.from_model(Child1)
         child2_state = ModelState.from_model(Child2)
+        index_names = [index.name for index in abstract_state.options["indexes"]]
+        self.assertEqual(index_names, ["migrations__name_ae16a4_idx"])
         index_names = [index.name for index in child1_state.options["indexes"]]
         self.assertEqual(index_names, ["migrations__name_b0afd7_idx"])
         index_names = [index.name for index in child2_state.options["indexes"]]
@@ -1887,7 +1890,9 @@ class ModelStateTests(SimpleTestCase):
 
             class Meta:
                 constraints = [
-                    models.CheckConstraint(check=models.Q(size__gt=1), name="size_gt_1")
+                    models.CheckConstraint(
+                        condition=models.Q(size__gt=1), name="size_gt_1"
+                    )
                 ]
 
         state = ModelState.from_model(ModelWithConstraints)

@@ -137,6 +137,7 @@ class UtilsTests(SimpleTestCase):
             (simple_function, SIMPLE_FUNCTION),
             ("test_from_model", article.test_from_model()),
             ("non_field", INSTANCE_ATTRIBUTE),
+            ("site__domain", SITE_NAME),
         )
 
         mock_admin = MockModelAdmin()
@@ -294,6 +295,17 @@ class UtilsTests(SimpleTestCase):
 
         self.assertEqual(label_for_field(lambda x: "nothing", Article), "--")
         self.assertEqual(label_for_field("site_id", Article), "Site id")
+        # The correct name and attr are returned when `__` is in the field name.
+        self.assertEqual(label_for_field("site__domain", Article), "Site  domain")
+        self.assertEqual(
+            label_for_field("site__domain", Article, return_attr=True),
+            ("Site  domain", Site._meta.get_field("domain")),
+        )
+
+    def test_label_for_field_failed_lookup(self):
+        msg = "Unable to lookup 'site__unknown' on Article"
+        with self.assertRaisesMessage(AttributeError, msg):
+            label_for_field("site__unknown", Article)
 
         class MockModelAdmin:
             @admin.display(description="not Really the Model")

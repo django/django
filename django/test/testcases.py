@@ -1,6 +1,7 @@
 import difflib
 import json
 import logging
+import pickle
 import posixpath
 import sys
 import threading
@@ -20,7 +21,7 @@ from urllib.parse import (
     urljoin,
     urlparse,
     urlsplit,
-    urlunparse,
+    urlunsplit,
 )
 from urllib.request import url2pathname
 
@@ -90,6 +91,18 @@ def to_list(value):
     if not isinstance(value, list):
         value = [value]
     return value
+
+
+def is_pickable(obj):
+    """
+    Returns true if the object can be dumped and loaded through the pickle
+    module.
+    """
+    try:
+        pickle.loads(pickle.dumps(obj))
+    except (AttributeError, TypeError, pickle.PickleError):
+        return False
+    return True
 
 
 def assert_and_parse_html(self, html, user_msg, msg):
@@ -280,6 +293,8 @@ class SimpleTestCase(unittest.TestCase):
                 self.connection is None
                 and self.alias not in cls.databases
                 and self.alias != NO_DB_ALIAS
+                # Dynamically created connections are always allowed.
+                and self.alias in connections
             ):
                 # Connection has not yet been established, but the alias is not allowed.
                 message = cls._disallowed_database_msg % {
@@ -300,6 +315,23 @@ class SimpleTestCase(unittest.TestCase):
         include a call to super().setUp().
         """
         self._setup_and_call(result)
+
+    def __getstate__(self):
+        """
+        Make SimpleTestCase picklable for parallel tests using subtests.
+        """
+        state = super().__dict__
+        # _outcome and _subtest cannot be tested on picklability, since they
+        # contain the TestCase itself, leading to an infinite recursion.
+        if state["_outcome"]:
+            pickable_state = {"_outcome": None, "_subtest": None}
+            for key, value in state.items():
+                if key in pickable_state or not is_pickable(value):
+                    continue
+                pickable_state[key] = value
+            return pickable_state
+
+        return state
 
     def debug(self):
         """Perform the same as __call__(), without catching the exception."""
@@ -509,11 +541,9 @@ class SimpleTestCase(unittest.TestCase):
         def normalize(url):
             """Sort the URL's query string parameters."""
             url = str(url)  # Coerce reverse_lazy() URLs.
-            scheme, netloc, path, params, query, fragment = urlparse(url)
+            scheme, netloc, path, query, fragment = urlsplit(url)
             query_parts = sorted(parse_qsl(query))
-            return urlunparse(
-                (scheme, netloc, path, params, urlencode(query_parts), fragment)
-            )
+            return urlunsplit((scheme, netloc, path, urlencode(query_parts), fragment))
 
         if msg_prefix:
             msg_prefix += ": "
@@ -1251,6 +1281,18 @@ def connections_support_transactions(aliases=None):
     return all(conn.features.supports_transactions for conn in conns)
 
 
+def connections_support_savepoints(aliases=None):
+    """
+    Return whether or not all (or specified) connections support savepoints.
+    """
+    conns = (
+        connections.all()
+        if aliases is None
+        else (connections[alias] for alias in aliases)
+    )
+    return all(conn.features.uses_savepoints for conn in conns)
+
+
 class TestData:
     """
     Descriptor to provide TestCase instance isolation for attributes assigned
@@ -1326,9 +1368,16 @@ class TestCase(TransactionTestCase):
         return connections_support_transactions(cls.databases)
 
     @classmethod
+    def _databases_support_savepoints(cls):
+        return connections_support_savepoints(cls.databases)
+
+    @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        if not cls._databases_support_transactions():
+        if not (
+            cls._databases_support_transactions()
+            and cls._databases_support_savepoints()
+        ):
             return
         cls.cls_atomics = cls._enter_atomics()
 
@@ -1356,7 +1405,10 @@ class TestCase(TransactionTestCase):
 
     @classmethod
     def tearDownClass(cls):
-        if cls._databases_support_transactions():
+        if (
+            cls._databases_support_transactions()
+            and cls._databases_support_savepoints()
+        ):
             cls._rollback_atomics(cls.cls_atomics)
             for conn in connections.all(initialized_only=True):
                 conn.close()
@@ -1382,6 +1434,15 @@ class TestCase(TransactionTestCase):
         if self.reset_sequences:
             raise TypeError("reset_sequences cannot be used on TestCase instances")
         self.atomics = self._enter_atomics()
+        if not self._databases_support_savepoints():
+            if self.fixtures:
+                for db_name in self._databases_names(include_mirrors=False):
+                    call_command(
+                        "loaddata",
+                        *self.fixtures,
+                        **{"verbosity": 0, "database": db_name},
+                    )
+            self.setUpTestData()
 
     def _fixture_teardown(self):
         if not self._databases_support_transactions():
@@ -1574,11 +1635,11 @@ class FSFilesHandler(WSGIHandler):
         * the host is provided as part of the base_url
         * the request's path isn't under the media path (or equal)
         """
-        return path.startswith(self.base_url[2]) and not self.base_url[1]
+        return path.startswith(self.base_url.path) and not self.base_url.netloc
 
     def file_path(self, url):
         """Return the relative path to the file on disk for the given URL."""
-        relative_url = url.removeprefix(self.base_url[2])
+        relative_url = url.removeprefix(self.base_url.path)
         return url2pathname(relative_url)
 
     def get_response(self, request):

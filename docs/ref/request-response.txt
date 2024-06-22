@@ -289,8 +289,6 @@ Methods
 
 .. method:: HttpRequest.auser()
 
-    .. versionadded:: 5.0
-
     From the :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`:
     Coroutine. Returns an instance of :setting:`AUTH_USER_MODEL` representing
     the currently logged-in user. If the user isn't currently logged in,
@@ -948,7 +946,7 @@ Methods
       sent with all same-site and cross-site requests.
 
     .. _HttpOnly: https://owasp.org/www-community/HttpOnly
-    .. _SameSite: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite
+    .. _SameSite: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie#samesitesamesite-value
 
     .. warning::
 
@@ -1289,8 +1287,6 @@ Attributes
 
 Handling disconnects
 --------------------
-
-.. versionadded:: 5.0
 
 If the client disconnects during a streaming response, Django will cancel the
 coroutine that is handling the response. If you want to clean up resources

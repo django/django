@@ -174,7 +174,19 @@ class ModelAdminTests(TestCase):
             pass
 
         ma = PlaceAdmin(Place, self.site)
-        self.assertIs(ma.lookup_allowed("country", "1", request), True)
+
+        cases = [
+            ("country", "1"),
+            ("country__exact", "1"),
+            ("country__id", "1"),
+            ("country__id__exact", "1"),
+            ("country__isnull", True),
+            ("country__isnull", False),
+            ("country__id__isnull", False),
+        ]
+        for lookup, lookup_value in cases:
+            with self.subTest(lookup=lookup):
+                self.assertIs(ma.lookup_allowed(lookup, lookup_value, request), True)
 
     @isolate_apps("modeladmin")
     def test_lookup_allowed_non_autofield_primary_key(self):
@@ -650,7 +662,8 @@ class ModelAdminTests(TestCase):
         self.assertHTMLEqual(
             str(form["main_band"]),
             '<div class="related-widget-wrapper" data-model-ref="band">'
-            '<select name="main_band" id="id_main_band" required>'
+            '<select data-context="available-source" '
+            'name="main_band" id="id_main_band" required>'
             '<option value="" selected>---------</option>'
             '<option value="%d">The Beatles</option>'
             '<option value="%d">The Doors</option>'
@@ -673,7 +686,8 @@ class ModelAdminTests(TestCase):
         self.assertHTMLEqual(
             str(form["main_band"]),
             '<div class="related-widget-wrapper" data-model-ref="band">'
-            '<select name="main_band" id="id_main_band" required>'
+            '<select data-context="available-source" '
+            'name="main_band" id="id_main_band" required>'
             '<option value="" selected>---------</option>'
             '<option value="%d">The Doors</option>'
             "</select></div>" % self.band.id,
@@ -767,7 +781,8 @@ class ModelAdminTests(TestCase):
             type(cmafa.base_fields["main_band"].widget.widget), AdminRadioSelect
         )
         self.assertEqual(
-            cmafa.base_fields["main_band"].widget.attrs, {"class": "radiolist inline"}
+            cmafa.base_fields["main_band"].widget.attrs,
+            {"class": "radiolist inline", "data-context": "available-source"},
         )
         self.assertEqual(
             list(cmafa.base_fields["main_band"].widget.choices),
@@ -778,7 +793,8 @@ class ModelAdminTests(TestCase):
             type(cmafa.base_fields["opening_band"].widget.widget), AdminRadioSelect
         )
         self.assertEqual(
-            cmafa.base_fields["opening_band"].widget.attrs, {"class": "radiolist"}
+            cmafa.base_fields["opening_band"].widget.attrs,
+            {"class": "radiolist", "data-context": "available-source"},
         )
         self.assertEqual(
             list(cmafa.base_fields["opening_band"].widget.choices),

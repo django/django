@@ -475,6 +475,7 @@ class ASGITest(SimpleTestCase):
         sync_waiter.active_threads.clear()
 
     async def test_asyncio_cancel_error(self):
+        view_started = asyncio.Event()
         # Flag to check if the view was cancelled.
         view_did_cancel = False
         # Track request_finished signal.
@@ -484,9 +485,10 @@ class ASGITest(SimpleTestCase):
 
         # A view that will listen for the cancelled error.
         async def view(request):
-            nonlocal view_did_cancel
+            nonlocal view_started, view_did_cancel
+            view_started.set()
             try:
-                await asyncio.sleep(0.2)
+                await asyncio.sleep(0.1)
                 return HttpResponse("Hello World!")
             except asyncio.CancelledError:
                 # Set the flag.
@@ -522,6 +524,7 @@ class ASGITest(SimpleTestCase):
         self.assertNotEqual(handler_call["thread"], threading.current_thread())
         # The signal sender is the handler class.
         self.assertEqual(handler_call["kwargs"], {"sender": TestASGIHandler})
+        view_started.clear()
 
         # Request cycle with a disconnect before the view can respond.
         application = TestASGIHandler()
@@ -529,7 +532,7 @@ class ASGITest(SimpleTestCase):
         communicator = ApplicationCommunicator(application, scope)
         await communicator.send_input({"type": "http.request"})
         # Let the view actually start.
-        await asyncio.sleep(0.1)
+        await view_started.wait()
         # Disconnect the client.
         await communicator.send_input({"type": "http.disconnect"})
         # The handler should not send a response.

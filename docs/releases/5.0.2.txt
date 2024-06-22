@@ -7,6 +7,12 @@ Django 5.0.2 release notes
 Django 5.0.2 fixes a security issue with severity "moderate" and several bugs
 in 5.0.1. Also, the latest string translations from Transifex are incorporated.
 
+CVE-2024-24680: Potential denial-of-service in ``intcomma`` template filter
+===========================================================================
+
+The ``intcomma`` template filter was subject to a potential denial-of-service
+attack when used with very long strings.
+
 Bugfixes
 ========
 
@@ -32,3 +38,12 @@ Bugfixes
 * Fixed a regression in Django 5.0 that caused the ``request_finished`` signal to
   sometimes not be fired when running Django through an ASGI server, resulting
   in potential resource leaks (:ticket:`35059`).
+
+* Fixed a bug in Django 5.0 that caused a migration crash on MySQL when adding
+  a ``BinaryField``, ``TextField``, ``JSONField``, or ``GeometryField`` with a
+  ``db_default`` (:ticket:`35162`).
+
+* Fixed a bug in Django 5.0 that caused a migration crash on models with a
+  literal ``db_default`` of a complex type such as ``dict`` instance of a
+  ``JSONField``. Running ``makemigrations`` might generate no-op ``AlterField``
+  operations for fields using ``db_default`` (:ticket:`35149`).

@@ -186,6 +186,12 @@ class ModelInstanceCreationTests(TestCase):
         with self.assertNumQueries(1):
             PrimaryKeyWithDefault().save()
 
+    def test_save_primary_with_default_force_update(self):
+        # An UPDATE attempt is made if explicitly requested.
+        obj = PrimaryKeyWithDefault.objects.create()
+        with self.assertNumQueries(1):
+            PrimaryKeyWithDefault(uuid=obj.pk).save(force_update=True)
+
     def test_save_primary_with_db_default(self):
         # An UPDATE attempt is skipped when a primary key has db_default.
         with self.assertNumQueries(1):
@@ -964,6 +970,13 @@ class ModelRefreshTests(TestCase):
         self.assertFalse(hasattr(article, "featured"))
         FeaturedArticle.objects.create(article_id=article.pk)
         article.refresh_from_db()
+        self.assertTrue(hasattr(article, "featured"))
+
+    def test_refresh_clears_reverse_related_explicit_fields(self):
+        article = Article.objects.create(headline="Test", pub_date=datetime(2024, 2, 4))
+        self.assertFalse(hasattr(article, "featured"))
+        FeaturedArticle.objects.create(article_id=article.pk)
+        article.refresh_from_db(fields=["featured"])
         self.assertTrue(hasattr(article, "featured"))
 
     def test_refresh_clears_one_to_one_field(self):

@@ -29,6 +29,8 @@
   
       --close-button-bg: #333333;
       --close-button-hover-bg: #666666;
+
+      color-scheme: dark;
     }
   }
 
@@ -63,6 +65,8 @@ html[data-theme="dark"] {
 
     --close-button-bg: #333333;
     --close-button-hover-bg: #666666;
+
+    color-scheme: dark;
 }
 
 /* THEME SWITCH */

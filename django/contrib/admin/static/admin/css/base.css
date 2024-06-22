@@ -84,6 +84,8 @@ html[data-theme="light"],
         "Segoe UI Emoji",
         "Segoe UI Symbol",
         "Noto Color Emoji";
+
+    color-scheme: light;
 }
 
 html, body {
@@ -215,6 +217,10 @@ fieldset {
     padding: 0;
     border: none;
     border-top: 1px solid var(--hairline-color);
+}
+
+details summary {
+    cursor: pointer;
 }
 
 blockquote {

@@ -342,6 +342,40 @@ class CreateModel(ModelOperation):
                         managers=self.managers,
                     ),
                 ]
+            elif isinstance(operation, AddConstraint):
+                return [
+                    CreateModel(
+                        self.name,
+                        fields=self.fields,
+                        options={
+                            **self.options,
+                            "constraints": [
+                                *self.options.get("constraints", []),
+                                operation.constraint,
+                            ],
+                        },
+                        bases=self.bases,
+                        managers=self.managers,
+                    ),
+                ]
+            elif isinstance(operation, RemoveConstraint):
+                options_constraints = [
+                    constraint
+                    for constraint in self.options.get("constraints", [])
+                    if constraint.name != operation.name
+                ]
+                return [
+                    CreateModel(
+                        self.name,
+                        fields=self.fields,
+                        options={
+                            **self.options,
+                            "constraints": options_constraints,
+                        },
+                        bases=self.bases,
+                        managers=self.managers,
+                    ),
+                ]
         return super().reduce(operation, app_label)
 
 
@@ -426,11 +460,11 @@ class RenameModel(ModelOperation):
                     model = new_model
                     related_key = (app_label, self.new_name_lower)
                 else:
-                    model = related_object.related_model
                     related_key = (
                         related_object.related_model._meta.app_label,
                         related_object.related_model._meta.model_name,
                     )
+                    model = to_state.apps.get_model(*related_key)
                 to_field = to_state.apps.get_model(*related_key)._meta.get_field(
                     related_object.field.name
                 )

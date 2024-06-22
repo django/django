@@ -155,10 +155,6 @@ Authenticating users
         this. Rather if you're looking for a way to login a user, use the
         :class:`~django.contrib.auth.views.LoginView`.
 
-    .. versionchanged:: 5.0
-
-        ``aauthenticate()`` function was added.
-
 .. _topic-authorization:
 
 Permissions and Authorization
@@ -401,10 +397,6 @@ Or in an asynchronous view::
         # Do something for anonymous users.
         ...
 
-.. versionchanged:: 5.0
-
-    The :meth:`.HttpRequest.auser` method was added.
-
 .. _how-to-log-a-user-in:
 
 How to log a user in
@@ -445,10 +437,6 @@ If you have an authenticated user you want to attach to the current session
             else:
                 # Return an 'invalid login' error message.
                 ...
-
-    .. versionchanged:: 5.0
-
-        ``alogin()`` function was added.
 
 Selecting the authentication backend
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -504,10 +492,6 @@ How to log a user out
     to put anything into the session that will be available to the user
     immediately after logging out, do that *after* calling
     :func:`django.contrib.auth.logout()`.
-
-    .. versionchanged:: 5.0
-
-        ``alogout()`` function was added.
 
 Limiting access to logged-in users
 ----------------------------------
@@ -617,6 +601,10 @@ The ``login_required`` decorator
     :func:`django.contrib.admin.views.decorators.staff_member_required`
     decorator a useful alternative to ``login_required()``.
 
+.. versionchanged:: 5.1
+
+    Support for wrapping asynchronous view functions was added.
+
 .. currentmodule:: django.contrib.auth.mixins
 
 The ``LoginRequiredMixin`` mixin
@@ -652,7 +640,24 @@ inheritance list.
     ``is_active`` flag on a user, but the default
     :setting:`AUTHENTICATION_BACKENDS` reject inactive users.
 
+.. _disable-login-required-middleware-for-views:
+
 .. currentmodule:: django.contrib.auth.decorators
+
+The ``login_not_required`` decorator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 5.1
+
+When :class:`~django.contrib.auth.middleware.LoginRequiredMiddleware` is
+installed, all views require authentication by default. Some views, such as the
+login view, may need to disable this behavior.
+
+.. function:: login_not_required()
+
+    Allows unauthenticated requests without redirecting to the login page when
+    :class:`~django.contrib.auth.middleware.LoginRequiredMiddleware` is
+    installed.
 
 Limiting access to logged-in users that pass a test
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -713,6 +718,11 @@ email in the desired domain and if not, redirects to the login page::
 
         @user_passes_test(email_check, login_url="/login/")
         def my_view(request): ...
+
+    .. versionchanged:: 5.1
+
+        Support for wrapping asynchronous view functions and using asynchronous
+        test callables was added.
 
 .. currentmodule:: django.contrib.auth.mixins
 
@@ -817,6 +827,10 @@ The ``permission_required`` decorator
     This also avoids a redirect loop when :class:`.LoginView`'s
     ``redirect_authenticated_user=True`` and the logged-in user doesn't have
     all of the required permissions.
+
+.. versionchanged:: 5.1
+
+    Support for wrapping asynchronous view functions was added.
 
 .. currentmodule:: django.contrib.auth.mixins
 
@@ -969,10 +983,6 @@ function.
                     update_session_auth_hash(request, form.user)
             else:
                 ...
-
-    .. versionchanged:: 5.0
-
-        ``aupdate_session_auth_hash()`` function was added.
 
 .. note::
 
@@ -1623,9 +1633,17 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
 
 .. class:: AdminPasswordChangeForm
 
-    A form used in the admin interface to change a user's password.
+    A form used in the admin interface to change a user's password, including
+    the ability to set an :meth:`unusable password
+    <django.contrib.auth.models.User.set_unusable_password>`, which blocks the
+    user from logging in with password-based authentication.
 
     Takes the ``user`` as the first positional argument.
+
+    .. versionchanged:: 5.1
+
+        Option to disable (or reenable) password-based authentication was
+        added.
 
 .. class:: AuthenticationForm
 
@@ -1717,12 +1735,21 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
     A :class:`~django.forms.ModelForm` for creating a new user. This is the
     recommended base class if you need to customize the user creation form.
 
-    It has three fields: ``username`` (from the user model), ``password1``,
-    and ``password2``. It verifies that ``password1`` and ``password2`` match,
-    validates the password using
+    It has four fields: ``username`` (from the user model), ``password1``,
+    ``password2``, and ``usable_password`` (the latter is enabled by default).
+    If ``usable_password`` is enabled, it verifies that ``password1`` and
+    ``password2`` are non empty and match, validates the password using
     :func:`~django.contrib.auth.password_validation.validate_password`, and
     sets the user's password using
     :meth:`~django.contrib.auth.models.User.set_password()`.
+    If ``usable_password`` is disabled, no password validation is done, and
+    password-based authentication is disabled for the user by calling
+    :meth:`~django.contrib.auth.models.User.set_unusable_password()`.
+
+    .. versionchanged:: 5.1
+
+        Option to create users with disabled password-based authentication was
+        added.
 
 .. class:: UserCreationForm
 
@@ -1837,6 +1864,8 @@ You should see a link to "Users" in the "Auth"
 section of the main admin index page. The "Add user" admin page is different
 than standard admin pages in that it requires you to choose a username and
 password before allowing you to edit the rest of the user's fields.
+Alternatively, on this page, you can choose a username and disable
+password-based authentication for the user.
 
 Also note: if you want a user account to be able to create users using the
 Django admin site, you'll need to give them permission to add users *and*
@@ -1858,4 +1887,4 @@ Changing passwords
 User passwords are not displayed in the admin (nor stored in the database), but
 the :doc:`password storage details </topics/auth/passwords>` are displayed.
 Included in the display of this information is a link to
-a password change form that allows admins to change user passwords.
+a password change form that allows admins to change or unset user passwords.

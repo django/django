@@ -106,7 +106,7 @@ class Serializer(base.Serializer):
         differently from regular fields).
         """
         self._start_relational_field(field)
-        related_att = getattr(obj, field.get_attname())
+        related_att = getattr(obj, field.attname)
         if related_att is not None:
             if self.use_natural_foreign_keys and hasattr(
                 field.remote_field.model, "natural_key"

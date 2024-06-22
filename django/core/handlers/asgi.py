@@ -50,21 +50,13 @@ class ASGIRequest(HttpRequest):
         self._post_parse_error = False
         self._read_started = False
         self.resolver_match = None
+        self.path = scope["path"]
         self.script_name = get_script_prefix(scope)
         if self.script_name:
             # TODO: Better is-prefix checking, slash handling?
             self.path_info = scope["path"].removeprefix(self.script_name)
         else:
             self.path_info = scope["path"]
-        # The Django path is different from ASGI scope path args, it should
-        # combine with script name.
-        if self.script_name:
-            self.path = "%s/%s" % (
-                self.script_name.rstrip("/"),
-                self.path_info.replace("/", "", 1),
-            )
-        else:
-            self.path = scope["path"]
         # HTTP basics.
         self.method = self.scope["method"].upper()
         # Ensure query string is encoded correctly.

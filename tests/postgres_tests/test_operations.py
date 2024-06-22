@@ -4,6 +4,7 @@ from migrations.test_base import OperationTestBase
 
 from django.db import IntegrityError, NotSupportedError, connection, transaction
 from django.db.migrations.state import ProjectState
+from django.db.migrations.writer import OperationWriter
 from django.db.models import CheckConstraint, Index, Q, UniqueConstraint
 from django.db.utils import ProgrammingError
 from django.test import modify_settings, override_settings
@@ -393,6 +394,25 @@ class CreateCollationTests(PostgreSQLTestCase):
         self.assertEqual(len(captured_queries), 1)
         self.assertIn("DROP COLLATION", captured_queries[0]["sql"])
 
+    def test_writer(self):
+        operation = CreateCollation(
+            "sample_collation",
+            "und-u-ks-level2",
+            provider="icu",
+            deterministic=False,
+        )
+        buff, imports = OperationWriter(operation, indentation=0).serialize()
+        self.assertEqual(imports, {"import django.contrib.postgres.operations"})
+        self.assertEqual(
+            buff,
+            "django.contrib.postgres.operations.CreateCollation(\n"
+            "    name='sample_collation',\n"
+            "    locale='und-u-ks-level2',\n"
+            "    provider='icu',\n"
+            "    deterministic=False,\n"
+            "),",
+        )
+
 
 @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific tests.")
 class RemoveCollationTests(PostgreSQLTestCase):
@@ -476,7 +496,7 @@ class AddConstraintNotValidTests(OperationTestBase):
     def test_add(self):
         table_name = f"{self.app_label}_pony"
         constraint_name = "pony_pink_gte_check"
-        constraint = CheckConstraint(check=Q(pink__gte=4), name=constraint_name)
+        constraint = CheckConstraint(condition=Q(pink__gte=4), name=constraint_name)
         operation = AddConstraintNotValid("Pony", constraint=constraint)
         project_state, new_state = self.make_test_state(self.app_label, operation)
         self.assertEqual(
@@ -529,7 +549,7 @@ class ValidateConstraintTests(OperationTestBase):
 
     def test_validate(self):
         constraint_name = "pony_pink_gte_check"
-        constraint = CheckConstraint(check=Q(pink__gte=4), name=constraint_name)
+        constraint = CheckConstraint(condition=Q(pink__gte=4), name=constraint_name)
         operation = AddConstraintNotValid("Pony", constraint=constraint)
         project_state, new_state = self.make_test_state(self.app_label, operation)
         Pony = new_state.apps.get_model(self.app_label, "Pony")

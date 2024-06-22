@@ -289,8 +289,8 @@ def lookup_field(name, obj, model_admin=None):
     try:
         f = _get_non_gfk_field(opts, name)
     except (FieldDoesNotExist, FieldIsAForeignKeyColumnName):
-        # For non-field values, the value is either a method, property or
-        # returned via a callable.
+        # For non-regular field values, the value is either a method,
+        # property, related field, or returned via a callable.
         if callable(name):
             attr = name
             value = attr(obj)
@@ -298,10 +298,17 @@ def lookup_field(name, obj, model_admin=None):
             attr = getattr(model_admin, name)
             value = attr(obj)
         else:
-            attr = getattr(obj, name)
+            sentinel = object()
+            attr = getattr(obj, name, sentinel)
             if callable(attr):
                 value = attr()
             else:
+                if attr is sentinel:
+                    attr = obj
+                    for part in name.split(LOOKUP_SEP):
+                        attr = getattr(attr, part, sentinel)
+                        if attr is sentinel:
+                            return None, None, None
                 value = attr
             if hasattr(model_admin, "model") and hasattr(model_admin.model, name):
                 attr = getattr(model_admin.model, name)
@@ -345,9 +352,10 @@ def label_for_field(name, model, model_admin=None, return_attr=False, form=None)
     """
     Return a sensible label for a field name. The name can be a callable,
     property (but not created with @property decorator), or the name of an
-    object's attribute, as well as a model field. If return_attr is True, also
-    return the resolved attribute (which could be a callable). This will be
-    None if (and only if) the name refers to a field.
+    object's attribute, as well as a model field, including across related
+    objects. If return_attr is True, also return the resolved attribute
+    (which could be a callable). This will be None if (and only if) the name
+    refers to a field.
     """
     attr = None
     try:
@@ -371,15 +379,15 @@ def label_for_field(name, model, model_admin=None, return_attr=False, form=None)
             elif form and name in form.fields:
                 attr = form.fields[name]
             else:
-                message = "Unable to lookup '%s' on %s" % (
-                    name,
-                    model._meta.object_name,
-                )
-                if model_admin:
-                    message += " or %s" % model_admin.__class__.__name__
-                if form:
-                    message += " or %s" % form.__class__.__name__
-                raise AttributeError(message)
+                try:
+                    attr = get_fields_from_path(model, name)[-1]
+                except (FieldDoesNotExist, NotRelationField):
+                    message = f"Unable to lookup '{name}' on {model._meta.object_name}"
+                    if model_admin:
+                        message += f" or {model_admin.__class__.__name__}"
+                    if form:
+                        message += f" or {form.__class__.__name__}"
+                    raise AttributeError(message)
 
             if hasattr(attr, "short_description"):
                 label = attr.short_description
