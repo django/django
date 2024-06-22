@@ -4,8 +4,8 @@ import re
 import reprlib
 import secrets
 import unicodedata
-from collections.abc import Sized
 from collections import deque
+from collections.abc import Sized
 from gzip import GzipFile
 from gzip import compress as gzip_compress
 from html import escape
