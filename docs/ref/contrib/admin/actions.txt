@@ -129,6 +129,7 @@ just like any other configuration option. So, the complete ``admin.py`` with
 the action and its registration would look like::
 
     from django.contrib import admin
+
     from myapp.models import Article
 
 

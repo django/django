@@ -25,6 +25,7 @@ which is a subclass of :class:`unittest.TestCase` that runs each test inside a
 transaction to provide isolation::
 
     from django.test import TestCase
+
     from myapp.models import Animal
 
 

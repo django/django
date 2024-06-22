@@ -844,6 +844,7 @@ If your custom user model is a subclass of ``AbstractUser``, then you can
 extend these forms in this manner::
 
     from django.contrib.auth.forms import UserCreationForm
+
     from myapp.models import CustomUser
 
 
