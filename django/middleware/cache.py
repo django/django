@@ -41,6 +41,10 @@ More details about how the caching works:
 * This middleware also sets ETag, Last-Modified, Expires and Cache-Control
   headers on the response object.
 
+Warning:
+* With ``CacheMiddleware`` enabled, views decorated
+  with ``django.views.decorators.cache.cache_page`` using a different cache alias,
+  will be cached twice, which may cause issues with large responses.
 """
 
 import time
