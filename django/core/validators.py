@@ -1,6 +1,7 @@
 import ipaddress
 import math
 import re
+from contextlib import suppress
 from pathlib import Path
 from urllib.parse import urlsplit, urlunsplit
 
@@ -282,11 +283,9 @@ class EmailValidator:
         literal_match = self.literal_regex.match(domain_part)
         if literal_match:
             ip_address = literal_match[1]
-            try:
+            with suppress(ValidationError):
                 validate_ipv46_address(ip_address)
                 return True
-            except ValidationError:
-                pass
         return False
 
     def __eq__(self, other):
