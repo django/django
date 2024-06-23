@@ -2301,6 +2301,14 @@ The ``InlineModelAdmin`` class adds or customizes:
     configured in :attr:`~ModelAdmin.fieldsets`, inlines with a ``collapse``
     class will be initially collapsed using an expandable widget.
 
+    .. admonition:: ``TabularInline`` does not support fieldsets
+
+        Using ``fieldsets`` in conjunction with ``TabularInline`` has no effect,
+        as it does not support styles that modify its layout or behavior.
+        For example, applying the ``collapse`` class will not make the fields
+        collapsible, and using ``wide`` will not alter the horizontal spacing
+        within the ``TabularInline``.
+
     .. versionchanged:: 5.1
 
         ``fieldsets`` using the ``collapse`` class now use ``<details>`` and
