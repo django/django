@@ -520,9 +520,12 @@ class DebugRepr(reprlib.Repr):
         return s
 
     def print(self, value):
-        if isinstance(value, Sized) and len(value) > self.limit:
+        if isinstance(value, Sized):
             length = len(value)
-            self.fillvalue = self.gen_trim_msg(length)
+            if length > self.limit:
+                self.fillvalue = self.gen_trim_msg(length)
+            else:
+                self.fillvalue = ""
         else:
             self.fillvalue = "..."
         return self.repr(value)
