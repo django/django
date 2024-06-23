@@ -1,12 +1,12 @@
 import os.path
+
 from django.conf import settings
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
 from django.core import checks
 from django.db import models
 from django.test import SimpleTestCase, TestCase
-from django.test.utils import isolate_apps
-from django.test.utils import override_settings
+from django.test.utils import isolate_apps, override_settings
 
 from .models import CustomArticle, ExclusiveArticle, SyndicatedArticle
 
