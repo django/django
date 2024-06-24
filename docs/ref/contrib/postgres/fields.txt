@@ -932,6 +932,10 @@ docs/current/rangetypes.html#RANGETYPES-INCLUSIVITY>`_.
     much like :class:`~django.db.models.AutoField` except that it does not have
     to be a primary key, and is not limited to a single instance per model.
 
+    It's backed by PostgreSQL's ``serial`` type. See `the PostgreSQL
+    documentation for the full details <https://www.postgresql.org/
+    docs/current/datatype-numeric.html#DATATYPE-SERIAL>`_.
+
 .. class:: BigSerialField(**options)
 
     A 64-bit integer, much like a :class:`SerialField` except that it is
