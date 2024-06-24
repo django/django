@@ -12,5 +12,4 @@ graft extras
 graft js_tests
 graft scripts
 graft tests
-global-exclude __pycache__
 global-exclude *.py[co]

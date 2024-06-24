@@ -46,7 +46,7 @@ Python style
 * Unless otherwise specified, follow :pep:`8`.
 
   Use :pypi:`flake8` to check for problems in this area. Note that our
-  ``setup.cfg`` file contains some excluded files (deprecated modules we don't
+  ``.flake8`` file contains some excluded files (deprecated modules we don't
   care about cleaning up and some third-party code that Django vendors) as well
   as some excluded errors that we don't consider as gross violations. Remember
   that :pep:`8` is only a guide, so respect the style of the surrounding code

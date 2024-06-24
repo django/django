@@ -58,7 +58,7 @@ You'll need a few things before getting started:
 
   .. code-block:: shell
 
-      $ python -m pip install wheel twine
+      $ python -m pip install build twine
 
 * Access to Django's record on PyPI. Create a file with your credentials:
 
@@ -222,9 +222,15 @@ OK, this is the fun part, where we actually push out a release!
    Please see `notes on setting the VERSION tuple`_ below for details
    on ``VERSION``.
 
-#. If this is a pre-release package, update the "Development Status" trove
-   classifier in ``setup.cfg`` to reflect this. Otherwise, make sure the
-   classifier is set to ``Development Status :: 5 - Production/Stable``.
+   #. If this is a pre-release package also update the "Development Status"
+      trove classifier in ``pyproject.toml`` to reflect this. An ``rc``
+      pre-release should not change the trove classifier (:commit:`example
+      commit for alpha release <eeeacc52a967234e920c001b7908c4acdfd7a848>`,
+      :commit:`example commit for beta release
+      <25fec8940b24107e21314ab6616e18ce8dec1c1c>`).
+
+   #. Otherwise, make sure the classifier is set to
+      ``Development Status :: 5 - Production/Stable``.
 
 #. Tag the release using ``git tag``. For example:
 
@@ -238,8 +244,8 @@ OK, this is the fun part, where we actually push out a release!
 
 #. Make sure you have an absolutely clean tree by running ``git clean -dfx``.
 
-#. Run ``make -f extras/Makefile`` to generate the release packages. This will
-   create the release packages in a ``dist/`` directory.
+#. Run ``python -m build`` to generate the release packages. This will create
+   the release packages in a ``dist/`` directory.
 
 #. Generate the hashes of the release packages:
 
