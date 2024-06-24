@@ -367,6 +367,7 @@ class BaseModelForm(BaseForm, AltersData):
         else:
             self.instance = instance
             object_data = model_to_dict(instance, opts.fields, opts.exclude)
+        self.old_pk = self.instance.pk
         # if initial was provided, it should override the values from instance
         if initial is not None:
             object_data.update(initial)
@@ -495,6 +496,11 @@ class BaseModelForm(BaseForm, AltersData):
             self._update_errors(e)
 
         try:
+            self.validate_pk()
+        except ValidationError as e:
+            self._update_errors(e)
+
+        try:
             self.instance.full_clean(exclude=exclude, validate_unique=False)
         except ValidationError as e:
             self._update_errors(e)
@@ -513,6 +519,33 @@ class BaseModelForm(BaseForm, AltersData):
             self.instance.validate_unique(exclude=exclude)
         except ValidationError as e:
             self._update_errors(e)
+
+    def validate_pk(self):
+        """
+        Raise a ValidationError if there's a primary key conflict.
+        """
+        instance = self.instance
+        meta = instance._meta
+        model_class = meta.model
+        old_pk = self.old_pk
+        new_pk = instance.pk
+        empty_vals = (None, "")
+
+        if (
+            old_pk not in empty_vals
+            and new_pk not in empty_vals
+            and old_pk != new_pk
+            and model_class._default_manager.filter(pk=new_pk).exists()
+        ):
+            pk_name = meta.pk.name
+            raise ValidationError(
+                {
+                    pk_name: instance.unique_error_message(
+                        model_class,
+                        (pk_name,),
+                    ),
+                }
+            )
 
     def _save_m2m(self):
         """

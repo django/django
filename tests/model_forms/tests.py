@@ -1461,6 +1461,27 @@ class UniqueTest(TestCase):
             form.errors["title"], ["Post's Title not unique for Posted date."]
         )
 
+    def test_pk_conflict(self):
+        ExplicitPK.objects.create(key="key1", desc="desc1")
+        instance = ExplicitPK.objects.create(key="key2", desc="desc2")
+
+        with self.subTest("key2 -> key1"):
+            form = ExplicitPKForm({"key": "key1"}, instance=instance)
+            self.assertEqual(len(form.errors), 1, form.errors)
+            self.assertEqual(
+                form.errors["key"], ["Explicit pk with this Key already exists."]
+            )
+
+        with self.subTest("key2 -> key2"):
+            instance = ExplicitPK.objects.get(key="key2")
+            form = ExplicitPKForm({"key": "key2"}, instance=instance)
+            self.assertEqual(len(form.errors), 0, form.errors)
+
+        with self.subTest("key2 -> key3"):
+            instance = ExplicitPK.objects.get(key="key2")
+            form = ExplicitPKForm({"key": "key3"}, instance=instance)
+            self.assertEqual(len(form.errors), 0, form.errors)
+
 
 class ModelFormBasicTests(TestCase):
     def create_basic_data(self):
