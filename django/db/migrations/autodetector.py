@@ -705,6 +705,7 @@ class MigrationAutodetector:
                         )
                     )
                 model_state.options["managed"] = False
+                model_state.options["old_app_label"] = rem_app_label
                 # if there are any base models, then add dependencies for them
                 # so that they are created before the model(s) inheriting it.
                 if model_state.bases:
