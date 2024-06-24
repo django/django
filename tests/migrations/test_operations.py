@@ -1427,7 +1427,7 @@ class OperationTests(OperationTestBase):
 
         self.assertTableNotExists(app_label + "_person")
         self.assertTableExists(app_label + "_other")
-    
+
     def test_move_model_with_fk(self):
         app_label_1 = "test_mmw_fk_1"
         app_label_2 = "test_mmw_fk_2"
