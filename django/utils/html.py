@@ -9,7 +9,7 @@ from urllib.parse import parse_qsl, quote, unquote, urlencode, urlsplit, urlunsp
 
 from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.encoding import punycode
-from django.utils.functional import Promise, keep_lazy, keep_lazy_text
+from django.utils.functional import Promise, cached_property, keep_lazy, keep_lazy_text
 from django.utils.http import RFC3986_GENDELIMS, RFC3986_SUBDELIMS
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.safestring import SafeData, SafeString, mark_safe
@@ -255,6 +255,16 @@ def smart_urlquote(url):
     return urlunsplit((scheme, netloc, path, query, fragment))
 
 
+class CountsDict(dict):
+    def __init__(self, *args, word, **kwargs):
+        super().__init__(*args, *kwargs)
+        self.word = word
+
+    def __missing__(self, key):
+        self[key] = self.word.count(key)
+        return self[key]
+
+
 class Urlizer:
     """
     Convert any URLs in text into clickable links.
@@ -360,40 +370,72 @@ class Urlizer:
             return x
         return "%s…" % x[: max(0, limit - 1)]
 
+    @cached_property
+    def wrapping_punctuation_openings(self):
+        return "".join(dict(self.wrapping_punctuation).keys())
+
+    @cached_property
+    def trailing_punctuation_chars_no_semicolon(self):
+        return self.trailing_punctuation_chars.replace(";", "")
+
+    @cached_property
+    def trailing_punctuation_chars_has_semicolon(self):
+        return ";" in self.trailing_punctuation_chars
+
     def trim_punctuation(self, word):
         """
         Trim trailing and wrapping punctuation from `word`. Return the items of
         the new state.
         """
-        lead, middle, trail = "", word, ""
+        # Strip all opening wrapping punctuation.
+        middle = word.lstrip(self.wrapping_punctuation_openings)
+        lead = word[: len(word) - len(middle)]
+        trail = ""
+
         # Continue trimming until middle remains unchanged.
         trimmed_something = True
-        while trimmed_something:
+        counts = CountsDict(word=middle)
+        while trimmed_something and middle:
             trimmed_something = False
             # Trim wrapping punctuation.
             for opening, closing in self.wrapping_punctuation:
-                if middle.startswith(opening):
-                    middle = middle.removeprefix(opening)
-                    lead += opening
-                    trimmed_something = True
-                # Keep parentheses at the end only if they're balanced.
-                if (
-                    middle.endswith(closing)
-                    and middle.count(closing) == middle.count(opening) + 1
-                ):
-                    middle = middle.removesuffix(closing)
-                    trail = closing + trail
-                    trimmed_something = True
-            # Trim trailing punctuation (after trimming wrapping punctuation,
-            # as encoded entities contain ';'). Unescape entities to avoid
-            # breaking them by removing ';'.
-            middle_unescaped = html.unescape(middle)
-            stripped = middle_unescaped.rstrip(self.trailing_punctuation_chars)
-            if middle_unescaped != stripped:
-                punctuation_count = len(middle_unescaped) - len(stripped)
-                trail = middle[-punctuation_count:] + trail
-                middle = middle[:-punctuation_count]
+                if counts[opening] < counts[closing]:
+                    rstripped = middle.rstrip(closing)
+                    if rstripped != middle:
+                        strip = counts[closing] - counts[opening]
+                        trail = middle[-strip:]
+                        middle = middle[:-strip]
+                        trimmed_something = True
+                        counts[closing] -= strip
+
+            rstripped = middle.rstrip(self.trailing_punctuation_chars_no_semicolon)
+            if rstripped != middle:
+                trail = middle[len(rstripped) :] + trail
+                middle = rstripped
                 trimmed_something = True
+
+            if self.trailing_punctuation_chars_has_semicolon and middle.endswith(";"):
+                # Only strip if not part of an HTML entity.
+                amp = middle.rfind("&")
+                if amp == -1:
+                    can_strip = True
+                else:
+                    potential_entity = middle[amp:]
+                    escaped = html.unescape(potential_entity)
+                    can_strip = (escaped == potential_entity) or escaped.endswith(";")
+
+                if can_strip:
+                    rstripped = middle.rstrip(";")
+                    amount_stripped = len(middle) - len(rstripped)
+                    if amp > -1 and amount_stripped > 1:
+                        # Leave a trailing semicolon as might be an entity.
+                        trail = middle[len(rstripped) + 1 :] + trail
+                        middle = rstripped + ";"
+                    else:
+                        trail = middle[len(rstripped) :] + trail
+                        middle = rstripped
+                    trimmed_something = True
+
         return lead, middle, trail
 
     @staticmethod
