@@ -1842,9 +1842,7 @@ standard :term:`language ID format <language code>`. For example, U.S. English
 is ``"en-us"``. See also the `list of language identifiers`_ and
 :doc:`/topics/i18n/index`.
 
-:setting:`USE_I18N` must be active for this setting to have any effect.
-
-It serves two purposes:
+It serves three purposes:
 
 * If the locale middleware isn't in use, it decides which translation is served
   to all users.
@@ -1852,6 +1850,11 @@ It serves two purposes:
   user's preferred language can't be determined or is not supported by the
   website. It also provides the fallback translation when a translation for a
   given literal doesn't exist for the user's preferred language.
+* If localization is explicitly disabled via the :tfilter:`unlocalize` filter
+  or the :ttag:`{% localize off %}<localize>` tag, it provides fallback
+  localization formats which will be applied instead. See
+  :ref:`controlling localization in templates <topic-l10n-templates>` for
+  details.
 
 See :ref:`how-django-discovers-language-preference` for more details.
 

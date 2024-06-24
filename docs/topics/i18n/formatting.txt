@@ -89,6 +89,9 @@ To activate or deactivate localization for a template block, use:
         {{ value }}
     {% endlocalize %}
 
+When localization is disabled, the :ref:`localization settings <settings-l10n>`
+formats are applied.
+
 See :tfilter:`localize` and :tfilter:`unlocalize` for template filters that will
 do the same job on a per-variable basis.
 
@@ -133,8 +136,9 @@ To force localization of a single value, use :tfilter:`localize`. To
 control localization over a large section of a template, use the
 :ttag:`localize` template tag.
 
-Returns a string representation for unlocalized numbers  (``int``, ``float``,
-or ``Decimal``).
+Returns a string representation for numbers  (``int``, ``float``, or
+``Decimal``) with the :ref:`localization settings <settings-l10n>` formats
+applied.
 
 .. _custom-format-files:
 
