@@ -352,6 +352,13 @@ class TestUtilsHtml(SimpleTestCase):
             "foo@.example.com",
             "foo@localhost",
             "foo@localhost.",
+            # trim_punctuation catastrophic tests
+            "(" * 100_000 + ":" + ")" * 100_000,
+            "(" * 100_000 + "&:" + ")" * 100_000,
+            "([" * 100_000 + ":" + "])" * 100_000,
+            "[(" * 100_000 + ":" + ")]" * 100_000,
+            "([[" * 100_000 + ":" + "]])" * 100_000,
+            "&:" + ";" * 100_000,
         )
         for value in tests:
             with self.subTest(value=value):
