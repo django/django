@@ -210,12 +210,70 @@ class ModelInstanceCreationTests(TestCase):
             a.save(False, False, None, None)
             self.assertEqual(Article.objects.count(), 1)
 
+    def test_save_deprecation_positional_arguments_used(self):
+        a = Article()
+        fields = ["headline"]
+        with (
+            self.assertWarns(RemovedInDjango60Warning),
+            mock.patch.object(a, "save_base") as mock_save_base,
+        ):
+            a.save(None, 1, 2, fields)
+        self.assertEqual(
+            mock_save_base.mock_calls,
+            [
+                mock.call(
+                    using=2,
+                    force_insert=None,
+                    force_update=1,
+                    update_fields=frozenset(fields),
+                )
+            ],
+        )
+
+    def test_save_too_many_positional_arguments(self):
+        a = Article()
+        msg = "Model.save() takes from 1 to 5 positional arguments but 6 were given"
+        with (
+            self.assertWarns(RemovedInDjango60Warning),
+            self.assertRaisesMessage(TypeError, msg),
+        ):
+            a.save(False, False, None, None, None)
+
     async def test_asave_deprecation(self):
         a = Article(headline="original", pub_date=datetime(2014, 5, 16))
         msg = "Passing positional arguments to asave() is deprecated"
         with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
             await a.asave(False, False, None, None)
             self.assertEqual(await Article.objects.acount(), 1)
+
+    async def test_asave_deprecation_positional_arguments_used(self):
+        a = Article()
+        fields = ["headline"]
+        with (
+            self.assertWarns(RemovedInDjango60Warning),
+            mock.patch.object(a, "save_base") as mock_save_base,
+        ):
+            await a.asave(None, 1, 2, fields)
+        self.assertEqual(
+            mock_save_base.mock_calls,
+            [
+                mock.call(
+                    using=2,
+                    force_insert=None,
+                    force_update=1,
+                    update_fields=frozenset(fields),
+                )
+            ],
+        )
+
+    async def test_asave_too_many_positional_arguments(self):
+        a = Article()
+        msg = "Model.asave() takes from 1 to 5 positional arguments but 6 were given"
+        with (
+            self.assertWarns(RemovedInDjango60Warning),
+            self.assertRaisesMessage(TypeError, msg),
+        ):
+            await a.asave(False, False, None, None, None)
 
     @ignore_warnings(category=RemovedInDjango60Warning)
     def test_save_positional_arguments(self):
