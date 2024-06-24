@@ -5,7 +5,7 @@ from django.test.utils import isolate_apps
 
 from . import PostgreSQLTestCase
 from .fields import BigSerialField, SerialField, SmallSerialField
-from .models import SerialModel
+from .models import SerialFKModel, SerialModel, SerialPKModel
 
 
 @isolate_apps("postgres_tests")
@@ -46,39 +46,73 @@ class SerialFieldTests(PostgreSQLTestCase):
         self.assertEqual(serial.cast_db_type(connection), "integer")
         self.assertEqual(big_serial.cast_db_type(connection), "bigint")
 
+    def test_rel_db_types(self):
+        class SerialPK(models.Model):
+            id = SerialField(primary_key=True)
 
-class SerialModelTests(PostgreSQLTestCase):
+        class SmallSerialPK(models.Model):
+            id = SmallSerialField(primary_key=True)
+
+        class BigSerialPK(models.Model):
+            id = BigSerialField(primary_key=True)
+
+        class SerialFK(models.Model):
+            fk = models.ForeignKey(SerialPK, on_delete=models.CASCADE)
+
+        class SmallSerialFK(models.Model):
+            fk = models.ForeignKey(SmallSerialPK, on_delete=models.CASCADE)
+
+        class BigSerialFK(models.Model):
+            fk = models.ForeignKey(BigSerialPK, on_delete=models.CASCADE)
+
+        fk = SerialFK._meta.get_field("fk")
+        small_fk = SmallSerialFK._meta.get_field("fk")
+        big_fk = BigSerialFK._meta.get_field("fk")
+
+        self.assertEqual(fk.rel_db_type(connection), "integer")
+        self.assertEqual(small_fk.rel_db_type(connection), "smallint")
+        self.assertEqual(big_fk.rel_db_type(connection), "bigint")
+
+
+class SerialModelBaseTests(PostgreSQLTestCase):
     @classmethod
-    def reset_sequences_to_1(cls):
+    def reset_sequences_to_1(cls, model):
         with connection.cursor() as cursor:
-            for statement in cls.get_sequence_reset_by_name_sql():
+            for statement in cls.get_sequence_reset_by_name_sql(model):
                 cursor.execute(statement)
 
     @classmethod
-    def get_sequence_reset_by_name_sql(cls):
+    def get_sequence_reset_by_name_sql(cls, model):
         return connection.ops.sequence_reset_by_name_sql(
-            no_style(), cls.get_sequences()
+            no_style(), cls.get_sequences(model)
         )
 
     @classmethod
-    def get_sequences(cls):
+    def get_sequences(cls, model):
         with connection.cursor() as cursor:
-            return connection.introspection.get_sequences(
-                cursor, SerialModel._meta.db_table
-            )
+            return connection.introspection.get_sequences(cursor, model._meta.db_table)
 
     @classmethod
-    def reset_sequences_to_max(cls):
+    def reset_sequences_to_max(cls, model):
         with connection.cursor() as cursor:
-            for statement in cls.get_sequence_reset_sql():
+            for statement in cls.get_sequence_reset_sql(model):
                 cursor.execute(statement)
 
     @classmethod
-    def get_sequence_reset_sql(cls):
-        return connection.ops.sequence_reset_sql(no_style(), [SerialModel])
+    def get_sequence_reset_sql(cls, model):
+        return connection.ops.sequence_reset_sql(no_style(), [model])
 
+    @classmethod
+    def get_table_description(cls, model):
+        with connection.cursor() as cursor:
+            return connection.introspection.get_table_description(
+                cursor, model._meta.db_table
+            )
+
+
+class SerialModelTests(SerialModelBaseTests):
     def test_create(self):
-        self.reset_sequences_to_1()
+        self.reset_sequences_to_1(SerialModel)
 
         obj_1 = SerialModel.objects.create()
         self.assertEqual(obj_1.small_serial, 1)
@@ -181,7 +215,7 @@ class SerialModelTests(PostgreSQLTestCase):
                 self.assertSequenceEqual(ctx.exception.messages, messages)
 
     def test_get_sequences(self):
-        sequences = self.get_sequences()
+        sequences = self.get_sequences(SerialModel)
 
         table = SerialModel._meta.db_table
         self.assertEqual(len(sequences), 4)
@@ -209,7 +243,7 @@ class SerialModelTests(PostgreSQLTestCase):
                 f') FROM "{db_table}";'
             )
 
-        statements = self.get_sequence_reset_sql()
+        statements = self.get_sequence_reset_sql(SerialModel)
         self.assertEqual(len(statements), 4)
         self.assertEqual(statements[0], get_statement("id"))
         self.assertEqual(statements[1], get_statement("small_serial"))
@@ -222,7 +256,7 @@ class SerialModelTests(PostgreSQLTestCase):
         self.assertEqual(obj_1.serial, 2)
         self.assertEqual(obj_1.big_serial, 3)
 
-        self.reset_sequences_to_max()
+        self.reset_sequences_to_max(SerialModel)
 
         obj_2 = SerialModel.objects.create()
         self.assertEqual(obj_2.small_serial, 2)
@@ -235,7 +269,7 @@ class SerialModelTests(PostgreSQLTestCase):
         self.assertEqual(obj_3.big_serial, 5)
 
     def test_reset_sequences_to_max_if_record_doesnt_exist(self):
-        self.reset_sequences_to_max()
+        self.reset_sequences_to_max(SerialModel)
 
         obj_1 = SerialModel.objects.create()
         self.assertEqual(obj_1.small_serial, 1)
@@ -248,7 +282,7 @@ class SerialModelTests(PostgreSQLTestCase):
         self.assertEqual(obj_2.big_serial, 2)
 
     def test_bulk_create(self):
-        self.reset_sequences_to_1()
+        self.reset_sequences_to_1(SerialModel)
         objs = [
             SerialModel(),
             SerialModel(small_serial=1, serial=1, big_serial=1),
@@ -273,3 +307,38 @@ class SerialModelTests(PostgreSQLTestCase):
             (obj_4.small_serial, obj_4.serial, obj_4.big_serial),
             (3, 2, 3),
         )
+
+
+class SerialPKModelTests(SerialModelBaseTests):
+    def test_create(self):
+        self.reset_sequences_to_1(SerialPKModel)
+
+        obj_1 = SerialPKModel.objects.create()
+        self.assertEqual(obj_1.id, 1)
+
+        obj_2 = SerialPKModel.objects.create()
+        self.assertEqual(obj_2.id, 2)
+
+
+class SerialFKModelTests(SerialModelBaseTests):
+    def test_create(self):
+        self.reset_sequences_to_1(SerialPKModel)
+        self.reset_sequences_to_1(SerialFKModel)
+
+        obj_1 = SerialPKModel.objects.create()
+        self.assertEqual(obj_1.id, 1)
+
+        obj_2 = SerialPKModel.objects.create()
+        self.assertEqual(obj_2.id, 2)
+
+        obj_3 = SerialFKModel.objects.create(fk=obj_2)
+        self.assertEqual(obj_3.id, 1)
+        self.assertEqual(obj_3.fk, obj_2)
+        self.assertEqual(obj_3.fk_id, obj_2.id)
+
+        columns = self.get_table_description(SerialFKModel)
+        fk_id = columns[1]
+        self.assertEqual(fk_id.name, "fk_id")
+        self.assertEqual(fk_id.type_code, 23)  # IntegerField
+        self.assertEqual(fk_id.internal_size, 4)
+        self.assertIsNone(fk_id.default)

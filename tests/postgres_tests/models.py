@@ -212,3 +212,11 @@ class SerialModel(PostgreSQLModel):
     small_serial = SmallSerialField()
     serial = SerialField()
     big_serial = BigSerialField()
+
+
+class SerialPKModel(PostgreSQLModel):
+    id = SerialField(primary_key=True)
+
+
+class SerialFKModel(PostgreSQLModel):
+    fk = models.ForeignKey(SerialPKModel, on_delete=models.CASCADE)
