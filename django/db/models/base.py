@@ -1251,7 +1251,7 @@ class Model(AltersData, metaclass=ModelBase):
         field_map = {
             field.name: Value(getattr(self, field.attname), field)
             for field in meta.local_concrete_fields
-            if field.name not in exclude
+            if field.name not in exclude and not field.generated
         }
         if "pk" not in exclude:
             field_map["pk"] = Value(self.pk, meta.pk)
