@@ -780,6 +780,12 @@ class ReturningModel(models.Model):
     created = CreatedField(editable=False)
 
 
+class UpdateReturningModel(models.Model):
+    key = models.CharField(max_length=10)
+    content = models.CharField(max_length=10)
+    hits = models.IntegerField(default=0)
+
+
 class NonIntegerPKReturningModel(models.Model):
     created = CreatedField(editable=False, primary_key=True)
 

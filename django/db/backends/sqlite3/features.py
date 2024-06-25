@@ -154,3 +154,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     can_return_rows_from_bulk_insert = property(
         operator.attrgetter("can_return_columns_from_insert")
     )
+
+    @cached_property
+    def can_return_columns_from_update(self):
+        return Database.sqlite_version_info >= (3, 35)
