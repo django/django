@@ -142,9 +142,8 @@ class RemoteUserMiddleware(MiddlewareMixin):
         # to authenticate the user.
         user = auth.authenticate(request, remote_user=username)
         if user:
-            # User is valid.  Set request.user and persist user in the session
+            # User is valid. Set request.user and persist user in the session
             # by logging the user in.
-            request.user = user
             auth.login(request, user)
 
     def clean_username(self, username, request):
