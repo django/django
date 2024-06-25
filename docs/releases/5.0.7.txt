@@ -10,4 +10,7 @@ issues with severity "low", and several bugs in 5.0.6.
 Bugfixes
 ========
 
-* ...
+* Fixed a bug in Django 5.0 that caused a crash of ``Model.full_clean()`` on
+  unsaved model instances with a ``GeneratedField`` and certain defined
+  :attr:`Meta.constraints <django.db.models.Options.constraints>`
+  (:ticket:`35560`).
