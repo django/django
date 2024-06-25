@@ -776,18 +776,59 @@ class Model(AltersData, metaclass=ModelBase):
             return getattr(self, field_name)
         return getattr(self, field.attname)
 
+    # RemovedInDjango60Warning: When the deprecation ends, remove completely.
+    def _parse_args_and_kwargs(self, *args, method_name, **kwargs):
+        defaults = {
+            "force_insert": False,
+            "force_update": False,
+            "using": None,
+            "update_fields": None,
+        }
+
+        invalid_kwargs = [k for k in kwargs.keys() if k not in defaults]
+        if invalid_kwargs:
+            name = invalid_kwargs[0]
+            raise TypeError(
+                f"Model.{method_name}() got an unexpected keyword argument '{name}'"
+            )
+
+        if args:
+            warnings.warn(
+                f"Passing positional arguments to {method_name}() is deprecated",
+                RemovedInDjango60Warning,
+                stacklevel=2,
+            )
+            total_len_args = len(args) + 1  # include self
+            max_len_args = len(defaults) + 1
+            if total_len_args > max_len_args:
+                # Recreate the proper TypeError message from Python.
+                raise TypeError(
+                    f"Model.{method_name}() takes from 1 to {max_len_args} positional "
+                    f"arguments but {total_len_args} were given"
+                )
+
+        sentinel = object()
+
+        def get_param(arg_name, arg_index):
+            param = kwargs.get(arg_name, sentinel)
+            if arg_index < len(args):
+                if param is not sentinel:
+                    # Recreate the proper TypeError message from Python.
+                    raise TypeError(
+                        f"Model.{method_name}() got multiple values for argument "
+                        f"'{arg_name}'"
+                    )
+                return args[arg_index]
+
+            return param if param is not sentinel else defaults[arg_name]
+
+        return [get_param(name, i) for i, name in enumerate(defaults.keys())]
+
     # RemovedInDjango60Warning: When the deprecation ends, replace with:
     # def save(
     #   self, *, force_insert=False, force_update=False, using=None, update_fields=None,
     # ):
-    def save(
-        self,
-        *args,
-        force_insert=False,
-        force_update=False,
-        using=None,
-        update_fields=None,
-    ):
+    def save(self, *args, **kwargs):
         """
         Save the current instance. Override this in a subclass if you want to
         control the saving process.
@@ -797,26 +838,9 @@ class Model(AltersData, metaclass=ModelBase):
         non-SQL backends), respectively. Normally, they should not be set.
         """
         # RemovedInDjango60Warning.
-        if args:
-            warnings.warn(
-                "Passing positional arguments to save() is deprecated",
-                RemovedInDjango60Warning,
-                stacklevel=2,
-            )
-            total_len_args = len(args) + 1  # include self
-            if total_len_args > 5:
-                # Recreate the proper TypeError message from Python.
-                raise TypeError(
-                    "Model.save() takes from 1 to 5 positional arguments but "
-                    f"{total_len_args} were given"
-                )
-            force_insert = args[0]
-            try:
-                force_update = args[1]
-                using = args[2]
-                update_fields = args[3]
-            except IndexError:
-                pass
+        force_insert, force_update, using, update_fields = self._parse_args_and_kwargs(
+            *args, method_name="save", **kwargs
+        )
 
         self._prepare_related_fields_for_save(operation_name="save")
 
@@ -875,36 +899,11 @@ class Model(AltersData, metaclass=ModelBase):
     # async def asave(
     #   self, *, force_insert=False, force_update=False, using=None, update_fields=None,
     # ):
-    async def asave(
-        self,
-        *args,
-        force_insert=False,
-        force_update=False,
-        using=None,
-        update_fields=None,
-    ):
+    async def asave(self, *args, **kwargs):
         # RemovedInDjango60Warning.
-        if args:
-            warnings.warn(
-                "Passing positional arguments to asave() is deprecated",
-                RemovedInDjango60Warning,
-                stacklevel=2,
-            )
-            total_len_args = len(args) + 1  # include self
-            if total_len_args > 5:
-                # Recreate the proper TypeError message from Python.
-                raise TypeError(
-                    "Model.asave() takes from 1 to 5 positional arguments but "
-                    f"{total_len_args} were given"
-                )
-            force_insert = args[0]
-            try:
-                force_update = args[1]
-                using = args[2]
-                update_fields = args[3]
-            except IndexError:
-                pass
-
+        force_insert, force_update, using, update_fields = self._parse_args_and_kwargs(
+            *args, method_name="asave", **kwargs
+        )
         return await sync_to_async(self.save)(
             force_insert=force_insert,
             force_update=force_update,
