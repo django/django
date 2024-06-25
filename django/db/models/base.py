@@ -803,18 +803,20 @@ class Model(AltersData, metaclass=ModelBase):
                 RemovedInDjango60Warning,
                 stacklevel=2,
             )
-            for arg, attr in zip(
-                args, ["force_insert", "force_update", "using", "update_fields"]
-            ):
-                if arg:
-                    if attr == "force_insert":
-                        force_insert = arg
-                    elif attr == "force_update":
-                        force_update = arg
-                    elif attr == "using":
-                        using = arg
-                    else:
-                        update_fields = arg
+            total_len_args = len(args) + 1  # include self
+            if total_len_args > 5:
+                # Recreate the proper TypeError message from Python.
+                raise TypeError(
+                    "Model.save() takes from 1 to 5 positional arguments but "
+                    f"{total_len_args} were given"
+                )
+            force_insert = args[0]
+            try:
+                force_update = args[1]
+                using = args[2]
+                update_fields = args[3]
+            except IndexError:
+                pass
 
         self._prepare_related_fields_for_save(operation_name="save")
 
@@ -888,18 +890,20 @@ class Model(AltersData, metaclass=ModelBase):
                 RemovedInDjango60Warning,
                 stacklevel=2,
             )
-            for arg, attr in zip(
-                args, ["force_insert", "force_update", "using", "update_fields"]
-            ):
-                if arg:
-                    if attr == "force_insert":
-                        force_insert = arg
-                    elif attr == "force_update":
-                        force_update = arg
-                    elif attr == "using":
-                        using = arg
-                    else:
-                        update_fields = arg
+            total_len_args = len(args) + 1  # include self
+            if total_len_args > 5:
+                # Recreate the proper TypeError message from Python.
+                raise TypeError(
+                    "Model.asave() takes from 1 to 5 positional arguments but "
+                    f"{total_len_args} were given"
+                )
+            force_insert = args[0]
+            try:
+                force_update = args[1]
+                using = args[2]
+                update_fields = args[3]
+            except IndexError:
+                pass
 
         return await sync_to_async(self.save)(
             force_insert=force_insert,
