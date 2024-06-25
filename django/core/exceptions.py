@@ -31,6 +31,10 @@ class MultipleObjectsReturned(Exception):
     pass
 
 
+class ObjectNotUpdated(Exception):
+    pass
+
+
 class SuspiciousOperation(Exception):
     """The user did something suspicious"""
 
