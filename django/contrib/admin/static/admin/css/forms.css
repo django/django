@@ -390,6 +390,10 @@ body.popup .submit-row {
     border-right-color: var(--darkened-bg);
 }
 
+.inline-related h3 {
+    color: var(--body-loud-color);
+}
+
 .inline-related h3 span.delete {
     float: right;
 }

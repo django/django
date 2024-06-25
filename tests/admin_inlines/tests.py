@@ -1858,6 +1858,7 @@ class SeleniumTests(AdminSeleniumTestCase):
             username="super", password="secret", email="super@example.com"
         )
 
+    @screenshot_cases(["desktop_size", "mobile_size", "dark", "high_contrast"])
     def test_add_stackeds(self):
         """
         The "Add another XXX" link correctly adds items to the stacked formset.
@@ -1878,6 +1879,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
         add_button.click()
         self.assertCountSeleniumElements(rows_selector, 4)
+        self.take_screenshot("added")
 
     def test_delete_stackeds(self):
         from selenium.webdriver.common.by import By
