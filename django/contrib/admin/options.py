@@ -1289,7 +1289,18 @@ class ModelAdmin(BaseModelAdmin):
         """
         Given a model instance save it to the database.
         """
+        self.update_pk_if_changed(obj, form)
         obj.save()
+
+    def update_pk_if_changed(self, obj, form):
+        old_pk = form.old_pk
+        new_pk = obj.pk
+        empty_vals = (None, "")
+
+        if old_pk not in empty_vals and new_pk not in empty_vals and old_pk != new_pk:
+            meta = obj._meta
+            update_kwargs = {meta.pk.name: new_pk}
+            meta.model.objects.filter(pk=old_pk).update(**update_kwargs)
 
     def delete_model(self, request, obj):
         """

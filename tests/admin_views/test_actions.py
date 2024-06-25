@@ -18,6 +18,7 @@ from .models import (
     Answer,
     Book,
     ExternalSubscriber,
+    ModelWithStringPrimaryKey,
     Question,
     Subscriber,
     UnchangeableObject,
@@ -489,6 +490,20 @@ action)</option>
         self.assertIn(r"&quot;value\\&quot;", output)
         self.assertIn(r"&quot;new_value\\&quot;", output)
         self.assertIn(r"&quot;obj\\&quot;", output)
+
+    def test_pk_change(self):
+        instance = ModelWithStringPrimaryKey.objects.create(string_pk="a")
+        url = reverse(
+            "admin:admin_views_modelwithstringprimarykey_change", args=(instance.pk,)
+        )
+
+        response = self.client.post(url, {"string_pk": "b"})
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(ModelWithStringPrimaryKey.objects.count(), 1)
+        self.assertTrue(
+            ModelWithStringPrimaryKey.objects.filter(string_pk="b").exists()
+        )
 
 
 @override_settings(ROOT_URLCONF="admin_views.urls")

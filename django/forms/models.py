@@ -367,6 +367,7 @@ class BaseModelForm(BaseForm, AltersData):
         else:
             self.instance = instance
             object_data = model_to_dict(instance, opts.fields, opts.exclude)
+        self.old_pk = self.instance.pk
         # if initial was provided, it should override the values from instance
         if initial is not None:
             object_data.update(initial)
