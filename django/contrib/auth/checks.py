@@ -245,19 +245,22 @@ def check_middleware(app_configs, **kwargs):
         settings.MIDDLEWARE,
     )
 
-    login_required_index = _subclass_index(
-        "django.contrib.auth.middleware.LoginRequiredMiddleware",
-        settings.MIDDLEWARE,
-    )
-
-    if login_required_index != -1:
-        if auth_middleware_index == -1 or auth_middleware_index > login_required_index:
+    for middleware, code in (
+        ("LoginRequiredMiddleware", "E013"),
+        ("RemoteUserMiddleware", "EXXX"),
+    ):
+        middleware_index = _subclass_index(
+            f"django.contrib.auth.middleware.{middleware}", settings.MIDDLEWARE
+        )
+        if middleware_index != -1 and (
+            auth_middleware_index == -1 or auth_middleware_index > middleware_index
+        ):
             errors.append(
                 checks.Error(
-                    "In order to use django.contrib.auth.middleware."
-                    "LoginRequiredMiddleware, django.contrib.auth.middleware."
-                    "AuthenticationMiddleware must be defined before it in MIDDLEWARE.",
-                    id="auth.E013",
+                    f"In order to use django.contrib.auth.middleware.{middleware}, "
+                    "django.contrib.auth.middleware.AuthenticationMiddleware must "
+                    "be defined before it in MIDDLEWARE.",
+                    id=f"auth.{code}",
                 )
             )
 
