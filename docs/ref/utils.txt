@@ -1147,6 +1147,11 @@ For a complete discussion on the usage of the following see the
     ``lang_code`` is ``'es-ar'`` and ``'es'`` is in :setting:`LANGUAGES` but
     ``'es-ar'`` isn't.
 
+    ``lang_code`` has a maximum accepted length of 500 characters. A
+    :exc:`ValueError` is raised if ``lang_code`` exceeds this limit and
+    ``strict`` is ``True``, or if there is no generic variant and ``strict``
+    is ``False``.
+
     If ``strict`` is ``False`` (the default), a country-specific variant may
     be returned when neither the language code nor its generic variant is found.
     For example, if only ``'es-co'`` is in :setting:`LANGUAGES`, that's
@@ -1154,6 +1159,11 @@ For a complete discussion on the usage of the following see the
     aren't returned if ``strict=True``.
 
     Raises :exc:`LookupError` if nothing is found.
+
+    .. versionchanged:: 4.2.14
+
+        In older versions, ``lang_code`` values over 500 characters were
+        processed without raising a :exc:`ValueError`.
 
 .. function:: to_locale(language)
 
