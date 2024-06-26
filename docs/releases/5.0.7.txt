@@ -33,6 +33,21 @@ directory-traversal via certain inputs when calling :meth:`save()
 
 Built-in ``Storage`` sub-classes were not affected by this vulnerability.
 
+CVE-2024-39614: Potential denial-of-service vulnerability in ``get_supported_language_variant()``
+=================================================================================================
+
+:meth:`~django.utils.translation.get_supported_language_variant` was subject to
+a potential denial-of-service attack when used with very long strings
+containing specific characters.
+
+To mitigate this vulnerability, the language code provided to
+:meth:`~django.utils.translation.get_supported_language_variant` is now parsed
+up to a maximum length of 500 characters.
+
+When the language code is over 500 characters, a :exc:`ValueError` will now be
+raised if ``strict`` is ``True``, or if there is no generic variant and
+``strict`` is ``False``.
+
 Bugfixes
 ========
 
