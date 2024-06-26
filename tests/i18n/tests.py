@@ -58,6 +58,7 @@ from django.utils.translation.reloader import (
     translation_file_changed,
     watch_for_translation_changes,
 )
+from django.utils.translation.trans_real import LANGUAGE_CODE_MAX_LENGTH
 
 from .forms import CompanyForm, I18nForm, SelectDateForm
 from .models import Company, TestModel
@@ -1672,6 +1673,16 @@ class MiscTests(SimpleTestCase):
             g("xyz")
         with self.assertRaises(LookupError):
             g("xy-zz")
+        msg = "'lang_code' exceeds the maximum accepted length"
+        with self.assertRaises(LookupError):
+            g("x" * LANGUAGE_CODE_MAX_LENGTH)
+        with self.assertRaisesMessage(ValueError, msg):
+            g("x" * (LANGUAGE_CODE_MAX_LENGTH + 1))
+        # 167 * 3 = 501 which is LANGUAGE_CODE_MAX_LENGTH + 1.
+        self.assertEqual(g("en-" * 167), "en")
+        with self.assertRaisesMessage(ValueError, msg):
+            g("en-" * 167, strict=True)
+        self.assertEqual(g("en-" * 30000), "en")  # catastrophic test
 
     def test_get_supported_language_variant_null(self):
         g = trans_null.get_supported_language_variant
