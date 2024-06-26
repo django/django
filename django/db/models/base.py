@@ -799,17 +799,17 @@ class Model(AltersData, metaclass=ModelBase):
                 f"arguments but {total_len_args} were given"
             )
 
-        def get_param(arg_name, arg_value, arg_index):
+        def get_param(param_name, param_value, arg_index):
             if arg_index < len(args):
-                if arg_value is not defaults[arg_name]:
+                if param_value is not defaults[param_name]:
                     # Recreate the proper TypeError message from Python.
                     raise TypeError(
                         f"Model.{method_name}() got multiple values for argument "
-                        f"'{arg_name}'"
+                        f"'{param_name}'"
                     )
                 return args[arg_index]
 
-            return arg_value
+            return param_value
 
         return [get_param(k, v, i) for i, (k, v) in enumerate(kwargs.items())]
 
