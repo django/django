@@ -239,6 +239,23 @@ class ModelInstanceCreationTests(TestCase):
         ):
             a.save(False, False, None, None, None)
 
+    def test_save_conflicting_positional_and_named_arguments(self):
+        a = Article()
+        cases = [
+            ("force_insert", True, [42]),
+            ("force_update", None, [42, 41]),
+            ("using", "some-db", [42, 41, 40]),
+            ("update_fields", ["foo"], [42, 41, 40, 39]),
+        ]
+        for param_name, param_value, args in cases:
+            with self.subTest(param_name=param_name):
+                msg = f"Model.save() got multiple values for argument '{param_name}'"
+                with (
+                    self.assertWarns(RemovedInDjango60Warning),
+                    self.assertRaisesMessage(TypeError, msg),
+                ):
+                    a.save(*args, **{param_name: param_value})
+
     async def test_asave_deprecation(self):
         a = Article(headline="original", pub_date=datetime(2014, 5, 16))
         msg = "Passing positional arguments to asave() is deprecated"
@@ -274,6 +291,23 @@ class ModelInstanceCreationTests(TestCase):
             self.assertRaisesMessage(TypeError, msg),
         ):
             await a.asave(False, False, None, None, None)
+
+    async def test_asave_conflicting_positional_and_named_arguments(self):
+        a = Article()
+        cases = [
+            ("force_insert", True, [42]),
+            ("force_update", None, [42, 41]),
+            ("using", "some-db", [42, 41, 40]),
+            ("update_fields", ["foo"], [42, 41, 40, 39]),
+        ]
+        for param_name, param_value, args in cases:
+            with self.subTest(param_name=param_name):
+                msg = f"Model.asave() got multiple values for argument '{param_name}'"
+                with (
+                    self.assertWarns(RemovedInDjango60Warning),
+                    self.assertRaisesMessage(TypeError, msg),
+                ):
+                    await a.asave(*args, **{param_name: param_value})
 
     @ignore_warnings(category=RemovedInDjango60Warning)
     def test_save_positional_arguments(self):
