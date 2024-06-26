@@ -240,17 +240,18 @@ def check_models_permissions(app_configs=None, **kwargs):
 def check_middleware(app_configs, **kwargs):
     errors = []
 
+    auth_middleware_index = _subclass_index(
+        "django.contrib.auth.middleware.AuthenticationMiddleware",
+        settings.MIDDLEWARE,
+    )
+
     login_required_index = _subclass_index(
         "django.contrib.auth.middleware.LoginRequiredMiddleware",
         settings.MIDDLEWARE,
     )
 
     if login_required_index != -1:
-        auth_index = _subclass_index(
-            "django.contrib.auth.middleware.AuthenticationMiddleware",
-            settings.MIDDLEWARE,
-        )
-        if auth_index == -1 or auth_index > login_required_index:
+        if auth_middleware_index == -1 or auth_middleware_index > login_required_index:
             errors.append(
                 checks.Error(
                     "In order to use django.contrib.auth.middleware."
@@ -259,4 +260,28 @@ def check_middleware(app_configs, **kwargs):
                     id="auth.E013",
                 )
             )
+
+    if auth_middleware_index != -1:
+        session_middleware_index = _subclass_index(
+            "django.contrib.sessions.middleware.SessionMiddleware",
+            settings.MIDDLEWARE,
+        )
+        if (
+            session_middleware_index == -1
+            or session_middleware_index > auth_middleware_index
+        ):
+            errors.append(
+                checks.Error(
+                    "'django.contrib.sessions.middleware.SessionMiddleware' must "
+                    "be defined before AuthenticationMiddleware in MIDDLEWARE.",
+                    hint=(
+                        "Insert "
+                        "'django.contrib.sessions.middleware.SessionMiddleware' "
+                        "before "
+                        "'django.contrib.auth.middleware.AuthenticationMiddleware'."
+                    ),
+                    id="auth.XXX",
+                )
+            )
+
     return errors

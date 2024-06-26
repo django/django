@@ -416,9 +416,9 @@ class MiddlewareChecksTests(SimpleTestCase):
 
     @override_settings(
         MIDDLEWARE=[
+            "django.contrib.sessions.middleware.SessionMiddleware",
             "django.contrib.auth.middleware.LoginRequiredMiddleware",
             "django.contrib.auth.middleware.AuthenticationMiddleware",
-            "django.contrib.sessions.middleware.SessionMiddleware",
         ]
     )
     def test_incorrect_order_with_login_required_middleware(self):
