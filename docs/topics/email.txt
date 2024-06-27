@@ -282,13 +282,14 @@ All parameters are optional and can be set at any time prior to calling the
   new connection is created when ``send()`` is called.
 
 * ``attachments``: A list of attachments to put on the message. These can
-  be either :class:`~email.mime.base.MIMEBase` instances, or a named tuple
-  with attributes ``(filename, content, mimetype)``.
+  be instances of :class:`~email.mime.base.MIMEBase` or
+  :class:`~django.core.mail.EmailAttachment`, or a tuple with attributes
+  ``(filename, content, mimetype)``.
 
   .. versionchanged:: 5.2
 
-    In older versions, tuple items of ``attachments`` were regular tuples,
-    as opposed to named tuples.
+    Support for :class:`~django.core.mail.EmailAttachment` items of
+    ``attachments`` were added.
 
 * ``headers``: A dictionary of extra headers to put on the message. The
   keys are the header name, values are the header values. It's up to the
@@ -384,6 +385,18 @@ The class has the following methods:
   For MIME types starting with :mimetype:`text/`, binary data is handled as in
   ``attach()``.
 
+.. class:: EmailAttachment
+
+    .. versionadded:: 5.2
+
+    A named tuple to store attachments to an email.
+
+    The named tuple has the following indexes:
+
+    * ``filename``
+    * ``content``
+    * ``mimetype``
+
 Sending alternative content types
 ---------------------------------
 
@@ -404,20 +417,21 @@ Django's email library, you can do this using the
 
     .. attribute:: alternatives
 
-        A list of named tuples with attributes ``(content, mimetype)``. This is
-        particularly useful in tests::
+        A list of :class:`~django.core.mail.EmailAlternative` named tuples. This
+        is particularly useful in tests::
 
             self.assertEqual(len(msg.alternatives), 1)
             self.assertEqual(msg.alternatives[0].content, html_content)
             self.assertEqual(msg.alternatives[0].mimetype, "text/html")
 
         Alternatives should only be added using the :meth:`attach_alternative`
-        method.
+        method, or passed to the constructor.
 
         .. versionchanged:: 5.2
 
             In older versions, ``alternatives`` was a list of regular tuples,
-            as opposed to named tuples.
+            as opposed to :class:`~django.core.mail.EmailAlternative` named
+            tuples.
 
     .. method:: attach_alternative(content, mimetype)
 
@@ -455,6 +469,17 @@ Django's email library, you can do this using the
 
                 self.assertIs(msg.body_contains("I am content"), True)
                 self.assertIs(msg.body_contains("<p>I am content.</p>"), False)
+
+.. class:: EmailAlternative
+
+    .. versionadded:: 5.2
+
+    A named tuple to store alternative versions of email content.
+
+    The named tuple has the following indexes:
+
+    * ``content``
+    * ``mimetype``
 
 Updating the default content type
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
