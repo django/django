@@ -284,7 +284,9 @@ PostgreSQL 14 and higher.
 Miscellaneous
 -------------
 
-* ...
+* :attr:`EmailMultiAlternatives.alternatives
+  <django.core.mail.EmailMultiAlternatives.alternatives>` should only be added
+  to using :meth:`~django.core.mail.EmailMultiAlternatives.attach_alternative`.
 
 .. _deprecated-features-5.2:
 
