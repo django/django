@@ -269,7 +269,8 @@ PostgreSQL 14 and higher.
 Miscellaneous
 -------------
 
-* ...
+* :attr:`~django.core.mail.EmailMultiAlternatives.alternatives` should only be added to using :meth:`~django.core.mail.EmailMultiAlternatives.attach_alternative`.
+* ``EmailMessage.attachments`` should only be added to using the ``attach`` or ``attach_file`` methods.
 
 .. _deprecated-features-5.2:
 

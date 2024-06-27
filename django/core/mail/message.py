@@ -191,7 +191,7 @@ class SafeMIMEMultipart(MIMEMixin, MIMEMultipart):
         MIMEMultipart.__setitem__(self, name, val)
 
 
-Alternative = namedtuple("Alternative", ["content", "mimetype"])
+EmailAlternative = namedtuple("Alternative", ["content", "mimetype"])
 EmailAttachment = namedtuple("Attachment", ["filename", "content", "mimetype"])
 
 
@@ -477,14 +477,14 @@ class EmailMultiAlternatives(EmailMessage):
             reply_to,
         )
         self.alternatives = [
-            Alternative(*alternative) for alternative in (alternatives or [])
+            EmailAlternative(*alternative) for alternative in (alternatives or [])
         ]
 
     def attach_alternative(self, content, mimetype):
         """Attach an alternative content representation."""
         if content is None or mimetype is None:
             raise ValueError("Both content and mimetype must be provided.")
-        self.alternatives.append(Alternative(content, mimetype))
+        self.alternatives.append(EmailAlternative(content, mimetype))
 
     def _create_message(self, msg):
         return self._create_attachments(self._create_alternatives(msg))

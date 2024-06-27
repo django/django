@@ -17,6 +17,8 @@ from unittest import mock, skipUnless
 from django.core import mail
 from django.core.mail import (
     DNS_NAME,
+    EmailAlternative,
+    EmailAttachment,
     EmailMessage,
     EmailMultiAlternatives,
     mail_admins,
@@ -556,11 +558,49 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         mime_type = "text/html"
         msg.attach_alternative(html_content, mime_type)
 
+        self.assertIsInstance(msg.alternatives[0], EmailAlternative)
+
         self.assertEqual(msg.alternatives[0][0], html_content)
         self.assertEqual(msg.alternatives[0].content, html_content)
 
         self.assertEqual(msg.alternatives[0][1], mime_type)
         self.assertEqual(msg.alternatives[0].mimetype, mime_type)
+
+        msg.message()
+
+    def test_alternatives_constructor(self):
+        html_content = "<p>This is <strong>html</strong></p>"
+        mime_type = "text/html"
+
+        msg = EmailMultiAlternatives(
+            alternatives=[EmailAlternative(html_content, mime_type)]
+        )
+
+        self.assertIsInstance(msg.alternatives[0], EmailAlternative)
+
+        self.assertEqual(msg.alternatives[0][0], html_content)
+        self.assertEqual(msg.alternatives[0].content, html_content)
+
+        self.assertEqual(msg.alternatives[0][1], mime_type)
+        self.assertEqual(msg.alternatives[0].mimetype, mime_type)
+
+        msg.message()
+
+    def test_alternatives_constructor_from_tuple(self):
+        html_content = "<p>This is <strong>html</strong></p>"
+        mime_type = "text/html"
+
+        msg = EmailMultiAlternatives(alternatives=[(html_content, mime_type)])
+
+        self.assertIsInstance(msg.alternatives[0], EmailAlternative)
+
+        self.assertEqual(msg.alternatives[0][0], html_content)
+        self.assertEqual(msg.alternatives[0].content, html_content)
+
+        self.assertEqual(msg.alternatives[0][1], mime_type)
+        self.assertEqual(msg.alternatives[0].mimetype, mime_type)
+
+        msg.message()
 
     def test_none_body(self):
         msg = EmailMessage("subject", None, "from@example.com", ["to@example.com"])
@@ -652,6 +692,48 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
 
         self.assertEqual(msg.attachments[0][2], mime_type)
         self.assertEqual(msg.attachments[0].mimetype, mime_type)
+
+        msg.message()
+
+    def test_attachments_constructor(self):
+        file_name = "example.txt"
+        file_content = "Text file content"
+        mime_type = "text/plain"
+        msg = EmailMessage(
+            attachments=[EmailAttachment(file_name, file_content, mime_type)]
+        )
+
+        self.assertIsInstance(msg.attachments[0], EmailAttachment)
+
+        self.assertEqual(msg.attachments[0][0], file_name)
+        self.assertEqual(msg.attachments[0].filename, file_name)
+
+        self.assertEqual(msg.attachments[0][1], file_content)
+        self.assertEqual(msg.attachments[0].content, file_content)
+
+        self.assertEqual(msg.attachments[0][2], mime_type)
+        self.assertEqual(msg.attachments[0].mimetype, mime_type)
+
+        msg.message()
+
+    def test_attachments_constructor_from_tuple(self):
+        file_name = "example.txt"
+        file_content = "Text file content"
+        mime_type = "text/plain"
+        msg = EmailMessage(attachments=[(file_name, file_content, mime_type)])
+
+        self.assertIsInstance(msg.attachments[0], EmailAttachment)
+
+        self.assertEqual(msg.attachments[0][0], file_name)
+        self.assertEqual(msg.attachments[0].filename, file_name)
+
+        self.assertEqual(msg.attachments[0][1], file_content)
+        self.assertEqual(msg.attachments[0].content, file_content)
+
+        self.assertEqual(msg.attachments[0][2], mime_type)
+        self.assertEqual(msg.attachments[0].mimetype, mime_type)
+
+        msg.message()
 
     def test_decoded_attachments(self):
         """Regression test for #9367"""
