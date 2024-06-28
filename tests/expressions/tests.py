@@ -1462,6 +1462,20 @@ class ExpressionsTests(TestCase):
                 Employee(firstname="Jean-Claude", lastname="Claude%"),
                 Employee(firstname="Johnny", lastname="Joh\\n"),
                 Employee(firstname="Johnny", lastname="_ohn"),
+                # These names have regex characters that must be escaped by
+                # backends (like MongoDB) that use regex matching rather than
+                # LIKE.
+                Employee(firstname="Johnny", lastname="^Joh"),
+                Employee(firstname="Johnny", lastname="Johnny$"),
+                Employee(firstname="Johnny", lastname="Joh."),
+                Employee(firstname="Johnny", lastname="[J]ohnny"),
+                Employee(firstname="Johnny", lastname="(J)ohnny"),
+                Employee(firstname="Johnny", lastname="J*ohnny"),
+                Employee(firstname="Johnny", lastname="J+ohnny"),
+                Employee(firstname="Johnny", lastname="J?ohnny"),
+                Employee(firstname="Johnny", lastname="J{1}ohnny"),
+                Employee(firstname="Johnny", lastname="J|ohnny"),
+                Employee(firstname="Johnny", lastname="J-ohnny"),
             ]
         )
         claude = Employee.objects.create(firstname="Jean-Claude", lastname="Claude")
