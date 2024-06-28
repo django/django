@@ -228,13 +228,10 @@ class SplitArrayField(forms.Field):
                         params={"nth": index + 1},
                     )
                 )
-                cleaned_data.append(None)
-            else:
-                errors.append(None)
+                cleaned_data.append(item)
         cleaned_data, null_index = self._remove_trailing_nulls(cleaned_data)
         if null_index is not None:
             errors = errors[:null_index]
-        errors = list(filter(None, errors))
         if errors:
             raise ValidationError(list(chain.from_iterable(errors)))
         return cleaned_data

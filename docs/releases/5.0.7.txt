@@ -9,4 +9,5 @@ Django 5.0.7 fixes several bugs in 5.0.6.
 Bugfixes
 ========
 
-* ...
+* Fixed a bug in ``SplitArrayField`` where validation did not work properly 
+  when ``remove_trailing_nulls=True`` (:ticket:`35449`).
