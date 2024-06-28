@@ -777,7 +777,7 @@ class Model(AltersData, metaclass=ModelBase):
         return getattr(self, field.attname)
 
     # RemovedInDjango60Warning: When the deprecation ends, remove completely.
-    def _parse_params(self, *args, method_name, **kwargs):
+    def _parse_save_params(self, *args, method_name, **kwargs):
         defaults = {
             "force_insert": False,
             "force_update": False,
@@ -835,7 +835,7 @@ class Model(AltersData, metaclass=ModelBase):
         """
         # RemovedInDjango60Warning.
         if args:
-            force_insert, force_update, using, update_fields = self._parse_params(
+            force_insert, force_update, using, update_fields = self._parse_save_params(
                 *args,
                 method_name="save",
                 force_insert=force_insert,
@@ -911,7 +911,7 @@ class Model(AltersData, metaclass=ModelBase):
     ):
         # RemovedInDjango60Warning.
         if args:
-            force_insert, force_update, using, update_fields = self._parse_params(
+            force_insert, force_update, using, update_fields = self._parse_save_params(
                 *args,
                 method_name="asave",
                 force_insert=force_insert,
