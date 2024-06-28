@@ -1,5 +1,4 @@
 import collections
-import contextlib
 from itertools import chain
 
 from django.apps import apps
@@ -22,9 +21,10 @@ def _issubclass(cls, classinfo):
     issubclass() variant that doesn't raise an exception if cls isn't a
     class.
     """
-    with contextlib.suppress(TypeError):
+    try:
         return issubclass(cls, classinfo)
-    return False
+    except TypeError:
+        return False
 
 
 def _contains_subclass(class_path, candidate_paths):
@@ -34,9 +34,13 @@ def _contains_subclass(class_path, candidate_paths):
     """
     cls = import_string(class_path)
     for path in candidate_paths:
-        with contextlib.suppress(ImportError, TypeError):
-            if issubclass(import_string(path), cls):
-                return True
+        try:
+            candidate_cls = import_string(path)
+        except ImportError:
+            # ImportErrors are raised elsewhere.
+            continue
+        if _issubclass(candidate_cls, cls):
+            return True
     return False
 
 
