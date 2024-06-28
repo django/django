@@ -1,4 +1,3 @@
-import contextlib
 from itertools import chain
 from types import MethodType
 
@@ -16,10 +15,13 @@ def _subclass_index(class_path, candidate_paths):
     list of candidate paths. If it does not exist, return -1.
     """
     cls = import_string(class_path)
-    for i, path in enumerate(candidate_paths):
-        with contextlib.suppress(ImportError, TypeError):
-            if issubclass(import_string(path), cls):
-                return i
+    for index, path in enumerate(candidate_paths):
+        try:
+            candidate_cls = import_string(path)
+            if issubclass(candidate_cls, cls):
+                return index
+        except (ImportError, TypeError):
+            continue
     return -1
 
 
