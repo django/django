@@ -2406,19 +2406,19 @@ class SeleniumTests(AdminSeleniumTestCase):
                 available, chosen = self.selenium.find_elements(
                     By.CSS_SELECTOR, css_selector % 0
                 )
-                self.assertEqual(available.text, "AVAILABLE ATTENDANT")
+                self.assertEqual(available.text, "AVAILABLE ATTENDANT\nADD")
                 self.assertEqual(chosen.text, "CHOSEN ATTENDANT")
                 # Added inline should also have the correct verbose_name.
                 self.selenium.find_element(By.LINK_TEXT, "Add another Class").click()
                 available, chosen = self.selenium.find_elements(
                     By.CSS_SELECTOR, css_selector % 1
                 )
-                self.assertEqual(available.text, "AVAILABLE ATTENDANT")
+                self.assertEqual(available.text, "AVAILABLE ATTENDANT\nADD")
                 self.assertEqual(chosen.text, "CHOSEN ATTENDANT")
                 # Third inline should also have the correct verbose_name.
                 self.selenium.find_element(By.LINK_TEXT, "Add another Class").click()
                 available, chosen = self.selenium.find_elements(
                     By.CSS_SELECTOR, css_selector % 2
                 )
-                self.assertEqual(available.text, "AVAILABLE ATTENDANT")
+                self.assertEqual(available.text, "AVAILABLE ATTENDANT\nADD")
                 self.assertEqual(chosen.text, "CHOSEN ATTENDANT")
