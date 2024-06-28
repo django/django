@@ -4,7 +4,7 @@ from django.conf import settings
 from django.contrib.staticfiles import finders, storage
 from django.core.exceptions import ImproperlyConfigured
 from django.test import SimpleTestCase, override_settings
-from django.utils.deprecation import RemovedInDjango60Warning
+from django.utils.deprecation import RemovedInDjango61Warning
 
 from .cases import StaticFilesTestCase
 from .settings import TEST_ROOT
@@ -37,7 +37,7 @@ class TestFinders:
 
     def test_find_all_deprecated_param(self):
         src, dst = self.find_all
-        with self.assertWarnsMessage(RemovedInDjango60Warning, DEPRECATION_MSG):
+        with self.assertWarnsMessage(RemovedInDjango61Warning, DEPRECATION_MSG):
             found = self.finder.find(src, all=True)
             found = [os.path.normcase(f) for f in found]
             dst = [os.path.normcase(d) for d in dst]
@@ -50,7 +50,7 @@ class TestFinders:
             "argument 'find_all'"
         )
         with (
-            self.assertWarnsMessage(RemovedInDjango60Warning, DEPRECATION_MSG),
+            self.assertWarnsMessage(RemovedInDjango61Warning, DEPRECATION_MSG),
             self.assertRaisesMessage(TypeError, msg),
         ):
             self.finder.find(src, find_all=True, all=True)
@@ -62,7 +62,7 @@ class TestFinders:
             "argument 'wrong'"
         )
         with (
-            self.assertWarnsMessage(RemovedInDjango60Warning, DEPRECATION_MSG),
+            self.assertWarnsMessage(RemovedInDjango61Warning, DEPRECATION_MSG),
             self.assertRaisesMessage(TypeError, msg),
         ):
             self.finder.find(src, all=True, wrong=1)
@@ -165,7 +165,7 @@ class TestMiscFinder(SimpleTestCase):
         )
 
     def test_searched_locations_deprecated_all(self):
-        with self.assertWarnsMessage(RemovedInDjango60Warning, DEPRECATION_MSG):
+        with self.assertWarnsMessage(RemovedInDjango61Warning, DEPRECATION_MSG):
             finders.find("spam", all=True)
             self.assertEqual(
                 finders.searched_locations,
@@ -175,7 +175,7 @@ class TestMiscFinder(SimpleTestCase):
     def test_searched_locations_conflicting_params(self):
         msg = "find() got multiple values for argument 'find_all'"
         with (
-            self.assertWarnsMessage(RemovedInDjango60Warning, DEPRECATION_MSG),
+            self.assertWarnsMessage(RemovedInDjango61Warning, DEPRECATION_MSG),
             self.assertRaisesMessage(TypeError, msg),
         ):
             finders.find("spam", find_all=True, all=True)
@@ -183,7 +183,7 @@ class TestMiscFinder(SimpleTestCase):
     def test_searched_locations_unexpected_params(self):
         msg = "find() got an unexpected keyword argument 'wrong'"
         with (
-            self.assertWarnsMessage(RemovedInDjango60Warning, DEPRECATION_MSG),
+            self.assertWarnsMessage(RemovedInDjango61Warning, DEPRECATION_MSG),
             self.assertRaisesMessage(TypeError, msg),
         ):
             finders.find("spam", all=True, wrong=1)
