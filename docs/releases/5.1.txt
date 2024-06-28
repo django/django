@@ -26,10 +26,10 @@ only officially support the latest release of each series.
 What's new in Django 5.1
 ========================
 
-``{% query_string %}`` template tag
+``{% querystring %}`` template tag
 -----------------------------------
 
-Django 5.1 introduces the :ttag:`{% query_string %} <query_string>` template
+Django 5.1 introduces the :ttag:`{% querystring %} <querystring>` template
 tag, simplifying the modification of query parameters in URLs, making it easier
 to generate links that maintain existing query parameters while adding or
 changing specific ones.
@@ -53,7 +53,7 @@ When switching to using this new template tag, the above magically becomes:
 
 .. code-block:: html+django
 
-    <a href="{% query_string page=page.next_page_number %}">Next page</a>
+    <a href="{% querystring page=page.next_page_number %}">Next page</a>
 
 PostgreSQL Connection Pools
 ---------------------------
