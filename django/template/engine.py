@@ -156,11 +156,11 @@ class Engine:
         tried = []
         for loader in self.template_loaders:
             try:
-                template = loader.get_template(name, skip=skip)
+                template = loader.get_template(str(name), skip=skip)
                 return template, template.origin
             except TemplateDoesNotExist as e:
                 tried.extend(e.tried)
-        raise TemplateDoesNotExist(name, tried=tried)
+        raise TemplateDoesNotExist(str(name), tried=tried)
 
     def from_string(self, template_code):
         """
@@ -174,10 +174,10 @@ class Engine:
         Return a compiled Template object for the given template name,
         handling template inheritance recursively.
         """
-        template, origin = self.find_template(template_name)
+        template, origin = self.find_template(str(template_name))
         if not hasattr(template, "render"):
             # template needs to be compiled
-            template = Template(template, origin, template_name, engine=self)
+            template = Template(template, origin, str(template_name), engine=self)
         return template
 
     def render_to_string(self, template_name, context=None):
