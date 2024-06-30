@@ -20,6 +20,7 @@ Django includes getting-started documentation for the following WSGI servers:
    uwsgi
    modwsgi
    apache-auth
+   behind-proxy
 
 The ``application`` object
 ==========================

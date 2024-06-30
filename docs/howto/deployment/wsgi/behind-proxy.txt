@@ -1,0 +1,219 @@
+==============================================================
+How to deploy Django to production with Gunicorn and Nginx
+==============================================================
+
+This 5-step tutorial will guide you through deploying a Django application using Gunicorn behind a reverse proxy (such as Nginx). 
+
+It's important to note that this greatly depends on the needs of your project, but for most people, this is intended to be a minimal/initial setup. 
+
+This configuration ensures that your application is served efficiently and securely to production. 
+
+Prerequisites
+-------------
+
+Before starting, ensure you have the following:
+
+- A domain name.
+- A server with root access (e.g. an Ubuntu server).
+- A Django application ready for deployment (e.g. being under **/opt/project_name**).
+- A virtual environment (e.g. being under **/opt/project_name/venv**).
+- Basic knowledge of Linux command-line operations.
+- Nginx installed on your server.
+
+Install Gunicorn
+------------------------
+
+First, activate your virtual environment and install Gunicorn:
+
+.. code-block:: bash
+
+    source /opt/project_name/venv/bin/activate
+    python3 -m pip install gunicorn
+
+Configure Gunicorn
+--------------------------
+
+Create a Gunicorn configuration file (optional but recommended) to manage settings like worker processes. Create a file named ``gunicorn_config.py`` in your project directory:
+
+.. code-block:: python
+
+    # gunicorn_config.py
+
+    bind = "127.0.0.1:8000"
+    workers = 3
+
+Adjust Django Settings
+------------------------------
+
+Update your Django settings to handle the proxy setup correctly. Edit your ``settings.py`` file to include the following:
+
+.. code-block:: python
+
+    # settings.py
+
+    # Static files (CSS, JavaScript, Images)
+    STATIC_URL = "/static/"
+    STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
+    # Media files (Uploaded by users)
+    MEDIA_URL = "/media/"
+    MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
+    # Specifies a list of valid host/domain names for the Django site, providing protection against HTTP Host header attacks.
+    ALLOWED_HOSTS = ["your_domain.com", "www.your_domain.com", "another_domain.com"]
+
+    # Tells Django to use the X-Forwarded-Host header from the proxy, allowing it to know the original host requested by the client.
+    USE_X_FORWARDED_HOST = True
+    # Tells Django to use the X-Forwarded-Port header from the proxy, indicating the port number used by the client.
+    USE_X_FORWARDED_PORT = True
+    # Instructs Django to trust the X-Forwarded-Proto header, which is set by the proxy server, to determine whether the request is secure (HTTPS).
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+    # Forces all HTTP requests to be redirected to HTTPS.
+    SECURE_SSL_REDIRECT = True
+
+    # Ensures that the CSRF cookie is only sent over HTTPS connections.
+    CSRF_COOKIE_SECURE = True
+    # Ensures that the session cookie is only sent over HTTPS connections.
+    SESSION_COOKIE_SECURE = True
+
+    # Enables HTTP Strict Transport Security (HSTS) for the specified duration (in seconds), forcing browsers to only connect via HTTPS.
+    SECURE_HSTS_SECONDS = 31536000
+    # Applies HSTS policy to all subdomains.
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    # Allows the domain to be included in browsers' HSTS preload list, ensuring maximum protection.
+    SECURE_HSTS_PRELOAD = True
+
+    # Enables the X-Content-Type-Options header, preventing browsers from MIME-sniffing a response away from the declared content-type.
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    # Controls the information sent in the Referer header, improving privacy and security by not sending the referrer from HTTPS to HTTP.
+    SECURE_REFERRER_POLICY = "no-referrer-when-downgrade"
+
+    # SECURE_BROWSER_XSS_FILTER = True
+    # [Deprecated on 4.0]
+    # Enables the X-XSS-Protection header, which tells browsers to block detected cross-site scripting (XSS) attacks.
+
+Collect Static Files
+^^^^^^^^^^^^^^^^^^^^
+
+Django comes with a handy command to collect all static files into the directory specified in STATIC_ROOT.
+
+.. code-block:: bash
+
+    python3 /opt/project_name/manage.py collectstatic
+
+Create a ``Systemd`` Service for Gunicorn
+---------------------------------------------
+
+Create a ``systemd`` service file to manage the Gunicorn process. Create a file named gunicorn.service in ``/etc/systemd/system/``:
+
+.. code-block:: ini
+
+    # /etc/systemd/system/gunicorn.service
+
+    [Unit]
+    Description=gunicorn daemon
+    After=network.target
+
+    [Service]
+    User=yourusername
+    Group=www-data
+    WorkingDirectory=/opt/project_name
+    ExecStart=/opt/project_name/venv/bin/gunicorn --config /opt/gunicorn_config.py project_name.wsgi:application
+
+    [Install]
+    WantedBy=multi-user.target
+
+Replace ``/opt/project_name``, ``/opt/project_name/venv``, and ``project_name`` with your actual project paths and names.
+
+Reload the ``systemd`` daemon and start the Gunicorn service:
+
+.. code-block:: bash
+
+    sudo systemctl daemon-reload
+    sudo systemctl start gunicorn
+    sudo systemctl enable gunicorn
+
+Configure Nginx
+-----------------------
+
+Create an Nginx configuration file to proxy requests to Gunicorn. Create a file named project_name in /etc/nginx/sites-available/:
+
+.. code-block:: nginx
+
+    # /etc/nginx/sites-available/project_name
+
+    server {
+        listen 80;
+        server_name your_domain.com www.your_domain.com another_domain.com;
+
+        location = /favicon.ico { access_log off; log_not_found off; }
+
+        location /static/ {
+            alias /opt/project_name/static/;  # Must be the same as STATIC_ROOT
+        }
+
+        location /media/ {
+            alias /opt/project_name/media/;  # Must be the same as MEDIA_ROOT
+            access_log /var/log/nginx/media_access.log;
+            error_log /var/log/nginx/media_error.log;
+        }
+
+        location / {
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_pass http://127.0.0.1:8000;
+
+            access_log /var/log/nginx/django_access.log;
+            error_log /var/log/nginx/django_error.log;
+        }
+
+        listen [::]:80;
+    }
+
+Create a symbolic link to enable the site, and ensure the static and media directories, as well as the log directories, have the correct permissions.
+
+You need to make sure that the user running Nginx has the necessary read/write permissions.
+
+.. code-block:: bash
+
+    # Create directories if they don't exist
+    sudo mkdir -p /opt/project_name/static /opt/project_name/media /var/log/nginx
+
+    # Set ownership (assuming nginx user and group) and permissions
+    sudo chown -R nginx:nginx /opt/project_name/static /opt/project_name/media /var/log/nginx
+    sudo chmod -R 755 /opt/project_name/static /opt/project_name/media /var/log/nginx
+
+    sudo ln -s /etc/nginx/sites-available/project_name /etc/nginx/sites-enabled
+
+Test the Nginx configuration and restart the service:
+
+.. code-block:: bash
+
+    sudo nginx -t
+    sudo systemctl restart nginx
+
+Configure HTTPS
+-----------------------
+
+It's highly recommended to secure your application with HTTPS. Use ``Certbot`` to obtain a free SSL certificate:
+
+.. code-block:: bash
+
+    sudo apt-get install certbot python3-certbot-nginx
+    sudo certbot --nginx -d your_domain.com -d www.your_domain.com -d another_domain.com
+
+Follow the prompts to configure SSL.
+
+.. note::
+    Your Django application is now deployed using Gunicorn behind an Nginx reverse proxy.
+
+    However, there are several ways you could customize and enhance this deployment:
+
+    - **Load Balancing**: If you anticipate high traffic, consider setting up additional Gunicorn instances.
+    - **Containerization**: Using Docker to containerize your application can simplify deployment and provide greater consistency across different environments.
+    - **Advanced Security Configurations**: Additional security measures such as setting up a Web Application Firewall (WAF), regular security audits, and implementing stricter Content Security Policies (CSP) can further protect your application.
+
+Be sure to explore these options and refer to the official documentation for Gunicorn, Nginx, and Django for further customization and advanced configurations.
