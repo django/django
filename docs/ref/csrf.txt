@@ -79,7 +79,7 @@ The CSRF protection is based on the following things:
    requests from ``www.example.com`` and ``api.example.com``. If the setting is
    not set, then the referer must match the HTTP ``Host`` header.
 
-   Expanding the accepted referers beyond the current host or cookie domain can
+   Expanding the accepted referrers beyond the current host or cookie domain can
    be done with the :setting:`CSRF_TRUSTED_ORIGINS` setting.
 
 This ensures that only forms that have originated from trusted domains can be
