@@ -33,3 +33,22 @@ class InspectDBTests(PostgreSQLTestCase):
                 "null=True)",
             ],
         )
+
+    def test_postgres_import(self):
+        out = StringIO()
+        call_command(
+            "inspectdb",
+            "postgres_tests_hotelreservation",
+            "postgres_tests_serialmodel",
+            "postgres_tests_room",
+            stdout=out,
+        )
+        output = out.getvalue()
+        postgres_import = "from django.contrib import postgres"
+        self.assertEqual(output.count(postgres_import), 1, output)
+        self.assertLess(output.find(postgres_import), output.find("class "))
+        self.assertIn(
+            "serial = postgres.fields.SerialField()  "
+            "# You may want to consider using AutoField instead.",
+            output,
+        )

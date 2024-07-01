@@ -3,6 +3,7 @@ from django.db import models
 from .fields import (
     ArrayField,
     BigIntegerRangeField,
+    BigSerialField,
     DateRangeField,
     DateTimeRangeField,
     DecimalRangeField,
@@ -10,6 +11,8 @@ from .fields import (
     HStoreField,
     IntegerRangeField,
     SearchVectorField,
+    SerialField,
+    SmallSerialField,
 )
 
 
@@ -203,3 +206,17 @@ class HotelReservation(PostgreSQLModel):
     end = models.DateTimeField()
     cancelled = models.BooleanField(default=False)
     requirements = models.JSONField(blank=True, null=True)
+
+
+class SerialModel(PostgreSQLModel):
+    small_serial = SmallSerialField()
+    serial = SerialField()
+    big_serial = BigSerialField()
+
+
+class SerialPKModel(PostgreSQLModel):
+    id = SerialField(primary_key=True)
+
+
+class SerialFKModel(PostgreSQLModel):
+    fk = models.ForeignKey(SerialPKModel, on_delete=models.CASCADE)

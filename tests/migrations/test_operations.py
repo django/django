@@ -1,4 +1,5 @@
 import math
+import unittest
 from decimal import Decimal
 
 from django.core.exceptions import FieldDoesNotExist
@@ -6153,6 +6154,91 @@ class OperationTests(OperationTestBase):
         pony_new = Pony.objects.create(weight=20)
         self.assertEqual(pony_new.generated, 1)
         self.assertEqual(pony_new.static, 2)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    def test_serial_field_operations(self):
+        from django.contrib.postgres.fields import SerialField
+
+        app_label = "test_3650d5bb"
+        project_state = self.set_up_test_model(app_label)
+        operation_1 = migrations.AddField("Pony", "serial", SerialField())
+        operation_2 = migrations.RemoveField("Pony", "serial")
+        operation_3 = migrations.AlterField("Pony", "green", SerialField())
+        operation_4 = migrations.AlterField("Pony", "pink", SerialField())
+        operation_5 = migrations.AddField("Pony", "serial_2", SerialField())
+        table_name = f"{app_label}_pony"
+        # Add field (serial).
+        self.assertColumnNotExists(table_name, "serial")
+        new_state = project_state.clone()
+        operation_1.state_forwards(app_label, new_state)
+        with connection.schema_editor() as editor:
+            operation_1.database_forwards(app_label, editor, project_state, new_state)
+        self.assertColumnExists(table_name, "serial")
+        Pony = new_state.apps.get_model(app_label, "pony")
+        obj_1 = Pony.objects.create(weight=1, green=1)
+        self.assertEqual(obj_1.serial, 1)
+        self.assertEqual(obj_1.green, 1)
+        self.assertEqual(obj_1.pink, 3)
+        obj_2 = Pony.objects.create(weight=1)
+        self.assertEqual(obj_2.serial, 2)
+        self.assertIsNone(obj_2.green)
+        self.assertEqual(obj_2.pink, 3)
+        # Remove field (serial).
+        project_state, new_state = new_state, new_state.clone()
+        operation_2.state_forwards(app_label, new_state)
+        with connection.schema_editor() as editor:
+            operation_2.database_forwards(app_label, editor, project_state, new_state)
+        self.assertColumnNotExists(table_name, "serial")
+        # Alter field (green -> SerialField()).
+        project_state, new_state = new_state, new_state.clone()
+        operation_3.state_forwards(app_label, new_state)
+        with connection.schema_editor() as editor:
+            operation_3.database_forwards(app_label, editor, project_state, new_state)
+        Pony = new_state.apps.get_model(app_label, "pony")
+        obj_1 = Pony.objects.get(id=obj_1.id)
+        self.assertEqual(obj_1.green, 1)
+        self.assertEqual(obj_1.pink, 3)
+        obj_2 = Pony.objects.get(id=obj_2.id)
+        self.assertEqual(obj_2.green, 2)
+        self.assertEqual(obj_2.pink, 3)
+        # Alter field (pink -> SerialField()).
+        project_state, new_state = new_state, new_state.clone()
+        operation_4.state_forwards(app_label, new_state)
+        with connection.schema_editor() as editor:
+            operation_4.database_forwards(app_label, editor, project_state, new_state)
+        Pony = new_state.apps.get_model(app_label, "pony")
+        obj_1 = Pony.objects.get(id=obj_1.id)
+        self.assertEqual(obj_1.green, 1)
+        self.assertEqual(obj_1.pink, 3)
+        obj_2 = Pony.objects.get(id=obj_2.id)
+        self.assertEqual(obj_2.green, 2)
+        self.assertEqual(obj_2.pink, 3)
+        obj_3 = Pony.objects.create(weight=1)
+        self.assertEqual(obj_3.green, 3)
+        self.assertEqual(obj_3.pink, 4)
+        # Add field (serial_2).
+        self.assertColumnNotExists(table_name, "serial_2")
+        project_state, new_state = new_state, new_state.clone()
+        operation_5.state_forwards(app_label, new_state)
+        with connection.schema_editor() as editor:
+            operation_5.database_forwards(app_label, editor, project_state, new_state)
+        Pony = new_state.apps.get_model(app_label, "pony")
+        obj_1 = Pony.objects.get(id=obj_1.id)
+        self.assertEqual(obj_1.green, 1)
+        self.assertEqual(obj_1.pink, 3)
+        self.assertEqual(obj_1.serial_2, 1)
+        obj_2 = Pony.objects.get(id=obj_2.id)
+        self.assertEqual(obj_2.green, 2)
+        self.assertEqual(obj_2.pink, 3)
+        self.assertEqual(obj_2.serial_2, 2)
+        obj_3 = Pony.objects.get(id=obj_3.id)
+        self.assertEqual(obj_3.green, 3)
+        self.assertEqual(obj_3.pink, 4)
+        self.assertEqual(obj_3.serial_2, 3)
+        obj_4 = Pony.objects.create(weight=1)
+        self.assertEqual(obj_4.green, 4)
+        self.assertEqual(obj_4.pink, 5)
+        self.assertEqual(obj_4.serial_2, 4)
 
 
 class SwappableOperationTests(OperationTestBase):

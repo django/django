@@ -298,7 +298,7 @@ class BaseDatabaseSchemaEditor:
         # Work out nullability.
         null = field.null
         # Add database default.
-        if field.db_default is not NOT_PROVIDED:
+        if field.db_default is not NOT_PROVIDED and not self.skip_default(field):
             default_sql, default_params = self.db_default_sql(field)
             yield f"DEFAULT {default_sql}"
             params.extend(default_params)

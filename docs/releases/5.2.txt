@@ -70,7 +70,10 @@ Minor features
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :class:`~django.contrib.postgres.fields.SerialField`,
+  :class:`~django.contrib.postgres.fields.BigSerialField` and
+  :class:`~django.contrib.postgres.fields.SmallSerialField` have been added
+  corresponding to their respective PostgreSQL database types.
 
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

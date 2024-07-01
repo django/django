@@ -225,6 +225,25 @@ class SchemaTests(TransactionTestCase):
         with connection.cursor() as cursor:
             return connection.introspection.get_constraints(cursor, table)
 
+    @staticmethod
+    def get_sequences(table):
+        with connection.cursor() as cursor:
+            return connection.introspection.get_sequences(cursor, table)
+
+    @staticmethod
+    def get_sequence(sequence):
+        with connection.cursor() as cursor:
+            cursor.execute(
+                (
+                    "SELECT data_type, last_value "
+                    "FROM pg_sequences "
+                    "WHERE sequencename = '%s'"
+                )
+                % sequence
+            )
+
+            return cursor.fetchone()
+
     def get_constraints_for_column(self, model, column_name):
         constraints = self.get_constraints(model._meta.db_table)
         constraints_for_column = []
@@ -5719,3 +5738,649 @@ class SchemaTests(TransactionTestCase):
             if connection.vendor == "postgresql":
                 with connection.cursor() as cursor:
                     cursor.execute("DROP COLLATION IF EXISTS case_insensitive")
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_serial_to_integer(self):
+        from django.contrib.postgres.fields import SerialField
+
+        self.serial_to_integer_test(SerialField, IntegerField)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_serial_to_small_integer(self):
+        from django.contrib.postgres.fields import SerialField
+
+        self.serial_to_integer_test(SerialField, SmallIntegerField)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_serial_to_big_integer(self):
+        from django.contrib.postgres.fields import SerialField
+
+        self.serial_to_integer_test(SerialField, BigIntegerField)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_small_serial_to_integer(self):
+        from django.contrib.postgres.fields import SmallSerialField
+
+        self.serial_to_integer_test(SmallSerialField, IntegerField)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_small_serial_to_small_integer(self):
+        from django.contrib.postgres.fields import SmallSerialField
+
+        self.serial_to_integer_test(SmallSerialField, SmallIntegerField)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_small_serial_to_big_integer(self):
+        from django.contrib.postgres.fields import SmallSerialField
+
+        self.serial_to_integer_test(SmallSerialField, BigIntegerField)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_big_serial_to_integer(self):
+        from django.contrib.postgres.fields import BigSerialField
+
+        self.serial_to_integer_test(BigSerialField, IntegerField)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_big_serial_to_small_integer(self):
+        from django.contrib.postgres.fields import BigSerialField
+
+        self.serial_to_integer_test(BigSerialField, SmallIntegerField)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_big_serial_to_big_integer(self):
+        from django.contrib.postgres.fields import BigSerialField
+
+        self.serial_to_integer_test(BigSerialField, BigIntegerField)
+
+    def serial_to_integer_test(self, old_field_cls, new_field_cls):
+        class Foo(Model):
+            field = old_field_cls()
+
+            class Meta:
+                app_label = "schema"
+
+        with connection.schema_editor() as editor:
+            editor.create_model(Foo)
+
+        self.isolated_local_models = [Foo]
+
+        self.assertColumns(Foo, {"id": "AutoField", "field": old_field_cls.__name__})
+        sequences = self.assertSequences(Foo, ["id", "field"])
+        self.assertSequence(sequences[1], old_field_cls, None)
+
+        old_field = Foo._meta.get_field("field")
+        new_field = new_field_cls()
+        new_field.model = Foo
+        new_field.set_attributes_from_name("field")
+
+        with connection.schema_editor() as editor:
+            editor.alter_field(Foo, old_field, new_field, strict=True)
+
+        self.assertColumns(Foo, {"id": "AutoField", "field": new_field_cls.__name__})
+        self.assertSequences(Foo, ["id"])
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_integer_to_serial(self):
+        from django.contrib.postgres.fields import SerialField
+
+        self.integer_to_serial_test(IntegerField, SerialField)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_integer_to_small_serial(self):
+        from django.contrib.postgres.fields import SmallSerialField
+
+        self.integer_to_serial_test(IntegerField, SmallSerialField)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_integer_to_big_serial(self):
+        from django.contrib.postgres.fields import BigSerialField
+
+        self.integer_to_serial_test(IntegerField, BigSerialField)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_small_integer_to_serial(self):
+        from django.contrib.postgres.fields import SerialField
+
+        self.integer_to_serial_test(SmallIntegerField, SerialField)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_small_integer_to_small_serial(self):
+        from django.contrib.postgres.fields import SmallSerialField
+
+        self.integer_to_serial_test(SmallIntegerField, SmallSerialField)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_small_integer_to_big_serial(self):
+        from django.contrib.postgres.fields import BigSerialField
+
+        self.integer_to_serial_test(SmallIntegerField, BigSerialField)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_big_integer_to_serial(self):
+        from django.contrib.postgres.fields import SerialField
+
+        self.integer_to_serial_test(BigIntegerField, SerialField)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_big_integer_to_small_serial(self):
+        from django.contrib.postgres.fields import SmallSerialField
+
+        self.integer_to_serial_test(BigIntegerField, SmallSerialField)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_big_integer_to_big_serial(self):
+        from django.contrib.postgres.fields import BigSerialField
+
+        self.integer_to_serial_test(BigIntegerField, BigSerialField)
+
+    def integer_to_serial_test(self, old_field_cls, new_field_cls):
+        class Foo(Model):
+            field = old_field_cls()
+
+            class Meta:
+                app_label = "schema"
+
+        with connection.schema_editor() as editor:
+            editor.create_model(Foo)
+
+        self.isolated_local_models = [Foo]
+
+        self.assertColumns(Foo, {"id": "AutoField", "field": old_field_cls.__name__})
+        self.assertSequences(Foo, ["id"])
+
+        old_field = Foo._meta.get_field("field")
+        new_field = new_field_cls()
+        new_field.model = Foo
+        new_field.set_attributes_from_name("field")
+
+        with connection.schema_editor() as editor:
+            editor.alter_field(Foo, old_field, new_field, strict=True)
+
+        self.assertColumns(Foo, {"id": "AutoField", "field": new_field_cls.__name__})
+        sequences = self.assertSequences(Foo, ["id", "field"])
+        self.assertSequence(sequences[1], new_field_cls, None)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_auto_field_to_serial(self):
+        from django.contrib.postgres.fields import SerialField
+
+        self.auto_field_to_serial_test(AutoField, SerialField)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_auto_field_to_small_serial(self):
+        from django.contrib.postgres.fields import SmallSerialField
+
+        self.auto_field_to_serial_test(AutoField, SmallSerialField)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_auto_field_to_big_serial(self):
+        from django.contrib.postgres.fields import BigSerialField
+
+        self.auto_field_to_serial_test(AutoField, BigSerialField)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_small_auto_field_to_serial(self):
+        from django.contrib.postgres.fields import SerialField
+
+        self.auto_field_to_serial_test(SmallAutoField, SerialField)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_small_auto_field_to_small_serial(self):
+        from django.contrib.postgres.fields import SmallSerialField
+
+        self.auto_field_to_serial_test(SmallAutoField, SmallSerialField)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_small_auto_field_to_big_serial(self):
+        from django.contrib.postgres.fields import BigSerialField
+
+        self.auto_field_to_serial_test(SmallAutoField, BigSerialField)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_big_auto_field_to_serial(self):
+        from django.contrib.postgres.fields import SerialField
+
+        self.auto_field_to_serial_test(BigAutoField, SerialField)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_big_auto_field_to_small_serial(self):
+        from django.contrib.postgres.fields import SmallSerialField
+
+        self.auto_field_to_serial_test(BigAutoField, SmallSerialField)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_big_auto_field_to_big_serial(self):
+        from django.contrib.postgres.fields import BigSerialField
+
+        self.auto_field_to_serial_test(BigAutoField, BigSerialField)
+
+    def auto_field_to_serial_test(self, old_field_cls, new_field_cls):
+        class Foo(Model):
+            id = old_field_cls(primary_key=True)
+
+            class Meta:
+                app_label = "schema"
+
+        with connection.schema_editor() as editor:
+            editor.create_model(Foo)
+
+        self.isolated_local_models = [Foo]
+
+        self.assertColumns(Foo, {"id": old_field_cls.__name__})
+        sequences = self.assertSequences(Foo, ["id"])
+        self.assertSequence(sequences[0], old_field_cls, None)
+
+        obj = Foo.objects.create()
+        self.assertEqual(obj.id, 1)
+        self.assertSequence(sequences[0], old_field_cls, 1)
+
+        old_field = Foo._meta.get_field("id")
+        new_field = new_field_cls(primary_key=True)
+        new_field.model = Foo
+        new_field.set_attributes_from_name("id")
+
+        with connection.schema_editor() as editor:
+            editor.alter_field(Foo, old_field, new_field, strict=True)
+
+        self.assertColumns(Foo, {"id": new_field_cls.__name__})
+        sequences = self.assertSequences(Foo, ["id"])
+        self.assertSequence(sequences[0], new_field_cls, 1)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_auto_field_to_serial_pre_41(self):
+        from django.contrib.postgres.fields import SerialField
+
+        class Foo(Model):
+            class Meta:
+                app_label = "schema"
+
+        self.isolated_local_models = [Foo]
+
+        with connection.schema_editor() as editor:
+            editor.create_model(Foo)
+            # pre-Django 4.1, auto fields used serial fields
+            table = Foo._meta.db_table
+            editor.execute(editor._drop_identity_sql(table, "id"))
+            editor.execute(editor._create_sequence_sql(table, "id", "integer"))
+            editor.execute(
+                f"ALTER TABLE {table} ALTER COLUMN id "
+                f"SET DEFAULT nextval('{table}_id_seq')"
+            )
+
+        obj = Foo.objects.create()
+        self.assertEqual(obj.id, 1)
+
+        self.assertColumns(Foo, {"id": "SerialField"})
+        sequences = self.assertSequences(Foo, ["id"])
+        self.assertSequence(sequences[0], SerialField, 1)
+
+        old_field = Foo._meta.get_field("id")
+        new_field = SerialField(primary_key=True)
+        new_field.model = Foo
+        new_field.set_attributes_from_name("id")
+
+        with connection.schema_editor() as editor:
+            editor.alter_field(Foo, old_field, new_field, strict=True)
+
+        obj = Foo.objects.create()
+        self.assertEqual(obj.id, 2)
+
+        self.assertColumns(Foo, {"id": "SerialField"})
+        sequences = self.assertSequences(Foo, ["id"])
+        self.assertSequence(sequences[0], SerialField, 2)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_serial_to_auto_field(self):
+        from django.contrib.postgres.fields import SerialField
+
+        self.serial_to_auto_field_test(SerialField, AutoField)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_serial_to_small_auto_field(self):
+        from django.contrib.postgres.fields import SerialField
+
+        self.serial_to_auto_field_test(SerialField, SmallAutoField)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_serial_to_big_auto_field(self):
+        from django.contrib.postgres.fields import SerialField
+
+        self.serial_to_auto_field_test(SerialField, BigAutoField)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_small_serial_to_auto_field(self):
+        from django.contrib.postgres.fields import SmallSerialField
+
+        self.serial_to_auto_field_test(SmallSerialField, AutoField)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_small_serial_to_small_auto_field(self):
+        from django.contrib.postgres.fields import SmallSerialField
+
+        self.serial_to_auto_field_test(SmallSerialField, SmallAutoField)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_small_serial_to_big_auto_field(self):
+        from django.contrib.postgres.fields import SmallSerialField
+
+        self.serial_to_auto_field_test(SmallSerialField, BigAutoField)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_big_serial_to_auto_field(self):
+        from django.contrib.postgres.fields import BigSerialField
+
+        self.serial_to_auto_field_test(BigSerialField, AutoField)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_big_serial_to_small_auto_field(self):
+        from django.contrib.postgres.fields import BigSerialField
+
+        self.serial_to_auto_field_test(BigSerialField, SmallAutoField)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_big_serial_to_big_auto_field(self):
+        from django.contrib.postgres.fields import BigSerialField
+
+        self.serial_to_auto_field_test(BigSerialField, BigAutoField)
+
+    def serial_to_auto_field_test(self, old_field_cls, new_field_cls):
+        class Foo(Model):
+            id = old_field_cls(primary_key=True)
+
+            class Meta:
+                app_label = "schema"
+
+        with connection.schema_editor() as editor:
+            editor.create_model(Foo)
+
+        self.isolated_local_models = [Foo]
+
+        self.assertColumns(Foo, {"id": old_field_cls.__name__})
+        sequences = self.assertSequences(Foo, ["id"])
+        self.assertSequence(sequences[0], old_field_cls, None)
+
+        obj = Foo.objects.create()
+        self.assertEqual(obj.id, 1)
+        obj = Foo.objects.create()
+        self.assertEqual(obj.id, 2)
+        self.assertSequence(sequences[0], old_field_cls, 2)
+
+        old_field = Foo._meta.get_field("id")
+        new_field = new_field_cls(primary_key=True)
+        new_field.model = Foo
+        new_field.set_attributes_from_name("id")
+
+        with connection.schema_editor() as editor:
+            editor.alter_field(Foo, old_field, new_field, strict=True)
+
+        self.assertColumns(Foo, {"id": new_field_cls.__name__})
+        sequences = self.assertSequences(Foo, ["id"])
+        self.assertSequence(sequences[0], new_field_cls, 2)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_small_serial_to_serial(self):
+        from django.contrib.postgres.fields import SerialField, SmallSerialField
+
+        self.serial_to_serial_test(SmallSerialField, SerialField)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_small_serial_to_big_serial(self):
+        from django.contrib.postgres.fields import BigSerialField, SmallSerialField
+
+        self.serial_to_serial_test(SmallSerialField, BigSerialField)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_serial_to_small_serial(self):
+        from django.contrib.postgres.fields import SerialField, SmallSerialField
+
+        self.serial_to_serial_test(SerialField, SmallSerialField)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_serial_to_big_serial(self):
+        from django.contrib.postgres.fields import BigSerialField, SerialField
+
+        self.serial_to_serial_test(SerialField, BigSerialField)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_big_serial_to_serial(self):
+        from django.contrib.postgres.fields import BigSerialField, SerialField
+
+        self.serial_to_serial_test(BigSerialField, SerialField)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_big_serial_to_small_serial(self):
+        from django.contrib.postgres.fields import BigSerialField, SmallSerialField
+
+        self.serial_to_serial_test(BigSerialField, SmallSerialField)
+
+    def serial_to_serial_test(self, old_field_cls, new_field_cls):
+        class Foo(Model):
+            field = old_field_cls()
+
+            class Meta:
+                app_label = "schema"
+
+        with connection.schema_editor() as editor:
+            editor.create_model(Foo)
+
+        self.isolated_local_models = [Foo]
+
+        self.assertColumns(Foo, {"id": "AutoField", "field": old_field_cls.__name__})
+        sequences = self.assertSequences(Foo, ["id", "field"])
+        self.assertSequence(sequences[1], old_field_cls, None)
+
+        old_field = Foo._meta.get_field("field")
+        new_field = new_field_cls()
+        new_field.model = Foo
+        new_field.set_attributes_from_name("field")
+
+        with connection.schema_editor() as editor:
+            editor.alter_field(Foo, old_field, new_field, strict=True)
+
+        self.assertColumns(Foo, {"id": "AutoField", "field": new_field_cls.__name__})
+        sequences = self.assertSequences(Foo, ["id", "field"])
+        self.assertSequence(sequences[1], new_field_cls, None)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_add_serial_field(self):
+        from django.contrib.postgres.fields import SerialField
+
+        self.add_serial_field_test(SerialField)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_add_small_serial_field(self):
+        from django.contrib.postgres.fields import SmallSerialField
+
+        self.add_serial_field_test(SmallSerialField)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_add_big_serial_field(self):
+        from django.contrib.postgres.fields import BigSerialField
+
+        self.add_serial_field_test(BigSerialField)
+
+    def add_serial_field_test(self, field_cls):
+        class Foo(Model):
+            class Meta:
+                app_label = "schema"
+
+        with connection.schema_editor() as editor:
+            editor.create_model(Foo)
+
+        self.isolated_local_models = [Foo]
+
+        self.assertColumns(Foo, {"id": "AutoField"})
+        self.assertSequences(Foo, ["id"])
+
+        foo_1 = Foo.objects.create()
+        foo_2 = Foo.objects.create()
+        foo_3 = Foo.objects.create()
+
+        field = field_cls()
+        field.model = Foo
+        field.set_attributes_from_name("field")
+        field.contribute_to_class(Foo, "field")
+
+        with connection.schema_editor() as editor:
+            editor.add_field(Foo, field)
+
+        self.assertColumns(Foo, {"id": "AutoField", "field": field_cls.__name__})
+        sequences = self.assertSequences(Foo, ["id", "field"])
+        self.assertSequence(sequences[1], field_cls, 3)
+
+        foo_1 = Foo.objects.get(id=foo_1.id)
+        foo_2 = Foo.objects.get(id=foo_2.id)
+        foo_3 = Foo.objects.get(id=foo_3.id)
+        self.assertEqual(foo_1.field, 1)
+        self.assertEqual(foo_2.field, 2)
+        self.assertEqual(foo_3.field, 3)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_remove_serial_field(self):
+        from django.contrib.postgres.fields import SerialField
+
+        self.remove_serial_field_test(SerialField)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_remove_small_serial_field(self):
+        from django.contrib.postgres.fields import SmallSerialField
+
+        self.remove_serial_field_test(SmallSerialField)
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_remove_big_serial_field(self):
+        from django.contrib.postgres.fields import BigSerialField
+
+        self.remove_serial_field_test(BigSerialField)
+
+    def remove_serial_field_test(self, field_cls):
+        class Foo(Model):
+            field = field_cls()
+
+            class Meta:
+                app_label = "schema"
+
+        with connection.schema_editor() as editor:
+            editor.create_model(Foo)
+
+        self.isolated_local_models = [Foo]
+
+        self.assertColumns(Foo, {"id": "AutoField", "field": field_cls.__name__})
+        sequences = self.assertSequences(Foo, ["id", "field"])
+        self.assertSequence(sequences[1], field_cls, None)
+
+        field = Foo._meta.get_field("field")
+
+        with connection.schema_editor() as editor:
+            editor.remove_field(Foo, field)
+
+        self.assertColumns(Foo, {"id": "AutoField"})
+        self.assertSequences(Foo, ["id"])
+
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @isolate_apps("schema")
+    def test_rename_serial_field(self):
+        from django.contrib.postgres.fields import SerialField
+
+        class Foo(Model):
+            field = SerialField()
+
+            class Meta:
+                app_label = "schema"
+
+        with connection.schema_editor() as editor:
+            editor.create_model(Foo)
+
+        self.isolated_local_models = [Foo]
+
+        old_field = Foo._meta.get_field("field")
+        new_field = SerialField()
+        new_field.model = Foo
+        new_field.set_attributes_from_name("field_2")
+
+        with connection.schema_editor() as editor:
+            editor.alter_field(Foo, old_field, new_field, strict=True)
+
+        self.assertColumns(Foo, {"id": "AutoField", "field_2": "SerialField"})
+        sequences = self.assertSequences(Foo, ["id", "field_2"])
+        self.assertEqual(sequences[1], "schema_foo_field_2_seq")
+        self.assertSequence(sequences[1], SerialField, None)
+
+    def assertColumns(self, model, columns):
+        column_classes = self.column_classes(model)
+        self.assertEqual(len(column_classes), len(columns))
+        for key, value in columns.items():
+            column_class = column_classes[key][0]
+            self.assertTrue(column_class[-len(value) :], value)
+
+    def assertSequences(self, model, fields):
+        table = model._meta.db_table
+        sequences = self.get_sequences(table)
+        self.assertEqual(len(sequences), len(fields))
+        columns = [sequence["column"] for sequence in sequences]
+        self.assertEqual(columns, fields)
+        return [sequence["name"] for sequence in sequences]
+
+    def assertSequence(self, sequence, field_cls, value):
+        data_types = {
+            "AutoField": "integer",
+            "SmallAutoField": "smallint",
+            "BigAutoField": "bigint",
+            "SerialField": "integer",
+            "SmallSerialField": "smallint",
+            "BigSerialField": "bigint",
+        }
+
+        data_type, last_value = self.get_sequence(sequence)
+        self.assertEqual(data_type, data_types[field_cls.__name__])
+        self.assertEqual(last_value, value)
