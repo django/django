@@ -1,0 +1,53 @@
+name: Accessibility
+
+on:
+  pull_request:
+    branches:
+      - "poc-ci-accessibility"
+      - main
+
+
+jobs:
+  accessibility:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_BD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+            --health-cmd pg_isready
+            --health-interval 10s
+            --health-timeout 5s
+            --health-retries 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "16"
+      - name: Install Requirements
+        run: python -m pip install .
+      - name: Cache Django
+        uses: actions/cache@v3
+        with:
+          path: Django/*
+          key: Django
+      - name: Create dummy app
+        run: |
+          django-admin startproject allyapp
+          python allyapp/manage.py migrate
+      - name: Install pa11y
+        run: npm install -g pa11y
+      - name: Run the project and pa11y
+        run: python allyapp/manage.py runserver & (sleep 10 && pa11y http://127.0.0.1:8000/ --runner axe)
