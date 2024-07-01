@@ -1368,14 +1368,14 @@ class Query(BaseExpression):
         # __exact is the default lookup if one isn't given.
         *transforms, lookup_name = lookups or ["exact"]
         for name in transforms:
-            lhs = self.try_transform(lhs, name)
+            lhs = self.try_transform(lhs, name, lookups)
         # First try get_lookup() so that the lookup takes precedence if the lhs
         # supports both transform and lookup for the name.
         lookup_class = lhs.get_lookup(lookup_name)
         if not lookup_class:
             # A lookup wasn't found. Try to interpret the name as a transform
             # and do an Exact lookup against it.
-            lhs = self.try_transform(lhs, lookup_name)
+            lhs = self.try_transform(lhs, lookup_name, lookups)
             lookup_name = "exact"
             lookup_class = lhs.get_lookup(lookup_name)
             if not lookup_class:
@@ -1402,7 +1402,7 @@ class Query(BaseExpression):
 
         return lookup
 
-    def try_transform(self, lhs, name):
+    def try_transform(self, lhs, name, lookups):
         """
         Helper method for build_lookup(). Try to fetch and initialize
         a transform for name parameter from lhs.
@@ -1419,9 +1419,10 @@ class Query(BaseExpression):
                 suggestion = ", perhaps you meant %s?" % " or ".join(suggested_lookups)
             else:
                 suggestion = "."
+            unsupported_lookup = LOOKUP_SEP.join(lookups[lookups.index(name) :])
             raise FieldError(
                 "Unsupported lookup '%s' for %s or join on the field not "
-                "permitted%s" % (name, output_field.__name__, suggestion)
+                "permitted%s" % (unsupported_lookup, output_field.__name__, suggestion)
             )
 
     def build_filter(
@@ -1882,7 +1883,7 @@ class Query(BaseExpression):
             def transform(field, alias, *, name, previous):
                 try:
                     wrapped = previous(field, alias)
-                    return self.try_transform(wrapped, name)
+                    return self.try_transform(wrapped, name, transforms)
                 except FieldError:
                     # FieldError is raised if the transform doesn't exist.
                     if isinstance(final_field, Field) and last_field_exception:
@@ -2003,8 +2004,9 @@ class Query(BaseExpression):
             field_list = name.split(LOOKUP_SEP)
             annotation = self.annotations.get(field_list[0])
             if annotation is not None:
-                for transform in field_list[1:]:
-                    annotation = self.try_transform(annotation, transform)
+                transforms = field_list[1:]
+                for transform in transforms:
+                    annotation = self.try_transform(annotation, transform, transforms)
                 return annotation
             join_info = self.setup_joins(
                 field_list, self.get_meta(), self.get_initial_alias(), can_reuse=reuse
