@@ -8,7 +8,8 @@ from django.contrib.auth.decorators import (
     user_passes_test,
 )
 from django.http import HttpResponse
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, override_settings
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.functional import keep_lazy, keep_lazy_text, lazy
 from django.utils.safestring import mark_safe
@@ -434,3 +435,16 @@ class MethodDecoratorTests(SimpleTestCase):
         Test().method()
         self.assertEqual(func_name, "method")
         self.assertIsNotNone(func_module)
+
+
+@override_settings(ROOT_URLCONF="decorators.urls")
+class AsyncMethodDecoratorTest(SimpleTestCase):
+    def test_view1(self):
+        response = self.client.get(reverse("view1"))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, b"hi")
+
+    def test_view2(self):
+        response = self.client.get(reverse("view2"))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, b"hi")
