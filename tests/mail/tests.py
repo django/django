@@ -1100,25 +1100,28 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
                 "Tó Example very long" * 4 + " <to@example.com>",
                 "utf-8",
                 "=?utf-8?q?T=C3=B3_Example_very_longT=C3=B3_Example_very_longT"
-                "=C3=B3_Example_?=\n"
-                " =?utf-8?q?very_longT=C3=B3_Example_very_long?= "
+                "=C3=B3_Example_very_longT=C3=B3_Example_very_long?= "
                 "<to@example.com>",
             ),
             (
                 ("Tó Example very long" * 4, "to@example.com"),
                 "utf-8",
                 "=?utf-8?q?T=C3=B3_Example_very_longT=C3=B3_Example_very_longT"
-                "=C3=B3_Example_?=\n"
-                " =?utf-8?q?very_longT=C3=B3_Example_very_long?= "
+                "=C3=B3_Example_very_longT=C3=B3_Example_very_long?= "
                 "<to@example.com>",
+            ),
+            (
+                "ţēśţ." * 6 + "@example.com",
+                "utf-8",
+                "=?utf-8?b?xaPEk8WbxaMuxaPEk8WbxaMuxaPEk8WbxaMuxaPEk8WbxaMuxa"
+                "PEk8WbxaMuxaPEk8WbxaMu?=@example.com",
             ),
             # Address with long display name and unicode domain.
             (
                 ("To Example very long" * 4, "to@exampl€.com"),
                 "utf-8",
                 "To Example very longTo Example very longTo Example very longT"
-                "o Example very\n"
-                " long <to@xn--exampl-nc1c.com>",
+                "o Example very long <to@xn--exampl-nc1c.com>",
             ),
         ):
             with self.subTest(email_address=email_address, encoding=encoding):
