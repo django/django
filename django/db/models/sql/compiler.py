@@ -787,6 +787,8 @@ class SQLCompiler:
                 result = ["SELECT"]
                 params = []
 
+                result += self.query.comments
+
                 if self.query.distinct:
                     distinct_result, distinct_params = self.connection.ops.distinct_sql(
                         distinct_fields,
@@ -1745,7 +1747,9 @@ class SQLInsertCompiler(SQLCompiler):
         insert_statement = self.connection.ops.insert_statement(
             on_conflict=self.query.on_conflict,
         )
-        result = ["%s %s" % (insert_statement, qn(opts.db_table))]
+        result = ["%s" % insert_statement]
+        result += self.query.comments
+        result += ["%s" % qn(opts.db_table)]
         fields = self.query.fields or [opts.pk]
         result.append("(%s)" % ", ".join(qn(f.column) for f in fields))
 
@@ -1891,7 +1895,13 @@ class SQLDeleteCompiler(SQLCompiler):
         )
 
     def _as_sql(self, query):
-        delete = "DELETE FROM %s" % self.quote_name_unless_alias(query.base_table)
+        result = [
+            "DELETE",
+            *self.query.comments,
+            "FROM",
+            self.quote_name_unless_alias(query.base_table),
+        ]
+        delete = " ".join(result)
         try:
             where, params = self.compile(query.where)
         except FullResultSet:
@@ -1975,9 +1985,10 @@ class SQLUpdateCompiler(SQLCompiler):
                 update_params.append(val)
             else:
                 values.append("%s = NULL" % qn(name))
-        table = self.query.base_table
         result = [
-            "UPDATE %s SET" % qn(table),
+            "UPDATE",
+            *self.query.comments,
+            "%s SET" % qn(self.query.base_table),
             ", ".join(values),
         ]
         try:

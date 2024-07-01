@@ -860,6 +860,7 @@ class ManagerTest(SimpleTestCase):
         "union",
         "intersection",
         "difference",
+        "comment",
         "aaggregate",
         "abulk_create",
         "abulk_update",

@@ -2030,6 +2030,40 @@ See the :doc:`/topics/db/sql` for more information.
   filtering. As such, it should generally be called from the ``Manager`` or
   from a fresh ``QuerySet`` instance.
 
+``comment()``
+~~~~~~~~~~~~~
+
+.. versionadded:: 5.2
+
+.. method:: comment(message)
+
+Adds an SQL comment to be inserted into the resultant SQL statement, after
+``SELECT``/``UPDATE``, and if applicable, ``DISTINCT``.. For example::
+
+    Entry.objects.comment("blog/views.py:50").all()
+
+… translates (roughly) into the following SQL:
+
+.. code-block:: sql
+
+    SELECT /* blog/views.py:50 */ blog_entry.* FROM blog_entry
+
+This is useful for adding logging information to the generated SQL for
+correlating problematic queries with the responsible Python code.
+
+Comments can be chained and will be added to the SQL statement as separate
+entries, for example::
+
+    Entry.objects.comment("blog/views.py:50").comment("python=3.12").update(
+        headline="This is new"
+    )
+
+… translates into
+
+.. code-block:: sql
+
+    UPDATE /* blog/views.py:50 */ /* python=3.12 */ blog_entry SET "headline" = 'This is new'
+
 Operators that return new ``QuerySet``\s
 ----------------------------------------
 
