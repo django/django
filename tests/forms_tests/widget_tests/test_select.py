@@ -102,6 +102,28 @@ class SelectTest(ChoiceWidgetTest):
             ),
         )
 
+    def test_constructor_option_attrs(self):
+        """
+        Select options shouldn't inherit the parent widget attrs.
+        """
+        widget = Select(
+            attrs={"class": "super", "id": "super"},
+            option_attrs={"data-test": "custom", "class": "other"},
+            choices=[(1, 1), (2, 2), (3, 3)],
+        )
+        self.check_html(
+            widget,
+            "num",
+            2,
+            html=(
+                """<select name="num" class="super" id="super">
+              <option value="1" data-test="custom" class="other">1</option>
+              <option value="2" data-test="custom" class="other" selected>2</option>
+              <option value="3" data-test="custom" class="other">3</option>
+            </select>"""
+            ),
+        )
+
     def test_compare_to_str(self):
         """
         The value is compared to its str().
@@ -303,6 +325,23 @@ class SelectTest(ChoiceWidgetTest):
         </select>
         """
         self.check_html(self.widget(choices=choices), "time", None, html=html)
+
+    def test_options_with_option_attrs(self):
+        options = list(
+            self.widget(choices=self.beatles, option_attrs={"class": "other"}).options(
+                "name",
+                ["J"],
+                attrs={"class": "super"},
+            )
+        )
+        self.assertEqual(len(options), 4)
+        for option, (i, (value, label)) in zip(options, enumerate(self.beatles)):
+            self.assertEqual(option["name"], "name")
+            self.assertEqual(option["value"], value)
+            self.assertEqual(option["label"], label)
+            self.assertEqual(option["index"], str(i))
+            self.assertEqual(option["attrs"]["class"], "other")
+            self.assertIs(option["selected"], value == "J")
 
     def _test_optgroups(self, choices):
         groups = list(
