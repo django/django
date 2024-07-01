@@ -568,6 +568,16 @@ class NonAggregateAnnotationTestCase(TestCase):
         self.assertEqual(book["other_rating"], 4)
         self.assertEqual(book["other_isbn"], "155860191")
 
+    def test_values_fields_annotations_order(self):
+        qs = Book.objects.annotate(other_rating=F("rating") - 1).values(
+            "other_rating", "rating"
+        )
+        book = qs.get(pk=self.b1.pk)
+        self.assertEqual(
+            list(book.items()),
+            [("other_rating", self.b1.rating - 1), ("rating", self.b1.rating)],
+        )
+
     def test_values_with_pk_annotation(self):
         # annotate references a field in values() with pk
         publishers = Publisher.objects.values("id", "book__rating").annotate(
