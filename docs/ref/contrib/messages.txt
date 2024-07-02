@@ -259,7 +259,7 @@ The ``Message`` class
       can be changed if you need by using the :setting:`MESSAGE_TAGS` setting.
 
     * ``extra_kwargs``: This variable accepts all further keyword arguments
-      to the Message class. The default behaviour is that this does nothing,
+      to the Message class. The default behavior is that this does nothing,
       but allows third-party storage classes to extend the behaviour of this
       class.
 
