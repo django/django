@@ -610,6 +610,8 @@ class UniqueConstraint(BaseConstraint):
                 if exclude and field_name in exclude:
                     return
                 field = model._meta.get_field(field_name)
+                if field.generated:
+                    return
                 lookup_value = getattr(instance, field.attname)
                 if (
                     self.nulls_distinct is not False

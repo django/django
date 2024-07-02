@@ -609,3 +609,87 @@ class GeneratedModelNullVirtual(models.Model):
 
     class Meta:
         required_db_features = {"supports_virtual_generated_columns"}
+
+
+class GeneratedModelUniqueConstraint(models.Model):
+    name = models.CharField(max_length=10)
+    lower_name = models.GeneratedField(
+        expression=Lower("name"),
+        output_field=models.CharField(max_length=10),
+        db_persist=True,
+    )
+
+    class Meta:
+        required_db_features = {"supports_stored_generated_columns"}
+        constraints = [
+            models.UniqueConstraint(Lower("name"), name="name_lower_uniq_generated"),
+            models.UniqueConstraint(fields=["name"], name="name_uniq_generated"),
+            models.UniqueConstraint(
+                fields=["lower_name"], name="lower_name_uniq_generated"
+            ),
+        ]
+
+
+class GeneratedModelUniqueConstraintVirtual(models.Model):
+    name = models.CharField(max_length=10)
+    lower_name = models.GeneratedField(
+        expression=Lower("name"),
+        output_field=models.CharField(max_length=10),
+        db_persist=False,
+    )
+
+    class Meta:
+        required_db_features = {"supports_virtual_generated_columns"}
+        constraints = [
+            models.UniqueConstraint(
+                Lower("name"), name="name_lower_uniq_generated_virtual"
+            ),
+            models.UniqueConstraint(
+                fields=["name"], name="name_uniq_generated_virtual"
+            ),
+            models.UniqueConstraint(
+                fields=["lower_name"], name="lower_name_uniq_generated_virtual"
+            ),
+        ]
+
+
+class GeneratedModelCheckConstraint(models.Model):
+    a = models.IntegerField()
+    b = models.IntegerField()
+    field = models.GeneratedField(
+        expression=F("a") + F("b"),
+        output_field=models.IntegerField(),
+        db_persist=True,
+    )
+
+    class Meta:
+        required_db_features = {
+            "supports_stored_generated_columns",
+            "supports_table_check_constraints",
+        }
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(a__gt=0), name="check_a_gt_0_generated"
+            )
+        ]
+
+
+class GeneratedModelCheckConstraintVirtual(models.Model):
+    a = models.IntegerField()
+    b = models.IntegerField()
+    field = models.GeneratedField(
+        expression=F("a") + F("b"),
+        output_field=models.IntegerField(),
+        db_persist=False,
+    )
+
+    class Meta:
+        required_db_features = {
+            "supports_virtual_generated_columns",
+            "supports_table_check_constraints",
+        }
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(a__gt=0), name="check_a_gt_0_generated_virtual"
+            )
+        ]

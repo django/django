@@ -18,6 +18,8 @@ from django.test.utils import isolate_apps
 from .models import (
     Foo,
     GeneratedModel,
+    GeneratedModelCheckConstraint,
+    GeneratedModelCheckConstraintVirtual,
     GeneratedModelFieldWithConverters,
     GeneratedModelNull,
     GeneratedModelNullVirtual,
@@ -25,6 +27,8 @@ from .models import (
     GeneratedModelOutputFieldDbCollationVirtual,
     GeneratedModelParams,
     GeneratedModelParamsVirtual,
+    GeneratedModelUniqueConstraint,
+    GeneratedModelUniqueConstraintVirtual,
     GeneratedModelVirtual,
 )
 
@@ -186,6 +190,23 @@ class GeneratedFieldTestMixin:
         m = self._refresh_if_needed(m)
         self.assertEqual(m.field, 3)
 
+    def test_full_clean_with_unique_constraint(self):
+        m = self.unique_constraint_model(name="ABC")
+        # full_clean() ignores GeneratedFields.
+        m.full_clean()
+        m.save()
+        m = self._refresh_if_needed(m)
+        self.assertEqual(m.lower_name, "abc")
+
+    @skipUnlessDBFeature("supports_table_check_constraints")
+    def test_full_clean_with_check_constraint(self):
+        m = self.check_constraint_model(a=1, b=2)
+        # full_clean() ignores GeneratedFields.
+        m.full_clean()
+        m.save()
+        m = self._refresh_if_needed(m)
+        self.assertEqual(m.field, 3)
+
     def test_create(self):
         m = self.base_model.objects.create(a=1, b=2)
         m = self._refresh_if_needed(m)
@@ -305,6 +326,8 @@ class GeneratedFieldTestMixin:
 class StoredGeneratedFieldTests(GeneratedFieldTestMixin, TestCase):
     base_model = GeneratedModel
     nullable_model = GeneratedModelNull
+    unique_constraint_model = GeneratedModelUniqueConstraint
+    check_constraint_model = GeneratedModelCheckConstraint
     output_field_db_collation_model = GeneratedModelOutputFieldDbCollation
     params_model = GeneratedModelParams
 
@@ -318,5 +341,7 @@ class StoredGeneratedFieldTests(GeneratedFieldTestMixin, TestCase):
 class VirtualGeneratedFieldTests(GeneratedFieldTestMixin, TestCase):
     base_model = GeneratedModelVirtual
     nullable_model = GeneratedModelNullVirtual
+    unique_constraint_model = GeneratedModelUniqueConstraintVirtual
+    check_constraint_model = GeneratedModelCheckConstraintVirtual
     output_field_db_collation_model = GeneratedModelOutputFieldDbCollationVirtual
     params_model = GeneratedModelParamsVirtual
