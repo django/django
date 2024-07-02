@@ -48,13 +48,13 @@ including database configuration, Django-specific options and
 application-specific settings.
 
 From the command line, ``cd`` into a directory where you'd like to store your
-code, then run the following command:
+code and make a new directory called ``djangotutorial``. Then run the following command:
 
 .. console::
 
-   $ django-admin startproject mysite
+   $ django-admin startproject mysite djangotutorial
 
-This will create a ``mysite`` directory in your current directory. If it didn't
+This will create your project in the ``djangotutorial`` directory. If it didn't
 work, see :ref:`troubleshooting-django-admin`.
 
 .. note::
@@ -68,7 +68,7 @@ Let's look at what :djadmin:`startproject` created:
 
 .. code-block:: text
 
-    mysite/
+    djangotutorial/
         manage.py
         mysite/
             __init__.py
@@ -79,14 +79,14 @@ Let's look at what :djadmin:`startproject` created:
 
 These files are:
 
-* The outer :file:`mysite/` root directory is a container for your project. Its
+* The outer :file:`djangotutorial/` root directory is a container for your project. Its
   name doesn't matter to Django; you can rename it to anything you like.
 
 * :file:`manage.py`: A command-line utility that lets you interact with this
   Django project in various ways. You can read all the details about
   :file:`manage.py` in :doc:`/ref/django-admin`.
 
-* The inner :file:`mysite/` directory is the actual Python package for your
+* The :file:`mysite/` directory is the actual Python package for your
   project. Its name is the Python package name you'll need to use to import
   anything inside it (e.g. ``mysite.urls``).
 
@@ -111,7 +111,7 @@ These files are:
 The development server
 ======================
 
-Let's verify your Django project works. Change into the outer :file:`mysite` directory, if
+Let's verify your Django project works. Change into the :file:`djangotutorial` directory, if
 you haven't already, and run the following commands:
 
 .. console::
@@ -180,9 +180,7 @@ rather than creating directories.
     multiple apps. An app can be in multiple projects.
 
 Your apps can live anywhere on your :ref:`Python path <tut-searchpath>`. In
-this tutorial, we'll create our poll app in the same directory as your
-:file:`manage.py` file so that it can be imported as its own top-level module,
-rather than a submodule of ``mysite``.
+this tutorial, we'll create our poll app in the ``djangotutorial`` directory.
 
 To create your app, make sure you're in the same directory as :file:`manage.py`
 and type this command:

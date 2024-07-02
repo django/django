@@ -305,7 +305,7 @@ powered by Django itself, and its interfaces use Django's own template system.
 Customizing your *project's* templates
 --------------------------------------
 
-Create a ``templates`` directory in your project directory (the one that
+Create a ``templates`` directory in your ``djangotutorial``directory (the one that
 contains ``manage.py``). Templates can live anywhere on your filesystem that
 Django can access. (Django runs as whatever user your server runs.) However,
 keeping your templates within the project is a good convention to follow.
