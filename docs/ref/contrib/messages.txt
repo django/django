@@ -260,7 +260,7 @@ The ``Message`` class
 
     * ``extra_kwargs``: This variable accepts all further keyword arguments
       to the Message class. The default behavior is that this does nothing,
-      but allows third-party storage classes to extend the behaviour of this
+      but allows third-party storage classes to extend the behavior of this
       class.
 
 Creating custom message levels
