@@ -8,6 +8,8 @@ from django.contrib.gis.gdal import (
     OGRGeomType,
     SpatialReference,
 )
+from django.contrib.gis.gdal.geometries import CircularString, CurvePolygon
+from django.contrib.gis.geos import GEOSException
 from django.template import Context
 from django.template.engine import Engine
 from django.test import SimpleTestCase
@@ -646,11 +648,11 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
             ("Multilinestring", 5, True),
             ("MultiPolygon", 6, True),
             ("GeometryCollection", 7, True),
-            ("CircularString", 8, False),
-            ("CompoundCurve", 9, False),
-            ("CurvePolygon", 10, False),
-            ("MultiCurve", 11, False),
-            ("MultiSurface", 12, False),
+            ("CircularString", 8, True),
+            ("CompoundCurve", 9, True),
+            ("CurvePolygon", 10, True),
+            ("MultiCurve", 11, True),
+            ("MultiSurface", 12, True),
             # 13 (Curve) and 14 (Surface) are abstract types.
             ("PolyhedralSurface", 15, False),
             ("TIN", 16, False),
@@ -664,11 +666,11 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
             ("Multilinestring Z", -2147483643, True),  # 1005
             ("MultiPolygon Z", -2147483642, True),  # 1006
             ("GeometryCollection Z", -2147483641, True),  # 1007
-            ("CircularString Z", 1008, False),
-            ("CompoundCurve Z", 1009, False),
-            ("CurvePolygon Z", 1010, False),
-            ("MultiCurve Z", 1011, False),
-            ("MultiSurface Z", 1012, False),
+            ("CircularString Z", 1008, True),
+            ("CompoundCurve Z", 1009, True),
+            ("CurvePolygon Z", 1010, True),
+            ("MultiCurve Z", 1011, True),
+            ("MultiSurface Z", 1012, True),
             ("PolyhedralSurface Z", 1015, False),
             ("TIN Z", 1016, False),
             ("Triangle Z", 1017, False),
@@ -679,11 +681,11 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
             ("MultiLineString M", 2005, True),
             ("MultiPolygon M", 2006, True),
             ("GeometryCollection M", 2007, True),
-            ("CircularString M", 2008, False),
-            ("CompoundCurve M", 2009, False),
-            ("CurvePolygon M", 2010, False),
-            ("MultiCurve M", 2011, False),
-            ("MultiSurface M", 2012, False),
+            ("CircularString M", 2008, True),
+            ("CompoundCurve M", 2009, True),
+            ("CurvePolygon M", 2010, True),
+            ("MultiCurve M", 2011, True),
+            ("MultiSurface M", 2012, True),
             ("PolyhedralSurface M", 2015, False),
             ("TIN M", 2016, False),
             ("Triangle M", 2017, False),
@@ -694,11 +696,11 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
             ("MultiLineString ZM", 3005, True),
             ("MultiPolygon ZM", 3006, True),
             ("GeometryCollection ZM", 3007, True),
-            ("CircularString ZM", 3008, False),
-            ("CompoundCurve ZM", 3009, False),
-            ("CurvePolygon ZM", 3010, False),
-            ("MultiCurve ZM", 3011, False),
-            ("MultiSurface ZM", 3012, False),
+            ("CircularString ZM", 3008, True),
+            ("CompoundCurve ZM", 3009, True),
+            ("CurvePolygon ZM", 3010, True),
+            ("MultiCurve ZM", 3011, True),
+            ("MultiSurface ZM", 3012, True),
             ("PolyhedralSurface ZM", 3015, False),
             ("TIN ZM", 3016, False),
             ("Triangle ZM", 3017, False),
@@ -966,6 +968,101 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
             with self.subTest(geom_input=geom_input):
                 geom = OGRGeometry(geom_input)
                 self.assertIs(geom.is_measured, True)
+
+    def test_has_curve(self):
+        for geom in self.geometries.curved_geoms:
+            with self.subTest(wkt=geom.wkt):
+                geom = OGRGeometry(geom.wkt)
+                self.assertIs(geom.has_curve, True)
+                msg = f"GEOS does not support {geom.__class__.__qualname__}."
+                with self.assertRaisesMessage(GEOSException, msg):
+                    geom.geos
+        geom = OGRGeometry("POINT (0 1)")
+        self.assertIs(geom.has_curve, False)
+
+    def test_get_linear_geometry(self):
+        geom = OGRGeometry("CIRCULARSTRING (-0.797 0.466,-0.481 0.62,-0.419 0.473)")
+        linear = geom.get_linear_geometry()
+        self.assertEqual(linear.geom_name, "LINESTRING")
+        self.assertIs(linear.has_curve, False)
+
+    def test_get_linear_geometry_no_conversion_possible(self):
+        wkt = "POINT (0 0)"
+        geom = OGRGeometry(wkt)
+        geom2 = geom.get_linear_geometry()
+        self.assertEqual(geom2.wkt, wkt)
+
+    def test_get_curve_geometry(self):
+        linear_string = OGRGeometry(
+            "LINESTRING (-0.797 0.466,-0.797500910583869 0.479079607685707,"
+            "-0.797096828208069 0.49216256476959,-0.795789684575482 0.505186328593822,"
+            "-0.793585728444384 0.518088639471983,-0.79049549575663 0.530807818319715,"
+            "-0.786533759270668 0.543283061509385,-0.781719457941079 0.555454731539925,"
+            "-0.776075606381369 0.567264642132187,-0.769629184843353 0.578656336386302,"
+            "-0.76241101023902 0.589575356672327,-0.754455588821145 0.599969504963013,"
+            "-0.745800951227352 0.609789092364991,-0.736488470675795 0.618987176654798,"
+            "-0.726562665181888 0.627519786684672,-0.716070984741265 0.635346132585369,"
+            "-0.705063584496685 0.642428800760598,-0.693593084972889 0.648733932741749,"
+            "-0.681714320525941 0.654231387047048,-0.669484077209319 0.658894883272069,"
+            "-0.656960821309923 0.662702127722269,-0.644204419852031 0.665634919987354,"
+            "-0.631275854404748 0.667679239947688,-0.618236929561618 0.668825314797118,"
+            "-0.60514997748578 0.669067665761503,-0.592077559933017 0.66840513428977,"
+            "-0.579082169177269 0.666840887592428,-0.566225929268313 0.664382403500809,"
+            "-0.553570299049824 0.661041434719465,-0.541175778357228 0.656833952642756,"
+            "-0.529101618800212 0.651780071004197,-0.5174055405123 0.645903949723276,"
+            "-0.506143456221622 0.639233679409784,-0.495369203961872 0.631801147077652,"
+            "-0.485134289701335 0.623641883709865,-0.475487641120239 0.614794894404014,"
+            "-0.46647537371355 0.605302471909454,-0.458140570337321 0.595209994448282,"
+            "-0.450523075252448 0.58456570878613,-0.443659303650563 0.573420499590156,"
+            "-0.437582067572208 0.561827646176397,-0.432320419050072 0.549842567809747,"
+            "-0.427899511226613 0.537522558773986,-0.424340478110267 0.524926514478182,"
+            "-0.421660333544978 0.512114649909193,-0.419871889876113 0.499148211775737,"
+            "-0.418983696701434 0.486089185720561,-0.419 0.473)"
+        )
+        curve = linear_string.get_curve_geometry()
+        self.assertEqual(curve.geom_name, "CIRCULARSTRING")
+        self.assertEqual(
+            curve.wkt,
+            "CIRCULARSTRING (-0.797 0.466,-0.618236929561618 "
+            "0.668825314797118,-0.419 0.473)",
+        )
+
+    def test_get_curve_geometry_no_conversion_possible(self):
+        geom = OGRGeometry("LINESTRING (0 0, 1 0, 2 0)")
+        geom2 = geom.get_curve_geometry()
+        self.assertEqual(geom2.wkt, geom.wkt)
+
+    def test_curved_geometries(self):
+        for geom in self.geometries.curved_geoms:
+            with self.subTest(wkt=geom.wkt, geom_name=geom.name):
+                g = OGRGeometry(geom.wkt)
+                self.assertEqual(geom.name, g.geom_type.name)
+                self.assertEqual(geom.num, g.geom_type.num)
+                msg = f"GEOS does not support {g.__class__.__qualname__}."
+                with self.assertRaisesMessage(GEOSException, msg):
+                    g.geos
+
+    def test_circularstring_has_linestring_features(self):
+        geom = OGRGeometry("CIRCULARSTRING ZM (1 5 0 1, 6 2 0 2, 7 3 0 3)")
+        self.assertIsInstance(geom, CircularString)
+        self.assertEqual(geom.x, [1, 6, 7])
+        self.assertEqual(geom.y, [5, 2, 3])
+        self.assertEqual(geom.z, [0, 0, 0])
+        self.assertEqual(geom.m, [1, 2, 3])
+        self.assertEqual(
+            geom.tuple,
+            ((1.0, 5.0, 0.0, 1.0), (6.0, 2.0, 0.0, 2.0), (7.0, 3.0, 0.0, 3.0)),
+        )
+        self.assertEqual(geom[0], (1, 5, 0, 1))
+        self.assertEqual(len(geom), 3)
+
+    def test_curvepolygon_has_polygon_features(self):
+        geom = OGRGeometry(
+            "CURVEPOLYGON ZM (CIRCULARSTRING ZM (0 0 0 0, 4 0 0 0, 4 4 0 0, 0 4 0 0, "
+            "0 0 0 0), (1 1 0 0, 3 3 0 0, 3 1 0 0, 1 1 0 0))"
+        )
+        self.assertIsInstance(geom, CurvePolygon)
+        self.assertIsInstance(geom.shell, CircularString)
 
 
 class DeprecationTests(SimpleTestCase):
