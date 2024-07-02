@@ -37,6 +37,10 @@
     div.context { padding:10px 0; overflow:hidden; }
     div.context ol { padding-left:30px; margin:0 10px; list-style-position: inside; }
     div.context ol li { font-family:monospace; white-space:pre; color:#777; cursor:pointer; padding-left: 2px; }
+    div.context ol li:hover::after{content: "Click to Expand"; position: absolute; background: white; color: black; padding: 5px; border: 1px solid #000; border-radius: 5px; }
+    div.context ol.active li:hover::after{ content: "Click to Collapse"; }
+    div.context button.toggle-button { position: absolute; font-size: 25px; margin-left: 15px; }
+    div.context button.toggle-button:hover { background-color: #FFFFCC; padding-left: 5px; padding-right: 5px; transition: 0.1s; border-radius: 5px; }
     div.context ol li pre { display:inline; }
     div.context ol.context-line li { color:#464646; background-color:#dfdfdf; padding: 3px 2px; }
     div.context ol.context-line li span { position:absolute; right:32px; }
@@ -82,8 +86,13 @@
     function toggle() {
       for (var i = 0; i < arguments.length; i++) {
         var e = document.getElementById(arguments[i]);
-        if (e) {
-          e.style.display = e.style.display == 'none' ? 'block': 'none';
+        if (e && i < arguments.length - 2) {
+          e.style.display = e.style.display == "none" ? "block" : "none";
+          e.classList.toggle("active");
+        } else if (i == arguments.length - 2) {
+          e.classList.toggle("active");
+        } else if (i == arguments.length - 1) {
+          e.textContent = e.textContent.trim() == "-" ? "+" : "-";
         }
       }
       return false;
@@ -241,17 +250,18 @@
               {% if frame.pre_context and not is_email %}
                 <ol start="{{ frame.pre_context_lineno }}" class="pre-context" id="pre{{ frame.id }}">
                 {% for line in frame.pre_context %}
-                  <li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')"><pre>{{ line }}</pre></li>
+                  <li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}', 'line{{ frame.id }}', 'button{{ frame.id }}')"><pre>{{ line }}</pre></li>
                 {% endfor %}
                 </ol>
               {% endif %}
-              <ol start="{{ frame.lineno }}" class="context-line">
-                <li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')"><pre>{{ frame.context_line }}{{ frame.colno }}</pre>{% if not is_email %} <span>…</span>{% endif %}</li>
+              <button class="toggle-button" id="button{{ frame.id }}" onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}', 'line{{ frame.id }}', 'button{{ frame.id }}')">+</button>
+              <ol start="{{ frame.lineno }}" class="context-line" id="line{{ frame.id }}">
+                <li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}', 'line{{ frame.id }}', 'button{{ frame.id }}')"><pre>{{ frame.context_line }}{{ frame.colno }}</pre>{% if not is_email %}{% endif %}</li>
               </ol>
               {% if frame.post_context and not is_email  %}
                 <ol start='{{ frame.lineno|add:"1" }}' class="post-context" id="post{{ frame.id }}">
                   {% for line in frame.post_context %}
-                  <li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')"><pre>{{ line }}</pre></li>
+                  <li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}', 'line{{ frame.id }}', 'button{{ frame.id }}')"><pre>{{ line }}</pre></li>
                   {% endfor %}
               </ol>
               {% endif %}
