@@ -2,6 +2,7 @@ import json
 from functools import lru_cache, partial
 
 from django.conf import settings
+from django.contrib.postgres.fields.serial import SerialFieldMixin
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.backends.postgresql.psycopg_any import (
     Inet,
@@ -43,6 +44,15 @@ class DatabaseOperations(BaseDatabaseOperations):
         "AutoField": "integer",
         "BigAutoField": "bigint",
         "SmallAutoField": "smallint",
+        "SerialField": "integer",
+        "BigSerialField": "bigint",
+        "SmallSerialField": "smallint",
+    }
+    integer_field_ranges = {
+        **BaseDatabaseOperations.integer_field_ranges,
+        "SmallSerialField": (-32768, 32767),
+        "SerialField": (-2147483648, 2147483647),
+        "BigSerialField": (-9223372036854775808, 9223372036854775807),
     }
 
     if is_psycopg3:
@@ -55,6 +65,9 @@ class DatabaseOperations(BaseDatabaseOperations):
             "PositiveSmallIntegerField": numeric.Int2,
             "PositiveIntegerField": numeric.Int4,
             "PositiveBigIntegerField": numeric.Int8,
+            "SmallSerialField": numeric.Int2,
+            "SerialField": numeric.Int4,
+            "BigSerialField": numeric.Int8,
         }
 
     def unification_cast_sql(self, output_field):
@@ -250,7 +263,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             # underlying sequence name from the table name and column name.
 
             for f in model._meta.local_fields:
-                if isinstance(f, models.AutoField):
+                if isinstance(f, (models.AutoField, SerialFieldMixin)):
                     output.append(
                         "%s setval(pg_get_serial_sequence('%s','%s'), "
                         "coalesce(max(%s), 1), max(%s) %s null) %s %s;"
@@ -265,9 +278,6 @@ class DatabaseOperations(BaseDatabaseOperations):
                             style.SQL_TABLE(qn(model._meta.db_table)),
                         )
                     )
-                    # Only one AutoField is allowed per model, so don't bother
-                    # continuing.
-                    break
         return output
 
     def prep_for_iexact_query(self, x):

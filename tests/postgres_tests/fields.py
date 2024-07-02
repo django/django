@@ -11,11 +11,14 @@ try:
     from django.contrib.postgres.fields import (
         ArrayField,
         BigIntegerRangeField,
+        BigSerialField,
         DateRangeField,
         DateTimeRangeField,
         DecimalRangeField,
         HStoreField,
         IntegerRangeField,
+        SerialField,
+        SmallSerialField,
     )
     from django.contrib.postgres.search import SearchVector, SearchVectorField
 except ImportError:
@@ -45,6 +48,7 @@ except ImportError:
 
     ArrayField = DummyArrayField
     BigIntegerRangeField = models.Field
+    BigSerialField = models.Field
     DateRangeField = models.Field
     DateTimeRangeField = DummyContinuousRangeField
     DecimalRangeField = DummyContinuousRangeField
@@ -52,6 +56,8 @@ except ImportError:
     IntegerRangeField = models.Field
     SearchVector = models.Expression
     SearchVectorField = models.Field
+    SerialField = models.Field
+    SmallSerialField = models.Field
 
 
 class EnumField(models.CharField):
