@@ -397,11 +397,27 @@ Django's email library, you can do this using the
 
 .. class:: EmailMultiAlternatives
 
-    A subclass of :class:`~django.core.mail.EmailMessage` that allows
-    additional versions of the message body in the email via the
-    ``attach_alternative()`` method. This directly inherits all methods
-    (including the class initialization) from
-    :class:`~django.core.mail.EmailMessage`.
+    A subclass of :class:`EmailMessage` that allows additional versions of the
+    message body in the email via the :meth:`attach_alternative` method. This
+    directly inherits all methods (including the class initialization) from
+    :class:`EmailMessage`.
+
+    .. attribute:: alternatives
+
+        A list of named tuples with attributes ``(content, mimetype)``. This is
+        particularly useful in tests::
+
+            self.assertEqual(len(msg.alternatives), 1)
+            self.assertEqual(msg.alternatives[0].content, html_content)
+            self.assertEqual(msg.alternatives[0].mimetype, "text/html")
+
+        Alternatives should only be added using the :meth:`attach_alternative`
+        method.
+
+        .. versionchanged:: 5.2
+
+            In older versions, ``alternatives`` was a list of regular tuples,
+            as opposed to named tuples.
 
     .. method:: attach_alternative(content, mimetype)
 
@@ -420,23 +436,25 @@ Django's email library, you can do this using the
             msg.attach_alternative(html_content, "text/html")
             msg.send()
 
-    .. attribute:: alternatives
+    .. method:: body_contains(text)
 
-        A list of named tuples with attributes ``(content, mimetype)``. This is
-        particularly useful in tests::
+        .. versionadded:: 5.2
 
-            self.assertEqual(len(msg.alternatives), 1)
-            self.assertEqual(msg.alternatives[0].content, html_content)
-            self.assertEqual(msg.alternatives[0].mimetype, "text/html")
+        Returns a boolean indicating whether the provided ``text`` is
+        contained in the email ``body`` and in all attached MIME type
+        ``text/*`` alternatives.
 
-        Alternatives should only be added using the
-        :meth:`~django.core.mail.EmailMultiAlternatives.attach_alternative`
-        method.
+        This can be useful when testing emails. For example::
 
-        .. versionchanged:: 5.2
+            def test_contains_email_content(self):
+                subject = "Hello World"
+                from_email = "from@example.com"
+                to = "to@example.com"
+                msg = EmailMultiAlternatives(subject, "I am content.", from_email, [to])
+                msg.attach_alternative("<p>I am content.</p>", "text/html")
 
-            In older versions, ``alternatives`` was a list of regular tuples, as opposed
-            to named tuples.
+                self.assertIs(msg.body_contains("I am content"), True)
+                self.assertIs(msg.body_contains("<p>I am content.</p>"), False)
 
 Updating the default content type
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
