@@ -241,6 +241,40 @@ That gives you more flexibility, but it's also more complex.
 It's a good idea to exploit the :class:`~django.contrib.sites.models.Site`
 objects as much as possible, to remove unneeded complexity and redundancy.
 
+Using ``site`` in templates
+---------------------------
+.. versionadded:: 5.2
+
+The current ``Site`` object is made available in the
+:doc:`template context</ref/templates/api>` when you use
+:class:`~django.template.RequestContext` and when your :setting:`TEMPLATES` setting
+contains ``'django.contrib.sites.context_processors.site'``.
+
+Note that an even more flexible (but more heavyweight) way of sending
+email notifications would be to use Django's template system. Assuming Lawrence.com and LJWorld.com
+have different template directories (:setting:`TEMPLATES`), you could 
+simply farm out to the template system like so::
+
+    from django.core.mail import send_mail
+    from django.template import loader, RequestContext
+
+
+    def register_for_newsletter(request):
+        # Check form values, etc., and subscribe the user.
+        # ...
+
+        subject_template = loader.get_template("alerts/subject.txt")
+        subject = subject_template.render(RequestContext(request, {}))
+        message_template = loader.get_template("alerts/message.txt")
+        message = message_template.render(RequestContext(request, {}))
+        send_mail(subject, message, "editor@ljworld.com", [user.email])
+
+        # ...
+
+In this case, you'd have to create :file:`subject.txt` and :file:`message.txt`
+template files that include ``{{ site.name }}`` and ``{{ site.domain }}``.
+That gives you more flexibility, but it's also more complex.
+
 Getting the current domain for full URLs
 ----------------------------------------
 
