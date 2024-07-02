@@ -36,7 +36,7 @@ Triage workflow
 Unfortunately, not all bug reports and feature requests in the ticket tracker
 provide all the :doc:`required details<bugs-and-features>`. A number of
 tickets have patches, but those patches don't meet all the requirements of a
-:ref:`good patch<patch-style>`.
+:ref:`good contribution<contribution-style>`.
 
 One way to help out is to *triage* tickets that have been created by other
 users.
