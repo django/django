@@ -11,7 +11,30 @@ Django provides convenient ways to access the default storage class:
 
 .. data:: storages
 
-    Storage instances as defined by :setting:`STORAGES`.
+    Mapping of aliases to storage instances as defined by :setting:`STORAGES`.
+
+    ``storages`` has a dictionary attribute ``backends``, which at startup is
+    the raw value provided to :setting:`STORAGES`.
+
+    Third-party packages providing storages may allow users to optionally
+    customize a storage for a known alias, using ``backends`` to provide a
+    default::
+
+        def get_storage(alias):
+            try:
+                # Did the user provide the alias?
+                return storages[alias]
+            except InvalidStorageError:
+                # Update storages to provide a default.
+                storages.backends[alias] = {"BACKEND": "package.default.StorageClass"}
+                return storages[alias]
+
+    Additionally ``storages`` provides a ``create_storage()`` method, accepting
+    the dictionary used in :setting:`STORAGES` for the backend, that will
+    return a storage instance. This may be useful for third-party packages
+    needing to instantiate storages in tests::
+
+        storage_instance = storages.create_storage({"BACKEND": "package.default.StorageClass"})
 
 .. class:: DefaultStorage
 
