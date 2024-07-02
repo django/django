@@ -118,7 +118,9 @@
     }
 
     function dismissAddRelatedObjectPopup(win, newId, newRepr) {
-        const name = removePopupIndex(win.name);
+        const urlParams = new URLSearchParams(win.location.search);
+        const tackOn = urlParams.get('_name_alteration') || '';
+        const name = removePopupIndex(win.name) + tackOn;
         const elem = document.getElementById(name);
         if (elem) {
             const elemName = elem.nodeName.toUpperCase();

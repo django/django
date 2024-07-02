@@ -77,8 +77,11 @@ class SeleniumTests(AdminSeleniumTestCase):
                 link = self.selenium.find_element(By.XPATH, f'//*[@id="{link_id}"]')
                 self.assertIsNone(link.get_attribute("aria-disabled"))
 
-    def test_related_object_update_with_camel_casing(self):
+    def test_related_object_add_js_actions(self):
         from selenium.webdriver.common.by import By
+
+        def _get_HTML_inside_element_by_id(id_):
+            return self.selenium.find_element(By.ID, id_).get_attribute("innerHTML")
 
         add_url = reverse("admin:admin_views_camelcaserelatedmodel_add")
         self.selenium.get(self.live_server_url + add_url)
@@ -118,5 +121,33 @@ class SeleniumTests(AdminSeleniumTestCase):
             m2m_box.get_attribute("innerHTML"),
             f"""
             <option value="1">{interesting_name}</option>
+            """,
+        )
+
+        # Test adding new related entry using + from M2M updates related lists.
+        new_interesting_name = "Bergeron"
+        self.selenium.find_element(By.ID, "add_id_m2m").click()
+        self.wait_for_and_switch_to_popup()
+        self.selenium.find_element(By.ID, "id_interesting_name").send_keys(
+            new_interesting_name
+        )
+        self.selenium.find_element(By.NAME, "_save").click()
+        self.wait_until(lambda d: len(d.window_handles) == 1, 1)
+        self.selenium.switch_to.window(self.selenium.window_handles[0])
+
+        self.assertHTMLEqual(
+            _get_HTML_inside_element_by_id("id_m2m_from"),
+            f"""
+            <option value="1">{interesting_name}</option>
+            <option selected value="2">{new_interesting_name}</option>
+            """,
+        )
+
+        self.assertHTMLEqual(
+            _get_HTML_inside_element_by_id("id_fk"),
+            f"""
+            <option value="" selected>---------</option>
+            <option value="1" selected>{interesting_name}</option>
+            <option value="2">{new_interesting_name}</option>
             """,
         )

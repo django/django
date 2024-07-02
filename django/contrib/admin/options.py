@@ -74,6 +74,7 @@ from django.views.generic import RedirectView
 IS_POPUP_VAR = "_popup"
 TO_FIELD_VAR = "_to_field"
 IS_FACETS_VAR = "_facets"
+NAME_ALTERATION = "_name_alteration"
 
 
 class ShowFacets(enum.Enum):

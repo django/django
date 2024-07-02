@@ -313,18 +313,19 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         )
 
     def get_context(self, name, value, attrs):
-        from django.contrib.admin.views.main import IS_POPUP_VAR, TO_FIELD_VAR
+        from django.contrib.admin.options import (
+            IS_POPUP_VAR,
+            NAME_ALTERATION,
+            TO_FIELD_VAR,
+        )
 
         rel_opts = self.rel.model._meta
         info = (rel_opts.app_label, rel_opts.model_name)
         related_field_name = self.rel.get_related_field().name
-        url_params = "&".join(
-            "%s=%s" % param
-            for param in [
-                (TO_FIELD_VAR, related_field_name),
-                (IS_POPUP_VAR, 1),
-            ]
-        )
+        param_list = [(TO_FIELD_VAR, related_field_name), (IS_POPUP_VAR, 1)]
+        if isinstance(self.widget, FilteredSelectMultiple):
+            param_list.append((NAME_ALTERATION, "_from"))
+        url_params = "&".join("%s=%s" % param for param in param_list)
         context = {
             "rendered_widget": self.widget.render(name, value, attrs),
             "is_hidden": self.is_hidden,
