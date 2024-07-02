@@ -653,6 +653,8 @@ class Field(RegisterLookupMixin):
             path = path.replace("django.db.models.fields.json", "django.db.models")
         elif path.startswith("django.db.models.fields.proxy"):
             path = path.replace("django.db.models.fields.proxy", "django.db.models")
+        elif path.startswith("django.db.models.fields.composite"):
+            path = path.replace("django.db.models.fields.composite", "django.db.models")
         elif path.startswith("django.db.models.fields"):
             path = path.replace("django.db.models.fields", "django.db.models")
         # Return basic info - other fields should override this.
@@ -1152,6 +1154,10 @@ class Field(RegisterLookupMixin):
     def slice_expression(self, expression, start, length):
         """Return a slice of this field."""
         raise NotSupportedError("This field does not support slicing.")
+
+    @classmethod
+    def is_set(cls, value):
+        return value is not None
 
 
 class BooleanField(Field):
