@@ -41,8 +41,9 @@ If you're not using the default project template, here are the requirements:
    <TEMPLATES-OPTIONS>`.
 
 #. If you've customized the :setting:`MIDDLEWARE` setting,
-   :class:`django.contrib.auth.middleware.AuthenticationMiddleware` and
-   :class:`django.contrib.messages.middleware.MessageMiddleware` must be
+   :class:`django.contrib.auth.middleware.AuthenticationMiddleware`,
+   :class:`django.contrib.messages.middleware.MessageMiddleware`, and
+   :class:`django.contrib.sessions.middleware.SessionMiddleware` must be
    included.
 
 #. :ref:`Hook the admin's URLs into your URLconf
