@@ -1,0 +1,73 @@
+============================================= 
+How to customize the ``shell`` command 
+=============================================
+
+Django provides functionality to auto-import project models in the shell. In
+your project, you might want to either avoid importing models or include
+additional imports in the shell. You can do this by subclassing the
+:djadmin:`shell` command and overriding a method. To set up the directory of
+your project you can follow this :doc:`guide
+</howto/custom-management-commands>` on how to override an existing command. 
+
+Customizing the shell
+=====================
+
+To override the current shell's functionality, you have to override the
+``shell.Command.get_namespace`` in order to return a namespace that maps every
+name to the object imported. For example, if you want to import ``resolve`` and
+``reverse`` methods in you shell, you can edit
+``polls/management/commands/shell.py`` to look like this::
+
+    from django.core.management.commands import shell
+
+
+    class Command(shell.Command):
+        def get_namespace(self):
+            from django.urls.base import resolve, reverse
+
+            return {
+                **super().get_namespace(),
+                "resolve": resolve,
+                "reverse": reverse,
+            }
+
+This way, your customized shell will import models from your apps along with the
+``resolve`` and ``reverse`` methods, allowing you to use them without needing
+additional imports.
+
+.. note::
+
+    If you prefer your shell without any auto-imported model, you can omit
+    calling the ``**super().get_namespace()`` method when returning the
+    namespace, as it can be empty.
+
+
+Implement your own python shell runner
+======================================
+
+By default, Django will use ``IPython`` or ``bpython`` as the shell runner if
+they are installed. To implement your own shell runner, you need to subclass the
+``shell.Command`` class and add a new method where you define your shell runner.
+Then, you must include the name of this new method in the ``shells`` attribute,
+like this::
+
+
+    from django.core.management.commands import shell
+
+
+    class Command(shell.Command):
+        ...
+
+        shell.Command.shells.append("ptpython")
+
+        ...
+
+        def ptpython(self, options):
+            from ptpython.repl import embed
+
+            imported_objects = self.get_and_report_namespace(options["verbosity"])
+            ...
+
+            embed(globals=imported_objects)
+
+

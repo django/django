@@ -1049,7 +1049,14 @@ Mails the email addresses specified in :setting:`ADMINS` using
 
 .. django-admin:: shell
 
-Starts the Python interactive interpreter.
+Starts the Python interactive interpreter. 
+
+    .. versionchanged:: 5.1
+
+        Auto-importing models feature was added.
+
+You can customize which imports you want or add a new shell runner by following
+the :doc:`custom-shell</howto/custom-shell>` guide.
 
 .. django-admin-option:: --interface {ipython,bpython,python}, -i {ipython,bpython,python}
 

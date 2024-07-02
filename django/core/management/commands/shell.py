@@ -3,6 +3,7 @@ import select
 import sys
 import traceback
 
+from django.apps import apps
 from django.core.management import BaseCommand, CommandError
 from django.utils.datastructures import OrderedSet
 
@@ -47,18 +48,21 @@ class Command(BaseCommand):
     def ipython(self, options):
         from IPython import start_ipython
 
-        start_ipython(argv=[])
+        start_ipython(
+            argv=[],
+            user_ns=self.get_and_report_namespace(options["verbosity"]),
+        )
 
     def bpython(self, options):
         import bpython
 
-        bpython.embed()
+        bpython.embed(self.get_and_report_namespace(options["verbosity"]))
 
     def python(self, options):
         import code
 
         # Set up a dictionary to serve as the environment for the shell.
-        imported_objects = {}
+        imported_objects = self.get_and_report_namespace(options["verbosity"])
 
         # We want to honor both $PYTHONSTARTUP and .pythonrc.py, so follow system
         # conventions and get $PYTHONSTARTUP first then .pythonrc.py.
@@ -111,10 +115,35 @@ class Command(BaseCommand):
         # Start the interactive interpreter.
         code.interact(local=imported_objects)
 
+    def get_and_report_namespace(self, verbosity):
+        namespace = self.get_namespace()
+
+        if verbosity >= 1:
+            self.stdout.write(
+                f"{len(namespace)} objects imported automatically",
+                self.style.SUCCESS,
+            )
+
+        return namespace
+
+    def get_namespace(self):
+        apps_models = apps.get_models()
+        apps_models_modules = [
+            (app.models_module, app.label) for app in apps.get_app_configs()
+        ]
+        namespace = {}
+        for model in reversed(apps_models):
+            if model.__module__:
+                namespace[model.__name__] = model
+        for app in apps_models_modules:
+            app_models_module, app_label = app
+            namespace[f"{app_label}_models"] = app_models_module
+        return namespace
+
     def handle(self, **options):
         # Execute the command and exit.
         if options["command"]:
-            exec(options["command"], globals())
+            exec(options["command"], {**self.get_namespace()})
             return
 
         # Execute stdin if it has anything to read and exit.
@@ -124,7 +153,7 @@ class Command(BaseCommand):
             and not sys.stdin.isatty()
             and select.select([sys.stdin], [], [], 0)[0]
         ):
-            exec(sys.stdin.read(), globals())
+            exec(sys.stdin.read(), {**self.get_namespace()})
             return
 
         available_shells = (
