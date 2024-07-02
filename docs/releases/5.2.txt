@@ -197,6 +197,7 @@ Models
 
 * ...
 
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -269,7 +270,11 @@ PostgreSQL 14 and higher.
 Miscellaneous
 -------------
 
-* ...
+* :attr:`~django.db.models.UniqueConstraint.violation_error_code` and 
+  :attr:`~django.db.models.UniqueConstraint.violation_error_message` will now show the custom
+  code and message if set, also for :class:`~django.db.models.UniqueConstraint`\s with
+  :attr:`~django.db.models.UniqueConstraint.fields` and without a.fields` and without a
+  :attr:`~django.db.models.UniqueConstraint.condition`
 
 .. _deprecated-features-5.2:
 
