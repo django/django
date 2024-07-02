@@ -159,6 +159,28 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             email.recipients(), ["to@example.com", "cc@example.com", "bcc@example.com"]
         )
 
+    def test_headers_not_repeated(self):
+        tests = ["To", "Cc", "Reply_To"]
+        for header in tests:
+            with self.subTest(header=header):
+                header_attr = header.lower()
+                header = header.replace("_", "-")
+                email = EmailMessage(
+                    "Subject",
+                    "Content",
+                    from_email="bounce@example.com",
+                    **{
+                        header_attr: ["test@example.com"],
+                        "headers": {header: "precedence@example.com"},
+                    },
+                )
+                message = email.message()
+                self.assertEqual(
+                    message.get_all(header),
+                    ["precedence@example.com"],
+                )
+                self.assertEqual(getattr(email, header_attr), ["test@example.com"])
+
     def test_cc(self):
         """Regression test for #7722"""
         email = EmailMessage(

@@ -254,6 +254,11 @@ class EmailMessage:
                 else:
                     self.attach(*attachment)
         self.extra_headers = headers or {}
+        self.headers_with_one_occurrence = {
+            "To": self.to,
+            "Reply-To": self.reply_to,
+            "Cc": self.cc,
+        }
         self.connection = connection
 
     def get_connection(self, fail_silently=False):
@@ -269,9 +274,6 @@ class EmailMessage:
         msg = self._create_message(msg)
         msg["Subject"] = self.subject
         msg["From"] = self.extra_headers.get("From", self.from_email)
-        self._set_list_header_if_not_empty(msg, "To", self.to)
-        self._set_list_header_if_not_empty(msg, "Cc", self.cc)
-        self._set_list_header_if_not_empty(msg, "Reply-To", self.reply_to)
 
         # Email header names are case-insensitive (RFC 2045), so we have to
         # accommodate that when doing comparisons.
@@ -288,6 +290,10 @@ class EmailMessage:
         for name, value in self.extra_headers.items():
             if name.lower() != "from":  # From is already handled
                 msg[name] = value
+        for header, value_header in self.headers_with_one_occurrence.items():
+            # extra_headers takes precedence over to/cc/reply_to parameters.
+            if msg.get(header) is None and value_header:
+                msg[header] = ", ".join(str(v) for v in value_header)
         return msg
 
     def recipients(self):
@@ -423,18 +429,6 @@ class EmailMessage:
                 "Content-Disposition", "attachment", filename=filename
             )
         return attachment
-
-    def _set_list_header_if_not_empty(self, msg, header, values):
-        """
-        Set msg's header, either from self.extra_headers, if present, or from
-        the values argument.
-        """
-        if values:
-            try:
-                value = self.extra_headers[header]
-            except KeyError:
-                value = ", ".join(str(v) for v in values)
-            msg[header] = value
 
 
 class EmailMultiAlternatives(EmailMessage):
