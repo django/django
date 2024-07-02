@@ -2,7 +2,15 @@ import math
 from decimal import Decimal
 
 from django.core.exceptions import FieldDoesNotExist
-from django.db import IntegrityError, connection, migrations, models, transaction
+from django.db import (
+    IntegrityError,
+    InternalError,
+    OperationalError,
+    connection,
+    migrations,
+    models,
+    transaction,
+)
 from django.db.migrations.migration import Migration
 from django.db.migrations.operations.base import Operation
 from django.db.migrations.operations.fields import FieldOperation
@@ -2067,6 +2075,52 @@ class OperationTests(OperationTestBase):
         self.assertEqual(definition[0], "RemoveField")
         self.assertEqual(definition[1], [])
         self.assertEqual(definition[2], {"model_name": "Pony", "name": "pink"})
+
+    def test_remove_field_blocked(self):
+        """
+        Tests migration is blocked by dependent objects.
+        """
+        project_state = self.set_up_test_model("test_rmflb")
+        new_state = project_state.clone()
+
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "CREATE VIEW test_rmflb_pony_view AS SELECT pink FROM test_rmflb_pony"
+            )
+            cursor.execute("SELECT * FROM test_rmflb_pony_view")
+
+        operation = migrations.RemoveField("Pony", "pink")
+        operation.state_forwards("test_rmflb", new_state)
+        self.assertColumnExists("test_rmflb_pony", "pink")
+
+        def drop_column():
+            with connection.schema_editor() as editor:
+                operation.database_forwards(
+                    "test_rmflb", editor, project_state, new_state
+                )
+
+        vendor2error = {
+            "postgresql": InternalError,
+            "sqlite": OperationalError,
+            "oracle": OperationalError,
+        }
+        expected_error = vendor2error.get(connection.vendor)
+        if expected_error:
+            with self.assertRaises(expected_error):
+                drop_column()
+            self.assertColumnExists("test_rmflb_pony", "pink")
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT * FROM test_rmflb_pony_view")
+        else:
+            # mysql uses cascade by default so we can't prevent the drop
+            drop_column()
+            self.assertColumnNotExists("test_rmflb_pony", "pink")
+            with self.assertRaises(OperationalError):
+                with connection.cursor() as cursor:
+                    cursor.execute("SELECT * FROM test_rmflb_pony_view")
+
+        with connection.cursor() as cursor:
+            cursor.execute("DROP VIEW test_rmflb_pony_view")
 
     def test_remove_fk(self):
         """

@@ -195,15 +195,12 @@ if the field is nullable or if it has a default value that can be used to
 populate the recreated column. If the field is not nullable and does not have a
 default value, the operation is irreversible.
 
-.. admonition:: PostgreSQL
+.. versionchanged:: 5.2
 
-    ``RemoveField`` will also delete any additional database objects that are
-    related to the removed field (like views, for example). This is because the
-    resulting ``DROP COLUMN`` statement will include the ``CASCADE`` clause to
-    ensure `dependent objects outside the table are also dropped`_.
-
-.. _dependent objects outside the table are also dropped: https://www.postgresql.org/docs/current/sql-altertable.html#SQL-ALTERTABLE-PARMS-CASCADE
-
+    :class:`~django.db.backends.base.schema.BaseDatabaseSchemaEditor` and
+    PostgreSQL backends no longer use ``CASCADE`` to delete dependent related
+    database objects, such as views. Any dependent objects that are not managed
+    by Django have to be removed another way before ``RemoveField`` runs.
 
 ``AlterField``
 --------------
