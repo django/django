@@ -924,6 +924,14 @@ For example::
     >>> p.get_shirt_size_display()
     'Large'
 
+A :class:`~django.db.models.GeneratedField` with ``choices`` set on
+:attr:`.GeneratedField.output_field` also has a ``get_FOO_display()`` method.
+
+.. versionchanged:: 5.2
+
+     Support for ``choices`` defined on :attr:`.GeneratedField.output_field`
+     was added.
+
 .. method:: Model.get_next_by_FOO(**kwargs)
 .. method:: Model.get_previous_by_FOO(**kwargs)
 

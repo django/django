@@ -30,6 +30,9 @@ class GeneratedField(Field):
         self.expression = expression
         self.output_field = output_field
         self.db_persist = db_persist
+
+        if kwargs.get("choices", None) is None and output_field.choices is not None:
+            kwargs["choices"] = output_field.choices
         super().__init__(**kwargs)
 
     @cached_property

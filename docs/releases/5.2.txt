@@ -223,6 +223,9 @@ Models
   expression contains a set-returning function, enforcing subquery evaluation.
   This is necessary for many Postgres set-returning functions.
 
+* :meth:`~django.db.models.Model.get_FOO_display` now supports when ``choices``
+  is defined on :attr:`.GeneratedField.output_field`.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

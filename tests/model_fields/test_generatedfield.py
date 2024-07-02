@@ -21,6 +21,8 @@ from .models import (
     GeneratedModel,
     GeneratedModelCheckConstraint,
     GeneratedModelCheckConstraintVirtual,
+    GeneratedModelChoices,
+    GeneratedModelChoicesVirtual,
     GeneratedModelFieldWithConverters,
     GeneratedModelNull,
     GeneratedModelNullVirtual,
@@ -341,6 +343,20 @@ class GeneratedFieldTestMixin:
         m2 = self._refresh_if_needed(m2)
         self.assertEqual(m2.lower_name, "name")
 
+    def test_choices_and_field_display(self):
+        wg_0 = self.choices_model.objects.create(c=0)
+        wg_1 = self.choices_model.objects.create(c=1)
+        wg_none = self.choices_model.objects.create(c=None)
+        self.assertEqual(wg_0.get_c_squared_display(), "Other")
+        self.assertEqual(wg_1.get_c_squared_display(), "First")
+        self.assertIsNone(wg_none.get_c_squared_display())
+        wg_3 = self.choices_model(c=3)
+        wg_3.full_clean()
+        wg_3.save()
+        wg_3.refresh_from_db()
+        self.assertEqual(wg_3.c_squared, 9)
+        self.assertEqual(wg_3.get_c_squared_display(), 9)
+
 
 @skipUnlessDBFeature("supports_stored_generated_columns")
 class StoredGeneratedFieldTests(GeneratedFieldTestMixin, TestCase):
@@ -350,6 +366,7 @@ class StoredGeneratedFieldTests(GeneratedFieldTestMixin, TestCase):
     unique_constraint_model = GeneratedModelUniqueConstraint
     output_field_db_collation_model = GeneratedModelOutputFieldDbCollation
     params_model = GeneratedModelParams
+    choices_model = GeneratedModelChoices
 
     def test_create_field_with_db_converters(self):
         obj = GeneratedModelFieldWithConverters.objects.create(field=uuid.uuid4())
@@ -365,3 +382,4 @@ class VirtualGeneratedFieldTests(GeneratedFieldTestMixin, TestCase):
     unique_constraint_model = GeneratedModelUniqueConstraintVirtual
     output_field_db_collation_model = GeneratedModelOutputFieldDbCollationVirtual
     params_model = GeneratedModelParamsVirtual
+    choices_model = GeneratedModelChoicesVirtual
