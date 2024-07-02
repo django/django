@@ -24,9 +24,9 @@ QUnit.test('init', function(assert) {
 QUnit.test('filtering available options', function(assert) {
     const $ = django.jQuery;
     $('<form><select multiple id="select"></select></form>').appendTo('#qunit-fixture');
-    $('<option value="1" title="Red">Red</option>').appendTo('#select');
-    $('<option value="2" title="Blue">Blue</option>').appendTo('#select');
-    $('<option value="3" title="Green">Green</option>').appendTo('#select');
+    $('<option value="1" title="Blue">Blue</option>').appendTo('#select');
+    $('<option value="2" title="Green">Green</option>').appendTo('#select');
+    $('<option value="3" title="Red">Red</option>').appendTo('#select');
     SelectFilter.init('select', 'items', 0);
     assert.equal($('#select_from option').length, 3);
     assert.equal($('#select_to option').length, 0);
@@ -38,7 +38,7 @@ QUnit.test('filtering available options', function(assert) {
     setTimeout(() => {
         assert.equal($('#select_from option').length, 2);
         assert.equal($('#select_to option').length, 0);
-        assert.equal($('#select_from option')[0].value, '1');
+        assert.equal($('#select_from option')[0].value, '2');
         assert.equal($('#select_from option')[1].value, '3');
         done();
     });
@@ -47,9 +47,9 @@ QUnit.test('filtering available options', function(assert) {
 QUnit.test('filtering selected options', function(assert) {
     const $ = django.jQuery;
     $('<form><select multiple id="select"></select></form>').appendTo('#qunit-fixture');
-    $('<option selected value="1" title="Red">Red</option>').appendTo('#select');
-    $('<option selected value="2" title="Blue">Blue</option>').appendTo('#select');
-    $('<option selected value="3" title="Green">Green</option>').appendTo('#select');
+    $('<option selected value="1" title="Blue">Blue</option>').appendTo('#select');
+    $('<option selected value="2" title="Green">Green</option>').appendTo('#select');
+    $('<option selected value="3" title="Red">Red</option>').appendTo('#select');
     SelectFilter.init('select', 'items', 0);
     assert.equal($('#select_from option').length, 0);
     assert.equal($('#select_to option').length, 3);
@@ -61,7 +61,7 @@ QUnit.test('filtering selected options', function(assert) {
     setTimeout(() => {
         assert.equal($('#select_from option').length, 0);
         assert.equal($('#select_to option').length, 2);
-        assert.equal($('#select_to option')[0].value, '1');
+        assert.equal($('#select_to option')[0].value, '2');
         assert.equal($('#select_to option')[1].value, '3');
         done();
     });
@@ -70,9 +70,9 @@ QUnit.test('filtering selected options', function(assert) {
 QUnit.test('filtering available options to nothing', function(assert) {
     const $ = django.jQuery;
     $('<form><select multiple id="select"></select></form>').appendTo('#qunit-fixture');
-    $('<option value="1" title="Red">Red</option>').appendTo('#select');
-    $('<option value="2" title="Blue">Blue</option>').appendTo('#select');
-    $('<option value="3" title="Green">Green</option>').appendTo('#select');
+    $('<option value="1" title="Blue">Blue</option>').appendTo('#select');
+    $('<option value="2" title="Green">Green</option>').appendTo('#select');
+    $('<option value="3" title="Red">Red</option>').appendTo('#select');
     SelectFilter.init('select', 'items', 0);
     assert.equal($('#select_from option').length, 3);
     assert.equal($('#select_to option').length, 0);
@@ -91,9 +91,9 @@ QUnit.test('filtering available options to nothing', function(assert) {
 QUnit.test('filtering selected options to nothing', function(assert) {
     const $ = django.jQuery;
     $('<form><select multiple id="select"></select></form>').appendTo('#qunit-fixture');
-    $('<option selected value="1" title="Red">Red</option>').appendTo('#select');
-    $('<option selected value="2" title="Blue">Blue</option>').appendTo('#select');
-    $('<option selected value="3" title="Green">Green</option>').appendTo('#select');
+    $('<option selected value="1" title="Blue">Blue</option>').appendTo('#select');
+    $('<option selected value="2" title="Green">Green</option>').appendTo('#select');
+    $('<option selected value="3" title="Red">Red</option>').appendTo('#select');
     SelectFilter.init('select', 'items', 0);
     assert.equal($('#select_from option').length, 0);
     assert.equal($('#select_to option').length, 3);
@@ -112,9 +112,9 @@ QUnit.test('filtering selected options to nothing', function(assert) {
 QUnit.test('selecting option', function(assert) {
     const $ = django.jQuery;
     $('<form><select multiple id="select"></select></form>').appendTo('#qunit-fixture');
-    $('<option value="1" title="Red">Red</option>').appendTo('#select');
-    $('<option value="2" title="Blue">Blue</option>').appendTo('#select');
-    $('<option value="3" title="Green">Green</option>').appendTo('#select');
+    $('<option value="1" title="Blue">Blue</option>').appendTo('#select');
+    $('<option value="2" title="Green">Green</option>').appendTo('#select');
+    $('<option value="3" title="Red">Red</option>').appendTo('#select');
     SelectFilter.init('select', 'items', 0);
     assert.equal($('#select_from option').length, 3);
     assert.equal($('#select_to option').length, 0);
@@ -134,13 +134,13 @@ QUnit.test('selecting option', function(assert) {
 QUnit.test('deselecting option', function(assert) {
     const $ = django.jQuery;
     $('<form><select multiple id="select"></select></form>').appendTo('#qunit-fixture');
-    $('<option selected value="1" title="Red">Red</option>').appendTo('#select');
-    $('<option value="2" title="Blue">Blue</option>').appendTo('#select');
-    $('<option value="3" title="Green">Green</option>').appendTo('#select');
+    $('<option value="1" title="Blue">Blue</option>').appendTo('#select');
+    $('<option value="2" title="Green">Green</option>').appendTo('#select');
+    $('<option selected value="3" title="Red">Red</option>').appendTo('#select');
     SelectFilter.init('select', 'items', 0);
     assert.equal($('#select_from option').length, 2);
     assert.equal($('#select_to option').length, 1);
-    assert.equal($('#select_to option')[0].value, '1');
+    assert.equal($('#select_to option')[0].value, '3');
     // move back to the left
     const done_left = assert.async();
     $('#select_to')[0].selectedIndex = 0;
