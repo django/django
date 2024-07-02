@@ -22,7 +22,8 @@ from django.core.validators import EmailValidator, RegexValidator
 from django.db import migrations, models
 from django.db.migrations.serializer import BaseSerializer
 from django.db.migrations.writer import MigrationWriter, OperationWriter
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, override_settings
+from django.test.utils import extend_sys_path
 from django.utils.deconstruct import deconstructible
 from django.utils.functional import SimpleLazyObject
 from django.utils.timezone import get_default_timezone, get_fixed_timezone
@@ -953,6 +954,29 @@ class WriterTests(SimpleTestCase):
                 )
                 writer = MigrationWriter(migration)
                 self.assertEqual(writer.path, expected_path)
+
+    @override_settings(
+        MIGRATION_MODULES={"namespace_app": "namespace_app.migrations"},
+        INSTALLED_APPS=[
+            "migrations.migrations_test_apps.distributed_app_location_2.namespace_app"
+        ],
+    )
+    def test_migration_path_distributed_namespace(self):
+        base_dir = os.path.dirname(os.path.dirname(__file__))
+        test_apps_dir = os.path.join(base_dir, "migrations", "migrations_test_apps")
+        expected_msg = (
+            "Could not locate an appropriate location to create "
+            "migrations package namespace_app.migrations. Make sure the toplevel "
+            "package exists and can be imported."
+        )
+        with extend_sys_path(
+            os.path.join(test_apps_dir, "distributed_app_location_1"),
+            os.path.join(test_apps_dir, "distributed_app_location_2"),
+        ):
+            migration = migrations.Migration("0001_initial", "namespace_app")
+            writer = MigrationWriter(migration)
+            with self.assertRaisesMessage(ValueError, expected_msg):
+                writer.path
 
     def test_custom_operation(self):
         migration = type(
