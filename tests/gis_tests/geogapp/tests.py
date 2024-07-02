@@ -107,7 +107,7 @@ class GeographyTest(TestCase):
         lm.save(silent=True, strict=True)
 
         for c, name, num_poly, state in zip(
-            County.objects.order_by("name"), names, num_polys, st_names
+            County.objects.order_by("name"), names, num_polys, st_names, strict=True
         ):
             self.assertEqual(4326, c.mpoly.srid)
             self.assertEqual(num_poly, len(c.mpoly))
@@ -135,7 +135,7 @@ class GeographyFunctionTests(FuncTestMixin, TestCase):
         res = City.objects.filter(name__in=("Houston", "Dallas")).aggregate(
             extent=models.Extent(Cast("point", models.PointField()))
         )
-        for val, exp in zip(res["extent"], expected):
+        for val, exp in zip(res["extent"], expected, strict=True):
             self.assertAlmostEqual(exp, val, 4)
 
     @skipUnlessDBFeature("has_Distance_function", "supports_distance_geodetic")
@@ -159,13 +159,13 @@ class GeographyFunctionTests(FuncTestMixin, TestCase):
             distance=Distance("poly", htown.point),
             distance2=Distance(htown.point, "poly"),
         )
-        for z, ref in zip(qs, ref_dists):
+        for z, ref in zip(qs, ref_dists, strict=True):
             self.assertAlmostEqual(z.distance.m, ref, 2)
 
         if connection.ops.postgis:
             # PostGIS casts geography to geometry when distance2 is calculated.
             ref_dists = [0, 4899.68, 8081.30, 9115.15]
-        for z, ref in zip(qs, ref_dists):
+        for z, ref in zip(qs, ref_dists, strict=True):
             self.assertAlmostEqual(z.distance2.m, ref, 2)
 
         if not connection.ops.spatialite:

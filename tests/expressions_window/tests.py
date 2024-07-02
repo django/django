@@ -1685,7 +1685,7 @@ class WindowFunctionTests(TestCase):
             {"year": 2011, "sum": 60000},
             {"year": 2013, "sum": 84000},
         ]
-        for idx, val in zip(range(len(results)), results):
+        for idx, val in enumerate(results):
             with self.subTest(result=val):
                 self.assertEqual(qs[idx], val)
 

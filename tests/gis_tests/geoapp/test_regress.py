@@ -47,7 +47,7 @@ class GeoRegressionTests(TestCase):
         extent = City.objects.filter(name="Pueblo").aggregate(Extent("point"))[
             "point__extent"
         ]
-        for ref_val, val in zip(ref_ext, extent):
+        for ref_val, val in zip(ref_ext, extent, strict=True):
             self.assertAlmostEqual(ref_val, val, 4)
 
     def test_unicode_date(self):

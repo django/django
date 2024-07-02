@@ -924,7 +924,7 @@ class MultiWidget(Widget):
         id_ = final_attrs.get("id")
         subwidgets = []
         for i, (widget_name, widget) in enumerate(
-            zip(self.widgets_names, self.widgets)
+            zip(self.widgets_names, self.widgets, strict=True)
         ):
             if input_type is not None:
                 widget.input_type = input_type
@@ -950,13 +950,17 @@ class MultiWidget(Widget):
     def value_from_datadict(self, data, files, name):
         return [
             widget.value_from_datadict(data, files, name + widget_name)
-            for widget_name, widget in zip(self.widgets_names, self.widgets)
+            for widget_name, widget in zip(
+                self.widgets_names, self.widgets, strict=True
+            )
         ]
 
     def value_omitted_from_data(self, data, files, name):
         return all(
             widget.value_omitted_from_data(data, files, name + widget_name)
-            for widget_name, widget in zip(self.widgets_names, self.widgets)
+            for widget_name, widget in zip(
+                self.widgets_names, self.widgets, strict=True
+            )
         )
 
     def decompress(self, value):

@@ -1189,7 +1189,7 @@ class MultiValueField(Field):
         else:
             if not isinstance(initial, list):
                 initial = self.widget.decompress(initial)
-        for field, initial, data in zip(self.fields, initial, data):
+        for field, initial, data in zip(self.fields, initial, data, strict=True):
             try:
                 initial = field.to_python(initial)
             except ValidationError:

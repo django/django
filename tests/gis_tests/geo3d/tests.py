@@ -126,7 +126,10 @@ class Geo3DLoadingHelper:
         bbox_wkt, bbox_z = bbox_data
         bbox_2d = GEOSGeometry(bbox_wkt, srid=32140)
         bbox_3d = Polygon(
-            tuple((x, y, z) for (x, y), z in zip(bbox_2d[0].coords, bbox_z)), srid=32140
+            tuple(
+                (x, y, z) for (x, y), z in zip(bbox_2d[0].coords, bbox_z, strict=True)
+            ),
+            srid=32140,
         )
         Polygon2D.objects.create(name="2D BBox", poly=bbox_2d)
         Polygon3D.objects.create(name="3D BBox", poly=bbox_3d)
@@ -236,7 +239,7 @@ class Geo3DTest(Geo3DLoadingHelper, TestCase):
         extent = City3D.objects.aggregate(Extent3D("point"))["point__extent3d"]
 
         def check_extent3d(extent3d, tol=6):
-            for ref_val, ext_val in zip(ref_extent3d, extent3d):
+            for ref_val, ext_val in zip(ref_extent3d, extent3d, strict=True):
                 self.assertAlmostEqual(ref_val, ext_val, tol)
 
         check_extent3d(extent)
@@ -251,7 +254,7 @@ class Geo3DTest(Geo3DLoadingHelper, TestCase):
             ll_cities=Extent3D("point", filter=Q(name__contains="ll"))
         )["ll_cities"]
         ref_extent3d = (-96.801611, -41.315268, 14.0, 174.783117, 32.782057, 147.0)
-        for ref_val, ext_val in zip(ref_extent3d, extent3d):
+        for ref_val, ext_val in zip(ref_extent3d, extent3d, strict=True):
             self.assertAlmostEqual(ref_val, ext_val, 6)
 
 

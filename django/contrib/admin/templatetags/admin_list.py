@@ -315,7 +315,11 @@ class ResultList(list):
 
 def results(cl):
     if cl.formset:
-        for res, form in zip(cl.result_list, cl.formset.forms):
+        for res, form in zip(
+            cl.result_list[: cl.formset.total_form_count()],
+            cl.formset.forms,
+            strict=True,
+        ):
             yield ResultList(form, items_for_result(cl, res, form))
     else:
         for res in cl.result_list:
@@ -324,7 +328,11 @@ def results(cl):
 
 def result_hidden_fields(cl):
     if cl.formset:
-        for res, form in zip(cl.result_list, cl.formset.forms):
+        for res, form in zip(
+            cl.result_list[: cl.formset.total_form_count()],
+            cl.formset.forms,
+            strict=True,
+        ):
             if form[cl.model._meta.pk.name].is_hidden:
                 yield mark_safe(form[cl.model._meta.pk.name])
 

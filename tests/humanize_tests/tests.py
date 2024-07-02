@@ -31,7 +31,7 @@ class HumanizeTests(SimpleTestCase):
     def humanize_tester(
         self, test_list, result_list, method, normalize_result_func=escape
     ):
-        for test_content, result in zip(test_list, result_list):
+        for test_content, result in zip(test_list, result_list, strict=True):
             with self.subTest(test_content):
                 t = Template("{%% load humanize %%}{{ test_content|%s }}" % method)
                 rendered = t.render(Context(locals())).strip()

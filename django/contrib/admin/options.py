@@ -1754,7 +1754,7 @@ class ModelAdmin(BaseModelAdmin):
             else self.has_add_permission(request)
         )
         inline_admin_formsets = []
-        for inline, formset in zip(inline_instances, formsets):
+        for inline, formset in zip(inline_instances, formsets, strict=True):
             fieldsets = list(inline.get_fieldsets(request, obj))
             readonly = list(inline.get_readonly_fields(request, obj))
             if can_edit_parent:

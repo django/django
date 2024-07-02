@@ -64,6 +64,7 @@ def _related_non_m2m_objects(old_field, new_field):
             for obj in _all_related_fields(new_field.model)
             if _is_relevant_relation(obj, new_field)
         ),
+        strict=True,
     )
     for old_rel, new_rel in related_fields:
         yield old_rel, new_rel
@@ -1142,7 +1143,7 @@ class BaseDatabaseSchemaEditor:
                 actions += null_actions
             # Combine actions together if we can (e.g. postgres)
             if self.connection.features.supports_combined_alters and actions:
-                sql, params = tuple(zip(*actions))
+                sql, params = tuple(zip(*actions, strict=True))
                 actions = [(", ".join(sql), sum(params, []))]
             # Apply those actions
             for sql, params in actions:

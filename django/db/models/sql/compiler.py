@@ -624,7 +624,7 @@ class SQLCompiler:
         if not self.query.subquery and features.supports_slicing_ordering_in_compound:
             braces = "({})"
         sql_parts, args_parts = zip(
-            *((braces.format(sql), args) for sql, args in parts)
+            *((braces.format(sql), args) for sql, args in parts), strict=True
         )
         result = [" {} ".format(combinator_sql).join(sql_parts)]
         params = []
@@ -1720,17 +1720,19 @@ class SQLInsertCompiler(SQLCompiler):
         # list of (sql, [params]) tuples for each object to be saved
         # Shape: [n_objs][n_fields][2]
         rows_of_fields_as_sql = (
-            (self.field_as_sql(field, v) for field, v in zip(fields, row))
+            (self.field_as_sql(field, v) for field, v in zip(fields, row, strict=True))
             for row in value_rows
         )
 
         # tuple like ([sqls], [[params]s]) for each object to be saved
         # Shape: [n_objs][2][n_fields]
-        sql_and_param_pair_rows = (zip(*row) for row in rows_of_fields_as_sql)
+        sql_and_param_pair_rows = (
+            zip(*row, strict=True) for row in rows_of_fields_as_sql
+        )
 
         # Extract separate lists for placeholders and params.
         # Each of these has shape [n_objs][n_fields]
-        placeholder_rows, param_rows = zip(*sql_and_param_pair_rows)
+        placeholder_rows, param_rows = zip(*sql_and_param_pair_rows, strict=True)
 
         # Params for each field are still lists, and need to be flattened.
         param_rows = [[p for ps in row for p in ps] for row in param_rows]
@@ -1814,7 +1816,7 @@ class SQLInsertCompiler(SQLCompiler):
                 result.append(on_conflict_suffix_sql)
             return [
                 (" ".join(result + ["VALUES (%s)" % ", ".join(p)]), vals)
-                for p, vals in zip(placeholder_rows, param_rows)
+                for p, vals in zip(placeholder_rows, param_rows, strict=True)
             ]
 
     def execute_sql(self, returning_fields=None):

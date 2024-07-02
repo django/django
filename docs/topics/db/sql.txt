@@ -331,7 +331,7 @@ using something like this::
         Assume the column names are unique.
         """
         columns = [col[0] for col in cursor.description]
-        return [dict(zip(columns, row)) for row in cursor.fetchall()]
+        return [dict(zip(columns, row, strict=True)) for row in cursor.fetchall()]
 
 Another option is to use :func:`collections.namedtuple` from the Python
 standard library. A ``namedtuple`` is a tuple-like object that has fields

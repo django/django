@@ -981,6 +981,7 @@ class ModelState:
                 for (k1, f1), (k2, f2) in zip(
                     sorted(self.fields.items()),
                     sorted(other.fields.items()),
+                    strict=True,
                 )
             )
             and (self.options == other.options)

@@ -284,7 +284,7 @@ class DataSourceTest(SimpleTestCase):
                 geos_geoms = layer.get_geoms(geos=True)
                 self.assertEqual(len(geoms), len(geos_geoms))
                 self.assertEqual(len(geoms), len(layer))
-                for feat, geom, geos_geom in zip(layer, geoms, geos_geoms):
+                for feat, geom, geos_geom in zip(layer, geoms, geos_geoms, strict=True):
                     g = feat.geom
                     self.assertEqual(geom, g)
                     self.assertIsInstance(geos_geom, GEOSGeometry)

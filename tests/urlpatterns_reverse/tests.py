@@ -622,8 +622,8 @@ class ResolverTests(SimpleTestCase):
             "Wrong number of tried URLs returned.  Expected %s, got %s."
             % (len(url_types_names), len(e.args[0]["tried"])),
         )
-        for tried, expected in zip(e.args[0]["tried"], url_types_names):
-            for t, e in zip(tried, expected):
+        for tried, expected in zip(e.args[0]["tried"], url_types_names, strict=True):
+            for t, e in zip(tried, expected, strict=True):
                 with self.subTest(t):
                     self.assertIsInstance(
                         t, e["type"]
