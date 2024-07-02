@@ -1,4 +1,5 @@
 from django.http import HttpResponse
+from django.middleware.constants import csp
 from django.test import RequestFactory, SimpleTestCase
 from django.test.utils import override_settings
 
@@ -309,3 +310,169 @@ class SecurityMiddlewareTest(SimpleTestCase):
             headers={"Cross-Origin-Opener-Policy": "same-origin"}
         )
         self.assertEqual(response.headers["Cross-Origin-Opener-Policy"], "same-origin")
+
+    def test_csp_defaults_off(self):
+        response = self.process_response()
+        self.assertNotIn(csp.HEADER, response.headers)
+        self.assertNotIn(csp.HEADER_REPORT_ONLY, response.headers)
+
+    @override_settings(SECURE_CSP={"DIRECTIVES": {"default-src": [csp.SELF]}})
+    def test_csp_basic(self):
+        """
+        With SECURE_CSP set to a valid value, the middleware adds a
+        "Content-Security-Policy" header to the response.
+        """
+        response = self.process_response()
+        self.assertEqual(response.headers[csp.HEADER], "default-src 'self'")
+        self.assertNotIn(csp.HEADER_REPORT_ONLY, response.headers)
+
+    @override_settings(
+        SECURE_CSP={
+            "DIRECTIVES": {"default-src": [csp.SELF, csp.NONCE]},
+        }
+    )
+    def test_csp_basic_with_nonce(self):
+        """
+        The middleware adds a "Content-Security-Policy" header to the response with a
+        nonce if the "default-src" directive includes "csp.NONCE". Since the nonce is
+        random and added to the request, we do extra work to get the request object.
+        """
+        request = self.request.get("/some/url")
+        self.middleware().process_request(request)
+        self.assertEqual(
+            self.process_response(request=request).headers[csp.HEADER],
+            f"default-src 'self' 'nonce-{request.csp_nonce}'",
+        )
+
+    @override_settings(
+        SECURE_CSP_REPORT_ONLY={"DIRECTIVES": {"default-src": [csp.SELF]}}
+    )
+    def test_csp_report_only_basic(self):
+        """
+        With SECURE_CSP_REPORT_ONLY set to a valid value, the middleware adds a
+        "Content-Security-Policy-Report-Only" header to the response.
+        """
+        response = self.process_response()
+        self.assertEqual(response.headers[csp.HEADER_REPORT_ONLY], "default-src 'self'")
+        self.assertNotIn(csp.HEADER, response.headers)
+
+    def test_csp_both(self):
+        """
+        If both SECURE_CSP and SECURE_CSP_REPORT_ONLY are set, the middleware
+        adds both headers to the response.
+        """
+        with override_settings(
+            SECURE_CSP={"DIRECTIVES": {"default-src": [csp.SELF]}},
+            SECURE_CSP_REPORT_ONLY={"DIRECTIVES": {"default-src": [csp.SELF]}},
+        ):
+            response = self.process_response()
+            self.assertEqual(response.headers[csp.HEADER], "default-src 'self'")
+            self.assertEqual(
+                response.headers[csp.HEADER_REPORT_ONLY],
+                "default-src 'self'",
+            )
+
+
+class BuildCSPTest(SimpleTestCase):
+    def setUp(self):
+        from django.middleware.security import build_csp
+
+        self.build_csp = build_csp
+
+    def assertPolicyEqual(self, a, b):
+        parts_a = sorted(a.split("; ")) if a is not None else None
+        parts_b = sorted(b.split("; ")) if b is not None else None
+        self.assertEqual(parts_a, parts_b, f"Policies not equal: {a!r} != {b!r}")
+
+    def test_config_empty(self):
+        self.assertPolicyEqual(self.build_csp({}), "")
+
+    def test_config_basic(self):
+        policy = {"DIRECTIVES": {"default-src": [csp.SELF]}}
+        self.assertPolicyEqual(self.build_csp(policy), "default-src 'self'")
+
+    def test_config_multiple_directives(self):
+        policy = {"DIRECTIVES": {"default-src": [csp.SELF], "script-src": [csp.SELF]}}
+        self.assertPolicyEqual(
+            self.build_csp(policy), "default-src 'self'; script-src 'self'"
+        )
+
+    def test_config_value_not_list(self):
+        policy = {"DIRECTIVES": {"default-src": csp.SELF}}
+        self.assertPolicyEqual(self.build_csp(policy), "default-src 'self'")
+
+    def test_config_value_tuple(self):
+        policy = {"DIRECTIVES": {"default-src": (csp.SELF,)}}
+        self.assertPolicyEqual(self.build_csp(policy), "default-src 'self'")
+
+    def test_config_value_none(self):
+        policy = {"DIRECTIVES": {"default-src": [csp.SELF], "script-src": None}}
+        self.assertPolicyEqual(self.build_csp(policy), "default-src 'self'")
+
+    def test_config_value_boolean_true(self):
+        policy = {
+            "DIRECTIVES": {"default-src": [csp.SELF], "block-all-mixed-content": True}
+        }
+        self.assertPolicyEqual(
+            self.build_csp(policy), "default-src 'self'; block-all-mixed-content"
+        )
+
+    def test_config_value_boolean_false(self):
+        policy = {
+            "DIRECTIVES": {"default-src": [csp.SELF], "block-all-mixed-content": False}
+        }
+        self.assertPolicyEqual(self.build_csp(policy), "default-src 'self'")
+
+    def test_config_value_multiple_boolean(self):
+        policy = {
+            "DIRECTIVES": {
+                "default-src": [csp.SELF],
+                "block-all-mixed-content": True,
+                "upgrade-insecure-requests": True,
+            }
+        }
+        self.assertPolicyEqual(
+            self.build_csp(policy),
+            "default-src 'self'; block-all-mixed-content; upgrade-insecure-requests",
+        )
+
+    def test_config_with_nonce_arg(self):
+        policy = {"DIRECTIVES": {"default-src": [csp.SELF]}}
+        self.assertPolicyEqual(
+            self.build_csp(policy, nonce="abc123"), "default-src 'self'"
+        )
+
+    def test_config_with_nonce(self):
+        policy = {
+            "DIRECTIVES": {"default-src": [csp.SELF, csp.NONCE]},
+        }
+        self.assertPolicyEqual(
+            self.build_csp(policy, nonce="abc123"), "default-src 'self' 'nonce-abc123'"
+        )
+
+    def test_config_with_multiple_nonces(self):
+        policy = {
+            "DIRECTIVES": {
+                "default-src": [csp.SELF, csp.NONCE],
+                "script-src": [csp.SELF, csp.NONCE],
+            },
+        }
+        self.assertPolicyEqual(
+            self.build_csp(policy, nonce="abc123"),
+            "default-src 'self' 'nonce-abc123'; script-src 'self' 'nonce-abc123'",
+        )
+
+    def test_config_with_only_nonce_directive(self):
+        policy = {"DIRECTIVES": {"default-src": [csp.NONCE]}}
+        self.assertPolicyEqual(
+            self.build_csp(policy, nonce="abc123"), "default-src 'nonce-abc123'"
+        )
+
+    def test_config_with_empty_directive(self):
+        policy = {"DIRECTIVES": {"default-src": []}}
+        self.assertPolicyEqual(self.build_csp(policy), "")
+
+    def test_nonce_sentinel(self):
+        assert csp.Nonce() == csp.Nonce()
+        assert csp.NONCE == csp.Nonce()
+        assert repr(csp.Nonce()) == "django.middleware.constants.csp.NONCE"
