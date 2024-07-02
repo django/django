@@ -96,6 +96,12 @@ the ``login_url`` and ``redirect_field_name`` values set via the
 :func:`~.django.contrib.auth.decorators.login_required` decorator, but does not
 support setting ``login_url`` or ``redirect_field_name`` via the
 :class:`~django.contrib.auth.mixins.LoginRequiredMixin`.
+Moving model between apps
+-------------------------
+
+The migration framework now auto-detects moving models between apps and
+supports doing so without database operations if a moved model's database table
+remains the same.
 
 Minor features
 --------------
