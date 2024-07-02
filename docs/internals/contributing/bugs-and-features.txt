@@ -117,6 +117,15 @@ branch, and show us your work!
 
 See also: :ref:`documenting-new-features`.
 
+Requesting performance optimizations
+====================================
+
+Reports of a performance regression, or suggested performance optimizations,
+should provide benchmarks and commands for the ticket triager to reproduce.
+
+See the :ref:`django-asv-benchmarks` for more details of Django's existing
+benchmarks.
+
 .. _how-we-make-decisions:
 
 How we make decisions
