@@ -50,6 +50,7 @@ from django.db.models.expressions import (
     Combinable,
     CombinedExpression,
     NegatedExpression,
+    OutputFieldIsNoneError,
     RawSQL,
     Ref,
 )
@@ -2343,10 +2344,37 @@ class ValueTests(TestCase):
                 expr = Value(value)
                 self.assertIsInstance(expr.output_field, output_field_type)
 
-    def test_resolve_output_field_failure(self):
-        msg = "Cannot resolve expression type, unknown output_field"
-        with self.assertRaisesMessage(FieldError, msg):
-            Value(object()).output_field
+    def test_output_field_resolution(self):
+        # why does this fail, but test_resolve_output_field_with_null pass?
+        test_cases = [
+            Value(None),
+            Value("a string") + Value(None),
+            Value(42) + Value(None),
+            Value(datetime.date(2019, 5, 15)) + Value(None),
+            Value(datetime.time(3, 16)) + Value(None),
+            Value(datetime.datetime(2019, 5, 15)) + Value(None),
+            Value(datetime.timedelta(1)) + Value(None),
+            Value(Decimal("3.14")) + Value(None),
+            Value(b"") + Value(None),
+            Value(uuid.uuid4()) + Value(None),
+            Value(3.14159) + Value(None),  # doesn't throw error as expected
+        ]
+
+        for expression in test_cases:
+            with self.subTest(expression):
+                with self.assertRaises(OutputFieldIsNoneError):
+                    repr(Employee.objects.annotate(custom_expression=expression))
+
+    def test_output_field_or_none_property(self):
+        for output_field in (None, IntegerField()):
+            with self.subTest(output_field=output_field):
+                expression = Value(None, output_field=output_field)
+                if output_field is None:
+                    self.assertIsNone(expression._output_field_or_none)
+                else:
+                    self.assertIsInstance(
+                        expression._output_field_or_none, IntegerField
+                    )
 
     def test_output_field_does_not_create_broken_validators(self):
         """
