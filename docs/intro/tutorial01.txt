@@ -14,7 +14,8 @@ It'll consist of two parts:
 
 We'll assume you have :doc:`Django installed </intro/install>` already. You can
 tell Django is installed and which version by running the following command
-in a shell prompt (indicated by the $ prefix):
+in a shell prompt (indicated by the $ sign or another prefix, depending on 
+your operating system):
 
 .. console::
 
