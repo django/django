@@ -320,8 +320,8 @@ class FunctionTests(SimpleTestCase):
         )
         self.assertEqual(
             urlize("[http://168.192.0.1](http://168.192.0.1)"),
-            '[<a href="http://168.192.0.1](http://168.192.0.1)" rel="nofollow">'
-            "http://168.192.0.1](http://168.192.0.1)</a>",
+            '[http://168.192.0.1](<a href="http://168.192.0.1" rel="nofollow">'
+            "http://168.192.0.1</a>)",
         )
 
     def test_wrapping_characters(self):
