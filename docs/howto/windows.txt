@@ -32,6 +32,12 @@ matches the version you installed by executing:
 
     ...\> py --version
 
+.. admonition:: ``py`` is not recognized or found
+
+    Depending on how you've installed Python (via the Microsoft Store,
+    for example), ``py`` may not be available.
+    You will need to use ``python`` instead.
+
 .. seealso::
 
     For more details, see :doc:`python:using/windows` documentation.
