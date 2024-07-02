@@ -927,6 +927,11 @@ class BaseDatabaseSchemaEditor:
         fks_dropped = set()
         if (
             self.connection.features.supports_foreign_keys
+            and (
+                self.connection.features.requires_fk_constraints_to_be_recreated
+                or not old_field.related_model == new_field.related_model
+                or getattr(new_field, "db_constraint", True) is False
+            )
             and old_field.remote_field
             and old_field.db_constraint
             and self._field_should_be_altered(
