@@ -951,7 +951,7 @@ class BaseDatabaseSchemaEditor:
                 fks_dropped.add((old_field.column,))
                 self.execute(self._delete_fk_sql(model, fk_name))
         # Has unique been removed?
-        if old_field._unique and not new_field._unique:
+        if old_field.unique and not old_field.primary_key and not new_field.unique:
             # Find the unique constraint for this field
             meta_constraint_names = {
                 constraint.name for constraint in model._meta.constraints

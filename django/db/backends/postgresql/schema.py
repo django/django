@@ -140,6 +140,15 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                     return sequence["name"]
         return None
 
+    def _is_changing_type_of_text_column_with_index(
+        self, old_field, old_type, new_type
+    ):
+        return (old_field.db_index or old_field.unique) and (
+            (old_type.startswith("varchar") and not new_type.startswith("varchar"))
+            or (old_type.startswith("text") and not new_type.startswith("text"))
+            or (old_type.startswith("citext") and not new_type.startswith("citext"))
+        )
+
     def _alter_column_type_sql(
         self, model, old_field, new_field, new_type, old_collation, new_collation
     ):
@@ -147,10 +156,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # different type.
         old_db_params = old_field.db_parameters(connection=self.connection)
         old_type = old_db_params["type"]
-        if (old_field.db_index or old_field.unique) and (
-            (old_type.startswith("varchar") and not new_type.startswith("varchar"))
-            or (old_type.startswith("text") and not new_type.startswith("text"))
-            or (old_type.startswith("citext") and not new_type.startswith("citext"))
+        if self._is_changing_type_of_text_column_with_index(
+            old_field, old_type, new_type
         ):
             index_name = self._create_index_name(
                 model._meta.db_table, [old_field.column], suffix="_like"
@@ -255,12 +262,14 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 model, old_field, new_field, new_type, old_collation, new_collation
             )
 
-    def _need_to_add_new_index(self, old_field, new_field):
+    def _new_index_should_be_added(self, old_field, new_field):
         return not (old_field.db_index or old_field.unique) and (
             new_field.db_index or new_field.unique
         )
 
-    def _need_to_recreate_deleted_index(self, old_field, new_field, old_type, new_type):
+    def _deleted_index_should_be_recreated(
+        self, old_field, new_field, old_type, new_type
+    ):
         if (
             old_field.db_index
             and not old_field.unique
@@ -269,11 +278,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 or (new_field.unique and not new_field.primary_key)
             )
         ) or (
-            (old_field.db_index or old_field.unique)
-            and (
-                (old_type.startswith("varchar") and not new_type.startswith("varchar"))
-                or (old_type.startswith("text") and not new_type.startswith("text"))
-                or (old_type.startswith("citext") and not new_type.startswith("citext"))
+            self._is_changing_type_of_text_column_with_index(
+                old_field, old_type, new_type
             )
         ):
             return True
@@ -300,9 +306,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             strict,
         )
         # Added an index? Create any PostgreSQL-specific indexes.
-        if self._need_to_add_new_index(
+        if self._new_index_should_be_added(
             old_field, new_field
-        ) or self._need_to_recreate_deleted_index(
+        ) or self._deleted_index_should_be_recreated(
             old_field, new_field, old_type, new_type
         ):
             like_index_statement = self._create_like_index_sql(model, new_field)
