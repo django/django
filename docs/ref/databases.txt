@@ -826,7 +826,7 @@ specific to SQLite that you should be aware of.
 Substring matching and case sensitivity
 ---------------------------------------
 
-For all SQLite versions, there is some slightly counter-intuitive behavior when
+For all SQLite versions, there is some slightly counterintuitive behavior when
 attempting to match some types of strings.  These are triggered when using the
 :lookup:`iexact` or :lookup:`contains` filters in Querysets. The behavior
 splits into two cases:
