@@ -2,9 +2,10 @@
 Django 5.0.7 release notes
 ==========================
 
-*Expected July 9, 2024*
+*July 9, 2024*
 
-Django 5.0.7 fixes several bugs in 5.0.6.
+Django 5.0.7 fixes two security issues with severity "moderate", two security
+issues with severity "low", and several bugs in 5.0.6.
 
 Bugfixes
 ========
