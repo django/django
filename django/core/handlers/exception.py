@@ -61,6 +61,10 @@ def convert_exception_to_response(get_response):
 
 
 def response_for_exception(request, exc):
+    if getattr(settings, "NO_LOG_EXCEPTION_IN_RESPONSE", False):
+        exception = None
+    else:
+        exception = exc
     if isinstance(exc, Http404):
         if settings.DEBUG:
             response = debug.technical_404_response(request, exc)
@@ -78,7 +82,7 @@ def response_for_exception(request, exc):
             request.path,
             response=response,
             request=request,
-            exception=exc,
+            exception=exception,
         )
 
     elif isinstance(exc, MultiPartParserError):
@@ -90,7 +94,7 @@ def response_for_exception(request, exc):
             request.path,
             response=response,
             request=request,
-            exception=exc,
+            exception=exception,
         )
 
     elif isinstance(exc, BadRequest):
@@ -108,7 +112,7 @@ def response_for_exception(request, exc):
             request.path,
             response=response,
             request=request,
-            exception=exc,
+            exception=exception,
         )
     elif isinstance(exc, SuspiciousOperation):
         if isinstance(exc, (RequestDataTooBig, TooManyFieldsSent, TooManyFilesSent)):
