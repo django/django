@@ -256,10 +256,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             )
 
     def _need_to_add_new_index(self, old_field, new_field):
-        if not (old_field.db_index or old_field.unique) and (
+        return not (old_field.db_index or old_field.unique) and (
             new_field.db_index or new_field.unique
-        ):
-            return True
+        )
 
     def _need_to_recreate_deleted_index(self, old_field, new_field, old_type, new_type):
         if (
