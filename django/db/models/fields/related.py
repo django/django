@@ -929,7 +929,9 @@ class ForeignKey(ForeignObject):
 
     empty_strings_allowed = False
     default_error_messages = {
-        "invalid": _("%(model)s instance with %(field)s %(value)r does not exist.")
+        "invalid": _(
+            "%(model)s instance with %(field)s %(value)r is not a valid choice."
+        )
     }
     description = _("Foreign Key (type determined by related field)")
 
