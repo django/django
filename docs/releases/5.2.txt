@@ -128,7 +128,8 @@ Database backends
 Decorators
 ~~~~~~~~~~
 
-* ...
+* :func:`~django.utils.decorators.method_decorator` now supports wrapping
+  asynchronous view methods.
 
 Email
 ~~~~~
