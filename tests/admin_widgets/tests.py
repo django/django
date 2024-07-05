@@ -23,6 +23,7 @@ from django.db.models import (
     UUIDField,
 )
 from django.test import SimpleTestCase, TestCase, ignore_warnings, override_settings
+from django.test.selenium import screenshot_cases
 from django.test.utils import requires_tz_support
 from django.urls import reverse
 from django.utils import translation
@@ -684,21 +685,21 @@ class ForeignKeyRawIdWidgetTest(TestCase):
         w = widgets.ForeignKeyRawIdWidget(rel_uuid, widget_admin_site)
         self.assertHTMLEqual(
             w.render("test", band.uuid, attrs={}),
-            '<input type="text" name="test" value="%(banduuid)s" '
+            '<div><input type="text" name="test" value="%(banduuid)s" '
             'class="vForeignKeyRawIdAdminField vUUIDField">'
             '<a href="/admin_widgets/band/?_to_field=uuid" class="related-lookup" '
             'id="lookup_id_test" title="Lookup"></a>&nbsp;<strong>'
             '<a href="/admin_widgets/band/%(bandpk)s/change/">Linkin Park</a>'
-            "</strong>" % {"banduuid": band.uuid, "bandpk": band.pk},
+            "</strong></div>" % {"banduuid": band.uuid, "bandpk": band.pk},
         )
 
         rel_id = ReleaseEvent._meta.get_field("album").remote_field
         w = widgets.ForeignKeyRawIdWidget(rel_id, widget_admin_site)
         self.assertHTMLEqual(
             w.render("test", None, attrs={}),
-            '<input type="text" name="test" class="vForeignKeyRawIdAdminField">'
+            '<div><input type="text" name="test" class="vForeignKeyRawIdAdminField">'
             '<a href="/admin_widgets/album/?_to_field=id" class="related-lookup" '
-            'id="lookup_id_test" title="Lookup"></a>',
+            'id="lookup_id_test" title="Lookup"></a></div>',
         )
 
     def test_relations_to_non_primary_key(self):
@@ -711,12 +712,12 @@ class ForeignKeyRawIdWidgetTest(TestCase):
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
             w.render("test", core.parent_id, attrs={}),
-            '<input type="text" name="test" value="86" '
+            '<div><input type="text" name="test" value="86" '
             'class="vForeignKeyRawIdAdminField">'
             '<a href="/admin_widgets/inventory/?_to_field=barcode" '
             'class="related-lookup" id="lookup_id_test" title="Lookup"></a>'
             '&nbsp;<strong><a href="/admin_widgets/inventory/%(pk)s/change/">'
-            "Apple</a></strong>" % {"pk": apple.pk},
+            "Apple</a></strong></div>" % {"pk": apple.pk},
         )
 
     def test_fk_related_model_not_in_admin(self):
@@ -760,12 +761,12 @@ class ForeignKeyRawIdWidgetTest(TestCase):
         )
         self.assertHTMLEqual(
             w.render("test", child_of_hidden.parent_id, attrs={}),
-            '<input type="text" name="test" value="93" '
+            '<div><input type="text" name="test" value="93" '
             '   class="vForeignKeyRawIdAdminField">'
             '<a href="/admin_widgets/inventory/?_to_field=barcode" '
             'class="related-lookup" id="lookup_id_test" title="Lookup"></a>'
             '&nbsp;<strong><a href="/admin_widgets/inventory/%(pk)s/change/">'
-            "Hidden</a></strong>" % {"pk": hidden.pk},
+            "Hidden</a></strong></div>" % {"pk": hidden.pk},
         )
 
     def test_render_unsafe_limit_choices_to(self):
@@ -773,10 +774,10 @@ class ForeignKeyRawIdWidgetTest(TestCase):
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
             w.render("test", None),
-            '<input type="text" name="test" class="vForeignKeyRawIdAdminField">\n'
+            '<div><input type="text" name="test" class="vForeignKeyRawIdAdminField">'
             '<a href="/admin_widgets/band/?name=%22%26%3E%3Cescapeme&amp;'
             '_to_field=artist_ptr" class="related-lookup" id="lookup_id_test" '
-            'title="Lookup"></a>',
+            'title="Lookup"></a></div>',
         )
 
     def test_render_fk_as_pk_model(self):
@@ -784,9 +785,9 @@ class ForeignKeyRawIdWidgetTest(TestCase):
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
             w.render("test", None),
-            '<input type="text" name="test" class="vForeignKeyRawIdAdminField">\n'
+            '<div><input type="text" name="test" class="vForeignKeyRawIdAdminField">'
             '<a href="/admin_widgets/releaseevent/?_to_field=album" '
-            'class="related-lookup" id="lookup_id_test" title="Lookup"></a>',
+            'class="related-lookup" id="lookup_id_test" title="Lookup"></a></div>',
         )
 
 
@@ -804,10 +805,10 @@ class ManyToManyRawIdWidgetTest(TestCase):
         self.assertHTMLEqual(
             w.render("test", [m1.pk, m2.pk], attrs={}),
             (
-                '<input type="text" name="test" value="%(m1pk)s,%(m2pk)s" '
+                '<div><input type="text" name="test" value="%(m1pk)s,%(m2pk)s" '
                 '   class="vManyToManyRawIdAdminField">'
                 '<a href="/admin_widgets/member/" class="related-lookup" '
-                '   id="lookup_id_test" title="Lookup"></a>'
+                '   id="lookup_id_test" title="Lookup"></a></div>'
             )
             % {"m1pk": m1.pk, "m2pk": m2.pk},
         )
@@ -815,10 +816,10 @@ class ManyToManyRawIdWidgetTest(TestCase):
         self.assertHTMLEqual(
             w.render("test", [m1.pk]),
             (
-                '<input type="text" name="test" value="%(m1pk)s" '
+                '<div><input type="text" name="test" value="%(m1pk)s" '
                 '   class="vManyToManyRawIdAdminField">'
                 '<a href="/admin_widgets/member/" class="related-lookup" '
-                '   id="lookup_id_test" title="Lookup"></a>'
+                '   id="lookup_id_test" title="Lookup"></a></div>'
             )
             % {"m1pk": m1.pk},
         )
@@ -1680,6 +1681,7 @@ class AdminRawIdWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
         Band.objects.create(id=42, name="Bogey Blues")
         Band.objects.create(id=98, name="Green Potatoes")
 
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
     def test_ForeignKey(self):
         from selenium.webdriver.common.by import By
 
@@ -1688,6 +1690,7 @@ class AdminRawIdWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
             self.live_server_url + reverse("admin:admin_widgets_event_add")
         )
         main_window = self.selenium.current_window_handle
+        self.take_screenshot("raw_id_widget")
 
         # No value has been selected yet
         self.assertEqual(
