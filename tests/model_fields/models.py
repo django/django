@@ -626,7 +626,7 @@ class GeneratedModelCheckConstraint(GeneratedModelBase):
         }
         constraints = [
             models.CheckConstraint(
-                condition=models.Q(a__gt=0),
+                check=models.Q(a__gt=0),
                 name="Generated model check constraint a > 0",
             )
         ]
@@ -640,7 +640,7 @@ class GeneratedModelCheckConstraintVirtual(GeneratedModelVirtualBase):
         }
         constraints = [
             models.CheckConstraint(
-                condition=models.Q(a__gt=0),
+                check=models.Q(a__gt=0),
                 name="Generated model check constraint virtual a > 0",
             )
         ]
