@@ -180,11 +180,7 @@ form .aligned table p {
 }
 
 .aligned .vCheckboxLabel {
-    float: none;
-    width: auto;
-    display: inline-block;
-    vertical-align: -3px;
-    padding: 0 0 5px 5px;
+    padding: 1px 0 0 5px;
 }
 
 .aligned .vCheckboxLabel + p.help,
@@ -392,6 +388,10 @@ body.popup .submit-row {
     border: 1px solid var(--hairline-color);
     border-left-color: var(--darkened-bg);
     border-right-color: var(--darkened-bg);
+}
+
+.inline-related h3 {
+    color: var(--body-loud-color);
 }
 
 .inline-related h3 span.delete {

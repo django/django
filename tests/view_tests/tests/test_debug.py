@@ -1463,7 +1463,7 @@ class ExceptionReportTestMixin:
             self.assertNotIn("worcestershire", body_plain)
 
             # Frames vars are shown in html email reports.
-            body_html = str(email.alternatives[0][0])
+            body_html = str(email.alternatives[0].content)
             self.assertIn("cooked_eggs", body_html)
             self.assertIn("scrambled", body_html)
             self.assertIn("sauce", body_html)
@@ -1499,7 +1499,7 @@ class ExceptionReportTestMixin:
             self.assertNotIn("worcestershire", body_plain)
 
             # Frames vars are shown in html email reports.
-            body_html = str(email.alternatives[0][0])
+            body_html = str(email.alternatives[0].content)
             self.assertIn("cooked_eggs", body_html)
             self.assertIn("scrambled", body_html)
             self.assertIn("sauce", body_html)

@@ -466,8 +466,8 @@ class TestQuerying(PostgreSQLTestCase):
                 ],
             )
         sql = ctx[0]["sql"]
-        self.assertIn("GROUP BY 2", sql)
-        self.assertIn("ORDER BY 2", sql)
+        self.assertIn("GROUP BY 1", sql)
+        self.assertIn("ORDER BY 1", sql)
 
     def test_order_by_arrayagg_index(self):
         qs = (

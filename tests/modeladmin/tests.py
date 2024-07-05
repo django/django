@@ -662,7 +662,8 @@ class ModelAdminTests(TestCase):
         self.assertHTMLEqual(
             str(form["main_band"]),
             '<div class="related-widget-wrapper" data-model-ref="band">'
-            '<select name="main_band" id="id_main_band" required>'
+            '<select data-context="available-source" '
+            'name="main_band" id="id_main_band" required>'
             '<option value="" selected>---------</option>'
             '<option value="%d">The Beatles</option>'
             '<option value="%d">The Doors</option>'
@@ -685,7 +686,8 @@ class ModelAdminTests(TestCase):
         self.assertHTMLEqual(
             str(form["main_band"]),
             '<div class="related-widget-wrapper" data-model-ref="band">'
-            '<select name="main_band" id="id_main_band" required>'
+            '<select data-context="available-source" '
+            'name="main_band" id="id_main_band" required>'
             '<option value="" selected>---------</option>'
             '<option value="%d">The Doors</option>'
             "</select></div>" % self.band.id,
@@ -779,7 +781,8 @@ class ModelAdminTests(TestCase):
             type(cmafa.base_fields["main_band"].widget.widget), AdminRadioSelect
         )
         self.assertEqual(
-            cmafa.base_fields["main_band"].widget.attrs, {"class": "radiolist inline"}
+            cmafa.base_fields["main_band"].widget.attrs,
+            {"class": "radiolist inline", "data-context": "available-source"},
         )
         self.assertEqual(
             list(cmafa.base_fields["main_band"].widget.choices),
@@ -790,7 +793,8 @@ class ModelAdminTests(TestCase):
             type(cmafa.base_fields["opening_band"].widget.widget), AdminRadioSelect
         )
         self.assertEqual(
-            cmafa.base_fields["opening_band"].widget.attrs, {"class": "radiolist"}
+            cmafa.base_fields["opening_band"].widget.attrs,
+            {"class": "radiolist", "data-context": "available-source"},
         )
         self.assertEqual(
             list(cmafa.base_fields["opening_band"].widget.choices),

@@ -110,6 +110,9 @@ class SeleniumTests(AdminSeleniumTestCase):
             <option value="1" selected>{interesting_name}</option>
             """,
         )
+        # Check the newly added instance is not also added in the "to" box.
+        m2m_to = self.selenium.find_element(By.ID, "id_m2m_to")
+        self.assertHTMLEqual(m2m_to.get_attribute("innerHTML"), "")
         m2m_box = self.selenium.find_element(By.ID, "id_m2m_from")
         self.assertHTMLEqual(
             m2m_box.get_attribute("innerHTML"),

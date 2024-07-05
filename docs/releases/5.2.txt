@@ -37,7 +37,9 @@ Minor features
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The ``admin/base.html`` template now has a new block
+  :ref:`extrabody <extrabody>` for adding custom code before the closing
+  ``</body>`` tag.
 
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -98,7 +100,10 @@ Minor features
 :mod:`django.contrib.syndication`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* All :class:`~django.utils.feedgenerator.SyndicationFeed` classes now support
+  a ``stylesheets`` attribute. If specified, an ``<? xml-stylesheet ?>``
+  processing instruction will be added to the top of the document for each
+  stylesheet in the given list. See :ref:`feed-stylesheets` for more details.
 
 Asynchronous views
 ~~~~~~~~~~~~~~~~~~
@@ -128,7 +133,19 @@ Decorators
 Email
 ~~~~~
 
-* ...
+* Tuple items of :class:`EmailMessage.attachments
+  <django.core.mail.EmailMessage>` and
+  :class:`EmailMultiAlternatives.attachments
+  <django.core.mail.EmailMultiAlternatives>` are now named tuples, as opposed
+  to regular tuples.
+
+* :attr:`EmailMultiAlternatives.alternatives
+  <django.core.mail.EmailMultiAlternatives.alternatives>` is now a list of
+  named tuples, as opposed to regular tuples.
+
+* The new :meth:`~django.core.mail.EmailMultiAlternatives.body_contains` method
+  returns a boolean indicating whether a provided text is contained in the
+  email ``body`` and in all attached MIME type ``text/*`` alternatives.
 
 Error Reporting
 ~~~~~~~~~~~~~~~
@@ -178,7 +195,13 @@ Migrations
 Models
 ~~~~~~
 
-* ...
+* The ``SELECT`` clause generated when using
+  :meth:`QuerySet.values()<django.db.models.query.QuerySet.values>` and
+  :meth:`~django.db.models.query.QuerySet.values_list` now matches the
+  specified order of the referenced expressions. Previously the order was based
+  of a set of counterintuitive rules which made query combination through
+  methods such as
+  :meth:`QuerySet.union()<django.db.models.query.QuerySet.union>` unpredictable.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -262,4 +285,5 @@ Features deprecated in 5.2
 Miscellaneous
 -------------
 
-* ...
+* The ``all`` argument for the ``django.contrib.staticfiles.finders.find()``
+  function is deprecated in favor of the ``find_all`` argument.
