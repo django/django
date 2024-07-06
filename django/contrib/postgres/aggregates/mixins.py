@@ -1,9 +1,19 @@
+import warnings
+
 from django.core.exceptions import FullResultSet
 from django.db.models.expressions import OrderByList
+from django.utils.deprecation import RemovedInDjango60Warning
 
 
 class OrderableAggMixin:
-    def __init__(self, *expressions, ordering=(), **extra):
+    def __init__(self, *expressions, ordering=(), order_by=(), **extra):
+        if ordering:
+            warnings.warn(
+                "The ordering argument is deprecated. Use order_by instead.",
+                category=RemovedInDjango60Warning,
+            )
+
+        ordering = ordering or order_by
         if not ordering:
             self.order_by = None
         elif isinstance(ordering, (list, tuple)):
@@ -25,12 +35,12 @@ class OrderableAggMixin:
         return super().set_source_expressions(exprs)
 
     def as_sql(self, compiler, connection):
-        *source_exprs, filtering_expr, ordering_expr = self.get_source_expressions()
+        *source_exprs, filtering_expr, order_by_expr = self.get_source_expressions()
 
         order_by_sql = ""
         order_by_params = []
-        if ordering_expr is not None:
-            order_by_sql, order_by_params = compiler.compile(ordering_expr)
+        if order_by_expr is not None:
+            order_by_sql, order_by_params = compiler.compile(order_by_expr)
 
         filter_params = []
         if filtering_expr is not None:
@@ -43,5 +53,5 @@ class OrderableAggMixin:
         for source_expr in source_exprs:
             source_params += compiler.compile(source_expr)[1]
 
-        sql, _ = super().as_sql(compiler, connection, ordering=order_by_sql)
+        sql, _ = super().as_sql(compiler, connection, order_by=order_by_sql)
         return sql, (*source_params, *order_by_params, *filter_params)
