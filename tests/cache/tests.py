@@ -2984,3 +2984,41 @@ class CacheHandlerTest(SimpleTestCase):
         # .all() initializes all caches.
         self.assertEqual(len(test_caches.all(initialized_only=True)), 2)
         self.assertEqual(test_caches.all(), test_caches.all(initialized_only=True))
+
+
+@override_settings(
+    CACHES={
+        "default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"},
+        "other": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "other",
+        },
+    },
+)
+class DuplicateCacheKey(TestCase):
+    def test_cache_page_conflict(self):
+        """cache_page isn't causing duplicates with middlewares"""
+
+        @cache_page(3000, cache="other")
+        def test_view(request):
+            return HttpResponse(b"Hello, world")
+
+        request = RequestFactory().get("/view/")
+        cache_key = (
+            "views.decorators.cache.cache_page..GET."
+            "5b30bdb36b35025daf3570b18c3bb916.d41d8cd98f00b204e9800998ecf8427e.en"
+        )
+
+        self.assertEqual(caches["default"].has_key(cache_key), False)
+        self.assertEqual(caches["other"].has_key(cache_key), False)
+
+        UpdateCacheMiddleware(test_view)(request)
+        self.assertEqual(caches["other"].has_key(cache_key), True)
+        self.assertEqual(caches["default"].has_key(cache_key), False)
+
+        CacheMiddleware(test_view)(request)
+        self.assertEqual(caches["other"].has_key(cache_key), True)
+        self.assertEqual(caches["default"].has_key(cache_key), False)
+
+        response = test_view(request)
+        self.assertEqual(response.content, b"Hello, world")
