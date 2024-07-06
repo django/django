@@ -495,3 +495,9 @@ Miscellaneous
 * The fallback to ``request.user`` when ``user`` is ``None`` in
   ``django.contrib.auth.login()`` and ``django.contrib.auth.alogin()`` will be
   removed.
+
+* The ``ordering`` keyword argument of the PostgreSQL specific aggregation
+  functions ``django.contrib.postgres.aggregates.ArrayAgg``,
+  ``django.contrib.postgres.aggregates.JSONBAgg``, and
+  ``django.contrib.postgres.aggregates.StringAgg`` is deprecated in favor
+  of the ``order_by`` argument.
