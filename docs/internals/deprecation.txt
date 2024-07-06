@@ -22,6 +22,10 @@ details on these changes.
   ``django.contrib.auth.login()`` and ``django.contrib.auth.alogin()`` will be
   removed.
 
+* The ``ordering`` keyword argument of the
+  ``django.contrib.postgres.aggregates.mixins.OrderableAggMixin`` class will be
+  removed.
+
 .. _deprecation-removed-in-6.0:
 
 6.0

@@ -17,7 +17,7 @@ __all__ = [
 
 class ArrayAgg(OrderableAggMixin, Aggregate):
     function = "ARRAY_AGG"
-    template = "%(function)s(%(distinct)s%(expressions)s %(ordering)s)"
+    template = "%(function)s(%(distinct)s%(expressions)s %(order_by)s)"
     allow_distinct = True
 
     @property
@@ -49,14 +49,14 @@ class BoolOr(Aggregate):
 
 class JSONBAgg(OrderableAggMixin, Aggregate):
     function = "JSONB_AGG"
-    template = "%(function)s(%(distinct)s%(expressions)s %(ordering)s)"
+    template = "%(function)s(%(distinct)s%(expressions)s %(order_by)s)"
     allow_distinct = True
     output_field = JSONField()
 
 
 class StringAgg(OrderableAggMixin, Aggregate):
     function = "STRING_AGG"
-    template = "%(function)s(%(distinct)s%(expressions)s %(ordering)s)"
+    template = "%(function)s(%(distinct)s%(expressions)s %(order_by)s)"
     allow_distinct = True
     output_field = TextField()
 
