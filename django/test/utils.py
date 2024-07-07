@@ -29,6 +29,9 @@ from django.test.signals import template_rendered
 from django.urls import get_script_prefix, set_script_prefix
 from django.utils.translation import deactivate
 from django.utils.version import PYPY
+import unittest
+from django.utils.decorators import _dec
+
 
 try:
     import jinja2
@@ -992,3 +995,73 @@ def garbage_collect():
     if PYPY:
         # Collecting weakreferences can take two collections on PyPy.
         gc.collect()
+
+class DummyDecorator:
+    """ Description of DummyDecorator """
+    def __call__(self, f):
+        
+        def wrapped(*args, **kwargs):
+            """
+            Description of wrapped
+
+            Args:
+                *args (undefined):
+                **kwargs (undefined):
+
+            """
+            return f(*args, **kwargs)
+        return wrapped
+
+decorator = DummyDecorator()
+
+def _multi_decorate(decorator, obj):
+    return decorator(obj)
+
+class TestDecFunction(unittest.TestCase):
+    """
+    Description of TestDecFunction
+
+    Inheritance:
+        unittest.TestCase:
+
+    """
+    
+
+    def test_valid_decorate_method(self):
+        """
+        Description of test_valid_decorate_method
+
+        Args:
+            self (undefined):
+
+        """
+        class TestClass:
+            def method(self):
+                return "original"
+
+        name = 'method'
+        result = _dec(TestClass)
+        self.assertTrue(callable(getattr(result, name)))
+        self.assertNotEqual(getattr(result, name)(), "original")
+
+    def test_invalid_decorate_missing_name(self):
+        class TestClass:
+            pass
+
+        name = 'missing_method'
+        with self.assertRaises(ValueError):
+            _dec(TestClass)
+
+    def test_invalid_decorate_non_callable(self):
+        class TestClass:
+            method = "not callable"
+
+        name = 'method'
+        with self.assertRaises(TypeError):
+            _dec(TestClass)
+
+    def test_non_class_object(self):
+        
+        non_class_obj = lambda x: x
+        result = _dec(non_class_obj)
+        self.assertTrue(callable(result))
