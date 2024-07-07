@@ -1367,7 +1367,7 @@ class Query(BaseExpression):
         # __exact is the default lookup if one isn't given.
         *transforms, lookup_name = lookups or ["exact"]
         for name in transforms:
-            lhs = self.try_transform(lhs, name)
+            lhs = self.try_transform(lhs, name, lookups)
         # First try get_lookup() so that the lookup takes precedence if the lhs
         # supports both transform and lookup for the name.
         lookup_class = lhs.get_lookup(lookup_name)
@@ -1401,7 +1401,7 @@ class Query(BaseExpression):
 
         return lookup
 
-    def try_transform(self, lhs, name):
+    def try_transform(self, lhs, name, lookups=None):
         """
         Helper method for build_lookup(). Try to fetch and initialize
         a transform for name parameter from lhs.
@@ -1418,9 +1418,14 @@ class Query(BaseExpression):
                 suggestion = ", perhaps you meant %s?" % " or ".join(suggested_lookups)
             else:
                 suggestion = "."
+            if lookups is not None:
+                name_index = lookups.index(name)
+                unsupported_lookup = LOOKUP_SEP.join(lookups[name_index:])
+            else:
+                unsupported_lookup = name
             raise FieldError(
                 "Unsupported lookup '%s' for %s or join on the field not "
-                "permitted%s" % (name, output_field.__name__, suggestion)
+                "permitted%s" % (unsupported_lookup, output_field.__name__, suggestion)
             )
 
     def build_filter(
