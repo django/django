@@ -9,6 +9,7 @@ from django.db import DatabaseError, NotSupportedError
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import F, OrderBy, RawSQL, Ref, Value
 from django.db.models.fields.composite import (
+    Cols,
     CompositePrimaryKey,
     unnest_composite_fields,
 )
@@ -1506,7 +1507,10 @@ class SQLCompiler:
     def get_converters(self, expressions):
         converters = {}
         for i, expression in enumerate(expressions):
-            if expression:
+            if isinstance(expression, Cols):
+                pos = (i, i + len(expression))
+                converters[pos] = ((Cols.db_converter,), expression)
+            elif expression:
                 backend_converters = self.connection.ops.get_db_converters(expression)
                 field_converters = expression.get_db_converters(self.connection)
                 if backend_converters or field_converters:
@@ -1518,6 +1522,8 @@ class SQLCompiler:
         converters = list(converters.items())
         for row in map(list, rows):
             for pos, (convs, expression) in converters:
+                if isinstance(pos, tuple):
+                    pos = slice(*pos)
                 value = row[pos]
                 for converter in convs:
                     value = converter(value, expression, connection)

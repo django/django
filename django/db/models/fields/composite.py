@@ -441,3 +441,7 @@ class Cols(Expression):
             return TupleRelatedIsNull
 
         return lookup
+
+    @staticmethod
+    def db_converter(value, *_):
+        return (tuple(value),)

@@ -15,9 +15,15 @@ class CompositePKGetTests(TestCase):
     def setUpTestData(cls):
         cls.tenant_1 = Tenant.objects.create()
         cls.tenant_2 = Tenant.objects.create()
-        cls.user_1 = User.objects.create(tenant=cls.tenant_1, id=1)
-        cls.user_2 = User.objects.create(tenant=cls.tenant_1, id=2)
-        cls.user_3 = User.objects.create(tenant=cls.tenant_2, id=3)
+        cls.user_1 = User.objects.create(
+            tenant=cls.tenant_1, id=1, email="user0001@example.com"
+        )
+        cls.user_2 = User.objects.create(
+            tenant=cls.tenant_1, id=2, email="user0002@example.com"
+        )
+        cls.user_3 = User.objects.create(
+            tenant=cls.tenant_2, id=3, email="user0003@example.com"
+        )
         cls.comment_1 = Comment.objects.create(id=1, user=cls.user_1)
 
     def test_get_user(self):
@@ -130,3 +136,47 @@ class CompositePKGetTests(TestCase):
             with self.subTest(user_id=user_id):
                 user = users.get(id=user_id)
                 self.assertEqual(user.comments_count, count)
+
+    def test_values_list(self):
+        self.assertSequenceEqual(
+            User.objects.values_list("pk").order_by("pk"),
+            (
+                ((1, 1),),
+                ((1, 2),),
+                ((2, 3),),
+            ),
+        )
+        self.assertSequenceEqual(
+            User.objects.values_list("pk", "email").order_by("pk"),
+            (
+                ((1, 1), "user0001@example.com"),
+                ((1, 2), "user0002@example.com"),
+                ((2, 3), "user0003@example.com"),
+            ),
+        )
+        self.assertSequenceEqual(
+            User.objects.values_list("pk", flat=True).order_by("pk"),
+            (
+                (1, 1),
+                (1, 2),
+                (2, 3),
+            ),
+        )
+
+    def test_values(self):
+        self.assertSequenceEqual(
+            User.objects.values("pk").order_by("pk"),
+            (
+                {"pk": (1, 1)},
+                {"pk": (1, 2)},
+                {"pk": (2, 3)},
+            ),
+        )
+        self.assertSequenceEqual(
+            User.objects.values("pk", "email").order_by("pk"),
+            (
+                {"pk": (1, 1), "email": "user0001@example.com"},
+                {"pk": (1, 2), "email": "user0002@example.com"},
+                {"pk": (2, 3), "email": "user0003@example.com"},
+            ),
+        )
