@@ -1134,6 +1134,9 @@ class SQLCompiler:
         """
         result = []
         params = []
+        # Copy alias_map to a tuple in case Join.as_sql() subclasses (objects
+        # in alias_map) alter compiler.query.alias_map. That would otherwise
+        # raise "RuntimeError: dictionary changed size during iteration".
         for alias, from_clause in tuple(self.query.alias_map.items()):
             if not self.query.alias_refcount[alias]:
                 continue
