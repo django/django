@@ -650,13 +650,13 @@ class Query(BaseExpression):
                 for combined_query in q.combined_queries
             )
         q.clear_ordering(force=True)
-        if limit:
+        if limit is True:
             q.set_limits(high=1)
         q.add_annotation(Value(1), "a")
         return q
 
     def has_results(self, using):
-        q = self.exists(using)
+        q = self.exists()
         compiler = q.get_compiler(using=using)
         return compiler.has_results()
 
