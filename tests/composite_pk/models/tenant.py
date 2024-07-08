@@ -42,3 +42,9 @@ class Comment(models.Model):
         related_name="comments",
     )
     text = models.TextField(default="", blank=True)
+
+
+class Post(models.Model):
+    pk = models.CompositePrimaryKey("tenant_id", "uuid")
+    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE)
+    uuid = models.UUIDField()

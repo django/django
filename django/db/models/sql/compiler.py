@@ -1508,6 +1508,10 @@ class SQLCompiler:
         converters = {}
         for i, expression in enumerate(expressions):
             if isinstance(expression, Cols):
+                cols = expression.get_source_expressions()
+                cols_converters = self.get_converters(cols)
+                for j, (convs, col) in cols_converters.items():
+                    converters[i + j] = (convs, col)
                 pos = (i, i + len(expression))
                 converters[pos] = ((Cols.db_converter,), expression)
             elif expression:

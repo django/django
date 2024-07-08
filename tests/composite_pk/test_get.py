@@ -1,7 +1,9 @@
+from uuid import UUID
+
 from django.db.models import Count
 from django.test import TestCase
 
-from .models import Comment, Tenant, User
+from .models import Comment, Post, Tenant, User
 
 
 class CompositePKGetTests(TestCase):
@@ -25,6 +27,15 @@ class CompositePKGetTests(TestCase):
             tenant=cls.tenant_2, id=3, email="user0003@example.com"
         )
         cls.comment_1 = Comment.objects.create(id=1, user=cls.user_1)
+        cls.post_1 = Post.objects.create(
+            tenant=cls.tenant_1, uuid="748ae4e5-eed7-442d-a93d-43867eadee2b"
+        )
+        cls.post_2 = Post.objects.create(
+            tenant=cls.tenant_1, uuid="b36cebfc-a9a5-48fd-baeb-2ad0fe63b260"
+        )
+        cls.post_3 = Post.objects.create(
+            tenant=cls.tenant_2, uuid="aa3d4b88-6ae1-45be-890e-32dd7e71b790"
+        )
 
     def test_get_user(self):
         test_cases = (
@@ -160,6 +171,14 @@ class CompositePKGetTests(TestCase):
                 (1, 1),
                 (1, 2),
                 (2, 3),
+            ),
+        )
+        self.assertSequenceEqual(
+            Post.objects.values_list("pk", flat=True).order_by("pk"),
+            (
+                (1, UUID("748ae4e5-eed7-442d-a93d-43867eadee2b")),
+                (1, UUID("b36cebfc-a9a5-48fd-baeb-2ad0fe63b260")),
+                (2, UUID("aa3d4b88-6ae1-45be-890e-32dd7e71b790")),
             ),
         )
 
