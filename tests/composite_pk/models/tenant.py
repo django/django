@@ -45,6 +45,6 @@ class Comment(models.Model):
 
 
 class Post(models.Model):
-    pk = models.CompositePrimaryKey("tenant_id", "uuid")
+    pk = models.CompositePrimaryKey("tenant_id", "id")
     tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE)
-    uuid = models.UUIDField()
+    id = models.UUIDField()

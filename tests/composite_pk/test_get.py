@@ -28,13 +28,13 @@ class CompositePKGetTests(TestCase):
         )
         cls.comment_1 = Comment.objects.create(id=1, user=cls.user_1)
         cls.post_1 = Post.objects.create(
-            tenant=cls.tenant_1, uuid="748ae4e5-eed7-442d-a93d-43867eadee2b"
+            tenant=cls.tenant_1, id="748ae4e5-eed7-442d-a93d-43867eadee2b"
         )
         cls.post_2 = Post.objects.create(
-            tenant=cls.tenant_1, uuid="b36cebfc-a9a5-48fd-baeb-2ad0fe63b260"
+            tenant=cls.tenant_1, id="b36cebfc-a9a5-48fd-baeb-2ad0fe63b260"
         )
         cls.post_3 = Post.objects.create(
-            tenant=cls.tenant_2, uuid="aa3d4b88-6ae1-45be-890e-32dd7e71b790"
+            tenant=cls.tenant_2, id="aa3d4b88-6ae1-45be-890e-32dd7e71b790"
         )
 
     def test_get_user(self):
@@ -152,33 +152,33 @@ class CompositePKGetTests(TestCase):
         self.assertSequenceEqual(
             User.objects.values_list("pk").order_by("pk"),
             (
-                ((1, 1),),
-                ((1, 2),),
-                ((2, 3),),
+                (self.user_1.pk,),
+                (self.user_2.pk,),
+                (self.user_3.pk,),
             ),
         )
         self.assertSequenceEqual(
             User.objects.values_list("pk", "email").order_by("pk"),
             (
-                ((1, 1), "user0001@example.com"),
-                ((1, 2), "user0002@example.com"),
-                ((2, 3), "user0003@example.com"),
+                (self.user_1.pk, "user0001@example.com"),
+                (self.user_2.pk, "user0002@example.com"),
+                (self.user_3.pk, "user0003@example.com"),
             ),
         )
         self.assertSequenceEqual(
             User.objects.values_list("pk", flat=True).order_by("pk"),
             (
-                (1, 1),
-                (1, 2),
-                (2, 3),
+                self.user_1.pk,
+                self.user_2.pk,
+                self.user_3.pk,
             ),
         )
         self.assertSequenceEqual(
             Post.objects.values_list("pk", flat=True).order_by("pk"),
             (
-                (1, UUID("748ae4e5-eed7-442d-a93d-43867eadee2b")),
-                (1, UUID("b36cebfc-a9a5-48fd-baeb-2ad0fe63b260")),
-                (2, UUID("aa3d4b88-6ae1-45be-890e-32dd7e71b790")),
+                (self.tenant_1.id, UUID("748ae4e5-eed7-442d-a93d-43867eadee2b")),
+                (self.tenant_1.id, UUID("b36cebfc-a9a5-48fd-baeb-2ad0fe63b260")),
+                (self.tenant_2.id, UUID("aa3d4b88-6ae1-45be-890e-32dd7e71b790")),
             ),
         )
 
@@ -186,16 +186,16 @@ class CompositePKGetTests(TestCase):
         self.assertSequenceEqual(
             User.objects.values("pk").order_by("pk"),
             (
-                {"pk": (1, 1)},
-                {"pk": (1, 2)},
-                {"pk": (2, 3)},
+                {"pk": self.user_1.pk},
+                {"pk": self.user_2.pk},
+                {"pk": self.user_3.pk},
             ),
         )
         self.assertSequenceEqual(
             User.objects.values("pk", "email").order_by("pk"),
             (
-                {"pk": (1, 1), "email": "user0001@example.com"},
-                {"pk": (1, 2), "email": "user0002@example.com"},
-                {"pk": (2, 3), "email": "user0003@example.com"},
+                {"pk": self.user_1.pk, "email": "user0001@example.com"},
+                {"pk": self.user_2.pk, "email": "user0002@example.com"},
+                {"pk": self.user_3.pk, "email": "user0003@example.com"},
             ),
         )
