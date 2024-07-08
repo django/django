@@ -1911,6 +1911,38 @@ class TestBadSetUpTestData(TestCase):
         self.assertFalse(self._in_atomic_block)
 
 
+@skipUnlessDBFeature
+class TestDataLeakOnSetUpTestData(TestCase):
+    class MyException(Exception):
+        pass
+
+    @classmethod
+    def setUpClass(cls):
+        try:
+            super().setUpClass()
+        except cls.MyException:
+            cls._in_atomic_block = connection.in_atomic_block
+
+    @classmethod
+    def setUpTestData(cls):
+        try:
+            raise cls.MyException()
+
+        except cls.MyException:
+            cls._fixture_teardown()
+            raise
+
+    @classmethod
+    def _fixture_teardown(cls):
+        try:
+            super()._fixture_teardown()
+        except Exception:
+            pass
+
+    def test_failure_in_setUpTestData_should_rollback_transaction(self):
+        self.assertFalse(self._in_atomic_block)
+
+
 @skipUnlessDBFeature("supports_transactions")
 class CaptureOnCommitCallbacksTests(TestCase):
     databases = {"default", "other"}
