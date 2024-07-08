@@ -121,11 +121,10 @@ class UpdateCacheMiddleware(MiddlewareMixin):
             cache_key = learn_cache_key(
                 request, response, timeout, self.key_prefix, cache=self.cache
             )
-            # check header for "x-successive-cache" to avoid multiple cache sets
-            # if not found, set it as key used
-            if response.has_header("x-successive-cache"):
+            # avoid multiple cache sets
+            if response.has_header("X-Cache-Success"):
                 return response
-            response["x-successive-cache"] = cache_key
+            response["X-Cache-Success"] = "true"
 
             if hasattr(response, "render") and callable(response.render):
                 response.add_post_render_callback(
