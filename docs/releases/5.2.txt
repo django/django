@@ -318,6 +318,9 @@ Models
 * :meth:`.QuerySet.explain` now supports the ``memory`` and ``serialize``
   options on PostgreSQL 17+.
 
+* Added :class:`~django.db.models.JSONArrayAgg` aggregate function to support
+  ``JSON_ARRAYAGG`` and ``JSON_GROUP_ARRAY`` for SQLite.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

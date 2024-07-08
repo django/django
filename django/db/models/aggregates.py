@@ -6,6 +6,7 @@ from django.core.exceptions import FieldError, FullResultSet
 from django.db import NotSupportedError
 from django.db.models.expressions import Case, ColPairs, Func, Star, Value, When
 from django.db.models.fields import IntegerField
+from django.db.models.fields.json import JSONField
 from django.db.models.functions import Coalesce
 from django.db.models.functions.mixins import (
     FixDurationInputMixin,
@@ -16,6 +17,7 @@ __all__ = [
     "Aggregate",
     "Avg",
     "Count",
+    "JSONArrayAgg",
     "Max",
     "Min",
     "StdDev",
@@ -124,13 +126,16 @@ class Aggregate(Func):
                 except FullResultSet:
                     pass
                 else:
-                    template = self.filter_template % extra_context.get(
-                        "template", self.template
-                    )
+                    extra_context = {
+                        **extra_context,
+                        "template": (
+                            self.filter_template
+                            % extra_context.get("template", self.template)
+                        ),
+                    }
                     sql, params = super().as_sql(
                         compiler,
                         connection,
-                        template=template,
                         filter=filter_sql,
                         **extra_context,
                     )
@@ -228,3 +233,49 @@ class Variance(NumericOutputFieldMixin, Aggregate):
 
     def _get_repr_options(self):
         return {**super()._get_repr_options(), "sample": self.function == "VAR_SAMP"}
+
+
+class JSONArrayAgg(Aggregate):
+    function = "JSON_ARRAYAGG"
+    output_field = JSONField()
+    arity = 1
+
+    def as_sql(self, compiler, connection, **extra_context):
+        if self.filter and not connection.features.supports_aggregate_filter_clause:
+            raise NotSupportedError(
+                "JSONArrayAgg(filter) is not supported on this database backend."
+            )
+        return super().as_sql(compiler, connection, **extra_context)
+
+    def as_sqlite(self, compiler, connection, **extra_context):
+        sql, params = self.as_sql(
+            compiler, connection, function="JSON_GROUP_ARRAY", **extra_context
+        )
+        # JSON_GROUP_ARRAY defaults to returning an empty array on an empty set.
+        if (default := self.default) == []:
+            return sql, params
+        # Ensure Count() is against the exact same parameters (filter, distinct)
+        count = self.copy()
+        count.__class__ = Count
+        count_sql, count_params = compiler.compile(count)
+        default_sql = ""
+        default_params = () if self.filter is not None else []
+        if default is not None:
+            default_sql, default_params = compiler.compile(default)
+            default_sql = f" ELSE {default_sql}"
+        sql = f"(CASE WHEN {count_sql} > 0 THEN {sql}{default_sql} END)"
+        return sql, count_params + params + default_params
+
+    def as_postgresql(self, compiler, connection, **extra_context):
+        if not connection.features.is_postgresql_16:
+            sql, params = super().as_sql(
+                compiler,
+                connection,
+                function="ARRAY_AGG",
+                **extra_context,
+            )
+            return f"TO_JSONB({sql})", params
+        extra_context.setdefault(
+            "template", "%(function)s(%(distinct)s%(expressions)s RETURNING JSONB)"
+        )
+        return self.as_sql(compiler, connection, **extra_context)
