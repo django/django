@@ -1120,6 +1120,7 @@ a.deletelink:focus, a.deletelink:hover {
     margin: 0;
     border-top: 1px solid var(--hairline-color);
     width: 100%;
+    box-sizing: border-box;
 }
 
 .paginator a:link, .paginator a:visited {
