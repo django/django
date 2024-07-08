@@ -7,7 +7,7 @@ import sys
 import threading
 import unittest
 from collections import Counter
-from contextlib import contextmanager
+from contextlib import contextmanager, suppress
 from copy import copy, deepcopy
 from difflib import get_close_matches
 from functools import wraps
@@ -1125,6 +1125,12 @@ class TransactionTestCase(SimpleTestCase):
         try:
             self._fixture_setup()
         except Exception:
+            # Attempt to teardown fixtures on exception during setup as
+            # `_post_teardown` won't be triggered to cleanup state when an
+            # an exception is surfaced to `SimpleTestCase._pre_setup`.
+            with suppress(Exception):
+                self._fixture_teardown()
+
             if self.available_apps is not None:
                 apps.unset_available_apps()
                 setting_changed.send(
