@@ -6164,7 +6164,7 @@ class OperationTests(OperationTestBase):
         operation_3 = migrations.RemoveField("Pony", "pk")
         table_name = f"{app_label}_pony"
 
-        # 1. Add field (primary_key).
+        # 1. Add field (pk).
         new_state = project_state.clone()
         operation_1.state_forwards(app_label, new_state)
         with connection.schema_editor() as editor:
@@ -6172,8 +6172,9 @@ class OperationTests(OperationTestBase):
         self.assertColumnNotExists(table_name, "pk")
         Pony = new_state.apps.get_model(app_label, "pony")
         obj_1 = Pony.objects.create(weight=1)
-        self.assertEqual(obj_1.id, 1)
-        self.assertEqual(obj_1.pk, (obj_1.id,))
+        msg = f"obj_1={obj_1}, obj_1.id={obj_1.id}, obj_1.pk={obj_1.pk}"
+        self.assertEqual(obj_1.id, 1, msg)
+        self.assertEqual(obj_1.pk, (obj_1.id,), msg)
 
         # 2. Alter field (id -> IntegerField()).
         project_state, new_state = new_state, new_state.clone()
@@ -6188,7 +6189,7 @@ class OperationTests(OperationTestBase):
         self.assertEqual(obj_2.id, 2)
         self.assertEqual(obj_2.pk, (obj_2.id,))
 
-        # 3. Remove field (primary_key).
+        # 3. Remove field (pk).
         project_state, new_state = new_state, new_state.clone()
         operation_3.state_forwards(app_label, new_state)
         with connection.schema_editor() as editor:
