@@ -166,6 +166,14 @@ class CompositePKGetTests(TestCase):
             ),
         )
         self.assertSequenceEqual(
+            User.objects.values_list("pk", "id").order_by("pk"),
+            (
+                (self.user_1.pk, self.user_1.id),
+                (self.user_2.pk, self.user_2.id),
+                (self.user_3.pk, self.user_3.id),
+            ),
+        )
+        self.assertSequenceEqual(
             User.objects.values_list("pk", flat=True).order_by("pk"),
             (
                 self.user_1.pk,
@@ -197,5 +205,13 @@ class CompositePKGetTests(TestCase):
                 {"pk": self.user_1.pk, "email": "user0001@example.com"},
                 {"pk": self.user_2.pk, "email": "user0002@example.com"},
                 {"pk": self.user_3.pk, "email": "user0003@example.com"},
+            ),
+        )
+        self.assertSequenceEqual(
+            User.objects.values("pk", "id").order_by("pk"),
+            (
+                {"pk": self.user_1.pk, "id": self.user_1.id},
+                {"pk": self.user_2.pk, "id": self.user_2.id},
+                {"pk": self.user_3.pk, "id": self.user_3.id},
             ),
         )
