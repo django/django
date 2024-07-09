@@ -5,7 +5,7 @@ Django 5.0.7 release notes
 *July 9, 2024*
 
 Django 5.0.7 fixes two security issues with severity "moderate", two security
-issues with severity "low", and several bugs in 5.0.6.
+issues with severity "low", and one bug in 5.0.6.
 
 CVE-2024-38875: Potential denial-of-service vulnerability in ``django.utils.html.urlize()``
 ===========================================================================================
