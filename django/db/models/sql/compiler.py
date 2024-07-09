@@ -1506,6 +1506,7 @@ class SQLCompiler:
 
     def get_converters(self, expressions):
         converters = {}
+        other_converters = {}
         for i, expression in enumerate(expressions):
             if isinstance(expression, Cols):
                 cols = expression.get_source_expressions()
@@ -1513,12 +1514,13 @@ class SQLCompiler:
                 for j, (convs, col) in cols_converters.items():
                     converters[i + j] = (convs, col)
                 pos = (i, i + len(expression))
-                converters[pos] = ((Cols.db_converter,), expression)
+                other_converters[pos] = ((Cols.db_converter,), expression)
             elif expression:
                 backend_converters = self.connection.ops.get_db_converters(expression)
                 field_converters = expression.get_db_converters(self.connection)
                 if backend_converters or field_converters:
                     converters[i] = (backend_converters + field_converters, expression)
+        converters.update(other_converters)
         return converters
 
     def apply_converters(self, rows, converters):
