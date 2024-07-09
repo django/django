@@ -6172,7 +6172,13 @@ class OperationTests(OperationTestBase):
         self.assertColumnNotExists(table_name, "pk")
         Pony = new_state.apps.get_model(app_label, "pony")
         obj_1 = Pony.objects.create(weight=1)
-        msg = f"obj_1={obj_1}, obj_1.id={obj_1.id}, obj_1.pk={obj_1.pk}"
+        msg = (
+            f"obj_1={obj_1}, "
+            f"obj_1.id={obj_1.id}, "
+            f"obj_1.pk={obj_1.pk}, "
+            f"Pony._meta.pk={Pony._meta.pk}, "
+            f"Pony._meta.get_field('id')={Pony._meta.get_field('id')}"
+        )
         self.assertEqual(obj_1.id, 1, msg)
         self.assertEqual(obj_1.pk, (obj_1.id,), msg)
 
