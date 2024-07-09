@@ -6176,8 +6176,8 @@ class OperationTests(OperationTestBase):
             f"obj_1={obj_1}, "
             f"obj_1.id={obj_1.id}, "
             f"obj_1.pk={obj_1.pk}, "
-            f"Pony._meta.pk={Pony._meta.pk}, "
-            f"Pony._meta.get_field('id')={Pony._meta.get_field('id')}"
+            f"Pony._meta.pk={repr(Pony._meta.pk)}, "
+            f"Pony._meta.get_field('id')={repr(Pony._meta.get_field('id'))}"
         )
         self.assertEqual(obj_1.id, 1, msg)
         self.assertEqual(obj_1.pk, (obj_1.id,), msg)
