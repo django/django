@@ -1877,8 +1877,10 @@ class SQLInsertCompiler(SQLCompiler):
                         self.returning_params,
                     )
                 ]
+                print("self.returning_fields", self.returning_fields)
                 cols = [field.get_col(opts.db_table) for field in self.returning_fields]
             else:
+                print("opts.pk", opts.pk)
                 cols = [opts.pk.get_col(opts.db_table)]
                 rows = [
                     (
