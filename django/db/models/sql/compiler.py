@@ -1889,7 +1889,11 @@ class SQLInsertCompiler(SQLCompiler):
                         ),
                     )
                 ]
-        converters = self.get_converters(cols)
+        try:
+            converters = self.get_converters(cols)
+        except ValueError:
+            print(rows)
+            raise
         if converters:
             rows = list(self.apply_converters(rows, converters))
         return rows
