@@ -16,6 +16,7 @@ from django.contrib.admin.utils import (
     label_for_field,
     lookup_field,
     quote,
+    unquote,
 )
 from django.core.validators import EMPTY_VALUES
 from django.db import DEFAULT_DB_ALIAS, models
@@ -436,7 +437,34 @@ class UtilsTests(SimpleTestCase):
         )
 
     def test_quote(self):
-        self.assertEqual(quote("something\nor\nother"), "something_0Aor_0Aother")
+        test_cases = (
+            ("something\nor\nother", "something_0Aor_0Aother"),
+            ("f,o,o", "f_2Co_2Co"),
+            ("b-a-r", "b-a-r"),
+            ((), ""),
+            ((1, 2), "1,2"),
+            ((3, "f,o,o"), "3,f_2Co_2Co"),
+            ((4, "b-a-r"), "4,b-a-r"),
+        )
+
+        for s, expected in test_cases:
+            with self.subTest(s=s, expected=expected):
+                self.assertEqual(quote(s), expected)
+
+    def test_unquote(self):
+        test_cases = (
+            ("something_0Aor_0Aother", "something\nor\nother"),
+            ("f_2Co_2Co", "f,o,o"),
+            ("b-a-r", "b-a-r"),
+            ("", ""),
+            ("1,2", ("1", "2")),
+            ("3,f_2Co_2Co", ("3", "f,o,o")),
+            ("4,b-a-r", ("4", "b-a-r")),
+        )
+
+        for s, expected in test_cases:
+            with self.subTest(s=s, expected=expected):
+                self.assertEqual(unquote(s), expected)
 
     def test_build_q_object_from_lookup_parameters(self):
         parameters = {

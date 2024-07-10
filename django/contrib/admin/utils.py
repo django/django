@@ -23,6 +23,7 @@ from django.utils.translation import override as translation_override
 QUOTE_MAP = {i: "_%02X" % i for i in b'":/_#?;@&=+$,"[]<>%\n\\'}
 UNQUOTE_MAP = {v: chr(k) for k, v in QUOTE_MAP.items()}
 UNQUOTE_RE = _lazy_re_compile("_(?:%s)" % "|".join([x[1:] for x in UNQUOTE_MAP]))
+PK_SEP = ","
 
 
 class FieldIsAForeignKeyColumnName(Exception):
@@ -91,11 +92,17 @@ def quote(s):
     Similar to urllib.parse.quote(), except that the quoting is slightly
     different so that it doesn't get automatically unquoted by the web browser.
     """
-    return s.translate(QUOTE_MAP) if isinstance(s, str) else s
+    if isinstance(s, str):
+        return s.translate(QUOTE_MAP)
+    elif isinstance(s, tuple):
+        return PK_SEP.join(str(quote(f)) for f in s)
+    return s
 
 
 def unquote(s):
     """Undo the effects of quote()."""
+    if PK_SEP in s:
+        return tuple(unquote(f) for f in s.split(PK_SEP))
     return UNQUOTE_RE.sub(lambda m: UNQUOTE_MAP[m[0]], s)
 
 
