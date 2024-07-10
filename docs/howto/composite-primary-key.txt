@@ -41,7 +41,8 @@ As of now, Django doesn't offer built-in support for the migration of primary
 keys.
 
 This means once a table is created, its primary key cannot be changed via
-Django's migration operations.
+Django's migration operations, regardless of whether the table was created
+with a regular primary key or a composite primary key.
 
 If you would like to migrate an existing table from a single primary key to a
 composite primary key, follow your database backend's instructions to do so.
