@@ -1515,6 +1515,8 @@ class SQLCompiler:
                     converters[i + j] = (convs, col)
                 pos = (i, i + len(expression))
                 other_converters[pos] = ((Cols.db_converter,), expression)
+                print(expressions)
+                raise ValueError()
             elif expression:
                 backend_converters = self.connection.ops.get_db_converters(expression)
                 field_converters = expression.get_db_converters(self.connection)
