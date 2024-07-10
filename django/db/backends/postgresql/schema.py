@@ -154,9 +154,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # different type.
         old_db_params = old_field.db_parameters(connection=self.connection)
         old_type = old_db_params["type"]
-        if self._is_changing_type_of_indexed_text_column(
-            old_field, old_type, new_type
-        ):
+        if self._is_changing_type_of_indexed_text_column(old_field, old_type, new_type):
             index_name = self._create_index_name(
                 model._meta.db_table, [old_field.column], suffix="_like"
             )
@@ -276,9 +274,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 or (new_field.unique and not new_field.primary_key)
             )
         ) or (
-            self._is_changing_type_of_indexed_text_column(
-                old_field, old_type, new_type
-            )
+            self._is_changing_type_of_indexed_text_column(old_field, old_type, new_type)
         ):
             return True
 
