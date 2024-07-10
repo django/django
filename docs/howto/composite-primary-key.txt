@@ -63,7 +63,9 @@ primary key appropriately.
 How to define a composite foreign key
 =====================================
 
-At the moment, ``ForeignKey`` doesn't support composite primary keys.
+At the moment, relationship fields (``ForeignKey``, ``OneToOneField``,
+``ManyToManyField``) don't support composite primary keys.
+
 For the time being, the ``ForeignObject`` field can be used as an alternative:
 
 .. code-block:: pycon
