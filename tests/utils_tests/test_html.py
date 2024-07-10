@@ -338,6 +338,15 @@ class TestUtilsHtml(SimpleTestCase):
                 'Search for <a href="http://google.com/?q=">google.com/?q=</a>!',
             ),
             ("foo@example.com", '<a href="mailto:foo@example.com">foo@example.com</a>'),
+            (
+                "test@" + "한.글." * 15 + "aaa",
+                '<a href="mailto:test@'
+                + "xn--6q8b.xn--bj0b." * 15
+                + 'aaa">'
+                + "test@"
+                + "한.글." * 15
+                + "aaa</a>",
+            ),
         )
         for value, output in tests:
             with self.subTest(value=value):
@@ -346,6 +355,10 @@ class TestUtilsHtml(SimpleTestCase):
     def test_urlize_unchanged_inputs(self):
         tests = (
             ("a" + "@a" * 50000) + "a",  # simple_email_re catastrophic test
+            # Unicode domain catastrophic tests.
+            "a@" + "한.글." * 1_000_000 + "a",
+            "http://" + "한.글." * 1_000_000 + "com",
+            "www." + "한.글." * 1_000_000 + "com",
             ("a" + "." * 1000000) + "a",  # trailing_punctuation catastrophic test
             "foo@",
             "@foo.com",
