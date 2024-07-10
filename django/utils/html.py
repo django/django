@@ -13,6 +13,8 @@ from django.utils.regex_helper import _lazy_re_compile
 from django.utils.safestring import SafeData, SafeString, mark_safe
 from django.utils.text import normalize_newlines
 
+MAX_URL_LENGTH = 2048
+
 
 @keep_lazy(SafeString)
 def escape(text):
@@ -300,9 +302,9 @@ class Urlizer:
             # Make URL we want to point to.
             url = None
             nofollow_attr = ' rel="nofollow"' if nofollow else ""
-            if self.simple_url_re.match(middle):
+            if len(middle) <= MAX_URL_LENGTH and self.simple_url_re.match(middle):
                 url = smart_urlquote(html.unescape(middle))
-            elif self.simple_url_2_re.match(middle):
+            elif len(middle) <= MAX_URL_LENGTH and self.simple_url_2_re.match(middle):
                 url = smart_urlquote("http://%s" % html.unescape(middle))
             elif ":" not in middle and self.is_email_simple(middle):
                 local, domain = middle.rsplit("@", 1)
@@ -416,6 +418,10 @@ class Urlizer:
             p1, p2 = value.split("@")
         except ValueError:
             # value contains more than one @.
+            return False
+        # Max length for domain name labels is 63 characters per RFC 1034.
+        # Helps to avoid ReDoS vectors in the domain part.
+        if len(p2) > 63:
             return False
         # Dot must be in p2 (e.g. example.com)
         if "." not in p2 or p2.startswith("."):
