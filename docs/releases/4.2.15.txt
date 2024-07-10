@@ -23,6 +23,13 @@ CVE-2024-41990: Potential denial-of-service vulnerability in ``django.utils.html
 denial-of-service attack via very large inputs with a specific sequence of
 characters.
 
+CVE-2024-41991: Potential denial-of-service vulnerability in ``django.utils.html.urlize()`` and ``AdminURLFieldWidget``
+=======================================================================================================================
+
+:tfilter:`urlize`, :tfilter:`urlizetrunc`, and ``AdminURLFieldWidget`` were
+subject to a potential denial-of-service attack via certain inputs with a very
+large number of Unicode characters.
+
 Bugfixes
 ========
 
