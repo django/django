@@ -1506,7 +1506,6 @@ class SQLCompiler:
 
     def get_converters(self, expressions):
         converters = {}
-        other_converters = {}
         for i, expression in enumerate(expressions):
             if isinstance(expression, Cols):
                 cols = expression.get_source_expressions()
@@ -1514,17 +1513,12 @@ class SQLCompiler:
                 for j, (convs, col) in cols_converters.items():
                     converters[i + j] = (convs, col)
                 pos = (i, i + len(expression))
-                other_converters[pos] = ((Cols.db_converter,), expression)
-                print(expressions)
-                print(expression.get_source_expressions())
-                print(expression.output_field)
-                raise ValueError()
+                converters[pos] = ((Cols.db_converter,), expression)
             elif expression:
                 backend_converters = self.connection.ops.get_db_converters(expression)
                 field_converters = expression.get_db_converters(self.connection)
                 if backend_converters or field_converters:
                     converters[i] = (backend_converters + field_converters, expression)
-        converters.update(other_converters)
         return converters
 
     def apply_converters(self, rows, converters):
@@ -1877,11 +1871,9 @@ class SQLInsertCompiler(SQLCompiler):
                         self.returning_params,
                     )
                 ]
-                print("self.returning_fields", self.returning_fields)
                 cols = [field.get_col(opts.db_table) for field in self.returning_fields]
             else:
-                print("opts.pk", opts.pk)
-                cols = [opts.pk.get_col(opts.db_table)]
+                cols = [self.returning_fields[0].get_col(opts.db_table)]
                 rows = [
                     (
                         self.connection.ops.last_insert_id(
@@ -1891,11 +1883,7 @@ class SQLInsertCompiler(SQLCompiler):
                         ),
                     )
                 ]
-        try:
-            converters = self.get_converters(cols)
-        except ValueError:
-            print(rows)
-            raise
+        converters = self.get_converters(cols)
         if converters:
             rows = list(self.apply_converters(rows, converters))
         return rows
