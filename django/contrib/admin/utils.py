@@ -99,11 +99,14 @@ def quote(s):
     return s
 
 
-def unquote(s):
+def unquote(s, pk_len=1):
     """Undo the effects of quote()."""
-    if PK_SEP in s:
-        return tuple(unquote(f) for f in s.split(PK_SEP))
-    return UNQUOTE_RE.sub(lambda m: UNQUOTE_MAP[m[0]], s)
+    if 1 < pk_len:
+        pk = s.split(PK_SEP, maxsplit=pk_len - 1)
+        pk += [""] * (pk_len - len(pk))
+        return tuple(unquote(f) for f in pk)
+    else:
+        return UNQUOTE_RE.sub(lambda m: UNQUOTE_MAP[m[0]], s)
 
 
 def flatten(fields):

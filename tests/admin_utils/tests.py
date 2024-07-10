@@ -453,18 +453,26 @@ class UtilsTests(SimpleTestCase):
 
     def test_unquote(self):
         test_cases = (
-            ("something_0Aor_0Aother", "something\nor\nother"),
-            ("f_2Co_2Co", "f,o,o"),
-            ("b-a-r", "b-a-r"),
-            ("", ""),
-            ("1,2", ("1", "2")),
-            ("3,f_2Co_2Co", ("3", "f,o,o")),
-            ("4,b-a-r", ("4", "b-a-r")),
+            ("something_0Aor_0Aother", 1, "something\nor\nother"),
+            ("f_2Co_2Co", 1, "f,o,o"),
+            ("b-a-r", 1, "b-a-r"),
+            ("", 1, ""),
+            ("", 2, ("", "")),
+            ("1,2,3", 1, "1,2,3"),
+            ("1,2,3", 2, ("1", "2,3")),
+            ("1,2,3", 3, ("1", "2", "3")),
+            ("1,2,3", 4, ("1", "2", "3", "")),
+            ("3,f_2Co_2Co", 1, "3,f,o,o"),
+            ("3,f_2Co_2Co", 2, ("3", "f,o,o")),
+            ("3,f_2Co_2Co", 3, ("3", "f,o,o", "")),
+            ("4,b-a-r", 1, "4,b-a-r"),
+            ("4,b-a-r", 2, ("4", "b-a-r")),
+            ("4,b-a-r", 3, ("4", "b-a-r", "")),
         )
 
-        for s, expected in test_cases:
-            with self.subTest(s=s, expected=expected):
-                self.assertEqual(unquote(s), expected)
+        for s, pk_len, expected in test_cases:
+            with self.subTest(s=s, pk_len=pk_len, expected=expected):
+                self.assertEqual(unquote(s, pk_len=pk_len), expected)
 
     def test_build_q_object_from_lookup_parameters(self):
         parameters = {

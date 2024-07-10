@@ -1804,9 +1804,10 @@ class ModelAdmin(BaseModelAdmin):
         Create a message informing the user that the object doesn't exist
         and return a redirect to the admin index page.
         """
+        pk_len = len(self.opts.pk_fields)
         msg = _("%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?") % {
             "name": opts.verbose_name,
-            "key": unquote(object_id),
+            "key": unquote(object_id, pk_len=pk_len),
         }
         self.message_user(request, msg, messages.WARNING)
         url = reverse("admin:index", current_app=self.admin_site.name)
@@ -1838,7 +1839,9 @@ class ModelAdmin(BaseModelAdmin):
             obj = None
 
         else:
-            obj = self.get_object(request, unquote(object_id), to_field)
+            pk_len = len(self.opts.pk_fields)
+            obj_id = unquote(object_id, pk_len=pk_len)
+            obj = self.get_object(request, obj_id, to_field)
 
             if request.method == "POST":
                 if not self.has_change_permission(request, obj):
@@ -2194,7 +2197,9 @@ class ModelAdmin(BaseModelAdmin):
                 "The field %s cannot be referenced." % to_field
             )
 
-        obj = self.get_object(request, unquote(object_id), to_field)
+        pk_len = len(self.opts.pk_fields)
+        obj_id = unquote(object_id, pk_len=pk_len)
+        obj = self.get_object(request, obj_id, to_field)
 
         if not self.has_delete_permission(request, obj):
             raise PermissionDenied
@@ -2256,7 +2261,9 @@ class ModelAdmin(BaseModelAdmin):
 
         # First check if the user can see this history.
         model = self.model
-        obj = self.get_object(request, unquote(object_id))
+        pk_len = len(self.opts.pk_fields)
+        obj_id = unquote(object_id, pk_len=pk_len)
+        obj = self.get_object(request, obj_id)
         if obj is None:
             return self._get_obj_does_not_exist_redirect(
                 request, model._meta, object_id
@@ -2267,9 +2274,10 @@ class ModelAdmin(BaseModelAdmin):
 
         # Then get the history for this object.
         app_label = self.opts.app_label
+        pk_len = len(self.opts.pk_fields)
         action_list = (
             LogEntry.objects.filter(
-                object_id=unquote(object_id),
+                object_id=unquote(object_id, pk_len=pk_len),
                 content_type=get_content_type_for_model(model),
             )
             .select_related()

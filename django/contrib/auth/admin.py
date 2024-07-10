@@ -153,7 +153,9 @@ class UserAdmin(admin.ModelAdmin):
 
     @sensitive_post_parameters_m
     def user_change_password(self, request, id, form_url=""):
-        user = self.get_object(request, unquote(id))
+        pk_len = len(self.opts.pk_fields)
+        user_id = unquote(id, pk_len=pk_len)
+        user = self.get_object(request, user_id)
         if not self.has_change_permission(request, user):
             raise PermissionDenied
         if user is None:
