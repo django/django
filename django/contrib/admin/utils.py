@@ -96,7 +96,8 @@ def quote(s):
         return s.translate(QUOTE_MAP)
     elif isinstance(s, tuple):
         return PK_SEP.join(str(quote(f)) for f in s)
-    return s
+    else:
+        return s
 
 
 def unquote(s, pk_len=1):
