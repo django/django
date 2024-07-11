@@ -96,6 +96,10 @@ alternative:
             to_fields=("tenant_id", "id"),
         )
 
+``ForeignObject`` is much like ``ForeignKey``,
+except that it doesn't create any columns (e.g. ``user_id``), foreign key
+constraints or indexes in the database.
+
 .. warning::
 
     ``ForeignObject`` is an internal API. The work to provide a public API for
