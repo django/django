@@ -1,5 +1,7 @@
+import json
 import unittest
 
+from django.core import serializers
 from django.db import IntegrityError, connection
 from django.db.models import CompositePrimaryKey
 from django.test import TestCase
@@ -131,7 +133,7 @@ class CompositePKTests(TestCase):
 class CompositePKFixturesTests(TestCase):
     fixtures = ["tenant"]
 
-    def test_fixtures(self):
+    def test_objects(self):
         tenant_1, tenant_2, tenant_3 = Tenant.objects.order_by("pk")
         self.assertEqual(tenant_1.id, 1)
         self.assertEqual(tenant_1.name, "Tenant 1")
@@ -157,3 +159,21 @@ class CompositePKFixturesTests(TestCase):
         self.assertEqual(user_4.tenant_id, 2)
         self.assertEqual(user_4.pk, (2, 4))
         self.assertEqual(user_4.email, "user0004@example.com")
+
+    def test_serialize(self):
+        users = User.objects.filter(pk=(1, 1))
+        result = serializers.serialize("json", users)
+        self.assertEqual(
+            json.loads(result),
+            [
+                {
+                    "model": "composite_pk.user",
+                    "pk": [1, 1],
+                    "fields": {
+                        "email": "user0001@example.com",
+                        "id": 1,
+                        "tenant": 1,
+                    },
+                }
+            ],
+        )

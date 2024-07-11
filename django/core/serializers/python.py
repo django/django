@@ -40,10 +40,15 @@ class Serializer(base.Serializer):
 
     def _value_from_field(self, obj, field):
         value = field.value_from_object(obj)
-        # Protected types (i.e., primitives like None, numbers, dates,
-        # and Decimals) are passed through as is. All other values are
-        # converted to string first.
-        return value if is_protected_type(value) else field.value_to_string(obj)
+        if is_protected_type(value):
+            # Protected types (i.e., primitives like None, numbers, dates,
+            # and Decimals) are passed through as is.
+            return value
+        elif isinstance(value, tuple):
+            return list(value)
+        else:
+            # All other values are converted to string first.
+            return field.value_to_string(obj)
 
     def handle_field(self, obj, field):
         self._current[field.name] = self._value_from_field(obj, field)
