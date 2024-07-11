@@ -71,9 +71,6 @@ So, given the ``Tenant`` and ``User`` models, we cannot do:
 .. code-block:: pycon
 
     class Comment(models.Model):
-        pk = models.CompositePrimaryKey("tenant_id", "id")
-        tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE)
-        id = models.IntegerField()
         user = models.ForeignKey(User, on_delete=models.CASCADE)  # 𐄂 ERROR
 
 Because ``ForeignKey`` cannot reference models with composite primary keys
@@ -85,9 +82,7 @@ alternative:
 .. code-block:: pycon
 
     class Comment(models.Model):
-        pk = models.CompositePrimaryKey("tenant_id", "id")
         tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE)
-        id = models.IntegerField()
         user_id = models.IntegerField()
         user = models.ForeignObject(
             User,
