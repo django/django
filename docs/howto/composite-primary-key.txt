@@ -66,7 +66,21 @@ How to define a composite foreign key
 At the moment, relationship fields (``ForeignKey``, ``OneToOneField``,
 ``ManyToManyField``) don't support composite primary keys.
 
-For the time being, the ``ForeignObject`` field can be used as an alternative:
+So, given the ``Tenant`` and ``User`` models, we cannot do:
+
+.. code-block:: pycon
+
+    class Comment(models.Model):
+        pk = models.CompositePrimaryKey("tenant_id", "id")
+        tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE)
+        id = models.IntegerField()
+        user = models.ForeignKey(User, on_delete=models.CASCADE)  # 𐄂 ERROR
+
+Because ``ForeignKey`` cannot reference models with composite primary keys
+*yet*.
+
+To work around this limitation, ``ForeignObject`` can be used as an
+alternative:
 
 .. code-block:: pycon
 
@@ -85,7 +99,7 @@ For the time being, the ``ForeignObject`` field can be used as an alternative:
 .. warning::
 
     ``ForeignObject`` is an internal API. The work to provide a public API for
-    composite foreign keys is still under progress. Use it at your own risk.
+    composite foreign keys is already under way. Use it at your own risk.
 
 Composite primary keys and generic relations
 ============================================

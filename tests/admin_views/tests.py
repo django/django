@@ -4066,7 +4066,7 @@ class AdminViewCompositePrimaryKeyTest(TestCase):
         self.assertContains(response, escape(self.obj.pk))
 
     def test_get_history_view_redirects_if_obj_does_not_exist(self):
-        url = reverse(self.HISTORY_VIEW, args=("a,b,c",))
+        url = reverse(self.HISTORY_VIEW, args=(self.obj.pk,))
         response = self.client.get(url)
         self.assertEqual(response.status_code, 302)
 
@@ -4076,7 +4076,7 @@ class AdminViewCompositePrimaryKeyTest(TestCase):
         self.assertContains(response, escape(self.obj.pk))
 
     def test_get_change_view_redirects_if_obj_does_not_exist(self):
-        url = reverse(self.CHANGE_VIEW, args=("1,2,3",))
+        url = reverse(self.CHANGE_VIEW, args=(self.obj.pk,))
         response = self.client.get(url)
         self.assertEqual(response.status_code, 302)
 
@@ -4086,7 +4086,7 @@ class AdminViewCompositePrimaryKeyTest(TestCase):
         self.assertContains(response, escape(self.obj.pk))
 
     def test_get_delete_view_redirects_if_obj_does_not_exist(self):
-        url = reverse(self.DELETE_VIEW, args=("1,2,3",))
+        url = reverse(self.DELETE_VIEW, args=(self.obj.pk,))
         response = self.client.get(url)
         self.assertEqual(response.status_code, 302)
 
