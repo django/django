@@ -27,15 +27,15 @@ class StorageValidateFileNameTests(SimpleTestCase):
         s = CustomStorage()
         # The initial name passed to `save` is not valid nor safe, fail early.
         for name in self.invalid_file_names:
-            with (
-                self.subTest(name=name),
-                mock.patch.object(s, "get_available_name") as mock_get_available_name,
-                mock.patch.object(s, "_save") as mock_internal_save,
-            ):
-                with self.assertRaisesMessage(
-                    SuspiciousFileOperation, self.error_msg % name
-                ):
-                    s.save(name, content="irrelevant")
+            with self.subTest(name=name):
+                with mock.patch.object(
+                    s, "get_available_name"
+                ) as mock_get_available_name:
+                    with mock.patch.object(s, "_save") as mock_internal_save:
+                        with self.assertRaisesMessage(
+                            SuspiciousFileOperation, self.error_msg % name
+                        ):
+                            s.save(name, content="irrelevant")
                 self.assertEqual(mock_get_available_name.mock_calls, [])
                 self.assertEqual(mock_internal_save.mock_calls, [])
 
@@ -44,15 +44,13 @@ class StorageValidateFileNameTests(SimpleTestCase):
         # The initial name passed to `save` is valid and safe, but the returned
         # name from `get_available_name` is not.
         for name in self.invalid_file_names:
-            with (
-                self.subTest(name=name),
-                mock.patch.object(s, "get_available_name", return_value=name),
-                mock.patch.object(s, "_save") as mock_internal_save,
-            ):
-                with self.assertRaisesMessage(
-                    SuspiciousFileOperation, self.error_msg % name
-                ):
-                    s.save("valid-file-name.txt", content="irrelevant")
+            with self.subTest(name=name):
+                with mock.patch.object(s, "get_available_name", return_value=name):
+                    with mock.patch.object(s, "_save") as mock_internal_save:
+                        with self.assertRaisesMessage(
+                            SuspiciousFileOperation, self.error_msg % name
+                        ):
+                            s.save("valid-file-name.txt", content="irrelevant")
                 self.assertEqual(mock_internal_save.mock_calls, [])
 
     def test_validate_after_internal_save(self):
@@ -60,11 +58,9 @@ class StorageValidateFileNameTests(SimpleTestCase):
         # The initial name passed to `save` is valid and safe, but the result
         # from `_save` is not (this is achieved by monkeypatching _save).
         for name in self.invalid_file_names:
-            with (
-                self.subTest(name=name),
-                mock.patch.object(s, "_save", return_value=name),
-            ):
-                with self.assertRaisesMessage(
-                    SuspiciousFileOperation, self.error_msg % name
-                ):
-                    s.save("valid-file-name.txt", content="irrelevant")
+            with self.subTest(name=name):
+                with mock.patch.object(s, "_save", return_value=name):
+                    with self.assertRaisesMessage(
+                        SuspiciousFileOperation, self.error_msg % name
+                    ):
+                        s.save("valid-file-name.txt", content="irrelevant")
