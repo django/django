@@ -84,6 +84,8 @@ from .models import (
     FieldOverridePost,
     FilteredManager,
     FooAccount,
+    FooBarCompositePK,
+    FooCompositePK,
     FoodDelivery,
     FunkyTag,
     Gallery,
@@ -93,7 +95,6 @@ from .models import (
     Link,
     MainPrepopulated,
     Media,
-    ModelWithCompositePrimaryKey,
     ModelWithStringPrimaryKey,
     OtherStory,
     Paper,
@@ -4045,14 +4046,17 @@ class AdminViewStringPrimaryKeyTest(TestCase):
 
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
-class AdminViewCompositePrimaryKeyTest(TestCase):
-    CHANGE_VIEW = "admin:admin_views_modelwithcompositeprimarykey_change"
-    HISTORY_VIEW = "admin:admin_views_modelwithcompositeprimarykey_history"
-    DELETE_VIEW = "admin:admin_views_modelwithcompositeprimarykey_delete"
+class AdminViewCompositePKTests(TestCase):
+    FOOBAR = "foobarcompositepk"
+    FOO = "foocompositepk"
+    CHANGE_VIEW = "admin:admin_views_%s_change"
+    HISTORY_VIEW = "admin:admin_views_%s_history"
+    DELETE_VIEW = "admin:admin_views_%s_delete"
 
     @classmethod
     def setUpTestData(cls):
-        cls.obj = ModelWithCompositePrimaryKey.objects.create(a="f,o,o", b="b-a-r")
+        cls.foobar = FooBarCompositePK.objects.create(foo="f,o,o", bar="b-a-r")
+        cls.foo = FooCompositePK.objects.create(foo="f,o,o")
         cls.superuser = User.objects.create_superuser(
             username="super", password="secret", email="super@example.com"
         )
@@ -4060,33 +4064,75 @@ class AdminViewCompositePrimaryKeyTest(TestCase):
     def setUp(self):
         self.client.force_login(self.superuser)
 
-    def test_get_history_view(self):
-        url = reverse(self.HISTORY_VIEW, args=(quote(self.obj.pk),))
+    def test_foobar_history_view(self):
+        viewname = self.HISTORY_VIEW % (self.FOOBAR,)
+        url = reverse(viewname, args=(quote(self.foobar.pk),))
         response = self.client.get(url)
-        self.assertContains(response, escape(self.obj.pk))
+        self.assertContains(response, escape(self.foobar.pk))
 
-    def test_get_history_view_redirects_if_obj_does_not_exist(self):
-        url = reverse(self.HISTORY_VIEW, args=(self.obj.pk,))
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 302)
-
-    def test_get_change_view(self):
-        url = reverse(self.CHANGE_VIEW, args=(quote(self.obj.pk),))
-        response = self.client.get(url)
-        self.assertContains(response, escape(self.obj.pk))
-
-    def test_get_change_view_redirects_if_obj_does_not_exist(self):
-        url = reverse(self.CHANGE_VIEW, args=(self.obj.pk,))
+    def test_foobar_history_view_redirects_if_does_not_exist(self):
+        viewname = self.HISTORY_VIEW % (self.FOOBAR,)
+        url = reverse(viewname, args=("1,2,3",))
         response = self.client.get(url)
         self.assertEqual(response.status_code, 302)
 
-    def test_get_delete_view(self):
-        url = reverse(self.DELETE_VIEW, args=(quote(self.obj.pk),))
+    def test_foo_history_view(self):
+        viewname = self.HISTORY_VIEW % (self.FOO,)
+        url = reverse(viewname, args=(quote(self.foo.pk),))
         response = self.client.get(url)
-        self.assertContains(response, escape(self.obj.pk))
+        self.assertContains(response, escape(self.foo.pk))
 
-    def test_get_delete_view_redirects_if_obj_does_not_exist(self):
-        url = reverse(self.DELETE_VIEW, args=(self.obj.pk,))
+    def test_foo_history_view_redirects_if_does_not_exist(self):
+        viewname = self.HISTORY_VIEW % (self.FOO,)
+        url = reverse(viewname, args=("1,2",))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+
+    def test_foobar_change_view(self):
+        viewname = self.CHANGE_VIEW % (self.FOOBAR,)
+        url = reverse(viewname, args=(quote(self.foobar.pk),))
+        response = self.client.get(url)
+        self.assertContains(response, escape(self.foobar.pk))
+
+    def test_foobar_change_view_redirects_if_does_not_exist(self):
+        viewname = self.CHANGE_VIEW % (self.FOOBAR,)
+        url = reverse(viewname, args=("f,o,o",))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+
+    def test_foo_change_view(self):
+        viewname = self.CHANGE_VIEW % (self.FOO,)
+        url = reverse(viewname, args=(quote(self.foo.pk),))
+        response = self.client.get(url)
+        self.assertContains(response, escape(self.foo.pk))
+
+    def test_foo_change_view_redirects_if_does_not_exist(self):
+        viewname = self.CHANGE_VIEW % (self.FOO,)
+        url = reverse(viewname, args=("f,o,o",))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+
+    def test_foobar_delete_view(self):
+        viewname = self.DELETE_VIEW % (self.FOOBAR,)
+        url = reverse(viewname, args=(quote(self.foobar.pk),))
+        response = self.client.get(url)
+        self.assertContains(response, escape(self.foobar.pk))
+
+    def test_foobar_delete_view_redirects_if_does_not_exist(self):
+        viewname = self.DELETE_VIEW % (self.FOOBAR,)
+        url = reverse(viewname, args=("1,2",))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+
+    def test_foo_delete_view(self):
+        viewname = self.DELETE_VIEW % (self.FOO,)
+        url = reverse(viewname, args=(quote(self.foo.pk),))
+        response = self.client.get(url)
+        self.assertContains(response, escape(self.foo.pk))
+
+    def test_foo_delete_view_redirects_if_does_not_exist(self):
+        viewname = self.DELETE_VIEW % (self.FOO,)
+        url = reverse(viewname, args=("123",))
         response = self.client.get(url)
         self.assertEqual(response.status_code, 302)
 

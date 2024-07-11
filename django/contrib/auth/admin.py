@@ -11,6 +11,7 @@ from django.contrib.auth.forms import (
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import PermissionDenied
 from django.db import router, transaction
+from django.db.models import CompositePrimaryKey
 from django.http import Http404, HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.urls import path, reverse
@@ -153,8 +154,8 @@ class UserAdmin(admin.ModelAdmin):
 
     @sensitive_post_parameters_m
     def user_change_password(self, request, id, form_url=""):
-        pk_len = len(self.opts.pk_fields)
-        user_id = unquote(id, pk_len=pk_len)
+        is_composite = isinstance(self.opts.pk, CompositePrimaryKey)
+        user_id = unquote(id, is_composite=is_composite)
         user = self.get_object(request, user_id)
         if not self.has_change_permission(request, user):
             raise PermissionDenied

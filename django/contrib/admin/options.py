@@ -40,6 +40,7 @@ from django.core.exceptions import (
 )
 from django.core.paginator import Paginator
 from django.db import models, router, transaction
+from django.db.models import CompositePrimaryKey
 from django.db.models.constants import LOOKUP_SEP
 from django.forms.formsets import DELETION_FIELD_NAME, all_valid
 from django.forms.models import (
@@ -1804,10 +1805,10 @@ class ModelAdmin(BaseModelAdmin):
         Create a message informing the user that the object doesn't exist
         and return a redirect to the admin index page.
         """
-        pk_len = len(self.opts.pk_fields)
+        is_composite = isinstance(self.opts.pk, CompositePrimaryKey)
         msg = _("%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?") % {
             "name": opts.verbose_name,
-            "key": unquote(object_id, pk_len=pk_len),
+            "key": unquote(object_id, is_composite=is_composite),
         }
         self.message_user(request, msg, messages.WARNING)
         url = reverse("admin:index", current_app=self.admin_site.name)
@@ -1839,8 +1840,8 @@ class ModelAdmin(BaseModelAdmin):
             obj = None
 
         else:
-            pk_len = len(self.opts.pk_fields)
-            obj_id = unquote(object_id, pk_len=pk_len)
+            is_composite = isinstance(self.opts.pk, CompositePrimaryKey)
+            obj_id = unquote(object_id, is_composite=is_composite)
             obj = self.get_object(request, obj_id, to_field)
 
             if request.method == "POST":
@@ -2197,8 +2198,8 @@ class ModelAdmin(BaseModelAdmin):
                 "The field %s cannot be referenced." % to_field
             )
 
-        pk_len = len(self.opts.pk_fields)
-        obj_id = unquote(object_id, pk_len=pk_len)
+        is_composite = isinstance(self.opts.pk, CompositePrimaryKey)
+        obj_id = unquote(object_id, is_composite=is_composite)
         obj = self.get_object(request, obj_id, to_field)
 
         if not self.has_delete_permission(request, obj):
@@ -2261,8 +2262,8 @@ class ModelAdmin(BaseModelAdmin):
 
         # First check if the user can see this history.
         model = self.model
-        pk_len = len(self.opts.pk_fields)
-        obj_id = unquote(object_id, pk_len=pk_len)
+        is_composite = isinstance(self.opts.pk, CompositePrimaryKey)
+        obj_id = unquote(object_id, is_composite=is_composite)
         obj = self.get_object(request, obj_id)
         if obj is None:
             return self._get_obj_does_not_exist_redirect(
@@ -2274,10 +2275,10 @@ class ModelAdmin(BaseModelAdmin):
 
         # Then get the history for this object.
         app_label = self.opts.app_label
-        pk_len = len(self.opts.pk_fields)
+        is_composite = isinstance(self.opts.pk, CompositePrimaryKey)
         action_list = (
             LogEntry.objects.filter(
-                object_id=unquote(object_id, pk_len=pk_len),
+                object_id=unquote(object_id, is_composite=is_composite),
                 content_type=get_content_type_for_model(model),
             )
             .select_related()

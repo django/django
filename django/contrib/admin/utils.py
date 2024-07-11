@@ -100,12 +100,10 @@ def quote(s):
         return s
 
 
-def unquote(s, pk_len=1):
+def unquote(s, is_composite=False):
     """Undo the effects of quote()."""
-    if 1 < pk_len:
-        pk = s.split(PK_SEP, maxsplit=pk_len - 1)
-        pk += [""] * (pk_len - len(pk))
-        return tuple(unquote(f) for f in pk)
+    if is_composite:
+        return tuple(unquote(f) for f in s.split(PK_SEP))
     else:
         return UNQUOTE_RE.sub(lambda m: UNQUOTE_MAP[m[0]], s)
 
