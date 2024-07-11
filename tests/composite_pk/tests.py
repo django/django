@@ -1,6 +1,8 @@
 import json
 import unittest
 
+import yaml
+
 from django.core import serializers
 from django.db import IntegrityError, connection
 from django.db.models import CompositePrimaryKey
@@ -160,7 +162,7 @@ class CompositePKFixturesTests(TestCase):
         self.assertEqual(user_4.pk, (2, 4))
         self.assertEqual(user_4.email, "user0004@example.com")
 
-    def test_serialize(self):
+    def test_serialize_json(self):
         users = User.objects.filter(pk=(1, 1))
         result = serializers.serialize("json", users)
         self.assertEqual(
@@ -175,5 +177,39 @@ class CompositePKFixturesTests(TestCase):
                         "tenant": 1,
                     },
                 }
+            ],
+        )
+
+    def test_serialize_jsonl(self):
+        users = User.objects.filter(pk=(1, 2))
+        result = serializers.serialize("jsonl", users)
+        self.assertEqual(
+            json.loads(result),
+            {
+                "model": "composite_pk.user",
+                "pk": [1, 2],
+                "fields": {
+                    "email": "user0002@example.com",
+                    "id": 2,
+                    "tenant": 1,
+                },
+            },
+        )
+
+    def test_serialize_yaml(self):
+        users = User.objects.filter(pk=(2, 3))
+        result = serializers.serialize("yaml", users)
+        self.assertEqual(
+            yaml.safe_load(result),
+            [
+                {
+                    "model": "composite_pk.user",
+                    "pk": [2, 3],
+                    "fields": {
+                        "email": "user0003@example.com",
+                        "id": 3,
+                        "tenant": 2,
+                    },
+                },
             ],
         )
