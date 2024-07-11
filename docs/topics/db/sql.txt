@@ -403,6 +403,19 @@ is equivalent to::
     finally:
         c.close()
 
+Async Connections and cursors
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+On backends that support async-native connections, you can request an async
+cursor::
+
+    from django.db import new_connection
+
+    async with new_connection() as connection:
+        async with connection.acursor() as c:
+            await c.execute(...)
+
+
 Calling stored procedures
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
