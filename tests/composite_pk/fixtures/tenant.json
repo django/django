@@ -1,0 +1,44 @@
+[
+    {
+        "pk": 1,
+        "model": "composite_pk.tenant",
+        "fields": {
+            "id": 1,
+            "name": "Tenant 1"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "composite_pk.tenant",
+        "fields": {
+            "id": 2,
+            "name": "Tenant 2"
+        }
+    },
+    {
+        "pk": 3,
+        "model": "composite_pk.tenant",
+        "fields": {
+            "id": 3,
+            "name": "Tenant 3"
+        }
+    },
+    {
+        "pk": [1, 1],
+        "model": "composite_pk.user",
+        "fields": {
+            "tenant_id": 1,
+            "id": 1,
+            "email": "user0001@example.com"
+        }
+    },
+    {
+        "pk": [1, 2],
+        "model": "composite_pk.user",
+        "fields": {
+            "tenant_id": 1,
+            "id": 2,
+            "email": "user0002@example.com"
+        }
+    }
+]

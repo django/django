@@ -126,3 +126,26 @@ class CompositePKTests(TestCase):
         """
         result = list(Comment.objects.iterator())
         self.assertEqual(result, [self.comment])
+
+
+class CompositePKFixturesTests(TestCase):
+    fixtures = ["tenant"]
+
+    def test_fixtures(self):
+        tenant_1, tenant_2, tenant_3 = Tenant.objects.order_by("pk")
+        self.assertEqual(tenant_1.id, 1)
+        self.assertEqual(tenant_1.name, "Tenant 1")
+        self.assertEqual(tenant_2.id, 2)
+        self.assertEqual(tenant_2.name, "Tenant 2")
+        self.assertEqual(tenant_3.id, 3)
+        self.assertEqual(tenant_3.name, "Tenant 3")
+
+        user_1, user_2 = User.objects.order_by("pk")
+        self.assertEqual(user_1.id, 1)
+        self.assertEqual(user_1.tenant_id, 1)
+        self.assertEqual(user_1.pk, (1, 1))
+        self.assertEqual(user_1.email, "user0001@example.com")
+        self.assertEqual(user_2.id, 2)
+        self.assertEqual(user_2.tenant_id, 1)
+        self.assertEqual(user_2.pk, (1, 2))
+        self.assertEqual(user_2.email, "user0002@example.com")
