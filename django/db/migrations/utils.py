@@ -2,9 +2,9 @@ import datetime
 import re
 from collections import namedtuple
 
+from django.conf import settings
 from django.db.models.fields.related import RECURSIVE_RELATIONSHIP_CONSTANT
 from django.utils.module_loading import import_string
-from django.conf import settings
 
 FieldReference = namedtuple("FieldReference", "to through")
 

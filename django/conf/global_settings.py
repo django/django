@@ -641,7 +641,7 @@ STATICFILES_FINDERS = [
 ##############
 
 # Executor to use for migration.
-MIGRATION_EXECUTOR_BACKEND = 'django.db.migrations.executor.MigrationExecutor'
+MIGRATION_EXECUTOR_BACKEND = "django.db.migrations.executor.MigrationExecutor"
 
 # Migration module overrides for apps, by app label.
 MIGRATION_MODULES = {}
