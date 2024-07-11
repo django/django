@@ -98,6 +98,18 @@ class CompositePKTests(TestCase):
         self.assertEqual(comment_pk["columns"], ["tenant_id", "comment_id"])
         self.assertTrue(comment_pk["primary_key"])
 
+    @unittest.skipUnless(connection.vendor == "oracle", "Oracle specific test")
+    def test_get_constraints_oracle(self):
+        user_constraints = self.get_constraints(User._meta.db_table)
+        user_pk = next(c for c in user_constraints.values() if c["primary_key"])
+        self.assertEqual(user_pk["columns"], ["tenant_id", "id"])
+        self.assertEqual(user_pk["primary_key"], 1)
+
+        comment_constraints = self.get_constraints(Comment._meta.db_table)
+        comment_pk = next(c for c in comment_constraints.values() if c["primary_key"])
+        self.assertEqual(comment_pk["columns"], ["tenant_id", "comment_id"])
+        self.assertEqual(comment_pk["primary_key"], 1)
+
     def test_in_bulk(self):
         """
         Test the .in_bulk() method of composite_pk models.
