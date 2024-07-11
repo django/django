@@ -93,6 +93,7 @@ from .models import (
     Link,
     MainPrepopulated,
     Media,
+    ModelWithCompositePrimaryKey,
     ModelWithStringPrimaryKey,
     OtherStory,
     Paper,
@@ -4041,6 +4042,53 @@ class AdminViewStringPrimaryKeyTest(TestCase):
 
         self.assertEqual(response.status_code, 302)  # temporary redirect
         self.assertIn("/123_2Fhistory/", response.headers["location"])  # PK is quoted
+
+
+@override_settings(ROOT_URLCONF="admin_views.urls")
+class AdminViewCompositePrimaryKeyTest(TestCase):
+    CHANGE_VIEW = "admin:admin_views_modelwithcompositeprimarykey_change"
+    HISTORY_VIEW = "admin:admin_views_modelwithcompositeprimarykey_history"
+    DELETE_VIEW = "admin:admin_views_modelwithcompositeprimarykey_delete"
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.obj = ModelWithCompositePrimaryKey.objects.create(a="f,o,o", b="b-a-r")
+        cls.superuser = User.objects.create_superuser(
+            username="super", password="secret", email="super@example.com"
+        )
+
+    def setUp(self):
+        self.client.force_login(self.superuser)
+
+    def test_get_history_view(self):
+        url = reverse(self.HISTORY_VIEW, args=(quote(self.obj.pk),))
+        response = self.client.get(url)
+        self.assertContains(response, escape(self.obj.pk))
+
+    def test_get_history_view_redirects_if_obj_does_not_exist(self):
+        url = reverse(self.HISTORY_VIEW, args=("a,b,c",))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+
+    def test_get_change_view(self):
+        url = reverse(self.CHANGE_VIEW, args=(quote(self.obj.pk),))
+        response = self.client.get(url)
+        self.assertContains(response, escape(self.obj.pk))
+
+    def test_get_change_view_redirects_if_obj_does_not_exist(self):
+        url = reverse(self.CHANGE_VIEW, args=("1,2,3",))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+
+    def test_get_delete_view(self):
+        url = reverse(self.DELETE_VIEW, args=(quote(self.obj.pk),))
+        response = self.client.get(url)
+        self.assertContains(response, escape(self.obj.pk))
+
+    def test_get_delete_view_redirects_if_obj_does_not_exist(self):
+        url = reverse(self.DELETE_VIEW, args=("1,2,3",))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
 
 
 @override_settings(ROOT_URLCONF="admin_views.urls")

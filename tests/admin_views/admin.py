@@ -78,6 +78,7 @@ from .models import (
     Language,
     Link,
     MainPrepopulated,
+    ModelWithCompositePrimaryKey,
     ModelWithStringPrimaryKey,
     NotReferenced,
     OldSubscriber,
@@ -1199,6 +1200,7 @@ site.register(
     search_fields=["name"],
 )
 site.register(ModelWithStringPrimaryKey)
+site.register(ModelWithCompositePrimaryKey)
 site.register(Color)
 site.register(Thing, ThingAdmin)
 site.register(Actor)

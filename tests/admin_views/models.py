@@ -145,6 +145,12 @@ class ModelWithStringPrimaryKey(models.Model):
         return "/dummy/%s/" % self.string_pk
 
 
+class ModelWithCompositePrimaryKey(models.Model):
+    pk = models.CompositePrimaryKey("a", "b")
+    a = models.CharField(max_length=10)
+    b = models.CharField(max_length=10)
+
+
 class Color(models.Model):
     value = models.CharField(max_length=10)
     warm = models.BooleanField(default=False)
