@@ -48,11 +48,11 @@ The steps are not duplicated in this tutorial, because as a third-party
 package, it may change separately to Django's schedule.
 
 Once installed, you should be able to see the DjDT "handle" on the right side
-of the browser window when you refresh the polls application. Click it to open
-the debug toolbar and use the tools in each panel. See the `panels
-documentation page
-<https://django-debug-toolbar.readthedocs.io/en/latest/panels.html>`__ for more
-information on what the panels show.
+of the browser window when you browse to ``http://localhost:8000/admin/``.
+Click it to open the debug toolbar and use the tools in each panel. See the
+`panels documentation page`__ for more information on what the panels show.
+
+__ https://django-debug-toolbar.readthedocs.io/en/latest/panels.html
 
 Getting help from others
 ========================

@@ -97,13 +97,12 @@ class OperationTestCase(TransactionTestCase):
         migration_class,
         model_name,
         field_name,
-        blank=False,
         field_class=None,
         field_class_kwargs=None,
     ):
         args = [model_name, field_name]
         if field_class:
-            field_class_kwargs = field_class_kwargs or {"srid": 4326, "blank": blank}
+            field_class_kwargs = field_class_kwargs or {}
             args.append(field_class(**field_class_kwargs))
         operation = migration_class(*args)
         old_state = self.current_state.clone()
@@ -122,7 +121,7 @@ class OperationTests(OperationTestCase):
         Test the AddField operation with a geometry-enabled column.
         """
         self.alter_gis_model(
-            migrations.AddField, "Neighborhood", "path", False, fields.LineStringField
+            migrations.AddField, "Neighborhood", "path", fields.LineStringField
         )
         self.assertColumnExists("gis_neighborhood", "path")
 
@@ -133,6 +132,24 @@ class OperationTests(OperationTestCase):
         # Test spatial indices when available
         if self.has_spatial_indexes:
             self.assertSpatialIndexExists("gis_neighborhood", "path")
+
+    @skipUnless(connection.vendor == "mysql", "MySQL specific test")
+    def test_remove_geom_field_nullable_with_index(self):
+        # MySQL doesn't support spatial indexes on NULL columns.
+        with self.assertNumQueries(1) as ctx:
+            self.alter_gis_model(
+                migrations.AddField,
+                "Neighborhood",
+                "path",
+                fields.LineStringField,
+                field_class_kwargs={"null": True},
+            )
+        self.assertColumnExists("gis_neighborhood", "path")
+        self.assertNotIn("CREATE SPATIAL INDEX", ctx.captured_queries[0]["sql"])
+
+        with self.assertNumQueries(1), self.assertNoLogs("django.contrib.gis", "ERROR"):
+            self.alter_gis_model(migrations.RemoveField, "Neighborhood", "path")
+        self.assertColumnNotExists("gis_neighborhood", "path")
 
     @skipUnless(HAS_GEOMETRY_COLUMNS, "Backend doesn't support GeometryColumns.")
     def test_geom_col_name(self):
@@ -147,7 +164,7 @@ class OperationTests(OperationTestCase):
         Test the AddField operation with a raster-enabled column.
         """
         self.alter_gis_model(
-            migrations.AddField, "Neighborhood", "heatmap", False, fields.RasterField
+            migrations.AddField, "Neighborhood", "heatmap", fields.RasterField
         )
         self.assertColumnExists("gis_neighborhood", "heatmap")
 
@@ -160,7 +177,11 @@ class OperationTests(OperationTestCase):
         Should be able to add a GeometryField with blank=True.
         """
         self.alter_gis_model(
-            migrations.AddField, "Neighborhood", "path", True, fields.LineStringField
+            migrations.AddField,
+            "Neighborhood",
+            "path",
+            fields.LineStringField,
+            field_class_kwargs={"blank": True},
         )
         self.assertColumnExists("gis_neighborhood", "path")
 
@@ -178,7 +199,11 @@ class OperationTests(OperationTestCase):
         Should be able to add a RasterField with blank=True.
         """
         self.alter_gis_model(
-            migrations.AddField, "Neighborhood", "heatmap", True, fields.RasterField
+            migrations.AddField,
+            "Neighborhood",
+            "heatmap",
+            fields.RasterField,
+            field_class_kwargs={"blank": True},
         )
         self.assertColumnExists("gis_neighborhood", "heatmap")
 
@@ -247,9 +272,8 @@ class OperationTests(OperationTestCase):
             migrations.AlterField,
             "Neighborhood",
             "geom",
-            False,
             fields.MultiPolygonField,
-            field_class_kwargs={"srid": 4326, "dim": 3},
+            field_class_kwargs={"dim": 3},
         )
         self.assertTrue(Neighborhood.objects.first().geom.hasz)
         # Rewind to 2 dimensions.
@@ -257,9 +281,8 @@ class OperationTests(OperationTestCase):
             migrations.AlterField,
             "Neighborhood",
             "geom",
-            False,
             fields.MultiPolygonField,
-            field_class_kwargs={"srid": 4326, "dim": 2},
+            field_class_kwargs={"dim": 2},
         )
         self.assertFalse(Neighborhood.objects.first().geom.hasz)
 
@@ -296,9 +319,5 @@ class NoRasterSupportTests(OperationTestCase):
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             self.set_up_test_model()
             self.alter_gis_model(
-                migrations.AddField,
-                "Neighborhood",
-                "heatmap",
-                False,
-                fields.RasterField,
+                migrations.AddField, "Neighborhood", "heatmap", fields.RasterField
             )

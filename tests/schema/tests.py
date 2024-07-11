@@ -929,6 +929,39 @@ class SchemaTests(TransactionTestCase):
         self.assertIs(obj.contains_foo, True)
 
     @isolate_apps("schema")
+    @skipUnlessDBFeature("supports_stored_generated_columns")
+    def test_alter_generated_field(self):
+        class GeneratedFieldIndexedModel(Model):
+            number = IntegerField(default=1)
+            generated = GeneratedField(
+                expression=F("number"),
+                db_persist=True,
+                output_field=IntegerField(),
+            )
+
+            class Meta:
+                app_label = "schema"
+
+        with connection.schema_editor() as editor:
+            editor.create_model(GeneratedFieldIndexedModel)
+
+        old_field = GeneratedFieldIndexedModel._meta.get_field("generated")
+        new_field = GeneratedField(
+            expression=F("number"),
+            db_persist=True,
+            db_index=True,
+            output_field=IntegerField(),
+        )
+        new_field.contribute_to_class(GeneratedFieldIndexedModel, "generated")
+
+        with connection.schema_editor() as editor:
+            editor.alter_field(GeneratedFieldIndexedModel, old_field, new_field)
+
+        self.assertIn(
+            "generated", self.get_indexes(GeneratedFieldIndexedModel._meta.db_table)
+        )
+
+    @isolate_apps("schema")
     def test_add_auto_field(self):
         class AddAutoFieldModel(Model):
             name = CharField(max_length=255, primary_key=True)

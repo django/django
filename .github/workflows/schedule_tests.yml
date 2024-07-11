@@ -90,7 +90,7 @@ jobs:
     continue-on-error: true
     services:
       postgres:
-        image: postgres:13-alpine
+        image: postgres:14-alpine
         env:
           POSTGRES_DB: django
           POSTGRES_USER: user
@@ -163,7 +163,7 @@ jobs:
     name: Selenium tests, PostgreSQL
     services:
       postgres:
-        image: postgres:13-alpine
+        image: postgres:14-alpine
         env:
           POSTGRES_DB: django
           POSTGRES_USER: user

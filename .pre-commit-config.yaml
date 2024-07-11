@@ -11,6 +11,7 @@ repos:
         additional_dependencies:
         - black==24.2.0
         files: 'docs/.*\.txt$'
+        args: ["--rst-literal-block"]
   - repo: https://github.com/PyCQA/isort
     rev: 5.13.2
     hooks:
@@ -20,6 +21,6 @@ repos:
     hooks:
       - id: flake8
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.56.0
+    rev: v9.2.0
     hooks:
       - id: eslint

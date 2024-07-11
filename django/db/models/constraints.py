@@ -6,7 +6,7 @@ from django.core import checks
 from django.core.exceptions import FieldDoesNotExist, FieldError, ValidationError
 from django.db import connections
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.expressions import Exists, ExpressionList, F, OrderBy, RawSQL
+from django.db.models.expressions import Exists, ExpressionList, F, RawSQL
 from django.db.models.indexes import IndexExpression
 from django.db.models.lookups import Exact
 from django.db.models.query_utils import Q
@@ -644,9 +644,8 @@ class UniqueConstraint(BaseConstraint):
             }
             expressions = []
             for expr in self.expressions:
-                # Ignore ordering.
-                if isinstance(expr, OrderBy):
-                    expr = expr.expression
+                if hasattr(expr, "get_expression_for_validation"):
+                    expr = expr.get_expression_for_validation()
                 expressions.append(Exact(expr, expr.replace_expressions(replacements)))
             queryset = queryset.filter(*expressions)
         model_class_pk = instance._get_pk_val(model._meta)

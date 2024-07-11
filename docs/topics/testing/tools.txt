@@ -497,10 +497,6 @@ Use the ``django.test.Client`` class to make requests.
         :meth:`~django.contrib.auth.models.UserManager.create_user` helper
         method to create a new user with a correctly hashed password.
 
-        .. versionchanged:: 5.0
-
-            ``alogin()`` method was added.
-
     .. method:: Client.force_login(user, backend=None)
     .. method:: Client.aforce_login(user, backend=None)
 
@@ -528,10 +524,6 @@ Use the ``django.test.Client`` class to make requests.
         ``login()`` by :ref:`using a weaker hasher while testing
         <speeding-up-tests-auth-hashers>`.
 
-        .. versionchanged:: 5.0
-
-            ``aforce_login()`` method was added.
-
     .. method:: Client.logout()
     .. method:: Client.alogout()
 
@@ -544,10 +536,6 @@ Use the ``django.test.Client`` class to make requests.
         After you call this method, the test client will have all the cookies
         and session data cleared to defaults. Subsequent requests will appear
         to come from an :class:`~django.contrib.auth.models.AnonymousUser`.
-
-        .. versionchanged:: 5.0
-
-            ``alogout()`` method was added.
 
 Testing responses
 -----------------
@@ -734,8 +722,6 @@ access these properties as part of a test condition.
             session.save()
 
 .. method:: Client.asession()
-
-    .. versionadded:: 5.0
 
     This is similar to the :attr:`session` attribute but it works in async
     contexts.
@@ -2061,10 +2047,6 @@ test client, with the following exceptions:
 
     >>> c = AsyncClient()
     >>> c.get("/customers/details/", {"name": "fred", "age": 7}, ACCEPT="application/json")
-
-.. versionchanged:: 5.0
-
-    Support for the ``follow`` parameter was added to the ``AsyncClient``.
 
 .. versionchanged:: 5.1
 

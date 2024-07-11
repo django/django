@@ -644,7 +644,7 @@ def slice_filter(value, arg):
                 bits.append(int(x))
         return value[slice(*bits)]
 
-    except (ValueError, TypeError):
+    except (ValueError, TypeError, KeyError):
         return value  # Fail silently.
 
 

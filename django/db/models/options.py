@@ -5,6 +5,7 @@ from collections import defaultdict
 from django.apps import apps
 from django.conf import settings
 from django.core.exceptions import FieldDoesNotExist, ImproperlyConfigured
+from django.core.signals import setting_changed
 from django.db import connections
 from django.db.models import AutoField, Manager, OrderWrt, UniqueConstraint
 from django.db.models.query_utils import PathInfo
@@ -230,6 +231,9 @@ class Options:
                 self.db_table, connection.ops.max_name_length()
             )
 
+        if self.swappable:
+            setting_changed.connect(self.setting_changed)
+
     def _format_names(self, objs):
         """App label/class name interpolation for object names."""
         names = {"app_label": self.app_label.lower(), "class": self.model_name}
@@ -399,7 +403,7 @@ class Options:
         with override(None):
             return str(self.verbose_name)
 
-    @property
+    @cached_property
     def swapped(self):
         """
         Has this model been swapped out for another? If so, return the model
@@ -426,6 +430,10 @@ class Options:
                 ):
                     return swapped_for
         return None
+
+    def setting_changed(self, *, setting, **kwargs):
+        if setting == self.swappable and "swapped" in self.__dict__:
+            del self.swapped
 
     @cached_property
     def managers(self):

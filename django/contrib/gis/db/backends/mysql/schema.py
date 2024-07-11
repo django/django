@@ -54,7 +54,7 @@ class MySQLGISSchemaEditor(DatabaseSchemaEditor):
         self.create_spatial_indexes()
 
     def remove_field(self, model, field):
-        if isinstance(field, GeometryField) and field.spatial_index:
+        if isinstance(field, GeometryField) and field.spatial_index and not field.null:
             index_name = self._create_spatial_index_name(model, field)
             sql = self._delete_index_sql(model, index_name)
             try:

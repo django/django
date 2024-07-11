@@ -1,12 +1,68 @@
 [build-system]
-requires = ['setuptools>=40.8.0']
-build-backend = 'setuptools.build_meta'
+requires = ["setuptools>=61.0.0,<69.3.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "Django"
+dynamic = ["version"]
+requires-python = ">= 3.10"
+dependencies = [
+    "asgiref>=3.7.0",
+    "sqlparse>=0.3.1",
+    "tzdata; sys_platform == 'win32'",
+]
+authors = [
+  {name = "Django Software Foundation", email = "foundation@djangoproject.com"},
+]
+description = "A high-level Python web framework that encourages rapid development and clean, pragmatic design."
+readme = "README.rst"
+license = {text = "BSD-3-Clause"}
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Environment :: Web Environment",
+    "Framework :: Django",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+    "Topic :: Internet :: WWW/HTTP :: WSGI",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+[project.optional-dependencies]
+argon2 = ["argon2-cffi>=19.1.0"]
+bcrypt = ["bcrypt"]
+
+[project.scripts]
+django-admin = "django.core.management:execute_from_command_line"
+
+[project.urls]
+Homepage = "https://www.djangoproject.com/"
+Documentation = "https://docs.djangoproject.com/"
+"Release notes" = "https://docs.djangoproject.com/en/stable/releases/"
+Funding = "https://www.djangoproject.com/fundraising/"
+Source = "https://github.com/django/django"
+Tracker = "https://code.djangoproject.com/"
 
 [tool.black]
-target-version = ['py310']
-force-exclude = 'tests/test_runner_apps/tagged/tests_syntax_error.py'
+target-version = ["py310"]
+force-exclude = "tests/test_runner_apps/tagged/tests_syntax_error.py"
 
 [tool.isort]
-profile = 'black'
-default_section = 'THIRDPARTY'
-known_first_party = 'django'
+profile = "black"
+default_section = "THIRDPARTY"
+known_first_party = "django"
+
+[tool.setuptools.dynamic]
+version = {attr = "django.__version__"}
+
+[tool.setuptools.packages.find]
+include = ["django*"]

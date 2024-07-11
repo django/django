@@ -166,6 +166,11 @@ class Relating(models.Model):
     people_hidden = models.ManyToManyField(Person, related_name="+")
 
 
+class Swappable(models.Model):
+    class Meta:
+        swappable = "MODEL_META_TESTS_SWAPPED"
+
+
 # ParentListTests models
 class CommonAncestor(models.Model):
     pass

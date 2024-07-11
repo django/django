@@ -37,11 +37,46 @@ class AWSS3Storage(Storage):
         return self.prefix + self.get_valid_name(filename)
 
 
+class StorageGenerateFilenameTests(SimpleTestCase):
+    """Tests for base Storage's generate_filename method."""
+
+    storage_class = Storage
+
+    def test_valid_names(self):
+        storage = self.storage_class()
+        name = "UnTRIVíAL @fil$ena#me!"
+        valid_name = storage.get_valid_name(name)
+        candidates = [
+            (name, valid_name),
+            (f"././././././{name}", valid_name),
+            (f"some/path/{name}", f"some/path/{valid_name}"),
+            (f"some/./path/./{name}", f"some/path/{valid_name}"),
+            (f"././some/././path/./{name}", f"some/path/{valid_name}"),
+            (f".\\.\\.\\.\\.\\.\\{name}", valid_name),
+            (f"some\\path\\{name}", f"some/path/{valid_name}"),
+            (f"some\\.\\path\\.\\{name}", f"some/path/{valid_name}"),
+            (f".\\.\\some\\.\\.\\path\\.\\{name}", f"some/path/{valid_name}"),
+        ]
+        for name, expected in candidates:
+            with self.subTest(name=name):
+                result = storage.generate_filename(name)
+                self.assertEqual(result, os.path.normpath(expected))
+
+
+class FileSystemStorageGenerateFilenameTests(StorageGenerateFilenameTests):
+
+    storage_class = FileSystemStorage
+
+
 class GenerateFilenameStorageTests(SimpleTestCase):
     def test_storage_dangerous_paths(self):
         candidates = [
             ("/tmp/..", ".."),
+            ("\\tmp\\..", ".."),
             ("/tmp/.", "."),
+            ("\\tmp\\.", "."),
+            ("..", ".."),
+            (".", "."),
             ("", ""),
         ]
         s = FileSystemStorage()
@@ -55,6 +90,8 @@ class GenerateFilenameStorageTests(SimpleTestCase):
 
     def test_storage_dangerous_paths_dir_name(self):
         candidates = [
+            ("../path", ".."),
+            ("..\\path", ".."),
             ("tmp/../path", "tmp/.."),
             ("tmp\\..\\path", "tmp/.."),
             ("/tmp/../path", "/tmp/.."),

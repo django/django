@@ -219,10 +219,6 @@ ones:
     Further examples are available in the :ref:`model field reference
     <field-choices>`.
 
-    .. versionchanged:: 5.0
-
-        Support for mappings and callables was added.
-
 :attr:`~Field.default`
     The default value for the field. This can be a value or a callable
     object. If callable it will be called every time a new object is

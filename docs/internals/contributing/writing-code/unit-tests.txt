@@ -278,16 +278,16 @@ For testing changes to the admin UI, the selenium tests can be run with the
 To define when screenshots should be taken during a selenium test, the test
 class must use the ``@django.test.selenium.screenshot_cases`` decorator with a
 list of supported screenshot types (``"desktop_size"``, ``"mobile_size"``,
-``"small_screen_size"``, ``"rtl"``, and ``"dark"``). It can then call
-``self.take_screenshot("unique-screenshot-name")`` at the desired point to
-generate the screenshots. For example::
+``"small_screen_size"``, ``"rtl"``, ``"dark"``, and ``"high_contrast"``). It
+can then call ``self.take_screenshot("unique-screenshot-name")`` at the desired
+point to generate the screenshots. For example::
 
     from django.test.selenium import SeleniumTestCase, screenshot_cases
     from django.urls import reverse
 
 
     class SeleniumTests(SeleniumTestCase):
-        @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark"])
+        @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
         def test_login_button_centered(self):
             self.selenium.get(self.live_server_url + reverse("admin:login"))
             self.take_screenshot("login")
@@ -295,7 +295,8 @@ generate the screenshots. For example::
 
 This generates multiple screenshots of the login page - one for a desktop
 screen, one for a mobile screen, one for right-to-left languages on desktop,
-and one for the dark mode on desktop.
+one for the dark mode on desktop, and one for high contrast mode on desktop
+when using chrome.
 
 .. versionchanged:: 5.1
 

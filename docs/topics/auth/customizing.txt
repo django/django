@@ -703,10 +703,6 @@ The following attributes and methods are available on any subclass of
         the user. (This takes care of the password hashing in making the
         comparison.)
 
-        .. versionchanged:: 5.0
-
-            ``acheck_password()`` method was added.
-
     .. method:: models.AbstractBaseUser.set_unusable_password()
 
         Marks the user as having no password set.  This isn't the same as

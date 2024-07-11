@@ -9,7 +9,7 @@ import time
 import warnings
 from email.header import Header
 from http.client import responses
-from urllib.parse import urlparse
+from urllib.parse import urlsplit
 
 from asgiref.sync import async_to_sync, sync_to_async
 
@@ -616,7 +616,7 @@ class HttpResponseRedirectBase(HttpResponse):
     def __init__(self, redirect_to, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self["Location"] = iri_to_uri(redirect_to)
-        parsed = urlparse(str(redirect_to))
+        parsed = urlsplit(str(redirect_to))
         if parsed.scheme and parsed.scheme not in self.allowed_schemes:
             raise DisallowedRedirect(
                 "Unsafe redirect to URL with protocol '%s'" % parsed.scheme

@@ -55,12 +55,6 @@ General-purpose aggregation functions
 
             F("some_field").desc()
 
-    .. versionchanged:: 5.0
-
-        In older versions, if there are no rows and ``default`` is not
-        provided, ``ArrayAgg`` returned an empty list instead of ``None``. If
-        you need it, explicitly set ``default`` to ``Value([])``.
-
 ``BitAnd``
 ----------
 
@@ -182,12 +176,6 @@ General-purpose aggregation functions
             {'parking': True, 'double_bed': True}
         ]}]>
 
-    .. versionchanged:: 5.0
-
-        In older versions, if there are no rows and ``default`` is not
-        provided, ``JSONBAgg`` returned an empty list instead of ``None``. If
-        you need it, explicitly set ``default`` to ``Value([])``.
-
 ``StringAgg``
 -------------
 
@@ -242,12 +230,6 @@ General-purpose aggregation functions
         <QuerySet [{
             'headline': 'NASA uses Python', 'publication_names': 'Science News, The Python Journal'
         }]>
-
-    .. versionchanged:: 5.0
-
-        In older versions, if there are no rows and ``default`` is not
-        provided, ``StringAgg`` returned an empty string instead of ``None``.
-        If you need it, explicitly set ``default`` to ``Value("")``.
 
 Aggregate functions for statistics
 ==================================

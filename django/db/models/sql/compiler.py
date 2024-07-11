@@ -247,11 +247,6 @@ class SQLCompiler:
         select = []
         klass_info = None
         annotations = {}
-        select_idx = 0
-        for alias, (sql, params) in self.query.extra_select.items():
-            annotations[alias] = select_idx
-            select.append((RawSQL(sql, params), alias))
-            select_idx += 1
         assert not (self.query.select and self.query.default_cols)
         select_mask = self.query.get_select_mask()
         if self.query.default_cols:
@@ -261,19 +256,39 @@ class SQLCompiler:
             # any model.
             cols = self.query.select
         if cols:
-            select_list = []
-            for col in cols:
-                select_list.append(select_idx)
-                select.append((col, None))
-                select_idx += 1
             klass_info = {
                 "model": self.query.model,
-                "select_fields": select_list,
+                "select_fields": list(
+                    range(
+                        len(self.query.extra_select),
+                        len(self.query.extra_select) + len(cols),
+                    )
+                ),
             }
-        for alias, annotation in self.query.annotation_select.items():
-            annotations[alias] = select_idx
-            select.append((annotation, alias))
-            select_idx += 1
+        selected = []
+        if self.query.selected is None:
+            selected = [
+                *(
+                    (alias, RawSQL(*args))
+                    for alias, args in self.query.extra_select.items()
+                ),
+                *((None, col) for col in cols),
+                *self.query.annotation_select.items(),
+            ]
+        else:
+            for alias, expression in self.query.selected.items():
+                # Reference to an annotation.
+                if isinstance(expression, str):
+                    expression = self.query.annotations[expression]
+                # Reference to a column.
+                elif isinstance(expression, int):
+                    expression = cols[expression]
+                selected.append((alias, expression))
+
+        for select_idx, (alias, expression) in enumerate(selected):
+            if alias:
+                annotations[alias] = select_idx
+            select.append((expression, alias))
 
         if self.query.select_related:
             related_klass_infos = self.get_related_selections(select, select_mask)
@@ -576,20 +591,15 @@ class SQLCompiler:
                 # generate valid SQL.
                 compiler.elide_empty = False
         parts = ()
+        selected = self.query.selected
         for compiler in compilers:
             try:
                 # If the columns list is limited, then all combined queries
                 # must have the same columns list. Set the selects defined on
                 # the query on all combined queries, if not already set.
-                if not compiler.query.values_select and self.query.values_select:
+                if selected is not None and compiler.query.selected is None:
                     compiler.query = compiler.query.clone()
-                    compiler.query.set_values(
-                        (
-                            *self.query.extra_select,
-                            *self.query.values_select,
-                            *self.query.annotation_select,
-                        )
-                    )
+                    compiler.query.set_values(selected)
                 part_sql, part_args = compiler.as_sql(with_col_aliases=True)
                 if compiler.query.combinator:
                     # Wrap in a subquery if wrapping in parentheses isn't
@@ -1253,21 +1263,20 @@ class SQLCompiler:
 
         if restricted:
             related_fields = [
-                (o.field, o.related_model)
+                (o, o.field, o.related_model)
                 for o in opts.related_objects
                 if o.field.unique and not o.many_to_many
             ]
-            for related_field, model in related_fields:
-                related_select_mask = select_mask.get(related_field) or {}
+            for related_object, related_field, model in related_fields:
                 if not select_related_descend(
-                    related_field,
+                    related_object,
                     restricted,
                     requested,
-                    related_select_mask,
-                    reverse=True,
+                    select_mask,
                 ):
                     continue
 
+                related_select_mask = select_mask.get(related_object) or {}
                 related_field_name = related_field.related_query_name()
                 fields_found.add(related_field_name)
 
@@ -1280,7 +1289,7 @@ class SQLCompiler:
                     "model": model,
                     "field": related_field,
                     "reverse": True,
-                    "local_setter": related_field.remote_field.set_cached_value,
+                    "local_setter": related_object.set_cached_value,
                     "remote_setter": related_field.set_cached_value,
                     "from_parent": from_parent,
                 }
@@ -1296,7 +1305,7 @@ class SQLCompiler:
                     select_fields.append(len(select))
                     select.append((col, None))
                 klass_info["select_fields"] = select_fields
-                next = requested.get(related_field.related_query_name(), {})
+                next = requested.get(related_field_name, {})
                 next_klass_infos = self.get_related_selections(
                     select,
                     related_select_mask,

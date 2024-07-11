@@ -1,0 +1,289 @@
+============================================
+Django 5.2 release notes - UNDER DEVELOPMENT
+============================================
+
+*Expected April 2025*
+
+Welcome to Django 5.2!
+
+These release notes cover the :ref:`new features <whats-new-5.2>`, as well as
+some :ref:`backwards incompatible changes <backwards-incompatible-5.2>` you
+should be aware of when upgrading from Django 5.1 or earlier. We've
+:ref:`begun the deprecation process for some features
+<deprecated-features-5.2>`.
+
+See the :doc:`/howto/upgrade-version` guide if you're updating an existing
+project.
+
+Django 5.2 is designated as a :term:`long-term support release
+<Long-term support release>`. It will receive security updates for at least
+three years after its release. Support for the previous LTS, Django 4.2, will
+end in April 2026.
+
+Python compatibility
+====================
+
+Django 5.2 supports Python 3.10, 3.11, 3.12, and 3.13. We **highly recommend**
+and only officially support the latest release of each series.
+
+.. _whats-new-5.2:
+
+What's new in Django 5.2
+========================
+
+Minor features
+--------------
+
+:mod:`django.contrib.admin`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The ``admin/base.html`` template now has a new block
+  :ref:`extrabody <extrabody>` for adding custom code before the closing
+  ``</body>`` tag.
+
+:mod:`django.contrib.admindocs`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.auth`
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The default iteration count for the PBKDF2 password hasher is increased from
+  870,000 to 1,000,000.
+
+:mod:`django.contrib.contenttypes`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.gis`
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.messages`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.postgres`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.redirects`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sessions`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sitemaps`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sites`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.staticfiles`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.syndication`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* All :class:`~django.utils.feedgenerator.SyndicationFeed` classes now support
+  a ``stylesheets`` attribute. If specified, an ``<? xml-stylesheet ?>``
+  processing instruction will be added to the top of the document for each
+  stylesheet in the given list. See :ref:`feed-stylesheets` for more details.
+
+Asynchronous views
+~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Cache
+~~~~~
+
+* ...
+
+CSRF
+~~~~
+
+* ...
+
+Database backends
+~~~~~~~~~~~~~~~~~
+
+* ...
+
+Decorators
+~~~~~~~~~~
+
+* ...
+
+Email
+~~~~~
+
+* Tuple items of :class:`EmailMessage.attachments
+  <django.core.mail.EmailMessage>` and
+  :class:`EmailMultiAlternatives.attachments
+  <django.core.mail.EmailMultiAlternatives>` are now named tuples, as opposed
+  to regular tuples.
+
+* :attr:`EmailMultiAlternatives.alternatives
+  <django.core.mail.EmailMultiAlternatives.alternatives>` is now a list of
+  named tuples, as opposed to regular tuples.
+
+* The new :meth:`~django.core.mail.EmailMultiAlternatives.body_contains` method
+  returns a boolean indicating whether a provided text is contained in the
+  email ``body`` and in all attached MIME type ``text/*`` alternatives.
+
+Error Reporting
+~~~~~~~~~~~~~~~
+
+* ...
+
+File Storage
+~~~~~~~~~~~~
+
+* ...
+
+File Uploads
+~~~~~~~~~~~~
+
+* ...
+
+Forms
+~~~~~
+
+* ...
+
+Generic Views
+~~~~~~~~~~~~~
+
+* ...
+
+Internationalization
+~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Logging
+~~~~~~~
+
+* ...
+
+Management Commands
+~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Migrations
+~~~~~~~~~~
+
+* ...
+
+Models
+~~~~~~
+
+* The ``SELECT`` clause generated when using
+  :meth:`QuerySet.values()<django.db.models.query.QuerySet.values>` and
+  :meth:`~django.db.models.query.QuerySet.values_list` now matches the
+  specified order of the referenced expressions. Previously the order was based
+  of a set of counterintuitive rules which made query combination through
+  methods such as
+  :meth:`QuerySet.union()<django.db.models.query.QuerySet.union>` unpredictable.
+
+Requests and Responses
+~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Security
+~~~~~~~~
+
+* ...
+
+Serialization
+~~~~~~~~~~~~~
+
+* ...
+
+Signals
+~~~~~~~
+
+* ...
+
+Templates
+~~~~~~~~~
+
+* ...
+
+Tests
+~~~~~
+
+* ...
+
+URLs
+~~~~
+
+* ...
+
+Utilities
+~~~~~~~~~
+
+* ...
+
+Validators
+~~~~~~~~~~
+
+* ...
+
+.. _backwards-incompatible-5.2:
+
+Backwards incompatible changes in 5.2
+=====================================
+
+Database backend API
+--------------------
+
+This section describes changes that may be needed in third-party database
+backends.
+
+* ...
+
+:mod:`django.contrib.gis`
+-------------------------
+
+* Support for PostGIS 3.0 is removed.
+
+Dropped support for PostgreSQL 13
+---------------------------------
+
+Upstream support for PostgreSQL 13 ends in November 2025. Django 5.2 supports
+PostgreSQL 14 and higher.
+
+Miscellaneous
+-------------
+
+* ...
+
+.. _deprecated-features-5.2:
+
+Features deprecated in 5.2
+==========================
+
+Miscellaneous
+-------------
+
+* The ``all`` argument for the ``django.contrib.staticfiles.finders.find()``
+  function is deprecated in favor of the ``find_all`` argument.
