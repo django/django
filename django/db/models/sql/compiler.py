@@ -7,7 +7,7 @@ from itertools import chain
 from django.core.exceptions import EmptyResultSet, FieldError, FullResultSet
 from django.db import DatabaseError, NotSupportedError
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.expressions import F, OrderBy, RawSQL, Ref, Value
+from django.db.models.expressions import Col, F, OrderBy, RawSQL, Ref, Value
 from django.db.models.fields.composite import (
     Cols,
     CompositePrimaryKey,
@@ -355,10 +355,11 @@ class SQLCompiler:
         # relatively expensive.
         if ordering and (select := self.select):
             for ordinal, (expr, _, alias) in enumerate(select, start=1):
-                pos_expr = PositionRef(ordinal, alias, expr)
-                if alias:
-                    selected_exprs[alias] = pos_expr
-                selected_exprs[expr] = pos_expr
+                if isinstance(expr, Col):
+                    pos_expr = PositionRef(ordinal, alias, expr)
+                    if alias:
+                        selected_exprs[alias] = pos_expr
+                    selected_exprs[expr] = pos_expr
 
         for field in ordering:
             if hasattr(field, "resolve_expression"):

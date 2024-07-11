@@ -28,13 +28,13 @@ class CompositePKGetTests(TestCase):
         )
         cls.comment_1 = Comment.objects.create(id=1, user=cls.user_1)
         cls.post_1 = Post.objects.create(
-            tenant=cls.tenant_1, id="748ae4e5-eed7-442d-a93d-43867eadee2b"
+            tenant=cls.tenant_1, id="77777777-7777-7777-7777-777777777777"
         )
         cls.post_2 = Post.objects.create(
-            tenant=cls.tenant_1, id="b36cebfc-a9a5-48fd-baeb-2ad0fe63b260"
+            tenant=cls.tenant_1, id="bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"
         )
         cls.post_3 = Post.objects.create(
-            tenant=cls.tenant_2, id="aa3d4b88-6ae1-45be-890e-32dd7e71b790"
+            tenant=cls.tenant_2, id="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
         )
 
     def test_get_user(self):
@@ -184,9 +184,9 @@ class CompositePKGetTests(TestCase):
         self.assertSequenceEqual(
             Post.objects.values_list("pk", flat=True).order_by("pk"),
             (
-                (self.tenant_1.id, UUID("748ae4e5-eed7-442d-a93d-43867eadee2b")),
-                (self.tenant_1.id, UUID("b36cebfc-a9a5-48fd-baeb-2ad0fe63b260")),
-                (self.tenant_2.id, UUID("aa3d4b88-6ae1-45be-890e-32dd7e71b790")),
+                (self.tenant_1.id, UUID("77777777-7777-7777-7777-777777777777")),
+                (self.tenant_1.id, UUID("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb")),
+                (self.tenant_2.id, UUID("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")),
             ),
         )
 
