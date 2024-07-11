@@ -40,5 +40,20 @@
             "id": 2,
             "email": "user0002@example.com"
         }
+    },
+    {
+        "pk": [2, 3],
+        "model": "composite_pk.user",
+        "fields": {
+            "email": "user0003@example.com"
+        }
+    },
+    {
+        "model": "composite_pk.user",
+        "fields": {
+            "tenant_id": 2,
+            "id": 4,
+            "email": "user0004@example.com"
+        }
     }
 ]
