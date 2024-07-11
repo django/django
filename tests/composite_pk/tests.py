@@ -63,7 +63,7 @@ class CompositePKTests(TestCase):
             Comment.objects.create(tenant=self.tenant, id=self.comment.id)
 
     @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific test")
-    def test_pk_constraints_in_postgresql(self):
+    def test_get_constraints_postgresql(self):
         user_constraints = self.get_constraints(User._meta.db_table)
         user_pk = user_constraints["composite_pk_user_pkey"]
         self.assertEqual(user_pk["columns"], ["tenant_id", "id"])
@@ -75,7 +75,7 @@ class CompositePKTests(TestCase):
         self.assertTrue(comment_pk["primary_key"])
 
     @unittest.skipUnless(connection.vendor == "sqlite", "SQLite specific test")
-    def test_pk_constraints_in_sqlite(self):
+    def test_get_constraints_sqlite(self):
         user_constraints = self.get_constraints(User._meta.db_table)
         user_pk = user_constraints["__primary__"]
         self.assertEqual(user_pk["columns"], ["tenant_id", "id"])
@@ -83,6 +83,18 @@ class CompositePKTests(TestCase):
 
         comment_constraints = self.get_constraints(Comment._meta.db_table)
         comment_pk = comment_constraints["__primary__"]
+        self.assertEqual(comment_pk["columns"], ["tenant_id", "comment_id"])
+        self.assertTrue(comment_pk["primary_key"])
+
+    @unittest.skipUnless(connection.vendor == "mysql", "MySQL specific test")
+    def test_get_constraints_mysql(self):
+        user_constraints = self.get_constraints(User._meta.db_table)
+        user_pk = user_constraints["PRIMARY"]
+        self.assertEqual(user_pk["columns"], ["tenant_id", "id"])
+        self.assertTrue(user_pk["primary_key"])
+
+        comment_constraints = self.get_constraints(Comment._meta.db_table)
+        comment_pk = comment_constraints["PRIMARY"]
         self.assertEqual(comment_pk["columns"], ["tenant_id", "comment_id"])
         self.assertTrue(comment_pk["primary_key"])
 
