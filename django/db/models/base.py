@@ -1778,6 +1778,8 @@ class Model(AltersData, metaclass=ModelBase):
                 hint = "'%s' field has no column." % (field_name,)
             elif field.null:
                 hint = "'%s' field may not set 'null=True'." % (field_name,)
+            elif field.generated:
+                hint = "'%s' field is a generated field." % (field_name,)
             else:
                 if alias := seen_columns.get(field.column):
                     hint = "'%s' is an alias of '%s'." % (field_name, alias)
