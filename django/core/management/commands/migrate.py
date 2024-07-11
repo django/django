@@ -7,9 +7,9 @@ from django.core.management.base import BaseCommand, CommandError, no_translatio
 from django.core.management.sql import emit_post_migrate_signal, emit_pre_migrate_signal
 from django.db import DEFAULT_DB_ALIAS, connections, router
 from django.db.migrations.autodetector import MigrationAutodetector
-from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.loader import AmbiguityError
 from django.db.migrations.state import ModelState, ProjectState
+from django.db.migrations.utils import get_migrate_executor
 from django.utils.module_loading import module_has_submodule
 from django.utils.text import Truncator
 
@@ -115,6 +115,8 @@ class Command(BaseCommand):
         # Hook for backends needing any database preparation
         connection.prepare_database()
         # Work out which apps have migrations and which do not
+
+        MigrationExecutor = get_migrate_executor()
         executor = MigrationExecutor(connection, self.migration_progress_callback)
 
         # Raise an error if any migrations are applied before their dependencies.
