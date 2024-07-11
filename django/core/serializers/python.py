@@ -7,6 +7,7 @@ other serializers.
 from django.apps import apps
 from django.core.serializers import base
 from django.db import DEFAULT_DB_ALIAS, models
+from django.db.models import CompositePrimaryKey
 from django.utils.encoding import is_protected_type
 
 
@@ -40,15 +41,15 @@ class Serializer(base.Serializer):
 
     def _value_from_field(self, obj, field):
         value = field.value_from_object(obj)
-        if is_protected_type(value):
-            # Protected types (i.e., primitives like None, numbers, dates,
-            # and Decimals) are passed through as is.
-            return value
-        elif isinstance(value, tuple):
-            return list(value)
-        else:
-            # All other values are converted to string first.
-            return field.value_to_string(obj)
+        if isinstance(field, CompositePrimaryKey):
+            return [
+                v if is_protected_type(v) else f.value_to_string(v)
+                for f, v in zip(field, value)
+            ]
+        # Protected types (i.e., primitives like None, numbers, dates,
+        # and Decimals) are passed through as is. All other values are
+        # converted to string first.
+        return value if is_protected_type(value) else field.value_to_string(obj)
 
     def handle_field(self, obj, field):
         self._current[field.name] = self._value_from_field(obj, field)

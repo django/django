@@ -214,18 +214,18 @@ class CompositePKFixturesTests(TestCase):
             ],
         )
 
-    def test_serialize_yaml(self):
-        users = User.objects.filter(pk=(2, 3))
-        result = serializers.serialize("yaml", users)
+    def test_serialize_python(self):
+        users = User.objects.filter(pk=(2, 4))
+        result = serializers.serialize("python", users)
         self.assertEqual(
-            yaml.safe_load(result),
+            result,
             [
                 {
                     "model": "composite_pk.user",
-                    "pk": [2, 3],
+                    "pk": [2, 4],
                     "fields": {
-                        "email": "user0003@example.com",
-                        "id": 3,
+                        "email": "user0004@example.com",
+                        "id": 4,
                         "tenant": 2,
                     },
                 },
