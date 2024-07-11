@@ -123,7 +123,10 @@ CSRF
 Database backends
 ~~~~~~~~~~~~~~~~~
 
-* ...
+* It is now possible to perform asynchronous raw SQL queries using an async cursor.
+  This is only possible on backends that support async-native connections.
+  Currently only supported in PostreSQL with the ``django.db.backends.postgresql``
+  backend.
 
 Decorators
 ~~~~~~~~~~

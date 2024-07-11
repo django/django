@@ -1,6 +1,8 @@
 import pkgutil
 from importlib import import_module
 
+from asgiref.local import Local
+
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
@@ -12,6 +14,7 @@ from django.utils.module_loading import import_string
 
 DEFAULT_DB_ALIAS = "default"
 DJANGO_VERSION_PICKLE_KEY = "_django_version"
+NO_VALUE = object()
 
 
 class Error(Exception):
@@ -192,6 +195,88 @@ class ConnectionHandler(BaseConnectionHandler):
         db = self.settings[alias]
         backend = load_backend(db["ENGINE"])
         return backend.DatabaseWrapper(db, alias)
+
+
+class AsyncAlias:
+    """
+    A Context-aware list of connections.
+    """
+
+    def __init__(self) -> None:
+        self._connections = Local()
+        setattr(self._connections, "_stack", [])
+
+    @property
+    def connections(self):
+        return getattr(self._connections, "_stack", [])
+
+    def __len__(self):
+        return len(self.connections)
+
+    def __iter__(self):
+        return iter(self.connections)
+
+    def __str__(self):
+        return ", ".join([str(id(conn)) for conn in self.connections])
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__}: {self}>"
+
+    def add_connection(self, connection):
+        setattr(self._connections, "_stack", self.connections + [connection])
+
+    def pop(self):
+        conns = self.connections
+        conns.pop()
+        setattr(self._connections, "_stack", conns)
+
+
+class AsyncConnectionHandler:
+    """
+    Context-aware class to store async connections, mapped by alias name.
+    """
+
+    _from_testcase = False
+
+    def __init__(self) -> None:
+        self._aliases = Local()
+        self._connection_count = Local()
+        setattr(self._connection_count, "value", 0)
+
+    def __getitem__(self, alias):
+        try:
+            async_alias = getattr(self._aliases, alias)
+        except AttributeError:
+            async_alias = AsyncAlias()
+            setattr(self._aliases, alias, async_alias)
+        return async_alias
+
+    def __repr__(self) -> str:
+        return f"<{self.__class__.__name__}: {self}>"
+
+    @property
+    def count(self):
+        return getattr(self._connection_count, "value", 0)
+
+    @property
+    def empty(self):
+        return self.count == 0
+
+    def add_connection(self, using, connection):
+        self[using].add_connection(connection)
+        setattr(self._connection_count, "value", self.count + 1)
+
+    def pop_connection(self, using):
+        self[using].connections.pop()
+        setattr(self._connection_count, "value", self.count - 1)
+
+    def get_connection(self, using):
+        alias = self[using]
+        if len(alias.connections) == 0:
+            raise ConnectionDoesNotExist(
+                f"There are no connections using the '{using}' alias."
+            )
+        return alias.connections[-1]
 
 
 class ConnectionRouter:
