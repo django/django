@@ -7,6 +7,15 @@ Django 5.0.8 release notes
 Django 5.0.8 fixes three security issues with severity "moderate", one security
 issue with severity "high", and several bugs in 5.0.7.
 
+CVE-2024-41989: Memory exhaustion in ``django.utils.numberformat.floatformat()``
+================================================================================
+
+If :tfilter:`floatformat` received a string representation of a number in
+scientific notation with a large exponent, it could lead to significant memory
+consumption.
+
+To avoid this, decimals with more than 200 digits are now returned as is.
+
 Bugfixes
 ========
 
