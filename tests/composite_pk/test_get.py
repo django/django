@@ -1,3 +1,4 @@
+from collections import namedtuple
 from uuid import UUID
 
 from django.db.models import Count
@@ -187,6 +188,15 @@ class CompositePKGetTests(TestCase):
                 (self.tenant_1.id, UUID("77777777-7777-7777-7777-777777777777")),
                 (self.tenant_1.id, UUID("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb")),
                 (self.tenant_2.id, UUID("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")),
+            ),
+        )
+        Row = namedtuple("Row", ["pk"])
+        self.assertSequenceEqual(
+            User.objects.values_list("pk", named=True).order_by("pk"),
+            (
+                Row(pk=self.user_1.pk),
+                Row(pk=self.user_2.pk),
+                Row(pk=self.user_3.pk),
             ),
         )
 
