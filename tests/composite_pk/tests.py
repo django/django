@@ -1,5 +1,6 @@
 import json
 import unittest
+from uuid import UUID
 
 import yaml
 
@@ -8,7 +9,7 @@ from django.db import IntegrityError, connection
 from django.db.models import CompositePrimaryKey
 from django.test import TestCase
 
-from .models import Comment, Tenant, User
+from .models import Comment, Post, Tenant, User
 
 
 class CompositePKTests(TestCase):
@@ -147,22 +148,30 @@ class CompositePKFixturesTests(TestCase):
         user_1, user_2, user_3, user_4 = User.objects.order_by("pk")
         self.assertEqual(user_1.id, 1)
         self.assertEqual(user_1.tenant_id, 1)
-        self.assertEqual(user_1.pk, (1, 1))
+        self.assertEqual(user_1.pk, (user_1.tenant_id, user_1.id))
         self.assertEqual(user_1.email, "user0001@example.com")
         self.assertEqual(user_2.id, 2)
         self.assertEqual(user_2.tenant_id, 1)
-        self.assertEqual(user_2.pk, (1, 2))
+        self.assertEqual(user_2.pk, (user_2.tenant_id, user_2.id))
         self.assertEqual(user_2.email, "user0002@example.com")
         self.assertEqual(user_3.id, 3)
         self.assertEqual(user_3.tenant_id, 2)
-        self.assertEqual(user_3.pk, (2, 3))
+        self.assertEqual(user_3.pk, (user_3.tenant_id, user_3.id))
         self.assertEqual(user_3.email, "user0003@example.com")
         self.assertEqual(user_4.id, 4)
         self.assertEqual(user_4.tenant_id, 2)
-        self.assertEqual(user_4.pk, (2, 4))
+        self.assertEqual(user_4.pk, (user_4.tenant_id, user_4.id))
         self.assertEqual(user_4.email, "user0004@example.com")
 
-    def test_serialize_json(self):
+        post_1, post_2 = Post.objects.order_by("pk")
+        self.assertEqual(post_1.id, UUID("11111111-1111-1111-1111-111111111111"))
+        self.assertEqual(post_1.tenant_id, 2)
+        self.assertEqual(post_1.pk, (post_1.tenant_id, post_1.id))
+        self.assertEqual(post_2.id, UUID("ffffffff-ffff-ffff-ffff-ffffffffffff"))
+        self.assertEqual(post_2.tenant_id, 2)
+        self.assertEqual(post_2.pk, (post_2.tenant_id, post_2.id))
+
+    def test_serialize_user_json(self):
         users = User.objects.filter(pk=(1, 1))
         result = serializers.serialize("json", users)
         self.assertEqual(
@@ -180,7 +189,7 @@ class CompositePKFixturesTests(TestCase):
             ],
         )
 
-    def test_serialize_jsonl(self):
+    def test_serialize_user_jsonl(self):
         users = User.objects.filter(pk=(1, 2))
         result = serializers.serialize("jsonl", users)
         self.assertEqual(
@@ -196,7 +205,7 @@ class CompositePKFixturesTests(TestCase):
             },
         )
 
-    def test_serialize_yaml(self):
+    def test_serialize_user_yaml(self):
         users = User.objects.filter(pk=(2, 3))
         result = serializers.serialize("yaml", users)
         self.assertEqual(
@@ -214,7 +223,7 @@ class CompositePKFixturesTests(TestCase):
             ],
         )
 
-    def test_serialize_python(self):
+    def test_serialize_user_python(self):
         users = User.objects.filter(pk=(2, 4))
         result = serializers.serialize("python", users)
         self.assertEqual(
@@ -226,6 +235,23 @@ class CompositePKFixturesTests(TestCase):
                     "fields": {
                         "email": "user0004@example.com",
                         "id": 4,
+                        "tenant": 2,
+                    },
+                },
+            ],
+        )
+
+    def test_serialize_post_uuid(self):
+        posts = Post.objects.filter(pk=(2, "11111111-1111-1111-1111-111111111111"))
+        result = serializers.serialize("json", posts)
+        self.assertEqual(
+            json.loads(result),
+            [
+                {
+                    "model": "composite_pk.post",
+                    "pk": [2, "11111111-1111-1111-1111-111111111111"],
+                    "fields": {
+                        "id": "11111111-1111-1111-1111-111111111111",
                         "tenant": 2,
                     },
                 },

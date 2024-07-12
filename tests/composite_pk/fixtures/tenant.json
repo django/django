@@ -55,5 +55,21 @@
             "id": 4,
             "email": "user0004@example.com"
         }
+    },
+    {
+        "pk": [2, "11111111-1111-1111-1111-111111111111"],
+        "model": "composite_pk.post",
+        "fields": {
+            "tenant_id": 2,
+            "id": "11111111-1111-1111-1111-111111111111"
+        }
+    },
+    {
+        "pk": [2, "ffffffff-ffff-ffff-ffff-ffffffffffff"],
+        "model": "composite_pk.post",
+        "fields": {
+            "tenant_id": 2,
+            "id": "ffffffff-ffff-ffff-ffff-ffffffffffff"
+        }
     }
 ]

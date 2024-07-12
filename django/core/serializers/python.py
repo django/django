@@ -40,12 +40,9 @@ class Serializer(base.Serializer):
         return data
 
     def _value_from_field(self, obj, field):
-        value = field.value_from_object(obj)
         if isinstance(field, CompositePrimaryKey):
-            return [
-                v if is_protected_type(v) else f.value_to_string(v)
-                for f, v in zip(field, value)
-            ]
+            return [self._value_from_field(obj, f) for f in field]
+        value = field.value_from_object(obj)
         # Protected types (i.e., primitives like None, numbers, dates,
         # and Decimals) are passed through as is. All other values are
         # converted to string first.
