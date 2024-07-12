@@ -5359,6 +5359,34 @@ class SchemaTests(TransactionTestCase):
 
     @isolate_apps("schema")
     @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    def test_remove_db_index(self):
+        class RemoveDBIndexModel(Model):
+            field1 = CharField(max_length=20, db_index=True)
+
+            class Meta:
+                app_label = "schema"
+
+        with connection.schema_editor() as editor:
+            editor.create_model(RemoveDBIndexModel)
+        self.assertEqual(
+            self.get_constraints_for_column(RemoveDBIndexModel, "field1"),
+            [
+                "schema_removedbindexmodel_field1_3e6b0e1c",
+                "schema_removedbindexmodel_field1_3e6b0e1c_like",
+            ],
+        )
+        old_field1 = RemoveDBIndexModel._meta.get_field("field1")
+        new_field1 = CharField(max_length=20, db_index=False)
+        new_field1.set_attributes_from_name("field1")
+        with connection.schema_editor() as editor:
+            editor.alter_field(RemoveDBIndexModel, old_field1, new_field1, strict=True)
+        self.assertEqual(
+            self.get_constraints_for_column(RemoveDBIndexModel, "field1"),
+            [],
+        )
+
+    @isolate_apps("schema")
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
     def test_slugfields_change_primary_key(self):
         class SimpleModel(Model):
             field1 = SlugField(max_length=20, primary_key=True)

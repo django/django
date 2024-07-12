@@ -267,8 +267,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         self, old_field, new_field, old_type, new_type
     ):
         if (
-            old_field.db_index
-            and not old_field.unique
+            not old_field.unique
             and (
                 not new_field.db_index
                 or (new_field.unique and not new_field.primary_key)
