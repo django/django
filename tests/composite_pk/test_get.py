@@ -150,98 +150,153 @@ class CompositePKGetTests(TestCase):
                 self.assertEqual(user.comments_count, count)
 
     def test_values_list(self):
-        self.assertSequenceEqual(
-            User.objects.values_list("pk").order_by("pk"),
-            (
-                (self.user_1.pk,),
-                (self.user_2.pk,),
-                (self.user_3.pk,),
-            ),
-        )
-        self.assertSequenceEqual(
-            User.objects.values_list("pk", "email").order_by("pk"),
-            (
-                (self.user_1.pk, "user0001@example.com"),
-                (self.user_2.pk, "user0002@example.com"),
-                (self.user_3.pk, "user0003@example.com"),
-            ),
-        )
-        self.assertSequenceEqual(
-            User.objects.values_list("pk", "id").order_by("pk"),
-            (
-                (self.user_1.pk, self.user_1.id),
-                (self.user_2.pk, self.user_2.id),
-                (self.user_3.pk, self.user_3.id),
-            ),
-        )
-        self.assertSequenceEqual(
-            User.objects.values_list("pk", flat=True).order_by("pk"),
-            (
-                self.user_1.pk,
-                self.user_2.pk,
-                self.user_3.pk,
-            ),
-        )
-        self.assertSequenceEqual(
-            Post.objects.values_list("pk", flat=True).order_by("pk"),
-            (
-                (self.tenant_1.id, UUID("77777777-7777-7777-7777-777777777777")),
-                (self.tenant_1.id, UUID("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb")),
-                (self.tenant_2.id, UUID("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")),
-            ),
-        )
-        Row = namedtuple("Row", ["pk"])
-        self.assertSequenceEqual(
-            User.objects.values_list("pk", named=True).order_by("pk"),
-            (
-                Row(pk=self.user_1.pk),
-                Row(pk=self.user_2.pk),
-                Row(pk=self.user_3.pk),
-            ),
-        )
+        with self.subTest('.values_list("pk")'):
+            self.assertSequenceEqual(
+                User.objects.values_list("pk").order_by("pk"),
+                (
+                    (self.user_1.pk,),
+                    (self.user_2.pk,),
+                    (self.user_3.pk,),
+                ),
+            )
+        with self.subTest('.values_list("pk", "email")'):
+            self.assertSequenceEqual(
+                User.objects.values_list("pk", "email").order_by("pk"),
+                (
+                    (self.user_1.pk, "user0001@example.com"),
+                    (self.user_2.pk, "user0002@example.com"),
+                    (self.user_3.pk, "user0003@example.com"),
+                ),
+            )
+        with self.subTest('.values_list("pk", "id")'):
+            self.assertSequenceEqual(
+                User.objects.values_list("pk", "id").order_by("pk"),
+                (
+                    (self.user_1.pk, self.user_1.id),
+                    (self.user_2.pk, self.user_2.id),
+                    (self.user_3.pk, self.user_3.id),
+                ),
+            )
+        with self.subTest('.values_list("pk", "tenant_id", "id")'):
+            self.assertSequenceEqual(
+                User.objects.values_list("pk", "tenant_id", "id").order_by("pk"),
+                (
+                    (self.user_1.pk, self.user_1.tenant_id, self.user_1.id),
+                    (self.user_2.pk, self.user_2.tenant_id, self.user_2.id),
+                    (self.user_3.pk, self.user_3.tenant_id, self.user_3.id),
+                ),
+            )
+        with self.subTest('.values_list("pk", flat=True)'):
+            self.assertSequenceEqual(
+                User.objects.values_list("pk", flat=True).order_by("pk"),
+                (
+                    self.user_1.pk,
+                    self.user_2.pk,
+                    self.user_3.pk,
+                ),
+            )
+        with self.subTest('.values_list("pk", flat=True)'):
+            self.assertSequenceEqual(
+                Post.objects.values_list("pk", flat=True).order_by("pk"),
+                (
+                    (self.tenant_1.id, UUID("77777777-7777-7777-7777-777777777777")),
+                    (self.tenant_1.id, UUID("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb")),
+                    (self.tenant_2.id, UUID("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")),
+                ),
+            )
+        with self.subTest('.values_list("pk", named=True)'):
+            Row = namedtuple("Row", ["pk"])
+            self.assertSequenceEqual(
+                User.objects.values_list("pk", named=True).order_by("pk"),
+                (
+                    Row(pk=self.user_1.pk),
+                    Row(pk=self.user_2.pk),
+                    Row(pk=self.user_3.pk),
+                ),
+            )
+        with self.subTest('.values_list("pk", "pk")'):
+            self.assertSequenceEqual(
+                User.objects.values_list("pk", "pk").order_by("pk"),
+                (
+                    (self.user_1.pk,),
+                    (self.user_2.pk,),
+                    (self.user_3.pk,),
+                ),
+            )
+        with self.subTest('.values_list("pk", "id", "pk", "id")'):
+            self.assertSequenceEqual(
+                User.objects.values_list("pk", "id", "pk", "id").order_by("pk"),
+                (
+                    (self.user_1.pk, self.user_1.id),
+                    (self.user_2.pk, self.user_2.id),
+                    (self.user_3.pk, self.user_3.id),
+                ),
+            )
 
     def test_values(self):
-        self.assertSequenceEqual(
-            User.objects.values("pk").order_by("pk"),
-            (
-                {"pk": self.user_1.pk},
-                {"pk": self.user_2.pk},
-                {"pk": self.user_3.pk},
-            ),
-        )
-        self.assertSequenceEqual(
-            User.objects.values("pk", "email").order_by("pk"),
-            (
-                {"pk": self.user_1.pk, "email": "user0001@example.com"},
-                {"pk": self.user_2.pk, "email": "user0002@example.com"},
-                {"pk": self.user_3.pk, "email": "user0003@example.com"},
-            ),
-        )
-        self.assertSequenceEqual(
-            User.objects.values("pk", "id").order_by("pk"),
-            (
-                {"pk": self.user_1.pk, "id": self.user_1.id},
-                {"pk": self.user_2.pk, "id": self.user_2.id},
-                {"pk": self.user_3.pk, "id": self.user_3.id},
-            ),
-        )
-        self.assertSequenceEqual(
-            User.objects.values("pk", "tenant_id", "id").order_by("pk"),
-            (
-                {
-                    "pk": self.user_1.pk,
-                    "tenant_id": self.user_1.tenant_id,
-                    "id": self.user_1.id,
-                },
-                {
-                    "pk": self.user_2.pk,
-                    "tenant_id": self.user_2.tenant_id,
-                    "id": self.user_2.id,
-                },
-                {
-                    "pk": self.user_3.pk,
-                    "tenant_id": self.user_3.tenant_id,
-                    "id": self.user_3.id,
-                },
-            ),
-        )
+        with self.subTest('.values("pk")'):
+            self.assertSequenceEqual(
+                User.objects.values("pk").order_by("pk"),
+                (
+                    {"pk": self.user_1.pk},
+                    {"pk": self.user_2.pk},
+                    {"pk": self.user_3.pk},
+                ),
+            )
+        with self.subTest('.values("pk", "email")'):
+            self.assertSequenceEqual(
+                User.objects.values("pk", "email").order_by("pk"),
+                (
+                    {"pk": self.user_1.pk, "email": "user0001@example.com"},
+                    {"pk": self.user_2.pk, "email": "user0002@example.com"},
+                    {"pk": self.user_3.pk, "email": "user0003@example.com"},
+                ),
+            )
+        with self.subTest('.values("pk", "id")'):
+            self.assertSequenceEqual(
+                User.objects.values("pk", "id").order_by("pk"),
+                (
+                    {"pk": self.user_1.pk, "id": self.user_1.id},
+                    {"pk": self.user_2.pk, "id": self.user_2.id},
+                    {"pk": self.user_3.pk, "id": self.user_3.id},
+                ),
+            )
+        with self.subTest('.values("pk", "tenant_id", "id")'):
+            self.assertSequenceEqual(
+                User.objects.values("pk", "tenant_id", "id").order_by("pk"),
+                (
+                    {
+                        "pk": self.user_1.pk,
+                        "tenant_id": self.user_1.tenant_id,
+                        "id": self.user_1.id,
+                    },
+                    {
+                        "pk": self.user_2.pk,
+                        "tenant_id": self.user_2.tenant_id,
+                        "id": self.user_2.id,
+                    },
+                    {
+                        "pk": self.user_3.pk,
+                        "tenant_id": self.user_3.tenant_id,
+                        "id": self.user_3.id,
+                    },
+                ),
+            )
+        with self.subTest('.values("pk", "pk")'):
+            self.assertSequenceEqual(
+                User.objects.values("pk", "pk").order_by("pk"),
+                (
+                    {"pk": self.user_1.pk},
+                    {"pk": self.user_2.pk},
+                    {"pk": self.user_3.pk},
+                ),
+            )
+        with self.subTest('.values("pk", "id", "pk", "id")'):
+            self.assertSequenceEqual(
+                User.objects.values("pk", "id", "pk", "id").order_by("pk"),
+                (
+                    {"pk": self.user_1.pk, "id": self.user_1.id},
+                    {"pk": self.user_2.pk, "id": self.user_2.id},
+                    {"pk": self.user_3.pk, "id": self.user_3.id},
+                ),
+            )
