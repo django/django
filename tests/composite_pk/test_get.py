@@ -225,3 +225,23 @@ class CompositePKGetTests(TestCase):
                 {"pk": self.user_3.pk, "id": self.user_3.id},
             ),
         )
+        self.assertSequenceEqual(
+            User.objects.values("pk", "tenant_id", "id").order_by("pk"),
+            (
+                {
+                    "pk": self.user_1.pk,
+                    "tenant_id": self.user_1.tenant_id,
+                    "id": self.user_1.id,
+                },
+                {
+                    "pk": self.user_2.pk,
+                    "tenant_id": self.user_2.tenant_id,
+                    "id": self.user_2.id,
+                },
+                {
+                    "pk": self.user_3.pk,
+                    "tenant_id": self.user_3.tenant_id,
+                    "id": self.user_3.id,
+                },
+            ),
+        )
