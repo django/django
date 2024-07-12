@@ -1875,13 +1875,14 @@ class SQLInsertCompiler(SQLCompiler):
                 ]
                 cols = [field.get_col(opts.db_table) for field in self.returning_fields]
             else:
-                cols = [self.returning_fields[0].get_col(opts.db_table)]
+                returning_field = self.returning_fields[0]
+                cols = [returning_field.get_col(opts.db_table)]
                 rows = [
                     (
                         self.connection.ops.last_insert_id(
                             cursor,
                             opts.db_table,
-                            opts.pk.column,
+                            returning_field.column,
                         ),
                     )
                 ]
