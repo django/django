@@ -288,6 +288,9 @@ class SQLCompiler:
                 # Reference to a column.
                 elif isinstance(expression, int):
                     expression = cols[expression]
+                # Cols cannot be aliased.
+                if isinstance(expression, Cols):
+                    alias = None
                 selected.append((alias, expression))
 
         for select_idx, (alias, expression) in enumerate(selected):

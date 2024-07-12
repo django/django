@@ -132,6 +132,10 @@ class CompositePKTests(TestCase):
         result = list(Comment.objects.iterator())
         self.assertEqual(result, [self.comment])
 
+    def test_query(self):
+        users = User.objects.values_list("pk").order_by("pk")
+        self.assertNotIn('AS "pk"', str(users.query))
+
 
 class CompositePKFixturesTests(TestCase):
     fixtures = ["tenant"]
