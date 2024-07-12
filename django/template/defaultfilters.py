@@ -163,6 +163,19 @@ def floatformat(text, arg=-1):
     except ValueError:
         return input_val
 
+    _, digits, exponent = d.as_tuple()
+    try:
+        number_of_digits_and_exponent_sum = len(digits) + abs(exponent)
+    except TypeError:
+        # Exponent values can be "F", "n", "N".
+        number_of_digits_and_exponent_sum = 0
+
+    # Values with more than 200 digits, or with a large exponent, are returned "as is"
+    # to avoid high memory consumption and potential denial-of-service attacks.
+    # The cut-off of 200 is consistent with django.utils.numberformat.floatformat().
+    if number_of_digits_and_exponent_sum > 200:
+        return input_val
+
     try:
         m = int(d) - d
     except (ValueError, OverflowError, InvalidOperation):
