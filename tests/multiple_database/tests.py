@@ -1240,15 +1240,14 @@ class QueryTestCase(TestCase):
             connections["default"].ops, "compiler"
         ) as default_db_compiler:
             queryset = Person.objects.using("other").all().order_by("id")
-
-        self.assertEqual(
-            str(queryset.query),
-            'SELECT "multiple_database_person"."id", '
-            '"multiple_database_person"."name" '
-            'FROM "multiple_database_person" '
-            'ORDER BY "multiple_database_person"."id" ASC',
-        )
-        default_db_compiler.assert_not_called()
+            self.assertEqual(
+                str(queryset.query),
+                'SELECT "multiple_database_person"."id", '
+                '"multiple_database_person"."name" '
+                'FROM "multiple_database_person" '
+                'ORDER BY "multiple_database_person"."id" ASC',
+            )
+            default_db_compiler.assert_not_called()
 
     def test_select_related(self):
         """

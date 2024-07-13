@@ -1781,7 +1781,7 @@ class QuerySet(AltersData):
         """Select which database this QuerySet should execute against."""
         clone = self._chain()
         clone._db = alias
-        clone._query.using(self.db)
+        clone._query.using(clone.db)
         return clone
 
     ###################################
