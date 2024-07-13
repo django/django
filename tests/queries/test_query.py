@@ -162,8 +162,7 @@ class TestQuery(SimpleTestCase):
 
     def test_use_correct_db(self):
         qs = Item.objects.using("other")
-        query = Query(Item, queryset=qs)
-        self.assertEqual(query.db, "other")
+        self.assertEqual(qs.query.db, "other")
 
 
 class TestQueryNoModel(TestCase):

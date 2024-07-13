@@ -1235,6 +1235,22 @@ class QueryTestCase(TestCase):
         val = Book.objects.raw("SELECT id FROM multiple_database_book").using("other")
         self.assertQuerySetEqual(val, [dive.pk], attrgetter("pk"))
 
+    def test_query_string(self):
+        with (
+            patch.object(connections["default"].ops, "compiler")
+            as default_db_compiler
+        ):
+            queryset = Person.objects.using("other").all().order_by("id")
+
+        self.assertEqual(
+            str(queryset.query),
+            'SELECT "multiple_database_person"."id", '
+            '"multiple_database_person"."name" '
+            'FROM "multiple_database_person" '
+            'ORDER BY "multiple_database_person"."id" ASC'
+        )
+        default_db_compiler.assert_not_called()
+
     def test_select_related(self):
         """
         Database assignment is retained if an object is retrieved with

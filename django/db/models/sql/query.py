@@ -289,9 +289,9 @@ class Query(BaseExpression):
 
     explain_info = None
 
-    def __init__(self, model, alias_cols=True, queryset=None):
+    def __init__(self, model, alias_cols=True):
         self.model = model
-        self.queryset = queryset
+        self.db = DEFAULT_DB_ALIAS
         self.alias_refcount = {}
         # alias_map is the most important data structure regarding joins.
         # It's used for recording which joins exist in the query and what
@@ -318,19 +318,13 @@ class Query(BaseExpression):
 
         self._filtered_relations = {}
 
-    # Remove queryset from pickle result.
-    # Refer https://code.djangoproject.com/ticket/27159
-    def __getstate__(self):
-        state = self.__dict__.copy()
-        state["queryset"] = None
-        return state
-
-    @property
-    def db(self):
-        # Must not use ``if self.queryset``, that will trigger evaluation of queryset.
-        if self.queryset is not None:
-            return self.queryset.db
-        return DEFAULT_DB_ALIAS
+    def using(self, alias):
+        """
+        This function is called in QuerySet.using and QuerySet._add_hints,
+        because these QuerySet methods cause db changes,
+        self.db should be synced with QuerySet.db, Refer GH#18039.
+        """
+        self.db = alias
 
     @property
     def output_field(self):
