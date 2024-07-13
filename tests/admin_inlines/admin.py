@@ -106,14 +106,18 @@ class PhotoInlineMixin:
     model = Photo
     extra = 2
     fieldsets = [
-        (None, {"fields": ["image", "title"]}),
+        (None, {"fields": ["image", "title"], "description": "First group"}),
         (
             "Details",
-            {"fields": ["description", "creation_date"], "classes": ["collapse"]},
+            {
+                "fields": ["description", "creation_date"],
+                "classes": ["collapse"],
+                "description": "Second group",
+            },
         ),
         (
             "Details",  # Fieldset name intentionally duplicated
-            {"fields": ["update_date", "updated_by"]},
+            {"fields": ["update_date", "updated_by"], "description": "Third group"},
         ),
     ]
 
