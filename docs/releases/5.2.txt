@@ -280,3 +280,9 @@ Miscellaneous
 -------------
 
 * ...
+
+Miscellaneous
+~~~~~
+
+* Subclasses of :class:`~django.middleware.cache.UpdateCacheMiddleware`
+  will no longer cause duplication when used with cache decorator. 
