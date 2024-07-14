@@ -667,7 +667,7 @@ class GeneratedModelUniqueConstraint(GeneratedModelBase):
     class Meta:
         required_db_features = {
             "supports_stored_generated_columns",
-            "supports_table_check_constraints",
+            "supports_expression_indexes",
         }
         constraints = [
             models.UniqueConstraint(F("a"), name="Generated model unique constraint a"),
