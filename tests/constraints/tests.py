@@ -896,6 +896,13 @@ class UniqueConstraintTests(TestCase):
                 ChildUniqueConstraintProduct(name=self.p1.name, color=self.p1.color),
             )
 
+    def test_validate_fields_unattached(self):
+        Product.objects.create(price=42)
+        constraint = models.UniqueConstraint(fields=["price"], name="uniq_prices")
+        msg = "Product with this Price already exists."
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint.validate(Product, Product(price=42))
+
     @skipUnlessDBFeature("supports_partial_indexes")
     def test_validate_condition(self):
         p1 = UniqueConstraintConditionProduct.objects.create(name="p1")
@@ -921,7 +928,7 @@ class UniqueConstraintTests(TestCase):
         )
 
     @skipUnlessDBFeature("supports_partial_indexes")
-    def test_validate_conditon_custom_error(self):
+    def test_validate_condition_custom_error(self):
         p1 = UniqueConstraintConditionProduct.objects.create(name="p1")
         constraint = models.UniqueConstraint(
             fields=["name"],
