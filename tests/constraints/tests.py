@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from django.db import IntegrityError, connection, models
 from django.db.models import F
 from django.db.models.constraints import BaseConstraint, UniqueConstraint
-from django.db.models.functions import Lower
+from django.db.models.functions import Abs, Lower
 from django.db.transaction import atomic
 from django.test import SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import ignore_warnings
@@ -1080,6 +1080,19 @@ class UniqueConstraintTests(TestCase):
         constraint.validate(Product, Product(price=None))
         Product.objects.create(price=None)
         msg = "Product with this Price already exists."
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint.validate(Product, Product(price=None))
+
+    def test_validate_nulls_distinct_expressions(self):
+        Product.objects.create(price=42)
+        constraint = models.UniqueConstraint(
+            Abs("price"),
+            nulls_distinct=False,
+            name="uniq_prices_nulls_distinct",
+        )
+        constraint.validate(Product, Product(price=None))
+        Product.objects.create(price=None)
+        msg = f"Constraint “{constraint.name}” is violated."
         with self.assertRaisesMessage(ValidationError, msg):
             constraint.validate(Product, Product(price=None))
 
