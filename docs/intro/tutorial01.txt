@@ -256,7 +256,7 @@ Your app directory should now look like:
         urls.py
         views.py
 
-The next step is to configure the global URLconf in the ``mysite`` project to
+The next step is to configure the root URLconf in the ``mysite`` project to
 include the URLconf defined in ``polls.urls``. To do this, add an import for
 ``django.urls.include`` in ``mysite/urls.py`` and insert an
 :func:`~django.urls.include` in the ``urlpatterns`` list, so you have:

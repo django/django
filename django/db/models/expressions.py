@@ -1613,7 +1613,6 @@ class Case(SQLiteNumericMixin, Expression):
         template_params = {**self.extra, **extra_context}
         case_parts = []
         sql_params = []
-        default_sql, default_params = compiler.compile(self.default)
         for case in self.cases:
             try:
                 case_sql, case_params = compiler.compile(case)
@@ -1624,6 +1623,8 @@ class Case(SQLiteNumericMixin, Expression):
                 break
             case_parts.append(case_sql)
             sql_params.extend(case_params)
+        else:
+            default_sql, default_params = compiler.compile(self.default)
         if not case_parts:
             return default_sql, default_params
         case_joiner = case_joiner or self.case_joiner
