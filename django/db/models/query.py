@@ -308,6 +308,8 @@ class QuerySet(AltersData):
         self._fields = None
         self._defer_next_filter = False
         self._deferred_filter = None
+        if query is None:
+            self._query.using(self.db)
 
     @property
     def query(self):

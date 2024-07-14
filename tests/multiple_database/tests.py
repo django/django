@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core import management
 from django.db import DEFAULT_DB_ALIAS, connections, router, transaction
+from django.db.backends.dummy.base import DatabaseWrapper as DummyDatabaseWrapper
 from django.db.models import signals
 from django.db.utils import ConnectionRouter
 from django.test import SimpleTestCase, TestCase, override_settings
@@ -113,7 +114,7 @@ class QueryTestCase(TestCase):
         )
         with self.settings(DATABASE_ROUTERS=[router]):
             book.refresh_from_db()
-        router.db_for_read.assert_called_once_with(Book, instance=book)
+        router.db_for_read.assert_called_with(Book, instance=book)
 
     def test_basic_queries(self):
         "Queries are constrained to a single database"
@@ -1236,18 +1237,45 @@ class QueryTestCase(TestCase):
         self.assertQuerySetEqual(val, [dive.pk], attrgetter("pk"))
 
     def test_query_string(self):
-        with patch.object(
-            connections["default"].ops, "compiler"
-        ) as default_db_compiler:
-            queryset = Person.objects.using("other").all().order_by("id")
-            self.assertEqual(
-                str(queryset.query),
-                'SELECT "multiple_database_person"."id", '
-                '"multiple_database_person"."name" '
-                'FROM "multiple_database_person" '
-                'ORDER BY "multiple_database_person"."id" ASC',
-            )
+        with (
+            patch.object(connections["default"].ops, "compiler") as default_db_compiler,
+            patch.object(
+                connections["other"].ops,
+                "compiler",
+                wraps=connections["other"].ops.compiler,
+            ) as other_db_compiler,
+        ):
+            queryset = Person.objects.using("other")
+            str(queryset.query)
             default_db_compiler.assert_not_called()
+            other_db_compiler.assert_called_once()
+
+    @override_settings(DATABASE_ROUTERS=["multiple_database.tests.TestRouter"])
+    def test_query_string_empty_default_db(self):
+        """
+        There is not an easy way to overwrite DATABASES settings and make it
+        effective immediately.
+
+        From the source code of django.db.utils.ConnectionHandler.configure_settings,
+        when DATABASE["default"] is empty dict, it will be replaced with
+        {"ENGINE": "django.db.backends.dummy"}.
+
+        To simulate this behavior, in this testcase, the default database connection
+        is patched with a dummy connection.
+        """
+        with (
+            patch.dict(connections, [(DEFAULT_DB_ALIAS, DummyDatabaseWrapper({}))]),
+            patch.object(connections["default"].ops, "compiler") as default_db_compiler,
+            patch.object(
+                connections["other"].ops,
+                "compiler",
+                wraps=connections["other"].ops.compiler,
+            ) as other_db_compiler,
+        ):
+            queryset = Person.objects.all()
+            str(queryset.query)
+            default_db_compiler.assert_not_called()
+            other_db_compiler.assert_called_once()
 
     def test_select_related(self):
         """
