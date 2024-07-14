@@ -187,7 +187,9 @@ class RelatedField(FieldCacheMixin, Field):
         return errors
 
     def _check_relation_model_exists(self):
-        rel_is_missing = self.remote_field.model not in self.opts.apps.get_models()
+        rel_is_missing = self.remote_field.model not in self.opts.apps.get_models(
+            include_auto_created=True
+        )
         rel_is_string = isinstance(self.remote_field.model, str)
         model_name = (
             self.remote_field.model
@@ -929,7 +931,9 @@ class ForeignKey(ForeignObject):
 
     empty_strings_allowed = False
     default_error_messages = {
-        "invalid": _("%(model)s instance with %(field)s %(value)r does not exist.")
+        "invalid": _(
+            "%(model)s instance with %(field)s %(value)r is not a valid choice."
+        )
     }
     description = _("Foreign Key (type determined by related field)")
 

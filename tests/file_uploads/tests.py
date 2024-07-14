@@ -880,7 +880,7 @@ class DirectoryCreationTests(SimpleTestCase):
         default_storage.delete(UPLOAD_TO)
         # Create a file with the upload directory name
         with SimpleUploadedFile(UPLOAD_TO, b"x") as file:
-            default_storage.save(UPLOAD_TO, file)
+            default_storage.save(UPLOAD_FOLDER, file)
         self.addCleanup(default_storage.delete, UPLOAD_TO)
         msg = "%s exists and is not a directory." % UPLOAD_TO
         with self.assertRaisesMessage(FileExistsError, msg):

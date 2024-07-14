@@ -223,7 +223,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             cc=["foo@example.com"],
             headers={"Cc": "override@example.com"},
         ).message()
-        self.assertEqual(message["Cc"], "override@example.com")
+        self.assertEqual(message.get_all("Cc"), ["override@example.com"])
 
     def test_cc_in_headers_only(self):
         message = EmailMessage(
@@ -233,7 +233,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             ["to@example.com"],
             headers={"Cc": "foo@example.com"},
         ).message()
-        self.assertEqual(message["Cc"], "foo@example.com")
+        self.assertEqual(message.get_all("Cc"), ["foo@example.com"])
 
     def test_reply_to(self):
         email = EmailMessage(
@@ -379,7 +379,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             headers={"From": "from@example.com"},
         )
         message = email.message()
-        self.assertEqual(message["From"], "from@example.com")
+        self.assertEqual(message.get_all("From"), ["from@example.com"])
 
     def test_to_header(self):
         """
@@ -393,7 +393,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             headers={"To": "mailing-list@example.com"},
         )
         message = email.message()
-        self.assertEqual(message["To"], "mailing-list@example.com")
+        self.assertEqual(message.get_all("To"), ["mailing-list@example.com"])
         self.assertEqual(
             email.to, ["list-subscriber@example.com", "list-subscriber2@example.com"]
         )
@@ -408,7 +408,8 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         )
         message = email.message()
         self.assertEqual(
-            message["To"], "list-subscriber@example.com, list-subscriber2@example.com"
+            message.get_all("To"),
+            ["list-subscriber@example.com, list-subscriber2@example.com"],
         )
         self.assertEqual(
             email.to, ["list-subscriber@example.com", "list-subscriber2@example.com"]
@@ -421,7 +422,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             "bounce@example.com",
             headers={"To": "to@example.com"},
         ).message()
-        self.assertEqual(message["To"], "to@example.com")
+        self.assertEqual(message.get_all("To"), ["to@example.com"])
 
     def test_reply_to_header(self):
         """
@@ -436,7 +437,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             headers={"Reply-To": "override@example.com"},
         )
         message = email.message()
-        self.assertEqual(message["Reply-To"], "override@example.com")
+        self.assertEqual(message.get_all("Reply-To"), ["override@example.com"])
 
     def test_reply_to_in_headers_only(self):
         message = EmailMessage(
@@ -446,7 +447,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             ["to@example.com"],
             headers={"Reply-To": "reply_to@example.com"},
         ).message()
-        self.assertEqual(message["Reply-To"], "reply_to@example.com")
+        self.assertEqual(message.get_all("Reply-To"), ["reply_to@example.com"])
 
     def test_multiple_message_call(self):
         """
@@ -461,9 +462,9 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             headers={"From": "from@example.com"},
         )
         message = email.message()
-        self.assertEqual(message["From"], "from@example.com")
+        self.assertEqual(message.get_all("From"), ["from@example.com"])
         message = email.message()
-        self.assertEqual(message["From"], "from@example.com")
+        self.assertEqual(message.get_all("From"), ["from@example.com"])
 
     def test_unicode_address_header(self):
         """

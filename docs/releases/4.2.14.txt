@@ -1,11 +1,11 @@
-==========================
-Django 5.0.7 release notes
-==========================
+===========================
+Django 4.2.14 release notes
+===========================
 
 *July 9, 2024*
 
-Django 5.0.7 fixes two security issues with severity "moderate", two security
-issues with severity "low", and one bug in 5.0.6.
+Django 4.2.14 fixes two security issues with severity "moderate" and two
+security issues with severity "low" in 4.2.13.
 
 CVE-2024-38875: Potential denial-of-service vulnerability in ``django.utils.html.urlize()``
 ===========================================================================================
@@ -47,11 +47,3 @@ up to a maximum length of 500 characters.
 When the language code is over 500 characters, a :exc:`ValueError` will now be
 raised if ``strict`` is ``True``, or if there is no generic variant and
 ``strict`` is ``False``.
-
-Bugfixes
-========
-
-* Fixed a bug in Django 5.0 that caused a crash of ``Model.full_clean()`` on
-  unsaved model instances with a ``GeneratedField`` and certain defined
-  :attr:`Meta.constraints <django.db.models.Options.constraints>`
-  (:ticket:`35560`).

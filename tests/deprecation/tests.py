@@ -1,12 +1,7 @@
 import warnings
 
 from django.test import SimpleTestCase
-from django.utils.deprecation import (
-    DeprecationInstanceCheck,
-    RemovedAfterNextVersionWarning,
-    RemovedInNextVersionWarning,
-    RenameMethodsBase,
-)
+from django.utils.deprecation import RemovedAfterNextVersionWarning, RenameMethodsBase
 
 
 class RenameManagerMethods(RenameMethodsBase):
@@ -166,14 +161,3 @@ class RenameMethodsTests(SimpleTestCase):
         self.assertTrue(
             issubclass(RemovedAfterNextVersionWarning, PendingDeprecationWarning)
         )
-
-
-class DeprecationInstanceCheckTest(SimpleTestCase):
-    def test_warning(self):
-        class Manager(metaclass=DeprecationInstanceCheck):
-            alternative = "fake.path.Foo"
-            deprecation_warning = RemovedInNextVersionWarning
-
-        msg = "`Manager` is deprecated, use `fake.path.Foo` instead."
-        with self.assertWarnsMessage(RemovedInNextVersionWarning, msg):
-            isinstance(object, Manager)
