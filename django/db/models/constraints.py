@@ -653,19 +653,16 @@ class UniqueConstraint(BaseConstraint):
             queryset = queryset.exclude(pk=model_class_pk)
         if not self.condition:
             if queryset.exists():
-                if self.expressions:
+                if self.fields:
+                    # When fields are defined, use the unique_error_message() for
+                    # backward compatibility.
                     raise ValidationError(
-                        self.get_violation_error_message(),
-                        code=self.violation_error_code,
+                        instance.unique_error_message(model, self.fields),
                     )
-                # When fields are defined, use the unique_error_message() for
-                # backward compatibility.
-                for model, constraints in instance.get_constraints():
-                    for constraint in constraints:
-                        if constraint is self:
-                            raise ValidationError(
-                                instance.unique_error_message(model, self.fields),
-                            )
+                raise ValidationError(
+                    self.get_violation_error_message(),
+                    code=self.violation_error_code,
+                )
         else:
             against = instance._get_field_value_map(meta=model._meta, exclude=exclude)
             try:
