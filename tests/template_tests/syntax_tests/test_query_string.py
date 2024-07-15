@@ -9,92 +9,88 @@ class QueryStringTagTests(SimpleTestCase):
     def setUp(self):
         self.request_factory = RequestFactory()
 
-    @setup({"query_string_empty": "{% query_string %}"})
-    def test_query_string_empty(self):
+    @setup({"querystring_empty": "{% querystring %}"})
+    def test_querystring_empty(self):
         request = self.request_factory.get("/")
-        template = self.engine.get_template("query_string_empty")
+        template = self.engine.get_template("querystring_empty")
         context = RequestContext(request)
         output = template.render(context)
         self.assertEqual(output, "")
 
-    @setup({"query_string_non_empty": "{% query_string %}"})
-    def test_query_string_non_empty(self):
+    @setup({"querystring_non_empty": "{% querystring %}"})
+    def test_querystring_non_empty(self):
         request = self.request_factory.get("/", {"a": "b"})
-        template = self.engine.get_template("query_string_non_empty")
+        template = self.engine.get_template("querystring_non_empty")
         context = RequestContext(request)
         output = template.render(context)
         self.assertEqual(output, "?a=b")
 
-    @setup({"query_string_multiple": "{% query_string %}"})
-    def test_query_string_multiple(self):
+    @setup({"querystring_multiple": "{% querystring %}"})
+    def test_querystring_multiple(self):
         request = self.request_factory.get("/", {"x": "y", "a": "b"})
-        template = self.engine.get_template("query_string_multiple")
+        template = self.engine.get_template("querystring_multiple")
         context = RequestContext(request)
         output = template.render(context)
         self.assertEqual(output, "?x=y&amp;a=b")
 
-    @setup({"query_string_replace": "{% query_string a=1 %}"})
-    def test_query_string_replace(self):
+    @setup({"querystring_replace": "{% querystring a=1 %}"})
+    def test_querystring_replace(self):
         request = self.request_factory.get("/", {"x": "y", "a": "b"})
-        template = self.engine.get_template("query_string_replace")
+        template = self.engine.get_template("querystring_replace")
         context = RequestContext(request)
         output = template.render(context)
         self.assertEqual(output, "?x=y&amp;a=1")
 
-    @setup({"query_string_add": "{% query_string test_new='something' %}"})
-    def test_query_string_add(self):
+    @setup({"querystring_add": "{% querystring test_new='something' %}"})
+    def test_querystring_add(self):
         request = self.request_factory.get("/", {"a": "b"})
-        template = self.engine.get_template("query_string_add")
+        template = self.engine.get_template("querystring_add")
         context = RequestContext(request)
         output = template.render(context)
         self.assertEqual(output, "?a=b&amp;test_new=something")
 
-    @setup({"query_string_remove": "{% query_string test=None a=1 %}"})
-    def test_query_string_remove(self):
+    @setup({"querystring_remove": "{% querystring test=None a=1 %}"})
+    def test_querystring_remove(self):
         request = self.request_factory.get("/", {"test": "value", "a": "1"})
-        template = self.engine.get_template("query_string_remove")
+        template = self.engine.get_template("querystring_remove")
         context = RequestContext(request)
         output = template.render(context)
         self.assertEqual(output, "?a=1")
 
-    @setup(
-        {"query_string_remove_nonexistent": "{% query_string nonexistent=None a=1 %}"}
-    )
-    def test_query_string_remove_nonexistent(self):
+    @setup({"querystring_remove_nonexistent": "{% querystring nonexistent=None a=1 %}"})
+    def test_querystring_remove_nonexistent(self):
         request = self.request_factory.get("/", {"x": "y", "a": "1"})
-        template = self.engine.get_template("query_string_remove_nonexistent")
+        template = self.engine.get_template("querystring_remove_nonexistent")
         context = RequestContext(request)
         output = template.render(context)
         self.assertEqual(output, "?x=y&amp;a=1")
 
-    @setup({"query_string_list": "{% query_string a=my_list %}"})
-    def test_query_string_add_list(self):
+    @setup({"querystring_list": "{% querystring a=my_list %}"})
+    def test_querystring_add_list(self):
         request = self.request_factory.get("/")
-        template = self.engine.get_template("query_string_list")
+        template = self.engine.get_template("querystring_list")
         context = RequestContext(request, {"my_list": [2, 3]})
         output = template.render(context)
         self.assertEqual(output, "?a=2&amp;a=3")
 
-    @setup({"query_string_query_dict": "{% query_string request.GET a=2 %}"})
-    def test_query_string_with_explicit_query_dict(self):
+    @setup({"querystring_query_dict": "{% querystring request.GET a=2 %}"})
+    def test_querystring_with_explicit_query_dict(self):
         request = self.request_factory.get("/", {"a": 1})
         output = self.engine.render_to_string(
-            "query_string_query_dict", {"request": request}
+            "querystring_query_dict", {"request": request}
         )
         self.assertEqual(output, "?a=2")
 
-    @setup(
-        {"query_string_query_dict_no_request": "{% query_string my_query_dict a=2 %}"}
-    )
-    def test_query_string_with_explicit_query_dict_and_no_request(self):
+    @setup({"querystring_query_dict_no_request": "{% querystring my_query_dict a=2 %}"})
+    def test_querystring_with_explicit_query_dict_and_no_request(self):
         context = {"my_query_dict": QueryDict("a=1&b=2")}
         output = self.engine.render_to_string(
-            "query_string_query_dict_no_request", context
+            "querystring_query_dict_no_request", context
         )
         self.assertEqual(output, "?a=2&amp;b=2")
 
-    @setup({"query_string_no_request_no_query_dict": "{% query_string %}"})
-    def test_query_string_without_request_or_explicit_query_dict(self):
+    @setup({"querystring_no_request_no_query_dict": "{% querystring %}"})
+    def test_querystring_without_request_or_explicit_query_dict(self):
         msg = "'Context' object has no attribute 'request'"
         with self.assertRaisesMessage(AttributeError, msg):
-            self.engine.render_to_string("query_string_no_request_no_query_dict")
+            self.engine.render_to_string("querystring_no_request_no_query_dict")
