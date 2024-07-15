@@ -86,14 +86,3 @@ def admin_actions_tag(parser, token):
     return InclusionAdminNode(
         parser, token, func=admin_actions, template_name="actions.html"
     )
-
-
-@register.tag(name="change_list_object_tools")
-def change_list_object_tools_tag(parser, token):
-    """Display the row of change list object tools."""
-    return InclusionAdminNode(
-        parser,
-        token,
-        func=lambda context: context,
-        template_name="change_list_object_tools.html",
-    )

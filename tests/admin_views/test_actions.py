@@ -3,6 +3,7 @@ import json
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.contrib.admin.views.main import IS_POPUP_VAR
 from django.contrib.auth.models import Permission, User
+from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.db import connection
 from django.template.loader import render_to_string
@@ -270,7 +271,9 @@ class AdminActionsTest(TestCase):
             reverse("admin:admin_views_externalsubscriber_changelist"), action_data
         )
         content = b"".join(list(response))
-        self.assertEqual(content, b"This is the content of the file")
+        self.assertEqual(
+            content, b"This is the content of the file written by John Doe"
+        )
         self.assertEqual(response.status_code, 200)
 
     def test_custom_function_action_no_perm_response(self):
@@ -295,13 +298,12 @@ class AdminActionsTest(TestCase):
             response,
             """<label>Action: <select name="action" required>
 <option value="" selected>---------</option>
-<option value="delete_selected">Delete selected external
-subscribers</option>
+<option value="delete_selected">Delete selected external subscribers</option>
 <option value="redirect_to">Redirect to (Awesome action)</option>
-<option value="external_mail">External mail (Another awesome
-action)</option>
+<option value="external_mail">External mail (Another awesome action)</option>
 <option value="download">Download selected subscriptions</option>
 <option value="no_perm">No permission to run</option>
+<option value="custom_action">Custom action</option>
 </select>""",
             html=True,
         )
@@ -551,15 +553,25 @@ class AdminActionsPermissionTests(TestCase):
 class AdminDetailActionsTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.superuser = User.objects.create_superuser(
-            username="super", password="secret", email="super@example.com"
+        cls.user = User.objects.create_user(
+            username="user",
+            password="secret",
+            email="user@example.com",
+            is_staff=True,
         )
         cls.s1 = ExternalSubscriber.objects.create(
             name="John Doe", email="john@example.org"
         )
+        content_type = ContentType.objects.get_for_model(ExternalSubscriber)
+        for permission_type in ("view", "add", "change", "delete"):
+            permission = Permission.objects.get(
+                codename=f"{permission_type}_externalsubscriber",
+                content_type=content_type,
+            )
+            cls.user.user_permissions.add(permission)
 
     def setUp(self):
-        self.client.force_login(self.superuser)
+        self.client.force_login(self.user)
 
     def test_available_detail_actions(self):
         """
@@ -678,11 +690,16 @@ class AdminDetailActionsTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_delete_action_in_detail_view(self):
+        content_type = ContentType.objects.get_for_model(Subscriber)
+        permission = Permission.objects.get(
+            codename="delete_subscriber", content_type=content_type
+        )
+        self.user.user_permissions.add(permission)
         response = self.client.post(
             reverse("admin:admin_views_externalsubscriber_change", args=[self.s1.pk]),
             {"action": "delete_selected"},
         )
-        self.assertTrue(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertContains(
             response,
             "Are you sure you want to delete the selected external subscriber?",
@@ -697,3 +714,26 @@ class AdminDetailActionsTest(TestCase):
         )
         self.assertTrue(response.status_code, 200)
         self.assertEqual(ExternalSubscriber.objects.count(), 0)
+
+    def test_permissions(self):
+        # User doesn't have the permission to run the custom action.
+        response = self.client.post(
+            reverse("admin:admin_views_externalsubscriber_change", args=[self.s1.pk]),
+            {"action": "custom_action"},
+        )
+        self.assertEqual(response.status_code, 302)
+
+        # Now user has the custom permission to run the custom action.
+        content_type = ContentType.objects.get_for_model(ExternalSubscriber)
+        permission = Permission.objects.create(
+            name="custom",
+            codename="custom_externalsubscriber",
+            content_type=content_type,
+        )
+        self.user.user_permissions.add(permission)
+        response = self.client.post(
+            reverse("admin:admin_views_externalsubscriber_change", args=[self.s1.pk]),
+            {"action": "custom_action"},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, b"OK")

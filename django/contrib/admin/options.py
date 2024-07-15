@@ -1661,7 +1661,16 @@ class ModelAdmin(BaseModelAdmin):
             if isinstance(response, HttpResponseBase):
                 return response
             else:
-                return HttpResponseRedirect(request.get_full_path())
+                # If action was executed from change view, redirect to
+                # list view once finished.
+                return HttpResponseRedirect(
+                    request.get_full_path()
+                    if not change
+                    else reverse(
+                        "admin:%s_%s_changelist"
+                        % (self.opts.app_label, self.opts.model_name)
+                    )
+                )
         else:
             msg = _("No action selected.")
             self.message_user(request, msg, messages.WARNING)
@@ -1853,12 +1862,15 @@ class ModelAdmin(BaseModelAdmin):
         if request.method == "POST":
             if actions and request.POST.get("action", ""):
                 action_failed = False
-                response = self.response_action(request, obj, change=not add)
+                response = self.response_action(
+                    request,
+                    self.get_queryset(request).filter(id=object_id),
+                    change=not add,
+                )
                 if response:
                     return response
                 else:
                     action_failed = True
-
                 if action_failed:
                     # Redirect back to the changelist page to avoid resubmitting the
                     # form if the user refreshes the browser or uses the "No, take
