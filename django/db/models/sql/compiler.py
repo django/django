@@ -1134,14 +1134,8 @@ class SQLCompiler:
         """
         result = []
         params = []
-        for alias in tuple(self.query.alias_map):
+        for alias, from_clause in tuple(self.query.alias_map.items()):
             if not self.query.alias_refcount[alias]:
-                continue
-            try:
-                from_clause = self.query.alias_map[alias]
-            except KeyError:
-                # Extra tables can end up in self.tables, but not in the
-                # alias_map if they aren't in a join. That's OK. We skip them.
                 continue
             clause_sql, clause_params = self.compile(from_clause)
             result.append(clause_sql)
