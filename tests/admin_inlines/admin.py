@@ -146,7 +146,6 @@ class PhotographerAdmin(admin.ModelAdmin):
     ]
     inlines = [
         PhotoTabularInline,
-        PhotoTabularInline,
         PhotoStackedExtra2Inline,
         PhotoStackedExtra3Inline,
         PhotoStackedCollapsibleInline,
