@@ -1,0 +1,40 @@
+name: Labels
+
+on:
+  pull_request:
+    types: [ edited, labeled, opened, reopened ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  no_ticket:
+    name: "Label whether ticket linked from title"
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions-ecosystem/action-regex-match@d50fd2e7a37d0e617aea3d7ada663bd56862b9cc
+        id: regex-match
+        name: "Check title"
+        with:
+          text: ${{ github.event.pull_request.title }}
+          regex: '#[0-9]+[ ,:]?'
+          flags: gm
+
+      - name: "Add 'no ticket' label"
+        uses: actions-ecosystem/action-add-labels@1a9c3715c0037e96b97bb38cb4c4b56a1f1d4871
+        if: ${{ steps.regex-match.outputs.match == '' }}
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          labels: "no ticket"
+
+      - name: "Remove 'no ticket' label"
+        uses: actions-ecosystem/action-remove-labels@d05162525702062b6bdef750ed8594fc024b3ed7
+        if: ${{ steps.regex-match.outputs.match != '' }}
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          labels: "no ticket"
