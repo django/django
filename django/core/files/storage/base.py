@@ -51,6 +51,10 @@ class Storage:
         validate_file_name(name, allow_relative_path=True)
         return name
 
+    def is_name_available(self, name, max_length=None):
+        exceeds_max_length = max_length and len(name) > max_length
+        return not self.exists(name) and not exceeds_max_length
+
     # These methods are part of the public API, with default implementations.
 
     def get_valid_name(self, name):
@@ -82,11 +86,11 @@ class Storage:
         validate_file_name(file_name)
         file_ext = "".join(pathlib.PurePath(file_name).suffixes)
         file_root = file_name.removesuffix(file_ext)
-        # If the filename already exists, generate an alternative filename
-        # until it doesn't exist.
+        # If the filename is not available, generate an alternative
+        # filename until one is available.
         # Truncate original name if required, so the new filename does not
         # exceed the max_length.
-        while self.exists(name) or (max_length and len(name) > max_length):
+        while not self.is_name_available(name, max_length=max_length):
             # file_ext includes the dot.
             name = os.path.join(
                 dir_name, self.get_alternative_name(file_root, file_ext)
