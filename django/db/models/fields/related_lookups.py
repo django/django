@@ -1,3 +1,6 @@
+from django.db.models.expressions import Cols
+from django.db.models.fields.composite import unnest_composite_fields
+from django.db.models.fields.tuple_lookups import tuple_lookups
 from django.db.models.lookups import (
     Exact,
     GreaterThan,
@@ -9,42 +12,16 @@ from django.db.models.lookups import (
 )
 
 
-class MultiColSource:
-    contains_aggregate = False
-    contains_over_clause = False
-
-    def __init__(self, alias, targets, sources, field):
-        self.targets, self.sources, self.field, self.alias = (
-            targets,
-            sources,
-            field,
-            alias,
-        )
-        self.output_field = self.field
-
-    def __repr__(self):
-        return "{}({}, {})".format(self.__class__.__name__, self.alias, self.field)
-
-    def relabeled_clone(self, relabels):
-        return self.__class__(
-            relabels.get(self.alias, self.alias), self.targets, self.sources, self.field
-        )
-
-    def get_lookup(self, lookup):
-        return self.output_field.get_lookup(lookup)
-
-    def resolve_expression(self, *args, **kwargs):
-        return self
-
-
 def get_normalized_value(value, lhs):
     from django.db.models import Model
 
     if isinstance(value, Model):
-        if value.pk is None:
+        pk = value.pk
+        opts = value._meta
+        if not opts.pk.is_set(pk):
             raise ValueError("Model instances passed to related filters must be saved.")
         value_list = []
-        sources = lhs.output_field.path_infos[-1].target_fields
+        sources = unnest_composite_fields(lhs.output_field.path_infos[-1].target_fields)
         for source in sources:
             while not isinstance(value, source.model) and source.remote_field:
                 source = source.remote_field.model._meta.get_field(
@@ -55,7 +32,7 @@ def get_normalized_value(value, lhs):
             except AttributeError:
                 # A case like Restaurant.objects.filter(place=restaurant_instance),
                 # where place is a OneToOneField and the primary key of Restaurant.
-                return (value.pk,)
+                return pk if isinstance(pk, tuple) else (pk,)
         return tuple(value_list)
     if not isinstance(value, tuple):
         return (value,)
@@ -64,7 +41,7 @@ def get_normalized_value(value, lhs):
 
 class RelatedIn(In):
     def get_prep_lookup(self):
-        if not isinstance(self.lhs, MultiColSource):
+        if not isinstance(self.lhs, Cols):
             if self.rhs_is_direct_value():
                 # If we get here, we are dealing with single-column relations.
                 self.rhs = [get_normalized_value(val, self.lhs)[0] for val in self.rhs]
@@ -98,49 +75,31 @@ class RelatedIn(In):
         return super().get_prep_lookup()
 
     def as_sql(self, compiler, connection):
-        if isinstance(self.lhs, MultiColSource):
+        if isinstance(self.lhs, Cols):
             # For multicolumn lookups we need to build a multicolumn where clause.
             # This clause is either a SubqueryConstraint (for values that need
             # to be compiled to SQL) or an OR-combined list of
             # (col1 = val1 AND col2 = val2 AND ...) clauses.
-            from django.db.models.sql.where import (
-                AND,
-                OR,
-                SubqueryConstraint,
-                WhereNode,
-            )
+            from django.db.models.sql.where import SubqueryConstraint
 
-            root_constraint = WhereNode(connector=OR)
             if self.rhs_is_direct_value():
                 values = [get_normalized_value(value, self.lhs) for value in self.rhs]
-                for value in values:
-                    value_constraint = WhereNode()
-                    for source, target, val in zip(
-                        self.lhs.sources, self.lhs.targets, value
-                    ):
-                        lookup_class = target.get_lookup("exact")
-                        lookup = lookup_class(
-                            target.get_col(self.lhs.alias, source), val
-                        )
-                        value_constraint.add(lookup, AND)
-                    root_constraint.add(value_constraint, OR)
+                lookup_cls = tuple_lookups["in"]
+                lookup = lookup_cls(self.lhs, values)
+                return lookup.as_sql(compiler, connection)
             else:
-                root_constraint.add(
-                    SubqueryConstraint(
-                        self.lhs.alias,
-                        [target.column for target in self.lhs.targets],
-                        [source.name for source in self.lhs.sources],
-                        self.rhs,
-                    ),
-                    AND,
-                )
-            return root_constraint.as_sql(compiler, connection)
+                return SubqueryConstraint(
+                    self.lhs.alias,
+                    [target.column for target in self.lhs.targets],
+                    [source.name for source in self.lhs.sources],
+                    self.rhs,
+                ).as_sql(compiler, connection)
         return super().as_sql(compiler, connection)
 
 
 class RelatedLookupMixin:
     def get_prep_lookup(self):
-        if not isinstance(self.lhs, MultiColSource) and not hasattr(
+        if not isinstance(self.lhs, Cols) and not hasattr(
             self.rhs, "resolve_expression"
         ):
             # If we get here, we are dealing with single-column relations.
@@ -158,20 +117,12 @@ class RelatedLookupMixin:
         return super().get_prep_lookup()
 
     def as_sql(self, compiler, connection):
-        if isinstance(self.lhs, MultiColSource):
+        if isinstance(self.lhs, Cols):
             assert self.rhs_is_direct_value()
             self.rhs = get_normalized_value(self.rhs, self.lhs)
-            from django.db.models.sql.where import AND, WhereNode
-
-            root_constraint = WhereNode()
-            for target, source, val in zip(
-                self.lhs.targets, self.lhs.sources, self.rhs
-            ):
-                lookup_class = target.get_lookup(self.lookup_name)
-                root_constraint.add(
-                    lookup_class(target.get_col(self.lhs.alias, source), val), AND
-                )
-            return root_constraint.as_sql(compiler, connection)
+            lookup_cls = tuple_lookups[self.lookup_name]
+            lookup = lookup_cls(self.lhs, self.rhs)
+            return lookup.as_sql(compiler, connection)
         return super().as_sql(compiler, connection)
 
 

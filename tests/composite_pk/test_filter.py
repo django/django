@@ -393,3 +393,8 @@ class CompositePKFilterTests(TestCase):
                 Comment.objects.filter(pk__isnull=False).order_by("pk"),
                 (c11, c12, c13, c15, c24),
             )
+
+    def test_filter_users_by_comments_subquery(self):
+        subquery = Comment.objects.filter(id=3).only("pk")
+        queryset = User.objects.filter(comments__in=subquery)
+        self.assertSequenceEqual(queryset, (self.user_2,))

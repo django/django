@@ -23,6 +23,7 @@ from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import (
     BaseExpression,
     Col,
+    Cols,
     Exists,
     F,
     OuterRef,
@@ -32,7 +33,6 @@ from django.db.models.expressions import (
     Value,
 )
 from django.db.models.fields import Field
-from django.db.models.fields.related_lookups import MultiColSource
 from django.db.models.lookups import Lookup
 from django.db.models.query_utils import (
     Q,
@@ -1544,9 +1544,7 @@ class Query(BaseExpression):
             if len(targets) == 1:
                 col = self._get_col(targets[0], join_info.final_field, alias)
             else:
-                col = MultiColSource(
-                    alias, targets, join_info.targets, join_info.final_field
-                )
+                col = Cols(alias, targets, join_info.targets, join_info.final_field)
         else:
             col = self._get_col(targets[0], join_info.final_field, alias)
 
