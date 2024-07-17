@@ -884,6 +884,11 @@ class F(Combinable):
     def __getitem__(self, subscript):
         return Sliced(self, subscript)
 
+    def __contains__(self, other):
+        # Disable old-style iteration protocol inherited from implementing
+        # __getitem__() to prevent this method from hanging.
+        raise TypeError(f"argument of type '{self.__class__.__name__}' is not iterable")
+
     def resolve_expression(
         self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False
     ):
