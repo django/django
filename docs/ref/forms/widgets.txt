@@ -558,6 +558,17 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
     * ``template_name``: ``'django/forms/widgets/url.html'``
     * Renders as: ``<input type="url" ...>``
 
+``SearchInput``
+~~~~~~~~~~~~~~~
+
+.. versionadded:: 5.2
+
+.. class:: SearchInput
+
+    * ``input_type``: ``'search'``
+    * ``template_name``: ``'django/forms/widgets/search.html'``
+    * Renders as: ``<input type="search" ...>``
+
 ``PasswordInput``
 ~~~~~~~~~~~~~~~~~
 

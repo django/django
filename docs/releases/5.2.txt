@@ -165,7 +165,8 @@ File Uploads
 Forms
 ~~~~~
 
-* ...
+* The new :class:`~django.forms.SearchInput` form widget is for entering search
+  queries and renders as ``<input type="search" ...>``.
 
 Generic Views
 ~~~~~~~~~~~~~
