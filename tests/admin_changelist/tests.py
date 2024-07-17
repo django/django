@@ -43,6 +43,7 @@ from .admin import (
     EmptyValueChildAdmin,
     EventAdmin,
     FilteredChildAdmin,
+    GrandChildAdmin,
     GroupAdmin,
     InvitationAdmin,
     NoListDisplayLinksParentAdmin,
@@ -62,6 +63,7 @@ from .models import (
     CustomIdUser,
     Event,
     Genre,
+    GrandChild,
     Group,
     Invitation,
     Membership,
@@ -339,6 +341,27 @@ class ChangeListTests(TestCase):
             '<input type="checkbox" id="action-toggle" '
             'aria-label="Select all objects on this page for an action">',
             table_output,
+        )
+
+    def test_action_checkbox_for_model_with_dunder_html(self):
+        grandchild = GrandChild.objects.create(name="name")
+        request = self._mocked_authenticated_request("/grandchild/", self.superuser)
+        m = GrandChildAdmin(GrandChild, custom_site)
+        cl = m.get_changelist_instance(request)
+        cl.formset = None
+        template = Template(
+            "{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}"
+        )
+        context = Context({"cl": cl, "opts": GrandChild._meta})
+        table_output = template.render(context)
+        link = reverse(
+            "admin:admin_changelist_grandchild_change", args=(grandchild.id,)
+        )
+        row_html = build_tbody_html(grandchild, link, "")
+        self.assertNotEqual(
+            table_output.find(row_html),
+            -1,
+            "Failed to find expected row element: %s" % table_output,
         )
 
     def test_result_list_editable_html(self):
