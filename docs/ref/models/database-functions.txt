@@ -791,7 +791,7 @@ Usage example:
     ... ).values("date", "day", "hour", "minute", "second").get()
     {'date': datetime.date(2014, 6, 15),
      'day': datetime.datetime(2014, 6, 16, 0, 0, tzinfo=zoneinfo.ZoneInfo('Australia/Melbourne')),
-     'hour': datetime.datetime(2014, 6, 16, 0, 0, tzinfo=zoneinfo.ZoneInfo('Australia/Melbourne')),
+     'hour': datetime.datetime(2014, 6, 16, 14, 0, tzinfo=zoneinfo.ZoneInfo('Australia/Melbourne')),
      'minute': 'minute': datetime.datetime(2014, 6, 15, 14, 30, tzinfo=timezone.utc),
      'second': datetime.datetime(2014, 6, 15, 14, 30, 50, tzinfo=timezone.utc)
     }
