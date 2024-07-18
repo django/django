@@ -1616,14 +1616,15 @@ class SQLCompiler:
     def as_subquery_condition(self, alias, columns, compiler):
         qn = compiler.quote_name_unless_alias
         qn2 = self.connection.ops.quote_name
+        query = self.query.clone()
 
-        for index, select_col in enumerate(self.query.select):
+        for index, select_col in enumerate(query.select):
             lhs_sql, lhs_params = self.compile(select_col)
             rhs = "%s.%s" % (qn(alias), qn2(columns[index]))
-            self.query.where.add(RawSQL("%s = %s" % (lhs_sql, rhs), lhs_params), AND)
+            query.where.add(RawSQL("%s = %s" % (lhs_sql, rhs), lhs_params), AND)
 
-        sql, params = self.as_sql()
-        return "EXISTS (%s)" % sql, params
+        sql, params = query.as_sql(compiler, self.connection)
+        return "EXISTS %s" % sql, params
 
     def explain_query(self):
         result = list(self.execute_sql())
