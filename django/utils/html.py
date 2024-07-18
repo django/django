@@ -410,7 +410,11 @@ class Urlizer:
                         trimmed_something = True
                         counts[closing] -= strip
 
-            rstripped = middle.rstrip(self.trailing_punctuation_chars_no_semicolon)
+            amp = middle.rfind("&")
+            if amp == -1:
+                rstripped = middle.rstrip(self.trailing_punctuation_chars)
+            else:
+                rstripped = middle.rstrip(self.trailing_punctuation_chars_no_semicolon)
             if rstripped != middle:
                 trail = middle[len(rstripped) :] + trail
                 middle = rstripped
@@ -418,15 +422,9 @@ class Urlizer:
 
             if self.trailing_punctuation_chars_has_semicolon and middle.endswith(";"):
                 # Only strip if not part of an HTML entity.
-                amp = middle.rfind("&")
-                if amp == -1:
-                    can_strip = True
-                else:
-                    potential_entity = middle[amp:]
-                    escaped = html.unescape(potential_entity)
-                    can_strip = (escaped == potential_entity) or escaped.endswith(";")
-
-                if can_strip:
+                potential_entity = middle[amp:]
+                escaped = html.unescape(potential_entity)
+                if escaped == potential_entity or escaped.endswith(";"):
                     rstripped = middle.rstrip(";")
                     amount_stripped = len(middle) - len(rstripped)
                     if amp > -1 and amount_stripped > 1:
