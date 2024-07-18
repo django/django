@@ -349,6 +349,8 @@ class TestUtilsHtml(SimpleTestCase):
             "[(" * 100_000 + ":" + ")]" * 100_000,
             "([[" * 100_000 + ":" + "]])" * 100_000,
             "&:" + ";" * 100_000,
+            "&.;" * 100_000,
+            ".;" * 100_000,
         )
         for value in tests:
             with self.subTest(value=value):
