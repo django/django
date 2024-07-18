@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models.functions import Coalesce, Lower
 
 
 class Product(models.Model):
@@ -26,6 +27,46 @@ class Product(models.Model):
                 name="unicode_unit_list",
             ),
         ]
+
+
+class GeneratedFieldStoredProduct(models.Model):
+    name = models.CharField(max_length=255, null=True)
+    price = models.IntegerField(null=True)
+    discounted_price = models.IntegerField(null=True)
+    rebate = models.GeneratedField(
+        expression=Coalesce("price", 0)
+        - Coalesce("discounted_price", Coalesce("price", 0)),
+        output_field=models.IntegerField(),
+        db_persist=True,
+    )
+    lower_name = models.GeneratedField(
+        expression=Lower(models.F("name")),
+        output_field=models.CharField(max_length=255, null=True),
+        db_persist=True,
+    )
+
+    class Meta:
+        required_db_features = {"supports_stored_generated_columns"}
+
+
+class GeneratedFieldVirtualProduct(models.Model):
+    name = models.CharField(max_length=255, null=True)
+    price = models.IntegerField(null=True)
+    discounted_price = models.IntegerField(null=True)
+    rebate = models.GeneratedField(
+        expression=Coalesce("price", 0)
+        - Coalesce("discounted_price", Coalesce("price", 0)),
+        output_field=models.IntegerField(),
+        db_persist=False,
+    )
+    lower_name = models.GeneratedField(
+        expression=Lower(models.F("name")),
+        output_field=models.CharField(max_length=255, null=True),
+        db_persist=False,
+    )
+
+    class Meta:
+        required_db_features = {"supports_virtual_generated_columns"}
 
 
 class UniqueConstraintProduct(models.Model):

@@ -1337,18 +1337,33 @@ class Model(AltersData, metaclass=ModelBase):
         if exclude is None:
             exclude = set()
         meta = meta or self._meta
-        field_map = {
-            field.name: (
-                value
-                if (value := getattr(self, field.attname))
-                and hasattr(value, "resolve_expression")
-                else Value(value, field)
-            )
-            for field in meta.local_concrete_fields
-            if field.name not in exclude and not field.generated
-        }
+        field_map = {}
+        generated_fields = []
+        for field in meta.local_concrete_fields:
+            if field.name in exclude:
+                continue
+            if field.generated:
+                if any(
+                    ref[0] in exclude
+                    for ref in self._get_expr_references(field.expression)
+                ):
+                    continue
+                generated_fields.append(field)
+                continue
+            value = getattr(self, field.attname)
+            if not value or not hasattr(value, "resolve_expression"):
+                value = Value(value, field)
+            field_map[field.name] = value
         if "pk" not in exclude:
             field_map["pk"] = Value(self.pk, meta.pk)
+        if generated_fields:
+            replacements = {F(name): value for name, value in field_map.items()}
+            for generated_field in generated_fields:
+                field_map[generated_field.name] = ExpressionWrapper(
+                    generated_field.expression.replace_expressions(replacements),
+                    generated_field.output_field,
+                )
+
         return field_map
 
     def prepare_database_save(self, field):
