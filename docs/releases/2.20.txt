@@ -5,4 +5,4 @@ Minor Features
 :mod:`django.shortcuts`
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-* The new :func:`django.shortcuts.make_toast` function returns ``'toast'``.
+* The new :func:`django.shortcuts.make_toast` function returns ``'toast'``..
