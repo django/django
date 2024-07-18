@@ -1,7 +1,7 @@
 from django.contrib.postgres.fields import ArrayField
-from django.db.models import Aggregate, BooleanField, JSONField, TextField, Value
+from django.db.models import Aggregate, BooleanField, JSONField, TextField
 
-from .mixins import OrderableAggMixin
+from .mixins import _DeprecatedOrdering
 
 __all__ = [
     "ArrayAgg",
@@ -15,10 +15,10 @@ __all__ = [
 ]
 
 
-class ArrayAgg(OrderableAggMixin, Aggregate):
+class ArrayAgg(_DeprecatedOrdering, Aggregate):
     function = "ARRAY_AGG"
-    template = "%(function)s(%(distinct)s%(expressions)s %(order_by)s)"
     allow_distinct = True
+    allow_order_by = True
 
     @property
     def output_field(self):
@@ -47,19 +47,16 @@ class BoolOr(Aggregate):
     output_field = BooleanField()
 
 
-class JSONBAgg(OrderableAggMixin, Aggregate):
+class JSONBAgg(_DeprecatedOrdering, Aggregate):
     function = "JSONB_AGG"
-    template = "%(function)s(%(distinct)s%(expressions)s %(order_by)s)"
     allow_distinct = True
+    allow_order_by = True
     output_field = JSONField()
 
 
-class StringAgg(OrderableAggMixin, Aggregate):
+class StringAgg(_DeprecatedOrdering, Aggregate):
     function = "STRING_AGG"
-    template = "%(function)s(%(distinct)s%(expressions)s %(order_by)s)"
     allow_distinct = True
+    allow_order_by = True
     output_field = TextField()
 
-    def __init__(self, expression, delimiter, **extra):
-        delimiter_expr = Value(str(delimiter))
-        super().__init__(expression, delimiter_expr, **extra)
