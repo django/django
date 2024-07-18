@@ -3,9 +3,9 @@ Classes to represent the definitions of aggregate functions.
 """
 
 from django.core.exceptions import FieldError, FullResultSet
-from django.db.models.fields import IntegerField
 from django.db import NotSupportedError
 from django.db.models.expressions import Case, Func, Star, Value, When, OrderByList
+from django.db.models.fields import IntegerField, TextField
 from django.db.models.functions.comparison import Coalesce
 from django.db.models.functions.mixins import (
     FixDurationInputMixin,
@@ -19,6 +19,7 @@ __all__ = [
     "Max",
     "Min",
     "StdDev",
+    "StringAgg",
     "Sum",
     "Variance",
 ]
@@ -42,6 +43,12 @@ class AggregateFilter(Func):
 
 class AggregateOrderBy(OrderByList):
     template = " ORDER BY %(expressions)s"
+
+    def as_sql(self, compiler, connection, **extra_context):
+        if not connection.features.supports_aggregate_order_by_clause:
+            raise NotSupportedError
+
+        return super().as_sql(compiler, connection, **extra_context)
 
 
 class Aggregate(Func):
@@ -155,6 +162,13 @@ class Aggregate(Func):
         return []
 
     def as_sql(self, compiler, connection, **extra_context):
+        if (
+            self.distinct and
+            not connection.features.supports_aggregate_distinct_multiple_argument and
+            len(super().get_source_expressions()) > 1
+        ):
+            raise NotSupportedError
+
         distinct_sql = "DISTINCT " if self.distinct else ""
         order_by_sql = ""
         order_by_params = []
@@ -236,6 +250,51 @@ class StdDev(NumericOutputFieldMixin, Aggregate):
 
     def _get_repr_options(self):
         return {**super()._get_repr_options(), "sample": self.function == "STDDEV_SAMP"}
+
+
+class StringAgg(Aggregate):
+    template = "%(function)s(%(distinct)s%(expressions)s%(order_by)s)%(filter)s"
+    function = "STRING_AGG"
+    name = "StringAgg"
+    allow_distinct = True
+    allow_order_by = True
+    output_field = TextField()
+
+    def __init__(self, expression, delimiter, **extra):
+        super().__init__(expression, delimiter, **extra)
+
+    def as_sql(self, compiler, connection, **extra_context):
+        return super().as_sql(compiler, connection, **extra_context)
+
+    def as_oracle(self, compiler, connection, **extra_context):
+        if self.order_by:
+            template = "%(function)s(%(distinct)s%(expressions)s) WITHIN GROUP %(order_by)s%(filter)s"
+        else:
+            template = "%(function)s(%(distinct)s%(expressions)s)%(filter)s"
+
+        return self.as_sql(
+            compiler,
+            connection,
+            function="LISTAGG",
+            template=template,
+            **extra_context,
+        )
+
+    def as_mysql(self, compiler, connection, **extra_context):
+        return self.as_sql(
+            compiler,
+            connection,
+            function="GROUP_CONCAT",
+            **extra_context,
+        )
+
+    def as_sqlite(self, compiler, connection, **extra_context):
+        return self.as_sql(
+            compiler,
+            connection,
+            function="GROUP_CONCAT",
+            **extra_context,
+        )
 
 
 class Sum(FixDurationInputMixin, Aggregate):

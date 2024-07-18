@@ -8,6 +8,7 @@ from django.db import connection
 from django.db.models import (
     Avg,
     Case,
+    CharField,
     Count,
     DateField,
     DateTimeField,
@@ -19,19 +20,23 @@ from django.db.models import (
     IntegerField,
     Max,
     Min,
+    Model,
     OuterRef,
     Q,
     StdDev,
+    StringAgg,
     Subquery,
     Sum,
+    TextField,
     TimeField,
     Transform,
     Value,
     Variance,
     When,
-    Window,
+    Window, ForeignKey, SET_NULL,
 )
 from django.db.models.expressions import Func, RawSQL
+from django.db.models.fields.json import KeyTextTransform, JSONField
 from django.db.models.functions import (
     Cast,
     Coalesce,
@@ -42,7 +47,7 @@ from django.db.models.functions import (
     Now,
     Pi,
     TruncDate,
-    TruncHour,
+    TruncHour, Concat,
 )
 from django.test import TestCase
 from django.test.testcases import skipUnlessDBFeature
@@ -102,6 +107,7 @@ class AggregateTestCase(TestCase):
             contact=cls.a1,
             publisher=cls.p1,
             pubdate=datetime.date(2007, 12, 6),
+            print_info={"lang": "en"},
         )
         cls.b2 = Book.objects.create(
             isbn="067232959",
@@ -112,6 +118,7 @@ class AggregateTestCase(TestCase):
             contact=cls.a3,
             publisher=cls.p2,
             pubdate=datetime.date(2008, 3, 3),
+            print_info={"lang": "fr"},
         )
         cls.b3 = Book.objects.create(
             isbn="159059996",
@@ -430,6 +437,7 @@ class AggregateTestCase(TestCase):
                     ),
                     "pages": 447,
                     "price": Approximate(Decimal("30")),
+                    "print_info": {"lang": "en"},
                     "pubdate": datetime.date(2007, 12, 6),
                     "publisher_id": self.p1.id,
                     "rating": 4.5,
@@ -481,6 +489,7 @@ class AggregateTestCase(TestCase):
                     ),
                     "pages": 447,
                     "price": Approximate(Decimal("30")),
+                    "print_info": {"lang": "en"},
                     "pubdate": datetime.date(2007, 12, 6),
                     "publisher_id": self.p1.id,
                     "rating": 4.5,
@@ -565,6 +574,13 @@ class AggregateTestCase(TestCase):
                     ratings=aggregate("rating", distinct=True)
                 )
                 self.assertEqual(books["ratings"], expected_result)
+
+    @skipUnlessDBFeature("supports_aggregate_distinct_multiple_argument")
+    def test_distinct_on_stringagg(self):
+        books = Book.objects.aggregate(
+            ratings=StringAgg(Cast(F("rating"), CharField()), Value(","), distinct=True)
+        )
+        self.assertEqual(books["ratings"], "3,4,4.5,5")
 
     def test_non_grouped_annotation_not_in_group_by(self):
         """
@@ -1770,10 +1786,12 @@ class AggregateTestCase(TestCase):
                 Publisher.objects.none().aggregate(
                     sum_awards=Sum("num_awards"),
                     books_count=Count("book"),
+                    all_names=StringAgg("name", Value(",")),
                 ),
                 {
                     "sum_awards": None,
                     "books_count": 0,
+                    "all_names": None,
                 },
             )
         # Expression without empty_result_set_value forces queries to be
@@ -1864,6 +1882,15 @@ class AggregateTestCase(TestCase):
                     value=Aggregate("age", default=Value(5) * Value(7)),
                 )
                 self.assertEqual(result["value"], 35)
+
+    def test_stringagg_default_value(self):
+        result = Author.objects.filter(age__gt=100).aggregate(
+            value=StringAgg(
+                "name", delimiter=Value(";"), default=Value("<empty>")
+            ),
+        )
+        self.assertEqual(result["value"], "<empty>")
+
 
     def test_aggregation_default_group_by(self):
         qs = (
@@ -2171,6 +2198,155 @@ class AggregateTestCase(TestCase):
             .values_list("sum", flat=True)
         )
         self.assertEqual(list(author_qs), [337])
+
+    def test_string_agg_requires_delimiter(self):
+        with self.assertRaises(TypeError):
+            Book.objects.aggregate(stringagg=StringAgg("name"))
+
+    def test_string_agg_escapes_delimiter(self):
+        values = Publisher.objects.aggregate(
+            stringagg=StringAgg("name", delimiter=Value("'"))
+        )
+
+        self.assertEqual(
+            values,
+            {
+                "stringagg": "Apress'Sams'Prentice Hall'Morgan Kaufmann'Jonno's House of Books",
+            }
+         )
+
+    @skipUnlessDBFeature("supports_aggregate_order_by_clause")
+    def test_string_agg_order_by(self):
+        order_by_test_cases = (
+            (
+                F("original_opening").desc(),
+                "Books.com;Amazon.com;Mamma and Pappa's Books",
+            ),
+            (
+                F("original_opening").asc(),
+                "Mamma and Pappa's Books;Amazon.com;Books.com",
+            ),
+            (F("original_opening"), "Mamma and Pappa's Books;Amazon.com;Books.com"),
+            ("original_opening", "Mamma and Pappa's Books;Amazon.com;Books.com"),
+            ("-original_opening", "Books.com;Amazon.com;Mamma and Pappa's Books"),
+            (
+                Concat("original_opening", Value("@")),
+                "Mamma and Pappa's Books;Amazon.com;Books.com",
+            ),
+            (
+                Concat("original_opening", Value("@")).desc(),
+                "Books.com;Amazon.com;Mamma and Pappa's Books",
+            ),
+        )
+        for order_by, expected_output in order_by_test_cases:
+            with self.subTest(order_by=order_by, expected_output=expected_output):
+                values = Store.objects.aggregate(
+                    stringagg=StringAgg("name", delimiter=Value(";"), order_by=order_by)
+                )
+                self.assertEqual(values, {"stringagg": expected_output})
+
+    def test_string_agg_filter(self):
+        values = Book.objects.aggregate(
+            stringagg=StringAgg(
+                "name",
+                delimiter=Value(";"),
+                filter=Q(name__startswith="P"),
+            )
+        )
+
+        expected_values = {
+            "stringagg": "Practical Django Projects;"
+                         "Python Web Development with Django;Paradigms of Artificial "
+                         "Intelligence Programming: Case Studies in Common Lisp",
+        }
+        self.assertEqual(values, expected_values)
+
+    @skipUnlessDBFeature("supports_aggregate_order_by_clause")
+    def test_string_agg_jsonfield_order_by(self):
+        values = Book.objects.aggregate(
+            stringagg=StringAgg(
+                KeyTextTransform("lang", "print_info"),
+                delimiter=Value(","),
+                order_by=KeyTextTransform("lang", "print_info"),
+                output_field=CharField(),
+            ),
+        )
+        self.assertEqual(values, {"stringagg": "en,fr"})
+
+    def test_string_agg_filter_in_subquery(self):
+        """
+        This test is based on tests taken from existing PostgreSQL specific tests and
+        kept to avoid regressions as StringAgg is ported to the shared database module.
+        """
+
+        aggregate = StringAgg(
+            "authors__name",
+            delimiter=Value(";"),
+            filter=~Q(authors__name__startswith="J")
+        )
+        subquery = (
+            Book.objects.filter(
+                pk=OuterRef("pk"),
+            )
+            .annotate(agg=aggregate)
+            .values("agg")
+        )
+        values = list(
+            Book.objects.annotate(
+                agg=Subquery(subquery),
+            )
+            .exclude(agg__isnull=True)
+            # Different engines treat null STRING_AGG differently, so excluding it for
+            # consistency.
+            .values_list("agg", flat=True)
+        )
+
+        expected_values = [
+            "Adrian Holovaty",
+            "Brad Dayley",
+            "Paul Bissex;Wesley J. Chun",
+            "Peter Norvig;Stuart Russell",
+            "Peter Norvig",
+        ]
+
+        self.assertEqual(expected_values, values)
+
+    @skipUnlessDBFeature("supports_aggregate_order_by_clause")
+    def test_order_by_in_subquery(self):
+        """
+        This test is based on tests taken from existing PostgreSQL specific tests and
+        kept to avoid regressions as StringAgg is ported to the shared database module.
+        """
+        aggregate = StringAgg(
+            "authors__name",
+            delimiter=Value(";"),
+            order_by="authors__name",
+        )
+        subquery = (
+            Book.objects.filter(
+                pk=OuterRef("pk"),
+            )
+            .annotate(agg=aggregate)
+            .values("agg")
+        )
+        values = list(
+            Book.objects.annotate(
+                agg=Subquery(subquery),
+            )
+            .order_by("agg")
+            .values_list("agg", flat=True)
+        )
+
+        expected_values = [
+            "Adrian Holovaty;Jacob Kaplan-Moss",
+            "Brad Dayley",
+            "James Bennett",
+            "Jeffrey Forcier;Paul Bissex;Wesley J. Chun",
+            "Peter Norvig",
+            "Peter Norvig;Stuart Russell",
+        ]
+
+        self.assertEqual(expected_values, values)
 
 
 class AggregateAnnotationPruningTests(TestCase):

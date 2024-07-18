@@ -30,6 +30,7 @@ class Book(models.Model):
     contact = models.ForeignKey(Author, models.CASCADE, related_name="book_contact_set")
     publisher = models.ForeignKey(Publisher, models.CASCADE)
     pubdate = models.DateField()
+    print_info = models.JSONField(null=True, default=None)
 
     def __str__(self):
         return self.name

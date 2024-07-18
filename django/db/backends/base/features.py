@@ -259,6 +259,8 @@ class BaseDatabaseFeatures:
 
     supports_aggregate_order_by_clause = False
 
+    supports_aggregate_distinct_multiple_argument = True
+
     # Does the backend support indexing a TextField?
     supports_index_on_text_field = True
 
