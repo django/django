@@ -128,7 +128,9 @@ class MiddlewareMixin:
         is running.
         """
         response = None
-        if hasattr(self, "process_request"):
+        if hasattr(self, "aprocess_request"):
+            response = await self.aprocess_request(request)
+        elif hasattr(self, "process_request"):
             response = await sync_to_async(
                 self.process_request,
                 thread_sensitive=True,
