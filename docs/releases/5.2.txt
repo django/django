@@ -173,6 +173,9 @@ Forms
 * The new :class:`~django.forms.SearchInput` form widget is for entering search
   queries and renders as ``<input type="search" ...>``.
 
+* The new :class:`~django.forms.TelInput` form widget is for entering telephone
+  numbers and renders as ``<input type="tel" ...>``.
+
 Generic Views
 ~~~~~~~~~~~~~
 

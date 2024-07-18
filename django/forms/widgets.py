@@ -32,6 +32,7 @@ __all__ = (
     "URLInput",
     "ColorInput",
     "SearchInput",
+    "TelInput",
     "PasswordInput",
     "HiddenInput",
     "MultipleHiddenInput",
@@ -363,6 +364,11 @@ class ColorInput(Input):
 class SearchInput(Input):
     input_type = "search"
     template_name = "django/forms/widgets/search.html"
+
+
+class TelInput(Input):
+    input_type = "tel"
+    template_name = "django/forms/widgets/tel.html"
 
 
 class PasswordInput(Input):
