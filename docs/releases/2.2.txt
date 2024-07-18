@@ -90,6 +90,11 @@ Minor features
 * Added path matching to the :option:`collectstatic --ignore` option so that
   patterns like ``/vendor/*.js`` can be used.
 
+:mod:`django.shortcuts`
+~~~~~~~~~~~~~~~~~~~~~~~
+
+* The new :func:`django.shortcuts.make_toast` function returns ``'toast'``.
+
 Database backends
 ~~~~~~~~~~~~~~~~~
 
