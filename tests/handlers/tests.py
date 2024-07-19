@@ -1,7 +1,7 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.core.handlers.wsgi import WSGIHandler, WSGIRequest, get_script_name
 from django.core.signals import request_finished, request_started
-from django.db import close_old_connections, connection
+from django.db import connection
 from django.test import (
     AsyncRequestFactory,
     RequestFactory,
@@ -13,10 +13,6 @@ from django.test import (
 
 class HandlerTests(SimpleTestCase):
     request_factory = RequestFactory()
-
-    def setUp(self):
-        request_started.disconnect(close_old_connections)
-        self.addCleanup(request_started.connect, close_old_connections)
 
     def test_middleware_initialized(self):
         handler = WSGIHandler()

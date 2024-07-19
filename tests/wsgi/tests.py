@@ -1,8 +1,6 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.core.servers.basehttp import get_internal_wsgi_application
-from django.core.signals import request_started
 from django.core.wsgi import get_wsgi_application
-from django.db import close_old_connections
 from django.http import FileResponse
 from django.test import SimpleTestCase, override_settings
 from django.test.client import RequestFactory
@@ -11,10 +9,6 @@ from django.test.client import RequestFactory
 @override_settings(ROOT_URLCONF="wsgi.urls")
 class WSGITest(SimpleTestCase):
     request_factory = RequestFactory()
-
-    def setUp(self):
-        request_started.disconnect(close_old_connections)
-        self.addCleanup(request_started.connect, close_old_connections)
 
     def test_get_wsgi_application(self):
         """

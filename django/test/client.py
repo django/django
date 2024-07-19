@@ -17,8 +17,7 @@ from django.core.handlers.asgi import ASGIRequest
 from django.core.handlers.base import BaseHandler
 from django.core.handlers.wsgi import LimitedStream, WSGIRequest
 from django.core.serializers.json import DjangoJSONEncoder
-from django.core.signals import got_request_exception, request_finished, request_started
-from django.db import close_old_connections
+from django.core.signals import got_request_exception, request_started
 from django.http import HttpHeaders, HttpRequest, QueryDict, SimpleCookie
 from django.test import signals
 from django.test.utils import ContextList
@@ -121,9 +120,7 @@ def closing_iterator_wrapper(iterable, close):
     try:
         yield from iterable
     finally:
-        request_finished.disconnect(close_old_connections)
         close()  # will fire request_finished
-        request_finished.connect(close_old_connections)
 
 
 async def aclosing_iterator_wrapper(iterable, close):
@@ -131,9 +128,7 @@ async def aclosing_iterator_wrapper(iterable, close):
         async for chunk in iterable:
             yield chunk
     finally:
-        request_finished.disconnect(close_old_connections)
         close()  # will fire request_finished
-        request_finished.connect(close_old_connections)
 
 
 def conditional_content_removal(request, response):
@@ -172,9 +167,7 @@ class ClientHandler(BaseHandler):
         if self._middleware_chain is None:
             self.load_middleware()
 
-        request_started.disconnect(close_old_connections)
         request_started.send(sender=self.__class__, environ=environ)
-        request_started.connect(close_old_connections)
         request = WSGIRequest(environ)
         # sneaky little hack so that we can easily get round
         # CsrfViewMiddleware.  This makes life easier, and is probably
@@ -203,9 +196,7 @@ class ClientHandler(BaseHandler):
                     response.streaming_content, response.close
                 )
         else:
-            request_finished.disconnect(close_old_connections)
             response.close()  # will fire request_finished
-            request_finished.connect(close_old_connections)
 
         return response
 
@@ -228,9 +219,7 @@ class AsyncClientHandler(BaseHandler):
         else:
             body_file = FakePayload("")
 
-        request_started.disconnect(close_old_connections)
         await request_started.asend(sender=self.__class__, scope=scope)
-        request_started.connect(close_old_connections)
         # Wrap FakePayload body_file to allow large read() in test environment.
         request = ASGIRequest(scope, LimitedStream(body_file, len(body_file)))
         # Sneaky little hack so that we can easily get round
@@ -255,10 +244,8 @@ class AsyncClientHandler(BaseHandler):
                     response.streaming_content, response.close
                 )
         else:
-            request_finished.disconnect(close_old_connections)
             # Will fire request_finished.
             await sync_to_async(response.close, thread_sensitive=False)()
-            request_finished.connect(close_old_connections)
         return response
 
 
