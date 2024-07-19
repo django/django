@@ -2883,8 +2883,8 @@ If ``value`` is ``"https://www.example.org/"``, the output will be
 Converts URLs and email addresses in text into clickable links.
 
 This template tag works on links prefixed with ``http://``, ``https://``, or
-``www.``. For example, ``https://goo.gl/aia1t`` will get converted but
-``goo.gl/aia1t`` won't.
+``www.``. For example, ``https://djangocon.eu`` will get converted but
+``djangocon.eu`` won't.
 
 It also supports domain-only links ending in one of the original top level
 domains (``.com``, ``.edu``, ``.gov``, ``.int``, ``.mil``, ``.net``, and
