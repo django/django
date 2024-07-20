@@ -34,10 +34,10 @@ class GZipMiddleware(MiddlewareMixin):
             if response.is_async:
                 # pull to lexical scope to capture fixed reference in case
                 # streaming_content is set again later.
-                orignal_iterator = response.streaming_content
+                original_iterator = response.streaming_content
 
                 async def gzip_wrapper():
-                    async for chunk in orignal_iterator:
+                    async for chunk in original_iterator:
                         yield compress_string(
                             chunk,
                             max_random_bytes=self.max_random_bytes,

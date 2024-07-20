@@ -19,7 +19,7 @@ class MultiJoin(Exception):
 
     def __init__(self, names_pos, path_with_names):
         self.level = names_pos
-        # The path travelled, this includes the path to the multijoin.
+        # The path traveled, this includes the path to the multijoin.
         self.names_with_path = path_with_names
 
 
@@ -96,12 +96,12 @@ class Join:
         qn = compiler.quote_name_unless_alias
         qn2 = connection.ops.quote_name
         # Add a join condition for each pair of joining columns.
-        # RemovedInDjango60Warning: when the depraction ends, replace with:
+        # RemovedInDjango60Warning: when the deprecation ends, replace with:
         # for lhs, rhs in self.join_field:
         join_fields = self.join_fields or self.join_cols
         for lhs, rhs in join_fields:
             if isinstance(lhs, str):
-                # RemovedInDjango60Warning: when the depraction ends, remove
+                # RemovedInDjango60Warning: when the deprecation ends, remove
                 # the branch for strings.
                 lhs_full_name = "%s.%s" % (qn(self.parent_alias), qn2(lhs))
                 rhs_full_name = "%s.%s" % (qn(self.table_alias), qn2(rhs))
