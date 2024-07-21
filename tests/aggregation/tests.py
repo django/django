@@ -993,9 +993,9 @@ class AggregateTestCase(TestCase):
         )
         self.assertEqual(max_books_per_rating, {"books_per_rating__max": 3})
 
-    def test_ticket17424(self):
+    def test_exclude_after_annotate(self):
         """
-        Doing exclude() on a foreign model after annotate() doesn't crash.
+        Doing exclude() on a foreign model after annotate() doesn't crash (#17424).
         """
         all_books = list(Book.objects.values_list("pk", flat=True).order_by("pk"))
         annotated_books = Book.objects.order_by("pk").annotate(one=Count("id"))
@@ -1013,18 +1013,18 @@ class AggregateTestCase(TestCase):
         self.assertIsNone(annotated_books.query.alias_map["aggregation_book"].join_type)
         self.assertIsNone(excluded_books.query.alias_map["aggregation_book"].join_type)
 
-    def test_ticket12886(self):
+    def test_aggregation_over_sliced_queryset(self):
         """
-        Aggregation over sliced queryset works correctly.
+        Aggregation over sliced queryset works correctly (#12886).
         """
         qs = Book.objects.order_by("-rating")[0:3]
         vals = qs.aggregate(average_top3_rating=Avg("rating"))["average_top3_rating"]
         self.assertAlmostEqual(vals, 4.5, places=2)
 
-    def test_ticket11881(self):
+    def test_subqueries_not_containing_order_by(self):
         """
         Subqueries do not needlessly contain ORDER BY, SELECT FOR UPDATE or
-        select_related() stuff.
+        select_related() stuff (#11881).
         """
         qs = (
             Book.objects.select_for_update()

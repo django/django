@@ -280,7 +280,7 @@ class ProxyDeleteTest(TestCase):
             Image.objects.values_list().delete()
 
 
-class Ticket19102Tests(TestCase):
+class DeletingUsingSubqueriesTests(TestCase):
     """
     Test different queries which alter the SELECT clause of the query. We
     also must be using a subquery for the deletion (that is, the original
@@ -288,7 +288,7 @@ class Ticket19102Tests(TestCase):
     deletion (that is, just one query for the .delete() call).
 
     Note that .values() is not tested here on purpose. .values().delete()
-    doesn't work for non fast-path deletes at all.
+    doesn't work for non fast-path deletes at all. (#19102)
     """
 
     @classmethod
@@ -299,7 +299,10 @@ class Ticket19102Tests(TestCase):
         cls.l2 = Login.objects.create(description="l2", orgunit=cls.o2)
 
     @skipUnlessDBFeature("update_can_self_select")
-    def test_ticket_19102_annotate(self):
+    def test_delete_subquery_for_annotated(self):
+        """
+        Deletion using subqueries works for annotated queries (#19102).
+        """
         with self.assertNumQueries(1):
             Login.objects.order_by("description").filter(
                 orgunit__name__isnull=False
@@ -310,7 +313,10 @@ class Ticket19102Tests(TestCase):
         self.assertTrue(Login.objects.filter(pk=self.l2.pk).exists())
 
     @skipUnlessDBFeature("update_can_self_select")
-    def test_ticket_19102_extra(self):
+    def test_delete_subquery_for_extra(self):
+        """
+        Deletion using subqueries works for extra queries (#19102).
+        """
         with self.assertNumQueries(1):
             Login.objects.order_by("description").filter(
                 orgunit__name__isnull=False
@@ -319,7 +325,10 @@ class Ticket19102Tests(TestCase):
         self.assertTrue(Login.objects.filter(pk=self.l2.pk).exists())
 
     @skipUnlessDBFeature("update_can_self_select")
-    def test_ticket_19102_select_related(self):
+    def test_delete_subquery_for_related(self):
+        """
+        Deletion using subqueries works for related queries (#19102).
+        """
         with self.assertNumQueries(1):
             Login.objects.filter(pk=self.l1.pk).filter(
                 orgunit__name__isnull=False
@@ -328,7 +337,10 @@ class Ticket19102Tests(TestCase):
         self.assertTrue(Login.objects.filter(pk=self.l2.pk).exists())
 
     @skipUnlessDBFeature("update_can_self_select")
-    def test_ticket_19102_defer(self):
+    def test_delete_subquery_for_defer(self):
+        """
+        Deletion using subqueries works for defer queries (#19102).
+        """
         with self.assertNumQueries(1):
             Login.objects.filter(pk=self.l1.pk).filter(
                 orgunit__name__isnull=False

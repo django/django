@@ -196,7 +196,10 @@ class Queries1Tests(TestCase):
         # So, 'U0."id"' is referenced in SELECT and WHERE twice.
         self.assertEqual(str(qs4.query).lower().count("u0."), 4)
 
-    def test_ticket1050(self):
+    def test_null_m2m(self):
+        """
+        Null FKs in an m2m shouldn't affect the results (#1050).
+        """
         self.assertSequenceEqual(
             Item.objects.filter(tags__isnull=True),
             [self.i3],
@@ -206,7 +209,10 @@ class Queries1Tests(TestCase):
             [self.i3],
         )
 
-    def test_ticket1801(self):
+    def test_and_with_joined_queries(self):
+        """
+        AND operator should be applied to the correct query when combining (#1801).
+        """
         self.assertSequenceEqual(
             Author.objects.filter(item=self.i2),
             [self.a2],
@@ -220,7 +226,10 @@ class Queries1Tests(TestCase):
             [self.a2],
         )
 
-    def test_ticket2306(self):
+    def test_avoiding_outer_joins(self):
+        """
+        Don't use outer joins when they are not needed. (#2306).
+        """
         # Checking that no join types are "left outer" joins.
         query = Item.objects.filter(tags=self.t2).query
         self.assertNotIn(LOUTER, [x.join_type for x in query.alias_map.values()])
@@ -259,7 +268,10 @@ class Queries1Tests(TestCase):
         qs = Author.objects.filter(ranking__rank=2).filter(ranking__id=self.rank1.id)
         self.assertEqual(qs.query.count_active_tables(), 3)
 
-    def test_ticket4464(self):
+    def test_chaining_on_m2m(self):
+        """
+        Chaining on ManyToManyField fields should not exclude results (#4464).
+        """
         self.assertSequenceEqual(
             Item.objects.filter(tags=self.t1).filter(tags=self.t2),
             [self.i1],
@@ -287,7 +299,10 @@ class Queries1Tests(TestCase):
             [self.i1, self.i2],
         )
 
-    def test_tickets_2080_3592(self):
+    def test_q_object_or_lookups(self):
+        """
+        Q objects can be used to perform OR queries (#2080) (#3592).
+        """
         self.assertSequenceEqual(
             Author.objects.filter(item__name="one") | Author.objects.filter(name="a3"),
             [self.a1, self.a3],
@@ -305,13 +320,18 @@ class Queries1Tests(TestCase):
             [self.a2],
         )
 
-    def test_ticket6074(self):
-        # Merging two empty result sets shouldn't leave a queryset with no constraints
-        # (which would match everything).
+    def test_merging_empty_results(self):
+        """
+        Merging two empty result sets shouldn't leave a queryset with no constraints,
+        which would match everything (#6074).
+        """
         self.assertSequenceEqual(Author.objects.filter(Q(id__in=[])), [])
         self.assertSequenceEqual(Author.objects.filter(Q(id__in=[]) | Q(id__in=[])), [])
 
-    def test_tickets_1878_2939(self):
+    def test_distinct_count(self):
+        """
+        Count should return distinct results when applied to a QuerySet (#1878) (#2939).
+        """
         self.assertEqual(Item.objects.values("creator").distinct().count(), 3)
 
         # Create something with a duplicate 'name' so that we can test multi-column
@@ -347,10 +367,16 @@ class Queries1Tests(TestCase):
         )
         xx.delete()
 
-    def test_ticket7323(self):
+    def test_queryset_paginator_with_multiple_columns(self):
+        """
+        Paginator should work with multi-column ordering (#7323).
+        """
         self.assertEqual(Item.objects.values("creator", "name").count(), 4)
 
-    def test_ticket2253(self):
+    def test_combining_queries_with_operator(self):
+        """
+        Combining two queries with the | operator return correct results (#2253).
+        """
         q1 = Item.objects.order_by("name")
         q2 = Item.objects.filter(id=self.i1.id)
         self.assertSequenceEqual(q1, [self.i4, self.i1, self.i3, self.i2])
@@ -444,7 +470,10 @@ class Queries1Tests(TestCase):
             Author.objects.order_by("name").get(pk=self.a1.pk)
         self.assertNotIn("order by", captured_queries[0]["sql"].lower())
 
-    def test_tickets_4088_4306(self):
+    def test_filter_on_foreign_keys(self):
+        """
+        Successful filter on foreign keys (#4088) (#4306).
+        """
         self.assertSequenceEqual(Report.objects.filter(creator=1001), [self.r1])
         self.assertSequenceEqual(Report.objects.filter(creator__num=1001), [self.r1])
         self.assertSequenceEqual(Report.objects.filter(creator__id=1001), [])
@@ -453,16 +482,21 @@ class Queries1Tests(TestCase):
         )
         self.assertSequenceEqual(Report.objects.filter(creator__name="a1"), [self.r1])
 
-    def test_ticket4510(self):
+    def test_reverse_relationship(self):
+        """Reverse relationships lookups (#4510)."""
         self.assertSequenceEqual(
             Author.objects.filter(report__name="r1"),
             [self.a1],
         )
 
-    def test_ticket7378(self):
+    def test_reverse_relationship_all(self):
+        """Reverse relationships lookups with all() (#7378)."""
         self.assertSequenceEqual(self.a1.report_set.all(), [self.r1])
 
-    def test_tickets_5324_6704(self):
+    def test_exclude_on_many_to_many(self):
+        """
+        Excluding on ManyToManyField fields returns the correct results (#5324) (#6704).
+        """
         self.assertSequenceEqual(
             Item.objects.filter(tags__name="t4"),
             [self.i4],
@@ -542,7 +576,11 @@ class Queries1Tests(TestCase):
             [self.t4, self.t5],
         )
 
-    def test_ticket2091(self):
+    def test_in_lookup_in_m2m(self):
+        """
+        Using the __in lookup with a list
+        should return the correct results (#2091).
+        """
         t = Tag.objects.get(name="t4")
         self.assertSequenceEqual(Item.objects.filter(tags__in=[t]), [self.i4])
 
@@ -594,13 +632,21 @@ class Queries1Tests(TestCase):
         with self.assertRaisesMessage(TypeError, msg):
             Author.objects.all() | Tag.objects.all()
 
-    def test_ticket3141(self):
+    def test_count_querysets_after_extra(self):
+        """
+        Counting the number of items in a queryset
+        after applying extra() (#3141).
+        """
         self.assertEqual(Author.objects.extra(select={"foo": "1"}).count(), 4)
         self.assertEqual(
             Author.objects.extra(select={"foo": "%s"}, select_params=(1,)).count(), 4
         )
 
-    def test_ticket2400(self):
+    def test_querying_backwards_relationship(self):
+        """
+        Allow querying of existance of backwards relationship
+        without resorting to custom sql (#2400).
+        """
         self.assertSequenceEqual(
             Author.objects.filter(item__isnull=True),
             [self.a3],
@@ -610,7 +656,8 @@ class Queries1Tests(TestCase):
             [self.t5],
         )
 
-    def test_ticket2496(self):
+    def test_select_related(self):
+        """select_related if table already in extra() (#2496)."""
         self.assertSequenceEqual(
             Item.objects.extra(tables=["queries_author"])
             .select_related()
@@ -622,9 +669,11 @@ class Queries1Tests(TestCase):
         with self.assertRaisesMessage(FieldError, "Cannot parse keyword query as dict"):
             Note.objects.filter({"note": "n1", "misc": "foo"})
 
-    def test_tickets_2076_7256(self):
-        # Ordering on related tables should be possible, even if the table is
-        # not otherwise involved.
+    def test_ordering_related_tables(self):
+        """
+        Ordering on related tables should be possible, even if the table is,
+        not otherwise involved (#2076) (#7256).
+        """
         self.assertSequenceEqual(
             Item.objects.order_by("note__note", "name"),
             [self.i2, self.i4, self.i1, self.i3],
@@ -663,7 +712,10 @@ class Queries1Tests(TestCase):
         self.assertSequenceEqual(qs, [self.i4, self.i1, self.i3, self.i2])
         self.assertEqual(len(qs.query.alias_map), 1)
 
-    def test_tickets_2874_3002(self):
+    def test_ordering(self):
+        """
+        Ordering of results from select_related (#2874) (#3002).
+        """
         qs = Item.objects.select_related().order_by("note__note", "name")
         self.assertQuerySetEqual(qs, [self.i2, self.i4, self.i1, self.i3])
 
@@ -672,7 +724,11 @@ class Queries1Tests(TestCase):
         self.assertEqual(repr(qs[0].note), "<Note: n2>")
         self.assertEqual(repr(qs[0].creator.extra.note), "<Note: n1>")
 
-    def test_ticket3037(self):
+    def test_q_object_with_or_operator(self):
+        """
+        Q objects with | operator should
+        return the right results (#3037).
+        """
         self.assertSequenceEqual(
             Item.objects.filter(
                 Q(creator__name="a3", name="two") | Q(creator__name="a4", name="four")
@@ -680,10 +736,10 @@ class Queries1Tests(TestCase):
             [self.i4],
         )
 
-    def test_tickets_5321_7070(self):
-        # Ordering columns must be included in the output columns. Note that
-        # this means results that might otherwise be distinct are not (if there
-        # are multiple values in the ordering cols), as in this example. This
+    def test_ordering_columns(self):
+        """Ordering columns must be included in the output columns. (#5321) (#7070)"""
+        # Note that this means results that might otherwise be distinct are not
+        # (if there are multiple values in the ordering cols), as in this example. This
         # isn't a bug; it's a warning to be careful with the selection of
         # ordering columns.
         self.assertSequenceEqual(
@@ -691,7 +747,11 @@ class Queries1Tests(TestCase):
             [{"misc": "foo"}, {"misc": "bar"}, {"misc": "foo"}],
         )
 
-    def test_ticket4358(self):
+    def test_consistent_results_for_values_on_fkey(self):
+        """
+        .values() or .values('field')
+        returns consistent results on a fkey (#4358).
+        """
         # If you don't pass any fields to values(), relation fields are
         # returned as "foo_id" keys, not "foo". For consistency, you should be
         # able to pass "foo_id" in the fields list and have it work, too. We
@@ -707,9 +767,8 @@ class Queries1Tests(TestCase):
             ExtraInfo.objects.values("note"), [{"note": 1}, {"note": 2}]
         )
 
-    def test_ticket6154(self):
-        # Multiple filter statements are joined using "AND" all the time.
-
+    def test_filter_statements_joined_using_and(self):
+        """Multiple filter statements are joined using "AND" all the time. (#6154)"""
         self.assertSequenceEqual(
             Author.objects.filter(id=self.a1.id).filter(
                 Q(extra__note=self.n1) | Q(item__note=self.n3)
@@ -723,13 +782,21 @@ class Queries1Tests(TestCase):
             [self.a1],
         )
 
-    def test_ticket6981(self):
+    def test_ordered_select_related(self):
+        """
+        Nullable foreign keys use inner joins
+        with select_related() and order_by() (#6981).
+        """
         self.assertSequenceEqual(
             Tag.objects.select_related("parent").order_by("name"),
             [self.t1, self.t2, self.t3, self.t4, self.t5],
         )
 
-    def test_ticket9926(self):
+    def test_nullable_foreign_key_excludes_results(self):
+        """
+        Nullable foreign keys should exclude results
+        when using select_related() (#9926).
+        """
         self.assertSequenceEqual(
             Tag.objects.select_related("parent", "category").order_by("name"),
             [self.t1, self.t2, self.t3, self.t4, self.t5],
@@ -739,8 +806,11 @@ class Queries1Tests(TestCase):
             [self.t1, self.t2, self.t3, self.t4, self.t5],
         )
 
-    def test_tickets_6180_6203(self):
-        # Dates with limits and/or counts
+    def test_date_queryset_with_limit_and_count(self):
+        """
+        DateQuerySet with limit and count()
+        should return the correct results (#6180) (#6203).
+        """
         self.assertEqual(Item.objects.count(), 4)
         self.assertEqual(Item.objects.datetimes("created", "month").count(), 1)
         self.assertEqual(Item.objects.datetimes("created", "day").count(), 2)
@@ -750,8 +820,10 @@ class Queries1Tests(TestCase):
             datetime.datetime(2007, 12, 19, 0, 0),
         )
 
-    def test_tickets_7087_12242(self):
-        # Dates with extra select columns
+    def test_dates_with_extra(self):
+        """
+        Dates with extra select columns should work (#7087) (#12242).
+        """
         self.assertSequenceEqual(
             Item.objects.datetimes("created", "day").extra(select={"a": 1}),
             [
@@ -782,8 +854,10 @@ class Queries1Tests(TestCase):
             [datetime.datetime(2007, 12, 19, 0, 0)],
         )
 
-    def test_ticket7155(self):
-        # Nullable dates
+    def test_nullable_dates(self):
+        """
+        Nullable dates should be included in the result set (#7155).
+        """
         self.assertSequenceEqual(
             Item.objects.datetimes("modified", "day"),
             [datetime.datetime(2007, 12, 19, 0, 0)],
@@ -803,7 +877,10 @@ class Queries1Tests(TestCase):
             ],
         )
 
-    def test_ticket7096(self):
+    def test_exclude_on_multiple_conditions(self):
+        """
+        Excluding on multiple conditions works (#7096).
+        """
         # Make sure exclude() with multiple conditions continues to work.
         self.assertSequenceEqual(
             Tag.objects.filter(parent=self.t1, name="t3").order_by("name"),
@@ -840,12 +917,17 @@ class Queries1Tests(TestCase):
             [self.i4, self.i1, self.i3],
         )
 
-    def test_tickets_7204_7506(self):
-        # Make sure querysets with related fields can be pickled. If this
-        # doesn't crash, it's a Good Thing.
+    def test_pickling_querysets(self):
+        """
+        Querysets with related fields can be pickled (#7204) (#7506).
+        """
+        # If this doesn't crash, it's a Good Thing.
         pickle.dumps(Item.objects.all())
 
-    def test_ticket7813(self):
+    def test_pickling_querysets_with_select_related(self):
+        """
+        Querysets with select_related() can be pickled (#7813).
+        """
         # We should also be able to pickle things that use select_related().
         # The only tricky thing here is to ensure that we do the related
         # selections properly after unpickling.
@@ -862,7 +944,10 @@ class Queries1Tests(TestCase):
         q3 = pickle.loads(pickle.dumps(qs, pickle.HIGHEST_PROTOCOL))
         self.assertEqual(list(qs), list(q3))
 
-    def test_ticket7277(self):
+    def test_multiple_or_statements(self):
+        """
+        Multiple OR statements should succeed (#7277).
+        """
         self.assertSequenceEqual(
             self.n1.annotation_set.filter(
                 Q(tag=self.t5)
@@ -872,15 +957,20 @@ class Queries1Tests(TestCase):
             [self.ann1],
         )
 
-    def test_tickets_7448_7707(self):
-        # Complex objects should be converted to strings before being used in
-        # lookups.
+    def test_complex_object_lookups(self):
+        """
+        Lookup of complex objects should be converted to strings
+        before being used (#7448) (#7707).
+        """
         self.assertSequenceEqual(
             Item.objects.filter(created__in=[self.time1, self.time2]),
             [self.i1, self.i2],
         )
 
-    def test_ticket7235(self):
+    def test_filter_on_empty_query(self):
+        """
+        Filter on empty EmptyQuerySet should return EmptyQuerySet (#7235).
+        """
         # An EmptyQuerySet should not raise exceptions if it is filtered.
         Eaten.objects.create(meal="m")
         q = Eaten.objects.none()
@@ -902,7 +992,8 @@ class Queries1Tests(TestCase):
             self.assertSequenceEqual(q.defer("meal"), [])
             self.assertSequenceEqual(q.only("meal"), [])
 
-    def test_ticket7791(self):
+    def test_len_on_distinct_ordered_querysets(self):
+        """len() on distinct ordered querysets (#7791)."""
         # There were "issues" when ordering and distinct-ing on fields related
         # via ForeignKeys.
         self.assertEqual(len(Note.objects.order_by("extrainfo__info").distinct()), 3)
@@ -911,7 +1002,8 @@ class Queries1Tests(TestCase):
         qs = Item.objects.datetimes("created", "month")
         pickle.loads(pickle.dumps(qs))
 
-    def test_ticket9997(self):
+    def test_filtering_with_valueslist(self):
+        """Filtering with ValuesList querysets should work (#9997)."""
         # If a ValuesList or Values queryset is passed as an inner query, we
         # make sure it's only requesting a single value and use that as the
         # thing to select.
@@ -936,7 +1028,8 @@ class Queries1Tests(TestCase):
                 name__in=Tag.objects.filter(parent=self.t1).values_list("name", "id")
             )
 
-    def test_ticket9985(self):
+    def test_values_list_values(self):
+        """values_list() with values() not inserting duplicate values. (#9985)"""
         # qs.values_list(...).values(...) combinations should work.
         self.assertSequenceEqual(
             Note.objects.values_list("note", flat=True).values("id").order_by("id"),
@@ -951,14 +1044,20 @@ class Queries1Tests(TestCase):
             [self.ann1],
         )
 
-    def test_ticket10205(self):
+    def test_update_filter_with_empty_in(self):
+        """
+        Updating a queryset filtered by an empty "__in"
+        returns 0 results. (#10205)
+        """
         # When bailing out early because of an empty "__in" filter, we need
         # to set things up correctly internally so that subqueries can continue
         # properly.
         self.assertEqual(Tag.objects.filter(name__in=()).update(name="foo"), 0)
 
-    def test_ticket10432(self):
-        # Testing an empty "__in" filter with a generator as the value.
+    def test_filter_with_generators(self):
+        """Filtering with __in generators works as expected (#10432)."""
+
+        # Testing empty "__in" filter with a generator as the value.
         def f():
             return iter([])
 
@@ -970,9 +1069,8 @@ class Queries1Tests(TestCase):
         self.assertSequenceEqual(Note.objects.filter(pk__in=f()), [])
         self.assertEqual(list(Note.objects.filter(pk__in=g())), [n_obj])
 
-    def test_ticket10742(self):
-        # Queries used in an __in clause don't execute subqueries
-
+    def test_with_subquery_inside_in(self):
+        """Queries used in an __in clause don't execute subqueries (#10742)."""
         subq = Author.objects.filter(num__lt=3000)
         qs = Author.objects.filter(pk__in=subq)
         self.assertSequenceEqual(qs, [self.a1, self.a2])
@@ -996,8 +1094,8 @@ class Queries1Tests(TestCase):
         # The subquery result cache should not be populated
         self.assertIsNone(subq._result_cache)
 
-    def test_ticket7076(self):
-        # Excluding shouldn't eliminate NULL entries.
+    def test_exclude_null_entries(self):
+        """Excluding shouldn't eliminate NULL entries (#7076)."""
         self.assertSequenceEqual(
             Item.objects.exclude(modified=self.time1).order_by("name"),
             [self.i4, self.i3, self.i2],
@@ -1007,9 +1105,9 @@ class Queries1Tests(TestCase):
             [self.t1, self.t4, self.t5],
         )
 
-    def test_ticket7181(self):
-        # Ordering by related tables should accommodate nullable fields (this
-        # test is a little tricky, since NULL ordering is database dependent.
+    def test_ordering_by_related_nullable_fields(self):
+        """Ordering by related tables should accommodate nullable fields (#7181)."""
+        # (this test is a little tricky, since NULL ordering is database dependent.
         # Instead, we just count the number of results).
         self.assertEqual(len(Tag.objects.order_by("parent__name")), 5)
 
@@ -1025,9 +1123,11 @@ class Queries1Tests(TestCase):
         self.assertSequenceEqual(Note.objects.none() & Note.objects.all(), [])
         self.assertSequenceEqual(Note.objects.all() & Note.objects.none(), [])
 
-    def test_ticket8439(self):
-        # Complex combinations of conjunctions, disjunctions and nullable
-        # relations.
+    def test_complex_conjunctions_and_disjunctions(self):
+        """
+        Complex combinations of
+        conjunctions, disjunctions and nullable relations (#8439).
+        """
         self.assertSequenceEqual(
             Author.objects.filter(
                 Q(item__note__extrainfo=self.e2) | Q(report=self.r1, name="xyz")
@@ -1063,10 +1163,8 @@ class Queries1Tests(TestCase):
             1,
         )
 
-    def test_ticket17429(self):
-        """
-        Meta.ordering=None works the same as Meta.ordering=[]
-        """
+    def test_meta_null_ordering(self):
+        """Meta.ordering=None works the same as Meta.ordering=[] (#17429)."""
         original_ordering = Tag._meta.ordering
         Tag._meta.ordering = None
         try:
@@ -1117,7 +1215,10 @@ class Queries1Tests(TestCase):
             Item.objects.filter(~~Q(tags__name__in=["t4", "t3"])),
         )
 
-    def test_ticket_10790_1(self):
+    def test_many_joins_1(self):
+        """
+        Multiple joins in a comparison for NULL (#10790).
+        """
         # Querying direct fields with isnull should trim the left outer join.
         # It also should not create INNER JOIN.
         q = Tag.objects.filter(parent__isnull=True)
@@ -1144,7 +1245,10 @@ class Queries1Tests(TestCase):
         self.assertEqual(str(q.query).count("LEFT OUTER JOIN"), 1)
         self.assertNotIn("INNER JOIN", str(q.query))
 
-    def test_ticket_10790_2(self):
+    def test_many_joins_2(self):
+        """
+        Multiple joins in a comparison for NULL (#10790).
+        """
         # Querying across several tables should strip only the last outer join,
         # while preserving the preceding inner joins.
         q = Tag.objects.filter(parent__parent__isnull=False)
@@ -1159,7 +1263,10 @@ class Queries1Tests(TestCase):
         self.assertEqual(str(q.query).count("LEFT OUTER JOIN"), 0)
         self.assertEqual(str(q.query).count("INNER JOIN"), 1)
 
-    def test_ticket_10790_3(self):
+    def test_many_joins_3(self):
+        """
+        Multiple joins in a comparison for NULL (#10790).
+        """
         # Querying via indirect fields should populate the left outer join
         q = NamedCategory.objects.filter(tag__isnull=True)
         self.assertEqual(str(q.query).count("LEFT OUTER JOIN"), 1)
@@ -1174,7 +1281,10 @@ class Queries1Tests(TestCase):
         self.assertEqual(str(q.query).count("LEFT OUTER JOIN"), 1)
         self.assertSequenceEqual(q, [self.nc1])
 
-    def test_ticket_10790_4(self):
+    def test_many_joins_4(self):
+        """
+        Multiple joins in a comparison for NULL (#10790).
+        """
         # Querying across m2m field should not strip the m2m table from join.
         q = Author.objects.filter(item__tags__isnull=True)
         self.assertSequenceEqual(q, [self.a2, self.a3])
@@ -1186,7 +1296,10 @@ class Queries1Tests(TestCase):
         self.assertEqual(str(q.query).count("LEFT OUTER JOIN"), 3)
         self.assertNotIn("INNER JOIN", str(q.query))
 
-    def test_ticket_10790_5(self):
+    def test_many_joins_5(self):
+        """
+        Multiple joins in a comparison for NULL (#10790).
+        """
         # Querying with isnull=False across m2m field should not create outer joins
         q = Author.objects.filter(item__tags__isnull=False)
         self.assertSequenceEqual(q, [self.a1, self.a1, self.a2, self.a2, self.a4])
@@ -1203,7 +1316,10 @@ class Queries1Tests(TestCase):
         self.assertEqual(str(q.query).count("LEFT OUTER JOIN"), 0)
         self.assertEqual(str(q.query).count("INNER JOIN"), 4)
 
-    def test_ticket_10790_6(self):
+    def test_many_joins_6(self):
+        """
+        Multiple joins in a comparison for NULL (#10790).
+        """
         # Querying with isnull=True across m2m field should not create inner joins
         # and strip last outer join
         q = Author.objects.filter(item__tags__parent__parent__isnull=True)
@@ -1219,7 +1335,10 @@ class Queries1Tests(TestCase):
         self.assertEqual(str(q.query).count("LEFT OUTER JOIN"), 3)
         self.assertEqual(str(q.query).count("INNER JOIN"), 0)
 
-    def test_ticket_10790_7(self):
+    def test_many_joins_7(self):
+        """
+        Multiple joins in a comparison for NULL (#10790).
+        """
         # Reverse querying with isnull should not strip the join
         q = Author.objects.filter(item__isnull=True)
         self.assertSequenceEqual(q, [self.a3])
@@ -1231,14 +1350,20 @@ class Queries1Tests(TestCase):
         self.assertEqual(str(q.query).count("LEFT OUTER JOIN"), 0)
         self.assertEqual(str(q.query).count("INNER JOIN"), 1)
 
-    def test_ticket_10790_8(self):
+    def test_many_joins_8(self):
+        """
+        Multiple joins in a comparison for NULL (#10790).
+        """
         # Querying with combined q-objects should also strip the left outer join
         q = Tag.objects.filter(Q(parent__isnull=True) | Q(parent=self.t1))
         self.assertSequenceEqual(q, [self.t1, self.t2, self.t3])
         self.assertEqual(str(q.query).count("LEFT OUTER JOIN"), 0)
         self.assertEqual(str(q.query).count("INNER JOIN"), 0)
 
-    def test_ticket_10790_combine(self):
+    def test_many_joins_and_combine(self):
+        """
+        Multiple joins in a comparison for NULL (#10790).
+        """
         # Combining queries should not re-populate the left outer join
         q1 = Tag.objects.filter(parent__isnull=True)
         q2 = Tag.objects.filter(parent__isnull=False)
@@ -1277,7 +1402,10 @@ class Queries1Tests(TestCase):
         self.assertEqual(str(q3.query).count("LEFT OUTER JOIN"), 1)
         self.assertEqual(str(q3.query).count("INNER JOIN"), 0)
 
-    def test_ticket19672(self):
+    def test_q_object_negation(self):
+        """
+        Negated Q objects over nullable joins result in valid SQL (#19672).
+        """
         self.assertSequenceEqual(
             Report.objects.filter(
                 Q(creator__isnull=False) & ~Q(creator__extra__value=41)
@@ -1285,7 +1413,10 @@ class Queries1Tests(TestCase):
             [self.r1],
         )
 
-    def test_ticket_20250(self):
+    def test_filtering_queryset_with_negated_via_fk(self):
+        """
+        Filtering annotated queryset with negated Q via fk (#20250).
+        """
         # A negated Q along with an annotated queryset failed in Django 1.4
         qs = Author.objects.annotate(Count("item"))
         qs = qs.filter(~Q(extra__value=0)).order_by("name")
@@ -1383,7 +1514,8 @@ class Queries2Tests(TestCase):
         cls.num8 = Number.objects.create(num=8)
         cls.num12 = Number.objects.create(num=12)
 
-    def test_ticket4289(self):
+    def test_q_object(self):
+        """Q objects correctly combine queries (#4289)."""
         # A slight variation on the restricting the filtering choices by the
         # lookup constraints.
         self.assertSequenceEqual(Number.objects.filter(num__lt=4), [])
@@ -1406,7 +1538,8 @@ class Queries2Tests(TestCase):
             [self.num8],
         )
 
-    def test_ticket12239(self):
+    def test_integer_lookups_rounding_floats(self):
+        """Integer lookups are rounding float values correctly (#12239)."""
         # Custom lookups are registered to round float values correctly on gte
         # and lt IntegerField queries.
         self.assertSequenceEqual(
@@ -1463,8 +1596,8 @@ class Queries2Tests(TestCase):
             [self.num4, self.num8, self.num12],
         )
 
-    def test_ticket7759(self):
-        # Count should work with a partially read result set.
+    def test_count_on_partially_read_resultset(self):
+        """Count should work with a partially read result set (#7759)."""
         count = Number.objects.count()
         qs = Number.objects.all()
 
@@ -1476,8 +1609,8 @@ class Queries2Tests(TestCase):
 
 
 class Queries3Tests(TestCase):
-    def test_ticket7107(self):
-        # This shouldn't create an infinite loop.
+    def test_all(self):
+        """all() not creating an infinite loop (#7107)."""
         self.assertSequenceEqual(Valid.objects.all(), [])
 
     def test_datetimes_invalid_field(self):
@@ -1487,7 +1620,11 @@ class Queries3Tests(TestCase):
         with self.assertRaisesMessage(TypeError, msg):
             Item.objects.datetimes("name", "month")
 
-    def test_ticket22023(self):
+    def test_misuse_of_values_method(self):
+        """
+        Calling certain methods after values()
+        raising expressive message (#22023).
+        """
         with self.assertRaisesMessage(
             TypeError, "Cannot call only() after .values() or .values_list()"
         ):
@@ -1525,7 +1662,8 @@ class Queries4Tests(TestCase):
             name="i2", created=datetime.datetime.now(), note=n1, creator=cls.a3
         )
 
-    def test_ticket24525(self):
+    def test_intersections_with_exclude(self):
+        """Intersecting querysets with exclude() works as expected (#24525)."""
         tag = Tag.objects.create()
         anth100 = tag.note_set.create(note="ANTH", misc="100")
         math101 = tag.note_set.create(note="MATH", misc="101")
@@ -1538,7 +1676,8 @@ class Queries4Tests(TestCase):
         )
         self.assertEqual(list(result), [s2])
 
-    def test_ticket11811(self):
+    def test_using_unsaved_instances_in_query(self):
+        """Using unsaved instances in a query raises a comprehensive error (#11811)."""
         unsaved_category = NamedCategory(name="Other")
         msg = (
             "Unsaved model instance <NamedCategory: Other> cannot be used in an ORM "
@@ -1547,7 +1686,8 @@ class Queries4Tests(TestCase):
         with self.assertRaisesMessage(ValueError, msg):
             Tag.objects.filter(pk=self.t1.pk).update(category=unsaved_category)
 
-    def test_ticket14876(self):
+    def test_combine_nullable_q_object(self):
+        """Q | Q with nullable related fields run a LEFT JOIN (#14876)."""
         # Note: when combining the query we need to have information available
         # about the join type of the trimmed "creator__isnull" join. If we
         # don't have that information, then the join is created as INNER JOIN
@@ -1617,7 +1757,8 @@ class Queries4Tests(TestCase):
         qs2 = otherteachers.filter(schools=s1).filter(schools=s3)
         self.assertSequenceEqual(qs1 | qs2, [])
 
-    def test_ticket7095(self):
+    def test_filter_on_m2m(self):
+        """Filtering works on m2m fields (#7095)."""
         # Updates that are filtered on the model being updated are somewhat
         # tricky in MySQL.
         ManagedModel.objects.create(data="mm1", tag=self.t1, public=True)
@@ -1684,14 +1825,19 @@ class Queries4Tests(TestCase):
             date_obj,
         )
 
-    def test_ticket10181(self):
-        # Avoid raising an EmptyResultSet if an inner query is probably
-        # empty (and hence, not executed).
+    def test_successful_empty_inner_query(self):
+        """
+        Avoid raising an EmptyResultSet if
+        an inner query is probably empty and hence, not executed (#10181).
+        """
         self.assertSequenceEqual(
             Tag.objects.filter(id__in=Tag.objects.filter(id__in=[])), []
         )
 
-    def test_ticket15316_filter_false(self):
+    def test_isnull_filter_on_subclass_fk(self):
+        """
+        Filter with isnull=False on subclass of FK model (#15316).
+        """
         c1 = SimpleCategory.objects.create(name="category1")
         c2 = SpecialCategory.objects.create(
             name="named category1", special_name="special1"
@@ -1708,7 +1854,8 @@ class Queries4Tests(TestCase):
         self.assertEqual(qs.count(), 2)
         self.assertCountEqual(qs, [ci2, ci3])
 
-    def test_ticket15316_exclude_false(self):
+    def test_isnull_on_subclass_of_fk_exclude_false(self):
+        """Exclude with isnull=False on subclass of FK model (#15316)."""
         c1 = SimpleCategory.objects.create(name="category1")
         c2 = SpecialCategory.objects.create(
             name="named category1", special_name="special1"
@@ -1725,7 +1872,8 @@ class Queries4Tests(TestCase):
         self.assertEqual(qs.count(), 1)
         self.assertSequenceEqual(qs, [ci1])
 
-    def test_ticket15316_filter_true(self):
+    def test_isnull_on_subclass_of_fk_filter_true(self):
+        """Filter with isnull=True on subclass of FK model (#15316)."""
         c1 = SimpleCategory.objects.create(name="category1")
         c2 = SpecialCategory.objects.create(
             name="named category1", special_name="special1"
@@ -1742,7 +1890,8 @@ class Queries4Tests(TestCase):
         self.assertEqual(qs.count(), 1)
         self.assertSequenceEqual(qs, [ci1])
 
-    def test_ticket15316_exclude_true(self):
+    def test_isnull_on_subclass_of_fk_exclude_true(self):
+        """Exclude with isnull=True on subclass of FK model (#15316)."""
         c1 = SimpleCategory.objects.create(name="category1")
         c2 = SpecialCategory.objects.create(
             name="named category1", special_name="special1"
@@ -1759,7 +1908,8 @@ class Queries4Tests(TestCase):
         self.assertEqual(qs.count(), 2)
         self.assertCountEqual(qs, [ci2, ci3])
 
-    def test_ticket15316_one2one_filter_false(self):
+    def test_isnull_on_subclass_of_one2one_filter_false(self):
+        """Filter with isnull=False on subclass of OneToOneField model (#15316)."""
         c = SimpleCategory.objects.create(name="cat")
         c0 = SimpleCategory.objects.create(name="cat0")
         c1 = SimpleCategory.objects.create(name="category1")
@@ -1777,7 +1927,8 @@ class Queries4Tests(TestCase):
         self.assertEqual(qs.count(), 2)
         self.assertSequenceEqual(qs, [ci2, ci3])
 
-    def test_ticket15316_one2one_exclude_false(self):
+    def test_isnull_on_subclass_of_one2one_exclude_false(self):
+        """Exclude with isnull=False on subclass of OneToOneField model (#15316)."""
         c = SimpleCategory.objects.create(name="cat")
         c0 = SimpleCategory.objects.create(name="cat0")
         c1 = SimpleCategory.objects.create(name="category1")
@@ -1793,7 +1944,8 @@ class Queries4Tests(TestCase):
         self.assertEqual(qs.count(), 1)
         self.assertSequenceEqual(qs, [ci1])
 
-    def test_ticket15316_one2one_filter_true(self):
+    def test_isnull_on_subclass_of_one2one_filter_true(self):
+        """Filter with isnull=True on subclass of OneToOne (#15316)."""
         c = SimpleCategory.objects.create(name="cat")
         c0 = SimpleCategory.objects.create(name="cat0")
         c1 = SimpleCategory.objects.create(name="category1")
@@ -1809,7 +1961,8 @@ class Queries4Tests(TestCase):
         self.assertEqual(qs.count(), 1)
         self.assertSequenceEqual(qs, [ci1])
 
-    def test_ticket15316_one2one_exclude_true(self):
+    def test_isnull_on_subclass_of_one2one_exclude_true(self):
+        """Exclude with isnull=True on subclass of OneToOneField (#15316)."""
         c = SimpleCategory.objects.create(name="cat")
         c0 = SimpleCategory.objects.create(name="cat0")
         c1 = SimpleCategory.objects.create(name="category1")
@@ -1879,9 +2032,11 @@ class Queries5Tests(TestCase):
         dicts = qs.values("id", "rank").order_by("id")
         self.assertEqual([d["rank"] for d in dicts], [2, 1, 3])
 
-    def test_ticket7256(self):
-        # An empty values() call includes all aliases, including those from an
-        # extra()
+    def test_empty_values_includes_aliases(self):
+        """
+        Empty values() call includes all aliases,
+        including those from an extra() (#7256).
+        """
         sql = "case when %s > 2 then 1 else 0 end" % connection.ops.quote_name("rank")
         qs = Ranking.objects.extra(select={"good": sql})
         dicts = qs.values().order_by("id")
@@ -1897,16 +2052,19 @@ class Queries5Tests(TestCase):
             ],
         )
 
-    def test_ticket7045(self):
+    def test_extra_tables_consecutive_use(self):
+        """extra() tables can be used consecutive times (#7045)."""
         # Extra tables used to crash SQL construction on the second use.
         qs = Ranking.objects.extra(tables=["django_site"])
         qs.query.get_compiler(qs.db).as_sql()
         # test passes if this doesn't raise an exception.
         qs.query.get_compiler(qs.db).as_sql()
 
-    def test_ticket9848(self):
-        # Make sure that updates which only filter on sub-tables don't
-        # inadvertently update the wrong records (bug #9848).
+    def test_update_on_subtable_filter(self):
+        """
+        Make sure that updates which only filter on sub-tables,
+        don't inadvertently update the wrong records (#9848).
+        """
         author_start = Author.objects.get(name="a1")
         ranking_start = Ranking.objects.get(author__name="a1")
 
@@ -1928,8 +2086,8 @@ class Queries5Tests(TestCase):
             [self.rank3, self.rank2, self.rank1],
         )
 
-    def test_ticket5261(self):
-        # Test different empty excludes.
+    def test_exclude_q_object(self):
+        """exclude() empty Q objects doesn't effect results (#5261)."""
         self.assertSequenceEqual(
             Note.objects.exclude(Q()),
             [self.n1, self.n2],
@@ -1988,7 +2146,11 @@ class Queries5Tests(TestCase):
 
 
 class SelectRelatedTests(TestCase):
-    def test_tickets_3045_3288(self):
+    def test_select_related(self):
+        """
+        select_related() should be able to cope
+        with single related object (#3045) (#3288)
+        """
         # Once upon a time, select_related() with circular relations would loop
         # infinitely if you forgot to specify "depth". Now we set an arbitrary
         # default upper bound.
@@ -1997,7 +2159,11 @@ class SelectRelatedTests(TestCase):
 
 
 class SubclassFKTests(TestCase):
-    def test_ticket7778(self):
+    def test_delete_subclasses(self):
+        """
+        Subclasses of models with nullable foreign keys
+        can be deleted (#7778).
+        """
         # Model subclasses could not be deleted if a nullable foreign key
         # relates to a model that relates back.
 
@@ -2013,12 +2179,17 @@ class SubclassFKTests(TestCase):
 
 
 class CustomPkTests(TestCase):
-    def test_ticket7371(self):
+    def test_ordering_on_custom_fk(self):
+        """
+        Ordering on a ForeignKey with an existing default
+        ordering and a custom PK (#7371).
+        """
         self.assertQuerySetEqual(Related.objects.order_by("custom"), [])
 
 
 class NullableRelOrderingTests(TestCase):
-    def test_ticket10028(self):
+    def test_nullable_rel_ordering(self):
+        """Nullable related fields can be used in ordering (#10028)."""
         # Ordering by model related to nullable relations(!) should use outer
         # joins, so that all results are included.
         p1 = Plaything.objects.create(name="p1")
@@ -2051,7 +2222,8 @@ class DisjunctiveFilterTests(TestCase):
         cls.n1 = Note.objects.create(note="n1", misc="foo", id=1)
         cls.e1 = ExtraInfo.objects.create(info="e1", note=cls.n1)
 
-    def test_ticket7872(self):
+    def test_complex_q_object_lookups(self):
+        """Complex Q-object filters are correctly evaluated (#7872)."""
         # Another variation on the disjunctive filtering theme.
 
         # For the purposes of this regression test, it's important that there is no
@@ -2063,8 +2235,8 @@ class DisjunctiveFilterTests(TestCase):
             [l1],
         )
 
-    def test_ticket8283(self):
-        # Checking that applying filters after a disjunction works correctly.
+    def test_filter_after_disjunction(self):
+        """Applying filters after a disjunction works correctly (#8283)."""
         self.assertSequenceEqual(
             (
                 ExtraInfo.objects.filter(note=self.n1)
@@ -2116,7 +2288,8 @@ class Queries6Tests(TestCase):
         qs = Annotation.objects.filter(notes__in=Note.objects.filter(note="xyzzy"))
         self.assertEqual(qs.query.get_compiler(qs.db).as_sql()[0].count("SELECT"), 2)
 
-    def test_tickets_8921_9188(self):
+    def test_exclude(self):
+        """exclude() queries across multi-valued relations."""
         # Incorrect SQL was being generated for certain types of exclude()
         # queries that crossed multi-valued relations (#8921, #9188 and some
         # preemptively discovered cases).
@@ -2155,12 +2328,13 @@ class Queries6Tests(TestCase):
             [self.ann1],
         )
 
-    def test_ticket3739(self):
-        # The all() method on querysets returns a copy of the queryset.
+    def test_all_method(self):
+        """The all() method on querysets returns a copy of the queryset (#3739)."""
         q1 = Tag.objects.order_by("name")
         self.assertIsNot(q1, q1.all())
 
-    def test_ticket_11320(self):
+    def test_join_reuse(self):
+        """Join promotion with exclude() (#11320)."""
         qs = Tag.objects.exclude(category=None).exclude(category__name="foo")
         self.assertEqual(str(qs.query).count(" INNER JOIN "), 1)
 
@@ -2217,8 +2391,11 @@ class RawQueriesTests(TestCase):
     def setUpTestData(cls):
         Note.objects.create(note="n1", misc="foo", id=1)
 
-    def test_ticket14729(self):
-        # Test representation of raw query with one or few parameters passed as list
+    def test_raw_query_repr(self):
+        """
+        Correct repr of raw query with one or few parameters
+        passed as list (#14729).
+        """
         query = "SELECT * FROM queries_note WHERE note = %s"
         params = ["n1"]
         qs = Note.objects.raw(query, params=params)
@@ -2236,9 +2413,11 @@ class RawQueriesTests(TestCase):
 
 
 class GeneratorExpressionTests(SimpleTestCase):
-    def test_ticket10432(self):
-        # Using an empty iterator as the rvalue for an "__in"
-        # lookup is legal.
+    def test_generator_expression_in_filter(self):
+        """
+        Using an empty iterator as the rvalue
+        for an "__in" lookup is legal (#10432).
+        """
         self.assertCountEqual(Note.objects.filter(pk__in=iter(())), [])
 
 
@@ -2249,8 +2428,8 @@ class ComparisonTests(TestCase):
         e1 = ExtraInfo.objects.create(info="e1", note=cls.n1)
         cls.a2 = Author.objects.create(name="a2", num=2002, extra=e1)
 
-    def test_ticket8597(self):
-        # Regression tests for case-insensitive comparisons
+    def test_case_insenstive_comparison(self):
+        """Insensitive comparison returns correct results (#8597)."""
         item_ab = Item.objects.create(
             name="a_b", created=datetime.datetime.now(), creator=self.a2, note=self.n1
         )
@@ -2302,7 +2481,11 @@ class ExistsSql(TestCase):
         self.assertIn(connection.ops.quote_name("id"), captured_sql)
         self.assertIn(connection.ops.quote_name("name"), captured_sql)
 
-    def test_ticket_18414(self):
+    def test_query_exists_on_empty_distinct_queryset(self):
+        """
+        Queryset.exists() returns False
+        when queryset is sliced/empty-distinct (#18414).
+        """
         Article.objects.create(name="one", created=datetime.datetime.now())
         Article.objects.create(name="one", created=datetime.datetime.now())
         Article.objects.create(name="two", created=datetime.datetime.now())
@@ -2312,7 +2495,8 @@ class ExistsSql(TestCase):
         self.assertFalse(Article.objects.distinct()[1:1].exists())
 
     @skipUnlessDBFeature("can_distinct_on_fields")
-    def test_ticket_18414_distinct_on(self):
+    def test_query_exists_on_distinct_queryset(self):
+        """queryset.exists() returns False when queryset is sliced/distinct (#18414)."""
         Article.objects.create(name="one", created=datetime.datetime.now())
         Article.objects.create(name="one", created=datetime.datetime.now())
         Article.objects.create(name="two", created=datetime.datetime.now())
@@ -2653,9 +2837,11 @@ class EmptyQuerySetTests(SimpleTestCase):
             Number.objects.filter(pk__in=Number.objects.none().values_list("pk")), []
         )
 
-    def test_ticket_19151(self):
-        # #19151 -- Calling .values() or .values_list() on an empty QuerySet
-        # should return an empty QuerySet and not cause an error.
+    def test_values_list_on_empty_queryset(self):
+        """
+        Calling .values() or .values_list() on an empty QuerySet
+        should return an empty QuerySet and not raise (#19151).
+        """
         q = Author.objects.none()
         self.assertCountEqual(q.values(), [])
         self.assertCountEqual(q.values_list(), [])
@@ -2939,7 +3125,8 @@ class WeirdQuerysetSlicingTests(TestCase):
         food = Food.objects.create(name="spam")
         Eaten.objects.create(meal="spam with eggs", food=food)
 
-    def test_tickets_7698_10202(self):
+    def test_empty_slicing(self):
+        """empty slicing returns empty query (#7698) (#10202)."""
         # People like to slice with '0' as the high-water mark.
         self.assertSequenceEqual(Article.objects.all()[0:0], [])
         self.assertSequenceEqual(Article.objects.all()[0:0][:10], [])
@@ -2970,7 +3157,8 @@ class WeirdQuerysetSlicingTests(TestCase):
 
 
 class EscapingTests(TestCase):
-    def test_ticket_7302(self):
+    def test_quoting(self):
+        """Proper quoting in SQL ordering fragment (#7302)."""
         # Reserved names are appropriately escaped
         r_a = ReservedName.objects.create(name="a", order=42)
         r_b = ReservedName.objects.create(name="b", order=37)
@@ -3465,10 +3653,9 @@ class ExcludeTest17600(TestCase):
         )
 
 
-class Exclude15786(TestCase):
-    """Regression test for #15786"""
-
-    def test_ticket15786(self):
+class ExcludeWithObjectsTests(TestCase):
+    def test_exclude_with_f_object(self):
+        """exclude() with F() objects on OneToOneField (#15786)."""
         c1 = SimpleCategory.objects.create(name="c1")
         c2 = SimpleCategory.objects.create(name="c2")
         OneToOneCategory.objects.create(category=c1)
@@ -3683,7 +3870,10 @@ class NullJoinPromotionOrTest(TestCase):
         b = ModelB.objects.create(name="b", c=c)
         cls.a2 = ModelA.objects.create(name="a2", b=b, d=d2)
 
-    def test_ticket_17886(self):
+    def test_null_join_promotion_or(self):
+        """
+        LOUTER join is promoted across filter expression (#17886).
+        """
         # The first Q-object is generating the match, the rest of the filters
         # should not remove the match even if they do not match anything. The
         # problem here was that b__name generates a LOUTER JOIN, then
@@ -3732,7 +3922,8 @@ class NullJoinPromotionOrTest(TestCase):
         qs = ModelA.objects.filter(Q(b__name__isnull=True) | Q(b__name__isnull=False))
         self.assertIn(" LEFT OUTER JOIN ", str(qs.query))
 
-    def test_ticket_21366(self):
+    def test_null_join_promotion(self):
+        """query join promotion with nullable join (#21366)."""
         n = Note.objects.create(note="n", misc="m")
         e = ExtraInfo.objects.create(info="info", note=n)
         a = Author.objects.create(name="Author1", num=1, extra=e)
@@ -3747,7 +3938,10 @@ class NullJoinPromotionOrTest(TestCase):
         self.assertEqual(str(qs.query).count(" JOIN "), 2)
         self.assertSequenceEqual(qs.order_by("name"), [r2, r1])
 
-    def test_ticket_21748(self):
+    def test_null_join_promotion_exclude(self):
+        """
+        Valid exclude result for related models with nullable join (#21748).
+        """
         i1 = Identifier.objects.create(name="i1")
         i2 = Identifier.objects.create(name="i2")
         i3 = Identifier.objects.create(name="i3")
@@ -3762,7 +3956,8 @@ class NullJoinPromotionOrTest(TestCase):
             [i1, i2],
         )
 
-    def test_ticket_21748_double_negated_and(self):
+    def test_double_negated_and(self):
+        """Valid results on double negated AND (#21748)."""
         i1 = Identifier.objects.create(name="i1")
         i2 = Identifier.objects.create(name="i2")
         Identifier.objects.create(name="i3")
@@ -3787,7 +3982,8 @@ class NullJoinPromotionOrTest(TestCase):
             str(qs1_doubleneg.query).count("INNER JOIN"),
         )
 
-    def test_ticket_21748_double_negated_or(self):
+    def test_double_negated_or(self):
+        """Valid results on double negated OR (#21748)."""
         i1 = Identifier.objects.create(name="i1")
         i2 = Identifier.objects.create(name="i2")
         Identifier.objects.create(name="i3")
@@ -3812,7 +4008,8 @@ class NullJoinPromotionOrTest(TestCase):
             str(qs1_doubleneg.query).count("INNER JOIN"),
         )
 
-    def test_ticket_21748_complex_filter(self):
+    def test_complex_filter(self):
+        """Valid results on complex operator queries (#21748)."""
         i1 = Identifier.objects.create(name="i1")
         i2 = Identifier.objects.create(name="i2")
         Identifier.objects.create(name="i3")
@@ -4060,7 +4257,8 @@ class ManyToManyExcludeTest(TestCase):
             [i_program],
         )
 
-    def test_ticket_12823(self):
+    def test_exclude_many_to_many_reverse(self):
+        """Correct results on exclude() on m2m (#12823)."""
         pg3 = Page.objects.create(text="pg3")
         pg2 = Page.objects.create(text="pg2")
         pg1 = Page.objects.create(text="pg1")
@@ -4084,7 +4282,11 @@ class ManyToManyExcludeTest(TestCase):
 
 
 class RelabelCloneTest(TestCase):
-    def test_ticket_19964(self):
+    def test_relabel_clone(self):
+        """
+        Evaluating a query clone with relabels
+        doesn't affect the original query (#19964).
+        """
         my1 = MyObject.objects.create(data="foo")
         my1.parent = my1
         my1.save()
@@ -4098,10 +4300,10 @@ class RelabelCloneTest(TestCase):
         self.assertEqual(list(parents), [my1])
 
 
-class Ticket20101Tests(TestCase):
-    def test_ticket_20101(self):
+class BitwiseOnQuerySetTests(TestCase):
+    def test_bitwise_on_queryset(self):
         """
-        Tests QuerySet ORed combining in exclude subquery case.
+        QuerySet ORed combining in exclude subquery case (#20101).
         """
         t = Tag.objects.create(name="foo")
         a1 = Annotation.objects.create(tag=t, name="a1")
@@ -4157,9 +4359,11 @@ class DoubleInSubqueryTests(TestCase):
         self.assertSequenceEqual(qs, [lfb1])
 
 
-class Ticket18785Tests(SimpleTestCase):
-    def test_ticket_18785(self):
-        # Test join trimming from ticket18785
+class ExtraJoinTests(SimpleTestCase):
+    def test_extra_join(self):
+        """
+        Extra joins are not promoted to inner joins (#18785).
+        """
         qs = (
             Item.objects.exclude(note__isnull=False)
             .filter(name="something", creator__extra__isnull=True)
@@ -4169,8 +4373,11 @@ class Ticket18785Tests(SimpleTestCase):
         self.assertEqual(0, str(qs.query).count("OUTER JOIN"))
 
 
-class Ticket20788Tests(TestCase):
-    def test_ticket_20788(self):
+class ExcludeQueryTests(TestCase):
+    def test_exclude_query_with_two_fks(self):
+        """
+        Exclude query with two FKs and a many-to-many field (#20788).
+        """
         Paragraph.objects.create()
         paragraph = Paragraph.objects.create()
         page = paragraph.page.create()
@@ -4186,8 +4393,11 @@ class Ticket20788Tests(TestCase):
         self.assertSequenceEqual(sentences_not_in_pub, [book2])
 
 
-class Ticket12807Tests(TestCase):
-    def test_ticket_12807(self):
+class EmptyResultsTests(TestCase):
+    def test_empty_results_when_part_of_or(self):
+        """
+        Successful query with empty results when part of an OR query (#12807).
+        """
         p1 = Paragraph.objects.create()
         p2 = Paragraph.objects.create()
         # The ORed condition below should have no effect on the query - the
@@ -4324,8 +4534,11 @@ class RelatedLookupTypeTests(TestCase):
         )
 
 
-class Ticket14056Tests(TestCase):
-    def test_ticket_14056(self):
+class ReverseForeignKeyTests(TestCase):
+    def test_reverse_foreign_key(self):
+        """
+        Right order of joins in reverse foreign key lookup (#14056).
+        """
         s1 = SharedConnection.objects.create(data="s1")
         s2 = SharedConnection.objects.create(data="s2")
         s3 = SharedConnection.objects.create(data="s3")
@@ -4339,8 +4552,11 @@ class Ticket14056Tests(TestCase):
         )
 
 
-class Ticket20955Tests(TestCase):
-    def test_ticket_20955(self):
+class DeepSelectRelatedTests(TestCase):
+    def test_deep_select_related(self):
+        """
+        Deep select_related returns correct results (#20955).
+        """
         jack = Staff.objects.create(name="jackstaff")
         jackstaff = StaffUser.objects.create(staff=jack)
         jill = Staff.objects.create(name="jillstaff")
@@ -4367,8 +4583,11 @@ class Ticket20955Tests(TestCase):
             )
 
 
-class Ticket21203Tests(TestCase):
-    def test_ticket_21203(self):
+class FieldsMisalignmentTests(TestCase):
+    def test_fields_misalignment(self):
+        """
+        Correct fields are used with select_related/defer (#21203).
+        """
         p = Ticket21203Parent.objects.create(parent_bool=True)
         c = Ticket21203Child.objects.create(parent=p)
         qs = Ticket21203Child.objects.select_related("parent").defer("parent__created")
@@ -4390,7 +4609,8 @@ class ValuesJoinPromotionTests(TestCase):
         qs = ObjectB.objects.values("objecta__name")
         self.assertIn(" INNER JOIN ", str(qs.query))
 
-    def test_ticket_21376(self):
+    def test_two_in_query(self):
+        """Two IN queries in a single query (#21376)."""
         a = ObjectA.objects.create()
         ObjectC.objects.create(objecta=a)
         qs = ObjectC.objects.filter(
@@ -4405,7 +4625,10 @@ class ValuesJoinPromotionTests(TestCase):
 
 
 class ForeignKeyToBaseExcludeTests(TestCase):
-    def test_ticket_21787(self):
+    def test_foreign_key_to_base_exclude(self):
+        """
+        ForeignKey to a base class is excluded (#21787).
+        """
         sc1 = SpecialCategory.objects.create(special_name="sc1", name="sc1")
         sc2 = SpecialCategory.objects.create(special_name="sc2", name="sc2")
         sc3 = SpecialCategory.objects.create(special_name="sc3", name="sc3")
@@ -4421,7 +4644,11 @@ class ForeignKeyToBaseExcludeTests(TestCase):
 
 
 class ReverseM2MCustomPkTests(TestCase):
-    def test_ticket_21879(self):
+    def test_reverse_m2m_custom_pk(self):
+        """
+        Successful reverse m2m query if
+        the model with ManyToManyField has CharField primary key (#21879).
+        """
         cpt1 = CustomPkTag.objects.create(id="cpt1", tag="cpt1")
         cp1 = CustomPk.objects.create(name="cp1", extra="extra")
         cp1.custompktag_set.add(cpt1)
@@ -4429,8 +4656,11 @@ class ReverseM2MCustomPkTests(TestCase):
         self.assertSequenceEqual(CustomPkTag.objects.filter(custom_pk=cp1), [cpt1])
 
 
-class Ticket22429Tests(TestCase):
-    def test_ticket_22429(self):
+class QueryObjectsTests(TestCase):
+    def test_q_object_with_f_object(self):
+        """
+        Successful query with Q object and F object (#22429).
+        """
         sc1 = School.objects.create()
         st1 = Student.objects.create(school=sc1)
 
@@ -4444,8 +4674,11 @@ class Ticket22429Tests(TestCase):
         self.assertSequenceEqual(queryset, [st2])
 
 
-class Ticket23605Tests(TestCase):
-    def test_ticket_23605(self):
+class AliasTests(TestCase):
+    def test_use_alias_for_subquery(self):
+        """
+        Not neglecting to use aliases when multiple subqueries are used (#23605).
+        """
         # Test filtering on a complicated q-object from ticket's report.
         # The query structure is such that we have multiple nested subqueries.
         # The original problem was that the inner queries weren't relabeled
@@ -4487,8 +4720,9 @@ class Ticket23605Tests(TestCase):
         self.assertSequenceEqual(qs2, [a2])
 
 
-class TestTicket24279(TestCase):
-    def test_ticket_24278(self):
+class SerializationOfMigrationTests(TestCase):
+    def test_serialization_of_migration(self):
+        """Successfully serialize migrations (#24278)."""
         School.objects.create()
         qs = School.objects.filter(Q(pk__in=()) | Q())
         self.assertSequenceEqual(qs, [])
@@ -4503,10 +4737,10 @@ class TestInvalidValuesRelation(SimpleTestCase):
             Annotation.objects.filter(tag__in=[123, "abc"])
 
 
-class TestTicket24605(TestCase):
-    def test_ticket_24605(self):
+class DatabaseIdentifierTests(TestCase):
+    def test_database_identifier(self):
         """
-        Subquery table names should be quoted.
+        Subquery table names should be quoted (#24605).
         """
         i1 = Individual.objects.create(alive=True)
         RelatedIndividual.objects.create(related=i1)
@@ -4529,12 +4763,12 @@ class TestTicket24605(TestCase):
         )
 
 
-class Ticket23622Tests(TestCase):
+class SubqueryOrderTests(TestCase):
     @skipUnlessDBFeature("can_distinct_on_fields")
-    def test_ticket_23622(self):
+    def test_subquery_order(self):
         """
         Make sure __pk__in and __in work the same for related fields when
-        using a distinct on subquery.
+        using a distinct on subquery (#23622).
         """
         a1 = Ticket23605A.objects.create()
         a2 = Ticket23605A.objects.create()

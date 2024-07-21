@@ -1635,7 +1635,7 @@ class MultiDbTests(TestCase):
         self.assertEqual(books, "Poems ()\n" "Sense and Sensibility ()\n")
 
 
-class Ticket19607Tests(TestCase):
+class PrefetchRelatedSuccessTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         LessonEntry.objects.bulk_create(
@@ -1655,7 +1655,8 @@ class Ticket19607Tests(TestCase):
             ]
         )
 
-    def test_bug(self):
+    def test_successful_prefetch_related(self):
+        """Successful prefetch_related() call (#19607)."""
         list(
             WordEntry.objects.prefetch_related(
                 "lesson_entry", "lesson_entry__wordentry_set"
@@ -1663,7 +1664,7 @@ class Ticket19607Tests(TestCase):
         )
 
 
-class Ticket21410Tests(TestCase):
+class PrefetchRelatedSuccess2Tests(TestCase):
     @classmethod
     def setUpTestData(cls):
         book1 = Book.objects.create(title="Poems")
@@ -1681,11 +1682,12 @@ class Ticket21410Tests(TestCase):
         author3.favorite_books.add(book2)
         author4.favorite_books.add(book3)
 
-    def test_bug(self):
+    def test_successful_prefetch_related(self):
+        """Successful prefetch_related() call (#21410)."""
         list(Author2.objects.prefetch_related("first_book", "favorite_books"))
 
 
-class Ticket21760Tests(TestCase):
+class PrefetchRelatedQueryTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.rooms = []
@@ -1698,7 +1700,8 @@ class Ticket21760Tests(TestCase):
             house.main_room = cls.rooms[-3]
             house.save()
 
-    def test_bug(self):
+    def test_efficient_prefetch_related(self):
+        """prefetch_related() results in efficient query (#21760)."""
         prefetcher = get_prefetcher(self.rooms[0], "house", "house")[0]
         queryset = prefetcher.get_prefetch_querysets(list(Room.objects.all()))[0]
         self.assertNotIn(" JOIN ", str(queryset.query))

@@ -104,8 +104,10 @@ class DeferRegressionTest(TestCase):
             list(SimpleItem.objects.annotate(Count("feature")).only("name")), list
         )
 
-    def test_ticket_16409(self):
-        # Regression for #16409 - make sure defer() and only() work with annotate()
+    def test_annotation_defer_and_only(self):
+        """
+        Make sure defer() and only() work with annotate() (#16409).
+        """
         self.assertIsInstance(
             list(SimpleItem.objects.annotate(Count("feature")).defer("name")), list
         )
@@ -113,7 +115,10 @@ class DeferRegressionTest(TestCase):
             list(SimpleItem.objects.annotate(Count("feature")).only("name")), list
         )
 
-    def test_ticket_23270(self):
+    def test_deferred_model_inheritance(self):
+        """
+        select_related on fields pointing to subclasses works when using defer (#23270).
+        """
         d = Derived.objects.create(text="foo", other_text="bar")
         with self.assertNumQueries(1):
             obj = Base.objects.select_related("derived").defer("text")[0]

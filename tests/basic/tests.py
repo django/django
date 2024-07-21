@@ -491,7 +491,10 @@ class ModelTest(TestCase):
                 len(Article.objects.none().distinct("headline", "pub_date")), 0
             )
 
-    def test_ticket_20278(self):
+    def test_emptyqs_values_list(self):
+        """
+        values_list() on an EmptyQuerySet returns an EmptyQuerySet (#20278).
+        """
         sr = SelfRef.objects.create()
         with self.assertRaises(ObjectDoesNotExist):
             SelfRef.objects.get(selfref=sr)

@@ -2874,9 +2874,9 @@ class SquashMigrationsTests(MigrationTestBase):
             )
         self.assertIn("Optimized from 8 operations to 2 operations.", out.getvalue())
 
-    def test_ticket_23799_squashmigrations_no_optimize(self):
+    def test_squashmigrations_no_optimize(self):
         """
-        squashmigrations --no-optimize doesn't optimize operations.
+        squashmigrations --no-optimize doesn't optimize operations (#23799).
         """
         out = io.StringIO()
         with self.temporary_migration_module(module="migrations.test_migrations"):

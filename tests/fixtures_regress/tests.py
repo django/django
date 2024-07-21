@@ -506,10 +506,9 @@ class TestFixtures(TestCase):
                 verbosity=0,
             )
 
-    def test_ticket_20820(self):
+    def test_loaddata_m2m(self):
         """
-        Regression for ticket #20820 -- loaddata on a model that inherits
-        from a model with a M2M shouldn't blow up.
+        loaddata on a model that inherits from a model with a M2M field (#20820).
         """
         management.call_command(
             "loaddata",
@@ -517,11 +516,10 @@ class TestFixtures(TestCase):
             verbosity=0,
         )
 
-    def test_ticket_22421(self):
+    def test_loaddata_with_m2m_via_abstract_parent(self):
         """
-        Regression for ticket #22421 -- loaddata on a model that inherits from
-        a grand-parent model with a M2M but via an abstract parent shouldn't
-        blow up.
+        loaddata on a model that inherits from a grand-parent model
+        with a M2M but via an abstract parent (#22421).
         """
         management.call_command(
             "loaddata",
@@ -934,12 +932,12 @@ class M2MNaturalKeyFixtureTests(TestCase):
         self.assertCountEqual(new_a.b_set.all(), [b1, b2])
 
 
-class TestTicket11101(TransactionTestCase):
+class TestFixtureRollback(TransactionTestCase):
     available_apps = ["fixtures_regress"]
 
     @skipUnlessDBFeature("supports_transactions")
-    def test_ticket_11101(self):
-        """Fixtures can be rolled back (ticket #11101)."""
+    def test_fixture_rollback(self):
+        """Fixtures can be rolled back (#11101)."""
         with transaction.atomic():
             management.call_command(
                 "loaddata",
