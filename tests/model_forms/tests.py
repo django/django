@@ -1,5 +1,6 @@
 import datetime
 import os
+import shutil
 from decimal import Decimal
 from unittest import mock, skipUnless
 
@@ -72,6 +73,7 @@ from .models import (
     Triple,
     Writer,
     WriterProfile,
+    temp_storage_dir,
     test_images,
 )
 
@@ -2482,6 +2484,12 @@ class ModelOneToOneFieldTests(TestCase):
 
 
 class FileAndImageFieldTests(TestCase):
+    def setUp(self):
+        if os.path.exists(temp_storage_dir):
+            shutil.rmtree(temp_storage_dir)
+        os.mkdir(temp_storage_dir)
+        self.addCleanup(shutil.rmtree, temp_storage_dir)
+
     def test_clean_false(self):
         """
         If the ``clean`` method on a non-required FileField receives False as
