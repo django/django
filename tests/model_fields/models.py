@@ -21,6 +21,10 @@ except ImportError:
     Image = None
 
 
+# Set up a temp directory for file storage.
+temp_storage_dir = tempfile.mkdtemp()
+temp_storage = FileSystemStorage(temp_storage_dir)
+
 test_collation = SimpleLazyObject(
     lambda: connection.features.test_collations["virtual"]
 )
@@ -206,7 +210,9 @@ class VerboseNameField(models.Model):
     field5 = models.DateTimeField("verbose field5")
     field6 = models.DecimalField("verbose field6", max_digits=6, decimal_places=1)
     field7 = models.EmailField("verbose field7")
-    field8 = models.FileField("verbose field8", upload_to="unused")
+    field8 = models.FileField(
+        "verbose field8", storage=temp_storage, upload_to="unused"
+    )
     field9 = models.FilePathField("verbose field9")
     field10 = models.FloatField("verbose field10")
     # Don't want to depend on Pillow in this test
@@ -256,7 +262,7 @@ class DataModel(models.Model):
 
 
 class Document(models.Model):
-    myfile = models.FileField(upload_to="unused", unique=True)
+    myfile = models.FileField(storage=temp_storage, upload_to="unused", unique=True)
 
 
 ###############################################################################
@@ -281,10 +287,6 @@ if Image:
 
     class TestImageField(models.ImageField):
         attr_class = TestImageFieldFile
-
-    # Set up a temp directory for file storage.
-    temp_storage_dir = tempfile.mkdtemp()
-    temp_storage = FileSystemStorage(temp_storage_dir)
 
     class Person(models.Model):
         """
