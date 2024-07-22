@@ -90,10 +90,7 @@ KEY_ERRORS_WITH_MEMCACHED_MSG = (
 )
 
 
-def retry(on_exceptions=(AssertionError,), retries=3, delay=1):
-    if not isinstance(on_exceptions, tuple):
-        on_exceptions = (on_exceptions,)
-
+def retry(retries=3, delay=1):
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -101,7 +98,7 @@ def retry(on_exceptions=(AssertionError,), retries=3, delay=1):
             while attempts < retries:
                 try:
                     return func(*args, **kwargs)
-                except on_exceptions:
+                except AssertionError:
                     attempts += 1
                     if attempts >= retries:
                         raise
