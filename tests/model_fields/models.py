@@ -21,6 +21,10 @@ except ImportError:
     Image = None
 
 
+# Set up a temp directory for file storage.
+temp_storage_dir = tempfile.mkdtemp()
+temp_storage = FileSystemStorage(temp_storage_dir)
+
 test_collation = SimpleLazyObject(
     lambda: connection.features.test_collations["virtual"]
 )
@@ -256,7 +260,7 @@ class DataModel(models.Model):
 
 
 class Document(models.Model):
-    myfile = models.FileField(upload_to="unused", unique=True)
+    myfile = models.FileField(storage=temp_storage, upload_to="unused", unique=True)
 
 
 ###############################################################################
@@ -281,10 +285,6 @@ if Image:
 
     class TestImageField(models.ImageField):
         attr_class = TestImageFieldFile
-
-    # Set up a temp directory for file storage.
-    temp_storage_dir = tempfile.mkdtemp()
-    temp_storage = FileSystemStorage(temp_storage_dir)
 
     class Person(models.Model):
         """
