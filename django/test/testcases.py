@@ -67,6 +67,9 @@ __all__ = (
     "skipUnlessDBFeature",
 )
 
+# Make unittest ignore frames in this module when reporting failures.
+__unittest = True
+
 
 if not PY311:
     # Backport of unittest.case._enter_context() from Python 3.11.

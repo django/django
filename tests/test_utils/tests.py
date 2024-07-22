@@ -1,6 +1,7 @@
 import os
 import sys
 import threading
+import traceback
 import unittest
 import warnings
 from io import StringIO
@@ -1112,6 +1113,19 @@ class JSONEqualTests(SimpleTestCase):
             self.assertJSONNotEqual(invalid_json, valid_json)
         with self.assertRaises(AssertionError):
             self.assertJSONNotEqual(valid_json, invalid_json)
+
+    def test_method_frames_ignored_by_unittest(self):
+        try:
+            self.assertJSONEqual("1", "2")
+        except AssertionError:
+            exc_type, exc, tb = sys.exc_info()
+
+        result = unittest.TestResult()
+        result.addFailure(self, (exc_type, exc, tb))
+        stack = traceback.extract_tb(exc.__traceback__)
+        self.assertEqual(len(stack), 1)
+        # Top element in the stack is this method, not assertJSONEqual.
+        self.assertEqual(stack[-1].name, "test_method_frames_ignored_by_unittest")
 
 
 class XMLEqualTests(SimpleTestCase):
