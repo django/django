@@ -240,7 +240,9 @@ Templates
 Tests
 ~~~~~
 
-* ...
+* Stack frames from Django's custom assertions are now hidden. This makes test
+  failures easier to read and enables :option:`test --pdb` to directly enter
+  into the failing test method.
 
 URLs
 ~~~~
