@@ -517,7 +517,7 @@ def get_supported_language_variant(lang_code, strict=False):
                 # There is a generic variant under the maximum length accepted length.
                 lang_code = lang_code[:index]
             else:
-                raise ValueError("'lang_code' exceeds the maximum accepted length")
+                raise LookupError(lang_code)
         # If 'zh-hant-tw' is not supported, try special fallback or subsequent
         # language codes i.e. 'zh-hant' and 'zh'.
         possible_lang_codes = [lang_code]

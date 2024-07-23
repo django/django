@@ -19,3 +19,7 @@ Bugfixes
 * Fixed a crash when creating a model with a ``Field.db_default`` and a
   ``Meta.constraints`` constraint composed of ``__endswith``, ``__startswith``,
   or ``__contains`` lookups (:ticket:`35625`).
+
+* Fixed a regression in Django 5.0.7 that caused a crash in
+  ``LocaleMiddleware`` when processing a language code over 500 characters
+  (:ticket:`35627`).
