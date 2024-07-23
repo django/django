@@ -823,7 +823,7 @@ class SimpleTestCase(unittest.TestCase):
     ):
         with func(expected_exception) as cm:
             yield cm
-        self.assertIn(expected_message, str(getattr(cm, cm_attr)))
+            self.assertIn(expected_message, str(getattr(cm, cm_attr)))
 
     def _assertFooMessage(
         self, func, cm_attr, expected_exception, expected_message, *args, **kwargs
