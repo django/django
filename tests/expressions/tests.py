@@ -1302,6 +1302,11 @@ class FTests(SimpleTestCase):
         self.assertNotEqual(f, value)
         self.assertNotEqual(value, f)
 
+    def test_contains(self):
+        msg = "argument of type 'F' is not iterable"
+        with self.assertRaisesMessage(TypeError, msg):
+            "" in F("name")
+
 
 class ExpressionsTests(TestCase):
     def test_F_reuse(self):

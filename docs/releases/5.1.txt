@@ -37,10 +37,10 @@ database-level actions:
 * ``DB_SET_NULL`` - set the referring foreign key to SQL ``NULL``.
 * ``DB_SET_DEFAULT`` - set the referring column to its ``db_default`` value.
 
-``{% query_string %}`` template tag
+``{% querystring %}`` template tag
 -----------------------------------
 
-Django 5.1 introduces the :ttag:`{% query_string %} <query_string>` template
+Django 5.1 introduces the :ttag:`{% querystring %} <querystring>` template
 tag, simplifying the modification of query parameters in URLs, making it easier
 to generate links that maintain existing query parameters while adding or
 changing specific ones.
@@ -64,7 +64,7 @@ When switching to using this new template tag, the above magically becomes:
 
 .. code-block:: html+django
 
-    <a href="{% query_string page=page.next_page_number %}">Next page</a>
+    <a href="{% querystring page=page.next_page_number %}">Next page</a>
 
 PostgreSQL Connection Pools
 ---------------------------

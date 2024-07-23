@@ -76,6 +76,12 @@ class QuerySetSetOperationTests(TestCase):
         qs3 = qs1.union(qs2)
         self.assertNumbersEqual(qs3[:1], [0])
 
+    def test_union_all_none_slice(self):
+        qs = Number.objects.filter(id__in=[])
+        with self.assertNumQueries(0):
+            self.assertSequenceEqual(qs.union(qs), [])
+            self.assertSequenceEqual(qs.union(qs)[0:0], [])
+
     def test_union_empty_filter_slice(self):
         qs1 = Number.objects.filter(num__lte=0)
         qs2 = Number.objects.filter(pk__in=[])

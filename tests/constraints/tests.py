@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from django.db import IntegrityError, connection, models
 from django.db.models import F
 from django.db.models.constraints import BaseConstraint, UniqueConstraint
-from django.db.models.functions import Lower
+from django.db.models.functions import Abs, Lower
 from django.db.transaction import atomic
 from django.test import SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import ignore_warnings
@@ -896,6 +896,13 @@ class UniqueConstraintTests(TestCase):
                 ChildUniqueConstraintProduct(name=self.p1.name, color=self.p1.color),
             )
 
+    def test_validate_fields_unattached(self):
+        Product.objects.create(price=42)
+        constraint = models.UniqueConstraint(fields=["price"], name="uniq_prices")
+        msg = "Product with this Price already exists."
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint.validate(Product, Product(price=42))
+
     @skipUnlessDBFeature("supports_partial_indexes")
     def test_validate_condition(self):
         p1 = UniqueConstraintConditionProduct.objects.create(name="p1")
@@ -921,7 +928,7 @@ class UniqueConstraintTests(TestCase):
         )
 
     @skipUnlessDBFeature("supports_partial_indexes")
-    def test_validate_conditon_custom_error(self):
+    def test_validate_condition_custom_error(self):
         p1 = UniqueConstraintConditionProduct.objects.create(name="p1")
         constraint = models.UniqueConstraint(
             fields=["name"],
@@ -1062,6 +1069,32 @@ class UniqueConstraintTests(TestCase):
             )
         is_not_null_constraint.validate(Product, Product(price=4, discounted_price=3))
         is_not_null_constraint.validate(Product, Product(price=2, discounted_price=1))
+
+    def test_validate_nulls_distinct_fields(self):
+        Product.objects.create(price=42)
+        constraint = models.UniqueConstraint(
+            fields=["price"],
+            nulls_distinct=False,
+            name="uniq_prices_nulls_distinct",
+        )
+        constraint.validate(Product, Product(price=None))
+        Product.objects.create(price=None)
+        msg = "Product with this Price already exists."
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint.validate(Product, Product(price=None))
+
+    def test_validate_nulls_distinct_expressions(self):
+        Product.objects.create(price=42)
+        constraint = models.UniqueConstraint(
+            Abs("price"),
+            nulls_distinct=False,
+            name="uniq_prices_nulls_distinct",
+        )
+        constraint.validate(Product, Product(price=None))
+        Product.objects.create(price=None)
+        msg = f"Constraint “{constraint.name}” is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint.validate(Product, Product(price=None))
 
     def test_name(self):
         constraints = get_constraints(UniqueConstraintProduct._meta.db_table)

@@ -223,6 +223,13 @@ class MultiColumnFKTests(TestCase):
             [m2],
         )
 
+    def test_query_does_not_mutate(self):
+        """
+        Recompiling the same subquery doesn't mutate it.
+        """
+        queryset = Friendship.objects.filter(to_friend__in=Person.objects.all())
+        self.assertEqual(str(queryset.query), str(queryset.query))
+
     def test_select_related_foreignkey_forward_works(self):
         Membership.objects.create(
             membership_country=self.usa, person=self.bob, group=self.cia
