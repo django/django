@@ -15,3 +15,7 @@ Bugfixes
 * Fixed a regression in Django 5.0 where ``ModelAdmin.action_checkbox`` could
   break the admin changelist HTML page when rendering a model instance with a
   ``__html__`` method (:ticket:`35606`).
+
+* Fixed a crash when creating a model with a ``Field.db_default`` and a
+  ``Meta.constraints`` constraint composed of ``__endswith``, ``__startswith``,
+  or ``__contains`` lookups (:ticket:`35625`).

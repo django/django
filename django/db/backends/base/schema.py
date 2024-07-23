@@ -164,7 +164,7 @@ class BaseDatabaseSchemaEditor:
     def __exit__(self, exc_type, exc_value, traceback):
         if exc_type is None:
             for sql in self.deferred_sql:
-                self.execute(sql)
+                self.execute(sql, None)
         if self.atomic_migration:
             self.atomic.__exit__(exc_type, exc_value, traceback)
 
@@ -265,16 +265,29 @@ class BaseDatabaseSchemaEditor:
                 )
                 if autoinc_sql:
                     self.deferred_sql.extend(autoinc_sql)
-        constraints = [
-            constraint.constraint_sql(model, self)
-            for constraint in model._meta.constraints
-        ]
+        # The BaseConstraint DDL creation methods such as constraint_sql(),
+        # create_sql(), and delete_sql(), were not designed in a way that
+        # separate SQL from parameters which make their generated SQL unfit to
+        # be used in a context where parametrization is delegated to the
+        # backend.
+        constraint_sqls = []
+        if params:
+            # If parameters are present (e.g. a DEFAULT clause on backends that
+            # allow parametrization) defer constraint creation so they are not
+            # mixed with SQL meant to be parametrized.
+            for constraint in model._meta.constraints:
+                self.deferred_sql.append(constraint.create_sql(model, self))
+        else:
+            constraint_sqls.extend(
+                constraint.constraint_sql(model, self)
+                for constraint in model._meta.constraints
+            )
         sql = self.sql_create_table % {
             "table": self.quote_name(model._meta.db_table),
             "definition": ", ".join(
-                str(constraint)
-                for constraint in (*column_sqls, *constraints)
-                if constraint
+                str(statement)
+                for statement in (*column_sqls, *constraint_sqls)
+                if statement
             ),
         }
         if model._meta.db_tablespace:
