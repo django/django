@@ -1295,6 +1295,52 @@ class Col(Expression):
         ) + self.target.get_db_converters(connection)
 
 
+class ColPairs(Expression):
+    def __init__(self, alias, targets, sources, output_field):
+        super().__init__(output_field=output_field)
+        self.alias, self.targets, self.sources = alias, targets, sources
+
+    def __len__(self):
+        return len(self.targets)
+
+    def __iter__(self):
+        return iter(self.get_cols())
+
+    def get_cols(self):
+        return [
+            Col(self.alias, target, source)
+            for target, source in zip(self.targets, self.sources)
+        ]
+
+    def get_source_expressions(self):
+        return self.get_cols()
+
+    def set_source_expressions(self, exprs):
+        assert all(isinstance(expr, Col) and expr.alias == self.alias for expr in exprs)
+        self.targets = [col.target for col in exprs]
+        self.sources = [col.field for col in exprs]
+
+    def as_sql(self, compiler, connection):
+        cols_sql = []
+        cols_params = []
+        cols = self.get_cols()
+
+        for col in cols:
+            sql, params = col.as_sql(compiler, connection)
+            cols_sql.append(sql)
+            cols_params.extend(params)
+
+        return ", ".join(cols_sql), cols_params
+
+    def relabeled_clone(self, relabels):
+        return self.__class__(
+            relabels.get(self.alias, self.alias), self.targets, self.sources, self.field
+        )
+
+    def resolve_expression(self, *args, **kwargs):
+        return self
+
+
 class Ref(Expression):
     """
     Reference to column alias of the query. For example, Ref('sum_cost') in

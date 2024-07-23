@@ -1,0 +1,242 @@
+import unittest
+
+from django.db import NotSupportedError, connection
+from django.test import TestCase
+
+from .models import Contact, Customer
+
+
+class TupleLookupsTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.customer_1 = Customer.objects.create(customer_id=1, company="a")
+        cls.customer_2 = Customer.objects.create(customer_id=1, company="b")
+        cls.customer_3 = Customer.objects.create(customer_id=2, company="c")
+        cls.customer_4 = Customer.objects.create(customer_id=3, company="d")
+        cls.customer_5 = Customer.objects.create(customer_id=1, company="e")
+        cls.contact_1 = Contact.objects.create(customer=cls.customer_1)
+        cls.contact_2 = Contact.objects.create(customer=cls.customer_1)
+        cls.contact_3 = Contact.objects.create(customer=cls.customer_2)
+        cls.contact_4 = Contact.objects.create(customer=cls.customer_3)
+        cls.contact_5 = Contact.objects.create(customer=cls.customer_1)
+        cls.contact_6 = Contact.objects.create(customer=cls.customer_5)
+
+    def test_exact(self):
+        test_cases = (
+            (self.customer_1, (self.contact_1, self.contact_2, self.contact_5)),
+            (self.customer_2, (self.contact_3,)),
+            (self.customer_3, (self.contact_4,)),
+            (self.customer_4, ()),
+            (self.customer_5, (self.contact_6,)),
+        )
+
+        for customer, contacts in test_cases:
+            with self.subTest(customer=customer, contacts=contacts):
+                self.assertSequenceEqual(
+                    Contact.objects.filter(customer=customer).order_by("id"), contacts
+                )
+
+    def test_exact_subquery(self):
+        with self.assertRaisesMessage(
+            NotSupportedError, "'exact' doesn't support multi-column subqueries."
+        ):
+            subquery = Customer.objects.filter(id=self.customer_1.id)[:1]
+            self.assertSequenceEqual(
+                Contact.objects.filter(customer=subquery).order_by("id"), ()
+            )
+
+    def test_in(self):
+        cust_1, cust_2, cust_3, cust_4, cust_5 = (
+            self.customer_1,
+            self.customer_2,
+            self.customer_3,
+            self.customer_4,
+            self.customer_5,
+        )
+        c1, c2, c3, c4, c5, c6 = (
+            self.contact_1,
+            self.contact_2,
+            self.contact_3,
+            self.contact_4,
+            self.contact_5,
+            self.contact_6,
+        )
+        test_cases = (
+            ((), ()),
+            ((cust_1,), (c1, c2, c5)),
+            ((cust_1, cust_2), (c1, c2, c3, c5)),
+            ((cust_1, cust_2, cust_3), (c1, c2, c3, c4, c5)),
+            ((cust_1, cust_2, cust_3, cust_4), (c1, c2, c3, c4, c5)),
+            ((cust_1, cust_2, cust_3, cust_4, cust_5), (c1, c2, c3, c4, c5, c6)),
+        )
+
+        for contacts, customers in test_cases:
+            with self.subTest(contacts=contacts, customers=customers):
+                self.assertSequenceEqual(
+                    Contact.objects.filter(customer__in=contacts).order_by("id"),
+                    customers,
+                )
+
+    @unittest.skipIf(
+        connection.vendor == "mysql",
+        "MySQL doesn't support LIMIT & IN/ALL/ANY/SOME subquery",
+    )
+    def test_in_subquery(self):
+        subquery = Customer.objects.filter(id=self.customer_1.id)[:1]
+        self.assertSequenceEqual(
+            Contact.objects.filter(customer__in=subquery).order_by("id"),
+            (self.contact_1, self.contact_2, self.contact_5),
+        )
+
+    def test_lt(self):
+        c1, c2, c3, c4, c5, c6 = (
+            self.contact_1,
+            self.contact_2,
+            self.contact_3,
+            self.contact_4,
+            self.contact_5,
+            self.contact_6,
+        )
+        test_cases = (
+            (self.customer_1, ()),
+            (self.customer_2, (c1, c2, c5)),
+            (self.customer_5, (c1, c2, c3, c5)),
+            (self.customer_3, (c1, c2, c3, c5, c6)),
+            (self.customer_4, (c1, c2, c3, c4, c5, c6)),
+        )
+
+        for customer, contacts in test_cases:
+            with self.subTest(customer=customer, contacts=contacts):
+                self.assertSequenceEqual(
+                    Contact.objects.filter(customer__lt=customer).order_by("id"),
+                    contacts,
+                )
+
+    def test_lt_subquery(self):
+        with self.assertRaisesMessage(
+            NotSupportedError, "'lt' doesn't support multi-column subqueries."
+        ):
+            subquery = Customer.objects.filter(id=self.customer_1.id)[:1]
+            self.assertSequenceEqual(
+                Contact.objects.filter(customer__lt=subquery).order_by("id"), ()
+            )
+
+    def test_lte(self):
+        c1, c2, c3, c4, c5, c6 = (
+            self.contact_1,
+            self.contact_2,
+            self.contact_3,
+            self.contact_4,
+            self.contact_5,
+            self.contact_6,
+        )
+        test_cases = (
+            (self.customer_1, (c1, c2, c5)),
+            (self.customer_2, (c1, c2, c3, c5)),
+            (self.customer_5, (c1, c2, c3, c5, c6)),
+            (self.customer_3, (c1, c2, c3, c4, c5, c6)),
+            (self.customer_4, (c1, c2, c3, c4, c5, c6)),
+        )
+
+        for customer, contacts in test_cases:
+            with self.subTest(customer=customer, contacts=contacts):
+                self.assertSequenceEqual(
+                    Contact.objects.filter(customer__lte=customer).order_by("id"),
+                    contacts,
+                )
+
+    def test_lte_subquery(self):
+        with self.assertRaisesMessage(
+            NotSupportedError, "'lte' doesn't support multi-column subqueries."
+        ):
+            subquery = Customer.objects.filter(id=self.customer_1.id)[:1]
+            self.assertSequenceEqual(
+                Contact.objects.filter(customer__lte=subquery).order_by("id"), ()
+            )
+
+    def test_gt(self):
+        test_cases = (
+            (self.customer_1, (self.contact_3, self.contact_4, self.contact_6)),
+            (self.customer_2, (self.contact_4, self.contact_6)),
+            (self.customer_5, (self.contact_4,)),
+            (self.customer_3, ()),
+            (self.customer_4, ()),
+        )
+
+        for customer, contacts in test_cases:
+            with self.subTest(customer=customer, contacts=contacts):
+                self.assertSequenceEqual(
+                    Contact.objects.filter(customer__gt=customer).order_by("id"),
+                    contacts,
+                )
+
+    def test_gt_subquery(self):
+        with self.assertRaisesMessage(
+            NotSupportedError, "'gt' doesn't support multi-column subqueries."
+        ):
+            subquery = Customer.objects.filter(id=self.customer_1.id)[:1]
+            self.assertSequenceEqual(
+                Contact.objects.filter(customer__gt=subquery).order_by("id"), ()
+            )
+
+    def test_gte(self):
+        c1, c2, c3, c4, c5, c6 = (
+            self.contact_1,
+            self.contact_2,
+            self.contact_3,
+            self.contact_4,
+            self.contact_5,
+            self.contact_6,
+        )
+        test_cases = (
+            (self.customer_1, (c1, c2, c3, c4, c5, c6)),
+            (self.customer_2, (c3, c4, c6)),
+            (self.customer_5, (c4, c6)),
+            (self.customer_3, (c4,)),
+            (self.customer_4, ()),
+        )
+
+        for customer, contacts in test_cases:
+            with self.subTest(customer=customer, contacts=contacts):
+                self.assertSequenceEqual(
+                    Contact.objects.filter(customer__gte=customer).order_by("pk"),
+                    contacts,
+                )
+
+    def test_gte_subquery(self):
+        with self.assertRaisesMessage(
+            NotSupportedError, "'gte' doesn't support multi-column subqueries."
+        ):
+            subquery = Customer.objects.filter(id=self.customer_1.id)[:1]
+            self.assertSequenceEqual(
+                Contact.objects.filter(customer__gte=subquery).order_by("id"), ()
+            )
+
+    def test_isnull(self):
+        with self.subTest("customer__isnull=True"):
+            self.assertSequenceEqual(
+                Contact.objects.filter(customer__isnull=True).order_by("id"),
+                (),
+            )
+        with self.subTest("customer__isnull=False"):
+            self.assertSequenceEqual(
+                Contact.objects.filter(customer__isnull=False).order_by("id"),
+                (
+                    self.contact_1,
+                    self.contact_2,
+                    self.contact_3,
+                    self.contact_4,
+                    self.contact_5,
+                    self.contact_6,
+                ),
+            )
+
+    def test_isnull_subquery(self):
+        with self.assertRaisesMessage(
+            NotSupportedError, "'isnull' doesn't support multi-column subqueries."
+        ):
+            subquery = Customer.objects.filter(id=0)[:1]
+            self.assertSequenceEqual(
+                Contact.objects.filter(customer__isnull=subquery).order_by("id"), ()
+            )
