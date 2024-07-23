@@ -1,0 +1,14 @@
+===========================
+Django 4.2.15 release notes
+===========================
+
+*Expected August 6, 2024*
+
+Django 4.2.15 fixes a regression in 4.2.14.
+
+Bugfixes
+========
+
+* Fixed a regression in Django 4.2.14 that caused a crash in
+  ``LocaleMiddleware`` when processing a language code over 500 characters
+  (:ticket:`35627`).
