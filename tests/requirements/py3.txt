@@ -1,5 +1,5 @@
 aiosmtpd
-asgiref >= 3.7.0
+asgiref >= 3.8.1
 argon2-cffi >= 19.2.0; sys_platform != 'win32' or python_version < '3.13'
 bcrypt
 black
