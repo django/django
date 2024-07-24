@@ -24,3 +24,7 @@ Bugfixes
 * Fixed a regression in Django 5.0.7 that caused a crash in
   ``LocaleMiddleware`` when processing a language code over 500 characters
   (:ticket:`35627`).
+
+* Fixed a bug in Django 5.0 that caused a system check crash when
+  ``ModelAdmin.date_hierarchy`` was a ``GeneratedField`` with an
+  ``output_field`` of ``DateField`` or ``DateTimeField`` (:ticket:`35628`).
