@@ -1187,7 +1187,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
                     )
                 ]
             else:
-                if not isinstance(field, (models.DateField, models.DateTimeField)):
+                if field.get_internal_type() not in {"DateField", "DateTimeField"}:
                     return must_be(
                         "a DateField or DateTimeField",
                         option="date_hierarchy",
