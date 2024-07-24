@@ -7,7 +7,7 @@ name = "Django"
 dynamic = ["version"]
 requires-python = ">= 3.10"
 dependencies = [
-    "asgiref>=3.7.0",
+    "asgiref>=3.8.1",
     "sqlparse>=0.3.1",
     "tzdata; sys_platform == 'win32'",
 ]
