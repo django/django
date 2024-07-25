@@ -81,12 +81,12 @@ class SpaceIntTest(SimpleTestCase):
 
     @setup({"spaceint16": "{{ i|spaceint }}"})
     def test_spaceint_16(self):
-        output = self.engine.render_to_string("spaceint16", {
-            "i": 123456789123456789123456789123456789123456789123456789
-        })
+        output = self.engine.render_to_string(
+            "spaceint16", {"i": 123456789123456789123456789123456789123456789123456789}
+        )
         self.assertEqual(
             output,
-            "123 456 789 123 456 789 123 456 789 123 456 789 123 456 789 123 456 789"
+            "123 456 789 123 456 789 123 456 789 123 456 789 123 456 789 123 456 789",
         )
 
     @setup({"spaceint17": "{{ i|spaceint }}"})

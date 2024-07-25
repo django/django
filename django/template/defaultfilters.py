@@ -287,9 +287,7 @@ def spaceint(value, arg=3):
             number_symbol = "-"
             value = abs(value)
         number_string = str(value)
-        number_list = re.split(
-            rf"(\d{{1,{arg}}})(?=(?:\d{{{arg}}})+$)", number_string
-        )
+        number_list = re.split(rf"(\d{{1,{arg}}})(?=(?:\d{{{arg}}})+$)", number_string)
         formatted_number = " ".join(filter(lambda i: i != "", number_list))
         formatted_number = f"{number_symbol}{formatted_number}"
         return formatted_number
