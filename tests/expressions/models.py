@@ -106,3 +106,10 @@ class UUIDPK(models.Model):
 class UUID(models.Model):
     uuid = models.UUIDField(null=True)
     uuid_fk = models.ForeignKey(UUIDPK, models.CASCADE, null=True)
+
+
+class JSONFieldModel(models.Model):
+    data = models.JSONField(null=True)
+
+    class Meta:
+        required_db_features = {"supports_json_field"}
