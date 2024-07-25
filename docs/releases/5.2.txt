@@ -226,7 +226,8 @@ Signals
 Templates
 ~~~~~~~~~
 
-* ...
+* New template filter called ``spaceint`` that inserts spaces inside
+  numbers for better readability.
 
 Tests
 ~~~~~

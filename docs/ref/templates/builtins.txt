@@ -2545,6 +2545,25 @@ For example:
 
 If ``value`` is ``"Joel is a slug"``, the output will be ``"joel-is-a-slug"``.
 
+.. templatefilter:: spaceint
+
+``spaceint``
+------------
+
+.. versionadded:: 5.2
+
+Inserts spaces inside numbers for better readability. Default distance between
+spaces is 3 digits.
+
+For example:
+
+.. code-block:: html+django
+
+    {{ value|4 }}
+
+If ``value`` is ``12345678``, the output will be
+``1234 5678``.
+
 .. templatefilter:: stringformat
 
 ``stringformat``

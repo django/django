@@ -261,6 +261,43 @@ def slugify(value):
 
 
 @register.filter(is_safe=True)
+def spaceint(value, arg=3):
+    """
+    Inserts spaces inside numbers for better readability.
+
+    'value' is the number to format.
+    'arg' is the number of digits between each spaces.
+
+    Works if 'value' or 'arg' is an int or a
+    string that can be converted to an int.
+    """
+    try:
+        arg = int(arg)
+    except ValueError:
+        return ""
+    if arg > 0:
+        number_symbol = ""
+        if isinstance(value, str):
+            value = value.replace(" ", "")
+            try:
+                value = int(value)
+            except ValueError:
+                return ""
+        if value < 0:
+            number_symbol = "-"
+            value = abs(value)
+        number_string = str(value)
+        number_list = re.split(
+            rf"(\d{{1,{arg}}})(?=(?:\d{{{arg}}})+$)", number_string
+        )
+        formatted_number = " ".join(filter(lambda i: i != "", number_list))
+        formatted_number = f"{number_symbol}{formatted_number}"
+        return formatted_number
+    else:
+        return ""
+
+
+@register.filter(is_safe=True)
 def stringformat(value, arg):
     """
     Format the variable according to the arg, a string formatting specifier.
