@@ -30,6 +30,13 @@ CVE-2024-41991: Potential denial-of-service vulnerability in ``django.utils.html
 subject to a potential denial-of-service attack via certain inputs with a very
 large number of Unicode characters.
 
+CVE-2024-42005: Potential SQL injection in ``QuerySet.values()`` and ``values_list()``
+======================================================================================
+
+:meth:`.QuerySet.values` and :meth:`~.QuerySet.values_list` methods on models
+with a ``JSONField`` were subject to SQL injection in column aliases, via a
+crafted JSON object key as a passed ``*arg``.
+
 Bugfixes
 ========
 
