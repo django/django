@@ -226,14 +226,14 @@ Signals
 Templates
 ~~~~~~~~~
 
-* New template filter called `spaceint` in the humanize contrib package
+* New template filter called `intspace` in the humanize contrib package
   that inserts spaces inside numbers for better readability.
 
 Tests
 ~~~~~
 
-* The ``humanize_tester`` method in
-  ``django.tests.humanize_tests.HumanizeTests`` now allows for arguments
+* The `humanize_tester` method in
+  `django.tests.humanize_tests.HumanizeTests` now allows for arguments
   to be passed to the humanize template filters during tests. For it, the
   test_content needs to be a tuple containing two values. The value passed
   to the filter first, followed by the argument.
