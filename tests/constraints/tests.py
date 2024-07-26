@@ -896,6 +896,7 @@ class UniqueConstraintTests(TestCase):
                 ChildUniqueConstraintProduct(name=self.p1.name, color=self.p1.color),
             )
 
+    @skipUnlessDBFeature("supports_table_check_constraints")
     def test_validate_fields_unattached(self):
         Product.objects.create(price=42)
         constraint = models.UniqueConstraint(fields=["price"], name="uniq_prices")
@@ -1070,6 +1071,7 @@ class UniqueConstraintTests(TestCase):
         is_not_null_constraint.validate(Product, Product(price=4, discounted_price=3))
         is_not_null_constraint.validate(Product, Product(price=2, discounted_price=1))
 
+    @skipUnlessDBFeature("supports_table_check_constraints")
     def test_validate_nulls_distinct_fields(self):
         Product.objects.create(price=42)
         constraint = models.UniqueConstraint(
@@ -1083,6 +1085,7 @@ class UniqueConstraintTests(TestCase):
         with self.assertRaisesMessage(ValidationError, msg):
             constraint.validate(Product, Product(price=None))
 
+    @skipUnlessDBFeature("supports_table_check_constraints")
     def test_validate_nulls_distinct_expressions(self):
         Product.objects.create(price=42)
         constraint = models.UniqueConstraint(
