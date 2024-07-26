@@ -4117,7 +4117,7 @@ class OperationTests(OperationTestBase):
         ]
         for check, valid, invalid in checks:
             with self.subTest(condition=check, valid=valid, invalid=invalid):
-                constraint = models.CheckConstraint(condition=check, name="constraint")
+                constraint = models.CheckConstraint(check=check, name="constraint")
                 operation = migrations.CreateModel(
                     "Author",
                     fields=[
