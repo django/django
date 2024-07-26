@@ -226,7 +226,8 @@ Models
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new :meth:`.HttpRequest.get_preferred_type` method can be used to query
+  the preferred media type the client accepts.
 
 Security
 ~~~~~~~~
@@ -308,6 +309,9 @@ Miscellaneous
   the :meth:`~.EmailMultiAlternatives.attach_alternative` method.
 
 * The minimum supported version of ``gettext`` is increased from 0.15 to 0.19.
+
+* ``HttpRequest.accepted_types`` is now sorted by the client's preference, based
+  on the request's ``Accept`` header.
 
 .. _deprecated-features-5.2:
 
