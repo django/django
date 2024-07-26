@@ -425,7 +425,34 @@ Methods
     Returns ``True`` if the request is secure; that is, if it was made with
     HTTPS.
 
+.. method:: HttpRequest.get_preferred_format(formats)
+
+    Returns the most preferred mime type from ``formats`` which the client
+    accepts, according to the ``Accept`` header.
+
+    Assuming the client sends an ``Accept`` header of
+    ``text/html,application/json;q=0.8``:
+
+    .. code-block:: pycon
+
+        >>> request.get_preferred_format(["text/html", "application/json"])
+        "text/html"
+        >>> request.get_preferred_format(["application/json", "text/plain"])
+        "application/json"
+
+    See :ref:`content-negotiation-example` of using
+    ``accepts()`` to return different content to API consumers.
+
+    If a response varies depending on the content of the ``Accept`` header and
+    you are using some form of caching like Django's :mod:`cache middleware
+    <django.middleware.cache>`, you should decorate the view with
+    :func:`vary_on_headers('Accept')
+    <django.views.decorators.vary.vary_on_headers>` so that the responses are
+    properly cached.
+
 .. method:: HttpRequest.accepts(mime_type)
+
+    Returns ``True`` if the client
 
     Returns ``True`` if the request ``Accept`` header matches the ``mime_type``
     argument:
@@ -438,15 +465,7 @@ Methods
     Most browsers send ``Accept: */*`` by default, so this would return
     ``True`` for all content types. Setting an explicit ``Accept`` header in
     API requests can be useful for returning a different content type for those
-    consumers only. See :ref:`content-negotiation-example` of using
-    ``accepts()`` to return different content to API consumers.
-
-    If a response varies depending on the content of the ``Accept`` header and
-    you are using some form of caching like Django's :mod:`cache middleware
-    <django.middleware.cache>`, you should decorate the view with
-    :func:`vary_on_headers('Accept')
-    <django.views.decorators.vary.vary_on_headers>` so that the responses are
-    properly cached.
+    consumers only.
 
 .. method:: HttpRequest.read(size=None)
 .. method:: HttpRequest.readline()
