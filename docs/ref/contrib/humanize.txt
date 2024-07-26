@@ -58,7 +58,7 @@ e.g. with the ``'de'`` language:
 
 Inserts spaces inside numbers for better readability. The number of numbers
 between each space can be specified as a filter argument. Default is 3.
-Basically `intcomma` but with spaces.
+Basically ``intcomma`` but with spaces.
 
 Examples:
 
