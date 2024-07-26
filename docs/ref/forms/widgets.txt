@@ -558,6 +558,17 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
     * ``template_name``: ``'django/forms/widgets/url.html'``
     * Renders as: ``<input type="url" ...>``
 
+``ColorInput``
+~~~~~~~~~~~~~~
+
+.. versionadded:: 5.2
+
+.. class:: ColorInput
+
+    * ``input_type``: ``'color'``
+    * ``template_name``:``'django/forms/widgets/color.html'``
+    * Renders as: ``<input type='color' ...>``
+
 ``SearchInput``
 ~~~~~~~~~~~~~~~
 
