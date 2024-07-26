@@ -36,6 +36,47 @@ Issues under Django's security process
 All security issues have been handled under versions of Django's security
 process. These are listed below.
 
+July 9, 2024 - :cve:`2024-39614`
+--------------------------------
+
+Potential denial-of-service in
+``django.utils.translation.get_supported_language_variant()``.
+`Full description
+<https://www.djangoproject.com/weblog/2024/jul/09/security-releases/>`__
+
+* Django 5.0 :commit:`(patch) <8e7a44e4bec0f11474699c3111a5e0a45afe7f49>`
+* Django 4.2 :commit:`(patch) <17358fb35fb7217423d4c4877ccb6d1a3a40b1c3>`
+
+July 9, 2024 - :cve:`2024-39330`
+--------------------------------
+
+Potential directory-traversal in ``django.core.files.storage.Storage.save()``.
+`Full description
+<https://www.djangoproject.com/weblog/2024/jul/09/security-releases/>`__
+
+* Django 5.0 :commit:`(patch) <9f4f63e9ebb7bf6cb9547ee4e2526b9b96703270>`
+* Django 4.2 :commit:`(patch) <2b00edc0151a660d1eb86da4059904a0fc4e095e>`
+
+July 9, 2024 - :cve:`2024-39329`
+--------------------------------
+
+Username enumeration through timing difference for users with unusable
+passwords. `Full description
+<https://www.djangoproject.com/weblog/2024/jul/09/security-releases/>`__
+
+* Django 5.0 :commit:`(patch) <07cefdee4a9d1fcd9a3a631cbd07c78defd1923b>`
+* Django 4.2 :commit:`(patch) <156d3186c96e3ec2ca73b8b25dc2ef366e38df14>`
+
+July 9, 2024 - :cve:`2024-38875`
+--------------------------------
+
+Potential denial-of-service in ``django.utils.html.urlize()``.
+`Full description
+<https://www.djangoproject.com/weblog/2024/jul/09/security-releases/>`__
+
+* Django 5.0 :commit:`(patch) <7285644640f085f41d60ab0c8ae4e9153f0485db>`
+* Django 4.2 :commit:`(patch) <79f368764295df109a37192f6182fb6f361d85b5>`
+
 March 4, 2024 - :cve:`2024-27351`
 ---------------------------------
 

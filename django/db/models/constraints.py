@@ -8,7 +8,7 @@ from django.db import connections
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import Exists, ExpressionList, F, RawSQL
 from django.db.models.indexes import IndexExpression
-from django.db.models.lookups import Exact
+from django.db.models.lookups import Exact, IsNull
 from django.db.models.query_utils import Q
 from django.db.models.sql.query import Query
 from django.db.utils import DEFAULT_DB_ALIAS
@@ -642,30 +642,31 @@ class UniqueConstraint(BaseConstraint):
                     meta=model._meta, exclude=exclude
                 ).items()
             }
-            expressions = []
+            filters = []
             for expr in self.expressions:
                 if hasattr(expr, "get_expression_for_validation"):
                     expr = expr.get_expression_for_validation()
-                expressions.append(Exact(expr, expr.replace_expressions(replacements)))
-            queryset = queryset.filter(*expressions)
+                rhs = expr.replace_expressions(replacements)
+                condition = Exact(expr, rhs)
+                if self.nulls_distinct is False:
+                    condition = Q(condition) | Q(IsNull(expr, True), IsNull(rhs, True))
+                filters.append(condition)
+            queryset = queryset.filter(*filters)
         model_class_pk = instance._get_pk_val(model._meta)
         if not instance._state.adding and model_class_pk is not None:
             queryset = queryset.exclude(pk=model_class_pk)
         if not self.condition:
             if queryset.exists():
-                if self.expressions:
+                if self.fields:
+                    # When fields are defined, use the unique_error_message() for
+                    # backward compatibility.
                     raise ValidationError(
-                        self.get_violation_error_message(),
-                        code=self.violation_error_code,
+                        instance.unique_error_message(model, self.fields),
                     )
-                # When fields are defined, use the unique_error_message() for
-                # backward compatibility.
-                for model, constraints in instance.get_constraints():
-                    for constraint in constraints:
-                        if constraint is self:
-                            raise ValidationError(
-                                instance.unique_error_message(model, self.fields),
-                            )
+                raise ValidationError(
+                    self.get_violation_error_message(),
+                    code=self.violation_error_code,
+                )
         else:
             against = instance._get_field_value_map(meta=model._meta, exclude=exclude)
             try:

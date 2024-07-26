@@ -884,6 +884,11 @@ class F(Combinable):
     def __getitem__(self, subscript):
         return Sliced(self, subscript)
 
+    def __contains__(self, other):
+        # Disable old-style iteration protocol inherited from implementing
+        # __getitem__() to prevent this method from hanging.
+        raise TypeError(f"argument of type '{self.__class__.__name__}' is not iterable")
+
     def resolve_expression(
         self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False
     ):
@@ -1613,7 +1618,6 @@ class Case(SQLiteNumericMixin, Expression):
         template_params = {**self.extra, **extra_context}
         case_parts = []
         sql_params = []
-        default_sql, default_params = compiler.compile(self.default)
         for case in self.cases:
             try:
                 case_sql, case_params = compiler.compile(case)
@@ -1624,6 +1628,8 @@ class Case(SQLiteNumericMixin, Expression):
                 break
             case_parts.append(case_sql)
             sql_params.extend(case_params)
+        else:
+            default_sql, default_params = compiler.compile(self.default)
         if not case_parts:
             return default_sql, default_params
         case_joiner = case_joiner or self.case_joiner

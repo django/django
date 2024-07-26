@@ -58,6 +58,7 @@ from django.utils.translation.reloader import (
     translation_file_changed,
     watch_for_translation_changes,
 )
+from django.utils.translation.trans_real import LANGUAGE_CODE_MAX_LENGTH
 
 from .forms import CompanyForm, I18nForm, SelectDateForm
 from .models import Company, TestModel
@@ -1672,6 +1673,15 @@ class MiscTests(SimpleTestCase):
             g("xyz")
         with self.assertRaises(LookupError):
             g("xy-zz")
+        with self.assertRaises(LookupError):
+            g("x" * LANGUAGE_CODE_MAX_LENGTH)
+        with self.assertRaises(LookupError):
+            g("x" * (LANGUAGE_CODE_MAX_LENGTH + 1))
+        # 167 * 3 = 501 which is LANGUAGE_CODE_MAX_LENGTH + 1.
+        self.assertEqual(g("en-" * 167), "en")
+        with self.assertRaises(LookupError):
+            g("en-" * 167, strict=True)
+        self.assertEqual(g("en-" * 30000), "en")  # catastrophic test
 
     def test_get_supported_language_variant_null(self):
         g = trans_null.get_supported_language_variant
@@ -1723,6 +1733,7 @@ class MiscTests(SimpleTestCase):
             ("/i-mingo/", "i-mingo"),
             ("/kl-tunumiit/", "kl-tunumiit"),
             ("/nan-hani-tw/", "nan-hani-tw"),
+            (f"/{'a' * 501}/", None),
         ]
         for path, language in tests:
             with self.subTest(path=path):
@@ -1997,6 +2008,11 @@ class CountrySpecificLanguageTests(SimpleTestCase):
         )
         lang = get_language_from_request(request)
         self.assertEqual("bg", lang)
+
+    def test_get_language_from_request_code_too_long(self):
+        request = self.rf.get("/", headers={"accept-language": "a" * 501})
+        lang = get_language_from_request(request)
+        self.assertEqual("en-us", lang)
 
     def test_get_language_from_request_null(self):
         lang = trans_null.get_language_from_request(None)

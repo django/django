@@ -4,7 +4,6 @@ from datetime import datetime, timezone
 from urllib.parse import urljoin
 
 from django.conf import settings
-from django.core.exceptions import SuspiciousFileOperation
 from django.core.files import File, locks
 from django.core.files.move import file_move_safe
 from django.core.signals import setting_changed
@@ -192,14 +191,18 @@ class FileSystemStorage(Storage, StorageSettingsMixin):
             # concurrently.
             pass
 
-    def exists(self, name):
-        try:
-            exists = os.path.lexists(self.path(name))
-        except SuspiciousFileOperation:
-            raise
+    def is_name_available(self, name, max_length=None):
         if self._allow_overwrite:
-            return False
-        return exists
+            return not (max_length and len(name) > max_length)
+        return super().is_name_available(name, max_length=max_length)
+
+    def get_alternative_name(self, file_root, file_ext):
+        if self._allow_overwrite:
+            return f"{file_root}{file_ext}"
+        return super().get_alternative_name(file_root, file_ext)
+
+    def exists(self, name):
+        return os.path.lexists(self.path(name))
 
     def listdir(self, path):
         path = self.path(path)

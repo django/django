@@ -257,6 +257,24 @@ JavaScript contributions
 For information on JavaScript contributions, see the :ref:`javascript-patches`
 documentation.
 
+Optimization patches
+====================
+
+Patches aiming to deliver a performance improvement should provide benchmarks
+showing the before and after impact of the patch and sharing the commands for
+reviewers to reproduce.
+
+.. _django-asv-benchmarks:
+
+``django-asv`` benchmarks
+-------------------------
+
+`django-asv`_ monitors the performance of Django code over time. These
+benchmarks can be run on a pull request by labeling the pull request with
+``benchmark``. Adding to these benchmarks is highly encouraged.
+
+.. _django-asv: https://github.com/django/django-asv/
+
 .. _patch-review-checklist:
 
 Contribution checklist

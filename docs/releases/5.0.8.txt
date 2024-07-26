@@ -1,0 +1,25 @@
+==========================
+Django 5.0.8 release notes
+==========================
+
+*Expected August 6, 2024*
+
+Django 5.0.8 fixes several bugs in 5.0.7.
+
+Bugfixes
+========
+
+* Added missing validation for ``UniqueConstraint(nulls_distinct=False)`` when
+  using ``*expressions`` (:ticket:`35594`).
+
+* Fixed a regression in Django 5.0 where ``ModelAdmin.action_checkbox`` could
+  break the admin changelist HTML page when rendering a model instance with a
+  ``__html__`` method (:ticket:`35606`).
+
+* Fixed a crash when creating a model with a ``Field.db_default`` and a
+  ``Meta.constraints`` constraint composed of ``__endswith``, ``__startswith``,
+  or ``__contains`` lookups (:ticket:`35625`).
+
+* Fixed a regression in Django 5.0.7 that caused a crash in
+  ``LocaleMiddleware`` when processing a language code over 500 characters
+  (:ticket:`35627`).
