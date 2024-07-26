@@ -273,3 +273,56 @@ works with an API-based workflow as well as 'normal' form POSTs::
     class AuthorCreateView(JsonableResponseMixin, CreateView):
         model = Author
         fields = ["name"]
+
+The above example assumes that if the client supports ``text/html``, that they
+would prefer it. However, this may not always be true. When requesting a
+``.css`` file, many browsers will send the header
+``Accept: text/css,*/*;q=0.1``, indicating that they would prefer CSS, but
+anything else is fine. This means ``request.accepts("text/html") will be
+``True``.
+
+To determine the correct format, taking into consideration the client's
+preference, use :func:`django.http.HttpRequest.get_preferred_type`::
+
+    class JsonableResponseMixin:
+        """
+        Mixin to add JSON support to a form.
+        Must be used with an object-based FormView (e.g. CreateView).
+        """
+
+        accepted_media_types = ["text/html", "application/json"]
+
+        def dispatch(self, request, *args, **kwargs):
+            if request.get_preferred_type(self.accepted_media_types) is None:
+                # No format in common.
+                return HttpResponse(
+                    status_code=406, headers={"Accept": ",".join(self.accepted_media_types)}
+                )
+
+            return super().dispatch(request, *args, **kwargs)
+
+        def form_invalid(self, form):
+            response = super().form_invalid(form)
+            accepted_type = request.get_preferred_type(self.accepted_media_types)
+            if accepted_type == "text/html":
+                return response
+            elif accepted_type == "application/json":
+                return JsonResponse(form.errors, status=400)
+
+        def form_valid(self, form):
+            # We make sure to call the parent's form_valid() method because
+            # it might do some processing (in the case of CreateView, it will
+            # call form.save() for example).
+            response = super().form_valid(form)
+            accepted_type = request.get_preferred_type(self.accepted_media_types)
+            if accepted_type == "text/html":
+                return response
+            elif accepted_type == "application/json":
+                data = {
+                    "pk": self.object.pk,
+                }
+                return JsonResponse(data)
+
+.. versionchanged:: 5.2
+
+    The :meth:`.HttpRequest.get_preferred_type` method was added.
