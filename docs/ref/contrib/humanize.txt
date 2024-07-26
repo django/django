@@ -51,6 +51,23 @@ e.g. with the ``'de'`` language:
 * ``45000`` becomes ``'45.000'``.
 * ``450000`` becomes ``'450.000'``.
 
+.. templatefilter:: intspace
+
+``intspace``
+============
+
+Inserts spaces inside numbers for better readability. The number of numbers
+between each space can be specified as a filter argument. Default is 3.
+Basically intcomma but with spaces.
+
+Examples:
+
+* ``1234`` becomes ``1 234``.
+* ``1234.2`` becomes ``1 234.2``.
+* ``12345`` becomes ``12 345``.
+* ``123456`` becomes ``123 456``.
+* ``1234567`` becomes ``1 234 567``.
+
 .. templatefilter:: intword
 
 ``intword``

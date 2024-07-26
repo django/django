@@ -120,6 +120,43 @@ intword_converters = (
 )
 
 
+@register.filter(is_safe=True)
+def intspace(value, arg=3):
+    """
+    Inserts spaces inside numbers for better readability.
+
+    'value' is the number to format.
+    'arg' is the number of digits between each space.
+
+    Works as long as 'value' is a number.
+    """
+    try:
+        arg = int(arg)
+    except ValueError:
+        return value
+    if arg < 1:
+        return value
+    number_symbol = ""
+    original_value = str(value)
+    value = original_value.replace(" ", "")
+    value_is_a_number = re.search(r"^-?[\d０１２３４５６７８９]+\.?[\d０１２３４５６７８９]+$", original_value)
+    if value_is_a_number:
+        if value[0] == "-":
+            number_symbol = "-"
+            value = value.replace("-", "")
+        decimal_part = re.search(r"\.[\d０１２３４５６７８９]+$", value)
+        if decimal_part is not None:
+            decimal_part = decimal_part.group()
+            value = value.replace(decimal_part, "")
+        else:
+            decimal_part = ""
+        number_list = re.split(rf"(\d{{1,{arg}}})(?=(?:\d{{{arg}}})+$)", value)
+        formatted_number = " ".join(filter(lambda i: i != "", number_list))
+        formatted_number = f"{number_symbol}{formatted_number}{decimal_part}"
+        return formatted_number
+    return original_value
+
+
 @register.filter(is_safe=False)
 def intword(value):
     """
