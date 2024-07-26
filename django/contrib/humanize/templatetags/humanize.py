@@ -139,7 +139,9 @@ def intspace(value, arg=3):
     number_symbol = ""
     original_value = str(value)
     value = original_value.replace(" ", "")
-    value_is_a_number = re.search(r"^-?[\d０１２３４５６７８９]+\.?[\d０１２３４５６７８９]+$", original_value)
+    value_is_a_number = re.search(
+        r"^-?[\d０１２３４５６７８９]+\.?[\d０１２３４５６７８９]+$", original_value
+    )
     if value_is_a_number:
         if value[0] == "-":
             number_symbol = "-"
