@@ -115,10 +115,7 @@ class DeferRegressionTest(TestCase):
             list(SimpleItem.objects.annotate(Count("feature")).only("name")), list
         )
 
-    def test_deferred_model_inheritance(self):
-        """
-        select_related on fields pointing to subclasses works when using defer (#23270).
-        """
+    def test_defer_with_select_related_inherited_model(self):
         d = Derived.objects.create(text="foo", other_text="bar")
         with self.assertNumQueries(1):
             obj = Base.objects.select_related("derived").defer("text")[0]
