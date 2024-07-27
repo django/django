@@ -288,8 +288,11 @@ appropriate flags on the Trac ticket based on the results of your review:
 "Patch needs improvement", "Needs documentation", and/or "Needs tests". As time
 and interest permits, mergers do final reviews of "Ready for checkin" tickets
 and will either commit the changes or bump it back to "Accepted" if further
-work needs to be done. If you're looking to become a merger, doing thorough
-reviews of contributions is a great way to earn trust.
+work needs to be done.
+
+If you're looking to become a member of the `triage & review team
+<https://www.djangoproject.com/foundation/teams/#triage-review-team>`_, doing
+thorough reviews of contributions is a great way to earn trust.
 
 Looking for a patch to review? Check out the "Patches needing review" section
 of the `Django Development Dashboard <https://dashboard.djangoproject.com/>`_.
