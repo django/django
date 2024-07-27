@@ -483,10 +483,7 @@ class BasicExpressionsTests(TestCase):
         queryset = Employee.objects.filter(firstname__iexact=F("lastname"))
         self.assertSequenceEqual(queryset, [test])
 
-    def test_startswith_endswith_works_with_f_expression(self):
-        """
-        startswith endswith and contains works with F expression (#16731).
-        """
+    def test_filter_startswith_with_f_expression(self):
         Employee.objects.create(firstname="John", lastname="Doe")
         e2 = Employee.objects.create(firstname="Jack", lastname="Jackson")
         e3 = Employee.objects.create(firstname="Jack", lastname="jackson")
