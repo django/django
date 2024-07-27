@@ -1742,8 +1742,8 @@ class AggregationTests(TestCase):
 
     def test_q_object_immutability(self):
         """
-        Splitting a Q object for where/having
-        does not alter the original Q object (#11293).
+        Combining Q objects with the | operator does not alter the original Q
+        object (#11293).
         """
         q1 = Q(isbn="")
         q2 = Q(authors__count__gt=1)
