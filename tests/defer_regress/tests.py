@@ -115,15 +115,6 @@ class DeferRegressionTest(TestCase):
             list(SimpleItem.objects.annotate(Count("feature")).only("name")), list
         )
 
-    def test_defer_with_select_related_inherited_model(self):
-        d = Derived.objects.create(text="foo", other_text="bar")
-        with self.assertNumQueries(1):
-            obj = Base.objects.select_related("derived").defer("text")[0]
-            self.assertIsInstance(obj.derived, Derived)
-            self.assertEqual("bar", obj.derived.other_text)
-            self.assertNotIn("text", obj.__dict__)
-            self.assertEqual(d.pk, obj.derived.base_ptr_id)
-
     def test_only_and_defer_usage_on_proxy_models(self):
         # Regression for #15790 - only() broken for proxy models
         proxy = Proxy.objects.create(name="proxy", value=42)
@@ -190,6 +181,15 @@ class DeferRegressionTest(TestCase):
             self.assertEqual(i.one_to_one_item.name, "second")
         with self.assertNumQueries(1):
             self.assertEqual(i.value, 42)
+
+    def test_defer_with_select_related_inherited_model(self):
+        d = Derived.objects.create(text="foo", other_text="bar")
+        with self.assertNumQueries(1):
+            obj = Base.objects.select_related("derived").defer("text")[0]
+            self.assertIsInstance(obj.derived, Derived)
+            self.assertEqual("bar", obj.derived.other_text)
+            self.assertNotIn("text", obj.__dict__)
+            self.assertEqual(d.pk, obj.derived.base_ptr_id)
 
     def test_defer_with_select_related(self):
         item1 = Item.objects.create(name="first", value=47)

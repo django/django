@@ -2271,6 +2271,12 @@ class CommandTypes(AdminScriptTestCase):
             "('traceback', False), ('verbosity', 1)]",
         )
 
+    def test_manage_help_test(self):
+        """manage.py command does not raise an errors with 'help test' (#17477)."""
+        args = ["help", "test"]
+        out, err = self.run_manage(args)
+        self.assertNoOutput(err)
+
 
 class Discovery(SimpleTestCase):
     def test_precedence(self):
