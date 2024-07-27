@@ -491,9 +491,9 @@ class ModelTest(TestCase):
                 len(Article.objects.none().distinct("headline", "pub_date")), 0
             )
 
-    def test_emptyqs_values_list(self):
+    def test_get_self_not_recursing_infinitely(self):
         """
-        values_list() on an EmptyQuerySet returns an EmptyQuerySet (#20278).
+        Passing self to object query doesn't cause infinite recursion (#20278).
         """
         sr = SelfRef.objects.create()
         with self.assertRaises(ObjectDoesNotExist):
