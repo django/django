@@ -110,11 +110,6 @@ part of that. Here are some tips on how to make a request most effectively:
 If there's a consensus agreement on the feature, then it's appropriate to
 create a ticket. Include a link to the discussion in the ticket description.
 
-As with most open-source projects, code talks. If you are willing to write the
-code for the feature yourself or, even better, if you've already written it,
-it's much more likely to be accepted. Fork Django on GitHub, create a feature
-branch, and show us your work!
-
 See also: :ref:`documenting-new-features`.
 
 Requesting performance optimizations
