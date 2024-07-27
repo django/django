@@ -476,10 +476,7 @@ class BasicExpressionsTests(TestCase):
         with self.assertRaisesMessage(ValueError, msg):
             acme.save()
 
-    def test_lookups_with_f_has_valid_sql(self):
-        """
-        Query lookups that reference an F() expression produce valid sql (#11722).
-        """
+    def test_filter_lookups_with_f_expression(self):
         Employee.objects.create(firstname="John", lastname="Doe")
         test = Employee.objects.create(firstname="Test", lastname="test")
 
