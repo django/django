@@ -280,7 +280,7 @@ class ProxyDeleteTest(TestCase):
             Image.objects.values_list().delete()
 
 
-class DeletingUsingSubqueriesTests(TestCase):
+class DeleteUsingSubqueryTests(TestCase):
     """
     Test different queries which alter the SELECT clause of the query. We
     also must be using a subquery for the deletion (that is, the original
