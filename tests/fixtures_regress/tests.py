@@ -506,7 +506,7 @@ class TestFixtures(TestCase):
                 verbosity=0,
             )
 
-    def test_loaddata_m2m(self):
+    def test_loaddata_with_inherited_m2m(self):
         """
         loaddata on a model that inherits from a model with a M2M field (#20820).
         """
