@@ -310,10 +310,7 @@ class DeleteUsingSubqueryTests(TestCase):
         self.assertTrue(Login.objects.filter(pk=self.l2.pk).exists())
 
     @skipUnlessDBFeature("update_can_self_select")
-    def test_delete_subquery_for_extra(self):
-        """
-        Deletion using subqueries works for extra queries (#19102).
-        """
+    def test_extra(self):
         with self.assertNumQueries(1):
             Login.objects.order_by("description").filter(
                 orgunit__name__isnull=False
@@ -322,10 +319,7 @@ class DeleteUsingSubqueryTests(TestCase):
         self.assertTrue(Login.objects.filter(pk=self.l2.pk).exists())
 
     @skipUnlessDBFeature("update_can_self_select")
-    def test_delete_subquery_for_related(self):
-        """
-        Deletion using subqueries works for related queries (#19102).
-        """
+    def test_select_related(self):
         with self.assertNumQueries(1):
             Login.objects.filter(pk=self.l1.pk).filter(
                 orgunit__name__isnull=False
@@ -334,10 +328,7 @@ class DeleteUsingSubqueryTests(TestCase):
         self.assertTrue(Login.objects.filter(pk=self.l2.pk).exists())
 
     @skipUnlessDBFeature("update_can_self_select")
-    def test_delete_subquery_for_defer(self):
-        """
-        Deletion using subqueries works for defer queries (#19102).
-        """
+    def test_defer(self):
         with self.assertNumQueries(1):
             Login.objects.filter(pk=self.l1.pk).filter(
                 orgunit__name__isnull=False
