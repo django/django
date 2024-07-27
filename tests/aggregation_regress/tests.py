@@ -1912,12 +1912,25 @@ class AggregationTests(TestCase):
             [{"num_recipes": 1}, {"num_recipes": 1}],
         )
 
+    def test_aggregate_self_referential_fk(self):
+        """
+        Self-referential FKs work with aggregation. (#24748)
+        """
+        t1 = SelfRefFK.objects.create(name="t1")
+        SelfRefFK.objects.create(name="t2", parent=t1)
+        SelfRefFK.objects.create(name="t3", parent=t1)
+        self.assertQuerySetEqual(
+            SelfRefFK.objects.annotate(num_children=Count("children")).order_by("name"),
+            [("t1", 2), ("t2", 0), ("t3", 0)],
+            lambda x: (x.name, x.num_children),
+        )
+
 
 class JoinPromotionTests(TestCase):
     def test_select_related_with_annotation(self):
         """
-        Select_related with annotation returns the correct results
-        and maintains related objects (#21150).
+        Select_related with annotation maintains related objects
+        (#21150).
         """
         b = Bravo.objects.create()
         c = Charlie.objects.create(bravo=b)
@@ -1951,18 +1964,3 @@ class JoinPromotionTests(TestCase):
     def test_non_nullable_fk_not_promoted(self):
         qs = Book.objects.annotate(Count("contact__name"))
         self.assertIn(" INNER JOIN ", str(qs.query))
-
-
-class SelfReferentialFKTests(TestCase):
-    def test_self_referential_fk_aggregate(self):
-        """
-        Self-referential FKs work with aggregation. (#24748)
-        """
-        t1 = SelfRefFK.objects.create(name="t1")
-        SelfRefFK.objects.create(name="t2", parent=t1)
-        SelfRefFK.objects.create(name="t3", parent=t1)
-        self.assertQuerySetEqual(
-            SelfRefFK.objects.annotate(num_children=Count("children")).order_by("name"),
-            [("t1", 2), ("t2", 0), ("t3", 0)],
-            lambda x: (x.name, x.num_children),
-        )
