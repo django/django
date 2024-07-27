@@ -299,10 +299,7 @@ class DeleteUsingSubqueryTests(TestCase):
         cls.l2 = Login.objects.create(description="l2", orgunit=cls.o2)
 
     @skipUnlessDBFeature("update_can_self_select")
-    def test_delete_subquery_for_annotated(self):
-        """
-        Deletion using subqueries works for annotated queries (#19102).
-        """
+    def test_annotate(self):
         with self.assertNumQueries(1):
             Login.objects.order_by("description").filter(
                 orgunit__name__isnull=False
