@@ -1021,7 +1021,7 @@ class AggregateTestCase(TestCase):
         vals = qs.aggregate(average_top3_rating=Avg("rating"))["average_top3_rating"]
         self.assertAlmostEqual(vals, 4.5, places=2)
 
-    def test_subqueries_not_containing_order_by(self):
+    def test_aggregation_not_containing_unneeded_sql(self):
         """
         Subqueries do not needlessly contain ORDER BY, SELECT FOR UPDATE or
         select_related() stuff (#11881).
