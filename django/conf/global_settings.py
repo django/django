@@ -189,16 +189,18 @@ DATABASE_ROUTERS = []
 EMAIL_PROVIDERS = {
     "default": {
         "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
-        "HOST": "localhost",
-        "PORT": 25,
+        "OPTIONS": {
+            "host": "localhost",
+            "port": 25,
+            "username": "",
+            "password": "",
+            "use_tls": False,
+            "use_ssl": False,
+            "ssl_certfile": None,
+            "ssl_keyfile": None,
+            "timeout": None,
+        },
         "USE_LOCALTIME": False,
-        "HOST_USER": "",
-        "HOST_PASSWORD": "",
-        "USE_TLS": False,
-        "USE_SSL": False,
-        "SSL_CERTFILE": None,
-        "SSL_KEYFILE": None,
-        # "TIMEOUT": None,
     },
 }
 
@@ -224,11 +226,11 @@ dep_EMAIL_USE_LOCALTIME = False
 # Optional SMTP authentication information for EMAIL_HOST.
 dep_EMAIL_HOST_USER = ""
 dep_EMAIL_HOST_PASSWORD = ""
-EMAIL_USE_TLS = False
-EMAIL_USE_SSL = False
-EMAIL_SSL_CERTFILE = None
-EMAIL_SSL_KEYFILE = None
-EMAIL_TIMEOUT = None
+dep_EMAIL_USE_TLS = False
+dep_EMAIL_USE_SSL = False
+dep_EMAIL_SSL_CERTFILE = None
+dep_EMAIL_SSL_KEYFILE = None
+dep_EMAIL_TIMEOUT = None
 
 # List of strings representing installed apps.
 INSTALLED_APPS = []
