@@ -144,9 +144,9 @@ def setup_test_environment(debug=None):
     settings.DEBUG = debug
 
     saved_data.email_backend = settings.EMAIL_PROVIDERS["default"]["BACKEND"]
-    settings.EMAIL_PROVIDERS["default"]["BACKEND"] = (
-        "django.core.mail.backends.locmem.EmailBackend"
-    )
+    settings.EMAIL_PROVIDERS["default"][
+        "BACKEND"
+    ] = "django.core.mail.backends.locmem.EmailBackend"
 
     saved_data.template_render = Template._render
     Template._render = instrumented_test_render

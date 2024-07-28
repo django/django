@@ -29,6 +29,7 @@ from django.core.mail.backends import console, dummy, filebased, locmem, smtp
 from django.core.mail.message import BadHeaderError, sanitize_address
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import requires_tz_support
+from django.utils.deprecation import RemovedInDjango61Warning
 from django.utils.translation import gettext_lazy
 
 try:
@@ -62,6 +63,11 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
     """
     Non-backend specific tests.
     """
+
+    connection_deprecation_message = (
+        "The connection argument is deprecated and will be removed in Django 6.2. "
+        "Please use provider with an appropriate configuration instead."
+    )
 
     def get_decoded_attachments(self, django_message):
         """
@@ -858,6 +864,52 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             )
         self.assertIsInstance(mail.get_connection(), locmem.EmailBackend)
 
+    @override_settings(
+        EMAIL_PROVIDERS={
+            "alternative": dict(
+                settings.EMAIL_PROVIDERS["default"],
+                BACKEND="django.core.mail.backends.locmem.EmailBackend",
+            ),
+        },
+        ADMINS=[("nobody", "nobody@example.com")],
+        MANAGERS=[("nobody", "nobody@example.com")],
+    )
+    def test_provider_arg(self):
+        """Test provider argument to send_mail(), et. al."""
+        mail.outbox = []
+
+        # Send using non-default connection
+        send_mail(
+            "Subject",
+            "Content",
+            "from@example.com",
+            ["to@example.com"],
+            provider="alternative",
+        )
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].subject, "Subject")
+
+        mail.outbox = []
+        send_mass_mail(
+            [
+                ("Subject1", "Content1", "from1@example.com", ["to1@example.com"]),
+                ("Subject2", "Content2", "from2@example.com", ["to2@example.com"]),
+            ],
+            provider="alternative",
+        )
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual(mail.outbox[0].subject, "Subject1")
+        self.assertEqual(mail.outbox[1].subject, "Subject2")
+
+        mail.outbox = []
+        mail_admins("Admin message", "Content", provider="alternative")
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].subject, "[Django] Admin message")
+
+        mail.outbox = []
+        mail_managers("Manager message", "Content", provider="alternative")
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].subject, "[Django] Manager message")
 
     @override_settings(
         EMAIL_PROVIDERS={
@@ -875,29 +927,36 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
 
         # Send using non-default connection
         connection = mail.get_connection("mail.custombackend.EmailBackend")
-        send_mail(
-            "Subject",
-            "Content",
-            "from@example.com",
-            ["to@example.com"],
-            connection=connection,
-        )
-        self.assertEqual(mail.outbox, [])
-        self.assertEqual(len(connection.test_outbox), 1)
-        self.assertEqual(connection.test_outbox[0].subject, "Subject")
+        with self.assertRaisesMessage(
+            RemovedInDjango61Warning, self.connection_deprecation_message
+        ):
+            send_mail(
+                "Subject",
+                "Content",
+                "from@example.com",
+                ["to@example.com"],
+                connection=connection,
+            )
+            self.assertEqual(mail.outbox, [])
+            self.assertEqual(len(connection.test_outbox), 1)
+            self.assertEqual(connection.test_outbox[0].subject, "Subject")
 
         connection = mail.get_connection("mail.custombackend.EmailBackend")
-        send_mass_mail(
-            [
-                ("Subject1", "Content1", "from1@example.com", ["to1@example.com"]),
-                ("Subject2", "Content2", "from2@example.com", ["to2@example.com"]),
-            ],
-            connection=connection,
-        )
-        self.assertEqual(mail.outbox, [])
-        self.assertEqual(len(connection.test_outbox), 2)
-        self.assertEqual(connection.test_outbox[0].subject, "Subject1")
-        self.assertEqual(connection.test_outbox[1].subject, "Subject2")
+        with self.assertRaisesMessage(
+            RemovedInDjango61Warning,
+            self.connection_deprecation_message
+        ):
+            send_mass_mail(
+                [
+                    ("Subject1", "Content1", "from1@example.com", ["to1@example.com"]),
+                    ("Subject2", "Content2", "from2@example.com", ["to2@example.com"]),
+                ],
+                connection=connection,
+            )
+            self.assertEqual(mail.outbox, [])
+            self.assertEqual(len(connection.test_outbox), 2)
+            self.assertEqual(connection.test_outbox[0].subject, "Subject1")
+            self.assertEqual(connection.test_outbox[1].subject, "Subject2")
 
         connection = mail.get_connection("mail.custombackend.EmailBackend")
         mail_admins("Admin message", "Content", connection=connection)
@@ -910,6 +969,66 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         self.assertEqual(mail.outbox, [])
         self.assertEqual(len(connection.test_outbox), 1)
         self.assertEqual(connection.test_outbox[0].subject, "[Django] Manager message")
+
+    def test_provider_and_connection_are_mutually_exclusive(self):
+        connection = mail.get_connection("mail.custombackend.EmailBackend")
+        with self.assertRaisesMessage(
+            ValueError,
+            "provider and connection/auth_user/auth_password are mutually "
+            "exclusive, so only use either of those arguments.",
+        ):
+            send_mail(
+                "Subject",
+                "Content",
+                "from@example.com",
+                ["to@example.com"],
+                provider="default",
+                connection=connection,
+            )
+
+        with self.assertRaisesMessage(
+            ValueError,
+            "provider and connection/auth_user/auth_password are mutually "
+            "exclusive, so only use either of those arguments.",
+        ):
+            send_mail(
+                "Subject",
+                "Content",
+                "from@example.com",
+                ["to@example.com"],
+                provider="default",
+                auth_user="not empty username",
+                auth_password="not empty password",
+            )
+
+        with self.assertRaisesMessage(
+            ValueError,
+            "provider and connection/auth_user/auth_password are mutually "
+            "exclusive, so only use either of those arguments."
+        ):
+            send_mass_mail(
+                [
+                    ("Subject1", "Content1", "from1@example.com", ["to1@example.com"]),
+                    ("Subject2", "Content2", "from2@example.com", ["to2@example.com"]),
+                ],
+                provider="default",
+                connection=connection,
+            )
+
+        with self.assertRaisesMessage(
+            ValueError,
+            "provider and connection/auth_user/auth_password are mutually "
+            "exclusive, so only use either of those arguments.",
+        ):
+            send_mass_mail(
+                [
+                    ("Subject1", "Content1", "from1@example.com", ["to1@example.com"]),
+                    ("Subject2", "Content2", "from2@example.com", ["to2@example.com"]),
+                ],
+                provider="default",
+                auth_user="not empty username",
+                auth_password="not empty password",
+            )
 
     def test_dont_mangle_from_in_body(self):
         # Regression for #13433 - Make sure that EmailMessage doesn't mangle
@@ -1223,13 +1342,14 @@ class MailTimeZoneTests(SimpleTestCase):
     )
     def test_date_header_localtime(self):
         """
-        EMAIL_PROVIDERS[...]["USE_LOCALTIME"]=True creates a datetime in the local time zone.
+        EMAIL_PROVIDERS[...]["USE_LOCALTIME"]=True creates a datetime in the
+        local time zone.
         """
         email = EmailMessage(
             "Subject", "Body", "bounce@example.com", ["to@example.com"]
         )
         self.assertTrue(
-            email.message()["Date"].endswith("+0100")
+            email.message(use_localtime=True)["Date"].endswith("+0100")
         )  # Africa/Algiers is UTC+1
 
 
@@ -1266,12 +1386,16 @@ class BaseEmailBackendTests(HeadersCheckMixin):
 
     @classmethod
     def setUpClass(cls):
-        cls.enterClassContext(override_settings(EMAIL_PROVIDERS={
-            "default": dict(
-                settings.EMAIL_PROVIDERS["default"],
-                BACKEND=cls.email_backend,
-            ),
-        }))
+        cls.enterClassContext(
+            override_settings(
+                EMAIL_PROVIDERS={
+                    "default": dict(
+                        settings.EMAIL_PROVIDERS["default"],
+                        BACKEND=cls.email_backend,
+                    ),
+                }
+            )
+        )
         super().setUpClass()
 
     def assertStartsWith(self, first, second):
@@ -1762,26 +1886,31 @@ class ConsoleBackendTests(BaseEmailBackendTests, SimpleTestCase):
         connection = mail.get_connection(
             "django.core.mail.backends.console.EmailBackend", stream=s
         )
-        send_mail(
-            "Subject",
-            "Content",
-            "from@example.com",
-            ["to@example.com"],
-            connection=connection,
+        msg = (
+            "The connection argument is deprecated and will be removed in Django 6.2. "
+            "Please use provider with an appropriate configuration instead."
         )
-        message = s.getvalue().split("\n" + ("-" * 79) + "\n")[0].encode()
-        self.assertMessageHasHeaders(
-            message,
-            {
-                ("MIME-Version", "1.0"),
-                ("Content-Type", 'text/plain; charset="utf-8"'),
-                ("Content-Transfer-Encoding", "7bit"),
-                ("Subject", "Subject"),
-                ("From", "from@example.com"),
-                ("To", "to@example.com"),
-            },
-        )
-        self.assertIn(b"\nDate: ", message)
+        with self.assertRaisesMessage(RemovedInDjango61Warning, msg):
+            send_mail(
+                "Subject",
+                "Content",
+                "from@example.com",
+                ["to@example.com"],
+                connection=connection,
+            )
+            message = s.getvalue().split("\n" + ("-" * 79) + "\n")[0].encode()
+            self.assertMessageHasHeaders(
+                message,
+                {
+                    ("MIME-Version", "1.0"),
+                    ("Content-Type", 'text/plain; charset="utf-8"'),
+                    ("Content-Transfer-Encoding", "7bit"),
+                    ("Subject", "Subject"),
+                    ("From", "from@example.com"),
+                    ("To", "to@example.com"),
+                },
+            )
+            self.assertIn(b"\nDate: ", message)
 
 
 class SMTPHandler:
@@ -1831,8 +1960,11 @@ class SMTPBackendTestsBase(SimpleTestCase):
                 "default": dict(
                     settings.EMAIL_PROVIDERS["default"],
                     BACKEND="django.core.mail.backends.smtp.EmailBackend",
-                    HOST=cls.smtp_controller.hostname,
-                    PORT=cls.smtp_controller.port,
+                    OPTIONS=dict(
+                        settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
+                        host=cls.smtp_controller.hostname,
+                        port=cls.smtp_controller.port,
+                    ),
                 ),
             }
         )
@@ -1865,13 +1997,16 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         EMAIL_PROVIDERS={
             "default": dict(
                 settings.EMAIL_PROVIDERS["default"],
-                HOST_USER="not empty username",
-                HOST_PASSWORD="not empty password",
+                OPTIONS=dict(
+                    settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
+                    username="not empty username",
+                    password="not empty password",
+                ),
             ),
         }
     )
     def test_email_authentication_use_settings(self):
-        backend = smtp.EmailBackend()
+        backend = smtp.EmailBackend(**settings.EMAIL_PROVIDERS["default"]["OPTIONS"])
         self.assertEqual(backend.username, "not empty username")
         self.assertEqual(backend.password, "not empty password")
 
@@ -1879,8 +2014,11 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         EMAIL_PROVIDERS={
             "default": dict(
                 settings.EMAIL_PROVIDERS["default"],
-                HOST_USER="not empty username",
-                HOST_PASSWORD="not empty password",
+                OPTIONS=dict(
+                    settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
+                    user="not empty username",
+                    password="not empty password",
+                ),
             ),
         }
     )
@@ -1893,8 +2031,11 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         EMAIL_PROVIDERS={
             "default": dict(
                 settings.EMAIL_PROVIDERS["default"],
-                HOST_USER="not empty username",
-                HOST_PASSWORD="not empty password",
+                OPTIONS=dict(
+                    settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
+                    user="not empty username",
+                    password="not empty password",
+                ),
             ),
         }
     )
@@ -1909,7 +2050,11 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         to authenticate against the SMTP server.
         """
         backend = smtp.EmailBackend(
-            username="not empty username", password="not empty password"
+            **dict(
+                settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
+                username="not empty username",
+                password="not empty password",
+            )
         )
         with self.assertRaisesMessage(
             SMTPException, "SMTP AUTH extension not supported by server."
@@ -1934,21 +2079,38 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         self.assertIs(backend.open(), False)
 
     @override_settings(
-        EMAIL_USE_TLS=True,
         EMAIL_PROVIDERS={
             "default": dict(
                 settings.EMAIL_PROVIDERS["default"],
-                USE_TLS=True,
+                OPTIONS=dict(
+                    settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
+                    use_tls=True,
+                ),
             ),
         }
     )
     def test_email_tls_use_settings(self):
-        backend = smtp.EmailBackend()
+        backend = smtp.EmailBackend(**settings.EMAIL_PROVIDERS["default"]["OPTIONS"])
         self.assertTrue(backend.use_tls)
 
-    @override_settings(EMAIL_USE_TLS=True)
+    @override_settings(
+        EMAIL_PROVIDERS={
+            "default": dict(
+                settings.EMAIL_PROVIDERS["default"],
+                OPTIONS=dict(
+                    settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
+                    use_tls=True,
+                ),
+            ),
+        }
+    )
     def test_email_tls_override_settings(self):
-        backend = smtp.EmailBackend(use_tls=False)
+        backend = smtp.EmailBackend(
+            **dict(
+                settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
+                use_tls=False,
+            )
+        )
         self.assertFalse(backend.use_tls)
 
     def test_email_tls_default_disabled(self):
@@ -1957,31 +2119,35 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
 
     def test_ssl_tls_mutually_exclusive(self):
         msg = (
-            "EMAIL_USE_TLS/EMAIL_USE_SSL are mutually exclusive, so only set "
+            "use_tls/use_ssl are mutually exclusive, so only set "
             "one of those settings to True."
         )
         with self.assertRaisesMessage(ValueError, msg):
             smtp.EmailBackend(use_ssl=True, use_tls=True)
 
     @override_settings(
-        EMAIL_USE_SSL=True,
         EMAIL_PROVIDERS={
             "default": dict(
                 settings.EMAIL_PROVIDERS["default"],
-                USE_SSL=True,
+                OPTIONS=dict(
+                    settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
+                    use_ssl=True,
+                ),
             )
         }
     )
     def test_email_ssl_use_settings(self):
-        backend = smtp.EmailBackend()
+        backend = smtp.EmailBackend(**settings.EMAIL_PROVIDERS["default"]["OPTIONS"])
         self.assertTrue(backend.use_ssl)
 
     @override_settings(
-        EMAIL_USE_SSL=True,
         EMAIL_PROVIDERS={
             "default": dict(
                 settings.EMAIL_PROVIDERS["default"],
-                USE_SSL=True,
+                OPTIONS=dict(
+                    settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
+                    use_ssl=True,
+                ),
             )
         }
     )
@@ -1994,24 +2160,28 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         self.assertFalse(backend.use_ssl)
 
     @override_settings(
-        EMAIL_SSL_CERTFILE="foo",
         EMAIL_PROVIDERS={
             "default": dict(
                 settings.EMAIL_PROVIDERS["default"],
-                SSL_CERTFILE="foo",
+                OPTIONS=dict(
+                    settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
+                    ssl_certfile="foo",
+                ),
             ),
         }
     )
     def test_email_ssl_certfile_use_settings(self):
-        backend = smtp.EmailBackend()
+        backend = smtp.EmailBackend(**settings.EMAIL_PROVIDERS["default"]["OPTIONS"])
         self.assertEqual(backend.ssl_certfile, "foo")
 
     @override_settings(
-        EMAIL_SSL_CERTFILE="foo",
         EMAIL_PROVIDERS={
             "default": dict(
                 settings.EMAIL_PROVIDERS["default"],
-                SSL_CERTFILE="foo",
+                OPTIONS=dict(
+                    settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
+                    ssl_certfile="foo",
+                ),
             ),
         }
     )
@@ -2024,19 +2194,31 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         self.assertIsNone(backend.ssl_certfile)
 
     @override_settings(
-        EMAIL_SSL_KEYFILE="foo",
         EMAIL_PROVIDERS={
             "default": dict(
                 settings.EMAIL_PROVIDERS["default"],
-                SSL_KEYFILE="foo",
+                OPTIONS=dict(
+                    settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
+                    ssl_keyfile="foo",
+                ),
             )
         }
     )
     def test_email_ssl_keyfile_use_settings(self):
-        backend = smtp.EmailBackend()
+        backend = smtp.EmailBackend(**settings.EMAIL_PROVIDERS["default"]["OPTIONS"])
         self.assertEqual(backend.ssl_keyfile, "foo")
 
-    @override_settings(EMAIL_SSL_KEYFILE="foo")
+    @override_settings(
+        EMAIL_PROVIDERS={
+            "default": dict(
+                settings.EMAIL_PROVIDERS["default"],
+                OPTIONS=dict(
+                    settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
+                    ssl_keyfile="foo",
+                ),
+            )
+        }
+    )
     def test_email_ssl_keyfile_override_settings(self):
         backend = smtp.EmailBackend(ssl_keyfile="bar")
         self.assertEqual(backend.ssl_keyfile, "bar")
@@ -2046,16 +2228,23 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         self.assertIsNone(backend.ssl_keyfile)
 
     @override_settings(
-        EMAIL_USE_TLS=True,
-        # EMAIL_PROVIDERS={
-        #     "default": dict(
-        #         settings.EMAIL_PROVIDERS["default"],
-        #         USE_TLS=True,
-        #     ),
-        # }
+        EMAIL_PROVIDERS={
+            "default": dict(
+                settings.EMAIL_PROVIDERS["default"],
+                OPTIONS=dict(
+                    settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
+                    use_tls=True,
+                ),
+            ),
+        }
     )
     def test_email_tls_attempts_starttls(self):
-        backend = smtp.EmailBackend()
+        backend = smtp.EmailBackend(
+            **dict(
+                settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
+                port=self.smtp_controller.port,
+            )
+        )
         self.assertTrue(backend.use_tls)
         with self.assertRaisesMessage(
             SMTPException, "STARTTLS extension not supported by server."
@@ -2064,16 +2253,23 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
                 pass
 
     @override_settings(
-        EMAIL_USE_SSL=True,
         EMAIL_PROVIDERS={
             "default": dict(
                 settings.EMAIL_PROVIDERS["default"],
-                USE_SSL=True,
+                OPTIONS=dict(
+                    settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
+                    use_ssl=True,
+                ),
             ),
         }
     )
     def test_email_ssl_attempts_ssl_connection(self):
-        backend = smtp.EmailBackend()
+        backend = smtp.EmailBackend(
+            **dict(
+                settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
+                port=self.smtp_controller.port,
+            )
+        )
         self.assertTrue(backend.use_ssl)
         with self.assertRaises(SSLError):
             with backend:
@@ -2098,9 +2294,19 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         self.assertEqual(myemailbackend.connection.timeout, 42)
         myemailbackend.close()
 
-    @override_settings(EMAIL_TIMEOUT=10)
+    @override_settings(
+        EMAIL_PROVIDERS={
+            "default": dict(
+                settings.EMAIL_PROVIDERS["default"],
+                OPTIONS=dict(
+                    settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
+                    timeout=10,
+                ),
+            ),
+        }
+    )
     def test_email_timeout_override_settings(self):
-        backend = smtp.EmailBackend()
+        backend = smtp.EmailBackend(**settings.EMAIL_PROVIDERS["default"]["OPTIONS"])
         self.assertEqual(backend.timeout, 10)
 
     def test_email_msg_uses_crlf(self):
@@ -2172,7 +2378,9 @@ class SMTPBackendStoppedServerTests(SMTPBackendTestsBase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.backend = smtp.EmailBackend(username="", password="")
+        cls.backend = smtp.EmailBackend(
+            **settings.EMAIL_PROVIDERS["default"]["OPTIONS"]
+        )
         cls.smtp_controller.stop()
 
     @classmethod
