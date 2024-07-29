@@ -155,7 +155,7 @@ the time zone of their primary audience or UTC.
 :func:`zoneinfo.available_timezones` provides a set of available timezones that
 you can use to build a map from likely locations to time zones.
 
-Here's an example that stores the current timezone in the session. (It skips
+Here's an example that stores the current timezone in cookies. (It skips
 error handling entirely for the sake of simplicity.)
 
 Add the following middleware to :setting:`MIDDLEWARE`::
@@ -170,7 +170,7 @@ Add the following middleware to :setting:`MIDDLEWARE`::
             self.get_response = get_response
 
         def __call__(self, request):
-            tzname = request.session.get("django_timezone")
+            tzname = request.COOKIES.get("django_timezone")
             if tzname:
                 timezone.activate(zoneinfo.ZoneInfo(tzname))
             else:
@@ -190,11 +190,11 @@ Create a view that can set the current timezone::
 
 
     def set_timezone(request):
+        response = render(request, "template.html", {"timezones": common_timezones})
         if request.method == "POST":
-            request.session["django_timezone"] = request.POST["timezone"]
-            return redirect("/")
-        else:
-            return render(request, "template.html", {"timezones": common_timezones})
+            tzname = request.POST["timezone"]
+            response.set_cookie("django_timezone", tzname)
+        return response
 
 Include a form in ``template.html`` that will ``POST`` to this view:
 
