@@ -83,9 +83,11 @@ def fetch_since(date_since, verbose=True, dry_run=True):
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("-v", "--verbose", action="store_true")
-    parser.add_argument("--dry_run", action="store_true")
+    parser.add_argument("--dry-run", dest="dry_run", action="store_true")
     parser.add_argument(
-        "date_since",
+        "-d",
+        "--date-since",
+        dest="date_since",
         metavar="YYYY-MM-DD",
         type=datetime.fromisoformat,
         help="Fetch new translations since this date (ISO format YYYY-MM-DD).",

@@ -20,6 +20,7 @@
 
 import os
 from argparse import ArgumentParser
+from datetime import datetime
 from subprocess import run
 
 import django
@@ -201,6 +202,58 @@ def fetch(resources=None, languages=None):
         exit(1)
 
 
+def add_common_arguments(parser):
+    parser.add_argument(
+        "-r",
+        "--resources",
+        action="append",
+        help="limit operation to the specified resources",
+    )
+    parser.add_argument(
+        "-l",
+        "--languages",
+        action="append",
+        help="limit operation to the specified languages",
+    )
+
+
+if __name__ == "__main__":
+    parser = ArgumentParser()
+
+    subparsers = parser.add_subparsers(
+        dest="cmd", help="choose the operation to perform"
+    )
+
+    parser_update = subparsers.add_parser(
+        "update_catalogs",
+        help="update English django.po files with new/updated translatable strings",
+    )
+    add_common_arguments(parser_update)
+
+    parser_stats = subparsers.add_parser(
+        "lang_stats",
+        help="print the approximate number of changed/added strings in the en catalog",
+    )
+    add_common_arguments(parser_stats)
+
+    parser_fetch = subparsers.add_parser(
+        "fetch",
+        help="fetch translations from Transifex, wrap long lines, generate mo files",
+    )
+    add_common_arguments(parser_fetch)
+    parser_fetch.add_argument("-v", "--verbose", action="store_true")
+    parser_fetch.add_argument(
+        "-d",
+        "--date-since",
+        dest="date_since",
+        metavar="YYYY-MM-DD",
+        type=datetime.fromisoformat,
+        help="fetch new translations since this date (ISO format YYYY-MM-DD).",
+    )
+    parser_fetch.add_argument("--dry-run", dest="dry_run", action="store_true")
+    options = parser.parse_args()
+    print(f"\n\n\n========== {options=}")
+
 if __name__ == "__main__":
     RUNABLE_SCRIPTS = ("update_catalogs", "lang_stats", "fetch")
 
@@ -218,6 +271,7 @@ if __name__ == "__main__":
         action="append",
         help="limit operation to the specified languages",
     )
-    options = parser.parse_args()
+    options = parser.parse_args().__dict__
 
-    eval(options.cmd[0])(options.resources, options.languages)
+    cmd = options.pop("cmd")
+    eval(cmd[0])(**options)
