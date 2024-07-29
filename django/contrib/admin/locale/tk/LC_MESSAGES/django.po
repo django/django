@@ -2,6 +2,7 @@
 #
 # Translators:
 # Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2022
+# Natalia, 2024
 # Resul <resulsaparov@gmail.com>, 2024
 # Rovshen Tagangylyjov, 2024
 # Welbeck Garli <welbeckgrlyw@gmail.com>, 2022
@@ -11,7 +12,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-22 11:46-0300\n"
 "PO-Revision-Date: 2013-04-25 07:05+0000\n"
-"Last-Translator: Rovshen Tagangylyjov, 2024\n"
+"Last-Translator: Natalia, 2024\n"
 "Language-Team: Turkmen (http://app.transifex.com/django/django/language/"
 "tk/)\n"
 "MIME-Version: 1.0\n"
@@ -151,7 +152,7 @@ msgstr "GirişHabarnamasy Obýekty"
 
 #, python-brace-format
 msgid "Added {name} “{object}”."
-msgstr "Goşuldy {at} \"{obýekt}\"."
+msgstr "Goşuldy {at} “{object}”."
 
 msgid "Added."
 msgstr "Goşuldy."
