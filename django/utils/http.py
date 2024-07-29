@@ -3,8 +3,9 @@ import re
 import unicodedata
 from binascii import Error as BinasciiError
 from datetime import UTC, datetime
-from email.utils import formatdate
-from urllib.parse import quote, unquote
+from email.message import Message
+from email.utils import collapse_rfc2231_value, formatdate
+from urllib.parse import quote
 from urllib.parse import urlencode as original_urlencode
 from urllib.parse import urlsplit
 
@@ -24,6 +25,7 @@ ETAG_MATCH = _lazy_re_compile(
     re.X,
 )
 
+MAX_HEADER_LENGTH = 10_000
 MONTHS = "jan feb mar apr may jun jul aug sep oct nov dec".split()
 __D = r"(?P<day>[0-9]{2})"
 __D2 = r"(?P<day>[ 0-9][0-9])"
@@ -310,46 +312,28 @@ def escape_leading_slashes(url):
     return url
 
 
-def _parseparam(s):
-    while s[:1] == ";":
-        s = s[1:]
-        end = s.find(";")
-        while end > 0 and (s.count('"', 0, end) - s.count('\\"', 0, end)) % 2:
-            end = s.find(";", end + 1)
-        if end < 0:
-            end = len(s)
-        f = s[:end]
-        yield f.strip()
-        s = s[end:]
-
-
-def parse_header_parameters(line):
+def parse_header_parameters(line, max_length=MAX_HEADER_LENGTH):
     """
     Parse a Content-type like header.
     Return the main content-type and a dictionary of options.
+
+    If `line` is longer than `max_length`, `ValueError` is raised.
     """
-    parts = _parseparam(";" + line)
-    key = parts.__next__().lower()
+    if max_length is not None and line and len(line) > max_length:
+        raise ValueError("Unable to parse header parameters (value too long).")
+
+    m = Message()
+    m["content-type"] = line
+    params = m.get_params()
+
     pdict = {}
-    for p in parts:
-        i = p.find("=")
-        if i >= 0:
-            has_encoding = False
-            name = p[:i].strip().lower()
-            if name.endswith("*"):
-                # Lang/encoding embedded in the value (like "filename*=UTF-8''file.ext")
-                # https://tools.ietf.org/html/rfc2231#section-4
-                name = name[:-1]
-                if p.count("'") == 2:
-                    has_encoding = True
-            value = p[i + 1 :].strip()
-            if len(value) >= 2 and value[0] == value[-1] == '"':
-                value = value[1:-1]
-                value = value.replace("\\\\", "\\").replace('\\"', '"')
-            if has_encoding:
-                encoding, lang, value = value.split("'")
-                value = unquote(value, encoding=encoding)
-            pdict[name] = value
+    key = params.pop(0)[0].lower()
+    for name, value in params:
+        if not name:
+            continue
+        if isinstance(value, tuple):
+            value = collapse_rfc2231_value(value)
+        pdict[name] = value
     return key, pdict
 
 

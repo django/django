@@ -311,6 +311,10 @@ Miscellaneous
 * The :ref:`JSON <serialization-formats-json>` serializer now writes a newline
   at the end of the output, even without the ``indent`` option set.
 
+* The undocumented ``django.utils.http.parse_header_parameters()`` function is
+  refactored to use Python's :py:class:`email.message.Message` for parsing.
+  Input headers exceeding 10000 characters will now raise :exc:`ValueError`.
+
 .. _deprecated-features-6.0:
 
 Features deprecated in 6.0
