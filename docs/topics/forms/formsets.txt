@@ -967,6 +967,7 @@ use the management form inside the template. Let's look at a sample view::
 
     from django.forms import formset_factory
     from django.shortcuts import render
+
     from myapp.forms import ArticleForm
 
 
@@ -1053,6 +1054,7 @@ a look at how this might be accomplished::
 
     from django.forms import formset_factory
     from django.shortcuts import render
+
     from myapp.forms import ArticleForm, BookForm
 
 
