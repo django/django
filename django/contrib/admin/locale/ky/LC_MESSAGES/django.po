@@ -3,16 +3,17 @@
 # Translators:
 # Belek <abylov.belek@gmail.com>, 2016
 # Chyngyz Monokbaev <monokbaev@gmail.com>, 2016
-# Soyuzbek Orozbek uulu <soyuzbek196.kg@gmail.com>, 2020-2021
-# Soyuzbek Orozbek uulu <soyuzbek196.kg@gmail.com>, 2020
+# Soyuzbek orozbek uulu <soyuzbek196.kg@gmail.com>, 2020-2021
+# Soyuzbek orozbek uulu <soyuzbek196.kg@gmail.com>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-11-27 14:12+0000\n"
-"Last-Translator: Soyuzbek Orozbek uulu <soyuzbek196.kg@gmail.com>\n"
-"Language-Team: Kyrgyz (http://www.transifex.com/django/django/language/ky/)\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2013-04-25 07:05+0000\n"
+"Last-Translator: Soyuzbek orozbek uulu <soyuzbek196.kg@gmail.com>, "
+"2020-2021\n"
+"Language-Team: Kyrgyz (http://app.transifex.com/django/django/language/ky/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -179,6 +180,9 @@ msgstr "Эчбир"
 msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr "Көбүрөөк тандоо үчүн “CTRL”, же макбук үчүн “Cmd” кармап туруңуз."
 
+msgid "Select this object for an action - {}"
+msgstr ""
+
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr "{name} \"{obj}\" ийгиликтүү кошулду."
@@ -195,10 +199,6 @@ msgstr "{name} \"{obj}\" ийгиликтүү кошулду. Сиз башка 
 msgid ""
 "The {name} “{obj}” was changed successfully. You may edit it again below."
 msgstr "{name} “{obj}” ийгиликтүү өзгөрдү. Сиз аны төмөндө өзгөртө аласыз."
-
-#, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr "{name} “{obj}” ийгиликтүү кошулду. Сиз аны төмөндө өзгөртө аласыз."
 
 #, python-brace-format
 msgid ""
@@ -263,8 +263,9 @@ msgstr "%(cnt)s нерседен эчтемке тандалган жок"
 msgid "Change history: %s"
 msgstr "%s тарыхын өзгөртүү"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -334,6 +335,9 @@ msgstr "Бүт %(total_count)s %(module_name)s тандаңыз"
 msgid "Clear selection"
 msgstr "Тандоону бошотуу"
 
+msgid "Breadcrumbs"
+msgstr ""
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "%(name)s колдонмосундагы моделдер"
@@ -360,15 +364,30 @@ msgstr "колдонуучу атыңызды жана сырсөз киргиз
 msgid "Change password"
 msgstr "Сырсөз өзгөртүү"
 
-msgid "Please correct the error below."
-msgstr "Төмөнкү катаны оңдоңуз."
+msgid "Set password"
+msgstr ""
 
-msgid "Please correct the errors below."
-msgstr "Төмөнкү каталарды оңдоңуз"
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "<strong>%(username)s</strong> үчүн жаңы сырсөз териңиз."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+
+msgid "Disable password-based authentication"
+msgstr ""
+
+msgid "Enable password-based authentication"
+msgstr ""
+
+msgid "Skip to main content"
+msgstr ""
 
 msgid "Welcome,"
 msgstr "Кош келиңиз,"
@@ -395,6 +414,12 @@ msgstr "Сайтта көрүү"
 msgid "Filter"
 msgstr "Чыпкалоо"
 
+msgid "Hide counts"
+msgstr ""
+
+msgid "Show counts"
+msgstr ""
+
 msgid "Clear all filters"
 msgstr "Бүт чыпкаларды алып салуу"
 
@@ -407,6 +432,15 @@ msgstr "Ирээттөө абзелдүүлүгү: %(priority_number)s"
 
 msgid "Toggle sorting"
 msgstr "Ирээтти алмаштыруу"
+
+msgid "Toggle theme (current theme: auto)"
+msgstr ""
+
+msgid "Toggle theme (current theme: light)"
+msgstr ""
+
+msgid "Toggle theme (current theme: dark)"
+msgstr ""
 
 msgid "Delete"
 msgstr "Өчүрүү"
@@ -492,6 +526,15 @@ msgstr "Менин аракеттерим"
 msgid "None available"
 msgstr "Мүмкүн эмес"
 
+msgid "Added:"
+msgstr ""
+
+msgid "Changed:"
+msgstr ""
+
+msgid "Deleted:"
+msgstr ""
+
 msgid "Unknown content"
 msgstr "Белгисиз мазмун"
 
@@ -517,6 +560,9 @@ msgstr "Колдонуучу атыңыз же сырсөздү унутуп к�
 msgid "Toggle navigation"
 msgstr "Навигацияны алмаштыруу"
 
+msgid "Sidebar"
+msgstr ""
+
 msgid "Start typing to filter…"
 msgstr "чыпкалоо үчүн жазып башта"
 
@@ -531,6 +577,10 @@ msgstr "Колдонуучу"
 
 msgid "Action"
 msgstr "Аракет"
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] ""
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -584,6 +634,10 @@ msgstr "Башка %(model)s кошуу"
 #, python-format
 msgid "Delete selected %(model)s"
 msgstr "Тандалган %(model)s обеттерин өчүрүү"
+
+#, python-format
+msgid "View selected %(model)s"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "Сайтта бираз убакыт өткөргөн үчүн ыраазычылык."
@@ -679,6 +733,9 @@ msgstr "едарек:"
 
 msgid "Reset my password"
 msgstr "Сырсөзүмдү кыйрат"
+
+msgid "Select all objects on this page for an action"
+msgstr ""
 
 msgid "All dates"
 msgstr "Бүт күндөр"

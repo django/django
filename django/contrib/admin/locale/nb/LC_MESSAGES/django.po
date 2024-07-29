@@ -3,26 +3,30 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # jensadne <jensadne@pvv.ntnu.no>, 2013-2014
-# Jon <jon@kolonial.no>, 2015-2016
-# Jon <jon@kolonial.no>, 2017-2020
-# Jon <jon@kolonial.no>, 2013
-# Jon <jon@kolonial.no>, 2011,2013
+# Jon, 2015-2016
+# Jon, 2017-2020,2022
+# Jon, 2013
+# Jon, 2011,2013
 # Sigurd Gartmann <sigurdga-transifex@sigurdga.no>, 2012
 # Tommy Strand <transifex@ireality.no>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-14 19:53+0200\n"
-"PO-Revision-Date: 2020-09-04 13:37+0000\n"
-"Last-Translator: Jon <jon@kolonial.no>\n"
-"Language-Team: Norwegian Bokmål (http://www.transifex.com/django/django/"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2013-04-25 07:05+0000\n"
+"Last-Translator: Jon, 2017-2020,2022\n"
+"Language-Team: Norwegian Bokmål (http://app.transifex.com/django/django/"
 "language/nb/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: nb\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Slett valgte %(verbose_name_plural)s"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -34,10 +38,6 @@ msgstr "Kan ikke slette %(name)s"
 
 msgid "Are you sure?"
 msgstr "Er du sikker?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Slett valgte %(verbose_name_plural)s"
 
 msgid "Administration"
 msgstr "Administrasjon"
@@ -185,6 +185,9 @@ msgid "Hold down “Control”, or “Command” on a Mac, to select more than o
 msgstr ""
 "Hold nede «Control», eller «Command» på en Mac, for å velge mer enn én."
 
+msgid "Select this object for an action - {}"
+msgstr ""
+
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr "{name} \"{obj}\" ble lagt til."
@@ -201,10 +204,6 @@ msgstr "{name} \"{obj}\" ble lagt til. Du kan legge til en ny {name} nedenfor."
 msgid ""
 "The {name} “{obj}” was changed successfully. You may edit it again below."
 msgstr "{name} \"{obj}\" ble endret. Du kan redigere videre nedenfor."
-
-#, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr "{name} \"{obj}\" ble lagt til. Du kan redigere videre nedenfor."
 
 #, python-brace-format
 msgid ""
@@ -269,8 +268,9 @@ msgstr "0 av %(cnt)s valgt"
 msgid "Change history: %s"
 msgstr "Endringshistorikk: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -340,6 +340,9 @@ msgstr "Velg alle %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Nullstill valg"
 
+msgid "Breadcrumbs"
+msgstr ""
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "Modeller i %(name)s-applikasjonen"
@@ -366,15 +369,31 @@ msgstr "Skriv inn brukernavn og passord."
 msgid "Change password"
 msgstr "Endre passord"
 
-msgid "Please correct the error below."
-msgstr "Vennligst korriger feilen under."
+msgid "Set password"
+msgstr ""
 
-msgid "Please correct the errors below."
-msgstr "Vennligst korriger feilene under."
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Skriv inn et nytt passord for brukeren <strong>%(username)s</strong>."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+
+msgid "Disable password-based authentication"
+msgstr ""
+
+msgid "Enable password-based authentication"
+msgstr ""
+
+msgid "Skip to main content"
+msgstr ""
 
 msgid "Welcome,"
 msgstr "Velkommen,"
@@ -401,6 +420,12 @@ msgstr "Vis på nettsted"
 msgid "Filter"
 msgstr "Filtrering"
 
+msgid "Hide counts"
+msgstr ""
+
+msgid "Show counts"
+msgstr ""
+
 msgid "Clear all filters"
 msgstr "Fjern alle filtre"
 
@@ -413,6 +438,15 @@ msgstr "Sorteringsprioritet: %(priority_number)s"
 
 msgid "Toggle sorting"
 msgstr "Slå av og på sortering"
+
+msgid "Toggle theme (current theme: auto)"
+msgstr ""
+
+msgid "Toggle theme (current theme: light)"
+msgstr ""
+
+msgid "Toggle theme (current theme: dark)"
+msgstr ""
 
 msgid "Delete"
 msgstr "Slett"
@@ -500,6 +534,15 @@ msgstr "Mine handlinger"
 msgid "None available"
 msgstr "Ingen tilgjengelige"
 
+msgid "Added:"
+msgstr ""
+
+msgid "Changed:"
+msgstr ""
+
+msgid "Deleted:"
+msgstr ""
+
 msgid "Unknown content"
 msgstr "Ukjent innhold"
 
@@ -525,6 +568,15 @@ msgstr "Glemt brukernavnet eller passordet ditt?"
 msgid "Toggle navigation"
 msgstr "Veksle navigasjon"
 
+msgid "Sidebar"
+msgstr ""
+
+msgid "Start typing to filter…"
+msgstr ""
+
+msgid "Filter navigation items"
+msgstr ""
+
 msgid "Date/time"
 msgstr "Dato/tid"
 
@@ -533,6 +585,11 @@ msgstr "Bruker"
 
 msgid "Action"
 msgstr "Handling"
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -590,7 +647,11 @@ msgstr "Legg til ny %(model)s"
 msgid "Delete selected %(model)s"
 msgstr "Slett valgte %(model)s"
 
-msgid "Thanks for spending some quality time with the Web site today."
+#, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+msgid "Thanks for spending some quality time with the web site today."
 msgstr "Takk for i dag."
 
 msgid "Log in again"
@@ -688,6 +749,9 @@ msgstr "E-postadresse:"
 
 msgid "Reset my password"
 msgstr "Nullstill mitt passord"
+
+msgid "Select all objects on this page for an action"
+msgstr ""
 
 msgid "All dates"
 msgstr "Alle datoer"

@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 07:05+0000\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2013-04-25 07:05+0000\n"
 "Last-Translator: emansije <emanuel.angelo@gmail.com>, 2023\n"
 "Language-Team: Portuguese (http://app.transifex.com/django/django/language/"
 "pt/)\n"
@@ -23,7 +23,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: pt\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % "
+"1000000 == 0 ? 1 : 2;\n"
 
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
@@ -210,11 +211,6 @@ msgstr ""
 "O {name} “{obj}” foi adicionado com sucesso. Pode editar novamente abaixo."
 
 #, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr ""
-"O {name} “{obj}” foi adicionado com sucesso. Pode editar novamente abaixo. "
-
-#, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
@@ -382,6 +378,9 @@ msgstr "Introduza o utilizador e palavra-passe."
 msgid "Change password"
 msgstr "Modificar palavra-passe"
 
+msgid "Set password"
+msgstr ""
+
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Por favor, corrija o erro abaixo"
@@ -393,6 +392,17 @@ msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr ""
 "Introduza uma nova palavra-passe para o utilizador <strong>%(username)s</"
 "strong>."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+
+msgid "Disable password-based authentication"
+msgstr ""
+
+msgid "Enable password-based authentication"
+msgstr ""
 
 msgid "Skip to main content"
 msgstr "Ir para o conteúdo principal"

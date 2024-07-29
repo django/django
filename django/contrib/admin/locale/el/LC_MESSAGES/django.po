@@ -14,10 +14,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-03-30 03:21+0000\n"
-"Last-Translator: Antonis Christofides <antonis@antonischristofides.com>\n"
-"Language-Team: Greek (http://www.transifex.com/django/django/language/el/)\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2013-04-25 07:05+0000\n"
+"Last-Translator: Antonis Christofides <antonis@antonischristofides.com>, "
+"2021\n"
+"Language-Team: Greek (http://app.transifex.com/django/django/language/el/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -186,6 +187,9 @@ msgstr ""
 "Κρατήστε πατημένο το «Control» («Command» σε Mac) για να επιλέξετε "
 "περισσότερα από ένα αντικείμενα."
 
+msgid "Select this object for an action - {}"
+msgstr ""
+
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr "Προστέθηκε {name} «{obj}»."
@@ -205,12 +209,6 @@ msgid ""
 msgstr ""
 "Το αντικείμενο ({name}) «{obj}» τροποποιήθηκε. Μπορεί να πραγματοποιηθεί "
 "περαιτέρω επεξεργασία παρακάτω."
-
-#, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr ""
-"Προστέθηκε {name} «{obj}». Μπορεί να πραγματοποιηθεί περαιτέρω επεξεργασία "
-"παρακάτω."
 
 #, python-brace-format
 msgid ""
@@ -278,8 +276,9 @@ msgstr "Επιλέχθηκαν 0 από %(cnt)s"
 msgid "Change history: %s"
 msgstr "Ιστορικό αλλαγών: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -350,6 +349,9 @@ msgstr "Επιλέξτε και τα %(total_count)s αντικείμενα (%(m
 msgid "Clear selection"
 msgstr "Καθαρισμός επιλογής"
 
+msgid "Breadcrumbs"
+msgstr ""
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "Μοντέλα στην εφαρμογή %(name)s"
@@ -376,16 +378,32 @@ msgstr "Προσδιορίστε όνομα χρήστη και συνθηματ
 msgid "Change password"
 msgstr "Αλλαγή συνθηματικού"
 
-msgid "Please correct the error below."
-msgstr "Παρακαλούμε διορθώστε το παρακάτω λάθος."
+msgid "Set password"
+msgstr ""
 
-msgid "Please correct the errors below."
-msgstr "Παρακαλοϋμε διορθώστε τα παρακάτω λάθη."
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr ""
 "Προσδιορίστε νέο συνθηματικό για το χρήστη <strong>%(username)s</strong>."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+
+msgid "Disable password-based authentication"
+msgstr ""
+
+msgid "Enable password-based authentication"
+msgstr ""
+
+msgid "Skip to main content"
+msgstr ""
 
 msgid "Welcome,"
 msgstr "Καλώς ήρθατε,"
@@ -412,6 +430,12 @@ msgstr "Προβολή στον ιστότοπο"
 msgid "Filter"
 msgstr "Φίλτρο"
 
+msgid "Hide counts"
+msgstr ""
+
+msgid "Show counts"
+msgstr ""
+
 msgid "Clear all filters"
 msgstr "Καθαρισμός όλων των φίλτρων"
 
@@ -424,6 +448,15 @@ msgstr "Προτεραιότητα ταξινόμησης: %(priority_number)s"
 
 msgid "Toggle sorting"
 msgstr "Εναλλαγή ταξινόμησης"
+
+msgid "Toggle theme (current theme: auto)"
+msgstr ""
+
+msgid "Toggle theme (current theme: light)"
+msgstr ""
+
+msgid "Toggle theme (current theme: dark)"
+msgstr ""
 
 msgid "Delete"
 msgstr "Διαγραφή"
@@ -513,6 +546,15 @@ msgstr "Οι ενέργειές μου"
 msgid "None available"
 msgstr "Κανένα διαθέσιμο"
 
+msgid "Added:"
+msgstr ""
+
+msgid "Changed:"
+msgstr ""
+
+msgid "Deleted:"
+msgstr ""
+
 msgid "Unknown content"
 msgstr "Άγνωστο περιεχόμενο"
 
@@ -539,6 +581,15 @@ msgstr "Ξεχάσατε το συνθηματικό ή το όνομα χρήσ
 msgid "Toggle navigation"
 msgstr "Εναλλαγή προβολής πλοήγησης"
 
+msgid "Sidebar"
+msgstr ""
+
+msgid "Start typing to filter…"
+msgstr ""
+
+msgid "Filter navigation items"
+msgstr ""
+
 msgid "Date/time"
 msgstr "Ημερομηνία/ώρα"
 
@@ -547,6 +598,11 @@ msgstr "Χρήστης"
 
 msgid "Action"
 msgstr "Ενέργεια"
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -604,8 +660,12 @@ msgstr "Να προστεθεί %(model)s"
 msgid "Delete selected %(model)s"
 msgstr "Να διαγραφεί το επιλεγμένο αντικείμενο (%(model)s)"
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Ευχαριστούμε που διαθέσατε χρόνο στον ιστότοπο."
+#, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr ""
 
 msgid "Log in again"
 msgstr "Επανασύνδεση"
@@ -705,6 +765,9 @@ msgstr "Διεύθυνση email:"
 
 msgid "Reset my password"
 msgstr "Επαναφορά του συνθηματικού μου"
+
+msgid "Select all objects on this page for an action"
+msgstr ""
 
 msgid "All dates"
 msgstr "Όλες οι ημερομηνίες"

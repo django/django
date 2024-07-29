@@ -1,6 +1,7 @@
 import os
 from argparse import ArgumentParser
 from collections import defaultdict
+from configparser import ConfigParser
 from datetime import datetime
 
 import requests
@@ -11,8 +12,13 @@ def list_resources_with_updates(date_since, verbose=False):
     resource_lang_changed = defaultdict(list)
     resource_lang_unchanged = defaultdict(list)
 
-    # This could read from the ~/.transifexrc file.
+    # Read token from ENV, otherwsie read from the ~/.transifexrc file.
     api_token = os.getenv("TRANSIFEX_API_TOKEN")
+    if not api_token:
+        parser = ConfigParser()
+        parser.read(os.path.expanduser("~/.transifexrc"))
+        api_token = parser.get("https://www.transifex.com", "token")
+
     assert api_token, "Please define the TRANSIFEX_API_TOKEN env var."
     headers = {"Authorization": f"Bearer {api_token}"}
     base_url = "https://rest.api.transifex.com"
@@ -64,7 +70,7 @@ def list_resources_with_updates(date_since, verbose=False):
 def fetch_since(date_since, verbose=True, dry_run=True):
     changed = list_resources_with_updates(date_since=date_since, verbose=verbose)
     if verbose:
-        print(f"== SUMMARY for changed resources {dry_run=}? ==\n")
+        print(f"== SUMMARY for changed resources {dry_run=} ==\n")
     for res, langs in changed.items():
         if verbose:
             print(f"\n * resource {res} languages {' '.join(sorted(langs))}")
@@ -80,6 +86,7 @@ if __name__ == "__main__":
     parser.add_argument("--dry_run", action="store_true")
     parser.add_argument(
         "date_since",
+        metavar="YYYY-MM-DD",
         type=datetime.fromisoformat,
         help="Fetch new translations since this date (ISO format YYYY-MM-DD).",
     )

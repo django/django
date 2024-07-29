@@ -27,6 +27,10 @@ from django.conf import settings
 from django.core.management import call_command
 
 HAVE_JS = ["admin"]
+LANG_OVERRIDES = {
+    "zh_CN": "zh_Hans",
+    "zh_TW": "zh_Hant",
+}
 
 
 def _get_locale_dirs(resources, include_core=True):
@@ -152,26 +156,26 @@ def fetch(resources=None, languages=None):
     errors = []
 
     for name, dir_ in locale_dirs:
+        cmd = [
+            "tx",
+            "pull",
+            "-r",
+            _tx_resource_for_name(name),
+            "-f",
+            "--minimum-perc=5",
+        ]
         # Transifex pull
         if languages is None:
-            run(
-                [
-                    "tx",
-                    "pull",
-                    "-r",
-                    _tx_resource_for_name(name),
-                    "-a",
-                    "-f",
-                    "--minimum-perc=5",
-                ]
-            )
+            run(cmd + ["--all"])
             target_langs = sorted(
                 d for d in os.listdir(dir_) if not d.startswith("_") and d != "en"
             )
         else:
             for lang in languages:
-                run(["tx", "pull", "-r", _tx_resource_for_name(name), "-f", "-l", lang])
+                run(cmd + ["-l", lang])
             target_langs = languages
+
+        target_langs = [LANG_OVERRIDES.get(d, d) for d in target_langs]
 
         # msgcat to wrap lines and msgfmt for compilation of .mo file
         for lang in target_langs:

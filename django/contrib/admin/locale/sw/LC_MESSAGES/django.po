@@ -5,14 +5,14 @@
 # DOREEN WANYAMA, 2023
 # Machaku, 2013-2014
 # Machaku, 2016
-# Millicent  Atieno Obwanda <atienoobwanda@gmail.com>, 2023
-# Natalia (Django Fellow), 2023
+# Millicent A.Obwanda <atienoobwanda@gmail.com>, 2023
+# Natalia, 2023
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-25 07:05+0000\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2013-04-25 07:05+0000\n"
 "Last-Translator: DOREEN WANYAMA, 2023\n"
 "Language-Team: Swahili (http://app.transifex.com/django/django/language/"
 "sw/)\n"
@@ -207,11 +207,6 @@ msgstr ""
 "chini."
 
 #, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr ""
-"{name} “{obj}” imeongezwa kwa mafanikio. Unaweza kuihariri tena hapa chini."
-
-#, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
@@ -377,6 +372,9 @@ msgstr "Ingiza jina la mtumiaji na nywila."
 msgid "Change password"
 msgstr "Badilisha nywila"
 
+msgid "Set password"
+msgstr ""
+
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Tafadhali sahihisha kosa lifuatalo."
@@ -385,6 +383,17 @@ msgstr[1] "Tafadhali sahihisha makosa yafuatayo"
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "ingiza nywila ya mtumiaji <strong>%(username)s</strong>."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+
+msgid "Disable password-based authentication"
+msgstr ""
+
+msgid "Enable password-based authentication"
+msgstr ""
 
 msgid "Skip to main content"
 msgstr "Ruka hadi kwa maudhui makuu."

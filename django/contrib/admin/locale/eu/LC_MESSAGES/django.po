@@ -12,10 +12,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:10-0500\n"
-"PO-Revision-Date: 2022-07-25 07:05+0000\n"
-"Last-Translator: Eneko Illarramendi <eneko@illarra.com>\n"
-"Language-Team: Basque (http://www.transifex.com/django/django/language/eu/)\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2013-04-25 07:05+0000\n"
+"Last-Translator: Eneko Illarramendi <eneko@illarra.com>, 2017-2019,2022\n"
+"Language-Team: Basque (http://app.transifex.com/django/django/language/eu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -183,6 +183,9 @@ msgstr ""
 "Bat baino gehiago hautatzeko, sakatu \"Kontrol\" tekla edo \"Command\" Mac "
 "batean."
 
+msgid "Select this object for an action - {}"
+msgstr ""
+
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr ""
@@ -201,11 +204,6 @@ msgid ""
 "The {name} “{obj}” was changed successfully. You may edit it again below."
 msgstr ""
 "{name} \"{obj}\" ondo aldatu da. Aldaketa gehiago egin ditzazkezu jarraian."
-
-#, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr ""
-"{name} \"{obj}\" ondo gehitu da. Aldaketa gehiago egin ditzazkezu jarraian."
 
 #, python-brace-format
 msgid ""
@@ -342,6 +340,9 @@ msgstr "Hautatu %(total_count)s %(module_name)s guztiak"
 msgid "Clear selection"
 msgstr "Garbitu hautapena"
 
+msgid "Breadcrumbs"
+msgstr ""
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "%(name)s aplikazioaren modeloak"
@@ -368,16 +369,32 @@ msgstr "Sartu erabiltzaile izen eta pasahitz bat."
 msgid "Change password"
 msgstr "Aldatu pasahitza"
 
-msgid "Please correct the error below."
-msgstr "Mesedez zuzendu erroreak behean."
+msgid "Set password"
+msgstr ""
 
-msgid "Please correct the errors below."
-msgstr "Mesedez zuzendu erroreak behean."
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr ""
 "Idatzi pasahitz berria <strong>%(username)s</strong> erabiltzailearentzat."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+
+msgid "Disable password-based authentication"
+msgstr ""
+
+msgid "Enable password-based authentication"
+msgstr ""
+
+msgid "Skip to main content"
+msgstr ""
 
 msgid "Welcome,"
 msgstr "Ongi etorri,"
@@ -404,6 +421,12 @@ msgstr "Webgunean ikusi"
 msgid "Filter"
 msgstr "Iragazkia"
 
+msgid "Hide counts"
+msgstr ""
+
+msgid "Show counts"
+msgstr ""
+
 msgid "Clear all filters"
 msgstr "Garbitu filtro guztiak."
 
@@ -416,6 +439,15 @@ msgstr "Ordenatzeko lehentasuna: %(priority_number)s"
 
 msgid "Toggle sorting"
 msgstr "Txandakatu ordenazioa"
+
+msgid "Toggle theme (current theme: auto)"
+msgstr ""
+
+msgid "Toggle theme (current theme: light)"
+msgstr ""
+
+msgid "Toggle theme (current theme: dark)"
+msgstr ""
 
 msgid "Delete"
 msgstr "Ezabatu"
@@ -502,6 +534,15 @@ msgstr "Nire ekintzak"
 msgid "None available"
 msgstr "Ez dago ezer"
 
+msgid "Added:"
+msgstr ""
+
+msgid "Changed:"
+msgstr ""
+
+msgid "Deleted:"
+msgstr ""
+
 msgid "Unknown content"
 msgstr "Eduki ezezaguna"
 
@@ -525,6 +566,9 @@ msgstr "Pasahitza edo erabiltzaile-izena ahaztu duzu?"
 msgid "Toggle navigation"
 msgstr ""
 
+msgid "Sidebar"
+msgstr ""
+
 msgid "Start typing to filter…"
 msgstr "Hasi idazten filtratzeko..."
 
@@ -541,10 +585,9 @@ msgid "Action"
 msgstr "Ekintza"
 
 msgid "entry"
-msgstr "sarrera"
-
-msgid "entries"
-msgstr "sarrerak"
+msgid_plural "entries"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -700,6 +743,9 @@ msgstr "Helbide elektronikoa:"
 
 msgid "Reset my password"
 msgstr "Berrezarri pasahitza"
+
+msgid "Select all objects on this page for an action"
+msgstr ""
 
 msgid "All dates"
 msgstr "Data guztiak"

@@ -13,10 +13,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-12-23 17:57+0000\n"
-"Last-Translator: tinnguyen121221\n"
-"Language-Team: Vietnamese (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2013-04-25 07:05+0000\n"
+"Last-Translator: tinnguyen121221, 2021\n"
+"Language-Team: Vietnamese (http://app.transifex.com/django/django/language/"
 "vi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -183,6 +183,9 @@ msgid "Hold down “Control”, or “Command” on a Mac, to select more than o
 msgstr ""
 "Nhấn giữ phím “Control”, hoặc “Command” trên máy Mac, để chọn nhiều hơn một."
 
+msgid "Select this object for an action - {}"
+msgstr ""
+
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr "{name} “{obj}” được thêm vào thành công."
@@ -202,11 +205,6 @@ msgid ""
 "The {name} “{obj}” was changed successfully. You may edit it again below."
 msgstr ""
 "{name} “{obj}” được chỉnh sửa thành công. Bạn có thể chỉnh sửa lại bên dưới."
-
-#, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr ""
-"{name} “{obj}” được thêm vào thành công. Bạn có thể chỉnh sửa lại bên dưới."
 
 #, python-brace-format
 msgid ""
@@ -271,8 +269,9 @@ msgstr "0 của %(cnt)s được chọn"
 msgid "Change history: %s"
 msgstr "Lịch sử thay đổi: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -342,6 +341,9 @@ msgstr "Hãy chọn tất cả %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Xóa lựa chọn"
 
+msgid "Breadcrumbs"
+msgstr ""
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "Các mô models trong %(name)s"
@@ -368,15 +370,30 @@ msgstr "Điền tên đăng nhập và mật khẩu."
 msgid "Change password"
 msgstr "Đổi mật khẩu"
 
-msgid "Please correct the error below."
-msgstr "Hãy sửa lỗi sai dưới đây"
+msgid "Set password"
+msgstr ""
 
-msgid "Please correct the errors below."
-msgstr "Hãy chỉnh sửa lại các lỗi sau."
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Hãy nhập mật khẩu mới cho người sử dụng <strong>%(username)s</strong>."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+
+msgid "Disable password-based authentication"
+msgstr ""
+
+msgid "Enable password-based authentication"
+msgstr ""
+
+msgid "Skip to main content"
+msgstr ""
 
 msgid "Welcome,"
 msgstr "Chào mừng bạn,"
@@ -403,6 +420,12 @@ msgstr "Xem trên trang web"
 msgid "Filter"
 msgstr "Bộ lọc"
 
+msgid "Hide counts"
+msgstr ""
+
+msgid "Show counts"
+msgstr ""
+
 msgid "Clear all filters"
 msgstr "Xóa tất cả bộ lọc"
 
@@ -415,6 +438,15 @@ msgstr "Sắp xếp theo:%(priority_number)s"
 
 msgid "Toggle sorting"
 msgstr "Hoán đổi sắp xếp"
+
+msgid "Toggle theme (current theme: auto)"
+msgstr ""
+
+msgid "Toggle theme (current theme: light)"
+msgstr ""
+
+msgid "Toggle theme (current theme: dark)"
+msgstr ""
 
 msgid "Delete"
 msgstr "Xóa"
@@ -500,6 +532,15 @@ msgstr "Hoạt động của tôi"
 msgid "None available"
 msgstr "Không có sẵn"
 
+msgid "Added:"
+msgstr ""
+
+msgid "Changed:"
+msgstr ""
+
+msgid "Deleted:"
+msgstr ""
+
 msgid "Unknown content"
 msgstr "Không biết nội dung"
 
@@ -526,6 +567,9 @@ msgstr "Bạn quên mật khẩu hoặc tài khoản?"
 msgid "Toggle navigation"
 msgstr ""
 
+msgid "Sidebar"
+msgstr ""
+
 msgid "Start typing to filter…"
 msgstr "Nhập để lọc..."
 
@@ -540,6 +584,10 @@ msgstr "Người dùng"
 
 msgid "Action"
 msgstr "Hành động"
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] ""
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -595,6 +643,10 @@ msgstr "Thêm %(model)s khác"
 #, python-format
 msgid "Delete selected %(model)s"
 msgstr "Xóa %(model)s đã chọn"
+
+#, python-format
+msgid "View selected %(model)s"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "Cảm ơn bạn đã dành thời gian với trang web."
@@ -694,6 +746,9 @@ msgstr "Địa chỉ Email:"
 
 msgid "Reset my password"
 msgstr "Làm lại mật khẩu"
+
+msgid "Select all objects on this page for an action"
+msgstr ""
 
 msgid "All dates"
 msgstr "Tất cả các ngày"

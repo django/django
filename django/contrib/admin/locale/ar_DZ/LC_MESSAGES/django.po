@@ -7,10 +7,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:10-0500\n"
-"PO-Revision-Date: 2022-07-25 07:05+0000\n"
-"Last-Translator: Jihad Bahmaid Al-Halki\n"
-"Language-Team: Arabic (Algeria) (http://www.transifex.com/django/django/"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2013-04-25 07:05+0000\n"
+"Last-Translator: Jihad Bahmaid Al-Halki, 2022\n"
+"Language-Team: Arabic (Algeria) (http://app.transifex.com/django/django/"
 "language/ar_DZ/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -180,6 +180,9 @@ msgstr ""
 "استمر بالضغط على مفتاح \\\"Control\\\", او \\\"Command\\\" على أجهزة الماك, "
 "لإختيار أكثر من أختيار واحد."
 
+msgid "Select this object for an action - {}"
+msgstr ""
+
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr "تمت إضافة {name} \\\"{obj}\\\" بنجاح."
@@ -196,10 +199,6 @@ msgstr "تمت إضافة {name} \\\"{obj}\\\" بنجاح. يمكنك إضافة
 msgid ""
 "The {name} “{obj}” was changed successfully. You may edit it again below."
 msgstr "تم تغيير {name} \\\"{obj}\\\" بنجاح. يمكنك تعديله مرة أخرى أدناه."
-
-#, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr "تمت إضافة {name} \\\"{obj}\\\" بنجاح. يمكنك تعديله مرة أخرى أدناه."
 
 #, python-brace-format
 msgid ""
@@ -342,6 +341,9 @@ msgstr "اختيار %(total_count)s %(module_name)s جميعها"
 msgid "Clear selection"
 msgstr "إزالة الاختيار"
 
+msgid "Breadcrumbs"
+msgstr ""
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "النماذج في تطبيق %(name)s"
@@ -368,15 +370,35 @@ msgstr "أدخل اسم مستخدم وكلمة مرور."
 msgid "Change password"
 msgstr "غيّر كلمة المرور"
 
-msgid "Please correct the error below."
-msgstr "يرجى تصحيح الخطأ أدناه."
+msgid "Set password"
+msgstr ""
 
-msgid "Please correct the errors below."
-msgstr "الرجاء تصحيح الأخطاء أدناه."
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "أدخل كلمة مرور جديدة للمستخدم <strong>%(username)s</strong>."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+
+msgid "Disable password-based authentication"
+msgstr ""
+
+msgid "Enable password-based authentication"
+msgstr ""
+
+msgid "Skip to main content"
+msgstr ""
 
 msgid "Welcome,"
 msgstr "أهلا، "
@@ -403,6 +425,12 @@ msgstr "مشاهدة على الموقع"
 msgid "Filter"
 msgstr "مرشّح"
 
+msgid "Hide counts"
+msgstr ""
+
+msgid "Show counts"
+msgstr ""
+
 msgid "Clear all filters"
 msgstr "مسح جميع المرشحات"
 
@@ -415,6 +443,15 @@ msgstr "أولوية الترتيب: %(priority_number)s"
 
 msgid "Toggle sorting"
 msgstr "عكس الترتيب"
+
+msgid "Toggle theme (current theme: auto)"
+msgstr ""
+
+msgid "Toggle theme (current theme: light)"
+msgstr ""
+
+msgid "Toggle theme (current theme: dark)"
+msgstr ""
 
 msgid "Delete"
 msgstr "احذف"
@@ -500,6 +537,15 @@ msgstr "إجراءاتي"
 msgid "None available"
 msgstr "لا يوجد"
 
+msgid "Added:"
+msgstr ""
+
+msgid "Changed:"
+msgstr ""
+
+msgid "Deleted:"
+msgstr ""
+
 msgid "Unknown content"
 msgstr "مُحتوى مجهول"
 
@@ -525,6 +571,9 @@ msgstr "نسيت كلمة المرور أو اسم المستخدم الخاص �
 msgid "Toggle navigation"
 msgstr "تغيير التنقل"
 
+msgid "Sidebar"
+msgstr ""
+
 msgid "Start typing to filter…"
 msgstr "ابدأ بالكتابة لبدء التصفية(الفلترة)..."
 
@@ -541,10 +590,13 @@ msgid "Action"
 msgstr "إجراء"
 
 msgid "entry"
-msgstr ""
-
-msgid "entries"
-msgstr ""
+msgid_plural "entries"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -706,6 +758,9 @@ msgstr "عنوان البريد الإلكتروني:"
 
 msgid "Reset my password"
 msgstr "استعد كلمة مروري"
+
+msgid "Select all objects on this page for an action"
+msgstr ""
 
 msgid "All dates"
 msgstr "كافة التواريخ"

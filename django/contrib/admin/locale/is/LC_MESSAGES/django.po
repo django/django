@@ -10,16 +10,20 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-14 19:53+0200\n"
-"PO-Revision-Date: 2020-07-14 22:38+0000\n"
-"Last-Translator: Transifex Bot <>\n"
-"Language-Team: Icelandic (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2013-04-25 07:05+0000\n"
+"Last-Translator: Thordur Sigurdsson <thordur@ja.is>, 2016-2020\n"
+"Language-Team: Icelandic (http://app.transifex.com/django/django/language/"
 "is/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: is\n"
 "Plural-Forms: nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Eyða völdum %(verbose_name_plural)s"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -31,10 +35,6 @@ msgstr "Get ekki eytt %(name)s"
 
 msgid "Are you sure?"
 msgstr "Ertu viss?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Eyða völdum %(verbose_name_plural)s"
 
 msgid "Administration"
 msgstr "Vefstjórn"
@@ -181,6 +181,9 @@ msgid "Hold down “Control”, or “Command” on a Mac, to select more than o
 msgstr ""
 "Haltu inni „Control“, eða „Command“ á Mac til þess að velja fleira en eitt."
 
+msgid "Select this object for an action - {}"
+msgstr ""
+
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr "{name} „{obj}“ var bætt við."
@@ -198,11 +201,6 @@ msgstr ""
 msgid ""
 "The {name} “{obj}” was changed successfully. You may edit it again below."
 msgstr "{name} „{obj}“ hefur verið breytt. Þú getur breytt því aftur að neðan."
-
-#, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr ""
-"{name} „{obj}“ hefur verið bætt við. Þú getur breytt því aftur að neðan."
 
 #, python-brace-format
 msgid ""
@@ -268,8 +266,9 @@ msgstr "0 af %(cnt)s valin"
 msgid "Change history: %s"
 msgstr "Breytingarsaga: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -339,6 +338,9 @@ msgstr "Velja alla %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Hreinsa val"
 
+msgid "Breadcrumbs"
+msgstr ""
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "Módel í appinu %(name)s"
@@ -365,15 +367,31 @@ msgstr "Sláðu inn notandanafn og lykilorð."
 msgid "Change password"
 msgstr "Breyta lykilorði"
 
-msgid "Please correct the error below."
-msgstr "Vinsamlegast lagfærðu villuna fyrir neðan."
+msgid "Set password"
+msgstr ""
 
-msgid "Please correct the errors below."
-msgstr "Vinsamlegast leiðréttu villurnar hér að neðan."
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Settu inn nýtt lykilorð fyrir notandann <strong>%(username)s</strong>."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+
+msgid "Disable password-based authentication"
+msgstr ""
+
+msgid "Enable password-based authentication"
+msgstr ""
+
+msgid "Skip to main content"
+msgstr ""
 
 msgid "Welcome,"
 msgstr "Velkomin(n),"
@@ -400,6 +418,12 @@ msgstr "Skoða á vef"
 msgid "Filter"
 msgstr "Sía"
 
+msgid "Hide counts"
+msgstr ""
+
+msgid "Show counts"
+msgstr ""
+
 msgid "Clear all filters"
 msgstr "Hreinsa allar síur"
 
@@ -412,6 +436,15 @@ msgstr "Forgangur röðunar: %(priority_number)s"
 
 msgid "Toggle sorting"
 msgstr "Röðun af/á"
+
+msgid "Toggle theme (current theme: auto)"
+msgstr ""
+
+msgid "Toggle theme (current theme: light)"
+msgstr ""
+
+msgid "Toggle theme (current theme: dark)"
+msgstr ""
 
 msgid "Delete"
 msgstr "Eyða"
@@ -497,6 +530,15 @@ msgstr "Mínar aðgerðir"
 msgid "None available"
 msgstr "Engin fáanleg"
 
+msgid "Added:"
+msgstr ""
+
+msgid "Changed:"
+msgstr ""
+
+msgid "Deleted:"
+msgstr ""
+
 msgid "Unknown content"
 msgstr "Óþekkt innihald"
 
@@ -522,6 +564,15 @@ msgstr "Gleymt notandanafn eða lykilorð?"
 msgid "Toggle navigation"
 msgstr ""
 
+msgid "Sidebar"
+msgstr ""
+
+msgid "Start typing to filter…"
+msgstr ""
+
+msgid "Filter navigation items"
+msgstr ""
+
 msgid "Date/time"
 msgstr "Dagsetning/tími"
 
@@ -530,6 +581,11 @@ msgstr "Notandi"
 
 msgid "Action"
 msgstr "Aðgerð"
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -587,8 +643,12 @@ msgstr "Bæta við %(model)s"
 msgid "Delete selected %(model)s"
 msgstr "Eyða völdu %(model)s"
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Takk fyrir að verja tíma í vefsíðuna í dag."
+#, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr ""
 
 msgid "Log in again"
 msgstr "Skráðu þig inn aftur"
@@ -688,6 +748,9 @@ msgstr "Netfang:"
 
 msgid "Reset my password"
 msgstr "Endursstilla lykilorðið mitt"
+
+msgid "Select all objects on this page for an action"
+msgstr ""
 
 msgid "All dates"
 msgstr "Allar dagsetningar"

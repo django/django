@@ -1,660 +1,985 @@
 # This file is distributed under the same license as the Django package.
-#
+# 
 # Translators:
 # Chen Chun-Chia <ccc.larc@gmail.com>, 2015
 # ilay <ilay@ilay.tw>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # mail6543210 <mail6543210@yahoo.com.tw>, 2013-2014
-# ming hsien tzang <tzangms@gmail.com>, 2011
+# 0a3cb7bfd0810218facdfb511e592a6d_8d19d07 <c136e508049103f37d35b6c3314e9b1d_5225>, 2011
 # tcc <tcchou@tcchou.org>, 2011
 # Tzu-ping Chung <uranusjr@gmail.com>, 2016-2017
+# YAO WEN LIANG, 2024
 # Yeh-Yung <yyc1217@gmail.com>, 2013
+# yubike, 2024
 # Yeh-Yung <yyc1217@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: Tzu-ping Chung <uranusjr@gmail.com>\n"
-"Language-Team: Chinese (Taiwan) (http://www.transifex.com/django/django/"
-"language/zh_TW/)\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2013-04-25 07:05+0000\n"
+"Last-Translator: YAO WEN LIANG, 2024\n"
+"Language-Team: Chinese (Taiwan) (http://app.transifex.com/django/django/language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: zh_TW\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#, python-format
-msgid "Successfully deleted %(count)d %(items)s."
-msgstr "成功的刪除了 %(count)d 個 %(items)s."
-
-#, python-format
-msgid "Cannot delete %(name)s"
-msgstr "無法刪除 %(name)s"
-
-msgid "Are you sure?"
-msgstr "你確定嗎？"
-
+#: contrib/admin/actions.py:17
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "刪除所選的 %(verbose_name_plural)s"
 
+#: contrib/admin/actions.py:54
+#, python-format
+msgid "Successfully deleted %(count)d %(items)s."
+msgstr "成功的刪除了 %(count)d 個 %(items)s."
+
+#: contrib/admin/actions.py:64 contrib/admin/options.py:2177
+#, python-format
+msgid "Cannot delete %(name)s"
+msgstr "無法刪除 %(name)s"
+
+#: contrib/admin/actions.py:66 contrib/admin/options.py:2179
+msgid "Are you sure?"
+msgstr "你確定嗎？"
+
+#: contrib/admin/apps.py:13
 msgid "Administration"
 msgstr "管理"
 
+#: contrib/admin/filters.py:153 contrib/admin/filters.py:295
+#: contrib/admin/filters.py:364 contrib/admin/filters.py:432
+#: contrib/admin/filters.py:607 contrib/admin/filters.py:701
 msgid "All"
 msgstr "全部"
 
+#: contrib/admin/filters.py:365
 msgid "Yes"
 msgstr "是"
 
+#: contrib/admin/filters.py:366
 msgid "No"
 msgstr "否"
 
+#: contrib/admin/filters.py:380
 msgid "Unknown"
 msgstr "未知"
 
+#: contrib/admin/filters.py:490
 msgid "Any date"
 msgstr "任何日期"
 
+#: contrib/admin/filters.py:492
 msgid "Today"
 msgstr "今天"
 
+#: contrib/admin/filters.py:499
 msgid "Past 7 days"
 msgstr "過去 7 天"
 
+#: contrib/admin/filters.py:506
 msgid "This month"
 msgstr "本月"
 
+#: contrib/admin/filters.py:513
 msgid "This year"
 msgstr "今年"
 
+#: contrib/admin/filters.py:523
 msgid "No date"
 msgstr "沒有日期"
 
+#: contrib/admin/filters.py:524
 msgid "Has date"
 msgstr "有日期"
 
+#: contrib/admin/filters.py:702
+msgid "Empty"
+msgstr "空的"
+
+#: contrib/admin/filters.py:703
+msgid "Not empty"
+msgstr "非空的"
+
+#: contrib/admin/forms.py:14
 #, python-format
 msgid ""
-"Please enter the correct %(username)s and password for a staff account. Note "
-"that both fields may be case-sensitive."
-msgstr "請輸入正確的工作人員%(username)s及密碼。請注意兩者皆區分大小寫。"
+"Please enter the correct %(username)s and password for a staff account. Note"
+" that both fields may be case-sensitive."
+msgstr "請輸入正確的工作人員帳號%(username)s及密碼。請注意兩者皆區分大小寫。"
 
+#: contrib/admin/helpers.py:30
 msgid "Action:"
 msgstr "動作:"
 
+#: contrib/admin/helpers.py:428
 #, python-format
 msgid "Add another %(verbose_name)s"
 msgstr "新增其它 %(verbose_name)s"
 
+#: contrib/admin/helpers.py:432
 msgid "Remove"
 msgstr "移除"
 
+#: contrib/admin/models.py:18
+msgid "Addition"
+msgstr "新增"
+
+#: contrib/admin/models.py:19 contrib/admin/templates/admin/app_list.html:28
+#: contrib/admin/templates/admin/edit_inline/stacked.html:16
+#: contrib/admin/templates/admin/edit_inline/tabular.html:36
+msgid "Change"
+msgstr "修改"
+
+#: contrib/admin/models.py:20
+msgid "Deletion"
+msgstr "删除"
+
+#: contrib/admin/models.py:50
 msgid "action time"
 msgstr "動作時間"
 
+#: contrib/admin/models.py:57
 msgid "user"
 msgstr "使用者"
 
+#: contrib/admin/models.py:62
 msgid "content type"
 msgstr "內容類型"
 
+#: contrib/admin/models.py:66
 msgid "object id"
 msgstr "物件 id"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
+#: contrib/admin/models.py:69
 msgid "object repr"
 msgstr "物件 repr"
 
+#: contrib/admin/models.py:71
 msgid "action flag"
 msgstr "動作旗標"
 
+#: contrib/admin/models.py:74
 msgid "change message"
-msgstr "變更訊息"
+msgstr "修改訊息"
 
+#: contrib/admin/models.py:79
 msgid "log entry"
-msgstr "紀錄項目"
+msgstr "日誌記錄"
 
+#: contrib/admin/models.py:80
 msgid "log entries"
-msgstr "紀錄項目"
+msgstr "日誌紀錄"
 
+#: contrib/admin/models.py:89
 #, python-format
-msgid "Added \"%(object)s\"."
+msgid "Added “%(object)s”."
 msgstr "\"%(object)s\" 已新增。"
 
+#: contrib/admin/models.py:91
 #, python-format
-msgid "Changed \"%(object)s\" - %(changes)s"
-msgstr "\"%(object)s\" - %(changes)s 已變更。"
+msgid "Changed “%(object)s” — %(changes)s"
+msgstr "\"%(object)s\" - %(changes)s 已修改。"
 
+#: contrib/admin/models.py:96
 #, python-format
-msgid "Deleted \"%(object)s.\""
+msgid "Deleted “%(object)s.”"
 msgstr "\"%(object)s\" 已刪除。"
 
+#: contrib/admin/models.py:98
 msgid "LogEntry Object"
-msgstr "紀錄項目"
+msgstr "日誌記錄物件"
 
+#: contrib/admin/models.py:127
 #, python-brace-format
-msgid "Added {name} \"{object}\"."
+msgid "Added {name} “{object}”."
 msgstr "{name} \"{object}\" 已新增。"
 
+#: contrib/admin/models.py:132
 msgid "Added."
 msgstr "已新增。"
 
+#: contrib/admin/models.py:140 contrib/admin/options.py:2433
 msgid "and"
 msgstr "和"
 
+#: contrib/admin/models.py:147
 #, python-brace-format
-msgid "Changed {fields} for {name} \"{object}\"."
-msgstr "{name} \"{object}\" 的 {fields} 已變更。"
+msgid "Changed {fields} for {name} “{object}”."
+msgstr "{name} \"{object}\" 的 {fields} 已修改。"
 
+#: contrib/admin/models.py:153
 #, python-brace-format
 msgid "Changed {fields}."
-msgstr "{fields} 已變更。"
+msgstr "{fields} 已修改。"
 
+#: contrib/admin/models.py:163
 #, python-brace-format
-msgid "Deleted {name} \"{object}\"."
+msgid "Deleted {name} “{object}”."
 msgstr "{name} \"{object}\" 已刪除。"
 
+#: contrib/admin/models.py:169
 msgid "No fields changed."
-msgstr "沒有欄位被變更。"
+msgstr "沒有欄位被修改。"
 
+#: contrib/admin/options.py:243 contrib/admin/options.py:287
 msgid "None"
 msgstr "無"
 
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
-msgstr "按住 \"Control\" 或 \"Command\" (Mac)，可選取多個值"
+#: contrib/admin/options.py:339
+msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
+msgstr "按住 \"Control\", 或者在 Mac 上按 \"Command\", 以選取更多值"
 
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr "{name} \"{obj}\" 新增成功。你可以在下面再次編輯它。"
+#: contrib/admin/options.py:995
+msgid "Select this object for an action - {}"
+msgstr "選擇此對象進行操作 - {}"
 
+#: contrib/admin/options.py:1405 contrib/admin/options.py:1434
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may add another {name} "
-"below."
-msgstr "{name} \"{obj}\" 新增成功。你可以在下方加入其他 {name}。"
-
-#, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
+msgid "The {name} “{obj}” was added successfully."
 msgstr "{name} \"{obj}\" 已成功新增。"
 
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
-msgstr "{name} \"{obj}\" 變更成功。你可以在下方再次編輯。"
+#: contrib/admin/options.py:1407
+msgid "You may edit it again below."
+msgstr "您可以在下面再次編輯它."
 
+#: contrib/admin/options.py:1420
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"The {name} “{obj}” was added successfully. You may add another {name} below."
+msgstr "{name} \"{obj}\" 新增成功。你可以在下方加入其他 {name}。"
+
+#: contrib/admin/options.py:1482
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may edit it again below."
+msgstr "{name} \"{obj}\" 修改成功。你可以在下方再次編輯。"
+
+#: contrib/admin/options.py:1516
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
-msgstr "{name} \"{obj}\" 變更成功。你可以在下方加入其他 {name}。"
+msgstr "{name} \"{obj}\" 修改成功。你可以在下方加入其他 {name}。"
 
+#: contrib/admin/options.py:1533
 #, python-brace-format
-msgid "The {name} \"{obj}\" was changed successfully."
-msgstr "{name} \"{obj}\" 已成功變更。"
+msgid "The {name} “{obj}” was changed successfully."
+msgstr "成功修改了 {name}“{obj}”。"
 
+#: contrib/admin/options.py:1611 contrib/admin/options.py:1996
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
-msgstr "必須要有項目被選到才能對它們進行動作。沒有項目變更。"
+msgstr "必須要有項目被選中才能進行動作。沒有任何項目被修改。"
 
+#: contrib/admin/options.py:1631
 msgid "No action selected."
-msgstr "沒有動作被選。"
+msgstr "沒有動作被選取。"
 
+#: contrib/admin/options.py:1662
 #, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "%(name)s \"%(obj)s\" 已成功刪除。"
+msgid "The %(name)s “%(obj)s” was deleted successfully."
+msgstr "成功删除了 %(name)s“%(obj)s”。"
 
+#: contrib/admin/options.py:1764
 #, python-format
-msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
 msgstr "不存在 ID 為「%(key)s」的 %(name)s。或許它已被刪除？"
 
+#: contrib/admin/options.py:1875
 #, python-format
 msgid "Add %s"
 msgstr "新增 %s"
 
+#: contrib/admin/options.py:1877
 #, python-format
 msgid "Change %s"
-msgstr "變更 %s"
+msgstr "修改 %s"
 
+#: contrib/admin/options.py:1879
+#, python-format
+msgid "View %s"
+msgstr "查看 %s"
+
+#: contrib/admin/options.py:1966
 msgid "Database error"
 msgstr "資料庫錯誤"
 
+#: contrib/admin/options.py:2056
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
-msgstr[0] "共 %(count)s %(name)s 已變更成功。"
+msgstr[0] "共 %(count)s %(name)s 已修改成功。"
 
+#: contrib/admin/options.py:2087
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
-msgstr[0] "全部 %(total_count)s 個被選"
+msgstr[0] "選取了 %(total_count)s 個"
 
+#: contrib/admin/options.py:2093
 #, python-format
 msgid "0 of %(cnt)s selected"
-msgstr "%(cnt)s 中 0 個被選"
+msgstr "%(cnt)s 中 0 個被選取"
 
+#: contrib/admin/options.py:2235
 #, python-format
 msgid "Change history: %s"
-msgstr "變更歷史: %s"
+msgstr "修改歷史: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
+#: contrib/admin/options.py:2427
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
 
+#: contrib/admin/options.py:2436
 #, python-format
 msgid ""
 "Deleting %(class_name)s %(instance)s would require deleting the following "
 "protected related objects: %(related_objects)s"
-msgstr ""
-"刪除 %(class_name)s %(instance)s 將會同時刪除下面受保護的相關物件："
-"%(related_objects)s"
+msgstr "刪除 %(class_name)s %(instance)s 將會同時刪除下面受保護的相關物件：%(related_objects)s"
 
+#: contrib/admin/sites.py:39 contrib/admin/templates/admin/base_site.html:3
 msgid "Django site admin"
 msgstr "Django 網站管理"
 
+#: contrib/admin/sites.py:42 contrib/admin/templates/admin/base_site.html:6
 msgid "Django administration"
 msgstr "Django 管理"
 
+#: contrib/admin/sites.py:45
 msgid "Site administration"
 msgstr "網站管理"
 
+#: contrib/admin/sites.py:422 contrib/admin/templates/admin/login.html:63
+#: contrib/admin/templates/registration/password_reset_complete.html:15
+#: contrib/admin/tests.py:143
 msgid "Log in"
 msgstr "登入"
 
+#: contrib/admin/sites.py:577
 #, python-format
 msgid "%(app)s administration"
 msgstr "%(app)s 管理"
 
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
 msgid "Page not found"
-msgstr "頁面沒有找到"
+msgstr "找不到頁面"
 
-msgid "We're sorry, but the requested page could not be found."
-msgstr "很抱歉，請求頁面無法找到。"
+#: contrib/admin/templates/admin/404.html:10
+msgid "We’re sorry, but the requested page could not be found."
+msgstr "很抱歉，請求頁面不存在。"
 
+#: contrib/admin/templates/admin/500.html:6
+#: contrib/admin/templates/admin/app_index.html:10
+#: contrib/admin/templates/admin/auth/user/change_password.html:10
+#: contrib/admin/templates/admin/base.html:76
+#: contrib/admin/templates/admin/change_form.html:18
+#: contrib/admin/templates/admin/change_list.html:32
+#: contrib/admin/templates/admin/delete_confirmation.html:14
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:14
+#: contrib/admin/templates/admin/invalid_setup.html:6
+#: contrib/admin/templates/admin/object_history.html:6
+#: contrib/admin/templates/registration/logged_out.html:4
+#: contrib/admin/templates/registration/password_change_done.html:13
+#: contrib/admin/templates/registration/password_change_form.html:14
+#: contrib/admin/templates/registration/password_reset_complete.html:6
+#: contrib/admin/templates/registration/password_reset_confirm.html:7
+#: contrib/admin/templates/registration/password_reset_done.html:6
+#: contrib/admin/templates/registration/password_reset_form.html:7
 msgid "Home"
 msgstr "首頁"
 
+#: contrib/admin/templates/admin/500.html:7
 msgid "Server error"
 msgstr "伺服器錯誤"
 
+#: contrib/admin/templates/admin/500.html:11
 msgid "Server error (500)"
 msgstr "伺服器錯誤 (500)"
 
+#: contrib/admin/templates/admin/500.html:14
 msgid "Server Error <em>(500)</em>"
 msgstr "伺服器錯誤 <em>(500)</em>"
 
+#: contrib/admin/templates/admin/500.html:15
 msgid ""
-"There's been an error. It's been reported to the site administrators via "
+"There’s been an error. It’s been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
-msgstr ""
-"存在一個錯誤。已透過電子郵件回報給網站管理員，並且應該很快就會被修正。謝謝你"
-"的關心。"
+msgstr "存在一個錯誤。已透過電子郵件回報給網站管理員，並且應該很快就會被修正。謝謝您的耐心等待。"
 
+#: contrib/admin/templates/admin/actions.html:8
 msgid "Run the selected action"
-msgstr "執行選擇的動作"
+msgstr "執行選取的動作"
 
+#: contrib/admin/templates/admin/actions.html:8
 msgid "Go"
-msgstr "去"
+msgstr "執行"
 
+#: contrib/admin/templates/admin/actions.html:16
 msgid "Click here to select the objects across all pages"
 msgstr "點選這裡可選取全部頁面的物件"
 
+#: contrib/admin/templates/admin/actions.html:16
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
 msgstr "選擇全部 %(total_count)s %(module_name)s"
 
+#: contrib/admin/templates/admin/actions.html:18
 msgid "Clear selection"
 msgstr "清除選擇"
 
+#: contrib/admin/templates/admin/app_index.html:8
+#: contrib/admin/templates/admin/base.html:73
+msgid "Breadcrumbs"
+msgstr "導覽路徑"
+
+#: contrib/admin/templates/admin/app_list.html:8
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "%(name)s 應用程式中的模型"
+
+#: contrib/admin/templates/admin/app_list.html:19
+msgid "Add"
+msgstr "新增"
+
+#: contrib/admin/templates/admin/app_list.html:26
+#: contrib/admin/templates/admin/edit_inline/stacked.html:16
+#: contrib/admin/templates/admin/edit_inline/tabular.html:36
+msgid "View"
+msgstr "查看"
+
+#: contrib/admin/templates/admin/app_list.html:39
+msgid "You don’t have permission to view or edit anything."
+msgstr "你沒有查看或編輯的權限。"
+
+#: contrib/admin/templates/admin/auth/user/add_form.html:6
 msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
-"options."
-msgstr "首先，輸入一個使用者名稱和密碼。然後你可以編輯更多使用者選項。"
+"First, enter a username and password. Then, you’ll be able to edit more user"
+" options."
+msgstr "輸入使用者名稱和密碼後，你可以編輯更多使用者選項。"
 
+#: contrib/admin/templates/admin/auth/user/add_form.html:8
 msgid "Enter a username and password."
-msgstr "輸入一個使用者名稱和密碼。"
+msgstr "輸入使用者名稱和密碼。"
 
+#: contrib/admin/templates/admin/auth/user/change_password.html:14
+#: contrib/admin/templates/admin/auth/user/change_password.html:52
+#: contrib/admin/templates/admin/base.html:57
+#: contrib/admin/templates/registration/password_change_done.html:4
+#: contrib/admin/templates/registration/password_change_form.html:5
 msgid "Change password"
-msgstr "變更密碼"
+msgstr "修改密碼"
 
+#: contrib/admin/templates/admin/auth/user/change_password.html:18
+msgid "Set password"
+msgstr "設定密碼"
+
+#: contrib/admin/templates/admin/auth/user/change_password.html:25
+#: contrib/admin/templates/admin/change_form.html:43
+#: contrib/admin/templates/admin/change_list.html:52
+#: contrib/admin/templates/admin/login.html:23
+#: contrib/admin/templates/registration/password_change_form.html:25
 msgid "Please correct the error below."
-msgstr "請更正下面的錯誤。"
+msgid_plural "Please correct the errors below."
+msgstr[0] "請修正以下錯誤。"
 
-msgid "Please correct the errors below."
-msgstr "請修正以下錯誤"
-
+#: contrib/admin/templates/admin/auth/user/change_password.html:29
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "為使用者<strong>%(username)s</strong>輸入一個新的密碼。"
 
+#: contrib/admin/templates/admin/auth/user/change_password.html:35
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr "這會 <strong>啟用</strong> 本用戶基於密碼的驗證"
+
+#: contrib/admin/templates/admin/auth/user/change_password.html:71
+msgid "Disable password-based authentication"
+msgstr "停用基於密碼的驗證"
+
+#: contrib/admin/templates/admin/auth/user/change_password.html:73
+msgid "Enable password-based authentication"
+msgstr "啟用基於密碼的驗證"
+
+#: contrib/admin/templates/admin/base.html:28
+msgid "Skip to main content"
+msgstr "跳到主要內容"
+
+#: contrib/admin/templates/admin/base.html:43
 msgid "Welcome,"
 msgstr "歡迎，"
 
+#: contrib/admin/templates/admin/base.html:48
 msgid "View site"
 msgstr "檢視網站"
 
+#: contrib/admin/templates/admin/base.html:53
+#: contrib/admin/templates/registration/password_change_done.html:4
+#: contrib/admin/templates/registration/password_change_form.html:5
 msgid "Documentation"
 msgstr "文件"
 
+#: contrib/admin/templates/admin/base.html:61
+#: contrib/admin/templates/registration/password_change_done.html:7
+#: contrib/admin/templates/registration/password_change_form.html:8
 msgid "Log out"
 msgstr "登出"
 
+#: contrib/admin/templates/admin/change_form.html:21
+#: contrib/admin/templates/admin/change_list_object_tools.html:8
 #, python-format
 msgid "Add %(name)s"
 msgstr "新增 %(name)s"
 
+#: contrib/admin/templates/admin/change_form_object_tools.html:5
+#: contrib/admin/templates/admin/object_history.html:10
 msgid "History"
 msgstr "歷史"
 
+#: contrib/admin/templates/admin/change_form_object_tools.html:7
+#: contrib/admin/templates/admin/edit_inline/stacked.html:18
+#: contrib/admin/templates/admin/edit_inline/tabular.html:38
 msgid "View on site"
 msgstr "在網站上檢視"
 
+#: contrib/admin/templates/admin/change_list.html:77
 msgid "Filter"
 msgstr "過濾器"
 
+#: contrib/admin/templates/admin/change_list.html:80
+msgid "Hide counts"
+msgstr "隱藏計數"
+
+#: contrib/admin/templates/admin/change_list.html:81
+msgid "Show counts"
+msgstr "顯示計數"
+
+#: contrib/admin/templates/admin/change_list.html:84
+msgid "Clear all filters"
+msgstr "清除所有篩選"
+
+#: contrib/admin/templates/admin/change_list_results.html:16
 msgid "Remove from sorting"
 msgstr "從排序中移除"
 
+#: contrib/admin/templates/admin/change_list_results.html:17
 #, python-format
 msgid "Sorting priority: %(priority_number)s"
 msgstr "優先排序：%(priority_number)s"
 
+#: contrib/admin/templates/admin/change_list_results.html:18
 msgid "Toggle sorting"
 msgstr "切換排序"
 
+#: contrib/admin/templates/admin/color_theme_toggle.html:3
+msgid "Toggle theme (current theme: auto)"
+msgstr "切換主題（當前主題:自動）"
+
+#: contrib/admin/templates/admin/color_theme_toggle.html:4
+msgid "Toggle theme (current theme: light)"
+msgstr "切換主題（當前主題:淺色）"
+
+#: contrib/admin/templates/admin/color_theme_toggle.html:5
+msgid "Toggle theme (current theme: dark)"
+msgstr "切換主題（當前主題:深色）"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:18
+#: contrib/admin/templates/admin/submit_line.html:14
 msgid "Delete"
 msgstr "刪除"
 
+#: contrib/admin/templates/admin/delete_confirmation.html:25
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
-msgstr ""
-"刪除 %(object_name)s '%(escaped_object)s' 會把相關的物件也刪除，不過你的帳號"
-"並沒有刪除以下型態物件的權限:"
+msgstr "刪除 %(object_name)s '%(escaped_object)s' 會把相關的物件也刪除，不過你的帳號並沒有刪除以下型態物件的權限:"
 
+#: contrib/admin/templates/admin/delete_confirmation.html:30
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
-"following protected related objects:"
-msgstr ""
-"要刪除 %(object_name)s '%(escaped_object)s', 將要求刪除下面受保護的相關物件:"
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the"
+" following protected related objects:"
+msgstr "要刪除 %(object_name)s '%(escaped_object)s', 將要求刪除下面受保護的相關物件:"
 
+#: contrib/admin/templates/admin/delete_confirmation.html:35
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
-msgstr ""
-"你確定想要刪除 %(object_name)s \"%(escaped_object)s\"？以下所有的相關項目都會"
-"被刪除:"
+msgstr "你確定想要刪除 %(object_name)s \"%(escaped_object)s\"？以下所有的相關項目都會被刪除:"
 
+#: contrib/admin/templates/admin/delete_confirmation.html:37
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:31
 msgid "Objects"
 msgstr "物件"
 
-msgid "Yes, I'm sure"
+#: contrib/admin/templates/admin/delete_confirmation.html:44
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:42
+msgid "Yes, I’m sure"
 msgstr "是的，我確定"
 
+#: contrib/admin/templates/admin/delete_confirmation.html:45
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:43
 msgid "No, take me back"
-msgstr "不，請帶我回去"
+msgstr "不，返回"
 
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:17
 msgid "Delete multiple objects"
 msgstr "刪除多個物件"
 
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:23
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
-msgstr ""
-"要刪除所選的 %(objects_name)s, 結果會刪除相關物件, 但你的帳號無權刪除下面物件"
-"型態:"
+msgstr "要刪除所選的 %(objects_name)s, 結果會刪除相關物件, 但你的帳號無權刪除下面物件型態:"
 
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:26
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
 "protected related objects:"
 msgstr "要刪除所選的 %(objects_name)s, 將要求刪除下面受保護的相關物件:"
 
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:29
 #, python-format
 msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
 "following objects and their related items will be deleted:"
-msgstr ""
-"你是否確定要刪除已選的 %(objects_name)s? 下面全部物件及其相關項目都將被刪除:"
+msgstr "你是否確定要刪除已選的 %(objects_name)s? 下面全部物件及其相關項目都將被刪除:"
 
-msgid "Change"
-msgstr "變更"
-
+#: contrib/admin/templates/admin/edit_inline/tabular.html:22
 msgid "Delete?"
 msgstr "刪除？"
 
+#: contrib/admin/templates/admin/filter.html:4
 #, python-format
 msgid " By %(filter_title)s "
 msgstr " 以 %(filter_title)s"
 
+#: contrib/admin/templates/admin/includes/object_delete_summary.html:2
 msgid "Summary"
 msgstr "總結"
 
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "%(name)s 應用程式中的Model"
-
-msgid "Add"
-msgstr "新增"
-
-msgid "You don't have permission to edit anything."
-msgstr "你沒有編輯任何東西的權限。"
-
+#: contrib/admin/templates/admin/index.html:23
 msgid "Recent actions"
 msgstr "最近的動作"
 
+#: contrib/admin/templates/admin/index.html:24
 msgid "My actions"
 msgstr "我的動作"
 
+#: contrib/admin/templates/admin/index.html:28
 msgid "None available"
-msgstr "無可用的"
+msgstr "無資料"
 
+#: contrib/admin/templates/admin/index.html:33
+msgid "Added:"
+msgstr "已新增。"
+
+#: contrib/admin/templates/admin/index.html:33
+msgid "Changed:"
+msgstr "已修改："
+
+#: contrib/admin/templates/admin/index.html:33
+msgid "Deleted:"
+msgstr "已刪除:"
+
+#: contrib/admin/templates/admin/index.html:43
 msgid "Unknown content"
 msgstr "未知內容"
 
+#: contrib/admin/templates/admin/invalid_setup.html:12
 msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
-"database tables have been created, and make sure the database is readable by "
-"the appropriate user."
-msgstr ""
-"你的資料庫安裝有錯誤。確定資料庫表格已經建立，並確定資料庫可被合適的使用者讀"
-"取。"
+"Something’s wrong with your database installation. Make sure the appropriate"
+" database tables have been created, and make sure the database is readable "
+"by the appropriate user."
+msgstr "你的資料庫安裝有錯誤。確定資料庫表格已經建立，並確定資料庫可被合適的使用者讀取。"
 
+#: contrib/admin/templates/admin/login.html:39
 #, python-format
 msgid ""
-"You are authenticated as %(username)s, but are not authorized to access this "
-"page. Would you like to login to a different account?"
-msgstr ""
-"您已認證為 %(username)s，但並沒有瀏覽此頁面的權限。您是否希望以其他帳號登入？"
+"You are authenticated as %(username)s, but are not authorized to access this"
+" page. Would you like to login to a different account?"
+msgstr "您目前以%(username)s登入，但並沒有瀏覽此頁面的權限。您是否希望以其他帳號登入？"
 
+#: contrib/admin/templates/admin/login.html:59
 msgid "Forgotten your password or username?"
-msgstr "忘了你的密碼或是使用者名稱？"
+msgstr "忘記您的密碼或是使用者名稱？"
 
+#: contrib/admin/templates/admin/nav_sidebar.html:2
+msgid "Toggle navigation"
+msgstr "切換導航"
+
+#: contrib/admin/templates/admin/nav_sidebar.html:3
+msgid "Sidebar"
+msgstr "側邊欄"
+
+#: contrib/admin/templates/admin/nav_sidebar.html:5
+msgid "Start typing to filter…"
+msgstr "輸入內容開始篩選..."
+
+#: contrib/admin/templates/admin/nav_sidebar.html:6
+msgid "Filter navigation items"
+msgstr "篩選導航項目"
+
+#: contrib/admin/templates/admin/object_history.html:22
 msgid "Date/time"
 msgstr "日期/時間"
 
+#: contrib/admin/templates/admin/object_history.html:23
 msgid "User"
 msgstr "使用者"
 
+#: contrib/admin/templates/admin/object_history.html:24
 msgid "Action"
 msgstr "動作"
 
-msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
-"admin site."
-msgstr "這個物件沒有變更的歷史。它可能不是透過這個管理網站新增的。"
+#: contrib/admin/templates/admin/object_history.html:49
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] "紀錄項目"
 
+#: contrib/admin/templates/admin/object_history.html:52
+msgid ""
+"This object doesn’t have a change history. It probably wasn’t added via this"
+" admin site."
+msgstr "該物件沒有修改的歷史紀錄。它可能不是透過此管理網站新增的。"
+
+#: contrib/admin/templates/admin/pagination.html:10
+#: contrib/admin/templates/admin/search_form.html:9
 msgid "Show all"
 msgstr "顯示全部"
 
+#: contrib/admin/templates/admin/pagination.html:11
+#: contrib/admin/templates/admin/submit_line.html:4
 msgid "Save"
 msgstr "儲存"
 
-msgid "Popup closing..."
-msgstr "關閉彈出視窗中⋯⋯"
+#: contrib/admin/templates/admin/popup_response.html:3
+msgid "Popup closing…"
+msgstr "關閉彈跳視窗中..."
 
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "變更所選的 %(model)s"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "新增其它 %(model)s"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "刪除所選的 %(model)s"
-
+#: contrib/admin/templates/admin/search_form.html:7
 msgid "Search"
 msgstr "搜尋"
 
+#: contrib/admin/templates/admin/search_form.html:9
 #, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
 msgstr[0] "%(counter)s 結果"
 
+#: contrib/admin/templates/admin/search_form.html:9
 #, python-format
 msgid "%(full_result_count)s total"
 msgstr "總共 %(full_result_count)s"
 
+#: contrib/admin/templates/admin/submit_line.html:5
 msgid "Save as new"
 msgstr "儲存為新的"
 
+#: contrib/admin/templates/admin/submit_line.html:6
 msgid "Save and add another"
 msgstr "儲存並新增另一個"
 
+#: contrib/admin/templates/admin/submit_line.html:7
 msgid "Save and continue editing"
 msgstr "儲存並繼續編輯"
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "感謝你今天花了重要的時間停留在本網站。"
+#: contrib/admin/templates/admin/submit_line.html:7
+msgid "Save and view"
+msgstr "儲存並查看"
 
+#: contrib/admin/templates/admin/submit_line.html:10
+msgid "Close"
+msgstr "關閉"
+
+#: contrib/admin/templates/admin/widgets/related_widget_wrapper.html:11
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "修改所選的 %(model)s"
+
+#: contrib/admin/templates/admin/widgets/related_widget_wrapper.html:19
+#, python-format
+msgid "Add another %(model)s"
+msgstr "新增其它 %(model)s"
+
+#: contrib/admin/templates/admin/widgets/related_widget_wrapper.html:27
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "刪除所選的 %(model)s"
+
+#: contrib/admin/templates/admin/widgets/related_widget_wrapper.html:34
+#, python-format
+msgid "View selected %(model)s"
+msgstr "查看已選擇的%(model)s"
+
+#: contrib/admin/templates/registration/logged_out.html:10
+msgid "Thanks for spending some quality time with the web site today."
+msgstr "感謝您今天在網站上度過了一段美好的時光。"
+
+#: contrib/admin/templates/registration/logged_out.html:12
 msgid "Log in again"
 msgstr "重新登入"
 
+#: contrib/admin/templates/registration/password_change_done.html:14
+#: contrib/admin/templates/registration/password_change_form.html:15
 msgid "Password change"
-msgstr "密碼變更"
+msgstr "密碼修改"
 
+#: contrib/admin/templates/registration/password_change_done.html:19
 msgid "Your password was changed."
-msgstr "你的密碼已變更。"
+msgstr "您的密碼已修改。"
 
+#: contrib/admin/templates/registration/password_change_form.html:30
 msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
-"password twice so we can verify you typed it in correctly."
-msgstr ""
-"為了安全上的考量，請輸入你的舊密碼，再輸入新密碼兩次，讓我們核驗你已正確地輸"
-"入。"
+"Please enter your old password, for security’s sake, and then enter your new"
+" password twice so we can verify you typed it in correctly."
+msgstr "為了安全上的考量，請輸入你的舊密碼，然後輸入兩次新密碼已確保輸入正確。"
 
+#: contrib/admin/templates/registration/password_change_form.html:58
+#: contrib/admin/templates/registration/password_reset_confirm.html:37
 msgid "Change my password"
-msgstr "變更我的密碼"
+msgstr "修改我的密碼"
 
+#: contrib/admin/templates/registration/password_reset_complete.html:7
+#: contrib/admin/templates/registration/password_reset_done.html:7
+#: contrib/admin/templates/registration/password_reset_form.html:8
 msgid "Password reset"
-msgstr "密碼重設"
+msgstr "重設密碼"
 
+#: contrib/admin/templates/registration/password_reset_complete.html:13
 msgid "Your password has been set.  You may go ahead and log in now."
 msgstr "你的密碼已設置，現在可以繼續登入。"
 
+#: contrib/admin/templates/registration/password_reset_confirm.html:8
 msgid "Password reset confirmation"
 msgstr "密碼重設確認"
 
+#: contrib/admin/templates/registration/password_reset_confirm.html:16
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
-msgstr "請輸入你的新密碼兩次, 這樣我們才能檢查你的輸入是否正確。"
+msgstr "請輸入新密碼兩次, 以便系統確認輸入無誤。"
 
+#: contrib/admin/templates/registration/password_reset_confirm.html:24
 msgid "New password:"
 msgstr "新密碼："
 
+#: contrib/admin/templates/registration/password_reset_confirm.html:31
 msgid "Confirm password:"
 msgstr "確認密碼："
 
+#: contrib/admin/templates/registration/password_reset_confirm.html:43
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
-msgstr "密碼重設連結無效，可能因為他已使用。請重新請求密碼重設。"
+msgstr "密碼重設連結無效，可能已被使用。請重新申請密碼重設。"
 
+#: contrib/admin/templates/registration/password_reset_done.html:13
 msgid ""
-"We've emailed you instructions for setting your password, if an account "
+"We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
-msgstr ""
-"若您提交的電子郵件地址存在對應帳號，我們已寄出重設密碼的相關指示。您應該很快"
-"就會收到。"
+msgstr "若您提交的電子郵件地址存在對應帳號，我們已寄出重設密碼的相關指示。您應該很快就會收到。"
 
+#: contrib/admin/templates/registration/password_reset_done.html:15
 msgid ""
-"If you don't receive an email, please make sure you've entered the address "
+"If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
-msgstr ""
-"如果您未收到電子郵件，請確認您輸入的電子郵件地址與您註冊時輸入的一致，並檢查"
-"您的垃圾郵件匣。"
+msgstr "如果您未收到電子郵件，請確認您輸入的電子郵件地址與您註冊時輸入的一致，並檢查您的垃圾郵件匣。"
 
+#: contrib/admin/templates/registration/password_reset_email.html:2
 #, python-format
 msgid ""
 "You're receiving this email because you requested a password reset for your "
 "user account at %(site_name)s."
-msgstr "這封電子郵件來自 %(site_name)s，因為你要求為帳號重新設定密碼。"
+msgstr "這封電子郵件來自 %(site_name)s，因為您要求為帳號重新設定密碼。"
 
+#: contrib/admin/templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
 msgstr "請到該頁面選擇一個新的密碼："
 
-msgid "Your username, in case you've forgotten:"
-msgstr "你的使用者名稱，萬一你已經忘記的話:"
+#: contrib/admin/templates/registration/password_reset_email.html:8
+msgid "Your username, in case you’ve forgotten:"
+msgstr "提醒一下，您的用戶名是："
 
+#: contrib/admin/templates/registration/password_reset_email.html:10
 msgid "Thanks for using our site!"
 msgstr "感謝使用本網站！"
 
+#: contrib/admin/templates/registration/password_reset_email.html:12
 #, python-format
 msgid "The %(site_name)s team"
 msgstr "%(site_name)s 團隊"
 
+#: contrib/admin/templates/registration/password_reset_form.html:14
 msgid ""
-"Forgotten your password? Enter your email address below, and we'll email "
+"Forgotten your password? Enter your email address below, and we’ll email "
 "instructions for setting a new one."
-msgstr ""
-"忘記你的密碼? 請在下面輸入你的電子郵件位址, 然後我們會寄出設定新密碼的操作指"
-"示。"
+msgstr "忘記您的密碼? 請在下面輸入您的電子郵件, 然後我們會寄出設定新密碼的操作指示。"
 
+#: contrib/admin/templates/registration/password_reset_form.html:21
 msgid "Email address:"
 msgstr "電子信箱："
 
+#: contrib/admin/templates/registration/password_reset_form.html:27
 msgid "Reset my password"
 msgstr "重設我的密碼"
 
+#: contrib/admin/templatetags/admin_list.py:100
+msgid "Select all objects on this page for an action"
+msgstr "選擇此頁面上的所有物件執行操作"
+
+#: contrib/admin/templatetags/admin_list.py:434
 msgid "All dates"
 msgstr "所有日期"
 
+#: contrib/admin/views/main.py:147
 #, python-format
 msgid "Select %s"
 msgstr "選擇 %s"
 
+#: contrib/admin/views/main.py:149
 #, python-format
 msgid "Select %s to change"
-msgstr "選擇 %s 來變更"
+msgstr "選擇 %s 來修改"
 
+#: contrib/admin/views/main.py:151
+#, python-format
+msgid "Select %s to view"
+msgstr "選擇%s查看"
+
+#: contrib/admin/widgets.py:98
 msgid "Date:"
 msgstr "日期"
 
+#: contrib/admin/widgets.py:99
 msgid "Time:"
 msgstr "時間"
 
+#: contrib/admin/widgets.py:163
 msgid "Lookup"
-msgstr "查詢"
+msgstr "查找"
 
+#: contrib/admin/widgets.py:389
 msgid "Currently:"
 msgstr "目前："
 
+#: contrib/admin/widgets.py:390
 msgid "Change:"
 msgstr "變動："

@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 07:05+0000\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2013-04-25 07:05+0000\n"
 "Last-Translator: F Wolff <friedel@translate.org.za>, 2019-2020,2023\n"
 "Language-Team: Afrikaans (http://app.transifex.com/django/django/language/"
 "af/)\n"
@@ -203,11 +203,6 @@ msgstr ""
 "Die {name} “{obj}” is suksesvol gewysig. Redigeer dit gerus weer onder."
 
 #, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr ""
-"Die {name} “{obj}” is suksesvol bygevoeg. Redigeer dit gerus weer onder."
-
-#, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
@@ -372,6 +367,9 @@ msgstr "Vul ’n gebruikersnaam en wagwoord in."
 msgid "Change password"
 msgstr "Verander wagwoord"
 
+msgid "Set password"
+msgstr ""
+
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Korrigeer asb. die fout hier onder."
@@ -380,6 +378,17 @@ msgstr[1] "Korrigeer asb. die foute hier onder."
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Vul ’n nuwe wagwoord vir gebruiker <strong>%(username)s</strong> in."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+
+msgid "Disable password-based authentication"
+msgstr ""
+
+msgid "Enable password-based authentication"
+msgstr ""
 
 msgid "Skip to main content"
 msgstr "Gaan direk na hoofinhoud"

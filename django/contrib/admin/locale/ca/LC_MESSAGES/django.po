@@ -16,10 +16,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:10-0500\n"
-"PO-Revision-Date: 2022-07-25 07:05+0000\n"
-"Last-Translator: Emilio Carrion\n"
-"Language-Team: Catalan (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2013-04-25 07:05+0000\n"
+"Last-Translator: Emilio Carrion, 2022\n"
+"Language-Team: Catalan (http://app.transifex.com/django/django/language/"
 "ca/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -188,6 +188,9 @@ msgstr ""
 "Premeu la tecla \"Control\", o \"Command\" en un Mac, per seleccionar més "
 "d'un valor."
 
+msgid "Select this object for an action - {}"
+msgstr ""
+
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr "El {name} \"{obj}\" fou afegit amb èxit."
@@ -207,11 +210,6 @@ msgid ""
 "The {name} “{obj}” was changed successfully. You may edit it again below."
 msgstr ""
 "El {name} \"{obj}\" fou canviat amb èxit. Podeu editar-lo de nou a sota."
-
-#, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr ""
-"El  {name} \"{obj}\" s'ha afegit amb èxit. Podeu editar-lo de nou a sota."
 
 #, python-brace-format
 msgid ""
@@ -351,6 +349,9 @@ msgstr "Seleccioneu tots %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Netejar la selecció"
 
+msgid "Breadcrumbs"
+msgstr ""
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "Models en l'aplicació %(name)s"
@@ -377,15 +378,31 @@ msgstr "Introduïu un nom d'usuari i contrasenya."
 msgid "Change password"
 msgstr "Canviar contrasenya"
 
-msgid "Please correct the error below."
-msgstr "Si us plau, corregiu l'error de sota."
+msgid "Set password"
+msgstr ""
 
-msgid "Please correct the errors below."
-msgstr "Si us plau, corregiu els errors mostrats a sota."
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Introduïu una contrasenya per l'usuari <strong>%(username)s</strong>"
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+
+msgid "Disable password-based authentication"
+msgstr ""
+
+msgid "Enable password-based authentication"
+msgstr ""
+
+msgid "Skip to main content"
+msgstr ""
 
 msgid "Welcome,"
 msgstr "Benvingut/da,"
@@ -412,6 +429,12 @@ msgstr "Veure al lloc"
 msgid "Filter"
 msgstr "Filtre"
 
+msgid "Hide counts"
+msgstr ""
+
+msgid "Show counts"
+msgstr ""
+
 msgid "Clear all filters"
 msgstr "Netejar tots els filtres"
 
@@ -424,6 +447,15 @@ msgstr "Prioritat d'ordenació: %(priority_number)s"
 
 msgid "Toggle sorting"
 msgstr "Commutar ordenació"
+
+msgid "Toggle theme (current theme: auto)"
+msgstr ""
+
+msgid "Toggle theme (current theme: light)"
+msgstr ""
+
+msgid "Toggle theme (current theme: dark)"
+msgstr ""
 
 msgid "Delete"
 msgstr "Eliminar"
@@ -451,8 +483,8 @@ msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Esteu segurs de voler esborrar els/les %(object_name)s \"%(escaped_object)s"
-"\"? S'esborraran els següents elements relacionats:"
+"Esteu segurs de voler esborrar els/les %(object_name)s "
+"\"%(escaped_object)s\"? S'esborraran els següents elements relacionats:"
 
 msgid "Objects"
 msgstr "Objectes"
@@ -511,6 +543,15 @@ msgstr "Les meves accions"
 msgid "None available"
 msgstr "Cap disponible"
 
+msgid "Added:"
+msgstr ""
+
+msgid "Changed:"
+msgstr ""
+
+msgid "Deleted:"
+msgstr ""
+
 msgid "Unknown content"
 msgstr "Contingut desconegut"
 
@@ -537,6 +578,9 @@ msgstr "Heu oblidat la vostra contrasenya o nom d'usuari?"
 msgid "Toggle navigation"
 msgstr "Canviar mode de navegació"
 
+msgid "Sidebar"
+msgstr ""
+
 msgid "Start typing to filter…"
 msgstr "Comença a teclejar per filtrar ..."
 
@@ -553,10 +597,9 @@ msgid "Action"
 msgstr "Acció"
 
 msgid "entry"
-msgstr "entrada"
-
-msgid "entries"
-msgstr "entrades"
+msgid_plural "entries"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -718,6 +761,9 @@ msgstr "Adreça de correu electrònic:"
 
 msgid "Reset my password"
 msgstr "Restablir la meva contrasenya"
+
+msgid "Select all objects on this page for an action"
+msgstr ""
 
 msgid "All dates"
 msgstr "Totes les dates"

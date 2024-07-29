@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 07:05+0000\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2013-04-25 07:05+0000\n"
 "Last-Translator: Meir Kriheli <mkriheli@gmail.com>, "
 "2011-2015,2017,2019-2020,2023\n"
 "Language-Team: Hebrew (http://app.transifex.com/django/django/language/he/)\n"
@@ -19,8 +19,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: he\n"
-"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % "
-"1 == 0) ? 1: (n % 10 == 0 && n % 1 == 0 && n > 10) ? 2 : 3;\n"
+"Plural-Forms: nplurals=3; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % "
+"1 == 0) ? 1: 2;\n"
 
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
@@ -202,10 +202,6 @@ msgid ""
 msgstr "שינוי {name} “{obj}” בוצע בהצלחה. ניתן לערוך שוב מתחת."
 
 #, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr "הוספת {name} “{obj}” בוצעה בהצלחה. ניתן לערוך שוב מתחת."
-
-#, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
@@ -252,7 +248,6 @@ msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "שינוי %(count)s %(name)s בוצע בהצלחה."
 msgstr[1] "שינוי %(count)s %(name)s בוצע בהצלחה."
 msgstr[2] "שינוי %(count)s %(name)s בוצע בהצלחה."
-msgstr[3] "שינוי %(count)s %(name)s בוצע בהצלחה."
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -260,7 +255,6 @@ msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s נבחר"
 msgstr[1] "כל ה־%(total_count)s נבחרו"
 msgstr[2] "כל ה־%(total_count)s נבחרו"
-msgstr[3] "כל ה־%(total_count)s נבחרו"
 
 #, python-format
 msgid "0 of %(cnt)s selected"
@@ -370,16 +364,29 @@ msgstr "נא לשים שם משתמש וסיסמה."
 msgid "Change password"
 msgstr "שינוי סיסמה"
 
+msgid "Set password"
+msgstr ""
+
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "נא לתקן את השגיאה מתחת."
 msgstr[1] "נא לתקן את השגיאות מתחת."
 msgstr[2] "נא לתקן את השגיאות מתחת."
-msgstr[3] "נא לתקן את השגיאות מתחת."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "יש להזין סיסמה חדשה עבור המשתמש <strong>%(username)s</strong>."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+
+msgid "Disable password-based authentication"
+msgstr ""
+
+msgid "Enable password-based authentication"
+msgstr ""
 
 msgid "Skip to main content"
 msgstr "דילוג לתוכן העיקרי"
@@ -578,7 +585,6 @@ msgid_plural "entries"
 msgstr[0] "רשומה"
 msgstr[1] "רשומה"
 msgstr[2] "רשומות"
-msgstr[3] "רשומות"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -603,7 +609,6 @@ msgid_plural "%(counter)s results"
 msgstr[0] "תוצאה %(counter)s"
 msgstr[1] "%(counter)s תוצאות"
 msgstr[2] "%(counter)s תוצאות"
-msgstr[3] "%(counter)s תוצאות"
 
 #, python-format
 msgid "%(full_result_count)s total"

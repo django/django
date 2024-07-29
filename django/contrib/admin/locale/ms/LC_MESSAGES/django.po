@@ -7,10 +7,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-12-06 07:41+0000\n"
-"Last-Translator: Mariusz Felisiak <felisiak.mariusz@gmail.com>\n"
-"Language-Team: Malay (http://www.transifex.com/django/django/language/ms/)\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2013-04-25 07:05+0000\n"
+"Last-Translator: Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2021\n"
+"Language-Team: Malay (http://app.transifex.com/django/django/language/ms/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -177,6 +177,9 @@ msgid "Hold down “Control”, or “Command” on a Mac, to select more than o
 msgstr ""
 "Tekan \"Control\", atau \"Command pada Mac untuk memilih lebih daripada satu."
 
+msgid "Select this object for an action - {}"
+msgstr ""
+
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr "{name} \"{obj}\" telah berjaya ditambah."
@@ -195,10 +198,6 @@ msgstr ""
 msgid ""
 "The {name} “{obj}” was changed successfully. You may edit it again below."
 msgstr "{name} \"{obj}\" berjaya diubah. Anda boleh edit semula dibawah."
-
-#, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr "{name} \"{obj}\" berjaya ditambah. Anda boleh edit semula dibawah."
 
 #, python-brace-format
 msgid ""
@@ -262,8 +261,9 @@ msgstr "0 daripada %(cnt)s dipilih"
 msgid "Change history: %s"
 msgstr "Sejarah penukaran: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -333,6 +333,9 @@ msgstr "Pilih kesemua %(total_count)s%(module_name)s"
 msgid "Clear selection"
 msgstr "Padam pilihan"
 
+msgid "Breadcrumbs"
+msgstr ""
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "Model didalam aplikasi %(name)s"
@@ -359,15 +362,30 @@ msgstr "Masukkan nama pengguna dan kata laluan."
 msgid "Change password"
 msgstr "Tukar kata laluan"
 
-msgid "Please correct the error below."
-msgstr "Sila betulkan ralat di bawah."
+msgid "Set password"
+msgstr ""
 
-msgid "Please correct the errors below."
-msgstr "Sila betulkan ralat-ralat di bawah."
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Masukkan kata lalauan bagi pengguna <strong>%(username)s</strong>"
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+
+msgid "Disable password-based authentication"
+msgstr ""
+
+msgid "Enable password-based authentication"
+msgstr ""
+
+msgid "Skip to main content"
+msgstr ""
 
 msgid "Welcome,"
 msgstr "Selamat datang,"
@@ -394,6 +412,12 @@ msgstr "Lihat di laman"
 msgid "Filter"
 msgstr "Tapis"
 
+msgid "Hide counts"
+msgstr ""
+
+msgid "Show counts"
+msgstr ""
+
 msgid "Clear all filters"
 msgstr "Kosongkan kesemua tapisan"
 
@@ -406,6 +430,15 @@ msgstr "Keutamaan susunan: %(priority_number)s"
 
 msgid "Toggle sorting"
 msgstr "Togol penyusunan"
+
+msgid "Toggle theme (current theme: auto)"
+msgstr ""
+
+msgid "Toggle theme (current theme: light)"
+msgstr ""
+
+msgid "Toggle theme (current theme: dark)"
+msgstr ""
 
 msgid "Delete"
 msgstr "Buang"
@@ -433,8 +466,8 @@ msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Adakah anda pasti anda ingin membuang %(object_name)s \"%(escaped_object)s"
-"\"? Semua item-item berkaitan berikut akan turut dibuang:"
+"Adakah anda pasti anda ingin membuang %(object_name)s "
+"\"%(escaped_object)s\"? Semua item-item berkaitan berikut akan turut dibuang:"
 
 msgid "Objects"
 msgstr "Objek-objek"
@@ -493,6 +526,15 @@ msgstr "Tindakan saya"
 msgid "None available"
 msgstr "Tiada yang tersedia"
 
+msgid "Added:"
+msgstr ""
+
+msgid "Changed:"
+msgstr ""
+
+msgid "Deleted:"
+msgstr ""
+
 msgid "Unknown content"
 msgstr "Kandungan tidak diketahui"
 
@@ -519,6 +561,9 @@ msgstr "Terlupa kata laluan atau nama pengguna anda?"
 msgid "Toggle navigation"
 msgstr "Togol navigasi"
 
+msgid "Sidebar"
+msgstr ""
+
 msgid "Start typing to filter…"
 msgstr "Mulakan menaip untuk menapis..."
 
@@ -533,6 +578,10 @@ msgstr "Pengguna"
 
 msgid "Action"
 msgstr "Tindakan"
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] ""
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -588,6 +637,10 @@ msgstr "Tambah %(model)s"
 #, python-format
 msgid "Delete selected %(model)s"
 msgstr "Buang %(model)s pilihan"
+
+#, python-format
+msgid "View selected %(model)s"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "Terima kasih kerana meluangkan masa di laman sesawang ini hari ini."
@@ -689,6 +742,9 @@ msgstr "Alamat emel:"
 
 msgid "Reset my password"
 msgstr "Tetap semula kata laluan saya"
+
+msgid "Select all objects on this page for an action"
+msgstr ""
 
 msgid "All dates"
 msgstr "Semua tarikh"
