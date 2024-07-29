@@ -3003,6 +3003,7 @@ class AdminViewPermissionsTest(TestCase):
         response = self.client.get(
             reverse("admin:admin_views_section_delete", args=(self.s1.pk,))
         )
+        self.assertContains(response, "<h1>Delete</h1>")
         self.assertContains(response, "<h2>Summary</h2>")
         self.assertContains(response, "<li>Articles: 3</li>")
         # test response contains link to related Article
