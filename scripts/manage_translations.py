@@ -22,7 +22,7 @@ import os
 from argparse import ArgumentParser
 from collections import defaultdict
 from configparser import ConfigParser
-from datetime import date, datetime
+from datetime import datetime
 from subprocess import run
 
 import requests
@@ -38,7 +38,7 @@ LANG_OVERRIDES = {
 }
 
 
-def list_resources_with_updates(date_since, verbose=False):
+def list_resources_with_updates(date_since, date_skip=None, verbose=False):
     resource_lang_changed = defaultdict(list)
     resource_lang_unchanged = defaultdict(list)
 
@@ -72,7 +72,8 @@ def list_resources_with_updates(date_since, verbose=False):
         stats_data = stats.json()["data"]
         for lang_data in stats_data:
             lang_id = lang_data["id"].split(":")[-1]
-            last_update = lang_data["attributes"]["last_translation_update"]
+            lang_attributes = lang_data["attributes"]
+            last_update = lang_attributes["last_translation_update"]
             if verbose:
                 print(
                     f"CHECKING {resource_name} for {lang_id=} updated on {last_update}"
@@ -82,8 +83,11 @@ def list_resources_with_updates(date_since, verbose=False):
                 continue
 
             last_update = datetime.strptime(last_update, "%Y-%m-%dT%H:%M:%SZ")
-            feature_freeze = date(2024, 5, 22)
-            if last_update > date_since and last_update.date() != feature_freeze:
+            if last_update > date_since and (
+                date_skip is None or last_update.date() != date_skip.date()
+            ):
+                if verbose:
+                    print(f"=> CHANGED {lang_attributes=} {date_skip=}")
                 resource_lang_changed[resource_name].append(lang_id)
             else:
                 resource_lang_unchanged[resource_name].append(lang_id)
@@ -266,11 +270,13 @@ def fetch(resources=None, languages=None):
         exit(1)
 
 
-def fetch_since(date_since, verbose=False, dry_run=False):
+def fetch_since(date_since, date_skip=None, verbose=False, dry_run=False):
     """
     Fetch translations from Transifex that were modified since the given date.
     """
-    changed = list_resources_with_updates(date_since=date_since, verbose=verbose)
+    changed = list_resources_with_updates(
+        date_since=date_since, date_skip=date_skip, verbose=verbose
+    )
     if verbose:
         print(f"== SUMMARY for changed resources {dry_run=} ==\n")
     for res, langs in changed.items():
@@ -338,6 +344,13 @@ if __name__ == "__main__":
         metavar="YYYY-MM-DD",
         type=datetime.fromisoformat,
         help="fetch new translations since this date (ISO format YYYY-MM-DD).",
+    )
+    parser_fetch.add_argument(
+        "--skip",
+        dest="date_skip",
+        metavar="YYYY-MM-DD",
+        type=datetime.fromisoformat,
+        help="skip changes from this date (ISO format YYYY-MM-DD).",
     )
     parser_fetch.add_argument("--dry-run", dest="dry_run", action="store_true")
 
