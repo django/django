@@ -1647,7 +1647,7 @@ class ModelMultipleChoiceField(ModelChoiceField):
                     params={"pk": pk},
                 )
         qs = self.queryset.filter(**{"%s__in" % key: value})
-        pks = {str(getattr(o, key)) for o in qs}
+        pks = {str(self.prepare_value(o)) for o in qs}
         for val in value:
             if str(val) not in pks:
                 raise ValidationError(
