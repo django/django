@@ -67,7 +67,10 @@ def list_resources_with_updates(date_since, verbose=False):
     return resource_lang_changed
 
 
-def fetch_since(date_since, verbose=True, dry_run=True):
+def fetch_since(date_since, verbose=False, dry_run=False):
+    """
+    Fetch translations from Transifex that were modified since the given date.
+    """
     changed = list_resources_with_updates(date_since=date_since, verbose=verbose)
     if verbose:
         print(f"== SUMMARY for changed resources {dry_run=} ==\n")
@@ -85,12 +88,12 @@ if __name__ == "__main__":
     parser.add_argument("-v", "--verbose", action="store_true")
     parser.add_argument("--dry-run", dest="dry_run", action="store_true")
     parser.add_argument(
-        "-d",
-        "--date-since",
+        "-s",
+        "--since",
         dest="date_since",
         metavar="YYYY-MM-DD",
         type=datetime.fromisoformat,
-        help="Fetch new translations since this date (ISO format YYYY-MM-DD).",
+        help="fetch new translations since this date (ISO format YYYY-MM-DD).",
     )
     options = parser.parse_args()
     fetch_since(**options.__dict__)
