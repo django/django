@@ -3,7 +3,7 @@
 # Translators:
 # Christian Joergensen <christian@gmta.info>, 2012
 # Dimitris Glezos <glezos@transifex.com>, 2012
-# Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2020-2023
+# Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2020-2024
 # Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2013,2015-2020
 # Finn Gruwier Larsen, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -12,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 07:05+0000\n"
-"Last-Translator: Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2020-2023\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 07:05+0000\n"
+"Last-Translator: Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2020-2024\n"
 "Language-Team: Danish (http://app.transifex.com/django/django/language/da/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -203,10 +203,6 @@ msgid ""
 msgstr "{name} “{obj}” blev ændret. Du kan redigere den/det igen herunder."
 
 #, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr "{name} “{obj}” blev tilføjet. Du kan redigere den/det igen herunder."
-
-#, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
@@ -372,6 +368,9 @@ msgstr "Indtast et brugernavn og en adgangskode."
 msgid "Change password"
 msgstr "Skift adgangskode"
 
+msgid "Set password"
+msgstr "Sæt adgangskode"
+
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Ret venligst fejlen herunder."
@@ -380,6 +379,19 @@ msgstr[1] "Ret venligst fejlene herunder."
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Indtast en ny adgangskode for brugeren <strong>%(username)s</strong>."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+"Denne handling vil <strong>aktivere</strong> adgangskodebaseret "
+"autentificering for denne bruger."
+
+msgid "Disable password-based authentication"
+msgstr "Deaktivér adgangskodebaseret autentificering."
+
+msgid "Enable password-based authentication"
+msgstr "Aktivér adgangskodebaseret autentificering."
 
 msgid "Skip to main content"
 msgstr "Gå til hovedindhold"
@@ -553,7 +565,7 @@ msgstr ""
 "denne site. Vil du logge ind med en anden brugerkonto?"
 
 msgid "Forgotten your password or username?"
-msgstr "Har du glemt dit password eller brugernavn?"
+msgstr "Har du glemt din adgangskode eller dit brugernavn?"
 
 msgid "Toggle navigation"
 msgstr "Vis/skjul navigation"
