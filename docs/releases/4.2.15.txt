@@ -2,9 +2,10 @@
 Django 4.2.15 release notes
 ===========================
 
-*Expected August 6, 2024*
+*August 6, 2024*
 
-Django 4.2.15 fixes a regression in 4.2.14.
+Django 4.2.15 fixes three security issues with severity "moderate", one
+security issue with severity "high", and a regression in 4.2.14.
 
 Bugfixes
 ========
