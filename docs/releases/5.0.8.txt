@@ -2,9 +2,10 @@
 Django 5.0.8 release notes
 ==========================
 
-*Expected August 6, 2024*
+*August 6, 2024*
 
-Django 5.0.8 fixes several bugs in 5.0.7.
+Django 5.0.8 fixes three security issues with severity "moderate", one security
+issue with severity "high", and several bugs in 5.0.7.
 
 Bugfixes
 ========
