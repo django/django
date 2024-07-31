@@ -1557,7 +1557,8 @@ class ExceptionReporterFilterTests(
         "SECRET_KEY_FALLBACKS",
         "PASSWORD",
         "API_KEY",
-        "AUTH_TOKEN",
+        "SOME_TOKEN",
+        "MY_AUTH",
     ]
 
     def test_non_sensitive_request(self):
@@ -1885,6 +1886,7 @@ class ExceptionReporterFilterTests(
             "PASSWORD": "super secret",
             "SECRET_VALUE": "super secret",
             "SOME_TOKEN": "super secret",
+            "THE_AUTH": "super secret",
         }
         request = self.rf.get("/", headers=headers)
         reporter_filter = SafeExceptionReporterFilter()

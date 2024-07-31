@@ -150,7 +150,8 @@ Email
 Error Reporting
 ~~~~~~~~~~~~~~~
 
-* ...
+* The attribute :attr:`.SafeExceptionReporterFilter.hidden_settings` now
+  treats values as sensitive if their name includes ``AUTH``.
 
 File Storage
 ~~~~~~~~~~~~
