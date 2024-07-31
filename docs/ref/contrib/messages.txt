@@ -156,7 +156,11 @@ tags for the levels you wish to override::
 Using messages in views and templates
 =====================================
 
-.. function:: add_message(request, level, message, extra_tags='', fail_silently=False)
+.. function:: add_message(request, level, message, extra_tags='', fail_silently=False, **kwargs)
+
+.. versionchanged:: 5.2
+
+    ``kwargs`` was added.
 
 Adding a message
 ----------------
@@ -262,6 +266,11 @@ The ``Message`` class
       to the Message class. The default behavior is that this does nothing,
       but allows third-party storage classes to extend the behavior of this
       class.
+
+
+    .. versionchanged:: 5.2
+
+        ``extra_kwargs`` was added.
 
 Creating custom message levels
 ------------------------------
