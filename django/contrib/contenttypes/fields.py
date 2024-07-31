@@ -362,6 +362,9 @@ class GenericRelation(ForeignObject):
             *self._check_generic_foreign_key_existence(),
         ]
 
+    def _check_from_fields_exist(self):
+        return []
+
     def _is_matching_generic_foreign_key(self, field):
         """
         Return True if field is a GenericForeignKey whose content type and
