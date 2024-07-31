@@ -149,7 +149,7 @@ h1 {
     margin: 0 0 20px;
     font-weight: 300;
     font-size: 1.25rem;
-    color: var(--body-quiet-color);
+    color: var(--body-loud-color);
 }
 
 h2 {
@@ -340,7 +340,7 @@ tfoot td {
 }
 
 thead th.required {
-    color: var(--body-loud-color);
+    color: var(--body-fg);
 }
 
 tr.alt {
