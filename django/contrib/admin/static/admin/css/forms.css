@@ -44,7 +44,6 @@ label {
 
 .required label, label.required {
     font-weight: bold;
-    color: var(--body-fg);
 }
 
 /* RADIO BUTTONS */
@@ -381,17 +380,13 @@ body.popup .submit-row {
 .inline-related h4,
 .inline-related:not(.tabular) .collapse summary {
     margin: 0;
-    color: var(--body-quiet-color);
+    color: var(--body-medium-color);
     padding: 5px;
     font-size: 0.8125rem;
     background: var(--darkened-bg);
     border: 1px solid var(--hairline-color);
     border-left-color: var(--darkened-bg);
     border-right-color: var(--darkened-bg);
-}
-
-.inline-related h3 {
-    color: var(--body-loud-color);
 }
 
 .inline-related h3 span.delete {
