@@ -339,20 +339,70 @@
         return $rows;
     };
 
+    function InlineActions(actionCheckboxes) {
+        let lastChecked = null;
+        let shiftPressed = false;
+
+        document.addEventListener('keydown', (event) => {
+            shiftPressed = event.shiftKey;
+        });
+
+        document.addEventListener('keyup', (event) => {
+            shiftPressed = event.shiftKey;
+        });
+
+        function affectedCheckboxes(target, withModifier) {
+            const multiSelect = (lastChecked && withModifier && lastChecked !== target);
+            if (!multiSelect) {
+                return [target];
+            }
+            const checkboxes = Array.from(actionCheckboxes);
+            const targetIndex = checkboxes.findIndex(el => el === target);
+            const lastCheckedIndex = checkboxes.findIndex(el => el === lastChecked);
+            const startIndex = Math.min(targetIndex, lastCheckedIndex);
+            const endIndex = Math.max(targetIndex, lastCheckedIndex);
+            const filtered = checkboxes.filter((el, index) => (startIndex <= index) && (index <= endIndex));
+            return filtered;
+        };
+
+        Array.from(document.getElementsByClassName('tabular_table')).forEach(function(el) {
+            for(const tBody of el.tBodies) {
+                tBody.addEventListener('change', function(event) {
+                    const target = event.target;
+                    if (target.tagName === "INPUT" && target.name.endsWith("DELETE")) {
+                        if ((lastChecked) && (lastChecked.name.slice(0, -9) === target.name.slice(0, -9))) {
+                            const checkboxes = affectedCheckboxes(target, shiftPressed);
+                            checkboxes.forEach(function(cb) {
+                                cb.checked = target.checked;
+                            });
+                        }
+                        lastChecked = target;
+                    }
+                });
+            };
+        });
+    };
+
     $(document).ready(function() {
         $(".js-inline-admin-formset").each(function() {
             const data = $(this).data(),
                 inlineOptions = data.inlineFormset;
             let selector;
             switch(data.inlineType) {
-            case "stacked":
+            case "stacked":{
                 selector = inlineOptions.name + "-group .inline-related";
                 $(selector).stackedFormset(selector, inlineOptions.options);
                 break;
-            case "tabular":
+            }
+            case "tabular": {
                 selector = inlineOptions.name + "-group .tabular.inline-related tbody:first > tr.form-row";
                 $(selector).tabularFormset(selector, inlineOptions.options);
+                const actionsEls = document.querySelectorAll('tr input[name$=DELETE]');
+                if (actionsEls.length > 0) {
+                    InlineActions(actionsEls);
+                }
                 break;
+            }
             }
         });
     });
