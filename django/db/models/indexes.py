@@ -171,7 +171,7 @@ class Index:
         column_names_with_order = [
             (("-%s" if order else "%s") % column_name)
             for column_name, (field_name, order) in zip(
-                column_names, self.fields_orders
+                column_names, self.fields_orders, strict=True
             )
         ]
         # The length of the parts of the name is based on the default max

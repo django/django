@@ -122,7 +122,9 @@ class RedisCacheClient:
         client = self.get_client(None)
         ret = client.mget(keys)
         return {
-            k: self._serializer.loads(v) for k, v in zip(keys, ret) if v is not None
+            k: self._serializer.loads(v)
+            for k, v in zip(keys, ret, strict=True)
+            if v is not None
         }
 
     def has_key(self, key):

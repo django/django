@@ -460,7 +460,7 @@ class GenericInlineModelAdminTest(SimpleTestCase):
         ma = EpisodeAdmin(Episode, self.site)
         inlines = ma.get_inline_instances(request)
         for (formset, inline), other_inline in zip(
-            ma.get_formsets_with_inlines(request), inlines
+            ma.get_formsets_with_inlines(request), inlines, strict=True
         ):
             self.assertIsInstance(formset, other_inline.get_formset(request).__class__)
 

@@ -398,7 +398,7 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             34.3635252198568,
             276.987855073372,
         )
-        for city, expected_distance in zip(qs, distances):
+        for city, expected_distance in zip(qs, distances, strict=True):
             with self.subTest(city=city):
                 self.assertAlmostEqual(city.distance, expected_distance)
 
@@ -618,9 +618,9 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
         tol = 5  # The low precision tolerance is for SpatiaLite
         qs = Country.objects.annotate(scaled=functions.Scale("mpoly", xfac, yfac))
         for country in qs:
-            for p1, p2 in zip(country.mpoly, country.scaled):
-                for r1, r2 in zip(p1, p2):
-                    for c1, c2 in zip(r1.coords, r2.coords):
+            for p1, p2 in zip(country.mpoly, country.scaled, strict=True):
+                for r1, r2 in zip(p1, p2, strict=True):
+                    for c1, c2 in zip(r1.coords, r2.coords, strict=True):
                         self.assertAlmostEqual(c1[0] * xfac, c2[0], tol)
                         self.assertAlmostEqual(c1[1] * yfac, c2[1], tol)
         # Test float/Decimal values
@@ -739,9 +739,9 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             translated=functions.Translate("mpoly", xfac, yfac)
         )
         for c in qs:
-            for p1, p2 in zip(c.mpoly, c.translated):
-                for r1, r2 in zip(p1, p2):
-                    for c1, c2 in zip(r1.coords, r2.coords):
+            for p1, p2 in zip(c.mpoly, c.translated, strict=True):
+                for r1, r2 in zip(p1, p2, strict=True):
+                    for c1, c2 in zip(r1.coords, r2.coords, strict=True):
                         # The low precision is for SpatiaLite
                         self.assertAlmostEqual(c1[0] + xfac, c2[0], 5)
                         self.assertAlmostEqual(c1[1] + yfac, c2[1], 5)

@@ -347,7 +347,9 @@ class InlineAdminFormSet:
             )
 
         for form, original in zip(
-            self.formset.initial_forms, self.formset.get_queryset()
+            self.formset.initial_forms,
+            self.formset.get_queryset()[: self.formset.initial_form_count()],
+            strict=True,
         ):
             view_on_site_url = self.opts.get_view_on_site_url(original)
             yield InlineAdminForm(

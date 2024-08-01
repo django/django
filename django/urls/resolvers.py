@@ -755,7 +755,7 @@ class URLResolver:
                 if args:
                     if len(args) != len(params):
                         continue
-                    candidate_subs = dict(zip(params, args))
+                    candidate_subs = dict(zip(params, args, strict=True))
                 else:
                     if set(kwargs).symmetric_difference(params).difference(defaults):
                         continue

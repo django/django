@@ -51,7 +51,9 @@ class BaseConstraint:
                 RemovedInDjango60Warning,
                 stacklevel=2,
             )
-            for arg, attr in zip(args, ["name", "violation_error_message"]):
+            for arg, attr in zip(
+                args, ["name", "violation_error_message"], strict=True
+            ):
                 if arg:
                     setattr(self, attr, arg)
 

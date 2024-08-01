@@ -116,7 +116,7 @@ class RelatedIn(In):
                 for value in values:
                     value_constraint = WhereNode()
                     for source, target, val in zip(
-                        self.lhs.sources, self.lhs.targets, value
+                        self.lhs.sources, self.lhs.targets, value, strict=True
                     ):
                         lookup_class = target.get_lookup("exact")
                         lookup = lookup_class(
@@ -165,7 +165,7 @@ class RelatedLookupMixin:
 
             root_constraint = WhereNode()
             for target, source, val in zip(
-                self.lhs.targets, self.lhs.sources, self.rhs
+                self.lhs.targets, self.lhs.sources, self.rhs, strict=False
             ):
                 lookup_class = target.get_lookup(self.lookup_name)
                 root_constraint.add(

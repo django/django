@@ -197,7 +197,7 @@ class Signal:
                         for receiver in async_receivers
                     )
                 )
-                return zip(async_receivers, async_responses)
+                return zip(async_receivers, async_responses, strict=True)
 
             responses.extend(async_to_sync(asend)())
         return responses
@@ -257,7 +257,7 @@ class Signal:
                 )
             ),
         )
-        responses.extend(zip(async_receivers, async_responses))
+        responses.extend(zip(async_receivers, async_responses, strict=True))
         return responses
 
     def _log_robust_failure(self, receiver, err):
@@ -326,7 +326,7 @@ class Signal:
                         for receiver in async_receivers
                     )
                 )
-                return zip(async_receivers, async_responses)
+                return zip(async_receivers, async_responses, strict=True)
 
             responses.extend(async_to_sync(asend)())
         return responses
@@ -400,7 +400,7 @@ class Signal:
                 *(asend_and_wrap_exception(receiver) for receiver in async_receivers),
             ),
         )
-        responses.extend(zip(async_receivers, async_responses))
+        responses.extend(zip(async_receivers, async_responses, strict=True))
         return responses
 
     def _clear_dead_receivers(self):

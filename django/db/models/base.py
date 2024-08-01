@@ -485,14 +485,14 @@ class Model(AltersData, metaclass=ModelBase):
             # when an iter throws it. So if the first iter throws it, the second
             # is *not* consumed. We rely on this, so don't change the order
             # without changing the logic.
-            for val, field in zip(args, fields_iter):
+            for val, field in zip(args, fields_iter, strict=False):
                 if val is _DEFERRED:
                     continue
                 _setattr(self, field.attname, val)
         else:
             # Slower, kwargs-ready version.
             fields_iter = iter(opts.fields)
-            for val, field in zip(args, fields_iter):
+            for val, field in zip(args, fields_iter, strict=False):
                 if val is _DEFERRED:
                     continue
                 _setattr(self, field.attname, val)
@@ -1161,7 +1161,7 @@ class Model(AltersData, metaclass=ModelBase):
                 cls._base_manager, using, fields, returning_fields, raw
             )
             if results:
-                for value, field in zip(results[0], returning_fields):
+                for value, field in zip(results[0], returning_fields, strict=False):
                     setattr(self, field.attname, value)
         return updated
 

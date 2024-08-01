@@ -1195,7 +1195,7 @@ def reorder_tests(tests, classes, reverse=False, shuffler=None):
     *class_bins, last_bin = bins
 
     for test in tests:
-        for test_bin, test_class in zip(class_bins, classes):
+        for test_bin, test_class in zip(class_bins, classes, strict=True):
             if isinstance(test, test_class):
                 break
         else:

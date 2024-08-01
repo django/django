@@ -521,7 +521,7 @@ class DistanceFunctionsTests(FuncTestMixin, TestCase):
         qs = AustraliaCity.objects.annotate(distance=Distance("point", ls)).order_by(
             "name"
         )
-        for city, distance in zip(qs, distances):
+        for city, distance in zip(qs, distances, strict=True):
             with self.subTest(city=city, distance=distance):
                 # Testing equivalence to within a meter (kilometer on SpatiaLite).
                 tol = -3 if connection.ops.spatialite else 0

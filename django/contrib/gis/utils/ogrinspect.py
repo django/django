@@ -195,7 +195,11 @@ def _ogrinspect(
     yield "class %s(models.Model):" % model_name
 
     for field_name, width, precision, field_type in zip(
-        ogr_fields, layer.field_widths, layer.field_precisions, layer.field_types
+        ogr_fields,
+        layer.field_widths,
+        layer.field_precisions,
+        layer.field_types,
+        strict=True,
     ):
         # The model field name.
         mfield = field_name.lower()

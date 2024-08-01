@@ -330,8 +330,9 @@ class FieldGetDbPrepValueIterableMixin(FieldGetDbPrepValueMixin):
         sql, params = zip(
             *(
                 self.resolve_expression_parameter(compiler, connection, sql, param)
-                for sql, param in zip(*pre_processed)
-            )
+                for sql, param in zip(*pre_processed, strict=True)
+            ),
+            strict=True,
         )
         params = itertools.chain.from_iterable(params)
         return sql, tuple(params)

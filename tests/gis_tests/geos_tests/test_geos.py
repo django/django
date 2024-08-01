@@ -1410,7 +1410,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             fromstr("LINESTRING(1 1, 3 3)"),
             fromstr("LINESTRING (1 1, 3 3, 4 2)"),
         )
-        for geom, merged in zip(ref_geoms, ref_merged):
+        for geom, merged in zip(ref_geoms, ref_merged, strict=True):
             self.assertEqual(merged, geom.merged)
 
     def test_valid_reason(self):

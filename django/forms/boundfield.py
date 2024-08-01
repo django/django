@@ -278,7 +278,9 @@ class BoundField(RenderableFieldMixin):
                 and not self.field.require_all_fields
                 and isinstance(self.field.widget, MultiWidget)
             ):
-                for subfield, subwidget in zip(self.field.fields, widget.widgets):
+                for subfield, subwidget in zip(
+                    self.field.fields, widget.widgets, strict=True
+                ):
                     subwidget.attrs["required"] = (
                         subwidget.use_required_attribute(self.initial)
                         and subfield.required

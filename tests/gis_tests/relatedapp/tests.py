@@ -26,7 +26,7 @@ class RelatedGeoModelTest(TestCase):
         )
 
         for qs in (qs1, qs2, qs3):
-            for ref, c in zip(cities, qs):
+            for ref, c in zip(cities, qs[:3], strict=True):
                 nm, st, lon, lat = ref
                 self.assertEqual(nm, c.name)
                 self.assertEqual(st, c.state)
@@ -54,7 +54,7 @@ class RelatedGeoModelTest(TestCase):
         # between the Oracle and PostGIS spatial backends on the extent calculation.
         tol = 4
         for ref, e in [(all_extent, e1), (txpa_extent, e2), (all_extent, e3)]:
-            for ref_val, e_val in zip(ref, e):
+            for ref_val, e_val in zip(ref, e, strict=True):
                 self.assertAlmostEqual(ref_val, e_val, tol)
 
     @skipUnlessDBFeature("supports_extent_aggr")
@@ -186,7 +186,7 @@ class RelatedGeoModelTest(TestCase):
 
         # Incrementing through each of the models, dictionaries, and tuples
         # returned by each QuerySet.
-        for m, d, t in zip(gqs, gvqs, gvlqs):
+        for m, d, t in zip(gqs, gvqs, gvlqs, strict=True):
             # The values should be Geometry objects and not raw strings returned
             # by the spatial database.
             self.assertIsInstance(d["point"], GEOSGeometry)
@@ -204,7 +204,7 @@ class RelatedGeoModelTest(TestCase):
         "Testing defer() and only() on Geographic models."
         qs = Location.objects.all().order_by("pk")
         def_qs = Location.objects.defer("point").order_by("pk")
-        for loc, def_loc in zip(qs, def_qs):
+        for loc, def_loc in zip(qs, def_qs, strict=True):
             self.assertEqual(loc.point, def_loc.point)
 
     def test09_pk_relations(self):
@@ -215,8 +215,8 @@ class RelatedGeoModelTest(TestCase):
         # ID column is selected instead of ID column for the city.
         city_ids = (1, 2, 3, 4, 5)
         loc_ids = (1, 2, 3, 5, 4)
-        ids_qs = City.objects.order_by("id").values("id", "location__id")
-        for val_dict, c_id, l_id in zip(ids_qs, city_ids, loc_ids):
+        ids_qs = City.objects.order_by("id").values("id", "location__id")[:5]
+        for val_dict, c_id, l_id in zip(ids_qs, city_ids, loc_ids, strict=True):
             self.assertEqual(val_dict["id"], c_id)
             self.assertEqual(val_dict["location__id"], l_id)
 

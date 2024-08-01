@@ -190,7 +190,7 @@ def normalize(pattern):
         # A case of using the disjunctive form. No results for you!
         return [("", [])]
 
-    return list(zip(*flatten_result(result)))
+    return list(zip(*flatten_result(result), strict=True))
 
 
 def next_char(input_iter):
@@ -327,8 +327,8 @@ def flatten_result(source):
                 inner_args.extend(args)
             new_result = []
             new_args = []
-            for item, args in zip(result, result_args):
-                for i_item, i_args in zip(inner_result, inner_args):
+            for item, args in zip(result, result_args, strict=True):
+                for i_item, i_args in zip(inner_result, inner_args, strict=True):
                     new_result.append(item + i_item)
                     new_args.append(args[:] + i_args)
             result = new_result

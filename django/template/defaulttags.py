@@ -233,7 +233,7 @@ class ForNode(Node):
                                 num_loopvars, len_item
                             ),
                         )
-                    unpacked_vars = dict(zip(self.loopvars, item))
+                    unpacked_vars = dict(zip(self.loopvars, item, strict=True))
                     pop_context = True
                     context.update(unpacked_vars)
                 else:

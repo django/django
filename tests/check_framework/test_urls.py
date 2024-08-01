@@ -246,7 +246,9 @@ class CheckCustomErrorHandlersTests(SimpleTestCase):
     def test_bad_function_based_handlers(self):
         result = check_custom_error_handlers(None)
         self.assertEqual(len(result), 4)
-        for code, num_params, error in zip([400, 403, 404, 500], [2, 2, 2, 1], result):
+        for code, num_params, error in zip(
+            [400, 403, 404, 500], [2, 2, 2, 1], result, strict=True
+        ):
             with self.subTest("handler{}".format(code)):
                 self.assertEqual(
                     error,
@@ -267,7 +269,9 @@ class CheckCustomErrorHandlersTests(SimpleTestCase):
     def test_bad_class_based_handlers(self):
         result = check_custom_error_handlers(None)
         self.assertEqual(len(result), 4)
-        for code, num_params, error in zip([400, 403, 404, 500], [2, 2, 2, 1], result):
+        for code, num_params, error in zip(
+            [400, 403, 404, 500], [2, 2, 2, 1], result, strict=True
+        ):
             with self.subTest("handler%s" % code):
                 self.assertEqual(
                     error,
@@ -302,7 +306,9 @@ class CheckCustomErrorHandlersTests(SimpleTestCase):
             "No module named 'invalid_module'",
             "Could not import '{}'. The path must be fully qualified.",
         ]
-        for code, path, hint, error in zip([400, 403, 404, 500], paths, hints, result):
+        for code, path, hint, error in zip(
+            [400, 403, 404, 500], paths, hints, result, strict=True
+        ):
             with self.subTest("handler{}".format(code)):
                 self.assertEqual(
                     error,
