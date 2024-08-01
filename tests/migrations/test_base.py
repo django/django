@@ -102,7 +102,7 @@ class MigrationTestBase(TransactionTestCase):
                     .values()
                     if (
                         c["columns"] == list(columns)
-                        and (index_type is None or c.get("type") == index_type)
+                        and (index_type is None or c["type"] == index_type)
                         and not c["unique"]
                     )
                 ),
