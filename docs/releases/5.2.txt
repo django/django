@@ -167,7 +167,7 @@ Forms
 ~~~~~
 
 * The new :class:`~django.forms.ColorInput` form widget is for entering a color
-  in ``rrggbb`` hexadecimal format and renders as ``<input type='color' ...>``.
+  in ``rrggbb`` hexadecimal format and renders as ``<input type="color" ...>``.
   Some browsers support a visual color picker interface for this input type.
 
 * The new :class:`~django.forms.SearchInput` form widget is for entering search

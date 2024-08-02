@@ -567,7 +567,7 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 
     * ``input_type``: ``'color'``
     * ``template_name``:``'django/forms/widgets/color.html'``
-    * Renders as: ``<input type='color' ...>``
+    * Renders as: ``<input type="color" ...>``
 
 ``SearchInput``
 ~~~~~~~~~~~~~~~
@@ -581,7 +581,7 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
     * Renders as: ``<input type="search" ...>``
 
 ``TelInput``
-~~~~~~~~~~~~~~
+~~~~~~~~~~~~
 
 .. versionadded:: 5.2
 
@@ -598,9 +598,7 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 
     Additionally, you can add server-side validation to your form field with a
     validator like :class:`~django.core.validators.RegexValidator` or via
-    third-party packages, such as `django-phonenumber-field`_.
-
-.. _django-phonenumber-field: https://django-phonenumber-field.readthedocs.io/en/latest/index.html
+    third-party packages, such as :pypi:`django-phonenumber-field`.
 
 ``PasswordInput``
 ~~~~~~~~~~~~~~~~~
