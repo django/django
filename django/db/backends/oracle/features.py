@@ -205,9 +205,5 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         return self.connection.oracle_version >= (23,)
 
     @cached_property
-    def supports_bulk_insert_with_multiple_rows(self):
-        return self.connection.oracle_version >= (23,)
-
-    @cached_property
     def bare_select_suffix(self):
         return "" if self.connection.oracle_version >= (23,) else " FROM DUAL"
