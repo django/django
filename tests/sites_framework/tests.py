@@ -1,10 +1,12 @@
+import os.path
+
 from django.conf import settings
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
 from django.core import checks
 from django.db import models
 from django.test import SimpleTestCase, TestCase
-from django.test.utils import isolate_apps
+from django.test.utils import isolate_apps, override_settings
 
 from .models import CustomArticle, ExclusiveArticle, SyndicatedArticle
 
@@ -73,3 +75,35 @@ class CurrentSiteManagerChecksTests(SimpleTestCase):
             )
         ]
         self.assertEqual(errors, expected)
+
+
+class ContextProcessorTest(TestCase):
+    urls = "sites_framework.urls"
+
+    @override_settings(
+        TEMPLATES=[
+            {
+                "BACKEND": "django.template.backends.django.DjangoTemplates",
+                "DIRS": [
+                    os.path.dirname(__file__),
+                ],
+                "APP_DIRS": True,
+                "OPTIONS": {
+                    "context_processors": [
+                        "django.template.context_processors.debug",
+                        "django.template.context_processors.request",
+                        "django.contrib.auth.context_processors.auth",
+                        "django.contrib.messages.context_processors.messages",
+                        "django.contrib.sites.context_processors.site",
+                    ]
+                },
+            }
+        ],
+        ROOT_URLCONF="sites_framework.urls",
+    )
+    def test_context_processor(self):
+        response = self.client.get("/context_processors/")
+        site_obj = Site.objects.get_current()
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "site.name: %s" % site_obj.name)
+        self.assertContains(response, "site.domain: %s" % site_obj.domain)
