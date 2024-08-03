@@ -2,6 +2,10 @@
 import rootConst from "/static/absolute_root.js";
 import testConst from "./module_test.js";
 import * as NewModule from "./module_test.js";
+import*as m from "./module_test.js";
+import *as m from "./module_test.js";
+import* as m from "./module_test.js";
+import*  as  m from "./module_test.js";
 import { testConst as alias } from "./module_test.js";
 import { firstConst, secondConst } from "./module_test.js";
 import {
