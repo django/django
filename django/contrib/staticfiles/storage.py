@@ -53,7 +53,8 @@ class HashedFilesMixin:
         (
             (
                 (
-                    r"""(?P<matched>import(?s:(?P<import>[\s\{].*?))"""
+                    r"""(?P<matched>import"""
+                    r"""(?s:(?P<import>[\s\{].*?|\*\s*as\s*\w+))"""
                     r"""\s*from\s*['"](?P<url>[./].*?)["']\s*;)"""
                 ),
                 """import%(import)s from "%(url)s";""",
