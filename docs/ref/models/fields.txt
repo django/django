@@ -12,8 +12,8 @@ This document contains all the API references of :class:`Field` including the
 
 .. seealso::
 
-    If the built-in fields don't do the trick, you can try `django-localflavor
-    <https://github.com/django/django-localflavor>`_ (`documentation
+    If the built-in fields don't do the trick, you can try
+    :pypi:`django-localflavor` (`documentation
     <https://django-localflavor.readthedocs.io/>`_), which contains assorted
     pieces of code that are useful for particular countries and cultures.
 
@@ -1357,9 +1357,7 @@ following optional arguments:
     Name of a model field which is auto-populated with the width of the image
     each time an image object is set.
 
-Requires the `Pillow`_ library.
-
-.. _Pillow: https://pillow.readthedocs.io/en/latest/
+Requires the :pypi:`pillow` library.
 
 :class:`ImageField` instances are created in your database as ``varchar``
 columns with a default max length of 100 characters. As with other fields, you

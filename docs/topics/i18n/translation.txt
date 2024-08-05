@@ -1335,9 +1335,7 @@ whenever you restart your application server::
 
 You can even pre-generate the JavaScript catalog as part of your deployment
 procedure and serve it as a static file. This radical technique is implemented
-in django-statici18n_.
-
-.. _django-statici18n: https://django-statici18n.readthedocs.io/
+in :pypi:`django-statici18n`.
 
 .. _url-internationalization:
 
