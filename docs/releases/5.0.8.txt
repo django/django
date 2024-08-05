@@ -32,3 +32,6 @@ Bugfixes
 * Fixed a bug in Django 5.0 which caused constraint validation to either crash
   or incorrectly raise validation errors for constraints referring to fields
   using ``Field.db_default`` (:ticket:`35638`).
+
+* Fixed a crash in Django 5.0 when saving a model containing a ``FileField``
+  with a ``db_default`` set (:ticket:`35657`).

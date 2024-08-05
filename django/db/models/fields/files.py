@@ -8,6 +8,7 @@ from django.core.files.images import ImageFile
 from django.core.files.storage import Storage, default_storage
 from django.core.files.utils import validate_file_name
 from django.db.models import signals
+from django.db.models.expressions import DatabaseDefault
 from django.db.models.fields import Field
 from django.db.models.query_utils import DeferredAttribute
 from django.db.models.utils import AltersData
@@ -190,6 +191,12 @@ class FileDescriptor(DeferredAttribute):
         # handle None.
         if isinstance(file, str) or file is None:
             attr = self.field.attr_class(instance, self.field, file)
+            instance.__dict__[self.field.attname] = attr
+
+        # If this value is a DatabaseDefault, initialize the attribute class
+        # for this field with its db_default value.
+        elif isinstance(file, DatabaseDefault):
+            attr = self.field.attr_class(instance, self.field, self.field.db_default)
             instance.__dict__[self.field.attname] = attr
 
         # Other types of files may be assigned as well, but they need to have
