@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from django.db import IntegrityError, connection, models
 from django.db.models import F
 from django.db.models.constraints import BaseConstraint, UniqueConstraint
-from django.db.models.functions import Abs, Lower
+from django.db.models.functions import Abs, Lower, Upper
 from django.db.transaction import atomic
 from django.test import SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import ignore_warnings
@@ -14,6 +14,7 @@ from .models import (
     ChildModel,
     ChildUniqueConstraintProduct,
     JSONFieldModel,
+    ModelWithDatabaseDefault,
     Product,
     UniqueConstraintConditionProduct,
     UniqueConstraintDeferrable,
@@ -395,6 +396,33 @@ class CheckConstraintTests(TestCase):
             constraint.check = other_condition
         with self.assertWarnsRegex(RemovedInDjango60Warning, msg):
             self.assertIs(constraint.check, other_condition)
+
+    def test_database_default(self):
+        models.CheckConstraint(
+            condition=models.Q(field_with_db_default="field_with_db_default"),
+            name="check_field_with_db_default",
+        ).validate(ModelWithDatabaseDefault, ModelWithDatabaseDefault())
+
+        # Ensure that a check also does not silently pass with either
+        # FieldError or DatabaseError when checking with a db_default.
+        with self.assertRaises(ValidationError):
+            models.CheckConstraint(
+                condition=models.Q(
+                    field_with_db_default="field_with_db_default", field="field"
+                ),
+                name="check_field_with_db_default_2",
+            ).validate(
+                ModelWithDatabaseDefault, ModelWithDatabaseDefault(field="not-field")
+            )
+
+        with self.assertRaises(ValidationError):
+            models.CheckConstraint(
+                condition=models.Q(field_with_db_default="field_with_db_default"),
+                name="check_field_with_db_default",
+            ).validate(
+                ModelWithDatabaseDefault,
+                ModelWithDatabaseDefault(field_with_db_default="other value"),
+            )
 
 
 class UniqueConstraintTests(TestCase):
@@ -1265,3 +1293,30 @@ class UniqueConstraintTests(TestCase):
         msg = "A unique constraint must be named."
         with self.assertRaisesMessage(ValueError, msg):
             models.UniqueConstraint(fields=["field"])
+
+    def test_database_default(self):
+        models.UniqueConstraint(
+            fields=["field_with_db_default"], name="unique_field_with_db_default"
+        ).validate(ModelWithDatabaseDefault, ModelWithDatabaseDefault())
+        models.UniqueConstraint(
+            Upper("field_with_db_default"),
+            name="unique_field_with_db_default_expression",
+        ).validate(ModelWithDatabaseDefault, ModelWithDatabaseDefault())
+
+        ModelWithDatabaseDefault.objects.create()
+
+        msg = (
+            "Model with database default with this Field with db default already "
+            "exists."
+        )
+        with self.assertRaisesMessage(ValidationError, msg):
+            models.UniqueConstraint(
+                fields=["field_with_db_default"], name="unique_field_with_db_default"
+            ).validate(ModelWithDatabaseDefault, ModelWithDatabaseDefault())
+
+        msg = "Constraint “unique_field_with_db_default_expression” is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            models.UniqueConstraint(
+                Upper("field_with_db_default"),
+                name="unique_field_with_db_default_expression",
+            ).validate(ModelWithDatabaseDefault, ModelWithDatabaseDefault())
