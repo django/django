@@ -1153,9 +1153,41 @@ class Star(Expression):
 
 
 class DatabaseDefault(Expression):
-    """Placeholder expression for the database default in an insert query."""
+    """
+    Expression to use DEFAULT keyword during insert otherwise the underlying expression.
+    """
+
+    def __init__(self, expression, output_field=None):
+        super().__init__(output_field)
+        self.expression = expression
+
+    def get_source_expressions(self):
+        return [self.expression]
+
+    def set_source_expressions(self, exprs):
+        (self.expression,) = exprs
+
+    def resolve_expression(
+        self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False
+    ):
+        resolved_expression = self.expression.resolve_expression(
+            query=query,
+            allow_joins=allow_joins,
+            reuse=reuse,
+            summarize=summarize,
+            for_save=for_save,
+        )
+        # Defaults used outside an INSERT context should resolve to their
+        # underlying expression.
+        if not for_save:
+            return resolved_expression
+        return DatabaseDefault(
+            resolved_expression, output_field=self._output_field_or_none
+        )
 
     def as_sql(self, compiler, connection):
+        if not connection.features.supports_default_keyword_in_insert:
+            return compiler.compile(self.expression)
         return "DEFAULT", []
 
 

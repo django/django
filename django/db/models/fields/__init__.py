@@ -982,13 +982,7 @@ class Field(RegisterLookupMixin):
 
     def pre_save(self, model_instance, add):
         """Return field's value just before saving."""
-        value = getattr(model_instance, self.attname)
-        if not connection.features.supports_default_keyword_in_insert:
-            from django.db.models.expressions import DatabaseDefault
-
-            if isinstance(value, DatabaseDefault):
-                return self._db_default_expression
-        return value
+        return getattr(model_instance, self.attname)
 
     def get_prep_value(self, value):
         """Perform preliminary non-db specific value checks and conversions."""
@@ -1030,7 +1024,9 @@ class Field(RegisterLookupMixin):
         if self.db_default is not NOT_PROVIDED:
             from django.db.models.expressions import DatabaseDefault
 
-            return DatabaseDefault
+            return lambda: DatabaseDefault(
+                self._db_default_expression, output_field=self
+            )
 
         if (
             not self.empty_strings_allowed

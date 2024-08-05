@@ -128,3 +128,10 @@ class JSONFieldModel(models.Model):
 
     class Meta:
         required_db_features = {"supports_json_field"}
+
+
+class ModelWithDatabaseDefault(models.Model):
+    field = models.CharField(max_length=255)
+    field_with_db_default = models.CharField(
+        max_length=255, db_default=models.Value("field_with_db_default")
+    )
