@@ -130,7 +130,7 @@ class LineSavedSearch(PostgreSQLModel):
 
 
 class RangesModel(PostgreSQLModel):
-    ints = IntegerRangeField(blank=True, null=True)
+    ints = IntegerRangeField(blank=True, null=True, db_default=(5, 10))
     bigints = BigIntegerRangeField(blank=True, null=True)
     decimals = DecimalRangeField(blank=True, null=True)
     timestamps = DateTimeRangeField(blank=True, null=True)
