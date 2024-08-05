@@ -662,6 +662,9 @@ class Model(AltersData, metaclass=ModelBase):
 
     pk = property(_get_pk_val, _set_pk_val)
 
+    def _is_pk_set(self, meta=None):
+        return self._get_pk_val(meta) is not None
+
     def get_deferred_fields(self):
         """
         Return a set containing names of deferred fields for this instance.
@@ -1095,10 +1098,10 @@ class Model(AltersData, metaclass=ModelBase):
             ]
 
         pk_val = self._get_pk_val(meta)
-        if pk_val is None:
+        if not self._is_pk_set(meta):
             pk_val = meta.pk.get_pk_value_on_save(self)
             setattr(self, meta.pk.attname, pk_val)
-        pk_set = pk_val is not None
+        pk_set = self._is_pk_set(meta)
         if not pk_set and (force_update or update_fields):
             raise ValueError("Cannot force an update in save() with no primary key.")
         updated = False

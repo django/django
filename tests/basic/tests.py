@@ -659,6 +659,10 @@ class ModelTest(TestCase):
             headline__startswith="Area",
         )
 
+    def test_is_pk_set(self):
+        self.assertFalse(Article()._is_pk_set())
+        self.assertTrue(Article(id=1)._is_pk_set())
+
 
 class ModelLookupTest(TestCase):
     @classmethod
