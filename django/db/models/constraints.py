@@ -74,7 +74,7 @@ class BaseConstraint:
     def get_violation_error_message(self):
         return self.violation_error_message % {"name": self.name}
 
-    def _check(self, model, connection):
+    def check(self, model, connection):
         return []
 
     def _check_references(self, model, references):
