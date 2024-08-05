@@ -124,7 +124,7 @@ class CheckConstraint(BaseConstraint):
         return schema_editor._delete_check_sql(model, self.name)
 
     def validate(self, model, instance, exclude=None, using=DEFAULT_DB_ALIAS):
-        against = instance._get_field_value_map(meta=model._meta, exclude=exclude)
+        against = instance._get_field_expression_map(meta=model._meta, exclude=exclude)
         try:
             if not Q(self.check).check(against, using=using):
                 raise ValidationError(
@@ -423,7 +423,7 @@ class UniqueConstraint(BaseConstraint):
                         return
             replacements = {
                 F(field): value
-                for field, value in instance._get_field_value_map(
+                for field, value in instance._get_field_expression_map(
                     meta=model._meta, exclude=exclude
                 ).items()
             }
@@ -454,7 +454,9 @@ class UniqueConstraint(BaseConstraint):
                     code=self.violation_error_code,
                 )
         else:
-            against = instance._get_field_value_map(meta=model._meta, exclude=exclude)
+            against = instance._get_field_expression_map(
+                meta=model._meta, exclude=exclude
+            )
             try:
                 if (self.condition & Exists(queryset.filter(self.condition))).check(
                     against, using=using

@@ -183,7 +183,7 @@ class ExclusionConstraint(BaseConstraint):
 
     def validate(self, model, instance, exclude=None, using=DEFAULT_DB_ALIAS):
         queryset = model._default_manager.using(using)
-        replacement_map = instance._get_field_value_map(
+        replacement_map = instance._get_field_expression_map(
             meta=model._meta, exclude=exclude
         )
         replacements = {F(field): value for field, value in replacement_map.items()}
