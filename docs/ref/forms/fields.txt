@@ -801,11 +801,11 @@ For each field, we describe the default widget used if you don't specify
     * Error message keys: ``required``, ``invalid``, ``missing``, ``empty``,
       ``invalid_image``
 
-    Using an ``ImageField`` requires that `Pillow`_ is installed with support
-    for the image formats you use. If you encounter a ``corrupt image`` error
-    when you upload an image, it usually means that Pillow doesn't understand
-    its format. To fix this, install the appropriate library and reinstall
-    Pillow.
+    Using an ``ImageField`` requires that :pypi:`pillow` is installed with
+    support for the image formats you use. If you encounter a ``corrupt image``
+    error when you upload an image, it usually means that Pillow doesn't
+    understand its format. To fix this, install the appropriate library and
+    reinstall Pillow.
 
     When you use an ``ImageField`` on a form, you must also remember to
     :ref:`bind the file data to the form <binding-uploaded-files>`.
@@ -851,7 +851,6 @@ For each field, we describe the default widget used if you don't specify
     image's content type if Pillow can determine it, otherwise it will be set
     to ``None``.
 
-.. _Pillow: https://pillow.readthedocs.io/en/latest/
 .. _Image: https://pillow.readthedocs.io/en/latest/reference/Image.html
 
 ``IntegerField``
