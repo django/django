@@ -287,6 +287,3 @@ Miscellaneous
 
 * The ``all`` argument for the ``django.contrib.staticfiles.finders.find()``
   function is deprecated in favor of the ``find_all`` argument.
-
-* Subclasses of :class:`~django.middleware.cache.UpdateCacheMiddleware`
-  will no longer cause duplication when used with cache decorator. 
