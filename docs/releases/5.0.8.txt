@@ -24,3 +24,6 @@ Bugfixes
 * Fixed a regression in Django 5.0.7 that caused a crash in
   ``LocaleMiddleware`` when processing a language code over 500 characters
   (:ticket:`35627`).
+
+* Fixed a crash when saving a model with a ``FileField`` with a ``db_default``
+  (:ticket:`35657`).
