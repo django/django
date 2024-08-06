@@ -99,7 +99,7 @@ class TranslationTests(SimpleTestCase):
         )
         self.assertEqual(
             ngettext("%(num)d year", "%(num)d years", 2) % {"num": 2},
-            "2 années",
+            "2 ans",
         )
         self.assertEqual(
             ngettext("%(size)d byte", "%(size)d bytes", 0) % {"size": 0}, "0 octet"
