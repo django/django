@@ -198,6 +198,10 @@ class HttpResponseBase:
     def __getitem__(self, header):
         return self.headers[header]
 
+    def __bool__(self) -> bool:
+        """Returns ``True`` if :attr:`status_code` is less than 400."""
+        return self.status_code < 400
+
     def has_header(self, header):
         """Case-insensitive check for a header."""
         return header in self.headers
