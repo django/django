@@ -97,6 +97,12 @@ class HttpResponseTests(SimpleTestCase):
         with self.assertRaisesMessage(ValueError, must_be_integer_in_range):
             HttpResponse(status=600)
 
+    def test_convert_to_bool(self):
+        resp = HttpResponse(status=200)
+        self.assertIs(bool(resp), True)
+        resp = HttpResponse(status=403)
+        self.assertIs(bool(resp), False)
+
     def test_reason_phrase(self):
         reason = "I'm an anarchist coffee pot on crack."
         resp = HttpResponse(status=419, reason=reason)
