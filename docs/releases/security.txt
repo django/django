@@ -36,6 +36,46 @@ Issues under Django's security process
 All security issues have been handled under versions of Django's security
 process. These are listed below.
 
+August 6, 2024 - :cve:`2024-42005`
+----------------------------------
+
+Potential SQL injection in ``QuerySet.values()`` and ``values_list()``.
+`Full description
+<https://www.djangoproject.com/weblog/2024/aug/06/security-releases/>`__
+
+* Django 5.0 :commit:`(patch) <32ebcbf2e1fe3e5ba79a6554a167efce81f7422d>`
+* Django 4.2 :commit:`(patch) <f4af67b9b41e0f4c117a8741da3abbd1c869ab28>`
+
+August 6, 2024 - :cve:`2024-41991`
+----------------------------------
+
+Potential denial-of-service vulnerability in ``django.utils.html.urlize()`` and
+``AdminURLFieldWidget``. `Full description
+<https://www.djangoproject.com/weblog/2024/aug/06/security-releases/>`__
+
+* Django 5.0 :commit:`(patch) <523da8771bce321023f490f70d71a9e973ddc927>`
+* Django 4.2 :commit:`(patch) <efea1ef7e2190e3f77ca0651b5458297bc0f6a9f>`
+
+August 6, 2024 - :cve:`2024-41990`
+----------------------------------
+
+Potential denial-of-service vulnerability in ``django.utils.html.urlize()``.
+`Full description
+<https://www.djangoproject.com/weblog/2024/aug/06/security-releases/>`__
+
+* Django 5.0 :commit:`(patch) <7b7b909579c8311c140c89b8a9431bf537febf93>`
+* Django 4.2 :commit:`(patch) <d0a82e26a74940bf0c78204933c3bdd6a283eb88>`
+
+August 6, 2024 - :cve:`2024-41989`
+----------------------------------
+
+Potential memory exhaustion in ``django.utils.numberformat.floatformat()``.
+`Full description
+<https://www.djangoproject.com/weblog/2024/aug/06/security-releases/>`__
+
+* Django 5.0 :commit:`(patch) <27900fe56f3d3cabb4aeb6ccb82f92bab29073a8>`
+* Django 4.2 :commit:`(patch) <fc76660f589ac07e45e9cd34ccb8087aeb11904b>`
+
 July 9, 2024 - :cve:`2024-39614`
 --------------------------------
 
