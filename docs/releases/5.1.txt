@@ -1,8 +1,8 @@
-============================================
-Django 5.1 release notes - UNDER DEVELOPMENT
-============================================
+========================
+Django 5.1 release notes
+========================
 
-*Expected August 2024*
+*August 7, 2024*
 
 Welcome to Django 5.1!
 
