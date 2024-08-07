@@ -1,0 +1,12 @@
+==========================
+Django 5.1.1 release notes
+==========================
+
+*Expected September 3, 2024*
+
+Django 5.1.1 fixes several bugs in 5.1.
+
+Bugfixes
+========
+
+* ...
