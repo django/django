@@ -702,7 +702,7 @@ isn't defined.
 
 .. note::
 
-   When using the `db_default` attribute, the field value will be an instance of `DatabaseDefault` before the instance is saved to the database. This means that a `bool()` evaluation of the field will not reflect the specified `db_default` value until the instance is saved.
+   When using the ``db_default`` attribute, the field value will be an instance of ``DatabaseDefault`` before the instance is saved to the database. This means that a ``bool()`` evaluation of the field will not reflect the specified ``db_default`` value until the instance is saved.
 
    For example:
 
@@ -721,7 +721,7 @@ isn't defined.
       my_obj.save()
       print(bool(my_obj.my_field))  # False, as expected.
 
-   To ensure the field value reflects the desired default before saving, also set the `default` attribute:
+   To ensure the field value reflects the desired default before saving, also set the ``default`` attribute:
 
    .. code-block:: python
 
