@@ -1597,6 +1597,13 @@ class ManageRunserver(SimpleTestCase):
             "Starting development server at http://0.0.0.0:8000/",
             self.output.getvalue(),
         )
+        self.assertIn(
+            "WARNING: This is a development server. Do not use it in a "
+            "production setting. Use a production WSGI or ASGI server instead."
+            "\nFor more information on production servers see: "
+            "https://docs.djangoproject.com/en/stable/howto/deployment/",
+            self.output.getvalue(),
+        )
 
     def test_on_bind(self):
         self.cmd.addr = "127.0.0.1"
@@ -1604,6 +1611,30 @@ class ManageRunserver(SimpleTestCase):
         self.cmd.on_bind("14437")
         self.assertIn(
             "Starting development server at http://127.0.0.1:14437/",
+            self.output.getvalue(),
+        )
+        self.assertIn(
+            "WARNING: This is a development server. Do not use it in a "
+            "production setting. Use a production WSGI or ASGI server instead."
+            "\nFor more information on production servers see: "
+            "https://docs.djangoproject.com/en/stable/howto/deployment/",
+            self.output.getvalue(),
+        )
+
+    @mock.patch.dict(os.environ, {"HIDE_PRODUCTION_WARNING": "true"})
+    def test_hide_production_warning_with_environment_variable(self):
+        self.cmd.addr = "0"
+        self.cmd._raw_ipv6 = False
+        self.cmd.on_bind("8000")
+        self.assertIn(
+            "Starting development server at http://0.0.0.0:8000/",
+            self.output.getvalue(),
+        )
+        self.assertNotIn(
+            "WARNING: This is a development server. Do not use it in a "
+            "production setting. Use a production WSGI or ASGI server instead."
+            "\nFor more information on production servers see: "
+            "https://docs.djangoproject.com/en/stable/howto/deployment/",
             self.output.getvalue(),
         )
 

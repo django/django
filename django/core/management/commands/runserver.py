@@ -188,3 +188,12 @@ class Command(BaseCommand):
             f"Quit the server with {quit_command}.",
             file=self.stdout,
         )
+        if os.environ.get("HIDE_PRODUCTION_WARNING") != "true":
+            self.stdout.write(
+                self.style.WARNING(
+                    "WARNING: This is a development server. Do not use it in a "
+                    "production setting. Use a production WSGI or ASGI server "
+                    "instead.\nFor more information on production servers see: "
+                    "https://docs.djangoproject.com/en/stable/howto/deployment/"
+                )
+            )

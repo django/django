@@ -194,7 +194,10 @@ Logging
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
-* ...
+* A new warning is printed to the console when running :djadmin:`runserver` that
+  ``runserver`` is unsuitable for production. This warning can be hidden by
+  setting the :envvar:`HIDE_PRODUCTION_WARNING` environment variable to
+  ``"true"``.
 
 Migrations
 ~~~~~~~~~~

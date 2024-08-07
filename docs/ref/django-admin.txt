@@ -947,6 +947,20 @@ multithreaded by default.
 Uses IPv6 for the development server. This changes the default IP address from
 ``127.0.0.1`` to ``::1``.
 
+.. envvar:: HIDE_PRODUCTION_WARNING
+
+.. versionadded:: 5.2
+
+By default, a warning is printed to the console that ``runserver`` is not
+suitable for production:
+
+.. code-block:: text
+
+    WARNING: This is a development server. Do not use it in a production setting. Use a production WSGI or ASGI server instead.
+    For more information on production servers see: https://docs.djangoproject.com/en/stable/howto/deployment/
+
+Set this environment variable to ``"true"`` to hide this warning.
+
 Examples of using different ports and addresses
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
