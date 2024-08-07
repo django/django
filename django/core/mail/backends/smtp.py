@@ -28,6 +28,7 @@ class EmailBackend(BaseEmailBackend):
         timeout=None,
         ssl_keyfile=None,
         ssl_certfile=None,
+        ssl_cafile=None,
         **kwargs,
     ):
         super().__init__(fail_silently=fail_silently)
@@ -43,6 +44,9 @@ class EmailBackend(BaseEmailBackend):
         )
         self.ssl_certfile = (
             settings.EMAIL_SSL_CERTFILE if ssl_certfile is None else ssl_certfile
+        )
+        self.ssl_cafile = (
+            settings.EMAIL_SSL_CAFILE if ssl_cafile is None else ssl_cafile
         )
         if self.use_ssl and self.use_tls:
             raise ValueError(
@@ -61,9 +65,13 @@ class EmailBackend(BaseEmailBackend):
         if self.ssl_certfile or self.ssl_keyfile:
             ssl_context = ssl.SSLContext(protocol=ssl.PROTOCOL_TLS_CLIENT)
             ssl_context.load_cert_chain(self.ssl_certfile, self.ssl_keyfile)
-            return ssl_context
         else:
-            return ssl.create_default_context()
+            ssl_context = ssl.create_default_context()
+
+        if self.ssl_cafile:
+            ssl_context.load_verify_locations(cafile=self.ssl_cafile)
+
+        return ssl_context
 
     def open(self):
         """
