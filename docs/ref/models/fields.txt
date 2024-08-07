@@ -690,12 +690,15 @@ case it can't be included in a :class:`~django.forms.ModelForm`.
 ``BooleanField``
 ----------------
 
-class BooleanField(**options)
+.. class:: BooleanField(**options)
+
 A true/false field.
 
-The default form widget for this field is CheckboxInput, or NullBooleanSelect if null=True.
+The default form widget for this field is :class:`~django.forms.CheckboxInput`,
+or :class:`~django.forms.NullBooleanSelect` if :attr:`null=True <Field.null>`.
 
-The default value of BooleanField is None when Field.default isn’t defined.
+The default value of ``BooleanField`` is ``None`` when :attr:`Field.default`
+isn't defined.
 
 .. note::
 
@@ -707,8 +710,10 @@ The default value of BooleanField is None when Field.default isn’t defined.
 
       from django.db import models
 
+
       class MyModel(models.Model):
           my_field = models.BooleanField(db_default=False)
+
 
       my_obj = MyModel()
       print(bool(my_obj.my_field))  # True, which is unexpected.
