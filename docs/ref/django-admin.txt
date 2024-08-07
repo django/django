@@ -870,11 +870,11 @@ are reserved for the superuser (root).
 This server uses the WSGI application object specified by the
 :setting:`WSGI_APPLICATION` setting.
 
-DO NOT USE THIS SERVER IN A PRODUCTION SETTING. It has not gone through
-security audits or performance tests. (And that's how it's gonna stay. We're in
-the business of making web frameworks, not web servers, so improving this
-server to be able to handle a production environment is outside the scope of
-Django.)
+.. warning:: DO NOT USE THIS SERVER IN A PRODUCTION SETTING.
+
+    This lightweight development server has not gone through security audits or
+    performance tests, hence is unsuitable for production. Making this server
+    able to handle a production environment is outside the scope of Django.
 
 The development server automatically reloads Python code for each request, as
 needed. You don't need to restart the server for code changes to take effect.
