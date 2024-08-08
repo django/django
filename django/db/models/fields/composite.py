@@ -49,6 +49,8 @@ class CompositePrimaryKey(Field):
             or len(set(args)) != len(args)
         ):
             raise ValueError("CompositePrimaryKey args must be unique strings.")
+        if kwargs.get("default", NOT_PROVIDED) is not NOT_PROVIDED:
+            raise ValueError("CompositePrimaryKey cannot have a default.")
         if kwargs.get("db_default", NOT_PROVIDED) is not NOT_PROVIDED:
             raise ValueError("CompositePrimaryKey cannot have a database default.")
         if kwargs.setdefault("editable", False):

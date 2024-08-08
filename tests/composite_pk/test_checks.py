@@ -28,6 +28,31 @@ class CompositePKChecksTests(TestCase):
             ):
                 models.CompositePrimaryKey(*args)
 
+    def test_composite_pk_cannot_have_a_default(self):
+        expected_message = "CompositePrimaryKey cannot have a default."
+        with self.assertRaisesMessage(ValueError, expected_message):
+            models.CompositePrimaryKey("id", default=(1, 1))
+
+    def test_composite_pk_cannot_have_a_database_default(self):
+        expected_message = "CompositePrimaryKey cannot have a database default."
+        with self.assertRaisesMessage(ValueError, expected_message):
+            models.CompositePrimaryKey("id", db_default=models.F("id"))
+
+    def test_composite_pk_cannot_be_editable(self):
+        expected_message = "CompositePrimaryKey cannot be editable."
+        with self.assertRaisesMessage(ValueError, expected_message):
+            models.CompositePrimaryKey("id", editable=True)
+
+    def test_composite_pk_must_be_a_primary_key(self):
+        expected_message = "CompositePrimaryKey must be a primary key."
+        with self.assertRaisesMessage(ValueError, expected_message):
+            models.CompositePrimaryKey("id", primary_key=False)
+
+    def test_composite_pk_must_be_blank(self):
+        expected_message = "CompositePrimaryKey must be blank."
+        with self.assertRaisesMessage(ValueError, expected_message):
+            models.CompositePrimaryKey("id", blank=False)
+
     def test_composite_pk_must_not_have_other_pk_field(self):
         class Foo(models.Model):
             pk = models.CompositePrimaryKey("foo_id", "id")
