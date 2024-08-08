@@ -121,6 +121,9 @@ class UpdateCacheMiddleware(MiddlewareMixin):
             cache_key = learn_cache_key(
                 request, response, timeout, self.key_prefix, cache=self.cache
             )
+            # Avoid duplicating cache.
+            response["X-Cache-Success"] = "true"
+
             if hasattr(response, "render") and callable(response.render):
                 response.add_post_render_callback(
                     lambda r: self.cache.set(cache_key, r, timeout)
