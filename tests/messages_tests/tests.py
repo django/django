@@ -4,6 +4,7 @@ from unittest import mock
 
 from django.conf import settings
 from django.contrib.messages import Message, add_message, constants
+from django.contrib.messages.restrictions import AmountRestriction
 from django.contrib.messages.storage import base
 from django.contrib.messages.test import MessagesTestMixin
 from django.test import RequestFactory, SimpleTestCase, override_settings
@@ -110,11 +111,29 @@ class AssertMessagesTest(MessagesTestMixin, SimpleTestCase):
         self.assertMessages(
             response,
             [
-                Message(constants.DEBUG, "DEBUG message."),
-                Message(constants.INFO, "INFO message."),
-                Message(constants.SUCCESS, "SUCCESS message."),
-                Message(constants.WARNING, "WARNING message."),
-                Message(constants.ERROR, "ERROR message."),
+                Message(
+                    constants.DEBUG,
+                    "DEBUG message.",
+                    restrictions=[AmountRestriction(2)],
+                ),
+                Message(
+                    constants.INFO, "INFO message.", restrictions=[AmountRestriction(2)]
+                ),
+                Message(
+                    constants.SUCCESS,
+                    "SUCCESS message.",
+                    restrictions=[AmountRestriction(2)],
+                ),
+                Message(
+                    constants.WARNING,
+                    "WARNING message.",
+                    restrictions=[AmountRestriction(2)],
+                ),
+                Message(
+                    constants.ERROR,
+                    "ERROR message.",
+                    restrictions=[AmountRestriction(2)],
+                ),
             ],
         )
 
@@ -147,10 +166,30 @@ class AssertMessagesTest(MessagesTestMixin, SimpleTestCase):
         self.assertMessages(
             response,
             [
-                Message(constants.INFO, "INFO message.", "extra-info"),
-                Message(constants.SUCCESS, "SUCCESS message.", "extra-success"),
-                Message(constants.WARNING, "WARNING message.", "extra-warning"),
-                Message(constants.ERROR, "ERROR message.", "extra-error"),
+                Message(
+                    constants.INFO,
+                    "INFO message.",
+                    "extra-info",
+                    restrictions=[AmountRestriction(2)],
+                ),
+                Message(
+                    constants.SUCCESS,
+                    "SUCCESS message.",
+                    "extra-success",
+                    restrictions=[AmountRestriction(2)],
+                ),
+                Message(
+                    constants.WARNING,
+                    "WARNING message.",
+                    "extra-warning",
+                    restrictions=[AmountRestriction(2)],
+                ),
+                Message(
+                    constants.ERROR,
+                    "ERROR message.",
+                    "extra-error",
+                    restrictions=[AmountRestriction(2)],
+                ),
             ],
         )
 
@@ -158,15 +197,24 @@ class AssertMessagesTest(MessagesTestMixin, SimpleTestCase):
     def test_custom_levelname(self):
         response = FakeResponse()
         add_message(response.wsgi_request, 42, "CUSTOM message.")
-        self.assertMessages(response, [Message(42, "CUSTOM message.")])
+        self.assertMessages(
+            response,
+            [Message(42, "CUSTOM message.", restrictions=[AmountRestriction(2)])],
+        )
 
     def test_ordered(self):
         response = FakeResponse()
         add_message(response.wsgi_request, constants.INFO, "First message.")
         add_message(response.wsgi_request, constants.WARNING, "Second message.")
         expected_messages = [
-            Message(constants.WARNING, "Second message."),
-            Message(constants.INFO, "First message."),
+            Message(
+                constants.WARNING,
+                "Second message.",
+                restrictions=[AmountRestriction(2)],
+            ),
+            Message(
+                constants.INFO, "First message.", restrictions=[AmountRestriction(2)]
+            ),
         ]
         self.assertMessages(response, expected_messages, ordered=False)
         with self.assertRaisesMessage(AssertionError, "Lists differ: "):
