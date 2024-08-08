@@ -961,20 +961,20 @@ output (as a string) inside a variable. This is useful if you want to use
 
 Outputs a URL-encoded formatted query string based on the provided parameters.
 
-This tag requires a :class:`~django.http.QueryDict` instance, which defaults to
-:attr:`request.GET <django.http.HttpRequest.GET>` if none is provided.
+This tag requires a :class:`~django.http.QueryDict` or :class:`dict` instance,
+which defaults to :attr:`request.GET <django.http.HttpRequest.GET>` if none is
+provided.
 
-If the :class:`~django.http.QueryDict` is empty and no additional parameters
-are provided, an empty string is returned. A non-empty result includes a
-leading ``"?"``.
+A non-empty result includes a leading ``"?"``, whereas an empty result returns
+an empty string.
 
 .. admonition:: Using ``request.GET`` as default
 
     To use ``request.GET`` as the default ``QueryDict`` instance, the
     ``django.template.context_processors.request`` context processor should be
     enabled. If it's not enabled, you must either explicitly pass the
-    ``request`` object into the template context, or provide a ``QueryDict``
-    instance to this tag.
+    ``request`` object into the template context, or pass the ``request.GET``
+    ``QueryDict`` instance to this tag.
 
 Basic usage
 ~~~~~~~~~~~
@@ -993,16 +993,24 @@ Outputs the current query string verbatim. So if the query string is
 Outputs the current query string with the addition of the ``size`` parameter.
 Following the previous example, the output would be ``?color=green&size=M``.
 
-Custom QueryDict
-~~~~~~~~~~~~~~~~
+Customizing the default QueryDict
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: html+django
 
-    {% querystring my_query_dict %}
+    {% querystring my_query_dict my_dict %}
 
-You can provide a custom ``QueryDict`` to be used instead of ``request.GET``.
-So if ``my_query_dict`` is ``<QueryDict: {'color': ['blue']}>``, this outputs
-``?color=blue``.
+You can provide custom ``QueryDict`` or ``dict`` instances as positional
+arguments to be used instead of ``request.GET``. Key values from later
+arguments take precedence over previously seen keys. So if ``my_query_dict``
+is ``<QueryDict: {'color': ['blue'], 'size': ['S']}>`` and ``my_dict`` is
+``{'color': 'orange', 'fabric': 'silk'}``, this outputs
+``?color=orange&size=S&fabric=silk``.
+
+.. versionchanged:: 5.2
+
+    Support for multiple positional arguments and positional arguments of
+    type ``dict`` were added.
 
 Setting items
 ~~~~~~~~~~~~~
