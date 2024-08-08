@@ -148,6 +148,10 @@ argument is passed in as ``True``::
 
     serializers.deserialize("xml", data, ignorenonexistent=True)
 
+In addition, you can extend the ``Deserializer`` class and extend it::
+
+    class CustomDeserializer(serializers.python.Deserializer): ...
+
 .. _serialization-formats:
 
 Serialization formats

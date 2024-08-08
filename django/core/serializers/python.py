@@ -96,100 +96,120 @@ class Serializer(base.Serializer):
         return self.objects
 
 
-def Deserializer(
-    object_list, *, using=DEFAULT_DB_ALIAS, ignorenonexistent=False, **options
-):
+class Deserializer:
     """
     Deserialize simple Python objects back into Django ORM instances.
 
     It's expected that you pass the Python objects themselves (instead of a
     stream or a string) to the constructor
     """
-    handle_forward_references = options.pop("handle_forward_references", False)
-    field_names_cache = {}  # Model: <list of field_names>
 
-    for d in object_list:
-        # Look up the model and starting build a dict of data for it.
-        try:
-            Model = _get_model(d["model"])
-        except base.DeserializationError:
-            if ignorenonexistent:
-                continue
-            else:
-                raise
-        data = {}
-        if "pk" in d:
+    def __init__(
+        self, object_list, *, using=DEFAULT_DB_ALIAS, ignorenonexistent=False, **options
+    ):
+        self.object_list = object_list
+        self.handle_forward_references = options.pop("handle_forward_references", False)
+        self.using = using
+        self.ignorenonexistent = ignorenonexistent
+        self.field_names_cache = {}  # Model: <list of field_names>
+
+    def __iter__(self):
+        for obj in self.object_list:
+            data = {}
+            m2m_data = {}
+            deferred_fields = {}
+            field_names = set()
+
+            # Look up the model and starting build a dict of data for it.
             try:
-                data[Model._meta.pk.attname] = Model._meta.pk.to_python(d.get("pk"))
-            except Exception as e:
-                raise base.DeserializationError.WithData(
-                    e, d["model"], d.get("pk"), None
-                )
-        m2m_data = {}
-        deferred_fields = {}
-
-        if Model not in field_names_cache:
-            field_names_cache[Model] = {f.name for f in Model._meta.get_fields()}
-        field_names = field_names_cache[Model]
-
-        # Handle each field
-        for field_name, field_value in d["fields"].items():
-            if ignorenonexistent and field_name not in field_names:
-                # skip fields no longer on model
-                continue
-
-            field = Model._meta.get_field(field_name)
-
-            # Handle M2M relations
-            if field.remote_field and isinstance(
-                field.remote_field, models.ManyToManyRel
-            ):
+                Model = self._get_model(obj["model"])
+            except base.DeserializationError:
+                if self.ignorenonexistent:
+                    continue
+                raise
+            if "pk" in obj:
                 try:
-                    values = base.deserialize_m2m_values(
-                        field, field_value, using, handle_forward_references
-                    )
-                except base.M2MDeserializationError as e:
-                    raise base.DeserializationError.WithData(
-                        e.original_exc, d["model"], d.get("pk"), e.pk
-                    )
-                if values == base.DEFER_FIELD:
-                    deferred_fields[field] = field_value
-                else:
-                    m2m_data[field.name] = values
-            # Handle FK fields
-            elif field.remote_field and isinstance(
-                field.remote_field, models.ManyToOneRel
-            ):
-                try:
-                    value = base.deserialize_fk_value(
-                        field, field_value, using, handle_forward_references
+                    data[Model._meta.pk.attname] = Model._meta.pk.to_python(
+                        obj.get("pk")
                     )
                 except Exception as e:
                     raise base.DeserializationError.WithData(
-                        e, d["model"], d.get("pk"), field_value
+                        e, obj["model"], obj.get("pk"), None
                     )
-                if value == base.DEFER_FIELD:
-                    deferred_fields[field] = field_value
+
+            if self.ignorenonexistent:
+                if Model not in self.field_names_cache:
+                    self.field_names_cache[Model] = {
+                        f.name for f in Model._meta.get_fields()
+                    }
+                field_names = self.field_names_cache[Model]
+
+            # Handle each field
+            for field_name, field_value in obj["fields"].items():
+                if self.ignorenonexistent and field_name not in field_names:
+                    # skip fields no longer on model
+                    continue
+
+                field = Model._meta.get_field(field_name)
+
+                # Handle M2M relations
+                if field.remote_field and isinstance(
+                    field.remote_field, models.ManyToManyRel
+                ):
+                    try:
+                        values = self._handle_m2m_field(field, field_value)
+                        if values == base.DEFER_FIELD:
+                            deferred_fields[field] = field_value
+                        else:
+                            m2m_data[field.name] = values
+                    except base.M2MDeserializationError as e:
+                        raise base.DeserializationError.WithData(
+                            e.original_exc, obj["model"], obj.get("pk"), e.pk
+                        )
+
+                # Handle FK fields
+                elif field.remote_field and isinstance(
+                    field.remote_field, models.ManyToOneRel
+                ):
+                    try:
+                        value = self._handle_foreign_key_field(field, field_value)
+                        if value == base.DEFER_FIELD:
+                            deferred_fields[field] = field_value
+                        else:
+                            data[field.attname] = value
+                    except Exception as e:
+                        raise base.DeserializationError.WithData(
+                            e, obj["model"], obj.get("pk"), field_value
+                        )
+
+                # Handle all other fields
                 else:
-                    data[field.attname] = value
-            # Handle all other fields
-            else:
-                try:
-                    data[field.name] = field.to_python(field_value)
-                except Exception as e:
-                    raise base.DeserializationError.WithData(
-                        e, d["model"], d.get("pk"), field_value
-                    )
+                    try:
+                        data[field.name] = field.to_python(field_value)
+                    except Exception as e:
+                        raise base.DeserializationError.WithData(
+                            e, obj["model"], obj.get("pk"), field_value
+                        )
 
-        obj = base.build_instance(Model, data, using)
-        yield base.DeserializedObject(obj, m2m_data, deferred_fields)
+            model_instance = base.build_instance(Model, data, self.using)
+            yield base.DeserializedObject(model_instance, m2m_data, deferred_fields)
 
-
-def _get_model(model_identifier):
-    """Look up a model from an "app_label.model_name" string."""
-    try:
-        return apps.get_model(model_identifier)
-    except (LookupError, TypeError):
-        raise base.DeserializationError(
-            "Invalid model identifier: '%s'" % model_identifier
+    def _handle_m2m_field(self, field, field_value):
+        return base.deserialize_m2m_values(
+            field, field_value, self.using, self.handle_forward_references
         )
+
+    def _handle_foreign_key_field(self, field, field_value):
+        return base.deserialize_fk_value(
+            field, field_value, self.using, self.handle_forward_references
+        )
+
+    @staticmethod
+    def _get_model(model_identifier):
+        """Look up a model from an "app_label.model_name" string."""
+        try:
+            return apps.get_model(model_identifier)
+        except (LookupError, TypeError):
+            raise base.DeserializationError(
+                f"Invalid model identifier: {model_identifier}"
+            )

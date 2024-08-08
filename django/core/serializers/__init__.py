@@ -143,7 +143,7 @@ def deserialize(format, stream_or_string, **options):
     list_of_related_objects}``.
     """
     d = get_deserializer(format)
-    return d(stream_or_string, **options)
+    return iter(d(stream_or_string, **options))
 
 
 def _load_serializers():
