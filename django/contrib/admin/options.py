@@ -1219,7 +1219,14 @@ class ModelAdmin(BaseModelAdmin):
                     connector=models.Q.OR,
                 )
                 term_queries.append(or_queries)
-            queryset = queryset.filter(models.Q.create(term_queries))
+            try:
+                queryset = queryset.filter(models.Q.create(term_queries))
+            except (ValueError, ValidationError):
+                # If a ValueError occurs
+                # (e.g. when a non-integer term is used with __exact)
+                # return an empty queryset.
+                return queryset.none(), may_have_duplicates
+
             may_have_duplicates |= any(
                 lookup_spawns_duplicates(self.opts, search_spec)
                 for search_spec in orm_lookups
