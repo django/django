@@ -104,6 +104,9 @@ class CompositePrimaryKey(Field):
     def is_set(cls, values):
         return all(value is not None for value in values)
 
+    def get_pk_value_on_save(self, instance):
+        return tuple(field.get_pk_value_on_save(instance) for field in self.fields)
+
     def _check_field_name(self):
         if self.name == "pk":
             return []
