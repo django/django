@@ -1156,7 +1156,7 @@ class Model(AltersData, metaclass=ModelBase):
                 for f in meta.local_concrete_fields
                 if not f.generated and (pk_set or f is not meta.auto_field)
             ]
-            returning_fields = meta.db_returning_fields
+            returning_fields = [f for f in meta.db_returning_fields if not f.generated]
             results = self._do_insert(
                 cls._base_manager, using, fields, returning_fields, raw
             )
