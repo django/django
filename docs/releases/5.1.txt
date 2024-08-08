@@ -91,11 +91,14 @@ redirects all unauthenticated requests to a login page. Views can allow
 unauthenticated requests by using the new
 :func:`~django.contrib.auth.decorators.login_not_required` decorator.
 
-The :class:`~django.contrib.auth.middleware.LoginRequiredMiddleware` respects
-the ``login_url`` and ``redirect_field_name`` values set via the
+``LoginRequiredMiddleware`` respects the ``login_url`` and
+``redirect_field_name`` values set via the
 :func:`~.django.contrib.auth.decorators.login_required` decorator, but does not
 support setting ``login_url`` or ``redirect_field_name`` via the
 :class:`~django.contrib.auth.mixins.LoginRequiredMixin`.
+
+To enable this, add ``"django.contrib.auth.middleware.LoginRequiredMiddleware"``
+to your :setting:`MIDDLEWARE` setting.
 
 Minor features
 --------------

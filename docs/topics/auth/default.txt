@@ -655,7 +655,7 @@ login view, may need to disable this behavior.
 
 .. function:: login_not_required()
 
-    Allows unauthenticated requests without redirecting to the login page when
+    Allows unauthenticated requests to this view when
     :class:`~django.contrib.auth.middleware.LoginRequiredMiddleware` is
     installed.
 

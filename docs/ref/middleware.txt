@@ -502,25 +502,49 @@ every incoming ``HttpRequest`` object. See :ref:`Authentication in web requests
 
 .. versionadded:: 5.1
 
-Redirects all unauthenticated requests to a login page. For admin views, this
-redirects to the admin login. For all other views, this will redirect to
-:setting:`settings.LOGIN_URL <LOGIN_URL>`. This can be customized by using the
-:func:`~.django.contrib.auth.decorators.login_required` decorator and setting
-``login_url`` or ``redirect_field_name`` for the view. For example::
+Redirects all unauthenticated requests to a login page, except for views
+excluded with :func:`~.django.contrib.auth.decorators.login_not_required`. The
+login page defaults to :setting:`settings.LOGIN_URL <LOGIN_URL>`, but can be
+customized.
+
+Enable this middleware by adding it to the :setting:`MIDDLEWARE` setting
+**after** :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`::
+
+    MIDDLEWARE = [
+        "...",
+        "django.contrib.auth.middleware.AuthenticationMiddleware",
+        "django.contrib.auth.middleware.LoginRequiredMiddleware",
+        "...",
+    ]
+
+Make a view public, allowing unauthenticated requests, with
+:func:`~.django.contrib.auth.decorators.login_not_required`. For example::
+
+       from django.contrib.auth.decorators import login_not_required
+
+
+       @login_not_required
+       def contact_us(request): ...
+
+Customize the login URL or field name for authenticated views with the
+:func:`~.django.contrib.auth.decorators.login_required` decorator to set
+``login_url`` or ``redirect_field_name`` respectively. For example::
+
+    from django.contrib.auth.decorators import login_required
+    from django.utils.decorators import method_decorator
+    from django.views.generic import View
+
+
+    @login_required(login_url="/books/login/", redirect_field_name="redirect_to")
+    def book_dashboard(request): ...
+
 
     @method_decorator(
-        login_required(login_url="/login/", redirect_field_name="redirect_to"),
+        login_required(login_url="/books/login/", redirect_field_name="redirect_to"),
         name="dispatch",
     )
-    class MyView(View):
+    class BookMetrics(View):
         pass
-
-
-    @login_required(login_url="/login/", redirect_field_name="redirect_to")
-    def my_view(request): ...
-
-Views using the :func:`~django.contrib.auth.decorators.login_not_required`
-decorator are exempt from this requirement.
 
 .. admonition:: Ensure that your login view does not require a login.
 
@@ -529,6 +553,9 @@ decorator are exempt from this requirement.
     <disable-login-required-middleware-for-views>` to your login view.
 
 **Methods and Attributes**
+
+Subclass the middleware and override these to customize behavior for
+unauthenticated requests.
 
 .. attribute:: redirect_field_name
 
