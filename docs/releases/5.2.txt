@@ -220,8 +220,8 @@ Email
   returns a boolean indicating whether a provided text is contained in the
   email ``body`` and in all attached MIME type ``text/*`` alternatives.
 
-* The SMTP email backend now supports certificate validation using a ``cafile``
-  with the :setting:`EMAIL_SSL_CAFILE` setting.
+* The SMTP :class:`~django.core.mail.backends.smtp.EmailBackend` now supports
+  certificate validation by setting the new ``ssl_cafile`` parameter.
 
 Error Reporting
 ~~~~~~~~~~~~~~~

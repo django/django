@@ -2269,25 +2269,19 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         backend = smtp.EmailBackend()
         self.assertFalse(backend.use_ssl)
 
-    @override_settings(EMAIL_SSL_CAFILE="foo")
-    def test_email_ssl_cafile_use_settings(self):
-        backend = smtp.EmailBackend()
-        self.assertEqual(backend.ssl_cafile, "foo")
-
     @override_settings(EMAIL_SSL_CERTFILE="foo")
     def test_email_ssl_certfile_use_settings(self):
         backend = smtp.EmailBackend()
         self.assertEqual(backend.ssl_certfile, "foo")
 
-    @override_settings(EMAIL_SSL_CAFILE="foo")
-    def test_email_ssl_cafile_override_settings(self):
-        backend = smtp.EmailBackend(ssl_cafile="bar")
-        self.assertEqual(backend.ssl_cafile, "bar")
-
     @override_settings(EMAIL_SSL_CERTFILE="foo")
     def test_email_ssl_certfile_override_settings(self):
         backend = smtp.EmailBackend(ssl_certfile="bar")
         self.assertEqual(backend.ssl_certfile, "bar")
+
+    def test_email_set_ssl_cafile(self):
+        backend = smtp.EmailBackend(ssl_cafile="bar")
+        self.assertEqual(backend.ssl_cafile, "bar")
 
     def test_email_ssl_cafile_default_disabled(self):
         backend = smtp.EmailBackend()

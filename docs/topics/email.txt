@@ -609,7 +609,7 @@ SMTP backend
 
     This is the default backend. Email will be sent through a SMTP server.
 
-    The value for each argument is retrieved from the matching setting if the
+    The value for most arguments is retrieved from the matching setting if the
     argument is ``None``:
 
     * ``host``: :setting:`EMAIL_HOST`
@@ -621,7 +621,6 @@ SMTP backend
     * ``timeout``: :setting:`EMAIL_TIMEOUT`
     * ``ssl_keyfile``: :setting:`EMAIL_SSL_KEYFILE`
     * ``ssl_certfile``: :setting:`EMAIL_SSL_CERTFILE`
-    * ``ssl_cafile``: :setting:`EMAIL_SSL_CAFILE`
 
     The SMTP backend is the default configuration inherited by Django. If you
     want to specify it explicitly, put the following in your settings::
@@ -630,6 +629,11 @@ SMTP backend
 
     If unspecified, the default ``timeout`` will be the one provided by
     :func:`socket.getdefaulttimeout()`, which defaults to ``None`` (no timeout).
+
+.. versionchanged:: 5.2
+
+    The ``ssl_cafile`` argument was added. It must be a ``pem`` formatted
+    CA certificate which is used to validate the SMTP server certificate.
 
 .. _topic-email-console-backend:
 

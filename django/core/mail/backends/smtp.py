@@ -45,9 +45,7 @@ class EmailBackend(BaseEmailBackend):
         self.ssl_certfile = (
             settings.EMAIL_SSL_CERTFILE if ssl_certfile is None else ssl_certfile
         )
-        self.ssl_cafile = (
-            settings.EMAIL_SSL_CAFILE if ssl_cafile is None else ssl_cafile
-        )
+        self.ssl_cafile = ssl_cafile
         if self.use_ssl and self.use_tls:
             raise ValueError(
                 "EMAIL_USE_TLS/EMAIL_USE_SSL are mutually exclusive, so only set "
