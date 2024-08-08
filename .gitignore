@@ -6,6 +6,7 @@
 *.pot
 *.py[co]
 .tox/
+venv*/
 __pycache__
 MANIFEST
 dist/
