@@ -164,6 +164,13 @@ the ``Client`` has been with us, we could do so using lookups:
     ... ).values_list("name", "discount")
     <QuerySet [('Jane Doe', '5%'), ('James Smith', '0%'), ('Jack Black', '10%')]>
 
+The ``**extra`` kwargs are ``key=value`` pairs that can be interpolated
+into the ``template`` attribute. To avoid an SQL injection vulnerability,
+``extra`` :ref:`must not contain untrusted user input
+<avoiding-sql-injection-in-query-expressions>` as these values are interpolated
+into the SQL string rather than passed as query parameters, where the database
+driver would escape them.
+
 .. note::
 
     Remember that the conditions are evaluated in order, so in the above

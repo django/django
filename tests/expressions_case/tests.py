@@ -722,6 +722,22 @@ class CaseExpressionTests(TestCase):
             transform=itemgetter("integer", "integer2", "max"),
         )
 
+    def test_case_with_extra_kwargs(self):
+        case_expression = Case(
+            When(integer=1, then=Value(10)),
+            When(integer=2, then=Value(20)),
+            default=Value(0),
+            template="CASE %(cases)s ELSE %(default)s + 5 END",
+        )
+        self.assertListEqual(
+            list(
+                CaseTestModel.objects.annotate(values=case_expression).values_list(
+                    "values", flat=True
+                )
+            ),
+            [10, 20, 5, 20, 5, 5, 5],
+        )
+
     def test_update(self):
         CaseTestModel.objects.update(
             string=Case(

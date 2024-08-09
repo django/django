@@ -568,7 +568,7 @@ expressions. For more details see :doc:`conditional-expressions`.
 ``Subquery()`` expressions
 --------------------------
 
-.. class:: Subquery(queryset, output_field=None)
+.. class:: Subquery(queryset, output_field=None, **extra)
 
 You can add an explicit subquery to a ``QuerySet`` using the ``Subquery``
 expression.
@@ -592,6 +592,13 @@ On PostgreSQL, the SQL looks like:
         WHERE U0."post_id" = ("post"."id")
         ORDER BY U0."created_at" DESC LIMIT 1
     ) AS "newest_commenter_email" FROM "post"
+
+The ``**extra`` kwargs are ``key=value`` pairs that can be interpolated
+into the ``template`` attribute. To avoid an SQL injection vulnerability,
+``extra`` :ref:`must not contain untrusted user input
+<avoiding-sql-injection-in-query-expressions>` as these values are interpolated
+into the SQL string rather than passed as query parameters, where the database
+driver would escape them.
 
 .. note::
 
