@@ -1352,6 +1352,52 @@ class FormattingTests(SimpleTestCase):
                 self.assertEqual(template2.render(context), output2)
                 self.assertEqual(template3.render(context), output3)
 
+    def test_unlocalize_honor_date_settings(self):
+        filter_template = Template(
+            "{% load l10n %}Localized: {{ my_value }}. "
+            "Unlocalized: {{ my_value|unlocalize }}."
+        )
+        tag_template = Template(
+            "{% load l10n %}Localized: {{ my_value }}. {% localize off %}"
+            "Unlocalized: {{ my_value }}{% endlocalize %}."
+        )
+        filter_inside_unlocalize = Template(
+            "{% load l10n %}Localized: {{ my_value|date }}. {% localize off %}"
+            "Unlocalized: {{ my_value|date:'DATE_FORMAT' }}{% endlocalize %}."
+        )
+        context = Context({"my_value": datetime.date(2024, 12, 15)})
+        expected_result = "Localized: 15. Dezember 2024. Unlocalized: 15-12-2024."
+        for case in (filter_template, tag_template, filter_inside_unlocalize):
+            with (
+                self.subTest(case=str(case)),
+                translation.override("de", deactivate=True),
+                self.settings(DATE_FORMAT="j-m-Y"),
+            ):
+                self.assertEqual(case.render(context), expected_result)
+
+    def test_unlocalize_honor_time_settings(self):
+        filter_template = Template(
+            "{% load l10n %}Localized: {{ my_value }}. "
+            "Unlocalized: {{ my_value|unlocalize }}."
+        )
+        tag_template = Template(
+            "{% load l10n %}Localized: {{ my_value }}. {% localize off %}"
+            "Unlocalized: {{ my_value }}{% endlocalize %}."
+        )
+        filter_inside_unlocalize = Template(
+            "{% load l10n %}Localized: {{ my_value|time }}. {% localize off %}"
+            "Unlocalized: {{ my_value|time }}{% endlocalize %}."
+        )
+        context = Context({"my_value": datetime.time(1, 2, 3)})
+        expected_result = "Localized: 01:02. Unlocalized: 01h 02m."
+        for case in (filter_template, tag_template, filter_inside_unlocalize):
+            with (
+                self.subTest(case=str(case)),
+                translation.override("de", deactivate=True),
+                self.settings(TIME_FORMAT="H\\h i\\m"),
+            ):
+                self.assertEqual(case.render(context), expected_result)
+
     def test_localized_off_numbers(self):
         """A string representation is returned for unlocalized numbers."""
         template = Template(

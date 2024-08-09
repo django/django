@@ -737,12 +737,14 @@ class FilterExpression:
                     arg_vals.append(mark_safe(arg))
                 else:
                     arg_vals.append(arg.resolve(context))
+            kwargs = {}
             if getattr(func, "expects_localtime", False):
                 obj = template_localtime(obj, context.use_tz)
+                kwargs["use_l10n"] = context.use_l10n
             if getattr(func, "needs_autoescape", False):
-                new_obj = func(obj, autoescape=context.autoescape, *arg_vals)
+                new_obj = func(obj, autoescape=context.autoescape, *arg_vals, **kwargs)
             else:
-                new_obj = func(obj, *arg_vals)
+                new_obj = func(obj, *arg_vals, **kwargs)
             if getattr(func, "is_safe", False) and isinstance(obj, SafeData):
                 obj = mark_safe(new_obj)
             else:
