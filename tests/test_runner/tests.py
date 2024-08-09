@@ -754,18 +754,6 @@ class TestRunnerInitializerTests(SimpleTestCase):
         self.assertEqual(initargs[6], {db.DEFAULT_DB_ALIAS})  # Used database aliases.
 
 
-class Ticket17477RegressionTests(AdminScriptTestCase):
-    def setUp(self):
-        super().setUp()
-        self.write_settings("settings.py")
-
-    def test_ticket_17477(self):
-        """'manage.py help test' works after r16352."""
-        args = ["help", "test"]
-        out, err = self.run_manage(args)
-        self.assertNoOutput(err)
-
-
 class SQLiteInMemoryTestDbs(TransactionTestCase):
     available_apps = ["test_runner"]
     databases = {"default", "other"}

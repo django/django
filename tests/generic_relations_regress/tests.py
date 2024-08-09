@@ -174,14 +174,20 @@ class GenericRelationTests(TestCase):
 
     @skipIfDBFeature("interprets_empty_strings_as_nulls")
     def test_gfk_to_model_with_empty_pk(self):
-        """Test related to #13085"""
+        """
+        GenericForeignKey saves to model instance
+        with an empty CharField PK (#13085).
+        """
         # Saving model with GenericForeignKey to model instance with an
         # empty CharField PK
         b1 = Board.objects.create(name="")
         tag = Tag(label="VP", content_object=b1)
         tag.save()
 
-    def test_ticket_20378(self):
+    def test_reverse_abstract_gfk(self):
+        """
+        Reverse join works with a GenericRelation defined on an abstract model (#20378).
+        """
         # Create a couple of extra HasLinkThing so that the autopk value
         # isn't the same for Link and HasLinkThing.
         hs1 = HasLinkThing.objects.create()
@@ -199,7 +205,10 @@ class GenericRelationTests(TestCase):
             HasLinkThing.objects.exclude(links=l1), [hs1, hs2, hs4]
         )
 
-    def test_ticket_20564(self):
+    def test_generic_relation(self):
+        """
+        Querying (exclude) on a GenericForeignKey field (#20564).
+        """
         b1 = B.objects.create()
         b2 = B.objects.create()
         b3 = B.objects.create()
@@ -211,7 +220,10 @@ class GenericRelationTests(TestCase):
         self.assertSequenceEqual(C.objects.filter(b__a__flag=None), [c1, c3])
         self.assertSequenceEqual(C.objects.exclude(b__a__flag=None), [c2])
 
-    def test_ticket_20564_nullable_fk(self):
+    def test_generic_nullable_relation(self):
+        """
+        Querying (exclude) on a nullable GenericForeignKey field (#20564).
+        """
         b1 = B.objects.create()
         b2 = B.objects.create()
         b3 = B.objects.create()
@@ -286,7 +298,8 @@ class GenericRelationTests(TestCase):
         links = HasLinkThing._meta.get_field("links")
         self.assertEqual(links.save_form_data_calls, 1)
 
-    def test_ticket_22998(self):
+    def test_generic_relation_delete(self):
+        """GenericRelation cascade deletion doesn't fire pre_delete signals (#22998)."""
         related = Related.objects.create()
         content = Content.objects.create(related_obj=related)
         Node.objects.create(content=content)
@@ -296,7 +309,11 @@ class GenericRelationTests(TestCase):
         with self.assertRaises(ProtectedError):
             related.delete()
 
-    def test_ticket_22982(self):
+    def test_coercing_to_string(self):
+        """
+        Coercing GenericRelation property to string
+        returning manager name (#22982).
+        """
         place = Place.objects.create(name="My Place")
         self.assertIn("GenericRelatedObjectManager", str(place.links))
 
