@@ -215,6 +215,10 @@ Models
   methods such as
   :meth:`QuerySet.union()<django.db.models.query.QuerySet.union>` unpredictable.
 
+* The new :attr:`.Expression.set_returning` attribute specifies that the
+  expression contains a set-returning function, enforcing subquery evaluation.
+  This is necessary for many Postgres set-returning functions.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

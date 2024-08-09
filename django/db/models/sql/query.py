@@ -491,6 +491,11 @@ class Query(BaseExpression):
             )
             or having
         )
+        set_returning_annotations = {
+            alias
+            for alias, annotation in self.annotation_select.items()
+            if getattr(annotation, "set_returning", False)
+        }
         # Decide if we need to use a subquery.
         #
         # Existing aggregations would cause incorrect results as
@@ -510,6 +515,7 @@ class Query(BaseExpression):
             or qualify
             or self.distinct
             or self.combinator
+            or set_returning_annotations
         ):
             from django.db.models.sql.subqueries import AggregateQuery
 
@@ -551,6 +557,9 @@ class Query(BaseExpression):
                         if annotation.get_group_by_cols():
                             annotation_mask.add(annotation_alias)
                     inner_query.set_annotation_mask(annotation_mask)
+                    # Annotations that possibly return multiple rows cannot
+                    # be masked as they might have an incidence on the query.
+                    annotation_mask |= set_returning_annotations
 
             # Add aggregates to the outer AggregateQuery. This requires making
             # sure all columns referenced by the aggregates are selected in the

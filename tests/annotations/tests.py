@@ -1,7 +1,9 @@
 import datetime
 from decimal import Decimal
+from unittest import skipUnless
 
 from django.core.exceptions import FieldDoesNotExist, FieldError
+from django.db import connection
 from django.db.models import (
     BooleanField,
     Case,
@@ -43,6 +45,7 @@ from .models import (
     Company,
     DepartmentStore,
     Employee,
+    JsonModel,
     Publisher,
     Store,
     Ticket,
@@ -1166,6 +1169,28 @@ class NonAggregateAnnotationTestCase(TestCase):
             with self.subTest(crafted_alias):
                 with self.assertRaisesMessage(ValueError, msg):
                     Book.objects.annotate(**{crafted_alias: Value(1)})
+
+    @skipUnless(connection.vendor == "postgresql", "PostgreSQL tests")
+    @skipUnlessDBFeature("supports_json_field")
+    def test_set_returning_functions(self):
+        """Test that utilizing the set returning flag returns the expected count"""
+        from django.db.models import JSONField
+
+        class JSONBPathQuery(Func):
+            function = "jsonb_path_query"
+            output_field = JSONField()
+            set_returning = True
+
+        test_model = JsonModel.objects.create(
+            data={"key": [{"id": 1, "name": "test1"}, {"id": 2, "name": "test2"}]}, id=1
+        )
+
+        test_model.save()
+        qs = JsonModel.objects.annotate(
+            table_element=JSONBPathQuery("data", Value("$.key[*]"))
+        ).filter(pk=1)
+
+        self.assertEqual(qs.count(), len(qs))
 
 
 class AliasTests(TestCase):

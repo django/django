@@ -182,6 +182,8 @@ class BaseExpression:
     allowed_default = False
     # Can the expression be used during a constraint validation?
     constraint_validation_compatible = True
+    # Does the expression possibly return more than one row?
+    set_returning = False
 
     def __init__(self, output_field=None):
         if output_field is not None:
