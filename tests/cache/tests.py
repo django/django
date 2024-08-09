@@ -56,12 +56,14 @@ from django.test.utils import CaptureQueriesContext
 from django.utils import timezone, translation
 from django.utils.cache import (
     get_cache_key,
+    get_key_prefix,
     learn_cache_key,
     patch_cache_control,
     patch_vary_headers,
 )
 from django.views.decorators.cache import cache_control, cache_page
 
+from .key_prefix_generator import DOTTED_PATH_KEY_PREFIX, cache_prefixer
 from .models import Poll, expensive_calculation
 
 
@@ -2521,7 +2523,7 @@ class CacheMiddlewareTest(SimpleTestCase):
 
         # Now test object attributes against values defined in setUp above
         self.assertEqual(middleware.cache_timeout, 30)
-        self.assertEqual(middleware.key_prefix, "middlewareprefix")
+        self.assertEqual(middleware.key_prefix, None)
         self.assertEqual(middleware.cache_alias, "other")
         self.assertEqual(middleware.cache, self.other_cache)
 
@@ -2553,13 +2555,13 @@ class CacheMiddlewareTest(SimpleTestCase):
         middleware = UpdateCacheMiddleware(empty_response)
         self.assertEqual(middleware.cache_timeout, 30)
         self.assertIsNone(middleware.page_timeout)
-        self.assertEqual(middleware.key_prefix, "middlewareprefix")
+        self.assertEqual(middleware.key_prefix, None)
         self.assertEqual(middleware.cache_alias, "other")
         self.assertEqual(middleware.cache, self.other_cache)
 
     def test_fetch_cache_middleware_constructor(self):
         middleware = FetchFromCacheMiddleware(empty_response)
-        self.assertEqual(middleware.key_prefix, "middlewareprefix")
+        self.assertEqual(middleware.key_prefix, None)
         self.assertEqual(middleware.cache_alias, "other")
         self.assertEqual(middleware.cache, self.other_cache)
 
@@ -2673,6 +2675,131 @@ class CacheMiddlewareTest(SimpleTestCase):
         # .. even if it has a prefix
         response = other_with_prefix_view(request, "16")
         self.assertEqual(response.content, b"Hello World 16")
+
+    def test_dynamic_cache_key(self):
+        """The key prefix is different for anonymous and authenticated users"""
+
+        cache_alias = "default"
+
+        anon_key_prefix = "anon"
+        auth_key_prefix = "auth"
+
+        class AnonUser:
+            @property
+            def is_authenticated(self):
+                return False
+
+            def __str__(self):
+                return "Anon"
+
+        class User:
+            @property
+            def is_authenticated(self):
+                return True
+
+            def __str__(self):
+                return "User"
+
+        def _cache_prefixer(request):
+            return auth_key_prefix if request.user.is_authenticated else anon_key_prefix
+
+        @cache_page(60, cache=cache_alias, key_prefix=_cache_prefixer)
+        def _view(request):
+            return HttpResponse(f"Hello, {request.user}!")
+
+        self.assertEqual(len(self.default_cache._cache), 0)
+
+        # anonymous hit
+        request = self.factory.get("/")
+        request.user = AnonUser()
+        response = _view(request)
+        self.assertEqual(response.content, b"Hello, Anon!")
+        anon_cache_key = get_cache_key(
+            request, anon_key_prefix, "GET", cache=self.default_cache
+        )
+        self.assertIn(anon_cache_key, self.default_cache)
+
+        # authenticated hit
+        request = self.factory.get("/")
+        request.user = User()
+        response = _view(request)
+        self.assertEqual(response.content, b"Hello, User!")
+        auth_cache_key = get_cache_key(
+            request, auth_key_prefix, "GET", cache=self.default_cache
+        )
+        self.assertIn(auth_cache_key, self.default_cache)
+
+    def test_dynamic_cache_key_defined_by_dot_path(self):
+        """
+        Test creating a key prefix by a callable defined by a dotted path in
+        CACHE_MIDDLEWARE_KEY_PREFIX.
+        """
+
+        cache_alias = "default"
+        key_prefix = DOTTED_PATH_KEY_PREFIX
+
+        @cache_page(
+            60,
+            cache=cache_alias,
+            key_prefix="cache.key_prefix_generator.cache_prefixer",
+        )
+        def _view(request):
+            return HttpResponse("Hello World!")
+
+        self.assertEqual(len(self.default_cache._cache), 0)
+
+        request = self.factory.get("/")
+        response = _view(request)
+        self.assertEqual(response.content, b"Hello World!")
+        cache_key = get_cache_key(request, key_prefix, "GET", cache=self.default_cache)
+        self.assertIn(cache_key, self.default_cache)
+
+    def test_conditional_cache_key(self):
+        """The key prefix callback bypasses the cache on query param"""
+
+        cache_alias = "default"
+        call_count = 0
+        key_prefix = "dynamic_prefix"
+        nocache_flag = "nocache"
+
+        def _cache_prefixer(request):
+            if nocache_flag in request.GET:  # skip caching
+                return None
+            return key_prefix
+
+        @cache_page(60, cache=cache_alias, key_prefix=_cache_prefixer)
+        def _view(request):
+            nonlocal call_count
+            call_count += 1
+            return HttpResponse(str(call_count))
+
+        self.assertEqual(call_count, 0)
+
+        # 1st uncached hit
+        response = _view(self.factory.get(f"/?{nocache_flag}"))
+        self.assertEqual(response.content, b"1")
+        self.assertEqual(call_count, 1)
+
+        # 2nd uncached hit
+        response = _view(self.factory.get(f"/?{nocache_flag}"))
+        self.assertEqual(response.content, b"2")
+        self.assertEqual(call_count, 2)
+
+        # 1st cached hit
+        request = self.factory.get("/")
+        response = _view(request)
+        self.assertEqual(response.content, b"3")
+        self.assertEqual(call_count, 3)
+        cache_key = get_cache_key(request, key_prefix, "GET", cache=self.default_cache)
+        self.assertIn(cache_key, self.default_cache)
+
+        # 2nd cached hit
+        request = self.factory.get("/")
+        response = _view(request)
+        self.assertEqual(response.content, b"3")
+        self.assertEqual(call_count, 3)
+        cache_key = get_cache_key(request, key_prefix, "GET", cache=self.default_cache)
+        self.assertIn(cache_key, self.default_cache)
 
     def test_cache_page_timeout(self):
         # Page timeout takes precedence over the "max-age" section of the
@@ -2984,3 +3111,46 @@ class CacheHandlerTest(SimpleTestCase):
         # .all() initializes all caches.
         self.assertEqual(len(test_caches.all(initialized_only=True)), 2)
         self.assertEqual(test_caches.all(), test_caches.all(initialized_only=True))
+
+
+class GetKeyPrefixTest(SimpleTestCase):
+    """Tests the key prefix creation."""
+
+    factory = RequestFactory()
+
+    def tearDown(self):
+        cache.clear()
+
+    def test_prefix_by_string(self):
+        key_prefix = "prefix"
+        request = self.factory.get("/")
+        self.assertEqual(get_key_prefix(request, key_prefix), key_prefix)
+
+    def test_prefix_by_string_from_settings(self):
+        key_prefix = "settings_prefix"
+        with override_settings(CACHE_MIDDLEWARE_KEY_PREFIX=key_prefix):
+            request = self.factory.get("/")
+            self.assertEqual(get_key_prefix(request, None), key_prefix)
+
+    def test_prefix_by_given_callable(self):
+        key_prefix = "callable_prefix"
+
+        def _cache_prefixer(request):
+            return key_prefix
+
+        request = self.factory.get("/")
+        self.assertEqual(get_key_prefix(request, _cache_prefixer), key_prefix)
+
+    def test_prefix_by_dotted_path_to_callable(self):
+        key_prefix = DOTTED_PATH_KEY_PREFIX
+        request = self.factory.get("/")
+        self.assertEqual(
+            get_key_prefix(request, "cache.key_prefix_generator.cache_prefixer"),
+            key_prefix,
+        )
+
+    def test_prefix_by_callable_from_settings(self):
+        key_prefix = DOTTED_PATH_KEY_PREFIX
+        request = self.factory.get("/")
+        with override_settings(CACHE_MIDDLEWARE_KEY_PREFIX=cache_prefixer):
+            self.assertEqual(get_key_prefix(request, None), key_prefix)

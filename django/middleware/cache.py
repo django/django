@@ -49,6 +49,7 @@ from django.conf import settings
 from django.core.cache import DEFAULT_CACHE_ALIAS, caches
 from django.utils.cache import (
     get_cache_key,
+    get_key_prefix,
     get_max_age,
     has_vary_header,
     learn_cache_key,
@@ -72,7 +73,7 @@ class UpdateCacheMiddleware(MiddlewareMixin):
         super().__init__(get_response)
         self.cache_timeout = settings.CACHE_MIDDLEWARE_SECONDS
         self.page_timeout = None
-        self.key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
+        self.key_prefix = None
         self.cache_alias = settings.CACHE_MIDDLEWARE_ALIAS
 
     @property
@@ -118,8 +119,11 @@ class UpdateCacheMiddleware(MiddlewareMixin):
                 return response
         patch_response_headers(response, timeout)
         if timeout and response.status_code == 200:
+            key_prefix = get_key_prefix(request, self.key_prefix)
+            if key_prefix is None:
+                return response
             cache_key = learn_cache_key(
-                request, response, timeout, self.key_prefix, cache=self.cache
+                request, response, timeout, key_prefix, cache=self.cache
             )
             if hasattr(response, "render") and callable(response.render):
                 response.add_post_render_callback(
@@ -141,7 +145,7 @@ class FetchFromCacheMiddleware(MiddlewareMixin):
 
     def __init__(self, get_response):
         super().__init__(get_response)
-        self.key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
+        self.key_prefix = None
         self.cache_alias = settings.CACHE_MIDDLEWARE_ALIAS
 
     @property
@@ -157,17 +161,20 @@ class FetchFromCacheMiddleware(MiddlewareMixin):
             request._cache_update_cache = False
             return None  # Don't bother checking the cache.
 
+        key_prefix = get_key_prefix(request, self.key_prefix)
+        if key_prefix is None:
+            request._cache_update_cache = False
+            return None
+
         # try and get the cached GET response
-        cache_key = get_cache_key(request, self.key_prefix, "GET", cache=self.cache)
+        cache_key = get_cache_key(request, key_prefix, "GET", cache=self.cache)
         if cache_key is None:
             request._cache_update_cache = True
             return None  # No cache information available, need to rebuild.
         response = self.cache.get(cache_key)
         # if it wasn't found and we are looking for a HEAD, try looking just for that
         if response is None and request.method == "HEAD":
-            cache_key = get_cache_key(
-                request, self.key_prefix, "HEAD", cache=self.cache
-            )
+            cache_key = get_cache_key(request, key_prefix, "HEAD", cache=self.cache)
             response = self.cache.get(cache_key)
 
         if response is None:
