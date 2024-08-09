@@ -118,7 +118,7 @@ Requires core.js and SelectBox.js.
             
             const warning_footer = quickElement('div', selector_chosen, '', 'class', 'list-footer-display');
             quickElement('span', warning_footer, '', 'id', field_id + '_list-footer-display-text');
-            quickElement('span', warning_footer, ' (click to clear)', 'class', 'list-footer-display__clear');
+            quickElement('span', warning_footer, ' ' + gettext('(click to clear)'), 'class', 'list-footer-display__clear');
             
             const clear_all = quickElement('a', selector_chosen, gettext('Remove all'), 'title', interpolate(gettext('Click to remove all chosen %s at once.'), [field_name]), 'href', '#', 'id', field_id + '_remove_all_link');
             clear_all.className = 'selector-clearall';
