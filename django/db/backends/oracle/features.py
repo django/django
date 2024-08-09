@@ -116,6 +116,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             "Oracle requires ORDER BY in row_number, ANSI:SQL doesn't.": {
                 "expressions_window.tests.WindowFunctionTests."
                 "test_row_number_no_ordering",
+                "prefetch_related.tests.PrefetchLimitTests.test_empty_order",
             },
             "Oracle doesn't support changing collations on indexed columns (#33671).": {
                 "migrations.test_operations.OperationTests."
