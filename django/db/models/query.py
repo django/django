@@ -175,7 +175,7 @@ class RawModelIterable(BaseIterable):
             converters = compiler.get_converters(cols)
             if converters:
                 query_iterator = compiler.apply_converters(query_iterator, converters)
-            if compiler.has_any_composite_fields(cols):
+            if compiler.has_composite_fields(cols):
                 query_iterator = compiler.composite_fields_to_tuples(
                     query_iterator, cols
                 )
