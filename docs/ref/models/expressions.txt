@@ -1095,6 +1095,16 @@ calling the appropriate methods on the wrapped expression.
         :py:data:`NotImplemented` which forces the expression to be computed on
         the database.
 
+    .. attribute:: set_returning
+
+    .. versionadded:: 5.2
+
+        Tells Django that this expression contains a set-returning function,
+        enforcing subquery evaluation. It's used, for example, to allow some
+        Postgres set-returning functions (e.g. ``JSONB_PATH_QUERY``,
+        ``UNNEST``, etc.) to skip optimization and be properly evaluated when
+        annotations spawn rows themselves. Defaults to ``False``.
+
     .. method:: resolve_expression(query=None, allow_joins=True, reuse=None, summarize=False, for_save=False)
 
         Provides the chance to do any preprocessing or validation of

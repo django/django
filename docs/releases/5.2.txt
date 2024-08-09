@@ -218,6 +218,10 @@ Models
 * Added support for validation of model constraints which use a
   :class:`~django.db.models.GeneratedField`.
 
+* The new :attr:`.Expression.set_returning` attribute specifies that the
+  expression contains a set-returning function, enforcing subquery evaluation.
+  This is necessary for many Postgres set-returning functions.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
