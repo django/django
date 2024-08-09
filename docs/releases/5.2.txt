@@ -215,6 +215,9 @@ Models
   methods such as
   :meth:`QuerySet.union()<django.db.models.query.QuerySet.union>` unpredictable.
 
+* Added support for validation of model constraints which use a
+  :class:`~django.db.models.GeneratedField`.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
