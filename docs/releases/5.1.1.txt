@@ -9,4 +9,6 @@ Django 5.1.1 fixes several bugs in 5.1.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression in Django 5.1 that caused a crash of ``Window()`` when
+  passing an empty sequence to the ``order_by`` parameter, and a crash of
+  ``Prefetch()`` for a sliced queryset without ordering (:ticket:`35665`).
