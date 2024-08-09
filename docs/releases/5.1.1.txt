@@ -23,3 +23,7 @@ Bugfixes
 * Adjusted the deprecation warning ``stacklevel`` in :meth:`.Model.save` and
   :meth:`.Model.asave` to correctly point to the offending call site
   (:ticket:`35060`).
+
+* Adjusted the deprecation warning ``stacklevel`` when using ``OS_OPEN_FLAGS``
+  in :class:`~django.core.files.storage.FileSystemStorage` to correctly point
+  to the offending call site (:ticket:`35326`).
