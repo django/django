@@ -94,7 +94,7 @@ spelling_warning = True
 # templates_path = []
 
 # The suffix of source filenames.
-source_suffix = ".txt"
+source_suffix = {".txt": "restructuredtext"}
 
 # The encoding of source files.
 # source_encoding = 'utf-8-sig'
