@@ -18,7 +18,7 @@ by the user's browser. However, XSS attacks can originate from any untrusted
 source of data, such as cookies or web services, whenever the data is not
 sufficiently sanitized before including in a page.
 
-Using Django templates protects you against the majority of XSS attacks.
+Using Django templates protects you against many types of XSS attacks.
 However, it is important to understand what protections it provides
 and its limitations.
 
@@ -47,6 +47,39 @@ escaping.
 
 You should also be very careful when storing HTML in the database, especially
 when that HTML is retrieved and displayed.
+
+
+.. _csp:
+
+Content Security Policy (CSP)
+=============================
+
+It's widely recommended to add a Content Security Policy (CSP) to your website
+in order to protect from for instance XSS attacks. CSP defines which source
+domains that are allowed to embed content such as scripts, stylesheets, images
+and fonts into your web pages.
+
+CSP consists of one or more HTTP headers sent from the web server. The headers
+follow a special format, informing the browser about which sources it is allowed
+to fetch content from for this particular domain. This allows you to mitigate a
+wide range of attacks.
+
+For instance, an attacker could try to sneak in code for an XSS attack that 
+would embed a malicious JavaScript, image or font into your web page. By adding
+CSP headers, your web server will inform the user's browser that such a content
+file is never acceptable in the first place.
+
+CSP can be enabled by adding an external Django package, providing a middleware
+and an easy configuration layer **or** by configuring your HTTP server to add
+these headers.
+
+.. tip::
+
+   Content Security Policy is quite advanced, and it's recommended to read more
+   on Wikipedia or OWASP. For instance, it's possible to define a reporting URL
+   that the browser will contact through a POST request in case of violations of
+   your policy. In that way, you may softly implement CSP without blocking 
+   requests and only enforce the policy once you know more from reports.
 
 
 Cross site request forgery (CSRF) protection
@@ -78,6 +111,8 @@ HSTS for supported browsers.
 
 Be very careful with marking views with the ``csrf_exempt`` decorator unless
 it is absolutely necessary.
+
+
 
 .. _sql-injection-protection:
 
