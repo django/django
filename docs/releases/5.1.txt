@@ -237,6 +237,9 @@ Management Commands
   each operation to highlight :class:`operation categories
   <django.db.migrations.operations.base.OperationCategory>`.
 
+* If the :djadmin:`startproject` and :djadmin:`startapp` command were successfully, now 
+  they display the directory in which the project or the app was created.
+
 Migrations
 ~~~~~~~~~~
 
