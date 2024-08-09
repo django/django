@@ -237,6 +237,9 @@ Management Commands
   each operation to highlight :class:`operation categories
   <django.db.migrations.operations.base.OperationCategory>`.
 
+* Introduce a :djadmin:`listurls` command that lists the URLs in the application,
+  including the view function and name, if present.
+
 Migrations
 ~~~~~~~~~~
 
