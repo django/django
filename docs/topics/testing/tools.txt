@@ -2069,7 +2069,9 @@ creates.
     If you are using test decorators, they must be async-compatible to ensure
     they work correctly. Django's built-in decorators will behave correctly, but
     third-party ones may appear to not execute (they will "wrap" the wrong part
-    of the execution flow and not your test).
+    of the execution flow and not your test). Similarly, decorators that perform
+    synchronous database operations cannot be applied directly to an async test
+    function.
 
     If you need to use these decorators, then you should decorate your test
     methods with :func:`~asgiref.sync.async_to_sync` *inside* of them instead::
