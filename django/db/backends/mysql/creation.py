@@ -74,14 +74,40 @@ class DatabaseCreation(BaseDatabaseCreation):
         load_cmd = cmd_args
         load_cmd[-1] = target_database_name
 
-        with subprocess.Popen(
-            dump_cmd, stdout=subprocess.PIPE, env=dump_env
-        ) as dump_proc:
+        self.log(f"Dump command: {' '.join(dump_cmd)}")
+        self.log(f"Load command: {' '.join(load_cmd)}")
+
+        try:
             with subprocess.Popen(
-                load_cmd,
-                stdin=dump_proc.stdout,
-                stdout=subprocess.DEVNULL,
-                env=load_env,
-            ):
-                # Allow dump_proc to receive a SIGPIPE if the load process exits.
-                dump_proc.stdout.close()
+                dump_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=dump_env
+            ) as dump_proc:
+                with subprocess.Popen(
+                    load_cmd,
+                    stdin=dump_proc.stdout,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    env=load_env,
+                ) as load_proc:
+                    dump_proc.stdout.close()
+                    load_out, load_err = load_proc.communicate()
+                    dump_err = dump_proc.stderr.read().decode()
+
+            if dump_proc.returncode != 0:
+                self.log(
+                    "Got a fatal error cloning the test database (dump): %s" % dump_err
+                )
+                sys.exit(2)
+
+            if load_proc.returncode != 0:
+                self.log(
+                    "Got a fatal error cloning the test database (load): %s" % load_err
+                )
+                sys.exit(2)
+
+            self.log("Database cloning completed with output: %s" % load_out.decode())
+            self.log("Got a non-fatal error cloning the test database: %s" % dump_err)
+        except Exception as e:
+            self.log("An exception occurred while cloning the database: %s" % e)
+            raise
+
+        self.log("Database cloning process finished.")

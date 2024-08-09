@@ -56,7 +56,18 @@ class DatabaseCreationTests(SimpleTestCase):
                 creation._clone_test_db("suffix", verbosity=0, keepdb=True)
                 _clone_db.assert_not_called()
 
-    def test_clone_test_db_options_ordering(self):
+    @mock.patch("subprocess.Popen")
+    def test_clone_test_db_unexpected_error(self, mocked_popen):
+        creation = DatabaseCreation(connection)
+        mocked_proc = mock.Mock()
+        mocked_proc.communicate.return_value = (b"stdout", b"stderr")
+        mocked_popen.return_value.__enter__.return_value = mocked_proc
+
+        with self.assertRaises(SystemExit):
+            creation._clone_db("source_db", "target_db")
+
+    @mock.patch("subprocess.Popen")
+    def test_clone_test_db_options_ordering(self, mocked_popen):
         creation = DatabaseCreation(connection)
         try:
             saved_settings = connection.settings_dict
@@ -71,22 +82,46 @@ class DatabaseCreationTests(SimpleTestCase):
                     "read_default_file": "my.cnf",
                 },
             }
-            with mock.patch.object(subprocess, "Popen") as mocked_popen:
-                creation._clone_db("source_db", "target_db")
-                mocked_popen.assert_has_calls(
-                    [
-                        mock.call(
-                            [
-                                "mysqldump",
-                                "--defaults-file=my.cnf",
-                                "--routines",
-                                "--events",
-                                "source_db",
-                            ],
-                            stdout=subprocess.PIPE,
-                            env=None,
-                        ),
-                    ]
-                )
+            mock_proc = mock.Mock()
+            mock_proc.communicate.return_value = (b"", b"")
+            mock_proc.returncode = 0
+            mocked_popen.return_value.__enter__.return_value = mock_proc
+
+            creation._clone_db("source_db", "target_db")
+            mocked_popen.assert_has_calls(
+                [
+                    mock.call(
+                        [
+                            "mysqldump",
+                            "--defaults-file=my.cnf",
+                            "--routines",
+                            "--events",
+                            "source_db",
+                        ],
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE,
+                        env=None,
+                    ),
+                    mock.call().__enter__(),
+                    mock.call(
+                        [
+                            "mysql",
+                            "--defaults-file=my.cnf",
+                            "target_db",
+                        ],
+                        stdin=mock.ANY,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE,
+                        env=None,
+                    ),
+                    mock.call().__enter__(),
+                    mock.call().__enter__().stdout.close(),
+                    mock.call().__enter__().communicate(),
+                    mock.call().__enter__().stderr.read(),
+                    mock.call().__enter__().stderr.read().decode(),
+                    mock.call().__exit__(None, None, None),
+                    mock.call().__exit__(None, None, None),
+                ]
+            )
         finally:
             connection.settings_dict = saved_settings
