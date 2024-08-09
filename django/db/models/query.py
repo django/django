@@ -20,10 +20,11 @@ from django.db import (
     router,
     transaction,
 )
-from django.db.models import AutoField, DateField, DateTimeField, Field, sql
+from django.db.models import DateField, DateTimeField, Field, sql
 from django.db.models.constants import LOOKUP_SEP, OnConflict
 from django.db.models.deletion import Collector
 from django.db.models.expressions import Case, F, Value, When
+from django.db.models.fields import AutoFieldMixin
 from django.db.models.functions import Cast, Trunc
 from django.db.models.query_utils import FilteredRelation, Q
 from django.db.models.sql.constants import CURSOR, GET_ITERATOR_CHUNK_SIZE
@@ -812,7 +813,7 @@ class QuerySet(AltersData):
                     obj_with_pk._state.adding = False
                     obj_with_pk._state.db = self.db
             if objs_without_pk:
-                fields = [f for f in fields if not isinstance(f, AutoField)]
+                fields = [f for f in fields if not isinstance(f, AutoFieldMixin)]
                 returned_columns = self._batched_insert(
                     objs_without_pk,
                     fields,
