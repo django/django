@@ -1545,6 +1545,9 @@ class SQLCompiler:
                 row[pos] = value
             yield row
 
+    def has_any_composite_fields(self, expressions):
+        return any(isinstance(expression, ColPairs) for expression in expressions)
+
     def composite_fields_to_tuples(self, rows, expressions):
         for row in map(list, rows):
             for i, expression in enumerate(expressions):
@@ -1571,7 +1574,8 @@ class SQLCompiler:
         rows = chain.from_iterable(results)
         if converters:
             rows = self.apply_converters(rows, converters)
-        rows = self.composite_fields_to_tuples(rows, fields)
+        if self.has_any_composite_fields(fields):
+            rows = self.composite_fields_to_tuples(rows, fields)
         if tuple_expected:
             rows = map(tuple, rows)
         return rows
@@ -1921,7 +1925,8 @@ class SQLInsertCompiler(SQLCompiler):
         converters = self.get_converters(cols)
         if converters:
             rows = self.apply_converters(rows, converters)
-        rows = self.composite_fields_to_tuples(rows, cols)
+        if self.has_any_composite_fields(cols):
+            rows = self.composite_fields_to_tuples(rows, cols)
         return list(rows)
 
 

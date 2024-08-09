@@ -621,7 +621,8 @@ class Query(BaseExpression):
             cols = outer_query.annotation_select.values()
             converters = compiler.get_converters(cols)
             rows = compiler.apply_converters((result,), converters)
-            rows = compiler.composite_fields_to_tuples(rows, cols)
+            if compiler.has_any_composite_fields(cols):
+                rows = compiler.composite_fields_to_tuples(rows, cols)
             result = next(rows)
 
         return dict(zip(outer_query.annotation_select, result))

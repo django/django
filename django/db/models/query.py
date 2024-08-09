@@ -175,7 +175,10 @@ class RawModelIterable(BaseIterable):
             converters = compiler.get_converters(cols)
             if converters:
                 query_iterator = compiler.apply_converters(query_iterator, converters)
-            query_iterator = compiler.composite_fields_to_tuples(query_iterator, cols)
+            if compiler.has_any_composite_fields(cols):
+                query_iterator = compiler.composite_fields_to_tuples(
+                    query_iterator, cols
+                )
             for values in query_iterator:
                 # Associate fields to values
                 model_init_values = [values[pos] for pos in model_init_pos]
