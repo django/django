@@ -5,7 +5,7 @@ from importlib import import_module
 from importlib.util import find_spec as importlib_find
 
 
-def cached_import(module_path, class_name):
+def cached_import(module_path, attribute):
     # Check whether module is loaded and fully initialized.
     if not (
         (module := sys.modules.get(module_path))
@@ -13,7 +13,13 @@ def cached_import(module_path, class_name):
         and getattr(spec, "_initializing", False) is False
     ):
         module = import_module(module_path)
-    return getattr(module, class_name)
+    # Check whether attribute has been explicitly imported
+    if not hasattr(module, attribute):
+        try:
+            import_module(f"{module_path}.{attribute}")
+        except ImportError:
+            pass
+    return getattr(module, attribute)
 
 
 def import_string(dotted_path):
