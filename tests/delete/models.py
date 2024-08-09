@@ -61,11 +61,17 @@ class A(models.Model):
     cascade_nullable = models.ForeignKey(
         R, models.CASCADE, null=True, related_name="cascade_nullable_set"
     )
+    db_cascade = models.ForeignKey(
+        R, models.DB_CASCADE, null=True, related_name="db_cascade_set"
+    )
     protect = models.ForeignKey(
         R, models.PROTECT, null=True, related_name="protect_set"
     )
     restrict = models.ForeignKey(
         R, models.RESTRICT, null=True, related_name="restrict_set"
+    )
+    db_restrict = models.ForeignKey(
+        R, models.DB_RESTRICT, null=True, related_name="db_restrict_set"
     )
     donothing = models.ForeignKey(
         R, models.DO_NOTHING, null=True, related_name="donothing_set"
@@ -76,6 +82,9 @@ class A(models.Model):
     )
     cascade_p = models.ForeignKey(
         P, models.CASCADE, related_name="cascade_p_set", null=True
+    )
+    db_cascade_p = models.ForeignKey(
+        P, models.DB_CASCADE, related_name="db_cascade_p_set", null=True
     )
 
     # A OneToOneField is just a ForeignKey unique=True, so we don't duplicate
@@ -101,8 +110,10 @@ def create_a(name):
         "setdefault_none",
         "cascade",
         "cascade_nullable",
+        "db_cascade",
         "protect",
         "restrict",
+        "db_restrict",
         "donothing",
         "o2o_setnull",
     ):
@@ -241,3 +252,99 @@ class GenericDeleteBottomParent(models.Model):
     generic_delete_bottom = models.ForeignKey(
         GenericDeleteBottom, on_delete=models.CASCADE
     )
+
+
+class ParentModel(models.Model):
+    pass
+
+
+class ChildModel(models.Model):
+    """First level foreignkey child for ParentModel
+    Implemented using database level cascading"""
+
+    parent_model = models.ForeignKey(ParentModel, on_delete=models.DB_CASCADE)
+
+
+class GrandChild(models.Model):
+    """Second level foreignkey child for ParentModel
+    Implemented using in DB cascading"""
+
+    child_model = models.ForeignKey(ChildModel, on_delete=models.DB_CASCADE)
+
+
+class ChildFKRestrict(models.Model):
+    """First level child of ParentModel with cascading set to restrict"""
+
+    parent_model = models.ForeignKey(ParentModel, on_delete=models.DB_RESTRICT)
+
+
+class GrandChildFKRestrict(models.Model):
+    """Second level child of ParentModel with cascading set to restrict"""
+
+    child_model = models.ForeignKey(ChildModel, on_delete=models.DB_RESTRICT)
+
+
+class ChildFKSetNull(models.Model):
+    """First level child of ParentModel with cascading set to null"""
+
+    parent_model = models.ForeignKey(
+        ParentModel, on_delete=models.DB_SET_NULL, null=True
+    )
+    another_field = models.CharField(max_length=20)
+
+
+class GrandChildFKSetNull(models.Model):
+    """Second level child of ParentModel with cascading set to null"""
+
+    child_model = models.ForeignKey(
+        ChildModel,
+        on_delete=models.DB_SET_NULL,
+        null=True,
+    )
+    another_field = models.CharField(max_length=20)
+
+
+class AnotherGrandChildFKSetNull(models.Model):
+    """Second level child of ParentModel with cascading set to null"""
+
+    child_fk_set_null = models.ForeignKey(
+        ChildFKSetNull, on_delete=models.DB_SET_NULL, null=True
+    )
+    another_field = models.CharField(max_length=20)
+
+
+class DBLevelChild(ParentModel):
+    grandparent_ptr = models.OneToOneField(
+        ParentModel, primary_key=True, parent_link=True, on_delete=models.DB_RESTRICT
+    )
+
+
+class NormalParent(ParentModel):
+    grandparent_ptr = models.OneToOneField(
+        ParentModel, primary_key=True, parent_link=True, on_delete=models.DB_CASCADE
+    )
+
+
+class DiamondParent(ParentModel):
+    gp_ptr = models.OneToOneField(
+        ParentModel, primary_key=True, parent_link=True, on_delete=models.DB_CASCADE
+    )
+
+
+class DiamondChild(NormalParent, DiamondParent):
+    parent_ptr = models.OneToOneField(
+        NormalParent, primary_key=True, parent_link=True, on_delete=models.DB_CASCADE
+    )
+
+    diamondparent_ptr = models.OneToOneField(
+        DiamondParent, parent_link=True, on_delete=models.DB_CASCADE
+    )
+
+
+class DBDefaultsFK(models.Model):
+    parent_model = models.ForeignKey(
+        ParentModel, db_default=1, on_delete=models.DB_SET_DEFAULT
+    )
+
+    class Meta:
+        required_db_features = ("has_on_delete_db_default",)

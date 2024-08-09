@@ -6434,3 +6434,1265 @@ class BaseOperationTests(SimpleTestCase):
     def test_formatted_description_no_category(self):
         operation = Operation()
         self.assertEqual(operation.formatted_description(), "? Operation: ((), {})")
+
+
+class DatabaseLevelOnDeleteMigrationTests(OperationTestBase):
+    def test_create_model_with_db_level_fk(self):
+        app_label = "test_cmwdblfk"
+        operations = [
+            migrations.CreateModel(
+                "Pony",
+                [
+                    (
+                        "id",
+                        models.CharField(
+                            primary_key=True,
+                            max_length=10,
+                        ),
+                    ),
+                ],
+            )
+        ]
+        project_state = self.apply_operations(app_label, ProjectState(), operations)
+        # ForeignKey.
+        new_state = project_state.clone()
+        operation_list = [
+            ("id", models.AutoField(primary_key=True)),
+            ("number", models.IntegerField(default=1)),
+            (
+                "pony_cascade",
+                models.ForeignKey(f"{app_label}.Pony", on_delete=models.DB_CASCADE),
+            ),
+            (
+                "pony_set_null",
+                models.ForeignKey(
+                    f"{app_label}.Pony", null=True, on_delete=models.DB_SET_NULL
+                ),
+            ),
+            (
+                "pony_restrict",
+                models.ForeignKey(f"{app_label}.Pony", on_delete=models.DB_RESTRICT),
+            ),
+        ]
+        if connection.features.has_on_delete_db_default:
+            operation_list.append(
+                (
+                    "pony_default",
+                    models.ForeignKey(
+                        f"{app_label}.Pony",
+                        db_default="bn",
+                        on_delete=models.DB_SET_DEFAULT,
+                    ),
+                )
+            )
+        operation = migrations.CreateModel("Rider", operation_list)
+        operation.state_forwards(app_label, new_state)
+        self.assertTableNotExists(f"{app_label}_rider")
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+        self.assertTableExists(f"{app_label}_rider")
+        self.assertColumnExists(f"{app_label}_rider", "pony_cascade_id")
+        self.assertColumnExists(f"{app_label}_rider", "pony_set_null_id")
+        self.assertColumnExists(f"{app_label}_rider", "pony_restrict_id")
+        if connection.features.has_on_delete_db_default:
+            self.assertColumnExists(f"{app_label}_rider", "pony_default_id")
+
+    def test_add_field_with_db_cascade(self):
+        app_label = "test_add_field_with_db_level_fk"
+        fk_parent_modelname = "FkParent"
+        fk_child_modelname = "FkChild"
+        fk_fieldname = "fk_parent"
+        operations = [
+            migrations.CreateModel(
+                fk_parent_modelname,
+                [
+                    (
+                        "id",
+                        models.CharField(
+                            primary_key=True,
+                            max_length=10,
+                        ),
+                    ),
+                ],
+            ),
+            migrations.CreateModel(
+                fk_child_modelname,
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    ("number", models.IntegerField(default=1)),
+                ],
+            ),
+        ]
+        project_state = self.apply_operations(app_label, ProjectState(), operations)
+        operation = migrations.AddField(
+            fk_child_modelname,
+            fk_fieldname,
+            models.ForeignKey(
+                f"{app_label}.{fk_parent_modelname}", on_delete=models.DB_CASCADE
+            ),
+        )
+        new_state = project_state.clone()
+        operation.state_forwards(app_label, new_state)
+        self.assertColumnNotExists(
+            f"{app_label}_{fk_child_modelname.lower()}", f"{fk_fieldname}_id"
+        )
+
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+        self.assertColumnExists(
+            f"{app_label}_{fk_child_modelname.lower()}", f"{fk_fieldname}_id"
+        )
+
+        fk_child_model = new_state.apps.get_model(app_label, fk_child_modelname)
+        fk_parent_model = new_state.apps.get_model(app_label, fk_parent_modelname)
+
+        fk_parent_instance = fk_parent_model.objects.create()
+        kwargs = {fk_fieldname: fk_parent_instance}
+        fk_child_instance1 = fk_child_model.objects.create(**kwargs)
+        fk_child_instance2 = fk_child_model.objects.create(**kwargs)
+
+        with self.assertNumQueries(1):
+            fk_parent_instance.delete()
+
+        self.assertIs(
+            fk_child_model.objects.filter(pk=fk_child_instance1.pk).exists(), False
+        )
+        self.assertIs(
+            fk_child_model.objects.filter(pk=fk_child_instance2.pk).exists(), False
+        )
+
+        with connection.schema_editor() as editor:
+            operation.database_backwards(app_label, editor, new_state, project_state)
+        self.assertColumnNotExists(
+            f"{app_label}_{fk_child_modelname.lower()}", f"{fk_fieldname}_id"
+        )
+
+    def test_add_field_with_db_set_null(self):
+        app_label = "test_add_field_with_db_set_null"
+        fk_parent_modelname = "FkParent"
+        fk_child_modelname = "FkChild"
+        fk_fieldname = "fk_parent"
+        operations = [
+            migrations.CreateModel(
+                fk_parent_modelname,
+                [
+                    (
+                        "id",
+                        models.CharField(
+                            primary_key=True,
+                            max_length=10,
+                        ),
+                    ),
+                ],
+            ),
+            migrations.CreateModel(
+                fk_child_modelname,
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    ("number", models.IntegerField(default=1)),
+                ],
+            ),
+        ]
+        project_state = self.apply_operations(app_label, ProjectState(), operations)
+        operation = migrations.AddField(
+            fk_child_modelname,
+            fk_fieldname,
+            models.ForeignKey(
+                f"{app_label}.{fk_parent_modelname}",
+                null=True,
+                on_delete=models.DB_SET_NULL,
+            ),
+        )
+        new_state = project_state.clone()
+        operation.state_forwards(app_label, new_state)
+        self.assertColumnNotExists(
+            f"{app_label}_{fk_child_modelname.lower()}", f"{fk_fieldname}_id"
+        )
+
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+        self.assertColumnExists(
+            f"{app_label}_{fk_child_modelname.lower()}", f"{fk_fieldname}_id"
+        )
+        fk_child_model = new_state.apps.get_model(app_label, fk_child_modelname)
+        fk_parent_model = new_state.apps.get_model(app_label, fk_parent_modelname)
+
+        fk_parent_instance = fk_parent_model.objects.create()
+        kwargs = {fk_fieldname: fk_parent_instance}
+        fk_child_instance1 = fk_child_model.objects.create(**kwargs)
+
+        with self.assertNumQueries(1):
+            fk_parent_instance.delete()
+
+        fk_child_instance1.refresh_from_db()
+        self.assertIsNone(getattr(fk_child_instance1, fk_fieldname))
+
+        with connection.schema_editor() as editor:
+            operation.database_backwards(app_label, editor, new_state, project_state)
+        self.assertColumnNotExists(
+            f"{app_label}_{fk_child_modelname.lower()}", f"{fk_fieldname}_id"
+        )
+
+    @skipUnlessDBFeature("has_on_delete_db_default")
+    def test_add_field_with_db_set_default(self):
+        app_label = "test_add_field_with_db_set_default"
+        fk_parent_modelname = "FkParent"
+        fk_child_modelname = "FkChild"
+        fk_fieldname = "fk_parent"
+        operations = [
+            migrations.CreateModel(
+                fk_parent_modelname,
+                [
+                    (
+                        "id",
+                        models.CharField(
+                            primary_key=True,
+                            max_length=10,
+                        ),
+                    ),
+                ],
+            ),
+            migrations.CreateModel(
+                fk_child_modelname,
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    ("number", models.IntegerField(default=1)),
+                ],
+            ),
+        ]
+        project_state = self.apply_operations(app_label, ProjectState(), operations)
+        operation = migrations.AddField(
+            fk_child_modelname,
+            fk_fieldname,
+            models.ForeignKey(
+                f"{app_label}.{fk_parent_modelname}",
+                db_default=1,
+                on_delete=models.DB_SET_DEFAULT,
+            ),
+        )
+        new_state = project_state.clone()
+        operation.state_forwards(app_label, new_state)
+        self.assertColumnNotExists(
+            f"{app_label}_{fk_child_modelname.lower()}", f"{fk_fieldname}_id"
+        )
+
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+        self.assertColumnExists(
+            f"{app_label}_{fk_child_modelname.lower()}", f"{fk_fieldname}_id"
+        )
+
+        fk_child_model = new_state.apps.get_model(app_label, fk_child_modelname)
+        fk_parent_model = new_state.apps.get_model(app_label, fk_parent_modelname)
+
+        fk_parent_default = fk_parent_model.objects.create(id=1)
+        fk_parent_instance = fk_parent_model.objects.create()
+        kwargs = {fk_fieldname: fk_parent_instance}
+        fk_child_instance = fk_child_model.objects.create(**kwargs)
+
+        fk_parent_instance.delete()
+
+        fk_child_instance.refresh_from_db()
+        fk_parent_default.refresh_from_db()
+        # After deletion it gets set to db default value
+        self.assertEqual(getattr(fk_child_instance, fk_fieldname), fk_parent_default)
+
+        with connection.schema_editor() as editor:
+            operation.database_backwards(app_label, editor, new_state, project_state)
+        self.assertColumnNotExists(
+            f"{app_label}_{fk_child_modelname.lower()}", f"{fk_fieldname}_id"
+        )
+
+    def test_add_field_with_db_restrict(self):
+        app_label = "test_add_field_with_db_restrict"
+        fk_parent_modelname = "FkParent"
+        fk_child_modelname = "FkChild"
+        fk_fieldname = "fk_parent"
+        operations = [
+            migrations.CreateModel(
+                fk_parent_modelname,
+                [
+                    (
+                        "id",
+                        models.CharField(
+                            primary_key=True,
+                            max_length=10,
+                        ),
+                    ),
+                ],
+            ),
+            migrations.CreateModel(
+                fk_child_modelname,
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    ("number", models.IntegerField(default=1)),
+                ],
+            ),
+        ]
+        project_state = self.apply_operations(app_label, ProjectState(), operations)
+        operation = migrations.AddField(
+            fk_child_modelname,
+            fk_fieldname,
+            models.ForeignKey(
+                f"{app_label}.{fk_parent_modelname}", on_delete=models.DB_RESTRICT
+            ),
+        )
+        new_state = project_state.clone()
+        operation.state_forwards(app_label, new_state)
+        self.assertColumnNotExists(
+            f"{app_label}_{fk_child_modelname.lower()}", f"{fk_fieldname}_id"
+        )
+
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+        self.assertColumnExists(
+            f"{app_label}_{fk_child_modelname.lower()}", f"{fk_fieldname}_id"
+        )
+
+        fk_child_model = new_state.apps.get_model(app_label, fk_child_modelname)
+        fk_parent_model = new_state.apps.get_model(app_label, fk_parent_modelname)
+
+        fk_parent_instance = fk_parent_model.objects.create()
+        kwargs = {fk_fieldname: fk_parent_instance}
+        fk_child_instance = fk_child_model.objects.create(**kwargs)
+
+        with self.assertRaises(IntegrityError):
+            fk_parent_instance.delete()
+
+        self.assertIs(
+            fk_child_model.objects.filter(pk=fk_child_instance.pk).exists(), True
+        )
+        self.assertIs(
+            fk_parent_model.objects.filter(pk=fk_parent_instance.pk).exists(), True
+        )
+
+        with connection.schema_editor() as editor:
+            operation.database_backwards(app_label, editor, new_state, project_state)
+        self.assertColumnNotExists(
+            f"{app_label}_{fk_child_modelname.lower()}", f"{fk_fieldname}_id"
+        )
+
+    def change_to_db_set_null_test(
+        self,
+        app_label,
+        fk_parent_modelname,
+        fk_child_modelname,
+        fk_fieldname,
+        project_state,
+    ):
+        operation = migrations.AlterField(
+            fk_child_modelname,
+            fk_fieldname,
+            models.ForeignKey(
+                f"{app_label}.{fk_parent_modelname}",
+                null=True,
+                on_delete=models.DB_SET_NULL,
+            ),
+        )
+        new_state = project_state.clone()
+        operation.state_forwards(app_label, new_state)
+
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+
+        fk_child_model = new_state.apps.get_model(app_label, fk_child_modelname)
+        fk_parent_model = new_state.apps.get_model(app_label, fk_parent_modelname)
+
+        fk_parent_instance = fk_parent_model.objects.create()
+        kwargs = {fk_fieldname: fk_parent_instance}
+        fk_child_instance1 = fk_child_model.objects.create(**kwargs)
+
+        with self.assertNumQueries(1):
+            fk_parent_instance.delete()
+
+        fk_child_instance1.refresh_from_db()
+        self.assertIsNone(getattr(fk_child_instance1, fk_fieldname))
+
+        fk_parent_model.objects.all().delete()
+        fk_child_model.objects.all().delete()
+
+        with connection.schema_editor() as editor:
+            operation.database_backwards(app_label, editor, new_state, project_state)
+
+    def change_to_db_cascade_test(
+        self,
+        app_label,
+        fk_parent_modelname,
+        fk_child_modelname,
+        fk_fieldname,
+        project_state,
+    ):
+        operation = migrations.AlterField(
+            fk_child_modelname,
+            fk_fieldname,
+            models.ForeignKey(
+                f"{app_label}.{fk_parent_modelname}",
+                on_delete=models.DB_CASCADE,
+            ),
+        )
+        new_state = project_state.clone()
+        operation.state_forwards(app_label, new_state)
+
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+
+        fk_child_model = new_state.apps.get_model(app_label, fk_child_modelname)
+        fk_parent_model = new_state.apps.get_model(app_label, fk_parent_modelname)
+
+        fk_parent_instance = fk_parent_model.objects.create()
+        kwargs = {fk_fieldname: fk_parent_instance}
+        fk_child_instance1 = fk_child_model.objects.create(**kwargs)
+        fk_child_instance2 = fk_child_model.objects.create(**kwargs)
+
+        with self.assertNumQueries(1):
+            fk_parent_instance.delete()
+
+        self.assertIs(
+            fk_child_model.objects.filter(pk=fk_child_instance1.pk).exists(), False
+        )
+        self.assertIs(
+            fk_child_model.objects.filter(pk=fk_child_instance2.pk).exists(), False
+        )
+
+        fk_parent_model.objects.all().delete()
+        fk_child_model.objects.all().delete()
+
+        with connection.schema_editor() as editor:
+            operation.database_backwards(app_label, editor, new_state, project_state)
+
+    def change_to_db_restrict_test(
+        self,
+        app_label,
+        fk_parent_modelname,
+        fk_child_modelname,
+        fk_fieldname,
+        project_state,
+    ):
+        operation = migrations.AlterField(
+            fk_child_modelname,
+            fk_fieldname,
+            models.ForeignKey(
+                f"{app_label}.{fk_parent_modelname}",
+                on_delete=models.DB_RESTRICT,
+            ),
+        )
+        new_state = project_state.clone()
+        operation.state_forwards(app_label, new_state)
+
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+
+        fk_child_model = new_state.apps.get_model(app_label, fk_child_modelname)
+        fk_parent_model = new_state.apps.get_model(app_label, fk_parent_modelname)
+
+        fk_parent_instance = fk_parent_model.objects.create()
+        kwargs = {fk_fieldname: fk_parent_instance}
+        fk_child_instance = fk_child_model.objects.create(**kwargs)
+
+        with self.assertRaises(IntegrityError):
+            fk_parent_instance.delete()
+
+        self.assertIs(
+            fk_child_model.objects.filter(pk=fk_child_instance.pk).exists(), True
+        )
+        self.assertIs(
+            fk_parent_model.objects.filter(pk=fk_parent_instance.pk).exists(), True
+        )
+
+        fk_child_model.objects.all().delete()
+        fk_parent_model.objects.all().delete()
+
+        with connection.schema_editor() as editor:
+            operation.database_backwards(app_label, editor, new_state, project_state)
+
+    def change_to_db_set_default_test(
+        self,
+        app_label,
+        fk_parent_modelname,
+        fk_child_modelname,
+        fk_fieldname,
+        project_state,
+    ):
+        operation = migrations.AlterField(
+            fk_child_modelname,
+            fk_fieldname,
+            models.ForeignKey(
+                f"{app_label}.{fk_parent_modelname}",
+                db_default=1,
+                on_delete=models.DB_SET_DEFAULT,
+            ),
+        )
+        new_state = project_state.clone()
+        operation.state_forwards(app_label, new_state)
+
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+
+        fk_child_model = new_state.apps.get_model(app_label, fk_child_modelname)
+        fk_parent_model = new_state.apps.get_model(app_label, fk_parent_modelname)
+
+        fk_parent_default = fk_parent_model.objects.create(id=1)
+        fk_parent_instance = fk_parent_model.objects.create()
+        kwargs = {fk_fieldname: fk_parent_instance}
+        fk_child_instance = fk_child_model.objects.create(**kwargs)
+
+        fk_parent_instance.delete()
+
+        fk_child_instance.refresh_from_db()
+        fk_parent_default.refresh_from_db()
+        # After deletion it gets set to db default value
+        self.assertEqual(getattr(fk_child_instance, fk_fieldname), fk_parent_default)
+
+        fk_child_model.objects.all().delete()
+        fk_parent_model.objects.all().delete()
+
+        with connection.schema_editor() as editor:
+            operation.database_backwards(app_label, editor, new_state, project_state)
+
+    def change_to_non_db_set_null_test(
+        self,
+        app_label,
+        fk_parent_modelname,
+        fk_child_modelname,
+        fk_fieldname,
+        project_state,
+    ):
+        operation = migrations.AlterField(
+            fk_child_modelname,
+            fk_fieldname,
+            models.ForeignKey(
+                f"{app_label}.{fk_parent_modelname}",
+                null=True,
+                on_delete=models.SET_NULL,
+            ),
+        )
+        new_state = project_state.clone()
+        operation.state_forwards(app_label, new_state)
+
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+
+        fk_child_model = new_state.apps.get_model(app_label, fk_child_modelname)
+        fk_parent_model = new_state.apps.get_model(app_label, fk_parent_modelname)
+
+        fk_parent_instance = fk_parent_model.objects.create()
+        kwargs = {fk_fieldname: fk_parent_instance}
+        fk_child_instance1 = fk_child_model.objects.create(**kwargs)
+
+        with self.assertNumQueries(4):
+            fk_parent_instance.delete()
+
+        fk_child_instance1.refresh_from_db()
+        self.assertIsNone(getattr(fk_child_instance1, fk_fieldname))
+
+        fk_parent_model.objects.all().delete()
+        fk_child_model.objects.all().delete()
+
+        with connection.schema_editor() as editor:
+            operation.database_backwards(app_label, editor, new_state, project_state)
+
+    def change_to_non_db_cascade_test(
+        self,
+        app_label,
+        fk_parent_modelname,
+        fk_child_modelname,
+        fk_fieldname,
+        project_state,
+    ):
+        operation = migrations.AlterField(
+            fk_child_modelname,
+            fk_fieldname,
+            models.ForeignKey(
+                f"{app_label}.{fk_parent_modelname}",
+                on_delete=models.CASCADE,
+            ),
+        )
+        new_state = project_state.clone()
+        operation.state_forwards(app_label, new_state)
+
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+
+        fk_child_model = new_state.apps.get_model(app_label, fk_child_modelname)
+        fk_parent_model = new_state.apps.get_model(app_label, fk_parent_modelname)
+
+        fk_parent_instance = fk_parent_model.objects.create()
+        kwargs = {fk_fieldname: fk_parent_instance}
+        fk_child_instance1 = fk_child_model.objects.create(**kwargs)
+        fk_child_instance2 = fk_child_model.objects.create(**kwargs)
+
+        with self.assertNumQueries(4):
+            fk_parent_instance.delete()
+
+        self.assertIs(
+            fk_child_model.objects.filter(pk=fk_child_instance1.pk).exists(), False
+        )
+        self.assertIs(
+            fk_child_model.objects.filter(pk=fk_child_instance2.pk).exists(), False
+        )
+
+        fk_parent_model.objects.all().delete()
+        fk_child_model.objects.all().delete()
+
+        with connection.schema_editor() as editor:
+            operation.database_backwards(app_label, editor, new_state, project_state)
+
+    def change_to_non_db_restrict_test(
+        self,
+        app_label,
+        fk_parent_modelname,
+        fk_child_modelname,
+        fk_fieldname,
+        project_state,
+    ):
+        operation = migrations.AlterField(
+            fk_child_modelname,
+            fk_fieldname,
+            models.ForeignKey(
+                f"{app_label}.{fk_parent_modelname}",
+                on_delete=models.RESTRICT,
+            ),
+        )
+        new_state = project_state.clone()
+        operation.state_forwards(app_label, new_state)
+
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+
+        fk_child_model = new_state.apps.get_model(app_label, fk_child_modelname)
+        fk_parent_model = new_state.apps.get_model(app_label, fk_parent_modelname)
+
+        fk_parent_instance = fk_parent_model.objects.create()
+        kwargs = {fk_fieldname: fk_parent_instance}
+        fk_child_instance = fk_child_model.objects.create(**kwargs)
+
+        with self.assertRaises(IntegrityError):
+            fk_parent_instance.delete()
+
+        self.assertIs(
+            fk_child_model.objects.filter(pk=fk_child_instance.pk).exists(), True
+        )
+        self.assertIs(
+            fk_parent_model.objects.filter(pk=fk_parent_instance.pk).exists(), True
+        )
+
+        fk_child_model.objects.all().delete()
+        fk_parent_model.objects.all().delete()
+
+        with connection.schema_editor() as editor:
+            operation.database_backwards(app_label, editor, new_state, project_state)
+
+    def change_to_non_db_set_default_test(
+        self,
+        app_label,
+        fk_parent_modelname,
+        fk_child_modelname,
+        fk_fieldname,
+        project_state,
+    ):
+        operation = migrations.AlterField(
+            fk_child_modelname,
+            fk_fieldname,
+            models.ForeignKey(
+                f"{app_label}.{fk_parent_modelname}",
+                default=1,
+                on_delete=models.SET_DEFAULT,
+            ),
+        )
+        new_state = project_state.clone()
+        operation.state_forwards(app_label, new_state)
+
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+
+        fk_child_model = new_state.apps.get_model(app_label, fk_child_modelname)
+        fk_parent_model = new_state.apps.get_model(app_label, fk_parent_modelname)
+
+        fk_parent_default = fk_parent_model.objects.create(id=1)
+        fk_parent_instance = fk_parent_model.objects.create()
+        kwargs = {fk_fieldname: fk_parent_instance}
+        fk_child_instance = fk_child_model.objects.create(**kwargs)
+
+        fk_parent_instance.delete()
+
+        fk_child_instance.refresh_from_db()
+        fk_parent_default.refresh_from_db()
+        # After deletion it gets set to db default value
+        self.assertEqual(getattr(fk_child_instance, fk_fieldname), fk_parent_default)
+
+        fk_child_model.objects.all().delete()
+        fk_parent_model.objects.all().delete()
+
+        with connection.schema_editor() as editor:
+            operation.database_backwards(app_label, editor, new_state, project_state)
+
+    def test_alter_field_to_db_level_fk_from_non_db_cascade(self):
+        app_label = "test_alter_db_level_fk_from_non_db_cascade"
+        fk_parent_modelname = "FkParent"
+        fk_child_modelname = "FkChild"
+        fk_fieldname = "fkparent"
+        operations = [
+            migrations.CreateModel(
+                fk_parent_modelname,
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                ],
+            ),
+            migrations.CreateModel(
+                fk_child_modelname,
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    ("number", models.IntegerField(default=1)),
+                    (
+                        fk_fieldname,
+                        models.ForeignKey(
+                            f"{app_label}.{fk_parent_modelname}",
+                            on_delete=models.CASCADE,
+                        ),
+                    ),
+                ],
+            ),
+        ]
+
+        project_state = self.apply_operations(app_label, ProjectState(), operations)
+
+        self.change_to_db_set_null_test(
+            app_label,
+            fk_parent_modelname,
+            fk_child_modelname,
+            fk_fieldname,
+            project_state,
+        )
+        self.change_to_db_cascade_test(
+            app_label,
+            fk_parent_modelname,
+            fk_child_modelname,
+            fk_fieldname,
+            project_state,
+        )
+        self.change_to_db_restrict_test(
+            app_label,
+            fk_parent_modelname,
+            fk_child_modelname,
+            fk_fieldname,
+            project_state,
+        )
+        if connection.features.has_on_delete_db_default:
+            self.change_to_db_set_default_test(
+                app_label,
+                fk_parent_modelname,
+                fk_child_modelname,
+                fk_fieldname,
+                project_state,
+            )
+
+    def test_alter_field_to_db_level_fk_from_non_db_restrict(self):
+        app_label = "test_alter_db_level_fk_from_non_db_restrict"
+        fk_parent_modelname = "FkParent"
+        fk_child_modelname = "FkChild"
+        fk_fieldname = "fkparent"
+        operations = [
+            migrations.CreateModel(
+                fk_parent_modelname,
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                ],
+            ),
+            migrations.CreateModel(
+                fk_child_modelname,
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    ("number", models.IntegerField(default=1)),
+                    (
+                        fk_fieldname,
+                        models.ForeignKey(
+                            f"{app_label}.{fk_parent_modelname}",
+                            on_delete=models.RESTRICT,
+                        ),
+                    ),
+                ],
+            ),
+        ]
+
+        project_state = self.apply_operations(app_label, ProjectState(), operations)
+
+        self.change_to_db_set_null_test(
+            app_label,
+            fk_parent_modelname,
+            fk_child_modelname,
+            fk_fieldname,
+            project_state,
+        )
+        self.change_to_db_cascade_test(
+            app_label,
+            fk_parent_modelname,
+            fk_child_modelname,
+            fk_fieldname,
+            project_state,
+        )
+        self.change_to_db_restrict_test(
+            app_label,
+            fk_parent_modelname,
+            fk_child_modelname,
+            fk_fieldname,
+            project_state,
+        )
+        if connection.features.has_on_delete_db_default:
+            self.change_to_db_set_default_test(
+                app_label,
+                fk_parent_modelname,
+                fk_child_modelname,
+                fk_fieldname,
+                project_state,
+            )
+
+    def test_alter_field_to_db_level_fk_from_non_db_set_null(self):
+        app_label = "test_alter_db_level_fk_from_non_db_set_null"
+        fk_parent_modelname = "FkParent"
+        fk_child_modelname = "FkChild"
+        fk_fieldname = "fkparent"
+        operations = [
+            migrations.CreateModel(
+                fk_parent_modelname,
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                ],
+            ),
+            migrations.CreateModel(
+                fk_child_modelname,
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    ("number", models.IntegerField(default=1)),
+                    (
+                        fk_fieldname,
+                        models.ForeignKey(
+                            f"{app_label}.{fk_parent_modelname}",
+                            null=True,
+                            on_delete=models.SET_NULL,
+                        ),
+                    ),
+                ],
+            ),
+        ]
+
+        project_state = self.apply_operations(app_label, ProjectState(), operations)
+
+        self.change_to_db_set_null_test(
+            app_label,
+            fk_parent_modelname,
+            fk_child_modelname,
+            fk_fieldname,
+            project_state,
+        )
+        self.change_to_db_cascade_test(
+            app_label,
+            fk_parent_modelname,
+            fk_child_modelname,
+            fk_fieldname,
+            project_state,
+        )
+        self.change_to_db_restrict_test(
+            app_label,
+            fk_parent_modelname,
+            fk_child_modelname,
+            fk_fieldname,
+            project_state,
+        )
+        if connection.features.has_on_delete_db_default:
+            self.change_to_db_set_default_test(
+                app_label,
+                fk_parent_modelname,
+                fk_child_modelname,
+                fk_fieldname,
+                project_state,
+            )
+
+    def test_alter_field_to_db_level_fk_from_non_db_set_default(self):
+        app_label = "test_alter_db_level_fk_from_non_db_set_default"
+        fk_parent_modelname = "FkParent"
+        fk_child_modelname = "FkChild"
+        fk_fieldname = "fkparent"
+        operations = [
+            migrations.CreateModel(
+                fk_parent_modelname,
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                ],
+            ),
+            migrations.CreateModel(
+                fk_child_modelname,
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    ("number", models.IntegerField(default=1)),
+                    (
+                        fk_fieldname,
+                        models.ForeignKey(
+                            f"{app_label}.{fk_parent_modelname}",
+                            default=1,
+                            on_delete=models.SET_DEFAULT,
+                        ),
+                    ),
+                ],
+            ),
+        ]
+
+        project_state = self.apply_operations(app_label, ProjectState(), operations)
+
+        self.change_to_db_set_null_test(
+            app_label,
+            fk_parent_modelname,
+            fk_child_modelname,
+            fk_fieldname,
+            project_state,
+        )
+        self.change_to_db_cascade_test(
+            app_label,
+            fk_parent_modelname,
+            fk_child_modelname,
+            fk_fieldname,
+            project_state,
+        )
+        self.change_to_db_restrict_test(
+            app_label,
+            fk_parent_modelname,
+            fk_child_modelname,
+            fk_fieldname,
+            project_state,
+        )
+        if connection.features.has_on_delete_db_default:
+            self.change_to_db_set_default_test(
+                app_label,
+                fk_parent_modelname,
+                fk_child_modelname,
+                fk_fieldname,
+                project_state,
+            )
+
+    def test_alter_field_from_db_cascade(self):
+        app_label = "test_alter_field_from_db_cascade"
+        fk_parent_modelname = "FkParent"
+        fk_child_modelname = "FkChild"
+        fk_fieldname = "fkparent"
+        operations = [
+            migrations.CreateModel(
+                fk_parent_modelname,
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                ],
+            ),
+            migrations.CreateModel(
+                fk_child_modelname,
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    ("number", models.IntegerField(default=1)),
+                    (
+                        fk_fieldname,
+                        models.ForeignKey(
+                            f"{app_label}.{fk_parent_modelname}",
+                            on_delete=models.DB_CASCADE,
+                        ),
+                    ),
+                ],
+            ),
+        ]
+
+        project_state = self.apply_operations(app_label, ProjectState(), operations)
+
+        self.change_to_db_set_null_test(
+            app_label,
+            fk_parent_modelname,
+            fk_child_modelname,
+            fk_fieldname,
+            project_state,
+        )
+        self.change_to_db_restrict_test(
+            app_label,
+            fk_parent_modelname,
+            fk_child_modelname,
+            fk_fieldname,
+            project_state,
+        )
+        if connection.features.has_on_delete_db_default:
+            self.change_to_db_set_default_test(
+                app_label,
+                fk_parent_modelname,
+                fk_child_modelname,
+                fk_fieldname,
+                project_state,
+            )
+
+        self.change_to_non_db_set_null_test(
+            app_label,
+            fk_parent_modelname,
+            fk_child_modelname,
+            fk_fieldname,
+            project_state,
+        )
+        self.change_to_non_db_cascade_test(
+            app_label,
+            fk_parent_modelname,
+            fk_child_modelname,
+            fk_fieldname,
+            project_state,
+        )
+        self.change_to_non_db_restrict_test(
+            app_label,
+            fk_parent_modelname,
+            fk_child_modelname,
+            fk_fieldname,
+            project_state,
+        )
+        self.change_to_non_db_set_default_test(
+            app_label,
+            fk_parent_modelname,
+            fk_child_modelname,
+            fk_fieldname,
+            project_state,
+        )
+
+    def test_alter_field_from_db_set_null(self):
+        app_label = "test_alter_field_from_db_set_null"
+        fk_parent_modelname = "FkParent"
+        fk_child_modelname = "FkChild"
+        fk_fieldname = "fkparent"
+        operations = [
+            migrations.CreateModel(
+                fk_parent_modelname,
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                ],
+            ),
+            migrations.CreateModel(
+                fk_child_modelname,
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    ("number", models.IntegerField(default=1)),
+                    (
+                        fk_fieldname,
+                        models.ForeignKey(
+                            f"{app_label}.{fk_parent_modelname}",
+                            null=True,
+                            on_delete=models.DB_SET_NULL,
+                        ),
+                    ),
+                ],
+            ),
+        ]
+
+        project_state = self.apply_operations(app_label, ProjectState(), operations)
+
+        self.change_to_db_cascade_test(
+            app_label,
+            fk_parent_modelname,
+            fk_child_modelname,
+            fk_fieldname,
+            project_state,
+        )
+        self.change_to_db_restrict_test(
+            app_label,
+            fk_parent_modelname,
+            fk_child_modelname,
+            fk_fieldname,
+            project_state,
+        )
+        if connection.features.has_on_delete_db_default:
+            self.change_to_db_set_default_test(
+                app_label,
+                fk_parent_modelname,
+                fk_child_modelname,
+                fk_fieldname,
+                project_state,
+            )
+        self.change_to_non_db_set_null_test(
+            app_label,
+            fk_parent_modelname,
+            fk_child_modelname,
+            fk_fieldname,
+            project_state,
+        )
+        self.change_to_non_db_cascade_test(
+            app_label,
+            fk_parent_modelname,
+            fk_child_modelname,
+            fk_fieldname,
+            project_state,
+        )
+        self.change_to_non_db_restrict_test(
+            app_label,
+            fk_parent_modelname,
+            fk_child_modelname,
+            fk_fieldname,
+            project_state,
+        )
+        self.change_to_non_db_set_default_test(
+            app_label,
+            fk_parent_modelname,
+            fk_child_modelname,
+            fk_fieldname,
+            project_state,
+        )
+
+    def test_alter_field_from_db_restrict(self):
+        app_label = "test_alter_field_from_db_restrict"
+        fk_parent_modelname = "FkParent"
+        fk_child_modelname = "FkChild"
+        fk_fieldname = "fkparent"
+        operations = [
+            migrations.CreateModel(
+                fk_parent_modelname,
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                ],
+            ),
+            migrations.CreateModel(
+                fk_child_modelname,
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    ("number", models.IntegerField(default=1)),
+                    (
+                        fk_fieldname,
+                        models.ForeignKey(
+                            f"{app_label}.{fk_parent_modelname}",
+                            on_delete=models.DB_RESTRICT,
+                        ),
+                    ),
+                ],
+            ),
+        ]
+
+        project_state = self.apply_operations(app_label, ProjectState(), operations)
+
+        self.change_to_db_set_null_test(
+            app_label,
+            fk_parent_modelname,
+            fk_child_modelname,
+            fk_fieldname,
+            project_state,
+        )
+        self.change_to_db_cascade_test(
+            app_label,
+            fk_parent_modelname,
+            fk_child_modelname,
+            fk_fieldname,
+            project_state,
+        )
+        if connection.features.has_on_delete_db_default:
+            self.change_to_db_set_default_test(
+                app_label,
+                fk_parent_modelname,
+                fk_child_modelname,
+                fk_fieldname,
+                project_state,
+            )
+
+        self.change_to_non_db_set_null_test(
+            app_label,
+            fk_parent_modelname,
+            fk_child_modelname,
+            fk_fieldname,
+            project_state,
+        )
+        self.change_to_non_db_cascade_test(
+            app_label,
+            fk_parent_modelname,
+            fk_child_modelname,
+            fk_fieldname,
+            project_state,
+        )
+        self.change_to_non_db_restrict_test(
+            app_label,
+            fk_parent_modelname,
+            fk_child_modelname,
+            fk_fieldname,
+            project_state,
+        )
+        self.change_to_non_db_set_default_test(
+            app_label,
+            fk_parent_modelname,
+            fk_child_modelname,
+            fk_fieldname,
+            project_state,
+        )
+
+    @skipUnlessDBFeature("has_on_delete_db_default")
+    def test_alter_field_from_db_set_default(self):
+        app_label = "test_alter_field_from_db_set_default"
+        fk_parent_modelname = "FkParent"
+        fk_child_modelname = "FkChild"
+        fk_fieldname = "fkparent"
+        operations = [
+            migrations.CreateModel(
+                fk_parent_modelname,
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                ],
+            ),
+            migrations.CreateModel(
+                fk_child_modelname,
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    ("number", models.IntegerField(default=1)),
+                    (
+                        fk_fieldname,
+                        models.ForeignKey(
+                            f"{app_label}.{fk_parent_modelname}",
+                            default=1,
+                            on_delete=models.DB_SET_DEFAULT,
+                        ),
+                    ),
+                ],
+            ),
+        ]
+
+        project_state = self.apply_operations(app_label, ProjectState(), operations)
+
+        self.change_to_db_set_null_test(
+            app_label,
+            fk_parent_modelname,
+            fk_child_modelname,
+            fk_fieldname,
+            project_state,
+        )
+        self.change_to_db_cascade_test(
+            app_label,
+            fk_parent_modelname,
+            fk_child_modelname,
+            fk_fieldname,
+            project_state,
+        )
+        self.change_to_db_restrict_test(
+            app_label,
+            fk_parent_modelname,
+            fk_child_modelname,
+            fk_fieldname,
+            project_state,
+        )
+
+        self.change_to_non_db_set_null_test(
+            app_label,
+            fk_parent_modelname,
+            fk_child_modelname,
+            fk_fieldname,
+            project_state,
+        )
+        self.change_to_non_db_cascade_test(
+            app_label,
+            fk_parent_modelname,
+            fk_child_modelname,
+            fk_fieldname,
+            project_state,
+        )
+        self.change_to_non_db_restrict_test(
+            app_label,
+            fk_parent_modelname,
+            fk_child_modelname,
+            fk_fieldname,
+            project_state,
+        )
+        self.change_to_non_db_set_default_test(
+            app_label,
+            fk_parent_modelname,
+            fk_child_modelname,
+            fk_fieldname,
+            project_state,
+        )

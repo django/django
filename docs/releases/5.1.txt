@@ -26,6 +26,17 @@ only officially support the latest release of each series.
 What's new in Django 5.1
 ========================
 
+Database-level values for ``ForeignKey.on_delete``
+--------------------------------------------------
+
+:attr:`.ForeignKey.on_delete` now supports four extra values to specify
+database-level actions:
+
+* ``DB_CASCADE`` - delete the referring object.
+* ``DB_RESTRICT`` - prevent deletion of referred-to objects.
+* ``DB_SET_NULL`` - set the referring foreign key to SQL ``NULL``.
+* ``DB_SET_DEFAULT`` - set the referring column to its ``db_default`` value.
+
 ``{% querystring %}`` template tag
 -----------------------------------
 
