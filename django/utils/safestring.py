@@ -35,10 +35,13 @@ class SafeString(str, SafeData):
         Concatenating a safe string with another safe bytestring or
         safe string is safe. Otherwise, the result is no longer safe.
         """
-        t = super().__add__(rhs)
-        if isinstance(rhs, SafeData):
-            return SafeString(t)
-        return t
+        if isinstance(rhs, str):
+            t = super().__add__(rhs)
+            if isinstance(rhs, SafeData):
+                t = SafeString(t)
+            return t
+        # Give the rhs object a chance to handle the addition:
+        return NotImplemented
 
     def __str__(self):
         return self
