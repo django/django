@@ -1,5 +1,6 @@
 import codecs
 import copy
+import operator
 from io import BytesIO
 from itertools import chain
 from urllib.parse import parse_qsl, quote, urlencode, urljoin, urlsplit
@@ -89,13 +90,49 @@ class HttpRequest:
 
     @cached_property
     def accepted_types(self):
-        """Return a list of MediaType instances."""
-        return parse_accept_header(self.headers.get("Accept", "*/*"))
+        """Return a list of MediaType instances, in order of preference."""
+        header_value = self.headers.get("Accept", "*/*")
+        return sorted(
+            (MediaType(token) for token in header_value.split(",") if token.strip()),
+            key=operator.attrgetter("quality", "specificity"),
+            reverse=True,
+        )
+
+    def accepted_type(self, media_type):
+        """
+        Return the most preferred MediaType instance which matches the given media type
+        """
+        return next(
+            (
+                accepted_type
+                for accepted_type in self.accepted_types
+                if accepted_type.match(media_type)
+            ),
+            None,
+        )
+
+    def get_preferred_type(self, media_types):
+        """Select the most preferred media type from the provided options"""
+        if not media_types or not self.accepted_types:
+            return None
+
+        desired_types = [
+            (accepted_type, media_type)
+            for media_type in media_types
+            if (accepted_type := self.accepted_type(media_type)) is not None
+        ]
+
+        if not desired_types:
+            return None
+
+        # Of the desired media types, select the one which is most desirable
+        return sorted(desired_types, key=lambda t: self.accepted_types.index(t[0]))[0][
+            1
+        ]
 
     def accepts(self, media_type):
-        return any(
-            accepted_type.match(media_type) for accepted_type in self.accepted_types
-        )
+        """Does the client accept a response in the given media type?"""
+        return self.accepted_type(media_type) is not None
 
     def _set_content_type_params(self, meta):
         """Set content_type, content_params, and encoding."""
@@ -682,6 +719,33 @@ class MediaType:
             return True
         return False
 
+    @cached_property
+    def quality(self):
+        try:
+            quality = float(self.params.get("q", 1))
+        except ValueError:
+            # Discard invalid values
+            return 1
+
+        # Valid quality values must be between 0 and 1
+        if quality < 0 or quality > 1:
+            return 1
+
+        return round(quality, 3)
+
+    @property
+    def specificity(self):
+        """
+        Return a specificity level from 0-3 for the media type given how specific it is.
+        """
+        if self.main_type == "*":
+            return 0
+        elif self.sub_type == "*":
+            return 1
+        elif self.quality == 1:
+            return 2
+        return 3
+
 
 # It's neither necessary nor appropriate to use
 # django.utils.encoding.force_str() for parsing URLs and form inputs. Thus,
@@ -732,7 +796,3 @@ def validate_host(host, allowed_hosts):
     return any(
         pattern == "*" or is_same_domain(host, pattern) for pattern in allowed_hosts
     )
-
-
-def parse_accept_header(header):
-    return [MediaType(token) for token in header.split(",") if token.strip()]
