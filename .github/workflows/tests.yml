@@ -18,12 +18,24 @@ permissions:
   contents: read
 
 jobs:
+  matrix_prep:
+    runs-on: ubuntu-latest
+    outputs:
+      python_versions_output: ${{ steps.set-matrix.outputs.python_versions }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - id: set-matrix
+        run: |
+          python_versions=$(sed -n "s/^.*Programming Language :: Python :: \([[:digit:]]\+\.[[:digit:]]\+\).*$/'\1', /p" pyproject.toml | tr -d '\n' | sed 's/, $//g')
+          echo "Supported Python versions: $python_versions"
+          echo "python_versions=[$python_versions]" >> "$GITHUB_OUTPUT"
   windows:
     runs-on: windows-latest
+    needs: matrix_prep
     strategy:
       matrix:
-        python-version:
-          - '3.12'
+        python-version: ${{ fromJson(needs.matrix_prep.outputs.python_versions_output) }}
     name: Windows, SQLite, Python ${{ matrix.python-version }}
     steps:
       - name: Checkout
