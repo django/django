@@ -558,8 +558,9 @@ class BackendTestCase(TransactionTestCase):
                 "Limit for query logging exceeded, only the last 3 queries will be "
                 "returned."
             )
-            with self.assertWarnsMessage(UserWarning, msg):
+            with self.assertWarnsMessage(UserWarning, msg) as ctx:
                 self.assertEqual(3, len(new_connection.queries))
+            self.assertEqual(ctx.filename, __file__)
 
         finally:
             BaseDatabaseWrapper.queries_limit = old_queries_limit
