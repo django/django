@@ -27,3 +27,7 @@ Bugfixes
 * Adjusted the deprecation warning ``stacklevel`` when using ``OS_OPEN_FLAGS``
   in :class:`~django.core.files.storage.FileSystemStorage` to correctly point
   to the offending call site (:ticket:`35326`).
+
+* Adjusted the deprecation warning ``stacklevel`` in
+  ``FieldCacheMixin.get_cache_name()`` to correctly point to the offending call
+  site (:ticket:`35405`).

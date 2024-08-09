@@ -34,9 +34,10 @@ class FieldCacheMixinTests(SimpleTestCase):
     # RemovedInDjango60Warning.
     def test_get_cache_name_deprecated(self):
         msg = "Override ExampleOld.cache_name instead of get_cache_name()."
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
             result = ExampleOld().cache_name
         self.assertEqual(result, "example")
+        self.assertEqual(ctx.filename, __file__)
 
     def test_cache_name(self):
         result = Example().cache_name
