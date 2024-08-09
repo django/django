@@ -388,6 +388,9 @@ class BaseDatabaseFeatures:
     # A map of reasons to sets of dotted paths to tests in Django's test suite
     # that should be skipped for this database.
     django_test_skips = {}
+    # Does the backend support tuple IN subquery?
+    # e.g. WHERE (foo, bar) IN (SELECT foo, bar FROM baz)
+    supports_tuple_in_subquery = True
 
     def __init__(self, connection):
         self.connection = connection
