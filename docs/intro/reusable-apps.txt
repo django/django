@@ -57,7 +57,7 @@ After the previous tutorials, our project should look like this:
 
 .. code-block:: text
 
-    mysite/
+    djangotutorial/
         manage.py
         mysite/
             __init__.py
@@ -90,7 +90,7 @@ After the previous tutorials, our project should look like this:
             admin/
                 base_site.html
 
-You created ``mysite/templates`` in :doc:`Tutorial 7 </intro/tutorial07>`,
+You created ``djangotutorial/templates`` in :doc:`Tutorial 7 </intro/tutorial07>`,
 and ``polls/templates`` in :doc:`Tutorial 3 </intro/tutorial03>`. Now perhaps
 it is clearer why we chose to have separate template directories for the
 project and application: everything that is part of the polls application is in
