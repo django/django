@@ -928,8 +928,9 @@ class ModelAdminTests(TestCase):
         mock_request.user = User.objects.create(username="bill")
         content_type = get_content_type_for_model(self.band)
         msg = "ModelAdmin.log_deletion() is deprecated. Use log_deletions() instead."
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
             created = ma.log_deletion(mock_request, self.band, str(self.band))
+        self.assertEqual(ctx.filename, __file__)
         fetched = LogEntry.objects.filter(action_flag=DELETION).latest("id")
         self.assertEqual(created, fetched)
         self.assertEqual(fetched.action_flag, DELETION)
@@ -966,8 +967,9 @@ class ModelAdminTests(TestCase):
             "instead."
         )
         with self.assertNumQueries(3):
-            with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+            with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
                 ima.log_deletions(mock_request, queryset)
+        self.assertEqual(ctx.filename, __file__)
         logs = (
             LogEntry.objects.filter(action_flag=DELETION)
             .order_by("id")
