@@ -52,6 +52,10 @@ Minor features
 * The default iteration count for the PBKDF2 password hasher is increased from
   870,000 to 1,000,000.
 
+* Auth backends can now provide async implementations which are used when
+  calling async auth functions (e.g. :func:`~.django.contrib.auth.aauthenticate`)
+  to reduce context-switching which improves performance.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

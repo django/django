@@ -771,7 +771,7 @@ class AsyncRequestFactory(RequestFactory):
         if headers:
             extra.update(HttpHeaders.to_asgi_names(headers))
         s["headers"] += [
-            (key.lower().encode("ascii"), value.encode("latin1"))
+            (key.lower().encode("ascii"), (value or "").encode("latin1"))
             for key, value in extra.items()
         ]
         return self.request(**s)

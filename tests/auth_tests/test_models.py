@@ -30,9 +30,18 @@ class NaturalKeysTestCase(TestCase):
         self.assertEqual(User.objects.get_by_natural_key("staff"), staff_user)
         self.assertEqual(staff_user.natural_key(), ("staff",))
 
+    async def test_auser_natural_key(self):
+        staff_user = await User.objects.acreate_user(username="staff")
+        self.assertEqual(await User.objects.aget_by_natural_key("staff"), staff_user)
+        self.assertEqual(staff_user.natural_key(), ("staff",))
+
     def test_group_natural_key(self):
         users_group = Group.objects.create(name="users")
         self.assertEqual(Group.objects.get_by_natural_key("users"), users_group)
+
+    async def test_agroup_natural_key(self):
+        users_group = await Group.objects.acreate(name="users")
+        self.assertEqual(await Group.objects.aget_by_natural_key("users"), users_group)
 
 
 class LoadDataWithoutNaturalKeysTestCase(TestCase):

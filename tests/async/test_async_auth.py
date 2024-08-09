@@ -34,8 +34,12 @@ class AsyncAuthTest(TestCase):
         self.assertEqual(user.username, self.test_user.username)
 
     async def test_alogin_without_user(self):
+        async def auser():
+            return self.test_user
+
         request = HttpRequest()
         request.user = self.test_user
+        request.auser = auser
         request.session = await self.client.asession()
         await alogin(request, None)
         user = await aget_user(request)
