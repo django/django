@@ -18,7 +18,7 @@ searched_locations = []
 
 
 # RemovedInDjango61Warning: When the deprecation ends, remove completely.
-def _check_deprecated_find_param(class_name="", find_all=False, **kwargs):
+def _check_deprecated_find_param(class_name="", find_all=False, stacklevel=3, **kwargs):
     method_name = "find" if not class_name else f"{class_name}.find"
     if "all" in kwargs:
         legacy_all = kwargs.pop("all")
@@ -26,7 +26,7 @@ def _check_deprecated_find_param(class_name="", find_all=False, **kwargs):
             "Passing the `all` argument to find() is deprecated. Use `find_all` "
             "instead."
         )
-        warnings.warn(msg, RemovedInDjango61Warning, stacklevel=2)
+        warnings.warn(msg, RemovedInDjango61Warning, stacklevel=stacklevel)
 
         # If both `find_all` and `all` were given, raise TypeError.
         if find_all is not False:
@@ -57,7 +57,7 @@ class BaseFinder:
     # RemovedInDjango61Warning: When the deprecation ends, remove completely.
     def _check_deprecated_find_param(self, **kwargs):
         return _check_deprecated_find_param(
-            class_name=self.__class__.__qualname__, **kwargs
+            class_name=self.__class__.__qualname__, stacklevel=4, **kwargs
         )
 
     # RemovedInDjango61Warning: When the deprecation ends, replace with:
