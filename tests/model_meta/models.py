@@ -5,7 +5,9 @@ from django.utils.translation import gettext_lazy as _
 
 
 class Relation(models.Model):
-    pass
+    content_type = models.ForeignKey(ContentType, models.CASCADE, related_name="+")
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey()
 
 
 class InstanceOnlyDescriptor:
