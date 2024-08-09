@@ -328,5 +328,6 @@ class ChoicesMetaDeprecationTests(SimpleTestCase):
         from django.db.models import enums
 
         msg = "ChoicesMeta is deprecated in favor of ChoicesType."
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
             enums.ChoicesMeta
+        self.assertEqual(ctx.filename, __file__)

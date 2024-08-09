@@ -240,7 +240,7 @@ class LogEntryTests(TestCase):
     def test_log_action(self):
         msg = "LogEntryManager.log_action() is deprecated. Use log_actions() instead."
         content_type_val = ContentType.objects.get_for_model(Article).pk
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
             log_entry = LogEntry.objects.log_action(
                 self.user.pk,
                 content_type_val,
@@ -250,6 +250,7 @@ class LogEntryTests(TestCase):
                 change_message="Changed something else",
             )
         self.assertEqual(log_entry, LogEntry.objects.latest("id"))
+        self.assertEqual(ctx.filename, __file__)
 
     def test_log_actions(self):
         queryset = Article.objects.all().order_by("-id")
@@ -297,9 +298,12 @@ class LogEntryTests(TestCase):
         msg = (
             "The usage of log_action() is deprecated. Implement log_actions() instead."
         )
-        with self.assertNumQueries(3):
-            with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
-                LogEntry.objects2.log_actions(self.user.pk, queryset, DELETION)
+        with (
+            self.assertNumQueries(3),
+            self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx,
+        ):
+            LogEntry.objects2.log_actions(self.user.pk, queryset, DELETION)
+        self.assertEqual(ctx.filename, __file__)
         log_values = (
             LogEntry.objects.filter(action_flag=DELETION)
             .order_by("id")

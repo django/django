@@ -25,11 +25,13 @@ class RenameMethodsTests(SimpleTestCase):
         the faulty method.
         """
         msg = "`Manager.old` method should be renamed `new`."
-        with self.assertWarnsMessage(DeprecationWarning, msg):
+        with self.assertWarnsMessage(DeprecationWarning, msg) as ctx:
 
             class Manager(metaclass=RenameManagerMethods):
                 def old(self):
                     pass
+
+        self.assertEqual(ctx.filename, __file__)
 
     def test_get_new_defined(self):
         """
@@ -48,19 +50,22 @@ class RenameMethodsTests(SimpleTestCase):
         self.assertEqual(len(recorded), 0)
 
         msg = "`Manager.old` is deprecated, use `new` instead."
-        with self.assertWarnsMessage(DeprecationWarning, msg):
+        with self.assertWarnsMessage(DeprecationWarning, msg) as ctx:
             manager.old()
+        self.assertEqual(ctx.filename, __file__)
 
     def test_get_old_defined(self):
         """
         Ensure `old` complains when only `old` is defined.
         """
         msg = "`Manager.old` method should be renamed `new`."
-        with self.assertWarnsMessage(DeprecationWarning, msg):
+        with self.assertWarnsMessage(DeprecationWarning, msg) as ctx:
 
             class Manager(metaclass=RenameManagerMethods):
                 def old(self):
                     pass
+
+        self.assertEqual(ctx.filename, __file__)
 
         manager = Manager()
 
@@ -70,8 +75,9 @@ class RenameMethodsTests(SimpleTestCase):
         self.assertEqual(len(recorded), 0)
 
         msg = "`Manager.old` is deprecated, use `new` instead."
-        with self.assertWarnsMessage(DeprecationWarning, msg):
+        with self.assertWarnsMessage(DeprecationWarning, msg) as ctx:
             manager.old()
+        self.assertEqual(ctx.filename, __file__)
 
     def test_deprecated_subclass_renamed(self):
         """
@@ -84,21 +90,25 @@ class RenameMethodsTests(SimpleTestCase):
                 pass
 
         msg = "`Deprecated.old` method should be renamed `new`."
-        with self.assertWarnsMessage(DeprecationWarning, msg):
+        with self.assertWarnsMessage(DeprecationWarning, msg) as ctx:
 
             class Deprecated(Renamed):
                 def old(self):
                     super().old()
 
+        self.assertEqual(ctx.filename, __file__)
+
         deprecated = Deprecated()
 
         msg = "`Renamed.old` is deprecated, use `new` instead."
-        with self.assertWarnsMessage(DeprecationWarning, msg):
+        with self.assertWarnsMessage(DeprecationWarning, msg) as ctx:
             deprecated.new()
+        self.assertEqual(ctx.filename, __file__)
 
         msg = "`Deprecated.old` is deprecated, use `new` instead."
-        with self.assertWarnsMessage(DeprecationWarning, msg):
+        with self.assertWarnsMessage(DeprecationWarning, msg) as ctx:
             deprecated.old()
+        self.assertEqual(ctx.filename, __file__)
 
     def test_renamed_subclass_deprecated(self):
         """
@@ -106,11 +116,13 @@ class RenameMethodsTests(SimpleTestCase):
         `old` subclass one that didn't.
         """
         msg = "`Deprecated.old` method should be renamed `new`."
-        with self.assertWarnsMessage(DeprecationWarning, msg):
+        with self.assertWarnsMessage(DeprecationWarning, msg) as ctx:
 
             class Deprecated(metaclass=RenameManagerMethods):
                 def old(self):
                     pass
+
+        self.assertEqual(ctx.filename, __file__)
 
         class Renamed(Deprecated):
             def new(self):
@@ -124,8 +136,9 @@ class RenameMethodsTests(SimpleTestCase):
         self.assertEqual(len(recorded), 0)
 
         msg = "`Renamed.old` is deprecated, use `new` instead."
-        with self.assertWarnsMessage(DeprecationWarning, msg):
+        with self.assertWarnsMessage(DeprecationWarning, msg) as ctx:
             renamed.old()
+        self.assertEqual(ctx.filename, __file__)
 
     def test_deprecated_subclass_renamed_and_mixins(self):
         """
@@ -147,20 +160,24 @@ class RenameMethodsTests(SimpleTestCase):
                 super().old()
 
         msg = "`DeprecatedMixin.old` method should be renamed `new`."
-        with self.assertWarnsMessage(DeprecationWarning, msg):
+        with self.assertWarnsMessage(DeprecationWarning, msg) as ctx:
 
             class Deprecated(DeprecatedMixin, RenamedMixin, Renamed):
                 pass
 
+        self.assertEqual(ctx.filename, __file__)
+
         deprecated = Deprecated()
 
         msg = "`RenamedMixin.old` is deprecated, use `new` instead."
-        with self.assertWarnsMessage(DeprecationWarning, msg):
+        with self.assertWarnsMessage(DeprecationWarning, msg) as ctx:
             deprecated.new()
+        self.assertEqual(ctx.filename, __file__)
 
         msg = "`DeprecatedMixin.old` is deprecated, use `new` instead."
-        with self.assertWarnsMessage(DeprecationWarning, msg):
+        with self.assertWarnsMessage(DeprecationWarning, msg) as ctx:
             deprecated.old()
+        self.assertEqual(ctx.filename, __file__)
 
     def test_removedafternextversionwarning_pending(self):
         self.assertTrue(

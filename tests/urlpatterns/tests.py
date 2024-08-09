@@ -212,10 +212,11 @@ class SimplifiedURLTests(SimpleTestCase):
             "converters is deprecated and will be removed in Django 6.0."
         )
         try:
-            with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+            with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
                 register_converter(IntConverter, "int")
         finally:
             REGISTERED_CONVERTERS.pop("int", None)
+        self.assertEqual(ctx.filename, __file__)
 
     def test_warning_override_converter(self):
         # RemovedInDjango60Warning: when the deprecation ends, replace with
@@ -226,11 +227,12 @@ class SimplifiedURLTests(SimpleTestCase):
             "registered converters is deprecated and will be removed in Django 6.0."
         )
         try:
-            with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+            with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
                 register_converter(Base64Converter, "base64")
                 register_converter(Base64Converter, "base64")
         finally:
             REGISTERED_CONVERTERS.pop("base64", None)
+        self.assertEqual(ctx.filename, __file__)
 
     def test_invalid_view(self):
         msg = "view must be a callable or a list/tuple in the case of include()."
