@@ -228,6 +228,7 @@ class BaseDatabaseOperations:
                 "DatabaseOperations.lookup_cast() instead."
             ),
             RemovedInDjango60Warning,
+            stacklevel=2,
         )
         return "%s"
 
