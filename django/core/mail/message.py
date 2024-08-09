@@ -214,6 +214,7 @@ class EmailMessage:
         headers=None,
         cc=None,
         reply_to=None,
+        provider=None,
     ):
         """
         Initialize a single email message (which can be sent to multiple
@@ -254,16 +255,20 @@ class EmailMessage:
                 else:
                     self.attach(*attachment)
         self.extra_headers = headers or {}
+        self.provider = provider
         self.connection = connection
 
     def get_connection(self, fail_silently=False):
         from django.core.mail import get_connection
 
         if not self.connection:
-            self.connection = get_connection(fail_silently=fail_silently)
+            self.connection = get_connection(
+                fail_silently=fail_silently,
+                provider=self.provider,
+            )
         return self.connection
 
-    def message(self):
+    def message(self, use_localtime=False):
         encoding = self.encoding or settings.DEFAULT_CHARSET
         msg = SafeMIMEText(self.body, self.content_subtype, encoding)
         msg = self._create_message(msg)
@@ -281,7 +286,7 @@ class EmailMessage:
             # the stdlib/OS concept of a timezone, however, Django sets the
             # TZ environment variable based on the TIME_ZONE setting which
             # will get picked up by formatdate().
-            msg["Date"] = formatdate(localtime=settings.EMAIL_USE_LOCALTIME)
+            msg["Date"] = formatdate(localtime=use_localtime)
         if "message-id" not in header_names:
             # Use cached DNS_NAME for performance
             msg["Message-ID"] = make_msgid(domain=DNS_NAME)
@@ -459,6 +464,7 @@ class EmailMultiAlternatives(EmailMessage):
         alternatives=None,
         cc=None,
         reply_to=None,
+        provider=None,
     ):
         """
         Initialize a single email message (which can be sent to multiple
@@ -475,6 +481,7 @@ class EmailMultiAlternatives(EmailMessage):
             headers,
             cc,
             reply_to,
+            provider,
         )
         self.alternatives = [
             EmailAlternative(*alternative) for alternative in (alternatives or [])

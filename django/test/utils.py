@@ -143,8 +143,10 @@ def setup_test_environment(debug=None):
     saved_data.debug = settings.DEBUG
     settings.DEBUG = debug
 
-    saved_data.email_backend = settings.EMAIL_BACKEND
-    settings.EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
+    saved_data.email_backend = settings.EMAIL_PROVIDERS["default"]["BACKEND"]
+    settings.EMAIL_PROVIDERS["default"][
+        "BACKEND"
+    ] = "django.core.mail.backends.locmem.EmailBackend"
 
     saved_data.template_render = Template._render
     Template._render = instrumented_test_render

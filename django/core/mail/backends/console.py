@@ -11,11 +11,12 @@ from django.core.mail.backends.base import BaseEmailBackend
 class EmailBackend(BaseEmailBackend):
     def __init__(self, *args, **kwargs):
         self.stream = kwargs.pop("stream", sys.stdout)
+        self.use_localtime = kwargs.pop("use_localtime", False)
         self._lock = threading.RLock()
         super().__init__(*args, **kwargs)
 
     def write_message(self, message):
-        msg = message.message()
+        msg = message.message(use_localtime=self.use_localtime)
         msg_data = msg.as_bytes()
         charset = (
             msg.get_charset().get_output_charset() if msg.get_charset() else "utf-8"

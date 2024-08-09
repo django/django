@@ -2,6 +2,8 @@
 Tools for sending email.
 """
 
+import warnings
+
 from django.conf import settings
 
 # Imported for backwards compatibility and for the sake
@@ -21,6 +23,7 @@ from django.core.mail.message import (
     make_msgid,
 )
 from django.core.mail.utils import DNS_NAME, CachedDnsName
+from django.utils.deprecation import RemovedInDjango61Warning
 from django.utils.module_loading import import_string
 
 __all__ = [
@@ -44,16 +47,31 @@ __all__ = [
 ]
 
 
-def get_connection(backend=None, fail_silently=False, **kwds):
+def get_connection(backend=None, fail_silently=False, *, provider=None, **kwds):
     """Load an email backend and return an instance of it.
 
-    If backend is None (default), use settings.EMAIL_BACKEND.
+    If backend is None (default), use settings.EMAIL_PROVIDERS[provider]["BACKEND"].
+    If provider is None as well, use settings.EMAIL_PROVIDERS["default"]["BACKEND"].
 
     Both fail_silently and other keyword arguments are used in the
     constructor of the backend.
     """
-    klass = import_string(backend or settings.EMAIL_BACKEND)
-    return klass(fail_silently=fail_silently, **kwds)
+    if backend:
+        if provider:
+            raise ValueError(
+                "backend and provider are mutually exclusive, "
+                "so only use either of those arguments."
+            )
+        klass = import_string(backend)
+        return klass(fail_silently=fail_silently, **kwds)
+
+    provider = provider or getattr(settings, "DEFAULT_EMAIL_PROVIDER_ALIAS", "default")
+    klass = import_string(settings.EMAIL_PROVIDERS[provider]["BACKEND"])
+    return klass(
+        fail_silently=fail_silently,
+        use_localtime=settings.EMAIL_PROVIDERS[provider]["USE_LOCALTIME"],
+        **(settings.EMAIL_PROVIDERS[provider]["OPTIONS"] | kwds),
+    )
 
 
 def send_mail(
@@ -62,6 +80,7 @@ def send_mail(
     from_email,
     recipient_list,
     fail_silently=False,
+    provider=None,
     auth_user=None,
     auth_password=None,
     connection=None,
@@ -78,11 +97,30 @@ def send_mail(
     Note: The API for this method is frozen. New code wanting to extend the
     functionality should use the EmailMessage class directly.
     """
-    connection = connection or get_connection(
-        username=auth_user,
-        password=auth_password,
-        fail_silently=fail_silently,
-    )
+    if provider:
+        if connection or auth_user or auth_password:
+            raise ValueError(
+                "provider and connection/auth_user/auth_password are mutually "
+                "exclusive, so only use either of those arguments."
+            )
+        provider_settings = settings.EMAIL_PROVIDERS[provider]
+        connection = get_connection(
+            backend=provider_settings["BACKEND"],
+            fail_silently=fail_silently,
+            **provider_settings["OPTIONS"],
+        )
+    elif connection:
+        msg = (
+            "The connection argument is deprecated and will be removed in Django 6.2. "
+            "Please use provider with an appropriate configuration instead.",
+        )
+        warnings.warn(msg, RemovedInDjango61Warning, stacklevel=2)
+    else:
+        connection = get_connection(
+            username=auth_user,
+            password=auth_password,
+            fail_silently=fail_silently,
+        )
     mail = EmailMultiAlternatives(
         subject, message, from_email, recipient_list, connection=connection
     )
@@ -93,7 +131,12 @@ def send_mail(
 
 
 def send_mass_mail(
-    datatuple, fail_silently=False, auth_user=None, auth_password=None, connection=None
+    datatuple,
+    fail_silently=False,
+    provider=None,
+    auth_user=None,
+    auth_password=None,
+    connection=None,
 ):
     """
     Given a datatuple of (subject, message, from_email, recipient_list), send
@@ -107,11 +150,30 @@ def send_mass_mail(
     Note: The API for this method is frozen. New code wanting to extend the
     functionality should use the EmailMessage class directly.
     """
-    connection = connection or get_connection(
-        username=auth_user,
-        password=auth_password,
-        fail_silently=fail_silently,
-    )
+    if provider:
+        if connection or auth_user or auth_password:
+            raise ValueError(
+                "provider and connection/auth_user/auth_password are mutually "
+                "exclusive, so only use either of those arguments."
+            )
+        provider_settings = settings.EMAIL_PROVIDERS[provider]
+        connection = get_connection(
+            backend=provider_settings["BACKEND"],
+            fail_silently=fail_silently,
+            **provider_settings["OPTIONS"],
+        )
+    elif connection:
+        msg = (
+            "The connection argument is deprecated and will be removed in Django 6.2. "
+            "Please use provider with an appropriate configuration instead.",
+        )
+        warnings.warn(msg, RemovedInDjango61Warning, stacklevel=2)
+    else:
+        connection = get_connection(
+            username=auth_user,
+            password=auth_password,
+            fail_silently=fail_silently,
+        )
     messages = [
         EmailMessage(subject, message, sender, recipient, connection=connection)
         for subject, message, sender, recipient in datatuple
@@ -120,7 +182,12 @@ def send_mass_mail(
 
 
 def mail_admins(
-    subject, message, fail_silently=False, connection=None, html_message=None
+    subject,
+    message,
+    fail_silently=False,
+    provider=None,
+    connection=None,
+    html_message=None,
 ):
     """Send a message to the admins, as defined by the ADMINS setting."""
     if not settings.ADMINS:
@@ -132,6 +199,7 @@ def mail_admins(
         message,
         settings.SERVER_EMAIL,
         [a[1] for a in settings.ADMINS],
+        provider=provider,
         connection=connection,
     )
     if html_message:
@@ -140,7 +208,12 @@ def mail_admins(
 
 
 def mail_managers(
-    subject, message, fail_silently=False, connection=None, html_message=None
+    subject,
+    message,
+    fail_silently=False,
+    provider=None,
+    connection=None,
+    html_message=None,
 ):
     """Send a message to the managers, as defined by the MANAGERS setting."""
     if not settings.MANAGERS:
@@ -152,6 +225,7 @@ def mail_managers(
         message,
         settings.SERVER_EMAIL,
         [a[1] for a in settings.MANAGERS],
+        provider=provider,
         connection=connection,
     )
     if html_message:

@@ -16,16 +16,58 @@ from pathlib import Path
 import django
 from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.deprecation import RemovedInDjango60Warning
+from django.utils.deprecation import RemovedInDjango60Warning, RemovedInDjango61Warning
 from django.utils.functional import LazyObject, empty
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
 DEFAULT_STORAGE_ALIAS = "default"
 STATICFILES_STORAGE_ALIAS = "staticfiles"
+DEFAULT_EMAIL_PROVIDER_ALIAS = "default"
 
 # RemovedInDjango60Warning.
 FORMS_URLFIELD_ASSUME_HTTPS_DEPRECATED_MSG = (
     "The FORMS_URLFIELD_ASSUME_HTTPS transitional setting is deprecated."
+)
+# RemovedInDjango61Warning.
+EMAIL_BACKEND_DEPRECATED_MSG = (
+    "The EMAIL_BACKEND setting is deprecated. "
+    'Use EMAIL_PROVIDER["default"]["BACKEND"] instead.'
+)
+EMAIL_HOST_DEPRECATED_MSG = (
+    "The EMAIL_HOST setting is deprecated. "
+    'Use EMAIL_PROVIDER["default"]["OPTIONS"]["host"] instead.'
+)
+EMAIL_PORT_DEPRECATED_MSG = (
+    "The EMAIL_PORT setting is deprecated. "
+    'Use EMAIL_PROVIDER["default"]["OPTIONS"]["port"] instead.'
+)
+EMAIL_USE_LOCALTIME_DEPRECATED_MSG = (
+    "The EMAIL_USE_LOCALTIME setting is deprecated. "
+    'Use EMAIL_PROVIDER["default"]["USE_LOCALTIME"] instead.'
+)
+EMAIL_HOST_USER_DEPRECATED_MSG = (
+    "The EMAIL_HOST_USER setting is deprecated. "
+    'Use EMAIL_PROVIDER["default"]["OPTIONS"]["username"] instead.'
+)
+EMAIL_HOST_PASSWORD_DEPRECATED_MSG = (
+    "The EMAIL_HOST_PASSWORD setting is deprecated. "
+    'Use EMAIL_PROVIDER["default"]["OPTIONS"]["password"] instead.'
+)
+EMAIL_USE_TLS_DEPRECATED_MSG = (
+    "The EMAIL_USE_TLS setting is deprecated. "
+    'Use EMAIL_PROVIDER["default"]["OPTIONS"]["use_tls"] instead.'
+)
+EMAIL_USE_SSL_DEPRECATED_MSG = (
+    "The EMAIL_USE_SSL setting is deprecated. "
+    'Use EMAIL_PROVIDER["default"]["OPTIONS"]["use_ssl"] instead.'
+)
+EMAIL_SSL_CERTFILE_DEPRECATED_MSG = (
+    "The EMAIL_SSL_CERTFILE setting is deprecated. "
+    'Use EMAIL_PROVIDER["default"]["OPTIONS"]["ssl_certfile"] instead.'
+)
+EMAIL_SSL_KEYFILE_DEPRECATED_MSG = (
+    "The EMAIL_SSL_KEYFILE setting is deprecated. "
+    'Use EMAIL_PROVIDER["default"]["OPTIONS"]["ssl_keyfile"] instead.'
 )
 
 
@@ -185,11 +227,61 @@ class Settings:
                     )
                 setattr(self, setting, setting_value)
                 self._explicit_settings.add(setting)
-
         if self.is_overridden("FORMS_URLFIELD_ASSUME_HTTPS"):
             warnings.warn(
                 FORMS_URLFIELD_ASSUME_HTTPS_DEPRECATED_MSG,
                 RemovedInDjango60Warning,
+            )
+        if self.is_overridden("EMAIL_BACKEND"):
+            warnings.warn(
+                EMAIL_BACKEND_DEPRECATED_MSG,
+                RemovedInDjango61Warning,
+            )
+            self.EMAIL_PROVIDER["default"]["BACKEND"] = self.EMAIL_BACKEND
+        if self.is_overridden("EMAIL_HOST"):
+            warnings.warn(
+                EMAIL_HOST_DEPRECATED_MSG,
+                RemovedInDjango61Warning,
+            )
+        if self.is_overridden("EMAIL_PORT"):
+            warnings.warn(
+                EMAIL_PORT_DEPRECATED_MSG,
+                RemovedInDjango61Warning,
+            )
+        if self.is_overridden("EMAIL_USE_LOCALTIME"):
+            warnings.warn(
+                EMAIL_USE_LOCALTIME_DEPRECATED_MSG,
+                RemovedInDjango61Warning,
+            )
+        if self.is_overridden("EMAIL_HOST_USER"):
+            warnings.warn(
+                EMAIL_HOST_USER_DEPRECATED_MSG,
+                RemovedInDjango61Warning,
+            )
+        if self.is_overridden("EMAIL_HOST_PASSWORD"):
+            warnings.warn(
+                EMAIL_HOST_PASSWORD_DEPRECATED_MSG,
+                RemovedInDjango61Warning,
+            )
+        if self.is_overridden("EMAIL_USE_TLS"):
+            warnings.warn(
+                EMAIL_USE_TLS_DEPRECATED_MSG,
+                RemovedInDjango61Warning,
+            )
+        if self.is_overridden("EMAIL_USE_SSL"):
+            warnings.warn(
+                EMAIL_USE_SSL_DEPRECATED_MSG,
+                RemovedInDjango61Warning,
+            )
+        if self.is_overridden("EMAIL_SSL_CERTFILE"):
+            warnings.warn(
+                EMAIL_SSL_CERTFILE_DEPRECATED_MSG,
+                RemovedInDjango61Warning,
+            )
+        if self.is_overridden("EMAIL_SSL_KEYFILE"):
+            warnings.warn(
+                EMAIL_SSL_KEYFILE_DEPRECATED_MSG,
+                RemovedInDjango61Warning,
             )
 
         if hasattr(time, "tzset") and self.TIME_ZONE:

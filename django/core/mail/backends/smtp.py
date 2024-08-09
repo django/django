@@ -31,24 +31,20 @@ class EmailBackend(BaseEmailBackend):
         **kwargs,
     ):
         super().__init__(fail_silently=fail_silently)
-        self.host = host or settings.EMAIL_HOST
-        self.port = port or settings.EMAIL_PORT
-        self.username = settings.EMAIL_HOST_USER if username is None else username
-        self.password = settings.EMAIL_HOST_PASSWORD if password is None else password
-        self.use_tls = settings.EMAIL_USE_TLS if use_tls is None else use_tls
-        self.use_ssl = settings.EMAIL_USE_SSL if use_ssl is None else use_ssl
-        self.timeout = settings.EMAIL_TIMEOUT if timeout is None else timeout
-        self.ssl_keyfile = (
-            settings.EMAIL_SSL_KEYFILE if ssl_keyfile is None else ssl_keyfile
-        )
-        self.ssl_certfile = (
-            settings.EMAIL_SSL_CERTFILE if ssl_certfile is None else ssl_certfile
-        )
+        self.host = host
+        self.port = port
+        self.username = username
+        self.password = password
+        self.use_tls = use_tls
+        self.use_ssl = use_ssl
+        self.ssl_keyfile = ssl_keyfile
+        self.ssl_certfile = ssl_certfile
         if self.use_ssl and self.use_tls:
             raise ValueError(
-                "EMAIL_USE_TLS/EMAIL_USE_SSL are mutually exclusive, so only set "
+                "use_tls/use_ssl are mutually exclusive, so only set "
                 "one of those settings to True."
             )
+        self.timeout = timeout
         self.connection = None
         self._lock = threading.RLock()
 
@@ -67,7 +63,7 @@ class EmailBackend(BaseEmailBackend):
 
     def open(self):
         """
-        Ensure an open connection to the email server. Return whether or not a
+        Ensure an open connection to the email server. Return whether a
         new connection was required (True or False) or None if an exception
         passed silently.
         """
