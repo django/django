@@ -855,6 +855,24 @@ class BasicExpressionsTests(TestCase):
         ).filter(ceo_manager=max_manager)
         self.assertEqual(qs.get(), self.gmbh)
 
+    def test_subquery_with_custom_template(self):
+        companies = Company.objects.annotate(
+            ceo_manager_count=Subquery(
+                Employee.objects.filter(
+                    lastname=OuterRef("ceo__lastname"),
+                ).values("manager"),
+                template="(SELECT count(*) FROM (%(subquery)s) _count)",
+            )
+        )
+        expected_results = [
+            {"name": "Example Inc.", "ceo_manager_count": 1},
+            {"name": "Foobar Ltd.", "ceo_manager_count": 1},
+            {"name": "Test GmbH", "ceo_manager_count": 1},
+        ]
+        self.assertListEqual(
+            list(companies.values("name", "ceo_manager_count")), expected_results
+        )
+
     def test_aggregate_subquery_annotation(self):
         with self.assertNumQueries(1) as ctx:
             aggregate = Company.objects.annotate(
