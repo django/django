@@ -525,6 +525,7 @@ the intermediate model:
 
     >>> ringo = Person.objects.create(name="Ringo Starr")
     >>> paul = Person.objects.create(name="Paul McCartney")
+    >>> john = Person.objects.create(name="John Wick")
     >>> beatles = Group.objects.create(name="The Beatles")
     >>> m1 = Membership(
     ...     person=ringo,
