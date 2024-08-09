@@ -230,6 +230,17 @@ class BaseDatabaseSchemaEditor:
             params.extend(extra_params)
             # FK.
             if field.remote_field and field.db_constraint:
+                if len(field.to_fields) > 1:
+                    if (
+                        self.sql_create_fk
+                        and self.connection.features.supports_foreign_keys
+                    ):
+                        self.deferred_sql.append(
+                            self._create_fk_sql(
+                                model, field, "_fk_%(to_table)s_%(to_column)s"
+                            )
+                        )
+                    continue
                 to_table = field.remote_field.model._meta.db_table
                 to_column = field.remote_field.model._meta.get_field(
                     field.remote_field.field_name
@@ -1648,7 +1659,11 @@ class BaseDatabaseSchemaEditor:
         """
         output = []
         if self._field_should_be_indexed(model, field):
-            output.append(self._create_index_sql(model, fields=[field]))
+            if hasattr(field, "local_related_fields"):
+                fields = field.local_related_fields
+            else:
+                fields = [field]
+            output.append(self._create_index_sql(model, fields=fields))
         return output
 
     def _field_should_be_altered(self, old_field, new_field, ignore=None):
@@ -1710,23 +1725,22 @@ class BaseDatabaseSchemaEditor:
         }
 
     def _create_fk_sql(self, model, field, suffix):
-        table = Table(model._meta.db_table, self.quote_name)
+        meta = model._meta
+        target_meta = field.target_field.model._meta
+        table = Table(meta.db_table, self.quote_name)
         name = self._fk_constraint_name(model, field, suffix)
-        column = Columns(model._meta.db_table, [field.column], self.quote_name)
-        to_table = Table(field.target_field.model._meta.db_table, self.quote_name)
-        to_column = Columns(
-            field.target_field.model._meta.db_table,
-            [field.target_field.column],
-            self.quote_name,
-        )
+        from_columns = [field.column for field in field.local_related_fields]
+        to_columns = [field.column for field in field.foreign_related_fields]
+        to_table = Table(target_meta.db_table, self.quote_name)
         deferrable = self.connection.ops.deferrable_sql()
+
         return Statement(
             self.sql_create_fk,
             table=table,
             name=name,
-            column=column,
+            column=Columns(meta.db_table, from_columns, self.quote_name),
             to_table=to_table,
-            to_column=to_column,
+            to_column=Columns(target_meta.db_table, to_columns, self.quote_name),
             deferrable=deferrable,
         )
 
@@ -1734,11 +1748,14 @@ class BaseDatabaseSchemaEditor:
         def create_fk_name(*args, **kwargs):
             return self.quote_name(self._create_index_name(*args, **kwargs))
 
+        from_columns = [field.column for field in field.local_related_fields]
+        to_columns = [field.column for field in field.foreign_related_fields]
+
         return ForeignKeyName(
             model._meta.db_table,
-            [field.column],
+            from_columns,
             split_identifier(field.target_field.model._meta.db_table)[1],
-            [field.target_field.column],
+            to_columns,
             suffix,
             create_fk_name,
         )
