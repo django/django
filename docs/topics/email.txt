@@ -569,11 +569,11 @@ can :ref:`write your own email backend <topic-custom-email-backend>`.
 SMTP backend
 ~~~~~~~~~~~~
 
-.. class:: backends.smtp.EmailBackend(host=None, port=None, username=None, password=None, use_tls=None, fail_silently=False, use_ssl=None, timeout=None, ssl_keyfile=None, ssl_certfile=None, **kwargs)
+.. class:: backends.smtp.EmailBackend(host=None, port=None, username=None, password=None, use_tls=None, fail_silently=False, use_ssl=None, timeout=None, ssl_keyfile=None, ssl_certfile=None, ssl_cafile=None, **kwargs)
 
     This is the default backend. Email will be sent through a SMTP server.
 
-    The value for each argument is retrieved from the matching setting if the
+    The value for most arguments is retrieved from the matching setting if the
     argument is ``None``:
 
     * ``host``: :setting:`EMAIL_HOST`
