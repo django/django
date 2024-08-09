@@ -2000,6 +2000,7 @@ class BaseDatabaseSchemaEditor:
         return result
 
     def _delete_primary_key(self, model, strict=False):
+        """Delete primary key on a column"""
         constraint_names = self._constraint_names(model, primary_key=True)
         if strict and len(constraint_names) != 1:
             raise ValueError(
@@ -2011,6 +2012,24 @@ class BaseDatabaseSchemaEditor:
             )
         for constraint_name in constraint_names:
             self.execute(self._delete_primary_key_sql(model, constraint_name))
+
+    def _delete_unique_key(self, model, column_name):
+        """Delete unique constraint on a column, if exists"""
+        constraint_names = self._constraint_names(
+            model, column_names=[column_name], unique=True
+        )
+
+        for constraint_name in constraint_names:
+            self.execute(self._delete_unique_sql(model, constraint_name))
+
+    def _delete_index(self, model, column_name):
+        """Delete index on a column, if exists"""
+        constraint_names = self._constraint_names(
+            model, column_names=[column_name], index=True
+        )
+
+        for constraint_name in constraint_names:
+            self.execute(self._delete_index_sql(model, constraint_name))
 
     def _create_primary_key_sql(self, model, field):
         return Statement(

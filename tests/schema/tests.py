@@ -86,6 +86,7 @@ from .models import (
     BookWithO2O,
     BookWithoutAuthor,
     BookWithSlug,
+    IndexKey,
     IntegerPK,
     Node,
     Note,
@@ -94,6 +95,7 @@ from .models import (
     TagM2MTest,
     TagUniqueRename,
     Thing,
+    UniqueKey,
     UniqueTest,
     new_apps,
 )
@@ -5647,6 +5649,48 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(Thing, new_field, old_field, strict=True)
         self.assertEqual(self.get_primary_key(Thing._meta.db_table), "when")
         self.assertIsNone(self.get_column_collation(Thing._meta.db_table, "when"))
+
+    @skipUnlessDBFeature("supports_collation_on_charfield")
+    def test_alter_unique_key_db_collation(self):
+        collation = connection.features.test_collations.get("non_default")
+        if not collation:
+            self.skipTest("Language collations are not supported.")
+
+        with connection.schema_editor() as editor:
+            editor.create_model(UniqueKey)
+
+        old_field = UniqueKey._meta.get_field("when")
+        new_field = CharField(max_length=1, db_collation=collation, unique=True)
+        new_field.set_attributes_from_name("when")
+        new_field.model = UniqueKey
+        with connection.schema_editor() as editor:
+            editor.alter_field(UniqueKey, old_field, new_field, strict=True)
+        self.assertTrue("when" in self.get_uniques(UniqueKey._meta.db_table))
+        self.assertEqual(
+            self.get_column_collation(UniqueKey._meta.db_table, "when"),
+            collation,
+        )
+
+    @skipUnlessDBFeature("supports_collation_on_charfield")
+    def test_alter_index_key_db_collation(self):
+        collation = connection.features.test_collations.get("non_default")
+        if not collation:
+            self.skipTest("Language collations are not supported.")
+
+        with connection.schema_editor() as editor:
+            editor.create_model(IndexKey)
+
+        old_field = IndexKey._meta.get_field("when")
+        new_field = CharField(max_length=1, db_collation=collation, db_index=True)
+        new_field.set_attributes_from_name("when")
+        new_field.model = IndexKey
+        with connection.schema_editor() as editor:
+            editor.alter_field(IndexKey, old_field, new_field, strict=True)
+        self.assertTrue("when" in self.get_indexes(IndexKey._meta.db_table))
+        self.assertEqual(
+            self.get_column_collation(IndexKey._meta.db_table, "when"),
+            collation,
+        )
 
     @skipUnlessDBFeature(
         "supports_collation_on_charfield", "supports_collation_on_textfield"
