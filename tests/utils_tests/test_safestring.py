@@ -121,3 +121,64 @@ class SafeStringTest(SimpleTestCase):
         msg = "object has no attribute 'dynamic_attr'"
         with self.assertRaisesMessage(AttributeError, msg):
             s.dynamic_attr = True
+
+    def test_add_str(self):
+        s = SafeString("a&b")
+        cases = [
+            ("test", "a&amp;btest"),
+            ("<p>unsafe</p>", "a&amp;b&lt;p&gt;unsafe&lt;/p&gt;"),
+            (SafeString("<p>safe</p>"), SafeString("a&b<p>safe</p>")),
+        ]
+        for case, expected in cases:
+            with self.subTest(case=case):
+                self.assertRenderEqual("{{ s }}", expected, s=s + case)
+
+    def test_add_obj(self):
+        """
+        SafeString objects allow other objects to override addition
+        """
+
+        class Add:
+            def __add__(self, other):
+                return "strange" + other
+
+        class AddSafe:
+            def __add__(self, other):
+                return mark_safe("strange") + other
+
+        class Radd:
+            def __radd__(self, other):
+                return other + "strange"
+
+        class RaddSafe:
+            def __radd__(self, other):
+                return other + mark_safe("strange")
+
+        cases = [
+            # Left-add test cases.
+            (Add(), "_result", "strange_result", str),
+            (Add(), mark_safe("_result"), "strange_result", str),
+            (AddSafe(), mark_safe("_result"), "strange_result", SafeString),
+            # Right-add test cases
+            ("hello_", Radd(), "hello_strange", str),
+            (mark_safe("hello_"), Radd(), "hello_strange", str),
+            (mark_safe("hello_"), RaddSafe(), "hello_strange", SafeString),
+        ]
+        for lhs, rhs, expected, expected_type in cases:
+            with self.subTest(
+                lhs=lhs, rhs=rhs, expected=expected, expected_type=expected_type
+            ):
+                result = lhs + rhs
+                self.assertEqual(result, expected)
+                self.assertEqual(type(result), expected_type)
+
+        cases = [
+            ("hello", Add()),
+            ("hello", AddSafe()),
+            (Radd(), "hello"),
+            (RaddSafe(), "hello"),
+        ]
+        for lhs, rhs in cases:
+            with self.subTest(lhs=lhs, rhs=rhs):
+                with self.assertRaises(TypeError):
+                    lhs + rhs

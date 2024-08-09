@@ -255,7 +255,9 @@ URLs
 Utilities
 ~~~~~~~~~
 
-* ...
+* :class:`~django.utils.safestring.SafeString` now supports adding objects
+  which specialize addition like :py:class:`str` does.
+
 
 Validators
 ~~~~~~~~~~
