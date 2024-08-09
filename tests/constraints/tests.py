@@ -412,15 +412,19 @@ class CheckConstraintTests(TestCase):
     def test_check_deprecation(self):
         msg = "CheckConstraint.check is deprecated in favor of `.condition`."
         condition = models.Q(foo="bar")
-        with self.assertWarnsRegex(RemovedInDjango60Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
             constraint = models.CheckConstraint(name="constraint", check=condition)
-        with self.assertWarnsRegex(RemovedInDjango60Warning, msg):
+        self.assertEqual(ctx.filename, __file__)
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
             self.assertIs(constraint.check, condition)
+        self.assertEqual(ctx.filename, __file__)
         other_condition = models.Q(something="else")
-        with self.assertWarnsRegex(RemovedInDjango60Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
             constraint.check = other_condition
-        with self.assertWarnsRegex(RemovedInDjango60Warning, msg):
+        self.assertEqual(ctx.filename, __file__)
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
             self.assertIs(constraint.check, other_condition)
+        self.assertEqual(ctx.filename, __file__)
 
     def test_database_default(self):
         models.CheckConstraint(

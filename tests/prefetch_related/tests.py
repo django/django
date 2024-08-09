@@ -2022,13 +2022,15 @@ class DeprecationTests(TestCase):
             "get_current_querysets() instead."
         )
         authors = Author.objects.all()
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
             self.assertEqual(
                 Prefetch("authors", authors).get_current_queryset(1),
                 authors,
             )
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+        self.assertEqual(ctx.filename, __file__)
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
             self.assertIsNone(Prefetch("authors").get_current_queryset(1))
+        self.assertEqual(ctx.filename, __file__)
 
     @ignore_warnings(category=RemovedInDjango60Warning)
     def test_prefetch_one_level_fallback(self):
