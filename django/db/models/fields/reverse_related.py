@@ -197,6 +197,7 @@ class ForeignObjectRel(FieldCacheMixin):
             "ForeignObjectRel.get_joining_columns() is deprecated. Use "
             "get_joining_fields() instead.",
             RemovedInDjango60Warning,
+            stacklevel=2,
         )
         return self.field.get_reverse_joining_columns()
 
