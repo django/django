@@ -206,9 +206,10 @@ class ModelInstanceCreationTests(TestCase):
     def test_save_deprecation(self):
         a = Article(headline="original", pub_date=datetime(2014, 5, 16))
         msg = "Passing positional arguments to save() is deprecated"
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
             a.save(False, False, None, None)
             self.assertEqual(Article.objects.count(), 1)
+        self.assertEqual(ctx.filename, __file__)
 
     def test_save_deprecation_positional_arguments_used(self):
         a = Article()
@@ -259,9 +260,10 @@ class ModelInstanceCreationTests(TestCase):
     async def test_asave_deprecation(self):
         a = Article(headline="original", pub_date=datetime(2014, 5, 16))
         msg = "Passing positional arguments to asave() is deprecated"
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
             await a.asave(False, False, None, None)
             self.assertEqual(await Article.objects.acount(), 1)
+        self.assertEqual(ctx.filename, __file__)
 
     async def test_asave_deprecation_positional_arguments_used(self):
         a = Article()

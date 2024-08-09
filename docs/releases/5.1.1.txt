@@ -19,3 +19,7 @@ Bugfixes
   children). A new :class:`~django.contrib.auth.forms.AdminUserCreationForm`
   including this field was added, isolating the feature to the admin where it
   was intended (:ticket:`35678`).
+
+* Adjusted the deprecation warning ``stacklevel`` in :meth:`.Model.save` and
+  :meth:`.Model.asave` to correctly point to the offending call site
+  (:ticket:`35060`).
