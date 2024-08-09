@@ -498,6 +498,7 @@ class StreamingHttpResponse(HttpResponseBase):
                 "StreamingHttpResponse must consume asynchronous iterators in order to "
                 "serve them synchronously. Use a synchronous iterator instead.",
                 Warning,
+                stacklevel=2,
             )
 
             # async iterator. Consume in async_to_sync and map back.
@@ -518,6 +519,7 @@ class StreamingHttpResponse(HttpResponseBase):
                 "StreamingHttpResponse must consume synchronous iterators in order to "
                 "serve them asynchronously. Use an asynchronous iterator instead.",
                 Warning,
+                stacklevel=2,
             )
             # sync iterator. Consume via sync_to_async and yield via async
             # generator.
