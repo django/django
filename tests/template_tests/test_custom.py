@@ -243,6 +243,278 @@ class SimpleTagTests(TagTestCase):
             )
 
 
+class SimpleBlockTagTests(TagTestCase):
+    def test_simple_block_tags(self):
+        c = Context({"value": 42})
+
+        templates = [
+            ("{% load custom %}{% div %}content{% enddiv %}", "<div>content</div>"),
+            (
+                "{% load custom %}{% oneparamblock 37 %}inner{% endoneparamblock %}",
+                "oneparamblock - Expected result: 37 with content inner",
+            ),
+            (
+                "{% load custom %}{% explicitnocontextblock 37 %}inner"
+                "{% endexplicitnocontextblock %}",
+                "explicitnocontextblock - Expected result: 37 with content inner",
+            ),
+            (
+                "{% load custom %}{% noparamswithcontextblock %}inner"
+                "{% endnoparamswithcontextblock %}",
+                "noparamswithcontextblock - Expected result (context value: 42) "
+                "(content value: inner)",
+            ),
+            (
+                "{% load custom %}{% paramsandcontextblock 37 %}inner"
+                "{% endparamsandcontextblock %}",
+                "paramsandcontextblock - Expected result (context value: 42) "
+                "(content value: inner): 37",
+            ),
+            (
+                "{% load custom %}{% simpletwoparamsblock 37 42 %}inner"
+                "{% endsimpletwoparamsblock %}",
+                "simpletwoparamsblock - Expected result (content value: inner): 37, 42",
+            ),
+            (
+                "{% load custom %}{% simplekeywordonlyparamblock kwarg=37 %}thirty "
+                "seven{% endsimplekeywordonlyparamblock %}",
+                "simplekeywordonlyparamblock - Expected result (content value: "
+                "thirty seven): 37",
+            ),
+            (
+                "{% load custom %}{% simplekeywordonlydefaultblock %}forty two"
+                "{% endsimplekeywordonlydefaultblock %}",
+                "simplekeywordonlydefaultblock - Expected result (content value: "
+                "forty two): 42",
+            ),
+            (
+                "{% load custom %}{% simplekeywordonlydefaultblock kwarg=37 %}thirty "
+                "seven{% endsimplekeywordonlydefaultblock %}",
+                "simplekeywordonlydefaultblock - Expected result (content value: "
+                "thirty seven): 37",
+            ),
+            (
+                "{% load custom %}{% simpleonedefaultblock 37 %}inner"
+                "{% endsimpleonedefaultblock %}",
+                "simpleonedefaultblock - Expected result (content value: inner): "
+                "37, hi",
+            ),
+            (
+                '{% load custom %}{% simpleonedefaultblock 37 two="hello" %}inner'
+                "{% endsimpleonedefaultblock %}",
+                "simpleonedefaultblock - Expected result (content value: inner): 37, "
+                "hello",
+            ),
+            (
+                '{% load custom %}{% simpleonedefaultblock one=99 two="hello" %}inner'
+                "{% endsimpleonedefaultblock %}",
+                "simpleonedefaultblock - Expected result (content value: inner): "
+                "99, hello",
+            ),
+            (
+                "{% load custom %}{% simpleonedefaultblock 37 42 %}inner"
+                "{% endsimpleonedefaultblock %}",
+                "simpleonedefaultblock - Expected result (content value: inner): "
+                "37, 42",
+            ),
+            (
+                "{% load custom %}{% simpleunlimitedargsblock 37 %}thirty seven"
+                "{% endsimpleunlimitedargsblock %}",
+                "simpleunlimitedargsblock - Expected result (content value: thirty "
+                "seven): 37, hi",
+            ),
+            (
+                "{% load custom %}{% simpleunlimitedargsblock 37 42 56 89 %}numbers"
+                "{% endsimpleunlimitedargsblock %}",
+                "simpleunlimitedargsblock - Expected result (content value: numbers): "
+                "37, 42, 56, 89",
+            ),
+            (
+                "{% load custom %}{% simpleonlyunlimitedargsblock %}inner"
+                "{% endsimpleonlyunlimitedargsblock %}",
+                "simpleonlyunlimitedargsblock - Expected result (content value: "
+                "inner): ",
+            ),
+            (
+                "{% load custom %}{% simpleonlyunlimitedargsblock 37 42 56 89 %}numbers"
+                "{% endsimpleonlyunlimitedargsblock %}",
+                "simpleonlyunlimitedargsblock - Expected result "
+                "(content value: numbers): 37, 42, 56, 89",
+            ),
+            (
+                "{% load custom %}"
+                '{% simpleunlimitedargskwargsblock 37 40|add:2 56 eggs="scrambled" '
+                "four=1|add:3 %}inner content{% endsimpleunlimitedargskwargsblock %}",
+                "simpleunlimitedargskwargsblock - Expected result (content value: "
+                "inner content): 37, 42, 56 / eggs=scrambled, four=4",
+            ),
+        ]
+
+        for entry in templates:
+            with self.subTest(entry[0]):
+                t = self.engine.from_string(entry[0])
+                self.assertEqual(t.render(c), entry[1])
+
+    def test_simple_block_tag_errors(self):
+        errors = [
+            (
+                "'simpleonedefaultblock' received unexpected keyword argument 'three'",
+                "{% load custom %}"
+                '{% simpleonedefaultblock 99 two="hello" three="foo" %}'
+                "{% endsimpleonedefaultblock %}",
+            ),
+            (
+                "'simpletwoparamsblock' received too many positional arguments",
+                "{% load custom %}{% simpletwoparamsblock 37 42 56 %}"
+                "{% endsimpletwoparamsblock %}",
+            ),
+            (
+                "'simpleonedefaultblock' received too many positional arguments",
+                "{% load custom %}{% simpleonedefaultblock 37 42 56 %}"
+                "{% endsimpleonedefaultblock %}",
+            ),
+            (
+                "'simplekeywordonlyparamblock' did not receive value(s) for the "
+                "argument(s): 'kwarg'",
+                "{% load custom %}{% simplekeywordonlyparamblock %}"
+                "{% endsimplekeywordonlyparamblock %}",
+            ),
+            (
+                "'simplekeywordonlyparamblock' received multiple values for "
+                "keyword argument 'kwarg'",
+                "{% load custom %}{% simplekeywordonlyparamblock kwarg=42 kwarg=37 %}"
+                "{% endsimplekeywordonlyparamblock %}",
+            ),
+            (
+                "'simplekeywordonlydefaultblock' received multiple values for "
+                "keyword argument 'kwarg'",
+                "{% load custom %}{% simplekeywordonlydefaultblock kwarg=42 "
+                "kwarg=37 %}{% endsimplekeywordonlydefaultblock %}",
+            ),
+            (
+                "'simpleunlimitedargskwargsblock' received some positional argument(s) "
+                "after some keyword argument(s)",
+                "{% load custom %}"
+                '{% simpleunlimitedargskwargsblock 37 40|add:2 eggs="scrambled" 56 '
+                "four=1|add:3 %}{% endsimpleunlimitedargskwargsblock %}",
+            ),
+            (
+                "'simpleunlimitedargskwargsblock' received multiple values for keyword "
+                "argument 'eggs'",
+                "{% load custom %}"
+                "{% simpleunlimitedargskwargsblock 37 "
+                'eggs="scrambled" eggs="scrambled" %}'
+                "{% endsimpleunlimitedargskwargsblock %}",
+            ),
+            (
+                "Unclosed tag on line 1: 'div'. Looking for one of: enddiv.",
+                "{% load custom %}{% div %}Some content",
+            ),
+            (
+                "Unclosed tag on line 1: 'simpleonedefaultblock'. Looking for one of: "
+                "endsimpleonedefaultblock.",
+                "{% load custom %}{% simpleonedefaultblock %}Some content",
+            ),
+        ]
+
+        for entry in errors:
+            with self.subTest(entry[1]):
+                with self.assertRaisesMessage(TemplateSyntaxError, entry[0]):
+                    self.engine.from_string(entry[1])
+
+    def test_simple_block_tag_escaping_autoescape_off(self):
+        c = Context({"name": "Jack & Jill"}, autoescape=False)
+        t = self.engine.from_string(
+            "{% load custom %}{% escapenaiveblock %}{{ name }} again"
+            "{% endescapenaiveblock %}"
+        )
+        self.assertEqual(t.render(c), "Hello Jack & Jill: Jack & Jill again!")
+
+    def test_simple_block_tag_naive_escaping(self):
+        c = Context({"name": "Jack & Jill"})
+        t = self.engine.from_string(
+            "{% load custom %}{% escapenaiveblock %}{{ name }} again"
+            "{% endescapenaiveblock %}"
+        )
+        self.assertEqual(
+            t.render(c), "Hello Jack &amp; Jill: Jack &amp;amp; Jill again!"
+        )
+
+    def test_simple_block_tag_explicit_escaping(self):
+        # Check we don't double escape
+        c = Context({"name": "Jack & Jill"})
+        t = self.engine.from_string(
+            "{% load custom %}{% escapeexplicitblock %}again"
+            "{% endescapeexplicitblock %}"
+        )
+        self.assertEqual(t.render(c), "Hello Jack &amp; Jill: again!")
+
+    def test_simple_block_tag_format_html_escaping(self):
+        # Check we don't double escape
+        c = Context({"name": "Jack & Jill"})
+        t = self.engine.from_string(
+            "{% load custom %}{% escapeformathtmlblock %}again"
+            "{% endescapeformathtmlblock %}"
+        )
+        self.assertEqual(t.render(c), "Hello Jack &amp; Jill: again!")
+
+    def test_simple_block_tag_missing_context(self):
+        # The 'context' parameter must be present when takes_context is True
+        msg = (
+            "'simpletagwithoutcontextparameter' is decorated with "
+            "takes_context=True so it must have a first argument of 'context'"
+        )
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.from_string(
+                "{% load custom %}{% simpletagwithoutcontextparameter 123 %}"
+                "{% endsimpletagwithoutcontextparameter %}"
+            )
+
+    def test_simple_block_tag_missing_context_no_params(self):
+        msg = (
+            "'simpletagtakescontextwithoutparamsblock' is decorated with "
+            "takes_context=True so it must have a first argument of 'context'"
+        )
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.from_string(
+                "{% load custom %}{% simpletagtakescontextwithoutparamsblock %}"
+                "{% endsimpletagtakescontextwithoutparamsblock %}"
+            )
+
+    def test_simple_block_tag_missing_content(self):
+        # The 'content' parameter must be present when takes_context is True
+        msg = "'simpleblocktagwithoutcontent' must have a first argument of 'content'"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.from_string(
+                "{% load custom %}{% simpleblocktagwithoutcontent %}"
+                "{% endsimpleblocktagwithoutcontent %}"
+            )
+
+    def test_simple_block_tag_with_context_missing_content(self):
+        # The 'content' parameter must be present when takes_context is True
+        msg = "'simpleblocktagwithcontextwithoutcontent' is decorated with "
+        "takes_context=True so it must have a first argument of 'context' and a "
+        "second argument of 'content'"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.from_string(
+                "{% load custom %}{% simpleblocktagwithcontextwithoutcontent %}"
+                "{% endsimpleblocktagwithcontextwithoutcontent %}"
+            )
+
+    def test_simple_block_gets_context(self):
+        c = Context({"name": "Jack & Jill"})
+        t = self.engine.from_string("{% load custom %}{% div %}{{ name }}{% enddiv %}")
+        self.assertEqual(t.render(c), "<div>Jack &amp; Jill</div>")
+
+    def test_simple_block_capture_as(self):
+        c = Context({"name": "Jack & Jill"})
+        t = self.engine.from_string(
+            "{% load custom %}{% div as div_content %}{{ name }}{% enddiv %}"
+            "My div is: {{ div_content }}"
+        )
+        self.assertEqual(t.render(c), "My div is: <div>Jack &amp; Jill</div>")
+
+
 class InclusionTagTests(TagTestCase):
     def test_inclusion_tags(self):
         c = Context({"value": 42})

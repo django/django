@@ -20,6 +20,11 @@ def make_data_div(value):
     return '<div data-name="%s"></div>' % value
 
 
+@register.simple_block_tag
+def div(content):
+    return format_html("<div>{}</div>", content)
+
+
 @register.filter
 def noop(value, param=None):
     """A noop filter that always return its first argument and does nothing with
@@ -51,6 +56,12 @@ def one_param(arg):
 one_param.anything = "Expected one_param __dict__"
 
 
+@register.simple_block_tag
+def oneparamblock(content, arg):
+    """Expected oneparam __doc__"""
+    return f"oneparamblock - Expected result: {arg} with content {content}"
+
+
 @register.simple_tag(takes_context=False)
 def explicit_no_context(arg):
     """Expected explicit_no_context __doc__"""
@@ -58,6 +69,12 @@ def explicit_no_context(arg):
 
 
 explicit_no_context.anything = "Expected explicit_no_context __dict__"
+
+
+@register.simple_block_tag(takes_context=False)
+def explicitnocontextblock(content, arg):
+    """Expected explicitnocontextblock __doc__"""
+    return f"explicitnocontextblock - Expected result: {arg} with content {content}"
 
 
 @register.simple_tag(takes_context=True)
@@ -72,6 +89,15 @@ def no_params_with_context(context):
 no_params_with_context.anything = "Expected no_params_with_context __dict__"
 
 
+@register.simple_block_tag(takes_context=True)
+def noparamswithcontextblock(context, content):
+    """Expected noparamswithcontextblock __doc__"""
+    return (
+        "noparamswithcontextblock - Expected result (context value: %s) "
+        "(content value: %s)" % (context["value"], content)
+    )
+
+
 @register.simple_tag(takes_context=True)
 def params_and_context(context, arg):
     """Expected params_and_context __doc__"""
@@ -84,6 +110,20 @@ def params_and_context(context, arg):
 params_and_context.anything = "Expected params_and_context __dict__"
 
 
+@register.simple_block_tag(takes_context=True)
+def paramsandcontextblock(context, content, arg):
+    """Expected paramsandcontextblock __doc__"""
+    return (
+        "paramsandcontextblock - Expected result (context value: %s) "
+        "(content value: %s): %s"
+        % (
+            context["value"],
+            content,
+            arg,
+        )
+    )
+
+
 @register.simple_tag
 def simple_two_params(one, two):
     """Expected simple_two_params __doc__"""
@@ -93,14 +133,40 @@ def simple_two_params(one, two):
 simple_two_params.anything = "Expected simple_two_params __dict__"
 
 
+@register.simple_block_tag
+def simpletwoparamsblock(content, one, two):
+    """Expected simpletwoparamsblock __doc__"""
+    return "simpletwoparamsblock - Expected result (content value: %s): %s, %s" % (
+        content,
+        one,
+        two,
+    )
+
+
 @register.simple_tag
 def simple_keyword_only_param(*, kwarg):
     return "simple_keyword_only_param - Expected result: %s" % kwarg
 
 
+@register.simple_block_tag
+def simplekeywordonlyparamblock(content, *, kwarg):
+    return "simplekeywordonlyparamblock - Expected result (content value: %s): %s" % (
+        content,
+        kwarg,
+    )
+
+
 @register.simple_tag
 def simple_keyword_only_default(*, kwarg=42):
     return "simple_keyword_only_default - Expected result: %s" % kwarg
+
+
+@register.simple_block_tag
+def simplekeywordonlydefaultblock(content, *, kwarg=42):
+    return "simplekeywordonlydefaultblock - Expected result (content value: %s): %s" % (
+        content,
+        kwarg,
+    )
 
 
 @register.simple_tag
@@ -110,6 +176,16 @@ def simple_one_default(one, two="hi"):
 
 
 simple_one_default.anything = "Expected simple_one_default __dict__"
+
+
+@register.simple_block_tag
+def simpleonedefaultblock(content, one, two="hi"):
+    """Expected simpleonedefaultblock __doc__"""
+    return "simpleonedefaultblock - Expected result (content value: %s): %s, %s" % (
+        content,
+        one,
+        two,
+    )
 
 
 @register.simple_tag
@@ -123,6 +199,15 @@ def simple_unlimited_args(one, two="hi", *args):
 simple_unlimited_args.anything = "Expected simple_unlimited_args __dict__"
 
 
+@register.simple_block_tag
+def simpleunlimitedargsblock(content, one, two="hi", *args):
+    """Expected simpleunlimitedargsblock __doc__"""
+    return "simpleunlimitedargsblock - Expected result (content value: %s): %s" % (
+        content,
+        ", ".join(str(arg) for arg in [one, two, *args]),
+    )
+
+
 @register.simple_tag
 def simple_only_unlimited_args(*args):
     """Expected simple_only_unlimited_args __doc__"""
@@ -132,6 +217,15 @@ def simple_only_unlimited_args(*args):
 
 
 simple_only_unlimited_args.anything = "Expected simple_only_unlimited_args __dict__"
+
+
+@register.simple_block_tag
+def simpleonlyunlimitedargsblock(content, *args):
+    """Expected simpleonlyunlimitedargsblock __doc__"""
+    return "simpleonlyunlimitedargsblock - Expected result (content value: %s): %s" % (
+        content,
+        ", ".join(str(arg) for arg in args),
+    )
 
 
 @register.simple_tag
@@ -146,6 +240,25 @@ def simple_unlimited_args_kwargs(one, two="hi", *args, **kwargs):
 simple_unlimited_args_kwargs.anything = "Expected simple_unlimited_args_kwargs __dict__"
 
 
+@register.simple_block_tag
+def simpleunlimitedargskwargsblock(content, one, two="hi", *args, **kwargs):
+    """Expected simpleunlimitedargskwargsblock __doc__"""
+    return (
+        "simpleunlimitedargskwargsblock - Expected result (content value: %s): %s / %s"
+        % (
+            content,
+            ", ".join(str(arg) for arg in [one, two, *args]),
+            ", ".join("%s=%s" % (k, v) for (k, v) in kwargs.items()),
+        )
+    )
+
+
+@register.simple_block_tag(takes_context=True)
+def simpletagwithoutcontextparameter(arg):
+    """Expected simpletagwithoutcontextparameter __doc__"""
+    return "Expected result"
+
+
 @register.simple_tag(takes_context=True)
 def simple_tag_without_context_parameter(arg):
     """Expected simple_tag_without_context_parameter __doc__"""
@@ -155,6 +268,12 @@ def simple_tag_without_context_parameter(arg):
 simple_tag_without_context_parameter.anything = (
     "Expected simple_tag_without_context_parameter __dict__"
 )
+
+
+@register.simple_tag(takes_context=True)
+def simpletagtakescontextwithoutparamsblock():
+    """Expected simpletagtakescontextwithoutparamsblock __doc__"""
+    return "Expected result"
 
 
 @register.simple_tag(takes_context=True)
@@ -168,10 +287,26 @@ simple_tag_takes_context_without_params.anything = (
 )
 
 
+@register.simple_block_tag
+def simpleblocktagwithoutcontent():
+    return "Expected result"
+
+
+@register.simple_block_tag(takes_context=True)
+def simpleblocktagwithcontextwithoutcontent():
+    return "Expected result"
+
+
 @register.simple_tag(takes_context=True)
 def escape_naive(context):
     """A tag that doesn't even think about escaping issues"""
     return "Hello {}!".format(context["name"])
+
+
+@register.simple_block_tag(takes_context=True)
+def escapenaiveblock(context, content):
+    """A tag that doesn't even think about escaping issues"""
+    return "Hello {}: {}!".format(context["name"], content)
 
 
 @register.simple_tag(takes_context=True)
@@ -180,10 +315,22 @@ def escape_explicit(context):
     return escape("Hello {}!".format(context["name"]))
 
 
+@register.simple_block_tag(takes_context=True)
+def escapeexplicitblock(context, content):
+    """A tag that uses escape explicitly"""
+    return escape("Hello {}: {}!".format(context["name"], content))
+
+
 @register.simple_tag(takes_context=True)
 def escape_format_html(context):
     """A tag that uses format_html"""
     return format_html("Hello {0}!", context["name"])
+
+
+@register.simple_block_tag(takes_context=True)
+def escapeformathtmlblock(context, content):
+    """A tag that uses format_html"""
+    return format_html("Hello {0}: {1}!", context["name"], content)
 
 
 @register.simple_tag(takes_context=True)

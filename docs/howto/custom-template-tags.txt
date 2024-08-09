@@ -498,6 +498,127 @@ you see fit:
     {% current_time "%Y-%m-%d %I:%M %p" as the_time %}
     <p>The time is {{ the_time }}.</p>
 
+.. _howto-custom-template-tags-simple-block-tags:
+
+Simple block tags
+-----------------
+
+.. method:: django.template.Library.simple_block_tag()
+
+Passing arguments may not be enough for some usages -- you may need to pass chunks of
+rendered template into your custom tags. This can be achieved using the
+``simple_block_tag`` helper function of ``django.template.Library``.
+``simple_block_tag`` functions similar to :meth:`~django.template.Library.simple_tag()`,
+however additionally passes a ``content`` argument which contains its rendered template
+content.
+
+For example, a custom block tag which created a chart could look like this::
+
+    from django import template
+    from myapp.charts import render_chart
+
+    register = template.Library()
+
+
+    @register.simple_block_tag
+    def chart(content):
+        return render_chart(source=content)
+
+The ``content`` argument contains everything in between the ``{% chart %}`` and
+``{% endchart %}`` tags. If there are other template tags or variables, they will be
+rendered before being passed in.
+
+.. code-block:: html+django
+
+    {% chart %}
+        digraph G {
+            label = "Chart for {{ request.user }}"
+            A -> {B C}
+        }
+    {% endchart %}
+
+A few things to note about the ``simple_block_tag`` helper function:
+
+* The first argument must be called ``content``, and will contain the contents of the
+  template tag as a rendered string.
+* Checking for the required number of arguments, etc., has already been
+  done by the time our function is called, so we don't need to do that.
+* The quotes around the argument (if any) have already been stripped away,
+  so we receive a plain string.
+* If the argument was a template variable, our function is passed the
+  current value of the variable, not the variable itself.
+* Variables passed to the tag are not included in the rendering context of the content,
+  as would be using the ``{% with %}`` tag.
+
+Like ``simple_tag``, ``simple_block_tag`` passes its output through
+:func:`~django.utils.html.conditional_escape` if the template context is in
+autoescape mode, to ensure correct HTML and protect you from XSS
+vulnerabilities.
+
+If additional escaping is not desired, you will need to use
+:func:`~django.utils.safestring.mark_safe` if you are absolutely sure that your
+code does not contain XSS vulnerabilities. For building small HTML snippets,
+use of :func:`~django.utils.html.format_html` instead of ``mark_safe()`` is
+strongly recommended.
+
+Because the ``content`` argument has already been rendered by Django, it is already
+escaped. Therefore, it may be necessary to use
+:func:`~django.utils.safestring.mark_safe` to ensure it's not double-escaped.
+
+If your template tag needs to access the current context, you can use the
+``takes_context`` argument when registering your tag::
+
+    @register.simple_block_tag(takes_context=True)
+    def chart(context, content):
+        return render_chart(source=content, dark_mode=context["dark_mode"])
+
+Note that the first argument *must* be called ``context``, and ``content`` moves to the
+second argument.
+
+For more information on how the ``takes_context`` option works, see the section
+on :ref:`inclusion tags<howto-custom-template-tags-inclusion-tags>`.
+
+If you need to rename your tag, you can provide a custom name for it::
+
+    register.simple_block_tag(lambda content: content.upper(), name="uppercase")
+
+
+    @register.simple_block_tag(name="lowercase")
+    def some_function(content):
+        return content.lower()
+
+``simple_block_tag`` functions may accept any number of positional or keyword
+arguments. For example::
+
+    @register.simple_block_tag
+    def mytag(content, a, b, *args, **kwargs):
+        profile = kwargs["profile"]
+        ...
+        return ...
+
+Then in the template any number of arguments, separated by spaces, may be
+passed to the template tag. Like in Python, the values for keyword arguments
+are set using the equal sign ("``=``") and must be provided after the
+positional arguments. For example:
+
+.. code-block:: html+django
+
+    {% mytag 123 "abcd" book.title profile=user.profile %}
+        This is some extra content.
+    {% endmytag%}
+
+It's possible to store the tag results in a template variable rather than
+directly outputting it. This is done by using the ``as`` argument followed by
+the variable name. Doing so enables you to output the content yourself where
+you see fit:
+
+.. code-block:: html+django
+
+    {% chart as my_chart %}
+        A -> {B C}
+    {% endchart %}
+    <p>The chart is {{ the_time|length }} characters.</p>
+
 .. _howto-custom-template-tags-inclusion-tags:
 
 Inclusion tags
