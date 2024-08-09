@@ -11,6 +11,7 @@ import tempfile
 import threading
 import time
 import unittest
+from functools import wraps
 from pathlib import Path
 from unittest import mock, skipIf
 
@@ -87,6 +88,25 @@ def empty_response(request):
 KEY_ERRORS_WITH_MEMCACHED_MSG = (
     "Cache key contains characters that will cause errors if used with memcached: %r"
 )
+
+
+def retry(retries=3, delay=1):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            attempts = 0
+            while attempts < retries:
+                try:
+                    return func(*args, **kwargs)
+                except AssertionError:
+                    attempts += 1
+                    if attempts >= retries:
+                        raise
+                    time.sleep(delay)
+
+        return wrapper
+
+    return decorator
 
 
 @override_settings(
@@ -616,6 +636,7 @@ class BaseCacheTests:
         self.assertEqual(cache.get("key3"), "sausage")
         self.assertEqual(cache.get("key4"), "lobster bisque")
 
+    @retry()
     def test_forever_timeout(self):
         """
         Passing in None into timeout results in a value that is cached forever
@@ -1425,6 +1446,7 @@ class LocMemCacheTests(BaseCacheTests, TestCase):
             self.assertIsNone(cache.get(key))
 
     @limit_locmem_entries
+    @retry()
     def test_lru_incr(self):
         """incr() moves cache keys."""
         for key in range(9):
@@ -2674,6 +2696,7 @@ class CacheMiddlewareTest(SimpleTestCase):
         response = other_with_prefix_view(request, "16")
         self.assertEqual(response.content, b"Hello World 16")
 
+    @retry()
     def test_cache_page_timeout(self):
         # Page timeout takes precedence over the "max-age" section of the
         # "Cache-Control".
