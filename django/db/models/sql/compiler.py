@@ -1554,8 +1554,8 @@ class SQLCompiler:
         for row in map(list, rows):
             for i, expression in enumerate(expressions):
                 if isinstance(expression, ColPairs):
-                    position = slice(i, i + len(expression))
-                    row[position] = (tuple(row[position]),)
+                    pos = slice(i, i + len(expression))
+                    row[pos] = (tuple(row[pos]),)
 
             yield row
 
