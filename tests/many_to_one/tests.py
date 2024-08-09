@@ -894,8 +894,9 @@ class ManyToOneTests(TestCase):
             "get_prefetch_queryset() is deprecated. Use get_prefetch_querysets() "
             "instead."
         )
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
             City.country.get_prefetch_queryset(cities)
+        self.assertEqual(ctx.filename, __file__)
 
     def test_get_prefetch_queryset_reverse_warning(self):
         usa = Country.objects.create(name="United States")
@@ -905,8 +906,9 @@ class ManyToOneTests(TestCase):
             "get_prefetch_queryset() is deprecated. Use get_prefetch_querysets() "
             "instead."
         )
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
             usa.cities.get_prefetch_queryset(countries)
+        self.assertEqual(ctx.filename, __file__)
 
     def test_get_prefetch_querysets_invalid_querysets_length(self):
         City.objects.create(name="Chicago")

@@ -583,8 +583,9 @@ class ManyToManyTests(TestCase):
             "get_prefetch_queryset() is deprecated. Use get_prefetch_querysets() "
             "instead."
         )
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
             self.a1.publications.get_prefetch_queryset(articles)
+        self.assertEqual(ctx.filename, __file__)
 
     def test_get_prefetch_querysets_invalid_querysets_length(self):
         articles = Article.objects.all()
