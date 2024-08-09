@@ -48,6 +48,7 @@ class FileSystemStorage(Storage, StorageSettingsMixin):
                 "Overriding OS_OPEN_FLAGS is deprecated. Use "
                 "the allow_overwrite parameter instead.",
                 RemovedInDjango60Warning,
+                stacklevel=2,
             )
 
     @cached_property

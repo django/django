@@ -11,5 +11,6 @@ class TestIterCompat(SimpleTestCase):
             "django.utils.itercompat.is_iterable() is deprecated. "
             "Use isinstance(..., collections.abc.Iterable) instead."
         )
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
             is_iterable([])
+        self.assertEqual(ctx.filename, __file__)

@@ -207,16 +207,18 @@ class GeoLite2Test(SimpleTestCase):
     def test_coords_deprecation_warning(self):
         g = GeoIP2()
         msg = "GeoIP2.coords() is deprecated. Use GeoIP2.lon_lat() instead."
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
             e1, e2 = g.coords(self.ipv4_str)
         self.assertIsInstance(e1, float)
         self.assertIsInstance(e2, float)
+        self.assertEqual(ctx.filename, __file__)
 
     def test_open_deprecation_warning(self):
         msg = "GeoIP2.open() is deprecated. Use GeoIP2() instead."
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
             g = GeoIP2.open(settings.GEOIP_PATH, GeoIP2.MODE_AUTO)
         self.assertTrue(g._reader)
+        self.assertEqual(ctx.filename, __file__)
 
 
 @skipUnless(HAS_GEOIP2, "GeoIP2 is required.")

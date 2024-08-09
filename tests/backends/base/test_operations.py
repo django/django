@@ -239,8 +239,9 @@ class DeprecationTests(TestCase):
             "DatabaseOperations.field_cast_sql() is deprecated use "
             "DatabaseOperations.lookup_cast() instead."
         )
-        with self.assertRaisesMessage(RemovedInDjango60Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
             base_ops.field_cast_sql("integer", "IntegerField")
+        self.assertEqual(ctx.filename, __file__)
 
     def test_field_cast_sql_usage_warning(self):
         compiler = Author.objects.all().query.get_compiler(connection.alias)

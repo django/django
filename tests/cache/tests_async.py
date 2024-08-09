@@ -38,8 +38,9 @@ class AsyncDummyCacheTests(SimpleTestCase):
 
     async def test_aget_many_invalid_key(self):
         msg = KEY_ERRORS_WITH_MEMCACHED_MSG % ":1:key with spaces"
-        with self.assertWarnsMessage(CacheKeyWarning, msg):
+        with self.assertWarnsMessage(CacheKeyWarning, msg) as ctx:
             await cache.aget_many(["key with spaces"])
+        self.assertEqual(ctx.filename, __file__)
 
     async def test_adelete(self):
         """
@@ -138,8 +139,9 @@ class AsyncDummyCacheTests(SimpleTestCase):
 
     async def test_aset_many_invalid_key(self):
         msg = KEY_ERRORS_WITH_MEMCACHED_MSG % ":1:key with spaces"
-        with self.assertWarnsMessage(CacheKeyWarning, msg):
+        with self.assertWarnsMessage(CacheKeyWarning, msg) as ctx:
             await cache.aset_many({"key with spaces": "foo"})
+        self.assertEqual(ctx.filename, __file__)
 
     async def test_adelete_many(self):
         """adelete_many() does nothing for the dummy cache backend."""
@@ -147,8 +149,9 @@ class AsyncDummyCacheTests(SimpleTestCase):
 
     async def test_adelete_many_invalid_key(self):
         msg = KEY_ERRORS_WITH_MEMCACHED_MSG % ":1:key with spaces"
-        with self.assertWarnsMessage(CacheKeyWarning, msg):
+        with self.assertWarnsMessage(CacheKeyWarning, msg) as ctx:
             await cache.adelete_many({"key with spaces": "foo"})
+        self.assertEqual(ctx.filename, __file__)
 
     async def test_aclear(self):
         """aclear() does nothing for the dummy cache backend."""

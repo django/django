@@ -98,8 +98,9 @@ class GetPrefetchQuerySetDeprecation(TestCase):
             "get_prefetch_queryset() is deprecated. Use get_prefetch_querysets() "
             "instead."
         )
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
             questions[0].answer_set.get_prefetch_queryset(questions)
+        self.assertEqual(ctx.filename, __file__)
 
     def test_generic_foreign_key_warning(self):
         answers = Answer.objects.all()
@@ -107,8 +108,9 @@ class GetPrefetchQuerySetDeprecation(TestCase):
             "get_prefetch_queryset() is deprecated. Use get_prefetch_querysets() "
             "instead."
         )
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
             Answer.question.get_prefetch_queryset(answers)
+        self.assertEqual(ctx.filename, __file__)
 
 
 class GetPrefetchQuerySetsTests(TestCase):

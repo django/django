@@ -972,6 +972,7 @@ class DeprecationTests(SimpleTestCase):
     def test_coord_setter_deprecation(self):
         geom = OGRGeometry("POINT (1 2)")
         msg = "coord_dim setter is deprecated. Use set_3d() instead."
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
             geom.coord_dim = 3
         self.assertEqual(geom.coord_dim, 3)
+        self.assertEqual(ctx.filename, __file__)
