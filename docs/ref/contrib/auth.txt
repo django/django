@@ -54,7 +54,8 @@ Fields
 
         Required. A hash of, and metadata about, the password. (Django doesn't
         store the raw password.) Raw passwords can be arbitrarily long and can
-        contain any character. See the :doc:`password documentation
+        contain any character. The metadata contained in this field may mark a
+        password as unusable. See the :doc:`password documentation
         </topics/auth/passwords>`.
 
     .. attribute:: groups
@@ -175,8 +176,9 @@ Methods
 
     .. method:: set_unusable_password()
 
-        Marks the user as having no password set.  This isn't the same as
-        having a blank string for a password.
+        Marks the user as having no password set, by modifying the metadata
+        contained in the :attr:`~django.contrib.auth.models.User.password`
+        field. This isn't the same as having a blank string for a password.
         :meth:`~django.contrib.auth.models.User.check_password()` for this user
         will never return ``True``. Doesn't save the
         :class:`~django.contrib.auth.models.User` object.
