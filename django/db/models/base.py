@@ -788,7 +788,7 @@ class Model(AltersData, metaclass=ModelBase):
         warnings.warn(
             f"Passing positional arguments to {method_name}() is deprecated",
             RemovedInDjango60Warning,
-            stacklevel=2,
+            stacklevel=3,
         )
         total_len_args = len(args) + 1  # include self
         max_len_args = len(defaults) + 1
