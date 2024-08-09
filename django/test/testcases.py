@@ -3,9 +3,11 @@ import json
 import logging
 import pickle
 import posixpath
+import sqlite3
 import sys
 import threading
 import unittest
+import urllib
 from collections import Counter
 from contextlib import contextmanager
 from copy import copy, deepcopy
@@ -1106,6 +1108,8 @@ class TransactionTestCase(SimpleTestCase):
     # This can be slow; this flag allows enabling on a per-case basis.
     serialized_rollback = False
 
+    do_clone = False
+
     def _pre_setup(self):
         """
         Perform pre-test setup:
@@ -1115,33 +1119,72 @@ class TransactionTestCase(SimpleTestCase):
         * If the class has a 'fixtures' attribute, install those fixtures.
         """
         super()._pre_setup()
-        if self.available_apps is not None:
-            apps.set_available_apps(self.available_apps)
-            setting_changed.send(
-                sender=settings._wrapped.__class__,
-                setting="INSTALLED_APPS",
-                value=self.available_apps,
-                enter=True,
-            )
-            for db_name in self._databases_names(include_mirrors=False):
-                emit_post_migrate_signal(verbosity=0, interactive=False, db=db_name)
-        try:
-            self._fixture_setup()
-        except Exception:
+
+        if self.do_clone:
+            self.clone_db()
+        else:
             if self.available_apps is not None:
-                apps.unset_available_apps()
+                apps.set_available_apps(self.available_apps)
                 setting_changed.send(
                     sender=settings._wrapped.__class__,
                     setting="INSTALLED_APPS",
-                    value=settings.INSTALLED_APPS,
-                    enter=False,
+                    value=self.available_apps,
+                    enter=True,
                 )
-            raise
-        # Clear the queries_log so that it's less likely to overflow (a single
-        # test probably won't execute 9K queries). If queries_log overflows,
-        # then assertNumQueries() doesn't work.
+                for db_name in self._databases_names(include_mirrors=False):
+                    emit_post_migrate_signal(verbosity=0, interactive=False, db=db_name)
+            try:
+                self._fixture_setup()
+            except Exception:
+                if self.available_apps is not None:
+                    apps.unset_available_apps()
+                    setting_changed.send(
+                        sender=settings._wrapped.__class__,
+                        setting="INSTALLED_APPS",
+                        value=settings.INSTALLED_APPS,
+                        enter=False,
+                    )
+                raise
+            # Clear the queries_log so that it's less likely to overflow (a single
+            # test probably won't execute 9K queries). If queries_log overflows,
+            # then assertNumQueries() doesn't work.
         for db_name in self._databases_names(include_mirrors=False):
             connections[db_name].queries_log.clear()
+
+    def clone_db(self):
+        for db_name in self._databases_names(include_mirrors=False):
+            conn = connections[db_name]
+            self.test_database_name = conn.settings_dict["NAME"]
+
+            # SQLite in-memory requires manual cloning
+            if conn.vendor == "sqlite" and conn.is_in_memory_db():
+                components = urllib.parse.urlparse(self.test_database_name)
+                sandbox_uri = urllib.parse.urlunparse(
+                    components._replace(path=f"{components.path}_sandbox")
+                )
+                source = sqlite3.connect(self.test_database_name, uri=True)
+                target = sqlite3.connect(sandbox_uri, uri=True)
+                source.backup(target)
+                source.close()
+                conn.settings_dict["NAME"] = sandbox_uri
+                conn.close()
+                conn.connect()  # reconnect before closing so we don't lose the db
+                target.close()
+
+            else:
+                conn.creation.clone_test_db(suffix="sandbox")
+                conn.settings_dict = conn.creation.get_test_db_clone_settings(
+                    suffix="sandbox"
+                )
+                conn.close()  # required for MySQL
+
+            if self.fixtures:
+                call_command(
+                    "loaddata",
+                    *self.fixtures,
+                    verbosity=0,
+                    database=db_name,
+                )
 
     @classmethod
     def _databases_names(cls, include_mirrors=True):
@@ -1169,25 +1212,28 @@ class TransactionTestCase(SimpleTestCase):
                             cursor.execute(sql)
 
     def _fixture_setup(self):
-        for db_name in self._databases_names(include_mirrors=False):
-            # Reset sequences
-            if self.reset_sequences:
-                self._reset_sequences(db_name)
+        if not self.do_clone:
+            for db_name in self._databases_names(include_mirrors=False):
+                # Reset sequences
+                if self.reset_sequences:
+                    self._reset_sequences(db_name)
 
-            # Provide replica initial data from migrated apps, if needed.
-            if self.serialized_rollback and hasattr(
-                connections[db_name], "_test_serialized_contents"
-            ):
-                if self.available_apps is not None:
-                    apps.unset_available_apps()
-                connections[db_name].creation.deserialize_db_from_string(
-                    connections[db_name]._test_serialized_contents
-                )
-                if self.available_apps is not None:
-                    apps.set_available_apps(self.available_apps)
+                # Provide replica initial data from migrated apps, if needed.
+                if self.serialized_rollback and hasattr(
+                    connections[db_name], "_test_serialized_contents"
+                ):
+                    if self.available_apps is not None:
+                        apps.unset_available_apps()
+                    connections[db_name].creation.deserialize_db_from_string(
+                        connections[db_name]._test_serialized_contents
+                    )
+                    if self.available_apps is not None:
+                        apps.set_available_apps(self.available_apps)
 
-            if self.fixtures:
-                call_command("loaddata", *self.fixtures, verbosity=0, database=db_name)
+                if self.fixtures:
+                    call_command(
+                        "loaddata", *self.fixtures, verbosity=0, database=db_name
+                    )
 
     def _should_reload_connections(self):
         return True
@@ -1199,27 +1245,34 @@ class TransactionTestCase(SimpleTestCase):
           class has an 'available_apps' attribute, don't fire post_migrate.
         * Force-close the connection so the next test gets a clean cursor.
         """
-        try:
-            self._fixture_teardown()
+        if self.do_clone:
             super()._post_teardown()
-            if self._should_reload_connections():
-                # Some DB cursors include SQL statements as part of cursor
-                # creation. If you have a test that does a rollback, the effect
-                # of these statements is lost, which can affect the operation of
-                # tests (e.g., losing a timezone setting causing objects to be
-                # created with the wrong time). To make sure this doesn't
-                # happen, get a clean connection at the start of every test.
-                for conn in connections.all(initialized_only=True):
-                    conn.close()
-        finally:
-            if self.available_apps is not None:
-                apps.unset_available_apps()
-                setting_changed.send(
-                    sender=settings._wrapped.__class__,
-                    setting="INSTALLED_APPS",
-                    value=settings.INSTALLED_APPS,
-                    enter=False,
-                )
+            for db_name in self._databases_names(include_mirrors=False):
+                conn = connections[db_name]
+                conn.creation.destroy_test_db(old_database_name=self.test_database_name)
+                conn.close()
+        else:
+            try:
+                self._fixture_teardown()
+                super()._post_teardown()
+                if self._should_reload_connections():
+                    # Some DB cursors include SQL statements as part of cursor
+                    # creation. If you have a test that does a rollback, the effect
+                    # of these statements is lost, which can affect the operation of
+                    # tests (e.g., losing a timezone setting causing objects to be
+                    # created with the wrong time). To make sure this doesn't
+                    # happen, get a clean connection at the start of every test.
+                    for conn in connections.all(initialized_only=True):
+                        conn.close()
+            finally:
+                if self.available_apps is not None:
+                    apps.unset_available_apps()
+                    setting_changed.send(
+                        sender=settings._wrapped.__class__,
+                        setting="INSTALLED_APPS",
+                        value=settings.INSTALLED_APPS,
+                        enter=False,
+                    )
 
     def _fixture_teardown(self):
         # Allow TRUNCATE ... CASCADE and don't emit the post_migrate signal
