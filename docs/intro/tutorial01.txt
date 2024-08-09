@@ -64,7 +64,7 @@ work, see :ref:`troubleshooting-django-admin`.
     ``django`` (which will conflict with Django itself) or ``test`` (which
     conflicts with a built-in Python package).
 
-Let's look at what :djadmin:`startproject` created:
+The :djadmin:`startproject` command should put together the :file:`mysite` directory like this.
 
 .. code-block:: text
 
@@ -77,36 +77,7 @@ Let's look at what :djadmin:`startproject` created:
             asgi.py
             wsgi.py
 
-These files are:
-
-* The outer :file:`mysite/` root directory is a container for your project. Its
-  name doesn't matter to Django; you can rename it to anything you like.
-
-* :file:`manage.py`: A command-line utility that lets you interact with this
-  Django project in various ways. You can read all the details about
-  :file:`manage.py` in :doc:`/ref/django-admin`.
-
-* The inner :file:`mysite/` directory is the actual Python package for your
-  project. Its name is the Python package name you'll need to use to import
-  anything inside it (e.g. ``mysite.urls``).
-
-* :file:`mysite/__init__.py`: An empty file that tells Python that this
-  directory should be considered a Python package. If you're a Python beginner,
-  read :ref:`more about packages <tut-packages>` in the official Python docs.
-
-* :file:`mysite/settings.py`: Settings/configuration for this Django
-  project.  :doc:`/topics/settings` will tell you all about how settings
-  work.
-
-* :file:`mysite/urls.py`: The URL declarations for this Django project; a
-  "table of contents" of your Django-powered site. You can read more about
-  URLs in :doc:`/topics/http/urls`.
-
-* :file:`mysite/asgi.py`: An entry-point for ASGI-compatible web servers to
-  serve your project. See :doc:`/howto/deployment/asgi/index` for more details.
-
-* :file:`mysite/wsgi.py`: An entry-point for WSGI-compatible web servers to
-  serve your project. See :doc:`/howto/deployment/wsgi/index` for more details.
+As we proceed through the tutorial we will take closer look at these files, their purpose and function will become clearer then.
 
 The development server
 ======================
