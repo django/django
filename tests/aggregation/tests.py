@@ -17,6 +17,7 @@ from django.db.models import (
     F,
     FloatField,
     IntegerField,
+    JSONArrayAgg,
     Max,
     Min,
     OuterRef,
@@ -2177,6 +2178,45 @@ class AggregateTestCase(TestCase):
             .values_list("sum", flat=True)
         )
         self.assertEqual(list(author_qs), [337])
+
+    def test_JSONArrayAgg(self):
+        vals = Store.objects.aggregate(jsonarrayagg=JSONArrayAgg("name"))
+        self.assertEqual(
+            vals,
+            {"jsonarrayagg": ["Amazon.com", "Books.com", "Mamma and Pappa's Books"]},
+        )
+
+    def test_JSONArrayAgg_datefield(self):
+        vals = Book.objects.aggregate(jsonarrayagg=JSONArrayAgg("pubdate"))
+        self.assertEqual(
+            vals,
+            {
+                "jsonarrayagg": [
+                    "2007-12-06",
+                    "2008-03-03",
+                    "2008-06-23",
+                    "2008-11-03",
+                    "1995-01-15",
+                    "1991-10-15",
+                ]
+            },
+        )
+
+    def test_JSONArrayAgg_decimalfield(self):
+        vals = Book.objects.aggregate(jsonarrayagg=JSONArrayAgg("price"))
+        self.assertEqual(
+            vals, {"jsonarrayagg": [30.0, 23.09, 29.69, 29.69, 82.8, 75.0]}
+        )
+
+    def test_JSONArrayAgg_integerfield(self):
+        vals = Book.objects.aggregate(jsonarrayagg=JSONArrayAgg("pages"))
+        self.assertEqual(vals, {"jsonarrayagg": [447, 528, 300, 350, 1132, 946]})
+
+    def test_JSONArrayAgg_filter(self):
+        vals = Author.objects.filter(age__gt=29).aggregate(
+            jsonarrayagg=JSONArrayAgg("age")
+        )
+        self.assertEqual(vals, {"jsonarrayagg": [34, 35, 45, 37, 57, 46]})
 
 
 class AggregateAnnotationPruningTests(TestCase):

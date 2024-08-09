@@ -5,6 +5,7 @@ Classes to represent the definitions of aggregate functions.
 from django.core.exceptions import FieldError, FullResultSet
 from django.db.models.expressions import Case, Func, Star, Value, When
 from django.db.models.fields import IntegerField
+from django.db.models.fields.json import JSONField
 from django.db.models.functions.comparison import Coalesce
 from django.db.models.functions.mixins import (
     FixDurationInputMixin,
@@ -15,6 +16,7 @@ __all__ = [
     "Aggregate",
     "Avg",
     "Count",
+    "JSONArrayAgg",
     "Max",
     "Min",
     "StdDev",
@@ -211,3 +213,30 @@ class Variance(NumericOutputFieldMixin, Aggregate):
 
     def _get_repr_options(self):
         return {**super()._get_repr_options(), "sample": self.function == "VAR_SAMP"}
+
+
+class JSONArrayAgg(Aggregate):
+    function = "JSON_ARRAYAGG"
+    name = "JSONArrayAgg"
+    output_field = JSONField()
+    arity = 1
+
+    def as_sqlite(self, compiler, connection, **extra_context):
+        return super().as_sql(
+            compiler, connection, function="JSON_GROUP_ARRAY", **extra_context
+        )
+
+    def as_postgresql(self, compiler, connection, **extra_context):
+        if not connection.features.is_postgresql_16:
+            sql, params = super().as_sql(
+                compiler,
+                connection,
+                function="ARRAY_AGG",
+                template="TO_JSON(%(function)s(%(distinct)s%(expressions)s))",
+                **extra_context,
+            )
+        else:
+            sql, params = super().as_sql(compiler, connection, **extra_context)
+        if self.output_field.get_internal_type() == "JSONField":
+            sql = "CAST(%s AS JSONB)" % sql
+        return sql, params
