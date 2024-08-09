@@ -4,6 +4,7 @@ import io
 import os
 import shutil
 import sys
+from pathlib import Path
 from unittest import mock
 
 from django.apps import apps
@@ -21,7 +22,7 @@ from django.db.backends.utils import truncate_name
 from django.db.migrations.exceptions import InconsistentMigrationHistory
 from django.db.migrations.recorder import MigrationRecorder
 from django.test import TestCase, override_settings, skipUnlessDBFeature
-from django.test.utils import captured_stdout
+from django.test.utils import captured_stdout, extend_sys_path
 from django.utils import timezone
 from django.utils.version import get_docs_version
 
@@ -1728,6 +1729,25 @@ class MakeMigrationsTests(MigrationTestBase):
         ):
             call_command("makemigrations", stdout=out)
         self.assertIn("0001_initial.py", out.getvalue())
+
+    def test_makemigrations_no_init_ambiguous(self):
+        """
+        Migration directories without an __init__.py file are not allowed if
+        there are multiple namespace search paths that resolve to them.
+        """
+        out = io.StringIO()
+        with self.temporary_migration_module(
+            module="migrations.test_migrations_no_init"
+        ) as migration_dir:
+            # Copy the project directory into another place under sys.path.
+            app_dir = Path(migration_dir).parent
+            os.remove(app_dir / "__init__.py")
+            project_dir = app_dir.parent
+            dest = project_dir.parent / "other_dir_in_path"
+            shutil.copytree(project_dir, dest)
+            with extend_sys_path(str(dest)):
+                call_command("makemigrations", stdout=out)
+        self.assertEqual("No changes detected\n", out.getvalue())
 
     def test_makemigrations_migrations_announce(self):
         """
