@@ -18,6 +18,7 @@ you quickly accomplish common tasks.
    custom-template-backend
    custom-template-tags
    custom-file-storage
+   custom-shell
    deployment/index
    upgrade-version
    error-reporting
