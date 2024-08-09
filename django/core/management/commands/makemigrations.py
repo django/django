@@ -5,11 +5,11 @@ from itertools import takewhile
 
 from django.apps import apps
 from django.conf import settings
-from django.core.management.base import BaseCommand, CommandError, no_translations
+from django.core.management.base import CommandError, no_translations
+from django.core.management.migration import MigrationCommand
 from django.core.management.utils import run_formatters
 from django.db import DEFAULT_DB_ALIAS, OperationalError, connections, router
 from django.db.migrations import Migration
-from django.db.migrations.autodetector import MigrationAutodetector
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.migration import SwappableTuple
 from django.db.migrations.optimizer import MigrationOptimizer
@@ -23,10 +23,12 @@ from django.db.migrations.utils import get_migration_name_timestamp
 from django.db.migrations.writer import MigrationWriter
 
 
-class Command(BaseCommand):
+class Command(MigrationCommand):
     help = "Creates new migration(s) for apps."
 
     def add_arguments(self, parser):
+        super().add_arguments(parser)
+
         parser.add_argument(
             "args",
             metavar="app_label",
@@ -47,13 +49,6 @@ class Command(BaseCommand):
             "--empty",
             action="store_true",
             help="Create an empty migration.",
-        )
-        parser.add_argument(
-            "--noinput",
-            "--no-input",
-            action="store_false",
-            dest="interactive",
-            help="Tells Django to NOT prompt the user for input of any kind.",
         )
         parser.add_argument(
             "-n",
@@ -209,7 +204,7 @@ class Command(BaseCommand):
                 log=self.log,
             )
         # Set up autodetector
-        autodetector = MigrationAutodetector(
+        autodetector = self.autodetector_class(
             loader.project_state(),
             ProjectState.from_apps(apps),
             questioner,
@@ -461,7 +456,7 @@ class Command(BaseCommand):
                 # If they still want to merge it, then write out an empty
                 # file depending on the migrations needing merging.
                 numbers = [
-                    MigrationAutodetector.parse_number(migration.name)
+                    self.autodetector_class.parse_number(migration.name)
                     for migration in merge_migrations
                 ]
                 try:
