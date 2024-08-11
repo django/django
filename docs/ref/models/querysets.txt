@@ -173,6 +173,10 @@ Here's the formal declaration of a ``QuerySet``:
 
         The database that will be used if this query is executed now.
 
+    .. attribute:: executed_query
+
+        A string with the executed SQL query if the ``QuerySet`` has been evaluated. ``None`` otherwise.
+
     .. note::
 
         The ``query`` parameter to :class:`QuerySet` exists so that specialized

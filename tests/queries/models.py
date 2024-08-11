@@ -789,3 +789,11 @@ class JSONFieldNullable(models.Model):
 
     class Meta:
         required_db_features = {"supports_json_field"}
+
+
+class ExecutedQueryModel(models.Model):
+    pass
+
+
+class ExecutedQueryRelatedModel(models.Model):
+    original_model = models.ForeignKey(ExecutedQueryModel, models.CASCADE)

@@ -12,7 +12,7 @@ from django.db.models.functions import ExtractYear, Length, LTrim
 from django.db.models.sql.constants import LOUTER
 from django.db.models.sql.where import AND, OR, NothingNode, WhereNode
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
-from django.test.utils import CaptureQueriesContext, register_lookup
+from django.test.utils import CaptureQueriesContext, override_settings, register_lookup
 
 from .models import (
     FK1,
@@ -40,6 +40,8 @@ from .models import (
     DumbCategory,
     Eaten,
     Employment,
+    ExecutedQueryModel,
+    ExecutedQueryRelatedModel,
     ExtraInfo,
     Fan,
     Food,
@@ -4613,3 +4615,32 @@ class Ticket23622Tests(TestCase):
             set(Ticket23605A.objects.filter(qy).values_list("pk", flat=True)),
         )
         self.assertSequenceEqual(Ticket23605A.objects.filter(qx), [a2])
+
+
+class ExecutedQueryTests(TestCase):
+    @override_settings(DEBUG=True)
+    def test_executed_query(self):
+        executed_query = ExecutedQueryModel.objects.create()
+        ExecutedQueryRelatedModel.objects.create(original_model=executed_query)
+
+        queryset = ExecutedQueryModel.objects.all()
+        list(queryset)
+        self.assertEqual(
+            queryset.executed_query,
+            'SELECT "queries_executedquerymodel"."id" '
+            'FROM "queries_executedquerymodel"',
+        )
+        self.assertEqual(queryset.executed_query, connection.queries[-1]["sql"])
+
+        queryset_with_prefetch = ExecutedQueryModel.objects.prefetch_related(
+            "executedqueryrelatedmodel_set"
+        )
+        list(queryset_with_prefetch)
+        self.assertEqual(
+            queryset_with_prefetch.executed_query,
+            'SELECT "queries_executedquerymodel"."id" '
+            'FROM "queries_executedquerymodel"',
+        )
+        self.assertEqual(
+            queryset_with_prefetch.executed_query, connection.queries[-2]["sql"]
+        )
