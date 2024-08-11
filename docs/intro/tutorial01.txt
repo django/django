@@ -135,7 +135,7 @@ You'll see the following output on the command line:
     Quit the server with CONTROL-C.
 
     WARNING: This is a development server. Do not use it in a production setting. Use a production WSGI or ASGI server instead.
-    For more information on production servers see: https://docs.djangoproject.com/en/stable/howto/deployment/
+    For more information on production servers see: https://docs.djangoproject.com/en/|version|/howto/deployment/
 
 .. note::
     Ignore the warning about unapplied database migrations for now; we'll deal

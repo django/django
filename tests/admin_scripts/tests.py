@@ -33,7 +33,7 @@ from django.db.migrations.recorder import MigrationRecorder
 from django.test import LiveServerTestCase, SimpleTestCase, TestCase, override_settings
 from django.test.utils import captured_stderr, captured_stdout
 from django.urls import path
-from django.utils.version import PY313
+from django.utils.version import PY313, get_docs_version
 from django.views.static import serve
 
 from . import urls
@@ -1597,11 +1597,13 @@ class ManageRunserver(SimpleTestCase):
             "Starting development server at http://0.0.0.0:8000/",
             self.output.getvalue(),
         )
+        docs_version = get_docs_version()
         self.assertIn(
             "WARNING: This is a development server. Do not use it in a "
             "production setting. Use a production WSGI or ASGI server instead."
             "\nFor more information on production servers see: "
-            "https://docs.djangoproject.com/en/stable/howto/deployment/",
+            f"https://docs.djangoproject.com/en/{docs_version}/howto/"
+            "deployment/",
             self.output.getvalue(),
         )
 
@@ -1613,11 +1615,13 @@ class ManageRunserver(SimpleTestCase):
             "Starting development server at http://127.0.0.1:14437/",
             self.output.getvalue(),
         )
+        docs_version = get_docs_version()
         self.assertIn(
             "WARNING: This is a development server. Do not use it in a "
             "production setting. Use a production WSGI or ASGI server instead."
             "\nFor more information on production servers see: "
-            "https://docs.djangoproject.com/en/stable/howto/deployment/",
+            f"https://docs.djangoproject.com/en/{docs_version}/howto/"
+            "deployment/",
             self.output.getvalue(),
         )
 
@@ -1630,11 +1634,13 @@ class ManageRunserver(SimpleTestCase):
             "Starting development server at http://0.0.0.0:8000/",
             self.output.getvalue(),
         )
+        docs_version = get_docs_version()
         self.assertNotIn(
             "WARNING: This is a development server. Do not use it in a "
             "production setting. Use a production WSGI or ASGI server instead."
             "\nFor more information on production servers see: "
-            "https://docs.djangoproject.com/en/stable/howto/deployment/",
+            f"https://docs.djangoproject.com/en/{docs_version}/howto/"
+            "deployment/",
             self.output.getvalue(),
         )
 

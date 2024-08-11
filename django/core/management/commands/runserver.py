@@ -11,6 +11,7 @@ from django.core.servers.basehttp import WSGIServer, get_internal_wsgi_applicati
 from django.db import connections
 from django.utils import autoreload
 from django.utils.regex_helper import _lazy_re_compile
+from django.utils.version import get_docs_version
 
 naiveip_re = _lazy_re_compile(
     r"""^(?:
@@ -188,12 +189,14 @@ class Command(BaseCommand):
             f"Quit the server with {quit_command}.",
             file=self.stdout,
         )
+        docs_version = get_docs_version()
         if os.environ.get("HIDE_PRODUCTION_WARNING") != "true":
             self.stdout.write(
                 self.style.WARNING(
                     "WARNING: This is a development server. Do not use it in a "
                     "production setting. Use a production WSGI or ASGI server "
                     "instead.\nFor more information on production servers see: "
-                    "https://docs.djangoproject.com/en/stable/howto/deployment/"
+                    f"https://docs.djangoproject.com/en/{docs_version}/howto/"
+                    "deployment/"
                 )
             )
