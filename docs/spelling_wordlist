@@ -123,6 +123,7 @@ deduplicates
 deduplication
 deepcopy
 deferrable
+DEP
 deprecations
 deserialization
 deserialize
