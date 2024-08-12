@@ -1,3 +1,4 @@
+import contextlib
 from importlib import import_module
 
 from django.apps import apps
@@ -44,10 +45,8 @@ class Command(BaseCommand):
         # Import the 'management' module within each installed app, to register
         # dispatcher events.
         for app_config in apps.get_app_configs():
-            try:
+            with contextlib.suppress(ImportError):
                 import_module(".management", app_config.name)
-            except ImportError:
-                pass
 
         sql_list = sql_flush(
             self.style,

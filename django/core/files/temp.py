@@ -16,6 +16,7 @@ arguments available in tempfile.NamedTemporaryFile.
 2: https://bugs.python.org/issue14243
 """
 
+import contextlib
 import os
 import tempfile
 
@@ -53,14 +54,10 @@ if os.name == "nt":
         def close(self):
             if not self.close_called:
                 self.close_called = True
-                try:
+                with contextlib.suppress(OSError):
                     self.file.close()
-                except OSError:
-                    pass
-                try:
+                with contextlib.suppress(OSError):
                     self.unlink(self.name)
-                except OSError:
-                    pass
 
         def __del__(self):
             self.close()

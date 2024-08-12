@@ -1,3 +1,4 @@
+import contextlib
 import inspect
 import os
 from importlib import import_module
@@ -158,10 +159,8 @@ class AppConfig:
 
         # If import_string succeeds, entry is an app config class.
         if app_config_class is None:
-            try:
+            with contextlib.suppress(Exception):
                 app_config_class = import_string(entry)
-            except Exception:
-                pass
         # If both import_module and import_string failed, it means that entry
         # doesn't have a valid value.
         if app_module is None and app_config_class is None:

@@ -1,3 +1,4 @@
+import contextlib
 import os
 import time
 import warnings
@@ -71,14 +72,10 @@ def update_connections_time_zone(*, setting, **kwargs):
     # Reset the database connections' time zone
     if setting in {"TIME_ZONE", "USE_TZ"}:
         for conn in connections.all(initialized_only=True):
-            try:
+            with contextlib.suppress(AttributeError):
                 del conn.timezone
-            except AttributeError:
-                pass
-            try:
+            with contextlib.suppress(AttributeError):
                 del conn.timezone_name
-            except AttributeError:
-                pass
             conn.ensure_timezone()
 
 

@@ -1,3 +1,4 @@
+import contextlib
 import threading
 import time
 from unittest import mock
@@ -52,10 +53,8 @@ class SelectForUpdateTests(TransactionTestCase):
         self.new_connection = connection.copy()
 
     def tearDown(self):
-        try:
+        with contextlib.suppress(DatabaseError, AttributeError):
             self.end_blocking_transaction()
-        except (DatabaseError, AttributeError):
-            pass
         self.new_connection.close()
 
     def start_blocking_transaction(self):

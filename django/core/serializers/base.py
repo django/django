@@ -2,6 +2,7 @@
 Module for abstract serializer/unserializer base classes.
 """
 
+import contextlib
 from io import StringIO
 
 from django.core.exceptions import ObjectDoesNotExist
@@ -316,12 +317,10 @@ def build_instance(Model, data, db):
         obj = Model(**data)
         obj._state.db = db
         natural_key = obj.natural_key()
-        try:
+        with contextlib.suppress(Model.DoesNotExist):
             data[Model._meta.pk.attname] = Model._meta.pk.to_python(
                 default_manager.db_manager(db).get_by_natural_key(*natural_key).pk
             )
-        except Model.DoesNotExist:
-            pass
     return Model(**data)
 
 

@@ -2,6 +2,7 @@
 Sphinx plugins for Django documentation.
 """
 
+import contextlib
 import json
 import os
 import re
@@ -266,10 +267,8 @@ checked>
 <section class="c-content-unix" id="c-content-%(id)s-unix">\n"""
             % {"id": uid}
         )
-        try:
+        with contextlib.suppress(nodes.SkipNode):
             self.visit_literal_block(node)
-        except nodes.SkipNode:
-            pass
         self.body.append("</section>\n")
 
         self.body.append(

@@ -1,3 +1,4 @@
+import contextlib
 import functools
 import os
 import pkgutil
@@ -372,11 +373,11 @@ class ManagementUtility:
         parser.add_argument("--settings")
         parser.add_argument("--pythonpath")
         parser.add_argument("args", nargs="*")  # catch-all
-        try:
+
+        # Ignore any option errors at this point.
+        with contextlib.suppress(CommandError):
             options, args = parser.parse_known_args(self.argv[2:])
             handle_default_options(options)
-        except CommandError:
-            pass  # Ignore any option errors at this point.
 
         try:
             settings.INSTALLED_APPS
