@@ -262,8 +262,8 @@ URLs
 Utilities
 ~~~~~~~~~
 
-* :class:`~django.utils.safestring.SafeString` now raises
-  :exc:`NotImplementedError` in ``__add__`` for non-string right-hand side
+* :class:`~django.utils.safestring.SafeString` now returns
+  :py:data:`NotImplemented` in ``__add__`` for non-string right-hand side
   values. This aligns with the :py:class:`str` addition behavior and allows
   ``__radd__`` to be used if available.
 
