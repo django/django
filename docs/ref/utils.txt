@@ -699,10 +699,29 @@ escaping HTML.
     joined using ``sep``. ``sep`` is also passed through
     :func:`conditional_escape`.
 
-    ``args_generator`` should be an iterator that returns the sequence of
-    ``args`` that will be passed to :func:`format_html`. For example::
+    ``args_generator`` should be an iterator that yields arguments to pass to
+    :func:`format_html`, either sequences of positional arguments or mappings of
+    keyword arguments.
 
-        format_html_join("\n", "<li>{} {}</li>", ((u.first_name, u.last_name) for u in users))
+    For example, tuples can be used for positional arguments::
+
+        format_html_join(
+            "\n",
+            "<li>{} {}</li>",
+            ((u.first_name, u.last_name) for u in users),
+        )
+
+    Or dictionaries can be used for keyword arguments::
+
+        format_html_join(
+            "\n",
+            '<li data-id="{id}">{id} {title}</li>',
+            ({"id": b.id, "title": b.title} for b in books),
+        )
+
+    .. versionchanged:: 5.2
+
+        Support for mappings in ``args_generator`` was added.
 
 .. function:: json_script(value, element_id=None, encoder=None)
 

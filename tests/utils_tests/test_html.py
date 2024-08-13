@@ -10,6 +10,7 @@ from django.utils.html import (
     escape,
     escapejs,
     format_html,
+    format_html_join,
     html_safe,
     json_script,
     linebreaks,
@@ -74,6 +75,26 @@ class TestUtilsHtml(SimpleTestCase):
         with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
             name = "Adam"
             self.assertEqual(format_html(f"<i>{name}</i>"), "<i>Adam</i>")
+
+    def test_format_html_join_with_positional_arguments(self):
+        self.assertEqual(
+            format_html_join(
+                "\n",
+                "<li>{}) {}</li>",
+                [(1, "Emma"), (2, "Matilda")],
+            ),
+            "<li>1) Emma</li>\n<li>2) Matilda</li>",
+        )
+
+    def test_format_html_join_with_keyword_arguments(self):
+        self.assertEqual(
+            format_html_join(
+                "\n",
+                "<li>{id}) {text}</li>",
+                [{"id": 1, "text": "Emma"}, {"id": 2, "text": "Matilda"}],
+            ),
+            "<li>1) Emma</li>\n<li>2) Matilda</li>",
+        )
 
     def test_linebreaks(self):
         items = (
