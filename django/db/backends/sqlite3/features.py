@@ -9,7 +9,7 @@ from .base import Database
 
 
 class DatabaseFeatures(BaseDatabaseFeatures):
-    minimum_database_version = (3, 27)
+    minimum_database_version = (3, 31)
     test_db_allows_multiple_connections = False
     supports_unspecified_pk = True
     supports_timezones = False
@@ -31,18 +31,15 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_parentheses_in_compound = False
     can_defer_constraint_checks = True
     supports_over_clause = True
-    supports_frame_range_fixed_distance = Database.sqlite_version_info >= (3, 28, 0)
-    supports_frame_exclusion = Database.sqlite_version_info >= (3, 28, 0)
-    supports_aggregate_filter_clause = Database.sqlite_version_info >= (3, 30, 1)
-    supports_order_by_nulls_modifier = Database.sqlite_version_info >= (3, 30, 0)
-    # NULLS LAST/FIRST emulation on < 3.30 requires subquery wrapping.
-    requires_compound_order_by_subquery = Database.sqlite_version_info < (3, 30)
+    supports_frame_range_fixed_distance = True
+    supports_frame_exclusion = True
+    supports_aggregate_filter_clause = True
     order_by_nulls_first = True
     supports_json_field_contains = False
     supports_update_conflicts = True
     supports_update_conflicts_with_target = True
-    supports_stored_generated_columns = Database.sqlite_version_info >= (3, 31, 0)
-    supports_virtual_generated_columns = Database.sqlite_version_info >= (3, 31, 0)
+    supports_stored_generated_columns = True
+    supports_virtual_generated_columns = True
     test_collations = {
         "ci": "nocase",
         "cs": "binary",

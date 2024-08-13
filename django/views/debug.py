@@ -113,7 +113,7 @@ class SafeExceptionReporterFilter:
 
     cleansed_substitute = "********************"
     hidden_settings = _lazy_re_compile(
-        "API|TOKEN|KEY|SECRET|PASS|SIGNATURE|HTTP_COOKIE", flags=re.I
+        "API|AUTH|TOKEN|KEY|SECRET|PASS|SIGNATURE|HTTP_COOKIE", flags=re.I
     )
 
     def cleanse_setting(self, key, value):

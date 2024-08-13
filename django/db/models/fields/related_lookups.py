@@ -1,3 +1,6 @@
+from django.db import NotSupportedError
+from django.db.models.expressions import ColPairs
+from django.db.models.fields.tuple_lookups import TupleIn, tuple_lookups
 from django.db.models.lookups import (
     Exact,
     GreaterThan,
@@ -7,34 +10,6 @@ from django.db.models.lookups import (
     LessThan,
     LessThanOrEqual,
 )
-
-
-class MultiColSource:
-    contains_aggregate = False
-    contains_over_clause = False
-
-    def __init__(self, alias, targets, sources, field):
-        self.targets, self.sources, self.field, self.alias = (
-            targets,
-            sources,
-            field,
-            alias,
-        )
-        self.output_field = self.field
-
-    def __repr__(self):
-        return "{}({}, {})".format(self.__class__.__name__, self.alias, self.field)
-
-    def relabeled_clone(self, relabels):
-        return self.__class__(
-            relabels.get(self.alias, self.alias), self.targets, self.sources, self.field
-        )
-
-    def get_lookup(self, lookup):
-        return self.output_field.get_lookup(lookup)
-
-    def resolve_expression(self, *args, **kwargs):
-        return self
 
 
 def get_normalized_value(value, lhs):
@@ -64,7 +39,7 @@ def get_normalized_value(value, lhs):
 
 class RelatedIn(In):
     def get_prep_lookup(self):
-        if not isinstance(self.lhs, MultiColSource):
+        if not isinstance(self.lhs, ColPairs):
             if self.rhs_is_direct_value():
                 # If we get here, we are dealing with single-column relations.
                 self.rhs = [get_normalized_value(val, self.lhs)[0] for val in self.rhs]
@@ -98,49 +73,33 @@ class RelatedIn(In):
         return super().get_prep_lookup()
 
     def as_sql(self, compiler, connection):
-        if isinstance(self.lhs, MultiColSource):
+        if isinstance(self.lhs, ColPairs):
             # For multicolumn lookups we need to build a multicolumn where clause.
             # This clause is either a SubqueryConstraint (for values that need
             # to be compiled to SQL) or an OR-combined list of
             # (col1 = val1 AND col2 = val2 AND ...) clauses.
-            from django.db.models.sql.where import (
-                AND,
-                OR,
-                SubqueryConstraint,
-                WhereNode,
-            )
+            from django.db.models.sql.where import SubqueryConstraint
 
-            root_constraint = WhereNode(connector=OR)
             if self.rhs_is_direct_value():
                 values = [get_normalized_value(value, self.lhs) for value in self.rhs]
-                for value in values:
-                    value_constraint = WhereNode()
-                    for source, target, val in zip(
-                        self.lhs.sources, self.lhs.targets, value
-                    ):
-                        lookup_class = target.get_lookup("exact")
-                        lookup = lookup_class(
-                            target.get_col(self.lhs.alias, source), val
-                        )
-                        value_constraint.add(lookup, AND)
-                    root_constraint.add(value_constraint, OR)
+                lookup = TupleIn(self.lhs, values)
+                return compiler.compile(lookup)
             else:
-                root_constraint.add(
+                return compiler.compile(
                     SubqueryConstraint(
                         self.lhs.alias,
                         [target.column for target in self.lhs.targets],
                         [source.name for source in self.lhs.sources],
                         self.rhs,
                     ),
-                    AND,
                 )
-            return root_constraint.as_sql(compiler, connection)
+
         return super().as_sql(compiler, connection)
 
 
 class RelatedLookupMixin:
     def get_prep_lookup(self):
-        if not isinstance(self.lhs, MultiColSource) and not hasattr(
+        if not isinstance(self.lhs, ColPairs) and not hasattr(
             self.rhs, "resolve_expression"
         ):
             # If we get here, we are dealing with single-column relations.
@@ -158,20 +117,16 @@ class RelatedLookupMixin:
         return super().get_prep_lookup()
 
     def as_sql(self, compiler, connection):
-        if isinstance(self.lhs, MultiColSource):
-            assert self.rhs_is_direct_value()
-            self.rhs = get_normalized_value(self.rhs, self.lhs)
-            from django.db.models.sql.where import AND, WhereNode
-
-            root_constraint = WhereNode()
-            for target, source, val in zip(
-                self.lhs.targets, self.lhs.sources, self.rhs
-            ):
-                lookup_class = target.get_lookup(self.lookup_name)
-                root_constraint.add(
-                    lookup_class(target.get_col(self.lhs.alias, source), val), AND
+        if isinstance(self.lhs, ColPairs):
+            if not self.rhs_is_direct_value():
+                raise NotSupportedError(
+                    f"'{self.lookup_name}' doesn't support multi-column subqueries."
                 )
-            return root_constraint.as_sql(compiler, connection)
+            self.rhs = get_normalized_value(self.rhs, self.lhs)
+            lookup_class = tuple_lookups[self.lookup_name]
+            lookup = lookup_class(self.lhs, self.rhs)
+            return compiler.compile(lookup)
+
         return super().as_sql(compiler, connection)
 
 

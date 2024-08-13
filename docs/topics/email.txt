@@ -282,8 +282,14 @@ All parameters are optional and can be set at any time prior to calling the
   new connection is created when ``send()`` is called.
 
 * ``attachments``: A list of attachments to put on the message. These can
-  be either :class:`~email.mime.base.MIMEBase` instances, or ``(filename,
-  content, mimetype)`` triples.
+  be instances of :class:`~email.mime.base.MIMEBase` or
+  :class:`~django.core.mail.EmailAttachment`, or a tuple with attributes
+  ``(filename, content, mimetype)``.
+
+  .. versionchanged:: 5.2
+
+    Support for :class:`~django.core.mail.EmailAttachment` items of
+    ``attachments`` were added.
 
 * ``headers``: A dictionary of extra headers to put on the message. The
   keys are the header name, values are the header values. It's up to the
@@ -379,27 +385,104 @@ The class has the following methods:
   For MIME types starting with :mimetype:`text/`, binary data is handled as in
   ``attach()``.
 
+.. class:: EmailAttachment
+
+    .. versionadded:: 5.2
+
+    A named tuple to store attachments to an email.
+
+    The named tuple has the following indexes:
+
+    * ``filename``
+    * ``content``
+    * ``mimetype``
+
 Sending alternative content types
+---------------------------------
+
+Sending multiple content versions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 It can be useful to include multiple versions of the content in an email; the
 classic example is to send both text and HTML versions of a message. With
-Django's email library, you can do this using the ``EmailMultiAlternatives``
-class. This subclass of :class:`~django.core.mail.EmailMessage` has an
-``attach_alternative()`` method for including extra versions of the message
-body in the email. All the other methods (including the class initialization)
-are inherited directly from :class:`~django.core.mail.EmailMessage`.
+Django's email library, you can do this using the
+:class:`~django.core.mail.EmailMultiAlternatives` class.
 
-To send a text and HTML combination, you could write::
+.. class:: EmailMultiAlternatives
 
-    from django.core.mail import EmailMultiAlternatives
+    A subclass of :class:`EmailMessage` that allows additional versions of the
+    message body in the email via the :meth:`attach_alternative` method. This
+    directly inherits all methods (including the class initialization) from
+    :class:`EmailMessage`.
 
-    subject, from_email, to = "hello", "from@example.com", "to@example.com"
-    text_content = "This is an important message."
-    html_content = "<p>This is an <strong>important</strong> message.</p>"
-    msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
-    msg.attach_alternative(html_content, "text/html")
-    msg.send()
+    .. attribute:: alternatives
+
+        A list of :class:`~django.core.mail.EmailAlternative` named tuples. This
+        is particularly useful in tests::
+
+            self.assertEqual(len(msg.alternatives), 1)
+            self.assertEqual(msg.alternatives[0].content, html_content)
+            self.assertEqual(msg.alternatives[0].mimetype, "text/html")
+
+        Alternatives should only be added using the :meth:`attach_alternative`
+        method, or passed to the constructor.
+
+        .. versionchanged:: 5.2
+
+            In older versions, ``alternatives`` was a list of regular tuples,
+            as opposed to :class:`~django.core.mail.EmailAlternative` named
+            tuples.
+
+    .. method:: attach_alternative(content, mimetype)
+
+        Attach an alternative representation of the message body in the email.
+
+        For example, to send a text and HTML combination, you could write::
+
+            from django.core.mail import EmailMultiAlternatives
+
+            subject = "hello"
+            from_email = "from@example.com"
+            to = "to@example.com"
+            text_content = "This is an important message."
+            html_content = "<p>This is an <strong>important</strong> message.</p>"
+            msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
+
+    .. method:: body_contains(text)
+
+        .. versionadded:: 5.2
+
+        Returns a boolean indicating whether the provided ``text`` is
+        contained in the email ``body`` and in all attached MIME type
+        ``text/*`` alternatives.
+
+        This can be useful when testing emails. For example::
+
+            def test_contains_email_content(self):
+                subject = "Hello World"
+                from_email = "from@example.com"
+                to = "to@example.com"
+                msg = EmailMultiAlternatives(subject, "I am content.", from_email, [to])
+                msg.attach_alternative("<p>I am content.</p>", "text/html")
+
+                self.assertIs(msg.body_contains("I am content"), True)
+                self.assertIs(msg.body_contains("<p>I am content.</p>"), False)
+
+.. class:: EmailAlternative
+
+    .. versionadded:: 5.2
+
+    A named tuple to store alternative versions of email content.
+
+    The named tuple has the following indexes:
+
+    * ``content``
+    * ``mimetype``
+
+Updating the default content type
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 By default, the MIME type of the ``body`` parameter in an
 :class:`~django.core.mail.EmailMessage` is ``"text/plain"``. It is good
@@ -691,7 +774,7 @@ to a file that can be inspected at your leisure.
 
 Another approach is to use a "dumb" SMTP server that receives the emails
 locally and displays them to the terminal, but does not actually send
-anything. The `aiosmtpd`_ package provides a way to accomplish this:
+anything. The :pypi:`aiosmtpd` package provides a way to accomplish this:
 
 .. code-block:: shell
 

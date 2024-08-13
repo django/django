@@ -173,10 +173,6 @@ Methods
         the user. (This takes care of the password hashing in making the
         comparison.)
 
-        .. versionchanged:: 5.0
-
-            ``acheck_password()`` method was added.
-
     .. method:: set_unusable_password()
 
         Marks the user as having no password set.  This isn't the same as
@@ -721,6 +717,3 @@ Utility functions
     backend's ``get_user()`` method, or if the session auth hash doesn't
     validate.
 
-    .. versionchanged:: 5.0
-
-        ``aget_user()`` function was added.

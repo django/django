@@ -1,5 +1,6 @@
 import datetime
 import os
+import shutil
 from decimal import Decimal
 from unittest import mock, skipUnless
 
@@ -72,6 +73,7 @@ from .models import (
     Triple,
     Writer,
     WriterProfile,
+    temp_storage_dir,
     test_images,
 )
 
@@ -2227,6 +2229,15 @@ class ModelMultipleChoiceFieldTests(TestCase):
         f = forms.ModelMultipleChoiceField(queryset=Writer.objects.all())
         self.assertNumQueries(1, f.clean, [p.pk for p in persons[1:11:2]])
 
+    def test_model_multiple_choice_null_characters(self):
+        f = forms.ModelMultipleChoiceField(queryset=ExplicitPK.objects.all())
+        msg = "Null characters are not allowed."
+        with self.assertRaisesMessage(ValidationError, msg):
+            f.clean(["\x00something"])
+
+        with self.assertRaisesMessage(ValidationError, msg):
+            f.clean(["valid", "\x00something"])
+
     def test_model_multiple_choice_run_validators(self):
         """
         ModelMultipleChoiceField run given validators (#14144).
@@ -2473,6 +2484,12 @@ class ModelOneToOneFieldTests(TestCase):
 
 
 class FileAndImageFieldTests(TestCase):
+    def setUp(self):
+        if os.path.exists(temp_storage_dir):
+            shutil.rmtree(temp_storage_dir)
+        os.mkdir(temp_storage_dir)
+        self.addCleanup(shutil.rmtree, temp_storage_dir)
+
     def test_clean_false(self):
         """
         If the ``clean`` method on a non-required FileField receives False as

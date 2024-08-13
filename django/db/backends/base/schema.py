@@ -3,6 +3,7 @@ import operator
 from datetime import datetime
 
 from django.conf import settings
+from django.core.exceptions import FieldError
 from django.db.backends.ddl_references import (
     Columns,
     Expressions,
@@ -163,7 +164,7 @@ class BaseDatabaseSchemaEditor:
     def __exit__(self, exc_type, exc_value, traceback):
         if exc_type is None:
             for sql in self.deferred_sql:
-                self.execute(sql)
+                self.execute(sql, None)
         if self.atomic_migration:
             self.atomic.__exit__(exc_type, exc_value, traceback)
 
@@ -264,16 +265,29 @@ class BaseDatabaseSchemaEditor:
                 )
                 if autoinc_sql:
                     self.deferred_sql.extend(autoinc_sql)
-        constraints = [
-            constraint.constraint_sql(model, self)
-            for constraint in model._meta.constraints
-        ]
+        # The BaseConstraint DDL creation methods such as constraint_sql(),
+        # create_sql(), and delete_sql(), were not designed in a way that
+        # separate SQL from parameters which make their generated SQL unfit to
+        # be used in a context where parametrization is delegated to the
+        # backend.
+        constraint_sqls = []
+        if params:
+            # If parameters are present (e.g. a DEFAULT clause on backends that
+            # allow parametrization) defer constraint creation so they are not
+            # mixed with SQL meant to be parametrized.
+            for constraint in model._meta.constraints:
+                self.deferred_sql.append(constraint.create_sql(model, self))
+        else:
+            constraint_sqls.extend(
+                constraint.constraint_sql(model, self)
+                for constraint in model._meta.constraints
+            )
         sql = self.sql_create_table % {
             "table": self.quote_name(model._meta.db_table),
             "definition": ", ".join(
-                str(constraint)
-                for constraint in (*column_sqls, *constraints)
-                if constraint
+                str(statement)
+                for statement in (*column_sqls, *constraint_sqls)
+                if statement
             ),
         }
         if model._meta.db_tablespace:
@@ -831,6 +845,7 @@ class BaseDatabaseSchemaEditor:
         old_type = old_db_params["type"]
         new_db_params = new_field.db_parameters(connection=self.connection)
         new_type = new_db_params["type"]
+        modifying_generated_field = False
         if (old_type is None and old_field.remote_field is None) or (
             new_type is None and new_field.remote_field is None
         ):
@@ -869,13 +884,19 @@ class BaseDatabaseSchemaEditor:
                 "through= on M2M fields)" % (old_field, new_field)
             )
         elif old_field.generated != new_field.generated or (
-            new_field.generated
-            and (
-                old_field.db_persist != new_field.db_persist
-                or old_field.generated_sql(self.connection)
-                != new_field.generated_sql(self.connection)
-            )
+            new_field.generated and old_field.db_persist != new_field.db_persist
         ):
+            modifying_generated_field = True
+        elif new_field.generated:
+            try:
+                old_field_sql = old_field.generated_sql(self.connection)
+            except FieldError:
+                # Field used in a generated field was renamed.
+                modifying_generated_field = True
+            else:
+                new_field_sql = new_field.generated_sql(self.connection)
+                modifying_generated_field = old_field_sql != new_field_sql
+        if modifying_generated_field:
             raise ValueError(
                 f"Modifying GeneratedFields is not supported - the field {new_field} "
                 "must be removed and re-added with the new definition."
@@ -1574,11 +1595,22 @@ class BaseDatabaseSchemaEditor:
         )
 
     def _delete_index_sql(self, model, name, sql=None):
-        return Statement(
+        statement = Statement(
             sql or self.sql_delete_index,
             table=Table(model._meta.db_table, self.quote_name),
             name=self.quote_name(name),
         )
+
+        # Remove all deferred statements referencing the deleted index.
+        table_name = statement.parts["table"].table
+        index_name = statement.parts["name"]
+        for sql in list(self.deferred_sql):
+            if isinstance(sql, Statement) and sql.references_index(
+                table_name, index_name
+            ):
+                self.deferred_sql.remove(sql)
+
+        return statement
 
     def _rename_index_sql(self, model, old_name, new_name):
         return Statement(

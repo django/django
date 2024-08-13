@@ -135,7 +135,7 @@ class WriterProfile(models.Model):
 
 
 class Document(models.Model):
-    myfile = models.FileField(upload_to="unused", blank=True)
+    myfile = models.FileField(storage=temp_storage, upload_to="unused", blank=True)
 
 
 class TextFile(models.Model):

@@ -32,9 +32,10 @@ _default = None
 CONTEXT_SEPARATOR = "\x04"
 
 # Maximum number of characters that will be parsed from the Accept-Language
-# header to prevent possible denial of service or memory exhaustion attacks.
-# About 10x longer than the longest value shown on MDN’s Accept-Language page.
-ACCEPT_LANGUAGE_HEADER_MAX_LENGTH = 500
+# header or cookie to prevent possible denial of service or memory exhaustion
+# attacks. About 10x longer than the longest value shown on MDN’s
+# Accept-Language page.
+LANGUAGE_CODE_MAX_LENGTH = 500
 
 # Format of Accept-Language header values. From RFC 9110 Sections 12.4.2 and
 # 12.5.4, and RFC 5646 Section 2.1.
@@ -498,11 +499,25 @@ def get_supported_language_variant(lang_code, strict=False):
     If `strict` is False (the default), look for a country-specific variant
     when neither the language code nor its generic variant is found.
 
+    The language code is truncated to a maximum length to avoid potential
+    denial of service attacks.
+
     lru_cache should have a maxsize to prevent from memory exhaustion attacks,
     as the provided language codes are taken from the HTTP request. See also
     <https://www.djangoproject.com/weblog/2007/oct/26/security-fix/>.
     """
     if lang_code:
+        # Truncate the language code to a maximum length to avoid potential
+        # denial of service attacks.
+        if len(lang_code) > LANGUAGE_CODE_MAX_LENGTH:
+            if (
+                not strict
+                and (index := lang_code.rfind("-", 0, LANGUAGE_CODE_MAX_LENGTH)) > 0
+            ):
+                # There is a generic variant under the maximum length accepted length.
+                lang_code = lang_code[:index]
+            else:
+                raise LookupError(lang_code)
         # If 'zh-hant-tw' is not supported, try special fallback or subsequent
         # language codes i.e. 'zh-hant' and 'zh'.
         possible_lang_codes = [lang_code]
@@ -626,13 +641,13 @@ def parse_accept_lang_header(lang_string):
     functools.lru_cache() to avoid repetitive parsing of common header values.
     """
     # If the header value doesn't exceed the maximum allowed length, parse it.
-    if len(lang_string) <= ACCEPT_LANGUAGE_HEADER_MAX_LENGTH:
+    if len(lang_string) <= LANGUAGE_CODE_MAX_LENGTH:
         return _parse_accept_lang_header(lang_string)
 
     # If there is at least one comma in the value, parse up to the last comma
     # before the max length, skipping any truncated parts at the end of the
     # header value.
-    if (index := lang_string.rfind(",", 0, ACCEPT_LANGUAGE_HEADER_MAX_LENGTH)) > 0:
+    if (index := lang_string.rfind(",", 0, LANGUAGE_CODE_MAX_LENGTH)) > 0:
         return _parse_accept_lang_header(lang_string[:index])
 
     # Don't attempt to parse if there is only one language-range value which is

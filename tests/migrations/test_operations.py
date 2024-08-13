@@ -9,7 +9,7 @@ from django.db.migrations.operations.fields import FieldOperation
 from django.db.migrations.state import ModelState, ProjectState
 from django.db.models import F
 from django.db.models.expressions import Value
-from django.db.models.functions import Abs, Pi
+from django.db.models.functions import Abs, Concat, Pi
 from django.db.transaction import atomic
 from django.test import (
     SimpleTestCase,
@@ -1345,6 +1345,89 @@ class OperationTests(OperationTestBase):
         ponyrider = PonyRider.objects.create()
         ponyrider.riders.add(jockey)
 
+    def test_rename_m2m_field_with_2_references(self):
+        app_label = "test_rename_many_refs"
+        project_state = self.apply_operations(
+            app_label,
+            ProjectState(),
+            operations=[
+                migrations.CreateModel(
+                    name="Person",
+                    fields=[
+                        (
+                            "id",
+                            models.BigAutoField(
+                                auto_created=True,
+                                primary_key=True,
+                                serialize=False,
+                                verbose_name="ID",
+                            ),
+                        ),
+                        ("name", models.CharField(max_length=255)),
+                    ],
+                ),
+                migrations.CreateModel(
+                    name="Relation",
+                    fields=[
+                        (
+                            "id",
+                            models.BigAutoField(
+                                auto_created=True,
+                                primary_key=True,
+                                serialize=False,
+                                verbose_name="ID",
+                            ),
+                        ),
+                        (
+                            "child",
+                            models.ForeignKey(
+                                on_delete=models.CASCADE,
+                                related_name="relations_as_child",
+                                to=f"{app_label}.person",
+                            ),
+                        ),
+                        (
+                            "parent",
+                            models.ForeignKey(
+                                on_delete=models.CASCADE,
+                                related_name="relations_as_parent",
+                                to=f"{app_label}.person",
+                            ),
+                        ),
+                    ],
+                ),
+                migrations.AddField(
+                    model_name="person",
+                    name="parents_or_children",
+                    field=models.ManyToManyField(
+                        blank=True,
+                        through=f"{app_label}.Relation",
+                        to=f"{app_label}.person",
+                    ),
+                ),
+            ],
+        )
+        Person = project_state.apps.get_model(app_label, "Person")
+        Relation = project_state.apps.get_model(app_label, "Relation")
+
+        person1 = Person.objects.create(name="John Doe")
+        person2 = Person.objects.create(name="Jane Smith")
+        Relation.objects.create(child=person2, parent=person1)
+
+        self.assertTableExists(app_label + "_person")
+        self.assertTableNotExists(app_label + "_other")
+
+        self.apply_operations(
+            app_label,
+            project_state,
+            operations=[
+                migrations.RenameModel(old_name="Person", new_name="Other"),
+            ],
+        )
+
+        self.assertTableNotExists(app_label + "_person")
+        self.assertTableExists(app_label + "_other")
+
     def test_add_field(self):
         """
         Tests the AddField operation.
@@ -1378,6 +1461,54 @@ class OperationTests(OperationTestBase):
         self.assertEqual(definition[0], "AddField")
         self.assertEqual(definition[1], [])
         self.assertEqual(sorted(definition[2]), ["field", "model_name", "name"])
+
+    @skipUnlessDBFeature("supports_stored_generated_columns")
+    def test_add_generated_field(self):
+        app_label = "test_add_generated_field"
+        project_state = self.apply_operations(
+            app_label,
+            ProjectState(),
+            operations=[
+                migrations.CreateModel(
+                    "Rider",
+                    fields=[
+                        ("id", models.AutoField(primary_key=True)),
+                    ],
+                ),
+                migrations.CreateModel(
+                    "Pony",
+                    fields=[
+                        ("id", models.AutoField(primary_key=True)),
+                        ("name", models.CharField(max_length=20)),
+                        (
+                            "rider",
+                            models.ForeignKey(
+                                f"{app_label}.Rider", on_delete=models.CASCADE
+                            ),
+                        ),
+                        (
+                            "name_and_id",
+                            models.GeneratedField(
+                                expression=Concat(("name"), ("rider_id")),
+                                output_field=models.TextField(),
+                                db_persist=True,
+                            ),
+                        ),
+                    ],
+                ),
+            ],
+        )
+        Pony = project_state.apps.get_model(app_label, "Pony")
+        Rider = project_state.apps.get_model(app_label, "Rider")
+        rider = Rider.objects.create()
+        pony = Pony.objects.create(name="pony", rider=rider)
+        self.assertEqual(pony.name_and_id, str(pony.name) + str(rider.id))
+
+        new_rider = Rider.objects.create()
+        pony.rider = new_rider
+        pony.save()
+        pony.refresh_from_db()
+        self.assertEqual(pony.name_and_id, str(pony.name) + str(new_rider.id))
 
     def test_add_charfield(self):
         """
@@ -3977,6 +4108,64 @@ class OperationTests(OperationTestBase):
         )
 
     @skipUnlessDBFeature("supports_table_check_constraints")
+    def test_create_model_constraint_percent_escaping(self):
+        app_label = "add_constraint_string_quoting"
+        from_state = ProjectState()
+        checks = [
+            # "%" generated in startswith lookup should be escaped in a way
+            # that is considered a leading wildcard.
+            (
+                models.Q(name__startswith="Albert"),
+                {"name": "Alberta"},
+                {"name": "Artur"},
+            ),
+            # Literal "%" should be escaped in a way that is not a considered a
+            # wildcard.
+            (models.Q(rebate__endswith="%"), {"rebate": "10%"}, {"rebate": "10%$"}),
+            # Right-hand-side baked "%" literals should not be used for
+            # parameters interpolation.
+            (
+                ~models.Q(surname__startswith=models.F("name")),
+                {"name": "Albert"},
+                {"name": "Albert", "surname": "Alberto"},
+            ),
+            # Exact matches against "%" literals should also be supported.
+            (
+                models.Q(name="%"),
+                {"name": "%"},
+                {"name": "Albert"},
+            ),
+        ]
+        for check, valid, invalid in checks:
+            with self.subTest(condition=check, valid=valid, invalid=invalid):
+                constraint = models.CheckConstraint(condition=check, name="constraint")
+                operation = migrations.CreateModel(
+                    "Author",
+                    fields=[
+                        ("id", models.AutoField(primary_key=True)),
+                        ("name", models.CharField(max_length=100)),
+                        ("surname", models.CharField(max_length=100, db_default="")),
+                        ("rebate", models.CharField(max_length=100)),
+                    ],
+                    options={"constraints": [constraint]},
+                )
+                to_state = from_state.clone()
+                operation.state_forwards(app_label, to_state)
+                with connection.schema_editor() as editor:
+                    operation.database_forwards(app_label, editor, from_state, to_state)
+                Author = to_state.apps.get_model(app_label, "Author")
+                try:
+                    with transaction.atomic():
+                        Author.objects.create(**valid).delete()
+                    with self.assertRaises(IntegrityError), transaction.atomic():
+                        Author.objects.create(**invalid)
+                finally:
+                    with connection.schema_editor() as editor:
+                        migrations.DeleteModel("Author").database_forwards(
+                            app_label, editor, to_state, from_state
+                        )
+
+    @skipUnlessDBFeature("supports_table_check_constraints")
     def test_add_constraint_percent_escaping(self):
         app_label = "add_constraint_string_quoting"
         operations = [
@@ -5841,6 +6030,50 @@ class OperationTests(OperationTestBase):
     @skipUnlessDBFeature("supports_virtual_generated_columns")
     def test_invalid_generated_field_changes_virtual(self):
         self._test_invalid_generated_field_changes(db_persist=False)
+
+    def _test_invalid_generated_field_changes_on_rename(self, db_persist):
+        app_label = "test_igfcor"
+        operation = migrations.AddField(
+            "Pony",
+            "modified_pink",
+            models.GeneratedField(
+                expression=F("pink") + F("pink"),
+                output_field=models.IntegerField(),
+                db_persist=db_persist,
+            ),
+        )
+        project_state, new_state = self.make_test_state(app_label, operation)
+        # Add generated column.
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+        # Rename field used in the generated field.
+        operations = [
+            migrations.RenameField("Pony", "pink", "renamed_pink"),
+            migrations.AlterField(
+                "Pony",
+                "modified_pink",
+                models.GeneratedField(
+                    expression=F("renamed_pink"),
+                    output_field=models.IntegerField(),
+                    db_persist=db_persist,
+                ),
+            ),
+        ]
+        msg = (
+            "Modifying GeneratedFields is not supported - the field "
+            f"{app_label}.Pony.modified_pink must be removed and re-added with the "
+            "new definition."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            self.apply_operations(app_label, new_state, operations)
+
+    @skipUnlessDBFeature("supports_stored_generated_columns")
+    def test_invalid_generated_field_changes_on_rename_stored(self):
+        self._test_invalid_generated_field_changes_on_rename(db_persist=True)
+
+    @skipUnlessDBFeature("supports_virtual_generated_columns")
+    def test_invalid_generated_field_changes_on_rename_virtual(self):
+        self._test_invalid_generated_field_changes_on_rename(db_persist=False)
 
     @skipUnlessDBFeature(
         "supports_stored_generated_columns",

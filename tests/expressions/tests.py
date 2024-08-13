@@ -208,24 +208,28 @@ class BasicExpressionsTests(TestCase):
 
     def _test_slicing_of_f_expressions(self, model):
         tests = [
-            (F("name")[:], "Example Inc.", "Example Inc."),
-            (F("name")[:7], "Example Inc.", "Example"),
-            (F("name")[:6][:5], "Example", "Examp"),  # Nested slicing.
-            (F("name")[0], "Examp", "E"),
-            (F("name")[5], "E", ""),
-            (F("name")[7:], "Foobar Ltd.", "Ltd."),
-            (F("name")[0:10], "Ltd.", "Ltd."),
-            (F("name")[2:7], "Test GmbH", "st Gm"),
-            (F("name")[1:][:3], "st Gm", "t G"),
-            (F("name")[2:2], "t G", ""),
+            (F("name")[:], "Example Inc."),
+            (F("name")[:7], "Example"),
+            (F("name")[:6][:5], "Examp"),  # Nested slicing.
+            (F("name")[0], "E"),
+            (F("name")[13], ""),
+            (F("name")[8:], "Inc."),
+            (F("name")[0:15], "Example Inc."),
+            (F("name")[2:7], "ample"),
+            (F("name")[1:][:3], "xam"),
+            (F("name")[2:2], ""),
         ]
-        for expression, name, expected in tests:
-            with self.subTest(expression=expression, name=name, expected=expected):
-                obj = model.objects.get(name=name)
-                obj.name = expression
-                obj.save()
-                obj.refresh_from_db()
-                self.assertEqual(obj.name, expected)
+        for expression, expected in tests:
+            with self.subTest(expression=expression, expected=expected):
+                obj = model.objects.get(name="Example Inc.")
+                try:
+                    obj.name = expression
+                    obj.save(update_fields=["name"])
+                    obj.refresh_from_db()
+                    self.assertEqual(obj.name, expected)
+                finally:
+                    obj.name = "Example Inc."
+                    obj.save(update_fields=["name"])
 
     def test_slicing_of_f_expressions_charfield(self):
         self._test_slicing_of_f_expressions(Company)
@@ -1302,6 +1306,11 @@ class FTests(SimpleTestCase):
         self.assertNotEqual(f, value)
         self.assertNotEqual(value, f)
 
+    def test_contains(self):
+        msg = "argument of type 'F' is not iterable"
+        with self.assertRaisesMessage(TypeError, msg):
+            "" in F("name")
+
 
 class ExpressionsTests(TestCase):
     def test_F_reuse(self):
@@ -1424,6 +1433,16 @@ class SimpleExpressionTests(SimpleTestCase):
             hash(Expression(TestModel._meta.get_field("field"))),
             hash(Expression(TestModel._meta.get_field("other_field"))),
         )
+
+    def test_get_expression_for_validation_only_one_source_expression(self):
+        expression = Expression()
+        expression.constraint_validation_compatible = False
+        msg = (
+            "Expressions with constraint_validation_compatible set to False must have "
+            "only one source expression."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            expression.get_expression_for_validation()
 
 
 class ExpressionsNumericTests(TestCase):
@@ -2295,11 +2314,6 @@ class ValueTests(TestCase):
         self.assertEqual(value, same_value)
         self.assertNotEqual(value, other_value)
         self.assertNotEqual(value, no_output_field)
-
-    def test_raise_empty_expressionlist(self):
-        msg = "ExpressionList requires at least one expression"
-        with self.assertRaisesMessage(ValueError, msg):
-            ExpressionList()
 
     def test_compile_unresolved(self):
         # This test might need to be revisited later on if #25425 is enforced.

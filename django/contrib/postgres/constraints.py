@@ -1,8 +1,7 @@
 from types import NoneType
 
-from django.contrib.postgres.indexes import OpClass
 from django.core.exceptions import ValidationError
-from django.db import DEFAULT_DB_ALIAS, NotSupportedError
+from django.db import DEFAULT_DB_ALIAS
 from django.db.backends.ddl_references import Expressions, Statement, Table
 from django.db.models import BaseConstraint, Deferrable, F, Q
 from django.db.models.expressions import Exists, ExpressionList
@@ -115,7 +114,6 @@ class ExclusionConstraint(BaseConstraint):
         )
 
     def create_sql(self, model, schema_editor):
-        self.check_supported(schema_editor)
         return Statement(
             "ALTER TABLE %(table)s ADD %(constraint)s",
             table=Table(model._meta.db_table, schema_editor.quote_name),
@@ -128,17 +126,6 @@ class ExclusionConstraint(BaseConstraint):
             model,
             schema_editor.quote_name(self.name),
         )
-
-    def check_supported(self, schema_editor):
-        if (
-            self.include
-            and self.index_type.lower() == "spgist"
-            and not schema_editor.connection.features.supports_covering_spgist_indexes
-        ):
-            raise NotSupportedError(
-                "Covering exclusion constraints using an SP-GiST index "
-                "require PostgreSQL 14+."
-            )
 
     def deconstruct(self):
         path, args, kwargs = super().deconstruct()
@@ -191,29 +178,21 @@ class ExclusionConstraint(BaseConstraint):
 
     def validate(self, model, instance, exclude=None, using=DEFAULT_DB_ALIAS):
         queryset = model._default_manager.using(using)
-        replacement_map = instance._get_field_value_map(
+        replacement_map = instance._get_field_expression_map(
             meta=model._meta, exclude=exclude
         )
         replacements = {F(field): value for field, value in replacement_map.items()}
         lookups = []
-        for idx, (expression, operator) in enumerate(self.expressions):
+        for expression, operator in self.expressions:
             if isinstance(expression, str):
                 expression = F(expression)
-            if exclude:
-                if isinstance(expression, F):
-                    if expression.name in exclude:
-                        return
-                else:
-                    for expr in expression.flatten():
-                        if isinstance(expr, F) and expr.name in exclude:
-                            return
+            if exclude and self._expression_refs_exclude(model, expression, exclude):
+                return
             rhs_expression = expression.replace_expressions(replacements)
-            # Remove OpClass because it only has sense during the constraint
-            # creation.
-            if isinstance(expression, OpClass):
-                expression = expression.get_source_expressions()[0]
-            if isinstance(rhs_expression, OpClass):
-                rhs_expression = rhs_expression.get_source_expressions()[0]
+            if hasattr(expression, "get_expression_for_validation"):
+                expression = expression.get_expression_for_validation()
+            if hasattr(rhs_expression, "get_expression_for_validation"):
+                rhs_expression = rhs_expression.get_expression_for_validation()
             lookup = PostgresOperatorLookup(lhs=expression, rhs=rhs_expression)
             lookup.postgres_operator = operator
             lookups.append(lookup)

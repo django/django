@@ -25,11 +25,18 @@ from django.core.files.uploadedfile import (
 )
 from django.db.models import FileField
 from django.db.models.fields.files import FileDescriptor
-from django.test import LiveServerTestCase, SimpleTestCase, TestCase, override_settings
+from django.test import (
+    LiveServerTestCase,
+    SimpleTestCase,
+    TestCase,
+    ignore_warnings,
+    override_settings,
+)
 from django.test.utils import requires_tz_support
 from django.urls import NoReverseMatch, reverse_lazy
 from django.utils import timezone
 from django.utils._os import symlinks_supported
+from django.utils.deprecation import RemovedInDjango60Warning
 
 from .models import (
     Storage,
@@ -281,22 +288,17 @@ class FileStorageTests(SimpleTestCase):
 
         self.storage.delete("path/to/test.file")
 
-    def test_file_save_abs_path(self):
-        test_name = "path/to/test.file"
-        f = ContentFile("file saved with path")
-        f_name = self.storage.save(os.path.join(self.temp_dir, test_name), f)
-        self.assertEqual(f_name, test_name)
-
     @unittest.skipUnless(
         symlinks_supported(), "Must be able to symlink to run this test."
     )
     def test_file_save_broken_symlink(self):
         """A new path is created on save when a broken symlink is supplied."""
         nonexistent_file_path = os.path.join(self.temp_dir, "nonexistent.txt")
-        broken_symlink_path = os.path.join(self.temp_dir, "symlink.txt")
+        broken_symlink_file_name = "symlink.txt"
+        broken_symlink_path = os.path.join(self.temp_dir, broken_symlink_file_name)
         os.symlink(nonexistent_file_path, broken_symlink_path)
         f = ContentFile("some content")
-        f_name = self.storage.save(broken_symlink_path, f)
+        f_name = self.storage.save(broken_symlink_file_name, f)
         self.assertIs(os.path.exists(os.path.join(self.temp_dir, f_name)), True)
 
     def test_save_doesnt_close(self):
@@ -607,6 +609,7 @@ class CustomStorageTests(FileStorageTests):
         self.storage.delete(second)
 
 
+# RemovedInDjango60Warning: Remove this class.
 class OverwritingStorage(FileSystemStorage):
     """
     Overwrite existing files instead of appending a suffix to generate an
@@ -621,7 +624,26 @@ class OverwritingStorage(FileSystemStorage):
         return name
 
 
-class OverwritingStorageTests(FileStorageTests):
+# RemovedInDjango60Warning: Remove this test class.
+class OverwritingStorageOSOpenFlagsWarningTests(SimpleTestCase):
+    storage_class = OverwritingStorage
+
+    def setUp(self):
+        self.temp_dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.temp_dir)
+
+    def test_os_open_flags_deprecation_warning(self):
+        msg = "Overriding OS_OPEN_FLAGS is deprecated. Use the allow_overwrite "
+        msg += "parameter instead."
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+            self.storage = self.storage_class(
+                location=self.temp_dir, base_url="/test_media_url/"
+            )
+
+
+# RemovedInDjango60Warning: Remove this test class.
+@ignore_warnings(category=RemovedInDjango60Warning)
+class OverwritingStorageOSOpenFlagsTests(FileStorageTests):
     storage_class = OverwritingStorage
 
     def test_save_overwrite_behavior(self):
@@ -647,6 +669,81 @@ class OverwritingStorageTests(FileStorageTests):
                 self.assertEqual(fp.read(), content_2)
         finally:
             self.storage.delete(name)
+
+
+class OverwritingStorageTests(FileStorageTests):
+    storage_class = FileSystemStorage
+
+    def setUp(self):
+        self.temp_dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.temp_dir)
+        self.storage = self.storage_class(
+            location=self.temp_dir, base_url="/test_media_url/", allow_overwrite=True
+        )
+
+    def test_save_overwrite_behavior(self):
+        """Saving to same file name twice overwrites the first file."""
+        name = "test.file"
+        self.assertFalse(self.storage.exists(name))
+        content_1 = b"content one"
+        content_2 = b"second content"
+        f_1 = ContentFile(content_1)
+        f_2 = ContentFile(content_2)
+        stored_name_1 = self.storage.save(name, f_1)
+        try:
+            self.assertEqual(stored_name_1, name)
+            self.assertTrue(self.storage.exists(name))
+            with self.storage.open(name) as fp:
+                self.assertEqual(fp.read(), content_1)
+            stored_name_2 = self.storage.save(name, f_2)
+            self.assertEqual(stored_name_2, name)
+            self.assertTrue(self.storage.exists(name))
+            with self.storage.open(name) as fp:
+                self.assertEqual(fp.read(), content_2)
+        finally:
+            self.storage.delete(name)
+
+    def test_save_overwrite_behavior_temp_file(self):
+        """Saving to same file name twice overwrites the first file."""
+        name = "test.file"
+        self.assertFalse(self.storage.exists(name))
+        content_1 = b"content one"
+        content_2 = b"second content"
+        f_1 = TemporaryUploadedFile("tmp1", "text/plain", 11, "utf8")
+        f_1.write(content_1)
+        f_1.seek(0)
+        f_2 = TemporaryUploadedFile("tmp2", "text/plain", 14, "utf8")
+        f_2.write(content_2)
+        f_2.seek(0)
+        stored_name_1 = self.storage.save(name, f_1)
+        try:
+            self.assertEqual(stored_name_1, name)
+            self.assertTrue(os.path.exists(os.path.join(self.temp_dir, name)))
+            with self.storage.open(name) as fp:
+                self.assertEqual(fp.read(), content_1)
+            stored_name_2 = self.storage.save(name, f_2)
+            self.assertEqual(stored_name_2, name)
+            self.assertTrue(os.path.exists(os.path.join(self.temp_dir, name)))
+            with self.storage.open(name) as fp:
+                self.assertEqual(fp.read(), content_2)
+        finally:
+            self.storage.delete(name)
+
+    def test_file_name_truncation(self):
+        name = "test_long_file_name.txt"
+        file = ContentFile(b"content")
+        stored_name = self.storage.save(name, file, max_length=10)
+        self.addCleanup(self.storage.delete, stored_name)
+        self.assertEqual(stored_name, "test_l.txt")
+        self.assertEqual(len(stored_name), 10)
+
+    def test_file_name_truncation_extension_too_long(self):
+        name = "file_name.longext"
+        file = ContentFile(b"content")
+        with self.assertRaisesMessage(
+            SuspiciousFileOperation, "Storage can not find an available filename"
+        ):
+            self.storage.save(name, file, max_length=5)
 
 
 class DiscardingFalseContentStorage(FileSystemStorage):
@@ -847,6 +944,20 @@ class FileFieldStorageTests(TestCase):
         self.assertEqual(obj.default.read(), b"default content")
         obj.default.close()
 
+    def test_filefield_db_default(self):
+        temp_storage.save("tests/db_default.txt", ContentFile("default content"))
+        obj = Storage.objects.create()
+        self.assertEqual(obj.db_default.name, "tests/db_default.txt")
+        self.assertEqual(obj.db_default.read(), b"default content")
+        obj.db_default.close()
+
+        # File is not deleted, even if there are no more objects using it.
+        obj.delete()
+        s = Storage()
+        self.assertEqual(s.db_default.name, "tests/db_default.txt")
+        self.assertEqual(s.db_default.read(), b"default content")
+        s.db_default.close()
+
     def test_empty_upload_to(self):
         # upload_to can be empty, meaning it does not use subdirectory.
         obj = Storage()
@@ -911,6 +1022,23 @@ class FileFieldStorageTests(TestCase):
         temp_storage.save("tests/stringio", output)
         self.assertTrue(temp_storage.exists("tests/stringio"))
         with temp_storage.open("tests/stringio") as f:
+            self.assertEqual(f.read(), b"content")
+
+    @override_settings(
+        STORAGES={
+            DEFAULT_STORAGE_ALIAS: {
+                "BACKEND": "django.core.files.storage.InMemoryStorage"
+            }
+        }
+    )
+    def test_create_file_field_from_another_file_field_in_memory_storage(self):
+        f = ContentFile("content", "file.txt")
+        obj = Storage.objects.create(storage_callable_default=f)
+        new_obj = Storage.objects.create(
+            storage_callable_default=obj.storage_callable_default.file
+        )
+        storage = callable_default_storage()
+        with storage.open(new_obj.storage_callable_default.name) as f:
             self.assertEqual(f.read(), b"content")
 
 

@@ -776,6 +776,43 @@ class Model(AltersData, metaclass=ModelBase):
             return getattr(self, field_name)
         return getattr(self, field.attname)
 
+    # RemovedInDjango60Warning: When the deprecation ends, remove completely.
+    def _parse_save_params(self, *args, method_name, **kwargs):
+        defaults = {
+            "force_insert": False,
+            "force_update": False,
+            "using": None,
+            "update_fields": None,
+        }
+
+        warnings.warn(
+            f"Passing positional arguments to {method_name}() is deprecated",
+            RemovedInDjango60Warning,
+            stacklevel=2,
+        )
+        total_len_args = len(args) + 1  # include self
+        max_len_args = len(defaults) + 1
+        if total_len_args > max_len_args:
+            # Recreate the proper TypeError message from Python.
+            raise TypeError(
+                f"Model.{method_name}() takes from 1 to {max_len_args} positional "
+                f"arguments but {total_len_args} were given"
+            )
+
+        def get_param(param_name, param_value, arg_index):
+            if arg_index < len(args):
+                if param_value is not defaults[param_name]:
+                    # Recreate the proper TypeError message from Python.
+                    raise TypeError(
+                        f"Model.{method_name}() got multiple values for argument "
+                        f"'{param_name}'"
+                    )
+                return args[arg_index]
+
+            return param_value
+
+        return [get_param(k, v, i) for i, (k, v) in enumerate(kwargs.items())]
+
     # RemovedInDjango60Warning: When the deprecation ends, replace with:
     # def save(
     #   self, *, force_insert=False, force_update=False, using=None, update_fields=None,
@@ -798,23 +835,14 @@ class Model(AltersData, metaclass=ModelBase):
         """
         # RemovedInDjango60Warning.
         if args:
-            warnings.warn(
-                "Passing positional arguments to save() is deprecated",
-                RemovedInDjango60Warning,
-                stacklevel=2,
+            force_insert, force_update, using, update_fields = self._parse_save_params(
+                *args,
+                method_name="save",
+                force_insert=force_insert,
+                force_update=force_update,
+                using=using,
+                update_fields=update_fields,
             )
-            for arg, attr in zip(
-                args, ["force_insert", "force_update", "using", "update_fields"]
-            ):
-                if arg:
-                    if attr == "force_insert":
-                        force_insert = arg
-                    elif attr == "force_update":
-                        force_update = arg
-                    elif attr == "using":
-                        using = arg
-                    else:
-                        update_fields = arg
 
         self._prepare_related_fields_for_save(operation_name="save")
 
@@ -883,24 +911,14 @@ class Model(AltersData, metaclass=ModelBase):
     ):
         # RemovedInDjango60Warning.
         if args:
-            warnings.warn(
-                "Passing positional arguments to asave() is deprecated",
-                RemovedInDjango60Warning,
-                stacklevel=2,
+            force_insert, force_update, using, update_fields = self._parse_save_params(
+                *args,
+                method_name="asave",
+                force_insert=force_insert,
+                force_update=force_update,
+                using=using,
+                update_fields=update_fields,
             )
-            for arg, attr in zip(
-                args, ["force_insert", "force_update", "using", "update_fields"]
-            ):
-                if arg:
-                    if attr == "force_insert":
-                        force_insert = arg
-                    elif attr == "force_update":
-                        force_update = arg
-                    elif attr == "using":
-                        using = arg
-                    else:
-                        update_fields = arg
-
         return await sync_to_async(self.save)(
             force_insert=force_insert,
             force_update=force_update,
@@ -1088,6 +1106,7 @@ class Model(AltersData, metaclass=ModelBase):
         if (
             not raw
             and not force_insert
+            and not force_update
             and self._state.adding
             and (
                 (meta.pk.default and meta.pk.default is not NOT_PROVIDED)
@@ -1314,17 +1333,37 @@ class Model(AltersData, metaclass=ModelBase):
             setattr(self, cachename, obj)
         return getattr(self, cachename)
 
-    def _get_field_value_map(self, meta, exclude=None):
+    def _get_field_expression_map(self, meta, exclude=None):
         if exclude is None:
             exclude = set()
         meta = meta or self._meta
-        field_map = {
-            field.name: Value(getattr(self, field.attname), field)
-            for field in meta.local_concrete_fields
-            if field.name not in exclude
-        }
+        field_map = {}
+        generated_fields = []
+        for field in meta.local_concrete_fields:
+            if field.name in exclude:
+                continue
+            if field.generated:
+                if any(
+                    ref[0] in exclude
+                    for ref in self._get_expr_references(field.expression)
+                ):
+                    continue
+                generated_fields.append(field)
+                continue
+            value = getattr(self, field.attname)
+            if not value or not hasattr(value, "resolve_expression"):
+                value = Value(value, field)
+            field_map[field.name] = value
         if "pk" not in exclude:
             field_map["pk"] = Value(self.pk, meta.pk)
+        if generated_fields:
+            replacements = {F(name): value for name, value in field_map.items()}
+            for generated_field in generated_fields:
+                field_map[generated_field.name] = ExpressionWrapper(
+                    generated_field.expression.replace_expressions(replacements),
+                    generated_field.output_field,
+                )
+
         return field_map
 
     def prepare_database_save(self, field):

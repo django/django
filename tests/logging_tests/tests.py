@@ -467,7 +467,7 @@ class AdminEmailHandlerTest(SimpleTestCase):
         msg = mail.outbox[0]
         self.assertEqual(msg.subject, "[Django] ERROR: message")
         self.assertEqual(len(msg.alternatives), 1)
-        body_html = str(msg.alternatives[0][0])
+        body_html = str(msg.alternatives[0].content)
         self.assertIn('<div id="traceback">', body_html)
         self.assertNotIn("<form", body_html)
 

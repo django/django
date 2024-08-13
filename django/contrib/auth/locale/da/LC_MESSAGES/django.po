@@ -2,7 +2,7 @@
 #
 # Translators:
 # Christian Joergensen <christian@gmta.info>, 2012
-# Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2021,2023
+# Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2021,2023-2024
 # Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2013-2017,2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # 85794379431c3e0f5c85c0e72a78d45b_658ddd9, 2013
@@ -12,10 +12,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-17 03:19-0500\n"
-"PO-Revision-Date: 2023-04-25 08:09+0000\n"
-"Last-Translator: Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2021,2023\n"
-"Language-Team: Danish (http://www.transifex.com/django/django/language/da/)\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 08:09+0000\n"
+"Last-Translator: Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2021,2023-2024\n"
+"Language-Team: Danish (http://app.transifex.com/django/django/language/da/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -35,12 +35,22 @@ msgstr "Vigtige datoer"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Der findes ikke et %(name)s-objekt med primærnøgle %(key)r."
 
+msgid "Conflicting form data submitted. Please try again."
+msgstr "Uoverensstemmende formulardata indsendt. Prøv igen."
+
 msgid "Password changed successfully."
 msgstr "Adgangskoden blev ændret."
+
+msgid "Password-based authentication was disabled."
+msgstr "Adgangskodebaseret autentificering blev deaktiveret."
 
 #, python-format
 msgid "Change password: %s"
 msgstr "Skift adgangskode: %s"
+
+#, python-format
+msgid "Set password: %s"
+msgstr "Sæt adgangskode: %s"
 
 msgid "Authentication and Authorization"
 msgstr "Godkendelse og autorisation"
@@ -57,8 +67,23 @@ msgstr "Ingen adgangskode valgt."
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Ugyldigt adgangskodeformat eller hashing-algoritme."
 
+msgid "Reset password"
+msgstr "Nulstil adgangskode"
+
+msgid "Set password"
+msgstr "Sæt adgangskode"
+
 msgid "The two password fields didn’t match."
 msgstr "De to adgangskoder var ikke identiske."
+
+msgid ""
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
+msgstr ""
+"Om brugeren kan logge ind med adgangskode eller ej. Hvis deaktiveret kan "
+"brugeren muligvis stadig logge ind vha. andre backends så som Single Sign-On "
+"eller LDAP."
 
 msgid "Password"
 msgstr "Adgangskode"
@@ -69,13 +94,26 @@ msgstr "Bekræftelse af adgangskode"
 msgid "Enter the same password as before, for verification."
 msgstr "Indtast den samme adgangskode som før, for bekræftelse."
 
+msgid "Password-based authentication"
+msgstr "Adgangskodebaseret autentificering"
+
+msgid "Enabled"
+msgstr "Aktiveret"
+
+msgid "Disabled"
+msgstr "Deaktiveret"
+
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user’s "
-"password, but you can change the password using <a href=\"{}\">this form</a>."
+"Raw passwords are not stored, so there is no way to see the user’s password."
 msgstr ""
-"Rå adgangskoder gemmes ikke, så det er ikke muligt at se denne brugers "
-"adgangskode, men du kan ændre adgangskoden ved hjælp af <a href=\"{}\">denne "
-"formular</a>."
+"Rå adgangskoder gemmes ikke, så det er ikke muligt at se brugerens "
+"adgangskode."
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
+msgstr ""
+"Aktivér adgangskodebaseret autentificering for denne bruger ved at sætte en "
+"adgangskode."
 
 #, python-format
 msgid ""
@@ -103,9 +141,6 @@ msgstr ""
 
 msgid "Old password"
 msgstr "Gammel adgangskode"
-
-msgid "Password (again)"
-msgstr "Adgangskode (igen)"
 
 msgid "algorithm"
 msgstr "algoritme"

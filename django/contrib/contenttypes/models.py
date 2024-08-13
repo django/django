@@ -75,7 +75,7 @@ class ContentTypeManager(models.Manager):
                 ct = self._get_from_cache(opts)
             except KeyError:
                 needed_models[opts.app_label].add(opts.model_name)
-                needed_opts[opts].append(model)
+                needed_opts[(opts.app_label, opts.model_name)].append(model)
             else:
                 results[model] = ct
         if needed_opts:
@@ -89,18 +89,13 @@ class ContentTypeManager(models.Manager):
             )
             cts = self.filter(condition)
             for ct in cts:
-                opts_models = needed_opts.pop(
-                    ct._meta.apps.get_model(ct.app_label, ct.model)._meta, []
-                )
+                opts_models = needed_opts.pop((ct.app_label, ct.model), [])
                 for model in opts_models:
                     results[model] = ct
                 self._add_to_cache(self.db, ct)
         # Create content types that weren't in the cache or DB.
-        for opts, opts_models in needed_opts.items():
-            ct = self.create(
-                app_label=opts.app_label,
-                model=opts.model_name,
-            )
+        for (app_label, model_name), opts_models in needed_opts.items():
+            ct = self.create(app_label=app_label, model=model_name)
             self._add_to_cache(self.db, ct)
             for model in opts_models:
                 results[model] = ct

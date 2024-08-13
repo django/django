@@ -219,10 +219,6 @@ ones:
     Further examples are available in the :ref:`model field reference
     <field-choices>`.
 
-    .. versionchanged:: 5.0
-
-        Support for mappings and callables was added.
-
 :attr:`~Field.default`
     The default value for the field. This can be a value or a callable
     object. If callable it will be called every time a new object is
@@ -723,6 +719,9 @@ Django places some restrictions on model field names:
            foo__bar = models.IntegerField()  # 'foo__bar' has two underscores!
 
 #. A field name cannot end with an underscore, for similar reasons.
+
+#. A field name cannot be ``check``, as this would override the check
+   framework's ``Model.check()`` method.
 
 These limitations can be worked around, though, because your field name doesn't
 necessarily have to match your database column name. See the

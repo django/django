@@ -13,6 +13,8 @@ from django.db.models.functions import Lower
 from django.utils.functional import SimpleLazyObject
 from django.utils.translation import gettext_lazy as _
 
+from .storage import NoReadFileSystemStorage
+
 try:
     from PIL import Image
 except ImportError:
@@ -373,6 +375,21 @@ if Image:
             width_field="headshot_width",
         )
 
+    class PersonNoReadImage(models.Model):
+        """
+        Model that defines an ImageField with a storage backend that does not
+        support reading.
+        """
+
+        mugshot = models.ImageField(
+            upload_to="tests",
+            storage=NoReadFileSystemStorage(temp_storage_dir),
+            width_field="mugshot_width",
+            height_field="mugshot_height",
+        )
+        mugshot_width = models.IntegerField()
+        mugshot_height = models.IntegerField()
+
 
 class CustomJSONDecoder(json.JSONDecoder):
     def __init__(self, object_hook=None, *args, **kwargs):
@@ -592,3 +609,79 @@ class GeneratedModelNullVirtual(models.Model):
 
     class Meta:
         required_db_features = {"supports_virtual_generated_columns"}
+
+
+class GeneratedModelBase(models.Model):
+    a = models.IntegerField()
+    a_squared = models.GeneratedField(
+        expression=F("a") * F("a"),
+        output_field=models.IntegerField(),
+        db_persist=True,
+    )
+
+    class Meta:
+        abstract = True
+
+
+class GeneratedModelVirtualBase(models.Model):
+    a = models.IntegerField()
+    a_squared = models.GeneratedField(
+        expression=F("a") * F("a"),
+        output_field=models.IntegerField(),
+        db_persist=False,
+    )
+
+    class Meta:
+        abstract = True
+
+
+class GeneratedModelCheckConstraint(GeneratedModelBase):
+    class Meta:
+        required_db_features = {
+            "supports_stored_generated_columns",
+            "supports_table_check_constraints",
+        }
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(a__gt=0),
+                name="Generated model check constraint a > 0",
+            )
+        ]
+
+
+class GeneratedModelCheckConstraintVirtual(GeneratedModelVirtualBase):
+    class Meta:
+        required_db_features = {
+            "supports_virtual_generated_columns",
+            "supports_table_check_constraints",
+        }
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(a__gt=0),
+                name="Generated model check constraint virtual a > 0",
+            )
+        ]
+
+
+class GeneratedModelUniqueConstraint(GeneratedModelBase):
+    class Meta:
+        required_db_features = {
+            "supports_stored_generated_columns",
+            "supports_expression_indexes",
+        }
+        constraints = [
+            models.UniqueConstraint(F("a"), name="Generated model unique constraint a"),
+        ]
+
+
+class GeneratedModelUniqueConstraintVirtual(GeneratedModelVirtualBase):
+    class Meta:
+        required_db_features = {
+            "supports_virtual_generated_columns",
+            "supports_expression_indexes",
+        }
+        constraints = [
+            models.UniqueConstraint(
+                F("a"), name="Generated model unique constraint virtual a"
+            ),
+        ]
