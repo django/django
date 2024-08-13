@@ -1092,7 +1092,7 @@ Python interpreter, use ``python`` as the interface name, like so:
 .. _IPython: https://ipython.org/
 .. _bpython: https://bpython-interpreter.org/
 
-.. django-admin-option:: --nostartup
+.. django-admin-option:: --no-startup
 
 Disables reading the startup script for the "plain" Python interpreter. By
 default, the script pointed to by the :envvar:`PYTHONSTARTUP` environment
