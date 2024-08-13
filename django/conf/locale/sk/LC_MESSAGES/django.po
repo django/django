@@ -1183,7 +1183,7 @@ msgid "%(num)d year"
 msgid_plural "%(num)d years"
 msgstr[0] "%(num)d rok"
 msgstr[1] "%(num)d roky"
-msgstr[2] "%(num)d rokov"
+msgstr[2] "%(num)d roka"
 msgstr[3] "%(num)d rokov"
 
 #, python-format
@@ -1191,7 +1191,7 @@ msgid "%(num)d month"
 msgid_plural "%(num)d months"
 msgstr[0] "%(num)d mesiac"
 msgstr[1] "%(num)d mesiace"
-msgstr[2] "%(num)d mesiacov"
+msgstr[2] "%(num)d mesiaca"
 msgstr[3] "%(num)d mesiacov"
 
 #, python-format
@@ -1199,7 +1199,7 @@ msgid "%(num)d week"
 msgid_plural "%(num)d weeks"
 msgstr[0] "%(num)d týždeň"
 msgstr[1] "%(num)d týždne"
-msgstr[2] "%(num)d týždňov"
+msgstr[2] "%(num)d týždňa"
 msgstr[3] "%(num)d týždňov"
 
 #, python-format
@@ -1207,7 +1207,7 @@ msgid "%(num)d day"
 msgid_plural "%(num)d days"
 msgstr[0] "%(num)d deň"
 msgstr[1] "%(num)d dni"
-msgstr[2] "%(num)d dní"
+msgstr[2] "%(num)d dňa"
 msgstr[3] "%(num)d dní"
 
 #, python-format
@@ -1215,16 +1215,16 @@ msgid "%(num)d hour"
 msgid_plural "%(num)d hours"
 msgstr[0] "%(num)d hodina"
 msgstr[1] "%(num)d hodiny"
-msgstr[2] "%(num)d hodín"
-msgstr[3] "%(num)d hodiny"
+msgstr[2] "%(num)d hodiny"
+msgstr[3] "%(num)d hodín"
 
 #, python-format
 msgid "%(num)d minute"
 msgid_plural "%(num)d minutes"
 msgstr[0] "%(num)d minúta"
 msgstr[1] "%(num)d minúty"
-msgstr[2] "%(num)d minút"
-msgstr[3] "%(num)d minúty"
+msgstr[2] "%(num)d minúty"
+msgstr[3] "%(num)d minút"
 
 msgid "Forbidden"
 msgstr "Zakázané (Forbidden)"
