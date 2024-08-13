@@ -267,6 +267,10 @@ Utilities
   values. This aligns with the :py:class:`str` addition behavior and allows
   ``__radd__`` to be used if available.
 
+* :func:`~django.utils.html.format_html_join` now supports taking an iterable
+  of mappings, passing their contents as keyword arguments to
+  :func:`~django.utils.html.format_html`.
+
 Validators
 ~~~~~~~~~~
 

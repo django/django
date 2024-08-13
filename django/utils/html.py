@@ -4,6 +4,7 @@ import html
 import json
 import re
 import warnings
+from collections.abc import Mapping
 from html.parser import HTMLParser
 from urllib.parse import parse_qsl, quote, unquote, urlencode, urlsplit, urlunsplit
 
@@ -155,7 +156,12 @@ def format_html_join(sep, format_string, args_generator):
     """
     return mark_safe(
         conditional_escape(sep).join(
-            format_html(format_string, *args) for args in args_generator
+            (
+                format_html(format_string, **args)
+                if isinstance(args, Mapping)
+                else format_html(format_string, *args)
+            )
+            for args in args_generator
         )
     )
 
