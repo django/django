@@ -361,6 +361,56 @@ Validators
 
 .. _backwards-incompatible-4.2:
 
+Breaking changes in 4.2
+=====================================
+
+
+User models that remove the ``is_active`` field
+-----------------------------------------------
+
+If you were previously defining the ``is_active`` field as ``None``
+
+.. code-block:: python
+    :caption: ``users/models.py``
+
+    from django.contrib.auth.models import AbstractUser
+
+
+    class User(AbstractUser):
+        is_active = None
+        active = models.BooleanField(default=False)
+
+You need create a property that returns the field you are using instead
+
+.. code-block:: python
+    :caption: ``users/models.py``
+
+    from django.contrib.auth.models import AbstractUser
+
+
+    class User(AbstractUser):
+        active = models.BooleanField(default=False)
+
+        @property
+        def is_active(self):
+            """Required by django.contrib.auth.backends.ModelBackend
+
+            See [#15839](https://github.com/django/django/pull/15839)
+            """
+            return self.active
+
+Or implementing your own :ref:`authentication backend <authentication-backends>`
+
+.. code-block:: python
+    :caption: ``auth/backends.py``
+
+    from django.contrib.auth.backends import AbstractUser
+
+
+    class MyBackend(ModelBackend):
+        def user_can_authenticate(self, user):
+            return getattr(user, "active", True)
+
 Backwards incompatible changes in 4.2
 =====================================
 
