@@ -25,7 +25,7 @@ the amount of time that we have to work on the framework is limited and will
 vary from week to week depending on our spare time. If we're busy, we may not
 be able to spend as much time on Django as we might want.
 
-The best way to make sure tickets do not get hung up on the way to checkin is
+The best way to make sure tickets do not get hung up on the way to check-in is
 to make it dead easy, even for someone who may not be intimately familiar with
 that area of the code, to understand the problem and verify the fix:
 
