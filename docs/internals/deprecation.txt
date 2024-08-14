@@ -20,6 +20,9 @@ details on these changes.
 
 * The ``django.contrib.postgres.aggregates.StringAgg`` class will be removed.
 
+* The ``django.contrib.postgres.aggregates.mixins.OrderableAggMixin`` class
+  will be removed.
+
 .. _deprecation-removed-in-6.1:
 
 6.1
