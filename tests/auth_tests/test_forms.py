@@ -5,6 +5,7 @@ from unittest import mock
 
 from django.contrib.auth.forms import (
     AdminPasswordChangeForm,
+    AdminUserCreationForm,
     AuthenticationForm,
     BaseUserCreationForm,
     PasswordChangeForm,
@@ -236,16 +237,6 @@ class BaseUserCreationFormTest(TestDataMixin, TestCase):
             form["password2"].errors,
         )
 
-        # passwords are not validated if `usable_password` is unset
-        data = {
-            "username": "othertestclient",
-            "password1": "othertestclient",
-            "password2": "othertestclient",
-            "usable_password": "false",
-        }
-        form = BaseUserCreationForm(data)
-        self.assertIs(form.is_valid(), True, form.errors)
-
     def test_custom_form(self):
         class CustomUserCreationForm(BaseUserCreationForm):
             class Meta(BaseUserCreationForm.Meta):
@@ -390,19 +381,6 @@ class BaseUserCreationFormTest(TestDataMixin, TestCase):
             ["The password is too similar to the first name."],
         )
 
-        # passwords are not validated if `usable_password` is unset
-        form = CustomUserCreationForm(
-            {
-                "username": "testuser",
-                "password1": "testpassword",
-                "password2": "testpassword",
-                "first_name": "testpassword",
-                "last_name": "lastname",
-                "usable_password": "false",
-            }
-        )
-        self.assertIs(form.is_valid(), True, form.errors)
-
     def test_username_field_autocapitalize_none(self):
         form = BaseUserCreationForm()
         self.assertEqual(
@@ -421,17 +399,6 @@ class BaseUserCreationFormTest(TestDataMixin, TestCase):
                 self.assertEqual(
                     form.fields[field_name].widget.attrs["autocomplete"], autocomplete
                 )
-
-    def test_unusable_password(self):
-        data = {
-            "username": "new-user-which-does-not-exist",
-            "usable_password": "false",
-        }
-        form = BaseUserCreationForm(data)
-        self.assertIs(form.is_valid(), True, form.errors)
-        u = form.save()
-        self.assertEqual(u.username, data["username"])
-        self.assertFalse(u.has_usable_password())
 
 
 class UserCreationFormTest(TestDataMixin, TestCase):
@@ -476,6 +443,49 @@ class UserCreationFormTest(TestDataMixin, TestCase):
             form["username"].errors,
             ["This username has already been taken."],
         )
+
+
+class AdminUserCreationFormTest(TestDataMixin, TestCase):
+    def test_unusable_password(self):
+        data = {
+            "username": "new-user-which-does-not-exist",
+            "usable_password": "false",
+        }
+        form = AdminUserCreationForm(data)
+        self.assertIs(form.is_valid(), True, form.errors)
+        u = form.save()
+        self.assertEqual(u.username, data["username"])
+        self.assertFalse(u.has_usable_password())
+
+    def test_admin_user_creation_form_validates_password(self):
+        # passwords are not validated if `usable_password` is unset
+        data = {
+            "username": "othertestclient",
+            "password1": "othertestclient",
+            "password2": "othertestclient",
+            "usable_password": "false",
+        }
+        form = AdminUserCreationForm(data)
+        self.assertIs(form.is_valid(), True, form.errors)
+
+    def test_admin_user_create_form_validates_password_with_all_data(self):
+        class CustomUserCreationForm(AdminUserCreationForm):
+            class Meta(BaseUserCreationForm.Meta):
+                model = User
+                fields = ("username", "email", "first_name", "last_name")
+
+        # passwords are not validated if `usable_password` is unset
+        form = CustomUserCreationForm(
+            {
+                "username": "testuser",
+                "password1": "testpassword",
+                "password2": "testpassword",
+                "first_name": "testpassword",
+                "last_name": "lastname",
+                "usable_password": "false",
+            }
+        )
+        self.assertIs(form.is_valid(), True, form.errors)
 
 
 # To verify that the login form rejects inactive users, use an authentication

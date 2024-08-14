@@ -200,7 +200,6 @@ class BaseUserCreationForm(SetPasswordMixin, forms.ModelForm):
     """
 
     password1, password2 = SetPasswordMixin.create_password_fields()
-    usable_password = SetPasswordMixin.create_usable_password_field()
 
     class Meta:
         model = User
@@ -518,6 +517,15 @@ class PasswordChangeForm(SetPasswordForm):
                 code="password_incorrect",
             )
         return old_password
+
+
+class AdminUserCreationForm(UserCreationForm):
+    """
+    A form used in the admin to create a user. It adds the usable password field
+    which the user facing UserCreationForm does not have,
+    """
+
+    usable_password = SetPasswordMixin.create_usable_password_field()
 
 
 class AdminPasswordChangeForm(SetPasswordMixin, forms.Form):
