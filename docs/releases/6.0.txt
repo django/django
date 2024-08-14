@@ -301,6 +301,9 @@ Miscellaneous
 * The PostgreSQL ``StringAgg`` class is deprecated in favor of the generally
   available :class:`~django.db.models.StringAgg` class.
 
+* The PostgreSQL ``OrderableAggMixin`` is deprecated in favor of the
+  ``order_by`` attribute now available on the ``Aggregate`` class.
+
 Features removed in 6.0
 =======================
 
