@@ -973,6 +973,9 @@ class Options:
             )
         ]
 
+    def is_composite_pk(self):
+        return False
+
     @cached_property
     def _property_names(self):
         """Return a set of the names of the properties defined on the model."""
