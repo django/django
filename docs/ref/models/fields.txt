@@ -43,13 +43,15 @@ If ``True``, Django will store empty values as ``NULL`` in the database. Default
 is ``False``.
 
 Avoid using :attr:`~Field.null` on string-based fields such as
-:class:`CharField` and :class:`TextField`. If a string-based field has
-``null=True``, that means it has two possible values for "no data": ``NULL``,
-and the empty string. In most cases, it's redundant to have two possible values
-for "no data;" the Django convention is to use the empty string, not
-``NULL``. One exception is when a :class:`CharField` has both ``unique=True``
-and ``blank=True`` set. In this situation, ``null=True`` is required to avoid
-unique constraint violations when saving multiple objects with blank values.
+:class:`CharField` and :class:`TextField`. The Django convention is to use an
+empty string, not ``NULL``, as the "no data" state for string-based fields. If a
+string-based field has ``null=False``, empty strings can still be saved for "no
+data". If a string-based field has ``null=True``, that means it has two possible
+values for "no data": ``NULL``, and the empty string. In most cases, it's
+redundant to have two possible values for "no data". One exception is when a
+:class:`CharField` has both ``unique=True`` and ``blank=True`` set. In this
+situation, ``null=True`` is required to avoid unique constraint violations when
+saving multiple objects with blank values.
 
 For both string-based and non-string-based fields, you will also need to
 set ``blank=True`` if you wish to permit empty values in forms, as the
