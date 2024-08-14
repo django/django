@@ -1291,7 +1291,13 @@ class ModelAdmin(BaseModelAdmin):
         """
         Given a model instance save it to the database.
         """
-        obj.save()
+        # Generate the list of updated fields, so the signals are correct
+        update_fields = set()
+        for field in obj._meta.fields:
+            if field.concrete and field.name in form.fields:
+                if form[field.name]._has_changed():
+                    update_fields.add(field.name)
+        obj.save(update_fields=update_fields)
 
     def delete_model(self, request, obj):
         """
