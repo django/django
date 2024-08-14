@@ -58,7 +58,7 @@ for several versions of Django:
   Django 1.3. Upon the release of Django 1.5, Django 1.3's security
   support will end.
 
-* :term:`Long-term support release`\s will receive security updates for a
+* :term:`Long-term support releases` will receive security updates for a
   specified period.
 
 When new releases are issued for security reasons, the accompanying
