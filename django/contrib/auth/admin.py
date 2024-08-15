@@ -5,8 +5,8 @@ from django.contrib.admin.utils import unquote
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import (
     AdminPasswordChangeForm,
+    AdminUserCreationForm,
     UserChangeForm,
-    UserCreationForm,
 )
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import PermissionDenied
@@ -71,7 +71,7 @@ class UserAdmin(admin.ModelAdmin):
         ),
     )
     form = UserChangeForm
-    add_form = UserCreationForm
+    add_form = AdminUserCreationForm
     change_password_form = AdminPasswordChangeForm
     list_display = ("username", "email", "first_name", "last_name", "is_staff")
     list_filter = ("is_staff", "is_superuser", "is_active", "groups")
