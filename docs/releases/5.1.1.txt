@@ -12,3 +12,9 @@ Bugfixes
 * Fixed a regression in Django 5.1 that caused a crash of ``Window()`` when
   passing an empty sequence to the ``order_by`` parameter, and a crash of
   ``Prefetch()`` for a sliced queryset without ordering (:ticket:`35665`).
+
+* Fixed a regression in Django 5.1 where a new ``usable_password`` field was
+  included in :class:`~django.contrib.auth.forms.BaseUserCreationForm` (and
+  children). A new :class:`~django.contrib.auth.forms.AdminUserCreationForm`
+  including this field was added, isolating the feature to the admin where it
+  was intended (:ticket:`35678`).
