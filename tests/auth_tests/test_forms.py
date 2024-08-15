@@ -5,6 +5,7 @@ from unittest import mock
 
 from django.contrib.auth.forms import (
     AdminPasswordChangeForm,
+    AdminUserCreationForm,
     AuthenticationForm,
     BaseUserCreationForm,
     PasswordChangeForm,
@@ -78,6 +79,12 @@ class ExtraValidationFormMixin:
 class BaseUserCreationFormTest(TestDataMixin, TestCase):
 
     form_class = BaseUserCreationForm
+
+    def test_form_fields(self):
+        form = self.form_class()
+        self.assertEqual(
+            list(form.fields.keys()), ["username", "password1", "password2"]
+        )
 
     def test_user_already_exists(self):
         data = {
@@ -239,16 +246,6 @@ class BaseUserCreationFormTest(TestDataMixin, TestCase):
             form["password2"].errors,
         )
 
-        # passwords are not validated if `usable_password` is unset
-        data = {
-            "username": "othertestclient",
-            "password1": "othertestclient",
-            "password2": "othertestclient",
-            "usable_password": "false",
-        }
-        form = BaseUserCreationForm(data)
-        self.assertIs(form.is_valid(), True, form.errors)
-
     def test_password_whitespace_not_stripped(self):
         data = {
             "username": "testuser",
@@ -330,19 +327,6 @@ class BaseUserCreationFormTest(TestDataMixin, TestCase):
             ["The password is too similar to the first name."],
         )
 
-        # passwords are not validated if `usable_password` is unset
-        form = CustomUserCreationForm(
-            {
-                "username": "testuser",
-                "password1": "testpassword",
-                "password2": "testpassword",
-                "first_name": "testpassword",
-                "last_name": "lastname",
-                "usable_password": "false",
-            }
-        )
-        self.assertIs(form.is_valid(), True, form.errors)
-
     def test_username_field_autocapitalize_none(self):
         form = self.form_class()
         self.assertEqual(
@@ -361,17 +345,6 @@ class BaseUserCreationFormTest(TestDataMixin, TestCase):
                 self.assertEqual(
                     form.fields[field_name].widget.attrs["autocomplete"], autocomplete
                 )
-
-    def test_unusable_password(self):
-        data = {
-            "username": "new-user-which-does-not-exist",
-            "usable_password": "false",
-        }
-        form = BaseUserCreationForm(data)
-        self.assertIs(form.is_valid(), True, form.errors)
-        u = form.save()
-        self.assertEqual(u.username, data["username"])
-        self.assertFalse(u.has_usable_password())
 
 
 class CustomUserCreationFormTest(TestDataMixin, TestCase):
@@ -1602,3 +1575,72 @@ class AdminPasswordChangeFormTest(TestDataMixin, TestCase):
         self.assertIs(form.is_valid(), True)  # Valid despite password empty/mismatch.
         user = form.save(commit=True)
         self.assertIs(user.has_usable_password(), False)
+
+
+class AdminUserCreationFormTest(BaseUserCreationFormTest):
+
+    form_class = AdminUserCreationForm
+
+    def test_form_fields(self):
+        form = self.form_class()
+        self.assertEqual(
+            list(form.fields.keys()),
+            ["username", "password1", "password2", "usable_password"],
+        )
+
+    @override_settings(
+        AUTH_PASSWORD_VALIDATORS=[
+            {
+                "NAME": (
+                    "django.contrib.auth.password_validation."
+                    "UserAttributeSimilarityValidator"
+                )
+            },
+            {
+                "NAME": (
+                    "django.contrib.auth.password_validation.MinimumLengthValidator"
+                ),
+                "OPTIONS": {
+                    "min_length": 12,
+                },
+            },
+        ]
+    )
+    def test_no_password_validation_if_unusable_password_set(self):
+        data = {
+            "username": "otherclient",
+            "password1": "otherclient",
+            "password2": "otherclient",
+            "usable_password": "false",
+        }
+        form = self.form_class(data)
+        # Passwords are not validated if `usable_password` is unset.
+        self.assertIs(form.is_valid(), True, form.errors)
+
+        class CustomUserCreationForm(self.form_class):
+            class Meta(self.form_class.Meta):
+                model = User
+                fields = ("username", "email", "first_name", "last_name")
+
+        form = CustomUserCreationForm(
+            {
+                "username": "testuser",
+                "password1": "testpassword",
+                "password2": "testpassword",
+                "first_name": "testpassword",
+                "last_name": "lastname",
+                "usable_password": "false",
+            }
+        )
+        self.assertIs(form.is_valid(), True, form.errors)
+
+    def test_unusable_password(self):
+        data = {
+            "username": "new-user-which-does-not-exist",
+            "usable_password": "false",
+        }
+        form = self.form_class(data)
+        self.assertIs(form.is_valid(), True, form.errors)
+        u = form.save()
+        self.assertEqual(u.username, data["username"])
+        self.assertFalse(u.has_usable_password())
