@@ -771,7 +771,8 @@ class DiscardingFalseContentStorageTests(FileStorageTests):
 
 class FileFieldStorageTests(TestCase):
     def tearDown(self):
-        shutil.rmtree(temp_storage_location)
+        if os.path.exists(temp_storage_location):
+            shutil.rmtree(temp_storage_location)
 
     def _storage_max_filename_length(self, storage):
         """
