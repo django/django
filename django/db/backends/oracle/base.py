@@ -250,7 +250,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         if not self.is_pool:
             return None
 
-        # Verify that we are not running with persistent connections
         if self.settings_dict.get("CONN_MAX_AGE", 0) != 0:
             raise ImproperlyConfigured(
                 "Pooling doesn't support persistent connections."
@@ -289,7 +288,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return self.oracle_version
 
     def get_connection_params(self):
-        # Pooling feature is only supported for oracledb
+        # Pooling feature is only supported for oracledb.
         if self.is_pool and not is_oracledb:
             raise ImproperlyConfigured(
                 "Pooling isn't supported by cx_Oracle. Use python-oracledb instead"

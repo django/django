@@ -123,7 +123,8 @@ CSRF
 Database backends
 ~~~~~~~~~~~~~~~~~
 
-* ...
+* ``"pool"`` option is now supported in :setting:`OPTIONS` on Oracle Database
+  to allow using :ref:`connection pools <oracle-pool>`.
 
 Decorators
 ~~~~~~~~~~

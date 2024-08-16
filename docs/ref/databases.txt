@@ -1112,7 +1112,7 @@ Example of a full DSN string::
 Connection pool
 ---------------
 
-.. versionadded:: 5.1
+.. versionadded:: 5.2
 
 To use a connection pool with `oracledb`_, you can set ``"pool"`` in the
 :setting:`OPTIONS` part of your database configuration in :setting:`DATABASES`
