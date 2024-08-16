@@ -3,6 +3,7 @@
 # Translators:
 # Resulkary <resulsaparov@gmail.com>, 2020
 # Welbeck Garli <welbeckgrlyw@gmail.com>, 2020
+# Gurov Nikita <robertgoodman088@gmail.com>, 2024 
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
@@ -23,7 +24,7 @@ msgstr "PostgreSQL giňeltmeleri"
 
 #, python-format
 msgid "Item %(nth)s in the array did not validate:"
-msgstr ""
+msgstr "Massiwyň %(nth)s elementi tassyklanmady"
 
 msgid "Nested arrays must have the same length."
 msgstr "Iç-içe massiwleriň deň uzynlygy bolmaly."
