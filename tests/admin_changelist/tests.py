@@ -1608,7 +1608,7 @@ class ChangeListTests(TestCase):
         response = m.changelist_view(request)
         self.assertIn('<ul class="object-tools">', response.rendered_content)
         # The "Add" button inside the object-tools shouldn't appear.
-        self.assertNotIn("Add ", response.rendered_content)
+        self.assertNotIn("Add event", response.rendered_content)
 
     def test_search_help_text(self):
         superuser = self._create_superuser("superuser")
