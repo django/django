@@ -39,7 +39,7 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
             opclasses = [self.geom_index_ops_nd]
         name = kwargs.get("name")
         if not name:
-            name = self._create_index_name(model._meta.db_table, [field.column], "_id")
+            name = self._create_spatial_index_name(model, field)
 
         return super()._create_index_sql(
             model,
@@ -79,3 +79,6 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
             ),
             [],
         )
+
+    def _create_spatial_index_name(self, model, field):
+        return self._create_index_name(model._meta.db_table, [field.column], "_id")
