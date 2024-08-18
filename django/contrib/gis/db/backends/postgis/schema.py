@@ -26,29 +26,7 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
         if fields is None or len(fields) != 1 or not hasattr(fields[0], "geodetic"):
             return super()._create_index_sql(model, fields=fields, **kwargs)
 
-        field = fields[0]
-        expressions = None
-        opclasses = None
-        if field.geom_type == "RASTER":
-            # For raster fields, wrap index creation SQL statement with ST_ConvexHull.
-            # Indexes on raster columns are based on the convex hull of the raster.
-            expressions = Func(Col(None, field), template=self.rast_index_template)
-            fields = None
-        elif field.dim > 2 and not field.geography:
-            # Use "nd" ops which are fast on multidimensional cases
-            opclasses = [self.geom_index_ops_nd]
-        name = kwargs.get("name")
-        if not name:
-            name = self._create_spatial_index_name(model, field)
-
-        return super()._create_index_sql(
-            model,
-            fields=fields,
-            name=name,
-            using=" USING %s" % self.geom_index_type,
-            opclasses=opclasses,
-            expressions=expressions,
-        )
+        return self._create_spatial_index_sql(model, fields[0], **kwargs)
 
     def _alter_column_type_sql(
         self, table, old_field, new_field, new_type, old_collation, new_collation
@@ -82,3 +60,27 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
 
     def _create_spatial_index_name(self, model, field):
         return self._create_index_name(model._meta.db_table, [field.column], "_id")
+
+    def _create_spatial_index_sql(self, model, field, **kwargs):
+        expressions = None
+        opclasses = None
+        fields = [field]
+        if field.geom_type == "RASTER":
+            # For raster fields, wrap index creation SQL statement with ST_ConvexHull.
+            # Indexes on raster columns are based on the convex hull of the raster.
+            expressions = Func(Col(None, field), template=self.rast_index_template)
+            fields = None
+        elif field.dim > 2 and not field.geography:
+            # Use "nd" ops which are fast on multidimensional cases
+            opclasses = [self.geom_index_ops_nd]
+        if not (name := kwargs.get("name")):
+            name = self._create_spatial_index_name(model, field)
+
+        return super()._create_index_sql(
+            model,
+            fields=fields,
+            name=name,
+            using=" USING %s" % self.geom_index_type,
+            opclasses=opclasses,
+            expressions=expressions,
+        )

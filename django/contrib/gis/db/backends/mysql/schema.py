@@ -33,12 +33,7 @@ class MySQLGISSchemaEditor(DatabaseSchemaEditor):
                         cursor, model._meta.db_table
                     )
                 )
-            qn = self.connection.ops.quote_name
-            sql = self.sql_add_spatial_index % {
-                "index": qn(self._create_spatial_index_name(model, field)),
-                "table": qn(model._meta.db_table),
-                "column": qn(field.column),
-            }
+            sql = self._create_spatial_index_sql(model, field)
             if supports_spatial_index:
                 return [sql]
             else:
@@ -51,8 +46,7 @@ class MySQLGISSchemaEditor(DatabaseSchemaEditor):
 
     def remove_field(self, model, field):
         if isinstance(field, GeometryField) and field.spatial_index and not field.null:
-            index_name = self._create_spatial_index_name(model, field)
-            sql = self._delete_index_sql(model, index_name)
+            sql = self._delete_spatial_index_sql(model, field)
             try:
                 self.execute(sql)
             except OperationalError:
@@ -66,3 +60,16 @@ class MySQLGISSchemaEditor(DatabaseSchemaEditor):
 
     def _create_spatial_index_name(self, model, field):
         return "%s_%s_id" % (model._meta.db_table, field.column)
+
+    def _create_spatial_index_sql(self, model, field):
+        index_name = self._create_spatial_index_name(model, field)
+        qn = self.connection.ops.quote_name
+        return self.sql_add_spatial_index % {
+            "index": qn(index_name),
+            "table": qn(model._meta.db_table),
+            "column": qn(field.column),
+        }
+
+    def _delete_spatial_index_sql(self, model, field):
+        index_name = self._create_spatial_index_name(model, field)
+        return self._delete_index_sql(model, index_name)
