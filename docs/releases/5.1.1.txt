@@ -14,6 +14,17 @@ CVE-2024-45230: Potential denial-of-service vulnerability in ``django.utils.html
 denial-of-service attack via very large inputs with a specific sequence of
 characters.
 
+CVE-2024-45231: Potential user email enumeration via response status on password reset
+======================================================================================
+
+Due to unhandled email sending failures, the
+:class:`~django.contrib.auth.forms.PasswordResetForm` class allowed remote
+attackers to enumerate user emails by issuing password reset requests and
+observing the outcomes.
+
+To mitigate this risk, exceptions occurring during password reset email sending
+are now handled and logged using the :ref:`django-contrib-auth-logger` logger.
+
 Bugfixes
 ========
 
