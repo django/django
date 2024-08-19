@@ -175,7 +175,8 @@ Migrations
 Models
 ~~~~~~
 
-* ...
+* :meth:`.QuerySet.in_bulk` now supports chaining after
+  :meth:`.QuerySet.values` and :meth:`.QuerySet.values_list`.
 
 Pagination
 ~~~~~~~~~~
