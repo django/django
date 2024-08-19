@@ -327,6 +327,13 @@ class LookupTests(TestCase):
         with self.assertRaisesMessage(TypeError, msg):
             Article.objects.all()[0:5].in_bulk([self.a1.id, self.a2.id])
 
+    def test_in_bulk_not_model_iterable(self):
+        msg = "in_bulk() cannot be used with values() or values_list()."
+        with self.assertRaisesMessage(TypeError, msg):
+            Author.objects.values().in_bulk()
+        with self.assertRaisesMessage(TypeError, msg):
+            Author.objects.values_list().in_bulk()
+
     def test_values(self):
         # values() returns a list of dictionaries instead of object instances --
         # and you can specify which fields you want to retrieve.
