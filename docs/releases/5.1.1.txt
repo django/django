@@ -31,3 +31,7 @@ Bugfixes
 * Adjusted the deprecation warning ``stacklevel`` in
   ``FieldCacheMixin.get_cache_name()`` to correctly point to the offending call
   site (:ticket:`35405`).
+
+* Restored, following a regression in Django 5.1, the ability to override the
+  timezone and role setting behavior used within the ``init_connection_state``
+  method of the PostgreSQL backend (:ticket:`35688`).
