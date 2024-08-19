@@ -205,6 +205,23 @@ class LookupTests(TestCase):
         with self.assertRaises(TypeError):
             Article.objects.in_bulk(headline__startswith="Blah")
 
+    def test_in_bulk_values(self):
+        bulk = Article.objects.values().in_bulk([self.a1.id])
+        self.assertIsInstance(bulk[self.a1.id], dict)
+
+    def test_in_bulk_values_without_pk(self):
+        bulk = Article.objects.values("headline").in_bulk([self.a1.id])
+        self.assertIn("pk", bulk[self.a1.id])
+
+    def test_in_bulk_values_list(self):
+        with self.assertRaises(TypeError):
+            Article.objects.values_list().in_bulk([self.a1.id])
+
+    def test_in_bulk_values_list_named(self) -> None:
+        # At some point this could return tuples
+        with self.assertRaises(TypeError):
+            Article.objects.values_list(named=True).in_bulk([self.a1.id])
+
     def test_in_bulk_lots_of_ids(self):
         test_range = 2000
         max_query_params = connection.features.max_query_params

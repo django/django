@@ -1119,6 +1119,29 @@ class QuerySet(AltersData):
                 "in_bulk()'s field_name must be a unique field but %r isn't."
                 % field_name
             )
+
+        if issubclass(self._iterable_class, ModelIterable):
+
+            def _get_key(row):
+                # Will raise an unhelpful AttributeError if field_name is deferred
+                # We could catch this earlier and raise a TypeError
+                return getattr(row, field_name)
+
+        elif issubclass(self._iterable_class, ValuesIterable):
+            # If field_name wasn't explicitly included, include it anyways
+            if field_name not in self.query.values_select:
+                return self.values(field_name, *self.query.values_select).in_bulk(
+                    id_list=id_list, field_name=field_name
+                )
+
+            def _get_key(row):
+                return row[field_name]
+
+        else:
+            # NamedValuesListIterable should work in theory,
+            # but in practice it's very clunky.
+            raise TypeError("in_bulk() cannot be used with %r." % self._iterable_class)
+
         if id_list is not None:
             if not id_list:
                 return {}
@@ -1136,7 +1159,7 @@ class QuerySet(AltersData):
                 qs = self.filter(**{filter_key: id_list})
         else:
             qs = self._chain()
-        return {getattr(obj, field_name): obj for obj in qs}
+        return {_get_key(obj): obj for obj in qs}
 
     async def ain_bulk(self, id_list=None, *, field_name="pk"):
         return await sync_to_async(self.in_bulk)(
