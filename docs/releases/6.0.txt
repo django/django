@@ -331,6 +331,9 @@ Models
   value from the non-null input values. This is supported on SQLite, MySQL,
   Oracle, and PostgreSQL 16+.
 
+* :meth:`.QuerySet.in_bulk` now supports chaining after
+  :meth:`.QuerySet.values` and :meth:`.QuerySet.values_list`.
+
 Pagination
 ~~~~~~~~~~
 
