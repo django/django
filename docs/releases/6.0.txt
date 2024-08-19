@@ -383,6 +383,9 @@ Models
   don't support it (MySQL and MariaDB), the fields are marked as deferred to
   trigger a refresh on subsequent accesses.
 
+* :meth:`.QuerySet.in_bulk` now supports chaining after
+  :meth:`.QuerySet.values` and :meth:`.QuerySet.values_list`.
+
 Pagination
 ~~~~~~~~~~
 
