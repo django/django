@@ -150,7 +150,7 @@ class MultipleObjectMixin(ContextMixin):
 class BaseListView(MultipleObjectMixin, View):
     """
     A base view for displaying a list of objects.
-    
+
     Using this base class requires subclassing to provide a response mixin.
     """
 
