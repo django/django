@@ -1,3 +1,4 @@
+import logging
 import unicodedata
 
 from django import forms
@@ -16,6 +17,7 @@ from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
 UserModel = get_user_model()
+logger = logging.getLogger("django.contrib.auth")
 
 
 def _unicode_ci_compare(s1, s2):
@@ -314,7 +316,12 @@ class PasswordResetForm(forms.Form):
             html_email = loader.render_to_string(html_email_template_name, context)
             email_message.attach_alternative(html_email, "text/html")
 
-        email_message.send()
+        try:
+            email_message.send()
+        except Exception:
+            logger.exception(
+                "Failed to send password reset email to %s", context["user"].pk
+            )
 
     def get_users(self, email):
         """Given an email, return matching user(s) who should receive a reset.
