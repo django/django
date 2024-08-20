@@ -2365,6 +2365,7 @@ class AggregateAnnotationPruningTests(TestCase):
         ).aggregate(count=Count("id", filter=Q(id__in=[F("max_book_author"), 0])))
         self.assertEqual(aggregates, {"count": 1})
 
+    @skipUnlessDBFeature("supports_select_union")
     def test_aggregate_combined_queries(self):
         # Combined queries could have members in their values select mask while
         # others have them in their annotation mask which makes annotation
