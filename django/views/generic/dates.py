@@ -300,7 +300,10 @@ class DateMixin:
 
 
 class BaseDateListView(MultipleObjectMixin, DateMixin, View):
-    """Abstract base class for date-based views displaying a list of objects."""
+    """ 
+    Abstract base class for date-based views displaying a list of objects. 
+    Requires a response mixin.
+    """
 
     allow_empty = False
     date_list_period = "year"
