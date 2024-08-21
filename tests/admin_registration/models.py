@@ -20,9 +20,3 @@ class Location(models.Model):
 
 class Place(Location):
     name = models.CharField(max_length=200)
-
-
-class Guest(models.Model):
-    pk = models.CompositePrimaryKey("traveler", "place")
-    traveler = models.ForeignKey(Traveler, on_delete=models.CASCADE)
-    place = models.ForeignKey(Place, on_delete=models.CASCADE)

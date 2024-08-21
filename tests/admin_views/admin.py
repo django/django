@@ -46,6 +46,7 @@ from .models import (
     Color,
     Color2,
     ComplexSortedPerson,
+    CompositePKModel,
     Country,
     CoverLetter,
     CustomArticle,
@@ -1199,6 +1200,7 @@ site.register(
     search_fields=["name"],
 )
 site.register(ModelWithStringPrimaryKey)
+site.register(CompositePKModel)
 site.register(Color)
 site.register(Thing, ThingAdmin)
 site.register(Actor)
