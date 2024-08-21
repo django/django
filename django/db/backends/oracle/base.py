@@ -255,8 +255,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 "Pooling doesn't support persistent connections."
             )
 
-        key = self.alias + self.settings_dict["USER"]
-        if key not in self._connection_pools:
+        pool_key = (self.alias, self.settings_dict["USER"])
+        if pool_key not in self._connection_pools:
             connect_kwargs = self.get_connection_params()
             pool_options = connect_kwargs["pool"]
 
@@ -276,15 +276,15 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 dsn=dsn(self.settings_dict),
                 **connect_kwargs,
             )
-            self._connection_pools.setdefault(key, pool)
+            self._connection_pools.setdefault(pool_key, pool)
 
-        return self._connection_pools[key]
+        return self._connection_pools[pool_key]
 
     def close_pool(self):
-        key = self.alias + self.settings_dict["USER"]
+        pool_key = (self.alias, self.settings_dict["USER"])
         if self.pool:
-            self.pool.close(0)
-            del self._connection_pools[key]
+            self.pool.close(force=True)
+            del self._connection_pools[pool_key]
 
     def get_database_version(self):
         return self.oracle_version
