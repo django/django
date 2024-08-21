@@ -145,13 +145,6 @@ class ModelWithStringPrimaryKey(models.Model):
         return "/dummy/%s/" % self.string_pk
 
 
-class FooBarCompositePK(models.Model):
-    pk = models.CompositePrimaryKey("foo", "bar")
-    foo = models.CharField(max_length=10)
-    bar = models.CharField(max_length=10)
-    title = models.CharField(max_length=10)
-
-
 class Color(models.Model):
     value = models.CharField(max_length=10)
     warm = models.BooleanField(default=False)
