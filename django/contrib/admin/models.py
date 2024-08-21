@@ -166,7 +166,9 @@ class LogEntry(models.Model):
         if not self.content_type:
             return self.get_admin_url()
 
-        view_permission_name = f"{self.content_type.app_label}.view_{self.content_type.model}"
+        view_permission_name = (
+            f"{self.content_type.app_label}.view_{self.content_type.model}"
+        )
         if self.user.has_perm(view_permission_name):
             return self.get_admin_url()
 
