@@ -1143,6 +1143,14 @@ class PasswordResetFormTest(TestDataMixin, TestCase):
         # makes tests interfere with each other, see #11505
         Site.objects.clear_cache()
 
+    def assertEmailMessageSent(self, **kwargs):
+        self.assertEqual(len(mail.outbox), 1)
+        msg = mail.outbox[0]
+        for attr, expected in kwargs.items():
+            with self.subTest(attr=attr):
+                self.assertEqual(getattr(msg, attr), expected)
+        return msg
+
     def create_dummy_user(self):
         """
         Create a user and return a tuple (user_object, username, email).
@@ -1165,8 +1173,7 @@ class PasswordResetFormTest(TestDataMixin, TestCase):
         form = PasswordResetForm(data)
         self.assertTrue(form.is_valid())
         form.save()
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(mail.outbox[0].to, ["mıke@example.org"])
+        self.assertEmailMessageSent(to=["mıke@example.org"])
 
     def test_user_email_domain_unicode_collision(self):
         User.objects.create_user("mike123", "mike@ixample.org", "test123")
@@ -1175,8 +1182,7 @@ class PasswordResetFormTest(TestDataMixin, TestCase):
         form = PasswordResetForm(data)
         self.assertTrue(form.is_valid())
         form.save()
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(mail.outbox[0].to, ["mike@ıxample.org"])
+        self.assertEmailMessageSent(to=["mike@ıxample.org"])
 
     def test_user_email_unicode_collision_nonexistent(self):
         User.objects.create_user("mike123", "mike@example.org", "test123")
@@ -1211,7 +1217,7 @@ class PasswordResetFormTest(TestDataMixin, TestCase):
         self.assertTrue(form.is_valid())
         form.save(domain_override="example.com")
         self.assertEqual(form.cleaned_data["email"], email)
-        self.assertEqual(len(mail.outbox), 1)
+        self.assertEmailMessageSent()
 
     def test_custom_email_subject(self):
         data = {"email": "testclient@example.com"}
@@ -1221,8 +1227,7 @@ class PasswordResetFormTest(TestDataMixin, TestCase):
         # domain_override to prevent the save operation from failing in the
         # potential case where contrib.sites is not installed. Refs #16412.
         form.save(domain_override="example.com")
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(mail.outbox[0].subject, "Custom password reset on example.com")
+        self.assertEmailMessageSent(subject="Custom password reset on example.com")
 
     def test_custom_email_constructor(self):
         data = {"email": "testclient@example.com"}
@@ -1255,10 +1260,11 @@ class PasswordResetFormTest(TestDataMixin, TestCase):
         # domain_override to prevent the save operation from failing in the
         # potential case where contrib.sites is not installed. Refs #16412.
         form.save(domain_override="example.com")
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(mail.outbox[0].subject, "Forgot your password?")
-        self.assertEqual(mail.outbox[0].bcc, ["site_monitor@example.com"])
-        self.assertEqual(mail.outbox[0].content_subtype, "plain")
+        self.assertEmailMessageSent(
+            subject="Forgot your password?",
+            bcc=["site_monitor@example.com"],
+            content_subtype="plain",
+        )
 
     def test_preserve_username_case(self):
         """
@@ -1305,12 +1311,12 @@ class PasswordResetFormTest(TestDataMixin, TestCase):
         form = PasswordResetForm({"email": email})
         self.assertTrue(form.is_valid())
         form.save()
-        self.assertEqual(len(mail.outbox), 1)
-        message = mail.outbox[0].message()
+        msg = self.assertEmailMessageSent()
+        self.assertEqual(len(msg.alternatives), 0)
+        message = msg.message()
         self.assertFalse(message.is_multipart())
         self.assertEqual(message.get_content_type(), "text/plain")
         self.assertEqual(message.get("subject"), "Custom password reset on example.com")
-        self.assertEqual(len(mail.outbox[0].alternatives), 0)
         self.assertEqual(message.get_all("to"), [email])
         self.assertTrue(
             re.match(r"^http://example.com/reset/[\w+/-]", message.get_payload())
@@ -1329,9 +1335,9 @@ class PasswordResetFormTest(TestDataMixin, TestCase):
         form.save(
             html_email_template_name="registration/html_password_reset_email.html"
         )
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(len(mail.outbox[0].alternatives), 1)
-        message = mail.outbox[0].message()
+        msg = self.assertEmailMessageSent()
+        self.assertEqual(len(msg.alternatives), 1)
+        message = msg.message()
         self.assertEqual(message.get("subject"), "Custom password reset on example.com")
         self.assertEqual(len(message.get_payload()), 2)
         self.assertTrue(message.is_multipart())
