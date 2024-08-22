@@ -1708,6 +1708,18 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
                             code="no_b_users",
                         )
 
+.. class:: BaseUserCreationForm
+
+    A :class:`~django.forms.ModelForm` for creating a new user. This is the
+    recommended base class if you need to customize the user creation form.
+
+    It has three fields: ``username`` (from the user model), ``password1``,
+    and ``password2``. It verifies that ``password1`` and ``password2`` match,
+    validates the password using
+    :func:`~django.contrib.auth.password_validation.validate_password`, and
+    sets the user's password using
+    :meth:`~django.contrib.auth.models.User.set_password()`.
+
 .. class:: PasswordChangeForm
 
     A form for allowing a user to change their password.
@@ -1746,18 +1758,6 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
 
     A form used in the admin interface to change a user's information and
     permissions.
-
-.. class:: BaseUserCreationForm
-
-    A :class:`~django.forms.ModelForm` for creating a new user. This is the
-    recommended base class if you need to customize the user creation form.
-
-    It has three fields: ``username`` (from the user model), ``password1``,
-    and ``password2``. It verifies that ``password1`` and ``password2`` match,
-    validates the password using
-    :func:`~django.contrib.auth.password_validation.validate_password`, and
-    sets the user's password using
-    :meth:`~django.contrib.auth.models.User.set_password()`.
 
 .. class:: UserCreationForm
 
