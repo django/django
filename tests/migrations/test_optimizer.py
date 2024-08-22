@@ -1,48 +1,16 @@
 from django.db import migrations, models
 from django.db.migrations import operations
 from django.db.migrations.optimizer import MigrationOptimizer
-from django.db.migrations.serializer import serializer_factory
 from django.db.models.functions import Abs
-from django.test import SimpleTestCase
 
 from .models import EmptyManager, UnicodeModel
+from .test_base import OptimizerTestBase
 
 
-class OptimizerTests(SimpleTestCase):
+class OptimizerTests(OptimizerTestBase):
     """
-    Tests the migration autodetector.
+    Tests the migration optimizer.
     """
-
-    def optimize(self, operations, app_label):
-        """
-        Handy shortcut for getting results + number of loops
-        """
-        optimizer = MigrationOptimizer()
-        return optimizer.optimize(operations, app_label), optimizer._iterations
-
-    def serialize(self, value):
-        return serializer_factory(value).serialize()[0]
-
-    def assertOptimizesTo(
-        self, operations, expected, exact=None, less_than=None, app_label=None
-    ):
-        result, iterations = self.optimize(operations, app_label or "migrations")
-        result = [self.serialize(f) for f in result]
-        expected = [self.serialize(f) for f in expected]
-        self.assertEqual(expected, result)
-        if exact is not None and iterations != exact:
-            raise self.failureException(
-                "Optimization did not take exactly %s iterations (it took %s)"
-                % (exact, iterations)
-            )
-        if less_than is not None and iterations >= less_than:
-            raise self.failureException(
-                "Optimization did not take less than %s iterations (it took %s)"
-                % (less_than, iterations)
-            )
-
-    def assertDoesNotOptimize(self, operations, **kwargs):
-        self.assertOptimizesTo(operations, operations, **kwargs)
 
     def test_none_app_label(self):
         optimizer = MigrationOptimizer()
