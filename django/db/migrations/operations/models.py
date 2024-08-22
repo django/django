@@ -979,7 +979,7 @@ class AddIndex(IndexOperation):
             return []
         if isinstance(operation, RenameIndex) and self.index.name == operation.old_name:
             self.index.name = operation.new_name
-            return [AddIndex(model_name=self.model_name, index=self.index)]
+            return [self.__class__(model_name=self.model_name, index=self.index)]
         return super().reduce(operation, app_label)
 
 
