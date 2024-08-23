@@ -672,7 +672,13 @@ class LabelCommand(BaseCommand):
     """
 
     label = "label"
-    missing_args_message = "Enter at least one %s." % label
+    missing_args_message = "Enter at least one %s."
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if self.missing_args_message == LabelCommand.missing_args_message:
+            self.missing_args_message = self.missing_args_message % self.label
 
     def add_arguments(self, parser):
         parser.add_argument("args", metavar=self.label, nargs="+")

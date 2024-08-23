@@ -25,6 +25,7 @@ from django.core.management import (
     color,
     execute_from_command_line,
 )
+from django.core.management.base import LabelCommand
 from django.core.management.commands.loaddata import Command as LoaddataCommand
 from django.core.management.commands.runserver import Command as RunserverCommand
 from django.core.management.commands.testserver import Command as TestserverCommand
@@ -2279,6 +2280,20 @@ class CommandTypes(AdminScriptTestCase):
             "False), ('no_color', False), ('pythonpath', None), "
             "('settings', None), ('traceback', False), ('verbosity', 1)]",
         )
+
+    def test_custom_label_command_custom_missing_args_message(self):
+        class Command(LabelCommand):
+            missing_args_message = "Missing argument."
+
+        with self.assertRaisesMessage(CommandError, "Error: Missing argument."):
+            call_command(Command())
+
+    def test_custom_label_command_none_missing_args_message(self):
+        class Command(LabelCommand):
+            missing_args_message = None
+
+        with self.assertRaisesMessage(CommandError, ""):
+            call_command(Command())
 
     def test_suppress_base_options_command_help(self):
         args = ["suppress_base_options_command", "--help"]
