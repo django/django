@@ -225,6 +225,7 @@ class LongNameTest(TransactionTestCase):
         connection.ops.execute_sql_flush(sql_list)
 
 
+@skipUnlessDBFeature("supports_sequence_reset")
 class SequenceResetTest(TestCase):
     def test_generic_relation(self):
         "Sequence names are correct when resetting generic relations (Ref #13941)"
