@@ -2015,3 +2015,27 @@ Usage example:
     >>> user_preferences = UserPreferences.objects.get(pk=user_preferences.pk)
     >>> print(user_preferences.settings)
     {'theme': 'light', 'notifications': True}
+
+
+``JSONRemove``
+--------------
+
+.. class:: JSONRemove(expression, *paths)
+
+Removes specific paths from a JSON field in the database. Accepts an expression
+from which paths will be removed and variable number of paths indicating
+the keys within the JSON structure that should be removed
+
+Usage example:
+
+.. code-block:: pycon
+
+    >>> from django.db.models.functions import JSONRemove
+    >>> user_preferences = UserPreferences.objects.create(
+    ...     settings={"theme": "dark", "notifications": True}
+    ... )
+    >>> UserPreferences.objects.update(settings=JSONRemove("settings", "theme"))
+    1
+    >>> user_preferences = UserPreferences.objects.get(pk=user_preferences.pk)
+    >>> print(user_preferences.settings)
+    {'notifications': True}
