@@ -147,3 +147,98 @@ class JSONSet(Func):
             arg_joiner=ArgJoiner(),
             **extra_context,
         )
+
+
+class JSONRemove(Func):
+    def __init__(self, expression, *paths):
+        if not paths:
+            raise TypeError("JSONRemove requires at least one path to remove")
+        self.paths = paths
+        super().__init__(expression)
+
+    def as_sql(
+        self,
+        compiler,
+        connection,
+        function=None,
+        template=None,
+        arg_joiner=None,
+        **extra_context,
+    ):
+        if not connection.features.supports_partial_json_update:
+            raise NotSupportedError(
+                "JSONRemove() is not supported on this database backend."
+            )
+
+        copy = self.copy()
+        new_source_expressions = copy.get_source_expressions()
+
+        for path in self.paths:
+            key_paths = path.split(LOOKUP_SEP)
+            key_paths_join = compile_json_path(key_paths)
+            new_source_expressions.append(Value(key_paths_join))
+
+        copy.set_source_expressions(new_source_expressions)
+
+        return super(JSONRemove, copy).as_sql(
+            compiler,
+            connection,
+            function="JSON_REMOVE",
+            **extra_context,
+        )
+
+    def as_postgresql(self, compiler, connection, **extra_context):
+        copy = self.copy()
+        path, *rest = self.paths
+
+        if rest:
+            copy.paths = (path,)
+            return JSONRemove(copy, *rest).as_postgresql(
+                compiler, connection, **extra_context
+            )
+
+        new_source_expressions = copy.get_source_expressions()
+        key_paths = path.split(LOOKUP_SEP)
+        key_paths_join = ",".join(key_paths)
+        new_source_expressions.append(Value(f"{{{key_paths_join}}}"))
+        copy.set_source_expressions(new_source_expressions)
+
+        return super(JSONRemove, copy).as_sql(
+            compiler,
+            connection,
+            template="%(expressions)s",
+            arg_joiner="#- ",
+            **extra_context,
+        )
+
+    def as_oracle(self, compiler, connection, **extra_context):
+        if not connection.features.supports_partial_json_update:
+            raise NotSupportedError(
+                "JSONRemove() is not supported on this database backend."
+            )
+
+        copy = self.copy()
+
+        all_items = self.paths
+        path, *rest = all_items
+
+        if rest:
+            copy.paths = (path,)
+            return JSONRemove(copy, *rest).as_oracle(
+                compiler, connection, **extra_context
+            )
+
+        key_paths = path.split(LOOKUP_SEP)
+        key_paths_join = compile_json_path(key_paths)
+
+        class ArgJoiner:
+            def join(self, args):
+                return f"{args[0]}, REMOVE '{key_paths_join}'"
+
+        return super(JSONRemove, copy).as_sql(
+            compiler,
+            connection,
+            function="JSON_TRANSFORM",
+            arg_joiner=ArgJoiner(),
+            **extra_context,
+        )
