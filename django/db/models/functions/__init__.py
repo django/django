@@ -25,7 +25,7 @@ from .datetime import (
     TruncWeek,
     TruncYear,
 )
-from .json import JSONObject
+from .json import JSONObject, JSONSet
 from .math import (
     Abs,
     ACos,
@@ -127,6 +127,7 @@ __all__ = [
     "TruncYear",
     # json
     "JSONObject",
+    "JSONSet",
     # math
     "Abs",
     "ACos",
