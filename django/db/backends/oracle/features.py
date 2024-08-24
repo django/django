@@ -208,3 +208,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def bare_select_suffix(self):
         return "" if self.connection.oracle_version >= (23,) else " FROM DUAL"
+
+    @cached_property
+    def supports_partial_json_update(self):
+        return self.connection.oracle_version >= (21,)
