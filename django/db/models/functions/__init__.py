@@ -25,6 +25,7 @@ from .datetime import (
     TruncWeek,
     TruncYear,
 )
+from .json import JSONSet
 from .math import (
     Abs,
     ACos,
@@ -187,4 +188,6 @@ __all__ = [
     "PercentRank",
     "Rank",
     "RowNumber",
+    # JSON-related functions
+    "JSONSet",
 ]

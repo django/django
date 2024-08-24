@@ -62,6 +62,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_stored_generated_columns = True
     supports_virtual_generated_columns = True
 
+    json_set_wraps_non_array_to_array = True
+
     @cached_property
     def minimum_database_version(self):
         if self.connection.mysql_is_mariadb:
