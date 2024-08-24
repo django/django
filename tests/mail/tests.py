@@ -41,7 +41,7 @@ except ImportError:
     HAS_AIOSMTPD = False
 
 
-class HeadersCheckMixin:
+class MailTestsMixin:
     def assertMessageHasHeaders(self, message, headers):
         """
         Asserts that the `message` has all `headers`.
@@ -53,17 +53,53 @@ class HeadersCheckMixin:
         if isinstance(message, bytes):
             message = message_from_bytes(message)
         msg_headers = set(message.items())
-        self.assertTrue(
-            headers.issubset(msg_headers),
-            msg="Message is missing "
-            "the following headers: %s" % (headers - msg_headers),
-        )
+        if not headers.issubset(msg_headers):
+            missing = "\n".join(f"  {h}: {v}" for h, v in headers - msg_headers)
+            actual = "\n".join(f"  {h}: {v}" for h, v in msg_headers)
+            raise self.failureException(
+                f"Expected headers not found in message.\n"
+                f"Missing headers:\n{missing}\n"
+                f"Actual headers:\n{actual}"
+            )
 
+    # In assertStartsWith()/assertEndsWith() failure messages, when truncating
+    # a long first ("haystack") string, include this many characters beyond the
+    # length of the second ("needle") string.
+    START_END_EXTRA_CONTEXT = 15
 
-class MailTests(HeadersCheckMixin, SimpleTestCase):
-    """
-    Non-backend specific tests.
-    """
+    def assertStartsWith(self, first, second):
+        if not first.startswith(second):
+            # Use assertEqual() for failure message with diffs. If first value
+            # is much longer than second, truncate end and add an ellipsis.
+            self.longMessage = True
+            max_len = len(second) + self.START_END_EXTRA_CONTEXT
+            start_of_first = (
+                first
+                if len(first) <= max_len
+                else first[:max_len] + ("…" if isinstance(first, str) else b"...")
+            )
+            self.assertEqual(
+                start_of_first,
+                second,
+                "First string doesn't start with the second.",
+            )
+
+    def assertEndsWith(self, first, second):
+        if not first.endswith(second):
+            # Use assertEqual() for failure message with diffs. If first value
+            # is much longer than second, truncate start and prepend an ellipsis.
+            self.longMessage = True
+            max_len = len(second) + self.START_END_EXTRA_CONTEXT
+            end_of_first = (
+                first
+                if len(first) <= max_len
+                else ("…" if isinstance(first, str) else b"...") + first[-max_len:]
+            )
+            self.assertEqual(
+                end_of_first,
+                second,
+                "First string doesn't end with the second.",
+            )
 
     def get_decoded_attachments(self, django_message):
         """
@@ -83,6 +119,12 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
                     yield filename, content, mimetype
 
         return list(iter_attachments())
+
+
+class MailTests(MailTestsMixin, SimpleTestCase):
+    """
+    Non-backend specific tests.
+    """
 
     def test_ascii(self):
         email = EmailMessage(
@@ -303,26 +345,16 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
 
     def test_header_injection(self):
         msg = "Header values can't contain newlines "
-        email = EmailMessage(
-            "Subject\nInjection Test", "Content", "from@example.com", ["to@example.com"]
-        )
-        with self.assertRaisesMessage(BadHeaderError, msg):
-            email.message()
-        email = EmailMessage(
-            gettext_lazy("Subject\nInjection Test"),
-            "Content",
-            "from@example.com",
-            ["to@example.com"],
-        )
-        with self.assertRaisesMessage(BadHeaderError, msg):
-            email.message()
-        with self.assertRaisesMessage(BadHeaderError, msg):
-            EmailMessage(
-                "Subject",
-                "Content",
-                "from@example.com",
-                ["Name\nInjection test <to@example.com>"],
-            ).message()
+        cases = [
+            {"subject": "Subject\nInjection Test"},
+            {"subject": gettext_lazy("Lazy Subject\nInjection Test")},
+            {"to": ["Name\nInjection test <to@example.com>"]},
+        ]
+        for kwargs in cases:
+            with self.subTest(case=kwargs):
+                email = EmailMessage(**kwargs)
+                with self.assertRaisesMessage(BadHeaderError, msg):
+                    email.message()
 
     def test_folding_white_space(self):
         """
@@ -615,8 +647,8 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
                 ("Content-Transfer-Encoding", "quoted-printable"),
             },
         )
-        self.assertTrue(
-            payload0.as_bytes().endswith(b"\n\nFirstname S=FCrname is a great guy.")
+        self.assertEndsWith(
+            payload0.as_bytes(), b"\n\nFirstname S=FCrname is a great guy."
         )
         # Check the text/html alternative.
         payload1 = message.get_payload(1)
@@ -630,10 +662,9 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
                 ("Content-Transfer-Encoding", "quoted-printable"),
             },
         )
-        self.assertTrue(
-            payload1.as_bytes().endswith(
-                b"\n\n<p>Firstname S=FCrname is a <strong>great</strong> guy.</p>"
-            )
+        self.assertEndsWith(
+            payload1.as_bytes(),
+            b"\n\n<p>Firstname S=FCrname is a <strong>great</strong> guy.</p>",
         )
 
     def test_attachments(self):
@@ -761,34 +792,38 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
 
         for basename, real_mimetype in files:
             for mimetype in test_mimetypes:
-                self.assertEqual(mimetypes.guess_type(basename)[0], real_mimetype)
-                expected_mimetype = (
-                    mimetype or real_mimetype or "application/octet-stream"
-                )
-                file_path = Path(__file__).parent / "attachments" / basename
-                expected_content = file_path.read_bytes()
-                if expected_mimetype.startswith("text/"):
-                    try:
-                        expected_content = expected_content.decode()
-                    except UnicodeDecodeError:
-                        expected_mimetype = "application/octet-stream"
+                with self.subTest(
+                    basename=basename, real_mimetype=real_mimetype, mimetype=mimetype
+                ):
+                    self.assertEqual(mimetypes.guess_type(basename)[0], real_mimetype)
+                    expected_mimetype = (
+                        mimetype or real_mimetype or "application/octet-stream"
+                    )
+                    file_path = Path(__file__).parent / "attachments" / basename
+                    expected_content = file_path.read_bytes()
+                    if expected_mimetype.startswith("text/"):
+                        try:
+                            expected_content = expected_content.decode()
+                        except UnicodeDecodeError:
+                            expected_mimetype = "application/octet-stream"
 
-                email = EmailMessage()
-                email.attach_file(file_path, mimetype=mimetype)
+                    email = EmailMessage()
+                    email.attach_file(file_path, mimetype=mimetype)
 
-                # Check EmailMessage.attachments.
-                self.assertEqual(len(email.attachments), 1)
-                self.assertEqual(email.attachments[0].filename, basename)
-                self.assertEqual(email.attachments[0].mimetype, expected_mimetype)
-                self.assertEqual(email.attachments[0].content, expected_content)
+                    # Check EmailMessage.attachments.
+                    self.assertEqual(len(email.attachments), 1)
+                    self.assertEqual(email.attachments[0].filename, basename)
+                    self.assertEqual(email.attachments[0].mimetype, expected_mimetype)
+                    self.assertEqual(email.attachments[0].content, expected_content)
 
-                # Check attachments in generated message.
-                # (The actual content is not checked as variations in platform
-                # line endings and rfc822 refolding complicate the logic.)
-                actual_attachment = self.get_decoded_attachments(email)[0]
-                actual_filename, actual_content, actual_mimetype = actual_attachment
-                self.assertEqual(actual_filename, basename)
-                self.assertEqual(actual_mimetype, expected_mimetype)
+                    # Check attachments in the generated message.
+                    # (The actual content is not checked as variations in platform
+                    # line endings and rfc822 refolding complicate the logic.)
+                    attachments = self.get_decoded_attachments(email)
+                    self.assertEqual(len(attachments), 1)
+                    actual = attachments[0]
+                    self.assertEqual(actual.filename, basename)
+                    self.assertEqual(actual.mimetype, expected_mimetype)
 
     def test_attach_text_as_bytes(self):
         msg = EmailMessage()
@@ -1207,7 +1242,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
 
 
 @requires_tz_support
-class MailTimeZoneTests(SimpleTestCase):
+class MailTimeZoneTests(MailTestsMixin, SimpleTestCase):
     @override_settings(
         EMAIL_USE_LOCALTIME=False, USE_TZ=True, TIME_ZONE="Africa/Algiers"
     )
@@ -1216,7 +1251,7 @@ class MailTimeZoneTests(SimpleTestCase):
         EMAIL_USE_LOCALTIME=False creates a datetime in UTC.
         """
         email = EmailMessage()
-        self.assertTrue(email.message()["Date"].endswith("-0000"))
+        self.assertEndsWith(email.message()["Date"], "-0000")
 
     @override_settings(
         EMAIL_USE_LOCALTIME=True, USE_TZ=True, TIME_ZONE="Africa/Algiers"
@@ -1226,9 +1261,8 @@ class MailTimeZoneTests(SimpleTestCase):
         EMAIL_USE_LOCALTIME=True creates a datetime in the local time zone.
         """
         email = EmailMessage()
-        self.assertTrue(
-            email.message()["Date"].endswith("+0100")
-        )  # Africa/Algiers is UTC+1
+        # Africa/Algiers is UTC+1 year round.
+        self.assertEndsWith(email.message()["Date"], "+0100")
 
 
 class PythonGlobalState(SimpleTestCase):
@@ -1259,22 +1293,13 @@ class PythonGlobalState(SimpleTestCase):
         self.assertIn("Content-Transfer-Encoding: base64", txt.as_string())
 
 
-class BaseEmailBackendTests(HeadersCheckMixin):
+class BaseEmailBackendTests(MailTestsMixin):
     email_backend = None
 
     @classmethod
     def setUpClass(cls):
         cls.enterClassContext(override_settings(EMAIL_BACKEND=cls.email_backend))
         super().setUpClass()
-
-    def assertStartsWith(self, first, second):
-        if not first.startswith(second):
-            self.longMessage = True
-            self.assertEqual(
-                first[: len(second)],
-                second,
-                "First string doesn't start with the second.",
-            )
 
     def get_mailbox_content(self):
         raise NotImplementedError(
@@ -1349,13 +1374,14 @@ class BaseEmailBackendTests(HeadersCheckMixin):
         # send_messages() may take a list or an iterator.
         emails_lists = ([email1, email2], iter((email1, email2)))
         for emails_list in emails_lists:
-            num_sent = mail.get_connection().send_messages(emails_list)
-            self.assertEqual(num_sent, 2)
-            messages = self.get_mailbox_content()
-            self.assertEqual(len(messages), 2)
-            self.assertEqual(messages[0]["To"], "to-1@example.com")
-            self.assertEqual(messages[1]["To"], "to-2@example.com")
-            self.flush_mailbox()
+            with self.subTest(emails_list=repr(emails_list)):
+                num_sent = mail.get_connection().send_messages(emails_list)
+                self.assertEqual(num_sent, 2)
+                messages = self.get_mailbox_content()
+                self.assertEqual(len(messages), 2)
+                self.assertEqual(messages[0]["To"], "to-1@example.com")
+                self.assertEqual(messages[1]["To"], "to-2@example.com")
+                self.flush_mailbox()
 
     def test_send_verbose_name(self):
         email = EmailMessage(
