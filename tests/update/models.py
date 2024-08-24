@@ -51,3 +51,7 @@ class UniqueNumber(models.Model):
 
 class UniqueNumberChild(UniqueNumber):
     pass
+
+
+class UserPreferences(models.Model):
+    date_created = models.DateTimeField(null=True)

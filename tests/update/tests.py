@@ -1,3 +1,4 @@
+import datetime
 import unittest
 
 from django.core.exceptions import FieldError
@@ -17,6 +18,7 @@ from .models import (
     RelatedPoint,
     UniqueNumber,
     UniqueNumberChild,
+    UserPreferences,
 )
 
 
@@ -346,3 +348,31 @@ class MySQLUpdateOrderByTest(TestCase):
         self.assertEqual(updated, 1)
         related.refresh_from_db()
         self.assertEqual(related.name, "new")
+
+
+class TransformUpdateTests(TestCase):
+    def test_get_update_expression_not_implemented(self):
+        date_created = datetime.datetime(3000, 1, 1, 21, 22, 23)
+        user_preferences = UserPreferences.objects.create(date_created=date_created)
+
+        with self.assertRaisesMessage(
+            NotImplementedError,
+            "Using ExtractYear is not supported in QuerySet.update().",
+        ):
+            UserPreferences.objects.update(date_created__year=2024)
+
+        user_preferences.refresh_from_db()
+        self.assertEqual(user_preferences.date_created, date_created)
+
+    def test_invalid_transform(self):
+        date_created = datetime.datetime(3000, 1, 1, 21, 22, 23)
+        user_preferences = UserPreferences.objects.create(date_created=date_created)
+
+        with self.assertRaisesMessage(
+            FieldError,
+            "foo is not a valid transform on DateTimeField.",
+        ):
+            UserPreferences.objects.update(date_created__foo=2024)
+
+        user_preferences.refresh_from_db()
+        self.assertEqual(user_preferences.date_created, date_created)
