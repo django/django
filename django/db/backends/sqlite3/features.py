@@ -130,6 +130,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                         "test_lookups_special_chars_double_quotes",
                         "db_functions.json.test_json_set.JSONSetTests."
                         "test_set_special_chars_double_quotes",
+                        "db_functions.json.test_json_remove.JSONRemoveTests."
+                        "test_remove_special_chars_double_quotes",
                     },
                 }
             )

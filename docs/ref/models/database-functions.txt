@@ -951,6 +951,34 @@ Usage example:
         >>> user_preferences.settings
         {'font': {'name': 'Arial', 'size': 10, 'color': 'white'}, 'notifications': True}  # theme__type will not be added
 
+``JSONRemove``
+--------------
+
+.. class:: JSONRemove(expression, *paths, **kwargs)
+
+Removes specified paths from a :class:`~django.db.models.JSONField` in the
+database. Accepts an expression identifying the
+:class:`~django.db.models.JSONField` and a variable number of paths defining
+the keys to be deleted from the JSON structure.
+
+Usage example:
+
+.. code-block:: pycon
+
+    >>> from django.db.models.functions import JSONRemove
+    >>> user_preferences = UserPreferences.objects.create(
+    ...     settings={
+    ...         "font": {"name": "Arial", "size": 10},
+    ...         "notifications": True,
+    ...     }
+    ... )
+    >>> UserPreferences.objects.update(
+    ...     settings=JSONRemove("settings", "font__size", "notifications")
+    ... )
+    1
+    >>> user_preferences = UserPreferences.objects.get(pk=user_preferences.pk)
+    >>> print(user_preferences.settings)
+    {'font': {'name': 'Arial'}}
 
 .. _math-functions:
 
