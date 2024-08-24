@@ -980,6 +980,9 @@ Usage example:
     >>> print(user_preferences.settings)
     {'font': {'name': 'Arial'}}
 
+For more information on how to use the ``JSONSet`` and ``JSONRemove``
+functions, see :ref:`updating-jsonfield`.
+
 .. _math-functions:
 
 Math Functions
