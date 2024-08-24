@@ -2039,3 +2039,6 @@ Usage example:
     >>> user_preferences = UserPreferences.objects.get(pk=user_preferences.pk)
     >>> print(user_preferences.settings)
     {'notifications': True}
+
+For more information on how to use the JSONSet and JSONRemove functions, see
+:ref:`updating-jsonfield`.
