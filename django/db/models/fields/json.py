@@ -340,12 +340,16 @@ class KeyTransform(Transform):
         super().__init__(*args, **kwargs)
         self.key_name = str(key_name)
 
-    def preprocess_lhs(self, compiler, connection):
+    def unwrap_transforms(self):
         key_transforms = [self.key_name]
         previous = self.lhs
         while isinstance(previous, KeyTransform):
             key_transforms.insert(0, previous.key_name)
             previous = previous.lhs
+        return previous, key_transforms
+
+    def preprocess_lhs(self, compiler, connection):
+        previous, key_transforms = self.unwrap_transforms()
         lhs, params = compiler.compile(previous)
         if connection.vendor == "oracle":
             # Escape string-formatting.
