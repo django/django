@@ -1660,7 +1660,7 @@ templates used by the :class:`ModelAdmin` views:
         class MyModelAdmin(admin.ModelAdmin):
             def get_urls(self):
                 urls = super().get_urls()
-                my_urls = [path("my_view/", self.admin_site.admin_view(self.my_view))]
+                my_urls = [path("my_view/", self.admin_view(self.my_view))]
                 return my_urls + urls
 
             def my_view(self, request):
@@ -1685,7 +1685,7 @@ templates used by the :class:`ModelAdmin` views:
     .. note::
 
         Notice how the ``self.my_view`` function is wrapped in
-        ``self.admin_site.admin_view``. This is important, since it ensures two
+        ``self.admin_view``. This is important, since it ensures two
         things:
 
         #. Permission checks are run, ensuring only active staff users can
@@ -1709,7 +1709,7 @@ templates used by the :class:`ModelAdmin` views:
     performed, you can pass a ``cacheable=True`` argument to
     ``AdminSite.admin_view()``::
 
-        path("my_view/", self.admin_site.admin_view(self.my_view, cacheable=True))
+        path("my_view/", self.admin_view(self.my_view, cacheable=True))
 
     ``ModelAdmin`` views have ``model_admin`` attributes. Other
     ``AdminSite`` views have ``admin_site`` attributes.
