@@ -186,7 +186,9 @@ class TestHashedFiles:
         err = StringIO()
         with self.assertRaisesMessage(RuntimeError, "Max post-process passes exceeded"):
             call_command("collectstatic", interactive=False, verbosity=0, stderr=err)
-        self.assertEqual("Post-processing 'All' failed!\n\n", err.getvalue())
+        self.assertEqual(
+            "Post-processing 'bar.css, foo.css' failed!\n\n", err.getvalue()
+        )
         self.assertPostCondition()
 
     def test_post_processing(self):
