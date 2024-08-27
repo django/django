@@ -2,9 +2,10 @@
 Django 5.1.1 release notes
 ==========================
 
-*Expected September 3, 2024*
+*September 3, 2024*
 
-Django 5.1.1 fixes several bugs in 5.1.
+Django 5.1.1 fixes one security issue with severity "moderate", one security
+issues with severity "low", and several bugs in 5.1.
 
 Bugfixes
 ========
