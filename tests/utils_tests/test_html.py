@@ -71,10 +71,11 @@ class TestUtilsHtml(SimpleTestCase):
         msg = "Calling format_html() without passing args or kwargs is deprecated."
         # RemovedInDjango60Warning: when the deprecation ends, replace with:
         # msg = "args or kwargs must be provided."
-        # with self.assertRaisesMessage(ValueError, msg):
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+        # with self.assertRaisesMessage(TypeError, msg):
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
             name = "Adam"
             self.assertEqual(format_html(f"<i>{name}</i>"), "<i>Adam</i>")
+        self.assertEqual(ctx.filename, __file__)
 
     def test_format_html_join_with_positional_arguments(self):
         self.assertEqual(

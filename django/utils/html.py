@@ -130,10 +130,11 @@ def format_html(format_string, *args, **kwargs):
     """
     if not (args or kwargs):
         # RemovedInDjango60Warning: when the deprecation ends, replace with:
-        # raise ValueError("args or kwargs must be provided.")
+        # raise TypeError("args or kwargs must be provided.")
         warnings.warn(
             "Calling format_html() without passing args or kwargs is deprecated.",
             RemovedInDjango60Warning,
+            stacklevel=2,
         )
     args_safe = map(conditional_escape, args)
     kwargs_safe = {k: conditional_escape(v) for (k, v) in kwargs.items()}
