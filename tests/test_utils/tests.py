@@ -2186,7 +2186,7 @@ class AllowedDatabaseQueriesTests(SimpleTestCase):
         finally:
             new_connection.validate_thread_sharing()
             new_connection._close()
-            if new_connection.vendor == "oracle":
+            if new_connection.is_pool:
                 new_connection.close_pool()
 
 
