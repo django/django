@@ -5,6 +5,6 @@ Django 4.2.16 release notes
 *September 3, 2024*
 
 Django 4.2.16 fixes one security issue with severity "moderate" and one
-security issues with severity "low" in 4.2.15.
+security issue with severity "low" in 4.2.15.
 
 ...
