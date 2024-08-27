@@ -5,6 +5,6 @@ Django 5.0.9 release notes
 *September 3, 2024*
 
 Django 5.0.9 fixes one security issue with severity "moderate" and one security
-issues with severity "low" in 5.0.8.
+issue with severity "low" in 5.0.8.
 
 ...
