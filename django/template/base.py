@@ -1034,11 +1034,21 @@ class Variable:
 
 
 class Node:
+    __slots__ = ("token", "origin")
+
     # Set this to True for nodes that must be first in the template (although
     # they can be preceded by text nodes.
     must_be_first = False
     child_nodelists = ("nodelist",)
-    token = None
+
+    def __new__(cls, *args, **kwargs):
+        obj = super().__new__(cls)
+        # The below attributes cannot be set in __init__() because nearly all
+        # Node subclasses with an __init__() method, including those in Django,
+        # do not call super().__init__().
+        obj.token = None
+        obj.origin = None
+        return obj
 
     def render(self, context):
         """
@@ -1108,6 +1118,8 @@ class NodeList(list):
 
 
 class TextNode(Node):
+    __slots__ = ("s",)
+
     child_nodelists = ()
 
     def __init__(self, s):
@@ -1146,6 +1158,7 @@ def render_value_in_context(value, context):
 
 
 class VariableNode(Node):
+    __slots__ = ("filter_expression",)
     child_nodelists = ()
 
     def __init__(self, filter_expression):

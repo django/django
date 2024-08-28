@@ -11,6 +11,8 @@ register = Library()
 
 
 class GetAvailableLanguagesNode(Node):
+    __slots__ = ("variable",)
+
     def __init__(self, variable):
         self.variable = variable
 
@@ -22,6 +24,8 @@ class GetAvailableLanguagesNode(Node):
 
 
 class GetLanguageInfoNode(Node):
+    __slots__ = ("lang_code", "variable")
+
     def __init__(self, lang_code, variable):
         self.lang_code = lang_code
         self.variable = variable
@@ -33,6 +37,8 @@ class GetLanguageInfoNode(Node):
 
 
 class GetLanguageInfoListNode(Node):
+    __slots__ = ("languages", "variable")
+
     def __init__(self, languages, variable):
         self.languages = languages
         self.variable = variable
@@ -52,6 +58,8 @@ class GetLanguageInfoListNode(Node):
 
 
 class GetCurrentLanguageNode(Node):
+    __slots__ = ("variable",)
+
     def __init__(self, variable):
         self.variable = variable
 
@@ -61,6 +69,8 @@ class GetCurrentLanguageNode(Node):
 
 
 class GetCurrentLanguageBidiNode(Node):
+    __slots__ = ("variable",)
+
     def __init__(self, variable):
         self.variable = variable
 
@@ -70,6 +80,8 @@ class GetCurrentLanguageBidiNode(Node):
 
 
 class TranslateNode(Node):
+    __slots__ = ("noop", "asvar", "message_context", "filter_expression")
+
     child_nodelists = ()
 
     def __init__(self, filter_expression, noop, asvar=None, message_context=None):
@@ -102,6 +114,18 @@ class TranslateNode(Node):
 
 
 class BlockTranslateNode(Node):
+    __slots__ = (
+        "extra_context",
+        "singular",
+        "plural",
+        "countervar",
+        "counter",
+        "message_context",
+        "trimmed",
+        "asvar",
+        "tag_name",
+    )
+
     def __init__(
         self,
         extra_context,
@@ -205,6 +229,8 @@ class BlockTranslateNode(Node):
 
 
 class LanguageNode(Node):
+    __slots__ = ("nodelist", "language")
+
     def __init__(self, nodelist, language):
         self.nodelist = nodelist
         self.language = language
