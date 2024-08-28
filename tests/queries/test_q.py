@@ -1,4 +1,5 @@
 from django.core.exceptions import FieldError
+from django.db import connections
 from django.db.models import (
     BooleanField,
     Exists,
@@ -12,6 +13,7 @@ from django.db.models.expressions import NegatedExpression, RawSQL
 from django.db.models.functions import Lower
 from django.db.models.lookups import Exact, IsNull
 from django.db.models.sql.where import NothingNode
+from django.db.utils import DEFAULT_DB_ALIAS
 from django.test import SimpleTestCase, TestCase
 
 from .models import Tag
@@ -320,10 +322,18 @@ class QCheckTests(TestCase):
         replaced by its value. In this case, Q.check() logs a warning and
         return True.
         """
+
+        # It's important that we use the same connection for q.check() and is_usable()
+        connection_alias = DEFAULT_DB_ALIAS
+
         q = Q(RawSQL("price > %s", params=(20,), output_field=BooleanField()))
         with self.assertLogs("django.db.models", "WARNING") as cm:
-            self.assertIs(q.check({"price": 10}), True)
+            self.assertIs(q.check({"price": 10}, using=connection_alias), True)
         self.assertIn(
             f"Got a database error calling check() on {q!r}: ",
             cm.records[0].getMessage(),
         )
+
+        # See ticket #35712
+        # We must leave connection in a usable state
+        self.assertTrue(connections[connection_alias].is_usable())
