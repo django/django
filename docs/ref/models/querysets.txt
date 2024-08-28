@@ -1599,9 +1599,7 @@ of the arguments is required, but you should use at least one of them.
       FROM blog_blog;
 
   Note that the parentheses required by most database engines around
-  subqueries are not required in Django's ``select`` clauses. Also note
-  that some database backends, such as some MySQL versions, don't support
-  subqueries.
+  subqueries are not required in Django's ``select`` clauses.
 
   In some rare cases, you might wish to pass parameters to the SQL
   fragments in ``extra(select=...)``. For this purpose, use the
