@@ -1088,9 +1088,13 @@ class Node:
 
 
 class NodeList(list):
-    # Set to True the first time a non-TextNode is inserted by
-    # extend_nodelist().
-    contains_nontext = False
+    __slots__ = ("contains_nontext",)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Set to True the first time a non-TextNode is inserted by
+        # extend_nodelist().
+        self.contains_nontext = False
 
     def render(self, context):
         return SafeString("".join([node.render_annotated(context) for node in self]))
