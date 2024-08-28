@@ -975,9 +975,9 @@ frame includes all rows from the partition to the last row in the set.
 The accepted values for the ``start`` and ``end`` arguments are ``None``, an
 integer, or zero. A negative integer for ``start`` results in ``N PRECEDING``,
 while ``None`` yields ``UNBOUNDED PRECEDING``. In ``ROWS`` mode, a positive
-integer can be used for ```start`` resulting in ``N FOLLOWING``. Positive
+integer can be used for ``start`` resulting in ``N FOLLOWING``. Positive
 integers are accepted for ``end`` and results in ``N FOLLOWING``. In ``ROWS``
-mode, a negative integer can be used for ```end`` resulting in ``N PRECEDING``.
+mode, a negative integer can be used for ``end`` resulting in ``N PRECEDING``.
 For both ``start`` and ``end``, zero will return ``CURRENT ROW``.
 
 There's a difference in what ``CURRENT ROW`` includes. When specified in
