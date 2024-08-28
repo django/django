@@ -296,7 +296,10 @@ class TagHelperNode(Node):
     function.
     """
 
+    __slots__ = ("func", "takes_context", "args", "kwargs")
+
     def __init__(self, func, takes_context, args, kwargs):
+        super().__init__()
         self.func = func
         self.takes_context = takes_context
         self.args = args
@@ -311,6 +314,7 @@ class TagHelperNode(Node):
 
 
 class SimpleNode(TagHelperNode):
+    __slots__ = ("target_var",)
     child_nodelists = ()
 
     def __init__(self, func, takes_context, args, kwargs, target_var):
@@ -346,6 +350,8 @@ class SimpleBlockNode(SimpleNode):
 
 
 class InclusionNode(TagHelperNode):
+    __slots__ = ("filename",)
+
     def __init__(self, func, takes_context, args, kwargs, filename):
         super().__init__(func, takes_context, args, kwargs)
         self.filename = filename

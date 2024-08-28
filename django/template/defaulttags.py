@@ -48,7 +48,10 @@ register = Library()
 class AutoEscapeControlNode(Node):
     """Implement the actions of the autoescape tag."""
 
+    __slots__ = ("setting", "nodelist")
+
     def __init__(self, setting, nodelist):
+        super().__init__()
         self.setting = setting
         self.nodelist = nodelist
 
@@ -64,6 +67,7 @@ class AutoEscapeControlNode(Node):
 
 
 class CommentNode(Node):
+    __slots__ = ()
     child_nodelists = ()
 
     def render(self, context):
@@ -71,6 +75,7 @@ class CommentNode(Node):
 
 
 class CsrfTokenNode(Node):
+    __slots__ = ()
     child_nodelists = ()
 
     def render(self, context):
@@ -96,7 +101,10 @@ class CsrfTokenNode(Node):
 
 
 class CycleNode(Node):
+    __slots__ = ("cyclevars", "variable_name", "silent")
+
     def __init__(self, cyclevars, variable_name=None, silent=False):
+        super().__init__()
         self.cyclevars = cyclevars
         self.variable_name = variable_name
         self.silent = silent
@@ -121,6 +129,8 @@ class CycleNode(Node):
 
 
 class DebugNode(Node):
+    __slots__ = ()
+
     def render(self, context):
         if not settings.DEBUG:
             return ""
@@ -134,7 +144,13 @@ class DebugNode(Node):
 
 
 class FilterNode(Node):
+    __slots__ = (
+        "filter_expr",
+        "nodelist",
+    )
+
     def __init__(self, filter_expr, nodelist):
+        super().__init__()
         self.filter_expr = filter_expr
         self.nodelist = nodelist
 
@@ -146,7 +162,10 @@ class FilterNode(Node):
 
 
 class FirstOfNode(Node):
+    __slots__ = ("vars", "asvar")
+
     def __init__(self, variables, asvar=None):
+        super().__init__()
         self.vars = variables
         self.asvar = asvar
 
@@ -164,11 +183,19 @@ class FirstOfNode(Node):
 
 
 class ForNode(Node):
+    __slots__ = (
+        "loopvars",
+        "sequence",
+        "is_reversed",
+        "nodelist_loop",
+        "nodelist_empty",
+    )
     child_nodelists = ("nodelist_loop", "nodelist_empty")
 
     def __init__(
         self, loopvars, sequence, is_reversed, nodelist_loop, nodelist_empty=None
     ):
+        super().__init__()
         self.loopvars = loopvars
         self.sequence = sequence
         self.is_reversed = is_reversed
@@ -257,9 +284,11 @@ class ForNode(Node):
 
 
 class IfChangedNode(Node):
+    __slots__ = ("nodelist_true", "nodelist_false", "_varlist")
     child_nodelists = ("nodelist_true", "nodelist_false")
 
     def __init__(self, nodelist_true, nodelist_false, *varlist):
+        super().__init__()
         self.nodelist_true = nodelist_true
         self.nodelist_false = nodelist_false
         self._varlist = varlist
@@ -305,7 +334,10 @@ class IfChangedNode(Node):
 
 
 class IfNode(Node):
+    __slots__ = ("conditions_nodelists",)
+
     def __init__(self, conditions_nodelists):
+        super().__init__()
         self.conditions_nodelists = conditions_nodelists
 
     def __repr__(self):
@@ -336,7 +368,10 @@ class IfNode(Node):
 
 
 class LoremNode(Node):
+    __slots__ = ("count", "method", "common")
+
     def __init__(self, count, method, common):
+        super().__init__()
         self.count = count
         self.method = method
         self.common = common
@@ -359,7 +394,10 @@ GroupedResult = namedtuple("GroupedResult", ["grouper", "list"])
 
 
 class RegroupNode(Node):
+    __slots__ = ("target", "expression", "var_name")
+
     def __init__(self, target, expression, var_name):
+        super().__init__()
         self.target = target
         self.expression = expression
         self.var_name = var_name
@@ -388,6 +426,8 @@ class RegroupNode(Node):
 
 
 class LoadNode(Node):
+    __slots__ = ()
+
     child_nodelists = ()
 
     def render(self, context):
@@ -395,7 +435,10 @@ class LoadNode(Node):
 
 
 class NowNode(Node):
+    __slots__ = ("format_string", "asvar")
+
     def __init__(self, format_string, asvar=None):
+        super().__init__()
         self.format_string = format_string
         self.asvar = asvar
 
@@ -411,7 +454,10 @@ class NowNode(Node):
 
 
 class PartialDefNode(Node):
+    __slots__ = ("partial_name", "inline", "nodelist")
+
     def __init__(self, partial_name, inline, nodelist):
+        super().__init__()
         self.partial_name = partial_name
         self.inline = inline
         self.nodelist = nodelist
@@ -421,7 +467,10 @@ class PartialDefNode(Node):
 
 
 class PartialNode(Node):
+    __slots__ = ("partial_name", "partial_mapping")
+
     def __init__(self, partial_name, partial_mapping):
+        super().__init__()
         # Defer lookup in `partial_mapping` and nodelist to runtime.
         self.partial_name = partial_name
         self.partial_mapping = partial_mapping
@@ -436,7 +485,10 @@ class PartialNode(Node):
 
 
 class ResetCycleNode(Node):
+    __slots__ = ("node",)
+
     def __init__(self, node):
+        super().__init__()
         self.node = node
 
     def render(self, context):
@@ -445,7 +497,10 @@ class ResetCycleNode(Node):
 
 
 class SpacelessNode(Node):
+    __slots__ = ("nodelist",)
+
     def __init__(self, nodelist):
+        super().__init__()
         self.nodelist = nodelist
 
     def render(self, context):
@@ -455,6 +510,8 @@ class SpacelessNode(Node):
 
 
 class TemplateTagNode(Node):
+    __slots__ = ("tagtype",)
+
     mapping = {
         "openblock": BLOCK_TAG_START,
         "closeblock": BLOCK_TAG_END,
@@ -467,6 +524,7 @@ class TemplateTagNode(Node):
     }
 
     def __init__(self, tagtype):
+        super().__init__()
         self.tagtype = tagtype
 
     def render(self, context):
@@ -474,9 +532,12 @@ class TemplateTagNode(Node):
 
 
 class URLNode(Node):
+    __slots__ = ("view_name", "args", "kwargs", "asvar")
+
     child_nodelists = ()
 
     def __init__(self, view_name, args, kwargs, asvar):
+        super().__init__()
         self.view_name = view_name
         self.args = args
         self.kwargs = kwargs
@@ -523,7 +584,10 @@ class URLNode(Node):
 
 
 class VerbatimNode(Node):
+    __slots__ = ("content",)
+
     def __init__(self, content):
+        super().__init__()
         self.content = content
 
     def render(self, context):
@@ -531,7 +595,15 @@ class VerbatimNode(Node):
 
 
 class WidthRatioNode(Node):
+    __slots__ = (
+        "val_expr",
+        "max_expr",
+        "max_width",
+        "asvar",
+    )
+
     def __init__(self, val_expr, max_expr, max_width, asvar=None):
+        super().__init__()
         self.val_expr = val_expr
         self.max_expr = max_expr
         self.max_width = max_width
@@ -564,7 +636,10 @@ class WidthRatioNode(Node):
 
 
 class WithNode(Node):
+    __slots__ = ("nodelist", "extra_context")
+
     def __init__(self, var, name, nodelist, extra_context=None):
+        super().__init__()
         self.nodelist = nodelist
         # var and name are legacy attributes, being left in case they are used
         # by third-party subclasses of this Node.
