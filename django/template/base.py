@@ -356,6 +356,8 @@ def linebreak_iter(template_source):
 
 
 class Token:
+    __slots__ = ("token_type", "contents", "position", "lineno")
+
     def __init__(self, token_type, contents, position=None, lineno=None):
         """
         A token representing a string from the template.
@@ -404,6 +406,8 @@ class Token:
 
 
 class Lexer:
+    __slots__ = ("template_string", "verbatim")
+
     def __init__(self, template_string):
         self.template_string = template_string
         self.verbatim = False
@@ -465,6 +469,8 @@ class Lexer:
 
 
 class DebugLexer(Lexer):
+    __slots__ = ()
+
     def _tag_re_split_positions(self):
         last = 0
         for match in tag_re.finditer(self.template_string):
