@@ -1097,7 +1097,7 @@ calling the appropriate methods on the wrapped expression.
 
     .. attribute:: set_returning
 
-    .. versionadded:: 5.2
+        .. versionadded:: 5.2
 
         Tells Django that this expression contains a set-returning function,
         enforcing subquery evaluation. It's used, for example, to allow some
