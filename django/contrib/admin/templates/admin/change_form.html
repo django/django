@@ -47,7 +47,7 @@
 
 {% block field_sets %}
 {% for fieldset in adminform %}
-  {% include "admin/includes/fieldset.html" with heading_level=2 id_suffix=forloop.counter0 %}
+  {% include "admin/includes/fieldset.html" with heading_level=2 prefix="fieldset" id_prefix=0 id_suffix=forloop.counter0 %}
 {% endfor %}
 {% endblock %}
 
