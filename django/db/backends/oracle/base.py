@@ -243,7 +243,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     @property
     def is_pool(self):
-        return self.settings_dict["OPTIONS"].get("pool")
+        return self.settings_dict["OPTIONS"].get("pool", False)
 
     @property
     def pool(self):
