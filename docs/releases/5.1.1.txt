@@ -35,3 +35,6 @@ Bugfixes
 * Restored, following a regression in Django 5.1, the ability to override the
   timezone and role setting behavior used within the ``init_connection_state``
   method of the PostgreSQL backend (:ticket:`35688`).
+
+* Fixed a bug in Django 5.1 where variable lookup errors were logged when
+  rendering admin fieldsets (:ticket:`35716`).
