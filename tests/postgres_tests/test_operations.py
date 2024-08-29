@@ -318,7 +318,7 @@ class CreateExtensionTests(PostgreSQLTestCase):
 
 
 @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific tests.")
-class CreateCollationTests(PostgreSQLTestCase):
+class CreateCollationTests(OptimizerTestBase, PostgreSQLTestCase):
     app_label = "test_allow_create_collation"
 
     @override_settings(DATABASE_ROUTERS=[NoMigrationRouter()])
@@ -457,6 +457,24 @@ class CreateCollationTests(PostgreSQLTestCase):
             "    provider='icu',\n"
             "    deterministic=False,\n"
             "),",
+        )
+
+    def test_reduce_create_remove(self):
+        self.assertOptimizesTo(
+            [
+                CreateCollation(
+                    "sample_collation",
+                    "und-u-ks-level2",
+                    provider="icu",
+                    deterministic=False,
+                ),
+                RemoveCollation(
+                    "sample_collation",
+                    # Different locale
+                    "de-u-ks-level1",
+                ),
+            ],
+            [],
         )
 
 
