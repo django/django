@@ -1768,6 +1768,13 @@ class TestInlineWithFieldsets(TestDataMixin, TestCase):
     def setUp(self):
         self.client.force_login(self.superuser)
 
+    @override_settings(DEBUG=True)
+    def test_fieldset_context_fully_set(self):
+        url = reverse("admin:admin_inlines_photographer_add")
+        with self.assertRaisesMessage(AssertionError, "no logs"):
+            with self.assertLogs("django.template", "DEBUG"):
+                self.client.get(url)
+
     def test_inline_headings(self):
         response = self.client.get(reverse("admin:admin_inlines_photographer_add"))
         # Page main title.
