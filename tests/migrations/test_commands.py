@@ -3321,6 +3321,8 @@ class CustomMigrationCommandTests(MigrationTestBase):
         command = CustomMigrateCommand(stdout=out)
 
         with self.temporary_migration_module() as migration_dir:
-            self.assertRaises(ModuleNotFoundError, call_command, command, "migrations", verbosity=0)
+            self.assertRaises(
+                ModuleNotFoundError, call_command, command, "migrations", verbosity=0
+            )
 
         self.assertTableNotExists("migrations_author")
