@@ -3321,7 +3321,7 @@ class CustomMigrationCommandTests(MigrationTestBase):
         out = io.StringIO()
         command = CustomMigrateCommand(stdout=out)
 
-        with self.temporary_migration_module() as migration_dir:
+        with self.temporary_migration_module():
             self.assertRaises(
                 ModuleNotFoundError, call_command, command, "migrations", verbosity=0
             )
