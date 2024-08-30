@@ -301,7 +301,7 @@ class DateMixin:
 
 class BaseDateListView(MultipleObjectMixin, DateMixin, View):
     """
-    A base view for date-based views displaying a list of objects.
+    Base class for date-based views displaying a list of objects.
 
     Using this base class requires subclassing to provide a response mixin.
     """
