@@ -29,6 +29,7 @@ from django.test import TestCase, override_settings, skipUnlessDBFeature
 from django.test.utils import captured_stdout
 from django.utils import timezone
 from django.utils.version import get_docs_version
+
 from .models import UnicodeModel, UnserializableModel
 from .routers import TestRouter
 from .test_base import MigrationTestBase
