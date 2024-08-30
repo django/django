@@ -720,6 +720,9 @@ Django places some restrictions on model field names:
 
 #. A field name cannot end with an underscore, for similar reasons.
 
+#. A field name cannot be ``check``, as this would override the check
+   framework's ``Model.check()`` method.
+
 These limitations can be worked around, though, because your field name doesn't
 necessarily have to match your database column name. See the
 :attr:`~Field.db_column` option.

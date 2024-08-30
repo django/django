@@ -4,6 +4,7 @@ from django.template.defaultfilters import floatformat
 from django.test import SimpleTestCase
 from django.utils import translation
 from django.utils.safestring import mark_safe
+from django.utils.version import PYPY
 
 from ..utils import setup
 
@@ -73,6 +74,7 @@ class FunctionTests(SimpleTestCase):
         self.assertEqual(floatformat(1.5e-15, 20), "0.00000000000000150000")
         self.assertEqual(floatformat(1.5e-15, -20), "0.00000000000000150000")
         self.assertEqual(floatformat(1.00000000000000015, 16), "1.0000000000000002")
+        self.assertEqual(floatformat("1e199"), "1" + "0" * 199)
 
     def test_invalid_inputs(self):
         cases = [
@@ -169,6 +171,31 @@ class FunctionTests(SimpleTestCase):
         self.assertEqual(floatformat(pos_inf), "inf")
         self.assertEqual(floatformat(neg_inf), "-inf")
         self.assertEqual(floatformat(pos_inf / pos_inf), "nan")
+        self.assertEqual(floatformat("inf"), "inf")
+        self.assertEqual(floatformat("NaN"), "NaN")
+
+    def test_too_many_digits_to_render(self):
+        cases = [
+            "1e200",
+            "1E200",
+            "1E10000000000000000",
+            "-1E10000000000000000",
+            "1e10000000000000000",
+            "-1e10000000000000000",
+        ]
+        for value in cases:
+            with self.subTest(value=value):
+                self.assertEqual(floatformat(value), value)
+
+    def test_too_many_digits_to_render_very_long(self):
+        value = "1" + "0" * 1_000_000
+        if PYPY:
+            # PyPy casts decimal parts to int, which reaches the integer string
+            # conversion length limit (default 4300 digits, CVE-2020-10735).
+            with self.assertRaises(ValueError):
+                floatformat(value)
+        else:
+            self.assertEqual(floatformat(value), value)
 
     def test_float_dunder_method(self):
         class FloatWrapper:

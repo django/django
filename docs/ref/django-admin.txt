@@ -870,11 +870,11 @@ are reserved for the superuser (root).
 This server uses the WSGI application object specified by the
 :setting:`WSGI_APPLICATION` setting.
 
-DO NOT USE THIS SERVER IN A PRODUCTION SETTING. It has not gone through
-security audits or performance tests. (And that's how it's gonna stay. We're in
-the business of making web frameworks, not web servers, so improving this
-server to be able to handle a production environment is outside the scope of
-Django.)
+.. warning:: DO NOT USE THIS SERVER IN A PRODUCTION SETTING.
+
+    This lightweight development server has not gone through security audits or
+    performance tests, hence is unsuitable for production. Making this server
+    able to handle a production environment is outside the scope of Django.
 
 The development server automatically reloads Python code for each request, as
 needed. You don't need to restart the server for code changes to take effect.
@@ -946,6 +946,20 @@ multithreaded by default.
 
 Uses IPv6 for the development server. This changes the default IP address from
 ``127.0.0.1`` to ``::1``.
+
+.. envvar:: HIDE_PRODUCTION_WARNING
+
+.. versionadded:: 5.2
+
+By default, a warning is printed to the console that ``runserver`` is not
+suitable for production:
+
+.. code-block:: text
+
+    WARNING: This is a development server. Do not use it in a production setting. Use a production WSGI or ASGI server instead.
+    For more information on production servers see: https://docs.djangoproject.com/en/|version|/howto/deployment/
+
+Set this environment variable to ``"true"`` to hide this warning.
 
 Examples of using different ports and addresses
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1078,7 +1092,7 @@ Python interpreter, use ``python`` as the interface name, like so:
 .. _IPython: https://ipython.org/
 .. _bpython: https://bpython-interpreter.org/
 
-.. django-admin-option:: --nostartup
+.. django-admin-option:: --no-startup
 
 Disables reading the startup script for the "plain" Python interpreter. By
 default, the script pointed to by the :envvar:`PYTHONSTARTUP` environment

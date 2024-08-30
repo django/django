@@ -1999,6 +1999,21 @@ class PrefetchLimitTests(TestDataMixin, TestCase):
         with self.assertRaisesMessage(NotSupportedError, msg):
             list(Book.objects.prefetch_related(Prefetch("authors", authors[1:])))
 
+    @skipUnlessDBFeature("supports_over_clause")
+    def test_empty_order(self):
+        authors = Author.objects.order_by()
+        with self.assertNumQueries(3):
+            books = list(
+                Book.objects.prefetch_related(
+                    Prefetch("authors", authors),
+                    Prefetch("authors", authors[:1], to_attr="authors_sliced"),
+                )
+            )
+        for book in books:
+            with self.subTest(book=book):
+                self.assertEqual(len(book.authors_sliced), 1)
+                self.assertIn(book.authors_sliced[0], list(book.authors.all()))
+
 
 class DeprecationTests(TestCase):
     def test_get_current_queryset_warning(self):
@@ -2007,13 +2022,15 @@ class DeprecationTests(TestCase):
             "get_current_querysets() instead."
         )
         authors = Author.objects.all()
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
             self.assertEqual(
                 Prefetch("authors", authors).get_current_queryset(1),
                 authors,
             )
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+        self.assertEqual(ctx.filename, __file__)
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
             self.assertIsNone(Prefetch("authors").get_current_queryset(1))
+        self.assertEqual(ctx.filename, __file__)
 
     @ignore_warnings(category=RemovedInDjango60Warning)
     def test_prefetch_one_level_fallback(self):

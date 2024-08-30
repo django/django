@@ -2,15 +2,16 @@
 #
 # Translators:
 # Viktar Palstsiuk <vipals@gmail.com>, 2015
-# znotdead <zhirafchik@gmail.com>, 2016-2017,2019,2021,2023
+# znotdead <zhirafchik@gmail.com>, 2016-2017,2019,2021,2023-2024
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-17 03:19-0500\n"
-"PO-Revision-Date: 2023-04-25 08:09+0000\n"
-"Last-Translator: znotdead <zhirafchik@gmail.com>, 2016-2017,2019,2021,2023\n"
-"Language-Team: Belarusian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 08:09+0000\n"
+"Last-Translator: znotdead <zhirafchik@gmail.com>, "
+"2016-2017,2019,2021,2023-2024\n"
+"Language-Team: Belarusian (http://app.transifex.com/django/django/language/"
 "be/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -33,12 +34,22 @@ msgstr "Важныя даты"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Аб'ект %(name)s з першасным ключом %(key)r не існуе."
 
+msgid "Conflicting form data submitted. Please try again."
+msgstr "Адпраўлены супярэчлівыя даныя формы. Калі ласка, паспрабуйце яшчэ раз."
+
 msgid "Password changed successfully."
 msgstr "Пароль зьмянілі."
+
+msgid "Password-based authentication was disabled."
+msgstr "Аўтэнтыфікацыя на аснове пароля адключана."
 
 #, python-format
 msgid "Change password: %s"
 msgstr "Зьмяніць пароль: %s"
+
+#, python-format
+msgid "Set password: %s"
+msgstr "Усталяваць пароль: %s"
 
 msgid "Authentication and Authorization"
 msgstr "Аўтэнтыфікацыя і аўтарызацыя"
@@ -55,8 +66,23 @@ msgstr "Пароль не зададзены."
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Няправільны фармат паролю або невядомы алгарытм хэшавання."
 
+msgid "Reset password"
+msgstr "Узнавіць пароль"
+
+msgid "Set password"
+msgstr "Усталяваць пароль"
+
 msgid "The two password fields didn’t match."
 msgstr "Не супадаюць паролі ў двух палях."
+
+msgid ""
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
+msgstr ""
+"Зможа карыстальнік прайсці аўтэнтыфікацыю з дапамогай пароля ці не. Калі "
+"гэта функцыя адключана, яны ўсё роўна могуць прайсці аўтэнтыфікацыю з "
+"дапамогай іншых бэкэндаў, такіх як Single Sign-On або LDAP."
 
 msgid "Password"
 msgstr "Пароль"
@@ -67,13 +93,26 @@ msgstr "Пацьвердзіце пароль"
 msgid "Enter the same password as before, for verification."
 msgstr "Дзеля пэўнасьці набярыце такі самы пароль яшчэ раз."
 
+msgid "Password-based authentication"
+msgstr "Аўтэнтыфікацыя на аснове пароля"
+
+msgid "Enabled"
+msgstr "Уключана"
+
+msgid "Disabled"
+msgstr "Адключана"
+
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user’s "
-"password, but you can change the password using <a href=\"{}\">this form</a>."
+"Raw passwords are not stored, so there is no way to see the user’s password."
 msgstr ""
-"Паролі не захоўваюцца ў такім выглядзе, як іх набралі, таму ўбачыць пароль "
-"карыстальніка нельга, але яго можна зьмяніць выкарыстоўваючы<a "
-"href=\"{}\">гэту форму </a>."
+"Неапрацаваныя паролі не захоўваюцца, таму няма магчымасці ўбачыць пароль "
+"карыстальніка."
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
+msgstr ""
+"Уключыць аўтэнтыфікацыю на аснове пароля для гэтага карыстальніка, "
+"усталяваўшы пароль."
 
 #, python-format
 msgid ""
@@ -100,9 +139,6 @@ msgstr "Пазначылі неадпаведны стары пароль. На�
 
 msgid "Old password"
 msgstr "Стары пароль"
-
-msgid "Password (again)"
-msgstr "Пароль (яшчэ раз)"
 
 msgid "algorithm"
 msgstr "альґарытм"

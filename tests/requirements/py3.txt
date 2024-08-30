@@ -1,20 +1,20 @@
 aiosmtpd
 asgiref >= 3.8.1
-argon2-cffi >= 19.2.0; sys_platform != 'win32' or python_version < '3.13'
+argon2-cffi >= 19.2.0
 bcrypt
 black
 docutils >= 0.19
-geoip2; python_version < '3.13'
+geoip2
 jinja2 >= 2.11.0
-numpy; sys_platform != 'win32' or python_version < '3.13'
-Pillow >= 6.2.1; sys_platform != 'win32' or python_version < '3.13'
+numpy
+Pillow >= 6.2.1
 # pylibmc/libmemcached can't be built on Windows.
 pylibmc; sys_platform != 'win32'
 pymemcache >= 3.4.0
 pywatchman; sys_platform != 'win32'
 PyYAML
 redis >= 3.4.0
-selenium >= 4.8.0; sys_platform != 'win32' or python_version < '3.13'
+selenium >= 4.8.0
 sqlparse >= 0.3.1
 tblib >= 1.5.0
 tzdata

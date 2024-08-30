@@ -128,7 +128,8 @@ Database backends
 Decorators
 ~~~~~~~~~~
 
-* ...
+* :func:`~django.utils.decorators.method_decorator` now supports wrapping
+  asynchronous view methods.
 
 Email
 ~~~~~
@@ -194,7 +195,10 @@ Logging
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
-* ...
+* A new warning is printed to the console when running :djadmin:`runserver` that
+  ``runserver`` is unsuitable for production. This warning can be hidden by
+  setting the :envvar:`HIDE_PRODUCTION_WARNING` environment variable to
+  ``"true"``.
 
 Migrations
 ~~~~~~~~~~
@@ -211,6 +215,13 @@ Models
   of a set of counterintuitive rules which made query combination through
   methods such as
   :meth:`QuerySet.union()<django.db.models.query.QuerySet.union>` unpredictable.
+
+* Added support for validation of model constraints which use a
+  :class:`~django.db.models.GeneratedField`.
+
+* The new :attr:`.Expression.set_returning` attribute specifies that the
+  expression contains a set-returning function, enforcing subquery evaluation.
+  This is necessary for many Postgres set-returning functions.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -240,7 +251,9 @@ Templates
 Tests
 ~~~~~
 
-* ...
+* Stack frames from Django's custom assertions are now hidden. This makes test
+  failures easier to read and enables :option:`test --pdb` to directly enter
+  into the failing test method.
 
 URLs
 ~~~~
@@ -250,7 +263,14 @@ URLs
 Utilities
 ~~~~~~~~~
 
-* ...
+* :class:`~django.utils.safestring.SafeString` now returns
+  :py:data:`NotImplemented` in ``__add__`` for non-string right-hand side
+  values. This aligns with the :py:class:`str` addition behavior and allows
+  ``__radd__`` to be used if available.
+
+* :func:`~django.utils.html.format_html_join` now supports taking an iterable
+  of mappings, passing their contents as keyword arguments to
+  :func:`~django.utils.html.format_html`.
 
 Validators
 ~~~~~~~~~~
@@ -284,7 +304,10 @@ PostgreSQL 14 and higher.
 Miscellaneous
 -------------
 
-* ...
+* Adding :attr:`.EmailMultiAlternatives.alternatives` is now only supported via
+  the :meth:`~.EmailMultiAlternatives.attach_alternative` method.
+
+* The minimum supported version of ``gettext`` is increased from 0.15 to 0.19.
 
 .. _deprecated-features-5.2:
 

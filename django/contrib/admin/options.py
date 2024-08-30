@@ -2229,7 +2229,7 @@ class ModelAdmin(BaseModelAdmin):
         if perms_needed or protected:
             title = _("Cannot delete %(name)s") % {"name": object_name}
         else:
-            title = _("Are you sure?")
+            title = _("Delete")
 
         context = {
             **self.admin_site.each_context(request),

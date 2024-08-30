@@ -635,10 +635,11 @@ class OverwritingStorageOSOpenFlagsWarningTests(SimpleTestCase):
     def test_os_open_flags_deprecation_warning(self):
         msg = "Overriding OS_OPEN_FLAGS is deprecated. Use the allow_overwrite "
         msg += "parameter instead."
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
             self.storage = self.storage_class(
                 location=self.temp_dir, base_url="/test_media_url/"
             )
+        self.assertEqual(ctx.filename, __file__)
 
 
 # RemovedInDjango60Warning: Remove this test class.
@@ -771,7 +772,8 @@ class DiscardingFalseContentStorageTests(FileStorageTests):
 
 class FileFieldStorageTests(TestCase):
     def tearDown(self):
-        shutil.rmtree(temp_storage_location)
+        if os.path.exists(temp_storage_location):
+            shutil.rmtree(temp_storage_location)
 
     def _storage_max_filename_length(self, storage):
         """
@@ -944,6 +946,20 @@ class FileFieldStorageTests(TestCase):
         self.assertEqual(obj.default.read(), b"default content")
         obj.default.close()
 
+    def test_filefield_db_default(self):
+        temp_storage.save("tests/db_default.txt", ContentFile("default content"))
+        obj = Storage.objects.create()
+        self.assertEqual(obj.db_default.name, "tests/db_default.txt")
+        self.assertEqual(obj.db_default.read(), b"default content")
+        obj.db_default.close()
+
+        # File is not deleted, even if there are no more objects using it.
+        obj.delete()
+        s = Storage()
+        self.assertEqual(s.db_default.name, "tests/db_default.txt")
+        self.assertEqual(s.db_default.read(), b"default content")
+        s.db_default.close()
+
     def test_empty_upload_to(self):
         # upload_to can be empty, meaning it does not use subdirectory.
         obj = Storage()
@@ -1008,6 +1024,23 @@ class FileFieldStorageTests(TestCase):
         temp_storage.save("tests/stringio", output)
         self.assertTrue(temp_storage.exists("tests/stringio"))
         with temp_storage.open("tests/stringio") as f:
+            self.assertEqual(f.read(), b"content")
+
+    @override_settings(
+        STORAGES={
+            DEFAULT_STORAGE_ALIAS: {
+                "BACKEND": "django.core.files.storage.InMemoryStorage"
+            }
+        }
+    )
+    def test_create_file_field_from_another_file_field_in_memory_storage(self):
+        f = ContentFile("content", "file.txt")
+        obj = Storage.objects.create(storage_callable_default=f)
+        new_obj = Storage.objects.create(
+            storage_callable_default=obj.storage_callable_default.file
+        )
+        storage = callable_default_storage()
+        with storage.open(new_obj.storage_callable_default.name) as f:
             self.assertEqual(f.read(), b"content")
 
 

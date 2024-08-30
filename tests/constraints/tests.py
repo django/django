@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from django.db import IntegrityError, connection, models
 from django.db.models import F
 from django.db.models.constraints import BaseConstraint, UniqueConstraint
-from django.db.models.functions import Abs, Lower
+from django.db.models.functions import Abs, Lower, Sqrt, Upper
 from django.db.transaction import atomic
 from django.test import SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import ignore_warnings
@@ -13,7 +13,10 @@ from django.utils.deprecation import RemovedInDjango60Warning
 from .models import (
     ChildModel,
     ChildUniqueConstraintProduct,
+    GeneratedFieldStoredProduct,
+    GeneratedFieldVirtualProduct,
     JSONFieldModel,
+    ModelWithDatabaseDefault,
     Product,
     UniqueConstraintConditionProduct,
     UniqueConstraintDeferrable,
@@ -383,18 +386,72 @@ class CheckConstraintTests(TestCase):
         with self.assertRaisesMessage(ValidationError, msg):
             json_exact_constraint.validate(JSONFieldModel, JSONFieldModel(data=data))
 
+    @skipUnlessDBFeature("supports_stored_generated_columns")
+    def test_validate_generated_field_stored(self):
+        self.assertGeneratedFieldIsValidated(model=GeneratedFieldStoredProduct)
+
+    @skipUnlessDBFeature("supports_virtual_generated_columns")
+    def test_validate_generated_field_virtual(self):
+        self.assertGeneratedFieldIsValidated(model=GeneratedFieldVirtualProduct)
+
+    def assertGeneratedFieldIsValidated(self, model):
+        constraint = models.CheckConstraint(
+            condition=models.Q(rebate__range=(0, 100)), name="bounded_rebate"
+        )
+        constraint.validate(model, model(price=50, discounted_price=20))
+
+        invalid_product = model(price=1200, discounted_price=500)
+        msg = f"Constraint “{constraint.name}” is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint.validate(model, invalid_product)
+
+        # Excluding referenced or generated fields should skip validation.
+        constraint.validate(model, invalid_product, exclude={"price"})
+        constraint.validate(model, invalid_product, exclude={"rebate"})
+
     def test_check_deprecation(self):
         msg = "CheckConstraint.check is deprecated in favor of `.condition`."
         condition = models.Q(foo="bar")
-        with self.assertWarnsRegex(RemovedInDjango60Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
             constraint = models.CheckConstraint(name="constraint", check=condition)
-        with self.assertWarnsRegex(RemovedInDjango60Warning, msg):
+        self.assertEqual(ctx.filename, __file__)
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
             self.assertIs(constraint.check, condition)
+        self.assertEqual(ctx.filename, __file__)
         other_condition = models.Q(something="else")
-        with self.assertWarnsRegex(RemovedInDjango60Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
             constraint.check = other_condition
-        with self.assertWarnsRegex(RemovedInDjango60Warning, msg):
+        self.assertEqual(ctx.filename, __file__)
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
             self.assertIs(constraint.check, other_condition)
+        self.assertEqual(ctx.filename, __file__)
+
+    def test_database_default(self):
+        models.CheckConstraint(
+            condition=models.Q(field_with_db_default="field_with_db_default"),
+            name="check_field_with_db_default",
+        ).validate(ModelWithDatabaseDefault, ModelWithDatabaseDefault())
+
+        # Ensure that a check also does not silently pass with either
+        # FieldError or DatabaseError when checking with a db_default.
+        with self.assertRaises(ValidationError):
+            models.CheckConstraint(
+                condition=models.Q(
+                    field_with_db_default="field_with_db_default", field="field"
+                ),
+                name="check_field_with_db_default_2",
+            ).validate(
+                ModelWithDatabaseDefault, ModelWithDatabaseDefault(field="not-field")
+            )
+
+        with self.assertRaises(ValidationError):
+            models.CheckConstraint(
+                condition=models.Q(field_with_db_default="field_with_db_default"),
+                name="check_field_with_db_default",
+            ).validate(
+                ModelWithDatabaseDefault,
+                ModelWithDatabaseDefault(field_with_db_default="other value"),
+            )
 
 
 class UniqueConstraintTests(TestCase):
@@ -1034,6 +1091,90 @@ class UniqueConstraintTests(TestCase):
             exclude={"name"},
         )
 
+    @skipUnlessDBFeature("supports_stored_generated_columns")
+    def test_validate_expression_generated_field_stored(self):
+        self.assertGeneratedFieldWithExpressionIsValidated(
+            model=GeneratedFieldStoredProduct
+        )
+
+    @skipUnlessDBFeature("supports_virtual_generated_columns")
+    def test_validate_expression_generated_field_virtual(self):
+        self.assertGeneratedFieldWithExpressionIsValidated(
+            model=GeneratedFieldVirtualProduct
+        )
+
+    def assertGeneratedFieldWithExpressionIsValidated(self, model):
+        constraint = UniqueConstraint(Sqrt("rebate"), name="unique_rebate_sqrt")
+        model.objects.create(price=100, discounted_price=84)
+
+        valid_product = model(price=100, discounted_price=75)
+        constraint.validate(model, valid_product)
+
+        invalid_product = model(price=20, discounted_price=4)
+        with self.assertRaisesMessage(
+            ValidationError, f"Constraint “{constraint.name}” is violated."
+        ):
+            constraint.validate(model, invalid_product)
+
+        # Excluding referenced or generated fields should skip validation.
+        constraint.validate(model, invalid_product, exclude={"rebate"})
+        constraint.validate(model, invalid_product, exclude={"price"})
+
+    @skipUnlessDBFeature("supports_stored_generated_columns")
+    def test_validate_fields_generated_field_stored(self):
+        self.assertGeneratedFieldWithFieldsIsValidated(
+            model=GeneratedFieldStoredProduct
+        )
+
+    @skipUnlessDBFeature("supports_virtual_generated_columns")
+    def test_validate_fields_generated_field_virtual(self):
+        self.assertGeneratedFieldWithFieldsIsValidated(
+            model=GeneratedFieldVirtualProduct
+        )
+
+    def assertGeneratedFieldWithFieldsIsValidated(self, model):
+        constraint = models.UniqueConstraint(
+            fields=["lower_name"], name="lower_name_unique"
+        )
+        model.objects.create(name="Box")
+        constraint.validate(model, model(name="Case"))
+
+        invalid_product = model(name="BOX")
+        msg = str(invalid_product.unique_error_message(model, ["lower_name"]))
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint.validate(model, invalid_product)
+
+        # Excluding referenced or generated fields should skip validation.
+        constraint.validate(model, invalid_product, exclude={"lower_name"})
+        constraint.validate(model, invalid_product, exclude={"name"})
+
+    @skipUnlessDBFeature("supports_stored_generated_columns")
+    def test_validate_fields_generated_field_stored_nulls_distinct(self):
+        self.assertGeneratedFieldNullsDistinctIsValidated(
+            model=GeneratedFieldStoredProduct
+        )
+
+    @skipUnlessDBFeature("supports_virtual_generated_columns")
+    def test_validate_fields_generated_field_virtual_nulls_distinct(self):
+        self.assertGeneratedFieldNullsDistinctIsValidated(
+            model=GeneratedFieldVirtualProduct
+        )
+
+    def assertGeneratedFieldNullsDistinctIsValidated(self, model):
+        constraint = models.UniqueConstraint(
+            fields=["lower_name"],
+            name="lower_name_unique_nulls_distinct",
+            nulls_distinct=False,
+        )
+        model.objects.create(name=None)
+        valid_product = model(name="Box")
+        constraint.validate(model, valid_product)
+
+        invalid_product = model(name=None)
+        msg = str(invalid_product.unique_error_message(model, ["lower_name"]))
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint.validate(model, invalid_product)
+
     @skipUnlessDBFeature("supports_table_check_constraints")
     def test_validate_nullable_textfield_with_isnull_true(self):
         is_null_constraint = models.UniqueConstraint(
@@ -1265,3 +1406,30 @@ class UniqueConstraintTests(TestCase):
         msg = "A unique constraint must be named."
         with self.assertRaisesMessage(ValueError, msg):
             models.UniqueConstraint(fields=["field"])
+
+    def test_database_default(self):
+        models.UniqueConstraint(
+            fields=["field_with_db_default"], name="unique_field_with_db_default"
+        ).validate(ModelWithDatabaseDefault, ModelWithDatabaseDefault())
+        models.UniqueConstraint(
+            Upper("field_with_db_default"),
+            name="unique_field_with_db_default_expression",
+        ).validate(ModelWithDatabaseDefault, ModelWithDatabaseDefault())
+
+        ModelWithDatabaseDefault.objects.create()
+
+        msg = (
+            "Model with database default with this Field with db default already "
+            "exists."
+        )
+        with self.assertRaisesMessage(ValidationError, msg):
+            models.UniqueConstraint(
+                fields=["field_with_db_default"], name="unique_field_with_db_default"
+            ).validate(ModelWithDatabaseDefault, ModelWithDatabaseDefault())
+
+        msg = "Constraint “unique_field_with_db_default_expression” is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            models.UniqueConstraint(
+                Upper("field_with_db_default"),
+                name="unique_field_with_db_default_expression",
+            ).validate(ModelWithDatabaseDefault, ModelWithDatabaseDefault())

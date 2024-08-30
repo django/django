@@ -612,8 +612,9 @@ class OneToOneTests(TestCase):
             "get_prefetch_queryset() is deprecated. Use get_prefetch_querysets() "
             "instead."
         )
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
             Place.bar.get_prefetch_queryset(places)
+        self.assertEqual(ctx.filename, __file__)
 
     def test_get_prefetch_querysets_invalid_querysets_length(self):
         places = Place.objects.all()
