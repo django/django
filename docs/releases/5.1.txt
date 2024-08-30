@@ -210,16 +210,6 @@ Database backends
 * ``"pool"`` option is now supported in :setting:`OPTIONS` on PostgreSQL to
   allow using :ref:`connection pools <postgresql-pool>`.
 
-Decorators
-~~~~~~~~~~
-
-* ...
-
-Email
-~~~~~
-
-* ...
-
 Error Reporting
 ~~~~~~~~~~~~~~~
 
