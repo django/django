@@ -1508,6 +1508,24 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         self.assertContains(response, "<h1>Change article</h1>")
         self.assertContains(response, "<h2>Article 2</h2>")
 
+    def test_error_in_titles(self):
+        for url, subtitle in [
+            (
+                reverse("admin:admin_views_article_change", args=(self.a1.pk,)),
+                "Article 1 | Change article",
+            ),
+            (reverse("admin:admin_views_article_add"), "Add article"),
+            (reverse("admin:login"), "Log in"),
+            (reverse("admin:password_change"), "Password change"),
+            (
+                reverse("admin:auth_user_password_change", args=(self.superuser.id,)),
+                "Change password: super",
+            ),
+        ]:
+            with self.subTest(url=url, subtitle=subtitle):
+                response = self.client.post(url, {})
+                self.assertContains(response, f"<title>Error: {subtitle}")
+
     def test_view_subtitle_per_object(self):
         viewuser = User.objects.create_user(
             username="viewuser",
