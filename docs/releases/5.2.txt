@@ -203,7 +203,10 @@ Management Commands
 Migrations
 ~~~~~~~~~~
 
-* ...
+:mod:`django.db.migrations`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ``MigrationAutodetector`` now exposes :attr:`MigrationAutodetector.autodetector_class` for subclasses
 
 Models
 ~~~~~~
