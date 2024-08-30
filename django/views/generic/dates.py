@@ -520,7 +520,7 @@ class MonthArchiveView(MultipleObjectTemplateResponseMixin, BaseMonthArchiveView
 
 class BaseWeekArchiveView(YearMixin, WeekMixin, BaseDateListView):
     """
-    A base view for list of objects published in a given week.
+    A base view for a list of objects published in a given week.
 
     Using this base class requires subclassing to provide a response mixin.
     """
