@@ -633,7 +633,7 @@ class DayArchiveView(MultipleObjectTemplateResponseMixin, BaseDayArchiveView):
 
 class BaseTodayArchiveView(BaseDayArchiveView):
     """
-    A base view for list of objects published today.
+    A base view for a list of objects published today.
 
     Using this base class requires subclassing to provide a response mixin.
     """
