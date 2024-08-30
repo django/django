@@ -474,7 +474,7 @@ class YearArchiveView(MultipleObjectTemplateResponseMixin, BaseYearArchiveView):
 
 class BaseMonthArchiveView(YearMixin, MonthMixin, BaseDateListView):
     """
-    A base view for list of objects published in a given month.
+    A base view for a list of objects published in a given month.
 
     Using this base class requires subclassing to provide a response mixin.
     """
