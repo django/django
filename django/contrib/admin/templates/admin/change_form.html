@@ -23,6 +23,33 @@
 {% endblock %}
 {% endif %}
 
+{% block pretitle %}
+  {% if errors %}
+    <p class="errornote">
+      {% blocktranslate count counter=errors|length %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktranslate %}
+    </p>
+
+    {{ adminform.form.non_field_errors }}
+
+    <div class="errornote">
+      <p>The following fields have errors</p>
+      <ul class="errorlist">
+        {% for fieldset in adminform %}
+          {% for line in fieldset %}
+            {% for field in line %}
+              {% if field.errors %}
+                <li>
+                  <a href="#{{ field.field.id_for_label }}">{{ field.field.label }}</a>
+                </li>
+              {% endif %}
+            {% endfor %}
+          {% endfor %}
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+{% endblock %}
+
 {% block content %}<div id="content-main">
 {% block object-tools %}
 {% if change and not is_popup %}
@@ -38,12 +65,6 @@
 {% if is_popup %}<input type="hidden" name="{{ is_popup_var }}" value="1">{% endif %}
 {% if to_field %}<input type="hidden" name="{{ to_field_var }}" value="{{ to_field }}">{% endif %}
 {% if save_on_top %}{% block submit_buttons_top %}{% submit_row %}{% endblock %}{% endif %}
-{% if errors %}
-    <p class="errornote">
-    {% blocktranslate count counter=errors|length %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktranslate %}
-    </p>
-    {{ adminform.form.non_field_errors }}
-{% endif %}
 
 {% block field_sets %}
 {% for fieldset in adminform %}
