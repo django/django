@@ -20,18 +20,14 @@ permissions:
 jobs:
   windows:
     runs-on: windows-latest
-    strategy:
-      matrix:
-        python-version:
-          - '3.12'
-    name: Windows, SQLite, Python ${{ matrix.python-version }}
+    name: Windows, SQLite, Python 3.12
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: '3.12'
           cache: 'pip'
           cache-dependency-path: 'tests/requirements/py3.txt'
       - name: Install and upgrade packaging tools
