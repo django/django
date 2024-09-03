@@ -303,6 +303,18 @@ class AdminReadonlyField:
                 result_repr = linebreaksbr(result_repr)
         return conditional_escape(result_repr)
 
+    def required_perm(self):
+        try:
+            f, _, _ = lookup_field(
+                self.field["field"], self.form.instance, self.model_admin
+            )
+        except (AttributeError, ValueError, ObjectDoesNotExist):
+            return None
+        if f is not None and isinstance(
+            f.remote_field, (ForeignObjectRel, OneToOneField)
+        ):
+            return f"perms.{f.model._meta.app_label}.view_{f.model._meta.model_name}"
+
 
 class InlineAdminFormSet:
     """
