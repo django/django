@@ -210,9 +210,19 @@ class ValuesIterable(BaseIterable):
         if query.selected:
             names = list(query.selected)
         else:
+            # RemovedInDjango60Warning: place extra(select) entries at the
+            # beginning of the SELECT clause until it's completely removed.
+            extra_names = []
+            annotation_select = []
+            for alias, expression in query.annotation_select.items():
+                if isinstance(expression, _ExtraSelectFirstRawSQL):
+                    extra_names.append(alias)
+                else:
+                    annotation_select.append(alias)
             names = [
+                *extra_names,
                 *query.values_select,
-                *query.annotation_select,
+                *annotation_select,
             ]
         indexes = range(len(names))
         for row in compiler.results_iter(
@@ -250,9 +260,19 @@ class NamedValuesListIterable(ValuesListIterable):
             names = queryset._fields
         else:
             query = queryset.query
+            # RemovedInDjango60Warning: place extra(select) entries at the
+            # beginning of the SELECT clause until it's completely removed.
+            extra_names = []
+            annotation_select = []
+            for alias, expression in query.annotation_select.items():
+                if isinstance(expression, _ExtraSelectFirstRawSQL):
+                    extra_names.append(alias)
+                else:
+                    annotation_select.append(alias)
             names = [
+                *extra_names,
                 *query.values_select,
-                *query.annotation_select,
+                *annotation_select,
             ]
         tuple_class = create_namedtuple_class(*names)
         new = tuple.__new__
@@ -273,6 +293,17 @@ class FlatValuesListIterable(BaseIterable):
             chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size
         ):
             yield row[0]
+
+
+# RemovedInDjango60Warning
+class _ExtraSelectFirstRawSQL(RawSQL):
+    """
+    Internal RawSQL subclass used during the deprecation of extra(select) to
+    preserve the undocumented implicit ordering of members at the begining of
+    the SELECT clause.
+    """
+
+    implicitly_select_first = True
 
 
 class QuerySet(AltersData):
@@ -1724,8 +1755,6 @@ class QuerySet(AltersData):
                 category=RemovedInDjango60Warning,
                 stacklevel=2,
             )
-            # XXX: This is mising the logic to always place extras at the begining
-            # of the select clause.
             if select_params:
                 param_iter = iter(select_params)
             else:
@@ -1739,7 +1768,9 @@ class QuerySet(AltersData):
                     if pos == 0 or entry[pos - 1] != "%":
                         entry_params.append(next(param_iter))
                     pos = entry.find("%s", pos + 2)
-                clone.query.add_annotation(RawSQL(entry, entry_params), name)
+                clone.query.add_annotation(
+                    _ExtraSelectFirstRawSQL(entry, entry_params), name
+                )
         if where:
             warnings.warn(
                 "extra(where) usage is deprecated, use filter() with RawSQL instead.",

@@ -286,7 +286,7 @@ class ExtraRegressTests(TestCase):
                     select={"foo": "first", "bar": "second", "whiz": "third"}
                 ).values_list()
             ),
-            [(obj.pk, "first", "second", "third", "first", "second", "third")],
+            [("first", "second", "third", obj.pk, "first", "second", "third")],
         )
 
         # Extra columns after an empty values_list() are still included
@@ -296,7 +296,7 @@ class ExtraRegressTests(TestCase):
                     select={"foo": "first", "bar": "second", "whiz": "third"}
                 )
             ),
-            [(obj.pk, "first", "second", "third", "first", "second", "third")],
+            [("first", "second", "third", obj.pk, "first", "second", "third")],
         )
 
         # Extra columns ignored completely if not mentioned in values_list()

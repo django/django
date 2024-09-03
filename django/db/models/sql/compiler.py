@@ -262,9 +262,22 @@ class SQLCompiler:
             }
         selected = []
         if self.query.selected is None:
+            # RemovedInDjango60Warning: place extra(select) entries at the
+            # beginning of the SELECT clause until it's completely removed.
+            leading_annotation_select = []
+            annotation_select = []
+            if self.query.values_select_all:
+                for alias, expression in self.query.annotation_select.items():
+                    if getattr(expression, "implicitly_select_first", False):
+                        leading_annotation_select.append((alias, expression))
+                    else:
+                        annotation_select.append((alias, expression))
+            else:
+                annotation_select = self.query.annotation_select.items()
             selected = [
+                *leading_annotation_select,
                 *((None, col) for col in cols),
-                *self.query.annotation_select.items(),
+                *annotation_select,
             ]
         else:
             for alias, expression in self.query.selected.items():

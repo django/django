@@ -2841,7 +2841,7 @@ class ValuesQuerysetTests(TestCase):
         self.assertEqual(type(values).__name__, "Row")
         self.assertEqual(
             values._fields,
-            ("id", "num", "other_num", "another_num", "num2", "id__count"),
+            ("num2", "id", "num", "other_num", "another_num", "id__count"),
         )
         self.assertEqual(values.num, 72)
         self.assertEqual(values.num2, 73)
