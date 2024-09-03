@@ -36,6 +36,28 @@ Issues under Django's security process
 All security issues have been handled under versions of Django's security
 process. These are listed below.
 
+September 3, 2024 - :cve:`2024-45231`
+-------------------------------------
+
+Potential user email enumeration via response status on password reset.
+`Full description
+<https://www.djangoproject.com/weblog/2024/sep/03/security-releases/>`__
+
+* Django 5.1 :commit:`(patch) <3c733c78d6f8e50296d6e248968b6516c92a53ca>`
+* Django 5.0 :commit:`(patch) <96d84047715ea1715b4bd1594e46122b8a77b9e2>`
+* Django 4.2 :commit:`(patch) <bf4888d317ba4506d091eeac6e8b4f1fcc731199>`
+
+September 3, 2024 - :cve:`2024-45230`
+-------------------------------------
+
+Potential denial-of-service vulnerability in ``django.utils.html.urlize()``.
+`Full description
+<https://www.djangoproject.com/weblog/2024/sep/03/security-releases/>`__
+
+* Django 5.1 :commit:`(patch) <022ab0a75c76ab2ea31dfcc5f2cf5501e378d397>`
+* Django 5.0 :commit:`(patch) <813de2672bd7361e9a453ab62cd6e52f96b6525b>`
+* Django 4.2 :commit:`(patch) <d147a8ebbdf28c17cafbbe2884f0bc57e2bf82e2>`
+
 August 6, 2024 - :cve:`2024-42005`
 ----------------------------------
 
