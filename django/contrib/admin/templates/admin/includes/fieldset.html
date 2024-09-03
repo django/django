@@ -20,13 +20,13 @@
                             {% else %}
                                 {{ field.label_tag }}
                                 {% if field.is_readonly %}
-                                    <p>
+                                    <div class="readonly">
                                       {% if field.required_perm and field.required_perm not in perms %}
                                         {{ field.contents|striptags }}
                                       {% else %}
                                         {{ field.contents }}
                                       {% endif %}
-                                    </p>
+                                    </div>
                                 {% else %}
                                     {{ field.field }}
                                 {% endif %}
