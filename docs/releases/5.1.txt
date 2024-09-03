@@ -115,7 +115,7 @@ Minor features
 * The default iteration count for the PBKDF2 password hasher is increased from
   720,000 to 870,000.
 
-* The default ``parallelism`` of the ``ScryptPasswordHasher`` is 
+* The default ``parallelism`` of the ``ScryptPasswordHasher`` is
   increased from 1 to 5, to follow OWASP recommendations.
 
 * The new :class:`~django.contrib.auth.forms.AdminUserCreationForm` and
@@ -196,6 +196,15 @@ Minor features
 * :class:`django.contrib.sessions.backends.base.SessionBase` and all built-in
   session engines now provide async API. The new asynchronous methods all have
   ``a`` prefixed names, e.g. ``aget()``, ``akeys()``, or ``acycle_key()``.
+
+:mod:`django.contrib.syndication`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Cache
+~~~~~
+
+* :func:`~django.views.decorators.cache.cache_page` decorator now accepts a
+  callable for ``key_prefix``.
 
 Database backends
 ~~~~~~~~~~~~~~~~~
