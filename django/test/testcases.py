@@ -208,6 +208,7 @@ class SimpleTestCase(unittest.TestCase):
     async_client_class = AsyncClient
     _overridden_settings = None
     _modified_settings = None
+    _pre_setup_ran_eagerly = False
 
     databases = set()
     _disallowed_database_msg = (
@@ -360,7 +361,10 @@ class SimpleTestCase(unittest.TestCase):
 
         if not skipped:
             try:
-                self._pre_setup()
+                if self.__class__._pre_setup_ran_eagerly:
+                    self.__class__._pre_setup_ran_eagerly = False
+                else:
+                    self._pre_setup()
             except Exception:
                 if debug:
                     raise
@@ -1090,6 +1094,7 @@ class TransactionTestCase(SimpleTestCase):
 
     # Subclasses can enable only a subset of apps for faster tests
     available_apps = None
+    _available_apps_calls_balanced = 0
 
     # Subclasses can define fixtures which will be automatically installed.
     fixtures = None
@@ -1108,6 +1113,20 @@ class TransactionTestCase(SimpleTestCase):
     serialized_rollback = False
 
     @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        if not issubclass(cls, TestCase):
+            cls._pre_setup()
+            cls._pre_setup_ran_eagerly = True
+
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        if not issubclass(cls, TestCase) and cls._available_apps_calls_balanced > 0:
+            apps.unset_available_apps()
+            cls._available_apps_calls_balanced -= 1
+
+    @classmethod
     def _pre_setup(cls):
         """
         Perform pre-test setup:
@@ -1119,6 +1138,7 @@ class TransactionTestCase(SimpleTestCase):
         super()._pre_setup()
         if cls.available_apps is not None:
             apps.set_available_apps(cls.available_apps)
+            cls._available_apps_calls_balanced += 1
             setting_changed.send(
                 sender=settings._wrapped.__class__,
                 setting="INSTALLED_APPS",
@@ -1216,8 +1236,9 @@ class TransactionTestCase(SimpleTestCase):
                 for conn in connections.all(initialized_only=True):
                     conn.close()
         finally:
-            if self.available_apps is not None:
+            if self.__class__.available_apps is not None:
                 apps.unset_available_apps()
+                self.__class__._available_apps_calls_balanced -= 1
                 setting_changed.send(
                     sender=settings._wrapped.__class__,
                     setting="INSTALLED_APPS",

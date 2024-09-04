@@ -280,6 +280,11 @@ To prevent serialized data from being loaded twice, setting
 :data:`~django.db.models.signals.post_migrate` signal when flushing the test
 database.
 
+.. versionchanged:: 5.2
+
+    For :class:`TransactionTestCase`, serialized migration data is made
+    available during ``setUpClass()``.
+
 Other test conditions
 ---------------------
 
