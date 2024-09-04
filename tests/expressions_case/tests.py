@@ -726,16 +726,13 @@ class CaseExpressionTests(TestCase):
         case_expression = Case(
             When(integer=1, then=Value(10)),
             When(integer=2, then=Value(20)),
-            default=Value(0),
-            template="CASE %(cases)s ELSE %(default)s + 5 END",
+            custom_default=5,
+            template="CASE %(cases)s ELSE %(custom_default)s END",
         )
-        self.assertListEqual(
-            list(
-                CaseTestModel.objects.annotate(values=case_expression).values_list(
-                    "values", flat=True
-                )
-            ),
+        self.assertQuerySetEqual(
+            CaseTestModel.objects.annotate(values=case_expression).order_by("pk"),
             [10, 20, 5, 20, 5, 5, 5],
+            transform=attrgetter("values"),
         )
 
     def test_update(self):

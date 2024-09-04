@@ -856,21 +856,19 @@ class BasicExpressionsTests(TestCase):
         self.assertEqual(qs.get(), self.gmbh)
 
     def test_subquery_with_custom_template(self):
-        companies = Company.objects.annotate(
-            ceo_manager_count=Subquery(
-                Employee.objects.filter(
-                    lastname=OuterRef("ceo__lastname"),
-                ).values("manager"),
-                template="(SELECT count(*) FROM (%(subquery)s) _count)",
-            )
+        custom_subquery = Company.objects.filter(
+            ceo__salary__in=Subquery(
+                Employee.objects.all().values("salary"),
+                salary=20,
+                template="(SELECT salary FROM (%(subquery)s) _subquery "
+                "WHERE salary = %(salary)s)",
+            ),
         )
-        expected_results = [
-            {"name": "Example Inc.", "ceo_manager_count": 1},
-            {"name": "Foobar Ltd.", "ceo_manager_count": 1},
-            {"name": "Test GmbH", "ceo_manager_count": 1},
-        ]
-        self.assertListEqual(
-            list(companies.values("name", "ceo_manager_count")), expected_results
+        expected_companies = Company.objects.filter(name="Foobar Ltd.")
+        self.assertQuerySetEqual(
+            custom_subquery.order_by("name"),
+            expected_companies.order_by("name"),
+            transform=lambda x: x,
         )
 
     def test_aggregate_subquery_annotation(self):
