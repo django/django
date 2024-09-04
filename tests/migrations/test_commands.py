@@ -30,7 +30,7 @@ from django.test.utils import captured_stdout
 from django.utils import timezone
 from django.utils.version import get_docs_version
 
-from .models import UnicodeModel, UnserializableModel
+from .models import UnicodeModel, UnserializableModel, ModelForAutodetection
 from .routers import TestRouter
 from .test_base import MigrationTestBase
 
@@ -3294,7 +3294,7 @@ class CustomMigrationCommandTests(MigrationTestBase):
             autodetector_class = CustomAutodetector
 
         self.assertTableNotExists("migrations_unicodemodel")
-        apps.register_model("migrations", UnicodeModel)
+        apps.register_model("migrations", ModelForAutodetection)
 
         out = io.StringIO()
         command = CustomMakeMigrationsCommand(stdout=out)
