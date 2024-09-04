@@ -1732,7 +1732,9 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
     .. method:: send_mail(subject_template_name, email_template_name, context, from_email, to_email, html_email_template_name=None)
 
         Uses the arguments to send an ``EmailMultiAlternatives``.
-        Can be overridden to customize how the email is sent to the user.
+        Can be overridden to customize how the email is sent to the user. If
+        you choose to override this method, be mindful of handling potential
+        exceptions raised due to email sending failures.
 
         :param subject_template_name: the template for the subject.
         :param email_template_name: the template for the email body.
