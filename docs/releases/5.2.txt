@@ -326,6 +326,10 @@ Models
 * :meth:`.QuerySet.explain` now supports the ``memory`` and ``serialize``
   options on PostgreSQL 17+.
 
+* The new :class:`~django.db.models.functions.JSONArray` database function
+  accepts a list of field names or expressions and returns a JSON array
+  containing those values.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
