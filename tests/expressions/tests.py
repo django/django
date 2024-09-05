@@ -866,9 +866,7 @@ class BasicExpressionsTests(TestCase):
         )
         expected_companies = Company.objects.filter(name="Foobar Ltd.")
         self.assertQuerySetEqual(
-            custom_subquery.order_by("name"),
-            expected_companies.order_by("name"),
-            transform=lambda x: x,
+            custom_subquery.order_by("name"), expected_companies.order_by("name")
         )
 
     def test_aggregate_subquery_annotation(self):
