@@ -12,3 +12,6 @@ Bugfixes
 * Fixed a regression in Django 5.1 that caused a crash when using the
   PostgreSQL lookup :lookup:`trigram_similar` on output fields from ``Concat``
   (:ticket:`35732`).
+
+* Fixed a regression in Django 5.1 that caused a crash of ``JSONObject()``
+  when using server-side binding with PostgreSQL 16+ (:ticket:`35734`).
