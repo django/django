@@ -858,8 +858,9 @@ class Variable:
 
                     engine = Engine.get_default()
                     warnings.warn(
-                        f"Double-dot lookup (e.g., '{{{{ {var} }}}}') in template {engine.current_template_name}[{self.lineno}] "
-                        "is deprecated.",
+                        "Double-dot lookup (e.g. '%s') in template %s[%d]"
+                        " is deprecated."
+                        % (var, engine.current_template_name, self.lineno),
                         RemovedInDjango61Warning,
                         stacklevel=2,
                     )
