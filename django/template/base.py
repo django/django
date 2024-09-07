@@ -54,7 +54,6 @@ import inspect
 import logging
 import re
 import warnings
-from django.utils.deprecation import RemovedInDjango61Warning
 from enum import Enum
 
 from django.template.context import BaseContext
@@ -65,6 +64,7 @@ from django.utils.safestring import SafeData, SafeString, mark_safe
 from django.utils.text import get_text_list, smart_split, unescape_string_literal
 from django.utils.timezone import template_localtime
 from django.utils.translation import gettext_lazy, pgettext_lazy
+from django.utils.deprecation import RemovedInDjango61Warning
 
 from .exceptions import TemplateSyntaxError
 
@@ -488,7 +488,9 @@ class Parser:
                         token, "Empty variable tag on line %d" % token.lineno
                     )
                 try:
-                    filter_expression = self.compile_filter(token.contents, token.lineno)
+                    filter_expression = self.compile_filter(
+                        token.contents, token.lineno
+                    )
                 except TemplateSyntaxError as e:
                     raise self.error(token, e)
                 var_node = VariableNode(filter_expression)
@@ -700,7 +702,9 @@ class FilterExpression:
                 filter_name = match["filter_name"]
                 args = []
                 if constant_arg := match["constant_arg"]:
-                    args.append((False, Variable(constant_arg, self.lineno).resolve({})))
+                    args.append(
+                        (False, Variable(constant_arg, self.lineno).resolve({}))
+                    )
                 elif var_arg := match["var_arg"]:
                     args.append((True, Variable(var_arg, self.lineno)))
                 filter_func = parser.find_filter(filter_name)
@@ -857,7 +861,7 @@ class Variable:
                         f"Double-dot lookup (e.g., '{{{{ {var} }}}}') in template {engine.current_template_name}[{self.lineno}] "
                         "is deprecated.",
                         RemovedInDjango61Warning,
-                        stacklevel=2
+                        stacklevel=2,
                     )
 
     def resolve(self, context):
