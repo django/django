@@ -232,7 +232,8 @@ underscores replaced with spaces), and that each line contains the string
 representation of the output.
 
 You can improve that by using the :func:`~django.contrib.admin.display`
-decorator on that method (in :file:`polls/models.py`), as follows:
+decorator on that method (extending the :file:`polls/models.py` file that was
+created in :doc:`Tutorial 2 </intro/tutorial02>`), as follows:
 
 .. code-block:: python
     :caption: ``polls/models.py``
