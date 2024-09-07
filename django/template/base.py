@@ -672,7 +672,7 @@ class FilterExpression:
 
     __slots__ = ("token", "filters", "var", "is_var", "lineno")
 
-    def __init__(self, token, parser, lineno):
+    def __init__(self, token, parser, lineno=None):
         self.token = token
         self.lineno = lineno
         matches = filter_re.finditer(token)
