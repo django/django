@@ -420,6 +420,7 @@ Function                              PostGIS  Oracle         MariaDB      MySQL
 :class:`Perimeter`                    X        X                                       X
 :class:`PointOnSurface`               X        X              X                        X
 :class:`Reverse`                      X        X                                       X
+:class:`Rotate`                       X
 :class:`Scale`                        X                                                X
 :class:`SnapToGrid`                   X                                                X
 :class:`SymDifference`                X        X              X            X           X
