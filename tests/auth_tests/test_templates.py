@@ -12,7 +12,6 @@ from django.contrib.auth.views import (
 )
 from django.test import RequestFactory, TestCase, override_settings
 from django.urls import reverse
-from django.utils.http import urlsafe_base64_encode
 
 from .client import PasswordResetConfirmClient
 from .models import CustomUser
@@ -67,7 +66,7 @@ class AuthTemplateTests(TestCase):
         client = PasswordResetConfirmClient()
         default_token_generator = PasswordResetTokenGenerator()
         token = default_token_generator.make_token(self.user)
-        uidb64 = urlsafe_base64_encode(str(self.user.pk).encode())
+        uidb64 = default_token_generator.encrypt_uid(self.user.pk)
         url = reverse(
             "password_reset_confirm", kwargs={"uidb64": uidb64, "token": token}
         )
@@ -87,7 +86,7 @@ class AuthTemplateTests(TestCase):
         client = PasswordResetConfirmClient()
         default_token_generator = PasswordResetTokenGenerator()
         token = default_token_generator.make_token(self.user)
-        uidb64 = urlsafe_base64_encode(str(self.user.pk).encode())
+        uidb64 = default_token_generator.encrypt_uid(self.user.pk)
         url = reverse(
             "password_reset_confirm", kwargs={"uidb64": uidb64, "token": token}
         )
@@ -106,7 +105,7 @@ class AuthTemplateTests(TestCase):
         client = PasswordResetConfirmClient()
         default_token_generator = PasswordResetTokenGenerator()
         token = default_token_generator.make_token(custom_user)
-        uidb64 = urlsafe_base64_encode(str(custom_user.pk).encode())
+        uidb64 = default_token_generator.encrypt_uid(custom_user.pk)
         url = reverse(
             "password_reset_confirm", kwargs={"uidb64": uidb64, "token": token}
         )

@@ -52,6 +52,8 @@ Minor features
 * The default iteration count for the PBKDF2 password hasher is increased from
   870,000 to 1,000,000.
 
+* The ``uid`` parameter in password reset emails is now obfuscated to prevent potential leakage of user count. This change hides the user's primary key (``user.pk``), which was previously only base64-encoded. The obfuscation is achieved using a simple XOR cipher.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

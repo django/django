@@ -298,9 +298,9 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
         return self.render_to_response(self.get_context_data())
 
     def get_user(self, uidb64):
+        user = None
         try:
-            # urlsafe_base64_decode() decodes to bytestring
-            uid = urlsafe_base64_decode(uidb64).decode()
+            uid = self.token_generator.decrypt_uid(uidb64)
             user = UserModel._default_manager.get(pk=uid)
         except (
             TypeError,
@@ -309,7 +309,22 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
             UserModel.DoesNotExist,
             ValidationError,
         ):
-            user = None
+            pass
+
+        # Temporarily support the old format of uid base64-encoded as plain text
+        if user is None:
+            try:
+                uid = urlsafe_base64_decode(uidb64).decode()
+                user = UserModel._default_manager.get(pk=uid)
+            except (
+                TypeError,
+                ValueError,
+                OverflowError,
+                UserModel.DoesNotExist,
+                ValidationError,
+            ):
+                pass
+
         return user
 
     def get_form_kwargs(self):

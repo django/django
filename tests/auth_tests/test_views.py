@@ -15,6 +15,7 @@ from django.contrib.auth.forms import (
     SetPasswordForm,
 )
 from django.contrib.auth.models import Permission, User
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.contrib.auth.views import (
     INTERNAL_RESET_SESSION_TOKEN,
     LoginView,
@@ -35,7 +36,6 @@ from django.middleware.csrf import CsrfViewMiddleware, get_token
 from django.test import Client, TestCase, modify_settings, override_settings
 from django.test.client import RedirectCycleError
 from django.urls import NoReverseMatch, reverse, reverse_lazy
-from django.utils.http import urlsafe_base64_encode
 
 from .client import PasswordResetConfirmClient
 from .models import CustomUser, UUIDUser
@@ -552,9 +552,10 @@ class UUIDUserPasswordResetTest(CustomUserPasswordResetTest):
         return super()._test_confirm_start()
 
     def test_confirm_invalid_uuid(self):
-        """A uidb64 that decodes to a non-UUID doesn't crash."""
+        """An encrypted non-UUID doesn't crash."""
         _, path = self._test_confirm_start()
-        invalid_uidb64 = urlsafe_base64_encode(b"INVALID_UUID")
+        default_token_generator = PasswordResetTokenGenerator()
+        invalid_uidb64 = default_token_generator.encrypt_uid("INVALID_UUID")
         first, _uuidb64_, second = path.strip("/").split("/")
         response = self.client.get(
             "/" + "/".join((first, invalid_uidb64, second)) + "/"
