@@ -98,6 +98,7 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
             "Perimeter",
             "PointOnSurface",
             "Reverse",
+            "Rotate",
             "Scale",
             "SnapToGrid",
             "Transform",

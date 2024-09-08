@@ -68,6 +68,10 @@ Minor features
 * The new :attr:`.GEOSGeometry.hasm` property checks whether the geometry has
   the M dimension.
 
+* The new :class:`~django.contrib.gis.db.models.functions.Rotate` database
+  function rotates a geometry by a specified angle around the origin or a
+  specified point.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
