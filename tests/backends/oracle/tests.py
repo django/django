@@ -1,3 +1,4 @@
+import copy
 import unittest
 from unittest import mock
 
@@ -13,8 +14,15 @@ if connection.vendor == "oracle":
         from django.db.backends.oracle.oracledb_any import is_oracledb
     except ImportError:
         is_oracledb = False
-else:
-    is_oracledb = False
+
+
+def no_pool_connection(alias=None):
+    new_connection = connection.copy(alias)
+    new_connection.settings_dict = copy.deepcopy(connection.settings_dict)
+    # Ensure that the second connection circumvents the pool, this is kind
+    # of a hack, but we cannot easily change the pool connections.
+    new_connection.settings_dict["OPTIONS"]["pool"] = False
+    return new_connection
 
 
 @unittest.skipUnless(connection.vendor == "oracle", "Oracle tests")
@@ -78,14 +86,22 @@ class Tests(TestCase):
             connection.check_database_version_supported()
         self.assertTrue(mocked_get_database_version.called)
 
-    @unittest.skipUnless(connection.is_pool, "Pool specific tests")
+    @unittest.skipUnless(is_oracledb, "Pool specific tests")
     def test_pool_set_to_true(self):
-        test_pool = connection.settings_dict["OPTIONS"]["pool"]
-        self.assertTrue(test_pool)
+        new_connection = no_pool_connection(alias="default_pool")
+        new_connection.settings_dict["OPTIONS"]["pool"] = True
+        try:
+            self.assertIsNotNone(new_connection.pool)
+        finally:
+            new_connection.close_pool()
 
-    @unittest.skipUnless(connection.is_pool, "Pool specific tests")
+    @unittest.skipUnless(is_oracledb, "Pool specific tests")
     def test_pool_reuse(self):
-        new_connection = connection.copy()
+        new_connection = no_pool_connection(alias="default_pool")
+        new_connection.settings_dict["OPTIONS"]["pool"] = {
+            "min": 0,
+            "max": 2,
+        }
         self.assertIsNotNone(new_connection.pool)
 
         connections = []
@@ -111,19 +127,22 @@ class Tests(TestCase):
             # Release all connections back to the pool.
             for conn in connections:
                 conn.close()
+            new_connection.close_pool()
 
-    @unittest.skipUnless(connection.is_pool, "Pool specific tests")
+    @unittest.skipUnless(is_oracledb, "Pool specific tests")
     def test_cannot_open_new_connection_in_atomic_block(self):
-        new_connection = connection.copy()
+        new_connection = no_pool_connection(alias="default_pool")
+        new_connection.settings_dict["OPTIONS"]["pool"] = True
         msg = "Cannot open a new connection in an atomic block."
         new_connection.in_atomic_block = True
         new_connection.closed_in_transaction = True
         with self.assertRaisesMessage(ProgrammingError, msg):
             new_connection.ensure_connection()
 
-    @unittest.skipUnless(connection.is_pool, "Pool specific tests")
+    @unittest.skipUnless(is_oracledb, "Pool specific tests")
     def test_pooling_not_support_persistent_connections(self):
-        new_connection = connection.copy()
+        new_connection = no_pool_connection(alias="default_pool")
+        new_connection.settings_dict["OPTIONS"]["pool"] = True
         new_connection.settings_dict["CONN_MAX_AGE"] = 10
         msg = "Pooling doesn't support persistent connections."
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
@@ -131,7 +150,8 @@ class Tests(TestCase):
 
     @unittest.skipIf(is_oracledb, "cx_oracle specific tests")
     def test_cx_Oracle_not_support_pooling(self):
-        new_connection = connection.copy()
+        new_connection = no_pool_connection()
+        new_connection.settings_dict["OPTIONS"]["pool"] = True
         msg = "Pooling isn't supported by cx_Oracle. Use python-oracledb instead"
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             new_connection.connect()

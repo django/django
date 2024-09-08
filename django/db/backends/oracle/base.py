@@ -260,13 +260,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             connect_kwargs = self.get_connection_params()
             pool_options = connect_kwargs["pool"]
 
-            if pool_options is True:
-                connect_kwargs["max"] = 4
-            else:
+            if pool_options is not True:
                 for key, val in pool_options.items():
                     connect_kwargs[key] = val
-                if not connect_kwargs.get("max"):
-                    connect_kwargs["max"] = 4
 
             del connect_kwargs["pool"]
 
