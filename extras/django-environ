@@ -1,0 +1,95 @@
+django-environ - Managing Environment Variables in Django
+Introduction
+django-environ is a library designed to help manage environment variables and settings in 
+your Django projects. It simplifies the configuration of different environments (development, 
+testing, production) by using .env files to store and retrieve settings.
+
+Installation
+To install django-environ, use pip: pip install django-environ
+
+Basic Setup
+Create a .env File
+
+In the root directory of your Django project, create a file named .env. This file will hold your 
+environment-specific settings. Here is an example of what the file might contain:
+
+DEBUG=True
+
+SECRET_KEY=your-secret-key
+
+DATABASE_URL=postgres://user
+@localhost:5432/dbname
+
+Configure Django to Use django-environ
+
+Import environ in your settings.py file:
+
+import environ
+
+Initialize django-environ and read the .env file:
+
+env = environ.Env() environ.Env.read_env()
+
+Update your settings to use environment variables. For example:
+
+SECRET_KEY = env('SECRET_KEY')
+
+DEBUG = env.bool('DEBUG', default=False)
+
+DATABASES = { 'default': env.db() # Reads DATABASE_URL }
+
+STATIC_URL = env('STATIC_URL', default='/static/')
+
+Environment Variable Options
+String Values: Retrieve a string value from the .env file. Example:
+
+MY_VAR = env('MY_VAR', default='default_value')
+
+Boolean Values: Retrieve a boolean value. Example:
+
+DEBUG = env.bool('DEBUG', default=False)
+
+Integer Values: Retrieve an integer value. Example:
+
+PORT = env.int('PORT', default=8000)
+
+Database Configuration: Use env.db() to parse DATABASE_URL. Example:
+
+DATABASES = { 'default': env.db() }
+
+List Values: Retrieve a list of values, typically comma-separated. Example:
+
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost'])
+
+Example .env File
+
+An example .env file might look like this:
+
+DEBUG=True
+
+SECRET_KEY=my-secret-key
+
+DATABASE_URL=postgres://user:password@localhost:5432/mydatabase
+
+STATIC_URL=/static/
+
+MEDIA_URL=/media/
+
+ALLOWED_HOSTS=localhost,127.0.0.1
+
+
+Best Practices
+Security: Ensure that the .env file is not committed to version control. Add .env to your .gitignore file to keep it secure.
+
+.env
+
+Default Values: Provide default values in your settings to ensure your application functions correctly even if some environment variables are missing.
+
+Separate Environments: Use different .env files for different environments (e.g., .env.development, .env.production) and manage which file is loaded based on the environment.
+
+Conclusion
+By using django-environ, you can keep your Django project's configuration clean, secure, and easy to manage across different environments.
+
+For more details and advanced usage the official documentation at: https://django-environ.readthedocs.io/en/latest/
+
+
