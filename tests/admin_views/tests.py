@@ -6983,6 +6983,39 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
     def test_readonly_foreignkey_links_custom_admin_site(self):
         self._test_readonly_foreignkey_links("namespaced_admin")
 
+    def test_readonly_foreignkey_link_not_set_without_view_permission(self):
+        """
+        Foreign key fields without "view_*" permission are rendered as a string.
+        """
+        user = User.objects.create(username="no_view_permission_user")
+        self.client.force_login(user)
+
+        # todo: add permissions
+
+        chapter = Chapter.objects.create(
+            title="Chapter 1",
+            content="content",
+            book=Book.objects.create(name="Book 1"),
+        )
+        language = Language.objects.create(iso="_40", name="Test")
+        obj = ReadOnlyRelatedField.objects.create(
+            chapter=chapter,
+            language=language,
+            user=user,
+        )
+        response = self.client.get(
+            reverse(
+                f"admin:admin_views_readonlyrelatedfield_change", args=(obj.pk,)
+            ),
+        )
+        # Related ForeignKey object registered in admin.
+        user_url = reverse(f"admin:auth_user_change", args=(self.superuser.pk,))
+        self.assertContains(
+            response,
+            '<div class="readonly">super</div>' % user_url,
+            html=True,
+        )
+
     def test_readonly_manytomany_backwards_ref(self):
         """
         Regression test for #16433 - backwards references for related objects
