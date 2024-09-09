@@ -4,6 +4,7 @@ import html
 import json
 import re
 import warnings
+from collections.abc import Mapping
 from html.parser import HTMLParser
 from urllib.parse import parse_qsl, quote, unquote, urlencode, urlsplit, urlunsplit
 
@@ -129,10 +130,11 @@ def format_html(format_string, *args, **kwargs):
     """
     if not (args or kwargs):
         # RemovedInDjango60Warning: when the deprecation ends, replace with:
-        # raise ValueError("args or kwargs must be provided.")
+        # raise TypeError("args or kwargs must be provided.")
         warnings.warn(
             "Calling format_html() without passing args or kwargs is deprecated.",
             RemovedInDjango60Warning,
+            stacklevel=2,
         )
     args_safe = map(conditional_escape, args)
     kwargs_safe = {k: conditional_escape(v) for (k, v) in kwargs.items()}
@@ -155,7 +157,12 @@ def format_html_join(sep, format_string, args_generator):
     """
     return mark_safe(
         conditional_escape(sep).join(
-            format_html(format_string, *args) for args in args_generator
+            (
+                format_html(format_string, **args)
+                if isinstance(args, Mapping)
+                else format_html(format_string, *args)
+            )
+            for args in args_generator
         )
     )
 
@@ -427,14 +434,17 @@ class Urlizer:
                 potential_entity = middle[amp:]
                 escaped = html.unescape(potential_entity)
                 if escaped == potential_entity or escaped.endswith(";"):
-                    rstripped = middle.rstrip(";")
-                    amount_stripped = len(middle) - len(rstripped)
-                    if amp > -1 and amount_stripped > 1:
-                        # Leave a trailing semicolon as might be an entity.
-                        trail = middle[len(rstripped) + 1 :] + trail
-                        middle = rstripped + ";"
+                    rstripped = middle.rstrip(self.trailing_punctuation_chars)
+                    trail_start = len(rstripped)
+                    amount_trailing_semicolons = len(middle) - len(middle.rstrip(";"))
+                    if amp > -1 and amount_trailing_semicolons > 1:
+                        # Leave up to most recent semicolon as might be an entity.
+                        recent_semicolon = middle[trail_start:].index(";")
+                        middle_semicolon_index = recent_semicolon + trail_start + 1
+                        trail = middle[middle_semicolon_index:] + trail
+                        middle = rstripped + middle[trail_start:middle_semicolon_index]
                     else:
-                        trail = middle[len(rstripped) :] + trail
+                        trail = middle[trail_start:] + trail
                         middle = rstripped
                     trimmed_something = True
 

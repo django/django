@@ -620,7 +620,7 @@ def technical_404_response(request, exception):
     else:
         resolved = False
         if not tried or (  # empty URLconf
-            request.path == "/"
+            request.path_info == "/"
             and len(tried) == 1
             and len(tried[0]) == 1  # default URLconf
             and getattr(tried[0][0], "app_name", "")

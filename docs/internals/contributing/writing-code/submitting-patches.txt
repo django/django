@@ -209,9 +209,10 @@ You should also add a test for the deprecation warning::
 
     def test_foo_deprecation_warning(self):
         msg = "Expected deprecation message"
-        with self.assertWarnsMessage(RemovedInDjangoXXWarning, msg):
+        with self.assertWarnsMessage(RemovedInDjangoXXWarning, msg) as ctx:
             # invoke deprecated behavior
             ...
+        self.assertEqual(ctx.filename, __file__)
 
 It's important to include a ``RemovedInDjangoXXWarning`` comment above code
 which has no warning reference, but will need to be changed or removed when the
@@ -233,6 +234,7 @@ deprecation ends. For example::
         warnings.warn(
             "foo() is deprecated.",
             category=RemovedInDjangoXXWarning,
+            stacklevel=2,
         )
         old_private_helper()
         ...

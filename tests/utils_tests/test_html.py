@@ -10,6 +10,7 @@ from django.utils.html import (
     escape,
     escapejs,
     format_html,
+    format_html_join,
     html_safe,
     json_script,
     linebreaks,
@@ -70,10 +71,31 @@ class TestUtilsHtml(SimpleTestCase):
         msg = "Calling format_html() without passing args or kwargs is deprecated."
         # RemovedInDjango60Warning: when the deprecation ends, replace with:
         # msg = "args or kwargs must be provided."
-        # with self.assertRaisesMessage(ValueError, msg):
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+        # with self.assertRaisesMessage(TypeError, msg):
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
             name = "Adam"
             self.assertEqual(format_html(f"<i>{name}</i>"), "<i>Adam</i>")
+        self.assertEqual(ctx.filename, __file__)
+
+    def test_format_html_join_with_positional_arguments(self):
+        self.assertEqual(
+            format_html_join(
+                "\n",
+                "<li>{}) {}</li>",
+                [(1, "Emma"), (2, "Matilda")],
+            ),
+            "<li>1) Emma</li>\n<li>2) Matilda</li>",
+        )
+
+    def test_format_html_join_with_keyword_arguments(self):
+        self.assertEqual(
+            format_html_join(
+                "\n",
+                "<li>{id}) {text}</li>",
+                [{"id": 1, "text": "Emma"}, {"id": 2, "text": "Matilda"}],
+            ),
+            "<li>1) Emma</li>\n<li>2) Matilda</li>",
+        )
 
     def test_linebreaks(self):
         items = (
@@ -374,6 +396,7 @@ class TestUtilsHtml(SimpleTestCase):
             "&:" + ";" * 100_000,
             "&.;" * 100_000,
             ".;" * 100_000,
+            "&" + ";:" * 100_000,
         )
         for value in tests:
             with self.subTest(value=value):

@@ -10,9 +10,10 @@ import functools
 import inspect
 import logging
 from collections import namedtuple
+from contextlib import nullcontext
 
 from django.core.exceptions import FieldError
-from django.db import DEFAULT_DB_ALIAS, DatabaseError, connections
+from django.db import DEFAULT_DB_ALIAS, DatabaseError, connections, transaction
 from django.db.models.constants import LOOKUP_SEP
 from django.utils import tree
 from django.utils.functional import cached_property
@@ -130,14 +131,21 @@ class Q(tree.Node):
                 value = Value(value)
             query.add_annotation(value, name, select=False)
         query.add_annotation(Value(1), "_check")
+        connection = connections[using]
         # This will raise a FieldError if a field is missing in "against".
-        if connections[using].features.supports_comparing_boolean_expr:
+        if connection.features.supports_comparing_boolean_expr:
             query.add_q(Q(Coalesce(self, True, output_field=BooleanField())))
         else:
             query.add_q(self)
         compiler = query.get_compiler(using=using)
+        context_manager = (
+            transaction.atomic(using=using)
+            if connection.in_atomic_block
+            else nullcontext()
+        )
         try:
-            return compiler.execute_sql(SINGLE) is not None
+            with context_manager:
+                return compiler.execute_sql(SINGLE) is not None
         except DatabaseError as e:
             logger.warning("Got a database error calling check() on %r: %s", self, e)
             return True

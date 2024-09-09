@@ -1645,6 +1645,23 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
         Option to disable (or reenable) password-based authentication was
         added.
 
+.. class:: AdminUserCreationForm
+
+    .. versionadded:: 5.1.1
+
+    A form used in the admin interface to create a new user. Inherits from
+    :class:`UserCreationForm`.
+
+    It includes an additional ``usable_password`` field, enabled by default. If
+    ``usable_password`` is enabled, it verifies that ``password1`` and
+    ``password2`` are non empty and match, validates the password using
+    :func:`~django.contrib.auth.password_validation.validate_password`, and
+    sets the user's password using
+    :meth:`~django.contrib.auth.models.User.set_password()`.
+    If ``usable_password`` is disabled, no password validation is done, and
+    password-based authentication is disabled for the user by calling
+    :meth:`~django.contrib.auth.models.User.set_unusable_password()`.
+
 .. class:: AuthenticationForm
 
     A form for logging a user in.
@@ -1691,6 +1708,18 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
                             code="no_b_users",
                         )
 
+.. class:: BaseUserCreationForm
+
+    A :class:`~django.forms.ModelForm` for creating a new user. This is the
+    recommended base class if you need to customize the user creation form.
+
+    It has three fields: ``username`` (from the user model), ``password1``,
+    and ``password2``. It verifies that ``password1`` and ``password2`` match,
+    validates the password using
+    :func:`~django.contrib.auth.password_validation.validate_password`, and
+    sets the user's password using
+    :meth:`~django.contrib.auth.models.User.set_password()`.
+
 .. class:: PasswordChangeForm
 
     A form for allowing a user to change their password.
@@ -1703,7 +1732,9 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
     .. method:: send_mail(subject_template_name, email_template_name, context, from_email, to_email, html_email_template_name=None)
 
         Uses the arguments to send an ``EmailMultiAlternatives``.
-        Can be overridden to customize how the email is sent to the user.
+        Can be overridden to customize how the email is sent to the user. If
+        you choose to override this method, be mindful of handling potential
+        exceptions raised due to email sending failures.
 
         :param subject_template_name: the template for the subject.
         :param email_template_name: the template for the email body.
@@ -1729,27 +1760,6 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
 
     A form used in the admin interface to change a user's information and
     permissions.
-
-.. class:: BaseUserCreationForm
-
-    A :class:`~django.forms.ModelForm` for creating a new user. This is the
-    recommended base class if you need to customize the user creation form.
-
-    It has four fields: ``username`` (from the user model), ``password1``,
-    ``password2``, and ``usable_password`` (the latter is enabled by default).
-    If ``usable_password`` is enabled, it verifies that ``password1`` and
-    ``password2`` are non empty and match, validates the password using
-    :func:`~django.contrib.auth.password_validation.validate_password`, and
-    sets the user's password using
-    :meth:`~django.contrib.auth.models.User.set_password()`.
-    If ``usable_password`` is disabled, no password validation is done, and
-    password-based authentication is disabled for the user by calling
-    :meth:`~django.contrib.auth.models.User.set_unusable_password()`.
-
-    .. versionchanged:: 5.1
-
-        Option to create users with disabled password-based authentication was
-        added.
 
 .. class:: UserCreationForm
 

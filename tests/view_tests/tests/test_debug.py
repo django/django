@@ -398,6 +398,15 @@ class DebugViewTests(SimpleTestCase):
             response, "<h1>The install worked successfully! Congratulations!</h1>"
         )
 
+    @override_settings(
+        ROOT_URLCONF="view_tests.default_urls", FORCE_SCRIPT_NAME="/FORCED_PREFIX"
+    )
+    def test_default_urlconf_script_name(self):
+        response = self.client.request(**{"path": "/FORCED_PREFIX/"})
+        self.assertContains(
+            response, "<h1>The install worked successfully! Congratulations!</h1>"
+        )
+
     @override_settings(ROOT_URLCONF="view_tests.regression_21530_urls")
     def test_regression_21530(self):
         """

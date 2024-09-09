@@ -185,6 +185,38 @@ class CreateModel(ModelOperation):
                 ),
             ]
         elif (
+            isinstance(operation, AlterModelTable)
+            and self.name_lower == operation.name_lower
+        ):
+            return [
+                CreateModel(
+                    self.name,
+                    fields=self.fields,
+                    options={
+                        **self.options,
+                        "db_table": operation.table,
+                    },
+                    bases=self.bases,
+                    managers=self.managers,
+                ),
+            ]
+        elif (
+            isinstance(operation, AlterModelTableComment)
+            and self.name_lower == operation.name_lower
+        ):
+            return [
+                CreateModel(
+                    self.name,
+                    fields=self.fields,
+                    options={
+                        **self.options,
+                        "db_table_comment": operation.table_comment,
+                    },
+                    bases=self.bases,
+                    managers=self.managers,
+                ),
+            ]
+        elif (
             isinstance(operation, AlterTogetherOptionOperation)
             and self.name_lower == operation.name_lower
         ):
@@ -947,7 +979,7 @@ class AddIndex(IndexOperation):
             return []
         if isinstance(operation, RenameIndex) and self.index.name == operation.old_name:
             self.index.name = operation.new_name
-            return [AddIndex(model_name=self.model_name, index=self.index)]
+            return [self.__class__(model_name=self.model_name, index=self.index)]
         return super().reduce(operation, app_label)
 
 

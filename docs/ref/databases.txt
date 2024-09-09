@@ -479,8 +479,6 @@ MySQL has a couple drivers that implement the Python Database API described in
 
 .. _MySQL Connector/Python: https://dev.mysql.com/downloads/connector/python/
 
-These drivers are thread-safe and provide connection pooling.
-
 In addition to a DB API driver, Django needs an adapter to access the database
 drivers from its ORM. Django provides an adapter for mysqlclient while MySQL
 Connector/Python includes `its own`_.

@@ -118,11 +118,11 @@ Minor features
 * The default ``parallelism`` of the ``ScryptPasswordHasher`` is 
   increased from 1 to 5, to follow OWASP recommendations.
 
-* :class:`~django.contrib.auth.forms.BaseUserCreationForm` and
-  :class:`~django.contrib.auth.forms.AdminPasswordChangeForm` now support
-  disabling password-based authentication by setting an unusable password on
-  form save. This is now available in the admin when visiting the user creation
-  and password change pages.
+* The new :class:`~django.contrib.auth.forms.AdminUserCreationForm` and
+  the existing :class:`~django.contrib.auth.forms.AdminPasswordChangeForm` now
+  support disabling password-based authentication by setting an unusable
+  password on form save. This is now available in the admin when visiting the
+  user creation and password change pages.
 
 * :func:`~.django.contrib.auth.decorators.login_required`,
   :func:`~.django.contrib.auth.decorators.permission_required`, and

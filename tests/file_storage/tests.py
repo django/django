@@ -635,10 +635,11 @@ class OverwritingStorageOSOpenFlagsWarningTests(SimpleTestCase):
     def test_os_open_flags_deprecation_warning(self):
         msg = "Overriding OS_OPEN_FLAGS is deprecated. Use the allow_overwrite "
         msg += "parameter instead."
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
             self.storage = self.storage_class(
                 location=self.temp_dir, base_url="/test_media_url/"
             )
+        self.assertEqual(ctx.filename, __file__)
 
 
 # RemovedInDjango60Warning: Remove this test class.
@@ -771,7 +772,8 @@ class DiscardingFalseContentStorageTests(FileStorageTests):
 
 class FileFieldStorageTests(TestCase):
     def tearDown(self):
-        shutil.rmtree(temp_storage_location)
+        if os.path.exists(temp_storage_location):
+            shutil.rmtree(temp_storage_location)
 
     def _storage_max_filename_length(self, storage):
         """
