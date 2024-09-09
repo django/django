@@ -15,6 +15,7 @@ from django.utils.text import Truncator
 
 
 class Command(BaseCommand):
+    autodetector = MigrationAutodetector
     help = (
         "Updates database schema. Manages both apps with migrations and those without."
     )
@@ -329,7 +330,7 @@ class Command(BaseCommand):
                 self.stdout.write("  No migrations to apply.")
                 # If there's changes that aren't in migrations yet, tell them
                 # how to fix it.
-                autodetector = MigrationAutodetector(
+                autodetector = self.autodetector(
                     executor.loader.project_state(),
                     ProjectState.from_apps(apps),
                 )
