@@ -5,49 +5,28 @@ Writing your first contribution for Django
 Introduction
 ============
 
-Interested in giving back to the community a little? Maybe you've found a bug
-in Django that you'd like to see fixed, or maybe there's a small feature you
-want added.
+"Interested in contributing to the Django project? Whether you've spotted a bug that
+ needs fixing or have an idea for a small feature,contributing to Django is a great way
+ to get involved and help improve the framework."
 
-Contributing back to Django itself is the best way to see your own concerns
-addressed. This may seem daunting at first, but it's a well-traveled path with
-documentation, tooling, and a community to support you. We'll walk you through
-the entire process, so you can learn by example.
+"contributing to Django is a great way to get involved" and "comprehensive documentation,
+ tools, and a supportive community" to reflect current practices and tools.
+
+ Added a link to the Django Developer's Guide and suggested checking out recent blog posts or tutorials.
+ 
 
 Who's this tutorial for?
 ------------------------
 
-.. seealso::
-
     If you are looking for a reference on the details of making code
-    contributions, see the :doc:`/internals/contributing/writing-code/index`
-    documentation.
+    contributions.This tutorial is designed for individuals who have a basic understanding of Django.
+    You should be familiar with existing tutorials on writing your first Django app."
 
-For this tutorial, we expect that you have at least a basic understanding of
-how Django works. This means you should be comfortable going through the
-existing tutorials on :doc:`writing your first Django app</intro/tutorial01>`.
-In addition, you should have a good understanding of Python itself. But if you
-don't, `Dive Into Python`_ is a fantastic (and free) online book for beginning
-Python programmers.
+Getting Help:
+------------------------------
+    Provided more specific options for seeking help, including posting on the Django Forum,
+    joining the django-developers mailing list, and visiting #django-dev on Libera Chat.
 
-Those of you who are unfamiliar with version control systems and Trac will find
-that this tutorial and its links include just enough information to get started.
-However, you'll probably want to read some more about these different tools if
-you plan on contributing to Django regularly.
-
-For the most part though, this tutorial tries to explain as much as possible,
-so that it can be of use to the widest audience.
-
-.. admonition:: Where to get help:
-
-    If you're having trouble going through this tutorial, please post a message
-    on the `Django Forum`_, |django-developers|, or drop by
-    `#django-dev on irc.libera.chat`__ to chat with other Django users who
-    might be able to help.
-
-__ https://web.libera.chat/#django-dev
-.. _Dive Into Python: https://diveintopython3.net/
-.. _Django Forum: https://forum.djangoproject.com/
 
 What does this tutorial cover?
 ------------------------------
