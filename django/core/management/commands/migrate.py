@@ -3,10 +3,10 @@ import time
 from importlib import import_module
 
 from django.apps import apps
-from django.core.management.base import BaseCommand, CommandError, no_translations
+from django.core.management.base import CommandError, no_translations
+from django.core.management.migration import MigrationCommand
 from django.core.management.sql import emit_post_migrate_signal, emit_pre_migrate_signal
 from django.db import DEFAULT_DB_ALIAS, connections, router
-from django.db.migrations.autodetector import MigrationAutodetector
 from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.loader import AmbiguityError
 from django.db.migrations.state import ModelState, ProjectState
@@ -14,13 +14,15 @@ from django.utils.module_loading import module_has_submodule
 from django.utils.text import Truncator
 
 
-class Command(BaseCommand):
+class Command(MigrationCommand):
     help = (
         "Updates database schema. Manages both apps with migrations and those without."
     )
     requires_system_checks = []
 
     def add_arguments(self, parser):
+        super().add_arguments(parser)
+
         parser.add_argument(
             "--skip-checks",
             action="store_true",
@@ -36,13 +38,6 @@ class Command(BaseCommand):
             nargs="?",
             help="Database state will be brought to the state after that "
             'migration. Use the name "zero" to unapply all migrations.',
-        )
-        parser.add_argument(
-            "--noinput",
-            "--no-input",
-            action="store_false",
-            dest="interactive",
-            help="Tells Django to NOT prompt the user for input of any kind.",
         )
         parser.add_argument(
             "--database",
@@ -329,7 +324,7 @@ class Command(BaseCommand):
                 self.stdout.write("  No migrations to apply.")
                 # If there's changes that aren't in migrations yet, tell them
                 # how to fix it.
-                autodetector = MigrationAutodetector(
+                autodetector = self.autodetector_class(
                     executor.loader.project_state(),
                     ProjectState.from_apps(apps),
                 )

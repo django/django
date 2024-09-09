@@ -48,6 +48,12 @@ class UnmigratedModel(models.Model):
     pass
 
 
+class ModelForAutodetection(models.Model):
+    class Meta:
+        # Disable auto loading of this model as we load it on our own
+        apps = Apps()
+
+
 class EmptyManager(models.Manager):
     use_in_migrations = True
 

@@ -9,6 +9,10 @@ from unittest import mock
 
 from django.apps import apps
 from django.core.management import CommandError, call_command
+from django.core.management.commands.makemigrations import (
+    Command as MakeMigrationsCommand,
+)
+from django.core.management.commands.migrate import Command as MigrateCommand
 from django.db import (
     ConnectionHandler,
     DatabaseError,
@@ -19,6 +23,7 @@ from django.db import (
 )
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.backends.utils import truncate_name
+from django.db.migrations import MigrationAutodetector
 from django.db.migrations.exceptions import InconsistentMigrationHistory
 from django.db.migrations.recorder import MigrationRecorder
 from django.test import TestCase, override_settings, skipUnlessDBFeature
@@ -26,7 +31,7 @@ from django.test.utils import captured_stdout, extend_sys_path
 from django.utils import timezone
 from django.utils.version import get_docs_version
 
-from .models import UnicodeModel, UnserializableModel
+from .models import UnicodeModel, UnserializableModel, ModelForAutodetection
 from .routers import TestRouter
 from .test_base import MigrationTestBase
 
@@ -3296,3 +3301,49 @@ class OptimizeMigrationTests(MigrationTestBase):
         msg = "Cannot find a migration matching 'nonexistent' from app 'migrations'."
         with self.assertRaisesMessage(CommandError, msg):
             call_command("optimizemigration", "migrations", "nonexistent")
+
+
+class CustomMigrationCommandTests(MigrationTestBase):
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
+    def test_custom_makemigrations_command(self):
+        class CustomAutodetector(MigrationAutodetector):
+            def changes(self, *args, **kwargs):
+                return []
+
+        class CustomMakeMigrationsCommand(MakeMigrationsCommand):
+            autodetector_class = CustomAutodetector
+
+        self.assertTableNotExists("migrations_unicodemodel")
+        apps.register_model("migrations", ModelForAutodetection)
+
+        out = io.StringIO()
+        command = CustomMakeMigrationsCommand(stdout=out)
+
+        with self.temporary_migration_module() as migration_dir:
+            call_command(command, "migrations", verbosity=0)
+
+            init_file = os.path.join(migration_dir, "__init__.py")
+            self.assertFalse(os.path.exists(init_file))
+
+            initial_file = os.path.join(migration_dir, "0001_initial.py")
+            self.assertFalse(os.path.exists(initial_file))
+
+    def test_custom_migrate_command(self):
+        class CustomAutodetector(MigrationAutodetector):
+            def changes(self, *args, **kwargs):
+                return []
+
+        class CustomMigrateCommand(MigrateCommand):
+            autodetector_class = CustomAutodetector
+
+        self.assertTableNotExists("migrations_author")
+
+        out = io.StringIO()
+        command = CustomMigrateCommand(stdout=out)
+
+        with self.temporary_migration_module():
+            self.assertRaises(
+                ModuleNotFoundError, call_command, command, "migrations", verbosity=0
+            )
+
+        self.assertTableNotExists("migrations_author")
