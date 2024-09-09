@@ -289,7 +289,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         # Pooling feature is only supported for oracledb.
         if self.is_pool and not is_oracledb:
             raise ImproperlyConfigured(
-                "Pooling isn't supported by cx_Oracle. Use python-oracledb instead"
+                "Pooling isn't supported by cx_Oracle. Use python-oracledb instead."
             )
 
         conn_params = self.settings_dict["OPTIONS"].copy()

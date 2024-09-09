@@ -154,7 +154,7 @@ class Tests(TestCase):
     def test_cx_Oracle_not_support_pooling(self):
         new_connection = no_pool_connection()
         new_connection.settings_dict["OPTIONS"]["pool"] = True
-        msg = "Pooling isn't supported by cx_Oracle. Use python-oracledb instead"
+        msg = "Pooling isn't supported by cx_Oracle. Use python-oracledb instead."
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             new_connection.connect()
 
