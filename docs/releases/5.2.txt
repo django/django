@@ -203,7 +203,8 @@ Management Commands
 Migrations
 ~~~~~~~~~~
 
-* ...
+* ``MigrationAutodetector`` now exposes
+  ``MigrationAutodetector.autodetector_class`` for subclasses to override.
 
 Models
 ~~~~~~
