@@ -198,7 +198,7 @@ class ExclusionConstraint(BaseConstraint):
             lookups.append(lookup)
         queryset = queryset.filter(*lookups)
         model_class_pk = instance._get_pk_val(model._meta)
-        if not instance._state.adding and model_class_pk is not None:
+        if not instance._state.adding and instance._is_pk_set(model._meta):
             queryset = queryset.exclude(pk=model_class_pk)
         if not self.condition:
             if queryset.exists():

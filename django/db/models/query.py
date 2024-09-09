@@ -668,7 +668,7 @@ class QuerySet(AltersData):
 
         connection = connections[self.db]
         for obj in objs:
-            if obj.pk is None:
+            if not obj._is_pk_set():
                 # Populate new PK values.
                 obj.pk = obj._meta.pk.get_pk_value_on_save(obj)
             if not connection.features.supports_default_keyword_in_bulk_insert:
@@ -794,7 +794,7 @@ class QuerySet(AltersData):
         objs = list(objs)
         self._prepare_for_bulk_create(objs)
         with transaction.atomic(using=self.db, savepoint=False):
-            objs_with_pk, objs_without_pk = partition(lambda o: o.pk is None, objs)
+            objs_without_pk, objs_with_pk = partition(lambda o: o._is_pk_set(), objs)
             if objs_with_pk:
                 returned_columns = self._batched_insert(
                     objs_with_pk,
@@ -862,7 +862,7 @@ class QuerySet(AltersData):
         if not fields:
             raise ValueError("Field names must be given to bulk_update().")
         objs = tuple(objs)
-        if any(obj.pk is None for obj in objs):
+        if not all(obj._is_pk_set() for obj in objs):
             raise ValueError("All bulk_update() objects must have a primary key set.")
         fields = [self.model._meta.get_field(name) for name in fields]
         if any(not f.concrete or f.many_to_many for f in fields):
@@ -1289,7 +1289,7 @@ class QuerySet(AltersData):
                 return False
         except AttributeError:
             raise TypeError("'obj' must be a model instance.")
-        if obj.pk is None:
+        if not obj._is_pk_set():
             raise ValueError("QuerySet.contains() cannot be used on unsaved objects.")
         if self._result_cache is not None:
             return obj in self._result_cache

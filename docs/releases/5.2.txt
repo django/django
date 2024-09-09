@@ -289,7 +289,9 @@ Database backend API
 This section describes changes that may be needed in third-party database
 backends.
 
-* ...
+* The new :meth:`Model._is_pk_set() <django.db.models.Model._is_pk_set>` method
+  allows checking if a Model instance's primary key is defined.
+
 
 :mod:`django.contrib.gis`
 -------------------------
