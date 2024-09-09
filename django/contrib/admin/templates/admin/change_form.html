@@ -25,27 +25,27 @@
 
 {% block pretitle %}
   {% if errors %}
-    <p class="errornote">
-      {% blocktranslate count counter=errors|length %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktranslate %}
-    </p>
-
-    {{ adminform.form.non_field_errors }}
-
-    <div class="errornote">
-      <p>The following fields have errors</p>
+    <div class="errornote" role="alert" aria-labelledby="error-summary-title" tabindex="-1">
+      <h2 id="error-summary-title">
+        {% blocktranslate %}There is a problem{% endblocktranslate %}
+      </h2>
+      <p>{{ adminform.form.non_field_errors }}</p>
+      {% if field_errors_exist %}
+      <p>The following fields have errors:</p>
       <ul class="errorlist">
         {% for fieldset in adminform %}
           {% for line in fieldset %}
             {% for field in line %}
               {% if field.errors %}
                 <li>
-                  <a href="#{{ field.field.id_for_label }}">{{ field.field.label }}</a>
+                  <a href="#" onclick="focusField('{{ field.field.id_for_label }}'); event.preventDefault();">{{ field.field.label }}</a>
                 </li>
               {% endif %}
             {% endfor %}
           {% endfor %}
         {% endfor %}
       </ul>
+      {% endif %}
     </div>
   {% endif %}
 {% endblock %}
@@ -85,6 +85,24 @@
 {% block submit_buttons_bottom %}{% submit_row %}{% endblock %}
 
 {% block admin_change_form_document_ready %}
+{% if errors %}
+  <script>
+      document.addEventListener("DOMContentLoaded", function() {
+          const errorSummary = document.querySelector('.errornote[role="alert"]');
+          if (errorSummary) {
+            errorSummary.focus();
+          }
+      });
+
+      function focusField(fieldId) {
+          const fieldElement = document.getElementById(fieldId);
+          if (fieldElement) {
+              fieldElement.focus();
+          }
+      }
+  </script>
+{% endif %}
+
     <script id="django-admin-form-add-constants"
             src="{% static 'admin/js/change_form.js' %}"
             {% if adminform and add %}

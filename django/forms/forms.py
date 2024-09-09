@@ -94,7 +94,7 @@ class BaseForm(RenderableFormMixin):
         self.label_suffix = label_suffix if label_suffix is not None else _(":")
         self.empty_permitted = empty_permitted
         self._errors = None  # Stores the errors after clean() has been called.
-
+        self._field_errors_exist = False
         # The base_fields class attribute is the *class-wide* definition of
         # fields. Because a particular *instance* of the class might want to
         # alter self.fields, we create self.fields here by copying base_fields.
@@ -298,6 +298,7 @@ class BaseForm(RenderableFormMixin):
                         error_class="nonfield", renderer=self.renderer
                     )
                 else:
+                    self._field_errors_exist = True
                     self._errors[field] = self.error_class(renderer=self.renderer)
             self._errors[field].extend(error_list)
             if field in self.cleaned_data:
