@@ -9,9 +9,12 @@ from django.test import TestCase, TransactionTestCase
 
 from ..models import Square, VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
 
-try:
-    from django.db.backends.oracle.oracledb_any import is_oracledb
-except ImportError:
+if connection.vendor == "oracle":
+    try:
+        from django.db.backends.oracle.oracledb_any import is_oracledb
+    except ImportError:
+        is_oracledb = False
+else:
     is_oracledb = False
 
 
