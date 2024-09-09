@@ -206,7 +206,7 @@ Migrations
 :mod:`django.db.migrations`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ``MigrationAutodetector`` now exposes :attr:`MigrationAutodetector.autodetector_class` for subclasses
+* ``MigrationAutodetector`` now exposes `MigrationAutodetector.autodetector_class` for subclasses
 
 Models
 ~~~~~~
