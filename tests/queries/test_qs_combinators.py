@@ -14,7 +14,16 @@ from django.db.models.functions import Mod
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
 
-from .models import Author, Celebrity, ExtraInfo, Number, ReservedName
+from .models import (
+    Annotation,
+    Author,
+    Celebrity,
+    ExtraInfo,
+    Note,
+    Number,
+    ReservedName,
+    Tag,
+)
 
 
 @skipUnlessDBFeature("supports_select_union")
@@ -449,6 +458,27 @@ class QuerySetSetOperationTests(TestCase):
             .values_list("order", flat=True),
             [8, 1],
         )
+
+    @skipUnlessDBFeature("supports_select_intersection")
+    def test_intersection_in_nested_subquery(self):
+        tag = Tag.objects.create(name="tag")
+        note = Note.objects.create(tag=tag)
+        annotation = Annotation.objects.create(tag=tag)
+        tags = Tag.objects.order_by()
+        tags = tags.filter(id=OuterRef("tag_id")).intersection(
+            tags.filter(id=OuterRef(OuterRef("tag_id")))
+        )
+        qs = Note.objects.filter(
+            Exists(
+                Annotation.objects.filter(
+                    Exists(tags),
+                    notes__in=OuterRef("pk"),
+                )
+            )
+        )
+        self.assertIsNone(qs.first())
+        annotation.notes.add(note)
+        self.assertEqual(qs.first(), note)
 
     def test_union_in_subquery_related_outerref(self):
         e1 = ExtraInfo.objects.create(value=7, info="e3")
