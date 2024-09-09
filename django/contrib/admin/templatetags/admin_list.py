@@ -170,7 +170,7 @@ def result_headers(cl):
             "ascending": order_type == "asc",
             "sort_priority": sort_priority,
             "url_primary": cl.get_query_string({ORDER_VAR: ".".join(o_list_primary)}),
-            "url_remove": cl.get_query_string({ORDER_VAR: ".".join(o_list_remove)}),
+            "url_remove": cl.get_query_string({ORDER_VAR: ".".join(o_list_remove) if o_list_remove else None}),
             "url_toggle": cl.get_query_string({ORDER_VAR: ".".join(o_list_toggle)}),
             "class_attrib": (
                 format_html(' class="{}"', " ".join(th_classes)) if th_classes else ""
