@@ -14,12 +14,16 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db import IntegrityError
 from django.db.backends.base.base import BaseDatabaseWrapper
-from django.db.backends.oracle.oracledb_any import oracledb as Database
 from django.db.backends.utils import debug_transaction
 from django.utils.asyncio import async_unsafe
 from django.utils.encoding import force_bytes, force_str
 from django.utils.functional import cached_property
 from django.utils.version import get_version_tuple
+
+try:
+    from django.db.backends.oracle.oracledb_any import oracledb as Database
+except ImportError as e:
+    raise ImproperlyConfigured(f"Error loading oracledb module: {e}")
 
 
 def _setup_environment(environ):
