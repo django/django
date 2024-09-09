@@ -139,7 +139,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                     },
                 }
             )
-        if self.connection.settings_dict["OPTIONS"].get("pool"):
+        if self.connection.is_pool:
             skips.update(
                 {
                     "Pooling does not support persistent connections": {

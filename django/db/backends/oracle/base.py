@@ -277,9 +277,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return self._connection_pools[pool_key]
 
     def close_pool(self):
-        pool_key = (self.alias, self.settings_dict["USER"])
         if self.pool:
             self.pool.close(force=True)
+            pool_key = (self.alias, self.settings_dict["USER"])
             del self._connection_pools[pool_key]
 
     def get_database_version(self):
@@ -385,8 +385,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             cursor.execute("SET CONSTRAINTS ALL DEFERRED")
 
     def is_usable(self):
-        if self.connection is None:
-            return False
         try:
             self.connection.ping()
         except Database.Error:
