@@ -973,3 +973,14 @@ Other attributes
     since they are yet to be saved. Instances fetched from a ``QuerySet``
     will have ``adding=False`` and ``db`` set to the alias of the associated
     database.
+
+``_is_pk_set()``
+----------------
+
+.. method:: Model._is_pk_set()
+
+.. versionadded:: 5.2
+
+The ``_is_pk_set()`` method returns whether the model instance's ``pk`` is set.
+It abstracts the model's primary key definition, ensuring consistent behavior
+regardless of the specific ``pk`` configuration.
