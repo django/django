@@ -2445,6 +2445,9 @@ Field API reference
         Returns the default :class:`django.forms.Field` of this field for
         :class:`~django.forms.ModelForm`.
 
+        If :meth:`~Field.formfield` is overridden to return ``None``, this field
+        is excluded from the :class:`~django.forms.ModelForm`.
+
         By default, if both ``form_class`` and ``choices_form_class`` are
         ``None``, it uses :class:`~django.forms.CharField`. If the field has
         :attr:`~django.db.models.Field.choices` and ``choices_form_class``
