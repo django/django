@@ -205,13 +205,15 @@ class DatabaseCreation(BaseDatabaseCreation):
         Destroy a test database, prompting the user for confirmation if the
         database already exists. Return the name of the test database created.
         """
-        self.connection.settings_dict["USER"] = self.connection.settings_dict[
-            "SAVED_USER"
-        ]
-        self.connection.settings_dict["PASSWORD"] = self.connection.settings_dict[
-            "SAVED_PASSWORD"
-        ]
+        if not self.connection.is_pool:
+            self.connection.settings_dict["USER"] = self.connection.settings_dict[
+                "SAVED_USER"
+            ]
+            self.connection.settings_dict["PASSWORD"] = self.connection.settings_dict[
+                "SAVED_PASSWORD"
+            ]
         self.connection.close()
+        self.connection.close_pool()
         parameters = self._get_test_db_params()
         with self._maindb_connection.cursor() as cursor:
             if self._test_user_create():
@@ -223,6 +225,7 @@ class DatabaseCreation(BaseDatabaseCreation):
                     self.log("Destroying test database tables...")
                 self._execute_test_db_destruction(cursor, parameters, verbosity)
         self._maindb_connection.close()
+        self._maindb_connection.close_pool()
 
     def _execute_test_db_creation(self, cursor, parameters, verbosity, keepdb=False):
         if verbosity >= 2:

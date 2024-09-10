@@ -2186,6 +2186,8 @@ class AllowedDatabaseQueriesTests(SimpleTestCase):
         finally:
             new_connection.validate_thread_sharing()
             new_connection._close()
+            if hasattr(new_connection, "close_pool"):
+                new_connection.close_pool()
 
 
 class DatabaseAliasTests(SimpleTestCase):
