@@ -1332,7 +1332,9 @@ class Col(Expression):
 class ColPairs(Expression):
     def __init__(self, alias, targets, sources, output_field):
         super().__init__(output_field=output_field)
-        self.alias, self.targets, self.sources = alias, targets, sources
+        self.alias = alias
+        self.targets = targets
+        self.sources = sources
 
     def __len__(self):
         return len(self.targets)

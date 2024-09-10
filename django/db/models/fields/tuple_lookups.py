@@ -83,12 +83,15 @@ class TupleGreaterThan(TupleLookupMixin, GreaterThan):
         vals_list = [val for val in self.rhs for _ in range(2)]
         cols_iter = iter(cols_list[:-1])
         vals_iter = iter(vals_list[:-1])
-        col, val = next(cols_iter), next(vals_iter)
-        lookup, connector = next(lookups), next(connectors)
+        col = next(cols_iter)
+        val = next(vals_iter)
+        lookup = next(lookups)
+        connector = next(connectors)
         root = node = WhereNode([lookup(col, val)], connector=connector)
 
         for col, val in zip(cols_iter, vals_iter):
-            lookup, connector = next(lookups), next(connectors)
+            lookup = next(lookups)
+            connector = next(connectors)
             child = WhereNode([lookup(col, val)], connector=connector)
             node.children.append(child)
             node = child
@@ -107,12 +110,15 @@ class TupleGreaterThanOrEqual(TupleLookupMixin, GreaterThanOrEqual):
         vals_list = [val for val in self.rhs for _ in range(2)]
         cols_iter = iter(cols_list)
         vals_iter = iter(vals_list)
-        col, val = next(cols_iter), next(vals_iter)
-        lookup, connector = next(lookups), next(connectors)
+        col = next(cols_iter)
+        val = next(vals_iter)
+        lookup = next(lookups)
+        connector = next(connectors)
         root = node = WhereNode([lookup(col, val)], connector=connector)
 
         for col, val in zip(cols_iter, vals_iter):
-            lookup, connector = next(lookups), next(connectors)
+            lookup = next(lookups)
+            connector = next(connectors)
             child = WhereNode([lookup(col, val)], connector=connector)
             node.children.append(child)
             node = child
@@ -131,12 +137,15 @@ class TupleLessThan(TupleLookupMixin, LessThan):
         vals_list = [val for val in self.rhs for _ in range(2)]
         cols_iter = iter(cols_list[:-1])
         vals_iter = iter(vals_list[:-1])
-        col, val = next(cols_iter), next(vals_iter)
-        lookup, connector = next(lookups), next(connectors)
+        col = next(cols_iter)
+        val = next(vals_iter)
+        lookup = next(lookups)
+        connector = next(connectors)
         root = node = WhereNode([lookup(col, val)], connector=connector)
 
         for col, val in zip(cols_iter, vals_iter):
-            lookup, connector = next(lookups), next(connectors)
+            lookup = next(lookups)
+            connector = next(connectors)
             child = WhereNode([lookup(col, val)], connector=connector)
             node.children.append(child)
             node = child
@@ -155,12 +164,15 @@ class TupleLessThanOrEqual(TupleLookupMixin, LessThanOrEqual):
         vals_list = [val for val in self.rhs for _ in range(2)]
         cols_iter = iter(cols_list)
         vals_iter = iter(vals_list)
-        col, val = next(cols_iter), next(vals_iter)
-        lookup, connector = next(lookups), next(connectors)
+        col = next(cols_iter)
+        val = next(vals_iter)
+        lookup = next(lookups)
+        connector = next(connectors)
         root = node = WhereNode([lookup(col, val)], connector=connector)
 
         for col, val in zip(cols_iter, vals_iter):
-            lookup, connector = next(lookups), next(connectors)
+            lookup = next(lookups)
+            connector = next(connectors)
             child = WhereNode([lookup(col, val)], connector=connector)
             node.children.append(child)
             node = child
