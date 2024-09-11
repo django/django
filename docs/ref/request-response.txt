@@ -833,6 +833,13 @@ Attributes
 
     A bytestring representing the content, encoded from a string if necessary.
 
+.. attribute:: HttpResponse.text
+
+    .. versionadded:: 5.2
+
+    A string representation of :attr:`HttpResponse.content`, decoded using the
+    response's :attr:`HttpResponse.charset` (defaulting to ``UTF-8`` if empty).
+
 .. attribute:: HttpResponse.cookies
 
     A :py:obj:`http.cookies.SimpleCookie` object holding the cookies included
@@ -1271,6 +1278,9 @@ with the following notable differences:
 * It has no ``content`` attribute. Instead, it has a
   :attr:`~StreamingHttpResponse.streaming_content` attribute. This can be used
   in middleware to wrap the response iterable, but should not be consumed.
+
+* It has no ``text`` attribute, as it would require iterating the response
+  object.
 
 * You cannot use the file-like object ``tell()`` or ``write()`` methods.
   Doing so will raise an exception.
