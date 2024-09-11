@@ -12,10 +12,11 @@ development, and to provide support for platforms that can't use SMTP.
 
 The code lives in the ``django.core.mail`` module.
 
-Quick example
-=============
+Quick examples
+==============
 
-In two lines::
+Use :func:`send_mail` for straightforward email sending. For example, to send a
+plain text message::
 
     from django.core.mail import send_mail
 
@@ -26,6 +27,39 @@ In two lines::
         ["to@example.com"],
         fail_silently=False,
     )
+
+When additional email sending functionality is needed, use
+:class:`EmailMessage` or :class:`EmailMultiAlternatives`. For example, to send
+a multipart email that includes both HTML and plain text versions with a
+specific template and custom headers, you can use the following approach::
+
+    from django.core.mail import EmailMultiAlternatives
+    from django.template.loader import render_to_string
+
+    # First, render the plain text content.
+    text_content = render_to_string(
+        "templates/emails/my_email.txt",
+        context={"my_variable": 42},
+    )
+
+    # Secondly, render the HTML content.
+    html_content = render_to_string(
+        "templates/emails/my_email.html",
+        context={"my_variable": 42},
+    )
+
+    # Then, create a multipart email instance.
+    msg = EmailMultiAlternatives(
+        "Subject here",
+        text_content,
+        "from@example.com",
+        ["to@example.com"],
+        headers={"List-Unsubscribe": "<mailto:unsub@example.com>"},
+    )
+
+    # Lastly, attach the HTML content to the email instance and send.
+    msg.attach_alternative(html_content, "text/html")
+    msg.send()
 
 Mail is sent using the SMTP host and port specified in the
 :setting:`EMAIL_HOST` and :setting:`EMAIL_PORT` settings. The
