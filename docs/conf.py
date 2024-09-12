@@ -292,8 +292,12 @@ latex_elements = {
         \setmainfont{Symbola}
     """,
     "preamble": r"""
-        \usepackage{newunicodechar}
         \usepackage[UTF8]{ctex}
+        \xeCJKDeclareCharClass{HalfLeft}{"2018, "201C}
+        \xeCJKDeclareCharClass{HalfRight}{
+            "00B7, "2019, "201D, "2013, "2014, "2025, "2026, "2E3A
+        }
+        \usepackage{newunicodechar}
         \newunicodechar{π}{\ensuremath{\pi}}
         \newunicodechar{≤}{\ensuremath{\le}}
         \newunicodechar{≥}{\ensuremath{\ge}}
