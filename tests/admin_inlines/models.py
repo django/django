@@ -332,7 +332,7 @@ class SomeParentModel(models.Model):
 
 class SomeChildModel(models.Model):
     name = models.CharField(max_length=1)
-    position = models.PositiveIntegerField()
+    position = models.PositiveIntegerField(help_text="Position help_text.")
     parent = models.ForeignKey(SomeParentModel, models.CASCADE)
     readonly_field = models.CharField(max_length=1)
 
