@@ -24,7 +24,8 @@ from django.test import (
     modify_settings,
     override_settings,
 )
-from django.views.debug import technical_500_response
+from django.urls import reverse
+from django.views.debug import ExceptionReporter, technical_500_response
 from django.views.decorators.debug import sensitive_variables
 
 from .models import (
@@ -799,6 +800,52 @@ class AuthenticateTests(TestCase):
             response,
             '<tr><td>credentials</td><td class="code">'
             "<pre>&#39;********************&#39;</pre></td></tr>",
+            html=True,
+            status_code=500,
+        )
+
+    @override_settings(
+        ROOT_URLCONF="django.contrib.auth.urls",
+        AUTHENTICATION_BACKENDS=["auth_tests.test_auth_backends.TypeErrorBackend"],
+    )
+    def test_login_process_sensitive_variables(self):
+        try:
+            self.client.post(
+                reverse("login"),
+                dict(username="testusername", password=self.sensitive_password),
+            )
+        except TypeError:
+            exc_info = sys.exc_info()
+
+        rf = RequestFactory()
+        response = technical_500_response(rf.get("/"), *exc_info)
+
+        self.assertNotContains(response, self.sensitive_password, status_code=500)
+        self.assertContains(response, "TypeErrorBackend", status_code=500)
+
+        # Check AuthenticationForm.clean function
+        self.assertContains(
+            response,
+            '<tr><td>password</td><td class="code">'
+            "<pre>&#39;********************&#39;</pre></td></tr>",
+            html=True,
+            status_code=500,
+        )
+
+        # Check Client.post function
+        self.assertContains(
+            response,
+            '<tr><td>data</td><td class="code">'
+            "<pre>&#x27;********************&#x27;</pre></td></tr>",
+            html=True,
+            status_code=500,
+        )
+
+        # Check RequestFactory.post function
+        self.assertContains(
+            response,
+            '<tr><td>post_data</td><td class="code">'
+            "<pre>&#x27;********************&#x27;</pre></td></tr>",
             html=True,
             status_code=500,
         )

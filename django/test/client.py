@@ -27,6 +27,7 @@ from django.utils.encoding import force_bytes
 from django.utils.functional import SimpleLazyObject
 from django.utils.http import urlencode
 from django.utils.regex_helper import _lazy_re_compile
+from django.views.decorators.debug import sensitive_variables
 
 __all__ = (
     "AsyncClient",
@@ -481,6 +482,7 @@ class RequestFactory:
             **extra,
         )
 
+    @sensitive_variables("data", "post_data")
     def post(
         self,
         path,
@@ -1135,6 +1137,7 @@ class Client(ClientMixin, RequestFactory):
             )
         return response
 
+    @sensitive_variables("data")
     def post(
         self,
         path,
