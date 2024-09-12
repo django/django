@@ -96,12 +96,20 @@ class TestFixtures(TestCase):
         the serialized data for fields that have been removed
         from the database when not ignored.
         """
-        with self.assertRaises(DeserializationError):
-            management.call_command(
-                "loaddata",
-                "sequence_extra",
-                verbosity=0,
-            )
+        for fixture_file in (
+            "sequence_extra",
+            "sequence_extra_jsonl",
+            "sequence_extra_yaml",
+        ):
+            with (
+                self.subTest(fixture_file=fixture_file),
+                self.assertRaises(DeserializationError),
+            ):
+                management.call_command(
+                    "loaddata",
+                    fixture_file,
+                    verbosity=0,
+                )
 
     def test_loaddata_not_found_fields_ignore(self):
         """
@@ -129,6 +137,32 @@ class TestFixtures(TestCase):
             verbosity=0,
         )
         self.assertEqual(Animal.specimens.all()[0].name, "Wolf")
+
+    def test_loaddata_not_found_fields_ignore_jsonl(self):
+        management.call_command(
+            "loaddata",
+            "sequence_extra_jsonl",
+            ignore=True,
+            verbosity=0,
+        )
+        self.assertEqual(Animal.specimens.all()[0].name, "Eagle")
+
+    def test_loaddata_not_found_fields_ignore_yaml(self):
+        management.call_command(
+            "loaddata",
+            "sequence_extra_yaml",
+            ignore=True,
+            verbosity=0,
+        )
+        self.assertEqual(Animal.specimens.all()[0].name, "Cat")
+
+    def test_loaddata_empty_lines_jsonl(self):
+        management.call_command(
+            "loaddata",
+            "sequence_empty_lines_jsonl.jsonl",
+            verbosity=0,
+        )
+        self.assertEqual(Animal.specimens.all()[0].name, "Eagle")
 
     @skipIfDBFeature("interprets_empty_strings_as_nulls")
     def test_pretty_print_xml(self):
