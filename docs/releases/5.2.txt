@@ -241,7 +241,9 @@ Security
 Serialization
 ~~~~~~~~~~~~~
 
-* ...
+* Each serialization format now defines a ``Deserializer`` class, rather than a
+  function, to improve extensibility when defining a
+  :ref:`custom serialization format <custom-serialization-formats>`.
 
 Signals
 ~~~~~~~
