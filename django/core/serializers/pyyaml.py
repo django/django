@@ -6,7 +6,6 @@ Requires PyYaml (https://pyyaml.org/), but that's checked for in __init__.
 
 import collections
 import decimal
-from io import StringIO
 
 import yaml
 
@@ -66,17 +65,23 @@ class Serializer(PythonSerializer):
         return super(PythonSerializer, self).getvalue()
 
 
-def Deserializer(stream_or_string, **options):
+class Deserializer(PythonDeserializer):
     """Deserialize a stream or string of YAML data."""
-    if isinstance(stream_or_string, bytes):
-        stream_or_string = stream_or_string.decode()
-    if isinstance(stream_or_string, str):
-        stream = StringIO(stream_or_string)
-    else:
+
+    def __init__(self, stream_or_string, **options):
         stream = stream_or_string
-    try:
-        yield from PythonDeserializer(yaml.load(stream, Loader=SafeLoader), **options)
-    except (GeneratorExit, DeserializationError):
-        raise
-    except Exception as exc:
-        raise DeserializationError() from exc
+        if isinstance(stream_or_string, bytes):
+            stream = stream_or_string.decode()
+        try:
+            objects = yaml.load(stream, Loader=SafeLoader)
+        except Exception as exc:
+            raise DeserializationError() from exc
+        super().__init__(objects, **options)
+
+    def _handle_object(self, obj):
+        try:
+            yield from super()._handle_object(obj)
+        except (GeneratorExit, DeserializationError):
+            raise
+        except Exception as exc:
+            raise DeserializationError(f"Error deserializing object: {exc}") from exc
