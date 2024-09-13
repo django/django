@@ -223,6 +223,10 @@ Models
   expression contains a set-returning function, enforcing subquery evaluation.
   This is necessary for many Postgres set-returning functions.
 
+* :attr:`CharField.max_length <django.db.models.CharField.max_length>` is no
+  longer required to be set on SQLite, which supports unlimited ``VARCHAR``
+  columns.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
