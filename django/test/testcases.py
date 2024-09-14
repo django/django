@@ -583,7 +583,11 @@ class SimpleTestCase(unittest.TestCase):
         content_repr = safe_repr(content)
         if not isinstance(text, bytes) or html:
             text = str(text)
-            content = content.decode(response.charset)
+            content = (
+                content.decode(response.charset)
+                if response.streaming
+                else response.text
+            )
             text_repr = "'%s'" % text
         else:
             text_repr = repr(text)
