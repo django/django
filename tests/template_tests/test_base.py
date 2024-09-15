@@ -8,7 +8,7 @@ class LexerTestMixin:
     template_string = (
         "text\n"
         "{% if test %}{{ varvalue }}{% endif %}"
-        "{#comment {{not a var}} %{not a block}% #}"
+        "{#comment {{not a var}} {%not a block%} #}"
         "end text"
     )
     expected_token_tuples = [
