@@ -687,3 +687,27 @@ class GeneratedModelUniqueConstraintVirtual(GeneratedModelVirtualBase):
                 F("a"), name="Generated model unique constraint virtual a"
             ),
         ]
+
+
+class GeneratedModelChoices(models.Model):
+    c = models.IntegerField(choices=Whiz.CHOICES, null=True)
+    c_squared = models.GeneratedField(
+        expression=F("c") * F("c"),
+        output_field=models.IntegerField(choices=Whiz.CHOICES, null=True),
+        db_persist=True,
+    )
+
+    class Meta:
+        required_db_features = {"supports_stored_generated_columns"}
+
+
+class GeneratedModelChoicesVirtual(models.Model):
+    c = models.IntegerField(choices=Whiz.CHOICES, null=True)
+    c_squared = models.GeneratedField(
+        expression=F("c") * F("c"),
+        output_field=models.IntegerField(choices=Whiz.CHOICES, null=True),
+        db_persist=True,
+    )
+
+    class Meta:
+        required_db_features = {"supports_virtual_generated_columns"}
