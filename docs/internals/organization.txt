@@ -186,7 +186,6 @@ The steering council holds the following prerogatives:
   the reversion of any particular merge or commit.
 - Announcing calls for proposals and ideas for the future technical direction
   of Django.
-- Setting and adjusting the schedule of releases of Django.
 - Selecting and removing mergers and releasers.
 - Participating in the removal of members of the steering council, when deemed
   appropriate.
