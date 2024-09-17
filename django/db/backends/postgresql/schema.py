@@ -140,6 +140,13 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                     return sequence["name"]
         return None
 
+    def _is_changing_type_of_indexed_text_column(self, old_field, old_type, new_type):
+        return (old_field.db_index or old_field.unique) and (
+            (old_type.startswith("varchar") and not new_type.startswith("varchar"))
+            or (old_type.startswith("text") and not new_type.startswith("text"))
+            or (old_type.startswith("citext") and not new_type.startswith("citext"))
+        )
+
     def _alter_column_type_sql(
         self, model, old_field, new_field, new_type, old_collation, new_collation
     ):
@@ -147,11 +154,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # different type.
         old_db_params = old_field.db_parameters(connection=self.connection)
         old_type = old_db_params["type"]
-        if (old_field.db_index or old_field.unique) and (
-            (old_type.startswith("varchar") and not new_type.startswith("varchar"))
-            or (old_type.startswith("text") and not new_type.startswith("text"))
-            or (old_type.startswith("citext") and not new_type.startswith("citext"))
-        ):
+        if self._is_changing_type_of_indexed_text_column(old_field, old_type, new_type):
             index_name = self._create_index_name(
                 model._meta.db_table, [old_field.column], suffix="_like"
             )
@@ -277,8 +280,14 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             strict,
         )
         # Added an index? Create any PostgreSQL-specific indexes.
-        if (not (old_field.db_index or old_field.unique) and new_field.db_index) or (
-            not old_field.unique and new_field.unique
+        if (
+            (not (old_field.db_index or old_field.unique) and new_field.db_index)
+            or (not old_field.unique and new_field.unique)
+            or (
+                self._is_changing_type_of_indexed_text_column(
+                    old_field, old_type, new_type
+                )
+            )
         ):
             like_index_statement = self._create_like_index_sql(model, new_field)
             if like_index_statement is not None:
