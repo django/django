@@ -204,7 +204,8 @@ input[type="submit"], button {
         min-height: 0;
     }
 
-    fieldset .fieldBox + .fieldBox {
+    fieldset div:has(> .fieldBox) + div:has(> .fieldBox) {
+        width: 100%;
         margin-top: 10px;
         padding-top: 10px;
         border-top: 1px solid var(--hairline-color);
@@ -560,7 +561,7 @@ input[type="submit"], button {
         width: auto;
     }
 
-    fieldset .fieldBox + .fieldBox {
+    fieldset div:has(> .fieldBox) + div:has(> .fieldBox) {
         margin-top: 15px;
         padding-top: 15px;
     }
