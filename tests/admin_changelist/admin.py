@@ -17,21 +17,6 @@ class CustomPaginator(Paginator):
         )
 
 
-class EventAdmin(admin.ModelAdmin):
-    date_hierarchy = "date"
-    list_display = ["event_date_func"]
-
-    @admin.display
-    def event_date_func(self, event):
-        return event.date
-
-    def has_add_permission(self, request):
-        return False
-
-
-site.register(Event, EventAdmin)
-
-
 class ParentAdmin(admin.ModelAdmin):
     list_filter = ["child__name"]
     search_fields = ["child__name"]
@@ -156,7 +141,7 @@ site.register(Parent, NoListDisplayLinksParentAdmin)
 
 
 class SwallowAdmin(admin.ModelAdmin):
-    actions = None  # prevent ['action_checkbox'] + list(list_display)
+    actions = None
     list_display = ("origin", "load", "speed", "swallowonetoone")
     list_editable = ["load", "speed"]
     list_per_page = 3
