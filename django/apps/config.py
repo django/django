@@ -1,7 +1,7 @@
 import inspect
 import os
 from importlib import import_module
-from typing import Any, Dict, Iterable, List, Optional, Type
+from typing import Any, Dict, Iterable, Optional, Type
 
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.functional import cached_property
@@ -27,19 +27,13 @@ class AppConfig:
         # Full Python path to the application e.g. 'django.contrib.admin'.
         self.name = app_name
 
-        # Root module for the application e.g. <module 'django.contrib.admin'
-        # from 'django/contrib/admin/__init__.py'>.
+        # Root module for the application.
         self.module = app_module
 
-        # Reference to the Apps registry that holds this AppConfig. Set by the
-        # registry when it registers the AppConfig instance.
+        # Reference to the Apps registry that holds this AppConfig.
         self.apps = None
 
-        # The following attributes could be defined at the class level in a
-        # subclass, hence the test-and-set pattern.
-
-        # Last component of the Python path to the application e.g. 'admin'.
-        # This value must be unique across a Django project.
+        # The following attributes could be defined at the class level in a subclass.
         if not hasattr(self, "label"):
             self.label = app_name.rpartition(".")[2]
         if not self.label.isidentifier():
@@ -51,18 +45,14 @@ class AppConfig:
         if not hasattr(self, "verbose_name"):
             self.verbose_name = self.label.title()
 
-        # Filesystem path to the application directory e.g.
-        # '/path/to/django/contrib/admin'.
+        # Filesystem path to the application directory.
         if not hasattr(self, "path"):
             self.path = self._path_from_module(app_module)
 
-        # Module containing models e.g. <module 'django.contrib.admin.models'
-        # from 'django/contrib/admin/models.py'>. Set by import_models().
-        # None if the application doesn't have a models module.
+        # Module containing models. Set by import_models().
         self.models_module = None
 
-        # Mapping of lowercase model names to model classes. Initially set to
-        # None to prevent accidental access before import_models() runs.
+        # Mapping of lowercase model names to model classes.
         self.models = None
 
     def __repr__(self) -> str:
@@ -76,12 +66,13 @@ class AppConfig:
 
     @property
     def _is_default_auto_field_overridden(self) -> bool:
-        return self.__class__.default_auto_field is not AppConfig.default_auto_field
+        return (
+            self.__class__.default_auto_field is not AppConfig.default_auto_field
+        )
 
     def _path_from_module(self, module: Any) -> str:
         """Attempt to determine app's filesystem path from its module."""
-        # See #21874 for extended discussion of the behavior of this method in
-        # various cases.
+        # See #21874 for extended discussion of the behavior of this method.
         # Convert to list because __path__ may not support indexing.
         paths = list(getattr(module, "__path__", []))
         if len(paths) != 1:
@@ -89,29 +80,28 @@ class AppConfig:
             if filename is not None:
                 paths = [os.path.dirname(filename)]
             else:
-                # For unknown reasons, sometimes the list returned by __path__
-                # contains duplicates that must be removed (#25246).
+                # Sometimes the list returned by __path__ contains duplicates.
                 paths = list(set(paths))
         if len(paths) > 1:
             raise ImproperlyConfigured(
-                f"The app module {module!r} has multiple filesystem locations ({paths!r}); "
-                "you must configure this app with an AppConfig subclass "
-                "with a 'path' class attribute."
+                f"The app module {module!r} has multiple filesystem locations "
+                f"({paths!r}); you must configure this app with an AppConfig "
+                "subclass with a 'path' class attribute."
             )
         elif not paths:
             raise ImproperlyConfigured(
-                f"The app module {module!r} has no filesystem location; "
-                "you must configure this app with an AppConfig subclass "
-                "with a 'path' class attribute."
+                f"The app module {module!r} has no filesystem location; you must "
+                "configure this app with an AppConfig subclass with a 'path' "
+                "class attribute."
             )
         return paths[0]
 
     @classmethod
-    def create(cls, entry: str) -> 'AppConfig':
+    def create(cls, entry: str) -> "AppConfig":
         """
         Factory that creates an app config from an entry in INSTALLED_APPS.
         """
-        app_config_class: Optional[Type['AppConfig']] = None
+        app_config_class: Optional[Type["AppConfig"]] = None
         app_name: Optional[str] = None
         app_module: Optional[Any] = None
 
@@ -148,20 +138,26 @@ class AppConfig:
             try:
                 app_name = app_config_class.name
             except AttributeError:
-                raise ImproperlyConfigured(f"'{entry}' must supply a name attribute.")
+                raise ImproperlyConfigured(
+                    f"'{entry}' must supply a name attribute."
+                )
 
         # Ensure app_name points to a valid module.
         try:
             app_module = import_module(app_name)
         except ImportError:
             raise ImproperlyConfigured(
-                f"Cannot import '{app_name}'. Check that '{app_config_class.__module__}.{app_config_class.__qualname__}.name' is correct."
+                f"Cannot import '{app_name}'. Check that "
+                f"'{app_config_class.__module__}.{app_config_class.__qualname__}.name' "
+                "is correct."
             )
 
         return app_config_class(app_name, app_module)
 
     @classmethod
-    def _find_default_app_config(cls, entry: str, app_module: Any) -> Optional[Type['AppConfig']]:
+    def _find_default_app_config(
+        cls, entry: str, app_module: Any
+    ) -> Optional[Type["AppConfig"]]:
         """
         Find the default AppConfig class in the app's 'apps' submodule.
         """
@@ -170,20 +166,30 @@ class AppConfig:
             mod = import_module(mod_path)
             # Find AppConfig candidates excluding those with default = False.
             app_configs = [
-                candidate for _, candidate in inspect.getmembers(mod, inspect.isclass)
-                if issubclass(candidate, cls) and candidate is not cls and getattr(candidate, "default", True)
+                candidate
+                for _, candidate in inspect.getmembers(mod, inspect.isclass)
+                if (
+                    issubclass(candidate, cls)
+                    and candidate is not cls
+                    and getattr(candidate, "default", True)
+                )
             ]
             if len(app_configs) == 1:
                 return app_configs[0]
             else:
                 # Find AppConfig candidates with default = True.
                 default_configs = [
-                    candidate for candidate in app_configs if getattr(candidate, "default", False)
+                    candidate
+                    for candidate in app_configs
+                    if getattr(candidate, "default", False)
                 ]
                 if len(default_configs) > 1:
-                    candidates = [candidate.__name__ for candidate in default_configs]
+                    candidates = [
+                        candidate.__name__ for candidate in default_configs
+                    ]
                     raise RuntimeError(
-                        f"{mod_path!r} declares more than one default AppConfig: {', '.join(candidates)}."
+                        f"{mod_path!r} declares more than one default AppConfig: "
+                        f"{', '.join(candidates)}."
                     )
                 elif default_configs:
                     return default_configs[0]
@@ -199,7 +205,8 @@ class AppConfig:
             # Likely intended to be an AppConfig class.
             mod = import_module(mod_path)
             candidates = [
-                name for name, candidate in inspect.getmembers(mod, inspect.isclass)
+                name
+                for name, candidate in inspect.getmembers(mod, inspect.isclass)
                 if issubclass(candidate, cls) and candidate is not cls
             ]
             msg = f"Module '{mod_path}' does not contain a '{cls_name}' class."
@@ -223,7 +230,9 @@ class AppConfig:
         try:
             return self.models[model_name.lower()]
         except KeyError:
-            raise LookupError(f"App '{self.label}' doesn't have a '{model_name}' model.")
+            raise LookupError(
+                f"App '{self.label}' doesn't have a '{model_name}' model."
+            )
 
     def get_models(
         self, include_auto_created: bool = False, include_swapped: bool = False
@@ -262,3 +271,4 @@ class AppConfig:
         Override this method in subclasses to run code when Django starts.
         """
         pass
+
