@@ -338,6 +338,8 @@ backends.
 
 * Support for PostGIS 3.1 is removed.
 
+* Support for GEOS 3.8 is removed.
+
 :mod:`django.contrib.postgres`
 ------------------------------
 
