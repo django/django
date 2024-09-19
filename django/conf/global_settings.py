@@ -43,8 +43,10 @@ TIME_ZONE = "America/Chicago"
 # If you set this to True, Django will use timezone-aware datetimes.
 USE_TZ = True
 
-# Language code for this installation. All choices can be found here:
-# http://www.i18nguy.com/unicode/language-identifiers.html
+# Language code for this installation. Valid choices can be found here:
+# https://www.iana.org/assignments/language-subtag-registry/
+# If LANGUAGE_CODE is not listed in LANGUAGES (below), the project must
+# provide the necessary translations and locale definitions.
 LANGUAGE_CODE = "en-us"
 
 # Languages we provide translations for, out of the box.
