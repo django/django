@@ -21,7 +21,10 @@ from django.db.models.query_utils import PathInfo
 from django.db.models.sql import AND
 from django.db.models.sql.where import WhereNode
 from django.db.models.utils import AltersData
-from django.utils.deprecation import RemovedInDjango60Warning
+from django.utils.deprecation import (
+    RemovedInDjango60Warning,
+    adjust_stacklevel_for_warning,
+)
 from django.utils.functional import cached_property
 
 
@@ -164,7 +167,7 @@ class GenericForeignKey(FieldCacheMixin, Field):
             "get_prefetch_queryset() is deprecated. Use get_prefetch_querysets() "
             "instead.",
             RemovedInDjango60Warning,
-            stacklevel=2,
+            **adjust_stacklevel_for_warning(__file__),
         )
         if queryset is None:
             return self.get_prefetch_querysets(instances)
@@ -631,7 +634,7 @@ def create_generic_related_manager(superclass, rel):
                 "get_prefetch_queryset() is deprecated. Use get_prefetch_querysets() "
                 "instead.",
                 RemovedInDjango60Warning,
-                stacklevel=2,
+                **adjust_stacklevel_for_warning(__file__),
             )
             if queryset is None:
                 return self.get_prefetch_querysets(instances)

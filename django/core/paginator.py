@@ -3,6 +3,7 @@ import inspect
 import warnings
 from math import ceil
 
+from django.utils.deprecation import adjust_stacklevel_for_warning
 from django.utils.functional import cached_property
 from django.utils.inspect import method_has_no_args
 from django.utils.translation import gettext_lazy as _
@@ -143,7 +144,7 @@ class Paginator:
                 "Pagination may yield inconsistent results with an unordered "
                 "object_list: {}.".format(obj_list_repr),
                 UnorderedObjectListWarning,
-                stacklevel=3,
+                **adjust_stacklevel_for_warning(__file__),
             )
 
     def get_elided_page_range(self, number=1, *, on_each_side=3, on_ends=2):

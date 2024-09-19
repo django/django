@@ -48,7 +48,10 @@ from django.db.models.signals import (
     pre_save,
 )
 from django.db.models.utils import AltersData, make_model_tuple
-from django.utils.deprecation import RemovedInDjango60Warning
+from django.utils.deprecation import (
+    RemovedInDjango60Warning,
+    adjust_stacklevel_for_warning,
+)
 from django.utils.encoding import force_str
 from django.utils.hashable import make_hashable
 from django.utils.text import capfirst, get_text_list
@@ -637,13 +640,13 @@ class Model(AltersData, metaclass=ModelBase):
                     "match the current version %s."
                     % (pickled_version, django.__version__),
                     RuntimeWarning,
-                    stacklevel=2,
+                    **adjust_stacklevel_for_warning(__file__),
                 )
         else:
             warnings.warn(
                 "Pickled model instance's Django version is not specified.",
                 RuntimeWarning,
-                stacklevel=2,
+                **adjust_stacklevel_for_warning(__file__),
             )
         if "_memoryview_attrs" in state:
             for attr, value in state.pop("_memoryview_attrs"):
@@ -791,7 +794,7 @@ class Model(AltersData, metaclass=ModelBase):
         warnings.warn(
             f"Passing positional arguments to {method_name}() is deprecated",
             RemovedInDjango60Warning,
-            stacklevel=3,
+            **adjust_stacklevel_for_warning(__file__),
         )
         total_len_args = len(args) + 1  # include self
         max_len_args = len(defaults) + 1

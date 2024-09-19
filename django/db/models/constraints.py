@@ -12,7 +12,10 @@ from django.db.models.lookups import Exact, IsNull
 from django.db.models.query_utils import Q
 from django.db.models.sql.query import Query
 from django.db.utils import DEFAULT_DB_ALIAS
-from django.utils.deprecation import RemovedInDjango60Warning
+from django.utils.deprecation import (
+    RemovedInDjango60Warning,
+    adjust_stacklevel_for_warning,
+)
 from django.utils.translation import gettext_lazy as _
 
 __all__ = ["BaseConstraint", "CheckConstraint", "Deferrable", "UniqueConstraint"]
@@ -49,7 +52,7 @@ class BaseConstraint:
                 f"Passing positional arguments to {self.__class__.__name__} is "
                 f"deprecated.",
                 RemovedInDjango60Warning,
-                stacklevel=2,
+                **adjust_stacklevel_for_warning(__file__),
             )
             for arg, attr in zip(args, ["name", "violation_error_message"]):
                 if arg:
@@ -164,7 +167,7 @@ class CheckConstraint(BaseConstraint):
             warnings.warn(
                 "CheckConstraint.check is deprecated in favor of `.condition`.",
                 RemovedInDjango60Warning,
-                stacklevel=2,
+                **adjust_stacklevel_for_warning(__file__),
             )
             condition = check
         self.condition = condition
@@ -182,7 +185,7 @@ class CheckConstraint(BaseConstraint):
         warnings.warn(
             "CheckConstraint.check is deprecated in favor of `.condition`.",
             RemovedInDjango60Warning,
-            stacklevel=2,
+            **adjust_stacklevel_for_warning(__file__),
         )
         return self.condition
 
@@ -190,7 +193,7 @@ class CheckConstraint(BaseConstraint):
         warnings.warn(
             "CheckConstraint.check is deprecated in favor of `.condition`.",
             RemovedInDjango60Warning,
-            stacklevel=2,
+            **adjust_stacklevel_for_warning(__file__),
         )
         self.condition = value
 

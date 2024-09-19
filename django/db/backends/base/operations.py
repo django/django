@@ -11,7 +11,10 @@ from django.db import NotSupportedError, transaction
 from django.db.backends import utils
 from django.db.models.expressions import Col
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango60Warning
+from django.utils.deprecation import (
+    RemovedInDjango60Warning,
+    adjust_stacklevel_for_warning,
+)
 from django.utils.encoding import force_str
 
 
@@ -228,7 +231,7 @@ class BaseDatabaseOperations:
                 "DatabaseOperations.lookup_cast() instead."
             ),
             RemovedInDjango60Warning,
-            stacklevel=2,
+            **adjust_stacklevel_for_warning(__file__),
         )
         return "%s"
 

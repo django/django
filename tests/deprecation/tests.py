@@ -1,5 +1,9 @@
+import importlib.util
+import os
 import warnings
+from pathlib import Path
 
+import django
 from django.test import SimpleTestCase
 from django.utils.deprecation import RemovedAfterNextVersionWarning, RenameMethodsBase
 
@@ -178,3 +182,37 @@ class RenameMethodsTests(SimpleTestCase):
         self.assertTrue(
             issubclass(RemovedAfterNextVersionWarning, PendingDeprecationWarning)
         )
+
+
+class AdjustStacklevelForWarningTests(SimpleTestCase):
+    def test_warning_in_django_code(self):
+        self.django_path = Path(os.path.dirname(django.__file__))
+        self.temp_file_path = self.django_path / "temp_adjust_stacklevel_for_warning.py"
+
+        file_content = """
+import warnings
+from django.utils.deprecation import adjust_stacklevel_for_warning
+
+def django_function():
+    warnings.warn(
+        "This is a test warning from Django code.",
+        DeprecationWarning,
+        **adjust_stacklevel_for_warning(__file__),
+    )
+        """
+        self.temp_file_path.write_text(file_content)
+
+        module_name = "temp_adjust_stacklevel_for_warning"
+        spec = importlib.util.spec_from_file_location(
+            module_name, str(self.temp_file_path)
+        )
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+
+        msg = "This is a test warning from Django code."
+        with self.assertWarnsMessage(DeprecationWarning, msg) as ctx:
+            module.django_function()
+
+        self.assertEqual(ctx.filename, __file__)
+
+        self.temp_file_path.unlink()

@@ -9,7 +9,10 @@ from django.core.checks import Error, Warning
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.storage import FileSystemStorage, Storage, default_storage
 from django.utils._os import safe_join
-from django.utils.deprecation import RemovedInDjango61Warning
+from django.utils.deprecation import (
+    RemovedInDjango61Warning,
+    adjust_stacklevel_for_warning,
+)
 from django.utils.functional import LazyObject, empty
 from django.utils.module_loading import import_string
 
@@ -18,7 +21,7 @@ searched_locations = []
 
 
 # RemovedInDjango61Warning: When the deprecation ends, remove completely.
-def _check_deprecated_find_param(class_name="", find_all=False, stacklevel=3, **kwargs):
+def _check_deprecated_find_param(class_name="", find_all=False, **kwargs):
     method_name = "find" if not class_name else f"{class_name}.find"
     if "all" in kwargs:
         legacy_all = kwargs.pop("all")
@@ -26,7 +29,9 @@ def _check_deprecated_find_param(class_name="", find_all=False, stacklevel=3, **
             "Passing the `all` argument to find() is deprecated. Use `find_all` "
             "instead."
         )
-        warnings.warn(msg, RemovedInDjango61Warning, stacklevel=stacklevel)
+        warnings.warn(
+            msg, RemovedInDjango61Warning, **adjust_stacklevel_for_warning(__file__)
+        )
 
         # If both `find_all` and `all` were given, raise TypeError.
         if find_all is not False:
@@ -57,7 +62,7 @@ class BaseFinder:
     # RemovedInDjango61Warning: When the deprecation ends, remove completely.
     def _check_deprecated_find_param(self, **kwargs):
         return _check_deprecated_find_param(
-            class_name=self.__class__.__qualname__, stacklevel=4, **kwargs
+            class_name=self.__class__.__qualname__, **kwargs
         )
 
     # RemovedInDjango61Warning: When the deprecation ends, replace with:

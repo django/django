@@ -9,7 +9,10 @@ from django.core.files.move import file_move_safe
 from django.core.signals import setting_changed
 from django.utils._os import safe_join
 from django.utils.deconstruct import deconstructible
-from django.utils.deprecation import RemovedInDjango60Warning
+from django.utils.deprecation import (
+    RemovedInDjango60Warning,
+    adjust_stacklevel_for_warning,
+)
 from django.utils.encoding import filepath_to_uri
 from django.utils.functional import cached_property
 
@@ -48,7 +51,7 @@ class FileSystemStorage(Storage, StorageSettingsMixin):
                 "Overriding OS_OPEN_FLAGS is deprecated. Use "
                 "the allow_overwrite parameter instead.",
                 RemovedInDjango60Warning,
-                stacklevel=2,
+                **adjust_stacklevel_for_warning(__file__),
             )
 
     @cached_property
