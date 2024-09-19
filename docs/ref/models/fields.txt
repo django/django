@@ -261,7 +261,7 @@ choices in a concise way::
 
         year_in_school = models.CharField(
             max_length=2,
-            choices=YearInSchool,
+            choices=YearInSchool.choices,
             default=YearInSchool.FRESHMAN,
         )
 
