@@ -2,6 +2,7 @@
 import json
 import os
 import re
+import unittest
 from io import StringIO
 from pathlib import Path
 
@@ -55,6 +56,13 @@ from .models import (
     Widget,
 )
 
+try:
+    import yaml  # NOQA
+
+    HAS_YAML = True
+except ImportError:
+    HAS_YAML = False
+
 _cur_dir = os.path.dirname(os.path.abspath(__file__))
 
 
@@ -96,11 +104,13 @@ class TestFixtures(TestCase):
         the serialized data for fields that have been removed
         from the database when not ignored.
         """
-        for fixture_file in (
+        test_fixtures = [
             "sequence_extra",
             "sequence_extra_jsonl",
-            "sequence_extra_yaml",
-        ):
+        ]
+        if HAS_YAML:
+            test_fixtures.append("sequence_extra_yaml")
+        for fixture_file in test_fixtures:
             with (
                 self.subTest(fixture_file=fixture_file),
                 self.assertRaises(DeserializationError),
@@ -147,6 +157,7 @@ class TestFixtures(TestCase):
         )
         self.assertEqual(Animal.specimens.all()[0].name, "Eagle")
 
+    @unittest.skipUnless(HAS_YAML, "No yaml library detected")
     def test_loaddata_not_found_fields_ignore_yaml(self):
         management.call_command(
             "loaddata",

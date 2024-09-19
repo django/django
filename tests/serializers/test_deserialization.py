@@ -1,13 +1,20 @@
 import json
+import unittest
 
 from django.core.serializers.base import DeserializationError, DeserializedObject
 from django.core.serializers.json import Deserializer as JsonDeserializer
 from django.core.serializers.jsonl import Deserializer as JsonlDeserializer
 from django.core.serializers.python import Deserializer
-from django.core.serializers.pyyaml import Deserializer as YamlDeserializer
 from django.test import SimpleTestCase
 
 from .models import Author
+
+try:
+    import yaml  # NOQA
+
+    HAS_YAML = True
+except ImportError:
+    HAS_YAML = False
 
 
 class TestDeserializer(SimpleTestCase):
@@ -94,7 +101,10 @@ class TestDeserializer(SimpleTestCase):
         self.assertEqual(first_item.object, self.jane)
         self.assertEqual(second_item.object, self.joe)
 
+    @unittest.skipUnless(HAS_YAML, "No yaml library detected")
     def test_yaml_bytes_input(self):
+        from django.core.serializers.pyyaml import Deserializer as YamlDeserializer
+
         test_string = """- pk: 1
   model: serializers.author
   fields:
