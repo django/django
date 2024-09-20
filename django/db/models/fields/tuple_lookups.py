@@ -57,18 +57,25 @@ class TupleExact(TupleLookupMixin, Exact):
         return root.as_sql(compiler, connection)
 
 
-class TupleIsNull(IsNull):
+class TupleIsNull(TupleLookupMixin, IsNull):
+    def get_prep_lookup(self):
+        rhs = self.rhs
+        if isinstance(rhs, (tuple, list)) and len(rhs) == 1:
+            rhs = rhs[0]
+        if isinstance(rhs, bool):
+            return rhs
+        raise ValueError(
+            "The QuerySet value for an isnull lookup must be True or False."
+        )
+
     def as_sql(self, compiler, connection):
         # e.g.: (a, b, c) is None as SQL:
-        # WHERE a IS NULL AND b IS NULL AND c IS NULL
-        vals = self.rhs
-        if isinstance(vals, bool):
-            vals = [vals] * len(self.lhs)
-
-        cols = self.lhs.get_cols()
-        lookups = [IsNull(col, val) for col, val in zip(cols, vals)]
-        root = WhereNode(lookups, connector=AND)
-
+        # WHERE a IS NULL OR b IS NULL OR c IS NULL
+        # e.g.: (a, b, c) is not None as SQL:
+        # WHERE a IS NOT NULL AND b IS NOT NULL AND c IS NOT NULL
+        rhs = self.rhs
+        lookups = [IsNull(col, rhs) for col in self.lhs]
+        root = WhereNode(lookups, connector=OR if rhs else AND)
         return root.as_sql(compiler, connection)
 
 
