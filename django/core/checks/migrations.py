@@ -26,12 +26,12 @@ def migrate_and_migrations_share_same_autodetector(app_configs, **kwargs):
     if make_migrations_autodetector is not migrate_autodetector:
         errors.append(
             Error(
-                "Migrate and makemigrations don't share the same autodetector class."
+                "Migrate and makemigrations don't share the same autodetector class. "
                 "Currently, this behavior is not supported.",
                 hint=(
                     "makemigrations.Command.autodetector_class is {}, but "
                     "migrate.Command.autodetector_class is {}."
-                ).format(make_migrations_autodetector, migrate_autodetector),
+                ).format(make_migrations_autodetector.__name__, migrate_autodetector.__name__),
                 id="migrations.E001",
             )
         )
