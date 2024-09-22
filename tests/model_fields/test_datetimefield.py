@@ -4,8 +4,9 @@ from django.db import models
 from django.test import SimpleTestCase, TestCase, override_settings, skipUnlessDBFeature
 from django.test.utils import requires_tz_support
 from django.utils import timezone
+from unittest import mock
 
-from .models import DateTimeModel
+from .models import DateTimeModel, AutoNowDateModel
 
 
 class DateTimeFieldTests(TestCase):
@@ -79,3 +80,20 @@ class ValidationTest(SimpleTestCase):
     def test_datefield_cleans_date(self):
         f = models.DateField()
         self.assertEqual(datetime.date(2008, 10, 10), f.clean("2008-10-10", None))
+
+
+class DateFieldAutoNowTests(TestCase):
+    def test_auto_now_respects_timezone(self):
+        current_time = timezone.now()
+        obj = AutoNowDateModel.objects.create()
+        obj.refresh_from_db()
+        self.assertEqual(obj.d, current_time.date())
+
+    @mock.patch('django.utils.timezone.now')
+    def test_auto_now_near_midnight(self, mock_timezone_now):
+        mock_time = timezone.make_aware(datetime.datetime(2024, 9, 22, 23, 59, 59))
+        mock_timezone_now.return_value = mock_time
+        
+        obj = AutoNowDateModel.objects.create()
+        obj.refresh_from_db()
+        self.assertEqual(obj.d, mock_time.date())

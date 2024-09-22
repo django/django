@@ -172,6 +172,10 @@ class DateTimeModel(models.Model):
     t = models.TimeField()
 
 
+class AutoNowDateModel(models.Model):
+    d = models.DateField(auto_now=True)
+
+
 class DurationModel(models.Model):
     field = models.DurationField()
 

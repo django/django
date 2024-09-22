@@ -1502,7 +1502,7 @@ class DateField(DateTimeCheckMixin, Field):
 
     def pre_save(self, model_instance, add):
         if self.auto_now or (self.auto_now_add and add):
-            value = datetime.date.today()
+            value = timezone.now().date()
             setattr(model_instance, self.attname, value)
             return value
         else:
