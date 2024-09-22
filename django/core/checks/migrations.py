@@ -31,7 +31,9 @@ def migrate_and_migrations_share_same_autodetector(app_configs, **kwargs):
                 hint=(
                     "makemigrations.Command.autodetector_class is {}, but "
                     "migrate.Command.autodetector_class is {}."
-                ).format(make_migrations_autodetector.__name__, migrate_autodetector.__name__),
+                ).format(
+                    make_migrations_autodetector.__name__, migrate_autodetector.__name__
+                ),
                 id="migrations.E001",
             )
         )
