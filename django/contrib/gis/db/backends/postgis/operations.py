@@ -176,6 +176,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
             "BoundingCircle": "ST_MinimumBoundingCircle",
             "FromWKB": "ST_GeomFromWKB",
             "FromWKT": "ST_GeomFromText",
+            "NumDimensions": "ST_NDims",
             "NumPoints": "ST_NPoints",
             "GeometryType": "GeometryType",
         }
