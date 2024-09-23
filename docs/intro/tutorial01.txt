@@ -52,7 +52,7 @@ code, then run the following command:
 
 .. console::
 
-   $ django-admin startproject mysite
+   $ django-admin startproject mysite djangotutorial
 
 This will create a ``mysite`` directory in your current directory. If it didn't
 work, see :ref:`troubleshooting-django-admin`.
