@@ -118,6 +118,10 @@ Minor features
   :class:`IsEmpty() <django.contrib.gis.db.models.functions.IsEmpty>`
   database function are now supported on SpatiaLite.
 
+* :class:`~django.contrib.gis.db.models.functions.NumDimensions` was added for
+  PostGIS and SpatiaLite backends which returns the number of dimensions used
+  by a geometry.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
