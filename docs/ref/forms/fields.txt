@@ -406,7 +406,7 @@ template, see also :ref:`overriding-built-in-field-templates`.
 
 Allows a per-field override of :attr:`~django.forms.Form.bound_field_class`
 
-.. versionchanged:: 5.1
+.. versionchanged:: 5.2
 
 Checking if the field data has changed
 ======================================

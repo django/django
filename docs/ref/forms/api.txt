@@ -936,9 +936,11 @@ adding and deleting forms from a formset.
 
 .. attribute:: Form.bound_field_class
 
-Allows you set a different :class:`~django.forms.BoundField` class to use for the form. This
-allows to override, for instance, :meth:`~django.forms.BoundField.label_tag`/
-:meth:`~django.forms.BoundField.legend_tag` to use in templates.
+Allows you set a different :class:`~django.forms.BoundField` class to use for
+the form. As an example, this allows overriding
+:meth:`~django.forms.BoundField.label_tag` or
+:meth:`~django.forms.BoundField.legend_tag` which are used by the default form
+rendering in templates
 
 .. code-block:: pycon
 
@@ -955,7 +957,7 @@ allows to override, for instance, :meth:`~django.forms.BoundField.label_tag`/
    >>> print(f["username"].label_tag)
    <label for="id_name" class="custom-class">Name:</label>
 
-.. versionchanged:: 5.1
+.. versionchanged:: 5.2
 
 Configuring the rendering of a form's widgets
 ---------------------------------------------
@@ -1131,6 +1133,10 @@ they're not the only way a form object can be displayed.
 
    Used to display HTML or access attributes for a single field of a
    :class:`Form` instance.
+
+   You can use :attr:`~django.forms.Form.bound_field_class` and
+   :attr:`~django.forms.Field.bound_field_class` to use a different
+   ``BoundField`` class per-form or per-field.
 
    The ``__str__()`` method of this object displays the HTML for this field.
 
@@ -1471,7 +1477,10 @@ If you need to access some additional information about a form field in a
 template and using a subclass of :class:`~django.forms.Field` isn't
 sufficient, consider also customizing :class:`~django.forms.BoundField`.
 
-A custom form field can override ``get_bound_field()``:
+A custom form can override :attr:`~django.forms.Form.bound_field_class` and
+a custom form field can take an optional
+:attr:`~django.forms.Field.bound_field_class` constructor argument.
+Additionally, it can override ``get_bound_field()``:
 
 .. method:: Field.get_bound_field(form, field_name)
 
