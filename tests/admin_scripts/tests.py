@@ -877,7 +877,7 @@ class ManageNoSettings(AdminScriptTestCase):
         args = ["runserver", "--settings=bad_settings", "--nostatic"]
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, 'Settings module bad_settings could not be imported')
+        self.assertOutput(err, "Settings module bad_settings could not be imported")
 
     def test_builtin_with_bad_environment(self):
         """
