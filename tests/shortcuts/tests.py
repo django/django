@@ -1,3 +1,5 @@
+from django.http.response import HttpResponseRedirectBase
+from django.shortcuts import redirect
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import require_jinja2
 
@@ -35,3 +37,22 @@ class RenderTests(SimpleTestCase):
         self.assertEqual(response.content, b"DTL\n")
         response = self.client.get("/render/using/?using=jinja2")
         self.assertEqual(response.content, b"Jinja2\n")
+
+
+class RedirectTests(SimpleTestCase):
+    def test_redirect_response_status_code(self):
+        tests = [
+            (True, False, 301),
+            (False, False, 302),
+            (False, True, 307),
+            (True, True, 308),
+        ]
+        for permanent, preserve_request, expected_status_code in tests:
+            with self.subTest(permanent=permanent, preserve_request=preserve_request):
+                response = redirect(
+                    "/path/is/irrelevant/",
+                    permanent=permanent,
+                    preserve_request=preserve_request,
+                )
+                self.assertIsInstance(response, HttpResponseRedirectBase)
+                self.assertEqual(response.status_code, expected_status_code)
