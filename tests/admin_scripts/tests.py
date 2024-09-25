@@ -1223,7 +1223,9 @@ class ManageAlternateSettings(AdminScriptTestCase):
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
         self.assertOutput(
-            err, r"No module named '?(test_project\.)?settings'?", regex=True
+            err,
+            r"Settings module '?(test_project\.)?settings'? could not be imported",
+            regex=True,
         )
 
     def test_custom_command_with_settings(self):
@@ -1423,7 +1425,7 @@ class ManageSettingsWithSettingsErrors(AdminScriptTestCase):
         args = ["help"]
         out, err = self.run_manage(args)
         self.assertOutput(out, "only Django core commands are listed")
-        self.assertOutput(err, "Improper configuration")
+        self.assertNoOutput(err)
 
 
 class ManageCheck(AdminScriptTestCase):
