@@ -255,11 +255,15 @@ class ManagementUtility:
             app_name = commands[subcommand]
         except KeyError:
             if os.environ.get("DJANGO_SETTINGS_MODULE"):
-                # If `subcommand` is missing due to misconfigured settings, the
-                # following line will retrigger an ImproperlyConfigured exception
-                # (get_commands() swallows the original one) so the user is
-                # informed about it.
-                settings.INSTALLED_APPS
+                if self.settings_exception:
+                    sys.stderr.write(str(self.settings_exception) + "\n")
+                    sys.exit(1)
+                else:
+                    # If `subcommand` is missing due to misconfigured settings, the
+                    # following line will retrigger an ImproperlyConfigured exception
+                    # (get_commands() swallows the original one) so the user is
+                    # informed about it.
+                    settings.INSTALLED_APPS
             elif not settings.configured:
                 sys.stderr.write("No Django settings specified.\n")
             possible_matches = get_close_matches(subcommand, commands)
@@ -273,6 +277,8 @@ class ManagementUtility:
             klass = app_name
         else:
             klass = load_command_class(app_name, subcommand)
+        if self.settings_exception and klass.requires_settings:
+            sys.stderr.write(str(self.settings_exception) + "\n")
         return klass
 
     def autocomplete(self):
@@ -382,9 +388,6 @@ class ManagementUtility:
             settings.INSTALLED_APPS
         except ImproperlyConfigured as exc:
             self.settings_exception = exc
-            # The following commands can be run without a valid settings file configured
-            if subcommand not in {"startproject", "startapp", "makemessages"}:
-                sys.stderr.write(str(exc) + "\n")
 
         if settings.configured:
             # Start the auto-reloading dev server even if the code is broken.
