@@ -156,9 +156,7 @@ class SettingsTests(SimpleTestCase):
     def setUp(self):
         self.testvalue = None
         signals.setting_changed.connect(self.signal_callback)
-
-    def tearDown(self):
-        signals.setting_changed.disconnect(self.signal_callback)
+        self.addCleanup(signals.setting_changed.disconnect, self.signal_callback)
 
     def signal_callback(self, sender, setting, value, **kwargs):
         if setting == "TEST":

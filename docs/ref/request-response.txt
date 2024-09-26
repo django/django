@@ -289,8 +289,6 @@ Methods
 
 .. method:: HttpRequest.auser()
 
-    .. versionadded:: 5.0
-
     From the :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`:
     Coroutine. Returns an instance of :setting:`AUTH_USER_MODEL` representing
     the currently logged-in user. If the user isn't currently logged in,
@@ -427,10 +425,48 @@ Methods
     Returns ``True`` if the request is secure; that is, if it was made with
     HTTPS.
 
+.. method:: HttpRequest.get_preferred_type(media_types)
+
+    .. versionadded:: 5.2
+
+    Returns the preferred mime type from ``media_types``, based on the
+    ``Accept`` header, or ``None`` if the client does not accept any of the
+    provided types.
+
+    Assuming the client sends an ``Accept`` header of
+    ``text/html,application/json;q=0.8``:
+
+    .. code-block:: pycon
+
+        >>> request.get_preferred_type(["text/html", "application/json"])
+        "text/html"
+        >>> request.get_preferred_type(["application/json", "text/plain"])
+        "application/json"
+        >>> request.get_preferred_type(["application/xml", "text/plain"])
+        None
+
+    Most browsers send ``Accept: */*`` by default, meaning they don't have a
+    preference, in which case the first item in ``media_types`` would be
+    returned.
+
+    Setting an explicit ``Accept`` header in API requests can be useful for
+    returning a different content type for those consumers only. See
+    :ref:`content-negotiation-example` for an example of returning
+    different content based on the ``Accept`` header.
+
+    .. note::
+
+        If a response varies depending on the content of the ``Accept`` header
+        and you are using some form of caching like Django's
+        :mod:`cache middleware <django.middleware.cache>`, you should decorate
+        the view with :func:`vary_on_headers('Accept')
+        <django.views.decorators.vary.vary_on_headers>` so that the responses
+        are properly cached.
+
 .. method:: HttpRequest.accepts(mime_type)
 
-    Returns ``True`` if the request ``Accept`` header matches the ``mime_type``
-    argument:
+    Returns ``True`` if the request's ``Accept`` header matches the
+    ``mime_type`` argument:
 
     .. code-block:: pycon
 
@@ -438,17 +474,10 @@ Methods
         True
 
     Most browsers send ``Accept: */*`` by default, so this would return
-    ``True`` for all content types. Setting an explicit ``Accept`` header in
-    API requests can be useful for returning a different content type for those
-    consumers only. See :ref:`content-negotiation-example` of using
-    ``accepts()`` to return different content to API consumers.
+    ``True`` for all content types.
 
-    If a response varies depending on the content of the ``Accept`` header and
-    you are using some form of caching like Django's :mod:`cache middleware
-    <django.middleware.cache>`, you should decorate the view with
-    :func:`vary_on_headers('Accept')
-    <django.views.decorators.vary.vary_on_headers>` so that the responses are
-    properly cached.
+    See :ref:`content-negotiation-example` for an example of using
+    ``accepts()`` to return different content based on the ``Accept`` header.
 
 .. method:: HttpRequest.read(size=None)
 .. method:: HttpRequest.readline()
@@ -948,7 +977,7 @@ Methods
       sent with all same-site and cross-site requests.
 
     .. _HttpOnly: https://owasp.org/www-community/HttpOnly
-    .. _SameSite: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite
+    .. _SameSite: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie#samesitesamesite-value
 
     .. warning::
 
@@ -1090,12 +1119,11 @@ Custom response classes
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 If you find yourself needing a response class that Django doesn't provide, you
-can create it with the help of :py:class:`http.HTTPStatus`. For example:
-
-.. code-block:: pycon
+can create it with the help of :py:class:`http.HTTPStatus`. For example::
 
     from http import HTTPStatus
     from django.http import HttpResponse
+
 
     class HttpResponseNoContent(HttpResponse):
         status_code = HTTPStatus.NO_CONTENT
@@ -1290,8 +1318,6 @@ Attributes
 
 Handling disconnects
 --------------------
-
-.. versionadded:: 5.0
 
 If the client disconnects during a streaming response, Django will cancel the
 coroutine that is handling the response. If you want to clean up resources

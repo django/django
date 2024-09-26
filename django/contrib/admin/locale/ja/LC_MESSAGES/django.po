@@ -9,18 +9,19 @@
 # Masaya, 2023
 # Shinichi Katsumata <shinichi.katsumata@gmail.com>, 2019
 # Shinya Okano <tokibito@gmail.com>, 2012-2018,2021,2023
-# Taichi Taniguchi, 2022
+# TANIGUCHI Taichi, 2022
 # Takuro Onoue <kusanaginoturugi@gmail.com>, 2020
 # Takuya N <takninnovationresearch@gmail.com>, 2020
 # Tetsuya Morimoto <tetsuya.morimoto@gmail.com>, 2011
 # 上田慶祐 <kei.mokusyun@gmail.com>, 2015
+# 余田大輝, 2024
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 07:05+0000\n"
-"Last-Translator: Shinya Okano <tokibito@gmail.com>, 2012-2018,2021,2023\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 07:05+0000\n"
+"Last-Translator: 余田大輝, 2024\n"
 "Language-Team: Japanese (http://app.transifex.com/django/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
@@ -211,10 +212,6 @@ msgid ""
 msgstr "{name} “{obj}” を変更しました。以下から再度編集できます。"
 
 #, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr "{name} “{obj}” を追加しました。続けて編集できます。"
-
-#, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
@@ -376,6 +373,9 @@ msgstr "ユーザー名とパスワードを入力してください。"
 msgid "Change password"
 msgstr "パスワードの変更"
 
+msgid "Set password"
+msgstr "パスワードを設定"
+
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "下記のエラーを修正してください。"
@@ -384,6 +384,18 @@ msgstr[0] "下記のエラーを修正してください。"
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr ""
 "<strong>%(username)s</strong>さんの新しいパスワードを入力してください。"
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+"このアクションは、このユーザーに対するパスワードによる認証を有効にします。"
+
+msgid "Disable password-based authentication"
+msgstr "パスワードによる認証の無効化"
+
+msgid "Enable password-based authentication"
+msgstr "パスワードによる認証の有効化"
 
 msgid "Skip to main content"
 msgstr "スキップしてメインコンテンツへ"

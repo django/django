@@ -740,14 +740,14 @@ primary key of the related object is valid. If the primary key is
 stored on a separate database, it's not possible to easily evaluate
 the validity of a primary key.
 
-If you're using Postgres, Oracle, or MySQL with InnoDB, this is
+If you're using Postgres, SQLite, Oracle, or MySQL with InnoDB, this is
 enforced at the database integrity level -- database level key
 constraints prevent the creation of relations that can't be validated.
 
-However, if you're using SQLite or MySQL with MyISAM tables, there is
-no enforced referential integrity; as a result, you may be able to
-'fake' cross database foreign keys. However, this configuration is not
-officially supported by Django.
+However, if you're using MySQL with MyISAM tables, there is no enforced
+referential integrity; as a result, you may be able to 'fake' cross database
+foreign keys. However, this configuration is not officially supported by
+Django.
 
 .. _contrib_app_multiple_databases:
 

@@ -1,10 +1,32 @@
+import pickle
 from functools import wraps
 
 from django.db import IntegrityError, connections, transaction
 from django.test import TestCase, skipUnlessDBFeature
-from django.test.testcases import DatabaseOperationForbidden, TestData
+from django.test.testcases import (
+    DatabaseOperationForbidden,
+    SimpleTestCase,
+    TestData,
+    is_pickable,
+)
 
 from .models import Car, Person, PossessedCar
+
+
+class UnpicklableObject:
+    def __getstate__(self):
+        raise pickle.PickleError("cannot be pickled for testing reasons")
+
+
+class TestSimpleTestCase(SimpleTestCase):
+    def test_is_picklable_with_non_picklable_properties(self):
+        """ParallelTestSuite requires that all TestCases are picklable."""
+        self.non_picklable = lambda: 0
+        self.assertEqual(self, pickle.loads(pickle.dumps(self)))
+
+    def test_is_picklable_with_non_picklable_object(self):
+        unpicklable_obj = UnpicklableObject()
+        self.assertEqual(is_pickable(unpicklable_obj), False)
 
 
 class TestTestCase(TestCase):
@@ -43,14 +65,12 @@ class TestTestCase(TestCase):
 
     @skipUnlessDBFeature("supports_transactions")
     def test_reset_sequences(self):
-        old_reset_sequences = self.reset_sequences
-        self.reset_sequences = True
+        old_reset_sequences = self.__class__.reset_sequences
+        self.__class__.reset_sequences = True
+        self.addCleanup(setattr, self.__class__, "reset_sequences", old_reset_sequences)
         msg = "reset_sequences cannot be used on TestCase instances"
-        try:
-            with self.assertRaisesMessage(TypeError, msg):
-                self._fixture_setup()
-        finally:
-            self.reset_sequences = old_reset_sequences
+        with self.assertRaisesMessage(TypeError, msg):
+            self._fixture_setup()
 
 
 def assert_no_queries(test):

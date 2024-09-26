@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Swara <swara09@gmail.com>, 2022
+# Swara <swara09@gmail.com>, 2022,2024
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-17 03:19-0500\n"
-"PO-Revision-Date: 2023-04-25 08:09+0000\n"
-"Last-Translator: Swara <swara09@gmail.com>, 2022\n"
-"Language-Team: Central Kurdish (http://www.transifex.com/django/django/"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 08:09+0000\n"
+"Last-Translator: Swara <swara09@gmail.com>, 2022,2024\n"
+"Language-Team: Central Kurdish (http://app.transifex.com/django/django/"
 "language/ckb/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -30,12 +30,22 @@ msgstr "بەروارە گرنگەکان"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(name)s ئۆبجێکت لەگەڵ کلیلی سەرەکیی %(key)r بوونی نیە."
 
+msgid "Conflicting form data submitted. Please try again."
+msgstr "داتای ناکۆکی فۆڕم نێردراوە. تکایە دووبارە هەوڵ بدەوە."
+
 msgid "Password changed successfully."
 msgstr "تێپەڕەوشە بەسەرکەوتوویی گۆڕدرا."
+
+msgid "Password-based authentication was disabled."
+msgstr "ڕەسەنایەتی لەسەر بنەمای تێپەڕەوشە ناچالاککراوە."
 
 #, python-format
 msgid "Change password: %s"
 msgstr "گۆڕینی تێپەڕەوشەی: %s"
+
+#, python-format
+msgid "Set password: %s"
+msgstr "دانانی تێپەڕەوشە: %s"
 
 msgid "Authentication and Authorization"
 msgstr "ڕەسەنایەتی و ڕێگەپێدان"
@@ -52,8 +62,23 @@ msgstr "تێپەڕەوشە جێگیرنەکراوە."
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "شێوازی تێپەڕەوشە نادروستە یان ئەلگۆریتمێکی هاشکراوی نەناسراوە."
 
+msgid "Reset password"
+msgstr "دانانەوەی تێپەڕەوشە"
+
+msgid "Set password"
+msgstr "دانانی تێپەڕەوشە"
+
 msgid "The two password fields didn’t match."
 msgstr "هەردوو خانەی تێپەڕەوشە وەک یەک نین."
+
+msgid ""
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
+msgstr ""
+"ئایا بەکارهێنەر دەتوانێت بە بەکارهێنانی تێپەڕەوشە خۆی بناسێنێت یان نا. ئەگەر "
+"ناچالاک کرابێت، لەوانەیە هێشتا بتوانێت خۆی بناسێنێت بە بەکارهێنانی سیستەمی "
+"تر لە پشتەوە، وەک چوونەژوورەوەی یەکجار Single Sign-On یان LDAP."
 
 msgid "Password"
 msgstr "تێپەڕەوشە"
@@ -64,13 +89,26 @@ msgstr "دووپاتکردنەوەی تێپەڕەوشە"
 msgid "Enter the same password as before, for verification."
 msgstr "بۆ پشتڕاستکردنەوە هەمان تێپەڕەوشەی پێشوو بنوسە."
 
+msgid "Password-based authentication"
+msgstr "ڕەسەنایەتی لەسەر بنەمای تێپەڕەوشە"
+
+msgid "Enabled"
+msgstr "چالاککراوە"
+
+msgid "Disabled"
+msgstr "ناچالاککراوە"
+
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user’s "
-"password, but you can change the password using <a href=\"{}\">this form</a>."
+"Raw passwords are not stored, so there is no way to see the user’s password."
 msgstr ""
-"تێپەڕەوشەی خاو هەڵناگیرێت, لەبەرئەوە هیچ ڕێگەیەک نییە بۆ بینینی تێپەڕەوشەی "
-"ئەم بەکارهێنەرە, بەڵام دەتوانیت تێپەڕەوشەکە بگۆڕیت بە بەکارهێنانی <a "
-"href=\"{}\">ئەم فۆڕمە</a>."
+"تێپەڕەوشە خاوەکان هەڵناگیرێن، کەواتە هیچ ڕێگایەک نییە بۆ بینینی تێپەڕەوشەی "
+"بەکارهێنەر."
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
+msgstr ""
+"ڕەسەنایەتی لەسەر بنەمای تێپەڕەوشە بۆ ئەم بەکارهێنەر چالاک بکە بەهۆی دانانی "
+"تێپەڕەوشەیەکەوە."
 
 #, python-format
 msgid ""
@@ -97,9 +135,6 @@ msgstr "تێپەڕەوشە کۆنەکەت بە هەڵە نوسراوە. تکای
 
 msgid "Old password"
 msgstr "تێپەڕەوشەی کۆن"
-
-msgid "Password (again)"
-msgstr "تێپەڕەوشە(دووبارە)"
 
 msgid "algorithm"
 msgstr "ئەلگۆریتم"
@@ -271,6 +306,8 @@ msgid ""
 "Enter a valid username. This value may contain only unaccented lowercase a-z "
 "and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
 msgstr ""
+"ناوی بەکارهێنەرێکی دروست بنوسە. ئەم بەهایە لەوانەیە تەنها پیتی بچووکی بێ "
+"زاراوەی تێدابێت a-z و پیتی گەورە A-Z، ژمارەکان، و هێماکانی @/./+/-/_."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "

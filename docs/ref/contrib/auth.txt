@@ -173,10 +173,6 @@ Methods
         the user. (This takes care of the password hashing in making the
         comparison.)
 
-        .. versionchanged:: 5.0
-
-            ``acheck_password()`` method was added.
-
     .. method:: set_unusable_password()
 
         Marks the user as having no password set.  This isn't the same as
@@ -187,6 +183,12 @@ Methods
 
         You may need this if authentication for your application takes place
         against an existing external source such as an LDAP directory.
+
+        .. admonition:: Password reset restriction
+
+            Users having an unusable password will not able to request a
+            password reset email via
+            :class:`~django.contrib.auth.views.PasswordResetView`.
 
     .. method:: has_usable_password()
 
@@ -715,6 +717,3 @@ Utility functions
     backend's ``get_user()`` method, or if the session auth hash doesn't
     validate.
 
-    .. versionchanged:: 5.0
-
-        ``aget_user()`` function was added.

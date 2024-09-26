@@ -32,6 +32,20 @@ class SchoolClass(models.Model):
     objects = SchoolClassManager()
 
 
+class SchoolBusManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().prefetch_related("schoolclasses")
+
+
+class SchoolBus(models.Model):
+    number = models.IntegerField()
+    schoolclasses = models.ManyToManyField("SchoolClass")
+    objects = SchoolBusManager()
+
+    class Meta:
+        base_manager_name = "objects"
+
+
 class VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ(models.Model):
     primary_key_is_quite_long_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz = models.AutoField(
         primary_key=True

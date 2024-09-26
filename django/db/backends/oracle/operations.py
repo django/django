@@ -54,7 +54,7 @@ BEGIN
     SELECT NVL(last_number - cache_size, 0) INTO seq_value FROM user_sequences
            WHERE sequence_name = seq_name;
     WHILE table_value > seq_value LOOP
-        EXECUTE IMMEDIATE 'SELECT "'||seq_name||'".nextval FROM DUAL'
+        EXECUTE IMMEDIATE 'SELECT "'||seq_name||'".nextval%(suffix)s'
         INTO seq_value;
     END LOOP;
 END;
@@ -165,6 +165,9 @@ END;
 
     def datetime_extract_sql(self, lookup_type, sql, params, tzname):
         sql, params = self._convert_sql_to_tz(sql, params, tzname)
+        if lookup_type == "second":
+            # Truncate fractional seconds.
+            return f"FLOOR(EXTRACT(SECOND FROM {sql}))", params
         return self.date_extract_sql(lookup_type, sql, params)
 
     def datetime_trunc_sql(self, lookup_type, sql, params, tzname):
@@ -187,6 +190,12 @@ END;
             # Cast to DATE removes sub-second precision.
             return f"CAST({sql} AS DATE)", params
         return f"TRUNC({sql}, %s)", (*params, trunc_param)
+
+    def time_extract_sql(self, lookup_type, sql, params):
+        if lookup_type == "second":
+            # Truncate fractional seconds.
+            return f"FLOOR(EXTRACT(SECOND FROM {sql}))", params
+        return self.date_extract_sql(lookup_type, sql, params)
 
     def time_trunc_sql(self, lookup_type, sql, params, tzname=None):
         # The implementation is similar to `datetime_trunc_sql` as both
@@ -286,6 +295,8 @@ END;
         columns = []
         for param in returning_params:
             value = param.get_value()
+            # Can be removed when cx_Oracle is no longer supported and
+            # python-oracle 2.1.2 becomes the minimum supported version.
             if value == []:
                 raise DatabaseError(
                     "The database did not return a new row id. Probably "
@@ -338,9 +349,10 @@ END;
     def lookup_cast(self, lookup_type, internal_type=None):
         if lookup_type in ("iexact", "icontains", "istartswith", "iendswith"):
             return "UPPER(%s)"
-        if (
-            lookup_type != "isnull" and internal_type in ("BinaryField", "TextField")
-        ) or (lookup_type == "exact" and internal_type == "JSONField"):
+        if lookup_type != "isnull" and internal_type in (
+            "BinaryField",
+            "TextField",
+        ):
             return "DBMS_LOB.SUBSTR(%s)"
         return "%s"
 
@@ -527,6 +539,7 @@ END;
                 "column": column,
                 "table_name": strip_quotes(table),
                 "column_name": strip_quotes(column),
+                "suffix": self.connection.features.bare_select_suffix,
             }
             sql.append(query)
         return sql
@@ -550,6 +563,7 @@ END;
                             "column": column,
                             "table_name": strip_quotes(table),
                             "column_name": strip_quotes(column),
+                            "suffix": self.connection.features.bare_select_suffix,
                         }
                     )
                     # Only one AutoField is allowed per model, so don't
@@ -588,10 +602,6 @@ END;
         if value is None:
             return None
 
-        # Expression values are adapted by the database.
-        if hasattr(value, "resolve_expression"):
-            return value
-
         # oracledb doesn't support tz-aware datetimes
         if timezone.is_aware(value):
             if settings.USE_TZ:
@@ -607,10 +617,6 @@ END;
     def adapt_timefield_value(self, value):
         if value is None:
             return None
-
-        # Expression values are adapted by the database.
-        if hasattr(value, "resolve_expression"):
-            return value
 
         if isinstance(value, str):
             return datetime.datetime.strptime(value, "%H:%M:%S")
@@ -665,25 +671,28 @@ END;
         return self._get_no_autofield_sequence_name(table) if row is None else row[0]
 
     def bulk_insert_sql(self, fields, placeholder_rows):
+        field_placeholders = [
+            BulkInsertMapper.types.get(
+                getattr(field, "target_field", field).get_internal_type(), "%s"
+            )
+            for field in fields
+            if field
+        ]
         query = []
         for row in placeholder_rows:
             select = []
             for i, placeholder in enumerate(row):
                 # A model without any fields has fields=[None].
                 if fields[i]:
-                    internal_type = getattr(
-                        fields[i], "target_field", fields[i]
-                    ).get_internal_type()
-                    placeholder = (
-                        BulkInsertMapper.types.get(internal_type, "%s") % placeholder
-                    )
+                    placeholder = field_placeholders[i] % placeholder
                 # Add columns aliases to the first select to avoid "ORA-00918:
                 # column ambiguously defined" when two or more columns in the
                 # first select have the same value.
                 if not query:
                     placeholder = "%s col_%s" % (placeholder, i)
                 select.append(placeholder)
-            query.append("SELECT %s FROM DUAL" % ", ".join(select))
+            suffix = self.connection.features.bare_select_suffix
+            query.append(f"SELECT %s{suffix}" % ", ".join(select))
         # Bulk insert to tables with Oracle identity columns causes Oracle to
         # add sequence.nextval to it. Sequence.nextval cannot be used with the
         # UNION operator. To prevent incorrect SQL, move UNION to a subquery.

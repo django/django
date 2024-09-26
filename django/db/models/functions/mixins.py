@@ -14,9 +14,11 @@ class FixDecimalInputMixin:
         clone = self.copy()
         clone.set_source_expressions(
             [
-                Cast(expression, output_field)
-                if isinstance(expression.output_field, FloatField)
-                else expression
+                (
+                    Cast(expression, output_field)
+                    if isinstance(expression.output_field, FloatField)
+                    else expression
+                )
                 for expression in self.get_source_expressions()
             ]
         )
@@ -31,7 +33,10 @@ class FixDurationInputMixin:
         return sql, params
 
     def as_oracle(self, compiler, connection, **extra_context):
-        if self.output_field.get_internal_type() == "DurationField":
+        if (
+            self.output_field.get_internal_type() == "DurationField"
+            and not connection.features.supports_aggregation_over_interval_types
+        ):
             expression = self.get_source_expressions()[0]
             options = self._get_repr_options()
             from django.db.backends.oracle.functions import (

@@ -4,7 +4,14 @@ from datetime import datetime, timedelta
 from unittest import mock
 
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
-from django.db import DEFAULT_DB_ALIAS, DatabaseError, connections, models
+from django.db import (
+    DEFAULT_DB_ALIAS,
+    DatabaseError,
+    connection,
+    connections,
+    models,
+    transaction,
+)
 from django.db.models.manager import BaseManager
 from django.db.models.query import MAX_GET_RESULTS, EmptyQuerySet
 from django.test import (
@@ -13,6 +20,9 @@ from django.test import (
     TransactionTestCase,
     skipUnlessDBFeature,
 )
+from django.test.utils import CaptureQueriesContext, ignore_warnings
+from django.utils.connection import ConnectionDoesNotExist
+from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.translation import gettext_lazy
 
 from .models import (
@@ -176,6 +186,12 @@ class ModelInstanceCreationTests(TestCase):
         with self.assertNumQueries(1):
             PrimaryKeyWithDefault().save()
 
+    def test_save_primary_with_default_force_update(self):
+        # An UPDATE attempt is made if explicitly requested.
+        obj = PrimaryKeyWithDefault.objects.create()
+        with self.assertNumQueries(1):
+            PrimaryKeyWithDefault(uuid=obj.pk).save(force_update=True)
+
     def test_save_primary_with_db_default(self):
         # An UPDATE attempt is skipped when a primary key has db_default.
         with self.assertNumQueries(1):
@@ -186,6 +202,144 @@ class ModelInstanceCreationTests(TestCase):
         # default.
         with self.assertNumQueries(2):
             ChildPrimaryKeyWithDefault().save()
+
+    def test_save_deprecation(self):
+        a = Article(headline="original", pub_date=datetime(2014, 5, 16))
+        msg = "Passing positional arguments to save() is deprecated"
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
+            a.save(False, False, None, None)
+            self.assertEqual(Article.objects.count(), 1)
+        self.assertEqual(ctx.filename, __file__)
+
+    def test_save_deprecation_positional_arguments_used(self):
+        a = Article()
+        fields = ["headline"]
+        with (
+            self.assertWarns(RemovedInDjango60Warning),
+            mock.patch.object(a, "save_base") as mock_save_base,
+        ):
+            a.save(None, 1, 2, fields)
+        self.assertEqual(
+            mock_save_base.mock_calls,
+            [
+                mock.call(
+                    using=2,
+                    force_insert=None,
+                    force_update=1,
+                    update_fields=frozenset(fields),
+                )
+            ],
+        )
+
+    def test_save_too_many_positional_arguments(self):
+        a = Article()
+        msg = "Model.save() takes from 1 to 5 positional arguments but 6 were given"
+        with (
+            self.assertWarns(RemovedInDjango60Warning),
+            self.assertRaisesMessage(TypeError, msg),
+        ):
+            a.save(False, False, None, None, None)
+
+    def test_save_conflicting_positional_and_named_arguments(self):
+        a = Article()
+        cases = [
+            ("force_insert", True, [42]),
+            ("force_update", None, [42, 41]),
+            ("using", "some-db", [42, 41, 40]),
+            ("update_fields", ["foo"], [42, 41, 40, 39]),
+        ]
+        for param_name, param_value, args in cases:
+            with self.subTest(param_name=param_name):
+                msg = f"Model.save() got multiple values for argument '{param_name}'"
+                with (
+                    self.assertWarns(RemovedInDjango60Warning),
+                    self.assertRaisesMessage(TypeError, msg),
+                ):
+                    a.save(*args, **{param_name: param_value})
+
+    async def test_asave_deprecation(self):
+        a = Article(headline="original", pub_date=datetime(2014, 5, 16))
+        msg = "Passing positional arguments to asave() is deprecated"
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
+            await a.asave(False, False, None, None)
+            self.assertEqual(await Article.objects.acount(), 1)
+        self.assertEqual(ctx.filename, __file__)
+
+    async def test_asave_deprecation_positional_arguments_used(self):
+        a = Article()
+        fields = ["headline"]
+        with (
+            self.assertWarns(RemovedInDjango60Warning),
+            mock.patch.object(a, "save_base") as mock_save_base,
+        ):
+            await a.asave(None, 1, 2, fields)
+        self.assertEqual(
+            mock_save_base.mock_calls,
+            [
+                mock.call(
+                    using=2,
+                    force_insert=None,
+                    force_update=1,
+                    update_fields=frozenset(fields),
+                )
+            ],
+        )
+
+    async def test_asave_too_many_positional_arguments(self):
+        a = Article()
+        msg = "Model.asave() takes from 1 to 5 positional arguments but 6 were given"
+        with (
+            self.assertWarns(RemovedInDjango60Warning),
+            self.assertRaisesMessage(TypeError, msg),
+        ):
+            await a.asave(False, False, None, None, None)
+
+    async def test_asave_conflicting_positional_and_named_arguments(self):
+        a = Article()
+        cases = [
+            ("force_insert", True, [42]),
+            ("force_update", None, [42, 41]),
+            ("using", "some-db", [42, 41, 40]),
+            ("update_fields", ["foo"], [42, 41, 40, 39]),
+        ]
+        for param_name, param_value, args in cases:
+            with self.subTest(param_name=param_name):
+                msg = f"Model.asave() got multiple values for argument '{param_name}'"
+                with (
+                    self.assertWarns(RemovedInDjango60Warning),
+                    self.assertRaisesMessage(TypeError, msg),
+                ):
+                    await a.asave(*args, **{param_name: param_value})
+
+    @ignore_warnings(category=RemovedInDjango60Warning)
+    def test_save_positional_arguments(self):
+        a = Article.objects.create(headline="original", pub_date=datetime(2014, 5, 16))
+        a.headline = "changed"
+
+        a.save(False, False, None, ["pub_date"])
+        a.refresh_from_db()
+        self.assertEqual(a.headline, "original")
+
+        a.headline = "changed"
+        a.save(False, False, None, ["pub_date", "headline"])
+        a.refresh_from_db()
+        self.assertEqual(a.headline, "changed")
+
+    @ignore_warnings(category=RemovedInDjango60Warning)
+    async def test_asave_positional_arguments(self):
+        a = await Article.objects.acreate(
+            headline="original", pub_date=datetime(2014, 5, 16)
+        )
+        a.headline = "changed"
+
+        await a.asave(False, False, None, ["pub_date"])
+        await a.arefresh_from_db()
+        self.assertEqual(a.headline, "original")
+
+        a.headline = "changed"
+        await a.asave(False, False, None, ["pub_date", "headline"])
+        await a.arefresh_from_db()
+        self.assertEqual(a.headline, "changed")
 
 
 class ModelTest(TestCase):
@@ -506,6 +660,31 @@ class ModelTest(TestCase):
             Article.objects.get,
             headline__startswith="Area",
         )
+
+    def test_is_pk_unset(self):
+        cases = [
+            Article(),
+            Article(id=None),
+        ]
+        for case in cases:
+            with self.subTest(case=case):
+                self.assertIs(case._is_pk_set(), False)
+
+    def test_is_pk_set(self):
+        def new_instance():
+            a = Article(pub_date=datetime.today())
+            a.save()
+            return a
+
+        cases = [
+            Article(id=1),
+            Article(id=0),
+            Article.objects.create(pub_date=datetime.today()),
+            new_instance(),
+        ]
+        for case in cases:
+            with self.subTest(case=case):
+                self.assertIs(case._is_pk_set(), True)
 
 
 class ModelLookupTest(TestCase):
@@ -912,6 +1091,13 @@ class ModelRefreshTests(TestCase):
         article.refresh_from_db()
         self.assertTrue(hasattr(article, "featured"))
 
+    def test_refresh_clears_reverse_related_explicit_fields(self):
+        article = Article.objects.create(headline="Test", pub_date=datetime(2024, 2, 4))
+        self.assertFalse(hasattr(article, "featured"))
+        FeaturedArticle.objects.create(article_id=article.pk)
+        article.refresh_from_db(fields=["featured"])
+        self.assertTrue(hasattr(article, "featured"))
+
     def test_refresh_clears_one_to_one_field(self):
         article = Article.objects.create(
             headline="Parrot programs in Python",
@@ -957,3 +1143,47 @@ class ModelRefreshTests(TestCase):
         # Cache was cleared and new results are available.
         self.assertCountEqual(a2_prefetched.selfref_set.all(), [s])
         self.assertCountEqual(a2_prefetched.cited.all(), [s])
+
+    @skipUnlessDBFeature("has_select_for_update")
+    def test_refresh_for_update(self):
+        a = Article.objects.create(pub_date=datetime.now())
+        for_update_sql = connection.ops.for_update_sql()
+
+        with transaction.atomic(), CaptureQueriesContext(connection) as ctx:
+            a.refresh_from_db(from_queryset=Article.objects.select_for_update())
+        self.assertTrue(
+            any(for_update_sql in query["sql"] for query in ctx.captured_queries)
+        )
+
+    def test_refresh_with_related(self):
+        a = Article.objects.create(pub_date=datetime.now())
+        fa = FeaturedArticle.objects.create(article=a)
+
+        from_queryset = FeaturedArticle.objects.select_related("article")
+        with self.assertNumQueries(1):
+            fa.refresh_from_db(from_queryset=from_queryset)
+            self.assertEqual(fa.article.pub_date, a.pub_date)
+        with self.assertNumQueries(2):
+            fa.refresh_from_db()
+            self.assertEqual(fa.article.pub_date, a.pub_date)
+
+    def test_refresh_overwrites_queryset_using(self):
+        a = Article.objects.create(pub_date=datetime.now())
+
+        from_queryset = Article.objects.using("nonexistent")
+        with self.assertRaises(ConnectionDoesNotExist):
+            a.refresh_from_db(from_queryset=from_queryset)
+        a.refresh_from_db(using="default", from_queryset=from_queryset)
+
+    def test_refresh_overwrites_queryset_fields(self):
+        a = Article.objects.create(pub_date=datetime.now())
+        headline = "headline"
+        Article.objects.filter(pk=a.pk).update(headline=headline)
+
+        from_queryset = Article.objects.only("pub_date")
+        with self.assertNumQueries(1):
+            a.refresh_from_db(from_queryset=from_queryset)
+            self.assertNotEqual(a.headline, headline)
+        with self.assertNumQueries(1):
+            a.refresh_from_db(fields=["headline"], from_queryset=from_queryset)
+            self.assertEqual(a.headline, headline)

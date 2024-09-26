@@ -228,6 +228,7 @@ class BaseDatabaseOperations:
                 "DatabaseOperations.lookup_cast() instead."
             ),
             RemovedInDjango60Warning,
+            stacklevel=2,
         )
         return "%s"
 
@@ -275,6 +276,11 @@ class BaseDatabaseOperations:
             )
             if sql
         )
+
+    def bulk_insert_sql(self, fields, placeholder_rows):
+        placeholder_rows_sql = (", ".join(row) for row in placeholder_rows)
+        values_sql = ", ".join([f"({sql})" for sql in placeholder_rows_sql])
+        return f"VALUES {values_sql}"
 
     def last_executed_query(self, cursor, sql, params):
         """
@@ -562,10 +568,6 @@ class BaseDatabaseOperations:
         """
         if value is None:
             return None
-        # Expression values are adapted by the database.
-        if hasattr(value, "resolve_expression"):
-            return value
-
         return str(value)
 
     def adapt_timefield_value(self, value):
@@ -575,10 +577,6 @@ class BaseDatabaseOperations:
         """
         if value is None:
             return None
-        # Expression values are adapted by the database.
-        if hasattr(value, "resolve_expression"):
-            return value
-
         if timezone.is_aware(value):
             raise ValueError("Django does not support timezone-aware times.")
         return str(value)

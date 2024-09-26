@@ -412,7 +412,7 @@ hashing algorithm.
 .. _`@import`: https://www.w3.org/TR/CSS2/cascade.html#at-import
 .. _`url()`: https://www.w3.org/TR/CSS2/syndata.html#uri
 .. _`Cascading Style Sheets`: https://www.w3.org/Style/CSS/
-.. _`source map`: https://developer.mozilla.org/en-US/docs/Tools/Debugger/How_to/Use_a_source_map
+.. _`source map`: https://firefox-source-docs.mozilla.org/devtools-user/debugger/how_to/use_a_source_map/
 .. _`modules import`: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules#importing_features_into_your_script
 .. _`modules aggregation`: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules#aggregating_modules
 

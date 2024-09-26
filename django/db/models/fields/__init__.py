@@ -15,6 +15,7 @@ from django.core import checks, exceptions, validators
 from django.db import connection, connections, router
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.query_utils import DeferredAttribute, RegisterLookupMixin
+from django.db.utils import NotSupportedError
 from django.utils import timezone
 from django.utils.choices import (
     BlankChoiceIterator,
@@ -218,12 +219,6 @@ class Field(RegisterLookupMixin):
         self.remote_field = rel
         self.is_relation = self.remote_field is not None
         self.default = default
-        if db_default is not NOT_PROVIDED and not hasattr(
-            db_default, "resolve_expression"
-        ):
-            from django.db.models.expressions import Value
-
-            db_default = Value(db_default)
         self.db_default = db_default
         self.editable = editable
         self.serialize = serialize
@@ -407,7 +402,7 @@ class Field(RegisterLookupMixin):
                 continue
             connection = connections[db]
 
-            if not getattr(self.db_default, "allowed_default", False) and (
+            if not getattr(self._db_default_expression, "allowed_default", False) and (
                 connection.features.supports_expression_defaults
             ):
                 msg = f"{self.db_default} cannot be used in db_default."
@@ -921,7 +916,7 @@ class Field(RegisterLookupMixin):
             return [self.from_db_value]
         return []
 
-    @property
+    @cached_property
     def unique(self):
         return self._unique or self.primary_key
 
@@ -988,13 +983,7 @@ class Field(RegisterLookupMixin):
 
     def pre_save(self, model_instance, add):
         """Return field's value just before saving."""
-        value = getattr(model_instance, self.attname)
-        if not connection.features.supports_default_keyword_in_insert:
-            from django.db.models.expressions import DatabaseDefault
-
-            if isinstance(value, DatabaseDefault):
-                return self.db_default
-        return value
+        return getattr(model_instance, self.attname)
 
     def get_prep_value(self, value):
         """Perform preliminary non-db specific value checks and conversions."""
@@ -1036,7 +1025,9 @@ class Field(RegisterLookupMixin):
         if self.db_default is not NOT_PROVIDED:
             from django.db.models.expressions import DatabaseDefault
 
-            return DatabaseDefault
+            return lambda: DatabaseDefault(
+                self._db_default_expression, output_field=self
+            )
 
         if (
             not self.empty_strings_allowed
@@ -1045,6 +1036,17 @@ class Field(RegisterLookupMixin):
         ):
             return return_None
         return str  # return empty string
+
+    @cached_property
+    def _db_default_expression(self):
+        db_default = self.db_default
+        if db_default is not NOT_PROVIDED and not hasattr(
+            db_default, "resolve_expression"
+        ):
+            from django.db.models.expressions import Value
+
+            db_default = Value(db_default, self)
+        return db_default
 
     def get_choices(
         self,
@@ -1142,6 +1144,10 @@ class Field(RegisterLookupMixin):
     def value_from_object(self, obj):
         """Return the value of this field in the given model instance."""
         return getattr(obj, self.attname)
+
+    def slice_expression(self, expression, start, length):
+        """Return a slice of this field."""
+        raise NotSupportedError("This field does not support slicing.")
 
 
 class BooleanField(Field):
@@ -1302,6 +1308,11 @@ class CharField(Field):
         if self.db_collation:
             kwargs["db_collation"] = self.db_collation
         return name, path, args, kwargs
+
+    def slice_expression(self, expression, start, length):
+        from django.db.models.functions import Substr
+
+        return Substr(expression, start, length)
 
 
 class CommaSeparatedIntegerField(CharField):
@@ -2496,6 +2507,11 @@ class TextField(Field):
         if self.db_collation:
             kwargs["db_collation"] = self.db_collation
         return name, path, args, kwargs
+
+    def slice_expression(self, expression, start, length):
+        from django.db.models.functions import Substr
+
+        return Substr(expression, start, length)
 
 
 class TimeField(DateTimeCheckMixin, Field):

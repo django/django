@@ -161,8 +161,7 @@ You could also write a decorator to encapsulate this logic::
 
 
     @disable_for_loaddata
-    def my_handler(**kwargs):
-        ...
+    def my_handler(**kwargs): ...
 
 Just be aware that this logic will disable the signals whenever fixtures are
 deserialized, not just during :djadmin:`loaddata`.

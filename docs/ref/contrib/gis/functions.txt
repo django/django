@@ -230,12 +230,17 @@ south = ``π``; west = ``3π/2``.
 
 *Availability*: `PostGIS <https://postgis.net/docs/ST_MinimumBoundingCircle.html>`__,
 `Oracle <https://docs.oracle.com/en/database/oracle/oracle-database/21/spatl/
-SDO_GEOM-reference.html#GUID-82A61626-BB64-4793-B53D-A0DBEC91831A>`_
+SDO_GEOM-reference.html#GUID-82A61626-BB64-4793-B53D-A0DBEC91831A>`_,
+SpatiaLite 5.1+
 
 Accepts a single geographic field or expression and returns the smallest circle
 polygon that can fully contain the geometry.
 
 The ``num_seg`` parameter is used only on PostGIS.
+
+.. versionchanged:: 5.1
+
+    SpatiaLite 5.1+ support was added.
 
 ``Centroid``
 ============
@@ -251,8 +256,6 @@ value of the geometry.
 
 ``ClosestPoint``
 ================
-
-.. versionadded:: 5.0
 
 .. class:: ClosestPoint(expr1, expr2, **extra)
 
@@ -354,24 +357,36 @@ are returned unchanged.
 ``FromWKB``
 ===========
 
-.. class:: FromWKB(expression, **extra)
+.. class:: FromWKB(expression, srid=0, **extra)
 
 *Availability*: MariaDB, `MySQL
 <https://dev.mysql.com/doc/refman/en/gis-wkb-functions.html#function_st-geomfromwkb>`__,
 Oracle, `PostGIS <https://postgis.net/docs/ST_GeomFromWKB.html>`__, SpatiaLite
 
-Creates geometry from `Well-known binary (WKB)`_ representation.
+Creates geometry from `Well-known binary (WKB)`_ representation. The optional
+``srid`` argument allows to specify the SRID of the resulting geometry.
+``srid`` is ignored on Oracle.
+
+.. versionchanged:: 5.1
+
+    The ``srid`` argument was added.
 
 ``FromWKT``
 ===========
 
-.. class:: FromWKT(expression, **extra)
+.. class:: FromWKT(expression, srid=0, **extra)
 
 *Availability*: MariaDB, `MySQL
 <https://dev.mysql.com/doc/refman/en/gis-wkt-functions.html#function_st-geomfromtext>`__,
 Oracle, `PostGIS <https://postgis.net/docs/ST_GeomFromText.html>`__, SpatiaLite
 
-Creates geometry from `Well-known text (WKT)`_ representation.
+Creates geometry from `Well-known text (WKT)`_ representation. The optional
+``srid`` argument allows to specify the SRID of the resulting geometry.
+``srid`` is ignored on Oracle.
+
+.. versionchanged:: 5.1
+
+    The ``srid`` argument was added.
 
 ``GeoHash``
 ===========

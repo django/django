@@ -5,6 +5,7 @@ These tests use dialogue from the 1975 film Monty Python and the Holy Grail.
 All text copyright Python (Monty) Pictures. Thanks to sacred-texts.com for the
 transcript.
 """
+
 from django.db.models import F, Value
 
 from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase

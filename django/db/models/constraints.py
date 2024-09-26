@@ -2,11 +2,13 @@ import warnings
 from enum import Enum
 from types import NoneType
 
-from django.core.exceptions import FieldError, ValidationError
+from django.core import checks
+from django.core.exceptions import FieldDoesNotExist, FieldError, ValidationError
 from django.db import connections
-from django.db.models.expressions import Exists, ExpressionList, F, OrderBy
+from django.db.models.constants import LOOKUP_SEP
+from django.db.models.expressions import Exists, ExpressionList, F, RawSQL
 from django.db.models.indexes import IndexExpression
-from django.db.models.lookups import Exact
+from django.db.models.lookups import Exact, IsNull
 from django.db.models.query_utils import Q
 from django.db.models.sql.query import Query
 from django.db.utils import DEFAULT_DB_ALIAS
@@ -66,11 +68,65 @@ class BaseConstraint:
     def remove_sql(self, model, schema_editor):
         raise NotImplementedError("This method must be implemented by a subclass.")
 
+    @classmethod
+    def _expression_refs_exclude(cls, model, expression, exclude):
+        get_field = model._meta.get_field
+        for field_name, *__ in model._get_expr_references(expression):
+            if field_name in exclude:
+                return True
+            field = get_field(field_name)
+            if field.generated and cls._expression_refs_exclude(
+                model, field.expression, exclude
+            ):
+                return True
+        return False
+
     def validate(self, model, instance, exclude=None, using=DEFAULT_DB_ALIAS):
         raise NotImplementedError("This method must be implemented by a subclass.")
 
     def get_violation_error_message(self):
         return self.violation_error_message % {"name": self.name}
+
+    def _check(self, model, connection):
+        return []
+
+    def _check_references(self, model, references):
+        errors = []
+        fields = set()
+        for field_name, *lookups in references:
+            # pk is an alias that won't be found by opts.get_field.
+            if field_name != "pk":
+                fields.add(field_name)
+            if not lookups:
+                # If it has no lookups it cannot result in a JOIN.
+                continue
+            try:
+                if field_name == "pk":
+                    field = model._meta.pk
+                else:
+                    field = model._meta.get_field(field_name)
+                if not field.is_relation or field.many_to_many or field.one_to_many:
+                    continue
+            except FieldDoesNotExist:
+                continue
+            # JOIN must happen at the first lookup.
+            first_lookup = lookups[0]
+            if (
+                hasattr(field, "get_transform")
+                and hasattr(field, "get_lookup")
+                and field.get_transform(first_lookup) is None
+                and field.get_lookup(first_lookup) is None
+            ):
+                errors.append(
+                    checks.Error(
+                        "'constraints' refers to the joined field '%s'."
+                        % LOOKUP_SEP.join([field_name] + lookups),
+                        obj=model,
+                        id="models.E041",
+                    )
+                )
+        errors.extend(model._check_local_fields(fields, "constraints"))
+        return errors
 
     def deconstruct(self):
         path = "%s.%s" % (self.__class__.__module__, self.__class__.__name__)
@@ -91,13 +147,30 @@ class BaseConstraint:
 
 
 class CheckConstraint(BaseConstraint):
+    # RemovedInDjango60Warning: when the deprecation ends, replace with
+    # def __init__(
+    #  self, *, condition, name, violation_error_code=None, violation_error_message=None
+    # )
     def __init__(
-        self, *, check, name, violation_error_code=None, violation_error_message=None
+        self,
+        *,
+        name,
+        condition=None,
+        check=None,
+        violation_error_code=None,
+        violation_error_message=None,
     ):
-        self.check = check
-        if not getattr(check, "conditional", False):
+        if check is not None:
+            warnings.warn(
+                "CheckConstraint.check is deprecated in favor of `.condition`.",
+                RemovedInDjango60Warning,
+                stacklevel=2,
+            )
+            condition = check
+        self.condition = condition
+        if not getattr(condition, "conditional", False):
             raise TypeError(
-                "CheckConstraint.check must be a Q instance or boolean expression."
+                "CheckConstraint.condition must be a Q instance or boolean expression."
             )
         super().__init__(
             name=name,
@@ -105,9 +178,66 @@ class CheckConstraint(BaseConstraint):
             violation_error_message=violation_error_message,
         )
 
+    def _get_check(self):
+        warnings.warn(
+            "CheckConstraint.check is deprecated in favor of `.condition`.",
+            RemovedInDjango60Warning,
+            stacklevel=2,
+        )
+        return self.condition
+
+    def _set_check(self, value):
+        warnings.warn(
+            "CheckConstraint.check is deprecated in favor of `.condition`.",
+            RemovedInDjango60Warning,
+            stacklevel=2,
+        )
+        self.condition = value
+
+    check = property(_get_check, _set_check)
+
+    def _check(self, model, connection):
+        errors = []
+        if not (
+            connection.features.supports_table_check_constraints
+            or "supports_table_check_constraints" in model._meta.required_db_features
+        ):
+            errors.append(
+                checks.Warning(
+                    f"{connection.display_name} does not support check constraints.",
+                    hint=(
+                        "A constraint won't be created. Silence this warning if you "
+                        "don't care about it."
+                    ),
+                    obj=model,
+                    id="models.W027",
+                )
+            )
+        elif (
+            connection.features.supports_table_check_constraints
+            or "supports_table_check_constraints"
+            not in model._meta.required_db_features
+        ):
+            references = set()
+            condition = self.condition
+            if isinstance(condition, Q):
+                references.update(model._get_expr_references(condition))
+            if any(isinstance(expr, RawSQL) for expr in condition.flatten()):
+                errors.append(
+                    checks.Warning(
+                        f"Check constraint {self.name!r} contains RawSQL() expression "
+                        "and won't be validated during the model full_clean().",
+                        hint="Silence this warning if you don't care about it.",
+                        obj=model,
+                        id="models.W045",
+                    ),
+                )
+            errors.extend(self._check_references(model, references))
+        return errors
+
     def _get_check_sql(self, model, schema_editor):
         query = Query(model=model, alias_cols=False)
-        where = query.build_where(self.check)
+        where = query.build_where(self.condition)
         compiler = query.get_compiler(connection=schema_editor.connection)
         sql, params = where.as_sql(compiler, schema_editor.connection)
         return sql % tuple(schema_editor.quote_value(p) for p in params)
@@ -124,9 +254,9 @@ class CheckConstraint(BaseConstraint):
         return schema_editor._delete_check_sql(model, self.name)
 
     def validate(self, model, instance, exclude=None, using=DEFAULT_DB_ALIAS):
-        against = instance._get_field_value_map(meta=model._meta, exclude=exclude)
+        against = instance._get_field_expression_map(meta=model._meta, exclude=exclude)
         try:
-            if not Q(self.check).check(against, using=using):
+            if not Q(self.condition).check(against, using=using):
                 raise ValidationError(
                     self.get_violation_error_message(), code=self.violation_error_code
                 )
@@ -134,9 +264,9 @@ class CheckConstraint(BaseConstraint):
             pass
 
     def __repr__(self):
-        return "<%s: check=%s name=%s%s%s>" % (
+        return "<%s: condition=%s name=%s%s%s>" % (
             self.__class__.__qualname__,
-            self.check,
+            self.condition,
             repr(self.name),
             (
                 ""
@@ -155,7 +285,7 @@ class CheckConstraint(BaseConstraint):
         if isinstance(other, CheckConstraint):
             return (
                 self.name == other.name
-                and self.check == other.check
+                and self.condition == other.condition
                 and self.violation_error_code == other.violation_error_code
                 and self.violation_error_message == other.violation_error_message
             )
@@ -163,7 +293,7 @@ class CheckConstraint(BaseConstraint):
 
     def deconstruct(self):
         path, args, kwargs = super().deconstruct()
-        kwargs["check"] = self.check
+        kwargs["condition"] = self.condition
         return path, args, kwargs
 
 
@@ -250,6 +380,104 @@ class UniqueConstraint(BaseConstraint):
     @property
     def contains_expressions(self):
         return bool(self.expressions)
+
+    def _check(self, model, connection):
+        errors = model._check_local_fields({*self.fields, *self.include}, "constraints")
+        required_db_features = model._meta.required_db_features
+        if self.condition is not None and not (
+            connection.features.supports_partial_indexes
+            or "supports_partial_indexes" in required_db_features
+        ):
+            errors.append(
+                checks.Warning(
+                    f"{connection.display_name} does not support unique constraints "
+                    "with conditions.",
+                    hint=(
+                        "A constraint won't be created. Silence this warning if you "
+                        "don't care about it."
+                    ),
+                    obj=model,
+                    id="models.W036",
+                )
+            )
+        if self.deferrable is not None and not (
+            connection.features.supports_deferrable_unique_constraints
+            or "supports_deferrable_unique_constraints" in required_db_features
+        ):
+            errors.append(
+                checks.Warning(
+                    f"{connection.display_name} does not support deferrable unique "
+                    "constraints.",
+                    hint=(
+                        "A constraint won't be created. Silence this warning if you "
+                        "don't care about it."
+                    ),
+                    obj=model,
+                    id="models.W038",
+                )
+            )
+        if self.include and not (
+            connection.features.supports_covering_indexes
+            or "supports_covering_indexes" in required_db_features
+        ):
+            errors.append(
+                checks.Warning(
+                    f"{connection.display_name} does not support unique constraints "
+                    "with non-key columns.",
+                    hint=(
+                        "A constraint won't be created. Silence this warning if you "
+                        "don't care about it."
+                    ),
+                    obj=model,
+                    id="models.W039",
+                )
+            )
+        if self.contains_expressions and not (
+            connection.features.supports_expression_indexes
+            or "supports_expression_indexes" in required_db_features
+        ):
+            errors.append(
+                checks.Warning(
+                    f"{connection.display_name} does not support unique constraints on "
+                    "expressions.",
+                    hint=(
+                        "A constraint won't be created. Silence this warning if you "
+                        "don't care about it."
+                    ),
+                    obj=model,
+                    id="models.W044",
+                )
+            )
+        if self.nulls_distinct is not None and not (
+            connection.features.supports_nulls_distinct_unique_constraints
+            or "supports_nulls_distinct_unique_constraints" in required_db_features
+        ):
+            errors.append(
+                checks.Warning(
+                    f"{connection.display_name} does not support unique constraints "
+                    "with nulls distinct.",
+                    hint=(
+                        "A constraint won't be created. Silence this warning if you "
+                        "don't care about it."
+                    ),
+                    obj=model,
+                    id="models.W047",
+                )
+            )
+        references = set()
+        if (
+            connection.features.supports_partial_indexes
+            or "supports_partial_indexes" not in required_db_features
+        ) and isinstance(self.condition, Q):
+            references.update(model._get_expr_references(self.condition))
+        if self.contains_expressions and (
+            connection.features.supports_expression_indexes
+            or "supports_expression_indexes" not in required_db_features
+        ):
+            for expression in self.expressions:
+                references.update(model._get_expr_references(expression))
+        errors.extend(self._check_references(model, references))
+        return errors
 
     def _get_condition_sql(self, model, schema_editor):
         if self.condition is None:
@@ -391,69 +619,91 @@ class UniqueConstraint(BaseConstraint):
         queryset = model._default_manager.using(using)
         if self.fields:
             lookup_kwargs = {}
+            generated_field_names = []
             for field_name in self.fields:
                 if exclude and field_name in exclude:
                     return
                 field = model._meta.get_field(field_name)
-                lookup_value = getattr(instance, field.attname)
-                if (
-                    self.nulls_distinct is not False
-                    and lookup_value is None
-                    or (
-                        lookup_value == ""
-                        and connections[
-                            using
-                        ].features.interprets_empty_strings_as_nulls
-                    )
-                ):
-                    # A composite constraint containing NULL value cannot cause
-                    # a violation since NULL != NULL in SQL.
-                    return
-                lookup_kwargs[field.name] = lookup_value
-            queryset = queryset.filter(**lookup_kwargs)
+                if field.generated:
+                    if exclude and self._expression_refs_exclude(
+                        model, field.expression, exclude
+                    ):
+                        return
+                    generated_field_names.append(field.name)
+                else:
+                    lookup_value = getattr(instance, field.attname)
+                    if (
+                        self.nulls_distinct is not False
+                        and lookup_value is None
+                        or (
+                            lookup_value == ""
+                            and connections[
+                                using
+                            ].features.interprets_empty_strings_as_nulls
+                        )
+                    ):
+                        # A composite constraint containing NULL value cannot cause
+                        # a violation since NULL != NULL in SQL.
+                        return
+                    lookup_kwargs[field.name] = lookup_value
+            lookup_args = []
+            if generated_field_names:
+                field_expression_map = instance._get_field_expression_map(
+                    meta=model._meta, exclude=exclude
+                )
+                for field_name in generated_field_names:
+                    expression = field_expression_map[field_name]
+                    if self.nulls_distinct is False:
+                        lhs = F(field_name)
+                        condition = Q(Exact(lhs, expression)) | Q(
+                            IsNull(lhs, True), IsNull(expression, True)
+                        )
+                        lookup_args.append(condition)
+                    else:
+                        lookup_kwargs[field_name] = expression
+            queryset = queryset.filter(*lookup_args, **lookup_kwargs)
         else:
             # Ignore constraints with excluded fields.
-            if exclude:
-                for expression in self.expressions:
-                    if hasattr(expression, "flatten"):
-                        for expr in expression.flatten():
-                            if isinstance(expr, F) and expr.name in exclude:
-                                return
-                    elif isinstance(expression, F) and expression.name in exclude:
-                        return
+            if exclude and any(
+                self._expression_refs_exclude(model, expression, exclude)
+                for expression in self.expressions
+            ):
+                return
             replacements = {
                 F(field): value
-                for field, value in instance._get_field_value_map(
+                for field, value in instance._get_field_expression_map(
                     meta=model._meta, exclude=exclude
                 ).items()
             }
-            expressions = []
+            filters = []
             for expr in self.expressions:
-                # Ignore ordering.
-                if isinstance(expr, OrderBy):
-                    expr = expr.expression
-                expressions.append(Exact(expr, expr.replace_expressions(replacements)))
-            queryset = queryset.filter(*expressions)
+                if hasattr(expr, "get_expression_for_validation"):
+                    expr = expr.get_expression_for_validation()
+                rhs = expr.replace_expressions(replacements)
+                condition = Exact(expr, rhs)
+                if self.nulls_distinct is False:
+                    condition = Q(condition) | Q(IsNull(expr, True), IsNull(rhs, True))
+                filters.append(condition)
+            queryset = queryset.filter(*filters)
         model_class_pk = instance._get_pk_val(model._meta)
-        if not instance._state.adding and model_class_pk is not None:
+        if not instance._state.adding and instance._is_pk_set(model._meta):
             queryset = queryset.exclude(pk=model_class_pk)
         if not self.condition:
             if queryset.exists():
-                if self.expressions:
+                if self.fields:
+                    # When fields are defined, use the unique_error_message() for
+                    # backward compatibility.
                     raise ValidationError(
-                        self.get_violation_error_message(),
-                        code=self.violation_error_code,
+                        instance.unique_error_message(model, self.fields),
                     )
-                # When fields are defined, use the unique_error_message() for
-                # backward compatibility.
-                for model, constraints in instance.get_constraints():
-                    for constraint in constraints:
-                        if constraint is self:
-                            raise ValidationError(
-                                instance.unique_error_message(model, self.fields),
-                            )
+                raise ValidationError(
+                    self.get_violation_error_message(),
+                    code=self.violation_error_code,
+                )
         else:
-            against = instance._get_field_value_map(meta=model._meta, exclude=exclude)
+            against = instance._get_field_expression_map(
+                meta=model._meta, exclude=exclude
+            )
             try:
                 if (self.condition & Exists(queryset.filter(self.condition))).check(
                     against, using=using

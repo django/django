@@ -1,0 +1,3 @@
+
+
+{"pk": "1", "model": "fixtures_regress.animal", "fields": {"name": "Eagle", "latin_name": "Aquila", "count": 3, "weight": 1.2}}

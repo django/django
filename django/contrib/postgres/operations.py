@@ -5,12 +5,13 @@ from django.contrib.postgres.signals import (
 )
 from django.db import NotSupportedError, router
 from django.db.migrations import AddConstraint, AddIndex, RemoveIndex
-from django.db.migrations.operations.base import Operation
+from django.db.migrations.operations.base import Operation, OperationCategory
 from django.db.models.constraints import CheckConstraint
 
 
 class CreateExtension(Operation):
     reversible = True
+    category = OperationCategory.ADDITION
 
     def __init__(self, name):
         self.name = name
@@ -120,6 +121,7 @@ class AddIndexConcurrently(NotInTransactionMixin, AddIndex):
     """Create an index using PostgreSQL's CREATE INDEX CONCURRENTLY syntax."""
 
     atomic = False
+    category = OperationCategory.ADDITION
 
     def describe(self):
         return "Concurrently create index %s on field(s) %s of model %s" % (
@@ -145,6 +147,7 @@ class RemoveIndexConcurrently(NotInTransactionMixin, RemoveIndex):
     """Remove an index using PostgreSQL's DROP INDEX CONCURRENTLY syntax."""
 
     atomic = False
+    category = OperationCategory.REMOVAL
 
     def describe(self):
         return "Concurrently remove index %s from %s" % (self.name, self.model_name)
@@ -213,6 +216,8 @@ class CollationOperation(Operation):
 class CreateCollation(CollationOperation):
     """Create a collation."""
 
+    category = OperationCategory.ADDITION
+
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         if schema_editor.connection.vendor != "postgresql" or not router.allow_migrate(
             schema_editor.connection.alias, app_label
@@ -235,6 +240,8 @@ class CreateCollation(CollationOperation):
 
 class RemoveCollation(CollationOperation):
     """Remove a collation."""
+
+    category = OperationCategory.REMOVAL
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         if schema_editor.connection.vendor != "postgresql" or not router.allow_migrate(
@@ -261,6 +268,8 @@ class AddConstraintNotValid(AddConstraint):
     Add a table constraint without enforcing validation, using PostgreSQL's
     NOT VALID syntax.
     """
+
+    category = OperationCategory.ADDITION
 
     def __init__(self, model_name, constraint):
         if not isinstance(constraint, CheckConstraint):
@@ -292,6 +301,8 @@ class AddConstraintNotValid(AddConstraint):
 
 class ValidateConstraint(Operation):
     """Validate a table NOT VALID constraint."""
+
+    category = OperationCategory.ALTERATION
 
     def __init__(self, model_name, name):
         self.model_name = model_name

@@ -47,7 +47,6 @@ def sensitive_variables(*variables):
 
             try:
                 file_path = inspect.getfile(wrapped_func)
-                _, first_file_line = inspect.getsourcelines(wrapped_func)
             except TypeError:  # Raises for builtins or native functions.
                 raise ValueError(
                     f"{func.__name__} cannot safely be wrapped by "
@@ -55,7 +54,10 @@ def sensitive_variables(*variables):
                     "Python file (not a builtin or from a native extension)."
                 )
             else:
-                key = hash(f"{file_path}:{first_file_line}")
+                # A source file may not be available (e.g. in .pyc-only builds),
+                # use the first line number instead.
+                first_line_number = wrapped_func.__code__.co_firstlineno
+                key = hash(f"{file_path}:{first_line_number}")
 
             if variables:
                 coroutine_functions_to_sensitive_variables[key] = variables

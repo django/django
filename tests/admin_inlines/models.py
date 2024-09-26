@@ -1,7 +1,9 @@
 """
 Testing of admin inline formsets.
 """
+
 import random
+import uuid
 
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
@@ -179,6 +181,27 @@ class ShoppingWeakness(models.Model):
     item = models.ForeignKey(OutfitItem, models.CASCADE)
 
 
+# Models for #35189
+
+
+class Photographer(Person):
+    fullname = models.CharField(max_length=100)
+    nationality = models.CharField(max_length=100)
+    residency = models.CharField(max_length=100)
+    siblings = models.IntegerField()
+    children = models.IntegerField()
+
+
+class Photo(models.Model):
+    photographer = models.ForeignKey(Photographer, on_delete=models.CASCADE)
+    image = models.CharField(max_length=100)
+    title = models.CharField(max_length=100)
+    description = models.TextField()
+    creation_date = models.DateField()
+    update_date = models.DateField()
+    updated_by = models.CharField(max_length=100)
+
+
 # Models for #13510
 
 
@@ -309,7 +332,7 @@ class SomeParentModel(models.Model):
 
 class SomeChildModel(models.Model):
     name = models.CharField(max_length=1)
-    position = models.PositiveIntegerField()
+    position = models.PositiveIntegerField(help_text="Position help_text.")
     parent = models.ForeignKey(SomeParentModel, models.CASCADE)
     readonly_field = models.CharField(max_length=1)
 
@@ -377,3 +400,13 @@ class BothVerboseNameProfile(Profile):
     class Meta:
         verbose_name = "Model with both - name"
         verbose_name_plural = "Model with both - plural name"
+
+
+class UUIDParent(models.Model):
+    pass
+
+
+class UUIDChild(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
+    title = models.CharField(max_length=128)
+    parent = models.ForeignKey(UUIDParent, on_delete=models.CASCADE)

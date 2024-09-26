@@ -8,9 +8,7 @@ from django.test.utils import extend_sys_path
 class EggLoadingTest(SimpleTestCase):
     def setUp(self):
         self.egg_dir = "%s/eggs" % os.path.dirname(__file__)
-
-    def tearDown(self):
-        apps.clear_cache()
+        self.addCleanup(apps.clear_cache)
 
     def test_egg1(self):
         """Models module can be loaded from an app in an egg"""

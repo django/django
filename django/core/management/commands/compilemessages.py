@@ -79,8 +79,8 @@ class Command(BaseCommand):
 
         if find_command(self.program) is None:
             raise CommandError(
-                "Can't find %s. Make sure you have GNU gettext "
-                "tools 0.15 or newer installed." % self.program
+                f"Can't find {self.program}. Make sure you have GNU gettext "
+                "tools 0.19 or newer installed."
             )
 
         basedirs = [os.path.join("conf", "locale"), "locale"]

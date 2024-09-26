@@ -32,7 +32,7 @@ class InclusionAdminNode(InclusionNode):
     def render(self, context):
         opts = context["opts"]
         app_label = opts.app_label.lower()
-        object_name = opts.object_name.lower()
+        object_name = opts.model_name
         # Load template for this render call. (Setting self.filename isn't
         # thread-safe.)
         context.render_context[self] = context.template.engine.select_template(

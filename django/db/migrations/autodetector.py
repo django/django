@@ -620,11 +620,12 @@ class MigrationAutodetector:
                                 rem_model_state.app_label,
                                 rem_model_state.name_lower,
                             )
-                            self.renamed_models_rel[
-                                renamed_models_rel_key
-                            ] = "%s.%s" % (
-                                model_state.app_label,
-                                model_state.name_lower,
+                            self.renamed_models_rel[renamed_models_rel_key] = (
+                                "%s.%s"
+                                % (
+                                    model_state.app_label,
+                                    model_state.name_lower,
+                                )
                             )
                             self.old_model_keys.remove((rem_app_label, rem_model_name))
                             self.old_model_keys.add((app_label, model_name))
@@ -1058,9 +1059,9 @@ class MigrationAutodetector:
                                 (rem_app_label, rem_model_name, rem_field_name)
                             )
                             old_field_keys.add((app_label, model_name, field_name))
-                            self.renamed_fields[
-                                app_label, model_name, field_name
-                            ] = rem_field_name
+                            self.renamed_fields[app_label, model_name, field_name] = (
+                                rem_field_name
+                            )
                             break
 
     def generate_renamed_fields(self):
@@ -1125,6 +1126,8 @@ class MigrationAutodetector:
                     self.to_state,
                 )
             )
+        if field.generated:
+            dependencies.extend(self._get_dependencies_for_generated_field(field))
         # You can't just add NOT NULL fields with no default or fields
         # which don't allow empty strings as default.
         time_fields = (models.DateField, models.DateTimeField, models.TimeField)
@@ -1544,6 +1547,27 @@ class MigrationAutodetector:
                     OperationDependency.Type.CREATE,
                 )
             )
+        return dependencies
+
+    def _get_dependencies_for_generated_field(self, field):
+        dependencies = []
+        referenced_base_fields = models.Q(field.expression).referenced_base_fields
+        newly_added_fields = sorted(self.new_field_keys - self.old_field_keys)
+        for app_label, model_name, added_field_name in newly_added_fields:
+            added_field = self.to_state.models[app_label, model_name].get_field(
+                added_field_name
+            )
+            if (
+                added_field.remote_field and added_field.remote_field.model
+            ) or added_field.name in referenced_base_fields:
+                dependencies.append(
+                    OperationDependency(
+                        app_label,
+                        model_name,
+                        added_field.name,
+                        OperationDependency.Type.CREATE,
+                    )
+                )
         return dependencies
 
     def _get_dependencies_for_model(self, app_label, model_name):

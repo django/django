@@ -433,6 +433,13 @@ class UserWithPermTestCase(TestCase):
                 backend="invalid.backend.CustomModelBackend",
             )
 
+    def test_invalid_backend_submodule(self):
+        with self.assertRaises(ImportError):
+            User.objects.with_perm(
+                "auth.test",
+                backend="json.tool",
+            )
+
     @override_settings(
         AUTHENTICATION_BACKENDS=["auth_tests.test_models.CustomModelBackend"]
     )
@@ -519,9 +526,7 @@ class TestCreateSuperUserSignals(TestCase):
     def setUp(self):
         self.signals_count = 0
         post_save.connect(self.post_save_listener, sender=User)
-
-    def tearDown(self):
-        post_save.disconnect(self.post_save_listener, sender=User)
+        self.addCleanup(post_save.disconnect, self.post_save_listener, sender=User)
 
     def test_create_user(self):
         User.objects.create_user("JohnDoe")

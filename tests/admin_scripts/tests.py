@@ -3,6 +3,7 @@ A series of tests to establish that the command-line management tools work as
 advertised - especially with regards to the handling of the
 DJANGO_SETTINGS_MODULE and default settings.py files.
 """
+
 import os
 import re
 import shutil
@@ -24,6 +25,7 @@ from django.core.management import (
     color,
     execute_from_command_line,
 )
+from django.core.management.base import LabelCommand
 from django.core.management.commands.loaddata import Command as LoaddataCommand
 from django.core.management.commands.runserver import Command as RunserverCommand
 from django.core.management.commands.testserver import Command as TestserverCommand
@@ -32,6 +34,7 @@ from django.db.migrations.recorder import MigrationRecorder
 from django.test import LiveServerTestCase, SimpleTestCase, TestCase, override_settings
 from django.test.utils import captured_stderr, captured_stdout
 from django.urls import path
+from django.utils.version import PY313, get_docs_version
 from django.views.static import serve
 
 from . import urls
@@ -757,7 +760,9 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         with open(os.path.join(app_path, "apps.py"), encoding="utf8") as f:
             content = f.read()
             self.assertIn("class こんにちはConfig(AppConfig)", content)
-            self.assertIn('name = "こんにちは"' if HAS_BLACK else "name = 'こんにちは'", content)
+            self.assertIn(
+                'name = "こんにちは"' if HAS_BLACK else "name = 'こんにちは'", content
+            )
 
     def test_builtin_command(self):
         """
@@ -1593,6 +1598,15 @@ class ManageRunserver(SimpleTestCase):
             "Starting development server at http://0.0.0.0:8000/",
             self.output.getvalue(),
         )
+        docs_version = get_docs_version()
+        self.assertIn(
+            "WARNING: This is a development server. Do not use it in a "
+            "production setting. Use a production WSGI or ASGI server instead."
+            "\nFor more information on production servers see: "
+            f"https://docs.djangoproject.com/en/{docs_version}/howto/"
+            "deployment/",
+            self.output.getvalue(),
+        )
 
     def test_on_bind(self):
         self.cmd.addr = "127.0.0.1"
@@ -1600,6 +1614,34 @@ class ManageRunserver(SimpleTestCase):
         self.cmd.on_bind("14437")
         self.assertIn(
             "Starting development server at http://127.0.0.1:14437/",
+            self.output.getvalue(),
+        )
+        docs_version = get_docs_version()
+        self.assertIn(
+            "WARNING: This is a development server. Do not use it in a "
+            "production setting. Use a production WSGI or ASGI server instead."
+            "\nFor more information on production servers see: "
+            f"https://docs.djangoproject.com/en/{docs_version}/howto/"
+            "deployment/",
+            self.output.getvalue(),
+        )
+
+    @mock.patch.dict(os.environ, {"HIDE_PRODUCTION_WARNING": "true"})
+    def test_hide_production_warning_with_environment_variable(self):
+        self.cmd.addr = "0"
+        self.cmd._raw_ipv6 = False
+        self.cmd.on_bind("8000")
+        self.assertIn(
+            "Starting development server at http://0.0.0.0:8000/",
+            self.output.getvalue(),
+        )
+        docs_version = get_docs_version()
+        self.assertNotIn(
+            "WARNING: This is a development server. Do not use it in a "
+            "production setting. Use a production WSGI or ASGI server instead."
+            "\nFor more information on production servers see: "
+            f"https://docs.djangoproject.com/en/{docs_version}/howto/"
+            "deployment/",
             self.output.getvalue(),
         )
 
@@ -1898,10 +1940,16 @@ class CommandTypes(AdminScriptTestCase):
         ]
         for option in expected_options:
             self.assertOutput(out, f"[{option}]")
-        self.assertOutput(out, "--option_a OPTION_A, -a OPTION_A")
-        self.assertOutput(out, "--option_b OPTION_B, -b OPTION_B")
-        self.assertOutput(out, "--option_c OPTION_C, -c OPTION_C")
-        self.assertOutput(out, "-v {0,1,2,3}, --verbosity {0,1,2,3}")
+        if PY313:
+            self.assertOutput(out, "--option_a, -a OPTION_A")
+            self.assertOutput(out, "--option_b, -b OPTION_B")
+            self.assertOutput(out, "--option_c, -c OPTION_C")
+            self.assertOutput(out, "-v, --verbosity {0,1,2,3}")
+        else:
+            self.assertOutput(out, "--option_a OPTION_A, -a OPTION_A")
+            self.assertOutput(out, "--option_b OPTION_B, -b OPTION_B")
+            self.assertOutput(out, "--option_c OPTION_C, -c OPTION_C")
+            self.assertOutput(out, "-v {0,1,2,3}, --verbosity {0,1,2,3}")
 
     def test_color_style(self):
         style = color.no_style()
@@ -2233,6 +2281,20 @@ class CommandTypes(AdminScriptTestCase):
             "('settings', None), ('traceback', False), ('verbosity', 1)]",
         )
 
+    def test_custom_label_command_custom_missing_args_message(self):
+        class Command(LabelCommand):
+            missing_args_message = "Missing argument."
+
+        with self.assertRaisesMessage(CommandError, "Error: Missing argument."):
+            call_command(Command())
+
+    def test_custom_label_command_none_missing_args_message(self):
+        class Command(LabelCommand):
+            missing_args_message = None
+
+        with self.assertRaisesMessage(CommandError, ""):
+            call_command(Command())
+
     def test_suppress_base_options_command_help(self):
         args = ["suppress_base_options_command", "--help"]
         out, err = self.run_manage(args)
@@ -2289,6 +2351,35 @@ class Discovery(SimpleTestCase):
             out = StringIO()
             call_command("duplicate", stdout=out)
             self.assertEqual(out.getvalue().strip(), "simple_app")
+
+
+class CommandDBOptionChoiceTests(SimpleTestCase):
+    def test_invalid_choice_db_option(self):
+        expected_error = (
+            "Error: argument --database: invalid choice: "
+            "'deflaut' (choose from 'default', 'other')"
+        )
+        args = [
+            "changepassword",
+            "createsuperuser",
+            "remove_stale_contenttypes",
+            "check",
+            "createcachetable",
+            "dbshell",
+            "flush",
+            "dumpdata",
+            "inspectdb",
+            "loaddata",
+            "showmigrations",
+            "sqlflush",
+            "sqlmigrate",
+            "sqlsequencereset",
+            "migrate",
+        ]
+
+        for arg in args:
+            with self.assertRaisesMessage(CommandError, expected_error):
+                call_command(arg, "--database", "deflaut", verbosity=0)
 
 
 class ArgumentOrder(AdminScriptTestCase):
@@ -2613,7 +2704,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
             urls.urlpatterns = old_urlpatterns
 
     def test_project_template_tarball_url(self):
-        """ "
+        """
         Startproject management command handles project template tar/zip balls
         from non-canonical urls.
         """

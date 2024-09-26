@@ -1,4 +1,5 @@
 import os
+import warnings
 from datetime import datetime, timezone
 from urllib.parse import urljoin
 
@@ -8,6 +9,7 @@ from django.core.files.move import file_move_safe
 from django.core.signals import setting_changed
 from django.utils._os import safe_join
 from django.utils.deconstruct import deconstructible
+from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.encoding import filepath_to_uri
 from django.utils.functional import cached_property
 
@@ -21,8 +23,7 @@ class FileSystemStorage(Storage, StorageSettingsMixin):
     Standard filesystem storage
     """
 
-    # The combination of O_CREAT and O_EXCL makes os.open() raise OSError if
-    # the file already exists before it's opened.
+    # RemovedInDjango60Warning: remove OS_OPEN_FLAGS.
     OS_OPEN_FLAGS = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_BINARY", 0)
 
     def __init__(
@@ -31,12 +32,24 @@ class FileSystemStorage(Storage, StorageSettingsMixin):
         base_url=None,
         file_permissions_mode=None,
         directory_permissions_mode=None,
+        allow_overwrite=False,
     ):
         self._location = location
         self._base_url = base_url
         self._file_permissions_mode = file_permissions_mode
         self._directory_permissions_mode = directory_permissions_mode
+        self._allow_overwrite = allow_overwrite
         setting_changed.connect(self._clear_cached_properties)
+        # RemovedInDjango60Warning: remove this warning.
+        if self.OS_OPEN_FLAGS != os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(
+            os, "O_BINARY", 0
+        ):
+            warnings.warn(
+                "Overriding OS_OPEN_FLAGS is deprecated. Use "
+                "the allow_overwrite parameter instead.",
+                RemovedInDjango60Warning,
+                stacklevel=2,
+            )
 
     @cached_property
     def base_location(self):
@@ -98,12 +111,30 @@ class FileSystemStorage(Storage, StorageSettingsMixin):
             try:
                 # This file has a file path that we can move.
                 if hasattr(content, "temporary_file_path"):
-                    file_move_safe(content.temporary_file_path(), full_path)
+                    file_move_safe(
+                        content.temporary_file_path(),
+                        full_path,
+                        allow_overwrite=self._allow_overwrite,
+                    )
 
                 # This is a normal uploadedfile that we can stream.
                 else:
-                    # The current umask value is masked out by os.open!
-                    fd = os.open(full_path, self.OS_OPEN_FLAGS, 0o666)
+                    # The combination of O_CREAT and O_EXCL makes os.open() raises an
+                    # OSError if the file already exists before it's opened.
+                    open_flags = (
+                        os.O_WRONLY
+                        | os.O_CREAT
+                        | os.O_EXCL
+                        | getattr(os, "O_BINARY", 0)
+                    )
+                    # RemovedInDjango60Warning: when the deprecation ends, replace with:
+                    # if self._allow_overwrite:
+                    #     open_flags = open_flags & ~os.O_EXCL
+                    if self.OS_OPEN_FLAGS != open_flags:
+                        open_flags = self.OS_OPEN_FLAGS
+                    elif self._allow_overwrite:
+                        open_flags = open_flags & ~os.O_EXCL
+                    fd = os.open(full_path, open_flags, 0o666)
                     _file = None
                     try:
                         locks.lock(fd, locks.LOCK_EX)
@@ -160,6 +191,16 @@ class FileSystemStorage(Storage, StorageSettingsMixin):
             # FileNotFoundError is raised if the file or directory was removed
             # concurrently.
             pass
+
+    def is_name_available(self, name, max_length=None):
+        if self._allow_overwrite:
+            return not (max_length and len(name) > max_length)
+        return super().is_name_available(name, max_length=max_length)
+
+    def get_alternative_name(self, file_root, file_ext):
+        if self._allow_overwrite:
+            return f"{file_root}{file_ext}"
+        return super().get_alternative_name(file_root, file_ext)
 
     def exists(self, name):
         return os.path.lexists(self.path(name))

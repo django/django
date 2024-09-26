@@ -1,6 +1,7 @@
 """
 Tools for sending email.
 """
+
 from django.conf import settings
 
 # Imported for backwards compatibility and for the sake
@@ -10,6 +11,8 @@ from django.conf import settings
 from django.core.mail.message import (
     DEFAULT_ATTACHMENT_MIME_TYPE,
     BadHeaderError,
+    EmailAlternative,
+    EmailAttachment,
     EmailMessage,
     EmailMultiAlternatives,
     SafeMIMEMultipart,
@@ -36,6 +39,8 @@ __all__ = [
     "send_mass_mail",
     "mail_admins",
     "mail_managers",
+    "EmailAlternative",
+    "EmailAttachment",
 ]
 
 

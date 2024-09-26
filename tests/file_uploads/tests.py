@@ -452,9 +452,10 @@ class FileUploadTests(TestCase):
 
     def test_file_content(self):
         file = tempfile.NamedTemporaryFile
-        with file(suffix=".ctype_extra") as no_content_type, file(
-            suffix=".ctype_extra"
-        ) as simple_file:
+        with (
+            file(suffix=".ctype_extra") as no_content_type,
+            file(suffix=".ctype_extra") as simple_file,
+        ):
             no_content_type.write(b"no content")
             no_content_type.seek(0)
 
@@ -483,9 +484,10 @@ class FileUploadTests(TestCase):
     def test_content_type_extra(self):
         """Uploaded files may have content type parameters available."""
         file = tempfile.NamedTemporaryFile
-        with file(suffix=".ctype_extra") as no_content_type, file(
-            suffix=".ctype_extra"
-        ) as simple_file:
+        with (
+            file(suffix=".ctype_extra") as no_content_type,
+            file(suffix=".ctype_extra") as simple_file,
+        ):
             no_content_type.write(b"something")
             no_content_type.seek(0)
 
@@ -878,7 +880,7 @@ class DirectoryCreationTests(SimpleTestCase):
         default_storage.delete(UPLOAD_TO)
         # Create a file with the upload directory name
         with SimpleUploadedFile(UPLOAD_TO, b"x") as file:
-            default_storage.save(UPLOAD_TO, file)
+            default_storage.save(UPLOAD_FOLDER, file)
         self.addCleanup(default_storage.delete, UPLOAD_TO)
         msg = "%s exists and is not a directory." % UPLOAD_TO
         with self.assertRaisesMessage(FileExistsError, msg):

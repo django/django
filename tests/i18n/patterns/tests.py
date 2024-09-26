@@ -52,10 +52,8 @@ class URLTestCaseBase(SimpleTestCase):
     def setUp(self):
         # Make sure the cache is empty before we are doing our tests.
         clear_url_caches()
-
-    def tearDown(self):
         # Make sure we will leave an empty cache for other testcases.
-        clear_url_caches()
+        self.addCleanup(clear_url_caches)
 
 
 class URLPrefixTests(URLTestCaseBase):
@@ -137,12 +135,16 @@ class URLTranslationTests(URLTestCaseBase):
         with translation.override("en"):
             self.assertEqual(reverse("no-prefix-translated"), "/translated/")
             self.assertEqual(
+                reverse("no-prefix-translated-regex"), "/translated-regex/"
+            )
+            self.assertEqual(
                 reverse("no-prefix-translated-slug", kwargs={"slug": "yeah"}),
                 "/translated/yeah/",
             )
 
         with translation.override("nl"):
             self.assertEqual(reverse("no-prefix-translated"), "/vertaald/")
+            self.assertEqual(reverse("no-prefix-translated-regex"), "/vertaald-regex/")
             self.assertEqual(
                 reverse("no-prefix-translated-slug", kwargs={"slug": "yeah"}),
                 "/vertaald/yeah/",
@@ -150,6 +152,9 @@ class URLTranslationTests(URLTestCaseBase):
 
         with translation.override("pt-br"):
             self.assertEqual(reverse("no-prefix-translated"), "/traduzidos/")
+            self.assertEqual(
+                reverse("no-prefix-translated-regex"), "/traduzidos-regex/"
+            )
             self.assertEqual(
                 reverse("no-prefix-translated-slug", kwargs={"slug": "yeah"}),
                 "/traduzidos/yeah/",
@@ -182,7 +187,7 @@ class URLTranslationTests(URLTestCaseBase):
                 "/nl/profiel/registreren-als-pad/",
             )
             self.assertEqual(translation.get_language(), "en")
-            # URL with parameters.
+            # re_path() URL with parameters.
             self.assertEqual(
                 translate_url("/en/with-arguments/regular-argument/", "nl"),
                 "/nl/with-arguments/regular-argument/",
@@ -192,6 +197,11 @@ class URLTranslationTests(URLTestCaseBase):
                     "/en/with-arguments/regular-argument/optional.html", "nl"
                 ),
                 "/nl/with-arguments/regular-argument/optional.html",
+            )
+            # path() URL with parameter.
+            self.assertEqual(
+                translate_url("/en/path-with-arguments/regular-argument/", "nl"),
+                "/nl/path-with-arguments/regular-argument/",
             )
 
         with translation.override("nl"):

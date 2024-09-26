@@ -1,6 +1,7 @@
 """
 Management utility to create superusers.
 """
+
 import getpass
 import os
 import sys
@@ -10,7 +11,7 @@ from django.contrib.auth.management import get_default_username
 from django.contrib.auth.password_validation import validate_password
 from django.core import exceptions
 from django.core.management.base import BaseCommand, CommandError
-from django.db import DEFAULT_DB_ALIAS
+from django.db import DEFAULT_DB_ALIAS, connections
 from django.utils.functional import cached_property
 from django.utils.text import capfirst
 
@@ -55,6 +56,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--database",
             default=DEFAULT_DB_ALIAS,
+            choices=tuple(connections),
             help='Specifies the database to use. Default is "default".',
         )
         for field_name in self.UserModel.REQUIRED_FIELDS:
@@ -271,15 +273,19 @@ class Command(BaseCommand):
         return "%s%s%s: " % (
             capfirst(field.verbose_name),
             " (leave blank to use '%s')" % default if default else "",
-            " (%s.%s)"
-            % (
-                field.remote_field.model._meta.object_name,
-                field.m2m_target_field_name()
-                if field.many_to_many
-                else field.remote_field.field_name,
-            )
-            if field.remote_field
-            else "",
+            (
+                " (%s.%s)"
+                % (
+                    field.remote_field.model._meta.object_name,
+                    (
+                        field.m2m_target_field_name()
+                        if field.many_to_many
+                        else field.remote_field.field_name
+                    ),
+                )
+                if field.remote_field
+                else ""
+            ),
         )
 
     @cached_property

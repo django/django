@@ -195,6 +195,16 @@ if the field is nullable or if it has a default value that can be used to
 populate the recreated column. If the field is not nullable and does not have a
 default value, the operation is irreversible.
 
+.. admonition:: PostgreSQL
+
+    ``RemoveField`` will also delete any additional database objects that are
+    related to the removed field (like views, for example). This is because the
+    resulting ``DROP COLUMN`` statement will include the ``CASCADE`` clause to
+    ensure `dependent objects outside the table are also dropped`_.
+
+.. _dependent objects outside the table are also dropped: https://www.postgresql.org/docs/current/sql-altertable.html#SQL-ALTERTABLE-PARMS-CASCADE
+
+
 ``AlterField``
 --------------
 
@@ -475,6 +485,42 @@ operations.
 For an example using ``SeparateDatabaseAndState``, see
 :ref:`changing-a-manytomanyfield-to-use-a-through-model`.
 
+Operation category
+==================
+
+.. versionadded:: 5.1
+
+.. currentmodule:: django.db.migrations.operations.base
+
+.. class:: OperationCategory
+
+    Categories of migration operation used by the :djadmin:`makemigrations`
+    command to display meaningful symbols.
+
+    .. attribute:: ADDITION
+
+        *Symbol*: ``+``
+
+    .. attribute:: REMOVAL
+
+        *Symbol*: ``-``
+
+    .. attribute:: ALTERATION
+
+        *Symbol*: ``~``
+
+    .. attribute:: PYTHON
+
+        *Symbol*: ``p``
+
+    .. attribute:: SQL
+
+        *Symbol*: ``s``
+
+    .. attribute:: MIXED
+
+        *Symbol*: ``?``
+
 .. _writing-your-own-migration-operation:
 
 Writing your own
@@ -494,6 +540,10 @@ structure of an ``Operation`` looks like this::
 
         # If this is False, Django will refuse to reverse past this operation.
         reversible = False
+
+        # This categorizes the operation. The corresponding symbol will be
+        # displayed by the makemigrations command.
+        category = OperationCategory.ADDITION
 
         def __init__(self, arg1, arg2):
             # Operations are usually instantiated with arguments in migration
@@ -516,7 +566,7 @@ structure of an ``Operation`` looks like this::
             pass
 
         def describe(self):
-            # This is used to describe what the operation does in console output.
+            # This is used to describe what the operation does.
             return "Custom Operation"
 
         @property

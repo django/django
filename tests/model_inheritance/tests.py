@@ -216,9 +216,11 @@ class ModelInheritanceTests(TestCase):
             GrandChild().save()
 
         for i, test in enumerate([a, b]):
-            with self.subTest(i=i), self.assertNumQueries(4), CaptureQueriesContext(
-                connection
-            ) as queries:
+            with (
+                self.subTest(i=i),
+                self.assertNumQueries(4),
+                CaptureQueriesContext(connection) as queries,
+            ):
                 test()
                 for query in queries:
                     sql = query["sql"]

@@ -111,9 +111,17 @@ including SQLite, SpatiaLite, PROJ, and GEOS. Install them like this:
     $ brew install spatialite-tools
     $ brew install gdal
 
-Finally, for GeoDjango to be able to find the SpatiaLite library, add the
-following to your ``settings.py``::
+Finally, for GeoDjango to be able to find the SpatiaLite library, set
+the ``SPATIALITE_LIBRARY_PATH`` setting to its path. This will be within
+your brew install path, which you can check with:
 
-    SPATIALITE_LIBRARY_PATH = "/usr/local/lib/mod_spatialite.dylib"
+.. code-block:: console
+
+    $ brew --prefix
+    /opt/homebrew
+
+Using this brew install path, the full path can be constructed like this::
+
+    SPATIALITE_LIBRARY_PATH = "/opt/homebrew/lib/mod_spatialite.dylib"
 
 .. _Homebrew: https://brew.sh/

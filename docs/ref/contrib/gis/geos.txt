@@ -19,7 +19,7 @@ maintained by `Refractions Research`__ of Victoria, Canada.
 
 __ https://libgeos.org/
 __ https://sourceforge.net/projects/jts-topo-suite/
-__ https://www.ogc.org/standards/sfs
+__ https://www.ogc.org/standard/sfs/
 __ http://www.refractions.net/
 
 Features
@@ -483,8 +483,6 @@ return a boolean.
     one thousandth of a unit.
 
 .. method:: GEOSGeometry.equals_identical(other)
-
-    .. versionadded:: 5.0
 
     Returns ``True`` if the two geometries are point-wise equivalent by
     checking that the structure, ordering, and values of all vertices are

@@ -352,9 +352,9 @@ class HttpResponseTests(SimpleTestCase):
         h.headers["Content-Disposition"] = 'attachment; filename="%s"' % f
         # This one is triggering https://bugs.python.org/issue20747, that is Python
         # will itself insert a newline in the header
-        h.headers[
-            "Content-Disposition"
-        ] = 'attachment; filename="EdelRot_Blu\u0308te (3)-0.JPG"'
+        h.headers["Content-Disposition"] = (
+            'attachment; filename="EdelRot_Blu\u0308te (3)-0.JPG"'
+        )
 
     def test_newlines_in_headers(self):
         # Bug #10188: Do not allow newlines in headers (CR or LF)
@@ -762,9 +762,7 @@ class FileCloseTests(SimpleTestCase):
         # Disable the request_finished signal during this test
         # to avoid interfering with the database connection.
         request_finished.disconnect(close_old_connections)
-
-    def tearDown(self):
-        request_finished.connect(close_old_connections)
+        self.addCleanup(request_finished.connect, close_old_connections)
 
     def test_response(self):
         filename = os.path.join(os.path.dirname(__file__), "abc.txt")

@@ -9,6 +9,7 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
+import functools
 import sys
 from os.path import abspath, dirname, join
 
@@ -29,6 +30,10 @@ sys.path.insert(1, dirname(dirname(abspath(__file__))))
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.append(abspath(join(dirname(__file__), "_ext")))
 
+# Use the module to GitHub url resolver, but import it after the _ext directoy
+# it lives in has been added to sys.path.
+import github_links  # NOQA
+
 # -- General configuration -----------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -40,8 +45,8 @@ extensions = [
     "djangodocs",
     "sphinx.ext.extlinks",
     "sphinx.ext.intersphinx",
-    "sphinx.ext.viewcode",
     "sphinx.ext.autosectionlabel",
+    "sphinx.ext.linkcode",
 ]
 
 # AutosectionLabel settings.
@@ -89,7 +94,7 @@ spelling_warning = True
 # templates_path = []
 
 # The suffix of source filenames.
-source_suffix = ".txt"
+source_suffix = {".txt": "restructuredtext"}
 
 # The encoding of source files.
 # source_encoding = 'utf-8-sig'
@@ -111,7 +116,7 @@ copyright = "Django Software Foundation and contributors"
 # built documents.
 #
 # The short X.Y version.
-version = "5.1"
+version = "5.2"
 # The full version, including alpha/beta/rc tags.
 try:
     from django import VERSION, get_version
@@ -128,7 +133,7 @@ else:
     release = django_release()
 
 # The "development version" of Django
-django_next_version = "5.1"
+django_next_version = "5.2"
 
 extlinks = {
     "bpo": ("https://bugs.python.org/issue?@action=redirect&bpo=%s", "bpo-%s"),
@@ -177,9 +182,9 @@ pygments_style = "trac"
 # Links to Python's docs should reference the most recent version of the 3.x
 # branch, which is located at this URL.
 intersphinx_mapping = {
-    "python": ("https://docs.python.org/3/", None),
-    "sphinx": ("https://www.sphinx-doc.org/en/master/", None),
-    "psycopg": ("https://www.psycopg.org/psycopg3/docs/", None),
+    "python": ("https://docs.python.org/3", None),
+    "sphinx": ("https://www.sphinx-doc.org/en/master", None),
+    "psycopg": ("https://www.psycopg.org/psycopg3/docs", None),
 }
 
 # Python's docs don't change every week.
@@ -287,8 +292,12 @@ latex_elements = {
         \setmainfont{Symbola}
     """,
     "preamble": r"""
-        \usepackage{newunicodechar}
         \usepackage[UTF8]{ctex}
+        \xeCJKDeclareCharClass{HalfLeft}{"2018, "201C}
+        \xeCJKDeclareCharClass{HalfRight}{
+            "00B7, "2019, "201D, "2013, "2014, "2025, "2026, "2E3A
+        }
+        \usepackage{newunicodechar}
         \newunicodechar{π}{\ensuremath{\pi}}
         \newunicodechar{≤}{\ensuremath{\le}}
         \newunicodechar{≥}{\ensuremath{\ge}}
@@ -432,3 +441,9 @@ epub_cover = ("", "epub-cover.html")
 
 # If false, no index is generated.
 # epub_use_index = True
+
+linkcode_resolve = functools.partial(
+    github_links.github_linkcode_resolve,
+    version=version,
+    next_version=django_next_version,
+)

@@ -273,8 +273,8 @@ See :doc:`/topics/cache`.
 
 Default: ``600``
 
-The default number of seconds to cache a page for the :ref:`cache middleware
-<the-per-site-cache>`.
+The default integer number of seconds to cache a page for the
+:ref:`cache middleware <the-per-site-cache>`.
 
 See :doc:`/topics/cache`.
 
@@ -422,8 +422,7 @@ A dotted path to the view function to be used when an incoming request is
 rejected by the :doc:`CSRF protection </ref/csrf>`. The function should have
 this signature::
 
-    def csrf_failure(request, reason=""):
-        ...
+    def csrf_failure(request, reason=""): ...
 
 where ``reason`` is a short message (intended for developers or logging, not
 for end users) indicating the reason the request was rejected. It should return
@@ -663,8 +662,10 @@ A string representing the time zone for this database connection or ``None``.
 This inner option of the :setting:`DATABASES` setting accepts the same values
 as the general :setting:`TIME_ZONE` setting.
 
-When :setting:`USE_TZ` is ``True`` and this option is set, reading datetimes
-from the database returns aware datetimes in this time zone instead of UTC.
+When :setting:`USE_TZ` is ``True``, reading datetimes from the database
+returns aware datetimes with the timezone set to this option's value if not
+``None``, or to UTC otherwise.
+
 When :setting:`USE_TZ` is ``False``, it is an error to set this option.
 
 * If the database backend doesn't support time zones (e.g. SQLite, MySQL,
@@ -687,13 +688,18 @@ When :setting:`USE_TZ` is ``False``, it is an error to set this option.
     third-party systems connect to the same database and expect to find
     datetimes in local time, then you must set this option.
 
-* If the database backend supports time zones (e.g. PostgreSQL), the
-  ``TIME_ZONE`` option is very rarely needed. It can be changed at any time;
-  the database takes care of converting datetimes to the desired time zone.
+* If the database backend supports time zones (e.g., PostgreSQL), then the
+  database connection's time zone is set to this value.
 
-  Setting the time zone of the database connection may be useful for running
-  raw SQL queries involving date/time functions provided by the database, such
-  as ``date_trunc``, because their results depend on the time zone.
+  Although setting the ``TIME_ZONE`` option is very rarely needed, there are
+  situations where it becomes necessary. Specifically, it's recommended to
+  match the general :setting:`TIME_ZONE` setting when dealing with raw queries
+  involving date/time functions like PostgreSQL's ``date_trunc()`` or
+  ``generate_series()``, especially when generating time-based series that
+  transition daylight savings.
+
+  This value can be changed at any time, the database will handle the
+  conversion of datetimes to the configured time zone.
 
   However, this has a downside: receiving all datetimes in local time makes
   datetime arithmetic more tricky — you must account for possible offset
@@ -1336,9 +1342,12 @@ See :ref:`Filtering error reports<filtering-error-reports>`.
 
 Default: ``'webmaster@localhost'``
 
-Default email address to use for various automated correspondence from the
-site manager(s). This doesn't include error messages sent to :setting:`ADMINS`
-and :setting:`MANAGERS`; for that, see :setting:`SERVER_EMAIL`.
+Default email address for automated correspondence from the site manager(s).
+This address is used in the ``From:`` header of outgoing emails and can take
+any format valid in the chosen email sending protocol.
+
+This doesn't affect error messages sent to :setting:`ADMINS` and
+:setting:`MANAGERS`. See :setting:`SERVER_EMAIL` for that.
 
 .. setting:: DEFAULT_INDEX_TABLESPACE
 
@@ -1380,7 +1389,7 @@ This is only used if ``CommonMiddleware`` is installed (see
 Default: ``'``:class:`django.core.mail.backends.smtp.EmailBackend`\ ``'``
 
 The backend to use for sending emails. For the list of available backends see
-:doc:`/topics/email`.
+:ref:`topic-email-backends`.
 
 .. setting:: EMAIL_FILE_PATH
 
@@ -1658,7 +1667,7 @@ the server-provided value of ``SCRIPT_NAME``, which may be a rewritten version
 of the preferred value or not supplied at all. It is also used by
 :func:`django.setup()` to set the URL resolver script prefix outside of the
 request/response cycle (e.g. in management commands and standalone scripts) to
-generate correct URLs when ``SCRIPT_NAME`` is not ``/``.
+generate correct URLs when ``FORCE_SCRIPT_NAME`` is provided.
 
 .. setting:: FORM_RENDERER
 
@@ -1680,7 +1689,6 @@ renderers are:
 ``FORMS_URLFIELD_ASSUME_HTTPS``
 -------------------------------
 
-.. versionadded:: 5.0
 .. deprecated:: 5.0
 
 Default: ``False``
@@ -1700,6 +1708,10 @@ A full Python path to a Python package that contains custom format definitions
 for project locales. If not ``None``, Django will check for a ``formats.py``
 file, under the directory named as the current locale, and will use the
 formats defined in this file.
+
+The name of the directory containing the format definitions is expected to be
+named using :term:`locale name` notation, for example ``de``, ``pt_BR``,
+``en_US``, etc.
 
 For example, if :setting:`FORMAT_MODULE_PATH` is set to ``mysite.formats``,
 and current language is ``en`` (English), Django will expect a directory tree
@@ -1830,9 +1842,7 @@ standard :term:`language ID format <language code>`. For example, U.S. English
 is ``"en-us"``. See also the `list of language identifiers`_ and
 :doc:`/topics/i18n/index`.
 
-:setting:`USE_I18N` must be active for this setting to have any effect.
-
-It serves two purposes:
+It serves three purposes:
 
 * If the locale middleware isn't in use, it decides which translation is served
   to all users.
@@ -1840,6 +1850,11 @@ It serves two purposes:
   user's preferred language can't be determined or is not supported by the
   website. It also provides the fallback translation when a translation for a
   given literal doesn't exist for the user's preferred language.
+* If localization is explicitly disabled via the :tfilter:`unlocalize` filter
+  or the :ttag:`{% localize off %}<localize>` tag, it provides fallback
+  localization formats which will be applied instead. See
+  :ref:`controlling localization in templates <topic-l10n-templates>` for
+  details.
 
 See :ref:`how-django-discovers-language-preference` for more details.
 
@@ -2528,7 +2543,9 @@ example, to define a YAML serializer, use::
 Default: ``'root@localhost'``
 
 The email address that error messages come from, such as those sent to
-:setting:`ADMINS` and :setting:`MANAGERS`.
+:setting:`ADMINS` and :setting:`MANAGERS`. This address is used in the
+``From:`` header and can take any format valid in the chosen email sending
+protocol.
 
 .. admonition:: Why are my emails sent from a different address?
 
@@ -2908,10 +2925,6 @@ be retained if present.
 
 See also :setting:`TIME_ZONE` and :setting:`USE_I18N`.
 
-.. versionchanged:: 5.0
-
-    In older versions, the default value is ``False``.
-
 .. setting:: USE_X_FORWARDED_HOST
 
 ``USE_X_FORWARDED_HOST``
@@ -3045,8 +3058,9 @@ Default: ``'/accounts/login/'``
 The URL or :ref:`named URL pattern <naming-url-patterns>` where requests are
 redirected for login when using the
 :func:`~django.contrib.auth.decorators.login_required` decorator,
-:class:`~django.contrib.auth.mixins.LoginRequiredMixin`, or
-:class:`~django.contrib.auth.mixins.AccessMixin`.
+:class:`~django.contrib.auth.mixins.LoginRequiredMixin`,
+:class:`~django.contrib.auth.mixins.AccessMixin`, or when
+:class:`~django.contrib.auth.middleware.LoginRequiredMiddleware` is installed.
 
 .. setting:: LOGOUT_REDIRECT_URL
 
@@ -3334,7 +3348,7 @@ Possible values for the setting are:
     Modern browsers provide a more secure default policy for the ``SameSite``
     flag and will assume ``Lax`` for cookies without an explicit value set.
 
-.. _SameSite: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite
+.. _SameSite: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie#samesitesamesite-value
 
 .. setting:: SESSION_COOKIE_SECURE
 
@@ -3622,6 +3636,7 @@ Email
 * :setting:`EMAIL_SUBJECT_PREFIX`
 * :setting:`EMAIL_TIMEOUT`
 * :setting:`EMAIL_USE_LOCALTIME`
+* :setting:`EMAIL_USE_SSL`
 * :setting:`EMAIL_USE_TLS`
 * :setting:`MANAGERS`
 * :setting:`SERVER_EMAIL`
@@ -3653,14 +3668,14 @@ Forms
 
 Globalization (``i18n``/``l10n``)
 ---------------------------------
-* :setting:`DATE_FORMAT`
-* :setting:`DATE_INPUT_FORMATS`
-* :setting:`DATETIME_FORMAT`
-* :setting:`DATETIME_INPUT_FORMATS`
-* :setting:`DECIMAL_SEPARATOR`
+
+.. _settings-i18n:
+
+Internationalization (``i18n``)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 * :setting:`FIRST_DAY_OF_WEEK`
 * :setting:`FORMAT_MODULE_PATH`
-* :setting:`LANGUAGE_CODE`
 * :setting:`LANGUAGE_COOKIE_AGE`
 * :setting:`LANGUAGE_COOKIE_DOMAIN`
 * :setting:`LANGUAGE_COOKIE_HTTPONLY`
@@ -3671,6 +3686,21 @@ Globalization (``i18n``/``l10n``)
 * :setting:`LANGUAGES`
 * :setting:`LANGUAGES_BIDI`
 * :setting:`LOCALE_PATHS`
+* :setting:`TIME_ZONE`
+* :setting:`USE_I18N`
+* :setting:`USE_TZ`
+
+.. _settings-l10n:
+
+Localization (``l10n``)
+~~~~~~~~~~~~~~~~~~~~~~~
+
+* :setting:`DATE_FORMAT`
+* :setting:`DATE_INPUT_FORMATS`
+* :setting:`DATETIME_FORMAT`
+* :setting:`DATETIME_INPUT_FORMATS`
+* :setting:`DECIMAL_SEPARATOR`
+* :setting:`LANGUAGE_CODE`
 * :setting:`MONTH_DAY_FORMAT`
 * :setting:`NUMBER_GROUPING`
 * :setting:`SHORT_DATE_FORMAT`
@@ -3678,10 +3708,7 @@ Globalization (``i18n``/``l10n``)
 * :setting:`THOUSAND_SEPARATOR`
 * :setting:`TIME_FORMAT`
 * :setting:`TIME_INPUT_FORMATS`
-* :setting:`TIME_ZONE`
-* :setting:`USE_I18N`
 * :setting:`USE_THOUSAND_SEPARATOR`
-* :setting:`USE_TZ`
 * :setting:`YEAR_MONTH_FORMAT`
 
 HTTP

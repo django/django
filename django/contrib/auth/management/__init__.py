@@ -1,6 +1,7 @@
 """
 Creates permissions for all installed apps that need permissions.
 """
+
 import getpass
 import unicodedata
 
@@ -45,6 +46,13 @@ def create_permissions(
     if not app_config.models_module:
         return
 
+    try:
+        Permission = apps.get_model("auth", "Permission")
+    except LookupError:
+        return
+    if not router.allow_migrate_model(using, Permission):
+        return
+
     # Ensure that contenttypes are created for this app. Needed if
     # 'django.contrib.auth' is in INSTALLED_APPS before
     # 'django.contrib.contenttypes'.
@@ -61,28 +69,15 @@ def create_permissions(
     try:
         app_config = apps.get_app_config(app_label)
         ContentType = apps.get_model("contenttypes", "ContentType")
-        Permission = apps.get_model("auth", "Permission")
     except LookupError:
         return
 
-    if not router.allow_migrate_model(using, Permission):
-        return
+    models = list(app_config.get_models())
 
-    # This will hold the permissions we're looking for as
-    # (content_type, (codename, name))
-    searched_perms = []
-    # The codenames and ctypes that should exist.
-    ctypes = set()
-    for klass in app_config.get_models():
-        # Force looking up the content types in the current database
-        # before creating foreign keys to them.
-        ctype = ContentType.objects.db_manager(using).get_for_model(
-            klass, for_concrete_model=False
-        )
-
-        ctypes.add(ctype)
-        for perm in _get_all_permissions(klass._meta):
-            searched_perms.append((ctype, perm))
+    # Grab all the ContentTypes.
+    ctypes = ContentType.objects.db_manager(using).get_for_models(
+        *models, for_concrete_models=False
+    )
 
     # Find all the Permissions that have a content_type for a model we're
     # looking for.  We don't need to check for codenames since we already have
@@ -90,20 +85,22 @@ def create_permissions(
     all_perms = set(
         Permission.objects.using(using)
         .filter(
-            content_type__in=ctypes,
+            content_type__in=set(ctypes.values()),
         )
         .values_list("content_type", "codename")
     )
 
     perms = []
-    for ct, (codename, name) in searched_perms:
-        if (ct.pk, codename) not in all_perms:
-            permission = Permission()
-            permission._state.db = using
-            permission.codename = codename
-            permission.name = name
-            permission.content_type = ct
-            perms.append(permission)
+    for model in models:
+        ctype = ctypes[model]
+        for codename, name in _get_all_permissions(model._meta):
+            if (ctype.pk, codename) not in all_perms:
+                permission = Permission()
+                permission._state.db = using
+                permission.codename = codename
+                permission.name = name
+                permission.content_type = ctype
+                perms.append(permission)
 
     Permission.objects.using(using).bulk_create(perms)
     if verbosity >= 2:

@@ -4,7 +4,7 @@ from unittest import mock
 from django.core.management.color import no_style
 from django.db import NotSupportedError, connection, transaction
 from django.db.backends.base.operations import BaseDatabaseOperations
-from django.db.models import DurationField, Value
+from django.db.models import DurationField
 from django.db.models.expressions import Col
 from django.db.models.lookups import Exact
 from django.test import (
@@ -89,16 +89,8 @@ class SimpleDatabaseOperationTests(SimpleTestCase):
     def test_adapt_timefield_value_none(self):
         self.assertIsNone(self.ops.adapt_timefield_value(None))
 
-    def test_adapt_timefield_value_expression(self):
-        value = Value(timezone.now().time())
-        self.assertEqual(self.ops.adapt_timefield_value(value), value)
-
     def test_adapt_datetimefield_value_none(self):
         self.assertIsNone(self.ops.adapt_datetimefield_value(None))
-
-    def test_adapt_datetimefield_value_expression(self):
-        value = Value(timezone.now())
-        self.assertEqual(self.ops.adapt_datetimefield_value(value), value)
 
     def test_adapt_timefield_value(self):
         msg = "Django does not support timezone-aware times."
@@ -247,8 +239,9 @@ class DeprecationTests(TestCase):
             "DatabaseOperations.field_cast_sql() is deprecated use "
             "DatabaseOperations.lookup_cast() instead."
         )
-        with self.assertRaisesMessage(RemovedInDjango60Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
             base_ops.field_cast_sql("integer", "IntegerField")
+        self.assertEqual(ctx.filename, __file__)
 
     def test_field_cast_sql_usage_warning(self):
         compiler = Author.objects.all().query.get_compiler(connection.alias)

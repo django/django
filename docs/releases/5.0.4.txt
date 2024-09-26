@@ -1,0 +1,30 @@
+==========================
+Django 5.0.4 release notes
+==========================
+
+*April 3, 2024*
+
+Django 5.0.4 fixes several bugs in 5.0.3.
+
+Bugfixes
+========
+
+* Fixed a bug in Django 5.0 that caused a crash of ``Model.full_clean()`` on
+  fields with expressions in ``db_default``. As a consequence,
+  ``Model.full_clean()`` no longer validates for empty values in fields with
+  ``db_default`` (:ticket:`35223`).
+
+* Fixed a regression in Django 5.0 where the ``AdminFileWidget`` could be
+  rendered with two ``id`` attributes on the "Clear" checkbox
+  (:ticket:`35273`).
+
+* Fixed a bug in Django 5.0 that caused a migration crash on PostgreSQL 15+
+  when adding a partial ``UniqueConstraint`` with ``nulls_distinct``
+  (:ticket:`35329`).
+
+* Fixed a crash in Django 5.0 when performing queries involving table aliases
+  and lookups on a ``GeneratedField`` of the aliased table (:ticket:`35344`).
+
+* Fixed a bug in Django 5.0 that caused a migration crash when adding a
+  ``GeneratedField`` relying on the ``__contains`` or ``__icontains``
+  lookups or using a ``Value`` containing a ``"%"`` (:ticket:`35336`).

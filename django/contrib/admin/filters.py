@@ -5,6 +5,7 @@ Filters are specified in models with the "list_filter" option.
 Each filter subclass knows how to display a filter for a field that passes a
 certain test -- e.g. being a DateField or ForeignKey.
 """
+
 import datetime
 
 from django.contrib.admin.exceptions import NotRegistered
@@ -139,7 +140,7 @@ class SimpleListFilter(FacetsMixin, ListFilter):
             if lookup_qs is not None:
                 counts[f"{i}__c"] = models.Count(
                     pk_attname,
-                    filter=lookup_qs.query.where,
+                    filter=models.Q(pk__in=lookup_qs),
                 )
         self.used_parameters[self.parameter_name] = original_value
         return counts

@@ -116,7 +116,7 @@ are loaded from the database::
         return instance
 
 
-    def save(self, *args, **kwargs):
+    def save(self, **kwargs):
         # Check how the current values differ from ._loaded_values. For example,
         # prevent changing the creator_id of the model. (This example doesn't
         # support cases where 'creator_id' is deferred).
@@ -124,7 +124,7 @@ are loaded from the database::
             self.creator_id != self._loaded_values["creator_id"]
         ):
             raise ValueError("Updating the value of creator isn't allowed")
-        super().save(*args, **kwargs)
+        super().save(**kwargs)
 
 The example above shows a full ``from_db()`` implementation to clarify how that
 is done. In this case it would be possible to use a ``super()`` call in the
@@ -142,8 +142,8 @@ value from the database:
     >>> del obj.field
     >>> obj.field  # Loads the field from the database
 
-.. method:: Model.refresh_from_db(using=None, fields=None)
-.. method:: Model.arefresh_from_db(using=None, fields=None)
+.. method:: Model.refresh_from_db(using=None, fields=None, from_queryset=None)
+.. method:: Model.arefresh_from_db(using=None, fields=None, from_queryset=None)
 
 *Asynchronous version*: ``arefresh_from_db()``
 
@@ -197,6 +197,27 @@ all of the instance's fields when a deferred field is reloaded::
                     fields = fields.union(deferred_fields)
             super().refresh_from_db(using, fields, **kwargs)
 
+The ``from_queryset`` argument allows using a different queryset than the one
+created from :attr:`~django.db.models.Model._base_manager`. It gives you more
+control over how the model is reloaded. For example, when your model uses soft
+deletion you can make ``refresh_from_db()`` to take this into account::
+
+    obj.refresh_from_db(from_queryset=MyModel.active_objects.all())
+
+You can cache related objects that otherwise would be cleared from the reloaded
+instance::
+
+    obj.refresh_from_db(from_queryset=MyModel.objects.select_related("related_field"))
+
+You can lock the row until the end of transaction before reloading a model's
+values::
+
+    obj.refresh_from_db(from_queryset=MyModel.objects.select_for_update())
+
+.. versionchanged:: 5.1
+
+    The ``from_queryset`` argument was added.
+
 .. method:: Model.get_deferred_fields()
 
 A helper method that returns a set containing the attribute names of all those
@@ -224,17 +245,6 @@ documentation </topics/forms/modelforms>` for more information. You should only
 need to call a model's :meth:`~Model.full_clean()` method if you plan to handle
 validation errors yourself, or if you have excluded fields from the
 :class:`~django.forms.ModelForm` that require validation.
-
-.. warning::
-
-    Constraints containing :class:`~django.db.models.JSONField` may not raise
-    validation errors as key, index, and path transforms have many
-    database-specific caveats. This :ticket:`may be fully supported later
-    <34059>`.
-
-    You should always check that there are no log messages, in the
-    ``django.db.models`` logger, like *"Got a database error calling check() on
-    …"* to confirm it's validated properly.
 
 .. method:: Model.full_clean(exclude=None, validate_unique=True, validate_constraints=True)
 
@@ -370,7 +380,7 @@ Then, ``full_clean()`` will check unique constraints on your model.
                         raise ValidationError(
                             {
                                 "status": _(
-                                    "Set status to draft if there is not a " "publication date."
+                                    "Set status to draft if there is not a publication date."
                                 ),
                             }
                         )
@@ -410,8 +420,8 @@ Saving objects
 
 To save an object back to the database, call ``save()``:
 
-.. method:: Model.save(force_insert=False, force_update=False, using=DEFAULT_DB_ALIAS, update_fields=None)
-.. method:: Model.asave(force_insert=False, force_update=False, using=DEFAULT_DB_ALIAS, update_fields=None)
+.. method:: Model.save(*, force_insert=False, force_update=False, using=DEFAULT_DB_ALIAS, update_fields=None)
+.. method:: Model.asave(*, force_insert=False, force_update=False, using=DEFAULT_DB_ALIAS, update_fields=None)
 
 *Asynchronous version*: ``asave()``
 
@@ -423,6 +433,10 @@ If you want customized saving behavior, you can override this ``save()``
 method. See :ref:`overriding-model-methods` for more details.
 
 The model save process also has some subtleties; see the sections below.
+
+.. deprecated:: 5.1
+
+    Support for positional arguments is deprecated.
 
 Auto-incrementing primary keys
 ------------------------------
@@ -566,10 +580,6 @@ which returns ``NULL``. In such cases it is possible to revert to the old
 algorithm by setting the :attr:`~django.db.models.Options.select_on_save`
 option to ``True``.
 
-.. versionchanged:: 5.0
-
-    The ``Field.db_default`` parameter was added.
-
 .. _ref-models-force-insert:
 
 Forcing an INSERT or UPDATE
@@ -601,11 +611,6 @@ errors that are difficult to track down. This feature is for advanced use
 only.
 
 Using ``update_fields`` will force an update similarly to ``force_update``.
-
-.. versionchanged:: 5.0
-
-    Support for passing a tuple of parent classes to ``force_insert`` was
-    added.
 
 .. _ref-models-field-updates-using-f-expressions:
 
@@ -968,3 +973,14 @@ Other attributes
     since they are yet to be saved. Instances fetched from a ``QuerySet``
     will have ``adding=False`` and ``db`` set to the alias of the associated
     database.
+
+``_is_pk_set()``
+----------------
+
+.. method:: Model._is_pk_set()
+
+.. versionadded:: 5.2
+
+The ``_is_pk_set()`` method returns whether the model instance's ``pk`` is set.
+It abstracts the model's primary key definition, ensuring consistent behavior
+regardless of the specific ``pk`` configuration.

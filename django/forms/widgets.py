@@ -30,6 +30,9 @@ __all__ = (
     "NumberInput",
     "EmailInput",
     "URLInput",
+    "ColorInput",
+    "SearchInput",
+    "TelInput",
     "PasswordInput",
     "HiddenInput",
     "MultipleHiddenInput",
@@ -101,9 +104,11 @@ class Media:
 
     def render_js(self):
         return [
-            path.__html__()
-            if hasattr(path, "__html__")
-            else format_html('<script src="{}"></script>', self.absolute_path(path))
+            (
+                path.__html__()
+                if hasattr(path, "__html__")
+                else format_html('<script src="{}"></script>', self.absolute_path(path))
+            )
             for path in self._js
         ]
 
@@ -113,12 +118,14 @@ class Media:
         media = sorted(self._css)
         return chain.from_iterable(
             [
-                path.__html__()
-                if hasattr(path, "__html__")
-                else format_html(
-                    '<link href="{}" media="{}" rel="stylesheet">',
-                    self.absolute_path(path),
-                    medium,
+                (
+                    path.__html__()
+                    if hasattr(path, "__html__")
+                    else format_html(
+                        '<link href="{}" media="{}" rel="stylesheet">',
+                        self.absolute_path(path),
+                        medium,
+                    )
                 )
                 for path in self._css[medium]
             ]
@@ -347,6 +354,21 @@ class EmailInput(Input):
 class URLInput(Input):
     input_type = "url"
     template_name = "django/forms/widgets/url.html"
+
+
+class ColorInput(Input):
+    input_type = "color"
+    template_name = "django/forms/widgets/color.html"
+
+
+class SearchInput(Input):
+    input_type = "search"
+    template_name = "django/forms/widgets/search.html"
+
+
+class TelInput(Input):
+    input_type = "tel"
+    template_name = "django/forms/widgets/tel.html"
 
 
 class PasswordInput(Input):

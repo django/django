@@ -111,9 +111,10 @@ class AdminSidebarTests(TestCase):
         self.assertContains(response, '<tr class="model-héllo current-model">')
         self.assertContains(
             response,
-            '<th scope="row">'
+            '<th scope="row" id="admin_views-héllo">'
             '<a href="/test_sidebar/admin/admin_views/h%C3%A9llo/" aria-current="page">'
             "Héllos</a></th>",
+            html=True,
         )
 
 

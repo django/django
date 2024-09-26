@@ -2,6 +2,7 @@
 This module has the mock object definitions used to hold reference geometry
 for the GEOS and GDAL tests.
 """
+
 import json
 import os
 

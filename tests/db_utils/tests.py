@@ -1,4 +1,5 @@
 """Tests for django.db.utils."""
+
 import unittest
 
 from django.core.exceptions import ImproperlyConfigured

@@ -318,9 +318,11 @@ class TruncBase(TimezoneMixin, Transform):
                 "Cannot truncate DateField '%s' to %s."
                 % (
                     field.name,
-                    output_field.__class__.__name__
-                    if has_explicit_output_field
-                    else "DateTimeField",
+                    (
+                        output_field.__class__.__name__
+                        if has_explicit_output_field
+                        else "DateTimeField"
+                    ),
                 )
             )
         elif isinstance(field, TimeField) and (
@@ -331,9 +333,11 @@ class TruncBase(TimezoneMixin, Transform):
                 "Cannot truncate TimeField '%s' to %s."
                 % (
                     field.name,
-                    output_field.__class__.__name__
-                    if has_explicit_output_field
-                    else "DateTimeField",
+                    (
+                        output_field.__class__.__name__
+                        if has_explicit_output_field
+                        else "DateTimeField"
+                    ),
                 )
             )
         return copy

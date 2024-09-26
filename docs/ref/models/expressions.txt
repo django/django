@@ -92,7 +92,7 @@ Some examples
     >>> Company.objects.order_by("name__length")
 
     # Boolean expression can be used directly in filters.
-    >>> from django.db.models import Exists
+    >>> from django.db.models import Exists, OuterRef
     >>> Company.objects.filter(
     ...     Exists(Employee.objects.filter(company=OuterRef("pk"), salary__gt=10))
     ... )
@@ -182,6 +182,28 @@ the field value of each one, and saving each one back to the database::
 
 * getting the database, rather than Python, to do work
 * reducing the number of queries some operations require
+
+.. _slicing-using-f:
+
+Slicing ``F()`` expressions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 5.1
+
+For string-based fields, text-based fields, and
+:class:`~django.contrib.postgres.fields.ArrayField`, you can use Python's
+array-slicing syntax. The indices are 0-based and the ``step`` argument to
+``slice`` is not supported. For example:
+
+.. code-block:: pycon
+
+    >>> # Replacing a name with a substring of itself.
+    >>> writer = Writers.objects.get(name="Priyansh")
+    >>> writer.name = F("name")[1:5]
+    >>> writer.save()
+    >>> writer.refresh_from_db()
+    >>> writer.name
+    'riya'
 
 .. _avoiding-race-conditions-using-f:
 
@@ -755,9 +777,7 @@ should avoid them if possible.
     your SQL with user-provided data.
 
     You also must not quote placeholders in the SQL string. This example is
-    vulnerable to SQL injection because of the quotes around ``%s``:
-
-    .. code-block:: pycon
+    vulnerable to SQL injection because of the quotes around ``%s``::
 
         RawSQL("select col from sometable where othercol = '%s'")  # unsafe!
 
@@ -955,9 +975,9 @@ frame includes all rows from the partition to the last row in the set.
 The accepted values for the ``start`` and ``end`` arguments are ``None``, an
 integer, or zero. A negative integer for ``start`` results in ``N PRECEDING``,
 while ``None`` yields ``UNBOUNDED PRECEDING``. In ``ROWS`` mode, a positive
-integer can be used for ```start`` resulting in ``N FOLLOWING``. Positive
+integer can be used for ``start`` resulting in ``N FOLLOWING``. Positive
 integers are accepted for ``end`` and results in ``N FOLLOWING``. In ``ROWS``
-mode, a negative integer can be used for ```end`` resulting in ``N PRECEDING``.
+mode, a negative integer can be used for ``end`` resulting in ``N PRECEDING``.
 For both ``start`` and ``end``, zero will return ``CURRENT ROW``.
 
 There's a difference in what ``CURRENT ROW`` includes. When specified in
@@ -1033,10 +1053,17 @@ calling the appropriate methods on the wrapped expression.
 
     .. attribute:: allowed_default
 
-        .. versionadded:: 5.0
-
         Tells Django that this expression can be used in
         :attr:`Field.db_default`. Defaults to ``False``.
+
+    .. attribute:: constraint_validation_compatible
+
+        .. versionadded:: 5.1
+
+        Tells Django that this expression can be used during a constraint
+        validation. Expressions with ``constraint_validation_compatible`` set
+        to ``False`` must have only one source expression. Defaults to
+        ``True``.
 
     .. attribute:: contains_aggregate
 
@@ -1067,6 +1094,16 @@ calling the appropriate methods on the wrapped expression.
         to apply a function over an empty result set. Defaults to
         :py:data:`NotImplemented` which forces the expression to be computed on
         the database.
+
+    .. attribute:: set_returning
+
+        .. versionadded:: 5.2
+
+        Tells Django that this expression contains a set-returning function,
+        enforcing subquery evaluation. It's used, for example, to allow some
+        Postgres set-returning functions (e.g. ``JSONB_PATH_QUERY``,
+        ``UNNEST``, etc.) to skip optimization and be properly evaluated when
+        annotations spawn rows themselves. Defaults to ``False``.
 
     .. method:: resolve_expression(query=None, allow_joins=True, reuse=None, summarize=False, for_save=False)
 

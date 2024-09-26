@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models.functions import Coalesce, Lower
 
 
 class Product(models.Model):
@@ -12,20 +13,60 @@ class Product(models.Model):
         }
         constraints = [
             models.CheckConstraint(
-                check=models.Q(price__gt=models.F("discounted_price")),
+                condition=models.Q(price__gt=models.F("discounted_price")),
                 name="price_gt_discounted_price",
             ),
             models.CheckConstraint(
-                check=models.Q(price__gt=0),
+                condition=models.Q(price__gt=0),
                 name="%(app_label)s_%(class)s_price_gt_0",
             ),
             models.CheckConstraint(
-                check=models.Q(
+                condition=models.Q(
                     models.Q(unit__isnull=True) | models.Q(unit__in=["μg/mL", "ng/mL"])
                 ),
                 name="unicode_unit_list",
             ),
         ]
+
+
+class GeneratedFieldStoredProduct(models.Model):
+    name = models.CharField(max_length=255, null=True)
+    price = models.IntegerField(null=True)
+    discounted_price = models.IntegerField(null=True)
+    rebate = models.GeneratedField(
+        expression=Coalesce("price", 0)
+        - Coalesce("discounted_price", Coalesce("price", 0)),
+        output_field=models.IntegerField(),
+        db_persist=True,
+    )
+    lower_name = models.GeneratedField(
+        expression=Lower(models.F("name")),
+        output_field=models.CharField(max_length=255, null=True),
+        db_persist=True,
+    )
+
+    class Meta:
+        required_db_features = {"supports_stored_generated_columns"}
+
+
+class GeneratedFieldVirtualProduct(models.Model):
+    name = models.CharField(max_length=255, null=True)
+    price = models.IntegerField(null=True)
+    discounted_price = models.IntegerField(null=True)
+    rebate = models.GeneratedField(
+        expression=Coalesce("price", 0)
+        - Coalesce("discounted_price", Coalesce("price", 0)),
+        output_field=models.IntegerField(),
+        db_persist=False,
+    )
+    lower_name = models.GeneratedField(
+        expression=Lower(models.F("name")),
+        output_field=models.CharField(max_length=255, null=True),
+        db_persist=False,
+    )
+
+    class Meta:
+        required_db_features = {"supports_virtual_generated_columns"}
 
 
 class UniqueConstraintProduct(models.Model):
@@ -113,7 +154,7 @@ class AbstractModel(models.Model):
         }
         constraints = [
             models.CheckConstraint(
-                check=models.Q(age__gte=18),
+                condition=models.Q(age__gte=18),
                 name="%(app_label)s_%(class)s_adult",
             ),
         ]
@@ -128,3 +169,10 @@ class JSONFieldModel(models.Model):
 
     class Meta:
         required_db_features = {"supports_json_field"}
+
+
+class ModelWithDatabaseDefault(models.Model):
+    field = models.CharField(max_length=255)
+    field_with_db_default = models.CharField(
+        max_length=255, db_default=models.Value("field_with_db_default")
+    )

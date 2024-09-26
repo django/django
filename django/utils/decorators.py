@@ -2,7 +2,7 @@
 
 from functools import partial, update_wrapper, wraps
 
-from asgiref.sync import iscoroutinefunction
+from asgiref.sync import iscoroutinefunction, markcoroutinefunction
 
 
 class classonlymethod(classmethod):
@@ -52,6 +52,10 @@ def _multi_decorate(decorators, method):
         _update_method_wrapper(_wrapper, dec)
     # Preserve any existing attributes of 'method', including the name.
     update_wrapper(_wrapper, method)
+
+    if iscoroutinefunction(method):
+        markcoroutinefunction(_wrapper)
+
     return _wrapper
 
 

@@ -111,7 +111,7 @@ There are many ways to approach writing tests.
 
 Some programmers follow a discipline called "`test-driven development`_"; they
 actually write their tests before they write their code. This might seem
-counter-intuitive, but in fact it's similar to what most people will often do
+counterintuitive, but in fact it's similar to what most people will often do
 anyway: they describe a problem, then create some code to solve it. Test-driven
 development formalizes the problem in a Python test case.
 

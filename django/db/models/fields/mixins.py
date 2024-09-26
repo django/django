@@ -1,31 +1,53 @@
+import warnings
+
 from django.core import checks
+from django.utils.deprecation import RemovedInDjango60Warning
+from django.utils.functional import cached_property
 
 NOT_PROVIDED = object()
 
 
 class FieldCacheMixin:
-    """Provide an API for working with the model's fields value cache."""
+    """
+    An API for working with the model's fields value cache.
 
+    Subclasses must set self.cache_name to a unique entry for the cache -
+    typically the field’s name.
+    """
+
+    # RemovedInDjango60Warning.
     def get_cache_name(self):
         raise NotImplementedError
 
-    def get_cached_value(self, instance, default=NOT_PROVIDED):
+    @cached_property
+    def cache_name(self):
+        # RemovedInDjango60Warning: when the deprecation ends, replace with:
+        # raise NotImplementedError
         cache_name = self.get_cache_name()
+        warnings.warn(
+            f"Override {self.__class__.__qualname__}.cache_name instead of "
+            "get_cache_name().",
+            RemovedInDjango60Warning,
+            stacklevel=3,
+        )
+        return cache_name
+
+    def get_cached_value(self, instance, default=NOT_PROVIDED):
         try:
-            return instance._state.fields_cache[cache_name]
+            return instance._state.fields_cache[self.cache_name]
         except KeyError:
             if default is NOT_PROVIDED:
                 raise
             return default
 
     def is_cached(self, instance):
-        return self.get_cache_name() in instance._state.fields_cache
+        return self.cache_name in instance._state.fields_cache
 
     def set_cached_value(self, instance, value):
-        instance._state.fields_cache[self.get_cache_name()] = value
+        instance._state.fields_cache[self.cache_name] = value
 
     def delete_cached_value(self, instance):
-        del instance._state.fields_cache[self.get_cache_name()]
+        del instance._state.fields_cache[self.cache_name]
 
 
 class CheckFieldDefaultMixin:

@@ -553,8 +553,54 @@ coordinate transformation:
 
     .. attribute:: coord_dim
 
-    Returns or sets the coordinate dimension of this geometry. For example, the
-    value would be 2 for two-dimensional geometries.
+    Returns the coordinate dimension of this geometry. For example, the value
+    would be 2 for two-dimensional geometries.
+
+    .. deprecated:: 5.1
+
+        The ``coord_dim`` setter is deprecated. Use :meth:`.set_3d` instead.
+
+    .. attribute:: is_3d
+
+    .. versionadded:: 5.1
+
+    A boolean indicating if this geometry has Z coordinates.
+
+    .. method:: set_3d(value)
+
+    .. versionadded:: 5.1
+
+    A method that adds or removes the Z coordinate dimension.
+
+    .. code-block:: pycon
+
+        >>> p = OGRGeometry("POINT (1 2 3)")
+        >>> p.is_3d
+        True
+        >>> p.set_3d(False)
+        >>> p.wkt
+        "POINT (1 2)"
+
+    .. attribute:: is_measured
+
+    .. versionadded:: 5.1
+
+    A boolean indicating if this geometry has M coordinates.
+
+    .. method:: set_measured(value)
+
+    .. versionadded:: 5.1
+
+    A method to add or remove the M coordinate dimension.
+
+    .. code-block:: pycon
+
+        >>> p = OGRGeometry("POINT (1 2)")
+        >>> p.is_measured
+        False
+        >>> p.set_measured(True)
+        >>> p.wkt
+        "POINT M (1 2 0)"
 
     .. attribute:: geom_count
 
@@ -793,6 +839,15 @@ coordinate transformation:
     Returns the region consisting of the union of this geometry and
     the other, as a new :class:`OGRGeometry` object.
 
+    .. attribute:: centroid
+
+    Returns a :class:`Point` representing the centroid of this geometry.
+
+    .. versionchanged:: 5.1
+
+        ``centroid`` was promoted from a :class:`.Polygon` only attribute to
+        being available on all geometry types.
+
     .. attribute:: tuple
 
     Returns the coordinates of a point geometry as a tuple, the
@@ -839,6 +894,18 @@ coordinate transformation:
         >>> OGRGeometry("POINT (1 2 3)").z
         3.0
 
+    .. attribute:: m
+
+    .. versionadded:: 5.1
+
+    Returns the M coordinate of this point, or ``None`` if the Point does not
+    have an M coordinate:
+
+    .. code-block:: pycon
+
+        >>> OGRGeometry("POINT ZM (1 2 3 4)").m
+        4.0
+
 .. class:: LineString
 
     .. attribute:: x
@@ -869,6 +936,17 @@ coordinate transformation:
         >>> OGRGeometry("LINESTRING (1 2 3,4 5 6)").z
         [3.0, 6.0]
 
+    .. attribute:: m
+
+    .. versionadded:: 5.1
+
+    Returns a list of M coordinates in this line or ``None`` if the line does
+    not have M coordinates:
+
+    .. code-block:: pycon
+
+        >>> OGRGeometry("LINESTRING(0 1 2 10, 1 2 3 11, 2 3 4 12)").m
+        [10.0, 11.0, 12.0]
 
 .. class:: Polygon
 
@@ -880,10 +958,6 @@ coordinate transformation:
     .. attribute:: exterior_ring
 
     An alias for :attr:`shell`.
-
-    .. attribute:: centroid
-
-    Returns a :class:`Point` representing the centroid of this polygon.
 
 .. class:: GeometryCollection
 

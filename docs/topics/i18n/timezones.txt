@@ -9,7 +9,10 @@ Overview
 
 When support for time zones is enabled, Django stores datetime information in
 UTC in the database, uses time-zone-aware datetime objects internally, and
-translates them to the end user's time zone in templates and forms.
+converts them to the end user's time zone in forms. Templates will use the
+:ref:`default time zone <default-current-time-zone>`, but this can be updated
+to the end user's time zone through the use of :ref:`filters and tags
+<time-zones-in-templates>`.
 
 This is handy if your users live in more than one time zone and you want to
 display datetime information according to each user's wall clock.
@@ -26,10 +29,6 @@ interacting with end users.
 
 Time zone support is enabled by default. To disable it, set :setting:`USE_TZ =
 False <USE_TZ>` in your settings file.
-
-.. versionchanged:: 5.0
-
-    In older version, time zone support was disabled by default.
 
 Time zone support uses :mod:`zoneinfo`, which is part of the Python standard
 library from Python 3.9.
@@ -393,9 +392,15 @@ UTC on storage, and from UTC to the connection's time zone on retrieval.
 
 As a consequence, if you're using PostgreSQL, you can switch between ``USE_TZ
 = False`` and ``USE_TZ = True`` freely. The database connection's time zone
-will be set to :setting:`TIME_ZONE` or ``UTC`` respectively, so that Django
-obtains correct datetimes in all cases. You don't need to perform any data
-conversions.
+will be set to :setting:`DATABASE-TIME_ZONE` or ``UTC`` respectively, so that
+Django obtains correct datetimes in all cases. You don't need to perform any
+data conversions.
+
+.. admonition:: Time zone settings
+
+    The :setting:`time zone <DATABASE-TIME_ZONE>` configured for the connection
+    in the :setting:`DATABASES` setting is distinct from the general
+    :setting:`TIME_ZONE` setting.
 
 Other databases
 ~~~~~~~~~~~~~~~

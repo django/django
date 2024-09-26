@@ -1,14 +1,14 @@
-============================================
-Django 5.1 release notes - UNDER DEVELOPMENT
-============================================
+========================
+Django 5.1 release notes
+========================
 
-*Expected August 2024*
+*August 7, 2024*
 
 Welcome to Django 5.1!
 
 These release notes cover the :ref:`new features <whats-new-5.1>`, as well as
-some :ref:`backwards incompatible changes <backwards-incompatible-5.1>` you'll
-want to be aware of when upgrading from Django 5.0 or earlier. We've
+some :ref:`backwards incompatible changes <backwards-incompatible-5.1>` you
+should be aware of when upgrading from Django 5.0 or earlier. We've
 :ref:`begun the deprecation process for some features
 <deprecated-features-5.1>`.
 
@@ -26,18 +26,88 @@ only officially support the latest release of each series.
 What's new in Django 5.1
 ========================
 
+``{% querystring %}`` template tag
+-----------------------------------
+
+Django 5.1 introduces the :ttag:`{% querystring %} <querystring>` template
+tag, simplifying the modification of query parameters in URLs, making it easier
+to generate links that maintain existing query parameters while adding or
+changing specific ones.
+
+For instance, navigating pagination and query strings in templates can be
+cumbersome. Consider this template fragment that dynamically generates a URL
+for navigating to the next page within a paginated view:
+
+.. code-block:: html+django
+
+    {# Linebreaks added for readability, this should be one, long line. #}
+    <a href="?{% for key, values in request.GET.iterlists %}
+      {% if key != "page" %}
+        {% for value in values %}
+          {{ key }}={{ value }}&amp;
+        {% endfor %}
+      {% endif %}
+    {% endfor %}page={{ page.next_page_number }}">Next page</a>
+
+When switching to using this new template tag, the above magically becomes:
+
+.. code-block:: html+django
+
+    <a href="{% querystring page=page.next_page_number %}">Next page</a>
+
+PostgreSQL Connection Pools
+---------------------------
+
+Django 5.1 also introduces :ref:`connection pool <postgresql-pool>` support for
+PostgreSQL. As the time to establish a new connection can be relatively long,
+keeping connections open can reduce latency.
+
+To use a connection pool with `psycopg`_, you can set the ``"pool"`` option
+inside :setting:`OPTIONS` to be a dict to be passed to
+:class:`~psycopg:psycopg_pool.ConnectionPool`, or to ``True`` to use the
+``ConnectionPool`` defaults::
+
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            # ...
+            "OPTIONS": {
+                "pool": {
+                    "min_size": 2,
+                    "max_size": 4,
+                    "timeout": 10,
+                }
+            },
+        },
+    }
+
+.. _psycopg: https://www.psycopg.org/
+
+Middleware to require authentication by default
+-----------------------------------------------
+
+The new :class:`~django.contrib.auth.middleware.LoginRequiredMiddleware`
+redirects all unauthenticated requests to a login page. Views can allow
+unauthenticated requests by using the new
+:func:`~django.contrib.auth.decorators.login_not_required` decorator.
+
+``LoginRequiredMiddleware`` respects the ``login_url`` and
+``redirect_field_name`` values set via the
+:func:`~.django.contrib.auth.decorators.login_required` decorator, but does not
+support setting ``login_url`` or ``redirect_field_name`` via the
+:class:`~django.contrib.auth.mixins.LoginRequiredMixin`.
+
+To enable this, add ``"django.contrib.auth.middleware.LoginRequiredMiddleware"``
+to your :setting:`MIDDLEWARE` setting.
+
 Minor features
 --------------
 
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
-
-:mod:`django.contrib.admindocs`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
+* :attr:`.ModelAdmin.list_display` now supports using ``__`` lookups to list
+  fields from related models.
 
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -45,95 +115,113 @@ Minor features
 * The default iteration count for the PBKDF2 password hasher is increased from
   720,000 to 870,000.
 
-:mod:`django.contrib.contenttypes`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* The default ``parallelism`` of the ``ScryptPasswordHasher`` is 
+  increased from 1 to 5, to follow OWASP recommendations.
 
-* ...
+* The new :class:`~django.contrib.auth.forms.AdminUserCreationForm` and
+  the existing :class:`~django.contrib.auth.forms.AdminPasswordChangeForm` now
+  support disabling password-based authentication by setting an unusable
+  password on form save. This is now available in the admin when visiting the
+  user creation and password change pages.
+
+* :func:`~.django.contrib.auth.decorators.login_required`,
+  :func:`~.django.contrib.auth.decorators.permission_required`, and
+  :func:`~.django.contrib.auth.decorators.user_passes_test` decorators now
+  support wrapping asynchronous view functions.
+
+* ``ReadOnlyPasswordHashWidget`` now includes a button to reset the user's
+  password, which replaces the link previously embedded in the
+  ``ReadOnlyPasswordHashField``'s help text, improving the overall
+  accessibility of the
+  :class:`~django.contrib.auth.forms.UserChangeForm`.
 
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :class:`~django.contrib.gis.db.models.functions.BoundingCircle` is now
+  supported on SpatiaLite 5.1+.
 
-:mod:`django.contrib.messages`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* :class:`~django.contrib.gis.db.models.Collect` is now supported on MySQL
+  8.0.24+.
 
-* ...
+* :class:`~django.contrib.gis.geoip2.GeoIP2` now allows querying using
+  :class:`ipaddress.IPv4Address` or :class:`ipaddress.IPv6Address` objects.
+
+* :meth:`.GeoIP2.country` now exposes the ``continent_code``,
+  ``continent_name``, and ``is_in_european_union`` values.
+
+* :meth:`.GeoIP2.city` now exposes the ``accuracy_radius`` and ``region_name``
+  values. In addition, the ``dma_code`` and ``region`` values are now exposed
+  as ``metro_code`` and ``region_code``, but the previous keys are also
+  retained for backward compatibility.
+
+* :class:`~django.contrib.gis.measure.Area` now supports the ``ha`` unit.
+
+* The new :attr:`.OGRGeometry.is_3d` attribute allows checking if a geometry
+  has a ``Z`` coordinate dimension.
+
+* The new :meth:`.OGRGeometry.set_3d` method allows addition and removal of the
+  ``Z`` coordinate dimension.
+
+* :class:`~django.contrib.gis.gdal.OGRGeometry`,
+  :class:`~django.contrib.gis.gdal.Point`,
+  :class:`~django.contrib.gis.gdal.LineString`,
+  :class:`~django.contrib.gis.gdal.Polygon`, and
+  :class:`~django.contrib.gis.gdal.GeometryCollection` and its subclasses now
+  support measured geometries via the new :attr:`.OGRGeometry.is_measured` and
+  ``m`` properties, and the :meth:`.OGRGeometry.set_measured` method.
+
+* :attr:`.OGRGeometry.centroid` is now available on all supported geometry
+  types.
+
+* :class:`FromWKB() <django.contrib.gis.db.models.functions.FromWKB>` and
+  :class:`FromWKT() <django.contrib.gis.db.models.functions.FromWKT>` functions
+  now support the optional ``srid`` argument (except for Oracle where it is
+  ignored).
 
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
-
-:mod:`django.contrib.redirects`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
+* :class:`~django.contrib.postgres.indexes.BTreeIndex` now supports the
+  ``deduplicate_items`` parameter.
 
 :mod:`django.contrib.sessions`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :class:`django.contrib.sessions.backends.cached_db.SessionStore` now handles
+  exceptions when storing session information in the cache, logging proper
+  error messages with their traceback via the newly added
+  :ref:`sessions logger <django-contrib-sessions-logger>`.
 
-:mod:`django.contrib.sitemaps`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* :class:`django.contrib.sessions.backends.base.SessionBase` and all built-in
+  session engines now provide async API. The new asynchronous methods all have
+  ``a`` prefixed names, e.g. ``aget()``, ``akeys()``, or ``acycle_key()``.
 
-* ...
+Database backends
+~~~~~~~~~~~~~~~~~
 
-:mod:`django.contrib.sites`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* ``"init_command"`` option is now supported in :setting:`OPTIONS` on SQLite
+  to allow specifying :ref:`pragma options <sqlite-init-command>` to set upon
+  connection.
 
-* ...
+* ``"transaction_mode"`` option is now supported in :setting:`OPTIONS` on
+  SQLite to allow specifying the :ref:`sqlite-transaction-behavior`.
 
-:mod:`django.contrib.staticfiles`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.syndication`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-Asynchronous views
-~~~~~~~~~~~~~~~~~~
-
-* ...
-
-Cache
-~~~~~
-
-* ...
-
-CSRF
-~~~~
-
-* ...
-
-Decorators
-~~~~~~~~~~
-
-* ...
-
-Email
-~~~~~
-
-* ...
+* ``"pool"`` option is now supported in :setting:`OPTIONS` on PostgreSQL to
+  allow using :ref:`connection pools <postgresql-pool>`.
 
 Error Reporting
 ~~~~~~~~~~~~~~~
 
-* ...
+* In order to improve accessibility, the technical 404 and 500 error pages now
+  use HTML landmark elements for the header, footer, and main content areas.
 
 File Storage
 ~~~~~~~~~~~~
 
-* ...
-
-File Uploads
-~~~~~~~~~~~~
-
-* ...
+* The :attr:`~django.core.files.storage.FileSystemStorage.allow_overwrite`
+  parameter of :class:`~django.core.files.storage.FileSystemStorage` now allows
+  saving new files over existing ones.
 
 Forms
 ~~~~~
@@ -142,30 +230,20 @@ Forms
   fieldsets with their help text, the form fieldset now includes the
   ``aria-describedby`` HTML attribute.
 
-Generic Views
-~~~~~~~~~~~~~
-
-* ...
-
-Internationalization
-~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-Logging
-~~~~~~~
-
-* ...
-
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The :djadmin:`makemigrations` command now displays meaningful symbols for
+  each operation to highlight :class:`operation categories
+  <django.db.migrations.operations.base.OperationCategory>`.
 
 Migrations
 ~~~~~~~~~~
 
-* ...
+* The new ``Operation.category`` attribute allows specifying an
+  :class:`operation category
+  <django.db.migrations.operations.base.OperationCategory>` used by the
+  :djadmin:`makemigrations` to display a meaningful symbol for the operation.
 
 Models
 ~~~~~~
@@ -184,25 +262,22 @@ Models
 * :meth:`.QuerySet.order_by` now supports ordering by annotation transforms
   such as ``JSONObject`` keys and ``ArrayAgg`` indices.
 
-Requests and Responses
-~~~~~~~~~~~~~~~~~~~~~~
+* :class:`F() <django.db.models.F>` and :class:`OuterRef()
+  <django.db.models.OuterRef>` expressions that output
+  :class:`~django.db.models.CharField`, :class:`~django.db.models.EmailField`,
+  :class:`~django.db.models.SlugField`, :class:`~django.db.models.URLField`,
+  :class:`~django.db.models.TextField`, or
+  :class:`~django.contrib.postgres.fields.ArrayField` can now be :ref:`sliced
+  <slicing-using-f>`.
 
-* ...
+* The new ``from_queryset`` argument of :meth:`.Model.refresh_from_db` and
+  :meth:`.Model.arefresh_from_db`  allows customizing the queryset used to
+  reload a model's value. This can be used to lock the row before reloading or
+  to select related objects.
 
-Security
-~~~~~~~~
-
-* ...
-
-Serialization
-~~~~~~~~~~~~~
-
-* ...
-
-Signals
-~~~~~~~
-
-* ...
+* The new :attr:`.Expression.constraint_validation_compatible` attribute allows
+  specifying that the expression should be ignored during a constraint
+  validation.
 
 Templates
 ~~~~~~~~~
@@ -211,10 +286,8 @@ Templates
   be made available on the ``Template`` instance. Such data may be used, for
   example, by the template loader, or other template clients.
 
-* The new :ttag:`{% query_string %} <query_string>` template tag allows
-  changing a :class:`~django.http.QueryDict` instance for use in links, for
-  example, to generate a link to the next page while keeping any filtering
-  options in place.
+* :ref:`Template engines <field-checking>` now implement a ``check()`` method
+  that is already registered with the check framework.
 
 Tests
 ~~~~~
@@ -223,9 +296,6 @@ Tests
   :meth:`~django.test.SimpleTestCase.assertNotContains`, and
   :meth:`~django.test.SimpleTestCase.assertInHTML` assertions now add haystacks
   to assertion error messages.
-
-* The Django test runner now supports a ``--screenshots`` option to save
-  screenshots for Selenium tests.
 
 * The :class:`~django.test.RequestFactory`,
   :class:`~django.test.AsyncRequestFactory`, :class:`~django.test.Client`, and
@@ -238,38 +308,40 @@ Tests
      self.client.post("/items/1", query_params={"action": "delete"})
      await self.async_client.post("/items/1", query_params={"action": "delete"})
 
-URLs
-~~~~
+* The new :meth:`.SimpleTestCase.assertNotInHTML` assertion allows testing that
+  an HTML fragment is not contained in the given HTML haystack.
 
-* ...
-
-Utilities
-~~~~~~~~~
-
-* ...
+* In order to enforce test isolation, database connections inside threads are
+  no longer allowed in :class:`~django.test.SimpleTestCase`.
 
 Validators
 ~~~~~~~~~~
 
-* ...
+* The new :class:`~django.core.validators.DomainNameValidator` validates domain
+  names, including internationalized domain names. The new
+  :func:`~django.core.validators.validate_domain_name` function returns an
+  instance of :class:`~django.core.validators.DomainNameValidator`.
 
 .. _backwards-incompatible-5.1:
 
 Backwards incompatible changes in 5.1
 =====================================
 
-Database backend API
---------------------
-
-This section describes changes that may be needed in third-party database
-backends.
-
-* ...
-
 :mod:`django.contrib.gis`
 -------------------------
 
 * Support for PostGIS 2.5 is removed.
+
+* Support for PROJ < 6 is removed.
+
+* Support for GDAL 2.4 is removed.
+
+* :class:`~django.contrib.gis.geoip2.GeoIP2` no longer opens both city and
+  country databases when a directory path is provided, preferring the city
+  database, if it is available. The country database is a subset of the city
+  database and both are not typically needed. If you require use of the country
+  database when in the same directory as the city database, explicitly pass the
+  country database path to the constructor.
 
 Dropped support for MariaDB 10.4
 --------------------------------
@@ -289,9 +361,44 @@ Miscellaneous
 * In order to improve accessibility, the admin's changelist filter is now
   rendered in a ``<nav>`` tag instead of a ``<div>``.
 
+* In order to improve accessibility, the admin's footer is now rendered in
+  a ``<footer>`` tag instead of a ``<div>``, and also moved below the
+  ``<div id="main">`` element.
+
+* In order to improve accessibility, the expandable widget used for
+  :attr:`ModelAdmin.fieldsets <django.contrib.admin.ModelAdmin.fieldsets>` and
+  :attr:`InlineModelAdmin.fieldsets <django.contrib.admin.InlineModelAdmin>`,
+  when the fieldset has a name and use the ``collapse`` class, now includes
+  ``<details>`` and ``<summary>`` elements.
+
+* The JavaScript file ``collapse.js`` is removed since it is no longer needed
+  in the Django admin site.
+
 * :meth:`.SimpleTestCase.assertURLEqual` and
   :meth:`~django.test.SimpleTestCase.assertInHTML` now add ``": "`` to the
   ``msg_prefix``. This is consistent with the behavior of other assertions.
+
+* ``django.utils.text.Truncator`` used by :tfilter:`truncatechars_html` and
+  :tfilter:`truncatewords_html` template filters now uses
+  :py:class:`html.parser.HTMLParser` subclasses. This results in a more robust
+  and faster operation, but there may be small differences in the output.
+
+* The undocumented ``django.urls.converters.get_converter()`` function is
+  removed.
+
+* The minimum supported version of SQLite is increased from 3.27.0 to 3.31.0.
+
+* :class:`~django.db.models.FileField` now raises a
+  :class:`~django.core.exceptions.FieldError` when saving a file without a
+  ``name``.
+
+* ``ImageField.update_dimension_fields(force=True)`` is no longer called after
+  saving the image to storage. If your storage backend resizes images, the
+  ``width_field`` and ``height_field`` will not match the width and height of
+  the image.
+
+* The minimum supported version of ``asgiref`` is increased from 3.7.0 to
+  3.8.1.
 
 .. _deprecated-features-5.1:
 
@@ -315,6 +422,27 @@ Miscellaneous
 
 * The ``django.contrib.gis.geoip2.GeoIP2.open()`` method is deprecated. Use the
   :class:`~django.contrib.gis.geoip2.GeoIP2` constructor instead.
+
+* Passing positional arguments to :meth:`.Model.save` and :meth:`.Model.asave`
+  is deprecated in favor of keyword-only arguments.
+
+* Setting ``django.contrib.gis.gdal.OGRGeometry.coord_dim`` is deprecated. Use
+  :meth:`~django.contrib.gis.gdal.OGRGeometry.set_3d` instead.
+
+* Overriding existing converters with ``django.urls.register_converter()`` is
+  deprecated.
+
+* The ``check`` keyword argument of ``CheckConstraint`` is deprecated in favor
+  of ``condition``.
+
+* The undocumented ``OS_OPEN_FLAGS`` property of
+  :class:`~django.core.files.storage.FileSystemStorage` is deprecated. To allow
+  overwriting files in storage, set the new
+  :attr:`~django.core.files.storage.FileSystemStorage.allow_overwrite` option
+  to ``True`` instead.
+
+* The ``get_cache_name()`` method of ``FieldCacheMixin`` is deprecated in favor
+  of the ``cache_name`` cached property.
 
 Features removed in 5.1
 =======================

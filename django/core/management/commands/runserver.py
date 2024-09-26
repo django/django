@@ -8,8 +8,10 @@ from datetime import datetime
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from django.core.servers.basehttp import WSGIServer, get_internal_wsgi_application, run
+from django.db import connections
 from django.utils import autoreload
 from django.utils.regex_helper import _lazy_re_compile
+from django.utils.version import get_docs_version
 
 naiveip_re = _lazy_re_compile(
     r"""^(?:
@@ -134,6 +136,9 @@ class Command(BaseCommand):
         # Need to check migrations here, so can't use the
         # requires_migrations_check attribute.
         self.check_migrations()
+        # Close all connections opened during migration checking.
+        for conn in connections.all(initialized_only=True):
+            conn.close()
 
         try:
             handler = self.get_handler(*args, **options)
@@ -184,3 +189,14 @@ class Command(BaseCommand):
             f"Quit the server with {quit_command}.",
             file=self.stdout,
         )
+        docs_version = get_docs_version()
+        if os.environ.get("HIDE_PRODUCTION_WARNING") != "true":
+            self.stdout.write(
+                self.style.WARNING(
+                    "WARNING: This is a development server. Do not use it in a "
+                    "production setting. Use a production WSGI or ASGI server "
+                    "instead.\nFor more information on production servers see: "
+                    f"https://docs.djangoproject.com/en/{docs_version}/howto/"
+                    "deployment/"
+                )
+            )

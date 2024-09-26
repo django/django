@@ -116,9 +116,11 @@ class SearchVector(SearchVectorCombinable, Func):
         clone.set_source_expressions(
             [
                 Coalesce(
-                    expression
-                    if isinstance(expression.output_field, (CharField, TextField))
-                    else Cast(expression, TextField()),
+                    (
+                        expression
+                        if isinstance(expression.output_field, (CharField, TextField))
+                        else Cast(expression, TextField())
+                    ),
                     Value(""),
                 )
                 for expression in clone.get_source_expressions()

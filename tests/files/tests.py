@@ -144,35 +144,40 @@ class FileTests(unittest.TestCase):
         self.assertEqual(list(f), ["one\n", "two\n", "three"])
 
     def test_readable(self):
-        with tempfile.TemporaryFile() as temp, File(
-            temp, name="something.txt"
-        ) as test_file:
+        with (
+            tempfile.TemporaryFile() as temp,
+            File(temp, name="something.txt") as test_file,
+        ):
             self.assertTrue(test_file.readable())
         self.assertFalse(test_file.readable())
 
     def test_writable(self):
-        with tempfile.TemporaryFile() as temp, File(
-            temp, name="something.txt"
-        ) as test_file:
+        with (
+            tempfile.TemporaryFile() as temp,
+            File(temp, name="something.txt") as test_file,
+        ):
             self.assertTrue(test_file.writable())
         self.assertFalse(test_file.writable())
-        with tempfile.TemporaryFile("rb") as temp, File(
-            temp, name="something.txt"
-        ) as test_file:
+        with (
+            tempfile.TemporaryFile("rb") as temp,
+            File(temp, name="something.txt") as test_file,
+        ):
             self.assertFalse(test_file.writable())
 
     def test_seekable(self):
-        with tempfile.TemporaryFile() as temp, File(
-            temp, name="something.txt"
-        ) as test_file:
+        with (
+            tempfile.TemporaryFile() as temp,
+            File(temp, name="something.txt") as test_file,
+        ):
             self.assertTrue(test_file.seekable())
         self.assertFalse(test_file.seekable())
 
     def test_io_wrapper(self):
         content = "vive l'été\n"
-        with tempfile.TemporaryFile() as temp, File(
-            temp, name="something.txt"
-        ) as test_file:
+        with (
+            tempfile.TemporaryFile() as temp,
+            File(temp, name="something.txt") as test_file,
+        ):
             test_file.write(content.encode())
             test_file.seek(0)
             wrapper = TextIOWrapper(test_file, "utf-8", newline="\n")
@@ -421,9 +426,10 @@ class FileMoveSafeTests(unittest.TestCase):
         handle_a, self.file_a = tempfile.mkstemp()
         handle_b, self.file_b = tempfile.mkstemp()
 
-        # file_move_safe() raises OSError if the destination file exists and
-        # allow_overwrite is False.
-        with self.assertRaises(FileExistsError):
+        # file_move_safe() raises FileExistsError if the destination file
+        # exists and allow_overwrite is False.
+        msg = r"Destination file .* exists and allow_overwrite is False\."
+        with self.assertRaisesRegex(FileExistsError, msg):
             file_move_safe(self.file_a, self.file_b, allow_overwrite=False)
 
         # should allow it and continue on if allow_overwrite is True

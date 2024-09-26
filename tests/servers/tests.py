@@ -1,6 +1,7 @@
 """
 Tests for django.core.servers.
 """
+
 import errno
 import os
 import socket

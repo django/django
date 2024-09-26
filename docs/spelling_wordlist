@@ -96,6 +96,7 @@ contenttypes
 contrib
 coroutine
 coroutines
+counterintuitive
 criticals
 cron
 crontab
@@ -119,6 +120,7 @@ datetimes
 declaratively
 decrementing
 deduplicates
+deduplication
 deepcopy
 deferrable
 deprecations
@@ -360,6 +362,7 @@ postfix
 postgis
 postgres
 postgresql
+pragma
 pre
 precisions
 precomputation

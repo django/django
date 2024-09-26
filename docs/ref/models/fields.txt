@@ -12,8 +12,8 @@ This document contains all the API references of :class:`Field` including the
 
 .. seealso::
 
-    If the built-in fields don't do the trick, you can try `django-localflavor
-    <https://github.com/django/django-localflavor>`_ (`documentation
+    If the built-in fields don't do the trick, you can try
+    :pypi:`django-localflavor` (`documentation
     <https://django-localflavor.readthedocs.io/>`_), which contains assorted
     pieces of code that are useful for particular countries and cultures.
 
@@ -43,13 +43,15 @@ If ``True``, Django will store empty values as ``NULL`` in the database. Default
 is ``False``.
 
 Avoid using :attr:`~Field.null` on string-based fields such as
-:class:`CharField` and :class:`TextField`. If a string-based field has
-``null=True``, that means it has two possible values for "no data": ``NULL``,
-and the empty string. In most cases, it's redundant to have two possible values
-for "no data;" the Django convention is to use the empty string, not
-``NULL``. One exception is when a :class:`CharField` has both ``unique=True``
-and ``blank=True`` set. In this situation, ``null=True`` is required to avoid
-unique constraint violations when saving multiple objects with blank values.
+:class:`CharField` and :class:`TextField`. The Django convention is to use an
+empty string, not ``NULL``, as the "no data" state for string-based fields. If a
+string-based field has ``null=False``, empty strings can still be saved for "no
+data". If a string-based field has ``null=True``, that means it has two possible
+values for "no data": ``NULL``, and the empty string. In most cases, it's
+redundant to have two possible values for "no data". One exception is when a
+:class:`CharField` has both ``unique=True`` and ``blank=True`` set. In this
+situation, ``null=True`` is required to avoid unique constraint violations when
+saving multiple objects with blank values.
 
 For both string-based and non-string-based fields, you will also need to
 set ``blank=True`` if you wish to permit empty values in forms, as the
@@ -137,10 +139,6 @@ the choices are:
   project to project. Examples in this category are using third-party apps that
   provide a well-known inventory of values, such as currencies, countries,
   languages, time zones, etc.
-
-.. versionchanged:: 5.0
-
-    Support for mappings and callables was added.
 
 Generally, it's best to define choices inside a model class, and to
 define a suitably-named constant for each value::
@@ -372,10 +370,6 @@ There are some additional caveats to be aware of:
 
         __empty__ = _("(Unknown)")
 
-.. versionchanged:: 5.0
-
-    Support for using enumeration types directly in the ``choices`` was added.
-
 ``db_column``
 -------------
 
@@ -404,8 +398,6 @@ looking at your Django code. For example::
 
 ``db_default``
 --------------
-
-.. versionadded:: 5.0
 
 .. attribute:: Field.db_default
 
@@ -728,8 +720,8 @@ The default form widget for this field is a :class:`~django.forms.TextInput`.
     The maximum length (in characters) of the field. The ``max_length``
     is enforced at the database level and in Django's validation using
     :class:`~django.core.validators.MaxLengthValidator`. It's required for all
-    database backends included with Django except PostgreSQL, which supports
-    unlimited ``VARCHAR`` columns.
+    database backends included with Django except PostgreSQL and SQLite, which
+    supports unlimited ``VARCHAR`` columns.
 
     .. note::
 
@@ -737,6 +729,10 @@ The default form widget for this field is a :class:`~django.forms.TextInput`.
         database backends, you should be aware that there are restrictions on
         ``max_length`` for some backends. Refer to the :doc:`database backend
         notes </ref/databases>` for details.
+
+    .. versionchanged:: 5.2
+
+       Support for unlimited ``VARCHAR`` columns was added on SQLite.
 
 .. attribute:: CharField.db_collation
 
@@ -808,6 +804,15 @@ Any combination of these options will result in an error.
     instead of a ``DateField`` and deciding how to handle the conversion from
     datetime to date at display time.
 
+.. warning:: Always use :class:`DateField` with a ``datetime.date`` instance.
+
+    If you have a ``datetime.datetime`` instance, it's recommended to convert
+    it to a ``datetime.date`` first. If you don't, :class:`DateField` will
+    localize the ``datetime.datetime`` to the :ref:`default timezone
+    <default-current-time-zone>` and convert it to a ``datetime.date``
+    instance, removing its time component. This is true for both storage and
+    comparison.
+
 ``DateTimeField``
 -----------------
 
@@ -819,6 +824,16 @@ Takes the same extra arguments as :class:`DateField`.
 The default form widget for this field is a single
 :class:`~django.forms.DateTimeInput`. The admin uses two separate
 :class:`~django.forms.TextInput` widgets with JavaScript shortcuts.
+
+.. warning:: Always use :class:`DateTimeField` with a ``datetime.datetime``
+    instance.
+
+    If you have a ``datetime.date`` instance, it's recommended to convert it to
+    a ``datetime.datetime`` first. If you don't, :class:`DateTimeField` will
+    use midnight in the :ref:`default timezone <default-current-time-zone>` for
+    the time component. This is true for both storage and comparison. To
+    compare the date portion of a :class:`DateTimeField` with a
+    ``datetime.date`` instance, use the :lookup:`date` lookup.
 
 ``DecimalField``
 ----------------
@@ -1235,8 +1250,6 @@ when :attr:`~django.forms.Field.localize` is ``False`` or
 ``GeneratedField``
 ------------------
 
-.. versionadded:: 5.0
-
 .. class:: GeneratedField(expression, output_field, db_persist=None, **kwargs)
 
 A field that is always computed based on other fields in the model. This field
@@ -1342,17 +1355,15 @@ following optional arguments:
 
 .. attribute:: ImageField.height_field
 
-    Name of a model field which will be auto-populated with the height of the
-    image each time the model instance is saved.
+    Name of a model field which is auto-populated with the height of the image
+    each time an image object is set.
 
 .. attribute:: ImageField.width_field
 
-    Name of a model field which will be auto-populated with the width of the
-    image each time the model instance is saved.
+    Name of a model field which is auto-populated with the width of the image
+    each time an image object is set.
 
-Requires the `Pillow`_ library.
-
-.. _Pillow: https://pillow.readthedocs.io/en/latest/
+Requires the :pypi:`pillow` library.
 
 :class:`ImageField` instances are created in your database as ``varchar``
 columns with a default max length of 100 characters. As with other fields, you
@@ -2434,6 +2445,9 @@ Field API reference
         Returns the default :class:`django.forms.Field` of this field for
         :class:`~django.forms.ModelForm`.
 
+        If :meth:`~Field.formfield` is overridden to return ``None``, this field
+        is excluded from the :class:`~django.forms.ModelForm`.
+
         By default, if both ``form_class`` and ``choices_form_class`` are
         ``None``, it uses :class:`~django.forms.CharField`. If the field has
         :attr:`~django.db.models.Field.choices` and ``choices_form_class``
@@ -2489,18 +2503,11 @@ Attributes for fields
 
 .. attribute:: Field.hidden
 
-    Boolean flag that indicates if a field is used to back another non-hidden
-    field's functionality (e.g. the ``content_type`` and ``object_id`` fields
-    that make up a ``GenericForeignKey``). The ``hidden`` flag is used to
-    distinguish what constitutes the public subset of fields on the model from
-    all the fields on the model.
-
-    .. note::
-
-        :meth:`Options.get_fields()
-        <django.db.models.options.Options.get_fields()>`
-        excludes hidden fields by default. Pass in ``include_hidden=True`` to
-        return hidden fields in the results.
+    Boolean flag that indicates if a field is hidden and should not be returned
+    by :meth:`Options.get_fields()
+    <django.db.models.options.Options.get_fields>` by default. An example is
+    the reverse field for a :class:`~django.db.models.ForeignKey` with a
+    ``related_name`` that starts with ``'+'``.
 
 .. attribute:: Field.is_relation
 

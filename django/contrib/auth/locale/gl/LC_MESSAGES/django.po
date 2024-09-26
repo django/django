@@ -6,15 +6,15 @@
 # fasouto <fsoutomoure@gmail.com>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Leandro Regueiro <leandro.regueiro@gmail.com>, 2011,2013
-# X Bello <xbello@gmail.com>, 2023
+# X Bello <xbello@gmail.com>, 2023-2024
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-17 03:19-0500\n"
-"PO-Revision-Date: 2023-04-25 08:09+0000\n"
-"Last-Translator: X Bello <xbello@gmail.com>, 2023\n"
-"Language-Team: Galician (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 08:09+0000\n"
+"Last-Translator: X Bello <xbello@gmail.com>, 2023-2024\n"
+"Language-Team: Galician (http://app.transifex.com/django/django/language/"
 "gl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -35,12 +35,22 @@ msgstr "Datas importantes"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "O obxeto %(name)s ca clave primaria %(key)r non existe."
 
+msgid "Conflicting form data submitted. Please try again."
+msgstr "Datos do formulario en conflicto. Por favor, tente de novo."
+
 msgid "Password changed successfully."
 msgstr "O contrasinal cambiouse correctamente."
+
+msgid "Password-based authentication was disabled."
+msgstr "A autentificación por contrasinal foi deshabilitada."
 
 #, python-format
 msgid "Change password: %s"
 msgstr "Cambiar o contrasinal: %s"
+
+#, python-format
+msgid "Set password: %s"
+msgstr "Configurar contrasinal: %s"
 
 msgid "Authentication and Authorization"
 msgstr "Autenticación e Autorización"
@@ -57,8 +67,23 @@ msgstr "Non se configurou ningún contrasinal."
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Formato de contrasinal non válido ou algoritmo de hash descoñecido."
 
+msgid "Reset password"
+msgstr "Reconfigurar contrasinal"
+
+msgid "Set password"
+msgstr "Configurar contrasinal"
+
 msgid "The two password fields didn’t match."
 msgstr "Os dous campos de contrasinal non coinciden."
+
+msgid ""
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
+msgstr ""
+"Se o usuario vai poder autentificarse usando un contrasinal ou non. Si se "
+"deshabilita, poderían ser capaces de autentificarse usando outros medios, "
+"como Single Sign-On ou LDAP."
 
 msgid "Password"
 msgstr "Contrasinal"
@@ -69,13 +94,26 @@ msgstr "Confirmación do contrasinal"
 msgid "Enter the same password as before, for verification."
 msgstr "Introduza o mesmo contrasinal que antes, para verificalo."
 
+msgid "Password-based authentication"
+msgstr "Autentificación basada en contrasinal"
+
+msgid "Enabled"
+msgstr "Habilitada"
+
+msgid "Disabled"
+msgstr "Deshabilitada"
+
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user’s "
-"password, but you can change the password using <a href=\"{}\">this form</a>."
+"Raw passwords are not stored, so there is no way to see the user’s password."
 msgstr ""
-"Non se gardan os contrasinais sen cifrar, de maneira que non se pode ver o "
-"contrasinal deste usuario, pero pode modificar o contrasinal mediante <a "
-"href=\"{}\">este formulario</a>."
+"Non se gardan os contrasináis en claro, así que non hai maneira de ver o "
+"contrasinal do usuario."
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
+msgstr ""
+"Habilite a autentificación basada en contrasinal para este usuario "
+"configurando un contrasinal."
 
 #, python-format
 msgid ""
@@ -102,9 +140,6 @@ msgstr "Inseriu incorrectamente o seu contrasinal actual. Insírao de novo."
 
 msgid "Old password"
 msgstr "Contrasinal antigo"
-
-msgid "Password (again)"
-msgstr "Contrasinal (outra vez)"
 
 msgid "algorithm"
 msgstr "algoritmo"

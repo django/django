@@ -5,6 +5,7 @@
 # Brian Wang <singeeking@gmail.com>, 2018
 # Fulong Sun <sunfulong@neusoft.edu.cn>, 2016
 # Huanqun Yang, 2022
+# jack yang, 2023
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kevin Sze <leiarix@gmail.com>, 2012
 # Lele Long <schemacs@gmail.com>, 2011,2015
@@ -23,6 +24,7 @@
 # yf zhan <daxian12345@gmail.com>, 2018
 # dykai <yingkaidang@gmail.com>, 2019
 # ced773123cfad7b4e8b79ca80f736af9, 2012
+# 千百度, 2024
 # LatteFang <370358679@qq.com>, 2020
 # Kevin Sze <leiarix@gmail.com>, 2012
 # 考证 李 <likaozheng@gmail.com>, 2020
@@ -33,9 +35,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 07:05+0000\n"
-"Last-Translator: Scott Jiang, 2023\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 07:05+0000\n"
+"Last-Translator: 千百度, 2024\n"
 "Language-Team: Chinese (China) (http://app.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -203,7 +205,7 @@ msgid "Hold down “Control”, or “Command” on a Mac, to select more than o
 msgstr "按住 Control 键或 Mac 上的 Command 键来选择多项。"
 
 msgid "Select this object for an action - {}"
-msgstr ""
+msgstr "选择此对象执行操作 - {}"
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -221,10 +223,6 @@ msgstr "成功添加了 {name}“{obj}”。你可以在下面添加另一个 {n
 msgid ""
 "The {name} “{obj}” was changed successfully. You may edit it again below."
 msgstr "成功修改了 {name}“{obj}”。你可以在下面再次编辑它。"
-
-#, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr "成功添加了 {name}“{obj}”。你可以在下面再次编辑它。"
 
 #, python-brace-format
 msgid ""
@@ -384,6 +382,9 @@ msgstr "输入用户名和密码"
 msgid "Change password"
 msgstr "修改密码"
 
+msgid "Set password"
+msgstr "设置密码"
+
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "请更正以下错误。"
@@ -391,6 +392,17 @@ msgstr[0] "请更正以下错误。"
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "为用户 <strong>%(username)s</strong> 输入一个新的密码。"
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr "这将<strong>启用</strong>本用户基于密码的验证"
+
+msgid "Disable password-based authentication"
+msgstr "禁用基于密码的验证"
+
+msgid "Enable password-based authentication"
+msgstr "启用基于密码的验证"
 
 msgid "Skip to main content"
 msgstr "跳到主要内容"
@@ -421,10 +433,10 @@ msgid "Filter"
 msgstr "过滤器"
 
 msgid "Hide counts"
-msgstr ""
+msgstr "隐藏计数"
 
 msgid "Show counts"
-msgstr ""
+msgstr "显示计数"
 
 msgid "Clear all filters"
 msgstr "清除所有筛选"
@@ -507,7 +519,7 @@ msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
 "following objects and their related items will be deleted:"
 msgstr ""
-"请确认要删除选中的 %(objects_name)s 吗？以下所有对象和余它们相关的条目将都会"
+"请确认要删除选中的 %(objects_name)s 吗？以下所有对象和与它们相关的条目将都会"
 "被删除："
 
 msgid "Delete?"
@@ -530,13 +542,13 @@ msgid "None available"
 msgstr "无可选的"
 
 msgid "Added:"
-msgstr ""
+msgstr "已添加："
 
 msgid "Changed:"
-msgstr ""
+msgstr "已修改："
 
 msgid "Deleted:"
-msgstr ""
+msgstr "已删除："
 
 msgid "Unknown content"
 msgstr "未知内容"
@@ -734,7 +746,7 @@ msgid "Reset my password"
 msgstr "重设我的密码"
 
 msgid "Select all objects on this page for an action"
-msgstr ""
+msgstr "选择此页面上的所有对象执行操作"
 
 msgid "All dates"
 msgstr "所有日期"

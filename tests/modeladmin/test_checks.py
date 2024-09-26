@@ -4,16 +4,17 @@ from django.contrib.admin import BooleanFieldListFilter, SimpleListFilter
 from django.contrib.admin.options import VERTICAL, ModelAdmin, TabularInline
 from django.contrib.admin.sites import AdminSite
 from django.core.checks import Error
+from django.db import models
 from django.db.models import CASCADE, F, Field, ForeignKey, ManyToManyField, Model
 from django.db.models.functions import Upper
 from django.forms.models import BaseModelFormSet
-from django.test import SimpleTestCase
+from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import isolate_apps
 
 from .models import Band, Song, User, ValidationTestInlineModel, ValidationTestModel
 
 
-class CheckTestCase(SimpleTestCase):
+class CheckTestCase(TestCase):
     def assertIsInvalid(
         self,
         model_admin,
@@ -69,7 +70,7 @@ class RawIdCheckTests(CheckTestCase):
 
     def test_missing_field(self):
         class TestModelAdmin(ModelAdmin):
-            raw_id_fields = ("non_existent_field",)
+            raw_id_fields = ["non_existent_field"]
 
         self.assertIsInvalid(
             TestModelAdmin,
@@ -96,6 +97,29 @@ class RawIdCheckTests(CheckTestCase):
             raw_id_fields = ("users",)
 
         self.assertIsValid(TestModelAdmin, ValidationTestModel)
+
+    @isolate_apps("modeladmin")
+    def assertGeneratedDateTimeFieldIsValid(self, *, db_persist):
+        class TestModel(Model):
+            date = models.DateTimeField()
+            date_copy = models.GeneratedField(
+                expression=F("date"),
+                output_field=models.DateTimeField(),
+                db_persist=db_persist,
+            )
+
+        class TestModelAdmin(ModelAdmin):
+            date_hierarchy = "date_copy"
+
+        self.assertIsValid(TestModelAdmin, TestModel)
+
+    @skipUnlessDBFeature("supports_stored_generated_columns")
+    def test_valid_case_stored_generated_field(self):
+        self.assertGeneratedDateTimeFieldIsValid(db_persist=True)
+
+    @skipUnlessDBFeature("supports_virtual_generated_columns")
+    def test_valid_case_virtual_generated_field(self):
+        self.assertGeneratedDateTimeFieldIsValid(db_persist=False)
 
     def test_field_attname(self):
         class TestModelAdmin(ModelAdmin):
@@ -323,6 +347,24 @@ class FilterVerticalCheckTests(CheckTestCase):
         )
 
     @isolate_apps("modeladmin")
+    def test_invalid_reverse_m2m_field_with_related_name(self):
+        class Contact(Model):
+            pass
+
+        class Customer(Model):
+            contacts = ManyToManyField("Contact", related_name="customers")
+
+        class TestModelAdmin(ModelAdmin):
+            filter_vertical = ["customers"]
+
+        self.assertIsInvalid(
+            TestModelAdmin,
+            Contact,
+            "The value of 'filter_vertical[0]' must be a many-to-many field.",
+            "admin.E020",
+        )
+
+    @isolate_apps("modeladmin")
     def test_invalid_m2m_field_with_through(self):
         class Artist(Model):
             bands = ManyToManyField("Band", through="BandArtist")
@@ -380,6 +422,24 @@ class FilterHorizontalCheckTests(CheckTestCase):
         self.assertIsInvalid(
             TestModelAdmin,
             ValidationTestModel,
+            "The value of 'filter_horizontal[0]' must be a many-to-many field.",
+            "admin.E020",
+        )
+
+    @isolate_apps("modeladmin")
+    def test_invalid_reverse_m2m_field_with_related_name(self):
+        class Contact(Model):
+            pass
+
+        class Customer(Model):
+            contacts = ManyToManyField("Contact", related_name="customers")
+
+        class TestModelAdmin(ModelAdmin):
+            filter_horizontal = ["customers"]
+
+        self.assertIsInvalid(
+            TestModelAdmin,
+            Contact,
             "The value of 'filter_horizontal[0]' must be a many-to-many field.",
             "admin.E020",
         )
@@ -566,8 +626,21 @@ class ListDisplayTests(CheckTestCase):
             TestModelAdmin,
             ValidationTestModel,
             "The value of 'list_display[0]' refers to 'non_existent_field', "
-            "which is not a callable, an attribute of 'TestModelAdmin', "
-            "or an attribute or method on 'modeladmin.ValidationTestModel'.",
+            "which is not a callable or attribute of 'TestModelAdmin', "
+            "or an attribute, method, or field on 'modeladmin.ValidationTestModel'.",
+            "admin.E108",
+        )
+
+    def test_missing_related_field(self):
+        class TestModelAdmin(ModelAdmin):
+            list_display = ("band__non_existent_field",)
+
+        self.assertIsInvalid(
+            TestModelAdmin,
+            ValidationTestModel,
+            "The value of 'list_display[0]' refers to 'band__non_existent_field', "
+            "which is not a callable or attribute of 'TestModelAdmin', "
+            "or an attribute, method, or field on 'modeladmin.ValidationTestModel'.",
             "admin.E108",
         )
 
@@ -979,6 +1052,33 @@ class DateHierarchyCheckTests(CheckTestCase):
             "The value of 'date_hierarchy' must be a DateField or DateTimeField.",
             "admin.E128",
         )
+
+    @isolate_apps("modeladmin")
+    def assertGeneratedIntegerFieldIsInvalid(self, *, db_persist):
+        class TestModel(Model):
+            generated = models.GeneratedField(
+                expression=models.Value(1),
+                output_field=models.IntegerField(),
+                db_persist=db_persist,
+            )
+
+        class TestModelAdmin(ModelAdmin):
+            date_hierarchy = "generated"
+
+        self.assertIsInvalid(
+            TestModelAdmin,
+            TestModel,
+            "The value of 'date_hierarchy' must be a DateField or DateTimeField.",
+            "admin.E128",
+        )
+
+    @skipUnlessDBFeature("supports_stored_generated_columns")
+    def test_related_invalid_field_type_stored_generated_field(self):
+        self.assertGeneratedIntegerFieldIsInvalid(db_persist=True)
+
+    @skipUnlessDBFeature("supports_virtual_generated_columns")
+    def test_related_invalid_field_type_virtual_generated_field(self):
+        self.assertGeneratedIntegerFieldIsInvalid(db_persist=False)
 
     def test_valid_case(self):
         class TestModelAdmin(ModelAdmin):

@@ -6,6 +6,7 @@ test case that is capable of testing the capabilities of
 the serializers. This includes all valid data values, plus
 forward, backwards and self references.
 """
+
 import datetime
 import decimal
 import uuid
@@ -368,7 +369,6 @@ The end.""",
     (pk_obj, 620, DatePKData, datetime.date(2006, 6, 16)),
     (pk_obj, 630, DateTimePKData, datetime.datetime(2006, 6, 16, 10, 42, 37)),
     (pk_obj, 640, EmailPKData, "hovercraft@example.com"),
-    # (pk_obj, 650, FilePKData, 'file:///foo/bar/whiz.txt'),
     (pk_obj, 660, FilePathPKData, "/foo/bar/whiz.txt"),
     (pk_obj, 670, DecimalPKData, decimal.Decimal("12.345")),
     (pk_obj, 671, DecimalPKData, decimal.Decimal("-12.345")),
@@ -379,7 +379,6 @@ The end.""",
     (pk_obj, 680, IntegerPKData, 123456789),
     (pk_obj, 681, IntegerPKData, -123456789),
     (pk_obj, 682, IntegerPKData, 0),
-    # (XX, ImagePKData
     (pk_obj, 695, GenericIPAddressPKData, "fe80:1424:2223:6cff:fe8a:2e8a:2151:abcd"),
     (pk_obj, 720, PositiveIntegerPKData, 123456789),
     (pk_obj, 730, PositiveSmallIntegerPKData, 12),
@@ -392,7 +391,6 @@ The end.""",
     # Several of them.
     # The end."""),
     # (pk_obj, 770, TimePKData, datetime.time(10, 42, 37)),
-    # (pk_obj, 790, XMLPKData, "<foo></foo>"),
     (pk_obj, 791, UUIDData, uuid_obj),
     (fk_obj, 792, FKToUUID, uuid_obj),
     (pk_obj, 793, UUIDDefaultData, uuid_obj),

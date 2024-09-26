@@ -17,8 +17,10 @@ from django.db.utils import (
 from django.utils.connection import ConnectionProxy
 
 __all__ = [
+    "close_old_connections",
     "connection",
     "connections",
+    "reset_queries",
     "router",
     "DatabaseError",
     "IntegrityError",

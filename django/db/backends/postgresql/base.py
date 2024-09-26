@@ -13,7 +13,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db import DatabaseError as WrappedDatabaseError
 from django.db import connections
-from django.db.backends.base.base import BaseDatabaseWrapper
+from django.db.backends.base.base import NO_DB_ALIAS, BaseDatabaseWrapper
 from django.db.backends.utils import CursorDebugWrapper as BaseCursorDebugWrapper
 from django.utils.asyncio import async_unsafe
 from django.utils.functional import cached_property
@@ -179,6 +179,53 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     ops_class = DatabaseOperations
     # PostgreSQL backend-specific attributes.
     _named_cursor_idx = 0
+    _connection_pools = {}
+
+    @property
+    def pool(self):
+        pool_options = self.settings_dict["OPTIONS"].get("pool")
+        if self.alias == NO_DB_ALIAS or not pool_options:
+            return None
+
+        if self.alias not in self._connection_pools:
+            if self.settings_dict.get("CONN_MAX_AGE", 0) != 0:
+                raise ImproperlyConfigured(
+                    "Pooling doesn't support persistent connections."
+                )
+            # Set the default options.
+            if pool_options is True:
+                pool_options = {}
+
+            try:
+                from psycopg_pool import ConnectionPool
+            except ImportError as err:
+                raise ImproperlyConfigured(
+                    "Error loading psycopg_pool module.\nDid you install psycopg[pool]?"
+                ) from err
+
+            connect_kwargs = self.get_connection_params()
+            # Ensure we run in autocommit, Django properly sets it later on.
+            connect_kwargs["autocommit"] = True
+            enable_checks = self.settings_dict["CONN_HEALTH_CHECKS"]
+            pool = ConnectionPool(
+                kwargs=connect_kwargs,
+                open=False,  # Do not open the pool during startup.
+                configure=self._configure_connection,
+                check=ConnectionPool.check_connection if enable_checks else None,
+                **pool_options,
+            )
+            # setdefault() ensures that multiple threads don't set this in
+            # parallel. Since we do not open the pool during it's init above,
+            # this means that at worst during startup multiple threads generate
+            # pool objects and the first to set it wins.
+            self._connection_pools.setdefault(self.alias, pool)
+
+        return self._connection_pools[self.alias]
+
+    def close_pool(self):
+        if self.pool:
+            self.pool.close()
+            del self._connection_pools[self.alias]
 
     def get_database_version(self):
         """
@@ -190,9 +237,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def get_connection_params(self):
         settings_dict = self.settings_dict
         # None may be used to connect to the default 'postgres' db
-        if settings_dict["NAME"] == "" and not settings_dict.get("OPTIONS", {}).get(
-            "service"
-        ):
+        if settings_dict["NAME"] == "" and not settings_dict["OPTIONS"].get("service"):
             raise ImproperlyConfigured(
                 "settings.DATABASES is improperly configured. "
                 "Please supply the NAME or OPTIONS['service'] value."
@@ -215,7 +260,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             }
         elif settings_dict["NAME"] is None:
             # Connect to the default 'postgres' db.
-            settings_dict.get("OPTIONS", {}).pop("service", None)
+            settings_dict["OPTIONS"].pop("service", None)
             conn_params = {"dbname": "postgres", **settings_dict["OPTIONS"]}
         else:
             conn_params = {**settings_dict["OPTIONS"]}
@@ -223,12 +268,19 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
         conn_params.pop("assume_role", None)
         conn_params.pop("isolation_level", None)
+
+        pool_options = conn_params.pop("pool", None)
+        if pool_options and not is_psycopg3:
+            raise ImproperlyConfigured("Database pooling requires psycopg >= 3")
+
         server_side_binding = conn_params.pop("server_side_binding", None)
         conn_params.setdefault(
             "cursor_factory",
-            ServerBindingCursor
-            if is_psycopg3 and server_side_binding is True
-            else Cursor,
+            (
+                ServerBindingCursor
+                if is_psycopg3 and server_side_binding is True
+                else Cursor
+            ),
         )
         if settings_dict["USER"]:
             conn_params["user"] = settings_dict["USER"]
@@ -272,7 +324,12 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                     f"Invalid transaction isolation level {isolation_level_value} "
                     f"specified. Use one of the psycopg.IsolationLevel values."
                 )
-        connection = self.Database.connect(**conn_params)
+        if self.pool:
+            # If nothing else has opened the pool, open it now.
+            self.pool.open()
+            connection = self.pool.getconn()
+        else:
+            connection = self.Database.connect(**conn_params)
         if set_isolation_level:
             connection.isolation_level = self.isolation_level
         if not is_psycopg3:
@@ -285,47 +342,89 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return connection
 
     def ensure_timezone(self):
+        # Close the pool so new connections pick up the correct timezone.
+        self.close_pool()
         if self.connection is None:
             return False
-        conn_timezone_name = self.connection.info.parameter_status("TimeZone")
+        return self._configure_timezone(self.connection)
+
+    def _configure_timezone(self, connection):
+        conn_timezone_name = connection.info.parameter_status("TimeZone")
         timezone_name = self.timezone_name
         if timezone_name and conn_timezone_name != timezone_name:
-            with self.connection.cursor() as cursor:
+            with connection.cursor() as cursor:
                 cursor.execute(self.ops.set_time_zone_sql(), [timezone_name])
             return True
         return False
 
-    def ensure_role(self):
-        if self.connection is None:
-            return False
-        if new_role := self.settings_dict.get("OPTIONS", {}).get("assume_role"):
-            with self.connection.cursor() as cursor:
+    def _configure_role(self, connection):
+        if new_role := self.settings_dict["OPTIONS"].get("assume_role"):
+            with connection.cursor() as cursor:
                 sql = self.ops.compose_sql("SET ROLE %s", [new_role])
                 cursor.execute(sql)
             return True
         return False
 
-    def init_connection_state(self):
-        super().init_connection_state()
+    def _configure_connection(self, connection):
+        # This function is called from init_connection_state and from the
+        # psycopg pool itself after a connection is opened.
 
         # Commit after setting the time zone.
-        commit_tz = self.ensure_timezone()
+        commit_tz = self._configure_timezone(connection)
         # Set the role on the connection. This is useful if the credential used
         # to login is not the same as the role that owns database resources. As
         # can be the case when using temporary or ephemeral credentials.
-        commit_role = self.ensure_role()
+        commit_role = self._configure_role(connection)
 
-        if (commit_role or commit_tz) and not self.get_autocommit():
-            self.connection.commit()
+        return commit_role or commit_tz
+
+    def _close(self):
+        if self.connection is not None:
+            # `wrap_database_errors` only works for `putconn` as long as there
+            # is no `reset` function set in the pool because it is deferred
+            # into a thread and not directly executed.
+            with self.wrap_database_errors:
+                if self.pool:
+                    # Ensure the correct pool is returned. This is a workaround
+                    # for tests so a pool can be changed on setting changes
+                    # (e.g. USE_TZ, TIME_ZONE).
+                    self.connection._pool.putconn(self.connection)
+                    # Connection can no longer be used.
+                    self.connection = None
+                else:
+                    return self.connection.close()
+
+    def init_connection_state(self):
+        super().init_connection_state()
+
+        if self.connection is not None and not self.pool:
+            commit = self._configure_connection(self.connection)
+
+            if commit and not self.get_autocommit():
+                self.connection.commit()
 
     @async_unsafe
     def create_cursor(self, name=None):
         if name:
-            # In autocommit mode, the cursor will be used outside of a
-            # transaction, hence use a holdable cursor.
-            cursor = self.connection.cursor(
-                name, scrollable=False, withhold=self.connection.autocommit
-            )
+            if is_psycopg3 and (
+                self.settings_dict["OPTIONS"].get("server_side_binding") is not True
+            ):
+                # psycopg >= 3 forces the usage of server-side bindings for
+                # named cursors so a specialized class that implements
+                # server-side cursors while performing client-side bindings
+                # must be used if `server_side_binding` is disabled (default).
+                cursor = ServerSideCursor(
+                    self.connection,
+                    name=name,
+                    scrollable=False,
+                    withhold=self.connection.autocommit,
+                )
+            else:
+                # In autocommit mode, the cursor will be used outside of a
+                # transaction, hence use a holdable cursor.
+                cursor = self.connection.cursor(
+                    name, scrollable=False, withhold=self.connection.autocommit
+                )
         else:
             cursor = self.connection.cursor()
 
@@ -384,6 +483,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             cursor.execute("SET CONSTRAINTS ALL DEFERRED")
 
     def is_usable(self):
+        if self.connection is None:
+            return False
         try:
             # Use a psycopg cursor directly, bypassing Django's utilities.
             with self.connection.cursor() as cursor:
@@ -392,6 +493,12 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             return False
         else:
             return True
+
+    def close_if_health_check_failed(self):
+        if self.pool:
+            # The pool only returns healthy connections.
+            return
+        return super().close_if_health_check_failed()
 
     @contextmanager
     def _nodb_cursor(self):
@@ -468,6 +575,23 @@ if is_psycopg3:
 
     class Cursor(CursorMixin, Database.ClientCursor):
         pass
+
+    class ServerSideCursor(
+        CursorMixin, Database.client_cursor.ClientCursorMixin, Database.ServerCursor
+    ):
+        """
+        psycopg >= 3 forces the usage of server-side bindings when using named
+        cursors but the ORM doesn't yet support the systematic generation of
+        prepareable SQL (#20516).
+
+        ClientCursorMixin forces the usage of client-side bindings while
+        ServerCursor implements the logic required to declare and scroll
+        through named cursors.
+
+        Mixing ClientCursorMixin in wouldn't be necessary if Cursor allowed to
+        specify how parameters should be bound instead, which ServerCursor
+        would inherit, but that's not the case.
+        """
 
     class CursorDebugWrapper(BaseCursorDebugWrapper):
         def copy(self, statement):

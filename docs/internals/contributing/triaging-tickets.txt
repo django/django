@@ -35,8 +35,8 @@ Triage workflow
 
 Unfortunately, not all bug reports and feature requests in the ticket tracker
 provide all the :doc:`required details<bugs-and-features>`. A number of
-tickets have patches, but those patches don't meet all the requirements of a
-:ref:`good patch<patch-style>`.
+tickets have proposed solutions, but those don't necessarily meet all the
+requirements :ref:`adhering to the guidelines for contributing <patch-style>`.
 
 One way to help out is to *triage* tickets that have been created by other
 users.
@@ -56,7 +56,7 @@ Since a picture is worth a thousand words, let's start there:
 We've got two roles in this diagram:
 
 * Mergers: people with commit access who are responsible for making the
-  final decision to merge a patch.
+  final decision to merge a change.
 
 * Ticket triagers: anyone in the Django community who chooses to
   become involved in Django's development process. Our Trac installation
@@ -115,18 +115,18 @@ Beyond that there are several considerations:
 * **Accepted + No Flags**
 
   The ticket is valid, but no one has submitted a patch for it yet. Often this
-  means you could safely start writing a patch for it. This is generally more
+  means you could safely start writing a fix for it. This is generally more
   true for the case of accepted bugs than accepted features. A ticket for a bug
   that has been accepted means that the issue has been verified by at least one
   triager as a legitimate bug - and should probably be fixed if possible. An
   accepted new feature may only mean that one triager thought the feature would
   be good to have, but this alone does not represent a consensus view or imply
   with any certainty that a patch will be accepted for that feature. Seek more
-  feedback before writing an extensive patch if you are in doubt.
+  feedback before writing an extensive contribution if you are in doubt.
 
 * **Accepted + Has Patch**
 
-  The ticket is waiting for people to review the supplied patch. This means
+  The ticket is waiting for people to review the supplied solution. This means
   downloading the patch and trying it out, verifying that it contains tests
   and docs, running the test suite with the included patch, and leaving
   feedback on the ticket.
@@ -143,7 +143,7 @@ Ready For Checkin
 
 The ticket was reviewed by any member of the community other than the person
 who supplied the patch and found to meet all the requirements for a
-commit-ready patch. A :ref:`merger <mergers-team>` now needs to give the patch
+commit-ready contribution. A :ref:`merger <mergers-team>` now needs to give
 a final review prior to being committed.
 
 There are a lot of pull requests. It can take a while for your patch to get
@@ -169,9 +169,9 @@ A number of flags, appearing as checkboxes in Trac, can be set on a ticket:
 Has patch
 ---------
 
-This means the ticket has an associated
-:doc:`patch<writing-code/submitting-patches>`. These will be reviewed
-to see if the patch is "good".
+This means the ticket has an associated solution. These will be reviewed to
+ensure they adhere to the :doc:`documented guidelines
+<writing-code/submitting-patches>`.
 
 The following three fields (Needs documentation, Needs tests,
 Patch needs improvement) apply only if a patch has been supplied.
@@ -187,12 +187,12 @@ Needs tests
 -----------
 
 This flags the patch as needing associated unit tests. Again, this
-is a required part of a valid patch.
+is a required part of a valid contribution.
 
 Patch needs improvement
 -----------------------
 
-This flag means that although the ticket *has* a patch, it's not quite
+This flag means that although the ticket *has* a solution, it's not quite
 ready for checkin. This could mean the patch no longer applies
 cleanly, there is a flaw in the implementation, or that the code
 doesn't meet our standards.
@@ -200,7 +200,7 @@ doesn't meet our standards.
 Easy pickings
 -------------
 
-Tickets that would require small, easy, patches.
+Tickets that would require small, easy, changes.
 
 Type
 ----
@@ -374,7 +374,7 @@ Then, you can help out by:
   you should raise it for discussion (referencing the relevant tickets)
   on the `Django Forum`_ or |django-developers|.
 
-* Verify if patches submitted by other users are correct. If they are correct
+* Verify if solutions submitted by others are correct. If they are correct
   and also contain appropriate documentation and tests then move them to the
   "Ready for Checkin" stage. If they are not correct then leave a comment to
   explain why and set the corresponding flags ("Patch needs improvement",
@@ -383,7 +383,7 @@ Then, you can help out by:
 .. note::
 
     The `Reports page`_ contains links to many useful Trac queries, including
-    several that are useful for triaging tickets and reviewing patches as
+    several that are useful for triaging tickets and reviewing proposals as
     suggested above.
 
     You can also find more :doc:`new-contributors`.

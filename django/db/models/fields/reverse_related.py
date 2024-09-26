@@ -8,6 +8,7 @@ in the ``remote_field`` attribute of the field.
 They also act as reverse fields for the purposes of the Meta API because
 they're the closest concept currently available.
 """
+
 import warnings
 
 from django.core import exceptions
@@ -65,7 +66,8 @@ class ForeignObjectRel(FieldCacheMixin):
     # AttributeError
     @cached_property
     def hidden(self):
-        return self.is_hidden()
+        """Should the related object be hidden?"""
+        return bool(self.related_name) and self.related_name[-1] == "+"
 
     @cached_property
     def name(self):
@@ -190,15 +192,12 @@ class ForeignObjectRel(FieldCacheMixin):
             qs = qs.order_by(*ordering)
         return (blank_choice if include_blank else []) + [(x.pk, str(x)) for x in qs]
 
-    def is_hidden(self):
-        """Should the related object be hidden?"""
-        return bool(self.related_name) and self.related_name[-1] == "+"
-
     def get_joining_columns(self):
         warnings.warn(
             "ForeignObjectRel.get_joining_columns() is deprecated. Use "
             "get_joining_fields() instead.",
             RemovedInDjango60Warning,
+            stacklevel=2,
         )
         return self.field.get_reverse_joining_columns()
 
@@ -217,6 +216,10 @@ class ForeignObjectRel(FieldCacheMixin):
         # By default foreign object doesn't relate to any remote field (for
         # example custom multicolumn joins currently have no remote field).
         self.field_name = None
+
+    @cached_property
+    def accessor_name(self):
+        return self.get_accessor_name()
 
     def get_accessor_name(self, model=None):
         # This method encapsulates the logic that decides what name to give an
@@ -246,12 +249,13 @@ class ForeignObjectRel(FieldCacheMixin):
     def path_infos(self):
         return self.get_path_info()
 
-    def get_cache_name(self):
+    @cached_property
+    def cache_name(self):
         """
         Return the name of the cache key to use for storing an instance of the
         forward model on the reverse model.
         """
-        return self.get_accessor_name()
+        return self.accessor_name
 
 
 class ManyToOneRel(ForeignObjectRel):

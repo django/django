@@ -2,7 +2,7 @@
 Django 5.0.1 release notes
 ==========================
 
-*Expected January 2, 2024*
+*January 2, 2024*
 
 Django 5.0.1 fixes several bugs in 5.0.
 
@@ -24,3 +24,15 @@ Bugfixes
 * Fixed a bug in Django 5.0 that caused a migration crash on Oracle < 23c when
   adding a ``GeneratedField`` with ``output_field=BooleanField``
   (:ticket:`35018`).
+
+* Fixed a regression in Django 5.0 where admin fields on the same line could
+  overflow the page and become non-interactive (:ticket:`35012`).
+
+* Added compatibility for ``oracledb`` 2.0.0 (:ticket:`35054`).
+
+* Fixed a regression in Django 5.0 where querysets referenced incorrect field
+  names from ``FilteredRelation()`` (:ticket:`35050`).
+
+* Fixed a regression in Django 5.0 that caused a system check crash when
+  ``ModelAdmin.filter_horizontal`` or ``filter_vertical`` contained a reverse
+  many-to-many relation with ``related_name`` (:ticket:`35056`).

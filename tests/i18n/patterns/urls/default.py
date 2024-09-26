@@ -8,7 +8,8 @@ view = TemplateView.as_view(template_name="dummy.html")
 urlpatterns = [
     path("not-prefixed/", view, name="not-prefixed"),
     path("not-prefixed-include/", include("i18n.patterns.urls.included")),
-    re_path(_(r"^translated/$"), view, name="no-prefix-translated"),
+    path(_("translated/"), view, name="no-prefix-translated"),
+    re_path(_(r"^translated-regex/$"), view, name="no-prefix-translated-regex"),
     re_path(
         _(r"^translated/(?P<slug>[\w-]+)/$"),
         view,
@@ -24,6 +25,11 @@ urlpatterns += i18n_patterns(
         _(r"^with-arguments/(?P<argument>[\w-]+)/(?:(?P<optional>[\w-]+).html)?$"),
         view,
         name="with-arguments",
+    ),
+    path(
+        _("path-with-arguments/<str:argument>/"),
+        view,
+        name="path-with-arguments",
     ),
     re_path(_(r"^users/$"), view, name="users"),
     re_path(

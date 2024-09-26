@@ -311,8 +311,7 @@ Pass a function, or any callable, to :func:`on_commit`::
     from django.db import transaction
 
 
-    def send_welcome_email():
-        ...
+    def send_welcome_email(): ...
 
 
     transaction.on_commit(send_welcome_email)

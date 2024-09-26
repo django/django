@@ -4,15 +4,15 @@
 # Bawar Jalal, 2021
 # Bawar Jalal, 2020-2021
 # Bawar Jalal, 2020
-# kosar tofiq <kosar.belana@gmail.com>, 2020-2021
-# Swara <swara09@gmail.com>, 2022-2023
+# Kosar Tofiq Saeed <kosar.belana@gmail.com>, 2020-2021
+# Swara <swara09@gmail.com>, 2022-2024
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-17 02:13-0600\n"
-"PO-Revision-Date: 2023-04-25 06:49+0000\n"
-"Last-Translator: Swara <swara09@gmail.com>, 2022-2023\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 06:49+0000\n"
+"Last-Translator: Swara <swara09@gmail.com>, 2022-2024\n"
 "Language-Team: Central Kurdish (http://app.transifex.com/django/django/"
 "language/ckb/)\n"
 "MIME-Version: 1.0\n"
@@ -55,7 +55,7 @@ msgid "Catalan"
 msgstr "کاتالانی"
 
 msgid "Central Kurdish (Sorani)"
-msgstr ""
+msgstr "کوردی"
 
 msgid "Czech"
 msgstr "چیکی"
@@ -297,6 +297,9 @@ msgstr "تاتاری"
 msgid "Udmurt"
 msgstr "ئودمورتی"
 
+msgid "Uyghur"
+msgstr "ئۆیغور"
+
 msgid "Ukrainian"
 msgstr "ئۆکرانی"
 
@@ -344,6 +347,9 @@ msgstr "ئەو پەڕەیە هیچ ئەنجامێکی تێدا نییە"
 msgid "Enter a valid value."
 msgstr "نرخێکی دروست لەناودابنێ."
 
+msgid "Enter a valid domain name."
+msgstr "پاوەن/دۆمەینی دروست بنوسە."
+
 msgid "Enter a valid URL."
 msgstr "URL ی دروست لەناودابنێ."
 
@@ -365,14 +371,18 @@ msgstr ""
 "\"سلەگ\"ێکی دروست بنوسە کە پێکهاتووە لە پیتی یونیکۆد، ژمارە، هێڵی ژێرەوە، "
 "یان هێما."
 
-msgid "Enter a valid IPv4 address."
-msgstr "ناونیشانێکی IPv4 ی دروست لەناودابنێ."
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr "ناونیشانی %(protocol)s دروست بنوسە."
 
-msgid "Enter a valid IPv6 address."
-msgstr "ناونیشانێکی IPv64 ی دروست لەناودابنێ."
+msgid "IPv4"
+msgstr "IPv4"
 
-msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "ناونیشانێکی IPv4 یان IPv6 ی دروست لەناودابنێ."
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "IPv4 or IPv6"
+msgstr "IPv4 یان IPv6"
 
 msgid "Enter only digits separated by commas."
 msgstr "تەنها ژمارە لەناودابنێ بە فاریزە جیاکرابێتەوە."
@@ -392,6 +402,15 @@ msgstr "دڵنیاببە ئەم نرخە گەورەترە یاخود یەکسا�
 #, python-format
 msgid "Ensure this value is a multiple of step size %(limit_value)s."
 msgstr "دڵنیابە کە ئەم بەهایە چەندانێکە لە قەبارەی هەنگاوی%(limit_value)s."
+
+#, python-format
+msgid ""
+"Ensure this value is a multiple of step size %(limit_value)s, starting from "
+"%(offset)s, e.g. %(offset)s, %(valid_value1)s, %(valid_value2)s, and so on."
+msgstr ""
+"دڵنیابە ئەم بەهایە چەند هێندەیەکی قەبارەی هەنگاوەکانە %(limit_value)s, "
+"دەستپێدەکات لە %(offset)s، بۆ نموونە %(offset)s، %(valid_value1)s، "
+"%(valid_value2)s، هتد."
 
 #, python-format
 msgid ""
@@ -504,7 +523,7 @@ msgid "String (up to %(max_length)s)"
 msgstr "ڕیزبەند (تا %(max_length)s)"
 
 msgid "String (unlimited)"
-msgstr ""
+msgstr "ڕیز(بێسنوور)"
 
 msgid "Comma-separated integers"
 msgstr "ژمارە تەواوەکان بە کۆما جیاکراونەتەوە"

@@ -259,12 +259,10 @@ class AtomicWithoutAutocommitTests(AtomicTests):
 
     def setUp(self):
         transaction.set_autocommit(False)
-
-    def tearDown(self):
+        self.addCleanup(transaction.set_autocommit, True)
         # The tests access the database after exercising 'atomic', initiating
         # a transaction ; a rollback is required before restoring autocommit.
-        transaction.rollback()
-        transaction.set_autocommit(True)
+        self.addCleanup(transaction.rollback)
 
 
 @skipUnlessDBFeature("uses_savepoints")
@@ -512,10 +510,8 @@ class NonAutocommitTests(TransactionTestCase):
 
     def setUp(self):
         transaction.set_autocommit(False)
-
-    def tearDown(self):
-        transaction.rollback()
-        transaction.set_autocommit(True)
+        self.addCleanup(transaction.set_autocommit, True)
+        self.addCleanup(transaction.rollback)
 
     def test_orm_query_after_error_and_rollback(self):
         """

@@ -53,7 +53,8 @@ class FileFieldTest(SimpleTestCase):
         self.assertIsInstance(
             f.clean(
                 SimpleUploadedFile(
-                    "我隻氣墊船裝滿晒鱔.txt", "मेरी मँडराने वाली नाव सर्पमीनों से भरी ह".encode()
+                    "我隻氣墊船裝滿晒鱔.txt",
+                    "मेरी मँडराने वाली नाव सर्पमीनों से भरी ह".encode(),
                 )
             ),
             SimpleUploadedFile,

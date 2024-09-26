@@ -310,6 +310,14 @@ class JSONExact(lookups.Exact):
             rhs %= tuple(func)
         return rhs, rhs_params
 
+    def as_oracle(self, compiler, connection):
+        lhs, lhs_params = self.process_lhs(compiler, connection)
+        rhs, rhs_params = self.process_rhs(compiler, connection)
+        if connection.features.supports_primitives_in_json_field:
+            lhs = f"JSON({lhs})"
+            rhs = f"JSON({rhs})"
+        return f"JSON_EQUAL({lhs}, {rhs} ERROR ON ERROR)", (*lhs_params, *rhs_params)
+
 
 class JSONIContains(CaseInsensitiveMixin, lookups.IContains):
     pass
@@ -352,10 +360,13 @@ class KeyTransform(Transform):
     def as_oracle(self, compiler, connection):
         lhs, params, key_transforms = self.preprocess_lhs(compiler, connection)
         json_path = compile_json_path(key_transforms)
-        return (
-            "COALESCE(JSON_QUERY(%s, '%s'), JSON_VALUE(%s, '%s'))"
-            % ((lhs, json_path) * 2)
-        ), tuple(params) * 2
+        if connection.features.supports_primitives_in_json_field:
+            sql = (
+                "COALESCE(JSON_VALUE(%s, '%s'), JSON_QUERY(%s, '%s' DISALLOW SCALARS))"
+            )
+        else:
+            sql = "COALESCE(JSON_QUERY(%s, '%s'), JSON_VALUE(%s, '%s'))"
+        return sql % ((lhs, json_path) * 2), tuple(params) * 2
 
     def as_postgresql(self, compiler, connection):
         lhs, params, key_transforms = self.preprocess_lhs(compiler, connection)

@@ -22,7 +22,7 @@ from .settings import TEST_ROOT
 
 def hashed_file_path(test, path):
     fullpath = test.render_template(test.static_template_snippet(path))
-    return fullpath.replace(settings.STATIC_URL, "")
+    return fullpath.removeprefix(settings.STATIC_URL)
 
 
 class TestHashedFiles:
@@ -101,7 +101,7 @@ class TestHashedFiles:
 
     def test_path_with_querystring_and_fragment(self):
         relpath = self.hashed_file_path("cached/css/fragments.css")
-        self.assertEqual(relpath, "cached/css/fragments.a60c0e74834f.css")
+        self.assertEqual(relpath, "cached/css/fragments.7fe344dee895.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
             self.assertIn(b"fonts/font.b9b105392eb8.eot?#iefix", content)
@@ -186,7 +186,9 @@ class TestHashedFiles:
         err = StringIO()
         with self.assertRaisesMessage(RuntimeError, "Max post-process passes exceeded"):
             call_command("collectstatic", interactive=False, verbosity=0, stderr=err)
-        self.assertEqual("Post-processing 'All' failed!\n\n", err.getvalue())
+        self.assertEqual(
+            "Post-processing 'bar.css, foo.css' failed!\n\n", err.getvalue()
+        )
         self.assertPostCondition()
 
     def test_post_processing(self):
@@ -417,16 +419,15 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         with open(self._clear_filename, "w") as f:
             f.write("to be deleted in one test")
 
-        self.patched_settings = self.settings(
+        patched_settings = self.settings(
             STATICFILES_DIRS=settings.STATICFILES_DIRS + [temp_dir],
         )
-        self.patched_settings.enable()
+        patched_settings.enable()
+        self.addCleanup(patched_settings.disable)
         self.addCleanup(shutil.rmtree, temp_dir)
         self._manifest_strict = storage.staticfiles_storage.manifest_strict
 
     def tearDown(self):
-        self.patched_settings.disable()
-
         if os.path.exists(self._clear_filename):
             os.unlink(self._clear_filename)
 
@@ -562,6 +563,32 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
 
 
 @override_settings(
+    STATIC_URL="/",
+    STORAGES={
+        **settings.STORAGES,
+        STATICFILES_STORAGE_ALIAS: {
+            "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
+        },
+    },
+)
+class TestCollectionManifestStorageStaticUrlSlash(CollectionTestCase):
+    run_collectstatic_in_setUp = False
+    hashed_file_path = hashed_file_path
+
+    def test_protocol_relative_url_ignored(self):
+        with override_settings(
+            STATICFILES_DIRS=[os.path.join(TEST_ROOT, "project", "static_url_slash")],
+            STATICFILES_FINDERS=["django.contrib.staticfiles.finders.FileSystemFinder"],
+        ):
+            self.run_collectstatic()
+        relpath = self.hashed_file_path("ignored.css")
+        self.assertEqual(relpath, "ignored.61707f5f4942.css")
+        with storage.staticfiles_storage.open(relpath) as relfile:
+            content = relfile.read()
+            self.assertIn(b"//foobar", content)
+
+
+@override_settings(
     STORAGES={
         **settings.STORAGES,
         STATICFILES_STORAGE_ALIAS: {
@@ -649,7 +676,7 @@ class TestCollectionJSModuleImportAggregationManifestStorage(CollectionTestCase)
 
     def test_module_import(self):
         relpath = self.hashed_file_path("cached/module.js")
-        self.assertEqual(relpath, "cached/module.55fd6938fbc5.js")
+        self.assertEqual(relpath, "cached/module.4326210cf0bd.js")
         tests = [
             # Relative imports.
             b'import testConst from "./module_test.477bbebe77f0.js";',
@@ -661,6 +688,11 @@ class TestCollectionJSModuleImportAggregationManifestStorage(CollectionTestCase)
             b'const dynamicModule = import("./module_test.477bbebe77f0.js");',
             # Creating a module object.
             b'import * as NewModule from "./module_test.477bbebe77f0.js";',
+            # Creating a minified module object.
+            b'import*as m from "./module_test.477bbebe77f0.js";',
+            b'import* as m from "./module_test.477bbebe77f0.js";',
+            b'import *as m from "./module_test.477bbebe77f0.js";',
+            b'import*  as  m from "./module_test.477bbebe77f0.js";',
             # Aliases.
             b'import { testConst as alias } from "./module_test.477bbebe77f0.js";',
             b"import {\n"
@@ -676,7 +708,7 @@ class TestCollectionJSModuleImportAggregationManifestStorage(CollectionTestCase)
 
     def test_aggregating_modules(self):
         relpath = self.hashed_file_path("cached/module.js")
-        self.assertEqual(relpath, "cached/module.55fd6938fbc5.js")
+        self.assertEqual(relpath, "cached/module.4326210cf0bd.js")
         tests = [
             b'export * from "./module_test.477bbebe77f0.js";',
             b'export { testConst } from "./module_test.477bbebe77f0.js";',
@@ -702,13 +734,13 @@ class CustomManifestStorage(storage.ManifestStaticFilesStorage):
 
 class TestCustomManifestStorage(SimpleTestCase):
     def setUp(self):
-        self.manifest_path = Path(tempfile.mkdtemp())
-        self.addCleanup(shutil.rmtree, self.manifest_path)
+        manifest_path = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, manifest_path)
 
         self.staticfiles_storage = CustomManifestStorage(
-            manifest_location=self.manifest_path,
+            manifest_location=manifest_path,
         )
-        self.manifest_file = self.manifest_path / self.staticfiles_storage.manifest_name
+        self.manifest_file = manifest_path / self.staticfiles_storage.manifest_name
         # Manifest without paths.
         self.manifest = {"version": self.staticfiles_storage.manifest_version}
         with self.manifest_file.open("w") as manifest_file:
@@ -762,12 +794,9 @@ class TestStaticFilePermissions(CollectionTestCase):
 
     def setUp(self):
         self.umask = 0o027
-        self.old_umask = os.umask(self.umask)
+        old_umask = os.umask(self.umask)
+        self.addCleanup(os.umask, old_umask)
         super().setUp()
-
-    def tearDown(self):
-        os.umask(self.old_umask)
-        super().tearDown()
 
     # Don't run collectstatic command in this test class.
     def run_collectstatic(self, **kwargs):

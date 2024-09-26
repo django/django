@@ -745,6 +745,11 @@ You can also refer to fields on related models with reverse relations through
     ``"true"``, ``"false"``, and ``"null"`` strings for
     :class:`~django.db.models.JSONField` key transforms.
 
+.. versionchanged:: 5.2
+
+    The ``SELECT`` clause generated when using ``values()`` was updated to
+    respect the order of the specified ``*fields`` and ``**expressions``.
+
 ``values_list()``
 ~~~~~~~~~~~~~~~~~
 
@@ -834,6 +839,11 @@ not having any author:
     ``values_list()`` will return ``True``, ``False``, and ``None`` instead of
     ``"true"``, ``"false"``, and ``"null"`` strings for
     :class:`~django.db.models.JSONField` key transforms.
+
+.. versionchanged:: 5.2
+
+    The ``SELECT`` clause generated when using ``values_list()`` was updated to
+    respect the order of the specified ``*fields``.
 
 ``dates()``
 ~~~~~~~~~~~
@@ -1159,12 +1169,6 @@ supports prefetching of
 :class:`~django.contrib.contenttypes.fields.GenericForeignKey`, however, the
 queryset for each ``ContentType`` must be provided in the ``querysets``
 parameter of :class:`~django.contrib.contenttypes.prefetch.GenericPrefetch`.
-
-.. versionchanged:: 5.0
-
-    Support for prefetching
-    :class:`~django.contrib.contenttypes.fields.GenericForeignKey` with
-    non-homogeneous set of results was added.
 
 For example, suppose you have these models::
 
@@ -1595,9 +1599,7 @@ of the arguments is required, but you should use at least one of them.
       FROM blog_blog;
 
   Note that the parentheses required by most database engines around
-  subqueries are not required in Django's ``select`` clauses. Also note
-  that some database backends, such as some MySQL versions, don't support
-  subqueries.
+  subqueries are not required in Django's ``select`` clauses.
 
   In some rare cases, you might wish to pass parameters to the SQL
   fragments in ``extra(select=...)``. For this purpose, use the
@@ -2114,13 +2116,6 @@ SQL equivalent:
             2
         )
 
-   .. versionchanged:: 5.0
-
-        In older versions, on databases without native support for the SQL
-        ``XOR`` operator, ``XOR`` returned rows that were matched by exactly
-        one operand. The previous behavior was not consistent with MySQL,
-        MariaDB, and Python behavior.
-
 Methods that do not return ``QuerySet``\s
 -----------------------------------------
 
@@ -2402,10 +2397,6 @@ Like :meth:`get_or_create` and :meth:`create`, if you're using manually
 specified primary keys and an object needs to be created but the key already
 exists in the database, an :exc:`~django.db.IntegrityError` is raised.
 
-.. versionchanged:: 5.0
-
-    The ``create_defaults`` argument was added.
-
 ``bulk_create()``
 ~~~~~~~~~~~~~~~~~
 
@@ -2469,11 +2460,6 @@ be in conflict must be provided.
 
 Enabling the ``ignore_conflicts`` parameter disables setting the primary key on
 each model instance (if the database normally supports it).
-
-.. versionchanged:: 5.0
-
-    In older versions, enabling the ``update_conflicts`` parameter prevented
-    setting the primary key on each model instance.
 
 .. warning::
 
@@ -2628,11 +2614,6 @@ evaluated will force it to evaluate again, repeating the query.
 ``iterator()`` is compatible with previous calls to ``prefetch_related()`` as
 long as ``chunk_size`` is given. Larger values will necessitate fewer queries
 to accomplish the prefetching at the cost of greater memory usage.
-
-.. versionchanged:: 5.0
-
-    Support for ``aiterator()`` with previous calls to ``prefetch_related()``
-    was added.
 
 On some databases (e.g. Oracle, `SQLite
 <https://www.sqlite.org/limits.html#max_variable_number>`_), the maximum number
@@ -4078,9 +4059,10 @@ elsewhere.
 A ``Q()`` object represents an SQL condition that can be used in
 database-related operations. It's similar to how an
 :class:`F() <django.db.models.F>` object represents the value of a model field
-or annotation. They make it possible to define and reuse conditions, and
-combine them using operators such as ``|`` (``OR``), ``&`` (``AND``), and ``^``
-(``XOR``). See :ref:`complex-lookups-with-q`.
+or annotation. They make it possible to define and reuse conditions. These can
+be negated using the ``~`` (``NOT``) operator, and combined using operators
+such as ``|`` (``OR``), ``&`` (``AND``), and ``^`` (``XOR``). See
+:ref:`complex-lookups-with-q`.
 
 ``Prefetch()`` objects
 ----------------------
@@ -4160,10 +4142,6 @@ lookups or :class:`Prefetch` objects you want to prefetch for. For example:
 When using multiple databases with ``prefetch_related_objects``, the prefetch
 query will use the database associated with the model instance. This can be
 overridden by using a custom queryset in a related lookup.
-
-.. versionchanged:: 5.0
-
-    ``aprefetch_related_objects()`` function was added.
 
 ``FilteredRelation()`` objects
 ------------------------------
