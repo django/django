@@ -145,6 +145,24 @@ class MinimumLengthValidatorTest(SimpleTestCase):
         )
 
 
+class MinimumLengthValidatorCustomErrorTest(SimpleTestCase):
+    def test(self):
+        class CustomMinimumLengthValidator(MinimumLengthValidator):
+            def get_error_message(self):
+                return "Your password must be %d characters long" % self.min_length
+
+        expected_error = "Your password must be %d characters long"
+
+        with self.assertRaises(ValidationError) as cm:
+            CustomMinimumLengthValidator().validate("1234567")
+        self.assertEqual(cm.exception.messages, [expected_error % 8])
+        self.assertEqual(cm.exception.error_list[0].code, "password_too_short")
+
+        with self.assertRaises(ValidationError) as cm:
+            CustomMinimumLengthValidator(min_length=3).validate("12")
+        self.assertEqual(cm.exception.messages, [expected_error % 3])
+
+
 class UserAttributeSimilarityValidatorTest(TestCase):
     def test_validate(self):
         user = User.objects.create_user(
@@ -214,6 +232,29 @@ class UserAttributeSimilarityValidatorTest(TestCase):
         )
 
 
+class UserAttributeSimilarityValidatorCustomErrorTest(TestCase):
+    def test(self):
+        class CustomUserAttributeSimilarityValidator(UserAttributeSimilarityValidator):
+            def get_error_message(self, verbose_name):
+                return "The password is too close to the %s." % verbose_name
+
+        user = User.objects.create_user(
+            username="testclient",
+            password="password",
+            email="testclient@example.com",
+            first_name="Test",
+            last_name="Client",
+        )
+
+        expected_error = "The password is too close to the %s."
+
+        with self.assertRaises(ValidationError) as cm:
+            CustomUserAttributeSimilarityValidator().validate("testclient", user=user)
+
+        self.assertEqual(cm.exception.messages, [expected_error % "username"])
+        self.assertEqual(cm.exception.error_list[0].code, "password_too_similar")
+
+
 class CommonPasswordValidatorTest(SimpleTestCase):
     def test_validate(self):
         expected_error = "This password is too common."
@@ -248,6 +289,19 @@ class CommonPasswordValidatorTest(SimpleTestCase):
         )
 
 
+class CommonPasswordValidatorCustomErrorTest(SimpleTestCase):
+    def test(self):
+        class CustomCommonPasswordValidator(CommonPasswordValidator):
+            def get_error_message(self):
+                return "This password has been used too much."
+
+        expected_error = "This password has been used too much."
+
+        with self.assertRaises(ValidationError) as cm:
+            CustomCommonPasswordValidator().validate("godzilla")
+        self.assertEqual(cm.exception.messages, [expected_error])
+
+
 class NumericPasswordValidatorTest(SimpleTestCase):
     def test_validate(self):
         expected_error = "This password is entirely numeric."
@@ -263,6 +317,20 @@ class NumericPasswordValidatorTest(SimpleTestCase):
             NumericPasswordValidator().get_help_text(),
             "Your password can’t be entirely numeric.",
         )
+
+
+class NumericPasswordValidatorCustomErrorTest(SimpleTestCase):
+    def test(self):
+        class CustomNumericPasswordValidator(NumericPasswordValidator):
+            def get_error_message(self):
+                return "This password is all digits."
+
+        expected_error = "This password is all digits."
+
+        with self.assertRaises(ValidationError) as cm:
+            CustomNumericPasswordValidator().validate("42424242")
+        self.assertEqual(cm.exception.messages, [expected_error])
+        self.assertEqual(cm.exception.error_list[0].code, "password_entirely_numeric")
 
 
 class UsernameValidatorsTests(SimpleTestCase):
