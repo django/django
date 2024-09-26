@@ -2,7 +2,7 @@ import itertools
 
 from django.core.exceptions import EmptyResultSet
 from django.db.models import Field
-from django.db.models.expressions import Func, Value
+from django.db.models.expressions import ColPairs, Func, Value
 from django.db.models.lookups import (
     Exact,
     GreaterThan,
@@ -28,16 +28,31 @@ class Tuple(Func):
 
 class TupleLookupMixin:
     def get_prep_lookup(self):
+        self.check_rhs_is_tuple_or_list()
         self.check_rhs_length_equals_lhs_length()
         return self.rhs
+
+    def check_rhs_is_tuple_or_list(self):
+        if not isinstance(self.rhs, (tuple, list)):
+            lhs_str = self.get_lhs_str()
+            raise ValueError(
+                f"{self.lookup_name!r} lookup of {lhs_str} must be a tuple or a list"
+            )
 
     def check_rhs_length_equals_lhs_length(self):
         len_lhs = len(self.lhs)
         if len_lhs != len(self.rhs):
+            lhs_str = self.get_lhs_str()
             raise ValueError(
-                f"'{self.lookup_name}' lookup of '{self.lhs.field.name}' field "
-                f"must have {len_lhs} elements"
+                f"{self.lookup_name!r} lookup of {lhs_str} must have {len_lhs} elements"
             )
+
+    def get_lhs_str(self):
+        if isinstance(self.lhs, ColPairs):
+            return repr(self.lhs.field.name)
+        else:
+            names = ", ".join(repr(f.name) for f in self.lhs)
+            return f"({names})"
 
     def get_prep_lhs(self):
         if isinstance(self.lhs, (tuple, list)):
@@ -196,14 +211,25 @@ class TupleLessThanOrEqual(TupleLookupMixin, LessThanOrEqual):
 
 class TupleIn(TupleLookupMixin, In):
     def get_prep_lookup(self):
+        self.check_rhs_is_tuple_or_list()
+        self.check_rhs_is_collection_of_tuples_or_lists()
         self.check_rhs_elements_length_equals_lhs_length()
-        return super(TupleLookupMixin, self).get_prep_lookup()
+        return self.rhs  # skip checks from mixin
+
+    def check_rhs_is_collection_of_tuples_or_lists(self):
+        if not all(isinstance(vals, (tuple, list)) for vals in self.rhs):
+            lhs_str = self.get_lhs_str()
+            raise ValueError(
+                f"{self.lookup_name!r} lookup of {lhs_str} "
+                "must be a collection of tuples or lists"
+            )
 
     def check_rhs_elements_length_equals_lhs_length(self):
         len_lhs = len(self.lhs)
         if not all(len_lhs == len(vals) for vals in self.rhs):
+            lhs_str = self.get_lhs_str()
             raise ValueError(
-                f"'{self.lookup_name}' lookup of '{self.lhs.field.name}' field "
+                f"{self.lookup_name!r} lookup of {lhs_str} "
                 f"must have {len_lhs} elements each"
             )
 
