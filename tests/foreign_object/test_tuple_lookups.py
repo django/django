@@ -1,3 +1,4 @@
+import itertools
 import unittest
 
 from django.db import NotSupportedError, connection
@@ -128,6 +129,37 @@ class TupleLookupsTests(TestCase):
             Contact.objects.filter(customer__in=subquery).order_by("id"),
             (self.contact_1, self.contact_2, self.contact_5),
         )
+
+    def test_tuple_in_rhs_must_be_collection_of_tuples_or_lists(self):
+        test_cases = (
+            (1, 2, 3),
+            ((1, 2), (3, 4), None),
+        )
+
+        for rhs in test_cases:
+            with self.subTest(rhs=rhs):
+                with self.assertRaisesMessage(
+                    ValueError,
+                    "'in' lookup of ('customer_code', 'company_code') "
+                    "must be a collection of tuples or lists",
+                ):
+                    TupleIn((F("customer_code"), F("company_code")), rhs)
+
+    def test_tuple_in_rhs_must_have_2_elements_each(self):
+        test_cases = (
+            ((),),
+            ((1,),),
+            ((1, 2, 3),),
+        )
+
+        for rhs in test_cases:
+            with self.subTest(rhs=rhs):
+                with self.assertRaisesMessage(
+                    ValueError,
+                    "'in' lookup of ('customer_code', 'company_code') "
+                    "must have 2 elements each",
+                ):
+                    TupleIn((F("customer_code"), F("company_code")), rhs)
 
     def test_lt(self):
         c1, c2, c3, c4, c5, c6 = (
@@ -358,8 +390,8 @@ class TupleLookupsTests(TestCase):
             )
 
     def test_lookup_errors(self):
-        m_2_elements = "'%s' lookup of 'customer' field must have 2 elements"
-        m_2_elements_each = "'in' lookup of 'customer' field must have 2 elements each"
+        m_2_elements = "'%s' lookup of 'customer' must have 2 elements"
+        m_2_elements_each = "'in' lookup of 'customer' must have 2 elements each"
         test_cases = (
             ({"customer": 1}, m_2_elements % "exact"),
             ({"customer": (1, 2, 3)}, m_2_elements % "exact"),
@@ -381,3 +413,77 @@ class TupleLookupsTests(TestCase):
                 self.assertRaisesMessage(ValueError, message),
             ):
                 Contact.objects.get(**kwargs)
+
+    def test_tuple_lookup_names(self):
+        test_cases = (
+            (TupleExact, "exact"),
+            (TupleGreaterThan, "gt"),
+            (TupleGreaterThanOrEqual, "gte"),
+            (TupleLessThan, "lt"),
+            (TupleLessThanOrEqual, "lte"),
+            (TupleIn, "in"),
+            (TupleIsNull, "isnull"),
+        )
+
+        for lookup_class, lookup_name in test_cases:
+            with self.subTest(lookup_name):
+                self.assertEqual(lookup_class.lookup_name, lookup_name)
+
+    def test_tuple_lookup_rhs_must_be_tuple_or_list(self):
+        test_cases = itertools.product(
+            (
+                TupleExact,
+                TupleGreaterThan,
+                TupleGreaterThanOrEqual,
+                TupleLessThan,
+                TupleLessThanOrEqual,
+                TupleIn,
+            ),
+            (
+                0,
+                1,
+                None,
+                True,
+                False,
+                {"foo": "bar"},
+            ),
+        )
+
+        for lookup_cls, rhs in test_cases:
+            lookup_name = lookup_cls.lookup_name
+            with self.subTest(lookup_name=lookup_name, rhs=rhs):
+                with self.assertRaisesMessage(
+                    ValueError,
+                    f"'{lookup_name}' lookup of ('customer_code', 'company_code') "
+                    "must be a tuple or a list",
+                ):
+                    lookup_cls((F("customer_code"), F("company_code")), rhs)
+
+    def test_tuple_lookup_rhs_must_have_2_elements(self):
+        test_cases = itertools.product(
+            (
+                TupleExact,
+                TupleGreaterThan,
+                TupleGreaterThanOrEqual,
+                TupleLessThan,
+                TupleLessThanOrEqual,
+            ),
+            (
+                [],
+                [1],
+                [1, 2, 3],
+                (),
+                (1,),
+                (1, 2, 3),
+            ),
+        )
+
+        for lookup_cls, rhs in test_cases:
+            lookup_name = lookup_cls.lookup_name
+            with self.subTest(lookup_name=lookup_name, rhs=rhs):
+                with self.assertRaisesMessage(
+                    ValueError,
+                    f"'{lookup_name}' lookup of ('customer_code', 'company_code') "
+                    "must have 2 elements",
+                ):
+                    lookup_cls((F("customer_code"), F("company_code")), rhs)
