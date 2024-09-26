@@ -82,6 +82,10 @@ Minor features
   improves performance. See :ref:`adding an async interface
   <writing-authentication-backends-async-interface>` for more details.
 
+* The :ref:`password validator classes <included-password-validators>`
+  now have a new method ``get_error_message()``, which can be overridden in
+  subclasses to customize the error messages.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
