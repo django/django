@@ -100,6 +100,10 @@ Minor features
   :meth:`.OGRGeometry.get_linear_geometry` and
   :meth:`.OGRGeometry.get_curve_geometry` methods.
 
+* :lookup:`coveredby` lookup is now supported on MySQL.
+
+* :lookup:`coveredby` lookup is now supported on MariaDB 11.7+.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

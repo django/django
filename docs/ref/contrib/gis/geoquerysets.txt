@@ -183,7 +183,7 @@ PostGIS     ``ST_ContainsProperly(poly, geom)``
 -------------
 
 *Availability*: `PostGIS <https://postgis.net/docs/ST_CoveredBy.html>`__,
-Oracle, PGRaster (Bilateral), SpatiaLite
+Oracle, MariaDB 11.7+, MySQL, PGRaster (Bilateral), SpatiaLite
 
 Tests if no point in the geometry field is outside the lookup geometry.
 [#fncovers]_
@@ -197,8 +197,14 @@ Backend     SQL Equivalent
 ==========  =============================
 PostGIS     ``ST_CoveredBy(poly, geom)``
 Oracle      ``SDO_COVEREDBY(poly, geom)``
+MariaDB     ``MBRCoveredBy(poly, geom)``
+MySQL       ``MBRCoveredBy(poly, geom)``
 SpatiaLite  ``CoveredBy(poly, geom)``
 ==========  =============================
+
+.. versionchanged:: 5.2
+
+    MySQL and MariaDB 11.7+ support was added.
 
 .. fieldlookup:: covers
 
