@@ -71,7 +71,10 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
             models.Union,
         ]
         is_mariadb = self.connection.mysql_is_mariadb
-        if is_mariadb or self.connection.mysql_version < (8, 0, 24):
+        if is_mariadb:
+            if self.connection.mysql_version < (11, 7):
+                disallowed_aggregates.insert(0, models.Collect)
+        elif self.connection.mysql_version < (8, 0, 24):
             disallowed_aggregates.insert(0, models.Collect)
         return tuple(disallowed_aggregates)
 
@@ -105,7 +108,8 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
         }
         if self.connection.mysql_is_mariadb:
             unsupported.remove("PointOnSurface")
-            unsupported.update({"GeoHash", "IsValid"})
+            if self.connection.mysql_version < (11, 7):
+                unsupported.update({"GeoHash", "IsValid"})
         return unsupported
 
     def geo_db_type(self, f):

@@ -393,7 +393,7 @@ Creates geometry from `Well-known text (WKT)`_ representation. The optional
 
 .. class:: GeoHash(expression, precision=None, **extra)
 
-*Availability*: `MySQL
+*Availability*: MariaDB, `MySQL
 <https://dev.mysql.com/doc/refman/en/spatial-geohash-functions.html#function_st-geohash>`__,
 `PostGIS <https://postgis.net/docs/ST_GeoHash.html>`__, SpatiaLite
 (LWGEOM/RTTOPO)
@@ -405,6 +405,10 @@ The ``precision`` keyword argument controls the number of characters in the
 result.
 
 __ https://en.wikipedia.org/wiki/Geohash
+
+.. versionchanged:: 5.2
+
+    MariaDB 11.7+ support was added.
 
 ``GeometryDistance``
 ====================
@@ -444,12 +448,16 @@ geometry. Returns ``True`` if its value is empty and ``False`` otherwise.
 
 .. class:: IsValid(expr)
 
-*Availability*: `MySQL
+*Availability*: MariaDB, `MySQL
 <https://dev.mysql.com/doc/refman/en/spatial-convenience-functions.html#function_st-isvalid>`__,
 `PostGIS <https://postgis.net/docs/ST_IsValid.html>`__, Oracle, SpatiaLite
 
 Accepts a geographic field or expression and tests if the value is well formed.
 Returns ``True`` if its value is a valid geometry and ``False`` otherwise.
+
+.. versionchanged:: 5.2
+
+    MariaDB 11.7+ support was added.
 
 ``Length``
 ==========

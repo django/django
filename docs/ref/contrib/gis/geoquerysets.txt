@@ -370,8 +370,8 @@ Example::
 ``isvalid``
 -----------
 
-*Availability*: MySQL, `PostGIS <https://postgis.net/docs/ST_IsValid.html>`__,
-Oracle, SpatiaLite
+*Availability*: MariaDB, MySQL,
+`PostGIS <https://postgis.net/docs/ST_IsValid.html>`__, Oracle, SpatiaLite
 
 Tests if the geometry is valid.
 
@@ -379,12 +379,16 @@ Example::
 
     Zipcode.objects.filter(poly__isvalid=True)
 
-==========================  ================================================================
-Backend                     SQL Equivalent
-==========================  ================================================================
-MySQL, PostGIS, SpatiaLite  ``ST_IsValid(poly)``
-Oracle                      ``SDO_GEOM.VALIDATE_GEOMETRY_WITH_CONTEXT(poly, 0.05) = 'TRUE'``
-==========================  ================================================================
+===================================  ================================================================
+Backend                              SQL Equivalent
+===================================  ================================================================
+MariaDB, MySQL, PostGIS, SpatiaLite  ``ST_IsValid(poly)``
+Oracle                               ``SDO_GEOM.VALIDATE_GEOMETRY_WITH_CONTEXT(poly, 0.05) = 'TRUE'``
+===================================  ================================================================
+
+.. versionchanged:: 5.2
+
+    MariaDB 11.7+ support was added.
 
 .. fieldlookup:: overlaps
 
@@ -876,8 +880,8 @@ Example:
 
 .. class:: Collect(geo_field, filter=None)
 
-*Availability*: `PostGIS <https://postgis.net/docs/ST_Collect.html>`__, MySQL,
-SpatiaLite
+*Availability*: `PostGIS <https://postgis.net/docs/ST_Collect.html>`__,
+MariaDB, MySQL, SpatiaLite
 
 Returns a ``GEOMETRYCOLLECTION`` or a ``MULTI`` geometry object from the geometry
 column. This is analogous to a simplified version of the :class:`Union`
@@ -888,6 +892,10 @@ caring about dissolving boundaries.
 .. versionchanged:: 5.1
 
     MySQL 8.0.24+ support was added.
+
+.. versionchanged:: 5.2
+
+    MariaDB 11.7+ support was added.
 
 ``Extent``
 ~~~~~~~~~~
