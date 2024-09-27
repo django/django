@@ -1699,6 +1699,20 @@ class OperationTests(OperationTestBase):
             sorted(definition[2]), ["field", "model_name", "name", "preserve_default"]
         )
 
+    def test_alter_field_preserve_default_drops_null_default(self):
+        project_state = self.set_up_test_model("test_adflpd")
+        operation = migrations.AlterField(
+            "Pony",
+            "yellow",
+            models.CharField(blank=True, default=""),
+            preserve_default=False,
+        )
+        new_state = project_state.clone()
+        operation.state_forwards("test_adflpd", new_state)
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_adflpd", editor, project_state, new_state)
+        self.assertColumnNotNull("test_adflpd_pony", "yellow")
+
     def test_add_field_database_default(self):
         """The AddField operation can set and unset a database default."""
         app_label = "test_adfldd"
