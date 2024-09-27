@@ -45,6 +45,7 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
             "bboverlaps": SpatialOperator(func="MBROverlaps"),  # ...
             "contained": SpatialOperator(func="MBRWithin"),  # ...
             "contains": SpatialOperator(func="ST_Contains"),
+            "coveredby": SpatialOperator(func="MBRCoveredBy"),
             "crosses": SpatialOperator(func="ST_Crosses"),
             "disjoint": SpatialOperator(func="ST_Disjoint"),
             "equals": SpatialOperator(func="ST_Equals"),
@@ -57,6 +58,8 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
         }
         if self.connection.mysql_is_mariadb:
             operators["relate"] = SpatialOperator(func="ST_Relate")
+            if self.connection.mysql_version < (11, 7):
+                del operators["coveredby"]
         return operators
 
     @cached_property
