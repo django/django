@@ -496,6 +496,42 @@ class GeoLookupTest(TestCase):
         with self.assertNoLogs("django.contrib.gis", "ERROR"):
             State.objects.filter(poly__intersects="LINESTRING(0 0, 1 1, 5 5)")
 
+    @skipUnlessGISLookup("coveredby")
+    def test_coveredby_lookup(self):
+        poly = Polygon(LinearRing((0, 0), (0, 5), (5, 5), (5, 0), (0, 0)))
+        state = State.objects.create(name="Test", poly=poly)
+
+        small_poly = Polygon(LinearRing((0, 0), (1, 4), (4, 4), (4, 1), (0, 0)))
+        qs = State.objects.filter(poly__coveredby=small_poly)
+        self.assertSequenceEqual(qs, [])
+
+        large_poly = Polygon(LinearRing((0, 0), (-1, 6), (6, 6), (6, -1), (0, 0)))
+        qs = State.objects.filter(poly__coveredby=large_poly)
+        self.assertSequenceEqual(qs, [state])
+
+        if not connection.ops.oracle:
+            # On Oracle, COVEREDBY doesn't match for EQUAL objects.
+            qs = State.objects.filter(poly__coveredby=poly)
+            self.assertSequenceEqual(qs, [state])
+
+    @skipUnlessGISLookup("covers")
+    def test_covers_lookup(self):
+        poly = Polygon(LinearRing((0, 0), (0, 5), (5, 5), (5, 0), (0, 0)))
+        state = State.objects.create(name="Test", poly=poly)
+
+        small_poly = Polygon(LinearRing((0, 0), (1, 4), (4, 4), (4, 1), (0, 0)))
+        qs = State.objects.filter(poly__covers=small_poly)
+        self.assertSequenceEqual(qs, [state])
+
+        large_poly = Polygon(LinearRing((-1, -1), (-1, 6), (6, 6), (6, -1), (-1, -1)))
+        qs = State.objects.filter(poly__covers=large_poly)
+        self.assertSequenceEqual(qs, [])
+
+        if not connection.ops.oracle:
+            # On Oracle, COVERS doesn't match for EQUAL objects.
+            qs = State.objects.filter(poly__covers=poly)
+            self.assertSequenceEqual(qs, [state])
+
     @skipUnlessDBFeature("supports_relate_lookup")
     def test_relate_lookup(self):
         "Testing the 'relate' lookup type."
