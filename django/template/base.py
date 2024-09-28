@@ -535,7 +535,8 @@ class Parser:
         if node.must_be_first and nodelist.contains_nontext:
             raise self.error(
                 token,
-                "%r must be the first tag in the template." % node,
+                "{%% extends %s %%} must be the first tag in the template."
+                % node.parent_name.token,
             )
         if not isinstance(node, TextNode):
             nodelist.contains_nontext = True
