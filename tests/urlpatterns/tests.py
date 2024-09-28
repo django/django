@@ -4,10 +4,20 @@ import uuid
 from django.core.exceptions import ImproperlyConfigured
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
-from django.urls import NoReverseMatch, Resolver404, path, re_path, resolve, reverse
+from django.urls import (
+    NoReverseMatch,
+    Resolver404,
+    path,
+    re_path,
+    register_converter,
+    resolve,
+    reverse,
+)
+from django.urls.converters import REGISTERED_CONVERTERS, IntConverter
+from django.utils.deprecation import RemovedInDjango60Warning
 from django.views import View
 
-from .converters import DynamicConverter
+from .converters import Base64Converter, DynamicConverter
 from .views import empty_view
 
 included_kwargs = {"base": b"hello", "value": b"world"}
@@ -34,6 +44,8 @@ class SimplifiedURLTests(SimpleTestCase):
         self.assertEqual(match.args, ())
         self.assertEqual(match.kwargs, {})
         self.assertEqual(match.route, "articles/2003/")
+        self.assertEqual(match.captured_kwargs, {})
+        self.assertEqual(match.extra_kwargs, {})
 
     def test_path_lookup_with_typed_parameters(self):
         match = resolve("/articles/2015/")
@@ -41,6 +53,8 @@ class SimplifiedURLTests(SimpleTestCase):
         self.assertEqual(match.args, ())
         self.assertEqual(match.kwargs, {"year": 2015})
         self.assertEqual(match.route, "articles/<int:year>/")
+        self.assertEqual(match.captured_kwargs, {"year": 2015})
+        self.assertEqual(match.extra_kwargs, {})
 
     def test_path_lookup_with_multiple_parameters(self):
         match = resolve("/articles/2015/04/12/")
@@ -48,18 +62,44 @@ class SimplifiedURLTests(SimpleTestCase):
         self.assertEqual(match.args, ())
         self.assertEqual(match.kwargs, {"year": 2015, "month": 4, "day": 12})
         self.assertEqual(match.route, "articles/<int:year>/<int:month>/<int:day>/")
+        self.assertEqual(match.captured_kwargs, {"year": 2015, "month": 4, "day": 12})
+        self.assertEqual(match.extra_kwargs, {})
+
+    def test_path_lookup_with_multiple_parameters_and_extra_kwarg(self):
+        match = resolve("/books/2015/04/12/")
+        self.assertEqual(match.url_name, "books-year-month-day")
+        self.assertEqual(match.args, ())
+        self.assertEqual(
+            match.kwargs, {"year": 2015, "month": 4, "day": 12, "extra": True}
+        )
+        self.assertEqual(match.route, "books/<int:year>/<int:month>/<int:day>/")
+        self.assertEqual(match.captured_kwargs, {"year": 2015, "month": 4, "day": 12})
+        self.assertEqual(match.extra_kwargs, {"extra": True})
+
+    def test_path_lookup_with_extra_kwarg(self):
+        match = resolve("/books/2007/")
+        self.assertEqual(match.url_name, "books-2007")
+        self.assertEqual(match.args, ())
+        self.assertEqual(match.kwargs, {"extra": True})
+        self.assertEqual(match.route, "books/2007/")
+        self.assertEqual(match.captured_kwargs, {})
+        self.assertEqual(match.extra_kwargs, {"extra": True})
 
     def test_two_variable_at_start_of_path_pattern(self):
         match = resolve("/en/foo/")
         self.assertEqual(match.url_name, "lang-and-path")
         self.assertEqual(match.kwargs, {"lang": "en", "url": "foo"})
         self.assertEqual(match.route, "<lang>/<path:url>/")
+        self.assertEqual(match.captured_kwargs, {"lang": "en", "url": "foo"})
+        self.assertEqual(match.extra_kwargs, {})
 
     def test_re_path(self):
         match = resolve("/regex/1/")
         self.assertEqual(match.url_name, "regex")
         self.assertEqual(match.kwargs, {"pk": "1"})
         self.assertEqual(match.route, "^regex/(?P<pk>[0-9]+)/$")
+        self.assertEqual(match.captured_kwargs, {"pk": "1"})
+        self.assertEqual(match.extra_kwargs, {})
 
     def test_re_path_with_optional_parameter(self):
         for url, kwargs in (
@@ -74,6 +114,8 @@ class SimplifiedURLTests(SimpleTestCase):
                     match.route,
                     r"^regex_optional/(?P<arg1>\d+)/(?:(?P<arg2>\d+)/)?",
                 )
+                self.assertEqual(match.captured_kwargs, kwargs)
+                self.assertEqual(match.extra_kwargs, {})
 
     def test_re_path_with_missing_optional_parameter(self):
         match = resolve("/regex_only_optional/")
@@ -84,6 +126,8 @@ class SimplifiedURLTests(SimpleTestCase):
             match.route,
             r"^regex_only_optional/(?:(?P<arg1>\d+)/)?",
         )
+        self.assertEqual(match.captured_kwargs, {})
+        self.assertEqual(match.extra_kwargs, {})
 
     def test_path_lookup_with_inclusion(self):
         match = resolve("/included_urls/extra/something/")
@@ -94,6 +138,9 @@ class SimplifiedURLTests(SimpleTestCase):
         match = resolve("/more/99/")
         self.assertEqual(match.url_name, "inner-more")
         self.assertEqual(match.route, r"^more/(?P<extra>\w+)/$")
+        self.assertEqual(match.kwargs, {"extra": "99", "sub-extra": True})
+        self.assertEqual(match.captured_kwargs, {"extra": "99"})
+        self.assertEqual(match.extra_kwargs, {"sub-extra": True})
 
     def test_path_lookup_with_double_inclusion(self):
         match = resolve("/included_urls/more/some_value/")
@@ -156,6 +203,37 @@ class SimplifiedURLTests(SimpleTestCase):
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             path("foo/<nonexistent:var>/", empty_view)
 
+    def test_warning_override_default_converter(self):
+        # RemovedInDjango60Warning: when the deprecation ends, replace with
+        # msg = "Converter 'int' is already registered."
+        # with self.assertRaisesMessage(ValueError, msg):
+        msg = (
+            "Converter 'int' is already registered. Support for overriding registered "
+            "converters is deprecated and will be removed in Django 6.0."
+        )
+        try:
+            with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
+                register_converter(IntConverter, "int")
+        finally:
+            REGISTERED_CONVERTERS.pop("int", None)
+        self.assertEqual(ctx.filename, __file__)
+
+    def test_warning_override_converter(self):
+        # RemovedInDjango60Warning: when the deprecation ends, replace with
+        # msg = "Converter 'base64' is already registered."
+        # with self.assertRaisesMessage(ValueError, msg):
+        msg = (
+            "Converter 'base64' is already registered. Support for overriding "
+            "registered converters is deprecated and will be removed in Django 6.0."
+        )
+        try:
+            with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
+                register_converter(Base64Converter, "base64")
+                register_converter(Base64Converter, "base64")
+        finally:
+            REGISTERED_CONVERTERS.pop("base64", None)
+        self.assertEqual(ctx.filename, __file__)
+
     def test_invalid_view(self):
         msg = "view must be a callable or a list/tuple in the case of include()."
         with self.assertRaisesMessage(TypeError, msg):
@@ -170,14 +248,12 @@ class SimplifiedURLTests(SimpleTestCase):
             path("foo", EmptyCBV())
 
     def test_whitespace_in_route(self):
-        msg = (
-            "URL route 'space/<int:num>/extra/<str:%stest>' cannot contain "
-            "whitespace in angle brackets <…>"
-        )
+        msg = "URL route %r cannot contain whitespace in angle brackets <…>"
         for whitespace in string.whitespace:
             with self.subTest(repr(whitespace)):
-                with self.assertRaisesMessage(ImproperlyConfigured, msg % whitespace):
-                    path("space/<int:num>/extra/<str:%stest>" % whitespace, empty_view)
+                route = "space/<int:num>/extra/<str:%stest>" % whitespace
+                with self.assertRaisesMessage(ImproperlyConfigured, msg % route):
+                    path(route, empty_view)
         # Whitespaces are valid in paths.
         p = path("space%s/<int:num>/" % string.whitespace, empty_view)
         match = p.resolve("space%s/1/" % string.whitespace)

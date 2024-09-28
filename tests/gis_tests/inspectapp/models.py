@@ -2,7 +2,6 @@ from django.contrib.gis.db import models
 
 
 class AllOGRFields(models.Model):
-
     f_decimal = models.FloatField()
     f_float = models.FloatField()
     f_int = models.IntegerField()

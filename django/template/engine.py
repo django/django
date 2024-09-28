@@ -38,8 +38,7 @@ class Engine:
             loaders = ["django.template.loaders.filesystem.Loader"]
             if app_dirs:
                 loaders += ["django.template.loaders.app_directories.Loader"]
-            if not debug:
-                loaders = [("django.template.loaders.cached.Loader", loaders)]
+            loaders = [("django.template.loaders.cached.Loader", loaders)]
         else:
             if app_dirs:
                 raise ImproperlyConfigured(
@@ -71,9 +70,11 @@ class Engine:
             self.__class__.__qualname__,
             "" if not self.dirs else " dirs=%s" % repr(self.dirs),
             self.app_dirs,
-            ""
-            if not self.context_processors
-            else " context_processors=%s" % repr(self.context_processors),
+            (
+                ""
+                if not self.context_processors
+                else " context_processors=%s" % repr(self.context_processors)
+            ),
             self.debug,
             repr(self.loaders),
             repr(self.string_if_invalid),

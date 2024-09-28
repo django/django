@@ -9,7 +9,6 @@ from .utils import csrf_input_lazy, csrf_token_lazy
 
 
 class TemplateStrings(BaseEngine):
-
     app_dirname = "template_strings"
 
     def __init__(self, params):

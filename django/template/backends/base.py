@@ -5,7 +5,6 @@ from django.utils.functional import cached_property
 
 
 class BaseEngine:
-
     # Core methods: engines have to provide their own implementation
     #               (except for from_string which is optional).
 
@@ -23,6 +22,9 @@ class BaseEngine:
             raise ImproperlyConfigured(
                 "Unknown parameters: {}".format(", ".join(params))
             )
+
+    def check(self, **kwargs):
+        return []
 
     @property
     def app_dirname(self):

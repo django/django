@@ -2,16 +2,19 @@
 This module allows importing AbstractBaseUser even when django.contrib.auth is
 not in INSTALLED_APPS.
 """
+
 import unicodedata
 
+from django.conf import settings
 from django.contrib.auth import password_validation
 from django.contrib.auth.hashers import (
+    acheck_password,
     check_password,
     is_password_usable,
     make_password,
 )
 from django.db import models
-from django.utils.crypto import get_random_string, salted_hmac
+from django.utils.crypto import salted_hmac
 from django.utils.translation import gettext_lazy as _
 
 
@@ -29,18 +32,6 @@ class BaseUserManager(models.Manager):
         else:
             email = email_name + "@" + domain_part.lower()
         return email
-
-    def make_random_password(
-        self,
-        length=10,
-        allowed_chars="abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789",
-    ):
-        """
-        Generate a random password with the given length and given
-        allowed_chars. The default value of allowed_chars does not have "I" or
-        "O" or letters and digits that look similar -- just to avoid confusion.
-        """
-        return get_random_string(length, allowed_chars)
 
     def get_by_natural_key(self, username):
         return self.get(**{self.model.USERNAME_FIELD: username})
@@ -64,6 +55,9 @@ class AbstractBaseUser(models.Model):
     def __str__(self):
         return self.get_username()
 
+    # RemovedInDjango60Warning: When the deprecation ends, replace with:
+    # def save(self, **kwargs):
+    #   super().save(**kwargs)
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         if self._password is not None:
@@ -114,6 +108,17 @@ class AbstractBaseUser(models.Model):
 
         return check_password(raw_password, self.password, setter)
 
+    async def acheck_password(self, raw_password):
+        """See check_password()."""
+
+        async def setter(raw_password):
+            self.set_password(raw_password)
+            # Password hash upgrades shouldn't be considered password changes.
+            self._password = None
+            await self.asave(update_fields=["password"])
+
+        return await acheck_password(raw_password, self.password, setter)
+
     def set_unusable_password(self):
         # Set a value that will never be a valid hash
         self.password = make_password(None)
@@ -128,10 +133,18 @@ class AbstractBaseUser(models.Model):
         """
         Return an HMAC of the password field.
         """
+        return self._get_session_auth_hash()
+
+    def get_session_auth_fallback_hash(self):
+        for fallback_secret in settings.SECRET_KEY_FALLBACKS:
+            yield self._get_session_auth_hash(secret=fallback_secret)
+
+    def _get_session_auth_hash(self, secret=None):
         key_salt = "django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash"
         return salted_hmac(
             key_salt,
             self.password,
+            secret=secret,
             algorithm="sha256",
         ).hexdigest()
 

@@ -5,6 +5,13 @@ from django.test import AsyncRequestFactory
 from .cases import StaticFilesTestCase
 
 
+class MockApplication:
+    """ASGI application that returns a string indicating that it was called."""
+
+    async def __call__(self, scope, receive, send):
+        return "Application called"
+
+
 class TestASGIStaticFilesHandler(StaticFilesTestCase):
     async_request_factory = AsyncRequestFactory()
 
@@ -20,3 +27,15 @@ class TestASGIStaticFilesHandler(StaticFilesTestCase):
         handler = ASGIStaticFilesHandler(ASGIHandler())
         response = await handler.get_response_async(request)
         self.assertEqual(response.status_code, 404)
+
+    async def test_non_http_requests_passed_to_the_wrapped_application(self):
+        tests = [
+            "/static/path.txt",
+            "/non-static/path.txt",
+        ]
+        for path in tests:
+            with self.subTest(path=path):
+                scope = {"type": "websocket", "path": path}
+                handler = ASGIStaticFilesHandler(MockApplication())
+                response = await handler(scope, None, None)
+                self.assertEqual(response, "Application called")

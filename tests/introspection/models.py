@@ -41,9 +41,9 @@ class Article(models.Model):
 
     class Meta:
         ordering = ("headline",)
-        index_together = [
-            ["headline", "pub_date"],
-            ["headline", "response_to", "pub_date", "reporter"],
+        indexes = [
+            models.Index(fields=["headline", "pub_date"]),
+            models.Index(fields=["headline", "response_to", "pub_date", "reporter"]),
         ]
 
 
@@ -84,7 +84,7 @@ class CheckConstraintModel(models.Model):
         }
         constraints = [
             models.CheckConstraint(
-                name="up_votes_gte_0_check", check=models.Q(up_votes__gte=0)
+                name="up_votes_gte_0_check", condition=models.Q(up_votes__gte=0)
             ),
         ]
 
@@ -102,3 +102,11 @@ class UniqueConstraintConditionModel(models.Model):
                 condition=models.Q(color__isnull=True),
             ),
         ]
+
+
+class DbCommentModel(models.Model):
+    name = models.CharField(max_length=15, db_comment="'Name' column comment")
+
+    class Meta:
+        db_table_comment = "Custom table comment"
+        required_db_features = {"supports_comments"}

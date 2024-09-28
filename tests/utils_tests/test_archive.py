@@ -26,11 +26,9 @@ except ImportError:
 class TestArchive(unittest.TestCase):
     def setUp(self):
         self.testdir = os.path.join(os.path.dirname(__file__), "archives")
-        self.old_cwd = os.getcwd()
+        old_cwd = os.getcwd()
         os.chdir(self.testdir)
-
-    def tearDown(self):
-        os.chdir(self.old_cwd)
+        self.addCleanup(os.chdir, old_cwd)
 
     def test_extract_function(self):
         with os.scandir(self.testdir) as entries:

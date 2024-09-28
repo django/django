@@ -1,7 +1,6 @@
 from django.contrib.admin.models import CHANGE, LogEntry
 from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.auth.models import User
-from django.contrib.contenttypes.models import ContentType
 from django.core.paginator import Paginator
 from django.test import TestCase, override_settings
 from django.urls import reverse
@@ -61,15 +60,13 @@ class SeleniumTests(AdminSeleniumTestCase):
             password="secret",
             email="super@example.com",
         )
-        content_type_pk = ContentType.objects.get_for_model(User).pk
         for i in range(1, 1101):
-            LogEntry.objects.log_action(
+            LogEntry.objects.log_actions(
                 self.superuser.pk,
-                content_type_pk,
-                self.superuser.pk,
-                repr(self.superuser),
+                [self.superuser],
                 CHANGE,
                 change_message=f"Changed something {i}",
+                single_object=True,
             )
         self.admin_login(
             username="super",

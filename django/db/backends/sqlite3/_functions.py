@@ -1,11 +1,13 @@
 """
 Implementations of SQL functions for SQLite.
 """
+
 import functools
 import random
 import statistics
+import zoneinfo
 from datetime import timedelta
-from hashlib import sha1, sha224, sha256, sha384, sha512
+from hashlib import md5, sha1, sha224, sha256, sha384, sha512
 from math import (
     acos,
     asin,
@@ -26,14 +28,12 @@ from math import (
 )
 from re import search as re_search
 
-from django.db.backends.base.base import timezone_constructor
 from django.db.backends.utils import (
     split_tzname_delta,
     typecast_time,
     typecast_timestamp,
 )
 from django.utils import timezone
-from django.utils.crypto import md5
 from django.utils.duration import duration_microseconds
 
 
@@ -60,25 +60,10 @@ def register(connection):
     create_deterministic_function("django_timestamp_diff", 2, _sqlite_timestamp_diff)
     create_deterministic_function("django_format_dtdelta", 3, _sqlite_format_dtdelta)
     create_deterministic_function("regexp", 2, _sqlite_regexp)
-    create_deterministic_function("ACOS", 1, _sqlite_acos)
-    create_deterministic_function("ASIN", 1, _sqlite_asin)
-    create_deterministic_function("ATAN", 1, _sqlite_atan)
-    create_deterministic_function("ATAN2", 2, _sqlite_atan2)
     create_deterministic_function("BITXOR", 2, _sqlite_bitxor)
-    create_deterministic_function("CEILING", 1, _sqlite_ceiling)
-    create_deterministic_function("COS", 1, _sqlite_cos)
     create_deterministic_function("COT", 1, _sqlite_cot)
-    create_deterministic_function("DEGREES", 1, _sqlite_degrees)
-    create_deterministic_function("EXP", 1, _sqlite_exp)
-    create_deterministic_function("FLOOR", 1, _sqlite_floor)
-    create_deterministic_function("LN", 1, _sqlite_ln)
-    create_deterministic_function("LOG", 2, _sqlite_log)
     create_deterministic_function("LPAD", 3, _sqlite_lpad)
     create_deterministic_function("MD5", 1, _sqlite_md5)
-    create_deterministic_function("MOD", 2, _sqlite_mod)
-    create_deterministic_function("PI", 0, _sqlite_pi)
-    create_deterministic_function("POWER", 2, _sqlite_power)
-    create_deterministic_function("RADIANS", 1, _sqlite_radians)
     create_deterministic_function("REPEAT", 2, _sqlite_repeat)
     create_deterministic_function("REVERSE", 1, _sqlite_reverse)
     create_deterministic_function("RPAD", 3, _sqlite_rpad)
@@ -88,9 +73,6 @@ def register(connection):
     create_deterministic_function("SHA384", 1, _sqlite_sha384)
     create_deterministic_function("SHA512", 1, _sqlite_sha512)
     create_deterministic_function("SIGN", 1, _sqlite_sign)
-    create_deterministic_function("SIN", 1, _sqlite_sin)
-    create_deterministic_function("SQRT", 1, _sqlite_sqrt)
-    create_deterministic_function("TAN", 1, _sqlite_tan)
     # Don't use the built-in RANDOM() function because it returns a value
     # in the range [-1 * 2^63, 2^63 - 1] instead of [0, 1).
     connection.create_function("RAND", 0, random.random)
@@ -98,6 +80,27 @@ def register(connection):
     connection.create_aggregate("STDDEV_SAMP", 1, StdDevSamp)
     connection.create_aggregate("VAR_POP", 1, VarPop)
     connection.create_aggregate("VAR_SAMP", 1, VarSamp)
+    # Some math functions are enabled by default in SQLite 3.35+.
+    sql = "select sqlite_compileoption_used('ENABLE_MATH_FUNCTIONS')"
+    if not connection.execute(sql).fetchone()[0]:
+        create_deterministic_function("ACOS", 1, _sqlite_acos)
+        create_deterministic_function("ASIN", 1, _sqlite_asin)
+        create_deterministic_function("ATAN", 1, _sqlite_atan)
+        create_deterministic_function("ATAN2", 2, _sqlite_atan2)
+        create_deterministic_function("CEILING", 1, _sqlite_ceiling)
+        create_deterministic_function("COS", 1, _sqlite_cos)
+        create_deterministic_function("DEGREES", 1, _sqlite_degrees)
+        create_deterministic_function("EXP", 1, _sqlite_exp)
+        create_deterministic_function("FLOOR", 1, _sqlite_floor)
+        create_deterministic_function("LN", 1, _sqlite_ln)
+        create_deterministic_function("LOG", 2, _sqlite_log)
+        create_deterministic_function("MOD", 2, _sqlite_mod)
+        create_deterministic_function("PI", 0, _sqlite_pi)
+        create_deterministic_function("POWER", 2, _sqlite_power)
+        create_deterministic_function("RADIANS", 1, _sqlite_radians)
+        create_deterministic_function("SIN", 1, _sqlite_sin)
+        create_deterministic_function("SQRT", 1, _sqlite_sqrt)
+        create_deterministic_function("TAN", 1, _sqlite_tan)
 
 
 def _sqlite_datetime_parse(dt, tzname=None, conn_tzname=None):
@@ -108,14 +111,17 @@ def _sqlite_datetime_parse(dt, tzname=None, conn_tzname=None):
     except (TypeError, ValueError):
         return None
     if conn_tzname:
-        dt = dt.replace(tzinfo=timezone_constructor(conn_tzname))
+        dt = dt.replace(tzinfo=zoneinfo.ZoneInfo(conn_tzname))
     if tzname is not None and tzname != conn_tzname:
         tzname, sign, offset = split_tzname_delta(tzname)
         if offset:
             hours, minutes = offset.split(":")
             offset_delta = timedelta(hours=int(hours), minutes=int(minutes))
             dt += offset_delta if sign == "+" else -offset_delta
-        dt = timezone.localtime(dt, timezone_constructor(tzname))
+        # The tzname may originally be just the offset e.g. "+3:00",
+        # which becomes an empty string after splitting the sign and offset.
+        # In this case, use the conn_tzname as fallback.
+        dt = timezone.localtime(dt, zoneinfo.ZoneInfo(tzname or conn_tzname))
     return dt
 
 
@@ -131,7 +137,7 @@ def _sqlite_date_trunc(lookup_type, dt, tzname, conn_tzname):
     elif lookup_type == "month":
         return f"{dt.year:04d}-{dt.month:02d}-01"
     elif lookup_type == "week":
-        dt = dt - timedelta(days=dt.weekday())
+        dt -= timedelta(days=dt.weekday())
         return f"{dt.year:04d}-{dt.month:02d}-{dt.day:02d}"
     elif lookup_type == "day":
         return f"{dt.year:04d}-{dt.month:02d}-{dt.day:02d}"
@@ -181,11 +187,11 @@ def _sqlite_datetime_extract(lookup_type, dt, tzname=None, conn_tzname=None):
     elif lookup_type == "iso_week_day":
         return dt.isoweekday()
     elif lookup_type == "week":
-        return dt.isocalendar()[1]
+        return dt.isocalendar().week
     elif lookup_type == "quarter":
         return ceil(dt.month / 3)
     elif lookup_type == "iso_year":
-        return dt.isocalendar()[0]
+        return dt.isocalendar().year
     else:
         return getattr(dt, lookup_type)
 
@@ -202,7 +208,7 @@ def _sqlite_datetime_trunc(lookup_type, dt, tzname, conn_tzname):
     elif lookup_type == "month":
         return f"{dt.year:04d}-{dt.month:02d}-01 00:00:00"
     elif lookup_type == "week":
-        dt = dt - timedelta(days=dt.weekday())
+        dt -= timedelta(days=dt.weekday())
         return f"{dt.year:04d}-{dt.month:02d}-{dt.day:02d} 00:00:00"
     elif lookup_type == "day":
         return f"{dt.year:04d}-{dt.month:02d}-{dt.day:02d} 00:00:00"

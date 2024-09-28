@@ -19,9 +19,13 @@ class ExplainTests(TestCase):
             Tag.objects.filter(name="test").prefetch_related("children"),
             Tag.objects.filter(name="test").annotate(Count("children")),
             Tag.objects.filter(name="test").values_list("name"),
-            Tag.objects.order_by().union(Tag.objects.order_by().filter(name="test")),
-            Tag.objects.all().select_for_update().filter(name="test"),
         ]
+        if connection.features.supports_select_union:
+            querysets.append(
+                Tag.objects.order_by().union(Tag.objects.order_by().filter(name="test"))
+            )
+        if connection.features.has_select_for_update:
+            querysets.append(Tag.objects.select_for_update().filter(name="test"))
         supported_formats = connection.features.supported_explain_formats
         all_formats = (
             (None,)
@@ -31,9 +35,7 @@ class ExplainTests(TestCase):
         for idx, queryset in enumerate(querysets):
             for format in all_formats:
                 with self.subTest(format=format, queryset=idx):
-                    with self.assertNumQueries(1), CaptureQueriesContext(
-                        connection
-                    ) as captured_queries:
+                    with self.assertNumQueries(1) as captured_queries:
                         result = queryset.explain(format=format)
                         self.assertTrue(
                             captured_queries[0]["sql"].startswith(
@@ -42,14 +44,16 @@ class ExplainTests(TestCase):
                         )
                         self.assertIsInstance(result, str)
                         self.assertTrue(result)
-                        if format == "xml":
+                        if not format:
+                            continue
+                        if format.lower() == "xml":
                             try:
                                 xml.etree.ElementTree.fromstring(result)
                             except xml.etree.ElementTree.ParseError as e:
                                 self.fail(
                                     f"QuerySet.explain() result is not valid XML: {e}"
                                 )
-                        elif format == "json":
+                        elif format.lower() == "json":
                             try:
                                 json.loads(result)
                             except json.JSONDecodeError as e:
@@ -57,10 +61,9 @@ class ExplainTests(TestCase):
                                     f"QuerySet.explain() result is not valid JSON: {e}"
                                 )
 
-    @skipUnlessDBFeature("validates_explain_options")
     def test_unknown_options(self):
-        with self.assertRaisesMessage(ValueError, "Unknown options: test, test2"):
-            Tag.objects.all().explain(test=1, test2=1)
+        with self.assertRaisesMessage(ValueError, "Unknown options: TEST, TEST2"):
+            Tag.objects.explain(**{"TEST": 1, "TEST2": 1})
 
     def test_unknown_format(self):
         msg = "DOES NOT EXIST is not a recognized format."
@@ -68,8 +71,10 @@ class ExplainTests(TestCase):
             msg += " Allowed formats: %s" % ", ".join(
                 sorted(connection.features.supported_explain_formats)
             )
+        else:
+            msg += f" {connection.display_name} does not support any formats."
         with self.assertRaisesMessage(ValueError, msg):
-            Tag.objects.all().explain(format="does not exist")
+            Tag.objects.explain(format="does not exist")
 
     @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
     def test_postgres_options(self):
@@ -80,11 +85,11 @@ class ExplainTests(TestCase):
             {"verbose": True, "timing": True, "analyze": True},
             {"verbose": False, "timing": False, "analyze": True},
             {"summary": True},
+            {"settings": True},
+            {"analyze": True, "wal": True},
         ]
-        if connection.features.is_postgresql_12:
-            test_options.append({"settings": True})
-        if connection.features.is_postgresql_13:
-            test_options.append({"analyze": True, "wal": True})
+        if connection.features.is_postgresql_16:
+            test_options.append({"generic_plan": True})
         for options in test_options:
             with self.subTest(**options), transaction.atomic():
                 with CaptureQueriesContext(connection) as captured_queries:
@@ -93,6 +98,45 @@ class ExplainTests(TestCase):
                 for name, value in options.items():
                     option = "{} {}".format(name.upper(), "true" if value else "false")
                     self.assertIn(option, captured_queries[0]["sql"])
+
+    @skipUnlessDBFeature("supports_select_union")
+    def test_multi_page_text_explain(self):
+        if "TEXT" not in connection.features.supported_explain_formats:
+            self.skipTest("This backend does not support TEXT format.")
+
+        base_qs = Tag.objects.order_by()
+        qs = base_qs.filter(name="test").union(*[base_qs for _ in range(100)])
+        result = qs.explain(format="text")
+        self.assertGreaterEqual(result.count("\n"), 100)
+
+    def test_option_sql_injection(self):
+        qs = Tag.objects.filter(name="test")
+        options = {"SUMMARY true) SELECT 1; --": True}
+        msg = "Invalid option name: 'SUMMARY true) SELECT 1; --'"
+        with self.assertRaisesMessage(ValueError, msg):
+            qs.explain(**options)
+
+    def test_invalid_option_names(self):
+        qs = Tag.objects.filter(name="test")
+        tests = [
+            'opt"ion',
+            "o'ption",
+            "op`tion",
+            "opti on",
+            "option--",
+            "optio\tn",
+            "o\nption",
+            "option;",
+            "你 好",
+            # [] are used by MSSQL.
+            "option[",
+            "option]",
+        ]
+        for invalid_option in tests:
+            with self.subTest(invalid_option):
+                msg = f"Invalid option name: {invalid_option!r}"
+                with self.assertRaisesMessage(ValueError, msg):
+                    qs.explain(**{invalid_option: True})
 
     @unittest.skipUnless(connection.vendor == "mysql", "MySQL specific")
     def test_mysql_text_to_traditional(self):

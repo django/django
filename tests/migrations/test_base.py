@@ -7,9 +7,11 @@ from importlib import import_module
 from django.apps import apps
 from django.db import connection, connections, migrations, models
 from django.db.migrations.migration import Migration
+from django.db.migrations.optimizer import MigrationOptimizer
 from django.db.migrations.recorder import MigrationRecorder
+from django.db.migrations.serializer import serializer_factory
 from django.db.migrations.state import ProjectState
-from django.test import TransactionTestCase
+from django.test import SimpleTestCase, TransactionTestCase
 from django.test.utils import extend_sys_path
 from django.utils.module_loading import module_dir
 
@@ -64,6 +66,30 @@ class MigrationTestBase(TransactionTestCase):
 
     def assertColumnNotNull(self, table, column, using="default"):
         self.assertFalse(self._get_column_allows_null(table, column, using))
+
+    def _get_column_collation(self, table, column, using):
+        return next(
+            f.collation
+            for f in self.get_table_description(table, using=using)
+            if f.name == column
+        )
+
+    def assertColumnCollation(self, table, column, collation, using="default"):
+        self.assertEqual(self._get_column_collation(table, column, using), collation)
+
+    def _get_table_comment(self, table, using):
+        with connections[using].cursor() as cursor:
+            return next(
+                t.comment
+                for t in connections[using].introspection.get_table_list(cursor)
+                if t.name == table
+            )
+
+    def assertTableComment(self, table, comment, using="default"):
+        self.assertEqual(self._get_table_comment(table, using), comment)
+
+    def assertTableCommentNotExists(self, table, using="default"):
+        self.assertIn(self._get_table_comment(table, using), [None, ""])
 
     def assertIndexExists(
         self, table, columns, value=True, using="default", index_type=None
@@ -125,6 +151,8 @@ class MigrationTestBase(TransactionTestCase):
             )
 
     def assertFKExists(self, table, columns, to, value=True, using="default"):
+        if not connections[using].features.can_introspect_foreign_keys:
+            return
         with connections[using].cursor() as cursor:
             self.assertEqual(
                 value,
@@ -243,7 +271,6 @@ class OperationTestBase(MigrationTestBase):
         unique_together=False,
         options=False,
         db_table=None,
-        index_together=False,
         constraints=None,
         indexes=None,
     ):
@@ -251,7 +278,6 @@ class OperationTestBase(MigrationTestBase):
         # Make the "current" state.
         model_options = {
             "swappable": "TEST_SWAP_MODEL",
-            "index_together": [["weight", "pink"]] if index_together else [],
             "unique_together": [["pink", "weight"]] if unique_together else [],
         }
         if options:
@@ -265,6 +291,13 @@ class OperationTestBase(MigrationTestBase):
                     ("id", models.AutoField(primary_key=True)),
                     ("pink", models.IntegerField(default=3)),
                     ("weight", models.FloatField()),
+                    ("green", models.IntegerField(null=True)),
+                    (
+                        "yellow",
+                        models.CharField(
+                            blank=True, null=True, db_default="Yellow", max_length=20
+                        ),
+                    ),
                 ],
                 options=model_options,
             )
@@ -369,3 +402,38 @@ class OperationTestBase(MigrationTestBase):
                 )
             )
         return self.apply_operations(app_label, ProjectState(), operations)
+
+
+class OptimizerTestBase(SimpleTestCase):
+    """Common functions to help test the optimizer."""
+
+    def optimize(self, operations, app_label):
+        """
+        Handy shortcut for getting results + number of loops
+        """
+        optimizer = MigrationOptimizer()
+        return optimizer.optimize(operations, app_label), optimizer._iterations
+
+    def serialize(self, value):
+        return serializer_factory(value).serialize()[0]
+
+    def assertOptimizesTo(
+        self, operations, expected, exact=None, less_than=None, app_label=None
+    ):
+        result, iterations = self.optimize(operations, app_label or "migrations")
+        result = [self.serialize(f) for f in result]
+        expected = [self.serialize(f) for f in expected]
+        self.assertEqual(expected, result)
+        if exact is not None and iterations != exact:
+            raise self.failureException(
+                "Optimization did not take exactly %s iterations (it took %s)"
+                % (exact, iterations)
+            )
+        if less_than is not None and iterations >= less_than:
+            raise self.failureException(
+                "Optimization did not take less than %s iterations (it took %s)"
+                % (less_than, iterations)
+            )
+
+    def assertDoesNotOptimize(self, operations, **kwargs):
+        self.assertOptimizesTo(operations, operations, **kwargs)

@@ -1,4 +1,5 @@
 import os
+import shutil
 
 from django.apps import apps
 from django.conf import settings
@@ -59,7 +60,6 @@ class Command(BaseCommand):
         )
 
     def handle(self, **options):
-
         self.verbosity = options["verbosity"]
         self.interactive = options["interactive"]
         app_label = options["app_label"]
@@ -123,7 +123,7 @@ class Command(BaseCommand):
             if self.interactive:
                 answer = None
                 while not answer or answer not in "yn":
-                    answer = input("Do you wish to proceed? [yN] ")
+                    answer = input("Do you wish to proceed? [y/N] ")
                     if not answer:
                         answer = "n"
                         break
@@ -244,6 +244,13 @@ class Command(BaseCommand):
                     "  See the comment at the top of the squashed migration for "
                     "details."
                 )
+                if shutil.which("black"):
+                    self.stdout.write(
+                        self.style.WARNING(
+                            "Squashed migration couldn't be formatted using the "
+                            '"black" command. You can call it manually.'
+                        )
+                    )
 
     def find_migration(self, loader, app_label, name):
         try:

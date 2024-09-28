@@ -1,4 +1,5 @@
 """Translation helper functions."""
+
 import functools
 import gettext as gettext_module
 import os
@@ -30,8 +31,14 @@ _default = None
 # magic gettext number to separate context from message
 CONTEXT_SEPARATOR = "\x04"
 
-# Format of Accept-Language header values. From RFC 2616, section 14.4 and 3.9
-# and RFC 3066, section 2.1
+# Maximum number of characters that will be parsed from the Accept-Language
+# header or cookie to prevent possible denial of service or memory exhaustion
+# attacks. About 10x longer than the longest value shown on MDN’s
+# Accept-Language page.
+LANGUAGE_CODE_MAX_LENGTH = 500
+
+# Format of Accept-Language header values. From RFC 9110 Sections 12.4.2 and
+# 12.5.4, and RFC 5646 Section 2.1.
 accept_language_re = _lazy_re_compile(
     r"""
         # "en", "en-au", "x-y-z", "es-419", "*"
@@ -96,11 +103,9 @@ class TranslationCatalog:
             yield from cat.keys()
 
     def update(self, trans):
-        # Merge if plural function is the same, else prepend.
-        for cat, plural in zip(self._catalogs, self._plurals):
-            if trans.plural.__code__ == plural.__code__:
-                cat.update(trans._catalog)
-                break
+        # Merge if plural function is the same as the top catalog, else prepend.
+        if trans.plural.__code__ == self._plurals[0]:
+            self._catalogs[0].update(trans._catalog)
         else:
             self._catalogs.insert(0, trans._catalog.copy())
             self._plurals.insert(0, trans.plural)
@@ -478,8 +483,9 @@ def check_for_language(lang_code):
 def get_languages():
     """
     Cache of settings.LANGUAGES in a dictionary for easy lookups by key.
+    Convert keys to lowercase as they should be treated as case-insensitive.
     """
-    return dict(settings.LANGUAGES)
+    return {key.lower(): value for key, value in dict(settings.LANGUAGES).items()}
 
 
 @functools.lru_cache(maxsize=1000)
@@ -491,11 +497,25 @@ def get_supported_language_variant(lang_code, strict=False):
     If `strict` is False (the default), look for a country-specific variant
     when neither the language code nor its generic variant is found.
 
+    The language code is truncated to a maximum length to avoid potential
+    denial of service attacks.
+
     lru_cache should have a maxsize to prevent from memory exhaustion attacks,
     as the provided language codes are taken from the HTTP request. See also
     <https://www.djangoproject.com/weblog/2007/oct/26/security-fix/>.
     """
     if lang_code:
+        # Truncate the language code to a maximum length to avoid potential
+        # denial of service attacks.
+        if len(lang_code) > LANGUAGE_CODE_MAX_LENGTH:
+            if (
+                not strict
+                and (index := lang_code.rfind("-", 0, LANGUAGE_CODE_MAX_LENGTH)) > 0
+            ):
+                # There is a generic variant under the maximum length accepted length.
+                lang_code = lang_code[:index]
+            else:
+                raise LookupError(lang_code)
         # If 'zh-hant-tw' is not supported, try special fallback or subsequent
         # language codes i.e. 'zh-hant' and 'zh'.
         possible_lang_codes = [lang_code]
@@ -510,7 +530,7 @@ def get_supported_language_variant(lang_code, strict=False):
         supported_lang_codes = get_languages()
 
         for code in possible_lang_codes:
-            if code in supported_lang_codes and check_for_language(code):
+            if code.lower() in supported_lang_codes and check_for_language(code):
                 return code
         if not strict:
             # if fr-fr is not supported, try fr-ca.
@@ -585,7 +605,7 @@ def get_language_from_request(request, check_path=False):
 
 
 @functools.lru_cache(maxsize=1000)
-def parse_accept_lang_header(lang_string):
+def _parse_accept_lang_header(lang_string):
     """
     Parse the lang_string, which is the body of an HTTP Accept-Language
     header, and return a tuple of (lang, q-value), ordered by 'q' values.
@@ -607,3 +627,27 @@ def parse_accept_lang_header(lang_string):
         result.append((lang, priority))
     result.sort(key=lambda k: k[1], reverse=True)
     return tuple(result)
+
+
+def parse_accept_lang_header(lang_string):
+    """
+    Parse the value of the Accept-Language header up to a maximum length.
+
+    The value of the header is truncated to a maximum length to avoid potential
+    denial of service and memory exhaustion attacks. Excessive memory could be
+    used if the raw value is very large as it would be cached due to the use of
+    functools.lru_cache() to avoid repetitive parsing of common header values.
+    """
+    # If the header value doesn't exceed the maximum allowed length, parse it.
+    if len(lang_string) <= LANGUAGE_CODE_MAX_LENGTH:
+        return _parse_accept_lang_header(lang_string)
+
+    # If there is at least one comma in the value, parse up to the last comma
+    # before the max length, skipping any truncated parts at the end of the
+    # header value.
+    if (index := lang_string.rfind(",", 0, LANGUAGE_CODE_MAX_LENGTH)) > 0:
+        return _parse_accept_lang_header(lang_string[:index])
+
+    # Don't attempt to parse if there is only one language-range value which is
+    # longer than the maximum allowed length and so truncated.
+    return ()

@@ -93,13 +93,13 @@ class ModelTests(TestCase):
         Party.objects.create(when=datetime.datetime(1998, 12, 31))
         Party.objects.create(when=datetime.datetime(1999, 1, 1))
         Party.objects.create(when=datetime.datetime(1, 3, 3))
-        self.assertQuerysetEqual(Party.objects.filter(when__month=2), [])
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(Party.objects.filter(when__month=2), [])
+        self.assertQuerySetEqual(
             Party.objects.filter(when__month=1),
             [datetime.date(1999, 1, 1)],
             attrgetter("when"),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Party.objects.filter(when__month=12),
             [
                 datetime.date(1999, 12, 31),
@@ -108,7 +108,7 @@ class ModelTests(TestCase):
             attrgetter("when"),
             ordered=False,
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Party.objects.filter(when__year=1998),
             [
                 datetime.date(1998, 12, 31),
@@ -116,7 +116,7 @@ class ModelTests(TestCase):
             attrgetter("when"),
         )
         # Regression test for #8510
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Party.objects.filter(when__day="31"),
             [
                 datetime.date(1999, 12, 31),
@@ -125,7 +125,7 @@ class ModelTests(TestCase):
             attrgetter("when"),
             ordered=False,
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Party.objects.filter(when__month="12"),
             [
                 datetime.date(1999, 12, 31),
@@ -134,7 +134,7 @@ class ModelTests(TestCase):
             attrgetter("when"),
             ordered=False,
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Party.objects.filter(when__year="1998"),
             [
                 datetime.date(1998, 12, 31),
@@ -143,14 +143,14 @@ class ModelTests(TestCase):
         )
 
         # Regression test for #18969
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Party.objects.filter(when__year=1),
             [
                 datetime.date(1, 3, 3),
             ],
             attrgetter("when"),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Party.objects.filter(when__year="1"),
             [
                 datetime.date(1, 3, 3),
@@ -165,7 +165,7 @@ class ModelTests(TestCase):
         Party.objects.create()
         p = Party.objects.filter(when__month=1)[0]
         self.assertEqual(p.when, datetime.date(1999, 1, 1))
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Party.objects.filter(pk=p.pk).dates("when", "month"),
             [1],
             attrgetter("month"),

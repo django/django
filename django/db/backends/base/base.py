@@ -1,38 +1,30 @@
 import _thread
 import copy
+import datetime
+import logging
 import threading
 import time
 import warnings
+import zoneinfo
 from collections import deque
 from contextlib import contextmanager
 
-try:
-    import zoneinfo
-except ImportError:
-    from backports import zoneinfo
-
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.db import DEFAULT_DB_ALIAS, DatabaseError
+from django.db import DEFAULT_DB_ALIAS, DatabaseError, NotSupportedError
 from django.db.backends import utils
 from django.db.backends.base.validation import BaseDatabaseValidation
 from django.db.backends.signals import connection_created
+from django.db.backends.utils import debug_transaction
 from django.db.transaction import TransactionManagementError
-from django.db.utils import DatabaseErrorWrapper
-from django.utils import timezone
+from django.db.utils import DatabaseErrorWrapper, ProgrammingError
 from django.utils.asyncio import async_unsafe
 from django.utils.functional import cached_property
 
 NO_DB_ALIAS = "__no_db__"
+RAN_DB_VERSION_CHECK = set()
 
-
-# RemovedInDjango50Warning
-def timezone_constructor(tzname):
-    if settings.USE_DEPRECATED_PYTZ:
-        import pytz
-
-        return pytz.timezone(tzname)
-    return zoneinfo.ZoneInfo(tzname)
+logger = logging.getLogger("django.db.backends.base")
 
 
 class BaseDatabaseWrapper:
@@ -89,6 +81,7 @@ class BaseDatabaseWrapper:
         # Tracks if the transaction should be rolled back to the next
         # available savepoint because of an exception in an inner block.
         self.needs_rollback = False
+        self.rollback_exc = None
 
         # Connection termination related attributes.
         self.close_at = None
@@ -103,8 +96,9 @@ class BaseDatabaseWrapper:
         self._thread_ident = _thread.get_ident()
 
         # A list of no-argument functions to run when the transaction commits.
-        # Each entry is an (sids, func) tuple, where sids is a set of the
-        # active savepoint IDs when this function was registered.
+        # Each entry is an (sids, func, robust) tuple, where sids is a set of
+        # the active savepoint IDs when this function was registered and robust
+        # specifies whether it's allowed for the function to fail.
         self.run_on_commit = []
 
         # Should we run the on-commit hooks the next time set_autocommit(True)
@@ -156,9 +150,9 @@ class BaseDatabaseWrapper:
         if not settings.USE_TZ:
             return None
         elif self.settings_dict["TIME_ZONE"] is None:
-            return timezone.utc
+            return datetime.timezone.utc
         else:
-            return timezone_constructor(self.settings_dict["TIME_ZONE"])
+            return zoneinfo.ZoneInfo(self.settings_dict["TIME_ZONE"])
 
     @cached_property
     def timezone_name(self):
@@ -181,9 +175,33 @@ class BaseDatabaseWrapper:
         if len(self.queries_log) == self.queries_log.maxlen:
             warnings.warn(
                 "Limit for query logging exceeded, only the last {} queries "
-                "will be returned.".format(self.queries_log.maxlen)
+                "will be returned.".format(self.queries_log.maxlen),
+                stacklevel=2,
             )
         return list(self.queries_log)
+
+    def get_database_version(self):
+        """Return a tuple of the database's version."""
+        raise NotImplementedError(
+            "subclasses of BaseDatabaseWrapper may require a get_database_version() "
+            "method."
+        )
+
+    def check_database_version_supported(self):
+        """
+        Raise an error if the database version isn't supported by this
+        version of Django.
+        """
+        if (
+            self.features.minimum_database_version is not None
+            and self.get_database_version() < self.features.minimum_database_version
+        ):
+            db_version = ".".join(map(str, self.get_database_version()))
+            min_db_version = ".".join(map(str, self.features.minimum_database_version))
+            raise NotSupportedError(
+                f"{self.display_name} {min_db_version} or later is required "
+                f"(found {db_version})."
+            )
 
     # ##### Backend-specific methods for creating connections and cursors #####
 
@@ -203,10 +221,10 @@ class BaseDatabaseWrapper:
 
     def init_connection_state(self):
         """Initialize the database connection settings."""
-        raise NotImplementedError(
-            "subclasses of BaseDatabaseWrapper may require an init_connection_state() "
-            "method"
-        )
+        global RAN_DB_VERSION_CHECK
+        if self.alias not in RAN_DB_VERSION_CHECK:
+            self.check_database_version_supported()
+            RAN_DB_VERSION_CHECK.add(self.alias)
 
     def create_cursor(self, name=None):
         """Create a cursor. Assume that a connection is established."""
@@ -254,6 +272,10 @@ class BaseDatabaseWrapper:
     def ensure_connection(self):
         """Guarantee that a connection to the database is established."""
         if self.connection is None:
+            if self.in_atomic_block and self.closed_in_transaction:
+                raise ProgrammingError(
+                    "Cannot open a new connection in an atomic block."
+                )
             with self.wrap_database_errors:
                 self.connect()
 
@@ -278,12 +300,12 @@ class BaseDatabaseWrapper:
 
     def _commit(self):
         if self.connection is not None:
-            with self.wrap_database_errors:
+            with debug_transaction(self, "COMMIT"), self.wrap_database_errors:
                 return self.connection.commit()
 
     def _rollback(self):
         if self.connection is not None:
-            with self.wrap_database_errors:
+            with debug_transaction(self, "ROLLBACK"), self.wrap_database_errors:
                 return self.connection.rollback()
 
     def _close(self):
@@ -393,7 +415,9 @@ class BaseDatabaseWrapper:
 
         # Remove any callbacks registered while this savepoint was active.
         self.run_on_commit = [
-            (sids, func) for (sids, func) in self.run_on_commit if sid not in sids
+            (sids, func, robust)
+            for (sids, func, robust) in self.run_on_commit
+            if sid not in sids
         ]
 
     @async_unsafe
@@ -457,9 +481,11 @@ class BaseDatabaseWrapper:
 
         if start_transaction_under_autocommit:
             self._start_transaction_under_autocommit()
-        else:
+        elif autocommit:
             self._set_autocommit(autocommit)
-
+        else:
+            with debug_transaction(self, "BEGIN"):
+                self._set_autocommit(autocommit)
         self.autocommit = autocommit
 
         if autocommit and self.run_commit_hooks_on_set_autocommit_on:
@@ -496,7 +522,7 @@ class BaseDatabaseWrapper:
             raise TransactionManagementError(
                 "An error occurred in the current transaction. You can't "
                 "execute queries until the end of the 'atomic' block."
-            )
+            ) from self.rollback_exc
 
     # ##### Foreign key constraints checks handling #####
 
@@ -699,12 +725,12 @@ class BaseDatabaseWrapper:
             )
         return self.SchemaEditorClass(self, *args, **kwargs)
 
-    def on_commit(self, func):
+    def on_commit(self, func, robust=False):
         if not callable(func):
             raise TypeError("on_commit()'s callback must be a callable.")
         if self.in_atomic_block:
             # Transaction in progress; save for execution on commit.
-            self.run_on_commit.append((set(self.savepoint_ids), func))
+            self.run_on_commit.append((set(self.savepoint_ids), func, robust))
         elif not self.get_autocommit():
             raise TransactionManagementError(
                 "on_commit() cannot be used in manual transaction management"
@@ -712,15 +738,36 @@ class BaseDatabaseWrapper:
         else:
             # No transaction in progress and in autocommit mode; execute
             # immediately.
-            func()
+            if robust:
+                try:
+                    func()
+                except Exception as e:
+                    logger.error(
+                        f"Error calling {func.__qualname__} in on_commit() (%s).",
+                        e,
+                        exc_info=True,
+                    )
+            else:
+                func()
 
     def run_and_clear_commit_hooks(self):
         self.validate_no_atomic_block()
         current_run_on_commit = self.run_on_commit
         self.run_on_commit = []
         while current_run_on_commit:
-            sids, func = current_run_on_commit.pop(0)
-            func()
+            _, func, robust = current_run_on_commit.pop(0)
+            if robust:
+                try:
+                    func()
+                except Exception as e:
+                    logger.error(
+                        f"Error calling {func.__qualname__} in on_commit() during "
+                        f"transaction (%s).",
+                        e,
+                        exc_info=True,
+                    )
+            else:
+                func()
 
     @contextmanager
     def execute_wrapper(self, wrapper):

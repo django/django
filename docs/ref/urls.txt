@@ -17,12 +17,12 @@ Returns an element for inclusion in ``urlpatterns``. For example::
     from django.urls import include, path
 
     urlpatterns = [
-        path('index/', views.index, name='main-view'),
-        path('bio/<username>/', views.bio, name='bio'),
-        path('articles/<slug:title>/', views.article, name='article-detail'),
-        path('articles/<slug:title>/<int:section>/', views.section, name='article-section'),
-        path('blog/', include('blog.urls')),
-        ...
+        path("index/", views.index, name="main-view"),
+        path("bio/<username>/", views.bio, name="bio"),
+        path("articles/<slug:title>/", views.article, name="article-detail"),
+        path("articles/<slug:title>/<int:section>/", views.section, name="article-section"),
+        path("blog/", include("blog.urls")),
+        ...,
     ]
 
 The ``route`` argument should be a string or
@@ -56,10 +56,10 @@ Returns an element for inclusion in ``urlpatterns``. For example::
     from django.urls import include, re_path
 
     urlpatterns = [
-        re_path(r'^index/$', views.index, name='index'),
-        re_path(r'^bio/(?P<username>\w+)/$', views.bio, name='bio'),
-        re_path(r'^blog/', include('blog.urls')),
-        ...
+        re_path(r"^index/$", views.index, name="index"),
+        re_path(r"^bio/(?P<username>\w+)/$", views.bio, name="bio"),
+        re_path(r"^blog/", include("blog.urls")),
+        ...,
     ]
 
 The ``route`` argument should be a string or
@@ -78,11 +78,6 @@ pattern (:py:func:`re.fullmatch` is used).
 
 The ``view``, ``kwargs`` and ``name`` arguments are the same as for
 :func:`~django.urls.path()`.
-
-.. versionchanged:: 2.2.25
-
-    In older versions, a full-match wasn't required for a ``route`` which ends
-    with ``$``.
 
 ``include()``
 =============
@@ -124,6 +119,10 @@ The function for registering a converter for use in :func:`~django.urls.path()`
 The ``converter`` argument is a converter class, and ``type_name`` is the
 converter name to use in path patterns. See
 :ref:`registering-custom-path-converters` for an example.
+
+.. deprecated:: 5.1
+
+    Overriding existing converters is deprecated.
 
 ==================================================
 ``django.conf.urls`` functions for use in URLconfs

@@ -26,13 +26,11 @@
     }
 
     function addPopupIndex(name) {
-        name = name + "__" + (popupIndex + 1);
-        return name;
+        return name + "__" + (popupIndex + 1);
     }
 
     function removePopupIndex(name) {
-        name = name.replace(new RegExp("__" + (popupIndex + 1) + "$"), '');
-        return name;
+        return name.replace(new RegExp("__" + (popupIndex + 1) + "$"), '');
     }
 
     function showAdminPopup(triggeringLink, name_regexp, add_popup) {
@@ -81,10 +79,47 @@
             siblings.each(function() {
                 const elm = $(this);
                 elm.attr('href', elm.attr('data-href-template').replace('__fk__', value));
+                elm.removeAttr('aria-disabled');
             });
         } else {
             siblings.removeAttr('href');
+            siblings.attr('aria-disabled', true);
         }
+    }
+
+    function updateRelatedSelectsOptions(currentSelect, win, objId, newRepr, newId, skipIds = []) {
+        // After create/edit a model from the options next to the current
+        // select (+ or :pencil:) update ForeignKey PK of the rest of selects
+        // in the page.
+
+        const path = win.location.pathname;
+        // Extract the model from the popup url '.../<model>/add/' or
+        // '.../<model>/<id>/change/' depending the action (add or change).
+        const modelName = path.split('/')[path.split('/').length - (objId ? 4 : 3)];
+        // Select elements with a specific model reference and context of "available-source".
+        const selectsRelated = document.querySelectorAll(`[data-model-ref="${modelName}"] [data-context="available-source"]`);
+
+        selectsRelated.forEach(function(select) {
+            if (currentSelect === select || skipIds && skipIds.includes(select.id)) {
+                return;
+            }
+
+            let option = select.querySelector(`option[value="${objId}"]`);
+
+            if (!option) {
+                option = new Option(newRepr, newId);
+                select.options.add(option);
+                // Update SelectBox cache for related fields.
+                if (window.SelectBox !== undefined && !SelectBox.cache[currentSelect.id]) {
+                    SelectBox.add_to_cache(select.id, option);
+                    SelectBox.redisplay(select.id);
+                }
+                return;
+            }
+
+            option.textContent = newRepr;
+            option.value = newId;
+        });
     }
 
     function dismissAddRelatedObjectPopup(win, newId, newRepr) {
@@ -94,6 +129,7 @@
             const elemName = elem.nodeName.toUpperCase();
             if (elemName === 'SELECT') {
                 elem.options[elem.options.length] = new Option(newRepr, newId, true, true);
+                updateRelatedSelectsOptions(elem, win, null, newRepr, newId);
             } else if (elemName === 'INPUT') {
                 if (elem.classList.contains('vManyToManyRawIdAdminField') && elem.value) {
                     elem.value += ',' + newId;
@@ -105,9 +141,14 @@
             $(elem).trigger('change');
         } else {
             const toId = name + "_to";
+            const toElem = document.getElementById(toId);
             const o = new Option(newRepr, newId);
             SelectBox.add_to_cache(toId, o);
             SelectBox.redisplay(toId);
+            if (toElem && toElem.nodeName.toUpperCase() === 'SELECT') {
+                const skipIds = [name + "_from"];
+                updateRelatedSelectsOptions(toElem, win, null, newRepr, newId, skipIds);
+            }
         }
         const index = relatedWindows.indexOf(win);
         if (index > -1) {
@@ -125,7 +166,8 @@
                 this.textContent = newRepr;
                 this.value = newId;
             }
-        });
+        }).trigger('change');
+        updateRelatedSelectsOptions(selects[0], win, objId, newRepr, newId);
         selects.next().find('.select2-selection__rendered').each(function() {
             // The element can have a clear button as a child.
             // Use the lastChild to modify only the displayed value.
@@ -178,7 +220,7 @@
             event.preventDefault();
             opener.dismissRelatedLookupPopup(window, $(this).data("popup-opener"));
         });
-        $('body').on('click', '.related-widget-wrapper-link', function(e) {
+        $('body').on('click', '.related-widget-wrapper-link[data-popup="yes"]', function(e) {
             e.preventDefault();
             if (this.href) {
                 const event = $.Event('django:show-related', {href: this.href});

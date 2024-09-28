@@ -11,6 +11,7 @@ import tempfile
 import threading
 import time
 import unittest
+from functools import wraps
 from pathlib import Path
 from unittest import mock, skipIf
 
@@ -87,6 +88,25 @@ def empty_response(request):
 KEY_ERRORS_WITH_MEMCACHED_MSG = (
     "Cache key contains characters that will cause errors if used with memcached: %r"
 )
+
+
+def retry(retries=3, delay=1):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            attempts = 0
+            while attempts < retries:
+                try:
+                    return func(*args, **kwargs)
+                except AssertionError:
+                    attempts += 1
+                    if attempts >= retries:
+                        raise
+                    time.sleep(delay)
+
+        return wrapper
+
+    return decorator
 
 
 @override_settings(
@@ -209,7 +229,7 @@ class DummyCacheTests(SimpleTestCase):
             "Iñtërnâtiônàlizætiøn": "Iñtërnâtiônàlizætiøn2",
             "ascii2": {"x": 1},
         }
-        for (key, value) in stuff.items():
+        for key, value in stuff.items():
             with self.subTest(key=key):
                 cache.set(key, value)
                 self.assertIsNone(cache.get(key))
@@ -454,7 +474,7 @@ class BaseCacheTests:
         Poll.objects.all().delete()
         Poll.objects.create(question="What?")
         self.assertEqual(expensive_calculation.num_runs, 1)
-        defer_qs = Poll.objects.all().defer("question")
+        defer_qs = Poll.objects.defer("question")
         self.assertEqual(defer_qs.count(), 1)
         self.assertEqual(expensive_calculation.num_runs, 1)
         cache.set("deferred_queryset", defer_qs)
@@ -467,7 +487,7 @@ class BaseCacheTests:
         Poll.objects.all().delete()
         Poll.objects.create(question="What?")
         self.assertEqual(expensive_calculation.num_runs, 1)
-        defer_qs = Poll.objects.all().defer("question")
+        defer_qs = Poll.objects.defer("question")
         self.assertEqual(defer_qs.count(), 1)
         cache.set("deferred_queryset", defer_qs)
         self.assertEqual(expensive_calculation.num_runs, 1)
@@ -489,6 +509,7 @@ class BaseCacheTests:
         self.assertEqual(cache.get("expire2"), "newvalue")
         self.assertIs(cache.has_key("expire3"), False)
 
+    @retry()
     def test_touch(self):
         # cache.touch() updates the timeout.
         cache.set("expire1", "very quickly", timeout=1)
@@ -514,23 +535,23 @@ class BaseCacheTests:
             "ascii2": {"x": 1},
         }
         # Test `set`
-        for (key, value) in stuff.items():
+        for key, value in stuff.items():
             with self.subTest(key=key):
                 cache.set(key, value)
                 self.assertEqual(cache.get(key), value)
 
         # Test `add`
-        for (key, value) in stuff.items():
+        for key, value in stuff.items():
             with self.subTest(key=key):
                 self.assertIs(cache.delete(key), True)
                 self.assertIs(cache.add(key, value), True)
                 self.assertEqual(cache.get(key), value)
 
         # Test `set_many`
-        for (key, value) in stuff.items():
+        for key, value in stuff.items():
             self.assertIs(cache.delete(key), True)
         cache.set_many(stuff)
-        for (key, value) in stuff.items():
+        for key, value in stuff.items():
             with self.subTest(key=key):
                 self.assertEqual(cache.get(key), value)
 
@@ -577,6 +598,9 @@ class BaseCacheTests:
         self.assertIsNone(cache.get("key1"))
         self.assertIsNone(cache.get("key2"))
 
+    def test_set_many_empty_data(self):
+        self.assertEqual(cache.set_many({}), [])
+
     def test_delete_many(self):
         # Multiple keys can be deleted using delete_many
         cache.set_many({"key1": "spam", "key2": "eggs", "key3": "ham"})
@@ -584,6 +608,9 @@ class BaseCacheTests:
         self.assertIsNone(cache.get("key1"))
         self.assertIsNone(cache.get("key2"))
         self.assertEqual(cache.get("key3"), "ham")
+
+    def test_delete_many_no_keys(self):
+        self.assertIsNone(cache.delete_many([]))
 
     def test_clear(self):
         # The cache can be emptied using clear
@@ -610,6 +637,7 @@ class BaseCacheTests:
         self.assertEqual(cache.get("key3"), "sausage")
         self.assertEqual(cache.get("key4"), "lobster bisque")
 
+    @retry()
     def test_forever_timeout(self):
         """
         Passing in None into timeout results in a value that is cached forever
@@ -698,6 +726,7 @@ class BaseCacheTests:
         portable caching code without making it too difficult to use production
         backends with more liberal key rules. Refs #6447.
         """
+
         # mimic custom ``make_key`` method being defined since the default will
         # never show the below warnings
         def func(key, *args):
@@ -796,7 +825,6 @@ class BaseCacheTests:
         self.assertIsNone(caches["v2"].get("answer4", version=2))
 
     def test_cache_versioning_add(self):
-
         # add, default version = 1, but manually override version = 2
         self.assertIs(cache.add("answer1", 42, version=2), True)
         self.assertIsNone(cache.get("answer1", version=1))
@@ -1143,18 +1171,13 @@ class BaseCacheTests:
     )
 )
 class DBCacheTests(BaseCacheTests, TransactionTestCase):
-
     available_apps = ["cache"]
 
     def setUp(self):
         # The super calls needs to happen first for the settings override.
         super().setUp()
         self.create_table()
-
-    def tearDown(self):
-        # The super call needs to happen first because it uses the database.
-        super().tearDown()
-        self.drop_table()
+        self.addCleanup(self.drop_table)
 
     def create_table(self):
         management.call_command("createcachetable", verbosity=0)
@@ -1396,6 +1419,7 @@ class LocMemCacheTests(BaseCacheTests, TestCase):
         self.assertEqual(cache.decr(key), 1)
         self.assertEqual(expire, cache._expire_info[_key])
 
+    @retry()
     @limit_locmem_entries
     def test_lru_get(self):
         """get() moves cache keys."""
@@ -1423,6 +1447,7 @@ class LocMemCacheTests(BaseCacheTests, TestCase):
         for key in range(3):
             self.assertIsNone(cache.get(key))
 
+    @retry()
     @limit_locmem_entries
     def test_lru_incr(self):
         """incr() moves cache keys."""
@@ -1462,7 +1487,6 @@ redis_excluded_caches = {"cull", "zero_cull"}
 
 
 class BaseMemcachedTests(BaseCacheTests):
-
     # By default it's assumed that the client doesn't clean up connections
     # properly, in which case the backend must do so after each request.
     should_disconnect_on_close = True
@@ -1756,6 +1780,34 @@ class FileBasedCacheTests(BaseCacheTests, TestCase):
         with open(cache_file, "rb") as fh:
             self.assertIs(cache._is_expired(fh), True)
 
+    def test_has_key_race_handling(self):
+        self.assertIs(cache.add("key", "value"), True)
+        with mock.patch("builtins.open", side_effect=FileNotFoundError) as mocked_open:
+            self.assertIs(cache.has_key("key"), False)
+            mocked_open.assert_called_once()
+
+    def test_touch(self):
+        """Override to manually advance time since file access can be slow."""
+
+        class ManualTickingTime:
+            def __init__(self):
+                # Freeze time, calling `sleep` will manually advance it.
+                self._time = time.time()
+
+            def time(self):
+                return self._time
+
+            def sleep(self, seconds):
+                self._time += seconds
+
+        mocked_time = ManualTickingTime()
+        with (
+            mock.patch("django.core.cache.backends.filebased.time", new=mocked_time),
+            mock.patch("django.core.cache.backends.base.time", new=mocked_time),
+            mock.patch("cache.tests.time", new=mocked_time),
+        ):
+            super().test_touch()
+
 
 @unittest.skipUnless(RedisCache_params, "Redis backend not configured")
 @override_settings(
@@ -1774,6 +1826,14 @@ class RedisCacheTests(BaseCacheTests, TestCase):
     @property
     def incr_decr_type_error(self):
         return self.lib.ResponseError
+
+    def test_incr_write_connection(self):
+        cache.set("number", 42)
+        with mock.patch(
+            "django.core.cache.backends.redis.RedisCacheClient.get_client"
+        ) as mocked_get_client:
+            cache.incr("number")
+            self.assertEqual(mocked_get_client.call_args.kwargs, {"write": True})
 
     def test_cache_client_class(self):
         self.assertIs(cache._class, RedisCacheClient)
@@ -1816,6 +1876,23 @@ class RedisCacheTests(BaseCacheTests, TestCase):
         self.assertEqual(cache._cache._serializer.dumps(123), 123)
         self.assertIsInstance(cache._cache._serializer.dumps(True), bytes)
         self.assertIsInstance(cache._cache._serializer.dumps("abc"), bytes)
+
+    @override_settings(
+        CACHES=caches_setting_for_tests(
+            base=RedisCache_params,
+            exclude=redis_excluded_caches,
+            OPTIONS={
+                "db": 5,
+                "socket_timeout": 0.1,
+                "retry_on_timeout": True,
+            },
+        )
+    )
+    def test_redis_pool_options(self):
+        pool = cache._cache._get_connection_pool(write=False)
+        self.assertEqual(pool.connection_kwargs["db"], 5)
+        self.assertEqual(pool.connection_kwargs["socket_timeout"], 0.1)
+        self.assertIs(pool.connection_kwargs["retry_on_timeout"], True)
 
 
 class FileBasedCachePathLibTests(FileBasedCacheTests):
@@ -1967,7 +2044,7 @@ class CacheUtils(SimpleTestCase):
 
     host = "www.example.com"
     path = "/cache/test/"
-    factory = RequestFactory(HTTP_HOST=host)
+    factory = RequestFactory(headers={"host": host})
 
     def tearDown(self):
         cache.clear()
@@ -2058,9 +2135,9 @@ class CacheUtils(SimpleTestCase):
         """
         get_cache_key keys differ by fully-qualified URL instead of path
         """
-        request1 = self.factory.get(self.path, HTTP_HOST="sub-1.example.com")
+        request1 = self.factory.get(self.path, headers={"host": "sub-1.example.com"})
         learn_cache_key(request1, HttpResponse())
-        request2 = self.factory.get(self.path, HTTP_HOST="sub-2.example.com")
+        request2 = self.factory.get(self.path, headers={"host": "sub-2.example.com"})
         learn_cache_key(request2, HttpResponse())
         self.assertNotEqual(get_cache_key(request1), get_cache_key(request2))
 
@@ -2452,12 +2529,9 @@ class CacheMiddlewareTest(SimpleTestCase):
 
     def setUp(self):
         self.default_cache = caches["default"]
+        self.addCleanup(self.default_cache.clear)
         self.other_cache = caches["other"]
-
-    def tearDown(self):
-        self.default_cache.clear()
-        self.other_cache.clear()
-        super().tearDown()
+        self.addCleanup(self.other_cache.clear)
 
     def test_constructor(self):
         """
@@ -2624,6 +2698,7 @@ class CacheMiddlewareTest(SimpleTestCase):
         response = other_with_prefix_view(request, "16")
         self.assertEqual(response.content, b"Hello World 16")
 
+    @retry()
     def test_cache_page_timeout(self):
         # Page timeout takes precedence over the "max-age" section of the
         # "Cache-Control".
@@ -2701,6 +2776,37 @@ class CacheMiddlewareTest(SimpleTestCase):
             thread.join()
 
         self.assertIsNot(thread_caches[0], thread_caches[1])
+
+    def test_cache_control_max_age(self):
+        view = cache_page(2)(hello_world_view)
+        request = self.factory.get("/view/")
+
+        # First request. Freshly created response gets returned with no Age
+        # header.
+        with mock.patch.object(
+            time, "time", return_value=1468749600
+        ):  # Sun, 17 Jul 2016 10:00:00 GMT
+            response = view(request, 1)
+            response.close()
+            self.assertIn("Expires", response)
+            self.assertEqual(response["Expires"], "Sun, 17 Jul 2016 10:00:02 GMT")
+            self.assertIn("Cache-Control", response)
+            self.assertEqual(response["Cache-Control"], "max-age=2")
+            self.assertNotIn("Age", response)
+
+        # Second request one second later. Response from the cache gets
+        # returned with an Age header set to 1 (second).
+        with mock.patch.object(
+            time, "time", return_value=1468749601
+        ):  # Sun, 17 Jul 2016 10:00:01 GMT
+            response = view(request, 1)
+            response.close()
+            self.assertIn("Expires", response)
+            self.assertEqual(response["Expires"], "Sun, 17 Jul 2016 10:00:02 GMT")
+            self.assertIn("Cache-Control", response)
+            self.assertEqual(response["Cache-Control"], "max-age=2")
+            self.assertIn("Age", response)
+            self.assertEqual(response["Age"], "1")
 
 
 @override_settings(

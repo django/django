@@ -1,0 +1,340 @@
+============================================
+Django 5.2 release notes - UNDER DEVELOPMENT
+============================================
+
+*Expected April 2025*
+
+Welcome to Django 5.2!
+
+These release notes cover the :ref:`new features <whats-new-5.2>`, as well as
+some :ref:`backwards incompatible changes <backwards-incompatible-5.2>` you
+should be aware of when upgrading from Django 5.1 or earlier. We've
+:ref:`begun the deprecation process for some features
+<deprecated-features-5.2>`.
+
+See the :doc:`/howto/upgrade-version` guide if you're updating an existing
+project.
+
+Django 5.2 is designated as a :term:`long-term support release
+<Long-term support release>`. It will receive security updates for at least
+three years after its release. Support for the previous LTS, Django 4.2, will
+end in April 2026.
+
+Python compatibility
+====================
+
+Django 5.2 supports Python 3.10, 3.11, 3.12, and 3.13. We **highly recommend**
+and only officially support the latest release of each series.
+
+.. _whats-new-5.2:
+
+What's new in Django 5.2
+========================
+
+Minor features
+--------------
+
+:mod:`django.contrib.admin`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The ``admin/base.html`` template now has a new block
+  :ref:`extrabody <extrabody>` for adding custom code before the closing
+  ``</body>`` tag.
+
+:mod:`django.contrib.admindocs`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.auth`
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The default iteration count for the PBKDF2 password hasher is increased from
+  870,000 to 1,000,000.
+
+:mod:`django.contrib.contenttypes`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.gis`
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.messages`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.postgres`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.redirects`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sessions`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sitemaps`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sites`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.staticfiles`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.syndication`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* All :class:`~django.utils.feedgenerator.SyndicationFeed` classes now support
+  a ``stylesheets`` attribute. If specified, an ``<? xml-stylesheet ?>``
+  processing instruction will be added to the top of the document for each
+  stylesheet in the given list. See :ref:`feed-stylesheets` for more details.
+
+Asynchronous views
+~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Cache
+~~~~~
+
+* ...
+
+CSRF
+~~~~
+
+* ...
+
+Database backends
+~~~~~~~~~~~~~~~~~
+
+* ...
+
+Decorators
+~~~~~~~~~~
+
+* :func:`~django.utils.decorators.method_decorator` now supports wrapping
+  asynchronous view methods.
+
+Email
+~~~~~
+
+* Tuple items of :class:`EmailMessage.attachments
+  <django.core.mail.EmailMessage>` and
+  :class:`EmailMultiAlternatives.attachments
+  <django.core.mail.EmailMultiAlternatives>` are now named tuples, as opposed
+  to regular tuples.
+
+* :attr:`EmailMultiAlternatives.alternatives
+  <django.core.mail.EmailMultiAlternatives.alternatives>` is now a list of
+  named tuples, as opposed to regular tuples.
+
+* The new :meth:`~django.core.mail.EmailMultiAlternatives.body_contains` method
+  returns a boolean indicating whether a provided text is contained in the
+  email ``body`` and in all attached MIME type ``text/*`` alternatives.
+
+Error Reporting
+~~~~~~~~~~~~~~~
+
+* The attribute :attr:`.SafeExceptionReporterFilter.hidden_settings` now
+  treats values as sensitive if their name includes ``AUTH``.
+
+File Storage
+~~~~~~~~~~~~
+
+* ...
+
+File Uploads
+~~~~~~~~~~~~
+
+* ...
+
+Forms
+~~~~~
+
+* The new :class:`~django.forms.ColorInput` form widget is for entering a color
+  in ``rrggbb`` hexadecimal format and renders as ``<input type="color" ...>``.
+  Some browsers support a visual color picker interface for this input type.
+
+* The new :class:`~django.forms.SearchInput` form widget is for entering search
+  queries and renders as ``<input type="search" ...>``.
+
+* The new :class:`~django.forms.TelInput` form widget is for entering telephone
+  numbers and renders as ``<input type="tel" ...>``.
+
+Generic Views
+~~~~~~~~~~~~~
+
+* ...
+
+Internationalization
+~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Logging
+~~~~~~~
+
+* ...
+
+Management Commands
+~~~~~~~~~~~~~~~~~~~
+
+* A new warning is printed to the console when running :djadmin:`runserver` that
+  ``runserver`` is unsuitable for production. This warning can be hidden by
+  setting the :envvar:`HIDE_PRODUCTION_WARNING` environment variable to
+  ``"true"``.
+
+Migrations
+~~~~~~~~~~
+
+* ...
+
+Models
+~~~~~~
+
+* The ``SELECT`` clause generated when using
+  :meth:`QuerySet.values()<django.db.models.query.QuerySet.values>` and
+  :meth:`~django.db.models.query.QuerySet.values_list` now matches the
+  specified order of the referenced expressions. Previously the order was based
+  of a set of counterintuitive rules which made query combination through
+  methods such as
+  :meth:`QuerySet.union()<django.db.models.query.QuerySet.union>` unpredictable.
+
+* Added support for validation of model constraints which use a
+  :class:`~django.db.models.GeneratedField`.
+
+* The new :attr:`.Expression.set_returning` attribute specifies that the
+  expression contains a set-returning function, enforcing subquery evaluation.
+  This is necessary for many Postgres set-returning functions.
+
+* :attr:`CharField.max_length <django.db.models.CharField.max_length>` is no
+  longer required to be set on SQLite, which supports unlimited ``VARCHAR``
+  columns.
+
+Requests and Responses
+~~~~~~~~~~~~~~~~~~~~~~
+
+* The new :meth:`.HttpRequest.get_preferred_type` method can be used to query
+  the preferred media type the client accepts.
+
+Security
+~~~~~~~~
+
+* ...
+
+Serialization
+~~~~~~~~~~~~~
+
+* Each serialization format now defines a ``Deserializer`` class, rather than a
+  function, to improve extensibility when defining a
+  :ref:`custom serialization format <custom-serialization-formats>`.
+
+Signals
+~~~~~~~
+
+* ...
+
+Templates
+~~~~~~~~~
+
+* ...
+
+Tests
+~~~~~
+
+* Stack frames from Django's custom assertions are now hidden. This makes test
+  failures easier to read and enables :option:`test --pdb` to directly enter
+  into the failing test method.
+
+* Data loaded from :attr:`~django.test.TransactionTestCase.fixtures` and from
+  migrations enabled with :ref:`serialized_rollback=True
+  <test-case-serialized-rollback>` are now available during
+  ``TransactionTestCase.setUpClass()``.
+
+URLs
+~~~~
+
+* ...
+
+Utilities
+~~~~~~~~~
+
+* :class:`~django.utils.safestring.SafeString` now returns
+  :py:data:`NotImplemented` in ``__add__`` for non-string right-hand side
+  values. This aligns with the :py:class:`str` addition behavior and allows
+  ``__radd__`` to be used if available.
+
+* :func:`~django.utils.html.format_html_join` now supports taking an iterable
+  of mappings, passing their contents as keyword arguments to
+  :func:`~django.utils.html.format_html`.
+
+Validators
+~~~~~~~~~~
+
+* ...
+
+.. _backwards-incompatible-5.2:
+
+Backwards incompatible changes in 5.2
+=====================================
+
+Database backend API
+--------------------
+
+This section describes changes that may be needed in third-party database
+backends.
+
+* The new :meth:`Model._is_pk_set() <django.db.models.Model._is_pk_set>` method
+  allows checking if a Model instance's primary key is defined.
+
+
+:mod:`django.contrib.gis`
+-------------------------
+
+* Support for PostGIS 3.0 is removed.
+
+* Support for GDAL 3.0 is removed.
+
+Dropped support for PostgreSQL 13
+---------------------------------
+
+Upstream support for PostgreSQL 13 ends in November 2025. Django 5.2 supports
+PostgreSQL 14 and higher.
+
+Miscellaneous
+-------------
+
+* Adding :attr:`.EmailMultiAlternatives.alternatives` is now only supported via
+  the :meth:`~.EmailMultiAlternatives.attach_alternative` method.
+
+* The minimum supported version of ``gettext`` is increased from 0.15 to 0.19.
+
+* ``HttpRequest.accepted_types`` is now sorted by the client's preference, based
+  on the request's ``Accept`` header.
+
+.. _deprecated-features-5.2:
+
+Features deprecated in 5.2
+==========================
+
+Miscellaneous
+-------------
+
+* The ``all`` argument for the ``django.contrib.staticfiles.finders.find()``
+  function is deprecated in favor of the ``find_all`` argument.

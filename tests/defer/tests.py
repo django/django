@@ -1,11 +1,12 @@
-from django.core.exceptions import FieldError
-from django.test import TestCase
+from django.core.exceptions import FieldDoesNotExist, FieldError
+from django.test import SimpleTestCase, TestCase
 
 from .models import (
     BigChild,
     Child,
     ChildProxy,
     Primary,
+    PrimaryOneToOne,
     RefreshPrimaryProxy,
     Secondary,
     ShadowChild,
@@ -48,7 +49,7 @@ class DeferTests(AssertionMixin, TestCase):
         # You can use 'pk' with reverse foreign key lookups.
         # The related_id is always set even if it's not fetched from the DB,
         # so pk and related_id are not deferred.
-        self.assert_delayed(self.s1.primary_set.all().only("pk")[0], 2)
+        self.assert_delayed(self.s1.primary_set.only("pk")[0], 2)
 
     def test_defer_only_chaining(self):
         qs = Primary.objects.all()
@@ -130,22 +131,6 @@ class DeferTests(AssertionMixin, TestCase):
         self.assertEqual(obj.related_id, self.s1.pk)
         self.assertEqual(obj.name, "p1")
 
-    def test_defer_select_related_raises_invalid_query(self):
-        msg = (
-            "Field Primary.related cannot be both deferred and traversed "
-            "using select_related at the same time."
-        )
-        with self.assertRaisesMessage(FieldError, msg):
-            Primary.objects.defer("related").select_related("related")[0]
-
-    def test_only_select_related_raises_invalid_query(self):
-        msg = (
-            "Field Primary.related cannot be both deferred and traversed using "
-            "select_related at the same time."
-        )
-        with self.assertRaisesMessage(FieldError, msg):
-            Primary.objects.only("name").select_related("related")[0]
-
     def test_defer_foreign_keys_are_deferred_and_not_traversed(self):
         # select_related() overrides defer().
         with self.assertNumQueries(1):
@@ -160,7 +145,7 @@ class DeferTests(AssertionMixin, TestCase):
         obj = Primary.objects.defer("value").get(name="p2")
         obj.name = "a new name"
         obj.save()
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Primary.objects.all(),
             [
                 "p1",
@@ -193,6 +178,11 @@ class DeferTests(AssertionMixin, TestCase):
         ShadowChild.objects.create()
         obj = ShadowChild.objects.defer("name").get()
         self.assertEqual(obj.name, "adonis")
+
+    def test_defer_fk_attname(self):
+        primary = Primary.objects.defer("related_id").get()
+        with self.assertNumQueries(1):
+            self.assertEqual(primary.related_id, self.p1.related_id)
 
 
 class BigChildDeferTests(AssertionMixin, TestCase):
@@ -248,7 +238,7 @@ class TestDefer2(AssertionMixin, TestCase):
         """
         related = Secondary.objects.create(first="x1", second="x2")
         ChildProxy.objects.create(name="p1", value="xx", related=related)
-        children = ChildProxy.objects.all().select_related().only("id", "name")
+        children = ChildProxy.objects.select_related().only("id", "name")
         self.assertEqual(len(children), 1)
         child = children[0]
         self.assert_delayed(child, 2)
@@ -299,3 +289,66 @@ class TestDefer2(AssertionMixin, TestCase):
             # access of any of them.
             self.assertEqual(rf2.name, "new foo")
             self.assertEqual(rf2.value, "new bar")
+
+
+class InvalidDeferTests(SimpleTestCase):
+    def test_invalid_defer(self):
+        msg = "Primary has no field named 'missing'"
+        with self.assertRaisesMessage(FieldDoesNotExist, msg):
+            list(Primary.objects.defer("missing"))
+        with self.assertRaisesMessage(FieldError, "missing"):
+            list(Primary.objects.defer("value__missing"))
+        msg = "Secondary has no field named 'missing'"
+        with self.assertRaisesMessage(FieldDoesNotExist, msg):
+            list(Primary.objects.defer("related__missing"))
+
+    def test_invalid_only(self):
+        msg = "Primary has no field named 'missing'"
+        with self.assertRaisesMessage(FieldDoesNotExist, msg):
+            list(Primary.objects.only("missing"))
+        with self.assertRaisesMessage(FieldError, "missing"):
+            list(Primary.objects.only("value__missing"))
+        msg = "Secondary has no field named 'missing'"
+        with self.assertRaisesMessage(FieldDoesNotExist, msg):
+            list(Primary.objects.only("related__missing"))
+
+    def test_defer_select_related_raises_invalid_query(self):
+        msg = (
+            "Field Primary.related cannot be both deferred and traversed using "
+            "select_related at the same time."
+        )
+        with self.assertRaisesMessage(FieldError, msg):
+            Primary.objects.defer("related").select_related("related")[0]
+
+    def test_only_select_related_raises_invalid_query(self):
+        msg = (
+            "Field Primary.related cannot be both deferred and traversed using "
+            "select_related at the same time."
+        )
+        with self.assertRaisesMessage(FieldError, msg):
+            Primary.objects.only("name").select_related("related")[0]
+
+
+class DeferredRelationTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.secondary = Secondary.objects.create(first="a", second="b")
+        cls.primary = PrimaryOneToOne.objects.create(
+            name="Bella", value="Baxter", related=cls.secondary
+        )
+
+    def test_defer_not_clear_cached_relations(self):
+        obj = Secondary.objects.defer("first").get(pk=self.secondary.pk)
+        with self.assertNumQueries(1):
+            obj.primary_o2o
+        obj.first  # Accessing a deferred field.
+        with self.assertNumQueries(0):
+            obj.primary_o2o
+
+    def test_only_not_clear_cached_relations(self):
+        obj = Secondary.objects.only("first").get(pk=self.secondary.pk)
+        with self.assertNumQueries(1):
+            obj.primary_o2o
+        obj.second  # Accessing a deferred field.
+        with self.assertNumQueries(0):
+            obj.primary_o2o

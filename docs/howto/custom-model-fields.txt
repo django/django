@@ -98,7 +98,7 @@ Normally, you're either writing a Django field to match a particular database
 column type, or you will need a way to convert your data to, say, a string.
 
 For our ``Hand`` example, we could convert the card data to a string of 104
-characters by concatenating all the cards together in a pre-determined order --
+characters by concatenating all the cards together in a predetermined order --
 say, all the *north* cards first, then the *east*, *south* and *west* cards. So
 ``Hand`` objects can be saved to text or character columns in the database.
 
@@ -162,12 +162,12 @@ behave like any existing field, so we'll subclass directly from
 
     from django.db import models
 
-    class HandField(models.Field):
 
+    class HandField(models.Field):
         description = "A hand of cards (bridge style)"
 
         def __init__(self, *args, **kwargs):
-            kwargs['max_length'] = 104
+            kwargs["max_length"] = 104
             super().__init__(*args, **kwargs)
 
 Our ``HandField`` accepts most of the standard field options (see the list
@@ -234,7 +234,7 @@ The counterpoint to writing your ``__init__()`` method is writing the
 :meth:`~.Field.deconstruct` method. It's used during :doc:`model migrations
 </topics/migrations>` to tell Django how to take an instance of your new field
 and reduce it to a serialized form - in particular, what arguments to pass to
-``__init__()`` to re-create it.
+``__init__()`` to recreate it.
 
 If you haven't added any extra options on top of the field you inherited from,
 then there's no need to write a new ``deconstruct()`` method. If, however,
@@ -259,10 +259,10 @@ we can drop it from the keyword arguments for readability::
 
     from django.db import models
 
-    class HandField(models.Field):
 
+    class HandField(models.Field):
         def __init__(self, *args, **kwargs):
-            kwargs['max_length'] = 104
+            kwargs["max_length"] = 104
             super().__init__(*args, **kwargs)
 
         def deconstruct(self):
@@ -277,6 +277,7 @@ such as when the default value is being used::
 
     from django.db import models
 
+
     class CommaSepField(models.Field):
         "Implements comma-separated storage of lists"
 
@@ -288,7 +289,7 @@ such as when the default value is being used::
             name, path, args, kwargs = super().deconstruct()
             # Only include kwarg if it's not the default
             if self.separator != ",":
-                kwargs['separator'] = self.separator
+                kwargs["separator"] = self.separator
             return name, path, args, kwargs
 
 More complex examples are beyond the scope of this document, but remember -
@@ -314,29 +315,43 @@ reconstructing the field::
     new_instance = MyField(*args, **kwargs)
     self.assertEqual(my_field_instance.some_attribute, new_instance.some_attribute)
 
+.. _custom-field-non_db_attrs:
+
+Field attributes not affecting database column definition
+---------------------------------------------------------
+
+You can override ``Field.non_db_attrs`` to customize attributes of a field that
+don't affect a column definition. It's used during model migrations to detect
+no-op ``AlterField`` operations.
+
+For example::
+
+    class CommaSepField(models.Field):
+        @property
+        def non_db_attrs(self):
+            return super().non_db_attrs + ("separator",)
+
+
 Changing a custom field's base class
 ------------------------------------
 
 You can't change the base class of a custom field because Django won't detect
 the change and make a migration for it. For example, if you start with::
 
-    class CustomCharField(models.CharField):
-        ...
+    class CustomCharField(models.CharField): ...
 
 and then decide that you want to use ``TextField`` instead, you can't change
 the subclass like this::
 
-    class CustomCharField(models.TextField):
-        ...
+    class CustomCharField(models.TextField): ...
 
 Instead, you must create a new custom field class and update your models to
 reference it::
 
-    class CustomCharField(models.CharField):
-        ...
+    class CustomCharField(models.CharField): ...
 
-    class CustomTextField(models.TextField):
-        ...
+
+    class CustomTextField(models.TextField): ...
 
 As discussed in :ref:`removing fields <migrations-removing-model-fields>`, you
 must retain the original ``CustomCharField`` class as long as you have
@@ -379,9 +394,10 @@ subclass ``Field`` and implement the :meth:`~Field.db_type` method, like so::
 
     from django.db import models
 
+
     class MytypeField(models.Field):
         def db_type(self, connection):
-            return 'mytype'
+            return "mytype"
 
 Once you have ``MytypeField``, you can use it in any model, just like any other
 ``Field`` type::
@@ -401,19 +417,17 @@ For example::
 
     class MyDateField(models.Field):
         def db_type(self, connection):
-            if connection.vendor == 'mysql':
-                return 'datetime'
+            if connection.vendor == "mysql":
+                return "datetime"
             else:
-                return 'timestamp'
+                return "timestamp"
 
 The :meth:`~Field.db_type` and :meth:`~Field.rel_db_type` methods are called by
 Django when the framework constructs the ``CREATE TABLE`` statements for your
 application -- that is, when you first create your tables. The methods are also
 called when constructing a ``WHERE`` clause that includes the model field --
 that is, when you retrieve data using QuerySet methods like ``get()``,
-``filter()``, and ``exclude()`` and have the model field as an argument. They
-are not called at any other time, so it can afford to execute slightly complex
-code, such as the ``connection.settings_dict`` check in the above example.
+``filter()``, and ``exclude()`` and have the model field as an argument.
 
 Some database column types accept parameters, such as ``CHAR(25)``, where the
 parameter ``25`` represents the maximum column length. In cases like these,
@@ -424,7 +438,8 @@ sense to have a ``CharMaxlength25Field``, shown here::
     # This is a silly example of hard-coded parameters.
     class CharMaxlength25Field(models.Field):
         def db_type(self, connection):
-            return 'char(25)'
+            return "char(25)"
+
 
     # In the model:
     class MyModel(models.Model):
@@ -442,7 +457,8 @@ time -- i.e., when the class is instantiated. To do that, implement
             super().__init__(*args, **kwargs)
 
         def db_type(self, connection):
-            return 'char(%s)' % self.max_length
+            return "char(%s)" % self.max_length
+
 
     # In the model:
     class MyModel(models.Model):
@@ -463,10 +479,10 @@ need the foreign keys that point to that field to use the same data type::
     # MySQL unsigned integer (range 0 to 4294967295).
     class UnsignedAutoField(models.AutoField):
         def db_type(self, connection):
-            return 'integer UNSIGNED AUTO_INCREMENT'
+            return "integer UNSIGNED AUTO_INCREMENT"
 
         def rel_db_type(self, connection):
-            return 'integer UNSIGNED'
+            return "integer UNSIGNED"
 
 .. _converting-values-to-python-objects:
 
@@ -493,8 +509,8 @@ following arguments:
 
 * ``None`` (if the field allows ``null=True``)
 
-In our ``HandField`` class, we're storing the data as a VARCHAR field in the
-database, so we need to be able to process strings and ``None`` in the
+In our ``HandField`` class, we're storing the data as a ``VARCHAR`` field in
+the database, so we need to be able to process strings and ``None`` in the
 ``from_db_value()``. In ``to_python()``, we need to also handle ``Hand``
 instances::
 
@@ -504,14 +520,16 @@ instances::
     from django.db import models
     from django.utils.translation import gettext_lazy as _
 
+
     def parse_hand(hand_string):
         """Takes a string of cards and splits into a full hand."""
-        p1 = re.compile('.{26}')
-        p2 = re.compile('..')
+        p1 = re.compile(".{26}")
+        p2 = re.compile("..")
         args = [p2.findall(x) for x in p1.findall(hand_string)]
         if len(args) != 4:
             raise ValidationError(_("Invalid input for a Hand instance"))
         return Hand(*args)
+
 
     class HandField(models.Field):
         # ...
@@ -551,8 +569,9 @@ For example::
         # ...
 
         def get_prep_value(self, value):
-            return ''.join([''.join(l) for l in (value.north,
-                    value.east, value.south, value.west)])
+            return "".join(
+                ["".join(l) for l in (value.north, value.east, value.south, value.west)]
+            )
 
 .. warning::
 
@@ -626,6 +645,9 @@ delegate further handling to the parent class. This might require you to write
 a custom form field (and even a form widget). See the :doc:`forms documentation
 </topics/forms/index>` for information about this.
 
+If you wish to exclude the field from the :class:`~django.forms.ModelForm`, you
+can override the :meth:`~Field.formfield` method to return ``None``.
+
 Continuing our ongoing example, we can write the :meth:`~Field.formfield` method
 as::
 
@@ -633,9 +655,13 @@ as::
         # ...
 
         def formfield(self, **kwargs):
-            # This is a fairly standard way to set up some defaults
-            # while letting the caller override them.
-            defaults = {'form_class': MyFormField}
+            # Exclude the field from the ModelForm when some condition is met.
+            some_condition = kwargs.get("some_condition", False)
+            if some_condition:
+                return None
+
+            # Set up some defaults while letting the caller override them.
+            defaults = {"form_class": MyFormField}
             defaults.update(kwargs)
             return super().formfield(**defaults)
 
@@ -662,7 +688,7 @@ For example::
         # ...
 
         def get_internal_type(self):
-            return 'CharField'
+            return "CharField"
 
 No matter which database backend we are using, this will mean that
 :djadmin:`migrate` and other SQL commands create the right column type for
@@ -704,7 +730,7 @@ serialization formats. Here are a couple of tips to make things go more
 smoothly:
 
 #. Look at the existing Django fields (in
-   :file:`django/db/models/fields/__init__.py`) for inspiration. Try to find
+   :source:`django/db/models/fields/__init__.py`) for inspiration. Try to find
    a field that's similar to what you want and extend it a little bit,
    instead of creating an entirely new field from scratch.
 
@@ -741,7 +767,7 @@ In addition to the above details, there are a few guidelines which can greatly
 improve the efficiency and readability of the field's code.
 
 #. The source for Django's own ``ImageField`` (in
-   ``django/db/models/fields/files.py``) is a great example of how to
+   :source:`django/db/models/fields/files.py`) is a great example of how to
    subclass ``FileField`` to support a particular type of file, as it
    incorporates all of the techniques described above.
 

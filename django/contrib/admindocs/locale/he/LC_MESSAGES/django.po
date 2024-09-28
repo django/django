@@ -2,16 +2,17 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Meir Kriheli <mkriheli@gmail.com>, 2012-2015,2017,2020
+# Meir Kriheli <mkriheli@gmail.com>, 2012-2015,2017,2020,2023
 # Yaron Shahrabani <sh.yaron@gmail.com>, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-05-17 12:29+0000\n"
-"Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>\n"
-"Language-Team: Hebrew (http://www.transifex.com/django/django/language/he/)\n"
+"PO-Revision-Date: 2023-12-04 20:19+0000\n"
+"Last-Translator: Meir Kriheli <mkriheli@gmail.com>, "
+"2012-2015,2017,2020,2023\n"
+"Language-Team: Hebrew (http://app.transifex.com/django/django/language/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -94,9 +95,11 @@ msgstr "נא להתקין את docutils"
 
 #, python-format
 msgid ""
-"The admin documentation system requires Python’s <a href=\"%(link)s"
-"\">docutils</a> library."
+"The admin documentation system requires Python’s <a "
+"href=\"%(link)s\">docutils</a> library."
 msgstr ""
+"מערכת התיעוד במנשק הניהול דורשת את ספריית הפייתון <a "
+"href=\"%(link)s\">docutils</a>."
 
 #, python-format
 msgid ""

@@ -28,8 +28,8 @@ class ProxyModelInheritanceTests(TransactionTestCase):
                 from app1.models import ProxyModel
                 from app2.models import NiceModel
 
-                self.assertEqual(NiceModel.objects.all().count(), 0)
-                self.assertEqual(ProxyModel.objects.all().count(), 0)
+                self.assertEqual(NiceModel.objects.count(), 0)
+                self.assertEqual(ProxyModel.objects.count(), 0)
 
 
 class MultiTableInheritanceProxyTest(TestCase):

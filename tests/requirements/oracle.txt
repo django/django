@@ -1,1 +1,1 @@
-cx_oracle >= 7.0
+oracledb >= 1.3.2

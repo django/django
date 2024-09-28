@@ -1,9 +1,12 @@
-from django.db.backends.base.introspection import (
-    BaseDatabaseIntrospection,
-    FieldInfo,
-    TableInfo,
-)
+from collections import namedtuple
+
+from django.db.backends.base.introspection import BaseDatabaseIntrospection
+from django.db.backends.base.introspection import FieldInfo as BaseFieldInfo
+from django.db.backends.base.introspection import TableInfo as BaseTableInfo
 from django.db.models import Index
+
+FieldInfo = namedtuple("FieldInfo", BaseFieldInfo._fields + ("is_autofield", "comment"))
+TableInfo = namedtuple("TableInfo", BaseTableInfo._fields + ("comment",))
 
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
@@ -37,7 +40,11 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_field_type(self, data_type, description):
         field_type = super().get_field_type(data_type, description)
-        if description.default and "nextval" in description.default:
+        if description.is_autofield or (
+            # Required for pre-Django 4.1 serial columns.
+            description.default
+            and "nextval" in description.default
+        ):
             if field_type == "IntegerField":
                 return "AutoField"
             elif field_type == "BigIntegerField":
@@ -56,7 +63,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     WHEN c.relispartition THEN 'p'
                     WHEN c.relkind IN ('m', 'v') THEN 'v'
                     ELSE 't'
-                END
+                END,
+                obj_description(c.oid, 'pg_class')
             FROM pg_catalog.pg_class c
             LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
             WHERE c.relkind IN ('f', 'm', 'p', 'r', 'v')
@@ -84,7 +92,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 a.attname AS column_name,
                 NOT (a.attnotnull OR (t.typtype = 'd' AND t.typnotnull)) AS is_nullable,
                 pg_get_expr(ad.adbin, ad.adrelid) AS column_default,
-                CASE WHEN collname = 'default' THEN NULL ELSE collname END AS collation
+                CASE WHEN collname = 'default' THEN NULL ELSE collname END AS collation,
+                a.attidentity != '' AS is_autofield,
+                col_description(a.attrelid, a.attnum) AS column_comment
             FROM pg_attribute a
             LEFT JOIN pg_attrdef ad ON a.attrelid = ad.adrelid AND a.attnum = ad.adnum
             LEFT JOIN pg_collation co ON a.attcollation = co.oid
@@ -106,7 +116,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             FieldInfo(
                 line.name,
                 line.type_code,
-                line.display_size,
+                # display_size is always None on psycopg2.
+                line.internal_size if line.display_size is None else line.display_size,
                 line.internal_size,
                 line.precision,
                 line.scale,
@@ -118,23 +129,21 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
     def get_sequences(self, cursor, table_name, table_fields=()):
         cursor.execute(
             """
-            SELECT s.relname as sequence_name, col.attname
-            FROM pg_class s
-                JOIN pg_namespace sn ON sn.oid = s.relnamespace
-                JOIN
-                    pg_depend d ON d.refobjid = s.oid
+            SELECT
+                s.relname AS sequence_name,
+                a.attname AS colname
+            FROM
+                pg_class s
+                JOIN pg_depend d ON d.objid = s.oid
+                    AND d.classid = 'pg_class'::regclass
                     AND d.refclassid = 'pg_class'::regclass
-                JOIN
-                    pg_attrdef ad ON ad.oid = d.objid
-                    AND d.classid = 'pg_attrdef'::regclass
-                JOIN
-                    pg_attribute col ON col.attrelid = ad.adrelid
-                    AND col.attnum = ad.adnum
-                JOIN pg_class tbl ON tbl.oid = ad.adrelid
-            WHERE s.relkind = 'S'
-              AND d.deptype in ('a', 'n')
-              AND pg_catalog.pg_table_is_visible(tbl.oid)
-              AND tbl.relname = %s
+                JOIN pg_attribute a ON d.refobjid = a.attrelid
+                    AND d.refobjsubid = a.attnum
+                JOIN pg_class tbl ON tbl.oid = d.refobjid
+                    AND tbl.relname = %s
+                    AND pg_catalog.pg_table_is_visible(tbl.oid)
+            WHERE
+                s.relkind = 'S';
         """,
             [table_name],
         )

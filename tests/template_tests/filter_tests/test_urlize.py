@@ -158,7 +158,7 @@ class FunctionTests(SimpleTestCase):
         )
 
     def test_word_with_dot(self):
-        self.assertEqual(urlize("some.organization"), "some.organization"),
+        self.assertEqual(urlize("some.organization"), "some.organization")
 
     def test_https(self):
         self.assertEqual(
@@ -303,6 +303,28 @@ class FunctionTests(SimpleTestCase):
             urlize('A test http://testing.com/example.,:;)"!'),
             'A test <a href="http://testing.com/example" rel="nofollow">'
             "http://testing.com/example</a>.,:;)&quot;!",
+        )
+
+    def test_trailing_semicolon(self):
+        self.assertEqual(
+            urlize("http://example.com?x=&amp;", autoescape=False),
+            '<a href="http://example.com?x=" rel="nofollow">'
+            "http://example.com?x=&amp;</a>",
+        )
+        self.assertEqual(
+            urlize("http://example.com?x=&amp;;", autoescape=False),
+            '<a href="http://example.com?x=" rel="nofollow">'
+            "http://example.com?x=&amp;</a>;",
+        )
+        self.assertEqual(
+            urlize("http://example.com?x=&amp;;;", autoescape=False),
+            '<a href="http://example.com?x=" rel="nofollow">'
+            "http://example.com?x=&amp;</a>;;",
+        )
+        self.assertEqual(
+            urlize("http://example.com?x=&amp.;...;", autoescape=False),
+            '<a href="http://example.com?x=" rel="nofollow">'
+            "http://example.com?x=&amp</a>.;...;",
         )
 
     def test_brackets(self):

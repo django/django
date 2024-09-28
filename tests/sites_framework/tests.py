@@ -23,7 +23,7 @@ class SitesFrameworkTestCase(TestCase):
         article = ExclusiveArticle.objects.create(
             title="Breaking News!", site_id=settings.SITE_ID
         )
-        self.assertEqual(ExclusiveArticle.on_site.all().get(), article)
+        self.assertEqual(ExclusiveArticle.on_site.get(), article)
 
     def test_sites_m2m(self):
         article = SyndicatedArticle.objects.create(title="Fresh News!")
@@ -31,14 +31,14 @@ class SitesFrameworkTestCase(TestCase):
         article.sites.add(Site.objects.get(id=settings.SITE_ID + 1))
         article2 = SyndicatedArticle.objects.create(title="More News!")
         article2.sites.add(Site.objects.get(id=settings.SITE_ID + 1))
-        self.assertEqual(SyndicatedArticle.on_site.all().get(), article)
+        self.assertEqual(SyndicatedArticle.on_site.get(), article)
 
     def test_custom_named_field(self):
         article = CustomArticle.objects.create(
             title="Tantalizing News!",
             places_this_article_should_appear_id=settings.SITE_ID,
         )
-        self.assertEqual(CustomArticle.on_site.all().get(), article)
+        self.assertEqual(CustomArticle.on_site.get(), article)
 
 
 @isolate_apps("sites_framework")

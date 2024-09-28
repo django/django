@@ -3,6 +3,7 @@ This module collects helper functions and classes that "span" multiple levels
 of MVC. In other words, these functions/classes introduce controlled coupling
 for convenience's sake.
 """
+
 from django.http import (
     Http404,
     HttpResponse,
@@ -89,6 +90,23 @@ def get_object_or_404(klass, *args, **kwargs):
         )
 
 
+async def aget_object_or_404(klass, *args, **kwargs):
+    """See get_object_or_404()."""
+    queryset = _get_queryset(klass)
+    if not hasattr(queryset, "aget"):
+        klass__name = (
+            klass.__name__ if isinstance(klass, type) else klass.__class__.__name__
+        )
+        raise ValueError(
+            "First argument to aget_object_or_404() must be a Model, Manager, or "
+            f"QuerySet, not '{klass__name}'."
+        )
+    try:
+        return await queryset.aget(*args, **kwargs)
+    except queryset.model.DoesNotExist:
+        raise Http404(f"No {queryset.model._meta.object_name} matches the given query.")
+
+
 def get_list_or_404(klass, *args, **kwargs):
     """
     Use filter() to return a list of objects, or raise an Http404 exception if
@@ -111,6 +129,23 @@ def get_list_or_404(klass, *args, **kwargs):
         raise Http404(
             "No %s matches the given query." % queryset.model._meta.object_name
         )
+    return obj_list
+
+
+async def aget_list_or_404(klass, *args, **kwargs):
+    """See get_list_or_404()."""
+    queryset = _get_queryset(klass)
+    if not hasattr(queryset, "filter"):
+        klass__name = (
+            klass.__name__ if isinstance(klass, type) else klass.__class__.__name__
+        )
+        raise ValueError(
+            "First argument to aget_list_or_404() must be a Model, Manager, or "
+            f"QuerySet, not '{klass__name}'."
+        )
+    obj_list = [obj async for obj in queryset.filter(*args, **kwargs)]
+    if not obj_list:
+        raise Http404(f"No {queryset.model._meta.object_name} matches the given query.")
     return obj_list
 
 

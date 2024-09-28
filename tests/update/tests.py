@@ -2,7 +2,7 @@ import unittest
 
 from django.core.exceptions import FieldError
 from django.db import IntegrityError, connection, transaction
-from django.db.models import CharField, Count, F, IntegerField, Max
+from django.db.models import Case, CharField, Count, F, IntegerField, Max, When
 from django.db.models.functions import Abs, Concat, Lower
 from django.test import TestCase
 from django.test.utils import register_lookup
@@ -81,7 +81,7 @@ class AdvancedTests(TestCase):
     def setUpTestData(cls):
         cls.d0 = DataPoint.objects.create(name="d0", value="apple")
         cls.d2 = DataPoint.objects.create(name="d2", value="banana")
-        cls.d3 = DataPoint.objects.create(name="d3", value="banana")
+        cls.d3 = DataPoint.objects.create(name="d3", value="banana", is_active=False)
         cls.r1 = RelatedPoint.objects.create(name="r1", data=cls.d3)
 
     def test_update(self):
@@ -225,6 +225,63 @@ class AdvancedTests(TestCase):
                             new_name=annotation,
                         ).update(name=F("new_name"))
 
+    def test_update_ordered_by_m2m_aggregation_annotation(self):
+        msg = (
+            "Cannot update when ordering by an aggregate: "
+            "Count(Col(update_bar_m2m_foo, update.Bar_m2m_foo.foo))"
+        )
+        with self.assertRaisesMessage(FieldError, msg):
+            Bar.objects.annotate(m2m_count=Count("m2m_foo")).order_by(
+                "m2m_count"
+            ).update(x=2)
+
+    def test_update_ordered_by_inline_m2m_annotation(self):
+        foo = Foo.objects.create(target="test")
+        Bar.objects.create(foo=foo)
+
+        Bar.objects.order_by(Abs("m2m_foo")).update(x=2)
+        self.assertEqual(Bar.objects.get().x, 2)
+
+    def test_update_ordered_by_m2m_annotation(self):
+        foo = Foo.objects.create(target="test")
+        Bar.objects.create(foo=foo)
+
+        Bar.objects.annotate(abs_id=Abs("m2m_foo")).order_by("abs_id").update(x=3)
+        self.assertEqual(Bar.objects.get().x, 3)
+
+    def test_update_ordered_by_m2m_annotation_desc(self):
+        foo = Foo.objects.create(target="test")
+        Bar.objects.create(foo=foo)
+
+        Bar.objects.annotate(abs_id=Abs("m2m_foo")).order_by("-abs_id").update(x=4)
+        self.assertEqual(Bar.objects.get().x, 4)
+
+    def test_update_negated_f(self):
+        DataPoint.objects.update(is_active=~F("is_active"))
+        self.assertCountEqual(
+            DataPoint.objects.values_list("name", "is_active"),
+            [("d0", False), ("d2", False), ("d3", True)],
+        )
+        DataPoint.objects.update(is_active=~F("is_active"))
+        self.assertCountEqual(
+            DataPoint.objects.values_list("name", "is_active"),
+            [("d0", True), ("d2", True), ("d3", False)],
+        )
+
+    def test_update_negated_f_conditional_annotation(self):
+        DataPoint.objects.annotate(
+            is_d2=Case(When(name="d2", then=True), default=False)
+        ).update(is_active=~F("is_d2"))
+        self.assertCountEqual(
+            DataPoint.objects.values_list("name", "is_active"),
+            [("d0", True), ("d2", False), ("d3", True)],
+        )
+
+    def test_updating_non_conditional_field(self):
+        msg = "Cannot negate non-conditional expressions."
+        with self.assertRaisesMessage(TypeError, msg):
+            DataPoint.objects.update(is_active=~F("name"))
+
 
 @unittest.skipUnless(
     connection.vendor == "mysql",
@@ -252,14 +309,20 @@ class MySQLUpdateOrderByTest(TestCase):
                 self.assertEqual(updated, 2)
 
     def test_order_by_update_on_unique_constraint_annotation(self):
-        # Ordering by annotations is omitted because they cannot be resolved in
-        # .update().
-        with self.assertRaises(IntegrityError):
-            UniqueNumber.objects.annotate(number_inverse=F("number").desc(),).order_by(
-                "number_inverse"
-            ).update(
-                number=F("number") + 1,
-            )
+        updated = (
+            UniqueNumber.objects.annotate(number_inverse=F("number").desc())
+            .order_by("number_inverse")
+            .update(number=F("number") + 1)
+        )
+        self.assertEqual(updated, 2)
+
+    def test_order_by_update_on_unique_constraint_annotation_desc(self):
+        updated = (
+            UniqueNumber.objects.annotate(number_annotation=F("number"))
+            .order_by("-number_annotation")
+            .update(number=F("number") + 1)
+        )
+        self.assertEqual(updated, 2)
 
     def test_order_by_update_on_parent_unique_constraint(self):
         # Ordering by inherited fields is omitted because joined fields cannot

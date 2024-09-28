@@ -1,5 +1,5 @@
 from django.db import connection
-from django.db.models import CharField
+from django.db.models import CharField, Value
 from django.db.models.functions import Length, Reverse, Trim
 from django.test import TestCase
 from django.test.utils import register_lookup
@@ -24,15 +24,18 @@ class ReverseTests(TestCase):
         )
 
     def test_basic(self):
-        authors = Author.objects.annotate(backward=Reverse("name"))
-        self.assertQuerysetEqual(
+        authors = Author.objects.annotate(
+            backward=Reverse("name"),
+            constant=Reverse(Value("static string")),
+        )
+        self.assertQuerySetEqual(
             authors,
             [
-                ("John Smith", "htimS nhoJ"),
-                ("Élena Jordan", "nadroJ anelÉ"),
-                ("パイソン", "ンソイパ"),
+                ("John Smith", "htimS nhoJ", "gnirts citats"),
+                ("Élena Jordan", "nadroJ anelÉ", "gnirts citats"),
+                ("パイソン", "ンソイパ", "gnirts citats"),
             ],
-            lambda a: (a.name, a.backward),
+            lambda a: (a.name, a.backward, a.constant),
             ordered=False,
         )
 

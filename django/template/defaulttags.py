@@ -1,8 +1,10 @@
 """Default tags used by the template system, available to all templates."""
+
 import re
 import sys
 import warnings
 from collections import namedtuple
+from collections.abc import Iterable
 from datetime import datetime
 from itertools import cycle as itertools_cycle
 from itertools import groupby
@@ -44,7 +46,8 @@ class AutoEscapeControlNode(Node):
     """Implement the actions of the autoescape tag."""
 
     def __init__(self, setting, nodelist):
-        self.setting, self.nodelist = setting, nodelist
+        self.setting = setting
+        self.nodelist = nodelist
 
     def render(self, context):
         old_setting = context.autoescape
@@ -129,7 +132,8 @@ class DebugNode(Node):
 
 class FilterNode(Node):
     def __init__(self, filter_expr, nodelist):
-        self.filter_expr, self.nodelist = filter_expr, nodelist
+        self.filter_expr = filter_expr
+        self.nodelist = nodelist
 
     def render(self, context):
         output = self.nodelist.render(context)
@@ -162,7 +166,8 @@ class ForNode(Node):
     def __init__(
         self, loopvars, sequence, is_reversed, nodelist_loop, nodelist_empty=None
     ):
-        self.loopvars, self.sequence = loopvars, sequence
+        self.loopvars = loopvars
+        self.sequence = sequence
         self.is_reversed = is_reversed
         self.nodelist_loop = nodelist_loop
         if nodelist_empty is None:
@@ -249,7 +254,8 @@ class IfChangedNode(Node):
     child_nodelists = ("nodelist_true", "nodelist_false")
 
     def __init__(self, nodelist_true, nodelist_false, *varlist):
-        self.nodelist_true, self.nodelist_false = nodelist_true, nodelist_false
+        self.nodelist_true = nodelist_true
+        self.nodelist_false = nodelist_false
         self._varlist = varlist
 
     def render(self, context):
@@ -309,7 +315,6 @@ class IfNode(Node):
 
     def render(self, context):
         for condition, nodelist in self.conditions_nodelists:
-
             if condition is not None:  # if / elif clause
                 try:
                     match = condition.eval(context)
@@ -326,7 +331,9 @@ class IfNode(Node):
 
 class LoremNode(Node):
     def __init__(self, count, method, common):
-        self.count, self.method, self.common = count, method, common
+        self.count = count
+        self.method = method
+        self.common = common
 
     def render(self, context):
         try:
@@ -347,7 +354,8 @@ GroupedResult = namedtuple("GroupedResult", ["grouper", "list"])
 
 class RegroupNode(Node):
     def __init__(self, target, expression, var_name):
-        self.target, self.expression = target, expression
+        self.target = target
+        self.expression = expression
         self.var_name = var_name
 
     def resolve_expression(self, obj, context):
@@ -1159,6 +1167,46 @@ def now(parser, token):
         raise TemplateSyntaxError("'now' statement takes one argument")
     format_string = bits[1][1:-1]
     return NowNode(format_string, asvar)
+
+
+@register.simple_tag(name="querystring", takes_context=True)
+def querystring(context, query_dict=None, **kwargs):
+    """
+    Add, remove, and change parameters of a ``QueryDict`` and return the result
+    as a query string. If the ``query_dict`` argument is not provided, default
+    to ``request.GET``.
+
+    For example::
+
+        {% querystring foo=3 %}
+
+    To remove a key::
+
+        {% querystring foo=None %}
+
+    To use with pagination::
+
+        {% querystring page=page_obj.next_page_number %}
+
+    A custom ``QueryDict`` can also be used::
+
+        {% querystring my_query_dict foo=3 %}
+    """
+    if query_dict is None:
+        query_dict = context.request.GET
+    query_dict = query_dict.copy()
+    for key, value in kwargs.items():
+        if value is None:
+            if key in query_dict:
+                del query_dict[key]
+        elif isinstance(value, Iterable) and not isinstance(value, str):
+            query_dict.setlist(key, value)
+        else:
+            query_dict[key] = value
+    if not query_dict:
+        return ""
+    query_string = query_dict.urlencode()
+    return f"?{query_string}"
 
 
 @register.tag

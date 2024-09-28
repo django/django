@@ -22,4 +22,5 @@ Generally, each model maps to a single database table.
    tablespaces
    optimization
    instrumentation
+   fixtures
    examples/index

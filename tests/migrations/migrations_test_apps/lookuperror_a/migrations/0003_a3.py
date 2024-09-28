@@ -2,7 +2,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("lookuperror_c", "0002_c2"),
         ("lookuperror_b", "0002_b2"),

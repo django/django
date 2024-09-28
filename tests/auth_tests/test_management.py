@@ -23,6 +23,7 @@ from .models import (
     CustomUserNonUniqueUsername,
     CustomUserWithFK,
     CustomUserWithM2M,
+    CustomUserWithUniqueConstraint,
     Email,
     Organization,
     UserProxy,
@@ -48,7 +49,7 @@ def mock_inputs(inputs):
     """
 
     def inner(test_func):
-        def wrapped(*args):
+        def wrapper(*args):
             class mock_getpass:
                 @staticmethod
                 def getpass(prompt=b"Password: ", stream=None):
@@ -89,7 +90,7 @@ def mock_inputs(inputs):
                 createsuperuser.getpass = old_getpass
                 builtins.input = old_input
 
-        return wrapped
+        return wrapper
 
     return inner
 
@@ -162,11 +163,9 @@ class ChangepasswordManagementCommandTestCase(TestCase):
 
     def setUp(self):
         self.stdout = StringIO()
+        self.addCleanup(self.stdout.close)
         self.stderr = StringIO()
-
-    def tearDown(self):
-        self.stdout.close()
-        self.stderr.close()
+        self.addCleanup(self.stderr.close)
 
     @mock.patch.object(getpass, "getpass", return_value="password")
     def test_get_pass(self, mock_get_pass):
@@ -310,6 +309,19 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
 
         # created password should be unusable
         self.assertFalse(u.has_usable_password())
+
+    def test_validate_username(self):
+        msg = (
+            "Enter a valid username. This value may contain only letters, numbers, "
+            "and @/./+/-/_ characters."
+        )
+        with self.assertRaisesMessage(CommandError, msg):
+            call_command(
+                "createsuperuser",
+                interactive=False,
+                username="🤠",
+                email="joe@somewhere.org",
+            )
 
     def test_non_ascii_verbose_name(self):
         @mock_inputs(
@@ -511,7 +523,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         self.assertEqual(u.group, group)
 
         non_existent_email = "mymail2@gmail.com"
-        msg = "email instance with email %r does not exist." % non_existent_email
+        msg = "email instance with email %r is not a valid choice." % non_existent_email
         with self.assertRaisesMessage(CommandError, msg):
             call_command(
                 "createsuperuser",
@@ -582,7 +594,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         email = Email.objects.create(email="mymail@gmail.com")
         Group.objects.all().delete()
         nonexistent_group_id = 1
-        msg = f"group instance with id {nonexistent_group_id} does not exist."
+        msg = f"group instance with id {nonexistent_group_id} is not a valid choice."
 
         with self.assertRaisesMessage(CommandError, msg):
             call_command(
@@ -599,7 +611,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         email = Email.objects.create(email="mymail@gmail.com")
         Group.objects.all().delete()
         nonexistent_group_id = 1
-        msg = f"group instance with id {nonexistent_group_id} does not exist."
+        msg = f"group instance with id {nonexistent_group_id} is not a valid choice."
 
         with mock.patch.dict(
             os.environ,
@@ -619,7 +631,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         email = Email.objects.create(email="mymail@gmail.com")
         Group.objects.all().delete()
         nonexistent_group_id = 1
-        msg = f"group instance with id {nonexistent_group_id} does not exist."
+        msg = f"group instance with id {nonexistent_group_id} is not a valid choice."
 
         @mock_inputs(
             {
@@ -954,6 +966,36 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
                 stderr=new_io,
             )
 
+    def test_blank_email_allowed_non_interactive(self):
+        new_io = StringIO()
+
+        call_command(
+            "createsuperuser",
+            email="",
+            username="joe",
+            interactive=False,
+            stdout=new_io,
+            stderr=new_io,
+        )
+        self.assertEqual(new_io.getvalue().strip(), "Superuser created successfully.")
+        u = User.objects.get(username="joe")
+        self.assertEqual(u.email, "")
+
+    @mock.patch.dict(os.environ, {"DJANGO_SUPERUSER_EMAIL": ""})
+    def test_blank_email_allowed_non_interactive_environment_variable(self):
+        new_io = StringIO()
+
+        call_command(
+            "createsuperuser",
+            username="joe",
+            interactive=False,
+            stdout=new_io,
+            stderr=new_io,
+        )
+        self.assertEqual(new_io.getvalue().strip(), "Superuser created successfully.")
+        u = User.objects.get(username="joe")
+        self.assertEqual(u.email, "")
+
     def test_password_validation_bypass(self):
         """
         Password validation can be bypassed by entering 'y' at the prompt.
@@ -1049,6 +1091,41 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         @mock_inputs(
             {"password": return_passwords, "username": return_usernames, "email": ""}
         )
+        def test(self):
+            call_command(
+                "createsuperuser",
+                interactive=True,
+                stdin=MockTTY(),
+                stdout=new_io,
+                stderr=new_io,
+            )
+            self.assertEqual(
+                new_io.getvalue().strip(),
+                "Error: That username is already taken.\n"
+                "Superuser created successfully.",
+            )
+
+        test(self)
+
+    @override_settings(AUTH_USER_MODEL="auth_tests.CustomUserWithUniqueConstraint")
+    def test_existing_username_meta_unique_constraint(self):
+        """
+        Creation fails if the username already exists and a custom user model
+        has UniqueConstraint.
+        """
+        user = CustomUserWithUniqueConstraint.objects.create(username="janet")
+        new_io = StringIO()
+        entered_passwords = ["password", "password"]
+        # Enter the existing username first and then a new one.
+        entered_usernames = [user.username, "joe"]
+
+        def return_passwords():
+            return entered_passwords.pop(0)
+
+        def return_usernames():
+            return entered_usernames.pop(0)
+
+        @mock_inputs({"password": return_passwords, "username": return_usernames})
         def test(self):
             call_command(
                 "createsuperuser",
@@ -1436,3 +1513,22 @@ class CreatePermissionsTests(TestCase):
                 codename=codename,
             ).exists()
         )
+
+
+class DefaultDBRouter:
+    """Route all writes to default."""
+
+    def db_for_write(self, model, **hints):
+        return "default"
+
+
+@override_settings(DATABASE_ROUTERS=[DefaultDBRouter()])
+class CreatePermissionsMultipleDatabasesTests(TestCase):
+    databases = {"default", "other"}
+
+    def test_set_permissions_fk_to_using_parameter(self):
+        Permission.objects.using("other").delete()
+        with self.assertNumQueries(4, using="other") as captured_queries:
+            create_permissions(apps.get_app_config("auth"), verbosity=0, using="other")
+        self.assertIn("INSERT INTO", captured_queries[-1]["sql"].upper())
+        self.assertGreater(Permission.objects.using("other").count(), 0)

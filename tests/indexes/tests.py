@@ -1,8 +1,9 @@
 import datetime
 from unittest import skipUnless
 
+from django.conf import settings
 from django.db import connection
-from django.db.models import CASCADE, ForeignKey, Index, Q
+from django.db.models import CASCADE, CharField, ForeignKey, Index, Q
 from django.db.models.functions import Lower
 from django.test import (
     TestCase,
@@ -13,12 +14,7 @@ from django.test import (
 from django.test.utils import override_settings
 from django.utils import timezone
 
-from .models import (
-    Article,
-    ArticleTranslation,
-    IndexedArticle2,
-    IndexTogetherSingleList,
-)
+from .models import Article, ArticleTranslation, IndexedArticle2
 
 
 class SchemaIndexesTests(TestCase):
@@ -64,26 +60,15 @@ class SchemaIndexesTests(TestCase):
             )
         self.assertEqual(index_name, expected[connection.vendor])
 
-    def test_index_together(self):
+    def test_quoted_index_name(self):
         editor = connection.schema_editor()
         index_sql = [str(statement) for statement in editor._model_indexes_sql(Article)]
         self.assertEqual(len(index_sql), 1)
-        # Ensure the index name is properly quoted
+        # Ensure the index name is properly quoted.
         self.assertIn(
-            connection.ops.quote_name(
-                editor._create_index_name(
-                    Article._meta.db_table, ["headline", "pub_date"], suffix="_idx"
-                )
-            ),
+            connection.ops.quote_name(Article._meta.indexes[0].name),
             index_sql[0],
         )
-
-    def test_index_together_single_list(self):
-        # Test for using index_together with a single list (#22172)
-        index_sql = connection.schema_editor()._model_indexes_sql(
-            IndexTogetherSingleList
-        )
-        self.assertEqual(len(index_sql), 1)
 
     def test_columns_list_sql(self):
         index = Index(fields=["headline"], name="whitespace_idx")
@@ -93,6 +78,7 @@ class SchemaIndexesTests(TestCase):
             str(index.create_sql(Article, editor)),
         )
 
+    @skipUnlessDBFeature("supports_index_column_ordering")
     def test_descending_columns_list_sql(self):
         index = Index(fields=["-headline"], name="whitespace_idx")
         editor = connection.schema_editor()
@@ -100,6 +86,24 @@ class SchemaIndexesTests(TestCase):
             "(%s DESC)" % editor.quote_name("headline"),
             str(index.create_sql(Article, editor)),
         )
+
+    @skipUnlessDBFeature("can_create_inline_fk", "can_rollback_ddl")
+    def test_alter_field_unique_false_removes_deferred_sql(self):
+        field_added = CharField(max_length=127, unique=True)
+        field_added.set_attributes_from_name("charfield_added")
+
+        field_to_alter = CharField(max_length=127, unique=True)
+        field_to_alter.set_attributes_from_name("charfield_altered")
+        altered_field = CharField(max_length=127, unique=False)
+        altered_field.set_attributes_from_name("charfield_altered")
+
+        with connection.schema_editor() as editor:
+            editor.add_field(ArticleTranslation, field_added)
+            editor.add_field(ArticleTranslation, field_to_alter)
+            self.assertEqual(len(editor.deferred_sql), 2)
+            editor.alter_field(ArticleTranslation, field_to_alter, altered_field)
+            self.assertEqual(len(editor.deferred_sql), 1)
+            self.assertIn("charfield_added", str(editor.deferred_sql[0].parts["name"]))
 
 
 class SchemaIndexesNotPostgreSQLTests(TransactionTestCase):
@@ -336,7 +340,7 @@ class SchemaIndexesMySQLTests(TransactionTestCase):
                 ArticleTranslation._meta.db_table,
             )
         if storage != "InnoDB":
-            self.skip("This test only applies to the InnoDB storage engine")
+            self.skipTest("This test only applies to the InnoDB storage engine")
         index_sql = [
             str(statement)
             for statement in connection.schema_editor()._model_indexes_sql(
@@ -599,11 +603,17 @@ class CoveringIndexTests(TransactionTestCase):
             condition=Q(pub_date__isnull=False),
         )
         with connection.schema_editor() as editor:
+            extra_sql = ""
+            if settings.DEFAULT_INDEX_TABLESPACE:
+                extra_sql = "TABLESPACE %s " % editor.quote_name(
+                    settings.DEFAULT_INDEX_TABLESPACE
+                )
             self.assertIn(
-                "(%s) INCLUDE (%s) WHERE %s "
+                "(%s) INCLUDE (%s) %sWHERE %s "
                 % (
                     editor.quote_name("headline"),
                     editor.quote_name("pub_date"),
+                    extra_sql,
                     editor.quote_name("pub_date"),
                 ),
                 str(index.create_sql(Article, editor)),

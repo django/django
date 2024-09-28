@@ -111,6 +111,29 @@ class DefaultsTests(TestCase):
                         (
                             "django.template.loaders.locmem.Loader",
                             {
+                                "400.html": (
+                                    "This is a test template for a 400 error "
+                                ),
+                            },
+                        ),
+                    ],
+                },
+            }
+        ]
+    )
+    def test_custom_bad_request_template(self):
+        response = self.client.get("/raises400/")
+        self.assertIs(response.wsgi_request, response.context.request)
+
+    @override_settings(
+        TEMPLATES=[
+            {
+                "BACKEND": "django.template.backends.django.DjangoTemplates",
+                "OPTIONS": {
+                    "loaders": [
+                        (
+                            "django.template.loaders.locmem.Loader",
+                            {
                                 "404.html": (
                                     "This is a test template for a 404 error "
                                     "(path: {{ request_path }}, "

@@ -6,6 +6,9 @@ from django.test.selenium import SeleniumTestCase
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.translation import gettext as _
 
+# Make unittest ignore frames in this module when reporting failures.
+__unittest = True
+
 
 class CSPMiddleware(MiddlewareMixin):
     """The admin's JavaScript should be compatible with CSP."""
@@ -17,7 +20,6 @@ class CSPMiddleware(MiddlewareMixin):
 
 @modify_settings(MIDDLEWARE={"append": "django.contrib.admin.tests.CSPMiddleware"})
 class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
-
     available_apps = [
         "django.contrib.admin",
         "django.contrib.auth",

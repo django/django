@@ -118,19 +118,20 @@ def mark_for_rollback_on_error(using=None):
     """
     try:
         yield
-    except Exception:
+    except Exception as exc:
         connection = get_connection(using)
         if connection.in_atomic_block:
             connection.needs_rollback = True
+            connection.rollback_exc = exc
         raise
 
 
-def on_commit(func, using=None):
+def on_commit(func, using=None, robust=False):
     """
     Register `func` to be called when the current transaction is committed.
     If the current transaction is rolled back, `func` will not be called.
     """
-    get_connection(using).on_commit(func)
+    get_connection(using).on_commit(func, robust)
 
 
 #################################
@@ -155,7 +156,7 @@ class Atomic(ContextDecorator):
     It's possible to disable the creation of savepoints if the goal is to
     ensure that some code runs within a transaction without creating overhead.
 
-    A stack of savepoints identifiers is maintained as an attribute of the
+    A stack of savepoint identifiers is maintained as an attribute of the
     connection. None denotes the absence of a savepoint.
 
     This allows reentrancy even if the same AtomicWrapper is reused. For
@@ -164,10 +165,10 @@ class Atomic(ContextDecorator):
 
     Since database connections are thread-local, this is thread-safe.
 
-    An atomic block can be tagged as durable. In this case, raise a
-    RuntimeError if it's nested within another atomic block. This guarantees
+    An atomic block can be tagged as durable. In this case, a RuntimeError is
+    raised if it's nested within another atomic block. This guarantees
     that database changes in a durable block are committed to the database when
-    the block exists without error.
+    the block exits without error.
 
     This is a private API.
     """

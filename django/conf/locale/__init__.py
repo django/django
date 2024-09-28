@@ -74,6 +74,12 @@ LANG_INFO = {
         "name": "Catalan",
         "name_local": "català",
     },
+    "ckb": {
+        "bidi": True,
+        "code": "ckb",
+        "name": "Central Kurdish (Sorani)",
+        "name_local": "کوردی",
+    },
     "cs": {
         "bidi": False,
         "code": "cs",
@@ -474,7 +480,7 @@ LANG_INFO = {
         "bidi": False,
         "code": "sk",
         "name": "Slovak",
-        "name_local": "Slovensky",
+        "name_local": "slovensky",
     },
     "sl": {
         "bidi": False,
@@ -559,6 +565,12 @@ LANG_INFO = {
         "code": "udm",
         "name": "Udmurt",
         "name_local": "Удмурт",
+    },
+    "ug": {
+        "bidi": True,
+        "code": "ug",
+        "name": "Uyghur",
+        "name_local": "ئۇيغۇرچە",
     },
     "uk": {
         "bidi": False,

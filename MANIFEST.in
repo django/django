@@ -5,6 +5,7 @@ include LICENSE
 include LICENSE.python
 include MANIFEST.in
 include package.json
+include tox.ini
 include *.rst
 graft django
 graft docs
@@ -12,5 +13,4 @@ graft extras
 graft js_tests
 graft scripts
 graft tests
-global-exclude __pycache__
 global-exclude *.py[co]

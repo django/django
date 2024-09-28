@@ -139,7 +139,7 @@ class FilteredAggregateTests(TestCase):
         self.assertEqual(qs.get(pk__in=qs.values("pk")), self.a1)
 
     def test_filtered_aggregate_ref_annotation(self):
-        aggs = Author.objects.annotate(double_age=F("age") * 2,).aggregate(
+        aggs = Author.objects.annotate(double_age=F("age") * 2).aggregate(
             cnt=Count("pk", filter=Q(double_age__gt=100)),
         )
         self.assertEqual(aggs["cnt"], 2)
@@ -190,5 +190,31 @@ class FilteredAggregateTests(TestCase):
                     Book.authors.through.objects.filter(book=OuterRef("pk")),
                 ),
             ),
+        )
+        self.assertEqual(aggregate, {"max_rating": 4.5})
+
+    def test_filtered_aggregate_empty_condition(self):
+        book = Book.objects.annotate(
+            authors_count=Count(
+                "authors",
+                filter=Q(authors__in=[]),
+            ),
+        ).get(pk=self.b1.pk)
+        self.assertEqual(book.authors_count, 0)
+        aggregate = Book.objects.aggregate(
+            max_rating=Max("rating", filter=Q(rating__in=[]))
+        )
+        self.assertEqual(aggregate, {"max_rating": None})
+
+    def test_filtered_aggregate_full_condition(self):
+        book = Book.objects.annotate(
+            authors_count=Count(
+                "authors",
+                filter=~Q(authors__in=[]),
+            ),
+        ).get(pk=self.b1.pk)
+        self.assertEqual(book.authors_count, 2)
+        aggregate = Book.objects.aggregate(
+            max_rating=Max("rating", filter=~Q(rating__in=[]))
         )
         self.assertEqual(aggregate, {"max_rating": 4.5})

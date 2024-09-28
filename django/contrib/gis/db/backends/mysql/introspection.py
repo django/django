@@ -28,10 +28,6 @@ class MySQLIntrospection(DatabaseIntrospection):
         return field_type, field_params
 
     def supports_spatial_index(self, cursor, table_name):
-        # Supported with MyISAM/Aria, or InnoDB on MySQL 5.7.5+/MariaDB.
+        # Supported with MyISAM, Aria, or InnoDB.
         storage_engine = self.get_storage_engine(cursor, table_name)
-        if storage_engine == "InnoDB":
-            if self.connection.mysql_is_mariadb:
-                return True
-            return self.connection.mysql_version >= (5, 7, 5)
-        return storage_engine in ("MyISAM", "Aria")
+        return storage_engine in ("MyISAM", "Aria", "InnoDB")

@@ -38,26 +38,20 @@ QUnit.test('added form has remove button', function(assert) {
 });
 
 QUnit.test('add/remove form events', function(assert) {
-    assert.expect(6);
-    const $ = django.jQuery;
-    const $document = $(document);
+    assert.expect(5);
     const addButton = this.table.find('.add-row a');
-    $document.on('formset:added', function(event, $row, formsetName) {
+    document.addEventListener('formset:added', (event) => {
         assert.ok(true, 'event `formset:added` triggered');
-        assert.equal(true, $row.is('#first-1'));
-        assert.equal(formsetName, 'first');
-        $document.off('formset:added');
-    });
+        assert.equal(true, event.target.matches('#first-1'));
+        assert.equal(event.detail.formsetName, 'first');
+    }, {once: true});
     addButton.click();
-    const deletedRow = $('#first-1');
     const deleteLink = this.table.find('.inline-deletelink');
-    $document.on('formset:removed', function(event, $row, formsetName) {
+    document.addEventListener('formset:removed', (event) => {
         assert.ok(true, 'event `formset:removed` triggered');
-        assert.equal(true, $row.is(deletedRow));
-        assert.equal(formsetName, 'first');
-        $document.off('formset:removed');
-    });
-    deleteLink.trigger($.Event('click', {target: deleteLink}));
+        assert.equal(event.detail.formsetName, 'first');
+    }, {once: true});
+    deleteLink.click();
 });
 
 QUnit.test('existing add button', function(assert) {

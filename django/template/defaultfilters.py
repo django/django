@@ -1,8 +1,9 @@
 """Default variable filters."""
+
 import random as random_module
 import re
 import types
-from decimal import ROUND_HALF_UP, Context, Decimal, InvalidOperation
+from decimal import ROUND_HALF_UP, Context, Decimal, InvalidOperation, getcontext
 from functools import wraps
 from inspect import unwrap
 from operator import itemgetter
@@ -149,7 +150,7 @@ def floatformat(text, arg=-1):
             use_l10n = False
             arg = arg[:-1] or -1
     try:
-        input_val = repr(text)
+        input_val = str(text)
         d = Decimal(input_val)
     except InvalidOperation:
         try:
@@ -161,12 +162,25 @@ def floatformat(text, arg=-1):
     except ValueError:
         return input_val
 
+    _, digits, exponent = d.as_tuple()
+    try:
+        number_of_digits_and_exponent_sum = len(digits) + abs(exponent)
+    except TypeError:
+        # Exponent values can be "F", "n", "N".
+        number_of_digits_and_exponent_sum = 0
+
+    # Values with more than 200 digits, or with a large exponent, are returned "as is"
+    # to avoid high memory consumption and potential denial-of-service attacks.
+    # The cut-off of 200 is consistent with django.utils.numberformat.floatformat().
+    if number_of_digits_and_exponent_sum > 200:
+        return input_val
+
     try:
         m = int(d) - d
     except (ValueError, OverflowError, InvalidOperation):
         return input_val
 
-    if not m and p < 0:
+    if not m and p <= 0:
         return mark_safe(
             formats.number_format(
                 "%d" % (int(d)),
@@ -182,6 +196,7 @@ def floatformat(text, arg=-1):
     units = len(tupl[1])
     units += -tupl[2] if m else tupl[2]
     prec = abs(p) + units + 1
+    prec = max(getcontext().prec, prec)
 
     # Avoid conversion to scientific notation by accessing `sign`, `digits`,
     # and `exponent` from Decimal.as_tuple() directly.
@@ -442,6 +457,16 @@ def escape_filter(value):
 
 
 @register.filter(is_safe=True)
+def escapeseq(value):
+    """
+    An "escape" filter for sequences. Mark each element in the sequence,
+    individually, as a string that should be auto-escaped. Return a list with
+    the results.
+    """
+    return [conditional_escape(obj) for obj in value]
+
+
+@register.filter(is_safe=True)
 @stringfilter
 def force_escape(value):
     """
@@ -583,8 +608,9 @@ def join(value, arg, autoescape=True):
     """Join a list with a string, like Python's ``str.join(list)``."""
     try:
         if autoescape:
-            value = [conditional_escape(v) for v in value]
-        data = conditional_escape(arg).join(value)
+            data = conditional_escape(arg).join([conditional_escape(v) for v in value])
+        else:
+            data = arg.join(value)
     except TypeError:  # Fail silently if arg isn't iterable.
         return value
     return mark_safe(data)
@@ -608,19 +634,13 @@ def length(value):
         return 0
 
 
-@register.filter(is_safe=False)
-def length_is(value, arg):
-    """Return a boolean of whether the value's length is the argument."""
-    try:
-        return len(value) == int(arg)
-    except (ValueError, TypeError):
-        return ""
-
-
 @register.filter(is_safe=True)
 def random(value):
     """Return a random item from the list."""
-    return random_module.choice(value)
+    try:
+        return random_module.choice(value)
+    except IndexError:
+        return ""
 
 
 @register.filter("slice", is_safe=True)
@@ -637,7 +657,7 @@ def slice_filter(value, arg):
                 bits.append(int(x))
         return value[slice(*bits)]
 
-    except (ValueError, TypeError):
+    except (ValueError, TypeError, KeyError):
         return value  # Fail silently.
 
 

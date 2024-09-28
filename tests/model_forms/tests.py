@@ -1,5 +1,6 @@
 import datetime
 import os
+import shutil
 from decimal import Decimal
 from unittest import mock, skipUnless
 
@@ -21,8 +22,11 @@ from django.forms.models import (
     modelform_factory,
 )
 from django.template import Context, Template
-from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
+from django.test import SimpleTestCase, TestCase, ignore_warnings, skipUnlessDBFeature
 from django.test.utils import isolate_apps
+from django.utils.choices import BlankChoiceIterator
+from django.utils.deprecation import RemovedInDjango60Warning
+from django.utils.version import PYPY
 
 from .models import (
     Article,
@@ -69,6 +73,7 @@ from .models import (
     Triple,
     Writer,
     WriterProfile,
+    temp_storage_dir,
     test_images,
 )
 
@@ -236,6 +241,15 @@ class ModelFormBaseTest(TestCase):
         field_dict = fields_for_model(Person, fields=())
         self.assertEqual(len(field_dict), 0)
 
+    def test_fields_for_model_form_fields(self):
+        form_declared_fields = CustomWriterForm.declared_fields
+        field_dict = fields_for_model(
+            Writer,
+            fields=["name"],
+            form_declared_fields=form_declared_fields,
+        )
+        self.assertIs(field_dict["name"], form_declared_fields["name"])
+
     def test_empty_fields_on_modelform(self):
         """
         No fields on a ModelForm should actually result in no fields.
@@ -360,6 +374,7 @@ class ModelFormBaseTest(TestCase):
         obj = form.save()
         self.assertEqual(obj.name, "")
 
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_save_blank_null_unique_charfield_saves_null(self):
         form_class = modelform_factory(
             model=NullableUniqueCharFieldModel, fields="__all__"
@@ -687,12 +702,12 @@ class ModelFormBaseTest(TestCase):
 
         self.assertHTMLEqual(
             str(SubclassMeta()),
-            """<tr><th><label for="id_name">Name:</label></th>
-<td><input id="id_name" type="text" name="name" maxlength="20" required></td></tr>
-<tr><th><label for="id_slug">Slug:</label></th>
-<td><input id="id_slug" type="text" name="slug" maxlength="20" required></td></tr>
-<tr><th><label for="id_checkbox">Checkbox:</label></th>
-<td><input type="checkbox" name="checkbox" id="id_checkbox" required></td></tr>""",
+            '<div><label for="id_name">Name:</label>'
+            '<input type="text" name="name" maxlength="20" required id="id_name">'
+            '</div><div><label for="id_slug">Slug:</label><input type="text" '
+            'name="slug" maxlength="20" required id="id_slug"></div><div>'
+            '<label for="id_checkbox">Checkbox:</label>'
+            '<input type="checkbox" name="checkbox" required id="id_checkbox"></div>',
         )
 
     def test_orderfields_form(self):
@@ -704,10 +719,10 @@ class ModelFormBaseTest(TestCase):
         self.assertEqual(list(OrderFields.base_fields), ["url", "name"])
         self.assertHTMLEqual(
             str(OrderFields()),
-            """<tr><th><label for="id_url">The URL:</label></th>
-<td><input id="id_url" type="text" name="url" maxlength="40" required></td></tr>
-<tr><th><label for="id_name">Name:</label></th>
-<td><input id="id_name" type="text" name="name" maxlength="20" required></td></tr>""",
+            '<div><label for="id_url">The URL:</label>'
+            '<input type="text" name="url" maxlength="40" required id="id_url">'
+            '</div><div><label for="id_name">Name:</label><input type="text" '
+            'name="name" maxlength="20" required id="id_name"></div>',
         )
 
     def test_orderfields2_form(self):
@@ -898,6 +913,13 @@ class ModelFormBaseTest(TestCase):
         self.assertEqual(m2.date_published, datetime.date(2010, 1, 1))
 
 
+# RemovedInDjango60Warning.
+# It's a temporary workaround for the deprecation period.
+class HttpsURLField(forms.URLField):
+    def __init__(self, **kwargs):
+        super().__init__(assume_scheme="https", **kwargs)
+
+
 class FieldOverridesByFormMetaForm(forms.ModelForm):
     class Meta:
         model = Category
@@ -921,7 +943,7 @@ class FieldOverridesByFormMetaForm(forms.ModelForm):
             }
         }
         field_classes = {
-            "url": forms.URLField,
+            "url": HttpsURLField,
         }
 
 
@@ -940,7 +962,8 @@ class TestFieldOverridesByFormMeta(SimpleTestCase):
         )
         self.assertHTMLEqual(
             str(form["slug"]),
-            '<input id="id_slug" type="text" name="slug" maxlength="20" required>',
+            '<input id="id_slug" type="text" name="slug" maxlength="20" '
+            'aria-describedby="id_slug_helptext" required>',
         )
 
     def test_label_overrides(self):
@@ -1460,12 +1483,11 @@ class ModelFormBasicTests(TestCase):
         f = BaseCategoryForm()
         self.assertHTMLEqual(
             str(f),
-            """<tr><th><label for="id_name">Name:</label></th>
-<td><input id="id_name" type="text" name="name" maxlength="20" required></td></tr>
-<tr><th><label for="id_slug">Slug:</label></th>
-<td><input id="id_slug" type="text" name="slug" maxlength="20" required></td></tr>
-<tr><th><label for="id_url">The URL:</label></th>
-<td><input id="id_url" type="text" name="url" maxlength="40" required></td></tr>""",
+            '<div><label for="id_name">Name:</label><input type="text" name="name" '
+            'maxlength="20" required id="id_name"></div><div><label for="id_slug">Slug:'
+            '</label><input type="text" name="slug" maxlength="20" required '
+            'id="id_slug"></div><div><label for="id_url">The URL:</label>'
+            '<input type="text" name="url" maxlength="40" required id="id_url"></div>',
         )
         self.assertHTMLEqual(
             str(f.as_ul()),
@@ -1538,12 +1560,9 @@ class ModelFormBasicTests(TestCase):
         f = RoykoForm(auto_id=False, instance=self.w_royko)
         self.assertHTMLEqual(
             str(f),
-            """
-            <tr><th>Name:</th><td>
-            <input type="text" name="name" value="Mike Royko" maxlength="50" required>
-            <br>
-            <span class="helptext">Use both first and last names.</span></td></tr>
-            """,
+            '<div>Name:<div class="helptext">Use both first and last names.</div>'
+            '<input type="text" name="name" value="Mike Royko" maxlength="50" '
+            "required></div>",
         )
 
         art = Article.objects.create(
@@ -1617,7 +1636,7 @@ class ModelFormBasicTests(TestCase):
         # Set up a callable initial value
         def formfield_for_dbfield(db_field, **kwargs):
             if db_field.name == "categories":
-                kwargs["initial"] = lambda: Category.objects.all().order_by("name")[:2]
+                kwargs["initial"] = lambda: Category.objects.order_by("name")[:2]
             return db_field.formfield(**kwargs)
 
         # Create a ModelForm, instantiate it, and check that the output is as expected
@@ -1703,30 +1722,39 @@ class ModelFormBasicTests(TestCase):
         self.assertHTMLEqual(
             str(f),
             """
-            <tr><th>Headline:</th><td>
-            <input type="text" name="headline" maxlength="50" required></td></tr>
-            <tr><th>Slug:</th><td>
-            <input type="text" name="slug" maxlength="50" required></td></tr>
-            <tr><th>Pub date:</th><td>
-            <input type="text" name="pub_date" required></td></tr>
-            <tr><th>Writer:</th><td><select name="writer" required>
-            <option value="" selected>---------</option>
-            <option value="%s">Bob Woodward</option>
-            <option value="%s">Mike Royko</option>
-            </select></td></tr>
-            <tr><th>Article:</th><td>
-            <textarea rows="10" cols="40" name="article" required></textarea></td></tr>
-            <tr><th>Categories:</th><td><select multiple name="categories">
-            <option value="%s">Entertainment</option>
-            <option value="%s">It&#x27;s a test</option>
-            <option value="%s">Third test</option>
-            </select></td></tr>
-            <tr><th>Status:</th><td><select name="status">
-            <option value="" selected>---------</option>
-            <option value="1">Draft</option>
-            <option value="2">Pending</option>
-            <option value="3">Live</option>
-            </select></td></tr>
+            <div>Headline:
+                <input type="text" name="headline" maxlength="50" required>
+            </div>
+            <div>Slug:
+                <input type="text" name="slug" maxlength="50" required>
+            </div>
+            <div>Pub date:
+                <input type="text" name="pub_date" required>
+            </div>
+            <div>Writer:
+                <select name="writer" required>
+                    <option value="" selected>---------</option>
+                    <option value="%s">Bob Woodward</option>
+                    <option value="%s">Mike Royko</option>
+                </select>
+            </div>
+            <div>Article:
+                <textarea name="article" cols="40" rows="10" required></textarea>
+            </div>
+            <div>Categories:
+                <select name="categories" multiple>
+                    <option value="%s">Entertainment</option>
+                    <option value="%s">It&#x27;s a test</option>
+                    <option value="%s">Third test</option>
+                </select>
+            </div>
+            <div>Status:
+                <select name="status">
+                    <option value="" selected>---------</option>
+                    <option value="1">Draft</option><option value="2">Pending</option>
+                    <option value="3">Live</option>
+                </select>
+            </div>
             """
             % (self.w_woodward.pk, self.w_royko.pk, self.c1.pk, self.c2.pk, self.c3.pk),
         )
@@ -1791,12 +1819,8 @@ class ModelFormBasicTests(TestCase):
         f = PartialArticleForm(auto_id=False)
         self.assertHTMLEqual(
             str(f),
-            """
-            <tr><th>Headline:</th><td>
-            <input type="text" name="headline" maxlength="50" required></td></tr>
-            <tr><th>Pub date:</th><td>
-            <input type="text" name="pub_date" required></td></tr>
-            """,
+            '<div>Headline:<input type="text" name="headline" maxlength="50" required>'
+            '</div><div>Pub date:<input type="text" name="pub_date" required></div>',
         )
 
         class PartialArticleFormWithSlug(forms.ModelForm):
@@ -1928,26 +1952,28 @@ class ModelFormBasicTests(TestCase):
         f = ArticleForm(auto_id=False)
         self.assertHTMLEqual(
             f.as_ul(),
-            """<li>Headline: <input type="text" name="headline" maxlength="50" required></li>
-<li>Slug: <input type="text" name="slug" maxlength="50" required></li>
-<li>Pub date: <input type="text" name="pub_date" required></li>
-<li>Writer: <select name="writer" required>
-<option value="" selected>---------</option>
-<option value="%s">Bob Woodward</option>
-<option value="%s">Mike Royko</option>
-</select></li>
-<li>Article: <textarea rows="10" cols="40" name="article" required></textarea></li>
-<li>Categories: <select multiple name="categories">
-<option value="%s">Entertainment</option>
-<option value="%s">It&#x27;s a test</option>
-<option value="%s">Third test</option>
-</select> </li>
-<li>Status: <select name="status">
-<option value="" selected>---------</option>
-<option value="1">Draft</option>
-<option value="2">Pending</option>
-<option value="3">Live</option>
-</select></li>"""
+            '<li>Headline: <input type="text" name="headline" maxlength="50" required>'
+            "</li>"
+            '<li>Slug: <input type="text" name="slug" maxlength="50" required></li>'
+            '<li>Pub date: <input type="text" name="pub_date" required></li>'
+            '<li>Writer: <select name="writer" required>'
+            '<option value="" selected>---------</option>'
+            '<option value="%s">Bob Woodward</option>'
+            '<option value="%s">Mike Royko</option>'
+            "</select></li>"
+            '<li>Article: <textarea rows="10" cols="40" name="article" required>'
+            "</textarea></li>"
+            '<li>Categories: <select multiple name="categories">'
+            '<option value="%s">Entertainment</option>'
+            '<option value="%s">It&#x27;s a test</option>'
+            '<option value="%s">Third test</option>'
+            "</select> </li>"
+            '<li>Status: <select name="status">'
+            '<option value="" selected>---------</option>'
+            '<option value="1">Draft</option>'
+            '<option value="2">Pending</option>'
+            '<option value="3">Live</option>'
+            "</select></li>"
             % (self.w_woodward.pk, self.w_royko.pk, self.c1.pk, self.c2.pk, self.c3.pk),
         )
 
@@ -1955,28 +1981,30 @@ class ModelFormBasicTests(TestCase):
         w_bernstein = Writer.objects.create(name="Carl Bernstein")
         self.assertHTMLEqual(
             f.as_ul(),
-            """<li>Headline: <input type="text" name="headline" maxlength="50" required></li>
-<li>Slug: <input type="text" name="slug" maxlength="50" required></li>
-<li>Pub date: <input type="text" name="pub_date" required></li>
-<li>Writer: <select name="writer" required>
-<option value="" selected>---------</option>
-<option value="%s">Bob Woodward</option>
-<option value="%s">Carl Bernstein</option>
-<option value="%s">Mike Royko</option>
-</select></li>
-<li>Article: <textarea rows="10" cols="40" name="article" required></textarea></li>
-<li>Categories: <select multiple name="categories">
-<option value="%s">Entertainment</option>
-<option value="%s">It&#x27;s a test</option>
-<option value="%s">Third test</option>
-<option value="%s">Fourth</option>
-</select></li>
-<li>Status: <select name="status">
-<option value="" selected>---------</option>
-<option value="1">Draft</option>
-<option value="2">Pending</option>
-<option value="3">Live</option>
-</select></li>"""
+            '<li>Headline: <input type="text" name="headline" maxlength="50" required>'
+            "</li>"
+            '<li>Slug: <input type="text" name="slug" maxlength="50" required></li>'
+            '<li>Pub date: <input type="text" name="pub_date" required></li>'
+            '<li>Writer: <select name="writer" required>'
+            '<option value="" selected>---------</option>'
+            '<option value="%s">Bob Woodward</option>'
+            '<option value="%s">Carl Bernstein</option>'
+            '<option value="%s">Mike Royko</option>'
+            "</select></li>"
+            '<li>Article: <textarea rows="10" cols="40" name="article" required>'
+            "</textarea></li>"
+            '<li>Categories: <select multiple name="categories">'
+            '<option value="%s">Entertainment</option>'
+            '<option value="%s">It&#x27;s a test</option>'
+            '<option value="%s">Third test</option>'
+            '<option value="%s">Fourth</option>'
+            "</select></li>"
+            '<li>Status: <select name="status">'
+            '<option value="" selected>---------</option>'
+            '<option value="1">Draft</option>'
+            '<option value="2">Pending</option>'
+            '<option value="3">Live</option>'
+            "</select></li>"
             % (
                 self.w_woodward.pk,
                 w_bernstein.pk,
@@ -1987,6 +2015,38 @@ class ModelFormBasicTests(TestCase):
                 c4.pk,
             ),
         )
+
+    @isolate_apps("model_forms")
+    def test_callable_choices_are_lazy(self):
+        call_count = 0
+
+        def get_animal_choices():
+            nonlocal call_count
+            call_count += 1
+            return [("LION", "Lion"), ("ZEBRA", "Zebra")]
+
+        class ZooKeeper(models.Model):
+            animal = models.CharField(
+                blank=True,
+                choices=get_animal_choices,
+                max_length=5,
+            )
+
+        class ZooKeeperForm(forms.ModelForm):
+            class Meta:
+                model = ZooKeeper
+                fields = ["animal"]
+
+        self.assertEqual(call_count, 0)
+        form = ZooKeeperForm()
+        self.assertEqual(call_count, 0)
+        self.assertIsInstance(form.fields["animal"].choices, BlankChoiceIterator)
+        self.assertEqual(call_count, 0)
+        self.assertEqual(
+            form.fields["animal"].choices,
+            models.BLANK_CHOICE_DASH + [("LION", "Lion"), ("ZEBRA", "Zebra")],
+        )
+        self.assertEqual(call_count, 1)
 
     def test_recleaning_model_form_instance(self):
         """
@@ -2070,7 +2130,7 @@ class ModelMultipleChoiceFieldTests(TestCase):
 
     def test_model_multiple_choice_field(self):
         f = forms.ModelMultipleChoiceField(Category.objects.all())
-        self.assertEqual(
+        self.assertCountEqual(
             list(f.choices),
             [
                 (self.c1.pk, "Entertainment"),
@@ -2098,7 +2158,7 @@ class ModelMultipleChoiceFieldTests(TestCase):
             [self.c1, self.c2],
         )
         with self.assertRaises(ValidationError):
-            f.clean(["100"])
+            f.clean(["0"])
         with self.assertRaises(ValidationError):
             f.clean("hello")
         with self.assertRaises(ValidationError):
@@ -2139,7 +2199,7 @@ class ModelMultipleChoiceFieldTests(TestCase):
 
         # queryset can be changed after the field is created.
         f.queryset = Category.objects.exclude(name="Third")
-        self.assertEqual(
+        self.assertCountEqual(
             list(f.choices),
             [(self.c1.pk, "Entertainment"), (self.c2.pk, "It's a test")],
         )
@@ -2151,7 +2211,7 @@ class ModelMultipleChoiceFieldTests(TestCase):
 
         f.queryset = Category.objects.all()
         f.label_from_instance = lambda obj: "multicategory " + str(obj)
-        self.assertEqual(
+        self.assertCountEqual(
             list(f.choices),
             [
                 (self.c1.pk, "multicategory Entertainment"),
@@ -2168,6 +2228,15 @@ class ModelMultipleChoiceFieldTests(TestCase):
 
         f = forms.ModelMultipleChoiceField(queryset=Writer.objects.all())
         self.assertNumQueries(1, f.clean, [p.pk for p in persons[1:11:2]])
+
+    def test_model_multiple_choice_null_characters(self):
+        f = forms.ModelMultipleChoiceField(queryset=ExplicitPK.objects.all())
+        msg = "Null characters are not allowed."
+        with self.assertRaisesMessage(ValidationError, msg):
+            f.clean(["\x00something"])
+
+        with self.assertRaisesMessage(ValidationError, msg):
+            f.clean(["valid", "\x00something"])
 
     def test_model_multiple_choice_run_validators(self):
         """
@@ -2415,6 +2484,12 @@ class ModelOneToOneFieldTests(TestCase):
 
 
 class FileAndImageFieldTests(TestCase):
+    def setUp(self):
+        if os.path.exists(temp_storage_dir):
+            shutil.rmtree(temp_storage_dir)
+        os.mkdir(temp_storage_dir)
+        self.addCleanup(shutil.rmtree, temp_storage_dir)
+
     def test_clean_false(self):
         """
         If the ``clean`` method on a non-required FileField receives False as
@@ -2843,6 +2918,7 @@ class ModelOtherFieldTests(SimpleTestCase):
             },
         )
 
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_url_on_modelform(self):
         "Check basic URL field validation on model forms"
 
@@ -2867,6 +2943,32 @@ class ModelOtherFieldTests(SimpleTestCase):
         )
         self.assertTrue(HomepageForm({"url": "http://example.com/foo/bar"}).is_valid())
 
+    def test_url_modelform_assume_scheme_warning(self):
+        msg = (
+            "The default scheme will be changed from 'http' to 'https' in Django "
+            "6.0. Pass the forms.URLField.assume_scheme argument to silence this "
+            "warning, or set the FORMS_URLFIELD_ASSUME_HTTPS transitional setting to "
+            "True to opt into using 'https' as the new default scheme."
+        )
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+
+            class HomepageForm(forms.ModelForm):
+                class Meta:
+                    model = Homepage
+                    fields = "__all__"
+
+    def test_url_modelform_assume_scheme_early_adopt_https(self):
+        msg = "The FORMS_URLFIELD_ASSUME_HTTPS transitional setting is deprecated."
+        with (
+            self.assertWarnsMessage(RemovedInDjango60Warning, msg),
+            self.settings(FORMS_URLFIELD_ASSUME_HTTPS=True),
+        ):
+
+            class HomepageForm(forms.ModelForm):
+                class Meta:
+                    model = Homepage
+                    fields = "__all__"
+
     def test_modelform_non_editable_field(self):
         """
         When explicitly including a non-editable field in a ModelForm, the
@@ -2886,23 +2988,27 @@ class ModelOtherFieldTests(SimpleTestCase):
                     model = Article
                     fields = ("headline", "created")
 
-    def test_http_prefixing(self):
+    def test_https_prefixing(self):
         """
-        If the http:// prefix is omitted on form input, the field adds it again.
+        If the https:// prefix is omitted on form input, the field adds it
+        again.
         """
 
         class HomepageForm(forms.ModelForm):
+            # RemovedInDjango60Warning.
+            url = forms.URLField(assume_scheme="https")
+
             class Meta:
                 model = Homepage
                 fields = "__all__"
 
         form = HomepageForm({"url": "example.com"})
         self.assertTrue(form.is_valid())
-        self.assertEqual(form.cleaned_data["url"], "http://example.com")
+        self.assertEqual(form.cleaned_data["url"], "https://example.com")
 
         form = HomepageForm({"url": "example.com/test"})
         self.assertTrue(form.is_valid())
-        self.assertEqual(form.cleaned_data["url"], "http://example.com/test")
+        self.assertEqual(form.cleaned_data["url"], "https://example.com/test")
 
 
 class OtherModelFormTests(TestCase):
@@ -2942,7 +3048,10 @@ class OtherModelFormTests(TestCase):
                 return ", ".join(c.name for c in obj.colours.all())
 
         field = ColorModelChoiceField(ColourfulItem.objects.prefetch_related("colours"))
-        with self.assertNumQueries(3):  # would be 4 if prefetch is ignored
+        # CPython calls ModelChoiceField.__len__() when coercing to tuple. PyPy
+        # doesn't call __len__() and so .count() isn't called on the QuerySet.
+        # The following would trigger an extra query if prefetch were ignored.
+        with self.assertNumQueries(2 if PYPY else 3):
             self.assertEqual(
                 tuple(field.choices),
                 (
@@ -2990,10 +3099,10 @@ class OtherModelFormTests(TestCase):
 
         self.assertHTMLEqual(
             str(CategoryForm()),
-            """<tr><th><label for="id_description">Description:</label></th>
-<td><input type="text" name="description" id="id_description" required></td></tr>
-<tr><th><label for="id_url">The URL:</label></th>
-<td><input id="id_url" type="text" name="url" maxlength="40" required></td></tr>""",
+            '<div><label for="id_description">Description:</label><input type="text" '
+            'name="description" required id="id_description"></div><div>'
+            '<label for="id_url">The URL:</label><input type="text" name="url" '
+            'maxlength="40" required id="id_url"></div>',
         )
         # to_field_name should also work on ModelMultipleChoiceField ##################
 
@@ -3014,8 +3123,8 @@ class OtherModelFormTests(TestCase):
         self.assertEqual(list(CustomFieldForExclusionForm.base_fields), ["name"])
         self.assertHTMLEqual(
             str(CustomFieldForExclusionForm()),
-            """<tr><th><label for="id_name">Name:</label></th>
-<td><input id="id_name" type="text" name="name" maxlength="10" required></td></tr>""",
+            '<div><label for="id_name">Name:</label><input type="text" '
+            'name="name" maxlength="10" required id="id_name"></div>',
         )
 
     def test_iterable_model_m2m(self):
@@ -3489,6 +3598,41 @@ class FormFieldCallbackTests(SimpleTestCase):
             self.assertEqual(
                 type(InheritedForm.base_fields[name].widget),
                 type(NewForm.base_fields[name].widget),
+            )
+
+    def test_custom_callback_in_meta(self):
+        def callback(db_field, **kwargs):
+            return forms.CharField(widget=forms.Textarea)
+
+        class NewForm(forms.ModelForm):
+            class Meta:
+                model = Person
+                fields = ["id", "name"]
+                formfield_callback = callback
+
+        for field in NewForm.base_fields.values():
+            self.assertEqual(type(field.widget), forms.Textarea)
+
+    def test_custom_callback_from_base_form_meta(self):
+        def callback(db_field, **kwargs):
+            return forms.CharField(widget=forms.Textarea)
+
+        class BaseForm(forms.ModelForm):
+            class Meta:
+                model = Person
+                fields = "__all__"
+                formfield_callback = callback
+
+        NewForm = modelform_factory(model=Person, form=BaseForm)
+
+        class InheritedForm(NewForm):
+            pass
+
+        for name, field in NewForm.base_fields.items():
+            self.assertEqual(type(field.widget), forms.Textarea)
+            self.assertEqual(
+                type(field.widget),
+                type(InheritedForm.base_fields[name].widget),
             )
 
 

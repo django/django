@@ -1,4 +1,4 @@
-from django.db import IntegrityError
+from django.contrib.contenttypes.models import ContentType
 from django.db.models import ProtectedError, Q, Sum
 from django.forms.models import modelform_factory
 from django.test import TestCase, skipIfDBFeature
@@ -15,7 +15,6 @@ from .models import (
     Contact,
     Content,
     D,
-    Developer,
     Guild,
     HasLinkThing,
     Link,
@@ -73,6 +72,20 @@ class GenericRelationTests(TestCase):
         oddrel = OddRelation2.objects.create(name="tlink")
         TextLink.objects.create(content_object=oddrel)
         oddrel.delete()
+
+    def test_charlink_filter(self):
+        oddrel = OddRelation1.objects.create(name="clink")
+        CharLink.objects.create(content_object=oddrel, value="value")
+        self.assertSequenceEqual(
+            OddRelation1.objects.filter(clinks__value="value"), [oddrel]
+        )
+
+    def test_textlink_filter(self):
+        oddrel = OddRelation2.objects.create(name="clink")
+        TextLink.objects.create(content_object=oddrel, value="value")
+        self.assertSequenceEqual(
+            OddRelation2.objects.filter(tlinks__value="value"), [oddrel]
+        )
 
     def test_coerce_object_id_remote_field_cache_persistence(self):
         restaurant = Restaurant.objects.create()
@@ -139,14 +152,6 @@ class GenericRelationTests(TestCase):
         self.assertEqual(len(places), 2)
         self.assertEqual(count_places(p1), 1)
         self.assertEqual(count_places(p2), 1)
-
-    def test_target_model_is_unsaved(self):
-        """Test related to #13085"""
-        # Fails with another, ORM-level error
-        dev1 = Developer(name="Joe")
-        note = Note(note="Deserves promotion", content_object=dev1)
-        with self.assertRaises(IntegrityError):
-            note.save()
 
     def test_target_model_len_zero(self):
         """
@@ -318,3 +323,24 @@ class GenericRelationTests(TestCase):
         thing = HasLinkThing.objects.create()
         link = Link.objects.create(content_object=thing)
         self.assertCountEqual(link.targets.all(), [thing])
+
+    def test_generic_reverse_relation_exclude_filter(self):
+        place1 = Place.objects.create(name="Test Place 1")
+        place2 = Place.objects.create(name="Test Place 2")
+        Link.objects.create(content_object=place1)
+        link2 = Link.objects.create(content_object=place2)
+        qs = Link.objects.filter(~Q(places__name="Test Place 1"))
+        self.assertSequenceEqual(qs, [link2])
+        qs = Link.objects.exclude(places__name="Test Place 1")
+        self.assertSequenceEqual(qs, [link2])
+
+    def test_check_cached_value_pk_different_type(self):
+        """Primary key is not checked if the content type doesn't match."""
+        board = Board.objects.create(name="some test")
+        oddrel = OddRelation1.objects.create(name="clink")
+        charlink = CharLink.objects.create(content_object=oddrel)
+        charlink = CharLink.objects.get(pk=charlink.pk)
+        self.assertEqual(charlink.content_object, oddrel)
+        charlink.object_id = board.pk
+        charlink.content_type_id = ContentType.objects.get_for_model(Board).id
+        self.assertEqual(charlink.content_object, board)

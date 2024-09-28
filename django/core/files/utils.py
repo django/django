@@ -10,10 +10,9 @@ def validate_file_name(name, allow_relative_path=False):
         raise SuspiciousFileOperation("Could not derive file name from '%s'" % name)
 
     if allow_relative_path:
-        # Use PurePosixPath() because this branch is checked only in
-        # FileField.generate_filename() where all file paths are expected to be
-        # Unix style (with forward slashes).
-        path = pathlib.PurePosixPath(name)
+        # Ensure that name can be treated as a pure posix path, i.e. Unix
+        # style (with forward slashes).
+        path = pathlib.PurePosixPath(str(name).replace("\\", "/"))
         if path.is_absolute() or ".." in path.parts:
             raise SuspiciousFileOperation(
                 "Detected path traversal attempt in '%s'" % name
@@ -26,7 +25,7 @@ def validate_file_name(name, allow_relative_path=False):
 
 class FileProxyMixin:
     """
-    A mixin class used to forward file methods to an underlaying file
+    A mixin class used to forward file methods to an underlying file
     object.  The internal file object has to be called "file"::
 
         class FileProxy(FileProxyMixin):

@@ -31,7 +31,7 @@ class BaseGenericInlineFormSet(BaseModelFormSet):
             + self.ct_fk_field.name
         )
         self.save_as_new = save_as_new
-        if self.instance is None or self.instance.pk is None:
+        if self.instance is None or not self.instance._is_pk_set():
             qs = self.model._default_manager.none()
         else:
             if queryset is None:
@@ -67,10 +67,10 @@ class BaseGenericInlineFormSet(BaseModelFormSet):
     def save_new(self, form, commit=True):
         setattr(
             form.instance,
-            self.ct_field.get_attname(),
+            self.ct_field.attname,
             ContentType.objects.get_for_model(self.instance).pk,
         )
-        setattr(form.instance, self.ct_fk_field.get_attname(), self.instance.pk)
+        setattr(form.instance, self.ct_fk_field.attname, self.instance.pk)
         return form.save(commit=commit)
 
 

@@ -2,13 +2,20 @@ from unittest import mock
 
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
-from django.db import connection
+from django.db import NotSupportedError, connection
 from django.db.models import Prefetch, QuerySet, prefetch_related_objects
-from django.db.models.query import get_prefetcher
+from django.db.models.fields.related import ForwardManyToOneDescriptor
+from django.db.models.query import get_prefetcher, prefetch_one_level
 from django.db.models.sql import Query
-from django.test import TestCase, override_settings
-from django.test.utils import CaptureQueriesContext, ignore_warnings
-from django.utils.deprecation import RemovedInDjango50Warning
+from django.test import (
+    TestCase,
+    ignore_warnings,
+    override_settings,
+    skipIfDBFeature,
+    skipUnlessDBFeature,
+)
+from django.test.utils import CaptureQueriesContext
+from django.utils.deprecation import RemovedInDjango60Warning
 
 from .models import (
     Article,
@@ -269,7 +276,7 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
             list(qs.all())
 
     def test_attribute_error(self):
-        qs = Reader.objects.all().prefetch_related("books_read__xyz")
+        qs = Reader.objects.prefetch_related("books_read__xyz")
         msg = (
             "Cannot find 'xyz' on Book object, 'books_read__xyz' "
             "is an invalid parameter to prefetch_related()"
@@ -380,25 +387,12 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
             [self.author1, self.author1, self.author3, self.author4],
         )
 
-    @ignore_warnings(category=RemovedInDjango50Warning)
-    def test_m2m_prefetching_iterator_without_chunks(self):
-        # prefetch_related() is ignored.
-        with self.assertNumQueries(5):
-            authors = [
-                b.authors.first()
-                for b in Book.objects.prefetch_related("authors").iterator()
-            ]
-        self.assertEqual(
-            authors,
-            [self.author1, self.author1, self.author3, self.author4],
-        )
-
-    def test_m2m_prefetching_iterator_without_chunks_warning(self):
+    def test_m2m_prefetching_iterator_without_chunks_error(self):
         msg = (
-            "Using QuerySet.iterator() after prefetch_related() without "
-            "specifying chunk_size is deprecated."
+            "chunk_size must be provided when using QuerySet.iterator() after "
+            "prefetch_related()."
         )
-        with self.assertWarnsMessage(RemovedInDjango50Warning, msg):
+        with self.assertRaisesMessage(ValueError, msg):
             Book.objects.prefetch_related("authors").iterator()
 
 
@@ -872,43 +866,33 @@ class CustomPrefetchTests(TestCase):
         # Test ForwardManyToOneDescriptor.
         houses = House.objects.select_related("owner")
         with self.assertNumQueries(6):
-            rooms = Room.objects.all().prefetch_related("house")
+            rooms = Room.objects.prefetch_related("house")
             lst1 = self.traverse_qs(rooms, [["house", "owner"]])
         with self.assertNumQueries(2):
-            rooms = Room.objects.all().prefetch_related(
-                Prefetch("house", queryset=houses.all())
-            )
+            rooms = Room.objects.prefetch_related(Prefetch("house", queryset=houses))
             lst2 = self.traverse_qs(rooms, [["house", "owner"]])
         self.assertEqual(lst1, lst2)
         with self.assertNumQueries(2):
             houses = House.objects.select_related("owner")
-            rooms = Room.objects.all().prefetch_related(
-                Prefetch("house", queryset=houses.all(), to_attr="house_attr")
+            rooms = Room.objects.prefetch_related(
+                Prefetch("house", queryset=houses, to_attr="house_attr")
             )
             lst2 = self.traverse_qs(rooms, [["house_attr", "owner"]])
         self.assertEqual(lst1, lst2)
-        room = (
-            Room.objects.all()
-            .prefetch_related(
-                Prefetch("house", queryset=houses.filter(address="DoesNotExist"))
-            )
-            .first()
-        )
+        room = Room.objects.prefetch_related(
+            Prefetch("house", queryset=houses.filter(address="DoesNotExist"))
+        ).first()
         with self.assertRaises(ObjectDoesNotExist):
             getattr(room, "house")
-        room = (
-            Room.objects.all()
-            .prefetch_related(
-                Prefetch(
-                    "house",
-                    queryset=houses.filter(address="DoesNotExist"),
-                    to_attr="house_attr",
-                )
+        room = Room.objects.prefetch_related(
+            Prefetch(
+                "house",
+                queryset=houses.filter(address="DoesNotExist"),
+                to_attr="house_attr",
             )
-            .first()
-        )
+        ).first()
         self.assertIsNone(room.house_attr)
-        rooms = Room.objects.all().prefetch_related(
+        rooms = Room.objects.prefetch_related(
             Prefetch("house", queryset=House.objects.only("name"))
         )
         with self.assertNumQueries(2):
@@ -919,20 +903,20 @@ class CustomPrefetchTests(TestCase):
         # Test ReverseOneToOneDescriptor.
         houses = House.objects.select_related("owner")
         with self.assertNumQueries(6):
-            rooms = Room.objects.all().prefetch_related("main_room_of")
+            rooms = Room.objects.prefetch_related("main_room_of")
             lst1 = self.traverse_qs(rooms, [["main_room_of", "owner"]])
         with self.assertNumQueries(2):
-            rooms = Room.objects.all().prefetch_related(
-                Prefetch("main_room_of", queryset=houses.all())
+            rooms = Room.objects.prefetch_related(
+                Prefetch("main_room_of", queryset=houses)
             )
             lst2 = self.traverse_qs(rooms, [["main_room_of", "owner"]])
         self.assertEqual(lst1, lst2)
         with self.assertNumQueries(2):
             rooms = list(
-                Room.objects.all().prefetch_related(
+                Room.objects.prefetch_related(
                     Prefetch(
                         "main_room_of",
-                        queryset=houses.all(),
+                        queryset=houses,
                         to_attr="main_room_of_attr",
                     )
                 )
@@ -996,6 +980,31 @@ class CustomPrefetchTests(TestCase):
         )
         with self.assertNumQueries(5):
             self.traverse_qs(list(houses), [["occupants", "houses", "main_room"]])
+
+    def test_nested_prefetch_related_with_duplicate_prefetch_and_depth(self):
+        people = Person.objects.prefetch_related(
+            Prefetch(
+                "houses__main_room",
+                queryset=Room.objects.filter(name="Dining room"),
+                to_attr="dining_room",
+            ),
+            "houses__main_room",
+        )
+        with self.assertNumQueries(4):
+            main_room = people[0].houses.all()[0]
+
+        people = Person.objects.prefetch_related(
+            "houses__main_room",
+            Prefetch(
+                "houses__main_room",
+                queryset=Room.objects.filter(name="Dining room"),
+                to_attr="dining_room",
+            ),
+        )
+        with self.assertNumQueries(4):
+            main_room = people[0].houses.all()[0]
+
+        self.assertEqual(main_room.main_room, self.room1_1)
 
     def test_values_queryset(self):
         msg = "Prefetch querysets cannot use raw(), values(), and values_list()."
@@ -1282,7 +1291,7 @@ class MultiTableInheritanceTest(TestCase):
         with self.assertNumQueries(2):
             qs = BookReview.objects.prefetch_related("book")
             titles = [obj.book.title for obj in qs]
-        self.assertEqual(titles, ["Poems", "More poems"])
+        self.assertCountEqual(titles, ["Poems", "More poems"])
 
     def test_m2m_to_inheriting_model(self):
         qs = AuthorWithAge.objects.prefetch_related("books_with_year")
@@ -1346,7 +1355,7 @@ class ForeignKeyToFieldTest(TestCase):
 
     def test_m2m(self):
         with self.assertNumQueries(3):
-            qs = Author.objects.all().prefetch_related("favorite_authors", "favors_me")
+            qs = Author.objects.prefetch_related("favorite_authors", "favors_me")
             favorites = [
                 (
                     [str(i_like) for i_like in author.favorite_authors.all()],
@@ -1362,14 +1371,6 @@ class ForeignKeyToFieldTest(TestCase):
                     ([str(self.author1)], [str(self.author2)]),
                 ],
             )
-
-    def test_m2m_manager_reused(self):
-        author = Author.objects.prefetch_related(
-            "favorite_authors",
-            "favors_me",
-        ).first()
-        self.assertIs(author.favorite_authors, author.favorite_authors)
-        self.assertIs(author.favors_me, author.favors_me)
 
 
 class LookupOrderingTest(TestCase):
@@ -1619,8 +1620,9 @@ class MultiDbTests(TestCase):
         )
 
         # Explicit using on a different db.
-        with self.assertNumQueries(1, using="default"), self.assertNumQueries(
-            1, using="other"
+        with (
+            self.assertNumQueries(1, using="default"),
+            self.assertNumQueries(1, using="other"),
         ):
             prefetch = Prefetch(
                 "first_time_authors", queryset=Author.objects.using("default")
@@ -1698,7 +1700,7 @@ class Ticket21760Tests(TestCase):
 
     def test_bug(self):
         prefetcher = get_prefetcher(self.rooms[0], "house", "house")[0]
-        queryset = prefetcher.get_prefetch_queryset(list(Room.objects.all()))[0]
+        queryset = prefetcher.get_prefetch_querysets(list(Room.objects.all()))[0]
         self.assertNotIn(" JOIN ", str(queryset.query))
 
 
@@ -1744,7 +1746,7 @@ class DirectPrefetchedObjectCacheReuseTests(TestCase):
         lookup.
         """
         with self.assertNumQueries(3):
-            books = Book.objects.filter(title__in=["book1", "book2"],).prefetch_related(
+            books = Book.objects.filter(title__in=["book1", "book2"]).prefetch_related(
                 Prefetch(
                     "first_time_authors",
                     Author.objects.prefetch_related(
@@ -1798,7 +1800,7 @@ class DirectPrefetchedObjectCacheReuseTests(TestCase):
 
     def test_detect_is_fetched_with_to_attr(self):
         with self.assertNumQueries(3):
-            books = Book.objects.filter(title__in=["book1", "book2"],).prefetch_related(
+            books = Book.objects.filter(title__in=["book1", "book2"]).prefetch_related(
                 Prefetch(
                     "first_time_authors",
                     Author.objects.prefetch_related(
@@ -1918,3 +1920,152 @@ class NestedPrefetchTests(TestCase):
         self.assertIs(Room.house.is_cached(self.room), True)
         with self.assertNumQueries(0):
             house.rooms.first().house.address
+
+
+class PrefetchLimitTests(TestDataMixin, TestCase):
+    @skipUnlessDBFeature("supports_over_clause")
+    def test_m2m_forward(self):
+        authors = Author.objects.all()  # Meta.ordering
+        with self.assertNumQueries(3):
+            books = list(
+                Book.objects.prefetch_related(
+                    Prefetch("authors", authors),
+                    Prefetch("authors", authors[1:], to_attr="authors_sliced"),
+                )
+            )
+        for book in books:
+            with self.subTest(book=book):
+                self.assertEqual(book.authors_sliced, list(book.authors.all())[1:])
+
+    @skipUnlessDBFeature("supports_over_clause")
+    def test_m2m_reverse(self):
+        books = Book.objects.order_by("title")
+        with self.assertNumQueries(3):
+            authors = list(
+                Author.objects.prefetch_related(
+                    Prefetch("books", books),
+                    Prefetch("books", books[1:2], to_attr="books_sliced"),
+                )
+            )
+        for author in authors:
+            with self.subTest(author=author):
+                self.assertEqual(author.books_sliced, list(author.books.all())[1:2])
+
+    @skipUnlessDBFeature("supports_over_clause")
+    def test_foreignkey_reverse(self):
+        authors = Author.objects.order_by("-name")
+        with self.assertNumQueries(3):
+            books = list(
+                Book.objects.prefetch_related(
+                    Prefetch(
+                        "first_time_authors",
+                        authors,
+                    ),
+                    Prefetch(
+                        "first_time_authors",
+                        authors[1:],
+                        to_attr="first_time_authors_sliced",
+                    ),
+                )
+            )
+        for book in books:
+            with self.subTest(book=book):
+                self.assertEqual(
+                    book.first_time_authors_sliced,
+                    list(book.first_time_authors.all())[1:],
+                )
+
+    @skipUnlessDBFeature("supports_over_clause")
+    def test_reverse_ordering(self):
+        authors = Author.objects.reverse()  # Reverse Meta.ordering
+        with self.assertNumQueries(3):
+            books = list(
+                Book.objects.prefetch_related(
+                    Prefetch("authors", authors),
+                    Prefetch("authors", authors[1:], to_attr="authors_sliced"),
+                )
+            )
+        for book in books:
+            with self.subTest(book=book):
+                self.assertEqual(book.authors_sliced, list(book.authors.all())[1:])
+
+    @skipIfDBFeature("supports_over_clause")
+    def test_window_not_supported(self):
+        authors = Author.objects.all()
+        msg = (
+            "Prefetching from a limited queryset is only supported on backends that "
+            "support window functions."
+        )
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            list(Book.objects.prefetch_related(Prefetch("authors", authors[1:])))
+
+    @skipUnlessDBFeature("supports_over_clause")
+    def test_empty_order(self):
+        authors = Author.objects.order_by()
+        with self.assertNumQueries(3):
+            books = list(
+                Book.objects.prefetch_related(
+                    Prefetch("authors", authors),
+                    Prefetch("authors", authors[:1], to_attr="authors_sliced"),
+                )
+            )
+        for book in books:
+            with self.subTest(book=book):
+                self.assertEqual(len(book.authors_sliced), 1)
+                self.assertIn(book.authors_sliced[0], list(book.authors.all()))
+
+
+class DeprecationTests(TestCase):
+    def test_get_current_queryset_warning(self):
+        msg = (
+            "Prefetch.get_current_queryset() is deprecated. Use "
+            "get_current_querysets() instead."
+        )
+        authors = Author.objects.all()
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
+            self.assertEqual(
+                Prefetch("authors", authors).get_current_queryset(1),
+                authors,
+            )
+        self.assertEqual(ctx.filename, __file__)
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
+            self.assertIsNone(Prefetch("authors").get_current_queryset(1))
+        self.assertEqual(ctx.filename, __file__)
+
+    @ignore_warnings(category=RemovedInDjango60Warning)
+    def test_prefetch_one_level_fallback(self):
+        class NoGetPrefetchQuerySetsDescriptor(ForwardManyToOneDescriptor):
+            def get_prefetch_queryset(self, instances, queryset=None):
+                if queryset is None:
+                    return super().get_prefetch_querysets(instances)
+                return super().get_prefetch_querysets(instances, [queryset])
+
+            def __getattribute__(self, name):
+                if name == "get_prefetch_querysets":
+                    raise AttributeError
+                return super().__getattribute__(name)
+
+        house = House.objects.create()
+        room = Room.objects.create(house=house)
+        house.main_room = room
+        house.save()
+
+        # prefetch_one_level() fallbacks to get_prefetch_queryset().
+        prefetcher = NoGetPrefetchQuerySetsDescriptor(Room._meta.get_field("house"))
+        obj_list, additional_lookups = prefetch_one_level(
+            [room],
+            prefetcher,
+            Prefetch("house", House.objects.all()),
+            0,
+        )
+        self.assertEqual(obj_list, [house])
+        self.assertEqual(additional_lookups, [])
+
+        obj_list, additional_lookups = prefetch_one_level(
+            [room],
+            prefetcher,
+            Prefetch("house"),
+            0,
+        )
+        self.assertEqual(obj_list, [house])
+        self.assertEqual(additional_lookups, [])

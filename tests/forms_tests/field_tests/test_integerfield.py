@@ -112,6 +112,36 @@ class IntegerFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         self.assertEqual(f.max_value, 20)
         self.assertEqual(f.min_value, 10)
 
+    def test_integerfield_6(self):
+        f = IntegerField(step_size=3)
+        self.assertWidgetRendersTo(
+            f,
+            '<input name="f" step="3" type="number" id="id_f" required>',
+        )
+        with self.assertRaisesMessage(
+            ValidationError, "'Ensure this value is a multiple of step size 3.'"
+        ):
+            f.clean("10")
+        self.assertEqual(12, f.clean(12))
+        self.assertEqual(12, f.clean("12"))
+        self.assertEqual(f.step_size, 3)
+
+    def test_integerfield_step_size_min_value(self):
+        f = IntegerField(step_size=3, min_value=-1)
+        self.assertWidgetRendersTo(
+            f,
+            '<input name="f" min="-1" step="3" type="number" id="id_f" required>',
+        )
+        msg = (
+            "Ensure this value is a multiple of step size 3, starting from -1, e.g. "
+            "-1, 2, 5, and so on."
+        )
+        with self.assertRaisesMessage(ValidationError, msg):
+            f.clean("9")
+        self.assertEqual(f.clean("2"), 2)
+        self.assertEqual(f.clean("-1"), -1)
+        self.assertEqual(f.step_size, 3)
+
     def test_integerfield_localized(self):
         """
         A localized IntegerField's widget renders to a text input without any

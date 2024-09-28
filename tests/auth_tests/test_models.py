@@ -1,5 +1,7 @@
 from unittest import mock
 
+from asgiref.sync import sync_to_async
+
 from django.conf.global_settings import PASSWORD_HASHERS
 from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
@@ -120,8 +122,8 @@ class UserManagerTestCase(TransactionTestCase):
         self.assertFalse(user.has_usable_password())
 
     def test_create_user_email_domain_normalize_rfc3696(self):
-        # According to https://tools.ietf.org/html/rfc3696#section-3
-        # the "@" symbol can be part of the local part of an email address
+        # According to RFC 3696 Section 3 the "@" symbol can be part of the
+        # local part of an email address.
         returned = UserManager.normalize_email(r"Abc\@DEF@EXAMPLE.com")
         self.assertEqual(returned, r"Abc\@DEF@example.com")
 
@@ -163,13 +165,6 @@ class UserManagerTestCase(TransactionTestCase):
                 password="test",
                 is_staff=False,
             )
-
-    def test_make_random_password(self):
-        allowed_chars = "abcdefg"
-        password = UserManager().make_random_password(5, allowed_chars)
-        self.assertEqual(len(password), 5)
-        for char in password:
-            self.assertIn(char, allowed_chars)
 
     def test_runpython_manager_methods(self):
         def forwards(apps, schema_editor):
@@ -304,6 +299,29 @@ class AbstractUserTestCase(TestCase):
         finally:
             hasher.iterations = old_iterations
 
+    @override_settings(PASSWORD_HASHERS=PASSWORD_HASHERS)
+    async def test_acheck_password_upgrade(self):
+        user = await sync_to_async(User.objects.create_user)(
+            username="user", password="foo"
+        )
+        initial_password = user.password
+        self.assertIs(await user.acheck_password("foo"), True)
+        hasher = get_hasher("default")
+        self.assertEqual("pbkdf2_sha256", hasher.algorithm)
+
+        old_iterations = hasher.iterations
+        try:
+            # Upgrade the password iterations.
+            hasher.iterations = old_iterations + 1
+            with mock.patch(
+                "django.contrib.auth.password_validation.password_changed"
+            ) as pw_changed:
+                self.assertIs(await user.acheck_password("foo"), True)
+                self.assertEqual(pw_changed.call_count, 0)
+            self.assertNotEqual(initial_password, user.password)
+        finally:
+            hasher.iterations = old_iterations
+
 
 class CustomModelBackend(ModelBackend):
     def with_perm(
@@ -415,6 +433,13 @@ class UserWithPermTestCase(TestCase):
                 backend="invalid.backend.CustomModelBackend",
             )
 
+    def test_invalid_backend_submodule(self):
+        with self.assertRaises(ImportError):
+            User.objects.with_perm(
+                "auth.test",
+                backend="json.tool",
+            )
+
     @override_settings(
         AUTHENTICATION_BACKENDS=["auth_tests.test_models.CustomModelBackend"]
     )
@@ -501,9 +526,7 @@ class TestCreateSuperUserSignals(TestCase):
     def setUp(self):
         self.signals_count = 0
         post_save.connect(self.post_save_listener, sender=User)
-
-    def tearDown(self):
-        post_save.disconnect(self.post_save_listener, sender=User)
+        self.addCleanup(post_save.disconnect, self.post_save_listener, sender=User)
 
     def test_create_user(self):
         User.objects.create_user("JohnDoe")
@@ -529,8 +552,8 @@ class AnonymousUserTests(SimpleTestCase):
         self.assertIs(self.user.is_staff, False)
         self.assertIs(self.user.is_active, False)
         self.assertIs(self.user.is_superuser, False)
-        self.assertEqual(self.user.groups.all().count(), 0)
-        self.assertEqual(self.user.user_permissions.all().count(), 0)
+        self.assertEqual(self.user.groups.count(), 0)
+        self.assertEqual(self.user.user_permissions.count(), 0)
         self.assertEqual(self.user.get_user_permissions(), set())
         self.assertEqual(self.user.get_group_permissions(), set())
 
@@ -579,5 +602,5 @@ class PermissionTests(TestCase):
     def test_str(self):
         p = Permission.objects.get(codename="view_customemailfield")
         self.assertEqual(
-            str(p), "auth_tests | custom email field | Can view custom email field"
+            str(p), "Auth_Tests | custom email field | Can view custom email field"
         )

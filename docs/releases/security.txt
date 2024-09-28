@@ -36,6 +36,259 @@ Issues under Django's security process
 All security issues have been handled under versions of Django's security
 process. These are listed below.
 
+September 3, 2024 - :cve:`2024-45231`
+-------------------------------------
+
+Potential user email enumeration via response status on password reset.
+`Full description
+<https://www.djangoproject.com/weblog/2024/sep/03/security-releases/>`__
+
+* Django 5.1 :commit:`(patch) <3c733c78d6f8e50296d6e248968b6516c92a53ca>`
+* Django 5.0 :commit:`(patch) <96d84047715ea1715b4bd1594e46122b8a77b9e2>`
+* Django 4.2 :commit:`(patch) <bf4888d317ba4506d091eeac6e8b4f1fcc731199>`
+
+September 3, 2024 - :cve:`2024-45230`
+-------------------------------------
+
+Potential denial-of-service vulnerability in ``django.utils.html.urlize()``.
+`Full description
+<https://www.djangoproject.com/weblog/2024/sep/03/security-releases/>`__
+
+* Django 5.1 :commit:`(patch) <022ab0a75c76ab2ea31dfcc5f2cf5501e378d397>`
+* Django 5.0 :commit:`(patch) <813de2672bd7361e9a453ab62cd6e52f96b6525b>`
+* Django 4.2 :commit:`(patch) <d147a8ebbdf28c17cafbbe2884f0bc57e2bf82e2>`
+
+August 6, 2024 - :cve:`2024-42005`
+----------------------------------
+
+Potential SQL injection in ``QuerySet.values()`` and ``values_list()``.
+`Full description
+<https://www.djangoproject.com/weblog/2024/aug/06/security-releases/>`__
+
+* Django 5.0 :commit:`(patch) <32ebcbf2e1fe3e5ba79a6554a167efce81f7422d>`
+* Django 4.2 :commit:`(patch) <f4af67b9b41e0f4c117a8741da3abbd1c869ab28>`
+
+August 6, 2024 - :cve:`2024-41991`
+----------------------------------
+
+Potential denial-of-service vulnerability in ``django.utils.html.urlize()`` and
+``AdminURLFieldWidget``. `Full description
+<https://www.djangoproject.com/weblog/2024/aug/06/security-releases/>`__
+
+* Django 5.0 :commit:`(patch) <523da8771bce321023f490f70d71a9e973ddc927>`
+* Django 4.2 :commit:`(patch) <efea1ef7e2190e3f77ca0651b5458297bc0f6a9f>`
+
+August 6, 2024 - :cve:`2024-41990`
+----------------------------------
+
+Potential denial-of-service vulnerability in ``django.utils.html.urlize()``.
+`Full description
+<https://www.djangoproject.com/weblog/2024/aug/06/security-releases/>`__
+
+* Django 5.0 :commit:`(patch) <7b7b909579c8311c140c89b8a9431bf537febf93>`
+* Django 4.2 :commit:`(patch) <d0a82e26a74940bf0c78204933c3bdd6a283eb88>`
+
+August 6, 2024 - :cve:`2024-41989`
+----------------------------------
+
+Potential memory exhaustion in ``django.utils.numberformat.floatformat()``.
+`Full description
+<https://www.djangoproject.com/weblog/2024/aug/06/security-releases/>`__
+
+* Django 5.0 :commit:`(patch) <27900fe56f3d3cabb4aeb6ccb82f92bab29073a8>`
+* Django 4.2 :commit:`(patch) <fc76660f589ac07e45e9cd34ccb8087aeb11904b>`
+
+July 9, 2024 - :cve:`2024-39614`
+--------------------------------
+
+Potential denial-of-service in
+``django.utils.translation.get_supported_language_variant()``.
+`Full description
+<https://www.djangoproject.com/weblog/2024/jul/09/security-releases/>`__
+
+* Django 5.0 :commit:`(patch) <8e7a44e4bec0f11474699c3111a5e0a45afe7f49>`
+* Django 4.2 :commit:`(patch) <17358fb35fb7217423d4c4877ccb6d1a3a40b1c3>`
+
+July 9, 2024 - :cve:`2024-39330`
+--------------------------------
+
+Potential directory-traversal in ``django.core.files.storage.Storage.save()``.
+`Full description
+<https://www.djangoproject.com/weblog/2024/jul/09/security-releases/>`__
+
+* Django 5.0 :commit:`(patch) <9f4f63e9ebb7bf6cb9547ee4e2526b9b96703270>`
+* Django 4.2 :commit:`(patch) <2b00edc0151a660d1eb86da4059904a0fc4e095e>`
+
+July 9, 2024 - :cve:`2024-39329`
+--------------------------------
+
+Username enumeration through timing difference for users with unusable
+passwords. `Full description
+<https://www.djangoproject.com/weblog/2024/jul/09/security-releases/>`__
+
+* Django 5.0 :commit:`(patch) <07cefdee4a9d1fcd9a3a631cbd07c78defd1923b>`
+* Django 4.2 :commit:`(patch) <156d3186c96e3ec2ca73b8b25dc2ef366e38df14>`
+
+July 9, 2024 - :cve:`2024-38875`
+--------------------------------
+
+Potential denial-of-service in ``django.utils.html.urlize()``.
+`Full description
+<https://www.djangoproject.com/weblog/2024/jul/09/security-releases/>`__
+
+* Django 5.0 :commit:`(patch) <7285644640f085f41d60ab0c8ae4e9153f0485db>`
+* Django 4.2 :commit:`(patch) <79f368764295df109a37192f6182fb6f361d85b5>`
+
+March 4, 2024 - :cve:`2024-27351`
+---------------------------------
+
+Potential regular expression denial-of-service in
+``django.utils.text.Truncator.words()``. `Full description
+<https://www.djangoproject.com/weblog/2024/mar/04/security-releases/>`__
+
+* Django 5.0 :commit:`(patch) <3394fc6132436eca89e997083bae9985fb7e761e>`
+* Django 4.2 :commit:`(patch) <3c9a2771cc80821e041b16eb36c1c37af5349d4a>`
+* Django 3.2 :commit:`(patch) <072963e4c4d0b3a7a8c5412bc0c7d27d1a9c3521>`
+
+February 6, 2024 - :cve:`2024-24680`
+------------------------------------
+
+Potential denial-of-service in ``intcomma`` template filter.
+`Full description
+<https://www.djangoproject.com/weblog/2024/feb/06/security-releases/>`__
+
+* Django 5.0 :commit:`(patch) <16a8fe18a3b81250f4fa57e3f93f0599dc4895bc>`
+* Django 4.2 :commit:`(patch) <572ea07e84b38ea8de0551f4b4eda685d91d09d2>`
+* Django 3.2 :commit:`(patch) <c1171ffbd570db90ca206c30f8e2b9f691243820>`
+
+November 1, 2023 - :cve:`2023-46695`
+------------------------------------
+
+Potential denial of service vulnerability in ``UsernameField`` on Windows.
+`Full description
+<https://www.djangoproject.com/weblog/2023/nov/01/security-releases/>`__
+
+* Django 4.2 :commit:`(patch) <048a9ebb6ea468426cb4e57c71572cbbd975517f>`
+* Django 4.1 :commit:`(patch) <4965bfdde2e5a5c883685019e57d123a3368a75e>`
+* Django 3.2 :commit:`(patch) <f9a7fb8466a7ba4857eaf930099b5258f3eafb2b>`
+
+October 4, 2023 - :cve:`2023-43665`
+-----------------------------------
+
+Denial-of-service possibility in ``django.utils.text.Truncator``.
+`Full description
+<https://www.djangoproject.com/weblog/2023/oct/04/security-releases/>`__
+
+* Django 4.2 :commit:`(patch) <be9c27c4d18c2e6a5be8af4e53c0797440794473>`
+* Django 4.1 :commit:`(patch) <c7b7024742250414e426ad49fb80db943e7ba4e8>`
+* Django 3.2 :commit:`(patch) <ccdade1a0262537868d7ca64374de3d957ca50c5>`
+
+September 4, 2023 - :cve:`2023-41164`
+-------------------------------------
+
+Potential denial of service vulnerability in
+``django.utils.encoding.uri_to_iri()``. `Full description
+<https://www.djangoproject.com/weblog/2023/sep/04/security-releases/>`__
+
+* Django 4.2 :commit:`(patch) <9c51b4dcfa0cefcb48231f4d71cafa80821f87b9>`
+* Django 4.1 :commit:`(patch) <ba00bc5ec6a7eff5e08be438f7b5b0e9574e8ff0>`
+* Django 3.2 :commit:`(patch) <6f030b1149bd8fa4ba90452e77cb3edc095ce54e>`
+
+July 3, 2023 - :cve:`2023-36053`
+--------------------------------
+
+Potential regular expression denial of service vulnerability in
+``EmailValidator``/``URLValidator``. `Full description
+<https://www.djangoproject.com/weblog/2023/jul/03/security-releases/>`__
+
+* Django 4.2 :commit:`(patch) <b7c5feb35a31799de6e582ad6a5a91a9de74e0f9>`
+* Django 4.1 :commit:`(patch) <beb3f3d55940d9aa7198bf9d424ab74e873aec3d>`
+* Django 3.2 :commit:`(patch) <454f2fb93437f98917283336201b4048293f7582>`
+
+May 3, 2023 - :cve:`2023-31047`
+-------------------------------
+
+Potential bypass of validation when uploading multiple files using one form
+field. `Full description
+<https://www.djangoproject.com/weblog/2023/may/03/security-releases/>`__
+
+* Django 4.2 :commit:`(patch) <21b1b1fc03e5f9e9f8c977ee6e35618dd3b353dd>`
+* Django 4.1 :commit:`(patch) <e7c3a2ccc3a562328600be05068ed9149e12ce64>`
+* Django 3.2 :commit:`(patch) <eed53d0011622e70b936e203005f0e6f4ac48965>`
+
+February 14, 2023 - :cve:`2023-24580`
+-------------------------------------
+
+Potential denial-of-service vulnerability in file uploads. `Full description
+<https://www.djangoproject.com/weblog/2023/feb/14/security-releases/>`__
+
+* Django 4.1 :commit:`(patch) <628b33a854a9c68ec8a0c51f382f304a0044ec92>`
+* Django 4.0 :commit:`(patch) <83f1ea83e4553e211c1c5a0dfc197b66d4e50432>`
+* Django 3.2 :commit:`(patch) <a665ed5179f5bbd3db95ce67286d0192eff041d8>`
+
+February 1, 2023 - :cve:`2023-23969`
+------------------------------------
+
+Potential denial-of-service via ``Accept-Language`` headers. `Full description
+<https://www.djangoproject.com/weblog/2023/feb/01/security-releases/>`__
+
+* Django 4.1 :commit:`(patch) <9d7bd5a56b1ce0576e8e07a8001373576d277942>`
+* Django 4.0 :commit:`(patch) <4452642f193533e288a52c02efb5bbc766a68f95>`
+* Django 3.2 :commit:`(patch) <c7e0151fdf33e1b11d488b6f67b94fdf3a30614a>`
+
+October 4, 2022 - :cve:`2022-41323`
+-----------------------------------
+
+Potential denial-of-service vulnerability in internationalized URLs. `Full
+description
+<https://www.djangoproject.com/weblog/2022/oct/04/security-releases/>`__
+
+* Django 4.1 :commit:`(patch) <9d656ea51d9ea7105c0c0785783ac29d426a7d25>`
+* Django 4.0 :commit:`(patch) <23f0093125ac2e553da6c1b2f9988eb6a3dd2ea1>`
+* Django 3.2 :commit:`(patch) <5b6b257fa7ec37ff27965358800c67e2dd11c924>`
+
+August 3, 2022 - :cve:`2022-36359`
+----------------------------------
+
+Potential reflected file download vulnerability in FileResponse. `Full
+description
+<https://www.djangoproject.com/weblog/2022/aug/03/security-releases/>`__
+
+* Django 4.0 :commit:`(patch) <b7d9529cbe0af4adabb6ea5d01ed8dcce3668fb3>`
+* Django 3.2 :commit:`(patch) <b3e4494d759202a3b6bf247fd34455bf13be5b80>`
+
+July 4, 2022 - :cve:`2022-34265`
+--------------------------------
+
+Potential SQL injection via ``Trunc(kind)`` and ``Extract(lookup_name)``
+arguments. `Full description
+<https://www.djangoproject.com/weblog/2022/jul/04/security-releases/>`__
+
+* Django 4.0 :commit:`(patch) <0dc9c016fadb71a067e5a42be30164e3f96c0492>`
+* Django 3.2 :commit:`(patch) <a9010fe5555e6086a9d9ae50069579400ef0685e>`
+
+April 11, 2022 - :cve:`2022-28346`
+----------------------------------
+
+Potential SQL injection in ``QuerySet.annotate()``, ``aggregate()``, and
+``extra()``. `Full description
+<https://www.djangoproject.com/weblog/2022/apr/11/security-releases/>`__
+
+* Django 4.0 :commit:`(patch) <800828887a0509ad1162d6d407e94d8de7eafc60>`
+* Django 3.2 :commit:`(patch) <2044dac5c6968441be6f534c4139bcf48c5c7e48>`
+* Django 2.2 :commit:`(patch) <2c09e68ec911919360d5f8502cefc312f9e03c5d>`
+
+April 11, 2022 - :cve:`2022-28347`
+----------------------------------
+
+Potential SQL injection via ``QuerySet.explain(**options)`` on PostgreSQL.
+`Full description
+<https://www.djangoproject.com/weblog/2022/apr/11/security-releases/>`__
+
+* Django 4.0 :commit:`(patch) <00b0fc50e1738c7174c495464a5ef069408a4402>`
+* Django 3.2 :commit:`(patch) <9e19accb6e0a00ba77d5a95a91675bf18877c72d>`
+* Django 2.2 :commit:`(patch) <29a6c98b4c13af82064f993f0acc6e8fafa4d3f5>`
+
 February 1, 2022 - :cve:`2022-22818`
 ------------------------------------
 
@@ -1231,7 +1484,7 @@ Versions affected
 
 * Django 1.2 :commit:`(patch) <7f84657b6b2243cc787bdb9f296710c8d13ad0bd>`
 
-October 9, 2009 - :cve:`2009-3965`
+October 9, 2009 - :cve:`2009-3695`
 ----------------------------------
 
 Denial-of-service via pathological regular expression performance. `Full

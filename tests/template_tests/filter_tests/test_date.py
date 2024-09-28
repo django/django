@@ -72,6 +72,11 @@ class DateTests(TimezoneTestCase):
         output = self.engine.render_to_string("date09", {"t": time(0, 0)})
         self.assertEqual(output, "00:00")
 
+    @setup({"datelazy": '{{ t|date:_("H:i") }}'})
+    def test_date_lazy(self):
+        output = self.engine.render_to_string("datelazy", {"t": time(0, 0)})
+        self.assertEqual(output, "00:00")
+
 
 class FunctionTests(SimpleTestCase):
     def test_date(self):

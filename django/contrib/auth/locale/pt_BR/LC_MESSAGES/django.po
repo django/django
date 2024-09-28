@@ -5,27 +5,31 @@
 # Amanda Savluchinske <amandasavluchinske@gmail.com>, 2019
 # amcorreia <mutley.sandro@gmail.com>, 2018
 # Camilo B. Moreira <camilo.moreira@fatec.sp.gov.br>, 2017
-# Carlos C. Leite <caduado@gmail.com>, 2016
-# Filipe Cifali Stangler <cifali.filipe@gmail.com>, 2016
+# Carlos Cadu “Cadu” Leite <caduado@gmail.com>, 2016
+# Filipe Cifali <cifali.filipe@gmail.com>, 2016
 # Claudemiro Alves Feitosa Neto <dimiro1@gmail.com>, 2015
 # dudanogueira <dudanogueira@gmail.com>, 2012
 # dudanogueira <dudanogueira@gmail.com>, 2014
 # Eduardo Cereto Carvalho, 2013
+# Eduardo Felipe Castegnaro <eduardo@onsign.tv>, 2024
 # Elyézer Rezende <elyezermr@gmail.com>, 2013
+# Evandro da Costa <evandrodacosta@gmail.com>, 2023
 # Fábio C. Barrionuevo da Luz <bnafta@gmail.com>, 2015
 # gilberto dos santos alves <gsavix@gmail.com>, 2013
-# semente, 2012
+# fa9e10542e458baef0599ae856e43651_13d2225, 2012
+# Guilherme <guilherme0xff@proton.me>, 2022
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Lucas Infante <maccinza@gmail.com>, 2015
+# Rafael Fontenelle <rffontenelle@gmail.com>, 2022
 # Sandro <sandrossv@hotmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-12-11 00:21+0000\n"
-"Last-Translator: Amanda Savluchinske <amandasavluchinske@gmail.com>\n"
-"Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 08:09+0000\n"
+"Last-Translator: Eduardo Felipe Castegnaro <eduardo@onsign.tv>, 2024\n"
+"Language-Team: Portuguese (Brazil) (http://app.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -46,12 +50,22 @@ msgstr "Datas importantes"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "objeto %(name)s com chave primária %(key)r não existe."
 
+msgid "Conflicting form data submitted. Please try again."
+msgstr "Formulário com datos conflitantes. Por favor, tente novamente."
+
 msgid "Password changed successfully."
 msgstr "Senha modificada com sucesso."
+
+msgid "Password-based authentication was disabled."
+msgstr "Autenticação baseada em senha foi desabilitada."
 
 #, python-format
 msgid "Change password: %s"
 msgstr "Alterar senha: %s"
+
+#, python-format
+msgid "Set password: %s"
+msgstr "Configurar senha: %s"
 
 msgid "Authentication and Authorization"
 msgstr "Autenticação e Autorização"
@@ -68,8 +82,23 @@ msgstr "Nenhuma senha definida."
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Formato de senha inválido ou algoritmo de hash desconhecido."
 
+msgid "Reset password"
+msgstr "Reconfigurar senha"
+
+msgid "Set password"
+msgstr "Configurar senha"
+
 msgid "The two password fields didn’t match."
 msgstr "Os dois campos de senha não correspondem."
+
+msgid ""
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
+msgstr ""
+"Se este usuário conseguirá autenticar usando uma senha ou não. Se "
+"desabilitado ainda será possível autenticar utilizando outros métodos, como "
+"Login Único ou LDAP."
 
 msgid "Password"
 msgstr "Senha"
@@ -80,13 +109,26 @@ msgstr "Confirmação de senha"
 msgid "Enter the same password as before, for verification."
 msgstr "Informe a mesma senha informada anteriormente, para verificação."
 
+msgid "Password-based authentication"
+msgstr "Autenticação baseada em senha"
+
+msgid "Enabled"
+msgstr "Habilitado"
+
+msgid "Disabled"
+msgstr "Desabilitado"
+
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user’s "
-"password, but you can change the password using <a href=\"{}\">this form</a>."
+"Raw passwords are not stored, so there is no way to see the user’s password."
 msgstr ""
-"Senhas brutas não são armazenadas, então não há como visualizar a senha "
-"desse usuário, porém você pode mudar a senha usando<a href=\"{}\">esse form</"
-"a>."
+"Senhas não são armazenadas diretamente, então não é possível ver a senha do "
+"usuário."
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
+msgstr ""
+"Habilitar autenticação baseada em senha para este usuário ao configurar uma "
+"senha."
 
 #, python-format
 msgid ""
@@ -114,9 +156,6 @@ msgstr ""
 
 msgid "Old password"
 msgstr "Senha antiga"
-
-msgid "Password (again)"
-msgstr "Senha (novamente)"
 
 msgid "algorithm"
 msgstr "algoritmo"
@@ -150,6 +189,9 @@ msgstr "fator de trabalho"
 
 msgid "checksum"
 msgstr "checksum"
+
+msgid "block size"
+msgstr "tamanho de bloco"
 
 msgid "name"
 msgstr "nome"
@@ -252,12 +294,16 @@ msgstr[0] ""
 msgstr[1] ""
 "Esta senha é muito curta. Ela precisa conter pelo menos %(min_length)d "
 "caracteres."
+msgstr[2] ""
+"Esta senha é muito curta. Ela precisa conter pelo menos %(min_length)d "
+"caracteres."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
 msgstr[0] "Sua senha precisa conter pelo menos %(min_length)d caracteres."
 msgstr[1] "Sua senha precisa conter pelo menos %(min_length)d caracteres."
+msgstr[2] "Sua senha precisa conter pelo menos %(min_length)d caracteres."
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
@@ -285,11 +331,11 @@ msgid "Password reset on %(site_name)s"
 msgstr "Redefinição de senha em %(site_name)s "
 
 msgid ""
-"Enter a valid username. This value may contain only English letters, "
-"numbers, and @/./+/-/_ characters."
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
 msgstr ""
-"Informe um nome de usuário válido. Este valor pode conter apenas letras, "
-"números e os seguintes caracteres @/./+/-/_."
+"Insira um nome de usuário válido. Este valor pode conter apenas letras, "
+"números e os caracteres @/./+/-/_."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "

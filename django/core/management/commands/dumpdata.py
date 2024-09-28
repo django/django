@@ -6,7 +6,7 @@ from django.apps import apps
 from django.core import serializers
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.utils import parse_apps_and_model_labels
-from django.db import DEFAULT_DB_ALIAS, router
+from django.db import DEFAULT_DB_ALIAS, connections, router
 
 try:
     import bz2
@@ -56,6 +56,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--database",
             default=DEFAULT_DB_ALIAS,
+            choices=tuple(connections),
             help="Nominates a specific database to dump fixtures from. "
             'Defaults to the "default" database.',
         )
@@ -193,7 +194,7 @@ class Command(BaseCommand):
                 # There is no need to sort dependencies when natural foreign
                 # keys are not used.
                 models = []
-                for (app_config, model_list) in app_list.items():
+                for app_config, model_list in app_list.items():
                     if model_list is None:
                         models.extend(app_config.get_models())
                     else:
@@ -219,7 +220,10 @@ class Command(BaseCommand):
                     if count_only:
                         yield queryset.order_by().count()
                     else:
-                        yield from queryset.iterator()
+                        chunk_size = (
+                            2000 if queryset._prefetch_related_lookups else None
+                        )
+                        yield from queryset.iterator(chunk_size=chunk_size)
 
         try:
             self.stdout.ending = None

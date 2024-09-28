@@ -9,10 +9,12 @@ and provides introspection. It also maintains a list of available :doc:`models
 </topics/db/models>`.
 
 This registry is called :attr:`~django.apps.apps` and it's available in
-:mod:`django.apps`::
+:mod:`django.apps`:
+
+.. code-block:: pycon
 
     >>> from django.apps import apps
-    >>> apps.get_app_config('admin').verbose_name
+    >>> apps.get_app_config("admin").verbose_name
     'Administration'
 
 Projects and applications
@@ -74,9 +76,9 @@ Alternatively, :setting:`INSTALLED_APPS` may contain the dotted path to a
 configuration class to specify it explicitly::
 
     INSTALLED_APPS = [
-        ...
-        'polls.apps.PollsAppConfig',
-        ...
+        ...,
+        "polls.apps.PollsAppConfig",
+        ...,
     ]
 
 For application authors
@@ -89,8 +91,9 @@ would provide a proper name for the admin::
 
     from django.apps import AppConfig
 
+
     class RockNRollConfig(AppConfig):
-        name = 'rock_n_roll'
+        name = "rock_n_roll"
         verbose_name = "Rock ’n’ roll"
 
 ``RockNRollConfig`` will be loaded automatically when :setting:`INSTALLED_APPS`
@@ -132,13 +135,15 @@ configuration::
 
     from rock_n_roll.apps import RockNRollConfig
 
+
     class JazzManoucheConfig(RockNRollConfig):
         verbose_name = "Jazz Manouche"
+
 
     # anthology/settings.py
 
     INSTALLED_APPS = [
-        'anthology.apps.JazzManoucheConfig',
+        "anthology.apps.JazzManoucheConfig",
         # ...
     ]
 
@@ -180,6 +185,14 @@ Configurable attributes
     It should be a valid Python identifier.
 
     It must be unique across a Django project.
+
+    .. warning::
+
+        Changing this attribute after migrations have been applied for an
+        application will result in breaking changes to a project or, in the
+        case of a reusable app, any existing installs of that app. This is
+        because ``AppConfig.label`` is used in database tables and migration
+        files when referencing an app in the dependencies list.
 
 .. attribute:: AppConfig.verbose_name
 
@@ -242,7 +255,7 @@ Read-only attributes
 Methods
 -------
 
-.. method:: AppConfig.get_models()
+.. method:: AppConfig.get_models(include_auto_created=False, include_swapped=False)
 
     Returns an iterable of :class:`~django.db.models.Model` classes for this
     application.
@@ -287,10 +300,11 @@ Methods
             def ready(self):
                 # importing model classes
                 from .models import MyModel  # or...
-                MyModel = self.get_model('MyModel')
+
+                MyModel = self.get_model("MyModel")
 
                 # registering signals with the model's string label
-                pre_save.connect(receiver, sender='app_label.MyModel')
+                pre_save.connect(receiver, sender="app_label.MyModel")
 
     .. warning::
 
@@ -311,7 +325,7 @@ Methods
         once by Django. But in some corner cases, particularly in tests which
         are fiddling with installed applications, ``ready`` might be called more
         than once. In that case, either write idempotent methods, or put a flag
-        on your ``AppConfig`` classes to prevent re-running code which should
+        on your ``AppConfig`` classes to prevent rerunning code which should
         be executed exactly one time.
 
 .. _namespace package:
@@ -419,7 +433,7 @@ application registry.
 
     This function is called automatically:
 
-    * When running an HTTP server via Django's WSGI support.
+    * When running an HTTP server via Django's ASGI or WSGI support.
     * When invoking a management command.
 
     It must be called explicitly in other cases, for instance in plain Python
@@ -503,3 +517,29 @@ Here are some common problems that you may encounter during initialization:
   :setting:`INSTALLED_APPS` to contain
   ``'django.contrib.admin.apps.SimpleAdminConfig'`` instead of
   ``'django.contrib.admin'``.
+
+* ``RuntimeWarning: Accessing the database during app initialization is
+  discouraged.`` This warning is triggered for database queries executed before
+  apps are ready, such as during module imports or in the
+  :meth:`AppConfig.ready` method. Such premature database queries are
+  discouraged because they will run during the startup of every management
+  command, which will slow down your project startup, potentially cache stale
+  data, and can even fail if migrations are pending.
+
+  For example, a common mistake is making a database query to populate form
+  field choices::
+
+    class LocationForm(forms.Form):
+        country = forms.ChoiceField(choices=[c.name for c in Country.objects.all()])
+
+  In the example above, the query from ``Country.objects.all()`` is executed
+  during module import, because the ``QuerySet`` is iterated over. To avoid the
+  warning, the form could use a :class:`~django.forms.ModelChoiceField`
+  instead::
+
+    class LocationForm(forms.Form):
+        country = forms.ModelChoiceField(queryset=Country.objects.all())
+
+  To make it easier to find the code that triggered this warning, you can make
+  Python :ref:`treat warnings as errors <python:warning-filter>` to reveal the
+  stack trace, for example with ``python -Werror manage.py shell``.

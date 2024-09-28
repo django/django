@@ -72,5 +72,14 @@ class BaseConnectionHandler:
     def __iter__(self):
         return iter(self.settings)
 
-    def all(self):
-        return [self[alias] for alias in self]
+    def all(self, initialized_only=False):
+        return [
+            self[alias]
+            for alias in self
+            # If initialized_only is True, return only initialized connections.
+            if not initialized_only or hasattr(self._connections, alias)
+        ]
+
+    def close_all(self):
+        for conn in self.all(initialized_only=True):
+            conn.close()

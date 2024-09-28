@@ -4,15 +4,17 @@ from django.contrib.admin import BooleanFieldListFilter, SimpleListFilter
 from django.contrib.admin.options import VERTICAL, ModelAdmin, TabularInline
 from django.contrib.admin.sites import AdminSite
 from django.core.checks import Error
-from django.db.models import CASCADE, F, Field, ForeignKey, Model
+from django.db import models
+from django.db.models import CASCADE, F, Field, ForeignKey, ManyToManyField, Model
 from django.db.models.functions import Upper
 from django.forms.models import BaseModelFormSet
-from django.test import SimpleTestCase
+from django.test import TestCase, skipUnlessDBFeature
+from django.test.utils import isolate_apps
 
 from .models import Band, Song, User, ValidationTestInlineModel, ValidationTestModel
 
 
-class CheckTestCase(SimpleTestCase):
+class CheckTestCase(TestCase):
     def assertIsInvalid(
         self,
         model_admin,
@@ -68,7 +70,7 @@ class RawIdCheckTests(CheckTestCase):
 
     def test_missing_field(self):
         class TestModelAdmin(ModelAdmin):
-            raw_id_fields = ("non_existent_field",)
+            raw_id_fields = ["non_existent_field"]
 
         self.assertIsInvalid(
             TestModelAdmin,
@@ -95,6 +97,29 @@ class RawIdCheckTests(CheckTestCase):
             raw_id_fields = ("users",)
 
         self.assertIsValid(TestModelAdmin, ValidationTestModel)
+
+    @isolate_apps("modeladmin")
+    def assertGeneratedDateTimeFieldIsValid(self, *, db_persist):
+        class TestModel(Model):
+            date = models.DateTimeField()
+            date_copy = models.GeneratedField(
+                expression=F("date"),
+                output_field=models.DateTimeField(),
+                db_persist=db_persist,
+            )
+
+        class TestModelAdmin(ModelAdmin):
+            date_hierarchy = "date_copy"
+
+        self.assertIsValid(TestModelAdmin, TestModel)
+
+    @skipUnlessDBFeature("supports_stored_generated_columns")
+    def test_valid_case_stored_generated_field(self):
+        self.assertGeneratedDateTimeFieldIsValid(db_persist=True)
+
+    @skipUnlessDBFeature("supports_virtual_generated_columns")
+    def test_valid_case_virtual_generated_field(self):
+        self.assertGeneratedDateTimeFieldIsValid(db_persist=False)
 
     def test_field_attname(self):
         class TestModelAdmin(ModelAdmin):
@@ -321,6 +346,44 @@ class FilterVerticalCheckTests(CheckTestCase):
             "admin.E020",
         )
 
+    @isolate_apps("modeladmin")
+    def test_invalid_reverse_m2m_field_with_related_name(self):
+        class Contact(Model):
+            pass
+
+        class Customer(Model):
+            contacts = ManyToManyField("Contact", related_name="customers")
+
+        class TestModelAdmin(ModelAdmin):
+            filter_vertical = ["customers"]
+
+        self.assertIsInvalid(
+            TestModelAdmin,
+            Contact,
+            "The value of 'filter_vertical[0]' must be a many-to-many field.",
+            "admin.E020",
+        )
+
+    @isolate_apps("modeladmin")
+    def test_invalid_m2m_field_with_through(self):
+        class Artist(Model):
+            bands = ManyToManyField("Band", through="BandArtist")
+
+        class BandArtist(Model):
+            artist = ForeignKey("Artist", on_delete=CASCADE)
+            band = ForeignKey("Band", on_delete=CASCADE)
+
+        class TestModelAdmin(ModelAdmin):
+            filter_vertical = ["bands"]
+
+        self.assertIsInvalid(
+            TestModelAdmin,
+            Artist,
+            "The value of 'filter_vertical[0]' cannot include the ManyToManyField "
+            "'bands', because that field manually specifies a relationship model.",
+            "admin.E013",
+        )
+
     def test_valid_case(self):
         class TestModelAdmin(ModelAdmin):
             filter_vertical = ("users",)
@@ -361,6 +424,44 @@ class FilterHorizontalCheckTests(CheckTestCase):
             ValidationTestModel,
             "The value of 'filter_horizontal[0]' must be a many-to-many field.",
             "admin.E020",
+        )
+
+    @isolate_apps("modeladmin")
+    def test_invalid_reverse_m2m_field_with_related_name(self):
+        class Contact(Model):
+            pass
+
+        class Customer(Model):
+            contacts = ManyToManyField("Contact", related_name="customers")
+
+        class TestModelAdmin(ModelAdmin):
+            filter_horizontal = ["customers"]
+
+        self.assertIsInvalid(
+            TestModelAdmin,
+            Contact,
+            "The value of 'filter_horizontal[0]' must be a many-to-many field.",
+            "admin.E020",
+        )
+
+    @isolate_apps("modeladmin")
+    def test_invalid_m2m_field_with_through(self):
+        class Artist(Model):
+            bands = ManyToManyField("Band", through="BandArtist")
+
+        class BandArtist(Model):
+            artist = ForeignKey("Artist", on_delete=CASCADE)
+            band = ForeignKey("Band", on_delete=CASCADE)
+
+        class TestModelAdmin(ModelAdmin):
+            filter_horizontal = ["bands"]
+
+        self.assertIsInvalid(
+            TestModelAdmin,
+            Artist,
+            "The value of 'filter_horizontal[0]' cannot include the ManyToManyField "
+            "'bands', because that field manually specifies a relationship model.",
+            "admin.E013",
         )
 
     def test_valid_case(self):
@@ -525,8 +626,21 @@ class ListDisplayTests(CheckTestCase):
             TestModelAdmin,
             ValidationTestModel,
             "The value of 'list_display[0]' refers to 'non_existent_field', "
-            "which is not a callable, an attribute of 'TestModelAdmin', "
-            "or an attribute or method on 'modeladmin.ValidationTestModel'.",
+            "which is not a callable or attribute of 'TestModelAdmin', "
+            "or an attribute, method, or field on 'modeladmin.ValidationTestModel'.",
+            "admin.E108",
+        )
+
+    def test_missing_related_field(self):
+        class TestModelAdmin(ModelAdmin):
+            list_display = ("band__non_existent_field",)
+
+        self.assertIsInvalid(
+            TestModelAdmin,
+            ValidationTestModel,
+            "The value of 'list_display[0]' refers to 'band__non_existent_field', "
+            "which is not a callable or attribute of 'TestModelAdmin', "
+            "or an attribute, method, or field on 'modeladmin.ValidationTestModel'.",
             "admin.E108",
         )
 
@@ -537,7 +651,44 @@ class ListDisplayTests(CheckTestCase):
         self.assertIsInvalid(
             TestModelAdmin,
             ValidationTestModel,
-            "The value of 'list_display[0]' must not be a ManyToManyField.",
+            "The value of 'list_display[0]' must not be a many-to-many field or a "
+            "reverse foreign key.",
+            "admin.E109",
+        )
+
+    def test_invalid_reverse_related_field(self):
+        class TestModelAdmin(ModelAdmin):
+            list_display = ["song_set"]
+
+        self.assertIsInvalid(
+            TestModelAdmin,
+            Band,
+            "The value of 'list_display[0]' must not be a many-to-many field or a "
+            "reverse foreign key.",
+            "admin.E109",
+        )
+
+    def test_invalid_related_field(self):
+        class TestModelAdmin(ModelAdmin):
+            list_display = ["song"]
+
+        self.assertIsInvalid(
+            TestModelAdmin,
+            Band,
+            "The value of 'list_display[0]' must not be a many-to-many field or a "
+            "reverse foreign key.",
+            "admin.E109",
+        )
+
+    def test_invalid_m2m_related_name(self):
+        class TestModelAdmin(ModelAdmin):
+            list_display = ["featured"]
+
+        self.assertIsInvalid(
+            TestModelAdmin,
+            Band,
+            "The value of 'list_display[0]' must not be a many-to-many field or a "
+            "reverse foreign key.",
             "admin.E109",
         )
 
@@ -902,6 +1053,33 @@ class DateHierarchyCheckTests(CheckTestCase):
             "admin.E128",
         )
 
+    @isolate_apps("modeladmin")
+    def assertGeneratedIntegerFieldIsInvalid(self, *, db_persist):
+        class TestModel(Model):
+            generated = models.GeneratedField(
+                expression=models.Value(1),
+                output_field=models.IntegerField(),
+                db_persist=db_persist,
+            )
+
+        class TestModelAdmin(ModelAdmin):
+            date_hierarchy = "generated"
+
+        self.assertIsInvalid(
+            TestModelAdmin,
+            TestModel,
+            "The value of 'date_hierarchy' must be a DateField or DateTimeField.",
+            "admin.E128",
+        )
+
+    @skipUnlessDBFeature("supports_stored_generated_columns")
+    def test_related_invalid_field_type_stored_generated_field(self):
+        self.assertGeneratedIntegerFieldIsInvalid(db_persist=True)
+
+    @skipUnlessDBFeature("supports_virtual_generated_columns")
+    def test_related_invalid_field_type_virtual_generated_field(self):
+        self.assertGeneratedIntegerFieldIsInvalid(db_persist=False)
+
     def test_valid_case(self):
         class TestModelAdmin(ModelAdmin):
             date_hierarchy = "pub_date"
@@ -1189,6 +1367,45 @@ class FkNameCheckTests(CheckTestCase):
             inlines = [ValidationTestInline]
 
         self.assertIsValid(TestModelAdmin, ValidationTestModel)
+
+    def test_proxy_model(self):
+        class Reporter(Model):
+            pass
+
+        class ProxyJournalist(Reporter):
+            class Meta:
+                proxy = True
+
+        class Article(Model):
+            reporter = ForeignKey(ProxyJournalist, on_delete=CASCADE)
+
+        class ArticleInline(admin.TabularInline):
+            model = Article
+
+        class ReporterAdmin(admin.ModelAdmin):
+            inlines = [ArticleInline]
+
+        self.assertIsValid(ReporterAdmin, Reporter)
+
+    def test_proxy_model_fk_name(self):
+        class ReporterFkName(Model):
+            pass
+
+        class ProxyJournalistFkName(ReporterFkName):
+            class Meta:
+                proxy = True
+
+        class ArticleFkName(Model):
+            reporter = ForeignKey(ProxyJournalistFkName, on_delete=CASCADE)
+
+        class ArticleInline(admin.TabularInline):
+            model = ArticleFkName
+            fk_name = "reporter"
+
+        class ReporterAdmin(admin.ModelAdmin):
+            inlines = [ArticleInline]
+
+        self.assertIsValid(ReporterAdmin, ReporterFkName)
 
     def test_proxy_model_parent(self):
         class Parent(Model):

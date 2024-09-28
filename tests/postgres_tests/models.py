@@ -3,9 +3,6 @@ from django.db import models
 from .fields import (
     ArrayField,
     BigIntegerRangeField,
-    CICharField,
-    CIEmailField,
-    CITextField,
     DateRangeField,
     DateTimeRangeField,
     DecimalRangeField,
@@ -119,13 +116,6 @@ class Character(models.Model):
     name = models.CharField(max_length=255)
 
 
-class CITestModel(PostgreSQLModel):
-    name = CICharField(primary_key=True, max_length=255)
-    email = CIEmailField()
-    description = CITextField()
-    array_field = ArrayField(CITextField(), null=True)
-
-
 class Line(PostgreSQLModel):
     scene = models.ForeignKey("Scene", models.CASCADE)
     character = models.ForeignKey("Character", models.CASCADE)
@@ -140,7 +130,7 @@ class LineSavedSearch(PostgreSQLModel):
 
 
 class RangesModel(PostgreSQLModel):
-    ints = IntegerRangeField(blank=True, null=True)
+    ints = IntegerRangeField(blank=True, null=True, db_default=(5, 10))
     bigints = BigIntegerRangeField(blank=True, null=True)
     decimals = DecimalRangeField(blank=True, null=True)
     timestamps = DateTimeRangeField(blank=True, null=True)

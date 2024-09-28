@@ -146,9 +146,19 @@ class PerformUniqueChecksTest(TestCase):
             mtv = ModelToValidate(number=10, name="Some Name")
             mtv.full_clean()
 
-    def test_func_unique_check_not_performed(self):
-        with self.assertNumQueries(0):
-            UniqueFuncConstraintModel(field="some name").full_clean()
+    def test_unique_db_default(self):
+        UniqueFieldsModel.objects.create(unique_charfield="foo", non_unique_field=42)
+        um = UniqueFieldsModel(unique_charfield="bar", non_unique_field=42)
+        with self.assertRaises(ValidationError) as cm:
+            um.full_clean()
+        self.assertEqual(
+            cm.exception.message_dict,
+            {
+                "unique_integerfield": [
+                    "Unique fields model with this Unique integerfield already exists."
+                ]
+            },
+        )
 
     def test_unique_for_date(self):
         Post.objects.create(

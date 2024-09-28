@@ -1,11 +1,13 @@
-import logging
 import os
+import sys
+import threading
+import traceback
 import unittest
 import warnings
 from io import StringIO
 from unittest import mock
 
-from django.conf import settings
+from django.conf import STATICFILES_STORAGE_ALIAS, settings
 from django.contrib.staticfiles.finders import get_finder, get_finders
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.exceptions import ImproperlyConfigured
@@ -27,6 +29,7 @@ from django.forms import (
     formset_factory,
 )
 from django.http import HttpResponse
+from django.template import Context, Template
 from django.template.loader import render_to_string
 from django.test import (
     SimpleTestCase,
@@ -40,14 +43,13 @@ from django.test.testcases import DatabaseOperationForbidden
 from django.test.utils import (
     CaptureQueriesContext,
     TestContextDecorator,
-    ignore_warnings,
     isolate_apps,
     override_settings,
     setup_test_environment,
 )
 from django.urls import NoReverseMatch, path, reverse, reverse_lazy
-from django.utils.deprecation import RemovedInDjango50Warning
-from django.utils.log import DEFAULT_LOGGING
+from django.utils.html import VOID_ELEMENTS
+from django.utils.version import PY311
 
 from .models import Car, Person, PossessedCar
 from .views import empty_response
@@ -69,6 +71,7 @@ class SkippingTestCase(SimpleTestCase):
         """
         Testing the django.test.skipUnlessDBFeature decorator.
         """
+
         # Total hack, but it works, just want an attribute that's always true.
         @skipUnlessDBFeature("__class__")
         def test_func():
@@ -100,9 +103,11 @@ class SkippingTestCase(SimpleTestCase):
             SkipTestCase("test_foo").test_foo,
             ValueError,
             "skipUnlessDBFeature cannot be used on test_foo (test_utils.tests."
-            "SkippingTestCase.test_skip_unless_db_feature.<locals>.SkipTestCase) "
+            "SkippingTestCase.test_skip_unless_db_feature.<locals>.SkipTestCase%s) "
             "as SkippingTestCase.test_skip_unless_db_feature.<locals>.SkipTestCase "
-            "doesn't allow queries against the 'default' database.",
+            "doesn't allow queries against the 'default' database."
+            # Python 3.11 uses fully qualified test name in the output.
+            % (".test_foo" if PY311 else ""),
         )
 
     def test_skip_if_db_feature(self):
@@ -145,13 +150,17 @@ class SkippingTestCase(SimpleTestCase):
             SkipTestCase("test_foo").test_foo,
             ValueError,
             "skipIfDBFeature cannot be used on test_foo (test_utils.tests."
-            "SkippingTestCase.test_skip_if_db_feature.<locals>.SkipTestCase) "
+            "SkippingTestCase.test_skip_if_db_feature.<locals>.SkipTestCase%s) "
             "as SkippingTestCase.test_skip_if_db_feature.<locals>.SkipTestCase "
-            "doesn't allow queries against the 'default' database.",
+            "doesn't allow queries against the 'default' database."
+            # Python 3.11 uses fully qualified test name in the output.
+            % (".test_foo" if PY311 else ""),
         )
 
 
-class SkippingClassTestCase(TestCase):
+class SkippingClassTestCase(TransactionTestCase):
+    available_apps = []
+
     def test_skip_class_unless_db_feature(self):
         @skipUnlessDBFeature("__class__")
         class NotSkippedTests(TestCase):
@@ -176,7 +185,11 @@ class SkippingClassTestCase(TestCase):
         except unittest.SkipTest:
             self.fail("SkipTest should not be raised here.")
         result = unittest.TextTestRunner(stream=StringIO()).run(test_suite)
-        self.assertEqual(result.testsRun, 3)
+        # PY312: Python 3.12.1 does not include skipped tests in the number of
+        # running tests.
+        self.assertEqual(
+            result.testsRun, 1 if sys.version_info[:3] == (3, 12, 1) else 3
+        )
         self.assertEqual(len(result.skipped), 2)
         self.assertEqual(result.skipped[0][1], "Database has feature(s) __class__")
         self.assertEqual(result.skipped[1][1], "Database has feature(s) __class__")
@@ -230,10 +243,6 @@ class AssertNumQueriesTests(TestCase):
         self.assertNumQueries(2, test_func)
 
 
-@unittest.skipUnless(
-    connection.vendor != "sqlite" or not connection.is_in_memory_db(),
-    "For SQLite in-memory tests, closing the connection destroys the database.",
-)
 class AssertNumQueriesUponConnectionTests(TransactionTestCase):
     available_apps = []
 
@@ -259,48 +268,48 @@ class AssertNumQueriesUponConnectionTests(TransactionTestCase):
                 list(Car.objects.all())
 
 
-class AssertQuerysetEqualTests(TestCase):
+class AssertQuerySetEqualTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.p1 = Person.objects.create(name="p1")
         cls.p2 = Person.objects.create(name="p2")
 
     def test_empty(self):
-        self.assertQuerysetEqual(Person.objects.filter(name="p3"), [])
+        self.assertQuerySetEqual(Person.objects.filter(name="p3"), [])
 
     def test_ordered(self):
-        self.assertQuerysetEqual(
-            Person.objects.all().order_by("name"),
+        self.assertQuerySetEqual(
+            Person.objects.order_by("name"),
             [self.p1, self.p2],
         )
 
     def test_unordered(self):
-        self.assertQuerysetEqual(
-            Person.objects.all().order_by("name"), [self.p2, self.p1], ordered=False
+        self.assertQuerySetEqual(
+            Person.objects.order_by("name"), [self.p2, self.p1], ordered=False
         )
 
     def test_queryset(self):
-        self.assertQuerysetEqual(
-            Person.objects.all().order_by("name"),
-            Person.objects.all().order_by("name"),
+        self.assertQuerySetEqual(
+            Person.objects.order_by("name"),
+            Person.objects.order_by("name"),
         )
 
     def test_flat_values_list(self):
-        self.assertQuerysetEqual(
-            Person.objects.all().order_by("name").values_list("name", flat=True),
+        self.assertQuerySetEqual(
+            Person.objects.order_by("name").values_list("name", flat=True),
             ["p1", "p2"],
         )
 
     def test_transform(self):
-        self.assertQuerysetEqual(
-            Person.objects.all().order_by("name"),
+        self.assertQuerySetEqual(
+            Person.objects.order_by("name"),
             [self.p1.pk, self.p2.pk],
             transform=lambda x: x.pk,
         )
 
     def test_repr_transform(self):
-        self.assertQuerysetEqual(
-            Person.objects.all().order_by("name"),
+        self.assertQuerySetEqual(
+            Person.objects.order_by("name"),
             [repr(self.p1), repr(self.p2)],
             transform=repr,
         )
@@ -313,16 +322,16 @@ class AssertQuerysetEqualTests(TestCase):
             "ordered value."
         )
         with self.assertRaisesMessage(ValueError, msg):
-            self.assertQuerysetEqual(
+            self.assertQuerySetEqual(
                 Person.objects.all(),
                 [self.p1, self.p2],
             )
         # No error for one value.
-        self.assertQuerysetEqual(Person.objects.filter(name="p1"), [self.p1])
+        self.assertQuerySetEqual(Person.objects.filter(name="p1"), [self.p1])
 
     def test_repeated_values(self):
         """
-        assertQuerysetEqual checks the number of appearance of each item
+        assertQuerySetEqual checks the number of appearance of each item
         when used with option ordered=False.
         """
         batmobile = Car.objects.create(name="Batmobile")
@@ -338,10 +347,10 @@ class AssertQuerysetEqualTests(TestCase):
             ]
         )
         with self.assertRaises(AssertionError):
-            self.assertQuerysetEqual(
+            self.assertQuerySetEqual(
                 self.p1.cars.all(), [batmobile, k2000], ordered=False
             )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             self.p1.cars.all(), [batmobile] * 2 + [k2000] * 4, ordered=False
         )
 
@@ -351,7 +360,7 @@ class AssertQuerysetEqualTests(TestCase):
         names.append("Extra Person")
 
         with self.assertRaises(AssertionError) as ctx:
-            self.assertQuerysetEqual(
+            self.assertQuerySetEqual(
                 Person.objects.filter(name__startswith="Joe"),
                 names,
                 ordered=False,
@@ -363,7 +372,7 @@ class AssertQuerysetEqualTests(TestCase):
         self.maxDiff = None
         try:
             with self.assertRaises(AssertionError) as ctx:
-                self.assertQuerysetEqual(
+                self.assertQuerySetEqual(
                     Person.objects.filter(name__startswith="Joe"),
                     names,
                     ordered=False,
@@ -531,11 +540,19 @@ class AssertTemplateUsedContextManagerTests(SimpleTestCase):
             with self.assertTemplateUsed("template_used/base.html"):
                 render_to_string("template_used/alternative.html")
 
-        with self.assertRaisesMessage(
-            AssertionError, "No templates used to render the response"
-        ):
+        msg = "No templates used to render the response"
+        with self.assertRaisesMessage(AssertionError, msg):
             response = self.client.get("/test_utils/no_template_used/")
             self.assertTemplateUsed(response, "template_used/base.html")
+
+        with self.assertRaisesMessage(AssertionError, msg):
+            with self.assertTemplateUsed("template_used/base.html"):
+                self.client.get("/test_utils/no_template_used/")
+
+        with self.assertRaisesMessage(AssertionError, msg):
+            with self.assertTemplateUsed("template_used/base.html"):
+                template = Template("template_used/alternative.html", name=None)
+                template.render(Context())
 
     def test_msg_prefix(self):
         msg_prefix = "Prefix"
@@ -648,27 +665,8 @@ class HTMLEqualTests(SimpleTestCase):
         self.assertEqual(len(dom.children), 1)
         self.assertEqual(dom.children[0], "<p>foo</p> '</scr'+'ipt>' <span>bar</span>")
 
-    def test_self_closing_tags(self):
-        self_closing_tags = [
-            "area",
-            "base",
-            "br",
-            "col",
-            "embed",
-            "hr",
-            "img",
-            "input",
-            "link",
-            "meta",
-            "param",
-            "source",
-            "track",
-            "wbr",
-            # Deprecated tags
-            "frame",
-            "spacer",
-        ]
-        for tag in self_closing_tags:
+    def test_void_elements(self):
+        for tag in VOID_ELEMENTS:
             with self.subTest(tag):
                 dom = parse_html("<p>Hello <%s> world</p>" % tag)
                 self.assertEqual(len(dom.children), 3)
@@ -994,6 +992,84 @@ class HTMLEqualTests(SimpleTestCase):
         )
 
 
+class InHTMLTests(SimpleTestCase):
+    def test_needle_msg(self):
+        msg = (
+            "False is not true : Couldn't find '<b>Hello</b>' in the following "
+            "response\n'<p>Test</p>'"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertInHTML("<b>Hello</b>", "<p>Test</p>")
+
+    def test_msg_prefix(self):
+        msg = (
+            "False is not true : Prefix: Couldn't find '<b>Hello</b>' in the following "
+            'response\n\'<input type="text" name="Hello" />\''
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertInHTML(
+                "<b>Hello</b>",
+                '<input type="text" name="Hello" />',
+                msg_prefix="Prefix",
+            )
+
+    def test_count_msg_prefix(self):
+        msg = (
+            "2 != 1 : Prefix: Found 2 instances of '<b>Hello</b>' (expected 1) in the "
+            "following response\n'<b>Hello</b><b>Hello</b>'"
+            ""
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertInHTML(
+                "<b>Hello</b>",
+                "<b>Hello</b><b>Hello</b>",
+                count=1,
+                msg_prefix="Prefix",
+            )
+
+    def test_base(self):
+        haystack = "<p><b>Hello</b> <span>there</span>! Hi <span>there</span>!</p>"
+
+        self.assertInHTML("<b>Hello</b>", haystack=haystack)
+        msg = f"Couldn't find '<p>Howdy</p>' in the following response\n{haystack!r}"
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertInHTML("<p>Howdy</p>", haystack)
+
+        self.assertInHTML("<span>there</span>", haystack=haystack, count=2)
+        msg = (
+            "Found 1 instances of '<b>Hello</b>' (expected 2) in the following response"
+            f"\n{haystack!r}"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertInHTML("<b>Hello</b>", haystack=haystack, count=2)
+
+    def test_long_haystack(self):
+        haystack = (
+            "<p>This is a very very very very very very very very long message which "
+            "exceedes the max limit of truncation.</p>"
+        )
+        msg = f"Couldn't find '<b>Hello</b>' in the following response\n{haystack!r}"
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertInHTML("<b>Hello</b>", haystack)
+
+        msg = (
+            "Found 0 instances of '<b>This</b>' (expected 3) in the following response"
+            f"\n{haystack!r}"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertInHTML("<b>This</b>", haystack, 3)
+
+    def test_assert_not_in_html(self):
+        haystack = "<p><b>Hello</b> <span>there</span>! Hi <span>there</span>!</p>"
+        self.assertNotInHTML("<b>Hi</b>", haystack=haystack)
+        msg = (
+            "'<b>Hello</b>' unexpectedly found in the following response"
+            f"\n{haystack!r}"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertNotInHTML("<b>Hello</b>", haystack=haystack)
+
+
 class JSONEqualTests(SimpleTestCase):
     def test_simple_equal(self):
         json1 = '{"attr1": "foo", "attr2":"baz"}'
@@ -1037,6 +1113,19 @@ class JSONEqualTests(SimpleTestCase):
             self.assertJSONNotEqual(invalid_json, valid_json)
         with self.assertRaises(AssertionError):
             self.assertJSONNotEqual(valid_json, invalid_json)
+
+    def test_method_frames_ignored_by_unittest(self):
+        try:
+            self.assertJSONEqual("1", "2")
+        except AssertionError:
+            exc_type, exc, tb = sys.exc_info()
+
+        result = unittest.TestResult()
+        result.addFailure(self, (exc_type, exc, tb))
+        stack = traceback.extract_tb(exc.__traceback__)
+        self.assertEqual(len(stack), 1)
+        # Top element in the stack is this method, not assertJSONEqual.
+        self.assertEqual(stack[-1].name, "test_method_frames_ignored_by_unittest")
 
 
 class XMLEqualTests(SimpleTestCase):
@@ -1125,7 +1214,7 @@ class XMLEqualTests(SimpleTestCase):
 
 
 class SkippingExtraTests(TestCase):
-    fixtures = ["should_not_be_loaded.json"]
+    fixtures = ["person.json"]
 
     # HACK: This depends on internals of our TestCase subclasses
     def __call__(self, result=None):
@@ -1186,47 +1275,6 @@ class AssertWarnsMessageTests(SimpleTestCase):
 
         with self.assertWarnsMessage(UserWarning, "[.*x+]y?"):
             func1()
-
-
-# TODO: Remove when dropping support for PY39.
-class AssertNoLogsTest(SimpleTestCase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        logging.config.dictConfig(DEFAULT_LOGGING)
-        cls.addClassCleanup(logging.config.dictConfig, settings.LOGGING)
-
-    def setUp(self):
-        self.logger = logging.getLogger("django")
-
-    @override_settings(DEBUG=True)
-    def test_fails_when_log_emitted(self):
-        msg = "Unexpected logs found: ['INFO:django:FAIL!']"
-        with self.assertRaisesMessage(AssertionError, msg):
-            with self.assertNoLogs("django", "INFO"):
-                self.logger.info("FAIL!")
-
-    @override_settings(DEBUG=True)
-    def test_text_level(self):
-        with self.assertNoLogs("django", "INFO"):
-            self.logger.debug("DEBUG logs are ignored.")
-
-    @override_settings(DEBUG=True)
-    def test_int_level(self):
-        with self.assertNoLogs("django", logging.INFO):
-            self.logger.debug("DEBUG logs are ignored.")
-
-    @override_settings(DEBUG=True)
-    def test_default_level(self):
-        with self.assertNoLogs("django"):
-            self.logger.debug("DEBUG logs are ignored.")
-
-    @override_settings(DEBUG=True)
-    def test_does_not_hide_other_failures(self):
-        msg = "1 != 2"
-        with self.assertRaisesMessage(AssertionError, msg):
-            with self.assertNoLogs("django"):
-                self.assertEqual(1, 2)
 
 
 class AssertFieldOutputTests(SimpleTestCase):
@@ -1313,7 +1361,7 @@ class AssertURLEqualTests(SimpleTestCase):
             self.assertURLEqual(
                 "http://example.com/?x=1&x=2",
                 "https://example.com/?x=2&x=1",
-                msg_prefix="Prefix: ",
+                msg_prefix="Prefix",
             )
 
 
@@ -1373,277 +1421,307 @@ class TestFormset(formset_factory(TestForm)):
 
 
 class AssertFormErrorTests(SimpleTestCase):
-    def test_non_client_response(self):
-        msg = (
-            "assertFormError() is only usable on responses fetched using the "
-            "Django test Client."
-        )
-        response = HttpResponse()
-        with self.assertRaisesMessage(ValueError, msg):
-            self.assertFormError(response, "formset", 0, "field", "invalid value")
+    def test_single_error(self):
+        self.assertFormError(TestForm.invalid(), "field", "invalid value")
 
-    def test_response_with_no_context(self):
-        msg = "Response did not use any contexts to render the response"
-        response = mock.Mock(context=[])
+    def test_error_list(self):
+        self.assertFormError(TestForm.invalid(), "field", ["invalid value"])
+
+    def test_empty_errors_valid_form(self):
+        self.assertFormError(TestForm.valid(), "field", [])
+
+    def test_empty_errors_valid_form_non_field_errors(self):
+        self.assertFormError(TestForm.valid(), None, [])
+
+    def test_field_not_in_form(self):
+        msg = (
+            "The form <TestForm bound=True, valid=False, fields=(field)> does not "
+            "contain the field 'other_field'."
+        )
         with self.assertRaisesMessage(AssertionError, msg):
-            self.assertFormError(response, "form", "field", "invalid value")
+            self.assertFormError(TestForm.invalid(), "other_field", "invalid value")
         msg_prefix = "Custom prefix"
         with self.assertRaisesMessage(AssertionError, f"{msg_prefix}: {msg}"):
             self.assertFormError(
-                response,
-                "form",
-                "field",
+                TestForm.invalid(),
+                "other_field",
                 "invalid value",
                 msg_prefix=msg_prefix,
             )
 
-    def test_form_not_in_context(self):
-        msg = "The form 'form' was not used to render the response"
-        response = mock.Mock(context=[{}])
-        with self.assertRaisesMessage(AssertionError, msg):
-            self.assertFormError(response, "form", "field", "invalid value")
-
-    def test_field_not_in_form(self):
-        msg = "The form 'form' in context 0 does not contain the field 'other_field'"
-        response = mock.Mock(context=[{"form": TestForm.invalid()}])
-        with self.assertRaisesMessage(AssertionError, msg):
-            self.assertFormError(response, "form", "other_field", "invalid value")
-
-    def test_field_not_in_form_multicontext(self):
-        msg = "The form 'form' in context 1 does not contain the field 'other_field'"
-        response = mock.Mock(context=[{}, {"form": TestForm.invalid()}])
-        with self.assertRaisesMessage(AssertionError, msg):
-            self.assertFormError(response, "form", "other_field", "invalid value")
-
     def test_field_with_no_errors(self):
-        msg = "The field 'field' on form 'form' in context 0 contains no errors"
-        response = mock.Mock(context=[{"form": TestForm.valid()}])
-        with self.assertRaisesMessage(AssertionError, msg):
-            self.assertFormError(response, "form", "field", "invalid value")
-
-    def test_field_with_no_errors_multicontext(self):
-        msg = "The field 'field' on form 'form' in context 1 contains no errors"
-        response = mock.Mock(context=[{}, {"form": TestForm.valid()}])
-        with self.assertRaisesMessage(AssertionError, msg):
-            self.assertFormError(response, "form", "field", "invalid value")
+        msg = (
+            "The errors of field 'field' on form <TestForm bound=True, valid=True, "
+            "fields=(field)> don't match."
+        )
+        with self.assertRaisesMessage(AssertionError, msg) as ctx:
+            self.assertFormError(TestForm.valid(), "field", "invalid value")
+        self.assertIn("[] != ['invalid value']", str(ctx.exception))
+        msg_prefix = "Custom prefix"
+        with self.assertRaisesMessage(AssertionError, f"{msg_prefix}: {msg}"):
+            self.assertFormError(
+                TestForm.valid(), "field", "invalid value", msg_prefix=msg_prefix
+            )
 
     def test_field_with_different_error(self):
         msg = (
-            "The field 'field' on form 'form' in context 0 does not contain "
-            "the error 'other error' (actual errors: ['invalid value'])"
+            "The errors of field 'field' on form <TestForm bound=True, valid=False, "
+            "fields=(field)> don't match."
         )
-        response = mock.Mock(context=[{"form": TestForm.invalid()}])
-        with self.assertRaisesMessage(AssertionError, msg):
-            self.assertFormError(response, "form", "field", "other error")
+        with self.assertRaisesMessage(AssertionError, msg) as ctx:
+            self.assertFormError(TestForm.invalid(), "field", "other error")
+        self.assertIn("['invalid value'] != ['other error']", str(ctx.exception))
+        msg_prefix = "Custom prefix"
+        with self.assertRaisesMessage(AssertionError, f"{msg_prefix}: {msg}"):
+            self.assertFormError(
+                TestForm.invalid(), "field", "other error", msg_prefix=msg_prefix
+            )
 
-    def test_field_with_different_error_multicontext(self):
+    def test_unbound_form(self):
         msg = (
-            "The field 'field' on form 'form' in context 1 does not contain "
-            "the error 'other error' (actual errors: ['invalid value'])"
+            "The form <TestForm bound=False, valid=Unknown, fields=(field)> is not "
+            "bound, it will never have any errors."
         )
-        response = mock.Mock(context=[{}, {"form": TestForm.invalid()}])
         with self.assertRaisesMessage(AssertionError, msg):
-            self.assertFormError(response, "form", "field", "other error")
-
-    def test_basic_positive_assertion(self):
-        response = mock.Mock(context=[{"form": TestForm.invalid()}])
-        self.assertFormError(response, "form", "field", "invalid value")
-
-    def test_basic_positive_assertion_multicontext(self):
-        response = mock.Mock(context=[{}, {"form": TestForm.invalid()}])
-        self.assertFormError(response, "form", "field", "invalid value")
-
-    def test_empty_errors_unbound_form(self):
-        response = mock.Mock(context=[{"form": TestForm()}])
-        self.assertFormError(response, "form", "field", [])
-
-    def test_empty_errors_valid_form(self):
-        response = mock.Mock(context=[{"form": TestForm.valid()}])
-        self.assertFormError(response, "form", "field", [])
+            self.assertFormError(TestForm(), "field", [])
+        msg_prefix = "Custom prefix"
+        with self.assertRaisesMessage(AssertionError, f"{msg_prefix}: {msg}"):
+            self.assertFormError(TestForm(), "field", [], msg_prefix=msg_prefix)
 
     def test_empty_errors_invalid_form(self):
-        response = mock.Mock(context=[{"form": TestForm.invalid()}])
-        self.assertFormError(response, "form", "field", [])
+        msg = (
+            "The errors of field 'field' on form <TestForm bound=True, valid=False, "
+            "fields=(field)> don't match."
+        )
+        with self.assertRaisesMessage(AssertionError, msg) as ctx:
+            self.assertFormError(TestForm.invalid(), "field", [])
+        self.assertIn("['invalid value'] != []", str(ctx.exception))
 
     def test_non_field_errors(self):
-        response = mock.Mock(context=[{"form": TestForm.invalid(nonfield=True)}])
-        self.assertFormError(response, "form", None, "non-field error")
+        self.assertFormError(TestForm.invalid(nonfield=True), None, "non-field error")
 
-    @ignore_warnings(category=RemovedInDjango50Warning)
-    def test_errors_none(self):
-        response = mock.Mock(context=[{"form": TestForm.invalid()}])
-        self.assertFormError(response, "form", "field", None)
-
-    def test_errors_none_warning(self):
-        response = mock.Mock(context=[{"form": TestForm.invalid()}])
+    def test_different_non_field_errors(self):
         msg = (
-            "Passing errors=None to assertFormError() is deprecated, use "
-            "errors=[] instead."
+            "The non-field errors of form <TestForm bound=True, valid=False, "
+            "fields=(field)> don't match."
         )
-        with self.assertWarnsMessage(RemovedInDjango50Warning, msg):
-            self.assertFormError(response, "form", "value", None)
-
-
-class AssertFormsetErrorTests(SimpleTestCase):
-    def _get_formset_data(self, field_value):
-        return {
-            "form-TOTAL_FORMS": "1",
-            "form-INITIAL_FORMS": "0",
-            "form-0-field": field_value,
-        }
-
-    def test_non_client_response(self):
-        msg = (
-            "assertFormsetError() is only usable on responses fetched using "
-            "the Django test Client."
+        with self.assertRaisesMessage(AssertionError, msg) as ctx:
+            self.assertFormError(
+                TestForm.invalid(nonfield=True), None, "other non-field error"
+            )
+        self.assertIn(
+            "['non-field error'] != ['other non-field error']", str(ctx.exception)
         )
-        response = HttpResponse()
-        with self.assertRaisesMessage(ValueError, msg):
-            self.assertFormsetError(response, "formset", 0, "field", "invalid value")
+        msg_prefix = "Custom prefix"
+        with self.assertRaisesMessage(AssertionError, f"{msg_prefix}: {msg}"):
+            self.assertFormError(
+                TestForm.invalid(nonfield=True),
+                None,
+                "other non-field error",
+                msg_prefix=msg_prefix,
+            )
 
-    def test_response_with_no_context(self):
-        msg = "Response did not use any contexts to render the response"
-        response = mock.Mock(context=[])
-        with self.assertRaisesMessage(AssertionError, msg):
-            self.assertFormsetError(response, "formset", 0, "field", "invalid value")
 
-    def test_formset_not_in_context(self):
-        msg = "The formset 'formset' was not used to render the response"
-        response = mock.Mock(context=[{}])
-        with self.assertRaisesMessage(AssertionError, msg):
-            self.assertFormsetError(response, "formset", 0, "field", "invalid value")
+class AssertFormSetErrorTests(SimpleTestCase):
+    def test_single_error(self):
+        self.assertFormSetError(TestFormset.invalid(), 0, "field", "invalid value")
+
+    def test_error_list(self):
+        self.assertFormSetError(TestFormset.invalid(), 0, "field", ["invalid value"])
+
+    def test_empty_errors_valid_formset(self):
+        self.assertFormSetError(TestFormset.valid(), 0, "field", [])
+
+    def test_multiple_forms(self):
+        formset = TestFormset(
+            {
+                "form-TOTAL_FORMS": "2",
+                "form-INITIAL_FORMS": "0",
+                "form-0-field": "valid",
+                "form-1-field": "invalid",
+            }
+        )
+        formset.full_clean()
+        self.assertFormSetError(formset, 0, "field", [])
+        self.assertFormSetError(formset, 1, "field", ["invalid value"])
 
     def test_field_not_in_form(self):
         msg = (
-            "The formset 'formset', form 0 in context 0 does not contain the "
-            "field 'other_field'"
+            "The form 0 of formset <TestFormset: bound=True valid=False total_forms=1> "
+            "does not contain the field 'other_field'."
         )
-        response = mock.Mock(context=[{"formset": TestFormset.invalid()}])
         with self.assertRaisesMessage(AssertionError, msg):
-            self.assertFormsetError(
-                response,
-                "formset",
-                0,
-                "other_field",
-                "invalid value",
+            self.assertFormSetError(
+                TestFormset.invalid(), 0, "other_field", "invalid value"
             )
-
-    def test_field_not_in_form_multicontext(self):
-        msg = (
-            "The formset 'formset', form 0 in context 1 does not contain the "
-            "field 'other_field'"
-        )
-        response = mock.Mock(context=[{}, {"formset": TestFormset.invalid()}])
-        with self.assertRaisesMessage(AssertionError, msg):
-            self.assertFormsetError(
-                response,
-                "formset",
+        msg_prefix = "Custom prefix"
+        with self.assertRaisesMessage(AssertionError, f"{msg_prefix}: {msg}"):
+            self.assertFormSetError(
+                TestFormset.invalid(),
                 0,
                 "other_field",
                 "invalid value",
+                msg_prefix=msg_prefix,
             )
 
     def test_field_with_no_errors(self):
         msg = (
-            "The field 'field' on formset 'formset', form 0 in context 0 "
-            "contains no errors"
+            "The errors of field 'field' on form 0 of formset <TestFormset: bound=True "
+            "valid=True total_forms=1> don't match."
         )
-        response = mock.Mock(context=[{"formset": TestFormset.valid()}])
-        with self.assertRaisesMessage(AssertionError, msg):
-            self.assertFormsetError(response, "formset", 0, "field", "invalid value")
-
-    def test_field_with_no_errors_multicontext(self):
-        msg = (
-            "The field 'field' on formset 'formset', form 0 in context 1 "
-            "contains no errors"
-        )
-        response = mock.Mock(context=[{}, {"formset": TestFormset.valid()}])
-        with self.assertRaisesMessage(AssertionError, msg):
-            self.assertFormsetError(response, "formset", 0, "field", "invalid value")
+        with self.assertRaisesMessage(AssertionError, msg) as ctx:
+            self.assertFormSetError(TestFormset.valid(), 0, "field", "invalid value")
+        self.assertIn("[] != ['invalid value']", str(ctx.exception))
+        msg_prefix = "Custom prefix"
+        with self.assertRaisesMessage(AssertionError, f"{msg_prefix}: {msg}"):
+            self.assertFormSetError(
+                TestFormset.valid(), 0, "field", "invalid value", msg_prefix=msg_prefix
+            )
 
     def test_field_with_different_error(self):
         msg = (
-            "The field 'field' on formset 'formset', form 0 in context 0 does"
-            " not contain the error 'other error' (actual errors: ['invalid "
-            "value'])"
+            "The errors of field 'field' on form 0 of formset <TestFormset: bound=True "
+            "valid=False total_forms=1> don't match."
         )
-        response = mock.Mock(context=[{"formset": TestFormset.invalid()}])
-        with self.assertRaisesMessage(AssertionError, msg):
-            self.assertFormsetError(response, "formset", 0, "field", "other error")
+        with self.assertRaisesMessage(AssertionError, msg) as ctx:
+            self.assertFormSetError(TestFormset.invalid(), 0, "field", "other error")
+        self.assertIn("['invalid value'] != ['other error']", str(ctx.exception))
+        msg_prefix = "Custom prefix"
+        with self.assertRaisesMessage(AssertionError, f"{msg_prefix}: {msg}"):
+            self.assertFormSetError(
+                TestFormset.invalid(), 0, "field", "other error", msg_prefix=msg_prefix
+            )
 
-    def test_field_with_different_error_multicontext(self):
+    def test_unbound_formset(self):
         msg = (
-            "The field 'field' on formset 'formset', form 0 in context 1 does"
-            " not contain the error 'other error' (actual errors: ['invalid "
-            "value'])"
+            "The formset <TestFormset: bound=False valid=Unknown total_forms=1> is not "
+            "bound, it will never have any errors."
         )
-        response = mock.Mock(context=[{}, {"formset": TestFormset.invalid()}])
         with self.assertRaisesMessage(AssertionError, msg):
-            self.assertFormsetError(response, "formset", 0, "field", "other error")
-
-    def test_basic_positive_assertion(self):
-        response = mock.Mock(context=[{"formset": TestFormset.invalid()}])
-        self.assertFormsetError(response, "formset", 0, "field", "invalid value")
-
-    def test_basic_positive_assertion_multicontext(self):
-        response = mock.Mock(context=[{}, {"formset": TestFormset.invalid()}])
-        self.assertFormsetError(response, "formset", 0, "field", "invalid value")
-
-    def test_empty_errors_unbound_formset(self):
-        response = mock.Mock(context=[{"formset": TestFormset()}])
-        self.assertFormsetError(response, "formset", 0, "field", [])
-
-    def test_empty_errors_valid_formset(self):
-        response = mock.Mock(context=[{}, {"formset": TestFormset.valid()}])
-        self.assertFormsetError(response, "formset", 0, "field", [])
+            self.assertFormSetError(TestFormset(), 0, "field", [])
 
     def test_empty_errors_invalid_formset(self):
-        response = mock.Mock(context=[{}, {"formset": TestFormset.invalid()}])
-        self.assertFormsetError(response, "formset", 0, "field", [])
+        msg = (
+            "The errors of field 'field' on form 0 of formset <TestFormset: bound=True "
+            "valid=False total_forms=1> don't match."
+        )
+        with self.assertRaisesMessage(AssertionError, msg) as ctx:
+            self.assertFormSetError(TestFormset.invalid(), 0, "field", [])
+        self.assertIn("['invalid value'] != []", str(ctx.exception))
 
     def test_non_field_errors(self):
-        response = mock.Mock(
-            context=[
-                {},
-                {"formset": TestFormset.invalid(nonfield=True)},
-            ]
+        self.assertFormSetError(
+            TestFormset.invalid(nonfield=True), 0, None, "non-field error"
         )
-        self.assertFormsetError(response, "formset", 0, None, "non-field error")
+
+    def test_different_non_field_errors(self):
+        msg = (
+            "The non-field errors of form 0 of formset <TestFormset: bound=True "
+            "valid=False total_forms=1> don't match."
+        )
+        with self.assertRaisesMessage(AssertionError, msg) as ctx:
+            self.assertFormSetError(
+                TestFormset.invalid(nonfield=True), 0, None, "other non-field error"
+            )
+        self.assertIn(
+            "['non-field error'] != ['other non-field error']", str(ctx.exception)
+        )
+        msg_prefix = "Custom prefix"
+        with self.assertRaisesMessage(AssertionError, f"{msg_prefix}: {msg}"):
+            self.assertFormSetError(
+                TestFormset.invalid(nonfield=True),
+                0,
+                None,
+                "other non-field error",
+                msg_prefix=msg_prefix,
+            )
+
+    def test_no_non_field_errors(self):
+        msg = (
+            "The non-field errors of form 0 of formset <TestFormset: bound=True "
+            "valid=False total_forms=1> don't match."
+        )
+        with self.assertRaisesMessage(AssertionError, msg) as ctx:
+            self.assertFormSetError(TestFormset.invalid(), 0, None, "non-field error")
+        self.assertIn("[] != ['non-field error']", str(ctx.exception))
+        msg_prefix = "Custom prefix"
+        with self.assertRaisesMessage(AssertionError, f"{msg_prefix}: {msg}"):
+            self.assertFormSetError(
+                TestFormset.invalid(), 0, None, "non-field error", msg_prefix=msg_prefix
+            )
 
     def test_non_form_errors(self):
-        response = mock.Mock(
-            context=[
-                {},
-                {"formset": TestFormset.invalid(nonform=True)},
-            ]
-        )
-        self.assertFormsetError(response, "formset", None, None, "error")
+        self.assertFormSetError(TestFormset.invalid(nonform=True), None, None, "error")
 
-    def test_formset_named_form(self):
-        formset = TestFormset.invalid()
-        # The mocked context emulates the template-based rendering of the
-        # formset.
-        response = mock.Mock(
-            context=[
-                {"form": formset},
-                {"form": formset.management_form},
-            ]
-        )
-        self.assertFormsetError(response, "form", 0, "field", "invalid value")
-
-    @ignore_warnings(category=RemovedInDjango50Warning)
-    def test_errors_none(self):
-        response = mock.Mock(context=[{"formset": TestFormset.invalid()}])
-        self.assertFormsetError(response, "formset", 0, "field", None)
-
-    def test_errors_none_warning(self):
-        response = mock.Mock(context=[{"formset": TestFormset.invalid()}])
+    def test_different_non_form_errors(self):
         msg = (
-            "Passing errors=None to assertFormsetError() is deprecated, use "
-            "errors=[] instead."
+            "The non-form errors of formset <TestFormset: bound=True valid=False "
+            "total_forms=0> don't match."
         )
-        with self.assertWarnsMessage(RemovedInDjango50Warning, msg):
-            self.assertFormsetError(response, "formset", 0, "field", None)
+        with self.assertRaisesMessage(AssertionError, msg) as ctx:
+            self.assertFormSetError(
+                TestFormset.invalid(nonform=True), None, None, "other error"
+            )
+        self.assertIn("['error'] != ['other error']", str(ctx.exception))
+        msg_prefix = "Custom prefix"
+        with self.assertRaisesMessage(AssertionError, f"{msg_prefix}: {msg}"):
+            self.assertFormSetError(
+                TestFormset.invalid(nonform=True),
+                None,
+                None,
+                "other error",
+                msg_prefix=msg_prefix,
+            )
+
+    def test_no_non_form_errors(self):
+        msg = (
+            "The non-form errors of formset <TestFormset: bound=True valid=False "
+            "total_forms=1> don't match."
+        )
+        with self.assertRaisesMessage(AssertionError, msg) as ctx:
+            self.assertFormSetError(TestFormset.invalid(), None, None, "error")
+        self.assertIn("[] != ['error']", str(ctx.exception))
+        msg_prefix = "Custom prefix"
+        with self.assertRaisesMessage(AssertionError, f"{msg_prefix}: {msg}"):
+            self.assertFormSetError(
+                TestFormset.invalid(),
+                None,
+                None,
+                "error",
+                msg_prefix=msg_prefix,
+            )
+
+    def test_non_form_errors_with_field(self):
+        msg = "You must use field=None with form_index=None."
+        with self.assertRaisesMessage(ValueError, msg):
+            self.assertFormSetError(
+                TestFormset.invalid(nonform=True), None, "field", "error"
+            )
+
+    def test_form_index_too_big(self):
+        msg = (
+            "The formset <TestFormset: bound=True valid=False total_forms=1> only has "
+            "1 form."
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertFormSetError(TestFormset.invalid(), 2, "field", "error")
+
+    def test_form_index_too_big_plural(self):
+        formset = TestFormset(
+            {
+                "form-TOTAL_FORMS": "2",
+                "form-INITIAL_FORMS": "0",
+                "form-0-field": "valid",
+                "form-1-field": "valid",
+            }
+        )
+        formset.full_clean()
+        msg = (
+            "The formset <TestFormset: bound=True valid=True total_forms=2> only has 2 "
+            "forms."
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertFormSetError(formset, 2, "field", "error")
 
 
 class FirstUrls:
@@ -1673,7 +1751,6 @@ class SetupTestEnvironmentTests(SimpleTestCase):
 
 
 class OverrideSettingsTests(SimpleTestCase):
-
     # #21518 -- If neither override_settings nor a setting_changed receiver
     # clears the URL cache between tests, then one of test_first or
     # test_second will fail.
@@ -1751,7 +1828,7 @@ class OverrideSettingsTests(SimpleTestCase):
 
     def test_override_database_routers(self):
         """
-        Overriding DATABASE_ROUTERS should update the master router.
+        Overriding DATABASE_ROUTERS should update the base router.
         """
         test_routers = [object()]
         with self.settings(DATABASE_ROUTERS=test_routers):
@@ -1777,12 +1854,14 @@ class OverrideSettingsTests(SimpleTestCase):
 
     def test_override_staticfiles_storage(self):
         """
-        Overriding the STATICFILES_STORAGE setting should be reflected in
+        Overriding the STORAGES setting should be reflected in
         the value of django.contrib.staticfiles.storage.staticfiles_storage.
         """
         new_class = "ManifestStaticFilesStorage"
         new_storage = "django.contrib.staticfiles.storage." + new_class
-        with self.settings(STATICFILES_STORAGE=new_storage):
+        with self.settings(
+            STORAGES={STATICFILES_STORAGE_ALIAS: {"BACKEND": new_storage}}
+        ):
             self.assertEqual(staticfiles_storage.__class__.__name__, new_class)
 
     def test_override_staticfiles_finders(self):
@@ -1811,6 +1890,7 @@ class OverrideSettingsTests(SimpleTestCase):
             self.assertIn(expected_location, finder.locations)
 
 
+@skipUnlessDBFeature("supports_transactions")
 class TestBadSetUpTestData(TestCase):
     """
     An exception in setUpTestData() shouldn't leak a transaction which would
@@ -1845,6 +1925,7 @@ class TestBadSetUpTestData(TestCase):
         self.assertFalse(self._in_atomic_block)
 
 
+@skipUnlessDBFeature("supports_transactions")
 class CaptureOnCommitCallbacksTests(TestCase):
     databases = {"default", "other"}
     callback_called = False
@@ -1968,6 +2049,32 @@ class CaptureOnCommitCallbacksTests(TestCase):
 
         self.assertEqual(callbacks, [branch_1, branch_2, leaf_3, leaf_1, leaf_2])
 
+    def test_execute_robust(self):
+        class MyException(Exception):
+            pass
+
+        def hook():
+            self.callback_called = True
+            raise MyException("robust callback")
+
+        with self.assertLogs("django.test", "ERROR") as cm:
+            with self.captureOnCommitCallbacks(execute=True) as callbacks:
+                transaction.on_commit(hook, robust=True)
+
+        self.assertEqual(len(callbacks), 1)
+        self.assertIs(self.callback_called, True)
+
+        log_record = cm.records[0]
+        self.assertEqual(
+            log_record.getMessage(),
+            "Error calling CaptureOnCommitCallbacksTests.test_execute_robust.<locals>."
+            "hook in on_commit() (robust callback).",
+        )
+        self.assertIsNotNone(log_record.exc_info)
+        raised_exception = log_record.exc_info[1]
+        self.assertIsInstance(raised_exception, MyException)
+        self.assertEqual(str(raised_exception), "robust callback")
+
 
 class DisallowedDatabaseQueriesTests(SimpleTestCase):
     def test_disallowed_database_connections(self):
@@ -2005,6 +2112,29 @@ class DisallowedDatabaseQueriesTests(SimpleTestCase):
         with self.assertRaisesMessage(DatabaseOperationForbidden, expected_message):
             next(Car.objects.iterator())
 
+    def test_disallowed_thread_database_connection(self):
+        expected_message = (
+            "Database threaded connections to 'default' are not allowed in "
+            "SimpleTestCase subclasses. Either subclass TestCase or TransactionTestCase"
+            " to ensure proper test isolation or add 'default' to "
+            "test_utils.tests.DisallowedDatabaseQueriesTests.databases to "
+            "silence this failure."
+        )
+
+        exceptions = []
+
+        def thread_func():
+            try:
+                Car.objects.first()
+            except DatabaseOperationForbidden as e:
+                exceptions.append(e)
+
+        t = threading.Thread(target=thread_func)
+        t.start()
+        t.join()
+        self.assertEqual(len(exceptions), 1)
+        self.assertEqual(exceptions[0].args[0], expected_message)
+
 
 class AllowedDatabaseQueriesTests(SimpleTestCase):
     databases = {"default"}
@@ -2014,6 +2144,50 @@ class AllowedDatabaseQueriesTests(SimpleTestCase):
 
     def test_allowed_database_chunked_cursor_queries(self):
         next(Car.objects.iterator(), None)
+
+    def test_allowed_threaded_database_queries(self):
+        connections_dict = {}
+
+        def thread_func():
+            # Passing django.db.connection between threads doesn't work while
+            # connections[DEFAULT_DB_ALIAS] does.
+            from django.db import connections
+
+            connection = connections["default"]
+
+            next(Car.objects.iterator(), None)
+
+            # Allow thread sharing so the connection can be closed by the main
+            # thread.
+            connection.inc_thread_sharing()
+            connections_dict[id(connection)] = connection
+
+        try:
+            t = threading.Thread(target=thread_func)
+            t.start()
+            t.join()
+        finally:
+            # Finish by closing the connections opened by the other threads
+            # (the connection opened in the main thread will automatically be
+            # closed on teardown).
+            for conn in connections_dict.values():
+                if conn is not connection and conn.allow_thread_sharing:
+                    conn.validate_thread_sharing()
+                    conn._close()
+                    conn.dec_thread_sharing()
+
+    def test_allowed_database_copy_queries(self):
+        new_connection = connection.copy("dynamic_connection")
+        try:
+            with new_connection.cursor() as cursor:
+                sql = f"SELECT 1{new_connection.features.bare_select_suffix}"
+                cursor.execute(sql)
+                self.assertEqual(cursor.fetchone()[0], 1)
+        finally:
+            new_connection.validate_thread_sharing()
+            new_connection._close()
+            if hasattr(new_connection, "close_pool"):
+                new_connection.close_pool()
 
 
 class DatabaseAliasTests(SimpleTestCase):

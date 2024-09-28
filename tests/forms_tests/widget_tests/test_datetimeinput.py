@@ -1,9 +1,7 @@
 from datetime import datetime
 
-from django.forms import DateTimeInput
-from django.test import ignore_warnings
+from django.forms import CharField, DateTimeInput, Form
 from django.utils import translation
-from django.utils.deprecation import RemovedInDjango50Warning
 
 from .base import WidgetTest
 
@@ -65,35 +63,15 @@ class DateTimeInputTest(WidgetTest):
             html=('<input type="text" name="date" value="17.09.2007 12:51:34">'),
         )
 
-    @translation.override("de-at")
-    def test_locale_aware(self):
-        d = datetime(2007, 9, 17, 12, 51, 34, 482548)
-        # RemovedInDjango50Warning: When the deprecation ends, remove
-        # @ignore_warnings and USE_L10N=False. The assertion should remain
-        # because format-related settings will take precedence over
-        # locale-dictated formats.
-        with ignore_warnings(category=RemovedInDjango50Warning):
-            with self.settings(USE_L10N=False):
-                with self.settings(
-                    DATETIME_INPUT_FORMATS=[
-                        "%Y-%m-%d %H:%M:%S",
-                        "%Y-%m-%d %H:%M:%S.%f",
-                        "%Y-%m-%d %H:%M",
-                    ]
-                ):
-                    self.check_html(
-                        self.widget,
-                        "date",
-                        d,
-                        html=(
-                            '<input type="text" name="date" '
-                            'value="2007-09-17 12:51:34">'
-                        ),
-                    )
-        with translation.override("es"):
-            self.check_html(
-                self.widget,
-                "date",
-                d,
-                html='<input type="text" name="date" value="17/09/2007 12:51:34">',
-            )
+    def test_fieldset(self):
+        class TestForm(Form):
+            template_name = "forms_tests/use_fieldset.html"
+            field = CharField(widget=self.widget)
+
+        form = TestForm()
+        self.assertIs(self.widget.use_fieldset, False)
+        self.assertHTMLEqual(
+            '<div><label for="id_field">Field:</label>'
+            '<input id="id_field" name="field" required type="text"></div>',
+            form.render(),
+        )

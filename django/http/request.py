@@ -1,6 +1,6 @@
-import cgi
 import codecs
 import copy
+import operator
 from io import BytesIO
 from itertools import chain
 from urllib.parse import parse_qsl, quote, urlencode, urljoin, urlsplit
@@ -8,13 +8,18 @@ from urllib.parse import parse_qsl, quote, urlencode, urljoin, urlsplit
 from django.conf import settings
 from django.core import signing
 from django.core.exceptions import (
+    BadRequest,
     DisallowedHost,
     ImproperlyConfigured,
     RequestDataTooBig,
     TooManyFieldsSent,
 )
 from django.core.files import uploadhandler
-from django.http.multipartparser import MultiPartParser, MultiPartParserError
+from django.http.multipartparser import (
+    MultiPartParser,
+    MultiPartParserError,
+    TooManyFilesSent,
+)
 from django.utils.datastructures import (
     CaseInsensitiveMapping,
     ImmutableList,
@@ -22,14 +27,12 @@ from django.utils.datastructures import (
 )
 from django.utils.encoding import escape_uri_path, iri_to_uri
 from django.utils.functional import cached_property
-from django.utils.http import is_same_domain
+from django.utils.http import is_same_domain, parse_header_parameters
 from django.utils.regex_helper import _lazy_re_compile
-
-from .multipartparser import parse_header
 
 RAISE_ERROR = object()
 host_validation_re = _lazy_re_compile(
-    r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(:[0-9]+)?$"
+    r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9.:]+\])(?::([0-9]+))?$"
 )
 
 
@@ -87,17 +90,51 @@ class HttpRequest:
 
     @cached_property
     def accepted_types(self):
-        """Return a list of MediaType instances."""
-        return parse_accept_header(self.headers.get("Accept", "*/*"))
+        """Return a list of MediaType instances, in order of preference."""
+        header_value = self.headers.get("Accept", "*/*")
+        return sorted(
+            (MediaType(token) for token in header_value.split(",") if token.strip()),
+            key=operator.attrgetter("quality", "specificity"),
+            reverse=True,
+        )
+
+    def accepted_type(self, media_type):
+        """
+        Return the preferred MediaType instance which matches the given media type.
+        """
+        return next(
+            (
+                accepted_type
+                for accepted_type in self.accepted_types
+                if accepted_type.match(media_type)
+            ),
+            None,
+        )
+
+    def get_preferred_type(self, media_types):
+        """Select the preferred media type from the provided options."""
+        if not media_types or not self.accepted_types:
+            return None
+
+        desired_types = [
+            (accepted_type, media_type)
+            for media_type in media_types
+            if (accepted_type := self.accepted_type(media_type)) is not None
+        ]
+
+        if not desired_types:
+            return None
+
+        # Of the desired media types, select the one which is most desirable.
+        return min(desired_types, key=lambda t: self.accepted_types.index(t[0]))[1]
 
     def accepts(self, media_type):
-        return any(
-            accepted_type.match(media_type) for accepted_type in self.accepted_types
-        )
+        """Does the client accept a response in the given media type?"""
+        return self.accepted_type(media_type) is not None
 
     def _set_content_type_params(self, meta):
         """Set content_type, content_params, and encoding."""
-        self.content_type, self.content_params = cgi.parse_header(
+        self.content_type, self.content_params = parse_header_parameters(
             meta.get("CONTENT_TYPE", "")
         )
         if "charset" in self.content_params:
@@ -168,9 +205,11 @@ class HttpRequest:
         return "%s%s%s" % (
             escape_uri_path(path),
             "/" if force_append_slash and not path.endswith("/") else "",
-            ("?" + iri_to_uri(self.META.get("QUERY_STRING", "")))
-            if self.META.get("QUERY_STRING", "")
-            else "",
+            (
+                ("?" + iri_to_uri(self.META.get("QUERY_STRING", "")))
+                if self.META.get("QUERY_STRING", "")
+                else ""
+            ),
         )
 
     def get_signed_cookie(self, key, default=RAISE_ERROR, salt="", max_age=None):
@@ -228,9 +267,7 @@ class HttpRequest:
                 # If location starts with '//' but has no netloc, reuse the
                 # schema and netloc from the current request. Strip the double
                 # slashes and continue as if it wasn't specified.
-                if location.startswith("//"):
-                    location = location[2:]
-                location = self._current_scheme_host + location
+                location = self._current_scheme_host + location.removeprefix("//")
             else:
                 # Join the constructed URL with the provided location, which
                 # allows the provided location to apply query strings to the
@@ -261,7 +298,8 @@ class HttpRequest:
                 )
             header_value = self.META.get(header)
             if header_value is not None:
-                return "https" if header_value == secure_value else "http"
+                header_value, *_ = header_value.split(",", 1)
+                return "https" if header_value.strip() == secure_value else "http"
         return self._get_scheme()
 
     def is_secure(self):
@@ -340,6 +378,8 @@ class HttpRequest:
                 self._body = self.read()
             except OSError as e:
                 raise UnreadablePostError(*e.args) from e
+            finally:
+                self._stream.close()
             self._stream = BytesIO(self._body)
         return self._body
 
@@ -367,7 +407,7 @@ class HttpRequest:
                 data = self
             try:
                 self._post, self._files = self.parse_file_upload(self.META, data)
-            except MultiPartParserError:
+            except (MultiPartParserError, TooManyFilesSent):
                 # An error occurred while parsing POST data. Since when
                 # formatting the error the request handler might access
                 # self.POST, set self._post and self._file to prevent
@@ -375,10 +415,16 @@ class HttpRequest:
                 self._mark_post_parse_error()
                 raise
         elif self.content_type == "application/x-www-form-urlencoded":
-            self._post, self._files = (
-                QueryDict(self.body, encoding=self._encoding),
-                MultiValueDict(),
-            )
+            # According to RFC 1866, the "application/x-www-form-urlencoded"
+            # content type does not have a charset and should be always treated
+            # as UTF-8.
+            if self._encoding is not None and self._encoding.lower() != "utf-8":
+                raise BadRequest(
+                    "HTTP requests with the 'application/x-www-form-urlencoded' "
+                    "content type must be UTF-8 encoded."
+                )
+            self._post = QueryDict(self.body, encoding="utf-8")
+            self._files = MultiValueDict()
         else:
             self._post, self._files = (
                 QueryDict(encoding=self._encoding),
@@ -439,10 +485,35 @@ class HttpHeaders(CaseInsensitiveMapping):
     @classmethod
     def parse_header_name(cls, header):
         if header.startswith(cls.HTTP_PREFIX):
-            header = header[len(cls.HTTP_PREFIX) :]
+            header = header.removeprefix(cls.HTTP_PREFIX)
         elif header not in cls.UNPREFIXED_HEADERS:
             return None
         return header.replace("_", "-").title()
+
+    @classmethod
+    def to_wsgi_name(cls, header):
+        header = header.replace("-", "_").upper()
+        if header in cls.UNPREFIXED_HEADERS:
+            return header
+        return f"{cls.HTTP_PREFIX}{header}"
+
+    @classmethod
+    def to_asgi_name(cls, header):
+        return header.replace("-", "_").upper()
+
+    @classmethod
+    def to_wsgi_names(cls, headers):
+        return {
+            cls.to_wsgi_name(header_name): value
+            for header_name, value in headers.items()
+        }
+
+    @classmethod
+    def to_asgi_names(cls, headers):
+        return {
+            cls.to_asgi_name(header_name): value
+            for header_name, value in headers.items()
+        }
 
 
 class QueryDict(MultiValueDict):
@@ -618,15 +689,13 @@ class QueryDict(MultiValueDict):
 
 class MediaType:
     def __init__(self, media_type_raw_line):
-        full_type, self.params = parse_header(
-            media_type_raw_line.encode("ascii") if media_type_raw_line else b""
+        full_type, self.params = parse_header_parameters(
+            media_type_raw_line if media_type_raw_line else ""
         )
         self.main_type, _, self.sub_type = full_type.partition("/")
 
     def __str__(self):
-        params_str = "".join(
-            "; %s=%s" % (k, v.decode("ascii")) for k, v in self.params.items()
-        )
+        params_str = "".join("; %s=%s" % (k, v) for k, v in self.params.items())
         return "%s%s%s" % (
             self.main_type,
             ("/%s" % self.sub_type) if self.sub_type else "",
@@ -644,9 +713,37 @@ class MediaType:
         if self.is_all_types:
             return True
         other = MediaType(other)
-        if self.main_type == other.main_type and self.sub_type in {"*", other.sub_type}:
-            return True
-        return False
+        return self.main_type == other.main_type and self.sub_type in {
+            "*",
+            other.sub_type,
+        }
+
+    @cached_property
+    def quality(self):
+        try:
+            quality = float(self.params.get("q", 1))
+        except ValueError:
+            # Discard invalid values.
+            return 1
+
+        # Valid quality values must be between 0 and 1.
+        if quality < 0 or quality > 1:
+            return 1
+
+        return round(quality, 3)
+
+    @property
+    def specificity(self):
+        """
+        Return a value from 0-3 for how specific the media type is.
+        """
+        if self.main_type == "*":
+            return 0
+        elif self.sub_type == "*":
+            return 1
+        elif self.quality == 1:
+            return 2
+        return 3
 
 
 # It's neither necessary nor appropriate to use
@@ -673,19 +770,11 @@ def split_domain_port(host):
     Returned domain is lowercased. If the host is invalid, the domain will be
     empty.
     """
-    host = host.lower()
-
-    if not host_validation_re.match(host):
-        return "", ""
-
-    if host[-1] == "]":
-        # It's an IPv6 address without a port.
-        return host, ""
-    bits = host.rsplit(":", 1)
-    domain, port = bits if len(bits) == 2 else (bits[0], "")
-    # Remove a trailing dot (if present) from the domain.
-    domain = domain[:-1] if domain.endswith(".") else domain
-    return domain, port
+    if match := host_validation_re.fullmatch(host.lower()):
+        domain, port = match.groups(default="")
+        # Remove a trailing dot (if present) from the domain.
+        return domain.removesuffix("."), port
+    return "", ""
 
 
 def validate_host(host, allowed_hosts):
@@ -706,7 +795,3 @@ def validate_host(host, allowed_hosts):
     return any(
         pattern == "*" or is_same_domain(host, pattern) for pattern in allowed_hosts
     )
-
-
-def parse_accept_header(header):
-    return [MediaType(token) for token in header.split(",") if token.strip()]

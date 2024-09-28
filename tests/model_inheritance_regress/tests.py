@@ -1,6 +1,7 @@
 """
 Regression tests for Model inheritance behavior.
 """
+
 import datetime
 from operator import attrgetter
 from unittest import expectedFailure
@@ -246,21 +247,11 @@ class ModelInheritanceTest(TestCase):
         self.assertEqual(r.id, orig_id)
         self.assertEqual(r.id, r.place_ptr_id)
 
-    def test_issue_7488(self):
-        # Regression test for #7488. This looks a little crazy, but it's the
-        # equivalent of what the admin interface has to do for the edit-inline
-        # case.
-        suppliers = Supplier.objects.filter(
-            restaurant=Restaurant(name="xx", address="yy")
-        )
-        suppliers = list(suppliers)
-        self.assertEqual(suppliers, [])
-
     def test_issue_11764(self):
         """
         Regression test for #11764
         """
-        wholesalers = list(Wholesaler.objects.all().select_related())
+        wholesalers = list(Wholesaler.objects.select_related())
         self.assertEqual(wholesalers, [])
 
     def test_issue_7853(self):
@@ -426,11 +417,6 @@ class ModelInheritanceTest(TestCase):
         parties = list(p4.bachelorparty_set.all())
         self.assertEqual(parties, [bachelor, messy_parent])
 
-    def test_abstract_base_class_m2m_relation_inheritance_manager_reused(self):
-        p1 = Person.objects.create(name="Alice")
-        self.assertIs(p1.birthdayparty_set, p1.birthdayparty_set)
-        self.assertIs(p1.bachelorparty_set, p1.bachelorparty_set)
-
     def test_abstract_verbose_name_plural_inheritance(self):
         """
         verbose_name_plural correctly inherited from ABC if inheritance chain
@@ -444,10 +430,10 @@ class ModelInheritanceTest(TestCase):
 
     def test_inherited_nullable_exclude(self):
         obj = SelfRefChild.objects.create(child_data=37, parent_data=42)
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             SelfRefParent.objects.exclude(self_data=72), [obj.pk], attrgetter("pk")
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             SelfRefChild.objects.exclude(self_data=72), [obj.pk], attrgetter("pk")
         )
 
@@ -525,7 +511,7 @@ class ModelInheritanceTest(TestCase):
             serves_pizza=True,
             serves_hot_dogs=True,
         )
-        p = Place.objects.all().select_related("restaurant")[0]
+        p = Place.objects.select_related("restaurant")[0]
         self.assertIsInstance(p.restaurant.serves_pizza, bool)
 
     def test_inheritance_select_related(self):
@@ -539,7 +525,7 @@ class ModelInheritanceTest(TestCase):
         Supplier.objects.create(name="John", restaurant=r1)
         Supplier.objects.create(name="Jane", restaurant=r2)
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Supplier.objects.order_by("name").select_related(),
             [
                 "Jane",
@@ -677,3 +663,15 @@ class ModelInheritanceTest(TestCase):
             Politician.objects.get(pk=c1.politician_ptr_id).title,
             "senator 1",
         )
+
+    def test_mti_update_parent_through_child(self):
+        Politician.objects.create()
+        Congressman.objects.create()
+        Congressman.objects.update(title="senator 1")
+        self.assertEqual(Congressman.objects.get().title, "senator 1")
+
+    def test_mti_update_grand_parent_through_child(self):
+        Politician.objects.create()
+        Senator.objects.create()
+        Senator.objects.update(title="senator 1")
+        self.assertEqual(Senator.objects.get().title, "senator 1")

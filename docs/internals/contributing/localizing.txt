@@ -16,7 +16,7 @@ coordinated at `Transifex`_.
 
 If you find an incorrect translation or want to discuss specific translations,
 go to the `Django project page`_. If you would like to help out with
-translating or add a language that isn't yet translated, here's what to do:
+translating or adding a language that isn't yet translated, here's what to do:
 
 * Introduce yourself on the `Django internationalization forum`_.
 
@@ -35,9 +35,9 @@ translating or add a language that isn't yet translated, here's what to do:
   procedural problems and handle the actual translation process.
 
 * Once you are a member of a team choose the translation resource you
-  want to update on the team page. For example the "core" resource refers
+  want to update on the team page. For example, the "core" resource refers
   to the translation catalog that contains all non-contrib translations.
-  Each of the contrib apps also have a resource (prefixed with "contrib").
+  Each of the contrib apps also has a resource (prefixed with "contrib").
 
   .. note::
      For more information about how to use Transifex, read the
@@ -59,18 +59,19 @@ the date, time and numbers formatting particularities of your locale. See
 :doc:`/topics/i18n/formatting` for details.
 
 The format files aren't managed by the use of Transifex. To change them, you
-must :doc:`create a patch<writing-code/submitting-patches>` against the
-Django source tree, as for any code change:
+must:
 
-* Create a diff against the current Git main branch.
+* :doc:`Create a pull request<writing-code/submitting-patches>` against the
+  Django Git ``main`` branch, as for any code change.
 
 * Open a ticket in Django's ticket system, set its ``Component`` field to
-  ``Translations``, and attach the patch to it.
+  ``Translations``, set the "has patch" flag, and include the link to the pull
+  request.
 
 .. _Transifex: https://www.transifex.com/
-.. _Django project page: https://www.transifex.com/django/django/
+.. _Django project page: https://app.transifex.com/django/django/
 .. _Django internationalization forum: https://forum.djangoproject.com/c/internals/i18n/14
-.. _Transifex User Guide: https://docs.transifex.com/
+.. _Transifex User Guide: https://help.transifex.com/
 
 .. _translating-documentation:
 
@@ -79,7 +80,7 @@ Documentation
 
 There is also an opportunity to translate the documentation, though this is a
 huge undertaking to complete entirely (you have been warned!). We use the same
-`Transifex tool <https://www.transifex.com/django/django-docs/>`_. The
+`Transifex tool <https://app.transifex.com/django/django-docs/>`_. The
 translations will appear at ``https://docs.djangoproject.com/<language_code>/``
 when at least the ``docs/intro/*`` files are fully translated in your language.
 

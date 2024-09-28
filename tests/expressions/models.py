@@ -1,6 +1,7 @@
 """
 Tests for F() query expression syntax.
 """
+
 import uuid
 
 from django.db import models
@@ -8,6 +9,9 @@ from django.db import models
 
 class Manager(models.Model):
     name = models.CharField(max_length=50)
+    secretary = models.ForeignKey(
+        "Employee", models.CASCADE, null=True, related_name="managers"
+    )
 
 
 class Employee(models.Model):
@@ -15,6 +19,7 @@ class Employee(models.Model):
     lastname = models.CharField(max_length=50)
     salary = models.IntegerField(blank=True, null=True)
     manager = models.ForeignKey(Manager, models.CASCADE, null=True)
+    based_in_eu = models.BooleanField(default=False)
 
     def __str__(self):
         return "%s %s" % (self.firstname, self.lastname)
@@ -51,7 +56,11 @@ class Number(models.Model):
     decimal_value = models.DecimalField(max_digits=20, decimal_places=17, null=True)
 
     def __str__(self):
-        return "%i, %.3f, %.17f" % (self.integer, self.float, self.decimal_value)
+        return "%i, %s, %s" % (
+            self.integer,
+            "%.3f" % self.float if self.float is not None else None,
+            "%.17f" % self.decimal_value if self.decimal_value is not None else None,
+        )
 
 
 class Experiment(models.Model):
@@ -102,3 +111,14 @@ class UUIDPK(models.Model):
 class UUID(models.Model):
     uuid = models.UUIDField(null=True)
     uuid_fk = models.ForeignKey(UUIDPK, models.CASCADE, null=True)
+
+
+class Text(models.Model):
+    name = models.TextField()
+
+
+class JSONFieldModel(models.Model):
+    data = models.JSONField(null=True)
+
+    class Meta:
+        required_db_features = {"supports_json_field"}

@@ -16,7 +16,7 @@
     border-right: 1px solid var(--hairline-color);
     background-color: var(--body-bg);
     cursor: pointer;
-    font-size: 20px;
+    font-size: 1.25rem;
     color: var(--link-fg);
     padding: 0;
 }
@@ -59,8 +59,13 @@
     content: '\00AB';
 }
 
+.main > #nav-sidebar {
+    visibility: hidden;
+}
+
 .main.shifted > #nav-sidebar {
     margin-left: 0;
+    visibility: visible;
 }
 
 [dir="rtl"] .main.shifted > #nav-sidebar {
@@ -95,6 +100,12 @@
 
 #nav-sidebar .current-model {
     background: var(--selected-row);
+}
+
+@media (forced-colors: active) {
+    #nav-sidebar .current-model {
+        background-color: SelectedItem;
+    }
 }
 
 .main > #nav-sidebar + .content {

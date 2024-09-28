@@ -19,6 +19,7 @@ from django.db.models import (
     ExpressionWrapper,
     F,
     IntegerField,
+    JSONField,
     OuterRef,
     Q,
     Subquery,
@@ -27,6 +28,7 @@ from django.db.models import (
 )
 from django.db.models.expressions import RawSQL
 from django.db.models.fields.json import (
+    KT,
     KeyTextTransform,
     KeyTransform,
     KeyTransformFactory,
@@ -88,7 +90,6 @@ class TestMethods(SimpleTestCase):
         transform = field.get_transform("my_transform")
         self.assertIs(transform, MyTransform)
         models.JSONField._unregister_lookup(MyTransform)
-        models.JSONField._clear_cached_lookups()
         transform = field.get_transform("my_transform")
         self.assertIsInstance(transform, KeyTransformFactory)
 
@@ -100,6 +101,29 @@ class TestMethods(SimpleTestCase):
         )
         with self.assertRaisesMessage(TypeError, msg):
             KeyTransformTextLookupMixin(transform)
+
+    def test_get_prep_value(self):
+        class JSONFieldGetPrepValue(models.JSONField):
+            def get_prep_value(self, value):
+                if value is True:
+                    return {"value": True}
+                return value
+
+        def noop_adapt_json_value(value, encoder):
+            return value
+
+        field = JSONFieldGetPrepValue()
+        with mock.patch.object(
+            connection.ops, "adapt_json_value", noop_adapt_json_value
+        ):
+            self.assertEqual(
+                field.get_db_prep_value(True, connection, prepared=False),
+                {"value": True},
+            )
+            self.assertIs(
+                field.get_db_prep_value(True, connection, prepared=True), True
+            )
+            self.assertEqual(field.get_db_prep_value(1, connection, prepared=False), 1)
 
 
 class TestValidation(SimpleTestCase):
@@ -193,13 +217,14 @@ class TestSaveLoad(TestCase):
 
     @skipUnlessDBFeature("supports_primitives_in_json_field")
     def test_json_null_different_from_sql_null(self):
-        json_null = NullableJSONModel.objects.create(value=Value("null"))
+        json_null = NullableJSONModel.objects.create(value=Value(None, JSONField()))
+        NullableJSONModel.objects.update(value=Value(None, JSONField()))
         json_null.refresh_from_db()
         sql_null = NullableJSONModel.objects.create(value=None)
         sql_null.refresh_from_db()
         # 'null' is not equal to NULL in the database.
         self.assertSequenceEqual(
-            NullableJSONModel.objects.filter(value=Value("null")),
+            NullableJSONModel.objects.filter(value=Value(None, JSONField())),
             [json_null],
         )
         self.assertSequenceEqual(
@@ -327,7 +352,7 @@ class TestQuerying(TestCase):
         )
 
     def test_icontains(self):
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             NullableJSONModel.objects.filter(value__icontains="BaX"),
             self.objs[6:8],
         )
@@ -371,18 +396,15 @@ class TestQuerying(TestCase):
             ).order_by("key"),
         ):
             self.assertSequenceEqual(qs, [self.objs[4]])
+        none_val = "" if connection.features.interprets_empty_strings_as_nulls else None
         qs = NullableJSONModel.objects.filter(value__isnull=False)
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs.filter(value__isnull=False)
-            .annotate(
-                key=KeyTextTransform(
-                    "f", KeyTransform("1", KeyTransform("d", "value"))
-                ),
-            )
+            .annotate(key=KT("value__d__1__f"))
             .values("key")
             .annotate(count=Count("key"))
             .order_by("count"),
-            [(None, 0), ("g", 1)],
+            [(none_val, 0), ("g", 1)],
             operator.itemgetter("key", "count"),
         )
 
@@ -395,7 +417,7 @@ class TestQuerying(TestCase):
             .annotate(count=Count("value__d__0"))
             .order_by("count")
         )
-        self.assertQuerysetEqual(qs, [0, 1], operator.itemgetter("count"))
+        self.assertQuerySetEqual(qs, [0, 1], operator.itemgetter("count"))
 
     def test_order_grouping_custom_decoder(self):
         NullableJSONModel.objects.create(value_custom={"a": "b"})
@@ -495,8 +517,19 @@ class TestQuerying(TestCase):
             [self.objs[4]],
         )
 
+    def test_key_text_transform_char_lookup(self):
+        qs = NullableJSONModel.objects.annotate(
+            char_value=KeyTextTransform("foo", "value"),
+        ).filter(char_value__startswith="bar")
+        self.assertSequenceEqual(qs, [self.objs[7]])
+
+        qs = NullableJSONModel.objects.annotate(
+            char_value=KeyTextTransform(1, KeyTextTransform("bar", "value")),
+        ).filter(char_value__startswith="bar")
+        self.assertSequenceEqual(qs, [self.objs[7]])
+
     def test_expression_wrapper_key_transform(self):
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             NullableJSONModel.objects.annotate(
                 expr=ExpressionWrapper(
                     KeyTransform("c", "value"),
@@ -507,7 +540,7 @@ class TestQuerying(TestCase):
         )
 
     def test_has_key(self):
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             NullableJSONModel.objects.filter(value__has_key="a"),
             [self.objs[3], self.objs[4]],
         )
@@ -571,10 +604,37 @@ class TestQuerying(TestCase):
         )
 
     def test_has_any_keys(self):
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             NullableJSONModel.objects.filter(value__has_any_keys=["c", "l"]),
             [self.objs[3], self.objs[4], self.objs[6]],
         )
+
+    def test_has_key_number(self):
+        obj = NullableJSONModel.objects.create(
+            value={
+                "123": "value",
+                "nested": {"456": "bar", "lorem": "abc", "999": True},
+                "array": [{"789": "baz", "777": "def", "ipsum": 200}],
+                "000": "val",
+            }
+        )
+        tests = [
+            Q(value__has_key="123"),
+            Q(value__nested__has_key="456"),
+            Q(value__array__0__has_key="789"),
+            Q(value__has_keys=["nested", "123", "array", "000"]),
+            Q(value__nested__has_keys=["lorem", "999", "456"]),
+            Q(value__array__0__has_keys=["789", "ipsum", "777"]),
+            Q(value__has_any_keys=["000", "nonexistent"]),
+            Q(value__nested__has_any_keys=["999", "nonexistent"]),
+            Q(value__array__0__has_any_keys=["777", "nonexistent"]),
+        ]
+        for condition in tests:
+            with self.subTest(condition=condition):
+                self.assertSequenceEqual(
+                    NullableJSONModel.objects.filter(condition),
+                    [obj],
+                )
 
     @skipUnlessDBFeature("supports_json_field_contains")
     def test_contains(self):
@@ -596,7 +656,7 @@ class TestQuerying(TestCase):
         for value, expected in tests:
             with self.subTest(value=value):
                 qs = NullableJSONModel.objects.filter(value__contains=value)
-                self.assertSequenceEqual(qs, expected)
+                self.assertCountEqual(qs, expected)
 
     @skipIfDBFeature("supports_json_field_contains")
     def test_contains_unsupported(self):
@@ -621,7 +681,7 @@ class TestQuerying(TestCase):
         qs = NullableJSONModel.objects.filter(
             value__contained_by={"a": "b", "c": 14, "h": True}
         )
-        self.assertSequenceEqual(qs, self.objs[2:4])
+        self.assertCountEqual(qs, self.objs[2:4])
 
     @skipIfDBFeature("supports_json_field_contains")
     def test_contained_by_unsupported(self):
@@ -630,7 +690,7 @@ class TestQuerying(TestCase):
             NullableJSONModel.objects.filter(value__contained_by={"a": "b"}).get()
 
     def test_deep_values(self):
-        qs = NullableJSONModel.objects.values_list("value__k__l")
+        qs = NullableJSONModel.objects.values_list("value__k__l").order_by("pk")
         expected_objs = [(None,)] * len(self.objs)
         expected_objs[4] = ("m",)
         self.assertSequenceEqual(qs, expected_objs)
@@ -640,19 +700,22 @@ class TestQuerying(TestCase):
         query = NullableJSONModel.objects.distinct("value__k__l").values_list(
             "value__k__l"
         )
-        self.assertSequenceEqual(query, [("m",), (None,)])
+        expected = [("m",), (None,)]
+        if not connection.features.nulls_order_largest:
+            expected.reverse()
+        self.assertSequenceEqual(query, expected)
 
     def test_isnull_key(self):
         # key__isnull=False works the same as has_key='key'.
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             NullableJSONModel.objects.filter(value__a__isnull=True),
             self.objs[:3] + self.objs[5:],
         )
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             NullableJSONModel.objects.filter(value__j__isnull=True),
             self.objs[:4] + self.objs[5:],
         )
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             NullableJSONModel.objects.filter(value__a__isnull=False),
             [self.objs[3], self.objs[4]],
         )
@@ -663,7 +726,7 @@ class TestQuerying(TestCase):
 
     def test_isnull_key_or_none(self):
         obj = NullableJSONModel.objects.create(value={"a": None})
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             NullableJSONModel.objects.filter(
                 Q(value__a__isnull=True) | Q(value__a=None)
             ),
@@ -697,7 +760,7 @@ class TestQuerying(TestCase):
         )
 
     def test_shallow_obj_lookup(self):
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             NullableJSONModel.objects.filter(value__a="b"),
             [self.objs[3], self.objs[4]],
         )
@@ -708,7 +771,7 @@ class TestQuerying(TestCase):
                 NullableJSONModel.objects.filter(pk=OuterRef("pk")).values("value")
             ),
         ).filter(field__a="b")
-        self.assertSequenceEqual(qs, [self.objs[3], self.objs[4]])
+        self.assertCountEqual(qs, [self.objs[3], self.objs[4]])
 
     def test_deep_lookup_objs(self):
         self.assertSequenceEqual(
@@ -735,11 +798,11 @@ class TestQuerying(TestCase):
         )
 
     def test_deep_lookup_transform(self):
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             NullableJSONModel.objects.filter(value__c__gt=2),
             [self.objs[3], self.objs[4]],
         )
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             NullableJSONModel.objects.filter(value__c__gt=2.33),
             [self.objs[3], self.objs[4]],
         )
@@ -751,11 +814,11 @@ class TestQuerying(TestCase):
             (Q(value__foo="bax"), [self.objs[0], self.objs[7]]),
         ]
         for condition, expected in tests:
-            self.assertSequenceEqual(
+            self.assertCountEqual(
                 NullableJSONModel.objects.exclude(condition),
                 expected,
             )
-            self.assertSequenceEqual(
+            self.assertCountEqual(
                 NullableJSONModel.objects.filter(~condition),
                 expected,
             )
@@ -765,7 +828,7 @@ class TestQuerying(TestCase):
         condition = Q(value__foo="bax")
         objs_with_value = [self.objs[6]]
         objs_with_different_value = [self.objs[0], self.objs[7]]
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             NullableJSONModel.objects.exclude(condition),
             objs_with_different_value,
         )
@@ -782,7 +845,7 @@ class TestQuerying(TestCase):
             objs_with_value + objs_with_different_value,
         )
         # Add the __isnull lookup to get an exhaustive set.
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             NullableJSONModel.objects.exclude(condition & Q(value__foo__isnull=False)),
             self.objs[0:6] + self.objs[7:],
         )
@@ -792,7 +855,7 @@ class TestQuerying(TestCase):
         )
 
     def test_usage_in_subquery(self):
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             NullableJSONModel.objects.filter(
                 id__in=NullableJSONModel.objects.filter(value__c=14),
             ),
@@ -850,7 +913,7 @@ class TestQuerying(TestCase):
         ]
         for lookup, value, expected in tests:
             with self.subTest(lookup=lookup, value=value):
-                self.assertSequenceEqual(
+                self.assertCountEqual(
                     NullableJSONModel.objects.filter(**{lookup: value}),
                     expected,
                 )
@@ -945,7 +1008,7 @@ class TestQuerying(TestCase):
                 False,
             )
         self.assertIn(
-            """."value" -> 'test'' = ''"a"'') OR 1 = 1 OR (''d') = '"x"' """,
+            """."value" -> 'test'' = ''"a"'') OR 1 = 1 OR (''d') = '"x"'""",
             queries[0]["sql"],
         )
 
@@ -1040,3 +1103,27 @@ class TestQuerying(TestCase):
             ).filter(chain=F("related_key__0")),
             [related_obj],
         )
+
+    def test_key_text_transform_from_lookup(self):
+        qs = NullableJSONModel.objects.annotate(b=KT("value__bax__foo")).filter(
+            b__contains="ar",
+        )
+        self.assertSequenceEqual(qs, [self.objs[7]])
+        qs = NullableJSONModel.objects.annotate(c=KT("value__o")).filter(
+            c__contains="uot",
+        )
+        self.assertSequenceEqual(qs, [self.objs[4]])
+
+    def test_key_text_transform_from_lookup_invalid(self):
+        msg = "Lookup must contain key or index transforms."
+        with self.assertRaisesMessage(ValueError, msg):
+            KT("value")
+        with self.assertRaisesMessage(ValueError, msg):
+            KT("")
+
+    def test_literal_annotation_filtering(self):
+        all_objects = NullableJSONModel.objects.order_by("id")
+        qs = all_objects.annotate(data=Value({"foo": "bar"}, JSONField())).filter(
+            data__foo="bar"
+        )
+        self.assertQuerySetEqual(qs, all_objects)

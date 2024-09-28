@@ -153,10 +153,6 @@ class Template:
         self.source = str(template_string)  # May be lazy.
         self.nodelist = self.compile_nodelist()
 
-    def __iter__(self):
-        for node in self.nodelist:
-            yield from node
-
     def __repr__(self):
         return '<%s template_string="%s...">' % (
             self.__class__.__qualname__,
@@ -197,7 +193,9 @@ class Template:
         )
 
         try:
-            return parser.parse()
+            nodelist = parser.parse()
+            self.extra_data = parser.extra_data
+            return nodelist
         except Exception as e:
             if self.engine.debug:
                 e.template_debug = self.get_exception_info(e, e.token)
@@ -311,7 +309,8 @@ class Token:
             The line number the token appears on in the template source.
             This is used for traceback information and gettext files.
         """
-        self.token_type, self.contents = token_type, contents
+        self.token_type = token_type
+        self.contents = contents
         self.lineno = lineno
         self.position = position
 
@@ -441,6 +440,12 @@ class Parser:
         self.tags = {}
         self.filters = {}
         self.command_stack = []
+
+        # Custom template tags may store additional data on the parser that
+        # will be made available on the template instance. Library authors
+        # should use a key to namespace any added data. The 'django' namespace
+        # is reserved for internal use.
+        self.extra_data = {}
 
         if libraries is None:
             libraries = {}
@@ -635,7 +640,7 @@ filter_raw_string = r"""
          )?
  )""" % {
     "constant": constant_string,
-    "num": r"[-+\.]?\d[\d\.e]*",
+    "num": r"[-+.]?\d[\d.e]*",
     "var_chars": r"\w\.",
     "filter_sep": re.escape(FILTER_SEPARATOR),
     "arg_sep": re.escape(FILTER_ARGUMENT_SEPARATOR),
@@ -675,13 +680,12 @@ class FilterExpression:
                     "%s|%s|%s" % (token[:upto], token[upto:start], token[start:])
                 )
             if var_obj is None:
-                var, constant = match["var"], match["constant"]
-                if constant:
+                if constant := match["constant"]:
                     try:
                         var_obj = Variable(constant).resolve({})
                     except VariableDoesNotExist:
                         var_obj = None
-                elif var is None:
+                elif (var := match["var"]) is None:
                     raise TemplateSyntaxError(
                         "Could not find variable at start of %s." % token
                     )
@@ -690,10 +694,9 @@ class FilterExpression:
             else:
                 filter_name = match["filter_name"]
                 args = []
-                constant_arg, var_arg = match["constant_arg"], match["var_arg"]
-                if constant_arg:
+                if constant_arg := match["constant_arg"]:
                     args.append((False, Variable(constant_arg).resolve({})))
-                elif var_arg:
+                elif var_arg := match["var_arg"]:
                     args.append((True, Variable(var_arg)))
                 filter_func = parser.find_filter(filter_name)
                 self.args_check(filter_name, filter_func, args)
@@ -877,6 +880,10 @@ class Variable:
         try:  # catch-all for silent variable failures
             for bit in self.lookups:
                 try:  # dictionary lookup
+                    # Only allow if the metaclass implements __getitem__. See
+                    # https://docs.python.org/3/reference/datamodel.html#classgetitem-versus-getitem
+                    if not hasattr(type(current), "__getitem__"):
+                        raise TypeError
                     current = current[bit]
                     # ValueError/IndexError are for numpy.array lookup on
                     # numpy < 1.9 and 1.9+ respectively
@@ -913,15 +920,18 @@ class Variable:
                         try:  # method call (assuming no args required)
                             current = current()
                         except TypeError:
-                            signature = inspect.signature(current)
                             try:
-                                signature.bind()
-                            except TypeError:  # arguments *were* required
-                                current = (
-                                    context.template.engine.string_if_invalid
-                                )  # invalid method call
+                                signature = inspect.signature(current)
+                            except ValueError:  # No signature found.
+                                current = context.template.engine.string_if_invalid
                             else:
-                                raise
+                                try:
+                                    signature.bind()
+                                except TypeError:  # Arguments *were* required.
+                                    # Invalid method call.
+                                    current = context.template.engine.string_if_invalid
+                                else:
+                                    raise
         except Exception as e:
             template_name = getattr(context, "template_name", None) or "unknown"
             logger.debug(
@@ -977,9 +987,6 @@ class Node:
                         )
                     )
             raise
-
-    def __iter__(self):
-        yield self
 
     def get_nodes_by_type(self, nodetype):
         """

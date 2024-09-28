@@ -4,12 +4,16 @@ from xml.dom import minidom
 from django.contrib.sites.models import Site
 from django.contrib.syndication import views
 from django.core.exceptions import ImproperlyConfigured
+from django.templatetags.static import static
 from django.test import TestCase, override_settings
 from django.test.utils import requires_tz_support
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.feedgenerator import (
     Atom1Feed,
     Rss201rev2Feed,
+    Stylesheet,
+    SyndicationFeed,
     rfc2822_date,
     rfc3339_date,
 )
@@ -195,6 +199,45 @@ class SyndicationFeedTest(FeedTestCase):
             self.assertIsNone(
                 item.getElementsByTagName("guid")[0].attributes.get("isPermaLink")
             )
+
+    def test_rss2_feed_with_callable_object(self):
+        response = self.client.get("/syndication/rss2/with-callable-object/")
+        doc = minidom.parseString(response.content)
+        chan = doc.getElementsByTagName("rss")[0].getElementsByTagName("channel")[0]
+        self.assertChildNodeContent(chan, {"ttl": "700"})
+
+    def test_rss2_feed_with_decorated_methods(self):
+        response = self.client.get("/syndication/rss2/with-decorated-methods/")
+        doc = minidom.parseString(response.content)
+        chan = doc.getElementsByTagName("rss")[0].getElementsByTagName("channel")[0]
+        self.assertCategories(chan, ["javascript", "vue"])
+        self.assertChildNodeContent(
+            chan,
+            {
+                "title": "Overridden title -- decorated by @wraps.",
+                "description": "Overridden description -- decorated by @wraps.",
+                "ttl": "800 -- decorated by @wraps.",
+                "copyright": "Copyright (c) 2022, John Doe -- decorated by @wraps.",
+            },
+        )
+        items = chan.getElementsByTagName("item")
+        self.assertChildNodeContent(
+            items[0],
+            {
+                "title": (
+                    f"Overridden item title: {self.e1.title} -- decorated by @wraps."
+                ),
+                "description": "Overridden item description -- decorated by @wraps.",
+            },
+        )
+
+    def test_rss2_feed_with_wrong_decorated_methods(self):
+        msg = (
+            "Feed method 'item_description' decorated by 'wrapper' needs to use "
+            "@functools.wraps."
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            self.client.get("/syndication/rss2/with-wrong-decorated-methods/")
 
     def test_rss2_feed_guid_permalink_false(self):
         """
@@ -521,6 +564,125 @@ class SyndicationFeedTest(FeedTestCase):
                 )
                 doc = feed.writeString("utf-8")
                 self.assertIn(f'<{tag} href="https://feed.url.com" rel="self"/>', doc)
+
+    def test_stylesheets_none(self):
+        feed = Rss201rev2Feed(
+            title="test",
+            link="https://example.com",
+            description="test",
+            stylesheets=None,
+        )
+        self.assertNotIn("xml-stylesheet", feed.writeString("utf-8"))
+
+    def test_stylesheets(self):
+        testdata = [
+            # Plain strings.
+            ("/test.xsl", 'href="/test.xsl" type="text/xsl" media="screen"'),
+            ("/test.xslt", 'href="/test.xslt" type="text/xsl" media="screen"'),
+            ("/test.css", 'href="/test.css" type="text/css" media="screen"'),
+            ("/test", 'href="/test" media="screen"'),
+            (
+                "https://example.com/test.xsl",
+                'href="https://example.com/test.xsl" type="text/xsl" media="screen"',
+            ),
+            (
+                "https://example.com/test.css",
+                'href="https://example.com/test.css" type="text/css" media="screen"',
+            ),
+            (
+                "https://example.com/test",
+                'href="https://example.com/test" media="screen"',
+            ),
+            ("/♥.xsl", 'href="/%E2%99%A5.xsl" type="text/xsl" media="screen"'),
+            (
+                static("stylesheet.xsl"),
+                'href="/static/stylesheet.xsl" type="text/xsl" media="screen"',
+            ),
+            (
+                static("stylesheet.css"),
+                'href="/static/stylesheet.css" type="text/css" media="screen"',
+            ),
+            (static("stylesheet"), 'href="/static/stylesheet" media="screen"'),
+            (
+                reverse("syndication-xsl-stylesheet"),
+                'href="/syndication/stylesheet.xsl" type="text/xsl" media="screen"',
+            ),
+            (
+                reverse_lazy("syndication-xsl-stylesheet"),
+                'href="/syndication/stylesheet.xsl" type="text/xsl" media="screen"',
+            ),
+            # Stylesheet objects.
+            (
+                Stylesheet("/test.xsl"),
+                'href="/test.xsl" type="text/xsl" media="screen"',
+            ),
+            (Stylesheet("/test.xsl", mimetype=None), 'href="/test.xsl" media="screen"'),
+            (Stylesheet("/test.xsl", media=None), 'href="/test.xsl" type="text/xsl"'),
+            (Stylesheet("/test.xsl", mimetype=None, media=None), 'href="/test.xsl"'),
+            (
+                Stylesheet("/test.xsl", mimetype="text/xml"),
+                'href="/test.xsl" type="text/xml" media="screen"',
+            ),
+        ]
+        for stylesheet, expected in testdata:
+            feed = Rss201rev2Feed(
+                title="test",
+                link="https://example.com",
+                description="test",
+                stylesheets=[stylesheet],
+            )
+            doc = feed.writeString("utf-8")
+            with self.subTest(expected=expected):
+                self.assertIn(f"<?xml-stylesheet {expected}?>", doc)
+
+    def test_stylesheets_instructions_are_at_the_top(self):
+        response = self.client.get("/syndication/stylesheet/")
+        doc = minidom.parseString(response.content)
+        self.assertEqual(doc.childNodes[0].nodeName, "xml-stylesheet")
+        self.assertEqual(
+            doc.childNodes[0].data,
+            'href="/stylesheet1.xsl" type="text/xsl" media="screen"',
+        )
+        self.assertEqual(doc.childNodes[1].nodeName, "xml-stylesheet")
+        self.assertEqual(
+            doc.childNodes[1].data,
+            'href="/stylesheet2.xsl" type="text/xsl" media="screen"',
+        )
+
+    def test_stylesheets_typeerror_if_str_or_stylesheet(self):
+        for stylesheet, error_message in [
+            ("/stylesheet.xsl", "stylesheets should be a list, not <class 'str'>"),
+            (
+                Stylesheet("/stylesheet.xsl"),
+                "stylesheets should be a list, "
+                "not <class 'django.utils.feedgenerator.Stylesheet'>",
+            ),
+        ]:
+            args = ("title", "/link", "description")
+            with self.subTest(stylesheets=stylesheet):
+                self.assertRaisesMessage(
+                    TypeError,
+                    error_message,
+                    SyndicationFeed,
+                    *args,
+                    stylesheets=stylesheet,
+                )
+
+    def test_stylesheets_repr(self):
+        testdata = [
+            (Stylesheet("/test.xsl", mimetype=None), "('/test.xsl', None, 'screen')"),
+            (Stylesheet("/test.xsl", media=None), "('/test.xsl', 'text/xsl', None)"),
+            (
+                Stylesheet("/test.xsl", mimetype=None, media=None),
+                "('/test.xsl', None, None)",
+            ),
+            (
+                Stylesheet("/test.xsl", mimetype="text/xml"),
+                "('/test.xsl', 'text/xml', 'screen')",
+            ),
+        ]
+        for stylesheet, expected in testdata:
+            self.assertEqual(repr(stylesheet), expected)
 
     @requires_tz_support
     def test_feed_last_modified_time_naive_date(self):

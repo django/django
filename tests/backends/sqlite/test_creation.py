@@ -1,7 +1,9 @@
 import copy
+import multiprocessing
 import unittest
+from unittest import mock
 
-from django.db import DEFAULT_DB_ALIAS, connection, connections
+from django.db import DEFAULT_DB_ALIAS, NotSupportedError, connection, connections
 from django.test import SimpleTestCase
 
 
@@ -33,3 +35,9 @@ class TestDbSignatureTests(SimpleTestCase):
                 creation_class = test_connection.creation_class(test_connection)
                 clone_settings_dict = creation_class.get_test_db_clone_settings("1")
                 self.assertEqual(clone_settings_dict["NAME"], expected_clone_name)
+
+    @mock.patch.object(multiprocessing, "get_start_method", return_value="forkserver")
+    def test_get_test_db_clone_settings_not_supported(self, *mocked_objects):
+        msg = "Cloning with start method 'forkserver' is not supported."
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            connection.creation.get_test_db_clone_settings(1)

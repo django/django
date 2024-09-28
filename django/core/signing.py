@@ -8,16 +8,16 @@ The format used looks like this:
 
 There are two components here, separated by a ':'. The first component is a
 URLsafe base64 encoded JSON of the object passed to dumps(). The second
-component is a base64 encoded hmac/SHA1 hash of "$first_component:$secret"
+component is a base64 encoded hmac/SHA-256 hash of "$first_component:$secret"
 
 signing.loads(s) checks the signature and returns the deserialized object.
 If the signature fails, a BadSignature exception is raised.
 
 >>> signing.loads("ImhlbGxvIg:1QaUZC:YIye-ze3TTx7gtSv422nZA4sgmk")
 'hello'
->>> signing.loads("ImhlbGxvIg:1QaUZC:YIye-ze3TTx7gtSv422nZA4sgmk-modified")
+>>> signing.loads("ImhlbGxvIg:1QaUZC:YIye-ze3TTx7gtSv42-modified")
 ...
-BadSignature: Signature failed: ImhlbGxvIg:1QaUZC:YIye-ze3TTx7gtSv422nZA4sgmk-modified
+BadSignature: Signature "ImhlbGxvIg:1QaUZC:YIye-ze3TTx7gtSv42-modified" does not match
 
 You can optionally compress the JSON prior to base64 encoding it to save
 space, using the compress=True argument. This checks if compression actually
@@ -147,7 +147,7 @@ def dumps(
 
     The serializer is expected to return a bytestring.
     """
-    return TimestampSigner(key, salt=salt).sign_object(
+    return TimestampSigner(key=key, salt=salt).sign_object(
         obj, serializer=serializer, compress=compress
     )
 
@@ -165,7 +165,9 @@ def loads(
 
     The serializer is expected to accept a bytestring.
     """
-    return TimestampSigner(key, salt=salt, fallback_keys=fallback_keys).unsign_object(
+    return TimestampSigner(
+        key=key, salt=salt, fallback_keys=fallback_keys
+    ).unsign_object(
         s,
         serializer=serializer,
         max_age=max_age,
@@ -174,12 +176,7 @@ def loads(
 
 class Signer:
     def __init__(
-        self,
-        key=None,
-        sep=":",
-        salt=None,
-        algorithm=None,
-        fallback_keys=None,
+        self, *, key=None, sep=":", salt=None, algorithm=None, fallback_keys=None
     ):
         self.key = key or settings.SECRET_KEY
         self.fallback_keys = (
@@ -188,16 +185,16 @@ class Signer:
             else settings.SECRET_KEY_FALLBACKS
         )
         self.sep = sep
-        if _SEP_UNSAFE.match(self.sep):
-            raise ValueError(
-                "Unsafe Signer separator: %r (cannot be empty or consist of "
-                "only A-z0-9-_=)" % sep,
-            )
         self.salt = salt or "%s.%s" % (
             self.__class__.__module__,
             self.__class__.__name__,
         )
         self.algorithm = algorithm or "sha256"
+        if _SEP_UNSAFE.match(self.sep):
+            raise ValueError(
+                "Unsafe Signer separator: %r (cannot be empty or consist of "
+                "only A-z0-9-_=)" % sep,
+            )
 
     def signature(self, value, key=None):
         key = key or self.key

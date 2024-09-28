@@ -8,7 +8,6 @@ from subprocess import run
 from unittest import mock
 
 from django.core.management import CommandError, call_command, execute_from_command_line
-from django.core.management.commands.makemessages import Command as MakeMessagesCommand
 from django.core.management.utils import find_command
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import captured_stderr, captured_stdout
@@ -22,12 +21,10 @@ has_msgfmt = find_command("msgfmt")
 
 @unittest.skipUnless(has_msgfmt, "msgfmt is mandatory for compilation tests")
 class MessageCompilationTests(RunInTmpDirMixin, SimpleTestCase):
-
     work_subdir = "commands"
 
 
 class PoFileTests(MessageCompilationTests):
-
     LOCALE = "es_AR"
     MO_FILE = "locale/%s/LC_MESSAGES/django.mo" % LOCALE
     MO_FILE_EN = "locale/en/LC_MESSAGES/django.mo"
@@ -83,7 +80,6 @@ class PoFileContentsTests(MessageCompilationTests):
 
 
 class MultipleLocaleCompilationTests(MessageCompilationTests):
-
     MO_FILE_HR = None
     MO_FILE_FR = None
 
@@ -108,7 +104,6 @@ class MultipleLocaleCompilationTests(MessageCompilationTests):
 
 
 class ExcludedLocaleCompilationTests(MessageCompilationTests):
-
     work_subdir = "exclude"
 
     MO_FILE = "locale/%s/LC_MESSAGES/django.mo"
@@ -199,6 +194,64 @@ class IgnoreDirectoryCompilationTests(MessageCompilationTests):
         self.assertNoneExist(self.CACHE_DIR, ["en", "fr", "it"])
         self.assertNoneExist(self.NESTED_DIR, ["en", "fr", "it"])
 
+    def test_no_dirs_accidentally_skipped(self):
+        os_walk_results = [
+            # To discover .po filepaths, compilemessages uses with a starting list of
+            # basedirs to inspect, which in this scenario are:
+            #   ["conf/locale", "locale"]
+            # Then os.walk is used to discover other locale dirs, ignoring dirs matching
+            # `ignore_patterns`. Mock the results to place an ignored directory directly
+            # before and after a directory named "locale".
+            [("somedir", ["ignore", "locale", "ignore"], [])],
+            # This will result in three basedirs discovered:
+            #   ["conf/locale", "locale", "somedir/locale"]
+            # os.walk is called for each locale in each basedir looking for .po files.
+            # In this scenario, we need to mock os.walk results for "en", "fr", and "it"
+            # locales for each basedir:
+            [("exclude/locale/LC_MESSAGES", [], ["en.po"])],
+            [("exclude/locale/LC_MESSAGES", [], ["fr.po"])],
+            [("exclude/locale/LC_MESSAGES", [], ["it.po"])],
+            [("exclude/conf/locale/LC_MESSAGES", [], ["en.po"])],
+            [("exclude/conf/locale/LC_MESSAGES", [], ["fr.po"])],
+            [("exclude/conf/locale/LC_MESSAGES", [], ["it.po"])],
+            [("exclude/somedir/locale/LC_MESSAGES", [], ["en.po"])],
+            [("exclude/somedir/locale/LC_MESSAGES", [], ["fr.po"])],
+            [("exclude/somedir/locale/LC_MESSAGES", [], ["it.po"])],
+        ]
+
+        module_path = "django.core.management.commands.compilemessages"
+        with mock.patch(f"{module_path}.os.walk", side_effect=os_walk_results):
+            with mock.patch(f"{module_path}.os.path.isdir", return_value=True):
+                with mock.patch(
+                    f"{module_path}.Command.compile_messages"
+                ) as mock_compile_messages:
+                    call_command("compilemessages", ignore=["ignore"], verbosity=4)
+
+        expected = [
+            (
+                [
+                    ("exclude/locale/LC_MESSAGES", "en.po"),
+                    ("exclude/locale/LC_MESSAGES", "fr.po"),
+                    ("exclude/locale/LC_MESSAGES", "it.po"),
+                ],
+            ),
+            (
+                [
+                    ("exclude/conf/locale/LC_MESSAGES", "en.po"),
+                    ("exclude/conf/locale/LC_MESSAGES", "fr.po"),
+                    ("exclude/conf/locale/LC_MESSAGES", "it.po"),
+                ],
+            ),
+            (
+                [
+                    ("exclude/somedir/locale/LC_MESSAGES", "en.po"),
+                    ("exclude/somedir/locale/LC_MESSAGES", "fr.po"),
+                    ("exclude/somedir/locale/LC_MESSAGES", "it.po"),
+                ],
+            ),
+        ]
+        self.assertEqual([c.args for c in mock_compile_messages.mock_calls], expected)
+
 
 class CompilationErrorHandling(MessageCompilationTests):
     def test_error_reported_by_msgfmt(self):
@@ -215,9 +268,6 @@ class CompilationErrorHandling(MessageCompilationTests):
             "django.core.management.utils.run",
             lambda *args, **kwargs: run(*args, env=env, **kwargs),
         ):
-            cmd = MakeMessagesCommand()
-            if cmd.gettext_version < (0, 18, 3):
-                self.skipTest("python-brace-format is a recent gettext addition.")
             stderr = StringIO()
             with self.assertRaisesMessage(
                 CommandError, "compilemessages generated one or more errors"

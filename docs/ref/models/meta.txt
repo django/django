@@ -49,15 +49,15 @@ Retrieving a single field instance of a model by name
         >>> from django.contrib.auth.models import User
 
         # A field on the model
-        >>> User._meta.get_field('username')
+        >>> User._meta.get_field("username")
         <django.db.models.fields.CharField: username>
 
         # A field from another model that has a relation with the current model
-        >>> User._meta.get_field('logentry')
+        >>> User._meta.get_field("logentry")
         <ManyToOneRel: admin.logentry>
 
         # A non existent field
-        >>> User._meta.get_field('does_not_exist')
+        >>> User._meta.get_field("does_not_exist")
         Traceback (most recent call last):
             ...
         FieldDoesNotExist: User has no field named 'does_not_exist'
@@ -79,10 +79,7 @@ Retrieving all field instances of a model
 
     ``include_hidden``
         ``False`` by default. If set to ``True``, ``get_fields()`` will include
-        fields that are used to back other field's functionality. This will
-        also include any fields that have a ``related_name`` (such
-        as :class:`~django.db.models.ManyToManyField`, or
-        :class:`~django.db.models.ForeignKey`) that start with a "+".
+        :attr:`hidden fields <django.db.models.Field.hidden>`.
 
     .. code-block:: pycon
 

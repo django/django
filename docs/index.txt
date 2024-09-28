@@ -22,11 +22,12 @@ Are you new to Django or to programming? This is the place to start!
   :doc:`Part 4: Forms and generic views <intro/tutorial04>` |
   :doc:`Part 5: Testing <intro/tutorial05>` |
   :doc:`Part 6: Static files <intro/tutorial06>` |
-  :doc:`Part 7: Customizing the admin site <intro/tutorial07>`
+  :doc:`Part 7: Customizing the admin site <intro/tutorial07>` |
+  :doc:`Part 8: Adding third-party packages <intro/tutorial08>`
 
 * **Advanced Tutorials:**
   :doc:`How to write reusable apps <intro/reusable-apps>` |
-  :doc:`Writing your first patch for Django <intro/contributing>`
+  :doc:`Writing your first contribution to Django <intro/contributing>`
 
 Getting help
 ============
@@ -324,12 +325,12 @@ Learn about the development process for the Django project itself and about how
 you can contribute:
 
 * **Community:**
-  :doc:`How to get involved <internals/contributing/index>` |
+  :doc:`Contributing to Django <internals/contributing/index>` |
   :doc:`The release process <internals/release-process>` |
   :doc:`Team organization <internals/organization>` |
   :doc:`The Django source code repository <internals/git>` |
   :doc:`Security policies <internals/security>` |
-  :doc:`Mailing lists <internals/mailing-lists>`
+  :doc:`Mailing lists and Forum<internals/mailing-lists>`
 
 * **Design philosophies:**
   :doc:`Overview <misc/design-philosophies>`

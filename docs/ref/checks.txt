@@ -94,10 +94,6 @@ Django's system checks are organized using the following tags:
 
 Some checks may be registered with multiple tags.
 
-.. versionchanged:: 4.0
-
-    The ``files`` tag was added.
-
 Core system checks
 ==================
 
@@ -157,8 +153,6 @@ If you're using MySQL or MariaDB, the following checks will be performed:
 Managing files
 --------------
 
-.. versionadded:: 4.0
-
 The following checks verify your setup for :doc:`/topics/files`:
 
 * **files.E001**: The :setting:`FILE_UPLOAD_TEMP_DIR` setting refers to the
@@ -171,9 +165,11 @@ Model fields
 * **fields.E002**: Field names must not contain ``"__"``.
 * **fields.E003**: ``pk`` is a reserved word that cannot be used as a field
   name.
-* **fields.E004**: ``choices`` must be an iterable (e.g., a list or tuple).
-* **fields.E005**: ``choices`` must be an iterable containing ``(actual value,
-  human readable name)`` tuples.
+* **fields.E004**: ``choices`` must be a mapping (e.g. a dictionary) or an
+  iterable (e.g. a list or tuple).
+* **fields.E005**: ``choices`` must be a mapping of actual values to human
+  readable names or an iterable containing ``(actual value, human readable
+  name)`` tuples.
 * **fields.E006**: ``db_index`` must be ``None``, ``True`` or ``False``.
 * **fields.E007**: Primary keys must not have ``null=True``.
 * **fields.E008**: All ``validators`` must be callable.
@@ -181,6 +177,9 @@ Model fields
   ``choices`` (``<count>`` characters).
 * **fields.E010**: ``<field>`` default should be a callable instead of an
   instance so that it's not shared between all field instances.
+* **fields.E011**: ``<database>`` does not support default database values with
+  expressions (``db_default``).
+* **fields.E012**: ``<expression>`` cannot be used in ``db_default``.
 * **fields.E100**: ``AutoField``\s must set primary_key=True.
 * **fields.E110**: ``BooleanField``\s do not accept null values. *This check
   appeared before support for null values was added in Django 2.1.*
@@ -202,11 +201,20 @@ Model fields
 * **fields.W161**: Fixed default value provided.
 * **fields.W162**: ``<database>`` does not support a database index on
   ``<field data type>`` columns.
+* **fields.W163**: ``<database>`` does not support comments on columns
+  (``db_comment``).
 * **fields.E170**: ``BinaryField``’s ``default`` cannot be a string. Use bytes
   content instead.
 * **fields.E180**: ``<database>`` does not support ``JSONField``\s.
 * **fields.E190**: ``<database>`` does not support a database collation on
   ``<field_type>``\s.
+* **fields.E220**: ``<database>`` does not support ``GeneratedField``\s.
+* **fields.E221**: ``<database>`` does not support non-persisted
+  ``GeneratedField``\s.
+* **fields.E222**: ``<database>`` does not support persisted
+  ``GeneratedField``\s.
+* **fields.E223**: ``GeneratedField.output_field`` has errors: ...
+* **fields.W224**: ``GeneratedField.output_field`` has warnings: ...
 * **fields.E900**: ``IPAddressField`` has been removed except for support in
   historical migrations.
 * **fields.W900**: ``IPAddressField`` has been deprecated. Support for it
@@ -229,6 +237,21 @@ Model fields
   4.0. *This check appeared in Django 3.1 and 3.2*.
 * **fields.E904**: ``django.contrib.postgres.fields.JSONField`` is removed
   except for support in historical migrations.
+* **fields.W905**: ``django.contrib.postgres.fields.CICharField`` is
+  deprecated. Support for it (except in historical migrations) will be removed
+  in Django 5.1. *This check appeared in Django 4.2 and 5.0*.
+* **fields.E905**: ``django.contrib.postgres.fields.CICharField`` is removed
+  except for support in historical migrations.
+* **fields.W906**: ``django.contrib.postgres.fields.CIEmailField`` is
+  deprecated. Support for it (except in historical migrations) will be removed
+  in Django 5.1. *This check appeared in Django 4.2 and 5.0*.
+* **fields.E906**: ``django.contrib.postgres.fields.CIEmailField`` is removed
+  except for support in historical migrations.
+* **fields.W907**: ``django.contrib.postgres.fields.CITextField`` is
+  deprecated. Support for it (except in historical migrations) will be removed
+  in Django 5.1. *This check appeared in Django 4.2 and 5.0*.
+* **fields.E907**: ``django.contrib.postgres.fields.CITextField`` is removed
+  except for support for historical migrations.
 
 File fields
 ~~~~~~~~~~~
@@ -312,6 +335,7 @@ Related fields
   the table name of ``<model>``/``<model>.<field name>``.
 * **fields.W345**: ``related_name`` has no effect on ``ManyToManyField`` with a
   symmetrical relationship, e.g. to "self".
+* **fields.W346**: ``db_comment`` has no effect on ``ManyToManyField``.
 
 Models
 ------
@@ -329,21 +353,23 @@ Models
   ``<field name>`` from model ``<model>``.
 * **models.E007**: Field ``<field name>`` has column name ``<column name>``
   that is used by another field.
-* **models.E008**: ``index_together`` must be a list or tuple.
+* **models.E008**: ``index_together`` must be a list or tuple. *This check
+  appeared before Django 5.1.*
 * **models.E009**: All ``index_together`` elements must be lists or tuples.
+  *This check appeared before Django 5.1.*
 * **models.E010**: ``unique_together`` must be a list or tuple.
 * **models.E011**: All ``unique_together`` elements must be lists or tuples.
-* **models.E012**: ``constraints/indexes/index_together/unique_together``
-  refers to the nonexistent field ``<field name>``.
-* **models.E013**: ``constraints/indexes/index_together/unique_together``
-  refers to a ``ManyToManyField`` ``<field name>``, but ``ManyToManyField``\s
-  are not supported for that option.
+* **models.E012**: ``constraints/indexes/unique_together`` refers to the
+  nonexistent field ``<field name>``.
+* **models.E013**: ``constraints/indexes/unique_together`` refers to a
+  ``ManyToManyField`` ``<field name>``, but ``ManyToManyField``\s are not
+  supported for that option.
 * **models.E014**: ``ordering`` must be a tuple or list (even if you want to
   order by only one field).
 * **models.E015**: ``ordering`` refers to the nonexistent field, related field,
   or lookup ``<field name>``.
-* **models.E016**: ``constraints/indexes/index_together/unique_together``
-  refers to field ``<field_name>`` which is not local to model ``<model>``.
+* **models.E016**: ``constraints/indexes/unique_together`` refers to field
+  ``<field_name>`` which is not local to model ``<model>``.
 * **models.E017**: Proxy model ``<model>`` contains model fields.
 * **models.E018**: Autogenerated column name too long for field ``<field>``.
   Maximum length is ``<maximum length>`` for database ``<alias>``.
@@ -395,6 +421,12 @@ Models
 * **models.W043**: ``<database>`` does not support indexes on expressions.
 * **models.W044**: ``<database>`` does not support unique constraints on
   expressions.
+* **models.W045**: Check constraint ``<constraint>`` contains ``RawSQL()``
+  expression and won't be validated during the model ``full_clean()``.
+* **models.W046**: ``<database>`` does not support comments on tables
+  (``db_table_comment``).
+* **models.W047**: ``<database>`` does not support unique constraints with
+  nulls distinct.
 
 Security
 --------
@@ -543,11 +575,16 @@ configured:
 
 * **templates.E001**: You have ``'APP_DIRS': True`` in your
   :setting:`TEMPLATES` but also specify ``'loaders'`` in ``OPTIONS``. Either
-  remove ``APP_DIRS`` or remove the ``'loaders'`` option.
+  remove ``APP_DIRS`` or remove the ``'loaders'`` option. *This check is
+  removed in Django 5.1 as system checks may now raise*
+  ``ImproperlyConfigured`` *instead.*
 * **templates.E002**: ``string_if_invalid`` in :setting:`TEMPLATES`
   :setting:`OPTIONS <TEMPLATES-OPTIONS>` must be a string but got: ``{value}``
   (``{type}``).
 * **templates.E003**:``<name>`` is used for multiple template tag modules:
+  ``<module list>``. *This check was changed to* ``templates.W003`` *in Django
+  4.1.2*.
+* **templates.W003**:``<name>`` is used for multiple template tag modules:
   ``<module list>``.
 
 Translation
@@ -593,6 +630,8 @@ The following checks are performed on your URL configuration:
   imported.
 * **urls.E009**: Your URL pattern ``<pattern>`` has an invalid view, pass
   ``<view>.as_view()`` instead of ``<view>``.
+* **urls.W010**: Your URL pattern ``<pattern>`` has an unmatched
+  ``<angle bracket>``.
 
 ``contrib`` app checks
 ======================
@@ -621,9 +660,10 @@ with the admin site:
 * **admin.E011**: The value of ``fieldsets[n][1]`` must contain the key
   ``fields``.
 * **admin.E012**: There are duplicate field(s) in ``fieldsets[n][1]``.
-* **admin.E013**: ``fields[n]/fieldsets[n][m]`` cannot include the
-  ``ManyToManyField`` ``<field name>``, because that field manually specifies a
-  relationship model.
+* **admin.E013**: The value of
+  ``fields[n]/filter_horizontal[n]/filter_vertical[n]/fieldsets[n][m]`` cannot
+  include the ``ManyToManyField`` ``<field name>``, because that field manually
+  specifies a relationship model.
 * **admin.E014**: The value of ``exclude`` must be a list or tuple.
 * **admin.E015**: The value of ``exclude`` contains duplicate field(s).
 * **admin.E016**: The value of ``form`` must inherit from ``BaseModelForm``.
@@ -659,8 +699,9 @@ with the admin site:
 * **admin.E033**: The value of ``ordering`` refers to ``<field name>``, which
   is not a field of ``<model>``.
 * **admin.E034**: The value of ``readonly_fields`` must be a list or tuple.
-* **admin.E035**: The value of ``readonly_fields[n]`` is not a callable, an
-  attribute of ``<ModelAdmin class>``, or an attribute of ``<model>``.
+* **admin.E035**: The value of ``readonly_fields[n]`` refers to
+  ``<field_name>``, which is not a callable, an attribute of
+  ``<ModelAdmin class>``, or an attribute of ``<model>``.
 * **admin.E036**: The value of ``autocomplete_fields`` must be a list or tuple.
 * **admin.E037**: The value of ``autocomplete_fields[n]`` refers to
   ``<field name>``, which is not a field of ``<model>``.
@@ -687,11 +728,11 @@ with the admin site:
 * **admin.E106**: The value of ``<InlineModelAdmin class>.model`` must be a
   ``Model``.
 * **admin.E107**: The value of ``list_display`` must be a list or tuple.
-* **admin.E108**: The value of ``list_display[n]`` refers to ``<label>``,
-  which is not a callable, an attribute of ``<ModelAdmin class>``, or an
-  attribute or method on ``<model>``.
-* **admin.E109**: The value of ``list_display[n]`` must not be a
-  ``ManyToManyField`` field.
+* **admin.E108**: The value of ``list_display[n]`` refers to ``<label>``, which
+  is not a callable or attribute of ``<ModelAdmin class>``, or an attribute,
+  method, or field on ``<model>``.
+* **admin.E109**: The value of ``list_display[n]`` must not be a many-to-many
+  field or a reverse foreign key.
 * **admin.E110**: The value of ``list_display_links`` must be a list, a tuple,
   or ``None``.
 * **admin.E111**: The value of ``list_display_links[n]`` refers to ``<label>``,
@@ -827,6 +868,10 @@ The following checks are performed on the default
   for its builtin permission names to be at most 100 characters.
 * **auth.E012**: The permission codenamed ``<codename>`` of model ``<model>``
   is longer than 100 characters.
+* **auth.E013**: In order to use
+  :class:`django.contrib.auth.middleware.LoginRequiredMiddleware`,
+  :class:`django.contrib.auth.middleware.AuthenticationMiddleware` must be
+  defined before it in MIDDLEWARE.
 
 ``contenttypes``
 ----------------
@@ -855,6 +900,9 @@ fields:
 * **postgres.E003**: ``<field>`` default should be a callable instead of an
   instance so that it's not shared between all field instances. *This check was
   changed to* ``fields.E010`` *in Django 3.1*.
+* **postgres.W004**: Base field for array has warnings: ...
+
+.. _sites-system-checks:
 
 ``sites``
 ---------
@@ -886,3 +934,5 @@ configured:
   :setting:`STATICFILES_DIRS` setting must not end with a slash.
 * **staticfiles.W004**: The directory ``<directory>`` in the
   :setting:`STATICFILES_DIRS` does not exist.
+* **staticfiles.E005**: The :setting:`STORAGES` setting must define a
+  ``staticfiles`` storage.

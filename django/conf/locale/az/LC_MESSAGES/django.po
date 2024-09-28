@@ -4,14 +4,17 @@
 # Emin Mastizada <emin@linux.com>, 2018,2020
 # Emin Mastizada <emin@linux.com>, 2015-2016
 # Metin Amiroff <amiroff@gmail.com>, 2011
+# Nicat Məmmədov <n1c4t97@gmail.com>, 2022
+# Nijat Mammadov, 2024
+# Sevdimali <sevdimaliisayev@mail.ru>, 2024
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-27 22:40+0200\n"
-"PO-Revision-Date: 2020-01-12 07:21+0000\n"
-"Last-Translator: Emin Mastizada <emin@linux.com>\n"
-"Language-Team: Azerbaijani (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 06:49+0000\n"
+"Last-Translator: Sevdimali <sevdimaliisayev@mail.ru>, 2024\n"
+"Language-Team: Azerbaijani (http://app.transifex.com/django/django/language/"
 "az/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -23,52 +26,58 @@ msgid "Afrikaans"
 msgstr "Afrikaans"
 
 msgid "Arabic"
-msgstr "Ərəbcə"
+msgstr "Ərəb"
+
+msgid "Algerian Arabic"
+msgstr "Əlcəzair Ərəbcəsi"
 
 msgid "Asturian"
-msgstr "Asturiyaca"
+msgstr "Asturiya"
 
 msgid "Azerbaijani"
-msgstr "Azərbaycanca"
+msgstr "Azərbaycan"
 
 msgid "Bulgarian"
-msgstr "Bolqarca"
+msgstr "Bolqar"
 
 msgid "Belarusian"
-msgstr "Belarusca"
+msgstr "Belarus"
 
 msgid "Bengali"
-msgstr "Benqalca"
+msgstr "Benqal"
 
 msgid "Breton"
-msgstr "Bretonca"
+msgstr "Breton"
 
 msgid "Bosnian"
-msgstr "Bosniyaca"
+msgstr "Bosniya"
 
 msgid "Catalan"
-msgstr "Katalanca"
+msgstr "Katalon"
+
+msgid "Central Kurdish (Sorani)"
+msgstr "Mərkəzi Kürd dili (Sorani)"
 
 msgid "Czech"
-msgstr "Çexcə"
+msgstr "Çex"
 
 msgid "Welsh"
-msgstr "Uelscə"
+msgstr "Uels"
 
 msgid "Danish"
-msgstr "Danimarkaca"
+msgstr "Danimarka"
 
 msgid "German"
-msgstr "Almanca"
+msgstr "Alman"
 
 msgid "Lower Sorbian"
-msgstr "Aşağı Sorbca"
+msgstr "Aşağı Sorb"
 
 msgid "Greek"
-msgstr "Yunanca"
+msgstr "Yunan"
 
 msgid "English"
-msgstr "İngiliscə"
+msgstr "İngilis"
 
 msgid "Australian English"
 msgstr "Avstraliya İngiliscəsi"
@@ -80,7 +89,7 @@ msgid "Esperanto"
 msgstr "Esperanto"
 
 msgid "Spanish"
-msgstr "İspanca"
+msgstr "İspan"
 
 msgid "Argentinian Spanish"
 msgstr "Argentina İspancası"
@@ -98,70 +107,73 @@ msgid "Venezuelan Spanish"
 msgstr "Venesuela İspancası"
 
 msgid "Estonian"
-msgstr "Estonca"
+msgstr "Eston"
 
 msgid "Basque"
-msgstr "Baskca"
+msgstr "Bask"
 
 msgid "Persian"
-msgstr "Farsca"
+msgstr "Fars"
 
 msgid "Finnish"
-msgstr "Fincə"
+msgstr "Fin"
 
 msgid "French"
-msgstr "Fransızca"
+msgstr "Fransız"
 
 msgid "Frisian"
-msgstr "Friscə"
+msgstr "Fris"
 
 msgid "Irish"
-msgstr "İrlandca"
+msgstr "İrland"
 
 msgid "Scottish Gaelic"
 msgstr "Şotland Keltcəsi"
 
 msgid "Galician"
-msgstr "Qallik dili"
+msgstr "Qalisiya"
 
 msgid "Hebrew"
-msgstr "İbranicə"
+msgstr "İvrit"
 
 msgid "Hindi"
-msgstr "Hindcə"
+msgstr "Hind"
 
 msgid "Croatian"
-msgstr "Xorvatca"
+msgstr "Xorvat"
 
 msgid "Upper Sorbian"
-msgstr "Üst Sorbca"
+msgstr "Yuxarı Sorb"
 
 msgid "Hungarian"
-msgstr "Macarca"
+msgstr "Macar"
 
 msgid "Armenian"
-msgstr "Ermənicə"
+msgstr "Erməni"
 
 msgid "Interlingua"
 msgstr "İnterlinqua"
 
 msgid "Indonesian"
-msgstr "İndonezcə"
+msgstr "İndoneziya dili"
+
+msgid "Igbo"
+msgstr "İqbo"
 
 msgid "Ido"
-msgstr "İdoca"
+msgstr "İdo"
 
 msgid "Icelandic"
-msgstr "İslandca"
+msgstr "İsland"
 
 msgid "Italian"
-msgstr "İtalyanca"
+msgstr "İtalyan"
 
 msgid "Japanese"
-msgstr "Yaponca"
+msgstr "Yapon"
 
 msgid "Georgian"
-msgstr "Gürcücə"
+msgstr "Gürcü"
 
 msgid "Kabyle"
 msgstr "Kabile"
@@ -170,37 +182,43 @@ msgid "Kazakh"
 msgstr "Qazax"
 
 msgid "Khmer"
-msgstr "Kxmercə"
+msgstr "Xmer"
 
 msgid "Kannada"
-msgstr "Kannada dili"
+msgstr "Kannada"
 
 msgid "Korean"
-msgstr "Koreyca"
+msgstr "Koreya"
+
+msgid "Kyrgyz"
+msgstr "Qırğız"
 
 msgid "Luxembourgish"
-msgstr "Lüksemburqca"
+msgstr "Lüksemburq"
 
 msgid "Lithuanian"
-msgstr "Litva dili"
+msgstr "Litva"
 
 msgid "Latvian"
-msgstr "Latviya dili"
+msgstr "Latış"
 
 msgid "Macedonian"
-msgstr "Makedonca"
+msgstr "Makedon"
 
 msgid "Malayalam"
-msgstr "Malayamca"
+msgstr "Malayam"
 
 msgid "Mongolian"
-msgstr "Monqolca"
+msgstr "Monqol"
 
 msgid "Marathi"
-msgstr "Marathicə"
+msgstr "Marathi"
+
+msgid "Malay"
+msgstr "Malay"
 
 msgid "Burmese"
-msgstr "Burmescə"
+msgstr "Birman"
 
 msgid "Norwegian Bokmål"
 msgstr "Norveç Bukmolcası"
@@ -209,88 +227,97 @@ msgid "Nepali"
 msgstr "Nepal"
 
 msgid "Dutch"
-msgstr "Flamandca"
+msgstr "Niderland"
 
 msgid "Norwegian Nynorsk"
-msgstr "Nynorsk Norveçcəsi"
+msgstr "Norveç Nyunorskcası"
 
 msgid "Ossetic"
-msgstr "Osetincə"
+msgstr "Osetin"
 
 msgid "Punjabi"
-msgstr "Pancabicə"
+msgstr "Pəncab"
 
 msgid "Polish"
-msgstr "Polyakca"
+msgstr "Polyak"
 
 msgid "Portuguese"
-msgstr "Portuqalca"
+msgstr "Portuqal"
 
 msgid "Brazilian Portuguese"
 msgstr "Braziliya Portuqalcası"
 
 msgid "Romanian"
-msgstr "Rumınca"
+msgstr "Rumın"
 
 msgid "Russian"
-msgstr "Rusca"
+msgstr "Rus"
 
 msgid "Slovak"
-msgstr "Slovakca"
+msgstr "Slovak"
 
 msgid "Slovenian"
-msgstr "Slovencə"
+msgstr "Sloven"
 
 msgid "Albanian"
-msgstr "Albanca"
+msgstr "Alban"
 
 msgid "Serbian"
-msgstr "Serbcə"
+msgstr "Serb"
 
 msgid "Serbian Latin"
-msgstr "Serbcə Latın"
+msgstr "Serb (Latın)"
 
 msgid "Swedish"
-msgstr "İsveçcə"
+msgstr "İsveç"
 
 msgid "Swahili"
 msgstr "Suahili"
 
 msgid "Tamil"
-msgstr "Tamilcə"
+msgstr "Tamil"
 
 msgid "Telugu"
-msgstr "Teluqu dili"
+msgstr "Teluqu"
+
+msgid "Tajik"
+msgstr "Tacik"
 
 msgid "Thai"
-msgstr "Tayca"
+msgstr "Tay"
+
+msgid "Turkmen"
+msgstr "Türkmən"
 
 msgid "Turkish"
-msgstr "Türkcə"
+msgstr "Türk"
 
 msgid "Tatar"
 msgstr "Tatar"
 
 msgid "Udmurt"
-msgstr "Udmurtca"
+msgstr "Udmurt"
+
+msgid "Uyghur"
+msgstr "Uyğur"
 
 msgid "Ukrainian"
-msgstr "Ukraynaca"
+msgstr "Ukrayn"
 
 msgid "Urdu"
-msgstr "Urduca"
+msgstr "Urdu"
 
 msgid "Uzbek"
-msgstr "Özbəkcə"
+msgstr "Özbək"
 
 msgid "Vietnamese"
-msgstr "Vyetnamca"
+msgstr "Vyetnam"
 
 msgid "Simplified Chinese"
-msgstr "Sadələşdirilmiş Çincə"
+msgstr "Sadələşdirilmiş Çin dili"
 
 msgid "Traditional Chinese"
-msgstr "Ənənəvi Çincə"
+msgstr "Ənənəvi Çin dili"
 
 msgid "Messages"
 msgstr "Mesajlar"
@@ -304,6 +331,11 @@ msgstr "Statik Fayllar"
 msgid "Syndication"
 msgstr "Sindikasiya"
 
+#. Translators: String used to replace omitted page numbers in elided page
+#. range generated by paginators, e.g. [1, 2, '…', 5, 6, 7, '…', 9, 10].
+msgid "…"
+msgstr "…"
+
 msgid "That page number is not an integer"
 msgstr "Səhifə nömrəsi rəqəm deyil"
 
@@ -311,10 +343,13 @@ msgid "That page number is less than 1"
 msgstr "Səhifə nömrəsi 1-dən balacadır"
 
 msgid "That page contains no results"
-msgstr "Səhifədə nəticə yoxdur"
+msgstr "O səhifədə nəticə yoxdur"
 
 msgid "Enter a valid value."
-msgstr "Düzgün qiymət daxil edin."
+msgstr "Düzgün dəyər daxil edin."
+
+msgid "Enter a valid domain name."
+msgstr "Düzgün domen adı daxil edin."
 
 msgid "Enter a valid URL."
 msgstr "Düzgün URL daxil edin."
@@ -339,31 +374,52 @@ msgstr ""
 "Unicode hərflərdən, rəqəmlərdən, alt-xətlərdən və ya defislərdən ibarət "
 "düzgün qısaltma (“slug”) daxil edin."
 
-msgid "Enter a valid IPv4 address."
-msgstr "Düzgün IPv4 ünvanı daxil edin."
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr "Düzgün %(protocol)s adres daxil edin."
 
-msgid "Enter a valid IPv6 address."
-msgstr "Düzgün IPv6 ünvanını daxil edin."
+msgid "IPv4"
+msgstr "IPv4"
 
-msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "Düzgün IPv4 və ya IPv6 ünvanını daxil edin."
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "IPv4 or IPv6"
+msgstr "IPv4 və ya IPv6"
 
 msgid "Enter only digits separated by commas."
 msgstr "Vergüllə ayırmaqla yalnız rəqəmlər daxil edin."
 
 #, python-format
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
-msgstr "Əmin edin ki, bu qiymət %(limit_value)s-dir (bu %(show_value)s-dir)."
+msgstr ""
+"Əmin olun ki, bu dəyər %(limit_value)s-dir/dır (bu %(show_value)s-dir/dır)."
 
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr ""
-"Bu qiymətin %(limit_value)s-ya bərabər və ya ondan kiçik olduğunu yoxlayın."
+"Bu qiymətin %(limit_value)s-(y)a/ə bərabər və ya ondan kiçik olduğunu "
+"yoxlayın."
 
 #, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr ""
-"Bu qiymətin %(limit_value)s-ya bərabər və ya ondan böyük olduğunu yoxlayın."
+"Bu qiymətin %(limit_value)s-(y)a/ə bərabər və ya ondan böyük olduğunu "
+"yoxlayın."
+
+#, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr ""
+"Bu dəyərin %(limit_value)s addım ölçüsünün mərtəbələri olduğundan əmin olun."
+
+#, python-format
+msgid ""
+"Ensure this value is a multiple of step size %(limit_value)s, starting from "
+"%(offset)s, e.g. %(offset)s, %(valid_value1)s, %(valid_value2)s, and so on."
+msgstr ""
+"Bu dəyərin %(offset)s dəyərindən başlayaraq %(limit_value)s addım ölçüsü "
+"mərtəbəsi olduğundan əmin olun. Məs: %(offset)s, %(valid_value1)s, "
+"%(valid_value2)s və s."
 
 #, python-format
 msgid ""
@@ -374,10 +430,10 @@ msgid_plural ""
 "%(show_value)d)."
 msgstr[0] ""
 "Bu dəyərin ən az %(limit_value)d simvol olduğuna əmin olun (%(show_value)d "
-"var)"
+"simvol var)"
 msgstr[1] ""
 "Bu dəyərin ən az %(limit_value)d simvol olduğuna əmin olun (%(show_value)d "
-"var)"
+"simvol var)"
 
 #, python-format
 msgid ""
@@ -388,10 +444,10 @@ msgid_plural ""
 "%(show_value)d)."
 msgstr[0] ""
 "Bu dəyərin ən çox %(limit_value)d simvol olduğuna əmin olun (%(show_value)d "
-"var)"
+"simvol var)"
 msgstr[1] ""
 "Bu dəyərin ən çox %(limit_value)d simvol olduğuna əmin olun (%(show_value)d "
-"var)"
+"simvol var)"
 
 msgid "Enter a number."
 msgstr "Ədəd daxil edin."
@@ -435,6 +491,10 @@ msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr "%(field_labels)s ilə %(model_name)s artıq mövcuddur."
 
 #, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr "“%(name)s” məhdudiyyəti pozuldu."
+
+#, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "%(value)r dəyəri doğru seçim deyil."
 
@@ -448,8 +508,8 @@ msgstr "Bu sahə ağ qala bilməz."
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s bu %(field_label)s sahə ilə artıq mövcuddur."
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -463,7 +523,7 @@ msgstr "Sahənin tipi: %(field_type)s"
 
 #, python-format
 msgid "“%(value)s” value must be either True or False."
-msgstr "“%(value)s” dəyəri True və ya False olmalıdır."
+msgstr "“%(value)s” dəyəri ya True, ya da False olmalıdır."
 
 #, python-format
 msgid "“%(value)s” value must be either True, False, or None."
@@ -475,6 +535,9 @@ msgstr "Bul (ya Doğru, ya Yalan)"
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "Sətir (%(max_length)s simvola kimi)"
+
+msgid "String (unlimited)"
+msgstr "Sətir (limitsiz)"
 
 msgid "Comma-separated integers"
 msgstr "Vergüllə ayrılmış tam ədədlər"
@@ -491,7 +554,7 @@ msgid ""
 "“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
-"“%(value)s” dəyəri düzgün formatdadır (YYYY-MM-DD) amma bu tarix xətalıdır."
+"“%(value)s” dəyəri düzgün formatdadır (YYYY-MM-DD), amma bu tarix xətalıdır."
 
 msgid "Date (without time)"
 msgstr "Tarix (saatsız)"
@@ -556,6 +619,9 @@ msgstr "Tam ədəd"
 msgid "Big (8 byte) integer"
 msgstr "Böyük (8 bayt) tam ədəd"
 
+msgid "Small integer"
+msgstr "Kiçik tam ədəd"
+
 msgid "IPv4 address"
 msgstr "IPv4 ünvanı"
 
@@ -567,7 +633,10 @@ msgid "“%(value)s” value must be either None, True or False."
 msgstr "“%(value)s” dəyəri None, True və ya False olmalıdır."
 
 msgid "Boolean (Either True, False or None)"
-msgstr "Bul (Ya Doğru, ya Yalan, ya da Heç nə)"
+msgstr "Bul (Ya True, ya False, ya da None)"
+
+msgid "Positive big integer"
+msgstr "Müsbət böyük rəqəm"
 
 msgid "Positive integer"
 msgstr "Müsbət tam ədəd"
@@ -578,9 +647,6 @@ msgstr "Müsbət tam kiçik ədəd"
 #, python-format
 msgid "Slug (up to %(max_length)s)"
 msgstr "Əzmə (%(max_length)s simvola kimi)"
-
-msgid "Small integer"
-msgstr "Kiçik tam ədəd"
 
 msgid "Text"
 msgstr "Mətn"
@@ -621,6 +687,12 @@ msgstr "Fayl"
 
 msgid "Image"
 msgstr "Şəkil"
+
+msgid "A JSON object"
+msgstr "JSON obyekti"
+
+msgid "Value must be valid JSON."
+msgstr "Dəyər düzgün JSON olmalıdır."
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
@@ -713,6 +785,9 @@ msgstr "Tam dəyər daxil edin."
 msgid "Enter a valid UUID."
 msgstr "Keçərli UUID daxil et."
 
+msgid "Enter a valid JSON."
+msgstr "Etibarlı bir JSON daxil edin."
+
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
 msgstr ":"
@@ -721,20 +796,26 @@ msgstr ":"
 msgid "(Hidden field %(name)s) %(error)s"
 msgstr "(Gizli %(name)s sahəsi) %(error)s"
 
-msgid "ManagementForm data is missing or has been tampered with"
-msgstr "ManagementForm məlumatları əksikdir və ya korlanıb"
+#, python-format
+msgid ""
+"ManagementForm data is missing or has been tampered with. Missing fields: "
+"%(field_names)s. You may need to file a bug report if the issue persists."
+msgstr ""
+"ManagementForm datası ya əskikdir, ya da dəyişdirilib. Çatışmayan xanalar: "
+"%(field_names)s. Problem davam edərsə, səhv hesabatı təqdim etməli ola "
+"bilərsiniz."
 
 #, python-format
-msgid "Please submit %d or fewer forms."
-msgid_plural "Please submit %d or fewer forms."
-msgstr[0] "Lütfən %d və ya daha az forma göndərin."
-msgstr[1] "Lütfən %d və ya daha az forma göndərin."
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] "Zəhmət olmasa ən çox %(num)d forma təsdiqləyin."
+msgstr[1] "Zəhmət olmasa ən çox %(num)d forma təsdiqləyin."
 
 #, python-format
-msgid "Please submit %d or more forms."
-msgid_plural "Please submit %d or more forms."
-msgstr[0] "Lütfən %d və ya daha çox forma göndərin."
-msgstr[1] "Lütfən %d və ya daha çox forma göndərin."
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] "Zəhmət olmasa ən az %(num)d forma təsdiqləyin."
+msgstr[1] "Zəhmət olmasa ən az %(num)d forma təsdiqləyin."
 
 msgid "Order"
 msgstr "Sırala"
@@ -779,7 +860,7 @@ msgid ""
 "may be ambiguous or it may not exist."
 msgstr ""
 "%(datetime)s vaxtı %(current_timezone)s zaman qurşağında ifadə oluna bilmir; "
-"ya duallıq, ya da mövcud olmaya bilər."
+"ya qeyri-müəyyənlik, ya da mövcud olmaya bilər."
 
 msgid "Clear"
 msgstr "Təmizlə"
@@ -799,15 +880,7 @@ msgstr "Hə"
 msgid "No"
 msgstr "Yox"
 
-msgid "Year"
-msgstr "İl"
-
-msgid "Month"
-msgstr "Ay"
-
-msgid "Day"
-msgstr "Gün"
-
+#. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
 msgstr "hə,yox,bəlkə"
 
@@ -838,16 +911,16 @@ msgid "%s PB"
 msgstr "%s PB"
 
 msgid "p.m."
-msgstr "p.m."
+msgstr "g.s."
 
 msgid "a.m."
-msgstr "a.m."
+msgstr "g.ə."
 
 msgid "PM"
-msgstr "PM"
+msgstr "GS"
 
 msgid "AM"
-msgstr "AM"
+msgstr "GƏ"
 
 msgid "midnight"
 msgstr "gecə yarısı"
@@ -1003,7 +1076,7 @@ msgstr "Avq."
 
 msgctxt "abbrev. month"
 msgid "Sept."
-msgstr "Sent."
+msgstr "Sen."
 
 msgctxt "abbrev. month"
 msgid "Oct."
@@ -1081,43 +1154,40 @@ msgid ", "
 msgstr ", "
 
 #, python-format
-msgid "%d year"
-msgid_plural "%d years"
-msgstr[0] "%d il"
-msgstr[1] "%d il"
+msgid "%(num)d year"
+msgid_plural "%(num)d years"
+msgstr[0] "%(num)d il"
+msgstr[1] "%(num)d il"
 
 #, python-format
-msgid "%d month"
-msgid_plural "%d months"
-msgstr[0] "%d ay"
-msgstr[1] "%d ay"
+msgid "%(num)d month"
+msgid_plural "%(num)d months"
+msgstr[0] "%(num)d ay"
+msgstr[1] "%(num)d ay"
 
 #, python-format
-msgid "%d week"
-msgid_plural "%d weeks"
-msgstr[0] "%d həftə"
-msgstr[1] "%d həftə"
+msgid "%(num)d week"
+msgid_plural "%(num)d weeks"
+msgstr[0] "%(num)d həftə"
+msgstr[1] "%(num)d həftə"
 
 #, python-format
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d gün"
-msgstr[1] "%d gün"
+msgid "%(num)d day"
+msgid_plural "%(num)d days"
+msgstr[0] "%(num)d gün"
+msgstr[1] "%(num)d gün"
 
 #, python-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d saat"
-msgstr[1] "%d saat"
+msgid "%(num)d hour"
+msgid_plural "%(num)d hours"
+msgstr[0] "%(num)d saat"
+msgstr[1] "%(num)d saat"
 
 #, python-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d dəqiqə"
-msgstr[1] "%d dəqiqə"
-
-msgid "0 minutes"
-msgstr "0 dəqiqə"
+msgid "%(num)d minute"
+msgid_plural "%(num)d minutes"
+msgstr[0] "%(num)d dəqiqə"
+msgstr[1] "%(num)d dəqiqə"
 
 msgid "Forbidden"
 msgstr "Qadağan"
@@ -1127,13 +1197,14 @@ msgstr "CSRF təsdiqləmə alınmadı. Sorğu ləğv edildi."
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a “Referer "
-"header” to be sent by your Web browser, but none was sent. This header is "
+"header” to be sent by your web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
-"Bu HTTPS sayt səyyahınız tərəfindən “Referer header” göndərilməsini tələb "
-"edir, amma göndərilmir. Bu başlıq səyyahınızın üçüncü biri tərəfindən hack-"
-"lənmədiyinə əmin olmaq üçün istifadə edilir."
+"Bu mesajı ona görə görürsünüz ki, bu HTTPS saytı sizin səyyah tərəfindən "
+"“Referer header”in göndərilməsini tələb etdiyi halda heç nə "
+"göndərilməmişdir. Bu başlıq sizin veb-səyyahınızın kənar şəxlər tərəfindən "
+"ələ keçirilmədiyindən əmin olmaq üçün tələb olunur."
 
 msgid ""
 "If you have configured your browser to disable “Referer” headers, please re-"
@@ -1148,14 +1219,14 @@ msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
 "including the “Referrer-Policy: no-referrer” header, please remove them. The "
 "CSRF protection requires the “Referer” header to do strict referer checking. "
-"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" …> for links to third-party sites."
+"If you’re concerned about privacy, use alternatives like <a "
+"rel=\"noreferrer\" …> for links to third-party sites."
 msgstr ""
 "Əgər <meta name=\"referrer\" content=\"no-referrer\"> etiketini və ya "
 "“Referrer-Policy: no-referrer” başlığını işlədirsinizsə, lütfən silin. CSRF "
 "qoruma dəqiq yönləndirən yoxlaması üçün “Referer” başlığını tələb edir. Əgər "
-"məxfilik üçün düşünürsünüzsə, üçüncü tərəf sayt keçidləri üçün <a rel="
-"\"noreferrer\" ...> kimi bir alternativ işlədin."
+"məxfilik üçün düşünürsünüzsə, üçüncü tərəf sayt keçidləri üçün <a "
+"rel=\"noreferrer\" ...> kimi bir alternativ işlədin."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
@@ -1216,7 +1287,7 @@ msgstr "Səhifə həm “axırıncı” deyil, həm də tam ədədə çevrilə b
 
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
-msgstr "Qeyri-düzgün səhifə (%(page_number)s): %(message)s"
+msgstr "Yanlış səhifə (%(page_number)s): %(message)s"
 
 #, python-format
 msgid "Empty list and “%(class_name)s.allow_empty” is False."
@@ -1233,8 +1304,8 @@ msgstr "“%(path)s” mövcud deyil"
 msgid "Index of %(directory)s"
 msgstr "%(directory)s-nin indeksi"
 
-msgid "Django: the Web framework for perfectionists with deadlines."
-msgstr "Django: tələsən mükəmməlləkçilər üçün Web framework."
+msgid "The install worked successfully! Congratulations!"
+msgstr "Quruluş uğurla tamamlandı! Təbriklər!"
 
 #, python-format
 msgid ""
@@ -1245,22 +1316,20 @@ msgstr ""
 "%(version)s/releases/\" target=\"_blank\" rel=\"noopener\">buraxılış "
 "qeydlərinə</a> baxın"
 
-msgid "The install worked successfully! Congratulations!"
-msgstr "Quruluş uğurla tamamlandı! Təbriklər!"
-
 #, python-format
 msgid ""
 "You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> is in your settings file and you have not configured any "
-"URLs."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
+"configured any URLs."
 msgstr ""
 "Tənzimləmə faylınızda <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> və heç bir URL qurmadığınız üçün bu səhifəni görürsünüz."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> və heç bir URL qurmadığınız üçün bu səhifəni "
+"görürsünüz."
 
 msgid "Django Documentation"
-msgstr "Django Sənədləri"
+msgstr "Django Dokumentasiya"
 
 msgid "Topics, references, &amp; how-to’s"
 msgstr "Mövzular, istinadlar və nümunələr"
@@ -1269,7 +1338,7 @@ msgid "Tutorial: A Polling App"
 msgstr "Məşğələ: Səsvermə Tətbiqi"
 
 msgid "Get started with Django"
-msgstr "Django-ya başla"
+msgstr "Django ilə başla"
 
 msgid "Django Community"
 msgstr "Django İcması"

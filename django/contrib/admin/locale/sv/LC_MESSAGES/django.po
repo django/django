@@ -1,14 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Albin Larsson <albin.post@gmail.com>, 2022-2023
 # Alex Nordlund <deep.alexander@gmail.com>, 2012
+# Anders Hovmöller <boxed@killingar.net>, 2023
 # Andreas Pelme <andreas@pelme.se>, 2014
 # d7bcbd5f5cbecdc2b959899620582440, 2011
 # Cybjit <cybjit@gmail.com>, 2012
+# Elias Johnstone <eli87as@gmail.com>, 2022
 # Henrik Palmlund Wahlgren <henrik@pwit.se>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Johan Rohdin, 2021
 # Jonathan Lindén, 2015
+# Jörgen Olofsson, 2024
 # Jonathan Lindén, 2014
 # metteludwig <luudde@gmail.com>, 2019
 # Mattias Hansson <mattias.gothenburg@gmail.com>, 2016
@@ -18,10 +22,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-04-01 12:33+0000\n"
-"Last-Translator: Johan Rohdin\n"
-"Language-Team: Swedish (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 07:05+0000\n"
+"Last-Translator: Jörgen Olofsson, 2024\n"
+"Language-Team: Swedish (http://app.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -81,10 +85,10 @@ msgid "Has date"
 msgstr "Har datum"
 
 msgid "Empty"
-msgstr ""
+msgstr "Tom"
 
 msgid "Not empty"
-msgstr ""
+msgstr "Inte tom"
 
 #, python-format
 msgid ""
@@ -189,6 +193,9 @@ msgid "Hold down “Control”, or “Command” on a Mac, to select more than o
 msgstr ""
 "Håll inne “Control”, eller “Command” på en Mac, för att välja fler än en."
 
+msgid "Select this object for an action - {}"
+msgstr "Välj detta objekt för en åtgärd - {}"
+
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr "Lade till {name} “{obj}”."
@@ -205,10 +212,6 @@ msgstr "Lade till {name} “{obj}”. Du kan lägga till ytterligare {name} neda
 msgid ""
 "The {name} “{obj}” was changed successfully. You may edit it again below."
 msgstr "Ändrade {name} “{obj}”. Du kan göra ytterligare förändringar nedan."
-
-#, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr "Lade till {name} “{obj}”. Du kan göra ytterligare förändringar nedan."
 
 #, python-brace-format
 msgid ""
@@ -272,8 +275,9 @@ msgstr "0 av %(cnt)s valda"
 msgid "Change history: %s"
 msgstr "Ändringshistorik: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -343,6 +347,9 @@ msgstr "Välj alla %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Rensa urval"
 
+msgid "Breadcrumbs"
+msgstr "Brödsmulor"
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "Modeller i applikationen %(name)s"
@@ -369,15 +376,33 @@ msgstr "Mata in användarnamn och lösenord."
 msgid "Change password"
 msgstr "Ändra lösenord"
 
-msgid "Please correct the error below."
-msgstr "Vänligen rätta nedanstående fel"
+msgid "Set password"
+msgstr "Sätt lösenord"
 
-msgid "Please correct the errors below."
-msgstr "Vänligen rätta till felen nedan."
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Var god rätta felet nedan."
+msgstr[1] "Vad god rätta felen nedan."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Ange nytt lösenord för användare <strong>%(username)s</strong>."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+"Denna åtgärd <strong>aktiverar</strong>  lösenordsbaserad autentisering för "
+"denna användare."
+
+msgid "Disable password-based authentication"
+msgstr "Inaktivera lösenordsbaserad autentisering"
+
+msgid "Enable password-based authentication"
+msgstr "Aktivera lösenordsbaserad autentisering"
+
+msgid "Skip to main content"
+msgstr "Hoppa till huvudinnehållet"
 
 msgid "Welcome,"
 msgstr "Välkommen,"
@@ -404,8 +429,14 @@ msgstr "Visa på webbplats"
 msgid "Filter"
 msgstr "Filtrera"
 
+msgid "Hide counts"
+msgstr "Dölj antal"
+
+msgid "Show counts"
+msgstr "Visa antal"
+
 msgid "Clear all filters"
-msgstr ""
+msgstr "Rensa alla filter"
 
 msgid "Remove from sorting"
 msgstr "Ta bort från sortering"
@@ -416,6 +447,15 @@ msgstr "Sorteringsprioritet: %(priority_number)s"
 
 msgid "Toggle sorting"
 msgstr "Ändra sorteringsordning"
+
+msgid "Toggle theme (current theme: auto)"
+msgstr "Växla tema (aktuellt tema: automatiskt)"
+
+msgid "Toggle theme (current theme: light)"
+msgstr "Växla tema (aktuellt tema: ljust)"
+
+msgid "Toggle theme (current theme: dark)"
+msgstr "Växla tema (aktuellt tema: mörkt)"
 
 msgid "Delete"
 msgstr "Radera"
@@ -503,6 +543,15 @@ msgstr "Mina händelser"
 msgid "None available"
 msgstr "Inga tillgängliga"
 
+msgid "Added:"
+msgstr "Lagt till:"
+
+msgid "Changed:"
+msgstr "Ändrade:"
+
+msgid "Deleted:"
+msgstr "Raderade:"
+
 msgid "Unknown content"
 msgstr "Okänt innehåll"
 
@@ -527,7 +576,16 @@ msgid "Forgotten your password or username?"
 msgstr "Har du glömt lösenordet eller användarnamnet?"
 
 msgid "Toggle navigation"
-msgstr ""
+msgstr "Växla navigering"
+
+msgid "Sidebar"
+msgstr "Sidopanel"
+
+msgid "Start typing to filter…"
+msgstr "Börja skriv för att filtrera..."
+
+msgid "Filter navigation items"
+msgstr "Filtrera navigeringsobjekt"
 
 msgid "Date/time"
 msgstr "Datum tid"
@@ -537,6 +595,11 @@ msgstr "Användare"
 
 msgid "Action"
 msgstr "Händelse"
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] "post"
+msgstr[1] "poster"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -594,8 +657,12 @@ msgstr "Lägg till %(model)s"
 msgid "Delete selected %(model)s"
 msgstr "Ta bort markerade %(model)s"
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Tack för att du spenderade lite kvalitetstid med webbplatsen idag."
+#, python-format
+msgid "View selected %(model)s"
+msgstr "Visa valda %(model)s"
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr "Tack för att du spenderade kvalitetstid med webbplatsen idag."
 
 msgid "Log in again"
 msgstr "Logga in igen"
@@ -693,6 +760,9 @@ msgstr "E-postadress:"
 
 msgid "Reset my password"
 msgstr "Nollställ mitt lösenord"
+
+msgid "Select all objects on this page for an action"
+msgstr "Välj alla objekt på denna sida för en åtgärd"
 
 msgid "All dates"
 msgstr "Alla datum"

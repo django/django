@@ -166,12 +166,20 @@ class AutocompleteMixinTests(TestCase):
         )
         languages = (
             ("de", "de"),
+            # Subsequent language codes are used when the language code is not
+            # supported.
+            ("de-at", "de"),
+            ("de-ch-1901", "de"),
+            ("en-latn-us", "en"),
+            ("nl-nl-x-informal", "nl"),
+            ("zh-hans-HK", "zh-CN"),
             # Language with code 00 does not exist.
             ("00", None),
             # Language files are case sensitive.
             ("sr-cyrl", "sr-Cyrl"),
             ("zh-hans", "zh-CN"),
             ("zh-hant", "zh-TW"),
+            (None, None),
         )
         for lang, select_lang in languages:
             with self.subTest(lang=lang):

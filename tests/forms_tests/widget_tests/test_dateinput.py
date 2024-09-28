@@ -1,6 +1,6 @@
 from datetime import date
 
-from django.forms import DateInput
+from django.forms import CharField, DateInput, Form
 from django.utils import translation
 
 from .base import WidgetTest
@@ -59,4 +59,17 @@ class DateInputTest(WidgetTest):
             "date",
             date(2007, 9, 17),
             html='<input type="text" name="date" value="17.09.2007">',
+        )
+
+    def test_fieldset(self):
+        class TestForm(Form):
+            template_name = "forms_tests/use_fieldset.html"
+            field = CharField(widget=self.widget)
+
+        form = TestForm()
+        self.assertIs(self.widget.use_fieldset, False)
+        self.assertHTMLEqual(
+            form.render(),
+            '<div><label for="id_field">Field:</label>'
+            '<input id="id_field" name="field" required type="text"></div>',
         )

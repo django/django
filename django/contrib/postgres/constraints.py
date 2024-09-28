@@ -1,14 +1,13 @@
-import warnings
+from types import NoneType
 
-from django.contrib.postgres.indexes import OpClass
-from django.db import NotSupportedError
+from django.core.exceptions import ValidationError
+from django.db import DEFAULT_DB_ALIAS
 from django.db.backends.ddl_references import Expressions, Statement, Table
-from django.db.models import Deferrable, F, Q
-from django.db.models.constraints import BaseConstraint
-from django.db.models.expressions import ExpressionList
+from django.db.models import BaseConstraint, Deferrable, F, Q
+from django.db.models.expressions import Exists, ExpressionList
 from django.db.models.indexes import IndexExpression
+from django.db.models.lookups import PostgresOperatorLookup
 from django.db.models.sql import Query
-from django.utils.deprecation import RemovedInDjango50Warning
 
 __all__ = ["ExclusionConstraint"]
 
@@ -32,7 +31,8 @@ class ExclusionConstraint(BaseConstraint):
         condition=None,
         deferrable=None,
         include=None,
-        opclasses=(),
+        violation_error_code=None,
+        violation_error_message=None,
     ):
         if index_type and index_type.lower() not in {"gist", "spgist"}:
             raise ValueError(
@@ -47,53 +47,42 @@ class ExclusionConstraint(BaseConstraint):
             isinstance(expr, (list, tuple)) and len(expr) == 2 for expr in expressions
         ):
             raise ValueError("The expressions must be a list of 2-tuples.")
-        if not isinstance(condition, (type(None), Q)):
+        if not isinstance(condition, (NoneType, Q)):
             raise ValueError("ExclusionConstraint.condition must be a Q instance.")
-        if condition and deferrable:
-            raise ValueError("ExclusionConstraint with conditions cannot be deferred.")
-        if not isinstance(deferrable, (type(None), Deferrable)):
+        if not isinstance(deferrable, (NoneType, Deferrable)):
             raise ValueError(
                 "ExclusionConstraint.deferrable must be a Deferrable instance."
             )
-        if not isinstance(include, (type(None), list, tuple)):
+        if not isinstance(include, (NoneType, list, tuple)):
             raise ValueError("ExclusionConstraint.include must be a list or tuple.")
-        if not isinstance(opclasses, (list, tuple)):
-            raise ValueError("ExclusionConstraint.opclasses must be a list or tuple.")
-        if opclasses and len(expressions) != len(opclasses):
-            raise ValueError(
-                "ExclusionConstraint.expressions and "
-                "ExclusionConstraint.opclasses must have the same number of "
-                "elements."
-            )
         self.expressions = expressions
         self.index_type = index_type or "GIST"
         self.condition = condition
         self.deferrable = deferrable
         self.include = tuple(include) if include else ()
-        self.opclasses = opclasses
-        if self.opclasses:
-            warnings.warn(
-                "The opclasses argument is deprecated in favor of using "
-                "django.contrib.postgres.indexes.OpClass in "
-                "ExclusionConstraint.expressions.",
-                category=RemovedInDjango50Warning,
-                stacklevel=2,
-            )
-        super().__init__(name=name)
+        super().__init__(
+            name=name,
+            violation_error_code=violation_error_code,
+            violation_error_message=violation_error_message,
+        )
 
     def _get_expressions(self, schema_editor, query):
         expressions = []
         for idx, (expression, operator) in enumerate(self.expressions):
             if isinstance(expression, str):
                 expression = F(expression)
-            try:
-                expression = OpClass(expression, self.opclasses[idx])
-            except IndexError:
-                pass
             expression = ExclusionConstraintExpression(expression, operator=operator)
             expression.set_wrapper_classes(schema_editor.connection)
             expressions.append(expression)
         return ExpressionList(*expressions).resolve_expression(query)
+
+    def _check(self, model, connection):
+        references = set()
+        for expr, _ in self.expressions:
+            if isinstance(expr, str):
+                expr = F(expr)
+            references.update(model._get_expr_references(expr))
+        return self._check_references(model, references)
 
     def _get_condition_sql(self, compiler, schema_editor, query):
         if self.condition is None:
@@ -125,7 +114,6 @@ class ExclusionConstraint(BaseConstraint):
         )
 
     def create_sql(self, model, schema_editor):
-        self.check_supported(schema_editor)
         return Statement(
             "ALTER TABLE %(table)s ADD %(constraint)s",
             table=Table(model._meta.db_table, schema_editor.quote_name),
@@ -139,26 +127,6 @@ class ExclusionConstraint(BaseConstraint):
             schema_editor.quote_name(self.name),
         )
 
-    def check_supported(self, schema_editor):
-        if (
-            self.include
-            and self.index_type.lower() == "gist"
-            and not schema_editor.connection.features.supports_covering_gist_indexes
-        ):
-            raise NotSupportedError(
-                "Covering exclusion constraints using a GiST index require "
-                "PostgreSQL 12+."
-            )
-        if (
-            self.include
-            and self.index_type.lower() == "spgist"
-            and not schema_editor.connection.features.supports_covering_spgist_indexes
-        ):
-            raise NotSupportedError(
-                "Covering exclusion constraints using an SP-GiST index "
-                "require PostgreSQL 14+."
-            )
-
     def deconstruct(self):
         path, args, kwargs = super().deconstruct()
         kwargs["expressions"] = self.expressions
@@ -170,8 +138,6 @@ class ExclusionConstraint(BaseConstraint):
             kwargs["deferrable"] = self.deferrable
         if self.include:
             kwargs["include"] = self.include
-        if self.opclasses:
-            kwargs["opclasses"] = self.opclasses
         return path, args, kwargs
 
     def __eq__(self, other):
@@ -183,12 +149,13 @@ class ExclusionConstraint(BaseConstraint):
                 and self.condition == other.condition
                 and self.deferrable == other.deferrable
                 and self.include == other.include
-                and self.opclasses == other.opclasses
+                and self.violation_error_code == other.violation_error_code
+                and self.violation_error_message == other.violation_error_message
             )
         return super().__eq__(other)
 
     def __repr__(self):
-        return "<%s: index_type=%s expressions=%s name=%s%s%s%s%s>" % (
+        return "<%s: index_type=%s expressions=%s name=%s%s%s%s%s%s>" % (
             self.__class__.__qualname__,
             repr(self.index_type),
             repr(self.expressions),
@@ -196,5 +163,52 @@ class ExclusionConstraint(BaseConstraint):
             "" if self.condition is None else " condition=%s" % self.condition,
             "" if self.deferrable is None else " deferrable=%r" % self.deferrable,
             "" if not self.include else " include=%s" % repr(self.include),
-            "" if not self.opclasses else " opclasses=%s" % repr(self.opclasses),
+            (
+                ""
+                if self.violation_error_code is None
+                else " violation_error_code=%r" % self.violation_error_code
+            ),
+            (
+                ""
+                if self.violation_error_message is None
+                or self.violation_error_message == self.default_violation_error_message
+                else " violation_error_message=%r" % self.violation_error_message
+            ),
         )
+
+    def validate(self, model, instance, exclude=None, using=DEFAULT_DB_ALIAS):
+        queryset = model._default_manager.using(using)
+        replacement_map = instance._get_field_expression_map(
+            meta=model._meta, exclude=exclude
+        )
+        replacements = {F(field): value for field, value in replacement_map.items()}
+        lookups = []
+        for expression, operator in self.expressions:
+            if isinstance(expression, str):
+                expression = F(expression)
+            if exclude and self._expression_refs_exclude(model, expression, exclude):
+                return
+            rhs_expression = expression.replace_expressions(replacements)
+            if hasattr(expression, "get_expression_for_validation"):
+                expression = expression.get_expression_for_validation()
+            if hasattr(rhs_expression, "get_expression_for_validation"):
+                rhs_expression = rhs_expression.get_expression_for_validation()
+            lookup = PostgresOperatorLookup(lhs=expression, rhs=rhs_expression)
+            lookup.postgres_operator = operator
+            lookups.append(lookup)
+        queryset = queryset.filter(*lookups)
+        model_class_pk = instance._get_pk_val(model._meta)
+        if not instance._state.adding and instance._is_pk_set(model._meta):
+            queryset = queryset.exclude(pk=model_class_pk)
+        if not self.condition:
+            if queryset.exists():
+                raise ValidationError(
+                    self.get_violation_error_message(), code=self.violation_error_code
+                )
+        else:
+            if (self.condition & Exists(queryset.filter(self.condition))).check(
+                replacement_map, using=using
+            ):
+                raise ValidationError(
+                    self.get_violation_error_message(), code=self.violation_error_code
+                )

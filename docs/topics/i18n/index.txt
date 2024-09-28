@@ -54,10 +54,9 @@ More details can be found in the `W3C Web Internationalization FAQ`_, the `Wikip
 
 .. warning::
 
-    Translation and formatting are controlled by :setting:`USE_I18N` and
-    :setting:`USE_L10N` settings respectively. However, both features involve
-    internationalization and localization. The names of the settings are an
-    unfortunate result of Django's history.
+    Translation is controlled by the :setting:`USE_I18N` setting. However, it
+    involves internationalization and localization. The name of the setting is
+    an unfortunate result of Django's history.
 
 Here are some other terms that will help us to handle a common language:
 

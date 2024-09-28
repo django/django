@@ -1,8 +1,9 @@
 import unittest
 from contextlib import contextmanager
+from unittest import mock
 
 from django.core.exceptions import ImproperlyConfigured
-from django.db import connection
+from django.db import NotSupportedError, connection
 from django.test import TestCase, override_settings
 
 
@@ -16,7 +17,6 @@ def get_connection():
 @override_settings(DEBUG=True)
 @unittest.skipUnless(connection.vendor == "mysql", "MySQL tests")
 class IsolationLevelTests(TestCase):
-
     read_committed = "read committed"
     repeatable_read = "repeatable read"
     isolation_values = {
@@ -99,3 +99,19 @@ class IsolationLevelTests(TestCase):
         )
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             new_connection.cursor()
+
+
+@unittest.skipUnless(connection.vendor == "mysql", "MySQL tests")
+class Tests(TestCase):
+    @mock.patch.object(connection, "get_database_version")
+    def test_check_database_version_supported(self, mocked_get_database_version):
+        if connection.mysql_is_mariadb:
+            mocked_get_database_version.return_value = (10, 4)
+            msg = "MariaDB 10.5 or later is required (found 10.4)."
+        else:
+            mocked_get_database_version.return_value = (8, 0, 4)
+            msg = "MySQL 8.0.11 or later is required (found 8.0.4)."
+
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            connection.check_database_version_supported()
+        self.assertTrue(mocked_get_database_version.called)

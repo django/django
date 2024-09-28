@@ -24,3 +24,6 @@ class Pool(models.Model):
 class PoolStyle(models.Model):
     name = models.CharField(max_length=30)
     pool = models.OneToOneField(Pool, models.CASCADE)
+    another_pool = models.OneToOneField(
+        Pool, models.CASCADE, null=True, related_name="another_style"
+    )

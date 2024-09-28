@@ -55,11 +55,10 @@ code.
 Django tools
 ~~~~~~~~~~~~
 
-`django-debug-toolbar
-<https://github.com/jazzband/django-debug-toolbar/>`_ is a very handy tool that
-provides insights into what your code is doing and how much time it spends
-doing it. In particular it can show you all the SQL queries your page is
-generating, and how long each one has taken.
+:pypi:`django-debug-toolbar` is a very handy tool that provides insights into
+what your code is doing and how much time it spends doing it. In particular it
+can show you all the SQL queries your page is generating, and how long each one
+has taken.
 
 Third-party panels are also available for the toolbar, that can (for example)
 report on cache performance and template rendering times.
@@ -75,7 +74,7 @@ These can't report on the internals of your code, but can provide a useful
 insight into your site's overall performance, including aspects that can't be
 adequately measured from within Django environment. Examples include:
 
-* `Yahoo's Yslow <http://yslow.org/>`_
+* `Yahoo's Yslow <https://yslow.org/>`_
 * `Google PageSpeed <https://developers.google.com/speed/>`_
 
 There are also several paid-for services that perform a similar analysis,
@@ -120,9 +119,13 @@ do them faster than the template language can::
     # of the Python objects
     len(my_bicycles)
 
-    # Django template filter
-    # slower still, because it will have to count them in Python anyway,
-    # and because of template language overheads
+.. code-block:: html+django
+
+    <!--
+    Django template filter
+    slower still, because it will have to count them in Python anyway,
+    and because of template language overheads
+    -->
     {{ my_bicycles|length }}
 
 Generally speaking, the most appropriate level for the job is the lowest-level

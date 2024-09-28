@@ -1,9 +1,10 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Antoni Aloy <aaloy@apsl.net>, 2012,2015-2017,2021
+# Antoni Aloy <aaloy@apsl.net>, 2012,2015-2017,2021-2022
 # Carles Barrobés <carles@barrobes.com>, 2011-2012,2014,2020
 # duub qnnp, 2015
+# Emilio Carrion, 2022
 # Gil Obradors Via <gil.obradors@gmail.com>, 2019
 # Gil Obradors Via <gil.obradors@gmail.com>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -16,9 +17,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-11-24 16:29+0000\n"
-"Last-Translator: Mariusz Felisiak <felisiak.mariusz@gmail.com>\n"
+"POT-Creation-Date: 2022-05-17 05:23-0500\n"
+"PO-Revision-Date: 2022-07-25 06:49+0000\n"
+"Last-Translator: Emilio Carrion\n"
 "Language-Team: Catalan (http://www.transifex.com/django/django/language/"
 "ca/)\n"
 "MIME-Version: 1.0\n"
@@ -73,7 +74,7 @@ msgid "German"
 msgstr "alemany"
 
 msgid "Lower Sorbian"
-msgstr "Lower Sorbian"
+msgstr "baix serbi"
 
 msgid "Greek"
 msgstr "grec"
@@ -145,7 +146,7 @@ msgid "Croatian"
 msgstr "croat"
 
 msgid "Upper Sorbian"
-msgstr "Upper Sorbian"
+msgstr "alt serbi"
 
 msgid "Hungarian"
 msgstr "hongarès"
@@ -217,7 +218,7 @@ msgid "Marathi"
 msgstr "Maratí"
 
 msgid "Malay"
-msgstr ""
+msgstr "Malai"
 
 msgid "Burmese"
 msgstr "Burmès"
@@ -226,7 +227,7 @@ msgid "Norwegian Bokmål"
 msgstr "Bokmål noruec"
 
 msgid "Nepali"
-msgstr "Nepalès"
+msgstr "nepalès"
 
 msgid "Dutch"
 msgstr "holandès"
@@ -235,7 +236,7 @@ msgid "Norwegian Nynorsk"
 msgstr "noruec nynorsk"
 
 msgid "Ossetic"
-msgstr "Ossètic"
+msgstr "ossètic"
 
 msgid "Punjabi"
 msgstr "panjabi"
@@ -398,6 +399,12 @@ msgstr ""
 "Assegureu-vos que aquest valor sigui més gran o igual que %(limit_value)s."
 
 #, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr ""
+" \n"
+"Asseguri's que aquest valor sigui un múltiple de %(limit_value)s."
+
+#, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
 "%(show_value)d)."
@@ -469,6 +476,10 @@ msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr "Ja existeix %(model_name)s amb aquest %(field_labels)s."
 
 #, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr "La restricció %(name)s no es compleix."
+
+#, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "El valor %(value)r no és una opció vàlida."
 
@@ -482,8 +493,8 @@ msgstr "Aquest camp no pot estar en blanc."
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "Ja existeix %(model_name)s amb aquest %(field_label)s."
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -500,7 +511,7 @@ msgstr "El valor '%(value)s' ha de ser \"True\" o \"False\"."
 
 #, python-format
 msgid "“%(value)s” value must be either True, False, or None."
-msgstr "El valor '%(value)s' ha de ser cert, fals o cap."
+msgstr "El valor '%(value)s' ha de ser cert, fals o buid."
 
 msgid "Boolean (Either True or False)"
 msgstr "Booleà (Cert o Fals)"
@@ -576,7 +587,7 @@ msgstr "Ruta del fitxer"
 
 #, python-format
 msgid "“%(value)s” value must be a float."
-msgstr "El valor '%(value)s' ha de ser un número de coma flotant."
+msgstr "El valor '%(value)s' ha de ser un número decimal."
 
 msgid "Floating point number"
 msgstr "Número de coma flotant"
@@ -783,16 +794,16 @@ msgstr ""
 "persisteix."
 
 #, python-format
-msgid "Please submit at most %d form."
-msgid_plural "Please submit at most %d forms."
-msgstr[0] "Si uns plau, envia com a màxim %d formulari"
-msgstr[1] "Si us plau, envia com a màxim %d formularis"
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] "Enviau com a màxim %(num)d formulari, si us plau."
+msgstr[1] "Enviau com a màxim %(num)d formularis, si us plau."
 
 #, python-format
-msgid "Please submit at least %d form."
-msgid_plural "Please submit at least %d forms."
-msgstr[0] "Sisplau envieu com a mínim %d formulari."
-msgstr[1] "Si us plau envieu com a mínim %d formularis."
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] "Enviau com a mínim %(num)d formulari, si us plau."
+msgstr[1] "Enviau com a mínim %(num)d formularis, si us plau."
 
 msgid "Order"
 msgstr "Ordre"

@@ -31,7 +31,9 @@ class BaseContext:
     def _reset_dicts(self, value=None):
         builtins = {"True": True, "False": False, "None": None}
         self.dicts = [builtins]
-        if value is not None:
+        if isinstance(value, BaseContext):
+            self.dicts += value.dicts[1:]
+        elif value is not None:
             self.dicts.append(value)
 
     def __copy__(self):
@@ -251,7 +253,15 @@ class RequestContext(Context):
         processors = template.engine.template_context_processors + self._processors
         updates = {}
         for processor in processors:
-            updates.update(processor(self.request))
+            context = processor(self.request)
+            try:
+                updates.update(context)
+            except TypeError as e:
+                raise TypeError(
+                    f"Context processor {processor.__qualname__} didn't return a "
+                    "dictionary."
+                ) from e
+
         self.dicts[self._processors_index] = updates
 
         try:

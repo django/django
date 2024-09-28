@@ -1,4 +1,4 @@
-from django.forms import CheckboxInput
+from django.forms import BooleanField, CheckboxInput, Form
 
 from .base import WidgetTest
 
@@ -124,3 +124,16 @@ class CheckboxInputTest(WidgetTest):
         attrs = {"checked": False}
         self.widget.get_context("name", True, attrs)
         self.assertIs(attrs["checked"], False)
+
+    def test_fieldset(self):
+        class TestForm(Form):
+            template_name = "forms_tests/use_fieldset.html"
+            field = BooleanField(widget=self.widget)
+
+        form = TestForm()
+        self.assertIs(self.widget.use_fieldset, False)
+        self.assertHTMLEqual(
+            form.render(),
+            '<div><label for="id_field">Field:</label>'
+            '<input id="id_field" name="field" required type="checkbox"></div>',
+        )

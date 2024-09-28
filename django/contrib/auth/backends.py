@@ -53,8 +53,7 @@ class ModelBackend(BaseBackend):
         Reject users with is_active=False. Custom user models that don't have
         that attribute are allowed.
         """
-        is_active = getattr(user, "is_active", None)
-        return is_active or is_active is None
+        return getattr(user, "is_active", True)
 
     def _get_user_permissions(self, user_obj):
         return user_obj.user_permissions.all()
@@ -192,6 +191,7 @@ class RemoteUserBackend(ModelBackend):
         """
         if not remote_user:
             return
+        created = False
         user = None
         username = self.clean_username(remote_user)
 
@@ -202,13 +202,12 @@ class RemoteUserBackend(ModelBackend):
             user, created = UserModel._default_manager.get_or_create(
                 **{UserModel.USERNAME_FIELD: username}
             )
-            if created:
-                user = self.configure_user(request, user)
         else:
             try:
                 user = UserModel._default_manager.get_by_natural_key(username)
             except UserModel.DoesNotExist:
                 pass
+        user = self.configure_user(request, user, created=created)
         return user if self.user_can_authenticate(user) else None
 
     def clean_username(self, username):
@@ -220,9 +219,9 @@ class RemoteUserBackend(ModelBackend):
         """
         return username
 
-    def configure_user(self, request, user):
+    def configure_user(self, request, user, created=True):
         """
-        Configure a user after creation and return the updated user.
+        Configure a user and return the updated user.
 
         By default, return the user unmodified.
         """

@@ -89,8 +89,7 @@ class OGRInspectTest(SimpleTestCase):
         # Same test with a 25D-type geometry field
         shp_file = os.path.join(TEST_DATA, "gas_lines", "gas_leitung.shp")
         model_def = ogrinspect(shp_file, "MyModel", multi_geom=True)
-        srid = "-1" if GDAL_VERSION < (2, 3) else "31253"
-        self.assertIn("geom = models.MultiLineStringField(srid=%s)" % srid, model_def)
+        self.assertIn("geom = models.MultiLineStringField(srid=31253)", model_def)
 
     def test_date_field(self):
         shp_file = os.path.join(TEST_DATA, "cities", "cities.shp")
@@ -143,8 +142,8 @@ class OGRInspectTest(SimpleTestCase):
 
         # The ordering of model fields might vary depending on several factors
         # (version of GDAL, etc.).
-        if connection.vendor == "sqlite":
-            # SpatiaLite introspection is somewhat lacking (#29461).
+        if connection.vendor == "sqlite" and GDAL_VERSION < (3, 4):
+            # SpatiaLite introspection is somewhat lacking on GDAL < 3.4 (#29461).
             self.assertIn("    f_decimal = models.CharField(max_length=0)", model_def)
         else:
             self.assertIn(
@@ -156,7 +155,7 @@ class OGRInspectTest(SimpleTestCase):
             # Probably a bug between GDAL and MariaDB on time fields.
             self.assertIn("    f_datetime = models.DateTimeField()", model_def)
             self.assertIn("    f_time = models.TimeField()", model_def)
-        if connection.vendor == "sqlite":
+        if connection.vendor == "sqlite" and GDAL_VERSION < (3, 4):
             self.assertIn("    f_float = models.CharField(max_length=0)", model_def)
         else:
             self.assertIn("    f_float = models.FloatField()", model_def)
@@ -204,7 +203,7 @@ def get_ogr_db_string():
     GDAL will create its own connection to the database, so we re-use the
     connection settings from the Django test.
     """
-    db = connections.databases["default"]
+    db = connections.settings["default"]
 
     # Map from the django backend into the OGR driver name and database identifier
     # https://gdal.org/drivers/vector/

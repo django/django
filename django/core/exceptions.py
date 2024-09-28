@@ -1,6 +1,7 @@
 """
 Global Django exception and warning classes.
 """
+
 import operator
 
 from django.utils.hashable import make_hashable
@@ -62,6 +63,15 @@ class TooManyFieldsSent(SuspiciousOperation):
     """
     The number of fields in a GET or POST request exceeded
     settings.DATA_UPLOAD_MAX_NUMBER_FIELDS.
+    """
+
+    pass
+
+
+class TooManyFilesSent(SuspiciousOperation):
+    """
+    The number of fields in a GET or POST request exceeded
+    settings.DATA_UPLOAD_MAX_NUMBER_FILES.
     """
 
     pass
@@ -229,6 +239,12 @@ class ValidationError(Exception):
 
 class EmptyResultSet(Exception):
     """A database query predicate is impossible."""
+
+    pass
+
+
+class FullResultSet(Exception):
+    """A database query predicate is matches everything."""
 
     pass
 

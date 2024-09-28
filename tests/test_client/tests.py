@@ -19,6 +19,8 @@ testing against the contexts and templates produced by a view,
 rather than the HTML rendered to the end-user.
 
 """
+
+import copy
 import itertools
 import tempfile
 from unittest import mock
@@ -44,7 +46,7 @@ from .views import TwoArgException, get_view, post_view, trace_view
 
 def middleware_urlconf(get_response):
     def middleware(request):
-        request.urlconf = "tests.test_client.urls_middleware_urlconf"
+        request.urlconf = "test_client.urls_middleware_urlconf"
         return get_response(request)
 
     return middleware
@@ -53,7 +55,7 @@ def middleware_urlconf(get_response):
 @async_only_middleware
 def async_middleware_urlconf(get_response):
     async def middleware(request):
-        request.urlconf = "tests.test_client.urls_middleware_urlconf"
+        request.urlconf = "test_client.urls_middleware_urlconf"
         return await get_response(request)
 
     return middleware
@@ -79,6 +81,25 @@ class ClientTest(TestCase):
         self.assertContains(response, "This is a test")
         self.assertEqual(response.context["var"], "\xf2")
         self.assertEqual(response.templates[0].name, "GET Template")
+
+    def test_copy_response(self):
+        tests = ["/cbv_view/", "/get_view/"]
+        for url in tests:
+            with self.subTest(url=url):
+                response = self.client.get(url)
+                response_copy = copy.copy(response)
+                self.assertEqual(repr(response), repr(response_copy))
+                self.assertIs(response_copy.client, response.client)
+                self.assertIs(response_copy.resolver_match, response.resolver_match)
+                self.assertIs(response_copy.wsgi_request, response.wsgi_request)
+
+    async def test_copy_response_async(self):
+        response = await self.async_client.get("/async_get_view/")
+        response_copy = copy.copy(response)
+        self.assertEqual(repr(response), repr(response_copy))
+        self.assertIs(response_copy.client, response.client)
+        self.assertIs(response_copy.resolver_match, response.resolver_match)
+        self.assertIs(response_copy.asgi_request, response.asgi_request)
 
     def test_query_string_encoding(self):
         # WSGI requires latin-1 encoded strings.
@@ -437,10 +458,10 @@ class ClientTest(TestCase):
         response = self.client.post("/form_view/", post_data)
         self.assertContains(response, "This field is required.", 3)
         self.assertTemplateUsed(response, "Invalid POST Template")
-
-        self.assertFormError(response, "form", "email", "This field is required.")
-        self.assertFormError(response, "form", "single", "This field is required.")
-        self.assertFormError(response, "form", "multi", "This field is required.")
+        form = response.context["form"]
+        self.assertFormError(form, "email", "This field is required.")
+        self.assertFormError(form, "single", "This field is required.")
+        self.assertFormError(form, "multi", "This field is required.")
 
     def test_form_error(self):
         "POST erroneous data to a form"
@@ -455,7 +476,9 @@ class ClientTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "Invalid POST Template")
 
-        self.assertFormError(response, "form", "email", "Enter a valid email address.")
+        self.assertFormError(
+            response.context["form"], "email", "Enter a valid email address."
+        )
 
     def test_valid_form_with_template(self):
         "POST valid data to a form using multiple templates"
@@ -480,10 +503,10 @@ class ClientTest(TestCase):
         self.assertTemplateUsed(response, "form_view.html")
         self.assertTemplateUsed(response, "base.html")
         self.assertTemplateNotUsed(response, "Invalid POST Template")
-
-        self.assertFormError(response, "form", "email", "This field is required.")
-        self.assertFormError(response, "form", "single", "This field is required.")
-        self.assertFormError(response, "form", "multi", "This field is required.")
+        form = response.context["form"]
+        self.assertFormError(form, "email", "This field is required.")
+        self.assertFormError(form, "single", "This field is required.")
+        self.assertFormError(form, "multi", "This field is required.")
 
     def test_form_error_with_template(self):
         "POST erroneous data to a form using multiple templates"
@@ -500,7 +523,9 @@ class ClientTest(TestCase):
         self.assertTemplateUsed(response, "base.html")
         self.assertTemplateNotUsed(response, "Invalid POST Template")
 
-        self.assertFormError(response, "form", "email", "Enter a valid email address.")
+        self.assertFormError(
+            response.context["form"], "email", "Enter a valid email address."
+        )
 
     def test_unknown_page(self):
         "GET an invalid URL"
@@ -832,6 +857,13 @@ class ClientTest(TestCase):
             response, "https://www.djangoproject.com/", fetch_redirect_response=False
         )
 
+    @override_settings(ALLOWED_HOSTS=["hostname1", "hostname2"])
+    def test_redirect_with_http_host(self):
+        response = self.client.get(
+            "/redirect_to_different_hostname/", follow=True, HTTP_HOST="hostname1"
+        )
+        self.assertEqual(response.content, b"hostname2")
+
     def test_external_redirect_without_trailing_slash(self):
         """
         Client._handle_redirects() with an empty path.
@@ -971,6 +1003,36 @@ class ClientTest(TestCase):
             )
         self.assertEqual(response.content, b"named_temp_file")
 
+    def test_query_params(self):
+        tests = (
+            "get",
+            "post",
+            "put",
+            "patch",
+            "delete",
+            "head",
+            "options",
+            "trace",
+        )
+        for method in tests:
+            with self.subTest(method=method):
+                client_method = getattr(self.client, method)
+                response = client_method("/get_view/", query_params={"example": "data"})
+                self.assertEqual(response.wsgi_request.GET["example"], "data")
+
+    def test_cannot_use_data_and_query_params_together(self):
+        tests = ["get", "head"]
+        msg = "query_params and data arguments are mutually exclusive."
+        for method in tests:
+            with self.subTest(method=method):
+                client_method = getattr(self.client, method)
+                with self.assertRaisesMessage(ValueError, msg):
+                    client_method(
+                        "/get_view/",
+                        data={"example": "data"},
+                        query_params={"q": "terms"},
+                    )
+
 
 @override_settings(
     MIDDLEWARE=["django.middleware.csrf.CsrfViewMiddleware"],
@@ -1046,6 +1108,73 @@ class RequestFactoryTest(SimpleTestCase):
         echoed_request_line = "TRACE {} {}".format(url_path, protocol)
         self.assertContains(response, echoed_request_line)
 
+    def test_request_factory_default_headers(self):
+        request = RequestFactory(
+            headers={
+                "authorization": "Bearer faketoken",
+                "x-another-header": "some other value",
+            }
+        ).get("/somewhere/")
+        self.assertEqual(request.headers["authorization"], "Bearer faketoken")
+        self.assertIn("HTTP_AUTHORIZATION", request.META)
+        self.assertEqual(request.headers["x-another-header"], "some other value")
+        self.assertIn("HTTP_X_ANOTHER_HEADER", request.META)
+
+        request = RequestFactory(
+            headers={
+                "Authorization": "Bearer faketoken",
+                "X-Another-Header": "some other value",
+            }
+        ).get("/somewhere/")
+        self.assertEqual(request.headers["authorization"], "Bearer faketoken")
+        self.assertIn("HTTP_AUTHORIZATION", request.META)
+        self.assertEqual(request.headers["x-another-header"], "some other value")
+        self.assertIn("HTTP_X_ANOTHER_HEADER", request.META)
+
+    def test_request_factory_sets_headers(self):
+        for method_name, view in self.http_methods_and_views:
+            method = getattr(self.request_factory, method_name)
+            request = method(
+                "/somewhere/",
+                headers={
+                    "authorization": "Bearer faketoken",
+                    "x-another-header": "some other value",
+                },
+            )
+            self.assertEqual(request.headers["authorization"], "Bearer faketoken")
+            self.assertIn("HTTP_AUTHORIZATION", request.META)
+            self.assertEqual(request.headers["x-another-header"], "some other value")
+            self.assertIn("HTTP_X_ANOTHER_HEADER", request.META)
+
+            request = method(
+                "/somewhere/",
+                headers={
+                    "Authorization": "Bearer faketoken",
+                    "X-Another-Header": "some other value",
+                },
+            )
+            self.assertEqual(request.headers["authorization"], "Bearer faketoken")
+            self.assertIn("HTTP_AUTHORIZATION", request.META)
+            self.assertEqual(request.headers["x-another-header"], "some other value")
+            self.assertIn("HTTP_X_ANOTHER_HEADER", request.META)
+
+    def test_request_factory_query_params(self):
+        tests = (
+            "get",
+            "post",
+            "put",
+            "patch",
+            "delete",
+            "head",
+            "options",
+            "trace",
+        )
+        for method in tests:
+            with self.subTest(method=method):
+                factory = getattr(self.request_factory, method)
+                request = factory("/somewhere", query_params={"example": "data"})
+                self.assertEqual(request.GET["example"], "data")
+
 
 @override_settings(ROOT_URLCONF="test_client.urls")
 class AsyncClientTest(TestCase):
@@ -1061,8 +1190,11 @@ class AsyncClientTest(TestCase):
         response = await self.async_client.get("/middleware_urlconf_view/")
         self.assertEqual(response.resolver_match.url_name, "middleware_urlconf_view")
 
-    async def test_follow_parameter_not_implemented(self):
-        msg = "AsyncClient request methods do not accept the follow parameter."
+    async def test_redirect(self):
+        response = await self.async_client.get("/redirect_view/")
+        self.assertEqual(response.status_code, 302)
+
+    async def test_follow_redirect(self):
         tests = (
             "get",
             "post",
@@ -1076,12 +1208,47 @@ class AsyncClientTest(TestCase):
         for method_name in tests:
             with self.subTest(method=method_name):
                 method = getattr(self.async_client, method_name)
-                with self.assertRaisesMessage(NotImplementedError, msg):
-                    await method("/redirect_view/", follow=True)
+                response = await method("/redirect_view/", follow=True)
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.resolver_match.url_name, "get_view")
+
+    async def test_follow_double_redirect(self):
+        response = await self.async_client.get("/double_redirect_view/", follow=True)
+        self.assertRedirects(
+            response, "/get_view/", status_code=302, target_status_code=200
+        )
+        self.assertEqual(len(response.redirect_chain), 2)
 
     async def test_get_data(self):
         response = await self.async_client.get("/get_view/", {"var": "val"})
         self.assertContains(response, "This is a test. val is the value.")
+
+    async def test_post_data(self):
+        response = await self.async_client.post("/post_view/", {"value": 37})
+        self.assertContains(response, "Data received: 37 is the value.")
+
+    async def test_body_read_on_get_data(self):
+        response = await self.async_client.get("/post_view/")
+        self.assertContains(response, "Viewing GET page.")
+
+    async def test_query_params(self):
+        tests = (
+            "get",
+            "post",
+            "put",
+            "patch",
+            "delete",
+            "head",
+            "options",
+            "trace",
+        )
+        for method in tests:
+            with self.subTest(method=method):
+                client_method = getattr(self.async_client, method)
+                response = await client_method(
+                    "/async_get_view/", query_params={"example": "data"}
+                )
+                self.assertEqual(response.asgi_request.GET["example"], "data")
 
 
 @override_settings(ROOT_URLCONF="test_client.urls")
@@ -1127,6 +1294,16 @@ class AsyncRequestFactoryTest(SimpleTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b'{"example": "data"}')
 
+    async def test_request_limited_read(self):
+        tests = ["GET", "POST"]
+        for method in tests:
+            with self.subTest(method=method):
+                request = self.request_factory.generic(
+                    method,
+                    "/somewhere",
+                )
+                self.assertEqual(request.read(200), b"")
+
     def test_request_factory_sets_headers(self):
         request = self.request_factory.get(
             "/somewhere/",
@@ -1138,7 +1315,49 @@ class AsyncRequestFactoryTest(SimpleTestCase):
         self.assertEqual(request.headers["x-another-header"], "some other value")
         self.assertIn("HTTP_X_ANOTHER_HEADER", request.META)
 
+        request = self.request_factory.get(
+            "/somewhere/",
+            headers={
+                "Authorization": "Bearer faketoken",
+                "X-Another-Header": "some other value",
+            },
+        )
+        self.assertEqual(request.headers["authorization"], "Bearer faketoken")
+        self.assertIn("HTTP_AUTHORIZATION", request.META)
+        self.assertEqual(request.headers["x-another-header"], "some other value")
+        self.assertIn("HTTP_X_ANOTHER_HEADER", request.META)
+
     def test_request_factory_query_string(self):
         request = self.request_factory.get("/somewhere/", {"example": "data"})
         self.assertNotIn("Query-String", request.headers)
         self.assertEqual(request.GET["example"], "data")
+
+    def test_request_factory_query_params(self):
+        tests = (
+            "get",
+            "post",
+            "put",
+            "patch",
+            "delete",
+            "head",
+            "options",
+            "trace",
+        )
+        for method in tests:
+            with self.subTest(method=method):
+                factory = getattr(self.request_factory, method)
+                request = factory("/somewhere", query_params={"example": "data"})
+                self.assertEqual(request.GET["example"], "data")
+
+    def test_cannot_use_data_and_query_params_together(self):
+        tests = ["get", "head"]
+        msg = "query_params and data arguments are mutually exclusive."
+        for method in tests:
+            with self.subTest(method=method):
+                factory = getattr(self.request_factory, method)
+                with self.assertRaisesMessage(ValueError, msg):
+                    factory(
+                        "/somewhere",
+                        data={"example": "data"},
+                        query_params={"q": "terms"},
+                    )

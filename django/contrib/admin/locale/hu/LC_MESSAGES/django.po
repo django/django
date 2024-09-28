@@ -3,7 +3,8 @@
 # Translators:
 # Ádám Krizsány <krizsany1302@gmail.com>, 2015
 # Akos Zsolt Hochrein <hoch.akos@gmail.com>, 2018
-# András Veres-Szentkirályi, 2016,2018-2020
+# András Veres-Szentkirályi, 2016,2018-2020,2023
+# Balázs R, 2023
 # Istvan Farkas <istvan.farkas@gmail.com>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # János R, 2017
@@ -15,16 +16,20 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-14 19:53+0200\n"
-"PO-Revision-Date: 2020-07-20 07:29+0000\n"
-"Last-Translator: András Veres-Szentkirályi\n"
-"Language-Team: Hungarian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 07:05+0000\n"
+"Last-Translator: András Veres-Szentkirályi, 2016,2018-2020,2023\n"
+"Language-Team: Hungarian (http://app.transifex.com/django/django/language/"
 "hu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: hu\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Kiválasztott %(verbose_name_plural)s törlése"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -36,10 +41,6 @@ msgstr "%(name)s törlése nem sikerült"
 
 msgid "Are you sure?"
 msgstr "Biztos benne?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Kiválasztott %(verbose_name_plural)s törlése"
 
 msgid "Administration"
 msgstr "Adminisztráció"
@@ -187,6 +188,9 @@ msgstr ""
 "Több elem kiválasztásához tartsa nyomva  a \"Control\" gombot, vagy Mac "
 "gépeken a \"Command\" gombot."
 
+msgid "Select this object for an action - {}"
+msgstr "Objektum kijelölése egy művelethez - {}"
+
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr "A(z) \"{obj}\" {name} sikeresen hozzáadva."
@@ -276,8 +280,9 @@ msgstr "0 kiválasztva ennyiből: %(cnt)s"
 msgid "Change history: %s"
 msgstr "Változások története: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -347,6 +352,9 @@ msgstr "Az összes %(module_name)s kiválasztása, összesen %(total_count)s db"
 msgid "Clear selection"
 msgstr "Kiválasztás törlése"
 
+msgid "Breadcrumbs"
+msgstr "Breadcrumb navigáció"
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "%(name)s alkalmazásban elérhető modellek."
@@ -374,15 +382,17 @@ msgid "Change password"
 msgstr "Jelszó megváltoztatása"
 
 msgid "Please correct the error below."
-msgstr "Kérem javítsa a hibát alább."
-
-msgid "Please correct the errors below."
-msgstr "Kérem javítsa ki a lenti hibákat."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Kérem javítsa a lenti hibát."
+msgstr[1] "Kérem javítsa a lenti hibákat."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr ""
 "Adjon meg egy új jelszót <strong>%(username)s</strong> nevű felhasználónak."
+
+msgid "Skip to main content"
+msgstr "Ugrás az oldal fő részéhez"
 
 msgid "Welcome,"
 msgstr "Üdvözlöm,"
@@ -409,6 +419,12 @@ msgstr "Megtekintés a honlapon"
 msgid "Filter"
 msgstr "Szűrő"
 
+msgid "Hide counts"
+msgstr "Számok elrejtése"
+
+msgid "Show counts"
+msgstr "Számok megjelenítése"
+
 msgid "Clear all filters"
 msgstr "Összes szűrő törlése"
 
@@ -421,6 +437,15 @@ msgstr "Prioritás rendezésnél: %(priority_number)s"
 
 msgid "Toggle sorting"
 msgstr "Rendezés megfordítása"
+
+msgid "Toggle theme (current theme: auto)"
+msgstr "Téma váltás (jelenleg: auto)"
+
+msgid "Toggle theme (current theme: light)"
+msgstr "Téma váltás (jelenleg: világos)"
+
+msgid "Toggle theme (current theme: dark)"
+msgstr "Téma váltás (jelenleg: sötét)"
 
 msgid "Delete"
 msgstr "Törlés"
@@ -508,6 +533,15 @@ msgstr "Az én műveleteim"
 msgid "None available"
 msgstr "Nincs elérhető"
 
+msgid "Added:"
+msgstr "Hozzáadva:"
+
+msgid "Changed:"
+msgstr "Szerkesztve:"
+
+msgid "Deleted:"
+msgstr "Törölve:"
+
 msgid "Unknown content"
 msgstr "Ismeretlen tartalom"
 
@@ -534,6 +568,15 @@ msgstr "Elfelejtette jelszavát vagy felhasználónevét?"
 msgid "Toggle navigation"
 msgstr "Navigáció megjelenítése/elrejtése"
 
+msgid "Sidebar"
+msgstr "Oldalsáv"
+
+msgid "Start typing to filter…"
+msgstr "Kezdjen el gépelni a szűréshez..."
+
+msgid "Filter navigation items"
+msgstr "Navigációs elemek szűrése"
+
 msgid "Date/time"
 msgstr "Dátum/idő"
 
@@ -542,6 +585,11 @@ msgstr "Felhasználó"
 
 msgid "Action"
 msgstr "Művelet"
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] "bejegyzés"
+msgstr[1] "bejegyzés"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -599,8 +647,12 @@ msgstr "Újabb %(model)s hozzáadása"
 msgid "Delete selected %(model)s"
 msgstr "Kiválasztott %(model)s törlése"
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Köszönjük hogy egy kis időt eltöltött ma a honlapunkon."
+#, python-format
+msgid "View selected %(model)s"
+msgstr "Kiválasztott %(model)s megtekintése"
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr "Köszönjük, hogy egy kis minőségi időt eltöltött ma a honlapunkon."
 
 msgid "Log in again"
 msgstr "Jelentkezzen be újra"
@@ -699,6 +751,9 @@ msgstr "E-mail cím:"
 
 msgid "Reset my password"
 msgstr "Jelszavam törlése"
+
+msgid "Select all objects on this page for an action"
+msgstr "Minden objektum kijelölése egy művelethez"
 
 msgid "All dates"
 msgstr "Minden dátum"

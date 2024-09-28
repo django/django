@@ -2,6 +2,7 @@
 Helpers to manipulate deferred DDL statements that might need to be adjusted or
 discarded within when executing a migration.
 """
+
 from copy import deepcopy
 
 
@@ -17,6 +18,12 @@ class Reference:
     def references_column(self, table, column):
         """
         Return whether or not this instance references the specified column.
+        """
+        return False
+
+    def references_index(self, table, index):
+        """
+        Return whether or not this instance references the specified index.
         """
         return False
 
@@ -50,6 +57,9 @@ class Table(Reference):
 
     def references_table(self, table):
         return self.table == table
+
+    def references_index(self, table, index):
+        return self.references_table(table) and str(self) == index
 
     def rename_table_references(self, old_table, new_table):
         if self.table == old_table:
@@ -203,6 +213,12 @@ class Statement(Reference):
     def references_column(self, table, column):
         return any(
             hasattr(part, "references_column") and part.references_column(table, column)
+            for part in self.parts.values()
+        )
+
+    def references_index(self, table, index):
+        return any(
+            hasattr(part, "references_index") and part.references_index(table, index)
             for part in self.parts.values()
         )
 

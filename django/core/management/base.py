@@ -2,10 +2,12 @@
 Base classes for writing management commands (named commands which can
 be executed through ``django-admin`` or ``manage.py``).
 """
+
 import argparse
 import os
 import sys
 from argparse import ArgumentParser, HelpFormatter
+from functools import partial
 from io import TextIOBase
 
 import django
@@ -71,6 +73,15 @@ class CommandParser(ArgumentParser):
         else:
             raise CommandError("Error: %s" % message)
 
+    def add_subparsers(self, **kwargs):
+        parser_class = kwargs.get("parser_class", type(self))
+        if issubclass(parser_class, CommandParser):
+            kwargs["parser_class"] = partial(
+                parser_class,
+                called_from_command_line=self.called_from_command_line,
+            )
+        return super().add_subparsers(**kwargs)
+
 
 def handle_default_options(options):
     """
@@ -87,7 +98,7 @@ def handle_default_options(options):
 def no_translations(handle_func):
     """Decorator that forces a command to run with translations deactivated."""
 
-    def wrapped(*args, **kwargs):
+    def wrapper(*args, **kwargs):
         from django.utils import translation
 
         saved_locale = translation.get_language()
@@ -99,7 +110,7 @@ def no_translations(handle_func):
                 translation.activate(saved_locale)
         return res
 
-    return wrapped
+    return wrapper
 
 
 class DjangoHelpFormatter(HelpFormatter):
@@ -286,10 +297,10 @@ class BaseCommand:
         Create and return the ``ArgumentParser`` which will be used to
         parse the arguments to this command.
         """
+        kwargs.setdefault("formatter_class", DjangoHelpFormatter)
         parser = CommandParser(
             prog="%s %s" % (os.path.basename(prog_name), subcommand),
             description=self.help or None,
-            formatter_class=DjangoHelpFormatter,
             missing_args_message=getattr(self, "missing_args_message", None),
             called_from_command_line=getattr(self, "_called_from_command_line", None),
             **kwargs,
@@ -334,7 +345,7 @@ class BaseCommand:
             parser,
             "--traceback",
             action="store_true",
-            help="Raise on CommandError exceptions.",
+            help="Display a full stack trace on CommandError exceptions.",
         )
         self.add_base_argument(
             parser,
@@ -518,9 +529,11 @@ class BaseCommand:
                 if issues:
                     visible_issue_count += len(issues)
                     formatted = (
-                        self.style.ERROR(str(e))
-                        if e.is_serious()
-                        else self.style.WARNING(str(e))
+                        (
+                            self.style.ERROR(str(e))
+                            if e.is_serious()
+                            else self.style.WARNING(str(e))
+                        )
                         for e in issues
                     )
                     formatted = "\n".join(sorted(formatted))
@@ -533,11 +546,15 @@ class BaseCommand:
             if visible_issue_count:
                 footer += "\n"
             footer += "System check identified %s (%s silenced)." % (
-                "no issues"
-                if visible_issue_count == 0
-                else "1 issue"
-                if visible_issue_count == 1
-                else "%s issues" % visible_issue_count,
+                (
+                    "no issues"
+                    if visible_issue_count == 0
+                    else (
+                        "1 issue"
+                        if visible_issue_count == 1
+                        else "%s issues" % visible_issue_count
+                    )
+                ),
                 len(all_issues) - visible_issue_count,
             )
 
@@ -655,7 +672,13 @@ class LabelCommand(BaseCommand):
     """
 
     label = "label"
-    missing_args_message = "Enter at least one %s." % label
+    missing_args_message = "Enter at least one %s."
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if self.missing_args_message == LabelCommand.missing_args_message:
+            self.missing_args_message = self.missing_args_message % self.label
 
     def add_arguments(self, parser):
         parser.add_argument("args", metavar=self.label, nargs="+")

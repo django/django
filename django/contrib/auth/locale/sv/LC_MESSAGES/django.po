@@ -1,10 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Albin Larsson <albin.post@gmail.com>, 2022
 # Alex Nordlund <deep.alexander@gmail.com>, 2012
+# Anders Hovmöller <boxed@killingar.net>, 2023
 # Cybjit <cybjit@gmail.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jonathan Lindén, 2015
+# Jörgen Olofsson, 2024
 # Jonathan Lindén, 2014
 # Mattias Hansson <mattias.gothenburg@gmail.com>, 2016
 # nip3o <n@niclasolofsson.se>, 2014
@@ -16,10 +19,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2021-05-06 05:59+0000\n"
-"Last-Translator: Tomas Lööw <tomas.loow@mailbox.org>\n"
-"Language-Team: Swedish (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 08:09+0000\n"
+"Last-Translator: Jörgen Olofsson, 2024\n"
+"Language-Team: Swedish (http://app.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -40,12 +43,22 @@ msgstr "Viktiga datum"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(name)s-objekt med primärnyckel %(key)r finns inte."
 
+msgid "Conflicting form data submitted. Please try again."
+msgstr "Motstridiga formulärdata skickades. Försök igen."
+
 msgid "Password changed successfully."
-msgstr "Lösenordet ändrades."
+msgstr "Lösenordet ändrades framgångsrikt."
+
+msgid "Password-based authentication was disabled."
+msgstr "Lösenordsbaserad autentisering inaktiverades."
 
 #, python-format
 msgid "Change password: %s"
 msgstr "Ändra lösenord: %s"
+
+#, python-format
+msgid "Set password: %s"
+msgstr "Sätt lösenord: %s"
 
 msgid "Authentication and Authorization"
 msgstr "Autentisering och auktorisering"
@@ -62,8 +75,23 @@ msgstr "Inget lösenord angivet."
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Ogiltigt lösenordsformat eller okänd hashalgoritm."
 
+msgid "Reset password"
+msgstr "Återställ lösenord"
+
+msgid "Set password"
+msgstr "Sätt lösenord"
+
 msgid "The two password fields didn’t match."
 msgstr "De två lösenordsfälten stämmer inte överens."
+
+msgid ""
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
+msgstr ""
+"Om användaren kommer att kunna autentisera sig med ett lösenord eller inte. "
+"Om inaktiverat, kan användaren fortfarande ha möjlighet att autentisera sig "
+"via andra backend-lösningar, såsom Single Sign-On eller LDAP."
 
 msgid "Password"
 msgstr "Lösenord"
@@ -74,12 +102,26 @@ msgstr "Lösenordsbekräftelse"
 msgid "Enter the same password as before, for verification."
 msgstr "Fyll i samma lösenord som tidigare för verifiering."
 
+msgid "Password-based authentication"
+msgstr "Lösenordsbaserad autentisering."
+
+msgid "Enabled"
+msgstr "Aktiverad"
+
+msgid "Disabled"
+msgstr "Avstängd"
+
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user’s "
-"password, but you can change the password using <a href=\"{}\">this form</a>."
+"Raw passwords are not stored, so there is no way to see the user’s password."
 msgstr ""
-"Lösenord lagras inte direkt, så det finns inget sätt att se denna användares "
-"lösenord, men du kan ändra lösenorden med <a href=\"{}\">detta formulär</a>."
+"Lösenord lagras inte i klartext, det finns inget sätt att se användarens "
+"lösenord."
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
+msgstr ""
+"Aktivera lösenordsbaserad autentisering för denna användare genom att sätta "
+"ett lösenord."
 
 #, python-format
 msgid ""
@@ -106,9 +148,6 @@ msgstr "Ditt gamla lösenord var felaktigt ifyllt. Var vänlig fyll i det igen."
 
 msgid "Old password"
 msgstr "Gammalt lösenord"
-
-msgid "Password (again)"
-msgstr "Lösenord (igen)"
 
 msgid "algorithm"
 msgstr "algoritm"
@@ -142,6 +181,9 @@ msgstr "arbetsfaktor"
 
 msgid "checksum"
 msgstr "kontrollsumma"
+
+msgid "block size"
+msgstr "blockstorlek"
 
 msgid "name"
 msgstr "namn"
@@ -182,7 +224,7 @@ msgstr ""
 "rättigheter som deras grupper har."
 
 msgid "user permissions"
-msgstr "användarättigheter"
+msgstr "användarrättigheter"
 
 msgid "Specific permissions for this user."
 msgstr "Specifika rättigheter för denna användare."
@@ -275,11 +317,11 @@ msgid "Password reset on %(site_name)s"
 msgstr "Lösenord nollställt på %(site_name)s"
 
 msgid ""
-"Enter a valid username. This value may contain only English letters, "
-"numbers, and @/./+/-/_ characters."
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
 msgstr ""
-"Fyll i ett giltigt användarnamn. Detta värde får endast innehålla bokstäver "
-"a-z, siffror och @/./+/-/_."
+"Fyll i ett giltigt användarnamn. Det får endast innehålla icke-accentsatta "
+"små och stora bokstäver a-z, A-Z, siffror samt tecknen @/./+/-/_."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "

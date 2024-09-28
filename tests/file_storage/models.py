@@ -9,7 +9,7 @@ import random
 import tempfile
 from pathlib import Path
 
-from django.core.files.storage import FileSystemStorage
+from django.core.files.storage import FileSystemStorage, default_storage
 from django.db import models
 
 
@@ -25,6 +25,10 @@ temp_storage = FileSystemStorage(location=temp_storage_location)
 
 def callable_storage():
     return temp_storage
+
+
+def callable_default_storage():
+    return default_storage
 
 
 class CallableStorage(FileSystemStorage):
@@ -62,8 +66,14 @@ class Storage(models.Model):
     storage_callable_class = models.FileField(
         storage=CallableStorage, upload_to="storage_callable_class"
     )
+    storage_callable_default = models.FileField(
+        storage=callable_default_storage, upload_to="storage_callable_default"
+    )
     default = models.FileField(
         storage=temp_storage, upload_to="tests", default="tests/default.txt"
+    )
+    db_default = models.FileField(
+        storage=temp_storage, upload_to="tests", db_default="tests/db_default.txt"
     )
     empty = models.FileField(storage=temp_storage)
     limited_length = models.FileField(

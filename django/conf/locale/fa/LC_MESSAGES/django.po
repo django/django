@@ -3,9 +3,11 @@
 # Translators:
 # Ahmad Hosseini <ahmadly.com@gmail.com>, 2020
 # alirezamastery <alireza.mastery@gmail.com>, 2021
+# ali salehi, 2023
 # Ali Vakilzade <ali.vakilzade@gmail.com>, 2015
 # Arash Fazeli <a.fazeli@gmail.com>, 2012
 # Eric Hamiter <ehamiter@gmail.com>, 2019
+# Eshagh <ase.mugem@gmail.com>, 2022
 # Farshad Asadpour, 2021
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2021
@@ -23,10 +25,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-11-24 16:28+0000\n"
-"Last-Translator: Mariusz Felisiak <felisiak.mariusz@gmail.com>\n"
-"Language-Team: Persian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 06:49+0000\n"
+"Last-Translator: ali salehi, 2023\n"
+"Language-Team: Persian (http://app.transifex.com/django/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -66,6 +68,9 @@ msgstr "بوسنیایی"
 
 msgid "Catalan"
 msgstr "کاتالونیایی"
+
+msgid "Central Kurdish (Sorani)"
+msgstr ""
 
 msgid "Czech"
 msgstr "چکی"
@@ -307,6 +312,9 @@ msgstr "تاتار"
 msgid "Udmurt"
 msgstr "ادمورت"
 
+msgid "Uyghur"
+msgstr ""
+
 msgid "Ukrainian"
 msgstr "اکراینی"
 
@@ -401,6 +409,16 @@ msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "مطمئن شوید این مقدار بزرگتر و یا مساوی %(limit_value)s است."
 
 #, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr ""
+
+#, python-format
+msgid ""
+"Ensure this value is a multiple of step size %(limit_value)s, starting from "
+"%(offset)s, e.g. %(offset)s, %(valid_value1)s, %(valid_value2)s, and so on."
+msgstr ""
+
+#, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
 "%(show_value)d)."
@@ -470,6 +488,10 @@ msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr "‏%(model_name)s با این %(field_labels)s وجود دارد."
 
 #, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr ""
+
+#, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "مقدار %(value)r انتخاب معتبری نیست. "
 
@@ -483,8 +505,8 @@ msgstr "این فیلد نمی تواند خالی باشد."
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s با این %(field_label)s از قبل موجود است."
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -509,6 +531,9 @@ msgstr "بولی (درست یا غلط)"
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "رشته (تا %(max_length)s)"
+
+msgid "String (unlimited)"
+msgstr "رشته (بی نهایت)"
 
 msgid "Comma-separated integers"
 msgstr "اعداد صحیح جدا-شده با ویلگول"
@@ -778,16 +803,16 @@ msgstr ""
 "%(field_names)s. اگر این مشکل ادامه داشت، آن را گزارش کنید."
 
 #, python-format
-msgid "Please submit at most %d form."
-msgid_plural "Please submit at most %d forms."
-msgstr[0] "لطفاً تعدا فرم‌ها حداکثر %d باشد."
-msgstr[1] "لطفاً تعداد فرم‌ها حداکثر %d باشد."
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
-msgid "Please submit at least %d form."
-msgid_plural "Please submit at least %d forms."
-msgstr[0] "لطفاً تعداد فرم‌ها حداقل %d باشد."
-msgstr[1] "لطفاً تعدا فرم‌ ها حداقل %d باشد."
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "Order"
 msgstr "ترتیب:"
@@ -1127,37 +1152,37 @@ msgstr "،"
 msgid "%(num)d year"
 msgid_plural "%(num)d years"
 msgstr[0] "%(num)d سال"
-msgstr[1] "%(num)d سال ها"
+msgstr[1] "%(num)d سال"
 
 #, python-format
 msgid "%(num)d month"
 msgid_plural "%(num)d months"
 msgstr[0] "%(num)d ماه"
-msgstr[1] "%(num)d ماه ها"
+msgstr[1] "%(num)d ماه"
 
 #, python-format
 msgid "%(num)d week"
 msgid_plural "%(num)d weeks"
 msgstr[0] "%(num)d هفته"
-msgstr[1] "%(num)d هفته ها"
+msgstr[1] "%(num)d هفته"
 
 #, python-format
 msgid "%(num)d day"
 msgid_plural "%(num)d days"
 msgstr[0] "%(num)d روز"
-msgstr[1] "%(num)d روزها"
+msgstr[1] "%(num)d روز"
 
 #, python-format
 msgid "%(num)d hour"
 msgid_plural "%(num)d hours"
 msgstr[0] "%(num)d ساعت"
-msgstr[1] "%(num)d ساعت ها"
+msgstr[1] "%(num)d ساعت"
 
 #, python-format
 msgid "%(num)d minute"
 msgid_plural "%(num)d minutes"
 msgstr[0] "%(num)d دقیقه"
-msgstr[1] "%(num)d دقیقه ها"
+msgstr[1] "%(num)d دقیقه"
 
 msgid "Forbidden"
 msgstr "ممنوع"
@@ -1189,8 +1214,8 @@ msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
 "including the “Referrer-Policy: no-referrer” header, please remove them. The "
 "CSRF protection requires the “Referer” header to do strict referer checking. "
-"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" …> for links to third-party sites."
+"If you’re concerned about privacy, use alternatives like <a "
+"rel=\"noreferrer\" …> for links to third-party sites."
 msgstr ""
 "اگر شما از تگ <meta name=\"referrer\" content=\"no-referrer\"> استفاده "
 "می‌کنید یا سر تیتر \"Referrer-Policy: no-referrer\"  را اضافه کرده‌اید، لطفاً "
@@ -1290,13 +1315,13 @@ msgstr ""
 #, python-format
 msgid ""
 "You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> is in your settings file and you have not configured any "
-"URLs."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
+"configured any URLs."
 msgstr ""
 "شما این صفحه را به این دلیل مشاهده می کنید که <a href=\"https://docs."
-"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" rel="
-"\"noopener\">DEBUG=True</a> در فایل تنظیمات شما وجود دارد و شما هیچ URL "
+"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> در فایل تنظیمات شما وجود دارد و شما هیچ URL "
 "تنظیم نکرده اید."
 
 msgid "Django Documentation"

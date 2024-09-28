@@ -10,8 +10,6 @@ on securing a Django-powered site.
 Cross site scripting (XSS) protection
 =====================================
 
-.. highlight:: html+django
-
 XSS attacks allow a user to inject client side scripts into the browsers of
 other users. This is usually achieved by storing the malicious scripts in the
 database where it will be retrieved and displayed to other users, or by getting
@@ -216,8 +214,6 @@ security middleware reference <referrer-policy>` for details.
 Cross-origin opener policy
 ==========================
 
-.. versionadded:: 4.0
-
 The cross-origin opener policy (COOP) header allows browsers to isolate a
 top-level window from other documents by putting them in a different context
 group so that they cannot directly interact with the top-level window. If a
@@ -308,5 +304,5 @@ security protection of the web server, operating system and other components.
   pages also include security principles that apply to any system.
 
 .. _LimitRequestBody: https://httpd.apache.org/docs/2.4/mod/core.html#limitrequestbody
-.. _Top 10 list: https://owasp.org/www-project-top-ten/OWASP_Top_Ten_2017/
+.. _Top 10 list: https://owasp.org/Top10/
 .. _web security: https://infosec.mozilla.org/guidelines/web_security.html

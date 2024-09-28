@@ -81,9 +81,10 @@ You can tell Django to stop reporting particular 404s by tweaking the
 regular expression objects. For example::
 
     import re
+
     IGNORABLE_404_URLS = [
-        re.compile(r'\.(php|cgi)$'),
-        re.compile(r'^/phpmyadmin/'),
+        re.compile(r"\.(php|cgi)$"),
+        re.compile(r"^/phpmyadmin/"),
     ]
 
 In this example, a 404 to any URL ending with ``.php`` or ``.cgi`` will *not* be
@@ -93,10 +94,11 @@ The following example shows how to exclude some conventional URLs that browsers 
 crawlers often request::
 
     import re
+
     IGNORABLE_404_URLS = [
-        re.compile(r'^/apple-touch-icon.*\.png$'),
-        re.compile(r'^/favicon\.ico$'),
-        re.compile(r'^/robots\.txt$'),
+        re.compile(r"^/apple-touch-icon.*\.png$"),
+        re.compile(r"^/favicon\.ico$"),
+        re.compile(r"^/robots\.txt$"),
     ]
 
 (Note that these are regular expressions, so we put a backslash in front of
@@ -158,7 +160,8 @@ filtered out of error reports in a production environment (that is, where
 
         from django.views.decorators.debug import sensitive_variables
 
-        @sensitive_variables('user', 'pw', 'cc')
+
+        @sensitive_variables("user", "pw", "cc")
         def process_info(user):
             pw = user.pass_word
             cc = user.credit_card_number
@@ -174,8 +177,7 @@ filtered out of error reports in a production environment (that is, where
     do not provide any argument to the ``sensitive_variables`` decorator::
 
         @sensitive_variables()
-        def my_function():
-            ...
+        def my_function(): ...
 
     .. admonition:: When using multiple decorators
 
@@ -185,11 +187,10 @@ filtered out of error reports in a production environment (that is, where
         at the top of the decorator chain. This way it will also hide the
         function argument as it gets passed through the other decorators::
 
-            @sensitive_variables('user', 'pw', 'cc')
+            @sensitive_variables("user", "pw", "cc")
             @some_decorator
             @another_decorator
-            def process_info(user):
-                ...
+            def process_info(user): ...
 
 .. function:: sensitive_post_parameters(*parameters)
 
@@ -201,13 +202,14 @@ filtered out of error reports in a production environment (that is, where
 
         from django.views.decorators.debug import sensitive_post_parameters
 
-        @sensitive_post_parameters('pass_word', 'credit_card_number')
+
+        @sensitive_post_parameters("pass_word", "credit_card_number")
         def record_user_profile(request):
             UserProfile.create(
                 user=request.user,
-                password=request.POST['pass_word'],
-                credit_card=request.POST['credit_card_number'],
-                name=request.POST['name'],
+                password=request.POST["pass_word"],
+                credit_card=request.POST["credit_card_number"],
+                name=request.POST["name"],
             )
             ...
 
@@ -221,8 +223,7 @@ filtered out of error reports in a production environment (that is, where
     do not provide any argument to the ``sensitive_post_parameters`` decorator::
 
         @sensitive_post_parameters()
-        def my_view(request):
-            ...
+        def my_view(request): ...
 
     All POST parameters are systematically filtered out of error reports for
     certain :mod:`django.contrib.auth.views` views (``login``,
@@ -248,7 +249,7 @@ override or customize this default behavior for your entire site, you need to
 define your own filter class and tell Django to use it via the
 :setting:`DEFAULT_EXCEPTION_REPORTER_FILTER` setting::
 
-    DEFAULT_EXCEPTION_REPORTER_FILTER = 'path.to.your.CustomExceptionReporterFilter'
+    DEFAULT_EXCEPTION_REPORTER_FILTER = "path.to.your.CustomExceptionReporterFilter"
 
 You may also control in a more granular way which filter to use within any
 given view by setting the ``HttpRequest``’s ``exception_reporter_filter``
@@ -281,7 +282,11 @@ following attributes and methods:
 
             import re
 
-            re.compile(r'API|TOKEN|KEY|SECRET|PASS|SIGNATURE', flags=re.IGNORECASE)
+            re.compile(r"API|AUTH|TOKEN|KEY|SECRET|PASS|SIGNATURE|HTTP_COOKIE", flags=re.IGNORECASE)
+
+        .. versionchanged:: 5.2
+
+            The term ``AUTH`` was added.
 
     .. method:: is_active(request)
 
@@ -307,7 +312,7 @@ If you need to customize error reports beyond filtering you may specify a
 custom error reporter class by defining the
 :setting:`DEFAULT_EXCEPTION_REPORTER` setting::
 
-    DEFAULT_EXCEPTION_REPORTER = 'path.to.your.CustomExceptionReporter'
+    DEFAULT_EXCEPTION_REPORTER = "path.to.your.CustomExceptionReporter"
 
 The exception reporter is responsible for compiling the exception report data,
 and formatting it as text or HTML appropriately. (The exception reporter uses

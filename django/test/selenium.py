@@ -1,8 +1,11 @@
 import sys
 import unittest
 from contextlib import contextmanager
+from functools import wraps
+from pathlib import Path
 
-from django.test import LiveServerTestCase, tag
+from django.conf import settings
+from django.test import LiveServerTestCase, override_settings, tag
 from django.utils.functional import classproperty
 from django.utils.module_loading import import_string
 from django.utils.text import capfirst
@@ -79,27 +82,69 @@ class SeleniumTestCaseBase(type(LiveServerTestCase)):
     def create_options(self):
         options = self.import_options(self.browser)()
         if self.headless:
-            try:
-                options.headless = True
-            except AttributeError:
-                pass  # Only Chrome and Firefox support the headless mode.
+            match self.browser:
+                case "chrome" | "edge":
+                    options.add_argument("--headless=new")
+                case "firefox":
+                    options.add_argument("-headless")
         return options
 
     def create_webdriver(self):
+        options = self.create_options()
         if self.selenium_hub:
             from selenium import webdriver
 
-            return webdriver.Remote(
-                command_executor=self.selenium_hub,
-                desired_capabilities=self.get_capability(self.browser),
-            )
-        return self.import_webdriver(self.browser)(options=self.create_options())
+            for key, value in self.get_capability(self.browser).items():
+                options.set_capability(key, value)
+
+            return webdriver.Remote(command_executor=self.selenium_hub, options=options)
+        return self.import_webdriver(self.browser)(options=options)
+
+
+class ChangeWindowSize:
+    def __init__(self, width, height, selenium):
+        self.selenium = selenium
+        self.new_size = (width, height)
+
+    def __enter__(self):
+        self.old_size = self.selenium.get_window_size()
+        self.selenium.set_window_size(*self.new_size)
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.selenium.set_window_size(self.old_size["width"], self.old_size["height"])
 
 
 @tag("selenium")
 class SeleniumTestCase(LiveServerTestCase, metaclass=SeleniumTestCaseBase):
     implicit_wait = 10
     external_host = None
+    screenshots = False
+
+    @classmethod
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        if not cls.screenshots:
+            return
+
+        for name, func in list(cls.__dict__.items()):
+            if not hasattr(func, "_screenshot_cases"):
+                continue
+            # Remove the main test.
+            delattr(cls, name)
+            # Add separate tests for each screenshot type.
+            for screenshot_case in getattr(func, "_screenshot_cases"):
+
+                @wraps(func)
+                def test(self, *args, _func=func, _case=screenshot_case, **kwargs):
+                    with getattr(self, _case)():
+                        return _func(self, *args, **kwargs)
+
+                test.__name__ = f"{name}_{screenshot_case}"
+                test.__qualname__ = f"{test.__qualname__}_{screenshot_case}"
+                test._screenshot_name = name
+                test._screenshot_case = screenshot_case
+                setattr(cls, test.__name__, test)
 
     @classproperty
     def live_server_url(cls):
@@ -114,15 +159,87 @@ class SeleniumTestCase(LiveServerTestCase, metaclass=SeleniumTestCaseBase):
         cls.selenium = cls.create_webdriver()
         cls.selenium.implicitly_wait(cls.implicit_wait)
         super().setUpClass()
+        cls.addClassCleanup(cls._quit_selenium)
+
+    @contextmanager
+    def desktop_size(self):
+        with ChangeWindowSize(1280, 720, self.selenium):
+            yield
+
+    @contextmanager
+    def small_screen_size(self):
+        with ChangeWindowSize(1024, 768, self.selenium):
+            yield
+
+    @contextmanager
+    def mobile_size(self):
+        with ChangeWindowSize(360, 800, self.selenium):
+            yield
+
+    @contextmanager
+    def rtl(self):
+        with self.desktop_size():
+            with override_settings(LANGUAGE_CODE=settings.LANGUAGES_BIDI[-1]):
+                yield
+
+    @contextmanager
+    def dark(self):
+        # Navigate to a page before executing a script.
+        self.selenium.get(self.live_server_url)
+        self.selenium.execute_script("localStorage.setItem('theme', 'dark');")
+        with self.desktop_size():
+            try:
+                yield
+            finally:
+                self.selenium.execute_script("localStorage.removeItem('theme');")
+
+    def set_emulated_media(self, *, media=None, features=None):
+        if self.browser not in {"chrome", "edge"}:
+            self.skipTest(
+                "Emulation.setEmulatedMedia is only supported on Chromium and "
+                "Chrome-based browsers. See https://chromedevtools.github.io/devtools-"
+                "protocol/1-3/Emulation/#method-setEmulatedMedia for more details."
+            )
+        params = {}
+        if media is not None:
+            params["media"] = media
+        if features is not None:
+            params["features"] = features
+
+        # Not using .execute_cdp_cmd() as it isn't supported by the remote web driver
+        # when using --selenium-hub.
+        self.selenium.execute(
+            driver_command="executeCdpCommand",
+            params={"cmd": "Emulation.setEmulatedMedia", "params": params},
+        )
+
+    @contextmanager
+    def high_contrast(self):
+        self.set_emulated_media(features=[{"name": "forced-colors", "value": "active"}])
+        with self.desktop_size():
+            try:
+                yield
+            finally:
+                self.set_emulated_media(
+                    features=[{"name": "forced-colors", "value": "none"}]
+                )
+
+    def take_screenshot(self, name):
+        if not self.screenshots:
+            return
+        test = getattr(self, self._testMethodName)
+        filename = f"{test._screenshot_name}--{name}--{test._screenshot_case}.png"
+        path = Path.cwd() / "screenshots" / filename
+        path.parent.mkdir(exist_ok=True, parents=True)
+        self.selenium.save_screenshot(path)
 
     @classmethod
-    def _tearDownClassInternal(cls):
+    def _quit_selenium(cls):
         # quit() the WebDriver before attempting to terminate and join the
         # single-threaded LiveServerThread to avoid a dead lock if the browser
         # kept a connection alive.
         if hasattr(cls, "selenium"):
             cls.selenium.quit()
-        super()._tearDownClassInternal()
 
     @contextmanager
     def disable_implicit_wait(self):
@@ -132,3 +249,15 @@ class SeleniumTestCase(LiveServerTestCase, metaclass=SeleniumTestCaseBase):
             yield
         finally:
             self.selenium.implicitly_wait(self.implicit_wait)
+
+
+def screenshot_cases(method_names):
+    if isinstance(method_names, str):
+        method_names = method_names.split(",")
+
+    def wrapper(func):
+        func._screenshot_cases = method_names
+        setattr(func, "tags", {"screenshot"}.union(getattr(func, "tags", set())))
+        return func
+
+    return wrapper

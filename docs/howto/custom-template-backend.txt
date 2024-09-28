@@ -19,14 +19,13 @@ fictional ``foobar`` template library::
 
 
     class FooBar(BaseEngine):
-
         # Name of the subdirectory containing the templates for this engine
         # inside an installed application.
-        app_dirname = 'foobar'
+        app_dirname = "foobar"
 
         def __init__(self, params):
             params = params.copy()
-            options = params.pop('OPTIONS').copy()
+            options = params.pop("OPTIONS").copy()
             super().__init__(params)
 
             self.engine = foobar.Engine(**options)
@@ -47,7 +46,6 @@ fictional ``foobar`` template library::
 
 
     class Template:
-
         def __init__(self, template):
             self.template = template
 
@@ -55,9 +53,9 @@ fictional ``foobar`` template library::
             if context is None:
                 context = {}
             if request is not None:
-                context['request'] = request
-                context['csrf_input'] = csrf_input_lazy(request)
-                context['csrf_token'] = csrf_token_lazy(request)
+                context["request"] = request
+                context["csrf_input"] = csrf_input_lazy(request)
+                context["csrf_token"] = csrf_token_lazy(request)
             return self.template.render(context)
 
 See `DEP 182`_ for more information.
@@ -127,25 +125,25 @@ a :class:`dict` with the following values:
 Given the above template error, ``template_debug`` would look like::
 
     {
-        'name': '/path/to/template.html',
-        'message': "Invalid block tag: 'syntax'",
-        'source_lines': [
-            (1, 'some\n'),
-            (2, 'lines\n'),
-            (3, 'before\n'),
-            (4, 'Hello {% syntax error %} {{ world }}\n'),
-            (5, 'some\n'),
-            (6, 'lines\n'),
-            (7, 'after\n'),
-            (8, ''),
+        "name": "/path/to/template.html",
+        "message": "Invalid block tag: 'syntax'",
+        "source_lines": [
+            (1, "some\n"),
+            (2, "lines\n"),
+            (3, "before\n"),
+            (4, "Hello {% syntax error %} {{ world }}\n"),
+            (5, "some\n"),
+            (6, "lines\n"),
+            (7, "after\n"),
+            (8, ""),
         ],
-        'line': 4,
-        'before': 'Hello ',
-        'during': '{% syntax error %}',
-        'after': ' {{ world }}\n',
-        'total': 9,
-        'bottom': 9,
-        'top': 1,
+        "line": 4,
+        "before": "Hello ",
+        "during": "{% syntax error %}",
+        "after": " {{ world }}\n",
+        "total": 9,
+        "bottom": 9,
+        "top": 1,
     }
 
 .. _template-origin-api:
@@ -156,7 +154,8 @@ Origin API and 3rd-party integration
 Django templates have an :class:`~django.template.base.Origin` object available
 through the ``template.origin`` attribute. This enables debug information to be
 displayed in the :ref:`template postmortem <template-postmortem>`, as well as
-in 3rd-party libraries, like the `Django Debug Toolbar`_.
+in 3rd-party libraries, like the :pypi:`Django Debug Toolbar
+<django-debug-toolbar>`.
 
 Custom engines can provide their own ``template.origin`` information by
 creating an object that specifies the following attributes:
@@ -170,4 +169,3 @@ creating an object that specifies the following attributes:
   to load the template, e.g. ``django.template.loaders.filesystem.Loader``.
 
 .. _DEP 182: https://github.com/django/deps/blob/main/final/0182-multiple-template-engines.rst
-.. _Django Debug Toolbar: https://github.com/jazzband/django-debug-toolbar/

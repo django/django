@@ -100,7 +100,7 @@ def submit_row(context):
                 and context.get("show_delete", True)
             ),
             "show_save_as_new": not is_popup
-            and has_change_permission
+            and has_add_permission
             and change
             and save_as,
             "show_save_and_add_another": can_save_and_add_another,
@@ -138,7 +138,11 @@ def cell_count(inline_admin_form):
         # Count all visible fields.
         for line in fieldset:
             for field in line:
-                if not field.field.is_hidden:
+                try:
+                    is_hidden = field.field.is_hidden
+                except AttributeError:
+                    is_hidden = field.field["is_hidden"]
+                if not is_hidden:
                     count += 1
     if inline_admin_form.formset.can_delete:
         # Delete checkbox

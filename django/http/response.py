@@ -6,9 +6,12 @@ import os
 import re
 import sys
 import time
+import warnings
 from email.header import Header
 from http.client import responses
-from urllib.parse import quote, urlparse
+from urllib.parse import urlsplit
+
+from asgiref.sync import async_to_sync, sync_to_async
 
 from django.conf import settings
 from django.core import signals, signing
@@ -18,7 +21,7 @@ from django.http.cookie import SimpleCookie
 from django.utils import timezone
 from django.utils.datastructures import CaseInsensitiveMapping
 from django.utils.encoding import iri_to_uri
-from django.utils.http import http_date
+from django.utils.http import content_disposition_header, http_date
 from django.utils.regex_helper import _lazy_re_compile
 
 _charset_from_content_type_re = _lazy_re_compile(
@@ -33,8 +36,9 @@ class ResponseHeaders(CaseInsensitiveMapping):
         correctly encoded.
         """
         self._store = {}
-        for header, value in self._unpack_items(data):
-            self[header] = value
+        if data:
+            for header, value in self._unpack_items(data):
+                self[header] = value
 
     def _convert_to_charset(self, value, charset, mime_encode=False):
         """
@@ -42,22 +46,32 @@ class ResponseHeaders(CaseInsensitiveMapping):
         `charset` must be 'ascii' or 'latin-1'. If `mime_encode` is True and
         `value` can't be represented in the given charset, apply MIME-encoding.
         """
-        if not isinstance(value, (bytes, str)):
-            value = str(value)
-        if (isinstance(value, bytes) and (b"\n" in value or b"\r" in value)) or (
-            isinstance(value, str) and ("\n" in value or "\r" in value)
-        ):
-            raise BadHeaderError(
-                "Header values can't contain newlines (got %r)" % value
-            )
         try:
             if isinstance(value, str):
                 # Ensure string is valid in given charset
                 value.encode(charset)
-            else:
+            elif isinstance(value, bytes):
                 # Convert bytestring using given charset
                 value = value.decode(charset)
+            else:
+                value = str(value)
+                # Ensure string is valid in given charset.
+                value.encode(charset)
+            if "\n" in value or "\r" in value:
+                raise BadHeaderError(
+                    f"Header values can't contain newlines (got {value!r})"
+                )
         except UnicodeError as e:
+            # Encoding to a string of the specified charset failed, but we
+            # don't know what type that value was, or if it contains newlines,
+            # which we may need to check for before sending it to be
+            # encoded for multiple character sets.
+            if (isinstance(value, bytes) and (b"\n" in value or b"\r" in value)) or (
+                isinstance(value, str) and ("\n" in value or "\r" in value)
+            ):
+                raise BadHeaderError(
+                    f"Header values can't contain newlines (got {value!r})"
+                ) from e
             if mime_encode:
                 value = Header(value, "utf-8", maxlinelen=sys.maxsize).encode()
             else:
@@ -98,17 +112,17 @@ class HttpResponseBase:
     def __init__(
         self, content_type=None, status=None, reason=None, charset=None, headers=None
     ):
-        self.headers = ResponseHeaders(headers or {})
+        self.headers = ResponseHeaders(headers)
         self._charset = charset
-        if content_type and "Content-Type" in self.headers:
+        if "Content-Type" not in self.headers:
+            if content_type is None:
+                content_type = f"text/html; charset={self.charset}"
+            self.headers["Content-Type"] = content_type
+        elif content_type:
             raise ValueError(
                 "'headers' must not contain 'Content-Type' when the "
                 "'content_type' parameter is provided."
             )
-        if "Content-Type" not in self.headers:
-            if content_type is None:
-                content_type = "text/html; charset=%s" % self.charset
-            self.headers["Content-Type"] = content_type
         self._resource_closers = []
         # This parameter is set by the handler. It's necessary to preserve the
         # historical behavior of request_finished.
@@ -141,11 +155,15 @@ class HttpResponseBase:
     def charset(self):
         if self._charset is not None:
             return self._charset
-        content_type = self.get("Content-Type", "")
-        matched = _charset_from_content_type_re.search(content_type)
-        if matched:
-            # Extract the charset and strip its double quotes
-            return matched["charset"].replace('"', "")
+        # The Content-Type header may not yet be set, because the charset is
+        # being inserted *into* it.
+        if content_type := self.headers.get("Content-Type"):
+            if matched := _charset_from_content_type_re.search(content_type):
+                # Extract the charset and strip its double quotes.
+                # Note that having parsed it from the Content-Type, we don't
+                # store it back into the _charset for later intentionally, to
+                # allow for the Content-Type to be switched again later.
+                return matched["charset"].replace('"', "")
         return settings.DEFAULT_CHARSET
 
     @charset.setter
@@ -212,25 +230,33 @@ class HttpResponseBase:
         - a naive ``datetime.datetime`` object in UTC,
         - an aware ``datetime.datetime`` object in any time zone.
         If it is a ``datetime.datetime`` object then calculate ``max_age``.
+
+        ``max_age`` can be:
+        - int/float specifying seconds,
+        - ``datetime.timedelta`` object.
         """
         self.cookies[key] = value
         if expires is not None:
             if isinstance(expires, datetime.datetime):
                 if timezone.is_naive(expires):
-                    expires = timezone.make_aware(expires, timezone.utc)
-                delta = expires - datetime.datetime.now(tz=timezone.utc)
+                    expires = timezone.make_aware(expires, datetime.timezone.utc)
+                delta = expires - datetime.datetime.now(tz=datetime.timezone.utc)
                 # Add one second so the date matches exactly (a fraction of
                 # time gets lost between converting to a timedelta and
                 # then the date string).
-                delta = delta + datetime.timedelta(seconds=1)
+                delta += datetime.timedelta(seconds=1)
                 # Just set max_age - the max_age logic will set expires.
                 expires = None
+                if max_age is not None:
+                    raise ValueError("'expires' and 'max_age' can't be used together.")
                 max_age = max(0, delta.days * 86400 + delta.seconds)
             else:
                 self.cookies[key]["expires"] = expires
         else:
             self.cookies[key]["expires"] = ""
         if max_age is not None:
+            if isinstance(max_age, datetime.timedelta):
+                max_age = max_age.total_seconds()
             self.cookies[key]["max-age"] = int(max_age)
             # IE requires expires, so set it if hasn't been already.
             if not expires:
@@ -436,7 +462,18 @@ class StreamingHttpResponse(HttpResponseBase):
 
     @property
     def streaming_content(self):
-        return map(self.make_bytes, self._iterator)
+        if self.is_async:
+            # pull to lexical scope to capture fixed reference in case
+            # streaming_content is set again later.
+            _iterator = self._iterator
+
+            async def awrapper():
+                async for part in _iterator:
+                    yield self.make_bytes(part)
+
+            return awrapper()
+        else:
+            return map(self.make_bytes, self._iterator)
 
     @streaming_content.setter
     def streaming_content(self, value):
@@ -444,12 +481,50 @@ class StreamingHttpResponse(HttpResponseBase):
 
     def _set_streaming_content(self, value):
         # Ensure we can never iterate on "value" more than once.
-        self._iterator = iter(value)
+        try:
+            self._iterator = iter(value)
+            self.is_async = False
+        except TypeError:
+            self._iterator = aiter(value)
+            self.is_async = True
         if hasattr(value, "close"):
             self._resource_closers.append(value.close)
 
     def __iter__(self):
-        return self.streaming_content
+        try:
+            return iter(self.streaming_content)
+        except TypeError:
+            warnings.warn(
+                "StreamingHttpResponse must consume asynchronous iterators in order to "
+                "serve them synchronously. Use a synchronous iterator instead.",
+                Warning,
+                stacklevel=2,
+            )
+
+            # async iterator. Consume in async_to_sync and map back.
+            async def to_list(_iterator):
+                as_list = []
+                async for chunk in _iterator:
+                    as_list.append(chunk)
+                return as_list
+
+            return map(self.make_bytes, iter(async_to_sync(to_list)(self._iterator)))
+
+    async def __aiter__(self):
+        try:
+            async for part in self.streaming_content:
+                yield part
+        except TypeError:
+            warnings.warn(
+                "StreamingHttpResponse must consume synchronous iterators in order to "
+                "serve them asynchronously. Use an asynchronous iterator instead.",
+                Warning,
+                stacklevel=2,
+            )
+            # sync iterator. Consume via sync_to_async and yield via async
+            # generator.
+            for part in await sync_to_async(list)(self.streaming_content):
+                yield part
 
     def getvalue(self):
         return b"".join(self.streaming_content)
@@ -519,7 +594,9 @@ class FileResponse(StreamingHttpResponse):
                 # Encoding isn't set to prevent browsers from automatically
                 # uncompressing files.
                 content_type = {
+                    "br": "application/x-brotli",
                     "bzip2": "application/x-bzip",
+                    "compress": "application/x-compress",
                     "gzip": "application/gzip",
                     "xz": "application/x-xz",
                 }.get(encoding, content_type)
@@ -529,18 +606,10 @@ class FileResponse(StreamingHttpResponse):
             else:
                 self.headers["Content-Type"] = "application/octet-stream"
 
-        if filename:
-            disposition = "attachment" if self.as_attachment else "inline"
-            try:
-                filename.encode("ascii")
-                file_expr = 'filename="{}"'.format(filename)
-            except UnicodeEncodeError:
-                file_expr = "filename*=utf-8''{}".format(quote(filename))
-            self.headers["Content-Disposition"] = "{}; {}".format(
-                disposition, file_expr
-            )
-        elif self.as_attachment:
-            self.headers["Content-Disposition"] = "attachment"
+        if content_disposition := content_disposition_header(
+            self.as_attachment, filename
+        ):
+            self.headers["Content-Disposition"] = content_disposition
 
 
 class HttpResponseRedirectBase(HttpResponse):
@@ -549,7 +618,7 @@ class HttpResponseRedirectBase(HttpResponse):
     def __init__(self, redirect_to, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self["Location"] = iri_to_uri(redirect_to)
-        parsed = urlparse(str(redirect_to))
+        parsed = urlsplit(str(redirect_to))
         if parsed.scheme and parsed.scheme not in self.allowed_schemes:
             raise DisallowedRedirect(
                 "Unsafe redirect to URL with protocol '%s'" % parsed.scheme

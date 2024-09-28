@@ -3,12 +3,14 @@ import shutil
 import struct
 import tempfile
 import zipfile
+from pathlib import Path
 from unittest import mock
 
-from django.contrib.gis.gdal import GDALRaster, SpatialReference
+from django.contrib.gis.gdal import GDAL_VERSION, GDALRaster, SpatialReference
 from django.contrib.gis.gdal.error import GDALException
 from django.contrib.gis.gdal.raster.band import GDALBand
 from django.contrib.gis.shortcuts import numpy
+from django.core.files.temp import NamedTemporaryFile
 from django.test import SimpleTestCase
 
 from ..data.rasters.textrasters import JSON_RASTER
@@ -24,6 +26,11 @@ class GDALRasterTests(SimpleTestCase):
             os.path.dirname(__file__), "../data/rasters/raster.tif"
         )
         self.rs = GDALRaster(self.rs_path)
+
+    def test_gdalraster_input_as_path(self):
+        rs_path = Path(__file__).parent.parent / "data" / "rasters" / "raster.tif"
+        rs = GDALRaster(rs_path)
+        self.assertEqual(str(rs_path), rs.name)
 
     def test_rs_name_repr(self):
         self.assertEqual(self.rs_path, self.rs.name)
@@ -95,8 +102,9 @@ class GDALRasterTests(SimpleTestCase):
         ]
         msg = "Geotransform must consist of 6 numeric values."
         for geotransform in error_geotransforms:
-            with self.subTest(i=geotransform), self.assertRaisesMessage(
-                ValueError, msg
+            with (
+                self.subTest(i=geotransform),
+                self.assertRaisesMessage(ValueError, msg),
             ):
                 rsmem.geotransform = geotransform
 
@@ -142,7 +150,7 @@ class GDALRasterTests(SimpleTestCase):
 
     def test_file_based_raster_creation(self):
         # Prepare tempfile
-        rstfile = tempfile.NamedTemporaryFile(suffix=".tif")
+        rstfile = NamedTemporaryFile(suffix=".tif")
 
         # Create file-based raster from scratch
         GDALRaster(
@@ -258,7 +266,7 @@ class GDALRasterTests(SimpleTestCase):
         self.assertIsNone(self.rs.vsi_buffer)
 
     def test_vsi_vsizip_filesystem(self):
-        rst_zipfile = tempfile.NamedTemporaryFile(suffix=".zip")
+        rst_zipfile = NamedTemporaryFile(suffix=".zip")
         with zipfile.ZipFile(rst_zipfile, mode="w") as zf:
             zf.write(self.rs_path, "raster.tif")
         rst_path = "/vsizip/" + os.path.join(rst_zipfile.name, "raster.tif")
@@ -400,7 +408,7 @@ class GDALRasterTests(SimpleTestCase):
         self.assertIn("NAD83 / Florida GDL Albers", infos)
 
     def test_compressed_file_based_raster_creation(self):
-        rstfile = tempfile.NamedTemporaryFile(suffix=".tif")
+        rstfile = NamedTemporaryFile(suffix=".tif")
         # Make a compressed copy of an existing raster.
         compressed = self.rs.warp(
             {"papsz_options": {"compress": "packbits"}, "name": rstfile.name}
@@ -408,9 +416,19 @@ class GDALRasterTests(SimpleTestCase):
         # Check physically if compression worked.
         self.assertLess(os.path.getsize(compressed.name), os.path.getsize(self.rs.name))
         # Create file-based raster with options from scratch.
+        papsz_options = {
+            "compress": "packbits",
+            "blockxsize": 23,
+            "blockysize": 23,
+        }
+        if GDAL_VERSION < (3, 7):
+            datatype = 1
+            papsz_options["pixeltype"] = "signedbyte"
+        else:
+            datatype = 14
         compressed = GDALRaster(
             {
-                "datatype": 1,
+                "datatype": datatype,
                 "driver": "tif",
                 "name": rstfile.name,
                 "width": 40,
@@ -425,12 +443,7 @@ class GDALRasterTests(SimpleTestCase):
                         "nodata_value": 255,
                     }
                 ],
-                "papsz_options": {
-                    "compress": "packbits",
-                    "pixeltype": "signedbyte",
-                    "blockxsize": 23,
-                    "blockysize": 23,
-                },
+                "papsz_options": papsz_options,
             }
         )
         # Check if options used on creation are stored in metadata.
@@ -441,9 +454,12 @@ class GDALRasterTests(SimpleTestCase):
             compressed.metadata["IMAGE_STRUCTURE"]["COMPRESSION"],
             "PACKBITS",
         )
-        self.assertEqual(
-            compressed.bands[0].metadata["IMAGE_STRUCTURE"]["PIXELTYPE"], "SIGNEDBYTE"
-        )
+        self.assertEqual(compressed.bands[0].datatype(), datatype)
+        if GDAL_VERSION < (3, 7):
+            self.assertEqual(
+                compressed.bands[0].metadata["IMAGE_STRUCTURE"]["PIXELTYPE"],
+                "SIGNEDBYTE",
+            )
         self.assertIn("Block=40x23", compressed.info)
 
     def test_raster_warp(self):
@@ -548,7 +564,7 @@ class GDALRasterTests(SimpleTestCase):
         self.assertEqual(result, [23] * 16)
 
     def test_raster_clone(self):
-        rstfile = tempfile.NamedTemporaryFile(suffix=".tif")
+        rstfile = NamedTemporaryFile(suffix=".tif")
         tests = [
             ("MEM", "", 23),  # In memory raster.
             ("tif", rstfile.name, 99),  # In file based raster.
@@ -594,7 +610,7 @@ class GDALRasterTests(SimpleTestCase):
         for srs in tests:
             with self.subTest(srs=srs):
                 # Prepare tempfile and nodata value.
-                rstfile = tempfile.NamedTemporaryFile(suffix=".tif")
+                rstfile = NamedTemporaryFile(suffix=".tif")
                 ndv = 99
                 # Create in file based raster.
                 source = GDALRaster(
@@ -695,7 +711,7 @@ class GDALRasterTests(SimpleTestCase):
     def test_raster_transform_clone(self):
         with mock.patch.object(GDALRaster, "clone") as mocked_clone:
             # Create in file based raster.
-            rstfile = tempfile.NamedTemporaryFile(suffix=".tif")
+            rstfile = NamedTemporaryFile(suffix=".tif")
             source = GDALRaster(
                 {
                     "datatype": 1,
@@ -723,7 +739,7 @@ class GDALRasterTests(SimpleTestCase):
 
     def test_raster_transform_clone_name(self):
         # Create in file based raster.
-        rstfile = tempfile.NamedTemporaryFile(suffix=".tif")
+        rstfile = NamedTemporaryFile(suffix=".tif")
         source = GDALRaster(
             {
                 "datatype": 1,
@@ -801,10 +817,16 @@ class GDALBandTests(SimpleTestCase):
             rs = band = None
             self.assertTrue(os.path.isfile(pam_file))
 
+    def _remove_aux_file(self):
+        pam_file = self.rs_path + ".aux.xml"
+        if os.path.isfile(pam_file):
+            os.remove(pam_file)
+
     def test_read_mode_error(self):
         # Open raster in read mode
         rs = GDALRaster(self.rs_path, write=False)
         band = rs.bands[0]
+        self.addCleanup(self._remove_aux_file)
 
         # Setting attributes in write mode raises exception in the _flush method
         with self.assertRaises(GDALException):

@@ -67,6 +67,7 @@ Adds a few conveniences for perfectionists:
 
     from django.views.decorators.common import no_append_slash
 
+
     @no_append_slash
     def sensitive_fbv(request, *args, **kwargs):
         """View to be excluded from APPEND_SLASH."""
@@ -93,18 +94,29 @@ GZip middleware
 
 .. class:: GZipMiddleware
 
-.. warning::
+    .. attribute:: max_random_bytes
 
-    Security researchers recently revealed that when compression techniques
-    (including ``GZipMiddleware``) are used on a website, the site may become
-    exposed to a number of possible attacks. Before using ``GZipMiddleware`` on
-    your site, you should consider very carefully whether you are subject to
-    these attacks. If you're in *any* doubt about whether you're affected, you
-    should avoid using ``GZipMiddleware``. For more details, see the `the BREACH
-    paper (PDF)`_ and `breachattack.com`_.
+        Defaults to 100. Subclass ``GZipMiddleware`` and override the attribute
+        to change the maximum number of random bytes that is included with
+        compressed responses.
 
-    .. _the BREACH paper (PDF): http://breachattack.com/resources/BREACH%20-%20SSL,%20gone%20in%2030%20seconds.pdf
-    .. _breachattack.com: http://breachattack.com
+.. note::
+
+    Security researchers revealed that when compression techniques (including
+    ``GZipMiddleware``) are used on a website, the site may become exposed to a
+    number of possible attacks.
+
+    To mitigate attacks, Django implements a technique called *Heal The Breach
+    (HTB)*. It adds up to 100 bytes (see
+    :attr:`.max_random_bytes`) of random bytes to each response
+    to make the attacks less effective.
+
+    For more details, see the `BREACH paper (PDF)`_, `breachattack.com`_, and
+    the `Heal The Breach (HTB) paper`_.
+
+    .. _BREACH paper (PDF): https://www.breachattack.com/resources/BREACH%20-%20SSL,%20gone%20in%2030%20seconds.pdf
+    .. _breachattack.com: https://www.breachattack.com/
+    .. _Heal The Breach (HTB) paper: https://ieeexplore.ieee.org/document/9754554
 
 The ``django.middleware.gzip.GZipMiddleware`` compresses content for browsers
 that understand GZip compression (all modern browsers).
@@ -122,7 +134,7 @@ It will NOT compress content if any of the following are true:
   containing ``gzip``.
 
 If the response has an ``ETag`` header, the ETag is made weak to comply with
-:rfc:`7232#section-2.1`.
+:rfc:`9110#section-8.8.1`.
 
 You can apply GZip compression to individual views using the
 :func:`~django.views.decorators.gzip.gzip_page()` decorator.
@@ -140,6 +152,9 @@ header, the middleware adds one if needed. If the response has an ``ETag`` or
 ``Last-Modified`` header, and the request has ``If-None-Match`` or
 ``If-Modified-Since``, the response is replaced by an
 :class:`~django.http.HttpResponseNotModified`.
+
+You can handle conditional GET operations with individual views using the
+:func:`~django.views.decorators.http.conditional_page()` decorator.
 
 Locale middleware
 -----------------
@@ -297,10 +312,11 @@ for:
 
 .. warning::
     When your site is served via HTTPS, :ref:`Django's CSRF protection system
-    <using-csrf>` requires the ``Referer`` header to be present, so completely
-    disabling the ``Referer`` header will interfere with CSRF protection. To
-    gain most of the benefits of disabling ``Referer`` headers while also
-    keeping CSRF protection, consider enabling only same-origin referrers.
+    <how-csrf-works>` requires the ``Referer`` header to be present, so
+    completely disabling the ``Referer`` header will interfere with CSRF
+    protection. To gain most of the benefits of disabling ``Referer`` headers
+    while also keeping CSRF protection, consider enabling only same-origin
+    referrers.
 
 ``SecurityMiddleware`` can set the ``Referrer-Policy`` header for you, based on
 the :setting:`SECURE_REFERRER_POLICY` setting (note spelling: browsers send a
@@ -353,8 +369,6 @@ this setting are:
 
 Cross-Origin Opener Policy
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 4.0
 
 Some browsers have the ability to isolate top-level windows from other
 documents by putting them in a separate browsing context group based on the
@@ -484,6 +498,85 @@ Adds the ``user`` attribute, representing the currently-logged-in user, to
 every incoming ``HttpRequest`` object. See :ref:`Authentication in web requests
 <auth-web-requests>`.
 
+.. class:: LoginRequiredMiddleware
+
+.. versionadded:: 5.1
+
+Redirects all unauthenticated requests to a login page, except for views
+excluded with :func:`~.django.contrib.auth.decorators.login_not_required`. The
+login page defaults to :setting:`settings.LOGIN_URL <LOGIN_URL>`, but can be
+customized.
+
+Enable this middleware by adding it to the :setting:`MIDDLEWARE` setting
+**after** :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`::
+
+    MIDDLEWARE = [
+        "...",
+        "django.contrib.auth.middleware.AuthenticationMiddleware",
+        "django.contrib.auth.middleware.LoginRequiredMiddleware",
+        "...",
+    ]
+
+Make a view public, allowing unauthenticated requests, with
+:func:`~.django.contrib.auth.decorators.login_not_required`. For example::
+
+       from django.contrib.auth.decorators import login_not_required
+
+
+       @login_not_required
+       def contact_us(request): ...
+
+Customize the login URL or field name for authenticated views with the
+:func:`~.django.contrib.auth.decorators.login_required` decorator to set
+``login_url`` or ``redirect_field_name`` respectively. For example::
+
+    from django.contrib.auth.decorators import login_required
+    from django.utils.decorators import method_decorator
+    from django.views.generic import View
+
+
+    @login_required(login_url="/books/login/", redirect_field_name="redirect_to")
+    def book_dashboard(request): ...
+
+
+    @method_decorator(
+        login_required(login_url="/books/login/", redirect_field_name="redirect_to"),
+        name="dispatch",
+    )
+    class BookMetrics(View):
+        pass
+
+.. admonition:: Ensure that your login view does not require a login.
+
+    To prevent infinite redirects, ensure you have
+    :ref:`enabled unauthenticated requests
+    <disable-login-required-middleware-for-views>` to your login view.
+
+**Methods and Attributes**
+
+Subclass the middleware and override these to customize behavior for
+unauthenticated requests.
+
+.. attribute:: redirect_field_name
+
+    Defaults to ``"next"``.
+
+.. method:: get_login_url()
+
+    Returns the URL that unauthenticated requests will be redirected to. If
+    defined, this returns the ``login_url`` set on the
+    :func:`~.django.contrib.auth.decorators.login_required` decorator. Defaults
+    to :setting:`settings.LOGIN_URL <LOGIN_URL>`.
+
+.. method:: get_redirect_field_name()
+
+    Returns the name of the query parameter that contains the URL the user
+    should be redirected to after a successful login. If defined, this returns
+    the ``redirect_field_name`` set on the
+    :func:`~.django.contrib.auth.decorators.login_required` decorator. Defaults
+    to :attr:`redirect_field_name`. If ``None`` is returned, a query parameter
+    won't be added.
+
 .. class:: RemoteUserMiddleware
 
 Middleware for utilizing web server provided authentication. See
@@ -505,6 +598,9 @@ CSRF protection middleware
 Adds protection against Cross Site Request Forgeries by adding hidden form
 fields to POST forms and checking requests for the correct value. See the
 :doc:`Cross Site Request Forgery protection documentation </ref/csrf>`.
+
+You can add Cross Site Request Forgery protection to individual views using the
+:func:`~django.views.decorators.csrf.csrf_protect()` decorator.
 
 ``X-Frame-Options`` middleware
 ------------------------------
@@ -585,6 +681,12 @@ Here are some hints about the ordering of various Django middleware classes:
 #. :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`
 
    After ``SessionMiddleware``: uses session storage.
+
+#. :class:`~django.contrib.auth.middleware.LoginRequiredMiddleware`
+
+   .. versionadded:: 5.1
+
+   After ``AuthenticationMiddleware``: uses user object.
 
 #. :class:`~django.contrib.messages.middleware.MessageMiddleware`
 

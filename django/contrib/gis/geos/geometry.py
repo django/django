@@ -2,6 +2,7 @@
  This module contains the 'base' GEOSGeometry object -- all GEOS Geometries
  inherit from this object.
 """
+
 import re
 from ctypes import addressof, byref, c_double
 
@@ -20,7 +21,6 @@ from django.utils.encoding import force_bytes, force_str
 
 
 class GEOSGeometryBase(GEOSBase):
-
     _GEOS_CLASSES = None
 
     ptr_type = GEOM_PTR
@@ -222,8 +222,16 @@ class GEOSGeometryBase(GEOSBase):
         "Return the dimension of this Geometry (0=point, 1=line, 2=surface)."
         return capi.get_dims(self.ptr)
 
-    def normalize(self):
-        "Convert this Geometry to normal form (or canonical form)."
+    def normalize(self, clone=False):
+        """
+        Convert this Geometry to normal form (or canonical form).
+        If the `clone` keyword is set, then the geometry is not modified and a
+        normalized clone of the geometry is returned instead.
+        """
+        if clone:
+            clone = self.clone()
+            capi.geos_normalize(clone.ptr)
+            return clone
         capi.geos_normalize(self.ptr)
 
     def make_valid(self):
@@ -231,8 +239,6 @@ class GEOSGeometryBase(GEOSBase):
         Attempt to create a valid representation of a given invalid geometry
         without losing any of the input vertices.
         """
-        if geos_version_tuple() < (3, 8):
-            raise GEOSException("GEOSGeometry.make_valid() requires GEOS >= 3.8.0.")
         return GEOSGeometry(capi.geos_makevalid(self.ptr), srid=self.srid)
 
     # #### Unary predicates ####
@@ -312,6 +318,16 @@ class GEOSGeometryBase(GEOSBase):
         specified tolerance.
         """
         return capi.geos_equalsexact(self.ptr, other.ptr, float(tolerance))
+
+    def equals_identical(self, other):
+        """
+        Return true if the two Geometries are point-wise equivalent.
+        """
+        if geos_version_tuple() < (3, 12):
+            raise GEOSException(
+                "GEOSGeometry.equals_identical() requires GEOS >= 3.12.0."
+            )
+        return capi.geos_equalsidentical(self.ptr, other.ptr)
 
     def intersects(self, other):
         "Return true if disjoint return false."
@@ -409,7 +425,7 @@ class GEOSGeometryBase(GEOSBase):
     def wkb(self):
         """
         Return the WKB (Well-Known Binary) representation of this Geometry
-        as a Python buffer.  SRID and Z values are not included, use the
+        as a Python memoryview. SRID and Z values are not included, use the
         `ewkb` property instead.
         """
         return wkb_w(3 if self.hasz else 2).write(self)
@@ -417,7 +433,7 @@ class GEOSGeometryBase(GEOSBase):
     @property
     def ewkb(self):
         """
-        Return the EWKB representation of this Geometry as a Python buffer.
+        Return the EWKB representation of this Geometry as a Python memoryview.
         This is an extension of the WKB specification that includes any SRID
         value that are a part of this geometry.
         """
@@ -527,7 +543,7 @@ class GEOSGeometryBase(GEOSBase):
         self, width, quadsegs=8, end_cap_style=1, join_style=1, mitre_limit=5.0
     ):
         """
-        Same as buffer() but allows customizing the style of the buffer.
+        Same as buffer() but allows customizing the style of the memoryview.
 
         End cap style can be round (1), flat (2), or square (3).
         Join style can be round (1), mitre (2), or bevel (3).
@@ -713,7 +729,7 @@ class GEOSGeometry(GEOSGeometryBase, ListMixin):
             - WKT
             - HEXEWKB (a PostGIS-specific canonical form)
             - GeoJSON (requires GDAL)
-         * buffer:
+         * memoryview:
             - WKB
 
         The `srid` keyword specifies the Source Reference Identifier (SRID)
@@ -743,7 +759,7 @@ class GEOSGeometry(GEOSGeometryBase, ListMixin):
             # When the input is a pointer to a geometry (GEOM_PTR).
             g = geo_input
         elif isinstance(geo_input, memoryview):
-            # When the input is a buffer (WKB).
+            # When the input is a memoryview (WKB).
             g = wkb_r().read(geo_input)
         elif isinstance(geo_input, GEOSGeometry):
             g = capi.geom_clone(geo_input.ptr)

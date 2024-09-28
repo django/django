@@ -1,5 +1,8 @@
+import asyncio
 from functools import update_wrapper, wraps
-from unittest import TestCase, mock
+from unittest import TestCase
+
+from asgiref.sync import iscoroutinefunction
 
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import (
@@ -7,18 +10,12 @@ from django.contrib.auth.decorators import (
     permission_required,
     user_passes_test,
 )
-from django.http import HttpRequest, HttpResponse, HttpResponseNotAllowed
-from django.middleware.clickjacking import XFrameOptionsMiddleware
+from django.http import HttpResponse
 from django.test import SimpleTestCase
 from django.utils.decorators import method_decorator
 from django.utils.functional import keep_lazy, keep_lazy_text, lazy
 from django.utils.safestring import mark_safe
 from django.views.decorators.cache import cache_control, cache_page, never_cache
-from django.views.decorators.clickjacking import (
-    xframe_options_deny,
-    xframe_options_exempt,
-    xframe_options_sameorigin,
-)
 from django.views.decorators.http import (
     condition,
     require_GET,
@@ -123,46 +120,15 @@ class DecoratorsTest(TestCase):
 
         self.assertEqual(response, ["test2", "test1"])
 
-    def test_cache_page(self):
-        def my_view(request):
-            return "response"
-
-        my_view_cached = cache_page(123)(my_view)
-        self.assertEqual(my_view_cached(HttpRequest()), "response")
-        my_view_cached2 = cache_page(123, key_prefix="test")(my_view)
-        self.assertEqual(my_view_cached2(HttpRequest()), "response")
-
-    def test_require_safe_accepts_only_safe_methods(self):
-        """
-        Test for the require_safe decorator.
-        A view returns either a response or an exception.
-        Refs #15637.
-        """
-
-        def my_view(request):
-            return HttpResponse("OK")
-
-        my_safe_view = require_safe(my_view)
-        request = HttpRequest()
-        request.method = "GET"
-        self.assertIsInstance(my_safe_view(request), HttpResponse)
-        request.method = "HEAD"
-        self.assertIsInstance(my_safe_view(request), HttpResponse)
-        request.method = "POST"
-        self.assertIsInstance(my_safe_view(request), HttpResponseNotAllowed)
-        request.method = "PUT"
-        self.assertIsInstance(my_safe_view(request), HttpResponseNotAllowed)
-        request.method = "DELETE"
-        self.assertIsInstance(my_safe_view(request), HttpResponseNotAllowed)
-
 
 # For testing method_decorator, a decorator that assumes a single argument.
 # We will get type arguments if there is a mismatch in the number of arguments.
 def simple_dec(func):
+    @wraps(func)
     def wrapper(arg):
         return func("test:" + arg)
 
-    return wraps(func)(wrapper)
+    return wrapper
 
 
 simple_dec_m = method_decorator(simple_dec)
@@ -196,10 +162,10 @@ class ClsDec:
         self.myattr = myattr
 
     def __call__(self, f):
-        def wrapped():
+        def wrapper():
             return f() and self.myattr
 
-        return update_wrapper(wrapped, f)
+        return update_wrapper(wrapper, f)
 
 
 class MethodDecoratorTests(SimpleTestCase):
@@ -473,143 +439,260 @@ class MethodDecoratorTests(SimpleTestCase):
         self.assertIsNotNone(func_module)
 
 
-class XFrameOptionsDecoratorsTests(TestCase):
+def async_simple_dec(func):
+    @wraps(func)
+    async def wrapper(*args, **kwargs):
+        result = await func(*args, **kwargs)
+        return f"returned: {result}"
+
+    return wrapper
+
+
+async_simple_dec_m = method_decorator(async_simple_dec)
+
+
+class AsyncMethodDecoratorTests(SimpleTestCase):
     """
-    Tests for the X-Frame-Options decorators.
+    Tests for async method_decorator
     """
 
-    def test_deny_decorator(self):
-        """
-        Ensures @xframe_options_deny properly sets the X-Frame-Options header.
-        """
+    async def test_preserve_signature(self):
+        class Test:
+            @async_simple_dec_m
+            async def say(self, msg):
+                return f"Saying {msg}"
 
-        @xframe_options_deny
-        def a_view(request):
-            return HttpResponse()
+        self.assertEqual(await Test().say("hello"), "returned: Saying hello")
 
-        r = a_view(HttpRequest())
-        self.assertEqual(r.headers["X-Frame-Options"], "DENY")
+    def test_preserve_attributes(self):
+        async def func(*args, **kwargs):
+            await asyncio.sleep(0.01)
+            return args, kwargs
 
-    def test_sameorigin_decorator(self):
-        """
-        Ensures @xframe_options_sameorigin properly sets the X-Frame-Options
-        header.
-        """
+        def myattr_dec(func):
+            async def wrapper(*args, **kwargs):
+                return await func(*args, **kwargs)
 
-        @xframe_options_sameorigin
-        def a_view(request):
-            return HttpResponse()
+            wrapper.myattr = True
+            return wrapper
 
-        r = a_view(HttpRequest())
-        self.assertEqual(r.headers["X-Frame-Options"], "SAMEORIGIN")
+        def myattr2_dec(func):
+            async def wrapper(*args, **kwargs):
+                return await func(*args, **kwargs)
 
-    def test_exempt_decorator(self):
-        """
-        Ensures @xframe_options_exempt properly instructs the
-        XFrameOptionsMiddleware to NOT set the header.
-        """
+            wrapper.myattr2 = True
+            return wrapper
 
-        @xframe_options_exempt
-        def a_view(request):
-            return HttpResponse()
+        # Sanity check myattr_dec and myattr2_dec
+        func = myattr_dec(func)
 
-        req = HttpRequest()
-        resp = a_view(req)
-        self.assertIsNone(resp.get("X-Frame-Options", None))
-        self.assertTrue(resp.xframe_options_exempt)
+        self.assertIs(getattr(func, "myattr", False), True)
 
-        # Since the real purpose of the exempt decorator is to suppress
-        # the middleware's functionality, let's make sure it actually works...
-        r = XFrameOptionsMiddleware(a_view)(req)
-        self.assertIsNone(r.get("X-Frame-Options", None))
+        func = myattr2_dec(func)
+        self.assertIs(getattr(func, "myattr2", False), True)
 
+        func = myattr_dec(myattr2_dec(func))
+        self.assertIs(getattr(func, "myattr", False), True)
+        self.assertIs(getattr(func, "myattr2", False), False)
 
-class HttpRequestProxy:
-    def __init__(self, request):
-        self._request = request
+        myattr_dec_m = method_decorator(myattr_dec)
+        myattr2_dec_m = method_decorator(myattr2_dec)
 
-    def __getattr__(self, attr):
-        """Proxy to the underlying HttpRequest object."""
-        return getattr(self._request, attr)
+        # Decorate using method_decorator() on the async method.
+        class TestPlain:
+            @myattr_dec_m
+            @myattr2_dec_m
+            async def method(self):
+                "A method"
 
+        # Decorate using method_decorator() on both the class and the method.
+        # The decorators applied to the methods are applied before the ones
+        # applied to the class.
+        @method_decorator(myattr_dec_m, "method")
+        class TestMethodAndClass:
+            @method_decorator(myattr2_dec_m)
+            async def method(self):
+                "A method"
 
-class NeverCacheDecoratorTest(SimpleTestCase):
-    @mock.patch("time.time")
-    def test_never_cache_decorator_headers(self, mocked_time):
-        @never_cache
-        def a_view(request):
-            return HttpResponse()
+        # Decorate using an iterable of function decorators.
+        @method_decorator((myattr_dec, myattr2_dec), "method")
+        class TestFunctionIterable:
+            async def method(self):
+                "A method"
 
-        mocked_time.return_value = 1167616461.0
-        response = a_view(HttpRequest())
-        self.assertEqual(
-            response.headers["Expires"],
-            "Mon, 01 Jan 2007 01:54:21 GMT",
+        # Decorate using an iterable of method decorators.
+        @method_decorator((myattr_dec_m, myattr2_dec_m), "method")
+        class TestMethodIterable:
+            async def method(self):
+                "A method"
+
+        tests = (
+            TestPlain,
+            TestMethodAndClass,
+            TestFunctionIterable,
+            TestMethodIterable,
         )
-        self.assertEqual(
-            response.headers["Cache-Control"],
-            "max-age=0, no-cache, no-store, must-revalidate, private",
-        )
+        for Test in tests:
+            with self.subTest(Test=Test):
+                self.assertIs(getattr(Test().method, "myattr", False), True)
+                self.assertIs(getattr(Test().method, "myattr2", False), True)
+                self.assertIs(getattr(Test.method, "myattr", False), True)
+                self.assertIs(getattr(Test.method, "myattr2", False), True)
+                self.assertEqual(Test.method.__doc__, "A method")
+                self.assertEqual(Test.method.__name__, "method")
 
-    def test_never_cache_decorator_expires_not_overridden(self):
-        @never_cache
-        def a_view(request):
-            return HttpResponse(headers={"Expires": "tomorrow"})
+    async def test_new_attribute(self):
+        """A decorator that sets a new attribute on the method."""
 
-        response = a_view(HttpRequest())
-        self.assertEqual(response.headers["Expires"], "tomorrow")
+        def decorate(func):
+            func.x = 1
+            return func
 
-    def test_never_cache_decorator_http_request(self):
         class MyClass:
-            @never_cache
-            def a_view(self, request):
-                return HttpResponse()
+            @method_decorator(decorate)
+            async def method(self):
+                return True
 
-        request = HttpRequest()
-        msg = (
-            "never_cache didn't receive an HttpRequest. If you are decorating "
-            "a classmethod, be sure to use @method_decorator."
-        )
+        obj = MyClass()
+        self.assertEqual(obj.method.x, 1)
+        self.assertIs(await obj.method(), True)
+
+    def test_bad_iterable(self):
+        decorators = {async_simple_dec}
+        msg = "'set' object is not subscriptable"
         with self.assertRaisesMessage(TypeError, msg):
-            MyClass().a_view(request)
-        with self.assertRaisesMessage(TypeError, msg):
-            MyClass().a_view(HttpRequestProxy(request))
 
-    def test_never_cache_decorator_http_request_proxy(self):
-        class MyClass:
-            @method_decorator(never_cache)
-            def a_view(self, request):
-                return HttpResponse()
+            @method_decorator(decorators, "method")
+            class TestIterable:
+                async def method(self):
+                    await asyncio.sleep(0.01)
 
-        request = HttpRequest()
-        response = MyClass().a_view(HttpRequestProxy(request))
-        self.assertIn("Cache-Control", response.headers)
-        self.assertIn("Expires", response.headers)
+    async def test_argumented(self):
 
+        class ClsDecAsync:
+            def __init__(self, myattr):
+                self.myattr = myattr
 
-class CacheControlDecoratorTest(SimpleTestCase):
-    def test_cache_control_decorator_http_request(self):
-        class MyClass:
-            @cache_control(a="b")
-            def a_view(self, request):
-                return HttpResponse()
+            def __call__(self, f):
+                async def wrapper():
+                    result = await f()
+                    return f"{result} appending {self.myattr}"
 
-        msg = (
-            "cache_control didn't receive an HttpRequest. If you are "
-            "decorating a classmethod, be sure to use @method_decorator."
-        )
-        request = HttpRequest()
-        with self.assertRaisesMessage(TypeError, msg):
-            MyClass().a_view(request)
-        with self.assertRaisesMessage(TypeError, msg):
-            MyClass().a_view(HttpRequestProxy(request))
+                return update_wrapper(wrapper, f)
 
-    def test_cache_control_decorator_http_request_proxy(self):
-        class MyClass:
-            @method_decorator(cache_control(a="b"))
-            def a_view(self, request):
-                return HttpResponse()
+        class Test:
+            @method_decorator(ClsDecAsync(False))
+            async def method(self):
+                return True
 
-        request = HttpRequest()
-        response = MyClass().a_view(HttpRequestProxy(request))
-        self.assertEqual(response.headers["Cache-Control"], "a=b")
+        self.assertEqual(await Test().method(), "True appending False")
+
+    async def test_descriptors(self):
+        class bound_wrapper:
+            def __init__(self, wrapped):
+                self.wrapped = wrapped
+                self.__name__ = wrapped.__name__
+
+            async def __call__(self, *args, **kwargs):
+                return await self.wrapped(*args, **kwargs)
+
+            def __get__(self, instance, cls=None):
+                return self
+
+        class descriptor_wrapper:
+            def __init__(self, wrapped):
+                self.wrapped = wrapped
+                self.__name__ = wrapped.__name__
+
+            def __get__(self, instance, cls=None):
+                return bound_wrapper(self.wrapped.__get__(instance, cls))
+
+        class Test:
+            @async_simple_dec_m
+            @descriptor_wrapper
+            async def method(self, arg):
+                return arg
+
+        self.assertEqual(await Test().method(1), "returned: 1")
+
+    async def test_class_decoration(self):
+        """
+        @method_decorator can be used to decorate a class and its methods.
+        """
+
+        @method_decorator(async_simple_dec, name="method")
+        class Test:
+            async def method(self):
+                return False
+
+            async def not_method(self):
+                return "a string"
+
+        self.assertEqual(await Test().method(), "returned: False")
+        self.assertEqual(await Test().not_method(), "a string")
+
+    async def test_tuple_of_decorators(self):
+        """
+        @method_decorator can accept a tuple of decorators.
+        """
+
+        def add_question_mark(func):
+            async def _wrapper(*args, **kwargs):
+                await asyncio.sleep(0.01)
+                return await func(*args, **kwargs) + "?"
+
+            return _wrapper
+
+        def add_exclamation_mark(func):
+            async def _wrapper(*args, **kwargs):
+                await asyncio.sleep(0.01)
+                return await func(*args, **kwargs) + "!"
+
+            return _wrapper
+
+        decorators = (add_exclamation_mark, add_question_mark)
+
+        @method_decorator(decorators, name="method")
+        class TestFirst:
+            async def method(self):
+                return "hello world"
+
+        class TestSecond:
+            @method_decorator(decorators)
+            async def method(self):
+                return "world hello"
+
+        self.assertEqual(await TestFirst().method(), "hello world?!")
+        self.assertEqual(await TestSecond().method(), "world hello?!")
+
+    async def test_wrapper_assignments(self):
+        """@method_decorator preserves wrapper assignments."""
+        func_data = {}
+
+        def decorator(func):
+            @wraps(func)
+            async def inner(*args, **kwargs):
+                func_data["func_name"] = getattr(func, "__name__", None)
+                func_data["func_module"] = getattr(func, "__module__", None)
+                return await func(*args, **kwargs)
+
+            return inner
+
+        class Test:
+            @method_decorator(decorator)
+            async def method(self):
+                return "tests"
+
+        await Test().method()
+        expected = {"func_name": "method", "func_module": "decorators.tests"}
+        self.assertEqual(func_data, expected)
+
+    async def test_markcoroutinefunction_applied(self):
+        class Test:
+            @async_simple_dec_m
+            async def method(self):
+                return "tests"
+
+        method = Test().method
+        self.assertIs(iscoroutinefunction(method), True)
+        self.assertEqual(await method(), "returned: tests")

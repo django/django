@@ -3,9 +3,6 @@ from django.db import migrations, models
 from ..fields import (
     ArrayField,
     BigIntegerRangeField,
-    CICharField,
-    CIEmailField,
-    CITextField,
     DateRangeField,
     DateTimeRangeField,
     DecimalRangeField,
@@ -18,7 +15,6 @@ from ..models import TagField
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("postgres_tests", "0001_setup_extensions"),
     ]
@@ -110,7 +106,10 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 ("tags", ArrayField(TagField(), blank=True, null=True, size=None)),
-                ("json", ArrayField(models.JSONField(default={}), default=[])),
+                (
+                    "json",
+                    ArrayField(models.JSONField(default=dict), default=list, size=None),
+                ),
                 ("int_ranges", ArrayField(IntegerRangeField(), null=True, blank=True)),
                 (
                     "bigint_ranges",
@@ -134,7 +133,12 @@ class Migration(migrations.Migration):
                         primary_key=True,
                     ),
                 ),
-                ("field", ArrayField(models.IntegerField(), size=None)),
+                (
+                    "field",
+                    ArrayField(
+                        models.IntegerField(), blank=True, default=list, size=None
+                    ),
+                ),
             ],
             options={
                 "required_db_vendor": "postgresql",
@@ -182,7 +186,7 @@ class Migration(migrations.Migration):
                 (
                     "field_nested",
                     ArrayField(
-                        ArrayField(models.IntegerField(), size=None, null=True),
+                        ArrayField(models.IntegerField(null=True), size=None),
                         size=None,
                         null=True,
                     ),
@@ -233,9 +237,7 @@ class Migration(migrations.Migration):
             fields=[
                 (
                     "id",
-                    models.SmallAutoField(
-                        verbose_name="ID", serialize=False, primary_key=True
-                    ),
+                    models.SmallAutoField(serialize=False, primary_key=True),
                 ),
             ],
             options=None,
@@ -245,9 +247,7 @@ class Migration(migrations.Migration):
             fields=[
                 (
                     "id",
-                    models.BigAutoField(
-                        verbose_name="ID", serialize=False, primary_key=True
-                    ),
+                    models.BigAutoField(serialize=False, primary_key=True),
                 ),
             ],
             options=None,
@@ -288,19 +288,6 @@ class Migration(migrations.Migration):
             bases=None,
         ),
         migrations.CreateModel(
-            name="CITestModel",
-            fields=[
-                ("name", CICharField(primary_key=True, max_length=255)),
-                ("email", CIEmailField()),
-                ("description", CITextField()),
-                ("array_field", ArrayField(CITextField(), null=True)),
-            ],
-            options={
-                "required_db_vendor": "postgresql",
-            },
-            bases=None,
-        ),
-        migrations.CreateModel(
             name="Line",
             fields=[
                 (
@@ -314,14 +301,12 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "scene",
-                    models.ForeignKey(
-                        "postgres_tests.Scene", on_delete=models.SET_NULL
-                    ),
+                    models.ForeignKey("postgres_tests.Scene", on_delete=models.CASCADE),
                 ),
                 (
                     "character",
                     models.ForeignKey(
-                        "postgres_tests.Character", on_delete=models.SET_NULL
+                        "postgres_tests.Character", on_delete=models.CASCADE
                     ),
                 ),
                 ("dialogue", models.TextField(blank=True, null=True)),
@@ -449,7 +434,7 @@ class Migration(migrations.Migration):
                         primary_key=True,
                     ),
                 ),
-                ("ints", IntegerRangeField(null=True, blank=True)),
+                ("ints", IntegerRangeField(null=True, blank=True, db_default=(5, 10))),
                 ("bigints", BigIntegerRangeField(null=True, blank=True)),
                 ("decimals", DecimalRangeField(null=True, blank=True)),
                 ("timestamps", DateTimeRangeField(null=True, blank=True)),
@@ -467,6 +452,15 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="RangeLookupsModel",
             fields=[
+                (
+                    "id",
+                    models.AutoField(
+                        verbose_name="ID",
+                        serialize=False,
+                        auto_created=True,
+                        primary_key=True,
+                    ),
+                ),
                 (
                     "parent",
                     models.ForeignKey(
@@ -508,7 +502,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "array_of_enums",
-                    ArrayField(EnumField(max_length=20), null=True, blank=True),
+                    ArrayField(EnumField(max_length=20), size=None),
                 ),
             ],
             options={

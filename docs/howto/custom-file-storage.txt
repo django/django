@@ -13,14 +13,15 @@ You'll need to follow these steps:
 
         from django.core.files.storage import Storage
 
-        class MyStorage(Storage):
-            ...
+
+        class MyStorage(Storage): ...
 
 #. Django must be able to instantiate your storage system without any arguments.
    This means that any settings should be taken from ``django.conf.settings``::
 
         from django.conf import settings
         from django.core.files.storage import Storage
+
 
         class MyStorage(Storage):
             def __init__(self, option=None):
@@ -74,7 +75,8 @@ objects. These are:
 Called by ``Storage.open()``, this is the actual mechanism the storage class
 uses to open the file. This must return a ``File`` object, though in most cases,
 you'll want to return some subclass here that implements logic specific to the
-backend storage system.
+backend storage system. The :exc:`FileNotFoundError` exception should be raised
+when a file doesn't exist.
 
 .. method:: _save(name, content)
 
@@ -82,8 +84,8 @@ Called by ``Storage.save()``. The ``name`` will already have gone through
 ``get_valid_name()`` and ``get_available_name()``, and the ``content`` will be a
 ``File`` object itself.
 
-Should return the actual name of name of the file saved (usually the ``name``
-passed in, but if the storage needs to change the file name return the new name
+Should return the actual name of the file saved (usually the ``name`` passed
+in, but if the storage needs to change the file name return the new name
 instead).
 
 .. method:: get_valid_name(name)
@@ -116,3 +118,22 @@ free unique filename cannot be found, a :exc:`SuspiciousFileOperation
 
 If a file with ``name`` already exists, ``get_alternative_name()`` is called to
 obtain an alternative name.
+
+.. _using-custom-storage-engine:
+
+Use your custom storage engine
+==============================
+
+The first step to using your custom storage with Django is to tell Django about
+the file storage backend you'll be using. This is done using the
+:setting:`STORAGES` setting. This setting maps storage aliases, which are a way
+to refer to a specific storage throughout Django, to a dictionary of settings
+for that specific storage backend. The settings in the inner dictionaries are
+described fully in the :setting:`STORAGES` documentation.
+
+Storages are then accessed by alias from the
+:data:`django.core.files.storage.storages` dictionary::
+
+    from django.core.files.storage import storages
+
+    example_storage = storages["example"]

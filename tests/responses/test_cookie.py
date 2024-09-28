@@ -1,12 +1,12 @@
 import time
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
+from email.utils import format_datetime as format_datetime_rfc5322
 from http import cookies
 
 from django.http import HttpResponse
 from django.test import SimpleTestCase
 from django.test.utils import freeze_time
 from django.utils.http import http_date
-from django.utils.timezone import utc
 
 
 class SetCookieTests(SimpleTestCase):
@@ -18,7 +18,9 @@ class SetCookieTests(SimpleTestCase):
         # evaluated expiration time and the time evaluated in set_cookie(). If
         # this difference doesn't exist, the cookie time will be 1 second
         # larger. The sleep guarantees that there will be a time difference.
-        expires = datetime.now(tz=utc).replace(tzinfo=None) + timedelta(seconds=10)
+        expires = datetime.now(tz=timezone.utc).replace(tzinfo=None) + timedelta(
+            seconds=10
+        )
         time.sleep(0.001)
         response.set_cookie("datetime", expires=expires)
         datetime_cookie = response.cookies["datetime"]
@@ -27,7 +29,7 @@ class SetCookieTests(SimpleTestCase):
     def test_aware_expiration(self):
         """set_cookie() accepts an aware datetime as expiration time."""
         response = HttpResponse()
-        expires = datetime.now(tz=utc) + timedelta(seconds=10)
+        expires = datetime.now(tz=timezone.utc) + timedelta(seconds=10)
         time.sleep(0.001)
         response.set_cookie("datetime", expires=expires)
         datetime_cookie = response.cookies["datetime"]
@@ -48,12 +50,18 @@ class SetCookieTests(SimpleTestCase):
     def test_far_expiration(self):
         """Cookie will expire when a distant expiration time is provided."""
         response = HttpResponse()
-        response.set_cookie("datetime", expires=datetime(2038, 1, 1, 4, 5, 6))
+        future_datetime = datetime(
+            date.today().year + 2, 1, 1, 4, 5, 6, tzinfo=timezone.utc
+        )
+        response.set_cookie("datetime", expires=future_datetime)
         datetime_cookie = response.cookies["datetime"]
         self.assertIn(
             datetime_cookie["expires"],
             # assertIn accounts for slight time dependency (#23450)
-            ("Fri, 01 Jan 2038 04:05:06 GMT", "Fri, 01 Jan 2038 04:05:07 GMT"),
+            (
+                format_datetime_rfc5322(future_datetime, usegmt=True),
+                format_datetime_rfc5322(future_datetime.replace(second=7), usegmt=True),
+            ),
         )
 
     def test_max_age_expiration(self):
@@ -70,6 +78,19 @@ class SetCookieTests(SimpleTestCase):
         response = HttpResponse()
         response.set_cookie("max_age", max_age=10.6)
         self.assertEqual(response.cookies["max_age"]["max-age"], 10)
+
+    def test_max_age_timedelta(self):
+        response = HttpResponse()
+        response.set_cookie("max_age", max_age=timedelta(hours=1))
+        self.assertEqual(response.cookies["max_age"]["max-age"], 3600)
+
+    def test_max_age_with_expires(self):
+        response = HttpResponse()
+        msg = "'expires' and 'max_age' can't be used together."
+        with self.assertRaisesMessage(ValueError, msg):
+            response.set_cookie(
+                "max_age", expires=datetime(2000, 1, 1), max_age=timedelta(hours=1)
+            )
 
     def test_httponly_cookie(self):
         response = HttpResponse()

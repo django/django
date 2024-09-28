@@ -23,21 +23,24 @@ Fields
 
         It specifies the underlying form field for the array. This is not used
         to render any HTML, but it is used to process the submitted data and
-        validate it. For example::
+        validate it. For example:
+
+        .. code-block:: pycon
 
             >>> from django import forms
             >>> from django.contrib.postgres.forms import SimpleArrayField
 
             >>> class NumberListForm(forms.Form):
             ...     numbers = SimpleArrayField(forms.IntegerField())
+            ...
 
-            >>> form = NumberListForm({'numbers': '1,2,3'})
+            >>> form = NumberListForm({"numbers": "1,2,3"})
             >>> form.is_valid()
             True
             >>> form.cleaned_data
             {'numbers': [1, 2, 3]}
 
-            >>> form = NumberListForm({'numbers': '1,2,a'})
+            >>> form = NumberListForm({"numbers": "1,2,a"})
             >>> form.is_valid()
             False
 
@@ -45,15 +48,18 @@ Fields
 
         This is an optional argument which defaults to a comma: ``,``. This
         value is used to split the submitted data. It allows you to chain
-        ``SimpleArrayField`` for multidimensional data::
+        ``SimpleArrayField`` for multidimensional data:
+
+        .. code-block:: pycon
 
             >>> from django import forms
             >>> from django.contrib.postgres.forms import SimpleArrayField
 
             >>> class GridForm(forms.Form):
-            ...     places = SimpleArrayField(SimpleArrayField(IntegerField()), delimiter='|')
+            ...     places = SimpleArrayField(SimpleArrayField(IntegerField()), delimiter="|")
+            ...
 
-            >>> form = GridForm({'places': '1,2|2,1|4,3'})
+            >>> form = GridForm({"places": "1,2|2,1|4,3"})
             >>> form.is_valid()
             True
             >>> form.cleaned_data
@@ -111,31 +117,31 @@ Fields
 
             SplitArrayField(IntegerField(required=True), size=3, remove_trailing_nulls=False)
 
-            ['1', '2', '3']  # -> [1, 2, 3]
-            ['1', '2', '']  # -> ValidationError - third entry required.
-            ['1', '', '3']  # -> ValidationError - second entry required.
-            ['', '2', '']  # -> ValidationError - first and third entries required.
+            ["1", "2", "3"]  # -> [1, 2, 3]
+            ["1", "2", ""]  # -> ValidationError - third entry required.
+            ["1", "", "3"]  # -> ValidationError - second entry required.
+            ["", "2", ""]  # -> ValidationError - first and third entries required.
 
             SplitArrayField(IntegerField(required=False), size=3, remove_trailing_nulls=False)
 
-            ['1', '2', '3']  # -> [1, 2, 3]
-            ['1', '2', '']  # -> [1, 2, None]
-            ['1', '', '3']  # -> [1, None, 3]
-            ['', '2', '']  # -> [None, 2, None]
+            ["1", "2", "3"]  # -> [1, 2, 3]
+            ["1", "2", ""]  # -> [1, 2, None]
+            ["1", "", "3"]  # -> [1, None, 3]
+            ["", "2", ""]  # -> [None, 2, None]
 
             SplitArrayField(IntegerField(required=True), size=3, remove_trailing_nulls=True)
 
-            ['1', '2', '3']  # -> [1, 2, 3]
-            ['1', '2', '']  # -> [1, 2]
-            ['1', '', '3']  # -> ValidationError - second entry required.
-            ['', '2', '']  # -> ValidationError - first entry required.
+            ["1", "2", "3"]  # -> [1, 2, 3]
+            ["1", "2", ""]  # -> [1, 2]
+            ["1", "", "3"]  # -> ValidationError - second entry required.
+            ["", "2", ""]  # -> ValidationError - first entry required.
 
             SplitArrayField(IntegerField(required=False), size=3, remove_trailing_nulls=True)
 
-            ['1', '2', '3']  # -> [1, 2, 3]
-            ['1', '2', '']  # -> [1, 2]
-            ['1', '', '3']  # -> [1, None, 3]
-            ['', '2', '']  # -> [None, 2]
+            ["1", "2", "3"]  # -> [1, 2, 3]
+            ["1", "2", ""]  # -> [1, 2]
+            ["1", "", "3"]  # -> [1, None, 3]
+            ["", "2", ""]  # -> [None, 2]
 
 ``HStoreField``
 ---------------
@@ -173,7 +179,7 @@ not greater than the upper bound. All of these fields use
 .. class:: IntegerRangeField
 
     Based on :class:`~django.forms.IntegerField` and translates its input into
-    :class:`~psycopg2:psycopg2.extras.NumericRange`. Default for
+    ``django.db.backends.postgresql.psycopg_any.NumericRange``. Default for
     :class:`~django.contrib.postgres.fields.IntegerRangeField` and
     :class:`~django.contrib.postgres.fields.BigIntegerRangeField`.
 
@@ -183,7 +189,7 @@ not greater than the upper bound. All of these fields use
 .. class:: DecimalRangeField
 
     Based on :class:`~django.forms.DecimalField` and translates its input into
-    :class:`~psycopg2:psycopg2.extras.NumericRange`. Default for
+    ``django.db.backends.postgresql.psycopg_any.NumericRange``. Default for
     :class:`~django.contrib.postgres.fields.DecimalRangeField`.
 
 ``DateTimeRangeField``
@@ -192,7 +198,7 @@ not greater than the upper bound. All of these fields use
 .. class:: DateTimeRangeField
 
     Based on :class:`~django.forms.DateTimeField` and translates its input into
-    :class:`~psycopg2:psycopg2.extras.DateTimeTZRange`. Default for
+    ``django.db.backends.postgresql.psycopg_any.DateTimeTZRange``. Default for
     :class:`~django.contrib.postgres.fields.DateTimeRangeField`.
 
 ``DateRangeField``
@@ -201,7 +207,7 @@ not greater than the upper bound. All of these fields use
 .. class:: DateRangeField
 
     Based on :class:`~django.forms.DateField` and translates its input into
-    :class:`~psycopg2:psycopg2.extras.DateRange`. Default for
+    ``django.db.backends.postgresql.psycopg_any.DateRange``. Default for
     :class:`~django.contrib.postgres.fields.DateRangeField`.
 
 Widgets

@@ -2,9 +2,8 @@ import decimal
 
 from django.core.exceptions import ValidationError
 from django.forms import DecimalField, NumberInput, Widget
-from django.test import SimpleTestCase, ignore_warnings, override_settings
+from django.test import SimpleTestCase, override_settings
 from django.utils import formats, translation
-from django.utils.deprecation import RemovedInDjango50Warning
 
 from . import FormFieldAssertionsMixin
 
@@ -81,8 +80,9 @@ class DecimalFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
             "--0.12",
         )
         for value in values:
-            with self.subTest(value=value), self.assertRaisesMessage(
-                ValidationError, "'Enter a number.'"
+            with (
+                self.subTest(value=value),
+                self.assertRaisesMessage(ValidationError, "'Enter a number.'"),
             ):
                 f.clean(value)
 
@@ -153,6 +153,25 @@ class DecimalFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         with self.assertRaisesMessage(ValidationError, msg):
             f.clean("1.1")
 
+    def test_decimalfield_step_size_min_value(self):
+        f = DecimalField(
+            step_size=decimal.Decimal("0.3"),
+            min_value=decimal.Decimal("-0.4"),
+        )
+        self.assertWidgetRendersTo(
+            f,
+            '<input name="f" min="-0.4" step="0.3" type="number" id="id_f" required>',
+        )
+        msg = (
+            "Ensure this value is a multiple of step size 0.3, starting from -0.4, "
+            "e.g. -0.4, -0.1, 0.2, and so on."
+        )
+        with self.assertRaisesMessage(ValidationError, msg):
+            f.clean("1")
+        self.assertEqual(f.clean("0.2"), decimal.Decimal("0.2"))
+        self.assertEqual(f.clean(2), decimal.Decimal(2))
+        self.assertEqual(f.step_size, decimal.Decimal("0.3"))
+
     def test_decimalfield_scientific(self):
         f = DecimalField(max_digits=4, decimal_places=2)
         with self.assertRaisesMessage(ValidationError, "Ensure that there are no more"):
@@ -195,31 +214,22 @@ class DecimalFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
             localized_d = formats.localize_input(d)  # -> '0,1' in French
             self.assertFalse(f.has_changed(d, localized_d))
 
-    # RemovedInDjango50Warning: When the deprecation ends, remove
-    # @ignore_warnings and USE_L10N=False. The test should remain because
-    # format-related settings will take precedence over locale-dictated
-    # formats.
-    @ignore_warnings(category=RemovedInDjango50Warning)
-    @override_settings(USE_L10N=False, DECIMAL_SEPARATOR=",")
+    @override_settings(DECIMAL_SEPARATOR=",")
     def test_decimalfield_support_decimal_separator(self):
-        f = DecimalField(localize=True)
-        self.assertEqual(f.clean("1001,10"), decimal.Decimal("1001.10"))
-        self.assertEqual(f.clean("1001.10"), decimal.Decimal("1001.10"))
+        with translation.override(None):
+            f = DecimalField(localize=True)
+            self.assertEqual(f.clean("1001,10"), decimal.Decimal("1001.10"))
+            self.assertEqual(f.clean("1001.10"), decimal.Decimal("1001.10"))
 
-    # RemovedInDjango50Warning: When the deprecation ends, remove
-    # @ignore_warnings and USE_L10N=False. The test should remain because
-    # format-related settings will take precedence over locale-dictated
-    # formats.
-    @ignore_warnings(category=RemovedInDjango50Warning)
     @override_settings(
-        USE_L10N=False,
         DECIMAL_SEPARATOR=",",
         USE_THOUSAND_SEPARATOR=True,
         THOUSAND_SEPARATOR=".",
     )
     def test_decimalfield_support_thousands_separator(self):
-        f = DecimalField(localize=True)
-        self.assertEqual(f.clean("1.001,10"), decimal.Decimal("1001.10"))
-        msg = "'Enter a number.'"
-        with self.assertRaisesMessage(ValidationError, msg):
-            f.clean("1,001.1")
+        with translation.override(None):
+            f = DecimalField(localize=True)
+            self.assertEqual(f.clean("1.001,10"), decimal.Decimal("1001.10"))
+            msg = "'Enter a number.'"
+            with self.assertRaisesMessage(ValidationError, msg):
+                f.clean("1,001.1")

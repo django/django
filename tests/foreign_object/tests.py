@@ -8,6 +8,7 @@ from django.db import models
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import isolate_apps
 from django.utils import translation
+from django.utils.deprecation import RemovedInDjango60Warning
 
 from .models import (
     Article,
@@ -93,7 +94,6 @@ class MultiColumnFKTests(TestCase):
             self.assertIs(membership.person, self.bob)
 
     def test_query_filters_correctly(self):
-
         # Creating a to valid memberships
         Membership.objects.create(
             membership_country_id=self.usa.id,
@@ -113,14 +113,13 @@ class MultiColumnFKTests(TestCase):
             group_id=self.cia.id,
         )
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Membership.objects.filter(person__name__contains="o"),
             [self.bob.id],
             attrgetter("person_id"),
         )
 
     def test_reverse_query_filters_correctly(self):
-
         timemark = datetime.datetime.now(tz=datetime.timezone.utc).replace(tzinfo=None)
         timedelta = datetime.timedelta(days=1)
 
@@ -146,7 +145,7 @@ class MultiColumnFKTests(TestCase):
             date_joined=timemark + timedelta,
         )
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Person.objects.filter(membership__date_joined__gte=timemark),
             ["Jim"],
             attrgetter("name"),
@@ -171,14 +170,14 @@ class MultiColumnFKTests(TestCase):
             group_id=self.cia.id,
         )
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Membership.objects.filter(person__in=[self.george, self.jim]),
             [
                 self.jim.id,
             ],
             attrgetter("person_id"),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Membership.objects.filter(person__in=Person.objects.filter(name="Jim")),
             [
                 self.jim.id,
@@ -224,6 +223,13 @@ class MultiColumnFKTests(TestCase):
             [m2],
         )
 
+    def test_query_does_not_mutate(self):
+        """
+        Recompiling the same subquery doesn't mutate it.
+        """
+        queryset = Friendship.objects.filter(to_friend__in=Person.objects.all())
+        self.assertEqual(str(queryset.query), str(queryset.query))
+
     def test_select_related_foreignkey_forward_works(self):
         Membership.objects.create(
             membership_country=self.usa, person=self.bob, group=self.cia
@@ -238,7 +244,7 @@ class MultiColumnFKTests(TestCase):
                 for m in Membership.objects.select_related("person").order_by("pk")
             ]
 
-        normal_people = [m.person for m in Membership.objects.all().order_by("pk")]
+        normal_people = [m.person for m in Membership.objects.order_by("pk")]
         self.assertEqual(people, normal_people)
 
     def test_prefetch_foreignkey_forward_works(self):
@@ -281,7 +287,7 @@ class MultiColumnFKTests(TestCase):
 
     def test_m2m_through_forward_returns_valid_members(self):
         # We start out by making sure that the Group 'CIA' has no members.
-        self.assertQuerysetEqual(self.cia.members.all(), [])
+        self.assertQuerySetEqual(self.cia.members.all(), [])
 
         Membership.objects.create(
             membership_country=self.usa, person=self.bob, group=self.cia
@@ -292,13 +298,13 @@ class MultiColumnFKTests(TestCase):
 
         # Bob and Jim should be members of the CIA.
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             self.cia.members.all(), ["Bob", "Jim"], attrgetter("name")
         )
 
     def test_m2m_through_reverse_returns_valid_members(self):
         # We start out by making sure that Bob is in no groups.
-        self.assertQuerysetEqual(self.bob.groups.all(), [])
+        self.assertQuerySetEqual(self.bob.groups.all(), [])
 
         Membership.objects.create(
             membership_country=self.usa, person=self.bob, group=self.cia
@@ -308,13 +314,13 @@ class MultiColumnFKTests(TestCase):
         )
 
         # Bob should be in the CIA and a Republican
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             self.bob.groups.all(), ["CIA", "Republican"], attrgetter("name")
         )
 
     def test_m2m_through_forward_ignores_invalid_members(self):
         # We start out by making sure that the Group 'CIA' has no members.
-        self.assertQuerysetEqual(self.cia.members.all(), [])
+        self.assertQuerySetEqual(self.cia.members.all(), [])
 
         # Something adds jane to group CIA but Jane is in Soviet Union which
         # isn't CIA's country.
@@ -323,11 +329,11 @@ class MultiColumnFKTests(TestCase):
         )
 
         # There should still be no members in CIA
-        self.assertQuerysetEqual(self.cia.members.all(), [])
+        self.assertQuerySetEqual(self.cia.members.all(), [])
 
     def test_m2m_through_reverse_ignores_invalid_members(self):
         # We start out by making sure that Jane has no groups.
-        self.assertQuerysetEqual(self.jane.groups.all(), [])
+        self.assertQuerySetEqual(self.jane.groups.all(), [])
 
         # Something adds jane to group CIA but Jane is in Soviet Union which
         # isn't CIA's country.
@@ -336,10 +342,10 @@ class MultiColumnFKTests(TestCase):
         )
 
         # Jane should still not be in any groups
-        self.assertQuerysetEqual(self.jane.groups.all(), [])
+        self.assertQuerySetEqual(self.jane.groups.all(), [])
 
     def test_m2m_through_on_self_works(self):
-        self.assertQuerysetEqual(self.jane.friends.all(), [])
+        self.assertQuerySetEqual(self.jane.friends.all(), [])
 
         Friendship.objects.create(
             from_friend_country=self.jane.person_country,
@@ -348,12 +354,12 @@ class MultiColumnFKTests(TestCase):
             to_friend=self.george,
         )
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             self.jane.friends.all(), ["George"], attrgetter("name")
         )
 
     def test_m2m_through_on_self_ignores_mismatch_columns(self):
-        self.assertQuerysetEqual(self.jane.friends.all(), [])
+        self.assertQuerySetEqual(self.jane.friends.all(), [])
 
         # Note that we use ids instead of instances. This is because instances
         # on ForeignObject properties will set all related field off of the
@@ -365,7 +371,7 @@ class MultiColumnFKTests(TestCase):
             from_friend_country_id=self.george.person_country_id,
         )
 
-        self.assertQuerysetEqual(self.jane.friends.all(), [])
+        self.assertQuerySetEqual(self.jane.friends.all(), [])
 
     def test_prefetch_related_m2m_forward_works(self):
         Membership.objects.create(
@@ -510,18 +516,35 @@ class MultiColumnFKTests(TestCase):
 
     def test_isnull_lookup(self):
         m1 = Membership.objects.create(
-            membership_country=self.usa, person=self.bob, group_id=None
+            person_id=self.bob.id,
+            membership_country_id=self.usa.id,
+            group_id=None,
         )
         m2 = Membership.objects.create(
-            membership_country=self.usa, person=self.bob, group=self.cia
+            person_id=self.jim.id,
+            membership_country_id=None,
+            group_id=self.cia.id,
         )
+        m3 = Membership.objects.create(
+            person_id=self.jane.id,
+            membership_country_id=None,
+            group_id=None,
+        )
+        m4 = Membership.objects.create(
+            person_id=self.george.id,
+            membership_country_id=self.soviet_union.id,
+            group_id=self.kgb.id,
+        )
+        for member in [m1, m2, m3]:
+            with self.assertRaises(Membership.group.RelatedObjectDoesNotExist):
+                getattr(member, "group")
         self.assertSequenceEqual(
             Membership.objects.filter(group__isnull=True),
-            [m1],
+            [m1, m2, m3],
         )
         self.assertSequenceEqual(
             Membership.objects.filter(group__isnull=False),
-            [m2],
+            [m4],
         )
 
 
@@ -689,3 +712,52 @@ class TestCachedPathInfo(TestCase):
         foreign_object_restored = pickle.loads(pickle.dumps(foreign_object))
         self.assertIn("path_infos", foreign_object_restored.__dict__)
         self.assertIn("reverse_path_infos", foreign_object_restored.__dict__)
+
+
+class GetJoiningDeprecationTests(TestCase):
+    def test_foreign_object_get_joining_columns_warning(self):
+        msg = (
+            "ForeignObject.get_joining_columns() is deprecated. Use "
+            "get_joining_fields() instead."
+        )
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
+            Membership.person.field.get_joining_columns()
+        self.assertEqual(ctx.filename, __file__)
+
+    def test_foreign_object_get_reverse_joining_columns_warning(self):
+        msg = (
+            "ForeignObject.get_reverse_joining_columns() is deprecated. Use "
+            "get_reverse_joining_fields() instead."
+        )
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
+            Membership.person.field.get_reverse_joining_columns()
+        self.assertEqual(ctx.filename, __file__)
+
+    def test_foreign_object_rel_get_joining_columns_warning(self):
+        msg = (
+            "ForeignObjectRel.get_joining_columns() is deprecated. Use "
+            "get_joining_fields() instead."
+        )
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
+            Membership.person.field.remote_field.get_joining_columns()
+        self.assertEqual(ctx.filename, __file__)
+
+    def test_join_get_joining_columns_warning(self):
+        class CustomForeignKey(models.ForeignKey):
+            def __getattribute__(self, attr):
+                if attr == "get_joining_fields":
+                    raise AttributeError
+                return super().__getattribute__(attr)
+
+        class CustomParent(models.Model):
+            value = models.CharField(max_length=255)
+
+        class CustomChild(models.Model):
+            links = CustomForeignKey(CustomParent, models.CASCADE)
+
+        msg = (
+            "The usage of get_joining_columns() in Join is deprecated. Implement "
+            "get_joining_fields() instead."
+        )
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+            CustomChild.objects.filter(links__value="value")

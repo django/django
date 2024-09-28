@@ -4,17 +4,18 @@
 # Bayarkhuu Bataa, 2014
 # Claude Paroz <claude@2xlibre.net>, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Zorig <zorig_ezd@yahoo.com>, 2013-2014,2016-2017
+# Turmunkh Batkhuyag, 2023
+# Zorig, 2013-2014,2016-2017
 # Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2014-2015
 # Баясгалан Цэвлээ <bayasaa_7672@yahoo.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: Zorig <zorig_ezd@yahoo.com>\n"
-"Language-Team: Mongolian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2023-12-24 20:19+0000\n"
+"Last-Translator: Turmunkh Batkhuyag, 2023\n"
+"Language-Team: Mongolian (http://app.transifex.com/django/django/language/"
 "mn/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -23,19 +24,19 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "Administrative Documentation"
-msgstr "Удирдлагын баримт"
+msgstr "Удирдлагын баримт бичиг"
 
 msgid "Home"
-msgstr "Админ эхлэл"
+msgstr "Нүүр"
 
 msgid "Documentation"
-msgstr "Баримтжуулалт"
+msgstr "Баримт бичиг"
 
 msgid "Bookmarklets"
-msgstr "Bookmarklet-ууд"
+msgstr "Хавчуурга"
 
 msgid "Documentation bookmarklets"
-msgstr "Мookmarklet-уудын баримтжуулалт"
+msgstr "Баримт бичгийн хавчуурга"
 
 msgid ""
 "To install bookmarklets, drag the link to your bookmarks toolbar, or right-"
@@ -102,11 +103,9 @@ msgstr "docutils ийг суулгана уу"
 
 #, python-format
 msgid ""
-"The admin documentation system requires Python's <a href=\"%(link)s"
-"\">docutils</a> library."
+"The admin documentation system requires Python’s <a "
+"href=\"%(link)s\">docutils</a> library."
 msgstr ""
-"Админ хэсгийн баримтжуулалтын ажиллуулхад  Python ийн <a href=\"%(link)s"
-"\">docutils</a> санг суулгах шаардлагатай."
 
 #, python-format
 msgid ""
@@ -157,13 +156,13 @@ msgid "Template: %(name)s"
 msgstr "Загвар: %(name)s"
 
 #, python-format
-msgid "Template: \"%(name)s\""
-msgstr "Загвар: \"%(name)s\""
+msgid "Template: <q>%(name)s</q>"
+msgstr ""
 
 #. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
-msgid "Search path for template \"%(name)s\":"
-msgstr "\"%(name)s\" тэмплэйтын зам хайх"
+msgid "Search path for template <q>%(name)s</q>:"
+msgstr ""
 
 msgid "(does not exist)"
 msgstr "(Оршдоггүй)"

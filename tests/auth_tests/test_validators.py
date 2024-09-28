@@ -14,7 +14,7 @@ from django.contrib.auth.password_validation import (
     password_validators_help_texts,
     validate_password,
 )
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models
 from django.test import SimpleTestCase, TestCase, override_settings
 from django.test.utils import isolate_apps
@@ -49,6 +49,15 @@ class PasswordValidationTest(SimpleTestCase):
         self.assertEqual(validators[0].__class__.__name__, "CommonPasswordValidator")
 
         self.assertEqual(get_password_validators([]), [])
+
+    def test_get_password_validators_custom_invalid(self):
+        validator_config = [{"NAME": "json.tool"}]
+        msg = (
+            "The module in NAME could not be imported: json.tool. "
+            "Check your AUTH_PASSWORD_VALIDATORS setting."
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            get_password_validators(validator_config)
 
     def test_validate_password(self):
         self.assertIsNone(validate_password("sufficiently-long"))
@@ -150,12 +159,12 @@ class UserAttributeSimilarityValidatorTest(TestCase):
         self.assertIsNone(UserAttributeSimilarityValidator().validate("testclient"))
 
         with self.assertRaises(ValidationError) as cm:
-            UserAttributeSimilarityValidator().validate("testclient", user=user),
+            UserAttributeSimilarityValidator().validate("testclient", user=user)
         self.assertEqual(cm.exception.messages, [expected_error % "username"])
         self.assertEqual(cm.exception.error_list[0].code, "password_too_similar")
 
         with self.assertRaises(ValidationError) as cm:
-            UserAttributeSimilarityValidator().validate("example.com", user=user),
+            UserAttributeSimilarityValidator().validate("example.com", user=user)
         self.assertEqual(cm.exception.messages, [expected_error % "email address"])
 
         with self.assertRaises(ValidationError) as cm:
@@ -193,7 +202,7 @@ class UserAttributeSimilarityValidatorTest(TestCase):
                 return "foobar"
 
         with self.assertRaises(ValidationError) as cm:
-            UserAttributeSimilarityValidator().validate("foobar", user=TestUser()),
+            UserAttributeSimilarityValidator().validate("foobar", user=TestUser())
         self.assertEqual(
             cm.exception.messages, ["The password is too similar to the username."]
         )

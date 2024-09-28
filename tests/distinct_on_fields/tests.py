@@ -76,9 +76,11 @@ class DistinctOnTests(TestCase):
             (StaffTag.objects.distinct("staff", "tag"), [self.st1]),
             (
                 Tag.objects.order_by("parent__pk", "pk").distinct("parent"),
-                [self.t2, self.t4, self.t1]
-                if connection.features.nulls_order_largest
-                else [self.t1, self.t2, self.t4],
+                (
+                    [self.t2, self.t4, self.t1]
+                    if connection.features.nulls_order_largest
+                    else [self.t1, self.t2, self.t4]
+                ),
             ),
             (
                 StaffTag.objects.select_related("staff")

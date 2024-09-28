@@ -19,6 +19,7 @@ class Alarm(models.Model):
 class Author(models.Model):
     name = models.CharField(max_length=100)
     alias = models.CharField(max_length=50, null=True, blank=True)
+    bio = models.TextField(null=True)
 
     class Meta:
         ordering = ("name",)

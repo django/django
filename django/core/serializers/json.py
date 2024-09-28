@@ -59,19 +59,27 @@ class Serializer(PythonSerializer):
         return super(PythonSerializer, self).getvalue()
 
 
-def Deserializer(stream_or_string, **options):
+class Deserializer(PythonDeserializer):
     """Deserialize a stream or string of JSON data."""
-    if not isinstance(stream_or_string, (bytes, str)):
-        stream_or_string = stream_or_string.read()
-    if isinstance(stream_or_string, bytes):
-        stream_or_string = stream_or_string.decode()
-    try:
-        objects = json.loads(stream_or_string)
-        yield from PythonDeserializer(objects, **options)
-    except (GeneratorExit, DeserializationError):
-        raise
-    except Exception as exc:
-        raise DeserializationError() from exc
+
+    def __init__(self, stream_or_string, **options):
+        if not isinstance(stream_or_string, (bytes, str)):
+            stream_or_string = stream_or_string.read()
+        if isinstance(stream_or_string, bytes):
+            stream_or_string = stream_or_string.decode()
+        try:
+            objects = json.loads(stream_or_string)
+        except Exception as exc:
+            raise DeserializationError() from exc
+        super().__init__(objects, **options)
+
+    def _handle_object(self, obj):
+        try:
+            yield from super()._handle_object(obj)
+        except (GeneratorExit, DeserializationError):
+            raise
+        except Exception as exc:
+            raise DeserializationError(f"Error deserializing object: {exc}") from exc
 
 
 class DjangoJSONEncoder(json.JSONEncoder):
@@ -87,7 +95,7 @@ class DjangoJSONEncoder(json.JSONEncoder):
             if o.microsecond:
                 r = r[:23] + r[26:]
             if r.endswith("+00:00"):
-                r = r[:-6] + "Z"
+                r = r.removesuffix("+00:00") + "Z"
             return r
         elif isinstance(o, datetime.date):
             return o.isoformat()

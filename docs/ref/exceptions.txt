@@ -42,6 +42,15 @@ Django core exception classes are defined in ``django.core.exceptions``.
     return any results. Most Django projects won't encounter this exception,
     but it might be useful for implementing custom lookups and expressions.
 
+``FullResultSet``
+-----------------
+
+.. exception:: FullResultSet
+
+    ``FullResultSet`` may be raised during query generation if a query will
+    match everything. Most Django projects won't encounter this exception, but
+    it might be useful for implementing custom lookups and expressions.
+
 ``FieldDoesNotExist``
 ---------------------
 
@@ -84,6 +93,7 @@ Django core exception classes are defined in ``django.core.exceptions``.
     * ``SuspiciousMultipartForm``
     * ``SuspiciousSession``
     * ``TooManyFieldsSent``
+    * ``TooManyFilesSent``
 
     If a ``SuspiciousOperation`` exception reaches the ASGI/WSGI handler level
     it is logged at the ``Error`` level and results in

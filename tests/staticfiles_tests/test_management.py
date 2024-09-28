@@ -9,7 +9,7 @@ from unittest import mock
 
 from admin_scripts.tests import AdminScriptTestCase
 
-from django.conf import settings
+from django.conf import STATICFILES_STORAGE_ALIAS, settings
 from django.contrib.staticfiles import storage
 from django.contrib.staticfiles.management.commands import collectstatic, runserver
 from django.core.exceptions import ImproperlyConfigured
@@ -17,7 +17,6 @@ from django.core.management import CommandError, call_command
 from django.core.management.base import SystemCheckError
 from django.test import RequestFactory, override_settings
 from django.test.utils import extend_sys_path
-from django.utils import timezone
 from django.utils._os import symlinks_supported
 from django.utils.functional import empty
 
@@ -125,6 +124,11 @@ class TestFindStatic(TestDefaults, CollectionTestCase):
             searched_locations,
         )
 
+    def test_missing_args_message(self):
+        msg = "Enter at least one staticfile."
+        with self.assertRaisesMessage(CommandError, msg):
+            call_command("findstatic")
+
 
 class TestConfiguration(StaticFilesTestCase):
     def test_location_empty(self):
@@ -142,16 +146,26 @@ class TestConfiguration(StaticFilesTestCase):
         try:
             storage.staticfiles_storage._wrapped = empty
             with self.settings(
-                STATICFILES_STORAGE=(
-                    "django.contrib.staticfiles.storage.StaticFilesStorage"
-                )
+                STORAGES={
+                    **settings.STORAGES,
+                    STATICFILES_STORAGE_ALIAS: {
+                        "BACKEND": (
+                            "django.contrib.staticfiles.storage.StaticFilesStorage"
+                        )
+                    },
+                }
             ):
                 command = collectstatic.Command()
                 self.assertTrue(command.is_local_storage())
 
             storage.staticfiles_storage._wrapped = empty
             with self.settings(
-                STATICFILES_STORAGE="staticfiles_tests.storage.DummyStorage"
+                STORAGES={
+                    **settings.STORAGES,
+                    STATICFILES_STORAGE_ALIAS: {
+                        "BACKEND": "staticfiles_tests.storage.DummyStorage"
+                    },
+                }
             ):
                 command = collectstatic.Command()
                 self.assertFalse(command.is_local_storage())
@@ -242,9 +256,14 @@ class TestCollectionVerbosity(CollectionTestCase):
         self.assertIn(self.copying_msg, output)
 
     @override_settings(
-        STATICFILES_STORAGE=(
-            "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
-        )
+        STORAGES={
+            **settings.STORAGES,
+            STATICFILES_STORAGE_ALIAS: {
+                "BACKEND": (
+                    "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
+                )
+            },
+        }
     )
     def test_verbosity_1_with_post_process(self):
         stdout = StringIO()
@@ -252,9 +271,14 @@ class TestCollectionVerbosity(CollectionTestCase):
         self.assertNotIn(self.post_process_msg, stdout.getvalue())
 
     @override_settings(
-        STATICFILES_STORAGE=(
-            "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
-        )
+        STORAGES={
+            **settings.STORAGES,
+            STATICFILES_STORAGE_ALIAS: {
+                "BACKEND": (
+                    "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
+                )
+            },
+        }
     )
     def test_verbosity_2_with_post_process(self):
         stdout = StringIO()
@@ -281,7 +305,12 @@ class TestCollectionClear(CollectionTestCase):
         super().run_collectstatic(clear=True)
 
     @override_settings(
-        STATICFILES_STORAGE="staticfiles_tests.storage.PathNotImplementedStorage"
+        STORAGES={
+            **settings.STORAGES,
+            STATICFILES_STORAGE_ALIAS: {
+                "BACKEND": "staticfiles_tests.storage.PathNotImplementedStorage"
+            },
+        }
     )
     def test_handle_path_notimplemented(self):
         self.run_collectstatic()
@@ -396,7 +425,12 @@ class TestCollectionDryRun(TestNoFilesCreated, CollectionTestCase):
 
 
 @override_settings(
-    STATICFILES_STORAGE="django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
+    STORAGES={
+        **settings.STORAGES,
+        STATICFILES_STORAGE_ALIAS: {
+            "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
+        },
+    }
 )
 class TestCollectionDryRunManifestStaticFilesStorage(TestCollectionDryRun):
     pass
@@ -439,17 +473,13 @@ class TestCollectionFilesOverride(CollectionTestCase):
 
         os.utime(self.testfile_path, (self.orig_atime - 1, self.orig_mtime - 1))
 
-        self.settings_with_test_app = self.modify_settings(
+        settings_with_test_app = self.modify_settings(
             INSTALLED_APPS={"prepend": "staticfiles_test_app"},
         )
         with extend_sys_path(self.temp_dir):
-            self.settings_with_test_app.enable()
-
+            settings_with_test_app.enable()
+        self.addCleanup(settings_with_test_app.disable)
         super().setUp()
-
-    def tearDown(self):
-        super().tearDown()
-        self.settings_with_test_app.disable()
 
     def test_ordering_override(self):
         """
@@ -519,7 +549,14 @@ class TestCollectionOverwriteWarning(CollectionTestCase):
             self.assertNotIn(self.warning_string, output)
 
 
-@override_settings(STATICFILES_STORAGE="staticfiles_tests.storage.DummyStorage")
+@override_settings(
+    STORAGES={
+        **settings.STORAGES,
+        STATICFILES_STORAGE_ALIAS: {
+            "BACKEND": "staticfiles_tests.storage.DummyStorage"
+        },
+    }
+)
 class TestCollectionNonLocalStorage(TestNoFilesCreated, CollectionTestCase):
     """
     Tests for a Storage that implements get_modified_time() but not path()
@@ -531,7 +568,7 @@ class TestCollectionNonLocalStorage(TestNoFilesCreated, CollectionTestCase):
         storage = DummyStorage()
         self.assertEqual(
             storage.get_modified_time("name"),
-            datetime.datetime(1970, 1, 1, tzinfo=timezone.utc),
+            datetime.datetime(1970, 1, 1, tzinfo=datetime.timezone.utc),
         )
         with self.assertRaisesMessage(
             NotImplementedError, "This backend doesn't support absolute paths."
@@ -541,7 +578,12 @@ class TestCollectionNonLocalStorage(TestNoFilesCreated, CollectionTestCase):
 
 class TestCollectionNeverCopyStorage(CollectionTestCase):
     @override_settings(
-        STATICFILES_STORAGE="staticfiles_tests.storage.NeverCopyRemoteStorage"
+        STORAGES={
+            **settings.STORAGES,
+            STATICFILES_STORAGE_ALIAS: {
+                "BACKEND": "staticfiles_tests.storage.NeverCopyRemoteStorage"
+            },
+        }
     )
     def test_skips_newer_files_in_remote_storage(self):
         """
@@ -608,7 +650,12 @@ class TestCollectionLinks(TestDefaults, CollectionTestCase):
         self.assertFalse(os.path.lexists(broken_symlink_path))
 
     @override_settings(
-        STATICFILES_STORAGE="staticfiles_tests.storage.PathNotImplementedStorage"
+        STORAGES={
+            **settings.STORAGES,
+            STATICFILES_STORAGE_ALIAS: {
+                "BACKEND": "staticfiles_tests.storage.PathNotImplementedStorage"
+            },
+        }
     )
     def test_no_remote_link(self):
         with self.assertRaisesMessage(

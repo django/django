@@ -1,0 +1,33 @@
+==========================
+Django 4.2.5 release notes
+==========================
+
+*September 4, 2023*
+
+Django 4.2.5 fixes a security issue with severity "moderate" and several bugs
+in 4.2.4.
+
+CVE-2023-41164: Potential denial of service vulnerability in ``django.utils.encoding.uri_to_iri()``
+===================================================================================================
+
+``django.utils.encoding.uri_to_iri()`` was subject to potential denial of
+service attack via certain inputs with a very large number of Unicode
+characters.
+
+Bugfixes
+========
+
+* Fixed a regression in Django 4.2 that caused an incorrect validation of
+  ``CheckConstraints`` on ``__isnull`` lookups against ``JSONField``
+  (:ticket:`34754`).
+
+* Fixed a bug in Django 4.2 where the deprecated ``DEFAULT_FILE_STORAGE`` and
+  ``STATICFILES_STORAGE`` settings were not synced with ``STORAGES``
+  (:ticket:`34773`).
+
+* Fixed a regression in Django 4.2.2 that caused an unnecessary selection of a
+  non-nullable ``ManyToManyField`` without a natural key during serialization
+  (:ticket:`34779`).
+
+* Fixed a regression in Django 4.2 that caused a crash of a queryset when
+  filtering against deeply nested ``OuterRef()`` annotations (:ticket:`34803`).

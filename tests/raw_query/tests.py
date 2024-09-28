@@ -176,10 +176,7 @@ class RawQueryTests(TestCase):
         self.assertSuccessfulRawQuery(MixedCaseIDColumn, query, queryset)
 
     def test_order_handler(self):
-        """
-        Test of raw raw query's tolerance for columns being returned in any
-        order
-        """
+        """Raw query tolerates columns being returned in any order."""
         selects = (
             ("dob, last_name, first_name, id"),
             ("last_name, dob, first_name, id"),
@@ -310,7 +307,7 @@ class RawQueryTests(TestCase):
             ("book_count", 1),
             ("book_count", 0),
         )
-        authors = Author.objects.all()
+        authors = Author.objects.order_by("pk")
         self.assertSuccessfulRawQuery(Author, query, authors, expected_annotations)
 
     def test_white_space_query(self):

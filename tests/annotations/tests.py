@@ -1,7 +1,9 @@
 import datetime
 from decimal import Decimal
+from unittest import skipUnless
 
 from django.core.exceptions import FieldDoesNotExist, FieldError
+from django.db import connection
 from django.db.models import (
     BooleanField,
     Case,
@@ -15,6 +17,7 @@ from django.db.models import (
     FloatField,
     Func,
     IntegerField,
+    JSONField,
     Max,
     OuterRef,
     Q,
@@ -24,7 +27,16 @@ from django.db.models import (
     When,
 )
 from django.db.models.expressions import RawSQL
-from django.db.models.functions import Coalesce, ExtractYear, Floor, Length, Lower, Trim
+from django.db.models.functions import (
+    Cast,
+    Coalesce,
+    ExtractYear,
+    Floor,
+    Length,
+    Lower,
+    Trim,
+)
+from django.db.models.sql.query import get_field_names_from_opts
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import register_lookup
 
@@ -34,6 +46,7 @@ from .models import (
     Company,
     DepartmentStore,
     Employee,
+    JsonModel,
     Publisher,
     Store,
     Ticket,
@@ -212,7 +225,7 @@ class NonAggregateAnnotationTestCase(TestCase):
         with register_lookup(DecimalField, Floor):
             books = Book.objects.annotate(floor_price=F("price__floor"))
 
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             books.values_list("pk", "floor_price"),
             [
                 (self.b1.pk, 30),
@@ -282,6 +295,13 @@ class NonAggregateAnnotationTestCase(TestCase):
         self.assertEqual(len(books), Book.objects.count())
         self.assertTrue(all(book.selected for book in books))
 
+    def test_full_expression_wrapped_annotation(self):
+        books = Book.objects.annotate(
+            selected=Coalesce(~Q(pk__in=[]), True),
+        )
+        self.assertEqual(len(books), Book.objects.count())
+        self.assertTrue(all(book.selected for book in books))
+
     def test_full_expression_annotation_with_aggregation(self):
         qs = Book.objects.filter(isbn="159059725").annotate(
             selected=ExpressionWrapper(~Q(pk__in=[]), output_field=BooleanField()),
@@ -292,7 +312,7 @@ class NonAggregateAnnotationTestCase(TestCase):
     def test_aggregate_over_full_expression_annotation(self):
         qs = Book.objects.annotate(
             selected=ExpressionWrapper(~Q(pk__in=[]), output_field=BooleanField()),
-        ).aggregate(Sum("selected"))
+        ).aggregate(selected__sum=Sum(Cast("selected", IntegerField())))
         self.assertEqual(qs["selected__sum"], Book.objects.count())
 
     def test_empty_queryset_annotation(self):
@@ -450,6 +470,16 @@ class NonAggregateAnnotationTestCase(TestCase):
                 )
             )
 
+    def test_values_wrong_annotation(self):
+        expected_message = (
+            "Cannot resolve keyword 'annotation_typo' into field. Choices are: %s"
+        )
+        article_fields = ", ".join(
+            ["annotation"] + sorted(get_field_names_from_opts(Book._meta))
+        )
+        with self.assertRaisesMessage(FieldError, expected_message % article_fields):
+            Book.objects.annotate(annotation=Value(1)).values_list("annotation_typo")
+
     def test_decimal_annotation(self):
         salary = Decimal(10) ** -Employee._meta.get_field("salary").decimal_places
         Employee.objects.create(
@@ -486,6 +516,7 @@ class NonAggregateAnnotationTestCase(TestCase):
         book2 = Book.objects.annotate(adjusted_rating=None + F("rating")).get(
             pk=self.b1.pk
         )
+        self.assertIs(book1.adjusted_rating, None)
         self.assertEqual(book1.adjusted_rating, book2.adjusted_rating)
 
     def test_update_with_annotation(self):
@@ -516,7 +547,7 @@ class NonAggregateAnnotationTestCase(TestCase):
             .order_by("store_name")
         )
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             books,
             ["Amazon.com", "Books.com", "Mamma and Pappa's Books"],
             lambda b: b.store_name,
@@ -541,6 +572,16 @@ class NonAggregateAnnotationTestCase(TestCase):
         self.assertEqual(book["other_rating"], 4)
         self.assertEqual(book["other_isbn"], "155860191")
 
+    def test_values_fields_annotations_order(self):
+        qs = Book.objects.annotate(other_rating=F("rating") - 1).values(
+            "other_rating", "rating"
+        )
+        book = qs.get(pk=self.b1.pk)
+        self.assertEqual(
+            list(book.items()),
+            [("other_rating", self.b1.rating - 1), ("rating", self.b1.rating)],
+        )
+
     def test_values_with_pk_annotation(self):
         # annotate references a field in values() with pk
         publishers = Publisher.objects.values("id", "book__rating").annotate(
@@ -548,21 +589,6 @@ class NonAggregateAnnotationTestCase(TestCase):
         )
         for publisher in publishers.filter(pk=self.p1.pk):
             self.assertEqual(publisher["book__rating"], publisher["total"])
-
-    @skipUnlessDBFeature("allows_group_by_pk")
-    def test_rawsql_group_by_collapse(self):
-        raw = RawSQL("SELECT MIN(id) FROM annotations_book", [])
-        qs = (
-            Author.objects.values("id")
-            .annotate(
-                min_book_id=raw,
-                count_friends=Count("friends"),
-            )
-            .order_by()
-        )
-        _, _, group_by = qs.query.get_compiler(using="default").pre_sql_setup()
-        self.assertEqual(len(group_by), 1)
-        self.assertNotEqual(raw, group_by[0])
 
     def test_defer_annotation(self):
         """
@@ -608,7 +634,7 @@ class NonAggregateAnnotationTestCase(TestCase):
             .filter(chain="Westfield")
         )
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [
                 ("Angus & Robinson", "Westfield", True, "155860191"),
@@ -628,7 +654,7 @@ class NonAggregateAnnotationTestCase(TestCase):
 
     def test_order_by_annotation(self):
         authors = Author.objects.annotate(other_age=F("age")).order_by("other_age")
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             authors,
             [
                 25,
@@ -650,7 +676,7 @@ class NonAggregateAnnotationTestCase(TestCase):
             .annotate(age_count=Count("age"))
             .order_by("age_count", "age")
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             authors,
             [
                 (25, 1),
@@ -734,7 +760,7 @@ class NonAggregateAnnotationTestCase(TestCase):
             (2, "Buffy", False, 42, "Summers", 18, Decimal(40000.00), store.name, 17),
         ]
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs.order_by("id"),
             rows,
             lambda e: (
@@ -785,7 +811,7 @@ class NonAggregateAnnotationTestCase(TestCase):
         ]
 
         # and we respect deferred columns!
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs.defer("age").order_by("id"),
             rows,
             lambda e: (
@@ -834,7 +860,7 @@ class NonAggregateAnnotationTestCase(TestCase):
             )
         ).order_by("name")
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [
                 ("Apple", "APPL"),
@@ -890,7 +916,7 @@ class NonAggregateAnnotationTestCase(TestCase):
         # LOWER function supported by:
         # oracle, postgres, mysql, sqlite, sqlserver
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [
                 ("Apple", "APPL".lower()),
@@ -988,6 +1014,42 @@ class NonAggregateAnnotationTestCase(TestCase):
             publisher_books_qs, [{"name": "Sams"}, {"name": "Morgan Kaufmann"}]
         )
 
+    def test_annotation_and_alias_filter_in_subquery(self):
+        awarded_publishers_qs = (
+            Publisher.objects.filter(num_awards__gt=4)
+            .annotate(publisher_annotate=Value(1))
+            .alias(publisher_alias=Value(1))
+        )
+        qs = Publisher.objects.filter(pk__in=awarded_publishers_qs)
+        self.assertCountEqual(qs, [self.p3, self.p4])
+
+    def test_annotation_and_alias_filter_related_in_subquery(self):
+        long_books_qs = (
+            Book.objects.filter(pages__gt=400)
+            .annotate(book_annotate=Value(1))
+            .alias(book_alias=Value(1))
+        )
+        publisher_books_qs = Publisher.objects.filter(
+            book__in=long_books_qs,
+        ).values("name")
+        self.assertCountEqual(
+            publisher_books_qs,
+            [
+                {"name": "Apress"},
+                {"name": "Sams"},
+                {"name": "Prentice Hall"},
+                {"name": "Morgan Kaufmann"},
+            ],
+        )
+
+    def test_annotation_exists_none_query(self):
+        self.assertIs(
+            Author.objects.annotate(exists=Exists(Company.objects.none()))
+            .get(pk=self.a1.pk)
+            .exists,
+            False,
+        )
+
     def test_annotation_exists_aggregate_values_chaining(self):
         qs = (
             Book.objects.values("publisher")
@@ -1074,6 +1136,57 @@ class NonAggregateAnnotationTestCase(TestCase):
                 {"name": "Wesley J. Chun", "max_pages": 0},
             ],
         )
+
+    def test_alias_sql_injection(self):
+        crafted_alias = """injected_name" from "annotations_book"; --"""
+        msg = (
+            "Column aliases cannot contain whitespace characters, quotation marks, "
+            "semicolons, or SQL comments."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            Book.objects.annotate(**{crafted_alias: Value(1)})
+
+    def test_alias_forbidden_chars(self):
+        tests = [
+            'al"ias',
+            "a'lias",
+            "ali`as",
+            "alia s",
+            "alias\t",
+            "ali\nas",
+            "alias--",
+            "ali/*as",
+            "alias*/",
+            "alias;",
+            # [] are used by MSSQL.
+            "alias[",
+            "alias]",
+        ]
+        msg = (
+            "Column aliases cannot contain whitespace characters, quotation marks, "
+            "semicolons, or SQL comments."
+        )
+        for crafted_alias in tests:
+            with self.subTest(crafted_alias):
+                with self.assertRaisesMessage(ValueError, msg):
+                    Book.objects.annotate(**{crafted_alias: Value(1)})
+
+    @skipUnless(connection.vendor == "postgresql", "PostgreSQL tests")
+    @skipUnlessDBFeature("supports_json_field")
+    def test_set_returning_functions(self):
+        class JSONBPathQuery(Func):
+            function = "jsonb_path_query"
+            output_field = JSONField()
+            set_returning = True
+
+        test_model = JsonModel.objects.create(
+            data={"key": [{"id": 1, "name": "test1"}, {"id": 2, "name": "test2"}]}, id=1
+        )
+        qs = JsonModel.objects.annotate(
+            table_element=JSONBPathQuery("data", Value("$.key[*]"))
+        ).filter(pk=test_model.pk)
+
+        self.assertEqual(qs.count(), len(qs))
 
 
 class AliasTests(TestCase):
@@ -1270,7 +1383,7 @@ class AliasTests(TestCase):
     def test_order_by_alias(self):
         qs = Author.objects.alias(other_age=F("age")).order_by("other_age")
         self.assertIs(hasattr(qs.first(), "other_age"), False)
-        self.assertQuerysetEqual(qs, [34, 34, 35, 46, 57], lambda a: a.age)
+        self.assertQuerySetEqual(qs, [34, 34, 35, 46, 57], lambda a: a.age)
 
     def test_order_by_alias_aggregate(self):
         qs = (
@@ -1279,7 +1392,7 @@ class AliasTests(TestCase):
             .order_by("age_count", "age")
         )
         self.assertIs(hasattr(qs.first(), "age_count"), False)
-        self.assertQuerysetEqual(qs, [35, 46, 57, 34], lambda a: a["age"])
+        self.assertQuerySetEqual(qs, [35, 46, 57, 34], lambda a: a["age"])
 
     def test_dates_alias(self):
         qs = Book.objects.alias(
@@ -1338,3 +1451,12 @@ class AliasTests(TestCase):
             with self.subTest(operation=operation):
                 with self.assertRaisesMessage(FieldError, msg):
                     getattr(qs, operation)("rating_alias")
+
+    def test_alias_sql_injection(self):
+        crafted_alias = """injected_name" from "annotations_book"; --"""
+        msg = (
+            "Column aliases cannot contain whitespace characters, quotation marks, "
+            "semicolons, or SQL comments."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            Book.objects.alias(**{crafted_alias: Value(1)})

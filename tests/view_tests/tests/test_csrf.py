@@ -1,3 +1,5 @@
+from unittest import mock
+
 from django.template import TemplateDoesNotExist
 from django.test import Client, RequestFactory, SimpleTestCase, override_settings
 from django.utils.translation import override
@@ -41,7 +43,7 @@ class CsrfViewTests(SimpleTestCase):
         Referer header is strictly checked for POST over HTTPS. Trigger the
         exception by sending an incorrect referer.
         """
-        response = self.client.post("/", HTTP_X_FORWARDED_PROTO="https")
+        response = self.client.post("/", headers={"x-forwarded-proto": "https"})
         self.assertContains(
             response,
             "You are seeing this message because this HTTPS site requires a "
@@ -110,6 +112,7 @@ class CsrfViewTests(SimpleTestCase):
         """A custom CSRF_FAILURE_TEMPLATE_NAME is used."""
         response = self.client.post("/")
         self.assertContains(response, "Test template for CSRF failure", status_code=403)
+        self.assertIs(response.wsgi_request, response.context.request)
 
     def test_custom_template_does_not_exist(self):
         """An exception is raised if a nonexistent template is supplied."""
@@ -117,3 +120,27 @@ class CsrfViewTests(SimpleTestCase):
         request = factory.post("/")
         with self.assertRaises(TemplateDoesNotExist):
             csrf_failure(request, template_name="nonexistent.html")
+
+    def test_template_encoding(self):
+        """
+        The template is loaded directly, not via a template loader, and should
+        be opened as utf-8 charset as is the default specified on template
+        engines.
+        """
+        from django.views.csrf import Path
+
+        with mock.patch.object(Path, "open") as m:
+            csrf_failure(mock.MagicMock(), mock.Mock())
+            m.assert_called_once_with(encoding="utf-8")
+
+    @override_settings(DEBUG=True)
+    @mock.patch("django.views.csrf.get_docs_version", return_value="4.2")
+    def test_doc_links(self, mocked_get_complete_version):
+        response = self.client.post("/")
+        self.assertContains(response, "Forbidden", status_code=403)
+        self.assertNotContains(
+            response, "https://docs.djangoproject.com/en/dev/", status_code=403
+        )
+        self.assertContains(
+            response, "https://docs.djangoproject.com/en/4.2/", status_code=403
+        )

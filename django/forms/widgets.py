@@ -6,18 +6,18 @@ import copy
 import datetime
 import warnings
 from collections import defaultdict
+from graphlib import CycleError, TopologicalSorter
 from itertools import chain
 
 from django.forms.utils import to_current_timezone
 from django.templatetags.static import static
 from django.utils import formats
-from django.utils.datastructures import OrderedSet
+from django.utils.choices import normalize_choices
 from django.utils.dates import MONTHS
 from django.utils.formats import get_format
 from django.utils.html import format_html, html_safe
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.safestring import mark_safe
-from django.utils.topological_sort import CyclicDependencyError, stable_topological_sort
 from django.utils.translation import gettext_lazy as _
 
 from .renderers import get_default_renderer
@@ -30,6 +30,9 @@ __all__ = (
     "NumberInput",
     "EmailInput",
     "URLInput",
+    "ColorInput",
+    "SearchInput",
+    "TelInput",
     "PasswordInput",
     "HiddenInput",
     "MultipleHiddenInput",
@@ -101,9 +104,11 @@ class Media:
 
     def render_js(self):
         return [
-            path.__html__()
-            if hasattr(path, "__html__")
-            else format_html('<script src="{}"></script>', self.absolute_path(path))
+            (
+                path.__html__()
+                if hasattr(path, "__html__")
+                else format_html('<script src="{}"></script>', self.absolute_path(path))
+            )
             for path in self._js
         ]
 
@@ -113,12 +118,14 @@ class Media:
         media = sorted(self._css)
         return chain.from_iterable(
             [
-                path.__html__()
-                if hasattr(path, "__html__")
-                else format_html(
-                    '<link href="{}" media="{}" rel="stylesheet">',
-                    self.absolute_path(path),
-                    medium,
+                (
+                    path.__html__()
+                    if hasattr(path, "__html__")
+                    else format_html(
+                        '<link href="{}" media="{}" rel="stylesheet">',
+                        self.absolute_path(path),
+                        medium,
+                    )
                 )
                 for path in self._css[medium]
             ]
@@ -151,29 +158,23 @@ class Media:
         in a certain order. In JavaScript you may not be able to reference a
         global or in CSS you might want to override a style.
         """
-        dependency_graph = defaultdict(set)
-        all_items = OrderedSet()
-        for list_ in filter(None, lists):
-            head = list_[0]
-            # The first items depend on nothing but have to be part of the
-            # dependency graph to be included in the result.
-            dependency_graph.setdefault(head, set())
-            for item in list_:
-                all_items.add(item)
-                # No self dependencies
-                if head != item:
-                    dependency_graph[item].add(head)
+        ts = TopologicalSorter()
+        for head, *tail in filter(None, lists):
+            ts.add(head)  # Ensure that the first items are included.
+            for item in tail:
+                if head != item:  # Avoid circular dependency to self.
+                    ts.add(item, head)
                 head = item
         try:
-            return stable_topological_sort(all_items, dependency_graph)
-        except CyclicDependencyError:
+            return list(ts.static_order())
+        except CycleError:
             warnings.warn(
                 "Detected duplicate Media files in an opposite order: {}".format(
                     ", ".join(repr(list_) for list_ in lists)
                 ),
                 MediaOrderConflictWarning,
             )
-            return list(all_items)
+            return list(dict.fromkeys(chain.from_iterable(filter(None, lists))))
 
     def __add__(self, other):
         combined = Media()
@@ -207,7 +208,7 @@ def media_property(cls):
                 else:
                     m = Media()
                     for medium in extend:
-                        m = m + base[medium]
+                        m += base[medium]
                 return m + Media(definition)
             return Media(definition)
         return base
@@ -234,6 +235,7 @@ class Widget(metaclass=MediaDefiningClass):
     is_localized = False
     is_required = False
     supports_microseconds = True
+    use_fieldset = False
 
     def __init__(self, attrs=None):
         self.attrs = {} if attrs is None else attrs.copy()
@@ -300,8 +302,8 @@ class Widget(metaclass=MediaDefiningClass):
 
     def id_for_label(self, id_):
         """
-        Return the HTML ID attribute of this Widget for use by a <label>,
-        given the ID of the field. Return None if no ID is available.
+        Return the HTML ID attribute of this Widget for use by a <label>, given
+        the ID of the field. Return an empty string if no ID is available.
 
         This hook is necessary because some widgets have multiple HTML
         elements and, thus, multiple IDs. In that case, this method should
@@ -352,6 +354,21 @@ class EmailInput(Input):
 class URLInput(Input):
     input_type = "url"
     template_name = "django/forms/widgets/url.html"
+
+
+class ColorInput(Input):
+    input_type = "color"
+    template_name = "django/forms/widgets/color.html"
+
+
+class SearchInput(Input):
+    input_type = "search"
+    template_name = "django/forms/widgets/search.html"
+
+
+class TelInput(Input):
+    input_type = "tel"
+    template_name = "django/forms/widgets/tel.html"
 
 
 class PasswordInput(Input):
@@ -412,9 +429,27 @@ class MultipleHiddenInput(HiddenInput):
 
 
 class FileInput(Input):
+    allow_multiple_selected = False
     input_type = "file"
     needs_multipart_form = True
     template_name = "django/forms/widgets/file.html"
+
+    def __init__(self, attrs=None):
+        if (
+            attrs is not None
+            and not self.allow_multiple_selected
+            and attrs.get("multiple", False)
+        ):
+            raise ValueError(
+                "%s doesn't support uploading multiple files."
+                % self.__class__.__qualname__
+            )
+        if self.allow_multiple_selected:
+            if attrs is None:
+                attrs = {"multiple": True}
+            else:
+                attrs.setdefault("multiple", True)
+        super().__init__(attrs)
 
     def format_value(self, value):
         """File input never renders a value."""
@@ -422,7 +457,13 @@ class FileInput(Input):
 
     def value_from_datadict(self, data, files, name):
         "File widgets take data from FILES, not POST"
-        return files.get(name)
+        getter = files.get
+        if self.allow_multiple_selected:
+            try:
+                getter = files.getlist
+            except AttributeError:
+                pass
+        return getter(name)
 
     def value_omitted_from_data(self, data, files, name):
         return name not in files
@@ -439,6 +480,7 @@ class ClearableFileInput(FileInput):
     initial_text = _("Currently")
     input_text = _("Change")
     template_name = "django/forms/widgets/clearable_file_input.html"
+    checked = False
 
     def clear_checkbox_name(self, name):
         """
@@ -480,14 +522,16 @@ class ClearableFileInput(FileInput):
                 "clear_checkbox_label": self.clear_checkbox_label,
             }
         )
+        context["widget"]["attrs"].setdefault("disabled", False)
+        context["widget"]["attrs"]["checked"] = self.checked
         return context
 
     def value_from_datadict(self, data, files, name):
         upload = super().value_from_datadict(data, files, name)
+        self.checked = self.clear_checkbox_name(name) in data
         if not self.is_required and CheckboxInput().value_from_datadict(
             data, files, self.clear_checkbox_name(name)
         ):
-
             if upload:
                 # If the user contradicts themselves (uploads a new file AND
                 # checks the "clear" checkbox), we return a unique marker
@@ -599,10 +643,7 @@ class ChoiceWidget(Widget):
 
     def __init__(self, attrs=None, choices=()):
         super().__init__(attrs)
-        # choices can be any iterable, but we may need to render this widget
-        # multiple times. Thus, collapse it into a list so it can be consumed
-        # more than once.
-        self.choices = list(choices)
+        self.choices = choices
 
     def __deepcopy__(self, memo):
         obj = copy.copy(self)
@@ -720,6 +761,14 @@ class ChoiceWidget(Widget):
             value = [value]
         return [str(v) if v is not None else "" for v in value]
 
+    @property
+    def choices(self):
+        return self._choices
+
+    @choices.setter
+    def choices(self, value):
+        self._choices = normalize_choices(value)
+
 
 class Select(ChoiceWidget):
     input_type = "select"
@@ -821,6 +870,7 @@ class RadioSelect(ChoiceWidget):
     input_type = "radio"
     template_name = "django/forms/widgets/radio.html"
     option_template_name = "django/forms/widgets/radio_option.html"
+    use_fieldset = True
 
     def id_for_label(self, id_, index=None):
         """
@@ -862,6 +912,7 @@ class MultiWidget(Widget):
     """
 
     template_name = "django/forms/widgets/multiwidget.html"
+    use_fieldset = True
 
     def __init__(self, widgets, attrs=None):
         if isinstance(widgets, dict):
@@ -881,9 +932,9 @@ class MultiWidget(Widget):
         if self.is_localized:
             for widget in self.widgets:
                 widget.is_localized = self.is_localized
-        # value is a list of values, each corresponding to a widget
+        # value is a list/tuple of values, each corresponding to a widget
         # in self.widgets.
-        if not isinstance(value, list):
+        if not isinstance(value, (list, tuple)):
             value = self.decompress(value)
 
         final_attrs = context["widget"]["attrs"]
@@ -941,7 +992,7 @@ class MultiWidget(Widget):
         """
         media = Media()
         for w in self.widgets:
-            media = media + w.media
+            media += w.media
         return media
 
     media = property(_get_media)
@@ -1027,6 +1078,7 @@ class SelectDateWidget(Widget):
     input_type = "select"
     select_widget = Select
     date_re = _lazy_re_compile(r"(\d{4}|0)-(\d\d?)-(\d\d?)$")
+    use_fieldset = True
 
     def __init__(self, attrs=None, years=None, months=None, empty_label=None):
         self.attrs = attrs or {}
@@ -1164,6 +1216,8 @@ class SelectDateWidget(Widget):
                 # Return pseudo-ISO dates with zeros for any unselected values,
                 # e.g. '2017-0-23'.
                 return "%s-%s-%s" % (y or 0, m or 0, d or 0)
+            except OverflowError:
+                return "0-0-0"
             return date_value.strftime(input_format)
         return data.get(name)
 

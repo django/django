@@ -276,8 +276,7 @@ class DictWrapper(dict):
         before returning, otherwise return the raw value.
         """
         use_func = key.startswith(self.prefix)
-        if use_func:
-            key = key[len(self.prefix) :]
+        key = key.removeprefix(self.prefix)
         value = super().__getitem__(key)
         if use_func:
             return self.func(value)
@@ -327,7 +326,10 @@ class CaseInsensitiveMapping(Mapping):
 
     @staticmethod
     def _unpack_items(data):
-        if isinstance(data, Mapping):
+        # Explicitly test for dict first as the common case for performance,
+        # avoiding abc's __instancecheck__ and _abc_instancecheck for the
+        # general Mapping case.
+        if isinstance(data, (dict, Mapping)):
             yield from data.items()
             return
         for i, elem in enumerate(data):

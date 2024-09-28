@@ -1,8 +1,9 @@
 from django.template import Context, Template
 from django.test import SimpleTestCase
-from django.utils import html
-from django.utils.functional import lazy, lazystr
+from django.utils import html, translation
+from django.utils.functional import Promise, lazy, lazystr
 from django.utils.safestring import SafeData, SafeString, mark_safe
+from django.utils.translation import gettext_lazy
 
 
 class customescape(str):
@@ -40,10 +41,17 @@ class SafeStringTest(SimpleTestCase):
         self.assertRenderEqual("{{ s|force_escape }}", "&lt;a&amp;b&gt;", s=s)
 
     def test_mark_safe_lazy(self):
-        s = lazystr("a&b")
+        safe_s = mark_safe(lazystr("a&b"))
 
-        self.assertIsInstance(mark_safe(s), SafeData)
-        self.assertRenderEqual("{{ s }}", "a&b", s=mark_safe(s))
+        self.assertIsInstance(safe_s, Promise)
+        self.assertRenderEqual("{{ s }}", "a&b", s=safe_s)
+        self.assertIsInstance(str(safe_s), SafeData)
+
+    def test_mark_safe_lazy_i18n(self):
+        s = mark_safe(gettext_lazy("name"))
+        tpl = Template("{{ s }}")
+        with translation.override("fr"):
+            self.assertEqual(tpl.render(Context({"s": s})), "nom")
 
     def test_mark_safe_object_implementing_dunder_str(self):
         class Obj:
@@ -113,3 +121,65 @@ class SafeStringTest(SimpleTestCase):
         msg = "object has no attribute 'dynamic_attr'"
         with self.assertRaisesMessage(AttributeError, msg):
             s.dynamic_attr = True
+
+    def test_add_str(self):
+        s = SafeString("a&b")
+        cases = [
+            ("test", "a&amp;btest"),
+            ("<p>unsafe</p>", "a&amp;b&lt;p&gt;unsafe&lt;/p&gt;"),
+            (SafeString("<p>safe</p>"), SafeString("a&b<p>safe</p>")),
+        ]
+        for case, expected in cases:
+            with self.subTest(case=case):
+                self.assertRenderEqual("{{ s }}", expected, s=s + case)
+
+    def test_add_obj(self):
+
+        base_str = "<strong>strange</strong>"
+        add_str = "hello</br>"
+
+        class Add:
+            def __add__(self, other):
+                return base_str + other
+
+        class AddSafe:
+            def __add__(self, other):
+                return mark_safe(base_str) + other
+
+        class Radd:
+            def __radd__(self, other):
+                return other + base_str
+
+        class RaddSafe:
+            def __radd__(self, other):
+                return other + mark_safe(base_str)
+
+        left_add_expected = f"{base_str}{add_str}"
+        right_add_expected = f"{add_str}{base_str}"
+        cases = [
+            # Left-add test cases.
+            (Add(), add_str, left_add_expected, str),
+            (Add(), mark_safe(add_str), left_add_expected, str),
+            (AddSafe(), add_str, left_add_expected, str),
+            (AddSafe(), mark_safe(add_str), left_add_expected, SafeString),
+            # Right-add test cases.
+            (add_str, Radd(), right_add_expected, str),
+            (mark_safe(add_str), Radd(), right_add_expected, str),
+            (add_str, Radd(), right_add_expected, str),
+            (mark_safe(add_str), RaddSafe(), right_add_expected, SafeString),
+        ]
+        for lhs, rhs, expected, expected_type in cases:
+            with self.subTest(lhs=lhs, rhs=rhs):
+                result = lhs + rhs
+                self.assertEqual(result, expected)
+                self.assertEqual(type(result), expected_type)
+
+        cases = [
+            ("hello", Add()),
+            ("hello", AddSafe()),
+            (Radd(), "hello"),
+            (RaddSafe(), "hello"),
+        ]
+        for lhs, rhs in cases:
+            with self.subTest(lhs=lhs, rhs=rhs), self.assertRaises(TypeError):
+                lhs + rhs

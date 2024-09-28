@@ -219,11 +219,11 @@ class QueryTestCase(TestCase):
         # Retrieve related object by descriptor. Related objects should be
         # database-bound.
         self.assertEqual(
-            list(dive.authors.all().values_list("name", flat=True)), ["Mark Pilgrim"]
+            list(dive.authors.values_list("name", flat=True)), ["Mark Pilgrim"]
         )
 
         self.assertEqual(
-            list(mark.book_set.all().values_list("title", flat=True)),
+            list(mark.book_set.values_list("title", flat=True)),
             ["Dive into Python"],
         )
 
@@ -985,7 +985,7 @@ class QueryTestCase(TestCase):
         # Retrieve related object by descriptor. Related objects should be
         # database-bound.
         self.assertEqual(
-            list(dive.reviews.all().values_list("source", flat=True)), ["Python Weekly"]
+            list(dive.reviews.values_list("source", flat=True)), ["Python Weekly"]
         )
 
     def test_generic_key_reverse_operations(self):
@@ -1118,7 +1118,7 @@ class QueryTestCase(TestCase):
 
         # Set a foreign key with an object from a different database
         msg = (
-            'Cannot assign "<ContentType: multiple_database | book>": the '
+            'Cannot assign "<ContentType: Multiple_Database | book>": the '
             "current database router prevents this relation."
         )
         with self.assertRaisesMessage(ValueError, msg):
@@ -1230,10 +1230,10 @@ class QueryTestCase(TestCase):
         val = Book.objects.db_manager("other").raw(
             "SELECT id FROM multiple_database_book"
         )
-        self.assertQuerysetEqual(val, [dive.pk], attrgetter("pk"))
+        self.assertQuerySetEqual(val, [dive.pk], attrgetter("pk"))
 
         val = Book.objects.raw("SELECT id FROM multiple_database_book").using("other")
-        self.assertQuerysetEqual(val, [dive.pk], attrgetter("pk"))
+        self.assertQuerySetEqual(val, [dive.pk], attrgetter("pk"))
 
     def test_select_related(self):
         """
@@ -1301,6 +1301,34 @@ class QueryTestCase(TestCase):
         mark.edited.get_or_create(
             title="Dive into Water", published=datetime.date(2009, 5, 4), extra_arg=True
         )
+
+    @override_settings(DATABASE_ROUTERS=["multiple_database.tests.TestRouter"])
+    def test_contenttype_in_separate_db(self):
+        ContentType.objects.using("other").all().delete()
+        book_other = Book.objects.using("other").create(
+            title="Test title other", published=datetime.date(2009, 5, 4)
+        )
+        book_default = Book.objects.using("default").create(
+            title="Test title default", published=datetime.date(2009, 5, 4)
+        )
+        book_type = ContentType.objects.using("default").get(
+            app_label="multiple_database", model="book"
+        )
+
+        book = book_type.get_object_for_this_type(title=book_other.title)
+        self.assertEqual(book, book_other)
+        book = book_type.get_object_for_this_type(using="other", title=book_other.title)
+        self.assertEqual(book, book_other)
+
+        with self.assertRaises(Book.DoesNotExist):
+            book_type.get_object_for_this_type(title=book_default.title)
+        book = book_type.get_object_for_this_type(
+            using="default", title=book_default.title
+        )
+        self.assertEqual(book, book_default)
+
+        all_books = book_type.get_all_objects_for_this_type()
+        self.assertCountEqual(all_books, [book_other])
 
 
 class ConnectionRouterTestCase(SimpleTestCase):
@@ -2240,7 +2268,6 @@ class SyncOnlyDefaultDatabaseRouter:
 
 
 class MigrateTestCase(TestCase):
-
     # Limit memory usage when calling 'migrate'.
     available_apps = [
         "multiple_database",
@@ -2415,7 +2442,7 @@ class RouteForWriteTestCase(TestCase):
         book.authors.add(auth)
         with self.assertRaises(RouterUsed) as cm:
             with self.override_router():
-                book.authors.all().update(name="Different")
+                book.authors.update(name="Different")
         e = cm.exception
         self.assertEqual(e.mode, RouterUsed.WRITE)
         self.assertEqual(e.model, Person)
@@ -2497,7 +2524,7 @@ class RouteForWriteTestCase(TestCase):
         book.authors.add(auth)
         with self.assertRaises(RouterUsed) as cm:
             with self.override_router():
-                auth.book_set.all().update(title="Different")
+                auth.book_set.update(title="Different")
         e = cm.exception
         self.assertEqual(e.mode, RouterUsed.WRITE)
         self.assertEqual(e.model, Book)

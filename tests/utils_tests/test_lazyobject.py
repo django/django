@@ -1,9 +1,10 @@
 import copy
 import pickle
 import sys
+import unittest
 import warnings
-from unittest import TestCase
 
+from django.test import TestCase
 from django.utils.functional import LazyObject, SimpleLazyObject, empty
 
 from .models import Category, CategoryInfo
@@ -20,7 +21,7 @@ class Foo:
         return self.foo == other.foo
 
 
-class LazyObjectTestCase(TestCase):
+class LazyObjectTestCase(unittest.TestCase):
     def lazy_wrap(self, wrapped_object):
         """
         Wrap the given object into a LazyObject
@@ -32,9 +33,39 @@ class LazyObjectTestCase(TestCase):
 
         return AdHocLazyObject()
 
+    def test_getattribute(self):
+        """
+        Proxy methods don't exist on wrapped objects unless they're set.
+        """
+        attrs = [
+            "__getitem__",
+            "__setitem__",
+            "__delitem__",
+            "__iter__",
+            "__len__",
+            "__contains__",
+        ]
+        foo = Foo()
+        obj = self.lazy_wrap(foo)
+        for attr in attrs:
+            with self.subTest(attr):
+                self.assertFalse(hasattr(obj, attr))
+                setattr(foo, attr, attr)
+                obj_with_attr = self.lazy_wrap(foo)
+                self.assertTrue(hasattr(obj_with_attr, attr))
+                self.assertEqual(getattr(obj_with_attr, attr), attr)
+
     def test_getattr(self):
         obj = self.lazy_wrap(Foo())
         self.assertEqual(obj.foo, "bar")
+
+    def test_getattr_falsey(self):
+        class Thing:
+            def __getattr__(self, key):
+                return []
+
+        obj = self.lazy_wrap(Thing())
+        self.assertEqual(obj.main, [])
 
     def test_setattr(self):
         obj = self.lazy_wrap(Foo())

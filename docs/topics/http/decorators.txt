@@ -24,6 +24,7 @@ a :class:`django.http.HttpResponseNotAllowed` if the conditions are not met.
 
         from django.views.decorators.http import require_http_methods
 
+
         @require_http_methods(["GET", "POST"])
         def my_view(request):
             # I can assume now that only GET or POST requests make it this far
@@ -61,6 +62,11 @@ The following decorators in :mod:`django.views.decorators.http` can be used to
 control caching behavior on particular views.
 
 .. function:: condition(etag_func=None, last_modified_func=None)
+
+.. function:: conditional_page()
+
+    This decorator provides the conditional GET operation handling of
+    :class:`~django.middleware.http.ConditionalGetMiddleware` to a view.
 
 .. function:: etag(etag_func)
 
@@ -138,3 +144,4 @@ customization of :class:`~django.middleware.common.CommonMiddleware` behavior.
 
     This decorator allows individual views to be excluded from
     :setting:`APPEND_SLASH` URL normalization.
+

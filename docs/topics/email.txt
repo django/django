@@ -12,20 +12,54 @@ development, and to provide support for platforms that can't use SMTP.
 
 The code lives in the ``django.core.mail`` module.
 
-Quick example
-=============
+Quick examples
+==============
 
-In two lines::
+Use :func:`send_mail` for straightforward email sending. For example, to send a
+plain text message::
 
     from django.core.mail import send_mail
 
     send_mail(
-        'Subject here',
-        'Here is the message.',
-        'from@example.com',
-        ['to@example.com'],
+        "Subject here",
+        "Here is the message.",
+        "from@example.com",
+        ["to@example.com"],
         fail_silently=False,
     )
+
+When additional email sending functionality is needed, use
+:class:`EmailMessage` or :class:`EmailMultiAlternatives`. For example, to send
+a multipart email that includes both HTML and plain text versions with a
+specific template and custom headers, you can use the following approach::
+
+    from django.core.mail import EmailMultiAlternatives
+    from django.template.loader import render_to_string
+
+    # First, render the plain text content.
+    text_content = render_to_string(
+        "templates/emails/my_email.txt",
+        context={"my_variable": 42},
+    )
+
+    # Secondly, render the HTML content.
+    html_content = render_to_string(
+        "templates/emails/my_email.html",
+        context={"my_variable": 42},
+    )
+
+    # Then, create a multipart email instance.
+    msg = EmailMultiAlternatives(
+        "Subject here",
+        text_content,
+        "from@example.com",
+        ["to@example.com"],
+        headers={"List-Unsubscribe": "<mailto:unsub@example.com>"},
+    )
+
+    # Lastly, attach the HTML content to the email instance and send.
+    msg.attach_alternative(html_content, "text/html")
+    msg.send()
 
 Mail is sent using the SMTP host and port specified in the
 :setting:`EMAIL_HOST` and :setting:`EMAIL_PORT` settings. The
@@ -101,8 +135,18 @@ For example, the following code would send two different messages to
 two different sets of recipients; however, only one connection to the
 mail server would be opened::
 
-    message1 = ('Subject here', 'Here is the message', 'from@example.com', ['first@example.com', 'other@example.com'])
-    message2 = ('Another Subject', 'Here is another message', 'from@example.com', ['second@test.com'])
+    message1 = (
+        "Subject here",
+        "Here is the message",
+        "from@example.com",
+        ["first@example.com", "other@example.com"],
+    )
+    message2 = (
+        "Another Subject",
+        "Here is another message",
+        "from@example.com",
+        ["second@test.com"],
+    )
     send_mass_mail((message1, message2), fail_silently=False)
 
 The return value will be the number of successfully delivered messages.
@@ -154,18 +198,18 @@ This sends a single email to john@example.com and jane@example.com, with them
 both appearing in the "To:"::
 
     send_mail(
-        'Subject',
-        'Message.',
-        'from@example.com',
-        ['john@example.com', 'jane@example.com'],
+        "Subject",
+        "Message.",
+        "from@example.com",
+        ["john@example.com", "jane@example.com"],
     )
 
 This sends a message to john@example.com and jane@example.com, with them both
 receiving a separate email::
 
     datatuple = (
-        ('Subject', 'Message.', 'from@example.com', ['john@example.com']),
-        ('Subject', 'Message.', 'from@example.com', ['jane@example.com']),
+        ("Subject", "Message.", "from@example.com", ["john@example.com"]),
+        ("Subject", "Message.", "from@example.com", ["jane@example.com"]),
     )
     send_mass_mail(datatuple)
 
@@ -194,20 +238,21 @@ from the request's POST data, sends that to admin@example.com and redirects to
     from django.core.mail import BadHeaderError, send_mail
     from django.http import HttpResponse, HttpResponseRedirect
 
+
     def send_email(request):
-        subject = request.POST.get('subject', '')
-        message = request.POST.get('message', '')
-        from_email = request.POST.get('from_email', '')
+        subject = request.POST.get("subject", "")
+        message = request.POST.get("message", "")
+        from_email = request.POST.get("from_email", "")
         if subject and message and from_email:
             try:
-                send_mail(subject, message, from_email, ['admin@example.com'])
+                send_mail(subject, message, from_email, ["admin@example.com"])
             except BadHeaderError:
-                return HttpResponse('Invalid header found.')
-            return HttpResponseRedirect('/contact/thanks/')
+                return HttpResponse("Invalid header found.")
+            return HttpResponseRedirect("/contact/thanks/")
         else:
             # In reality we'd use a form class
             # to get proper validation errors.
-            return HttpResponse('Make sure all fields are entered and valid.')
+            return HttpResponse("Make sure all fields are entered and valid.")
 
 .. _Header injection: http://www.nyphp.org/phundamentals/8_Preventing-Email-Header-Injection.html
 
@@ -271,8 +316,14 @@ All parameters are optional and can be set at any time prior to calling the
   new connection is created when ``send()`` is called.
 
 * ``attachments``: A list of attachments to put on the message. These can
-  be either :class:`~email.mime.base.MIMEBase` instances, or ``(filename,
-  content, mimetype)`` triples.
+  be instances of :class:`~email.mime.base.MIMEBase` or
+  :class:`~django.core.mail.EmailAttachment`, or a tuple with attributes
+  ``(filename, content, mimetype)``.
+
+  .. versionchanged:: 5.2
+
+    Support for :class:`~django.core.mail.EmailAttachment` items of
+    ``attachments`` were added.
 
 * ``headers``: A dictionary of extra headers to put on the message. The
   keys are the header name, values are the header values. It's up to the
@@ -290,13 +341,13 @@ For example::
     from django.core.mail import EmailMessage
 
     email = EmailMessage(
-        'Hello',
-        'Body goes here',
-        'from@example.com',
-        ['to1@example.com', 'to2@example.com'],
-        ['bcc@example.com'],
-        reply_to=['another@example.com'],
-        headers={'Message-ID': 'foo'},
+        "Hello",
+        "Body goes here",
+        "from@example.com",
+        ["to1@example.com", "to2@example.com"],
+        ["bcc@example.com"],
+        reply_to=["another@example.com"],
+        headers={"Message-ID": "foo"},
     )
 
 The class has the following methods:
@@ -340,7 +391,7 @@ The class has the following methods:
 
     For example::
 
-       message.attach('design.png', img_data, 'image/png')
+       message.attach("design.png", img_data, "image/png")
 
     If you specify a ``mimetype`` of :mimetype:`message/rfc822`, it will also
     accept :class:`django.core.mail.EmailMessage` and
@@ -363,32 +414,109 @@ The class has the following methods:
   the MIME type to use for the attachment. If the MIME type is omitted, it
   will be guessed from the filename. You can use it like this::
 
-    message.attach_file('/images/weather_map.png')
+    message.attach_file("/images/weather_map.png")
 
   For MIME types starting with :mimetype:`text/`, binary data is handled as in
   ``attach()``.
 
+.. class:: EmailAttachment
+
+    .. versionadded:: 5.2
+
+    A named tuple to store attachments to an email.
+
+    The named tuple has the following indexes:
+
+    * ``filename``
+    * ``content``
+    * ``mimetype``
+
 Sending alternative content types
+---------------------------------
+
+Sending multiple content versions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 It can be useful to include multiple versions of the content in an email; the
 classic example is to send both text and HTML versions of a message. With
-Django's email library, you can do this using the ``EmailMultiAlternatives``
-class. This subclass of :class:`~django.core.mail.EmailMessage` has an
-``attach_alternative()`` method for including extra versions of the message
-body in the email. All the other methods (including the class initialization)
-are inherited directly from :class:`~django.core.mail.EmailMessage`.
+Django's email library, you can do this using the
+:class:`~django.core.mail.EmailMultiAlternatives` class.
 
-To send a text and HTML combination, you could write::
+.. class:: EmailMultiAlternatives
 
-    from django.core.mail import EmailMultiAlternatives
+    A subclass of :class:`EmailMessage` that allows additional versions of the
+    message body in the email via the :meth:`attach_alternative` method. This
+    directly inherits all methods (including the class initialization) from
+    :class:`EmailMessage`.
 
-    subject, from_email, to = 'hello', 'from@example.com', 'to@example.com'
-    text_content = 'This is an important message.'
-    html_content = '<p>This is an <strong>important</strong> message.</p>'
-    msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
-    msg.attach_alternative(html_content, "text/html")
-    msg.send()
+    .. attribute:: alternatives
+
+        A list of :class:`~django.core.mail.EmailAlternative` named tuples. This
+        is particularly useful in tests::
+
+            self.assertEqual(len(msg.alternatives), 1)
+            self.assertEqual(msg.alternatives[0].content, html_content)
+            self.assertEqual(msg.alternatives[0].mimetype, "text/html")
+
+        Alternatives should only be added using the :meth:`attach_alternative`
+        method, or passed to the constructor.
+
+        .. versionchanged:: 5.2
+
+            In older versions, ``alternatives`` was a list of regular tuples,
+            as opposed to :class:`~django.core.mail.EmailAlternative` named
+            tuples.
+
+    .. method:: attach_alternative(content, mimetype)
+
+        Attach an alternative representation of the message body in the email.
+
+        For example, to send a text and HTML combination, you could write::
+
+            from django.core.mail import EmailMultiAlternatives
+
+            subject = "hello"
+            from_email = "from@example.com"
+            to = "to@example.com"
+            text_content = "This is an important message."
+            html_content = "<p>This is an <strong>important</strong> message.</p>"
+            msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
+
+    .. method:: body_contains(text)
+
+        .. versionadded:: 5.2
+
+        Returns a boolean indicating whether the provided ``text`` is
+        contained in the email ``body`` and in all attached MIME type
+        ``text/*`` alternatives.
+
+        This can be useful when testing emails. For example::
+
+            def test_contains_email_content(self):
+                subject = "Hello World"
+                from_email = "from@example.com"
+                to = "to@example.com"
+                msg = EmailMultiAlternatives(subject, "I am content.", from_email, [to])
+                msg.attach_alternative("<p>I am content.</p>", "text/html")
+
+                self.assertIs(msg.body_contains("I am content"), True)
+                self.assertIs(msg.body_contains("<p>I am content.</p>"), False)
+
+.. class:: EmailAlternative
+
+    .. versionadded:: 5.2
+
+    A named tuple to store alternative versions of email content.
+
+    The named tuple has the following indexes:
+
+    * ``content``
+    * ``mimetype``
+
+Updating the default content type
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 By default, the MIME type of the ``body`` parameter in an
 :class:`~django.core.mail.EmailMessage` is ``"text/plain"``. It is good
@@ -430,11 +558,17 @@ It can also be used as a context manager, which will automatically call
 
     with mail.get_connection() as connection:
         mail.EmailMessage(
-            subject1, body1, from1, [to1],
+            subject1,
+            body1,
+            from1,
+            [to1],
             connection=connection,
         ).send()
         mail.EmailMessage(
-            subject2, body2, from2, [to2],
+            subject2,
+            body2,
+            from2,
+            [to2],
             connection=connection,
         ).send()
 
@@ -489,7 +623,7 @@ SMTP backend
     The SMTP backend is the default configuration inherited by Django. If you
     want to specify it explicitly, put the following in your settings::
 
-        EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+        EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
     If unspecified, the default ``timeout`` will be the one provided by
     :func:`socket.getdefaulttimeout()`, which defaults to ``None`` (no timeout).
@@ -506,7 +640,7 @@ providing the ``stream`` keyword argument when constructing the connection.
 
 To specify this backend, put the following in your settings::
 
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 This backend is not intended for use in production -- it is provided as a
 convenience that can be used during development.
@@ -524,8 +658,8 @@ the ``file_path`` keyword when creating a connection with
 
 To specify this backend, put the following in your settings::
 
-    EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-    EMAIL_FILE_PATH = '/tmp/app-messages' # change this to a proper location
+    EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
+    EMAIL_FILE_PATH = "/tmp/app-messages"  # change this to a proper location
 
 This backend is not intended for use in production -- it is provided as a
 convenience that can be used during development.
@@ -543,7 +677,7 @@ be sent.
 
 To specify this backend, put the following in your settings::
 
-  EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
+  EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 
 This backend is not intended for use in production -- it is provided as a
 convenience that can be used during development and testing.
@@ -559,7 +693,7 @@ Dummy backend
 As the name suggests the dummy backend does nothing with your messages. To
 specify this backend, put the following in your settings::
 
-   EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
+   EMAIL_BACKEND = "django.core.mail.backends.dummy.EmailBackend"
 
 This backend is not intended for use in production -- it is provided as a
 convenience that can be used during development.
@@ -604,7 +738,8 @@ some periodic email you wish to send out, you could send these emails using
 a single call to send_messages::
 
     from django.core import mail
-    connection = mail.get_connection()   # Use default email connection
+
+    connection = mail.get_connection()  # Use default email connection
     messages = get_notification_email()
     connection.send_messages(messages)
 
@@ -617,6 +752,7 @@ manually open or close the connection if it is already open, so if you
 manually open the connection, you can control when it is closed. For example::
 
     from django.core import mail
+
     connection = mail.get_connection()
 
     # Manually open the connection
@@ -624,26 +760,26 @@ manually open the connection, you can control when it is closed. For example::
 
     # Construct an email message that uses the connection
     email1 = mail.EmailMessage(
-        'Hello',
-        'Body goes here',
-        'from@example.com',
-        ['to1@example.com'],
+        "Hello",
+        "Body goes here",
+        "from@example.com",
+        ["to1@example.com"],
         connection=connection,
     )
-    email1.send() # Send the email
+    email1.send()  # Send the email
 
     # Construct two more messages
     email2 = mail.EmailMessage(
-        'Hello',
-        'Body goes here',
-        'from@example.com',
-        ['to2@example.com'],
+        "Hello",
+        "Body goes here",
+        "from@example.com",
+        ["to2@example.com"],
     )
     email3 = mail.EmailMessage(
-        'Hello',
-        'Body goes here',
-        'from@example.com',
-        ['to3@example.com'],
+        "Hello",
+        "Body goes here",
+        "from@example.com",
+        ["to3@example.com"],
     )
 
     # Send the two emails in a single call -
@@ -664,7 +800,7 @@ and that those emails will contain the correct content.
 
 The easiest way to configure email for local development is to use the
 :ref:`console <topic-email-console-backend>` email backend. This backend
-redirects all email to stdout, allowing you to inspect the content of mail.
+redirects all email to ``stdout``, allowing you to inspect the content of mail.
 
 The :ref:`file <topic-email-file-backend>` email backend can also be useful
 during development -- this backend dumps the contents of every SMTP connection
@@ -672,7 +808,9 @@ to a file that can be inspected at your leisure.
 
 Another approach is to use a "dumb" SMTP server that receives the emails
 locally and displays them to the terminal, but does not actually send
-anything. The `aiosmtpd`_ package provides a way to accomplish this::
+anything. The :pypi:`aiosmtpd` package provides a way to accomplish this:
+
+.. code-block:: shell
 
     python -m pip install aiosmtpd
 

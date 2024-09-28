@@ -11,7 +11,7 @@ class UpperTests(TestCase):
         Author.objects.create(name="John Smith", alias="smithj")
         Author.objects.create(name="Rhonda")
         authors = Author.objects.annotate(upper_name=Upper("name"))
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             authors.order_by("name"),
             [
                 "JOHN SMITH",
@@ -20,7 +20,7 @@ class UpperTests(TestCase):
             lambda a: a.upper_name,
         )
         Author.objects.update(name=Upper("name"))
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             authors.order_by("name"),
             [
                 ("JOHN SMITH", "JOHN SMITH"),
@@ -34,7 +34,7 @@ class UpperTests(TestCase):
             Author.objects.create(name="John Smith", alias="smithj")
             Author.objects.create(name="Rhonda")
             authors = Author.objects.filter(name__upper__exact="JOHN SMITH")
-            self.assertQuerysetEqual(
+            self.assertQuerySetEqual(
                 authors.order_by("name"),
                 [
                     "John Smith",

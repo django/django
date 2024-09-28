@@ -18,6 +18,7 @@ from django.db.models.fields.related import (
 from django.forms.utils import flatatt
 from django.template.defaultfilters import capfirst, linebreaksbr
 from django.urls import NoReverseMatch, reverse
+from django.utils.functional import cached_property
 from django.utils.html import conditional_escape, format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext
@@ -34,9 +35,6 @@ class ActionForm(forms.Form):
         initial=0,
         widget=forms.HiddenInput({"class": "select-across"}),
     )
-
-
-checkbox = forms.CheckboxInput({"class": "action-select"}, lambda value: False)
 
 
 class AdminForm:
@@ -84,10 +82,18 @@ class AdminForm:
         return self.form.non_field_errors
 
     @property
+    def fields(self):
+        return self.form.fields
+
+    @property
+    def is_bound(self):
+        return self.form.is_bound
+
+    @property
     def media(self):
         media = self.form.media
         for fs in self:
-            media = media + fs.media
+            media += fs.media
         return media
 
 
@@ -111,9 +117,13 @@ class Fieldset:
 
     @property
     def media(self):
-        if "collapse" in self.classes:
-            return forms.Media(js=["admin/js/collapse.js"])
         return forms.Media()
+
+    @cached_property
+    def is_collapsible(self):
+        if any([field in self.fields for field in self.form.errors]):
+            return False
+        return "collapse" in self.classes
 
     def __iter__(self):
         for field in self.fields:
@@ -433,15 +443,28 @@ class InlineAdminFormSet:
     def forms(self):
         return self.formset.forms
 
-    @property
+    @cached_property
+    def is_collapsible(self):
+        if any(self.formset.errors):
+            return False
+        return "collapse" in self.classes
+
     def non_form_errors(self):
-        return self.formset.non_form_errors
+        return self.formset.non_form_errors()
+
+    @property
+    def is_bound(self):
+        return self.formset.is_bound
+
+    @property
+    def total_form_count(self):
+        return self.formset.total_form_count
 
     @property
     def media(self):
         media = self.opts.media + self.formset.media
         for fs in self:
-            media = media + fs.media
+            media += fs.media
         return media
 
 
@@ -486,13 +509,18 @@ class InlineAdminForm(AdminForm):
             # Auto fields are editable, so check for auto or non-editable pk.
             self.form._meta.model._meta.auto_field
             or not self.form._meta.model._meta.pk.editable
+            # The pk can be editable, but excluded from the inline.
+            or (
+                self.form._meta.exclude
+                and self.form._meta.model._meta.pk.name in self.form._meta.exclude
+            )
             or
             # Also search any parents for an auto field. (The pk info is
             # propagated to child models so that does not need to be checked
             # in parents.)
             any(
                 parent._meta.auto_field or not parent._meta.model._meta.pk.editable
-                for parent in self.form._meta.model._meta.get_parent_list()
+                for parent in self.form._meta.model._meta.all_parents
             )
         )
 
@@ -510,11 +538,6 @@ class InlineAdminForm(AdminForm):
         from django.forms.formsets import DELETION_FIELD_NAME
 
         return AdminField(self.form, DELETION_FIELD_NAME, False)
-
-    def ordering_field(self):
-        from django.forms.formsets import ORDERING_FIELD_NAME
-
-        return AdminField(self.form, ORDERING_FIELD_NAME, False)
 
 
 class InlineFieldset(Fieldset):

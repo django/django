@@ -5,15 +5,16 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Le Tartuffe <magno79@gmail.com>, 2014
 # JunGu Kang <chr0m3.kr@gmail.com>, 2015
-# Noh Seho <iam@sehonoh.kr>, 2018
-# Yongjin Jo <wnrhd114@gmail.com>, 2018
+# Seho Noh <iam@sehonoh.kr>, 2018
+# 정훈 이, 2021
+# Jrog <jrog612@gmail.com>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-16 20:42+0100\n"
-"PO-Revision-Date: 2018-12-14 06:03+0000\n"
-"Last-Translator: Yongjin Jo <wnrhd114@gmail.com>\n"
+"POT-Creation-Date: 2021-04-07 14:40+0200\n"
+"PO-Revision-Date: 2021-12-24 18:40+0000\n"
+"Last-Translator: 정훈 이\n"
 "Language-Team: Korean (http://www.transifex.com/django/django/language/ko/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -80,19 +81,9 @@ msgid "{}th"
 msgstr "{}번째"
 
 #, python-format
-msgid "%(value).1f million"
-msgid_plural "%(value).1f million"
-msgstr[0] "%(value).1f백만"
-
-#, python-format
 msgid "%(value)s million"
 msgid_plural "%(value)s million"
 msgstr[0] "%(value)s 백만"
-
-#, python-format
-msgid "%(value).1f billion"
-msgid_plural "%(value).1f billion"
-msgstr[0] "%(value).1f십억"
 
 #, python-format
 msgid "%(value)s billion"
@@ -100,19 +91,9 @@ msgid_plural "%(value)s billion"
 msgstr[0] "%(value)s 십억"
 
 #, python-format
-msgid "%(value).1f trillion"
-msgid_plural "%(value).1f trillion"
-msgstr[0] "%(value).1f조"
-
-#, python-format
 msgid "%(value)s trillion"
 msgid_plural "%(value)s trillion"
 msgstr[0] "%(value)s 조"
-
-#, python-format
-msgid "%(value).1f quadrillion"
-msgid_plural "%(value).1f quadrillion"
-msgstr[0] "%(value).1f 천조"
 
 #, python-format
 msgid "%(value)s quadrillion"
@@ -120,19 +101,9 @@ msgid_plural "%(value)s quadrillion"
 msgstr[0] "%(value)s 천조"
 
 #, python-format
-msgid "%(value).1f quintillion"
-msgid_plural "%(value).1f quintillion"
-msgstr[0] "%(value).1f 백경"
-
-#, python-format
 msgid "%(value)s quintillion"
 msgid_plural "%(value)s quintillion"
 msgstr[0] "%(value)s 백경"
-
-#, python-format
-msgid "%(value).1f sextillion"
-msgid_plural "%(value).1f sextillion"
-msgstr[0] "%(value).1f 섹틸리언-10의21제곱"
 
 #, python-format
 msgid "%(value)s sextillion"
@@ -140,19 +111,9 @@ msgid_plural "%(value)s sextillion"
 msgstr[0] "%(value)s 섹틸리언-10의21제곱"
 
 #, python-format
-msgid "%(value).1f septillion"
-msgid_plural "%(value).1f septillion"
-msgstr[0] "%(value).1f 셉틸리언-10의 24제곱"
-
-#, python-format
 msgid "%(value)s septillion"
 msgid_plural "%(value)s septillion"
 msgstr[0] "%(value)s 셉틸리언-10의 24제곱"
-
-#, python-format
-msgid "%(value).1f octillion"
-msgid_plural "%(value).1f octillion"
-msgstr[0] "%(value).1f 옥틸리언-10의 27제곱"
 
 #, python-format
 msgid "%(value)s octillion"
@@ -160,29 +121,14 @@ msgid_plural "%(value)s octillion"
 msgstr[0] "%(value)s 옥틸리언-10의 27제곱"
 
 #, python-format
-msgid "%(value).1f nonillion"
-msgid_plural "%(value).1f nonillion"
-msgstr[0] "%(value).1f 노닐리언-10의30제곱"
-
-#, python-format
 msgid "%(value)s nonillion"
 msgid_plural "%(value)s nonillion"
 msgstr[0] "%(value)s 노닐리언-10의30제곱"
 
 #, python-format
-msgid "%(value).1f decillion"
-msgid_plural "%(value).1f decillion"
-msgstr[0] "%(value).1f 디실리언-10의 33제곱"
-
-#, python-format
 msgid "%(value)s decillion"
 msgid_plural "%(value)s decillion"
 msgstr[0] "%(value)s 디실리언-10의 33제곱"
-
-#, python-format
-msgid "%(value).1f googol"
-msgid_plural "%(value).1f googol"
-msgstr[0] "%(value).1f 구골-10의 100제곱"
 
 #, python-format
 msgid "%(value)s googol"
@@ -285,74 +231,74 @@ msgstr "지금부터 %(delta)s"
 #. Translators: 'naturaltime-past' strings will be included in '%(delta)s ago'
 #, python-format
 msgctxt "naturaltime-past"
-msgid "%d year"
-msgid_plural "%d years"
-msgstr[0] "%d년"
+msgid "%(num)d year"
+msgid_plural "%(num)d years"
+msgstr[0] "%(num)d년"
 
 #, python-format
 msgctxt "naturaltime-past"
-msgid "%d month"
-msgid_plural "%d months"
-msgstr[0] "%d개월"
+msgid "%(num)d month"
+msgid_plural "%(num)d months"
+msgstr[0] "%(num)d개월"
 
 #, python-format
 msgctxt "naturaltime-past"
-msgid "%d week"
-msgid_plural "%d weeks"
-msgstr[0] "%d주"
+msgid "%(num)d week"
+msgid_plural "%(num)d weeks"
+msgstr[0] "%(num)d주"
 
 #, python-format
 msgctxt "naturaltime-past"
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d일"
+msgid "%(num)d day"
+msgid_plural "%(num)d days"
+msgstr[0] "%(num)d일"
 
 #, python-format
 msgctxt "naturaltime-past"
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d시간"
+msgid "%(num)d hour"
+msgid_plural "%(num)d hours"
+msgstr[0] "%(num)d시간"
 
 #, python-format
 msgctxt "naturaltime-past"
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d분"
+msgid "%(num)d minute"
+msgid_plural "%(num)d minutes"
+msgstr[0] "%(num)d분"
 
 #. Translators: 'naturaltime-future' strings will be included in '%(delta)s
 #. from now'
 #, python-format
 msgctxt "naturaltime-future"
-msgid "%d year"
-msgid_plural "%d years"
-msgstr[0] "%d년"
+msgid "%(num)d year"
+msgid_plural "%(num)d years"
+msgstr[0] "%(num)d년"
 
 #, python-format
 msgctxt "naturaltime-future"
-msgid "%d month"
-msgid_plural "%d months"
-msgstr[0] "%d개월"
+msgid "%(num)d month"
+msgid_plural "%(num)d months"
+msgstr[0] "%(num)d개월"
 
 #, python-format
 msgctxt "naturaltime-future"
-msgid "%d week"
-msgid_plural "%d weeks"
-msgstr[0] "%d주"
+msgid "%(num)d week"
+msgid_plural "%(num)d weeks"
+msgstr[0] "%(num)d주"
 
 #, python-format
 msgctxt "naturaltime-future"
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d일"
+msgid "%(num)d day"
+msgid_plural "%(num)d days"
+msgstr[0] "%(num)d일"
 
 #, python-format
 msgctxt "naturaltime-future"
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d시간"
+msgid "%(num)d hour"
+msgid_plural "%(num)d hours"
+msgstr[0] "%(num)d시간"
 
 #, python-format
 msgctxt "naturaltime-future"
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d분"
+msgid "%(num)d minute"
+msgid_plural "%(num)d minutes"
+msgstr[0] "%(num)d분"

@@ -11,7 +11,6 @@ from django.utils.module_loading import (
     import_string,
     module_has_submodule,
 )
-from django.utils.version import PY310
 
 
 class DefaultLoader(unittest.TestCase):
@@ -205,35 +204,12 @@ class AutodiscoverModulesTestCase(SimpleTestCase):
         self.assertEqual(site._registry, {"lorem": "ipsum"})
 
 
-if PY310:
+class TestFinder:
+    def __init__(self, *args, **kwargs):
+        self.importer = zipimporter(*args, **kwargs)
 
-    class TestFinder:
-        def __init__(self, *args, **kwargs):
-            self.importer = zipimporter(*args, **kwargs)
-
-        def find_spec(self, path, target=None):
-            return self.importer.find_spec(path, target)
-
-else:
-
-    class TestFinder:
-        def __init__(self, *args, **kwargs):
-            self.importer = zipimporter(*args, **kwargs)
-
-        def find_module(self, path):
-            importer = self.importer.find_module(path)
-            if importer is None:
-                return
-            return TestLoader(importer)
-
-    class TestLoader:
-        def __init__(self, importer):
-            self.importer = importer
-
-        def load_module(self, name):
-            mod = self.importer.load_module(name)
-            mod.__loader__ = self
-            return mod
+    def find_spec(self, path, target=None):
+        return self.importer.find_spec(path, target)
 
 
 class CustomLoader(EggLoader):

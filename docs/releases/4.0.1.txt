@@ -50,8 +50,7 @@ Bugfixes
 ========
 
 * Fixed a regression in Django 4.0 that caused a crash of
-  :meth:`~django.test.SimpleTestCase.assertFormsetError` on a formset named
-  ``form`` (:ticket:`33346`).
+  ``assertFormsetError()`` on a formset named ``form`` (:ticket:`33346`).
 
 * Fixed a bug in Django 4.0 that caused a crash on booleans with the
   ``RedisCache`` backend (:ticket:`33361`).

@@ -2,6 +2,7 @@
 This module houses the ctypes function prototypes for GDAL DataSource (raster)
 related data structures.
 """
+
 from ctypes import POINTER, c_bool, c_char_p, c_double, c_int, c_void_p
 from functools import partial
 
@@ -24,15 +25,6 @@ from django.contrib.gis.gdal.prototypes.generation import (
 void_output = partial(void_output, cpl=True)
 const_string_output = partial(const_string_output, cpl=True)
 double_output = partial(double_output, cpl=True)
-
-# Raster Driver Routines
-register_all = void_output(std_call("GDALAllRegister"), [], errcheck=False)
-get_driver = voidptr_output(std_call("GDALGetDriver"), [c_int])
-get_driver_by_name = voidptr_output(
-    std_call("GDALGetDriverByName"), [c_char_p], errcheck=False
-)
-get_driver_count = int_output(std_call("GDALGetDriverCount"), [])
-get_driver_description = const_string_output(std_call("GDALGetDescription"), [c_void_p])
 
 # Raster Data Source Routines
 create_ds = voidptr_output(

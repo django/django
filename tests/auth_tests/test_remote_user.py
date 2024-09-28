@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from django.conf import settings
 from django.contrib.auth import authenticate
@@ -7,12 +7,10 @@ from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.contrib.auth.models import User
 from django.middleware.csrf import _get_new_csrf_string, _mask_cipher_secret
 from django.test import Client, TestCase, modify_settings, override_settings
-from django.utils import timezone
 
 
 @override_settings(ROOT_URLCONF="auth_tests.urls")
 class RemoteUserTest(TestCase):
-
     middleware = "django.contrib.auth.middleware.RemoteUserMiddleware"
     backend = "django.contrib.auth.backends.RemoteUserBackend"
     header = "REMOTE_USER"
@@ -22,15 +20,15 @@ class RemoteUserTest(TestCase):
     known_user = "knownuser"
     known_user2 = "knownuser2"
 
-    def setUp(self):
-        self.patched_settings = modify_settings(
-            AUTHENTICATION_BACKENDS={"append": self.backend},
-            MIDDLEWARE={"append": self.middleware},
+    @classmethod
+    def setUpClass(cls):
+        cls.enterClassContext(
+            modify_settings(
+                AUTHENTICATION_BACKENDS={"append": cls.backend},
+                MIDDLEWARE={"append": cls.middleware},
+            )
         )
-        self.patched_settings.enable()
-
-    def tearDown(self):
-        self.patched_settings.disable()
+        super().setUpClass()
 
     def test_no_remote_user(self):
         """Users are not created when remote user is not specified."""
@@ -215,11 +213,14 @@ class CustomRemoteUserBackend(RemoteUserBackend):
         """
         return username.split("@")[0]
 
-    def configure_user(self, request, user):
+    def configure_user(self, request, user, created=True):
         """
         Sets user's email address using the email specified in an HTTP header.
+        Sets user's last name for existing users.
         """
         user.email = request.META.get(RemoteUserTest.email_header, "")
+        if not created:
+            user.last_name = user.username
         user.save()
         return user
 
@@ -242,8 +243,12 @@ class RemoteUserCustomTest(RemoteUserTest):
         should not have been configured with an email address.
         """
         super().test_known_user()
-        self.assertEqual(User.objects.get(username="knownuser").email, "")
-        self.assertEqual(User.objects.get(username="knownuser2").email, "")
+        knownuser = User.objects.get(username="knownuser")
+        knownuser2 = User.objects.get(username="knownuser2")
+        self.assertEqual(knownuser.email, "")
+        self.assertEqual(knownuser2.email, "")
+        self.assertEqual(knownuser.last_name, "knownuser")
+        self.assertEqual(knownuser2.last_name, "knownuser2")
 
     def test_unknown_user(self):
         """
@@ -260,6 +265,7 @@ class RemoteUserCustomTest(RemoteUserTest):
         )
         self.assertEqual(response.context["user"].username, "newuser")
         self.assertEqual(response.context["user"].email, "user@example.com")
+        self.assertEqual(response.context["user"].last_name, "")
         self.assertEqual(User.objects.count(), num_users + 1)
         newuser = User.objects.get(username="newuser")
         self.assertEqual(newuser.email, "user@example.com")

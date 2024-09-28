@@ -20,6 +20,7 @@ Here's a view that returns the current date and time, as an HTML document::
     from django.http import HttpResponse
     import datetime
 
+
     def current_datetime(request):
         now = datetime.datetime.now()
         html = "<html><body>It is now %s.</body></html>" % now
@@ -70,12 +71,13 @@ example::
 
     from django.http import HttpResponse, HttpResponseNotFound
 
+
     def my_view(request):
         # ...
         if foo:
-            return HttpResponseNotFound('<h1>Page not found</h1>')
+            return HttpResponseNotFound("<h1>Page not found</h1>")
         else:
-            return HttpResponse('<h1>Page was found</h1>')
+            return HttpResponse("<h1>Page was found</h1>")
 
 There isn't a specialized subclass for every possible HTTP response code,
 since many of them aren't going to be that common. However, as documented in
@@ -84,6 +86,7 @@ HTTP status code into the constructor for :class:`~django.http.HttpResponse`
 to create a return class for any status code you like. For example::
 
     from django.http import HttpResponse
+
 
     def my_view(request):
         # ...
@@ -102,7 +105,7 @@ The ``Http404`` exception
 When you return an error such as :class:`~django.http.HttpResponseNotFound`,
 you're responsible for defining the HTML of the resulting error page::
 
-    return HttpResponseNotFound('<h1>Page not found</h1>')
+    return HttpResponseNotFound("<h1>Page not found</h1>")
 
 For convenience, and because it's a good idea to have a consistent 404 error page
 across your site, Django provides an ``Http404`` exception. If you raise
@@ -115,12 +118,13 @@ Example usage::
     from django.shortcuts import render
     from polls.models import Poll
 
+
     def detail(request, poll_id):
         try:
             p = Poll.objects.get(pk=poll_id)
         except Poll.DoesNotExist:
             raise Http404("Poll does not exist")
-        return render(request, 'polls/detail.html', {'poll': p})
+        return render(request, "polls/detail.html", {"poll": p})
 
 In order to show customized HTML when Django returns a 404, you can create an
 HTML template named ``404.html`` and place it in the top level of your
@@ -145,22 +149,22 @@ effect).
 The :func:`~django.views.defaults.page_not_found` view is overridden by
 :data:`~django.conf.urls.handler404`::
 
-    handler404 = 'mysite.views.my_custom_page_not_found_view'
+    handler404 = "mysite.views.my_custom_page_not_found_view"
 
 The :func:`~django.views.defaults.server_error` view is overridden by
 :data:`~django.conf.urls.handler500`::
 
-    handler500 = 'mysite.views.my_custom_error_view'
+    handler500 = "mysite.views.my_custom_error_view"
 
 The :func:`~django.views.defaults.permission_denied` view is overridden by
 :data:`~django.conf.urls.handler403`::
 
-    handler403 = 'mysite.views.my_custom_permission_denied_view'
+    handler403 = "mysite.views.my_custom_permission_denied_view"
 
 The :func:`~django.views.defaults.bad_request` view is overridden by
 :data:`~django.conf.urls.handler400`::
 
-    handler400 = 'mysite.views.my_custom_bad_request_view'
+    handler400 = "mysite.views.my_custom_bad_request_view"
 
 .. seealso::
 
@@ -180,7 +184,7 @@ in a test view. For example::
 
 
     def response_error_handler(request, exception=None):
-        return HttpResponse('Error handler content', status=403)
+        return HttpResponse("Error handler content", status=403)
 
 
     def permission_denied_view(request):
@@ -188,7 +192,7 @@ in a test view. For example::
 
 
     urlpatterns = [
-        path('403/', permission_denied_view),
+        path("403/", permission_denied_view),
     ]
 
     handler403 = response_error_handler
@@ -197,11 +201,10 @@ in a test view. For example::
     # ROOT_URLCONF must specify the module that contains handler403 = ...
     @override_settings(ROOT_URLCONF=__name__)
     class CustomErrorHandlerTests(SimpleTestCase):
-
         def test_handler_renders_template_response(self):
-            response = self.client.get('/403/')
+            response = self.client.get("/403/")
             # Make assertions on the response here. For example:
-            self.assertContains(response, 'Error handler content', status_code=403)
+            self.assertContains(response, "Error handler content", status_code=403)
 
 .. _async-views:
 
@@ -219,9 +222,10 @@ Here's an example of an async view::
     import datetime
     from django.http import HttpResponse
 
+
     async def current_datetime(request):
         now = datetime.datetime.now()
-        html = '<html><body>It is now %s.</body></html>' % now
+        html = "<html><body>It is now %s.</body></html>" % now
         return HttpResponse(html)
 
 You can read more about Django's async support, and how to best use async

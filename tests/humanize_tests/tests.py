@@ -6,7 +6,7 @@ from django.template import Context, Template, defaultfilters
 from django.test import SimpleTestCase, modify_settings, override_settings
 from django.utils import translation
 from django.utils.html import escape
-from django.utils.timezone import get_fixed_timezone, utc
+from django.utils.timezone import get_fixed_timezone
 from django.utils.translation import gettext as _
 
 # Mock out datetime in some tests so they don't fail occasionally when they
@@ -55,6 +55,9 @@ class HumanizeTests(SimpleTestCase):
             "102",
             "103",
             "111",
+            "-0",
+            "-1",
+            "-105",
             "something else",
             None,
         )
@@ -70,6 +73,9 @@ class HumanizeTests(SimpleTestCase):
             "102nd",
             "103rd",
             "111th",
+            "0th",
+            "-1",
+            "-105",
             "something else",
             None,
         )
@@ -116,39 +122,83 @@ class HumanizeTests(SimpleTestCase):
     def test_intcomma(self):
         test_list = (
             100,
+            -100,
             1000,
+            -1000,
             10123,
+            -10123,
             10311,
+            -10311,
             1000000,
+            -1000000,
             1234567.25,
+            -1234567.25,
             "100",
+            "-100",
+            "100.1",
+            "-100.1",
+            "100.13",
+            "-100.13",
             "1000",
+            "-1000",
             "10123",
+            "-10123",
             "10311",
+            "-10311",
+            "100000.13",
+            "-100000.13",
             "1000000",
+            "-1000000",
             "1234567.1234567",
+            "-1234567.1234567",
             Decimal("1234567.1234567"),
+            Decimal("-1234567.1234567"),
             None,
             "１２３４５６７",
+            "-１２３４５６７",
             "１２３４５６７.１２",
+            "-１２３４５６７.１２",
+            "the quick brown fox jumped over the lazy dog",
         )
         result_list = (
             "100",
+            "-100",
             "1,000",
+            "-1,000",
             "10,123",
+            "-10,123",
             "10,311",
+            "-10,311",
             "1,000,000",
+            "-1,000,000",
             "1,234,567.25",
+            "-1,234,567.25",
             "100",
+            "-100",
+            "100.1",
+            "-100.1",
+            "100.13",
+            "-100.13",
             "1,000",
+            "-1,000",
             "10,123",
+            "-10,123",
             "10,311",
+            "-10,311",
+            "100,000.13",
+            "-100,000.13",
             "1,000,000",
+            "-1,000,000",
             "1,234,567.1234567",
+            "-1,234,567.1234567",
             "1,234,567.1234567",
+            "-1,234,567.1234567",
             None,
             "1,234,567",
+            "-1,234,567",
             "１,２３４,５６７.１２",
+            "-１,２３４,５６７.１２",
+            "the quick brown fox jumped over the lazy dog",
         )
         with translation.override("en"):
             self.humanize_tester(test_list, result_list, "intcomma")
@@ -156,39 +206,71 @@ class HumanizeTests(SimpleTestCase):
     def test_l10n_intcomma(self):
         test_list = (
             100,
+            -100,
             1000,
+            -1000,
             10123,
+            -10123,
             10311,
+            -10311,
             1000000,
+            -1000000,
             1234567.25,
+            -1234567.25,
             "100",
+            "-100",
             "1000",
+            "-1000",
             "10123",
+            "-10123",
             "10311",
+            "-10311",
             "1000000",
+            "-1000000",
             "1234567.1234567",
+            "-1234567.1234567",
             Decimal("1234567.1234567"),
+            -Decimal("1234567.1234567"),
             None,
             "１２３４５６７",
+            "-１２３４５６７",
             "１２３４５６７.１２",
+            "-１２３４５６７.１２",
+            "the quick brown fox jumped over the lazy dog",
         )
         result_list = (
             "100",
+            "-100",
             "1,000",
+            "-1,000",
             "10,123",
+            "-10,123",
             "10,311",
+            "-10,311",
             "1,000,000",
+            "-1,000,000",
             "1,234,567.25",
+            "-1,234,567.25",
             "100",
+            "-100",
             "1,000",
+            "-1,000",
             "10,123",
+            "-10,123",
             "10,311",
+            "-10,311",
             "1,000,000",
+            "-1,000,000",
             "1,234,567.1234567",
+            "-1,234,567.1234567",
             "1,234,567.1234567",
+            "-1,234,567.1234567",
             None,
             "1,234,567",
+            "-1,234,567",
             "１,２３４,５６７.１２",
+            "-１,２３４,５６７.１２",
+            "the quick brown fox jumped over the lazy dog",
         )
         with self.settings(USE_THOUSAND_SEPARATOR=False):
             with translation.override("en"):
@@ -359,7 +441,7 @@ class HumanizeTests(SimpleTestCase):
     def test_naturalday_uses_localtime(self):
         # Regression for #18504
         # This is 2012-03-08HT19:30:00-06:00 in America/Chicago
-        dt = datetime.datetime(2012, 3, 9, 1, 30, tzinfo=utc)
+        dt = datetime.datetime(2012, 3, 9, 1, 30, tzinfo=datetime.timezone.utc)
 
         orig_humanize_datetime, humanize.datetime = humanize.datetime, MockDateTime
         try:
@@ -396,7 +478,7 @@ class HumanizeTests(SimpleTestCase):
             now + datetime.timedelta(days=2, hours=6),
             now + datetime.timedelta(days=500),
             now.replace(tzinfo=naive()),
-            now.replace(tzinfo=utc),
+            now.replace(tzinfo=datetime.timezone.utc),
         ]
         result_list = [
             "test",
@@ -506,8 +588,8 @@ class HumanizeTests(SimpleTestCase):
             # "%(delta)s from now" translations
             now + datetime.timedelta(days=1),
             now + datetime.timedelta(days=2),
-            now + datetime.timedelta(days=30),
-            now + datetime.timedelta(days=60),
+            now + datetime.timedelta(days=31),
+            now + datetime.timedelta(days=61),
             now + datetime.timedelta(days=500),
             now + datetime.timedelta(days=865),
         ]

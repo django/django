@@ -2,17 +2,17 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Nuno Mariz <nmariz@gmail.com>, 2011-2012,2015,2017
-# Paulo Köch <paulo.koch@gmail.com>, 2011
+# Nuno Mariz <nmariz@gmail.com>, 2011-2012,2015,2017,2023
+# 12574c6d66324e145c1d19e02acecb73_84badd8 <4e8d94859927eab3b50486d21249c068_5346>, 2011
 # Raúl Pedro Fernandes Santos, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2017-11-30 23:49+0000\n"
-"Last-Translator: Nuno Mariz <nmariz@gmail.com>\n"
-"Language-Team: Portuguese (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2023-09-18 15:04-0300\n"
+"PO-Revision-Date: 2023-12-04 07:59+0000\n"
+"Last-Translator: Nuno Mariz <nmariz@gmail.com>, 2011-2012,2015,2017,2023\n"
+"Language-Team: Portuguese (http://app.transifex.com/django/django/language/"
 "pt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -64,6 +64,10 @@ msgstr ""
 "Esta é a lista de %s escolhidos. Poderá remover alguns, selecionando-os na "
 "caixa abaixo e clicando na seta \"Remover\" entre as duas caixas."
 
+#, javascript-format
+msgid "Type into this box to filter down the list of selected %s."
+msgstr ""
+
 msgid "Remove all"
 msgstr "Remover todos"
 
@@ -71,10 +75,18 @@ msgstr "Remover todos"
 msgid "Click to remove all chosen %s at once."
 msgstr "Clique para remover todos os %s escolhidos de uma vez."
 
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] "%(sel)s de %(cnt)s selecionado"
 msgstr[1] "%(sel)s de %(cnt)s selecionados"
+msgstr[2] "%(sel)s de %(cnt)s selecionados"
 
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
@@ -84,45 +96,19 @@ msgstr ""
 "mudanças por guardar serão perdidas."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
-"Selecionou uma ação mas ainda não guardou as mudanças dos campos "
-"individuais. Carregue em OK para gravar. Precisará de correr de novo a ação."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
-"Selecionou uma ação mas ainda não guardou as mudanças dos campos "
-"individuais. Provavelmente quererá o botão Ir ao invés do botão Guardar."
-
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] ""
-"Nota: O seu fuso horário está %s hora adiantado em relação ao servidor."
-msgstr[1] ""
-"Nota: O seu fuso horário está %s horas adiantado em relação ao servidor."
-
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] ""
-"Nota: O use fuso horário está %s hora atrasado em relação ao servidor."
-msgstr[1] ""
-"Nota: O use fuso horário está %s horas atrasado em relação ao servidor."
 
 msgid "Now"
 msgstr "Agora"
-
-msgid "Choose a Time"
-msgstr "Escolha a Hora"
-
-msgid "Choose a time"
-msgstr "Escolha a hora"
 
 msgid "Midnight"
 msgstr "Meia-noite"
@@ -135,6 +121,32 @@ msgstr "Meio-dia"
 
 msgid "6 p.m."
 msgstr "6 p.m."
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] ""
+"Nota: O seu fuso horário está %s hora adiantado em relação ao servidor."
+msgstr[1] ""
+"Nota: O seu fuso horário está %s horas adiantado em relação ao servidor."
+msgstr[2] ""
+"Nota: O seu fuso horário está %s horas adiantado em relação ao servidor."
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] ""
+"Nota: O use fuso horário está %s hora atrasado em relação ao servidor."
+msgstr[1] ""
+"Nota: O use fuso horário está %s horas atrasado em relação ao servidor."
+msgstr[2] ""
+"Nota: O use fuso horário está %s horas atrasado em relação ao servidor."
+
+msgid "Choose a Time"
+msgstr "Escolha a Hora"
+
+msgid "Choose a time"
+msgstr "Escolha a hora"
 
 msgid "Cancel"
 msgstr "Cancelar"
@@ -186,6 +198,103 @@ msgstr "Novembro"
 
 msgid "December"
 msgstr "Dezembro"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "Jan"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "Fev"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "Mar"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "Abr"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "Mai"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "Jun"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "Jul"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "Ago"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "Set"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "Out"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "Nov"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "Dez"
+
+msgid "Sunday"
+msgstr "Domingo"
+
+msgid "Monday"
+msgstr "Segunda-feira"
+
+msgid "Tuesday"
+msgstr "Terça-feira"
+
+msgid "Wednesday"
+msgstr "Quarta-feira"
+
+msgid "Thursday"
+msgstr "Quinta-feira"
+
+msgid "Friday"
+msgstr "Sexta-feira"
+
+msgid "Saturday"
+msgstr "Sábado"
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr "Dom"
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr "Seg"
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr "Ter"
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr "Qua"
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr "Qui"
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr "Sex"
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr "Sáb"
 
 msgctxt "one letter Sunday"
 msgid "S"

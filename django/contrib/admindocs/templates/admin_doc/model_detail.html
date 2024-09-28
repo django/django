@@ -3,7 +3,7 @@
 
 {% block extrahead %}
 {{ block.super }}
-<style type="text/css">
+<style>
 .module table { width:100%; }
 .module table p { padding: 0; margin: 0; }
 </style>
@@ -32,9 +32,9 @@
 <table class="model">
 <thead>
 <tr>
-    <th>{% translate 'Field' %}</th>
-    <th>{% translate 'Type' %}</th>
-    <th>{% translate 'Description' %}</th>
+    <th scope="col">{% translate 'Field' %}</th>
+    <th scope="col">{% translate 'Type' %}</th>
+    <th scope="col">{% translate 'Description' %}</th>
 </tr>
 </thead>
 <tbody>
@@ -55,9 +55,9 @@
 <table class="model">
 <thead>
 <tr>
-    <th>{% translate 'Method' %}</th>
-    <th>{% translate 'Arguments' %}</th>
-    <th>{% translate 'Description' %}</th>
+    <th scope="col">{% translate 'Method' %}</th>
+    <th scope="col">{% translate 'Arguments' %}</th>
+    <th scope="col">{% translate 'Description' %}</th>
 </tr>
 </thead>
 <tbody>
@@ -73,6 +73,6 @@
 </div>
 {% endif %}
 
-<p class="small"><a href="{% url 'django-admindocs-models-index' %}">&lsaquo; {% translate 'Back to Model documentation' %}</a></p>
+<p><a href="{% url 'django-admindocs-models-index' %}">&lsaquo; {% translate 'Back to Model documentation' %}</a></p>
 </div>
 {% endblock %}

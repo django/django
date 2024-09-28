@@ -232,7 +232,7 @@ class MeasureBase:
         """
         Retrieve the unit attribute name for the given unit string.
         For example, if the given unit string is 'metre', return 'm'.
-        Raise an exception if an attribute cannot be found.
+        Raise an AttributeError if an attribute cannot be found.
         """
         lower = unit_str.lower()
         if unit_str in cls.UNITS:
@@ -242,9 +242,7 @@ class MeasureBase:
         elif lower in cls.LALIAS:
             return cls.LALIAS[lower]
         else:
-            raise Exception(
-                'Could not find a unit keyword associated with "%s"' % unit_str
-            )
+            raise AttributeError(f"Unknown unit type: {unit_str}")
 
 
 class Distance(MeasureBase):
@@ -349,8 +347,13 @@ class Distance(MeasureBase):
 class Area(MeasureBase):
     STANDARD_UNIT = AREA_PREFIX + Distance.STANDARD_UNIT
     # Getting the square units values and the alias dictionary.
-    UNITS = {"%s%s" % (AREA_PREFIX, k): v**2 for k, v in Distance.UNITS.items()}
-    ALIAS = {k: "%s%s" % (AREA_PREFIX, v) for k, v in Distance.ALIAS.items()}
+    UNITS = {"%s%s" % (AREA_PREFIX, k): v**2 for k, v in Distance.UNITS.items()} | {
+        "ha": 10000,
+    }
+    ALIAS = {k: "%s%s" % (AREA_PREFIX, v) for k, v in Distance.ALIAS.items()} | {
+        "hectare": "ha",
+    }
+
     LALIAS = {k.lower(): v for k, v in ALIAS.items()}
 
     def __truediv__(self, other):

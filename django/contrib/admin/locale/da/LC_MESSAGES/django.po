@@ -3,7 +3,7 @@
 # Translators:
 # Christian Joergensen <christian@gmta.info>, 2012
 # Dimitris Glezos <glezos@transifex.com>, 2012
-# Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2020
+# Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2020-2024
 # Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2013,2015-2020
 # Finn Gruwier Larsen, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -12,15 +12,19 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-14 19:53+0200\n"
-"PO-Revision-Date: 2020-07-15 08:56+0000\n"
-"Last-Translator: Erik Ramsgaard Wognsen <r4mses@gmail.com>\n"
-"Language-Team: Danish (http://www.transifex.com/django/django/language/da/)\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 07:05+0000\n"
+"Last-Translator: Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2020-2024\n"
+"Language-Team: Danish (http://app.transifex.com/django/django/language/da/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: da\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Slet valgte %(verbose_name_plural)s"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -32,10 +36,6 @@ msgstr "Kan ikke slette %(name)s "
 
 msgid "Are you sure?"
 msgstr "Er du sikker?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Slet valgte %(verbose_name_plural)s"
 
 msgid "Administration"
 msgstr "Administration"
@@ -181,6 +181,9 @@ msgstr "Ingen"
 msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr "Hold “Ctrl”, eller “Æbletasten” på Mac, nede for at vælge mere end én."
 
+msgid "Select this object for an action - {}"
+msgstr "Vælg dette objekt for en handling - {}"
+
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr "{name} “{obj}” blev tilføjet."
@@ -198,10 +201,6 @@ msgstr ""
 msgid ""
 "The {name} “{obj}” was changed successfully. You may edit it again below."
 msgstr "{name} “{obj}” blev ændret. Du kan redigere den/det igen herunder."
-
-#, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr "{name} “{obj}” blev tilføjet. Du kan redigere den/det igen herunder."
 
 #, python-brace-format
 msgid ""
@@ -268,8 +267,9 @@ msgstr "0 af %(cnt)s valgt"
 msgid "Change history: %s"
 msgstr "Ændringshistorik: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -339,6 +339,9 @@ msgstr "Vælg alle %(total_count)s  %(module_name)s "
 msgid "Clear selection"
 msgstr "Ryd valg"
 
+msgid "Breadcrumbs"
+msgstr "Sti"
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "Modeller i applikationen %(name)s"
@@ -365,15 +368,33 @@ msgstr "Indtast et brugernavn og en adgangskode."
 msgid "Change password"
 msgstr "Skift adgangskode"
 
-msgid "Please correct the error below."
-msgstr "Ret venligst fejlen herunder."
+msgid "Set password"
+msgstr "Sæt adgangskode"
 
-msgid "Please correct the errors below."
-msgstr "Ret venligst fejlene herunder."
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Ret venligst fejlen herunder."
+msgstr[1] "Ret venligst fejlene herunder."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Indtast en ny adgangskode for brugeren <strong>%(username)s</strong>."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+"Denne handling vil <strong>aktivere</strong> adgangskodebaseret "
+"autentificering for denne bruger."
+
+msgid "Disable password-based authentication"
+msgstr "Deaktivér adgangskodebaseret autentificering."
+
+msgid "Enable password-based authentication"
+msgstr "Aktivér adgangskodebaseret autentificering."
+
+msgid "Skip to main content"
+msgstr "Gå til hovedindhold"
 
 msgid "Welcome,"
 msgstr "Velkommen,"
@@ -400,6 +421,12 @@ msgstr "Se på website"
 msgid "Filter"
 msgstr "Filtrer"
 
+msgid "Hide counts"
+msgstr "Skjul antal"
+
+msgid "Show counts"
+msgstr "Vis antal"
+
 msgid "Clear all filters"
 msgstr "Nulstil alle filtre"
 
@@ -412,6 +439,15 @@ msgstr "Sorteringsprioritet: %(priority_number)s"
 
 msgid "Toggle sorting"
 msgstr "Skift sortering"
+
+msgid "Toggle theme (current theme: auto)"
+msgstr "Skift tema (nuværende tema: auto)"
+
+msgid "Toggle theme (current theme: light)"
+msgstr "Skift tema (nuværende tema: lyst)"
+
+msgid "Toggle theme (current theme: dark)"
+msgstr "Skift tema (nuværende tema: mørkt)"
 
 msgid "Delete"
 msgstr "Slet"
@@ -499,6 +535,15 @@ msgstr "Mine handlinger"
 msgid "None available"
 msgstr "Ingen tilgængelige"
 
+msgid "Added:"
+msgstr "Tilføjede:"
+
+msgid "Changed:"
+msgstr "Ændrede:"
+
+msgid "Deleted:"
+msgstr "Slettede:"
+
 msgid "Unknown content"
 msgstr "Ukendt indhold"
 
@@ -520,10 +565,19 @@ msgstr ""
 "denne site. Vil du logge ind med en anden brugerkonto?"
 
 msgid "Forgotten your password or username?"
-msgstr "Har du glemt dit password eller brugernavn?"
+msgstr "Har du glemt din adgangskode eller dit brugernavn?"
 
 msgid "Toggle navigation"
 msgstr "Vis/skjul navigation"
+
+msgid "Sidebar"
+msgstr "Sidebjælke"
+
+msgid "Start typing to filter…"
+msgstr "Skriv for at filtrere…"
+
+msgid "Filter navigation items"
+msgstr "Filtrer navigationsemner"
 
 msgid "Date/time"
 msgstr "Dato/tid"
@@ -533,6 +587,11 @@ msgstr "Bruger"
 
 msgid "Action"
 msgstr "Funktion"
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] "post"
+msgstr[1] "poster"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -590,7 +649,11 @@ msgstr "Tilføj endnu en %(model)s"
 msgid "Delete selected %(model)s"
 msgstr "Slet valgte %(model)s"
 
-msgid "Thanks for spending some quality time with the Web site today."
+#, python-format
+msgid "View selected %(model)s"
+msgstr "Vis valgte %(model)s"
+
+msgid "Thanks for spending some quality time with the web site today."
 msgstr "Tak for den kvalitetstid du brugte på websitet i dag."
 
 msgid "Log in again"
@@ -690,6 +753,9 @@ msgstr "E-mail-adresse:"
 
 msgid "Reset my password"
 msgstr "Nulstil min adgangskode"
+
+msgid "Select all objects on this page for an action"
+msgstr "Vælg alle objekter på denne side for en handling"
 
 msgid "All dates"
 msgstr "Alle datoer"

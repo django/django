@@ -7,7 +7,6 @@ from django.core import mail
 from django.core.exceptions import ValidationError
 from django.forms import fields
 from django.forms.forms import Form
-from django.forms.formsets import BaseFormSet, formset_factory
 from django.http import (
     HttpResponse,
     HttpResponseBadRequest,
@@ -19,6 +18,7 @@ from django.shortcuts import render
 from django.template import Context, Template
 from django.test import Client
 from django.utils.decorators import method_decorator
+from django.views.generic import TemplateView
 
 
 def get_view(request):
@@ -90,6 +90,8 @@ def post_view(request):
             c = Context()
     else:
         t = Template("Viewing GET page.", name="Empty GET Template")
+        # Used by test_body_read_on_get_data.
+        request.read(200)
         c = Context()
     return HttpResponse(t.render(c))
 
@@ -177,6 +179,14 @@ def method_saving_308_redirect_view(request):
     return _post_view_redirect(request, 308)
 
 
+def redirect_to_different_hostname(request):
+    return HttpResponseRedirect("https://hostname2/get_host_view/")
+
+
+def get_host_view(request):
+    return HttpResponse(request.get_host())
+
+
 def view_with_secure(request):
     "A view that indicates if the request was secure"
     response = HttpResponse()
@@ -257,48 +267,6 @@ def form_view_with_template(request):
             "message": message,
         },
     )
-
-
-class BaseTestFormSet(BaseFormSet):
-    def clean(self):
-        """No two email addresses are the same."""
-        if any(self.errors):
-            # Don't bother validating the formset unless each form is valid
-            return
-
-        emails = []
-        for form in self.forms:
-            email = form.cleaned_data["email"]
-            if email in emails:
-                raise ValidationError(
-                    "Forms in a set must have distinct email addresses."
-                )
-            emails.append(email)
-
-
-TestFormSet = formset_factory(TestForm, BaseTestFormSet)
-
-
-def formset_view(request):
-    "A view that tests a simple formset"
-    if request.method == "POST":
-        formset = TestFormSet(request.POST)
-        if formset.is_valid():
-            t = Template("Valid POST data.", name="Valid POST Template")
-            c = Context()
-        else:
-            t = Template(
-                "Invalid POST data. {{ my_formset.errors }}",
-                name="Invalid POST Template",
-            )
-            c = Context({"my_formset": formset})
-    else:
-        formset = TestForm(request.GET)
-        t = Template(
-            "Viewing base formset. {{ my_formset }}.", name="Formset GET Template"
-        )
-        c = Context({"my_formset": formset})
-    return HttpResponse(t.render(c))
 
 
 @login_required
@@ -435,8 +403,7 @@ def django_project_redirect(request):
 
 def no_trailing_slash_external_redirect(request):
     """
-    RFC 2616 3.2.2: A bare domain without any abs_path element should be
-    treated as having the trailing `/`.
+    RFC 3986 Section 6.2.3: Empty path should be normalized to "/".
 
     Use https://testserver, rather than an external domain, in order to allow
     use of follow=True, triggering Client._handle_redirects().
@@ -461,3 +428,7 @@ class TwoArgException(Exception):
 
 def two_arg_exception(request):
     raise TwoArgException("one", "two")
+
+
+class CBView(TemplateView):
+    template_name = "base.html"

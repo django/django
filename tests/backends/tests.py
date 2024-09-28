@@ -1,4 +1,5 @@
 """Tests related to django.db.backends that haven't been organized."""
+
 import datetime
 import threading
 import unittest
@@ -101,6 +102,7 @@ class LastExecutedQueryTest(TestCase):
                 pk=1,
                 reporter__pk=9,
             ).exclude(reporter__pk__in=[2, 1]),
+            Article.objects.filter(pk__in=list(range(20, 31))),
         ):
             sql, params = qs.query.sql_with_params()
             with qs.query.get_compiler(DEFAULT_DB_ALIAS).execute_sql(CURSOR) as cursor:
@@ -123,6 +125,39 @@ class LastExecutedQueryTest(TestCase):
             self.assertEqual(
                 cursor.db.ops.last_executed_query(cursor, sql, params),
                 sql % params,
+            )
+
+    @skipUnlessDBFeature("supports_paramstyle_pyformat")
+    def test_last_executed_query_dict_overlap_keys(self):
+        square_opts = Square._meta
+        sql = "INSERT INTO %s (%s, %s) VALUES (%%(root)s, %%(root2)s)" % (
+            connection.introspection.identifier_converter(square_opts.db_table),
+            connection.ops.quote_name(square_opts.get_field("root").column),
+            connection.ops.quote_name(square_opts.get_field("square").column),
+        )
+        with connection.cursor() as cursor:
+            params = {"root": 2, "root2": 4}
+            cursor.execute(sql, params)
+            self.assertEqual(
+                cursor.db.ops.last_executed_query(cursor, sql, params),
+                sql % params,
+            )
+
+    def test_last_executed_query_with_duplicate_params(self):
+        square_opts = Square._meta
+        table = connection.introspection.identifier_converter(square_opts.db_table)
+        id_column = connection.ops.quote_name(square_opts.get_field("id").column)
+        root_column = connection.ops.quote_name(square_opts.get_field("root").column)
+        sql = f"UPDATE {table} SET {root_column} = %s + %s WHERE {id_column} = %s"
+        with connection.cursor() as cursor:
+            params = [42, 42, 1]
+            cursor.execute(sql, params)
+            last_executed_query = connection.ops.last_executed_query(
+                cursor, sql, params
+            )
+            self.assertEqual(
+                last_executed_query,
+                f"UPDATE {table} SET {root_column} = 42 + 42 WHERE {id_column} = 1",
             )
 
 
@@ -190,6 +225,7 @@ class LongNameTest(TransactionTestCase):
         connection.ops.execute_sql_flush(sql_list)
 
 
+@skipUnlessDBFeature("supports_sequence_reset")
 class SequenceResetTest(TestCase):
     def test_generic_relation(self):
         "Sequence names are correct when resetting generic relations (Ref #13941)"
@@ -213,7 +249,6 @@ class SequenceResetTest(TestCase):
 # This test needs to run outside of a transaction, otherwise closing the
 # connection would implicitly rollback and cause problems during teardown.
 class ConnectionCreatedSignalTest(TransactionTestCase):
-
     available_apps = []
 
     # Unfortunately with sqlite3 the in-memory test database cannot be closed,
@@ -263,7 +298,6 @@ class EscapingChecksDebug(EscapingChecks):
 
 
 class BackendTestCase(TransactionTestCase):
-
     available_apps = ["backends"]
 
     def create_squares_with_executemany(self, args):
@@ -420,7 +454,7 @@ class BackendTestCase(TransactionTestCase):
         with connection.cursor() as cursor:
             self.assertIsInstance(cursor, CursorWrapper)
         # Both InterfaceError and ProgrammingError seem to be used when
-        # accessing closed cursor (psycopg2 has InterfaceError, rest seem
+        # accessing closed cursor (psycopg has InterfaceError, rest seem
         # to use ProgrammingError).
         with self.assertRaises(connection.features.closed_cursor_error_class):
             # cursor should be closed, so no queries should be possible.
@@ -428,12 +462,12 @@ class BackendTestCase(TransactionTestCase):
 
     @unittest.skipUnless(
         connection.vendor == "postgresql",
-        "Psycopg2 specific cursor.closed attribute needed",
+        "Psycopg specific cursor.closed attribute needed",
     )
     def test_cursor_contextmanager_closing(self):
         # There isn't a generic way to test that cursors are closed, but
-        # psycopg2 offers us a way to check that by closed attribute.
-        # So, run only on psycopg2 for that reason.
+        # psycopg offers us a way to check that by closed attribute.
+        # So, run only on psycopg for that reason.
         with connection.cursor() as cursor:
             self.assertIsInstance(cursor, CursorWrapper)
         self.assertTrue(cursor.closed)
@@ -524,8 +558,9 @@ class BackendTestCase(TransactionTestCase):
                 "Limit for query logging exceeded, only the last 3 queries will be "
                 "returned."
             )
-            with self.assertWarnsMessage(UserWarning, msg):
+            with self.assertWarnsMessage(UserWarning, msg) as ctx:
                 self.assertEqual(3, len(new_connection.queries))
+            self.assertEqual(ctx.filename, __file__)
 
         finally:
             BaseDatabaseWrapper.queries_limit = old_queries_limit
@@ -548,6 +583,12 @@ class BackendTestCase(TransactionTestCase):
         )
         self.assertEqual(tuple(kwargs["extra"].values()), params[1:])
 
+    def test_queries_bare_where(self):
+        sql = f"SELECT 1{connection.features.bare_select_suffix} WHERE 1=1"
+        with connection.cursor() as cursor:
+            cursor.execute(sql)
+            self.assertEqual(cursor.fetchone(), (1,))
+
     def test_timezone_none_use_tz_false(self):
         connection.ensure_connection()
         with self.settings(TIME_ZONE=None, USE_TZ=False):
@@ -557,7 +598,6 @@ class BackendTestCase(TransactionTestCase):
 # These tests aren't conditional because it would require differentiating
 # between MySQL+InnoDB and MySQL+MYISAM (something we currently can't do).
 class FkConstraintsTests(TransactionTestCase):
-
     available_apps = ["backends"]
 
     def setUp(self):
@@ -688,8 +728,12 @@ class FkConstraintsTests(TransactionTestCase):
             a.reporter_id = 30
             with connection.constraint_checks_disabled():
                 a.save()
-                with self.assertRaises(IntegrityError):
+                try:
                     connection.check_constraints(table_names=[Article._meta.db_table])
+                except IntegrityError:
+                    pass
+                else:
+                    self.skipTest("This backend does not support integrity checks.")
             transaction.set_rollback(True)
 
     def test_check_constraints_sql_keywords(self):
@@ -699,13 +743,16 @@ class FkConstraintsTests(TransactionTestCase):
             obj.reporter_id = 30
             with connection.constraint_checks_disabled():
                 obj.save()
-                with self.assertRaises(IntegrityError):
+                try:
                     connection.check_constraints(table_names=["order"])
+                except IntegrityError:
+                    pass
+                else:
+                    self.skipTest("This backend does not support integrity checks.")
             transaction.set_rollback(True)
 
 
 class ThreadTests(TransactionTestCase):
-
     available_apps = ["backends"]
 
     def test_default_connection_thread_local(self):
@@ -748,7 +795,8 @@ class ThreadTests(TransactionTestCase):
             # closed on teardown).
             for conn in connections_dict.values():
                 if conn is not connection and conn.allow_thread_sharing:
-                    conn.close()
+                    conn.validate_thread_sharing()
+                    conn._close()
                     conn.dec_thread_sharing()
 
     def test_connections_thread_local(self):

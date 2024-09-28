@@ -72,14 +72,6 @@ Model Form API reference. For introductory material about model forms, see the
 
     See :ref:`model-formsets` for example usage.
 
-    .. versionchanged:: 4.0
-
-        The ``renderer`` argument was added.
-
-    .. versionchanged:: 4.1
-
-        The ``edit_only`` argument was added.
-
 ``inlineformset_factory``
 =========================
 
@@ -93,11 +85,3 @@ Model Form API reference. For introductory material about model forms, see the
     the ``parent_model``, you must specify a ``fk_name``.
 
     See :ref:`inline-formsets` for example usage.
-
-    .. versionchanged:: 4.0
-
-        The ``renderer`` argument was added.
-
-    .. versionchanged:: 4.1
-
-        The ``edit_only`` argument was added.

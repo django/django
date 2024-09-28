@@ -12,6 +12,7 @@ object.
 
 See docs/topics/cache.txt for information on the public API.
 """
+
 from django.core import signals
 from django.core.cache.backends.base import (
     BaseCache,
@@ -51,14 +52,6 @@ class CacheHandler(BaseConnectionHandler):
             ) from e
         return backend_cls(location, params)
 
-    def all(self, initialized_only=False):
-        return [
-            self[alias]
-            for alias in self
-            # If initialized_only is True, return only initialized caches.
-            if not initialized_only or hasattr(self._connections, alias)
-        ]
-
 
 caches = CacheHandler()
 
@@ -68,8 +61,7 @@ cache = ConnectionProxy(caches, DEFAULT_CACHE_ALIAS)
 def close_caches(**kwargs):
     # Some caches need to do a cleanup at the end of a request cycle. If not
     # implemented in a particular backend cache.close() is a no-op.
-    for cache in caches.all(initialized_only=True):
-        cache.close()
+    caches.close_all()
 
 
 signals.request_finished.connect(close_caches)

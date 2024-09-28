@@ -2,6 +2,7 @@
 import json
 import os
 import re
+import unittest
 from io import StringIO
 from pathlib import Path
 
@@ -44,6 +45,7 @@ from .models import (
     M2MSimpleCircularA,
     M2MSimpleCircularB,
     M2MThroughAB,
+    NaturalKeyWithFKDependency,
     NKChild,
     Parent,
     Person,
@@ -53,6 +55,13 @@ from .models import (
     Thingy,
     Widget,
 )
+
+try:
+    import yaml  # NOQA
+
+    HAS_YAML = True
+except ImportError:
+    HAS_YAML = False
 
 _cur_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -95,12 +104,22 @@ class TestFixtures(TestCase):
         the serialized data for fields that have been removed
         from the database when not ignored.
         """
-        with self.assertRaises(DeserializationError):
-            management.call_command(
-                "loaddata",
-                "sequence_extra",
-                verbosity=0,
-            )
+        test_fixtures = [
+            "sequence_extra",
+            "sequence_extra_jsonl",
+        ]
+        if HAS_YAML:
+            test_fixtures.append("sequence_extra_yaml")
+        for fixture_file in test_fixtures:
+            with (
+                self.subTest(fixture_file=fixture_file),
+                self.assertRaises(DeserializationError),
+            ):
+                management.call_command(
+                    "loaddata",
+                    fixture_file,
+                    verbosity=0,
+                )
 
     def test_loaddata_not_found_fields_ignore(self):
         """
@@ -128,6 +147,33 @@ class TestFixtures(TestCase):
             verbosity=0,
         )
         self.assertEqual(Animal.specimens.all()[0].name, "Wolf")
+
+    def test_loaddata_not_found_fields_ignore_jsonl(self):
+        management.call_command(
+            "loaddata",
+            "sequence_extra_jsonl",
+            ignore=True,
+            verbosity=0,
+        )
+        self.assertEqual(Animal.specimens.all()[0].name, "Eagle")
+
+    @unittest.skipUnless(HAS_YAML, "No yaml library detected")
+    def test_loaddata_not_found_fields_ignore_yaml(self):
+        management.call_command(
+            "loaddata",
+            "sequence_extra_yaml",
+            ignore=True,
+            verbosity=0,
+        )
+        self.assertEqual(Animal.specimens.all()[0].name, "Cat")
+
+    def test_loaddata_empty_lines_jsonl(self):
+        management.call_command(
+            "loaddata",
+            "sequence_empty_lines_jsonl.jsonl",
+            verbosity=0,
+        )
+        self.assertEqual(Animal.specimens.all()[0].name, "Eagle")
 
     @skipIfDBFeature("interprets_empty_strings_as_nulls")
     def test_pretty_print_xml(self):
@@ -568,6 +614,20 @@ class TestFixtures(TestCase):
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             management.call_command("loaddata", "absolute.json", verbosity=0)
 
+    @override_settings(FIXTURE_DIRS=[Path(_cur_dir) / "fixtures"])
+    def test_fixture_dirs_with_default_fixture_path_as_pathlib(self):
+        """
+        settings.FIXTURE_DIRS cannot contain a default fixtures directory
+        for application (app/fixtures) in order to avoid repeated fixture loading.
+        """
+        msg = (
+            "'%s' is a default fixture directory for the '%s' app "
+            "and cannot be listed in settings.FIXTURE_DIRS."
+            % (os.path.join(_cur_dir, "fixtures"), "fixtures_regress")
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            management.call_command("loaddata", "absolute.json", verbosity=0)
+
     @override_settings(
         FIXTURE_DIRS=[
             os.path.join(_cur_dir, "fixtures_1"),
@@ -584,7 +644,7 @@ class TestFixtures(TestCase):
     @override_settings(FIXTURE_DIRS=[Path(_cur_dir) / "fixtures_1"])
     def test_fixtures_dir_pathlib(self):
         management.call_command("loaddata", "inner/absolute.json", verbosity=0)
-        self.assertQuerysetEqual(Absolute.objects.all(), [1], transform=lambda o: o.pk)
+        self.assertQuerySetEqual(Absolute.objects.all(), [1], transform=lambda o: o.pk)
 
 
 class NaturalKeyFixtureTests(TestCase):
@@ -777,7 +837,7 @@ class NaturalKeyFixtureTests(TestCase):
             verbosity=0,
         )
         books = Book.objects.all()
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             books,
             [
                 "<Book: Cryptonomicon by Neal Stephenson (available at Amazon, "
@@ -789,6 +849,25 @@ class NaturalKeyFixtureTests(TestCase):
             ],
             transform=repr,
         )
+
+
+class NaturalKeyFixtureOnOtherDatabaseTests(TestCase):
+    databases = {"other"}
+
+    def test_natural_key_dependencies(self):
+        """
+        Natural keys with foreign keys in dependencies works in a multiple
+        database setup.
+        """
+        management.call_command(
+            "loaddata",
+            "nk_with_foreign_key.json",
+            database="other",
+            verbosity=0,
+        )
+        obj = NaturalKeyWithFKDependency.objects.using("other").get()
+        self.assertEqual(obj.name, "The Lord of the Rings")
+        self.assertEqual(obj.author.name, "J.R.R. Tolkien")
 
 
 class M2MNaturalKeyFixtureTests(TestCase):
@@ -901,7 +980,6 @@ class M2MNaturalKeyFixtureTests(TestCase):
 
 
 class TestTicket11101(TransactionTestCase):
-
     available_apps = ["fixtures_regress"]
 
     @skipUnlessDBFeature("supports_transactions")
