@@ -348,7 +348,7 @@ Lookup Type                        PostGIS    Oracle   MariaDB    MySQL [#]_   S
 :lookup:`contains <gis-contains>`  X          X        X          X            X          B
 :lookup:`contains_properly`        X                                                      B
 :lookup:`coveredby`                X          X        X (≥ 11.7) X            X          B
-:lookup:`covers`                   X          X                                X          B
+:lookup:`covers`                   X          X                   X            X          B
 :lookup:`crosses`                  X                   X          X            X          C
 :lookup:`disjoint`                 X          X        X          X            X          B
 :lookup:`distance_gt`              X          X        X          X            X          N
