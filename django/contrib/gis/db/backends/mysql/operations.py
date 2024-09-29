@@ -60,6 +60,8 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
             operators["relate"] = SpatialOperator(func="ST_Relate")
             if self.connection.mysql_version < (11, 7):
                 del operators["coveredby"]
+        else:
+            operators["covers"] = SpatialOperator(func="MBRCovers")
         return operators
 
     @cached_property
