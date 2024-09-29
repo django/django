@@ -188,6 +188,215 @@ Usage example:
     >>> author.json_object
     {'name': 'margaret smith', 'alias': 'msmith', 'age': 50}
 
+``JSONSet``
+-----------
+
+.. class:: JSONSet(**updates)
+
+Takes a JSON field or expression and returns a new JSON object with the given updates applied.
+
+Note: The exact behavior might vary slightly between database backends due to differences in their JSON implementations.
+
+While ``sqlite`` does not require as strict of casting of the ``output_field``, other backends like postgresql, and mysqldb/mariadb do.
+
+Usage example setup:
+
+.. code-block:: pycon
+
+    class Flying(models.Model):
+        circus = models.JSONField(blank=True, null=True)
+
+        class Meta:
+            required_db_features = {"supports_json_field"}
+
+    c1 = Flying.objects.create(
+        circus={
+            "id": 1,
+            "name": "Bingo Monty DuClownPort I",
+            "profession": {"active": False, "specialization": ["physical", "bits"]},
+        }
+    )
+    c2 = Flying.objects.create(
+        circus={
+            "id": 2,
+            "name": "Bingo Monty DuClownPort II",
+            "profession": {"active": True, "specialization": ["tumbling"]},
+        }
+    )
+    c3 = Flying.objects.create(
+        circus={
+            "id": 3,
+            "name": "Bingo Monty DuClownPort III",
+            "profession": {"active": False, "specialization": ["fire tumbling"]},
+        }
+    )
+
+Example update all json object names:
+
+.. code-block:: pycon
+
+    objs = Flying.objects.all()
+    name = "Ringo Monty DuClownTown I"
+    objs.update(circus=JSONSet(name=Cast(Value(name), output_field=TextField())))
+    objs = Flying.objects.all()
+    self.assertTrue(all(obj.circus["name"] == name for obj in objs))
+
+Example updating a single entry within a nested array:
+
+.. code-block:: pycon
+
+    objs = Flying.objects.filter(circus__id=1)
+    self.assertEqual(
+        "physical bits",
+        " ".join(updated_obj.circus["profession"]["specialization"]),
+    )
+    objs.update(circus=JSONSet(profession__specialization__1=Cast(Value("flips"), output_field=TextField())))
+    updated_obj = Flying.objects.get(circus__id=1)
+    self.assertEqual(
+        "physical flips",
+        " ".join(updated_obj.circus["profession"]["specialization"]),
+    )
+
+Example flipping a boolean value:
+
+.. code-block: pycon
+
+    active = Cast(Value(True), output_field=BooleanField())
+    if connection.vendor in ["mariadb", "mysql"]:
+        active = Cast(Value(1), output_field=SmallIntegerField())
+    objs = Flying.objects.filter(circus__profession__active=False)
+    objs.update(circus=JSONSet(profession__active=active))
+    updated_objs = Flying.objects.all()
+    self.assertTrue(all(obj.circus["profession"]["active"] for obj in updated_objs))
+
+
+``JSONRemove``
+--------------
+
+.. class:: JSONRemove(expression, *paths)
+
+Takes a JSON field or expression and returns a new JSON object with the specified paths removed.
+
+Note: The exact behavior might vary slightly between database backends due to differences in their JSON implementations.
+
+Example setup in ``JSONSet``.
+
+Example removing a single key from a nested object:
+
+.. code-block:: pycon
+
+    Flying.objects.filter(circus__id=1).update(circus=JSONRemove("profession.active"))
+    updated_obj = Flying.objects.get(circus__id=1)
+    self.assertNotIn("active", updated_obj.circus["profession"])
+
+Example removing multiple keys from a nested object:
+
+.. code-block:: pycon
+
+    Flying.objects.filter(circus__id=2).update(circus=JSONRemove("profession.active", "profession.specialization"))
+    updated_obj = Flying.objects.get(circus__id=2)
+    self.assertNotIn("active", updated_obj.circus["profession"])
+    self.assertNotIn("specialization", updated_obj.circus["profession"])
+
+Example removing an element from an array:
+
+.. code-block:: pycon
+
+    remove_array_zero = "profession.specialization[0]"
+    if connection.vendor == 'postgresql':
+        remove_array_zero = "profession.specialization.0"
+    Flying.objects.filter(circus__id=1).update(circus=JSONRemove(remove_array_zero))
+    updated_obj = Flying.objects.get(circus__id=1)
+    self.assertEqual(len(updated_obj.circus["profession"]["specialization"]), 1)
+    self.assertEqual(updated_obj.circus["profession"]["specialization"][0], "bits")
+
+Example removing a nonexistent key (no effect):
+
+.. code-block:: pycon
+
+    Flying.objects.filter(circus__id=3).update(circus=JSONRemove("nonexistent_key"))
+    updated_obj = Flying.objects.get(circus__id=3)
+    self.assertEqual(updated_obj.circus, c3.circus)  # Should remain unchanged
+
+
+``JSONExtract``
+---------------
+
+.. class:: JSONExtract(expression, *paths)
+
+Takes a JSON field or expression and returns the value at the specified path(s).
+
+Note: The exact behavior might vary slightly between database backends due to differences in their JSON implementations.
+
+See setup in ``JSONSet`` above:
+
+Example extracting a single value:
+
+.. code-block:: pycon
+
+    value = Value('name', output_field=TextField())
+    if connection.vendor == 'postgresql':
+        value = Cast(value, output_field=TextField())
+    result = Flying.objects.filter(circus__id=1).annotate(
+        extracted_name=Cast(JSONExtract('circus', value), output_field=TextField())
+    ).values_list('extracted_name', flat=True).first()
+    self.assertEqual(result, "Bingo Monty DuClownPort I")
+
+Example extracting a nested value:
+
+.. code-block:: pycon
+
+    path = Value('profession.active')
+    output_field = BooleanField()
+
+    if connection.vendor in ['mariadb', 'mysql']:
+        output_field = SmallIntegerField()
+
+    elif connection.vendor == "postgresql":
+        path = Cast(Value('profession,active'), output_field=TextField())
+
+    result = Flying.objects.filter(circus__id=1).annotate(
+        is_active=Cast(JSONExtract('circus', path), output_field=output_field)
+    ).values_list('is_active', flat=True).first()
+    self.assertEqual(result, False)
+
+Example extracting multiple values
+
+Although not officially supported by postgres ``jsonb_extract``, the ``JSONExtract`` in django supports a version of multi path extraction.
+
+.. code-block:: pycon
+
+    output_field = TextField()
+    single_path = Value('name', output_field=output_field)
+    nested_path = Value('profession.mixed')
+    if connection.vendor == "postgresql":
+        nested_path = Cast(Value('profession,mixed'), output_field=output_field)
+        output_field = ArrayField(base_field=output_field)
+
+    result = Flying.objects.filter(circus__id=1).annotate(
+        multi=Cast(JSONExtract('circus', single_path, nested_path), output_field=output_field)
+    ).values_list("multi", flat=True).first()
+    array_field = ['Bingo Monty DuClownPort I', 'no']
+    if connection.vendor == "postgresql":
+        self.assertEqual(result, array_field)
+    else:
+        self.assertEqual(json.loads(result), array_field)
+
+Example extracting a value from an array:
+
+.. code-block:: pycon
+
+    if connection.vendor == 'postgresql':
+        v = 'profession,specialization,0'
+    else:
+        v = 'profession.specialization[0]'
+    result = Flying.objects.filter(circus__id=1).annotate(
+        first_specialization=Cast(JSONExtract('circus', Value(v)), output_field=TextField())
+    ).values_list('first_specialization', flat=True).first()
+    self.assertEqual(result, "physical")
+
+
+
 ``Least``
 ---------
 

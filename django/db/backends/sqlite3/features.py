@@ -147,6 +147,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     can_introspect_json_field = property(operator.attrgetter("supports_json_field"))
     has_json_object_function = property(operator.attrgetter("supports_json_field"))
+    has_json_set_function = property(operator.attrgetter("supports_json_field"))
 
     @cached_property
     def can_return_columns_from_insert(self):

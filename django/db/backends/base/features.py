@@ -343,6 +343,9 @@ class BaseDatabaseFeatures:
     # Does the backend support JSONObject() database function?
     has_json_object_function = True
 
+    # Does the backend support JSONSet() database function?
+    has_json_set_function = True
+
     # Does the backend support column collations?
     supports_collation_on_charfield = True
     supports_collation_on_textfield = True

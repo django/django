@@ -227,6 +227,9 @@ Models
   longer required to be set on SQLite, which supports unlimited ``VARCHAR``
   columns.
 
+* Added sqlite, postgres, and mariadb support for :class:`~django.db.models.functions.JSONSet`, 
+  :class:`~django.db.models.functions.JSONRemove`, :class:`~django.db.models.functions.JSONExtract` (:ticket:`32519`)
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
