@@ -2723,13 +2723,27 @@ Truncated strings will end with a translatable ellipsis character ("…").
 
 **Argument:** Number of characters to truncate to
 
-For example:
+For example in a template:
 
 .. code-block:: html+django
 
     {{ value|truncatechars:7 }}
 
 If ``value`` is ``"Joel is a slug"``, the output will be ``"Joel i…"``.
+
+For example in Python:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import truncatechars
+
+    truncated = truncatechars("Joel is a slug", 7)
+
+If ``value`` is ``"Joel is a slug"``, the output will be ``"Joel i…"``.
+
+.. function:: truncatechars(value, arg)
+
+    This function truncates a string after ``arg`` number of characters.
 
 .. templatefilter:: truncatechars_html
 
