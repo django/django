@@ -100,7 +100,7 @@ Minor features
   :meth:`.OGRGeometry.get_linear_geometry` and
   :meth:`.OGRGeometry.get_curve_geometry` methods.
 
-* :lookup:`coveredby` lookup is now supported on MySQL.
+* :lookup:`coveredby` and :lookup:`covers` lookup are now supported on MySQL.
 
 * :lookup:`coveredby` and :lookup:`isvalid` lookups,
   :class:`~django.contrib.gis.db.models.Collect` aggregation, and

@@ -212,7 +212,7 @@ SpatiaLite  ``CoveredBy(poly, geom)``
 ----------
 
 *Availability*: `PostGIS <https://postgis.net/docs/ST_Covers.html>`__,
-Oracle, PGRaster (Bilateral), SpatiaLite
+Oracle, MySQL, PGRaster (Bilateral), SpatiaLite
 
 Tests if no point in the lookup geometry is outside the geometry field.
 [#fncovers]_
@@ -226,8 +226,13 @@ Backend     SQL Equivalent
 ==========  ==========================
 PostGIS     ``ST_Covers(poly, geom)``
 Oracle      ``SDO_COVERS(poly, geom)``
+MySQL       ``MBRCovers(poly, geom)``
 SpatiaLite  ``Covers(poly, geom)``
 ==========  ==========================
+
+.. versionchanged:: 5.2
+
+    MySQL support was added.
 
 .. fieldlookup:: crosses
 
