@@ -328,6 +328,9 @@ Miscellaneous
 * ``HttpRequest.accepted_types`` is now sorted by the client's preference, based
   on the request's ``Accept`` header.
 
+* The :func:`~django.template.context_processors.debug` context processor is no
+  longer included in the default project template.
+
 .. _deprecated-features-5.2:
 
 Features deprecated in 5.2
