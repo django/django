@@ -645,6 +645,9 @@ delegate further handling to the parent class. This might require you to write
 a custom form field (and even a form widget). See the :doc:`forms documentation
 </topics/forms/index>` for information about this.
 
+If you wish to exclude the field from the :class:`~django.forms.ModelForm`, you
+can override the :meth:`~Field.formfield` method to return ``None``.
+
 Continuing our ongoing example, we can write the :meth:`~Field.formfield` method
 as::
 
@@ -652,8 +655,12 @@ as::
         # ...
 
         def formfield(self, **kwargs):
-            # This is a fairly standard way to set up some defaults
-            # while letting the caller override them.
+            # Exclude the field from the ModelForm when some condition is met.
+            some_condition = kwargs.get("some_condition", False)
+            if some_condition:
+                return None
+
+            # Set up some defaults while letting the caller override them.
             defaults = {"form_class": MyFormField}
             defaults.update(kwargs)
             return super().formfield(**defaults)

@@ -247,11 +247,6 @@ class SQLCompiler:
         select = []
         klass_info = None
         annotations = {}
-        select_idx = 0
-        for alias, (sql, params) in self.query.extra_select.items():
-            annotations[alias] = select_idx
-            select.append((RawSQL(sql, params), alias))
-            select_idx += 1
         assert not (self.query.select and self.query.default_cols)
         select_mask = self.query.get_select_mask()
         if self.query.default_cols:
@@ -261,19 +256,39 @@ class SQLCompiler:
             # any model.
             cols = self.query.select
         if cols:
-            select_list = []
-            for col in cols:
-                select_list.append(select_idx)
-                select.append((col, None))
-                select_idx += 1
             klass_info = {
                 "model": self.query.model,
-                "select_fields": select_list,
+                "select_fields": list(
+                    range(
+                        len(self.query.extra_select),
+                        len(self.query.extra_select) + len(cols),
+                    )
+                ),
             }
-        for alias, annotation in self.query.annotation_select.items():
-            annotations[alias] = select_idx
-            select.append((annotation, alias))
-            select_idx += 1
+        selected = []
+        if self.query.selected is None:
+            selected = [
+                *(
+                    (alias, RawSQL(*args))
+                    for alias, args in self.query.extra_select.items()
+                ),
+                *((None, col) for col in cols),
+                *self.query.annotation_select.items(),
+            ]
+        else:
+            for alias, expression in self.query.selected.items():
+                # Reference to an annotation.
+                if isinstance(expression, str):
+                    expression = self.query.annotations[expression]
+                # Reference to a column.
+                elif isinstance(expression, int):
+                    expression = cols[expression]
+                selected.append((alias, expression))
+
+        for select_idx, (alias, expression) in enumerate(selected):
+            if alias:
+                annotations[alias] = select_idx
+            select.append((expression, alias))
 
         if self.query.select_related:
             related_klass_infos = self.get_related_selections(select, select_mask)
@@ -388,8 +403,13 @@ class SQLCompiler:
                 )
                 continue
 
-            ref, *transforms = col.split(LOOKUP_SEP)
-            if expr := self.query.annotations.get(ref):
+            if expr := self.query.annotations.get(col):
+                ref = col
+                transforms = []
+            else:
+                ref, *transforms = col.split(LOOKUP_SEP)
+                expr = self.query.annotations.get(ref)
+            if expr:
                 if self.query.combinator and self.select:
                     if transforms:
                         raise NotImplementedError(
@@ -568,55 +588,28 @@ class SQLCompiler:
                     raise DatabaseError(
                         "ORDER BY not allowed in subqueries of compound statements."
                     )
-        elif self.query.is_sliced and combinator == "union":
-            for compiler in compilers:
-                # A sliced union cannot have its parts elided as some of them
-                # might be sliced as well and in the event where only a single
-                # part produces a non-empty resultset it might be impossible to
-                # generate valid SQL.
-                compiler.elide_empty = False
-        parts = ()
+        parts = []
+        empty_compiler = None
         for compiler in compilers:
             try:
-                # If the columns list is limited, then all combined queries
-                # must have the same columns list. Set the selects defined on
-                # the query on all combined queries, if not already set.
-                if not compiler.query.values_select and self.query.values_select:
-                    compiler.query = compiler.query.clone()
-                    compiler.query.set_values(
-                        (
-                            *self.query.extra_select,
-                            *self.query.values_select,
-                            *self.query.annotation_select,
-                        )
-                    )
-                part_sql, part_args = compiler.as_sql(with_col_aliases=True)
-                if compiler.query.combinator:
-                    # Wrap in a subquery if wrapping in parentheses isn't
-                    # supported.
-                    if not features.supports_parentheses_in_compound:
-                        part_sql = "SELECT * FROM ({})".format(part_sql)
-                    # Add parentheses when combining with compound query if not
-                    # already added for all compound queries.
-                    elif (
-                        self.query.subquery
-                        or not features.supports_slicing_ordering_in_compound
-                    ):
-                        part_sql = "({})".format(part_sql)
-                elif (
-                    self.query.subquery
-                    and features.supports_slicing_ordering_in_compound
-                ):
-                    part_sql = "({})".format(part_sql)
-                parts += ((part_sql, part_args),)
+                parts.append(self._get_combinator_part_sql(compiler))
             except EmptyResultSet:
                 # Omit the empty queryset with UNION and with DIFFERENCE if the
                 # first queryset is nonempty.
                 if combinator == "union" or (combinator == "difference" and parts):
+                    empty_compiler = compiler
                     continue
                 raise
         if not parts:
             raise EmptyResultSet
+        elif len(parts) == 1 and combinator == "union" and self.query.is_sliced:
+            # A sliced union cannot be composed of a single component because
+            # in the event the later is also sliced it might result in invalid
+            # SQL due to the usage of multiple LIMIT clauses. Prevent that from
+            # happening by always including an empty resultset query to force
+            # the creation of an union.
+            empty_compiler.elide_empty = False
+            parts.append(self._get_combinator_part_sql(empty_compiler))
         combinator_sql = self.connection.ops.set_operators[combinator]
         if all and combinator == "union":
             combinator_sql += " ALL"
@@ -631,6 +624,32 @@ class SQLCompiler:
         for part in args_parts:
             params.extend(part)
         return result, params
+
+    def _get_combinator_part_sql(self, compiler):
+        features = self.connection.features
+        # If the columns list is limited, then all combined queries
+        # must have the same columns list. Set the selects defined on
+        # the query on all combined queries, if not already set.
+        selected = self.query.selected
+        if selected is not None and compiler.query.selected is None:
+            compiler.query = compiler.query.clone()
+            compiler.query.set_values(selected)
+        part_sql, part_args = compiler.as_sql(with_col_aliases=True)
+        if compiler.query.combinator:
+            # Wrap in a subquery if wrapping in parentheses isn't
+            # supported.
+            if not features.supports_parentheses_in_compound:
+                part_sql = "SELECT * FROM ({})".format(part_sql)
+            # Add parentheses when combining with compound query if not
+            # already added for all compound queries.
+            elif (
+                self.query.subquery
+                or not features.supports_slicing_ordering_in_compound
+            ):
+                part_sql = "({})".format(part_sql)
+        elif self.query.subquery and features.supports_slicing_ordering_in_compound:
+            part_sql = "({})".format(part_sql)
+        return part_sql, part_args
 
     def get_qualify_sql(self):
         where_parts = []
@@ -1124,14 +1143,11 @@ class SQLCompiler:
         """
         result = []
         params = []
-        for alias in tuple(self.query.alias_map):
+        # Copy alias_map to a tuple in case Join.as_sql() subclasses (objects
+        # in alias_map) alter compiler.query.alias_map. That would otherwise
+        # raise "RuntimeError: dictionary changed size during iteration".
+        for alias, from_clause in tuple(self.query.alias_map.items()):
             if not self.query.alias_refcount[alias]:
-                continue
-            try:
-                from_clause = self.query.alias_map[alias]
-            except KeyError:
-                # Extra tables can end up in self.tables, but not in the
-                # alias_map if they aren't in a join. That's OK. We skip them.
                 continue
             clause_sql, clause_params = self.compile(from_clause)
             result.append(clause_sql)
@@ -1605,14 +1621,15 @@ class SQLCompiler:
     def as_subquery_condition(self, alias, columns, compiler):
         qn = compiler.quote_name_unless_alias
         qn2 = self.connection.ops.quote_name
+        query = self.query.clone()
 
-        for index, select_col in enumerate(self.query.select):
+        for index, select_col in enumerate(query.select):
             lhs_sql, lhs_params = self.compile(select_col)
             rhs = "%s.%s" % (qn(alias), qn2(columns[index]))
-            self.query.where.add(RawSQL("%s = %s" % (lhs_sql, rhs), lhs_params), AND)
+            query.where.add(RawSQL("%s = %s" % (lhs_sql, rhs), lhs_params), AND)
 
-        sql, params = self.as_sql()
-        return "EXISTS (%s)" % sql, params
+        sql, params = query.as_sql(compiler, self.connection)
+        return "EXISTS %s" % sql, params
 
     def explain_query(self):
         result = list(self.execute_sql())

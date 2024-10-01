@@ -26,7 +26,7 @@
 
   {% with parent_counter=forloop.counter0 %}
     {% for fieldset in inline_admin_form %}
-      {% include "admin/includes/fieldset.html" with heading_level=4 id_prefix=parent_counter id_suffix=forloop.counter0 %}
+      {% include "admin/includes/fieldset.html" with heading_level=4 prefix=fieldset.formset.prefix id_prefix=parent_counter id_suffix=forloop.counter0 %}
     {% endfor %}
   {% endwith %}
 

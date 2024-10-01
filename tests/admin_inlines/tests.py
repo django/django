@@ -349,7 +349,12 @@ class TestInline(TestDataMixin, TestCase):
         )
         response = self.client.get(url)
         self.assertInHTML(
-            '<th class="column-position hidden">Position</th>',
+            '<th class="column-position hidden">Position'
+            '<img src="/static/admin/img/icon-unknown.svg" '
+            'class="help help-tooltip" width="10" height="10" '
+            'alt="(Position help_text.)" '
+            'title="Position help_text.">'
+            "</th>",
             response.rendered_content,
         )
         self.assertInHTML(
@@ -379,13 +384,15 @@ class TestInline(TestDataMixin, TestCase):
         self.assertInHTML(
             '<div class="flex-container fieldBox field-position hidden">'
             '<label class="inline">Position:</label>'
-            '<div class="readonly">0</div></div>',
+            '<div class="readonly">0</div></div>'
+            '<div class="help hidden"><div>Position help_text.</div></div>',
             response.rendered_content,
         )
         self.assertInHTML(
             '<div class="flex-container fieldBox field-position hidden">'
             '<label class="inline">Position:</label>'
-            '<div class="readonly">1</div></div>',
+            '<div class="readonly">1</div></div>'
+            '<div class="help hidden"><div>Position help_text.</div></div>',
             response.rendered_content,
         )
 
@@ -407,13 +414,17 @@ class TestInline(TestDataMixin, TestCase):
         self.assertInHTML(
             '<div class="form-row hidden field-position">'
             '<div><div class="flex-container"><label>Position:</label>'
-            '<div class="readonly">0</div></div></div></div>',
+            '<div class="readonly">0</div></div>'
+            '<div class="help hidden"><div>Position help_text.</div></div>'
+            "</div></div>",
             response.rendered_content,
         )
         self.assertInHTML(
             '<div class="form-row hidden field-position">'
             '<div><div class="flex-container"><label>Position:</label>'
-            '<div class="readonly">1</div></div></div></div>',
+            '<div class="readonly">1</div></div>'
+            '<div class="help hidden"><div>Position help_text.</div></div>'
+            "</div></div>",
             response.rendered_content,
         )
 
@@ -448,7 +459,12 @@ class TestInline(TestDataMixin, TestCase):
         self.assertInHTML(
             '<thead><tr><th class="original"></th>'
             '<th class="column-name required">Name</th>'
-            '<th class="column-position required hidden">Position</th>'
+            '<th class="column-position required hidden">Position'
+            '<img src="/static/admin/img/icon-unknown.svg" '
+            'class="help help-tooltip" width="10" height="10" '
+            'alt="(Position help_text.)" '
+            'title="Position help_text.">'
+            "</th>"
             "<th>Delete?</th></tr></thead>",
             response.rendered_content,
         )
@@ -1768,6 +1784,13 @@ class TestInlineWithFieldsets(TestDataMixin, TestCase):
     def setUp(self):
         self.client.force_login(self.superuser)
 
+    @override_settings(DEBUG=True)
+    def test_fieldset_context_fully_set(self):
+        url = reverse("admin:admin_inlines_photographer_add")
+        with self.assertRaisesMessage(AssertionError, "no logs"):
+            with self.assertLogs("django.template", "DEBUG"):
+                self.client.get(url)
+
     def test_inline_headings(self):
         response = self.client.get(reverse("admin:admin_inlines_photographer_add"))
         # Page main title.
@@ -1858,6 +1881,7 @@ class SeleniumTests(AdminSeleniumTestCase):
             username="super", password="secret", email="super@example.com"
         )
 
+    @screenshot_cases(["desktop_size", "mobile_size", "dark", "high_contrast"])
     def test_add_stackeds(self):
         """
         The "Add another XXX" link correctly adds items to the stacked formset.
@@ -1878,6 +1902,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
         add_button.click()
         self.assertCountSeleniumElements(rows_selector, 4)
+        self.take_screenshot("added")
 
     def test_delete_stackeds(self):
         from selenium.webdriver.common.by import By
@@ -2420,3 +2445,39 @@ class SeleniumTests(AdminSeleniumTestCase):
                 )
                 self.assertEqual(available.text, "AVAILABLE ATTENDANT")
                 self.assertEqual(chosen.text, "CHOSEN ATTENDANT")
+
+    def test_tabular_inline_layout(self):
+        from selenium.webdriver.common.by import By
+
+        self.admin_login(username="super", password="secret")
+        self.selenium.get(
+            self.live_server_url + reverse("admin:admin_inlines_photographer_add")
+        )
+        tabular_inline = self.selenium.find_element(
+            By.CSS_SELECTOR, "[data-inline-type='tabular']"
+        )
+        headers = tabular_inline.find_elements(By.TAG_NAME, "th")
+        self.assertEqual(
+            [h.get_attribute("innerText") for h in headers],
+            [
+                "",
+                "IMAGE",
+                "TITLE",
+                "DESCRIPTION",
+                "CREATION DATE",
+                "UPDATE DATE",
+                "UPDATED BY",
+                "DELETE?",
+            ],
+        )
+        # There are no fieldset section names rendered.
+        self.assertNotIn("Details", tabular_inline.text)
+        # There are no fieldset section descriptions rendered.
+        self.assertNotIn("First group", tabular_inline.text)
+        self.assertNotIn("Second group", tabular_inline.text)
+        self.assertNotIn("Third group", tabular_inline.text)
+        # There are no fieldset classes applied.
+        self.assertEqual(
+            tabular_inline.find_elements(By.CSS_SELECTOR, ".collapse"),
+            [],
+        )

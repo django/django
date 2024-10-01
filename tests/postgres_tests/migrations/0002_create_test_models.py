@@ -434,7 +434,7 @@ class Migration(migrations.Migration):
                         primary_key=True,
                     ),
                 ),
-                ("ints", IntegerRangeField(null=True, blank=True)),
+                ("ints", IntegerRangeField(null=True, blank=True, db_default=(5, 10))),
                 ("bigints", BigIntegerRangeField(null=True, blank=True)),
                 ("decimals", DecimalRangeField(null=True, blank=True)),
                 ("timestamps", DateTimeRangeField(null=True, blank=True)),

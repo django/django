@@ -258,8 +258,9 @@ class HandlerRequestTests(SimpleTestCase):
             "StreamingHttpResponse must consume asynchronous iterators in order to "
             "serve them synchronously. Use a synchronous iterator instead."
         )
-        with self.assertWarnsMessage(Warning, msg):
+        with self.assertWarnsMessage(Warning, msg) as ctx:
             self.assertEqual(b"".join(list(response)), b"streaming content")
+        self.assertEqual(ctx.filename, __file__)
 
 
 class ScriptNameTests(SimpleTestCase):
@@ -350,10 +351,11 @@ class AsyncHandlerRequestTests(SimpleTestCase):
             "StreamingHttpResponse must consume synchronous iterators in order to "
             "serve them asynchronously. Use an asynchronous iterator instead."
         )
-        with self.assertWarnsMessage(Warning, msg):
+        with self.assertWarnsMessage(Warning, msg) as ctx:
             self.assertEqual(
                 b"".join([chunk async for chunk in response]), b"streaming content"
             )
+        self.assertEqual(ctx.filename, __file__)
 
     async def test_async_streaming(self):
         response = await self.async_client.get("/async_streaming/")

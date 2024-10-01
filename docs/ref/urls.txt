@@ -25,6 +25,9 @@ Returns an element for inclusion in ``urlpatterns``. For example::
         ...,
     ]
 
+``route``
+---------
+
 The ``route`` argument should be a string or
 :func:`~django.utils.translation.gettext_lazy()` (see
 :ref:`translating-urlpatterns`) that contains a URL pattern. The string
@@ -33,15 +36,42 @@ URL and send it as a keyword argument to the view. The angle brackets may
 include a converter specification (like the ``int`` part of ``<int:section>``)
 which limits the characters matched and may also change the type of the
 variable passed to the view. For example, ``<int:section>`` matches a string
-of decimal digits and converts the value to an ``int``. See
+of decimal digits and converts the value to an ``int``.
+
+When processing a request, Django starts at the first pattern in
+``urlpatterns`` and makes its way down the list, comparing the requested URL
+against each pattern until it finds one that matches. See
 :ref:`how-django-processes-a-request` for more details.
+
+Patterns don't match GET and POST parameters, or the domain name. For example,
+in a request to ``https://www.example.com/myapp/``, the URLconf will look for
+``myapp/``. In a request to ``https://www.example.com/myapp/?page=3``, the
+URLconf will also look for ``myapp/``.
+
+``view``
+--------
 
 The ``view`` argument is a view function or the result of
 :meth:`~django.views.generic.base.View.as_view` for class-based views. It can
-also be an :func:`django.urls.include`.
+also be a :func:`django.urls.include`.
+
+When Django finds a matching pattern, it calls the specified view function with
+an :class:`~django.http.HttpRequest` object as the first argument and any
+"captured" values from the route as keyword arguments.
+
+``kwargs``
+----------
 
 The ``kwargs`` argument allows you to pass additional arguments to the view
 function or method. See :ref:`views-extra-options` for an example.
+
+``name``
+--------
+
+Naming your URL lets you refer to it unambiguously from elsewhere in Django,
+especially from within templates. This powerful feature allows you to make
+global changes to the URL patterns of your project while only touching a single
+file.
 
 See :ref:`Naming URL patterns <naming-url-patterns>` for why the ``name``
 argument is useful.

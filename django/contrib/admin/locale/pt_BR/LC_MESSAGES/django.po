@@ -4,10 +4,11 @@
 # Allisson Azevedo <allisson@gmail.com>, 2014
 # Bruce de Sá <contato@publidex.com.br>, 2019
 # bruno.devpod <bruno.devpod@gmail.com>, 2014
-# Carlos C. Leite <caduado@gmail.com>, 2019
-# Carlos C. Leite <caduado@gmail.com>, 2019
+# Carlos Cadu “Cadu” Leite <caduado@gmail.com>, 2019
+# Carlos Cadu “Cadu” Leite <caduado@gmail.com>, 2019
 # Filipe Cifali <cifali.filipe@gmail.com>, 2016
 # dudanogueira <dudanogueira@gmail.com>, 2012
+# Eduardo Felipe Castegnaro <eduardo@onsign.tv>, 2024
 # Elyézer Rezende <elyezermr@gmail.com>, 2013
 # Fábio C. Barrionuevo da Luz <bnafta@gmail.com>, 2015
 # Fabio Cerqueira <fabio@cerqueira.me>, 2019
@@ -36,9 +37,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 07:05+0000\n"
-"Last-Translator: Gabriel da Mota <gabrielmotaa@hotmail.com>, 2023\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 07:05+0000\n"
+"Last-Translator: Eduardo Felipe Castegnaro <eduardo@onsign.tv>, 2024\n"
 "Language-Team: Portuguese (Brazil) (http://app.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -57,7 +58,7 @@ msgstr "Removido %(count)d %(items)s com sucesso."
 
 #, python-format
 msgid "Cannot delete %(name)s"
-msgstr "Não é possível excluir %(name)s "
+msgstr "Não é possível remover %(name)s "
 
 msgid "Are you sure?"
 msgstr "Tem certeza?"
@@ -129,7 +130,7 @@ msgid "Change"
 msgstr "Modificar"
 
 msgid "Deletion"
-msgstr "Eliminação"
+msgstr "Remoção"
 
 msgid "action time"
 msgstr "hora da ação"
@@ -170,7 +171,7 @@ msgstr "Alterado “%(object)s”  — %(changes)s"
 
 #, python-format
 msgid "Deleted “%(object)s.”"
-msgstr "Deletado “%(object)s.”"
+msgstr "Removido “%(object)s.”"
 
 msgid "LogEntry Object"
 msgstr "Objeto LogEntry"
@@ -195,7 +196,7 @@ msgstr "Alterado {fields}."
 
 #, python-brace-format
 msgid "Deleted {name} “{object}”."
-msgstr "Deletado {name} “{object}”."
+msgstr "Removido {name} “{object}”."
 
 msgid "No fields changed."
 msgstr "Nenhum campo modificado."
@@ -231,12 +232,6 @@ msgstr ""
 "abaixo."
 
 #, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr ""
-"O {name} “{obj}” foi adicionado com sucesso. Você pode editá-lo novamente "
-"abaixo."
-
-#, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
@@ -260,11 +255,11 @@ msgstr "Nenhuma ação selecionada."
 
 #, python-format
 msgid "The %(name)s “%(obj)s” was deleted successfully."
-msgstr "O %(name)s “%(obj)s” foi deletado com sucesso."
+msgstr "O %(name)s “%(obj)s” foi removido com sucesso."
 
 #, python-format
 msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
-msgstr "O %(name)s com ID “%(key)s” não existe. Talvez tenha sido deletado."
+msgstr "O %(name)s com ID “%(key)s” não existe. Talvez tenha sido removido."
 
 #, python-format
 msgid "Add %s"
@@ -315,7 +310,7 @@ msgid ""
 "Deleting %(class_name)s %(instance)s would require deleting the following "
 "protected related objects: %(related_objects)s"
 msgstr ""
-"Excluir o %(class_name)s %(instance)s exigiria excluir os seguintes objetos "
+"Remover o %(class_name)s %(instance)s exigiria remover os seguintes objetos "
 "protegidos relacionados: %(related_objects)s"
 
 msgid "Django site admin"
@@ -376,7 +371,7 @@ msgid "Clear selection"
 msgstr "Limpar seleção"
 
 msgid "Breadcrumbs"
-msgstr "Migalhas de pão"
+msgstr "Marcas de navegação"
 
 #, python-format
 msgid "Models in the %(name)s application"
@@ -395,7 +390,7 @@ msgid ""
 "First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
 msgstr ""
-"Primeiro, informe seu nome de usuário e senha. Então, você poderá editar "
+"Primeiro, informe um nome de usuário e senha. Então, você poderá editar "
 "outras opções do usuário."
 
 msgid "Enter a username and password."
@@ -403,6 +398,9 @@ msgstr "Digite um nome de usuário e senha."
 
 msgid "Change password"
 msgstr "Alterar senha"
+
+msgid "Set password"
+msgstr "Definir senha"
 
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
@@ -414,8 +412,21 @@ msgstr[2] "Por favor corrija os erros abaixo."
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Informe uma nova senha para o usuário <strong>%(username)s</strong>."
 
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+"Esta ação irá <strong>habilitar</strong>autenticação baseada em senha para "
+"este usuário."
+
+msgid "Disable password-based authentication"
+msgstr "Desabilitar autenticação baseada em senha"
+
+msgid "Enable password-based authentication"
+msgstr "Habilitar autenticação baseada em senha"
+
 msgid "Skip to main content"
-msgstr "Pule o conteúdo principal"
+msgstr "Ir para o conteúdo principal"
 
 msgid "Welcome,"
 msgstr "Bem-vindo(a),"
@@ -471,7 +482,7 @@ msgid "Toggle theme (current theme: dark)"
 msgstr "Alternar tema (tema atual: escuro)"
 
 msgid "Delete"
-msgstr "Apagar"
+msgstr "Remover"
 
 #, python-format
 msgid ""
@@ -488,7 +499,7 @@ msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
 "following protected related objects:"
 msgstr ""
-"Excluir o %(object_name)s  ' %(escaped_object)s ' exigiria excluir os "
+"Remover o %(object_name)s  ' %(escaped_object)s ' exigiria remover os "
 "seguintes objetos protegidos relacionados:"
 
 #, python-format
@@ -517,8 +528,8 @@ msgid ""
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
 msgstr ""
-"Excluir o %(objects_name)s selecionado pode resultar na remoção de objetos "
-"relacionados, mas sua conta não tem permissão para excluir os seguintes "
+"Remover o %(objects_name)s selecionado pode resultar na remoção de objetos "
+"relacionados, mas sua conta não tem permissão para remover os seguintes "
 "tipos de objetos:"
 
 #, python-format
@@ -526,7 +537,7 @@ msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
 "protected related objects:"
 msgstr ""
-"Excluir o %(objects_name)s selecionado exigiria excluir os seguintes objetos "
+"Remover o %(objects_name)s selecionado exigiria remover os seguintes objetos "
 "relacionados protegidos:"
 
 #, python-format
@@ -534,11 +545,11 @@ msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
 "following objects and their related items will be deleted:"
 msgstr ""
-"Tem certeza de que deseja apagar o %(objects_name)s selecionado? Todos os "
+"Tem certeza de que deseja remover o %(objects_name)s selecionado? Todos os "
 "seguintes objetos e seus itens relacionados serão removidos:"
 
 msgid "Delete?"
-msgstr "Apagar?"
+msgstr "Remover?"
 
 #, python-format
 msgid " By %(filter_title)s "
@@ -563,7 +574,7 @@ msgid "Changed:"
 msgstr "Alterado:"
 
 msgid "Deleted:"
-msgstr "Apagado:"
+msgstr "Removido:"
 
 msgid "Unknown content"
 msgstr "Conteúdo desconhecido"
@@ -670,7 +681,7 @@ msgstr "Adicionar outro %(model)s"
 
 #, python-format
 msgid "Delete selected %(model)s"
-msgstr "Excluir %(model)s selecionado"
+msgstr "Remover %(model)s selecionado"
 
 #, python-format
 msgid "View selected %(model)s"

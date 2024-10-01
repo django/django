@@ -799,7 +799,9 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             reverse("admin:admin_views_complexsortedperson_changelist"), {}
         )
         # Should have 5 columns (including action checkbox col)
-        self.assertContains(response, '<th scope="col"', count=5)
+        result_list_table_re = re.compile('<table id="result_list">(.*?)</thead>')
+        result_list_table_head = result_list_table_re.search(str(response.content))[0]
+        self.assertEqual(result_list_table_head.count('<th scope="col"'), 5)
 
         self.assertContains(response, "Name")
         self.assertContains(response, "Colored name")
@@ -830,7 +832,11 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
                 reverse("admin:admin_views_%s_changelist" % url), {}
             )
             # Should have 3 columns including action checkbox col.
-            self.assertContains(response, '<th scope="col"', count=3, msg_prefix=url)
+            result_list_table_re = re.compile('<table id="result_list">(.*?)</thead>')
+            result_list_table_head = result_list_table_re.search(str(response.content))[
+                0
+            ]
+            self.assertEqual(result_list_table_head.count('<th scope="col"'), 3)
             # Check if the correct column was selected. 2 is the index of the
             # 'order' column in the model admin's 'list_display' with 0 being
             # the implicit 'action_checkbox' and 1 being the column 'stuff'.
@@ -1502,6 +1508,24 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         self.assertContains(response, "<h1>Change article</h1>")
         self.assertContains(response, "<h2>Article 2</h2>")
 
+    def test_error_in_titles(self):
+        for url, subtitle in [
+            (
+                reverse("admin:admin_views_article_change", args=(self.a1.pk,)),
+                "Article 1 | Change article",
+            ),
+            (reverse("admin:admin_views_article_add"), "Add article"),
+            (reverse("admin:login"), "Log in"),
+            (reverse("admin:password_change"), "Password change"),
+            (
+                reverse("admin:auth_user_password_change", args=(self.superuser.id,)),
+                "Change password: super",
+            ),
+        ]:
+            with self.subTest(url=url, subtitle=subtitle):
+                response = self.client.post(url, {})
+                self.assertContains(response, f"<title>Error: {subtitle}")
+
     def test_view_subtitle_per_object(self):
         viewuser = User.objects.create_user(
             username="viewuser",
@@ -1662,7 +1686,6 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             "APP_DIRS": True,
             "OPTIONS": {
                 "context_processors": [
-                    "django.template.context_processors.debug",
                     "django.template.context_processors.request",
                     "django.contrib.auth.context_processors.auth",
                     "django.contrib.messages.context_processors.messages",
@@ -1745,6 +1768,10 @@ class AdminCustomTemplateTests(AdminViewBasicTestCase):
         """
         response = self.client.get(reverse("admin:admin_views_section_add"))
         self.assertContains(response, "bodyclass_consistency_check ")
+
+    def test_extended_extrabody(self):
+        response = self.client.get(reverse("admin:admin_views_section_add"))
+        self.assertContains(response, "extrabody_check\n</body>")
 
     def test_change_password_template(self):
         user = User.objects.get(username="super")
@@ -2999,6 +3026,7 @@ class AdminViewPermissionsTest(TestCase):
         response = self.client.get(
             reverse("admin:admin_views_section_delete", args=(self.s1.pk,))
         )
+        self.assertContains(response, "<h1>Delete</h1>")
         self.assertContains(response, "<h2>Summary</h2>")
         self.assertContains(response, "<li>Articles: 3</li>")
         # test response contains link to related Article
@@ -7381,7 +7409,7 @@ class UserAdminTest(TestCase):
         # Don't depend on a warm cache, see #17377.
         ContentType.objects.clear_cache()
 
-        expected_num_queries = 10 if connection.features.uses_savepoints else 8
+        expected_num_queries = 8 if connection.features.uses_savepoints else 6
         with self.assertNumQueries(expected_num_queries):
             response = self.client.get(reverse("admin:auth_user_change", args=(u.pk,)))
             self.assertEqual(response.status_code, 200)
@@ -7429,7 +7457,7 @@ class GroupAdminTest(TestCase):
         # Ensure no queries are skipped due to cached content type for Group.
         ContentType.objects.clear_cache()
 
-        expected_num_queries = 8 if connection.features.uses_savepoints else 6
+        expected_num_queries = 6 if connection.features.uses_savepoints else 4
         with self.assertNumQueries(expected_num_queries):
             response = self.client.get(reverse("admin:auth_group_change", args=(g.pk,)))
             self.assertEqual(response.status_code, 200)
@@ -7493,12 +7521,26 @@ class CSSTest(TestCase):
         # General index page
         response = self.client.get(reverse("admin:index"))
         self.assertContains(response, '<div class="app-admin_views module')
+        self.assertContains(
+            response,
+            '<thead class="visually-hidden"><tr><th scope="col">Model name</th>'
+            '<th scope="col">Add link</th><th scope="col">Change or view list link</th>'
+            "</tr></thead>",
+            html=True,
+        )
         self.assertContains(response, '<tr class="model-actor">')
         self.assertContains(response, '<tr class="model-album">')
 
         # App index page
         response = self.client.get(reverse("admin:app_list", args=("admin_views",)))
         self.assertContains(response, '<div class="app-admin_views module')
+        self.assertContains(
+            response,
+            '<thead class="visually-hidden"><tr><th scope="col">Model name</th>'
+            '<th scope="col">Add link</th><th scope="col">Change or view list link</th>'
+            "</tr></thead>",
+            html=True,
+        )
         self.assertContains(response, '<tr class="model-actor">')
         self.assertContains(response, '<tr class="model-album">')
 
@@ -7652,7 +7694,6 @@ class AdminDocsTest(TestCase):
             "APP_DIRS": True,
             "OPTIONS": {
                 "context_processors": [
-                    "django.template.context_processors.debug",
                     "django.template.context_processors.request",
                     "django.contrib.auth.context_processors.auth",
                     "django.contrib.messages.context_processors.messages",

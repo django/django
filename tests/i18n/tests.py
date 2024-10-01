@@ -8,7 +8,7 @@ import tempfile
 from contextlib import contextmanager
 from importlib import import_module
 from pathlib import Path
-from unittest import mock
+from unittest import mock, skipUnless
 
 from asgiref.local import Local
 
@@ -17,6 +17,7 @@ from django.apps import AppConfig
 from django.conf import settings
 from django.conf.locale import LANG_INFO
 from django.conf.urls.i18n import i18n_patterns
+from django.core.management.utils import find_command, popen_wrapper
 from django.template import Context, Template
 from django.test import RequestFactory, SimpleTestCase, TestCase, override_settings
 from django.utils import translation
@@ -58,6 +59,7 @@ from django.utils.translation.reloader import (
     translation_file_changed,
     watch_for_translation_changes,
 )
+from django.utils.translation.trans_real import LANGUAGE_CODE_MAX_LENGTH
 
 from .forms import CompanyForm, I18nForm, SelectDateForm
 from .models import Company, TestModel
@@ -98,7 +100,7 @@ class TranslationTests(SimpleTestCase):
         )
         self.assertEqual(
             ngettext("%(num)d year", "%(num)d years", 2) % {"num": 2},
-            "2 années",
+            "2 ans",
         )
         self.assertEqual(
             ngettext("%(size)d byte", "%(size)d bytes", 0) % {"size": 0}, "0 octet"
@@ -128,6 +130,49 @@ class TranslationTests(SimpleTestCase):
         # Internal _catalog can query subcatalogs (from different po files).
         self.assertEqual(french._catalog[("%d singular", 0)], "%d singulier")
         self.assertEqual(french._catalog[("%(num)d hour", 0)], "%(num)d heure")
+
+    @translation.override("fr")
+    @skipUnless(find_command("msgfmt"), "msgfmt is mandatory for this test")
+    def test_multiple_plurals_merge(self):
+        def _create_translation_from_string(content):
+            with tempfile.TemporaryDirectory() as dirname:
+                po_path = Path(dirname).joinpath("fr", "LC_MESSAGES", "django.po")
+                po_path.parent.mkdir(parents=True)
+                po_path.write_text(content)
+                errors = popen_wrapper(
+                    ["msgfmt", "-o", po_path.with_suffix(".mo"), po_path]
+                )[1]
+                if errors:
+                    self.fail(f"msgfmt compilation error: {errors}")
+                return gettext_module.translation(
+                    domain="django",
+                    localedir=dirname,
+                    languages=["fr"],
+                )
+
+        french = trans_real.catalog()
+        # Merge a new translation file with different plural forms.
+        catalog1 = _create_translation_from_string(
+            'msgid ""\n'
+            'msgstr ""\n'
+            '"Content-Type: text/plain; charset=UTF-8\\n"\n'
+            '"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n==0 ? 1 : 2);\\n"\n'
+            'msgid "I win"\n'
+            'msgstr "Je perds"\n'
+        )
+        french.merge(catalog1)
+        # Merge a second translation file with plural forms from django.conf.
+        catalog2 = _create_translation_from_string(
+            'msgid ""\n'
+            'msgstr ""\n'
+            '"Content-Type: text/plain; charset=UTF-8\\n"\n'
+            '"Plural-Forms: Plural-Forms: nplurals=2; plural=(n > 1);\\n"\n'
+            'msgid "I win"\n'
+            'msgstr "Je gagne"\n'
+        )
+        french.merge(catalog2)
+        # Translations from this last one are supposed to win.
+        self.assertEqual(french.gettext("I win"), "Je gagne")
 
     def test_override(self):
         activate("de")
@@ -1672,6 +1717,15 @@ class MiscTests(SimpleTestCase):
             g("xyz")
         with self.assertRaises(LookupError):
             g("xy-zz")
+        with self.assertRaises(LookupError):
+            g("x" * LANGUAGE_CODE_MAX_LENGTH)
+        with self.assertRaises(LookupError):
+            g("x" * (LANGUAGE_CODE_MAX_LENGTH + 1))
+        # 167 * 3 = 501 which is LANGUAGE_CODE_MAX_LENGTH + 1.
+        self.assertEqual(g("en-" * 167), "en")
+        with self.assertRaises(LookupError):
+            g("en-" * 167, strict=True)
+        self.assertEqual(g("en-" * 30000), "en")  # catastrophic test
 
     def test_get_supported_language_variant_null(self):
         g = trans_null.get_supported_language_variant
@@ -1723,6 +1777,7 @@ class MiscTests(SimpleTestCase):
             ("/i-mingo/", "i-mingo"),
             ("/kl-tunumiit/", "kl-tunumiit"),
             ("/nan-hani-tw/", "nan-hani-tw"),
+            (f"/{'a' * 501}/", None),
         ]
         for path, language in tests:
             with self.subTest(path=path):
@@ -1997,6 +2052,11 @@ class CountrySpecificLanguageTests(SimpleTestCase):
         )
         lang = get_language_from_request(request)
         self.assertEqual("bg", lang)
+
+    def test_get_language_from_request_code_too_long(self):
+        request = self.rf.get("/", headers={"accept-language": "a" * 501})
+        lang = get_language_from_request(request)
+        self.assertEqual("en-us", lang)
 
     def test_get_language_from_request_null(self):
         lang = trans_null.get_language_from_request(None)

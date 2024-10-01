@@ -1,0 +1,9 @@
+[flake8]
+exclude = build,.git,.tox,./tests/.env
+extend-ignore = E203
+max-line-length = 88
+per-file-ignores =
+    django/core/cache/backends/filebased.py:W601
+    django/core/cache/backends/base.py:W601
+    django/core/cache/backends/redis.py:W601
+    tests/cache/tests.py:W601

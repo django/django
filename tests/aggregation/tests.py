@@ -1750,6 +1750,26 @@ class AggregateTestCase(TestCase):
             ],
         )
 
+    def test_order_by_aggregate_default_alias(self):
+        publisher_books = (
+            Publisher.objects.values("book")
+            .annotate(Count("book"))
+            .order_by("book__count", "book__id")
+            .values_list("book", flat=True)
+        )
+        self.assertQuerySetEqual(
+            publisher_books,
+            [
+                None,
+                self.b1.id,
+                self.b2.id,
+                self.b3.id,
+                self.b4.id,
+                self.b5.id,
+                self.b6.id,
+            ],
+        )
+
     def test_empty_result_optimization(self):
         with self.assertNumQueries(0):
             self.assertEqual(
@@ -2345,6 +2365,7 @@ class AggregateAnnotationPruningTests(TestCase):
         ).aggregate(count=Count("id", filter=Q(id__in=[F("max_book_author"), 0])))
         self.assertEqual(aggregates, {"count": 1})
 
+    @skipUnlessDBFeature("supports_select_union")
     def test_aggregate_combined_queries(self):
         # Combined queries could have members in their values select mask while
         # others have them in their annotation mask which makes annotation

@@ -105,6 +105,9 @@ You'll see the following output on the command line:
     Starting development server at http://127.0.0.1:8000/
     Quit the server with CONTROL-C.
 
+    WARNING: This is a development server. Do not use it in a production setting. Use a production WSGI or ASGI server instead.
+    For more information on production servers see: https://docs.djangoproject.com/en/|version|/howto/deployment/
+
 .. note::
     Ignore the warning about unapplied database migrations for now; we'll deal
     with the database shortly.
@@ -193,10 +196,25 @@ and put the following Python code in it:
     def index(request):
         return HttpResponse("Hello, world. You're at the polls index.")
 
-This is the simplest view possible in Django. To call the view, we need to map
-it to a URL - and for this we need a URLconf.
+This is the most basic view possible in Django. To access it in a browser, we
+need to map it to a URL - and for this we need to define a URL configuration,
+or "URLconf" for short. These URL configurations are defined inside each
+Django app, and they are Python files named ``urls.py``.
 
-To create a URLconf in the polls directory, create a file called ``urls.py``.
+To define a URLconf for the ``polls`` app, create a file ``polls/urls.py``
+with the following content:
+
+.. code-block:: python
+    :caption: ``polls/urls.py``
+
+    from django.urls import path
+
+    from . import views
+
+    urlpatterns = [
+        path("", views.index, name="index"),
+    ]
+
 Your app directory should now look like:
 
 .. code-block:: text
@@ -212,21 +230,9 @@ Your app directory should now look like:
         urls.py
         views.py
 
-In the ``polls/urls.py`` file include the following code:
-
-.. code-block:: python
-    :caption: ``polls/urls.py``
-
-    from django.urls import path
-
-    from . import views
-
-    urlpatterns = [
-        path("", views.index, name="index"),
-    ]
-
-The next step is to point the root URLconf at the ``polls.urls`` module. In
-``mysite/urls.py``, add an import for ``django.urls.include`` and insert an
+The next step is to configure the root URLconf in the ``mysite`` project to
+include the URLconf defined in ``polls.urls``. To do this, add an import for
+``django.urls.include`` in ``mysite/urls.py`` and insert an
 :func:`~django.urls.include` in the ``urlpatterns`` list, so you have:
 
 .. code-block:: python
@@ -240,6 +246,8 @@ The next step is to point the root URLconf at the ``polls.urls`` module. In
         path("admin/", admin.site.urls),
     ]
 
+The :func:`~django.urls.path` function expects at least two arguments:
+``route`` and ``view``.
 The :func:`~django.urls.include` function allows referencing other URLconfs.
 Whenever Django encounters :func:`~django.urls.include`, it chops off whatever
 part of the URL matched up to that point and sends the remaining string to the
@@ -271,45 +279,6 @@ text "*Hello, world. You're at the polls index.*", which you defined in the
 
     If you get an error page here, check that you're going to
     http://localhost:8000/polls/ and not http://localhost:8000/.
-
-The :func:`~django.urls.path` function is passed four arguments, two required:
-``route`` and ``view``, and two optional: ``kwargs``, and ``name``.
-At this point, it's worth reviewing what these arguments are for.
-
-:func:`~django.urls.path` argument: ``route``
----------------------------------------------
-
-``route`` is a string that contains a URL pattern. When processing a request,
-Django starts at the first pattern in ``urlpatterns`` and makes its way down
-the list, comparing the requested URL against each pattern until it finds one
-that matches.
-
-Patterns don't search GET and POST parameters, or the domain name. For example,
-in a request to ``https://www.example.com/myapp/``, the URLconf will look for
-``myapp/``. In a request to ``https://www.example.com/myapp/?page=3``, the
-URLconf will also look for ``myapp/``.
-
-:func:`~django.urls.path` argument: ``view``
---------------------------------------------
-
-When Django finds a matching pattern, it calls the specified view function with
-an :class:`~django.http.HttpRequest` object as the first argument and any
-"captured" values from the route as keyword arguments. We'll give an example
-of this in a bit.
-
-:func:`~django.urls.path` argument: ``kwargs``
-----------------------------------------------
-
-Arbitrary keyword arguments can be passed in a dictionary to the target view. We
-aren't going to use this feature of Django in the tutorial.
-
-:func:`~django.urls.path` argument: ``name``
---------------------------------------------
-
-Naming your URL lets you refer to it unambiguously from elsewhere in Django,
-especially from within templates. This powerful feature allows you to make
-global changes to the URL patterns of your project while only touching a single
-file.
 
 When you're comfortable with the basic request and response flow, read
 :doc:`part 2 of this tutorial </intro/tutorial02>` to start working with the

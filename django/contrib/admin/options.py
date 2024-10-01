@@ -1026,7 +1026,9 @@ class ModelAdmin(BaseModelAdmin):
         """
         attrs = {
             "class": "action-select",
-            "aria-label": format_html(_("Select this object for an action - {}"), obj),
+            "aria-label": format_html(
+                _("Select this object for an action - {}"), str(obj)
+            ),
         }
         checkbox = forms.CheckboxInput(attrs, lambda value: False)
         return checkbox.render(helpers.ACTION_CHECKBOX_NAME, str(obj.pk))
@@ -1814,6 +1816,9 @@ class ModelAdmin(BaseModelAdmin):
 
     @csrf_protect_m
     def changeform_view(self, request, object_id=None, form_url="", extra_context=None):
+        if request.method in ("GET", "HEAD", "OPTIONS", "TRACE"):
+            return self._changeform_view(request, object_id, form_url, extra_context)
+
         with transaction.atomic(using=router.db_for_write(self.model)):
             return self._changeform_view(request, object_id, form_url, extra_context)
 
@@ -2175,6 +2180,9 @@ class ModelAdmin(BaseModelAdmin):
 
     @csrf_protect_m
     def delete_view(self, request, object_id, extra_context=None):
+        if request.method in ("GET", "HEAD", "OPTIONS", "TRACE"):
+            return self._delete_view(request, object_id, extra_context)
+
         with transaction.atomic(using=router.db_for_write(self.model)):
             return self._delete_view(request, object_id, extra_context)
 
@@ -2221,7 +2229,7 @@ class ModelAdmin(BaseModelAdmin):
         if perms_needed or protected:
             title = _("Cannot delete %(name)s") % {"name": object_name}
         else:
-            title = _("Are you sure?")
+            title = _("Delete")
 
         context = {
             **self.admin_site.each_context(request),

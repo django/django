@@ -143,7 +143,7 @@ def github_linkcode_resolve(domain, info, *, version, next_version):
 
     branch = get_branch(version=version, next_version=next_version)
     relative_path = path.relative_to(pathlib.Path(__file__).parents[2])
-    # Use "/" explicitely to join the path parts since str(file), on Windows,
+    # Use "/" explicitly to join the path parts since str(file), on Windows,
     # uses the Windows path separator which is incorrect for URLs.
     url_path = "/".join(relative_path.parts)
     return f"https://github.com/django/django/blob/{branch}/{url_path}#L{lineno}"

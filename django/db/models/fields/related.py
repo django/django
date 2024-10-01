@@ -187,7 +187,9 @@ class RelatedField(FieldCacheMixin, Field):
         return errors
 
     def _check_relation_model_exists(self):
-        rel_is_missing = self.remote_field.model not in self.opts.apps.get_models()
+        rel_is_missing = self.remote_field.model not in self.opts.apps.get_models(
+            include_auto_created=True
+        )
         rel_is_string = isinstance(self.remote_field.model, str)
         model_name = (
             self.remote_field.model
@@ -779,6 +781,7 @@ class ForeignObject(RelatedField):
             "ForeignObject.get_joining_columns() is deprecated. Use "
             "get_joining_fields() instead.",
             RemovedInDjango60Warning,
+            stacklevel=2,
         )
         source = self.reverse_related_fields if reverse_join else self.related_fields
         return tuple(
@@ -790,6 +793,7 @@ class ForeignObject(RelatedField):
             "ForeignObject.get_reverse_joining_columns() is deprecated. Use "
             "get_reverse_joining_fields() instead.",
             RemovedInDjango60Warning,
+            stacklevel=2,
         )
         return self.get_joining_columns(reverse_join=True)
 
@@ -929,7 +933,9 @@ class ForeignKey(ForeignObject):
 
     empty_strings_allowed = False
     default_error_messages = {
-        "invalid": _("%(model)s instance with %(field)s %(value)r does not exist.")
+        "invalid": _(
+            "%(model)s instance with %(field)s %(value)r is not a valid choice."
+        )
     }
     description = _("Foreign Key (type determined by related field)")
 
@@ -1963,7 +1969,7 @@ class ManyToManyField(RelatedField):
         pass
 
     def value_from_object(self, obj):
-        return [] if obj.pk is None else list(getattr(obj, self.attname).all())
+        return list(getattr(obj, self.attname).all()) if obj._is_pk_set() else []
 
     def save_form_data(self, instance, data):
         getattr(instance, self.attname).set(data)

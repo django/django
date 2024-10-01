@@ -48,7 +48,7 @@ class ModelToValidate(models.Model):
 
 class UniqueFieldsModel(models.Model):
     unique_charfield = models.CharField(max_length=100, unique=True)
-    unique_integerfield = models.IntegerField(unique=True)
+    unique_integerfield = models.IntegerField(unique=True, db_default=42)
     non_unique_field = models.IntegerField()
 
 
@@ -215,19 +215,5 @@ class UniqueConstraintConditionProduct(models.Model):
                 fields=["name"],
                 name="name_without_color_uniq_validation",
                 condition=models.Q(color__isnull=True),
-            ),
-        ]
-
-
-class UniqueConstraintNullsDistinctProduct(models.Model):
-    name = models.CharField(max_length=255, blank=True, null=True)
-
-    class Meta:
-        required_db_features = {"supports_nulls_distinct_unique_constraints"}
-        constraints = [
-            models.UniqueConstraint(
-                fields=["name"],
-                name="name_nulls_not_distinct_uniq",
-                nulls_distinct=False,
             ),
         ]
