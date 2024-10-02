@@ -563,19 +563,19 @@ unauthenticated requests.
 
 .. method:: get_login_url()
 
-    Returns the URL that unauthenticated requests will be redirected to. If
-    defined, this returns the ``login_url`` set on the
-    :func:`~.django.contrib.auth.decorators.login_required` decorator. Defaults
-    to :setting:`settings.LOGIN_URL <LOGIN_URL>`.
+    Returns the URL that unauthenticated requests will be redirected to. This
+    result is either the ``login_url`` set on the
+    :func:`~django.contrib.auth.decorators.login_required` decorator (if not
+    ``None``), or :setting:`settings.LOGIN_URL <LOGIN_URL>`.
 
 .. method:: get_redirect_field_name()
 
     Returns the name of the query parameter that contains the URL the user
-    should be redirected to after a successful login. If defined, this returns
+    should be redirected to after a successful login. This result is either
     the ``redirect_field_name`` set on the
-    :func:`~.django.contrib.auth.decorators.login_required` decorator. Defaults
-    to :attr:`redirect_field_name`. If ``None`` is returned, a query parameter
-    won't be added.
+    :func:`~.django.contrib.auth.decorators.login_required` decorator (if not
+    ``None``), or :attr:`redirect_field_name`. If ``None`` is returned, a query
+    parameter won't be added.
 
 .. class:: RemoteUserMiddleware
 
