@@ -1132,6 +1132,7 @@ class MigrationAutodetector:
         # You can't just add NOT NULL fields with no default or fields
         # which don't allow empty strings as default.
         time_fields = (models.DateField, models.DateTimeField, models.TimeField)
+        auto_fields = (models.AutoField, models.SmallAutoField, models.BigAutoField)
         preserve_default = (
             field.null
             or field.has_default()
@@ -1139,6 +1140,7 @@ class MigrationAutodetector:
             or field.many_to_many
             or (field.blank and field.empty_strings_allowed)
             or (isinstance(field, time_fields) and field.auto_now)
+            or (isinstance(field, auto_fields))
         )
         if not preserve_default:
             field = field.clone()
