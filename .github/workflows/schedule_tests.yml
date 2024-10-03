@@ -200,10 +200,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: [16, 17rc1]
+        version: [16, 17]
         server_side_bindings: [0, 1]
     runs-on: ubuntu-latest
-    name: Newer PostgreSQL Versions
+    name: PostgreSQL Versions
     env:
       SERVER_SIDE_BINDING: ${{ matrix.server_side_bindings }}
     services:
