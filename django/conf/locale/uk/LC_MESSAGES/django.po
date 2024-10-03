@@ -799,7 +799,7 @@ msgid "Enter a complete value."
 msgstr "Введіть значення повністю."
 
 msgid "Enter a valid UUID."
-msgstr "Введіть коректне значення UUID,"
+msgstr "Введіть коректне значення UUID."
 
 msgid "Enter a valid JSON."
 msgstr "Введіть коректний JSON."
