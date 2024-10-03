@@ -1,16 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Aindriú Mac Giolla Eoin, 2024
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Michael Thornhill <michael@maithu.com>, 2011-2012,2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Irish (http://www.transifex.com/django/django/language/ga/)\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2024-10-07 19:03+0000\n"
+"Last-Translator: Aindriú Mac Giolla Eoin, 2024\n"
+"Language-Team: Irish (http://app.transifex.com/django/django/language/ga/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -28,9 +29,9 @@ msgid "URL"
 msgstr "URL"
 
 msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+"Example: “/about/contact/”. Make sure to have leading and trailing slashes."
 msgstr ""
-"Sampla '/about/contact/' Déan cinnte go bhfuil príomhslaid agus cúlslais "
+"Sampla: “/ faoi/teagmháil/”. Bí cinnte go bhfuil slais tosaigh agus slaise "
 "agat."
 
 msgid ""
@@ -39,6 +40,9 @@ msgid ""
 msgstr ""
 "Ní mór an luach a bhfuil ach litreacha, uimhreacha, poncanna, béim, dashes, "
 "slaiseanna nó thilde."
+
+msgid "Example: “/about/contact”. Make sure to have a leading slash."
+msgstr "Sampla: “/ faoi/teagmháil”. Bí cinnte go bhfuil slais tosaigh."
 
 msgid "URL is missing a leading slash."
 msgstr "Tá slais tosaigh in easnamh ag an URL."
@@ -63,11 +67,11 @@ msgid "template name"
 msgstr "ainm an teimpléid"
 
 msgid ""
-"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
-"will use 'flatpages/default.html'."
+"Example: “flatpages/contact_page.html”. If this isn’t provided, the system "
+"will use “flatpages/default.html”."
 msgstr ""
-"Sampla: 'flatpages/contact_page.html'. Muna bhfuil sé ar soláthair, bainfidh "
-"an córás úsáid as 'flatpages/default.html'."
+"Sampla: “flatpages/contact_page.html”. Mura gcuirtear é seo ar fáil, "
+"úsáidfidh an córas “flatpages/default.html”."
 
 msgid "registration required"
 msgstr "clárúchán riachtanach"
@@ -78,7 +82,7 @@ msgstr ""
 "leathanach seo a fheiceail"
 
 msgid "sites"
-msgstr ""
+msgstr "láithreáin"
 
 msgid "flat page"
 msgstr "leacleathanach"

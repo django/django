@@ -3,16 +3,16 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Leonardo José Guzmán <ljguzman@gmail.com>, 2013
-# Natalia (Django Fellow), 2023
-# Natalia (Django Fellow), 2023
-# Ramiro Morales, 2013-2023
+# Natalia, 2023
+# Natalia, 2023
+# Ramiro Morales, 2013-2024
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 07:05+0000\n"
-"Last-Translator: Natalia (Django Fellow), 2023\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-10-07 07:05+0000\n"
+"Last-Translator: Ramiro Morales, 2013-2024\n"
 "Language-Team: Spanish (Argentina) (http://app.transifex.com/django/django/"
 "language/es_AR/)\n"
 "MIME-Version: 1.0\n"
@@ -206,10 +206,6 @@ msgstr ""
 "Se modificó con éxito {name} \"{obj}”. Puede modificarlo/a nuevamente abajo."
 
 #, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr "Se agregó con éxito {name} \"{obj}”. Puede modificarlo/a abajo."
-
-#, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
@@ -377,6 +373,9 @@ msgstr "Introduzca un nombre de usuario y una contraseña."
 msgid "Change password"
 msgstr "Cambiar contraseña"
 
+msgid "Set password"
+msgstr "Establecer contraseña"
+
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Por favor, corrija el siguiente error."
@@ -388,6 +387,19 @@ msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr ""
 "Introduzca una nueva contraseña para el usuario <strong>%(username)s</"
 "strong>."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+"Esta acción <strong>activará</strong> la autenticación basada en contraseñas "
+"para este usuario."
+
+msgid "Disable password-based authentication"
+msgstr "Desactivar la autenticación basada en contraseñas"
+
+msgid "Enable password-based authentication"
+msgstr "Activar la autenticación basada en contraseñas"
 
 msgid "Skip to main content"
 msgstr "Ir al contenido principal"
