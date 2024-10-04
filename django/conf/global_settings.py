@@ -663,6 +663,12 @@ SECURE_REFERRER_POLICY = "same-origin"
 SECURE_SSL_HOST = None
 SECURE_SSL_REDIRECT = False
 
+##################
+# CSP MIDDLEWARE #
+##################
+SECURE_CSP = {}
+SECURE_CSP_REPORT_ONLY = {}
+
 # RemovedInDjango70Warning: A transitional setting helpful in early adoption of
 # HTTPS as the default protocol in urlize and urlizetrunc when no protocol is
 # provided. Set to True to assume HTTPS during the Django 6.x release cycle.
