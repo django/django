@@ -1,8 +1,15 @@
+import hashlib
 from datetime import datetime
 
 from django.conf import settings
 from django.utils.crypto import constant_time_compare, salted_hmac
-from django.utils.http import base36_to_int, int_to_base36
+from django.utils.encoding import force_bytes, force_str
+from django.utils.http import (
+    base36_to_int,
+    int_to_base36,
+    urlsafe_base64_decode,
+    urlsafe_base64_encode,
+)
 
 
 class PasswordResetTokenGenerator:
@@ -127,6 +134,41 @@ class PasswordResetTokenGenerator:
     def _now(self):
         # Used for mocking in tests
         return datetime.now()
+
+    def _xor_encrypt_decrypt(self, uid):
+        """
+        Performs XOR encryption/decryption on a uid to obfuscate
+        its value in the reset link.
+        This approach avoids adding a new dependency for encryption,
+        which is not natively part of Python's standard library.
+        The cypher key is a salted hash of the SECRET_KEY.
+        It is important that the cipher key is at least as long as the uid.
+        We use the SHA-512 hash algorithm to ensure a long enough cipher key (64 bytes)
+        to encrypt UUID4s (36 bytes) that might be used as primary key.
+        BigAutoField (the default primary key) is also supported since
+        it has a maximum size of 19 bytes. We cycle the key to also support the
+        unlikely scenario that the uid is longer than 64 bytes.
+        """
+        key = hashlib.sha512(force_bytes(f"{self.key_salt}{self.secret}")).digest()
+        uid_bytes = force_bytes(uid)
+        xor_ciphertext = bytes(
+            a ^ b for a, b in zip(uid_bytes, (key * (len(uid_bytes) // len(key) + 1)))
+        )
+        return xor_ciphertext
+
+    def encrypt_uid(self, uid):
+        """
+        Returns a XOR-encrypted user id for use in the password reset mechanism.
+        """
+        xor_ciphertext = self._xor_encrypt_decrypt(uid)
+        return urlsafe_base64_encode(xor_ciphertext)
+
+    def decrypt_uid(self, encrypted_uidb64):
+        """
+        Returns the decrypted user id given the base64-encoded encrypted user id.
+        """
+        xor_ciphertext = urlsafe_base64_decode(encrypted_uidb64)
+        return force_str(self._xor_encrypt_decrypt(xor_ciphertext))
 
 
 default_token_generator = PasswordResetTokenGenerator()
