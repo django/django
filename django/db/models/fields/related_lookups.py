@@ -16,7 +16,7 @@ def get_normalized_value(value, lhs):
     from django.db.models import Model
 
     if isinstance(value, Model):
-        if value.pk is None:
+        if not value._is_pk_set():
             raise ValueError("Model instances passed to related filters must be saved.")
         value_list = []
         sources = lhs.output_field.path_infos[-1].target_fields
@@ -74,10 +74,6 @@ class RelatedIn(In):
 
     def as_sql(self, compiler, connection):
         if isinstance(self.lhs, ColPairs):
-            # For multicolumn lookups we need to build a multicolumn where clause.
-            # This clause is either a SubqueryConstraint (for values that need
-            # to be compiled to SQL) or an OR-combined list of
-            # (col1 = val1 AND col2 = val2 AND ...) clauses.
             from django.db.models.sql.where import SubqueryConstraint
 
             if self.rhs_is_direct_value():

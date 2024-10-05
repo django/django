@@ -1332,13 +1332,21 @@ class Col(Expression):
 class ColPairs(Expression):
     def __init__(self, alias, targets, sources, output_field):
         super().__init__(output_field=output_field)
-        self.alias, self.targets, self.sources = alias, targets, sources
+        self.alias = alias
+        self.targets = targets
+        self.sources = sources
 
     def __len__(self):
         return len(self.targets)
 
     def __iter__(self):
         return iter(self.get_cols())
+
+    def __repr__(self):
+        return (
+            f"{self.__class__.__name__}({self.alias!r}, {self.targets!r}, "
+            f"{self.sources!r}, {self.output_field!r})"
+        )
 
     def get_cols(self):
         return [

@@ -720,8 +720,8 @@ The default form widget for this field is a :class:`~django.forms.TextInput`.
     The maximum length (in characters) of the field. The ``max_length``
     is enforced at the database level and in Django's validation using
     :class:`~django.core.validators.MaxLengthValidator`. It's required for all
-    database backends included with Django except PostgreSQL, which supports
-    unlimited ``VARCHAR`` columns.
+    database backends included with Django except PostgreSQL and SQLite, which
+    supports unlimited ``VARCHAR`` columns.
 
     .. note::
 
@@ -729,6 +729,10 @@ The default form widget for this field is a :class:`~django.forms.TextInput`.
         database backends, you should be aware that there are restrictions on
         ``max_length`` for some backends. Refer to the :doc:`database backend
         notes </ref/databases>` for details.
+
+    .. versionchanged:: 5.2
+
+       Support for unlimited ``VARCHAR`` columns was added on SQLite.
 
 .. attribute:: CharField.db_collation
 
@@ -2440,6 +2444,9 @@ Field API reference
 
         Returns the default :class:`django.forms.Field` of this field for
         :class:`~django.forms.ModelForm`.
+
+        If :meth:`~Field.formfield` is overridden to return ``None``, this field
+        is excluded from the :class:`~django.forms.ModelForm`.
 
         By default, if both ``form_class`` and ``choices_form_class`` are
         ``None``, it uses :class:`~django.forms.CharField`. If the field has

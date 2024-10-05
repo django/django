@@ -223,10 +223,15 @@ Models
   expression contains a set-returning function, enforcing subquery evaluation.
   This is necessary for many Postgres set-returning functions.
 
+* :attr:`CharField.max_length <django.db.models.CharField.max_length>` is no
+  longer required to be set on SQLite, which supports unlimited ``VARCHAR``
+  columns.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new :meth:`.HttpRequest.get_preferred_type` method can be used to query
+  the preferred media type the client accepts.
 
 Security
 ~~~~~~~~
@@ -236,7 +241,9 @@ Security
 Serialization
 ~~~~~~~~~~~~~
 
-* ...
+* Each serialization format now defines a ``Deserializer`` class, rather than a
+  function, to improve extensibility when defining a
+  :ref:`custom serialization format <custom-serialization-formats>`.
 
 Signals
 ~~~~~~~
@@ -254,6 +261,11 @@ Tests
 * Stack frames from Django's custom assertions are now hidden. This makes test
   failures easier to read and enables :option:`test --pdb` to directly enter
   into the failing test method.
+
+* Data loaded from :attr:`~django.test.TransactionTestCase.fixtures` and from
+  migrations enabled with :ref:`serialized_rollback=True
+  <test-case-serialized-rollback>` are now available during
+  ``TransactionTestCase.setUpClass()``.
 
 URLs
 ~~~~
@@ -288,12 +300,16 @@ Database backend API
 This section describes changes that may be needed in third-party database
 backends.
 
-* ...
+* The new :meth:`Model._is_pk_set() <django.db.models.Model._is_pk_set>` method
+  allows checking if a Model instance's primary key is defined.
+
 
 :mod:`django.contrib.gis`
 -------------------------
 
 * Support for PostGIS 3.0 is removed.
+
+* Support for GDAL 3.0 is removed.
 
 Dropped support for PostgreSQL 13
 ---------------------------------
@@ -308,6 +324,12 @@ Miscellaneous
   the :meth:`~.EmailMultiAlternatives.attach_alternative` method.
 
 * The minimum supported version of ``gettext`` is increased from 0.15 to 0.19.
+
+* ``HttpRequest.accepted_types`` is now sorted by the client's preference, based
+  on the request's ``Accept`` header.
+
+* The :func:`~django.template.context_processors.debug` context processor is no
+  longer included in the default project template.
 
 .. _deprecated-features-5.2:
 

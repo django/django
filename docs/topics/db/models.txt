@@ -917,7 +917,7 @@ example::
             if (
                 update_fields := kwargs.get("update_fields")
             ) is not None and "name" in update_fields:
-                update_fields = {"slug"}.union(update_fields)
+                kwargs["update_fields"] = {"slug"}.union(update_fields)
             super().save(**kwargs)
 
 See :ref:`ref-models-update-fields` for more details.
