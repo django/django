@@ -7003,12 +7003,10 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
             user=user,
         )
         response = self.client.get(
-            reverse(
-                f"admin:admin_views_readonlyrelatedfield_change", args=(obj.pk,)
-            ),
+            reverse("admin:admin_views_readonlyrelatedfield_change", args=(obj.pk,)),
         )
         # Related ForeignKey object registered in admin.
-        user_url = reverse(f"admin:auth_user_change", args=(self.superuser.pk,))
+        user_url = reverse("admin:auth_user_change", args=(self.superuser.pk,))
         self.assertContains(
             response,
             '<div class="readonly">super</div>' % user_url,
