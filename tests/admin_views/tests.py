@@ -6989,27 +6989,25 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         user = User.objects.create(username="no_view_permission_user")
         self.client.force_login(user)
 
-        # todo: add permissions
+        permission = Permission.objects.get(
+            codename="view_chapter",
+            content_type=ContentType.objects.get_for_model(Chapter),
+        )
+        user.user_permissions.add(permission)
 
         chapter = Chapter.objects.create(
             title="Chapter 1",
             content="content",
             book=Book.objects.create(name="Book 1"),
         )
-        language = Language.objects.create(iso="_40", name="Test")
-        obj = ReadOnlyRelatedField.objects.create(
-            chapter=chapter,
-            language=language,
-            user=user,
-        )
+
         response = self.client.get(
-            reverse("admin:admin_views_readonlyrelatedfield_change", args=(obj.pk,)),
+            reverse("admin:admin_views_chapter_change", args=(chapter.pk,)),
         )
-        # Related ForeignKey object registered in admin.
-        user_url = reverse("admin:auth_user_change", args=(self.superuser.pk,))
+        # Foreign key fields rendered as div instead of select.
         self.assertContains(
             response,
-            '<div class="readonly">super</div>' % user_url,
+            '<div class="readonly">Book 1</div>',
             html=True,
         )
 
