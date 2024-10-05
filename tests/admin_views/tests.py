@@ -7002,7 +7002,7 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         )
 
         response = self.client.get(
-            reverse("admin:admin_views_chapter_change", args=(chapter.pk,)),
+            reverse("admin6:admin_views_chapter_change", args=(chapter.pk,)),
         )
         # Foreign key fields rendered as div instead of select.
         self.assertContains(
