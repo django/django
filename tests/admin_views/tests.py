@@ -6986,7 +6986,10 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         """
         Foreign key fields without "view_*" permission are rendered as a string.
         """
-        user = User.objects.create(username="no_view_permission_user")
+        user = User.objects.create(
+            username="no_view_permission_user",
+            is_superuser=True,
+        )
         self.client.force_login(user)
 
         permission = Permission.objects.get(
