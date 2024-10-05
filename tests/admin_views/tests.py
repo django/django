@@ -6988,7 +6988,7 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         """
         user = User.objects.create(
             username="no_view_permission_user",
-            is_superuser=True,
+            is_staff=True,
         )
         self.client.force_login(user)
 
