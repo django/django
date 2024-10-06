@@ -533,9 +533,13 @@ class Parser:
     def extend_nodelist(self, nodelist, node, token):
         # Check that non-text nodes don't appear before an extends tag.
         if node.must_be_first and nodelist.contains_nontext:
+            if self.origin.template_name:
+                origin = repr(self.origin.template_name)
+            else:
+                origin = "the template"
             raise self.error(
                 token,
-                "%r must be the first tag in the template." % node,
+                "{%% %s %%} must be the first tag in %s." % (token.contents, origin),
             )
         if not isinstance(node, TextNode):
             nodelist.contains_nontext = True
