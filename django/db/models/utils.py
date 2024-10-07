@@ -1,4 +1,5 @@
 import functools
+import inspect
 from collections import namedtuple
 
 
@@ -67,3 +68,24 @@ class AltersData:
                         break
 
         super().__init_subclass__(**kwargs)
+
+
+# RemovedInDjango61Warning
+def _depends_on_contribute_to_class(obj):
+    if inspect.isclass(obj):
+        return False
+    if "__set_name__" in obj.__class__.__dict__:
+        return False
+    for base in obj.__class__.mro():
+        # Since a __set_name__ defined on a "contributable" prior to patch for
+        # #27880 would never be invoked in model class creation, it is safe to
+        # assume that "contributables" will only implement __set_name__ after
+        # the aforementioned patch, which means we can safely assume that a
+        # __set_name__ defined on a field is there to take on the role of
+        # contribute_to_class.
+        if (
+            "contribute_to_class" in base.__dict__
+            and "__set_name__" not in base.__dict__
+        ):
+            return True
+    return False

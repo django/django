@@ -617,7 +617,7 @@ class SchemaTests(TransactionTestCase):
         list(Tag.objects.all())
         # Make a db_constraint=False FK
         new_field = M2MFieldClass(Tag, related_name="authors", db_constraint=False)
-        new_field.contribute_to_class(LocalAuthorWithM2M, "tags")
+        new_field.__set_name__(LocalAuthorWithM2M, "tags")
         # Add the field
         with connection.schema_editor() as editor:
             editor.add_field(LocalAuthorWithM2M, new_field)
@@ -917,7 +917,7 @@ class SchemaTests(TransactionTestCase):
             db_persist=True,
             output_field=BooleanField(),
         )
-        field.contribute_to_class(GeneratedFieldContainsModel, "contains_foo")
+        field.__set_name__(GeneratedFieldContainsModel, "contains_foo")
 
         with connection.schema_editor() as editor:
             editor.add_field(GeneratedFieldContainsModel, field)
@@ -952,7 +952,7 @@ class SchemaTests(TransactionTestCase):
             db_index=True,
             output_field=IntegerField(),
         )
-        new_field.contribute_to_class(GeneratedFieldIndexedModel, "generated")
+        new_field.__set_name__(GeneratedFieldIndexedModel, "generated")
 
         with connection.schema_editor() as editor:
             editor.alter_field(GeneratedFieldIndexedModel, old_field, new_field)
@@ -2618,7 +2618,7 @@ class SchemaTests(TransactionTestCase):
             editor.create_model(TagM2MTest)
         # Create an M2M field
         new_field = M2MFieldClass("schema.TagM2MTest", related_name="authors")
-        new_field.contribute_to_class(LocalAuthorWithM2M, "tags")
+        new_field.__set_name__(LocalAuthorWithM2M, "tags")
         # Ensure there's no m2m table there
         with self.assertRaises(DatabaseError):
             self.column_classes(new_field.remote_field.through)
@@ -2716,7 +2716,7 @@ class SchemaTests(TransactionTestCase):
         new_field = M2MFieldClass(
             "schema.TagM2MTest", related_name="authors", through=LocalAuthorTag
         )
-        new_field.contribute_to_class(LocalAuthorWithM2MThrough, "tags")
+        new_field.__set_name__(LocalAuthorWithM2MThrough, "tags")
         with connection.schema_editor() as editor:
             editor.alter_field(
                 LocalAuthorWithM2MThrough, old_field, new_field, strict=True
@@ -2765,7 +2765,7 @@ class SchemaTests(TransactionTestCase):
         # Repoint the M2M
         old_field = LocalBookWithM2M._meta.get_field("tags")
         new_field = M2MFieldClass(UniqueTest)
-        new_field.contribute_to_class(LocalBookWithM2M, "uniques")
+        new_field.__set_name__(LocalBookWithM2M, "uniques")
         with connection.schema_editor() as editor:
             editor.alter_field(LocalBookWithM2M, old_field, new_field, strict=True)
         # Ensure old M2M is gone
@@ -2816,7 +2816,7 @@ class SchemaTests(TransactionTestCase):
         # Alter a field in LocalTagM2MTest.
         old_field = LocalTagM2MTest._meta.get_field("title")
         new_field = CharField(max_length=254)
-        new_field.contribute_to_class(LocalTagM2MTest, "title1")
+        new_field.__set_name__(LocalTagM2MTest, "title1")
         # @isolate_apps() and inner models are needed to have the model
         # relations populated, otherwise this doesn't act as a regression test.
         self.assertEqual(len(new_field.model._meta.related_objects), 1)

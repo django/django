@@ -48,10 +48,16 @@ class GenericForeignKey(FieldCacheMixin, Field):
         self.for_concrete_model = for_concrete_model
         self.is_relation = True
 
-    def contribute_to_class(self, cls, name, **kwargs):
-        super().contribute_to_class(cls, name, private_only=True, **kwargs)
+        self._private_only = True
+
+    def __set_name__(self, cls, name):
+        super().__set_name__(cls, name)
         # GenericForeignKey is its own descriptor.
         setattr(cls, self.attname, self)
+
+    # RemovedInDjango61Warning
+    def contribute_to_class(self, cls, name, private_only=True):
+        self.__set_name__(cls, name)
 
     def get_attname_column(self):
         attname, column = super().get_attname_column()
@@ -352,6 +358,8 @@ class GenericRelation(ForeignObject):
         # reverse join.
         super().__init__(to, from_fields=[object_id_field], to_fields=[], **kwargs)
 
+        self._private_only = True
+
         self.object_id_field_name = object_id_field
         self.content_type_field_name = content_type_field
         self.for_concrete_model = for_concrete_model
@@ -482,9 +490,8 @@ class GenericRelation(ForeignObject):
         qs = getattr(obj, self.name).all()
         return str([instance.pk for instance in qs])
 
-    def contribute_to_class(self, cls, name, **kwargs):
-        kwargs["private_only"] = True
-        super().contribute_to_class(cls, name, **kwargs)
+    def __set_name__(self, cls, name):
+        super().__set_name__(cls, name)
         self.model = cls
         # Disable the reverse relation for fields inherited by subclasses of a
         # model in multi-table inheritance. The reverse relation points to the
@@ -510,6 +517,10 @@ class GenericRelation(ForeignObject):
                 self.model,
                 self.remote_field.model,
             )
+
+    # RemovedInDjango61Warning
+    def contribute_to_class(self, cls, name, private_only=True):
+        self.__set_name__(cls, name)
 
     def set_attributes_from_rel(self):
         pass

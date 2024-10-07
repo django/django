@@ -1,5 +1,4 @@
 import copy
-import inspect
 import warnings
 from functools import partialmethod
 from itertools import chain
@@ -47,7 +46,11 @@ from django.db.models.signals import (
     pre_init,
     pre_save,
 )
-from django.db.models.utils import AltersData, make_model_tuple
+from django.db.models.utils import (
+    AltersData,
+    _depends_on_contribute_to_class,
+    make_model_tuple,
+)
 from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.encoding import force_str
 from django.utils.hashable import make_hashable
@@ -82,11 +85,6 @@ def subclass_exception(name, bases, module, attached_to):
             "__qualname__": "%s.%s" % (attached_to.__qualname__, name),
         },
     )
-
-
-def _has_contribute_to_class(value):
-    # Only call contribute_to_class() if it's bound.
-    return not inspect.isclass(value) and hasattr(value, "contribute_to_class")
 
 
 def get_base_metas(bases):
@@ -159,12 +157,11 @@ class ModelBase(type):
                 "%s cannot proxy the swapped model '%s'." % (name, base_meta.swapped)
             )
 
-        # Pass all attributes without a (Django-specific) contribute_to_class()
-        # method to type.__new__() so that they're properly initialized
-        # (i.e. __set_name__()).
+        # RemovedInDjango61Warning. When deprecation ends, replace with
+        # new_attrs.update(attrs)
         contributable_attrs = {}
         for obj_name, obj in attrs.items():
-            if _has_contribute_to_class(obj):
+            if _depends_on_contribute_to_class(obj):
                 contributable_attrs[obj_name] = obj
             else:
                 new_attrs[obj_name] = obj
@@ -214,6 +211,7 @@ class ModelBase(type):
                 if not hasattr(meta, "get_latest_by"):
                     new_class._meta.get_latest_by = base_meta.get_latest_by
 
+        # RemovedInDjango61Warning
         for obj_name, obj in contributable_attrs.items():
             obj.contribute_to_class(new_class, obj_name)
 
@@ -326,7 +324,7 @@ class ModelBase(type):
                     # Only add the ptr field if it's not already present;
                     # e.g. migrations will already have it specified
                     if not hasattr(new_class, attr_name):
-                        field.contribute_to_class(new_class, attr_name)
+                        field.__set_name__(new_class, attr_name)
                 else:
                     field = None
                 new_class._meta.parents[base] = field
@@ -341,7 +339,7 @@ class ModelBase(type):
                         and field.name not in inherited_attributes
                     ):
                         new_field = copy.deepcopy(field)
-                        new_field.contribute_to_class(new_class, field.name)
+                        new_field.__set_name__(new_class, field.name)
                         # Replace parent links defined on this base by the new
                         # field. It will be appropriately resolved if required.
                         if field.one_to_one:
@@ -370,7 +368,7 @@ class ModelBase(type):
                     field = copy.deepcopy(field)
                     if not base._meta.abstract:
                         field.mti_inherited = True
-                    field.contribute_to_class(new_class, field.name)
+                    field.__set_name__(new_class, field.name)
 
         # Copy indexes so that index names are unique when models extend an
         # abstract model.
@@ -407,7 +405,7 @@ class ModelBase(type):
             # created and registered. If remote_field is None, we're ordering
             # with respect to a GenericForeignKey and don't know what the
             # foreign class is - we'll add those accessors later in
-            # contribute_to_class().
+            # __set_name__().
             if opts.order_with_respect_to.remote_field:
                 wrt = opts.order_with_respect_to
                 remote = wrt.remote_field.model

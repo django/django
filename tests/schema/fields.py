@@ -63,13 +63,13 @@ class CustomManyToManyField(RelatedField):
             **kwargs,
         )
 
-    def contribute_to_class(self, cls, name, **kwargs):
+    def __set_name__(self, cls, name):
         if self.remote_field.symmetrical and (
             self.remote_field.model == "self"
             or self.remote_field.model == cls._meta.object_name
         ):
             self.remote_field.related_name = "%s_rel_+" % name
-        super().contribute_to_class(cls, name, **kwargs)
+        super().__set_name__(cls, name)
         if (
             not self.remote_field.through
             and not cls._meta.abstract

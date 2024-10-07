@@ -40,8 +40,8 @@ class ActiveTranslationField(models.ForeignObject):
     def get_extra_descriptor_filter(self, instance):
         return {"lang": get_language()}
 
-    def contribute_to_class(self, cls, name):
-        super().contribute_to_class(cls, name)
+    def __set_name__(self, cls, name):
+        super().__set_name__(cls, name)
         setattr(cls, self.name, ArticleTranslationDescriptor(self))
 
 

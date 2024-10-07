@@ -45,7 +45,7 @@ class BaseGeneratedFieldTests(SimpleTestCase):
             )
 
     @isolate_apps("model_fields")
-    def test_contribute_to_class(self):
+    def test_set_name(self):
         class BareModel(Model):
             pass
 
@@ -58,7 +58,7 @@ class BaseGeneratedFieldTests(SimpleTestCase):
         try:
             # GeneratedField can be added to the model even when apps are not
             # fully loaded.
-            new_field.contribute_to_class(BareModel, "name")
+            new_field.__set_name__(BareModel, "name")
             self.assertEqual(BareModel._meta.get_field("name"), new_field)
         finally:
             apps.models_ready = True

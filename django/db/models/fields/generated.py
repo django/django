@@ -43,13 +43,18 @@ class GeneratedField(Field):
             output_field = self.output_field
         return super().get_col(alias, output_field)
 
-    def contribute_to_class(self, *args, **kwargs):
-        super().contribute_to_class(*args, **kwargs)
+    def __set_name__(self, cls, name):
+        super().__set_name__(cls, name)
 
         self._query = Query(model=self.model, alias_cols=False)
         # Register lookups from the output_field class.
         for lookup_name, lookup in self.output_field.get_class_lookups().items():
             self.register_lookup(lookup, lookup_name=lookup_name)
+
+    # RemovedInDjango61Warning
+    def contribute_to_class(self, cls, name, private_only=False):
+        self._private_only = private_only
+        self.__set_name__(cls, name)
 
     def generated_sql(self, connection):
         compiler = connection.ops.compiler("SQLCompiler")(

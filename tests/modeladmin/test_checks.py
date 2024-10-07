@@ -710,8 +710,8 @@ class ListDisplayTests(CheckTestCase):
         class PositionField(Field):
             """Custom field accessible only via instance."""
 
-            def contribute_to_class(self, cls, name):
-                super().contribute_to_class(cls, name)
+            def __set_name__(self, cls, name):
+                super().__set_name__(cls, name)
                 setattr(cls, self.name, self)
 
             def __get__(self, instance, owner):

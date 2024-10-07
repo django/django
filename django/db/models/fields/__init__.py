@@ -233,6 +233,8 @@ class Field(RegisterLookupMixin):
         self._db_tablespace = db_tablespace
         self.auto_created = auto_created
 
+        self._private_only = False
+
         # Adjust the appropriate creation counter, and save our local copy.
         if auto_created:
             self.creation_counter = Field.auto_creation_counter
@@ -568,7 +570,7 @@ class Field(RegisterLookupMixin):
         """
         Return enough information to recreate the field as a 4-tuple:
 
-         * The name of the field on the model, if contribute_to_class() has
+         * The name of the field on the model, if __set_name__() has
            been run.
          * The import path of the field, including the class, e.g.
            django.db.models.IntegerField. This should be the most portable
@@ -932,6 +934,15 @@ class Field(RegisterLookupMixin):
             and connection.features.can_return_columns_from_insert
         )
 
+    @staticmethod
+    def model_only_set_name(meth):
+        def wrapper(self, cls, name):
+            if not hasattr(cls, "_meta"):
+                return
+            return meth(self, cls, name)
+
+        return wrapper
+
     def set_attributes_from_name(self, name):
         self.name = self.name or name
         self.attname, self.column = self.get_attname_column()
@@ -939,7 +950,8 @@ class Field(RegisterLookupMixin):
         if self.verbose_name is None and self.name:
             self.verbose_name = self.name.replace("_", " ")
 
-    def contribute_to_class(self, cls, name, private_only=False):
+    @model_only_set_name
+    def __set_name__(self, cls, name):
         """
         Register the field with the model class it belongs to.
 
@@ -948,20 +960,25 @@ class Field(RegisterLookupMixin):
         """
         self.set_attributes_from_name(name)
         self.model = cls
-        cls._meta.add_field(self, private=private_only)
+        cls._meta.add_field(self, private=self._private_only)
         if self.column:
             setattr(cls, self.attname, self.descriptor_class(self))
         if self.choices is not None:
             # Don't override a get_FOO_display() method defined explicitly on
             # this class, but don't check methods derived from inheritance, to
             # allow overriding inherited choices. For more complex inheritance
-            # structures users should override contribute_to_class().
+            # structures users should override __set_name__().
             if "get_%s_display" % self.name not in cls.__dict__:
                 setattr(
                     cls,
                     "get_%s_display" % self.name,
                     partialmethod(cls._get_FIELD_display, field=self),
                 )
+
+    # RemovedInDjango61Warning
+    def contribute_to_class(self, cls, name, private_only=False):
+        self._private_only = private_only
+        self.__set_name__(cls, name)
 
     def get_filter_kwargs_for_object(self, obj):
         """
@@ -1508,8 +1525,9 @@ class DateField(DateTimeCheckMixin, Field):
         else:
             return super().pre_save(model_instance, add)
 
-    def contribute_to_class(self, cls, name, **kwargs):
-        super().contribute_to_class(cls, name, **kwargs)
+    @Field.model_only_set_name
+    def __set_name__(self, cls, name):
+        super().__set_name__(cls, name)
         if not self.null:
             setattr(
                 cls,
@@ -1525,6 +1543,11 @@ class DateField(DateTimeCheckMixin, Field):
                     cls._get_next_or_previous_by_FIELD, field=self, is_next=False
                 ),
             )
+
+    # RemovedInDjango61Warning
+    def contribute_to_class(self, cls, name, private_only=False):
+        self._private_only = private_only
+        self.__set_name__(cls, name)
 
     def get_prep_value(self, value):
         value = super().get_prep_value(value)
@@ -1648,7 +1671,7 @@ class DateTimeField(DateField):
         else:
             return super().pre_save(model_instance, add)
 
-    # contribute_to_class is inherited from DateField, it registers
+    # __set_name__ is inherited from DateField, it registers
     # get_next_by_FOO and get_prev_by_FOO
 
     def get_prep_value(self, value):
@@ -2816,14 +2839,19 @@ class AutoFieldMixin:
             value = connection.ops.validate_autopk_value(value)
         return value
 
-    def contribute_to_class(self, cls, name, **kwargs):
+    def __set_name__(self, cls, name):
         if cls._meta.auto_field:
             raise ValueError(
                 "Model %s can't have more than one auto-generated field."
                 % cls._meta.label
             )
-        super().contribute_to_class(cls, name, **kwargs)
+        super().__set_name__(cls, name)
         cls._meta.auto_field = self
+
+    # RemovedInDjango61Warning
+    def contribute_to_class(self, cls, name, private_only=False):
+        self._private_only = private_only
+        self.__set_name__(cls, name)
 
     def formfield(self, **kwargs):
         return None

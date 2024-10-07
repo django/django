@@ -338,9 +338,15 @@ class FileField(Field):
             file.save(file.name, file.file, save=False)
         return file
 
-    def contribute_to_class(self, cls, name, **kwargs):
-        super().contribute_to_class(cls, name, **kwargs)
+    @Field.model_only_set_name
+    def __set_name__(self, cls, name):
+        super().__set_name__(cls, name)
         setattr(cls, self.attname, self.descriptor_class(self))
+
+    # RemovedInDjango61Warning
+    def contribute_to_class(self, cls, name, private_only=False):
+        self._private_only = private_only
+        self.__set_name__(cls, name)
 
     def generate_filename(self, instance, filename):
         """
@@ -462,8 +468,8 @@ class ImageField(FileField):
             kwargs["height_field"] = self.height_field
         return name, path, args, kwargs
 
-    def contribute_to_class(self, cls, name, **kwargs):
-        super().contribute_to_class(cls, name, **kwargs)
+    def __set_name__(self, cls, name):
+        super().__set_name__(cls, name)
         # Attach update_dimension_fields so that dimension fields declared
         # after their corresponding image field don't stay cleared by
         # Model.__init__, see bug #11196.
@@ -471,6 +477,11 @@ class ImageField(FileField):
         # with width_field/height_field.
         if not cls._meta.abstract and (self.width_field or self.height_field):
             signals.post_init.connect(self.update_dimension_fields, sender=cls)
+
+    # RemovedInDjango61Warning
+    def contribute_to_class(self, cls, name, private_only=False):
+        self._private_only = private_only
+        self.__set_name__(cls, name)
 
     def update_dimension_fields(self, instance, force=False, *args, **kwargs):
         """
