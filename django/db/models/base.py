@@ -175,7 +175,8 @@ class ModelBase(type):
 
         # Add model-specific exceptions if the model isn't abstract.
         if not abstract:
-            new_class.add_to_class(
+            setattr(
+                new_class,
                 "DoesNotExist",
                 subclass_exception(
                     "DoesNotExist",
@@ -189,7 +190,8 @@ class ModelBase(type):
                     attached_to=new_class,
                 ),
             )
-            new_class.add_to_class(
+            setattr(
+                new_class,
                 "MultipleObjectsReturned",
                 subclass_exception(
                     "MultipleObjectsReturned",
@@ -212,10 +214,8 @@ class ModelBase(type):
                 if not hasattr(meta, "get_latest_by"):
                     new_class._meta.get_latest_by = base_meta.get_latest_by
 
-        # Add remaining attributes (those with a contribute_to_class() method)
-        # to the class.
         for obj_name, obj in contributable_attrs.items():
-            new_class.add_to_class(obj_name, obj)
+            obj.contribute_to_class(new_class, obj_name)
 
         # All the fields of any type declared on this model
         new_fields = chain(
@@ -326,7 +326,7 @@ class ModelBase(type):
                     # Only add the ptr field if it's not already present;
                     # e.g. migrations will already have it specified
                     if not hasattr(new_class, attr_name):
-                        new_class.add_to_class(attr_name, field)
+                        field.contribute_to_class(new_class, attr_name)
                 else:
                     field = None
                 new_class._meta.parents[base] = field
@@ -341,7 +341,7 @@ class ModelBase(type):
                         and field.name not in inherited_attributes
                     ):
                         new_field = copy.deepcopy(field)
-                        new_class.add_to_class(field.name, new_field)
+                        new_field.contribute_to_class(new_class, field.name)
                         # Replace parent links defined on this base by the new
                         # field. It will be appropriately resolved if required.
                         if field.one_to_one:
@@ -370,7 +370,7 @@ class ModelBase(type):
                     field = copy.deepcopy(field)
                     if not base._meta.abstract:
                         field.mti_inherited = True
-                    new_class.add_to_class(field.name, field)
+                    field.contribute_to_class(new_class, field.name)
 
         # Copy indexes so that index names are unique when models extend an
         # abstract model.
@@ -389,12 +389,6 @@ class ModelBase(type):
         new_class._prepare()
         new_class._meta.apps.register_model(new_class._meta.app_label, new_class)
         return new_class
-
-    def add_to_class(cls, name, value):
-        if _has_contribute_to_class(value):
-            value.contribute_to_class(cls, name)
-        else:
-            setattr(cls, name, value)
 
     def _prepare(cls):
         """Create some methods once self._meta has been populated."""

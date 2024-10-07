@@ -295,7 +295,7 @@ class Options:
             if not any(
                 isinstance(field, OrderWrt) for field in model._meta.local_fields
             ):
-                model.add_to_class("_order", OrderWrt())
+                OrderWrt().contribute_to_class(model, "_order")
         else:
             self.order_with_respect_to = None
 
@@ -317,7 +317,7 @@ class Options:
             else:
                 pk_class = self._get_default_pk_class()
                 auto = pk_class(verbose_name="ID", primary_key=True, auto_created=True)
-                model.add_to_class("id", auto)
+                auto.contribute_to_class(model, "id")
 
     def add_manager(self, manager):
         self.local_managers.append(manager)

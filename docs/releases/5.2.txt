@@ -231,6 +231,8 @@ Models
 
 * ``Manager.contribute_to_class()`` is replaced with ``Manager.__set_name__().``
 
+* ``Model.add_to_class()`` is removed.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
