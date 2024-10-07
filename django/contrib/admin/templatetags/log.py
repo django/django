@@ -19,6 +19,8 @@ class AdminLogNode(template.Node):
             if not user_id.isdigit():
                 user_id = context[self.user].pk
             entries = entries.filter(user__pk=user_id)
+        for entry in entries:
+            entry.url = entry.get_url_for_user()
         context[self.varname] = entries[: int(self.limit)]
         return ""
 
