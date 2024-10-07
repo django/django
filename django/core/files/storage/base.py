@@ -84,7 +84,15 @@ class Storage:
                 "Detected path traversal attempt in '%s'" % dir_name
             )
         validate_file_name(file_name)
-        file_ext = "".join(pathlib.PurePath(file_name).suffixes)
+        # Extract file extensions (.txt, .jpeg, .tar.gz) from the filename
+        suffixes = pathlib.PurePath(file_name).suffixes
+        file_ext = ""
+        # Iterate backwards from the last suffix. Consider suffixes
+        # shorter than 5 characters to be part of the extension
+        for index, suffix in enumerate(suffixes[::-1]):
+            if index > 0 and len(suffix) >= 5:
+                break
+            file_ext = suffix + file_ext
         file_root = file_name.removesuffix(file_ext)
         # If the filename is not available, generate an alternative
         # filename until one is available.
