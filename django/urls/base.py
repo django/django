@@ -127,8 +127,9 @@ def clear_script_prefix():
 
 def set_urlconf(urlconf_name):
     """
-    Set the URLconf for the current thread (overriding the default one in
-    settings). If urlconf_name is None, revert back to the default.
+    Set the URLconf for the current thread or asyncio task (overriding the
+    default one in settings). If urlconf_name is None, revert back to the
+    default.
     """
     if urlconf_name:
         _urlconfs.value = urlconf_name
@@ -139,8 +140,8 @@ def set_urlconf(urlconf_name):
 
 def get_urlconf(default=None):
     """
-    Return the root URLconf to use for the current thread if it has been
-    changed from the default one.
+    Return the root URLconf to use for the current thread or asyncio task if it
+    has been changed from the default one.
     """
     return getattr(_urlconfs, "value", default)
 
