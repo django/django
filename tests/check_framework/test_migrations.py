@@ -22,8 +22,7 @@ class MigrationsCheckTests(SimpleTestCase):
             autodetector_class = int
 
         expected_error = Error(
-            "Migrate and makemigrations don't share the same autodetector class. "
-            "Currently, this behavior is not supported.",
+            "Migrate and makemigrations don't share the same autodetector class. ",
             hint=(
                 "makemigrations.Command.autodetector_class is {}, but "
                 "migrate.Command.autodetector_class is {}."
