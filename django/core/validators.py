@@ -252,9 +252,9 @@ class EmailValidator:
             self.domain_allowlist = allowlist
 
     def __call__(self, value):
-        # The maximum length of an email is 320 characters per RFC 3696
+        # The maximum length of an email is 254 characters per RFC 5321/5322
         # section 3.
-        if not value or "@" not in value or len(value) > 320:
+        if not value or "@" not in value or len(value) > 254:
             raise ValidationError(self.message, code=self.code, params={"value": value})
 
         user_part, domain_part = value.rsplit("@", 1)
