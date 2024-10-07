@@ -3,7 +3,7 @@
 # Translators:
 # Bayu Satiyo <itsyuukunz@gmail.com>, 2024
 # Claude Paroz <claude@2xlibre.net>, 2014
-# Fery Setiawan <gembelweb@gmail.com>, 2015-2019,2021-2023
+# Fery Setiawan <gembelweb@gmail.com>, 2015-2019,2021-2024
 # Jannis Leidel <jannis@leidel.info>, 2011
 # M Asep Indrayana <me@drayanaindra.com>, 2015
 # oon arfiandwi (OonID) <oon.arfiandwi@gmail.com>, 2016,2020
@@ -16,8 +16,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2013-04-25 07:05+0000\n"
-"Last-Translator: Bayu Satiyo <itsyuukunz@gmail.com>, 2024\n"
+"PO-Revision-Date: 2024-10-07 07:05+0000\n"
+"Last-Translator: Fery Setiawan <gembelweb@gmail.com>, 2015-2019,2021-2024\n"
 "Language-Team: Indonesian (http://app.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
@@ -372,7 +372,7 @@ msgid "Change password"
 msgstr "Ganti sandi"
 
 msgid "Set password"
-msgstr ""
+msgstr "Setel sandi"
 
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
@@ -386,12 +386,14 @@ msgid ""
 "This action will <strong>enable</strong> password-based authentication for "
 "this user."
 msgstr ""
+"Tindakan ini akan <strong>enable</strong> autentifikasi brerdasarkan-sandi "
+"untuk pengguna ini."
 
 msgid "Disable password-based authentication"
-msgstr ""
+msgstr "Tiadakan autentifikasu berdasarkan-sandi"
 
 msgid "Enable password-based authentication"
-msgstr ""
+msgstr "Adakan autentifikasu berdasarkan-sandi"
 
 msgid "Skip to main content"
 msgstr "Lewati ke isi utama"
