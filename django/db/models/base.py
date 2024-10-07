@@ -440,7 +440,7 @@ class ModelBase(type):
                 )
             manager = Manager()
             manager.auto_created = True
-            cls.add_to_class("objects", manager)
+            manager.__set_name__(cls, "objects")
 
         # Set the name of _meta.indexes. This can't be done in
         # Options.__set_name__() because fields haven't been added to

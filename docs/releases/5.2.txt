@@ -229,6 +229,8 @@ Models
 
 * ``Options.contribute_to_class()`` is replaced with ``Options.__set_name__().``
 
+* ``Manager.contribute_to_class()`` is replaced with ``Manager.__set_name__().``
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
