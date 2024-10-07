@@ -21,15 +21,15 @@
 # Natalia, 2024
 # Pablo, 2015
 # Salomon Herrera, 2023
-# Uriel Medina <urimeba511@gmail.com>, 2020-2023
+# Uriel Medina <urimeba511@gmail.com>, 2020-2024
 # Veronicabh <vero.blazher@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 07:05+0000\n"
-"Last-Translator: Natalia, 2024\n"
+"PO-Revision-Date: 2024-10-07 07:05+0000\n"
+"Last-Translator: Uriel Medina <urimeba511@gmail.com>, 2020-2024\n"
 "Language-Team: Spanish (http://app.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
@@ -411,13 +411,13 @@ msgid ""
 "this user."
 msgstr ""
 "Esta acción <strong>habilitará</strong> la autenticación basada en "
-"contraseñas para este usuario."
+"contraseña para este usuario."
 
 msgid "Disable password-based authentication"
-msgstr "Deshabilitar la autenticación basada en contraseñas"
+msgstr "Deshabilitar la autenticación basada en contraseña"
 
 msgid "Enable password-based authentication"
-msgstr "Habilitar la autenticación basada en contraseñas"
+msgstr "Habilitar la autenticación basada en contraseña"
 
 msgid "Skip to main content"
 msgstr "Saltar al contenido principal"
