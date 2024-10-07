@@ -227,6 +227,8 @@ Models
   longer required to be set on SQLite, which supports unlimited ``VARCHAR``
   columns.
 
+* ``Options.contribute_to_class()`` is replaced with ``Options.__set_name__().``
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

@@ -168,7 +168,7 @@ class Options:
         # Don't go through get_app_config to avoid triggering imports.
         return self.apps.app_configs.get(self.app_label)
 
-    def contribute_to_class(self, cls, name):
+    def __set_name__(self, cls, name):
         from django.db import connection
         from django.db.backends.utils import truncate_name
 
