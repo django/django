@@ -352,7 +352,7 @@ Once you're in the shell, explore the :doc:`database API </topics/db/queries>`:
 
 .. code-block:: pycon
 
-    >>> from polls.models import Choice, Question  # Import the model classes we just wrote.
+    # Django automatically imports models.
 
     # No questions are in the system yet.
     >>> Question.objects.all()
@@ -442,8 +442,6 @@ Save these changes and start a new Python interactive shell by running
 ``python manage.py shell`` again:
 
 .. code-block:: pycon
-
-    >>> from polls.models import Choice, Question
 
     # Make sure our __str__() addition worked.
     >>> Question.objects.all()
