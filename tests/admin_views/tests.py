@@ -6205,6 +6205,22 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
         self.take_screenshot("focus-multi-widget")
 
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
+    def test_error_message_position(self):
+        """Error messages are shown above the field and below the label"""
+        from selenium.webdriver.common.by import By
+
+        url = reverse("admin:admin_views_article_add")
+        full_url = self.live_server_url + url
+        self.admin_login(
+            username="super", password="secret", login_url=reverse("admin:index")
+        )
+        self.selenium.get(full_url)
+        # Submit an empty form to trigger validation errors
+        self.selenium.find_element(By.CSS_SELECTOR, 'input[type="submit"]').click()
+        self.wait_page_ready()
+        self.take_screenshot("error-message-position")
+
     def test_cancel_delete_confirmation(self):
         "Cancelling the deletion of an object takes the user back one page."
         from selenium.webdriver.common.by import By
