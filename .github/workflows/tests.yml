@@ -23,7 +23,7 @@ jobs:
     strategy:
       matrix:
         python-version:
-          - '3.12'
+          - '3.13'
     name: Windows, SQLite, Python ${{ matrix.python-version }}
     steps:
       - name: Checkout
