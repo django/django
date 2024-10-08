@@ -860,6 +860,31 @@ class ChangeListTests(TestCase):
         cl = m.get_changelist_instance(request)
         self.assertCountEqual(cl.queryset, [abcd])
 
+    def test_search_with_exact_on_non_string_field(self):
+        """
+        ensures that the get_search_results method handles
+        the scenario where a non-integer term is provided
+        for an __exact search on an integer field.
+        """
+
+        child = Child.objects.create(name="Asher", age=11)
+        model_admin = ChildAdmin(Child, custom_site)
+
+        request = self.factory.get("/", data={SEARCH_VAR: "11"})
+        request.user = self.superuser
+        cl = model_admin.get_changelist_instance(request)
+        self.assertCountEqual(cl.queryset, [child])
+
+        request = self.factory.get("/", data={SEARCH_VAR: "fsfsl"})
+        request.user = self.superuser
+        cl = model_admin.get_changelist_instance(request)
+        self.assertCountEqual(cl.queryset, [])
+
+        request = self.factory.get("/", data={SEARCH_VAR: "3.14"})
+        request.user = self.superuser
+        cl = model_admin.get_changelist_instance(request)
+        self.assertCountEqual(cl.queryset, [])
+
     def test_no_distinct_for_m2m_in_list_filter_without_params(self):
         """
         If a ManyToManyField is in list_filter but isn't in any lookup params,
