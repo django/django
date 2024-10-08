@@ -1065,6 +1065,19 @@ Mails the email addresses specified in :setting:`ADMINS` using
 
 Starts the Python interactive interpreter.
 
+All models from installed apps are automatically imported into the shell
+environment. Models from apps listed earlier in :setting:`INSTALLED_APPS` take
+precedence. For a ``--verbosity`` of 2 or higher, the automatically imported
+objects will be listed. To disable automatic importing entirely, use the
+``--no-imports`` flag.
+
+See the guide on :ref:`customizing this behaviour
+<customizing-shell-auto-imports>` to add or remove automatic imports.
+
+.. versionchanged:: 5.2
+
+    Automatic models import was added.
+
 .. django-admin-option:: --interface {ipython,bpython,python}, -i {ipython,bpython,python}
 
 Specifies the shell to use. By default, Django will use IPython_ or bpython_ if
