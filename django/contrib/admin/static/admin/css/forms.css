@@ -169,6 +169,10 @@ form .aligned select + div.help {
     padding-left: 10px;
 }
 
+form .aligned select option:checked {
+    background-color: var(--selected-row);
+}
+
 form .aligned ul li {
     list-style: none;
 }
