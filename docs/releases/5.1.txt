@@ -18,8 +18,9 @@ project.
 Python compatibility
 ====================
 
-Django 5.1 supports Python 3.10, 3.11, and 3.12. We **highly recommend** and
-only officially support the latest release of each series.
+Django 5.1 supports Python 3.10, 3.11, 3.12, and 3.13 (as of 5.1.3). We
+**highly recommend** and only officially support the latest release of each
+series.
 
 .. _whats-new-5.1:
 
