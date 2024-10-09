@@ -1351,9 +1351,55 @@ files is:
 Creates a Django project directory structure for the given project name in
 the current directory or the given destination.
 
-By default, :source:`the new directory <django/conf/project_template>` contains
-``manage.py`` and a project package (containing a ``settings.py`` and other
-files).
+For example:
+
+.. console::
+
+    django-admin startproject myproject
+
+Creates the following project directory structure:
+
+.. code-block:: text
+
+    myproject/
+        manage.py
+        myproject/
+            __init__.py
+            settings.py
+            urls.py
+            asgi.py
+            wsgi.py
+
+The project directory contents are:
+
+* The outer :file:`myproject/` root directory is a container for your project. Its
+  name doesn't matter to Django; you can rename it to anything you like.
+
+* :file:`manage.py`: A command-line utility that lets you interact with this
+  Django project in various ways. You can read all the uses of
+  :file:`manage.py` in :doc:`this page </ref/django-admin>`.
+
+* The inner :file:`myproject/` directory is the actual Python package for your
+  project. Its name is the Python package name you'll need to use to import
+  anything inside it (e.g. ``mysite.urls``).
+
+* :file:`myproject/__init__.py`: An empty file that tells Python that this
+  directory should be considered a Python package. If you're a Python beginner,
+  read :ref:`more about packages <tut-packages>` in the official Python docs.
+
+* :file:`myproject/settings.py`: Settings/configuration for this Django
+  project.  :doc:`/topics/settings` will tell you all about how settings
+  work.
+
+* :file:`myproject/urls.py`: The URL declarations for this Django project; a
+  "table of contents" of your Django-powered site. You can read more about
+  URLs in :doc:`/topics/http/urls`.
+
+* :file:`myproject/asgi.py`: An entry-point for ASGI-compatible web servers to
+  serve your project. See :doc:`/howto/deployment/asgi/index` for more details.
+
+* :file:`myproject/wsgi.py`: An entry-point for WSGI-compatible web servers to
+  serve your project. See :doc:`/howto/deployment/wsgi/index` for more details.
 
 If only the project name is given, both the project directory and project
 package will be named ``<projectname>`` and the project directory
@@ -1371,8 +1417,9 @@ For example:
 
 .. django-admin-option:: --template TEMPLATE
 
-Specifies a directory, file path, or URL of a custom project template. See the
-:option:`startapp --template` documentation for examples and usage.
+Specifies a directory, file path, or URL of a custom project template.
+By default,it uses the :source:`the new directory <django/conf/project_template>`.
+See the :option:`startapp --template` documentation for examples and usage.
 
 .. django-admin-option:: --extension EXTENSIONS, -e EXTENSIONS
 
