@@ -1,5 +1,5 @@
 """
-Global Django exception and warning classes.
+Global Django exception classes.
 """
 
 import operator
