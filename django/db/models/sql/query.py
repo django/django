@@ -290,6 +290,8 @@ class Query(BaseExpression):
 
     explain_info = None
 
+    update_returning = False
+
     def __init__(self, model, alias_cols=True):
         self.model = model
         self.alias_refcount = {}
