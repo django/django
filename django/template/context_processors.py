@@ -87,3 +87,11 @@ def media(request):
 
 def request(request):
     return {"request": request}
+
+
+# TODO: Add tests
+def csp_nonce(request):
+    """
+    Add the CSP nonce to the context.
+    """
+    return {"CSP_NONCE": getattr(request, "csp_nonce", None)}
