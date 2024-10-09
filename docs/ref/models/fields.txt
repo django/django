@@ -702,6 +702,34 @@ or :class:`~django.forms.NullBooleanSelect` if :attr:`null=True <Field.null>`.
 The default value of ``BooleanField`` is ``None`` when :attr:`Field.default`
 isn't defined.
 
+.. note::
+
+   When using the ``db_default`` attribute, the field value will be an instance of ``DatabaseDefault`` before the instance is saved to the database. This means that a ``bool()`` evaluation of the field will not reflect the specified ``db_default`` value until the instance is saved.
+
+   For example:
+
+   .. code-block:: python
+
+      from django.db import models
+
+
+      class MyModel(models.Model):
+          my_field = models.BooleanField(db_default=False)
+
+
+      my_obj = MyModel()
+      print(bool(my_obj.my_field))  # True, which is unexpected.
+
+      my_obj.save()
+      print(bool(my_obj.my_field))  # False, as expected.
+
+   To ensure the field value reflects the desired default before saving, also set the ``default`` attribute:
+
+   .. code-block:: python
+
+      class MyModel(models.Model):
+          my_field = models.BooleanField(default=False, db_default=False)
+
 ``CharField``
 -------------
 
