@@ -1952,7 +1952,7 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
         later = now + timedelta(hours=2)
         non_utc_model = self.create_model(now, later)
         models_qs = DTModel.objects.annotate(
-            start_trunc=TruncSecond('start_datetime')
+            start_trunc=TruncSecond("start_datetime")
         ).filter(id=non_utc_model.id, start_trunc__lte=now)
         self.assertEqual(models_qs.count(), 1)
         test_timezones = [
@@ -1965,13 +1965,13 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
                 later = now + timedelta(hours=2)
                 non_utc_model = self.create_model(now, later)
                 models_qs = DTModel.objects.annotate(
-                    start_trunc=TruncSecond('start_datetime')
+                    start_trunc=TruncSecond("start_datetime")
                 ).filter(id=non_utc_model.id, start_trunc__lte=now)
                 self.assertNotEqual(models_qs.count(), 1)
                 adjusted_now = timezone.localtime(now).replace(
                     tzinfo=zoneinfo.ZoneInfo(key='UTC')
                 )
                 models_qs = DTModel.objects.annotate(
-                    start_trunc=TruncSecond('start_datetime')
+                    start_trunc=TruncSecond("start_datetime")
                 ).filter(id=non_utc_model.id, start_trunc__lte=adjusted_now)
                 self.assertEqual(models_qs.count(), 1)
