@@ -202,12 +202,13 @@ class UserAttributeSimilarityValidator:
                     except FieldDoesNotExist:
                         verbose_name = attribute_name
                     raise ValidationError(
-                        self.get_error_message(verbose_name),
+                        self.get_error_message(),
                         code="password_too_similar",
+                        params={"verbose_name": verbose_name},
                     )
 
-    def get_error_message(self, verbose_name):
-        return _("The password is too similar to the %s." % verbose_name)
+    def get_error_message(self):
+        return _("The password is too similar to the %(verbose_name)s.")
 
     def get_help_text(self):
         return _(

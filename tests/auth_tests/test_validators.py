@@ -235,8 +235,8 @@ class UserAttributeSimilarityValidatorTest(TestCase):
 class UserAttributeSimilarityValidatorCustomErrorTest(TestCase):
     def test(self):
         class CustomUserAttributeSimilarityValidator(UserAttributeSimilarityValidator):
-            def get_error_message(self, verbose_name):
-                return "The password is too close to the %s." % verbose_name
+            def get_error_message(self):
+                return "The password is too close to the %(verbose_name)s."
 
         user = User.objects.create_user(
             username="testclient",
@@ -252,6 +252,27 @@ class UserAttributeSimilarityValidatorCustomErrorTest(TestCase):
             CustomUserAttributeSimilarityValidator().validate("testclient", user=user)
 
         self.assertEqual(cm.exception.messages, [expected_error % "username"])
+        self.assertEqual(cm.exception.error_list[0].code, "password_too_similar")
+
+    def test_verbose_name_not_used(self):
+        class CustomUserAttributeSimilarityValidator(UserAttributeSimilarityValidator):
+            def get_error_message(self):
+                return "The password is too close to a user attribute."
+
+        user = User.objects.create_user(
+            username="testclient",
+            password="password",
+            email="testclient@example.com",
+            first_name="Test",
+            last_name="Client",
+        )
+
+        expected_error = "The password is too close to a user attribute."
+
+        with self.assertRaises(ValidationError) as cm:
+            CustomUserAttributeSimilarityValidator().validate("testclient", user=user)
+
+        self.assertEqual(cm.exception.messages, [expected_error])
         self.assertEqual(cm.exception.error_list[0].code, "password_too_similar")
 
 
