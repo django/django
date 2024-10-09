@@ -81,6 +81,7 @@ Minor features
   :func:`~.django.contrib.auth.aauthenticate`) to reduce context-switching which
   improves performance. See :ref:`adding an async interface
   <writing-authentication-backends-async-interface>` for more details.
+
 * The password validator classes have a new method ``get_error_message()``,
   which can be overridden in subclasses to customize the error messages.
 
