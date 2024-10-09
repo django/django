@@ -175,7 +175,10 @@ class JSONObject(Func):
         )
 
     def as_postgresql(self, compiler, connection, **extra_context):
-        if not connection.features.is_postgresql_16:
+        if (
+            not connection.features.is_postgresql_16
+            or connection.features.uses_server_side_binding
+        ):
             copy = self.copy()
             copy.set_source_expressions(
                 [

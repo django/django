@@ -1,4 +1,4 @@
-{% load i18n %}
+{% load i18n static %}
 <button class="sticky toggle-nav-sidebar" id="toggle-nav-sidebar" aria-label="{% translate 'Toggle navigation' %}"></button>
 <nav class="sticky" id="nav-sidebar" aria-label="{% translate 'Sidebar' %}">
   <input type="search" id="nav-filter"
@@ -6,3 +6,4 @@
          aria-label="{% translate 'Filter navigation items' %}">
   {% include 'admin/app_list.html' with app_list=available_apps show_changelinks=False %}
 </nav>
+<script src="{% static 'admin/js/nav_sidebar.js' %}"></script>
