@@ -4,6 +4,7 @@ import html
 import json
 import re
 import warnings
+from collections.abc import Mapping
 from html.parser import HTMLParser
 from urllib.parse import parse_qsl, quote, unquote, urlencode, urlsplit, urlunsplit
 
@@ -37,6 +38,8 @@ VOID_ELEMENTS = frozenset(
         "spacer",
     )
 )
+
+MAX_URL_LENGTH = 2048
 
 
 @keep_lazy(SafeString)
@@ -127,10 +130,11 @@ def format_html(format_string, *args, **kwargs):
     """
     if not (args or kwargs):
         # RemovedInDjango60Warning: when the deprecation ends, replace with:
-        # raise ValueError("args or kwargs must be provided.")
+        # raise TypeError("args or kwargs must be provided.")
         warnings.warn(
             "Calling format_html() without passing args or kwargs is deprecated.",
             RemovedInDjango60Warning,
+            stacklevel=2,
         )
     args_safe = map(conditional_escape, args)
     kwargs_safe = {k: conditional_escape(v) for (k, v) in kwargs.items()}
@@ -153,7 +157,12 @@ def format_html_join(sep, format_string, args_generator):
     """
     return mark_safe(
         conditional_escape(sep).join(
-            format_html(format_string, *args) for args in args_generator
+            (
+                format_html(format_string, **args)
+                if isinstance(args, Mapping)
+                else format_html(format_string, *args)
+            )
+            for args in args_generator
         )
     )
 
@@ -332,9 +341,9 @@ class Urlizer:
             # Make URL we want to point to.
             url = None
             nofollow_attr = ' rel="nofollow"' if nofollow else ""
-            if self.simple_url_re.match(middle):
+            if len(middle) <= MAX_URL_LENGTH and self.simple_url_re.match(middle):
                 url = smart_urlquote(html.unescape(middle))
-            elif self.simple_url_2_re.match(middle):
+            elif len(middle) <= MAX_URL_LENGTH and self.simple_url_2_re.match(middle):
                 url = smart_urlquote("http://%s" % html.unescape(middle))
             elif ":" not in middle and self.is_email_simple(middle):
                 local, domain = middle.rsplit("@", 1)
@@ -410,7 +419,11 @@ class Urlizer:
                         trimmed_something = True
                         counts[closing] -= strip
 
-            rstripped = middle.rstrip(self.trailing_punctuation_chars_no_semicolon)
+            amp = middle.rfind("&")
+            if amp == -1:
+                rstripped = middle.rstrip(self.trailing_punctuation_chars)
+            else:
+                rstripped = middle.rstrip(self.trailing_punctuation_chars_no_semicolon)
             if rstripped != middle:
                 trail = middle[len(rstripped) :] + trail
                 middle = rstripped
@@ -418,23 +431,20 @@ class Urlizer:
 
             if self.trailing_punctuation_chars_has_semicolon and middle.endswith(";"):
                 # Only strip if not part of an HTML entity.
-                amp = middle.rfind("&")
-                if amp == -1:
-                    can_strip = True
-                else:
-                    potential_entity = middle[amp:]
-                    escaped = html.unescape(potential_entity)
-                    can_strip = (escaped == potential_entity) or escaped.endswith(";")
-
-                if can_strip:
-                    rstripped = middle.rstrip(";")
-                    amount_stripped = len(middle) - len(rstripped)
-                    if amp > -1 and amount_stripped > 1:
-                        # Leave a trailing semicolon as might be an entity.
-                        trail = middle[len(rstripped) + 1 :] + trail
-                        middle = rstripped + ";"
+                potential_entity = middle[amp:]
+                escaped = html.unescape(potential_entity)
+                if escaped == potential_entity or escaped.endswith(";"):
+                    rstripped = middle.rstrip(self.trailing_punctuation_chars)
+                    trail_start = len(rstripped)
+                    amount_trailing_semicolons = len(middle) - len(middle.rstrip(";"))
+                    if amp > -1 and amount_trailing_semicolons > 1:
+                        # Leave up to most recent semicolon as might be an entity.
+                        recent_semicolon = middle[trail_start:].index(";")
+                        middle_semicolon_index = recent_semicolon + trail_start + 1
+                        trail = middle[middle_semicolon_index:] + trail
+                        middle = rstripped + middle[trail_start:middle_semicolon_index]
                     else:
-                        trail = middle[len(rstripped) :] + trail
+                        trail = middle[trail_start:] + trail
                         middle = rstripped
                     trimmed_something = True
 
@@ -450,6 +460,10 @@ class Urlizer:
             p1, p2 = value.split("@")
         except ValueError:
             # value contains more than one @.
+            return False
+        # Max length for domain name labels is 63 characters per RFC 1034.
+        # Helps to avoid ReDoS vectors in the domain part.
+        if len(p2) > 63:
             return False
         # Dot must be in p2 (e.g. example.com)
         if "." not in p2 or p2.startswith("."):

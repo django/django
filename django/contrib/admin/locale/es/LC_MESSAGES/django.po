@@ -10,6 +10,7 @@
 # Ignacio José Lizarán Rus <ilizaran@gmail.com>, 2019
 # Igor Támara <igor@tamarapatino.org>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Jorge Andres Bravo Meza, 2024
 # Jorge Puente Sarrín <puentesarrin@gmail.com>, 2014-2015
 # José Luis <alagunajs@gmail.com>, 2016
 # Josue Naaman Nistal Guerra <josuenistal@hotmail.com>, 2014
@@ -17,17 +18,18 @@
 # Marc Garcia <garcia.marc@gmail.com>, 2011
 # Miguel Angel Tribaldos <mtribaldos@gmail.com>, 2017
 # Miguel Gonzalez <migonzalvar@gmail.com>, 2023
+# Natalia, 2024
 # Pablo, 2015
 # Salomon Herrera, 2023
-# Uriel Medina <urimeba511@gmail.com>, 2020-2023
+# Uriel Medina <urimeba511@gmail.com>, 2020-2024
 # Veronicabh <vero.blazher@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 07:05+0000\n"
-"Last-Translator: Uriel Medina <urimeba511@gmail.com>, 2020-2023\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-10-07 07:05+0000\n"
+"Last-Translator: Uriel Medina <urimeba511@gmail.com>, 2020-2024\n"
 "Language-Team: Spanish (http://app.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
@@ -222,12 +224,6 @@ msgstr ""
 "continuación."
 
 #, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr ""
-"El {name} “{obj}” se agregó correctamente. Puede editarlo nuevamente a "
-"continuación."
-
-#, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
@@ -395,6 +391,9 @@ msgstr "Introduzca un nombre de usuario y contraseña"
 msgid "Change password"
 msgstr "Cambiar contraseña"
 
+msgid "Set password"
+msgstr "Establecer contraseña"
+
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Por favor, corrija el siguiente error."
@@ -406,6 +405,19 @@ msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr ""
 "Introduzca una nueva contraseña para el usuario <strong>%(username)s</"
 "strong>."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+"Esta acción <strong>habilitará</strong> la autenticación basada en "
+"contraseña para este usuario."
+
+msgid "Disable password-based authentication"
+msgstr "Deshabilitar la autenticación basada en contraseña"
+
+msgid "Enable password-based authentication"
+msgstr "Habilitar la autenticación basada en contraseña"
 
 msgid "Skip to main content"
 msgstr "Saltar al contenido principal"

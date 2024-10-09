@@ -206,9 +206,10 @@ class ModelInstanceCreationTests(TestCase):
     def test_save_deprecation(self):
         a = Article(headline="original", pub_date=datetime(2014, 5, 16))
         msg = "Passing positional arguments to save() is deprecated"
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
             a.save(False, False, None, None)
             self.assertEqual(Article.objects.count(), 1)
+        self.assertEqual(ctx.filename, __file__)
 
     def test_save_deprecation_positional_arguments_used(self):
         a = Article()
@@ -259,9 +260,10 @@ class ModelInstanceCreationTests(TestCase):
     async def test_asave_deprecation(self):
         a = Article(headline="original", pub_date=datetime(2014, 5, 16))
         msg = "Passing positional arguments to asave() is deprecated"
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
             await a.asave(False, False, None, None)
             self.assertEqual(await Article.objects.acount(), 1)
+        self.assertEqual(ctx.filename, __file__)
 
     async def test_asave_deprecation_positional_arguments_used(self):
         a = Article()
@@ -658,6 +660,31 @@ class ModelTest(TestCase):
             Article.objects.get,
             headline__startswith="Area",
         )
+
+    def test_is_pk_unset(self):
+        cases = [
+            Article(),
+            Article(id=None),
+        ]
+        for case in cases:
+            with self.subTest(case=case):
+                self.assertIs(case._is_pk_set(), False)
+
+    def test_is_pk_set(self):
+        def new_instance():
+            a = Article(pub_date=datetime.today())
+            a.save()
+            return a
+
+        cases = [
+            Article(id=1),
+            Article(id=0),
+            Article.objects.create(pub_date=datetime.today()),
+            new_instance(),
+        ]
+        for case in cases:
+            with self.subTest(case=case):
+                self.assertIs(case._is_pk_set(), True)
 
 
 class ModelLookupTest(TestCase):

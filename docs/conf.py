@@ -94,7 +94,7 @@ spelling_warning = True
 # templates_path = []
 
 # The suffix of source filenames.
-source_suffix = ".txt"
+source_suffix = {".txt": "restructuredtext"}
 
 # The encoding of source files.
 # source_encoding = 'utf-8-sig'
@@ -182,9 +182,9 @@ pygments_style = "trac"
 # Links to Python's docs should reference the most recent version of the 3.x
 # branch, which is located at this URL.
 intersphinx_mapping = {
-    "python": ("https://docs.python.org/3/", None),
-    "sphinx": ("https://www.sphinx-doc.org/en/master/", None),
-    "psycopg": ("https://www.psycopg.org/psycopg3/docs/", None),
+    "python": ("https://docs.python.org/3", None),
+    "sphinx": ("https://www.sphinx-doc.org/en/master", None),
+    "psycopg": ("https://www.psycopg.org/psycopg3/docs", None),
 }
 
 # Python's docs don't change every week.
@@ -292,8 +292,12 @@ latex_elements = {
         \setmainfont{Symbola}
     """,
     "preamble": r"""
-        \usepackage{newunicodechar}
         \usepackage[UTF8]{ctex}
+        \xeCJKDeclareCharClass{HalfLeft}{"2018, "201C}
+        \xeCJKDeclareCharClass{HalfRight}{
+            "00B7, "2019, "201D, "2013, "2014, "2025, "2026, "2E3A
+        }
+        \usepackage{newunicodechar}
         \newunicodechar{π}{\ensuremath{\pi}}
         \newunicodechar{≤}{\ensuremath{\le}}
         \newunicodechar{≥}{\ensuremath{\ge}}

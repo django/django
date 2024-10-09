@@ -28,6 +28,7 @@ class FieldCacheMixin:
             f"Override {self.__class__.__qualname__}.cache_name instead of "
             "get_cache_name().",
             RemovedInDjango60Warning,
+            stacklevel=3,
         )
         return cache_name
 

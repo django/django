@@ -3636,6 +3636,7 @@ Email
 * :setting:`EMAIL_SUBJECT_PREFIX`
 * :setting:`EMAIL_TIMEOUT`
 * :setting:`EMAIL_USE_LOCALTIME`
+* :setting:`EMAIL_USE_SSL`
 * :setting:`EMAIL_USE_TLS`
 * :setting:`MANAGERS`
 * :setting:`SERVER_EMAIL`

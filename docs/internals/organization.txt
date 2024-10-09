@@ -169,7 +169,7 @@ The steering council is a group of experienced contributors who:
 
 - provide oversight of Django's development and release process,
 - assist in setting the direction of feature development and releases,
-- take part in filling certain roles, and
+- select Mergers and Releasers, and
 - have a tie-breaking vote when other decision-making processes fail.
 
 Their main concern is to maintain the quality and stability of the Django Web
@@ -186,7 +186,6 @@ The steering council holds the following prerogatives:
   the reversion of any particular merge or commit.
 - Announcing calls for proposals and ideas for the future technical direction
   of Django.
-- Setting and adjusting the schedule of releases of Django.
 - Selecting and removing mergers and releasers.
 - Participating in the removal of members of the steering council, when deemed
   appropriate.
@@ -211,10 +210,13 @@ who demonstrate:
   This history must begin at least 18 months prior to the individual's
   candidacy for the Steering Council, and include substantive contributions in
   at least two of these bullet points:
-  - Code contributions on Django projects or major third-party packages in the Django ecosystem
+
+  - Code contributions to Django projects or major third-party packages in the
+    Django ecosystem
   - Reviewing pull requests and/or triaging Django project tickets
   - Documentation, tutorials or blog posts
-  - Discussions about Django on the django-developers mailing list or the Django Forum
+  - Discussions about Django on the django-developers mailing list or the Django
+    Forum
   - Running Django-related events or user groups
 
 - A history of engagement with the direction and future of Django. This does

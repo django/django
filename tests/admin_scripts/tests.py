@@ -25,6 +25,7 @@ from django.core.management import (
     color,
     execute_from_command_line,
 )
+from django.core.management.base import LabelCommand
 from django.core.management.commands.loaddata import Command as LoaddataCommand
 from django.core.management.commands.runserver import Command as RunserverCommand
 from django.core.management.commands.testserver import Command as TestserverCommand
@@ -33,7 +34,7 @@ from django.db.migrations.recorder import MigrationRecorder
 from django.test import LiveServerTestCase, SimpleTestCase, TestCase, override_settings
 from django.test.utils import captured_stderr, captured_stdout
 from django.urls import path
-from django.utils.version import PY313
+from django.utils.version import PY313, get_docs_version
 from django.views.static import serve
 
 from . import urls
@@ -1597,6 +1598,15 @@ class ManageRunserver(SimpleTestCase):
             "Starting development server at http://0.0.0.0:8000/",
             self.output.getvalue(),
         )
+        docs_version = get_docs_version()
+        self.assertIn(
+            "WARNING: This is a development server. Do not use it in a "
+            "production setting. Use a production WSGI or ASGI server instead."
+            "\nFor more information on production servers see: "
+            f"https://docs.djangoproject.com/en/{docs_version}/howto/"
+            "deployment/",
+            self.output.getvalue(),
+        )
 
     def test_on_bind(self):
         self.cmd.addr = "127.0.0.1"
@@ -1604,6 +1614,34 @@ class ManageRunserver(SimpleTestCase):
         self.cmd.on_bind("14437")
         self.assertIn(
             "Starting development server at http://127.0.0.1:14437/",
+            self.output.getvalue(),
+        )
+        docs_version = get_docs_version()
+        self.assertIn(
+            "WARNING: This is a development server. Do not use it in a "
+            "production setting. Use a production WSGI or ASGI server instead."
+            "\nFor more information on production servers see: "
+            f"https://docs.djangoproject.com/en/{docs_version}/howto/"
+            "deployment/",
+            self.output.getvalue(),
+        )
+
+    @mock.patch.dict(os.environ, {"HIDE_PRODUCTION_WARNING": "true"})
+    def test_hide_production_warning_with_environment_variable(self):
+        self.cmd.addr = "0"
+        self.cmd._raw_ipv6 = False
+        self.cmd.on_bind("8000")
+        self.assertIn(
+            "Starting development server at http://0.0.0.0:8000/",
+            self.output.getvalue(),
+        )
+        docs_version = get_docs_version()
+        self.assertNotIn(
+            "WARNING: This is a development server. Do not use it in a "
+            "production setting. Use a production WSGI or ASGI server instead."
+            "\nFor more information on production servers see: "
+            f"https://docs.djangoproject.com/en/{docs_version}/howto/"
+            "deployment/",
             self.output.getvalue(),
         )
 
@@ -2242,6 +2280,20 @@ class CommandTypes(AdminScriptTestCase):
             "False), ('no_color', False), ('pythonpath', None), "
             "('settings', None), ('traceback', False), ('verbosity', 1)]",
         )
+
+    def test_custom_label_command_custom_missing_args_message(self):
+        class Command(LabelCommand):
+            missing_args_message = "Missing argument."
+
+        with self.assertRaisesMessage(CommandError, "Error: Missing argument."):
+            call_command(Command())
+
+    def test_custom_label_command_none_missing_args_message(self):
+        class Command(LabelCommand):
+            missing_args_message = None
+
+        with self.assertRaisesMessage(CommandError, ""):
+            call_command(Command())
 
     def test_suppress_base_options_command_help(self):
         args = ["suppress_base_options_command", "--help"]

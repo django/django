@@ -186,7 +186,9 @@ class TestHashedFiles:
         err = StringIO()
         with self.assertRaisesMessage(RuntimeError, "Max post-process passes exceeded"):
             call_command("collectstatic", interactive=False, verbosity=0, stderr=err)
-        self.assertEqual("Post-processing 'All' failed!\n\n", err.getvalue())
+        self.assertEqual(
+            "Post-processing 'bar.css, foo.css' failed!\n\n", err.getvalue()
+        )
         self.assertPostCondition()
 
     def test_post_processing(self):
@@ -674,7 +676,7 @@ class TestCollectionJSModuleImportAggregationManifestStorage(CollectionTestCase)
 
     def test_module_import(self):
         relpath = self.hashed_file_path("cached/module.js")
-        self.assertEqual(relpath, "cached/module.55fd6938fbc5.js")
+        self.assertEqual(relpath, "cached/module.4326210cf0bd.js")
         tests = [
             # Relative imports.
             b'import testConst from "./module_test.477bbebe77f0.js";',
@@ -686,6 +688,11 @@ class TestCollectionJSModuleImportAggregationManifestStorage(CollectionTestCase)
             b'const dynamicModule = import("./module_test.477bbebe77f0.js");',
             # Creating a module object.
             b'import * as NewModule from "./module_test.477bbebe77f0.js";',
+            # Creating a minified module object.
+            b'import*as m from "./module_test.477bbebe77f0.js";',
+            b'import* as m from "./module_test.477bbebe77f0.js";',
+            b'import *as m from "./module_test.477bbebe77f0.js";',
+            b'import*  as  m from "./module_test.477bbebe77f0.js";',
             # Aliases.
             b'import { testConst as alias } from "./module_test.477bbebe77f0.js";',
             b"import {\n"
@@ -701,7 +708,7 @@ class TestCollectionJSModuleImportAggregationManifestStorage(CollectionTestCase)
 
     def test_aggregating_modules(self):
         relpath = self.hashed_file_path("cached/module.js")
-        self.assertEqual(relpath, "cached/module.55fd6938fbc5.js")
+        self.assertEqual(relpath, "cached/module.4326210cf0bd.js")
         tests = [
             b'export * from "./module_test.477bbebe77f0.js";',
             b'export { testConst } from "./module_test.477bbebe77f0.js";',

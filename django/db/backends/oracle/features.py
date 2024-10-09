@@ -116,6 +116,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             "Oracle requires ORDER BY in row_number, ANSI:SQL doesn't.": {
                 "expressions_window.tests.WindowFunctionTests."
                 "test_row_number_no_ordering",
+                "prefetch_related.tests.PrefetchLimitTests.test_empty_order",
             },
             "Oracle doesn't support changing collations on indexed columns (#33671).": {
                 "migrations.test_operations.OperationTests."
@@ -202,10 +203,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     @cached_property
     def supports_aggregation_over_interval_types(self):
-        return self.connection.oracle_version >= (23,)
-
-    @cached_property
-    def supports_bulk_insert_with_multiple_rows(self):
         return self.connection.oracle_version >= (23,)
 
     @cached_property

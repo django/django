@@ -33,9 +33,40 @@ class AsyncAuthTest(TestCase):
         self.assertIsInstance(user, User)
         self.assertEqual(user.username, self.test_user.username)
 
+    async def test_changed_password_invalidates_aget_user(self):
+        request = HttpRequest()
+        request.session = await self.client.asession()
+        await alogin(request, self.test_user)
+
+        self.test_user.set_password("new_password")
+        await self.test_user.asave()
+
+        user = await aget_user(request)
+
+        self.assertIsNotNone(user)
+        self.assertTrue(user.is_anonymous)
+        # Session should be flushed.
+        self.assertIsNone(request.session.session_key)
+
+    async def test_alogin_new_user(self):
+        request = HttpRequest()
+        request.session = await self.client.asession()
+        await alogin(request, self.test_user)
+        second_user = await User.objects.acreate_user(
+            "testuser2", "test2@example.com", "testpw2"
+        )
+        await alogin(request, second_user)
+        user = await aget_user(request)
+        self.assertIsInstance(user, User)
+        self.assertEqual(user.username, second_user.username)
+
     async def test_alogin_without_user(self):
+        async def auser():
+            return self.test_user
+
         request = HttpRequest()
         request.user = self.test_user
+        request.auser = auser
         request.session = await self.client.asession()
         await alogin(request, None)
         user = await aget_user(request)

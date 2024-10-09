@@ -1,0 +1,13 @@
+==========================
+Django 5.1.3 release notes
+==========================
+
+*Expected November 5, 2024*
+
+Django 5.1.3 fixes several bugs in 5.1.2 and adds compatibility with Python
+3.13.
+
+Bugfixes
+========
+
+* ...

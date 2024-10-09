@@ -92,6 +92,20 @@ class OperationTestCase(TransactionTestCase):
         else:
             self.assertIn([column], [c["columns"] for c in constraints.values()])
 
+    def assertSpatialIndexNotExists(self, table, column, raster=False):
+        with connection.cursor() as cursor:
+            constraints = connection.introspection.get_constraints(cursor, table)
+        if raster:
+            self.assertFalse(
+                any(
+                    "st_convexhull(%s)" % column in c["definition"]
+                    for c in constraints.values()
+                    if c["definition"] is not None
+                )
+            )
+        else:
+            self.assertNotIn([column], [c["columns"] for c in constraints.values()])
+
     def alter_gis_model(
         self,
         migration_class,
@@ -238,6 +252,102 @@ class OperationTests(OperationTestCase):
 
         if connection.features.supports_raster:
             self.assertSpatialIndexExists("gis_neighborhood", "rast", raster=True)
+
+    @skipUnlessDBFeature("can_alter_geometry_field")
+    def test_alter_field_add_spatial_index(self):
+        if not self.has_spatial_indexes:
+            self.skipTest("No support for Spatial indexes")
+
+        self.alter_gis_model(
+            migrations.AddField,
+            "Neighborhood",
+            "point",
+            fields.PointField,
+            field_class_kwargs={"spatial_index": False},
+        )
+        self.assertSpatialIndexNotExists("gis_neighborhood", "point")
+
+        self.alter_gis_model(
+            migrations.AlterField,
+            "Neighborhood",
+            "point",
+            fields.PointField,
+            field_class_kwargs={"spatial_index": True},
+        )
+        self.assertSpatialIndexExists("gis_neighborhood", "point")
+
+    @skipUnlessDBFeature("can_alter_geometry_field")
+    def test_alter_field_remove_spatial_index(self):
+        if not self.has_spatial_indexes:
+            self.skipTest("No support for Spatial indexes")
+
+        self.assertSpatialIndexExists("gis_neighborhood", "geom")
+
+        self.alter_gis_model(
+            migrations.AlterField,
+            "Neighborhood",
+            "geom",
+            fields.MultiPolygonField,
+            field_class_kwargs={"spatial_index": False},
+        )
+        self.assertSpatialIndexNotExists("gis_neighborhood", "geom")
+
+    @skipUnlessDBFeature("can_alter_geometry_field")
+    @skipUnless(connection.vendor == "mysql", "MySQL specific test")
+    def test_alter_field_nullable_with_spatial_index(self):
+        if not self.has_spatial_indexes:
+            self.skipTest("No support for Spatial indexes")
+
+        self.alter_gis_model(
+            migrations.AddField,
+            "Neighborhood",
+            "point",
+            fields.PointField,
+            field_class_kwargs={"spatial_index": False, "null": True},
+        )
+        # MySQL doesn't support spatial indexes on NULL columns.
+        self.assertSpatialIndexNotExists("gis_neighborhood", "point")
+
+        self.alter_gis_model(
+            migrations.AlterField,
+            "Neighborhood",
+            "point",
+            fields.PointField,
+            field_class_kwargs={"spatial_index": True, "null": True},
+        )
+        self.assertSpatialIndexNotExists("gis_neighborhood", "point")
+
+        self.alter_gis_model(
+            migrations.AlterField,
+            "Neighborhood",
+            "point",
+            fields.PointField,
+            field_class_kwargs={"spatial_index": False, "null": True},
+        )
+        self.assertSpatialIndexNotExists("gis_neighborhood", "point")
+
+    @skipUnlessDBFeature("can_alter_geometry_field")
+    def test_alter_field_with_spatial_index(self):
+        if not self.has_spatial_indexes:
+            self.skipTest("No support for Spatial indexes")
+
+        self.alter_gis_model(
+            migrations.AddField,
+            "Neighborhood",
+            "point",
+            fields.PointField,
+            field_class_kwargs={"spatial_index": True},
+        )
+        self.assertSpatialIndexExists("gis_neighborhood", "point")
+
+        self.alter_gis_model(
+            migrations.AlterField,
+            "Neighborhood",
+            "point",
+            fields.PointField,
+            field_class_kwargs={"spatial_index": True, "srid": 3086},
+        )
+        self.assertSpatialIndexExists("gis_neighborhood", "point")
 
     @skipUnlessDBFeature("supports_3d_storage")
     def test_add_3d_field_opclass(self):

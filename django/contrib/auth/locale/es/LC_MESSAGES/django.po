@@ -9,17 +9,19 @@
 # guillem <serra.guillem@gmail.com>, 2012
 # Igor Támara <igor@tamarapatino.org>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Jorge Andres Bravo Meza, 2024
 # Josue Naaman Nistal Guerra <josuenistal@hotmail.com>, 2014
 # Leonardo J. Caballero G. <leonardocaballero@gmail.com>, 2011
-# Uriel Medina <urimeba511@gmail.com>, 2020-2021,2023
+# Natalia, 2024
+# Uriel Medina <urimeba511@gmail.com>, 2020-2021,2023-2024
 # Veronicabh <vero.blazher@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-17 03:19-0500\n"
-"PO-Revision-Date: 2023-12-04 08:09+0000\n"
-"Last-Translator: Uriel Medina <urimeba511@gmail.com>, 2020-2021,2023\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-10-07 08:09+0000\n"
+"Last-Translator: Uriel Medina <urimeba511@gmail.com>, 2020-2021,2023-2024\n"
 "Language-Team: Spanish (http://app.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
@@ -41,12 +43,24 @@ msgstr "Fechas importantes"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "el objeto %(name)s con clave primaria %(key)r no existe."
 
+msgid "Conflicting form data submitted. Please try again."
+msgstr ""
+"Se enviaron datos contradictorios en el formulario. Por favor inténtalo de "
+"nuevo."
+
 msgid "Password changed successfully."
 msgstr "La contraseña se ha cambiado con éxito."
+
+msgid "Password-based authentication was disabled."
+msgstr "La autenticación basada en contraseña fue deshabilitada."
 
 #, python-format
 msgid "Change password: %s"
 msgstr "Cambiar contraseña: %s"
+
+#, python-format
+msgid "Set password: %s"
+msgstr "Establecer contraseña: %s"
 
 msgid "Authentication and Authorization"
 msgstr "Autenticación y autorización"
@@ -63,8 +77,23 @@ msgstr "No se ha establecido la clave."
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Formato de clave incorrecto o algoritmo de hash desconocido."
 
+msgid "Reset password"
+msgstr "Restablecer contraseña"
+
+msgid "Set password"
+msgstr "Establecer contraseña"
+
 msgid "The two password fields didn’t match."
 msgstr "Los dos campos de contraseña no coinciden."
+
+msgid ""
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
+msgstr ""
+"Determina si el usuario podrá autenticarse usando una contraseña. Si está "
+"deshabilitado, el usuario aún podría autenticarse mediante otros métodos, "
+"como Single Sign-On o LDAP."
 
 msgid "Password"
 msgstr "Contraseña"
@@ -75,13 +104,26 @@ msgstr "Contraseña (confirmación)"
 msgid "Enter the same password as before, for verification."
 msgstr "Para verificar, introduzca la misma contraseña anterior."
 
+msgid "Password-based authentication"
+msgstr "Autenticación basada en contraseña"
+
+msgid "Enabled"
+msgstr "Habilitado"
+
+msgid "Disabled"
+msgstr "Deshabilitado"
+
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user’s "
-"password, but you can change the password using <a href=\"{}\">this form</a>."
+"Raw passwords are not stored, so there is no way to see the user’s password."
 msgstr ""
-"Las contraseñas no se almacenan en bruto, así que no hay manera de ver la "
-"contraseña del usuario, pero se puede cambiar la contraseña mediante <a "
-"href=\"{}\">este formulario</a>."
+"Las contraseñas en texto plano no se almacenan, por lo que no se puede ver "
+"la contraseña del usuario."
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
+msgstr ""
+"Habilite la autenticación por contraseña para este usuario estableciendo una "
+"contraseña."
 
 #, python-format
 msgid ""
@@ -109,9 +151,6 @@ msgstr ""
 
 msgid "Old password"
 msgstr "Contraseña antigua"
-
-msgid "Password (again)"
-msgstr "Contraseña (de nuevo)"
 
 msgid "algorithm"
 msgstr "algoritmo"

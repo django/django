@@ -57,7 +57,7 @@ After the previous tutorials, our project should look like this:
 
 .. code-block:: text
 
-    mysite/
+    djangotutorial/
         manage.py
         mysite/
             __init__.py
@@ -90,12 +90,12 @@ After the previous tutorials, our project should look like this:
             admin/
                 base_site.html
 
-You created ``mysite/templates`` in :doc:`Tutorial 7 </intro/tutorial07>`,
-and ``polls/templates`` in :doc:`Tutorial 3 </intro/tutorial03>`. Now perhaps
-it is clearer why we chose to have separate template directories for the
-project and application: everything that is part of the polls application is in
-``polls``. It makes the application self-contained and easier to drop into a
-new project.
+You created ``djangotutorial/templates`` in :doc:`Tutorial 7
+</intro/tutorial07>`, and ``polls/templates`` in
+:doc:`Tutorial 3 </intro/tutorial03>`. Now perhaps it is clearer why we chose
+to have separate template directories for the project and application:
+everything that is part of the polls application is in ``polls``. It makes the
+application self-contained and easier to drop into a new project.
 
 The ``polls`` directory could now be copied into a new Django project and
 immediately reused. It's not quite ready to be published though. For that, we
@@ -237,6 +237,7 @@ this. For a small app like polls, this process isn't too difficult.
            "Programming Language :: Python :: 3.10",
            "Programming Language :: Python :: 3.11",
            "Programming Language :: Python :: 3.12",
+           "Programming Language :: Python :: 3.13",
            "Topic :: Internet :: WWW/HTTP",
            "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
        ]

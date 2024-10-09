@@ -781,6 +781,7 @@ class ForeignObject(RelatedField):
             "ForeignObject.get_joining_columns() is deprecated. Use "
             "get_joining_fields() instead.",
             RemovedInDjango60Warning,
+            stacklevel=2,
         )
         source = self.reverse_related_fields if reverse_join else self.related_fields
         return tuple(
@@ -792,6 +793,7 @@ class ForeignObject(RelatedField):
             "ForeignObject.get_reverse_joining_columns() is deprecated. Use "
             "get_reverse_joining_fields() instead.",
             RemovedInDjango60Warning,
+            stacklevel=2,
         )
         return self.get_joining_columns(reverse_join=True)
 
@@ -1967,7 +1969,7 @@ class ManyToManyField(RelatedField):
         pass
 
     def value_from_object(self, obj):
-        return [] if obj.pk is None else list(getattr(obj, self.attname).all())
+        return list(getattr(obj, self.attname).all()) if obj._is_pk_set() else []
 
     def save_form_data(self, instance, data):
         getattr(instance, self.attname).set(data)

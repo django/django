@@ -24,6 +24,7 @@ from django.db.models.lookups import (
     Exact,
     GreaterThan,
     GreaterThanOrEqual,
+    In,
     IsNull,
     LessThan,
     LessThanOrEqual,
@@ -326,6 +327,13 @@ class LookupTests(TestCase):
         msg = "Cannot use 'limit' or 'offset' with in_bulk()."
         with self.assertRaisesMessage(TypeError, msg):
             Article.objects.all()[0:5].in_bulk([self.a1.id, self.a2.id])
+
+    def test_in_bulk_not_model_iterable(self):
+        msg = "in_bulk() cannot be used with values() or values_list()."
+        with self.assertRaisesMessage(TypeError, msg):
+            Author.objects.values().in_bulk()
+        with self.assertRaisesMessage(TypeError, msg):
+            Author.objects.values_list().in_bulk()
 
     def test_values(self):
         # values() returns a list of dictionaries instead of object instances --
@@ -1503,6 +1511,25 @@ class LookupQueryingTests(TestCase):
             Season.objects.filter(IsNull(F("nulled_text_field"), True)),
             [self.s1, self.s3],
         )
+
+    def test_in_lookup_in_filter(self):
+        test_cases = [
+            ((), ()),
+            ((1942,), (self.s1,)),
+            ((1842,), (self.s2,)),
+            ((2042,), (self.s3,)),
+            ((1942, 1842), (self.s1, self.s2)),
+            ((1942, 2042), (self.s1, self.s3)),
+            ((1842, 2042), (self.s2, self.s3)),
+            ((1942, 1942, 1942), (self.s1,)),
+            ((1942, 2042, 1842), (self.s1, self.s2, self.s3)),
+        ]
+
+        for years, seasons in test_cases:
+            with self.subTest(years=years, seasons=seasons):
+                self.assertSequenceEqual(
+                    Season.objects.filter(In(F("year"), years)).order_by("pk"), seasons
+                )
 
     def test_filter_lookup_lhs(self):
         qs = Season.objects.annotate(before_20=LessThan(F("year"), 2000)).filter(

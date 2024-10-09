@@ -1,6 +1,7 @@
 import os
 import sys
 import threading
+import traceback
 import unittest
 import warnings
 from io import StringIO
@@ -1113,6 +1114,19 @@ class JSONEqualTests(SimpleTestCase):
         with self.assertRaises(AssertionError):
             self.assertJSONNotEqual(valid_json, invalid_json)
 
+    def test_method_frames_ignored_by_unittest(self):
+        try:
+            self.assertJSONEqual("1", "2")
+        except AssertionError:
+            exc_type, exc, tb = sys.exc_info()
+
+        result = unittest.TestResult()
+        result.addFailure(self, (exc_type, exc, tb))
+        stack = traceback.extract_tb(exc.__traceback__)
+        self.assertEqual(len(stack), 1)
+        # Top element in the stack is this method, not assertJSONEqual.
+        self.assertEqual(stack[-1].name, "test_method_frames_ignored_by_unittest")
+
 
 class XMLEqualTests(SimpleTestCase):
     def test_simple_equal(self):
@@ -1200,7 +1214,7 @@ class XMLEqualTests(SimpleTestCase):
 
 
 class SkippingExtraTests(TestCase):
-    fixtures = ["should_not_be_loaded.json"]
+    fixtures = ["person.json"]
 
     # HACK: This depends on internals of our TestCase subclasses
     def __call__(self, result=None):
@@ -2172,6 +2186,8 @@ class AllowedDatabaseQueriesTests(SimpleTestCase):
         finally:
             new_connection.validate_thread_sharing()
             new_connection._close()
+            if hasattr(new_connection, "close_pool"):
+                new_connection.close_pool()
 
 
 class DatabaseAliasTests(SimpleTestCase):

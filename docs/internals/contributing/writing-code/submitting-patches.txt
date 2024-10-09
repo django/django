@@ -6,6 +6,8 @@ We're always grateful for contributions to Django's code. Indeed, bug reports
 with associated contributions will get fixed *far* more quickly than those
 without a solution.
 
+.. _trivial-change:
+
 Typo fixes and trivial documentation changes
 ============================================
 
@@ -52,9 +54,10 @@ and time availability), claim it by following these steps:
 
 .. note::
     The Django software foundation requests that anyone contributing more than
-    a trivial change to Django sign and submit a `Contributor License
-    Agreement`_, this ensures that the Django Software Foundation has clear
-    license to all contributions allowing for a clear license for all users.
+    a :ref:`trivial change <trivial-change>`, to Django sign and submit a
+    `Contributor License Agreement`_, this ensures that the Django Software
+    Foundation has clear license to all contributions allowing for a clear
+    license for all users.
 
 .. _Login using your GitHub account: https://code.djangoproject.com/github/login
 .. _Create an account: https://www.djangoproject.com/accounts/register/
@@ -206,9 +209,10 @@ You should also add a test for the deprecation warning::
 
     def test_foo_deprecation_warning(self):
         msg = "Expected deprecation message"
-        with self.assertWarnsMessage(RemovedInDjangoXXWarning, msg):
+        with self.assertWarnsMessage(RemovedInDjangoXXWarning, msg) as ctx:
             # invoke deprecated behavior
             ...
+        self.assertEqual(ctx.filename, __file__)
 
 It's important to include a ``RemovedInDjangoXXWarning`` comment above code
 which has no warning reference, but will need to be changed or removed when the
@@ -230,6 +234,7 @@ deprecation ends. For example::
         warnings.warn(
             "foo() is deprecated.",
             category=RemovedInDjangoXXWarning,
+            stacklevel=2,
         )
         old_private_helper()
         ...
@@ -257,21 +262,45 @@ JavaScript contributions
 For information on JavaScript contributions, see the :ref:`javascript-patches`
 documentation.
 
+Optimization patches
+====================
+
+Patches aiming to deliver a performance improvement should provide benchmarks
+showing the before and after impact of the patch and sharing the commands for
+reviewers to reproduce.
+
+.. _django-asv-benchmarks:
+
+``django-asv`` benchmarks
+-------------------------
+
+`django-asv`_ monitors the performance of Django code over time. These
+benchmarks can be run on a pull request by labeling the pull request with
+``benchmark``. Adding to these benchmarks is highly encouraged.
+
+.. _django-asv: https://github.com/django/django-asv/
+
 .. _patch-review-checklist:
 
 Contribution checklist
 ======================
 
-Use this checklist to review a pull request. If you are reviewing a pull
-request that is not your own and it passes all the criteria below, please set
-the "Triage Stage" on the corresponding Trac ticket to "Ready for checkin".
+Use this checklist to review a pull request. If this contribution would not be
+:ref:`considered trivial <trivial-change>`, first ensure it has an accepted
+ticket before proceeding with the review.
+
+If the pull request passes all the criteria below and is not your own, please
+set the "Triage Stage" on the corresponding Trac ticket to "Ready for checkin".
 If you've left comments for improvement on the pull request, please tick the
 appropriate flags on the Trac ticket based on the results of your review:
 "Patch needs improvement", "Needs documentation", and/or "Needs tests". As time
 and interest permits, mergers do final reviews of "Ready for checkin" tickets
 and will either commit the changes or bump it back to "Accepted" if further
-work needs to be done. If you're looking to become a merger, doing thorough
-reviews of contributions is a great way to earn trust.
+work needs to be done.
+
+If you're looking to become a member of the `triage & review team
+<https://www.djangoproject.com/foundation/teams/#triage-review-team>`_, doing
+thorough reviews of contributions is a great way to earn trust.
 
 Looking for a patch to review? Check out the "Patches needing review" section
 of the `Django Development Dashboard <https://dashboard.djangoproject.com/>`_.
@@ -331,5 +360,7 @@ All tickets
   :ref:`commit message format <committing-guidelines>`?
 * Are you the patch author and a new contributor? Please add yourself to the
   :source:`AUTHORS` file and submit a `Contributor License Agreement`_.
+* Does this have an accepted ticket on Trac? All contributions require a ticket
+  unless the :ref:`change is considered trivial <trivial-change>`.
 
 .. _Contributor License Agreement: https://www.djangoproject.com/foundation/cla/

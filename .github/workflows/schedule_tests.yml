@@ -19,7 +19,7 @@ jobs:
           - '3.10'
           - '3.11'
           - '3.12'
-          - '3.13-dev'
+          - '3.13'
     name: Windows, SQLite, Python ${{ matrix.python-version }}
     continue-on-error: true
     steps:
@@ -46,7 +46,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.13'
           cache: 'pip'
       - name: Install libmemcached-dev for pylibmc
         run: sudo apt-get install libmemcached-dev
@@ -145,7 +145,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.13'
           cache: 'pip'
           cache-dependency-path: 'tests/requirements/py3.txt'
       - name: Install libmemcached-dev for pylibmc
@@ -181,7 +181,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.13'
           cache: 'pip'
           cache-dependency-path: 'tests/requirements/py3.txt'
       - name: Install libmemcached-dev for pylibmc
@@ -195,3 +195,47 @@ jobs:
         working-directory: ./tests/
         run: |
           python -Wall runtests.py --verbosity 2 --noinput --selenium=chrome --headless --settings=test_postgres --parallel 2
+
+  postgresql:
+    strategy:
+      fail-fast: false
+      matrix:
+        version: [16, 17]
+        server_side_bindings: [0, 1]
+    runs-on: ubuntu-latest
+    name: PostgreSQL Versions
+    env:
+      SERVER_SIDE_BINDING: ${{ matrix.server_side_bindings }}
+    services:
+      postgres:
+        image: postgres:${{ matrix.version }}-alpine
+        env:
+          POSTGRES_DB: django
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip'
+          cache-dependency-path: 'tests/requirements/py3.txt'
+      - name: Install libmemcached-dev for pylibmc
+        run: sudo apt-get install libmemcached-dev
+      - name: Install and upgrade packaging tools
+        run: python -m pip install --upgrade pip setuptools wheel
+      - run: python -m pip install -r tests/requirements/py3.txt -r tests/requirements/postgres.txt -e .
+      - name: Create PostgreSQL settings file
+        run: mv ./.github/workflows/data/test_postgres.py.tpl ./tests/test_postgres.py
+      - name: Run tests
+        working-directory: ./tests/
+        run: python -Wall runtests.py --settings=test_postgres --verbosity=2

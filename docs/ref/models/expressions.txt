@@ -975,9 +975,9 @@ frame includes all rows from the partition to the last row in the set.
 The accepted values for the ``start`` and ``end`` arguments are ``None``, an
 integer, or zero. A negative integer for ``start`` results in ``N PRECEDING``,
 while ``None`` yields ``UNBOUNDED PRECEDING``. In ``ROWS`` mode, a positive
-integer can be used for ```start`` resulting in ``N FOLLOWING``. Positive
+integer can be used for ``start`` resulting in ``N FOLLOWING``. Positive
 integers are accepted for ``end`` and results in ``N FOLLOWING``. In ``ROWS``
-mode, a negative integer can be used for ```end`` resulting in ``N PRECEDING``.
+mode, a negative integer can be used for ``end`` resulting in ``N PRECEDING``.
 For both ``start`` and ``end``, zero will return ``CURRENT ROW``.
 
 There's a difference in what ``CURRENT ROW`` includes. When specified in
@@ -1094,6 +1094,16 @@ calling the appropriate methods on the wrapped expression.
         to apply a function over an empty result set. Defaults to
         :py:data:`NotImplemented` which forces the expression to be computed on
         the database.
+
+    .. attribute:: set_returning
+
+        .. versionadded:: 5.2
+
+        Tells Django that this expression contains a set-returning function,
+        enforcing subquery evaluation. It's used, for example, to allow some
+        Postgres set-returning functions (e.g. ``JSONB_PATH_QUERY``,
+        ``UNNEST``, etc.) to skip optimization and be properly evaluated when
+        annotations spawn rows themselves. Defaults to ``False``.
 
     .. method:: resolve_expression(query=None, allow_joins=True, reuse=None, summarize=False, for_save=False)
 

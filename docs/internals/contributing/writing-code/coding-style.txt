@@ -35,8 +35,8 @@ with them.
 Python style
 ============
 
-* All files should be formatted using the `black`_ auto-formatter. This will be
-  run by ``pre-commit`` if that is configured.
+* All files should be formatted using the :pypi:`black` auto-formatter. This
+  will be run by ``pre-commit`` if that is configured.
 
 * The project repository includes an ``.editorconfig`` file. We recommend using
   a text editor with `EditorConfig`_ support to avoid indentation and
@@ -506,5 +506,4 @@ JavaScript style
 For details about the JavaScript code style used by Django, see
 :doc:`javascript`.
 
-.. _black: https://black.readthedocs.io/en/stable/
 .. _editorconfig: https://editorconfig.org/

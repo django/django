@@ -799,7 +799,9 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             reverse("admin:admin_views_complexsortedperson_changelist"), {}
         )
         # Should have 5 columns (including action checkbox col)
-        self.assertContains(response, '<th scope="col"', count=5)
+        result_list_table_re = re.compile('<table id="result_list">(.*?)</thead>')
+        result_list_table_head = result_list_table_re.search(str(response.content))[0]
+        self.assertEqual(result_list_table_head.count('<th scope="col"'), 5)
 
         self.assertContains(response, "Name")
         self.assertContains(response, "Colored name")
@@ -830,7 +832,11 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
                 reverse("admin:admin_views_%s_changelist" % url), {}
             )
             # Should have 3 columns including action checkbox col.
-            self.assertContains(response, '<th scope="col"', count=3, msg_prefix=url)
+            result_list_table_re = re.compile('<table id="result_list">(.*?)</thead>')
+            result_list_table_head = result_list_table_re.search(str(response.content))[
+                0
+            ]
+            self.assertEqual(result_list_table_head.count('<th scope="col"'), 3)
             # Check if the correct column was selected. 2 is the index of the
             # 'order' column in the model admin's 'list_display' with 0 being
             # the implicit 'action_checkbox' and 1 being the column 'stuff'.
@@ -1502,6 +1508,24 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         self.assertContains(response, "<h1>Change article</h1>")
         self.assertContains(response, "<h2>Article 2</h2>")
 
+    def test_error_in_titles(self):
+        for url, subtitle in [
+            (
+                reverse("admin:admin_views_article_change", args=(self.a1.pk,)),
+                "Article 1 | Change article",
+            ),
+            (reverse("admin:admin_views_article_add"), "Add article"),
+            (reverse("admin:login"), "Log in"),
+            (reverse("admin:password_change"), "Password change"),
+            (
+                reverse("admin:auth_user_password_change", args=(self.superuser.id,)),
+                "Change password: super",
+            ),
+        ]:
+            with self.subTest(url=url, subtitle=subtitle):
+                response = self.client.post(url, {})
+                self.assertContains(response, f"<title>Error: {subtitle}")
+
     def test_view_subtitle_per_object(self):
         viewuser = User.objects.create_user(
             username="viewuser",
@@ -1662,7 +1686,6 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             "APP_DIRS": True,
             "OPTIONS": {
                 "context_processors": [
-                    "django.template.context_processors.debug",
                     "django.template.context_processors.request",
                     "django.contrib.auth.context_processors.auth",
                     "django.contrib.messages.context_processors.messages",
@@ -3003,6 +3026,7 @@ class AdminViewPermissionsTest(TestCase):
         response = self.client.get(
             reverse("admin:admin_views_section_delete", args=(self.s1.pk,))
         )
+        self.assertContains(response, "<h1>Delete</h1>")
         self.assertContains(response, "<h2>Summary</h2>")
         self.assertContains(response, "<li>Articles: 3</li>")
         # test response contains link to related Article
@@ -6152,6 +6176,65 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.take_screenshot("selectbox-non-collapsible")
 
     @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
+    def test_selectbox_selected_rows(self):
+        from selenium.webdriver import ActionChains
+        from selenium.webdriver.common.by import By
+        from selenium.webdriver.common.keys import Keys
+
+        self.admin_login(
+            username="super", password="secret", login_url=reverse("admin:index")
+        )
+        # Create a new user to ensure that no extra permissions have been set.
+        user = User.objects.create_user(username="new", password="newuser")
+        url = self.live_server_url + reverse("admin:auth_user_change", args=[user.id])
+        self.selenium.get(url)
+
+        # Scroll to the User permissions section.
+        user_permissions = self.selenium.find_element(
+            By.CSS_SELECTOR, "#id_user_permissions_from"
+        )
+        ActionChains(self.selenium).move_to_element(user_permissions).perform()
+        self.take_screenshot("selectbox-available-perms-none-selected")
+
+        # Select multiple permissions from the "Available" list.
+        ct = ContentType.objects.get_for_model(Permission)
+        perms = list(Permission.objects.filter(content_type=ct))
+        for perm in perms:
+            elem = self.selenium.find_element(
+                By.CSS_SELECTOR, f"#id_user_permissions_from option[value='{perm.id}']"
+            )
+            ActionChains(self.selenium).key_down(Keys.CONTROL).click(elem).key_up(
+                Keys.CONTROL
+            ).perform()
+
+        # Move focus to other element.
+        self.selenium.find_element(
+            By.CSS_SELECTOR, "#id_user_permissions_input"
+        ).click()
+        self.take_screenshot("selectbox-available-perms-some-selected")
+
+        # Move permissions to the "Chosen" list, but none is selected yet.
+        self.selenium.find_element(
+            By.CSS_SELECTOR, "#id_user_permissions_add_link"
+        ).click()
+        self.take_screenshot("selectbox-chosen-perms-none-selected")
+
+        # Select some permissions from the "Chosen" list.
+        for perm in [perms[0], perms[-1]]:
+            elem = self.selenium.find_element(
+                By.CSS_SELECTOR, f"#id_user_permissions_to option[value='{perm.id}']"
+            )
+            ActionChains(self.selenium).key_down(Keys.CONTROL).click(elem).key_up(
+                Keys.CONTROL
+            ).perform()
+
+        # Move focus to other element.
+        self.selenium.find_element(
+            By.CSS_SELECTOR, "#id_user_permissions_selected_input"
+        ).click()
+        self.take_screenshot("selectbox-chosen-perms-some-selected")
+
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
     def test_first_field_focus(self):
         """JavaScript-assisted auto-focus on first usable form field."""
         from selenium.webdriver.common.by import By
@@ -7497,12 +7580,26 @@ class CSSTest(TestCase):
         # General index page
         response = self.client.get(reverse("admin:index"))
         self.assertContains(response, '<div class="app-admin_views module')
+        self.assertContains(
+            response,
+            '<thead class="visually-hidden"><tr><th scope="col">Model name</th>'
+            '<th scope="col">Add link</th><th scope="col">Change or view list link</th>'
+            "</tr></thead>",
+            html=True,
+        )
         self.assertContains(response, '<tr class="model-actor">')
         self.assertContains(response, '<tr class="model-album">')
 
         # App index page
         response = self.client.get(reverse("admin:app_list", args=("admin_views",)))
         self.assertContains(response, '<div class="app-admin_views module')
+        self.assertContains(
+            response,
+            '<thead class="visually-hidden"><tr><th scope="col">Model name</th>'
+            '<th scope="col">Add link</th><th scope="col">Change or view list link</th>'
+            "</tr></thead>",
+            html=True,
+        )
         self.assertContains(response, '<tr class="model-actor">')
         self.assertContains(response, '<tr class="model-album">')
 
@@ -7656,7 +7753,6 @@ class AdminDocsTest(TestCase):
             "APP_DIRS": True,
             "OPTIONS": {
                 "context_processors": [
-                    "django.template.context_processors.debug",
                     "django.template.context_processors.request",
                     "django.contrib.auth.context_processors.auth",
                     "django.contrib.messages.context_processors.messages",

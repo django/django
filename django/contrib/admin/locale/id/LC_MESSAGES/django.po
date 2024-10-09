@@ -1,22 +1,23 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Bayu Satiyo <itsyuukunz@gmail.com>, 2024
 # Claude Paroz <claude@2xlibre.net>, 2014
-# Fery Setiawan <gembelweb@gmail.com>, 2015-2019,2021-2023
+# Fery Setiawan <gembelweb@gmail.com>, 2015-2019,2021-2024
 # Jannis Leidel <jannis@leidel.info>, 2011
 # M Asep Indrayana <me@drayanaindra.com>, 2015
 # oon arfiandwi (OonID) <oon.arfiandwi@gmail.com>, 2016,2020
 # rodin <romihardiyanto@gmail.com>, 2011-2013
 # rodin <romihardiyanto@gmail.com>, 2013-2017
-# sag᠎e <laymonage@gmail.com>, 2019
+# sag​e <laymonage@gmail.com>, 2019
 # Sutrisno Efendi <kangfend@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 07:05+0000\n"
-"Last-Translator: Fery Setiawan <gembelweb@gmail.com>, 2015-2019,2021-2023\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-10-07 07:05+0000\n"
+"Last-Translator: Fery Setiawan <gembelweb@gmail.com>, 2015-2019,2021-2024\n"
 "Language-Team: Indonesian (http://app.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
@@ -186,7 +187,7 @@ msgstr ""
 "Tekan “Control”, atau “Command” pada Mac, untuk memilih lebih dari satu."
 
 msgid "Select this object for an action - {}"
-msgstr ""
+msgstr "Pilih objek ini untuk suatu aksi - {}"
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -207,11 +208,6 @@ msgid ""
 "The {name} “{obj}” was changed successfully. You may edit it again below."
 msgstr ""
 "{name} “{obj}” berhasil diubah. Anda dapat mengeditnya kembali di bawah."
-
-#, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr ""
-"{name} “{obj}” berhasil ditambahkan. Anda dapat mengeditnya kembali di bawah."
 
 #, python-brace-format
 msgid ""
@@ -375,6 +371,9 @@ msgstr "Masukkan nama pengguna dan sandi."
 msgid "Change password"
 msgstr "Ganti sandi"
 
+msgid "Set password"
+msgstr "Setel sandi"
+
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Harap perbaiki kesalahan dibawah."
@@ -382,6 +381,19 @@ msgstr[0] "Harap perbaiki kesalahan dibawah."
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Masukkan sandi baru untuk pengguna <strong>%(username)s</strong>."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+"Tindakan ini akan <strong>enable</strong> autentifikasi brerdasarkan-sandi "
+"untuk pengguna ini."
+
+msgid "Disable password-based authentication"
+msgstr "Tiadakan autentifikasu berdasarkan-sandi"
+
+msgid "Enable password-based authentication"
+msgstr "Adakan autentifikasu berdasarkan-sandi"
 
 msgid "Skip to main content"
 msgstr "Lewati ke isi utama"
@@ -412,10 +424,10 @@ msgid "Filter"
 msgstr "Filter"
 
 msgid "Hide counts"
-msgstr ""
+msgstr "Sembunyikan hitungan"
 
 msgid "Show counts"
-msgstr ""
+msgstr "Tampilkan hitungan"
 
 msgid "Clear all filters"
 msgstr "Hapus semua penyaringan"
@@ -431,13 +443,13 @@ msgid "Toggle sorting"
 msgstr "Ubah pengurutan"
 
 msgid "Toggle theme (current theme: auto)"
-msgstr ""
+msgstr "Ganti tema (tema saat ini: otomatis)"
 
 msgid "Toggle theme (current theme: light)"
-msgstr ""
+msgstr "Ganti tema (tema saat ini: terang)"
 
 msgid "Toggle theme (current theme: dark)"
-msgstr ""
+msgstr "Ganti tema (tema saat ini: gelap)"
 
 msgid "Delete"
 msgstr "Hapus"
@@ -526,13 +538,13 @@ msgid "None available"
 msgstr "Tidak ada yang tersedia"
 
 msgid "Added:"
-msgstr ""
+msgstr "Ditambahkan:"
 
 msgid "Changed:"
-msgstr ""
+msgstr "Berubah:"
 
 msgid "Deleted:"
-msgstr ""
+msgstr "Dihapus:"
 
 msgid "Unknown content"
 msgstr "Konten tidak diketahui"
@@ -744,7 +756,7 @@ msgid "Reset my password"
 msgstr "Setel ulang sandi saya"
 
 msgid "Select all objects on this page for an action"
-msgstr ""
+msgstr "Pilih semua objek di halaman ini untuk suatu aksi"
 
 msgid "All dates"
 msgstr "Semua tanggal"

@@ -403,8 +403,13 @@ class SQLCompiler:
                 )
                 continue
 
-            ref, *transforms = col.split(LOOKUP_SEP)
-            if expr := self.query.annotations.get(ref):
+            if expr := self.query.annotations.get(col):
+                ref = col
+                transforms = []
+            else:
+                ref, *transforms = col.split(LOOKUP_SEP)
+                expr = self.query.annotations.get(ref)
+            if expr:
                 if self.query.combinator and self.select:
                     if transforms:
                         raise NotImplementedError(

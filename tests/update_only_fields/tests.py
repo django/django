@@ -262,10 +262,11 @@ class UpdateOnlyFieldsTests(TestCase):
 
         msg = "Passing positional arguments to save() is deprecated"
         with (
-            self.assertWarnsMessage(RemovedInDjango60Warning, msg),
+            self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx,
             self.assertNumQueries(0),
         ):
             s.save(False, False, None, [])
+        self.assertEqual(ctx.filename, __file__)
 
     async def test_empty_update_fields_positional_asave(self):
         s = await Person.objects.acreate(name="Sara", gender="F")
@@ -273,8 +274,9 @@ class UpdateOnlyFieldsTests(TestCase):
         s.name = "Other"
 
         msg = "Passing positional arguments to asave() is deprecated"
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
             await s.asave(False, False, None, [])
+        self.assertEqual(ctx.filename, __file__)
 
         # No save occurred for an empty update_fields.
         await s.arefresh_from_db()

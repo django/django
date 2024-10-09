@@ -3,7 +3,7 @@
 # Translators:
 # Jiyoon, Ha <cryptography@konkuk.ac.kr>, 2016
 # DONGHO JEONG <nearermg@gmail.com>, 2020
-# 코딩 영, 2021
+# Dummy Iam, 2021
 # Geonho Kim / Leo Kim <gh.leokim@gmail.com>, 2019
 # Gihun Ham <progh2@gmail.com>, 2018
 # Hang Park <hangpark@kaist.ac.kr>, 2019
@@ -13,21 +13,24 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jay Oh <theanswer.jay@gmail.com>, 2020
 # Le Tartuffe <magno79@gmail.com>, 2014,2016
+# Juyoung Lim, 2024
 # LEE Hwanyong <hwan@ajou.ac.kr>, 2023
 # Seho Noh <iam@sehonoh.kr>, 2018
 # Seacbyul Lee <femizkim@gmail.com>, 2017
+# 최소영, 2024
 # Taesik Yoon <xotlr43@gmail.com>, 2015
 # 정훈 이, 2021
 # 박태진, 2021
 # Yang Chan Woo <oizys18@gmail.com>, 2019
+# Youngkwang Yang, 2024
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-17 02:13-0600\n"
-"PO-Revision-Date: 2023-04-25 07:05+0000\n"
-"Last-Translator: LEE Hwanyong <hwan@ajou.ac.kr>, 2023\n"
-"Language-Team: Korean (http://www.transifex.com/django/django/language/ko/)\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-10-07 07:05+0000\n"
+"Last-Translator: Youngkwang Yang, 2024\n"
+"Language-Team: Korean (http://app.transifex.com/django/django/language/ko/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -195,6 +198,9 @@ msgstr ""
 "하나 이상을 선택하려면 \"Control\" 키를 누른 채로 선택해주세요. Mac의 경우에"
 "는 \"Command\" 키를 눌러주세요."
 
+msgid "Select this object for an action - {}"
+msgstr "작업에 대한 객체를 선택합니다."
+
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr "{name} \"{obj}\"가 성공적으로 추가되었습니다."
@@ -214,12 +220,6 @@ msgid ""
 "The {name} “{obj}” was changed successfully. You may edit it again below."
 msgstr ""
 "{name} \"{obj}\"가 성공적으로 변경되었습니다. 아래에서 다시 수정할 수 있습니"
-"다."
-
-#, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr ""
-"{name} \"{obj}\"가 성공적으로 추가되었습니다. 아래에서 다시 수정할 수 있습니"
 "다."
 
 #, python-brace-format
@@ -359,6 +359,9 @@ msgstr "%(total_count)s개의 %(module_name)s 모두를 선택합니다."
 msgid "Clear selection"
 msgstr "선택 해제"
 
+msgid "Breadcrumbs"
+msgstr "사용자 위치"
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "%(name)s 애플리케이션의 모델"
@@ -385,13 +388,27 @@ msgstr "사용자 이름과 비밀번호를 입력하세요."
 msgid "Change password"
 msgstr "비밀번호 변경"
 
+msgid "Set password"
+msgstr "비밀번호 설정"
+
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] "아래 오류를 수정하기 바랍니다. "
+msgstr[0] "아래 오류들을 수정하기 바랍니다. "
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "<strong>%(username)s</strong> 새로운 비밀번호를 입력하세요."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+
+msgid "Disable password-based authentication"
+msgstr ""
+
+msgid "Enable password-based authentication"
+msgstr ""
 
 msgid "Skip to main content"
 msgstr "메인 콘텐츠로 이동"
@@ -408,9 +425,6 @@ msgstr "문서"
 msgid "Log out"
 msgstr "로그아웃"
 
-msgid "Breadcrumbs"
-msgstr "사용자 위치"
-
 #, python-format
 msgid "Add %(name)s"
 msgstr "%(name)s 추가"
@@ -423,6 +437,12 @@ msgstr "사이트에서 보기"
 
 msgid "Filter"
 msgstr "필터"
+
+msgid "Hide counts"
+msgstr "개수 숨기기"
+
+msgid "Show counts"
+msgstr "개수 표시"
 
 msgid "Clear all filters"
 msgstr "모든 필터 삭제"
@@ -530,6 +550,15 @@ msgstr "나의 활동"
 
 msgid "None available"
 msgstr "이용할 수 없습니다."
+
+msgid "Added:"
+msgstr "추가되었습니다:"
+
+msgid "Changed:"
+msgstr "변경:"
+
+msgid "Deleted:"
+msgstr "삭제:"
 
 msgid "Unknown content"
 msgstr "알 수 없는 형식입니다."
@@ -736,6 +765,9 @@ msgstr "이메일 주소:"
 
 msgid "Reset my password"
 msgstr "비밀번호 초기화"
+
+msgid "Select all objects on this page for an action"
+msgstr "작업에 대한 이 페이지의 모든 객체를 선택합니다."
 
 msgid "All dates"
 msgstr "언제나"

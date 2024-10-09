@@ -8,10 +8,10 @@ Django's strengths is the rich ecosystem of third-party packages. They're
 community developed packages that can be used to quickly improve the feature set
 of an application.
 
-This tutorial will show how to add `Django Debug Toolbar
-<https://django-debug-toolbar.readthedocs.io>`_, a commonly used third-party
-package. The Django Debug Toolbar has ranked in the top three most used
-third-party packages in the Django Developers Survey in recent years.
+This tutorial will show how to add :pypi:`Django Debug Toolbar
+<django-debug-toolbar>`, a commonly used third-party package. The Django Debug
+Toolbar has ranked in the top three most used third-party packages in the
+Django Developers Survey in recent years.
 
 .. admonition:: Where to get help:
 
