@@ -151,11 +151,10 @@ class MinimumLengthValidatorCustomErrorTest(SimpleTestCase):
             def get_error_message(self):
                 return "Your password must be %d characters long" % self.min_length
 
-        expected_error = "Your password must be %d characters long"
+        expected_error = "Your password must be 8 characters long"
 
-        with self.assertRaises(ValidationError) as cm:
+        with self.assertRaisesMessage(ValidationError, expected_error) as cm:
             CustomMinimumLengthValidator().validate("1234567")
-        self.assertEqual(cm.exception.messages, [expected_error % 8])
         self.assertEqual(cm.exception.error_list[0].code, "password_too_short")
 
         with self.assertRaises(ValidationError) as cm:
