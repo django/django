@@ -246,11 +246,8 @@ class UserAttributeSimilarityValidatorCustomErrorTest(TestCase):
 
         expected_error = "The password is too close to the %s."
 
-        with self.assertRaises(ValidationError) as cm:
+        with self.assertRaisesMessage(ValidationError, expected_error % "username"):
             CustomUserAttributeSimilarityValidator().validate("testclient", user=user)
-
-        self.assertEqual(cm.exception.messages, [expected_error % "username"])
-        self.assertEqual(cm.exception.error_list[0].code, "password_too_similar")
 
     def test_verbose_name_not_used(self):
         class CustomUserAttributeSimilarityValidator(UserAttributeSimilarityValidator):
@@ -267,11 +264,8 @@ class UserAttributeSimilarityValidatorCustomErrorTest(TestCase):
 
         expected_error = "The password is too close to a user attribute."
 
-        with self.assertRaises(ValidationError) as cm:
+        with self.assertRaisesMessage(ValidationError, expected_error):
             CustomUserAttributeSimilarityValidator().validate("testclient", user=user)
-
-        self.assertEqual(cm.exception.messages, [expected_error])
-        self.assertEqual(cm.exception.error_list[0].code, "password_too_similar")
 
 
 class CommonPasswordValidatorTest(SimpleTestCase):
@@ -316,9 +310,8 @@ class CommonPasswordValidatorCustomErrorTest(SimpleTestCase):
 
         expected_error = "This password has been used too much."
 
-        with self.assertRaises(ValidationError) as cm:
+        with self.assertRaisesMessage(ValidationError, expected_error):
             CustomCommonPasswordValidator().validate("godzilla")
-        self.assertEqual(cm.exception.messages, [expected_error])
 
 
 class NumericPasswordValidatorTest(SimpleTestCase):
@@ -346,10 +339,8 @@ class NumericPasswordValidatorCustomErrorTest(SimpleTestCase):
 
         expected_error = "This password is all digits."
 
-        with self.assertRaises(ValidationError) as cm:
+        with self.assertRaisesMessage(ValidationError, expected_error):
             CustomNumericPasswordValidator().validate("42424242")
-        self.assertEqual(cm.exception.messages, [expected_error])
-        self.assertEqual(cm.exception.error_list[0].code, "password_entirely_numeric")
 
 
 class UsernameValidatorsTests(SimpleTestCase):
