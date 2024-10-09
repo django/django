@@ -293,7 +293,8 @@ app will still work.
 .. admonition:: When to use :func:`~django.urls.include()`
 
     You should always use ``include()`` when you include other URL patterns.
-    ``admin.site.urls`` is the only exception to this.
+    The only exception is ``admin.site.urls``, which is a pre-built URLconf
+    provided by Django for the default admin site.
 
 You have now wired an ``index`` view into the URLconf. Verify it's working with
 the following command:
