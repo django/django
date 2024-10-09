@@ -1969,7 +1969,7 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
                 ).filter(id=non_utc_model.id, start_trunc__lte=now)
                 self.assertNotEqual(models_qs.count(), 1)
                 adjusted_now = timezone.localtime(now).replace(
-                    tzinfo=zoneinfo.ZoneInfo(key='UTC')
+                    tzinfo=zoneinfo.ZoneInfo(key="UTC")
                 )
                 models_qs = DTModel.objects.annotate(
                     start_trunc=TruncSecond("start_datetime")
