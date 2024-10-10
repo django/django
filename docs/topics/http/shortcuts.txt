@@ -91,7 +91,7 @@ This example is equivalent to::
 ``redirect()``
 ==============
 
-.. function:: redirect(to, *args, permanent=False, **kwargs)
+.. function:: redirect(to, *args, permanent=False, preserve_method=False, **kwargs)
 
    Returns an :class:`~django.http.HttpResponseRedirect` to the appropriate URL
    for the arguments passed.
@@ -109,6 +109,12 @@ This example is equivalent to::
 
    By default issues a temporary redirect; pass ``permanent=True`` to issue a
    permanent redirect.
+
+   If ``preserve_method=True``, the redirect preserves the original HTTP method.
+
+   .. versionchanged:: 5.2
+
+        The argument ``preserve_method`` was added.
 
 Examples
 --------
@@ -157,6 +163,14 @@ will be returned::
         ...
         obj = MyModel.objects.get(...)
         return redirect(obj, permanent=True)
+
+Additionally, the ``preserve_method`` argument can be used to preserve the
+original HTTP method::
+
+    def my_view(request):
+        ...
+        obj = MyModel.objects.get(...)
+        return redirect(obj, preserve_method=True)
 
 ``get_object_or_404()``
 =======================
