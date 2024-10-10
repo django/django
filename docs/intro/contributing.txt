@@ -220,9 +220,15 @@ encounter.
 Now we are ready to run the test suite. If you're using GNU/Linux, macOS, or
 some other flavor of Unix, run:
 
-.. console::
+.. code-block:: console 
 
     $ ./runtests.py
+
+If you're using Windows, run:
+
+.. code-block:: doscon
+
+    ...\> python runtests.py
 
 Now sit back and relax. Django's entire test suite has thousands of tests, and
 it takes at least a few minutes to run, depending on the speed of your
@@ -357,11 +363,18 @@ Running your new test
 
 Since we haven't made any modifications to ``django.shortcuts`` yet, our test
 should fail. Let's run all the tests in the ``shortcuts`` folder to make sure
-that's really what happens. ``cd`` to the Django ``tests/`` directory and run:
+that's really what happens. ``cd`` to the Django ``tests/`` directory and if 
+you're using GNU/Linux, macOS, or some other flavor of Unix, run:
 
-.. console::
+.. code-block:: console
 
     $ ./runtests.py shortcuts
+
+If you're using Windows, run:
+
+.. code-block:: doscon
+
+    ...\> python runtests.py shortcuts
 
 If the tests ran correctly, you should see one failure corresponding to the test
 method we added, with this error:
@@ -386,11 +399,17 @@ bottom, add::
 
 Now we need to make sure that the test we wrote earlier passes, so we can see
 whether the code we added is working correctly. Again, navigate to the Django
-``tests/`` directory and run:
+``tests/`` directory and if you're using GNU/Linux, macOS, or some other flavor of Unix, run:
 
-.. console::
+.. code-block:: console
 
     $ ./runtests.py shortcuts
+
+If you're using Windows, run:
+
+.. code-block:: doscon
+
+    ...\> python runtests.py shortcuts
 
 Everything should pass. If it doesn't, make sure you correctly added the
 function to the correct file.
@@ -405,11 +424,17 @@ passing the entire test suite doesn't guarantee your code is bug free, it does
 help identify many bugs and regressions that might otherwise go unnoticed.
 
 To run the entire Django test suite, ``cd`` into the Django ``tests/``
-directory and run:
+directory and if you're using GNU/Linux, macOS, or some other flavor of Unix, run:
 
-.. console::
+.. code-block:: console
 
     $ ./runtests.py
+
+If you're using windows, run:
+
+.. code-block:: doscon
+
+    ...\> python runtests.py shortcuts
 
 Writing Documentation
 =====================
