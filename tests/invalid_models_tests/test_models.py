@@ -1,3 +1,4 @@
+import sys
 import unittest
 
 from django.core.checks import Error, Warning
@@ -658,13 +659,13 @@ class FieldNamesTests(TestCase):
         models.ForeignKey(
             VeryLongModelNamezzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz,
             models.CASCADE,
-        ).contribute_to_class(m2msimple, long_field_name)
+        ).__set_name__(m2msimple, long_field_name)
 
         models.ForeignKey(
             VeryLongModelNamezzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz,
             models.CASCADE,
             db_column=long_field_name,
-        ).contribute_to_class(m2mcomplex, long_field_name)
+        ).__set_name__(m2mcomplex, long_field_name)
 
         errors = ModelWithLongField.check(databases=("default", "other"))
 
@@ -733,10 +734,10 @@ class FieldNamesTests(TestCase):
 
         long_field_name = "a" * (self.max_column_name_length + 1)
         long_field_name2 = "b" * (self.max_column_name_length + 1)
-        models.CharField(max_length=11).contribute_to_class(
+        models.CharField(max_length=11).__set_name__(
             ModelWithLongField, long_field_name
         )
-        models.CharField(max_length=11, db_column="vlmn").contribute_to_class(
+        models.CharField(max_length=11, db_column="vlmn").__set_name__(
             ModelWithLongField, long_field_name2
         )
         self.assertEqual(
@@ -1817,11 +1818,24 @@ class MultipleAutoFieldsTests(TestCase):
             "Model invalid_models_tests.MultipleAutoFields can't have more "
             "than one auto-generated field."
         )
-        with self.assertRaisesMessage(ValueError, msg):
 
-            class MultipleAutoFields(models.Model):
-                auto1 = models.AutoField(primary_key=True)
-                auto2 = models.AutoField(primary_key=True)
+        if sys.version_info < (3, 12):
+            # For Python < 3.12, the ValueError in type.__new__()
+            # is wrapped in a RuntimeError
+            with self.assertRaises(RuntimeError) as exc:
+
+                class MultipleAutoFields(models.Model):
+                    auto1 = models.AutoField(primary_key=True)
+                    auto2 = models.AutoField(primary_key=True)
+
+            self.assertIsInstance(exc.exception.__cause__, ValueError)
+            self.assertIn(msg, str(exc.exception.__cause__))
+        else:
+            with self.assertRaisesMessage(ValueError, msg):
+
+                class MultipleAutoFields(models.Model):
+                    auto1 = models.AutoField(primary_key=True)
+                    auto2 = models.AutoField(primary_key=True)
 
 
 @isolate_apps("invalid_models_tests")
