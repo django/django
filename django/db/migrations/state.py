@@ -719,7 +719,14 @@ class ModelState:
     """
 
     def __init__(
-        self, app_label, name, fields, options=None, bases=None, managers=None
+        self,
+        app_label,
+        name,
+        fields,
+        options=None,
+        bases=None,
+        managers=None,
+        metaclass=None,
     ):
         self.app_label = app_label
         self.name = name
@@ -729,6 +736,7 @@ class ModelState:
         self.options.setdefault("constraints", [])
         self.bases = bases or (models.Model,)
         self.managers = managers or []
+        self.metaclass = metaclass or models.base.ModelBase
         for name, field in self.fields.items():
             # Sanity-check that fields are NOT already bound to a model.
             if hasattr(field, "model"):
@@ -905,6 +913,7 @@ class ModelState:
             options,
             bases,
             managers,
+            type(model),
         )
 
     def construct_managers(self):
@@ -932,6 +941,7 @@ class ModelState:
             options=dict(self.options),
             bases=self.bases,
             managers=list(self.managers),
+            metaclass=self.metaclass,
         )
 
     def render(self, apps):
@@ -954,10 +964,16 @@ class ModelState:
         body["Meta"] = meta
         body["__module__"] = "__fake__"
 
+        metaclass = (
+            apps.get_model(self.metaclass)
+            if isinstance(self.metaclass, str)
+            else self.metaclass
+        )
+
         # Restore managers
         body.update(self.construct_managers())
         # Then, make a Model object (apps.register_model is called in __new__)
-        return type(self.name, bases, body)
+        return metaclass(self.name, bases, body)
 
     def get_index_by_name(self, name):
         for index in self.options["indexes"]:
