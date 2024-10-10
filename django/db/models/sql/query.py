@@ -1021,6 +1021,17 @@ class Query(BaseExpression):
                 if alias == old_alias:
                     table_aliases[pos] = new_alias
                     break
+
+        # 3. Rename the external aliases of combined queries.
+        for combined_query in self.combined_queries:
+            external_change_map = {
+                alias: aliased
+                for alias, aliased in change_map.items()
+                if alias in combined_query.external_aliases
+            }
+            if external_change_map:
+                combined_query.change_aliases(external_change_map)
+
         self.external_aliases = {
             # Table is aliased or it's being changed and thus is aliased.
             change_map.get(alias, alias): (aliased or alias in change_map)
