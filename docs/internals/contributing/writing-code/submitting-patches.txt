@@ -114,7 +114,7 @@ requirements:
   feature, the change should also contain documentation.
 
 When you think your work is ready to be reviewed, send :doc:`a GitHub pull
-request <working-with-git>`. 
+request <working-with-git>`.
 If you can't send a pull request for some reason, you can also use patches in
 Trac. When using this style, follow these guidelines.
 
@@ -140,20 +140,66 @@ Regardless of the way you submit your work, follow these steps.
 .. _ticket tracker: https://code.djangoproject.com/
 .. _Development dashboard: https://dashboard.djangoproject.com/
 
-Non-trivial contributions
-=========================
+Contributions which require community feedback
+==============================================
 
-A "non-trivial" contribution is one that is more than a small bug fix. It's a
-change that introduces new Django functionality and makes some sort of design
-decision.
+A patch that introduces Django functionality and makes some sort of design
+decision requires a wider community discussion. Especially if the approach
+involves a deprecation or potentially introducing breaking changes.
+Please include evidence that the approach and alternatives have been discussed
+on the `Django Forum`_ or |django-developers| list.
 
-If you provide a non-trivial change, include evidence that alternatives have
-been discussed on the `Django Forum`_ or |django-developers| list.
+Here are a few approaches for gaining feedback from the community:
 
-If you're not sure whether your contribution should be considered non-trivial,
-ask on the ticket for opinions.
+* `Django Forum`_ or |django-developers| mailing list:
+  You can make a proposal on the `Django Forum`_ or |django-developers| mailing list.
+  You should explain the need for the change, go into details of the approach
+  and discuss alternatives. Please include a link to such discussions in your patch.
 
-.. _Django Forum: https://forum.djangoproject.com/
+* Third party package: Django does not accept experimental features.
+  If you need user feedback on a public interface, landing this into
+  Django core is not the way to do it. Iterations must follow the
+  :ref:`deprecation process<internal-release-deprecation-policy>`
+  and can take months or even years for the users to see the benefit of such changes.
+
+  Therefore, in such cases, it is better to create a third-party package which
+  seeks user feedback. The public API can be iterated on and you can validate
+  that there is a need for such a feature.
+
+  Once this package becomes stable and there are clear benefits of
+  incorporating aspects into Django core, starting a discussion on the
+  `Django Forum`_ or |django-developers| mailing list would be the next step.
+
+* Django Enhancement Proposal (DEP): Similar to Python’s PEPs, Django
+  has `Django Enhancement Proposals`_ or DEPs. A DEP is a design document
+  providing information to the Django community, or describing a new feature
+  or process for Django. DEPs provide concise technical specifications of
+  features, along with rationales.
+
+  DEPs are primary mechanisms for proposing and collecting community input on
+  major new features, and for documenting design decisions that have gone into Django.
+
+  Before considering writing a DEP, its recommeneded to first open a discussion
+  on the `Django Forum`_ or |django-developers| mailing list.
+
+  This allows the community to provide feedback and helps refine the proposal.
+  Once the DEP is ready the :ref:`Steering Council <steering-council>`
+  votes on whether to accept it.
+
+  Some examples of DEPs that have been approved and fully implemented:
+
+  * `DEP 181:
+     ORM Expressions
+     <https://github.com/django/deps/blob/main/final/0181-orm-expressions.rst>`_
+  * `DEP 182:
+     Multiple Template Engines
+     <https://github.com/django/deps/blob/main/final/0182-multiple-template-engines.rst>`_
+  * `DEP 201:
+     Simplified routing syntax
+     <https://github.com/django/deps/blob/main/final/0201-simplified-routing-syntax.rst>`_
+
+  .. _Django Forum: https://forum.djangoproject.com/
+  .. _Django Enhancement Proposals: https://github.com/django/deps
 
 .. _deprecating-a-feature:
 
