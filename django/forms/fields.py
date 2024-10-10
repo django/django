@@ -44,7 +44,10 @@ from django.forms.widgets import (
 from django.utils import formats
 from django.utils.choices import normalize_choices
 from django.utils.dateparse import parse_datetime, parse_duration
-from django.utils.deprecation import RemovedInDjango60Warning
+from django.utils.deprecation import (
+    RemovedInDjango60Warning,
+    adjust_stacklevel_for_warning,
+)
 from django.utils.duration import duration_string
 from django.utils.ipv6 import clean_ipv6_address
 from django.utils.regex_helper import _lazy_re_compile
@@ -781,7 +784,7 @@ class URLField(CharField):
                     "transitional setting to True to opt into using 'https' as the new "
                     "default scheme.",
                     RemovedInDjango60Warning,
-                    stacklevel=2,
+                    **adjust_stacklevel_for_warning(__file__),
                 )
                 assume_scheme = "http"
         # RemovedInDjango60Warning: When the deprecation ends, replace with:

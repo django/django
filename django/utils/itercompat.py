@@ -2,7 +2,10 @@
 
 import warnings
 
-from django.utils.deprecation import RemovedInDjango60Warning
+from django.utils.deprecation import (
+    RemovedInDjango60Warning,
+    adjust_stacklevel_for_warning,
+)
 
 
 def is_iterable(x):
@@ -11,7 +14,7 @@ def is_iterable(x):
         "django.utils.itercompat.is_iterable() is deprecated. "
         "Use isinstance(..., collections.abc.Iterable) instead.",
         RemovedInDjango60Warning,
-        stacklevel=2,
+        **adjust_stacklevel_for_warning(__file__),
     )
     try:
         iter(x)

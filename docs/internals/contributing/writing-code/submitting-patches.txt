@@ -114,7 +114,7 @@ requirements:
   feature, the change should also contain documentation.
 
 When you think your work is ready to be reviewed, send :doc:`a GitHub pull
-request <working-with-git>`. 
+request <working-with-git>`.
 If you can't send a pull request for some reason, you can also use patches in
 Trac. When using this style, follow these guidelines.
 
@@ -221,7 +221,10 @@ previous behavior, or standalone items that are unnecessary or unused when the
 deprecation ends. For example::
 
     import warnings
-    from django.utils.deprecation import RemovedInDjangoXXWarning
+    from django.utils.deprecation import (
+        RemovedInDjangoXXWarning,
+        adjust_stacklevel_for_warning,
+    )
 
 
     # RemovedInDjangoXXWarning.
@@ -234,7 +237,7 @@ deprecation ends. For example::
         warnings.warn(
             "foo() is deprecated.",
             category=RemovedInDjangoXXWarning,
-            stacklevel=2,
+            **adjust_stacklevel_for_warning(__file__),
         )
         old_private_helper()
         ...

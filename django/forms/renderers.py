@@ -5,7 +5,10 @@ from pathlib import Path
 from django.conf import settings
 from django.template.backends.django import DjangoTemplates
 from django.template.loader import get_template
-from django.utils.deprecation import RemovedInDjango60Warning
+from django.utils.deprecation import (
+    RemovedInDjango60Warning,
+    adjust_stacklevel_for_warning,
+)
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 
@@ -80,7 +83,7 @@ class DjangoDivFormRenderer(DjangoTemplates):
             "The DjangoDivFormRenderer transitional form renderer is deprecated. Use "
             "DjangoTemplates instead.",
             RemovedInDjango60Warning,
-            stacklevel=2,
+            **adjust_stacklevel_for_warning(__file__),
         )
         super().__init__(*args, **kwargs)
 
@@ -97,7 +100,7 @@ class Jinja2DivFormRenderer(Jinja2):
             "The Jinja2DivFormRenderer transitional form renderer is deprecated. Use "
             "Jinja2 instead.",
             RemovedInDjango60Warning,
-            stacklevel=2,
+            **adjust_stacklevel_for_warning(__file__),
         )
         super().__init__(*args, **kwargs)
 

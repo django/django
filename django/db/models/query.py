@@ -33,7 +33,10 @@ from django.db.models.utils import (
     resolve_callables,
 )
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango60Warning
+from django.utils.deprecation import (
+    RemovedInDjango60Warning,
+    adjust_stacklevel_for_warning,
+)
 from django.utils.functional import cached_property, partition
 
 # The maximum number of results to fetch in a get() query.
@@ -343,13 +346,13 @@ class QuerySet(AltersData):
                     "match the current version %s."
                     % (pickled_version, django.__version__),
                     RuntimeWarning,
-                    stacklevel=2,
+                    **adjust_stacklevel_for_warning(__file__),
                 )
         else:
             warnings.warn(
                 "Pickled queryset instance's Django version is not specified.",
                 RuntimeWarning,
-                stacklevel=2,
+                **adjust_stacklevel_for_warning(__file__),
             )
         self.__dict__.update(state)
 
@@ -2225,7 +2228,7 @@ class Prefetch:
             "Prefetch.get_current_queryset() is deprecated. Use "
             "get_current_querysets() instead.",
             RemovedInDjango60Warning,
-            stacklevel=2,
+            **adjust_stacklevel_for_warning(__file__),
         )
         querysets = self.get_current_querysets(level)
         return querysets[0] if querysets is not None else None
@@ -2532,7 +2535,7 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
             "The usage of get_prefetch_queryset() in prefetch_related_objects() is "
             "deprecated. Implement get_prefetch_querysets() instead.",
             RemovedInDjango60Warning,
-            stacklevel=2,
+            **adjust_stacklevel_for_warning(__file__),
         )
         queryset = None
         if querysets := lookup.get_current_querysets(level):

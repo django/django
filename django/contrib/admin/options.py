@@ -55,7 +55,10 @@ from django.http.response import HttpResponseBase
 from django.template.response import SimpleTemplateResponse, TemplateResponse
 from django.urls import reverse
 from django.utils.decorators import method_decorator
-from django.utils.deprecation import RemovedInDjango60Warning
+from django.utils.deprecation import (
+    RemovedInDjango60Warning,
+    adjust_stacklevel_for_warning,
+)
 from django.utils.html import format_html
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
@@ -983,7 +986,7 @@ class ModelAdmin(BaseModelAdmin):
         warnings.warn(
             "ModelAdmin.log_deletion() is deprecated. Use log_deletions() instead.",
             RemovedInDjango60Warning,
-            stacklevel=2,
+            **adjust_stacklevel_for_warning(__file__),
         )
         from django.contrib.admin.models import DELETION, LogEntry
 
@@ -1010,7 +1013,7 @@ class ModelAdmin(BaseModelAdmin):
                 "The usage of log_deletion() is deprecated. Implement log_deletions() "
                 "instead.",
                 RemovedInDjango60Warning,
-                stacklevel=2,
+                **adjust_stacklevel_for_warning(__file__),
             )
             return [self.log_deletion(request, obj, str(obj)) for obj in queryset]
 

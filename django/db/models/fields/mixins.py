@@ -1,7 +1,11 @@
 import warnings
 
+import django
 from django.core import checks
-from django.utils.deprecation import RemovedInDjango60Warning
+from django.utils.deprecation import (
+    RemovedInDjango60Warning,
+    adjust_stacklevel_for_warning,
+)
 from django.utils.functional import cached_property
 
 NOT_PROVIDED = object()
@@ -28,7 +32,7 @@ class FieldCacheMixin:
             f"Override {self.__class__.__qualname__}.cache_name instead of "
             "get_cache_name().",
             RemovedInDjango60Warning,
-            stacklevel=3,
+            **adjust_stacklevel_for_warning(django.utils.functional.__file__),
         )
         return cache_name
 

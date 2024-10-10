@@ -1,7 +1,11 @@
 import inspect
+import os
 import warnings
 
 from asgiref.sync import iscoroutinefunction, markcoroutinefunction, sync_to_async
+
+import django
+from django.utils.version import PY312
 
 
 class RemovedInDjango60Warning(DeprecationWarning):
@@ -140,3 +144,25 @@ class MiddlewareMixin:
                 thread_sensitive=True,
             )(request, response)
         return response
+
+
+def adjust_stacklevel_for_warning(skip_file_prefixes):
+    def _get_non_django_stacklevel():
+        django_path = os.path.dirname(django.__file__)
+        stacklevel = 1
+        # Exclude current and nested function frames with [2:].
+        for frame_info in inspect.stack()[2:]:
+            filename = os.path.abspath(frame_info.filename)
+            if not filename.startswith(django_path):
+                return stacklevel
+            stacklevel += 1
+        return 1
+
+    if PY312:
+        return {
+            "skip_file_prefixes": (
+                os.path.normpath(os.path.dirname(skip_file_prefixes)),
+            )
+        }
+    else:
+        return {"stacklevel": _get_non_django_stacklevel()}

@@ -1,6 +1,9 @@
 import warnings
 
-from django.utils.deprecation import RemovedInDjango60Warning
+from django.utils.deprecation import (
+    RemovedInDjango60Warning,
+    adjust_stacklevel_for_warning,
+)
 
 try:
     import oracledb
@@ -13,7 +16,7 @@ except ImportError as e:
         warnings.warn(
             "cx_Oracle is deprecated. Use oracledb instead.",
             RemovedInDjango60Warning,
-            stacklevel=2,
+            **adjust_stacklevel_for_warning(__file__),
         )
         is_oracledb = False
     except ImportError:

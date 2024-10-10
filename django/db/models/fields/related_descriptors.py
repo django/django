@@ -81,7 +81,10 @@ from django.db.models.lookups import GreaterThan, LessThanOrEqual
 from django.db.models.query import QuerySet
 from django.db.models.query_utils import DeferredAttribute
 from django.db.models.utils import AltersData, resolve_callables
-from django.utils.deprecation import RemovedInDjango60Warning
+from django.utils.deprecation import (
+    RemovedInDjango60Warning,
+    adjust_stacklevel_for_warning,
+)
 from django.utils.functional import cached_property
 
 
@@ -160,7 +163,7 @@ class ForwardManyToOneDescriptor:
             "get_prefetch_queryset() is deprecated. Use get_prefetch_querysets() "
             "instead.",
             RemovedInDjango60Warning,
-            stacklevel=2,
+            **adjust_stacklevel_for_warning(__file__),
         )
         if queryset is None:
             return self.get_prefetch_querysets(instances)
@@ -452,7 +455,7 @@ class ReverseOneToOneDescriptor:
             "get_prefetch_queryset() is deprecated. Use get_prefetch_querysets() "
             "instead.",
             RemovedInDjango60Warning,
-            stacklevel=2,
+            **adjust_stacklevel_for_warning(__file__),
         )
         if queryset is None:
             return self.get_prefetch_querysets(instances)
@@ -770,7 +773,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
                 "get_prefetch_queryset() is deprecated. Use get_prefetch_querysets() "
                 "instead.",
                 RemovedInDjango60Warning,
-                stacklevel=2,
+                **adjust_stacklevel_for_warning(__file__),
             )
             if queryset is None:
                 return self.get_prefetch_querysets(instances)
@@ -1150,7 +1153,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                 "get_prefetch_queryset() is deprecated. Use get_prefetch_querysets() "
                 "instead.",
                 RemovedInDjango60Warning,
-                stacklevel=2,
+                **adjust_stacklevel_for_warning(__file__),
             )
             if queryset is None:
                 return self.get_prefetch_querysets(instances)

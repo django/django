@@ -20,7 +20,10 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_ipv46_address
 from django.utils._os import to_path
-from django.utils.deprecation import RemovedInDjango60Warning
+from django.utils.deprecation import (
+    RemovedInDjango60Warning,
+    adjust_stacklevel_for_warning,
+)
 from django.utils.functional import cached_property
 
 __all__ = ["HAS_GEOIP2"]
@@ -199,7 +202,7 @@ class GeoIP2:
         warnings.warn(
             "GeoIP2.coords() is deprecated. Use GeoIP2.lon_lat() instead.",
             RemovedInDjango60Warning,
-            stacklevel=2,
+            **adjust_stacklevel_for_warning(__file__),
         )
         data = self.city(query)
         return tuple(data[o] for o in ordering)
@@ -226,6 +229,6 @@ class GeoIP2:
         warnings.warn(
             "GeoIP2.open() is deprecated. Use GeoIP2() instead.",
             RemovedInDjango60Warning,
-            stacklevel=2,
+            **adjust_stacklevel_for_warning(__file__),
         )
         return GeoIP2(full_path, cache)

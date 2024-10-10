@@ -20,6 +20,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.http.cookie import SimpleCookie
 from django.utils import timezone
 from django.utils.datastructures import CaseInsensitiveMapping
+from django.utils.deprecation import adjust_stacklevel_for_warning
 from django.utils.encoding import iri_to_uri
 from django.utils.http import content_disposition_header, http_date
 from django.utils.regex_helper import _lazy_re_compile
@@ -498,7 +499,7 @@ class StreamingHttpResponse(HttpResponseBase):
                 "StreamingHttpResponse must consume asynchronous iterators in order to "
                 "serve them synchronously. Use a synchronous iterator instead.",
                 Warning,
-                stacklevel=2,
+                **adjust_stacklevel_for_warning(__file__),
             )
 
             # async iterator. Consume in async_to_sync and map back.
@@ -519,7 +520,7 @@ class StreamingHttpResponse(HttpResponseBase):
                 "StreamingHttpResponse must consume synchronous iterators in order to "
                 "serve them asynchronously. Use an asynchronous iterator instead.",
                 Warning,
-                stacklevel=2,
+                **adjust_stacklevel_for_warning(__file__),
             )
             # sync iterator. Consume via sync_to_async and yield via async
             # generator.

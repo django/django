@@ -6,6 +6,7 @@ from collections import Counter, defaultdict
 from functools import partial
 
 from django.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
+from django.utils.deprecation import adjust_stacklevel_for_warning
 
 from .config import AppConfig
 
@@ -228,7 +229,7 @@ class Apps:
                     "advised as it can lead to inconsistencies, most notably with "
                     "related models." % (app_label, model_name),
                     RuntimeWarning,
-                    stacklevel=2,
+                    **adjust_stacklevel_for_warning(__file__),
                 )
             else:
                 raise RuntimeError(

@@ -7,7 +7,10 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.urls import NoReverseMatch, reverse
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango60Warning
+from django.utils.deprecation import (
+    RemovedInDjango60Warning,
+    adjust_stacklevel_for_warning,
+)
 from django.utils.text import get_text_list
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
@@ -38,7 +41,7 @@ class LogEntryManager(models.Manager):
         warnings.warn(
             "LogEntryManager.log_action() is deprecated. Use log_actions() instead.",
             RemovedInDjango60Warning,
-            stacklevel=2,
+            **adjust_stacklevel_for_warning(__file__),
         )
         if isinstance(change_message, list):
             change_message = json.dumps(change_message)
@@ -60,7 +63,7 @@ class LogEntryManager(models.Manager):
                 "The usage of log_action() is deprecated. Implement log_actions() "
                 "instead.",
                 RemovedInDjango60Warning,
-                stacklevel=2,
+                **adjust_stacklevel_for_warning(__file__),
             )
             return [
                 self.log_action(
