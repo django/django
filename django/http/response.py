@@ -21,6 +21,7 @@ from django.http.cookie import SimpleCookie
 from django.utils import timezone
 from django.utils.datastructures import CaseInsensitiveMapping
 from django.utils.encoding import iri_to_uri
+from django.utils.functional import cached_property
 from django.utils.http import content_disposition_header, http_date
 from django.utils.regex_helper import _lazy_re_compile
 
@@ -408,6 +409,11 @@ class HttpResponse(HttpResponseBase):
             content = self.make_bytes(value)
         # Create a list of properly encoded bytestrings to support write().
         self._container = [content]
+        self.__dict__.pop("text", None)
+
+    @cached_property
+    def text(self):
+        return self.content.decode(self.charset or "utf-8")
 
     def __iter__(self):
         return iter(self._container)
@@ -458,6 +464,12 @@ class StreamingHttpResponse(HttpResponseBase):
         raise AttributeError(
             "This %s instance has no `content` attribute. Use "
             "`streaming_content` instead." % self.__class__.__name__
+        )
+
+    @property
+    def text(self):
+        raise AttributeError(
+            "This %s instance has no `text` attribute." % self.__class__.__name__
         )
 
     @property
