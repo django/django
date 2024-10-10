@@ -3,6 +3,7 @@ import re
 import unicodedata
 from binascii import Error as BinasciiError
 from datetime import datetime, timezone
+from email.message import Message
 from email.utils import formatdate
 from urllib.parse import quote, unquote
 from urllib.parse import urlencode as original_urlencode
@@ -311,45 +312,39 @@ def escape_leading_slashes(url):
 
 
 def _parseparam(s):
-    while s[:1] == ";":
-        s = s[1:]
-        end = s.find(";")
-        while end > 0 and (s.count('"', 0, end) - s.count('\\"', 0, end)) % 2:
-            end = s.find(";", end + 1)
-        if end < 0:
-            end = len(s)
-        f = s[:end]
-        yield f.strip()
-        s = s[end:]
+    end = s.find(";")
+    while end > 0 and (s.count('"', 0, end) - s.count('\\"', 0, end)) % 2:
+        end = s.find(";", end + 1)
+    if end < 0:
+        end = len(s)
+    return s[:end].strip().lower(), s[end:]
 
 
-def parse_header_parameters(line):
+def _cgi_compatible_params(params, limit):
+    pdict = {}
+    params = list(filter(lambda x: x[0], params))[:limit]
+    for name, value in params:
+        if isinstance(value, tuple):
+            encoding, lang, value = value
+            # email.message params always unquoted with "latin-1"
+            if encoding:
+                value = unquote(quote(value, encoding="latin-1"), encoding=encoding)
+        pdict[name] = value
+
+    return pdict
+
+
+def parse_header_parameters(line, limit=2):
     """
     Parse a Content-type like header.
     Return the main content-type and a dictionary of options.
     """
-    parts = _parseparam(";" + line)
-    key = parts.__next__().lower()
-    pdict = {}
-    for p in parts:
-        i = p.find("=")
-        if i >= 0:
-            has_encoding = False
-            name = p[:i].strip().lower()
-            if name.endswith("*"):
-                # Lang/encoding embedded in the value (like "filename*=UTF-8''file.ext")
-                # https://tools.ietf.org/html/rfc2231#section-4
-                name = name[:-1]
-                if p.count("'") == 2:
-                    has_encoding = True
-            value = p[i + 1 :].strip()
-            if len(value) >= 2 and value[0] == value[-1] == '"':
-                value = value[1:-1]
-                value = value.replace("\\\\", "\\").replace('\\"', '"')
-            if has_encoding:
-                encoding, lang, value = value.split("'")
-                value = unquote(value, encoding=encoding)
-            pdict[name] = value
+    key, params = _parseparam(line)
+    m = Message()
+    m["content-type"] = params
+
+    pdict = _cgi_compatible_params(m.get_params(), limit)
+
     return key, pdict
 
 
