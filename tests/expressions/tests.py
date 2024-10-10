@@ -51,6 +51,7 @@ from django.db.models.expressions import (
     Combinable,
     CombinedExpression,
     NegatedExpression,
+    OutputFieldIsNoneError,
     RawSQL,
     Ref,
 )
@@ -2328,6 +2329,24 @@ class ValueTests(TestCase):
         Time.objects.create()
         time = Time.objects.annotate(one=Value(1, output_field=DecimalField())).first()
         self.assertEqual(time.one, 1)
+
+    def test_output_field_is_none_error(self):
+        """Tests the new OutputFieldIsNoneError error introduced in #35235"""
+        with self.assertRaises(OutputFieldIsNoneError):
+            Employee.objects.annotate(custom_expression=Value(None)).values_list(
+                "custom_expression", flat=True
+            ).first()
+
+    def test_output_field_or_none_property(self):
+        """
+        The _output_field_or_none property was changed from @cached_property
+        to @property in #35235. Rather than write subtests, this test explicitly
+        checks if the property is re-evaluated when the output field is reset
+        """
+        expression = Value(None, output_field=None)
+        self.assertIsNone(expression._output_field_or_none)
+        expression.output_field = BooleanField()
+        self.assertIsInstance(expression._output_field_or_none, BooleanField)
 
     def test_resolve_output_field(self):
         value_types = [
