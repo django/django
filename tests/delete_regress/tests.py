@@ -6,8 +6,10 @@ from django.test import (
     SimpleTestCase,
     TestCase,
     TransactionTestCase,
+    ignore_warnings,
     skipUnlessDBFeature,
 )
+from django.utils.deprecation import RemovedInDjango60Warning
 
 from .models import (
     Award,
@@ -309,6 +311,8 @@ class Ticket19102Tests(TestCase):
         self.assertFalse(Login.objects.filter(pk=self.l1.pk).exists())
         self.assertTrue(Login.objects.filter(pk=self.l2.pk).exists())
 
+    # Entire block can be removed once deprecation period ends.
+    @ignore_warnings(category=RemovedInDjango60Warning)
     @skipUnlessDBFeature("update_can_self_select")
     def test_ticket_19102_extra(self):
         with self.assertNumQueries(1):

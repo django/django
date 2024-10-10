@@ -258,22 +258,26 @@ class SQLCompiler:
         if cols:
             klass_info = {
                 "model": self.query.model,
-                "select_fields": list(
-                    range(
-                        len(self.query.extra_select),
-                        len(self.query.extra_select) + len(cols),
-                    )
-                ),
+                "select_fields": list(range(0, len(cols))),
             }
         selected = []
         if self.query.selected is None:
+            # RemovedInDjango60Warning: place extra(select) entries at the
+            # beginning of the SELECT clause until it's completely removed.
+            leading_annotation_select = []
+            annotation_select = []
+            if self.query.values_select_all:
+                for alias, expression in self.query.annotation_select.items():
+                    if getattr(expression, "implicitly_select_first", False):
+                        leading_annotation_select.append((alias, expression))
+                    else:
+                        annotation_select.append((alias, expression))
+            else:
+                annotation_select = self.query.annotation_select.items()
             selected = [
-                *(
-                    (alias, RawSQL(*args))
-                    for alias, args in self.query.extra_select.items()
-                ),
+                *leading_annotation_select,
                 *((None, col) for col in cols),
-                *self.query.annotation_select.items(),
+                *annotation_select,
             ]
         else:
             for alias, expression in self.query.selected.items():
@@ -329,9 +333,7 @@ class SQLCompiler:
         return ret, klass_info, annotations
 
     def _order_by_pairs(self):
-        if self.query.extra_order_by:
-            ordering = self.query.extra_order_by
-        elif not self.query.default_ordering:
+        if not self.query.default_ordering:
             ordering = self.query.order_by
         elif self.query.order_by:
             ordering = self.query.order_by
@@ -428,35 +430,6 @@ class SQLCompiler:
                 yield OrderBy(expr, descending=descending), False
                 continue
 
-            if "." in field:
-                # This came in through an extra(order_by=...) addition. Pass it
-                # on verbatim.
-                table, col = col.split(".", 1)
-                yield (
-                    OrderBy(
-                        RawSQL(
-                            "%s.%s" % (self.quote_name_unless_alias(table), col), []
-                        ),
-                        descending=descending,
-                    ),
-                    False,
-                )
-                continue
-
-            if self.query.extra and col in self.query.extra:
-                if col in self.query.extra_select:
-                    yield (
-                        OrderBy(
-                            Ref(col, RawSQL(*self.query.extra[col])),
-                            descending=descending,
-                        ),
-                        True,
-                    )
-                else:
-                    yield (
-                        OrderBy(RawSQL(*self.query.extra[col]), descending=descending),
-                        False,
-                    )
             else:
                 if self.query.combinator and self.select:
                     # Don't use the first model's field because other
@@ -550,13 +523,8 @@ class SQLCompiler:
         """
         if name in self.quote_cache:
             return self.quote_cache[name]
-        if (
-            (name in self.query.alias_map and name not in self.query.table_map)
-            or name in self.query.extra_select
-            or (
-                self.query.external_aliases.get(name)
-                and name not in self.query.table_map
-            )
+        if (name in self.query.alias_map and name not in self.query.table_map) or (
+            self.query.external_aliases.get(name) and name not in self.query.table_map
         ):
             self.quote_cache[name] = name
             return name
@@ -2044,7 +2012,6 @@ class SQLUpdateCompiler(SQLCompiler):
         query = self.query.chain(klass=Query)
         query.select_related = False
         query.clear_ordering(force=True)
-        query.extra = {}
         query.select = []
         meta = query.get_meta()
         fields = [meta.pk.name]
