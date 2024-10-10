@@ -12,7 +12,6 @@ from django.core.asgi import get_asgi_application
 from django.core.exceptions import RequestDataTooBig
 from django.core.handlers.asgi import ASGIHandler, ASGIRequest
 from django.core.signals import request_finished, request_started
-from django.db import close_old_connections
 from django.http import HttpResponse, StreamingHttpResponse
 from django.test import (
     AsyncRequestFactory,
@@ -44,10 +43,6 @@ class SignalHandler:
 @override_settings(ROOT_URLCONF="asgi.urls")
 class ASGITest(SimpleTestCase):
     async_request_factory = AsyncRequestFactory()
-
-    def setUp(self):
-        request_started.disconnect(close_old_connections)
-        self.addCleanup(request_started.connect, close_old_connections)
 
     async def test_get_asgi_application(self):
         """

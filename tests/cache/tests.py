@@ -28,7 +28,7 @@ from django.core.cache import (
 from django.core.cache.backends.base import InvalidCacheBackendError
 from django.core.cache.backends.redis import RedisCacheClient
 from django.core.cache.utils import make_template_fragment_key
-from django.db import close_old_connections, connection, connections
+from django.db import connection, connections
 from django.db.backends.utils import CursorWrapper
 from django.http import (
     HttpRequest,
@@ -1584,15 +1584,11 @@ class BaseMemcachedTests(BaseCacheTests):
     def test_close(self):
         # For clients that don't manage their connections properly, the
         # connection is closed when the request is complete.
-        signals.request_finished.disconnect(close_old_connections)
-        try:
-            with mock.patch.object(
-                cache._class, "disconnect_all", autospec=True
-            ) as mock_disconnect:
-                signals.request_finished.send(self.__class__)
-                self.assertIs(mock_disconnect.called, self.should_disconnect_on_close)
-        finally:
-            signals.request_finished.connect(close_old_connections)
+        with mock.patch.object(
+            cache._class, "disconnect_all", autospec=True
+        ) as mock_disconnect:
+            signals.request_finished.send(self.__class__)
+            self.assertIs(mock_disconnect.called, self.should_disconnect_on_close)
 
     def test_set_many_returns_failing_keys(self):
         def fail_set_multi(mapping, *args, **kwargs):
