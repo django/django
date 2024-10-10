@@ -91,6 +91,7 @@ Django's system checks are organized using the following tags:
 * ``templates``: Checks template related configuration.
 * ``translation``: Checks translation related configuration.
 * ``urls``: Checks URL configuration.
+* ``migrations``: Checks migrations related configuration.
 
 Some checks may be registered with multiple tags.
 
@@ -936,3 +937,11 @@ configured:
   :setting:`STATICFILES_DIRS` does not exist.
 * **staticfiles.E005**: The :setting:`STORAGES` setting must define a
   ``staticfiles`` storage.
+
+``migrations``
+--------------
+
+The following checks are performed on the :mod:`django.db.migrations` module:
+
+* **migrations.E001**: The migration commands don't share the same
+  ``autodetector_class``.
