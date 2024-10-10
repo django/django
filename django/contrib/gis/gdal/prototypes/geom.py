@@ -85,6 +85,14 @@ is_3d = bool_output(lgdal.OGR_G_Is3D, [c_void_p])
 set_3d = void_output(lgdal.OGR_G_Set3D, [c_void_p, c_int], errcheck=False)
 is_measured = bool_output(lgdal.OGR_G_IsMeasured, [c_void_p])
 set_measured = void_output(lgdal.OGR_G_SetMeasured, [c_void_p, c_int], errcheck=False)
+has_curve = bool_output(lgdal.OGR_G_HasCurveGeometry, [c_void_p, c_int])
+get_linear_geometry = geom_output(
+    lgdal.OGR_G_GetLinearGeometry, [c_void_p, c_double, POINTER(c_char_p)]
+)
+get_curve_geometry = geom_output(
+    lgdal.OGR_G_GetCurveGeometry, [c_void_p, POINTER(c_char_p)]
+)
+
 
 # Geometry modification routines.
 add_geom = void_output(lgdal.OGR_G_AddGeometry, [c_void_p, c_void_p])
