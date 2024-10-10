@@ -283,7 +283,8 @@ Signals
 Templates
 ~~~~~~~~~
 
-* ...
+* The :ttag:`querystring` template tag now supports multiple positional
+  arguments and positional arguments of type ``dict``.
 
 Tests
 ~~~~~
