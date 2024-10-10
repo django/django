@@ -1428,6 +1428,222 @@ class OperationTests(OperationTestBase):
         self.assertTableNotExists(app_label + "_person")
         self.assertTableExists(app_label + "_other")
 
+    def test_move_model_with_fk(self):
+        app_label_1 = "test_mmw_fk_1"
+        app_label_2 = "test_mmw_fk_2"
+        project_state = self.apply_operations(
+            app_label_1,
+            ProjectState(),
+            operations=[
+                migrations.CreateModel(
+                    "Rider",
+                    fields=[
+                        ("id", models.AutoField(primary_key=True)),
+                    ],
+                ),
+                migrations.CreateModel(
+                    "TempRider",
+                    fields=[
+                        ("id", models.AutoField(primary_key=True)),
+                    ],
+                ),
+            ],
+        )
+        project_state = self.apply_operations(
+            app_label_2,
+            project_state,
+            operations=[
+                migrations.CreateModel(
+                    "Pony",
+                    fields=[
+                        ("id", models.AutoField(primary_key=True)),
+                        (
+                            "riders",
+                            models.ForeignKey(
+                                f"{app_label_1}.TempRider", on_delete=models.CASCADE
+                            ),
+                        ),
+                    ],
+                ),
+            ],
+        )
+
+        self.assertTableExists(f"{app_label_1}_temprider")
+        self.assertTableExists(f"{app_label_2}_pony")
+        temp_rider = project_state.apps.get_model(app_label_1, "TempRider")
+        pony = project_state.apps.get_model(app_label_2, "Pony")
+        pony.objects.create(riders=temp_rider.objects.create())
+
+        project_state = self.apply_operations(
+            app_label_1,
+            project_state,
+            operations=[
+                migrations.AlterModelTable(
+                    "TempRider",
+                    f"{app_label_2}_temprider",
+                ),
+            ],
+        )
+        project_state = self.apply_operations(
+            app_label_2,
+            project_state,
+            operations=[
+                migrations.CreateModel(
+                    "TempRider",
+                    fields=[
+                        ("id", models.AutoField(primary_key=True)),
+                    ],
+                    options={
+                        "managed": False,
+                    },
+                ),
+            ],
+        )
+        project_state = self.apply_operations(
+            app_label_1,
+            project_state,
+            operations=[
+                migrations.AlterModelOptions("TempRider", {"managed": False}),
+            ],
+        )
+        project_state = self.apply_operations(
+            app_label_2,
+            project_state,
+            operations=[
+                migrations.AlterModelOptions("TempRider", {}),
+                migrations.AlterField(
+                    "pony",
+                    name="riders",
+                    field=models.ForeignKey(
+                        on_delete=models.CASCADE, to=f"{app_label_2}.temprider"
+                    ),
+                ),
+            ],
+        )
+        project_state = self.apply_operations(
+            app_label_1,
+            project_state,
+            operations=[
+                migrations.DeleteModel(
+                    "TempRider",
+                ),
+            ],
+        )
+        self.assertTableExists(f"{app_label_2}_temprider")
+        self.assertTableExists(f"{app_label_2}_pony")
+        temp_rider = project_state.apps.get_model(app_label_2, "TempRider")
+        pony = project_state.apps.get_model(app_label_2, "Pony")
+        pony.objects.create(riders=temp_rider.objects.create())
+        self.assertEqual(temp_rider.objects.count(), 2)
+        self.assertEqual(pony.objects.count(), 2)
+
+    def test_move_model_with_inheritance_and_m2m_field(self):
+        app_label_1 = "test_mmw_i_m2m_1"
+        app_label_2 = "test_mmw_i_m2m_2"
+        project_state = self.set_up_test_model(app_label_1, mti_model=True)
+        project_state = self.apply_operations(
+            app_label_2,
+            project_state,
+            operations=[
+                migrations.CreateModel(
+                    "Rider",
+                    fields=[
+                        ("id", models.AutoField(primary_key=True)),
+                        (
+                            "shetlandpony_fk",
+                            models.ForeignKey(
+                                f"{app_label_1}.ShetlandPony", on_delete=models.CASCADE
+                            ),
+                        ),
+                    ],
+                ),
+            ],
+        )
+
+        self.assertTableExists(f"{app_label_1}_shetlandpony")
+        self.assertTableExists(f"{app_label_1}_pony")
+        self.assertTableExists(f"{app_label_2}_rider")
+        shetlandpony = project_state.apps.get_model(app_label_1, "ShetlandPony")
+        rider = project_state.apps.get_model(app_label_2, "Rider")
+        rider.objects.create(shetlandpony_fk=shetlandpony.objects.create(weight=2))
+
+        project_state = self.apply_operations(
+            app_label_1,
+            project_state,
+            operations=[
+                migrations.AlterModelTable(
+                    "ShetlandPony",
+                    f"{app_label_2}_shetlandpony",
+                ),
+            ],
+        )
+        project_state = self.apply_operations(
+            app_label_2,
+            project_state,
+            operations=[
+                migrations.CreateModel(
+                    "ShetlandPony",
+                    fields=[
+                        (
+                            "pony_ptr",
+                            models.OneToOneField(
+                                f"{app_label_1}.Pony",
+                                models.CASCADE,
+                                auto_created=True,
+                                parent_link=True,
+                                primary_key=True,
+                                to_field="id",
+                                serialize=False,
+                            ),
+                        ),
+                        ("cuteness", models.IntegerField(default=1)),
+                    ],
+                    bases=["%s.Pony" % app_label_1],
+                    options={
+                        "managed": False,
+                    },
+                ),
+            ],
+        )
+        project_state = self.apply_operations(
+            app_label_1,
+            project_state,
+            operations=[
+                migrations.AlterModelOptions("ShetlandPony", {"managed": False}),
+            ],
+        )
+        project_state = self.apply_operations(
+            app_label_2,
+            project_state,
+            operations=[
+                migrations.AlterModelOptions("ShetlandPony", {}),
+                migrations.AlterField(
+                    "Rider",
+                    name="shetlandpony_fk",
+                    field=models.ForeignKey(
+                        on_delete=models.CASCADE, to=f"{app_label_2}.ShetlandPony"
+                    ),
+                ),
+            ],
+        )
+        project_state = self.apply_operations(
+            app_label_1,
+            project_state,
+            operations=[
+                migrations.DeleteModel(
+                    "ShetlandPony",
+                ),
+            ],
+        )
+        self.assertTableExists(f"{app_label_2}_shetlandpony")
+        self.assertTableExists(f"{app_label_1}_pony")
+        self.assertTableExists(f"{app_label_2}_rider")
+        shetlandpony = project_state.apps.get_model(app_label_2, "ShetlandPony")
+        rider = project_state.apps.get_model(app_label_2, "Rider")
+        rider.objects.create(shetlandpony_fk=shetlandpony.objects.create(weight=2))
+        self.assertEqual(shetlandpony.objects.count(), 2)
+        self.assertEqual(rider.objects.count(), 2)
+
     def test_add_field(self):
         """
         Tests the AddField operation.

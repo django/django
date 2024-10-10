@@ -29,6 +29,8 @@ class OperationDependency(
         ALTER = 2
         REMOVE_ORDER_WRT = 3
         ALTER_FOO_TOGETHER = 4
+        ALTER_MODEL_OPTIONS = 5
+        ALTER_MODEL_TABLE = 6
 
     @cached_property
     def model_name_lower(self):
@@ -179,6 +181,7 @@ class MigrationAutodetector:
 
         # Renames have to come first
         self.generate_renamed_models()
+        self.generate_moved_models()
 
         # Prepare lists of fields and generate through model map
         self._prepare_field_lists()
@@ -504,6 +507,24 @@ class MigrationAutodetector:
                 and operation.model_name_lower == dependency.model_name_lower
                 and operation.name_lower == dependency.field_name_lower
             )
+        # Model options being altered
+        elif (
+            dependency.field_name is None
+            and dependency.type == OperationDependency.Type.ALTER_MODEL_OPTIONS
+        ):
+            return (
+                isinstance(operation, operations.AlterModelOptions)
+                and operation.name_lower == dependency.model_name_lower
+            )
+        # Model table being altered
+        elif (
+            dependency.field_name is None
+            and dependency.type == OperationDependency.Type.ALTER_MODEL_TABLE
+        ):
+            return (
+                isinstance(operation, operations.AlterModelTable)
+                and operation.name_lower == dependency.model_name_lower
+            )
         # order_with_respect_to being unset for a field
         elif (
             dependency.field_name is not None
@@ -630,6 +651,137 @@ class MigrationAutodetector:
                             self.old_model_keys.remove((rem_app_label, rem_model_name))
                             self.old_model_keys.add((app_label, model_name))
                             break
+
+    def generate_moved_models(self):
+        """
+        Find any moved models, generate the operations for them, and remove
+        the old entry from the model lists. Must be run before other
+        model-level generation.
+        """
+        added_models = self.new_model_keys - self.old_model_keys
+        for app_label, model_name in added_models:
+            model_state = self.to_state.models[app_label, model_name]
+            model_fields_def = self.only_relation_agnostic_fields(model_state.fields)
+            removed_models = self.old_model_keys - self.new_model_keys
+            for rem_app_label, rem_model_name in removed_models:
+                if rem_app_label == app_label:
+                    continue
+                rem_model_state = self.from_state.models[rem_app_label, rem_model_name]
+                rem_model_fields_def = self.only_relation_agnostic_fields(
+                    rem_model_state.fields
+                )
+                if (
+                    model_fields_def == rem_model_fields_def
+                    and not self.questioner.ask_move_model(
+                        rem_model_state,
+                        model_state,
+                    )
+                ):
+                    continue
+                dependencies = []
+                old_table_name = rem_model_state.options.get(
+                    "db_table", f"{rem_app_label}_{rem_model_name}"
+                )
+                new_table_name = model_state.options.get(
+                    "db_table", f"{app_label}_{model_name}"
+                )
+                # If moved model has same table name as it was in old app,
+                # then don't rename table.
+                if old_table_name != new_table_name:
+                    self.add_operation(
+                        rem_app_label,
+                        operations.AlterModelTable(
+                            name=model_name,
+                            table=new_table_name,
+                        ),
+                        beginning=True,
+                    )
+                    dependencies.append(
+                        OperationDependency(
+                            rem_app_label,
+                            model_name,
+                            None,
+                            OperationDependency.Type.ALTER_MODEL_TABLE,
+                        )
+                    )
+                model_state.options["managed"] = False
+                model_state.options["old_app_label"] = rem_app_label
+                # if there are any base models, then add dependencies for them
+                # so that they are created before the model(s) inheriting it.
+                if model_state.bases:
+                    for base in model_state.bases:
+                        if isinstance(base, str) and "." in base:
+                            base_app_label, base_name = base.split(".", 1)
+                            if (base_app_label, base_name) in added_models:
+                                dependencies.append(
+                                    OperationDependency(
+                                        base_app_label,
+                                        base_name,
+                                        None,
+                                        OperationDependency.Type.CREATE,
+                                    )
+                                )
+                self.add_operation(
+                    app_label,
+                    operations.CreateModel(
+                        name=model_name,
+                        fields=[d for d in model_state.fields.items()],
+                        options=model_state.options,
+                        bases=model_state.bases,
+                        managers=model_state.managers,
+                    ),
+                    dependencies=dependencies,
+                )
+                dependencies = list(dependencies) + self._alter_options_for_moved_model(
+                    rem_app_label, app_label, model_name, dependencies
+                )
+                self.add_operation(
+                    rem_app_label,
+                    operations.DeleteModel(name=model_name),
+                    dependencies=dependencies,
+                )
+                self.old_model_keys.remove((rem_app_label, rem_model_name))
+                self.old_model_keys.add((app_label, model_name))
+                self.from_state.add_model(model_state)
+                break
+
+    def _alter_options_for_moved_model(
+        self, rem_app_label, app_label, model_name, dependencies
+    ):
+        dependencies = list(dependencies) + [
+            OperationDependency(
+                app_label, model_name, None, OperationDependency.Type.CREATE
+            )
+        ]
+        # Make a model unmanaged before deleting it.
+        self.add_operation(
+            rem_app_label,
+            operations.AlterModelOptions(name=model_name, options={"managed": False}),
+            dependencies=dependencies,
+        )
+        dependencies = list(dependencies) + [
+            OperationDependency(
+                rem_app_label,
+                model_name,
+                None,
+                OperationDependency.Type.ALTER_MODEL_OPTIONS,
+            )
+        ]
+        # Switch moved model (which was created un-managed) back to managed.
+        self.add_operation(
+            app_label,
+            operations.AlterModelOptions(name=model_name, options={}),
+            dependencies=dependencies,
+        )
+        dependencies = list(dependencies) + [
+            OperationDependency(
+                app_label,
+                model_name,
+                None,
+                OperationDependency.Type.ALTER_MODEL_OPTIONS,
+            )
+        ]
+        return dependencies
 
     def generate_created_models(self):
         """
