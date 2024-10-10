@@ -1465,6 +1465,30 @@ templates used by the :class:`ModelAdmin` views:
 
     See also :ref:`saving-objects-in-the-formset`.
 
+.. warning::
+
+    All ``getter`` methods related to the ``ModelAdmin`` properties return 
+    the properties themselves rather than a copy of their values. This
+    is only an issue if you set the property in a class and then
+    modify its current value dynamically inside a related method. 
+    Let's take :meth:`ModelAdmin.get_readonly_fields` as an example::
+
+        class PersonAdmin(admin.ModelAdmin):
+            readonly_fields = ["name"]
+
+            def get_readonly_fields(request, obj=None):
+                readonly = super().get_readonly_fields(request, obj)
+                if not request.user.is_superuser:
+                    readonly.append("age")  # Edits the class attribute
+
+                return readonly
+
+    This will result in ``"age"`` being added to 
+    the ``PersonAdmin.readonly_fields`` each time 
+    a non-superuser visits this admin page and you
+    might end up with ``readonly_fields = ["name", "age", "age", ...]``
+    even for a **superuser**.
+
 .. method:: ModelAdmin.get_ordering(request)
 
     The ``get_ordering`` method takes a ``request`` as parameter and
