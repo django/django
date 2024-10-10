@@ -5,7 +5,11 @@
     <div class="app-{{ app.app_label }} module{% if app.app_url in request.path|urlencode %} current-app{% endif %}">
       <table>
         <caption>
-          <a href="{{ app.app_url }}" class="section" title="{% blocktranslate with name=app.name %}Models in the {{ name }} application{% endblocktranslate %}">{{ app.name }}</a>
+          {% if app.app_url %}
+            <a href="{{ app.app_url }}" class="section" title="{% blocktranslate with name=app.name %}Models in the {{ name }} application{% endblocktranslate %}">{{ app.name }}</a>
+          {% else %}
+            <span class="section">{{ app.name }}</span>
+          {% endif %}
         </caption>
         <thead class="visually-hidden">
           <tr>
