@@ -1274,3 +1274,42 @@ class RemoveConstraint(IndexOperation):
     @property
     def migration_name_fragment(self):
         return "remove_%s_%s" % (self.model_name_lower, self.name.lower())
+
+
+class AlterConstraint(IndexOperation):
+    category = OperationCategory.ALTERATION
+    option_name = "constraints"
+
+    def __init__(self, model_name, name, constraint):
+        self.model_name = model_name
+        self.name = name
+        self.constraint = constraint
+
+    def state_forwards(self, app_label, state):
+        state.alter_constraint(
+            app_label, self.model_name_lower, self.name, self.constraint
+        )
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        pass
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        pass
+
+    def deconstruct(self):
+        return (
+            self.__class__.__name__,
+            [],
+            {
+                "model_name": self.model_name,
+                "name": self.name,
+                "constraint": self.constraint,
+            },
+        )
+
+    def describe(self):
+        return f"Alter constraint {self.name} on {self.model_name}"
+
+    @property
+    def migration_name_fragment(self):
+        return f"alter_{self.model_name_lower}_{self.constraint.name.lower()}"
