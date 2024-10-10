@@ -145,6 +145,22 @@ class MinimumLengthValidatorTest(SimpleTestCase):
         )
 
 
+class MinimumLengthValidatorCustomErrorTest(SimpleTestCase):
+    def test(self):
+        class CustomMinimumLengthValidator(MinimumLengthValidator):
+            def get_error_message(self):
+                return "Your password must be %d characters long" % self.min_length
+
+        expected_error = "Your password must be %d characters long"
+
+        with self.assertRaisesMessage(ValidationError, expected_error % 8) as cm:
+            CustomMinimumLengthValidator().validate("1234567")
+        self.assertEqual(cm.exception.error_list[0].code, "password_too_short")
+
+        with self.assertRaisesMessage(ValidationError, expected_error % 3) as cm:
+            CustomMinimumLengthValidator(min_length=3).validate("12")
+
+
 class UserAttributeSimilarityValidatorTest(TestCase):
     def test_validate(self):
         user = User.objects.create_user(
@@ -214,6 +230,44 @@ class UserAttributeSimilarityValidatorTest(TestCase):
         )
 
 
+class UserAttributeSimilarityValidatorCustomErrorTest(TestCase):
+    def test(self):
+        class CustomUserAttributeSimilarityValidator(UserAttributeSimilarityValidator):
+            def get_error_message(self):
+                return "The password is too close to the %(verbose_name)s."
+
+        user = User.objects.create_user(
+            username="testclient",
+            password="password",
+            email="testclient@example.com",
+            first_name="Test",
+            last_name="Client",
+        )
+
+        expected_error = "The password is too close to the %s."
+
+        with self.assertRaisesMessage(ValidationError, expected_error % "username"):
+            CustomUserAttributeSimilarityValidator().validate("testclient", user=user)
+
+    def test_verbose_name_not_used(self):
+        class CustomUserAttributeSimilarityValidator(UserAttributeSimilarityValidator):
+            def get_error_message(self):
+                return "The password is too close to a user attribute."
+
+        user = User.objects.create_user(
+            username="testclient",
+            password="password",
+            email="testclient@example.com",
+            first_name="Test",
+            last_name="Client",
+        )
+
+        expected_error = "The password is too close to a user attribute."
+
+        with self.assertRaisesMessage(ValidationError, expected_error):
+            CustomUserAttributeSimilarityValidator().validate("testclient", user=user)
+
+
 class CommonPasswordValidatorTest(SimpleTestCase):
     def test_validate(self):
         expected_error = "This password is too common."
@@ -248,6 +302,18 @@ class CommonPasswordValidatorTest(SimpleTestCase):
         )
 
 
+class CommonPasswordValidatorCustomErrorTest(SimpleTestCase):
+    def test(self):
+        class CustomCommonPasswordValidator(CommonPasswordValidator):
+            def get_error_message(self):
+                return "This password has been used too much."
+
+        expected_error = "This password has been used too much."
+
+        with self.assertRaisesMessage(ValidationError, expected_error):
+            CustomCommonPasswordValidator().validate("godzilla")
+
+
 class NumericPasswordValidatorTest(SimpleTestCase):
     def test_validate(self):
         expected_error = "This password is entirely numeric."
@@ -263,6 +329,18 @@ class NumericPasswordValidatorTest(SimpleTestCase):
             NumericPasswordValidator().get_help_text(),
             "Your password can’t be entirely numeric.",
         )
+
+
+class NumericPasswordValidatorCustomErrorTest(SimpleTestCase):
+    def test(self):
+        class CustomNumericPasswordValidator(NumericPasswordValidator):
+            def get_error_message(self):
+                return "This password is all digits."
+
+        expected_error = "This password is all digits."
+
+        with self.assertRaisesMessage(ValidationError, expected_error):
+            CustomNumericPasswordValidator().validate("42424242")
 
 
 class UsernameValidatorsTests(SimpleTestCase):
