@@ -2017,6 +2017,14 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         backend = smtp.EmailBackend(ssl_certfile="bar")
         self.assertEqual(backend.ssl_certfile, "bar")
 
+    def test_email_set_ssl_cafile(self):
+        backend = smtp.EmailBackend(ssl_cafile="bar")
+        self.assertEqual(backend.ssl_cafile, "bar")
+
+    def test_email_ssl_cafile_default_disabled(self):
+        backend = smtp.EmailBackend()
+        self.assertIsNone(backend.ssl_cafile)
+
     def test_email_ssl_certfile_default_disabled(self):
         backend = smtp.EmailBackend()
         self.assertIsNone(backend.ssl_certfile)
