@@ -15,7 +15,7 @@
   </h2>
   {% if inline_admin_formset.is_collapsible %}</summary>{% endif %}
    {{ inline_admin_formset.formset.non_form_errors }}
-   <table>
+   <table class="tabular_inline_table">
      <thead><tr>
        <th class="original"></th>
      {% for field in inline_admin_formset.fields %}
