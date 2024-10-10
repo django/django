@@ -1,4 +1,5 @@
 import fnmatch
+import logging
 import os
 import shutil
 import subprocess
@@ -169,7 +170,11 @@ def run_formatters(written_files, black_path=(sentinel := object())):
     if black_path is sentinel:
         black_path = shutil.which("black")
     if black_path:
-        subprocess.run(
-            [black_path, "--fast", "--", *written_files],
-            capture_output=True,
-        )
+        try:
+            subprocess.run(
+                [black_path, "--fast", "--", *written_files],
+                capture_output=True,
+            )
+        except OSError:
+            logger = logging.getLogger(__name__)
+            logger.warning("Black failed to launch.", exc_info=True)
