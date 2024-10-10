@@ -171,6 +171,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             "AutoField",
             "BigAutoField",
             "SmallAutoField",
+            "UUID4AutoField",
         }
         old_is_auto = old_internal_type in auto_field_types
         new_is_auto = new_internal_type in auto_field_types
@@ -234,6 +235,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 "AutoField": "integer",
                 "BigAutoField": "bigint",
                 "SmallAutoField": "smallint",
+                "UUID4AutoField": "uuid",
             }
             # Alter the sequence type if exists (Django 4.1+ identity columns
             # don't have it).
