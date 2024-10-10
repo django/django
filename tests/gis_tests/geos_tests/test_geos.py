@@ -1188,10 +1188,8 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
 
             # Testing __getitem__ (doesn't work on Point or Polygon)
             if isinstance(g, Point):
-                # IndexError is not raised in GEOS 3.8.0.
-                if geos_version_tuple() != (3, 8, 0):
-                    with self.assertRaises(IndexError):
-                        g.x
+                with self.assertRaises(IndexError):
+                    g.x
             elif isinstance(g, Polygon):
                 lr = g.shell
                 self.assertEqual("LINEARRING EMPTY", lr.wkt)
