@@ -491,6 +491,11 @@ class MemSize(GeoFunc):
     arity = 1
 
 
+class NumDimensions(GeoFunc):
+    output_field = IntegerField()
+    arity = 1
+
+
 class NumGeometries(GeoFunc):
     output_field = IntegerField()
     arity = 1

@@ -11,7 +11,15 @@ from django.db.models import IntegerField, Sum, Value
 from django.test import TestCase, skipUnlessDBFeature
 
 from ..utils import FuncTestMixin
-from .models import City, Country, CountryWebMercator, ManyPointModel, State, Track
+from .models import (
+    City,
+    Country,
+    CountryWebMercator,
+    ManyPointModel,
+    State,
+    ThreeDimensionalFeature,
+    Track,
+)
 
 
 class GISFunctionsTests(FuncTestMixin, TestCase):
@@ -575,6 +583,23 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
                 self.assertIsNone(city.num_geom)
             else:
                 self.assertEqual(1, city.num_geom)
+
+    @skipUnlessDBFeature("has_NumDimensions_function")
+    def test_num_dimensions(self):
+        for c in Country.objects.annotate(num_dims=functions.NumDimensions("mpoly")):
+            self.assertEqual(2, c.num_dims)
+
+        ThreeDimensionalFeature.objects.create(
+            name="London", geom=Point(-0.126418, 51.500832, 0)
+        )
+        qs = ThreeDimensionalFeature.objects.annotate(
+            num_dims=functions.NumDimensions("geom")
+        )
+        self.assertEqual(qs[0].num_dims, 3)
+
+        msg = "'NumDimensions' takes exactly 1 argument (2 given)"
+        with self.assertRaisesMessage(TypeError, msg):
+            Country.objects.annotate(num_dims=functions.NumDimensions("point", "error"))
 
     @skipUnlessDBFeature("has_NumPoint_function")
     def test_num_points(self):
