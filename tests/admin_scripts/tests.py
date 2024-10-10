@@ -2793,7 +2793,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
 
     def test_custom_project_destination_missing(self):
         """
-        Make sure an exception is raised when the provided
+        Create the directory when the provided
         destination directory doesn't exist
         """
         template_path = os.path.join(custom_templates_dir, "project_template")
@@ -2807,12 +2807,8 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         testproject_dir = os.path.join(self.test_dir, "project_dir2")
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
-        self.assertOutput(
-            err,
-            "Destination directory '%s' does not exist, please create it first."
-            % testproject_dir,
-        )
-        self.assertFalse(os.path.exists(testproject_dir))
+        self.assertNoOutput(err)
+        self.assertTrue(os.path.exists(testproject_dir))
 
     def test_custom_project_template_with_non_ascii_templates(self):
         """
@@ -3038,6 +3034,21 @@ class StartApp(AdminScriptTestCase):
                 'name = "new_app"' if HAS_BLACK else "name = 'new_app'",
                 content,
             )
+
+    def test_custom_app_destination_missing(self):
+        """
+        Create the directory when the provided destination directory doesn't exist
+        """
+        args = [
+            "startapp",
+            "my_app",
+            "my_app",
+        ]
+        testapp_dir = os.path.join(self.test_dir, "my_app")
+        out, err = self.run_django_admin(args)
+        self.assertNoOutput(out)
+        self.assertNoOutput(err)
+        self.assertTrue(os.path.exists(testapp_dir))
 
 
 class DiffSettings(AdminScriptTestCase):
