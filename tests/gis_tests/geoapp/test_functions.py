@@ -412,7 +412,7 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             else:
                 self.assertIs(c.inter.empty, True)
 
-    @skipUnlessDBFeature("supports_empty_geometries", "has_IsEmpty_function")
+    @skipUnlessDBFeature("has_IsEmpty_function")
     def test_isempty(self):
         empty = City.objects.create(name="Nowhere", point=Point(srid=4326))
         City.objects.create(name="Somewhere", point=Point(6.825, 47.1, srid=4326))
