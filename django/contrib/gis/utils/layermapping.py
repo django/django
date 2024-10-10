@@ -650,6 +650,14 @@ class LayerMapping:
                             else:
                                 geom = geom_value.ogr
                                 new = OGRGeometry(kwargs[self.geom_field])
+                                if (
+                                    geom_typeid := geom.geos.geom_typeid
+                                ) in self.MULTI_TYPES:
+                                    # Database returned non-MULTI type, reconvert.
+                                    multi_type = self.MULTI_TYPES[geom_typeid]
+                                    g = OGRGeometry(multi_type)
+                                    g.add(geom)
+                                    geom = g
                                 for g in new:
                                     geom.add(g)
                             setattr(m, self.geom_field, geom.wkt)
