@@ -1,6 +1,9 @@
+from unittest import mock
+
 from django.template.defaultfilters import urlize
 from django.test import SimpleTestCase
 from django.utils.functional import lazy
+from django.utils.html import Urlizer
 from django.utils.safestring import mark_safe
 
 from ..utils import setup
@@ -466,4 +469,38 @@ class FunctionTests(SimpleTestCase):
         self.assertEqual(
             urlize(prepend_www("google.com")),
             '<a href="http://www.google.com" rel="nofollow">www.google.com</a>',
+        )
+
+    @mock.patch.object(Urlizer, "handle_word", return_value="test")
+    def test_caching_repeated_words(self, mock_handle_word):
+        urlize("test test test test")
+        common_handle_word_args = {
+            "safe_input": False,
+            "trim_url_limit": None,
+            "nofollow": True,
+            "autoescape": True,
+        }
+        self.assertEqual(
+            mock_handle_word.mock_calls,
+            [
+                mock.call("test", **common_handle_word_args),
+                mock.call(" ", **common_handle_word_args),
+            ],
+        )
+
+    @mock.patch.object(Urlizer, "handle_word", return_value="test")
+    def test_caching_repeated_calls(self, mock_handle_word):
+        urlize("test")
+        handle_word_test = mock.call(
+            "test",
+            safe_input=False,
+            trim_url_limit=None,
+            nofollow=True,
+            autoescape=True,
+        )
+        self.assertEqual(mock_handle_word.mock_calls, [handle_word_test])
+
+        urlize("test")
+        self.assertEqual(
+            mock_handle_word.mock_calls, [handle_word_test, handle_word_test]
         )
