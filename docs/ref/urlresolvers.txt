@@ -7,8 +7,8 @@
 ``reverse()``
 =============
 
-If you need to use something similar to the :ttag:`url` template tag in
-your code, Django provides the following function:
+The ``reverse()`` function can be used to return an absolute path reference
+for a given view and optional parameters, similar to the :ttag:`url` tag:
 
 .. function:: reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None)
 
