@@ -174,10 +174,14 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault("is_superuser", False)
         return self._create_user(username, email, password, **extra_fields)
 
+    create_user.alters_data = True
+
     async def acreate_user(self, username, email=None, password=None, **extra_fields):
         extra_fields.setdefault("is_staff", False)
         extra_fields.setdefault("is_superuser", False)
         return await self._acreate_user(username, email, password, **extra_fields)
+
+    acreate_user.alters_data = True
 
     def create_superuser(self, username, email=None, password=None, **extra_fields):
         extra_fields.setdefault("is_staff", True)
@@ -189,6 +193,8 @@ class UserManager(BaseUserManager):
             raise ValueError("Superuser must have is_superuser=True.")
 
         return self._create_user(username, email, password, **extra_fields)
+
+    create_superuser.alters_data = True
 
     async def acreate_superuser(
         self, username, email=None, password=None, **extra_fields
@@ -202,6 +208,8 @@ class UserManager(BaseUserManager):
             raise ValueError("Superuser must have is_superuser=True.")
 
         return await self._acreate_user(username, email, password, **extra_fields)
+
+    acreate_superuser.alters_data = True
 
     def with_perm(
         self, perm, is_active=True, include_superusers=True, backend=None, obj=None

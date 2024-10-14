@@ -392,6 +392,22 @@ Miscellaneous
 * The :func:`~django.template.context_processors.debug` context processor is no
   longer included in the default project template.
 
+* The following methods now have ``alters_data=True`` set to prevent side
+  effects when :ref:`rendering a template context <alters-data-description>`:
+
+  * :meth:`.UserManager.create_user`
+  * :meth:`.UserManager.acreate_user`
+  * :meth:`.UserManager.create_superuser`
+  * :meth:`.UserManager.acreate_superuser`
+  * :meth:`.QuerySet.create`
+  * :meth:`.QuerySet.acreate`
+  * :meth:`.QuerySet.bulk_create`
+  * :meth:`.QuerySet.abulk_create`
+  * :meth:`.QuerySet.get_or_create`
+  * :meth:`.QuerySet.aget_or_create`
+  * :meth:`.QuerySet.update_or_create`
+  * :meth:`.QuerySet.aupdate_or_create`
+
 .. _deprecated-features-5.2:
 
 Features deprecated in 5.2
