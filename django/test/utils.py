@@ -380,7 +380,6 @@ def get_runner(settings, test_runner_class=None):
     test_module = __import__(test_module_name, {}, {}, test_path[-1])
     return getattr(test_module, test_path[-1])
 
-
 class TestContextDecorator:
     """
     A base class that can either be used as a context manager during tests

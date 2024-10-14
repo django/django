@@ -53,6 +53,7 @@ class DebugSQLTextTestResult(unittest.TextTestResult):
         self.debug_sql_stream = StringIO()
         self.handler = logging.StreamHandler(self.debug_sql_stream)
         self.logger.addHandler(self.handler)
+        self.logger.info(f"Starting test: {test}")
         super().startTest(test)
 
     def stopTest(self, test):
