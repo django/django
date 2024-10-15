@@ -630,7 +630,7 @@ class JsonResponseTests(SimpleTestCase):
     def test_json_response_non_ascii(self):
         data = {"key": "łóżko"}
         response = JsonResponse(data)
-        self.assertEqual(json.loads(response.content.decode()), data)
+        self.assertEqual(json.loads(response.text), data)
 
     def test_json_response_raises_type_error_with_default_setting(self):
         with self.assertRaisesMessage(
@@ -642,16 +642,16 @@ class JsonResponseTests(SimpleTestCase):
 
     def test_json_response_text(self):
         response = JsonResponse("foobar", safe=False)
-        self.assertEqual(json.loads(response.content.decode()), "foobar")
+        self.assertEqual(json.loads(response.text), "foobar")
 
     def test_json_response_list(self):
         response = JsonResponse(["foo", "bar"], safe=False)
-        self.assertEqual(json.loads(response.content.decode()), ["foo", "bar"])
+        self.assertEqual(json.loads(response.text), ["foo", "bar"])
 
     def test_json_response_uuid(self):
         u = uuid.uuid4()
         response = JsonResponse(u, safe=False)
-        self.assertEqual(json.loads(response.content.decode()), str(u))
+        self.assertEqual(json.loads(response.text), str(u))
 
     def test_json_response_custom_encoder(self):
         class CustomDjangoJSONEncoder(DjangoJSONEncoder):
@@ -659,11 +659,11 @@ class JsonResponseTests(SimpleTestCase):
                 return json.dumps({"foo": "bar"})
 
         response = JsonResponse({}, encoder=CustomDjangoJSONEncoder)
-        self.assertEqual(json.loads(response.content.decode()), {"foo": "bar"})
+        self.assertEqual(json.loads(response.text), {"foo": "bar"})
 
     def test_json_response_passing_arguments_to_json_dumps(self):
         response = JsonResponse({"foo": "bar"}, json_dumps_params={"indent": 2})
-        self.assertEqual(response.content.decode(), '{\n  "foo": "bar"\n}')
+        self.assertEqual(response.text, '{\n  "foo": "bar"\n}')
 
 
 class StreamingHttpResponseTests(SimpleTestCase):
