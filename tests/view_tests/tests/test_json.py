@@ -10,7 +10,7 @@ class JsonResponseTests(SimpleTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers["content-type"], "application/json")
         self.assertEqual(
-            json.loads(response.content.decode()),
+            json.loads(response.text),
             {
                 "a": [1, 2, 3],
                 "foo": {"bar": "baz"},

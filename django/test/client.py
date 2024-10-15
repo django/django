@@ -947,9 +947,7 @@ class ClientMixin:
                     'Content-Type header is "%s", not "application/json"'
                     % response.get("Content-Type")
                 )
-            response._json = json.loads(
-                response.content.decode(response.charset), **extra
-            )
+            response._json = json.loads(response.text, **extra)
         return response._json
 
     def _follow_redirect(
