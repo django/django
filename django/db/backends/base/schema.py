@@ -300,12 +300,12 @@ class BaseDatabaseSchemaEditor:
             ),
         }
         db_tablespace = None
-        if settings.DATABASES[self.connection.alias].get("DEFAULT_TABLESPACE"):
+        if model._meta.db_tablespace:
+            db_tablespace = model._meta.db_tablespace
+        elif settings.DATABASES[self.connection.alias].get("DEFAULT_TABLESPACE"):
             db_tablespace = settings.DATABASES[self.connection.alias][
                 "DEFAULT_TABLESPACE"
             ]
-        elif model._meta.db_tablespace:
-            db_tablespace = model._meta.db_tablespace
         if db_tablespace:
             tablespace_sql = self.connection.ops.tablespace_sql(db_tablespace)
             if tablespace_sql:
