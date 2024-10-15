@@ -373,8 +373,8 @@ class BaseDatabaseSchemaEditor:
         # Optionally add the tablespace if it's an implicitly indexed column.
         tablespace = (
             field.db_tablespace
-            or settings.DATABASES[self.connection.alias].get("DEFAULT_TABLESPACE")
             or model._meta.db_tablespace
+            or settings.DATABASES[self.connection.alias].get("DEFAULT_TABLESPACE")
         )
         if (
             tablespace
@@ -1556,10 +1556,10 @@ class BaseDatabaseSchemaEditor:
                 db_tablespace = db_settings["DEFAULT_INDEX_TABLESPACE"]
             elif settings.DEFAULT_INDEX_TABLESPACE:
                 db_tablespace = settings.DEFAULT_INDEX_TABLESPACE
-            elif db_settings.get("DEFAULT_TABLESPACE"):
-                db_tablespace = db_settings["DEFAULT_TABLESPACE"]
             elif model._meta.db_tablespace:
                 db_tablespace = model._meta.db_tablespace
+            elif db_settings.get("DEFAULT_TABLESPACE"):
+                db_tablespace = db_settings["DEFAULT_TABLESPACE"]
         if db_tablespace is not None:
             return " " + self.connection.ops.tablespace_sql(db_tablespace)
         return ""
