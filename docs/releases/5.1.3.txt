@@ -14,3 +14,6 @@ Bugfixes
   :class:`~django.core.validators.DomainNameValidator` accepted any input value
   that contained a valid domain name, rather than only input values that were a
   valid domain name (:ticket:`35845`).
+
+* Fixed a regression in Django 5.1 that prevented the use of DB-IP databases
+  with :class:`~django.contrib.gis.geoip2.GeoIP2` (:ticket:`35841`).
