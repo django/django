@@ -124,7 +124,8 @@ class GeoLite2Test(SimpleTestCase):
 
     def test_country(self):
         g = GeoIP2(city="<invalid>")
-        self.assertIs(g._metadata.database_type.endswith("Country"), True)
+        self.assertIs(g.is_city, False)
+        self.assertIs(g.is_country, True)
         for query in self.query_values:
             with self.subTest(query=query):
                 self.assertEqual(g.country(query), self.expected_country)
@@ -137,7 +138,8 @@ class GeoLite2Test(SimpleTestCase):
 
     def test_country_using_city_database(self):
         g = GeoIP2(country="<invalid>")
-        self.assertIs(g._metadata.database_type.endswith("City"), True)
+        self.assertIs(g.is_city, True)
+        self.assertIs(g.is_country, False)
         for query in self.query_values:
             with self.subTest(query=query):
                 self.assertEqual(g.country(query), self.expected_country)
@@ -150,7 +152,8 @@ class GeoLite2Test(SimpleTestCase):
 
     def test_city(self):
         g = GeoIP2(country="<invalid>")
-        self.assertIs(g._metadata.database_type.endswith("City"), True)
+        self.assertIs(g.is_city, True)
+        self.assertIs(g.is_country, False)
         for query in self.query_values:
             with self.subTest(query=query):
                 self.assertEqual(g.city(query), self.expected_city)
@@ -222,6 +225,27 @@ class GeoLite2Test(SimpleTestCase):
 )
 class GeoIP2Test(GeoLite2Test):
     """Non-free GeoIP2 databases are supported."""
+
+
+@skipUnless(HAS_GEOIP2, "GeoIP2 is required.")
+@override_settings(
+    GEOIP_CITY="dbip-city-lite-test.mmdb",
+    GEOIP_COUNTRY="dbip-country-lite-test.mmdb",
+)
+class DBIPLiteTest(GeoLite2Test):
+    """DB-IP Lite databases are supported."""
+
+    expected_city = GeoLite2Test.expected_city | {
+        "accuracy_radius": None,
+        "city": "London (Shadwell)",
+        "latitude": 51.5181,
+        "longitude": -0.0714189,
+        "postal_code": None,
+        "region_code": None,
+        "time_zone": None,
+        # Kept for backward compatibility.
+        "region": None,
+    }
 
 
 @skipUnless(HAS_GEOIP2, "GeoIP2 is required.")
