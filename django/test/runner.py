@@ -547,17 +547,20 @@ class ParallelTestSuite(unittest.TestSuite):
 
             tests = list(self.subsuites[subsuite_index])
             for event in events:
-                event_name = event[0]
-                handler = getattr(result, event_name, None)
-                if handler is None:
-                    continue
-                test = tests[event[1]]
-                args = event[2:]
-                handler(test, *args)
+                self.handle_event(result, tests, event)
 
         pool.join()
 
         return result
+
+    def handle_event(self, result, tests, event):
+        event_name = event[0]
+        handler = getattr(result, event_name, None)
+        if handler is None:
+            return
+        test = tests[event[1]]
+        args = event[2:]
+        handler(test, *args)
 
     def __iter__(self):
         return iter(self.subsuites)
