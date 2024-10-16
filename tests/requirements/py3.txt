@@ -6,7 +6,7 @@ black
 docutils >= 0.19
 geoip2
 jinja2 >= 2.11.0
-numpy
+numpy; python_version < '3.14'
 Pillow >= 6.2.1
 # pylibmc/libmemcached can't be built on Windows.
 pylibmc; sys_platform != 'win32'
