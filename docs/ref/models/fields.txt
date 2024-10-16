@@ -426,6 +426,11 @@ precedence when creating instances in Python code. ``db_default`` will still be
 set at the database level and will be used when inserting rows outside of the
 ORM or when adding a new field in a migration.
 
+If a field has a ``db_default`` without a ``default`` set and no value is
+assigned to the field, a ``DatabaseDefault`` object is returned as the field
+value on unsaved model instances. The actual value for the field is determined
+by the database when the model instance is saved.
+
 ``db_index``
 ------------
 
