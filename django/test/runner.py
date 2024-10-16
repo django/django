@@ -12,6 +12,7 @@ import random
 import sys
 import textwrap
 import unittest
+import unittest.suite
 from collections import defaultdict
 from contextlib import contextmanager
 from importlib import import_module
@@ -292,7 +293,15 @@ failure and get a correct traceback.
 
     def addError(self, test, err):
         self.check_picklable(test, err)
-        self.events.append(("addError", self.test_index, err))
+
+        event_occurred_before_first_test = self.test_index == -1
+        if event_occurred_before_first_test and isinstance(
+            test, unittest.suite._ErrorHolder
+        ):
+            self.events.append(("addError", self.test_index, test.id(), err))
+        else:
+            self.events.append(("addError", self.test_index, err))
+
         super().addError(test, err)
 
     def addFailure(self, test, err):
@@ -558,8 +567,19 @@ class ParallelTestSuite(unittest.TestSuite):
         handler = getattr(result, event_name, None)
         if handler is None:
             return
-        test = tests[event[1]]
-        args = event[2:]
+        test_index = event[1]
+        event_occurred_before_first_test = test_index == -1
+        if (
+            event_name == "addError"
+            and event_occurred_before_first_test
+            and len(event) >= 4
+        ):
+            test_id = event[2]
+            test = unittest.suite._ErrorHolder(test_id)
+            args = event[3:]
+        else:
+            test = tests[test_index]
+            args = event[2:]
         handler(test, *args)
 
     def __iter__(self):
