@@ -101,13 +101,16 @@ class DomainNameValidator(RegexValidator):
 
         if self.accept_idna:
             self.regex = _lazy_re_compile(
-                self.hostname_re + self.domain_re + self.tld_re, re.IGNORECASE
+                r"^" + self.hostname_re + self.domain_re + self.tld_re + r"$",
+                re.IGNORECASE,
             )
         else:
             self.regex = _lazy_re_compile(
-                self.ascii_only_hostname_re
+                r"^"
+                + self.ascii_only_hostname_re
                 + self.ascii_only_domain_re
-                + self.ascii_only_tld_re,
+                + self.ascii_only_tld_re
+                + r"$",
                 re.IGNORECASE,
             )
         super().__init__(**kwargs)
