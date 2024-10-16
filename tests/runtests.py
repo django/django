@@ -10,11 +10,7 @@ import socket
 import subprocess
 import sys
 import tempfile
-import ast
-import inspect
-from typing import List
 import warnings
-import textwrap
 from pathlib import Path
 
 try:
@@ -31,8 +27,8 @@ else:
     from django.test import TestCase, TransactionTestCase
     from django.test.runner import get_max_test_processes, parallel_type
     from django.test.selenium import SeleniumTestCase, SeleniumTestCaseBase
-    from django.test.utils import NullTimeKeeper, TimeKeeper, requires_tz_support #, get_runner
-    from django.test.runner import DiscoverRunner
+    from django.test.utils import NullTimeKeeper, TimeKeeper, get_runner
+    from custom_test_runner import CustomDiscoverRunner, state_output
     from django.utils.deprecation import (
         RemovedInDjango60Warning,
         RemovedInDjango61Warning,
@@ -115,256 +111,6 @@ CONTRIB_TESTS_TO_APPS = {
     "flatpages_tests": ["django.contrib.flatpages"],
     "redirects_tests": ["django.contrib.redirects"],
 }
-
-
-inject_func = ast.parse("state_output(locals())")
-
-def testName(name, value=None):
-  exclude_sections = ['In', 'Out', 'requests', 'json', 'os', 'subprocess', 'tempfile', 'shutil', 're', 'ast']
-  if (not name.startswith('_') and name not in dir(__builtins__) and not callable(value) and not isinstance(value, type) and name not in exclude_sections):
-    return True
-  return False
-
-def custom_repr(obj, depth=0, max_depth=10):
-    if depth > max_depth:
-        return ""
-
-    if hasattr(obj, '__class__') and not isinstance(obj, (str, int, float, bool, list, dict, tuple)):
-        attrs = []
-        for k in dir(obj.__class__):
-            if testName(k, getattr(obj, k)):
-                v = getattr(obj, k)
-                v_repr = custom_repr(v, depth + 1, max_depth)
-                attrs.append(f"{k}: {v_repr}")
-        return f'{obj.__class__.__name__}' + '{' + ', '.join(attrs) + '}'
-
-    return repr(obj)
-
-def state_output(local_vars, codeLine):
-  all_vars = local_vars
-  user_defined_vars = {
-    name: custom_repr(value) for name, value in all_vars.items()
-    if testName(name, value)
-  }
-  print(codeLine)
-  for var_name, var_value in user_defined_vars.items():
-    print(f"{var_name}: {var_value}")
-
-def recursive_injection(callstack):
-  body2 = []
-
-  for b in callstack.body:
-    #print(b, end="Next, \n")
-    bodyExists = True
-    try:
-      b.body
-    except:
-      bodyExists = False
-
-    if bodyExists:
-      recursive_injection(b)
-    
-    
-    inject_func = ast.parse(f"state_output(locals(), \"{b}\")")
-    body2.append(inject_func)
-    body2.append(b)
-
-    #print(body2)
-  
-  body2.append(inject_func)
-  callstack.body = body2
-
-
-  callStack = True
-  try:
-    callstack.orelse
-  except:
-    callStack = False
-
-  if callStack:
-    orelse2 = []
-
-    for b in callstack.orelse:
-      #print(b, end="Next, \n")
-
-      bodyExists = True
-      try:
-        b.body
-      except:
-        bodyExists = False
-
-      if bodyExists:
-        #print("Sub-body!")
-        recursive_injection(b)
-
-
-      inject_func = ast.parse(f"state_output(locals(), \"{ast.unparse(b)}\")")
-      orelse2.append(inject_func)
-      orelse2.append(b)
-
-      #print(body2)
-
-    orelse2.append(inject_func)
-    callstack.orelse = orelse2
-
-  return callstack
-
-def function_injection(unit_test):
-  string_test = inspect.getsource(unit_test)
-  string_test = textwrap.dedent(string_test)
-  inject_func = ast.parse("state_output(locals())")
-  tree = ast.parse(string_test)
-  tr2 = recursive_injection(tree)
-  tree = ast.unparse(tr2)
-
-  state_output_code = textwrap.dedent("""
-    def custom_repr(obj, depth=0, max_depth=10):
-        if depth > max_depth:
-            return ""
-
-        if hasattr(obj, '__class__') and not isinstance(obj, (str, int, float, bool, list, dict, tuple)):
-            attrs = []
-            for k in dir(obj.__class__):
-                if testName(k, getattr(obj, k)):
-                    v = getattr(obj, k)
-                    v_repr = custom_repr(v, depth + 1, max_depth)
-                    attrs.append(f"{k}: {v_repr}")
-            return f'{obj.__class__.__name__}' + '{' + ', '.join(attrs) + '}'
-
-        return repr(obj)
-                                                     
-    def state_output(local_vars, codeLine):
-        exclude_sections = ['In', 'Out', 'requests', 'json', 'os', 'subprocess', 'tempfile', 'shutil', 're', 'ast']
-        all_vars = local_vars
-        user_defined_vars = {
-            name: custom_repr(value) for name, value in all_vars.items()
-            if (not name.startswith('_') and name not in dir(__builtins__) and not callable(value) and not isinstance(value, type) and name not in exclude_sections)
-        }
-        print(codeLine)
-        for var_name, var_value in user_defined_vars.items():
-            print(f"{var_name}: {var_value}")
-                                      
-    """)
-
-  tree = state_output_code + "\n" + tree
-  
-
-  return tree
-
-def test5():
-
-  class arbitraryPoint:
-    x = 0
-    y = 0
-
-  class arbitraryVar:
-    x1 = 2
-    x2 = 2
-    x3 = arbitraryPoint()
-
-    def changeValue(self, x4):
-      self.x1 = x4
-      # print(dir())
-      # print(globals())
-      # print(locals)
-      # print(dir(self))
-      # print(self)
-
-  z = arbitraryVar()
-  z.x1 = 3
-  z.changeValue(17)
-
-
-class ModifiedTestRunner(DiscoverRunner):
-    def run_suite(self, suite, **kwargs):
-        modified_suite = self.test_suite()
-        for test in suite:
-            for val in test:
-                print(val._testMethodName)
-                valMethodName = val._testMethodName
-                print(valMethodName)
-                test_method = getattr(val, valMethodName)
-                print(test_method)
-                modified_test_method = function_injection(test_method)
-                print(modified_test_method)
-
-                module_name = test.__class__.__module__
-                module = sys.modules.get(module_name)
-                if module is None:
-                    print(f"Module {module_name} not found in sys.modules.")
-                    exec_globals = {}
-                else:
-                    exec_globals = module.__dict__
-
-                print(exec_globals)
-                
-                # exec_globals = test.__class__.__module__.__dict__.copy()
-                # exec_locals = test.__dict__
-                
-                # # Execute the modified method within the correct context
-                # exec(modified_test_method, exec_globals, exec_locals)
-                # exec(modified_test_method, exec_globals, test.__dict__)
-                try:
-                    exec(modified_test_method, exec_globals)
-                    # modified_suite.addTest(modified_test_method)
-                    print("This test succeeded")
-                except:
-                    print("This test failed")
-
-                # try:
-                #     modified_suite.addTest(modified_test_method)
-                #     print("This one worked x1")
-                # except:
-                #     print("This one failed")
-
-                try:
-                    modified_suite.addTest(test_method)
-                    print("This one worked x1")
-                except:
-                    print("This one failed")
-            # test_method = getattr(test, test.testMethod)
-            # print(test_method)
-        #     modified_test_method = function_injection(test_method)
-        #     exec(modified_test_method, test.__dict__)
-                # try:
-                #     print(val.__fields__)
-                # except:
-                #     print("no fields")
-
-                # try:
-                #     print(dir(val))
-                # except:
-                #     print("no dir")
-
-                # try:
-                #     print(val.testMethod)
-                # except:
-                #     print("no testMethod")
-
-                # try:
-                #     print(val[0])
-                # except:
-                #     print("no indexing")
-
-                # try:
-                #     print(dir(type(val)))
-                # except:
-                #     print(" dir type val fails")
-
-            # print(test)
-            # print(dir(test))
-            # print("BREAKPOINT AHHHH")
-            # test_method = getattr(test, test.testMethod)
-            # print(test_method)
-        #     modified_test_method = function_injection(test_method)
-        #     exec(modified_test_method, test.__dict__)
-        #     modified_suite.addTest(test)
-        return super().run_suite(modified_suite, **kwargs)
-
-def get_runner(settings, test_runner_class=None):
-    if test_runner_class is None:
-        test_runner_class = ModifiedTestRunner
-    return test_runner_class
 
 
 def get_test_modules(gis_enabled):
@@ -476,6 +222,7 @@ def setup_collect_tests(start_at, start_after, test_labels=None):
             "APP_DIRS": True,
             "OPTIONS": {
                 "context_processors": [
+                    "django.template.context_processors.debug",
                     "django.template.context_processors.request",
                     "django.contrib.auth.context_processors.auth",
                     "django.contrib.messages.context_processors.messages",
@@ -611,6 +358,76 @@ class ActionSelenium(argparse.Action):
         setattr(namespace, self.dest, browsers)
 
 
+# def django_tests(
+#     verbosity,
+#     interactive,
+#     failfast,
+#     keepdb,
+#     reverse,
+#     test_labels,
+#     debug_sql,
+#     parallel,
+#     tags,
+#     exclude_tags,
+#     test_name_patterns,
+#     start_at,
+#     start_after,
+#     pdb,
+#     buffer,
+#     timing,
+#     shuffle,
+#     durations=None,
+# ):
+#     if parallel in {0, "auto"}:
+#         max_parallel = get_max_test_processes()
+#     else:
+#         max_parallel = parallel
+
+#     if verbosity >= 1:
+#         msg = "Testing against Django installed in '%s'" % os.path.dirname(
+#             django.__file__
+#         )
+#         if max_parallel > 1:
+#             msg += " with up to %d processes" % max_parallel
+#         print(msg)
+
+#     process_setup_args = (verbosity, start_at, start_after, test_labels)
+#     test_labels, state = setup_run_tests(*process_setup_args)
+#     # Run the test suite, including the extra validation tests.
+#     if not hasattr(settings, "TEST_RUNNER"):
+#         settings.TEST_RUNNER = "django.test.runner.DiscoverRunner"
+
+#     if parallel in {0, "auto"}:
+#         # This doesn't work before django.setup() on some databases.
+#         if all(conn.features.can_clone_databases for conn in connections.all()):
+#             parallel = max_parallel
+#         else:
+#             parallel = 1
+
+#     TestRunner = CustomDiscoverRunner()
+#     TestRunner.parallel_test_suite.process_setup = setup_run_tests
+#     TestRunner.parallel_test_suite.process_setup_args = process_setup_args
+#     test_runner = TestRunner(
+#         verbosity=verbosity,
+#         interactive=interactive,
+#         failfast=failfast,
+#         keepdb=keepdb,
+#         reverse=reverse,
+#         debug_sql=debug_sql,
+#         parallel=parallel,
+#         tags=tags,
+#         exclude_tags=exclude_tags,
+#         test_name_patterns=test_name_patterns,
+#         pdb=pdb,
+#         buffer=buffer,
+#         timing=timing,
+#         shuffle=shuffle,
+#         durations=durations,
+#     )
+#     failures = test_runner.run_tests(test_labels)
+#     teardown_run_tests(state)
+#     return failures
+
 def django_tests(
     verbosity,
     interactive,
@@ -631,6 +448,8 @@ def django_tests(
     shuffle,
     durations=None,
 ):
+    state_output()
+
     if parallel in {0, "auto"}:
         max_parallel = get_max_test_processes()
     else:
@@ -646,6 +465,7 @@ def django_tests(
 
     process_setup_args = (verbosity, start_at, start_after, test_labels)
     test_labels, state = setup_run_tests(*process_setup_args)
+    
     # Run the test suite, including the extra validation tests.
     if not hasattr(settings, "TEST_RUNNER"):
         settings.TEST_RUNNER = "django.test.runner.DiscoverRunner"
@@ -657,9 +477,10 @@ def django_tests(
         else:
             parallel = 1
 
-    TestRunner = get_runner(settings)
+    TestRunner = CustomDiscoverRunner
     TestRunner.parallel_test_suite.process_setup = setup_run_tests
     TestRunner.parallel_test_suite.process_setup_args = process_setup_args
+
     test_runner = TestRunner(
         verbosity=verbosity,
         interactive=interactive,
@@ -677,31 +498,11 @@ def django_tests(
         shuffle=shuffle,
         durations=durations,
     )
-
-    original_run_suite = test_runner.run_suite
-    def run_only_first_test(suite):
-        # Get the first test from the suite
-        first_test = next(iter(suite), None)
-        if first_test:
-            # Create a new suite with only the first test
-            new_suite = test_runner.test_suite()
-            print(new_suite)
-            print(first_test)
-            new_suite.addTest(first_test)
-            return original_run_suite(new_suite)
-        return original_run_suite(suite)
     
-    test_runner.run_suite = run_only_first_test
-    
-    foo = function_injection(test5)
-    print("Please...")
-    print(foo)
-    exec(foo)
-    print("hi")
-    test5()
-
     failures = test_runner.run_tests(test_labels)
+    
     teardown_run_tests(state)
+    
     return failures
 
 
