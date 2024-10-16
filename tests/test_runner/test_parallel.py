@@ -1,9 +1,13 @@
 import pickle
+import re
 import sys
 import unittest
+from unittest.case import TestCase
+from unittest.result import TestResult
+from unittest.suite import _ErrorHolder
 
 from django.test import SimpleTestCase
-from django.test.runner import RemoteTestResult
+from django.test.runner import ParallelTestSuite, RemoteTestResult
 from django.utils.version import PY311, PY312
 
 try:
@@ -72,29 +76,66 @@ class RemoteTestResultTest(SimpleTestCase):
 
     def test_was_successful_one_success(self):
         result = RemoteTestResult()
-        result.addSuccess(None)
+        test = None
+        result.startTest(test)
+        result.addSuccess(test)
+        result.stopTest(test)
         self.assertIs(result.wasSuccessful(), True)
 
     def test_was_successful_one_expected_failure(self):
         result = RemoteTestResult()
-        result.addExpectedFailure(None, self._test_error_exc_info())
+        test = None
+        result.startTest(test)
+        result.addExpectedFailure(test, self._test_error_exc_info())
+        result.stopTest(test)
         self.assertIs(result.wasSuccessful(), True)
 
     def test_was_successful_one_skip(self):
         result = RemoteTestResult()
-        result.addSkip(None, "Skipped")
+        test = None
+        result.startTest(test)
+        result.addSkip(test, "Skipped")
+        result.stopTest(test)
         self.assertIs(result.wasSuccessful(), True)
 
     @unittest.skipUnless(tblib is not None, "requires tblib to be installed")
     def test_was_successful_one_error(self):
         result = RemoteTestResult()
-        result.addError(None, self._test_error_exc_info())
+        test = None
+        result.startTest(test)
+        result.addError(test, self._test_error_exc_info())
+        result.stopTest(test)
         self.assertIs(result.wasSuccessful(), False)
 
     @unittest.skipUnless(tblib is not None, "requires tblib to be installed")
     def test_was_successful_one_failure(self):
         result = RemoteTestResult()
-        result.addFailure(None, self._test_error_exc_info())
+        test = None
+        result.startTest(test)
+        result.addFailure(test, self._test_error_exc_info())
+        result.stopTest(test)
+        self.assertIs(result.wasSuccessful(), False)
+
+    # NOTE: As of this writing there is no *integration* test that ensures that
+    #       RemoteTestResult includes the extra test_id element in the event
+    #       tuple, and that ParallelTestSuite correctly extracts and uses
+    #       test_id. (But there are related unit tests
+    #       RemoteTestResultTest.test_add_error_before_first_test and
+    #       ParallelTestSuiteTest.test_handle_add_error_before_first_test.)
+    @unittest.skipUnless(tblib is not None, "requires tblib to be installed")
+    def test_add_error_before_first_test(self):
+        result = RemoteTestResult()
+        test_id = "test_foo (tests.test_foo.FooTest.test_foo)"
+        test = _ErrorHolder(test_id)
+        # (Do not call startTest)
+        result.addError(test, self._test_error_exc_info())
+
+        (event,) = result.events
+        self.assertEqual(event[0], "addError")
+        self.assertEqual(event[1], -1)
+        self.assertEqual(event[2], test_id)
+        (error_type, _, _) = event[3]
+        self.assertEqual(error_type, ValueError)
         self.assertIs(result.wasSuccessful(), False)
 
     def test_picklable(self):
@@ -161,3 +202,81 @@ class RemoteTestResultTest(SimpleTestCase):
         result = RemoteTestResult()
         result.addDuration(None, 2.3)
         self.assertEqual(result.collectedDurations, [("None", 2.3)])
+
+
+class ParallelTestSuiteTest(SimpleTestCase):
+    # NOTE: As of this writing there is no *integration* test that ensures that
+    #       RemoteTestResult includes the extra test_id element in the event
+    #       tuple, and that ParallelTestSuite correctly extracts and uses
+    #       test_id. (But there are related unit tests
+    #       RemoteTestResultTest.test_add_error_before_first_test and
+    #       ParallelTestSuiteTest.test_handle_add_error_before_first_test.)
+    def test_handle_add_error_before_first_test(self):
+        dummy_subsuites = []
+        pts = ParallelTestSuite(dummy_subsuites, processes=2)
+        result = TestResult()
+        test_id = "setUpClass (tests.test_foo.FooTest.setUpClass)"
+        test = TestCase()
+        err = _test_error_exc_info()
+        event = ("addError", -1, test_id, err)
+        pts.handle_event(result, tests=[test], event=event)
+
+        self.assertEqual(len(result.errors), 1)
+        actual_test, tb_and_details_str = result.errors[0]
+        self.assertIsInstance(actual_test, _ErrorHolder)
+        self.assertEqual(actual_test.id(), test_id)
+        self.assertRegex(
+            tb_and_details_str, re.compile(r"^Traceback .* woops.*", re.DOTALL)
+        )
+
+    def test_handle_add_error_during_test(self):
+        dummy_subsuites = []
+        pts = ParallelTestSuite(dummy_subsuites, processes=2)
+        result = TestResult()
+        test = TestCase()
+        err = _test_error_exc_info()
+        event = ("addError", 0, err)
+        pts.handle_event(result, tests=[test], event=event)
+
+        self.assertEqual(len(result.errors), 1)
+        actual_test, tb_and_details_str = result.errors[0]
+        self.assertIsInstance(actual_test, TestCase)
+        self.assertEqual(actual_test.id(), "unittest.case.TestCase.runTest")
+        self.assertRegex(
+            tb_and_details_str, re.compile(r"^Traceback .* woops.*", re.DOTALL)
+        )
+
+    def test_handle_add_failure(self):
+        dummy_subsuites = []
+        pts = ParallelTestSuite(dummy_subsuites, processes=2)
+        result = TestResult()
+        test = TestCase()
+        err = _test_error_exc_info()
+        event = ("addFailure", 0, err)
+        pts.handle_event(result, tests=[test], event=event)
+
+        self.assertEqual(len(result.failures), 1)
+        actual_test, tb_and_details_str = result.failures[0]
+        self.assertIsInstance(actual_test, TestCase)
+        self.assertEqual(actual_test.id(), "unittest.case.TestCase.runTest")
+        self.assertRegex(
+            tb_and_details_str, re.compile(r"^Traceback .* woops.*", re.DOTALL)
+        )
+
+    def test_handle_add_success(self):
+        dummy_subsuites = []
+        pts = ParallelTestSuite(dummy_subsuites, processes=2)
+        result = TestResult()
+        test = TestCase()
+        event = ("addSuccess", 0)
+        pts.handle_event(result, tests=[test], event=event)
+
+        self.assertEqual(len(result.errors), 0)
+        self.assertEqual(len(result.failures), 0)
+
+
+def _test_error_exc_info():
+    try:
+        raise ValueError("woops")
+    except ValueError:
+        return sys.exc_info()
