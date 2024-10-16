@@ -1,8 +1,7 @@
-import asyncio
 from functools import wraps
 from urllib.parse import urlsplit
 
-from asgiref.sync import async_to_sync, sync_to_async
+from asgiref.sync import async_to_sync, iscoroutinefunction, sync_to_async
 
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
@@ -35,11 +34,11 @@ def user_passes_test(
 
             return redirect_to_login(path, resolved_login_url, redirect_field_name)
 
-        if asyncio.iscoroutinefunction(view_func):
+        if iscoroutinefunction(view_func):
 
             async def _view_wrapper(request, *args, **kwargs):
                 auser = await request.auser()
-                if asyncio.iscoroutinefunction(test_func):
+                if iscoroutinefunction(test_func):
                     test_pass = await test_func(auser)
                 else:
                     test_pass = await sync_to_async(test_func)(auser)
@@ -51,7 +50,7 @@ def user_passes_test(
         else:
 
             def _view_wrapper(request, *args, **kwargs):
-                if asyncio.iscoroutinefunction(test_func):
+                if iscoroutinefunction(test_func):
                     test_pass = async_to_sync(test_func)(request.user)
                 else:
                     test_pass = test_func(request.user)
@@ -107,7 +106,7 @@ def permission_required(perm, login_url=None, raise_exception=False):
         perms = perm
 
     def decorator(view_func):
-        if asyncio.iscoroutinefunction(view_func):
+        if iscoroutinefunction(view_func):
 
             async def check_perms(user):
                 # First check if the user has the permission (even anon users).
