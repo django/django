@@ -224,6 +224,15 @@ ones:
     object. If callable it will be called every time a new object is
     created.
 
+:attr:`~Field.db_default`
+    The database-computed default value for the field. This can be a literal
+    value or a database function.
+
+    If both ``db_default`` and :attr:`Field.default` are set, ``default`` will
+    take precedence when creating instances in Python code. ``db_default`` will
+    still be set at the database level and will be used when inserting rows
+    outside of the ORM or when adding a new field in a migration.
+
 :attr:`~Field.help_text`
     Extra "help" text to be displayed with the form widget. It's useful for
     documentation even if your field isn't used on a form.
