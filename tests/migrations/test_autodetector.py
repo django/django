@@ -293,6 +293,23 @@ class AutodetectorTests(BaseAutodetectorTests):
             ]
         },
     )
+    author_name_check_constraint_2 = ModelState(
+        "testapp",
+        "Author",
+        [
+            ("id", models.AutoField(primary_key=True)),
+            ("name", models.CharField(max_length=200)),
+        ],
+        {
+            "constraints": [
+                models.CheckConstraint(
+                    condition=models.Q(name__contains="Bob"),
+                    name="name_contains_bob",
+                    violation_error_message="Name doesn't contain Bob",
+                )
+            ]
+        },
+    )
     author_dates_of_birth_auto_now = ModelState(
         "testapp",
         "Author",
@@ -2979,6 +2996,28 @@ class AutodetectorTests(BaseAutodetectorTests):
         self.assertOperationTypes(changes, "testapp", 0, ["RemoveConstraint"])
         self.assertOperationAttributes(
             changes, "testapp", 0, 0, model_name="author", name="name_contains_bob"
+        )
+
+    def test_alter_constraint(self):
+        altered_constraint = models.CheckConstraint(
+            condition=models.Q(name__contains="Bob"),
+            name="name_contains_bob",
+            violation_error_message="Name doesn't contain Bob",
+        )
+        changes = self.get_changes(
+            [self.author_name_check_constraint], [self.author_name_check_constraint_2]
+        )
+
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(changes, "testapp", 0, ["AlterConstraint"])
+        self.assertOperationAttributes(
+            changes,
+            "testapp",
+            0,
+            0,
+            model_name="author",
+            name="name_contains_bob",
+            constraint=altered_constraint,
         )
 
     def test_add_unique_together(self):
