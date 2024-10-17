@@ -1,10 +1,24 @@
 """Tests for django.db.utils."""
 
+import asyncio
+import concurrent.futures
 import unittest
+from unittest import mock
 
 from django.core.exceptions import ImproperlyConfigured
-from django.db import DEFAULT_DB_ALIAS, ProgrammingError, connection
-from django.db.utils import ConnectionHandler, load_backend
+from django.db import (
+    DEFAULT_DB_ALIAS,
+    ProgrammingError,
+    async_connections,
+    connection,
+    new_connection,
+)
+from django.db.utils import (
+    AsyncAlias,
+    AsyncConnectionHandler,
+    ConnectionHandler,
+    load_backend,
+)
 from django.test import SimpleTestCase, TestCase
 from django.utils.connection import ConnectionDoesNotExist
 
@@ -90,3 +104,67 @@ class LoadBackendTests(SimpleTestCase):
         with self.assertRaisesMessage(ImproperlyConfigured, msg) as cm:
             load_backend("foo")
         self.assertEqual(str(cm.exception.__cause__), "No module named 'foo'")
+
+
+class AsyncConnectionTests(SimpleTestCase):
+    def run_pool(self, coro, count=2):
+        def fn():
+            asyncio.run(coro())
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+            futures = []
+            for _ in range(count):
+                futures.append(executor.submit(fn))
+
+            for future in concurrent.futures.as_completed(futures):
+                exc = future.exception()
+                if exc is not None:
+                    raise exc
+
+    def test_async_alias(self):
+        alias = AsyncAlias()
+        assert len(alias) == 0
+        assert alias.connections == []
+
+        async def coro():
+            assert len(alias) == 0
+            alias.add_connection(mock.Mock())
+            alias.pop()
+
+        self.run_pool(coro)
+
+    def test_async_connection_handler(self):
+        aconns = AsyncConnectionHandler()
+        assert aconns.empty is True
+        assert aconns["default"].connections == []
+
+        async def coro():
+            assert aconns["default"].connections == []
+            aconns.add_connection("default", mock.Mock())
+            aconns.pop_connection("default")
+
+        self.run_pool(coro)
+
+    @unittest.skipUnless(connection.supports_async is True, "Async DB test")
+    def test_new_connection_threading(self):
+        async def coro():
+            assert async_connections.empty is True
+            async with new_connection() as connection:
+                async with connection.acursor() as c:
+                    await c.execute("SELECT 1")
+
+        self.run_pool(coro)
+
+    @unittest.skipUnless(connection.supports_async is True, "Async DB test")
+    async def test_new_connection(self):
+        with self.assertRaises(ConnectionDoesNotExist):
+            async_connections.get_connection(DEFAULT_DB_ALIAS)
+
+        async with new_connection():
+            conn1 = async_connections.get_connection(DEFAULT_DB_ALIAS)
+            async with new_connection():
+                conn2 = async_connections.get_connection(DEFAULT_DB_ALIAS)
+                self.assertNotEqual(conn1, conn2)
+            self.assertNotEqual(conn1, conn2)
+        with self.assertRaises(ConnectionDoesNotExist):
+            async_connections.get_connection(DEFAULT_DB_ALIAS)
