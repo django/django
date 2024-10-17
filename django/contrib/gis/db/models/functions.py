@@ -8,6 +8,7 @@ from django.db import NotSupportedError
 from django.db.models import (
     BinaryField,
     BooleanField,
+    CharField,
     FloatField,
     Func,
     IntegerField,
@@ -419,6 +420,36 @@ class GeometryDistance(GeoFunc):
 class Intersection(OracleToleranceMixin, GeomOutputGeoFunc):
     arity = 2
     geom_param_pos = (0, 1)
+
+
+@BaseSpatialField.register_lookup
+class GeometryType(GeoFuncMixin, Transform):
+    function = "GeometryType"
+    output_field = CharField()
+    lookup_name = "geom_type"
+
+    def as_oracle(self, compiler, connection, **extra_context):
+        lhs, params = compiler.compile(self.lhs)
+
+        sql = f"""
+            CASE MOD({lhs}.SDO_GTYPE, 10)
+                WHEN 1 THEN 'POINT'
+                WHEN 2 THEN 'LINESTRING'
+                WHEN 3 THEN 'POLYGON'
+                WHEN 4 THEN 'COLLECTION'
+                WHEN 5 THEN 'MULTIPOINT'
+                WHEN 6 THEN 'MULTILINESTRING'
+                WHEN 7 THEN 'MULTIPOLYGON'
+                WHEN 8 THEN 'SOLID'
+                ELSE 'UNKNOWN'
+            END
+        """
+        return sql, params
+
+    def as_mysql(self, compiler, connection, **extra_context):
+        lhs, params = compiler.compile(self.lhs)
+        sql = f"ST_GeometryType({lhs})"
+        return sql, params
 
 
 @BaseSpatialField.register_lookup
