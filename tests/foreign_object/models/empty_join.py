@@ -83,8 +83,8 @@ class StartsWithRelation(models.ForeignObject):
             )
         ]
 
-    def contribute_to_class(self, cls, name, private_only=False):
-        super().contribute_to_class(cls, name, private_only)
+    def __set_name__(self, cls, name):
+        super().__set_name__(cls, name)
         setattr(cls, self.name, ReverseManyToOneDescriptor(self))
 
 

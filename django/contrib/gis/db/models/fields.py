@@ -290,8 +290,8 @@ class GeometryField(BaseSpatialField):
             kwargs["tolerance"] = self._tolerance
         return name, path, args, kwargs
 
-    def contribute_to_class(self, cls, name, **kwargs):
-        super().contribute_to_class(cls, name, **kwargs)
+    def __set_name__(self, cls, name):
+        super().__set_name__(cls, name)
 
         # Setup for lazy-instantiated Geometry object.
         setattr(
@@ -299,6 +299,11 @@ class GeometryField(BaseSpatialField):
             self.attname,
             SpatialProxy(self.geom_class or GEOSGeometry, self, load_func=GEOSGeometry),
         )
+
+    # RemovedInDjango61Warning
+    def contribute_to_class(self, cls, name, private_only=False):
+        self._private_only = private_only
+        self.__set_name__(cls, name)
 
     def formfield(self, **kwargs):
         defaults = {
@@ -413,13 +418,18 @@ class RasterField(BaseSpatialField):
     def from_db_value(self, value, expression, connection):
         return connection.ops.parse_raster(value)
 
-    def contribute_to_class(self, cls, name, **kwargs):
-        super().contribute_to_class(cls, name, **kwargs)
+    def __set_name__(self, cls, name):
+        super().__set_name__(cls, name)
         # Setup for lazy-instantiated Raster object. For large querysets, the
         # instantiation of all GDALRasters can potentially be expensive. This
         # delays the instantiation of the objects to the moment of evaluation
         # of the raster attribute.
         setattr(cls, self.attname, SpatialProxy(gdal.GDALRaster, self))
+
+    # RemovedInDjango61Warning
+    def contribute_to_class(self, cls, name, private_only=False):
+        self._private_only = private_only
+        self.__set_name__(cls, name)
 
     def get_transform(self, name):
         from django.contrib.gis.db.models.lookups import RasterBandTransform

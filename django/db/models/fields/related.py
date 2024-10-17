@@ -348,8 +348,8 @@ class RelatedField(FieldCacheMixin, Field):
         # columns from another table.
         return None
 
-    def contribute_to_class(self, cls, name, private_only=False, **kwargs):
-        super().contribute_to_class(cls, name, private_only=private_only, **kwargs)
+    def __set_name__(self, cls, name):
+        super().__set_name__(cls, name)
 
         self.opts = cls._meta
 
@@ -380,6 +380,11 @@ class RelatedField(FieldCacheMixin, Field):
             lazy_related_operation(
                 resolve_related_class, cls, self.remote_field.model, field=self
             )
+
+    # RemovedInDjango61Warning
+    def contribute_to_class(self, cls, name, private_only=False):
+        self._private_only = private_only
+        self.__set_name__(cls, name)
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
@@ -882,9 +887,14 @@ class ForeignObject(RelatedField):
         class_lookups = [parent.__dict__.get("class_lookups", {}) for parent in bases]
         return cls.merge_dicts(class_lookups)
 
-    def contribute_to_class(self, cls, name, private_only=False, **kwargs):
-        super().contribute_to_class(cls, name, private_only=private_only, **kwargs)
+    def __set_name__(self, cls, name):
+        super().__set_name__(cls, name)
         setattr(cls, self.name, self.forward_related_accessor_class(self))
+
+    # RemovedInDjango61Warning
+    def contribute_to_class(self, cls, name, private_only=False):
+        self._private_only = private_only
+        self.__set_name__(cls, name)
 
     def contribute_to_related_class(self, cls, related):
         # Internal FK's - i.e., those with a related name ending with '+' -
@@ -967,7 +977,7 @@ class ForeignKey(ForeignObject):
         else:
             # For backwards compatibility purposes, we need to *try* and set
             # the to_field during FK construction. It won't be guaranteed to
-            # be correct until contribute_to_class is called. Refs #12190.
+            # be correct until __set_name__ is called. Refs #12190.
             to_field = to_field or (to._meta.pk and to._meta.pk.name)
         if not callable(on_delete):
             raise TypeError("on_delete must be callable.")
@@ -1890,7 +1900,7 @@ class ManyToManyField(RelatedField):
                     break
         return getattr(self, cache_attr)
 
-    def contribute_to_class(self, cls, name, **kwargs):
+    def __set_name__(self, cls, name):
         # To support multiple relations to self, it's useful to have a non-None
         # related name on symmetrical relations for internal reasons. The
         # concept doesn't make a lot of sense externally ("you want me to
@@ -1913,7 +1923,7 @@ class ManyToManyField(RelatedField):
                 name,
             )
 
-        super().contribute_to_class(cls, name, **kwargs)
+        super().__set_name__(cls, name)
 
         # The intermediate m2m model is not auto created if:
         #  1) There is a manually specified intermediate, or
@@ -1938,6 +1948,11 @@ class ManyToManyField(RelatedField):
 
         # Set up the accessor for the m2m table name for the relation.
         self.m2m_db_table = partial(self._get_m2m_db_table, cls._meta)
+
+    # RemovedInDjango61Warning
+    def contribute_to_class(self, cls, name, private_only=False):
+        self._private_only = private_only
+        self.__set_name__(cls, name)
 
     def contribute_to_related_class(self, cls, related):
         # Internal M2Ms (i.e., those with a related name ending with '+')

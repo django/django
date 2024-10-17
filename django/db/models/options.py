@@ -168,7 +168,7 @@ class Options:
         # Don't go through get_app_config to avoid triggering imports.
         return self.apps.app_configs.get(self.app_label)
 
-    def contribute_to_class(self, cls, name):
+    def __set_name__(self, cls, name):
         from django.db import connection
         from django.db.backends.utils import truncate_name
 
@@ -295,7 +295,7 @@ class Options:
             if not any(
                 isinstance(field, OrderWrt) for field in model._meta.local_fields
             ):
-                model.add_to_class("_order", OrderWrt())
+                OrderWrt().__set_name__(model, "_order")
         else:
             self.order_with_respect_to = None
 
@@ -317,7 +317,7 @@ class Options:
             else:
                 pk_class = self._get_default_pk_class()
                 auto = pk_class(verbose_name="ID", primary_key=True, auto_created=True)
-                model.add_to_class("id", auto)
+                auto.__set_name__(model, "id")
 
     def add_manager(self, manager):
         self.local_managers.append(manager)
