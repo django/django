@@ -6,6 +6,7 @@ import copy
 import datetime
 
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
+from django.forms.boundfield import BoundField
 from django.forms.fields import Field
 from django.forms.utils import ErrorDict, ErrorList, RenderableFormMixin
 from django.forms.widgets import Media, MediaDefiningClass
@@ -67,6 +68,8 @@ class BaseForm(RenderableFormMixin):
     template_name_table = "django/forms/table.html"
     template_name_ul = "django/forms/ul.html"
     template_name_label = "django/forms/label.html"
+
+    bound_field_class = BoundField
 
     def __init__(
         self,
