@@ -421,7 +421,6 @@ following structure:
 
 .. code-block:: text
 
-    runtests.py
     polls/
         __init__.py
         models.py
@@ -429,10 +428,69 @@ following structure:
     tests/
         __init__.py
         models.py
-        test_settings.py
+        settings.py
         tests.py
+        urls.py
 
 Let's take a look inside a couple of those files:
+
+.. code-block:: python
+   :caption: ``tests/settings.py``
+
+   from django.urls import include, path
+
+   SECRET_KEY = "fake-key"
+
+   INSTALLED_APPS = [
+       "polls",
+       # adding tests allows us to define models inside the tests package
+       "tests",
+   ]
+
+   DATABASES = {
+       "default": {
+           "ENGINE": "django.db.backends.sqlite3",
+           "NAME": ":memory:",
+       }
+   }
+
+   TEMPLATES = [
+       {
+           "BACKEND": "django.template.backends.django.DjangoTemplates",
+           "APP_DIRS": True,
+       },
+   ]
+
+   ROOT_URLCONF = "tests.urls"
+
+This file contains the :doc:`Django settings </topics/settings>` required to
+run your app's tests.
+
+Since the *tests* package is included in :setting:`INSTALLED_APPS` when running
+your tests, you can define test-only models in its ``models.py`` file.
+
+
+.. code-block:: python
+   :caption: ``tests/urls.py``
+
+   from django.urls import include, path
+
+   urlpatterns = [
+       path("polls/", include("polls.urls")),
+   ]
+
+If you want to test views, you need a :setting:`ROOT_URLCONF` that includes
+your app.
+
+
+You can then invoke the test runner using
+
+.. code-block:: shell
+
+    python -m django test --settings=tests.settings tests
+
+If you need a more complicated setup, you can create a custom ``runtests.py``
+to manually initialize the test runner.
 
 .. code-block:: python
     :caption: ``runtests.py``
@@ -446,7 +504,7 @@ Let's take a look inside a couple of those files:
     from django.test.utils import get_runner
 
     if __name__ == "__main__":
-        os.environ["DJANGO_SETTINGS_MODULE"] = "tests.test_settings"
+        os.environ["DJANGO_SETTINGS_MODULE"] = "tests.settings"
         django.setup()
         TestRunner = get_runner(settings)
         test_runner = TestRunner()
@@ -454,32 +512,13 @@ Let's take a look inside a couple of those files:
         sys.exit(bool(failures))
 
 
-This is the script that you invoke to run the test suite. It sets up the
-Django environment, creates the test database and runs the tests.
+You can use use this script to run the test suite. It sets up the Django
+environment, creates the test database and runs the tests.
 
 For the sake of clarity, this example contains only the bare minimum
 necessary to use the Django test runner. You may want to add
 command-line options for controlling verbosity, passing in specific test
 labels to run, etc.
-
-.. code-block:: python
-    :caption: ``tests/test_settings.py``
-
-    SECRET_KEY = "fake-key"
-    INSTALLED_APPS = [
-        "tests",
-    ]
-
-This file contains the :doc:`Django settings </topics/settings>`
-required to run your app's tests.
-
-Again, this is a minimal example; your tests may require additional
-settings to run.
-
-Since the *tests* package is included in :setting:`INSTALLED_APPS` when
-running your tests, you can define test-only models in its ``models.py``
-file.
-
 
 .. _other-testing-frameworks:
 
