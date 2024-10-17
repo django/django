@@ -30,6 +30,9 @@ you can use any of the following to reverse the URL::
 
     reverse(views.archive)
 
+The callable view object can also be a function view :ref:`derived from a
+class-based view <view-function-from-cbv>`.
+
 If the URL accepts arguments, you may pass them in ``args``. For example::
 
     from django.urls import reverse
