@@ -24,6 +24,33 @@
 {% endblock %}
 {% endif %}
 
+{% block pretitle %}
+  {% if errors %}
+    <div class="errornote" role="alert" aria-labelledby="error-summary-title" tabindex="-1">
+      <h2 id="error-summary-title">
+        {% blocktranslate %}There is a problem{% endblocktranslate %}
+      </h2>
+      <p>{{ adminform.form.non_field_errors }}</p>
+      {% if field_errors_exist %}
+      <p>The following fields have errors:</p>
+      <ul class="errorlist">
+        {% for fieldset in adminform %}
+          {% for line in fieldset %}
+            {% for field in line %}
+              {% if field.errors %}
+                <li>
+                  <a href="#" onclick="focusField('{{ field.field.id_for_label }}'); event.preventDefault();">{{ field.field.label }}</a>
+                </li>
+              {% endif %}
+            {% endfor %}
+          {% endfor %}
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+  {% endif %}
+{% endblock %}
+
 {% block content %}<div id="content-main">
 {% block object-tools %}
 {% if change and not is_popup %}
@@ -39,12 +66,6 @@
 {% if is_popup %}<input type="hidden" name="{{ is_popup_var }}" value="1">{% endif %}
 {% if to_field %}<input type="hidden" name="{{ to_field_var }}" value="{{ to_field }}">{% endif %}
 {% if save_on_top %}{% block submit_buttons_top %}{% submit_row %}{% endblock %}{% endif %}
-{% if errors %}
-    <p class="errornote">
-    {% blocktranslate count counter=errors|length %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktranslate %}
-    </p>
-    {{ adminform.form.non_field_errors }}
-{% endif %}
 
 {% block field_sets %}
 {% for fieldset in adminform %}
@@ -65,6 +86,24 @@
 {% block submit_buttons_bottom %}{% submit_row %}{% endblock %}
 
 {% block admin_change_form_document_ready %}
+{% if errors %}
+  <script>
+      document.addEventListener("DOMContentLoaded", function() {
+          const errorSummary = document.querySelector('.errornote[role="alert"]');
+          if (errorSummary) {
+            errorSummary.focus();
+          }
+      });
+
+      function focusField(fieldId) {
+          const fieldElement = document.getElementById(fieldId);
+          if (fieldElement) {
+              fieldElement.focus();
+          }
+      }
+  </script>
+{% endif %}
+
     <script id="django-admin-form-add-constants"
             src="{% static 'admin/js/change_form.js' %}"
             {% if adminform and add %}
