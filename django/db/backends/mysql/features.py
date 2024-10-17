@@ -27,6 +27,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_frame_range_fixed_distance = True
     supports_update_conflicts = True
     delete_can_self_reference_subquery = False
+    can_return_columns_from_update = False
     create_test_procedure_without_params_sql = """
         CREATE PROCEDURE test_procedure ()
         BEGIN
