@@ -1982,3 +1982,63 @@ gaps.
 Computes the row number according to the ordering of either the frame clause
 or the ordering of the whole query if there is no partitioning of the
 :ref:`window frame <window-frames>`.
+
+.. json-related-functions:
+
+JSON-related functions
+======================
+
+We'll be using the following model in examples of each function::
+
+    class UserPreferences(models.Model):
+        settings = models.JSONField(encoder=DjangoJSONEncoder)
+
+``JSONSet``
+-----------
+
+.. class:: JSONSet(expression, **fields)
+
+Updates specific fields within a JSON field in the database. Takes an
+expression which will be updated and key-value pairs that specify which fields
+within the JSON structure should be updated.
+
+Usage example:
+
+.. code-block:: pycon
+
+    >>> from django.db.models.functions import JSONSet
+    >>> user_preferences = UserPreferences.objects.create(
+    ...     settings={"theme": "dark", "notifications": True}
+    ... )
+    >>> UserPreferences.objects.update(settings=JSONSet("settings", theme="light"))
+    1
+    >>> user_preferences = UserPreferences.objects.get(pk=user_preferences.pk)
+    >>> print(user_preferences.settings)
+    {'theme': 'light', 'notifications': True}
+
+
+``JSONRemove``
+--------------
+
+.. class:: JSONRemove(expression, *paths)
+
+Removes specific paths from a JSON field in the database. Accepts an expression
+from which paths will be removed and variable number of paths indicating
+the keys within the JSON structure that should be removed
+
+Usage example:
+
+.. code-block:: pycon
+
+    >>> from django.db.models.functions import JSONRemove
+    >>> user_preferences = UserPreferences.objects.create(
+    ...     settings={"theme": "dark", "notifications": True}
+    ... )
+    >>> UserPreferences.objects.update(settings=JSONRemove("settings", "theme"))
+    1
+    >>> user_preferences = UserPreferences.objects.get(pk=user_preferences.pk)
+    >>> print(user_preferences.settings)
+    {'notifications': True}
+
+For more information on how to use the JSONSet and JSONRemove functions, see
+:ref:`updating-jsonfield`.

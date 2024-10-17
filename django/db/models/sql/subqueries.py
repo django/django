@@ -3,6 +3,7 @@ Query subclasses which provide extra functionality beyond simple data retrieval.
 """
 
 from django.core.exceptions import FieldError
+from django.db.models.constants import LOOKUP_SEP
 from django.db.models.sql.constants import CURSOR, GET_ITERATOR_CHUNK_SIZE, NO_RESULTS
 from django.db.models.sql.query import Query
 
@@ -83,13 +84,42 @@ class UpdateQuery(Query):
         query. This is the entry point for the public update() method on
         querysets.
         """
-        values_seq = []
+        field_dict = dict()
         for name, val in values.items():
+            name, *transforms = name.split(LOOKUP_SEP)
             field = self.get_meta().get_field(name)
             direct = (
                 not (field.auto_created and not field.concrete) or not field.concrete
             )
             model = field.model._meta.concrete_model
+
+            # Handle using transforms in update()
+            if transforms:
+                lhs = name
+                for transform in transforms:
+                    transform_class = field.get_transform(transform)
+                    if transform_class:
+                        lhs = transform_class(lhs)
+                    else:
+                        raise FieldError(
+                            f"{transform} is not a valid transform "
+                            f"on {field.__class__.__name__}."
+                        )
+
+                # Handle updating the same field multiple times with
+                # different transforms
+                if field_dict.get(field):
+                    previous_expression = field_dict.get(field)[-1]
+                    field_dict[field] = (
+                        field,
+                        model,
+                        lhs.get_update_expression(val, previous_expression),
+                    )
+                else:
+                    field_dict[field] = (field, model, lhs.get_update_expression(val))
+
+                continue
+
             if not direct or (field.is_relation and field.many_to_many):
                 raise FieldError(
                     "Cannot update model field %r (only non-relations and "
@@ -98,8 +128,9 @@ class UpdateQuery(Query):
             if model is not self.get_meta().concrete_model:
                 self.add_related_update(model, field, val)
                 continue
-            values_seq.append((field, model, val))
-        return self.add_update_fields(values_seq)
+            field_dict[field] = (field, model, val)
+
+        return self.add_update_fields(field_dict.values())
 
     def add_update_fields(self, values_seq):
         """
