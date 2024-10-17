@@ -72,10 +72,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def test_collations(self):
         return {
-            "ci": f"utf8mb4_general_ci",
-            "non_default": f"utf8mb4_esperanto_ci",
-            "swedish_ci": f"utf8mb4_swedish_ci",
-            "virtual": f"utf8mb4_esperanto_ci",
+            "ci": "utf8mb4_general_ci",
+            "non_default": "utf8mb4_esperanto_ci",
+            "swedish_ci": "utf8mb4_swedish_ci",
+            "virtual": "utf8mb4_esperanto_ci",
         }
 
     test_now_utc_template = "UTC_TIMESTAMP(6)"
