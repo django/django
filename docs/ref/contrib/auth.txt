@@ -30,10 +30,7 @@ Fields
 
         The ``max_length`` should be sufficient for many use cases. If you need
         a longer length, please use a :ref:`custom user model
-        <specifying-custom-user-model>`. If you use MySQL with the ``utf8mb4``
-        encoding (recommended for proper Unicode support), specify at most
-        ``max_length=191`` because MySQL can only create unique indexes with
-        191 characters in that case by default.
+        <specifying-custom-user-model>`.
 
     .. attribute:: first_name
 
