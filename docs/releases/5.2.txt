@@ -352,6 +352,8 @@ backends.
 
 * Support for GDAL 3.0 is removed.
 
+* Support for GEOS 3.8 is removed.
+
 Dropped support for PostgreSQL 13
 ---------------------------------
 
