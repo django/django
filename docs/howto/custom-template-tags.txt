@@ -498,7 +498,77 @@ you see fit:
     {% current_time "%Y-%m-%d %I:%M %p" as the_time %}
     <p>The time is {{ the_time }}.</p>
 
+.. _howto-custom-template-tags-simple-block-tags:
+
+Simple block tags
+-----------------
+
+.. versionadded:: 5.2
+
+.. method:: django.template.Library.simple_block_tag()
+
+If you need to pass a section of rendered template into your custom tag, the
+``simple_block_tag`` helper function of ``django.template.Library`` passes a
+``content`` argument, containing the rendered template content enclosed in the
+tag. This functions similar to :meth:`~django.template.Library.simple_tag()`,
+but with an additional ``content`` argument.
+
+For example, a custom block tag which created a chart could look like this::
+
+    from django import template
+    from myapp.charts import render_chart
+
+    register = template.Library()
+
+
+    @register.simple_block_tag
+    def chart(content):
+        return render_chart(source=content)
+
+The ``content`` argument contains everything in between the ``{% chart %}``
+and ``{% endchart %}`` tags. If there are other template tags or variables,
+they will be rendered before being passed in.
+
+.. code-block:: html+django
+
+    {% chart %}
+        digraph G {
+            label = "Chart for {{ request.user }}"
+            A -> {B C}
+        }
+    {% endchart %}
+
+A few things to note about the ``simple_block_tag`` helper function:
+
+* The first argument must be called ``content``, and will contain the contents
+  of the template tag as a rendered string.
+* Variables passed to the tag are not included in the rendering context of the
+  content, as would be when using the ``{% with %}`` tag.
+
+Just like :ref:`simple_tag<howto-custom-template-tags-simple-tags>`,
+``simple_block_tag``:
+
+* Validates the quantity and quality of the arguments.
+* Strips quotes from arguments if necessary.
+* Escapes the output accordingly.
+* Supports passing ``takes_context=True`` at registration time to access context.
+  Note that in this case, the first argument *must* be called ``context``,
+  and ``content`` must follows.
+* Supports renaming the tag by passing the ``name`` argument when registering.
+* Supports accepting any number of positional or keyword arguments.
+* Supports storing the result in a template variable using the ``as`` variant.
+
+.. admonition::  Content Escaping
+
+    ``simple_block_tag`` behaves similarly to ``simple_tag`` regarding
+    auto-escaping. For details on escaping and safety, refer to ``simple_tag``.
+
+    Because the ``content`` argument has already been rendered by Django, it is
+    already escaped. Therefore, it may be necessary to use
+    :func:`~django.utils.safestring.mark_safe` to ensure it's not
+    double-escaped.
 .. _howto-custom-template-tags-inclusion-tags:
+
 
 Inclusion tags
 --------------
