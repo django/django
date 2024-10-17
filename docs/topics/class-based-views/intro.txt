@@ -144,6 +144,36 @@ Another option is to configure class attributes as keyword arguments to the
     :meth:`~django.views.generic.base.View.as_view` entry point are
     configured only once at the time your URLs are imported.
 
+.. _view-function-from-cbv:
+
+Deriving a view function from a class-based view
+------------------------------------------------
+
+It is possible to directly use the view function provided as the result of
+calling :meth:`~django.views.generic.base.View.as_view` on a class-based view.
+This allows you to create a class-based view while still using a view function.
+
+For example::
+
+    from django.http import HttpResponse
+    from django.views import View
+
+
+    class GreetingView(View):
+        greeting = "Good Day"
+
+        def get(self, request):
+            return HttpResponse(self.greeting)
+
+
+    morning_greeting_view = GreetingView.as_view(greeting="Good Morning")
+
+Which can be used in the URLconf as::
+
+    urlpatterns = [
+        path("about/", morning_greeting_view),
+    ]
+
 Using mixins
 ============
 
