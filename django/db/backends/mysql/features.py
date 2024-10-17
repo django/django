@@ -71,21 +71,11 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     @cached_property
     def test_collations(self):
-        charset = "utf8"
-        if (
-            self.connection.mysql_is_mariadb
-            and self.connection.mysql_version >= (10, 6)
-        ) or (
-            not self.connection.mysql_is_mariadb
-            and self.connection.mysql_version >= (8, 0, 30)
-        ):
-            # utf8 is an alias for utf8mb3 in MariaDB 10.6+ and MySQL 8.0.30+.
-            charset = "utf8mb3"
         return {
-            "ci": f"{charset}_general_ci",
-            "non_default": f"{charset}_esperanto_ci",
-            "swedish_ci": f"{charset}_swedish_ci",
-            "virtual": f"{charset}_esperanto_ci",
+            "ci": f"utf8mb4_general_ci",
+            "non_default": f"utf8mb4_esperanto_ci",
+            "swedish_ci": f"utf8mb4_swedish_ci",
+            "virtual": f"utf8mb4_esperanto_ci",
         }
 
     test_now_utc_template = "UTC_TIMESTAMP(6)"
