@@ -257,7 +257,8 @@ class SpecializedFieldTest(SimpleTestCase):
         """
         self.assertTrue(form_instance.is_valid())
         rendered = form_instance.as_p()
-        self.assertIn("new MapWidget(options);", rendered)
+        field_name = list(form_instance.fields.keys())[0]
+        self.assertIn(f"window.geodjango_{field_name}Options = options;", rendered)
         self.assertIn("map_srid: 3857,", rendered)
         self.assertIn("gis/js/OLMapWidget.js", str(form_instance.media))
 
