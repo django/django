@@ -846,6 +846,11 @@ class ChangeListTests(TestCase):
         cl = model_admin.get_changelist_instance(request)
         self.assertCountEqual(cl.queryset, [child])
 
+        request = self.factory.get("/", data={SEARCH_VAR: "Asher"})
+        request.user = self.superuser
+        cl = model_admin.get_changelist_instance(request)
+        self.assertCountEqual(cl.queryset, [child])
+
         request = self.factory.get("/", data={SEARCH_VAR: "fsfsl"})
         request.user = self.superuser
         cl = model_admin.get_changelist_instance(request)

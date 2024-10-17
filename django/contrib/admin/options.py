@@ -3,11 +3,11 @@ import enum
 import json
 import re
 import warnings
-from functools import partial, update_wrapper
+import operator
+from functools import partial, update_wrapper, reduce
 from urllib.parse import parse_qsl
 from urllib.parse import quote as urlquote
 from urllib.parse import urlparse
-
 from django import forms
 from django.conf import settings
 from django.contrib import messages
@@ -1167,7 +1167,6 @@ class ModelAdmin(BaseModelAdmin):
         Return a tuple containing a queryset to implement the search
         and a boolean indicating if the results may contain duplicates.
         """
-
         # Apply keyword searches.
         def construct_search(field_name):
             if field_name.startswith("^"):
@@ -1208,17 +1207,27 @@ class ModelAdmin(BaseModelAdmin):
             for bit in smart_split(search_term):
                 if bit.startswith(('"', "'")) and bit[0] == bit[-1]:
                     bit = unescape_string_literal(bit)
-                or_queries = models.Q.create(
-                    [(orm_lookup, bit) for orm_lookup in orm_lookups],
-                    connector=models.Q.OR,
-                )
-                term_queries.append(or_queries)
-            try:
-                queryset = queryset.filter(models.Q.create(term_queries))
-            except (ValueError, ValidationError):
-                # If a ValueError occurs
-                # (e.g. when a non-integer term is used with __exact)
-                # return an empty queryset.
+                
+                field_queries = []
+                for orm_lookup in orm_lookups:
+                    try:
+                        # Attempt to create a query for each field
+                        field_query = models.Q(**{orm_lookup: bit})
+                        queryset.filter(field_query).exists()  # Test if the query is valid
+                        field_queries.append(field_query)
+                    except (ValueError, ValidationError):
+                        # Skip this field if the query is invalid
+                        continue
+                
+                # Combine valid field queries with OR
+                if field_queries:
+                    term_queries.append(models.Q(reduce(operator.or_, field_queries)))
+            
+            # Combine term queries with AND
+            if term_queries:
+                queryset = queryset.filter(reduce(operator.and_, term_queries))
+            else:
+                # If no valid queries were created, return an empty queryset
                 return queryset.none(), may_have_duplicates
 
             may_have_duplicates |= any(
