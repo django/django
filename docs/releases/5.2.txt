@@ -94,7 +94,8 @@ Minor features
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new :class:`~django.contrib.gis.db.models.functions.Rotate` rotates
+  a geometry by a specified angle around the origin or a specified point.
 
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
