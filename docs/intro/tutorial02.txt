@@ -154,9 +154,9 @@ A :class:`~django.db.models.Field` can also have various optional arguments; in
 this case, we've set the :attr:`~django.db.models.Field.default` value of
 ``votes`` to 0.
 
-Finally, note a relationship is defined, using
-:class:`~django.db.models.ForeignKey`. That tells Django each ``Choice`` is
-related to a single ``Question``. Django supports all the common database
+Finally, note that a relationship is defined, using
+:class:`~django.db.models.ForeignKey`. That tells Django that each ``Choice`` is
+related to a single ``Question``. However, this doesn't mean that each ``Question`` is related to only one ``Choice``. One ``Question`` could have many ``Choice`` instances related to it. As a result, this relationship would be defined as many-to-one. Django supports all the common database
 relationships: many-to-one, many-to-many, and one-to-one.
 
 Activating models
