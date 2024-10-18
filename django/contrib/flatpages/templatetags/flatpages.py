@@ -7,7 +7,10 @@ register = template.Library()
 
 
 class FlatpageNode(template.Node):
+    __slots__ = ("context_name", "starts_with", "user")
+
     def __init__(self, context_name, starts_with=None, user=None):
+        super().__init__()
         self.context_name = context_name
         if starts_with:
             self.starts_with = template.Variable(starts_with)
