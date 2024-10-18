@@ -31,6 +31,31 @@ and only officially support the latest release of each series.
 What's new in Django 5.2
 ========================
 
+Auto imported models in the ``shell``
+-------------------------------------
+
+The :djadmin:`shell` management command now automatically imports all models
+from all installed apps.
+
+You can view all imported functions and classes when ``--verbosity`` is 2
+or above.
+
+.. code-block:: shell
+
+    $ python manage.py shell --verbosity=2
+    10 objects imported automatically
+    from django.contrib.sessions.models import Session
+    from django.contrib.contenttypes.models import ContentType
+    from django.contrib.auth.models import User, Group, Permission
+    from django.contrib.admin.models import LogEntry
+    import django.contrib.admin.models as admin_models
+    import django.contrib.auth.models as auth_models
+    import django.contrib.contenttypes.models as contenttypes_models
+    import django.contrib.sessions.models as sessions_models
+
+This :ref:`behavior can be customized <customizing-shell-auto-imports>` to add
+extra imports or remove the new default imports.
+
 Minor features
 --------------
 
