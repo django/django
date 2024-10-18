@@ -364,7 +364,8 @@ class HashedFilesMixin:
                 if name in adjustable_paths:
                     old_hashed_name = hashed_name
                     try:
-                        content = original_file.read().decode("utf-8")
+                        unprocessed_content = original_file.read().decode("utf-8")
+                        final_content = unprocessed_content
                     except UnicodeDecodeError as exc:
                         yield name, None, exc, False
                     for extension, patterns in self._patterns.items():
@@ -374,13 +375,29 @@ class HashedFilesMixin:
                                     name, hashed_files, template
                                 )
                                 try:
-                                    content = pattern.sub(converter, content)
+                                    processed_content = pattern.sub(
+                                        converter, unprocessed_content
+                                    )
+                                    final_content_lines = final_content.split("\n")
+                                    processed_content_lines = processed_content.split(
+                                        "\n"
+                                    )
+                                    for i, final_content_line in enumerate(
+                                        final_content_lines
+                                    ):
+                                        if len(final_content_line) < len(
+                                            processed_content_lines[i]
+                                        ):
+                                            final_content_lines[i] = (
+                                                processed_content_lines[i]
+                                            )  # Keep the processed line
+                                    final_content = "\n".join(final_content_lines)
                                 except ValueError as exc:
                                     yield name, None, exc, False
                     if hashed_file_exists:
                         self.delete(hashed_name)
                     # then save the processed result
-                    content_file = ContentFile(content.encode())
+                    content_file = ContentFile(final_content.encode())
                     if self.keep_intermediate_files:
                         # Save intermediate file for reference
                         self._save(hashed_name, content_file)
