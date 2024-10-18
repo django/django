@@ -18,6 +18,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     requires_explicit_null_ordering_when_grouping = True
     atomic_transactions = False
     can_clone_databases = True
+    supports_aggregate_order_by_clause = True
     supports_comments = True
     supports_comments_inline = True
     supports_temporal_subtraction = True

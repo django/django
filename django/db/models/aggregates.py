@@ -3,8 +3,9 @@ Classes to represent the definitions of aggregate functions.
 """
 
 from django.core.exceptions import FieldError, FullResultSet
-from django.db.models.expressions import Case, Func, Star, Value, When
-from django.db.models.fields import IntegerField
+from django.db import NotSupportedError
+from django.db.models.expressions import Case, Func, OrderByList, Star, Value, When
+from django.db.models.fields import IntegerField, TextField
 from django.db.models.functions.comparison import Coalesce
 from django.db.models.functions.mixins import (
     FixDurationInputMixin,
@@ -18,42 +19,87 @@ __all__ = [
     "Max",
     "Min",
     "StdDev",
+    "StringAgg",
     "Sum",
     "Variance",
 ]
 
 
+class AggregateFilter(Func):
+    arity = 1
+    template = " FILTER (WHERE %(expressions)s)"
+
+    def as_sql(self, compiler, connection, **extra_context):
+        if not connection.features.supports_aggregate_filter_clause:
+            raise NotSupportedError
+        try:
+            return super().as_sql(compiler, connection, **extra_context)
+        except FullResultSet:
+            return "", ()
+
+    @property
+    def condition(self):
+        return self.source_expressions[0]
+
+    def __str__(self):
+        return self.arg_joiner.join(str(arg) for arg in self.source_expressions)
+
+
+class AggregateOrderBy(OrderByList):
+    template = " ORDER BY %(expressions)s"
+
+    def as_sql(self, compiler, connection, **extra_context):
+        if not connection.features.supports_aggregate_order_by_clause:
+            raise NotSupportedError
+
+        return super().as_sql(compiler, connection, **extra_context)
+
+
 class Aggregate(Func):
-    template = "%(function)s(%(distinct)s%(expressions)s)"
+    template = "%(function)s(%(distinct)s%(expressions)s%(order_by)s)%(filter)s"
     contains_aggregate = True
     name = None
-    filter_template = "%s FILTER (WHERE %%(filter)s)"
     window_compatible = True
     allow_distinct = False
+    allow_order_by = False
     empty_result_set_value = None
 
     def __init__(
-        self, *expressions, distinct=False, filter=None, default=None, **extra
+        self,
+        *expressions,
+        distinct=False,
+        filter=None,
+        default=None,
+        order_by=None,
+        **extra,
     ):
         if distinct and not self.allow_distinct:
             raise TypeError("%s does not allow distinct." % self.__class__.__name__)
+        if order_by and not self.allow_order_by:
+            raise TypeError("%s does not allow order_by." % self.__class__.__name__)
         if default is not None and self.empty_result_set_value is not None:
             raise TypeError(f"{self.__class__.__name__} does not allow default.")
+
         self.distinct = distinct
-        self.filter = filter
+        self.filter = filter and AggregateFilter(filter)
+        self.order_by = order_by
         self.default = default
+        self.order_by = order_by and AggregateOrderBy.from_param(
+            f"{self.__class__.__name__}.order_by", order_by
+        )
         super().__init__(*expressions, **extra)
 
     def get_source_fields(self):
-        # Don't return the filter expression since it's not a source field.
+        # Don't consider filter and order by expression as they have nothing
+        # to do with the output field resolution.
         return [e._output_field_or_none for e in super().get_source_expressions()]
 
     def get_source_expressions(self):
         source_expressions = super().get_source_expressions()
-        return source_expressions + [self.filter]
+        return source_expressions + [self.filter, self.order_by]
 
     def set_source_expressions(self, exprs):
-        *exprs, self.filter = exprs
+        *exprs, self.filter, self.order_by = exprs
         return super().set_source_expressions(exprs)
 
     def resolve_expression(
@@ -64,6 +110,11 @@ class Aggregate(Func):
         c.filter = (
             c.filter.resolve_expression(query, allow_joins, reuse, summarize)
             if c.filter
+            else None
+        )
+        c.order_by = (
+            c.order_by.resolve_expression(query, allow_joins, reuse, summarize)
+            if c.order_by
             else None
         )
         if summarize:
@@ -115,35 +166,45 @@ class Aggregate(Func):
         return []
 
     def as_sql(self, compiler, connection, **extra_context):
-        extra_context["distinct"] = "DISTINCT " if self.distinct else ""
-        if self.filter:
-            if connection.features.supports_aggregate_filter_clause:
-                try:
-                    filter_sql, filter_params = self.filter.as_sql(compiler, connection)
-                except FullResultSet:
-                    pass
-                else:
-                    template = self.filter_template % extra_context.get(
-                        "template", self.template
-                    )
-                    sql, params = super().as_sql(
-                        compiler,
-                        connection,
-                        template=template,
-                        filter=filter_sql,
-                        **extra_context,
-                    )
-                    return sql, (*params, *filter_params)
-            else:
+        if (
+            self.distinct
+            and not connection.features.supports_aggregate_distinct_multiple_argument
+            and len(super().get_source_expressions()) > 1
+        ):
+            raise NotSupportedError(
+                f"{self.name} doesn't support `distinct` with multiple expressions on "
+                f"{connection.vendor}"
+            )
+
+        distinct_sql = "DISTINCT " if self.distinct else ""
+        order_by_sql = ""
+        order_by_params = []
+        filter_sql = ""
+        filter_params = []
+
+        if (order_by := self.order_by) is not None:
+            order_by_sql, order_by_params = compiler.compile(order_by)
+
+        if self.filter is not None:
+            try:
+                filter_sql, filter_params = compiler.compile(self.filter)
+            except NotSupportedError:
+                # Fallback to a CASE statement on backends that don't
+                # support the FILTER clause.
                 copy = self.copy()
                 copy.filter = None
                 source_expressions = copy.get_source_expressions()
-                condition = When(self.filter, then=source_expressions[0])
+                condition = When(self.filter.condition, then=source_expressions[0])
                 copy.set_source_expressions([Case(condition)] + source_expressions[1:])
-                return super(Aggregate, copy).as_sql(
-                    compiler, connection, **extra_context
-                )
-        return super().as_sql(compiler, connection, **extra_context)
+                return copy.as_sql(compiler, connection, **extra_context)
+
+        extra_context.update(
+            distinct=distinct_sql,
+            filter=filter_sql,
+            order_by=order_by_sql,
+        )
+        sql, params = super().as_sql(compiler, connection, **extra_context)
+        return sql, (*params, *order_by_params, *filter_params)
 
     def _get_repr_options(self):
         options = super()._get_repr_options()
@@ -151,6 +212,8 @@ class Aggregate(Func):
             options["distinct"] = self.distinct
         if self.filter:
             options["filter"] = self.filter
+        if self.order_by:
+            options["order_by"] = self.order_by
         return options
 
 
@@ -194,6 +257,93 @@ class StdDev(NumericOutputFieldMixin, Aggregate):
 
     def _get_repr_options(self):
         return {**super()._get_repr_options(), "sample": self.function == "STDDEV_SAMP"}
+
+
+class StringAggDelimiter(Func):
+    arity = 1
+    template = "%(expressions)s"
+
+    def __init__(self, value):
+        self.value = value
+        super().__init__(value)
+
+    def as_mysql(self, compiler, connection, **extra_context):
+        template = " SEPARATOR %(expressions)s"
+
+        return self.as_sql(
+            compiler,
+            connection,
+            template=template,
+            **extra_context,
+        )
+
+
+class StringAgg(Aggregate):
+    template = "%(function)s(%(distinct)s%(expressions)s%(order_by)s)%(filter)s"
+    function = "STRING_AGG"
+    name = "StringAgg"
+    allow_distinct = True
+    allow_order_by = True
+    output_field = TextField()
+
+    def __init__(self, expression, delimiter, **extra):
+        self.delimiter = StringAggDelimiter(delimiter)
+        super().__init__(expression, self.delimiter, **extra)
+
+    def as_oracle(self, compiler, connection, **extra_context):
+        if self.order_by:
+            template = (
+                "%(function)s(%(distinct)s%(expressions)s) WITHIN GROUP (%(order_by)s)"
+                "%(filter)s"
+            )
+        else:
+            template = "%(function)s(%(distinct)s%(expressions)s)%(filter)s"
+
+        return self.as_sql(
+            compiler,
+            connection,
+            function="LISTAGG",
+            template=template,
+            **extra_context,
+        )
+
+    def as_mysql(self, compiler, connection, **extra_context):
+        """
+        Compile the aggregate for MySQL.
+
+        MySQL does not treat the delimiter as an expression like other database
+        backends. Instead, it is put at the end of the aggregate using the `SEPARATOR`
+        declaration. Because of this, the creation of the delimiter SQL and the ordering
+        of the parameters must be handled explicitly.
+        """
+        extra_context["function"] = "GROUP_CONCAT"
+
+        template = "%(function)s(%(distinct)s%(expressions)s%(order_by)s%(delimiter)s)"
+        extra_context["template"] = template
+
+        c = self.copy()
+
+        delimiter_params = []
+        if c.delimiter:
+            delimiter_sql, delimiter_params = compiler.compile(c.delimiter)
+            # Drop the delimiter from the source expressions
+            c.source_expressions = c.source_expressions[:-1]
+            extra_context["delimiter"] = delimiter_sql
+
+        sql, params = c.as_sql(compiler, connection, **extra_context)
+
+        return sql, (*params, *delimiter_params)
+
+    def as_sqlite(self, compiler, connection, **extra_context):
+        if connection.get_database_version() < (3, 44):
+            return self.as_sql(
+                compiler,
+                connection,
+                function="GROUP_CONCAT",
+                **extra_context,
+            )
+
+        return self.as_sql(compiler, connection, **extra_context)
 
 
 class Sum(FixDurationInputMixin, Aggregate):

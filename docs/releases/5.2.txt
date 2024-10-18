@@ -265,6 +265,12 @@ Models
   longer required to be set on SQLite, which supports unlimited ``VARCHAR``
   columns.
 
+* Adds ``order_by`` support and the
+  :attr:`~django.db.models.Aggregate.allow_order_by` class attribute to
+  :class:`~django.db.models.Aggregate`.
+
+* Adds :class:`~django.db.models.StringAgg`.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -387,3 +393,12 @@ Miscellaneous
 
 * The ``all`` argument for the ``django.contrib.staticfiles.finders.find()``
   function is deprecated in favor of the ``find_all`` argument.
+
+* The PostgreSQL ``ordering`` argument on aggregates class is deprecated in favor
+  of the ``order_by`` argument instead.
+
+* The PostgreSQL ``StringAgg`` class is deprecated in favor of the generally
+  available ``StringAgg`` class.
+
+* The PostgreSQL ``OrderableAggMixin`` is deprecated in favor of the
+  ``order_by`` attribute now available on the ``Aggregate`` class.

@@ -257,6 +257,15 @@ class BaseDatabaseFeatures:
     # expressions?
     supports_aggregate_filter_clause = False
 
+    # Does the database support ORDER BY in aggregate expressions?
+    supports_aggregate_order_by_clause = False
+
+    # Does the database backend support DISTINCT when using multiple arguments in an
+    # aggregate expression? For example, Sqlite treats the "delimiter" argument of
+    # STRING_AGG/GROUP_CONCAT as an extra argument and does not allow using a custom
+    # delimiter along with DISTINCT.
+    supports_aggregate_distinct_multiple_argument = True
+
     # Does the backend support indexing a TextField?
     supports_index_on_text_field = True
 
