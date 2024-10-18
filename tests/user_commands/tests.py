@@ -15,6 +15,7 @@ from django.core.management.utils import (
     is_ignored_path,
     normalize_path_patterns,
     popen_wrapper,
+    run_formatters,
 )
 from django.db import connection
 from django.test import SimpleTestCase, override_settings
@@ -535,3 +536,10 @@ class UtilsTests(SimpleTestCase):
     def test_normalize_path_patterns_truncates_wildcard_base(self):
         expected = [os.path.normcase(p) for p in ["foo/bar", "bar/*/"]]
         self.assertEqual(normalize_path_patterns(["foo/bar/*", "bar/*/"]), expected)
+
+    @mock.patch("subprocess.run", side_effect=OSError)
+    def test_formatting_failure_is_caught_and_logged(self, _mock):
+        with self.assertLogs("django.core.management.utils", level="WARNING") as cm:
+            run_formatters([])
+        self.assertIn("Black failed to launch.\n", cm.output[0])
+        self.assertIn("OSError", cm.output[0])
