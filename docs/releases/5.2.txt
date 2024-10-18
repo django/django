@@ -182,6 +182,9 @@ Email
   returns a boolean indicating whether a provided text is contained in the
   email ``body`` and in all attached MIME type ``text/*`` alternatives.
 
+* The SMTP email backend now supports certificate validation by setting
+  ``ssl_cafile`` in the constructor.
+
 Error Reporting
 ~~~~~~~~~~~~~~~
 
