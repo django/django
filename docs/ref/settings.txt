@@ -2660,6 +2660,68 @@ backend definition in :setting:`STORAGES`.
     Defining this setting overrides the default value and is *not* merged with
     it.
 
+.. setting:: TASKS
+
+``TASKS``
+----------
+
+Default::
+
+    {
+        "default": {
+            "BACKEND": "django.tasks.backends.immediate.ImmediateBackend",
+        }
+    }
+
+A dictionary containing the settings for all task backends to be used with
+Django. It is a nested dictionary whose contents maps backend aliases to a
+dictionary containing the options for each backend.
+
+The :setting:`TASKS` setting must configure a ``default`` backend; any number
+of additional backends may also be specified. Depending on which backend is used,
+other options may be required. The following options are available as standard:
+
+.. setting:: TASKS-BACKEND
+
+``BACKEND``
+~~~~~~~~~~~
+
+Default: ``''`` (Empty string)
+
+The task backend to use. The built-in backends are:
+
+* ``'django.tasks.backends.dummy.DummyBackend'``
+* ``'django.tasks.backends.immediate.ImmediateBackend'``
+
+You can use a backend that doesn't ship with Django by setting
+:setting:`BACKEND <TASKS-BACKEND>` to a fully-qualified path of a backend
+class (i.e. ``mypackage.backends.whatever.WhateverBackend``).
+
+.. setting:: TASKS-ENQUEUE_ON_COMMIT
+
+``ENQUEUE_ON_COMMIT``
+~~~~~~~~~~~~~~~~~~~~~
+
+Default: ``True``
+
+Whether a task should be enqueued at the end of the current transaction (if there
+is one) commits successfully, rather than enqueueing immediately.
+
+This can also be configured on a per-task basis.
+
+.. setting:: TASKS-QUEUES
+
+``QUEUES``
+~~~~~~~~~~~~~~~~~~~~~
+
+Default: ``["default"]``
+
+Specify the queue names supported by the backend. This can be used to ensure
+tasks aren't enqueued to queues which don't exist.
+
+To disable queue name validation, set :setting:`QUEUES <TASKS-QUEUES>` to an
+empty list (``[]``).
+
 .. setting:: TEMPLATES
 
 ``TEMPLATES``

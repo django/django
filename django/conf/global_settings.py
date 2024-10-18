@@ -667,3 +667,8 @@ SECURE_REDIRECT_EXEMPT = []
 SECURE_REFERRER_POLICY = "same-origin"
 SECURE_SSL_HOST = None
 SECURE_SSL_REDIRECT = False
+
+#########
+# TASKS #
+#########
+TASKS = {"default": {"BACKEND": "django.tasks.backends.immediate.ImmediateBackend"}}
