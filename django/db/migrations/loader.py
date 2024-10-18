@@ -4,6 +4,7 @@ from importlib import import_module, reload
 
 from django.apps import apps
 from django.conf import settings
+from django.core.management import CommandError
 from django.db.migrations.graph import MigrationGraph
 from django.db.migrations.recorder import MigrationRecorder
 
@@ -249,12 +250,73 @@ class MigrationLoader:
         for key, migration in self.disk_migrations.items():
             self.add_external_dependencies(key, migration)
         # Carry out replacements where possible and if enabled.
+
+        # application_memo[target] = [is_calculating, result]
+        application_memo = {}
+
+        def has_been_applied(target):
+            if target in application_memo:
+                is_calculating, result = application_memo[target]
+                if is_calculating:
+                    raise CommandError(
+                        f"Migration replacement loop found starting at {target}"
+                    )
+                return result
+
+            application_memo[target] = [True, None]
+            # we have two ways that a target can be applied
+            # 1. we have it in self.applied_migrations (registered in the DB)
+            # 2. it is a squashed migration, and its replaces have been applied
+            if target in self.applied_migrations:
+                # set the value for memoization
+                application_memo[target] = [False, True]
+                return True
+            if target in self.replacements:
+                # this has a replaces key, let's look up whether those have been applied
+                migration = self.replacements[target]
+                calculated_result = all(
+                    has_been_applied(target) for target in migration.replaces
+                )
+                application_memo[target] = [False, calculated_result]
+                return calculated_result
+
+            application_memo[target] = [False, False]
+            return False
+
         if self.replace_migrations:
-            for key, migration in self.replacements.items():
+            # migration_work[key] = [migration, visited, finished_replacement]
+            # this is mainly used to track cyclical dependencies and which
+            # migrations we have finished replacing, and is needed because
+            # squashed migrations can depend on other squashed migrations
+            migration_work = {
+                key: [migration, False, False]
+                for key, migration in self.replacements.items()
+            }
+
+            # this helper function handles the actual replacement
+            def do_replacement(key):
+                migration, visited, finished_replacement = migration_work[key]
+                if finished_replacement:
+                    # we have already replaced this item
+                    return
+                if visited:
+                    # we visited this node but have not finished the replacement
+                    # this means we have a circular dependency
+                    raise CommandError(
+                        f"Cyclical squash replacement found, starting at {key}"
+                    )
+                # begin visiting this one
+                migration_work[key][1] = True
+                # before processing this replacement, process
+                # potential squashed elements in its replaces
+                for key2 in migration.replaces:
+                    if key2 in migration_work:
+                        do_replacement(key2)
+
                 # Get applied status of each of this migration's replacement
                 # targets.
                 applied_statuses = [
-                    (target in self.applied_migrations) for target in migration.replaces
+                    has_been_applied(target) for target in migration.replaces
                 ]
                 # The replacing migration is only marked as applied if all of
                 # its replacement targets are.
@@ -271,6 +333,11 @@ class MigrationLoader:
                     # partially applied. Remove it from the graph and remap
                     # dependencies to it (#25945).
                     self.graph.remove_replacement_node(key, migration.replaces)
+                # at the end, mark this node as having been visited completely
+                migration_work[key][2] = True
+
+            for key in self.replacements.keys():
+                do_replacement(key)
         # Ensure the graph is consistent.
         try:
             self.graph.validate_consistency()
