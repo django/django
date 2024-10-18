@@ -3148,6 +3148,45 @@ class Dumpdata(AdminScriptTestCase):
         self.assertNoOutput(out)
 
 
+class Listurls(AdminScriptTestCase):
+    """Tests for the listurls command."""
+
+    def test_list_with_no_urls(self):
+        """Functional test for 28800"""
+        self.write_settings("settings.py")
+        args = ["listurls"]
+        out, err = self.run_manage(args)
+        self.assertNoOutput(err)
+        self.assertOutput(out, "There are no URLs that match those prefixes\n")
+
+    @override_settings(ROOT_URLCONF="admin_scripts.app_with_urls.rooturls")
+    def test_list_long(self):
+        self.write_settings(
+            "settings.py",
+            apps=[
+                "admin_scripts.app_with_urls",
+            ],
+        )
+        args = ["listurls"]
+        out, err = self.run_manage(args)
+        self.assertNoOutput(err)
+        self.assertOutput(out, "Name: ns:named")
+        self.assertOutput(out, "URL: nons/named")
+
+    @override_settings(ROOT_URLCONF="admin_scripts.app_with_urls.rooturls")
+    def test_list_long_filter(self):
+        self.write_settings(
+            "settings.py",
+            apps=[
+                "admin_scripts.app_with_urls",
+            ],
+        )
+        args = ["listurls", "namespaced"]
+        out, err = self.run_manage(args)
+        self.assertNoOutput(err)
+        self.assertNotInOutput(out, "URL: nons/named")
+
+
 class MainModule(AdminScriptTestCase):
     """python -m django works like django-admin."""
 
