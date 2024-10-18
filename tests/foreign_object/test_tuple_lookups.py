@@ -12,7 +12,8 @@ from django.db.models.fields.tuple_lookups import (
     TupleLessThan,
     TupleLessThanOrEqual,
 )
-from django.test import TestCase
+from django.db.models.lookups import In
+from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
 from .models import Contact, Customer
 
@@ -129,6 +130,59 @@ class TupleLookupsTests(TestCase):
             Contact.objects.filter(customer__in=subquery).order_by("id"),
             (self.contact_1, self.contact_2, self.contact_5),
         )
+
+    def test_tuple_in_subquery_must_be_query(self):
+        lhs = (F("customer_code"), F("company_code"))
+        # if rhs is any non-Query object with an as_sql() function
+        rhs = In(F("customer_code"), [1, 2, 3])
+        with self.assertRaisesMessage(
+            ValueError,
+            "'in' subquery lookup of ('customer_code', 'company_code') "
+            "must be a Query object (received 'In')",
+        ):
+            TupleIn(lhs, rhs)
+
+    def test_tuple_in_subquery_must_have_2_fields(self):
+        lhs = (F("customer_code"), F("company_code"))
+        rhs = Customer.objects.values_list("customer_id").query
+        with self.assertRaisesMessage(
+            ValueError,
+            "'in' subquery lookup of ('customer_code', 'company_code') "
+            "must have 2 fields (received 1)",
+        ):
+            TupleIn(lhs, rhs)
+
+    @skipUnlessDBFeature("supports_tuple_in_subquery")
+    def test_tuple_in_subquery(self):
+        customers = Customer.objects.values_list("customer_id", "company")
+        test_cases = (
+            (self.customer_1, (self.contact_1, self.contact_2, self.contact_5)),
+            (self.customer_2, (self.contact_3,)),
+            (self.customer_3, (self.contact_4,)),
+            (self.customer_4, ()),
+            (self.customer_5, (self.contact_6,)),
+        )
+
+        for customer, contacts in test_cases:
+            lhs = (F("customer_code"), F("company_code"))
+            rhs = customers.filter(id=customer.id).query
+            lookup = TupleIn(lhs, rhs)
+            qs = Contact.objects.filter(lookup).order_by("id")
+
+            with self.subTest(customer=customer.id, query=str(qs.query)):
+                self.assertSequenceEqual(qs, contacts)
+
+    @skipIfDBFeature("supports_tuple_in_subquery")
+    def test_tuple_in_subquery_not_supported(self):
+        customers = Customer.objects.values_list("customer_id", "company")
+        lhs = (F("customer_code"), F("company_code"))
+        rhs = customers.filter(id=self.customer_1.id).query
+        lookup = TupleIn(lhs, rhs)
+        with self.assertRaisesMessage(
+            NotSupportedError,
+            f"{connection.display_name} doesn't support TupleIn subqueries.",
+        ):
+            self.assertSequenceEqual(Contact.objects.filter(lookup), [])
 
     def test_tuple_in_rhs_must_be_collection_of_tuples_or_lists(self):
         test_cases = (
