@@ -120,6 +120,12 @@ upgrading Django.
   :setting:`CSRF_TRUSTED_ORIGINS` setting must start with a scheme (usually
   ``http://`` or ``https://``) but found ``<hostname>``.
 
+Deprecated settings
+-------------------
+
+* **settings.W001**: Checks the Django settings for used but deprecated
+  variables.
+
 Caches
 ------
 
