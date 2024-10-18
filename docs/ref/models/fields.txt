@@ -426,6 +426,27 @@ precedence when creating instances in Python code. ``db_default`` will still be
 set at the database level and will be used when inserting rows outside of the
 ORM or when adding a new field in a migration.
 
+If a field is configured with db_default but lacks a default, accessing the field
+on an unsaved model instance, where no value has been explicitly assigned,
+will return a DatabaseDefault object::
+
+    from django.db import models
+    from django.db.models.functions import Now
+
+
+    class MyModel(models.Model):
+        # No default provided at the Django (Python) level, only db_default
+        created = models.DateTimeField(db_default=Now())
+
+.. code-block:: shell
+
+    >>> instance = MyModel()
+    >>> print(instance.created)
+    <django.db.models.expressions.DatabaseDefault object at 0x743257147ca0>
+
+The actual value for the field is determined by the database when the model
+instance is saved.
+
 ``db_index``
 ------------
 
