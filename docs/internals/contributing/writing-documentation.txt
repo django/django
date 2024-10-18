@@ -72,9 +72,9 @@ The documentation is organized into several categories:
   Providing background context helps a newcomer connect the topic to things
   that they already know.
 
-* :doc:`Reference guides </ref/index>` contain technical references for APIs.
-  They describe the functioning of Django's internal machinery and instruct in
-  its use.
+* :doc:`Reference guides </ref/index>` contain technical references for APIs
+  and other components of the framework. They detail how these elements
+  function and how to use them effectively.
 
   Keep reference material tightly focused on the subject. Assume that the
   reader already understands the basic concepts involved but needs to know or
@@ -88,8 +88,8 @@ The documentation is organized into several categories:
   steps in key subjects.
 
   What matters most in a how-to guide is what a user wants to achieve.
-  A how-to should always be result-oriented rather than focused on internal
-  details of how Django implements whatever is being discussed.
+  A how-to should always be focused on the desired outcome, rather than on the
+  implementation details of Django.
 
   These guides are more advanced than tutorials and assume some knowledge about
   how Django works. Assume that the reader has followed the tutorials and don't
