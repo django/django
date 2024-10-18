@@ -6,6 +6,7 @@ from pathlib import Path
 from subprocess import run
 
 from django.apps import apps as installed_apps
+from django.core.management.color import make_style, no_style, supports_color
 from django.utils.crypto import get_random_string
 from django.utils.encoding import DEFAULT_LOCALE_ENCODING
 
@@ -173,3 +174,57 @@ def run_formatters(written_files, black_path=(sentinel := object())):
             [black_path, "--fast", "--", *written_files],
             capture_output=True,
         )
+
+
+def get_directory_tree(path, max_depth=10, prefix="", depth=0, **options):
+    """
+    Get the folder structure of a directory and its content,
+    akin to the `tree` command.
+    Adapted from: https://stackoverflow.com/a/59109706
+
+    Example:
+    >>> for line in get_directory_tree(Path.home()):
+    ...     print(line)
+    """
+    SPACE_PREFIX = "    "
+    BRANCH_PREFIX = "|   "
+    ELBOW_PREFIX = "|___ "
+
+    path = Path(path)
+    if (supports_color() and not options.get("no_color", False)) or (
+        options.get("force_color", False)
+    ):
+        directory_style = make_style("notice=blue,bold;")
+    else:
+        directory_style = no_style()
+
+    if depth == 0:
+        yield directory_style.NOTICE(path.name)
+
+    if not path.is_dir():
+        raise CommandError("'%s' is not a directory" % (path))
+
+    if depth >= max_depth:
+        return
+
+    dir_contents = list(path.iterdir())
+
+    for index, subpath in enumerate(sorted(dir_contents)):
+        # Make folders appear bolder in terminal
+        subpath_name = (
+            directory_style.NOTICE(subpath.name) if subpath.is_dir() else subpath.name
+        )
+
+        is_last_element = index == len(dir_contents) - 1
+
+        yield prefix + ELBOW_PREFIX + subpath_name
+
+        if subpath.is_dir():
+            extension = SPACE_PREFIX if is_last_element else BRANCH_PREFIX
+            yield from get_directory_tree(
+                subpath,
+                max_depth,
+                prefix=prefix + extension,
+                depth=depth + 1,
+                **options,
+            )
