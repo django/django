@@ -99,7 +99,7 @@ END;
         else:
             lookup_type = lookup_type.upper()
             if not self._extract_format_re.fullmatch(lookup_type):
-                raise ValueError(f"Invalid loookup type: {lookup_type!r}")
+                raise ValueError(f"Invalid lookup type: {lookup_type!r}")
             # https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/EXTRACT-datetime.html
             return f"EXTRACT({lookup_type} FROM {sql})", params
         return extract_sql, (*params, extract_param)

@@ -53,7 +53,7 @@ def do_timezone(value, arg):
         if timezone.is_naive(value):
             default_timezone = timezone.get_default_timezone()
             value = timezone.make_aware(value, default_timezone)
-    # Filters must never raise exceptionsm, so catch everything.
+    # Filters must never raise exceptions, so catch everything.
     except Exception:
         return ""
 
