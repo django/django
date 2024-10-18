@@ -17,6 +17,7 @@
     h4 { margin:0 0 .5em 0; font-weight: normal; }
     code, pre { font-size: 100%; white-space: pre-wrap; word-break: break-word; }
     summary { cursor: pointer; }
+    details ol.context-line { cursor: pointer; }
     table { border:1px solid #ccc; border-collapse: collapse; width:100%; background:white; }
     tbody td, tbody th { vertical-align:top; padding:2px 3px; }
     thead th {
@@ -34,14 +35,17 @@
     ul.traceback li.cause { word-break: break-word; }
     ul.traceback li.frame { padding-bottom:1em; color:#4f4f4f; }
     ul.traceback li.user { background-color:#e0e0e0; color:#000 }
-    div.context { padding:10px 0; overflow:hidden; }
-    div.context ol { padding-left:30px; margin:0 10px; list-style-position: inside; }
-    div.context ol li { font-family:monospace; white-space:pre; color:#777; cursor:pointer; padding-left: 2px; }
-    div.context ol li pre { display:inline; }
-    div.context ol.context-line li { color:#464646; background-color:#dfdfdf; padding: 3px 2px; }
-    div.context ol.context-line li span { position:absolute; right:32px; }
-    .user div.context ol.context-line li { background-color:#bbb; color:#000; }
-    .user div.context ol li { color:#666; }
+    details.context { padding:10px 0; overflow:hidden; }
+    details.context ol { padding-left:30px; margin:0 10px; list-style-position: inside; }
+    details.context ol li { font-family:monospace; white-space:pre; color:#777; cursor:pointer; padding-left: 2px; }
+    details.context ol li pre { display:inline; }
+    details.context ol.context-line li { color:#464646; background-color:#dfdfdf; padding: 3px 2px; }
+    details.context ol.context-line li span { position:absolute; right:32px; }
+    details.context summary { list-style: none; }
+    .django details.context ol.context-line li { border: 1px double #bbb; }
+    .user details.context ol.context-line li { background-color:#bbb; color:#000; border: 1px double #999; }
+    .user details.context ol li { color:#666; }
+    details summary.commands { width: fit-content; }
     div.commands, summary.commands { margin-left: 40px; }
     div.commands a, summary.commands { color:#555; text-decoration:none; }
     .user div.commands a { color: black; }
@@ -66,6 +70,12 @@
     pre.exception_value { font-family: sans-serif; color: #575757; font-size: 1.5rem; margin: 10px 0 10px 0; }
     .append-bottom { margin-bottom: 10px; }
     .fname { user-select: all; }
+    {% if not is_email %}
+    details.context ol.context-line li::before { content: "\002b"; position: absolute; left: 40px; }
+    details[open].context ol.context-line li::before { content: "\002d"; }
+    .django details.context ol.context-line { background-color: #bbb; }
+    .user details.context ol.context-line { background-color: #999; }
+    {% endif %}
   </style>
   {% if not is_email %}
   <script>
@@ -75,9 +85,21 @@
       }
     }
     window.onload = function() {
-      hideAll(document.querySelectorAll('ol.pre-context'));
-      hideAll(document.querySelectorAll('ol.post-context'));
       hideAll(document.querySelectorAll('div.pastebin'));
+      document.querySelectorAll(".context-summary").forEach(function(summary) {
+        summary.addEventListener("click", function(event) {
+          event.preventDefault();
+          extendDetails(summary);
+        });
+      });
+      document.querySelectorAll(".context-summary-placeholder").forEach(function(placeholder) {
+        placeholder.addEventListener("keydown", function(event) {
+          if (event.keyCode === 13) {
+            event.preventDefault();
+            placeholder.click();
+          }
+        }, false);
+      });
     }
     function toggle() {
       for (var i = 0; i < arguments.length; i++) {
@@ -87,6 +109,17 @@
         }
       }
       return false;
+    }
+    function collapseDetails(summaryId) {
+      var summary = document.getElementById(summaryId);
+      summary.style.display = 'block';
+      summary.parentElement.removeAttribute('open');
+      summary.focus();
+    }
+    function extendDetails(summary) {
+      summary.parentElement.setAttribute('open', '');
+      summary.style.display = 'none';
+      document.getElementById(summary.dataset.placeholderid).focus();
     }
     function switchPastebinFriendly(link) {
       s1 = "Switch to copy-and-paste view";
@@ -237,25 +270,32 @@
           {% endif %}
 
           {% if frame.context_line %}
-            <div class="context" id="c{{ frame.id }}">
+            <details class="context" id="c{{ frame.id }}">
               {% if frame.pre_context and not is_email %}
-                <ol start="{{ frame.pre_context_lineno }}" class="pre-context" id="pre{{ frame.id }}">
+                <ol start="{{ frame.pre_context_lineno }}" class="pre-context" id="pre{{ frame.id }}" onclick="collapseDetails('summary{{ frame.id }}')">
                 {% for line in frame.pre_context %}
-                  <li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')"><pre>{{ line }}</pre></li>
+                  <li><pre>{{ line }}</pre></li>
                 {% endfor %}
                 </ol>
               {% endif %}
-              <ol start="{{ frame.lineno }}" class="context-line">
-                <li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')"><pre>{{ frame.context_line }}{{ frame.colno }}</pre>{% if not is_email %} <span>…</span>{% endif %}</li>
-              </ol>
-              {% if frame.post_context and not is_email  %}
-                <ol start='{{ frame.lineno|add:"1" }}' class="post-context" id="post{{ frame.id }}">
-                  {% for line in frame.post_context %}
-                  <li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')"><pre>{{ line }}</pre></li>
-                  {% endfor %}
-              </ol>
+              {% if not is_email %}
+                <ol start="{{ frame.lineno }}" class="context-summary-placeholder context-line" id="center{{ frame.id }}" tabindex="0" onclick="collapseDetails('summary{{ frame.id }}')">
+                  <li><pre>{{ frame.context_line }}{{ frame.colno }}</pre><span>…</span></li>
+                </ol>
               {% endif %}
-            </div>
+              <summary id="summary{{ frame.id }}" class="context-summary" data-placeholderid="center{{ frame.id }}">
+                <ol start="{{ frame.lineno }}" class="context-line">
+                  <li><pre>{{ frame.context_line }}{{ frame.colno }}</pre>{% if not is_email %}<span>…</span>{% endif %}</li>
+                </ol>
+              </summary>
+              {% if frame.post_context and not is_email  %}
+                <ol start='{{ frame.lineno|add:"1" }}' class="post-context" id="post{{ frame.id }}" onclick="collapseDetails('summary{{ frame.id }}')">
+                {% for line in frame.post_context %}
+                  <li><pre>{{ line }}</pre></li>
+                {% endfor %}
+                </ol>
+              {% endif %}
+            </details>
           {% endif %}
 
           {% if frame.vars %}
