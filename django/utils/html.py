@@ -311,18 +311,22 @@ class Urlizer:
         safe_input = isinstance(text, SafeData)
 
         words = self.word_split_re.split(str(text))
-        return "".join(
-            [
-                self.handle_word(
+        mapping = {}
+        urlized_words = []
+        for word in words:
+            if word in mapping:
+                urlized_words.append(mapping[word])
+            else:
+                urlized_word = self.handle_word(
                     word,
                     safe_input=safe_input,
                     trim_url_limit=trim_url_limit,
                     nofollow=nofollow,
                     autoescape=autoescape,
                 )
-                for word in words
-            ]
-        )
+                urlized_words.append(urlized_word)
+                mapping[word] = urlized_word
+        return "".join(urlized_words)
 
     def handle_word(
         self,
