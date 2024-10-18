@@ -94,7 +94,7 @@ Minor features
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Introduced :lookup:`geom_type` lookup to allow filtering by geometry type (:ticket:`28696`)
 
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
