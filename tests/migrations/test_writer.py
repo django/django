@@ -20,7 +20,7 @@ from django import get_version
 from django.conf import SettingsReference, settings
 from django.core.validators import EmailValidator, RegexValidator
 from django.db import migrations, models
-from django.db.migrations.serializer import BaseSerializer
+from django.db.migrations.serializer import BaseSerializer, serializer_factory
 from django.db.migrations.writer import MigrationWriter, OperationWriter
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import extend_sys_path
@@ -1138,3 +1138,25 @@ class WriterTests(SimpleTestCase):
             ValueError, "'TestModel1' must inherit from 'BaseSerializer'."
         ):
             MigrationWriter.register_serializer(complex, TestModel1)
+
+    def test_database_on_delete_serializer_value(self):
+        db_level_on_delete_options = [
+            models.DB_CASCADE,
+            models.DB_SET_DEFAULT,
+            models.DB_SET_NULL,
+            models.DB_RESTRICT,
+        ]
+        for option in db_level_on_delete_options:
+            serialized_data = MigrationWriter.serialize(option)[0]
+            self.assertEqual(serialized_data, f"models.{option.__name__}")
+
+    def test_database_on_delete_serializer_value_with_field(self):
+        db_level_on_delete_options = [
+            models.ForeignKey("test", on_delete=models.DB_CASCADE),
+            models.ForeignKey("test", null=True, on_delete=models.DB_SET_NULL),
+            models.ForeignKey("test", on_delete=models.DB_RESTRICT),
+            models.ForeignKey("test", db_default="bn", on_delete=models.DB_SET_DEFAULT),
+        ]
+        for option in db_level_on_delete_options:
+            serialized_data = MigrationWriter.serialize(option)
+            self.assertEqual(serialized_data, serializer_factory(option).serialize())

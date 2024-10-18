@@ -1,10 +1,15 @@
 from math import ceil
 
-from django.db import connection, models
+from django.db import IntegrityError, connection, models, transaction
 from django.db.models import ProtectedError, Q, RestrictedError
 from django.db.models.deletion import Collector
 from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE
-from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
+from django.test import (
+    TestCase,
+    TransactionTestCase,
+    skipIfDBFeature,
+    skipUnlessDBFeature,
+)
 
 from .models import (
     B1,
@@ -12,24 +17,37 @@ from .models import (
     B3,
     MR,
     A,
+    AnotherGrandChildFKSetNull,
     Avatar,
     B,
     Base,
     Child,
+    ChildFKRestrict,
+    ChildFKSetNull,
+    ChildModel,
+    DBDefaultsFK,
+    DBLevelChild,
     DeleteBottom,
     DeleteTop,
+    DiamondChild,
+    DiamondParent,
     GenericB1,
     GenericB2,
     GenericDeleteBottom,
+    GrandChild,
+    GrandChildFKRestrict,
+    GrandChildFKSetNull,
     HiddenUser,
     HiddenUserProfile,
     M,
     M2MFrom,
     M2MTo,
     MRNull,
+    NormalParent,
     Origin,
     P,
     Parent,
+    ParentModel,
     R,
     RChild,
     RChildChild,
@@ -302,6 +320,26 @@ class OnDeleteTests(TestCase):
         self.assertFalse(GenericB1.objects.exists())
         self.assertFalse(GenericB2.objects.exists())
         self.assertFalse(GenericDeleteBottom.objects.exists())
+
+    def test_db_restrict_path_db_cascade_direct(self):
+        a = create_a("db_restrict")
+        a.db_restrict.p = P.objects.create()
+        a.db_restrict.save()
+        a.db_cascade_p = a.db_restrict.p
+        a.save()
+        a.db_restrict.p.delete()
+        self.assertFalse(A.objects.filter(name="db_restrict").exists())
+        self.assertFalse(R.objects.filter(pk=a.db_restrict_id).exists())
+
+    def test_db_restrict_path_cascade_direct(self):
+        a = create_a("db_restrict")
+        a.db_restrict.p = P.objects.create()
+        a.db_restrict.save()
+        a.cascade_p = a.db_restrict.p
+        a.save()
+        a.db_restrict.p.delete()
+        self.assertFalse(A.objects.filter(name="db_restrict").exists())
+        self.assertFalse(R.objects.filter(pk=a.db_restrict_id).exists())
 
 
 class DeletionTests(TestCase):
@@ -800,3 +838,189 @@ class FastDeleteTests(TestCase):
         with self.assertNumQueries(1):
             User.objects.filter(~Q(pk__in=[]) | Q(avatar__desc="foo")).delete()
         self.assertFalse(User.objects.exists())
+
+
+class DatabaseLevelOnDeleteTests(TestCase):
+    def test_deletion_on_nested_cascades(self):
+        parent = ParentModel.objects.create()
+        child = ChildModel.objects.create(parent_model=parent)
+        grand_child = GrandChild.objects.create(child_model=child)
+
+        parent.delete()
+
+        self.assertIs(ChildModel.objects.filter(pk=child.pk).exists(), False)
+        self.assertIs(GrandChild.objects.filter(pk=grand_child.pk).exists(), False)
+
+    def test_restricted_deletion(self):
+        parent = ParentModel.objects.create()
+        ChildFKRestrict.objects.create(parent_model=parent)
+
+        with self.assertRaises(IntegrityError):
+            parent.delete()
+
+    def test_restricted_deletion_by_cascade(self):
+        parent = ParentModel.objects.create()
+        child = ChildModel.objects.create(parent_model=parent)
+        GrandChildFKRestrict.objects.create(child_model=child)
+        with self.assertRaises(IntegrityError):
+            parent.delete()
+
+    def test_deletion_on_set_null(self):
+        parent = ParentModel.objects.create()
+        child = ChildFKSetNull.objects.create(
+            parent_model=parent, another_field="Some Value"
+        )
+        parent.delete()
+        orphan_child = ChildFKSetNull.objects.get(pk=child.pk)
+        self.assertEqual(child.pk, orphan_child.pk)
+        self.assertEqual(child.another_field, orphan_child.another_field)
+        self.assertNotEqual(child.parent_model, orphan_child.parent_model)
+        self.assertIsNone(orphan_child.parent_model)
+
+    def test_set_null_on_cascade_deletion(self):
+        parent = ParentModel.objects.create()
+        child = ChildModel.objects.create(parent_model=parent)
+        grand_child = GrandChildFKSetNull.objects.create(
+            child_model=child, another_field="Some Value"
+        )
+        parent.delete()
+        orphan_grand_child = GrandChildFKSetNull.objects.get(pk=grand_child.pk)
+        self.assertEqual(grand_child.pk, orphan_grand_child.pk)
+        self.assertEqual(grand_child.another_field, orphan_grand_child.another_field)
+        self.assertNotEqual(grand_child.child_model, orphan_grand_child.child_model)
+        self.assertIsNone(orphan_grand_child.child_model)
+
+    def test_nested_set_null_on_deletion(self):
+        parent = ParentModel.objects.create()
+        child = ChildFKSetNull.objects.create(parent_model=parent)
+        grand_child = AnotherGrandChildFKSetNull.objects.create(child_fk_set_null=child)
+        parent.delete()
+
+        orphan_child = ChildFKSetNull.objects.get(pk=child.pk)
+        self.assertEqual(child.pk, orphan_child.pk)
+        self.assertEqual(child.another_field, orphan_child.another_field)
+        self.assertNotEqual(child.parent_model, orphan_child.parent_model)
+        self.assertIsNone(orphan_child.parent_model)
+
+        orphan_grand_child = AnotherGrandChildFKSetNull.objects.get(pk=grand_child.pk)
+        self.assertEqual(grand_child.pk, orphan_grand_child.pk)
+        self.assertEqual(grand_child.another_field, orphan_grand_child.another_field)
+        self.assertEqual(
+            grand_child.child_fk_set_null, orphan_grand_child.child_fk_set_null
+        )
+        self.assertIsNotNone(orphan_grand_child.child_fk_set_null)
+
+    @skipUnlessDBFeature("has_on_delete_db_default")
+    def test_foreign_key_db_default_exists(self):
+        # Default parent exists
+        default_parent = ParentModel.objects.create(pk=1)
+        parent = ParentModel.objects.create(pk=2)
+        child1 = DBDefaultsFK.objects.create(parent_model=parent)
+        with self.assertNumQueries(1):
+            parent.delete()
+        child1.refresh_from_db()
+        self.assertEqual(child1.parent_model, default_parent)
+        child1.delete()
+        default_parent.delete()
+
+
+class DatabaseLevelOnDeleteTransactionTests(TransactionTestCase):
+    available_apps = ["delete"]
+
+    @skipUnlessDBFeature("has_on_delete_db_default")
+    def test_foreign_key_default_parent_deleted_before_parent(self):
+        # Default parent does not exists
+        # Default parent deleted before parent
+        default_parent = ParentModel.objects.create(pk=1)
+        parent = ParentModel.objects.create(pk=2)
+        child1 = DBDefaultsFK.objects.create(parent_model=parent)
+        default_parent.delete()
+        with self.assertRaises(IntegrityError):
+            parent.delete()
+            child1.refresh_from_db()
+
+    @skipUnlessDBFeature("has_on_delete_db_default")
+    def test_foreign_key_default_parent_deleted_after_parent(self):
+        # Default parent does not exists
+        # Default parent deleted after parent
+        default_parent = ParentModel.objects.create(pk=1)
+        parent = ParentModel.objects.create(pk=2)
+        child1 = DBDefaultsFK.objects.create(parent_model=parent)
+        parent.delete()
+        with self.assertRaises(IntegrityError):
+            default_parent.delete()
+            child1.refresh_from_db()
+
+
+class DatabaseLevelOnDeleteQueryAssertionTests(TestCase):
+    def test_queries_on_nested_cascade(self):
+        parent = ParentModel.objects.create()
+
+        for i in range(3):
+            ChildModel.objects.create(parent_model=parent)
+
+        for child in ChildModel.objects.all():
+            for i in range(3):
+                GrandChild.objects.create(child_model=child)
+
+        # one is the deletion
+        with self.assertNumQueries(1):
+            parent.delete()
+
+    def test_queries_on_nested_set_null(self):
+        parent = ParentModel.objects.create()
+
+        for i in range(3):
+            ChildFKSetNull.objects.create(parent_model=parent)
+
+        for child_fk_set_null in ChildFKSetNull.objects.all():
+            for i in range(3):
+                AnotherGrandChildFKSetNull.objects.create(
+                    child_fk_set_null=child_fk_set_null
+                )
+
+        # one is the deletion
+        with self.assertNumQueries(1):
+            parent.delete()
+
+    def test_queries_on_nested_set_null_cascade(self):
+        parent = ParentModel.objects.create()
+
+        for i in range(3):
+            ChildModel.objects.create(parent_model=parent)
+
+        for child in ChildModel.objects.all():
+            for i in range(3):
+                GrandChildFKSetNull.objects.create(child_model=child)
+
+        # one is the deletion
+        with self.assertNumQueries(1):
+            parent.delete()
+
+    def test_queries_on_inherited_model(self):
+        gp = ParentModel.objects.create()
+        parent = NormalParent.objects.create(grandparent_ptr=gp)
+        diamond_parent = DiamondParent.objects.create(gp_ptr=gp)
+
+        dc = DiamondChild.objects.create(
+            parent_ptr=parent, diamondparent_ptr=diamond_parent
+        )
+
+        with self.assertNumQueries(1):
+            gp.delete()
+
+        self.assertIs(NormalParent.objects.filter(pk=parent.pk).exists(), False)
+        self.assertIs(
+            DiamondParent.objects.filter(pk=diamond_parent.pk).exists(), False
+        )
+        self.assertIs(DiamondChild.objects.filter(pk=dc.pk).exists(), False)
+
+    def test_restrict_on_inherited_model(self):
+        gp = ParentModel.objects.create()
+        child = DBLevelChild.objects.create(grandparent_ptr=gp)
+
+        with transaction.atomic():
+            with self.assertRaises(IntegrityError):
+                gp.delete()
+
+        self.assertIs(DBLevelChild.objects.filter(pk=child.pk).exists(), True)
