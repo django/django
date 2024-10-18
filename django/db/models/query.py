@@ -660,8 +660,12 @@ class QuerySet(AltersData):
         obj.save(force_insert=True, using=self.db)
         return obj
 
+    create.alters_data = True
+
     async def acreate(self, **kwargs):
         return await sync_to_async(self.create)(**kwargs)
+
+    acreate.alters_data = True
 
     def _prepare_for_bulk_create(self, objs):
         from django.db.models.expressions import DatabaseDefault
@@ -835,6 +839,8 @@ class QuerySet(AltersData):
 
         return objs
 
+    bulk_create.alters_data = True
+
     async def abulk_create(
         self,
         objs,
@@ -852,6 +858,8 @@ class QuerySet(AltersData):
             update_fields=update_fields,
             unique_fields=unique_fields,
         )
+
+    abulk_create.alters_data = True
 
     def bulk_update(self, objs, fields, batch_size=None):
         """
@@ -941,11 +949,15 @@ class QuerySet(AltersData):
                     pass
                 raise
 
+    get_or_create.alters_data = True
+
     async def aget_or_create(self, defaults=None, **kwargs):
         return await sync_to_async(self.get_or_create)(
             defaults=defaults,
             **kwargs,
         )
+
+    aget_or_create.alters_data = True
 
     def update_or_create(self, defaults=None, create_defaults=None, **kwargs):
         """
@@ -992,12 +1004,16 @@ class QuerySet(AltersData):
                 obj.save(using=self.db)
         return obj, False
 
+    update_or_create.alters_data = True
+
     async def aupdate_or_create(self, defaults=None, create_defaults=None, **kwargs):
         return await sync_to_async(self.update_or_create)(
             defaults=defaults,
             create_defaults=create_defaults,
             **kwargs,
         )
+
+    aupdate_or_create.alters_data = True
 
     def _extract_model_params(self, defaults, **kwargs):
         """
