@@ -529,6 +529,17 @@ class Reverse(GeoFunc):
     arity = 1
 
 
+class Rotate(GeomOutputGeoFunc):
+    def __init__(self, expression, angle, x=0.0, y=0.0, **extra):
+        expressions = [
+            expression,
+            self._handle_param(angle, "angle", NUMERIC_TYPES),
+            self._handle_param(x, "x", NUMERIC_TYPES),
+            self._handle_param(y, "y", NUMERIC_TYPES),
+        ]
+        super().__init__(*expressions, **extra)
+
+
 class Scale(SQLiteDecimalToFloatMixin, GeomOutputGeoFunc):
     def __init__(self, expression, x, y, z=0.0, **extra):
         expressions = [

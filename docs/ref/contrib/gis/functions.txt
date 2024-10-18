@@ -568,6 +568,18 @@ SpatiaLite
 Accepts a single geographic field or expression and returns a geometry with
 reversed coordinates.
 
+``Rotate``
+===========
+
+.. class:: Rotate(expression, angle, x=0.0, y=0.0, **extra)
+
+*Availability*: `PostGIS <https://postgis.net/docs/ST_Rotate.html>`__
+
+Accepts a single geographic field or expression and returns a geometry with
+coordinates rotated by the specified ``angle`` around the origin.
+Optionally, the rotation can be performed around a specified point defined by the parameters
+``x`` and ``y``.
+
 ``Scale``
 =========
 
