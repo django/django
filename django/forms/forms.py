@@ -6,6 +6,7 @@ import copy
 import datetime
 
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
+from django.forms.boundfield import BoundField
 from django.forms.fields import Field
 from django.forms.utils import ErrorDict, ErrorList, RenderableFormMixin
 from django.forms.widgets import Media, MediaDefiningClass
@@ -68,6 +69,8 @@ class BaseForm(RenderableFormMixin):
     template_name_ul = "django/forms/ul.html"
     template_name_label = "django/forms/label.html"
 
+    bound_field_class = BoundField
+
     def __init__(
         self,
         data=None,
@@ -81,6 +84,7 @@ class BaseForm(RenderableFormMixin):
         field_order=None,
         use_required_attribute=None,
         renderer=None,
+        bound_field_class=None,
     ):
         self.is_bound = data is not None or files is not None
         self.data = MultiValueDict() if data is None else data
@@ -123,6 +127,9 @@ class BaseForm(RenderableFormMixin):
                 if isinstance(self.default_renderer, type):
                     renderer = renderer()
         self.renderer = renderer
+        self.bound_field_class = (
+            bound_field_class or self.renderer.get_bound_field_class()
+        )
 
     def order_fields(self, field_order):
         """

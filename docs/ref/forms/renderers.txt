@@ -61,9 +61,26 @@ should return a rendered templates (as a string) or raise
 
     .. attribute:: field_template_name
 
-        The default name of the template used to render a ``BoundField``.
+        The default name of the template used to render a
+        :class:`~django.forms.BoundField`.
 
         Defaults to ``"django/forms/field.html"``
+
+    .. attribute:: bound_field_class
+
+        The default :class:`~django.forms.BoundField` to use when rendering
+        forms. If not overriden by :attr:`~django.forms.Form.bound_field_class`
+        or :attr:`~django.forms.Field.bound_field_class`, this is the
+        ``BoundField`` class that gets used during rendering.
+
+        Defaults to ``"``:class:`django.forms.boundfield.BoundField`\ ``"``.
+
+    .. method:: get_bound_field_class()
+
+        Subclasses can implement this method to customize what default
+        :class:`django.forms.boundfield.BoundField` gets used when rendering
+        forms. By default, just import and return the class declared
+        by fully-qualified name in :attr:`BaseRenderer.bound_field_class`.
 
     .. method:: get_template(template_name)
 
