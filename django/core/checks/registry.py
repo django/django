@@ -18,6 +18,7 @@ class Tags:
     files = "files"
     models = "models"
     security = "security"
+    settings = "settings"
     signals = "signals"
     sites = "sites"
     staticfiles = "staticfiles"
