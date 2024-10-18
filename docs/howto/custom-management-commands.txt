@@ -157,6 +157,8 @@ Testing
 Information on how to test custom management commands can be found in the
 :ref:`testing docs <topics-testing-management-commands>`.
 
+.. _overriding-commands:
+
 Overriding commands
 ===================
 

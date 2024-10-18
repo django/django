@@ -233,6 +233,11 @@ Management Commands
   ``runserver`` is unsuitable for production. This warning can be hidden by
   setting the :envvar:`HIDE_PRODUCTION_WARNING` environment variable to
   ``"true"``.
+  
+* The :djadmin:`shell` management command now automatically imports all models
+  from all installed apps and other default imports. :ref:`Customize this
+  behavior <customizing-shell-auto-imports>` to add extra imports or remove the
+  new defaults.
 
 * The :djadmin:`makemigrations` and :djadmin:`migrate` commands  have a new
   ``Command.autodetector`` attribute for subclasses to override in order to use
