@@ -133,6 +133,17 @@ class ModuleImportTests(SimpleTestCase):
         cls = import_string("django.utils.module_loading.import_string")
         self.assertEqual(cls, import_string)
 
+        import_string("utils_tests.test_module.main_module")
+        good_module = import_string("utils_tests.test_module.good_module")
+        self.assertEqual(good_module.content, "Good Module")
+
+        sys.modules.pop("utils_tests.test_module")
+        import_string("utils_tests.test_module")
+        another_good_module = import_string(
+            "utils_tests.test_module.another_good_module"
+        )
+        self.assertEqual(another_good_module.content, "Another Good Module")
+
         # Test exceptions raised
         with self.assertRaises(ImportError):
             import_string("no_dots_in_path")
