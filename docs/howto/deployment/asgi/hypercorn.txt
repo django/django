@@ -33,6 +33,7 @@ requires that your project be on the Python path; to ensure that run
 this command from the same directory as your ``manage.py`` file.
 
 For more advanced usage, please read the `Hypercorn documentation
-<Hypercorn_>`_.
+<HypercornDoc_>`_.
 
-.. _Hypercorn: https://pgjones.gitlab.io/hypercorn/
+.. _Hypercorn: https://github.com/pgjones/hypercorn/
+.. _HypercornDoc: https://hypercorn.readthedocs.io/en/latest/index.html
