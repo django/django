@@ -6,6 +6,7 @@ from itertools import chain
 from django.apps import apps
 from django.conf import settings
 from django.core.checks import Error, Tags, Warning, register
+from django.db.models.utils import _depends_on_contribute_to_class
 
 
 @register(Tags.models)
@@ -225,3 +226,30 @@ def _check_lazy_references(apps, ignore=None):
 @register(Tags.models)
 def check_lazy_references(app_configs=None, **kwargs):
     return _check_lazy_references(apps)
+
+
+# RemovedInDjango61Warning
+@register(Tags.models)
+def check_deprecated_field_contribute_to_class(app_configs=None, **kwargs):
+    warnings = []
+    if app_configs is None:
+        models = apps.get_models()
+    else:
+        models = chain.from_iterable(
+            app_config.get_models() for app_config in app_configs
+        )
+
+    for model in models:
+        for field in model._meta.get_fields():
+            if _depends_on_contribute_to_class(field):
+                warnings.append(
+                    Warning(
+                        "%s.contribute_to_class() is deprecated for field '%s' in "
+                        "model '%s'."
+                        % (field.__class__.__name__, field.name, model.__name__),
+                        hint="Implement __set_name__() instead.",
+                        obj=model,
+                        id="models.W048",
+                    )
+                )
+    return warnings

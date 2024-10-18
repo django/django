@@ -1,5 +1,4 @@
 import copy
-import inspect
 import warnings
 from functools import partialmethod
 from itertools import chain
@@ -47,7 +46,11 @@ from django.db.models.signals import (
     pre_init,
     pre_save,
 )
-from django.db.models.utils import AltersData, make_model_tuple
+from django.db.models.utils import (
+    AltersData,
+    _depends_on_contribute_to_class,
+    make_model_tuple,
+)
 from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.encoding import force_str
 from django.utils.hashable import make_hashable
@@ -84,9 +87,23 @@ def subclass_exception(name, bases, module, attached_to):
     )
 
 
-def _has_contribute_to_class(value):
-    # Only call contribute_to_class() if it's bound.
-    return not inspect.isclass(value) and hasattr(value, "contribute_to_class")
+def get_base_metas(bases):
+    """
+    Given a list of bases, return a tuple with (base_meta, ab_meta).
+
+    ``base_meta`` is from the first base with ``_meta``, and ``ab_meta`` is
+    from the first abstract model base.
+    """
+    base_meta = None
+    ab_meta = None
+    for base in bases:
+        if hasattr(base, "_meta") and base_meta is None:
+            base_meta = base._meta
+        if hasattr(base, "Meta") and ab_meta is None:
+            ab_meta = base.Meta
+        if base_meta and ab_meta:
+            break
+    return base_meta, ab_meta
 
 
 class ModelBase(type):
@@ -107,27 +124,17 @@ class ModelBase(type):
         classcell = attrs.pop("__classcell__", None)
         if classcell is not None:
             new_attrs["__classcell__"] = classcell
+
+        # Prepare the model options.
         attr_meta = attrs.pop("Meta", None)
-        # Pass all attrs without a (Django-specific) contribute_to_class()
-        # method to type.__new__() so that they're properly initialized
-        # (i.e. __set_name__()).
-        contributable_attrs = {}
-        for obj_name, obj in attrs.items():
-            if _has_contribute_to_class(obj):
-                contributable_attrs[obj_name] = obj
-            else:
-                new_attrs[obj_name] = obj
-        new_class = super_new(cls, name, bases, new_attrs, **kwargs)
+        base_meta, ab_meta = get_base_metas(bases)
+        meta = attr_meta or ab_meta
 
         abstract = getattr(attr_meta, "abstract", False)
-        meta = attr_meta or getattr(new_class, "Meta", None)
-        base_meta = getattr(new_class, "_meta", None)
-
-        app_label = None
 
         # Look for an application configuration to attach the model to.
+        app_label = None
         app_config = apps.get_containing_app_config(module)
-
         if getattr(meta, "app_label", None) is None:
             if app_config is None:
                 if not abstract:
@@ -136,13 +143,37 @@ class ModelBase(type):
                         "app_label and isn't in an application in "
                         "INSTALLED_APPS." % (module, name)
                     )
-
             else:
                 app_label = app_config.label
 
-        new_class.add_to_class("_meta", Options(meta, app_label))
+        # Assign model options (_meta) to the new class.
+        new_attrs["_meta"] = Options(meta, app_label)
+
+        is_proxy = getattr(meta, "proxy", False) if meta else False
+        # If the model is a proxy, ensure that the base class
+        # hasn't been swapped out.
+        if is_proxy and base_meta and base_meta.swapped:
+            raise TypeError(
+                "%s cannot proxy the swapped model '%s'." % (name, base_meta.swapped)
+            )
+
+        # RemovedInDjango61Warning. When deprecation ends, replace with
+        # new_attrs.update(attrs)
+        contributable_attrs = {}
+        for obj_name, obj in attrs.items():
+            if _depends_on_contribute_to_class(obj):
+                contributable_attrs[obj_name] = obj
+            else:
+                new_attrs[obj_name] = obj
+
+        # Create the class -- super_new ensures special attributes, those with
+        # __set_name__(), are properly handled.
+        new_class = super_new(cls, name, bases, new_attrs, **kwargs)
+
+        # Add model-specific exceptions if the model isn't abstract.
         if not abstract:
-            new_class.add_to_class(
+            setattr(
+                new_class,
                 "DoesNotExist",
                 subclass_exception(
                     "DoesNotExist",
@@ -156,7 +187,8 @@ class ModelBase(type):
                     attached_to=new_class,
                 ),
             )
-            new_class.add_to_class(
+            setattr(
+                new_class,
                 "MultipleObjectsReturned",
                 subclass_exception(
                     "MultipleObjectsReturned",
@@ -179,19 +211,9 @@ class ModelBase(type):
                 if not hasattr(meta, "get_latest_by"):
                     new_class._meta.get_latest_by = base_meta.get_latest_by
 
-        is_proxy = new_class._meta.proxy
-
-        # If the model is a proxy, ensure that the base class
-        # hasn't been swapped out.
-        if is_proxy and base_meta and base_meta.swapped:
-            raise TypeError(
-                "%s cannot proxy the swapped model '%s'." % (name, base_meta.swapped)
-            )
-
-        # Add remaining attributes (those with a contribute_to_class() method)
-        # to the class.
+        # RemovedInDjango61Warning
         for obj_name, obj in contributable_attrs.items():
-            new_class.add_to_class(obj_name, obj)
+            obj.contribute_to_class(new_class, obj_name)
 
         # All the fields of any type declared on this model
         new_fields = chain(
@@ -302,7 +324,7 @@ class ModelBase(type):
                     # Only add the ptr field if it's not already present;
                     # e.g. migrations will already have it specified
                     if not hasattr(new_class, attr_name):
-                        new_class.add_to_class(attr_name, field)
+                        field.__set_name__(new_class, attr_name)
                 else:
                     field = None
                 new_class._meta.parents[base] = field
@@ -317,7 +339,7 @@ class ModelBase(type):
                         and field.name not in inherited_attributes
                     ):
                         new_field = copy.deepcopy(field)
-                        new_class.add_to_class(field.name, new_field)
+                        new_field.__set_name__(new_class, field.name)
                         # Replace parent links defined on this base by the new
                         # field. It will be appropriately resolved if required.
                         if field.one_to_one:
@@ -346,7 +368,7 @@ class ModelBase(type):
                     field = copy.deepcopy(field)
                     if not base._meta.abstract:
                         field.mti_inherited = True
-                    new_class.add_to_class(field.name, field)
+                    field.__set_name__(new_class, field.name)
 
         # Copy indexes so that index names are unique when models extend an
         # abstract model.
@@ -366,12 +388,6 @@ class ModelBase(type):
         new_class._meta.apps.register_model(new_class._meta.app_label, new_class)
         return new_class
 
-    def add_to_class(cls, name, value):
-        if _has_contribute_to_class(value):
-            value.contribute_to_class(cls, name)
-        else:
-            setattr(cls, name, value)
-
     def _prepare(cls):
         """Create some methods once self._meta has been populated."""
         opts = cls._meta
@@ -389,7 +405,7 @@ class ModelBase(type):
             # created and registered. If remote_field is None, we're ordering
             # with respect to a GenericForeignKey and don't know what the
             # foreign class is - we'll add those accessors later in
-            # contribute_to_class().
+            # __set_name__().
             if opts.order_with_respect_to.remote_field:
                 wrt = opts.order_with_respect_to
                 remote = wrt.remote_field.model
@@ -416,10 +432,10 @@ class ModelBase(type):
                 )
             manager = Manager()
             manager.auto_created = True
-            cls.add_to_class("objects", manager)
+            manager.__set_name__(cls, "objects")
 
         # Set the name of _meta.indexes. This can't be done in
-        # Options.contribute_to_class() because fields haven't been added to
+        # Options.__set_name__() because fields haven't been added to
         # the model at that point.
         for index in cls._meta.indexes:
             if not index.name:

@@ -24,3 +24,33 @@ class CustomDeferredAttribute(DeferredAttribute):
 
 class CustomDescriptorField(models.CharField):
     descriptor_class = CustomDeferredAttribute
+
+
+class NotOKCustomField(models.CharField):
+    def contribute_to_class(self, cls, name, private_only=False):
+        super().contribute_to_class(cls, name, private_only=private_only)
+
+        def get_uppercase_value(instance):
+            value = getattr(instance, name)
+            return value.upper() if value else value
+
+        setattr(cls, f"get_{name}_uppercase", get_uppercase_value)
+
+
+class OKCustomField(models.CharField):
+    def __set_name__(self, owner, name):
+        super().__set_name__(owner, name)
+
+        def get_uppercase_value(instance):
+            value = getattr(instance, name)
+            return value.upper() if value else value
+
+        setattr(owner, f"get_{name}_uppercase", get_uppercase_value)
+
+
+class ChildNotOKField(NotOKCustomField):
+    pass
+
+
+class ChildOKField(OKCustomField):
+    pass

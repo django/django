@@ -32,6 +32,14 @@ class BaseManager:
         self._db = None
         self._hints = {}
 
+    def __set_name__(self, cls, name):
+        if not hasattr(cls, "_meta"):
+            return
+        self.name = self.name or name
+        self.model = cls
+        setattr(cls, name, ManagerDescriptor(self))
+        cls._meta.add_manager(self)
+
     def __str__(self):
         """Return "app_label.model_label.manager_name"."""
         return "%s.%s" % (self.model._meta.label, self.name)
@@ -116,14 +124,6 @@ class BaseManager:
                 **cls._get_queryset_methods(queryset_class),
             },
         )
-
-    def contribute_to_class(self, cls, name):
-        self.name = self.name or name
-        self.model = cls
-
-        setattr(cls, name, ManagerDescriptor(self))
-
-        cls._meta.add_manager(self)
 
     def _set_creation_counter(self):
         """

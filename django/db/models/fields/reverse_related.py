@@ -62,7 +62,7 @@ class ForeignObjectRel(FieldCacheMixin):
 
     # Some of the following cached_properties can't be initialized in
     # __init__ as the field doesn't have its model yet. Calling these methods
-    # before field.contribute_to_class() has been called will result in
+    # before field.__set_name__() has been called will result in
     # AttributeError
     @cached_property
     def hidden(self):
@@ -94,7 +94,7 @@ class ForeignObjectRel(FieldCacheMixin):
     def related_model(self):
         if not self.field.model:
             raise AttributeError(
-                "This property can't be accessed before self.field.contribute_to_class "
+                "This property can't be accessed before self.field.__set_name__ "
                 "has been called."
             )
         return self.field.model
