@@ -1138,3 +1138,28 @@ class WriterTests(SimpleTestCase):
             ValueError, "'TestModel1' must inherit from 'BaseSerializer'."
         ):
             MigrationWriter.register_serializer(complex, TestModel1)
+
+    def test_composite_fk(self):
+        migration = type(
+            "Migration",
+            (migrations.Migration,),
+            {
+                "operations": [
+                    migrations.AddField(
+                        "comment",
+                        "user",
+                        models.ForeignKey(
+                            "testapp.User",
+                            models.CASCADE,
+                            from_fields=("tenant_id", "user_id"),
+                            to_fields=("tenant_id", "id"),
+                        ),
+                    ),
+                ]
+            },
+        )
+
+        writer = MigrationWriter(migration)
+        output = writer.as_string()
+        self.assertIn("from_fields", output)
+        self.assertIn("to_fields", output)
