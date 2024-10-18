@@ -470,6 +470,26 @@ class StateTests(SimpleTestCase):
         ModelState.from_model(Book).render(apps)
         ModelState.from_model(Novel).render(apps)
 
+    def test_render_metaclass(self):
+        class AlphaBase(type):
+            pass
+
+        class Alpha(metaclass=AlphaBase):
+            pass
+
+        class AuthorBase(AlphaBase, type(models.Model)):
+            pass
+
+        class Author(Alpha, models.Model, metaclass=AuthorBase):
+            class Meta:
+                app_label = "migrations"
+                apps = Apps()
+
+        apps = Apps(["migrations"])
+        ModelState.from_model(Author).render(apps)
+        self.assertEqual(ModelState.from_model(Author).bases, (Alpha, models.Model))
+        self.assertEqual(ModelState.from_model(Author).metaclass, AuthorBase)
+
     def test_render_model_with_multiple_inheritance(self):
         class Foo(models.Model):
             class Meta:

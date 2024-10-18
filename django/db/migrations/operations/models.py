@@ -18,6 +18,20 @@ def _check_for_duplicates(arg_name, objs):
         used_vals.add(val)
 
 
+def _check_bases_for_duplicates(bases):
+    _check_for_duplicates(
+        "bases",
+        (
+            (
+                base._meta.label_lower
+                if hasattr(base, "_meta")
+                else base.lower() if isinstance(base, str) else base
+            )
+            for base in bases
+        ),
+    )
+
+
 class ModelOperation(Operation):
     def __init__(self, name):
         self.name = name
@@ -44,26 +58,19 @@ class CreateModel(ModelOperation):
     category = OperationCategory.ADDITION
     serialization_expand_args = ["fields", "options", "managers"]
 
-    def __init__(self, name, fields, options=None, bases=None, managers=None):
+    def __init__(
+        self, name, fields, options=None, bases=None, managers=None, metaclass=None
+    ):
         self.fields = fields
         self.options = options or {}
         self.bases = bases or (models.Model,)
         self.managers = managers or []
+        self.metaclass = metaclass or models.base.ModelBase
         super().__init__(name)
         # Sanity-check that there are no duplicated field names, bases, or
         # manager names
         _check_for_duplicates("fields", (name for name, _ in self.fields))
-        _check_for_duplicates(
-            "bases",
-            (
-                (
-                    base._meta.label_lower
-                    if hasattr(base, "_meta")
-                    else base.lower() if isinstance(base, str) else base
-                )
-                for base in self.bases
-            ),
-        )
+        _check_bases_for_duplicates(self.bases)
         _check_for_duplicates("managers", (name for name, _ in self.managers))
 
     def deconstruct(self):
@@ -77,6 +84,8 @@ class CreateModel(ModelOperation):
             kwargs["bases"] = self.bases
         if self.managers and self.managers != [("objects", models.Manager())]:
             kwargs["managers"] = self.managers
+        if self.metaclass and self.metaclass != models.base.ModelBase:
+            kwargs["metaclass"] = self.metaclass.__class__.__qualname__
         return (self.__class__.__qualname__, [], kwargs)
 
     def state_forwards(self, app_label, state):
@@ -88,6 +97,7 @@ class CreateModel(ModelOperation):
                 dict(self.options),
                 tuple(self.bases),
                 list(self.managers),
+                self.metaclass,
             )
         )
 
@@ -126,6 +136,13 @@ class CreateModel(ModelOperation):
             ):
                 return True
 
+        if (
+            self.metaclass is not models.base.ModelBase
+            and isinstance(self.metaclass, str)
+            and resolve_relation(self.metaclass, app_label) == reference_model_tuple
+        ):
+            return True
+
         # Check we have no FKs/M2Ms with it
         for _name, field in self.fields:
             if field_references(
@@ -152,6 +169,7 @@ class CreateModel(ModelOperation):
                     options=self.options,
                     bases=self.bases,
                     managers=self.managers,
+                    metaclass=self.metaclass,
                 ),
             ]
         elif (
@@ -169,6 +187,7 @@ class CreateModel(ModelOperation):
                     options=options,
                     bases=self.bases,
                     managers=self.managers,
+                    metaclass=self.metaclass,
                 ),
             ]
         elif (
@@ -182,6 +201,7 @@ class CreateModel(ModelOperation):
                     options=self.options,
                     bases=self.bases,
                     managers=operation.managers,
+                    metaclass=self.metaclass,
                 ),
             ]
         elif (
@@ -230,6 +250,7 @@ class CreateModel(ModelOperation):
                     },
                     bases=self.bases,
                     managers=self.managers,
+                    metaclass=self.metaclass,
                 ),
             ]
         elif (
@@ -246,6 +267,7 @@ class CreateModel(ModelOperation):
                     },
                     bases=self.bases,
                     managers=self.managers,
+                    metaclass=self.metaclass,
                 ),
             ]
         elif (
@@ -260,6 +282,7 @@ class CreateModel(ModelOperation):
                         options=self.options,
                         bases=self.bases,
                         managers=self.managers,
+                        metaclass=self.metaclass,
                     ),
                 ]
             elif isinstance(operation, AlterField):
@@ -273,6 +296,7 @@ class CreateModel(ModelOperation):
                         options=self.options,
                         bases=self.bases,
                         managers=self.managers,
+                        metaclass=self.metaclass,
                     ),
                 ]
             elif isinstance(operation, RemoveField):
@@ -307,6 +331,7 @@ class CreateModel(ModelOperation):
                         options=options,
                         bases=self.bases,
                         managers=self.managers,
+                        metaclass=self.metaclass,
                     ),
                 ]
             elif isinstance(operation, RenameField):
@@ -334,6 +359,7 @@ class CreateModel(ModelOperation):
                         options=options,
                         bases=self.bases,
                         managers=self.managers,
+                        metaclass=self.metaclass,
                     ),
                 ]
         elif (
@@ -354,6 +380,7 @@ class CreateModel(ModelOperation):
                         },
                         bases=self.bases,
                         managers=self.managers,
+                        metaclass=self.metaclass,
                     ),
                 ]
             elif isinstance(operation, RemoveIndex):
@@ -372,6 +399,7 @@ class CreateModel(ModelOperation):
                         },
                         bases=self.bases,
                         managers=self.managers,
+                        metaclass=self.metaclass,
                     ),
                 ]
             elif isinstance(operation, AddConstraint):
@@ -388,6 +416,7 @@ class CreateModel(ModelOperation):
                         },
                         bases=self.bases,
                         managers=self.managers,
+                        metaclass=self.metaclass,
                     ),
                 ]
             elif isinstance(operation, RemoveConstraint):
@@ -406,6 +435,7 @@ class CreateModel(ModelOperation):
                         },
                         bases=self.bases,
                         managers=self.managers,
+                        metaclass=self.metaclass,
                     ),
                 ]
         return super().reduce(operation, app_label)
@@ -630,6 +660,51 @@ class AlterModelTable(ModelOptionOperation):
     @property
     def migration_name_fragment(self):
         return "alter_%s_table" % self.name_lower
+
+
+class AlterModelMetaclass(ModelOperation):
+    reduces_to_sql = False
+    reversible = True
+
+    def __init__(self, name, metaclass):
+        super().__init__(name)
+        self.metaclass = metaclass
+
+    def state_forwards(self, app_label, state):
+        state.models[app_label, self.name_lower].metaclass = self.metaclass
+        state.reload_model(app_label, self.name_lower)
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        pass
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        pass
+
+    def describe(self):
+        return "Update %s metaclass to %s" % (self.name, self.metaclass)
+
+
+class AlterModelBases(ModelOperation):
+    reduce_to_sql = False
+    reversible = True
+
+    def __init__(self, name, bases):
+        super().__init__(name)
+        self.bases = bases
+        _check_bases_for_duplicates(self.bases)
+
+    def state_forwards(self, app_label, state):
+        state.models[app_label, self.name_lower].bases = self.bases
+        state.reload_model(app_label, self.name_lower)
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        pass
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        pass
+
+    def describe(self):
+        return "Update %s bases to %s" % (self.name, self.bases)
 
 
 class AlterModelTableComment(ModelOptionOperation):

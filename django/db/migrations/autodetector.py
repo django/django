@@ -154,6 +154,10 @@ class MigrationAutodetector:
         self.new_model_keys = set()
         self.new_proxy_keys = set()
         self.new_unmanaged_keys = set()
+        self.old_bases = set()
+        self.new_bases = set()
+        self.old_metaclass = set()
+        self.new_metaclass = set()
         for (app_label, model_name), model_state in self.from_state.models.items():
             if not model_state.options.get("managed", True):
                 self.old_unmanaged_keys.add((app_label, model_name))
@@ -162,6 +166,8 @@ class MigrationAutodetector:
                     self.old_proxy_keys.add((app_label, model_name))
                 else:
                     self.old_model_keys.add((app_label, model_name))
+            self.old_bases.add((app_label, model_name, model_state.bases))
+            self.old_metaclass.add((app_label, model_name, model_state.metaclass))
 
         for (app_label, model_name), model_state in self.to_state.models.items():
             if not model_state.options.get("managed", True):
@@ -173,6 +179,8 @@ class MigrationAutodetector:
                     self.new_proxy_keys.add((app_label, model_name))
                 else:
                     self.new_model_keys.add((app_label, model_name))
+            self.new_bases.add((app_label, model_name, model_state.bases))
+            self.new_metaclass.add((app_label, model_name, model_state.metaclass))
 
         self.from_state.resolve_fields_and_relations()
         self.to_state.resolve_fields_and_relations()
@@ -192,7 +200,8 @@ class MigrationAutodetector:
         self.generate_altered_options()
         self.generate_altered_managers()
         self.generate_altered_db_table_comment()
-
+        self.generate_altered_metaclass()
+        self.generate_altered_bases()
         # Create the renamed fields and store them in self.renamed_fields.
         # They are used by create_altered_indexes(), generate_altered_fields(),
         # generate_removed_altered_index/unique_together(), and
@@ -735,6 +744,7 @@ class MigrationAutodetector:
                     options=model_state.options,
                     bases=model_state.bases,
                     managers=model_state.managers,
+                    metaclass=model_state.metaclass,
                 ),
                 dependencies=dependencies,
                 beginning=True,
@@ -889,6 +899,7 @@ class MigrationAutodetector:
                     options=model_state.options,
                     bases=model_state.bases,
                     managers=model_state.managers,
+                    metaclass=model_state.metaclass,
                 ),
                 # Depend on the deletion of any possible non-proxy version of us
                 dependencies=dependencies,
@@ -1722,6 +1733,68 @@ class MigrationAutodetector:
                         table_comment=new_db_table_comment,
                     ),
                 )
+
+    def generate_altered_metaclass(self):
+        metaclass_diff = self.new_metaclass - self.old_metaclass
+        for app_label, model_name, _ in sorted(metaclass_diff):
+            to_model = self.to_state.models[app_label, model_name]
+            from_model = self.from_state.models.get((app_label, model_name))
+            if not from_model:
+                continue
+            from_metaclass_name = (
+                from_model.metaclass
+                if (isinstance(from_model.metaclass, str))
+                else (from_model.metaclass.__name__)
+            )
+            to_metaclass_name = (
+                to_model.metaclass
+                if (isinstance(to_model.metaclass, str))
+                else (to_model.metaclass.__name__)
+            )
+            if from_metaclass_name == to_metaclass_name:
+                continue
+            self.add_operation(
+                app_label,
+                operations.AlterModelMetaclass(
+                    name=to_model.name,
+                    metaclass=to_model.metaclass,
+                ),
+            )
+
+    def generate_altered_bases(self):
+        models_diff = self.new_bases - self.old_bases
+        for app_label, model_name, changed_to_bases in sorted(models_diff):
+            to_model = self.to_state.models[app_label, model_name]
+            from_model = self.from_state.models.get((app_label, model_name))
+            if not from_model:
+                continue
+            self.add_operation(
+                app_label,
+                operations.AlterModelBases(name=to_model.name, bases=to_model.bases),
+            )
+            if changed_to_bases[0] is models.Model:
+                pk_field_name = [
+                    key for key, value in from_model.fields.items() if value.primary_key
+                ][0]
+                self.add_operation(
+                    app_label,
+                    operations.AlterField(
+                        model_name=to_model.name,
+                        name=pk_field_name,
+                        field=models.AutoField(
+                            auto_created=True,
+                            primary_key=True,
+                            serialize=False,
+                            verbose_name="ID",
+                        ),
+                    ),
+                )
+                self.add_operation(
+                    app_label,
+                    operations.RenameField(to_model.name, pk_field_name, "id"),
+                )
+                self.new_field_keys.remove((app_label, model_name, "id"))
+                self.old_field_keys.remove((app_label, model_name, pk_field_name))
 
     def generate_altered_options(self):
         """
