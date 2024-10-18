@@ -6262,6 +6262,25 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
         self.take_screenshot("focus-multi-widget")
 
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
+    def test_error_message(self):
+        from selenium.webdriver.common.by import By
+
+        self.admin_login(
+            username="super", password="secret", login_url=reverse("admin:index")
+        )
+        with self.wait_page_loaded():
+            self.selenium.get(
+                self.live_server_url + reverse("admin:admin_views_picture_add")
+            )
+
+        # Submit an empty form to trigger validation errors.
+        with self.wait_page_loaded():
+            self.selenium.find_element(By.CSS_SELECTOR, 'input[type="submit"]').click()
+        error = self.selenium.find_elements(By.CSS_SELECTOR, ".errornote")
+        self.assertEqual(len(error), 1)
+        self.take_screenshot("error-message-position")
+
     def test_cancel_delete_confirmation(self):
         "Cancelling the deletion of an object takes the user back one page."
         from selenium.webdriver.common.by import By
