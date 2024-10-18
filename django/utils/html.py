@@ -12,6 +12,7 @@ from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.encoding import punycode
 from django.utils.functional import Promise, cached_property, keep_lazy, keep_lazy_text
 from django.utils.http import RFC3986_GENDELIMS, RFC3986_SUBDELIMS
+from django.utils.markdown import find_closing_markdown_bracket, has_markdown_link
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.safestring import SafeData, SafeString, mark_safe
 from django.utils.text import normalize_newlines
@@ -297,6 +298,7 @@ class Urlizer:
 
     mailto_template = "mailto:{local}@{domain}"
     url_template = '<a href="{href}"{attrs}>{url}</a>'
+    markdown_url_template = '[{text}](<a href="{url}"{attrs}>{trimmed_url}</a>)'
 
     def __call__(self, text, trim_url_limit=None, nofollow=False, autoescape=False):
         """
@@ -310,7 +312,17 @@ class Urlizer:
         """
         safe_input = isinstance(text, SafeData)
 
-        words = self.word_split_re.split(str(text))
+        text = str(text)
+        if has_markdown_link(text):
+            return self.handle_markdown_link(
+                text,
+                safe_input=safe_input,
+                trim_url_limit=trim_url_limit,
+                nofollow=nofollow,
+                autoescape=autoescape,
+            )
+
+        words = self.word_split_re.split(text)
         return "".join(
             [
                 self.handle_word(
@@ -323,6 +335,79 @@ class Urlizer:
                 for word in words
             ]
         )
+
+    def handle_markdown_link(
+        self,
+        text,
+        *,
+        safe_input,
+        trim_url_limit=None,
+        nofollow=False,
+        autoescape=False,
+    ):
+        nofollow_attr = ' rel="nofollow"' if nofollow else ""
+
+        def find_and_replace_link(text):
+            i = 0
+            result = []
+            while i < len(text):
+                if text[i] == "\\":
+                    result.append(text[i : i + 2])
+                    i += 2
+                    continue
+                if text[i] == "[":
+                    start = i
+                    close_bracket = find_closing_markdown_bracket(text, i + 1)
+                    if (
+                        close_bracket != -1
+                        and close_bracket + 1 < len(text)
+                        and text[close_bracket + 1] == "("
+                    ):
+                        j = close_bracket + 2
+                        paren_depth = 1
+                        while j < len(text):
+                            if text[j] == "\\":
+                                j += 2
+                                continue
+                            if text[j] == "(":
+                                paren_depth += 1
+                            elif text[j] == ")":
+                                paren_depth -= 1
+                                if paren_depth == 0:
+                                    link_text = text[start + 1 : close_bracket]
+                                    link_url = text[close_bracket + 2 : j]
+                                    trimmed_url = self.trim_url(
+                                        link_url, limit=trim_url_limit
+                                    )
+
+                                    if autoescape and not safe_input:
+                                        link_text = escape(link_text)
+                                        link_url = escape(link_url)
+                                        trimmed_url = escape(trimmed_url)
+
+                                    result.append(
+                                        self.markdown_url_template.format(
+                                            text=link_text,
+                                            url=link_url,
+                                            attrs=nofollow_attr,
+                                            trimmed_url=trimmed_url,
+                                        )
+                                    )
+                                    i = j + 1
+                                    break
+                            j += 1
+                        else:
+                            result.append(text[i])
+                            i += 1
+                    else:
+                        result.append(text[i])
+                        i = close_bracket + 1 if close_bracket != -1 else i + 1
+                else:
+                    result.append(text[i])
+                    i += 1
+            return "".join(result)
+
+        return find_and_replace_link(text)
 
     def handle_word(
         self,

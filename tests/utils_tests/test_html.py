@@ -18,6 +18,7 @@ from django.utils.html import (
     strip_spaces_between_tags,
     strip_tags,
     urlize,
+    urlizer,
 )
 from django.utils.safestring import mark_safe
 
@@ -401,3 +402,78 @@ class TestUtilsHtml(SimpleTestCase):
         for value in tests:
             with self.subTest(value=value):
                 self.assertEqual(urlize(value), value)
+
+    def test_handle_markdown_link(self):
+        tests = [
+            {
+                "input": "Here's a [link with [nested] brackets](https://example.com)",
+                "expected": "Here's a [link with [nested] brackets](<a href=\"https://"
+                'example.com">https://example.com</a>)',
+                "params": {
+                    "trim_url_limit": None,
+                    "nofollow": False,
+                    "autoescape": False,
+                },
+            },
+            {
+                "input": "Check out [this link](https://example.com/page(1))",
+                "expected": 'Check out [this link](<a href="https://example.com/'
+                'page(1)">https://example.com/page(1)</a>)',
+                "params": {
+                    "trim_url_limit": None,
+                    "nofollow": False,
+                    "autoescape": False,
+                },
+            },
+            {
+                "input": "Here's a [complex URL](https://example.com/"
+                "path?param1=value1&param2=value2#fragment)",
+                "expected": "Here's a [complex URL](<a href=\"https://example.com/"
+                'path?param1=value1&amp;param2=value2#fragment">'
+                "https://example.com/path?param1=value1&amp;"
+                "param2=value2#fragment</a>)",
+                "params": {
+                    "trim_url_limit": None,
+                    "nofollow": False,
+                    "autoescape": True,
+                },
+            },
+            {
+                "input": "Multiple [link1](https://example1.com) and "
+                "[link2](https://example2.com)",
+                "expected": 'Multiple [link1](<a href="https://example1.com">'
+                "https://example1.com</a>) and [link2]"
+                '(<a href="https://example2.com">https://example2.com</a>)',
+                "params": {
+                    "trim_url_limit": None,
+                    "nofollow": False,
+                    "autoescape": False,
+                },
+            },
+            {
+                "input": "This is a [broken link(https://example.com)",
+                "expected": "This is a [broken link(https://example.com)",
+                "params": {
+                    "trim_url_limit": None,
+                    "nofollow": False,
+                    "autoescape": False,
+                },
+            },
+            {
+                "input": "Here's a [very long URL](https://example.com/"
+                + "x" * 100
+                + ")",
+                "expected": "Here's a [very long URL](<a href=\"https://example.com/"
+                + "x" * 100
+                + '">https://example.com/xxxxxxxxx…</a>)',
+                "params": {
+                    "trim_url_limit": 30,
+                    "nofollow": False,
+                    "autoescape": False,
+                },
+            },
+        ]
+        for test in tests:
+            with self.subTest(test=test):
+                output = urlizer(test["input"], **test["params"])
+                self.assertEqual(output, test["expected"])
