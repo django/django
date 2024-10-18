@@ -391,7 +391,36 @@ class BaseFormSet(RenderableFormMixin):
                 if not (self.can_delete and self._should_delete_form(form))
             ]
         )
-        return forms_valid and not self.non_form_errors()
+        if not forms_valid:
+            return False
+        unique_forms = [
+            form for form in self.forms if not self._should_delete_form(form)
+        ]
+        unique_together_error = self._check_unique_together(unique_forms)
+        return forms_valid and not self.non_form_errors() and not unique_together_error
+
+    def _check_unique_together(self, forms):
+        unique_together_errors = []
+
+        for i, form in enumerate(forms):
+            unique_together_data = form.cleaned_data.get("field1")
+            unique_together_data2 = form.cleaned_data.get("field2")
+
+            for j, other_form in enumerate(forms[i + 1 :]):
+                other_unique_together_data = other_form.cleaned_data.get("field1")
+                other_unique_together_data2 = other_form.cleaned_data.get("field2")
+
+                if (
+                    unique_together_data is not None
+                    and unique_together_data == other_unique_together_data
+                    and unique_together_data2 == other_unique_together_data2
+                ):
+                    error_msg = (
+                        "Forms {} and {} have duplicate values "
+                        "for the unique constraint.".format(i, j + i + 1)
+                    )
+                    unique_together_errors.append(ValidationError(error_msg))
+        return unique_together_errors
 
     def full_clean(self):
         """
