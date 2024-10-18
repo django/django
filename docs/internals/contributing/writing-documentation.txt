@@ -301,6 +301,10 @@ documentation:
   syntax, it won't be highlighted. Adding ``.. code-block:: python``, for
   example, will force highlighting despite invalid syntax.
 
+* Use ``.. code-block:: pycon`` to highlight code blocks that show examples of
+  an interactive Python console session, and make sure to include the ``>>>``
+  line prefixes in that case.
+
 * To improve readability, use ``.. admonition:: Descriptive title`` rather than
   ``.. note::``. Use these boxes sparingly.
 
