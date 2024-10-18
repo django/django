@@ -535,6 +535,45 @@ database migrations such as ``__init__()``, ``deconstruct()``, and
 which reference the field exist. For example, after squashing migrations and
 removing the old ones, you should be able to remove the field completely.
 
+.. _moving-model-between-apps:
+
+Moving a model between apps
+===========================
+
+  .. versionadded:: 5.1
+
+Django seamlessly handles the process of transferring models from one app
+to another. This involves recognizing the moved model and automatically
+generating the necessary migrations.
+
+When we are going to move a model - that is, delete a model in one app and
+recreate it in another - we want to avoid dropping and recreating its
+database table (which would lose all data). A table rename will happen
+unless the moved model in the new app defines a ``Meta.db_table`` that matches
+the old table name.
+
+To move a model from one app to another, move the model's code (the class
+definition) from the old app's ``models.py`` file to the new app's
+``models.py``, and run the :djadmin:`makemigrations` management command.
+This command will generate migrations in both apps, with the following
+operations:
+
+- First, create the new model, making it point to the already existing table. 
+  To make Django not attempt to create that table (which would fail), mark it
+  ``managed=False`` upon creation (after this operation, we momentarily have
+  two models pointing at the same table).
+- Then, to make it possible to remove the old model without deleting the
+  table, mark it ``managed=False`` as well.
+- Finally, remove the old model and mark the new one ``managed=True``
+  (these are two migrations, as each is in its own app).
+
+.. note::
+    This only handles the migrations part - you will still need to handle other
+    aspects of the move such as changing all existing references to the model
+    to point to its new location yourself. In fact, you will probably need to
+    handle these before running :djadmin:`makemigrations`, for Django to be able to load
+    the apps.
+
 .. _data-migrations:
 
 Data Migrations
