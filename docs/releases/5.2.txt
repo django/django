@@ -139,6 +139,12 @@ Minor features
   processing instruction will be added to the top of the document for each
   stylesheet in the given list. See :ref:`feed-stylesheets` for more details.
 
+:mod:`django.shortcuts`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* :func:`~django.shortcuts.redirect` now supports preserving the HTTP method
+   during redirection.
+
 Asynchronous views
 ~~~~~~~~~~~~~~~~~~
 
