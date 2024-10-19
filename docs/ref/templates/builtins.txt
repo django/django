@@ -3110,7 +3110,7 @@ slightly different call:
 
     {% load static %}
     {% static "images/hi.jpg" as myphoto %}
-    <img src="{{ myphoto }}">
+    <img src="{{ myphoto }}" alt="Hi!">
 
 .. admonition:: Using Jinja2 templates?
 
