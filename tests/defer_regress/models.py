@@ -10,6 +10,12 @@ class Item(models.Model):
     text = models.TextField(default="xyzzy")
     value = models.IntegerField()
     other_value = models.IntegerField(default=0)
+    source = models.OneToOneField(
+        "self",
+        related_name="destination",
+        on_delete=models.CASCADE,
+        null=True,
+    )
 
 
 class RelatedItem(models.Model):

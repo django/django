@@ -11,7 +11,7 @@
 # Maciej Olko <maciej.olko@gmail.com>, 2016-2022
 # Maciej Olko <maciej.olko@gmail.com>, 2023
 # Maciej Olko <maciej.olko@gmail.com>, 2015
-# Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2020,2022-2023
+# Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2020,2022-2024
 # Ola Sitarska <ola@sitarska.com>, 2013
 # Ola Sitarska <ola@sitarska.com>, 2013
 # Roman Barczyński, 2014
@@ -20,10 +20,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 07:05+0000\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 07:05+0000\n"
 "Last-Translator: Mariusz Felisiak <felisiak.mariusz@gmail.com>, "
-"2020,2022-2023\n"
+"2020,2022-2024\n"
 "Language-Team: Polish (http://app.transifex.com/django/django/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -219,12 +219,6 @@ msgstr ""
 "go/ją/je ponownie poniżej."
 
 #, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr ""
-"{name} „{obj}” został(a)(-ło) dodany(-na)(-ne) pomyślnie. Można edytować go/"
-"ją/je ponownie poniżej."
-
-#, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
@@ -394,6 +388,9 @@ msgstr "Podaj nazwę użytkownika i hasło."
 msgid "Change password"
 msgstr "Zmień hasło"
 
+msgid "Set password"
+msgstr "Ustaw hasło"
+
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Prosimy poprawić poniższy błąd."
@@ -404,6 +401,19 @@ msgstr[3] "Prosimy poprawić poniższe błędy."
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Podaj nowe hasło dla użytkownika <strong>%(username)s</strong>."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+"To działanie <strong>włączy</strong> uwierzytelnianie oparte na haśle dla "
+"tego użytkownika. "
+
+msgid "Disable password-based authentication"
+msgstr "Wyłącz uwierzytelnianie oparte na haśle"
+
+msgid "Enable password-based authentication"
+msgstr "Włącz uwierzytelnianie oparte na haśle"
 
 msgid "Skip to main content"
 msgstr "Przejdź do głównej treści"

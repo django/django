@@ -4,6 +4,7 @@ from unittest import mock
 
 from django import __version__
 from django.core.management import CommandError, call_command
+from django.core.management.commands import shell
 from django.test import SimpleTestCase
 from django.test.utils import captured_stdin, captured_stdout
 
@@ -70,6 +71,15 @@ class ShellCommandTestCase(SimpleTestCase):
             call_command("shell")
         self.assertEqual(stdout.getvalue().strip(), __version__)
 
+    def test_ipython(self):
+        cmd = shell.Command()
+        mock_ipython = mock.Mock(start_ipython=mock.MagicMock())
+
+        with mock.patch.dict(sys.modules, {"IPython": mock_ipython}):
+            cmd.ipython({})
+
+        self.assertEqual(mock_ipython.start_ipython.mock_calls, [mock.call(argv=[])])
+
     @mock.patch("django.core.management.commands.shell.select.select")  # [1]
     @mock.patch.dict("sys.modules", {"IPython": None})
     def test_shell_with_ipython_not_installed(self, select):
@@ -78,6 +88,15 @@ class ShellCommandTestCase(SimpleTestCase):
             CommandError, "Couldn't import ipython interface."
         ):
             call_command("shell", interface="ipython")
+
+    def test_bpython(self):
+        cmd = shell.Command()
+        mock_bpython = mock.Mock(embed=mock.MagicMock())
+
+        with mock.patch.dict(sys.modules, {"bpython": mock_bpython}):
+            cmd.bpython({})
+
+        self.assertEqual(mock_bpython.embed.mock_calls, [mock.call()])
 
     @mock.patch("django.core.management.commands.shell.select.select")  # [1]
     @mock.patch.dict("sys.modules", {"bpython": None})
@@ -88,7 +107,16 @@ class ShellCommandTestCase(SimpleTestCase):
         ):
             call_command("shell", interface="bpython")
 
-    # [1] Patch select to prevent tests failing when when the test suite is run
+    def test_python(self):
+        cmd = shell.Command()
+        mock_code = mock.Mock(interact=mock.MagicMock())
+
+        with mock.patch.dict(sys.modules, {"code": mock_code}):
+            cmd.python({"no_startup": True})
+
+        self.assertEqual(mock_code.interact.mock_calls, [mock.call(local={})])
+
+    # [1] Patch select to prevent tests failing when the test suite is run
     # in parallel mode. The tests are run in a subprocess and the subprocess's
     # stdin is closed and replaced by /dev/null. Reading from /dev/null always
     # returns EOF and so select always shows that sys.stdin is ready to read.

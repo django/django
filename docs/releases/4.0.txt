@@ -367,8 +367,7 @@ Tests
   serialized to allow usage of the
   :ref:`serialized_rollback <test-case-serialized-rollback>` feature.
 
-* Django test runner now supports a :option:`--buffer <test --buffer>` option
-  with parallel tests.
+* The :option:`test --buffer` option now supports parallel tests.
 
 * The new ``logger`` argument to :class:`~django.test.runner.DiscoverRunner`
   allows a Python :py:ref:`logger <logger>` to be used for logging.
@@ -376,8 +375,8 @@ Tests
 * The new :meth:`.DiscoverRunner.log` method provides a way to log messages
   that uses the ``DiscoverRunner.logger``, or prints to the console if not set.
 
-* Django test runner now supports a :option:`--shuffle <test --shuffle>` option
-  to execute tests in a random order.
+* :class:`~django.test.runner.DiscoverRunner` can now execute tests in a random
+  order using the :option:`test --shuffle` option.
 
 * The :option:`test --parallel` option now supports the value ``auto`` to run
   one test process for each processor core.

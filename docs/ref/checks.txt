@@ -77,6 +77,7 @@ Django's system checks are organized using the following tags:
 * ``async_support``: Checks asynchronous-related configuration.
 * ``caches``: Checks cache related configuration.
 * ``compatibility``: Flags potential problems with version upgrades.
+* ``commands``: Checks custom management commands related configuration.
 * ``database``: Checks database-related configuration issues. Database checks
   are not run by default because they do more than static code analysis as
   regular checks do. They are only run by the :djadmin:`migrate` command or if
@@ -428,6 +429,14 @@ Models
 * **models.W047**: ``<database>`` does not support unique constraints with
   nulls distinct.
 
+Management Commands
+-------------------
+
+The following checks verify custom management commands are correctly configured:
+
+* **commands.E001**: The ``migrate`` and ``makemigrations`` commands must have
+  the same ``autodetector``.
+
 Security
 --------
 
@@ -575,7 +584,9 @@ configured:
 
 * **templates.E001**: You have ``'APP_DIRS': True`` in your
   :setting:`TEMPLATES` but also specify ``'loaders'`` in ``OPTIONS``. Either
-  remove ``APP_DIRS`` or remove the ``'loaders'`` option.
+  remove ``APP_DIRS`` or remove the ``'loaders'`` option. *This check is
+  removed in Django 5.1 as system checks may now raise*
+  ``ImproperlyConfigured`` *instead.*
 * **templates.E002**: ``string_if_invalid`` in :setting:`TEMPLATES`
   :setting:`OPTIONS <TEMPLATES-OPTIONS>` must be a string but got: ``{value}``
   (``{type}``).
@@ -726,9 +737,9 @@ with the admin site:
 * **admin.E106**: The value of ``<InlineModelAdmin class>.model`` must be a
   ``Model``.
 * **admin.E107**: The value of ``list_display`` must be a list or tuple.
-* **admin.E108**: The value of ``list_display[n]`` refers to ``<label>``,
-  which is not a callable, an attribute of ``<ModelAdmin class>``, or an
-  attribute or method on ``<model>``.
+* **admin.E108**: The value of ``list_display[n]`` refers to ``<label>``, which
+  is not a callable or attribute of ``<ModelAdmin class>``, or an attribute,
+  method, or field on ``<model>``.
 * **admin.E109**: The value of ``list_display[n]`` must not be a many-to-many
   field or a reverse foreign key.
 * **admin.E110**: The value of ``list_display_links`` must be a list, a tuple,
@@ -866,6 +877,10 @@ The following checks are performed on the default
   for its builtin permission names to be at most 100 characters.
 * **auth.E012**: The permission codenamed ``<codename>`` of model ``<model>``
   is longer than 100 characters.
+* **auth.E013**: In order to use
+  :class:`django.contrib.auth.middleware.LoginRequiredMiddleware`,
+  :class:`django.contrib.auth.middleware.AuthenticationMiddleware` must be
+  defined before it in MIDDLEWARE.
 
 ``contenttypes``
 ----------------

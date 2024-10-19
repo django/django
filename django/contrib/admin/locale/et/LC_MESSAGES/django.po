@@ -2,10 +2,10 @@
 #
 # Translators:
 # eallik <eallik@gmail.com>, 2011
-# Erlend <debcf78e@opayq.com>, 2020
+# Erlend Eelmets <debcf78e@opayq.com>, 2020
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janno Liivak <jannolii@gmail.com>, 2013-2015
-# Martin <martinpajuste@gmail.com>, 2015,2022-2023
+# Martin <martinpajuste@gmail.com>, 2015,2022-2024
 # Martin <martinpajuste@gmail.com>, 2016,2019-2020
 # Marti Raudsepp <marti@juffo.org>, 2016
 # Ragnar Rebase <rrebase@gmail.com>, 2019
@@ -13,9 +13,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 07:05+0000\n"
-"Last-Translator: Martin <martinpajuste@gmail.com>, 2015,2022-2023\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 07:05+0000\n"
+"Last-Translator: Martin <martinpajuste@gmail.com>, 2015,2022-2024\n"
 "Language-Team: Estonian (http://app.transifex.com/django/django/language/"
 "et/)\n"
 "MIME-Version: 1.0\n"
@@ -205,10 +205,6 @@ msgid ""
 msgstr "{name} “{obj}” muutmine õnnestus. Allpool saate seda uuesti muuta."
 
 #, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr "{name} “{obj}” lisamine õnnestus. Allpool saate seda uuesti muuta."
-
-#, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
@@ -372,6 +368,9 @@ msgstr "Sisestage kasutajanimi ja salasõna."
 msgid "Change password"
 msgstr "Muuda salasõna"
 
+msgid "Set password"
+msgstr "Määra parool"
+
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Palun parandage allolev viga."
@@ -380,6 +379,17 @@ msgstr[1] "Palun parandage allolevad vead."
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Sisestage uus salasõna kasutajale <strong>%(username)s</strong>"
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+
+msgid "Disable password-based authentication"
+msgstr ""
+
+msgid "Enable password-based authentication"
+msgstr ""
 
 msgid "Skip to main content"
 msgstr "Liigu põhisisu juurde"
@@ -738,7 +748,7 @@ msgid "Email address:"
 msgstr "E-posti aadress:"
 
 msgid "Reset my password"
-msgstr "Reseti parool"
+msgstr "Lähtesta mu parool"
 
 msgid "Select all objects on this page for an action"
 msgstr "Vali toiminguks kõik objektid sellel lehel"

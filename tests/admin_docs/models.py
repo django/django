@@ -54,6 +54,12 @@ class Person(models.Model):
     def dummy_function(self, baz, rox, *some_args, **some_kwargs):
         return some_kwargs
 
+    def dummy_function_keyword_only_arg(self, *, keyword_only_arg):
+        return keyword_only_arg
+
+    def all_kinds_arg_function(self, position_only_arg, /, arg, *, kwarg):
+        return position_only_arg, arg, kwarg
+
     @property
     def a_property(self):
         return "a_property"

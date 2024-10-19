@@ -614,6 +614,10 @@ class LookupTransformCallOrderTests(SimpleTestCase):
             )
             TrackCallsYearTransform.call_order = []
             # junk transform - tries transform only, then fails
+            msg = (
+                "Unsupported lookup 'junk__more_junk' for IntegerField or join"
+                " on the field not permitted."
+            )
             with self.assertRaisesMessage(FieldError, msg):
                 Author.objects.filter(birthdate__testyear__junk__more_junk=2012)
             self.assertEqual(TrackCallsYearTransform.call_order, ["transform"])

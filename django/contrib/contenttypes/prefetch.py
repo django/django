@@ -3,7 +3,7 @@ from django.db.models.query import ModelIterable, RawQuerySet
 
 
 class GenericPrefetch(Prefetch):
-    def __init__(self, lookup, querysets=None, to_attr=None):
+    def __init__(self, lookup, querysets, to_attr=None):
         for queryset in querysets:
             if queryset is not None and (
                 isinstance(queryset, RawQuerySet)

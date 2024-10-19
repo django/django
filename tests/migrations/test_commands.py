@@ -4,10 +4,15 @@ import io
 import os
 import shutil
 import sys
+from pathlib import Path
 from unittest import mock
 
 from django.apps import apps
 from django.core.management import CommandError, call_command
+from django.core.management.commands.makemigrations import (
+    Command as MakeMigrationsCommand,
+)
+from django.core.management.commands.migrate import Command as MigrateCommand
 from django.db import (
     ConnectionHandler,
     DatabaseError,
@@ -18,10 +23,11 @@ from django.db import (
 )
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.backends.utils import truncate_name
+from django.db.migrations.autodetector import MigrationAutodetector
 from django.db.migrations.exceptions import InconsistentMigrationHistory
 from django.db.migrations.recorder import MigrationRecorder
 from django.test import TestCase, override_settings, skipUnlessDBFeature
-from django.test.utils import captured_stdout
+from django.test.utils import captured_stdout, extend_sys_path, isolate_apps
 from django.utils import timezone
 from django.utils.version import get_docs_version
 
@@ -1427,6 +1433,53 @@ class MigrateTests(MigrationTestBase):
         with self.assertRaisesMessage(CommandError, msg):
             call_command("migrate", prune=True)
 
+    @override_settings(
+        MIGRATION_MODULES={
+            "migrations": "migrations.test_migrations_squashed_no_replaces",
+            "migrations2": "migrations2.test_migrations_2_squashed_with_replaces",
+        },
+        INSTALLED_APPS=["migrations", "migrations2"],
+    )
+    def test_prune_respect_app_label(self):
+        recorder = MigrationRecorder(connection)
+        recorder.record_applied("migrations", "0001_initial")
+        recorder.record_applied("migrations", "0002_second")
+        recorder.record_applied("migrations", "0001_squashed_0002")
+        # Second app has squashed migrations with replaces.
+        recorder.record_applied("migrations2", "0001_initial")
+        recorder.record_applied("migrations2", "0002_second")
+        recorder.record_applied("migrations2", "0001_squashed_0002")
+        out = io.StringIO()
+        try:
+            call_command("migrate", "migrations", prune=True, stdout=out, no_color=True)
+            self.assertEqual(
+                out.getvalue(),
+                "Pruning migrations:\n"
+                "  Pruning migrations.0001_initial OK\n"
+                "  Pruning migrations.0002_second OK\n",
+            )
+            applied_migrations = [
+                migration
+                for migration in recorder.applied_migrations()
+                if migration[0] in ["migrations", "migrations2"]
+            ]
+            self.assertEqual(
+                applied_migrations,
+                [
+                    ("migrations", "0001_squashed_0002"),
+                    ("migrations2", "0001_initial"),
+                    ("migrations2", "0002_second"),
+                    ("migrations2", "0001_squashed_0002"),
+                ],
+            )
+        finally:
+            recorder.record_unapplied("migrations", "0001_initial")
+            recorder.record_unapplied("migrations", "0001_second")
+            recorder.record_unapplied("migrations", "0001_squashed_0002")
+            recorder.record_unapplied("migrations2", "0001_initial")
+            recorder.record_unapplied("migrations2", "0002_second")
+            recorder.record_unapplied("migrations2", "0001_squashed_0002")
+
 
 class MakeMigrationsTests(MigrationTestBase):
     """
@@ -1681,6 +1734,25 @@ class MakeMigrationsTests(MigrationTestBase):
         ):
             call_command("makemigrations", stdout=out)
         self.assertIn("0001_initial.py", out.getvalue())
+
+    def test_makemigrations_no_init_ambiguous(self):
+        """
+        Migration directories without an __init__.py file are not allowed if
+        there are multiple namespace search paths that resolve to them.
+        """
+        out = io.StringIO()
+        with self.temporary_migration_module(
+            module="migrations.test_migrations_no_init"
+        ) as migration_dir:
+            # Copy the project directory into another place under sys.path.
+            app_dir = Path(migration_dir).parent
+            os.remove(app_dir / "__init__.py")
+            project_dir = app_dir.parent
+            dest = project_dir.parent / "other_dir_in_path"
+            shutil.copytree(project_dir, dest)
+            with extend_sys_path(str(dest)):
+                call_command("makemigrations", stdout=out)
+        self.assertEqual("No changes detected\n", out.getvalue())
 
     def test_makemigrations_migrations_announce(self):
         """
@@ -3229,3 +3301,59 @@ class OptimizeMigrationTests(MigrationTestBase):
         msg = "Cannot find a migration matching 'nonexistent' from app 'migrations'."
         with self.assertRaisesMessage(CommandError, msg):
             call_command("optimizemigration", "migrations", "nonexistent")
+
+
+class CustomMigrationCommandTests(MigrationTestBase):
+    @override_settings(
+        MIGRATION_MODULES={"migrations": "migrations.test_migrations"},
+        INSTALLED_APPS=["migrations.migrations_test_apps.migrated_app"],
+    )
+    @isolate_apps("migrations.migrations_test_apps.migrated_app")
+    def test_makemigrations_custom_autodetector(self):
+        class CustomAutodetector(MigrationAutodetector):
+            def changes(self, *args, **kwargs):
+                return []
+
+        class CustomMakeMigrationsCommand(MakeMigrationsCommand):
+            autodetector = CustomAutodetector
+
+        class NewModel(models.Model):
+            class Meta:
+                app_label = "migrated_app"
+
+        out = io.StringIO()
+        command = CustomMakeMigrationsCommand(stdout=out)
+        call_command(command, "migrated_app", stdout=out)
+        self.assertIn("No changes detected", out.getvalue())
+
+    @override_settings(INSTALLED_APPS=["migrations.migrations_test_apps.migrated_app"])
+    @isolate_apps("migrations.migrations_test_apps.migrated_app")
+    def test_migrate_custom_autodetector(self):
+        class CustomAutodetector(MigrationAutodetector):
+            def changes(self, *args, **kwargs):
+                return []
+
+        class CustomMigrateCommand(MigrateCommand):
+            autodetector = CustomAutodetector
+
+        class NewModel(models.Model):
+            class Meta:
+                app_label = "migrated_app"
+
+        out = io.StringIO()
+        command = CustomMigrateCommand(stdout=out)
+
+        out = io.StringIO()
+        try:
+            call_command(command, verbosity=0)
+            call_command(command, stdout=out, no_color=True)
+            command_stdout = out.getvalue().lower()
+            self.assertEqual(
+                "operations to perform:\n"
+                "  apply all migrations: migrated_app\n"
+                "running migrations:\n"
+                "  no migrations to apply.\n",
+                command_stdout,
+            )
+        finally:
+            call_command(command, "migrated_app", "zero", verbosity=0)

@@ -17,7 +17,7 @@ from django.db.backends.base.validation import BaseDatabaseValidation
 from django.db.backends.signals import connection_created
 from django.db.backends.utils import debug_transaction
 from django.db.transaction import TransactionManagementError
-from django.db.utils import DatabaseErrorWrapper
+from django.db.utils import DatabaseErrorWrapper, ProgrammingError
 from django.utils.asyncio import async_unsafe
 from django.utils.functional import cached_property
 
@@ -175,7 +175,8 @@ class BaseDatabaseWrapper:
         if len(self.queries_log) == self.queries_log.maxlen:
             warnings.warn(
                 "Limit for query logging exceeded, only the last {} queries "
-                "will be returned.".format(self.queries_log.maxlen)
+                "will be returned.".format(self.queries_log.maxlen),
+                stacklevel=2,
             )
         return list(self.queries_log)
 
@@ -271,6 +272,10 @@ class BaseDatabaseWrapper:
     def ensure_connection(self):
         """Guarantee that a connection to the database is established."""
         if self.connection is None:
+            if self.in_atomic_block and self.closed_in_transaction:
+                raise ProgrammingError(
+                    "Cannot open a new connection in an atomic block."
+                )
             with self.wrap_database_errors:
                 self.connect()
 

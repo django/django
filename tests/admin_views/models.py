@@ -83,6 +83,9 @@ class Book(models.Model):
     def __str__(self):
         return self.name
 
+    def get_absolute_url(self):
+        return f"/books/{self.id}/"
+
 
 class Promo(models.Model):
     name = models.CharField(max_length=100, verbose_name="¿Name?")
@@ -1152,3 +1155,15 @@ class Square(models.Model):
 
     class Meta:
         required_db_features = {"supports_stored_generated_columns"}
+
+
+class CamelCaseModel(models.Model):
+    interesting_name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.interesting_name
+
+
+class CamelCaseRelatedModel(models.Model):
+    m2m = models.ManyToManyField(CamelCaseModel, related_name="m2m")
+    fk = models.ForeignKey(CamelCaseModel, on_delete=models.CASCADE, related_name="fk")

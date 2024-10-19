@@ -1,6 +1,7 @@
 import logging
 from contextlib import contextmanager
 from io import StringIO
+from unittest import mock
 
 from admin_scripts.tests import AdminScriptTestCase
 
@@ -466,9 +467,29 @@ class AdminEmailHandlerTest(SimpleTestCase):
         msg = mail.outbox[0]
         self.assertEqual(msg.subject, "[Django] ERROR: message")
         self.assertEqual(len(msg.alternatives), 1)
-        body_html = str(msg.alternatives[0][0])
+        body_html = str(msg.alternatives[0].content)
         self.assertIn('<div id="traceback">', body_html)
         self.assertNotIn("<form", body_html)
+
+    @override_settings(ADMINS=[])
+    def test_emit_no_admins(self):
+        handler = AdminEmailHandler()
+        record = self.logger.makeRecord(
+            "name",
+            logging.ERROR,
+            "function",
+            "lno",
+            "message",
+            None,
+            None,
+        )
+        with mock.patch.object(
+            handler,
+            "format_subject",
+            side_effect=AssertionError("Should not be called"),
+        ):
+            handler.emit(record)
+        self.assertEqual(len(mail.outbox), 0)
 
 
 class SettingsConfigTest(AdminScriptTestCase):

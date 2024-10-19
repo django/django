@@ -1126,6 +1126,8 @@ class MigrationAutodetector:
                     self.to_state,
                 )
             )
+        if field.generated:
+            dependencies.extend(self._get_dependencies_for_generated_field(field))
         # You can't just add NOT NULL fields with no default or fields
         # which don't allow empty strings as default.
         time_fields = (models.DateField, models.DateTimeField, models.TimeField)
@@ -1545,6 +1547,27 @@ class MigrationAutodetector:
                     OperationDependency.Type.CREATE,
                 )
             )
+        return dependencies
+
+    def _get_dependencies_for_generated_field(self, field):
+        dependencies = []
+        referenced_base_fields = models.Q(field.expression).referenced_base_fields
+        newly_added_fields = sorted(self.new_field_keys - self.old_field_keys)
+        for app_label, model_name, added_field_name in newly_added_fields:
+            added_field = self.to_state.models[app_label, model_name].get_field(
+                added_field_name
+            )
+            if (
+                added_field.remote_field and added_field.remote_field.model
+            ) or added_field.name in referenced_base_fields:
+                dependencies.append(
+                    OperationDependency(
+                        app_label,
+                        model_name,
+                        added_field.name,
+                        OperationDependency.Type.CREATE,
+                    )
+                )
         return dependencies
 
     def _get_dependencies_for_model(self, app_label, model_name):

@@ -1,6 +1,10 @@
 from django.contrib import admin
 from django.contrib.auth import views
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import (
+    login_not_required,
+    login_required,
+    permission_required,
+)
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.urls import urlpatterns as auth_urlpatterns
 from django.contrib.auth.views import LoginView
@@ -9,6 +13,8 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 from django.template import RequestContext, Template
 from django.urls import path, re_path, reverse_lazy
+from django.utils.decorators import method_decorator
+from django.views import View
 from django.views.decorators.cache import never_cache
 from django.views.i18n import set_language
 
@@ -86,6 +92,42 @@ def login_and_permission_required_exception(request):
 class CustomDefaultRedirectURLLoginView(LoginView):
     def get_default_redirect_url(self):
         return "/custom/"
+
+
+class EmptyResponseBaseView(View):
+    def get(self, request, *args, **kwargs):
+        return HttpResponse()
+
+
+@method_decorator(login_not_required, name="dispatch")
+class PublicView(EmptyResponseBaseView):
+    pass
+
+
+class ProtectedView(EmptyResponseBaseView):
+    pass
+
+
+@method_decorator(
+    login_required(login_url="/custom_login/", redirect_field_name="step"),
+    name="dispatch",
+)
+class ProtectedViewWithCustomLoginRequired(EmptyResponseBaseView):
+    pass
+
+
+@login_not_required
+def public_view(request):
+    return HttpResponse()
+
+
+def protected_view(request):
+    return HttpResponse()
+
+
+@login_required(login_url="/custom_login/", redirect_field_name="step")
+def protected_view_with_login_required_decorator(request):
+    return HttpResponse()
 
 
 # special urls for auth test cases
@@ -198,7 +240,14 @@ urlpatterns = auth_urlpatterns + [
         "login_and_permission_required_exception/",
         login_and_permission_required_exception,
     ),
+    path("public_view/", PublicView.as_view()),
+    path("public_function_view/", public_view),
+    path("protected_view/", ProtectedView.as_view()),
+    path("protected_function_view/", protected_view),
+    path(
+        "login_required_decorator_view/", protected_view_with_login_required_decorator
+    ),
+    path("login_required_cbv_view/", ProtectedViewWithCustomLoginRequired.as_view()),
     path("setlang/", set_language, name="set_language"),
-    # This line is only required to render the password reset with is_admin=True
     path("admin/", admin.site.urls),
 ]

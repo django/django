@@ -287,7 +287,7 @@ outputting the complete HTML ``<script>`` or ``<link>`` tag content:
     >>> @html_safe
     ... class JSPath:
     ...     def __str__(self):
-    ...         return '<script src="https://example.org/asset.js" rel="stylesheet">'
+    ...         return '<script src="https://example.org/asset.js" defer>'
     ...
 
     >>> class SomeWidget(forms.TextInput):

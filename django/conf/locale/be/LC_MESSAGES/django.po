@@ -2,15 +2,16 @@
 #
 # Translators:
 # Viktar Palstsiuk <vipals@gmail.com>, 2014-2015
-# znotdead <zhirafchik@gmail.com>, 2016-2017,2019-2021,2023
+# znotdead <zhirafchik@gmail.com>, 2016-2017,2019-2021,2023-2024
 # Bobsans <mr.bobsans@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 06:49+0000\n"
-"Last-Translator: znotdead <zhirafchik@gmail.com>, 2016-2017,2019-2021,2023\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 06:49+0000\n"
+"Last-Translator: znotdead <zhirafchik@gmail.com>, "
+"2016-2017,2019-2021,2023-2024\n"
 "Language-Team: Belarusian (http://app.transifex.com/django/django/language/"
 "be/)\n"
 "MIME-Version: 1.0\n"
@@ -347,6 +348,9 @@ msgstr "Гэтая старонка не мае ніякіх вынікаў"
 msgid "Enter a valid value."
 msgstr "Пазначце правільнае значэньне."
 
+msgid "Enter a valid domain name."
+msgstr "Пазначце сапраўднае даменнае имя."
+
 msgid "Enter a valid URL."
 msgstr "Пазначце чынную спасылку."
 
@@ -370,14 +374,18 @@ msgstr ""
 "Значэнне павінна быць толькі з літараў стандарту Unicode, личбаў, знакаў "
 "падкрэслівання ці злучкі."
 
-msgid "Enter a valid IPv4 address."
-msgstr "Пазначце чынны адрас IPv4."
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr "Пазначце сапраўдны %(protocol)s адрас."
 
-msgid "Enter a valid IPv6 address."
-msgstr "Пазначце чынны адрас IPv6."
+msgid "IPv4"
+msgstr "IPv4"
 
-msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "Пазначце чынны адрас IPv4 або IPv6."
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "IPv4 or IPv6"
+msgstr "IPv4 або IPv6"
 
 msgid "Enter only digits separated by commas."
 msgstr "Набярыце лічбы, падзеленыя коскамі."

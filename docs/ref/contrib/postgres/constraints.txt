@@ -136,8 +136,6 @@ used for queries that select only included fields
 ``violation_error_code``
 ------------------------
 
-.. versionadded:: 5.0
-
 .. attribute:: ExclusionConstraint.violation_error_code
 
 The error code used when ``ValidationError`` is raised during

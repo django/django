@@ -12,6 +12,7 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Johan Rohdin, 2021
 # Jonathan Lindén, 2015
+# Jörgen Olofsson, 2024
 # Jonathan Lindén, 2014
 # metteludwig <luudde@gmail.com>, 2019
 # Mattias Hansson <mattias.gothenburg@gmail.com>, 2016
@@ -21,9 +22,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 07:05+0000\n"
-"Last-Translator: Albin Larsson <albin.post@gmail.com>, 2022-2023\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 07:05+0000\n"
+"Last-Translator: Jörgen Olofsson, 2024\n"
 "Language-Team: Swedish (http://app.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -193,7 +194,7 @@ msgstr ""
 "Håll inne “Control”, eller “Command” på en Mac, för att välja fler än en."
 
 msgid "Select this object for an action - {}"
-msgstr ""
+msgstr "Välj detta objekt för en åtgärd - {}"
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -211,10 +212,6 @@ msgstr "Lade till {name} “{obj}”. Du kan lägga till ytterligare {name} neda
 msgid ""
 "The {name} “{obj}” was changed successfully. You may edit it again below."
 msgstr "Ändrade {name} “{obj}”. Du kan göra ytterligare förändringar nedan."
-
-#, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr "Lade till {name} “{obj}”. Du kan göra ytterligare förändringar nedan."
 
 #, python-brace-format
 msgid ""
@@ -379,6 +376,9 @@ msgstr "Mata in användarnamn och lösenord."
 msgid "Change password"
 msgstr "Ändra lösenord"
 
+msgid "Set password"
+msgstr "Sätt lösenord"
+
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Var god rätta felet nedan."
@@ -387,6 +387,19 @@ msgstr[1] "Vad god rätta felen nedan."
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Ange nytt lösenord för användare <strong>%(username)s</strong>."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+"Denna åtgärd <strong>aktiverar</strong>  lösenordsbaserad autentisering för "
+"denna användare."
+
+msgid "Disable password-based authentication"
+msgstr "Inaktivera lösenordsbaserad autentisering"
+
+msgid "Enable password-based authentication"
+msgstr "Aktivera lösenordsbaserad autentisering"
 
 msgid "Skip to main content"
 msgstr "Hoppa till huvudinnehållet"
@@ -417,10 +430,10 @@ msgid "Filter"
 msgstr "Filtrera"
 
 msgid "Hide counts"
-msgstr ""
+msgstr "Dölj antal"
 
 msgid "Show counts"
-msgstr ""
+msgstr "Visa antal"
 
 msgid "Clear all filters"
 msgstr "Rensa alla filter"
@@ -531,13 +544,13 @@ msgid "None available"
 msgstr "Inga tillgängliga"
 
 msgid "Added:"
-msgstr ""
+msgstr "Lagt till:"
 
 msgid "Changed:"
-msgstr ""
+msgstr "Ändrade:"
 
 msgid "Deleted:"
-msgstr ""
+msgstr "Raderade:"
 
 msgid "Unknown content"
 msgstr "Okänt innehåll"
@@ -749,7 +762,7 @@ msgid "Reset my password"
 msgstr "Nollställ mitt lösenord"
 
 msgid "Select all objects on this page for an action"
-msgstr ""
+msgstr "Välj alla objekt på denna sida för en åtgärd"
 
 msgid "All dates"
 msgstr "Alla datum"

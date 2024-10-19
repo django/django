@@ -1,4 +1,4 @@
-/* global QUnit */
+/* global QUnit, initSidebarQuickFilter */
 'use strict';
 
 QUnit.module('admin.sidebar: filter', {

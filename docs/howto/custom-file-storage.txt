@@ -131,7 +131,7 @@ to refer to a specific storage throughout Django, to a dictionary of settings
 for that specific storage backend. The settings in the inner dictionaries are
 described fully in the :setting:`STORAGES` documentation.
 
-Storages are then accessed by alias from from the
+Storages are then accessed by alias from the
 :data:`django.core.files.storage.storages` dictionary::
 
     from django.core.files.storage import storages

@@ -1,4 +1,5 @@
 from django.core.exceptions import FieldError
+from django.db import connection
 from django.db.models import (
     BooleanField,
     Exists,
@@ -10,6 +11,7 @@ from django.db.models import (
 )
 from django.db.models.expressions import NegatedExpression, RawSQL
 from django.db.models.functions import Lower
+from django.db.models.lookups import Exact, IsNull
 from django.db.models.sql.where import NothingNode
 from django.test import SimpleTestCase, TestCase
 
@@ -263,6 +265,33 @@ class QTests(SimpleTestCase):
                     Q(*items, _connector=connector),
                 )
 
+    def test_referenced_base_fields(self):
+        # Make sure Q.referenced_base_fields retrieves all base fields from
+        # both filters and F expressions.
+        tests = [
+            (Q(field_1=1) & Q(field_2=1), {"field_1", "field_2"}),
+            (
+                Q(Exact(F("field_3"), IsNull(F("field_4"), True))),
+                {"field_3", "field_4"},
+            ),
+            (Q(Exact(Q(field_5=F("field_6")), True)), {"field_5", "field_6"}),
+            (Q(field_2=1), {"field_2"}),
+            (Q(field_7__lookup=True), {"field_7"}),
+            (Q(field_7__joined_field__lookup=True), {"field_7"}),
+        ]
+        combined_q = Q(1)
+        combined_q_base_fields = set()
+        for q, expected_base_fields in tests:
+            combined_q &= q
+            combined_q_base_fields |= expected_base_fields
+        tests.append((combined_q, combined_q_base_fields))
+        for q, expected_base_fields in tests:
+            with self.subTest(q=q):
+                self.assertEqual(
+                    q.referenced_base_fields,
+                    expected_base_fields,
+                )
+
 
 class QCheckTests(TestCase):
     def test_basic(self):
@@ -299,3 +328,6 @@ class QCheckTests(TestCase):
             f"Got a database error calling check() on {q!r}: ",
             cm.records[0].getMessage(),
         )
+
+        # We must leave the connection in a usable state (#35712).
+        self.assertTrue(connection.is_usable())

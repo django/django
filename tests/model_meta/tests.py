@@ -3,7 +3,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 from django.core.exceptions import FieldDoesNotExist
 from django.db.models import CharField, Field, ForeignObjectRel, ManyToManyField
 from django.db.models.options import EMPTY_RELATION_TREE, IMMUTABLE_WARNING
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, override_settings
 
 from .models import (
     AbstractPerson,
@@ -16,6 +16,7 @@ from .models import (
     Relating,
     Relation,
     SecondParent,
+    Swappable,
 )
 from .results import TEST_RESULTS
 
@@ -222,6 +223,42 @@ class GetFieldByNameTests(OptionsBaseTests):
             opts.apps.models_ready = True
 
 
+class VerboseNameRawTests(SimpleTestCase):
+    def test_string(self):
+        # Clear cached property.
+        Relation._meta.__dict__.pop("verbose_name_raw", None)
+        self.assertEqual(Relation._meta.verbose_name_raw, "relation")
+
+    def test_gettext(self):
+        Person._meta.__dict__.pop("verbose_name_raw", None)
+        self.assertEqual(Person._meta.verbose_name_raw, "Person")
+
+
+class SwappedTests(SimpleTestCase):
+    def test_plain_model_none(self):
+        self.assertIsNone(Relation._meta.swapped)
+
+    def test_unset(self):
+        self.assertIsNone(Swappable._meta.swapped)
+
+    def test_set_and_unset(self):
+        with override_settings(MODEL_META_TESTS_SWAPPED="model_meta.Relation"):
+            self.assertEqual(Swappable._meta.swapped, "model_meta.Relation")
+        self.assertIsNone(Swappable._meta.swapped)
+
+    def test_setting_none(self):
+        with override_settings(MODEL_META_TESTS_SWAPPED=None):
+            self.assertIsNone(Swappable._meta.swapped)
+
+    def test_setting_non_label(self):
+        with override_settings(MODEL_META_TESTS_SWAPPED="not-a-label"):
+            self.assertEqual(Swappable._meta.swapped, "not-a-label")
+
+    def test_setting_self(self):
+        with override_settings(MODEL_META_TESTS_SWAPPED="model_meta.swappable"):
+            self.assertIsNone(Swappable._meta.swapped)
+
+
 class RelationTreeTests(SimpleTestCase):
     all_models = (Relation, AbstractPerson, BasePerson, Person, ProxyPerson, Relating)
 
@@ -258,7 +295,7 @@ class RelationTreeTests(SimpleTestCase):
             sorted(
                 field.related_query_name()
                 for field in Relation._meta._relation_tree
-                if not field.remote_field.field.remote_field.is_hidden()
+                if not field.remote_field.field.remote_field.hidden
             ),
             sorted(
                 [
@@ -314,14 +351,18 @@ class RelationTreeTests(SimpleTestCase):
         )
 
 
-class ParentListTests(SimpleTestCase):
-    def test_get_parent_list(self):
-        self.assertEqual(CommonAncestor._meta.get_parent_list(), [])
-        self.assertEqual(FirstParent._meta.get_parent_list(), [CommonAncestor])
-        self.assertEqual(SecondParent._meta.get_parent_list(), [CommonAncestor])
+class AllParentsTests(SimpleTestCase):
+    def test_all_parents(self):
+        self.assertEqual(CommonAncestor._meta.all_parents, ())
+        self.assertEqual(FirstParent._meta.all_parents, (CommonAncestor,))
+        self.assertEqual(SecondParent._meta.all_parents, (CommonAncestor,))
         self.assertEqual(
-            Child._meta.get_parent_list(), [FirstParent, SecondParent, CommonAncestor]
+            Child._meta.all_parents,
+            (FirstParent, SecondParent, CommonAncestor),
         )
+
+    def test_get_parent_list(self):
+        self.assertEqual(Child._meta.get_parent_list(), list(Child._meta.all_parents))
 
 
 class PropertyNamesTests(SimpleTestCase):

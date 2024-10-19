@@ -200,12 +200,15 @@ class ValuesIterable(BaseIterable):
         query = queryset.query
         compiler = query.get_compiler(queryset.db)
 
-        # extra(select=...) cols are always at the start of the row.
-        names = [
-            *query.extra_select,
-            *query.values_select,
-            *query.annotation_select,
-        ]
+        if query.selected:
+            names = list(query.selected)
+        else:
+            # extra(select=...) cols are always at the start of the row.
+            names = [
+                *query.extra_select,
+                *query.values_select,
+                *query.annotation_select,
+            ]
         indexes = range(len(names))
         for row in compiler.results_iter(
             chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size
@@ -223,28 +226,6 @@ class ValuesListIterable(BaseIterable):
         queryset = self.queryset
         query = queryset.query
         compiler = query.get_compiler(queryset.db)
-
-        if queryset._fields:
-            # extra(select=...) cols are always at the start of the row.
-            names = [
-                *query.extra_select,
-                *query.values_select,
-                *query.annotation_select,
-            ]
-            fields = [
-                *queryset._fields,
-                *(f for f in query.annotation_select if f not in queryset._fields),
-            ]
-            if fields != names:
-                # Reorder according to fields.
-                index_map = {name: idx for idx, name in enumerate(names)}
-                rowfactory = operator.itemgetter(*[index_map[f] for f in fields])
-                return map(
-                    rowfactory,
-                    compiler.results_iter(
-                        chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size
-                    ),
-                )
         return compiler.results_iter(
             tuple_expected=True,
             chunked_fetch=self.chunked_fetch,
@@ -687,7 +668,7 @@ class QuerySet(AltersData):
 
         connection = connections[self.db]
         for obj in objs:
-            if obj.pk is None:
+            if not obj._is_pk_set():
                 # Populate new PK values.
                 obj.pk = obj._meta.pk.get_pk_value_on_save(obj)
             if not connection.features.supports_default_keyword_in_bulk_insert:
@@ -788,7 +769,7 @@ class QuerySet(AltersData):
         # model to detect the inheritance pattern ConcreteGrandParent ->
         # MultiTableParent -> ProxyChild. Simply checking self.model._meta.proxy
         # would not identify that case as involving multiple tables.
-        for parent in self.model._meta.get_parent_list():
+        for parent in self.model._meta.all_parents:
             if parent._meta.concrete_model is not self.model._meta.concrete_model:
                 raise ValueError("Can't bulk create a multi-table inherited model")
         if not objs:
@@ -813,7 +794,7 @@ class QuerySet(AltersData):
         objs = list(objs)
         self._prepare_for_bulk_create(objs)
         with transaction.atomic(using=self.db, savepoint=False):
-            objs_with_pk, objs_without_pk = partition(lambda o: o.pk is None, objs)
+            objs_without_pk, objs_with_pk = partition(lambda o: o._is_pk_set(), objs)
             if objs_with_pk:
                 returned_columns = self._batched_insert(
                     objs_with_pk,
@@ -881,7 +862,7 @@ class QuerySet(AltersData):
         if not fields:
             raise ValueError("Field names must be given to bulk_update().")
         objs = tuple(objs)
-        if any(obj.pk is None for obj in objs):
+        if not all(obj._is_pk_set() for obj in objs):
             raise ValueError("All bulk_update() objects must have a primary key set.")
         fields = [self.model._meta.get_field(name) for name in fields]
         if any(not f.concrete or f.many_to_many for f in fields):
@@ -1120,6 +1101,8 @@ class QuerySet(AltersData):
         """
         if self.query.is_sliced:
             raise TypeError("Cannot use 'limit' or 'offset' with in_bulk().")
+        if not issubclass(self._iterable_class, ModelIterable):
+            raise TypeError("in_bulk() cannot be used with values() or values_list().")
         opts = self.model._meta
         unique_fields = [
             constraint.fields[0]
@@ -1306,7 +1289,7 @@ class QuerySet(AltersData):
                 return False
         except AttributeError:
             raise TypeError("'obj' must be a model instance.")
-        if obj.pk is None:
+        if not obj._is_pk_set():
             raise ValueError("QuerySet.contains() cannot be used on unsaved objects.")
         if self._result_cache is not None:
             return obj in self._result_cache
@@ -2186,8 +2169,7 @@ class RawQuerySet:
         converter = connections[self.db].introspection.identifier_converter
         model_fields = {}
         for field in self.model._meta.fields:
-            name, column = field.get_attname_column()
-            model_fields[converter(column)] = field
+            model_fields[converter(field.column)] = field
         return model_fields
 
 

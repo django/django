@@ -7,6 +7,13 @@
         <caption>
           <a href="{{ app.app_url }}" class="section" title="{% blocktranslate with name=app.name %}Models in the {{ name }} application{% endblocktranslate %}">{{ app.name }}</a>
         </caption>
+        <thead class="visually-hidden">
+          <tr>
+            <th scope="col">{% translate 'Model name' %}</th>
+            <th scope="col">{% translate 'Add link' %}</th>
+            <th scope="col">{% translate 'Change or view list link' %}</th>
+          </tr>
+        </thead>
         {% for model in app.models %}
           {% with model_name=model.object_name|lower %}
             <tr class="model-{{ model_name }}{% if model.admin_url in request.path|urlencode %} current-model{% endif %}">

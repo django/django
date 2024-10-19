@@ -388,7 +388,7 @@ Models
   ``OneToOneField`` emulates the behavior of the SQL constraint ``ON DELETE
   RESTRICT``.
 
-* :attr:`.CheckConstraint.check` now supports boolean expressions.
+* ``CheckConstraint.check`` now supports boolean expressions.
 
 * The :meth:`.RelatedManager.add`, :meth:`~.RelatedManager.create`, and
   :meth:`~.RelatedManager.set` methods now accept callables as values in the
@@ -475,8 +475,8 @@ Tests
 * The new :setting:`MIGRATE <TEST_MIGRATE>` test database setting allows
   disabling of migrations during a test database creation.
 
-* Django test runner now supports a :option:`test --buffer` option to discard
-  output for passing tests.
+* :class:`~django.test.runner.DiscoverRunner` can now discard output for
+  passing tests using the :option:`test --buffer` option.
 
 * :class:`~django.test.runner.DiscoverRunner` now skips running the system
   checks on databases not :ref:`referenced by tests<testing-multi-db>`.

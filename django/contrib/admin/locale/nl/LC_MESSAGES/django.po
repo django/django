@@ -12,14 +12,14 @@
 # Meteor0id, 2019-2020
 # 8de006b1b0894aab6aef71979dcd8bd6_5c6b207 <ff2658a8d8dbebbd9cc240b8c133a515_234097>, 2014-2015
 # Tino de Bruijn <tinodb@gmail.com>, 2011
-# Tonnes <tonnes.mb@gmail.com>, 2017,2019-2020,2022-2023
+# Tonnes <tonnes.mb@gmail.com>, 2017,2019-2020,2022-2024
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 07:05+0000\n"
-"Last-Translator: Tonnes <tonnes.mb@gmail.com>, 2017,2019-2020,2022-2023\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 07:05+0000\n"
+"Last-Translator: Tonnes <tonnes.mb@gmail.com>, 2017,2019-2020,2022-2024\n"
 "Language-Team: Dutch (http://app.transifex.com/django/django/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -213,12 +213,6 @@ msgstr ""
 "bewerken."
 
 #, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr ""
-"De {name} ‘{obj}’ is met succes toegevoegd. U kunt deze hieronder nogmaals "
-"bewerken."
-
-#, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
@@ -385,6 +379,9 @@ msgstr "Voer een gebruikersnaam en wachtwoord in."
 msgid "Change password"
 msgstr "Wachtwoord wijzigen"
 
+msgid "Set password"
+msgstr "Wachtwoord instellen"
+
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Corrigeer de onderstaande fout."
@@ -394,6 +391,19 @@ msgstr[1] "Corrigeer de onderstaande fouten."
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr ""
 "Voer een nieuw wachtwoord in voor de gebruiker <strong>%(username)s</strong>."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+"Deze actie <strong>schakelt op wachtwoord gebaseerde authenticatie in</"
+"strong> voor deze gebruiker."
+
+msgid "Disable password-based authentication"
+msgstr "Op wachtwoord gebaseerde authenticatie uitschakelen"
+
+msgid "Enable password-based authentication"
+msgstr "Op wachtwoord gebaseerde authenticatie inschakelen"
 
 msgid "Skip to main content"
 msgstr "Naar hoofdinhoud"

@@ -316,8 +316,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         # Find inline check constraints.
         try:
             table_schema = cursor.execute(
-                "SELECT sql FROM sqlite_master WHERE type='table' and name=%s"
-                % (self.connection.ops.quote_name(table_name),)
+                "SELECT sql FROM sqlite_master WHERE type='table' and name=%s",
+                [table_name],
             ).fetchone()[0]
         except TypeError:
             # table_name is a view.
@@ -337,8 +337,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             # columns. Discard last 2 columns if there.
             number, index, unique = row[:3]
             cursor.execute(
-                "SELECT sql FROM sqlite_master "
-                "WHERE type='index' AND name=%s" % self.connection.ops.quote_name(index)
+                "SELECT sql FROM sqlite_master WHERE type='index' AND name=%s",
+                [index],
             )
             # There's at most one row.
             (sql,) = cursor.fetchone() or (None,)

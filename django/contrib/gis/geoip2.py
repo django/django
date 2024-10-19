@@ -34,6 +34,18 @@ else:
     __all__ += ["GeoIP2", "GeoIP2Exception"]
 
 
+# These are the values stored in the `database_type` field of the metadata.
+# See https://maxmind.github.io/MaxMind-DB/#database_type for details.
+SUPPORTED_DATABASE_TYPES = {
+    "DBIP-City-Lite",
+    "DBIP-Country-Lite",
+    "GeoIP2-City",
+    "GeoIP2-Country",
+    "GeoLite2-City",
+    "GeoLite2-Country",
+}
+
+
 class GeoIP2Exception(Exception):
     pass
 
@@ -106,7 +118,7 @@ class GeoIP2:
             )
 
         database_type = self._metadata.database_type
-        if not database_type.endswith(("City", "Country")):
+        if database_type not in SUPPORTED_DATABASE_TYPES:
             raise GeoIP2Exception(f"Unable to handle database edition: {database_type}")
 
     def __del__(self):
@@ -123,6 +135,14 @@ class GeoIP2:
     def _metadata(self):
         return self._reader.metadata()
 
+    @cached_property
+    def is_city(self):
+        return "City" in self._metadata.database_type
+
+    @cached_property
+    def is_country(self):
+        return "Country" in self._metadata.database_type
+
     def _query(self, query, *, require_city=False):
         if not isinstance(query, (str, ipaddress.IPv4Address, ipaddress.IPv6Address)):
             raise TypeError(
@@ -130,9 +150,7 @@ class GeoIP2:
                 "IPv6Address, not type %s" % type(query).__name__,
             )
 
-        is_city = self._metadata.database_type.endswith("City")
-
-        if require_city and not is_city:
+        if require_city and not self.is_city:
             raise GeoIP2Exception(f"Invalid GeoIP city data file: {self._path}")
 
         try:
@@ -141,7 +159,7 @@ class GeoIP2:
             # GeoIP2 only takes IP addresses, so try to resolve a hostname.
             query = socket.gethostbyname(query)
 
-        function = self._reader.city if is_city else self._reader.country
+        function = self._reader.city if self.is_city else self._reader.country
         return function(query)
 
     def city(self, query):

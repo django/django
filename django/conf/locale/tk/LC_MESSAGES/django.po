@@ -3,15 +3,15 @@
 # Translators:
 # Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2020-2021
 # Resul <resulsaparov@gmail.com>, 2020
-# Resul <resulsaparov@gmail.com>, 2022-2023
+# Resul <resulsaparov@gmail.com>, 2022-2024
 # Welbeck Garli <welbeckgrlyw@gmail.com>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 06:49+0000\n"
-"Last-Translator: Resul <resulsaparov@gmail.com>, 2022-2023\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 06:49+0000\n"
+"Last-Translator: Resul <resulsaparov@gmail.com>, 2022-2024\n"
 "Language-Team: Turkmen (http://app.transifex.com/django/django/language/"
 "tk/)\n"
 "MIME-Version: 1.0\n"
@@ -297,7 +297,7 @@ msgid "Udmurt"
 msgstr "Udmurt"
 
 msgid "Uyghur"
-msgstr ""
+msgstr "Uýgur"
 
 msgid "Ukrainian"
 msgstr "Ukrainçe"
@@ -346,6 +346,9 @@ msgstr "Ol sahypada hiç hili netije ýok"
 msgid "Enter a valid value."
 msgstr "Dogry baha giriziň."
 
+msgid "Enter a valid domain name."
+msgstr "Dogry domen adyny giriziň."
+
 msgid "Enter a valid URL."
 msgstr "Dogry URL giriziň."
 
@@ -369,14 +372,18 @@ msgstr ""
 "Unikod harplaryndan, sanlardan, aşaky çyzyklardan ýa-da defislerden ybarat "
 "dogry “slug” giriziň."
 
-msgid "Enter a valid IPv4 address."
-msgstr "Dogry IPv4 salgysyny giriziň."
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr "Dogry %(protocol)s adresi giriziň."
 
-msgid "Enter a valid IPv6 address."
-msgstr "Dogry IPv6 salgysyny giriziň."
+msgid "IPv4"
+msgstr "IPv4"
 
-msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "Dogry IPv4 ýa-da IPv6 adresi giriziň."
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "IPv4 or IPv6"
+msgstr "IPv4 ýa IPv6"
 
 msgid "Enter only digits separated by commas."
 msgstr "Diňe otur bilen aýrylan sanlary giriziň."

@@ -22,6 +22,7 @@
 # Ignacio José Lizarán Rus <ilizaran@gmail.com>, 2019
 # Igor Támara <igor@tamarapatino.org>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Jorge Andres Bravo Meza, 2024
 # José Luis <alagunajs@gmail.com>, 2016
 # José Luis <alagunajs@gmail.com>, 2016
 # Josue Naaman Nistal Guerra <josuenistal@hotmail.com>, 2014
@@ -32,7 +33,7 @@
 # Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2021
 # mpachas <miguel.pachas.garcia@gmail.com>, 2022
 # monobotsoft <monobot.soft@gmail.com>, 2012
-# Natalia (Django Fellow), 2024
+# Natalia, 2024
 # ntrrgc <ntrrgc@gmail.com>, 2013
 # ntrrgc <ntrrgc@gmail.com>, 2013
 # Pablo, 2015
@@ -46,9 +47,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2024-01-12 06:49+0000\n"
-"Last-Translator: Natalia (Django Fellow), 2024\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 06:49+0000\n"
+"Last-Translator: Jorge Andres Bravo Meza, 2024\n"
 "Language-Team: Spanish (http://app.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
@@ -384,6 +385,9 @@ msgstr "Esa página no contiene resultados"
 msgid "Enter a valid value."
 msgstr "Introduzca un valor válido."
 
+msgid "Enter a valid domain name."
+msgstr "Ingrese un nombre de dominio válido."
+
 msgid "Enter a valid URL."
 msgstr "Introduzca una URL válida."
 
@@ -407,14 +411,18 @@ msgstr ""
 "Introduzca un 'slug' válido, consistente en letras, números, guiones bajos o "
 "medios de Unicode."
 
-msgid "Enter a valid IPv4 address."
-msgstr "Introduzca una dirección IPv4 válida."
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr "Ingrese una dirección de %(protocol)s válida."
 
-msgid "Enter a valid IPv6 address."
-msgstr "Introduzca una dirección IPv6 válida."
+msgid "IPv4"
+msgstr "IPv4"
 
-msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "Introduzca una dirección IPv4 o IPv6 válida."
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "IPv4 or IPv6"
+msgstr "IPv4 o IPv6"
 
 msgid "Enter only digits separated by commas."
 msgstr "Introduzca sólo dígitos separados por comas."

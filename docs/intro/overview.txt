@@ -26,7 +26,7 @@ representing your models -- so far, it's been solving many years' worth of
 database-schema problems. Here's a quick example:
 
 .. code-block:: python
-    :caption: ``mysite/news/models.py``
+    :caption: ``news/models.py``
 
     from django.db import models
 
@@ -151,7 +151,7 @@ a website that lets authenticated users add, change and delete objects. The
 only step required is to register your model in the admin site:
 
 .. code-block:: python
-    :caption: ``mysite/news/models.py``
+    :caption: ``news/models.py``
 
     from django.db import models
 
@@ -163,7 +163,7 @@ only step required is to register your model in the admin site:
         reporter = models.ForeignKey(Reporter, on_delete=models.CASCADE)
 
 .. code-block:: python
-    :caption: ``mysite/news/admin.py``
+    :caption: ``news/admin.py``
 
     from django.contrib import admin
 
@@ -195,7 +195,7 @@ Here's what a URLconf might look like for the ``Reporter``/``Article``
 example above:
 
 .. code-block:: python
-    :caption: ``mysite/news/urls.py``
+    :caption: ``news/urls.py``
 
     from django.urls import path
 
@@ -235,7 +235,7 @@ and renders the template with the retrieved data. Here's an example view for
 ``year_archive`` from above:
 
 .. code-block:: python
-    :caption: ``mysite/news/views.py``
+    :caption: ``news/views.py``
 
     from django.shortcuts import render
 
@@ -265,7 +265,7 @@ Let's say the ``news/year_archive.html`` template was found. Here's what that
 might look like:
 
 .. code-block:: html+django
-    :caption: ``mysite/news/templates/news/year_archive.html``
+    :caption: ``news/templates/news/year_archive.html``
 
     {% extends "base.html" %}
 
@@ -306,7 +306,7 @@ Here's what the "base.html" template, including the use of :doc:`static files
 </howto/static-files/index>`, might look like:
 
 .. code-block:: html+django
-    :caption: ``mysite/templates/base.html``
+    :caption: ``templates/base.html``
 
     {% load static %}
     <html>

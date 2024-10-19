@@ -674,11 +674,11 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
             ("Triangle Z", 1017, False),
             ("Point M", 2001, True),
             ("LineString M", 2002, True),
-            ("Polygon M", 2003, False),
-            ("MultiPoint M", 2004, False),
-            ("MultiLineString M", 2005, False),
-            ("MultiPolygon M", 2006, False),
-            ("GeometryCollection M", 2007, False),
+            ("Polygon M", 2003, True),
+            ("MultiPoint M", 2004, True),
+            ("MultiLineString M", 2005, True),
+            ("MultiPolygon M", 2006, True),
+            ("GeometryCollection M", 2007, True),
             ("CircularString M", 2008, False),
             ("CompoundCurve M", 2009, False),
             ("CurvePolygon M", 2010, False),
@@ -689,11 +689,11 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
             ("Triangle M", 2017, False),
             ("Point ZM", 3001, True),
             ("LineString ZM", 3002, True),
-            ("Polygon ZM", 3003, False),
-            ("MultiPoint ZM", 3004, False),
-            ("MultiLineString ZM", 3005, False),
-            ("MultiPolygon ZM", 3006, False),
-            ("GeometryCollection ZM", 3007, False),
+            ("Polygon ZM", 3003, True),
+            ("MultiPoint ZM", 3004, True),
+            ("MultiLineString ZM", 3005, True),
+            ("MultiPolygon ZM", 3006, True),
+            ("GeometryCollection ZM", 3007, True),
             ("CircularString ZM", 3008, False),
             ("CompoundCurve ZM", 3009, False),
             ("CurvePolygon ZM", 3010, False),
@@ -915,11 +915,64 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
         self.assertIs(geom.is_measured, False)
         self.assertIs(geom.m, None)
 
+    def test_polygon_m_dimension(self):
+        geom = OGRGeometry("POLYGON Z ((0 0 0, 10 0 0, 10 10 0, 0 10 0, 0 0 0))")
+        self.assertIs(geom.is_measured, False)
+        self.assertEqual(
+            geom.shell.wkt, "LINEARRING (0 0 0,10 0 0,10 10 0,0 10 0,0 0 0)"
+        )
+
+        geom = OGRGeometry("POLYGON M ((0 0 0, 10 0 0, 10 10 0, 0 10 0, 0 0 0))")
+        self.assertIs(geom.is_measured, True)
+        self.assertEqual(
+            geom.shell.wkt, "LINEARRING M (0 0 0,10 0 0,10 10 0,0 10 0,0 0 0)"
+        )
+
+        geom = OGRGeometry(
+            "POLYGON ZM ((0 0 0 1, 10 0 0 1, 10 10 0 1, 0 10 0 1, 0 0 0 1))"
+        )
+        self.assertIs(geom.is_measured, True)
+        self.assertEqual(
+            geom.shell.wkt,
+            "LINEARRING ZM (0 0 0 1,10 0 0 1,10 10 0 1,0 10 0 1,0 0 0 1)",
+        )
+
+        geom.set_measured(False)
+        self.assertEqual(geom.wkt, "POLYGON ((0 0 0,10 0 0,10 10 0,0 10 0,0 0 0))")
+        self.assertEqual(
+            geom.shell.wkt, "LINEARRING (0 0 0,10 0 0,10 10 0,0 10 0,0 0 0)"
+        )
+
+    def test_multi_geometries_m_dimension(self):
+        tests = [
+            "MULTIPOINT M ((10 40 10), (40 30 10), (20 20 10))",
+            "MULTIPOINT ZM ((10 40 0 10), (40 30 1 10), (20 20 1 10))",
+            "MULTILINESTRING M ((10 10 1, 20 20 2),(40 40 1, 30 30 2))",
+            "MULTILINESTRING ZM ((10 10 0 1, 20 20 0 2),(40 40 1, 30 30 0 2))",
+            (
+                "MULTIPOLYGON ZM (((30 20 1 0, 45 40 1 0, 30 20 1 0)),"
+                "((15 5 0 0, 40 10 0 0, 15 5 0 0)))"
+            ),
+            (
+                "GEOMETRYCOLLECTION M (POINT M (40 10 0),"
+                "LINESTRING M (10 10 0, 20 20 0, 10 40 0))"
+            ),
+            (
+                "GEOMETRYCOLLECTION ZM (POINT ZM (40 10 0 1),"
+                "LINESTRING ZM (10 10 1 0, 20 20 1 0, 10 40 1 0))"
+            ),
+        ]
+        for geom_input in tests:
+            with self.subTest(geom_input=geom_input):
+                geom = OGRGeometry(geom_input)
+                self.assertIs(geom.is_measured, True)
+
 
 class DeprecationTests(SimpleTestCase):
     def test_coord_setter_deprecation(self):
         geom = OGRGeometry("POINT (1 2)")
         msg = "coord_dim setter is deprecated. Use set_3d() instead."
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
             geom.coord_dim = 3
         self.assertEqual(geom.coord_dim, 3)
+        self.assertEqual(ctx.filename, __file__)

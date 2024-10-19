@@ -2,6 +2,7 @@ from django.apps import apps
 from django.core import checks
 from django.core.checks.registry import registry
 from django.core.management.base import BaseCommand, CommandError
+from django.db import connections
 
 
 class Command(BaseCommand):
@@ -43,6 +44,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--database",
             action="append",
+            choices=tuple(connections),
             dest="databases",
             help="Run database related checks against these aliases.",
         )

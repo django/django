@@ -10,7 +10,7 @@ URL. The canonical way to enable cache middleware is to set
         'django.middleware.cache.FetchFromCacheMiddleware'
     ]
 
-This is counter-intuitive, but correct: ``UpdateCacheMiddleware`` needs to run
+This is counterintuitive, but correct: ``UpdateCacheMiddleware`` needs to run
 last during the response phase, which processes middleware bottom-up;
 ``FetchFromCacheMiddleware`` needs to run last during the request phase, which
 processes middleware top-down.
@@ -43,6 +43,8 @@ More details about how the caching works:
 
 """
 
+import time
+
 from django.conf import settings
 from django.core.cache import DEFAULT_CACHE_ALIAS, caches
 from django.utils.cache import (
@@ -53,6 +55,7 @@ from django.utils.cache import (
     patch_response_headers,
 )
 from django.utils.deprecation import MiddlewareMixin
+from django.utils.http import parse_http_date_safe
 
 
 class UpdateCacheMiddleware(MiddlewareMixin):
@@ -170,6 +173,15 @@ class FetchFromCacheMiddleware(MiddlewareMixin):
         if response is None:
             request._cache_update_cache = True
             return None  # No cache information available, need to rebuild.
+
+        # Derive the age estimation of the cached response.
+        if (max_age_seconds := get_max_age(response)) is not None and (
+            expires_timestamp := parse_http_date_safe(response["Expires"])
+        ) is not None:
+            now_timestamp = int(time.time())
+            remaining_seconds = expires_timestamp - now_timestamp
+            # Use Age: 0 if local clock got turned back.
+            response["Age"] = max(0, max_age_seconds - remaining_seconds)
 
         # hit, return cached response
         request._cache_update_cache = False

@@ -1,5 +1,5 @@
 import re
-from urllib.parse import urlparse
+from urllib.parse import urlsplit
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
@@ -171,7 +171,7 @@ class BrokenLinkEmailsMiddleware(MiddlewareMixin):
 
         # The referer is equal to the current URL, ignoring the scheme (assumed
         # to be a poorly implemented bot).
-        parsed_referer = urlparse(referer)
+        parsed_referer = urlsplit(referer)
         if parsed_referer.netloc in ["", domain] and parsed_referer.path == uri:
             return True
 

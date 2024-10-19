@@ -47,13 +47,13 @@ To install Uvicorn and Gunicorn, use the following:
 
 .. code-block:: shell
 
-    python -m pip install uvicorn gunicorn
+    python -m pip install uvicorn uvicorn-worker gunicorn
 
 Then start Gunicorn using the Uvicorn worker class like this:
 
 .. code-block:: shell
 
-    python -m gunicorn myproject.asgi:application -k uvicorn.workers.UvicornWorker
+    python -m gunicorn myproject.asgi:application -k uvicorn_worker.UvicornWorker
 
 .. _Uvicorn: https://www.uvicorn.org/
 .. _Gunicorn: https://gunicorn.org/

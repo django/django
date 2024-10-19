@@ -4,6 +4,7 @@ from django.template.defaultfilters import floatformat
 from django.test import SimpleTestCase
 from django.utils import translation
 from django.utils.safestring import mark_safe
+from django.utils.version import PYPY
 
 from ..utils import setup
 
@@ -60,12 +61,8 @@ class FunctionTests(SimpleTestCase):
             floatformat(Decimal("123456.123456789012345678901"), 21),
             "123456.123456789012345678901",
         )
-        self.assertEqual(floatformat("foo"), "")
         self.assertEqual(floatformat(13.1031, "bar"), "13.1031")
         self.assertEqual(floatformat(18.125, 2), "18.13")
-        self.assertEqual(floatformat("foo", "bar"), "")
-        self.assertEqual(floatformat("¿Cómo esta usted?"), "")
-        self.assertEqual(floatformat(None), "")
         self.assertEqual(
             floatformat(-1.323297138040798e35, 2),
             "-132329713804079800000000000000000000.00",
@@ -77,6 +74,46 @@ class FunctionTests(SimpleTestCase):
         self.assertEqual(floatformat(1.5e-15, 20), "0.00000000000000150000")
         self.assertEqual(floatformat(1.5e-15, -20), "0.00000000000000150000")
         self.assertEqual(floatformat(1.00000000000000015, 16), "1.0000000000000002")
+        self.assertEqual(floatformat("1e199"), "1" + "0" * 199)
+
+    def test_invalid_inputs(self):
+        cases = [
+            # Non-numeric strings.
+            None,
+            [],
+            {},
+            object(),
+            "abc123",
+            "123abc",
+            "foo",
+            "error",
+            "¿Cómo esta usted?",
+            # Scientific notation - missing exponent value.
+            "1e",
+            "1e+",
+            "1e-",
+            # Scientific notation - missing base number.
+            "e400",
+            "e+400",
+            "e-400",
+            # Scientific notation - invalid exponent value.
+            "1e^2",
+            "1e2e3",
+            "1e2a",
+            "1e2.0",
+            "1e2,0",
+            # Scientific notation - misplaced decimal point.
+            "1e.2",
+            "1e2.",
+            # Scientific notation - misplaced '+' sign.
+            "1+e2",
+            "1e2+",
+        ]
+        for value in cases:
+            with self.subTest(value=value):
+                self.assertEqual(floatformat(value), "")
+            with self.subTest(value=value, arg="bar"):
+                self.assertEqual(floatformat(value, "bar"), "")
 
     def test_force_grouping(self):
         with translation.override("en"):
@@ -134,6 +171,31 @@ class FunctionTests(SimpleTestCase):
         self.assertEqual(floatformat(pos_inf), "inf")
         self.assertEqual(floatformat(neg_inf), "-inf")
         self.assertEqual(floatformat(pos_inf / pos_inf), "nan")
+        self.assertEqual(floatformat("inf"), "inf")
+        self.assertEqual(floatformat("NaN"), "NaN")
+
+    def test_too_many_digits_to_render(self):
+        cases = [
+            "1e200",
+            "1E200",
+            "1E10000000000000000",
+            "-1E10000000000000000",
+            "1e10000000000000000",
+            "-1e10000000000000000",
+        ]
+        for value in cases:
+            with self.subTest(value=value):
+                self.assertEqual(floatformat(value), value)
+
+    def test_too_many_digits_to_render_very_long(self):
+        value = "1" + "0" * 1_000_000
+        if PYPY:
+            # PyPy casts decimal parts to int, which reaches the integer string
+            # conversion length limit (default 4300 digits, CVE-2020-10735).
+            with self.assertRaises(ValueError):
+                floatformat(value)
+        else:
+            self.assertEqual(floatformat(value), value)
 
     def test_float_dunder_method(self):
         class FloatWrapper:

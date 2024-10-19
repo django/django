@@ -5,6 +5,7 @@ import inspect
 from collections import defaultdict
 from decimal import Decimal
 from enum import Enum
+from itertools import chain
 from types import NoneType
 from uuid import UUID
 
@@ -175,10 +176,14 @@ class BaseExpression:
     _output_field_resolved_to_none = False
     # Can the expression be used in a WHERE clause?
     filterable = True
-    # Can the expression can be used as a source expression in Window?
+    # Can the expression be used as a source expression in Window?
     window_compatible = False
     # Can the expression be used as a database default value?
     allowed_default = False
+    # Can the expression be used during a constraint validation?
+    constraint_validation_compatible = True
+    # Does the expression possibly return more than one row?
+    set_returning = False
 
     def __init__(self, output_field=None):
         if output_field is not None:
@@ -483,6 +488,20 @@ class BaseExpression:
             return self.output_field.select_format(compiler, sql, params)
         return sql, params
 
+    def get_expression_for_validation(self):
+        # Ignore expressions that cannot be used during a constraint validation.
+        if not getattr(self, "constraint_validation_compatible", True):
+            try:
+                (expression,) = self.get_source_expressions()
+            except ValueError as e:
+                raise ValueError(
+                    "Expressions with constraint_validation_compatible set to False "
+                    "must have only one source expression."
+                ) from e
+            else:
+                return expression
+        return self
+
 
 @deconstructible
 class Expression(BaseExpression, Combinable):
@@ -597,10 +616,16 @@ _connector_combinations = [
     },
     # Numeric with NULL.
     {
-        connector: [
-            (field_type, NoneType, field_type),
-            (NoneType, field_type, field_type),
-        ]
+        connector: list(
+            chain.from_iterable(
+                [(field_type, NoneType, field_type), (NoneType, field_type, field_type)]
+                for field_type in (
+                    fields.IntegerField,
+                    fields.DecimalField,
+                    fields.FloatField,
+                )
+            )
+        )
         for connector in (
             Combinable.ADD,
             Combinable.SUB,
@@ -609,7 +634,6 @@ _connector_combinations = [
             Combinable.MOD,
             Combinable.POW,
         )
-        for field_type in (fields.IntegerField, fields.DecimalField, fields.FloatField)
     },
     # Date/DateTimeField/DurationField/TimeField.
     {
@@ -861,6 +885,11 @@ class F(Combinable):
 
     def __getitem__(self, subscript):
         return Sliced(self, subscript)
+
+    def __contains__(self, other):
+        # Disable old-style iteration protocol inherited from implementing
+        # __getitem__() to prevent this method from hanging.
+        raise TypeError(f"argument of type '{self.__class__.__name__}' is not iterable")
 
     def resolve_expression(
         self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False
@@ -1202,10 +1231,9 @@ class RawSQL(Expression):
     ):
         # Resolve parents fields used in raw SQL.
         if query.model:
-            for parent in query.model._meta.get_parent_list():
+            for parent in query.model._meta.all_parents:
                 for parent_field in parent._meta.local_fields:
-                    _, column_name = parent_field.get_attname_column()
-                    if column_name.lower() in self.sql.lower():
+                    if parent_field.column.lower() in self.sql.lower():
                         query.resolve_ref(
                             parent_field.name, allow_joins, reuse, summarize
                         )
@@ -1224,9 +1252,41 @@ class Star(Expression):
 
 
 class DatabaseDefault(Expression):
-    """Placeholder expression for the database default in an insert query."""
+    """
+    Expression to use DEFAULT keyword during insert otherwise the underlying expression.
+    """
+
+    def __init__(self, expression, output_field=None):
+        super().__init__(output_field)
+        self.expression = expression
+
+    def get_source_expressions(self):
+        return [self.expression]
+
+    def set_source_expressions(self, exprs):
+        (self.expression,) = exprs
+
+    def resolve_expression(
+        self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False
+    ):
+        resolved_expression = self.expression.resolve_expression(
+            query=query,
+            allow_joins=allow_joins,
+            reuse=reuse,
+            summarize=summarize,
+            for_save=for_save,
+        )
+        # Defaults used outside an INSERT context should resolve to their
+        # underlying expression.
+        if not for_save:
+            return resolved_expression
+        return DatabaseDefault(
+            resolved_expression, output_field=self._output_field_or_none
+        )
 
     def as_sql(self, compiler, connection):
+        if not connection.features.supports_default_keyword_in_insert:
+            return compiler.compile(self.expression)
         return "DEFAULT", []
 
 
@@ -1267,6 +1327,60 @@ class Col(Expression):
         return self.output_field.get_db_converters(
             connection
         ) + self.target.get_db_converters(connection)
+
+
+class ColPairs(Expression):
+    def __init__(self, alias, targets, sources, output_field):
+        super().__init__(output_field=output_field)
+        self.alias = alias
+        self.targets = targets
+        self.sources = sources
+
+    def __len__(self):
+        return len(self.targets)
+
+    def __iter__(self):
+        return iter(self.get_cols())
+
+    def __repr__(self):
+        return (
+            f"{self.__class__.__name__}({self.alias!r}, {self.targets!r}, "
+            f"{self.sources!r}, {self.output_field!r})"
+        )
+
+    def get_cols(self):
+        return [
+            Col(self.alias, target, source)
+            for target, source in zip(self.targets, self.sources)
+        ]
+
+    def get_source_expressions(self):
+        return self.get_cols()
+
+    def set_source_expressions(self, exprs):
+        assert all(isinstance(expr, Col) and expr.alias == self.alias for expr in exprs)
+        self.targets = [col.target for col in exprs]
+        self.sources = [col.field for col in exprs]
+
+    def as_sql(self, compiler, connection):
+        cols_sql = []
+        cols_params = []
+        cols = self.get_cols()
+
+        for col in cols:
+            sql, params = col.as_sql(compiler, connection)
+            cols_sql.append(sql)
+            cols_params.extend(params)
+
+        return ", ".join(cols_sql), cols_params
+
+    def relabeled_clone(self, relabels):
+        return self.__class__(
+            relabels.get(self.alias, self.alias), self.targets, self.sources, self.field
+        )
+
+    def resolve_expression(self, *args, **kwargs):
+        return self
 
 
 class Ref(Expression):
@@ -1319,15 +1433,13 @@ class ExpressionList(Func):
 
     template = "%(expressions)s"
 
-    def __init__(self, *expressions, **extra):
-        if not expressions:
-            raise ValueError(
-                "%s requires at least one expression." % self.__class__.__name__
-            )
-        super().__init__(*expressions, **extra)
-
     def __str__(self):
         return self.arg_joiner.join(str(arg) for arg in self.source_expressions)
+
+    def as_sql(self, *args, **kwargs):
+        if not self.source_expressions:
+            return "", ()
+        return super().as_sql(*args, **kwargs)
 
     def as_sqlite(self, compiler, connection, **extra_context):
         # Casting to numeric is unnecessary.
@@ -1592,7 +1704,6 @@ class Case(SQLiteNumericMixin, Expression):
         template_params = {**self.extra, **extra_context}
         case_parts = []
         sql_params = []
-        default_sql, default_params = compiler.compile(self.default)
         for case in self.cases:
             try:
                 case_sql, case_params = compiler.compile(case)
@@ -1603,6 +1714,8 @@ class Case(SQLiteNumericMixin, Expression):
                 break
             case_parts.append(case_sql)
             sql_params.extend(case_params)
+        else:
+            default_sql, default_params = compiler.compile(self.default)
         if not case_parts:
             return default_sql, default_params
         case_joiner = case_joiner or self.case_joiner
@@ -1711,6 +1824,7 @@ class Exists(Subquery):
 class OrderBy(Expression):
     template = "%(expression)s %(ordering)s"
     conditional = False
+    constraint_validation_compatible = False
 
     def __init__(self, expression, descending=False, nulls_first=None, nulls_last=None):
         if nulls_first and nulls_last:

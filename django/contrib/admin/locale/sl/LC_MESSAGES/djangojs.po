@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Andrej Marsetič, 2022
+# Andrej Marsetič, 2022,2024
 # Jannis Leidel <jannis@leidel.info>, 2011
 # zejn <zelo.zejn+transifex@gmail.com>, 2016
 # zejn <zelo.zejn+transifex@gmail.com>, 2011-2012
@@ -9,10 +9,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-17 03:19-0500\n"
-"PO-Revision-Date: 2023-04-25 07:59+0000\n"
-"Last-Translator: Andrej Marsetič, 2022\n"
-"Language-Team: Slovenian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 07:59+0000\n"
+"Last-Translator: Andrej Marsetič, 2022,2024\n"
+"Language-Team: Slovenian (http://app.transifex.com/django/django/language/"
 "sl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -67,7 +67,7 @@ msgstr ""
 
 #, javascript-format
 msgid "Type into this box to filter down the list of selected %s."
-msgstr ""
+msgstr "Vnesite v to polje, da filtrirate seznam izbranih %s ."
 
 msgid "Remove all"
 msgstr "Odstrani vse"
@@ -79,10 +79,10 @@ msgstr "Kliknite za odstranitev vseh %s hkrati."
 #, javascript-format
 msgid "%s selected option not visible"
 msgid_plural "%s selected options not visible"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] " %s izbrana možnosti ni vidna"
+msgstr[1] " %s izbrani možnosti nista vidni"
+msgstr[2] " %s izbrane možnosti niso vidne"
+msgstr[3] " %s izbrane možnosti niso vidne"
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -103,12 +103,16 @@ msgid ""
 "individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
+"Izbrali ste dejanje, vendar še niste shranili sprememb posameznih polj. Za "
+"shranjevanje kliknite V redu. Akcijo boste morali ponovno zagnati."
 
 msgid ""
 "You have selected an action, and you haven’t made any changes on individual "
 "fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
+"Izbrali ste dejanje in niste spremenili posameznih polj. Verjetno iščete "
+"gumb Pojdi in ne gumb Shrani."
 
 msgid "Now"
 msgstr "Takoj"
@@ -246,6 +250,55 @@ msgctxt "abbrev. month December"
 msgid "Dec"
 msgstr "Dec"
 
+msgid "Sunday"
+msgstr "Nedelja"
+
+msgid "Monday"
+msgstr "Ponedeljek"
+
+msgid "Tuesday"
+msgstr "Torek"
+
+msgid "Wednesday"
+msgstr "Sreda"
+
+msgid "Thursday"
+msgstr "Četrtek"
+
+msgid "Friday"
+msgstr "Petek"
+
+msgid "Saturday"
+msgstr "Sobota"
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr "Ned"
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr "Pon"
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr "Tor"
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr "Sre"
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr "Čet"
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr "Pet"
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr "Sob"
+
 msgctxt "one letter Sunday"
 msgid "S"
 msgstr "N"
@@ -273,9 +326,3 @@ msgstr "P"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "S"
-
-msgid "Show"
-msgstr "Prikaži"
-
-msgid "Hide"
-msgstr "Skrij"

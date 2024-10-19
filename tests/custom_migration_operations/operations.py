@@ -68,6 +68,11 @@ class ArgsKwargsOperation(TestOperation):
         )
 
 
+class ArgsAndKeywordOnlyArgsOperation(ArgsKwargsOperation):
+    def __init__(self, arg1, arg2, *, kwarg1, kwarg2):
+        super().__init__(arg1, arg2, kwarg1=kwarg1, kwarg2=kwarg2)
+
+
 class ExpandArgsOperation(TestOperation):
     serialization_expand_args = ["arg"]
 

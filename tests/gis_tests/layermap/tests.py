@@ -218,7 +218,7 @@ class LayerMapTest(TestCase):
         #  `unique='name'`: Creates models on the condition that they have
         #    unique county names; geometries from each feature however will be
         #    appended to the geometry collection of the unique model.  Thus,
-        #    all of the various islands in Honolulu county will be in in one
+        #    all of the various islands in Honolulu county will be in one
         #    database record with a MULTIPOLYGON type.
         lm = LayerMapping(County, co_shp, co_mapping, transform=False, unique="name")
         lm.save(silent=True, strict=True)

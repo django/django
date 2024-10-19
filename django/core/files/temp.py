@@ -12,7 +12,7 @@ processes in a manner that works across platforms.
 The custom version of NamedTemporaryFile doesn't support the same keyword
 arguments available in tempfile.NamedTemporaryFile.
 
-1: https://mail.python.org/pipermail/python-list/2005-December/336957.html
+1: https://mail.python.org/pipermail/python-list/2005-December/336955.html
 2: https://bugs.python.org/issue14243
 """
 

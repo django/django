@@ -183,6 +183,11 @@ Register custom converter classes in your URLconf using
         ...,
     ]
 
+.. deprecated:: 5.1
+
+    Overriding existing converters with ``django.urls.register_converter()`` is
+    deprecated.
+
 Using regular expressions
 =========================
 

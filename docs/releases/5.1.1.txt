@@ -1,0 +1,58 @@
+==========================
+Django 5.1.1 release notes
+==========================
+
+*September 3, 2024*
+
+Django 5.1.1 fixes one security issue with severity "moderate", one security
+issue with severity "low", and several bugs in 5.1.
+
+CVE-2024-45230: Potential denial-of-service vulnerability in ``django.utils.html.urlize()``
+===========================================================================================
+
+:tfilter:`urlize` and :tfilter:`urlizetrunc` were subject to a potential
+denial-of-service attack via very large inputs with a specific sequence of
+characters.
+
+CVE-2024-45231: Potential user email enumeration via response status on password reset
+======================================================================================
+
+Due to unhandled email sending failures, the
+:class:`~django.contrib.auth.forms.PasswordResetForm` class allowed remote
+attackers to enumerate user emails by issuing password reset requests and
+observing the outcomes.
+
+To mitigate this risk, exceptions occurring during password reset email sending
+are now handled and logged using the :ref:`django-contrib-auth-logger` logger.
+
+Bugfixes
+========
+
+* Fixed a regression in Django 5.1 that caused a crash of ``Window()`` when
+  passing an empty sequence to the ``order_by`` parameter, and a crash of
+  ``Prefetch()`` for a sliced queryset without ordering (:ticket:`35665`).
+
+* Fixed a regression in Django 5.1 where a new ``usable_password`` field was
+  included in :class:`~django.contrib.auth.forms.BaseUserCreationForm` (and
+  children). A new :class:`~django.contrib.auth.forms.AdminUserCreationForm`
+  including this field was added, isolating the feature to the admin where it
+  was intended (:ticket:`35678`).
+
+* Adjusted the deprecation warning ``stacklevel`` in :meth:`.Model.save` and
+  :meth:`.Model.asave` to correctly point to the offending call site
+  (:ticket:`35060`).
+
+* Adjusted the deprecation warning ``stacklevel`` when using ``OS_OPEN_FLAGS``
+  in :class:`~django.core.files.storage.FileSystemStorage` to correctly point
+  to the offending call site (:ticket:`35326`).
+
+* Adjusted the deprecation warning ``stacklevel`` in
+  ``FieldCacheMixin.get_cache_name()`` to correctly point to the offending call
+  site (:ticket:`35405`).
+
+* Restored, following a regression in Django 5.1, the ability to override the
+  timezone and role setting behavior used within the ``init_connection_state``
+  method of the PostgreSQL backend (:ticket:`35688`).
+
+* Fixed a bug in Django 5.1 where variable lookup errors were logged when
+  rendering admin fieldsets (:ticket:`35716`).

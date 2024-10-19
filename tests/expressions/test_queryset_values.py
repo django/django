@@ -1,7 +1,7 @@
 from django.db.models import F, Sum
-from django.test import TestCase
+from django.test import TestCase, skipUnlessDBFeature
 
-from .models import Company, Employee
+from .models import Company, Employee, JSONFieldModel
 
 
 class ValuesExpressionsTests(TestCase):
@@ -42,6 +42,19 @@ class ValuesExpressionsTests(TestCase):
         )
         with self.assertRaisesMessage(ValueError, msg):
             Company.objects.values(**{crafted_alias: F("ceo__salary")})
+
+    @skipUnlessDBFeature("supports_json_field")
+    def test_values_expression_alias_sql_injection_json_field(self):
+        crafted_alias = """injected_name" from "expressions_company"; --"""
+        msg = (
+            "Column aliases cannot contain whitespace characters, quotation marks, "
+            "semicolons, or SQL comments."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            JSONFieldModel.objects.values(f"data__{crafted_alias}")
+
+        with self.assertRaisesMessage(ValueError, msg):
+            JSONFieldModel.objects.values_list(f"data__{crafted_alias}")
 
     def test_values_expression_group_by(self):
         # values() applies annotate() first, so values selected are grouped by

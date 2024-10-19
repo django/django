@@ -61,7 +61,7 @@ def delete_selected(modeladmin, request, queryset):
     if perms_needed or protected:
         title = _("Cannot delete %(name)s") % {"name": objects_name}
     else:
-        title = _("Are you sure?")
+        title = _("Delete multiple objects")
 
     context = {
         **modeladmin.admin_site.each_context(request),

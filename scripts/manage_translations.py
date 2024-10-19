@@ -20,13 +20,86 @@
 
 import os
 from argparse import ArgumentParser
+from collections import defaultdict
+from configparser import ConfigParser
+from datetime import datetime
 from subprocess import run
+
+import requests
 
 import django
 from django.conf import settings
 from django.core.management import call_command
 
 HAVE_JS = ["admin"]
+LANG_OVERRIDES = {
+    "zh_CN": "zh_Hans",
+    "zh_TW": "zh_Hant",
+}
+
+
+def list_resources_with_updates(date_since, date_skip=None, verbose=False):
+    resource_lang_changed = defaultdict(list)
+    resource_lang_unchanged = defaultdict(list)
+
+    # Read token from ENV, otherwise read from the ~/.transifexrc file.
+    api_token = os.getenv("TRANSIFEX_API_TOKEN")
+    if not api_token:
+        parser = ConfigParser()
+        parser.read(os.path.expanduser("~/.transifexrc"))
+        api_token = parser.get("https://www.transifex.com", "token")
+
+    assert api_token, "Please define the TRANSIFEX_API_TOKEN env var."
+    headers = {"Authorization": f"Bearer {api_token}"}
+    base_url = "https://rest.api.transifex.com"
+    base_params = {"filter[project]": "o:django:p:django"}
+
+    resources_url = base_url + "/resources"
+    resource_stats_url = base_url + "/resource_language_stats"
+
+    response = requests.get(resources_url, headers=headers, params=base_params)
+    assert response.ok, response.content
+    data = response.json()["data"]
+
+    for item in data:
+        if item["type"] != "resources":
+            continue
+        resource_id = item["id"]
+        resource_name = item["attributes"]["name"]
+        params = base_params.copy()
+        params.update({"filter[resource]": resource_id})
+        stats = requests.get(resource_stats_url, headers=headers, params=params)
+        stats_data = stats.json()["data"]
+        for lang_data in stats_data:
+            lang_id = lang_data["id"].split(":")[-1]
+            lang_attributes = lang_data["attributes"]
+            last_update = lang_attributes["last_translation_update"]
+            if verbose:
+                print(
+                    f"CHECKING {resource_name} for {lang_id=} updated on {last_update}"
+                )
+            if last_update is None:
+                resource_lang_unchanged[resource_name].append(lang_id)
+                continue
+
+            last_update = datetime.strptime(last_update, "%Y-%m-%dT%H:%M:%SZ")
+            if last_update > date_since and (
+                date_skip is None or last_update.date() != date_skip.date()
+            ):
+                if verbose:
+                    print(f"=> CHANGED {lang_attributes=} {date_skip=}")
+                resource_lang_changed[resource_name].append(lang_id)
+            else:
+                resource_lang_unchanged[resource_name].append(lang_id)
+
+    if verbose:
+        unchanged = "\n".join(
+            f"\n * resource {res} languages {' '.join(sorted(langs))}"
+            for res, langs in resource_lang_unchanged.items()
+        )
+        print(f"== SUMMARY for unchanged resources ==\n{unchanged}")
+
+    return resource_lang_changed
 
 
 def _get_locale_dirs(resources, include_core=True):
@@ -152,26 +225,26 @@ def fetch(resources=None, languages=None):
     errors = []
 
     for name, dir_ in locale_dirs:
+        cmd = [
+            "tx",
+            "pull",
+            "-r",
+            _tx_resource_for_name(name),
+            "-f",
+            "--minimum-perc=5",
+        ]
         # Transifex pull
         if languages is None:
-            run(
-                [
-                    "tx",
-                    "pull",
-                    "-r",
-                    _tx_resource_for_name(name),
-                    "-a",
-                    "-f",
-                    "--minimum-perc=5",
-                ]
-            )
+            run(cmd + ["--all"])
             target_langs = sorted(
                 d for d in os.listdir(dir_) if not d.startswith("_") and d != "en"
             )
         else:
             for lang in languages:
-                run(["tx", "pull", "-r", _tx_resource_for_name(name), "-f", "-l", lang])
+                run(cmd + ["-l", lang])
             target_langs = languages
+
+        target_langs = [LANG_OVERRIDES.get(d, d) for d in target_langs]
 
         # msgcat to wrap lines and msgfmt for compilation of .mo file
         for lang in target_langs:
@@ -197,11 +270,25 @@ def fetch(resources=None, languages=None):
         exit(1)
 
 
-if __name__ == "__main__":
-    RUNABLE_SCRIPTS = ("update_catalogs", "lang_stats", "fetch")
+def fetch_since(date_since, date_skip=None, verbose=False, dry_run=False):
+    """
+    Fetch translations from Transifex that were modified since the given date.
+    """
+    changed = list_resources_with_updates(
+        date_since=date_since, date_skip=date_skip, verbose=verbose
+    )
+    if verbose:
+        print(f"== SUMMARY for changed resources {dry_run=} ==\n")
+    for res, langs in changed.items():
+        if verbose:
+            print(f"\n * resource {res} languages {' '.join(sorted(langs))}")
+        if not dry_run:
+            fetch(resources=[res], languages=sorted(langs))
+    if not changed and verbose:
+        print(f"\n No resource changed since {date_since}")
 
-    parser = ArgumentParser()
-    parser.add_argument("cmd", nargs=1, choices=RUNABLE_SCRIPTS)
+
+def add_common_arguments(parser):
     parser.add_argument(
         "-r",
         "--resources",
@@ -214,6 +301,60 @@ if __name__ == "__main__":
         action="append",
         help="limit operation to the specified languages",
     )
-    options = parser.parse_args()
 
-    eval(options.cmd[0])(options.resources, options.languages)
+
+if __name__ == "__main__":
+    parser = ArgumentParser()
+
+    subparsers = parser.add_subparsers(
+        dest="cmd", help="choose the operation to perform"
+    )
+
+    parser_update = subparsers.add_parser(
+        "update_catalogs",
+        help="update English django.po files with new/updated translatable strings",
+    )
+    add_common_arguments(parser_update)
+
+    parser_stats = subparsers.add_parser(
+        "lang_stats",
+        help="print the approximate number of changed/added strings in the en catalog",
+    )
+    add_common_arguments(parser_stats)
+
+    parser_fetch = subparsers.add_parser(
+        "fetch",
+        help="fetch translations from Transifex, wrap long lines, generate mo files",
+    )
+    add_common_arguments(parser_fetch)
+
+    parser_fetch = subparsers.add_parser(
+        "fetch_since",
+        help=(
+            "fetch translations from Transifex modified since a given date "
+            "(for all languages and all resources)"
+        ),
+    )
+    parser_fetch.add_argument("-v", "--verbose", action="store_true")
+    parser_fetch.add_argument(
+        "-s",
+        "--since",
+        required=True,
+        dest="date_since",
+        metavar="YYYY-MM-DD",
+        type=datetime.fromisoformat,
+        help="fetch new translations since this date (ISO format YYYY-MM-DD).",
+    )
+    parser_fetch.add_argument(
+        "--skip",
+        dest="date_skip",
+        metavar="YYYY-MM-DD",
+        type=datetime.fromisoformat,
+        help="skip changes from this date (ISO format YYYY-MM-DD).",
+    )
+    parser_fetch.add_argument("--dry-run", dest="dry_run", action="store_true")
+
+    options = parser.parse_args()
+    kwargs = options.__dict__
+    cmd = kwargs.pop("cmd")
+    eval(cmd)(**kwargs)

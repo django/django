@@ -9,7 +9,7 @@ class DatabaseClient(BaseDatabaseClient):
     @classmethod
     def settings_to_cmd_args_env(cls, settings_dict, parameters):
         args = [cls.executable_name]
-        options = settings_dict.get("OPTIONS", {})
+        options = settings_dict["OPTIONS"]
 
         host = settings_dict.get("HOST")
         port = settings_dict.get("PORT")

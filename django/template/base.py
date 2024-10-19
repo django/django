@@ -533,9 +533,13 @@ class Parser:
     def extend_nodelist(self, nodelist, node, token):
         # Check that non-text nodes don't appear before an extends tag.
         if node.must_be_first and nodelist.contains_nontext:
+            if self.origin.template_name:
+                origin = repr(self.origin.template_name)
+            else:
+                origin = "the template"
             raise self.error(
                 token,
-                "%r must be the first tag in the template." % node,
+                "{%% %s %%} must be the first tag in %s." % (token.contents, origin),
             )
         if not isinstance(node, TextNode):
             nodelist.contains_nontext = True
@@ -880,6 +884,10 @@ class Variable:
         try:  # catch-all for silent variable failures
             for bit in self.lookups:
                 try:  # dictionary lookup
+                    # Only allow if the metaclass implements __getitem__. See
+                    # https://docs.python.org/3/reference/datamodel.html#classgetitem-versus-getitem
+                    if not hasattr(type(current), "__getitem__"):
+                        raise TypeError
                     current = current[bit]
                     # ValueError/IndexError are for numpy.array lookup on
                     # numpy < 1.9 and 1.9+ respectively

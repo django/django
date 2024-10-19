@@ -1,6 +1,7 @@
 {% extends "admin/base_site.html" %}
 {% load i18n admin_urls static admin_list %}
 
+{% block title %}{% if cl.formset and cl.formset.errors %}{% translate "Error:" %} {% endif %}{{ block.super }}{% endblock %}
 {% block extrastyle %}
   {{ block.super }}
   <link rel="stylesheet" href="{% static "admin/css/changelists.css" %}">

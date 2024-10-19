@@ -272,6 +272,8 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         self.can_add_related = can_add_related
         # XXX: The UX does not support multiple selected values.
         multiple = getattr(widget, "allow_multiple_selected", False)
+        if not isinstance(widget, AutocompleteMixin):
+            self.attrs["data-context"] = "available-source"
         self.can_change_related = not multiple and can_change_related
         # XXX: The deletion UX can be confusing when dealing with cascading deletion.
         cascade = getattr(rel, "on_delete", None) is CASCADE
@@ -329,6 +331,7 @@ class RelatedFieldWidgetWrapper(forms.Widget):
             "name": name,
             "url_params": url_params,
             "model": rel_opts.verbose_name,
+            "model_name": rel_opts.model_name,
             "can_add_related": self.can_add_related,
             "can_change_related": self.can_change_related,
             "can_delete_related": self.can_delete_related,
@@ -390,7 +393,7 @@ class AdminURLFieldWidget(forms.URLInput):
         context["current_label"] = _("Currently:")
         context["change_label"] = _("Change:")
         context["widget"]["href"] = (
-            smart_urlquote(context["widget"]["value"]) if value else ""
+            smart_urlquote(context["widget"]["value"]) if url_valid else ""
         )
         context["url_valid"] = url_valid
         return context

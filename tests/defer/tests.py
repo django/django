@@ -6,6 +6,7 @@ from .models import (
     Child,
     ChildProxy,
     Primary,
+    PrimaryOneToOne,
     RefreshPrimaryProxy,
     Secondary,
     ShadowChild,
@@ -326,3 +327,28 @@ class InvalidDeferTests(SimpleTestCase):
         )
         with self.assertRaisesMessage(FieldError, msg):
             Primary.objects.only("name").select_related("related")[0]
+
+
+class DeferredRelationTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.secondary = Secondary.objects.create(first="a", second="b")
+        cls.primary = PrimaryOneToOne.objects.create(
+            name="Bella", value="Baxter", related=cls.secondary
+        )
+
+    def test_defer_not_clear_cached_relations(self):
+        obj = Secondary.objects.defer("first").get(pk=self.secondary.pk)
+        with self.assertNumQueries(1):
+            obj.primary_o2o
+        obj.first  # Accessing a deferred field.
+        with self.assertNumQueries(0):
+            obj.primary_o2o
+
+    def test_only_not_clear_cached_relations(self):
+        obj = Secondary.objects.only("first").get(pk=self.secondary.pk)
+        with self.assertNumQueries(1):
+            obj.primary_o2o
+        obj.second  # Accessing a deferred field.
+        with self.assertNumQueries(0):
+            obj.primary_o2o

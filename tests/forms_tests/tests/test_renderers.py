@@ -64,16 +64,18 @@ class DeprecationTests(SimpleTestCase):
             "The DjangoDivFormRenderer transitional form renderer is deprecated. Use "
             "DjangoTemplates instead."
         )
-        with self.assertRaisesMessage(RemovedInDjango60Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
             DjangoDivFormRenderer()
+        self.assertEqual(ctx.filename, __file__)
 
     def test_jinja2_div_renderer_warning(self):
         msg = (
             "The Jinja2DivFormRenderer transitional form renderer is deprecated. Use "
             "Jinja2 instead."
         )
-        with self.assertRaisesMessage(RemovedInDjango60Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
             Jinja2DivFormRenderer()
+        self.assertEqual(ctx.filename, __file__)
 
     @ignore_warnings(category=RemovedInDjango60Warning)
     def test_deprecation_renderers_can_be_instantiated(self):

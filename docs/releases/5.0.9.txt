@@ -1,0 +1,26 @@
+===========================
+Django 5.0.9 release notes
+===========================
+
+*September 3, 2024*
+
+Django 5.0.9 fixes one security issue with severity "moderate" and one security
+issue with severity "low" in 5.0.8.
+
+CVE-2024-45230: Potential denial-of-service vulnerability in ``django.utils.html.urlize()``
+===========================================================================================
+
+:tfilter:`urlize` and :tfilter:`urlizetrunc` were subject to a potential
+denial-of-service attack via very large inputs with a specific sequence of
+characters.
+
+CVE-2024-45231: Potential user email enumeration via response status on password reset
+======================================================================================
+
+Due to unhandled email sending failures, the
+:class:`~django.contrib.auth.forms.PasswordResetForm` class allowed remote
+attackers to enumerate user emails by issuing password reset requests and
+observing the outcomes.
+
+To mitigate this risk, exceptions occurring during password reset email sending
+are now handled and logged using the :ref:`django-contrib-auth-logger` logger.

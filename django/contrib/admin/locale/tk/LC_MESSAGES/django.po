@@ -2,15 +2,18 @@
 #
 # Translators:
 # Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2022
+# Natalia, 2024
+# Resul <resulsaparov@gmail.com>, 2024
+# Rovshen Tagangylyjov, 2024
 # Welbeck Garli <welbeckgrlyw@gmail.com>, 2022
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-17 02:13-0600\n"
-"PO-Revision-Date: 2023-04-25 07:05+0000\n"
-"Last-Translator: Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2022\n"
-"Language-Team: Turkmen (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 07:05+0000\n"
+"Last-Translator: Natalia, 2024\n"
+"Language-Team: Turkmen (http://app.transifex.com/django/django/language/"
 "tk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -46,7 +49,7 @@ msgid "No"
 msgstr "Ýok"
 
 msgid "Unknown"
-msgstr "Nätanyş"
+msgstr "Näbelli"
 
 msgid "Any date"
 msgstr "Islendik sene"
@@ -58,16 +61,16 @@ msgid "Past 7 days"
 msgstr "Soňky 7 gün"
 
 msgid "This month"
-msgstr "Şul aý"
+msgstr "Şu aý"
 
 msgid "This year"
-msgstr "Şul ýyl"
+msgstr "Şu ýyl"
 
 msgid "No date"
 msgstr "Senesiz"
 
 msgid "Has date"
-msgstr "Seneli"
+msgstr "Senesi bar"
 
 msgid "Empty"
 msgstr "Boş"
@@ -80,7 +83,7 @@ msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
 "that both fields may be case-sensitive."
 msgstr ""
-"Administratiw bolmadyk hasap üçin dogry %(username)swe parol ulanmagyňyzy "
+"Administratiw bolmadyk hasap üçin dogry %(username)s we parol ulanmagyňyzy "
 "sizden haýyş edýäris. Giriziljek maglumatlaryň harp ýalňyşsyz bolmagyny göz "
 "öňünde tutmagy unutmaň."
 
@@ -95,7 +98,7 @@ msgid "Remove"
 msgstr "Aýyr"
 
 msgid "Addition"
-msgstr "Goşmaça"
+msgstr "Goşmak"
 
 msgid "Change"
 msgstr "Üýtget"
@@ -110,18 +113,18 @@ msgid "user"
 msgstr "ulanyjy"
 
 msgid "content type"
-msgstr "maglumat görnüşi"
+msgstr "mazmun görnüşi"
 
 msgid "object id"
-msgstr "obýekt id'sy"
+msgstr "obýekt id-sy"
 
 #. Translators: 'repr' means representation
 #. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
-msgstr "obýekt repr'y"
+msgstr "obýekt repr-y"
 
 msgid "action flag"
-msgstr "hereket baýdaklandyryşy"
+msgstr "hereket belligi"
 
 msgid "change message"
 msgstr "Habarnamany üýtget"
@@ -149,7 +152,7 @@ msgstr "GirişHabarnamasy Obýekty"
 
 #, python-brace-format
 msgid "Added {name} “{object}”."
-msgstr "Goşuldy {name} \"{object}\"."
+msgstr "Goşuldy {name} “{object}”."
 
 msgid "Added."
 msgstr "Goşuldy."
@@ -163,7 +166,7 @@ msgstr ""
 
 #, python-brace-format
 msgid "Changed {fields}."
-msgstr ""
+msgstr "{fields} üýtgedildi."
 
 #, python-brace-format
 msgid "Deleted {name} “{object}”."
@@ -176,6 +179,9 @@ msgid "None"
 msgstr ""
 
 msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
+msgstr ""
+
+msgid "Select this object for an action - {}"
 msgstr ""
 
 #, python-brace-format
@@ -193,10 +199,6 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may edit it again below."
-msgstr ""
-
-#, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -328,6 +330,9 @@ msgstr ""
 msgid "Clear selection"
 msgstr ""
 
+msgid "Breadcrumbs"
+msgstr ""
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr ""
@@ -352,6 +357,9 @@ msgstr ""
 msgid "Change password"
 msgstr ""
 
+msgid "Set password"
+msgstr ""
+
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] ""
@@ -359,6 +367,17 @@ msgstr[1] ""
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr ""
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+
+msgid "Disable password-based authentication"
+msgstr ""
+
+msgid "Enable password-based authentication"
 msgstr ""
 
 msgid "Skip to main content"
@@ -376,9 +395,6 @@ msgstr ""
 msgid "Log out"
 msgstr ""
 
-msgid "Breadcrumbs"
-msgstr ""
-
 #, python-format
 msgid "Add %(name)s"
 msgstr ""
@@ -390,6 +406,12 @@ msgid "View on site"
 msgstr ""
 
 msgid "Filter"
+msgstr ""
+
+msgid "Hide counts"
+msgstr ""
+
+msgid "Show counts"
 msgstr ""
 
 msgid "Clear all filters"
@@ -484,6 +506,15 @@ msgid "My actions"
 msgstr ""
 
 msgid "None available"
+msgstr ""
+
+msgid "Added:"
+msgstr ""
+
+msgid "Changed:"
+msgstr ""
+
+msgid "Deleted:"
 msgstr ""
 
 msgid "Unknown content"
@@ -671,6 +702,9 @@ msgid "Email address:"
 msgstr ""
 
 msgid "Reset my password"
+msgstr ""
+
+msgid "Select all objects on this page for an action"
 msgstr ""
 
 msgid "All dates"

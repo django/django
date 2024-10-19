@@ -4,12 +4,16 @@
      data-inline-formset="{{ inline_admin_formset.inline_formset_data }}">
   <div class="tabular inline-related {% if forloop.last %}last-related{% endif %}">
 {{ inline_admin_formset.formset.management_form }}
-<fieldset class="module {{ inline_admin_formset.classes }}">
-   {% if inline_admin_formset.formset.max_num == 1 %}
-     <h2>{{ inline_admin_formset.opts.verbose_name|capfirst }}</h2>
-   {% else %}
-     <h2>{{ inline_admin_formset.opts.verbose_name_plural|capfirst }}</h2>
-   {% endif %}
+<fieldset class="module {{ inline_admin_formset.classes }}" aria-labelledby="{{ inline_admin_formset.formset.prefix }}-heading">
+  {% if inline_admin_formset.is_collapsible %}<details><summary>{% endif %}
+  <h2 id="{{ inline_admin_formset.formset.prefix }}-heading" class="inline-heading">
+  {% if inline_admin_formset.formset.max_num == 1 %}
+    {{ inline_admin_formset.opts.verbose_name|capfirst }}
+  {% else %}
+    {{ inline_admin_formset.opts.verbose_name_plural|capfirst }}
+  {% endif %}
+  </h2>
+  {% if inline_admin_formset.is_collapsible %}</summary>{% endif %}
    {{ inline_admin_formset.formset.non_form_errors }}
    <table>
      <thead><tr>
@@ -61,6 +65,7 @@
      {% endfor %}
      </tbody>
    </table>
+  {% if inline_admin_formset.is_collapsible %}</details>{% endif %}
 </fieldset>
   </div>
 </div>

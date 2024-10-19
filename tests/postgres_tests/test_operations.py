@@ -1,9 +1,11 @@
 import unittest
 
-from migrations.test_base import OperationTestBase
+from migrations.test_base import OperationTestBase, OptimizerTestBase
 
 from django.db import IntegrityError, NotSupportedError, connection, transaction
+from django.db.migrations.operations import RemoveIndex, RenameIndex
 from django.db.migrations.state import ProjectState
+from django.db.migrations.writer import OperationWriter
 from django.db.models import CheckConstraint, Index, Q, UniqueConstraint
 from django.db.utils import ProgrammingError
 from django.test import modify_settings, override_settings
@@ -29,7 +31,7 @@ except ImportError:
 
 @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific tests.")
 @modify_settings(INSTALLED_APPS={"append": "migrations"})
-class AddIndexConcurrentlyTests(OperationTestBase):
+class AddIndexConcurrentlyTests(OptimizerTestBase, OperationTestBase):
     app_label = "test_add_concurrently"
 
     def test_requires_atomic_false(self):
@@ -127,6 +129,51 @@ class AddIndexConcurrentlyTests(OperationTestBase):
                 self.app_label, editor, new_state, project_state
             )
         self.assertIndexNotExists(table_name, ["pink"])
+
+    def test_reduce_add_remove_concurrently(self):
+        self.assertOptimizesTo(
+            [
+                AddIndexConcurrently(
+                    "Pony",
+                    Index(fields=["pink"], name="pony_pink_idx"),
+                ),
+                RemoveIndex("Pony", "pony_pink_idx"),
+            ],
+            [],
+        )
+
+    def test_reduce_add_remove(self):
+        self.assertOptimizesTo(
+            [
+                AddIndexConcurrently(
+                    "Pony",
+                    Index(fields=["pink"], name="pony_pink_idx"),
+                ),
+                RemoveIndexConcurrently("Pony", "pony_pink_idx"),
+            ],
+            [],
+        )
+
+    def test_reduce_add_rename(self):
+        self.assertOptimizesTo(
+            [
+                AddIndexConcurrently(
+                    "Pony",
+                    Index(fields=["pink"], name="pony_pink_idx"),
+                ),
+                RenameIndex(
+                    "Pony",
+                    old_name="pony_pink_idx",
+                    new_name="pony_pink_index",
+                ),
+            ],
+            [
+                AddIndexConcurrently(
+                    "Pony",
+                    Index(fields=["pink"], name="pony_pink_index"),
+                ),
+            ],
+        )
 
 
 @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific tests.")
@@ -271,7 +318,7 @@ class CreateExtensionTests(PostgreSQLTestCase):
 
 
 @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific tests.")
-class CreateCollationTests(PostgreSQLTestCase):
+class CreateCollationTests(OptimizerTestBase, PostgreSQLTestCase):
     app_label = "test_allow_create_collation"
 
     @override_settings(DATABASE_ROUTERS=[NoMigrationRouter()])
@@ -393,6 +440,43 @@ class CreateCollationTests(PostgreSQLTestCase):
         self.assertEqual(len(captured_queries), 1)
         self.assertIn("DROP COLLATION", captured_queries[0]["sql"])
 
+    def test_writer(self):
+        operation = CreateCollation(
+            "sample_collation",
+            "und-u-ks-level2",
+            provider="icu",
+            deterministic=False,
+        )
+        buff, imports = OperationWriter(operation, indentation=0).serialize()
+        self.assertEqual(imports, {"import django.contrib.postgres.operations"})
+        self.assertEqual(
+            buff,
+            "django.contrib.postgres.operations.CreateCollation(\n"
+            "    name='sample_collation',\n"
+            "    locale='und-u-ks-level2',\n"
+            "    provider='icu',\n"
+            "    deterministic=False,\n"
+            "),",
+        )
+
+    def test_reduce_create_remove(self):
+        self.assertOptimizesTo(
+            [
+                CreateCollation(
+                    "sample_collation",
+                    "und-u-ks-level2",
+                    provider="icu",
+                    deterministic=False,
+                ),
+                RemoveCollation(
+                    "sample_collation",
+                    # Different locale
+                    "de-u-ks-level1",
+                ),
+            ],
+            [],
+        )
+
 
 @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific tests.")
 class RemoveCollationTests(PostgreSQLTestCase):
@@ -476,7 +560,7 @@ class AddConstraintNotValidTests(OperationTestBase):
     def test_add(self):
         table_name = f"{self.app_label}_pony"
         constraint_name = "pony_pink_gte_check"
-        constraint = CheckConstraint(check=Q(pink__gte=4), name=constraint_name)
+        constraint = CheckConstraint(condition=Q(pink__gte=4), name=constraint_name)
         operation = AddConstraintNotValid("Pony", constraint=constraint)
         project_state, new_state = self.make_test_state(self.app_label, operation)
         self.assertEqual(
@@ -529,7 +613,7 @@ class ValidateConstraintTests(OperationTestBase):
 
     def test_validate(self):
         constraint_name = "pony_pink_gte_check"
-        constraint = CheckConstraint(check=Q(pink__gte=4), name=constraint_name)
+        constraint = CheckConstraint(condition=Q(pink__gte=4), name=constraint_name)
         operation = AddConstraintNotValid("Pony", constraint=constraint)
         project_state, new_state = self.make_test_state(self.app_label, operation)
         Pony = new_state.apps.get_model(self.app_label, "Pony")

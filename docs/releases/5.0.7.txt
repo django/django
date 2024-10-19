@@ -1,0 +1,57 @@
+==========================
+Django 5.0.7 release notes
+==========================
+
+*July 9, 2024*
+
+Django 5.0.7 fixes two security issues with severity "moderate", two security
+issues with severity "low", and one bug in 5.0.6.
+
+CVE-2024-38875: Potential denial-of-service vulnerability in ``django.utils.html.urlize()``
+===========================================================================================
+
+:tfilter:`urlize` and :tfilter:`urlizetrunc` were subject to a potential
+denial-of-service attack via certain inputs with a very large number of
+brackets.
+
+CVE-2024-39329: Username enumeration through timing difference for users with unusable passwords
+================================================================================================
+
+The :meth:`~django.contrib.auth.backends.ModelBackend.authenticate()` method
+allowed remote attackers to enumerate users via a timing attack involving login
+requests for users with unusable passwords.
+
+CVE-2024-39330: Potential directory-traversal via ``Storage.save()``
+====================================================================
+
+Derived classes of the :class:`~django.core.files.storage.Storage` base class
+which override :meth:`generate_filename()
+<django.core.files.storage.Storage.generate_filename()>` without replicating
+the file path validations existing in the parent class, allowed for potential
+directory-traversal via certain inputs when calling :meth:`save()
+<django.core.files.storage.Storage.save()>`.
+
+Built-in ``Storage`` sub-classes were not affected by this vulnerability.
+
+CVE-2024-39614: Potential denial-of-service vulnerability in ``get_supported_language_variant()``
+=================================================================================================
+
+:meth:`~django.utils.translation.get_supported_language_variant` was subject to
+a potential denial-of-service attack when used with very long strings
+containing specific characters.
+
+To mitigate this vulnerability, the language code provided to
+:meth:`~django.utils.translation.get_supported_language_variant` is now parsed
+up to a maximum length of 500 characters.
+
+When the language code is over 500 characters, a :exc:`ValueError` will now be
+raised if ``strict`` is ``True``, or if there is no generic variant and
+``strict`` is ``False``.
+
+Bugfixes
+========
+
+* Fixed a bug in Django 5.0 that caused a crash of ``Model.full_clean()`` on
+  unsaved model instances with a ``GeneratedField`` and certain defined
+  :attr:`Meta.constraints <django.db.models.Options.constraints>`
+  (:ticket:`35560`).

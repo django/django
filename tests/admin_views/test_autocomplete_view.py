@@ -102,7 +102,7 @@ class AutocompleteJsonViewTests(AdminViewBasicTestCase):
         request.user = self.superuser
         response = AutocompleteJsonView.as_view(**self.as_view_args)(request)
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content.decode("utf-8"))
+        data = json.loads(response.text)
         self.assertEqual(
             data,
             {
@@ -120,7 +120,7 @@ class AutocompleteJsonViewTests(AdminViewBasicTestCase):
         request.user = self.superuser
         response = AutocompleteJsonView.as_view(**self.as_view_args)(request)
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content.decode("utf-8"))
+        data = json.loads(response.text)
         self.assertEqual(
             data,
             {
@@ -150,7 +150,7 @@ class AutocompleteJsonViewTests(AdminViewBasicTestCase):
         request.user = self.superuser
         response = AutocompleteJsonView.as_view(**self.as_view_args)(request)
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content.decode("utf-8"))
+        data = json.loads(response.text)
         self.assertEqual(
             data,
             {
@@ -184,7 +184,7 @@ class AutocompleteJsonViewTests(AdminViewBasicTestCase):
                 request.user = self.superuser
                 response = AutocompleteJsonView.as_view(**self.as_view_args)(request)
                 self.assertEqual(response.status_code, 200)
-                data = json.loads(response.content.decode("utf-8"))
+                data = json.loads(response.text)
                 self.assertEqual(
                     data,
                     {
@@ -205,7 +205,7 @@ class AutocompleteJsonViewTests(AdminViewBasicTestCase):
         request.user = self.superuser
         response = AutocompleteJsonView.as_view(**self.as_view_args)(request)
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content.decode("utf-8"))
+        data = json.loads(response.text)
         self.assertEqual(
             data,
             {
@@ -250,7 +250,7 @@ class AutocompleteJsonViewTests(AdminViewBasicTestCase):
         request.user = self.superuser
         response = AutocompleteJsonView.as_view(**self.as_view_args)(request)
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content.decode("utf-8"))
+        data = json.loads(response.text)
         self.assertEqual(
             data,
             {
@@ -306,7 +306,7 @@ class AutocompleteJsonViewTests(AdminViewBasicTestCase):
         with model_admin(Question, DistinctQuestionAdmin):
             response = AutocompleteJsonView.as_view(**self.as_view_args)(request)
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content.decode("utf-8"))
+        data = json.loads(response.text)
         self.assertEqual(len(data["results"]), 3)
 
     def test_missing_search_fields(self):
@@ -335,7 +335,7 @@ class AutocompleteJsonViewTests(AdminViewBasicTestCase):
         with model_admin(Question, PKOrderingQuestionAdmin):
             response = AutocompleteJsonView.as_view(**self.as_view_args)(request)
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content.decode("utf-8"))
+        data = json.loads(response.text)
         self.assertEqual(
             data,
             {
@@ -352,7 +352,7 @@ class AutocompleteJsonViewTests(AdminViewBasicTestCase):
         with model_admin(Question, PKOrderingQuestionAdmin):
             response = AutocompleteJsonView.as_view(**self.as_view_args)(request)
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content.decode("utf-8"))
+        data = json.loads(response.text)
         self.assertEqual(
             data,
             {
@@ -380,7 +380,7 @@ class AutocompleteJsonViewTests(AdminViewBasicTestCase):
             request
         )
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content.decode("utf-8"))
+        data = json.loads(response.text)
         self.assertEqual(
             data,
             {
@@ -576,7 +576,8 @@ class SeleniumTests(AdminSeleniumTestCase):
 
         def assertNoResults(row):
             elem = row.find_element(By.CSS_SELECTOR, ".select2-selection")
-            elem.click()  # Open the autocomplete dropdown.
+            with self.select2_ajax_wait():
+                elem.click()  # Open the autocomplete dropdown.
             results = self.selenium.find_element(By.CSS_SELECTOR, ".select2-results")
             self.assertTrue(results.is_displayed())
             option = self.selenium.find_element(

@@ -36,6 +36,14 @@ Some of the checks described below can be automated using the :option:`check
 --deploy` option. Be sure to run it against your production settings file as
 described in the option's documentation.
 
+Switch away from ``manage.py runserver``
+========================================
+
+The :djadmin:`runserver` command is not designed for a production setting. Be
+sure to switch to a production-ready WSGI or ASGI server. For a few common
+options, see :doc:`WSGI servers </howto/deployment/wsgi/index>` or
+:doc:`ASGI servers </howto/deployment/asgi/index>`.
+
 Critical settings
 =================
 

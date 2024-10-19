@@ -564,8 +564,6 @@ See :ref:`ref-forms-api-outputting-html` for more details.
 Reusable field group templates
 ------------------------------
 
-.. versionadded:: 5.0
-
 Each field is available as an attribute of the form, using
 ``{{ form.name_of_field }}`` in a template. A field has a
 :meth:`~django.forms.BoundField.as_field_group` method which renders the
@@ -781,12 +779,10 @@ Useful attributes on ``{{ field }}`` include:
         <label for="id_email">Email address:</label>
 
 ``{{ field.legend_tag }}``
-
     Similar to ``field.label_tag`` but uses a ``<legend>`` tag in place of
     ``<label>``, for widgets with multiple inputs wrapped in a ``<fieldset>``.
 
 ``{{ field.use_fieldset }}``
-
     This attribute is ``True`` if the form field's widget contains multiple
     inputs that should be semantically grouped in a ``<fieldset>`` with a
     ``<legend>`` to improve accessibility. An example use in a template:

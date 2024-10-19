@@ -9,7 +9,7 @@ import time
 import warnings
 from email.header import Header
 from http.client import responses
-from urllib.parse import urlparse
+from urllib.parse import urlsplit
 
 from asgiref.sync import async_to_sync, sync_to_async
 
@@ -21,6 +21,7 @@ from django.http.cookie import SimpleCookie
 from django.utils import timezone
 from django.utils.datastructures import CaseInsensitiveMapping
 from django.utils.encoding import iri_to_uri
+from django.utils.functional import cached_property
 from django.utils.http import content_disposition_header, http_date
 from django.utils.regex_helper import _lazy_re_compile
 
@@ -408,6 +409,11 @@ class HttpResponse(HttpResponseBase):
             content = self.make_bytes(value)
         # Create a list of properly encoded bytestrings to support write().
         self._container = [content]
+        self.__dict__.pop("text", None)
+
+    @cached_property
+    def text(self):
+        return self.content.decode(self.charset or "utf-8")
 
     def __iter__(self):
         return iter(self._container)
@@ -461,6 +467,12 @@ class StreamingHttpResponse(HttpResponseBase):
         )
 
     @property
+    def text(self):
+        raise AttributeError(
+            "This %s instance has no `text` attribute." % self.__class__.__name__
+        )
+
+    @property
     def streaming_content(self):
         if self.is_async:
             # pull to lexical scope to capture fixed reference in case
@@ -498,6 +510,7 @@ class StreamingHttpResponse(HttpResponseBase):
                 "StreamingHttpResponse must consume asynchronous iterators in order to "
                 "serve them synchronously. Use a synchronous iterator instead.",
                 Warning,
+                stacklevel=2,
             )
 
             # async iterator. Consume in async_to_sync and map back.
@@ -518,6 +531,7 @@ class StreamingHttpResponse(HttpResponseBase):
                 "StreamingHttpResponse must consume synchronous iterators in order to "
                 "serve them asynchronously. Use an asynchronous iterator instead.",
                 Warning,
+                stacklevel=2,
             )
             # sync iterator. Consume via sync_to_async and yield via async
             # generator.
@@ -616,7 +630,7 @@ class HttpResponseRedirectBase(HttpResponse):
     def __init__(self, redirect_to, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self["Location"] = iri_to_uri(redirect_to)
-        parsed = urlparse(str(redirect_to))
+        parsed = urlsplit(str(redirect_to))
         if parsed.scheme and parsed.scheme not in self.allowed_schemes:
             raise DisallowedRedirect(
                 "Unsafe redirect to URL with protocol '%s'" % parsed.scheme

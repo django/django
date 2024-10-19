@@ -1,5 +1,3 @@
-from unittest import mock
-
 from django.contrib.postgres.indexes import (
     BloomIndex,
     BrinIndex,
@@ -11,10 +9,9 @@ from django.contrib.postgres.indexes import (
     PostgresIndex,
     SpGistIndex,
 )
-from django.db import NotSupportedError, connection
+from django.db import connection
 from django.db.models import CharField, F, Index, Q
 from django.db.models.functions import Cast, Collate, Length, Lower
-from django.test import skipUnlessDBFeature
 from django.test.utils import register_lookup
 
 from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase
@@ -640,7 +637,6 @@ class SchemaTests(PostgreSQLTestCase):
             index_name, self.get_constraints(TextFieldModel._meta.db_table)
         )
 
-    @skipUnlessDBFeature("supports_covering_spgist_indexes")
     def test_spgist_include(self):
         index_name = "scene_spgist_include_setting"
         index = SpGistIndex(name=index_name, fields=["scene"], include=["setting"])
@@ -652,20 +648,6 @@ class SchemaTests(PostgreSQLTestCase):
         self.assertEqual(constraints[index_name]["columns"], ["scene", "setting"])
         with connection.schema_editor() as editor:
             editor.remove_index(Scene, index)
-        self.assertNotIn(index_name, self.get_constraints(Scene._meta.db_table))
-
-    def test_spgist_include_not_supported(self):
-        index_name = "spgist_include_exception"
-        index = SpGistIndex(fields=["scene"], name=index_name, include=["setting"])
-        msg = "Covering SP-GiST indexes require PostgreSQL 14+."
-        with self.assertRaisesMessage(NotSupportedError, msg):
-            with mock.patch(
-                "django.db.backends.postgresql.features.DatabaseFeatures."
-                "supports_covering_spgist_indexes",
-                False,
-            ):
-                with connection.schema_editor() as editor:
-                    editor.add_index(Scene, index)
         self.assertNotIn(index_name, self.get_constraints(Scene._meta.db_table))
 
     def test_custom_suffix(self):

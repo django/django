@@ -562,10 +562,8 @@ flag on the connection's socket::
     }
 
 Here's an example configuration for a ``redis`` based backend that selects
-database ``10`` (by default Redis ships with 16 logical databases), specifies a
-`parser class`_ (``redis.connection.HiredisParser`` will be used by default if
-the ``hiredis-py`` package is installed), and sets a custom `connection pool
-class`_ (``redis.ConnectionPool`` is used by default)::
+database ``10`` (by default Redis ships with 16 logical databases), and sets a
+custom `connection pool class`_ (``redis.ConnectionPool`` is used by default)::
 
     CACHES = {
         "default": {
@@ -573,13 +571,11 @@ class`_ (``redis.ConnectionPool`` is used by default)::
             "LOCATION": "redis://127.0.0.1:6379",
             "OPTIONS": {
                 "db": "10",
-                "parser_class": "redis.connection.PythonParser",
                 "pool_class": "redis.BlockingConnectionPool",
             },
         }
     }
 
-.. _`parser class`: https://github.com/redis/redis-py#parsers
 .. _`connection pool class`: https://github.com/redis/redis-py#connection-pools
 
 .. _the-per-site-cache:

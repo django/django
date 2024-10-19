@@ -1,7 +1,9 @@
 import datetime
+from unittest import mock
 
 from django.test import SimpleTestCase
 from django.utils import feedgenerator
+from django.utils.functional import SimpleLazyObject
 from django.utils.timezone import get_fixed_timezone
 
 
@@ -148,3 +150,12 @@ class FeedgeneratorTests(SimpleTestCase):
                     rss_feed.latest_post_date().tzinfo,
                     datetime.timezone.utc,
                 )
+
+    def test_stylesheet_keeps_lazy_urls(self):
+        m = mock.Mock(return_value="test.css")
+        stylesheet = feedgenerator.Stylesheet(SimpleLazyObject(m))
+        m.assert_not_called()
+        self.assertEqual(
+            str(stylesheet), 'href="test.css" type="text/css" media="screen"'
+        )
+        m.assert_called_once()

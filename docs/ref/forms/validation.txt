@@ -370,7 +370,7 @@ example::
                 # Only do something if both fields are valid so far.
                 if "help" not in subject:
                     raise ValidationError(
-                        "Did not send for 'help' in the subject despite " "CC'ing yourself."
+                        "Did not send for 'help' in the subject despite CC'ing yourself."
                     )
 
 In this code, if the validation error is raised, the form will display an

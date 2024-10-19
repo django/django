@@ -163,9 +163,10 @@ class URLFieldAssumeSchemeDeprecationTest(FormFieldAssertionsMixin, SimpleTestCa
             "or set the FORMS_URLFIELD_ASSUME_HTTPS transitional setting to True to "
             "opt into using 'https' as the new default scheme."
         )
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
             f = URLField()
             self.assertEqual(f.clean("example.com"), "http://example.com")
+        self.assertEqual(ctx.filename, __file__)
 
     @ignore_warnings(category=RemovedInDjango60Warning)
     def test_urlfield_forms_urlfield_assume_https(self):

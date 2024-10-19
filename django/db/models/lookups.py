@@ -122,7 +122,7 @@ class Lookup(Expression):
             # Ensure expression is wrapped in parentheses to respect operator
             # precedence but avoid double wrapping as it can be misinterpreted
             # on some backends (e.g. subqueries on SQLite).
-            if sql and sql[0] != "(":
+            if not isinstance(value, Value) and sql and sql[0] != "(":
                 sql = "(%s)" % sql
             return sql, params
         else:
@@ -300,7 +300,11 @@ class FieldGetDbPrepValueIterableMixin(FieldGetDbPrepValueMixin):
                 # An expression will be handled by the database but can coexist
                 # alongside real values.
                 pass
-            elif self.prepare_rhs and hasattr(self.lhs.output_field, "get_prep_value"):
+            elif (
+                self.prepare_rhs
+                and hasattr(self.lhs, "output_field")
+                and hasattr(self.lhs.output_field, "get_prep_value")
+            ):
                 rhs_value = self.lhs.output_field.get_prep_value(rhs_value)
             prepared_values.append(rhs_value)
         return prepared_values

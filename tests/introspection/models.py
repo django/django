@@ -84,7 +84,7 @@ class CheckConstraintModel(models.Model):
         }
         constraints = [
             models.CheckConstraint(
-                name="up_votes_gte_0_check", check=models.Q(up_votes__gte=0)
+                name="up_votes_gte_0_check", condition=models.Q(up_votes__gte=0)
             ),
         ]
 

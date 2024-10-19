@@ -78,7 +78,7 @@ class ConcatPair(Func):
         return super(ConcatPair, coalesced).as_sql(
             compiler,
             connection,
-            template="%(expressions)s",
+            template="(%(expressions)s)",
             arg_joiner=" || ",
             **extra_context,
         )

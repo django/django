@@ -10,6 +10,7 @@
 # Gustaf Hansen <gustaf.hansen@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jonathan Lindén, 2015
+# Jörgen Olofsson, 2024
 # Ken Lewerentz, 2022
 # Jonathan Lindén, 2014
 # Mattias Hansson <mattias.gothenburg@gmail.com>, 2016
@@ -23,10 +24,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-17 02:13-0600\n"
-"PO-Revision-Date: 2023-04-25 06:49+0000\n"
-"Last-Translator: Anders Hovmöller <boxed@killingar.net>, 2023\n"
-"Language-Team: Swedish (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 06:49+0000\n"
+"Last-Translator: Jörgen Olofsson, 2024\n"
+"Language-Team: Swedish (http://app.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -310,6 +311,9 @@ msgstr "Tatariska"
 msgid "Udmurt"
 msgstr "Udmurtiska"
 
+msgid "Uyghur"
+msgstr "Uiguriska"
+
 msgid "Ukrainian"
 msgstr "Ukrainska"
 
@@ -357,6 +361,9 @@ msgstr "Sidan innehåller inga resultat"
 msgid "Enter a valid value."
 msgstr "Fyll i ett giltigt värde."
 
+msgid "Enter a valid domain name."
+msgstr "Fyll i ett giltigt domännamn."
+
 msgid "Enter a valid URL."
 msgstr "Fyll i en giltig URL."
 
@@ -380,14 +387,18 @@ msgstr ""
 "Fyll i en giltig 'slug', beståendes av bokstäver, siffror, understreck eller "
 "bindestreck i Unicode."
 
-msgid "Enter a valid IPv4 address."
-msgstr "Fyll i en giltig IPv4-adress."
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr "Fyll i en giltig %(protocol)s adress."
 
-msgid "Enter a valid IPv6 address."
-msgstr "Ange en giltig IPv6-adress."
+msgid "IPv4"
+msgstr "IPv4"
 
-msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "Ange en giltig IPv4- eller IPv6-adress."
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "IPv4 or IPv6"
+msgstr "IPv4 eller IPv6"
 
 msgid "Enter only digits separated by commas."
 msgstr "Fyll enbart i siffror separerade med kommatecken."
@@ -411,6 +422,15 @@ msgstr ""
 msgid "Ensure this value is a multiple of step size %(limit_value)s."
 msgstr ""
 "Kontrollera att detta värde är multipel av stegstorlek %(limit_value)s."
+
+#, python-format
+msgid ""
+"Ensure this value is a multiple of step size %(limit_value)s, starting from "
+"%(offset)s, e.g. %(offset)s, %(valid_value1)s, %(valid_value2)s, and so on."
+msgstr ""
+"Kontrollera att detta värde är en multipel med stegstorlek %(limit_value)s, "
+"med början från %(offset)s, t ex. %(offset)s, %(valid_value1)s, "
+"%(valid_value2)s och så vidare"
 
 #, python-format
 msgid ""

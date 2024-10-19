@@ -1192,10 +1192,6 @@ Attributes of ``BoundField``
     When rendering a field with errors, ``aria-invalid="true"`` will be set on
     the field's widget to indicate there is an error to screen reader users.
 
-    .. versionchanged:: 5.0
-
-        The ``aria-invalid="true"`` was added when a field has errors.
-
 .. attribute:: BoundField.field
 
     The form :class:`~django.forms.Field` instance from the form class that
@@ -1289,8 +1285,6 @@ Attributes of ``BoundField``
 
 .. attribute:: BoundField.template_name
 
-    .. versionadded:: 5.0
-
     The name of the template rendered with :meth:`.BoundField.as_field_group`.
 
     A property returning the value of the
@@ -1322,8 +1316,6 @@ Methods of ``BoundField``
 -------------------------
 
 .. method:: BoundField.as_field_group()
-
-    .. versionadded:: 5.0
 
     Renders the field using :meth:`.BoundField.render` with default values
     which renders the ``BoundField``, including its label, help text and errors
@@ -1371,8 +1363,6 @@ Methods of ``BoundField``
         'foo bar required'
 
 .. method:: BoundField.get_context()
-
-    .. versionadded:: 5.0
 
     Return the template context for rendering the field. The available context
     is ``field`` being the instance of the bound field.
@@ -1425,8 +1415,6 @@ Methods of ``BoundField``
     ``<label>``.
 
 .. method:: BoundField.render(template_name=None, context=None, renderer=None)
-
-    .. versionadded:: 5.0
 
     The render method is called by ``as_field_group``. All arguments are 
     optional and default to:

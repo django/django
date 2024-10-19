@@ -24,6 +24,7 @@ from django.db.migrations.writer import MigrationWriter
 
 
 class Command(BaseCommand):
+    autodetector = MigrationAutodetector
     help = "Creates new migration(s) for apps."
 
     def add_arguments(self, parser):
@@ -209,7 +210,7 @@ class Command(BaseCommand):
                 log=self.log,
             )
         # Set up autodetector
-        autodetector = MigrationAutodetector(
+        autodetector = self.autodetector(
             loader.project_state(),
             ProjectState.from_apps(apps),
             questioner,
@@ -461,7 +462,7 @@ class Command(BaseCommand):
                 # If they still want to merge it, then write out an empty
                 # file depending on the migrations needing merging.
                 numbers = [
-                    MigrationAutodetector.parse_number(migration.name)
+                    self.autodetector.parse_number(migration.name)
                     for migration in merge_migrations
                 ]
                 try:

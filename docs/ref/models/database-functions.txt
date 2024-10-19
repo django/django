@@ -569,11 +569,6 @@ Usage example:
     On Oracle, the SQL ``LOCALTIMESTAMP`` is used to avoid issues with casting
     ``CURRENT_TIMESTAMP`` to ``DateTimeField``.
 
-.. versionchanged:: 5.0
-
-    In older versions, the SQL ``CURRENT_TIMESTAMP`` was used on Oracle instead
-    of ``LOCALTIMESTAMP``.
-
 ``Trunc``
 ---------
 
@@ -1975,7 +1970,7 @@ Row # Value Rank Calculation  Relative Rank
 
 .. class:: Rank(*expressions, **extra)
 
-Comparable to ``RowNumber``, this function ranks rows in the window. The
+Comparable to :class:`RowNumber`, this function ranks rows in the window. The
 computed rank contains gaps. Use :class:`DenseRank` to compute rank without
 gaps.
 

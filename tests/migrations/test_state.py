@@ -1131,6 +1131,22 @@ class StateTests(SimpleTestCase):
         self.assertIsNone(order_field.related_model)
         self.assertIsInstance(order_field, models.PositiveSmallIntegerField)
 
+    def test_get_order_field_after_removed_order_with_respect_to_field(self):
+        new_apps = Apps()
+
+        class HistoricalRecord(models.Model):
+            _order = models.PositiveSmallIntegerField()
+
+            class Meta:
+                app_label = "migrations"
+                apps = new_apps
+
+        model_state = ModelState.from_model(HistoricalRecord)
+        model_state.options["order_with_respect_to"] = None
+        order_field = model_state.get_field("_order")
+        self.assertIsNone(order_field.related_model)
+        self.assertIsInstance(order_field, models.PositiveSmallIntegerField)
+
     def test_manager_refer_correct_model_version(self):
         """
         #24147 - Managers refer to the correct version of a
@@ -1856,8 +1872,11 @@ class ModelStateTests(SimpleTestCase):
         class Child2(Abstract):
             pass
 
+        abstract_state = ModelState.from_model(Abstract)
         child1_state = ModelState.from_model(Child1)
         child2_state = ModelState.from_model(Child2)
+        index_names = [index.name for index in abstract_state.options["indexes"]]
+        self.assertEqual(index_names, ["migrations__name_ae16a4_idx"])
         index_names = [index.name for index in child1_state.options["indexes"]]
         self.assertEqual(index_names, ["migrations__name_b0afd7_idx"])
         index_names = [index.name for index in child2_state.options["indexes"]]
@@ -1887,7 +1906,9 @@ class ModelStateTests(SimpleTestCase):
 
             class Meta:
                 constraints = [
-                    models.CheckConstraint(check=models.Q(size__gt=1), name="size_gt_1")
+                    models.CheckConstraint(
+                        condition=models.Q(size__gt=1), name="size_gt_1"
+                    )
                 ]
 
         state = ModelState.from_model(ModelWithConstraints)

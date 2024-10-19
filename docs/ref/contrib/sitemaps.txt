@@ -249,11 +249,6 @@ Note:
         sitemap was requested is used. If the sitemap is built outside the
         context of a request, the default is ``'https'``.
 
-        .. versionchanged:: 5.0
-
-            In older versions, the default protocol for sitemaps built outside
-            the context of a request was ``'http'``.
-
     .. attribute:: Sitemap.limit
 
         **Optional.**

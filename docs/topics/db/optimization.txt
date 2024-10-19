@@ -14,7 +14,7 @@ As general programming practice, this goes without saying. Find out :ref:`what
 queries you are doing and what they are costing you <faq-see-raw-sql-queries>`.
 Use :meth:`.QuerySet.explain` to understand how specific ``QuerySet``\s are
 executed by your database. You may also want to use an external project like
-django-debug-toolbar_, or a tool that monitors your database directly.
+:pypi:`django-debug-toolbar`, or a tool that monitors your database directly.
 
 Remember that you may be optimizing for speed or memory or both, depending on
 your requirements. Sometimes optimizing for one will be detrimental to the
@@ -29,8 +29,6 @@ that the change is a benefit, and a big enough benefit given the decrease in
 readability of your code. **All** of the suggestions below come with the caveat
 that in your circumstances the general principle might not apply, or might even
 be reversed.
-
-.. _django-debug-toolbar: https://github.com/jazzband/django-debug-toolbar/
 
 Use standard DB optimization techniques
 =======================================

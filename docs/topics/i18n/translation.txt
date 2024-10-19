@@ -515,14 +515,18 @@ pass the translatable string as argument to another function, you can wrap
 this function inside a lazy call yourself. For example::
 
     from django.utils.functional import lazy
-    from django.utils.safestring import mark_safe
     from django.utils.translation import gettext_lazy as _
 
-    mark_safe_lazy = lazy(mark_safe, str)
+
+    def to_lower(string):
+        return string.lower()
+
+
+    to_lower_lazy = lazy(to_lower, str)
 
 And then later::
 
-    lazy_string = mark_safe_lazy(_("<p>My <strong>string!</strong></p>"))
+    lazy_string = to_lower_lazy(_("My STRING!"))
 
 Localized names of languages
 ----------------------------
@@ -1331,9 +1335,7 @@ whenever you restart your application server::
 
 You can even pre-generate the JavaScript catalog as part of your deployment
 procedure and serve it as a static file. This radical technique is implemented
-in django-statici18n_.
-
-.. _django-statici18n: https://django-statici18n.readthedocs.io/
+in :pypi:`django-statici18n`.
 
 .. _url-internationalization:
 
@@ -1549,7 +1551,7 @@ Django comes with a tool, :djadmin:`django-admin makemessages
     commands from the GNU gettext toolset: ``xgettext``, ``msgfmt``,
     ``msgmerge`` and ``msguniq``.
 
-    The minimum version of the ``gettext`` utilities supported is 0.15.
+    The minimum version of the ``gettext`` utilities supported is 0.19.
 
 To create or update a message file, run this command:
 

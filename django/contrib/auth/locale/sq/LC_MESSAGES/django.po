@@ -2,15 +2,15 @@
 #
 # Translators:
 # Besnik Bleta <besnik@programeshqip.org>, 2011,2015
-# Besnik Bleta <besnik@programeshqip.org>, 2023
+# Besnik Bleta <besnik@programeshqip.org>, 2023-2024
 # Besnik Bleta <besnik@programeshqip.org>, 2015,2017,2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-17 03:19-0500\n"
-"PO-Revision-Date: 2023-12-04 08:09+0000\n"
-"Last-Translator: Besnik Bleta <besnik@programeshqip.org>, 2023\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 08:09+0000\n"
+"Last-Translator: Besnik Bleta <besnik@programeshqip.org>, 2023-2024\n"
 "Language-Team: Albanian (http://app.transifex.com/django/django/language/"
 "sq/)\n"
 "MIME-Version: 1.0\n"
@@ -32,12 +32,22 @@ msgstr "Të dhëna të rëndësishme"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "S’ekziston objekt %(name)s me kyç parësor %(key)r."
 
+msgid "Conflicting form data submitted. Please try again."
+msgstr "U parashtruar të dhëna formulari me përplasje. Ju lutemi, riprovoni."
+
 msgid "Password changed successfully."
 msgstr "Fjalëkalimi u ndryshua me sukses."
+
+msgid "Password-based authentication was disabled."
+msgstr "Mirëfilltësimi me bazë fjalëkalimin u çaktivizua."
 
 #, python-format
 msgid "Change password: %s"
 msgstr "Ndryshoni fjalëkalimin: %s"
+
+#, python-format
+msgid "Set password: %s"
+msgstr "Caktoni fjalëkalim: %s"
 
 msgid "Authentication and Authorization"
 msgstr "Mirëfilltësim dhe Autorizim"
@@ -54,8 +64,24 @@ msgstr "S’ka fjalëkalim të caktuar."
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Format i pavlefshëm fjalëkalimi ose algoritëm i panjohur hashi."
 
+msgid "Reset password"
+msgstr "Ricaktoni fjalëkalim"
+
+msgid "Set password"
+msgstr "Caktoni fjalëkalim"
+
 msgid "The two password fields didn’t match."
 msgstr "Dy fushat për fjalëkalim s’u përputhën."
+
+msgid ""
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
+msgstr ""
+"Do të jetë apo jo në gjendje përdoruesi të bëjë mirëfilltësimin me "
+"fjalëkalim. Në u çaktivizoftë, prapë mund të jetë në gjendje të bëjë  "
+"mirëfilltësimin duke përdorur mekanizma të tjera, fjala vjen, Hyrje Njëshe "
+"(Single Sign-On), ose LDAP."
 
 msgid "Password"
 msgstr "Fjalëkalim"
@@ -66,13 +92,26 @@ msgstr "Ripohim fjalëkalimi"
 msgid "Enter the same password as before, for verification."
 msgstr "Jepni, për verifikim, të njëjtin fjalëkalim si më parë."
 
+msgid "Password-based authentication"
+msgstr "Mirëfilltësim me bazë fjalëkalimin"
+
+msgid "Enabled"
+msgstr "I aktivizuar"
+
+msgid "Disabled"
+msgstr "I çaktivizuar"
+
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user’s "
-"password, but you can change the password using <a href=\"{}\">this form</a>."
+"Raw passwords are not stored, so there is no way to see the user’s password."
 msgstr ""
-"Nuk depozitohen fjalëkalime të papërpunuar, ndaj s’ka ndonjë mënyrë për të "
-"parë fjalëkalimin e këtij përdoruesi, por mund ta ndryshoni fjalëkalimin "
-"duke përdorur <a href=\"{}\">këtë formular</a>."
+"Nuk ruhen fjalëkalime shqeto, ndaj s’ka ndonjë rrugë për të parë "
+"fjalëkalimin e përdoruesit."
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
+msgstr ""
+"Aktivizoni mirëfilltësim me bazë fjalëkalime për këtë përdorues, duke "
+"caktuar një fjalëkalim."
 
 #, python-format
 msgid ""
@@ -101,9 +140,6 @@ msgstr ""
 
 msgid "Old password"
 msgstr "Fjalëkalim i vjetër"
-
-msgid "Password (again)"
-msgstr "Fjalëkalim (sërish)"
 
 msgid "algorithm"
 msgstr "algoritëm"

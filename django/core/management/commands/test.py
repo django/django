@@ -41,11 +41,6 @@ class Command(BaseCommand):
             help="Tells Django to NOT prompt the user for input of any kind.",
         )
         parser.add_argument(
-            "--failfast",
-            action="store_true",
-            help="Tells Django to stop running the test suite after first failed test.",
-        )
-        parser.add_argument(
             "--testrunner",
             help="Tells Django to use specified test runner class instead of "
             "the one specified by the TEST_RUNNER setting.",

@@ -54,7 +54,7 @@ class MapWidget {
 
         // Altering using user-provided options
         for (const property in options) {
-            if (options.hasOwnProperty(property)) {
+            if (Object.hasOwn(options, property)) {
                 this.options[property] = options[property];
             }
         }

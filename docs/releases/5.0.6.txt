@@ -1,0 +1,7 @@
+==========================
+Django 5.0.6 release notes
+==========================
+
+*May 7, 2024*
+
+Django 5.0.6 fixes a packaging error in 5.0.5.

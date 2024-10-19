@@ -49,7 +49,7 @@ class Group(models.Model):
 
 class Membership(models.Model):
     # Table Column Fields
-    membership_country = models.ForeignKey(Country, models.CASCADE)
+    membership_country = models.ForeignKey(Country, models.CASCADE, null=True)
     date_joined = models.DateTimeField(default=datetime.datetime.now)
     invite_reason = models.CharField(max_length=64, null=True)
     person_id = models.IntegerField()

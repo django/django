@@ -8,12 +8,13 @@
 # Arthur Silva <arxdsilva@gmail.com>, 2017
 # bruno.devpod <bruno.devpod@gmail.com>, 2014
 # Camilo B. Moreira <camilo.moreira@fatec.sp.gov.br>, 2017
-# Carlos C. Leite <caduado@gmail.com>, 2020
-# Carlos C. Leite <caduado@gmail.com>, 2016,2019
+# Carlos Cadu “Cadu” Leite <caduado@gmail.com>, 2020
+# Carlos Cadu “Cadu” Leite <caduado@gmail.com>, 2016,2019
 # Filipe Cifali <cifali.filipe@gmail.com>, 2016
 # Claudio Rogerio Carvalho Filho <excriptbrasil@gmail.com>, 2020
 # dudanogueira <dudanogueira@gmail.com>, 2012
 # dudanogueira <dudanogueira@gmail.com>, 2019
+# Eduardo Felipe Castegnaro <eduardo@onsign.tv>, 2024
 # Elyézer Rezende <elyezermr@gmail.com>, 2013
 # Fábio C. Barrionuevo da Luz <bnafta@gmail.com>, 2014-2015
 # Felipe Rodrigues <bidu.pub@gmail.com>, 2016
@@ -22,6 +23,7 @@
 # fa9e10542e458baef0599ae856e43651_13d2225, 2011-2014
 # Guilherme <guilherme0xff@proton.me>, 2022
 # Heron Fonsaca, 2022
+# Hugo Tácito <hugotacito@gmail.com>, 2024
 # Igor Cavalcante <igorcavlim@gmail.com>, 2017
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jonas Rodrigues, 2023
@@ -42,9 +44,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 06:49+0000\n"
-"Last-Translator: Leonardo Gregianin, 2023\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 06:49+0000\n"
+"Last-Translator: Eduardo Felipe Castegnaro <eduardo@onsign.tv>, 2024\n"
 "Language-Team: Portuguese (Brazil) (http://app.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -379,6 +381,9 @@ msgstr "Essa página não contém resultados"
 msgid "Enter a valid value."
 msgstr "Informe um valor válido."
 
+msgid "Enter a valid domain name."
+msgstr "Informe um domínio válido."
+
 msgid "Enter a valid URL."
 msgstr "Informe uma URL válida."
 
@@ -401,14 +406,18 @@ msgstr ""
 "Informe um “slug” válido tendo letras em Unicode, números, \"underscores\" e "
 "hífens."
 
-msgid "Enter a valid IPv4 address."
-msgstr "Insira um endereço IPv4 válido."
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr "Insira um endereço %(protocol)s válido."
 
-msgid "Enter a valid IPv6 address."
-msgstr "Insira um endereço IPv6 válido."
+msgid "IPv4"
+msgstr "IPv4"
 
-msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "Insira um endereço IPv4 ou IPv6 válido."
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "IPv4 or IPv6"
+msgstr "IPv4 ou IPv6"
 
 msgid "Enter only digits separated by commas."
 msgstr "Insira apenas dígitos separados por vírgulas."

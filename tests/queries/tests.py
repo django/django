@@ -1357,6 +1357,35 @@ class Queries1Tests(TestCase):
         )
         self.assertSequenceEqual(Note.objects.exclude(negate=True), [self.n3])
 
+    def test_combining_does_not_mutate(self):
+        all_authors = Author.objects.all()
+        authors_with_report = Author.objects.filter(
+            Exists(Report.objects.filter(creator__pk=OuterRef("id")))
+        )
+        authors_without_report = all_authors.exclude(pk__in=authors_with_report)
+        items_before = Item.objects.filter(creator__in=authors_without_report)
+        self.assertCountEqual(items_before, [self.i2, self.i3, self.i4])
+        # Combining querysets doesn't mutate them.
+        all_authors | authors_with_report
+        all_authors & authors_with_report
+
+        authors_without_report = all_authors.exclude(pk__in=authors_with_report)
+        items_after = Item.objects.filter(creator__in=authors_without_report)
+
+        self.assertCountEqual(items_after, [self.i2, self.i3, self.i4])
+        self.assertCountEqual(items_before, items_after)
+
+    @skipUnlessDBFeature("supports_select_union")
+    def test_union_values_subquery(self):
+        items = Item.objects.filter(creator=OuterRef("pk"))
+        item_authors = Author.objects.annotate(is_creator=Exists(items)).order_by()
+        reports = Report.objects.filter(creator=OuterRef("pk"))
+        report_authors = Author.objects.annotate(is_creator=Exists(reports)).order_by()
+        all_authors = item_authors.union(report_authors).order_by("is_creator")
+        self.assertEqual(
+            list(all_authors.values_list("is_creator", flat=True)), [False, True]
+        )
+
 
 class Queries2Tests(TestCase):
     @classmethod
@@ -2182,7 +2211,7 @@ class Queries6Tests(TestCase):
                 {"tag_per_parent__max": 2},
             )
         sql = captured_queries[0]["sql"]
-        self.assertIn("AS %s" % connection.ops.quote_name("col1"), sql)
+        self.assertIn("AS %s" % connection.ops.quote_name("parent"), sql)
 
     def test_xor_subquery(self):
         self.assertSequenceEqual(

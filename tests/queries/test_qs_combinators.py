@@ -14,7 +14,16 @@ from django.db.models.functions import Mod
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
 
-from .models import Author, Celebrity, ExtraInfo, Number, ReservedName
+from .models import (
+    Annotation,
+    Author,
+    Celebrity,
+    ExtraInfo,
+    Note,
+    Number,
+    ReservedName,
+    Tag,
+)
 
 
 @skipUnlessDBFeature("supports_select_union")
@@ -75,6 +84,12 @@ class QuerySetSetOperationTests(TestCase):
         qs2 = Number.objects.none()
         qs3 = qs1.union(qs2)
         self.assertNumbersEqual(qs3[:1], [0])
+
+    def test_union_all_none_slice(self):
+        qs = Number.objects.filter(id__in=[])
+        with self.assertNumQueries(0):
+            self.assertSequenceEqual(qs.union(qs), [])
+            self.assertSequenceEqual(qs.union(qs)[0:0], [])
 
     def test_union_empty_filter_slice(self):
         qs1 = Number.objects.filter(num__lte=0)
@@ -257,6 +272,23 @@ class QuerySetSetOperationTests(TestCase):
         )
         self.assertCountEqual(qs1.union(qs2), [(1, 0), (1, 2)])
 
+    def test_union_with_field_and_annotation_values(self):
+        qs1 = (
+            Number.objects.filter(num=1)
+            .annotate(
+                zero=Value(0, IntegerField()),
+            )
+            .values_list("num", "zero")
+        )
+        qs2 = (
+            Number.objects.filter(num=2)
+            .annotate(
+                zero=Value(0, IntegerField()),
+            )
+            .values_list("zero", "num")
+        )
+        self.assertCountEqual(qs1.union(qs2), [(1, 0), (0, 2)])
+
     def test_union_with_extra_and_values_list(self):
         qs1 = (
             Number.objects.filter(num=1)
@@ -426,6 +458,27 @@ class QuerySetSetOperationTests(TestCase):
             .values_list("order", flat=True),
             [8, 1],
         )
+
+    @skipUnlessDBFeature("supports_select_intersection")
+    def test_intersection_in_nested_subquery(self):
+        tag = Tag.objects.create(name="tag")
+        note = Note.objects.create(tag=tag)
+        annotation = Annotation.objects.create(tag=tag)
+        tags = Tag.objects.order_by()
+        tags = tags.filter(id=OuterRef("tag_id")).intersection(
+            tags.filter(id=OuterRef(OuterRef("tag_id")))
+        )
+        qs = Note.objects.filter(
+            Exists(
+                Annotation.objects.filter(
+                    Exists(tags),
+                    notes__in=OuterRef("pk"),
+                )
+            )
+        )
+        self.assertIsNone(qs.first())
+        annotation.notes.add(note)
+        self.assertEqual(qs.first(), note)
 
     def test_union_in_subquery_related_outerref(self):
         e1 = ExtraInfo.objects.create(value=7, info="e3")

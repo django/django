@@ -224,6 +224,9 @@ class MigrationExecutor:
         # remaining applied migrations.
         last_unapplied_migration = plan[-1][0]
         state = states[last_unapplied_migration]
+        # Avoid mutating state with apps rendered as it's an expensive
+        # operation.
+        del state.apps
         for index, (migration, _) in enumerate(full_plan):
             if migration == last_unapplied_migration:
                 for migration, _ in full_plan[index:]:

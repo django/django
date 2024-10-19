@@ -4,7 +4,7 @@ from django.db import connections
 from django.test import TestCase, TransactionTestCase, override_settings
 from django.test.testcases import DatabaseOperationForbidden
 
-from .models import Car
+from .models import Car, Person
 
 
 class TestSerializedRollbackInhibitsPostMigrate(TransactionTestCase):
@@ -68,3 +68,16 @@ class DisallowedDatabaseQueriesTests(TransactionTestCase):
         )
         with self.assertRaisesMessage(DatabaseOperationForbidden, message):
             Car.objects.using("other").get()
+
+
+class FixtureAvailableInSetUpClassTest(TransactionTestCase):
+    available_apps = ["test_utils"]
+    fixtures = ["person.json"]
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.elvis = Person.objects.get(name="Elvis Presley")
+
+    def test_fixture_loaded_during_class_setup(self):
+        self.assertIsInstance(self.elvis, Person)

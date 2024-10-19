@@ -27,7 +27,7 @@ urlpatterns = [
     ),
     path(
         "template/cached/<foo>/",
-        cache_page(2.0)(TemplateView.as_view(template_name="generic_views/about.html")),
+        cache_page(2)(TemplateView.as_view(template_name="generic_views/about.html")),
     ),
     path(
         "template/extra_context/",

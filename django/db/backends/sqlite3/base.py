@@ -40,6 +40,12 @@ def adapt_datetime(val):
     return val.isoformat(" ")
 
 
+def _get_varchar_column(data):
+    if data["max_length"] is None:
+        return "varchar"
+    return "varchar(%(max_length)s)" % data
+
+
 Database.register_converter("bool", b"1".__eq__)
 Database.register_converter("date", decoder(parse_date))
 Database.register_converter("time", decoder(parse_time))
@@ -62,7 +68,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         "BigAutoField": "integer",
         "BinaryField": "BLOB",
         "BooleanField": "bool",
-        "CharField": "varchar(%(max_length)s)",
+        "CharField": _get_varchar_column,
         "DateField": "date",
         "DateTimeField": "datetime",
         "DecimalField": "decimal",
@@ -187,6 +193,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 f"{allowed_transaction_modes}, or None."
             )
         self.transaction_mode = transaction_mode.upper() if transaction_mode else None
+
+        init_command = kwargs.pop("init_command", "")
+        self.init_commands = init_command.split(";")
         return kwargs
 
     def get_database_version(self):
@@ -201,6 +210,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         # The macOS bundled SQLite defaults legacy_alter_table ON, which
         # prevents atomic table renames.
         conn.execute("PRAGMA legacy_alter_table = OFF")
+        for init_command in self.init_commands:
+            if init_command := init_command.strip():
+                conn.execute(init_command)
         return conn
 
     def create_cursor(self, name=None):

@@ -480,7 +480,7 @@ LANG_INFO = {
         "bidi": False,
         "code": "sk",
         "name": "Slovak",
-        "name_local": "Slovensky",
+        "name_local": "slovensky",
     },
     "sl": {
         "bidi": False,

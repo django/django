@@ -410,6 +410,13 @@ class TestFormField(PostgreSQLSimpleTestCase):
         form_w_hstore = HStoreFormTest({"f1": '{"a": 2}'}, initial={"f1": {"a": 1}})
         self.assertTrue(form_w_hstore.has_changed())
 
+    def test_prepare_value(self):
+        field = forms.HStoreField()
+        self.assertEqual(
+            field.prepare_value({"aira_maplayer": "Αρδευτικό δίκτυο"}),
+            '{"aira_maplayer": "Αρδευτικό δίκτυο"}',
+        )
+
 
 class TestValidator(PostgreSQLSimpleTestCase):
     def test_simple_valid(self):

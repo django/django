@@ -154,7 +154,7 @@ Uploading multiple files
     should be updated after any changes in the following snippets.
 
 If you want to upload multiple files using one form field, create a subclass
-of the field's widget and set the ``allow_multiple_selected`` attribute on it
+of the field's widget and set its ``allow_multiple_selected`` class attribute
 to ``True``.
 
 In order for such files to be all validated by your form (and have the value of
@@ -186,14 +186,14 @@ below for an example.
             if isinstance(data, (list, tuple)):
                 result = [single_file_clean(d, initial) for d in data]
             else:
-                result = single_file_clean(data, initial)
+                result = [single_file_clean(data, initial)]
             return result
 
 
     class FileFieldForm(forms.Form):
         file_field = MultipleFileField()
 
-Then override the ``post`` method of your
+Then override the ``form_valid()`` method of your
 :class:`~django.views.generic.edit.FormView` subclass to handle multiple file
 uploads:
 
@@ -209,19 +209,11 @@ uploads:
         template_name = "upload.html"  # Replace with your template.
         success_url = "..."  # Replace with your URL or reverse().
 
-        def post(self, request, *args, **kwargs):
-            form_class = self.get_form_class()
-            form = self.get_form(form_class)
-            if form.is_valid():
-                return self.form_valid(form)
-            else:
-                return self.form_invalid(form)
-
         def form_valid(self, form):
             files = form.cleaned_data["file_field"]
             for f in files:
                 ...  # Do something with each file.
-            return super().form_valid()
+            return super().form_valid(form)
 
 .. warning::
 

@@ -1,4 +1,3 @@
-from django.db import NotSupportedError
 from django.db.models import Func, Index
 from django.utils.functional import cached_property
 
@@ -234,16 +233,10 @@ class SpGistIndex(PostgresIndex):
             with_params.append("fillfactor = %d" % self.fillfactor)
         return with_params
 
-    def check_supported(self, schema_editor):
-        if (
-            self.include
-            and not schema_editor.connection.features.supports_covering_spgist_indexes
-        ):
-            raise NotSupportedError("Covering SP-GiST indexes require PostgreSQL 14+.")
-
 
 class OpClass(Func):
     template = "%(expressions)s %(name)s"
+    constraint_validation_compatible = False
 
     def __init__(self, expression, name):
         super().__init__(expression, name=name)

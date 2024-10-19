@@ -1,6 +1,7 @@
 import difflib
 import json
 import logging
+import pickle
 import posixpath
 import sys
 import threading
@@ -20,7 +21,7 @@ from urllib.parse import (
     urljoin,
     urlparse,
     urlsplit,
-    urlunparse,
+    urlunsplit,
 )
 from urllib.request import url2pathname
 
@@ -66,6 +67,9 @@ __all__ = (
     "skipUnlessDBFeature",
 )
 
+# Make unittest ignore frames in this module when reporting failures.
+__unittest = True
+
 
 if not PY311:
     # Backport of unittest.case._enter_context() from Python 3.11.
@@ -90,6 +94,18 @@ def to_list(value):
     if not isinstance(value, list):
         value = [value]
     return value
+
+
+def is_pickable(obj):
+    """
+    Returns true if the object can be dumped and loaded through the pickle
+    module.
+    """
+    try:
+        pickle.loads(pickle.dumps(obj))
+    except (AttributeError, TypeError, pickle.PickleError):
+        return False
+    return True
 
 
 def assert_and_parse_html(self, html, user_msg, msg):
@@ -192,6 +208,7 @@ class SimpleTestCase(unittest.TestCase):
     async_client_class = AsyncClient
     _overridden_settings = None
     _modified_settings = None
+    _pre_setup_ran_eagerly = False
 
     databases = set()
     _disallowed_database_msg = (
@@ -280,6 +297,8 @@ class SimpleTestCase(unittest.TestCase):
                 self.connection is None
                 and self.alias not in cls.databases
                 and self.alias != NO_DB_ALIAS
+                # Dynamically created connections are always allowed.
+                and self.alias in connections
             ):
                 # Connection has not yet been established, but the alias is not allowed.
                 message = cls._disallowed_database_msg % {
@@ -300,6 +319,23 @@ class SimpleTestCase(unittest.TestCase):
         include a call to super().setUp().
         """
         self._setup_and_call(result)
+
+    def __getstate__(self):
+        """
+        Make SimpleTestCase picklable for parallel tests using subtests.
+        """
+        state = super().__dict__
+        # _outcome and _subtest cannot be tested on picklability, since they
+        # contain the TestCase itself, leading to an infinite recursion.
+        if state["_outcome"]:
+            pickable_state = {"_outcome": None, "_subtest": None}
+            for key, value in state.items():
+                if key in pickable_state or not is_pickable(value):
+                    continue
+                pickable_state[key] = value
+            return pickable_state
+
+        return state
 
     def debug(self):
         """Perform the same as __call__(), without catching the exception."""
@@ -325,7 +361,10 @@ class SimpleTestCase(unittest.TestCase):
 
         if not skipped:
             try:
-                self._pre_setup()
+                if self.__class__._pre_setup_ran_eagerly:
+                    self.__class__._pre_setup_ran_eagerly = False
+                else:
+                    self._pre_setup()
             except Exception:
                 if debug:
                     raise
@@ -344,14 +383,15 @@ class SimpleTestCase(unittest.TestCase):
                 result.addError(self, sys.exc_info())
                 return
 
-    def _pre_setup(self):
+    @classmethod
+    def _pre_setup(cls):
         """
         Perform pre-test setup:
         * Create a test client.
         * Clear the mail test outbox.
         """
-        self.client = self.client_class()
-        self.async_client = self.async_client_class()
+        cls.client = cls.client_class()
+        cls.async_client = cls.async_client_class()
         mail.outbox = []
 
     def _post_teardown(self):
@@ -373,8 +413,8 @@ class SimpleTestCase(unittest.TestCase):
 
     def modify_settings(self, **kwargs):
         """
-        A context manager that temporarily applies changes a list setting and
-        reverts back to the original value when exiting the context.
+        A context manager that temporarily applies changes to a list setting
+        and reverts back to the original value when exiting the context.
         """
         return modify_settings(**kwargs)
 
@@ -509,11 +549,9 @@ class SimpleTestCase(unittest.TestCase):
         def normalize(url):
             """Sort the URL's query string parameters."""
             url = str(url)  # Coerce reverse_lazy() URLs.
-            scheme, netloc, path, params, query, fragment = urlparse(url)
+            scheme, netloc, path, query, fragment = urlsplit(url)
             query_parts = sorted(parse_qsl(query))
-            return urlunparse(
-                (scheme, netloc, path, params, urlencode(query_parts), fragment)
-            )
+            return urlunsplit((scheme, netloc, path, urlencode(query_parts), fragment))
 
         if msg_prefix:
             msg_prefix += ": "
@@ -1056,6 +1094,7 @@ class TransactionTestCase(SimpleTestCase):
 
     # Subclasses can enable only a subset of apps for faster tests
     available_apps = None
+    _available_apps_calls_balanced = 0
 
     # Subclasses can define fixtures which will be automatically installed.
     fixtures = None
@@ -1073,7 +1112,22 @@ class TransactionTestCase(SimpleTestCase):
     # This can be slow; this flag allows enabling on a per-case basis.
     serialized_rollback = False
 
-    def _pre_setup(self):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        if not issubclass(cls, TestCase):
+            cls._pre_setup()
+            cls._pre_setup_ran_eagerly = True
+
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        if not issubclass(cls, TestCase) and cls._available_apps_calls_balanced > 0:
+            apps.unset_available_apps()
+            cls._available_apps_calls_balanced -= 1
+
+    @classmethod
+    def _pre_setup(cls):
         """
         Perform pre-test setup:
         * If the class has an 'available_apps' attribute, restrict the app
@@ -1082,20 +1136,21 @@ class TransactionTestCase(SimpleTestCase):
         * If the class has a 'fixtures' attribute, install those fixtures.
         """
         super()._pre_setup()
-        if self.available_apps is not None:
-            apps.set_available_apps(self.available_apps)
+        if cls.available_apps is not None:
+            apps.set_available_apps(cls.available_apps)
+            cls._available_apps_calls_balanced += 1
             setting_changed.send(
                 sender=settings._wrapped.__class__,
                 setting="INSTALLED_APPS",
-                value=self.available_apps,
+                value=cls.available_apps,
                 enter=True,
             )
-            for db_name in self._databases_names(include_mirrors=False):
+            for db_name in cls._databases_names(include_mirrors=False):
                 emit_post_migrate_signal(verbosity=0, interactive=False, db=db_name)
         try:
-            self._fixture_setup()
+            cls._fixture_setup()
         except Exception:
-            if self.available_apps is not None:
+            if cls.available_apps is not None:
                 apps.unset_available_apps()
                 setting_changed.send(
                     sender=settings._wrapped.__class__,
@@ -1107,7 +1162,7 @@ class TransactionTestCase(SimpleTestCase):
         # Clear the queries_log so that it's less likely to overflow (a single
         # test probably won't execute 9K queries). If queries_log overflows,
         # then assertNumQueries() doesn't work.
-        for db_name in self._databases_names(include_mirrors=False):
+        for db_name in cls._databases_names(include_mirrors=False):
             connections[db_name].queries_log.clear()
 
     @classmethod
@@ -1123,7 +1178,8 @@ class TransactionTestCase(SimpleTestCase):
             )
         ]
 
-    def _reset_sequences(self, db_name):
+    @staticmethod
+    def _reset_sequences(db_name):
         conn = connections[db_name]
         if conn.features.supports_sequence_reset:
             sql_list = conn.ops.sequence_reset_by_name_sql(
@@ -1135,26 +1191,27 @@ class TransactionTestCase(SimpleTestCase):
                         for sql in sql_list:
                             cursor.execute(sql)
 
-    def _fixture_setup(self):
-        for db_name in self._databases_names(include_mirrors=False):
+    @classmethod
+    def _fixture_setup(cls):
+        for db_name in cls._databases_names(include_mirrors=False):
             # Reset sequences
-            if self.reset_sequences:
-                self._reset_sequences(db_name)
+            if cls.reset_sequences:
+                cls._reset_sequences(db_name)
 
             # Provide replica initial data from migrated apps, if needed.
-            if self.serialized_rollback and hasattr(
+            if cls.serialized_rollback and hasattr(
                 connections[db_name], "_test_serialized_contents"
             ):
-                if self.available_apps is not None:
+                if cls.available_apps is not None:
                     apps.unset_available_apps()
                 connections[db_name].creation.deserialize_db_from_string(
                     connections[db_name]._test_serialized_contents
                 )
-                if self.available_apps is not None:
-                    apps.set_available_apps(self.available_apps)
+                if cls.available_apps is not None:
+                    apps.set_available_apps(cls.available_apps)
 
-            if self.fixtures:
-                call_command("loaddata", *self.fixtures, verbosity=0, database=db_name)
+            if cls.fixtures:
+                call_command("loaddata", *cls.fixtures, verbosity=0, database=db_name)
 
     def _should_reload_connections(self):
         return True
@@ -1179,8 +1236,9 @@ class TransactionTestCase(SimpleTestCase):
                 for conn in connections.all(initialized_only=True):
                     conn.close()
         finally:
-            if self.available_apps is not None:
+            if self.__class__.available_apps is not None:
                 apps.unset_available_apps()
+                self.__class__._available_apps_calls_balanced -= 1
                 setting_changed.send(
                     sender=settings._wrapped.__class__,
                     setting="INSTALLED_APPS",
@@ -1249,6 +1307,18 @@ def connections_support_transactions(aliases=None):
         else (connections[alias] for alias in aliases)
     )
     return all(conn.features.supports_transactions for conn in conns)
+
+
+def connections_support_savepoints(aliases=None):
+    """
+    Return whether or not all (or specified) connections support savepoints.
+    """
+    conns = (
+        connections.all()
+        if aliases is None
+        else (connections[alias] for alias in aliases)
+    )
+    return all(conn.features.uses_savepoints for conn in conns)
 
 
 class TestData:
@@ -1326,9 +1396,16 @@ class TestCase(TransactionTestCase):
         return connections_support_transactions(cls.databases)
 
     @classmethod
+    def _databases_support_savepoints(cls):
+        return connections_support_savepoints(cls.databases)
+
+    @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        if not cls._databases_support_transactions():
+        if not (
+            cls._databases_support_transactions()
+            and cls._databases_support_savepoints()
+        ):
             return
         cls.cls_atomics = cls._enter_atomics()
 
@@ -1356,7 +1433,10 @@ class TestCase(TransactionTestCase):
 
     @classmethod
     def tearDownClass(cls):
-        if cls._databases_support_transactions():
+        if (
+            cls._databases_support_transactions()
+            and cls._databases_support_savepoints()
+        ):
             cls._rollback_atomics(cls.cls_atomics)
             for conn in connections.all(initialized_only=True):
                 conn.close()
@@ -1372,16 +1452,26 @@ class TestCase(TransactionTestCase):
             return False
         return super()._should_reload_connections()
 
-    def _fixture_setup(self):
-        if not self._databases_support_transactions():
+    @classmethod
+    def _fixture_setup(cls):
+        if not cls._databases_support_transactions():
             # If the backend does not support transactions, we should reload
             # class data before each test
-            self.setUpTestData()
+            cls.setUpTestData()
             return super()._fixture_setup()
 
-        if self.reset_sequences:
+        if cls.reset_sequences:
             raise TypeError("reset_sequences cannot be used on TestCase instances")
-        self.atomics = self._enter_atomics()
+        cls.atomics = cls._enter_atomics()
+        if not cls._databases_support_savepoints():
+            if cls.fixtures:
+                for db_name in cls._databases_names(include_mirrors=False):
+                    call_command(
+                        "loaddata",
+                        *cls.fixtures,
+                        **{"verbosity": 0, "database": db_name},
+                    )
+            cls.setUpTestData()
 
     def _fixture_teardown(self):
         if not self._databases_support_transactions():
@@ -1574,11 +1664,11 @@ class FSFilesHandler(WSGIHandler):
         * the host is provided as part of the base_url
         * the request's path isn't under the media path (or equal)
         """
-        return path.startswith(self.base_url[2]) and not self.base_url[1]
+        return path.startswith(self.base_url.path) and not self.base_url.netloc
 
     def file_path(self, url):
         """Return the relative path to the file on disk for the given URL."""
-        relative_url = url.removeprefix(self.base_url[2])
+        relative_url = url.removeprefix(self.base_url.path)
         return url2pathname(relative_url)
 
     def get_response(self, request):

@@ -259,6 +259,7 @@ class FormsModelTestCase(TestCase):
             m.file.name,
             "tests/\u6211\u96bb\u6c23\u588a\u8239\u88dd\u6eff\u6652\u9c54.txt",
         )
+        m.file.delete()
         m.delete()
 
     def test_boundary_conditions(self):

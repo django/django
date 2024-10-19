@@ -9,7 +9,7 @@ YEAR_MONTH_FORMAT = "F Y"
 MONTH_DAY_FORMAT = "j F"
 SHORT_DATE_FORMAT = "Y-m-d"
 SHORT_DATETIME_FORMAT = "Y-m-d H\xa0h\xa0i"
-FIRST_DAY_OF_WEEK = 1  # Lundi
+FIRST_DAY_OF_WEEK = 0  # Dimanche
 
 # The *_INPUT_FORMATS strings use the Python strftime format syntax,
 # see https://docs.python.org/library/datetime.html#strftime-strptime-behavior

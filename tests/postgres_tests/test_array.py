@@ -466,8 +466,8 @@ class TestQuerying(PostgreSQLTestCase):
                 ],
             )
         sql = ctx[0]["sql"]
-        self.assertIn("GROUP BY 2", sql)
-        self.assertIn("ORDER BY 2", sql)
+        self.assertIn("GROUP BY 1", sql)
+        self.assertIn("ORDER BY 1", sql)
 
     def test_order_by_arrayagg_index(self):
         qs = (
@@ -1336,6 +1336,22 @@ class TestSplitFormField(PostgreSQLSimpleTestCase):
                 "characters (it has 3).",
                 "Item 3 in the array did not validate: Ensure this value has at most 2 "
                 "characters (it has 4).",
+            ],
+        )
+
+    def test_invalid_char_length_with_remove_trailing_nulls(self):
+        field = SplitArrayField(
+            forms.CharField(max_length=2, required=False),
+            size=3,
+            remove_trailing_nulls=True,
+        )
+        with self.assertRaises(exceptions.ValidationError) as cm:
+            field.clean(["abc", "", ""])
+        self.assertEqual(
+            cm.exception.messages,
+            [
+                "Item 1 in the array did not validate: Ensure this value has at most 2 "
+                "characters (it has 3).",
             ],
         )
 

@@ -2,16 +2,16 @@
 #
 # Translators:
 # Besnik Bleta <besnik@programeshqip.org>, 2011-2014
-# Besnik Bleta <besnik@programeshqip.org>, 2020-2023
+# Besnik Bleta <besnik@programeshqip.org>, 2020-2024
 # Besnik Bleta <besnik@programeshqip.org>, 2015-2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 06:49+0000\n"
-"Last-Translator: Besnik Bleta <besnik@programeshqip.org>, 2020-2023\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 06:49+0000\n"
+"Last-Translator: Besnik Bleta <besnik@programeshqip.org>, 2020-2024\n"
 "Language-Team: Albanian (http://app.transifex.com/django/django/language/"
 "sq/)\n"
 "MIME-Version: 1.0\n"
@@ -346,6 +346,9 @@ msgstr "Ajo faqe s’përmban përfundime"
 msgid "Enter a valid value."
 msgstr "Jepni një vlerë të vlefshme."
 
+msgid "Enter a valid domain name."
+msgstr "Jepni një emër të vlefshëm përkatësie."
+
 msgid "Enter a valid URL."
 msgstr "Jepni një URL të vlefshme."
 
@@ -369,14 +372,18 @@ msgstr ""
 "Jepni një “slug” të vlefshëm, të përbërë nga shkronja, numra, nënvija ose "
 "vija ndarëse Unikod."
 
-msgid "Enter a valid IPv4 address."
-msgstr "Jepni një adresë IPv4 të vlefshme."
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr "Jepni një adresë %(protocol)s të vlefshme."
 
-msgid "Enter a valid IPv6 address."
-msgstr "Jepni një adresë IPv6 të vlefshme."
+msgid "IPv4"
+msgstr "IPv4"
 
-msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "Jepni një adresë IPv4 ose IPv6 të vlefshme."
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "IPv4 or IPv6"
+msgstr "IPv4, ose IPv6"
 
 msgid "Enter only digits separated by commas."
 msgstr "Jepni vetëm shifra të ndara nga presje."

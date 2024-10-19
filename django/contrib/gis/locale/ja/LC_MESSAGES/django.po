@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Akio Ogasahara <libratechwriter@gmail.com>, 2024
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Shinya Okano <tokibito@gmail.com>, 2012,2014-2015
 # Takuya N <takninnovationresearch@gmail.com>, 2020
@@ -9,8 +10,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 18:45+0000\n"
-"Last-Translator: Takuya N <takninnovationresearch@gmail.com>, 2020\n"
+"PO-Revision-Date: 2024-08-07 18:45+0000\n"
+"Last-Translator: Akio Ogasahara <libratechwriter@gmail.com>, 2024\n"
 "Language-Team: Japanese (http://app.transifex.com/django/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
@@ -48,7 +49,7 @@ msgid "Multi polygon"
 msgstr "複数のポリゴン"
 
 msgid "Geometry collection"
-msgstr "地形の集合"
+msgstr "ジオメトリのコレクション"
 
 msgid "Extent Aggregate Field"
 msgstr "広さ集計フィールド"

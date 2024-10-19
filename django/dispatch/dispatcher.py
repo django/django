@@ -244,7 +244,9 @@ class Signal:
                 return responses
 
         else:
-            sync_send = list
+
+            async def sync_send():
+                return []
 
         responses, async_responses = await asyncio.gather(
             sync_send(),
@@ -380,7 +382,9 @@ class Signal:
                 return responses
 
         else:
-            sync_send = list
+
+            async def sync_send():
+                return []
 
         async def asend_and_wrap_exception(receiver):
             try:

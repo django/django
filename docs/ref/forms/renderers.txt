@@ -61,8 +61,6 @@ should return a rendered templates (as a string) or raise
 
     .. attribute:: field_template_name
 
-        .. versionadded:: 5.0
-
         The default name of the template used to render a ``BoundField``.
 
         Defaults to ``"django/forms/field.html"``
@@ -173,8 +171,6 @@ forms receive a dictionary with the following values:
 Context available in field templates
 ====================================
 
-.. versionadded:: 5.0
-
 Field templates receive a context from :meth:`.BoundField.get_context`. By
 default, fields receive a dictionary with the following values:
 
@@ -223,8 +219,6 @@ renderer. Then overriding form templates works :doc:`the same as
 
 Overriding built-in field templates
 ===================================
-
-.. versionadded:: 5.0
 
 :attr:`.Field.template_name`
 

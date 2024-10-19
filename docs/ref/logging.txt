@@ -209,6 +209,18 @@ Django development server. This logger generates an ``INFO`` message upon
 detecting a modification in a source code file and may produce ``WARNING``
 messages during filesystem inspection and event subscription processes.
 
+.. _django-contrib-auth-logger:
+
+``django.contrib.auth``
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 4.2.16
+
+Log messages related to :doc:`contrib/auth`, particularly ``ERROR`` messages
+are generated when a :class:`~django.contrib.auth.forms.PasswordResetForm` is
+successfully submitted but the password reset email cannot be delivered due to
+a mail sending exception.
+
 .. _django-contrib-gis-logger:
 
 ``django.contrib.gis``
@@ -285,6 +297,17 @@ queries executed by :class:`~django.db.migrations.operations.RunPython`.
 Messages to this logger have ``params`` and ``sql`` in their extra context (but
 unlike ``django.db.backends``, not duration). The values have the same meaning
 as explained in :ref:`django-db-logger`.
+
+.. _django-contrib-sessions-logger:
+
+``django.contrib.sessions``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Log messages related to the :doc:`session framework</topics/http/sessions>`.
+
+* Non-fatal errors occurring when using the
+  :class:`django.contrib.sessions.backends.cached_db.SessionStore` engine are
+  logged as ``ERROR`` messages with the corresponding traceback.
 
 Handlers
 --------

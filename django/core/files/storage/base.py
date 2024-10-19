@@ -34,11 +34,26 @@ class Storage:
         if not hasattr(content, "chunks"):
             content = File(content, name)
 
+        # Ensure that the name is valid, before and after having the storage
+        # system potentially modifying the name. This duplicates the check made
+        # inside `get_available_name` but it's necessary for those cases where
+        # `get_available_name` is overriden and validation is lost.
+        validate_file_name(name, allow_relative_path=True)
+
+        # Potentially find a different name depending on storage constraints.
         name = self.get_available_name(name, max_length=max_length)
+        # Validate the (potentially) new name.
+        validate_file_name(name, allow_relative_path=True)
+
+        # The save operation should return the actual name of the file saved.
         name = self._save(name, content)
         # Ensure that the name returned from the storage system is still valid.
         validate_file_name(name, allow_relative_path=True)
         return name
+
+    def is_name_available(self, name, max_length=None):
+        exceeds_max_length = max_length and len(name) > max_length
+        return not self.exists(name) and not exceeds_max_length
 
     # These methods are part of the public API, with default implementations.
 
@@ -69,12 +84,13 @@ class Storage:
                 "Detected path traversal attempt in '%s'" % dir_name
             )
         validate_file_name(file_name)
-        file_root, file_ext = os.path.splitext(file_name)
-        # If the filename already exists, generate an alternative filename
-        # until it doesn't exist.
+        file_ext = "".join(pathlib.PurePath(file_name).suffixes)
+        file_root = file_name.removesuffix(file_ext)
+        # If the filename is not available, generate an alternative
+        # filename until one is available.
         # Truncate original name if required, so the new filename does not
         # exceed the max_length.
-        while self.exists(name) or (max_length and len(name) > max_length):
+        while not self.is_name_available(name, max_length=max_length):
             # file_ext includes the dot.
             name = os.path.join(
                 dir_name, self.get_alternative_name(file_root, file_ext)

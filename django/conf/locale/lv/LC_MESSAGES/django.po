@@ -2,7 +2,7 @@
 #
 # Translators:
 # edgars <edgars.jekabsons@gmail.com>, 2011
-# Edgars Voroboks <edgars.voroboks@gmail.com>, 2023
+# Edgars Voroboks <edgars.voroboks@gmail.com>, 2023-2024
 # Edgars Voroboks <edgars.voroboks@gmail.com>, 2017,2022
 # Edgars Voroboks <edgars.voroboks@gmail.com>, 2017-2018
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -17,9 +17,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 06:49+0000\n"
-"Last-Translator: Edgars Voroboks <edgars.voroboks@gmail.com>, 2023\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 06:49+0000\n"
+"Last-Translator: Edgars Voroboks <edgars.voroboks@gmail.com>, 2023-2024\n"
 "Language-Team: Latvian (http://app.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
@@ -355,6 +355,9 @@ msgstr "Lapa nesatur rezultātu"
 msgid "Enter a valid value."
 msgstr "Ievadiet korektu vērtību."
 
+msgid "Enter a valid domain name."
+msgstr "Ievadiet derīgu domēna vārdu."
+
 msgid "Enter a valid URL."
 msgstr "Ievadiet korektu URL adresi."
 
@@ -378,14 +381,18 @@ msgstr ""
 "Ievadiet korektu \"identifikatora\" vērtību, kas satur tikai Unikoda burtus, "
 "ciparus, apakšsvītras vai defises."
 
-msgid "Enter a valid IPv4 address."
-msgstr "Ievadiet korektu IPv4 adresi."
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr "Ievadiet derīgu %(protocol)s adresi."
 
-msgid "Enter a valid IPv6 address."
-msgstr "Ievadiet korektu IPv6 adresi"
+msgid "IPv4"
+msgstr "IPv4"
 
-msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "Ievadiet korektu IPv4 vai IPv6 adresi"
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "IPv4 or IPv6"
+msgstr "IPv4 vai IPv6"
 
 msgid "Enter only digits separated by commas."
 msgstr "Ievadiet tikai numurus, atdalītus ar komatiem."

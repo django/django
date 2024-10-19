@@ -1,0 +1,22 @@
+===========================
+Django 3.2.25 release notes
+===========================
+
+*March 4, 2024*
+
+Django 3.2.25 fixes a security issue with severity "moderate" and a regression
+in 3.2.24.
+
+CVE-2024-27351: Potential regular expression denial-of-service in ``django.utils.text.Truncator.words()``
+=========================================================================================================
+
+``django.utils.text.Truncator.words()`` method (with ``html=True``) and
+:tfilter:`truncatewords_html` template filter were subject to a potential
+regular expression denial-of-service attack using a suitably crafted string
+(follow up to :cve:`2019-14232` and :cve:`2023-43665`).
+
+Bugfixes
+========
+
+* Fixed a regression in Django 3.2.24 where ``intcomma`` template filter could
+  return a leading comma for string representation of floats (:ticket:`35172`).

@@ -140,7 +140,7 @@ class SimpleListFilter(FacetsMixin, ListFilter):
             if lookup_qs is not None:
                 counts[f"{i}__c"] = models.Count(
                     pk_attname,
-                    filter=lookup_qs.query.where,
+                    filter=models.Q(pk__in=lookup_qs),
                 )
         self.used_parameters[self.parameter_name] = original_value
         return counts

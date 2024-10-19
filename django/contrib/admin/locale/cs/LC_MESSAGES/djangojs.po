@@ -2,7 +2,9 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
-# trendspotter <jirka.p@volny.cz>, 2022
+# Jan Papež <honyczek@centrum.cz>, 2024
+# Jiří Podhorecký <jirka.p@volny.cz>, 2024
+# Jiří Podhorecký <jirka.p@volny.cz>, 2022
 # Jirka Vejrazka <Jirka.Vejrazka@gmail.com>, 2011
 # Vláďa Macek <macek@sandbox.cz>, 2012,2014
 # Vláďa Macek <macek@sandbox.cz>, 2015-2016,2020-2021
@@ -10,10 +12,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:26-0500\n"
-"PO-Revision-Date: 2022-07-25 07:59+0000\n"
-"Last-Translator: trendspotter <jirka.p@volny.cz>\n"
-"Language-Team: Czech (http://www.transifex.com/django/django/language/cs/)\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-10-07 07:59+0000\n"
+"Last-Translator: Jan Papež <honyczek@centrum.cz>, 2024\n"
+"Language-Team: Czech (http://app.transifex.com/django/django/language/cs/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -67,12 +69,24 @@ msgstr ""
 "Seznam vybraných položek %s. Jednotlivě je lze odebrat tak, že na ně v "
 "rámečku klepnete a pak klepnete na šipku \"Odebrat mezi rámečky."
 
+#, javascript-format
+msgid "Type into this box to filter down the list of selected %s."
+msgstr "Zadáním do tohoto pole vyfiltrujete seznam vybraných %s."
+
 msgid "Remove all"
 msgstr "Odebrat vše"
 
 #, javascript-format
 msgid "Click to remove all chosen %s at once."
 msgstr "Chcete-li najednou odebrat všechny vybrané položky %s, klepněte sem."
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] "%s vybraná volba není viditelná"
+msgstr[1] "%s vybrané volby nejsou viditelné"
+msgstr[2] "%s vybrané volby nejsou viditelné"
+msgstr[3] "%s vybrané volby nejsou viditelné"
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -240,6 +254,55 @@ msgctxt "abbrev. month December"
 msgid "Dec"
 msgstr "Pro"
 
+msgid "Sunday"
+msgstr "Neděle"
+
+msgid "Monday"
+msgstr "Pondělí"
+
+msgid "Tuesday"
+msgstr "Úterý"
+
+msgid "Wednesday"
+msgstr "Středa"
+
+msgid "Thursday"
+msgstr "Čtvrtek"
+
+msgid "Friday"
+msgstr "Pátek"
+
+msgid "Saturday"
+msgstr "Sobota"
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr "Ned"
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr "Pon"
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr "Úte"
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr "Stř"
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr "Čtv"
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr "Pát"
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr "Sob"
+
 msgctxt "one letter Sunday"
 msgid "S"
 msgstr "N"
@@ -267,14 +330,3 @@ msgstr "P"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "S"
-
-msgid ""
-"You have already submitted this form. Are you sure you want to submit it "
-"again?"
-msgstr "Tento formulář jste již odeslali. Opravdu jej chcete odeslat znovu?"
-
-msgid "Show"
-msgstr "Zobrazit"
-
-msgid "Hide"
-msgstr "Skrýt"

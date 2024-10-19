@@ -24,7 +24,7 @@ class FunctionTests(SimpleTestCase):
             truncatewords_html(
                 '<p>one <a href="#">two - three <br>four</a> five</p>', 4
             ),
-            '<p>one <a href="#">two - three …</a></p>',
+            '<p>one <a href="#">two - three <br> …</a></p>',
         )
 
     def test_truncate3(self):
@@ -32,7 +32,7 @@ class FunctionTests(SimpleTestCase):
             truncatewords_html(
                 '<p>one <a href="#">two - three <br>four</a> five</p>', 5
             ),
-            '<p>one <a href="#">two - three <br>four …</a></p>',
+            '<p>one <a href="#">two - three <br>four</a> …</p>',
         )
 
     def test_truncate4(self):
@@ -53,7 +53,7 @@ class FunctionTests(SimpleTestCase):
             truncatewords_html(
                 "<i>Buenos d&iacute;as! &#x00bf;C&oacute;mo est&aacute;?</i>", 3
             ),
-            "<i>Buenos d&iacute;as! &#x00bf;C&oacute;mo …</i>",
+            "<i>Buenos días! ¿Cómo …</i>",
         )
 
     def test_invalid_arg(self):

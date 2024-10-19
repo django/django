@@ -2,7 +2,7 @@
 #
 # Translators:
 # edgars <edgars.jekabsons@gmail.com>, 2011
-# Edgars Voroboks <edgars.voroboks@gmail.com>, 2023
+# Edgars Voroboks <edgars.voroboks@gmail.com>, 2023-2024
 # Edgars Voroboks <edgars.voroboks@gmail.com>, 2017,2022
 # Edgars Voroboks <edgars.voroboks@gmail.com>, 2018
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -14,9 +14,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 07:05+0000\n"
-"Last-Translator: Edgars Voroboks <edgars.voroboks@gmail.com>, 2023\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 07:05+0000\n"
+"Last-Translator: Edgars Voroboks <edgars.voroboks@gmail.com>, 2023-2024\n"
 "Language-Team: Latvian (http://app.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
@@ -208,10 +208,6 @@ msgid ""
 msgstr "{name} “{obj}” tika veiksmīgi mainīts. Zemāk varat to labot vēlreiz."
 
 #, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr "{name} “{obj}” veiksmīgi pievienots. Zemāk to varat atkal labot."
-
-#, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
@@ -378,6 +374,9 @@ msgstr "Ievadi lietotājvārdu un paroli."
 msgid "Change password"
 msgstr "Paroles maiņa"
 
+msgid "Set password"
+msgstr "Iestatīt paroli"
+
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Lūdzu, izlabojiet zemāk norādītās kļūdas."
@@ -387,6 +386,19 @@ msgstr[2] "Lūdzu, izlabojiet zemāk norādītās kļūdas."
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Ievadiet jaunu paroli lietotājam <strong>%(username)s</strong>."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+"Šī darbība šim lietotājam <strong>iespējos</strong> paroles bāzētu "
+"autentifikāciju."
+
+msgid "Disable password-based authentication"
+msgstr "Atspējot paroles bāzētu autentifikāciju"
+
+msgid "Enable password-based authentication"
+msgstr "Iespējot paroles bāzētu autentifikāciju"
 
 msgid "Skip to main content"
 msgstr "Pāriet uz galveno saturu"
