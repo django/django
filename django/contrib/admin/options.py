@@ -1,14 +1,13 @@
 import copy
 import enum
 import json
+import operator
 import re
 import warnings
-import operator
-from functools import partial, update_wrapper, reduce
+from functools import partial, reduce, update_wrapper
 from urllib.parse import parse_qsl
 from urllib.parse import quote as urlquote
 from urllib.parse import urlsplit
-
 
 from django import forms
 from django.conf import settings
@@ -1175,6 +1174,7 @@ class ModelAdmin(BaseModelAdmin):
         Return a tuple containing a queryset to implement the search
         and a boolean indicating if the results may contain duplicates.
         """
+
         # Apply keyword searches.
         def construct_search(field_name):
             if field_name.startswith("^"):
@@ -1215,22 +1215,24 @@ class ModelAdmin(BaseModelAdmin):
             for bit in smart_split(search_term):
                 if bit.startswith(('"', "'")) and bit[0] == bit[-1]:
                     bit = unescape_string_literal(bit)
-                
+
                 field_queries = []
                 for orm_lookup in orm_lookups:
                     try:
                         # Attempt to create a query for each field
                         field_query = models.Q(**{orm_lookup: bit})
-                        queryset.filter(field_query).exists()  # Test if the query is valid
+                        queryset.filter(
+                            field_query
+                        ).exists()  # Test if the query is valid
                         field_queries.append(field_query)
                     except (ValueError, ValidationError):
                         # Skip this field if the query is invalid
                         continue
-                
+
                 # Combine valid field queries with OR
                 if field_queries:
                     term_queries.append(models.Q(reduce(operator.or_, field_queries)))
-            
+
             # Combine term queries with AND
             if term_queries:
                 queryset = queryset.filter(reduce(operator.and_, term_queries))
