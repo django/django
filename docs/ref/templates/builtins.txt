@@ -2,6 +2,8 @@
 Built-in template tags and filters
 ==================================
 
+.. module:: django.template.defaultfilters
+
 This document describes Django's built-in template tags and filters. It is
 recommended that you use the :doc:`automatic documentation
 </ref/contrib/admin/admindocs>`, if available, as this will also include
@@ -1567,7 +1569,7 @@ output will be ``[1, 2, 3, 4, 5, 6]``.
 
 Adds slashes before quotes. Useful for escaping strings in CSV, for example.
 
-For example:
+For example in a template:
 
 .. code-block:: html+django
 
@@ -1575,6 +1577,16 @@ For example:
 
 If ``value`` is ``"I'm using Django"``, the output will be
 ``"I\'m using Django"``.
+
+For example in Python:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import addslashes
+    sometext = addslashes("I'm using Django")
+
+If ``value`` is ``"I'm using Django"``, the output will be
+``"I\\'m using Django"``.
 
 .. templatefilter:: capfirst
 
@@ -1584,11 +1596,20 @@ If ``value`` is ``"I'm using Django"``, the output will be
 Capitalizes the first character of the value. If the first character is not
 a letter, this filter has no effect.
 
-For example:
+For example in a template:
 
 .. code-block:: html+django
 
     {{ value|capfirst }}
+
+If ``value`` is ``"django"``, the output will be ``"Django"``.
+
+For example in Python:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import capfirst
+    sometext = capfirst("django")
 
 If ``value`` is ``"django"``, the output will be ``"Django"``.
 
@@ -1599,11 +1620,20 @@ If ``value`` is ``"django"``, the output will be ``"Django"``.
 
 Centers the value in a field of a given width.
 
-For example:
+For example in a template:
 
 .. code-block:: html+django
 
     "{{ value|center:"15" }}"
+
+If ``value`` is ``"Django"``, the output will be ``"     Django    "``.
+
+For example in Python:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import center
+    sometext = center("Django", 15)
 
 If ``value`` is ``"Django"``, the output will be ``"     Django    "``.
 
@@ -1727,7 +1757,7 @@ Format character  Description                               Example output
                   (January 1 1970 00:00:00 UTC).
 ================  ========================================  =====================
 
-For example:
+For example in a template:
 
 .. code-block:: html+django
 
@@ -1770,6 +1800,65 @@ representation of a ``datetime`` value. E.g.:
 .. code-block:: html+django
 
     {{ value|date:"D d M Y" }} {{ value|time:"H:i" }}
+
+
+For example in Python:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import date
+
+    formatted_date = date(value, "D d M Y")
+
+If ``value`` is a :py:class:`~datetime.datetime` object (e.g., the result of
+``datetime.datetime.now()``), the output will be the string
+``'Wed 09 Jan 2008'``.
+
+The format passed can be one of the predefined ones :setting:`DATE_FORMAT`,
+:setting:`DATETIME_FORMAT`, :setting:`SHORT_DATE_FORMAT` or
+:setting:`SHORT_DATETIME_FORMAT`, or a custom format that uses the format
+specifiers shown in the table above. Note that predefined formats may vary
+depending on the current locale.
+
+Assuming that :setting:`LANGUAGE_CODE` is, for example, ``"es"``, then for:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import date
+
+    formatted_date = date(value, "SHORT_DATE_FORMAT")
+
+the output would be the string ``"09/01/2008"`` (the ``"SHORT_DATE_FORMAT"``
+format specifier for the ``es`` locale as shipped with Django is ``"d/m/Y"``).
+
+When used without a format string, the ``DATE_FORMAT`` format specifier is
+used. Assuming the same settings as the previous example:
+
+.. code-block:: html+django
+
+    from django.template.defaultfilters import date
+
+    formatted_date = date(value)
+
+outputs ``9 de Enero de 2008`` (the ``DATE_FORMAT`` format specifier for the
+``es`` locale is ``r'j \d\e F \d\e Y'``). Both "d" and "e" are
+backslash-escaped, because otherwise each is a format string that displays the
+day and the timezone name, respectively.
+
+You can combine ``date`` with the :tfilter:`time` filter to render a full
+representation of a ``datetime`` value. E.g.:
+
+.. code-block:: html+django
+
+    from django.template.defaultfilters import date
+    from django.template.defaultfilters import time
+    
+    formatted_date = date(value, "D d M Y")
+    formatted_time = time(value, "H:i")
+    formatted_datetime = f"{formatted_date} {formatted_time}"
+
+.. function:: date(value, arg=None)
+    This function formats a date according to the given format.
 
 .. templatefilter:: default
 
@@ -1992,13 +2081,28 @@ For example:
 
 Applies the :tfilter:`escape` filter to each element of a sequence. Useful in
 conjunction with other filters that operate on sequences, such as
-:tfilter:`join`. For example:
+:tfilter:`join`. 
+
+For example in a template:
 
 .. code-block:: html+django
 
     {% autoescape off %}
         {{ my_list|escapeseq|join:", " }}
     {% endautoescape %}
+
+For example in Python:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import escapeseq
+    from django.template.defaultfilters import join
+
+    my_list = ["<b>first</b>", "<i>second</i>"]
+    escaped_list = escapeseq(my_list)
+    joined_list = join(escaped_list, ", ")
+
+The output will be ``"&lt;b&gt;first&lt;/b&gt;, &lt;i&gt;second&lt;/i&gt;"``.
 
 .. templatefilter:: filesizeformat
 
@@ -2008,13 +2112,22 @@ conjunction with other filters that operate on sequences, such as
 Formats the value like a 'human-readable' file size (i.e. ``'13 KB'``,
 ``'4.1 MB'``, ``'102 bytes'``, etc.).
 
-For example:
+For example in a template:
 
 .. code-block:: html+django
 
     {{ value|filesizeformat }}
 
 If ``value`` is 123456789, the output would be ``117.7 MB``.
+
+For example in Python:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import filesizeformat
+    formatted_size = filesizeformat(123456789)
+
+The value of ``formatted_size`` will be ``'117.7\xa0MB'``.
 
 .. admonition:: File sizes and SI units
 
@@ -2116,6 +2229,15 @@ locale is ``pl`` (Polish):
 Using ``floatformat`` with no argument is equivalent to using ``floatformat``
 with an argument of ``-1``.
 
+This can also be used in Python by doing the following:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import floatformat
+    formatted_float = floatformat(34.23234, 3)
+
+The example table above used for the templates will return the same results.
+
 .. templatefilter:: force_escape
 
 ``force_escape``
@@ -2166,11 +2288,21 @@ strings containing non-ASCII characters in a URL.
 It's safe to use this filter on a string that has already gone through the
 :tfilter:`urlencode` filter.
 
-For example:
+For example in a template:
 
 .. code-block:: html+django
 
     {{ value|iriencode }}
+
+If ``value`` is ``"?test=I ♥ Django"``, the output will be
+``"?test=I%20%E2%99%A5%20Django"``.
+
+For example in Python:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import iriencode
+    url = iriencode("?test=I ♥ Django")
 
 If ``value`` is ``"?test=I ♥ Django"``, the output will be
 ``"?test=I%20%E2%99%A5%20Django"``.
@@ -2237,7 +2369,7 @@ executable code.
 
 Returns the last item in a list.
 
-For example:
+For example in a template:
 
 .. code-block:: html+django
 
@@ -2245,6 +2377,15 @@ For example:
 
 If ``value`` is the list ``['a', 'b', 'c', 'd']``, the output will be the
 string ``"d"``.
+
+For example in Python:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import last
+    last_item = last(['a', 'b', 'c', 'd'])
+
+The value of ``last_item`` will be ``"d"``.
 
 .. templatefilter:: length
 
@@ -2306,7 +2447,7 @@ slug``.
 
 Displays text with line numbers.
 
-For example:
+For example in a template:
 
 .. code-block:: html+django
 
@@ -2328,6 +2469,19 @@ the output will be:
     2. two
     3. three
 
+for example in Python:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import linenumbers
+    numbered_text = linenumbers("one\ntwo\nthree")
+
+the output will be:
+
+.. code-block:: python
+
+    "1. one\n2. two\n3. three"
+
 .. templatefilter:: ljust
 
 ``ljust``
@@ -2337,13 +2491,22 @@ Left-aligns the value in a field of a given width.
 
 **Argument:** field size
 
-For example:
+For example in a template:
 
 .. code-block:: html+django
 
     "{{ value|ljust:"10" }}"
 
 If ``value`` is ``Django``, the output will be ``"Django    "``.
+
+For example in Python:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import ljust
+    left_aligned = ljust("Django", 10)
+
+The output will be ``"Django    "``.
 
 .. templatefilter:: lower
 
@@ -2352,7 +2515,7 @@ If ``value`` is ``Django``, the output will be ``"Django    "``.
 
 Converts a string into all lowercase.
 
-For example:
+For example in a template:
 
 .. code-block:: html+django
 
@@ -2360,6 +2523,15 @@ For example:
 
 If ``value`` is ``Totally LOVING this Album!``, the output will be
 ``totally loving this album!``.
+
+For example in Python:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import lower
+    lowercased = lower("Totally LOVING this Album!")
+
+The output will be ``"totally loving this album!"``.
 
 .. templatefilter:: make_list
 
@@ -2390,7 +2562,7 @@ equivalent.
 The input doesn't have to be a valid phone number. This will happily convert
 any string.
 
-For example:
+For example in a template:
 
 .. code-block:: html+django
 
@@ -2449,13 +2621,22 @@ A wrapper around :func:`pprint.pprint` -- for debugging, really.
 
 Returns a random item from the given list.
 
-For example:
+For example in a template:
 
 .. code-block:: html+django
 
     {{ value|random }}
 
 If ``value`` is the list ``['a', 'b', 'c', 'd']``, the output could be ``"b"``.
+
+For example in Python:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import random
+    random_item = random(['a', 'b', 'c', 'd'])
+
+The value of ``random_item`` will be a random item from the list.
 
 .. templatefilter:: rjust
 
@@ -2466,13 +2647,22 @@ Right-aligns the value in a field of a given width.
 
 **Argument:** field size
 
-For example:
+For example in a template:
 
 .. code-block:: html+django
 
     "{{ value|rjust:"10" }}"
 
 If ``value`` is ``Django``, the output will be ``"    Django"``.
+
+For example in Python:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import rjust
+    right_aligned = rjust("Django", 10)
+
+The output will be ``"    Django"``.
 
 .. templatefilter:: safe
 
@@ -2537,13 +2727,22 @@ Converts to ASCII. Converts spaces to hyphens. Removes characters that aren't
 alphanumerics, underscores, or hyphens. Converts to lowercase. Also strips
 leading and trailing whitespace.
 
-For example:
+For example in a template:
 
 .. code-block:: html+django
 
     {{ value|slugify }}
 
 If ``value`` is ``"Joel is a slug"``, the output will be ``"joel-is-a-slug"``.
+
+For example in Python:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import slugify
+    slug = slugify("Joel is a slug")
+
+The value of ``slug`` will be ``"joel-is-a-slug"``.
 
 .. templatefilter:: stringformat
 
@@ -2554,13 +2753,22 @@ Formats the variable according to the argument, a string formatting specifier.
 This specifier uses the :ref:`old-string-formatting` syntax, with the exception
 that the leading "%" is dropped.
 
-For example:
+For example in a template:
 
 .. code-block:: html+django
 
     {{ value|stringformat:"E" }}
 
 If ``value`` is ``10``, the output will be ``1.000000E+01``.
+
+For example in Python:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import stringformat
+    formatted_value = stringformat(10, "E")
+
+The value of ``formatted_value`` will be ``"1.000000E+01"``.
 
 .. templatefilter:: striptags
 
@@ -2569,7 +2777,7 @@ If ``value`` is ``10``, the output will be ``1.000000E+01``.
 
 Makes all possible efforts to strip all [X]HTML tags.
 
-For example:
+For example in a template:
 
 .. code-block:: html+django
 
@@ -2577,6 +2785,15 @@ For example:
 
 If ``value`` is ``"<b>Joel</b> <button>is</button> a <span>slug</span>"``, the
 output will be ``"Joel is a slug"``.
+
+For example in Python:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import striptags
+    stripped_value = striptags("<b>Joel</b> <button>is</button> a <span>slug</span>")
+
+The value of ``stripped_value`` will be ``"Joel is a slug"``.
 
 .. admonition:: No safety guarantee
 
@@ -2596,11 +2813,20 @@ Given format can be the predefined one :setting:`TIME_FORMAT`, or a custom
 format, same as the :tfilter:`date` filter. Note that the predefined format
 is locale-dependent.
 
-For example:
+For example in a template:
 
 .. code-block:: html+django
 
     {{ value|time:"H:i" }}
+
+Or in Python:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import time
+
+    formatted_time = time(value, "H:i")
+
 
 If ``value`` is equivalent to ``datetime.datetime.now()``, the output will be
 the string ``"01:23"``.
@@ -2610,19 +2836,38 @@ Note that you can backslash-escape a format string if you want to use the
 otherwise each is a format string that displays the hour and the month,
 respectively:
 
+Template example:
+
 .. code-block:: html+django
 
     {{ value|time:"H\h i\m" }}
 
+Python example:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import time
+
+    formatted_time = time(value, "H\h i\m")
+
+
 This would display as "01h 23m".
 
-Another example:
+Another example in a template:
 
 Assuming that :setting:`LANGUAGE_CODE` is, for example, ``"de"``, then for:
 
 .. code-block:: html+django
 
     {{ value|time:"TIME_FORMAT" }}
+
+Or in Python:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import time
+
+    formatted_time = time(value, "TIME_FORMAT")
 
 the output will be the string ``"01:23"`` (The ``"TIME_FORMAT"`` format
 specifier for the ``de`` locale as shipped with Django is ``"H:i"``).
@@ -2650,6 +2895,25 @@ is the same as:
 .. code-block:: html+django
 
     {{ value|time:"TIME_FORMAT" }}
+
+The above example in Python:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import time
+
+    formatted_time = time(value)
+
+would be the same as:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import time
+
+    formatted_time = time(value, "TIME_FORMAT")
+
+.. function:: time(value, arg=None)
+    This function formats a time according to the given format.
 
 .. templatefilter:: timesince
 
@@ -2705,13 +2969,22 @@ Converts a string into titlecase by making words start with an uppercase
 character and the remaining characters lowercase. This tag makes no effort to
 keep "trivial words" in lowercase.
 
-For example:
+For example in a template:
 
 .. code-block:: html+django
 
     {{ value|title }}
 
 If ``value`` is ``"my FIRST post"``, the output will be ``"My First Post"``.
+
+For example in Python:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import title
+    titled = title("my FIRST post")
+
+The output of ``titled`` will be ``"My First Post"``.
 
 .. templatefilter:: truncatechars
 
@@ -2739,7 +3012,7 @@ For example in Python:
 
     truncated = truncatechars("Joel is a slug", 7)
 
-If ``value`` is ``"Joel is a slug"``, the output will be ``"Joel i…"``.
+The output of ``truncated`` will be ``"Joel i…"``.
 
 .. function:: truncatechars(value, arg)
 
@@ -2754,7 +3027,7 @@ Similar to :tfilter:`truncatechars`, except that it is aware of HTML tags. Any
 tags that are opened in the string and not closed before the truncation point
 are closed immediately after the truncation.
 
-For example:
+For example in a template:
 
 .. code-block:: html+django
 
@@ -2762,6 +3035,16 @@ For example:
 
 If ``value`` is ``"<p>Joel is a slug</p>"``, the output will be
 ``"<p>Joel i…</p>"``.
+
+For example in Python:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import truncatechars_html
+
+    truncated = truncatechars_html("<p>Joel is a slug</p>", 7)
+
+The output of ``truncated`` will be ``"<p>Joel i…</p>"``.
 
 Newlines in the HTML content will be preserved.
 
@@ -2780,13 +3063,23 @@ Truncates a string after a certain number of words.
 
 **Argument:** Number of words to truncate after
 
-For example:
+For example in a template:
 
 .. code-block:: html+django
 
     {{ value|truncatewords:2 }}
 
 If ``value`` is ``"Joel is a slug"``, the output will be ``"Joel is …"``.
+
+For example in Python:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import truncatewords
+
+    truncated = truncatewords("Joel is a slug", 2)
+
+The output of ``truncated`` will be ``"Joel is …"``.
 
 Newlines within the string will be removed.
 
@@ -2802,7 +3095,7 @@ are closed immediately after the truncation.
 This is less efficient than :tfilter:`truncatewords`, so should only be used
 when it is being passed HTML text.
 
-For example:
+For example in a template:
 
 .. code-block:: html+django
 
@@ -2810,6 +3103,16 @@ For example:
 
 If ``value`` is ``"<p>Joel is a slug</p>"``, the output will be
 ``"<p>Joel is …</p>"``.
+
+For example in Python:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import truncatewords_html
+
+    truncated = truncatewords_html("<p>Joel is a slug</p>", 2)
+
+The output of ``truncated`` will be ``"<p>Joel is …</p>"``.
 
 Newlines in the HTML content will be preserved.
 
@@ -2994,7 +3297,7 @@ Wraps words at specified line length.
 
 **Argument:** number of characters at which to wrap the text
 
-For example:
+For example in a template:
 
 .. code-block:: html+django
 
@@ -3007,6 +3310,16 @@ If ``value`` is ``Joel is a slug``, the output would be:
     Joel
     is a
     slug
+
+For example in Python:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import wordwrap
+
+    wrapped = wordwrap("Joel is a slug", 5)
+
+The output of ``wrapped`` will be ``'Joel\nis a\nslug'``.
 
 .. templatefilter:: yesno
 
