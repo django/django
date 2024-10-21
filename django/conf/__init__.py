@@ -232,7 +232,6 @@ class Settings:
                 FORMS_URLFIELD_ASSUME_HTTPS_DEPRECATED_MSG,
                 RemovedInDjango60Warning,
             )
-
         self._is_overridden_EMAIL_PROVIDERS = self.is_overridden("EMAIL_PROVIDERS")
         if self.is_overridden("EMAIL_BACKEND"):
             if self._is_overridden_EMAIL_PROVIDERS:
