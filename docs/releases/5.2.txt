@@ -94,7 +94,9 @@ Minor features
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The :lookup:`isempty` lookup and
+  :class:`~django.contrib.gis.db.models.functions.IsEmpty` expression are now
+  supported on SpatiaLite.
 
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
