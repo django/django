@@ -414,6 +414,7 @@ Function                              PostGIS  Oracle         MariaDB      MySQL
 :class:`LineLocatePoint`              X                                                X
 :class:`MakeValid`                    X                                                X (LWGEOM/RTTOPO)
 :class:`MemSize`                      X
+:class:`NumDimensions`                X                                                X
 :class:`NumGeometries`                X        X              X            X           X
 :class:`NumPoints`                    X        X              X            X           X
 :class:`Perimeter`                    X        X                                       X

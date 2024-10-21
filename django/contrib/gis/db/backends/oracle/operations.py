@@ -129,6 +129,7 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
         "LineLocatePoint",
         "MakeValid",
         "MemSize",
+        "NumDimensions",
         "Scale",
         "SnapToGrid",
         "Translate",
