@@ -282,7 +282,7 @@ We'll now implement this feature and associated tests.
 Creating a branch
 =================
 
-Before making any changes, create a new branch for the ticket:
+Before making any changes, must create a new branch for the ticket:
 
 .. console::
 
