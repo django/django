@@ -1,6 +1,7 @@
 import os
 from argparse import ArgumentDefaultsHelpFormatter
 from io import StringIO
+from pathlib import Path
 from unittest import mock
 
 from admin_scripts.tests import AdminScriptTestCase
@@ -537,9 +538,19 @@ class UtilsTests(SimpleTestCase):
         expected = [os.path.normcase(p) for p in ["foo/bar", "bar/*/"]]
         self.assertEqual(normalize_path_patterns(["foo/bar/*", "bar/*/"]), expected)
 
-    @mock.patch("subprocess.run", side_effect=OSError)
-    def test_formatting_failure_is_caught_and_logged(self, _mock):
-        with self.assertLogs("django.core.management.utils", level="WARNING") as cm:
-            run_formatters([])
-        self.assertIn("Black failed to launch.\n", cm.output[0])
-        self.assertIn("OSError", cm.output[0])
+    def test_formatting_failure_is_caught_and_logged(self):
+        cases = [
+            (FileNotFoundError, "nonexistent"),
+            (PermissionError, Path(__file__).parent / "test_files" / "black"),
+        ]
+        for exception, location in cases:
+            with (
+                self.subTest(exception=exception),
+                self.assertLogs("django.core.management.utils", level="WARNING") as cm,
+                mock.patch(
+                    "django.core.management.utils.shutil.which", return_value=location
+                ),
+            ):
+                run_formatters([])
+                self.assertIn("Black failed to launch.\n", cm.output[0])
+                self.assertIn(exception.__qualname__, cm.output[0])
