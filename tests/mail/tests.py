@@ -16,6 +16,7 @@ from unittest import mock, skipUnless
 
 from django.conf import settings
 from django.core import mail
+from django.core.exceptions import ImproperlyConfigured
 from django.core.mail import (
     DNS_NAME,
     EmailMessage,
@@ -2016,7 +2017,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
                 settings.EMAIL_PROVIDERS["default"],
                 OPTIONS=dict(
                     settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
-                    user="not empty username",
+                    username="not empty username",
                     password="not empty password",
                 ),
             ),
@@ -2033,7 +2034,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
                 settings.EMAIL_PROVIDERS["default"],
                 OPTIONS=dict(
                     settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
-                    user="not empty username",
+                    username="not empty username",
                     password="not empty password",
                 ),
             ),
@@ -2273,6 +2274,23 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         self.assertTrue(backend.use_ssl)
         with self.assertRaises(SSLError):
             with backend:
+                pass
+
+    @override_settings(
+        EMAIL_PROVIDERS={
+            "default": dict(
+                settings.EMAIL_PROVIDERS["default"],
+            ),
+        },
+        EMAIL_HOST = "localhost",
+    )
+    def test_email_provider_configuration_mismatch(self):
+        with self.assertRaises(ImproperlyConfigured):
+            connection = mail.get_connection()
+            # backend = smtp.EmailBackend(
+            #     **settings.EMAIL_PROVIDERS["default"]["OPTIONS"],
+            # )
+            with connection:
                 pass
 
     def test_connection_timeout_default(self):
