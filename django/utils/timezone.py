@@ -3,6 +3,7 @@ Timezone-related classes and functions.
 """
 
 import functools
+import warnings
 import zoneinfo
 from contextlib import ContextDecorator
 from datetime import datetime, timedelta, timezone, tzinfo
@@ -241,6 +242,18 @@ def make_aware(value, timezone=None):
     # Check that we won't overwrite the timezone of an aware datetime.
     if is_aware(value):
         raise ValueError("make_aware expects a naive datetime, got %s" % value)
+
+    # Handle string type timezone
+    if isinstance(timezone, str):
+        timezone = zoneinfo.ZoneInfo(timezone)
+
+    # Issue a warning for pytz timezones
+    if isinstance(timezone, tzinfo) and str(timezone.__module__).startswith("pytz"):
+        warnings.warn(
+            "pytz timezones are not supported and may lead to wrong results",
+            UserWarning,
+        )
+
     # This may be wrong around DST changes!
     return value.replace(tzinfo=timezone)
 

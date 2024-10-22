@@ -1,5 +1,7 @@
 import datetime
+import warnings
 import zoneinfo
+from datetime import tzinfo
 from unittest import mock
 
 from django.test import SimpleTestCase, override_settings
@@ -220,6 +222,46 @@ class TimezoneTests(SimpleTestCase):
         )
         self.assertEqual(std.utcoffset(), datetime.timedelta(hours=1))
         self.assertEqual(dst.utcoffset(), datetime.timedelta(hours=2))
+
+    def test_make_aware_str(self):
+        timezone_str = "Asia/Shanghai"
+        tz = zoneinfo.ZoneInfo(timezone_str)
+
+        make_aware = timezone.make_aware(
+            datetime.datetime(2024, 10, 22), timezone=timezone_str
+        )
+        self.assertEqual(make_aware.tzinfo, tz)
+
+    def test_make_aware_pytz(self):
+        class MockPytzTimezone(tzinfo):
+            """Mock class to simulate a pytz timezone."""
+
+            def utcoffset(self, dt):
+                return datetime.timedelta(hours=-5)  # Mock UTC-5 offset
+
+            def dst(self, dt):
+                return datetime.timedelta(hours=1)  # Mock DST offset
+
+            def tzname(self, dt):
+                return "Mock Timezone"  # Mock timezone name
+
+        # Create a mock object that simulates a pytz timezone
+        mock_pytz_timezone = MockPytzTimezone()
+        mock_pytz_timezone.__module__ = "pytz"
+
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")  # Always trigger warnings
+            # Call the function with the mock pytz timezone
+            timezone.make_aware(
+                datetime.datetime(2023, 10, 22, 12, 0), mock_pytz_timezone
+            )
+
+            # Check if the warning was raised
+            self.assertTrue(len(w) > 0)
+            self.assertEqual(
+                w[-1].message.args[0],
+                "pytz timezones are not supported and may lead to wrong results",
+            )
 
     def test_get_timezone_name(self):
         """
