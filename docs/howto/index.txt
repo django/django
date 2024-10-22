@@ -1,11 +1,57 @@
-===============
-"How-to" guides
-===============
+=============
+How-to guides
+=============
 
-Here you'll find short answers to "How do I....?" types of questions. These
-how-to guides don't cover topics in depth -- you'll find that material in the
-:doc:`/topics/index` and the :doc:`/ref/index`. However, these guides will help
-you quickly accomplish common tasks.
+Practical guides covering common tasks and problems.
+
+Models, data and databases
+==========================
+
+.. toctree::
+   :maxdepth: 1
+
+   initial-data
+   legacy-databases
+   custom-model-fields
+   writing-migrations
+   custom-lookups
+
+Templates and output
+====================
+
+.. toctree::
+   :maxdepth: 1
+
+   outputting-csv
+   outputting-pdf
+   overriding-templates
+   custom-template-backend
+   custom-template-tags
+
+Project configuration and management
+====================================
+
+.. toctree::
+   :maxdepth: 1
+
+   static-files/index
+   logging
+   error-reporting
+   delete-app
+
+Installing, deploying and upgrading
+===================================
+
+.. toctree::
+   :maxdepth: 1
+
+   upgrade-version
+   windows
+   deployment/index
+   static-files/deployment
+
+Other guides
+============
 
 .. toctree::
    :maxdepth: 1
@@ -13,25 +59,7 @@ you quickly accomplish common tasks.
    auth-remote-user
    csrf
    custom-management-commands
-   custom-model-fields
-   custom-lookups
-   custom-template-backend
-   custom-template-tags
    custom-file-storage
-   deployment/index
-   upgrade-version
-   error-reporting
-   initial-data
-   legacy-databases
-   logging
-   outputting-csv
-   outputting-pdf
-   overriding-templates
-   static-files/index
-   static-files/deployment
-   windows
-   writing-migrations
-   delete-app
 
 .. seealso::
 
