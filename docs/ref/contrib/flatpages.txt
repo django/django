@@ -256,7 +256,7 @@ Here's a sample :file:`flatpages/default.html` template:
 .. code-block:: html+django
 
     <!DOCTYPE html>
-    <html>
+    <html lang="en">
     <head>
     <title>{{ flatpage.title }}</title>
     </head>

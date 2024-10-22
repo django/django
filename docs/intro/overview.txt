@@ -309,7 +309,7 @@ Here's what the "base.html" template, including the use of :doc:`static files
     :caption: ``templates/base.html``
 
     {% load static %}
-    <html>
+    <html lang="en">
     <head>
         <title>{% block title %}{% endblock %}</title>
     </head>
