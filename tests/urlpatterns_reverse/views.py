@@ -58,12 +58,12 @@ def bad_view(request, *args, **kwargs):
     raise ValueError("I don't think I'm getting good value for this view")
 
 
-class _HelloView(View):
+class HelloView(View):
     def get(self, request, *args, **kwargs):
         return HttpResponse(f"Hello {self.kwargs['name']}")
 
 
-view_func_from_cbv = _HelloView.as_view()
+view_func_from_cbv = HelloView.as_view()
 
 empty_view_partial = partial(empty_view, template_name="template.html")
 empty_view_nested_partial = partial(
