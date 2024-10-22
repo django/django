@@ -120,6 +120,12 @@ upgrading Django.
   :setting:`CSRF_TRUSTED_ORIGINS` setting must start with a scheme (usually
   ``http://`` or ``https://``) but found ``<hostname>``.
 
+Removed setting variables
+-------------------------
+
+* **settings.W001**: The ``<name>`` setting was removed and its use is not
+  recommended.
+
 Caches
 ------
 
