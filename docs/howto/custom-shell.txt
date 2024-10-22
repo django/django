@@ -1,0 +1,52 @@
+====================================== 
+How to customize the ``shell`` command 
+======================================
+
+First, create a new custom management command which subclasses
+``django.core.management.commands.shell.Command``, overriding the existing
+``shell`` management command. See the guide on :ref:`overriding commands
+<overriding-commands>` for more details.
+
+.. _customizing-shell-auto-imports:
+
+Customize automatic imports
+===========================
+
+.. versionadded:: 5.2
+
+To customize the automatic import behavior of the :djadmin:`shell` management
+command, override its ``get_namespace()`` method. For example:
+
+.. code-block:: python
+    :caption: ``polls/management/commands/shell.py``
+
+    from django.core.management.commands import shell
+
+
+    class Command(shell.Command):
+        def get_namespace(self):
+            from django.urls.base import resolve, reverse
+
+            return {
+                **super().get_namespace(),
+                "resolve": resolve,
+                "reverse": reverse,
+            }
+
+The above customization adds :func:`~django.urls.resolve` and
+:func:`~django.urls.reverse` to the default namespace, which includes all
+models from all apps. These two functions will then be available when the
+shell opens, without a manual import statement.
+
+If you prefer to not have models automatically imported, create a custom
+``get_namespace()`` that excludes the ``super().get_namespace()`` call:
+
+.. code-block:: python
+    :caption: ``polls/management/commands/shell.py``
+
+    from django.core.management.commands import shell
+
+
+    class Command(shell.Command):
+        def get_namespace(self):
+            return {}
