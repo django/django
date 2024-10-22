@@ -23,7 +23,7 @@ Here's a view that returns the current date and time, as an HTML document::
 
     def current_datetime(request):
         now = datetime.datetime.now()
-        html = "<html><body>It is now %s.</body></html>" % now
+        html = '<html lang="en"><body>It is now %s.</body></html>' % now
         return HttpResponse(html)
 
 Let's step through this code one line at a time:
@@ -225,7 +225,7 @@ Here's an example of an async view::
 
     async def current_datetime(request):
         now = datetime.datetime.now()
-        html = "<html><body>It is now %s.</body></html>" % now
+        html = '<html lang="en"><body>It is now %s.</body></html>' % now
         return HttpResponse(html)
 
 You can read more about Django's async support, and how to best use async
