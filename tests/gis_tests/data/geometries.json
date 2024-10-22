@@ -137,5 +137,87 @@
   "union_geoms": [
       {"wkt": "POLYGON ((-5 0,-5 10,5 10,5 5,10 5,10 -5,0 -5,0 0,-5 0))"},
       {"wkt": "POLYGON ((2 0, 2 15, 18 15, 18 0, 2 0))"}
+  ],
+"curved_geoms": [
+    {"wkt": "CIRCULARSTRING(1 5, 6 2, 7 3)",
+     "name": "CircularString",
+     "num": 8
+    },
+    {"wkt": "COMPOUNDCURVE((5 3, 5 13), CIRCULARSTRING(5 13, 7 15, 9 13), (9 13, 9 3), CIRCULARSTRING(9 3, 7 1, 5 3))",
+     "name": "CompoundCurve",
+     "num": 9
+    },
+    {"wkt": "CURVEPOLYGON(CIRCULARSTRING(0 0, 4 0, 4 4, 0 4, 0 0),(1 1, 3 3, 3 1, 1 1))",
+     "name": "CurvePolygon",
+     "num": 10
+    },
+    {"wkt": "MULTICURVE((0 0, 5 5), CIRCULARSTRING(4 0, 4 4, 8 4))",
+     "name": "MultiCurve",
+     "num": 11
+    },
+    {"wkt": "MULTISURFACE(((0 0, 0 1, 1 1, 1 0, 0 0)), ((1 1, 1 2, 2 2, 2 1, 1 1)))",
+     "name": "MultiSurface",
+     "num": 12
+    },
+    {"wkt": "CIRCULARSTRING Z (1 5 1, 6 2 2, 7 3 3)",
+     "name": "CircularStringZ",
+     "num": 1008
+    },
+    {"wkt": "COMPOUNDCURVE Z ((5 3 0, 5 13 0), CIRCULARSTRING Z (5 13 0, 7 15 0, 9 13 0), (9 13 0 , 9 3 0), CIRCULARSTRING(9 3 0, 7 1 0, 5 3 0))",
+     "name": "CompoundCurveZ",
+     "num": 1009
+    },
+    {"wkt": "CURVEPOLYGON Z(CIRCULARSTRING Z (0 0 0, 4 0 0, 4 4 0, 0 4 0, 0 0 0),(1 1 0, 3 3 0, 3 1 0, 1 1 0))",
+     "name": "CurvePolygonZ",
+     "num": 1010
+    },
+    {"wkt": "MULTICURVE Z ((0 0 1, 5 5 2), CIRCULARSTRING Z (4 0 0, 4 4 0, 8 4 0))",
+     "name": "MultiCurveZ",
+     "num": 1011
+    },
+    {"wkt": "MULTISURFACE Z (((0 0 1, 0 1 2, 1 1 3, 1 0 4, 0 0 5)), ((1 1 0, 1 2 0, 2 2 0, 2 1 0, 1 1 0)))",
+     "name": "MultiSurfaceZ",
+     "num": 1012
+    },
+    {"wkt": "CIRCULARSTRING M (1 5 1, 6 2 2, 7 3 3)",
+     "name": "CircularStringM",
+     "num": 2008
+    },
+    {"wkt": "COMPOUNDCURVE M ((5 3 0, 5 13 0), CIRCULARSTRING M (5 13 0, 7 15 0, 9 13 0), (9 13 0 , 9 3 0), CIRCULARSTRING M (9 3 0, 7 1 0, 5 3 0))",
+     "name": "CompoundCurveM",
+     "num": 2009
+    },
+    {"wkt": "CURVEPOLYGON M (CIRCULARSTRING M (0 0 0, 4 0 0, 4 4 0, 0 4 0, 0 0 0),(1 1 0, 3 3 1, 3 1 1, 1 1 2))",
+     "name": "CurvePolygonM",
+     "num": 2010
+    },
+    {"wkt": "MULTICURVE M ((0 0 1, 5 5 2), CIRCULARSTRING M (4 0 0, 4 4 0, 8 4 0))",
+     "name": "MultiCurveM",
+     "num": 2011
+    },
+    {"wkt": "MULTISURFACE M (((0 0 1, 0 1 2, 1 1 3, 1 0 4, 0 0 5)), ((1 1 0, 1 2 0, 2 2 0, 2 1 0, 1 1 0)))",
+     "name": "MultiSurfaceM",
+     "num": 2012
+    },
+    {"wkt": "CIRCULARSTRING ZM (1 5 0 1, 6 2 0 2, 7 3 0 3)",
+     "name": "CircularStringZM",
+     "num": 3008
+    },
+    {"wkt": "COMPOUNDCURVE ZM ((5 3 0 0, 5 13 0 0), CIRCULARSTRING ZM (5 13 0 0, 7 15 0 0, 9 13 0 0), (9 13 0 0, 9 3 0 0), CIRCULARSTRING ZM (9 3 0 0, 7 1 0 0, 5 3 0 0))",
+     "name": "CompoundCurveZM",
+     "num": 3009
+    },
+    {"wkt": "CURVEPOLYGON ZM (CIRCULARSTRING ZM (0 0 0 0, 4 0 0 0, 4 4 0 0, 0 4 0 0, 0 0 0 0), (1 1 0 0, 3 3 0 0, 3 1 0 0, 1 1 0 0))",
+     "name": "CurvePolygonZM",
+     "num": 3010
+    },
+    {"wkt": "MULTICURVE ZM ((0 0 0 1, 5 5 0 2), CIRCULARSTRING ZM (4 0 0 0, 4 4 0 0, 8 4 0 0))",
+     "name": "MultiCurveZM",
+     "num": 3011
+    },
+    {"wkt": "MULTISURFACE ZM (((0 0 0 1, 0 1 0 2, 1 1 0 3, 1 0 0 4, 0 0 0 5)), ((1 1 0 0, 1 2 0 0, 2 2 0 0, 2 1 0 0, 1 1 0 0)))",
+     "name": "MultiSurfaceZM",
+     "num": 3012
+    }
   ]
 }
