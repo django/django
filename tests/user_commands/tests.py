@@ -1,3 +1,4 @@
+import io
 import os
 import sys
 from argparse import ArgumentDefaultsHelpFormatter
@@ -548,13 +549,14 @@ class UtilsTests(SimpleTestCase):
             ),
         ]
         for exception, location in cases:
+            stderr = io.StringIO()
             with (
                 self.subTest(exception=exception),
-                self.assertLogs("django.core.management.utils", level="WARNING") as cm,
                 mock.patch(
                     "django.core.management.utils.shutil.which", return_value=location
                 ),
             ):
-                run_formatters([])
-                self.assertIn("Black failed to launch.\n", cm.output[0])
-                self.assertIn(exception.__qualname__, cm.output[0])
+                run_formatters([], stderr=stderr)
+                out = stderr.getvalue()
+                self.assertIn("Black failed to launch.\n", out)
+                self.assertIn(exception.__qualname__, out)

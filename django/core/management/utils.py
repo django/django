@@ -1,8 +1,8 @@
 import fnmatch
-import logging
 import os
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 from subprocess import run
 
@@ -162,7 +162,9 @@ def find_formatters():
     return {"black_path": shutil.which("black")}
 
 
-def run_formatters(written_files, black_path=(sentinel := object())):
+def run_formatters(
+    written_files, black_path=(sentinel := object()), *, stderr=sys.stderr
+):
     """
     Run the black formatter on the specified files.
     """
@@ -176,5 +178,4 @@ def run_formatters(written_files, black_path=(sentinel := object())):
                 capture_output=True,
             )
         except OSError:
-            logger = logging.getLogger(__name__)
-            logger.warning("Black failed to launch.", exc_info=True)
+            stderr.write(f"Black failed to launch.\n{sys.exc_info()}")
