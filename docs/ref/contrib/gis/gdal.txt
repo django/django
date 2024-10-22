@@ -611,6 +611,26 @@ coordinate transformation:
         >>> polygon.geom_count
         1
 
+    .. attribute:: has_curve
+
+    .. versionadded:: 5.2
+
+    A boolean indicating if this geometry is or contains a curve geometry.
+
+    .. method:: get_linear_geometry
+
+    .. versionadded:: 5.2
+
+    Returns a linear version of the geometry. If no conversion can be made, the
+    original geometry is returned.
+
+    .. method:: get_curve_geometry
+
+    .. versionadded:: 5.2
+
+    Returns a curved version of the geometry. If no conversion can be made, the
+    original geometry is returned.
+
     .. attribute:: point_count
 
     Returns the number of points used to describe this geometry:
