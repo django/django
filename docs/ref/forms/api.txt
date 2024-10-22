@@ -936,7 +936,7 @@ adding and deleting forms from a formset.
 
 .. attribute:: Form.bound_field_class
 
-Allows you set a different :class:`~django.forms.BoundField` class to use for
+Allows you to set a different :class:`~django.forms.BoundField` class to use for
 the form. As an example, this allows overriding
 :meth:`~django.forms.BoundField.label_tag` or
 :meth:`~django.forms.BoundField.legend_tag` which are used by the default form
@@ -1477,9 +1477,14 @@ If you need to access some additional information about a form field in a
 template and using a subclass of :class:`~django.forms.Field` isn't
 sufficient, consider also customizing :class:`~django.forms.BoundField`.
 
+A project can define a project-wise ``BoundField`` using
+:attr:`~django.forms.renderers.BaseRenderer.bound_field_class` and
+:setting:`FORM_RENDERER`.
+
 A custom form can override :attr:`~django.forms.Form.bound_field_class` and
 a custom form field can take an optional
 :attr:`~django.forms.Field.bound_field_class` constructor argument.
+
 Additionally, it can override ``get_bound_field()``:
 
 .. method:: Field.get_bound_field(form, field_name)

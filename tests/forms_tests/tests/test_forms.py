@@ -4797,20 +4797,51 @@ Options: <select multiple name="options" aria-invalid="true" required>
             f["name"]
 
     def test_form_custom_bound_field(self):
-        class TestForm(Form):
-            name = CharField(max_length=10)
-            colour = CharField(max_length=10)
+        with self.subTest("Class attribute"):
 
-        f = TestForm(bound_field_class=BoundFieldWithoutColon)
-        self.assertHTMLEqual(
-            f.as_div(),
-            '<div><label for="id_name">Name</label>'
-            '<input type="text" name="name" maxlength="10" '
-            'required id="id_name"></div><div>'
-            '<label for="id_colour">Colour</label>'
-            '<input type="text" name="colour" maxlength="10" '
-            'required id="id_colour"></div>',
-        )
+            class TestForm(Form):
+                bound_field_class = BoundFieldWithoutColon
+
+                name = CharField(max_length=10)
+                colour = CharField(max_length=10)
+
+            f = TestForm()
+            self.assertHTMLEqual(
+                f.as_div(),
+                '<div><label for="id_name">Name</label>'
+                '<input type="text" name="name" maxlength="10" '
+                'required id="id_name"></div><div>'
+                '<label for="id_colour">Colour</label>'
+                '<input type="text" name="colour" maxlength="10" '
+                'required id="id_colour"></div>',
+            )
+
+        with self.subTest("Constructor args takes priority over class attribute"):
+
+            class TestForm(Form):
+                bound_field_class = BoundFieldWithoutColon
+
+                name = CharField(max_length=10)
+                colour = CharField(max_length=10)
+
+            class BoundFieldWithTwoColons(BoundField):
+                def label_tag(
+                    self, contents=None, attrs=None, label_suffix=None, tag=None
+                ):
+                    return super().label_tag(
+                        contents=contents, attrs=attrs, label_suffix="::", tag=None
+                    )
+
+            f = TestForm(bound_field_class=BoundFieldWithTwoColons)
+            self.assertHTMLEqual(
+                f.as_div(),
+                '<div><label for="id_name">Name::</label>'
+                '<input type="text" name="name" maxlength="10" '
+                'required id="id_name"></div><div>'
+                '<label for="id_colour">Colour::</label>'
+                '<input type="text" name="colour" maxlength="10" '
+                'required id="id_colour"></div>',
+            )
 
     def test_field_custom_bound_field(self):
         class TestForm(Form):
@@ -5387,6 +5418,7 @@ class OverrideTests(SimpleTestCase):
             '<legend class="required">Language:</legend>',
         )
 
+    @override_settings(FORM_RENDERER="forms_tests.tests.test_forms.CustomRenderer2")
     def test_custom_boundfield(self):
         class CustomBoundField(BoundField):
 
@@ -5402,15 +5434,46 @@ class OverrideTests(SimpleTestCase):
                 attrs["class"] = "custom-class-2"
                 return super().label_tag(contents, attrs, label_suffix, tag)
 
-        class CustomFrameworkForm(FrameworkForm):
-            name = CharField(bound_field_class=CustomBoundField)
+        with self.subTest("settings.FORM_RENDERER is the default"):
 
-            template_name = "forms_tests/legend_test.html"
-            bound_field_class = CustomBoundField2
+            class CustomFrameworkForm(FrameworkForm):
+                template_name = "forms_tests/legend_test.html"
 
-        f = CustomFrameworkForm()
-        self.assertHTMLEqual(
-            str(f),
-            '<label for="id_name" class="custom-class">Name:</label>'
-            '<legend class="custom-class-2">Language:</legend>',
-        )
+                name = CharField()
+
+            f = CustomFrameworkForm()
+
+            self.assertHTMLEqual(
+                str(f),
+                '<label for="id_name">Name</label>' "<label>Language</label>",
+            )
+        with self.subTest("Field-level takes priority over form-level"):
+
+            class CustomFrameworkForm(FrameworkForm):
+                template_name = "forms_tests/legend_test.html"
+                bound_field_class = CustomBoundField2
+
+                name = CharField(bound_field_class=CustomBoundField)
+
+            f = CustomFrameworkForm()
+
+            self.assertHTMLEqual(
+                str(f),
+                '<label for="id_name" class="custom-class">Name:</label>'
+                '<legend class="custom-class-2">Language:</legend>',
+            )
+
+        with self.subTest("Constructor argument takes priority over class attribute"):
+
+            class CustomFrameworkForm(FrameworkForm):
+                bound_field_class = CustomBoundField
+                template_name = "forms_tests/legend_test.html"
+
+                name = CharField()
+
+            f = CustomFrameworkForm(bound_field_class=CustomBoundField2)
+            self.assertHTMLEqual(
+                str(f),
+                '<label class="custom-class-2" for="id_name">Name:</label>'
+                '<legend class="custom-class-2">Language:</legend>',
+            )

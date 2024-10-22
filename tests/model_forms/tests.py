@@ -849,7 +849,9 @@ class ModelFormBaseTest(TestCase):
     def test_renderer_kwarg(self):
         from django.forms.renderers import BaseRenderer
 
-        custom = type("custom", (BaseRenderer,), {})()
+        class Renderer(BaseRenderer): ...  # noqa: E701 # Black disagrees with flake8
+
+        custom = Renderer()
         self.assertIs(ProductForm(renderer=custom).renderer, custom)
 
     def test_default_splitdatetime_field(self):
