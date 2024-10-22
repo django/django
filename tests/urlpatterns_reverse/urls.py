@@ -137,6 +137,6 @@ urlpatterns = [
     path("includes/", include(other_patterns)),
     # Security tests
     re_path("(.+)/security/$", empty_view, name="security"),
-    # View function from cbv
+    # View function from cbv.
     path("hello/<slug:name>/", view_func_from_cbv),
 ]

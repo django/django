@@ -522,12 +522,12 @@ class URLPatternReverse(SimpleTestCase):
         with self.assertRaisesMessage(NoReverseMatch, msg):
             reverse("places", kwargs={"arg1": 2})
 
-    def test_func_view_from_cbv(self):
+    def test_view_func_from_cbv(self):
         expected = "/hello/world/"
         url = reverse(views.view_func_from_cbv, kwargs={"name": "world"})
         self.assertEqual(url, expected)
 
-    def test_func_view_from_cbv_no_expected_kwarg(self):
+    def test_view_func_from_cbv_no_expected_kwarg(self):
         with self.assertRaises(NoReverseMatch):
             reverse(views.view_func_from_cbv)
 
