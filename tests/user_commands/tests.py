@@ -1,4 +1,5 @@
 import os
+import sys
 from argparse import ArgumentDefaultsHelpFormatter
 from io import StringIO
 from pathlib import Path
@@ -541,7 +542,10 @@ class UtilsTests(SimpleTestCase):
     def test_formatting_failure_is_caught_and_logged(self):
         cases = [
             (FileNotFoundError, "nonexistent"),
-            (PermissionError, Path(__file__).parent / "test_files" / "black"),
+            (
+                OSError if sys.platform == "win32" else PermissionError,
+                Path(__file__).parent / "test_files" / "black",
+            ),
         ]
         for exception, location in cases:
             with (
