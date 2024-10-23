@@ -1637,4 +1637,27 @@ only requirements are that it implement a ``clean()`` method and that its
 ``label``, ``initial``, ``widget``, ``help_text``).
 
 You can also customize how a field will be accessed by overriding
-:meth:`~django.forms.Field.get_bound_field()`.
+:attr:`~django.forms.Field.bound_field_class`::
+
+    class GPSCoordinatesBoundField(BoundField):
+        @property
+        def country(self):
+            """
+            Return the country the coordinates lie in or None if it can't be
+            determined.
+            """
+            value = self.value()
+            if value:
+                return get_country_from_coordinates(value)
+            else:
+                return None
+
+
+    # Either by setting a class attribute
+    class GPSCoordinatesField(Field):
+        bound_field_class = GPSCoordinatesBoundField
+
+
+    # Or passing it as an constructor argument:
+    class LocalizationForm(Form):
+        gps_coordinates = GPSCoordinatesField(bound_field_class=GPSCoordinatesBoundField)

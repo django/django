@@ -94,6 +94,7 @@ class Field:
         "required": _("This field is required."),
     }
     empty_values = list(validators.EMPTY_VALUES)
+    bound_field_class = None
 
     def __init__(
         self,
@@ -141,7 +142,7 @@ class Field:
         self.help_text = help_text
         self.disabled = disabled
         self.label_suffix = label_suffix
-        self.bound_field_class = bound_field_class
+        self.bound_field_class = bound_field_class or self.bound_field_class
         widget = widget or self.widget
         if isinstance(widget, type):
             widget = widget()

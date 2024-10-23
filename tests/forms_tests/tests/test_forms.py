@@ -4824,14 +4824,6 @@ Options: <select multiple name="options" aria-invalid="true" required>
                 name = CharField(max_length=10)
                 colour = CharField(max_length=10)
 
-            class BoundFieldWithTwoColons(BoundField):
-                def label_tag(
-                    self, contents=None, attrs=None, label_suffix=None, tag=None
-                ):
-                    return super().label_tag(
-                        contents=contents, attrs=attrs, label_suffix="::", tag=None
-                    )
-
             f = TestForm(bound_field_class=BoundFieldWithTwoColons)
             self.assertHTMLEqual(
                 f.as_div(),
@@ -4844,9 +4836,13 @@ Options: <select multiple name="options" aria-invalid="true" required>
             )
 
     def test_field_custom_bound_field(self):
+        class CustomField(CharField):
+            bound_field_class = BoundFieldWithoutColon
+
         class TestForm(Form):
-            name = CharField(max_length=10, bound_field_class=BoundFieldWithoutColon)
+            name = CustomField(max_length=10)
             colour = CharField(max_length=10)
+            comment = CustomField(bound_field_class=BoundFieldWithTwoColons)
 
         f = TestForm()
         self.assertHTMLEqual(
@@ -4856,7 +4852,9 @@ Options: <select multiple name="options" aria-invalid="true" required>
             'required id="id_name"></div><div>'
             '<label for="id_colour">Colour:</label>'
             '<input type="text" name="colour" maxlength="10" '
-            'required id="id_colour"></div>',
+            'required id="id_colour"></div>'
+            '<div><label for="id_comment">Comment::</label>'
+            '<input id="id_comment" name="comment" required type="text"></div>',
         )
 
 
@@ -4869,6 +4867,13 @@ class BoundFieldWithoutColon(BoundField):
     def label_tag(self, contents=None, attrs=None, label_suffix=None, tag=None):
         return super().label_tag(
             contents=contents, attrs=attrs, label_suffix="", tag=None
+        )
+
+
+class BoundFieldWithTwoColons(BoundField):
+    def label_tag(self, contents=None, attrs=None, label_suffix=None, tag=None):
+        return super().label_tag(
+            contents=contents, attrs=attrs, label_suffix="::", tag=None
         )
 
 
