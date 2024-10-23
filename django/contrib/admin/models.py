@@ -162,6 +162,18 @@ class LogEntry(models.Model):
     def is_deletion(self):
         return self.action_flag == DELETION
 
+    def get_url_for_user(self):
+        if not self.content_type:
+            return self.get_admin_url()
+
+        view_permission_name = (
+            f"{self.content_type.app_label}.view_{self.content_type.model}"
+        )
+        if self.user.has_perm(view_permission_name):
+            return self.get_admin_url()
+
+        return None
+
     def get_change_message(self):
         """
         If self.change_message is a JSON structure, interpret it as a change
