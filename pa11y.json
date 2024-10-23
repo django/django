@@ -1,0 +1,14 @@
+{
+    "defaults": {
+        "timeout": 10000
+    },
+    "urls": [
+        "http://127.0.0.1:8000/",
+        "http://127.0.0.1:8000/admin/",
+        "http://127.0.0.1:8000/admin/demo/artist/",
+        "http://127.0.0.1:8000/admin/demo/artist/7zX2wRWDKLiW2V5QlI4QXU/change/",
+        "http://127.0.0.1:8000/admin/demo/release/",
+        "http://127.0.0.1:8000/admin/demo/release/7xxg6PunBVeuTliClh4H5p/change/"
+
+    ]
+}
