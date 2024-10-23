@@ -56,7 +56,20 @@ class DatabaseCreationTests(SimpleTestCase):
                 creation._clone_test_db("suffix", verbosity=0, keepdb=True)
                 _clone_db.assert_not_called()
 
-    def test_clone_test_db_options_ordering(self):
+    @mock.patch("subprocess.Popen")
+    def test_clone_test_db_unexpected_error(self, mocked_popen):
+        creation = DatabaseCreation(connection)
+        mocked_proc = mock.Mock()
+        mocked_proc.communicate.return_value = (b"stdout", b"stderr")
+        mocked_popen.return_value.__enter__.return_value = mocked_proc
+
+        with self.assertRaises(SystemExit):
+            creation._clone_db("source_db", "target_db")
+
+    @mock.patch("sys.stdout", new_callable=StringIO)
+    @mock.patch("sys.stderr", new_callable=StringIO)
+    @mock.patch("subprocess.Popen")
+    def test_clone_test_db_options_ordering(self, mocked_popen, *mocked_objects):
         creation = DatabaseCreation(connection)
         try:
             saved_settings = connection.settings_dict
@@ -71,22 +84,116 @@ class DatabaseCreationTests(SimpleTestCase):
                     "read_default_file": "my.cnf",
                 },
             }
-            with mock.patch.object(subprocess, "Popen") as mocked_popen:
+            mock_proc = mock.Mock()
+            mock_proc.communicate.return_value = (b"", b"")
+            mock_proc.returncode = 0
+            mocked_popen.return_value.__enter__.return_value = mock_proc
+
+            creation._clone_db("source_db", "target_db")
+            mocked_popen.assert_has_calls(
+                [
+                    mock.call(
+                        [
+                            "mysqldump",
+                            "--defaults-file=my.cnf",
+                            "--routines",
+                            "--events",
+                            "source_db",
+                        ],
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE,
+                        env=None,
+                    ),
+                ]
+            )
+        finally:
+            connection.settings_dict = saved_settings
+
+    @mock.patch("sys.stdout", new_callable=StringIO)
+    @mock.patch("sys.stderr", new_callable=StringIO)
+    @mock.patch("subprocess.Popen")
+    def test_clone_test_db_dump_error(self, mocked_popen, *mocked_objects):
+        creation = DatabaseCreation(connection)
+        try:
+            saved_settings = connection.settings_dict
+            connection.settings_dict = {
+                "NAME": "source_db",
+                "USER": "",
+                "PASSWORD": "",
+                "PORT": "",
+                "HOST": "",
+                "ENGINE": "django.db.backends.mysql",
+                "OPTIONS": {
+                    "read_default_file": "my.cnf",
+                },
+            }
+            mock_proc = mock.Mock()
+            mock_proc.communicate.return_value = (b"", b"Dump error")
+            mock_proc.returncode = 1  # Simulate dump failure
+            mocked_popen.return_value.__enter__.return_value = mock_proc
+
+            with self.assertRaises(SystemExit) as cm:
                 creation._clone_db("source_db", "target_db")
-                mocked_popen.assert_has_calls(
-                    [
-                        mock.call(
-                            [
-                                "mysqldump",
-                                "--defaults-file=my.cnf",
-                                "--routines",
-                                "--events",
-                                "source_db",
-                            ],
-                            stdout=subprocess.PIPE,
-                            env=None,
-                        ),
-                    ]
-                )
+            self.assertEqual(cm.exception.code, 2)
+
+            mocked_popen.assert_called_with(
+                [
+                    "mysqldump",
+                    "--defaults-file=my.cnf",
+                    "--routines",
+                    "--events",
+                    "source_db",
+                ],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                env=None,
+            )
+        finally:
+            connection.settings_dict = saved_settings
+
+    @mock.patch("sys.stdout", new_callable=StringIO)
+    @mock.patch("sys.stderr", new_callable=StringIO)
+    @mock.patch("subprocess.Popen")
+    def test_clone_test_db_load_error(self, mocked_popen, *mocked_objects):
+        creation = DatabaseCreation(connection)
+        try:
+            saved_settings = connection.settings_dict
+            connection.settings_dict = {
+                "NAME": "source_db",
+                "USER": "",
+                "PASSWORD": "",
+                "PORT": "",
+                "HOST": "",
+                "ENGINE": "django.db.backends.mysql",
+                "OPTIONS": {
+                    "read_default_file": "my.cnf",
+                },
+            }
+            mock_dump_proc = mock.Mock()
+            mock_dump_proc.communicate.return_value = (b"", b"")
+            mock_dump_proc.returncode = 0  # Simulate successful dump
+
+            mock_load_proc = mock.Mock()
+            mock_load_proc.communicate.return_value = (b"", b"Load error")
+            mock_load_proc.returncode = 1  # Simulate load failure
+
+            mocked_popen.side_effect = [mock_dump_proc, mock_load_proc]
+
+            with self.assertRaises(SystemExit) as cm:
+                creation._clone_db("source_db", "target_db")
+            self.assertEqual(cm.exception.code, 2)
+
+            mocked_popen.assert_called_with(
+                [
+                    "mysqldump",
+                    "--defaults-file=my.cnf",
+                    "--routines",
+                    "--events",
+                    "source_db",
+                ],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                env=None,
+            )
         finally:
             connection.settings_dict = saved_settings
