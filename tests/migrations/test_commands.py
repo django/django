@@ -2261,7 +2261,7 @@ class MakeMigrationsTests(MigrationTestBase):
         self.assertIn(f"Created new merge migration {merge_file}", err.getvalue())
 
     @mock.patch("django.core.management.utils.shutil.which", return_value="nonexistent")
-    def test_makemigrations_stderr_contains_formatting_failures(self, _mock):
+    def test_makemigrations_stderr_contains_formatting_failures(self, mock):
         out = io.StringIO()
         err = io.StringIO()
         with self.temporary_migration_module(
@@ -2271,6 +2271,21 @@ class MakeMigrationsTests(MigrationTestBase):
                 "makemigrations",
                 "migrations",
                 empty=True,
+                stdout=out,
+                stderr=err,
+            )
+        self.assertIn("Formatters failed to launch", err.getvalue())
+
+        out = io.StringIO()
+        err = io.StringIO()
+        with self.temporary_migration_module(
+            module="migrations.test_migrations_conflict"
+        ):
+            call_command(
+                "makemigrations",
+                "migrations",
+                merge=True,
+                interactive=False,
                 stdout=out,
                 stderr=err,
             )
@@ -3080,6 +3095,22 @@ class SquashMigrationsTests(MigrationTestBase):
             + black_warning,
         )
 
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
+    @mock.patch("django.core.management.utils.shutil.which", return_value="nonexistent")
+    def test_failure_to_format(self, mock):
+        out = io.StringIO()
+        err = io.StringIO()
+        with self.temporary_migration_module(module="migrations.test_migrations"):
+            call_command(
+                "squashmigrations",
+                "migrations",
+                "0002",
+                interactive=False,
+                stdout=out,
+                stderr=err,
+            )
+        self.assertIn("Formatters failed to launch", err.getvalue())
+
 
 class AppLabelErrorTests(TestCase):
     """
@@ -3312,3 +3343,14 @@ class OptimizeMigrationTests(MigrationTestBase):
         msg = "Cannot find a migration matching 'nonexistent' from app 'migrations'."
         with self.assertRaisesMessage(CommandError, msg):
             call_command("optimizemigration", "migrations", "nonexistent")
+
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
+    @mock.patch("django.core.management.utils.shutil.which", return_value="nonexistent")
+    def test_failure_to_format(self, mock):
+        out = io.StringIO()
+        err = io.StringIO()
+        with self.temporary_migration_module(module="migrations.test_migrations"):
+            call_command(
+                "optimizemigration", "migrations", "0001", stdout=out, stderr=err
+            )
+        self.assertIn("Formatters failed to launch", err.getvalue())
