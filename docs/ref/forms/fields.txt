@@ -1661,3 +1661,14 @@ You can also customize how a field will be accessed by overriding
     # Or passing it as an constructor argument:
     class LocalizationForm(Form):
         gps_coordinates = GPSCoordinatesField(bound_field_class=GPSCoordinatesBoundField)
+
+Alternatively, you can customize how the corresponding
+:class:`~django.forms.BoundField` is created by overriding
+``Field.get_bound_field``:
+
+.. method:: Field.get_bound_field(form, field_name)
+
+    Takes an instance of :class:`~django.forms.Form` and the name of the field.
+    The return value will be used when accessing the field in a template. Most
+    likely it will be an instance of a subclass of
+    :class:`~django.forms.BoundField`.
