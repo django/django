@@ -78,7 +78,12 @@ Required ``Meta`` Options
 
 .. attribute:: ModelFormOptions.fields
 
-    *One of* :attr:`~ModelFormOptions.fields` *and* :attr:`~ModelFormOptions.exclude` *must be set.* Expects a tuple of string or list of strings where each string is the name of a field from the model set in :attr:`~ModelFormOptions.model` or, instead, the single, special string ``'__all__'``. Every field named in :attr:`~ModelFormOptions.fields` will be included in the output form. Non-editable fields cannot be included.
+    *One of* :attr:`~ModelFormOptions.fields` *and*
+    :attr:`~ModelFormOptions.exclude` *must be set.* Expects a tuple of string
+    or list of strings where each string is the name of a field from the model
+    set in :attr:`~ModelFormOptions.model` or, instead, the single, special
+    string ``'__all__'``. Every field named in :attr:`~ModelFormOptions.fields`
+    will be included in the output form. Non-editable fields cannot be included.
     
     * If set to the special string ``'__all__'``, all non-editable model fields
       will be inlcuded.
@@ -104,7 +109,13 @@ Required ``Meta`` Options
 
 .. attribute:: ModelFormOptions.exclude
 
-    *One of* :attr:`~ModelFormOptions.fields` *and* :attr:`~ModelFormOptions.exclude` *must be set.* Expects a tuple of strings or list of strings where each string is the name of a field from the model set in :attr:`~ModelFormOptions.model`. Every field named in :attr:`~ModelFormOptions.exclude` will be excluded from the output form, **including fields that are also listed in** :attr:`~ModelFormOptions.fields`.
+    *One of* :attr:`~ModelFormOptions.fields` *and*
+    :attr:`~ModelFormOptions.exclude` *must be set.* Expects a tuple of strings
+    or list of strings where each string is the name of a field from the model
+    set in :attr:`~ModelFormOptions.model`. Every field named in
+    :attr:`~ModelFormOptions.exclude` will be excluded from the output form,
+    **including fields that are also listed in**
+    :attr:`~ModelFormOptions.fields`.
 
     * When using :attr:`~ModelFormOptions.exclude`, leaving
       :attr:`~ModelFormOptions.fields` unset or setting it to ``None`` has the
