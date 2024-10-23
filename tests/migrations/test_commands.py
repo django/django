@@ -2260,6 +2260,22 @@ class MakeMigrationsTests(MigrationTestBase):
         self.assertEqual(out.getvalue(), f"{merge_file}\n")
         self.assertIn(f"Created new merge migration {merge_file}", err.getvalue())
 
+    @mock.patch("django.core.management.utils.shutil.which", return_value="nonexistent")
+    def test_makemigrations_stderr_contains_formatting_failures(self, _mock):
+        out = io.StringIO()
+        err = io.StringIO()
+        with self.temporary_migration_module(
+            module="migrations.migrations.test_migrations"
+        ):
+            call_command(
+                "makemigrations",
+                "migrations",
+                empty=True,
+                stdout=out,
+                stderr=err,
+            )
+        self.assertIn("Formatters failed to launch", err.getvalue())
+
     def test_makemigrations_migrations_modules_path_not_exist(self):
         """
         makemigrations creates migrations when specifying a custom location
