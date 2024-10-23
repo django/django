@@ -47,7 +47,7 @@ produced can be controlled by setting metadata options as attributes of an inner
     While any number of attributes can be included in a ``Meta``
     class, **only attributes that match those described below will be used**.
     When troubleshooting or encountering unexpected behavior, be sure to check
-    for mistyped or misnamed attributes because these will **not**, in and of
+    for typos or misnamed attributes because these will **not**, in and of
     themselves, raise an error (though they might cause another error to be
     raised if they affect a required attribute).
 
@@ -86,7 +86,7 @@ Required ``Meta`` Options
     will be included in the output form. Non-editable fields cannot be included.
     
     * If set to the special string ``'__all__'``, all non-editable model fields
-      will be inlcuded.
+      will be included.
     * Other than the special case of ``'__all__'``,
       :attr:`~ModelFormOptions.fields` **cannot** be set to a single string,
       even if only a single field is desired. The input for
@@ -95,7 +95,7 @@ Required ``Meta`` Options
       'myFieldName' ]``) or else a :exc:`TypeError` will be raised.
     * If a string provided is not a valid field name for the model specified by
       :attr:`ModelFormOptions.model` (e.g., the field doesn't exist on the model
-      or the field name was mistyped), a
+      or the field name contained a typo), a
       :exc:`~django.core.exceptions.FieldError` exception will be raised.
     * If a non-editable field name is provided, a
       :exc:`~django.core.exceptions.FieldError` exception will be raised.
