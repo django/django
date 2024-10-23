@@ -64,6 +64,7 @@ class OGRGeometry(GDALBase):
     """Encapsulate an OGR geometry."""
 
     destructor = capi.destroy_geom
+    geos_support = True
 
     def __init__(self, geom_input, srs=None):
         """Initialize Geometry on either WKT or an OGR pointer as input."""
@@ -304,6 +305,19 @@ class OGRGeometry(GDALBase):
                 f"Input to 'set_measured' must be a boolean, got '{value!r}'."
             )
 
+    @property
+    def has_curve(self):
+        """Return True if the geometry is or has curve geometry."""
+        return capi.has_curve_geom(self.ptr, 0)
+
+    def get_linear_geometry(self):
+        """Return a linear version of this geometry."""
+        return OGRGeometry(capi.get_linear_geom(self.ptr, 0, None))
+
+    def get_curve_geometry(self):
+        """Return a curve version of this geometry."""
+        return OGRGeometry(capi.get_curve_geom(self.ptr, None))
+
     # #### SpatialReference-related Properties ####
 
     # The SRS property
@@ -360,9 +374,14 @@ class OGRGeometry(GDALBase):
     @property
     def geos(self):
         "Return a GEOSGeometry object from this OGRGeometry."
-        from django.contrib.gis.geos import GEOSGeometry
+        if self.geos_support:
+            from django.contrib.gis.geos import GEOSGeometry
 
-        return GEOSGeometry(self._geos_ptr(), self.srid)
+            return GEOSGeometry(self._geos_ptr(), self.srid)
+        else:
+            from django.contrib.gis.geos import GEOSException
+
+            raise GEOSException(f"GEOS does not support {self.__class__.__qualname__}.")
 
     @property
     def gml(self):
@@ -727,6 +746,18 @@ class Polygon(OGRGeometry):
         return sum(self[i].point_count for i in range(self.geom_count))
 
 
+class CircularString(LineString):
+    geos_support = False
+
+
+class CurvePolygon(Polygon):
+    geos_support = False
+
+
+class CompoundCurve(OGRGeometry):
+    geos_support = False
+
+
 # Geometry Collection base class.
 class GeometryCollection(OGRGeometry):
     "The Geometry Collection class."
@@ -788,6 +819,14 @@ class MultiPolygon(GeometryCollection):
     pass
 
 
+class MultiSurface(GeometryCollection):
+    geos_support = False
+
+
+class MultiCurve(GeometryCollection):
+    geos_support = False
+
+
 # Class mapping dictionary (using the OGRwkbGeometryType as the key)
 GEO_CLASSES = {
     1: Point,
@@ -797,7 +836,17 @@ GEO_CLASSES = {
     5: MultiLineString,
     6: MultiPolygon,
     7: GeometryCollection,
+    8: CircularString,
+    9: CompoundCurve,
+    10: CurvePolygon,
+    11: MultiCurve,
+    12: MultiSurface,
     101: LinearRing,
+    1008: CircularString,  # CIRCULARSTRING Z
+    1009: CompoundCurve,  # COMPOUNDCURVE Z
+    1010: CurvePolygon,  # CURVEPOLYGON Z
+    1011: MultiCurve,  # MULTICURVE Z
+    1012: MultiSurface,  # MULTICURVE Z
     2001: Point,  # POINT M
     2002: LineString,  # LINESTRING M
     2003: Polygon,  # POLYGON M
@@ -805,6 +854,11 @@ GEO_CLASSES = {
     2005: MultiLineString,  # MULTILINESTRING M
     2006: MultiPolygon,  # MULTIPOLYGON M
     2007: GeometryCollection,  # GEOMETRYCOLLECTION M
+    2008: CircularString,  # CIRCULARSTRING M
+    2009: CompoundCurve,  # COMPOUNDCURVE M
+    2010: CurvePolygon,  # CURVEPOLYGON M
+    2011: MultiCurve,  # MULTICURVE M
+    2012: MultiSurface,  # MULTICURVE M
     3001: Point,  # POINT ZM
     3002: LineString,  # LINESTRING ZM
     3003: Polygon,  # POLYGON ZM
@@ -812,6 +866,11 @@ GEO_CLASSES = {
     3005: MultiLineString,  # MULTILINESTRING ZM
     3006: MultiPolygon,  # MULTIPOLYGON ZM
     3007: GeometryCollection,  # GEOMETRYCOLLECTION ZM
+    3008: CircularString,  # CIRCULARSTRING ZM
+    3009: CompoundCurve,  # COMPOUNDCURVE ZM
+    3010: CurvePolygon,  # CURVEPOLYGON ZM
+    3011: MultiCurve,  # MULTICURVE ZM
+    3012: MultiSurface,  # MULTISURFACE ZM
     1 + OGRGeomType.wkb25bit: Point,  # POINT Z
     2 + OGRGeomType.wkb25bit: LineString,  # LINESTRING Z
     3 + OGRGeomType.wkb25bit: Polygon,  # POLYGON Z

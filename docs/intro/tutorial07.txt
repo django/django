@@ -306,10 +306,10 @@ powered by Django itself, and its interfaces use Django's own template system.
 Customizing your *project's* templates
 --------------------------------------
 
-Create a ``templates`` directory in your project directory (the one that
-contains ``manage.py``). Templates can live anywhere on your filesystem that
-Django can access. (Django runs as whatever user your server runs.) However,
-keeping your templates within the project is a good convention to follow.
+Create a ``templates`` directory in your ``djangotutorial`` directory.
+Templates can live anywhere on your filesystem that Django can access. (Django
+runs as whatever user your server runs.) However, keeping your templates within
+the project is a good convention to follow.
 
 Open your settings file (:file:`mysite/settings.py`, remember) and add a
 :setting:`DIRS <TEMPLATES-DIRS>` option in the :setting:`TEMPLATES` setting:
@@ -324,7 +324,6 @@ Open your settings file (:file:`mysite/settings.py`, remember) and add a
             "APP_DIRS": True,
             "OPTIONS": {
                 "context_processors": [
-                    "django.template.context_processors.debug",
                     "django.template.context_processors.request",
                     "django.contrib.auth.context_processors.auth",
                     "django.contrib.messages.context_processors.messages",

@@ -62,7 +62,8 @@ class represents a particular record in the database table.
 To create an object, instantiate it using keyword arguments to the model class,
 then call :meth:`~django.db.models.Model.save` to save it to the database.
 
-Assuming models live in a file ``mysite/blog/models.py``, here's an example:
+Assuming models live in a ``models.py`` file inside a ``blog`` Django app, here
+is an example:
 
 .. code-block:: pycon
 

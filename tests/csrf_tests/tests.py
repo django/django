@@ -1481,9 +1481,11 @@ class CsrfInErrorHandlingViewsTests(CsrfFunctionTestMixin, SimpleTestCase):
         response = self.client.get("/does not exist/")
         # The error handler returns status code 599.
         self.assertEqual(response.status_code, 599)
-        token1 = response.content.decode("ascii")
+        response.charset = "ascii"
+        token1 = response.text
         response = self.client.get("/does not exist/")
         self.assertEqual(response.status_code, 599)
-        token2 = response.content.decode("ascii")
+        response.charset = "ascii"
+        token2 = response.text
         secret2 = _unmask_cipher_token(token2)
         self.assertMaskedSecretCorrect(token1, secret2)

@@ -17,7 +17,7 @@ You can install Hypercorn with ``pip``:
 Running Django in Hypercorn
 ===========================
 
-When Hypercorn is installed, a ``hypercorn`` command is available
+When :pypi:`Hypercorn` is installed, a ``hypercorn`` command is available
 which runs ASGI applications. Hypercorn needs to be called with the
 location of a module containing an ASGI application object, followed
 by what the application is called (separated by a colon).
@@ -35,4 +35,4 @@ this command from the same directory as your ``manage.py`` file.
 For more advanced usage, please read the `Hypercorn documentation
 <Hypercorn_>`_.
 
-.. _Hypercorn: https://pgjones.gitlab.io/hypercorn/
+.. _Hypercorn: https://hypercorn.readthedocs.io/

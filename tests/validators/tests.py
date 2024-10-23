@@ -635,8 +635,8 @@ TEST_DATA = [
     (validate_domain_name, "python-python.com", None),
     (validate_domain_name, "python.name.uk", None),
     (validate_domain_name, "python.tips", None),
-    (validate_domain_name, "http://例子.测试", None),
-    (validate_domain_name, "http://dashinpunytld.xn---c", None),
+    (validate_domain_name, "例子.测试", None),
+    (validate_domain_name, "dashinpunytld.xn---c", None),
     (validate_domain_name, "python..org", ValidationError),
     (validate_domain_name, "python-.org", ValidationError),
     (validate_domain_name, "too-long-name." * 20 + "com", ValidationError),
@@ -652,6 +652,16 @@ TEST_DATA = [
     ),
     (DomainNameValidator(accept_idna=False), "ıçğü.com", ValidationError),
     (DomainNameValidator(accept_idna=False), "not-domain-name", ValidationError),
+    (
+        DomainNameValidator(accept_idna=False),
+        "not-domain-name, but-has-domain-name-suffix.com",
+        ValidationError,
+    ),
+    (
+        DomainNameValidator(accept_idna=False),
+        "not-domain-name.com, but has domain prefix",
+        ValidationError,
+    ),
 ]
 
 # Add valid and invalid URL tests.

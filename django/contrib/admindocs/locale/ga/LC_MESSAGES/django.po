@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Aindriú Mac Giolla Eoin, 2024
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Luke Blaney <transifex@lukeblaney.co.uk>, 2019
 # Michael Thornhill <michael@maithu.com>, 2012
@@ -8,10 +9,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2019-06-22 21:37+0000\n"
-"Last-Translator: Luke Blaney <transifex@lukeblaney.co.uk>\n"
-"Language-Team: Irish (http://www.transifex.com/django/django/language/ga/)\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2024-10-07 20:19+0000\n"
+"Last-Translator: Aindriú Mac Giolla Eoin, 2024\n"
+"Language-Team: Irish (http://app.transifex.com/django/django/language/ga/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -20,7 +21,7 @@ msgstr ""
 "4);\n"
 
 msgid "Administrative Documentation"
-msgstr ""
+msgstr "Doiciméadúchán Riaracháin"
 
 msgid "Home"
 msgstr "Baile"
@@ -39,6 +40,10 @@ msgid ""
 "click the link and add it to your bookmarks. Now you can select the "
 "bookmarklet from any page in the site."
 msgstr ""
+"Chun leabharmharcanna a shuiteáil, tarraing an nasc chuig do bharra uirlisí "
+"leabharmharcanna, nó deaschliceáil ar an nasc agus cuir le do "
+"leabharmharcanna é. Anois is féidir leat an leabharmharc a roghnú ó aon "
+"leathanach ar an suíomh."
 
 msgid "Documentation for this page"
 msgstr "Doiciméadúchán le hadhaigh an leathanach seo"
@@ -54,7 +59,7 @@ msgid "Tags"
 msgstr "Clibeanna"
 
 msgid "List of all the template tags and their functions."
-msgstr ""
+msgstr "Liosta de na clibeanna teimpléid go léir agus a bhfeidhmeanna."
 
 msgid "Filters"
 msgstr "Scagairí"
@@ -63,6 +68,8 @@ msgid ""
 "Filters are actions which can be applied to variables in a template to alter "
 "the output."
 msgstr ""
+"Is gníomhartha iad na scagairí is féidir a chur i bhfeidhm ar athróga i "
+"dteimpléad chun an t-aschur a athrú."
 
 msgid "Models"
 msgstr "Samhla"
@@ -72,6 +79,9 @@ msgid ""
 "associated fields. Each model has a list of fields which can be accessed as "
 "template variables"
 msgstr ""
+"Is éard atá i múnlaí ná cur síos ar na réada go léir sa chóras agus ar na "
+"réimsí a bhaineann leo. Tá liosta réimsí ag gach samhail ar féidir rochtain "
+"a fháil orthu mar athróga teimpléid"
 
 msgid "Views"
 msgstr "Radharcanna"
@@ -81,138 +91,149 @@ msgid ""
 "template is used to generate the page and which objects are available to "
 "that template."
 msgstr ""
+"Gintear gach leathanach ar an suíomh poiblí trí radharc. Sainmhíníonn an t-"
+"amharc cén teimpléad a úsáidtear chun an leathanach a ghiniúint agus na "
+"rudaí atá ar fáil don teimpléad sin."
 
 msgid "Tools for your browser to quickly access admin functionality."
 msgstr ""
+"Uirlisí do do bhrabhsálaí chun rochtain tapa a fháil ar fheidhmiúlacht "
+"riaracháin."
 
 msgid "Please install docutils"
-msgstr ""
+msgstr "Suiteáil docutils le do thoil"
 
 #, python-format
 msgid ""
-"The admin documentation system requires Python's <a href=\"%(link)s"
-"\">docutils</a> library."
+"The admin documentation system requires Python’s <a "
+"href=\"%(link)s\">docutils</a> library."
 msgstr ""
+"Teastaíonn leabharlann Python <a href=\"%(link)s\">docutils</a> ón gcóras "
+"doiciméadúcháin riaracháin."
 
 #, python-format
 msgid ""
 "Please ask your administrators to install <a href=\"%(link)s\">docutils</a>."
-msgstr ""
+msgstr "Iarr ar do riarthóirí <a href=\"%(link)s\">docutils</a> a shuiteáil."
 
 #, python-format
 msgid "Model: %(name)s"
-msgstr ""
+msgstr "Múnla: %(name)s"
 
 msgid "Fields"
-msgstr ""
+msgstr "Réimsí"
 
 msgid "Field"
-msgstr ""
+msgstr "Réimse"
 
 msgid "Type"
 msgstr "Cineál"
 
 msgid "Description"
-msgstr ""
+msgstr "Cur síos"
 
 msgid "Methods with arguments"
-msgstr ""
+msgstr "Modhanna le hargóintí"
 
 msgid "Method"
-msgstr ""
+msgstr "Modh"
 
 msgid "Arguments"
-msgstr ""
+msgstr "Argóintí"
 
 msgid "Back to Model documentation"
-msgstr ""
+msgstr "Ar ais chuig an doiciméadú Múnla"
 
 msgid "Model documentation"
-msgstr ""
+msgstr "Doiciméadú múnla"
 
 msgid "Model groups"
-msgstr ""
+msgstr "Grúpaí samhlacha"
 
 msgid "Templates"
 msgstr "Teimpléid"
 
 #, python-format
 msgid "Template: %(name)s"
-msgstr ""
+msgstr "Teimpléad: %(name)s"
 
 #, python-format
-msgid "Template: \"%(name)s\""
-msgstr ""
+msgid "Template: <q>%(name)s</q>"
+msgstr "Teimpléad: <q>%(name)s</q>"
 
 #. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
-msgid "Search path for template \"%(name)s\":"
-msgstr ""
+msgid "Search path for template <q>%(name)s</q>:"
+msgstr "Teimpléad cuardaigh cosán <q>%(name)s</q>:"
 
 msgid "(does not exist)"
-msgstr ""
+msgstr "(níl ann)"
 
 msgid "Back to Documentation"
-msgstr ""
+msgstr "Ar ais go Doiciméadúchán"
 
 msgid "Template filters"
-msgstr ""
+msgstr "Ar ais go Doiciméadúchán"
 
 msgid "Template filter documentation"
-msgstr ""
+msgstr "Doiciméadú scagaire teimpléid"
 
 msgid "Built-in filters"
-msgstr ""
+msgstr "scagairí ionsuite"
 
 #, python-format
 msgid ""
 "To use these filters, put <code>%(code)s</code> in your template before "
 "using the filter."
 msgstr ""
+"Chun na scagairí seo a úsáid, cuir<code>%(code)s</code> i do theimpléad sula "
+"n-úsáideann tú an scagaire."
 
 msgid "Template tags"
-msgstr ""
+msgstr "Clibeanna teimpléid"
 
 msgid "Template tag documentation"
-msgstr ""
+msgstr "Doiciméadú clib teimpléad"
 
 msgid "Built-in tags"
-msgstr ""
+msgstr "Insuite i clibeanna"
 
 #, python-format
 msgid ""
 "To use these tags, put <code>%(code)s</code> in your template before using "
 "the tag."
 msgstr ""
+"Chun na clibeanna seo a úsáid, cuir <code>%(code)s</code> i do theimpléad "
+"sula n-úsáideann tú an chlib."
 
 #, python-format
 msgid "View: %(name)s"
-msgstr ""
+msgstr "Amharc: %(name)s"
 
 msgid "Context:"
-msgstr ""
+msgstr "Comhthéacs:"
 
 msgid "Templates:"
-msgstr ""
+msgstr "Teimpléid:"
 
 msgid "Back to View documentation"
-msgstr ""
+msgstr "Ar ais go dtí Féach ar na doiciméid"
 
 msgid "View documentation"
-msgstr ""
+msgstr "Féach ar cháipéisíocht"
 
 msgid "Jump to namespace"
-msgstr ""
+msgstr "Léim go spás ainm"
 
 msgid "Empty namespace"
-msgstr ""
+msgstr "Ainmspás folamh"
 
 #, python-format
 msgid "Views by namespace %(name)s"
-msgstr ""
+msgstr "Radhairc de réir ainmspáis %(name)s"
 
 msgid "Views by empty namespace"
-msgstr ""
+msgstr "Radhairc de réir ainmspás folamh"
 
 #, python-format
 msgid ""
@@ -220,6 +241,9 @@ msgid ""
 "    View function: <code>%(full_name)s</code>. Name: <code>%(url_name)s</"
 "code>.\n"
 msgstr ""
+"\n"
+"    Féach ar fheidhm: <code>%(full_name)s</code>. Ainm: <code>%(url_name)s</"
+"code>.\n"
 
 msgid "tag:"
 msgstr "clib:"
@@ -232,7 +256,7 @@ msgstr "radharc:"
 
 #, python-format
 msgid "App %(app_label)r not found"
-msgstr ""
+msgstr "Aip %(app_label)r gan aimsiú"
 
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"

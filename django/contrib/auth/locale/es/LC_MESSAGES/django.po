@@ -13,15 +13,15 @@
 # Josue Naaman Nistal Guerra <josuenistal@hotmail.com>, 2014
 # Leonardo J. Caballero G. <leonardocaballero@gmail.com>, 2011
 # Natalia, 2024
-# Uriel Medina <urimeba511@gmail.com>, 2020-2021,2023
+# Uriel Medina <urimeba511@gmail.com>, 2020-2021,2023-2024
 # Veronicabh <vero.blazher@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 08:09+0000\n"
-"Last-Translator: Natalia, 2024\n"
+"PO-Revision-Date: 2024-10-07 08:09+0000\n"
+"Last-Translator: Uriel Medina <urimeba511@gmail.com>, 2020-2021,2023-2024\n"
 "Language-Team: Spanish (http://app.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
@@ -44,13 +44,15 @@ msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "el objeto %(name)s con clave primaria %(key)r no existe."
 
 msgid "Conflicting form data submitted. Please try again."
-msgstr "Los datos enviados se contradicen. Por favor intente de nuevo."
+msgstr ""
+"Se enviaron datos contradictorios en el formulario. Por favor inténtalo de "
+"nuevo."
 
 msgid "Password changed successfully."
 msgstr "La contraseña se ha cambiado con éxito."
 
 msgid "Password-based authentication was disabled."
-msgstr "La autenticación basada en contraseñas fue deshabilitada."
+msgstr "La autenticación basada en contraseña fue deshabilitada."
 
 #, python-format
 msgid "Change password: %s"
@@ -103,7 +105,7 @@ msgid "Enter the same password as before, for verification."
 msgstr "Para verificar, introduzca la misma contraseña anterior."
 
 msgid "Password-based authentication"
-msgstr "Autenticación basada en contraseñas"
+msgstr "Autenticación basada en contraseña"
 
 msgid "Enabled"
 msgstr "Habilitado"

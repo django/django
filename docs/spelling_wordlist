@@ -123,6 +123,7 @@ deduplicates
 deduplication
 deepcopy
 deferrable
+DEP
 deprecations
 deserialization
 deserialize
@@ -141,6 +142,7 @@ Disqus
 distro
 django
 djangoproject
+djangotutorial
 dm
 docstring
 docstrings

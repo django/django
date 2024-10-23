@@ -300,7 +300,11 @@ class DateMixin:
 
 
 class BaseDateListView(MultipleObjectMixin, DateMixin, View):
-    """Abstract base class for date-based views displaying a list of objects."""
+    """
+    Base class for date-based views displaying a list of objects.
+
+    This requires subclassing to provide a response mixin.
+    """
 
     allow_empty = False
     date_list_period = "year"
@@ -388,7 +392,9 @@ class BaseDateListView(MultipleObjectMixin, DateMixin, View):
 
 class BaseArchiveIndexView(BaseDateListView):
     """
-    Base class for archives of date-based items. Requires a response mixin.
+    Base view for archives of date-based items.
+
+    This requires subclassing to provide a response mixin.
     """
 
     context_object_name = "latest"
@@ -411,7 +417,11 @@ class ArchiveIndexView(MultipleObjectTemplateResponseMixin, BaseArchiveIndexView
 
 
 class BaseYearArchiveView(YearMixin, BaseDateListView):
-    """List of objects published in a given year."""
+    """
+    Base view for a list of objects published in a given year.
+
+    This requires subclassing to provide a response mixin.
+    """
 
     date_list_period = "month"
     make_object_list = False
@@ -463,7 +473,11 @@ class YearArchiveView(MultipleObjectTemplateResponseMixin, BaseYearArchiveView):
 
 
 class BaseMonthArchiveView(YearMixin, MonthMixin, BaseDateListView):
-    """List of objects published in a given month."""
+    """
+    Base view for a list of objects published in a given month.
+
+    This requires subclassing to provide a response mixin.
+    """
 
     date_list_period = "day"
 
@@ -505,7 +519,11 @@ class MonthArchiveView(MultipleObjectTemplateResponseMixin, BaseMonthArchiveView
 
 
 class BaseWeekArchiveView(YearMixin, WeekMixin, BaseDateListView):
-    """List of objects published in a given week."""
+    """
+    Base view for a list of objects published in a given week.
+
+    This requires subclassing to provide a response mixin.
+    """
 
     def get_dated_items(self):
         """Return (date_list, items, extra_context) for this request."""
@@ -563,7 +581,11 @@ class WeekArchiveView(MultipleObjectTemplateResponseMixin, BaseWeekArchiveView):
 
 
 class BaseDayArchiveView(YearMixin, MonthMixin, DayMixin, BaseDateListView):
-    """List of objects published on a given day."""
+    """
+    Base view for a list of objects published on a given day.
+
+    This requires subclassing to provide a response mixin.
+    """
 
     def get_dated_items(self):
         """Return (date_list, items, extra_context) for this request."""
@@ -610,7 +632,11 @@ class DayArchiveView(MultipleObjectTemplateResponseMixin, BaseDayArchiveView):
 
 
 class BaseTodayArchiveView(BaseDayArchiveView):
-    """List of objects published today."""
+    """
+    Base view for a list of objects published today.
+
+    This requires subclassing to provide a response mixin.
+    """
 
     def get_dated_items(self):
         """Return (date_list, items, extra_context) for this request."""
@@ -625,8 +651,10 @@ class TodayArchiveView(MultipleObjectTemplateResponseMixin, BaseTodayArchiveView
 
 class BaseDateDetailView(YearMixin, MonthMixin, DayMixin, DateMixin, BaseDetailView):
     """
-    Detail view of a single object on a single date; this differs from the
+    Base detail view for a single object on a single date; this differs from the
     standard DetailView by accepting a year/month/day in the URL.
+
+    This requires subclassing to provide a response mixin.
     """
 
     def get_object(self, queryset=None):

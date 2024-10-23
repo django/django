@@ -15,6 +15,7 @@
 # Le Yang <youngleocn@qq.com>, 2018
 # li beite <lbt012345@gmail.com>, 2020
 # Liping Wang <lynn.config@gmail.com>, 2016-2017
+# L., 2024
 # matthew Yip <yymmatthew@gmail.com>, 2020
 # mozillazg <opensource.mozillazg@gmail.com>, 2016
 # Ronald White <tkliuxing@me.com>, 2014
@@ -33,6 +34,7 @@
 # ced773123cfad7b4e8b79ca80f736af9, 2011-2012
 # Ziya Tang <tcztzy@gmail.com>, 2018
 # 付峥 <fuzheng1998@outlook.com>, 2018
+# L., 2024
 # LatteFang <370358679@qq.com>, 2020
 # Kevin Sze <leiarix@gmail.com>, 2012
 # 高乐喆 <gaolezhe@outlook.com>, 2023
@@ -40,9 +42,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-25 06:49+0000\n"
-"Last-Translator: jack yang, 2023\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-10-07 06:49+0000\n"
+"Last-Translator: L., 2024\n"
 "Language-Team: Chinese (China) (http://app.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -377,6 +379,9 @@ msgstr "本页结果为空"
 msgid "Enter a valid value."
 msgstr "输入一个有效的值。"
 
+msgid "Enter a valid domain name."
+msgstr "输入一个有效的域名。"
+
 msgid "Enter a valid URL."
 msgstr "输入一个有效的 URL。"
 
@@ -396,14 +401,18 @@ msgid ""
 "hyphens."
 msgstr "输入由Unicode字母，数字，下划线或连字符号组成的有效“字段”。"
 
-msgid "Enter a valid IPv4 address."
-msgstr "输入一个有效的 IPv4 地址。"
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr "输入一个有效的 %(protocol)s 地址。"
 
-msgid "Enter a valid IPv6 address."
-msgstr "输入一个有效的 IPv6 地址。"
+msgid "IPv4"
+msgstr "IPv4"
 
-msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "输入一个有效的 IPv4 或 IPv6 地址."
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "IPv4 or IPv6"
+msgstr "IPv4 或 IPv6"
 
 msgid "Enter only digits separated by commas."
 msgstr "只能输入用逗号分隔的数字。"
