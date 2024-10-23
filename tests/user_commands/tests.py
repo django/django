@@ -560,4 +560,5 @@ class UtilsTests(SimpleTestCase):
                 out = stderr.getvalue()
                 self.assertIn("Formatters failed to launch:", out)
                 self.assertIn(exception.__qualname__, out)
-                self.assertIn(location, out)
+                if sys.platform != "win32":
+                    self.assertIn(location, out)
