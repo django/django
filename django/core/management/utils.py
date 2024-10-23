@@ -179,5 +179,5 @@ def run_formatters(
                 capture_output=True,
             )
         except OSError:
-            stderr.write(f"Formatters failed to launch:")
+            stderr.write("Formatters failed to launch:")
             traceback.print_exc(file=stderr)
