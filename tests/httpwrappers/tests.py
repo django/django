@@ -557,7 +557,9 @@ class HttpResponseSubclassesTests(SimpleTestCase):
             content="The resource has temporarily moved",
         )
         self.assertContains(
-            response, "The resource has temporarily moved", status_code=302
+            response,
+            "The resource has temporarily moved",
+            status_code=302,
         )
         self.assertEqual(response.url, response.headers["Location"])
 
@@ -565,6 +567,46 @@ class HttpResponseSubclassesTests(SimpleTestCase):
         """Make sure HttpResponseRedirect works with lazy strings."""
         r = HttpResponseRedirect(lazystr("/redirected/"))
         self.assertEqual(r.url, "/redirected/")
+
+    def test_redirect_permanent(self):
+        response = HttpResponsePermanentRedirect(
+            "/redirected/", content="The resource has permanently moved"
+        )
+        self.assertEqual(response.status_code, 301)
+        self.assertContains(
+            response,
+            "The resource has permanently moved",
+            status_code=301,
+        )
+        self.assertEqual(response.url, response.headers["Location"])
+
+    def test_redirect_preserve_method(self):
+        response = HttpResponseRedirect(
+            "/redirected/",
+            content="The resource has temporarily moved, please use same method",
+            preserve_method=True,
+        )
+        self.assertEqual(response.status_code, 307)
+        self.assertContains(
+            response,
+            "The resource has temporarily moved, please use same method",
+            status_code=307,
+        )
+        self.assertEqual(response.url, response.headers["Location"])
+
+    def test_redirect_permanent_preserve_method(self):
+        response = HttpResponsePermanentRedirect(
+            "/redirected/",
+            content="The resource has permanently moved, please use same method",
+            preserve_method=True,
+        )
+        self.assertEqual(response.status_code, 308)
+        self.assertContains(
+            response,
+            "The resource has permanently moved, please use same method",
+            status_code=308,
+        )
+        self.assertEqual(response.url, response.headers["Location"])
 
     def test_redirect_repr(self):
         response = HttpResponseRedirect("/redirected/")

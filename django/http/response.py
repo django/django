@@ -627,10 +627,12 @@ class FileResponse(StreamingHttpResponse):
 class HttpResponseRedirectBase(HttpResponse):
     allowed_schemes = ["http", "https", "ftp"]
 
-    def __init__(self, redirect_to, *args, **kwargs):
+    def __init__(self, redirect_to, preserve_method=False, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self["Location"] = iri_to_uri(redirect_to)
         parsed = urlsplit(str(redirect_to))
+        if preserve_method:
+            self.status_code = self.preserve_method_status_code
         if parsed.scheme and parsed.scheme not in self.allowed_schemes:
             raise DisallowedRedirect(
                 "Unsafe redirect to URL with protocol '%s'" % parsed.scheme
@@ -652,10 +654,12 @@ class HttpResponseRedirectBase(HttpResponse):
 
 class HttpResponseRedirect(HttpResponseRedirectBase):
     status_code = 302
+    preserve_method_status_code = 307
 
 
 class HttpResponsePermanentRedirect(HttpResponseRedirectBase):
     status_code = 301
+    preserve_method_status_code = 308
 
 
 class HttpResponseNotModified(HttpResponse):

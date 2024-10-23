@@ -26,7 +26,7 @@ def render(
     return HttpResponse(content, content_type, status)
 
 
-def redirect(to, *args, permanent=False, **kwargs):
+def redirect(to, *args, permanent=False, preserve_method=False, **kwargs):
     """
     Return an HttpResponseRedirect to the appropriate URL for the arguments
     passed.
@@ -40,13 +40,18 @@ def redirect(to, *args, permanent=False, **kwargs):
 
         * A URL, which will be used as-is for the redirect location.
 
-    Issues a temporary redirect by default; pass permanent=True to issue a
-    permanent redirect.
+    Issues a temporary redirect by default. Pass permanent=True to issue a
+    permanent redirect. Pass preserve_method=True to issue a redirect that must
+    preserve the HTTP method.
     """
+
     redirect_class = (
         HttpResponsePermanentRedirect if permanent else HttpResponseRedirect
     )
-    return redirect_class(resolve_url(to, *args, **kwargs))
+
+    return redirect_class(
+        resolve_url(to, *args, **kwargs), preserve_method=preserve_method
+    )
 
 
 def _get_queryset(klass):
