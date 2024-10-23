@@ -1940,6 +1940,7 @@ class ModelAdmin(BaseModelAdmin):
             "inline_admin_formsets": inline_formsets,
             "errors": helpers.AdminErrorList(form, formsets),
             "preserved_filters": self.get_preserved_filters(request),
+            "field_errors_exist": form._field_errors_exist,
         }
 
         # Hide the "Save" and "Save and continue" buttons if "Save as New" was
