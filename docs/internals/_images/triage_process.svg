@@ -233,10 +233,10 @@
       <g id="Graphic_89">
         <rect x="189" y="144" width="243" height="54" fill="white"/>
         <path d="M 432 198 L 189 198 L 189 144 L 432 144 Z" stroke="#aaa" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4.0,4.0" stroke-width="1"/>
-        <text transform="translate(193 150)" fill="#797979">
-          <tspan font-family="Helvetica" font-size="12" fill="#797979" x="19.789062" y="11">The ticket was already reported, was </tspan>
-          <tspan font-family="Helvetica" font-size="12" fill="#797979" x=".8017578" y="25">already rejected, isn&apos;t a bug, doesn&apos;t contain </tspan>
-          <tspan font-family="Helvetica" font-size="12" fill="#797979" x="1.2792969" y="39">enough information, or can&apos;t be reproduced.</tspan>
+        <text transform="translate(193 150)" fill="#595959">
+          <tspan font-family="Helvetica" font-size="12" fill="#595959" x="19.789062" y="11">The ticket was already reported, was </tspan>
+          <tspan font-family="Helvetica" font-size="12" fill="#595959" x=".8017578" y="25">already rejected, isn&apos;t a bug, doesn&apos;t contain </tspan>
+          <tspan font-family="Helvetica" font-size="12" fill="#595959" x="1.2792969" y="39">enough information, or can&apos;t be reproduced.</tspan>
         </text>
       </g>
       <g id="Line_90">
@@ -248,10 +248,10 @@
       <g id="Graphic_96">
         <rect x="72" y="144" width="99" height="54" fill="white"/>
         <path d="M 171 198 L 72 198 L 72 144 L 171 144 Z" stroke="#aaa" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4.0,4.0" stroke-width="1"/>
-        <text transform="translate(76 150)" fill="#797979">
-          <tspan font-family="Helvetica" font-size="12" fill="#797979" x="8.486328" y="11">The ticket is a </tspan>
-          <tspan font-family="Helvetica" font-size="12" fill="#797979" x="4.463867" y="25">bug and should </tspan>
-          <tspan font-family="Helvetica" font-size="12" fill="#797979" x="22.81836" y="39">be fixed.</tspan>
+        <text transform="translate(76 150)" fill="#595959">
+          <tspan font-family="Helvetica" font-size="12" fill="#595959" x="8.486328" y="11">The ticket is a </tspan>
+          <tspan font-family="Helvetica" font-size="12" fill="#595959" x="4.463867" y="25">bug and should </tspan>
+          <tspan font-family="Helvetica" font-size="12" fill="#595959" x="22.81836" y="39">be fixed.</tspan>
         </text>
       </g>
       <g id="Graphic_97">
@@ -263,9 +263,9 @@
       <g id="Graphic_102">
         <rect x="72" y="522" width="342" height="36" fill="white"/>
         <path d="M 414 558 L 72 558 L 72 522 L 414 522 Z" stroke="#aaa" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4.0,4.0" stroke-width="1"/>
-        <text transform="translate(76 526)" fill="#797979">
-          <tspan font-family="Helvetica" font-size="12" fill="#797979" x="7.241211" y="11">The ticket has a patch which applies cleanly and includes all </tspan>
-          <tspan font-family="Helvetica" font-size="12" fill="#797979" x="26.591797" y="25">needed tests and docs. A merger can commit it as is.</tspan>
+        <text transform="translate(76 526)" fill="#595959">
+          <tspan font-family="Helvetica" font-size="12" fill="#595959" x="7.241211" y="11">The ticket has a patch which applies cleanly and includes all </tspan>
+          <tspan font-family="Helvetica" font-size="12" fill="#595959" x="26.591797" y="25">needed tests and docs. A merger can commit it as is.</tspan>
         </text>
       </g>
       <g id="Graphic_103">
