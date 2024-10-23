@@ -49,8 +49,8 @@ attribute easily tells us what and who each ticket is waiting on.
 Since a picture is worth a thousand words, let's start there:
 
 .. image:: /internals/_images/triage_process.*
-   :height: 501
-   :width: 400
+   :height: 750
+   :width: 600
    :alt: Django's ticket triage workflow
 
 We've got two roles in this diagram:
