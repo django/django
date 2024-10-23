@@ -545,7 +545,7 @@ class UtilsTests(SimpleTestCase):
             (FileNotFoundError, "nonexistent"),
             (
                 OSError if sys.platform == "win32" else PermissionError,
-                Path(__file__).parent / "test_files" / "black",
+                str(Path(__file__).parent / "test_files" / "black"),
             ),
         ]
         for exception, location in cases:
