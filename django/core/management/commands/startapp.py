@@ -7,6 +7,7 @@ class Command(TemplateCommand):
         "the current directory or optionally in the given directory."
     )
     missing_args_message = "You must provide an application name."
+    requires_settings = False
 
     def handle(self, **options):
         app_name = options.pop("name")
