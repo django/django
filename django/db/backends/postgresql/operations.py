@@ -32,7 +32,9 @@ class DatabaseOperations(BaseDatabaseOperations):
             "BUFFERS",
             "COSTS",
             "GENERIC_PLAN",
+            "MEMORY",
             "SETTINGS",
+            "SERIALIZE",
             "SUMMARY",
             "TIMING",
             "VERBOSE",
@@ -365,6 +367,9 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def explain_query_prefix(self, format=None, **options):
         extra = {}
+        if serialize := options.pop("serialize", None):
+            if serialize.upper() in {"TEXT", "BINARY"}:
+                extra["SERIALIZE"] = serialize.upper()
         # Normalize options.
         if options:
             options = {

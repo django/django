@@ -277,6 +277,9 @@ Models
   longer required to be set on SQLite, which supports unlimited ``VARCHAR``
   columns.
 
+* :meth:`.QuerySet.explain` now supports the ``memory`` and ``serialize``
+  options on PostgreSQL 17+.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
