@@ -3,6 +3,7 @@ import os
 import shutil
 import subprocess
 import sys
+import traceback
 from pathlib import Path
 from subprocess import run
 
@@ -178,4 +179,5 @@ def run_formatters(
                 capture_output=True,
             )
         except OSError:
-            stderr.write(f"Black failed to launch.\n{sys.exc_info()}")
+            stderr.write(f"Formatters failed to launch:")
+            traceback.print_exc(file=stderr)

@@ -558,5 +558,5 @@ class UtilsTests(SimpleTestCase):
             ):
                 run_formatters([], stderr=stderr)
                 out = stderr.getvalue()
-                self.assertIn("Black failed to launch.\n", out)
+                self.assertIn("Formatters failed to launch:", out)
                 self.assertIn(exception.__qualname__, out)
