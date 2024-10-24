@@ -2,6 +2,9 @@ import ast
 import functools
 import importlib.util
 import pathlib
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class CodeLocator(ast.NodeVisitor):
@@ -106,6 +109,9 @@ def get_path_and_line(module, fullname):
             name=imported_path, package=module
         )
     except ImportError as error:
+        logger.error(
+            f"Could not import '{imported_path}' in '{module}'.", exc_info=True
+        )
         raise ImportError(
             f"Could not import '{imported_path}' in '{module}'."
         ) from error
@@ -139,6 +145,9 @@ def github_linkcode_resolve(domain, info, *, version, next_version):
     try:
         path, lineno = get_path_and_line(module=module, fullname=info["fullname"])
     except CodeNotFound:
+        logger.warning(
+            f"Code definition not found for module '{module}' and fullname '{info['fullname']}'."
+        )
         return None
 
     branch = get_branch(version=version, next_version=next_version)
