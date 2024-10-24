@@ -90,6 +90,9 @@ class ExplainTests(TestCase):
         ]
         if connection.features.is_postgresql_16:
             test_options.append({"generic_plan": True})
+        if connection.features.is_postgresql_17:
+            test_options.append({"memory": True})
+            test_options.append({"serialize": True})
         for options in test_options:
             with self.subTest(**options), transaction.atomic():
                 with CaptureQueriesContext(connection) as captured_queries:
