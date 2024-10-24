@@ -232,47 +232,47 @@
       </g>
       <g id="Graphic_89">
         <rect x="189" y="144" width="243" height="54" fill="white"/>
-        <path d="M 432 198 L 189 198 L 189 144 L 432 144 Z" stroke="#aaa" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4.0,4.0" stroke-width="1"/>
-        <text transform="translate(193 150)" fill="#797979">
-          <tspan font-family="Helvetica" font-size="12" fill="#797979" x="19.789062" y="11">The ticket was already reported, was </tspan>
-          <tspan font-family="Helvetica" font-size="12" fill="#797979" x=".8017578" y="25">already rejected, isn&apos;t a bug, doesn&apos;t contain </tspan>
-          <tspan font-family="Helvetica" font-size="12" fill="#797979" x="1.2792969" y="39">enough information, or can&apos;t be reproduced.</tspan>
+        <path d="M 432 198 L 189 198 L 189 144 L 432 144 Z" stroke="#595959" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4.0,4.0" stroke-width="1"/>
+        <text transform="translate(193 150)" fill="#595959">
+          <tspan font-family="Helvetica" font-size="12" fill="#595959" x="19.789062" y="11">The ticket was already reported, was </tspan>
+          <tspan font-family="Helvetica" font-size="12" fill="#595959" x=".8017578" y="25">already rejected, isn&apos;t a bug, doesn&apos;t contain </tspan>
+          <tspan font-family="Helvetica" font-size="12" fill="#595959" x="1.2792969" y="39">enough information, or can&apos;t be reproduced.</tspan>
         </text>
       </g>
       <g id="Line_90">
-        <line x1="252" y1="278.5" x2="252" y2="198" stroke="#aaa" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4.0,4.0" stroke-width="1"/>
+        <line x1="252" y1="278.5" x2="252" y2="198" stroke="#595959" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4.0,4.0" stroke-width="1"/>
       </g>
       <g id="Graphic_91">
-        <path d="M 258.36395 281.63605 C 261.8787 285.15076 261.8787 290.84924 258.36395 294.36395 C 254.84924 297.8787 249.15076 297.8787 245.63605 294.36395 C 242.1213 290.84924 242.1213 285.15076 245.63605 281.63605 C 249.15076 278.1213 254.84924 278.1213 258.36395 281.63605" stroke="#aaa" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4.0,4.0" stroke-width="1"/>
+        <path d="M 258.36395 281.63605 C 261.8787 285.15076 261.8787 290.84924 258.36395 294.36395 C 254.84924 297.8787 249.15076 297.8787 245.63605 294.36395 C 242.1213 290.84924 242.1213 285.15076 245.63605 281.63605 C 249.15076 278.1213 254.84924 278.1213 258.36395 281.63605" stroke="#595959" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4.0,4.0" stroke-width="1"/>
       </g>
       <g id="Graphic_96">
         <rect x="72" y="144" width="99" height="54" fill="white"/>
-        <path d="M 171 198 L 72 198 L 72 144 L 171 144 Z" stroke="#aaa" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4.0,4.0" stroke-width="1"/>
-        <text transform="translate(76 150)" fill="#797979">
-          <tspan font-family="Helvetica" font-size="12" fill="#797979" x="8.486328" y="11">The ticket is a </tspan>
-          <tspan font-family="Helvetica" font-size="12" fill="#797979" x="4.463867" y="25">bug and should </tspan>
-          <tspan font-family="Helvetica" font-size="12" fill="#797979" x="22.81836" y="39">be fixed.</tspan>
+        <path d="M 171 198 L 72 198 L 72 144 L 171 144 Z" stroke="#595959" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4.0,4.0" stroke-width="1"/>
+        <text transform="translate(76 150)" fill="#595959">
+          <tspan font-family="Helvetica" font-size="12" fill="#595959" x="8.486328" y="11">The ticket is a </tspan>
+          <tspan font-family="Helvetica" font-size="12" fill="#595959" x="4.463867" y="25">bug and should </tspan>
+          <tspan font-family="Helvetica" font-size="12" fill="#595959" x="22.81836" y="39">be fixed.</tspan>
         </text>
       </g>
       <g id="Graphic_97">
-        <path d="M 150.36395 317.63605 C 153.87869 321.15076 153.87869 326.84924 150.36395 330.36395 C 146.84924 333.8787 141.15076 333.8787 137.63605 330.36395 C 134.12131 326.84924 134.12131 321.15076 137.63605 317.63605 C 141.15076 314.1213 146.84924 314.1213 150.36395 317.63605" stroke="#aaa" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4.0,4.0" stroke-width="1"/>
+        <path d="M 150.36395 317.63605 C 153.87869 321.15076 153.87869 326.84924 150.36395 330.36395 C 146.84924 333.8787 141.15076 333.8787 137.63605 330.36395 C 134.12131 326.84924 134.12131 321.15076 137.63605 317.63605 C 141.15076 314.1213 146.84924 314.1213 150.36395 317.63605" stroke="#595959" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4.0,4.0" stroke-width="1"/>
       </g>
       <g id="Line_98">
-        <path d="M 134.5 324 L 81 324 L 81 198" stroke="#aaa" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4.0,4.0" stroke-width="1"/>
+        <path d="M 134.5 324 L 81 324 L 81 198" stroke="#595959" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4.0,4.0" stroke-width="1"/>
       </g>
       <g id="Graphic_102">
         <rect x="72" y="522" width="342" height="36" fill="white"/>
-        <path d="M 414 558 L 72 558 L 72 522 L 414 522 Z" stroke="#aaa" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4.0,4.0" stroke-width="1"/>
-        <text transform="translate(76 526)" fill="#797979">
-          <tspan font-family="Helvetica" font-size="12" fill="#797979" x="7.241211" y="11">The ticket has a patch which applies cleanly and includes all </tspan>
-          <tspan font-family="Helvetica" font-size="12" fill="#797979" x="26.591797" y="25">needed tests and docs. A merger can commit it as is.</tspan>
+        <path d="M 414 558 L 72 558 L 72 522 L 414 522 Z" stroke="#595959" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4.0,4.0" stroke-width="1"/>
+        <text transform="translate(76 526)" fill="#595959">
+          <tspan font-family="Helvetica" font-size="12" fill="#595959" x="7.241211" y="11">The ticket has a patch which applies cleanly and includes all </tspan>
+          <tspan font-family="Helvetica" font-size="12" fill="#595959" x="26.591797" y="25">needed tests and docs. A merger can commit it as is.</tspan>
         </text>
       </g>
       <g id="Graphic_103">
-        <path d="M 150.36395 407.63605 C 153.87869 411.15076 153.87869 416.84924 150.36395 420.36395 C 146.84924 423.8787 141.15076 423.8787 137.63605 420.36395 C 134.12131 416.84924 134.12131 411.15076 137.63605 407.63605 C 141.15076 404.1213 146.84924 404.1213 150.36395 407.63605" stroke="#aaa" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4.0,4.0" stroke-width="1"/>
+        <path d="M 150.36395 407.63605 C 153.87869 411.15076 153.87869 416.84924 150.36395 420.36395 C 146.84924 423.8787 141.15076 423.8787 137.63605 420.36395 C 134.12131 416.84924 134.12131 411.15076 137.63605 407.63605 C 141.15076 404.1213 146.84924 404.1213 150.36395 407.63605" stroke="#595959" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4.0,4.0" stroke-width="1"/>
       </g>
       <g id="Line_104">
-        <path d="M 134.5 414 L 81 414 L 81 522" stroke="#aaa" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4.0,4.0" stroke-width="1"/>
+        <path d="M 134.5 414 L 81 414 L 81 522" stroke="#595959" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4.0,4.0" stroke-width="1"/>
       </g>
       <g id="Line_151">
         <line x1="252" y1="288" x2="303.79966" y2="317.5998" marker-end="url(#FilledArrow_Marker)" stroke="#008f00" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
