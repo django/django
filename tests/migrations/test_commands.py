@@ -2,6 +2,7 @@ import datetime
 import importlib
 import io
 import os
+import re
 import shutil
 import sys
 from pathlib import Path
@@ -25,6 +26,7 @@ from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.backends.utils import truncate_name
 from django.db.migrations.autodetector import MigrationAutodetector
 from django.db.migrations.exceptions import InconsistentMigrationHistory
+from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.recorder import MigrationRecorder
 from django.test import TestCase, override_settings, skipUnlessDBFeature
 from django.test.utils import captured_stdout, extend_sys_path, isolate_apps
@@ -2867,6 +2869,69 @@ class SquashMigrationsTests(MigrationTestBase):
             "squashed,\n"
             "  you can delete them.\n" % squashed_migration_file,
         )
+
+    def test_squashmigrations_replaces_loop(self):
+        """
+        our migration loader will properly detect if there is a loop inside of our
+        squashing code, and will raise an error in that case.
+        """
+        out = io.StringIO()
+        with self.temporary_migration_module(
+            module="migrations.test_migration_squash_loop"
+        ):
+            # we expect to hit a squash replacement cycle check error, but the actual
+            # failure is dependent on the order in which the files are read on disk.
+            with self.assertRaisesRegex(
+                CommandError,
+                r"Cyclical squash replacement found, starting at"
+                r" \('migrations', '2_(squashed|auto)'\)",
+            ):
+                call_command(
+                    "migrate", "migrations", "--plan", interactive=False, stdout=out
+                )
+
+    def test_squashmigrations_squashes_already_squashed(self):
+        out = io.StringIO()
+
+        with self.temporary_migration_module(
+            module="migrations.test_migrations_squashed_complex"
+        ):
+            call_command(
+                "squashmigrations",
+                "migrations",
+                "3_squashed_5",
+                "--squashed-name",
+                "double_squash",
+                stdout=out,
+                interactive=False,
+            )
+
+            # confirm the replaces mechanism holds the squashed migration
+            # (and not what it squashes, as the squash operations are what
+            #  end up being used)
+
+            loader = MigrationLoader(connection)
+            migration = loader.disk_migrations[("migrations", "0001_double_squash")]
+            self.assertEqual(
+                migration.replaces,
+                [
+                    ("migrations", "1_auto"),
+                    ("migrations", "2_auto"),
+                    ("migrations", "3_squashed_5"),
+                ],
+            )
+
+            # check the migrations that would get run
+            # check that we have migrations.0001_double_squash
+            # migrations.6_auto, and migrations.7_auto
+
+            out = io.StringIO()
+            call_command(
+                "migrate", "migrations", "--plan", interactive=False, stdout=out
+            )
+
+            migration_plan = re.findall("migrations.(.+)\n", out.getvalue())
+            self.assertEqual(migration_plan, ["0001_double_squash", "6_auto", "7_auto"])
 
     def test_squashmigrations_initial_attribute(self):
         with self.temporary_migration_module(

@@ -10,7 +10,6 @@ from django.db.migrations.loader import AmbiguityError, MigrationLoader
 from django.db.migrations.migration import SwappableTuple
 from django.db.migrations.optimizer import MigrationOptimizer
 from django.db.migrations.writer import MigrationWriter
-from django.utils.version import get_docs_version
 
 
 class Command(BaseCommand):
@@ -83,34 +82,27 @@ class Command(BaseCommand):
             )
 
         migration = self.find_migration(loader, app_label, migration_name)
-
-        # Work out the list of predecessor migrations
-        migrations_to_squash = [
-            loader.get_migration(al, mn)
-            for al, mn in loader.graph.forwards_plan(
-                (migration.app_label, migration.name)
+        try:
+            # First try to work with replacement migrations. They might be optimized
+            # manually after a previous squash.
+            migrations_to_squash = self.get_migrations_to_squash(
+                loader, migration.app_label, start_migration_name, migration.name
             )
-            if al == migration.app_label
-        ]
-
-        if start_migration_name:
-            start_migration = self.find_migration(
-                loader, app_label, start_migration_name
-            )
-            start = loader.get_migration(
-                start_migration.app_label, start_migration.name
-            )
-            try:
-                start_index = migrations_to_squash.index(start)
-                migrations_to_squash = migrations_to_squash[start_index:]
-            except ValueError:
-                raise CommandError(
-                    "The migration '%s' cannot be found. Maybe it comes after "
-                    "the migration '%s'?\n"
-                    "Have a look at:\n"
-                    "  python manage.py showmigrations %s\n"
-                    "to debug this issue." % (start_migration, migration, app_label)
+        except CommandError:
+            # If start/end migration was squashed, then we have to work with
+            # pre-squash (replaced) migrations.
+            loader.replace_migrations = False
+            loader.build_graph()
+            replacement_keys = list(loader.replacements)
+            for replacement_key in replacement_keys:
+                replacement_migration = loader.get_migration(*replacement_key)
+                loader.graph.remove_replacement_node(
+                    replacement_key, replacement_migration.replaces
                 )
+
+            migrations_to_squash = self.get_migrations_to_squash(
+                loader, migration.app_label, start_migration_name, migration.name
+            )
 
         # Tell them what we're doing and optionally ask if we should proceed
         if self.verbosity > 0 or self.interactive:
@@ -141,12 +133,6 @@ class Command(BaseCommand):
         # as it may be 0002 depending on 0001
         first_migration = True
         for smigration in migrations_to_squash:
-            if smigration.replaces:
-                raise CommandError(
-                    "You cannot squash squashed migrations! Please transition it to a "
-                    "normal migration first: https://docs.djangoproject.com/en/%s/"
-                    "topics/migrations/#squashing-migrations" % get_docs_version()
-                )
             operations.extend(smigration.operations)
             for dependency in smigration.dependencies:
                 if isinstance(dependency, SwappableTuple):
@@ -184,10 +170,7 @@ class Command(BaseCommand):
         # need to feed their replaces into ours
         replaces = []
         for migration in migrations_to_squash:
-            if migration.replaces:
-                replaces.extend(migration.replaces)
-            else:
-                replaces.append((migration.app_label, migration.name))
+            replaces.append((migration.app_label, migration.name))
 
         # Make a new migration with those operations
         subclass = type(
@@ -200,6 +183,7 @@ class Command(BaseCommand):
             },
         )
         if start_migration_name:
+            start_migration = migrations_to_squash[0]
             if squashed_name:
                 # Use the name from --squashed-name.
                 prefix, _ = start_migration.name.split("_", 1)
@@ -265,3 +249,35 @@ class Command(BaseCommand):
                 "Cannot find a migration matching '%s' from app '%s'."
                 % (name, app_label)
             )
+
+    def get_migrations_to_squash(
+        self, loader, app_label, start_migration_name, end_migration_name
+    ):
+        # Work out the list of predecessor migrations
+        migrations_to_squash = [
+            loader.get_migration(al, mn)
+            for al, mn in loader.graph.forwards_plan((app_label, end_migration_name))
+            if al == app_label
+        ]
+
+        if start_migration_name:
+            start_migration = self.find_migration(
+                loader, app_label, start_migration_name
+            )
+            start = loader.get_migration(
+                start_migration.app_label, start_migration.name
+            )
+            try:
+                start_index = migrations_to_squash.index(start)
+                migrations_to_squash = migrations_to_squash[start_index:]
+            except ValueError:
+                raise CommandError(
+                    "The migration '%s' cannot be found. Maybe it comes after "
+                    "the migration '%s.%s'?\n"
+                    "Have a look at:\n"
+                    "  python manage.py showmigrations %s\n"
+                    "to debug this issue."
+                    % (start_migration, app_label, end_migration_name, app_label)
+                )
+
+        return migrations_to_squash
