@@ -4,7 +4,7 @@ import re
 from decimal import Decimal
 
 from django.core.exceptions import FieldError
-from django.db import connection
+from django.db import NotSupportedError, connection
 from django.db.models import (
     Avg,
     Case,
@@ -17,6 +17,7 @@ from django.db.models import (
     F,
     FloatField,
     IntegerField,
+    JSONArrayAgg,
     Max,
     Min,
     OuterRef,
@@ -45,7 +46,7 @@ from django.db.models.functions import (
     TruncHour,
 )
 from django.test import TestCase
-from django.test.testcases import skipUnlessDBFeature
+from django.test.testcases import skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import Approximate, CaptureQueriesContext
 from django.utils import timezone
 
@@ -2177,6 +2178,85 @@ class AggregateTestCase(TestCase):
             .values_list("sum", flat=True)
         )
         self.assertEqual(list(author_qs), [337])
+
+    @skipUnlessDBFeature("supports_aggregate_filter_clause")
+    def test_JSONArrayAgg(self):
+        vals = Store.objects.aggregate(jsonarrayagg=JSONArrayAgg("name"))
+        self.assertEqual(
+            vals,
+            {"jsonarrayagg": ["Amazon.com", "Books.com", "Mamma and Pappa's Books"]},
+        )
+
+    @skipUnlessDBFeature("supports_aggregate_filter_clause")
+    def test_JSONArrayAgg_datefield(self):
+        vals = Book.objects.aggregate(jsonarrayagg=JSONArrayAgg("pubdate"))
+        self.assertEqual(
+            vals,
+            {
+                "jsonarrayagg": [
+                    "2007-12-06",
+                    "2008-03-03",
+                    "2008-06-23",
+                    "2008-11-03",
+                    "1995-01-15",
+                    "1991-10-15",
+                ]
+            },
+        )
+
+    @skipUnlessDBFeature("supports_aggregate_filter_clause")
+    def test_JSONArrayAgg_decimalfield(self):
+        vals = Book.objects.aggregate(jsonarrayagg=JSONArrayAgg("price"))
+        self.assertEqual(
+            vals, {"jsonarrayagg": [30.0, 23.09, 29.69, 29.69, 82.8, 75.0]}
+        )
+
+    @skipUnlessDBFeature("supports_aggregate_filter_clause")
+    def test_JSONArrayAgg_integerfield(self):
+        vals = Book.objects.aggregate(jsonarrayagg=JSONArrayAgg("pages"))
+        self.assertEqual(vals, {"jsonarrayagg": [447, 528, 300, 350, 1132, 946]})
+
+    @skipUnlessDBFeature("supports_aggregate_filter_clause")
+    def test_JSONArrayAgg_filter(self):
+        vals = Author.objects.aggregate(
+            jsonarrayagg=JSONArrayAgg("age", filter=Q(age__gt=29))
+        )
+
+        self.assertEqual(vals, {"jsonarrayagg": [34, 35, 45, 37, 57, 46]})
+
+    @skipUnlessDBFeature("supports_aggregate_filter_clause")
+    def test_JSONArrayAgg_empty_result_set(self):
+        Author.objects.all().delete()
+
+        val = Author.objects.aggregate(jsonarrayagg=JSONArrayAgg("age"))
+
+        self.assertEqual(val, {"jsonarrayagg": None})
+
+    @skipUnlessDBFeature("supports_aggregate_filter_clause")
+    def test_JSONArrayAgg_default_set(self):
+        Author.objects.all().delete()
+
+        val = Author.objects.aggregate(
+            jsonarrayagg=JSONArrayAgg("name", default=["<empty>"])
+        )
+        self.assertEqual(val, {"jsonarrayagg": ["<empty>"]})
+
+    @skipUnlessDBFeature("supports_aggregate_filter_clause")
+    def test_JSONArrayAgg_distinct_false(self):
+        val = Author.objects.aggregate(jsonarrayagg=JSONArrayAgg("age", distinct=False))
+        self.assertEqual(val, {"jsonarrayagg": [34, 35, 45, 29, 37, 29, 25, 57, 46]})
+
+    @skipUnlessDBFeature("supports_aggregate_filter_clause")
+    def test_JSONArrayAgg_distinct_true(self):
+        msg = "JSONArrayAgg does not allow distinct."
+        with self.assertRaisesMessage(TypeError, msg):
+            JSONArrayAgg("age", distinct=True)
+
+    @skipIfDBFeature("supports_aggregate_filter_clause")
+    def test_JSONArrayAgg_not_supported(self):
+        msg = "JSONArrayAgg is not supported on this database backend."
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            Author.objects.aggregate(arrayagg=JSONArrayAgg("age"))
 
 
 class AggregateAnnotationPruningTests(TestCase):
