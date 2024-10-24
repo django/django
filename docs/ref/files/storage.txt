@@ -11,7 +11,25 @@ Django provides convenient ways to access the default storage class:
 
 .. data:: storages
 
-    Storage instances as defined by :setting:`STORAGES`.
+    A dictionary-like object that allows retrieving a storage instance using
+    its alias as defined by :setting:`STORAGES`.
+
+    ``storages`` has an attribute ``backends``, which defaults to the raw value
+    provided in :setting:`STORAGES`.
+
+    Additionally, ``storages`` provides a ``create_storage()`` method that
+    accepts the dictionary used in :setting:`STORAGES` for a backend, and
+    returns a storage instance based on that backend definition. This may be
+    useful for third-party packages needing to instantiate storages in tests:
+
+    .. code-block:: pycon
+
+        >>> from django.core.files.storage import storages
+        >>> storages.backends
+        {'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
+         'staticfiles': {'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage'},
+         'custom': {'BACKEND': 'package.storage.CustomStorage'}}
+        >>> storage_instance = storages.create_storage({"BACKEND": "package.storage.CustomStorage"})
 
 .. class:: DefaultStorage
 
