@@ -134,6 +134,43 @@ class CreateModel(ModelOperation):
                 return True
         return False
 
+    def reduce_related(self, operation, app_label):
+        if isinstance(operation, RenameModel):
+            impacted_fields = [
+                (_, field)
+                for _, field in self.fields
+                if field.remote_field
+                and field.remote_field.model
+                == f"{app_label}.{operation.old_name_lower}"
+            ]
+            if len(impacted_fields) == 0:
+                return [self]
+
+            not_impacted_fields = [
+                (_, field)
+                for (_, field) in self.fields
+                if (_, field) not in impacted_fields
+            ]
+
+            fixed_fields = []
+
+            for _, impacted_field in impacted_fields:
+                name, path, args, kwargs = impacted_field.deconstruct()
+                kwargs["to"] = f"{app_label}.{operation.new_name_lower}"
+                impacted_field = impacted_field.__class__(*args, **kwargs)
+                fixed_fields.append((_, impacted_field))
+
+            return [
+                CreateModel(
+                    name=self.name,
+                    fields=not_impacted_fields + fixed_fields,
+                    options=self.options,
+                    bases=self.bases,
+                    managers=self.managers,
+                ),
+            ]
+        return super().reduce_related(operation, app_label)
+
     def reduce(self, operation, app_label):
         if (
             isinstance(operation, DeleteModel)
