@@ -527,6 +527,13 @@ AdvanceCOMP's ``advpng``:
 This is based on OptiPNG version 0.7.5. Older versions may complain about the
 ``-strip all`` option being lossy.
 
+.. admonition:: When run these commands
+
+    These commands should only be run by those who add (or modify) images in
+    their documentation changes. They are also run by Django Fellows once in a
+    while (e.g. before the final release of a new build) to optimize any images
+    that were not already optimized when they were added or modified.
+
 An example
 ==========
 
