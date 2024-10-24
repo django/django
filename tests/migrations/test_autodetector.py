@@ -4444,6 +4444,70 @@ class AutodetectorTests(BaseAutodetectorTests):
         self.assertOperationAttributes(changes, "testapp", 0, 0, name="Author")
         self.assertOperationAttributes(changes, "testapp", 0, 1, name="Aardvark")
 
+    def test_remove_bases(self):
+        A = ModelState("app", "A", [("a_id", models.AutoField(primary_key=True))])
+        B = ModelState(
+            "app",
+            "B",
+            [
+                (
+                    "a_ptr_id",
+                    models.OneToOneField("app.A", models.CASCADE, primary_key=True),
+                )
+            ],
+            bases=("app.A",),
+        )
+        ChangedB = ModelState("app", "B", [("id", models.AutoField(primary_key=True))])
+        changes = self.get_changes([A, B], [A, ChangedB])
+        self.assertNumberMigrations(changes, "app", 1)
+        self.assertOperationTypes(
+            changes, "app", 0, ["AlterModelBases", "RenameField", "AlterField"]
+        )
+        self.assertOperationAttributes(changes, "app", 0, 0, name="B")
+        self.assertOperationAttributes(changes, "app", 0, 0, bases=(models.Model,))
+
+    def test_change_bases(self):
+        A = ModelState("app", "A", [("a_id", models.AutoField(primary_key=True))])
+        B = ModelState("app", "B", [("b_id", models.AutoField(primary_key=True))])
+        C = ModelState("app", "C", [], bases=("app.A",))
+        ChangedC = ModelState("app", "C", [], bases=("app.B",))
+        changes = self.get_changes([A, B, C], [A, B, ChangedC])
+        self.assertNumberMigrations(changes, "app", 1)
+        self.assertOperationTypes(changes, "app", 0, ["AlterModelBases"])
+        self.assertOperationAttributes(changes, "app", 0, 0, name="C")
+        self.assertOperationAttributes(changes, "app", 0, 0, bases=("app.B",))
+
+    def test_changed_metaclass_and_bases(self):
+        class AlphaBase(type):
+            pass
+
+        class Alpha(metaclass=AlphaBase):
+            pass
+
+        class AuthorAlphaBase(AlphaBase, type(models.Model)):
+            pass
+
+        class BetaBase(type):
+            pass
+
+        class Beta(metaclass=BetaBase):
+            pass
+
+        class AuthorBetaBase(BetaBase, type(models.Model)):
+            pass
+
+        Author = ModelState(
+            "app", "author", [], bases=(Alpha, models.Model), metaclass=AuthorAlphaBase
+        )
+        AuthorChanged = ModelState(
+            "app", "author", [], bases=(Beta, models.Model), metaclass=AuthorBetaBase
+        )
+        changes = self.get_changes([Author], [AuthorChanged])
+        self.assertNumberMigrations(changes, "app", 1)
+        self.assertOperationTypes(
+            changes, "app", 0, ["AlterModelMetaclass", "AlterModelBases"]
+        )
+
     def test_bases_first_mixed_case_app_label(self):
         app_label = "MiXedCaseApp"
         changes = self.get_changes(
