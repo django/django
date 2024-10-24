@@ -540,10 +540,6 @@ input[type="submit"], button {
         max-width: 100vw;
     }
 
-    .aligned .form-row > div {
-        width: calc(100vw - 30px);
-    }
-
     .flex-container {
         flex-flow: column;
     }
