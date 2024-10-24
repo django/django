@@ -1,5 +1,4 @@
 import base64
-import os
 import shutil
 import string
 import tempfile
@@ -921,8 +920,8 @@ class FileSessionTests(SessionTestsMixin, SimpleTestCase):
             return len(
                 [
                     session_file
-                    for session_file in os.listdir(storage_path)
-                    if session_file.startswith(file_prefix)
+                    for session_file in storage_path.iterdir()
+                    if session_file.name.startswith(file_prefix)
                 ]
             )
 
