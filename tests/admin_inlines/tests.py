@@ -2420,31 +2420,43 @@ class SeleniumTests(AdminSeleniumTestCase):
             "admin:admin_inlines_courseproxy1_add",
             "admin:admin_inlines_courseproxy2_add",
         ]
-        css_selector = ".dynamic-class_set#class_set-%s h2"
+        css_available_selector = (
+            ".dynamic-class_set#class_set-%s .selector-available-title"
+        )
+        css_chosen_selector = ".dynamic-class_set#class_set-%s .selector-chosen-title"
 
         for url_name in tests:
             with self.subTest(url=url_name):
                 self.selenium.get(self.live_server_url + reverse(url_name))
                 # First inline shows the verbose_name.
-                available, chosen = self.selenium.find_elements(
-                    By.CSS_SELECTOR, css_selector % 0
+                available = self.selenium.find_element(
+                    By.CSS_SELECTOR, css_available_selector % 0
                 )
-                self.assertEqual(available.text, "AVAILABLE ATTENDANT")
-                self.assertEqual(chosen.text, "CHOSEN ATTENDANT")
+                chosen = self.selenium.find_element(
+                    By.CSS_SELECTOR, css_chosen_selector % 0
+                )
+                self.assertIn("Available attendant", available.text)
+                self.assertIn("Chosen attendant", chosen.text)
                 # Added inline should also have the correct verbose_name.
                 self.selenium.find_element(By.LINK_TEXT, "Add another Class").click()
-                available, chosen = self.selenium.find_elements(
-                    By.CSS_SELECTOR, css_selector % 1
+                available = self.selenium.find_element(
+                    By.CSS_SELECTOR, css_available_selector % 1
                 )
-                self.assertEqual(available.text, "AVAILABLE ATTENDANT")
-                self.assertEqual(chosen.text, "CHOSEN ATTENDANT")
+                chosen = self.selenium.find_element(
+                    By.CSS_SELECTOR, css_chosen_selector % 1
+                )
+                self.assertIn("Available attendant", available.text)
+                self.assertIn("Chosen attendant", chosen.text)
                 # Third inline should also have the correct verbose_name.
                 self.selenium.find_element(By.LINK_TEXT, "Add another Class").click()
-                available, chosen = self.selenium.find_elements(
-                    By.CSS_SELECTOR, css_selector % 2
+                available = self.selenium.find_element(
+                    By.CSS_SELECTOR, css_available_selector % 2
                 )
-                self.assertEqual(available.text, "AVAILABLE ATTENDANT")
-                self.assertEqual(chosen.text, "CHOSEN ATTENDANT")
+                chosen = self.selenium.find_element(
+                    By.CSS_SELECTOR, css_chosen_selector % 2
+                )
+                self.assertIn("Available attendant", available.text)
+                self.assertIn("Chosen attendant", chosen.text)
 
     def test_tabular_inline_layout(self):
         from selenium.webdriver.common.by import By
