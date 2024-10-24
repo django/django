@@ -289,6 +289,7 @@ class QuerySet(AltersData):
         self._fields = None
         self._defer_next_filter = False
         self._deferred_filter = None
+        self.executed_query = None
 
     @property
     def query(self):
@@ -1909,6 +1910,8 @@ class QuerySet(AltersData):
     def _fetch_all(self):
         if self._result_cache is None:
             self._result_cache = list(self._iterable_class(self))
+            self.executed_query = connections[self.db].last_query
+
         if self._prefetch_related_lookups and not self._prefetch_done:
             self._prefetch_related_objects()
 
