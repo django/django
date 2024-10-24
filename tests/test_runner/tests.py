@@ -506,6 +506,7 @@ class ManageCommandTests(unittest.TestCase):
 @mock.patch.dict(os.environ, {}, clear=True)
 @mock.patch.object(multiprocessing, "cpu_count", return_value=12)
 class ManageCommandParallelTests(SimpleTestCase):
+    @mock.patch.object(multiprocessing, "get_start_method", return_value="fork")
     def test_parallel_default(self, *mocked_objects):
         with captured_stderr() as stderr:
             call_command(
@@ -515,6 +516,7 @@ class ManageCommandParallelTests(SimpleTestCase):
             )
         self.assertIn("parallel=12", stderr.getvalue())
 
+    @mock.patch.object(multiprocessing, "get_start_method", return_value="fork")
     def test_parallel_auto(self, *mocked_objects):
         with captured_stderr() as stderr:
             call_command(
@@ -550,12 +552,14 @@ class ManageCommandParallelTests(SimpleTestCase):
         self.assertEqual(stderr.getvalue(), "")
 
     @mock.patch.dict(os.environ, {"DJANGO_TEST_PROCESSES": "7"})
+    @mock.patch.object(multiprocessing, "get_start_method", return_value="fork")
     def test_no_parallel_django_test_processes_env(self, *mocked_objects):
         with captured_stderr() as stderr:
             call_command("test", testrunner="test_runner.tests.MockTestRunner")
         self.assertEqual(stderr.getvalue(), "")
 
     @mock.patch.dict(os.environ, {"DJANGO_TEST_PROCESSES": "invalid"})
+    @mock.patch.object(multiprocessing, "get_start_method", return_value="fork")
     def test_django_test_processes_env_non_int(self, *mocked_objects):
         with self.assertRaises(ValueError):
             call_command(
@@ -565,6 +569,7 @@ class ManageCommandParallelTests(SimpleTestCase):
             )
 
     @mock.patch.dict(os.environ, {"DJANGO_TEST_PROCESSES": "7"})
+    @mock.patch.object(multiprocessing, "get_start_method", return_value="fork")
     def test_django_test_processes_parallel_default(self, *mocked_objects):
         for parallel in ["--parallel", "--parallel=auto"]:
             with self.subTest(parallel=parallel):
