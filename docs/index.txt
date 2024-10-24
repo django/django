@@ -251,6 +251,7 @@ applications and Django provides multiple protection tools and mechanisms:
 * :doc:`Cross Site Request Forgery protection <ref/csrf>`
 * :doc:`Cryptographic signing <topics/signing>`
 * :ref:`Security Middleware <security-middleware>`
+* :ref:`Content Security Policy <content-security-policy>`
 
 Internationalization and localization
 =====================================
