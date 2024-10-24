@@ -347,31 +347,33 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             """
             SELECT
                 cons.constraint_name,
+                LOWER(rcols.table_name),
                 LISTAGG(LOWER(cols.column_name), ',')
                     WITHIN GROUP (ORDER BY cols.position),
-                LOWER(rcols.table_name),
-                LOWER(rcols.column_name)
+                LISTAGG(LOWER(rcols.column_name), ',')
+                    WITHIN GROUP (ORDER BY rcols.position)
             FROM
                 user_constraints cons
             INNER JOIN
                 user_cons_columns rcols
-                ON rcols.constraint_name = cons.r_constraint_name AND rcols.position = 1
+                ON rcols.constraint_name = cons.r_constraint_name
             LEFT OUTER JOIN
                 user_cons_columns cols
                 ON cons.constraint_name = cols.constraint_name
+                AND cols.position = rcols.position
             WHERE
                 cons.constraint_type = 'R' AND
                 cons.table_name = UPPER(%s)
-            GROUP BY cons.constraint_name, rcols.table_name, rcols.column_name
+            GROUP BY cons.constraint_name, rcols.table_name
             """,
             [table_name],
         )
-        for constraint, columns, other_table, other_column in cursor.fetchall():
+        for constraint, other_table, columns, other_columns in cursor.fetchall():
             constraint = self.identifier_converter(constraint)
             constraints[constraint] = {
                 "primary_key": False,
                 "unique": False,
-                "foreign_key": (other_table, other_column),
+                "foreign_key": (other_table, *other_columns.split(",")),
                 "check": False,
                 "index": False,
                 "columns": columns.split(","),
