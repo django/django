@@ -31,6 +31,39 @@ and only officially support the latest release of each series.
 What's new in Django 5.2
 ========================
 
+Simplified usage of :class:`~django.forms.BoundField`
+-----------------------------------------------------
+
+As of Django 5.2, you can now specify a custom :class:`~django.forms.BoundField`
+class to use at project, form and field level. This allows a fine-grained
+usage of the :ref:`ref-forms-api-bound-unbound`::
+
+    from django.forms import BoundField
+    from django.forms import Form
+
+
+    class BoundFieldWithCssClass(BoundField):
+        def css_classes(self, extra_classes=None):
+            return super().css_classes("user-form")
+
+
+    class CustomForm(Form):
+        # Override per-form
+        bound_field_class = BoundFieldWithCssClass
+
+        # Or per-field
+        name = CharField(bound_field_class=BoundFieldWithCssClass)
+
+
+    # Alternatively, you can set a the ``BoundField`` class for the whole
+    # renderer:
+    class CustomRenderer2(DjangoTemplates):
+        bound_field_class = BoundFieldWithCssClass
+
+Check out :attr:`~django.forms.renderers.BaseRenderer.bound_field_class`,
+:attr:`~django.forms.Form.bound_field_class` and
+:attr:`~django.forms.Field.bound_field_class` for documentation.
+
 Minor features
 --------------
 
