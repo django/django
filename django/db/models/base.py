@@ -89,6 +89,25 @@ def _has_contribute_to_class(value):
     return not inspect.isclass(value) and hasattr(value, "contribute_to_class")
 
 
+def get_base_metas(parents):
+    """
+    Given a list of parents, return a tuple with (base_meta, ab_meta).
+
+    ``base_meta`` is from the first base with ``_meta``, and ``ab_meta`` is
+    from the first abstract parent.
+    """
+    base_meta = None
+    ab_meta = None
+    for base in parents:
+        if base_meta is None:
+            base_meta = getattr(base, "_meta", None)
+        if ab_meta is None:
+            ab_meta = getattr(base, "Meta", None)
+        if base_meta and ab_meta:
+            break
+    return base_meta, ab_meta
+
+
 class ModelBase(type):
     """Metaclass for all models."""
 
@@ -107,27 +126,17 @@ class ModelBase(type):
         classcell = attrs.pop("__classcell__", None)
         if classcell is not None:
             new_attrs["__classcell__"] = classcell
+
+        # Prepare the model options.
         attr_meta = attrs.pop("Meta", None)
-        # Pass all attrs without a (Django-specific) contribute_to_class()
-        # method to type.__new__() so that they're properly initialized
-        # (i.e. __set_name__()).
-        contributable_attrs = {}
-        for obj_name, obj in attrs.items():
-            if _has_contribute_to_class(obj):
-                contributable_attrs[obj_name] = obj
-            else:
-                new_attrs[obj_name] = obj
-        new_class = super_new(cls, name, bases, new_attrs, **kwargs)
+        base_meta, ab_meta = get_base_metas(parents)
+        meta = attr_meta or ab_meta
 
         abstract = getattr(attr_meta, "abstract", False)
-        meta = attr_meta or getattr(new_class, "Meta", None)
-        base_meta = getattr(new_class, "_meta", None)
-
-        app_label = None
 
         # Look for an application configuration to attach the model to.
+        app_label = None
         app_config = apps.get_containing_app_config(module)
-
         if getattr(meta, "app_label", None) is None:
             if app_config is None:
                 if not abstract:
@@ -136,11 +145,35 @@ class ModelBase(type):
                         "app_label and isn't in an application in "
                         "INSTALLED_APPS." % (module, name)
                     )
-
             else:
                 app_label = app_config.label
 
-        new_class.add_to_class("_meta", Options(meta, app_label))
+        # Assign model options (_meta) to the new class.
+        new_attrs["_meta"] = Options(meta, app_label)
+
+        is_proxy = getattr(meta, "proxy", False) if meta else False
+        # If the model is a proxy, ensure that the base class
+        # hasn't been swapped out.
+        if is_proxy and base_meta and base_meta.swapped:
+            raise TypeError(
+                "%s cannot proxy the swapped model '%s'." % (name, base_meta.swapped)
+            )
+
+        # Pass all attributes without a (Django-specific) contribute_to_class()
+        # method to type.__new__() so that they're properly initialized
+        # (i.e. __set_name__()).
+        contributable_attrs = {}
+        for obj_name, obj in attrs.items():
+            if _has_contribute_to_class(obj):
+                contributable_attrs[obj_name] = obj
+            else:
+                new_attrs[obj_name] = obj
+
+        # Create the class -- super_new ensures special attributes, those with
+        # __set_name__(), are properly handled.
+        new_class = super_new(cls, name, bases, new_attrs, **kwargs)
+
+        # Add model-specific exceptions if the model isn't abstract.
         if not abstract:
             new_class.add_to_class(
                 "DoesNotExist",
@@ -178,15 +211,6 @@ class ModelBase(type):
                     new_class._meta.ordering = base_meta.ordering
                 if not hasattr(meta, "get_latest_by"):
                     new_class._meta.get_latest_by = base_meta.get_latest_by
-
-        is_proxy = new_class._meta.proxy
-
-        # If the model is a proxy, ensure that the base class
-        # hasn't been swapped out.
-        if is_proxy and base_meta and base_meta.swapped:
-            raise TypeError(
-                "%s cannot proxy the swapped model '%s'." % (name, base_meta.swapped)
-            )
 
         # Add remaining attributes (those with a contribute_to_class() method)
         # to the class.
@@ -419,7 +443,7 @@ class ModelBase(type):
             cls.add_to_class("objects", manager)
 
         # Set the name of _meta.indexes. This can't be done in
-        # Options.contribute_to_class() because fields haven't been added to
+        # Options.__set_name__() because fields haven't been added to
         # the model at that point.
         for index in cls._meta.indexes:
             if not index.name:
