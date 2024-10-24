@@ -6,12 +6,11 @@ This document describes how to make use of external authentication sources
 (where the web server sets the ``REMOTE_USER`` environment variable) in your
 Django applications.  This type of authentication solution is typically seen on
 intranet sites, with single sign-on solutions such as IIS and Integrated
-Windows Authentication or Apache and `mod_authnz_ldap`_, `CAS`_, `Cosign`_,
-`WebAuth`_, `mod_auth_sspi`_, etc.
+Windows Authentication or Apache and `mod_authnz_ldap`_, `CAS`_, `WebAuth`_,
+`mod_auth_sspi`_, etc.
 
-.. _mod_authnz_ldap: https://httpd.apache.org/docs/2.2/mod/mod_authnz_ldap.html
+.. _mod_authnz_ldap: https://httpd.apache.org/docs/current/mod/mod_authnz_ldap.html
 .. _CAS: https://www.apereo.org/projects/cas
-.. _Cosign: http://weblogin.org
 .. _WebAuth: https://uit.stanford.edu/service/authentication
 .. _mod_auth_sspi: https://sourceforge.net/projects/mod-auth-sspi
 
