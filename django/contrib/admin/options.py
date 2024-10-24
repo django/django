@@ -251,7 +251,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
     def get_field_queryset(self, db, db_field, request):
         """
         If the ModelAdmin specifies ordering, the queryset should respect that
-        ordering.  Otherwise don't specify the queryset, let the field decide
+        ordering. Otherwise don't specify the queryset, let the field decide
         (return None in that case).
         """
         try:
@@ -1034,16 +1034,21 @@ class ModelAdmin(BaseModelAdmin):
         return checkbox.render(helpers.ACTION_CHECKBOX_NAME, str(obj.pk))
 
     @staticmethod
-    def _get_action_description(func, name):
+    def _get_action_description(func, name, change=False):
         try:
-            return func.short_description
+            if change:
+                return func.short_description
+            else:
+                return func.plural_description
         except AttributeError:
             return capfirst(name.replace("_", " "))
 
-    def _get_base_actions(self):
+    def _get_base_actions(self, change=False):
         """Return the list of actions, prior to any request-based filtering."""
         actions = []
-        base_actions = (self.get_action(action) for action in self.actions or [])
+        base_actions = (
+            self.get_action(action, change) for action in self.actions or []
+        )
         # get_action might have returned None, so filter any of those out.
         base_actions = [action for action in base_actions if action]
         base_action_names = {name for _, name, _ in base_actions}
@@ -1052,7 +1057,7 @@ class ModelAdmin(BaseModelAdmin):
         for name, func in self.admin_site.actions:
             if name in base_action_names:
                 continue
-            description = self._get_action_description(func, name)
+            description = self._get_action_description(func, name, change)
             actions.append((func, name, description))
         # Add actions from this ModelAdmin.
         actions.extend(base_actions)
@@ -1074,7 +1079,7 @@ class ModelAdmin(BaseModelAdmin):
                 filtered_actions.append(action)
         return filtered_actions
 
-    def get_actions(self, request):
+    def get_actions(self, request, change=False):
         """
         Return a dictionary mapping the names of all actions for this
         ModelAdmin to a tuple of (callable, name, description) for each action.
@@ -1083,24 +1088,28 @@ class ModelAdmin(BaseModelAdmin):
         # this page.
         if self.actions is None or IS_POPUP_VAR in request.GET:
             return {}
-        actions = self._filter_actions_by_permissions(request, self._get_base_actions())
+        actions = self._filter_actions_by_permissions(
+            request, self._get_base_actions(change)
+        )
         return {name: (func, name, desc) for func, name, desc in actions}
 
-    def get_action_choices(self, request, default_choices=models.BLANK_CHOICE_DASH):
+    def get_action_choices(
+        self, request, change=False, default_choices=models.BLANK_CHOICE_DASH
+    ):
         """
-        Return a list of choices for use in a form object.  Each choice is a
+        Return a list of choices for use in a form object. Each choice is a
         tuple (name, description).
         """
         choices = [] + default_choices
-        for func, name, description in self.get_actions(request).values():
+        for func, name, description in self.get_actions(request, change).values():
             choice = (name, description % model_format_dict(self.opts))
             choices.append(choice)
         return choices
 
-    def get_action(self, action):
+    def get_action(self, action, change):
         """
         Return a given action from a parameter, which can either be a callable,
-        or the name of a method on the ModelAdmin.  Return is a tuple of
+        or the name of a method on the ModelAdmin. Return is a tuple of
         (callable, name, description).
         """
         # If the action is a callable, just use it.
@@ -1121,7 +1130,7 @@ class ModelAdmin(BaseModelAdmin):
             except KeyError:
                 return None
 
-        description = self._get_action_description(func, action)
+        description = self._get_action_description(func, action, change)
         return func, action, description
 
     def get_list_display(self, request):
@@ -1608,11 +1617,13 @@ class ModelAdmin(BaseModelAdmin):
         """
         return self._response_post_save(request, obj)
 
-    def response_action(self, request, queryset):
+    def response_action(self, request, queryset, change):
         """
         Handle an admin action. This is called if a request is POSTed to the
-        changelist; it returns an HttpResponse if the action was handled, and
-        None otherwise.
+        changelist or changeform; it returns an HttpResponse if the action was
+        handled, and None otherwise.
+        `change` is True if it's called from change_view; False if comes from
+        changelist_view or add_view.
         """
 
         # There can be multiple action forms on the page (at the top
@@ -1643,25 +1654,26 @@ class ModelAdmin(BaseModelAdmin):
         # If the form's valid we can handle the action.
         if action_form.is_valid():
             action = action_form.cleaned_data["action"]
-            select_across = action_form.cleaned_data["select_across"]
             func = self.get_actions(request)[action][0]
+            if not change:
+                select_across = action_form.cleaned_data["select_across"]
+                # Get the list of selected PKs. If nothing's selected, we can't
+                # perform an action on it, so bail. Except we want to perform
+                # the action explicitly on all objects.
+                selected = request.POST.getlist(helpers.ACTION_CHECKBOX_NAME)
+                if not selected and not select_across:
+                    # Reminder that something needs to be selected or nothing will
+                    # happen
+                    msg = _(
+                        "Items must be selected in order to perform "
+                        "actions on them. No items have been changed."
+                    )
+                    self.message_user(request, msg, messages.WARNING)
+                    return None
 
-            # Get the list of selected PKs. If nothing's selected, we can't
-            # perform an action on it, so bail. Except we want to perform
-            # the action explicitly on all objects.
-            selected = request.POST.getlist(helpers.ACTION_CHECKBOX_NAME)
-            if not selected and not select_across:
-                # Reminder that something needs to be selected or nothing will happen
-                msg = _(
-                    "Items must be selected in order to perform "
-                    "actions on them. No items have been changed."
-                )
-                self.message_user(request, msg, messages.WARNING)
-                return None
-
-            if not select_across:
-                # Perform the action only on the selected objects
-                queryset = queryset.filter(pk__in=selected)
+                if not select_across:
+                    # Perform the action only on the selected objects
+                    queryset = queryset.filter(pk__in=selected)
 
             response = func(self, request, queryset)
 
@@ -1671,7 +1683,16 @@ class ModelAdmin(BaseModelAdmin):
             if isinstance(response, HttpResponseBase):
                 return response
             else:
-                return HttpResponseRedirect(request.get_full_path())
+                # If action was executed from change view, redirect to
+                # list view once finished.
+                return HttpResponseRedirect(
+                    request.get_full_path()
+                    if not change
+                    else reverse(
+                        "admin:%s_%s_changelist"
+                        % (self.opts.app_label, self.opts.model_name)
+                    )
+                )
         else:
             msg = _("No action selected.")
             self.message_user(request, msg, messages.WARNING)
@@ -1858,7 +1879,26 @@ class ModelAdmin(BaseModelAdmin):
         ModelForm = self.get_form(
             request, obj, change=not add, fields=flatten_fieldsets(fieldsets)
         )
+
+        actions = self.get_actions(request)
         if request.method == "POST":
+            if actions and request.POST.get("action", ""):
+                action_failed = False
+                response = self.response_action(
+                    request,
+                    self.get_queryset(request).filter(id=object_id),
+                    change=not add,
+                )
+                if response:
+                    return response
+                else:
+                    action_failed = True
+                if action_failed:
+                    # Redirect back to the changelist page to avoid resubmitting the
+                    # form if the user refreshes the browser or uses the "No, take
+                    # me back" button on the action confirmation page.
+                    return HttpResponseRedirect(request.get_full_path())
+
             form = ModelForm(request.POST, request.FILES, instance=obj)
             formsets, inline_instances = self._create_formsets(
                 request,
@@ -1927,6 +1967,17 @@ class ModelAdmin(BaseModelAdmin):
             title = _("Change %s")
         else:
             title = _("View %s")
+
+        # Build the action form and populate it with available actions.
+        if actions and not add:
+            action_form = self.action_form(auto_id=None)
+            action_form.fields["action"].choices = self.get_action_choices(
+                request, change=True
+            )
+            media += action_form.media
+        else:
+            action_form = None
+
         context = {
             **self.admin_site.each_context(request),
             "title": title % self.opts.verbose_name,
@@ -1937,6 +1988,7 @@ class ModelAdmin(BaseModelAdmin):
             "is_popup": IS_POPUP_VAR in request.POST or IS_POPUP_VAR in request.GET,
             "to_field": to_field,
             "media": media,
+            "action_form": action_form,
             "inline_admin_formsets": inline_formsets,
             "errors": helpers.AdminErrorList(form, formsets),
             "preserved_filters": self.get_preserved_filters(request),
@@ -2035,7 +2087,7 @@ class ModelAdmin(BaseModelAdmin):
         ):
             if selected:
                 response = self.response_action(
-                    request, queryset=cl.get_queryset(request)
+                    request, queryset=cl.get_queryset(request), change=False
                 )
                 if response:
                     return response
@@ -2059,7 +2111,7 @@ class ModelAdmin(BaseModelAdmin):
         ):
             if selected:
                 response = self.response_action(
-                    request, queryset=cl.get_queryset(request)
+                    request, queryset=cl.get_queryset(request), change=False
                 )
                 if response:
                     return response
