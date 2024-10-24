@@ -30,7 +30,7 @@ General-purpose aggregation functions
 ``ArrayAgg``
 ------------
 
-.. class:: ArrayAgg(expression, distinct=False, filter=None, default=None, ordering=(), **extra)
+.. class:: ArrayAgg(expression, distinct=False, filter=None, default=None, ordering=(), order_by=(), **extra)
 
     Returns a list of values, including nulls, concatenated into an array, or
     ``default`` if there are no values.
@@ -41,6 +41,12 @@ General-purpose aggregation functions
         will be distinct. Defaults to ``False``.
 
     .. attribute:: ordering
+
+        .. deprecated:: 5.2
+
+            The :attr:`ArrayAgg.order_by` field should be used instead.
+
+    .. attribute:: order_by
 
         An optional string of a field name (with an optional ``"-"`` prefix
         which indicates descending order) or an expression (or a tuple or list
@@ -130,7 +136,7 @@ General-purpose aggregation functions
 ``JSONBAgg``
 ------------
 
-.. class:: JSONBAgg(expressions, distinct=False, filter=None, default=None, ordering=(), **extra)
+.. class:: JSONBAgg(expressions, distinct=False, filter=None, default=None, ordering=(), order_by=(), **extra)
 
     Returns the input values as a ``JSON`` array, or ``default`` if there are
     no values. You can query the result using :lookup:`key and index lookups
@@ -143,12 +149,18 @@ General-purpose aggregation functions
 
     .. attribute:: ordering
 
+        .. deprecated:: 5.2
+
+            The :attr:`JSONBAgg.order_by` field should be used instead.
+
+    .. attribute:: order_by
+
         An optional string of a field name (with an optional ``"-"`` prefix
         which indicates descending order) or an expression (or a tuple or list
         of strings and/or expressions) that specifies the ordering of the
         elements in the result list.
 
-        Examples are the same as for :attr:`ArrayAgg.ordering`.
+        Examples are the same as for :attr:`ArrayAgg.order_by`.
 
     Usage example::
 
@@ -168,7 +180,7 @@ General-purpose aggregation functions
         >>> Room.objects.annotate(
         ...     requirements=JSONBAgg(
         ...         "hotelreservation__requirements",
-        ...         ordering="-hotelreservation__start",
+        ...         order_by="-hotelreservation__start",
         ...     )
         ... ).filter(requirements__0__sea_view=True).values("number", "requirements")
         <QuerySet [{'number': 102, 'requirements': [
@@ -179,7 +191,7 @@ General-purpose aggregation functions
 ``StringAgg``
 -------------
 
-.. class:: StringAgg(expression, delimiter, distinct=False, filter=None, default=None, ordering=())
+.. class:: StringAgg(expression, delimiter, distinct=False, filter=None, default=None, ordering=(), order_by=())
 
     Returns the input values concatenated into a string, separated by
     the ``delimiter`` string, or ``default`` if there are no values.
@@ -195,12 +207,18 @@ General-purpose aggregation functions
 
     .. attribute:: ordering
 
+        .. deprecated:: 5.2
+
+            The :attr:`StringAgg.order_by` field should be used instead.
+
+    .. attribute:: order_by
+
         An optional string of a field name (with an optional ``"-"`` prefix
         which indicates descending order) or an expression (or a tuple or list
         of strings and/or expressions) that specifies the ordering of the
         elements in the result string.
 
-        Examples are the same as for :attr:`ArrayAgg.ordering`.
+        Examples are the same as for :attr:`ArrayAgg.order_by`.
 
     Usage example::
 
@@ -224,7 +242,7 @@ General-purpose aggregation functions
         ...     publication_names=StringAgg(
         ...         "publications__title",
         ...         delimiter=", ",
-        ...         ordering="publications__title",
+        ...         order_by="publications__title",
         ...     )
         ... ).values("headline", "publication_names")
         <QuerySet [{
