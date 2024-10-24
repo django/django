@@ -1,10 +1,9 @@
 import copy
 import enum
 import json
-import operator
 import re
 import warnings
-from functools import partial, reduce, update_wrapper
+from functools import partial, update_wrapper
 from urllib.parse import parse_qsl
 from urllib.parse import quote as urlquote
 from urllib.parse import urlsplit
