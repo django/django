@@ -163,6 +163,31 @@ and ``comment.modified``.
     The PostgreSQL behavior can be emulated using ``Coalesce`` if you know
     a sensible minimum value to provide as a default.
 
+``JSONArray``
+--------------
+
+.. class:: JSONArray(*expressions)
+
+Accepts a list of field names or expressions and returns a JSON array
+containing those values.
+
+Usage example:
+
+.. code-block:: pycon
+
+    >>> from django.db.models import F
+    >>> from django.db.models.functions import JSONArray, Lower
+    >>> Author.objects.create(name="Margaret Smith", alias="msmith", age=25)
+    >>> author = Author.objects.annotate(
+    ...     json_array=JSONArray(
+    ...         Lower("name"),
+    ...         "alias",
+    ...         F("age") * 2,
+    ...     )
+    ... ).get()
+    >>> author.json_array
+    ['margaret smith', 'msmith', 50]
+
 ``JSONObject``
 --------------
 
