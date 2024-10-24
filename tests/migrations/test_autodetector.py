@@ -2289,6 +2289,168 @@ class AutodetectorTests(BaseAutodetectorTests):
             changes, "testapp", 0, 0, old_name="EntityA", new_name="RenamedEntityA"
         )
 
+    def test_move_model_with_no_db_table(self):
+        before = [self.author_name, self.book]
+        after = [
+            ModelState(
+                "otherapp",
+                "Author",
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    ("name", models.CharField(max_length=200)),
+                ],
+            ),
+            ModelState(
+                "otherapp",
+                "Book",
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    ("author", models.ForeignKey("otherapp.Author", models.CASCADE)),
+                    ("title", models.CharField(max_length=200)),
+                ],
+            ),
+        ]
+        changes = self.get_changes(
+            before, after, MigrationQuestioner({"ask_move_model": True})
+        )
+        self.assertNumberMigrations(changes, "otherapp", 2)
+
+        self.assertMigrationDependencies(
+            changes, "otherapp", 0, [("testapp", "auto_1")]
+        )
+        self.assertOperationTypes(changes, "otherapp", 0, ["CreateModel"])
+        self.assertMigrationDependencies(
+            changes, "otherapp", 1, [("otherapp", "auto_1"), ("testapp", "auto_2")]
+        )
+        self.assertOperationTypes(
+            changes, "otherapp", 1, ["AlterModelOptions", "AlterField"]
+        )
+
+        self.assertNumberMigrations(changes, "testapp", 3)
+
+        self.assertMigrationDependencies(changes, "testapp", 0, [])
+        self.assertOperationTypes(changes, "testapp", 0, ["AlterModelTable"])
+        self.assertMigrationDependencies(
+            changes, "testapp", 1, [("otherapp", "auto_1"), ("testapp", "auto_1")]
+        )
+        self.assertOperationTypes(changes, "testapp", 1, ["AlterModelOptions"])
+        self.assertMigrationDependencies(
+            changes, "testapp", 2, [("otherapp", "auto_2"), ("testapp", "auto_2")]
+        )
+        self.assertOperationTypes(changes, "testapp", 2, ["DeleteModel"])
+
+    def test_move_model_with_db_table_changed(self):
+        before = [self.author_with_db_table_options, self.book]
+        after = [
+            ModelState(
+                "otherapp",
+                "Author",
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    ("name", models.CharField(max_length=200)),
+                ],
+                {"db_table": "changed_db_table"},
+            ),
+            ModelState(
+                "otherapp",
+                "Book",
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    ("author", models.ForeignKey("otherapp.Author", models.CASCADE)),
+                    ("title", models.CharField(max_length=200)),
+                ],
+            ),
+        ]
+        changes = self.get_changes(
+            before, after, MigrationQuestioner({"ask_move_model": True})
+        )
+        self.assertNumberMigrations(changes, "otherapp", 2)
+
+        self.assertMigrationDependencies(
+            changes, "otherapp", 0, [("testapp", "auto_1")]
+        )
+        self.assertOperationTypes(changes, "otherapp", 0, ["CreateModel"])
+        self.assertOperationAttributes(
+            changes,
+            "otherapp",
+            0,
+            0,
+            name="author",
+            options={
+                "db_table": "changed_db_table",
+                "indexes": [],
+                "constraints": [],
+                "managed": False,
+                "old_app_label": "testapp",
+            },
+        )
+        self.assertMigrationDependencies(
+            changes, "otherapp", 1, [("otherapp", "auto_1"), ("testapp", "auto_2")]
+        )
+        self.assertOperationTypes(
+            changes, "otherapp", 1, ["AlterModelOptions", "AlterField"]
+        )
+
+        self.assertNumberMigrations(changes, "testapp", 3)
+
+        self.assertMigrationDependencies(changes, "testapp", 0, [])
+        self.assertOperationTypes(changes, "testapp", 0, ["AlterModelTable"])
+        self.assertMigrationDependencies(
+            changes, "testapp", 1, [("otherapp", "auto_1"), ("testapp", "auto_1")]
+        )
+        self.assertOperationTypes(changes, "testapp", 1, ["AlterModelOptions"])
+        self.assertMigrationDependencies(
+            changes, "testapp", 2, [("otherapp", "auto_2"), ("testapp", "auto_2")]
+        )
+        self.assertOperationTypes(changes, "testapp", 2, ["DeleteModel"])
+
+    def test_move_model_with_explicit_db_table(self):
+        before = [self.author_name, self.book]
+        after = [
+            ModelState(
+                "otherapp",
+                "Author",
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    ("name", models.CharField(max_length=200)),
+                ],
+                options={"db_table": "testapp_author"},
+            ),
+            ModelState(
+                "otherapp",
+                "Book",
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    ("author", models.ForeignKey("otherapp.Author", models.CASCADE)),
+                    ("title", models.CharField(max_length=200)),
+                ],
+            ),
+        ]
+        changes = self.get_changes(
+            before, after, MigrationQuestioner({"ask_move_model": True})
+        )
+        self.assertNumberMigrations(changes, "otherapp", 2)
+
+        self.assertMigrationDependencies(changes, "otherapp", 0, [])
+        self.assertOperationTypes(changes, "otherapp", 0, ["CreateModel"])
+        self.assertMigrationDependencies(
+            changes, "otherapp", 1, [("otherapp", "auto_1"), ("testapp", "auto_1")]
+        )
+        self.assertOperationTypes(
+            changes, "otherapp", 1, ["AlterModelOptions", "AlterField"]
+        )
+
+        self.assertNumberMigrations(changes, "testapp", 2)
+
+        self.assertMigrationDependencies(
+            changes, "testapp", 0, [("otherapp", "auto_1")]
+        )
+        self.assertOperationTypes(changes, "testapp", 0, ["AlterModelOptions"])
+        self.assertMigrationDependencies(
+            changes, "testapp", 1, [("otherapp", "auto_2"), ("testapp", "auto_1")]
+        )
+        self.assertOperationTypes(changes, "testapp", 1, ["DeleteModel"])
+
     def test_fk_dependency(self):
         """Having a ForeignKey automatically adds a dependency."""
         # Note that testapp (author) has no dependencies,
