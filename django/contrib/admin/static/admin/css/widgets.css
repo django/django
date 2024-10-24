@@ -2,7 +2,7 @@
 
 .selector {
     display: flex;
-    flex-grow: 1;
+    flex: 1;
     gap: 0 10px;
 }
 
@@ -14,15 +14,18 @@
 }
 
 .selector-available, .selector-chosen {
-    text-align: center;
     display: flex;
     flex-direction: column;
     flex: 1 1;
 }
 
-.selector-available h2, .selector-chosen h2 {
+.selector-available-title, .selector-chosen-title {
     border: 1px solid var(--border-color);
     border-radius: 4px 4px 0 0;
+}
+
+.selector .helptext {
+    font-size: 0.6875rem;
 }
 
 .selector-chosen .list-footer-display {
@@ -40,14 +43,20 @@
     color: var(--breadcrumbs-fg);
 }
 
-.selector-chosen h2 {
+.selector-chosen-title {
     background: var(--secondary);
+    color: var(--header-link-color);
+    padding: 8px;
+}
+
+.selector-chosen-title label {
     color: var(--header-link-color);
 }
 
-.selector .selector-available h2 {
+.selector-available-title {
     background: var(--darkened-bg);
     color: var(--body-quiet-color);
+    padding: 8px;
 }
 
 .selector .selector-filter {
@@ -121,6 +130,7 @@
     overflow: hidden;
     cursor: default;
     opacity: 0.55;
+    border: none;
 }
 
 .active.selector-add, .active.selector-remove {
@@ -147,7 +157,7 @@
     background-position: 0 -80px;
 }
 
-a.selector-chooseall, a.selector-clearall {
+.selector-chooseall, .selector-clearall {
     display: inline-block;
     height: 16px;
     text-align: left;
@@ -158,38 +168,39 @@ a.selector-chooseall, a.selector-clearall {
     color: var(--body-quiet-color);
     text-decoration: none;
     opacity: 0.55;
+    border: none;
 }
 
-a.active.selector-chooseall:focus, a.active.selector-clearall:focus,
-a.active.selector-chooseall:hover, a.active.selector-clearall:hover {
+.active.selector-chooseall:focus, .active.selector-clearall:focus,
+.active.selector-chooseall:hover, .active.selector-clearall:hover {
     color: var(--link-fg);
 }
 
-a.active.selector-chooseall, a.active.selector-clearall {
+.active.selector-chooseall, .active.selector-clearall {
     opacity: 1;
 }
 
-a.active.selector-chooseall:hover, a.active.selector-clearall:hover {
+.active.selector-chooseall:hover, .active.selector-clearall:hover {
     cursor: pointer;
 }
 
-a.selector-chooseall {
+.selector-chooseall {
     padding: 0 18px 0 0;
     background: url(../img/selector-icons.svg) right -160px no-repeat;
     cursor: default;
 }
 
-a.active.selector-chooseall:focus, a.active.selector-chooseall:hover {
+.active.selector-chooseall:focus, .active.selector-chooseall:hover {
     background-position: 100% -176px;
 }
 
-a.selector-clearall {
+.selector-clearall {
     padding: 0 0 0 18px;
     background: url(../img/selector-icons.svg) 0 -128px no-repeat;
     cursor: default;
 }
 
-a.active.selector-clearall:focus, a.active.selector-clearall:hover {
+.active.selector-clearall:focus, .active.selector-clearall:hover {
     background-position: 0 -144px;
 }
 
