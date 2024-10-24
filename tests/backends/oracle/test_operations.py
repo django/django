@@ -141,3 +141,19 @@ class OperationsTests(TransactionTestCase):
         self.assertIn("BACKENDS_PERSON_SQ", statements[5])
         self.assertIn("BACKENDS_VERYLONGMODELN7BE2_SQ", statements[6])
         self.assertIn("BACKENDS_TAG_SQ", statements[7])
+
+    def test_date_extract_sql_lookup_types(self):
+        valid_types = ["year", "month", "day", "week", "hour", "minute", "second"]
+        invalid_types = ["invalid", "month2", "dayyy"]
+
+        for lookup_type in valid_types:
+            with self.subTest(lookup_type=lookup_type):
+                try:
+                    connection.ops.date_extract_sql(lookup_type, "table.column", [])
+                except ValueError:
+                    self.fail(f"Unexpected ValueError for lookup type: {lookup_type}")
+
+        for lookup_type in invalid_types:
+            with self.subTest(lookup_type=lookup_type):
+                with self.assertRaises(ValueError):
+                    connection.ops.date_extract_sql(lookup_type, "table.column", [])
