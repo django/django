@@ -161,7 +161,8 @@ CSRF
 Database backends
 ~~~~~~~~~~~~~~~~~
 
-* ...
+* MySQL connections now default to using the ``utf8mb4`` character set,
+  instead of ``utf8``, which is an alias for ``utf8mb3``.
 
 Decorators
 ~~~~~~~~~~
@@ -361,6 +362,14 @@ Dropped support for PostgreSQL 13
 
 Upstream support for PostgreSQL 13 ends in November 2025. Django 5.2 supports
 PostgreSQL 14 and higher.
+
+Changed MySQL connection character set default
+----------------------------------------------
+
+MySQL connections now default to using the ``utf8mb4`` character set, instead
+of ``utf8``, which is an alias for ``utf8mb3``. ``utf8mb3`` can be specified
+in the ``OPTIONS`` part of the ``DATABASES`` setting, if needed for legacy
+databases.
 
 Miscellaneous
 -------------

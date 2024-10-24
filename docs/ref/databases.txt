@@ -517,7 +517,7 @@ You can `create your database`_ using the command-line tools and this SQL:
 
 .. code-block:: sql
 
-  CREATE DATABASE <dbname> CHARACTER SET utf8;
+  CREATE DATABASE <dbname> CHARACTER SET utf8mb4;
 
 This ensures all tables and columns will use UTF-8 by default.
 
@@ -542,23 +542,14 @@ Django doesn't provide an API to change them.
 .. _documented thoroughly: https://dev.mysql.com/doc/refman/en/charset.html
 
 By default, with a UTF-8 database, MySQL will use the
-``utf8_general_ci`` collation. This results in all string equality
+``utf8mb4_0900_ai_ci`` collation. This results in all string equality
 comparisons being done in a *case-insensitive* manner. That is, ``"Fred"`` and
 ``"freD"`` are considered equal at the database level. If you have a unique
 constraint on a field, it would be illegal to try to insert both ``"aa"`` and
 ``"AA"`` into the same column, since they compare as equal (and, hence,
 non-unique) with the default collation. If you want case-sensitive comparisons
 on a particular column or table, change the column or table to use the
-``utf8_bin`` collation.
-
-Please note that according to `MySQL Unicode Character Sets`_, comparisons for
-the ``utf8_general_ci`` collation are faster, but slightly less correct, than
-comparisons for ``utf8_unicode_ci``. If this is acceptable for your application,
-you should use ``utf8_general_ci`` because it is faster. If this is not acceptable
-(for example, if you require German dictionary order), use ``utf8_unicode_ci``
-because it is more accurate.
-
-.. _MySQL Unicode Character Sets: https://dev.mysql.com/doc/refman/en/charset-unicode-sets.html
+``utf8mb4_0900_as_cs`` collation.
 
 .. warning::
 
@@ -602,7 +593,7 @@ Here's a sample configuration which uses a MySQL option file::
     database = NAME
     user = USER
     password = PASSWORD
-    default-character-set = utf8
+    default-character-set = utf8mb4
 
 Several other `MySQLdb connection options`_ may be useful, such as ``ssl``,
 ``init_command``, and ``sql_mode``.
