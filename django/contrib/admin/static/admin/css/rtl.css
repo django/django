@@ -235,19 +235,19 @@ fieldset .fieldBox {
   background-position: 0 -112px;
 }
 
-a.selector-chooseall {
+.selector-chooseall {
     background: url(../img/selector-icons.svg) right -128px no-repeat;
 }
 
-a.active.selector-chooseall:focus, a.active.selector-chooseall:hover {
+.active.selector-chooseall:focus, .active.selector-chooseall:hover {
     background-position: 100% -144px;
 }
 
-a.selector-clearall {
+.selector-clearall {
     background: url(../img/selector-icons.svg) 0 -160px no-repeat;
 }
 
-a.active.selector-clearall:focus, a.active.selector-clearall:hover {
+.active.selector-clearall:focus, .active.selector-clearall:hover {
     background-position: 0 -176px;
 }
 
