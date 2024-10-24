@@ -87,3 +87,9 @@ def media(request):
 
 def request(request):
     return {"request": request}
+
+
+def nonce(request):
+    nonce = request.csp_nonce if hasattr(request, "csp_nonce") else ""
+
+    return {"CSP_NONCE": nonce}
