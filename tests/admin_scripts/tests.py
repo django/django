@@ -2943,6 +2943,15 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
                     expected_mode,
                 )
 
+    @mock.patch("django.core.management.utils.shutil.which", return_value="nonexistent")
+    def test_failure_to_format(self, mock):
+        out = StringIO()
+        err = StringIO()
+        call_command(
+            "startapp", "mynewapp", directory=self.test_dir, stdout=out, stderr=err
+        )
+        self.assertIn("Formatters failed to launch", err.getvalue())
+
 
 class StartApp(AdminScriptTestCase):
     def test_invalid_name(self):

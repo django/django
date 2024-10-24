@@ -1,6 +1,9 @@
+import io
 import os
+import sys
 from argparse import ArgumentDefaultsHelpFormatter
 from io import StringIO
+from pathlib import Path
 from unittest import mock
 
 from admin_scripts.tests import AdminScriptTestCase
@@ -15,6 +18,7 @@ from django.core.management.utils import (
     is_ignored_path,
     normalize_path_patterns,
     popen_wrapper,
+    run_formatters,
 )
 from django.db import connection
 from django.test import SimpleTestCase, override_settings
@@ -535,3 +539,26 @@ class UtilsTests(SimpleTestCase):
     def test_normalize_path_patterns_truncates_wildcard_base(self):
         expected = [os.path.normcase(p) for p in ["foo/bar", "bar/*/"]]
         self.assertEqual(normalize_path_patterns(["foo/bar/*", "bar/*/"]), expected)
+
+    def test_formatting_failure_is_caught_and_logged(self):
+        cases = [
+            (FileNotFoundError, "nonexistent"),
+            (
+                OSError if sys.platform == "win32" else PermissionError,
+                str(Path(__file__).parent / "test_files" / "black"),
+            ),
+        ]
+        for exception, location in cases:
+            stderr = io.StringIO()
+            with (
+                self.subTest(exception=exception),
+                mock.patch(
+                    "django.core.management.utils.shutil.which", return_value=location
+                ),
+            ):
+                run_formatters([], stderr=stderr)
+                out = stderr.getvalue()
+                self.assertIn("Formatters failed to launch:", out)
+                self.assertIn(exception.__qualname__, out)
+                if sys.platform != "win32":
+                    self.assertIn(location, out)
