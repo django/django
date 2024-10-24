@@ -97,7 +97,7 @@ either restore Django's defaults at the end of each request, force an
 appropriate value at the beginning of each request, or disable persistent
 connections.
 
-If a connection is created in a long-running process, outside of Django’s
+If a connection is created in a process or sub-thread, outside of Django’s
 request-response cycle, the connection will remain open until explicitly
 closed, or timeout occurs. You can use ``django.db.close_old_connections()`` to
 close all old or unusable connections.
