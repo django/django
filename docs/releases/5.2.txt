@@ -31,6 +31,50 @@ and only officially support the latest release of each series.
 What's new in Django 5.2
 ========================
 
+Support for ``JSONField`` key transforms in ``update()``
+--------------------------------------------------------
+
+Django 5.2 introduces support for ``JSONField`` key transforms in ``update`` so
+you can do partial update ``JSONField`` more efficiently. Consider following
+example to update a ``JSONField``.
+
+.. code-block:: pycon
+
+    >>> user_preferences = UserPreferences.objects.create(
+    ...     settings={
+    ...         "theme": "dark",
+    ...         "notifications": True,
+    ...         "font": {"size": 10, "name": "Arial"},
+    ...     }
+    ... )
+    >>> UserPreferences.objects.update(
+    ...     settings__theme="light",
+    ...     settings__font__size=20,
+    ... )
+    >>> user_preferences = UserPreferences.objects.get(pk=user_preferences.pk)
+    >>> print(user_preferences.settings)
+    {'theme': 'light', 'notifications': True, 'font': {'size': 20, 'name': 'Arial'}}
+
+You can also remove a key by providing ``NOT_PROVIDED`` to parameter value.
+
+.. code-block:: pycon
+
+    >>> from django.db.models import NOT_PROVIDED
+    >>> user_preferences = UserPreferences.objects.create(
+    ...     settings={
+    ...         "theme": "dark",
+    ...         "notifications": True,
+    ...         "font": {"size": 10, "name": "Arial"},
+    ...     }
+    ... )
+    >>> UserPreferences.objects.update(
+    ...     settings__theme=NOT_PROVIDED,
+    ...     settings__font__size=20,
+    ... )
+    >>> user_preferences = UserPreferences.objects.get(pk=user_preferences.pk)
+    >>> print(user_preferences.settings)
+    {'notifications': True, 'font': {'size': 20, 'name': 'Arial'}}
+
 Minor features
 --------------
 

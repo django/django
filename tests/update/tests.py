@@ -1,10 +1,21 @@
+import datetime
 import unittest
 
 from django.core.exceptions import FieldError
 from django.db import IntegrityError, connection, transaction
-from django.db.models import Case, CharField, Count, F, IntegerField, Max, When
-from django.db.models.functions import Abs, Concat, Lower
-from django.test import TestCase
+from django.db.models import (
+    NOT_PROVIDED,
+    Case,
+    CharField,
+    Count,
+    F,
+    IntegerField,
+    Max,
+    Value,
+    When,
+)
+from django.db.models.functions import Abs, Concat, JSONObject, Lower
+from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import register_lookup
 
 from .models import (
@@ -17,6 +28,7 @@ from .models import (
     RelatedPoint,
     UniqueNumber,
     UniqueNumberChild,
+    UserPreferences,
 )
 
 
@@ -346,3 +358,199 @@ class MySQLUpdateOrderByTest(TestCase):
         self.assertEqual(updated, 1)
         related.refresh_from_db()
         self.assertEqual(related.name, "new")
+
+
+class TransformUpdateTests(TestCase):
+    def test_get_update_expression_not_implemented(self):
+        date_created = datetime.datetime(3000, 1, 1, 21, 22, 23)
+        user_preferences = UserPreferences.objects.create(date_created=date_created)
+
+        with self.assertRaisesMessage(
+            NotImplementedError,
+            "Using ExtractYear is not supported in QuerySet.update().",
+        ):
+            UserPreferences.objects.update(date_created__year=2024)
+
+        user_preferences.refresh_from_db()
+        self.assertEqual(user_preferences.date_created, date_created)
+
+    def test_invalid_transform(self):
+        date_created = datetime.datetime(3000, 1, 1, 21, 22, 23)
+        user_preferences = UserPreferences.objects.create(date_created=date_created)
+
+        with self.assertRaisesMessage(
+            FieldError,
+            "foo is not a valid transform on DateTimeField.",
+        ):
+            UserPreferences.objects.update(date_created__foo=2024)
+
+        user_preferences.refresh_from_db()
+        self.assertEqual(user_preferences.date_created, date_created)
+
+
+@skipUnlessDBFeature("supports_partial_json_update")
+class JSONKeyTransformUpdateTests(TestCase):
+    def test_update_json_key_transform(self):
+        user_preferences = UserPreferences.objects.create(
+            settings={
+                "theme": {"color": "black", "font": "Arial"},
+                "notifications": {"email": False, "sms": True},
+            }
+        )
+        UserPreferences.objects.update(settings__theme__color="white")
+        user_preferences = UserPreferences.objects.get(pk=user_preferences.pk)
+        self.assertEqual(
+            user_preferences.settings,
+            {
+                "theme": {"color": "white", "font": "Arial"},
+                "notifications": {"email": False, "sms": True},
+            },
+        )
+
+    def test_update_json_multiple_key_transform(self):
+        user_preferences = UserPreferences.objects.create(
+            settings={
+                "theme": {"color": "black", "font": "Arial"},
+                "notifications": {"email": False, "sms": True},
+            }
+        )
+        UserPreferences.objects.update(
+            settings__theme__color="white", settings__theme__font="Comic Sans"
+        )
+        user_preferences = UserPreferences.objects.get(pk=user_preferences.pk)
+        self.assertEqual(
+            user_preferences.settings,
+            {
+                "theme": {"color": "white", "font": "Comic Sans"},
+                "notifications": {"email": False, "sms": True},
+            },
+        )
+
+    def test_update_json_remove(self):
+        user_preferences = UserPreferences.objects.create(
+            settings={
+                "theme": {"color": "black", "font": "Arial"},
+                "notifications": {"email": False, "sms": True},
+            }
+        )
+        UserPreferences.objects.update(settings__theme__color=NOT_PROVIDED)
+        user_preferences = UserPreferences.objects.get(pk=user_preferences.pk)
+        self.assertEqual(
+            user_preferences.settings,
+            {
+                "theme": {"font": "Arial"},
+                "notifications": {"email": False, "sms": True},
+            },
+        )
+
+    def test_combine_update_json_remove(self):
+        user_preferences = UserPreferences.objects.create(
+            settings={
+                "theme": {"color": "black", "font": "Arial"},
+                "notifications": {"email": False, "sms": True},
+            }
+        )
+        UserPreferences.objects.update(
+            settings__theme__font="Comic Sans", settings__theme__color=NOT_PROVIDED
+        )
+        user_preferences = UserPreferences.objects.get(pk=user_preferences.pk)
+        self.assertEqual(
+            user_preferences.settings,
+            {
+                "theme": {"font": "Comic Sans"},
+                "notifications": {"email": False, "sms": True},
+            },
+        )
+
+    def test_update_field_with_list_value(self):
+        user_preferences = UserPreferences.objects.create(
+            settings={
+                "theme": {"color": "black", "font": "Arial"},
+                "notifications": {"email": False, "sms": True},
+            }
+        )
+        UserPreferences.objects.update(settings__theme__font=["Arial", "Comic Sans"])
+        user_preferences = UserPreferences.objects.get(pk=user_preferences.pk)
+        self.assertEqual(
+            user_preferences.settings,
+            {
+                "theme": {"font": ["Arial", "Comic Sans"], "color": "black"},
+                "notifications": {"email": False, "sms": True},
+            },
+        )
+
+    def test_update_field_with_list_value_using_index(self):
+        user_preferences = UserPreferences.objects.create(
+            settings={
+                "theme": {"color": "black", "font": ["Arial", "Calibri"]},
+                "notifications": {"email": False, "sms": True},
+            }
+        )
+        UserPreferences.objects.update(settings__theme__font__1="Comic Sans")
+        user_preferences = UserPreferences.objects.get(pk=user_preferences.pk)
+        self.assertEqual(
+            user_preferences.settings,
+            {
+                "theme": {"font": ["Arial", "Comic Sans"], "color": "black"},
+                "notifications": {"email": False, "sms": True},
+            },
+        )
+
+    def test_update_field_with_previous_nonexist_key(self):
+        user_preferences = UserPreferences.objects.create(
+            settings={
+                "theme": {"color": "black"},
+                "notifications": {"email": False, "sms": True},
+            }
+        )
+        UserPreferences.objects.update(settings__theme__font="Arial")
+        user_preferences = UserPreferences.objects.get(pk=user_preferences.pk)
+        self.assertEqual(
+            user_preferences.settings,
+            {
+                "theme": {"color": "black", "font": "Arial"},
+                "notifications": {"email": False, "sms": True},
+            },
+        )
+
+    def test_update_field_with_none_value(self):
+        user_preferences = UserPreferences.objects.create(
+            settings={
+                "theme": {"color": "black", "font": "Arial"},
+                "notifications": {"email": False, "sms": True},
+            }
+        )
+        UserPreferences.objects.update(settings__theme=None)
+        user_preferences = UserPreferences.objects.get(pk=user_preferences.pk)
+        self.assertEqual(
+            user_preferences.settings,
+            {"theme": None, "notifications": {"email": False, "sms": True}},
+        )
+
+    def test_update_using_jsonobject(self):
+        user_preferences = UserPreferences.objects.create(
+            settings={
+                "theme": "dark",
+                "notifications": True,
+            }
+        )
+        UserPreferences.objects.update(settings__theme=JSONObject(color=Value("black")))
+        user_preferences = UserPreferences.objects.get(pk=user_preferences.pk)
+        self.assertEqual(
+            user_preferences.settings,
+            {"theme": {"color": "black"}, "notifications": True},
+        )
+
+    def test_update_using_expressions(self):
+        user_preferences = UserPreferences.objects.create(
+            settings={
+                "theme": "dark",
+                "notifications": True,
+            }
+        )
+        UserPreferences.objects.update(settings__id=F("id"))
+        user_preferences = UserPreferences.objects.get(pk=user_preferences.pk)
+        self.assertEqual(
+            user_preferences.settings,
+            {"theme": "dark", "notifications": True, "id": user_preferences.pk},
+        )
