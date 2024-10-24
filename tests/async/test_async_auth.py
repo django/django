@@ -8,6 +8,7 @@ from django.contrib.auth import (
 from django.contrib.auth.models import AnonymousUser, User
 from django.http import HttpRequest
 from django.test import TestCase, override_settings
+from django.utils.deprecation import RemovedInDjango61Warning
 
 
 class AsyncAuthTest(TestCase):
@@ -60,7 +61,36 @@ class AsyncAuthTest(TestCase):
         self.assertIsInstance(user, User)
         self.assertEqual(user.username, second_user.username)
 
-    async def test_alogin_without_user(self):
+    async def test_alogin_without_user_no_request_user(self):
+        request = HttpRequest()
+        request.session = await self.client.asession()
+        # RemovedInDjango61Warning: Fallback to request.user will be removed.
+        # This will raise AttributeError: 'NoneType' object has no attribute '_meta'
+        # when the fallback is removed.
+        with self.assertRaisesMessage(
+            AttributeError,
+            "'HttpRequest' object has no attribute 'auser'",
+        ):
+            await alogin(request, None)
+
+    async def test_alogin_without_user_anonymous_request(self):
+        async def auser():
+            return AnonymousUser()
+
+        request = HttpRequest()
+        request.user = AnonymousUser()
+        request.auser = auser
+        request.session = await self.client.asession()
+        # RemovedInDjango61Warning: Fallback to request.user will be removed.
+        # This will raise AttributeError: 'NoneType' object has no attribute '_meta'
+        # when the fallback is removed.
+        with self.assertRaisesMessage(
+            AttributeError,
+            "'AnonymousUser' object has no attribute '_meta'",
+        ):
+            await alogin(request, None)
+
+    async def test_alogin_without_user_authenticated_request(self):
         async def auser():
             return self.test_user
 
@@ -68,7 +98,15 @@ class AsyncAuthTest(TestCase):
         request.user = self.test_user
         request.auser = auser
         request.session = await self.client.asession()
-        await alogin(request, None)
+
+        with self.assertWarnsMessage(
+            RemovedInDjango61Warning,
+            "Fallback to request.user when user is None will be removed.",
+        ):
+            # This will raise AttributeError: 'NoneType' object has no attribute '_meta'
+            # when the fallback is removed.
+            await alogin(request, None)
+
         user = await aget_user(request)
         self.assertIsInstance(user, User)
         self.assertEqual(user.username, self.test_user.username)

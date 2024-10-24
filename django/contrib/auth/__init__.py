@@ -1,11 +1,13 @@
 import inspect
 import re
+import warnings
 
 from django.apps import apps as django_apps
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.middleware.csrf import rotate_token
 from django.utils.crypto import constant_time_compare
+from django.utils.deprecation import RemovedInDjango61Warning
 from django.utils.module_loading import import_string
 from django.views.decorators.debug import sensitive_variables
 
@@ -156,7 +158,18 @@ def login(request, user, backend=None):
     """
     session_auth_hash = ""
     if user is None:
+        # Fallback to request.user when user is None.
+        # This is undocumented behaviour and will be removed in Django 6.1.
         user = request.user
+        if user and isinstance(user, get_user_model()):
+            # Avoid a warning when the user remains None or becomes AnonymousUser.
+            # Those cases result in an error down the line anyway.
+            warnings.warn(
+                "Fallback to request.user when user is None will be removed.",
+                RemovedInDjango61Warning,
+                stacklevel=2,
+            )
+
     if hasattr(user, "get_session_auth_hash"):
         session_auth_hash = user.get_session_auth_hash()
 
@@ -189,7 +202,17 @@ async def alogin(request, user, backend=None):
     """See login()."""
     session_auth_hash = ""
     if user is None:
+        # Fallback to request.user when user is None.
+        # This is undocumented behaviour and will be removed in Django 6.1.
         user = await request.auser()
+        if user and isinstance(user, get_user_model()):
+            # Avoid a warning when the user remains None or becomes AnonymousUser.
+            # Those cases result in an error down the line anyway.
+            warnings.warn(
+                "Fallback to request.user when user is None will be removed.",
+                RemovedInDjango61Warning,
+                stacklevel=2,
+            )
     if hasattr(user, "get_session_auth_hash"):
         session_auth_hash = user.get_session_auth_hash()
 
