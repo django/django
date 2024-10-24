@@ -1,0 +1,279 @@
+.. _content-security-policy:
+
+=============================
+Content Security Policy (CSP)
+=============================
+
+.. module:: django.middleware.csp
+   :synopsis: Middleware for Content Security Policy headers
+
+Django provides built-in support for Content Security Policy (CSP) headers through the CSP
+middleware. Content Security Policy is a powerful security feature that helps protect web applications
+against various types of attacks, particularly Cross-Site Scripting (XSS) and other code injection attacks.
+
+CSP works by allowing you to specify which sources of content are considered trusted, and instructing
+the browser to only execute or render resources from those trusted sources. This effectively creates a
+whitelist of content sources, significantly reducing the risk of malicious code execution.
+
+Some key benefits of implementing CSP include:
+
+1. Mitigating XSS attacks by preventing the execution of inline scripts and restricting which external
+   scripts can be loaded.
+2. Controlling which external resources (like images, fonts, or stylesheets) can be loaded by your site.
+3. Preventing unwanted framing of your site, protecting against clickjacking attacks.
+4. Reporting policy violations to a specified URL, allowing you to monitor potential attacks or
+   misconfigured directives.
+
+CSP provides a robust and flexible framework for securing your web application, giving you fine-grained
+control over the resources your site can use and interact with. By leveraging Django's CSP middleware,
+you can easily implement and manage these policies in your project.
+
+Using CSP
+=========
+
+To enable CSP in your Django project:
+
+1. Add the CSP middleware to your ``MIDDLEWARE`` setting:
+
+   .. code-block:: python
+
+      MIDDLEWARE = [
+          # ...
+          "django.middleware.csp.ContentSecurityPolicyMiddleware",
+          # ...
+      ]
+
+2. Configure your CSP policies in your ``settings.py`` using either ``SECURE_CSP`` or ``SECURE_CSP_REPORT_ONLY``:
+
+   .. code-block:: python
+
+      from django.middleware import csp
+
+      SECURE_CSP = {
+          "DIRECTIVES": {
+              "default-src": [csp.SELF],
+              "script-src": [csp.SELF],
+              "style-src": [csp.SELF],
+              # Add more directives as needed
+          }
+      }
+
+      # Or for report-only mode:
+      SECURE_CSP_REPORT_ONLY = {
+          "DIRECTIVES": {
+              "default-src": [csp.SELF],
+              "script-src": [csp.SELF],
+              "style-src": [csp.SELF],
+              # Add more directives as needed
+          }
+      }
+
+3. To use CSP nonces for inline scripts or styles, include ``csp.NONCE`` in your directives:
+
+   .. code-block:: python
+
+      SECURE_CSP = {
+          "DIRECTIVES": {
+              "script-src": [csp.SELF, csp.NONCE],
+              # Other directives...
+          }
+      }
+
+Nonce Usage
+===========
+
+To use nonces in your CSP policy:
+
+1. Add the CSP context processor to your ``TEMPLATES`` setting:
+
+   .. code-block:: python
+
+      TEMPLATES = [
+          {
+              "BACKEND": "django.template.backends.django.DjangoTemplates",
+              "OPTIONS": {
+                  "context_processors": [
+                      # ...
+                      "django.template.context_processors.csp_nonce",
+                  ],
+              },
+          },
+      ]
+
+   This context processor makes the CSP nonce available in all templates.
+
+2. In your templates, use the ``request.csp_nonce``:
+
+   .. code-block:: html
+
+      <script nonce="{{ request.csp_nonce }}">
+          // Your inline JavaScript
+      </script>
+
+The CSP middleware will automatically generate and include a nonce in the CSP header for each request.
+
+========
+Settings
+========
+
+Django's CSP middleware is configured using either ``SECURE_CSP`` or ``SECURE_CSP_REPORT_ONLY`` in your
+``settings.py``. These are dictionaries with a ``"DIRECTIVES"`` key, where the value is another dictionary
+of CSP directives and their corresponding policies. Here's a comprehensive example that demonstrates a decent
+starting point for many applications:
+
+This example is considered decent because it:
+1. Sets a default policy for all content types
+2. Provides specific policies for common content types (scripts, styles, images, etc.)
+3. Restricts potentially dangerous sources (e.g., ``object-src``, ``frame-src``)
+4. Enables ``upgrade-insecure-requests`` for better security
+5. Uses CSP nonces for inline scripts and styles
+6. Demonstrates the use of various CSP directives and constant values (``SELF``, ``NONE``, ``NONCE``, etc.)
+
+.. code-block:: python
+
+    from django.middleware import csp
+
+    SECURE_CSP = {
+        "DIRECTIVES": {
+            "default-src": [csp.SELF],
+            "script-src": [csp.SELF, csp.NONCE],
+            "style-src": [csp.SELF, csp.NONCE],
+            "img-src": [csp.SELF, "https:"],
+            "connect-src": [csp.SELF],
+            "font-src": [csp.SELF],
+            "object-src": [csp.NONE],
+            "media-src": [csp.SELF],
+            "frame-src": [csp.NONE],
+            "form-action": [csp.SELF],
+            "base-uri": [csp.SELF],
+            "frame-ancestors": [csp.NONE],
+            "upgrade-insecure-requests": True,
+        }
+    }
+
+.. _content-security-policy-report-only:
+
+Use ``SECURE_CSP_REPORT_ONLY`` for report-only mode, which will not enforce policies but only report violations.
+
+Decorators
+==========
+
+.. module:: django.views.decorators.csp
+
+The examples below assume you are using function-based views. If you
+are working with class-based views, you can refer to :ref:`Decorating
+class-based views<decorating-class-based-views>`.
+
+.. function:: csp_exempt(enforced=True, report_only=True)(view)
+
+    This decorator marks a view as being exempt from the Content Security Policy
+    protection ensured by the middleware. Example:
+
+    .. code-block:: python
+
+        from django.http import HttpResponse
+        from django.views.decorators.csp import csp_exempt
+
+
+        @csp_exempt
+        def my_view(request):
+            return HttpResponse("This view will not have either CSP headers")
+
+    This decorator takes optional boolean arguments ``enforced`` and ``report_only`` to
+    customize which header is exempt. By default, both headers are exempt. Example:
+
+    .. code-block:: python
+
+        from django.http import HttpResponse
+        from django.views.decorators.csp import csp_exempt
+
+
+        @csp_exempt(report_only=False)
+        def my_view(request):
+            return HttpResponse("This view will not have a report-only CSP header")
+
+
+        @csp_exempt(enforced=False)
+        def another_view(request):
+            return HttpResponse("This view will not have an enforced CSP header")
+
+
+.. function:: csp_override(config, enforced=True, report_only=True)(view)
+
+    This decorator allows you to override the Content Security Policy for a specific view.
+    It takes a dictionary as an argument, similar to the ``SECURE_CSP`` and ``SECURE_CSP_REPORT_ONLY``
+    settings. This decorator also takes optional boolean arguments ``enforced`` and ``report_only``
+    to customize which header is overridden. By default, both headers are overridden. Example:
+
+    .. code-block:: python
+
+        from django.http import HttpResponse
+        from django.middleware import csp
+        from django.views.decorators.csp import csp_override
+
+
+        @csp_override(
+            {
+                "default-src": [csp.SELF],
+                "img-src": [csp.SELF, "data:"],
+            }
+        )
+        def my_view(request):
+            return HttpResponse("Both CSP headers will be overridden")
+
+
+        @csp_override(
+            {
+                "default-src": [csp.SELF],
+                "img-src": [csp.SELF, "data:"],
+            },
+            report_only=False,
+        )
+        def enforced_only_view(request):
+            return HttpResponse("Only the enforced CSP header will be overridden")
+
+
+        @csp_override(
+            {
+                "default-src": [csp.SELF],
+                "img-src": [csp.SELF, "data:"],
+            },
+            enforced=False,
+        )
+        def report_only_view(request):
+            return HttpResponse("Only the report-only CSP header will be overridden")
+
+These decorators provide fine-grained control over the Content Security Policy
+on a per-view basis, allowing you to customize the policy as needed for specific
+parts of your application.
+
+Limitations and Considerations
+==============================
+
+While Content Security Policy (CSP) is a powerful security feature, it's important to be aware of
+its limitations and considerations, especially in the context of Django's implementation:
+
+* Browser Support: While most modern browsers support CSP, support for directives vary.
+
+* Performance Impact: Implementing CSP, especially with nonces, can have a slight performance
+  impact due to the additional processing required for each request.
+
+* Third-party Scripts: If your application relies heavily on third-party scripts or services,
+  implementing a strict CSP can be challenging and may require careful configuration.
+
+* Report-Only Mode Limitations: While useful for testing, the report-only mode
+  (``SECURE_CSP_REPORT_ONLY``) doesn't actually prevent any violations, it only reports them.
+
+* Nonce Limitations: Nonces are single-use tokens. If you're caching pages that include nonces,
+  you'll need to implement additional logic to ensure the nonces are refreshed appropriately.
+
+* Limited Directive Validation: Django's CSP middleware doesn't validate that all specified
+  directives match the CSP specification. It's the developer's responsibility to ensure the
+  correctness of the directives.
+
+* Violation Reports: While Django provides a way to set up CSP reporting, it doesn't include 
+  built-in functionality to handle and analyze these reports. You'll need to implement this 
+  separately or use a 3rd party service if you want to make use of violation reports.
+
+Remember, while these limitations exist, CSP is still a valuable tool in your security arsenal. It's
+important to understand these constraints and plan your implementation accordingly.
