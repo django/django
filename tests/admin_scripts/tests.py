@@ -34,7 +34,7 @@ from django.db.migrations.recorder import MigrationRecorder
 from django.test import LiveServerTestCase, SimpleTestCase, TestCase, override_settings
 from django.test.utils import captured_stderr, captured_stdout
 from django.urls import path
-from django.utils.version import PY313, get_docs_version
+from django.utils.version import PY313, PY314, get_docs_version
 from django.views.static import serve
 
 from . import urls
@@ -2355,10 +2355,16 @@ class Discovery(SimpleTestCase):
 
 class CommandDBOptionChoiceTests(SimpleTestCase):
     def test_invalid_choice_db_option(self):
-        expected_error = (
-            "Error: argument --database: invalid choice: "
-            "'deflaut' (choose from 'default', 'other')"
-        )
+        if PY314:
+            expected_error = (
+                "Error: argument --database: invalid choice: 'deflaut' "
+                "(choose from default, other)"
+            )
+        else:
+            expected_error = (
+                "Error: argument --database: invalid choice: 'deflaut' "
+                "(choose from 'default', 'other')"
+            )
         args = [
             "changepassword",
             "createsuperuser",
