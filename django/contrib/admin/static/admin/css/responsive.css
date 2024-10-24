@@ -299,7 +299,7 @@ input[type="submit"], button {
         background-position: 0 -80px;
     }
 
-    a.selector-chooseall, a.selector-clearall {
+    .selector-chooseall, .selector-clearall {
         align-self: center;
     }
 
@@ -649,6 +649,7 @@ input[type="submit"], button {
 
     .related-widget-wrapper .selector {
         order: 1;
+        flex: 1 0 auto;
     }
 
     .related-widget-wrapper > a {
