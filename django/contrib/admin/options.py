@@ -1175,6 +1175,7 @@ class ModelAdmin(BaseModelAdmin):
         Return a tuple containing a queryset to implement the search
         and a boolean indicating if the results may contain duplicates.
         """
+
         # Apply keyword searches.
         def construct_search(field_name):
             if field_name.startswith("^"):
@@ -1203,7 +1204,7 @@ class ModelAdmin(BaseModelAdmin):
                         # Update opts to follow the relation.
                         opts = field.path_infos[-1].to_opts
             # Return the field name as-is if it already includes __exact
-            if field_name.endswith('__exact'):
+            if field_name.endswith("__exact"):
                 return field_name
             # Otherwise, use the field with icontains.
             return "%s__icontains" % field_name
@@ -1214,12 +1215,16 @@ class ModelAdmin(BaseModelAdmin):
             # Add string cast annotations for non-string exact lookups
             str_annotations = {}
             for field in search_fields:
-                if field.endswith('__exact'):
-                    field_name = field.rsplit('__exact', 1)[0]
+                if field.endswith("__exact"):
+                    field_name = field.rsplit("__exact", 1)[0]
                     try:
                         field_obj = queryset.model._meta.get_field(field_name)
-                        if not isinstance(field_obj, (models.CharField, models.TextField)):
-                            str_annotations[f"{field_name}_str"] = Cast(field_name, output_field=models.CharField())
+                        if not isinstance(
+                            field_obj, (models.CharField, models.TextField)
+                        ):
+                            str_annotations[f"{field_name}_str"] = Cast(
+                                field_name, output_field=models.CharField()
+                            )
                     except FieldDoesNotExist:
                         continue
 
@@ -1227,11 +1232,17 @@ class ModelAdmin(BaseModelAdmin):
                 queryset = queryset.annotate(**str_annotations)
                 # Modify search fields to use string casts for non-string exact fields
                 search_fields = [
-                    (f"{field.rsplit('__exact', 1)[0]}_str__exact" 
-                    if field.endswith('__exact') and 
-                        not isinstance(queryset.model._meta.get_field(field.rsplit('__exact', 1)[0]), 
-                                    (models.CharField, models.TextField))
-                    else field)
+                    (
+                        f"{field.rsplit('__exact', 1)[0]}_str__exact"
+                        if field.endswith("__exact")
+                        and not isinstance(
+                            queryset.model._meta.get_field(
+                                field.rsplit("__exact", 1)[0]
+                            ),
+                            (models.CharField, models.TextField),
+                        )
+                        else field
+                    )
                     for field in search_fields
                 ]
 
