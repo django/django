@@ -1,16 +1,3 @@
-
-
-
-
-
-
-
-
-
-
-
-
-
 const moduleConst2 = "module2";
 export default moduleConst2;
 export const moduleConst = "module";
@@ -42,18 +29,3 @@ export {
     firstVar as firstVarAlias,
     secondVar as secondVarAlias
 } from "./module_test.js";
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
