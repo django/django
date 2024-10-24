@@ -1,5 +1,6 @@
 from django.core.exceptions import FieldDoesNotExist, FieldError
-from django.test import SimpleTestCase, TestCase
+from django.test import SimpleTestCase, TestCase, ignore_warnings
+from django.utils.deprecation import RemovedInDjango60Warning
 
 from .models import (
     BigChild,
@@ -82,6 +83,8 @@ class DeferTests(AssertionMixin, TestCase):
         with self.assertRaisesMessage(TypeError, msg):
             Primary.objects.only(None)
 
+    # Entire test can be removed once deprecation period ends.
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_defer_extra(self):
         qs = Primary.objects.all()
         self.assert_delayed(qs.defer("name").extra(select={"a": 1})[0], 1)

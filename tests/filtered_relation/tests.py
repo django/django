@@ -18,8 +18,9 @@ from django.db.models import (
 )
 from django.db.models.functions import Concat
 from django.db.models.lookups import Exact, IStartsWith
-from django.test import TestCase
+from django.test import TestCase, ignore_warnings
 from django.test.testcases import skipUnlessDBFeature
+from django.utils.deprecation import RemovedInDjango60Warning
 
 from .models import (
     Author,
@@ -344,6 +345,8 @@ class FilteredRelationTests(TestCase):
             ],
         )
 
+    # Entire test can be removed once deprecation period ends.
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_extra(self):
         self.assertSequenceEqual(
             Author.objects.annotate(
