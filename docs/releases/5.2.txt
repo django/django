@@ -99,6 +99,7 @@ Minor features
   :attr:`.OGRGeometry.has_curve` property, and the
   :meth:`.OGRGeometry.get_linear_geometry` and
   :meth:`.OGRGeometry.get_curve_geometry` methods.
+* Introduced :lookup:`geom_type` lookup to allow filtering by geometry type (:ticket:`28696`)
 
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
