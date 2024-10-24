@@ -42,6 +42,7 @@ from django.core.exceptions import (
 from django.core.paginator import Paginator
 from django.db import models, router, transaction
 from django.db.models.constants import LOOKUP_SEP
+from django.db.models.functions import Cast
 from django.forms.formsets import DELETION_FIELD_NAME, all_valid
 from django.forms.models import (
     BaseInlineFormSet,
@@ -1174,7 +1175,6 @@ class ModelAdmin(BaseModelAdmin):
         Return a tuple containing a queryset to implement the search
         and a boolean indicating if the results may contain duplicates.
         """
-
         # Apply keyword searches.
         def construct_search(field_name):
             if field_name.startswith("^"):
@@ -1202,12 +1202,39 @@ class ModelAdmin(BaseModelAdmin):
                     if hasattr(field, "path_infos"):
                         # Update opts to follow the relation.
                         opts = field.path_infos[-1].to_opts
+            # Return the field name as-is if it already includes __exact
+            if field_name.endswith('__exact'):
+                return field_name
             # Otherwise, use the field with icontains.
             return "%s__icontains" % field_name
 
         may_have_duplicates = False
         search_fields = self.get_search_fields(request)
         if search_fields and search_term:
+            # Add string cast annotations for non-string exact lookups
+            str_annotations = {}
+            for field in search_fields:
+                if field.endswith('__exact'):
+                    field_name = field.rsplit('__exact', 1)[0]
+                    try:
+                        field_obj = queryset.model._meta.get_field(field_name)
+                        if not isinstance(field_obj, (models.CharField, models.TextField)):
+                            str_annotations[f"{field_name}_str"] = Cast(field_name, output_field=models.CharField())
+                    except FieldDoesNotExist:
+                        continue
+
+            if str_annotations:
+                queryset = queryset.annotate(**str_annotations)
+                # Modify search fields to use string casts for non-string exact fields
+                search_fields = [
+                    (f"{field.rsplit('__exact', 1)[0]}_str__exact" 
+                    if field.endswith('__exact') and 
+                        not isinstance(queryset.model._meta.get_field(field.rsplit('__exact', 1)[0]), 
+                                    (models.CharField, models.TextField))
+                    else field)
+                    for field in search_fields
+                ]
+
             orm_lookups = [
                 construct_search(str(search_field)) for search_field in search_fields
             ]
@@ -1215,31 +1242,15 @@ class ModelAdmin(BaseModelAdmin):
             for bit in smart_split(search_term):
                 if bit.startswith(('"', "'")) and bit[0] == bit[-1]:
                     bit = unescape_string_literal(bit)
-
-                field_queries = []
-                for orm_lookup in orm_lookups:
-                    try:
-                        # Attempt to create a query for each field
-                        field_query = models.Q(**{orm_lookup: bit})
-                        queryset.filter(
-                            field_query
-                        ).exists()  # Test if the query is valid
-                        field_queries.append(field_query)
-                    except (ValueError, ValidationError):
-                        # Skip this field if the query is invalid
-                        continue
-
-                # Combine valid field queries with OR
-                if field_queries:
-                    term_queries.append(models.Q(reduce(operator.or_, field_queries)))
-
-            # Combine term queries with AND
-            if term_queries:
-                queryset = queryset.filter(reduce(operator.and_, term_queries))
-            else:
-                # If no valid queries were created, return an empty queryset
+                or_queries = models.Q.create(
+                    [(orm_lookup, bit) for orm_lookup in orm_lookups],
+                    connector=models.Q.OR,
+                )
+                term_queries.append(or_queries)
+            try:
+                queryset = queryset.filter(models.Q.create(term_queries))
+            except (ValueError, ValidationError):
                 return queryset.none(), may_have_duplicates
-
             may_have_duplicates |= any(
                 lookup_spawns_duplicates(self.opts, search_spec)
                 for search_spec in orm_lookups
