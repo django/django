@@ -13,6 +13,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.utils import (
     find_formatters,
+    get_directory_tree,
     handle_extensions,
     run_formatters,
 )
@@ -230,6 +231,8 @@ class TemplateCommand(BaseCommand):
                     shutil.rmtree(path_to_remove)
 
         run_formatters([top_dir], **formatter_paths)
+        for subpath in get_directory_tree(top_dir, no_color=self.no_color):
+            self.stdout.write(subpath)
 
     def handle_template(self, template, subdir):
         """
