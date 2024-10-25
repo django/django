@@ -230,7 +230,7 @@ effect since fields that haven't been included would never be accessed.
 .. attribute:: ModelFormOptions.model
 
     *Required.* A :class:`django.db.models.Model` to be used for this
-    :class:`~django.forms.ModelForm`. This is **not** a string.
+    :class:`~django.forms.ModelForm`.
 
     If no class is specified, a :exc:`ValueError` exception will be raised.
 
