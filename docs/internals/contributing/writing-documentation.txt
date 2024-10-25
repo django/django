@@ -159,9 +159,14 @@ Spelling check
 
 Before you commit your docs, it's a good idea to run the spelling checker.
 You'll need to install :pypi:`sphinxcontrib-spelling` first. Then from the
-``docs`` directory, run ``make spelling``. Wrong words (if any) along with the
-file and line number where they occur will be saved to
-``_build/spelling/output.txt``.
+``docs`` directory, run:
+
+.. console::
+
+     $ make spelling
+
+Wrong words (if any) along with the file and line number where they occur will
+be saved to ``_build/spelling/output.txt``.
 
 If you encounter false-positives (error output that actually is correct), do
 one of the following:
@@ -179,10 +184,21 @@ Link check
 
 Links in documentation can become broken or changed such that they are no
 longer the canonical link. Sphinx provides a builder that can check whether the
-links in the documentation are working. From the ``docs`` directory, run ``make
-linkcheck``. Output is printed to the terminal, but can also be found in
+links in the documentation are working. From the ``docs`` directory, run:
+
+.. console::
+
+     $ make linkcheck
+
+Output is printed to the terminal, but can also be found in
 ``_build/linkcheck/output.txt`` and ``_build/linkcheck/output.json``.
 
+.. warning::
+
+    The execution of the command requires an internet connection and takes
+    several minutes to complete, because the command tests all the links
+    that are found in the documentation.
+    
 Entries that have a status of "working" are fine, those that are "unchecked" or
 "ignored" have been skipped because they either cannot be checked or have
 matched ignore rules in the configuration.
@@ -290,7 +306,8 @@ documentation:
   display a link with the title "auth".
 
 * All Python code blocks should be formatted using the :pypi:`blacken-docs`
-  auto-formatter. This will be run by ``pre-commit`` if that is configured.
+  auto-formatter. This will be run by :ref:`pre-commit
+  <coding-style-pre-commit>` if that is configured.
 
 * Use :mod:`~sphinx.ext.intersphinx` to reference Python's and Sphinx'
   documentation.
@@ -324,8 +341,9 @@ documentation:
     Five
     ^^^^
 
-* Use :rst:role:`:rfc:<rfc>` to reference RFC and try to link to the relevant
-  section if possible. For example, use ``:rfc:`2324#section-2.3.2``` or
+* Use :rst:role:`:rfc:<rfc>` to reference a Request for Comments (RFC) and
+  try to link to the relevant section if possible. For example, use
+  ``:rfc:`2324#section-2.3.2``` or
   ``:rfc:`Custom link text <2324#section-2.3.2>```.
 
 * Use :rst:role:`:pep:<pep>` to reference a Python Enhancement Proposal (PEP)
@@ -338,6 +356,9 @@ documentation:
 * Use :rst:role:`:envvar:<envvar>` to refer to an environment variable. You may
   also need to define a reference to the documentation for that environment
   variable using :rst:dir:`.. envvar:: <envvar>`.
+
+* Use :rst:role:`:cve:<cve>` to reference a Common Vulnerabilities and
+  Exposures (CVE) identifier. For example, use ``:cve:`2019-14232```.
 
 Django-specific markup
 ======================
@@ -518,7 +539,7 @@ Minimizing images
 Optimize image compression where possible. For PNG files, use OptiPNG and
 AdvanceCOMP's ``advpng``:
 
-.. code-block:: console
+.. console::
 
    $ cd docs
    $ optipng -o7 -zm1-9 -i0 -strip all `find . -type f -not -path "./_build/*" -name "*.png"`
@@ -619,6 +640,10 @@ included in the Django repository and the releases as
 ``docs/man/django-admin.1``. There isn't a need to update this file when
 updating the documentation, as it's updated once as part of the release process.
 
-To generate an updated version of the man page, run ``make man`` in the
-``docs`` directory. The new man page will be written in
-``docs/_build/man/django-admin.1``.
+To generate an updated version of the man page, in the ``docs`` directory, run:
+
+.. console::
+
+     $ make man
+
+The new man page will be written in ``docs/_build/man/django-admin.1``.
