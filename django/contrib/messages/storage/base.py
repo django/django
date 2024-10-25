@@ -12,10 +12,11 @@ class Message:
     or template.
     """
 
-    def __init__(self, level, message, extra_tags=None):
+    def __init__(self, level, message, extra_tags=None, **kwargs):
         self.level = int(level)
         self.message = message
         self.extra_tags = extra_tags
+        self.extra_kwargs = kwargs
 
     def _prepare(self):
         """
@@ -139,7 +140,7 @@ class BaseStorage:
             messages = self._loaded_messages + self._queued_messages
             return self._store(messages, response)
 
-    def add(self, level, message, extra_tags=""):
+    def add(self, level, message, extra_tags="", **kwargs):
         """
         Queue a message to be stored.
 
@@ -154,7 +155,7 @@ class BaseStorage:
             return
         # Add the message.
         self.added_new = True
-        message = Message(level, message, extra_tags=extra_tags)
+        message = Message(level, message, extra_tags=extra_tags, **kwargs)
         self._queued_messages.append(message)
 
     def _get_level(self):
