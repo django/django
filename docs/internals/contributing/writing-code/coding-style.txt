@@ -417,7 +417,7 @@ Model style
   * All database fields
   * Custom manager attributes
   * ``class Meta``
-  * ``def __str__()``
+  * ``def __str__()`` and other Python magic methods
   * ``def save()``
   * ``def get_absolute_url()``
   * Any custom methods
