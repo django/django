@@ -8,8 +8,9 @@ from django.core.checks.urls import (
     check_url_settings,
     get_warning_for_invalid_pattern,
 )
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, ignore_warnings
 from django.test.utils import override_settings
+from django.utils.deprecation import RemovedInDjango61Warning
 
 
 class CheckUrlConfigTests(SimpleTestCase):
@@ -243,10 +244,11 @@ class CheckCustomErrorHandlersTests(SimpleTestCase):
     @override_settings(
         ROOT_URLCONF="check_framework.urls.bad_function_based_error_handlers",
     )
+    @ignore_warnings(category=RemovedInDjango61Warning)
     def test_bad_function_based_handlers(self):
         result = check_custom_error_handlers(None)
         self.assertEqual(len(result), 4)
-        for code, num_params, error in zip([400, 403, 404, 500], [2, 2, 2, 1], result):
+        for code, error in zip([400, 403, 404, 500], result):
             with self.subTest("handler{}".format(code)):
                 self.assertEqual(
                     error,
@@ -254,9 +256,7 @@ class CheckCustomErrorHandlersTests(SimpleTestCase):
                         "The custom handler{} view 'check_framework.urls."
                         "bad_function_based_error_handlers.bad_handler' "
                         "does not take the correct number of arguments "
-                        "(request{}).".format(
-                            code, ", exception" if num_params == 2 else ""
-                        ),
+                        "(request, exception).".format(code),
                         id="urls.E007",
                     ),
                 )
@@ -264,10 +264,11 @@ class CheckCustomErrorHandlersTests(SimpleTestCase):
     @override_settings(
         ROOT_URLCONF="check_framework.urls.bad_class_based_error_handlers",
     )
+    @ignore_warnings(category=RemovedInDjango61Warning)
     def test_bad_class_based_handlers(self):
         result = check_custom_error_handlers(None)
         self.assertEqual(len(result), 4)
-        for code, num_params, error in zip([400, 403, 404, 500], [2, 2, 2, 1], result):
+        for code, error in zip([400, 403, 404, 500], result):
             with self.subTest("handler%s" % code):
                 self.assertEqual(
                     error,
@@ -275,11 +276,7 @@ class CheckCustomErrorHandlersTests(SimpleTestCase):
                         "The custom handler%s view 'check_framework.urls."
                         "bad_class_based_error_handlers.HandlerView.as_view."
                         "<locals>.view' does not take the correct number of "
-                        "arguments (request%s)."
-                        % (
-                            code,
-                            ", exception" if num_params == 2 else "",
-                        ),
+                        "arguments (request, exception)." % code,
                         id="urls.E007",
                     ),
                 )
@@ -287,6 +284,7 @@ class CheckCustomErrorHandlersTests(SimpleTestCase):
     @override_settings(
         ROOT_URLCONF="check_framework.urls.bad_error_handlers_invalid_path"
     )
+    @ignore_warnings(category=RemovedInDjango61Warning)
     def test_bad_handlers_invalid_path(self):
         result = check_custom_error_handlers(None)
         paths = [
@@ -318,6 +316,7 @@ class CheckCustomErrorHandlersTests(SimpleTestCase):
     @override_settings(
         ROOT_URLCONF="check_framework.urls.good_function_based_error_handlers",
     )
+    @ignore_warnings(category=RemovedInDjango61Warning)
     def test_good_function_based_handlers(self):
         result = check_custom_error_handlers(None)
         self.assertEqual(result, [])
@@ -325,6 +324,7 @@ class CheckCustomErrorHandlersTests(SimpleTestCase):
     @override_settings(
         ROOT_URLCONF="check_framework.urls.good_class_based_error_handlers",
     )
+    @ignore_warnings(category=RemovedInDjango61Warning)
     def test_good_class_based_handlers(self):
         result = check_custom_error_handlers(None)
         self.assertEqual(result, [])

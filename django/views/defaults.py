@@ -1,13 +1,17 @@
 from urllib.parse import quote
 
 from django.http import (
+    HttpResponse,
     HttpResponseBadRequest,
     HttpResponseForbidden,
     HttpResponseNotFound,
     HttpResponseServerError,
 )
 from django.template import Context, Engine, TemplateDoesNotExist, loader
+from django.utils.decorators import method_decorator
+from django.views.debug import DEBUG_ENGINE
 from django.views.decorators.csrf import requires_csrf_token
+from django.views.generic.base import ContextMixin, View
 
 ERROR_404_TEMPLATE_NAME = "404.html"
 ERROR_403_TEMPLATE_NAME = "403.html"
@@ -148,3 +152,63 @@ def permission_denied(request, exception, template_name=ERROR_403_TEMPLATE_NAME)
     return HttpResponseForbidden(
         template.render(request=request, context={"exception": str(exception)})
     )
+
+
+@method_decorator(requires_csrf_token, name="dispatch")
+class DefaultErrorView(ContextMixin, View):
+    status_code = None
+    context_by_status = {
+        400: {"title": "Bad Request (400)", "details": ""},
+        403: {"title": "403 Forbidden", "details": ""},
+        404: {
+            "title": "Not Found",
+            "details": "The requested resource was not found on this server.",
+        },
+        500: {"title": "Server Error (500)", "details": ""},
+    }
+
+    def setup(self, request, exception=None, **kwargs):
+        self.exception = exception
+        return super().setup(request, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        response_class = HttpResponse.response_class_by_status_code(self.status_code)
+        context = self.get_context_data(**kwargs)
+        try:
+            template = loader.get_template(self.get_template_name())
+            content = template.render(context, request)
+        except TemplateDoesNotExist:
+            template = DEBUG_ENGINE.from_string(ERROR_PAGE_TEMPLATE % context)
+            content = template.render(context=Context(context))
+        return response_class(content, status=self.status_code)
+
+    def post(self, *args, **kwargs):
+        return self.get(*args, **kwargs)
+
+    def get_template_name(self):
+        return f"{self.status_code}.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context |= self.context_by_status.get(
+            self.status_code, {"title": f"Error ({self.status_code})", "details": ""}
+        )
+        context |= {
+            "request_path": quote(self.request.path),
+            "exception": self.exception_as_string(),
+        }
+        return context
+
+    def exception_as_string(self):
+        if self.status_code == 404:
+            # Try to get an "interesting" exception message, if any (and not the
+            # ugly Resolver404 dictionary)
+            try:
+                message = self.exception.args[0]
+            except (AttributeError, IndexError):
+                pass
+            else:
+                if isinstance(message, str):
+                    return message
+            return self.exception.__class__.__name__
+        return str(self.exception)

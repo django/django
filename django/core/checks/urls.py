@@ -131,7 +131,7 @@ def check_custom_error_handlers(app_configs, **kwargs):
     errors = []
     # All handlers take (request, exception) arguments except handler500
     # which takes (request).
-    for status_code, num_parameters in [(400, 2), (403, 2), (404, 2), (500, 1)]:
+    for status_code, num_parameters in [(400, 2), (403, 2), (404, 2), (500, 2)]:
         try:
             handler = resolver.resolve_error_handler(status_code)
         except (ImportError, ViewDoesNotExist) as e:
