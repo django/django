@@ -217,8 +217,7 @@ a dependency for one or more of the Python packages. Consult the failing
 package's documentation or search the web with the error message that you
 encounter.
 
-Now we are ready to run the test suite. If you're using GNU/Linux, macOS, or
-some other flavor of Unix, run:
+Now we are ready to run the test suite:
 
 .. console::
 
