@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Michael Wolf <milupo@sorbzilla.de>, 2016-2023
+# Michael Wolf <milupo@sorbzilla.de>, 2016-2024
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 06:49+0000\n"
-"Last-Translator: Michael Wolf <milupo@sorbzilla.de>, 2016-2023\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-10-07 06:49+0000\n"
+"Last-Translator: Michael Wolf <milupo@sorbzilla.de>, 2016-2024\n"
 "Language-Team: Lower Sorbian (http://app.transifex.com/django/django/"
 "language/dsb/)\n"
 "MIME-Version: 1.0\n"
@@ -344,6 +344,9 @@ msgstr "Toś ten bok njewopśimujo wuslědki"
 msgid "Enter a valid value."
 msgstr "Zapódajśo płaśiwu gódnotu."
 
+msgid "Enter a valid domain name."
+msgstr "Zapódajśo płaśiwe domenowe mě."
+
 msgid "Enter a valid URL."
 msgstr "Zapódajśo płaśiwy URL."
 
@@ -367,14 +370,18 @@ msgstr ""
 "Zapódajśo płaśiwe „adresowe mě“, kótarež jano wopśimujo unicodowe pismiki, "
 "licby, pódmužki abo wězawki."
 
-msgid "Enter a valid IPv4 address."
-msgstr "Zapódajśo płaśiwu IPv4-adresu."
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr "Zapódajśo płaśiwu %(protocol)s-adresu."
 
-msgid "Enter a valid IPv6 address."
-msgstr "Zapódajśo płaśiwu IPv6-adresu."
+msgid "IPv4"
+msgstr "IPv4"
 
-msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "Zapódajśo płaśiwu IPv4- abo IPv6-adresu."
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "IPv4 or IPv6"
+msgstr "IPv4 abo IPv6"
 
 msgid "Enter only digits separated by commas."
 msgstr "Zapódajśo jano cyfry źělone pśez komy."

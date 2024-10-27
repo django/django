@@ -530,6 +530,22 @@ class HttpResponseTests(SimpleTestCase):
                 headers={"Content-Type": "text/csv"},
             )
 
+    def test_text_updates_when_content_updates(self):
+        response = HttpResponse("Hello, world!")
+        self.assertEqual(response.text, "Hello, world!")
+        response.content = "Updated content"
+        self.assertEqual(response.text, "Updated content")
+
+    def test_text_charset(self):
+        for content_type, content in [
+            (None, b"Ol\xc3\xa1 Mundo"),
+            ("text/plain; charset=utf-8", b"Ol\xc3\xa1 Mundo"),
+            ("text/plain; charset=iso-8859-1", b"Ol\xe1 Mundo"),
+        ]:
+            with self.subTest(content_type=content_type):
+                response = HttpResponse(content, content_type=content_type)
+                self.assertEqual(response.text, "Olá Mundo")
+
 
 class HttpResponseSubclassesTests(SimpleTestCase):
     def test_redirect(self):
@@ -614,7 +630,7 @@ class JsonResponseTests(SimpleTestCase):
     def test_json_response_non_ascii(self):
         data = {"key": "łóżko"}
         response = JsonResponse(data)
-        self.assertEqual(json.loads(response.content.decode()), data)
+        self.assertEqual(json.loads(response.text), data)
 
     def test_json_response_raises_type_error_with_default_setting(self):
         with self.assertRaisesMessage(
@@ -626,16 +642,16 @@ class JsonResponseTests(SimpleTestCase):
 
     def test_json_response_text(self):
         response = JsonResponse("foobar", safe=False)
-        self.assertEqual(json.loads(response.content.decode()), "foobar")
+        self.assertEqual(json.loads(response.text), "foobar")
 
     def test_json_response_list(self):
         response = JsonResponse(["foo", "bar"], safe=False)
-        self.assertEqual(json.loads(response.content.decode()), ["foo", "bar"])
+        self.assertEqual(json.loads(response.text), ["foo", "bar"])
 
     def test_json_response_uuid(self):
         u = uuid.uuid4()
         response = JsonResponse(u, safe=False)
-        self.assertEqual(json.loads(response.content.decode()), str(u))
+        self.assertEqual(json.loads(response.text), str(u))
 
     def test_json_response_custom_encoder(self):
         class CustomDjangoJSONEncoder(DjangoJSONEncoder):
@@ -643,11 +659,11 @@ class JsonResponseTests(SimpleTestCase):
                 return json.dumps({"foo": "bar"})
 
         response = JsonResponse({}, encoder=CustomDjangoJSONEncoder)
-        self.assertEqual(json.loads(response.content.decode()), {"foo": "bar"})
+        self.assertEqual(json.loads(response.text), {"foo": "bar"})
 
     def test_json_response_passing_arguments_to_json_dumps(self):
         response = JsonResponse({"foo": "bar"}, json_dumps_params={"indent": 2})
-        self.assertEqual(response.content.decode(), '{\n  "foo": "bar"\n}')
+        self.assertEqual(response.text, '{\n  "foo": "bar"\n}')
 
 
 class StreamingHttpResponseTests(SimpleTestCase):
@@ -755,6 +771,13 @@ class StreamingHttpResponseTests(SimpleTestCase):
         )
         with self.assertWarnsMessage(Warning, msg):
             self.assertEqual(b"hello", await anext(aiter(r)))
+
+    def test_text_attribute_error(self):
+        r = StreamingHttpResponse(iter(["hello", "world"]))
+        msg = "This %s instance has no `text` attribute." % r.__class__.__name__
+
+        with self.assertRaisesMessage(AttributeError, msg):
+            r.text
 
 
 class FileCloseTests(SimpleTestCase):

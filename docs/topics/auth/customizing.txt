@@ -400,10 +400,9 @@ the Django model that you wish to use as your user model.
 Using a custom user model when starting a project
 -------------------------------------------------
 
-If you're starting a new project, it's highly recommended to set up a custom
-user model, even if the default :class:`~django.contrib.auth.models.User` model
-is sufficient for you. This model behaves identically to the default user
-model, but you'll be able to customize it in the future if the need arises::
+If you're starting a new project, you can set up a custom user model that
+behaves identically to the default user model by subclassing
+:class:`~django.contrib.auth.models.AbstractUser`::
 
     from django.contrib.auth.models import AbstractUser
 
@@ -426,7 +425,7 @@ Changing to a custom user model mid-project
 -------------------------------------------
 
 Changing :setting:`AUTH_USER_MODEL` after you've created database tables is
-significantly more difficult since it affects foreign keys and many-to-many
+possible, but can be complex, since it affects foreign keys and many-to-many
 relationships, for example.
 
 This change can't be done automatically and requires manually fixing your
@@ -791,9 +790,16 @@ utility methods:
         email address.
 
     .. method:: models.BaseUserManager.get_by_natural_key(username)
+    .. method:: models.BaseUserManager.aget_by_natural_key(username)
+
+        *Asynchronous version*: ``aget_by_natural_key()``
 
         Retrieves a user instance using the contents of the field
         nominated by ``USERNAME_FIELD``.
+
+        .. versionchanged:: 5.2
+
+            ``aget_by_natural_key()`` method was added.
 
 Extending Django's default ``User``
 -----------------------------------
@@ -1187,3 +1193,25 @@ Finally, specify the custom model as the default user model for your project
 using the :setting:`AUTH_USER_MODEL` setting in your ``settings.py``::
 
     AUTH_USER_MODEL = "customauth.MyUser"
+
+.. _writing-authentication-backends-async-interface:
+
+Adding an async interface
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 5.2
+
+To optimize performance when called from an async context authentication,
+backends can implement async versions of each function - ``aget_user(user_id)``
+and ``aauthenticate(request, **credentials)``. When an authentication backend
+extends ``BaseBackend`` and async versions of these functions are not provided,
+they will be automatically synthesized with ``sync_to_async``. This has
+:ref:`performance penalties <async_performance>`.
+
+While an async interface is optional, a synchronous interface is always
+required. There is no automatic synthesis for a synchronous interface if an
+async interface is implemented.
+
+Django's out-of-the-box authentication backends have native async support. If
+these native backends are extended take special care to make sure the async
+versions of modified functions are modified as well.

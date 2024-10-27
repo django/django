@@ -45,7 +45,7 @@ class GenericViewsSitemapTests(SitemapTestsBase):
             "%s\n"
             "</urlset>"
         ) % expected
-        self.assertXMLEqual(response.content.decode(), expected_content)
+        self.assertXMLEqual(response.text, expected_content)
 
     def test_generic_sitemap_lastmod(self):
         test_model = TestModel.objects.first()
@@ -61,7 +61,7 @@ class GenericViewsSitemapTests(SitemapTestsBase):
             self.base_url,
             test_model.pk,
         )
-        self.assertXMLEqual(response.content.decode(), expected_content)
+        self.assertXMLEqual(response.text, expected_content)
         self.assertEqual(
             response.headers["Last-Modified"], "Wed, 13 Mar 2013 10:00:00 GMT"
         )
@@ -89,4 +89,4 @@ class GenericViewsSitemapTests(SitemapTestsBase):
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <sitemap><loc>http://example.com/simple/sitemap-generic.xml</loc><lastmod>2013-03-13T10:00:00</lastmod></sitemap>
 </sitemapindex>"""
-        self.assertXMLEqual(response.content.decode("utf-8"), expected_content)
+        self.assertXMLEqual(response.text, expected_content)

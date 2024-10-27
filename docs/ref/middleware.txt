@@ -34,6 +34,12 @@ defines. See the :doc:`cache documentation </topics/cache>`.
 
 .. class:: CommonMiddleware
 
+    .. attribute:: response_redirect_class
+
+        Defaults to :class:`~django.http.HttpResponsePermanentRedirect`. Subclass
+        ``CommonMiddleware`` and override the attribute to customize the redirects
+        issued by the middleware.
+
 Adds a few conveniences for perfectionists:
 
 * Forbids access to user agents in the :setting:`DISALLOWED_USER_AGENTS`
@@ -74,12 +80,6 @@ Adds a few conveniences for perfectionists:
         return HttpResponse()
 
 * Sets the ``Content-Length`` header for non-streaming responses.
-
-.. attribute:: CommonMiddleware.response_redirect_class
-
-Defaults to :class:`~django.http.HttpResponsePermanentRedirect`. Subclass
-``CommonMiddleware`` and override the attribute to customize the redirects
-issued by the middleware.
 
 .. class:: BrokenLinkEmailsMiddleware
 
@@ -164,15 +164,15 @@ Locale middleware
 
 .. class:: LocaleMiddleware
 
+    .. attribute:: LocaleMiddleware.response_redirect_class
+
+        Defaults to :class:`~django.http.HttpResponseRedirect`. Subclass
+        ``LocaleMiddleware`` and override the attribute to customize the
+        redirects issued by the middleware.
+
 Enables language selection based on data from the request. It customizes
 content for each user. See the :doc:`internationalization documentation
 </topics/i18n/translation>`.
-
-.. attribute:: LocaleMiddleware.response_redirect_class
-
-Defaults to :class:`~django.http.HttpResponseRedirect`. Subclass
-``LocaleMiddleware`` and override the attribute to customize the redirects
-issued by the middleware.
 
 Message middleware
 ------------------
@@ -500,6 +500,29 @@ every incoming ``HttpRequest`` object. See :ref:`Authentication in web requests
 
 .. class:: LoginRequiredMiddleware
 
+    Subclass the middleware and override the following attributes and methods
+    to customize behavior for unauthenticated requests.
+
+    .. attribute:: redirect_field_name
+
+        Defaults to ``"next"``.
+
+    .. method:: get_login_url()
+
+        Returns the URL that unauthenticated requests will be redirected to. This
+        result is either the ``login_url`` set on the
+        :func:`~django.contrib.auth.decorators.login_required` decorator (if not
+        ``None``), or :setting:`settings.LOGIN_URL <LOGIN_URL>`.
+
+    .. method:: get_redirect_field_name()
+
+        Returns the name of the query parameter that contains the URL the user
+        should be redirected to after a successful login. This result is either
+        the ``redirect_field_name`` set on the
+        :func:`~.django.contrib.auth.decorators.login_required` decorator (if not
+        ``None``), or :attr:`redirect_field_name`. If ``None`` is returned, a query
+        parameter won't be added.
+
 .. versionadded:: 5.1
 
 Redirects all unauthenticated requests to a login page, except for views
@@ -551,31 +574,6 @@ Customize the login URL or field name for authenticated views with the
     To prevent infinite redirects, ensure you have
     :ref:`enabled unauthenticated requests
     <disable-login-required-middleware-for-views>` to your login view.
-
-**Methods and Attributes**
-
-Subclass the middleware and override these to customize behavior for
-unauthenticated requests.
-
-.. attribute:: redirect_field_name
-
-    Defaults to ``"next"``.
-
-.. method:: get_login_url()
-
-    Returns the URL that unauthenticated requests will be redirected to. If
-    defined, this returns the ``login_url`` set on the
-    :func:`~.django.contrib.auth.decorators.login_required` decorator. Defaults
-    to :setting:`settings.LOGIN_URL <LOGIN_URL>`.
-
-.. method:: get_redirect_field_name()
-
-    Returns the name of the query parameter that contains the URL the user
-    should be redirected to after a successful login. If defined, this returns
-    the ``redirect_field_name`` set on the
-    :func:`~.django.contrib.auth.decorators.login_required` decorator. Defaults
-    to :attr:`redirect_field_name`. If ``None`` is returned, a query parameter
-    won't be added.
 
 .. class:: RemoteUserMiddleware
 

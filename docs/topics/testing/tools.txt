@@ -1262,24 +1262,34 @@ subclass::
 
 Here's specifically what will happen:
 
-* At the start of each test, before ``setUp()`` is run, Django will flush the
-  database, returning the database to the state it was in directly after
-  :djadmin:`migrate` was called.
+* During ``setUpClass()``, all the named fixtures are installed. In this
+  example, Django will install any JSON fixture named ``mammals``, followed by
+  any fixture named ``birds``. See the :ref:`fixtures-explanation` topic for
+  more details on defining and installing fixtures.
 
-* Then, all the named fixtures are installed. In this example, Django will
-  install any JSON fixture named ``mammals``, followed by any fixture named
-  ``birds``. See the :ref:`fixtures-explanation` topic for more details on
-  defining and installing fixtures.
+For most unit tests using :class:`TestCase`, Django doesn't need to do
+anything else, because transactions are used to clean the database after each
+test for performance reasons. But for :class:`TransactionTestCase`, the
+following actions will take place:
 
-For performance reasons, :class:`TestCase` loads fixtures once for the entire
-test class, before :meth:`~TestCase.setUpTestData`, instead of before each
-test, and it uses transactions to clean the database before each test. In any case,
-you can be certain that the outcome of a test will not be affected by another
-test or by the order of test execution.
+* At the end of each test Django will flush the database, returning the
+  database to the state it was in directly after :djadmin:`migrate` was
+  called.
+
+* For each subsequent test, the fixtures will be reloaded before ``setUp()``
+  is run.
+
+In any case, you can be certain that the outcome of a test will not be
+affected by another test or by the order of test execution.
 
 By default, fixtures are only loaded into the ``default`` database. If you are
 using multiple databases and set :attr:`TransactionTestCase.databases`,
 fixtures will be loaded into all specified databases.
+
+.. versionchanged:: 5.2
+
+    For :class:`TransactionTestCase`, fixtures were made available during
+    ``setUpClass()``.
 
 URLconf configuration
 ---------------------

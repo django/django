@@ -195,8 +195,9 @@ Exceptions
 
 .. exception:: GeoIP2Exception
 
-    The exception raised when an error occurs in a call to the underlying
-    ``geoip2`` library.
+    The exception raised when an error occurs in the :class:`GeoIP2` wrapper.
+    Exceptions from the underlying ``geoip2`` library are passed through
+    unchanged.
 
 .. rubric:: Footnotes
 .. [#] GeoIP(R) is a registered trademark of MaxMind, Inc.

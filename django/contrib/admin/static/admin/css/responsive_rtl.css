@@ -28,7 +28,6 @@
         margin-left: 0;
     }
 
-    [dir="rtl"] .inline-group ul.tools a.add,
     [dir="rtl"] .inline-group div.add-row a,
     [dir="rtl"] .inline-group .tabular tr.add-row td a {
         padding: 8px 26px 8px 10px;

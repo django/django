@@ -1969,7 +1969,7 @@ class ManyToManyField(RelatedField):
         pass
 
     def value_from_object(self, obj):
-        return [] if obj.pk is None else list(getattr(obj, self.attname).all())
+        return list(getattr(obj, self.attname).all()) if obj._is_pk_set() else []
 
     def save_form_data(self, instance, data):
         getattr(instance, self.attname).set(data)

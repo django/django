@@ -8,7 +8,7 @@ import tempfile
 from contextlib import contextmanager
 from importlib import import_module
 from pathlib import Path
-from unittest import mock
+from unittest import mock, skipUnless
 
 from asgiref.local import Local
 
@@ -17,6 +17,7 @@ from django.apps import AppConfig
 from django.conf import settings
 from django.conf.locale import LANG_INFO
 from django.conf.urls.i18n import i18n_patterns
+from django.core.management.utils import find_command, popen_wrapper
 from django.template import Context, Template
 from django.test import RequestFactory, SimpleTestCase, TestCase, override_settings
 from django.utils import translation
@@ -129,6 +130,49 @@ class TranslationTests(SimpleTestCase):
         # Internal _catalog can query subcatalogs (from different po files).
         self.assertEqual(french._catalog[("%d singular", 0)], "%d singulier")
         self.assertEqual(french._catalog[("%(num)d hour", 0)], "%(num)d heure")
+
+    @translation.override("fr")
+    @skipUnless(find_command("msgfmt"), "msgfmt is mandatory for this test")
+    def test_multiple_plurals_merge(self):
+        def _create_translation_from_string(content):
+            with tempfile.TemporaryDirectory() as dirname:
+                po_path = Path(dirname).joinpath("fr", "LC_MESSAGES", "django.po")
+                po_path.parent.mkdir(parents=True)
+                po_path.write_text(content)
+                errors = popen_wrapper(
+                    ["msgfmt", "-o", po_path.with_suffix(".mo"), po_path]
+                )[1]
+                if errors:
+                    self.fail(f"msgfmt compilation error: {errors}")
+                return gettext_module.translation(
+                    domain="django",
+                    localedir=dirname,
+                    languages=["fr"],
+                )
+
+        french = trans_real.catalog()
+        # Merge a new translation file with different plural forms.
+        catalog1 = _create_translation_from_string(
+            'msgid ""\n'
+            'msgstr ""\n'
+            '"Content-Type: text/plain; charset=UTF-8\\n"\n'
+            '"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n==0 ? 1 : 2);\\n"\n'
+            'msgid "I win"\n'
+            'msgstr "Je perds"\n'
+        )
+        french.merge(catalog1)
+        # Merge a second translation file with plural forms from django.conf.
+        catalog2 = _create_translation_from_string(
+            'msgid ""\n'
+            'msgstr ""\n'
+            '"Content-Type: text/plain; charset=UTF-8\\n"\n'
+            '"Plural-Forms: Plural-Forms: nplurals=2; plural=(n > 1);\\n"\n'
+            'msgid "I win"\n'
+            'msgstr "Je gagne"\n'
+        )
+        french.merge(catalog2)
+        # Translations from this last one are supposed to win.
+        self.assertEqual(french.gettext("I win"), "Je gagne")
 
     def test_override(self):
         activate("de")

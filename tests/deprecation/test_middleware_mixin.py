@@ -6,7 +6,6 @@ from django.contrib.admindocs.middleware import XViewMiddleware
 from django.contrib.auth.middleware import (
     AuthenticationMiddleware,
     LoginRequiredMiddleware,
-    RemoteUserMiddleware,
 )
 from django.contrib.flatpages.middleware import FlatpageFallbackMiddleware
 from django.contrib.messages.middleware import MessageMiddleware
@@ -48,7 +47,6 @@ class MiddlewareMixinTests(SimpleTestCase):
         LocaleMiddleware,
         MessageMiddleware,
         RedirectFallbackMiddleware,
-        RemoteUserMiddleware,
         SecurityMiddleware,
         SessionMiddleware,
         UpdateCacheMiddleware,

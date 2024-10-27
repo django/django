@@ -1,16 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Aindriú Mac Giolla Eoin, 2024
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Michael Thornhill <michael@maithu.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Irish (http://www.transifex.com/django/django/language/ga/)\n"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2024-10-07 18:45+0000\n"
+"Last-Translator: Aindriú Mac Giolla Eoin, 2024\n"
+"Language-Team: Irish (http://app.transifex.com/django/django/language/ga/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -19,14 +20,16 @@ msgstr ""
 "4);\n"
 
 msgid "GIS"
-msgstr ""
+msgstr "GIS"
 
 msgid "The base GIS field."
-msgstr ""
+msgstr "Réimse bonn GIS."
 
 msgid ""
-"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
+"The base Geometry field — maps to the OpenGIS Specification Geometry type."
 msgstr ""
+"An bonnréimse Céimseata — léarscáileanna chuig an gcineál Céimseata "
+"Sonraíochta OpenGIS."
 
 msgid "Point"
 msgstr "Pointe"
@@ -50,10 +53,10 @@ msgid "Geometry collection"
 msgstr "Céimseata bhailiú"
 
 msgid "Extent Aggregate Field"
-msgstr ""
+msgstr "Méid Réimse Comhiomlán"
 
 msgid "Raster Field"
-msgstr ""
+msgstr "Réimse Raster"
 
 msgid "No geometry value provided."
 msgstr "Ní soláthair méid geoiméadracht"
@@ -72,17 +75,14 @@ msgstr ""
 "geoiméadracht."
 
 msgid "Delete all Features"
-msgstr ""
-
-msgid "WKT debugging window:"
-msgstr ""
+msgstr "Scrios na Gnéithe go léir"
 
 msgid "Debugging window (serialized value)"
-msgstr ""
+msgstr "Fuinneog dífhabhtaithe (luach sraitheach)"
 
 msgid "No feeds are registered."
 msgstr "Níl fothaí cláraithe."
 
 #, python-format
-msgid "Slug %r isn't registered."
-msgstr "Níl slug %r cláraithe."
+msgid "Slug %r isn’t registered."
+msgstr "Níl seilide %r cláraithe."

@@ -686,15 +686,23 @@ class UniqueConstraint(BaseConstraint):
                 filters.append(condition)
             queryset = queryset.filter(*filters)
         model_class_pk = instance._get_pk_val(model._meta)
-        if not instance._state.adding and model_class_pk is not None:
+        if not instance._state.adding and instance._is_pk_set(model._meta):
             queryset = queryset.exclude(pk=model_class_pk)
         if not self.condition:
             if queryset.exists():
-                if self.fields:
-                    # When fields are defined, use the unique_error_message() for
-                    # backward compatibility.
+                if (
+                    self.fields
+                    and self.violation_error_message
+                    == self.default_violation_error_message
+                ):
+                    # When fields are defined, use the unique_error_message() as
+                    # a default for backward compatibility.
+                    validation_error_message = instance.unique_error_message(
+                        model, self.fields
+                    )
                     raise ValidationError(
-                        instance.unique_error_message(model, self.fields),
+                        validation_error_message,
+                        code=validation_error_message.code,
                     )
                 raise ValidationError(
                     self.get_violation_error_message(),

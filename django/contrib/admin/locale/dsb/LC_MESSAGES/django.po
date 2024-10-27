@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Michael Wolf <milupo@sorbzilla.de>, 2016-2023
+# Michael Wolf <milupo@sorbzilla.de>, 2016-2024
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 07:05+0000\n"
-"Last-Translator: Michael Wolf <milupo@sorbzilla.de>, 2016-2023\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-10-07 07:05+0000\n"
+"Last-Translator: Michael Wolf <milupo@sorbzilla.de>, 2016-2024\n"
 "Language-Team: Lower Sorbian (http://app.transifex.com/django/django/"
 "language/dsb/)\n"
 "MIME-Version: 1.0\n"
@@ -200,11 +200,6 @@ msgstr ""
 "{name} „{obj}“ jo se wuspěšnje změnił. Móžośo jen dołojce znowego wobźěłowaś."
 
 #, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr ""
-"{name} „{obj}“ jo se wuspěšnje pśidał. Móžośo jen dołojce znowego wobźěłowaś."
-
-#, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
@@ -373,6 +368,9 @@ msgstr "Zapódajśo wužywarske mě a gronidło."
 msgid "Change password"
 msgstr "Gronidło změniś"
 
+msgid "Set password"
+msgstr "Gronidło póstajiś"
+
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Pšosym korigěrujśo slědujucu zmólku."
@@ -383,6 +381,19 @@ msgstr[3] "Pšosym korigěrujśo slědujuce zmólki."
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Zapódajśo nowe gronidło za wužywarja <strong>%(username)s</strong>."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+"Toś ta akcija awtentifikaciju na zakłaźe gronidła za toś togo wužywarja "
+"<strong> zmóžnijo </strong>."
+
+msgid "Disable password-based authentication"
+msgstr "Awtentifikaciju na zakłaźe gronidła znjemóžniś"
+
+msgid "Enable password-based authentication"
+msgstr "Awtentifikaciju na zakłaźe gronidła zmóžniś"
 
 msgid "Skip to main content"
 msgstr "Dalej ku głownemu wopśimjeśeju"
