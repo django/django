@@ -1,5 +1,6 @@
 import inspect
 import os
+import warnings
 from importlib import import_module
 
 from django.core.exceptions import ImproperlyConfigured
@@ -134,7 +135,7 @@ class AppConfig:
                 ]
                 if len(app_configs) == 1:
                     app_config_class = app_configs[0][1]
-                else:
+                elif len(app_configs) > 1:
                     # Check if there's exactly one AppConfig subclass,
                     # among those that explicitly define default = True.
                     app_configs = [
@@ -150,6 +151,12 @@ class AppConfig:
                         )
                     elif len(app_configs) == 1:
                         app_config_class = app_configs[0][1]
+                    else:
+                        warnings.warn(
+                            "The base AppConfig class will be used because multiple "
+                            f"subclasses of AppConfig were detected in {mod_path} "
+                            "and none of them specified AppConfig.default as True.",
+                        )
 
             # Use the default app config class if we didn't find anything.
             if app_config_class is None:

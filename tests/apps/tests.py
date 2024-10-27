@@ -1,4 +1,5 @@
 import os
+import warnings
 from unittest.mock import patch
 
 import django
@@ -123,8 +124,20 @@ class AppsTests(SimpleTestCase):
 
     def test_two_configs_app(self):
         """Load an app that provides two AppConfig classes."""
-        with self.settings(INSTALLED_APPS=["apps.two_configs_app"]):
-            config = apps.get_app_config("two_configs_app")
+        msg = (
+            "The base AppConfig class will be used because multiple subclasses "
+            + "of AppConfig were detected in apps.two_configs_app.apps "
+            + "and none of them specified AppConfig.default as True."
+        )
+
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+
+            with self.settings(INSTALLED_APPS=["apps.two_configs_app"]):
+                config = apps.get_app_config("two_configs_app")
+
+        self.assertEqual(len(w), 1)
+        self.assertEqual(str(w[0].message), msg)
         self.assertIsInstance(config, AppConfig)
 
     def test_two_default_configs_app(self):
