@@ -2323,7 +2323,7 @@ called ``thirdpartyapp``, it can be referenced as::
 
     class Car(models.Model):
         manufacturer = models.ForeignKey(
-            "thirdpartyapp``.Manufacturer",
+            "thirdpartyapp.Manufacturer",
             on_delete=models.CASCADE,
         )
 
