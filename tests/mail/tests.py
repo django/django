@@ -17,6 +17,7 @@ from unittest import mock, skipUnless
 from django.core import mail
 from django.core.mail import (
     DNS_NAME,
+    BadHeaderError,
     EmailAlternative,
     EmailAttachment,
     EmailMessage,
@@ -27,7 +28,7 @@ from django.core.mail import (
     send_mass_mail,
 )
 from django.core.mail.backends import console, dummy, filebased, locmem, smtp
-from django.core.mail.message import BadHeaderError, sanitize_address
+from django.core.mail.message import sanitize_address
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import requires_tz_support
 from django.utils.translation import gettext_lazy
@@ -45,7 +46,7 @@ class HeadersCheckMixin:
         """
         Asserts that the `message` has all `headers`.
 
-        message: can be an instance of an email.Message subclass or a string
+        message: can be an instance of an email.Message subclass or bytes
                  with the contents of an email message.
         headers: should be a set of (header-name, header-value) tuples.
         """
@@ -323,9 +324,9 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
                 ["Name\nInjection test <to@example.com>"],
             ).message()
 
-    def test_space_continuation(self):
+    def test_folding_white_space(self):
         """
-        Test for space continuation character in long (ASCII) subject headers (#7747)
+        Test for correct use of "folding white space" in long headers (#7747)
         """
         email = EmailMessage(
             "Long subject lines that get wrapped should contain a space continuation "
@@ -515,10 +516,10 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             message["Comments"], "=?utf-8?q?My_S=C3=BCrname_is_non-ASCII?="
         )
 
-    def test_safe_mime_multipart(self):
+    def test_non_utf8_headers_multipart(self):
         """
         Make sure headers can be set with a different encoding than utf-8 in
-        SafeMIMEMultipart as well
+        EmailMultiAlternatives as well.
         """
         headers = {"Date": "Fri, 09 Nov 2001 01:08:47 -0000", "Message-ID": "foo"}
         from_email, to = "from@example.com", '"Sürname, Firstname" <to@example.com>'
@@ -542,7 +543,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             "=?iso-8859-1?q?Message_from_Firstname_S=FCrname?=",
         )
 
-    def test_safe_mime_multipart_with_attachments(self):
+    def test_multipart_with_attachments(self):
         """
         EmailMultiAlternatives includes alternatives if the body is empty and
         it has attachments.
@@ -643,7 +644,10 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         )
         self.assertEqual(message.get_payload(), "Firstname S=FCrname is a great guy.")
 
-        # MIME attachments works correctly with other encodings than utf-8.
+    def test_encoding_alternatives(self):
+        """
+        Encode alternatives correctly with other encodings than utf-8.
+        """
         text_content = "Firstname Sürname is a great guy."
         html_content = "<p>Firstname Sürname is a <strong>great</strong> guy.</p>"
         msg = EmailMultiAlternatives(
@@ -655,6 +659,8 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         self.assertMessageHasHeaders(
             payload0,
             {
+                # (The MIME-Version header is neither required nor meaningful
+                # in a subpart, and this check for it can be safely removed.)
                 ("MIME-Version", "1.0"),
                 ("Content-Type", 'text/plain; charset="iso-8859-1"'),
                 ("Content-Transfer-Encoding", "quoted-printable"),
@@ -667,6 +673,8 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         self.assertMessageHasHeaders(
             payload1,
             {
+                # (The MIME-Version header is neither required nor meaningful
+                # in a subpart, and this check for it can be safely removed.)
                 ("MIME-Version", "1.0"),
                 ("Content-Type", 'text/html; charset="iso-8859-1"'),
                 ("Content-Transfer-Encoding", "quoted-printable"),
@@ -739,8 +747,20 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         attachments = self.get_decoded_attachments(msg)
         self.assertEqual(attachments[0], (file_name, file_content.encode(), mime_type))
 
-    def test_decoded_attachments(self):
-        """Regression test for #9367"""
+    def test_attachments_constructor_omit_mimetype(self):
+        """
+        The mimetype can be omitted from an attachment tuple.
+        """
+        msg = EmailMessage(attachments=[("filename1", "content1")])
+        filename, content, mimetype = self.get_decoded_attachments(msg)[0]
+        self.assertEqual(filename, "filename1")
+        self.assertEqual(content, b"content1")
+        self.assertEqual(mimetype, "application/octet-stream")
+
+    def test_attachments_with_alternative_parts(self):
+        """
+        Message with attachment and alternative has correct structure (#9367).
+        """
         headers = {"Date": "Fri, 09 Nov 2001 01:08:47 -0000", "Message-ID": "foo"}
         subject, from_email, to = "hello", "from@example.com", "to@example.com"
         text_content = "This is an important message."
@@ -758,13 +778,6 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         payload = message.get_payload()
         self.assertEqual(payload[0].get_content_type(), "multipart/alternative")
         self.assertEqual(payload[1].get_content_type(), "application/pdf")
-
-    def test_decoded_attachments_two_tuple(self):
-        msg = EmailMessage(attachments=[("filename1", "content1")])
-        filename, content, mimetype = self.get_decoded_attachments(msg)[0]
-        self.assertEqual(filename, "filename1")
-        self.assertEqual(content, b"content1")
-        self.assertEqual(mimetype, "application/octet-stream")
 
     def test_decoded_attachments_MIMEText(self):
         txt = MIMEText("content1")
@@ -788,8 +801,8 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
     def test_attach_file(self):
         """
         Test attaching a file against different mimetypes and make sure that
-        a file will be attached and sent properly even if an invalid mimetype
-        is specified.
+        a file will be attached and sent in some form even if a mismatched
+        mimetype is specified.
         """
         files = (
             # filename, actual mimetype
@@ -832,7 +845,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
     def test_attach_utf8_text_as_bytes(self):
         """
         Non-ASCII characters encoded as valid UTF-8 are correctly transported
-        and decoded.
+        in a form that can be decoded at the receiving end.
         """
         msg = EmailMessage("subject", "body", "from@example.com", ["to@example.com"])
         msg.attach("file.txt", b"\xc3\xa4")  # UTF-8 encoded a umlaut.
@@ -854,7 +867,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         self.assertEqual(content, b"\xff")
         self.assertEqual(mimetype, "application/octet-stream")
 
-    def test_attach_mimetext_content_mimetype(self):
+    def test_attach_mimebase_prohibits_other_params(self):
         email_msg = EmailMessage()
         txt = MIMEText("content")
         msg = (
@@ -866,7 +879,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         with self.assertRaisesMessage(ValueError, msg):
             email_msg.attach(txt, mimetype="text/plain")
 
-    def test_attach_content_none(self):
+    def test_attach_content_is_required(self):
         email_msg = EmailMessage()
         msg = "content must be provided."
         with self.assertRaisesMessage(ValueError, msg):
@@ -1145,20 +1158,23 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             ("A name <to@example.com>", "utf-8", "A name <to@example.com>"),
             ('"A name" <to@example.com>', "ascii", "A name <to@example.com>"),
             ('"A name" <to@example.com>', "utf-8", "A name <to@example.com>"),
-            # Unicode addresses (supported per RFC-6532).
-            ("tó@example.com", "utf-8", "=?utf-8?b?dMOz?=@example.com"),
+            # Unicode addresses: IDNA encoded domain supported per RFC-5890.
             ("to@éxample.com", "utf-8", "to@xn--xample-9ua.com"),
+            # The next three cases should be removed when fixing #35713.
+            # (An 'encoded-word' localpart is prohibited by RFC-2047, and not
+            # supported by any known mail service.)
+            ("tó@example.com", "utf-8", "=?utf-8?b?dMOz?=@example.com"),
             (
                 ("Tó Example", "tó@example.com"),
                 "utf-8",
                 "=?utf-8?q?T=C3=B3_Example?= <=?utf-8?b?dMOz?=@example.com>",
             ),
-            # Unicode addresses with display names.
             (
                 "Tó Example <tó@example.com>",
                 "utf-8",
                 "=?utf-8?q?T=C3=B3_Example?= <=?utf-8?b?dMOz?=@example.com>",
             ),
+            # IDNA addresses with display names.
             (
                 "To Example <to@éxample.com>",
                 "ascii",
