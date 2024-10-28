@@ -87,9 +87,8 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
         if self.form_class:
             return self.form_class
         else:
-            if self.model is not None:
-                # If a model has been explicitly provided, use it
-                model = self.model
+            if (model := self.get_model()) is not None:
+                pass  # If the model is explicitly provided, use it.
             elif getattr(self, "object", None) is not None:
                 # If this view is operating on a single object, use
                 # the class of that object

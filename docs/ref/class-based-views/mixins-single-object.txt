@@ -14,10 +14,13 @@ Single object mixins
 
     .. attribute:: model
 
-        The model that this view will display data for. Specifying ``model
-        = Foo`` is effectively the same as specifying ``queryset =
-        Foo.objects.all()``, where ``objects`` stands for ``Foo``’s
-        :ref:`default manager <default-managers>`.
+        The default model for this view, which serves as the source of
+        objects when :attr:`queryset` is not defined. By default, specifying
+        ``model = Foo`` is effectively the same as specifying ``queryset =
+        Foo.objects.all()``, where ``objects`` is ``Foo``’s
+        :ref:`default manager <default-managers>`. However, if
+        :meth:`get_model` is overridden, it can replace
+        this attribute as the model source.
 
     .. attribute:: queryset
 
@@ -81,6 +84,16 @@ Single object mixins
 
         When :attr:`query_pk_and_slug` is ``True``, ``get_object()`` will
         perform its lookup using both the primary key and the slug.
+
+    .. method:: get_model()
+
+        .. versionadded:: 5.2
+
+        Returns the model that this view displays data for. By default,
+        this method returns the model defined by the view's ``model``
+        attribute, but it can be overridden to return any model. If
+        :attr:`queryset` is provided, it supersedes the value returned by
+        ``get_model``.
 
     .. method:: get_queryset()
 
