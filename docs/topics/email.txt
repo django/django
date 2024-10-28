@@ -311,9 +311,11 @@ All parameters are optional and can be set at any time prior to calling the
 * ``bcc``: A list or tuple of addresses used in the "Bcc" header when
   sending the email.
 
-* ``connection``: An email backend instance. Use this parameter if
-  you want to use the same connection for multiple messages. If omitted, a
-  new connection is created when ``send()`` is called.
+* ``connection``: An :ref:`email backend <topic-email-backends>` instance. Use
+  this parameter if you are sending the ``EmailMessage`` via ``send()`` and you
+  want to use the same connection for multiple messages. If omitted, a new
+  connection is created when ``send()`` is called. This parameter is ignored
+  when using :ref:`send_messages() <topics-sending-multiple-emails>`.
 
 * ``attachments``: A list of attachments to put on the message. These can
   be instances of :class:`~email.mime.base.MIMEBase` or
@@ -728,9 +730,10 @@ destroying a connection every time you want to send an email.
 
 There are two ways you tell an email backend to reuse a connection.
 
-Firstly, you can use the ``send_messages()`` method. ``send_messages()`` takes
-a list of :class:`~django.core.mail.EmailMessage` instances (or subclasses),
-and sends them all using a single connection.
+Firstly, you can use the ``send_messages()`` method on a connection. This takes
+a list of :class:`EmailMessage` (or subclass) instances, and sends them all
+using that single connection. As a consequence, any :class:`connection
+<EmailMessage>` set on an individual message is ignored.
 
 For example, if you have a function called ``get_notification_email()`` that
 returns a list of :class:`~django.core.mail.EmailMessage` objects representing
