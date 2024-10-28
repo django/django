@@ -1027,21 +1027,9 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         )
         self.assertNotIn(b">From the future", email.message().as_bytes())
 
-    def test_dont_base64_encode(self):
-        # Ticket #3472
-        # Shouldn't use Base64 encoding at all
-        msg = EmailMessage(
-            "Subject",
-            "UTF-8 encoded body",
-            "bounce@example.com",
-            ["to@example.com"],
-            headers={"From": "from@example.com"},
-        )
-        self.assertIn(b"Content-Transfer-Encoding: 7bit", msg.message().as_bytes())
-
-        # Ticket #11212
-        # Shouldn't use quoted printable, should detect it can represent
-        # content with 7 bit data.
+    def test_body_content_transfer_encoding(self):
+        # Shouldn't use base64 or quoted-printable, instead should detect it
+        # can represent content with 7-bit data (#3472, #11212).
         msg = EmailMessage(
             "Subject",
             "Body with only ASCII characters.",
@@ -1052,8 +1040,8 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         s = msg.message().as_bytes()
         self.assertIn(b"Content-Transfer-Encoding: 7bit", s)
 
-        # Shouldn't use quoted printable, should detect it can represent
-        # content with 8 bit data.
+        # Shouldn't use base64 or quoted-printable, instead should detect
+        # it can represent content with 8-bit data.
         msg = EmailMessage(
             "Subject",
             "Body with latin characters: àáä.",
@@ -1063,9 +1051,16 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         )
         s = msg.message().as_bytes()
         self.assertIn(b"Content-Transfer-Encoding: 8bit", s)
+        # The following test is left over from Python 2 and can be safely removed.
+        # 8bit CTE within a Unicode str is not meaningful, and Python's modern
+        # email api won't generate it. (The test still works with the legacy api.)
         s = msg.message().as_string()
         self.assertIn("Content-Transfer-Encoding: 8bit", s)
 
+        # Long body lines that require folding should use quoted-printable or base64,
+        # whichever is shorter. However, Python's legacy email API avoids re-folding
+        # non-ASCII text and just uses CTE 8bit. (The modern API would correctly choose
+        # base64 here. Any of these is deliverable.)
         msg = EmailMessage(
             "Subject",
             "Body with non latin characters: А Б В Г Д Е Ж Ѕ З И І К Л М Н О П.",
@@ -1075,6 +1070,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         )
         s = msg.message().as_bytes()
         self.assertIn(b"Content-Transfer-Encoding: 8bit", s)
+        # The following test is left over from Python 2.
         s = msg.message().as_string()
         self.assertIn("Content-Transfer-Encoding: 8bit", s)
 
