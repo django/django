@@ -818,25 +818,38 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
 
         for basename, real_mimetype in files:
             for mimetype in test_mimetypes:
-                email = EmailMessage(
-                    "subject", "body", "from@example.com", ["to@example.com"]
-                )
                 self.assertEqual(mimetypes.guess_type(basename)[0], real_mimetype)
-                self.assertEqual(email.attachments, [])
-                file_path = os.path.join(
-                    os.path.dirname(__file__), "attachments", basename
+                expected_mimetype = (
+                    mimetype or real_mimetype or "application/octet-stream"
                 )
+                file_path = Path(__file__).parent / "attachments" / basename
+                expected_content = file_path.read_bytes()
+                if expected_mimetype.startswith("text/"):
+                    try:
+                        expected_content = expected_content.decode()
+                    except UnicodeDecodeError:
+                        expected_mimetype = "application/octet-stream"
+
+                email = EmailMessage()
                 email.attach_file(file_path, mimetype=mimetype)
+
+                # Check EmailMessage.attachments.
                 self.assertEqual(len(email.attachments), 1)
-                self.assertIn(basename, email.attachments[0])
-                msgs_sent_num = email.send()
-                self.assertEqual(msgs_sent_num, 1)
+                self.assertEqual(email.attachments[0].filename, basename)
+                self.assertEqual(email.attachments[0].mimetype, expected_mimetype)
+                self.assertEqual(email.attachments[0].content, expected_content)
+
+                # Check attachments in generated message.
+                # (The actual content is not checked as variations in platform
+                # line endings and rfc822 refolding complicate the logic.)
+                actual_attachment = self.get_decoded_attachments(email)[0]
+                actual_filename, actual_content, actual_mimetype = actual_attachment
+                self.assertEqual(actual_filename, basename)
+                self.assertEqual(actual_mimetype, expected_mimetype)
 
     def test_attach_text_as_bytes(self):
         msg = EmailMessage("subject", "body", "from@example.com", ["to@example.com"])
         msg.attach("file.txt", b"file content")
-        sent_num = msg.send()
-        self.assertEqual(sent_num, 1)
         filename, content, mimetype = self.get_decoded_attachments(msg)[0]
         self.assertEqual(filename, "file.txt")
         self.assertEqual(content, b"file content")
