@@ -166,5 +166,5 @@ class FileBasedCache(BaseCache):
         """
         return [
             os.path.join(self._dir, fname)
-            for fname in glob.glob1(self._dir, "*%s" % self.cache_suffix)
+            for fname in glob.glob(f"*{self.cache_suffix}", root_dir=self._dir)
         ]
