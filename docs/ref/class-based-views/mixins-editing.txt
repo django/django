@@ -121,9 +121,10 @@ The following mixins are used to construct Django's editing views:
 
     .. attribute:: model
 
-        A model class. Can be explicitly provided, otherwise will be determined
-        by examining ``self.object`` or
-        :attr:`~django.views.generic.detail.SingleObjectMixin.queryset`.
+        A model class. It can be explicitly provided; otherwise, it will be
+        determined by examining ``self.object``,
+        :attr:`~django.views.generic.detail.SingleObjectMixin.queryset`, or the
+        value returned by :meth:`~django.views.generic.edit.ModelFormMixin.get_model`.
 
     .. attribute:: fields
 
@@ -158,6 +159,14 @@ The following mixins are used to construct Django's editing views:
 
         Add the current instance (``self.object``) to the standard
         :meth:`~django.views.generic.edit.FormMixin.get_form_kwargs`.
+
+    .. method:: get_model()
+
+        .. versionadded:: 5.2
+
+        Return ``self.model`` if specified, or the model defined in the
+        ``form_class``'s ``Meta`` attribute if ``form_class`` is provided as
+        a ``ModelForm``.
 
     .. method:: get_success_url()
 

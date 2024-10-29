@@ -231,6 +231,11 @@ Generic Views
   overridden. If ``queryset`` is provided, it takes precedence as the source
   of objects.
 
+* :meth:`~django.views.generic.edit.ModelFormMixin.get_model` is overridden to
+  return the model from the ``ModelForm``'s ``Meta`` class when the view's
+  ``model`` attribute is not defined, allowing for simplified form-based edit
+  views using only ``form_class``.
+
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
 
