@@ -277,6 +277,9 @@ Models
   longer required to be set on SQLite, which supports unlimited ``VARCHAR``
   columns.
 
+* The new :attr:`QuerySet.executed_query <.QuerySet.executed_query>`
+  attribute returns the SQL query if the QuerySet has been evaluated.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

@@ -203,6 +203,10 @@ class BaseDatabaseWrapper:
                 f"(found {db_version})."
             )
 
+    @property
+    def last_query(self):
+        return queries[-1]["sql"] if (queries := self.queries) else None
+
     # ##### Backend-specific methods for creating connections and cursors #####
 
     def get_connection_params(self):
