@@ -2533,6 +2533,19 @@ class AdminViewPermissionsTest(TestCase):
         self.assertContains(
             response, '<input type="submit" value="Save and view" name="_continue">'
         )
+        self.assertContains(
+            response,
+            '<h2 id="fieldset-0-0-heading" class="fieldset-heading">Some fields</h2>',
+        )
+        self.assertContains(
+            response,
+            '<h2 id="fieldset-0-1-heading" class="fieldset-heading">'
+            "Some other fields</h2>",
+        )
+        self.assertContains(
+            response,
+            '<h2 id="fieldset-0-2-heading" class="fieldset-heading">이름</h2>',
+        )
         post = self.client.post(
             reverse("admin:admin_views_article_add"), add_dict, follow=False
         )
