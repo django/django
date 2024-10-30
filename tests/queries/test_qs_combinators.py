@@ -1,7 +1,9 @@
 import operator
+from datetime import datetime
 
 from django.db import DatabaseError, NotSupportedError, connection
 from django.db.models import (
+    DateTimeField,
     Exists,
     F,
     IntegerField,
@@ -10,12 +12,13 @@ from django.db.models import (
     Transform,
     Value,
 )
-from django.db.models.functions import Mod
+from django.db.models.functions import Cast, Mod
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
 
 from .models import (
     Annotation,
+    Article,
     Author,
     Celebrity,
     ExtraInfo,
@@ -439,6 +442,39 @@ class QuerySetSetOperationTests(TestCase):
             qs1.union(qs2).order_by("order"),
             [("c1", -10, "cb"), ("rn1", 10, "rn")],
         )
+
+    def test_union_multiple_models_with_values_list_and_datetime_annotations(self):
+        gen_x = datetime(1966, 6, 6)
+        Article.objects.create(name="Bellatrix", created=gen_x)
+        column_names = ["name", "created", "order"]
+        qs1 = Article.objects.annotate(order=Value(1)).values_list(*column_names)
+
+        gen_y = datetime(1991, 10, 10)
+        ReservedName.objects.create(name="Rigel", order=2)
+        qs2 = ReservedName.objects.annotate(
+            created=Cast(Value(gen_y), DateTimeField())
+        ).values_list(*column_names)
+
+        expected_result = [("Bellatrix", gen_x, 1), ("Rigel", gen_y, 2)]
+        self.assertEqual(list(qs1.union(qs2).order_by("order")), expected_result)
+
+    def test_union_multiple_models_with_values_and_datetime_annotations(self):
+        gen_x = datetime(1966, 6, 6)
+        Article.objects.create(name="Bellatrix", created=gen_x)
+        column_names = ["name", "created", "order"]
+        qs1 = Article.objects.values(*column_names, order=Value(1))
+
+        gen_y = datetime(1991, 10, 10)
+        ReservedName.objects.create(name="Rigel", order=2)
+        qs2 = ReservedName.objects.values(
+            *column_names, created=Cast(Value(gen_y), DateTimeField())
+        )
+
+        expected_result = [
+            {"name": "Bellatrix", "created": gen_x, "order": 1},
+            {"name": "Rigel", "created": gen_y, "order": 2},
+        ]
+        self.assertEqual(list(qs1.union(qs2).order_by("order")), expected_result)
 
     def test_union_in_subquery(self):
         ReservedName.objects.bulk_create(
