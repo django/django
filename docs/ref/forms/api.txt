@@ -511,7 +511,7 @@ empty string, because ``nick_name`` is ``CharField``, and ``CharField``\s treat
 empty values as an empty string. Each field type knows what its "blank" value
 is -- e.g., for ``DateField``, it's ``None`` instead of the empty string. For
 full details on each field's behavior in this case, see the "Empty value" note
-for each field in the "Built-in ``Field`` classes" section below.
+for each field in the :ref:`built-in-fields` section below.
 
 You can write code to perform validation for particular form fields (based on
 their name) or for the form as a whole (considering combinations of various
