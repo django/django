@@ -17,3 +17,6 @@ Bugfixes
 
 * Fixed a regression in Django 5.1 that prevented the use of DB-IP databases
   with :class:`~django.contrib.gis.geoip2.GeoIP2` (:ticket:`35841`).
+
+* Fixed a regression in Django 5.1 where non-ASCII fieldset names were not
+  displayed when rendering admin fieldsets (:ticket:`35876`).

@@ -1801,7 +1801,7 @@ class TestInlineWithFieldsets(TestDataMixin, TestCase):
         # The second and third have the same "Advanced options" name, but the
         # second one has the "collapse" class.
         for x, classes in ((1, ""), (2, "collapse")):
-            heading_id = f"fieldset-0-advanced-options-{x}-heading"
+            heading_id = f"fieldset-0-{x}-heading"
             with self.subTest(heading_id=heading_id):
                 self.assertContains(
                     response,
@@ -1846,7 +1846,7 @@ class TestInlineWithFieldsets(TestDataMixin, TestCase):
                 # Every fieldset defined for an inline's form.
                 for z, fieldset in enumerate(inline_admin_form):
                     if fieldset.name:
-                        heading_id = f"{prefix}-{y}-details-{z}-heading"
+                        heading_id = f"{prefix}-{y}-{z}-heading"
                         self.assertContains(
                             response,
                             f'<fieldset class="module aligned {fieldset.classes}" '
