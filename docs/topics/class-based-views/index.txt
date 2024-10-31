@@ -1,3 +1,5 @@
+.. _class-based-views-explanation:
+
 =================
 Class-based views
 =================

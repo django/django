@@ -340,8 +340,7 @@ use the variable you want.
 
 Run the server, and use your new polling app based on generic views.
 
-For full details on generic views, see the :doc:`generic views documentation
-</topics/class-based-views/index>`.
+For full details on generic views, see the generic views documentation under :ref:`class-based-views-explanation`.
 
 When you're comfortable with forms and generic views, read :doc:`part 5 of this
 tutorial</intro/tutorial05>` to learn about testing our polls app.
