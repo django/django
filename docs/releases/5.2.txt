@@ -223,6 +223,9 @@ Forms
 * The new :class:`~django.forms.TelInput` form widget is for entering telephone
   numbers and renders as ``<input type="tel" ...>``.
 
+* The new :attr:`~django.forms.Select.option_attrs` attribute can be used to
+  specify option-specific HTML attributes.
+
 Generic Views
 ~~~~~~~~~~~~~
 

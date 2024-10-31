@@ -111,6 +111,20 @@ with fields which are not based on choice -- such as a :class:`CharField` --
 but it is recommended to use a :class:`ChoiceField`-based field when the
 choices are inherent to the model and not just the representational widget.
 
+.. versionchanged:: 5.2
+
+For widgets that have options on their own, like those inheriting from ``ChoiceWidget``,
+you can also pass option-specific attributes using ``option_attrs``.
+For example, if you wish to set custom CSS classes for a RadioSelect's options, you could
+do as follows:
+
+.. code-block:: pycon
+
+    >>> from django.forms.widgets import RadioSelect
+    >>> widget = RadioSelect(choices=(("J", "John"),), option_attrs={"class": "special"})
+    >>> widget.render(name="beatle", value=["J"])
+    '<div><div>\n    <label><input type="radio" name="beatle" value="J" class="special" checked>\n John</label>\n\n</div>\n</div>'
+
 Customizing widget instances
 ============================
 
@@ -194,18 +208,6 @@ Django will then include the extra attributes in the rendered output:
 
 You can also set the HTML ``id`` using :attr:`~Widget.attrs`. See
 :attr:`BoundField.id_for_label` for an example.
-
-For widgets that have options on their own, like those inheriting from ``ChoiceWidget``,
-you can also pass option-specific attributes using ``option_attrs``.
-For example, if you wish to set custom CSS classes for a RadioSelect's options, you could
-do as follows:
-
-.. code-block:: pycon
-
-    >>> from django.forms.widgets import RadioSelect
-    >>> widget = RadioSelect(choices=(("J", "John"),), option_attrs={"class": "special"})
-    >>> widget.render(name="beatle", value=["J"])
-    '<div><div>\n    <label><input type="radio" name="beatle" value="J" class="special" checked>\n John</label>\n\n</div>\n</div>'
 
 .. _styling-widget-classes:
 
@@ -756,6 +758,20 @@ that specifies the template used to render each choice. For example, for the
         This attribute is optional when the form field does not have a
         ``choices`` attribute. If it does, it will override anything you set
         here when the attribute is updated on the :class:`Field`.
+    
+    .. attribute:: Select.option_attrs
+
+        .. versionadded:: 5.2
+
+        An optional dictionary containing option-specific HTML attributes to
+        be set on the rendered widget.
+
+        .. code-block:: pycon
+
+            >>> from django.forms.widgets import RadioSelect
+            >>> widget = RadioSelect(choices=(("J", "John"),), option_attrs={"class": "special"})
+            >>> widget.render(name="beatle", value=["J"])
+            '<div><div>\n    <label><input type="radio" name="beatle" value="J" class="special" checked>\n John</label>\n\n</div>\n</div>'
 
 ``NullBooleanSelect``
 ~~~~~~~~~~~~~~~~~~~~~
