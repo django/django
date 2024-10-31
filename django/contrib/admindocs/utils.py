@@ -242,3 +242,7 @@ def remove_non_capturing_groups(pattern):
         final_pattern += pattern[prev_end:start]
         prev_end = end
     return final_pattern + pattern[prev_end:]
+
+
+def strip_p_tags(value):
+    return mark_safe(value.replace("<p>", "").replace("</p>", ""))

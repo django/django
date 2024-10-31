@@ -30,7 +30,7 @@ from django.utils.inspect import (
 from django.utils.translation import gettext as _
 from django.views.generic import TemplateView
 
-from .utils import get_view_name
+from .utils import get_view_name, strip_p_tags
 
 # Exclude methods starting with these strings from documentation
 MODEL_METHODS_EXCLUDE = ("_", "add_", "delete", "save", "set_")
@@ -195,7 +195,7 @@ class ViewDetailView(BaseAdminDocsView):
             **{
                 **kwargs,
                 "name": view,
-                "summary": title,
+                "summary": strip_p_tags(title),
                 "body": body,
                 "meta": metadata,
             }
@@ -384,7 +384,7 @@ class ModelDetailView(BaseAdminDocsView):
             **{
                 **kwargs,
                 "name": opts.label,
-                "summary": title,
+                "summary": strip_p_tags(title),
                 "description": body,
                 "fields": fields,
                 "methods": methods,
