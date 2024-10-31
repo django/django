@@ -1,7 +1,6 @@
 import itertools
-import unittest
 
-from django.db import NotSupportedError, connection
+from django.db import NotSupportedError
 from django.db.models import F
 from django.db.models.fields.tuple_lookups import (
     TupleExact,
@@ -12,7 +11,7 @@ from django.db.models.fields.tuple_lookups import (
     TupleLessThan,
     TupleLessThanOrEqual,
 )
-from django.test import TestCase
+from django.test import TestCase, skipUnlessDBFeature
 
 from .models import Contact, Customer
 
@@ -119,10 +118,7 @@ class TupleLookupsTests(TestCase):
                     Contact.objects.filter(lookup).order_by("id"), contacts
                 )
 
-    @unittest.skipIf(
-        connection.vendor == "mysql",
-        "MySQL doesn't support LIMIT & IN/ALL/ANY/SOME subquery",
-    )
+    @skipUnlessDBFeature("allow_sliced_subqueries_with_in")
     def test_in_subquery(self):
         subquery = Customer.objects.filter(id=self.customer_1.id)[:1]
         self.assertSequenceEqual(
