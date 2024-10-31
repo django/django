@@ -52,35 +52,39 @@ Minor features
 * The default iteration count for the PBKDF2 password hasher is increased from
   870,000 to 1,000,000.
 
-* The following new asynchronous methods on are now provided, using an ``a``
+* The following new asynchronous methods are now provided, using an ``a``
   prefix:
 
   * :meth:`.UserManager.acreate_user`
   * :meth:`.UserManager.acreate_superuser`
   * :meth:`.BaseUserManager.aget_by_natural_key`
-  * :meth:`.User.aget_user_permissions()`
-  * :meth:`.User.aget_all_permissions()`
-  * :meth:`.User.aget_group_permissions()`
-  * :meth:`.User.ahas_perm()`
-  * :meth:`.User.ahas_perms()`
-  * :meth:`.User.ahas_module_perms()`
-  * :meth:`.User.aget_user_permissions()`
-  * :meth:`.User.aget_group_permissions()`
-  * :meth:`.User.ahas_perm()`
-  * :meth:`.ModelBackend.aauthenticate()`
-  * :meth:`.ModelBackend.aget_user_permissions()`
-  * :meth:`.ModelBackend.aget_group_permissions()`
-  * :meth:`.ModelBackend.aget_all_permissions()`
-  * :meth:`.ModelBackend.ahas_perm()`
-  * :meth:`.ModelBackend.ahas_module_perms()`
-  * :meth:`.RemoteUserBackend.aauthenticate()`
-  * :meth:`.RemoteUserBackend.aconfigure_user()`
+  * :meth:`.User.aget_user_permissions`
+  * :meth:`.User.aget_all_permissions`
+  * :meth:`.User.aget_group_permissions`
+  * :meth:`.User.ahas_perm`
+  * :meth:`.User.ahas_perms`
+  * :meth:`.User.ahas_module_perms`
+  * :meth:`.User.aget_user_permissions`
+  * :meth:`.User.aget_group_permissions`
+  * :meth:`.User.ahas_perm`
+  * :meth:`.ModelBackend.aauthenticate`
+  * :meth:`.ModelBackend.aget_user_permissions`
+  * :meth:`.ModelBackend.aget_group_permissions`
+  * :meth:`.ModelBackend.aget_all_permissions`
+  * :meth:`.ModelBackend.ahas_perm`
+  * :meth:`.ModelBackend.ahas_module_perms`
+  * :meth:`.RemoteUserBackend.aauthenticate`
+  * :meth:`.RemoteUserBackend.aconfigure_user`
 
 * Auth backends can now provide async implementations which are used when
   calling async auth functions (e.g.
   :func:`~.django.contrib.auth.aauthenticate`) to reduce context-switching which
   improves performance. See :ref:`adding an async interface
   <writing-authentication-backends-async-interface>` for more details.
+
+* The :ref:`password validator classes <included-password-validators>`
+  now have a new method ``get_error_message()``, which can be overridden in
+  subclasses to customize the error messages.
 
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -90,7 +94,19 @@ Minor features
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* GDAL now supports curved geometries ``CurvePolygon``, ``CompoundCurve``,
+  ``CircularString``, ``MultiSurface``, and ``MultiCurve`` via the new
+  :attr:`.OGRGeometry.has_curve` property, and the
+  :meth:`.OGRGeometry.get_linear_geometry` and
+  :meth:`.OGRGeometry.get_curve_geometry` methods.
+
+* :lookup:`coveredby` and :lookup:`covers` lookup are now supported on MySQL.
+
+* :lookup:`coveredby` and :lookup:`isvalid` lookups,
+  :class:`~django.contrib.gis.db.models.Collect` aggregation, and
+  :class:`~django.contrib.gis.db.models.functions.GeoHash` and
+  :class:`~django.contrib.gis.db.models.functions.IsValid` database functions
+  are now supported on MariaDB 11.7+.
 
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -230,6 +246,10 @@ Management Commands
   setting the :envvar:`HIDE_PRODUCTION_WARNING` environment variable to
   ``"true"``.
 
+* The :djadmin:`makemigrations` and :djadmin:`migrate` commands  have a new
+  ``Command.autodetector`` attribute for subclasses to override in order to use
+  a custom autodetector class.
+
 Migrations
 ~~~~~~~~~~
 
@@ -257,8 +277,14 @@ Models
   longer required to be set on SQLite, which supports unlimited ``VARCHAR``
   columns.
 
+* :meth:`.QuerySet.explain` now supports the ``memory`` and ``serialize``
+  options on PostgreSQL 17+.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
+
+* The new :attr:`.HttpResponse.text` property provides the string representation
+  of :attr:`.HttpResponse.content`.
 
 * The new :meth:`.HttpRequest.get_preferred_type` method can be used to query
   the preferred media type the client accepts.
@@ -357,6 +383,11 @@ Miscellaneous
 
 * ``HttpRequest.accepted_types`` is now sorted by the client's preference, based
   on the request's ``Accept`` header.
+
+* :attr:`.UniqueConstraint.violation_error_code` and
+  :attr:`.UniqueConstraint.violation_error_message` are now always used when
+  provided. Previously, these were ignored when :attr:`.UniqueConstraint.fields`
+  were set without a :attr:`.UniqueConstraint.condition`.
 
 * The :func:`~django.template.context_processors.debug` context processor is no
   longer included in the default project template.

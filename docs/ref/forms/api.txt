@@ -406,8 +406,8 @@ process:
 .. code-block:: pycon
 
     >>> f.base_fields["subject"].label_suffix = "?"
-    >>> another_f = CommentForm(auto_id=False)
-    >>> f.as_div().split("</div>")[0]
+    >>> another_f = ContactForm(auto_id=False)
+    >>> another_f.as_div().split("</div>")[0]
     '<div><label for="id_subject">Subject?</label><input type="text" name="subject" maxlength="100" required id="id_subject">'
 
 Accessing "clean" data
@@ -511,7 +511,7 @@ empty string, because ``nick_name`` is ``CharField``, and ``CharField``\s treat
 empty values as an empty string. Each field type knows what its "blank" value
 is -- e.g., for ``DateField``, it's ``None`` instead of the empty string. For
 full details on each field's behavior in this case, see the "Empty value" note
-for each field in the "Built-in ``Field`` classes" section below.
+for each field in the :ref:`built-in-fields` section below.
 
 You can write code to perform validation for particular form fields (based on
 their name) or for the form as a whole (considering combinations of various
@@ -770,7 +770,7 @@ The template used by ``as_table()``. Default: ``'django/forms/table.html'``.
     >>> f = ContactForm()
     >>> f.as_table()
     '<tr><th><label for="id_subject">Subject:</label></th><td><input id="id_subject" type="text" name="subject" maxlength="100" required></td></tr>\n<tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" required></td></tr>\n<tr><th><label for="id_sender">Sender:</label></th><td><input type="email" name="sender" id="id_sender" required></td></tr>\n<tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself"></td></tr>'
-    >>> print(f)
+    >>> print(f.as_table())
     <tr><th><label for="id_subject">Subject:</label></th><td><input id="id_subject" type="text" name="subject" maxlength="100" required></td></tr>
     <tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" required></td></tr>
     <tr><th><label for="id_sender">Sender:</label></th><td><input type="email" name="sender" id="id_sender" required></td></tr>

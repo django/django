@@ -38,6 +38,41 @@ action to be taken, you may receive further followup emails.
 
 .. _our public Trac instance: https://code.djangoproject.com/query
 
+.. _security-report-evaluation:
+
+How does Django evaluate a report
+=================================
+
+These are criteria used by the security team when evaluating whether a report
+requires a security release:
+
+* The vulnerability is within a :ref:`supported version <security-support>` of
+  Django.
+
+* The vulnerability applies to a production-grade Django application. This means
+  the following do not require a security release:
+
+  * Exploits that only affect local development, for example when using
+    :djadmin:`runserver`.
+  * Exploits which fail to follow security best practices, such as failure to
+    sanitize user input. For other examples, see our :ref:`security
+    documentation <cross-site-scripting>`.
+  * Exploits in AI generated code that do not adhere to security best practices.
+
+The security team may conclude that the source of the vulnerability is within
+the Python standard library, in which case the reporter will be asked to report
+the vulnerability to the Python core team. For further details see the `Python
+security guidelines <https://www.python.org/dev/security/>`_.
+
+On occasion, a security release may be issued to help resolve a security
+vulnerability within a popular third-party package. These reports should come
+from the package maintainers.
+
+If you are unsure whether your finding meets these criteria, please still report
+it :ref:`privately by emailing security@djangoproject.com
+<reporting-security-issues>`. The security team will review your report and
+recommend the correct course of action.
+
 .. _security-support:
 
 Supported versions

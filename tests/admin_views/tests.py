@@ -296,9 +296,7 @@ class AdminViewBasicTestCase(TestCase):
         self.assertLess(
             response.content.index(text1.encode()),
             response.content.index(text2.encode()),
-            (failing_msg or "")
-            + "\nResponse:\n"
-            + response.content.decode(response.charset),
+            (failing_msg or "") + "\nResponse:\n" + response.text,
         )
 
 
@@ -2535,6 +2533,19 @@ class AdminViewPermissionsTest(TestCase):
         self.assertContains(
             response, '<input type="submit" value="Save and view" name="_continue">'
         )
+        self.assertContains(
+            response,
+            '<h2 id="fieldset-0-0-heading" class="fieldset-heading">Some fields</h2>',
+        )
+        self.assertContains(
+            response,
+            '<h2 id="fieldset-0-1-heading" class="fieldset-heading">'
+            "Some other fields</h2>",
+        )
+        self.assertContains(
+            response,
+            '<h2 id="fieldset-0-2-heading" class="fieldset-heading">이름</h2>',
+        )
         post = self.client.post(
             reverse("admin:admin_views_article_add"), add_dict, follow=False
         )
@@ -3603,7 +3614,7 @@ class AdminViewDeletedObjectsTest(TestCase):
         response = self.client.get(
             reverse("admin:admin_views_villain_delete", args=(self.v1.pk,))
         )
-        self.assertRegex(response.content.decode(), pattern)
+        self.assertRegex(response.text, pattern)
 
     def test_cyclic(self):
         """
@@ -8266,7 +8277,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
         # Check the `change_view` link has the correct querystring.
         detail_link = re.search(
             '<a href="(.*?)">{}</a>'.format(self.joepublicuser.username),
-            response.content.decode(),
+            response.text,
         )
         self.assertURLEqual(detail_link[1], self.get_change_url())
 
@@ -8278,7 +8289,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
         # Check the form action.
         form_action = re.search(
             '<form action="(.*?)" method="post" id="user_form" novalidate>',
-            response.content.decode(),
+            response.text,
         )
         self.assertURLEqual(
             form_action[1], "?%s" % self.get_preserved_filters_querystring()
@@ -8286,13 +8297,13 @@ class AdminKeepChangeListFiltersTests(TestCase):
 
         # Check the history link.
         history_link = re.search(
-            '<a href="(.*?)" class="historylink">History</a>', response.content.decode()
+            '<a href="(.*?)" class="historylink">History</a>', response.text
         )
         self.assertURLEqual(history_link[1], self.get_history_url())
 
         # Check the delete link.
         delete_link = re.search(
-            '<a href="(.*?)" class="deletelink">Delete</a>', response.content.decode()
+            '<a href="(.*?)" class="deletelink">Delete</a>', response.text
         )
         self.assertURLEqual(delete_link[1], self.get_delete_url())
 
@@ -8332,7 +8343,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
         self.client.force_login(viewuser)
         response = self.client.get(self.get_change_url())
         close_link = re.search(
-            '<a href="(.*?)" class="closelink">Close</a>', response.content.decode()
+            '<a href="(.*?)" class="closelink">Close</a>', response.text
         )
         close_link = close_link[1].replace("&amp;", "&")
         self.assertURLEqual(close_link, self.get_changelist_url())
@@ -8350,7 +8361,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
         # Check the form action.
         form_action = re.search(
             '<form action="(.*?)" method="post" id="user_form" novalidate>',
-            response.content.decode(),
+            response.text,
         )
         self.assertURLEqual(
             form_action[1], "?%s" % self.get_preserved_filters_querystring()

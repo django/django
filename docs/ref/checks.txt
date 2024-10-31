@@ -77,6 +77,7 @@ Django's system checks are organized using the following tags:
 * ``async_support``: Checks asynchronous-related configuration.
 * ``caches``: Checks cache related configuration.
 * ``compatibility``: Flags potential problems with version upgrades.
+* ``commands``: Checks custom management commands related configuration.
 * ``database``: Checks database-related configuration issues. Database checks
   are not run by default because they do more than static code analysis as
   regular checks do. They are only run by the :djadmin:`migrate` command or if
@@ -427,6 +428,14 @@ Models
   (``db_table_comment``).
 * **models.W047**: ``<database>`` does not support unique constraints with
   nulls distinct.
+
+Management Commands
+-------------------
+
+The following checks verify custom management commands are correctly configured:
+
+* **commands.E001**: The ``migrate`` and ``makemigrations`` commands must have
+  the same ``autodetector``.
 
 Security
 --------

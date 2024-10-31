@@ -72,15 +72,13 @@ class GeneratedFieldVirtualProduct(models.Model):
 class UniqueConstraintProduct(models.Model):
     name = models.CharField(max_length=255)
     color = models.CharField(max_length=32, null=True)
+    age = models.IntegerField(null=True)
 
     class Meta:
         constraints = [
             models.UniqueConstraint(
                 fields=["name", "color"],
                 name="name_color_uniq",
-                # Custom message and error code are ignored.
-                violation_error_code="custom_code",
-                violation_error_message="Custom message",
             )
         ]
 

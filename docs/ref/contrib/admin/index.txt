@@ -337,7 +337,8 @@ subclass::
     If neither ``fields`` nor :attr:`~ModelAdmin.fieldsets` options are present,
     Django will default to displaying each field that isn't an ``AutoField`` and
     has ``editable=True``, in a single fieldset, in the same order as the fields
-    are defined in the model.
+    are defined in the model, followed by any fields defined in
+    :attr:`~ModelAdmin.readonly_fields`.
 
 .. attribute:: ModelAdmin.fieldsets
 
@@ -1464,6 +1465,27 @@ templates used by the :class:`ModelAdmin` views:
                 formset.save_m2m()
 
     See also :ref:`saving-objects-in-the-formset`.
+
+.. warning::
+
+    All hooks that return a ``ModelAdmin`` property return the property itself
+    rather than a copy of its value. Dynamically modifying the value can lead
+    to surprising results.
+
+    Let's take :meth:`ModelAdmin.get_readonly_fields` as an example::
+
+        class PersonAdmin(admin.ModelAdmin):
+            readonly_fields = ["name"]
+
+            def get_readonly_fields(self, request, obj=None):
+                readonly = super().get_readonly_fields(request, obj)
+                if not request.user.is_superuser:
+                    readonly.append("age")  # Edits the class attribute.
+                return readonly
+
+    This results in ``readonly_fields`` becoming
+    ``["name", "age", "age", ...]``, even for a superuser, as ``"age"`` is added
+    each time non-superuser visits the page.
 
 .. method:: ModelAdmin.get_ordering(request)
 
