@@ -89,6 +89,18 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
         # View docstring
         self.assertContains(response, "Base view for admindocs views.")
 
+    def testview_docstring_links(self):
+        summary = (
+            '<h2 class="subhead">This is a view for '
+            '<a class="reference external" href="/admindocs/models/myapp.company/">'
+            "myapp.Company</a></h2>"
+        )
+        url = reverse(
+            "django-admindocs-views-detail", args=["admin_docs.views.CompanyView"]
+        )
+        response = self.client.get(url)
+        self.assertContains(response, summary, html=True)
+
     @override_settings(ROOT_URLCONF="admin_docs.namespace_urls")
     def test_namespaced_view_detail(self):
         url = reverse(
@@ -408,9 +420,9 @@ class TestModelDetailView(TestDataMixin, AdminDocsTestCase):
 
     def test_model_docstring_renders_correctly(self):
         summary = (
-            '<h2 class="subhead"><p>Stores information about a person, related to '
+            '<h2 class="subhead">Stores information about a person, related to '
             '<a class="reference external" href="/admindocs/models/myapp.company/">'
-            "myapp.Company</a>.</p></h2>"
+            "myapp.Company</a>.</h2>"
         )
         subheading = "<p><strong>Notes</strong></p>"
         body = (
