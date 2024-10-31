@@ -728,7 +728,7 @@ email in the desired domain and if not, redirects to the login page::
 
 .. class:: UserPassesTestMixin
 
-    When using :ref:`classed-based views class-based-views-explanation`, you
+    When using :ref:`class-based-views-explanation`, you
     can use the ``UserPassesTestMixin`` to do this.
 
     .. method:: test_func()
