@@ -994,7 +994,7 @@ Oracle notes
 ============
 
 Django supports `Oracle Database Server`_ versions 19c and higher. Version
-1.3.2 or higher of the `oracledb`_ Python driver is required.
+2.3.0 or higher of the `oracledb`_ Python driver is required.
 
 .. deprecated:: 5.0
 
@@ -1104,6 +1104,46 @@ Example of a full DSN string::
         "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))"
         "(CONNECT_DATA=(SERVICE_NAME=orclpdb1)))"
     )
+
+.. _oracle-pool:
+
+Connection pool
+---------------
+
+.. versionadded:: 5.2
+
+To use a connection pool with `oracledb`_, set ``"pool"`` to ``True`` in the
+:setting:`OPTIONS` part of your database configuration. This uses the driver's
+`create_pool()`_ default values::
+
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.oracle",
+            # ...
+            "OPTIONS": {
+                "pool": True,
+            },
+        },
+    }
+
+To pass custom parameters to the driver's `create_pool()`_  function, you can
+alternatively set ``"pool"`` to be a dict::
+
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.oracle",
+            # ...
+            "OPTIONS": {
+                "pool": {
+                    "min": 1,
+                    "max": 10,
+                    # ...
+                }
+            },
+        },
+    }
+
+.. _`create_pool()`: https://python-oracledb.readthedocs.io/en/latest/user_guide/connection_handling.html#connection-pooling
 
 Threaded option
 ---------------
