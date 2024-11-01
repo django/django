@@ -41,6 +41,7 @@ from django.core.exceptions import (
 from django.core.paginator import Paginator
 from django.db import models, router, transaction
 from django.db.models.constants import LOOKUP_SEP
+from django.db.models.functions import Cast
 from django.forms.formsets import DELETION_FIELD_NAME, all_valid
 from django.forms.models import (
     BaseInlineFormSet,
@@ -1207,9 +1208,33 @@ class ModelAdmin(BaseModelAdmin):
         may_have_duplicates = False
         search_fields = self.get_search_fields(request)
         if search_fields and search_term:
-            orm_lookups = [
-                construct_search(str(search_field)) for search_field in search_fields
-            ]
+            str_annotations = {}
+            orm_lookups = []
+            for field in search_fields:
+                if field.endswith("__exact"):
+                    field_name = field.rsplit("__exact", 1)[0]
+                    try:
+                        field_obj = queryset.model._meta.get_field(field_name)
+                    except FieldDoesNotExist:
+                        lookup = construct_search(field)
+                        orm_lookups.append(lookup)
+                        continue
+                    # Add string cast annotations for non-string exact lookups.
+                    if not isinstance(field_obj, (models.CharField, models.TextField)):
+                        str_annotations[f"{field_name}_str"] = Cast(
+                            field_name, output_field=models.CharField()
+                        )
+                        orm_lookups.append(f"{field_name}_str__exact")
+                    else:
+                        lookup = construct_search(field)
+                        orm_lookups.append(lookup)
+                else:
+                    lookup = construct_search(str(field))
+                    orm_lookups.append(lookup)
+
+            if str_annotations:
+                queryset = queryset.annotate(**str_annotations)
+
             term_queries = []
             for bit in smart_split(search_term):
                 if bit.startswith(('"', "'")) and bit[0] == bit[-1]:
