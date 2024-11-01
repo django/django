@@ -9,7 +9,7 @@ application safely.
 
 #. Remove all references to the app (imports, foreign keys etc.).
 
-#. Remove all models from the corresponding ``models.py`` file.
+#. Remove all models from the corresponding ``models.py`` file .
 
 #. Create relevant migrations by running :djadmin:`makemigrations`. This step
    generates a migration that deletes tables for the removed models, and any
