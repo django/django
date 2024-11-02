@@ -1,4 +1,5 @@
 from django.contrib.gis.gdal import (
+    GDAL_VERSION,
     AxisOrder,
     CoordTransform,
     GDALException,
@@ -353,7 +354,8 @@ class SpatialRefTest(SimpleTestCase):
             self.assertEqual(srs.name, "DHDN / Soldner 39 Langschoß")
             self.assertEqual(srs.wkt, wkt)
             self.assertIn("Langschoß", srs.pretty_wkt)
-            self.assertIn("Langschoß", srs.xml)
+            if GDAL_VERSION < (3, 9):
+                self.assertIn("Langschoß", srs.xml)
 
     def test_axis_order(self):
         wgs84_trad = SpatialReference(4326, axis_order=AxisOrder.TRADITIONAL)
