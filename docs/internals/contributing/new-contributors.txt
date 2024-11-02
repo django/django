@@ -21,7 +21,8 @@ First steps
 
 Start with these steps to discover Django's development process.
 
-* **Triage tickets**
+Triage tickets
+-----------------
 
   If an `unreviewed ticket`_ reports a bug, try and reproduce it. If you
   can reproduce it and it seems valid, make a note that you confirmed the bug
@@ -30,8 +31,8 @@ Start with these steps to discover Django's development process.
   behavior, even if you don't fix the bug itself. See more at
   :ref:`how-can-i-help-with-triaging`
 
-* **Look for tickets that are accepted and review patches to build familiarity
-  with the codebase and the process**
+Look for tickets that are accepted and review patches to build familiarity with the codebase and the process
+------------------------------------------------------------------------------------------------------------
 
   Mark the appropriate flags if a patch needs docs or tests. Look through the
   changes a patch makes, and keep an eye out for syntax that is incompatible
@@ -40,14 +41,16 @@ Start with these steps to discover Django's development process.
   Where possible and relevant, try them out on a database other than SQLite.
   Leave comments and feedback!
 
-* **Keep old patches up to date**
+Keep old patches up to date
+---------------------------
 
   Oftentimes the codebase will change between a patch being submitted and the
   time it gets reviewed. Make sure it still applies cleanly and functions as
   expected. Updating a patch is both useful and important! See more on
   :doc:`writing-code/submitting-patches`.
 
-* **Write some documentation**
+Write some documentation
+------------------------
 
   Django's documentation is great but it can always be improved. Did you find
   a typo? Do you think that something should be clarified? Go ahead and
@@ -62,7 +65,8 @@ Start with these steps to discover Django's development process.
 
       .. _reports page: https://code.djangoproject.com/wiki/Reports
 
-* **Sign the Contributor License Agreement**
+Sign the Contributor License Agreement
+--------------------------------------
 
   The code that you write belongs to you or your employer. If your
   contribution is more than one or two lines of code, you need to sign the
@@ -80,13 +84,14 @@ Guidelines
 As a newcomer on a large project, it's easy to experience frustration. Here's
 some advice to make your work on Django more useful and rewarding.
 
-* **Pick a subject area that you care about, that you are familiar with, or
-  that you want to learn about**
+Pick a subject area that you care about, that you are familiar with, or that you want to learn about
+----------------------------------------------------------------------------------------------------
 
   You don't already have to be an expert on the area you want to work on; you
   become an expert through your ongoing contributions to the code.
 
-* **Analyze tickets' context and history**
+Analyze tickets' context and history
+------------------------------------
 
   Trac isn't an absolute; the context is just as important as the words.
   When reading Trac, you need to take into account who says things, and when
@@ -96,19 +101,21 @@ some advice to make your work on Django more useful and rewarding.
   recently involved in a discussion, then a ticket may not have the support
   required to get into Django.
 
-* **Start small**
+Start small
+-----------
 
   It's easier to get feedback on a little issue than on a big one. See the
   `easy pickings`_.
 
-* **If you're going to engage in a big task, make sure that your idea has
-  support first**
+If you're going to engage in a big task, make sure that your idea has support first
+-----------------------------------------------------------------------------------
 
   This means getting someone else to confirm that a bug is real before you fix
   the issue, and ensuring that there's consensus on a proposed feature before
   you go implementing it.
 
-* **Be bold! Leave feedback!**
+Be bold! Leave feedback!
+------------------------
 
   Sometimes it can be scary to put your opinion out to the world and say "this
   ticket is correct" or "this patch needs work", but it's the only way the
@@ -116,20 +123,23 @@ some advice to make your work on Django more useful and rewarding.
   ultimately have a much greater impact than that of any one person. We can't
   do it without **you**!
 
-* **Err on the side of caution when marking things Ready For Check-in**
+Err on the side of caution when marking things Ready For Check-in
+-----------------------------------------------------------------
 
   If you're really not certain if a ticket is ready, don't mark it as
   such. Leave a comment instead, letting others know your thoughts.  If you're
   mostly certain, but not completely certain, you might also try asking on IRC
   to see if someone else can confirm your suspicions.
 
-* **Wait for feedback, and respond to feedback that you receive**
+Wait for feedback, and respond to feedback that you receive
+-----------------------------------------------------------
 
   Focus on one or two tickets, see them through from start to finish, and
   repeat. The shotgun approach of taking on lots of tickets and letting some
   fall by the wayside ends up doing more harm than good.
 
-* **Be rigorous**
+Be rigorous
+-----------
 
   When we say ":pep:`8`, and must have docs and tests", we mean it. If a patch
   doesn't have docs and tests, there had better be a good reason. Arguments
@@ -138,7 +148,8 @@ some advice to make your work on Django more useful and rewarding.
   writing the very first tests for that feature, not that you get a pass from
   writing tests altogether.
 
-* **Be patient**
+Be patient
+-----------
 
   It's not always easy for your ticket or your patch to be reviewed quickly.
   This isn't personal. There are a lot of tickets and pull requests to get
