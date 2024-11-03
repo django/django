@@ -15,6 +15,16 @@ class Group(models.Model):
 
 
 class Family(models.Model):
+    """
+    Links with different link text.
+
+    This is a line with tag :tag:`extends <built_in-extends>`
+    This is a line with model :model:`Family <myapp.Family>`
+    This is a line with view :view:`Index <myapp.views.Index>`
+    This is a line with template :template:`index template <Index.html>`
+    This is a line with filter :filter:`example filter <filtername>`
+    """
+
     last_name = models.CharField(max_length=200)
 
 
