@@ -30,9 +30,6 @@ of this page, or update Django to the newest version. If you're using an older
 version of Python, check :ref:`faq-python-version-support` to find a compatible
 version of Django.
 
-See :doc:`How to install Django </topics/install>` for advice on how to remove
-older versions of Django and install a newer one.
-
 .. admonition:: Where to get help:
 
     If you're having trouble going through this tutorial, please head over to
