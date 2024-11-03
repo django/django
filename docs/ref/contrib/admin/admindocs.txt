@@ -31,6 +31,8 @@ Once those steps are complete, you can start browsing the documentation by
 going to your admin interface and clicking the "Documentation" link in the
 upper right of the page.
 
+.. _admindocs-helpers:
+
 Documentation helpers
 =====================
 
@@ -46,6 +48,13 @@ Template tags       ``:tag:`tagname```
 Template filters    ``:filter:`filtername```
 Templates           ``:template:`path/to/template.html```
 =================   =======================
+
+Each of these support custom link text with the format
+``:role:`link text <link>```. For example, ``:tag:`block <built_in-block>```.
+
+.. versionchanged:: 5.2
+
+    Support for custom link text was added.
 
 Model reference
 ===============

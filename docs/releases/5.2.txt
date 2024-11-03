@@ -44,7 +44,10 @@ Minor features
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Links to components in docstrings now supports custom link text, using the
+  format ``:role:`link text <link>```. See :ref:`documentation helpers
+  <admindocs-helpers>` for more details.
+ 
 
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
