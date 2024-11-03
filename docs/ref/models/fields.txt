@@ -2041,6 +2041,34 @@ that control how the relationship functions.
         prefer Django not to create a backwards relation, set ``related_name``
         to ``'+'``.
 
+    .. admonition:: Order of foreign keys to source models in intermediary models
+
+        When defining an asymmetric many-to-many relationship from a model to
+        itself using an intermediary model, the first foreign key in the
+        intermediary model will be treated as representing the source side of
+        the ``ManyToManyField``, and the second as the target side. For
+        example::
+
+            from django.db import models
+
+
+            class Manufacturer(models.Model):
+                name = models.CharField(max_length=255)
+                clients = models.ManyToManyField(
+                    "self", symmetrical=False, related_name="suppliers"
+                )
+
+
+            class Supply(models.Model):
+                supplier = models.ForeignKey(Manufacturer, models.CASCADE)
+                client = models.ForeignKey(Manufacturer, models.CASCADE)
+                product = models.CharField(max_length=255)
+
+        Here, the ``Manufacturer`` model in its role as a supplier defines
+        the many-to-many relationship with ``clients``, so the ``supplier``
+        foreign key must come before the ``clients`` foreign key in the
+        intermediary ``Supply`` model.
+
     If you don't specify an explicit ``through`` model, there is still an
     implicit ``through`` model class you can use to directly access the table
     created to hold the association. It has three fields to link the models, a
