@@ -1178,17 +1178,17 @@ class ModelAdmin(BaseModelAdmin):
         # Apply keyword searches.
         def construct_search(field_name):
             if field_name.startswith("^"):
-                return "%s__istartswith" % field_name.removeprefix("^")
+                return "%s__istartswith" % field_name.removeprefix("^"), None
             elif field_name.startswith("="):
-                return "%s__iexact" % field_name.removeprefix("=")
+                return "%s__iexact" % field_name.removeprefix("="), None
             elif field_name.startswith("@"):
-                return "%s__search" % field_name.removeprefix("@")
+                return "%s__search" % field_name.removeprefix("@"), None
             # Use field_name if it includes a lookup.
             opts = queryset.model._meta
             lookup_fields = field_name.split(LOOKUP_SEP)
             # Go through the fields, following all relations.
             prev_field = None
-            for path_part in lookup_fields:
+            for i, path_part in enumerate(lookup_fields):
                 if path_part == "pk":
                     path_part = opts.pk.name
                 try:
@@ -1196,44 +1196,39 @@ class ModelAdmin(BaseModelAdmin):
                 except FieldDoesNotExist:
                     # Use valid query lookups.
                     if prev_field and prev_field.get_lookup(path_part):
-                        return field_name
+                        if path_part == "exact" and not isinstance(
+                            prev_field, (models.CharField, models.TextField)
+                        ):
+                            field_name_without_exact = "__".join(lookup_fields[:i])
+                            alias = Cast(
+                                field_name_without_exact,
+                                output_field=models.CharField(),
+                            )
+                            alias_name = "_".join(lookup_fields[:i])
+                            return f"{alias_name}_str", alias
+                        else:
+                            return field_name, None
                 else:
                     prev_field = field
                     if hasattr(field, "path_infos"):
                         # Update opts to follow the relation.
                         opts = field.path_infos[-1].to_opts
             # Otherwise, use the field with icontains.
-            return "%s__icontains" % field_name
+            return "%s__icontains" % field_name, None
 
         may_have_duplicates = False
         search_fields = self.get_search_fields(request)
         if search_fields and search_term:
-            str_annotations = {}
+            str_aliases = {}
             orm_lookups = []
             for field in search_fields:
-                if field.endswith("__exact"):
-                    field_name = field.rsplit("__exact", 1)[0]
-                    try:
-                        field_obj = queryset.model._meta.get_field(field_name)
-                    except FieldDoesNotExist:
-                        lookup = construct_search(field)
-                        orm_lookups.append(lookup)
-                        continue
-                    # Add string cast annotations for non-string exact lookups.
-                    if not isinstance(field_obj, (models.CharField, models.TextField)):
-                        str_annotations[f"{field_name}_str"] = Cast(
-                            field_name, output_field=models.CharField()
-                        )
-                        orm_lookups.append(f"{field_name}_str__exact")
-                    else:
-                        lookup = construct_search(field)
-                        orm_lookups.append(lookup)
-                else:
-                    lookup = construct_search(str(field))
-                    orm_lookups.append(lookup)
+                lookup, str_alias = construct_search(str(field))
+                orm_lookups.append(lookup)
+                if str_alias:
+                    str_aliases[lookup] = str_alias
 
-            if str_annotations:
-                queryset = queryset.annotate(**str_annotations)
+            if str_aliases:
+                queryset = queryset.alias(**str_aliases)
 
             term_queries = []
             for bit in smart_split(search_term):
