@@ -47,10 +47,14 @@ and time availability), claim it by following these steps:
   any activity, it's probably safe to reassign it to yourself.
 
 * Log into your account, if you haven't already, by clicking "GitHub Login"
-  or "DjangoProject Login" in the upper left of the ticket page.
+  or "DjangoProject Login" in the upper left of the ticket page. Once logged
+  in, you can then click the "Modify Ticket" button near the bottom of the
+  page.
 
-* Claim the ticket by clicking the "assign to myself" radio button under
-  "Action" near the bottom of the page, then click "Submit changes."
+* Claim the ticket by clicking the "assign to" radio button in the "Action"
+  section. Your username will be filled in the text box by default.
+
+* Finally click the "Submit changes" button at the bottom to save.
 
 .. note::
     The Django software foundation requests that anyone contributing more than
