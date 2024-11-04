@@ -78,6 +78,10 @@ def get_image_dimensions(file_or_path, close=False):
                 # e.g. "RuntimeError: could not create decoder object" for
                 # WebP files. A different chunk_size may work.
                 pass
+            except ValueError:
+                # e.g.: ValueError('Invalid dimensions') because PIL
+                # needs more data from a TIFF file.
+                pass
             if p.image:
                 return p.image.size
             chunk_size *= 2
