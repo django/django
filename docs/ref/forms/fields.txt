@@ -65,8 +65,6 @@ an empty value -- either ``None`` or the empty string (``""``) -- then
     Traceback (most recent call last):
     ...
     ValidationError: ['This field is required.']
-    >>> f.clean(" ")
-    ' '
     >>> f.clean(0)
     '0'
     >>> f.clean(True)
