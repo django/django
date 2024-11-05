@@ -498,6 +498,18 @@ Only support for PostgreSQL is implemented.
 
 If this option is provided, models are also created for database views.
 
+``listurls``
+------------
+
+.. django-admin:: listurls [url_prefix ...]
+
+Displays a list of the URLs and their associated short names and views in the
+project. Optionally restrict to one or more prefixes.
+
+.. django-admin-option:: --table
+
+Output the list of URLs as a table, one URL per line.
+
 ``loaddata``
 ------------
 
