@@ -160,16 +160,15 @@ class JSONObject(Func):
             )
         return super().as_sql(compiler, connection, **extra_context)
 
-    def as_native(self, compiler, connection, *, returning, **extra_context):
-        class ArgJoiner:
-            def join(self, args):
-                pairs = zip(args[::2], args[1::2], strict=True)
-                return ", ".join([" VALUE ".join(pair) for pair in pairs])
+    def join(self, args):
+        pairs = zip(args[::2], args[1::2], strict=True)
+        return ", ".join([" VALUE ".join(pair) for pair in pairs])
 
+    def as_native(self, compiler, connection, *, returning, **extra_context):
         return self.as_sql(
             compiler,
             connection,
-            arg_joiner=ArgJoiner(),
+            arg_joiner=self,
             template=f"%(function)s(%(expressions)s RETURNING {returning})",
             **extra_context,
         )
