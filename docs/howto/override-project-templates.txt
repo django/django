@@ -1,0 +1,248 @@
+==============================================================
+How to override project and app file structure using templates
+==============================================================
+
+
+Introduction
+============
+
+The first command you will run when setting up a django project is
+:djadmin:`startproject`. Having set up your project, you will then start
+creating your apps with :djadmin:`startapp`. Each of these commands will create
+a file structure that is based on default templates within the Django
+repository.
+
+However, you can create your own templates so that when you run
+:djadmin:`startproject` or :djadmin:`startapp` it creates the app and project
+structure that is best for you.
+
+What the defaults look like
+===========================
+
+The command :djadmin:`startproject` will create the ``manage.py`` file, along
+with a folder named after the ``project_name`` parameter passed in the initial
+command. Here the command is run with the project name as ``myproject``:
+
+.. console::
+
+   $ django-admin startproject myproject .
+
+The resulting file structure is based on the default template-file structure in
+(:source:`django/conf/project_templates`). There, each file has the extension
+``.py-tpl`` to denote the file as a template. Each template contains template
+tags that end up being filled from the command and django version context. The
+template context is detailed at the end of the documentation for
+:djadmin:`startproject`.
+
+The resulting files all have the ``.py`` file extension and are ready to be
+used:
+
+.. code-block:: none
+
+    myproject/
+        manage.py
+        myproject/
+            __init__.py
+            asgi.py
+            settings.py
+            urls.py
+            wsgi.py
+
+A similar thing happens when you run :djadmin:`startapp`. Both commands inherit
+from the same ``TemplateCommand`` class (in
+:source:`django/core/management/templates.py`), but they discern between app
+and project.
+
+A typical command to initialize an app with the name ``myapp``:
+
+.. console::
+
+   $ python manage.py startapp myapp .
+
+This creates an app in the current directory with the default file structure
+found in (:source:`django/conf/app_templates`). As above, each template  has
+the extension ``.py-tpl`` to denote the file as a template, but is copied over
+as a python file. Each template contains template tags for the variables that
+will be passed.
+
+.. code-block:: none
+
+    myapp/
+        __init__.py
+        admin.py
+        apps.py
+        migrations/
+            __init__.py
+        models.py
+        tests.py
+        views.py
+
+
+Creating your own Project and App Templates
+===========================================
+
+The default project and app file structures are the ones suggested by django,
+but not the only ones that can be used. Because django does not require a
+specific file structure for the ``settings`` or ``urls`` files, you can create
+your own structure. The only thing to watch out for is that the imports and
+references to other modules is correct. As long as the files find each other,
+it doesn't matter where they are placed.
+
+The folders that contain your templates can have any naming convention.
+``new_django_template`` is as valid as ``files_structure``. You can even have
+them as a directory, as a zip file or a compressed or uncompressed archive. In
+addition, you can pull them from the web as long as they are in a valid format.
+
+File and folder naming conventions
+----------------------------------
+
+There is, however, a specific naming convention that needs to be followed in
+order to have your project name as the folder name enclosing the settings
+files.  In the project template, the folder that uses the name you pass in the
+:djadmin:`startproject` command must be named ``project_name``. This name is
+then replaced by the name you enter when you run the command. In the example at
+the top of the page the template folder ``project_name``  would be replaced
+with ``myapp``.
+
+For the :djadmin:`startapp` command, this is not necessary, as the folder
+enclosing the files ``admin.py`` and ``urls.py`` is the folder of the app
+template, and the command will take the contents of this folder, and move them
+to a folder with the name passed in the command.
+
+However, you can leverage the app name or project name if you have a file or
+folder that needs to use the name. Because this substitution happens using
+Python's string ``replace`` function, you can have something like a separate
+settings folder in your template with the name ``project_name_settings`` and
+the folder name will be changed, as in the above example to
+``myproject_settings``. The same is true for files with ``project_name`` as
+part of their name. For apps, you should have folders or files with
+``app_name`` within their name. In our example, ``app_name`` would be replaced
+by ``myapp`` and ``app_name_utilities`` would be replaced by
+``myapp_utilities``.
+
+File structure of the templates
+-------------------------------
+
+Neither the :djadmin:`startproject` nor the :djadmin:`startapp` commands
+generate the code in the files. They only copy existing files and (when
+applicable) insert the context. When the files are copied from a custom project
+template, they are copied directly without any code modifications from the
+default templates. It is up to the developer to make sure that the template
+file structure and code actually works, and that they contain up-to-date code,
+settings, and variables for the version of django being used. When updating the
+Django version, it is recommended to double-check against the default project
+or app template files to see what has been added or changed. It is highly
+recommended to start a django project first, make sure that the files work
+together, and then create a template based on that file structure and content.
+
+As a example, a flat Django project can look like this, with all of the files
+normally found in the project folder outside that folder, and at the same level
+as ``manage.py``:
+
+.. code-block:: none
+
+    myproject/
+        asgi.py
+        manage.py
+        settings.py
+        urls.py
+        wsgi.py
+
+
+In this particular instance, to make the files work with each other, you'd have
+to adapt the settings reference in ``manage.py`` to refer to ``"settings"``
+instead of ``"myproject.settings"`` since your ``settings.py`` file is no
+longer in the created ``myproject`` folder, but at the same level as
+``manage.py``. Likewise in ``settings.py``, you'd have to change the value of
+:settings:`ROOT_URLCONF` from ``"myproject.urls"`` to simply ``"urls"`` and
+:settings:`WSGI_APPLICATION` from ``"myproject.wsgi.application"`` to
+``"wsgi.application"``.
+
+For the :djadmin:`startapp` command, there is less that can be customized since
+it is a single folder with files and a migrations folder within. If certain
+files are not needed they can be left out. For example, if no models will be
+used, the ``models.py`` file and the ``migrations`` folder can be left out. In
+this case the ``admin.py`` file could also be left off. Conversely, if you
+always use custom managers, you could add a ``managers.py`` file to your custom
+structure to make sure the file is always there.
+
+Template suffixes
+-----------------
+
+For convenience, python files used in the templates use the suffix ``.py-tpl``.
+During the process of creating the project or app files, the suffix is changed
+to ``.py``. However, this is not absolutely necessary, since any files with the
+``.py`` suffix can have the context changed by the templating engine if they
+contain template tags that are variables.
+
+
+Templating non-Python files
+---------------------------
+
+Since the commands that use the templates just copy files, you can have any
+type of file in the project or app template. This is especially useful if you
+want to set up frontend or infrastructure files within the project template.
+
+Any type of file is supported as long as it doesn't end with ``.pyo``,
+``.pyc``, or ``.py.class``. Any type of directory is supported as long as it
+doesn't begin with a period ``.`` (hidden directory) or is a ``__pycache__``
+file.
+
+You can even use the template engine to fill in ``{{ project_name }}`` in
+places where the project name would be commonly used by other apps, such as in
+Kubernetes or Docker files.
+
+
+Excluding parts of files from templating
+----------------------------------------
+
+The templating engine will overwrite any context variables found in the project
+or app template. Sometimes, for the purposes of documentation, you want to
+leave the variables visible in the produced app or project structure. To have
+``{{ django_version }}`` or ``{{ project_name }}`` still visible in the
+resulting file, you can wrap that part of the file, or even the whole file with
+the template tags ``{% verbatim %}`` and ``{% endverbatim %}``. The templating
+engine will end up removing them from the finished file.
+
+
+Using your templates
+====================
+
+The basic command to start your project using your new template is:
+
+.. console::
+
+    $ django-admin startproject myproject .
+
+To add non-python files to the templating engine, add the names to the
+``extension`` flag like so:
+
+.. console::
+
+    $ django-admin startproject myproject . --extension js,toml
+
+So now all Javascript and toml files will be run through the templating engine
+to replace any variables.
+
+If you are using any non-python files that you need run through the templating
+engine that do not have extensions, such as ``Dockerfile`` or ``.gitignore``,
+or for files with extensions in which only some files should go through the
+template engine, you can add them individually after the ``name`` flag:
+
+.. console::
+
+    $ django-admin startproject myproject . --name Dockerfile,.gitignore
+
+To exclude any directories from being affected by the template engine, you can
+use the ``exclude`` flag and they will be removed from the folders to go
+through templating:
+
+.. console::
+
+    $ django-admin startproject myproject . --exclude frontend,reference
+
+The flag usage above holds true for ``python manage.py startapp .``, but,
+instead, you would be working on the app level instead of the project level.
+
+For more information, you can visit the documentation for
+:djadmin:`startproject` and :djadmin:`startapp`.
