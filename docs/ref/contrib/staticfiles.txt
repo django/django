@@ -383,7 +383,7 @@ following requirements are met:
 
 Since creating the MD5 hash can be a performance burden to your website
 during runtime, ``staticfiles`` will automatically store the mapping with
-hashed names for all processed files in a file called ``staticfiles.json``.
+hashed names for all processed files in a file called ``staticfiles_[..].json``.
 This happens once when you run the :djadmin:`collectstatic` management
 command.
 

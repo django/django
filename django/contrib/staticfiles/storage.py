@@ -1,3 +1,4 @@
+import base64
 import json
 import os
 import posixpath
@@ -10,6 +11,7 @@ from django.contrib.staticfiles.utils import check_settings, matches_patterns
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.base import ContentFile
 from django.core.files.storage import FileSystemStorage, storages
+from django.utils.crypto import salted_hmac
 from django.utils.functional import LazyObject
 
 
@@ -451,9 +453,20 @@ class HashedFilesMixin:
         raise ValueError("The name '%s' could not be hashed with %r." % (name, self))
 
 
+_staticfiles_json_entropy = (
+    base64.b32encode(  # for good readability and zero trouble with URLs
+        salted_hmac(
+            key_salt="staticfiles_json",
+            value="dummy",
+            secret=None,  # i.e. use settings.SECRET_KEY
+        ).digest()
+    ).decode("ascii")
+)
+
+
 class ManifestFilesMixin(HashedFilesMixin):
     manifest_version = "1.1"  # the manifest format standard
-    manifest_name = "staticfiles.json"
+    manifest_name = f"staticfiles_{_staticfiles_json_entropy}.json"
     manifest_strict = True
     keep_intermediate_files = False
 
