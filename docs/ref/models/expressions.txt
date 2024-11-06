@@ -111,7 +111,7 @@ Built-in Expressions
 
     These expressions are defined in ``django.db.models.expressions`` and
     ``django.db.models.aggregates``, but for convenience they're available and
-    usually imported from :mod:`django.db.models`.
+    usually importable from :mod:`django.db.models`.
 
 ``F()`` expressions
 -------------------
