@@ -1,5 +1,5 @@
 =============================
-Django documentation contents
+My Django Project Documentation
 =============================
 
 .. toctree::
@@ -11,10 +11,13 @@ Django documentation contents
     :maxdepth: 3
 
     intro/index
+    tutorials/index
     topics/index
     howto/index
+    best_practices/index
     faq/index
     ref/index
+    examples/index
     misc/index
     glossary
     releases/index
