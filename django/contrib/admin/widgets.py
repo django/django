@@ -494,7 +494,15 @@ class AutocompleteMixin:
 
     url_name = "%s:autocomplete"
 
-    def __init__(self, field, admin_site, attrs=None, choices=(), using=None, option_attrs=None):
+    def __init__(
+        self,
+        field,
+        admin_site,
+        attrs=None,
+        choices=(),
+        using=None,
+        option_attrs=None,
+    ):
         self.field = field
         self.admin_site = admin_site
         self.db = using
