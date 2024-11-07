@@ -156,7 +156,7 @@ class _WKTReader(IOBase):
 
     def read(self, wkt):
         if not isinstance(wkt, (bytes, str)):
-            raise TypeError
+            raise TypeError(f"'wkt' must be bytes or str (got {wkt!r} instead).")
         return wkt_reader_read(self.ptr, force_bytes(wkt))
 
 
@@ -176,7 +176,9 @@ class _WKBReader(IOBase):
             wkb_s = wkb.encode()
             return wkb_reader_read_hex(self.ptr, wkb_s, len(wkb_s))
         else:
-            raise TypeError
+            raise TypeError(
+                f"'wkb' must be bytes, str or memoryview (got {wkb!r} instead)."
+            )
 
 
 def default_trim_value():

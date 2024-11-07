@@ -29,15 +29,23 @@ class GEOSIOTest(SimpleTestCase):
                 self.assertEqual(ref, geom)
 
         # Should only accept string objects.
-        with self.assertRaises(TypeError):
-            wkt_r.read(1)
-        with self.assertRaises(TypeError):
-            wkt_r.read(memoryview(b"foo"))
+        bad_input = (1, 5.23, None, False, memoryview(b"foo"))
+        msg = "'wkt' must be bytes or str (got {} instead)."
+        for bad_wkt in bad_input:
+            with (
+                self.subTest(bad_wkt=bad_wkt),
+                self.assertRaisesMessage(TypeError, msg.format(bad_wkt)),
+            ):
+                wkt_r.read(bad_wkt)
 
     def test02_wktwriter(self):
         # Creating a WKTWriter instance, testing its ptr property.
         wkt_w = WKTWriter()
-        with self.assertRaises(TypeError):
+        msg = (
+            "Incompatible pointer type: "
+            "<class 'django.contrib.gis.geos.prototypes.io.LP_WKTReader_st'>."
+        )
+        with self.assertRaisesMessage(TypeError, msg):
             wkt_w.ptr = WKTReader.ptr_type()
 
         ref = GEOSGeometry("POINT (5 23)")
@@ -72,8 +80,12 @@ class GEOSIOTest(SimpleTestCase):
                 self.assertEqual(ref, geom)
 
         bad_input = (1, 5.23, None, False)
+        msg = "'wkb' must be bytes, str or memoryview (got {} instead)."
         for bad_wkb in bad_input:
-            with self.assertRaises(TypeError):
+            with (
+                self.subTest(bad_wkb=bad_wkb),
+                self.assertRaisesMessage(TypeError, msg.format(bad_wkb)),
+            ):
                 wkb_r.read(bad_wkb)
 
     def test04_wkbwriter(self):
