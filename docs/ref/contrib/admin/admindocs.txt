@@ -56,13 +56,16 @@ Each of these support custom link text with the format
 
     Support for custom link text was added.
 
+.. _admindocs-model-reference:
+
 Model reference
 ===============
 
-The **models** section of the ``admindocs`` page describes each model in the
-system along with all the fields, properties, and methods available on it.
-Relationships to other models appear as hyperlinks. Descriptions are pulled
-from ``help_text`` attributes on fields or from docstrings on model methods.
+The **models** section of the ``admindocs`` page describes each model that the
+user has access to along with all the fields, properties, and methods available
+on it. Relationships to other models appear as hyperlinks. Descriptions are
+pulled from ``help_text`` attributes on fields or from docstrings on model
+methods.
 
 A model with useful documentation might look like this::
 
@@ -85,6 +88,11 @@ A model with useful documentation might look like this::
         def publish(self):
             """Makes the blog entry live on the site."""
             ...
+
+.. versionchanged:: 5.2
+
+    Access was restricted to only allow users with model view or change
+    permissions.
 
 View reference
 ==============
