@@ -1,6 +1,6 @@
 from django.db.models import Q
 from django.http import Http404
-from django.shortcuts import aget_list_or_404, aget_object_or_404
+from django.shortcuts import aget_list_or_404, aget_object_or_404, aget_object_or_none
 from django.test import TestCase
 
 from .models import RelatedModel, SimpleModel
@@ -56,3 +56,24 @@ class GetListObjectOr404Test(TestCase):
         )
         with self.assertRaisesMessage(ValueError, msg):
             await aget_list_or_404([SimpleModel], field=1)
+
+    async def test_aget_object_or_none(self):
+        # Test successful retrieval
+        self.assertEqual(await aget_object_or_none(SimpleModel, field=1), self.s2)
+        self.assertEqual(await aget_object_or_none(SimpleModel, Q(field=0)), self.s1)
+        self.assertEqual(
+            await aget_object_or_none(SimpleModel.objects.all(), field=1), self.s2
+        )
+        self.assertEqual(
+            await aget_object_or_none(self.s1.relatedmodel_set, pk=self.r1.pk), self.r1
+        )
+        # Test non-existent object returns None
+        self.assertIsNone(await aget_object_or_none(SimpleModel, field=2))
+
+    async def test_aget_object_or_none_bad_class(self):
+        msg = (
+            "First argument to aget_object_or_none() must be a Model, Manager, or "
+            "QuerySet, not 'str'."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            await aget_object_or_none("SimpleModel", field=0)
