@@ -494,13 +494,13 @@ class AutocompleteMixin:
 
     url_name = "%s:autocomplete"
 
-    def __init__(self, field, admin_site, attrs=None, choices=(), using=None):
+    def __init__(self, field, admin_site, attrs=None, choices=(), using=None, option_attrs=None):
         self.field = field
         self.admin_site = admin_site
         self.db = using
         self.choices = choices
         self.attrs = {} if attrs is None else attrs.copy()
-        self.option_attrs = {}
+        self.option_attrs = {} if option_attrs is None else option_attrs.copy()
         self.i18n_name = get_select2_language()
 
     def get_url(self):

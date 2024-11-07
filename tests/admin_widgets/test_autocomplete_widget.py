@@ -17,6 +17,7 @@ class AlbumForm(forms.ModelForm):
                 Album._meta.get_field("band"),
                 admin.site,
                 attrs={"class": "my-class"},
+                option_attrs={"data-test": "custom", "class": "other"},
             ),
             "featuring": AutocompleteSelect(
                 Album._meta.get_field("featuring"),
@@ -196,3 +197,18 @@ class AutocompleteMixinTests(TestCase):
                         AutocompleteSelect(rel, admin.site).media._js,
                         list(expected_files),
                     )
+
+    def test_option_attrs(self):
+        beatles = Band.objects.create(name="The Beatles", style="rock")
+        form = AlbumForm(initial={"band": beatles.uuid})
+        widget = form["band"].field.widget.render(name="my_field", value=beatles.uuid)
+        self.assertInHTML(
+            f'<option value="{beatles.uuid}" data-test="custom" '
+            'class="other admin-autocomplete" data-ajax--cache="true" '
+            'data-ajax--delay="250" data-ajax--type="GET" '
+            'data-ajax--url="/autocomplete/" data-app-label="admin_widgets" '
+            'data-model-name="album" data-field-name="band" '
+            'data-theme="admin-autocomplete" data-allow-clear="false" '
+            'data-placeholder="" lang="en" selected>The Beatles</option>',
+            widget,
+        )

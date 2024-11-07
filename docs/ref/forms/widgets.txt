@@ -764,14 +764,14 @@ that specifies the template used to render each choice. For example, for the
         .. versionadded:: 5.2
 
         An optional dictionary containing option-specific HTML attributes to
-        be set on the rendered widget.
+        be set on the options of the rendered widget.
 
         .. code-block:: pycon
 
-            >>> from django.forms.widgets import RadioSelect
-            >>> widget = RadioSelect(choices=(("J", "John"),), option_attrs={"class": "special"})
+            >>> from django.forms.widgets import Select
+            >>> widget = Select(choices=(("J", "John"),), option_attrs={"class": "special"})
             >>> widget.render(name="beatle", value=["J"])
-            '<div><div>\n    <label><input type="radio" name="beatle" value="J" class="special" checked>\n John</label>\n\n</div>\n</div>'
+            '<select name="beatle">\n  <option value="J" class="special" selected>John</option>\n\n</select>'
 
 ``NullBooleanSelect``
 ~~~~~~~~~~~~~~~~~~~~~
