@@ -259,6 +259,10 @@ Forms
 * An :attr:`~django.forms.BoundField.aria_describedby` property is added to
   ``BoundField`` to ease use of this HTML attribute in templates.
 
+* The new asset object :class:`~django.forms.Script` is available for adding
+  custom HTML-attributes to JavaScript in form media. See
+  :ref:`paths as objects <form-media-asset-objects>` for more details.
+
 Generic Views
 ~~~~~~~~~~~~~
 
