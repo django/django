@@ -47,7 +47,9 @@ Minor features
 * Links to components in docstrings now supports custom link text, using the
   format ``:role:`link text <link>```. See :ref:`documentation helpers
   <admindocs-helpers>` for more details.
- 
+
+* The :ref:`model pages <admindocs-model-reference>` are now restricted to only
+  allow access to users with the corresponding model view or change permissions.
 
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -5,6 +5,8 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.admindocs import utils, views
 from django.contrib.admindocs.views import get_return_data_type, simplify_regex
+from django.contrib.auth.models import Permission, User
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.db import models
 from django.db.models import fields
@@ -481,6 +483,110 @@ class TestModelDetailView(TestDataMixin, AdminDocsTestCase):
             "Model 'doesnotexist' not found in app 'admin_docs'",
         )
         self.assertEqual(response.status_code, 404)
+
+    def test_model_permission_denied(self):
+        person_url = reverse(
+            "django-admindocs-models-detail", args=["admin_docs", "person"]
+        )
+        company_url = reverse(
+            "django-admindocs-models-detail", args=["admin_docs", "company"]
+        )
+        staff_user = User.objects.create_user(
+            username="staff", password="secret", is_staff=True
+        )
+        self.client.force_login(staff_user)
+        response_for_person = self.client.get(person_url)
+        response_for_company = self.client.get(company_url)
+        # No access without permissions.
+        self.assertEqual(response_for_person.status_code, 403)
+        self.assertEqual(response_for_company.status_code, 403)
+        company_content_type = ContentType.objects.get_for_model(Company)
+        person_content_type = ContentType.objects.get_for_model(Person)
+        view_company = Permission.objects.get(
+            codename="view_company", content_type=company_content_type
+        )
+        change_person = Permission.objects.get(
+            codename="change_person", content_type=person_content_type
+        )
+        staff_user.user_permissions.add(view_company, change_person)
+        response_for_person = self.client.get(person_url)
+        response_for_company = self.client.get(company_url)
+        # View or change permission grants access.
+        self.assertEqual(response_for_person.status_code, 200)
+        self.assertEqual(response_for_company.status_code, 200)
+
+
+@unittest.skipUnless(utils.docutils_is_available, "no docutils installed.")
+class TestModelIndexView(TestDataMixin, AdminDocsTestCase):
+    def test_model_index_superuser(self):
+        self.client.force_login(self.superuser)
+        index_url = reverse("django-admindocs-models-index")
+        response = self.client.get(index_url)
+        self.assertContains(
+            response,
+            '<a href="/admindocs/models/admin_docs.family/">Family</a>',
+            html=True,
+        )
+        self.assertContains(
+            response,
+            '<a href="/admindocs/models/admin_docs.person/">Person</a>',
+            html=True,
+        )
+        self.assertContains(
+            response,
+            '<a href="/admindocs/models/admin_docs.company/">Company</a>',
+            html=True,
+        )
+
+    def test_model_index_with_model_permission(self):
+        staff_user = User.objects.create_user(
+            username="staff", password="secret", is_staff=True
+        )
+        self.client.force_login(staff_user)
+        index_url = reverse("django-admindocs-models-index")
+        response = self.client.get(index_url)
+        # Models are not listed without permissions.
+        self.assertNotContains(
+            response,
+            '<a href="/admindocs/models/admin_docs.family/">Family</a>',
+            html=True,
+        )
+        self.assertNotContains(
+            response,
+            '<a href="/admindocs/models/admin_docs.person/">Person</a>',
+            html=True,
+        )
+        self.assertNotContains(
+            response,
+            '<a href="/admindocs/models/admin_docs.company/">Company</a>',
+            html=True,
+        )
+        company_content_type = ContentType.objects.get_for_model(Company)
+        person_content_type = ContentType.objects.get_for_model(Person)
+        view_company = Permission.objects.get(
+            codename="view_company", content_type=company_content_type
+        )
+        change_person = Permission.objects.get(
+            codename="change_person", content_type=person_content_type
+        )
+        staff_user.user_permissions.add(view_company, change_person)
+        response = self.client.get(index_url)
+        # View or change permission grants access.
+        self.assertNotContains(
+            response,
+            '<a href="/admindocs/models/admin_docs.family/">Family</a>',
+            html=True,
+        )
+        self.assertContains(
+            response,
+            '<a href="/admindocs/models/admin_docs.person/">Person</a>',
+            html=True,
+        )
+        self.assertContains(
+            response,
+            '<a href="/admindocs/models/admin_docs.company/">Company</a>',
+            html=True,
+        )
 
 
 class CustomField(models.Field):
