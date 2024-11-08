@@ -103,7 +103,7 @@ class Polygon(GEOSGeometry):
         param,
         msg=(
             "Parameter must be a sequence of LinearRings or objects that can "
-            "initialize to LinearRings"
+            "initialize to LinearRings."
         ),
     ):
         "Try to construct a ring from the given parameter."
