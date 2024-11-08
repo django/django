@@ -203,7 +203,7 @@ class HashedFilesMixin:
         """
         return self._url(self.stored_name, name, force)
 
-    def url_converter(self, name, hashed_files, template=None):
+    def url_converter(self, name, hashed_files, hashed_imports_exports, template=None):
         """
         Return the custom URL converter for the given file name.
         """
@@ -220,6 +220,10 @@ class HashedFilesMixin:
             matches = matchobj.groupdict()
             matched = matches["matched"]
             url = matches["url"]
+
+            # Ignore already hashed imports and exports
+            if url in hashed_imports_exports:
+                return matched
 
             # Ignore absolute/protocol-relative and data-uri URLs.
             if re.match(r"^[a-z]+:", url) or url.startswith("//"):
@@ -264,6 +268,7 @@ class HashedFilesMixin:
 
             # Return the hashed version to the file
             matches["url"] = unquote(transformed_url)
+            hashed_imports_exports.add(matches["url"])
             return template % matches
 
         return converter
@@ -363,41 +368,25 @@ class HashedFilesMixin:
                 # ..to apply each replacement pattern to the content
                 if name in adjustable_paths:
                     old_hashed_name = hashed_name
+                    hashed_imports_exports = set()
                     try:
-                        unprocessed_content = original_file.read().decode("utf-8")
-                        final_content = unprocessed_content
+                        content = original_file.read().decode("utf-8")
                     except UnicodeDecodeError as exc:
                         yield name, None, exc, False
                     for extension, patterns in self._patterns.items():
                         if matches_patterns(path, (extension,)):
                             for pattern, template in patterns:
                                 converter = self.url_converter(
-                                    name, hashed_files, template
+                                    name, hashed_files, hashed_imports_exports, template
                                 )
                                 try:
-                                    processed_content = pattern.sub(
-                                        converter, unprocessed_content
-                                    )
-                                    final_content_lines = final_content.split("\n")
-                                    processed_content_lines = processed_content.split(
-                                        "\n"
-                                    )
-                                    for i, final_content_line in enumerate(
-                                        final_content_lines
-                                    ):
-                                        if len(final_content_line) < len(
-                                            processed_content_lines[i]
-                                        ):
-                                            final_content_lines[i] = (
-                                                processed_content_lines[i]
-                                            )  # Keep the processed line
-                                    final_content = "\n".join(final_content_lines)
+                                    content = pattern.sub(converter, content)
                                 except ValueError as exc:
                                     yield name, None, exc, False
                     if hashed_file_exists:
                         self.delete(hashed_name)
                     # then save the processed result
-                    content_file = ContentFile(final_content.encode())
+                    content_file = ContentFile(content.encode())
                     if self.keep_intermediate_files:
                         # Save intermediate file for reference
                         self._save(hashed_name, content_file)
