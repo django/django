@@ -220,6 +220,7 @@ class RemoteTestResultTest(SimpleTestCase):
 
 
 class ParallelTestSuiteTest(SimpleTestCase):
+    @unittest.skipUnless(tblib is not None, "requires tblib to be installed")
     def test_handle_add_error_before_first_test(self):
         dummy_subsuites = []
         pts = ParallelTestSuite(dummy_subsuites, processes=2)
