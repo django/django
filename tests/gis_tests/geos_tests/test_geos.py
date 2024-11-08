@@ -788,22 +788,18 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
                     )  # Making sure __len__ works
 
                     # Checks __getitem__ and __setitem__
-                    for i in range(len(p.ext_ring_cs)):
-                        c1 = p.ext_ring_cs[i]  # Expected value
-                        c2 = cs[i]  # Value from coordseq
-                        self.assertEqual(c1, c2)
+                    for expected_value, coord_sequence in zip(p.ext_ring_cs, cs):
+                        self.assertEqual(expected_value, coord_sequence)
 
                         # Construct the test value to set the coordinate sequence with
-                        if len(c1) == 2:
+                        if len(expected_value) == 2:
                             tset = (5, 23)
                         else:
                             tset = (5, 23, 8)
-                        cs[i] = tset
+                        coord_sequence = tset
 
                         # Making sure every set point matches what we expect
-                        for j in range(len(tset)):
-                            cs[i] = tset
-                            self.assertEqual(tset[j], cs[i][j])
+                        self.assertEqual(tset, coord_sequence)
 
     def test_relate_pattern(self):
         "Testing relate() and relate_pattern()."
@@ -820,12 +816,14 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
 
     def test_intersection(self):
         "Testing intersects() and intersection()."
-        for i in range(len(self.geometries.topology_geoms)):
-            a = fromstr(self.geometries.topology_geoms[i].wkt_a)
-            b = fromstr(self.geometries.topology_geoms[i].wkt_b)
-            i1 = fromstr(self.geometries.intersect_geoms[i].wkt)
+        for topology_geom, intersect_geom in zip(
+            self.geometries.topology_geoms, self.geometries.intersect_geoms
+        ):
+            a = fromstr(topology_geom.wkt_a)
+            b = fromstr(topology_geom.wkt_b)
+            i1 = fromstr(intersect_geom.wkt)
             i2 = a.intersection(b)
-            with self.subTest(i=i):
+            with self.subTest(topology_geom=topology_geom):
                 self.assertIs(a.intersects(b), True)
                 self.assertTrue(i1.equals(i2))
                 self.assertTrue(i1.equals(a & b))  # __and__ is intersection operator
@@ -834,12 +832,14 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
 
     def test_union(self):
         "Testing union()."
-        for i in range(len(self.geometries.topology_geoms)):
-            a = fromstr(self.geometries.topology_geoms[i].wkt_a)
-            b = fromstr(self.geometries.topology_geoms[i].wkt_b)
-            u1 = fromstr(self.geometries.union_geoms[i].wkt)
+        for topology_geom, union_geom in zip(
+            self.geometries.topology_geoms, self.geometries.union_geoms
+        ):
+            a = fromstr(topology_geom.wkt_a)
+            b = fromstr(topology_geom.wkt_b)
+            u1 = fromstr(union_geom.wkt)
             u2 = a.union(b)
-            with self.subTest(i=i):
+            with self.subTest(topology_geom=topology_geom):
                 self.assertTrue(u1.equals(u2))
                 self.assertTrue(u1.equals(a | b))  # __or__ is union operator
                 a |= b  # testing __ior__
@@ -847,22 +847,26 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
 
     def test_unary_union(self):
         "Testing unary_union."
-        for i in range(len(self.geometries.topology_geoms)):
-            a = fromstr(self.geometries.topology_geoms[i].wkt_a)
-            b = fromstr(self.geometries.topology_geoms[i].wkt_b)
-            u1 = fromstr(self.geometries.union_geoms[i].wkt)
+        for topology_geom, union_geom in zip(
+            self.geometries.topology_geoms, self.geometries.union_geoms
+        ):
+            a = fromstr(topology_geom.wkt_a)
+            b = fromstr(topology_geom.wkt_b)
+            u1 = fromstr(union_geom.wkt)
             u2 = GeometryCollection(a, b).unary_union
-            with self.subTest(i=i):
+            with self.subTest(topology_geom=topology_geom):
                 self.assertTrue(u1.equals(u2))
 
     def test_difference(self):
         "Testing difference()."
-        for i in range(len(self.geometries.topology_geoms)):
-            a = fromstr(self.geometries.topology_geoms[i].wkt_a)
-            b = fromstr(self.geometries.topology_geoms[i].wkt_b)
-            d1 = fromstr(self.geometries.diff_geoms[i].wkt)
+        for topology_geom, union_geom in zip(
+            self.geometries.topology_geoms, self.geometries.diff_geoms
+        ):
+            a = fromstr(topology_geom.wkt_a)
+            b = fromstr(topology_geom.wkt_b)
+            d1 = fromstr(union_geom.wkt)
             d2 = a.difference(b)
-            with self.subTest(i=i):
+            with self.subTest(topology_geom=topology_geom):
                 self.assertTrue(d1.equals(d2))
                 self.assertTrue(d1.equals(a - b))  # __sub__ is difference operator
                 a -= b  # testing __isub__
@@ -870,12 +874,14 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
 
     def test_symdifference(self):
         "Testing sym_difference()."
-        for i in range(len(self.geometries.topology_geoms)):
-            a = fromstr(self.geometries.topology_geoms[i].wkt_a)
-            b = fromstr(self.geometries.topology_geoms[i].wkt_b)
-            d1 = fromstr(self.geometries.sdiff_geoms[i].wkt)
+        for topology_geom, sdiff_geom in zip(
+            self.geometries.topology_geoms, self.geometries.sdiff_geoms
+        ):
+            a = fromstr(topology_geom.wkt_a)
+            b = fromstr(topology_geom.wkt_b)
+            d1 = fromstr(sdiff_geom.wkt)
             d2 = a.sym_difference(b)
-            with self.subTest(i=i):
+            with self.subTest(topology_geom=topology_geom):
                 self.assertTrue(d1.equals(d2))
                 self.assertTrue(
                     d1.equals(a ^ b)
@@ -948,15 +954,12 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
                 self.assertEqual(len(exp_buf), len(buf))
 
                 # Now assuring that each point in the buffer is almost equal
-                for j in range(len(exp_buf)):
-                    exp_ring = exp_buf[j]
-                    buf_ring = buf[j]
-                    self.assertEqual(len(exp_ring), len(buf_ring))
-                    for k in range(len(exp_ring)):
+                for exp_ring, buf_ring in zip(exp_buf, buf, strict=True):
+                    for exp_point, buf_point in zip(exp_ring, buf_ring, strict=True):
                         # Asserting the X, Y of each point are almost equal (due to
                         # floating point imprecision).
-                        self.assertAlmostEqual(exp_ring[k][0], buf_ring[k][0], 9)
-                        self.assertAlmostEqual(exp_ring[k][1], buf_ring[k][1], 9)
+                        self.assertAlmostEqual(exp_point[0], buf_point[0], 9)
+                        self.assertAlmostEqual(exp_point[1], buf_point[1], 9)
 
     def test_covers(self):
         poly = Polygon(((0, 0), (0, 10), (10, 10), (10, 0), (0, 0)))
@@ -993,9 +996,9 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             Point(5, 23), LineString((0, 0), (1.5, 1.5), (3, 3)), srid=32021
         )
         self.assertEqual(32021, gc.srid)
-        for i in range(len(gc)):
-            with self.subTest(i=i):
-                self.assertEqual(32021, gc[i].srid)
+        for geom in gc:
+            with self.subTest(geom=geom):
+                self.assertEqual(32021, geom.srid)
 
         # GEOS may get the SRID from HEXEWKB
         # 'POINT(5 23)' at SRID=4326 in hex form -- obtained from PostGIS
