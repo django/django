@@ -15,6 +15,13 @@ except ImportError:
     tblib = None
 
 
+def _test_error_exc_info():
+    try:
+        raise ValueError("woops")
+    except ValueError:
+        return sys.exc_info()
+
+
 class ExceptionThatFailsUnpickling(Exception):
     """
     After pickling, this class fails unpickling with an error about incorrect
@@ -75,12 +82,6 @@ class SampleErrorTest(SimpleTestCase):
 
 
 class RemoteTestResultTest(SimpleTestCase):
-    def _test_error_exc_info(self):
-        try:
-            raise ValueError("woops")
-        except ValueError:
-            return sys.exc_info()
-
     def test_was_successful_no_events(self):
         result = RemoteTestResult()
         self.assertIs(result.wasSuccessful(), True)
@@ -100,7 +101,7 @@ class RemoteTestResultTest(SimpleTestCase):
         test = None
         result.startTest(test)
         try:
-            result.addExpectedFailure(test, self._test_error_exc_info())
+            result.addExpectedFailure(test, _test_error_exc_info())
         finally:
             result.stopTest(test)
         self.assertIs(result.wasSuccessful(), True)
@@ -121,7 +122,7 @@ class RemoteTestResultTest(SimpleTestCase):
         test = None
         result.startTest(test)
         try:
-            result.addError(test, self._test_error_exc_info())
+            result.addError(test, _test_error_exc_info())
         finally:
             result.stopTest(test)
         self.assertIs(result.wasSuccessful(), False)
@@ -132,7 +133,7 @@ class RemoteTestResultTest(SimpleTestCase):
         test = None
         result.startTest(test)
         try:
-            result.addFailure(test, self._test_error_exc_info())
+            result.addFailure(test, _test_error_exc_info())
         finally:
             result.stopTest(test)
         self.assertIs(result.wasSuccessful(), False)
@@ -143,7 +144,7 @@ class RemoteTestResultTest(SimpleTestCase):
         test_id = "test_foo (tests.test_foo.FooTest.test_foo)"
         test = _ErrorHolder(test_id)
         # Call addError() without a call to startTest().
-        result.addError(test, self._test_error_exc_info())
+        result.addError(test, _test_error_exc_info())
 
         (event,) = result.events
         self.assertEqual(event[0], "addError")
@@ -283,10 +284,3 @@ class ParallelTestSuiteTest(SimpleTestCase):
 
         self.assertEqual(len(result.errors), 0)
         self.assertEqual(len(result.failures), 0)
-
-
-def _test_error_exc_info():
-    try:
-        raise ValueError("woops")
-    except ValueError:
-        return sys.exc_info()
