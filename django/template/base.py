@@ -57,7 +57,7 @@ from enum import Enum
 
 from django.template.context import BaseContext
 from django.utils.formats import localize
-from django.utils.html import conditional_escape, escape
+from django.utils.html import conditional_escape
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.safestring import SafeData, SafeString, mark_safe
 from django.utils.text import get_text_list, smart_split, unescape_string_literal
@@ -247,10 +247,10 @@ class Template:
         for num, next in enumerate(linebreak_iter(self.source)):
             if start >= upto and end <= next:
                 line = num
-                before = escape(self.source[upto:start])
-                during = escape(self.source[start:end])
-                after = escape(self.source[end:next])
-            source_lines.append((num, escape(self.source[upto:next])))
+                before = self.source[upto:start]
+                during = self.source[start:end]
+                after = self.source[end:next]
+            source_lines.append((num, self.source[upto:next]))
             upto = next
         total = len(source_lines)
 
