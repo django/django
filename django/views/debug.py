@@ -6,6 +6,7 @@ import sys
 import types
 import warnings
 from pathlib import Path
+from urllib.parse import urlparse, urlunparse
 
 from django.conf import settings
 from django.http import Http404, HttpResponse, HttpResponseNotFound
@@ -115,6 +116,7 @@ class SafeExceptionReporterFilter:
     hidden_settings = _lazy_re_compile(
         "API|AUTH|TOKEN|KEY|SECRET|PASS|SIGNATURE|HTTP_COOKIE", flags=re.I
     )
+    hidden_url_settings = _lazy_re_compile("URL$", flags=re.I)
 
     def cleanse_setting(self, key, value):
         """
@@ -122,15 +124,21 @@ class SafeExceptionReporterFilter:
         value is a dictionary, recursively cleanse the keys in that dictionary.
         """
         if key == settings.SESSION_COOKIE_NAME:
+            is_url = False
             is_sensitive = True
         else:
             try:
-                is_sensitive = self.hidden_settings.search(key)
+                is_url = self.hidden_url_settings.search(key)
+                is_sensitive = is_url or self.hidden_settings.search(key)
             except TypeError:
+                is_url = False
                 is_sensitive = False
 
         if is_sensitive:
-            cleansed = self.cleansed_substitute
+            if is_url:
+                cleansed = self.cleanse_url(key, value)
+            else:
+                cleansed = self.cleansed_substitute
         elif isinstance(value, dict):
             cleansed = {k: self.cleanse_setting(k, v) for k, v in value.items()}
         elif isinstance(value, list):
@@ -144,6 +152,32 @@ class SafeExceptionReporterFilter:
             cleansed = CallableSettingWrapper(cleansed)
 
         return cleansed
+
+    def cleanse_url(self, key, value):
+        del key
+
+        try:
+            parsed = urlparse(value)
+        except Exception:
+            return self.cleansed_substitute
+
+        cleansed_netloc = re.sub(
+            "^([^:]*:[^:]*)@",
+            f"{self.cleansed_substitute}:{self.cleansed_substitute}@",
+            parsed.netloc,
+        )
+        cleansed_value = urlunparse(
+            [
+                parsed.scheme,
+                cleansed_netloc,
+                parsed.path,
+                parsed.params,
+                parsed.query,
+                parsed.fragment,
+            ]
+        )
+
+        return cleansed_value
 
     def get_safe_settings(self):
         """
