@@ -322,7 +322,6 @@ dependencies:
 * :pypi:`numpy`
 * :pypi:`Pillow` 6.2.1+
 * :pypi:`PyYAML`
-* :pypi:`pytz` (required)
 * :pypi:`pywatchman`
 * :pypi:`redis` 3.4+
 * :pypi:`setuptools`
