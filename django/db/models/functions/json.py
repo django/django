@@ -23,8 +23,10 @@ class JSONSet(Func):
         c.fields = {
             key: (
                 value.resolve_expression(query, allow_joins, reuse, summarize, for_save)
+                # If it's an expression, resolve it and use it as-is
                 if hasattr(value, "resolve_expression")
-                else value
+                # Otherwise, use Value to serialize the data to string
+                else Value(value, output_field=c.output_field)
             )
             for key, value in self.fields.items()
         }
@@ -51,13 +53,10 @@ class JSONSet(Func):
             key_paths_join = compile_json_path(key_paths)
             new_source_expressions.append(Value(key_paths_join))
 
-            if not hasattr(value, "resolve_expression"):
-                # Use Value to serialize the data to string,
-                # then use Cast to ensure the string is treated as JSON.
-                value = Cast(
-                    Value(value, output_field=self.output_field),
-                    output_field=self.output_field,
-                )
+            # If it's a Value, assume it to be a JSON-formatted string.
+            # Use Cast to ensure the string is treated as JSON on the database.
+            if isinstance(value, Value):
+                value = Cast(value, output_field=self.output_field)
 
             new_source_expressions.append(value)
 
@@ -90,11 +89,7 @@ class JSONSet(Func):
         key_paths = key.split(LOOKUP_SEP)
         new_source_expressions.append(Value(key_paths))
 
-        if not hasattr(value, "resolve_expression"):
-            # We do not need Cast() because psycopg will automatically adapt the
-            # value to JSONB.
-            value = Value(value, output_field=self.output_field)
-        else:
+        if not isinstance(value, Value):
             # Database expressions may return any type. We cannot use Cast() here
             # because ::jsonb only works with JSON-formatted strings, not with
             # other types like integers. The TO_JSONB function is available for
@@ -104,6 +99,11 @@ class JSONSet(Func):
                 function = "TO_JSONB"
 
             value = ToJSONB(value, output_field=self.output_field)
+        elif value.value is None:
+            # FIXME: why do we need to wrap this again?
+            # If we don't, for some reason, it is interpreted as SQL NULL.
+            # Fails on test_set_single_key_with_json_null.
+            value = Value(value, output_field=self.output_field)
 
         new_source_expressions.append(value)
         copy.set_source_expressions(new_source_expressions)
@@ -135,7 +135,7 @@ class JSONSet(Func):
         key_paths = key.split(LOOKUP_SEP)
         key_paths_join = compile_json_path(key_paths)
 
-        if not hasattr(value, "resolve_expression"):
+        if isinstance(value, Value):
             # We do not need Cast() because Oracle has the FORMAT JSON clause
             # in JSON_TRANSFORM that will automatically treat the value as JSON.
             value = Value(value, output_field=self.output_field)
