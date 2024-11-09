@@ -62,7 +62,7 @@ def _get_queryset(klass):
     return klass
 
 
-def get_object_or_404(klass, *args, **kwargs):
+def get_object_or_404(klass, exception_detail: str = None, *args, **kwargs):
     """
     Use get() to return an object, or raise an Http404 exception if the object
     does not exist.
@@ -85,9 +85,11 @@ def get_object_or_404(klass, *args, **kwargs):
     try:
         return queryset.get(*args, **kwargs)
     except queryset.model.DoesNotExist:
-        raise Http404(
-            "No %s matches the given query." % queryset.model._meta.object_name
-        )
+        if not exception_detail:
+            exception_detail = (
+                "No %s matches the given query." % queryset.model._meta.object_name
+            )
+        raise Http404(exception_detail)
 
 
 async def aget_object_or_404(klass, *args, **kwargs):
