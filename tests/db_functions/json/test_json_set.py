@@ -92,31 +92,42 @@ class JSONSetTests(TestCase):
             {"font": {"size": 10, "name": "Arial"}, "theme": "dark"},
         )
 
-    def test_set_key_with_dot_character(self):
+    def test_set_problematic_keys(self):
         """
         Most databases use a dot-notation for the JSON path.
         Ensure that using a key that contains a dot is escaped properly.
         """
-        user_preferences = UserPreferences.objects.create(
-            settings={"font.size": 20, "notifications": True, "font": {"size": 30}}
-        )
-        # Update the key that contains a dot character.
-        UserPreferences.objects.update(
-            settings=JSONSet("settings", **{"font.size": 10})
-        )
-        user_preferences = UserPreferences.objects.get(pk=user_preferences.pk)
-        self.assertEqual(
-            user_preferences.settings,
-            {"font.size": 10, "notifications": True, "font": {"size": 30}},
-        )
+        problematic_keys = [
+            "font.size",
+            "$.font.size",
+            '"font"."size"',
+            '"font " .size"',
+            "font',\"}",
+        ]
+        for key in problematic_keys:
+            with self.subTest(key=key):
+                user_preferences = UserPreferences.objects.create(
+                    settings={key: 20, "notifications": True, "font": {"size": 30}}
+                )
+                # Update the key that contains a dot character.
+                UserPreferences.objects.update(
+                    settings=JSONSet("settings", **{key: 10})
+                )
+                user_preferences = UserPreferences.objects.get(pk=user_preferences.pk)
+                self.assertEqual(
+                    user_preferences.settings,
+                    {key: 10, "notifications": True, "font": {"size": 30}},
+                )
 
-        # Update the nested key.
-        UserPreferences.objects.update(settings=JSONSet("settings", font__size=20))
-        user_preferences = UserPreferences.objects.get(pk=user_preferences.pk)
-        self.assertEqual(
-            user_preferences.settings,
-            {"font.size": 10, "notifications": True, "font": {"size": 20}},
-        )
+                # Update the nested key.
+                UserPreferences.objects.update(
+                    settings=JSONSet("settings", font__size=20)
+                )
+                user_preferences = UserPreferences.objects.get(pk=user_preferences.pk)
+                self.assertEqual(
+                    user_preferences.settings,
+                    {key: 10, "notifications": True, "font": {"size": 20}},
+                )
 
     def test_set_multiple_keys_in_nested_json_object_with_nested_calls(self):
         user_preferences = UserPreferences.objects.create(
