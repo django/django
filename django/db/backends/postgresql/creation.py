@@ -1,5 +1,6 @@
 import sys
 
+from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.base.creation import BaseDatabaseCreation
 from django.db.backends.postgresql.psycopg_any import errors
@@ -36,6 +37,31 @@ class DatabaseCreation(BaseDatabaseCreation):
             [strip_quotes(database_name)],
         )
         return cursor.fetchone() is not None
+
+    def _get_extensions(self):
+        with self.connection.cursor() as cursor:
+            cursor.execute("SELECT extname FROM pg_extension;")
+            return [row[0] for row in cursor.fetchall()]
+
+    def _create_test_db(self, verbosity, autoclobber, keepdb=False):
+        test_database_name = super()._create_test_db(verbosity, autoclobber, keepdb)
+
+        self.database_extensions = self._get_extensions()
+        self.connection.close()
+
+        settings.DATABASES[self.connection.alias]["NAME"] = test_database_name
+        self.connection.settings_dict["NAME"] = test_database_name
+
+        with self.connection.cursor() as cursor:
+            for extension in self.database_extensions:
+                from psycopg2 import sql
+
+                query = sql.SQL("CREATE EXTENSION IF NOT EXISTS {extension};").format(
+                    extension=sql.Identifier(extension)
+                )
+                cursor.execute(query)
+
+        return test_database_name
 
     def _execute_create_test_db(self, cursor, parameters, keepdb=False):
         try:
