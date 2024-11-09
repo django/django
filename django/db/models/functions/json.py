@@ -88,8 +88,7 @@ class JSONSet(Func):
         new_source_expressions = copy.get_source_expressions()
 
         key_paths = key.split(LOOKUP_SEP)
-        key_paths_join = ",".join(key_paths)
-        new_source_expressions.append(Value(f"{{{key_paths_join}}}"))
+        new_source_expressions.append(Value(key_paths))
 
         if not hasattr(value, "resolve_expression"):
             # We do not need Cast() because psycopg will automatically adapt the
@@ -213,8 +212,7 @@ class JSONRemove(Func):
 
         new_source_expressions = copy.get_source_expressions()
         key_paths = path.split(LOOKUP_SEP)
-        key_paths_join = ",".join(key_paths)
-        new_source_expressions.append(Value(f"{{{key_paths_join}}}"))
+        new_source_expressions.append(Value(key_paths))
         copy.set_source_expressions(new_source_expressions)
 
         return super(JSONRemove, copy).as_sql(
