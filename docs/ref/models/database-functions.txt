@@ -1991,7 +1991,7 @@ JSON-related functions
 We'll be using the following model in examples of each function::
 
     class UserPreferences(models.Model):
-        settings = models.JSONField(encoder=DjangoJSONEncoder)
+        settings = models.JSONField()
 
 ``JSONSet``
 -----------

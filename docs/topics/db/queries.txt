@@ -1350,7 +1350,7 @@ To demonstrate, we will use the following example model::
 
 
     class UserPreferences(models.Model):
-        settings = models.JSONField(encoder=DjangoJSONEncoder)
+        settings = models.JSONField()
 
 A simple way to update a ``JSONField`` is by treating it like a dictionary.
 To update a specific key within the ``JSONField``, you can modify it just as
