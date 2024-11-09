@@ -29,6 +29,7 @@ from django.db.models import (
 from django.db.models.expressions import RawSQL
 from django.db.models.fields.json import (
     KT,
+    HasKey,
     KeyTextTransform,
     KeyTransform,
     KeyTransformFactory,
@@ -581,6 +582,14 @@ class TestQuerying(TestCase):
                     NullableJSONModel.objects.filter(condition),
                     [expected],
                 )
+
+    def test_has_key_literal_lookup(self):
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.filter(
+                HasKey(Value({"foo": "bar"}, JSONField()), "foo")
+            ).order_by("id"),
+            self.objs,
+        )
 
     def test_has_key_list(self):
         obj = NullableJSONModel.objects.create(value=[{"a": 1}, {"b": "x"}])

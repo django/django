@@ -23,6 +23,15 @@ Remember that absolutely NO guarantee is provided about the results of
 ``strip_tags()`` call without escaping it first, for example with
 :func:`django.utils.html.escape`.
 
+CVE-2024-53908: Potential SQL injection via ``HasKey(lhs, rhs)`` on Oracle
+==========================================================================
+
+Direct usage of the ``django.db.models.fields.json.HasKey`` lookup on Oracle
+was subject to SQL injection if untrusted data was used as a ``lhs`` value.
+
+Applications that use the :lookup:`has_key <jsonfield.has_key>` lookup through
+the ``__`` syntax are unaffected.
+
 Bugfixes
 ========
 
