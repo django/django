@@ -193,20 +193,18 @@ class HasKeyLookup(PostgresOperatorLookup):
         # Compile the final key without interpreting ints as array elements.
         return ".%s" % json.dumps(key_transform)
 
-    def as_sql(self, compiler, connection, template=None):
+    def _as_sql_parts(self, compiler, connection):
         # Process JSON path from the left-hand side.
         if isinstance(self.lhs, KeyTransform):
-            lhs, lhs_params, lhs_key_transforms = self.lhs.preprocess_lhs(
+            lhs_sql, lhs_params, lhs_key_transforms = self.lhs.preprocess_lhs(
                 compiler, connection
             )
             lhs_json_path = compile_json_path(lhs_key_transforms)
         else:
-            lhs, lhs_params = self.process_lhs(compiler, connection)
+            lhs_sql, lhs_params = self.process_lhs(compiler, connection)
             lhs_json_path = "$"
-        sql = template % lhs
         # Process JSON path from the right-hand side.
         rhs = self.rhs
-        rhs_params = []
         if not isinstance(rhs, (list, tuple)):
             rhs = [rhs]
         for key in rhs:
@@ -217,25 +215,45 @@ class HasKeyLookup(PostgresOperatorLookup):
             *rhs_key_transforms, final_key = rhs_key_transforms
             rhs_json_path = compile_json_path(rhs_key_transforms, include_root=False)
             rhs_json_path += self.compile_json_path_final_key(final_key)
-            rhs_params.append(lhs_json_path + rhs_json_path)
+            yield lhs_sql, lhs_params, lhs_json_path + rhs_json_path
+
+    def _combine_sql_parts(self, parts):
         # Add condition for each key.
         if self.logical_operator:
-            sql = "(%s)" % self.logical_operator.join([sql] * len(rhs_params))
-        return sql, tuple(lhs_params) + tuple(rhs_params)
+            return "(%s)" % self.logical_operator.join(parts)
+        return "".join(parts)
+
+    def as_sql(self, compiler, connection, template=None):
+        sql_parts = []
+        params = []
+        for lhs_sql, lhs_params, rhs_json_path in self._as_sql_parts(
+            compiler, connection
+        ):
+            sql_parts.append(template % (lhs_sql, "%s"))
+            params.extend(lhs_params + [rhs_json_path])
+        return self._combine_sql_parts(sql_parts), tuple(params)
 
     def as_mysql(self, compiler, connection):
         return self.as_sql(
-            compiler, connection, template="JSON_CONTAINS_PATH(%s, 'one', %%s)"
+            compiler, connection, template="JSON_CONTAINS_PATH(%s, 'one', %s)"
         )
 
     def as_oracle(self, compiler, connection):
-        sql, params = self.as_sql(
-            compiler, connection, template="JSON_EXISTS(%s, q'\uffff%%s\uffff')"
-        )
-        # Add paths directly into SQL because path expressions cannot be passed
-        # as bind variables on Oracle. Use a custom delimiter to prevent the
-        # JSON path from escaping the SQL literal. See comment in KeyTransform.
-        return sql % tuple(params), []
+        # Use a custom delimiter to prevent the JSON path from escaping the SQL
+        # literal. See comment in KeyTransform.
+        template = "JSON_EXISTS(%s, q'\uffff%s\uffff')"
+        sql_parts = []
+        params = []
+        for lhs_sql, lhs_params, rhs_json_path in self._as_sql_parts(
+            compiler, connection
+        ):
+            # Add right-hand-side directly into SQL because it cannot be passed
+            # as bind variables to JSON_EXISTS. It might result in invalid
+            # queries but it is assumed that it cannot be evaded because the
+            # path is JSON serialized.
+            sql_parts.append(template % (lhs_sql, rhs_json_path))
+            params.extend(lhs_params)
+        return self._combine_sql_parts(sql_parts), tuple(params)
 
     def as_postgresql(self, compiler, connection):
         if isinstance(self.rhs, KeyTransform):
@@ -247,7 +265,7 @@ class HasKeyLookup(PostgresOperatorLookup):
 
     def as_sqlite(self, compiler, connection):
         return self.as_sql(
-            compiler, connection, template="JSON_TYPE(%s, %%s) IS NOT NULL"
+            compiler, connection, template="JSON_TYPE(%s, %s) IS NOT NULL"
         )
 
 
@@ -470,9 +488,9 @@ class KeyTransformIsNull(lookups.IsNull):
         return "(NOT %s OR %s IS NULL)" % (sql, lhs), tuple(params) + tuple(lhs_params)
 
     def as_sqlite(self, compiler, connection):
-        template = "JSON_TYPE(%s, %%s) IS NULL"
+        template = "JSON_TYPE(%s, %s) IS NULL"
         if not self.rhs:
-            template = "JSON_TYPE(%s, %%s) IS NOT NULL"
+            template = "JSON_TYPE(%s, %s) IS NOT NULL"
         return HasKeyOrArrayIndex(self.lhs.lhs, self.lhs.key_name).as_sql(
             compiler,
             connection,
