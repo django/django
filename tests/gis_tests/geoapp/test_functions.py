@@ -624,7 +624,9 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
         qs_origin_param = Country.objects.annotate(
             rotated=functions.Rotate("mpoly", angle=angle, origin=Point(0, 0))
         )
-        for c_origin, c_xy_params, c_origin_point_param in zip(qs_origin, qs_xy_params, qs_origin_param):
+        for c_origin, c_xy_params, c_origin_point_param in zip(
+            qs_origin, qs_xy_params, qs_origin_param
+        ):
             for p1, p2 in zip(c_origin.mpoly, c_origin.rotated):
                 for r1, r2 in zip(p1, p2):
                     for c1, c2 in zip(r1.coords, r2.coords):
