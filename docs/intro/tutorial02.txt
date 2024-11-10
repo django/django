@@ -155,11 +155,11 @@ this case, we've set the :attr:`~django.db.models.Field.default` value of
 ``votes`` to 0.
 
 Finally, note that a :class:`~django.db.models.ForeignKey` defines a
-relationship between models. This creates a one-to-many relationship, where
-a ``Question`` can have multiple related ``Choice`` instances. Django supports
+relationship between models. This creates a many-to-one relationship, where
+each ``Choice`` points to a single ``Question``, but a ``Question`` can have 
+multiple ``Choice`` instances pointing to it. Django supports
 all the common database relationships: many-to-one, many-to-many, and
 one-to-one.
-relationships: many-to-one, many-to-many, and one-to-one.
 
 Activating models
 =================
