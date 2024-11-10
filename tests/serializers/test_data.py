@@ -69,6 +69,7 @@ from .models import (
     Tag,
     TextData,
     TimeData,
+    TimePKData,
     UniqueAnchor,
     UUIDData,
     UUIDDefaultData,
@@ -390,7 +391,7 @@ The end.""",
     # It contains line breaks.
     # Several of them.
     # The end."""),
-    # (pk_obj, 770, TimePKData, datetime.time(10, 42, 37)),
+    (pk_obj, 770, TimePKData, datetime.time(10, 42, 37)),
     (pk_obj, 791, UUIDData, uuid_obj),
     (fk_obj, 792, FKToUUID, uuid_obj),
     (pk_obj, 793, UUIDDefaultData, uuid_obj),
