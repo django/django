@@ -88,6 +88,16 @@ class LazySettings(LazyObject):
             val = self._add_script_prefix(val)
         elif name == "SECRET_KEY" and not val:
             raise ImproperlyConfigured("The SECRET_KEY setting must not be empty.")
+        elif name == "DEBUG" and not isinstance(val, bool):
+            # This is supposed to protect against accidental debug mode:
+            # String values like "0" or "False" evaluate to True in Python and so guard
+            # "if settings.DEBUG:" would then activate debug mode, which was precisely
+            # not what the user had intended.  Accidental debug mode can have serious
+            # security implications, and that's why Django started being stricter about
+            # it.
+            raise ImproperlyConfigured(
+                "The DEBUG setting must be of type bool (for safety reasons)."
+            )
 
         self.__dict__[name] = val
         return val
