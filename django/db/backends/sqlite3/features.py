@@ -101,7 +101,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                         "servers.tests.LiveServerTestCloseConnectionTest."
                         "test_closes_connections",
                     },
-                    "For SQLite in-memory tests, closing the connection destroys"
+                    "For SQLite in-memory tests, closing the connection destroys "
                     "the database.": {
                         "test_utils.tests.AssertNumQueriesUponConnectionTests."
                         "test_ignores_connection_configuration_queries",
