@@ -17,11 +17,24 @@ class AlbumForm(forms.ModelForm):
                 Album._meta.get_field("band"),
                 admin.site,
                 attrs={"class": "my-class"},
-                option_attrs={"data-test": "custom", "class": "other"},
             ),
             "featuring": AutocompleteSelect(
                 Album._meta.get_field("featuring"),
                 admin.site,
+            ),
+        }
+
+
+class ReleaseEventForm(forms.ModelForm):
+    class Meta:
+        model = ReleaseEvent
+        fields = ["album"]
+        widgets = {
+            "album": AutocompleteSelect(
+                ReleaseEvent._meta.get_field("album"),
+                admin.site,
+                attrs={"class": "my-class"},
+                option_attrs={"data-test": "custom", "class": "other"},
             ),
         }
 
@@ -200,15 +213,16 @@ class AutocompleteMixinTests(TestCase):
 
     def test_option_attrs(self):
         beatles = Band.objects.create(name="The Beatles", style="rock")
-        form = AlbumForm(initial={"band": beatles.uuid})
-        widget = form["band"].field.widget.render(name="my_field", value=beatles.uuid)
+        rubber_soul = Album.objects.create(name="Rubber Soul", band=beatles)
+        form = ReleaseEventForm(initial={"album": rubber_soul.pk})
+        widget = form["album"].field.widget.render(name="my_field", value=rubber_soul.pk)
         self.assertInHTML(
-            f'<option value="{beatles.uuid}" data-test="custom" '
+            f'<option value="{rubber_soul.pk}" data-test="custom" '
             'class="other admin-autocomplete" data-ajax--cache="true" '
             'data-ajax--delay="250" data-ajax--type="GET" '
             'data-ajax--url="/autocomplete/" data-app-label="admin_widgets" '
-            'data-model-name="album" data-field-name="band" '
+            'data-model-name="releaseevent" data-field-name="album" '
             'data-theme="admin-autocomplete" data-allow-clear="false" '
-            'data-placeholder="" lang="en" selected>The Beatles</option>',
+            'data-placeholder="" lang="en" selected>Rubber Soul</option>',
             widget,
         )
