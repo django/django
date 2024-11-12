@@ -242,8 +242,11 @@ class SmallPKData(models.Model):
     data = models.SmallIntegerField(primary_key=True)
 
 
-# class TextPKData(models.Model):
-#     data = models.TextField(primary_key=True)
+class TextPKData(models.Model):
+    data = models.TextField(primary_key=True)
+
+    class Meta:
+        required_db_features = ["supports_index_on_text_field"]
 
 
 class TimePKData(models.Model):
