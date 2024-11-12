@@ -128,8 +128,11 @@ Be cautious when marking things "Ready For Check-in"
 
 If you're really not certain if a ticket is ready, don't mark it as such. Leave
 a comment instead, letting others know your thoughts. If you're mostly certain,
-but not completely certain, you might also try asking on IRC to see if someone
-else can confirm your suspicions.
+but not completely certain, you might also try asking on the
+``#contributing-getting-started`` channel in the `Django Discord server`_ to
+see if someone else can confirm your suspicions.
+
+.. _`Django Discord server`: https://discord.gg/xcRH6mN4fa
 
 Wait for feedback, and respond to feedback that you receive
 -----------------------------------------------------------
