@@ -215,7 +215,9 @@ class AutocompleteMixinTests(TestCase):
         beatles = Band.objects.create(name="The Beatles", style="rock")
         rubber_soul = Album.objects.create(name="Rubber Soul", band=beatles)
         form = ReleaseEventForm(initial={"album": rubber_soul.pk})
-        widget = form["album"].field.widget.render(name="my_field", value=rubber_soul.pk)
+        widget = form["album"].field.widget.render(
+            name="my_field", value=rubber_soul.pk
+        )
         self.assertInHTML(
             f'<option value="{rubber_soul.pk}" data-test="custom" '
             'class="other admin-autocomplete" data-ajax--cache="true" '
