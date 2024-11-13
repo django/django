@@ -1,6 +1,7 @@
 import os
 from datetime import datetime
 
+from django.core.exceptions import SuspiciousOperation
 from django.core.serializers.json import DjangoJSONEncoder
 from django.test import SimpleTestCase
 from django.utils.deprecation import RemovedInDjango60Warning
@@ -145,11 +146,17 @@ class TestUtilsHtml(SimpleTestCase):
             ("<script>alert()</script>&h", "alert()h"),
             ("><!" + ("&" * 16000) + "D", "><!" + ("&" * 16000) + "D"),
             ("X<<<<br>br>br>br>X", "XX"),
+            ("<" * 50 + "a>" * 50, ""),
         )
         for value, output in items:
             with self.subTest(value=value, output=output):
                 self.check_output(strip_tags, value, output)
                 self.check_output(strip_tags, lazystr(value), output)
+
+    def test_strip_tags_suspicious_operation(self):
+        value = "<" * 51 + "a>" * 51, "<a>"
+        with self.assertRaises(SuspiciousOperation):
+            strip_tags(value)
 
     def test_strip_tags_files(self):
         # Test with more lengthy content (also catching performance regressions)
