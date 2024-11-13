@@ -6,6 +6,7 @@ import re
 from html.parser import HTMLParser
 from urllib.parse import parse_qsl, quote, unquote, urlencode, urlsplit, urlunsplit
 
+from django.core.exceptions import SuspiciousOperation
 from django.utils.encoding import punycode
 from django.utils.functional import Promise, cached_property, keep_lazy, keep_lazy_text
 from django.utils.http import RFC3986_GENDELIMS, RFC3986_SUBDELIMS
@@ -14,6 +15,7 @@ from django.utils.safestring import SafeData, SafeString, mark_safe
 from django.utils.text import normalize_newlines
 
 MAX_URL_LENGTH = 2048
+MAX_STRIP_TAGS_DEPTH = 50
 
 
 @keep_lazy(SafeString)
@@ -172,15 +174,19 @@ def _strip_once(value):
 @keep_lazy_text
 def strip_tags(value):
     """Return the given HTML with all tags stripped."""
-    # Note: in typical case this loop executes _strip_once once. Loop condition
-    # is redundant, but helps to reduce number of executions of _strip_once.
     value = str(value)
+    # Note: in typical case this loop executes _strip_once twice (the second
+    # execution does not remove any more tags).
+    strip_tags_depth = 0
     while "<" in value and ">" in value:
+        if strip_tags_depth >= MAX_STRIP_TAGS_DEPTH:
+            raise SuspiciousOperation
         new_value = _strip_once(value)
         if value.count("<") == new_value.count("<"):
             # _strip_once wasn't able to detect more tags.
             break
         value = new_value
+        strip_tags_depth += 1
     return value
 
 
