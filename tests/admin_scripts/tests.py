@@ -879,6 +879,12 @@ class ManageNoSettings(AdminScriptTestCase):
         self.assertNoOutput(out)
         self.assertOutput(err, "Settings module bad_settings could not be imported")
 
+    def test_startapp_with_bad_settings(self):
+        args = ["startapp", "--settings=bad_settings", "app1"]
+        out, err = self.run_manage(args)
+        self.assertNoOutput(out)
+        self.assertNoOutput(err)
+
     def test_builtin_with_bad_environment(self):
         """
         no settings: manage.py builtin commands fail if settings file (from
