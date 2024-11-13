@@ -48,13 +48,10 @@ following example will create a formset class to display two blank forms:
 
     >>> ArticleFormSet = formset_factory(ArticleForm, extra=2)
 
-Iterating over a formset will render the forms in the order they were
-created. You can change this order by providing an alternate implementation for
-the ``__iter__()`` method.
-
-Formsets can also be indexed into, which returns the corresponding form. If you
-override ``__iter__``, you will need to also override ``__getitem__`` to have
-matching behavior.
+Formsets can be iterated and indexed, accessing forms in the order they were
+created. You can reorder the forms by overriding the default
+:py:meth:`iteration <object.__iter__>` and
+:py:meth:`indexing <object.__getitem__>` behavior if needed.
 
 .. _formsets-initial-data:
 
