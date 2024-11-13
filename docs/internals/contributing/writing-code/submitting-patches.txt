@@ -138,7 +138,7 @@ Regardless of the way you submit your work, follow these steps.
 
 * Check the "Has pull request" box on the ticket and make sure the "Needs
   documentation", "Needs tests", and "Pull request needs improvement" boxes
-  aren't checked. This makes the ticket appear in the "Patches needing review"
+  aren't checked. This makes the ticket appear in the "PRs needing review"
   queue on the `Development dashboard`_.
 
 .. _ticket tracker: https://code.djangoproject.com/
@@ -349,7 +349,7 @@ If you're looking to become a member of the `triage & review team
 <https://www.djangoproject.com/foundation/teams/#triage-review-team>`_, doing
 thorough reviews of contributions is a great way to earn trust.
 
-Looking for a pull request to review? Check out the "Patches needing review"
+Looking for a pull request to review? Check out the "PRs needing review"
 section of the `Django Development Dashboard`_.
 
 Looking to get your pull request reviewed? Ensure the Trac flags on the ticket
