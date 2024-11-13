@@ -71,7 +71,7 @@ are a few additional guidelines to follow:
   capturing a *brief* screencast. If your software permits it, capture only
   the relevant area of the screen.
 
-* If you're offering a patch that changes the look or behavior of Django's
+* If you're proposing a change that impacts the look or behavior of Django's
   UI, you **must** attach before *and* after screenshots/screencasts.
   Tickets lacking these are difficult for triagers to assess quickly.
 
