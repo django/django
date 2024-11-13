@@ -15,7 +15,7 @@ Serving static files in production
 The basic outline of putting static files into production consists of two
 steps: run the :djadmin:`collectstatic` command when static files change, then
 arrange for the collected static files directory (:setting:`STATIC_ROOT`) to be
-moved to the static file server and served. Depending the ``staticfiles``
+moved to the static file server and served. Depending on the ``staticfiles``
 :setting:`STORAGES` alias, files may need to be moved to a new location
 manually or the :func:`post_process
 <django.contrib.staticfiles.storage.StaticFilesStorage.post_process>` method of
