@@ -2251,6 +2251,7 @@ information.
     inlines to a model by specifying them in a ``ModelAdmin.inlines``::
 
         from django.contrib import admin
+        from myapp.models import Author, Book
 
 
         class BookInline(admin.TabularInline):
@@ -2261,6 +2262,9 @@ information.
             inlines = [
                 BookInline,
             ]
+
+
+        admin.site.register(Author, AuthorAdmin)
 
     Django provides two subclasses of ``InlineModelAdmin`` and they are:
 
@@ -2494,6 +2498,10 @@ Take this model for instance::
     from django.db import models
 
 
+    class Person(models.Model):
+        name = models.CharField(max_length=128)
+
+
     class Friendship(models.Model):
         to_person = models.ForeignKey(
             Person, on_delete=models.CASCADE, related_name="friends"
@@ -2507,7 +2515,7 @@ you need to explicitly define the foreign key since it is unable to do so
 automatically::
 
     from django.contrib import admin
-    from myapp.models import Friendship
+    from myapp.models import Friendship, Person
 
 
     class FriendshipInline(admin.TabularInline):
@@ -2519,6 +2527,9 @@ automatically::
         inlines = [
             FriendshipInline,
         ]
+
+
+    admin.site.register(Person, PersonAdmin)
 
 Working with many-to-many models
 --------------------------------
@@ -2548,16 +2559,11 @@ If you want to display many-to-many relations using an inline, you can do
 so by defining an ``InlineModelAdmin`` object for the relationship::
 
     from django.contrib import admin
+    from myapp.models import Group
 
 
     class MembershipInline(admin.TabularInline):
         model = Group.members.through
-
-
-    class PersonAdmin(admin.ModelAdmin):
-        inlines = [
-            MembershipInline,
-        ]
 
 
     class GroupAdmin(admin.ModelAdmin):
@@ -2565,6 +2571,9 @@ so by defining an ``InlineModelAdmin`` object for the relationship::
             MembershipInline,
         ]
         exclude = ["members"]
+
+
+    admin.site.register(Group, GroupAdmin)
 
 There are two features worth noting in this example.
 
