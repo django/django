@@ -65,8 +65,8 @@ must:
   Django Git ``main`` branch, as for any code change.
 
 * Open a ticket in Django's ticket system, set its ``Component`` field to
-  ``Translations``, set the "has patch" flag, and include the link to the pull
-  request.
+  ``Translations``, set the "has pull request" flag, and include the link to
+  the pull request.
 
 .. _Transifex: https://www.transifex.com/
 .. _Django project page: https://app.transifex.com/django/django/

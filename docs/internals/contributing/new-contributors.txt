@@ -156,7 +156,7 @@ This isn't personal. There are a lot of tickets and pull requests to get
 through.
 
 Keeping your pull request up to date is important. Review the ticket on Trac to
-ensure that the *Needs tests*, *Needs documentation*, and *Patch needs
+ensure that the *Needs tests*, *Needs documentation*, and *Pull request needs
 improvement* flags are unchecked once you've addressed all review comments.
 
 Remember that Django has an eight-month release cycle, so there's plenty of

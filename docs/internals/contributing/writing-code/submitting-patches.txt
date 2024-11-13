@@ -136,10 +136,10 @@ Regardless of the way you submit your work, follow these steps.
 * Make sure your code fulfills the requirements in our :ref:`contribution
   checklist <patch-review-checklist>`.
 
-* Check the "Has patch" box on the ticket and make sure the "Needs
-  documentation", "Needs tests", and "Patch needs improvement" boxes aren't
-  checked. This makes the ticket appear in the "Patches needing review" queue
-  on the `Development dashboard`_.
+* Check the "Has pull request" box on the ticket and make sure the "Needs
+  documentation", "Needs tests", and "Pull request needs improvement" boxes
+  aren't checked. This makes the ticket appear in the "Patches needing review"
+  queue on the `Development dashboard`_.
 
 .. _ticket tracker: https://code.djangoproject.com/
 .. _Development dashboard: https://dashboard.djangoproject.com/
@@ -340,10 +340,10 @@ If the pull request passes all the criteria below and is not your own, please
 set the "Triage Stage" on the corresponding Trac ticket to "Ready for checkin".
 If you've left comments for improvement on the pull request, please tick the
 appropriate flags on the Trac ticket based on the results of your review:
-"Patch needs improvement", "Needs documentation", and/or "Needs tests". As time
-and interest permits, mergers do final reviews of "Ready for checkin" tickets
-and will either commit the changes or bump it back to "Accepted" if further
-work needs to be done.
+"Pull request needs improvement", "Needs documentation", and/or "Needs tests".
+As time and interest permits, mergers do final reviews of "Ready for checkin"
+tickets and will either commit the changes or bump it back to "Accepted" if
+further work needs to be done.
 
 If you're looking to become a member of the `triage & review team
 <https://www.djangoproject.com/foundation/teams/#triage-review-team>`_, doing
