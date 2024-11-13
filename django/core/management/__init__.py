@@ -254,16 +254,9 @@ class ManagementUtility:
         try:
             app_name = commands[subcommand]
         except KeyError:
-            if os.environ.get("DJANGO_SETTINGS_MODULE"):
-                if self.settings_exception:
-                    sys.stderr.write(str(self.settings_exception) + "\n")
-                    sys.exit(1)
-                else:
-                    # If `subcommand` is missing due to misconfigured settings, the
-                    # following line will retrigger an ImproperlyConfigured exception
-                    # (get_commands() swallows the original one) so the user is
-                    # informed about it.
-                    settings.INSTALLED_APPS
+            if os.environ.get("DJANGO_SETTINGS_MODULE") and self.settings_exception:
+                sys.stderr.write(str(self.settings_exception) + "\n")
+                sys.exit(1)
             elif not settings.configured:
                 sys.stderr.write("No Django settings specified.\n")
             possible_matches = get_close_matches(subcommand, commands)
