@@ -294,6 +294,16 @@ Requests and Responses
 * The new :meth:`.HttpRequest.get_preferred_type` method can be used to query
   the preferred media type the client accepts.
 
+* The new ``preserve_request`` argument for
+  :class:`~django.http.HttpResponseRedirect` and
+  :class:`~django.http.HttpResponsePermanentRedirect`
+  determines whether the HTTP status codes 302/307 or 301/308 are used,
+  respectively.
+
+* The new ``preserve_request`` argument for
+  :func:`~django.shortcuts.redirect` allows to instruct the user agent to reuse
+  the HTTP method and body during redirection using specific status codes.
+
 Security
 ~~~~~~~~
 

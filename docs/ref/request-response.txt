@@ -1070,18 +1070,32 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
     (e.g. ``'https://www.yahoo.com/search/'``), an absolute path with no domain
     (e.g. ``'/search/'``), or even a relative path (e.g. ``'search/'``). In that
     last case, the client browser will reconstruct the full URL itself
-    according to the current path. See :class:`HttpResponse` for other optional
-    constructor arguments. Note that this returns an HTTP status code 302.
+    according to the current path.
+
+    The constructor accepts an optional ``preserve_request`` keyword argument
+    that defaults to ``False``, producing a response with a 302 status code. If
+    ``preserve_request`` is ``True``, the status code will be 307 instead.
+
+    See :class:`HttpResponse` for other optional constructor arguments.
 
     .. attribute:: HttpResponseRedirect.url
 
         This read-only attribute represents the URL the response will redirect
         to (equivalent to the ``Location`` response header).
 
+    .. versionchanged:: 5.2
+
+        The ``preserve_request`` argument was added.
+
 .. class:: HttpResponsePermanentRedirect
 
     Like :class:`HttpResponseRedirect`, but it returns a permanent redirect
     (HTTP status code 301) instead of a "found" redirect (status code 302).
+    When ``preserve_request=True``, the response's status code is 308.
+
+    .. versionchanged:: 5.2
+
+        The ``preserve_request`` argument was added.
 
 .. class:: HttpResponseNotModified
 
