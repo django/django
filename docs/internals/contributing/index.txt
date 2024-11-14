@@ -26,11 +26,6 @@ a great ecosystem to work in:
   place to ask and answer any questions related to installing, using, or
   contributing to Django.
 
-* Join the |django-users| mailing list and answer questions. This
-  mailing list has a huge audience, and we really want to maintain a
-  friendly and helpful atmosphere. If you're new to the Django community,
-  you should read the `posting guidelines`_.
-
 * Join the `Django Discord server`_ or the `#django IRC channel`_ on
   Libera.Chat to discuss and answer questions. By explaining Django to other
   users, you're going to learn a lot about the framework yourself.

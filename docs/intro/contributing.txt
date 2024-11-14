@@ -41,7 +41,7 @@ so that it can be of use to the widest audience.
 .. admonition:: Where to get help:
 
     If you're having trouble going through this tutorial, please post a message
-    on the `Django Forum`_, |django-developers|, or drop by
+    on the `Django Forum`_, or drop by
     `#django-dev on irc.libera.chat`__ to chat with other Django users who
     might be able to help.
 
