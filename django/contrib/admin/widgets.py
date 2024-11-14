@@ -27,8 +27,6 @@ class FilteredSelectMultiple(forms.SelectMultiple):
     catalog has been loaded in the page
     """
 
-    use_fieldset = True
-
     class Media:
         js = [
             "admin/js/core.js",
@@ -52,7 +50,6 @@ class FilteredSelectMultiple(forms.SelectMultiple):
 
 
 class BaseAdminDateWidget(forms.DateInput):
-    use_fieldset = True
 
     class Media:
         js = [
@@ -70,7 +67,6 @@ class AdminDateWidget(BaseAdminDateWidget):
 
 
 class BaseAdminTimeWidget(forms.TimeInput):
-    use_fieldset = True
 
     class Media:
         js = [
@@ -92,7 +88,6 @@ class AdminSplitDateTime(forms.SplitDateTimeWidget):
     A SplitDateTime Widget that has some admin-specific styling.
     """
 
-    use_fieldset = True
     template_name = "admin/widgets/split_datetime.html"
 
     def __init__(self, attrs=None):
@@ -109,12 +104,10 @@ class AdminSplitDateTime(forms.SplitDateTimeWidget):
 
 
 class AdminRadioSelect(forms.RadioSelect):
-    use_fieldset = True
     template_name = "admin/widgets/radio.html"
 
 
 class AdminFileWidget(forms.ClearableFileInput):
-    use_fieldset = True
     template_name = "admin/widgets/clearable_file_input.html"
 
 
@@ -144,7 +137,6 @@ class ForeignKeyRawIdWidget(forms.TextInput):
     in a <select> box.
     """
 
-    use_fieldset = True
     template_name = "admin/widgets/foreign_key_raw_id.html"
 
     def __init__(self, rel, admin_site, attrs=None, using=None):
@@ -373,28 +365,24 @@ class RelatedFieldWidgetWrapper(forms.Widget):
 
 
 class AdminTextareaWidget(forms.Textarea):
-    use_fieldset = True
 
     def __init__(self, attrs=None):
         super().__init__(attrs={"class": "vLargeTextField", **(attrs or {})})
 
 
 class AdminTextInputWidget(forms.TextInput):
-    use_fieldset = True
 
     def __init__(self, attrs=None):
         super().__init__(attrs={"class": "vTextField", **(attrs or {})})
 
 
 class AdminEmailInputWidget(forms.EmailInput):
-    use_fieldset = True
 
     def __init__(self, attrs=None):
         super().__init__(attrs={"class": "vTextField", **(attrs or {})})
 
 
 class AdminURLFieldWidget(forms.URLInput):
-    use_fieldset = True
     template_name = "admin/widgets/url.html"
 
     def __init__(self, attrs=None, validator_class=URLValidator):
@@ -418,7 +406,6 @@ class AdminURLFieldWidget(forms.URLInput):
 
 
 class AdminIntegerFieldWidget(forms.NumberInput):
-    use_fieldset = True
     class_name = "vIntegerField"
 
     def __init__(self, attrs=None):
@@ -430,7 +417,6 @@ class AdminBigIntegerFieldWidget(AdminIntegerFieldWidget):
 
 
 class AdminUUIDInputWidget(forms.TextInput):
-    use_fieldset = True
 
     def __init__(self, attrs=None):
         super().__init__(attrs={"class": "vUUIDField", **(attrs or {})})
@@ -619,10 +605,8 @@ class AutocompleteMixin:
 
 
 class AutocompleteSelect(AutocompleteMixin, forms.Select):
-    use_fieldset = True
     pass
 
 
 class AutocompleteSelectMultiple(AutocompleteMixin, forms.SelectMultiple):
-    use_fieldset = True
     pass

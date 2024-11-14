@@ -173,6 +173,7 @@ class AdminField:
         self.is_first = is_first  # Whether this field is first on the line
         self.is_checkbox = isinstance(self.field.field.widget, forms.CheckboxInput)
         self.is_readonly = False
+        self.is_fieldset = self.field.field.widget.use_fieldset
 
     def label_tag(self):
         classes = []
@@ -185,12 +186,14 @@ class AdminField:
         if not self.is_first:
             classes.append("inline")
         attrs = {"class": " ".join(classes)} if classes else {}
+        tag = "legend" if self.is_fieldset else None
         # checkboxes should not have a label suffix as the checkbox appears
         # to the left of the label.
         return self.field.label_tag(
             contents=mark_safe(contents),
             attrs=attrs,
             label_suffix="" if self.is_checkbox else None,
+            tag=tag,
         )
 
     def errors(self):
