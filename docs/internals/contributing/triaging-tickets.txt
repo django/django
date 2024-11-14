@@ -23,7 +23,7 @@ mistakes. Trac is "mostly accurate", and we give allowances for the fact that
 sometimes it will be wrong. That's okay. We're perfectionists with deadlines.
 
 We rely on the community to keep participating, keep tickets as accurate as
-possible, and raise issues for discussion on the `Django Forum`_ when there is
+possible, and raise issues for discussion on the |django-forum| when there is
 confusion or disagreement.
 
 Django is a community project, and every contribution helps. We can't do this
@@ -306,7 +306,7 @@ A ticket can be resolved in a number of ways:
 * wontfix
       Used when someone decides that the request isn't appropriate for
       consideration in Django. Sometimes a ticket is closed as "wontfix" with a
-      request for the reporter to start a discussion on the `Django Forum`_ if
+      request for the reporter to start a discussion on the |django-forum| if
       they feel differently from the rationale provided by the person who
       closed the ticket. Other times, a discussion precedes the decision to
       close a ticket. Always use the forum to get a consensus before reopening
@@ -330,7 +330,7 @@ If you believe that the ticket was closed in error -- because you're
 still having the issue, or it's popped up somewhere else, or the triagers have
 made a mistake -- please reopen the ticket and provide further information.
 Again, please do not reopen tickets that have been marked as "wontfix" and
-bring the issue to the `Django Forum`_ instead.
+bring the issue to the |django-forum| instead.
 
 .. _how-can-i-help-with-triaging:
 
@@ -351,7 +351,7 @@ Then, you can help out by:
 
 * Closing "Unreviewed" tickets as "needsinfo" when the description is too
   sparse to be actionable, or when they're feature requests requiring a
-  discussion on the `Django Forum`_.
+  discussion on the |django-forum|.
 
 * Correcting the "Needs tests", "Needs documentation", or "Has patch"
   flags for tickets where they are incorrectly set.
@@ -369,7 +369,7 @@ Then, you can help out by:
   reports about a particular part of Django, it may indicate we should
   consider refactoring that part of the code. If a trend is emerging,
   you should raise it for discussion (referencing the relevant tickets)
-  on the `Django Forum`_.
+  on the |django-forum|.
 
 * Verify if solutions submitted by others are correct. If they are correct
   and also contain appropriate documentation and tests then move them to the
@@ -396,18 +396,17 @@ the ticket database:
   review a patch that you submit.
 
 * Please **don't** reverse a decision without posting a message to the
-  `Django Forum`_ to find consensus.
+  |django-forum| to find consensus.
 
 * If you're unsure if you should be making a change, don't make the
   change but instead leave a comment with your concerns on the ticket,
-  or post a message to the `Django Forum`_. It's okay to be unsure, but your
+  or post a message to the |django-forum|. It's okay to be unsure, but your
   input is still valuable.
 
 .. _Trac: https://code.djangoproject.com/
 .. _`easy pickings`: https://code.djangoproject.com/query?status=!closed&easy=1
 .. _`creating an account on Trac`: https://www.djangoproject.com/accounts/register/
 .. _password reset page: https://www.djangoproject.com/accounts/password/reset/
-.. _Django Forum: https://forum.djangoproject.com/
 
 Bisecting a regression
 ======================
