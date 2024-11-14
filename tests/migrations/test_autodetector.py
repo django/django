@@ -2511,7 +2511,7 @@ class AutodetectorTests(BaseAutodetectorTests):
         )
         self.assertOperationTypes(changes, "testapp", 1, ["DeleteModel"])
 
-    def test_move_inherited_models(self):
+    def test_move_mti_models_operations(self):
         before = [self.author_name, self.aardvark_based_on_author]
         after = [
             ModelState(
