@@ -49,7 +49,7 @@ installation, usage, or debugging of Django.
 
 * `django-users mailing archive`_
 
-.. _django-users posting email: mailto:django-users@googlegroups.com
+.. _django-users mailing archive: https://groups.google.com/g/django-users
 
 .. _django-developers-mailing-list:
 
