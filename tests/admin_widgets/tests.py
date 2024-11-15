@@ -959,7 +959,7 @@ class RelatedFieldWidgetWrapperTests(SimpleTestCase):
           <a class="related-widget-wrapper-link add-related" id="add_id_stream"
              data-popup="yes" title="Add another release event"
              href="/admin_widgets/releaseevent/add/?_to_field=album&amp;_popup=1">
-            <img src="/static/admin/img/icon-addlink.svg" alt="" width="20" height="20">
+            <img src="/static/admin/img/icon-addlink.svg" alt="" width="24" height="24">
           </a>
         </div>
         """
