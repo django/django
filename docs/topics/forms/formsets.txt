@@ -571,14 +571,12 @@ happen when the user changes these values:
     ...         {"title": "Article #2", "pub_date": datetime.date(2008, 5, 11)},
     ...     ],
     ... )
-    >>> formset.is_valid()
-    True
     >>> for form in formset.ordered_forms:
     ...     print(form.cleaned_data)
     ...
-    {'pub_date': datetime.date(2008, 5, 1), 'ORDER': 0, 'title': 'Article #3'}
-    {'pub_date': datetime.date(2008, 5, 11), 'ORDER': 1, 'title': 'Article #2'}
-    {'pub_date': datetime.date(2008, 5, 10), 'ORDER': 2, 'title': 'Article #1'}
+    {'title': 'Article #3', 'pub_date': datetime.date(2008, 5, 1), 'ORDER': 0}
+    {'title': 'Article #2', 'pub_date': datetime.date(2008, 5, 11), 'ORDER': 1}
+    {'title': 'Article #1', 'pub_date': datetime.date(2008, 5, 10), 'ORDER': 2}
 
 :class:`~django.forms.formsets.BaseFormSet` also provides an
 :attr:`~django.forms.formsets.BaseFormSet.ordering_widget` attribute and
@@ -690,7 +688,7 @@ delete fields you can access them with ``deleted_forms``:
     ...     ],
     ... )
     >>> [form.cleaned_data for form in formset.deleted_forms]
-    [{'DELETE': True, 'pub_date': datetime.date(2008, 5, 10), 'title': 'Article #1'}]
+    [{'title': 'Article #1', 'pub_date': datetime.date(2008, 5, 10), 'DELETE': True}]
 
 If you are using a :class:`ModelFormSet<django.forms.models.BaseModelFormSet>`,
 model instances for deleted forms will be deleted when you call
