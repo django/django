@@ -220,19 +220,21 @@ fieldset .fieldBox {
 }
 
 .selector-add {
-  background: url(../img/selector-icons.svg) 0 -64px no-repeat;
+    background: url(../img/selector-icons.svg) 0 -96px no-repeat;
+    background-size: 24px auto;
 }
 
 .active.selector-add:focus, .active.selector-add:hover {
-  background-position: 0 -80px;
+    background-position: 0 -120px;
 }
 
 .selector-remove {
-  background: url(../img/selector-icons.svg) 0 -96px no-repeat;
+    background: url(../img/selector-icons.svg) 0 -144px no-repeat;
+    background-size: 24px auto;
 }
 
 .active.selector-remove:focus, .active.selector-remove:hover {
-  background-position: 0 -112px;
+    background-position: 0 -168px;
 }
 
 .selector-chooseall {

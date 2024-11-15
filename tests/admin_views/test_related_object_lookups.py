@@ -36,8 +36,8 @@ class SeleniumTests(AdminSeleniumTestCase):
                     By.XPATH, f'//*[@id="{link_id}"]/img'
                 )
                 self.assertEqual(link_image.get_attribute("alt"), "")
-                self.assertEqual(link_image.get_attribute("width"), "20")
-                self.assertEqual(link_image.get_attribute("height"), "20")
+                self.assertEqual(link_image.get_attribute("width"), "24")
+                self.assertEqual(link_image.get_attribute("height"), "24")
 
     def test_related_object_lookup_link_initial_state(self):
         from selenium.webdriver.common.by import By
