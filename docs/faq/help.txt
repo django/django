@@ -50,9 +50,6 @@ If nobody has answered your question, it may be because nobody knows the
 answer, it may be because nobody can understand the question, or it may be that
 everybody that can help is busy.
 
-You can also try asking on a different channel. But please don't post your
-question in all three channels in quick succession.
-
 I think I've found a bug! What should I do?
 ===========================================
 
