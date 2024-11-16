@@ -1005,10 +1005,11 @@ deal with the management form:
 The above ends up calling the :meth:`BaseFormSet.render` method on the formset
 class. This renders the formset using the template specified by the
 :attr:`~BaseFormSet.template_name` attribute. Similar to forms, by default the
-formset will be rendered ``as_table``, with other helper methods of ``as_p``
-and ``as_ul`` being available. The rendering of the formset can be customized
-by specifying the ``template_name`` attribute, or more generally by
-:ref:`overriding the default template <overriding-built-in-formset-templates>`.
+formset will be rendered ``as_div``, with other helper methods of ``as_p``,
+``as_ul``, and ``as_table`` being available. The rendering of the formset can
+be customized by specifying the ``template_name`` attribute, or more generally
+by :ref:`overriding the default template
+<overriding-built-in-formset-templates>`.
 
 .. _manually-rendered-can-delete-and-can-order:
 
