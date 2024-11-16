@@ -4011,6 +4011,38 @@ class OperationTests(OperationTestBase):
         # Ensure the index is still there
         self.assertIndexExists("test_alflin_pony", ["pink"])
 
+    def test_historical_index_together(self):
+        app_label = "test"
+        operations = [
+            migrations.CreateModel(
+                "Author",
+                fields=[
+                    ("id", models.AutoField(primary_key=True)),
+                    ("first_name", models.CharField(max_length=100)),
+                    ("last_name", models.CharField(max_length=100)),
+                ],
+                options={
+                    "index_together": {("first_name", "last_name")},
+                },
+            ),
+        ]
+        state = self.apply_operations(app_label, ProjectState(), operations)
+        self.assertIndexExists("test_author", ("first_name", "last_name"))
+        operations = [
+            migrations.AlterIndexTogether("Author", {("last_name", "first_name")})
+        ]
+        state = self.apply_operations(app_label, state, operations)
+        self.assertIndexExists("test_author", ("last_name", "first_name"))
+        self.assertIndexNotExists("test_author", ("first_name", "last_name"))
+        operations = [
+            migrations.AlterIndexTogether(
+                "Author",
+                None,
+            )
+        ]
+        state = self.apply_operations(app_label, state, operations)
+        self.assertIndexNotExists("test_author", ("last_name", "first_name"))
+
     def test_alter_index_together_remove(self):
         operation = migrations.AlterIndexTogether("Pony", None)
         self.assertEqual(
