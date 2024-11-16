@@ -137,7 +137,7 @@ one that it is comfortable to code for.
 
     Firstly, in a real-life case you need to consider what is happening before
     and after your count to work out what's an optimal way of doing it *in that
-    particular context*. The database optimization documents describes :ref:`a
+    particular context*. The database optimization document describes :ref:`a
     case where counting in the template would be better
     <overuse_of_count_and_exists>`.
 
