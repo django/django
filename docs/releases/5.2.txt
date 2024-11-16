@@ -48,8 +48,8 @@ Minor features
   format ``:role:`link text <link>```. See :ref:`documentation helpers
   <admindocs-helpers>` for more details.
 
-* The :ref:`model pages <admindocs-model-reference>` are now restricted to only
-  allow access to users with the corresponding model view or change permissions.
+* The :ref:`model pages <admindocs-model-reference>` are now restricted to
+  users with the corresponding view or change permissions.
 
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -83,8 +83,8 @@ Minor features
 
 * Auth backends can now provide async implementations which are used when
   calling async auth functions (e.g.
-  :func:`~.django.contrib.auth.aauthenticate`) to reduce context-switching which
-  improves performance. See :ref:`adding an async interface
+  :func:`~.django.contrib.auth.aauthenticate`) to reduce context-switching
+  which improves performance. See :ref:`adding an async interface
   <writing-authentication-backends-async-interface>` for more details.
 
 * The :ref:`password validator classes <included-password-validators>`
@@ -246,10 +246,9 @@ Logging
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
-* A new warning is printed to the console when running :djadmin:`runserver` that
-  ``runserver`` is unsuitable for production. This warning can be hidden by
-  setting the :envvar:`HIDE_PRODUCTION_WARNING` environment variable to
-  ``"true"``.
+* A new warning is displayed when running :djadmin:`runserver`, indicating that
+  it is unsuitable for production. This warning can be suppressed by setting
+  the :envvar:`HIDE_PRODUCTION_WARNING` environment variable to ``"true"``.
 
 * The :djadmin:`makemigrations` and :djadmin:`migrate` commands  have a new
   ``Command.autodetector`` attribute for subclasses to override in order to use
@@ -263,13 +262,11 @@ Migrations
 Models
 ~~~~~~
 
-* The ``SELECT`` clause generated when using
-  :meth:`QuerySet.values()<django.db.models.query.QuerySet.values>` and
-  :meth:`~django.db.models.query.QuerySet.values_list` now matches the
-  specified order of the referenced expressions. Previously the order was based
-  of a set of counterintuitive rules which made query combination through
-  methods such as
-  :meth:`QuerySet.union()<django.db.models.query.QuerySet.union>` unpredictable.
+* The ``SELECT`` clause generated when using :meth:`.QuerySet.values` and
+  :meth:`.QuerySet.values_list` now matches the specified order of the
+  referenced expressions. Previously, the order was based of a set of
+  counterintuitive rules which made query combination through methods such as
+  :meth:`.QuerySet.union` unpredictable.
 
 * Added support for validation of model constraints which use a
   :class:`~django.db.models.GeneratedField`.
@@ -288,8 +285,8 @@ Models
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
-* The new :attr:`.HttpResponse.text` property provides the string representation
-  of :attr:`.HttpResponse.content`.
+* The new :attr:`.HttpResponse.text` property provides the string
+  representation of :attr:`.HttpResponse.content`.
 
 * The new :meth:`.HttpRequest.get_preferred_type` method can be used to query
   the preferred media type the client accepts.
@@ -396,13 +393,13 @@ Miscellaneous
 
 * The minimum supported version of ``gettext`` is increased from 0.15 to 0.19.
 
-* ``HttpRequest.accepted_types`` is now sorted by the client's preference, based
-  on the request's ``Accept`` header.
+* ``HttpRequest.accepted_types`` is now sorted by the client's preference,
+  based on the request's ``Accept`` header.
 
-* :attr:`.UniqueConstraint.violation_error_code` and
+* The attributes :attr:`.UniqueConstraint.violation_error_code` and
   :attr:`.UniqueConstraint.violation_error_message` are now always used when
-  provided. Previously, these were ignored when :attr:`.UniqueConstraint.fields`
-  were set without a :attr:`.UniqueConstraint.condition`.
+  provided. Previously, they were ignored if :attr:`.UniqueConstraint.fields`
+  was set without a :attr:`.UniqueConstraint.condition`.
 
 * The :func:`~django.template.context_processors.debug` context processor is no
   longer included in the default project template.
