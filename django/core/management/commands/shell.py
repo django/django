@@ -2,9 +2,12 @@ import os
 import select
 import sys
 import traceback
+import importlib
 
 from django.core.management import BaseCommand, CommandError
 from django.utils.datastructures import OrderedSet
+from django.apps import apps
+import django
 
 
 class Command(BaseCommand):
@@ -46,12 +49,10 @@ class Command(BaseCommand):
 
     def ipython(self, options):
         from IPython import start_ipython
-
         start_ipython(argv=[])
 
     def bpython(self, options):
         import bpython
-
         bpython.embed()
 
     def python(self, options):
@@ -60,8 +61,16 @@ class Command(BaseCommand):
         # Set up a dictionary to serve as the environment for the shell.
         imported_objects = {}
 
-        # We want to honor both $PYTHONSTARTUP and .pythonrc.py, so follow system
-        # conventions and get $PYTHONSTARTUP first then .pythonrc.py.
+        # Automatically set up Django environment
+        django.setup()
+
+        # Auto-import all models from installed apps
+        self.auto_import_models(imported_objects)
+
+        # Allow users to customize the shell by adding extra imports
+        self.add_custom_imports(imported_objects)
+
+        # Honor both $PYTHONSTARTUP and .pythonrc.py, so follow system conventions
         if not options["no_startup"]:
             for pythonrc in OrderedSet(
                 [os.environ.get("PYTHONSTARTUP"), os.path.expanduser("~/.pythonrc.py")]
@@ -72,29 +81,21 @@ class Command(BaseCommand):
                     continue
                 with open(pythonrc) as handle:
                     pythonrc_code = handle.read()
-                # Match the behavior of the cpython shell where an error in
-                # PYTHONSTARTUP prints an exception and continues.
                 try:
                     exec(compile(pythonrc_code, pythonrc, "exec"), imported_objects)
                 except Exception:
                     traceback.print_exc()
 
-        # By default, this will set up readline to do tab completion and to read and
-        # write history to the .python_history file, but this can be overridden by
-        # $PYTHONSTARTUP or ~/.pythonrc.py.
+        # By default, this will set up readline for tab completion and to read and
+        # write history to the .python_history file.
         try:
             hook = sys.__interactivehook__
         except AttributeError:
-            # Match the behavior of the cpython shell where a missing
-            # sys.__interactivehook__ is ignored.
             pass
         else:
             try:
                 hook()
             except Exception:
-                # Match the behavior of the cpython shell where an error in
-                # sys.__interactivehook__ prints a warning and the exception
-                # and continues.
                 print("Failed calling sys.__interactivehook__")
                 traceback.print_exc()
 
@@ -108,8 +109,51 @@ class Command(BaseCommand):
         except ImportError:
             pass
 
-        # Start the interactive interpreter.
+        # Start the interactive interpreter with auto-imported models and custom imports.
         code.interact(local=imported_objects)
+
+    def auto_import_models(self, imported_objects):
+        """Auto-import all models from installed Django apps."""
+        for app_config in apps.get_app_configs():
+            try:
+                if hasattr(app_config.module, 'models'):
+                    models_module = app_config.module.models
+                    self.import_models_from_module(models_module, app_config.label, 
+                                                    imported_objects)
+            except ModuleNotFoundError:
+                pass
+
+    def import_models_from_module(self, models_module, app_name, imported_objects):
+        """Imports models from the module and handles name collisions."""
+        try:
+            # Dynamically import models module
+            models = importlib.import_module(f'{models_module.__name__}')
+            for model_name, model in vars(models).items():
+                if hasattr(model, '_meta'):
+                    # Create a unique key for the model to avoid name collision
+                    unique_name = f"{app_name}_{model_name}"
+                    imported_objects[unique_name] = model
+                    imported_objects.update(
+                        {model.__name__: model for model in vars(models_module).values() 
+                         if hasattr(model, '_meta')}
+                    )
+                    print(f"Auto-imported model {model_name} from {app_name}")
+        except ImportError as e:
+            print(f"Failed to import models from {app_name}: {e}")
+
+    def add_custom_imports(self, imported_objects):
+        """
+        Allow users to customize the shell by adding extra methods or classes.
+        Users can subclass this command and override this method to add their own imports.
+        """
+        # Example custom import (Users can override this method to add their own)
+        try:
+            # Importing any additional utilities or classes
+            from datetime import datetime
+            imported_objects['datetime'] = datetime
+            print("Auto-imported custom utilities (e.g., datetime)")
+        except ImportError:
+            pass
 
     def handle(self, **options):
         # Execute the command and exit.
@@ -118,7 +162,6 @@ class Command(BaseCommand):
             return
 
         # Execute stdin if it has anything to read and exit.
-        # Not supported on Windows due to select.select() limitations.
         if (
             sys.platform != "win32"
             and not sys.stdin.isatty()
@@ -136,4 +179,4 @@ class Command(BaseCommand):
                 return getattr(self, shell)(options)
             except ImportError:
                 pass
-        raise CommandError("Couldn't import {} interface.".format(shell))
+        raise CommandError(f"Couldn't import {options['interface']} interface.")
