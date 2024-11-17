@@ -1688,7 +1688,7 @@ class SQLInsertCompiler(SQLCompiler):
     returning_fields = None
     returning_params = ()
 
-    def field_as_sql(self, field, val):
+    def field_as_sql(self, field, get_placeholder, val):
         """
         Take a field and a value intended to be saved on that field, and
         return placeholder SQL and accompanying params. Check for raw values,
@@ -1703,10 +1703,10 @@ class SQLInsertCompiler(SQLCompiler):
         elif hasattr(val, "as_sql"):
             # This is an expression, let's compile it.
             sql, params = self.compile(val)
-        elif hasattr(field, "get_placeholder"):
+        elif get_placeholder is not None:
             # Some fields (e.g. geo fields) need special munging before
             # they can be inserted.
-            sql, params = field.get_placeholder(val, self, self.connection), [val]
+            sql, params = get_placeholder(val, self, self.connection), [val]
         else:
             # Return the common case for the placeholder
             sql, params = "%s", [val]
@@ -1775,8 +1775,12 @@ class SQLInsertCompiler(SQLCompiler):
 
         # list of (sql, [params]) tuples for each object to be saved
         # Shape: [n_objs][n_fields][2]
+        get_placeholders = [getattr(field, "get_placeholder", None) for field in fields]
         rows_of_fields_as_sql = (
-            (self.field_as_sql(field, v) for field, v in zip(fields, row))
+            (
+                self.field_as_sql(field, get_placeholder, value)
+                for field, get_placeholder, value in zip(fields, get_placeholders, row)
+            )
             for row in value_rows
         )
 
