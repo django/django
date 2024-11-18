@@ -61,10 +61,27 @@ class QuestionerHelperMethodsTests(SimpleTestCase):
         )
 
     @mock.patch("builtins.input", side_effect=["bad code", "exit"])
-    def test_questioner_no_default_bad_user_entry_code(self, mock_input):
+    def test_questioner_no_default_syntax_error(self, mock_input):
         with self.assertRaises(SystemExit):
             self.questioner._ask_default()
-        self.assertIn("Invalid input: ", self.prompt.getvalue())
+        self.assertIn("SyntaxError: invalid syntax", self.prompt.getvalue())
+
+    @mock.patch("builtins.input", side_effect=["datetim", "exit"])
+    def test_questioner_no_default_name_error(self, mock_input):
+        with self.assertRaises(SystemExit):
+            self.questioner._ask_default()
+        self.assertIn(
+            "NameError: name 'datetim' is not defined", self.prompt.getvalue()
+        )
+
+    @mock.patch("builtins.input", side_effect=["datetime.dat", "exit"])
+    def test_questioner_no_default_attribute_error(self, mock_input):
+        with self.assertRaises(SystemExit):
+            self.questioner._ask_default()
+        self.assertIn(
+            "AttributeError: module 'datetime' has no attribute 'dat'",
+            self.prompt.getvalue(),
+        )
 
     @mock.patch("builtins.input", side_effect=[KeyboardInterrupt()])
     def test_questioner_no_default_keyboard_interrupt(self, mock_input):
