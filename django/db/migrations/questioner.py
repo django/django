@@ -160,8 +160,8 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
             else:
                 try:
                     return eval(code, {}, {"datetime": datetime, "timezone": timezone})
-                except (SyntaxError, NameError) as e:
-                    self.prompt_output.write("Invalid input: %s" % e)
+                except Exception as e:
+                    self.prompt_output.write(f"{e.__class__.__name__}: {e}")
 
     def ask_not_null_addition(self, field_name, model_name):
         """Adding a NOT NULL field to a model."""
