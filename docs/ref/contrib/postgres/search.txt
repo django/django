@@ -94,16 +94,22 @@ Examples:
 
 .. _Full Text Search docs: https://www.postgresql.org/docs/current/textsearch-controls.html#TEXTSEARCH-PARSING-QUERIES
 
-    >>> from django.contrib.postgres.search import SearchQuery, Lexeme
-    >>> SearchQuery('red tomato')  # two keywords
-    >>> SearchQuery('tomato red')  # same results as above
-    >>> SearchQuery('red tomato', search_type='phrase')  # a phrase
-    >>> SearchQuery('tomato red', search_type='phrase')  # a different phrase
-    >>> SearchQuery("'tomato' & ('red' | 'green')", search_type='raw')  # boolean operators
-    >>> SearchQuery("'tomato' ('red' OR 'green')", search_type='websearch')  # websearch operators
-    >>> SearchQuery(Lexeme('tomato') & (Lexeme('red') | Lexeme('green')))  # Lexeme objects
+.. code-block:: pycon
 
-``SearchQuery`` terms can be combined logically to provide more flexibility::
+    >>> from django.contrib.postgres.search import SearchQuery, Lexeme
+    >>> SearchQuery("red tomato")  # two keywords
+    >>> SearchQuery("tomato red")  # same results as above
+    >>> SearchQuery("red tomato", search_type="phrase")  # a phrase
+    >>> SearchQuery("tomato red", search_type="phrase")  # a different phrase
+    >>> SearchQuery("'tomato' & ('red' | 'green')", search_type="raw")  # boolean operators
+    >>> SearchQuery(
+    ...     "'tomato' ('red' OR 'green')", search_type="websearch"
+    ... )  # websearch operators
+    >>> SearchQuery(Lexeme("tomato") & (Lexeme("red") | Lexeme("green")))  # Lexeme objects
+
+``SearchQuery`` terms can be combined logically to provide more flexibility:
+
+.. code-block:: pycon
 
     >>> from django.contrib.postgres.search import SearchQuery
     >>> SearchQuery("red tomato")  # two keywords
@@ -293,17 +299,27 @@ untrusted source. The content of each lexeme is escaped so that any operators th
 exist in the string itself will not be interpreted.
 
 You can combine lexemes with other lexemes in Python using the ``&`` and ``|``
-operators and also negate them with the ``~`` operator. For example::
+operators and also negate them with the ``~`` operator. For example:
+
+.. code-block:: pycon
 
     >>> from django.contrib.postgres.search import SearchQuery, Lexeme
-    >>> SearchRank(Lexeme("The user's search query") & Lexeme("Something else") & ~Lexeme("Exclude documents that match this"))
+    >>> SearchRank(
+    ...     Lexeme("The user's search query")
+    ...     & Lexeme("Something else")
+    ...     & ~Lexeme("Exclude documents that match this")
+    ... )
     >>> SearchRank(Lexeme("The user's search query") | Lexeme("Something else"))
 
-Lexeme objects also support weighting and prefixes::
+Lexeme objects also support weighting and prefixes:
+
+.. code-block:: pycon
 
     >>> from django.contrib.postgres.search import SearchQuery, Lexeme
-    >>> SearchRank(Lexeme("These terms have lower weight", weight='D') & Lexeme("than these terms")
-    >>> SearchRank(Lexeme("Djan", prefix=True)
+    >>> SearchRank(
+    ...     Lexeme("These terms have lower weight", weight="D") & Lexeme("than these terms")
+    ... )
+    >>> SearchRank(Lexeme("Djan", prefix=True))
 
 Performance
 ===========
