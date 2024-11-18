@@ -66,6 +66,11 @@ class QuestionerHelperMethodsTests(SimpleTestCase):
             self.questioner._ask_default()
         self.assertIn("Invalid input: ", self.prompt.getvalue())
 
+    @mock.patch("builtins.input", side_effect=[KeyboardInterrupt()])
+    def test_questioner_no_default_keyboard_interrupt(self, mock_input):
+        with self.assertRaises(KeyboardInterrupt):
+            self.questioner._ask_default()
+
     @mock.patch("builtins.input", side_effect=["", "n"])
     def test_questioner_no_default_no_user_entry_boolean(self, mock_input):
         value = self.questioner._boolean_input("Proceed?")
