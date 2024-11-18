@@ -1931,6 +1931,105 @@ class SeleniumTests(AdminSeleniumTestCase):
         with self.disable_implicit_wait():
             self.assertCountSeleniumElements(rows_selector, 0)
 
+    def test_delete_multiselect(self):
+        from selenium.webdriver.common.action_chains import ActionChains
+        from selenium.webdriver.common.by import By
+        from selenium.webdriver.common.keys import Keys
+
+        self.admin_login(username="super", password="secret")
+        self.selenium.get(
+            self.live_server_url + reverse("admin:admin_inlines_capofamiglia_add")
+        )
+
+        # Enter some data and click 'Save'
+        self.selenium.find_element(By.ID, "id_name").send_keys("Family Name")
+
+        self.selenium.find_element(By.ID, "id_-1-0-name").send_keys("person name 1 1")
+        self.selenium.find_element(By.ID, "id_-1-1-name").send_keys("person name 1 2")
+        self.selenium.find_element(By.ID, "id_-1-2-name").send_keys("person name 1 3")
+        self.selenium.find_element(By.ID, "id_-2-0-name").send_keys("person name 2 1")
+        self.selenium.find_element(By.ID, "id_-2-1-name").send_keys("person name 2 2")
+        self.selenium.find_element(By.ID, "id_-2-2-name").send_keys("person name 2 3")
+        with self.wait_page_loaded():
+            self.selenium.find_element(
+                By.XPATH, '//input[@value="Save and continue editing"]'
+            ).click()
+
+        delete_1_0 = self.selenium.find_element(By.ID, "id_-1-0-DELETE")
+        delete_1_1 = self.selenium.find_element(By.ID, "id_-1-1-DELETE")
+        delete_1_2 = self.selenium.find_element(By.ID, "id_-1-2-DELETE")
+
+        self.assertFalse(delete_1_1.get_property("checked"))
+
+        actions = ActionChains(self.selenium)
+        actions.move_to_element(delete_1_0)
+        actions.key_down(Keys.SHIFT)
+        actions.click()
+        actions.move_to_element(delete_1_2)
+        actions.click()
+        actions.key_up(Keys.SHIFT)
+        actions.perform()
+        self.assertTrue(delete_1_1.get_property("checked"))
+
+        actions.move_to_element(delete_1_2)
+        actions.key_down(Keys.SHIFT)
+        actions.click()
+        actions.move_to_element(delete_1_0)
+        actions.click()
+        actions.key_up(Keys.SHIFT)
+        actions.perform()
+        self.assertFalse(delete_1_1.get_property("checked"))
+
+        delete_2_0 = self.selenium.find_element(By.ID, "id_-2-0-DELETE")
+        delete_2_1 = self.selenium.find_element(By.ID, "id_-2-1-DELETE")
+        delete_2_2 = self.selenium.find_element(By.ID, "id_-2-2-DELETE")
+        self.selenium.execute_script(
+            "window.scrollTo(0, %s);" % delete_1_0.location["y"]
+        )
+        actions.key_down(Keys.SHIFT)
+        actions.move_to_element(delete_1_0)
+        actions.click()
+        actions.perform()
+
+        self.selenium.execute_script(
+            "window.scrollTo(0, %s);" % delete_2_2.location["y"]
+        )
+        actions.key_down(Keys.SHIFT)
+        actions.move_to_element(delete_2_2)
+        actions.click()
+        actions.perform()
+
+        self.assertTrue(delete_1_0.get_property("checked"))
+        self.assertFalse(delete_1_1.get_property("checked"))
+        self.assertFalse(delete_1_2.get_property("checked"))
+        self.assertFalse(delete_2_0.get_property("checked"))
+        self.assertFalse(delete_2_1.get_property("checked"))
+        self.assertTrue(delete_2_2.get_property("checked"))
+
+        self.selenium.execute_script(
+            "window.scrollTo(0, %s);" % delete_1_0.location["y"]
+        )
+        actions.move_to_element(delete_1_0)
+        actions.key_down(Keys.SHIFT)
+        actions.click()
+        actions.move_to_element(delete_1_2)
+        actions.click()
+        actions.key_up(Keys.SHIFT)
+        actions.perform()
+        self.selenium.execute_script(
+            "window.scrollTo(0, %s);" % delete_2_0.location["y"]
+        )
+        actions.move_to_element(delete_2_0)
+        actions.key_down(Keys.SHIFT)
+        actions.click()
+        actions.move_to_element(delete_2_1)
+        actions.click()
+        actions.key_up(Keys.SHIFT)
+        actions.perform()
+
+        with self.wait_page_loaded():
+            self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
+
     def test_delete_invalid_stacked_inlines(self):
         from selenium.common.exceptions import NoSuchElementException
         from selenium.webdriver.common.by import By
