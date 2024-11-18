@@ -39,6 +39,10 @@ class SlugConverter(StringConverter):
     regex = "[-a-zA-Z0-9_]+"
 
 
+class IrSlugConverter(StringConverter):
+    regex = "[-a-zA-Z0-9_\u0600-\u06FF]+"
+
+
 class PathConverter(StringConverter):
     regex = ".+"
 
@@ -47,6 +51,7 @@ DEFAULT_CONVERTERS = {
     "int": IntConverter(),
     "path": PathConverter(),
     "slug": SlugConverter(),
+    "irslug": IrSlugConverter(),
     "str": StringConverter(),
     "uuid": UUIDConverter(),
 }
