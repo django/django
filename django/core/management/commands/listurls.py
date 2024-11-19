@@ -46,7 +46,7 @@ class Command(BaseCommand):
             "-u",
             action="store_true",
             dest="unsorted",
-            help="Filter URLs by the given prefix[es]",
+            help="Show URLs without sorting them alphabetically.",
         )
 
         # Prefix
