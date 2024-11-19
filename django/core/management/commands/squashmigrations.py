@@ -6,6 +6,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.utils import run_formatters
 from django.db import DEFAULT_DB_ALIAS, connections, migrations
+from django.db.migrations.exceptions import CircularDependencyError
 from django.db.migrations.loader import AmbiguityError, MigrationLoader
 from django.db.migrations.migration import SwappableTuple
 from django.db.migrations.optimizer import MigrationOptimizer
@@ -251,6 +252,14 @@ class Command(BaseCommand):
                             '"black" command. You can call it manually.'
                         )
                     )
+
+        try:
+            MigrationLoader(connections[DEFAULT_DB_ALIAS])
+        except CircularDependencyError as e:
+            os.remove(writer.path)
+            raise CommandError(
+                f"Squashed migration would create a circular dependency: {e}"
+            )
 
     def find_migration(self, loader, app_label, name):
         try:
