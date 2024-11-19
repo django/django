@@ -120,6 +120,47 @@ class SimpleTagRegistrationTests(SimpleTestCase):
         self.assertTrue(hasattr(func_wrapped, "cache_info"))
 
 
+class SimpleBlockTagRegistrationTests(SimpleTestCase):
+    def setUp(self):
+        self.library = Library()
+
+    def test_simple_block_tag(self):
+        @self.library.simple_block_tag
+        def func(content):
+            return content
+
+        self.assertIn("func", self.library.tags)
+
+    def test_simple_block_tag_parens(self):
+        @self.library.simple_tag()
+        def func(content):
+            return content
+
+        self.assertIn("func", self.library.tags)
+
+    def test_simple_block_tag_name_kwarg(self):
+        @self.library.simple_block_tag(name="name")
+        def func(content):
+            return content
+
+        self.assertIn("name", self.library.tags)
+
+    def test_simple_block_tag_invalid(self):
+        msg = "Invalid arguments provided to simple_block_tag"
+        with self.assertRaisesMessage(ValueError, msg):
+            self.library.simple_block_tag("invalid")
+
+    def test_simple_tag_wrapped(self):
+        @self.library.simple_block_tag
+        @functools.lru_cache(maxsize=32)
+        def func(content):
+            return content
+
+        func_wrapped = self.library.tags["func"].__wrapped__
+        self.assertIs(func_wrapped, func)
+        self.assertTrue(hasattr(func_wrapped, "cache_info"))
+
+
 class TagRegistrationTests(SimpleTestCase):
     def setUp(self):
         self.library = Library()
