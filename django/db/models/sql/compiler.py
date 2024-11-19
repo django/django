@@ -19,6 +19,7 @@ from django.db.models.sql.constants import (
     MULTI,
     NO_RESULTS,
     ORDER_DIR,
+    ROW_COUNT,
     SINGLE,
 )
 from django.db.models.sql.query import Query, get_order_dir
@@ -1596,15 +1597,15 @@ class SQLCompiler:
     ):
         """
         Run the query against the database and return the result(s). The
-        return value is a single data item if result_type is SINGLE, or an
-        iterator over the results if the result_type is MULTI.
+        return value depends on the value of result_type.
 
-        result_type is either MULTI (use fetchmany() to retrieve all rows),
-        SINGLE (only retrieve a single row), or None. In this last case, the
-        cursor is returned if any query is executed, since it's used by
-        subclasses such as InsertQuery). It's possible, however, that no query
-        is needed, as the filters describe an empty set. In that case, None is
-        returned, to avoid any unnecessary database interaction.
+        When result_type is:
+        - MULTI: Retrieves all rows using fetchmany(). Wraps in an iterator for
+           chunked reads when supported.
+        - SINGLE: Retrieves a single row using fetchone().
+        - ROW_COUNT: Retrieves the number of rows in the result.
+        - CURSOR: Runs the query, and returns the cursor object. It is the
+           caller's responsibility to close the cursor.
         """
         result_type = result_type or NO_RESULTS
         try:
@@ -1627,6 +1628,11 @@ class SQLCompiler:
             cursor.close()
             raise
 
+        if result_type == ROW_COUNT:
+            try:
+                return cursor.rowcount
+            finally:
+                cursor.close()
         if result_type == CURSOR:
             # Give the caller the cursor to process and close.
             return cursor
@@ -2069,19 +2075,19 @@ class SQLUpdateCompiler(SQLCompiler):
         non-empty query that is executed. Row counts for any subsequent,
         related queries are not available.
         """
-        cursor = super().execute_sql(result_type)
-        try:
-            rows = cursor.rowcount if cursor else 0
-            is_empty = cursor is None
-        finally:
-            if cursor:
-                cursor.close()
+        row_count = super().execute_sql(result_type)
+        is_empty = row_count is None
+        row_count = row_count or 0
+
         for query in self.query.get_related_updates():
-            aux_rows = query.get_compiler(self.using).execute_sql(result_type)
-            if is_empty and aux_rows:
-                rows = aux_rows
+            # If the result_type is NO_RESULTS then the aux_row_count is None.
+            aux_row_count = query.get_compiler(self.using).execute_sql(result_type)
+            if is_empty and aux_row_count:
+                # Returns the row count for any related updates as the number of
+                # rows updated.
+                row_count = aux_row_count
                 is_empty = False
-        return rows
+        return row_count
 
     def pre_sql_setup(self):
         """
