@@ -213,14 +213,10 @@ class Command(BaseCommand):
         indent = 4 if pretty else None
 
         # Having keys in the resulting JSON makes it more useful
-        url_pattern_dicts = []
-        for route, view, name in url_patterns:
-            url_pattern_dict = {
-                "route": route,
-                "view": view,
-                "name": name,
-            }
-            url_pattern_dicts.append(url_pattern_dict)
+        url_pattern_dicts = [
+            {"route": route, "view": view, "name": name}
+            for route, view, name in url_patterns
+        ]
 
         return json.dumps(url_pattern_dicts, indent=indent)
 
