@@ -69,11 +69,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        # Make sure the prefixes are a list
         prefixes = options["prefixes"]
-        if prefixes:
-            prefixes = prefixes if isinstance(prefixes, list) else [prefixes]
-
         url_patterns = get_url_patterns(prefixes=prefixes)
 
         if not url_patterns:
