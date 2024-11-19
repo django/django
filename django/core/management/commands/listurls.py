@@ -84,11 +84,13 @@ class Command(BaseCommand):
             url_patterns.sort()
 
         # Apply colors
-        if (
+        self.is_color_enabled = (
             color.supports_color()
             and (not no_color)
             and (format not in COLORLESS_FORMATS)
-        ):
+        )
+
+        if self.is_color_enabled:
             url_patterns = self.apply_color(url_patterns=url_patterns)
 
         # Apply formatting
@@ -140,11 +142,10 @@ class Command(BaseCommand):
             widths.append(len(max(columns, key=len)) + margin)
 
         # Headers
-        headers = (
-            self.style.HEADER("Route"),
-            self.style.HEADER("View"),
-            self.style.HEADER("Name"),
-        )
+        headers = ["Route", "View", "Name"]
+
+        if self.is_color_enabled:
+            headers = [self.style.HEADER(header) for header in headers]
 
         header_parts = []
         for width, header in zip(widths, headers, strict=False):
@@ -189,9 +190,18 @@ class Command(BaseCommand):
         formatted_str = StringIO()
 
         for route, view, name in url_patterns:
-            route_str = f"{self.style.HEADER('Route:')} {route}"
-            view_str = f"{self.style.HEADER('View:')} {view}"
-            name_str = f"{self.style.HEADER('Name:')} {name}" if name else ""
+            route_title = "Route:"
+            view_title = "View:"
+            name_title = "Name:"
+
+            if self.is_color_enabled:
+                route_title = self.style.HEADER(route_title)
+                view_title = self.style.HEADER(view_title)
+                name_title = self.style.HEADER(name_title)
+
+            route_str = f"{route_title} {route}"
+            view_str = f"{view_title} {view}"
+            name_str = f"{name_title} {name}" if name else ""
 
             separator = "-" * 20 + "\n"
             parts = (
