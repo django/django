@@ -323,7 +323,9 @@ Signals
 Templates
 ~~~~~~~~~
 
-* ...
+* The new :meth:`~django.template.Library.simple_block_tag` decorator enables
+  the creation of simple block tags, which can accept and use a section of the
+  template.
 
 Tests
 ~~~~~
