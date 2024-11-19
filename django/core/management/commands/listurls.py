@@ -157,7 +157,7 @@ class Command(BaseCommand):
         formatted_str.write(" | ".join(header_parts))
         formatted_str.write("\n")
 
-        # Header - content seperator
+        # Header - content separator
         formatted_str.write("-+-".join("-" * width for width in widths))
         formatted_str.write("\n")
 
@@ -197,12 +197,12 @@ class Command(BaseCommand):
             view_str = f"{self.style.HEADER('View:')} {view}"
             name_str = f"{self.style.HEADER('Name:')} {name}" if name else ""
 
-            seperator = "-" * 20 + "\n"
+            separator = "-" * 20 + "\n"
             parts = (
                 route_str,
                 view_str,
                 name_str,
-                seperator,
+                separator,
             )
 
             formatted_str.write("\n".join(part for part in parts if part))
