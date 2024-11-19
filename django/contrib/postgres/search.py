@@ -388,6 +388,24 @@ class TrigramDistance(TrigramBase):
     arg_joiner = " <-> "
 
 
+class TrigramWordDistance(TrigramWordBase):
+    function = ""
+    arg_joiner = " <<-> "
+
+
+class TrigramStrictWordDistance(TrigramWordBase):
+    function = ""
+    arg_joiner = " <<<-> "
+
+
+class TrigramWordSimilarity(TrigramWordBase):
+    function = "WORD_SIMILARITY"
+
+
+class TrigramStrictWordSimilarity(TrigramWordBase):
+    function = "STRICT_WORD_SIMILARITY"
+
+
 class LexemeCombinable:
     BITAND = "&"
     BITOR = "|"
