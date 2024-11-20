@@ -554,11 +554,20 @@ a subclass of dictionary. Exceptions are outlined here:
 
 .. method:: QueryDict.__getitem__(key)
 
-    Returns the value for the given key. If the key has more than one value,
-    it returns the last value. Raises
+    Returns the last value for the given key; or an empty list (``[]``) if the
+    key exists but has no values. Raises
     ``django.utils.datastructures.MultiValueDictKeyError`` if the key does not
     exist. (This is a subclass of Python's standard :exc:`KeyError`, so you can
     stick to catching ``KeyError``.)
+
+    .. code-block:: pycon
+
+        >>> q = QueryDict("a=1&a=2&a=3", mutable=True)
+        >>> q.__getitem__("a")
+        '3'
+        >>> q.__setitem__("b", [])
+        >>> q.__getitem__("b")
+        []
 
 .. method:: QueryDict.__setitem__(key, value)
 
