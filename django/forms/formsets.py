@@ -8,7 +8,15 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import ngettext_lazy
 
-__all__ = ("BaseFormSet", "formset_factory", "all_valid")
+__all__ = (
+    "BaseFormSet",
+    "formset_factory",
+    "all_valid",
+    "TOTAL_FORM_COUNT",
+    "INITIAL_FORM_COUNT",
+    "MIN_NUM_FORM_COUNT",
+    "MAX_NUM_FORM_COUNT",
+)
 
 # special field names
 TOTAL_FORM_COUNT = "TOTAL_FORMS"
@@ -78,6 +86,8 @@ class BaseFormSet(RenderableFormMixin):
     template_name_table = "django/forms/formsets/table.html"
     template_name_ul = "django/forms/formsets/ul.html"
 
+    management_form_class = ManagementForm
+
     def __init__(
         self,
         data=None,
@@ -88,6 +98,7 @@ class BaseFormSet(RenderableFormMixin):
         error_class=ErrorList,
         form_kwargs=None,
         error_messages=None,
+        management_form_class=None,
     ):
         self.is_bound = data is not None or files is not None
         self.prefix = prefix or self.get_default_prefix()
@@ -101,6 +112,7 @@ class BaseFormSet(RenderableFormMixin):
         self._non_form_errors = None
         self.form_renderer = self.renderer
         self.renderer = self.renderer or get_default_renderer()
+        self.management_form_class = management_form_class or self.management_form_class
 
         messages = {}
         for cls in reversed(type(self).__mro__):
@@ -206,6 +218,27 @@ class BaseFormSet(RenderableFormMixin):
             self._construct_form(i, **self.get_form_kwargs(i))
             for i in range(self.total_form_count())
         ]
+
+    def get_management_form_kwargs(self):
+        if self.is_bound:
+            return {
+                "data": self.data,
+                "auto_id": self.auto_id,
+                "prefix": self.prefix,
+                "renderer": self.renderer,
+            }
+        else:
+            return {
+                "auto_id": self.auto_id,
+                "prefix": self.prefix,
+                "initial": {
+                    TOTAL_FORM_COUNT: self.total_form_count(),
+                    INITIAL_FORM_COUNT: self.initial_form_count(),
+                    MIN_NUM_FORM_COUNT: self.min_num,
+                    MAX_NUM_FORM_COUNT: self.max_num,
+                },
+                "renderer": self.renderer,
+            }
 
     def get_form_kwargs(self, index):
         """
@@ -544,6 +577,7 @@ def formset_factory(
     absolute_max=None,
     can_delete_extra=True,
     renderer=None,
+    management_form_class=None,
 ):
     """Return a FormSet for the given form class."""
     if min_num is None:
@@ -570,6 +604,10 @@ def formset_factory(
         "validate_max": validate_max,
         "renderer": renderer,
     }
+
+    if management_form_class:
+        attrs["management_form_class"] = management_form_class
+
     form_name = form.__name__
     if form_name.endswith("Form"):
         formset_name = form_name + "Set"

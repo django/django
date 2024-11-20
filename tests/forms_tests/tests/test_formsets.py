@@ -1966,3 +1966,83 @@ class AllValidTests(SimpleTestCase):
         ]
         self.assertEqual(formset1._errors, expected_errors)
         self.assertEqual(formset2._errors, expected_errors)
+
+
+class WarningManagmentForm(ManagementForm):
+    """
+    A managment form with a number of forms beyond which the front
+    should display a warning
+    """
+
+    WARNING_NUM_FORMS = IntegerField(required=False, widget=HiddenInput)
+
+
+class EnpointManagmentForm(ManagementForm):
+    """
+    A managment form indicating an enpoint to POST to for front
+    """
+
+    FRONT_API_ENPOINT = CharField(required=False, widget=HiddenInput)
+
+
+class CustomManagmentFormTest(SimpleTestCase):
+    def test_managment_form_override(self):
+        class CustomFormset(BaseFormSet):
+            management_form_class = WarningManagmentForm
+            renderer = None
+
+        self.assertIs(CustomFormset().management_form_class, WarningManagmentForm)
+        self.assertIs(
+            CustomFormset(
+                management_form_class=EnpointManagmentForm
+            ).management_form_class,
+            EnpointManagmentForm,
+        )
+
+    def test_formset_factory_override(self):
+        class CustomFormset(BaseFormSet):
+            management_form_class = WarningManagmentForm
+            renderer = None
+
+        with self.subTest("formset_factory defaults to class attribute"):
+            formset = formset_factory(Form, formset=CustomFormset)
+            self.assertIs(formset().management_form_class, WarningManagmentForm)
+
+        with self.subTest(
+            "formset_factory argument takes priority over class attribute"
+        ):
+            formset = formset_factory(
+                Form, formset=CustomFormset, management_form_class=EnpointManagmentForm
+            )
+            self.assertIs(formset().management_form_class, EnpointManagmentForm)
+
+        with self.subTest(
+            "constructor argument takes priory over formset_factory argument"
+        ):
+            formset = formset_factory(
+                Form, formset=CustomFormset, management_form_class=EnpointManagmentForm
+            )
+            self.assertIs(
+                formset(management_form_class=ManagementForm).management_form_class,
+                ManagementForm,
+            )
+
+    def test_get_management_form_kwargs(self):
+        class CustomFormset(BaseFormSet):
+            management_form_class = WarningManagmentForm
+
+            def get_management_form_kwargs(self):
+                kwargs = super().get_management_form_kwargs()
+                kwargs["initial"]["WARNING_NUM_FORMS"] = 30
+                return kwargs
+
+        self.assertEqual(
+            formset_factory(Form, formset=CustomFormset)().management_form.initial,
+            {
+                "INITIAL_FORMS": 0,
+                "MAX_NUM_FORMS": 1000,
+                "MIN_NUM_FORMS": 0,
+                "TOTAL_FORMS": 1,
+                "WARNING_NUM_FORMS": 30,
+            },
+        )

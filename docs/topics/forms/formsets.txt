@@ -1081,3 +1081,54 @@ it is rendered and processed correctly.
 
 Each formset's :ref:`prefix <formset-prefix>` replaces the default ``form``
 prefix that's added to each field's ``name`` and ``id`` HTML attributes.
+
+.. _formset-management-form:
+
+Customizing the management form
+===============================
+
+.. versionadded:: 5.2
+
+Formsets use a ``ManagementForm`` to manage the collection of forms contained
+in the formset (see :ref:`understanding-the-managementform`). In certain
+situations, you may want to get more control over that mangement form and
+how it is created. That's why :class:`~.BaseFormSet` offers some extension
+points to allow ``ManagementForm`` customization:
+
+.. attribute:: BaseFormSet.management_form_class
+
+    The ``ManagementForm`` class to use to produce the management form.
+    Defaults to ``django.forms.formsets.ManagementForm``.
+
+:func:`~django.forms.formsets.formset_factory` accepts an optionnal
+``management_form_class`` parameter. When provided, it takes priority over
+:attr:`~.BaseFormSet.management_form_class`.
+
+:class:`~.BaseFormSet`'s ``__init__`` accepts an optionnal
+``management_form_class`` parameter. When provided, it takes priority over
+``formset_factory``'s ``management_form_class`` parameter.
+
+Usage::
+
+    from django.forms import formset_factory, ManagmentForm, BaseFormSet
+
+
+    class WarningManagmentForm(ManagementForm):
+        """
+        A managment form with a number of forms beyond which the front
+        should display a warning
+        """
+
+        WARNING_NUM_FORMS = IntegerField(required=False, widget=HiddenInput)
+
+
+    class WarningFormSet(BaseFormSet):
+        management_form_class = WarningManagmentForm
+
+        def get_management_form_kwargs(self):
+            kwargs = super().get_management_form_kwargs()
+            kwargs["initial"]["WARNING_NUM_FORMS"] = 30
+            return kwargs
+
+
+    formset = formset_factory(Form, formset=WarningFormSet)
