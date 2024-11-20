@@ -556,8 +556,8 @@ a subclass of dictionary. Exceptions are outlined here:
 
     Returns the last data value for the given key. If the key has more than one value,
     it returns the last value. If the value is an empty list, ``[]`` is returned. 
-    Raises``django.utils.datastructures.MultiValueDictKeyError`` if the key does notnot exist. 
-    (This is a subclass of Python's standard:exc:`KeyError`, so you can stick to catching ``KeyError``.)
+    Raises``django.utils.datastructures.MultiValueDictKeyError`` if the key does not exist. 
+    (This is a subclass of Python's standard :exc: `KeyError`, so you can stick to catching ``KeyError``.)
 	
 .. method:: QueryDict.__setitem__(key, value)
 
