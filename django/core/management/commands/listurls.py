@@ -40,7 +40,6 @@ class Command(BaseCommand):
     def add_arguments(self, parser: CommandParser):
         super().add_arguments(parser)
 
-        # Sorting
         parser.add_argument(
             "--unsorted",
             "-u",
@@ -49,7 +48,6 @@ class Command(BaseCommand):
             help="Show URLs without sorting them alphabetically.",
         )
 
-        # Prefix
         parser.add_argument(
             "--prefix",
             "-p",
@@ -58,7 +56,6 @@ class Command(BaseCommand):
             nargs="*",
         )
 
-        # Format
         parser.add_argument(
             "--format",
             "-f",
