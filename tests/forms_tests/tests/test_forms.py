@@ -5361,9 +5361,6 @@ class BoundFieldOverrideRenderer(DjangoTemplates):
     FORM_RENDERER="forms_tests.tests.test_forms.BoundFieldOverrideRenderer"
 )
 class CustomBoundFieldTest(SimpleTestCase):
-    def setUp(self):
-        self.maxDiff = None
-
     def test_renderer_custom_bound_field(self):
         t = Template("{{ form }}")
         html = t.render(Context({"form": Person()}))
