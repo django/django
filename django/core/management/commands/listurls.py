@@ -70,7 +70,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         prefixes = options["prefixes"]
-        url_patterns = get_url_patterns(prefixes=prefixes)
+        url_patterns = self.get_url_patterns(prefixes=prefixes)
 
         if not url_patterns:
             raise CommandError("There are no URL patterns that match given prefixes")
@@ -98,6 +98,53 @@ class Command(BaseCommand):
             url_patterns=url_patterns,
             format=format,
         )
+
+        return url_patterns
+
+    @classmethod
+    def get_url_patterns(cls, prefixes=None):
+        """
+        Returns a list of URL patterns in the project with given prefixes.
+
+        Each object in the returned list is a tuple[str] with 3 elements:
+        (route, view, name)
+        """
+
+        url_patterns = []
+        urlconf = import_module(settings.ROOT_URLCONF)
+
+        for view_func, regex, namespace_list, name in extract_views_from_urlpatterns(
+            urlconf.urlpatterns
+        ):
+            # Route
+            route = simplify_regex(regex)
+
+            # View
+            view = "{}.{}".format(
+                view_func.__module__,
+                getattr(view_func, "__name__", view_func.__class__.__name__),
+            )
+
+            # Name
+            namespace = ""
+
+            if namespace_list:
+                for part in namespace_list:
+                    namespace += part + ":"
+
+            name = namespace + name if name else None
+            name = name or ""
+
+            # Append to the list
+            url_patterns.append((route, view, name))
+
+        # Filter out when prefixes are given but the pattern's route doesn't match
+        if prefixes:
+            url_patterns = [
+                url_pattern
+                for url_pattern in url_patterns
+                if any(url_pattern[0].startswith(prefix) for prefix in prefixes)
+            ]
 
         return url_patterns
 
@@ -228,50 +275,3 @@ class Command(BaseCommand):
 
     def format_pretty_json(self, url_patterns):
         return self.format_json(url_patterns, pretty=True)
-
-
-def get_url_patterns(prefixes=None):
-    """
-    Returns a list of URL patterns in the project with given prefixes.
-
-    Each object in the returned list is a tuple[str] with 3 elements:
-    (route, view, name)
-    """
-
-    url_patterns = []
-    urlconf = import_module(settings.ROOT_URLCONF)
-
-    for view_func, regex, namespace_list, name in extract_views_from_urlpatterns(
-        urlconf.urlpatterns
-    ):
-        # Route
-        route = simplify_regex(regex)
-
-        # View
-        view = "{}.{}".format(
-            view_func.__module__,
-            getattr(view_func, "__name__", view_func.__class__.__name__),
-        )
-
-        # Name
-        namespace = ""
-
-        if namespace_list:
-            for part in namespace_list:
-                namespace += part + ":"
-
-        name = namespace + name if name else None
-        name = name or ""
-
-        # Append to the list
-        url_patterns.append((route, view, name))
-
-    # Filter out when prefixes are given but the pattern's route doesn't match
-    if prefixes:
-        url_patterns = [
-            url_pattern
-            for url_pattern in url_patterns
-            if any(url_pattern[0].startswith(prefix) for prefix in prefixes)
-        ]
-
-    return url_patterns
