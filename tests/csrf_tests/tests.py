@@ -839,8 +839,8 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
     def _test_https_good_referer_matches_cookie_domain(self):
         req = self._get_POST_request_with_token()
         req._is_secure_override = True
-        req.META['HTTP_HOST'] = 'www.example.com'
-        req.META['HTTP_REFERER'] = 'https://foo.example.com/'
+        req.META["HTTP_HOST"] = "www.example.com"
+        req.META["HTTP_REFERER"] = "https://foo.example.com/"
         mw = CsrfViewMiddleware(post_form_view)
         mw.process_request(req)
         response = mw.process_view(req, post_form_view, (), {})
@@ -849,8 +849,8 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
     def _test_https_good_referer_matches_cookie_domain_with_different_port(self):
         req = self._get_POST_request_with_token()
         req._is_secure_override = True
-        req.META['HTTP_HOST'] = 'www.example.com:4443'
-        req.META['HTTP_REFERER'] = 'https://foo.example.com:4443/'
+        req.META["HTTP_HOST"] = "www.example.com:4443"
+        req.META["HTTP_REFERER"] = "https://foo.example.com:4443/"
         mw = CsrfViewMiddleware(post_form_view)
         mw.process_request(req)
         response = mw.process_view(req, post_form_view, (), {})
@@ -1274,10 +1274,10 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
         self._check_token_present(resp, csrf_cookie)
 
     @override_settings(
-        ALLOWED_HOSTS=['www.example.com'],
-        CSRF_COOKIE_DOMAIN='.example.com',
+        ALLOWED_HOSTS=["www.example.com"],
+        CSRF_COOKIE_DOMAIN=".example.com",
         USE_X_FORWARDED_PORT=True,
-        USE_X_FORWARDED_HOST=True
+        USE_X_FORWARDED_HOST=True,
     )
     def test_https_good_referer_behind_proxy(self):
         """
