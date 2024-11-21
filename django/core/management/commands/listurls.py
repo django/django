@@ -262,14 +262,17 @@ class Command(BaseCommand):
 
         return formatted_str.getvalue()
 
+    def as_dict(self, url_pattern):
+        return {
+            "route": url_pattern[0],
+            "view": url_pattern[1],
+            "name": url_pattern[2],
+        }
+
     def format_json(self, url_patterns, pretty=False):
         indent = 4 if pretty else None
 
-        # Having keys in the resulting JSON makes it more useful
-        url_pattern_dicts = [
-            {"route": route, "view": view, "name": name}
-            for route, view, name in url_patterns
-        ]
+        url_pattern_dicts = [self.as_dict(url_pattern) for url_pattern in url_patterns]
 
         return json.dumps(url_pattern_dicts, indent=indent)
 
