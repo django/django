@@ -24,10 +24,8 @@ def normalize_spaces(val: str):
 
 
 def psql_escape(query: str):
-    # replace unsafe chars with space
-    query = _spec_chars_re.sub(" ", query)
-    query = normalize_spaces(query)  # convert multiple spaces to single
-    return query
+    """Replace unsafe chars with space and convert multiple spaces to single."""
+    return normalize_spaces(_spec_chars_re.sub(" ", query))
 
 
 class SearchVectorExact(Lookup):
