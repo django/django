@@ -3,6 +3,7 @@ import copy
 import operator
 
 from collections import namedtuple
+from cgi import parse_header
 from io import BytesIO
 from itertools import chain
 from urllib.parse import parse_qsl, quote, urlencode, urljoin, urlsplit
@@ -20,7 +21,6 @@ from django.core.files import uploadhandler
 from django.http.multipartparser import (
     MultiPartParser,
     MultiPartParserError,
-    TooManyFilesSent,
 )
 from django.utils.datastructures import (
     CaseInsensitiveMapping,
@@ -29,13 +29,11 @@ from django.utils.datastructures import (
 )
 from django.utils.encoding import escape_uri_path, iri_to_uri
 from django.utils.functional import cached_property
-from django.utils.http import is_same_domain, parse_header_parameters
-from django.utils.regex_helper import _lazy_re_compile
+from django.utils.http import is_same_domain
 
 RAISE_ERROR = object()
-host_validation_re = _lazy_re_compile(
-    r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(?::([0-9]+))?$"
-)
+MAX_ALLOWED_FILES = 1000
+host_validation_re = r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(?::([0-9]+))?$"
 
 ParsedHostHeader = namedtuple("ParsedHostHeader", ["domain", "port", "combined"])
 
@@ -154,7 +152,7 @@ class HttpRequest:
 
     def _set_content_type_params(self, meta):
         """Set content_type, content_params, and encoding."""
-        self.content_type, self.content_params = parse_header_parameters(
+        self.content_type, self.content_params = parse_header(
             meta.get("CONTENT_TYPE", "")
         )
         if "charset" in self.content_params:
@@ -453,7 +451,11 @@ class HttpRequest:
                 data = self
             try:
                 self._post, self._files = self.parse_file_upload(self.META, data)
-            except (MultiPartParserError, TooManyFilesSent):
+                if len(self._files) > MAX_ALLOWED_FILES:
+                    raise MultiPartParserError(
+                        f"{len(self._files)} files processed. Maximum {MAX_ALLOWED_FILES} files allowed."
+                    )
+            except MultiPartParserError:
                 # An error occurred while parsing POST data. Since when
                 # formatting the error the request handler might access
                 # self.POST, set self._post and self._file to prevent
@@ -735,7 +737,7 @@ class QueryDict(MultiValueDict):
 
 class MediaType:
     def __init__(self, media_type_raw_line):
-        full_type, self.params = parse_header_parameters(
+        full_type, self.params = parse_header(
             media_type_raw_line if media_type_raw_line else ""
         )
         self.main_type, _, self.sub_type = full_type.partition("/")
