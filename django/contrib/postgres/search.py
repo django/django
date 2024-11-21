@@ -452,8 +452,8 @@ class Lexeme(LexemeCombinable, Value):
         if label:
             param = f"{param}:{label}"
         if self.invert:
-            param = "!{param}"
-        return template, [params]
+            param = f"!{param}"
+        return template, [param]
 
     def __invert__(self):
         return type(self)(
@@ -475,7 +475,7 @@ class CombinedLexeme(LexemeCombinable, CombinedExpression):
         rsql, params = compiler.compile(self.rhs)
         value_params.extend(params)
 
-        combined_sql = "({lsql} {self.connector} {rsql})"
+        combined_sql = f"({lsql} {self.connector} {rsql})"
         return "%s", [combined_sql % tuple(value_params)]
 
     def __invert__(self):
