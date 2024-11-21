@@ -202,7 +202,7 @@ class Command(BaseCommand):
         formatted_str.write("\n")
 
         # Header - content separator
-        formatted_str.write("-+-".join("-" * width for width in widths))
+        formatted_str.write("-+-".join(["-" * width for width in widths]))
         formatted_str.write("\n")
 
         # Rows (content)
@@ -258,7 +258,7 @@ class Command(BaseCommand):
                 separator,
             )
 
-            formatted_str.write("\n".join(part for part in parts if part))
+            formatted_str.write("\n".join([part for part in parts if part]))
 
         return formatted_str.getvalue()
 
