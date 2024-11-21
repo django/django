@@ -487,7 +487,7 @@ class CombinedLexeme(LexemeCombinable, CombinedExpression):
     def __invert__(self):
         """
         Swap the connector and invert the lhs and rhs.
-        
+
         This generates a query that's equivalent to what we expect
         thanks to De Morgan's theorem.
         """
