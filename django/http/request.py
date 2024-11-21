@@ -276,10 +276,10 @@ class HttpRequest:
         Return an absolute URI from variables available in this request. Skip
         allowed hosts protection, so may return insecure URI.
         """
-        return "{scheme}://{host}{path}".format(
-            scheme=self.scheme,
-            host=self._get_parsed_host_header(validate=False).combined,
-            path=self.get_full_path(),
+        return (
+            f"{self.scheme}://"
+            f"{self._get_parsed_host_header(validate=False).combined}"
+            f"{self.get_full_path()}"
         )
 
     def build_absolute_uri(self, location=None):
@@ -323,7 +323,7 @@ class HttpRequest:
 
     @cached_property
     def _current_scheme_host(self):
-        return "{}://{}".format(self.scheme, self.get_host())
+        return f"{self.scheme}://{self.get_host()}"
 
     def _get_scheme(self):
         """
