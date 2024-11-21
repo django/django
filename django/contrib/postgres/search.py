@@ -485,9 +485,12 @@ class CombinedLexeme(LexemeCombinable, CombinedExpression):
         return "%s", [combined_value]
 
     def __invert__(self):
-        # Swap the connector and invert the lhs and rhs.
-        # This generates a query that's equivalent to what we expect
-        # thanks to De Morgan's theorem
+        """
+        Swap the connector and invert the lhs and rhs.
+        
+        This generates a query that's equivalent to what we expect
+        thanks to De Morgan's theorem.
+        """
         return type(self)(
             ~self.lhs,
             self.BITAND if self.connector == self.BITOR else self.BITOR,
