@@ -6,7 +6,13 @@ from django.core.exceptions import FieldError
 from django.db.models.sql.constants import CURSOR, GET_ITERATOR_CHUNK_SIZE, NO_RESULTS
 from django.db.models.sql.query import Query
 
-__all__ = ["DeleteQuery", "UpdateQuery", "InsertQuery", "AggregateQuery"]
+__all__ = [
+    "DeleteQuery",
+    "UpdateQuery",
+    "BulkUpdateQuery",
+    "InsertQuery",
+    "AggregateQuery",
+]
 
 
 class DeleteQuery(Query):
@@ -140,6 +146,23 @@ class UpdateQuery(Query):
                 query.add_filter("pk__in", self.related_ids[model])
             result.append(query)
         return result
+
+
+class BulkUpdateQuery(Query):
+    compiler = "SQLBulkUpdateCompiler"
+
+    def __init__(self, *args, row_tuples, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.row_values = row_tuples
+
+    def clone(self):
+        obj = super().clone()
+        if self.row_values is not None:
+            obj.related_updates = self.row_values.copy()
+        return obj
+
+    def add_row_values(self, row_values):
+        self.row_values = row_values
 
 
 class InsertQuery(Query):

@@ -302,6 +302,9 @@ class BaseDatabaseFeatures:
     # Does this backend require casting the results of CASE expressions used
     # in UPDATE statements to ensure the expression has the correct type?
     requires_casted_case_in_updates = False
+    # Does this backend require casting the results of a VALUES expression used
+    # in UPDATE statements to ensure the expression has the correct type?
+    requires_casted_case_in_values_updates = False
 
     # Does the backend support partial indexes (CREATE INDEX ... WHERE ...)?
     supports_partial_indexes = True
