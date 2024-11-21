@@ -19,7 +19,7 @@ multiple_spaces_re = re.compile(r"\s{2,}")
 
 
 def normalize_spaces(val: str):
-    """Converts multiple spaces to single and strips from both sides"""
+    """Converts multiple spaces to single and strips from both sides."""
     if not val:
         return None
     return multiple_spaces_re.sub(" ", val.strip())
