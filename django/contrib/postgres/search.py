@@ -13,19 +13,15 @@ from django.db.models import (
 from django.db.models.expressions import CombinedExpression, register_combinable_fields
 from django.db.models.functions import Cast, Coalesce
 
-_SEARCH_SPEC_CHARS = r"['\0\[\]()|&:*!@<>\\]"
-_spec_chars_re = re.compile(_SEARCH_SPEC_CHARS)
-multiple_spaces_re = re.compile(r"\s{2,}")
-
 
 def normalize_spaces(val: str):
     """Converts multiple spaces to single and strips from both sides."""
-    return multiple_spaces_re.sub(" ", val.strip()) if val else None
+    return re.sub(r"\s{2,}", " ", val.strip()) if val else None
 
 
 def psql_escape(query: str):
     """Replace unsafe chars with space and convert multiple spaces to single."""
-    return normalize_spaces(_spec_chars_re.sub(" ", query))
+    return normalize_spaces(re.sub(r"['\0\[\]()|&:*!@<>\\]", " ", query))
 
 
 class SearchVectorExact(Lookup):
@@ -410,7 +406,7 @@ class LexemeCombinable:
         if not isinstance(other, LexemeCombinable):
             raise TypeError(
                 "A Lexeme can only be combined with another Lexeme, "
-                "got {}.".format(type(other))
+                f"got {type(other)}."
             )
         if reversed:
             return CombinedLexeme(other, connector, self)
@@ -426,10 +422,10 @@ class LexemeCombinable:
         return self._combine(other, self.BITOR, False)
 
     def __or__(self, other):
-        return self._combine(other, self.BITOR, False)
+        return self.bitor(other)
 
     def __and__(self, other):
-        return self._combine(other, self.BITAND, False)
+        return self.bitand(other)
 
 
 class Lexeme(LexemeCombinable, Value):
@@ -454,11 +450,10 @@ class Lexeme(LexemeCombinable, Value):
             label += self.weight
 
         if label:
-            param = "{}:{}".format(param, label)
+            param = f"{param}:{label}"
         if self.invert:
-            param = "!{}".format(param)
-        params = [param]
-        return template, params
+            param = "!{param}"
+        return template, [params]
 
     def __invert__(self):
         return type(self)(
@@ -480,9 +475,8 @@ class CombinedLexeme(LexemeCombinable, CombinedExpression):
         rsql, params = compiler.compile(self.rhs)
         value_params.extend(params)
 
-        combined_sql = "({} {} {})".format(lsql, self.connector, rsql)
-        combined_value = combined_sql % tuple(value_params)
-        return "%s", [combined_value]
+        combined_sql = "({lsql} {self.connector} {rsql})"
+        return "%s", [combined_sql % tuple(value_params)]
 
     def __invert__(self):
         """
