@@ -814,8 +814,10 @@ class TestLexemes(GrailTestData, PostgreSQLTestCase):
         self.assertCountEqual(searched, [self.verse1, self.verse2, self.verse0])
 
     def test_advanced(self):
-        # Test cominbation of & and |
-        # This is mainly helpful for checking the test_advanced_invert below
+        """
+        Test cominbation of & and |
+        This is mainly helpful for checking the test_advanced_invert below
+        """
         searched = Line.objects.annotate(search=SearchVector("dialogue")).filter(
             search=SearchQuery(
                 Lexeme("shall") & Lexeme("use") & Lexeme("larger") | Lexeme("nostrils")
@@ -830,8 +832,10 @@ class TestLexemes(GrailTestData, PostgreSQLTestCase):
         self.assertCountEqual(searched, [self.verse0, self.verse2])
 
     def test_advanced_invert(self):
-        # Test inverting a query that uses a cominbation of & and |
-        # Should return the opposite of test_advanced
+        """
+        Test inverting a query that uses a cominbation of & and |
+        Should return the opposite of test_advanced
+        """
         searched = Line.objects.annotate(search=SearchVector("dialogue")).filter(
             search=SearchQuery(
                 ~(
