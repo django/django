@@ -1,6 +1,7 @@
 import codecs
 import copy
 import operator
+import re
 from collections import namedtuple
 from io import BytesIO
 from itertools import chain
@@ -851,7 +852,7 @@ def split_domain_port(host):
     """
     host = host.lower()
 
-    host_match = host_validation_re.match(host)
+    host_match = re.match(host_validation_re, host)
     if not host_match:
         return "", ""
 
