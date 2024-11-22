@@ -336,11 +336,7 @@ class ExceptionReporter:
         Return an absolute URI from variables available in this request. Skip
         allowed hosts protection, so may return insecure URI.
         """
-        return "{scheme}://{host}{path}".format(
-            scheme=self.request.scheme,
-            host=self.request._get_raw_host(),
-            path=self.request.get_full_path(),
-        )
+        return self.request.get_raw_uri()
 
     def get_traceback_data(self):
         """Return a dictionary containing traceback information."""
