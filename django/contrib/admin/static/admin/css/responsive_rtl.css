@@ -34,11 +34,6 @@
         background-position: calc(100% - 8px) 9px;
     }
 
-    [dir="rtl"] .selector .selector-filter label {
-        margin-right: 0;
-        margin-left: 8px;
-    }
-
     [dir="rtl"] .object-tools li {
         float: right;
     }

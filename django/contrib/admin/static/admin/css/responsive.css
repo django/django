@@ -254,10 +254,6 @@ input[type="submit"], button {
         align-items: center;
     }
 
-    .selector .selector-filter label {
-        margin: 0 8px 0 0;
-    }
-
     .selector .selector-filter input {
         width: 100%;
         min-height: 0;
