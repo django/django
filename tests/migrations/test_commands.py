@@ -8,6 +8,8 @@ from pathlib import Path
 from unittest import mock
 
 from django.apps import apps
+from django.core.checks import Error, Tags, register
+from django.core.checks.registry import registry
 from django.core.management import CommandError, call_command
 from django.core.management.base import SystemCheckError
 from django.core.management.commands.makemigrations import (
@@ -96,6 +98,7 @@ class MigrateTests(MigrationTestBase):
         self.assertTableNotExists("migrations_tribble")
         self.assertTableNotExists("migrations_book")
 
+    @mock.patch("django.core.management.base.BaseCommand.check")
     @override_settings(
         INSTALLED_APPS=[
             "django.contrib.auth",
@@ -103,10 +106,33 @@ class MigrateTests(MigrationTestBase):
             "migrations.migrations_test_apps.migrated_app",
         ]
     )
-    def test_migrate_with_system_checks(self):
+    def test_migrate_with_system_checks(self, mocked_check):
         out = io.StringIO()
         call_command("migrate", skip_checks=False, no_color=True, stdout=out)
         self.assertIn("Apply all migrations: migrated_app", out.getvalue())
+        mocked_check.assert_called_once()
+
+    def test_migrate_with_custom_system_checks(self):
+        original_checks = registry.registered_checks.copy()
+
+        @register(Tags.signals)
+        def my_check(app_configs, **kwargs):
+            return [Error("my error")]
+
+        self.addCleanup(setattr, registry, "registered_checks", original_checks)
+
+        class CustomMigrateCommandWithSignalsChecks(MigrateCommand):
+            requires_system_checks = [Tags.signals]
+
+        command = CustomMigrateCommandWithSignalsChecks()
+        with self.assertRaises(SystemCheckError):
+            call_command(command, skip_checks=False, stderr=io.StringIO())
+
+        class CustomMigrateCommandWithSecurityChecks(MigrateCommand):
+            requires_system_checks = [Tags.security]
+
+        command = CustomMigrateCommandWithSecurityChecks()
+        call_command(command, skip_checks=False, stdout=io.StringIO())
 
     @override_settings(
         INSTALLED_APPS=[
