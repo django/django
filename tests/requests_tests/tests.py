@@ -1240,10 +1240,11 @@ class HostValidationTests(SimpleTestCase):
                 }
                 request.get_host()
 
-    @override_settings(USE_X_FORWARDED_PORT=False)
+    @override_settings(USE_X_FORWARDED_PORT=False, ALLOWED_HOSTS=["internal.com"])
     def test_get_port(self):
         request = HttpRequest()
         request.META = {
+            "SERVER_NAME": "internal.com",
             "SERVER_PORT": "8080",
             "HTTP_X_FORWARDED_PORT": "80",
         }
@@ -1252,14 +1253,16 @@ class HostValidationTests(SimpleTestCase):
 
         request = HttpRequest()
         request.META = {
+            "SERVER_NAME": "internal.com",
             "SERVER_PORT": "8080",
         }
         self.assertEqual(request.get_port(), "8080")
 
-    @override_settings(USE_X_FORWARDED_PORT=True)
+    @override_settings(USE_X_FORWARDED_PORT=True, ALLOWED_HOSTS=["internal.com"])
     def test_get_port_with_x_forwarded_port(self):
         request = HttpRequest()
         request.META = {
+            "SERVER_NAME": "internal.com",
             "SERVER_PORT": "8080",
             "HTTP_X_FORWARDED_PORT": "80",
         }
@@ -1268,6 +1271,7 @@ class HostValidationTests(SimpleTestCase):
 
         request = HttpRequest()
         request.META = {
+            "SERVER_NAME": "internal.com",
             "SERVER_PORT": "8080",
         }
         self.assertEqual(request.get_port(), "8080")
