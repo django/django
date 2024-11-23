@@ -68,6 +68,7 @@
     margin: 0;
     text-align: left;
     display: flex;
+    gap: 8px;
 }
 
 .selector .selector-filter label,
@@ -84,11 +85,6 @@
 
 .selector-filter input {
     flex-grow: 1;
-}
-
-.selector .selector-available input,
-.selector .selector-chosen input {
-    margin-left: 8px;
 }
 
 .selector ul.selector-chooser {
