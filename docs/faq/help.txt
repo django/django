@@ -37,8 +37,6 @@ your choice of words.
 
 .. _Django Code of Conduct: https://www.djangoproject.com/conduct/
 
-.. _message-does-not-appear-on-django-users:
-
 Nobody answered my question! What should I do?
 ==============================================
 
