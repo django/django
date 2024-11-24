@@ -1535,7 +1535,7 @@ Built-in filter reference
 
 Adds the argument to the value.
 
-For example:
+For example in a template:
 
 .. code-block:: html+django
 
@@ -1543,12 +1543,21 @@ For example:
 
 If ``value`` is ``4``, then the output will be ``6``.
 
+For example in Python:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import add
+    sometext = add(4, 2)
+
+The value of ``sometext`` will be ``6``.
+
 This filter will first try to coerce both values to integers. If this fails,
 it'll attempt to add the values together anyway. This will work on some data
 types (strings, list, etc.) and fail on others. If it fails, the result will
 be an empty string.
 
-For example, if we have:
+For example in a template:
 
 .. code-block:: html+django
 
@@ -1556,6 +1565,15 @@ For example, if we have:
 
 and ``first`` is ``[1, 2, 3]`` and ``second`` is ``[4, 5, 6]``, then the
 output will be ``[1, 2, 3, 4, 5, 6]``.
+
+For example in Python:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import add
+    sometext = add([1, 2, 3], [4, 5, 6])
+
+The output of ``sometext`` will be ``[1, 2, 3, 4, 5, 6]``.
 
 .. warning::
 
@@ -1868,13 +1886,22 @@ representation of a ``datetime`` value. E.g.:
 If value evaluates to ``False``, uses the given default. Otherwise, uses the
 value.
 
-For example:
+For example in a template:
 
 .. code-block:: html+django
 
     {{ value|default:"nothing" }}
 
 If ``value`` is ``""`` (the empty string), the output will be ``nothing``.
+
+For example in Python:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import default
+    sometext = default("", "nothing")
+
+The output of ``sometext`` will be ``nothing``.
 
 .. templatefilter:: default_if_none
 
@@ -1887,13 +1914,22 @@ value.
 Note that if an empty string is given, the default value will *not* be used.
 Use the :tfilter:`default` filter if you want to fallback for empty strings.
 
-For example:
+For example in a template:
 
 .. code-block:: html+django
 
     {{ value|default_if_none:"nothing" }}
 
 If ``value`` is ``None``, the output will be ``nothing``.
+
+For example in Python:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import default_if_none
+    sometext = default_if_none(None, "nothing")
+
+The output of ``sometext`` will be ``nothing``.
 
 .. templatefilter:: dictsort
 
@@ -1902,6 +1938,9 @@ If ``value`` is ``None``, the output will be ``nothing``.
 
 Takes a list of dictionaries and returns that list sorted by the key given in
 the argument.
+
+Template Examples
+=================
 
 For example:
 
@@ -1989,6 +2028,78 @@ produce empty output:
 
     {{ values|dictsort:"0" }}
 
+Python Examples
+===============
+
+For example in Python:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import dictsort
+    sorted_list = dictsort([
+        {"name": "zed", "age": 19},
+        {"name": "amy", "age": 22},
+        {"name": "joe", "age": 31},
+    ], "name")
+
+The value of ``sorted_list`` will be:
+
+.. code-block:: python
+
+    [
+        {"name": "amy", "age": 22},
+        {"name": "joe", "age": 31},
+        {"name": "zed", "age": 19},
+    ]
+
+You can also do more complicated things like:
+
+For example in Python:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import dictsort
+    sorted_list = dictsort([
+        {"title": "1984", "author": {"name": "George", "age": 45}},
+        {"title": "Timequake", "author": {"name": "Kurt", "age": 75}},
+        {"title": "Alice", "author": {"name": "Lewis", "age": 33}},
+    ], "author.age")
+
+The value of ``sorted_list`` will be:
+
+.. code-block:: python
+
+    [
+        {"title": "Alice", "author": {"name": "Lewis", "age": 33}},
+        {"title": "1984", "author": {"name": "George", "age": 45}},
+        {"title": "Timequake", "author": {"name": "Kurt", "age": 75}},
+    ]
+
+``dictsort`` can also order a list of lists (or any other object implementing
+``__getitem__()``) by elements at specified index. For example:
+
+
+For example in Python:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import dictsort
+    sorted_list = dictsort([
+        ("a", "42"),
+        ("c", "string"),
+        ("b", "foo"),
+    ], 0)
+
+The value of ``sorted_list`` will be:
+
+.. code-block:: python
+
+    [
+        ("a", "42"),
+        ("b", "foo"),
+        ("c", "string"),
+    ]
+
 Ordering by elements at specified index is not supported on dictionaries.
 
 .. templatefilter:: dictsortreversed
@@ -2007,13 +2118,22 @@ but the returned value will be in reverse order.
 
 Returns ``True`` if the value is divisible by the argument.
 
-For example:
+For example in a template:
 
 .. code-block:: html+django
 
     {{ value|divisibleby:"3" }}
 
 If ``value`` is ``21``, the output would be ``True``.
+
+For example in Python:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import divisibleby
+    is_divisible = divisibleby(21, 3)
+
+The value of ``is_divisible`` will be ``True``.
 
 .. templatefilter:: escape
 
@@ -2144,13 +2264,22 @@ The value of ``formatted_size`` will be ``'117.7\xa0MB'``.
 
 Returns the first item in a list.
 
-For example:
+For example in a template:
 
 .. code-block:: html+django
 
     {{ value|first }}
 
 If ``value`` is the list ``['a', 'b', 'c']``, the output will be ``'a'``.
+
+For example in Python:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import first
+    first_item = first(['a', 'b', 'c'])
+
+The value of ``first_item`` will be ``'a'``.
 
 .. templatefilter:: floatformat
 
@@ -2268,13 +2397,22 @@ digit, 2 is the second-right-most digit, etc. Returns the original value for
 invalid input (if input or argument is not an integer, or if argument is less
 than 1). Otherwise, output is always an integer.
 
-For example:
+For example in a template:
 
 .. code-block:: html+django
 
     {{ value|get_digit:"2" }}
 
 If ``value`` is ``123456789``, the output will be ``8``.
+
+For example in Python:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import get_digit
+    digit = get_digit(123456789, 2)
+
+The output of ``digit`` will be ``8``.
 
 .. templatefilter:: iriencode
 
@@ -2394,7 +2532,7 @@ The value of ``last_item`` will be ``"d"``.
 
 Returns the length of the value. This works for both strings and lists.
 
-For example:
+For example in a template:
 
 .. code-block:: html+django
 
@@ -2402,6 +2540,15 @@ For example:
 
 If ``value`` is ``['a', 'b', 'c', 'd']`` or ``"abcd"``, the output will be
 ``4``.
+
+For example in Python:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import length
+    length_of_value = length(['a', 'b', 'c', 'd'])
+
+The value of ``length_of_value`` will be ``4``.
 
 The filter returns ``0`` for an undefined variable.
 
@@ -2541,7 +2688,7 @@ The output will be ``"totally loving this album!"``.
 Returns the value turned into a list. For a string, it's a list of characters.
 For an integer, the argument is cast to a string before creating a list.
 
-For example:
+For example in a template:
 
 .. code-block:: html+django
 
@@ -2550,6 +2697,15 @@ For example:
 If ``value`` is the string ``"Joel"``, the output would be the list
 ``['J', 'o', 'e', 'l']``. If ``value`` is ``123``, the output will be the
 list ``['1', '2', '3']``.
+
+For example in Python:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import make_list
+    list_of_chars = make_list("Joel")
+
+The output will be the list ``['J', 'o', 'e', 'l']``.
 
 .. templatefilter:: phone2numeric
 
@@ -2578,6 +2734,9 @@ If ``value`` is ``800-COLLECT``, the output will be ``800-2655328``.
 Returns a plural suffix if the value is not ``1``, ``'1'``, or an object of
 length 1. By default, this suffix is ``'s'``.
 
+Template Examples
+=================
+
 Example:
 
 .. code-block:: html+django
@@ -2604,6 +2763,42 @@ Example:
 .. code-block:: html+django
 
     You have {{ num_cherries }} cherr{{ num_cherries|pluralize:"y,ies" }}.
+
+Python Examples
+===============
+
+.. code-block:: python
+
+    from django.template.defaultfilters import pluralize
+    single_message = f"You have 1 message{{pluralize(1)}}"
+    multiple_messages = f"You have 2 messages{{pluralize(2)}}"
+
+The output of ``single_message`` will be ``You have 1 message``. The output of
+``multiple_messages`` will be ``'You have 2 messages'``.
+
+For words that require a suffix other than ``'s'``, you can provide an alternate
+suffix as a parameter to the filter.
+
+.. code-block:: python
+
+    from django.template.defaultfilters import pluralize
+    single_walrus = f"You have 1 walrus{pluralize(1, "es")}"
+    multiple_walrus = f"You have 1 walrus{pluralize(2, "es")}"
+
+The output of ``single_walrus`` will be ``'You have 1 walrus'``. The output of
+``multiple_walrus`` will be ``'You have 2 walruses'``.
+
+For words that don't pluralize by simple suffix, you can specify 
+both a singular and plural suffix, separated by a comma.
+
+.. code-block:: python
+
+    from django.template.defaultfilters import pluralize
+    cherry_singular = f"You have 1 cherr{pluralize(1, "y,ies")}"
+    cherry_pluralized = f"You have 1 cherr{pluralize(2, "y,ies")}"
+
+The output of ``cherry_singular`` will be ``'You have 1 cherry'``. The output of
+``cherry_pluralized`` will be ``'You have 2 cherries'``.
 
 .. note:: Use :ttag:`blocktranslate` to pluralize translated strings.
 
@@ -3155,13 +3350,22 @@ contains ``['States', ['Kansas', ['Lawrence', 'Topeka'], 'Illinois']]``, then
 
 Converts a string into all uppercase.
 
-For example:
+For example in a template:
 
 .. code-block:: html+django
 
     {{ value|upper }}
 
 If ``value`` is ``"Joel is a slug"``, the output will be ``"JOEL IS A SLUG"``.
+
+For example in Python:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import upper
+    uppercased = upper("Joel is a slug")
+
+The output of ``uppercased`` will be ``"JOEL IS A SLUG"``.
 
 .. templatefilter:: urlencode
 
@@ -3170,7 +3374,7 @@ If ``value`` is ``"Joel is a slug"``, the output will be ``"JOEL IS A SLUG"``.
 
 Escapes a value for use in a URL.
 
-For example:
+For example in a template:
 
 .. code-block:: html+django
 
@@ -3179,11 +3383,23 @@ For example:
 If ``value`` is ``"https://www.example.org/foo?a=b&c=d"``, the output will be
 ``"https%3A//www.example.org/foo%3Fa%3Db%26c%3Dd"``.
 
+For example in Python:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import urlencode
+
+    escaped = urlencode("https://www.example.org/foo?a=b&c=d")
+
+The output of ``escaped`` will be ``"https%3A//www.example.org/foo%3Fa%3Db%26c%3Dd"``.
+
 An optional argument containing the characters which should not be escaped can
 be provided.
 
 If not provided, the '/' character is assumed safe. An empty string can be
-provided when *all* characters should be escaped. For example:
+provided when *all* characters should be escaped. 
+
+For example in a template:
 
 .. code-block:: html+django
 
@@ -3191,6 +3407,16 @@ provided when *all* characters should be escaped. For example:
 
 If ``value`` is ``"https://www.example.org/"``, the output will be
 ``"https%3A%2F%2Fwww.example.org%2F"``.
+
+For example in Python:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import urlencode
+
+    escaped = urlencode("https://www.example.org/", "")
+
+The output of ``escaped`` will be ``"https%3A%2F%2Fwww.example.org%2F"``.
 
 .. templatefilter:: urlize
 
@@ -3280,13 +3506,23 @@ As with urlize_, this filter should only be applied to plain text.
 
 Returns the number of words.
 
-For example:
+For example in a template:
 
 .. code-block:: html+django
 
     {{ value|wordcount }}
 
 If ``value`` is ``"Joel is a slug"``, the output will be ``4``.
+
+For example in Python:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import wordcount
+
+    count = wordcount("Joel is a slug")
+
+The output of ``count`` will be ``4``.
 
 .. templatefilter:: wordwrap
 
@@ -3330,11 +3566,22 @@ Maps values for ``True``, ``False``, and (optionally) ``None``, to the strings
 "yes", "no", "maybe", or a custom mapping passed as a comma-separated list, and
 returns one of those strings according to the value:
 
-For example:
+For example in a template:
 
 .. code-block:: html+django
 
     {{ value|yesno:"yeah,no,maybe" }}
+
+For example in Python:
+
+.. code-block:: python
+
+    from django.template.defaultfilters import yesno
+
+    result = yesno(True, "yeah,no,maybe")
+
+The table below shows the possible inputs and outputs for both template usage 
+and Python usage:
 
 ==========  ======================  ===========================================
 Value       Argument                Outputs
