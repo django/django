@@ -50,6 +50,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         # The django_format_dtdelta() function doesn't properly handle mixed
         # Date/DateTime fields and timedeltas.
         "expressions.tests.FTimeDeltaTests.test_mixed_comparisons1",
+        # SQLite doesn't parse escaped double quotes in the JSON path notation,
+        # so it cannot match keys that contains double quotes (#35842).
+        "model_fields.test_jsonfield.TestQuerying."
+        "test_lookups_special_chars_double_quotes",
     }
     create_test_table_with_composite_primary_key = """
         CREATE TABLE test_table_composite_pk (
