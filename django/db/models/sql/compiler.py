@@ -2111,7 +2111,7 @@ class SQLBulkUpdateCompiler(SQLCompiler):
     def get_set_sql_clause(self, values):
         qn = self.quote_name_unless_alias
         set_sql = []
-        for idx, field in enumerate(values.field_list, 2):
+        for idx, field in enumerate(values.field_list, start=2):
             name = field.column
             set_sql.append(
                 "%s = %s.%s" % (qn(name), qn("subquery"), qn(f"column{idx}"))
