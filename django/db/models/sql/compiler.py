@@ -2093,12 +2093,12 @@ class SQLUpdateCompiler(SQLCompiler):
 class SQLBulkUpdateCompiler(SQLCompiler):
     def execute_sql(self, result_type):
         cursor = super().execute_sql(result_type)
+        if not cursor:
+            return 0
         try:
-            rows = cursor.rowcount if cursor else 0
+            return cursor.rowcount
         finally:
-            if cursor:
-                cursor.close()
-        return rows
+            cursor.close()
 
     def get_update_clause(self, values):
         qn = self.quote_name_unless_alias
