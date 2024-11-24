@@ -9,6 +9,7 @@ from unittest import mock
 
 from django.apps import apps
 from django.core.management import CommandError, call_command
+from django.core.management.base import SystemCheckError
 from django.core.management.commands.makemigrations import (
     Command as MakeMigrationsCommand,
 )
@@ -859,7 +860,7 @@ class MigrateTests(MigrationTestBase):
         sqlmigrate outputs forward looking SQL.
         """
         out = io.StringIO()
-        call_command("sqlmigrate", "migrations", "0001", stdout=out)
+        call_command("sqlmigrate", "migrations", "0001", stdout=out, no_color=True)
 
         lines = out.getvalue().splitlines()
 
@@ -921,7 +922,14 @@ class MigrateTests(MigrationTestBase):
         call_command("migrate", "migrations", verbosity=0)
 
         out = io.StringIO()
-        call_command("sqlmigrate", "migrations", "0001", stdout=out, backwards=True)
+        call_command(
+            "sqlmigrate",
+            "migrations",
+            "0001",
+            stdout=out,
+            backwards=True,
+            no_color=True,
+        )
 
         lines = out.getvalue().splitlines()
         try:
@@ -1097,6 +1105,30 @@ class MigrateTests(MigrationTestBase):
                 "-- THIS OPERATION CANNOT BE WRITTEN AS SQL",
             ],
         )
+
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
+    def test_sqlmigrate_transaction_keywords_not_colorized(self):
+        out = io.StringIO()
+        with mock.patch(
+            "django.core.management.color.supports_color", lambda *args: True
+        ):
+            call_command("sqlmigrate", "migrations", "0001", stdout=out, no_color=False)
+        self.assertNotIn("\x1b", out.getvalue())
+
+    @override_settings(
+        MIGRATION_MODULES={"migrations": "migrations.test_migrations_no_operations"},
+        INSTALLED_APPS=["django.contrib.auth"],
+    )
+    def test_sqlmigrate_system_checks_colorized(self):
+        with (
+            mock.patch(
+                "django.core.management.color.supports_color", lambda *args: True
+            ),
+            self.assertRaisesMessage(SystemCheckError, "\x1b"),
+        ):
+            call_command(
+                "sqlmigrate", "migrations", "0001", skip_checks=False, no_color=False
+            )
 
     @override_settings(
         INSTALLED_APPS=[
