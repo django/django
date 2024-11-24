@@ -1416,7 +1416,7 @@ Methods of ``BoundField``
 
 .. method:: BoundField.render(template_name=None, context=None, renderer=None)
 
-    The render method is called by ``as_field_group``. All arguments are 
+    The render method is called by ``as_field_group``. All arguments are
     optional and default to:
 
     * ``template_name``: :attr:`.BoundField.template_name`

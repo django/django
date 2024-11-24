@@ -198,7 +198,7 @@ Output is printed to the terminal, but can also be found in
     The execution of the command requires an internet connection and takes
     several minutes to complete, because the command tests all the links
     that are found in the documentation.
-    
+
 Entries that have a status of "working" are fine, those that are "unchecked" or
 "ignored" have been skipped because they either cannot be checked or have
 matched ignore rules in the configuration.
