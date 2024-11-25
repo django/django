@@ -11,7 +11,12 @@ from admin_scripts.tests import AdminScriptTestCase
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
-from django.http import HttpRequest, HttpResponsePermanentRedirect, HttpResponseRedirect
+from django.http import (
+    HttpRequest,
+    HttpResponsePermanentRedirect,
+    HttpResponseRedirect,
+    QueryDict,
+)
 from django.shortcuts import redirect
 from django.test import RequestFactory, SimpleTestCase, TestCase, override_settings
 from django.test.utils import override_script_prefix
@@ -530,6 +535,38 @@ class URLPatternReverse(SimpleTestCase):
     def test_view_func_from_cbv_no_expected_kwarg(self):
         with self.assertRaises(NoReverseMatch):
             reverse(views.view_func_from_cbv)
+
+    def test_reverse_with_query(self):
+        self.assertEqual(
+            reverse("test", query={"hello": "world", "foo": 123}),
+            "/test/1?hello=world&foo=123",
+        )
+
+    def test_reverse_with_fragment(self):
+        self.assertEqual(
+            reverse("test", fragment="tab-1"),
+            "/test/1#tab-1",
+        )
+
+    def test_reverse_with_query_and_fragment(self):
+        self.assertEqual(
+            reverse("test", query={"hello": "world", "foo": 123}, fragment="tab-1"),
+            "/test/1?hello=world&foo=123#tab-1",
+        )
+
+    def test_reverse_with_correct_query_encoding(self):
+        self.assertEqual(
+            reverse("test", query={"hello world": "django project", "foo": [123, 456]}),
+            "/test/1?hello+world=django+project&foo=123&foo=456",
+        )
+
+    def test_reverse_with_query_from_querydict(self):
+        query_string = "a=1&b=2&b=3&c=4"
+        query_dict = QueryDict(query_string)
+        self.assertEqual(
+            reverse("test", query=query_dict),
+            f"/test/1?{query_string}",
+        )
 
 
 class ResolverTests(SimpleTestCase):
