@@ -11,7 +11,12 @@ from admin_scripts.tests import AdminScriptTestCase
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
-from django.http import HttpRequest, HttpResponsePermanentRedirect, HttpResponseRedirect
+from django.http import (
+    HttpRequest,
+    HttpResponsePermanentRedirect,
+    HttpResponseRedirect,
+    QueryDict,
+)
 from django.shortcuts import redirect
 from django.test import RequestFactory, SimpleTestCase, TestCase, override_settings
 from django.test.utils import override_script_prefix
@@ -530,6 +535,81 @@ class URLPatternReverse(SimpleTestCase):
     def test_view_func_from_cbv_no_expected_kwarg(self):
         with self.assertRaises(NoReverseMatch):
             reverse(views.view_func_from_cbv)
+
+    def test_reverse_with_query(self):
+        self.assertEqual(
+            reverse("test", query={"hello": "world", "foo": 123}),
+            "/test/1?hello=world&foo=123",
+        )
+
+    def test_reverse_with_query_sequences(self):
+        cases = [
+            [("hello", "world"), ("foo", 123), ("foo", 456)],
+            (("hello", "world"), ("foo", 123), ("foo", 456)),
+            {"hello": "world", "foo": (123, 456)},
+        ]
+        for query in cases:
+            with self.subTest(query=query):
+                self.assertEqual(
+                    reverse("test", query=query), "/test/1?hello=world&foo=123&foo=456"
+                )
+
+    def test_reverse_with_fragment(self):
+        self.assertEqual(reverse("test", fragment="tab-1"), "/test/1#tab-1")
+
+    def test_reverse_with_fragment_not_encoded(self):
+        self.assertEqual(
+            reverse("test", fragment="tab 1 is the best!"), "/test/1#tab 1 is the best!"
+        )
+
+    def test_reverse_with_query_and_fragment(self):
+        self.assertEqual(
+            reverse("test", query={"hello": "world", "foo": 123}, fragment="tab-1"),
+            "/test/1?hello=world&foo=123#tab-1",
+        )
+
+    def test_reverse_with_empty_fragment(self):
+        self.assertEqual(reverse("test", fragment=None), "/test/1")
+        self.assertEqual(reverse("test", fragment=""), "/test/1#")
+
+    def test_reverse_with_invalid_fragment(self):
+        cases = [0, False, {}, [], set(), ()]
+        for fragment in cases:
+            with self.subTest(fragment=fragment):
+                with self.assertRaises(TypeError):
+                    reverse("test", fragment=fragment)
+
+    def test_reverse_with_empty_query(self):
+        cases = [None, "", {}, [], set(), (), QueryDict()]
+        for query in cases:
+            with self.subTest(query=query):
+                self.assertEqual(reverse("test", query=query), "/test/1")
+
+    def test_reverse_with_invalid_query(self):
+        cases = [0, False, [1, 3, 5], {1, 2, 3}]
+        for query in cases:
+            with self.subTest(query=query):
+                with self.assertRaises(TypeError):
+                    print(reverse("test", query=query))
+
+    def test_reverse_encodes_query_string(self):
+        self.assertEqual(
+            reverse(
+                "test",
+                query={
+                    "hello world": "django project",
+                    "foo": [123, 456],
+                    "@invalid": ["?", "!", "a b"],
+                },
+            ),
+            "/test/1?hello+world=django+project&foo=123&foo=456"
+            "&%40invalid=%3F&%40invalid=%21&%40invalid=a+b",
+        )
+
+    def test_reverse_with_query_from_querydict(self):
+        query_string = "a=1&b=2&b=3&c=4"
+        query_dict = QueryDict(query_string)
+        self.assertEqual(reverse("test", query=query_dict), f"/test/1?{query_string}")
 
 
 class ResolverTests(SimpleTestCase):
