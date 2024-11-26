@@ -502,7 +502,7 @@ select[multiple] {
     width: 100%; 
     height: auto; 
     display: block; 
-    margin: 0 auto;
+    margin: 0 auto; /* Center the widget (if needed) */
 }
 
 /* Additional styling for better visibility */

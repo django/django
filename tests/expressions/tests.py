@@ -2855,28 +2855,28 @@ def test_order_by_with_outerref_comprehensive(self):
     """
     Test ORDER BY with OuterRef in different scenarios
     """
-
     def test_simple_outerref():
         # Basic OuterRef test
         inner = Company.objects.annotate(
-            emp_diff=F("num_employees") - OuterRef("num_employees")
-        ).order_by("emp_diff")
+            emp_diff=F('num_employees') - OuterRef('num_employees')
+        ).order_by('emp_diff')
         self.assertQuerysetEqual(list(inner), [...])  # Expected results
 
     def test_complex_outerref():
         # Multiple OuterRef test
         inner = Company.objects.annotate(
             complex_order=ExpressionWrapper(
-                F("num_employees") * OuterRef("num_employees") / 100,
-                output_field=IntegerField(),
+                F('num_employees') * OuterRef('num_employees') / 100,
+                output_field=IntegerField()
             )
-        ).order_by("complex_order")
+        ).order_by('complex_order')
         self.assertQuerysetEqual(list(inner), [...])
 
     def test_mixed_ordering():
         # Mix of normal fields and OuterRef
         inner = Company.objects.order_by(
-            "name", F("num_employees") - OuterRef("num_employees")
+            'name',
+            F('num_employees') - OuterRef('num_employees')
         )
         self.assertQuerysetEqual(list(inner), [...])
 
