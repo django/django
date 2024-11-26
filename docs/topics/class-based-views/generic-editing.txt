@@ -278,7 +278,7 @@ The above example assumes that if the client supports ``text/html``, that they
 would prefer it. However, this may not always be true. When requesting a
 ``.css`` file, many browsers will send the header
 ``Accept: text/css,*/*;q=0.1``, indicating that they would prefer CSS, but
-anything else is fine. This means ``request.accepts("text/html") will be
+anything else is fine. This means ``request.accepts("text/html")`` will be
 ``True``.
 
 To determine the correct format, taking into consideration the client's
