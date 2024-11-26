@@ -9,4 +9,5 @@ Django 5.1.4 fixes several bugs in 5.1.3.
 Bugfixes
 ========
 
-* ...
+* Fixed a crash in ``createsuperuser`` on Python 3.13+ caused by an unhandled
+  ``OSError`` when the username could not be determined (:ticket:`35942`).
