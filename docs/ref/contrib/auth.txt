@@ -419,8 +419,8 @@ fields:
 
     .. attribute:: content_type
 
-        Required. A reference to the ``django_content_type`` database table,
-        which contains a record for each installed model.
+        Required. A foreign key to the
+        :class:`~django.contrib.contenttypes.models.ContentType` model.
 
     .. attribute:: codename
 
