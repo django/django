@@ -424,7 +424,7 @@ table thead th.sorted .sortoptions a {
     width: 14px;
     height: 14px;
     display: inline-block;
-    background: url(../img/sorting-icons.svg) 0 0 no-repeat;
+    mask-image: url(../img/sorting-icons.svg) 0 0 no-repeat;
     background-size: 14px auto;
 }
 
@@ -628,19 +628,22 @@ ul.messagelist li {
     font-size: 0.8125rem;
     padding: 10px 10px 10px 65px;
     margin: 0 0 10px 0;
-    background: var(--message-success-bg) url(../img/icon-yes.svg) 40px 12px no-repeat;
+    background-color: --message-success-bg;
+    mask-image: url(../img/icon-yes.svg) 40px 12px no-repeat;
+
+
     background-size: 16px auto;
     color: var(--body-fg);
     word-break: break-word;
 }
 
 ul.messagelist li.warning {
-    background: var(--message-warning-bg) url(../img/icon-alert.svg) 40px 14px no-repeat;
+    mask-image: var(--message-warning-bg) url(../img/icon-alert.svg) 40px 14px no-repeat;
     background-size: 14px auto;
 }
 
 ul.messagelist li.error {
-    background: var(--message-error-bg) url(../img/icon-no.svg) 40px 12px no-repeat;
+    mask-image: var(--message-error-bg) url(../img/icon-no.svg) 40px 12px no-repeat;
     background-size: 16px auto;
 }
 
@@ -733,27 +736,27 @@ div.breadcrumbs a:focus, div.breadcrumbs a:hover {
 
 .viewlink, .inlineviewlink {
     padding-left: 16px;
-    background: url(../img/icon-viewlink.svg) 0 1px no-repeat;
+    mask-image: url(../img/icon-viewlink.svg) 0 1px no-repeat;
 }
 
 .hidelink {
     padding-left: 16px;
-    background: url(../img/icon-hidelink.svg) 0 1px no-repeat;
+    mask-image: url(../img/icon-hidelink.svg) 0 1px no-repeat;
 }
 
 .addlink {
     padding-left: 16px;
-    background: url(../img/icon-addlink.svg) 0 1px no-repeat;
+    mask-image: url(../img/icon-addlink.svg) 0 1px no-repeat;
 }
 
 .changelink, .inlinechangelink {
     padding-left: 16px;
-    background: url(../img/icon-changelink.svg) 0 1px no-repeat;
+    mask-image: url(../img/icon-changelink.svg) 0 1px no-repeat;
 }
 
 .deletelink {
     padding-left: 16px;
-    background: url(../img/icon-deletelink.svg) 0 1px no-repeat;
+    mask-image: url(../img/icon-deletelink.svg) 0 1px no-repeat;
 }
 
 a.deletelink:link, a.deletelink:visited {
