@@ -679,7 +679,7 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
         user permissions and group permissions. Returns an empty set if
         :attr:`~django.contrib.auth.models.AbstractBaseUser.is_anonymous` or
         :attr:`~django.contrib.auth.models.CustomUser.is_active` is ``False``.
-    
+
         .. versionchanged:: 5.2
 
             ``aget_all_permissions()`` function was added.
