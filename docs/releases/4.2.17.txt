@@ -1,0 +1,8 @@
+===========================
+Django 4.2.17 release notes
+===========================
+
+*December 4, 2024*
+
+Django 4.2.17 fixes one security issue with severity "high" and one security
+issue with severity "moderate" in 4.2.16.
