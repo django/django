@@ -392,7 +392,7 @@ be ignored in favor of the value from the form's initial data.
 .. attribute:: Field.template_name
 
 The ``template_name`` argument allows a custom template to be used when the
-field is rendered with :meth:`~django.forms.BoundField.as_field_group`. By 
+field is rendered with :meth:`~django.forms.BoundField.as_field_group`. By
 default this value is set to ``"django/forms/field.html"``. Can be changed per
 field by overriding this attribute or more generally by overriding the default
 template, see also :ref:`overriding-built-in-field-templates`.
