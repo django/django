@@ -13,7 +13,7 @@ import uuid
 
 from django.core import serializers
 from django.db import connection, models
-from django.test import TestCase
+from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
 from .models import (
     Anchor,
@@ -256,7 +256,6 @@ uuid_obj = uuid.uuid4()
 test_data = [
     # Format: (data type, PK value, Model Class, data)
     (data_obj, 1, BinaryData, memoryview(b"\x05\xFD\x00")),
-    (data_obj, 2, BinaryData, None),
     (data_obj, 5, BooleanData, True),
     (data_obj, 6, BooleanData, False),
     (data_obj, 7, BooleanData, None),
@@ -265,7 +264,6 @@ test_data = [
     (data_obj, 12, CharData, "None"),
     (data_obj, 13, CharData, "null"),
     (data_obj, 14, CharData, "NULL"),
-    (data_obj, 15, CharData, None),
     # (We use something that will fit into a latin1 database encoding here,
     # because that is still the default used on many system setups.)
     (data_obj, 16, CharData, "\xa5"),
@@ -274,13 +272,11 @@ test_data = [
     (data_obj, 30, DateTimeData, datetime.datetime(2006, 6, 16, 10, 42, 37)),
     (data_obj, 31, DateTimeData, None),
     (data_obj, 40, EmailData, "hovercraft@example.com"),
-    (data_obj, 41, EmailData, None),
     (data_obj, 42, EmailData, ""),
     (data_obj, 50, FileData, "file:///foo/bar/whiz.txt"),
     # (data_obj, 51, FileData, None),
     (data_obj, 52, FileData, ""),
     (data_obj, 60, FilePathData, "/foo/bar/whiz.txt"),
-    (data_obj, 61, FilePathData, None),
     (data_obj, 62, FilePathData, ""),
     (data_obj, 70, DecimalData, decimal.Decimal("12.345")),
     (data_obj, 71, DecimalData, decimal.Decimal("-12.345")),
@@ -304,7 +300,6 @@ test_data = [
     (data_obj, 130, PositiveSmallIntegerData, 12),
     (data_obj, 131, PositiveSmallIntegerData, None),
     (data_obj, 140, SlugData, "this-is-a-slug"),
-    (data_obj, 141, SlugData, None),
     (data_obj, 142, SlugData, ""),
     (data_obj, 150, SmallData, 12),
     (data_obj, 151, SmallData, -12),
@@ -320,7 +315,6 @@ Several of them.
 The end.""",
     ),
     (data_obj, 161, TextData, ""),
-    (data_obj, 162, TextData, None),
     (data_obj, 170, TimeData, datetime.time(10, 42, 37)),
     (data_obj, 171, TimeData, None),
     (generic_obj, 200, GenericData, ["Generic Object 1", "tag1", "tag2"]),
@@ -388,15 +382,6 @@ The end.""",
     (pk_obj, 750, SmallPKData, 12),
     (pk_obj, 751, SmallPKData, -12),
     (pk_obj, 752, SmallPKData, 0),
-    (
-        pk_obj,
-        760,
-        TextPKData,
-        """This is a long piece of text.
-    It contains line breaks.
-    Several of them.
-    The end.""",
-    ),
     (pk_obj, 770, TimePKData, datetime.time(10, 42, 37)),
     (pk_obj, 791, UUIDData, uuid_obj),
     (fk_obj, 792, FKToUUID, uuid_obj),
@@ -420,41 +405,11 @@ The end.""",
 ]
 
 
-# Because Oracle treats the empty string as NULL, Oracle is expected to fail
-# when field.empty_strings_allowed is True and the value is None; skip these
-# tests.
-if connection.features.interprets_empty_strings_as_nulls:
-    test_data = [
-        data
-        for data in test_data
-        if not (
-            data[0] == data_obj
-            and data[2]._meta.get_field("data").empty_strings_allowed
-            and data[3] is None
-        )
-    ]
-
-
-if not connection.features.supports_index_on_text_field:
-    test_data = [data for data in test_data if data[2] != TextPKData]
-
-
 class SerializerDataTests(TestCase):
     pass
 
 
-def serializerTest(self, format):
-    # FK to an object with PK of 0. This won't work on MySQL without the
-    # NO_AUTO_VALUE_ON_ZERO SQL mode since it won't let you create an object
-    # with an autoincrement primary key of 0.
-    if connection.features.allows_auto_pk_0:
-        test_data.extend(
-            [
-                (data_obj, 0, Anchor, "Anchor 0"),
-                (fk_obj, 465, FKData, 0),
-            ]
-        )
-
+def assert_serializer(self, format, data):
     # Create all the objects defined in the test data
     objects = []
     instance_count = {}
@@ -486,4 +441,60 @@ def serializerTest(self, format):
         self.assertEqual(count, klass.objects.count())
 
 
+def serializerTest(self, format):
+    assert_serializer(self, format, test_data)
+
+
+@skipUnlessDBFeature("allows_auto_pk_0")
+def serializerTestPK0(self, format):
+    # FK to an object with PK of 0. This won't work on MySQL without the
+    # NO_AUTO_VALUE_ON_ZERO SQL mode since it won't let you create an object
+    # with an autoincrement primary key of 0.
+    data = [
+        (data_obj, 0, Anchor, "Anchor 0"),
+        (fk_obj, 1, FKData, 0),
+    ]
+    assert_serializer(self, format, data)
+
+
+@skipIfDBFeature("interprets_empty_strings_as_nulls")
+def serializerTestNullValueStingField(self, format):
+    data = [
+        (data_obj, 1, BinaryData, None),
+        (data_obj, 2, CharData, None),
+        (data_obj, 3, EmailData, None),
+        (data_obj, 4, FilePathData, None),
+        (data_obj, 5, SlugData, None),
+        (data_obj, 6, TextData, None),
+    ]
+    assert_serializer(self, format, data)
+
+
+@skipUnlessDBFeature("supports_index_on_text_field")
+def serializerTestTextFieldPK(self, format):
+    data = [
+        (
+            pk_obj,
+            1,
+            TextPKData,
+            """This is a long piece of text.
+            It contains line breaks.
+            Several of them.
+            The end.""",
+        ),
+    ]
+    assert_serializer(self, format, data)
+
+
 register_tests(SerializerDataTests, "test_%s_serializer", serializerTest)
+register_tests(SerializerDataTests, "test_%s_serializer_pk_0", serializerTestPK0)
+register_tests(
+    SerializerDataTests,
+    "test_%s_serializer_null_value_string_field",
+    serializerTestNullValueStingField,
+)
+register_tests(
+    SerializerDataTests,
+    "test_%s_serializer_text_field_pk",
+    serializerTestTextFieldPK,
+)
