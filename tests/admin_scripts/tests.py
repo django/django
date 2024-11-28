@@ -755,6 +755,7 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         args = ["startapp", "こんにちは"]
         app_path = os.path.join(self.test_dir, "こんにちは")
         out, err = self.run_django_admin(args, "test_project.settings")
+        self.assertOutput(out, f"Success! Created こんにちは at {self.test_dir}")
         self.assertNoOutput(err)
         self.assertTrue(os.path.exists(app_path))
         with open(os.path.join(app_path, "apps.py"), encoding="utf8") as f:
@@ -2486,6 +2487,21 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         self.assertOutput(err, "usage:")
         self.assertOutput(err, "You must provide a project name.")
 
+    def test_output(self):
+        dirs = {
+            "testproject": self.test_dir,
+            "testproject1": os.path.join(self.test_dir, "otherdirectory"),
+        }
+        for name_project, dir in dirs.items():
+            with self.subTest(name_project=name_project, dir=dir):
+                args = ["startproject", name_project]
+                if not os.path.exists(dir):
+                    os.mkdir(dir)
+                    args.append(dir)
+                out, err = self.run_django_admin(args)
+                self.assertOutput(out, f"Success! Created {name_project} at {dir}")
+                self.assertNoOutput(err)
+
     def test_simple_project(self):
         "Make sure the startproject management command creates a project"
         args = ["startproject", "testproject"]
@@ -2959,6 +2975,26 @@ class StartApp(AdminScriptTestCase):
                     "sure the name is a valid identifier.".format(bad_name),
                 )
                 self.assertFalse(os.path.exists(testproject_dir))
+
+    def test_output(self):
+        dirs = {
+            "foo": self.test_dir,
+            # Use a subdirectory so it is outside the PYTHONPATH.
+            "bar": (
+                os.path.join(self.test_dir, "apps/otherdir")
+                if os.name == "posix"
+                else os.path.join(self.test_dir, "apps\\otherdir")
+            ),
+        }
+        for name_app, dir in dirs.items():
+            with self.subTest(name_app=name_app, dir=dir):
+                args = ["startapp", name_app]
+                if not os.path.exists(dir):
+                    os.makedirs(dir)
+                    args.append(dir)
+                out, err = self.run_django_admin(args)
+                self.assertOutput(out, f"Success! Created {name_app} at {dir}")
+                self.assertNoOutput(err)
 
     def test_importable_name(self):
         """

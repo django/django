@@ -230,6 +230,15 @@ class TemplateCommand(BaseCommand):
                     shutil.rmtree(path_to_remove)
 
         run_formatters([top_dir], **formatter_paths)
+        self.handle_target(name, target)
+
+    def handle_target(self, name, target=None):
+        if target is None:
+            target = os.getcwd()
+        else:
+            target = os.path.abspath(target)
+
+        self.stdout.write(f"Success! Created {name} at {target}.", self.style.SUCCESS)
 
     def handle_template(self, template, subdir):
         """
