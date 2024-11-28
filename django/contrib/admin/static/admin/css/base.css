@@ -34,6 +34,10 @@ html[data-theme="light"],
 
     --error-fg: #ba2121;
 
+    --icon-success-color: #70bf2b;
+    --icon-warning-color: #ff9800;
+    --icon-error-color: #f44336;
+
     --message-success-bg: #dfd;
     --message-warning-bg: #ffc;
     --message-error-bg: #ffefef;
@@ -626,25 +630,53 @@ ul.messagelist li {
     display: block;
     font-weight: 400;
     font-size: 0.8125rem;
-    padding: 10px 10px 10px 65px;
-    margin: 0 0 10px 0;
-    background-color: --message-success-bg;
-    mask-image: url(../img/icon-yes.svg) 40px 12px no-repeat;
-
-
-    background-size: 16px auto;
+    padding: 0.625rem 0.625rem 0.625rem 4.063rem;
+    margin: 0 0 0.625rem 0;
+    background-color: var(--message-success-bg);
     color: var(--body-fg);
     word-break: break-word;
+    position: relative;
+}
+
+ul.messagelist li::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0.625rem;
+    transform: translateY(-50%);
+    width: 1rem;
+    height: 1rem;
+    mask-image: url(../img/icon-yes.svg);
+    -webkit-mask-image: url(../img/icon-yes.svg);
+    mask-size: contain;
+    -webkit-mask-size: contain;
+    mask-repeat: no-repeat;
+    -webkit-mask-repeat: no-repeat;
+    background-color: var(--icon-success-color);
 }
 
 ul.messagelist li.warning {
-    mask-image: var(--message-warning-bg) url(../img/icon-alert.svg) 40px 14px no-repeat;
-    background-size: 14px auto;
+    background-color: var(--message-warning-bg);
+}
+
+ul.messagelist li.warning::before {
+    mask-image: url(../img/icon-alert.svg);
+    -webkit-mask-image: url(../img/icon-alert.svg);
+    width: 0.875rem;
+    height: 0.875rem;
+    background-color: var(--icon-warning-color);
 }
 
 ul.messagelist li.error {
-    mask-image: var(--message-error-bg) url(../img/icon-no.svg) 40px 12px no-repeat;
-    background-size: 16px auto;
+    background-color: var(--message-error-bg);
+}
+
+ul.messagelist li.error::before {
+    mask-image: url(../img/icon-no.svg);
+    -webkit-mask-image: url(../img/icon-no.svg);
+    width: 1rem;
+    height: 1rem;
+    background-color: var(--icon-error-color);
 }
 
 .errornote {
@@ -817,11 +849,11 @@ a.deletelink:focus, a.deletelink:hover {
 }
 
 .object-tools a.viewsitelink {
-    background-image: url(../img/tooltag-arrowright.svg);
+    mask-image: url(../img/tooltag-arrowright.svg);
 }
 
 .object-tools a.addlink {
-    background-image: url(../img/tooltag-add.svg);
+    mask-image: url(../img/tooltag-add.svg);
 }
 
 /* OBJECT HISTORY */
