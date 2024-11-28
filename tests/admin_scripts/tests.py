@@ -2356,8 +2356,8 @@ class Discovery(SimpleTestCase):
 class CommandDBOptionChoiceTests(SimpleTestCase):
     def test_invalid_choice_db_option(self):
         expected_error = (
-            "Error: argument --database: invalid choice: "
-            "'deflaut' (choose from 'default', 'other')"
+            r"Error: argument --database: invalid choice: 'deflaut' "
+            r"\(choose from '?default'?, '?other'?\)"
         )
         args = [
             "changepassword",
@@ -2378,7 +2378,7 @@ class CommandDBOptionChoiceTests(SimpleTestCase):
         ]
 
         for arg in args:
-            with self.assertRaisesMessage(CommandError, expected_error):
+            with self.assertRaisesRegex(CommandError, expected_error):
                 call_command(arg, "--database", "deflaut", verbosity=0)
 
 

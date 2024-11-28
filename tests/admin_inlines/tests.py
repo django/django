@@ -1801,7 +1801,7 @@ class TestInlineWithFieldsets(TestDataMixin, TestCase):
         # The second and third have the same "Advanced options" name, but the
         # second one has the "collapse" class.
         for x, classes in ((1, ""), (2, "collapse")):
-            heading_id = f"fieldset-0-advanced-options-{x}-heading"
+            heading_id = f"fieldset-0-{x}-heading"
             with self.subTest(heading_id=heading_id):
                 self.assertContains(
                     response,
@@ -1846,7 +1846,7 @@ class TestInlineWithFieldsets(TestDataMixin, TestCase):
                 # Every fieldset defined for an inline's form.
                 for z, fieldset in enumerate(inline_admin_form):
                     if fieldset.name:
-                        heading_id = f"{prefix}-{y}-details-{z}-heading"
+                        heading_id = f"{prefix}-{y}-{z}-heading"
                         self.assertContains(
                             response,
                             f'<fieldset class="module aligned {fieldset.classes}" '
@@ -2420,31 +2420,43 @@ class SeleniumTests(AdminSeleniumTestCase):
             "admin:admin_inlines_courseproxy1_add",
             "admin:admin_inlines_courseproxy2_add",
         ]
-        css_selector = ".dynamic-class_set#class_set-%s h2"
+        css_available_selector = (
+            ".dynamic-class_set#class_set-%s .selector-available-title"
+        )
+        css_chosen_selector = ".dynamic-class_set#class_set-%s .selector-chosen-title"
 
         for url_name in tests:
             with self.subTest(url=url_name):
                 self.selenium.get(self.live_server_url + reverse(url_name))
                 # First inline shows the verbose_name.
-                available, chosen = self.selenium.find_elements(
-                    By.CSS_SELECTOR, css_selector % 0
+                available = self.selenium.find_element(
+                    By.CSS_SELECTOR, css_available_selector % 0
                 )
-                self.assertEqual(available.text, "AVAILABLE ATTENDANT")
-                self.assertEqual(chosen.text, "CHOSEN ATTENDANT")
+                chosen = self.selenium.find_element(
+                    By.CSS_SELECTOR, css_chosen_selector % 0
+                )
+                self.assertIn("Available attendant", available.text)
+                self.assertIn("Chosen attendant", chosen.text)
                 # Added inline should also have the correct verbose_name.
                 self.selenium.find_element(By.LINK_TEXT, "Add another Class").click()
-                available, chosen = self.selenium.find_elements(
-                    By.CSS_SELECTOR, css_selector % 1
+                available = self.selenium.find_element(
+                    By.CSS_SELECTOR, css_available_selector % 1
                 )
-                self.assertEqual(available.text, "AVAILABLE ATTENDANT")
-                self.assertEqual(chosen.text, "CHOSEN ATTENDANT")
+                chosen = self.selenium.find_element(
+                    By.CSS_SELECTOR, css_chosen_selector % 1
+                )
+                self.assertIn("Available attendant", available.text)
+                self.assertIn("Chosen attendant", chosen.text)
                 # Third inline should also have the correct verbose_name.
                 self.selenium.find_element(By.LINK_TEXT, "Add another Class").click()
-                available, chosen = self.selenium.find_elements(
-                    By.CSS_SELECTOR, css_selector % 2
+                available = self.selenium.find_element(
+                    By.CSS_SELECTOR, css_available_selector % 2
                 )
-                self.assertEqual(available.text, "AVAILABLE ATTENDANT")
-                self.assertEqual(chosen.text, "CHOSEN ATTENDANT")
+                chosen = self.selenium.find_element(
+                    By.CSS_SELECTOR, css_chosen_selector % 2
+                )
+                self.assertIn("Available attendant", available.text)
+                self.assertIn("Chosen attendant", chosen.text)
 
     def test_tabular_inline_layout(self):
         from selenium.webdriver.common.by import By

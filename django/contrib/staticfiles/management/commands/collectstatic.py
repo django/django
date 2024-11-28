@@ -279,14 +279,14 @@ class Command(BaseCommand):
             try:
                 # When was the target file modified last time?
                 target_last_modified = self.storage.get_modified_time(prefixed_path)
-            except (OSError, NotImplementedError, AttributeError):
+            except (OSError, NotImplementedError):
                 # The storage doesn't support get_modified_time() or failed
                 pass
             else:
                 try:
                     # When was the source file modified last time?
                     source_last_modified = source_storage.get_modified_time(path)
-                except (OSError, NotImplementedError, AttributeError):
+                except (OSError, NotImplementedError):
                     pass
                 else:
                     # The full path of the target file

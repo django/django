@@ -148,7 +148,11 @@ class MultipleObjectMixin(ContextMixin):
 
 
 class BaseListView(MultipleObjectMixin, View):
-    """A base view for displaying a list of objects."""
+    """
+    Base view for displaying a list of objects.
+
+    This requires subclassing to provide a response mixin.
+    """
 
     def get(self, request, *args, **kwargs):
         self.object_list = self.get_queryset()

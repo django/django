@@ -65,8 +65,6 @@ an empty value -- either ``None`` or the empty string (``""``) -- then
     Traceback (most recent call last):
     ...
     ValidationError: ['This field is required.']
-    >>> f.clean(" ")
-    ' '
     >>> f.clean(0)
     '0'
     >>> f.clean(True)
@@ -112,7 +110,7 @@ validation may not be correct when adding and deleting formsets.
 The ``label`` argument lets you specify the "human-friendly" label for this
 field. This is used when the ``Field`` is displayed in a ``Form``.
 
-As explained in "Outputting forms as HTML" above, the default label for a
+As explained in :ref:`ref-forms-api-outputting-html`, the default label for a
 ``Field`` is generated from the field name by converting all underscores to
 spaces and upper-casing the first letter. Specify ``label`` if that default
 behavior doesn't result in an adequate label.
@@ -226,7 +224,7 @@ validation if a particular field's value is not given. ``initial`` values are
     >>> f = CommentForm(data)
     >>> f.is_valid()
     False
-    # The form does *not* fall back to using the initial values.
+    # The form does *not* fallback to using the initial values.
     >>> f.errors
     {'url': ['This field is required.'], 'name': ['This field is required.']}
 
@@ -375,7 +373,7 @@ See the :doc:`validators documentation </ref/validators>` for more information.
 The ``localize`` argument enables the localization of form data input, as well
 as the rendered output.
 
-See the :doc:`format localization </topics/i18n/formatting>` documentation for
+See the :doc:`format localization documentation </topics/i18n/formatting>` for
 more information.
 
 ``disabled``
@@ -394,7 +392,7 @@ be ignored in favor of the value from the form's initial data.
 .. attribute:: Field.template_name
 
 The ``template_name`` argument allows a custom template to be used when the
-field is rendered with :meth:`~django.forms.BoundField.as_field_group`. By 
+field is rendered with :meth:`~django.forms.BoundField.as_field_group`. By
 default this value is set to ``"django/forms/field.html"``. Can be changed per
 field by overriding this attribute or more generally by overriding the default
 template, see also :ref:`overriding-built-in-field-templates`.

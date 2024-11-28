@@ -337,7 +337,8 @@ subclass::
     If neither ``fields`` nor :attr:`~ModelAdmin.fieldsets` options are present,
     Django will default to displaying each field that isn't an ``AutoField`` and
     has ``editable=True``, in a single fieldset, in the same order as the fields
-    are defined in the model.
+    are defined in the model, followed by any fields defined in
+    :attr:`~ModelAdmin.readonly_fields`.
 
 .. attribute:: ModelAdmin.fieldsets
 
@@ -1465,6 +1466,27 @@ templates used by the :class:`ModelAdmin` views:
 
     See also :ref:`saving-objects-in-the-formset`.
 
+.. warning::
+
+    All hooks that return a ``ModelAdmin`` property return the property itself
+    rather than a copy of its value. Dynamically modifying the value can lead
+    to surprising results.
+
+    Let's take :meth:`ModelAdmin.get_readonly_fields` as an example::
+
+        class PersonAdmin(admin.ModelAdmin):
+            readonly_fields = ["name"]
+
+            def get_readonly_fields(self, request, obj=None):
+                readonly = super().get_readonly_fields(request, obj)
+                if not request.user.is_superuser:
+                    readonly.append("age")  # Edits the class attribute.
+                return readonly
+
+    This results in ``readonly_fields`` becoming
+    ``["name", "age", "age", ...]``, even for a superuser, as ``"age"`` is added
+    each time non-superuser visits the page.
+
 .. method:: ModelAdmin.get_ordering(request)
 
     The ``get_ordering`` method takes a ``request`` as parameter and
@@ -2229,6 +2251,7 @@ information.
     inlines to a model by specifying them in a ``ModelAdmin.inlines``::
 
         from django.contrib import admin
+        from myapp.models import Author, Book
 
 
         class BookInline(admin.TabularInline):
@@ -2239,6 +2262,9 @@ information.
             inlines = [
                 BookInline,
             ]
+
+
+        admin.site.register(Author, AuthorAdmin)
 
     Django provides two subclasses of ``InlineModelAdmin`` and they are:
 
@@ -2472,6 +2498,10 @@ Take this model for instance::
     from django.db import models
 
 
+    class Person(models.Model):
+        name = models.CharField(max_length=128)
+
+
     class Friendship(models.Model):
         to_person = models.ForeignKey(
             Person, on_delete=models.CASCADE, related_name="friends"
@@ -2485,7 +2515,7 @@ you need to explicitly define the foreign key since it is unable to do so
 automatically::
 
     from django.contrib import admin
-    from myapp.models import Friendship
+    from myapp.models import Friendship, Person
 
 
     class FriendshipInline(admin.TabularInline):
@@ -2497,6 +2527,9 @@ automatically::
         inlines = [
             FriendshipInline,
         ]
+
+
+    admin.site.register(Person, PersonAdmin)
 
 Working with many-to-many models
 --------------------------------
@@ -2526,16 +2559,11 @@ If you want to display many-to-many relations using an inline, you can do
 so by defining an ``InlineModelAdmin`` object for the relationship::
 
     from django.contrib import admin
+    from myapp.models import Group
 
 
     class MembershipInline(admin.TabularInline):
         model = Group.members.through
-
-
-    class PersonAdmin(admin.ModelAdmin):
-        inlines = [
-            MembershipInline,
-        ]
 
 
     class GroupAdmin(admin.ModelAdmin):
@@ -2543,6 +2571,9 @@ so by defining an ``InlineModelAdmin`` object for the relationship::
             MembershipInline,
         ]
         exclude = ["members"]
+
+
+    admin.site.register(Group, GroupAdmin)
 
 There are two features worth noting in this example.
 

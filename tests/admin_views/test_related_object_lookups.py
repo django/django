@@ -162,7 +162,7 @@ class SeleniumTests(AdminSeleniumTestCase):
 
         # Move the new value to the from box.
         self.selenium.find_element(By.XPATH, "//*[@id='id_m2m_to']/option").click()
-        self.selenium.find_element(By.XPATH, "//*[@id='id_m2m_remove_link']").click()
+        self.selenium.find_element(By.XPATH, "//*[@id='id_m2m_remove']").click()
 
         self.assertHTMLEqual(
             m2m_box.get_attribute("innerHTML"),
@@ -172,7 +172,7 @@ class SeleniumTests(AdminSeleniumTestCase):
 
         # Move the new value to the to box.
         self.selenium.find_element(By.XPATH, "//*[@id='id_m2m_from']/option").click()
-        self.selenium.find_element(By.XPATH, "//*[@id='id_m2m_add_link']").click()
+        self.selenium.find_element(By.XPATH, "//*[@id='id_m2m_add']").click()
 
         self.assertHTMLEqual(m2m_box.get_attribute("innerHTML"), "")
         self.assertHTMLEqual(

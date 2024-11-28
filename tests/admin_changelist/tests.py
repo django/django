@@ -860,6 +860,47 @@ class ChangeListTests(TestCase):
         cl = m.get_changelist_instance(request)
         self.assertCountEqual(cl.queryset, [abcd])
 
+    def test_search_with_exact_lookup_for_non_string_field(self):
+        child = Child.objects.create(name="Asher", age=11)
+        model_admin = ChildAdmin(Child, custom_site)
+
+        for search_term, expected_result in [
+            ("11", [child]),
+            ("Asher", [child]),
+            ("1", []),
+            ("A", []),
+            ("random", []),
+        ]:
+            request = self.factory.get("/", data={SEARCH_VAR: search_term})
+            request.user = self.superuser
+            with self.subTest(search_term=search_term):
+                # 1 query for filtered result, 1 for filtered count, 1 for total count.
+                with self.assertNumQueries(3):
+                    cl = model_admin.get_changelist_instance(request)
+                self.assertCountEqual(cl.queryset, expected_result)
+
+    def test_search_with_exact_lookup_relationship_field(self):
+        child = Child.objects.create(name="I am a child", age=11)
+        grandchild = GrandChild.objects.create(name="I am a grandchild", parent=child)
+        model_admin = GrandChildAdmin(GrandChild, custom_site)
+
+        request = self.factory.get("/", data={SEARCH_VAR: "'I am a child'"})
+        request.user = self.superuser
+        cl = model_admin.get_changelist_instance(request)
+        self.assertCountEqual(cl.queryset, [grandchild])
+        for search_term, expected_result in [
+            ("11", [grandchild]),
+            ("'I am a child'", [grandchild]),
+            ("1", []),
+            ("A", []),
+            ("random", []),
+        ]:
+            request = self.factory.get("/", data={SEARCH_VAR: search_term})
+            request.user = self.superuser
+            with self.subTest(search_term=search_term):
+                cl = model_admin.get_changelist_instance(request)
+                self.assertCountEqual(cl.queryset, expected_result)
+
     def test_no_distinct_for_m2m_in_list_filter_without_params(self):
         """
         If a ManyToManyField is in list_filter but isn't in any lookup params,

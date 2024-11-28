@@ -20,6 +20,7 @@ jobs:
           - '3.11'
           - '3.12'
           - '3.13'
+          - '3.14-dev'
     name: Windows, SQLite, Python ${{ matrix.python-version }}
     continue-on-error: true
     steps:
@@ -35,7 +36,7 @@ jobs:
         run: python -m pip install --upgrade pip setuptools wheel
       - run: python -m pip install -r tests/requirements/py3.txt -e .
       - name: Run tests
-        run: python tests/runtests.py -v2
+        run: python -Wall tests/runtests.py -v2
 
   pyc-only:
     runs-on: ubuntu-latest
@@ -61,7 +62,7 @@ jobs:
           find $DJANGO_PACKAGE_ROOT -name '*.py' -print -delete
       - run: python -m pip install -r tests/requirements/py3.txt
       - name: Run tests
-        run: python tests/runtests.py --verbosity=2
+        run: python -Wall tests/runtests.py --verbosity=2
 
   pypy-sqlite:
     runs-on: ubuntu-latest

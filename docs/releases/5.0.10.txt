@@ -1,0 +1,8 @@
+===========================
+Django 5.0.10 release notes
+===========================
+
+*December 4, 2024*
+
+Django 5.0.10 fixes one security issue with severity "high" and one security
+issue with severity "moderate" in 5.0.9.

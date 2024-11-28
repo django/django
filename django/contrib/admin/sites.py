@@ -282,7 +282,7 @@ class AdminSite:
             path("autocomplete/", wrap(self.autocomplete_view), name="autocomplete"),
             path("jsi18n/", wrap(self.i18n_javascript, cacheable=True), name="jsi18n"),
             path(
-                "r/<int:content_type_id>/<path:object_id>/",
+                "r/<path:content_type_id>/<path:object_id>/",
                 wrap(contenttype_views.shortcut),
                 name="view_on_site",
             ),

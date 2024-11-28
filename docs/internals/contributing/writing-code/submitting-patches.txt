@@ -47,10 +47,14 @@ and time availability), claim it by following these steps:
   any activity, it's probably safe to reassign it to yourself.
 
 * Log into your account, if you haven't already, by clicking "GitHub Login"
-  or "DjangoProject Login" in the upper left of the ticket page.
+  or "DjangoProject Login" in the upper left of the ticket page. Once logged
+  in, you can then click the "Modify Ticket" button near the bottom of the
+  page.
 
-* Claim the ticket by clicking the "assign to myself" radio button under
-  "Action" near the bottom of the page, then click "Submit changes."
+* Claim the ticket by clicking the "assign to" radio button in the "Action"
+  section. Your username will be filled in the text box by default.
+
+* Finally click the "Submit changes" button at the bottom to save.
 
 .. note::
     The Django software foundation requests that anyone contributing more than
@@ -114,7 +118,7 @@ requirements:
   feature, the change should also contain documentation.
 
 When you think your work is ready to be reviewed, send :doc:`a GitHub pull
-request <working-with-git>`. 
+request <working-with-git>`.
 If you can't send a pull request for some reason, you can also use patches in
 Trac. When using this style, follow these guidelines.
 
@@ -140,20 +144,63 @@ Regardless of the way you submit your work, follow these steps.
 .. _ticket tracker: https://code.djangoproject.com/
 .. _Development dashboard: https://dashboard.djangoproject.com/
 
-Non-trivial contributions
-=========================
+Contributions which require community feedback
+==============================================
 
-A "non-trivial" contribution is one that is more than a small bug fix. It's a
-change that introduces new Django functionality and makes some sort of design
-decision.
+A wider community discussion is required when a patch introduces new Django
+functionality and makes some sort of design decision. This is especially
+important if the approach involves a :ref:`deprecation <deprecating-a-feature>`
+or introduces breaking changes.
 
-If you provide a non-trivial change, include evidence that alternatives have
-been discussed on the `Django Forum`_ or |django-developers| list.
+The following are different approaches for gaining feedback from the community.
 
-If you're not sure whether your contribution should be considered non-trivial,
-ask on the ticket for opinions.
+The Django Forum or django-developers mailing list
+--------------------------------------------------
+
+You can propose a change on the `Django Forum`_ or |django-developers| mailing
+list. You should explain the need for the change, go into details of the
+approach and discuss alternatives.
+
+Please include a link to such discussions in your contributions.
+
+Third party package
+-------------------
+
+Django does not accept experimental features. All features must follow our
+:ref:`deprecation policy <internal-release-deprecation-policy>`. Hence, it can
+take months or years for Django to iterate on an API design.
+
+If you need user feedback on a public interface, it is better to create a
+third-party package first. You can iterate on the public API much faster, while
+also validating the need for the feature.
+
+Once this package becomes stable and there are clear benefits of incorporating
+aspects into Django core, starting a discussion on the `Django Forum`_ or
+|django-developers| mailing list would be the next step.
+
+Django Enhancement Proposal (DEP)
+---------------------------------
+
+Similar to Python’s PEPs, Django has `Django Enhancement Proposals`_ or DEPs. A
+DEP is a design document which provides information to the Django community, or
+describes a new feature or process for Django. They provide concise technical
+specifications of features, along with rationales. DEPs are also the primary
+mechanism for proposing and collecting community input on major new features.
+
+Before considering writing a DEP, it is recommended to first open a discussion
+on the `Django Forum`_ or |django-developers| mailing list. This allows the
+community to provide feedback and helps refine the proposal. Once the DEP is
+ready the :ref:`Steering Council <steering-council>` votes on whether to accept
+it.
+
+Some examples of DEPs that have been approved and fully implemented:
+
+* `DEP 181: ORM Expressions <https://github.com/django/deps/blob/main/final/0181-orm-expressions.rst>`_
+* `DEP 182: Multiple Template Engines <https://github.com/django/deps/blob/main/final/0182-multiple-template-engines.rst>`_
+* `DEP 201: Simplified routing syntax <https://github.com/django/deps/blob/main/final/0201-simplified-routing-syntax.rst>`_
 
 .. _Django Forum: https://forum.djangoproject.com/
+.. _Django Enhancement Proposals: https://github.com/django/deps
 
 .. _deprecating-a-feature:
 

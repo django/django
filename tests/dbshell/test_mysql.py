@@ -112,7 +112,7 @@ class MySqlDbshellCommandTestCase(SimpleTestCase):
             "--user=someuser",
             "--host=somehost",
             "--port=444",
-            "--default-character-set=utf8",
+            "--default-character-set=utf8mb4",
             "somedbname",
         ]
         expected_env = {"MYSQL_PWD": "somepassword"}
@@ -124,7 +124,7 @@ class MySqlDbshellCommandTestCase(SimpleTestCase):
                     "PASSWORD": "somepassword",
                     "HOST": "somehost",
                     "PORT": 444,
-                    "OPTIONS": {"charset": "utf8"},
+                    "OPTIONS": {"charset": "utf8mb4"},
                 }
             ),
             (expected_args, expected_env),

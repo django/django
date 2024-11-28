@@ -237,6 +237,7 @@ class ArticleAdmin(ArticleAdminWithExtraUrl):
             "Some other fields",
             {"classes": ("wide",), "fields": ("date", "section", "sub_section")},
         ),
+        ("이름", {"fields": ("another_section",)}),
     )
 
     # These orderings aren't particularly useful but show that expressions can

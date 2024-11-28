@@ -68,7 +68,9 @@ from .models import (
     SmallPKData,
     Tag,
     TextData,
+    TextPKData,
     TimeData,
+    TimePKData,
     UniqueAnchor,
     UUIDData,
     UUIDDefaultData,
@@ -386,11 +388,16 @@ The end.""",
     (pk_obj, 750, SmallPKData, 12),
     (pk_obj, 751, SmallPKData, -12),
     (pk_obj, 752, SmallPKData, 0),
-    # (pk_obj, 760, TextPKData, """This is a long piece of text.
-    # It contains line breaks.
-    # Several of them.
-    # The end."""),
-    # (pk_obj, 770, TimePKData, datetime.time(10, 42, 37)),
+    (
+        pk_obj,
+        760,
+        TextPKData,
+        """This is a long piece of text.
+    It contains line breaks.
+    Several of them.
+    The end.""",
+    ),
+    (pk_obj, 770, TimePKData, datetime.time(10, 42, 37)),
     (pk_obj, 791, UUIDData, uuid_obj),
     (fk_obj, 792, FKToUUID, uuid_obj),
     (pk_obj, 793, UUIDDefaultData, uuid_obj),
@@ -426,6 +433,10 @@ if connection.features.interprets_empty_strings_as_nulls:
             and data[3] is None
         )
     ]
+
+
+if not connection.features.supports_index_on_text_field:
+    test_data = [data for data in test_data if data[2] != TextPKData]
 
 
 class SerializerDataTests(TestCase):

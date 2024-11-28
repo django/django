@@ -2,7 +2,7 @@ import itertools
 
 from django.core.exceptions import EmptyResultSet
 from django.db.models import Field
-from django.db.models.expressions import Func, Value
+from django.db.models.expressions import ColPairs, Func, Value
 from django.db.models.lookups import (
     Exact,
     GreaterThan,
@@ -12,6 +12,7 @@ from django.db.models.lookups import (
     LessThan,
     LessThanOrEqual,
 )
+from django.db.models.sql import Query
 from django.db.models.sql.where import AND, OR, WhereNode
 
 
@@ -28,16 +29,31 @@ class Tuple(Func):
 
 class TupleLookupMixin:
     def get_prep_lookup(self):
+        self.check_rhs_is_tuple_or_list()
         self.check_rhs_length_equals_lhs_length()
         return self.rhs
+
+    def check_rhs_is_tuple_or_list(self):
+        if not isinstance(self.rhs, (tuple, list)):
+            lhs_str = self.get_lhs_str()
+            raise ValueError(
+                f"{self.lookup_name!r} lookup of {lhs_str} must be a tuple or a list"
+            )
 
     def check_rhs_length_equals_lhs_length(self):
         len_lhs = len(self.lhs)
         if len_lhs != len(self.rhs):
+            lhs_str = self.get_lhs_str()
             raise ValueError(
-                f"'{self.lookup_name}' lookup of '{self.lhs.field.name}' field "
-                f"must have {len_lhs} elements"
+                f"{self.lookup_name!r} lookup of {lhs_str} must have {len_lhs} elements"
             )
+
+    def get_lhs_str(self):
+        if isinstance(self.lhs, ColPairs):
+            return repr(self.lhs.field.name)
+        else:
+            names = ", ".join(repr(f.name) for f in self.lhs)
+            return f"({names})"
 
     def get_prep_lhs(self):
         if isinstance(self.lhs, (tuple, list)):
@@ -196,15 +212,50 @@ class TupleLessThanOrEqual(TupleLookupMixin, LessThanOrEqual):
 
 class TupleIn(TupleLookupMixin, In):
     def get_prep_lookup(self):
-        self.check_rhs_elements_length_equals_lhs_length()
-        return super(TupleLookupMixin, self).get_prep_lookup()
+        if self.rhs_is_direct_value():
+            self.check_rhs_is_tuple_or_list()
+            self.check_rhs_is_collection_of_tuples_or_lists()
+            self.check_rhs_elements_length_equals_lhs_length()
+        else:
+            self.check_rhs_is_query()
+            self.check_rhs_select_length_equals_lhs_length()
+
+        return self.rhs  # skip checks from mixin
+
+    def check_rhs_is_collection_of_tuples_or_lists(self):
+        if not all(isinstance(vals, (tuple, list)) for vals in self.rhs):
+            lhs_str = self.get_lhs_str()
+            raise ValueError(
+                f"{self.lookup_name!r} lookup of {lhs_str} "
+                "must be a collection of tuples or lists"
+            )
 
     def check_rhs_elements_length_equals_lhs_length(self):
         len_lhs = len(self.lhs)
         if not all(len_lhs == len(vals) for vals in self.rhs):
+            lhs_str = self.get_lhs_str()
             raise ValueError(
-                f"'{self.lookup_name}' lookup of '{self.lhs.field.name}' field "
+                f"{self.lookup_name!r} lookup of {lhs_str} "
                 f"must have {len_lhs} elements each"
+            )
+
+    def check_rhs_is_query(self):
+        if not isinstance(self.rhs, Query):
+            lhs_str = self.get_lhs_str()
+            rhs_cls = self.rhs.__class__.__name__
+            raise ValueError(
+                f"{self.lookup_name!r} subquery lookup of {lhs_str} "
+                f"must be a Query object (received {rhs_cls!r})"
+            )
+
+    def check_rhs_select_length_equals_lhs_length(self):
+        len_rhs = len(self.rhs.select)
+        len_lhs = len(self.lhs)
+        if len_rhs != len_lhs:
+            lhs_str = self.get_lhs_str()
+            raise ValueError(
+                f"{self.lookup_name!r} subquery lookup of {lhs_str} "
+                f"must have {len_lhs} fields (received {len_rhs})"
             )
 
     def process_rhs(self, compiler, connection):
@@ -229,10 +280,17 @@ class TupleIn(TupleLookupMixin, In):
 
         return Tuple(*result).as_sql(compiler, connection)
 
+    def as_sql(self, compiler, connection):
+        if not self.rhs_is_direct_value():
+            return self.as_subquery(compiler, connection)
+        return super().as_sql(compiler, connection)
+
     def as_sqlite(self, compiler, connection):
         rhs = self.rhs
         if not rhs:
             raise EmptyResultSet
+        if not self.rhs_is_direct_value():
+            return self.as_subquery(compiler, connection)
 
         # e.g.: (a, b, c) in [(x1, y1, z1), (x2, y2, z2)] as SQL:
         # WHERE (a = x1 AND b = y1 AND c = z1) OR (a = x2 AND b = y2 AND c = z2)
@@ -244,6 +302,9 @@ class TupleIn(TupleLookupMixin, In):
             root.children.append(WhereNode(lookups, connector=AND))
 
         return root.as_sql(compiler, connection)
+
+    def as_subquery(self, compiler, connection):
+        return compiler.compile(In(self.lhs, self.rhs))
 
 
 tuple_lookups = {

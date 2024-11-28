@@ -1046,7 +1046,7 @@ class InHTMLTests(SimpleTestCase):
     def test_long_haystack(self):
         haystack = (
             "<p>This is a very very very very very very very very long message which "
-            "exceedes the max limit of truncation.</p>"
+            "exceeds the max limit of truncation.</p>"
         )
         msg = f"Couldn't find '<b>Hello</b>' in the following response\n{haystack!r}"
         with self.assertRaisesMessage(AssertionError, msg):

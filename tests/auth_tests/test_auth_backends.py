@@ -1,6 +1,7 @@
 import sys
 from datetime import date
 from unittest import mock
+from unittest.mock import patch
 
 from asgiref.sync import sync_to_async
 
@@ -14,19 +15,22 @@ from django.contrib.auth import (
     signals,
 )
 from django.contrib.auth.backends import BaseBackend, ModelBackend
+from django.contrib.auth.forms import PasswordChangeForm, SetPasswordForm
 from django.contrib.auth.hashers import MD5PasswordHasher
 from django.contrib.auth.models import AnonymousUser, Group, Permission, User
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.http import HttpRequest
 from django.test import (
+    Client,
     RequestFactory,
     SimpleTestCase,
     TestCase,
     modify_settings,
     override_settings,
 )
-from django.views.debug import technical_500_response
+from django.urls import reverse
+from django.views.debug import ExceptionReporter, technical_500_response
 from django.views.decorators.debug import sensitive_variables
 
 from .models import (
@@ -36,6 +40,16 @@ from .models import (
     ExtensionUser,
     UUIDUser,
 )
+
+
+class FilteredExceptionReporter(ExceptionReporter):
+    def get_traceback_frames(self):
+        frames = super().get_traceback_frames()
+        return [
+            frame
+            for frame in frames
+            if not isinstance(dict(frame["vars"]).get("self"), Client)
+        ]
 
 
 class SimpleBackend(BaseBackend):
@@ -1040,6 +1054,15 @@ class TypeErrorBackend:
         raise TypeError
 
 
+class TypeErrorValidator:
+    """
+    Always raises a TypeError.
+    """
+
+    def validate(self, password=None, user=None):
+        raise TypeError
+
+
 class SkippedBackend:
     def authenticate(self):
         # Doesn't accept any credentials so is skipped by authenticate().
@@ -1123,6 +1146,113 @@ class AuthenticateTests(TestCase):
             response,
             '<tr><td>credentials</td><td class="code">'
             "<pre>&#39;********************&#39;</pre></td></tr>",
+            html=True,
+            status_code=500,
+        )
+
+    @override_settings(
+        ROOT_URLCONF="django.contrib.auth.urls",
+        AUTHENTICATION_BACKENDS=["auth_tests.test_auth_backends.TypeErrorBackend"],
+    )
+    def test_login_process_sensitive_variables(self):
+        try:
+            self.client.post(
+                reverse("login"),
+                dict(username="testusername", password=self.sensitive_password),
+            )
+        except TypeError:
+            exc_info = sys.exc_info()
+
+        rf = RequestFactory()
+        with patch("django.views.debug.ExceptionReporter", FilteredExceptionReporter):
+            response = technical_500_response(rf.get("/"), *exc_info)
+
+        self.assertNotContains(response, self.sensitive_password, status_code=500)
+        self.assertContains(response, "TypeErrorBackend", status_code=500)
+
+        # AuthenticationForm.clean().
+        self.assertContains(
+            response,
+            '<tr><td>password</td><td class="code">'
+            "<pre>&#39;********************&#39;</pre></td></tr>",
+            html=True,
+            status_code=500,
+        )
+
+    def test_setpasswordform_validate_passwords_sensitive_variables(self):
+        password_form = SetPasswordForm(AnonymousUser())
+        password_form.cleaned_data = {
+            "password1": self.sensitive_password,
+            "password2": self.sensitive_password + "2",
+        }
+        try:
+            password_form.validate_passwords()
+        except ValueError:
+            exc_info = sys.exc_info()
+
+        rf = RequestFactory()
+        response = technical_500_response(rf.get("/"), *exc_info)
+        self.assertNotContains(response, self.sensitive_password, status_code=500)
+        self.assertNotContains(response, self.sensitive_password + "2", status_code=500)
+
+        self.assertContains(
+            response,
+            '<tr><td>password1</td><td class="code">'
+            "<pre>&#x27;********************&#x27;</pre></td></tr>",
+            html=True,
+            status_code=500,
+        )
+
+        self.assertContains(
+            response,
+            '<tr><td>password2</td><td class="code">'
+            "<pre>&#x27;********************&#x27;</pre></td></tr>",
+            html=True,
+            status_code=500,
+        )
+
+    @override_settings(
+        AUTH_PASSWORD_VALIDATORS=[
+            {"NAME": __name__ + ".TypeErrorValidator"},
+        ]
+    )
+    def test_setpasswordform_validate_password_for_user_sensitive_variables(self):
+        password_form = SetPasswordForm(AnonymousUser())
+        password_form.cleaned_data = {"password2": self.sensitive_password}
+        try:
+            password_form.validate_password_for_user(AnonymousUser())
+        except TypeError:
+            exc_info = sys.exc_info()
+
+        rf = RequestFactory()
+        response = technical_500_response(rf.get("/"), *exc_info)
+        self.assertNotContains(response, self.sensitive_password, status_code=500)
+
+        self.assertContains(
+            response,
+            '<tr><td>password</td><td class="code">'
+            "<pre>&#x27;********************&#x27;</pre></td></tr>",
+            html=True,
+            status_code=500,
+        )
+
+    def test_passwordchangeform_clean_old_password_sensitive_variables(self):
+        password_form = PasswordChangeForm(User())
+        password_form.cleaned_data = {"old_password": self.sensitive_password}
+        password_form.error_messages = None
+        try:
+            password_form.clean_old_password()
+        except TypeError:
+            exc_info = sys.exc_info()
+
+        rf = RequestFactory()
+        response = technical_500_response(rf.get("/"), *exc_info)
+        self.assertNotContains(response, self.sensitive_password, status_code=500)
+
+        self.assertContains(
+            response,
+            '<tr><td>old_password</td><td class="code">'
+            "<pre>&#x27;********************&#x27;</pre></td></tr>",
             html=True,
             status_code=500,
         )

@@ -45,6 +45,7 @@ def change_loader_patterns(patterns):
 @mock.patch.dict(os.environ, {}, clear=True)
 @mock.patch.object(multiprocessing, "cpu_count", return_value=12)
 # Python 3.8 on macOS defaults to 'spawn' mode.
+# Python 3.14 on POSIX systems defaults to 'forkserver' mode.
 @mock.patch.object(multiprocessing, "get_start_method", return_value="fork")
 class DiscoverRunnerParallelArgumentTests(SimpleTestCase):
     def get_parser(self):

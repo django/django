@@ -339,42 +339,42 @@ divided into the three categories described in the :ref:`raster lookup details
 <spatial-lookup-raster>`: native support ``N``, bilateral native support ``B``,
 and geometry conversion support ``C``.
 
-=================================  =========  ======== ========= ============ ========== ========
-Lookup Type                        PostGIS    Oracle   MariaDB   MySQL [#]_   SpatiaLite PGRaster
-=================================  =========  ======== ========= ============ ========== ========
-:lookup:`bbcontains`               X                   X         X            X          N
-:lookup:`bboverlaps`               X                   X         X            X          N
-:lookup:`contained`                X                   X         X            X          N
-:lookup:`contains <gis-contains>`  X          X        X         X            X          B
-:lookup:`contains_properly`        X                                                     B
-:lookup:`coveredby`                X          X                               X          B
-:lookup:`covers`                   X          X                               X          B
-:lookup:`crosses`                  X                   X         X            X          C
-:lookup:`disjoint`                 X          X        X         X            X          B
-:lookup:`distance_gt`              X          X        X         X            X          N
-:lookup:`distance_gte`             X          X        X         X            X          N
-:lookup:`distance_lt`              X          X        X         X            X          N
-:lookup:`distance_lte`             X          X        X         X            X          N
-:lookup:`dwithin`                  X          X                               X          B
-:lookup:`equals`                   X          X        X         X            X          C
-:lookup:`exact <same_as>`          X          X        X         X            X          B
-:lookup:`intersects`               X          X        X         X            X          B
+=================================  =========  ======== ========== ============ ========== ========
+Lookup Type                        PostGIS    Oracle   MariaDB    MySQL [#]_   SpatiaLite PGRaster
+=================================  =========  ======== ========== ============ ========== ========
+:lookup:`bbcontains`               X                   X          X            X          N
+:lookup:`bboverlaps`               X                   X          X            X          N
+:lookup:`contained`                X                   X          X            X          N
+:lookup:`contains <gis-contains>`  X          X        X          X            X          B
+:lookup:`contains_properly`        X                                                      B
+:lookup:`coveredby`                X          X        X (≥ 11.7) X            X          B
+:lookup:`covers`                   X          X                   X            X          B
+:lookup:`crosses`                  X                   X          X            X          C
+:lookup:`disjoint`                 X          X        X          X            X          B
+:lookup:`distance_gt`              X          X        X          X            X          N
+:lookup:`distance_gte`             X          X        X          X            X          N
+:lookup:`distance_lt`              X          X        X          X            X          N
+:lookup:`distance_lte`             X          X        X          X            X          N
+:lookup:`dwithin`                  X          X                                X          B
+:lookup:`equals`                   X          X        X          X            X          C
+:lookup:`exact <same_as>`          X          X        X          X            X          B
+:lookup:`intersects`               X          X        X          X            X          B
 :lookup:`isempty`                  X
-:lookup:`isvalid`                  X          X                  X            X
-:lookup:`overlaps`                 X          X        X         X            X          B
-:lookup:`relate`                   X          X        X                      X          C
-:lookup:`same_as`                  X          X        X         X            X          B
-:lookup:`touches`                  X          X        X         X            X          B
-:lookup:`within`                   X          X        X         X            X          B
-:lookup:`left`                     X                                                     C
-:lookup:`right`                    X                                                     C
-:lookup:`overlaps_left`            X                                                     B
-:lookup:`overlaps_right`           X                                                     B
-:lookup:`overlaps_above`           X                                                     C
-:lookup:`overlaps_below`           X                                                     C
-:lookup:`strictly_above`           X                                                     C
-:lookup:`strictly_below`           X                                                     C
-=================================  =========  ======== ========= ============ ========== ========
+:lookup:`isvalid`                  X          X        X (≥ 11.7) X            X
+:lookup:`overlaps`                 X          X        X          X            X          B
+:lookup:`relate`                   X          X        X                       X          C
+:lookup:`same_as`                  X          X        X          X            X          B
+:lookup:`touches`                  X          X        X          X            X          B
+:lookup:`within`                   X          X        X          X            X          B
+:lookup:`left`                     X                                                      C
+:lookup:`right`                    X                                                      C
+:lookup:`overlaps_left`            X                                                      B
+:lookup:`overlaps_right`           X                                                      B
+:lookup:`overlaps_above`           X                                                      C
+:lookup:`overlaps_below`           X                                                      C
+:lookup:`strictly_above`           X                                                      C
+:lookup:`strictly_below`           X                                                      C
+=================================  =========  ======== ========== ============ ========== ========
 
 .. _database-functions-compatibility:
 
@@ -406,10 +406,10 @@ Function                              PostGIS  Oracle         MariaDB      MySQL
 :class:`ForcePolygonCW`               X                                                X
 :class:`FromWKB`                      X        X              X            X           X
 :class:`FromWKT`                      X        X              X            X           X
-:class:`GeoHash`                      X                                    X           X (LWGEOM/RTTOPO)
+:class:`GeoHash`                      X                       X (≥ 11.7)   X           X (LWGEOM/RTTOPO)
 :class:`Intersection`                 X        X              X            X           X
 :class:`IsEmpty`                      X
-:class:`IsValid`                      X        X                           X           X
+:class:`IsValid`                      X        X              X (≥ 11.7)   X           X
 :class:`Length`                       X        X              X            X           X
 :class:`LineLocatePoint`              X                                                X
 :class:`MakeValid`                    X                                                X (LWGEOM/RTTOPO)
@@ -431,20 +431,19 @@ Aggregate Functions
 -------------------
 
 The following table provides a summary of what GIS-specific aggregate functions
-are available on each spatial backend. Please note that MariaDB does not
-support any of these aggregates, and is thus excluded from the table.
+are available on each spatial backend.
 
 .. currentmodule:: django.contrib.gis.db.models
 
-=======================  =======  ======  ============  ==========
-Aggregate                PostGIS  Oracle  MySQL         SpatiaLite
-=======================  =======  ======  ============  ==========
-:class:`Collect`         X                X (≥ 8.0.24)  X
-:class:`Extent`          X        X                     X
+=======================  =======  ======  ==========  ============  ==========
+Aggregate                PostGIS  Oracle  MariaDB     MySQL         SpatiaLite
+=======================  =======  ======  ==========  ============  ==========
+:class:`Collect`         X                X (≥ 11.7)  X (≥ 8.0.24)  X
+:class:`Extent`          X        X                                 X
 :class:`Extent3D`        X
-:class:`MakeLine`        X                              X
-:class:`Union`           X        X                     X
-=======================  =======  ======  ============  ==========
+:class:`MakeLine`        X                                          X
+:class:`Union`           X        X                                 X
+=======================  =======  ======  ==========  ============  ==========
 
 .. rubric:: Footnotes
 .. [#fnwkt] *See* Open Geospatial Consortium, Inc., `OpenGIS Simple Feature Specification For SQL <https://portal.ogc.org/files/?artifact_id=829>`_, Document 99-049 (May 5, 1999), at  Ch. 3.2.5, p. 3-11 (SQL Textual Representation of Geometry).
