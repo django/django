@@ -259,7 +259,8 @@ Management Commands
 Migrations
 ~~~~~~~~~~
 
-* ...
+* The new operation :class:`.AlterConstraint` is a no-op operation that alters
+  constraints without dropping and recreating constraints in the database.
 
 Models
 ~~~~~~
