@@ -211,6 +211,14 @@ class ProjectState:
         model_state.options[option_name] = [obj for obj in objs if obj.name != obj_name]
         self.reload_model(app_label, model_name, delay=True)
 
+    def _alter_option(self, app_label, model_name, option_name, obj_name, alt_obj):
+        model_state = self.models[app_label, model_name]
+        objs = model_state.options[option_name]
+        model_state.options[option_name] = [
+            obj if obj.name != obj_name else alt_obj for obj in objs
+        ]
+        self.reload_model(app_label, model_name, delay=True)
+
     def add_index(self, app_label, model_name, index):
         self._append_option(app_label, model_name, "indexes", index)
 
@@ -236,6 +244,11 @@ class ProjectState:
 
     def remove_constraint(self, app_label, model_name, constraint_name):
         self._remove_option(app_label, model_name, "constraints", constraint_name)
+
+    def alter_constraint(self, app_label, model_name, constraint_name, constraint):
+        self._alter_option(
+            app_label, model_name, "constraints", constraint_name, constraint
+        )
 
     def add_field(self, app_label, model_name, name, field, preserve_default):
         # If preserve default is off, don't use the default for future state.

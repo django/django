@@ -23,6 +23,8 @@ class BaseConstraint:
     violation_error_code = None
     violation_error_message = None
 
+    non_db_attrs = ("violation_error_code", "violation_error_message")
+
     # RemovedInDjango60Warning: When the deprecation ends, replace with:
     # def __init__(
     #     self, *, name, violation_error_code=None, violation_error_message=None

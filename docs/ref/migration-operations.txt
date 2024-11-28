@@ -278,6 +278,16 @@ the model with ``model_name``.
 
 Removes the constraint named ``name`` from the model with ``model_name``.
 
+``AlterConstraint``
+-------------------
+
+.. versionadded:: 5.2
+
+.. class:: AlterConstraint(model_name, name, constraint)
+
+Alters the constraint named ``name`` of the model with ``model_name`` with the
+new ``constraint`` without affecting the database.
+
 Special Operations
 ==================
 
