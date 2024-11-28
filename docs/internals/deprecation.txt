@@ -18,6 +18,10 @@ details on these changes.
 * The ``all`` keyword argument of ``django.contrib.staticfiles.finders.find()``
   will be removed.
 
+* The fallback to ``request.user`` when ``user`` is ``None`` in
+  ``django.contrib.auth.login()`` and ``django.contrib.auth.alogin()`` will be
+  removed.
+
 .. _deprecation-removed-in-6.0:
 
 6.0
