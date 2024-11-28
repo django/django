@@ -145,13 +145,20 @@ class Command(BaseCommand):
                         module = ".".join(tokens)
                         imports_by_alias[module] = obj_name
 
+            import_string = ""
             for module, imported_objects in imports_by_module.items():
-                self.stdout.write(
-                    f"from {module} import {', '.join(imported_objects)}",
-                    self.style.SUCCESS,
-                )
+                import_string += f"from {module} import {', '.join(imported_objects)}\n"
             for module, alias in imports_by_alias.items():
-                self.stdout.write(f"import {module} as {alias}", self.style.SUCCESS)
+                import_string += f"import {module} as {alias}\n"
+
+            try:
+                import isort
+
+                import_string = isort.code(import_string)
+            except ImportError:
+                pass
+
+            self.stdout.write(import_string, self.style.SUCCESS)
 
         return namespace
 

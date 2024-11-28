@@ -241,7 +241,8 @@ class ShellCommandTestCase(SimpleTestCase):
         self.assertEqual(stdout.getvalue().strip(), "")
 
     @override_settings(INSTALLED_APPS=["shell", "django.contrib.contenttypes"])
-    def test_message_with_stdout_listing_objects(self):
+    @mock.patch.dict(sys.modules, {"isort": None})
+    def test_message_with_stdout_listing_objects_with_isort_not_installed(self):
         class Command(shell.Command):
             def get_namespace(self):
                 class MyClass:
@@ -266,6 +267,43 @@ class ShellCommandTestCase(SimpleTestCase):
             "from shell.models import Phone, Marker\n"
             "import shell.models as shell_models\n"
             "import django.contrib.contenttypes.models as contenttypes_models",
+        )
+
+    @override_settings(INSTALLED_APPS=["shell", "django.contrib.contenttypes"])
+    def test_message_with_stdout_listing_objects_with_isort(self):
+        sorted_imports = (
+            "import shell.models as shell_models\n"
+            "from shell.models import Marker, Phone\n\n"
+            "import django.contrib.contenttypes.models as contenttypes_models\n"
+            "from django.contrib.contenttypes.models import ContentType"
+        )
+        mock_isort_code = mock.Mock(code=mock.MagicMock(return_value=sorted_imports))
+
+        class Command(shell.Command):
+            def get_namespace(self):
+                class MyClass:
+                    pass
+
+                constant = "constant"
+
+                return {
+                    **super().get_namespace(),
+                    "MyClass": MyClass,
+                    "constant": constant,
+                }
+
+        with captured_stdout() as stdout:
+            cmd = Command()
+            with mock.patch.dict(sys.modules, {"isort": mock_isort_code}):
+                cmd.get_and_report_namespace(verbosity=2)
+
+        self.assertEqual(
+            stdout.getvalue().strip(),
+            "7 objects imported automatically\n"
+            "import shell.models as shell_models\n"
+            "from shell.models import Marker, Phone\n\n"
+            "import django.contrib.contenttypes.models as contenttypes_models\n"
+            "from django.contrib.contenttypes.models import ContentType",
         )
 
     @override_settings(
