@@ -5,12 +5,15 @@ from django.apps import apps
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.utils import run_formatters
-from django.db import DEFAULT_DB_ALIAS, connections, migrations
+from django.db import DEFAULT_DB_ALIAS, connections, migrations, models
 from django.db.migrations.loader import AmbiguityError, MigrationLoader
 from django.db.migrations.migration import SwappableTuple
 from django.db.migrations.optimizer import MigrationOptimizer
 from django.db.migrations.writer import MigrationWriter
 from django.utils.version import get_docs_version
+from django.db.migrations.operations.base import OperationCategory
+from django.db.migrations.operations.fields import FieldOperation
+from django.db.migrations.operations.models import ModelOperation
 
 
 class Command(BaseCommand):
@@ -35,6 +38,14 @@ class Command(BaseCommand):
         parser.add_argument(
             "migration_name",
             help="Migrations will be squashed until and including this migration.",
+        )
+        parser.add_argument(
+            "--ignore-dependencies",
+            "--ignore-deps",
+            action="store_true",
+            dest="ignore_dependencies",
+            help="Ignore dependencies, except for those included in the"
+            " initial migration.",
         )
         parser.add_argument(
             "--no-optimize",
@@ -65,6 +76,7 @@ class Command(BaseCommand):
         app_label = options["app_label"]
         start_migration_name = options["start_migration_name"]
         migration_name = options["migration_name"]
+        ignore_dependencies = options["ignore_dependencies"]
         no_optimize = options["no_optimize"]
         squashed_name = options["squashed_name"]
         include_header = options["include_header"]
@@ -140,6 +152,7 @@ class Command(BaseCommand):
         # We need to take all dependencies from the first migration in the list
         # as it may be 0002 depending on 0001
         first_migration = True
+
         for smigration in migrations_to_squash:
             if smigration.replaces:
                 raise CommandError(
@@ -147,15 +160,32 @@ class Command(BaseCommand):
                     "normal migration first: https://docs.djangoproject.com/en/%s/"
                     "topics/migrations/#squashing-migrations" % get_docs_version()
                 )
-            operations.extend(smigration.operations)
+
+            if not first_migration and ignore_dependencies:
+                filtered_operations = self.filter_multi_app_operations(
+                    smigration.app_label, smigration.operations
+                )
+
+                operations.extend(filtered_operations)
+            else:
+                operations.extend(smigration.operations)
+
             for dependency in smigration.dependencies:
                 if isinstance(dependency, SwappableTuple):
                     if settings.AUTH_USER_MODEL == dependency.setting:
                         dependencies.add(("__setting__", "AUTH_USER_MODEL"))
-                    else:
+                    elif (
+                        not ignore_dependencies
+                        and not first_migration
+                        and dependency.setting.split(".")[0] == smigration.app_label
+                    ):
                         dependencies.add(dependency)
-                elif dependency[0] != smigration.app_label or first_migration:
+                elif (
+                    not ignore_dependencies
+                    and (dependency[0] != smigration.app_label or first_migration)
+                ) or (ignore_dependencies and first_migration):
                     dependencies.add(dependency)
+
             first_migration = False
 
         if no_optimize:
@@ -251,6 +281,42 @@ class Command(BaseCommand):
                             '"black" command. You can call it manually.'
                         )
                     )
+
+    def _is_multiapp_operation(self, app_label, operation):
+        return self._is_multiapp_field_operation(
+            app_label, operation
+        ) or self._is_multiapp_model_operation(app_label, operation)
+
+    def _is_multiapp_field_operation(self, app_label, operation):
+        return (
+            isinstance(operation, FieldOperation)
+            and isinstance(operation.field, models.fields.related.RelatedField)
+            and operation.field.related_model.split(".")[0] != app_label
+        )
+
+    def _is_multiapp_model_operation(self, app_label, operation):
+        if isinstance(operation, ModelOperation):
+            for field in operation.fields:
+                if (
+                    isinstance(field[-1], models.fields.related.RelatedField)
+                    and not field[-1].related_model.split(".")[0] != app_label
+                ):
+                    return True
+
+    def filter_multi_app_operations(self, app_label, operations):
+        filtered_operations = []
+        ignore_restricted_categories = set(
+            [OperationCategory.ADDITION, OperationCategory.ALTERATION]
+        )
+
+        for operation in operations:
+            if (operation.category not in ignore_restricted_categories) or (
+                operation.category in ignore_restricted_categories
+                and not self._is_multiapp_operation(app_label, operation)
+            ):
+                filtered_operations.append(operation)
+
+        return filtered_operations
 
     def find_migration(self, loader, app_label, name):
         try:
