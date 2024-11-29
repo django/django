@@ -5,6 +5,8 @@ The main QuerySet implementation. This provides the public API for the ORM.
 import copy
 import operator
 import warnings
+
+from collections import defaultdict
 from itertools import chain, islice
 
 from asgiref.sync import sync_to_async
@@ -898,12 +900,16 @@ class QuerySet(AltersData):
         for batch_objs in batches:
             update_kwargs = {}
             for field in fields:
-                when_statements = []
+                value_to_pks = defaultdict(list)
                 for obj in batch_objs:
                     attr = getattr(obj, field.attname)
                     if not hasattr(attr, "resolve_expression"):
                         attr = Value(attr, output_field=field)
-                    when_statements.append(When(pk=obj.pk, then=attr))
+                    value_to_pks[attr].append(obj.pk)
+                when_statements = [
+                    When(pk__in=pks, then=value)
+                    for value, pks in value_to_pks.items()
+                ]
                 case_statement = Case(*when_statements, output_field=field)
                 if requires_casting:
                     case_statement = Cast(case_statement, output_field=field)
