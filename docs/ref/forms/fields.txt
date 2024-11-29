@@ -397,6 +397,15 @@ default this value is set to ``"django/forms/field.html"``. Can be changed per
 field by overriding this attribute or more generally by overriding the default
 template, see also :ref:`overriding-built-in-field-templates`.
 
+``bound_field_class``
+---------------------
+
+.. versionadded:: 5.2
+
+.. attribute:: Field.bound_field_class
+
+Allows a per-field override of :attr:`.Form.bound_field_class`.
+
 Checking if the field data has changed
 ======================================
 
@@ -1626,4 +1635,5 @@ only requirements are that it implement a ``clean()`` method and that its
 ``label``, ``initial``, ``widget``, ``help_text``).
 
 You can also customize how a field will be accessed by overriding
-:meth:`~django.forms.Field.get_bound_field()`.
+:attr:`~django.forms.Field.bound_field_class`. See :ref:`custom-boundfield`
+for examples of overriding a ``BoundField``.
