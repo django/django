@@ -229,7 +229,7 @@ class TemplateCommand(BaseCommand):
                 else:
                     shutil.rmtree(path_to_remove)
 
-        run_formatters([top_dir], **formatter_paths)
+        run_formatters([top_dir], **formatter_paths, stderr=self.stderr)
 
     def handle_template(self, template, subdir):
         """
