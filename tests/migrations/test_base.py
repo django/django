@@ -4,7 +4,10 @@ import tempfile
 from contextlib import contextmanager
 from importlib import import_module
 
+from user_commands.utils import AssertFormatterFailureCaughtContext
+
 from django.apps import apps
+from django.core.management import call_command
 from django.db import connection, connections, migrations, models
 from django.db.migrations.migration import Migration
 from django.db.migrations.optimizer import MigrationOptimizer
@@ -167,6 +170,15 @@ class MigrationTestBase(TransactionTestCase):
 
     def assertFKNotExists(self, table, columns, to):
         return self.assertFKExists(table, columns, to, False)
+
+    def assertFormatterFailureCaught(
+        self, *args, module="migrations.test_migrations", **kwargs
+    ):
+        with (
+            self.temporary_migration_module(module=module),
+            AssertFormatterFailureCaughtContext(self) as ctx,
+        ):
+            call_command(*args, stdout=ctx.stdout, stderr=ctx.stderr, **kwargs)
 
     @contextmanager
     def temporary_migration_module(self, app_label="migrations", module=None):
