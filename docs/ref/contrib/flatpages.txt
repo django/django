@@ -221,14 +221,9 @@ registering a custom ``ModelAdmin`` for ``FlatPage``::
 Via the Python API
 ------------------
 
-.. class:: FlatPage
-
-    Flatpages are represented by a standard
-    :doc:`Django model </topics/db/models>`,
-    which lives in :source:`django/contrib/flatpages/models.py`. You can access
-    flatpage objects via the :doc:`Django database API </topics/db/queries>`.
-
-.. currentmodule:: django.contrib.flatpages
+Flatpages are represented by a standard
+:doc:`Django model </topics/db/models>`, :class:`.FlatPage`. You can access
+flatpage objects via the :doc:`Django database API </topics/db/queries>`.
 
 .. admonition:: Check for duplicate flatpage URLs.
 
@@ -237,6 +232,71 @@ Via the Python API
     used in the admin performs this validation check, and can be imported from
     ``django.contrib.flatpages.forms.FlatpageForm`` and used in your own
     views.
+
+.. currentmodule:: django.contrib.flatpages
+
+``FlatPage`` model
+==================
+
+.. class:: models.FlatPage
+
+Fields
+------
+
+:class:`~django.contrib.flatpages.models.FlatPage` objects have the following
+fields:
+
+.. class:: models.FlatPage
+    :noindex:
+
+    .. attribute:: url
+
+        Required. 100 characters or fewer. Indexed for faster lookups.
+
+    .. attribute:: title
+
+        Required. 200 characters or fewer.
+
+    .. attribute:: content
+
+        Optional (:attr:`blank=True <django.db.models.Field.blank>`).
+        :class:`~django.db.models.TextField` that typically, contains the HTML
+        content of the page.
+
+    .. attribute:: enable_comments
+
+        Boolean. This field is not used by :mod:`~django.contrib.flatpages` by
+        default and does not appear in the admin interface. Please see
+        :ref:`flatpages admin interface section <flatpages-admin>` for a
+        detailed explanation.
+
+    .. attribute:: template_name
+
+        Optional (:attr:`blank=True <django.db.models.Field.blank>`). 70
+        characters or fewer. Specifies the template used to render the page.
+        Defaults to :file:`flatpages/default.html` if not provided.
+
+    .. attribute: registration_required
+
+        Boolean. When ``True``, restricts the page access to logged-in users
+        only.
+
+    .. attribute:: sites
+
+        Many-to-many relationship to
+        :class:`~django.contrib.sites.models.Site`, which determines the
+        :doc:`sites </ref/contrib/sites>` the flatpage is available on.
+
+Methods
+-------
+
+.. class:: models.FlatPage
+    :noindex:
+
+    .. method:: get_absolute_url()
+
+        Returns the relative URL path of the page based on the
+        :attr:`~django.contrib.flatpages.models.FlatPage.url` attribute.
 
 Flatpage templates
 ==================
