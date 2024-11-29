@@ -2486,6 +2486,31 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         self.assertOutput(err, "usage:")
         self.assertOutput(err, "You must provide a project name.")
 
+    def test_output_directory_structure(self):
+
+        dirs = {
+            "testproject": self.test_dir,
+            "testproject1": os.path.join(self.test_dir, "otherdirectory"),
+        }
+        for name_project, dir in dirs.items():
+            with self.subTest(name_project=name_project, dir=dir):
+                args = ["startproject", name_project]
+                if not os.path.exists(dir):
+                    os.mkdir(dir)
+                    args.append(dir)
+                out, err = self.run_django_admin(args)
+
+                # Confirm the directory structure is as expected
+                self.assertIn(name_project, out)
+                self.assertIn("|___ manage.py", out)
+                self.assertIn("|___ testproject", out)
+                self.assertIn("    |___ __init__.py", out)
+                self.assertIn("    |___ asgi.py", out)
+                self.assertIn("    |___ settings.py", out)
+                self.assertIn("    |___ urls.py", out)
+                self.assertIn("    |___ wsgi.py", out)
+                self.assertNoOutput(err)
+
     def test_simple_project(self):
         "Make sure the startproject management command creates a project"
         args = ["startproject", "testproject"]
@@ -2959,6 +2984,28 @@ class StartApp(AdminScriptTestCase):
                     "sure the name is a valid identifier.".format(bad_name),
                 )
                 self.assertFalse(os.path.exists(testproject_dir))
+
+    def test_output_directory_structure(self):
+        dirs = {
+            "foo": self.test_dir,
+            "bar": os.path.join(self.test_dir, "otherdir"),
+        }
+        for name_app, dir in dirs.items():
+            with self.subTest(name_project=name_app, dir=dir):
+                args = ["startapp", name_app]
+                out, err = self.run_django_admin(args)
+
+                # Confirm the directory structure is as expected
+                self.assertIn(name_app, out)
+                self.assertIn("|___ __init__.py", out)
+                self.assertIn("|___ admin.py", out)
+                self.assertIn("|___ apps.py", out)
+                self.assertIn("|___ migrations", out)
+                self.assertIn("|   |___ __init__.py", out)
+                self.assertIn("|___ models.py", out)
+                self.assertIn("|___ tests.py", out)
+                self.assertIn("|___ views.py", out)
+                self.assertNoOutput(err)
 
     def test_importable_name(self):
         """

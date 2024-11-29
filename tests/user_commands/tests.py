@@ -1,6 +1,8 @@
 import os
+import tempfile
 from argparse import ArgumentDefaultsHelpFormatter
 from io import StringIO
+from pathlib import Path
 from unittest import mock
 
 from admin_scripts.tests import AdminScriptTestCase
@@ -11,6 +13,7 @@ from django.core.checks import Tags
 from django.core.management import BaseCommand, CommandError, find_commands
 from django.core.management.utils import (
     find_command,
+    get_directory_tree,
     get_random_secret_key,
     is_ignored_path,
     normalize_path_patterns,
@@ -535,3 +538,107 @@ class UtilsTests(SimpleTestCase):
     def test_normalize_path_patterns_truncates_wildcard_base(self):
         expected = [os.path.normcase(p) for p in ["foo/bar", "bar/*/"]]
         self.assertEqual(normalize_path_patterns(["foo/bar/*", "bar/*/"]), expected)
+
+    def test_get_directory_tree(self):
+        from django.utils.termcolors import colorize
+
+        def format_dir(x):
+            return colorize(x, fg="blue", opts=["bold"])
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            subdir = Path(tmpdir) / "foo/bar/"
+            subdir.mkdir(exist_ok=True, parents=True)
+            files = [
+                "file1.txt",
+                "file2.txt",
+                "foo/foo1.txt",
+                "foo/foo2.txt",
+                "foo/bar/bar1.txt",
+                "foo/bar/bar2.txt",
+            ]
+            [Path(tmpdir).joinpath(file).touch() for file in files]
+
+            expected = [
+                format_dir(Path(tmpdir).name),
+                "|___ file1.txt",
+                "|___ file2.txt",
+                f"|___ {format_dir('foo')}",
+                f"    |___ {format_dir('bar')}",
+                "    |   |___ bar1.txt",
+                "    |   |___ bar2.txt",
+                "    |___ foo1.txt",
+                "    |___ foo2.txt",
+            ]
+            self.assertListEqual(
+                list(get_directory_tree(tmpdir, force_color=True)), expected
+            )
+
+    def test_get_directory_tree_no_color(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            subdir = Path(tmpdir) / "foo/bar/"
+            subdir.mkdir(exist_ok=True, parents=True)
+            files = [
+                "file1.txt",
+                "file2.txt",
+                "foo/foo1.txt",
+                "foo/foo2.txt",
+                "foo/bar/bar1.txt",
+                "foo/bar/bar2.txt",
+            ]
+            [Path(tmpdir).joinpath(file).touch() for file in files]
+
+            expected = [
+                Path(tmpdir).name,
+                "|___ file1.txt",
+                "|___ file2.txt",
+                "|___ foo",
+                "    |___ bar",
+                "    |   |___ bar1.txt",
+                "    |   |___ bar2.txt",
+                "    |___ foo1.txt",
+                "    |___ foo2.txt",
+            ]
+            self.assertListEqual(
+                list(get_directory_tree(tmpdir, no_color=True)), expected
+            )
+
+    def test_get_directory_tree_max_depth(self):
+        from django.utils.termcolors import colorize
+
+        def format_dir(x):
+            return colorize(x, fg="blue", opts=["bold"])
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            subdir = Path(tmpdir) / "foo/bar/"
+            subdir.mkdir(exist_ok=True, parents=True)
+            files = [
+                "file1.txt",
+                "file2.txt",
+                "foo/foo1.txt",
+                "foo/foo2.txt",
+                "foo/bar/bar1.txt",
+                "foo/bar/bar2.txt",
+            ]
+            [Path(tmpdir).joinpath(file).touch() for file in files]
+
+            expected = [
+                format_dir(Path(tmpdir).name),
+                "|___ file1.txt",
+                "|___ file2.txt",
+                f"|___ {format_dir('foo')}",
+                f"    |___ {format_dir('bar')}",
+                "    |___ foo1.txt",
+                "    |___ foo2.txt",
+            ]
+            self.assertListEqual(
+                list(get_directory_tree(tmpdir, max_depth=2, force_color=True)),
+                expected,
+            )
+
+    def test_get_directory_tree_fail_not_dir(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmpfile = Path(tmpdir).joinpath("file.txt")
+            tmpfile.touch()
+
+            with self.assertRaises(CommandError):
+                list(get_directory_tree(tmpfile.name))
