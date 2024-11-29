@@ -2265,6 +2265,19 @@ class MakeMigrationsTests(MigrationTestBase):
         self.assertEqual(out.getvalue(), f"{merge_file}\n")
         self.assertIn(f"Created new merge migration {merge_file}", err.getvalue())
 
+    def test_makemigrations_failure_to_format_code(self):
+        self.assertFormatterFailureCaught("makemigrations", "migrations")
+
+    def test_merge_makemigrations_failure_to_format_code(self):
+        self.assertFormatterFailureCaught("makemigrations", "migrations", empty=True)
+        self.assertFormatterFailureCaught(
+            "makemigrations",
+            "migrations",
+            merge=True,
+            interactive=False,
+            module="migrations.test_migrations_conflict",
+        )
+
     def test_makemigrations_migrations_modules_path_not_exist(self):
         """
         makemigrations creates migrations when specifying a custom location
@@ -3069,6 +3082,11 @@ class SquashMigrationsTests(MigrationTestBase):
             + black_warning,
         )
 
+    def test_failure_to_format_code(self):
+        self.assertFormatterFailureCaught(
+            "squashmigrations", "migrations", "0002", interactive=False
+        )
+
 
 class AppLabelErrorTests(TestCase):
     """
@@ -3301,6 +3319,9 @@ class OptimizeMigrationTests(MigrationTestBase):
         msg = "Cannot find a migration matching 'nonexistent' from app 'migrations'."
         with self.assertRaisesMessage(CommandError, msg):
             call_command("optimizemigration", "migrations", "nonexistent")
+
+    def test_failure_to_format_code(self):
+        self.assertFormatterFailureCaught("optimizemigration", "migrations", "0001")
 
 
 class CustomMigrationCommandTests(MigrationTestBase):

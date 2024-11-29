@@ -1,6 +1,8 @@
 import os
+import sys
 from argparse import ArgumentDefaultsHelpFormatter
 from io import StringIO
+from pathlib import Path
 from unittest import mock
 
 from admin_scripts.tests import AdminScriptTestCase
@@ -15,6 +17,7 @@ from django.core.management.utils import (
     is_ignored_path,
     normalize_path_patterns,
     popen_wrapper,
+    run_formatters,
 )
 from django.db import connection
 from django.test import SimpleTestCase, override_settings
@@ -22,6 +25,7 @@ from django.test.utils import captured_stderr, extend_sys_path
 from django.utils import translation
 
 from .management.commands import dance
+from .utils import AssertFormatterFailureCaughtContext
 
 
 # A minimal set of apps to avoid system checks running on all apps.
@@ -535,3 +539,24 @@ class UtilsTests(SimpleTestCase):
     def test_normalize_path_patterns_truncates_wildcard_base(self):
         expected = [os.path.normcase(p) for p in ["foo/bar", "bar/*/"]]
         self.assertEqual(normalize_path_patterns(["foo/bar/*", "bar/*/"]), expected)
+
+    def test_run_formatters_handles_oserror_for_black_path(self):
+        cases = [
+            (FileNotFoundError, "nonexistent"),
+            (
+                OSError if sys.platform == "win32" else PermissionError,
+                str(Path(__file__).parent / "test_files" / "black"),
+            ),
+        ]
+        for exception, location in cases:
+            with (
+                self.subTest(exception.__qualname__),
+                AssertFormatterFailureCaughtContext(
+                    self, shutil_which_result=location
+                ) as ctx,
+            ):
+                run_formatters([], stderr=ctx.stderr)
+                parsed_error = ctx.stderr.getvalue()
+                self.assertIn(exception.__qualname__, parsed_error)
+                if sys.platform != "win32":
+                    self.assertIn(location, parsed_error)
