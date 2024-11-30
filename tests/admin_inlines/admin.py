@@ -320,7 +320,15 @@ class ConsigliereInline(admin.TabularInline):
     model = Consigliere
 
 
+class ConsigliereInlineStacked(admin.StackedInline):
+    model = Consigliere
+
+
 class SottoCapoInline(admin.TabularInline):
+    model = SottoCapo
+
+
+class SottoCapoInlineStacked(admin.StackedInline):
     model = SottoCapo
 
 
@@ -510,7 +518,14 @@ site.register(Holder4, Holder4Admin)
 site.register(Holder5, Holder5Admin)
 site.register(Author, AuthorAdmin)
 site.register(
-    CapoFamiglia, inlines=[ConsigliereInline, SottoCapoInline, ReadOnlyInlineInline]
+    CapoFamiglia,
+    inlines=[
+        ConsigliereInline,
+        SottoCapoInline,
+        ReadOnlyInlineInline,
+        ConsigliereInlineStacked,
+        SottoCapoInlineStacked,
+    ],
 )
 site.register(ProfileCollection, inlines=[ProfileInline])
 site.register(ParentModelWithCustomPk, inlines=[ChildModel1Inline, ChildModel2Inline])
