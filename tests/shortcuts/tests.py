@@ -4,6 +4,7 @@ from django.test import SimpleTestCase, override_settings
 from django.test.utils import require_jinja2
 
 
+        
 @override_settings(ROOT_URLCONF="shortcuts.urls")
 class RenderTests(SimpleTestCase):
     def test_render(self):

@@ -14,6 +14,8 @@ from django.template import loader
 from django.urls import NoReverseMatch, reverse
 from django.utils.functional import Promise
 
+def make_toast():
+    return "toasty ME!"
 
 def render(
     request, template_name, context=None, content_type=None, status=None, using=None

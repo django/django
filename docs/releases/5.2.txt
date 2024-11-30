@@ -52,6 +52,10 @@ See :doc:`/topics/composite-primary-key` for more details.
 
 Minor features
 --------------
+:mod:`django.shortcuts`
+~~~~~~~~~~~~~~~~~~~~~~~
+
+* The new :func:`django.shortcuts.make_toast` function returns ``'toast'``.
 
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -466,3 +470,4 @@ Miscellaneous
 * The fallback to ``request.user`` when ``user`` is ``None`` in
   ``django.contrib.auth.login()`` and ``django.contrib.auth.alogin()`` will be
   removed.
+
