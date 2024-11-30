@@ -12,3 +12,7 @@ Bugfixes
 
 * Fixed a crash in ``createsuperuser`` on Python 3.13+ caused by an unhandled
   ``OSError`` when the username could not be determined (:ticket:`35942`).
+
+* Fixed a regression in Django 5.1 where relational fields were not updated
+  when calling ``Model.refresh_from_db()`` on instances with deferred fields
+  (:ticket:`35950`).
