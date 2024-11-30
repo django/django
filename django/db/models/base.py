@@ -717,12 +717,13 @@ class Model(AltersData, metaclass=ModelBase):
         if fields is not None:
             db_instance_qs = db_instance_qs.only(*fields)
         elif deferred_fields:
-            fields = {
-                f.attname
-                for f in self._meta.concrete_fields
-                if f.attname not in deferred_fields
-            }
-            db_instance_qs = db_instance_qs.only(*fields)
+            db_instance_qs = db_instance_qs.only(
+                *{
+                    f.attname
+                    for f in self._meta.concrete_fields
+                    if f.attname not in deferred_fields
+                }
+            )
 
         db_instance = db_instance_qs.get()
         non_loaded_fields = db_instance.get_deferred_fields()
@@ -739,9 +740,9 @@ class Model(AltersData, metaclass=ModelBase):
                     field.delete_cached_value(self)
 
         # Clear cached relations.
-        for field in self._meta.related_objects:
-            if (fields is None or field.name in fields) and field.is_cached(self):
-                field.delete_cached_value(self)
+        for rel in self._meta.related_objects:
+            if (fields is None or rel.name in fields) and rel.is_cached(self):
+                rel.delete_cached_value(self)
 
         # Clear cached private relations.
         for field in self._meta.private_fields:
