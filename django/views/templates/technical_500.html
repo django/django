@@ -101,14 +101,9 @@
         }, false);
       });
     }
-    function toggle() {
-      for (var i = 0; i < arguments.length; i++) {
-        var e = document.getElementById(arguments[i]);
-        if (e) {
-          e.style.display = e.style.display == 'none' ? 'block': 'none';
-        }
-      }
-      return false;
+    function toggleDisplay(elementId) {
+      var e = document.getElementById(elementId);
+      e.style.display = e.style.display == 'none' ? 'block': 'none';
     }
     function collapseDetails(summaryId) {
       var summary = document.getElementById(summaryId);
@@ -125,7 +120,8 @@
       s1 = "Switch to copy-and-paste view";
       s2 = "Switch back to interactive view";
       link.textContent = link.textContent.trim() == s1 ? s2: s1;
-      toggle('browserTraceback', 'pastebinTraceback');
+      toggleDisplay('browserTraceback');
+      toggleDisplay('pastebinTraceback');
       return false;
     }
   </script>
