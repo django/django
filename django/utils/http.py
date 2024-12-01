@@ -1,5 +1,6 @@
 import base64
 import datetime
+import ipaddress
 import re
 import unicodedata
 from binascii import Error as BinasciiError
@@ -310,6 +311,21 @@ def _remove_unsafe_bytes_from_url(url):
 
 
 # TODO: Remove when dropping support for PY38.
+def _check_bracketed_host(hostname):
+    # Valid bracketed hosts are defined in
+    # https://www.rfc-editor.org/rfc/rfc3986#page-49 and
+    # https://url.spec.whatwg.org/.
+    if hostname.startswith("v"):
+        if not re.match(r"\Av[a-fA-F0-9]+\..+\Z", hostname):
+            raise ValueError("IPvFuture address is invalid")
+    else:
+        # Throws Value Error if not IPv6 or IPv4.
+        ip = ipaddress.ip_address(hostname)
+        if isinstance(ip, ipaddress.IPv4Address):
+            raise ValueError("An IPv4 address cannot be in brackets")
+
+
+# TODO: Remove when dropping support for PY38.
 # Backport of urllib.parse.urlsplit() from Python 3.9.
 def _urlsplit(url, scheme="", allow_fragments=True):
     """Parse a URL into 5 components:
@@ -336,6 +352,9 @@ def _urlsplit(url, scheme="", allow_fragments=True):
             "]" in netloc and "[" not in netloc
         ):
             raise ValueError("Invalid IPv6 URL")
+        if "[" in netloc and "]" in netloc:
+            bracketed_host = netloc.partition("[")[2].partition("]")[0]
+            _check_bracketed_host(bracketed_host)
     if allow_fragments and "#" in url:
         url, fragment = url.split("#", 1)
     if "?" in url:

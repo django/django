@@ -6,6 +6,7 @@ from unittest import mock
 from django.test import SimpleTestCase
 from django.utils.datastructures import MultiValueDict
 from django.utils.http import (
+    _urlsplit,
     base36_to_int,
     content_disposition_header,
     escape_leading_slashes,
@@ -290,6 +291,46 @@ class URLHasAllowedHostAndSchemeTests(unittest.TestCase):
                     ),
                     False,
                 )
+
+    # TODO: Remove when dropping support for PY38.
+    def test_invalid_bracketed_hosts(self):
+        # Port of urllib.parse.urlsplit() tests from Python.
+        tests = [
+            "Scheme://user@[192.0.2.146]/Path?Query",
+            "Scheme://user@[important.com:8000]/Path?Query",
+            "Scheme://user@[v123r.IP]/Path?Query",
+            "Scheme://user@[v12ae]/Path?Query",
+            "Scheme://user@[v.IP]/Path?Query",
+            "Scheme://user@[v123.]/Path?Query",
+            "Scheme://user@[v]/Path?Query",
+            "Scheme://user@[0439:23af::2309::fae7:1234]/Path?Query",
+            "Scheme://user@[0439:23af:2309::fae7:1234:2342:438e:192.0.2.146]/"
+            "Path?Query",
+            "Scheme://user@]v6a.ip[/Path",
+        ]
+        for invalid_url in tests:
+            with self.subTest(invalid_url=invalid_url):
+                self.assertRaises(ValueError, _urlsplit, invalid_url)
+
+    # TODO: Remove when dropping support for PY38.
+    def test_splitting_bracketed_hosts(self):
+        # Port of urllib.parse.urlsplit() tests from Python.
+        p1 = _urlsplit("scheme://user@[v6a.ip]/path?query")
+        self.assertEqual(p1.hostname, "v6a.ip")
+        self.assertEqual(p1.username, "user")
+        self.assertEqual(p1.path, "/path")
+        # Removed the '%test' suffix from ported tests as %scope_id suffixes were
+        # added in Python 3.9: https://docs.python.org/3/whatsnew/3.9.html#ipaddress
+        p2 = _urlsplit("scheme://user@[0439:23af:2309::fae7]/path?query")
+        self.assertEqual(p2.hostname, "0439:23af:2309::fae7")
+        self.assertEqual(p2.username, "user")
+        self.assertEqual(p2.path, "/path")
+        p3 = _urlsplit(
+            "scheme://user@[0439:23af:2309::fae7:1234:192.0.2.146]/path?query"
+        )
+        self.assertEqual(p3.hostname, "0439:23af:2309::fae7:1234:192.0.2.146")
+        self.assertEqual(p3.username, "user")
+        self.assertEqual(p3.path, "/path")
 
 
 class URLSafeBase64Tests(unittest.TestCase):
