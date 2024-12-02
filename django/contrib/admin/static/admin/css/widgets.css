@@ -129,11 +129,11 @@
     border: none;
 }
 
-.active.selector-add, .active.selector-remove {
+:enabled.selector-add, :enabled.selector-remove {
     opacity: 1;
 }
 
-.active.selector-add:hover, .active.selector-remove:hover {
+:enabled.selector-add:hover, :enabled.selector-remove:hover {
     cursor: pointer;
 }
 
@@ -142,7 +142,7 @@
     background-size: 24px auto;
 }
 
-.active.selector-add:focus, .active.selector-add:hover {
+:enabled.selector-add:focus, :enabled.selector-add:hover {
     background-position: 0 -168px;
 }
 
@@ -151,7 +151,7 @@
     background-size: 24px auto;
 }
 
-.active.selector-remove:focus, .active.selector-remove:hover {
+:enabled.selector-remove:focus, :enabled.selector-remove:hover {
     background-position: 0 -120px;
 }
 
@@ -169,16 +169,16 @@
     border: none;
 }
 
-.active.selector-chooseall:focus, .active.selector-clearall:focus,
-.active.selector-chooseall:hover, .active.selector-clearall:hover {
+:enabled.selector-chooseall:focus, :enabled.selector-clearall:focus,
+:enabled.selector-chooseall:hover, :enabled.selector-clearall:hover {
     color: var(--link-fg);
 }
 
-.active.selector-chooseall, .active.selector-clearall {
+:enabled.selector-chooseall, :enabled.selector-clearall {
     opacity: 1;
 }
 
-.active.selector-chooseall:hover, .active.selector-clearall:hover {
+:enabled.selector-chooseall:hover, :enabled.selector-clearall:hover {
     cursor: pointer;
 }
 
@@ -188,7 +188,7 @@
     cursor: default;
 }
 
-.active.selector-chooseall:focus, .active.selector-chooseall:hover {
+:enabled.selector-chooseall:focus, :enabled.selector-chooseall:hover {
     background-position: 100% -176px;
 }
 
@@ -198,7 +198,7 @@
     cursor: default;
 }
 
-.active.selector-clearall:focus, .active.selector-clearall:hover {
+:enabled.selector-clearall:focus, :enabled.selector-clearall:hover {
     background-position: 0 -144px;
 }
 
@@ -252,12 +252,12 @@
     cursor: default;
 }
 
-.stacked .active.selector-add {
+.stacked :enabled.selector-add {
     background-position: 0 -48px;
     cursor: pointer;
 }
 
-.stacked .active.selector-add:focus, .stacked .active.selector-add:hover {
+.stacked :enabled.selector-add:focus, .stacked :enabled.selector-add:hover {
     background-position: 0 -72px;
     cursor: pointer;
 }
@@ -268,12 +268,12 @@
     cursor: default;
 }
 
-.stacked .active.selector-remove {
+.stacked :enabled.selector-remove {
     background-position: 0 0px;
     cursor: pointer;
 }
 
-.stacked .active.selector-remove:focus, .stacked .active.selector-remove:hover {
+.stacked :enabled.selector-remove:focus, .stacked :enabled.selector-remove:hover {
     background-position: 0 -24px;
     cursor: pointer;
 }

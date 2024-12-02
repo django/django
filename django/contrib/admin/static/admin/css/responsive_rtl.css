@@ -75,7 +75,7 @@
         background-position: 0 0;
     }
 
-    [dir="rtl"] .active.selector-remove:focus, .active.selector-remove:hover {
+    [dir="rtl"] :enabled.selector-remove:focus, :enabled.selector-remove:hover {
         background-position: 0 -24px;
     }
 
@@ -83,7 +83,7 @@
         background-position: 0 -48px;
     }
 
-    [dir="rtl"] .active.selector-add:focus, .active.selector-add:hover {
+    [dir="rtl"] :enabled.selector-add:focus, :enabled.selector-add:hover {
         background-position: 0 -72px;
     }
 }

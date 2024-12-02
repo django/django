@@ -224,7 +224,7 @@ fieldset .fieldBox {
     background-size: 24px auto;
 }
 
-.active.selector-add:focus, .active.selector-add:hover {
+:enabled.selector-add:focus, :enabled.selector-add:hover {
     background-position: 0 -120px;
 }
 
@@ -233,7 +233,7 @@ fieldset .fieldBox {
     background-size: 24px auto;
 }
 
-.active.selector-remove:focus, .active.selector-remove:hover {
+:enabled.selector-remove:focus, :enabled.selector-remove:hover {
     background-position: 0 -168px;
 }
 
@@ -241,7 +241,7 @@ fieldset .fieldBox {
     background: url(../img/selector-icons.svg) right -128px no-repeat;
 }
 
-.active.selector-chooseall:focus, .active.selector-chooseall:hover {
+:enabled.selector-chooseall:focus, :enabled.selector-chooseall:hover {
     background-position: 100% -144px;
 }
 
@@ -249,7 +249,7 @@ fieldset .fieldBox {
     background: url(../img/selector-icons.svg) 0 -160px no-repeat;
 }
 
-.active.selector-clearall:focus, .active.selector-clearall:hover {
+:enabled.selector-clearall:focus, :enabled.selector-clearall:hover {
     background-position: 0 -176px;
 }
 
