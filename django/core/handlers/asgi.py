@@ -64,6 +64,7 @@ class ASGIRequest(HttpRequest):
         if isinstance(query_string, bytes):
             query_string = query_string.decode()
         self.META = {
+            **self.scope,
             "REQUEST_METHOD": self.method,
             "QUERY_STRING": query_string,
             "SCRIPT_NAME": self.script_name,
