@@ -32,7 +32,7 @@ class RemoteEmployee(Employee):
 class Company(models.Model):
     name = models.CharField(max_length=100)
     num_employees = models.PositiveIntegerField()
-    num_chairs = models.PositiveIntegerField()
+    num_chairs = models.PositiveIntegerField(default=0)
     ceo = models.ForeignKey(
         Employee,
         models.CASCADE,
