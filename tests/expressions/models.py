@@ -32,7 +32,7 @@ class RemoteEmployee(Employee):
 class Company(models.Model):
     name = models.CharField(max_length=100)
     num_employees = models.PositiveIntegerField()
-    num_chairs = models.PositiveIntegerField()
+    num_chairs = models.PositiveIntegerField(default=0)
     ceo = models.ForeignKey(
         Employee,
         models.CASCADE,
@@ -122,3 +122,10 @@ class JSONFieldModel(models.Model):
 
     class Meta:
         required_db_features = {"supports_json_field"}
+
+class NamedCategory(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name

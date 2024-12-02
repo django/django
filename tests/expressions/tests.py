@@ -6,6 +6,7 @@ from collections import namedtuple
 from copy import deepcopy
 from decimal import Decimal
 from unittest import mock
+from .models import NamedCategory
 
 from django.core.exceptions import FieldError
 from django.db import DatabaseError, NotSupportedError, connection
@@ -2849,3 +2850,57 @@ class OrderByTests(SimpleTestCase):
             F("field").asc(nulls_first=False)
         with self.assertRaisesMessage(ValueError, msg):
             F("field").desc(nulls_last=False)
+
+
+class OuterRefOrderByTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.ceo = Employee.objects.create(
+            firstname="John", lastname="Doe", salary=100000
+        )
+        cls.gmbh = Company.objects.create(
+            name="GmbH",
+            num_employees=50,
+            ceo=cls.ceo,
+            point_of_contact=cls.ceo,
+            based_in_eu=True,
+        )
+        cls.foobar_ltd = Company.objects.create(
+            name="Foobar Ltd",
+            num_employees=100,
+            ceo=cls.ceo,
+            point_of_contact=cls.ceo,
+            based_in_eu=False,
+        )
+
+    def test_order_by_with_outerref(self):
+        inner = Company.objects.filter(
+            num_employees__lt=OuterRef("num_employees")
+        ).order_by("num_employees")
+
+        qs = Company.objects.annotate(next_bigger=Subquery(inner.values("pk")[:1]))
+        foobar_ltd = qs.get(pk=self.foobar_ltd.pk)
+
+        self.assertIsNotNone(foobar_ltd.next_bigger)
+        self.assertEqual(foobar_ltd.next_bigger, self.gmbh.pk)
+
+class SubqueryTests(TestCase):
+    def test_outer_ref_order_by(self):
+        NamedCategory.objects.create(id=1, name="first")
+        NamedCategory.objects.create(id=4, name="fourth")
+        NamedCategory.objects.create(id=2, name="second")
+        NamedCategory.objects.create(id=3, name="third")
+        outer_query = NamedCategory.objects.all()
+
+        subquery = (
+            NamedCategory.objects.filter(id=OuterRef("id"))
+            .order_by("name")
+            .values("name")
+        )
+
+        values = outer_query.annotate(sorted_name=Subquery(subquery)).order_by(
+            "sorted_name"
+        )
+        sorted_names = list(values.values_list("sorted_name", flat=True))
+
+        self.assertListEqual(sorted_names, ["first", "fourth", "second", "third"])
