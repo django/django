@@ -1254,21 +1254,27 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         self.arthur = Student.objects.create(name="Arthur")
         self.school = School.objects.create(name="School of Awesome")
 
-    def assertActiveButtons(
-        self, mode, field_name, choose, remove, choose_all=None, remove_all=None
+    def assertButtonsDisabled(
+        self,
+        mode,
+        field_name,
+        choose_btn_disabled=False,
+        remove_btn_disabled=False,
+        choose_all_btn_disabled=False,
+        remove_all_btn_disabled=False,
     ):
         choose_button = "#id_%s_add" % field_name
         choose_all_button = "#id_%s_add_all" % field_name
         remove_button = "#id_%s_remove" % field_name
         remove_all_button = "#id_%s_remove_all" % field_name
-        self.assertEqual(self.has_css_class(choose_button, "active"), choose)
-        self.assertEqual(self.has_css_class(remove_button, "active"), remove)
+        self.assertEqual(self.is_disabled(choose_button), choose_btn_disabled)
+        self.assertEqual(self.is_disabled(remove_button), remove_btn_disabled)
         if mode == "horizontal":
             self.assertEqual(
-                self.has_css_class(choose_all_button, "active"), choose_all
+                self.is_disabled(choose_all_button), choose_all_btn_disabled
             )
             self.assertEqual(
-                self.has_css_class(remove_all_button, "active"), remove_all
+                self.is_disabled(remove_all_button), remove_all_btn_disabled
             )
 
     def execute_basic_operations(self, mode, field_name):
@@ -1296,7 +1302,14 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
             ],
         )
         self.assertSelectOptions(to_box, [str(self.lisa.id), str(self.peter.id)])
-        self.assertActiveButtons(mode, field_name, False, False, True, True)
+        self.assertButtonsDisabled(
+            mode,
+            field_name,
+            choose_btn_disabled=True,
+            remove_btn_disabled=True,
+            choose_all_btn_disabled=False,
+            remove_all_btn_disabled=False,
+        )
 
         # Click 'Choose all' --------------------------------------------------
         if mode == "horizontal":
@@ -1323,7 +1336,14 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
                 str(self.john.id),
             ],
         )
-        self.assertActiveButtons(mode, field_name, False, False, False, True)
+        self.assertButtonsDisabled(
+            mode,
+            field_name,
+            choose_btn_disabled=True,
+            remove_btn_disabled=True,
+            choose_all_btn_disabled=True,
+            remove_all_btn_disabled=False,
+        )
 
         # Click 'Remove all' --------------------------------------------------
         if mode == "horizontal":
@@ -1350,7 +1370,14 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
             ],
         )
         self.assertSelectOptions(to_box, [])
-        self.assertActiveButtons(mode, field_name, False, False, True, False)
+        self.assertButtonsDisabled(
+            mode,
+            field_name,
+            choose_btn_disabled=True,
+            remove_btn_disabled=True,
+            choose_all_btn_disabled=False,
+            remove_all_btn_disabled=True,
+        )
 
         # Choose some options ------------------------------------------------
         from_lisa_select_option = self.selenium.find_element(
@@ -1367,9 +1394,23 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         self.select_option(from_box, str(self.jason.id))
         self.select_option(from_box, str(self.bob.id))
         self.select_option(from_box, str(self.john.id))
-        self.assertActiveButtons(mode, field_name, True, False, True, False)
+        self.assertButtonsDisabled(
+            mode,
+            field_name,
+            choose_btn_disabled=False,
+            remove_btn_disabled=True,
+            choose_all_btn_disabled=False,
+            remove_all_btn_disabled=True,
+        )
         self.selenium.find_element(By.ID, choose_button).click()
-        self.assertActiveButtons(mode, field_name, False, False, True, True)
+        self.assertButtonsDisabled(
+            mode,
+            field_name,
+            choose_btn_disabled=True,
+            remove_btn_disabled=True,
+            choose_all_btn_disabled=False,
+            remove_all_btn_disabled=False,
+        )
 
         self.assertSelectOptions(
             from_box,
@@ -1402,9 +1443,23 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         # Remove some options -------------------------------------------------
         self.select_option(to_box, str(self.lisa.id))
         self.select_option(to_box, str(self.bob.id))
-        self.assertActiveButtons(mode, field_name, False, True, True, True)
+        self.assertButtonsDisabled(
+            mode,
+            field_name,
+            choose_btn_disabled=True,
+            remove_btn_disabled=False,
+            choose_all_btn_disabled=False,
+            remove_all_btn_disabled=False,
+        )
         self.selenium.find_element(By.ID, remove_button).click()
-        self.assertActiveButtons(mode, field_name, False, False, True, True)
+        self.assertButtonsDisabled(
+            mode,
+            field_name,
+            choose_btn_disabled=True,
+            remove_btn_disabled=True,
+            choose_all_btn_disabled=False,
+            remove_all_btn_disabled=False,
+        )
 
         self.assertSelectOptions(
             from_box,
