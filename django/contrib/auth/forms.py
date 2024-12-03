@@ -117,8 +117,8 @@ class SetPasswordMixin:
         password2 = forms.CharField(
             label=label2,
             required=False,
-            widget=forms.PasswordInput(attrs={"autocomplete": "new-password"}),
             strip=False,
+            widget=forms.PasswordInput(attrs={"autocomplete": "new-password"}),
             help_text=_("Enter the same password as before, for verification."),
         )
         return password1, password2
