@@ -37,6 +37,13 @@ class AggregateFilter(Func):
     arity = 1
     template = " FILTER (WHERE %(expressions)s)"
 
+    @classmethod
+    def from_param(cls, param):
+        if isinstance(param, AggregateFilter):
+            return param
+        else:
+            return cls(param)
+
     def as_sql(self, compiler, connection, **extra_context):
         if not connection.features.supports_aggregate_filter_clause:
             raise NotSupportedError
@@ -89,7 +96,7 @@ class Aggregate(Func):
             raise TypeError(f"{self.__class__.__name__} does not allow default.")
 
         self.distinct = distinct
-        self.filter = filter and AggregateFilter(filter)
+        self.filter = filter and AggregateFilter.from_param(filter)
         self.order_by = order_by
         self.default = default
         self.order_by = order_by and AggregateOrderBy.from_param(
