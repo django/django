@@ -47,6 +47,7 @@ from .models import (
     GenericData,
     GenericIPAddressData,
     GenericIPAddressPKData,
+    ImageData,
     InheritAbstractModel,
     InheritBaseModel,
     IntegerData,
@@ -291,7 +292,9 @@ test_data = [
     (data_obj, 81, IntegerData, -123456789),
     (data_obj, 82, IntegerData, 0),
     (data_obj, 83, IntegerData, None),
-    # (XX, ImageData
+    (data_obj, 86, ImageData, "file:///foo/bar/whiz.png"),
+    # (data_obj, 87, ImageData, None),
+    (data_obj, 88, ImageData, ""),
     (data_obj, 95, GenericIPAddressData, "fe80:1424:2223:6cff:fe8a:2e8a:2151:abcd"),
     (data_obj, 96, GenericIPAddressData, None),
     (data_obj, 110, PositiveBigIntegerData, 9223372036854775807),
