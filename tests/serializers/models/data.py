@@ -62,8 +62,8 @@ class BigIntegerData(models.Model):
     data = models.BigIntegerField(null=True)
 
 
-# class ImageData(models.Model):
-#    data = models.ImageField(null=True)
+class ImageData(models.Model):
+    data = models.ImageField(null=True)
 
 
 class GenericIPAddressData(models.Model):
