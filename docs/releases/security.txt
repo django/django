@@ -36,6 +36,28 @@ Issues under Django's security process
 All security issues have been handled under versions of Django's security
 process. These are listed below.
 
+December 4, 2024 - :cve:`2024-53907`
+------------------------------------
+
+Potential denial-of-service in django.utils.html.strip_tags().
+`Full description
+<https://www.djangoproject.com/weblog/2024/dec/04/security-releases/>`__
+
+* Django 5.1 :commit:`(patch) <bbc74a7f7eb7335e913bdb4787f22e83a9be947e>`
+* Django 5.0 :commit:`(patch) <a5a89ea28cc550c1b29b03f9e14ef3c128ec1e84>`
+* Django 4.2 :commit:`(patch) <790eb058b0716c536a2f2e8d1c6d5079d776c22b>`
+
+December 4, 2024 - :cve:`2024-53908`
+------------------------------------
+
+Potential SQL injection in HasKey(lhs, rhs) on Oracle.
+`Full description
+<https://www.djangoproject.com/weblog/2024/dec/04/security-releases/>`__
+
+* Django 5.1 :commit:`(patch) <6943d61818e63e77b65d8b1ae65941e8f04bd87b>`
+* Django 5.0 :commit:`(patch) <ff08bb6c70aa45f83a5ef3bd0b601c7c9d1a7642>`
+* Django 4.2 :commit:`(patch) <7376bcbf508883282ffcc0f0fac5cf0ed2d6cbc5>`
+
 September 3, 2024 - :cve:`2024-45231`
 -------------------------------------
 
