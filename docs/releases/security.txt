@@ -39,7 +39,7 @@ process. These are listed below.
 December 4, 2024 - :cve:`2024-53907`
 ------------------------------------
 
-Potential denial-of-service in django.utils.html.strip_tags().
+Potential denial-of-service in ``django.utils.html.strip_tags()``.
 `Full description
 <https://www.djangoproject.com/weblog/2024/dec/04/security-releases/>`__
 
@@ -50,7 +50,7 @@ Potential denial-of-service in django.utils.html.strip_tags().
 December 4, 2024 - :cve:`2024-53908`
 ------------------------------------
 
-Potential SQL injection in HasKey(lhs, rhs) on Oracle.
+Potential SQL injection in ``HasKey(lhs, rhs)`` on Oracle.
 `Full description
 <https://www.djangoproject.com/weblog/2024/dec/04/security-releases/>`__
 
