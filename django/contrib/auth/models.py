@@ -77,7 +77,7 @@ class Permission(models.Model):
         ordering = ["content_type__app_label", "content_type__model", "codename"]
 
     def __str__(self):
-        return "%s | %s" % (self.content_type, self.name)
+        return "%s | %s" % (self.content_type, _(self.name))
 
     def natural_key(self):
         return (self.codename,) + self.content_type.natural_key()
