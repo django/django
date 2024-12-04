@@ -249,6 +249,9 @@ Forms
 * The new :class:`~django.forms.TelInput` form widget is for entering telephone
   numbers and renders as ``<input type="tel" ...>``.
 
+* The new :ref:`CSS & JS objects <form-media-asset-objects>` are available for
+  adding custom HTML-attributes to CSS and JavaScript in form media.
+
 Generic Views
 ~~~~~~~~~~~~~
 
