@@ -1,0 +1,42 @@
+[
+    {
+        "pk": "3",
+        "model": "fixtures.article",
+        "fields": {
+            "headline": "Copyright is fine the way it is",
+            "pub_date": "2006-06-16 14:00:00"
+        }
+    },
+    {
+        "pk": "4",
+        "model": "fixtures.article",
+        "fields": {
+            "headline": "Django conquers world!",
+            "pub_date": "2006-06-16 15:00:00"
+        }
+    },
+    {
+        "pk": 1,
+        "model": "fixtures.category",
+        "fields": {
+            "description": "Latest news stories",
+            "title": "News Stories"
+        }
+    },
+    {
+        "pk": "1",
+        "model": "fixtures.article",
+        "fields": {
+            "headline": "Poker has no place on ESPN",
+            "pub_date": "2006-06-16 14:00:00"
+        }
+    },
+    {
+        "pk": "2",
+        "model": "fixtures.article",
+        "fields": {
+            "headline": "Time to reform copyright",
+            "pub_date": "2006-06-16 15:00:00"
+        }
+    }
+]

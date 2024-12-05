@@ -1233,6 +1233,32 @@ class FixtureTransactionTests(DumpDataAssertMixin, TransactionTestCase):
             ],
         )
 
+    def test_force_insert(self):
+        """use force_insert option to reduce query count"""
+        from django.db import connection
+
+        with self.settings(DEBUG=True):
+            management.call_command(
+                "loaddata", "fixture2.json", "--force_insert", verbosity=0
+            )
+            self.assertFalse(
+                "UPDATE" in [x['sql'].split(" ", 1)[0] for x in connection.queries]
+            )
+
+    def test_bulk_create(self):
+        """use bulk_create option to reduce query count"""
+        from django.db import connection
+
+        with self.settings(DEBUG=True):
+            management.call_command(
+                "loaddata", "fixture10.json", "--bulk_create", verbosity=0
+            )
+            insert_counter = [
+                x for x in connection.queries if x['sql'].startswith('INSERT INTO')
+            ]
+            self.assertEqual(3, len(insert_counter))
+            self.assertEqual(4, Article.objects.count())
+
 
 class ForwardReferenceTests(DumpDataAssertMixin, TestCase):
     def test_forward_reference_fk(self):

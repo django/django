@@ -532,6 +532,18 @@ Excludes loading the fixtures from the given applications and/or models (in the
 form of ``app_label`` or ``app_label.ModelName``). Use the option multiple
 times to exclude more than one app or model.
 
+.. django-admin-option:: --force_insert
+
+Applies the ``force_insert`` option on each item's save() method. This assumes that
+the fixture is not an update and skips the UPDATE attempt. This reduces load time but
+will fail if by accident the primary key does happen to be present beforehand.
+
+.. django-admin-option:: --bulk_create
+
+Instead of saving each item individually, subsequent items of the same model are
+inserted using a single statement. This could improve loading speed dramatically, but
+has some significant caveats, as described in :ref:`bulk_create <bulk_create>`
+
 .. _loading-fixtures-stdin:
 
 Loading fixtures from ``stdin``

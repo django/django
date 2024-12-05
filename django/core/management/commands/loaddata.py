@@ -89,6 +89,26 @@ class Command(BaseCommand):
             help="Format of serialized data when reading from stdin.",
         )
 
+        parser.add_argument(
+            "--force_insert",
+            action="store_true",
+            dest="force_insert",
+            help=(
+                "Add force_insert option to each objects save() call to "
+                "skip UPDATE statements and speed up insertions",
+            ),
+        )
+
+        parser.add_argument(
+            "--bulk_create",
+            action="store_true",
+            dest="bulk_create",
+            help=(
+                "Use bulk_create statements to insert multiple records for the "
+                "same model"
+            ),
+        )
+
     def handle(self, *fixture_labels, **options):
         self.ignore = options["ignore"]
         self.using = options["database"]
@@ -98,6 +118,8 @@ class Command(BaseCommand):
             options["exclude"]
         )
         self.format = options["format"]
+        self.force_insert = options["force_insert"]
+        self.bulk_create = options['bulk_create']
 
         with transaction.atomic(using=self.using):
             self.loaddata(fixture_labels)
@@ -207,7 +229,7 @@ class Command(BaseCommand):
             saved = True
             self.models.add(obj.object.__class__)
             try:
-                obj.save(using=self.using)
+                obj.save(using=self.using, force_insert=self.force_insert)
             # psycopg raises ValueError if data contains NUL chars.
             except (DatabaseError, IntegrityError, ValueError) as e:
                 e.args = (
@@ -222,6 +244,39 @@ class Command(BaseCommand):
         if obj.deferred_fields:
             self.objs_with_deferred_fields.append(obj)
         return saved
+
+    def bulk_create_obj(self, objects):
+        """
+        split objects into groups with the same model, then use bulk_create to load
+        all instances in a single statement
+        """
+        objects_in_fixture = 0
+        loaded_objects_in_fixture = 0
+        group_model = None
+        instances = []
+
+        for obj in objects:
+            objects_in_fixture += 1
+            obj_model = obj.object.__class__
+            if not group_model:
+                group_model = obj_model
+            if obj_model == group_model:
+                instances.append(obj.object)
+                continue
+            group_model.objects.bulk_create(instances)
+            loaded_objects_in_fixture += len(instances)
+
+            group_model = obj_model
+            instances = [obj.object]
+
+        # repeat for last set of records
+        group_model.objects.bulk_create(instances)
+        loaded_objects_in_fixture += len(instances)
+
+        return {
+            "objects_in_fixture": objects_in_fixture,
+            "loaded_objects_in_fixture": loaded_objects_in_fixture,
+        }
 
     def load_label(self, fixture_label):
         """Load fixtures files for a given label."""
@@ -249,15 +304,26 @@ class Command(BaseCommand):
                     handle_forward_references=True,
                 )
 
-                for obj in objects:
-                    objects_in_fixture += 1
-                    if self.save_obj(obj):
-                        loaded_objects_in_fixture += 1
-                        if show_progress:
-                            self.stdout.write(
-                                "\rProcessed %i object(s)." % loaded_objects_in_fixture,
-                                ending="",
-                            )
+                if self.bulk_create:
+                    counters = self.bulk_create_obj(objects)
+                    objects_in_fixture += counters['objects_in_fixture']
+                    loaded_objects_in_fixture += counters['loaded_objects_in_fixture']
+                    if show_progress:
+                        self.stdout.write(
+                            "\rProcessed %i object(s)." % loaded_objects_in_fixture,
+                            ending="",
+                        )
+                else:
+                    for obj in objects:
+                        objects_in_fixture += 1
+                        if self.save_obj(obj):
+                            loaded_objects_in_fixture += 1
+                            if show_progress:
+                                self.stdout.write(
+                                    "\rProcessed %i object(s)."
+                                    % loaded_objects_in_fixture,
+                                    ending="",
+                                )
             except Exception as e:
                 if not isinstance(e, CommandError):
                     e.args = (
