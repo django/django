@@ -43,7 +43,7 @@ class HStoreField(CheckFieldDefaultMixin, Field):
         return value
 
     def value_to_string(self, obj):
-        return json.dumps(self.value_from_object(obj))
+        return json.dumps(self.value_from_object(obj), ensure_ascii=False)
 
     def formfield(self, **kwargs):
         return super().formfield(
