@@ -297,39 +297,53 @@ class TestChecks(PostgreSQLSimpleTestCase):
 
 
 class TestSerialization(PostgreSQLSimpleTestCase):
-    test_data = json.dumps(
-        [
-            {
-                "model": "postgres_tests.hstoremodel",
-                "pk": None,
-                "fields": {
-                    "field": json.dumps({"a": "b"}),
-                    "array_field": json.dumps(
-                        [
-                            json.dumps({"a": "b"}),
-                            json.dumps({"b": "a"}),
-                        ]
-                    ),
-                },
-            }
-        ]
-    )
+    field_values = [
+        ({"a": "b"}, [{"a": "b"}, {"b": "a"}]),
+        (
+            {"все": "Трурль и Клапауций"},
+            [{"Трурль": "Клапауций"}, {"Клапауций": "Трурль"}],
+        ),
+    ]
+
+    @staticmethod
+    def create_json_data(field_value, array_field_value):
+        fields = {
+            "field": json.dumps(field_value, ensure_ascii=False),
+            "array_field": json.dumps(
+                [json.dumps(item, ensure_ascii=False) for item in array_field_value],
+                ensure_ascii=False,
+            ),
+        }
+        return json.dumps(
+            [{"model": "postgres_tests.hstoremodel", "pk": None, "fields": fields}]
+        )
 
     def test_dumping(self):
-        instance = HStoreModel(field={"a": "b"}, array_field=[{"a": "b"}, {"b": "a"}])
-        data = serializers.serialize("json", [instance])
-        self.assertEqual(json.loads(data), json.loads(self.test_data))
+        for field_value, array_field_value in self.field_values:
+            with self.subTest(field_value=field_value, array_value=array_field_value):
+                instance = HStoreModel(field=field_value, array_field=array_field_value)
+                data = serializers.serialize("json", [instance])
+                json_data = self.create_json_data(field_value, array_field_value)
+                self.assertEqual(json.loads(data), json.loads(json_data))
 
     def test_loading(self):
-        instance = list(serializers.deserialize("json", self.test_data))[0].object
-        self.assertEqual(instance.field, {"a": "b"})
-        self.assertEqual(instance.array_field, [{"a": "b"}, {"b": "a"}])
+        for field_value, array_field_value in self.field_values:
+            with self.subTest(field_value=field_value, array_value=array_field_value):
+                json_data = self.create_json_data(field_value, array_field_value)
+                instance = list(serializers.deserialize("json", json_data))[0].object
+                self.assertEqual(instance.field, field_value)
+                self.assertEqual(instance.array_field, array_field_value)
 
     def test_roundtrip_with_null(self):
-        instance = HStoreModel(field={"a": "b", "c": None})
-        data = serializers.serialize("json", [instance])
-        new_instance = list(serializers.deserialize("json", data))[0].object
-        self.assertEqual(instance.field, new_instance.field)
+        for field_value in [
+            {"a": "b", "c": None},
+            {"Енеїда": "Ти знаєш, він який суціга", "Зефір": None},
+        ]:
+            with self.subTest(field_value=field_value):
+                instance = HStoreModel(field=field_value)
+                data = serializers.serialize("json", [instance])
+                new_instance = list(serializers.deserialize("json", data))[0].object
+                self.assertEqual(instance.field, new_instance.field)
 
 
 class TestValidation(PostgreSQLSimpleTestCase):
