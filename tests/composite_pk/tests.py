@@ -1,7 +1,13 @@
 import json
+import unittest
 from uuid import UUID
 
-import yaml
+try:
+    import yaml  # NOQA
+
+    HAS_YAML = True
+except ImportError:
+    HAS_YAML = False
 
 from django import forms
 from django.core import serializers
@@ -252,6 +258,7 @@ class CompositePKFixturesTests(TestCase):
             },
         )
 
+    @unittest.skipUnless(HAS_YAML, "No yaml library detected")
     def test_serialize_user_yaml(self):
         users = User.objects.filter(pk=(2, 3))
         result = serializers.serialize("yaml", users)
