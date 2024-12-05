@@ -1242,7 +1242,7 @@ class FixtureTransactionTests(DumpDataAssertMixin, TransactionTestCase):
                 "loaddata", "fixture2.json", "--force_insert", verbosity=0
             )
             self.assertFalse(
-                "UPDATE" in [x['sql'].split(" ", 1)[0] for x in connection.queries]
+                "UPDATE" in [x["sql"].split(" ", 1)[0] for x in connection.queries]
             )
 
     def test_bulk_create(self):
@@ -1254,7 +1254,7 @@ class FixtureTransactionTests(DumpDataAssertMixin, TransactionTestCase):
                 "loaddata", "fixture10.json", "--bulk_create", verbosity=0
             )
             insert_counter = [
-                x for x in connection.queries if x['sql'].startswith('INSERT INTO')
+                x for x in connection.queries if x["sql"].startswith("INSERT INTO")
             ]
             self.assertEqual(3, len(insert_counter))
             self.assertEqual(4, Article.objects.count())
