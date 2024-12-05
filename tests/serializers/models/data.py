@@ -13,6 +13,15 @@ from django.db import models
 
 from .base import BaseModel
 
+try:
+    from PIL import Image  # NOQA
+except ImportError:
+    ImageData = None
+else:
+
+    class ImageData(models.Model):
+        data = models.ImageField(null=True)
+
 
 class BinaryData(models.Model):
     data = models.BinaryField(null=True)
@@ -60,10 +69,6 @@ class IntegerData(models.Model):
 
 class BigIntegerData(models.Model):
     data = models.BigIntegerField(null=True)
-
-
-class ImageData(models.Model):
-    data = models.ImageField(null=True)
 
 
 class GenericIPAddressData(models.Model):
