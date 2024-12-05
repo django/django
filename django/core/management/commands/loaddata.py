@@ -119,7 +119,7 @@ class Command(BaseCommand):
         )
         self.format = options["format"]
         self.force_insert = options["force_insert"]
-        self.bulk_create = options['bulk_create']
+        self.bulk_create = options["bulk_create"]
 
         with transaction.atomic(using=self.using):
             self.loaddata(fixture_labels)
@@ -306,8 +306,8 @@ class Command(BaseCommand):
 
                 if self.bulk_create:
                     counters = self.bulk_create_obj(objects)
-                    objects_in_fixture += counters['objects_in_fixture']
-                    loaded_objects_in_fixture += counters['loaded_objects_in_fixture']
+                    objects_in_fixture += counters["objects_in_fixture"]
+                    loaded_objects_in_fixture += counters["loaded_objects_in_fixture"]
                     if show_progress:
                         self.stdout.write(
                             "\rProcessed %i object(s)." % loaded_objects_in_fixture,
