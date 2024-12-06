@@ -827,9 +827,6 @@ class ModelState:
                 if name == "unique_together":
                     ut = model._meta.original_attrs["unique_together"]
                     options[name] = set(normalize_together(ut))
-                elif name == "index_together":
-                    it = model._meta.original_attrs["index_together"]
-                    options[name] = set(normalize_together(it))
                 elif name == "indexes":
                     indexes = [idx.clone() for idx in model._meta.indexes]
                     for index in indexes:
@@ -845,7 +842,7 @@ class ModelState:
         # If we're ignoring relationships, remove all field-listing model
         # options (that option basically just means "make a stub model")
         if exclude_rels:
-            for key in ["unique_together", "index_together", "order_with_respect_to"]:
+            for key in ["unique_together", "order_with_respect_to"]:
                 if key in options:
                     del options[key]
         # Private fields are ignored, so remove options that refer to them.
@@ -950,7 +947,11 @@ class ModelState:
     def render(self, apps):
         """Create a Model object from our current state into the given apps."""
         # First, make a Meta object
-        meta_contents = {"app_label": self.app_label, "apps": apps, **self.options}
+        meta_options = {**self.options}
+        # Prune index_together from options as it's no longer an allowed meta
+        # attribute.
+        meta_options.pop("index_together", None)
+        meta_contents = {"app_label": self.app_label, "apps": apps, **meta_options}
         meta = type("Meta", (), meta_contents)
         # Then, work out our bases
         try:
