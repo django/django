@@ -33,7 +33,13 @@ from django.core.management.commands.runserver import Command as RunserverComman
 from django.core.management.commands.testserver import Command as TestserverCommand
 from django.db import ConnectionHandler, connection
 from django.db.migrations.recorder import MigrationRecorder
-from django.test import LiveServerTestCase, SimpleTestCase, TestCase, override_settings
+from django.test import (
+    LiveServerTestCase,
+    RequestFactory,
+    SimpleTestCase,
+    TestCase,
+    override_settings,
+)
 from django.test.utils import captured_stderr, captured_stdout
 from django.urls import path
 from django.utils.version import PY313, get_docs_version
@@ -1734,6 +1740,23 @@ class ManageRunserver(SimpleTestCase):
         )
         self.assertIn("Performing system checks...", self.output.getvalue())
         mocked_check.assert_called()
+
+    @override_settings(MIDDLEWARE=["django.middleware.common.CommonMiddleware"])
+    def test_middleware_loaded_only_once(self):
+        with mock.patch("django.middleware.common.CommonMiddleware") as mocked:
+            self.cmd.get_handler(use_static_handler=True, insecure_serving=True)
+            self.assertEqual(mocked.call_count, 1)
+
+    def test_404_response(self):
+        handler = self.cmd.get_handler(use_static_handler=True, insecure_serving=True)
+        missing_static_file = os.path.join(settings.STATIC_URL, "unknown.css")
+        req = RequestFactory().get(missing_static_file)
+        with override_settings(DEBUG=False):
+            response = handler.get_response(req)
+            self.assertEqual(response.status_code, 404)
+        with override_settings(DEBUG=True):
+            response = handler.get_response(req)
+            self.assertEqual(response.status_code, 404)
 
 
 class ManageRunserverMigrationWarning(TestCase):
