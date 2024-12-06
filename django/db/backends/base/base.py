@@ -594,7 +594,7 @@ class BaseDatabaseWrapper:
         Close the current connection if unrecoverable errors have occurred
         or if it outlived its maximum age.
         """
-        if self.connection is not None:
+        if self.connection is not None and not self.in_atomic_block:
             self.health_check_done = False
             # If the application didn't restore the original autocommit setting,
             # don't take chances, drop the connection.
