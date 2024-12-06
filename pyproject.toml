@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=61.0.0,<69.3.0"]
+requires = ["git+https://github.com/pypa/setuptools.git@75f77825a816933088bc07ec290d9e2ef700a8ee"]
 build-backend = "setuptools.build_meta"
 
 [project]
