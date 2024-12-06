@@ -482,7 +482,7 @@ input, textarea, select, .form-row p, form .button {
     font-size: 0.8125rem;
 }
 .form-row div.help {
-    padding: 2px 3px;
+    padding: 2px 3px 2px 0;
 }
 
 textarea {

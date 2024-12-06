@@ -481,11 +481,7 @@ input[type="submit"], button {
     }
 
     .flex-container {
-        flex-flow: column;
-    }
-
-    .flex-container.checkbox-row {
-        flex-flow: row;
+        align-items: stretch;
     }
 
     textarea {
@@ -528,6 +524,10 @@ input[type="submit"], button {
         padding: 1px 0 0 5px;
     }
 
+    .aligned .checkbox-row + div.help {
+        margin-top: 5px;
+    }
+
     .aligned label + p,
     .aligned label + div.help,
     .aligned label + div.readonly {
@@ -555,7 +555,6 @@ input[type="submit"], button {
 
     form .aligned .form-row div.help {
         width: 100%;
-        margin: 5px 0 0;
         padding: 0;
     }
 
