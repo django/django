@@ -612,6 +612,37 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
         coords.reverse()
         self.assertEqual(tuple(coords), track.reverse_geom.coords)
 
+    @skipUnlessDBFeature("has_Rotate_function")
+    def test_rotate(self):
+        angle = math.pi
+        qs_origin = Country.objects.annotate(
+            rotated=functions.Rotate("mpoly", angle=angle)
+        )
+        qs_xy_params = Country.objects.annotate(
+            rotated=functions.Rotate("mpoly", angle=angle, x=1, y=1)
+        )
+        qs_origin_param = Country.objects.annotate(
+            rotated=functions.Rotate("mpoly", angle=angle, origin=Point(0, 0))
+        )
+        for c_origin, c_xy_params, c_origin_point_param in zip(
+            qs_origin, qs_xy_params, qs_origin_param
+        ):
+            for p1, p2 in zip(c_origin.mpoly, c_origin.rotated):
+                for r1, r2 in zip(p1, p2):
+                    for c1, c2 in zip(r1.coords, r2.coords):
+                        self.assertAlmostEqual(-c1[0], c2[0], 5)
+                        self.assertAlmostEqual(-c1[1], c2[1], 5)
+            for p1, p2 in zip(c_xy_params.mpoly, c_xy_params.rotated):
+                for r1, r2 in zip(p1, p2):
+                    for c1, c2 in zip(r1.coords, r2.coords):
+                        self.assertAlmostEqual(-c1[0] + 2, c2[0], 5)
+                        self.assertAlmostEqual(-c1[1] + 2, c2[1], 5)
+            for p1, p2 in zip(c_origin_point_param.mpoly, c_origin_point_param.rotated):
+                for r1, r2 in zip(p1, p2):
+                    for c1, c2 in zip(r1.coords, r2.coords):
+                        self.assertAlmostEqual(-c1[0], c2[0], 5)
+                        self.assertAlmostEqual(-c1[1], c2[1], 5)
+
     @skipUnlessDBFeature("has_Scale_function")
     def test_scale(self):
         xfac, yfac = 2, 3
