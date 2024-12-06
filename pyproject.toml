@@ -1,5 +1,8 @@
 [build-system]
-requires = ["setuptools>=61.0.0,<69.3.0"]
+requires = [
+    "setuptools>=75.8.1; python_version >= '3.9'",
+    "setuptools<75.4.0; python_version < '3.9'",
+]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -7,8 +10,8 @@ name = "Django"
 dynamic = ["version"]
 requires-python = ">= 3.8"
 dependencies = [
-    "asgiref >= 3.6.0, < 4",
-    "backports.zoneinfo; python_version<'3.9'",
+    "asgiref>=3.6.0,<4",
+    "backports.zoneinfo; python_version < '3.9'",
     "sqlparse>=0.3.1",
     "tzdata; sys_platform == 'win32'",
 ]
