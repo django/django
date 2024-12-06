@@ -1065,6 +1065,21 @@ Mails the email addresses specified in :setting:`ADMINS` using
 
 Starts the Python interactive interpreter.
 
+All models from all installed apps are automatically imported. See the guide on
+:ref:`customizing this behaviour <customizing-shell-auto-imports>` to add or
+remove imports.
+
+Models from apps listed earlier in :setting:`INSTALLED_APPS` take precedence.
+You can access overridden models from later, lower-precedence apps through its
+models module, which is made available as ``<app_label>_models``, for example
+``biblio_models.Book`` to access a model called ``Book`` in an app called
+``biblio``. For a ``--verbosity`` of 2 and above, all imported functions and
+classes are shown.
+
+.. versionchanged:: 5.2
+
+    Automatic importing of models was added.
+
 .. django-admin-option:: --interface {ipython,bpython,python}, -i {ipython,bpython,python}
 
 Specifies the shell to use. By default, Django will use IPython_ or bpython_ if
