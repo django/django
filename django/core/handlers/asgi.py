@@ -327,7 +327,7 @@ class ASGIHandler(base.BaseHandler):
             # - Consume via `__aiter__` and not `streaming_content` directly, to
             #   allow mapping of a sync iterator.
             # - Use aclosing() when consuming aiter.
-            #   See https://github.com/python/cpython/commit/6e8dcda
+            #   See https://github.com/python/cpython/commit/6e8dcdaaa49d4313bf9fab9f9923ca5828fbb10e  # noqa: E501
             async with aclosing(aiter(response)) as content:
                 async for part in content:
                     for chunk, _ in self.chunk_bytes(part):
