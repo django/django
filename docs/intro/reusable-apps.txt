@@ -209,7 +209,7 @@ this. For a small app like polls, this process isn't too difficult.
        :caption: ``django-polls/pyproject.toml``
 
        [build-system]
-       requires = ["setuptools>=69.3"]
+       requires = ["setuptools>=77.0.3"]
        build-backend = "setuptools.build_meta"
 
        [project]
@@ -220,6 +220,7 @@ this. For a small app like polls, this process isn't too difficult.
        ]
        description = "A Django app to conduct web-based polls."
        readme = "README.rst"
+       license = "BSD-3-Clause"
        requires-python = ">= 3.10"
        authors = [
            {name = "Your Name", email = "yourname@example.com"},
@@ -229,7 +230,6 @@ this. For a small app like polls, this process isn't too difficult.
            "Framework :: Django",
            "Framework :: Django :: X.Y",  # Replace "X.Y" as appropriate
            "Intended Audience :: Developers",
-           "License :: OSI Approved :: BSD License",
            "Operating System :: OS Independent",
            "Programming Language :: Python",
            "Programming Language :: Python :: 3",
