@@ -1692,7 +1692,7 @@ class ChangelistTests(MessagesTestMixin, AuthViewsTestCase):
         (_request, user), _kwargs = has_change_permission.call_args
         self.assertEqual(user.pk, self.admin.pk)
 
-    def test_view_user_password_is_readonly(self):
+    def test_password_not_viewable_for_user_without_change_permission(self):
         u = User.objects.get(username="testclient")
         u.is_superuser = False
         u.save()
@@ -1704,7 +1704,7 @@ class ChangelistTests(MessagesTestMixin, AuthViewsTestCase):
         algo, salt, hash_string = u.password.split("$")
         self.assertContains(response, '<div class="readonly">testclient</div>')
         # ReadOnlyPasswordHashWidget is used to render the field.
-        self.assertContains(
+        self.assertNotContains(
             response,
             "<strong>algorithm</strong>: <bdi>%s</bdi>\n\n"
             "<strong>salt</strong>: <bdi>%s********************</bdi>\n\n"
@@ -1715,6 +1715,9 @@ class ChangelistTests(MessagesTestMixin, AuthViewsTestCase):
                 hash_string[:6],
             ),
             html=True,
+        )
+        self.assertNotContains(
+            response, '<a class="button" href="../password/">Reset password</a>'
         )
         # Value in POST data is ignored.
         data = self.get_user_data(u)
