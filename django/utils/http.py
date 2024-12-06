@@ -362,10 +362,15 @@ def content_disposition_header(as_attachment, filename):
         disposition = "attachment" if as_attachment else "inline"
         try:
             filename.encode("ascii")
+            is_ascii = True
+        except UnicodeEncodeError:
+            is_ascii = False
+        # https://datatracker.ietf.org/doc/html/rfc9110#name-quoted-strings
+        if is_ascii and re.match(r"^[\t \x21-\x7e]*$", filename):
             file_expr = 'filename="{}"'.format(
                 filename.replace("\\", "\\\\").replace('"', r"\"")
             )
-        except UnicodeEncodeError:
+        else:
             file_expr = "filename*=utf-8''{}".format(quote(filename))
         return f"{disposition}; {file_expr}"
     elif as_attachment:
