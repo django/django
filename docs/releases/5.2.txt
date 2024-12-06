@@ -256,7 +256,15 @@ Forms
 Generic Views
 ~~~~~~~~~~~~~
 
-* ...
+* The new :meth:`~django.views.generic.detail.SingleObjectMixin.get_model`
+  method returns the model defined for the view, or a custom model if
+  overridden. If ``queryset`` is provided, it takes precedence as the source
+  of objects.
+
+* :meth:`~django.views.generic.edit.ModelFormMixin.get_model` is overridden to
+  return the model from the ``ModelForm``'s ``Meta`` class when the view's
+  ``model`` attribute is not defined, allowing for simplified form-based edit
+  views using only ``form_class``.
 
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
