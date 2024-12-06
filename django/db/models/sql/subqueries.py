@@ -3,7 +3,11 @@ Query subclasses which provide extra functionality beyond simple data retrieval.
 """
 
 from django.core.exceptions import FieldError
-from django.db.models.sql.constants import CURSOR, GET_ITERATOR_CHUNK_SIZE, NO_RESULTS
+from django.db.models.sql.constants import (
+    GET_ITERATOR_CHUNK_SIZE,
+    NO_RESULTS,
+    ROW_COUNT,
+)
 from django.db.models.sql.query import Query
 
 __all__ = ["DeleteQuery", "UpdateQuery", "InsertQuery", "AggregateQuery"]
@@ -17,11 +21,7 @@ class DeleteQuery(Query):
     def do_query(self, table, where, using):
         self.alias_map = {table: self.alias_map[table]}
         self.where = where
-        cursor = self.get_compiler(using).execute_sql(CURSOR)
-        if cursor:
-            with cursor:
-                return cursor.rowcount
-        return 0
+        return self.get_compiler(using).execute_sql(ROW_COUNT)
 
     def delete_batch(self, pk_list, using):
         """
