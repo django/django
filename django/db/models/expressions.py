@@ -167,13 +167,16 @@ class Combinable:
         return NegatedExpression(self)
 
 
+class OutputFieldIsNoneError(FieldError):
+    pass
+
+
 class BaseExpression:
     """Base class for all query expressions."""
 
     empty_result_set_value = NotImplemented
     # aggregate specific fields
     is_summary = False
-    _output_field_resolved_to_none = False
     # Can the expression be used in a WHERE clause?
     filterable = True
     # Can the expression be used as a source expression in Window?
@@ -315,11 +318,12 @@ class BaseExpression:
         """Return the output type of this expressions."""
         output_field = self._resolve_output_field()
         if output_field is None:
-            self._output_field_resolved_to_none = True
-            raise FieldError("Cannot resolve expression type, unknown output_field")
+            raise OutputFieldIsNoneError(
+                "Cannot resolve expression type, unknown output_field"
+            )
         return output_field
 
-    @cached_property
+    @property
     def _output_field_or_none(self):
         """
         Return the output field of this expression, or None if
@@ -327,9 +331,8 @@ class BaseExpression:
         """
         try:
             return self.output_field
-        except FieldError:
-            if not self._output_field_resolved_to_none:
-                raise
+        except OutputFieldIsNoneError:
+            return
 
     def _resolve_output_field(self):
         """

@@ -309,6 +309,21 @@ class TestGeneralAggregate(PostgreSQLTestCase):
         )
         self.assertCountEqual(qs, [[], [5]])
 
+    def test_array_agg_with_empty_filter_and_default_values(self):
+        for filter_value in ([-1], []):
+            for default_value in ([], Value([])):
+                with self.subTest(filter=filter_value, default=default_value):
+                    queryset = AggregateTestModel.objects.annotate(
+                        test_array_agg=ArrayAgg(
+                            "stattestmodel__int1",
+                            filter=Q(pk__in=filter_value),
+                            default=default_value,
+                        )
+                    )
+                    for obj in queryset:
+                        with self.subTest(object_id=obj.pk):
+                            self.assertSequenceEqual(obj.test_array_agg, [])
+
     def test_bit_and_general(self):
         values = AggregateTestModel.objects.filter(integer_field__in=[0, 1]).aggregate(
             bitand=BitAnd("integer_field")
