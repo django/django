@@ -871,6 +871,18 @@ class ManageNoSettings(AdminScriptTestCase):
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
 
+    def test_runserver_with_bad_settings(self):
+        args = ["runserver", "--settings=bad_settings", "--nostatic"]
+        out, err = self.run_manage(args)
+        self.assertNoOutput(out)
+        self.assertOutput(err, "Settings module bad_settings could not be imported")
+
+    def test_startapp_with_bad_settings(self):
+        args = ["startapp", "--settings=bad_settings", "app1"]
+        out, err = self.run_manage(args)
+        self.assertNoOutput(out)
+        self.assertNoOutput(err)
+
     def test_builtin_with_bad_environment(self):
         """
         no settings: manage.py builtin commands fail if settings file (from
@@ -1215,7 +1227,9 @@ class ManageAlternateSettings(AdminScriptTestCase):
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
         self.assertOutput(
-            err, r"No module named '?(test_project\.)?settings'?", regex=True
+            err,
+            r"Settings module '?(test_project\.)?settings'? could not be imported",
+            regex=True,
         )
 
     def test_custom_command_with_settings(self):
@@ -1410,7 +1424,7 @@ class ManageSettingsWithSettingsErrors(AdminScriptTestCase):
         self.write_settings(
             "settings.py",
             extra="from django.core.exceptions import ImproperlyConfigured\n"
-            "raise ImproperlyConfigured()",
+            "raise ImproperlyConfigured('Improper configuration')",
         )
         args = ["help"]
         out, err = self.run_manage(args)
