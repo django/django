@@ -1,3 +1,5 @@
+import re
+
 from django.db.models import (
     CharField,
     Expression,
@@ -10,6 +12,16 @@ from django.db.models import (
 )
 from django.db.models.expressions import CombinedExpression, register_combinable_fields
 from django.db.models.functions import Cast, Coalesce
+
+
+def normalize_spaces(val: str):
+    """Converts multiple spaces to single and strips from both sides."""
+    return re.sub(r"\s{2,}", " ", val.strip()) if val else None
+
+
+def psql_escape(query: str):
+    """Replace unsafe chars with space and convert multiple spaces to single."""
+    return normalize_spaces(re.sub(r"['\0\[\]()|&:*!@<>\\]", " ", query))
 
 
 class SearchVectorExact(Lookup):
@@ -203,6 +215,9 @@ class SearchQuery(SearchQueryCombinable, Func):
         invert=False,
         search_type="plain",
     ):
+        if isinstance(value, LexemeCombinable):
+            search_type = "raw"
+
         self.function = self.SEARCH_TYPES.get(search_type)
         if self.function is None:
             raise ValueError("Unknown search_type argument '%s'." % search_type)
@@ -381,3 +396,91 @@ class TrigramWordSimilarity(TrigramWordBase):
 
 class TrigramStrictWordSimilarity(TrigramWordBase):
     function = "STRICT_WORD_SIMILARITY"
+
+
+class LexemeCombinable:
+    BITAND = "&"
+    BITOR = "|"
+
+    def _combine(self, other, connector, reversed, node=None):
+        if not isinstance(other, LexemeCombinable):
+            raise TypeError(
+                "A Lexeme can only be combined with another Lexeme, "
+                f"got {type(other)}."
+            )
+        if reversed:
+            return CombinedLexeme(other, connector, self)
+        return CombinedLexeme(self, connector, other)
+
+    # On Combinable, these are not implemented to reduce confusion with Q. In
+    # this case we are actually (ab)using them to do logical combination so
+    # it's consistent with other usage in Django.
+    def __or__(self, other):
+        return self._combine(other, self.BITOR, False)
+
+    def __and__(self, other):
+        return self._combine(other, self.BITAND, False)
+
+
+class Lexeme(LexemeCombinable, Value):
+    _output_field = SearchQueryField()
+
+    def __init__(
+        self, value, output_field=None, *, invert=False, prefix=False, weight=None
+    ):
+        self.prefix = prefix
+        self.invert = invert
+        self.weight = weight
+        super().__init__(value, output_field=output_field)
+
+    def as_sql(self, compiler, connection):
+        param = "'%s'" % psql_escape(self.value)
+        template = "%s"
+
+        label = ""
+        if self.prefix:
+            label += "*"
+        if self.weight:
+            label += self.weight
+
+        if label:
+            param = f"{param}:{label}"
+        if self.invert:
+            param = f"!{param}"
+        return template, [param]
+
+    def __invert__(self):
+        return type(self)(
+            self.value, invert=not self.invert, prefix=self.prefix, weight=self.weight
+        )
+
+
+class CombinedLexeme(LexemeCombinable, CombinedExpression):
+    _output_field = SearchQueryField()
+
+    def __init__(self, lhs, connector, rhs, output_field=None):
+        super().__init__(lhs, connector, rhs, output_field)
+
+    def as_sql(self, compiler, connection):
+        value_params = []
+        lsql, params = compiler.compile(self.lhs)
+        value_params.extend(params)
+
+        rsql, params = compiler.compile(self.rhs)
+        value_params.extend(params)
+
+        combined_sql = f"({lsql} {self.connector} {rsql})"
+        return "%s", [combined_sql % tuple(value_params)]
+
+    def __invert__(self):
+        """
+        Swap the connector and invert the lhs and rhs.
+
+        This generates a query that's equivalent to what we expect
+        thanks to De Morgan's theorem.
+        """
+        return type(self)(
+            ~self.lhs,
+            self.BITAND if self.connector == self.BITOR else self.BITOR,
+            ~self.rhs,
+        )
