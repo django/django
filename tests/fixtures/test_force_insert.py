@@ -10,15 +10,8 @@ from django.core.management.commands.dumpdata import ProxyModelWarning
 from django.db import IntegrityError, connection
 from django.test import TestCase, skipUnlessDBFeature
 
-from .tests import (
-    DumpDataAssertMixin,
-)
-from .models import (
-    Article,
-    PrimaryKeyUUIDModel,
-    ProxySpy,
-    Spy,
-)
+from .models import Article, PrimaryKeyUUIDModel, ProxySpy, Spy
+from .tests import DumpDataAssertMixin
 
 try:
     import bz2  # NOQA
