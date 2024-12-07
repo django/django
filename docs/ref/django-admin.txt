@@ -534,11 +534,15 @@ times to exclude more than one app or model.
 
 .. django-admin-option:: --force_insert
 
+.. versionadded:: 5.2
+
 Applies the ``force_insert`` option on each item's save() method. This assumes that
 the fixture is not an update and skips the UPDATE attempt. This reduces load time but
 will fail if by accident the primary key does happen to be present beforehand.
 
 .. django-admin-option:: --bulk_create
+
+.. versionadded:: 5.2
 
 Instead of saving each item individually, subsequent items of the same model are
 inserted using a single statement. This could improve loading speed dramatically, but
