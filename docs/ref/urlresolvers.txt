@@ -10,7 +10,7 @@
 The ``reverse()`` function can be used to return an absolute path reference
 for a given view and optional parameters, similar to the :ttag:`url` tag:
 
-.. function:: reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None)
+.. function:: reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None, query=None, fragment=None)
 
 ``viewname`` can be a :ref:`URL pattern name <naming-url-patterns>` or the
 callable view object used in the URLconf. For example, given the following
@@ -66,6 +66,23 @@ namespaces into URLs on specific application instances, according to the
 
 The ``urlconf`` argument is the URLconf module containing the URL patterns to
 use for reversing. By default, the root URLconf for the current thread is used.
+
+The ``query`` argument allows you to provide a dictionary of data to be added
+to the returned URL in the query string. Alternatively, a
+:class:`~django.http.QueryDict` such as ``request.GET`` can be passed instead.
+
+The ``fragment`` argument allows you to provide a fragment identifier to be
+appended to the returned URL (that is, after the path and query string,
+preceded by a ``#``). For example:
+
+.. code-block:: pycon
+
+    >>> reverse("search", query={"q": "biscuits", "page": 2}, fragment="results")
+    '/search/?q=biscuits&page=2#results'
+
+.. versionchanged:: 5.2
+
+    The ``query`` and ``fragment`` arguments were added.
 
 .. note::
 
