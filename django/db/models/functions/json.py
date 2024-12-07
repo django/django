@@ -100,10 +100,8 @@ class JSONSet(Func):
 
             value = ToJSONB(value, output_field=self.output_field)
         elif value.value is None:
-            # FIXME: why do we need to wrap this again?
-            # If we don't, for some reason, it is interpreted as SQL NULL.
-            # Fails on test_set_single_key_with_json_null.
-            value = Value(value, output_field=self.output_field)
+            # Avoid None from being interpreted as SQL NULL.
+            value = Value(None, output_field=self.output_field)
 
         new_source_expressions.append(value)
         copy.set_source_expressions(new_source_expressions)
