@@ -5,6 +5,10 @@ from django.db.models.fields.json import compile_json_path
 from django.db.models.functions import Cast
 
 
+class ToJSONB(Func):
+    function = "TO_JSONB"
+
+
 class JSONSet(Func):
     def __init__(self, expression, output_field=None, **fields):
         if not fields:
@@ -31,6 +35,19 @@ class JSONSet(Func):
             for key, value in self.fields.items()
         }
         return c
+
+    def join(self, args):
+        key, value = list(self.fields.items())[0]
+        key_paths = key.split(LOOKUP_SEP)
+        key_paths_join = compile_json_path(key_paths)
+
+        template = f"{args[0]}, SET q'\uffff{key_paths_join}\uffff' = {args[-1]}"
+
+        if isinstance(value, Value):
+            # Use the FORMAT JSON clause in JSON_TRANSFORM so the value is automatically
+            # treated as JSON.
+            return f"{template} FORMAT JSON"
+        return template
 
     def as_sql(
         self,
@@ -94,10 +111,6 @@ class JSONSet(Func):
             # because ::jsonb only works with JSON-formatted strings, not with
             # other types like integers. The TO_JSONB function is available for
             # this purpose, i.e. to convert any SQL type to JSONB.
-
-            class ToJSONB(Func):
-                function = "TO_JSONB"
-
             value = ToJSONB(value, output_field=self.output_field)
         elif value.value is None:
             # Avoid None from being interpreted as SQL NULL.
@@ -130,28 +143,9 @@ class JSONSet(Func):
 
         new_source_expressions = copy.get_source_expressions()
 
-        key_paths = key.split(LOOKUP_SEP)
-        key_paths_join = compile_json_path(key_paths)
-
         if isinstance(value, Value):
-            # We do not need Cast() because Oracle has the FORMAT JSON clause
-            # in JSON_TRANSFORM that will automatically treat the value as JSON.
+            # We do not need Cast() because we use the FORMAT JSON clause instead.
             value = Value(value, output_field=self.output_field)
-
-            class ArgJoiner:
-                def join(self, args):
-                    return (
-                        f"{args[0]}, SET q'\uffff{key_paths_join}\uffff' = {args[-1]} "
-                        "FORMAT JSON"
-                    )
-
-        else:
-
-            class ArgJoiner:
-                def join(self, args):
-                    return (
-                        f"{args[0]}, SET q'\uffff{key_paths_join}\uffff' = {args[-1]}"
-                    )
 
         new_source_expressions.append(value)
         copy.set_source_expressions(new_source_expressions)
@@ -160,7 +154,7 @@ class JSONSet(Func):
             compiler,
             connection,
             function="JSON_TRANSFORM",
-            arg_joiner=ArgJoiner(),
+            arg_joiner=self,
             **extra_context,
         )
 
@@ -171,6 +165,13 @@ class JSONRemove(Func):
             raise TypeError("JSONRemove requires at least one path to remove")
         self.paths = paths
         super().__init__(expression)
+
+    def join(self, args):
+        path = self.paths[0]
+        key_paths = path.split(LOOKUP_SEP)
+        key_paths_join = compile_json_path(key_paths)
+
+        return f"{args[0]}, REMOVE q'\uffff{key_paths_join}\uffff'"
 
     def as_sql(
         self,
@@ -243,17 +244,10 @@ class JSONRemove(Func):
                 compiler, connection, **extra_context
             )
 
-        key_paths = path.split(LOOKUP_SEP)
-        key_paths_join = compile_json_path(key_paths)
-
-        class ArgJoiner:
-            def join(self, args):
-                return f"{args[0]}, REMOVE q'\uffff{key_paths_join}\uffff'"
-
         return super(JSONRemove, copy).as_sql(
             compiler,
             connection,
             function="JSON_TRANSFORM",
-            arg_joiner=ArgJoiner(),
+            arg_joiner=self,
             **extra_context,
         )
