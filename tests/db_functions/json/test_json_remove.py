@@ -105,6 +105,50 @@ class JSONRemoveTests(TestCase):
             {"notifications": True},
         )
 
+    def test_remove_special_chars(self):
+        test_keys = [
+            "CONTROL",
+            "single'",
+            "dollar$",
+            "dot.dot",
+            "with space",
+            "back\\slash",
+            "question?mark",
+            "user@name",
+            "emo🤡'ji",
+            "com,ma",
+            "curly{{{brace}}}s",
+            "escape\uffff'seq'\uffffue\uffff'nce",
+        ]
+        for key in test_keys:
+            with self.subTest(key=key):
+                user_preferences = UserPreferences.objects.create(
+                    settings={key: 20, "notifications": True, "font": {"size": 30}}
+                )
+                UserPreferences.objects.update(settings=JSONRemove("settings", key))
+                user_preferences = UserPreferences.objects.get(pk=user_preferences.pk)
+                self.assertEqual(
+                    user_preferences.settings,
+                    {"notifications": True, "font": {"size": 30}},
+                )
+
+    def test_remove_special_chars_double_quotes(self):
+        test_keys = [
+            'double"',
+            "m\\i@x. m🤡'a,t{{{ch}}}e?d$\"'es\uffff'ca\uffff'pe",
+        ]
+        for key in test_keys:
+            with self.subTest(key=key):
+                user_preferences = UserPreferences.objects.create(
+                    settings={key: 20, "notifications": True, "font": {"size": 30}}
+                )
+                UserPreferences.objects.update(settings=JSONRemove("settings", key))
+                user_preferences = UserPreferences.objects.get(pk=user_preferences.pk)
+                self.assertEqual(
+                    user_preferences.settings,
+                    {"notifications": True, "font": {"size": 30}},
+                )
+
 
 class InvalidJSONRemoveTests(TestCase):
     @skipIfDBFeature("supports_partial_json_update")

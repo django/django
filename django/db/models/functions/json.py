@@ -140,13 +140,18 @@ class JSONSet(Func):
 
             class ArgJoiner:
                 def join(self, args):
-                    return f"{args[0]}, SET '{key_paths_join}' = {args[-1]} FORMAT JSON"
+                    return (
+                        f"{args[0]}, SET q'\uffff{key_paths_join}\uffff' = {args[-1]} "
+                        "FORMAT JSON"
+                    )
 
         else:
 
             class ArgJoiner:
                 def join(self, args):
-                    return f"{args[0]}, SET '{key_paths_join}' = {args[-1]}"
+                    return (
+                        f"{args[0]}, SET q'\uffff{key_paths_join}\uffff' = {args[-1]}"
+                    )
 
         new_source_expressions.append(value)
         copy.set_source_expressions(new_source_expressions)
@@ -243,7 +248,7 @@ class JSONRemove(Func):
 
         class ArgJoiner:
             def join(self, args):
-                return f"{args[0]}, REMOVE '{key_paths_join}'"
+                return f"{args[0]}, REMOVE q'\uffff{key_paths_join}\uffff'"
 
         return super(JSONRemove, copy).as_sql(
             compiler,

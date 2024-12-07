@@ -92,24 +92,55 @@ class JSONSetTests(TestCase):
             {"font": {"size": 10, "name": "Arial"}, "theme": "dark"},
         )
 
-    def test_set_problematic_keys(self):
-        """
-        Most databases use a dot-notation for the JSON path.
-        Ensure that using a key that contains a dot is escaped properly.
-        """
-        problematic_keys = [
-            "font.size",
-            "$.font.size",
-            '"font"."size"',
-            '"font " .size"',
-            "font',\"}",
+    def test_set_special_chars(self):
+        test_keys = [
+            "CONTROL",
+            "single'",
+            "dollar$",
+            "dot.dot",
+            "with space",
+            "back\\slash",
+            "question?mark",
+            "user@name",
+            "emo🤡'ji",
+            "com,ma",
+            "curly{{{brace}}}s",
+            "escape\uffff'seq'\uffffue\uffff'nce",
         ]
-        for key in problematic_keys:
+        for key in test_keys:
             with self.subTest(key=key):
                 user_preferences = UserPreferences.objects.create(
                     settings={key: 20, "notifications": True, "font": {"size": 30}}
                 )
-                # Update the key that contains a dot character.
+                UserPreferences.objects.update(
+                    settings=JSONSet("settings", **{key: 10})
+                )
+                user_preferences = UserPreferences.objects.get(pk=user_preferences.pk)
+                self.assertEqual(
+                    user_preferences.settings,
+                    {key: 10, "notifications": True, "font": {"size": 30}},
+                )
+
+                # Update the nested key.
+                UserPreferences.objects.update(
+                    settings=JSONSet("settings", font__size=20)
+                )
+                user_preferences = UserPreferences.objects.get(pk=user_preferences.pk)
+                self.assertEqual(
+                    user_preferences.settings,
+                    {key: 10, "notifications": True, "font": {"size": 20}},
+                )
+
+    def test_set_special_chars_double_quotes(self):
+        test_keys = [
+            'double"',
+            "m\\i@x. m🤡'a,t{{{ch}}}e?d$\"'es\uffff'ca\uffff'pe",
+        ]
+        for key in test_keys:
+            with self.subTest(key=key):
+                user_preferences = UserPreferences.objects.create(
+                    settings={key: 20, "notifications": True, "font": {"size": 30}}
+                )
                 UserPreferences.objects.update(
                     settings=JSONSet("settings", **{key: 10})
                 )
