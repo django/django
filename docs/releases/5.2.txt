@@ -399,6 +399,8 @@ backends.
 * The new :meth:`Model._is_pk_set() <django.db.models.Model._is_pk_set>` method
   allows checking if a Model instance's primary key is defined.
 
+* ``BaseDatabaseOperations.adapt_decimalfield_value()`` is now a no-op, simply
+  returning the given value.
 
 :mod:`django.contrib.gis`
 -------------------------
