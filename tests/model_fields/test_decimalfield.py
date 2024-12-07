@@ -1,9 +1,10 @@
 import math
 from decimal import Decimal
+from unittest import mock
 
 from django.core import validators
 from django.core.exceptions import ValidationError
-from django.db import models
+from django.db import connection, models
 from django.test import TestCase
 
 from .models import BigD, Foo
@@ -47,6 +48,20 @@ class DecimalFieldTests(TestCase):
         f = models.DecimalField(max_digits=5, decimal_places=1)
         self.assertIsNone(f.get_prep_value(None))
         self.assertEqual(f.get_prep_value("2.4"), Decimal("2.4"))
+
+    def test_get_db_prep_value(self):
+        """
+        DecimalField.get_db_prep_value() must call
+        DatabaseOperations.adapt_decimalfield_value().
+        """
+        f = models.DecimalField(max_digits=5, decimal_places=1)
+        # None of the built-in database backends implement
+        # adapt_decimalfield_value(), so this must be confirmed with mocking.
+        with mock.patch.object(
+            connection.ops.__class__, "adapt_decimalfield_value"
+        ) as adapt_decimalfield_value:
+            f.get_db_prep_value("2.4", connection)
+        adapt_decimalfield_value.assert_called_with(Decimal("2.4"), 5, 1)
 
     def test_filter_with_strings(self):
         """
