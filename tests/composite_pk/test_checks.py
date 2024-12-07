@@ -1,7 +1,7 @@
 from django.core import checks
 from django.db import connection, models
 from django.db.models import F
-from django.test import TestCase
+from django.test import TestCase, skipUnlessAnyDBFeature
 from django.test.utils import isolate_apps
 
 
@@ -217,16 +217,18 @@ class CompositePKChecksTests(TestCase):
             ],
         )
 
+    @skipUnlessAnyDBFeature(
+        "supports_virtual_generated_columns",
+        "supports_stored_generated_columns",
+    )
     def test_composite_pk_cannot_include_generated_field(self):
-        is_oracle = connection.vendor == "oracle"
-
         class Foo(models.Model):
             pk = models.CompositePrimaryKey("id", "foo")
             id = models.IntegerField()
             foo = models.GeneratedField(
                 expression=F("id"),
                 output_field=models.IntegerField(),
-                db_persist=not is_oracle,
+                db_persist=connection.features.supports_stored_generated_columns,
             )
 
         self.assertEqual(

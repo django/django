@@ -32,8 +32,10 @@ else:
         RemovedInDjango60Warning,
         RemovedInDjango61Warning,
     )
+    from django.utils.functional import classproperty
     from django.utils.log import DEFAULT_LOGGING
     from django.utils.version import PY312, PYPY
+
 
 try:
     import MySQLdb
@@ -307,12 +309,12 @@ def setup_run_tests(verbosity, start_at, start_after, test_labels=None):
     apps.set_installed_apps(settings.INSTALLED_APPS)
 
     # Force declaring available_apps in TransactionTestCase for faster tests.
-    def no_available_apps(self):
+    def no_available_apps(cls):
         raise Exception(
             "Please define available_apps in TransactionTestCase and its subclasses."
         )
 
-    TransactionTestCase.available_apps = property(no_available_apps)
+    TransactionTestCase.available_apps = classproperty(no_available_apps)
     TestCase.available_apps = None
 
     # Set an environment variable that other code may consult to see if

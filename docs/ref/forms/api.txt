@@ -1025,12 +1025,16 @@ method you're using:
 Customizing the error list format
 ---------------------------------
 
-.. class:: ErrorList(initlist=None, error_class=None, renderer=None)
+.. class:: ErrorList(initlist=None, error_class=None, renderer=None, field_id=None)
 
     By default, forms use ``django.forms.utils.ErrorList`` to format validation
     errors. ``ErrorList`` is a list like object where ``initlist`` is the
     list of errors. In addition this class has the following attributes and
     methods.
+
+    .. versionchanged:: 5.2
+
+        The ``field_id`` argument was added.
 
     .. attribute:: error_class
 
@@ -1042,6 +1046,16 @@ Customizing the error list format
         Specifies the :doc:`renderer <renderers>` to use for ``ErrorList``.
         Defaults to ``None`` which means to use the default renderer
         specified by the :setting:`FORM_RENDERER` setting.
+
+    .. attribute:: field_id
+
+        .. versionadded:: 5.2
+
+        An ``id`` for the field for which the errors relate. This allows an
+        HTML ``id`` attribute to be added in the error template and is useful
+        to associate the errors with the field. The default template uses the
+        format ``id="{{ field_id }}_error"`` and a value is provided by
+        :meth:`.Form.add_error` using the field's :attr:`~.BoundField.auto_id`.
 
     .. attribute:: template_name
 

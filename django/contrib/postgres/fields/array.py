@@ -169,7 +169,7 @@ class ArrayField(CheckFieldDefaultMixin, Field):
             else:
                 obj = AttributeSetter(base_field.attname, val)
                 values.append(base_field.value_to_string(obj))
-        return json.dumps(values)
+        return json.dumps(values, ensure_ascii=False)
 
     def get_transform(self, name):
         transform = super().get_transform(name)

@@ -249,7 +249,8 @@ class FormsErrorMessagesTestCase(SimpleTestCase, AssertFormErrorsMixin):
         form1 = TestForm({"first_name": "John"})
         self.assertHTMLEqual(
             str(form1["last_name"].errors),
-            '<ul class="errorlist"><li>This field is required.</li></ul>',
+            '<ul class="errorlist" id="id_last_name_error"><li>'
+            "This field is required.</li></ul>",
         )
         self.assertHTMLEqual(
             str(form1.errors["__all__"]),
@@ -280,7 +281,7 @@ class FormsErrorMessagesTestCase(SimpleTestCase, AssertFormErrorsMixin):
         f = SomeForm({"field": "<script>"})
         self.assertHTMLEqual(
             t.render(Context({"form": f})),
-            '<ul class="errorlist"><li>field<ul class="errorlist">'
+            '<ul class="errorlist"><li>field<ul class="errorlist" id="id_field_error">'
             "<li>Select a valid choice. &lt;script&gt; is not one of the "
             "available choices.</li></ul></li></ul>",
         )
@@ -291,7 +292,7 @@ class FormsErrorMessagesTestCase(SimpleTestCase, AssertFormErrorsMixin):
         f = SomeForm({"field": ["<script>"]})
         self.assertHTMLEqual(
             t.render(Context({"form": f})),
-            '<ul class="errorlist"><li>field<ul class="errorlist">'
+            '<ul class="errorlist"><li>field<ul class="errorlist" id="id_field_error">'
             "<li>Select a valid choice. &lt;script&gt; is not one of the "
             "available choices.</li></ul></li></ul>",
         )
@@ -302,7 +303,7 @@ class FormsErrorMessagesTestCase(SimpleTestCase, AssertFormErrorsMixin):
         f = SomeForm({"field": ["<script>"]})
         self.assertHTMLEqual(
             t.render(Context({"form": f})),
-            '<ul class="errorlist"><li>field<ul class="errorlist">'
+            '<ul class="errorlist"><li>field<ul class="errorlist" id="id_field_error">'
             "<li>“&lt;script&gt;” is not a valid value.</li>"
             "</ul></li></ul>",
         )

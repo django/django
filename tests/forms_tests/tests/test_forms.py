@@ -181,53 +181,55 @@ class FormsTestCase(SimpleTestCase):
         self.assertHTMLEqual(
             str(p),
             '<div><label for="id_first_name">First name:</label>'
-            '<ul class="errorlist"><li>This field is required.</li></ul>'
-            '<input type="text" name="first_name" aria-invalid="true" required '
-            'id="id_first_name"></div>'
+            '<ul class="errorlist" id="id_first_name_error"><li>This field is required.'
+            '</li></ul><input type="text" name="first_name" aria-invalid="true" '
+            'required id="id_first_name"></div>'
             '<div><label for="id_last_name">Last name:</label>'
-            '<ul class="errorlist"><li>This field is required.</li></ul>'
-            '<input type="text" name="last_name" aria-invalid="true" required '
-            'id="id_last_name"></div><div>'
+            '<ul class="errorlist" id="id_last_name_error"><li>This field is required.'
+            '</li></ul><input type="text" name="last_name" aria-invalid="true" '
+            'required id="id_last_name"></div><div>'
             '<label for="id_birthday">Birthday:</label>'
-            '<ul class="errorlist"><li>This field is required.</li></ul>'
-            '<input type="text" name="birthday" aria-invalid="true" required '
+            '<ul class="errorlist" id="id_birthday_error"><li>This field is required.'
+            '</li></ul><input type="text" name="birthday" aria-invalid="true" required '
             'id="id_birthday"></div>',
         )
         self.assertHTMLEqual(
             p.as_table(),
             """<tr><th><label for="id_first_name">First name:</label></th><td>
-<ul class="errorlist"><li>This field is required.</li></ul>
+<ul class="errorlist" id="id_first_name_error"><li>This field is required.</li></ul>
 <input type="text" name="first_name" id="id_first_name" aria-invalid="true" required>
 </td></tr><tr><th><label for="id_last_name">Last name:</label></th>
-<td><ul class="errorlist"><li>This field is required.</li></ul>
+<td><ul class="errorlist" id="id_last_name_error"><li>This field is required.</li></ul>
 <input type="text" name="last_name" id="id_last_name" aria-invalid="true" required>
 </td></tr><tr><th><label for="id_birthday">Birthday:</label></th>
-<td><ul class="errorlist"><li>This field is required.</li></ul>
+<td><ul class="errorlist" id="id_birthday_error"><li>This field is required.</li></ul>
 <input type="text" name="birthday" id="id_birthday" aria-invalid="true" required>
 </td></tr>""",
         )
         self.assertHTMLEqual(
             p.as_ul(),
-            """<li><ul class="errorlist"><li>This field is required.</li></ul>
+            """<li><ul class="errorlist" id="id_first_name_error">
+<li>This field is required.</li></ul>
 <label for="id_first_name">First name:</label>
 <input type="text" name="first_name" id="id_first_name" aria-invalid="true" required>
-</li><li><ul class="errorlist"><li>This field is required.</li></ul>
-<label for="id_last_name">Last name:</label>
+</li><li><ul class="errorlist" id="id_last_name_error"><li>This field is required.</li>
+</ul><label for="id_last_name">Last name:</label>
 <input type="text" name="last_name" id="id_last_name" aria-invalid="true" required>
-</li><li><ul class="errorlist"><li>This field is required.</li></ul>
-<label for="id_birthday">Birthday:</label>
+</li><li><ul class="errorlist" id="id_birthday_error"><li>This field is required.</li>
+</ul><label for="id_birthday">Birthday:</label>
 <input type="text" name="birthday" id="id_birthday" aria-invalid="true" required>
 </li>""",
         )
         self.assertHTMLEqual(
             p.as_p(),
-            """<ul class="errorlist"><li>This field is required.</li></ul>
+            """<ul class="errorlist" id="id_first_name_error"><li>
+This field is required.</li></ul>
 <p><label for="id_first_name">First name:</label>
 <input type="text" name="first_name" id="id_first_name" aria-invalid="true" required>
-</p><ul class="errorlist"><li>This field is required.</li></ul>
+</p><ul class="errorlist" id="id_last_name_error"><li>This field is required.</li></ul>
 <p><label for="id_last_name">Last name:</label>
 <input type="text" name="last_name" id="id_last_name" aria-invalid="true" required>
-</p><ul class="errorlist"><li>This field is required.</li></ul>
+</p><ul class="errorlist" id="id_birthday_error"><li>This field is required.</li></ul>
 <p><label for="id_birthday">Birthday:</label>
 <input type="text" name="birthday" id="id_birthday" aria-invalid="true" required>
 </p>""",
@@ -235,16 +237,16 @@ class FormsTestCase(SimpleTestCase):
         self.assertHTMLEqual(
             p.as_div(),
             '<div><label for="id_first_name">First name:</label>'
-            '<ul class="errorlist"><li>This field is required.</li></ul>'
-            '<input type="text" name="first_name" aria-invalid="true" required '
-            'id="id_first_name"></div>'
+            '<ul class="errorlist" id="id_first_name_error"><li>This field is required.'
+            '</li></ul><input type="text" name="first_name" aria-invalid="true" '
+            'required id="id_first_name"></div>'
             '<div><label for="id_last_name">Last name:</label>'
-            '<ul class="errorlist"><li>This field is required.</li></ul>'
-            '<input type="text" name="last_name" aria-invalid="true" required '
-            'id="id_last_name"></div><div>'
+            '<ul class="errorlist" id="id_last_name_error"><li>This field is required.'
+            '</li></ul><input type="text" name="last_name" aria-invalid="true" '
+            'required id="id_last_name"></div><div>'
             '<label for="id_birthday">Birthday:</label>'
-            '<ul class="errorlist"><li>This field is required.</li></ul>'
-            '<input type="text" name="birthday" aria-invalid="true" required '
+            '<ul class="errorlist" id="id_birthday_error"><li>This field is required.'
+            '</li></ul><input type="text" name="birthday" aria-invalid="true" required '
             'id="id_birthday"></div>',
         )
 
@@ -387,7 +389,8 @@ class FormsTestCase(SimpleTestCase):
         self.assertEqual(p["first_name"].errors, ["This field is required."])
         self.assertHTMLEqual(
             p["first_name"].errors.as_ul(),
-            '<ul class="errorlist"><li>This field is required.</li></ul>',
+            '<ul class="errorlist" id="id_first_name_error">'
+            "<li>This field is required.</li></ul>",
         )
         self.assertEqual(p["first_name"].errors.as_text(), "* This field is required.")
 
@@ -3706,7 +3709,7 @@ Options: <select multiple name="options" aria-invalid="true" required>
         self.assertHTMLEqual(
             p.as_ul(),
             """
-            <li class="required error"><ul class="errorlist">
+            <li class="required error"><ul class="errorlist" id="id_name_error">
             <li>This field is required.</li></ul>
             <label class="required" for="id_name">Name:</label>
             <input type="text" name="name" id="id_name" aria-invalid="true" required>
@@ -3719,7 +3722,7 @@ Options: <select multiple name="options" aria-invalid="true" required>
             </select></li>
             <li><label for="id_email">Email:</label>
             <input type="email" name="email" id="id_email" maxlength="320"></li>
-            <li class="required error"><ul class="errorlist">
+            <li class="required error"><ul class="errorlist" id="id_age_error">
             <li>This field is required.</li></ul>
             <label class="required" for="id_age">Age:</label>
             <input type="number" name="age" id="id_age" aria-invalid="true" required>
@@ -3729,8 +3732,8 @@ Options: <select multiple name="options" aria-invalid="true" required>
         self.assertHTMLEqual(
             p.as_p(),
             """
-            <ul class="errorlist"><li>This field is required.</li></ul>
-            <p class="required error">
+            <ul class="errorlist" id="id_name_error"><li>This field is required.</li>
+            </ul><p class="required error">
             <label class="required" for="id_name">Name:</label>
             <input type="text" name="name" id="id_name" aria-invalid="true" required>
             </p><p class="required">
@@ -3742,17 +3745,17 @@ Options: <select multiple name="options" aria-invalid="true" required>
             </select></p>
             <p><label for="id_email">Email:</label>
             <input type="email" name="email" id="id_email" maxlength="320"></p>
-            <ul class="errorlist"><li>This field is required.</li></ul>
-            <p class="required error"><label class="required" for="id_age">Age:</label>
-            <input type="number" name="age" id="id_age" aria-invalid="true" required>
-            </p>""",
+            <ul class="errorlist" id="id_age_error"><li>This field is required.</li>
+            </ul><p class="required error"><label class="required" for="id_age">
+            Age:</label><input type="number" name="age" id="id_age" aria-invalid="true"
+            required></p>""",
         )
 
         self.assertHTMLEqual(
             p.as_table(),
             """<tr class="required error">
 <th><label class="required" for="id_name">Name:</label></th>
-<td><ul class="errorlist"><li>This field is required.</li></ul>
+<td><ul class="errorlist" id="id_name_error"><li>This field is required.</li></ul>
 <input type="text" name="name" id="id_name" aria-invalid="true" required></td></tr>
 <tr class="required"><th><label class="required" for="id_is_cool">Is cool:</label></th>
 <td><select name="is_cool" id="id_is_cool">
@@ -3763,14 +3766,14 @@ Options: <select multiple name="options" aria-invalid="true" required>
 <tr><th><label for="id_email">Email:</label></th><td>
 <input type="email" name="email" id="id_email" maxlength="320"></td></tr>
 <tr class="required error"><th><label class="required" for="id_age">Age:</label></th>
-<td><ul class="errorlist"><li>This field is required.</li></ul>
+<td><ul class="errorlist" id="id_age_error"><li>This field is required.</li></ul>
 <input type="number" name="age" id="id_age" aria-invalid="true" required></td></tr>""",
         )
         self.assertHTMLEqual(
             p.as_div(),
             '<div class="required error"><label for="id_name" class="required">Name:'
-            '</label><ul class="errorlist"><li>This field is required.</li></ul>'
-            '<input type="text" name="name" required id="id_name" '
+            '</label><ul class="errorlist" id="id_name_error"><li>This field is '
+            'required.</li></ul><input type="text" name="name" required id="id_name" '
             'aria-invalid="true" /></div>'
             '<div class="required"><label for="id_is_cool" class="required">Is cool:'
             '</label><select name="is_cool" id="id_is_cool">'
@@ -3779,8 +3782,8 @@ Options: <select multiple name="options" aria-invalid="true" required>
             '</select></div><div><label for="id_email">Email:</label>'
             '<input type="email" name="email" id="id_email" maxlength="320"/></div>'
             '<div class="required error"><label for="id_age" class="required">Age:'
-            '</label><ul class="errorlist"><li>This field is required.</li></ul>'
-            '<input type="number" name="age" required id="id_age" '
+            '</label><ul class="errorlist" id="id_age_error"><li>This field is '
+            'required.</li></ul><input type="number" name="age" required id="id_age" '
             'aria-invalid="true" /></div>',
         )
 
@@ -4255,8 +4258,10 @@ Options: <select multiple name="options" aria-invalid="true" required>
 
         errors = form.errors.as_ul()
         control = [
-            '<li>foo<ul class="errorlist"><li>This field is required.</li></ul></li>',
-            '<li>bar<ul class="errorlist"><li>This field is required.</li></ul></li>',
+            '<li>foo<ul class="errorlist" id="id_foo_error"><li>This field is required.'
+            "</li></ul></li>",
+            '<li>bar<ul class="errorlist" id="id_bar_error"><li>This field is required.'
+            "</li></ul></li>",
             '<li>__all__<ul class="errorlist nonfield"><li>Non-field error.</li></ul>'
             "</li>",
         ]
@@ -4461,7 +4466,8 @@ Options: <select multiple name="options" aria-invalid="true" required>
             form.as_ul(),
             '<li><ul class="errorlist nonfield">'
             "<li>(Hidden field hidden) Foo &amp; &quot;bar&quot;!</li></ul></li>"
-            '<li><ul class="errorlist"><li>Foo &amp; &quot;bar&quot;!</li></ul>'
+            '<li><ul class="errorlist" id="id_visible_error"><li>Foo &amp; '
+            "&quot;bar&quot;!</li></ul>"
             '<label for="id_visible">Visible:</label> '
             '<input type="text" name="visible" aria-invalid="true" value="b" '
             'id="id_visible" required>'
