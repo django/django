@@ -160,11 +160,14 @@ class JSONSet(Func):
 
 
 class JSONRemove(Func):
-    def __init__(self, expression, *paths):
+    def __init__(self, expression, *paths, **kwargs):
         if not paths:
             raise TypeError("JSONRemove requires at least one path to remove")
         self.paths = paths
-        super().__init__(expression)
+        super().__init__(expression, **kwargs)
+
+    def _get_repr_options(self):
+        return {**super().get_repr_options(), **self.fields}
 
     def join(self, args):
         path = self.paths[0]
