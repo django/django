@@ -752,6 +752,8 @@ class AsyncRequestFactory(RequestFactory):
             "scheme": "https" if secure else "http",
             "headers": [(b"host", b"testserver")],
         }
+        if self.defaults:
+            extra = {**self.defaults, **extra}
         if data:
             s["headers"].extend(
                 [
