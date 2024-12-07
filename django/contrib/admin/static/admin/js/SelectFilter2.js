@@ -326,12 +326,14 @@ Requires core.js and SelectBox.js.
     });
 
     document.addEventListener('formset:removed', function(e) {
-        const inlineElement = e.target; // The removed inline element.
-        const field_id = inlineElement.querySelector('select.filtered')?.id;
-        if (field_id) {
-            // Remove any references or event listeners related to the field_id.
+        const inlineElement = e.target;
+        const field = inlineElement.querySelector('select.filtered');
+        if (field) {
+            const field_id = field.id.replace('_from', ''); // Remove '_from' suffix if present
             const fromBox = document.getElementById(field_id + '_from');
             const toBox = document.getElementById(field_id + '_to');
+            
+            // Remove elements if present
             if (fromBox) fromBox.remove();
             if (toBox) toBox.remove();
             console.log(`Cleaned up SelectFilter for field_id: ${field_id}`);
