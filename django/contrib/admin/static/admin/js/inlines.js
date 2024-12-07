@@ -159,6 +159,11 @@
                 updateElementIndex($(forms).get(i), options.prefix, i);
                 $(forms.get(i)).find("*").each(updateElementCallback);
             }
+
+            // Reinitialize SelectFilter widgets to ensure proper functionality
+            if (typeof updateSelectFilter === "function") {
+                updateSelectFilter();
+            }
         };
 
         const toggleDeleteButtonVisibility = function(inlineGroup) {
