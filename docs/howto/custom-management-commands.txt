@@ -319,6 +319,15 @@ the :meth:`~BaseCommand.handle` method must be implemented.
     checks, and list of database aliases in the ``databases`` to run database
     related checks against them.
 
+.. method:: BaseCommand.get_check_kwargs(options)
+
+    .. versionadded:: 5.2
+
+    Supplies kwargs for the call to :meth:`check`, including transforming
+    the value of :attr:`requires_system_checks` to the ``tag`` kwarg. Override
+    this method to, for example, opt into checks involving the database by
+    adding ``"databases": [options["database"]]``.
+
 .. _ref-basecommand-subclasses:
 
 ``BaseCommand`` subclasses
