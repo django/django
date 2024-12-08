@@ -15,6 +15,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_regex_backreferencing = False
     supports_date_lookup_using_string = False
     supports_timezones = False
+    requires_fk_constraints_to_be_recreated = True
     requires_explicit_null_ordering_when_grouping = True
     atomic_transactions = False
     can_clone_databases = True
