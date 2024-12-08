@@ -21,3 +21,4 @@ venv/
 .venv/
 env/
 .env/
+myproject/staticfiles

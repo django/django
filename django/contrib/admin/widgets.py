@@ -40,6 +40,10 @@ class FilteredSelectMultiple(forms.SelectMultiple):
         super().__init__(attrs, choices)
     
     def get_context(self, name, value, attrs):
+        if name is None:
+            name = "None"
+        if attrs is None:
+            attrs = {}
         context = super().get_context(name, value, attrs)
         widget_attrs = context["widget"]["attrs"]
         widget_attrs["class"] = "selectfilter"
