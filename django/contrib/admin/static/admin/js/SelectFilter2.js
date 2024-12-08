@@ -169,7 +169,7 @@ Requires core.js and SelectBox.js.
             clear_all.addEventListener('click', function(e) {
                 move_selection(e, this, SelectBox.move_all, field_id + '_to', field_id + '_from');
             });
-            warning_footer.addEventListener('click', function(e) {
+            warning_footer.addEventListener('click', function() {
                 filter_selected_input.value = '';
                 SelectBox.filter(field_id + '_to', '');
                 SelectFilter.refresh_filtered_warning(field_id);
@@ -318,7 +318,7 @@ Requires core.js and SelectBox.js.
         }
     };
 
-    window.addEventListener('load', function(e) {
+    window.addEventListener('load', function() {
         document.querySelectorAll('select.selectfilter, select.selectfilterstacked').forEach(function(el) {
             const data = el.dataset;
             SelectFilter.init(el.id, data.fieldName, parseInt(data.isStacked, 10));

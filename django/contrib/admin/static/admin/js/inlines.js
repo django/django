@@ -174,7 +174,7 @@
             }
         };
 
-        $this.each(function(i) {
+        $this.each(function() {
             $(this).not("." + options.emptyCssClass).addClass(options.formCssClass);
         });
 
@@ -276,7 +276,7 @@
     // Stacked inlines ---------------------------------------------------------
     $.fn.stackedFormset = function(selector, options) {
         const $rows = $(this);
-        const updateInlineLabel = function(row) {
+        const updateInlineLabel = function() {
             $(selector).find(".inline_label").each(function(i) {
                 const count = i + 1;
                 $(this).html($(this).html().replace(/(#\d+)/g, "#" + count));
