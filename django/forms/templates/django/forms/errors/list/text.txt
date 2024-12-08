@@ -1,2 +1,0 @@
-{% for error in errors %}* {{ error }}
-{% endfor %}

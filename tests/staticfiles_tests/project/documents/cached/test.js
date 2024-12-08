@@ -1,1 +1,0 @@
-myVar = url("import.css");

@@ -913,6 +913,8 @@ class MultiWidget(Widget):
 
     template_name = "django/forms/widgets/multiwidget.html"
     use_fieldset = True
+    use_custom_rendering = True  # Default to the new rendering logic
+    
 
     def __init__(self, widgets, attrs=None):
         if isinstance(widgets, dict):
@@ -922,6 +924,29 @@ class MultiWidget(Widget):
             self.widgets_names = ["_%s" % i for i in range(len(widgets))]
         self.widgets = [w() if isinstance(w, type) else w for w in widgets]
         super().__init__(attrs)
+
+    def render(self, name, value, attrs=None, renderer=None):
+        """
+        Render the multiwidget as a string of HTML by rendering each subwidget.
+        Removes need for multiwidget.html that is causing multiwidget render issues
+        Ensures backwards compatability & using template in case there is no custom renderings
+        """
+        if not isinstance(value, (list, tuple)):
+            value = self.decompress(value)
+
+        if self.use_custom_rendering:  # New rendering logic
+            final_attrs = self.build_attrs(attrs or {})
+            output = []
+            for i, (widget_name, widget) in enumerate(zip(self.widgets_names, self.widgets)):
+                widget_value = value[i] if i < len(value) else None
+                widget_attrs = final_attrs.copy()
+                widget_attrs["id"] = f"{final_attrs.get('id', name)}_{i}"
+                output.append(widget.render(f"{name}{widget_name}", widget_value, widget_attrs))
+
+            return mark_safe(''.join(output))
+        else:  # Legacy template-based rendering
+            context = self.get_context(name, value, attrs)
+            return self._render(self.template_name, context, renderer)
 
     @property
     def is_hidden(self):
