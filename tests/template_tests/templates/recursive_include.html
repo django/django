@@ -1,0 +1,7 @@
+Recursion!
+{% for comment in comments %}
+    {{ comment.comment }}
+    {% if comment.children %}
+        {% include "recursive_include.html" with comments=comment.children %}
+    {% endif %}
+{% endfor %}

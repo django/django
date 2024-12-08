@@ -1,0 +1,2 @@
+class MyOtherClass:
+    pass

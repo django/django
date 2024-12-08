@@ -1,0 +1,22 @@
+==========================
+Django 5.1.2 release notes
+==========================
+
+*October 8, 2024*
+
+Django 5.1.2 fixes several bugs in 5.1.1. Also, the latest string translations
+from Transifex are incorporated.
+
+Bugfixes
+========
+
+* Fixed a regression in Django 5.1 that caused a crash when using the
+  PostgreSQL lookup :lookup:`trigram_similar` on output fields from ``Concat``
+  (:ticket:`35732`).
+
+* Fixed a regression in Django 5.1 that caused a crash of ``JSONObject()``
+  when using server-side binding with PostgreSQL 16+ (:ticket:`35734`).
+
+* Fixed a regression in Django 5.1 that made selected items in multi-select
+  widgets indistinguishable from non-selected items in the admin dark theme
+  (:ticket:`35809`).

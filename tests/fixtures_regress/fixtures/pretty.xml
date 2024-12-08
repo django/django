@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<django-objects version="1.0">
+  <object pk="1" model="fixtures_regress.stuff">
+    <field type="CharField" name="name">
+      <None/>
+    </field>
+    <field to="auth.user" name="owner" rel="ManyToOneRel">
+      <None/>
+    </field>
+  </object>
+</django-objects>

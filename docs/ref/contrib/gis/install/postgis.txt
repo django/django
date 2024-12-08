@@ -1,0 +1,77 @@
+==================
+Installing PostGIS
+==================
+
+`PostGIS`_ adds geographic object support to PostgreSQL, turning it
+into a spatial database. :ref:`geosbuild`, :ref:`proj4` and
+:ref:`gdalbuild` should be installed prior to building PostGIS. You
+might also need additional libraries, see `PostGIS requirements`_.
+
+The `psycopg`_ or `psycopg2`_ module is required for use as the database
+adapter when using GeoDjango with PostGIS.
+
+On Debian/Ubuntu, you are advised to install the following packages:
+``postgresql-x``, ``postgresql-x-postgis-3``, ``postgresql-server-dev-x``,
+and ``python3-psycopg3`` (x matching the PostgreSQL version you want to
+install). Alternately, you can `build from source`_. Consult the
+platform-specific instructions if you are on :ref:`macos` or :ref:`windows`.
+
+.. _PostGIS: https://postgis.net/
+.. _psycopg: https://www.psycopg.org/psycopg3/
+.. _psycopg2: https://www.psycopg.org/
+.. _PostGIS requirements: https://postgis.net/docs/postgis_installation.html#install_requirements
+.. _build from source: https://postgis.net/docs/postgis_installation.html#install_short_version
+
+Post-installation
+=================
+
+.. _spatialdb_template:
+
+Creating a spatial database
+---------------------------
+
+PostGIS includes an extension for PostgreSQL that's used to enable spatial
+functionality:
+
+.. code-block:: shell
+
+    $ createdb  <db name>
+    $ psql <db name>
+    > CREATE EXTENSION postgis;
+
+The database user must be a superuser in order to run
+``CREATE EXTENSION postgis;``. The command is run during the :djadmin:`migrate`
+process. An alternative is to use a migration operation in your project::
+
+    from django.contrib.postgres.operations import CreateExtension
+    from django.db import migrations
+
+
+    class Migration(migrations.Migration):
+        operations = [CreateExtension("postgis"), ...]
+
+If you plan to use PostGIS raster functionality, you should also activate the
+``postgis_raster`` extension. You can install the extension using the
+:class:`~django.contrib.postgres.operations.CreateExtension` migration
+operation, or directly by running ``CREATE EXTENSION postgis_raster;``.
+
+GeoDjango does not currently leverage any `PostGIS topology functionality`__.
+If you plan to use those features at some point, you can also install the
+``postgis_topology`` extension by issuing ``CREATE EXTENSION
+postgis_topology;``.
+
+__ https://postgis.net/docs/Topology.html
+
+Managing the database
+---------------------
+
+To administer the database, you can either use the pgAdmin III program
+(:menuselection:`Start --> PostgreSQL X --> pgAdmin III`) or the SQL Shell
+(:menuselection:`Start --> PostgreSQL X --> SQL Shell`). For example, to create
+a ``geodjango`` spatial database and user, the following may be executed from
+the SQL Shell as the ``postgres`` user:
+
+.. code-block:: psql
+
+    postgres# CREATE USER geodjango PASSWORD 'my_passwd';
+    postgres# CREATE DATABASE geodjango OWNER geodjango;

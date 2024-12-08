@@ -1,0 +1,53 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Elias Johnstone <eli87as@gmail.com>, 2022
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Jonathan Lindén, 2014
+# Thomas Lundqvist, 2017
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2022-07-24 18:32+0000\n"
+"Last-Translator: Elias Johnstone <eli87as@gmail.com>\n"
+"Language-Team: Swedish (http://www.transifex.com/django/django/language/"
+"sv/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: sv\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Redirects"
+msgstr "Omdirigeringar"
+
+msgid "site"
+msgstr "webbplats"
+
+msgid "redirect from"
+msgstr "omdirigera från"
+
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: “/"
+"events/search/”."
+msgstr ""
+"Detta bör vara en absolut sökväg utan domännamnet. Exempel: '/handelser/"
+"sok/'."
+
+msgid "redirect to"
+msgstr "omdirigera till"
+
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with a "
+"scheme such as “https://”."
+msgstr ""
+"Detta kan vara antingen en absolut sökväg (som ovan) eller en fullständig "
+"URL som börjar med 'https://'."
+
+msgid "redirect"
+msgstr "omdirigera"
+
+msgid "redirects"
+msgstr "omdirigeringar"

@@ -1,0 +1,16 @@
+===========================
+Django 1.5.11 release notes
+===========================
+
+*October 22, 2014*
+
+Django 1.5.11 fixes a couple regressions in the 1.5.9 security release.
+
+Bugfixes
+========
+
+* Allowed related many-to-many fields to be referenced in the admin
+  (:ticket:`23604`).
+
+* Allowed inline and hidden references to admin fields
+  (:ticket:`23431`).

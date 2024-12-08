@@ -1,0 +1,44 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: django tests\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-02-14 17:33+0100\n"
+"PO-Revision-Date: 2011-01-21 21:37-0300\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: de <de@li.org>\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+#: models.py:7
+msgctxt "month name"
+msgid "May"
+msgstr "Mai"
+
+#: models.py:9
+msgctxt "verb"
+msgid "May"
+msgstr "Kann"
+
+#: models.py:11
+msgid "%s item"
+msgid_plural "%s items"
+msgstr[0] "%s Element"
+msgstr[1] "%s Elemente"
+
+#: models.py:11
+msgctxt "search"
+msgid "%s result"
+msgid_plural "%s results"
+msgstr[0] "%s Resultat"
+msgstr[1] "%s Resultate"
+
+msgid "Image"
+msgstr "Bild"

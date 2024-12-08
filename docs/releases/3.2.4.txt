@@ -1,0 +1,58 @@
+==========================
+Django 3.2.4 release notes
+==========================
+
+*June 2, 2021*
+
+Django 3.2.4 fixes two security issues and several bugs in 3.2.3.
+
+CVE-2021-33203: Potential directory traversal via ``admindocs``
+===============================================================
+
+Staff members could use the :mod:`~django.contrib.admindocs`
+``TemplateDetailView`` view to check the existence of arbitrary files.
+Additionally, if (and only if) the default admindocs templates have been
+customized by the developers to also expose the file contents, then not only
+the existence but also the file contents would have been exposed.
+
+As a mitigation, path sanitation is now applied and only files within the
+template root directories can be loaded.
+
+CVE-2021-33571: Possible indeterminate SSRF, RFI, and LFI attacks since validators accepted leading zeros in IPv4 addresses
+===========================================================================================================================
+
+:class:`~django.core.validators.URLValidator`,
+:func:`~django.core.validators.validate_ipv4_address`, and
+:func:`~django.core.validators.validate_ipv46_address` didn't prohibit leading
+zeros in octal literals. If you used such values you could suffer from
+indeterminate SSRF, RFI, and LFI attacks.
+
+:func:`~django.core.validators.validate_ipv4_address` and
+:func:`~django.core.validators.validate_ipv46_address` validators were not
+affected on Python 3.9.5+.
+
+Bugfixes
+========
+
+* Fixed a bug in Django 3.2 where a final catch-all view in the admin didn't
+  respect the server-provided value of ``SCRIPT_NAME`` when redirecting
+  unauthenticated users to the login page (:ticket:`32754`).
+
+* Fixed a bug in Django 3.2 where a system check would crash on an abstract
+  model (:ticket:`32733`).
+
+* Prevented unnecessary initialization of unused caches following a regression
+  in Django 3.2 (:ticket:`32747`).
+
+* Fixed a crash in Django 3.2 that could occur when running ``mod_wsgi`` with
+  the recommended settings while the Windows ``colorama`` library was installed
+  (:ticket:`32740`).
+
+* Fixed a bug in Django 3.2 that would trigger the auto-reloader for template
+  changes when directory paths were specified with strings (:ticket:`32744`).
+
+* Fixed a regression in Django 3.2 that caused a crash of auto-reloader with
+  ``AttributeError``, e.g. inside a ``Conda`` environment (:ticket:`32783`).
+
+* Fixed a regression in Django 3.2 that caused a loss of precision for
+  operations with ``DecimalField`` on MySQL (:ticket:`32793`).

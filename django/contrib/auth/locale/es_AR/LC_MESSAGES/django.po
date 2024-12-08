@@ -1,0 +1,354 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Ramiro Morales, 2013-2017,2019,2021,2023-2024
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-10-07 08:09+0000\n"
+"Last-Translator: Ramiro Morales, 2013-2017,2019,2021,2023-2024\n"
+"Language-Team: Spanish (Argentina) (http://app.transifex.com/django/django/"
+"language/es_AR/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: es_AR\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Personal info"
+msgstr "Información personal"
+
+msgid "Permissions"
+msgstr "Permisos"
+
+msgid "Important dates"
+msgstr "Fechas importantes"
+
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "No existe un objeto %(name)s con una clave primaria %(key)r."
+
+msgid "Conflicting form data submitted. Please try again."
+msgstr "Los datos enviados se contradicen. Por favor intente de nuevo."
+
+msgid "Password changed successfully."
+msgstr "Cambio de contraseña exitoso"
+
+msgid "Password-based authentication was disabled."
+msgstr "La autenticación basada en contraseñas fue desactivada."
+
+#, python-format
+msgid "Change password: %s"
+msgstr "Cambiar contraseña: %s"
+
+#, python-format
+msgid "Set password: %s"
+msgstr "Establecer contraseña: %s"
+
+msgid "Authentication and Authorization"
+msgstr "Autenticación y Autorización"
+
+msgid "password"
+msgstr "contraseña"
+
+msgid "last login"
+msgstr "último ingreso"
+
+msgid "No password set."
+msgstr "No se ha establecido una contraseña."
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Formato de contraseña inválido o algoritmo de hashing desconocido."
+
+msgid "Reset password"
+msgstr "Restablecer contraseña"
+
+msgid "Set password"
+msgstr "Establecer contraseña"
+
+msgid "The two password fields didn’t match."
+msgstr "Los dos campos de contraseñas no coinciden entre si."
+
+msgid ""
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
+msgstr ""
+"Determina si el usuario podrá autenticarse usando una contraseña. Si está "
+"desactivado, el usuario aún podría autenticarse mediante otros métodos, como "
+"Single Sign-On o LDAP."
+
+msgid "Password"
+msgstr "Contraseña"
+
+msgid "Password confirmation"
+msgstr "Confirmación de contraseña"
+
+msgid "Enter the same password as before, for verification."
+msgstr ""
+"Introduzca la misma contraseña nuevamente, para poder verificar la misma."
+
+msgid "Password-based authentication"
+msgstr "Autenticación basada en contraseñas"
+
+msgid "Enabled"
+msgstr "Activo"
+
+msgid "Disabled"
+msgstr "Inactivo"
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see the user’s password."
+msgstr ""
+"Las contraseñas en texto plano no se almacenan, por lo que no se puede ver "
+"la contraseña del usuario."
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
+msgstr ""
+"Active la autenticación por contraseña para este usuario estableciendo una "
+"contraseña."
+
+#, python-format
+msgid ""
+"Please enter a correct %(username)s and password. Note that both fields may "
+"be case-sensitive."
+msgstr ""
+"Por favor introduzca un %(username)s y una contraseña correctos. Tenga en "
+"cuenta que ambos campos son sensibles a mayúsculas/minúsculas."
+
+msgid "This account is inactive."
+msgstr "Esta cuenta está inactiva."
+
+msgid "Email"
+msgstr "Email"
+
+msgid "New password"
+msgstr "Contraseña nueva"
+
+msgid "New password confirmation"
+msgstr "Confirmación de contraseña nueva"
+
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr ""
+"La antigua contraseña introducida es incorrecta. Por favor introdúzcala "
+"nuevamente."
+
+msgid "Old password"
+msgstr "Contraseña antigua"
+
+msgid "algorithm"
+msgstr "algoritmo"
+
+msgid "iterations"
+msgstr "iteraciones"
+
+msgid "salt"
+msgstr "salt"
+
+msgid "hash"
+msgstr "hash"
+
+msgid "variety"
+msgstr "variedad"
+
+msgid "version"
+msgstr "versión"
+
+msgid "memory cost"
+msgstr "costo en memoria"
+
+msgid "time cost"
+msgstr "costo en tiempo"
+
+msgid "parallelism"
+msgstr "paralelismo"
+
+msgid "work factor"
+msgstr "work factor"
+
+msgid "checksum"
+msgstr "suma de verificación"
+
+msgid "block size"
+msgstr "tamaño de bloque"
+
+msgid "name"
+msgstr "nombre"
+
+msgid "content type"
+msgstr "tipo de contenido"
+
+msgid "codename"
+msgstr "nombre en código"
+
+msgid "permission"
+msgstr "permiso"
+
+msgid "permissions"
+msgstr "permisos"
+
+msgid "group"
+msgstr "grupo"
+
+msgid "groups"
+msgstr "grupos"
+
+msgid "superuser status"
+msgstr "es superusuario"
+
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr ""
+"Indica que este usuario posee todos los permisos sin que sea necesario "
+"asignarle los mismos en forma explícita."
+
+msgid ""
+"The groups this user belongs to. A user will get all permissions granted to "
+"each of their groups."
+msgstr ""
+"Grupos a los cuales pertenece este usuario. Un usuario obtiene todos los "
+"permisos otorgados a cada uno de los grupos a los cuales pertenece."
+
+msgid "user permissions"
+msgstr "permisos de usuario"
+
+msgid "Specific permissions for this user."
+msgstr "Permisos específicos de este usuario"
+
+msgid "username"
+msgstr "nombre de usuario"
+
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr ""
+"Obligatorio. Longitud máxima de 150 caracteres. Solo puede estar formado por "
+"letras, números y los caracteres @/./+/-/_."
+
+msgid "A user with that username already exists."
+msgstr "Ya existe un usuario con ese nombre."
+
+msgid "first name"
+msgstr "nombre"
+
+msgid "last name"
+msgstr "apellido"
+
+msgid "email address"
+msgstr "Dirección de email"
+
+msgid "staff status"
+msgstr "es staff"
+
+msgid "Designates whether the user can log into this admin site."
+msgstr "Indica si el usuario puede ingresar a este sitio de administración."
+
+msgid "active"
+msgstr "activo"
+
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+"Indica si el usuario debe ser tratado como un usuario activo. Desactive este "
+"campo en lugar de eliminar usuarios."
+
+msgid "date joined"
+msgstr "fecha de creación"
+
+msgid "user"
+msgstr "usuario"
+
+msgid "users"
+msgstr "usuarios"
+
+#, python-format
+msgid ""
+"This password is too short. It must contain at least %(min_length)d "
+"character."
+msgid_plural ""
+"This password is too short. It must contain at least %(min_length)d "
+"characters."
+msgstr[0] ""
+"La contraseña es demasiado corta. Debe contener por lo menos %(min_length)d "
+"caracter."
+msgstr[1] ""
+"La contraseña es demasiado corta. Debe contener por lo menos %(min_length)d "
+"caracteres."
+msgstr[2] ""
+"La contraseña es demasiado corta. Debe contener por lo menos %(min_length)d "
+"caracteres."
+
+#, python-format
+msgid "Your password must contain at least %(min_length)d character."
+msgid_plural "Your password must contain at least %(min_length)d characters."
+msgstr[0] "Su contraseña debe contener por lo menos %(min_length)d caracter."
+msgstr[1] "Su contraseña debe contener por lo menos %(min_length)d caracteres."
+msgstr[2] "Su contraseña debe contener por lo menos %(min_length)d caracteres."
+
+#, python-format
+msgid "The password is too similar to the %(verbose_name)s."
+msgstr "La contraseña es muy similar a %(verbose_name)s."
+
+msgid "Your password can’t be too similar to your other personal information."
+msgstr ""
+"Su contraseña no puede ser similar a otros componentes de su información "
+"personal."
+
+msgid "This password is too common."
+msgstr "La contraseña tiene un valor demasiado común."
+
+msgid "Your password can’t be a commonly used password."
+msgstr "Su contraseña no puede ser una contraseña usada muy comúnmente."
+
+msgid "This password is entirely numeric."
+msgstr "La contraseña está formada completamente por dígitos."
+
+msgid "Your password can’t be entirely numeric."
+msgstr "Su contraseña no puede estar formada exclusivamente por números."
+
+#, python-format
+msgid "Password reset on %(site_name)s"
+msgstr "Reinicio de contraseña en %(site_name)s"
+
+msgid ""
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
+msgstr ""
+"Introduzca un nombre de usuario válido. Este valor solo puede contener "
+"letras mayúsculas y minúsculas de la A la Z (excepto las acentuadas), "
+"números y los caracteres @/./+/-/_."
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+"Introduzca un nombre de usuario válido. Este valor solo puede contener "
+"letras, números y los caracteres @/./+/-/_."
+
+msgid "Logged out"
+msgstr "Sesión cerrada"
+
+msgid "Password reset"
+msgstr "Reinicio de contraseña"
+
+msgid "Password reset sent"
+msgstr "Se ha enviado un email de reinicialización de contraseña"
+
+msgid "Enter new password"
+msgstr "Introduzca nueva contraseña"
+
+msgid "Password reset unsuccessful"
+msgstr "Reinicio de contraseña fallido"
+
+msgid "Password reset complete"
+msgstr "Reinicio de contraseña completado"
+
+msgid "Password change"
+msgstr "Cambio de contraseña"
+
+msgid "Password change successful"
+msgstr "Cambio de contraseña exitoso"

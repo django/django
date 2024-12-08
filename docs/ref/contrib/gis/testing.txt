@@ -1,0 +1,135 @@
+======================
+Testing GeoDjango apps
+======================
+
+Included in this documentation are some additional notes and settings
+for :ref:`testing-postgis` users.
+
+.. _testing-postgis:
+
+PostGIS
+=======
+
+Settings
+--------
+
+.. note::
+
+    The settings below have sensible defaults, and shouldn't require manual setting.
+
+.. setting:: POSTGIS_VERSION
+
+``POSTGIS_VERSION``
+~~~~~~~~~~~~~~~~~~~
+
+When GeoDjango's spatial backend initializes on PostGIS, it has to perform
+an SQL query to determine the version in order to figure out what
+features are available. Advanced users wishing to prevent this additional
+query may set the version manually using a 3-tuple of integers specifying
+the major, minor, and micro version numbers for PostGIS. For example,
+to configure for PostGIS X.Y.Z you would use::
+
+    POSTGIS_VERSION = (X, Y, Z)
+
+Obtaining sufficient privileges
+-------------------------------
+
+Depending on your configuration, this section describes several methods to
+configure a database user with sufficient privileges to run tests for
+GeoDjango applications on PostgreSQL. If your
+:ref:`spatial database template <spatialdb_template>`
+was created like in the instructions, then your testing database user
+only needs to have the ability to create databases. In other configurations,
+you may be required to use a database superuser.
+
+Create database user
+~~~~~~~~~~~~~~~~~~~~
+
+To make a database user with the ability to create databases, use the
+following command:
+
+.. code-block:: shell
+
+    $ createuser --createdb -R -S <user_name>
+
+The ``-R -S`` flags indicate that we do not want the user to have the ability
+to create additional users (roles) or to be a superuser, respectively.
+
+Alternatively, you may alter an existing user's role from the SQL shell
+(assuming this is done from an existing superuser account):
+
+.. code-block:: psql
+
+    postgres# ALTER ROLE <user_name> CREATEDB NOSUPERUSER NOCREATEROLE;
+
+Create database superuser
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This may be done at the time the user is created, for example:
+
+.. code-block:: shell
+
+    $ createuser --superuser <user_name>
+
+Or you may alter the user's role from the SQL shell (assuming this
+is done from an existing superuser account):
+
+.. code-block:: psql
+
+    postgres# ALTER ROLE <user_name> SUPERUSER;
+
+Windows
+-------
+
+On Windows platforms you can use the pgAdmin III utility to add superuser
+privileges to your database user.
+
+By default, the PostGIS installer on Windows includes a template
+spatial database entitled ``template_postgis``.
+
+.. _geodjango-tests:
+
+GeoDjango tests
+===============
+
+To have the GeoDjango tests executed when :ref:`running the Django test suite
+<running-unit-tests>` with ``runtests.py`` all of the databases in the settings
+file must be using one of the :ref:`spatial database backends
+<spatial-backends>`.
+
+
+Example
+-------
+
+The following is an example bare-bones settings file with spatial backends
+that can be used to run the entire Django test suite, including those
+in :mod:`django.contrib.gis`::
+
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.contrib.gis.db.backends.postgis",
+            "NAME": "geodjango",
+            "USER": "geodjango",
+        },
+        "other": {
+            "ENGINE": "django.contrib.gis.db.backends.postgis",
+            "NAME": "other",
+            "USER": "geodjango",
+        },
+    }
+
+    SECRET_KEY = "django_tests_secret_key"
+
+Assuming the settings above were in a ``postgis.py`` file in the same
+directory as ``runtests.py``, then all Django and GeoDjango tests would
+be performed when executing the command:
+
+.. code-block:: shell
+
+    $ ./runtests.py --settings=postgis
+
+To run only the GeoDjango test suite, specify ``gis_tests``:
+
+.. code-block:: shell
+
+    $ ./runtests.py --settings=postgis gis_tests

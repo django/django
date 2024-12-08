@@ -1,0 +1,322 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Goto Hayato <habita.gh@gmail.com>, 2021
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Shinya Okano <tokibito@gmail.com>, 2012,2014-2016,2023
+# Taichi Taniguchi, 2022
+# Takuro Onoue <kusanaginoturugi@gmail.com>, 2020
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-09-18 15:04-0300\n"
+"PO-Revision-Date: 2023-12-04 07:59+0000\n"
+"Last-Translator: Shinya Okano <tokibito@gmail.com>, 2012,2014-2016,2023\n"
+"Language-Team: Japanese (http://app.transifex.com/django/django/language/"
+"ja/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ja\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#, javascript-format
+msgid "Available %s"
+msgstr "利用可能 %s"
+
+#, javascript-format
+msgid ""
+"This is the list of available %s. You may choose some by selecting them in "
+"the box below and then clicking the \"Choose\" arrow between the two boxes."
+msgstr ""
+"これが使用可能な %s のリストです。下のボックスで項目を選択し、2つのボックス間"
+"の \"選択\"の矢印をクリックして、いくつかを選択することができます。"
+
+#, javascript-format
+msgid "Type into this box to filter down the list of available %s."
+msgstr "使用可能な %s のリストを絞り込むには、このボックスに入力します。"
+
+msgid "Filter"
+msgstr "フィルター"
+
+msgid "Choose all"
+msgstr "全て選択"
+
+#, javascript-format
+msgid "Click to choose all %s at once."
+msgstr "クリックするとすべての %s を選択します。"
+
+msgid "Choose"
+msgstr "選択"
+
+msgid "Remove"
+msgstr "削除"
+
+#, javascript-format
+msgid "Chosen %s"
+msgstr "選択された %s"
+
+#, javascript-format
+msgid ""
+"This is the list of chosen %s. You may remove some by selecting them in the "
+"box below and then clicking the \"Remove\" arrow between the two boxes."
+msgstr ""
+"これが選択された %s のリストです。下のボックスで選択し、2つのボックス間の "
+"\"削除\"矢印をクリックして一部を削除することができます。"
+
+#, javascript-format
+msgid "Type into this box to filter down the list of selected %s."
+msgstr "選択された%sのリストを絞り込むには、このボックスに入力します。"
+
+msgid "Remove all"
+msgstr "すべて削除"
+
+#, javascript-format
+msgid "Click to remove all chosen %s at once."
+msgstr "クリックするとすべての %s を選択から削除します。"
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] "選択された%s件のオプションは非表示です。"
+
+msgid "%(sel)s of %(cnt)s selected"
+msgid_plural "%(sel)s of %(cnt)s selected"
+msgstr[0] "%(cnt)s個中%(sel)s個選択"
+
+msgid ""
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
+msgstr ""
+"フィールドに未保存の変更があります。操作を実行すると未保存の変更は失われま"
+"す。"
+
+msgid ""
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
+"action."
+msgstr ""
+"操作を選択しましたが、フィールドに未保存の変更があります。OKをクリックして保"
+"存してください。その後、操作を再度実行する必要があります。"
+
+msgid ""
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
+"button."
+msgstr ""
+"操作を選択しましたが、フィールドに変更はありませんでした。もしかして保存ボタ"
+"ンではなくて実行ボタンをお探しですか。"
+
+msgid "Now"
+msgstr "現在"
+
+msgid "Midnight"
+msgstr "0時"
+
+msgid "6 a.m."
+msgstr "午前 6 時"
+
+msgid "Noon"
+msgstr "12時"
+
+msgid "6 p.m."
+msgstr "午後 6 時"
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "ノート: あなたの環境はサーバー時間より、%s時間進んでいます。"
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "ノート: あなたの環境はサーバー時間より、%s時間遅れています。"
+
+msgid "Choose a Time"
+msgstr "時間を選択"
+
+msgid "Choose a time"
+msgstr "時間を選択"
+
+msgid "Cancel"
+msgstr "キャンセル"
+
+msgid "Today"
+msgstr "今日"
+
+msgid "Choose a Date"
+msgstr "日付を選択"
+
+msgid "Yesterday"
+msgstr "昨日"
+
+msgid "Tomorrow"
+msgstr "明日"
+
+msgid "January"
+msgstr "1月"
+
+msgid "February"
+msgstr "2月"
+
+msgid "March"
+msgstr "3月"
+
+msgid "April"
+msgstr "4月"
+
+msgid "May"
+msgstr "5月"
+
+msgid "June"
+msgstr "6月"
+
+msgid "July"
+msgstr "7月"
+
+msgid "August"
+msgstr "8月"
+
+msgid "September"
+msgstr "9月"
+
+msgid "October"
+msgstr "10月"
+
+msgid "November"
+msgstr "11月"
+
+msgid "December"
+msgstr "12月"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "1月"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "2月"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "3月"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "4月"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "5月"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "6月"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "7月"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "8月"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "9月"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "10月"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "11月"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "12月"
+
+msgid "Sunday"
+msgstr "日曜日"
+
+msgid "Monday"
+msgstr "月曜日"
+
+msgid "Tuesday"
+msgstr "火曜日"
+
+msgid "Wednesday"
+msgstr "水曜日"
+
+msgid "Thursday"
+msgstr "木曜日"
+
+msgid "Friday"
+msgstr "金曜日"
+
+msgid "Saturday"
+msgstr "土曜日"
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr "日"
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr "月"
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr "火"
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr "水"
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr "木"
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr "金"
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr "土"
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr "日"
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr "月"
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr "火"
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr "水"
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr "木"
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr "金"
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr "土"
+
+msgid "Show"
+msgstr "表示"
+
+msgid "Hide"
+msgstr "非表示"

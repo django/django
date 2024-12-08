@@ -1,0 +1,49 @@
+==========================
+Django 5.0.2 release notes
+==========================
+
+*February 6, 2024*
+
+Django 5.0.2 fixes a security issue with severity "moderate" and several bugs
+in 5.0.1. Also, the latest string translations from Transifex are incorporated.
+
+CVE-2024-24680: Potential denial-of-service in ``intcomma`` template filter
+===========================================================================
+
+The ``intcomma`` template filter was subject to a potential denial-of-service
+attack when used with very long strings.
+
+Bugfixes
+========
+
+* Reallowed, following a regression in Django 5.0.1, filtering against local
+  foreign keys not included in :attr:`.ModelAdmin.list_filter`
+  (:ticket:`35087`).
+
+* Fixed a regression in Django 5.0 where links in the admin had an incorrect
+  color (:ticket:`35121`).
+
+* Fixed a bug in Django 5.0 that caused a crash of ``Model.full_clean()`` on
+  models with a ``GeneratedField`` (:ticket:`35127`).
+
+* Fixed a regression in Django 5.0 that caused a crash of
+  ``FilteredRelation()`` with querysets as right-hand sides (:ticket:`35135`).
+  ``FilteredRelation()`` now raises a ``ValueError`` on querysets as right-hand
+  sides.
+
+* Fixed a regression in Django 5.0 that caused a crash of the ``dumpdata``
+  management command when a base queryset used ``prefetch_related()``
+  (:ticket:`35159`).
+
+* Fixed a regression in Django 5.0 that caused the ``request_finished`` signal to
+  sometimes not be fired when running Django through an ASGI server, resulting
+  in potential resource leaks (:ticket:`35059`).
+
+* Fixed a bug in Django 5.0 that caused a migration crash on MySQL when adding
+  a ``BinaryField``, ``TextField``, ``JSONField``, or ``GeometryField`` with a
+  ``db_default`` (:ticket:`35162`).
+
+* Fixed a bug in Django 5.0 that caused a migration crash on models with a
+  literal ``db_default`` of a complex type such as ``dict`` instance of a
+  ``JSONField``. Running ``makemigrations`` might generate no-op ``AlterField``
+  operations for fields using ``db_default`` (:ticket:`35149`).

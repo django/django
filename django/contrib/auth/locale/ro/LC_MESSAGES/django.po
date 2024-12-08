@@ -1,0 +1,320 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Bogdan Mateescu, 2018
+# Daniel Ursache-Dogariu, 2011
+# Denis Darii <denis.darii@gmail.com>, 2011
+# Eugenol Man <neatusebastian@gmail.com>, 2020
+# Jannis Leidel <jannis@leidel.info>, 2011
+# razvan ionescu <ionescu77@gmail.com>, 2015
+# Razvan Stefanescu <razvan.stefanescu@gmail.com>, 2016-2017
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-07-15 11:11+0000\n"
+"Last-Translator: Eugenol Man <neatusebastian@gmail.com>\n"
+"Language-Team: Romanian (http://www.transifex.com/django/django/language/"
+"ro/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ro\n"
+"Plural-Forms: nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?"
+"2:1));\n"
+
+msgid "Personal info"
+msgstr "Informații personale"
+
+msgid "Permissions"
+msgstr "Permisiuni"
+
+msgid "Important dates"
+msgstr "Date importante"
+
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "Obiectul %(name)s cu cheia primară %(key)r nu există."
+
+msgid "Password changed successfully."
+msgstr "Parolă schimbată cu succes."
+
+#, python-format
+msgid "Change password: %s"
+msgstr "Schimbă parola: %s"
+
+msgid "Authentication and Authorization"
+msgstr "Autentificare și autorizare"
+
+msgid "password"
+msgstr "parolă"
+
+msgid "last login"
+msgstr "ultima autentificare"
+
+msgid "No password set."
+msgstr "Parola nu este setată."
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr ""
+"Parolă nu are formatarea corectă sau algoritmul de criptare nu este cunoscut."
+
+msgid "The two password fields didn’t match."
+msgstr "Cele două parole nu corespund."
+
+msgid "Password"
+msgstr "Parolă"
+
+msgid "Password confirmation"
+msgstr "Confirmare parolă"
+
+msgid "Enter the same password as before, for verification."
+msgstr "Introduceți parola precedentă pentru confirmare."
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see this user’s "
+"password, but you can change the password using <a href=\"{}\">this form</a>."
+msgstr ""
+"Parolele nu sunt salvate în clar așa că nu poți vedea parola. O poți schimba "
+"<a href=\"{}\">de aici</a>."
+
+#, python-format
+msgid ""
+"Please enter a correct %(username)s and password. Note that both fields may "
+"be case-sensitive."
+msgstr ""
+"Introduceți vă rog un %(username)s corect și o parolă. Reţineţi că ambele "
+"câmpuri pot fi sensibile la litere mari şi mici."
+
+msgid "This account is inactive."
+msgstr "Acest cont este inactiv."
+
+msgid "Email"
+msgstr "Email"
+
+msgid "New password"
+msgstr "Parolă nouă"
+
+msgid "New password confirmation"
+msgstr "Confirmarea parolă nouă"
+
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr "Parola veche a fost introdusă greșit. Introduceți-o din nou."
+
+msgid "Old password"
+msgstr "Parolă veche"
+
+msgid "Password (again)"
+msgstr "Parolă (din nou)"
+
+msgid "algorithm"
+msgstr "algoritm"
+
+msgid "iterations"
+msgstr "iterații"
+
+msgid "salt"
+msgstr "salt"
+
+msgid "hash"
+msgstr "hash"
+
+msgid "variety"
+msgstr "varietate"
+
+msgid "version"
+msgstr "versiune"
+
+msgid "memory cost"
+msgstr "memorie necesară"
+
+msgid "time cost"
+msgstr "timp necesar"
+
+msgid "parallelism"
+msgstr "paralelism"
+
+msgid "work factor"
+msgstr "factor de efort"
+
+msgid "checksum"
+msgstr "sumă de control"
+
+msgid "name"
+msgstr "nume"
+
+msgid "content type"
+msgstr "tip de conținut"
+
+msgid "codename"
+msgstr "nume de cod"
+
+msgid "permission"
+msgstr "permisiune"
+
+msgid "permissions"
+msgstr "permisiuni"
+
+msgid "group"
+msgstr "grup"
+
+msgid "groups"
+msgstr "grupuri"
+
+msgid "superuser status"
+msgstr "stare superutilizator"
+
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr ""
+"Marchează daca acest utilizator are toate permisiunile,  fără a le mai "
+"selecta explicit."
+
+msgid ""
+"The groups this user belongs to. A user will get all permissions granted to "
+"each of their groups."
+msgstr ""
+"Grupurile din care face parte acest utilizator. Un utilizator va obține "
+"drepturile de acces corespunzătoare grupurilor din care face parte."
+
+msgid "user permissions"
+msgstr "permisiuni utilizator"
+
+msgid "Specific permissions for this user."
+msgstr "Drepturile de access specifice acestui utilizator."
+
+msgid "username"
+msgstr "nume utilizator"
+
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr ""
+"Obligatoriu. 150 de caractere sau mai puține. Numai litere, cifre și @/./+/-/"
+"_."
+
+msgid "A user with that username already exists."
+msgstr "Un utilizator cu acest nume de utilizator există deja."
+
+msgid "first name"
+msgstr "Prenume"
+
+msgid "last name"
+msgstr "Nume"
+
+msgid "email address"
+msgstr "adresă de email"
+
+msgid "staff status"
+msgstr "stare autorizare"
+
+msgid "Designates whether the user can log into this admin site."
+msgstr ""
+"Marchează dacă utilizatorul se poate autentifica în acest site de "
+"administrare."
+
+msgid "active"
+msgstr "activ"
+
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+"Desemnează dacă acest utilizator trebuie tratat ca activ. Deselectaţi "
+"această opţiune în loc să ştergeţi conturi."
+
+msgid "date joined"
+msgstr "data înscrierii"
+
+msgid "user"
+msgstr "utilizator"
+
+msgid "users"
+msgstr "utilizatori"
+
+#, python-format
+msgid ""
+"This password is too short. It must contain at least %(min_length)d "
+"character."
+msgid_plural ""
+"This password is too short. It must contain at least %(min_length)d "
+"characters."
+msgstr[0] ""
+"Parola este prea scurtă. Trebuie să conțină cel puțin %(min_length)d "
+"caracter."
+msgstr[1] ""
+"Parola este prea scurtă. Trebuie să conțină cel puțin %(min_length)d "
+"caractere."
+msgstr[2] ""
+"Parola este prea scurtă. Trebuie să conțină cel puțin %(min_length)d de "
+"caractere."
+
+#, python-format
+msgid "Your password must contain at least %(min_length)d character."
+msgid_plural "Your password must contain at least %(min_length)d characters."
+msgstr[0] "Parola trebuie să conțină cel puțin %(min_length)d caracter."
+msgstr[1] "Parola trebuie să conțină cel puțin %(min_length)d caractere."
+msgstr[2] "Parola trebuie să conțină cel puțin %(min_length)d de caractere."
+
+#, python-format
+msgid "The password is too similar to the %(verbose_name)s."
+msgstr "Parola este prea asemănătoare cu %(verbose_name)s."
+
+msgid "Your password can’t be too similar to your other personal information."
+msgstr ""
+"Nu este recomandabil ca parola sa fie asemănătoare cu celelalte date "
+"personale."
+
+msgid "This password is too common."
+msgstr "Această parolă este prea răspândită."
+
+msgid "Your password can’t be a commonly used password."
+msgstr "Parola nu poate fi atât de comună. "
+
+msgid "This password is entirely numeric."
+msgstr "Acestă parolă este compusă exclusiv din elemente numerice."
+
+msgid "Your password can’t be entirely numeric."
+msgstr "Parola nu poate fi doar cu numere."
+
+#, python-format
+msgid "Password reset on %(site_name)s"
+msgstr "Resetează parola pentru %(site_name)s"
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+"Vă rugăm să folosiți un nume acceptat. Această valoare poate conține doar "
+"litere, cifre și caracterele @/./+/-/_."
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+"Vă rugăm să folosiți un nume acceptat. Această valoare poate conține doar "
+"litere, cifre și caracterele @/./+/-/_"
+
+msgid "Logged out"
+msgstr "Deautentificat"
+
+msgid "Password reset"
+msgstr "Resetază parola"
+
+msgid "Password reset sent"
+msgstr "Cerea de resetare a parolei trimisă cu succes"
+
+msgid "Enter new password"
+msgstr "Introduceți noua parolă"
+
+msgid "Password reset unsuccessful"
+msgstr "Resetarea parolei nu a avut succes."
+
+msgid "Password reset complete"
+msgstr "Parola a fost resetată."
+
+msgid "Password change"
+msgstr "Schimbare parolă"
+
+msgid "Password change successful"
+msgstr "Schimbarea parolei a fost efectuată cu succes"

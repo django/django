@@ -1,0 +1,720 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011
+# lauris <lauris@runbox.com>, 2011
+# Matas Dailyda <matas@dailyda.com>, 2015-2019
+# Nikolajus Krauklis <nikolajus@gmail.com>, 2013
+# Simonas Kazlauskas <simonas@kazlauskas.me>, 2012-2013
+# sirex <sirexas@gmail.com>, 2011
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-18 10:32+0000\n"
+"Last-Translator: Matas Dailyda <matas@dailyda.com>\n"
+"Language-Team: Lithuanian (http://www.transifex.com/django/django/language/"
+"lt/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: lt\n"
+"Plural-Forms: nplurals=4; plural=(n % 10 == 1 && (n % 100 > 19 || n % 100 < "
+"11) ? 0 : (n % 10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? "
+"1 : n % 1 != 0 ? 2: 3);\n"
+
+#, python-format
+msgid "Successfully deleted %(count)d %(items)s."
+msgstr "Sėkmingai ištrinta %(count)d %(items)s."
+
+#, python-format
+msgid "Cannot delete %(name)s"
+msgstr "Ištrinti %(name)s negalima"
+
+msgid "Are you sure?"
+msgstr "Ar esate tikras?"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Ištrinti pasirinktus %(verbose_name_plural)s "
+
+msgid "Administration"
+msgstr "Administravimas"
+
+msgid "All"
+msgstr "Visi"
+
+msgid "Yes"
+msgstr "Taip"
+
+msgid "No"
+msgstr "Ne"
+
+msgid "Unknown"
+msgstr "Nežinomas"
+
+msgid "Any date"
+msgstr "Betkokia data"
+
+msgid "Today"
+msgstr "Šiandien"
+
+msgid "Past 7 days"
+msgstr "Paskutinės 7 dienos"
+
+msgid "This month"
+msgstr "Šį mėnesį"
+
+msgid "This year"
+msgstr "Šiais metais"
+
+msgid "No date"
+msgstr "Nėra datos"
+
+msgid "Has date"
+msgstr "Turi datą"
+
+#, python-format
+msgid ""
+"Please enter the correct %(username)s and password for a staff account. Note "
+"that both fields may be case-sensitive."
+msgstr ""
+"Prašome įvesti tinkamą personalo paskyros %(username)s ir slaptažodį. "
+"Atminkite, kad abu laukeliai yra jautrūs raidžių dydžiui."
+
+msgid "Action:"
+msgstr "Veiksmas:"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Pridėti dar viena %(verbose_name)s"
+
+msgid "Remove"
+msgstr "Pašalinti"
+
+msgid "Addition"
+msgstr "Pridėjimas"
+
+msgid "Change"
+msgstr "Pakeisti"
+
+msgid "Deletion"
+msgstr "Pašalinimas"
+
+msgid "action time"
+msgstr "veiksmo laikas"
+
+msgid "user"
+msgstr "vartotojas"
+
+msgid "content type"
+msgstr "turinio tipas"
+
+msgid "object id"
+msgstr "objekto id"
+
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/library/functions.html#repr)
+msgid "object repr"
+msgstr "objekto repr"
+
+msgid "action flag"
+msgstr "veiksmo žymė"
+
+msgid "change message"
+msgstr "pakeisti žinutę"
+
+msgid "log entry"
+msgstr "log įrašas"
+
+msgid "log entries"
+msgstr "log įrašai"
+
+#, python-format
+msgid "Added \"%(object)s\"."
+msgstr "„%(object)s“ pridėti."
+
+#, python-format
+msgid "Changed \"%(object)s\" - %(changes)s"
+msgstr "Pakeisti „%(object)s“ - %(changes)s"
+
+#, python-format
+msgid "Deleted \"%(object)s.\""
+msgstr "„%(object)s“ ištrinti."
+
+msgid "LogEntry Object"
+msgstr "LogEntry objektas"
+
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr "Pridėtas {name} \"{object}\"."
+
+msgid "Added."
+msgstr "Pridėta."
+
+msgid "and"
+msgstr "ir"
+
+#, python-brace-format
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr "Pakeisti {fields} arba {name} \"{object}\"."
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr "Pakeisti {fields}."
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr "Pašalintas {name} \"{object}\"."
+
+msgid "No fields changed."
+msgstr "Nei vienas laukas nepakeistas"
+
+msgid "None"
+msgstr "None"
+
+msgid ""
+"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr ""
+"Nuspauskite \"Control\", arba \"Command\" Mac kompiuteriuose, kad pasirinkti "
+"daugiau nei vieną."
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "{name} \"{obj}\" buvo sėkmingai pridėtas."
+
+msgid "You may edit it again below."
+msgstr "Galite tai dar kartą redaguoti žemiau."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
+"below."
+msgstr ""
+"{name} \"{obj}\" buvo sėkmingai pridėtas. Galite pridėti kitą {name} žemiau."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgstr "{name} \"{obj}\" buvo sėkmingai pakeistas. Galite jį koreguoti žemiau."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr ""
+"{name} \"{obj}\" buvo sėkmingai pridėtas. Galite jį vėl redaguoti žemiau."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+"{name} \"{obj}\" buvo sėkmingai pakeistas. Galite pridėti kitą {name} žemiau."
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr "{name} \"{obj}\" buvo sėkmingai pakeistas."
+
+msgid ""
+"Items must be selected in order to perform actions on them. No items have "
+"been changed."
+msgstr ""
+"Įrašai turi būti pasirinkti, kad būtų galima atlikti veiksmus. Įrašai "
+"pakeisti nebuvo."
+
+msgid "No action selected."
+msgstr "Veiksmai atlikti nebuvo."
+
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr "%(name)s \"%(obj)s\" sėkmingai ištrintas."
+
+#, python-format
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr "%(name)s su ID \"%(key)s\" neegzistuoja. Gal tai buvo ištrinta?"
+
+#, python-format
+msgid "Add %s"
+msgstr "Pridėti %s"
+
+#, python-format
+msgid "Change %s"
+msgstr "Pakeisti %s"
+
+#, python-format
+msgid "View %s"
+msgstr "Peržiūrėti %s"
+
+msgid "Database error"
+msgstr "Duomenų bazės klaida"
+
+#, python-format
+msgid "%(count)s %(name)s was changed successfully."
+msgid_plural "%(count)s %(name)s were changed successfully."
+msgstr[0] "%(count)s %(name)s sėkmingai pakeistas."
+msgstr[1] "%(count)s %(name)s sėkmingai pakeisti."
+msgstr[2] "%(count)s %(name)s "
+msgstr[3] "%(count)s %(name)s "
+
+#, python-format
+msgid "%(total_count)s selected"
+msgid_plural "All %(total_count)s selected"
+msgstr[0] "%(total_count)s pasirinktas"
+msgstr[1] "%(total_count)s pasirinkti"
+msgstr[2] "Visi %(total_count)s pasirinkti"
+msgstr[3] "Visi %(total_count)s pasirinkti"
+
+#, python-format
+msgid "0 of %(cnt)s selected"
+msgstr "0 iš %(cnt)s pasirinkta"
+
+#, python-format
+msgid "Change history: %s"
+msgstr "Pakeitimų istorija: %s"
+
+#. Translators: Model verbose name and instance representation,
+#. suitable to be an item in a list.
+#, python-format
+msgid "%(class_name)s %(instance)s"
+msgstr "%(class_name)s %(instance)s"
+
+#, python-format
+msgid ""
+"Deleting %(class_name)s %(instance)s would require deleting the following "
+"protected related objects: %(related_objects)s"
+msgstr ""
+"%(class_name)s %(instance)s šalinimas reikalautų pašalinti apsaugotus "
+"susijusius objektus: %(related_objects)s"
+
+msgid "Django site admin"
+msgstr "Django tinklalapio administravimas"
+
+msgid "Django administration"
+msgstr "Django administravimas"
+
+msgid "Site administration"
+msgstr "Tinklalapio administravimas"
+
+msgid "Log in"
+msgstr "Prisijungti"
+
+#, python-format
+msgid "%(app)s administration"
+msgstr "%(app)s administravimas"
+
+msgid "Page not found"
+msgstr "Puslapis nerastas"
+
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Atsiprašome, bet prašytas puslapis nerastas."
+
+msgid "Home"
+msgstr "Pradinis"
+
+msgid "Server error"
+msgstr "Serverio klaida"
+
+msgid "Server error (500)"
+msgstr "Serverio klaida (500)"
+
+msgid "Server Error <em>(500)</em>"
+msgstr "Serverio klaida <em>(500)</em>"
+
+msgid ""
+"There's been an error. It's been reported to the site administrators via "
+"email and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"Netikėta klaida. Apie ją buvo pranešta administratoriams el. paštu ir ji "
+"turėtų būti greitai sutvarkyta. Dėkui už kantrybę."
+
+msgid "Run the selected action"
+msgstr "Vykdyti pasirinktus veiksmus"
+
+msgid "Go"
+msgstr "Vykdyti"
+
+msgid "Click here to select the objects across all pages"
+msgstr "Spauskite čia norėdami pasirinkti visus įrašus"
+
+#, python-format
+msgid "Select all %(total_count)s %(module_name)s"
+msgstr "Pasirinkti visus %(total_count)s %(module_name)s"
+
+msgid "Clear selection"
+msgstr "Atstatyti į pradinę būseną"
+
+msgid ""
+"First, enter a username and password. Then, you'll be able to edit more user "
+"options."
+msgstr ""
+"Pirmiausia įveskite naudotojo vardą ir slaptažodį. Tada galėsite keisti "
+"daugiau naudotojo nustatymų."
+
+msgid "Enter a username and password."
+msgstr "Įveskite naudotojo vardą ir slaptažodį."
+
+msgid "Change password"
+msgstr "Keisti slaptažodį"
+
+msgid "Please correct the error below."
+msgstr "Prašome ištaisyti žemiau esančią klaidą."
+
+msgid "Please correct the errors below."
+msgstr "Ištaisykite žemiau esančias klaidas."
+
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr "Įveskite naują slaptažodį naudotojui <strong>%(username)s</strong>."
+
+msgid "Welcome,"
+msgstr "Sveiki,"
+
+msgid "View site"
+msgstr "Peržiūrėti tinklalapį"
+
+msgid "Documentation"
+msgstr "Dokumentacija"
+
+msgid "Log out"
+msgstr "Atsijungti"
+
+#, python-format
+msgid "Add %(name)s"
+msgstr "Naujas %(name)s"
+
+msgid "History"
+msgstr "Istorija"
+
+msgid "View on site"
+msgstr "Matyti tinklalapyje"
+
+msgid "Filter"
+msgstr "Filtras"
+
+msgid "Remove from sorting"
+msgstr "Pašalinti iš rikiavimo"
+
+#, python-format
+msgid "Sorting priority: %(priority_number)s"
+msgstr "Rikiavimo prioritetas: %(priority_number)s"
+
+msgid "Toggle sorting"
+msgstr "Perjungti rikiavimą"
+
+msgid "Delete"
+msgstr "Ištrinti"
+
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+"Trinant %(object_name)s '%(escaped_object)s' turi būti ištrinti ir susiję "
+"objektai, bet tavo vartotojas neturi teisių ištrinti šių objektų:"
+
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
+msgstr ""
+"Ištrinant %(object_name)s '%(escaped_object)s' būtų ištrinti šie apsaugoti "
+"ir susiję objektai:"
+
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+"Ar este tikri, kad norite ištrinti %(object_name)s \"%(escaped_object)s\"? "
+"Visi susiję objektai bus ištrinti:"
+
+msgid "Objects"
+msgstr "Objektai"
+
+msgid "Yes, I'm sure"
+msgstr "Taip, esu tikras"
+
+msgid "No, take me back"
+msgstr "Ne, grįžti atgal"
+
+msgid "Delete multiple objects"
+msgstr "Ištrinti kelis objektus"
+
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+"Ištrinant pasirinktą %(objects_name)s būtų ištrinti susiję objektai, tačiau "
+"jūsų vartotojas neturi reikalingų teisių ištrinti šiuos objektų tipus:"
+
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would require deleting the following "
+"protected related objects:"
+msgstr ""
+"Ištrinant pasirinktus %(objects_name)s būtų ištrinti šie apsaugoti ir susiję "
+"objektai:"
+
+#, python-format
+msgid ""
+"Are you sure you want to delete the selected %(objects_name)s? All of the "
+"following objects and their related items will be deleted:"
+msgstr ""
+"Ar esate tikri, kad norite ištrinti pasirinktus %(objects_name)s? Sekantys "
+"pasirinkti bei susiję objektai bus ištrinti:"
+
+msgid "View"
+msgstr "Peržiūrėti"
+
+msgid "Delete?"
+msgstr "Ištrinti?"
+
+#, python-format
+msgid " By %(filter_title)s "
+msgstr " Pagal %(filter_title)s "
+
+msgid "Summary"
+msgstr "Santrauka"
+
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "%(name)s aplikacijos modeliai"
+
+msgid "Add"
+msgstr "Pridėti"
+
+msgid "You don't have permission to view or edit anything."
+msgstr "Jūs neturite teisių peržiūrai ir redagavimui."
+
+msgid "Recent actions"
+msgstr "Paskutiniai veiksmai"
+
+msgid "My actions"
+msgstr "Mano veiksmai"
+
+msgid "None available"
+msgstr "Nėra prieinamų"
+
+msgid "Unknown content"
+msgstr "Nežinomas turinys"
+
+msgid ""
+"Something's wrong with your database installation. Make sure the appropriate "
+"database tables have been created, and make sure the database is readable by "
+"the appropriate user."
+msgstr ""
+"Kažkas yra negerai su jūsų duomenų bazės instaliacija. Įsitikink, kad visos "
+"reikalingos lentelės sukurtos ir vartotojas turi teises skaityti duomenų "
+"bazę."
+
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+"Jūs esate prisijungęs kaip %(username)s, bet neturite teisių patekti į šį "
+"puslapį. Ar norėtumete prisijungti su kitu vartotoju?"
+
+msgid "Forgotten your password or username?"
+msgstr "Pamiršote slaptažodį ar vartotojo vardą?"
+
+msgid "Date/time"
+msgstr "Data/laikas"
+
+msgid "User"
+msgstr "Naudotojas"
+
+msgid "Action"
+msgstr "Veiksmas"
+
+msgid ""
+"This object doesn't have a change history. It probably wasn't added via this "
+"admin site."
+msgstr ""
+"Šis objektas neturi pakeitimų istorijos. Tikriausiai jis buvo pridėtas ne "
+"per administravimo puslapį."
+
+msgid "Show all"
+msgstr "Rodyti visus"
+
+msgid "Save"
+msgstr "Išsaugoti"
+
+msgid "Popup closing…"
+msgstr "Iškylantysis langas užsidaro..."
+
+msgid "Search"
+msgstr "Ieškoti"
+
+#, python-format
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] "%(counter)s rezultatas"
+msgstr[1] "%(counter)s rezultatai"
+msgstr[2] "%(counter)s rezultatai"
+msgstr[3] "%(counter)s rezultatai"
+
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr "%(full_result_count)s iš viso"
+
+msgid "Save as new"
+msgstr "Išsaugoti kaip naują"
+
+msgid "Save and add another"
+msgstr "Išsaugoti ir pridėti naują"
+
+msgid "Save and continue editing"
+msgstr "Išsaugoti ir tęsti redagavimą"
+
+msgid "Save and view"
+msgstr "Išsaugoti ir peržiūrėti"
+
+msgid "Close"
+msgstr "Uždaryti"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Keisti pasirinktus %(model)s"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Pridėti dar vieną %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Pašalinti pasirinktus %(model)s"
+
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "Dėkui už šiandien tinklalapyje turiningai praleistą laiką."
+
+msgid "Log in again"
+msgstr "Prisijungti dar kartą"
+
+msgid "Password change"
+msgstr "Slaptažodžio keitimas"
+
+msgid "Your password was changed."
+msgstr "Jūsų slaptažodis buvo pakeistas."
+
+msgid ""
+"Please enter your old password, for security's sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+"Saugumo sumetimais įveskite seną slaptažodį ir tada du kartus naują, kad "
+"įsitikinti, jog nesuklydote rašydamas"
+
+msgid "Change my password"
+msgstr "Keisti mano slaptažodį"
+
+msgid "Password reset"
+msgstr "Slaptažodžio atstatymas"
+
+msgid "Your password has been set.  You may go ahead and log in now."
+msgstr "Jūsų slaptažodis buvo išsaugotas. Dabas galite prisijungti."
+
+msgid "Password reset confirmation"
+msgstr "Slaptažodžio atstatymo patvirtinimas"
+
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr ""
+"Įveskite naująjį slaptažodį du kartus, taip užtikrinant, jog nesuklydote "
+"rašydami."
+
+msgid "New password:"
+msgstr "Naujasis slaptažodis:"
+
+msgid "Confirm password:"
+msgstr "Slaptažodžio patvirtinimas:"
+
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr ""
+"Slaptažodžio atstatymo nuoroda buvo negaliojanti, nes ji tikriausiai jau "
+"buvo panaudota. Prašykite naujo slaptažodžio pakeitimo."
+
+msgid ""
+"We've emailed you instructions for setting your password, if an account "
+"exists with the email you entered. You should receive them shortly."
+msgstr ""
+"Jei egzistuoja vartotojas su jūsų įvestu elektroninio pašto adresu, "
+"išsiųsime jums slaptažodžio nustatymo instrukcijas . Instrukcijas turėtumėte "
+"gauti netrukus."
+
+msgid ""
+"If you don't receive an email, please make sure you've entered the address "
+"you registered with, and check your spam folder."
+msgstr ""
+"Jei el. laiško negavote, prašome įsitikinti ar įvedėte tą el. pašto adresą "
+"kuriuo registravotės ir patikrinkite savo šlamšto aplanką."
+
+#, python-format
+msgid ""
+"You're receiving this email because you requested a password reset for your "
+"user account at %(site_name)s."
+msgstr ""
+"Jūs gaunate šį laišką nes prašėte paskyros slaptažodžio atkūrimo "
+"%(site_name)s svetainėje."
+
+msgid "Please go to the following page and choose a new password:"
+msgstr "Prašome eiti į šį puslapį ir pasirinkti naują slaptažodį:"
+
+msgid "Your username, in case you've forgotten:"
+msgstr "Jūsų naudotojo vardas, jei netyčia jį užmiršote:"
+
+msgid "Thanks for using our site!"
+msgstr "Dėkui, kad naudojatės mūsų tinklalapiu!"
+
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "%(site_name)s komanda"
+
+msgid ""
+"Forgotten your password? Enter your email address below, and we'll email "
+"instructions for setting a new one."
+msgstr ""
+"Pamiršote slaptažodį? Įveskite savo el. pašto adresą ir mes išsiųsime laišką "
+"su instrukcijomis kaip nustatyti naują slaptažodį."
+
+msgid "Email address:"
+msgstr "El. pašto adresas:"
+
+msgid "Reset my password"
+msgstr "Atstatyti slaptažodį"
+
+msgid "All dates"
+msgstr "Visos datos"
+
+#, python-format
+msgid "Select %s"
+msgstr "Pasirinkti %s"
+
+#, python-format
+msgid "Select %s to change"
+msgstr "Pasirinkite %s kurį norite keisti"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "Pasirinkti %s peržiūrai"
+
+msgid "Date:"
+msgstr "Data:"
+
+msgid "Time:"
+msgstr "Laikas:"
+
+msgid "Lookup"
+msgstr "Paieška"
+
+msgid "Currently:"
+msgstr "Šiuo metu:"
+
+msgid "Change:"
+msgstr "Pakeisti:"

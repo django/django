@@ -1,0 +1,583 @@
+=====================
+The sitemap framework
+=====================
+
+.. module:: django.contrib.sitemaps
+   :synopsis: A framework for generating Google sitemap XML files.
+
+Django comes with a high-level sitemap-generating framework to create sitemap_
+XML files.
+
+.. _sitemap: https://www.sitemaps.org/
+
+Overview
+========
+
+A sitemap is an XML file on your website that tells search-engine indexers how
+frequently your pages change and how "important" certain pages are in relation
+to other pages on your site. This information helps search engines index your
+site.
+
+The Django sitemap framework automates the creation of this XML file by letting
+you express this information in Python code.
+
+It works much like Django's :doc:`syndication framework
+</ref/contrib/syndication>`. To create a sitemap, write a
+:class:`~django.contrib.sitemaps.Sitemap` class and point to it in your
+:doc:`URLconf </topics/http/urls>`.
+
+Installation
+============
+
+To install the sitemap app, follow these steps:
+
+#. Add ``'django.contrib.sitemaps'`` to your :setting:`INSTALLED_APPS` setting.
+
+#. Make sure your :setting:`TEMPLATES` setting contains a ``DjangoTemplates``
+   backend whose ``APP_DIRS`` options is set to ``True``. It's in there by
+   default, so you'll only need to change this if you've changed that setting.
+
+#. Make sure you've installed the :mod:`sites framework<django.contrib.sites>`.
+
+(Note: The sitemap application doesn't install any database tables. The only
+reason it needs to go into :setting:`INSTALLED_APPS` is so that the
+:func:`~django.template.loaders.app_directories.Loader` template
+loader can find the default templates.)
+
+Initialization
+==============
+
+.. function:: views.sitemap(request, sitemaps, section=None, template_name='sitemap.xml', content_type='application/xml')
+
+To activate sitemap generation on your Django site, add this line to your
+:doc:`URLconf </topics/http/urls>`::
+
+    from django.contrib.sitemaps.views import sitemap
+
+    path(
+        "sitemap.xml",
+        sitemap,
+        {"sitemaps": sitemaps},
+        name="django.contrib.sitemaps.views.sitemap",
+    )
+
+This tells Django to build a sitemap when a client accesses :file:`/sitemap.xml`.
+
+The name of the sitemap file is not important, but the location is. Search
+engines will only index links in your sitemap for the current URL level and
+below. For instance, if :file:`sitemap.xml` lives in your root directory, it may
+reference any URL in your site. However, if your sitemap lives at
+:file:`/content/sitemap.xml`, it may only reference URLs that begin with
+:file:`/content/`.
+
+The sitemap view takes an extra, required argument: ``{'sitemaps': sitemaps}``.
+``sitemaps`` should be a dictionary that maps a short section label (e.g.,
+``blog`` or ``news``) to its :class:`~django.contrib.sitemaps.Sitemap` class
+(e.g., ``BlogSitemap`` or ``NewsSitemap``). It may also map to an *instance* of
+a :class:`~django.contrib.sitemaps.Sitemap` class (e.g.,
+``BlogSitemap(some_var)``).
+
+``Sitemap`` classes
+===================
+
+A :class:`~django.contrib.sitemaps.Sitemap` class is a Python class that
+represents a "section" of entries in your sitemap. For example, one
+:class:`~django.contrib.sitemaps.Sitemap` class could represent all the entries
+of your blog, while another could represent all of the events in your events
+calendar.
+
+In the simplest case, all these sections get lumped together into one
+:file:`sitemap.xml`, but it's also possible to use the framework to generate a
+sitemap index that references individual sitemap files, one per section. (See
+`Creating a sitemap index`_ below.)
+
+:class:`~django.contrib.sitemaps.Sitemap` classes must subclass
+``django.contrib.sitemaps.Sitemap``. They can live anywhere in your codebase.
+
+An example
+==========
+
+Let's assume you have a blog system, with an ``Entry`` model, and you want your
+sitemap to include all the links to your individual blog entries. Here's how
+your sitemap class might look::
+
+    from django.contrib.sitemaps import Sitemap
+    from blog.models import Entry
+
+
+    class BlogSitemap(Sitemap):
+        changefreq = "never"
+        priority = 0.5
+
+        def items(self):
+            return Entry.objects.filter(is_draft=False)
+
+        def lastmod(self, obj):
+            return obj.pub_date
+
+Note:
+
+* :attr:`~Sitemap.changefreq` and :attr:`~Sitemap.priority` are class
+  attributes corresponding to ``<changefreq>`` and ``<priority>`` elements,
+  respectively. They can be made callable as functions, as
+  :attr:`~Sitemap.lastmod` was in the example.
+* :attr:`~Sitemap.items()` is a method that returns a :term:`sequence` or
+  ``QuerySet`` of objects. The objects returned will get passed to any callable
+  methods corresponding to a sitemap property (:attr:`~Sitemap.location`,
+  :attr:`~Sitemap.lastmod`, :attr:`~Sitemap.changefreq`, and
+  :attr:`~Sitemap.priority`).
+* :attr:`~Sitemap.lastmod` should return a :class:`~datetime.datetime`.
+* There is no :attr:`~Sitemap.location` method in this example, but you
+  can provide it in order to specify the URL for your object. By default,
+  :attr:`~Sitemap.location()` calls ``get_absolute_url()`` on each object
+  and returns the result.
+
+``Sitemap`` class reference
+===========================
+
+.. class:: Sitemap
+
+    A ``Sitemap`` class can define the following methods/attributes:
+
+    .. attribute:: Sitemap.items
+
+        **Required.** A method that returns a :term:`sequence` or ``QuerySet``
+        of objects. The framework doesn't care what *type* of objects they are;
+        all that matters is that these objects get passed to the
+        :attr:`~Sitemap.location()`, :attr:`~Sitemap.lastmod()`,
+        :attr:`~Sitemap.changefreq()` and :attr:`~Sitemap.priority()` methods.
+
+    .. attribute:: Sitemap.location
+
+        **Optional.** Either a method or attribute.
+
+        If it's a method, it should return the absolute path for a given object
+        as returned by :attr:`~Sitemap.items()`.
+
+        If it's an attribute, its value should be a string representing an
+        absolute path to use for *every* object returned by
+        :attr:`~Sitemap.items()`.
+
+        In both cases, "absolute path" means a URL that doesn't include the
+        protocol or domain. Examples:
+
+        * Good: ``'/foo/bar/'``
+        * Bad: ``'example.com/foo/bar/'``
+        * Bad: ``'https://example.com/foo/bar/'``
+
+        If :attr:`~Sitemap.location` isn't provided, the framework will call
+        the ``get_absolute_url()`` method on each object as returned by
+        :attr:`~Sitemap.items()`.
+
+        To specify a protocol other than ``'http'``, use
+        :attr:`~Sitemap.protocol`.
+
+    .. attribute:: Sitemap.lastmod
+
+        **Optional.** Either a method or attribute.
+
+        If it's a method, it should take one argument -- an object as returned
+        by :attr:`~Sitemap.items()` -- and return that object's last-modified
+        date/time as a :class:`~datetime.datetime`.
+
+        If it's an attribute, its value should be a :class:`~datetime.datetime`
+        representing the last-modified date/time for *every* object returned by
+        :attr:`~Sitemap.items()`.
+
+        If all items in a sitemap have a :attr:`~Sitemap.lastmod`, the sitemap
+        generated by :func:`views.sitemap` will have a ``Last-Modified``
+        header equal to the latest ``lastmod``. You can activate the
+        :class:`~django.middleware.http.ConditionalGetMiddleware` to make
+        Django respond appropriately to requests with an ``If-Modified-Since``
+        header which will prevent sending the sitemap if it hasn't changed.
+
+    .. attribute:: Sitemap.paginator
+
+        **Optional.**
+
+        This property returns a :class:`~django.core.paginator.Paginator` for
+        :attr:`~Sitemap.items()`. If you generate sitemaps in a batch you may
+        want to override this as a cached property in order to avoid multiple
+        ``items()`` calls.
+
+    .. attribute:: Sitemap.changefreq
+
+        **Optional.** Either a method or attribute.
+
+        If it's a method, it should take one argument -- an object as returned
+        by :attr:`~Sitemap.items()` -- and return that object's change
+        frequency as a string.
+
+        If it's an attribute, its value should be a string representing the
+        change frequency of *every* object returned by :attr:`~Sitemap.items()`.
+
+        Possible values for :attr:`~Sitemap.changefreq`, whether you use a
+        method or attribute, are:
+
+        * ``'always'``
+        * ``'hourly'``
+        * ``'daily'``
+        * ``'weekly'``
+        * ``'monthly'``
+        * ``'yearly'``
+        * ``'never'``
+
+    .. attribute:: Sitemap.priority
+
+        **Optional.** Either a method or attribute.
+
+        If it's a method, it should take one argument -- an object as returned
+        by :attr:`~Sitemap.items()` -- and return that object's priority as
+        either a string or float.
+
+        If it's an attribute, its value should be either a string or float
+        representing the priority of *every* object returned by
+        :attr:`~Sitemap.items()`.
+
+        Example values for :attr:`~Sitemap.priority`: ``0.4``, ``1.0``. The
+        default priority of a page is ``0.5``. See the `sitemaps.org
+        documentation`_ for more.
+
+        .. _sitemaps.org documentation: https://www.sitemaps.org/protocol.html#prioritydef
+
+    .. attribute:: Sitemap.protocol
+
+        **Optional.**
+
+        This attribute defines the protocol (``'http'`` or ``'https'``) of the
+        URLs in the sitemap. If it isn't set, the protocol with which the
+        sitemap was requested is used. If the sitemap is built outside the
+        context of a request, the default is ``'https'``.
+
+    .. attribute:: Sitemap.limit
+
+        **Optional.**
+
+        This attribute defines the maximum number of URLs included on each page
+        of the sitemap. Its value should not exceed the default value of
+        ``50000``, which is the upper limit allowed in the `Sitemaps protocol
+        <https://www.sitemaps.org/protocol.html#index>`_.
+
+    .. attribute:: Sitemap.i18n
+
+        **Optional.**
+
+        A boolean attribute that defines if the URLs of this sitemap should
+        be generated using all of your :setting:`LANGUAGES`. The default is
+        ``False``.
+
+    .. attribute:: Sitemap.languages
+
+        **Optional.**
+
+        A :term:`sequence` of :term:`language codes<language code>` to use for
+        generating alternate links when :attr:`~Sitemap.i18n` is enabled.
+        Defaults to :setting:`LANGUAGES`.
+
+    .. attribute:: Sitemap.alternates
+
+        **Optional.**
+
+        A boolean attribute. When used in conjunction with
+        :attr:`~Sitemap.i18n` generated URLs will each have a list of alternate
+        links pointing to other language versions using the `hreflang
+        attribute`_. The default is ``False``.
+
+        .. _hreflang attribute: https://developers.google.com/search/docs/advanced/crawling/localized-versions
+
+    .. attribute:: Sitemap.x_default
+
+        **Optional.**
+
+        A boolean attribute. When ``True`` the alternate links generated by
+        :attr:`~Sitemap.alternates` will contain a ``hreflang="x-default"``
+        fallback entry with a value of :setting:`LANGUAGE_CODE`. The default is
+        ``False``.
+
+    .. method:: Sitemap.get_latest_lastmod()
+
+        **Optional.** A method that returns the latest value returned by
+        :attr:`~Sitemap.lastmod`. This function is used to add the ``lastmod``
+        attribute to :ref:`Sitemap index context
+        variables<sitemap-index-context-variables>`.
+
+        By default :meth:`~Sitemap.get_latest_lastmod` returns:
+
+        * If :attr:`~Sitemap.lastmod` is an attribute:
+          :attr:`~Sitemap.lastmod`.
+        * If :attr:`~Sitemap.lastmod` is a method:
+          The latest ``lastmod`` returned by calling the method with all
+          items returned by :meth:`Sitemap.items`.
+
+    .. method:: Sitemap.get_languages_for_item(item)
+
+        **Optional.** A method that returns the sequence of language codes for
+        which the item is displayed. By default
+        :meth:`~Sitemap.get_languages_for_item` returns
+        :attr:`~Sitemap.languages`.
+
+Shortcuts
+=========
+
+The sitemap framework provides a convenience class for a common case:
+
+.. class:: GenericSitemap(info_dict, priority=None, changefreq=None, protocol=None)
+
+    The :class:`django.contrib.sitemaps.GenericSitemap` class allows you to
+    create a sitemap by passing it a dictionary which has to contain at least
+    a ``queryset`` entry. This queryset will be used to generate the items
+    of the sitemap. It may also have a ``date_field`` entry that
+    specifies a date field for objects retrieved from the ``queryset``.
+    This will be used for the :attr:`~Sitemap.lastmod` attribute and
+    :meth:`~Sitemap.get_latest_lastmod` methods in the in the
+    generated sitemap.
+
+    The :attr:`~Sitemap.priority`, :attr:`~Sitemap.changefreq`,
+    and :attr:`~Sitemap.protocol` keyword arguments allow specifying these
+    attributes for all URLs.
+
+Example
+-------
+
+Here's an example of a :doc:`URLconf </topics/http/urls>` using
+:class:`GenericSitemap`::
+
+    from django.contrib.sitemaps import GenericSitemap
+    from django.contrib.sitemaps.views import sitemap
+    from django.urls import path
+    from blog.models import Entry
+
+    info_dict = {
+        "queryset": Entry.objects.all(),
+        "date_field": "pub_date",
+    }
+
+    urlpatterns = [
+        # some generic view using info_dict
+        # ...
+        # the sitemap
+        path(
+            "sitemap.xml",
+            sitemap,
+            {"sitemaps": {"blog": GenericSitemap(info_dict, priority=0.6)}},
+            name="django.contrib.sitemaps.views.sitemap",
+        ),
+    ]
+
+.. _URLconf: ../url_dispatch/
+
+Sitemap for static views
+========================
+
+Often you want the search engine crawlers to index views which are neither
+object detail pages nor flatpages. The solution is to explicitly list URL
+names for these views in ``items`` and call :func:`~django.urls.reverse` in
+the ``location`` method of the sitemap. For example::
+
+    # sitemaps.py
+    from django.contrib import sitemaps
+    from django.urls import reverse
+
+
+    class StaticViewSitemap(sitemaps.Sitemap):
+        priority = 0.5
+        changefreq = "daily"
+
+        def items(self):
+            return ["main", "about", "license"]
+
+        def location(self, item):
+            return reverse(item)
+
+
+    # urls.py
+    from django.contrib.sitemaps.views import sitemap
+    from django.urls import path
+
+    from .sitemaps import StaticViewSitemap
+    from . import views
+
+    sitemaps = {
+        "static": StaticViewSitemap,
+    }
+
+    urlpatterns = [
+        path("", views.main, name="main"),
+        path("about/", views.about, name="about"),
+        path("license/", views.license, name="license"),
+        # ...
+        path(
+            "sitemap.xml",
+            sitemap,
+            {"sitemaps": sitemaps},
+            name="django.contrib.sitemaps.views.sitemap",
+        ),
+    ]
+
+
+Creating a sitemap index
+========================
+
+.. function:: views.index(request, sitemaps, template_name='sitemap_index.xml', content_type='application/xml', sitemap_url_name='django.contrib.sitemaps.views.sitemap')
+
+The sitemap framework also has the ability to create a sitemap index that
+references individual sitemap files, one per each section defined in your
+``sitemaps`` dictionary. The only differences in usage are:
+
+* You use two views in your URLconf: :func:`django.contrib.sitemaps.views.index`
+  and :func:`django.contrib.sitemaps.views.sitemap`.
+* The :func:`django.contrib.sitemaps.views.sitemap` view should take a
+  ``section`` keyword argument.
+
+Here's what the relevant URLconf lines would look like for the example above::
+
+    from django.contrib.sitemaps import views
+
+    urlpatterns = [
+        path(
+            "sitemap.xml",
+            views.index,
+            {"sitemaps": sitemaps},
+            name="django.contrib.sitemaps.views.index",
+        ),
+        path(
+            "sitemap-<section>.xml",
+            views.sitemap,
+            {"sitemaps": sitemaps},
+            name="django.contrib.sitemaps.views.sitemap",
+        ),
+    ]
+
+This will automatically generate a :file:`sitemap.xml` file that references
+both :file:`sitemap-flatpages.xml` and :file:`sitemap-blog.xml`. The
+:class:`~django.contrib.sitemaps.Sitemap` classes and the ``sitemaps``
+dict don't change at all.
+
+If all sitemaps have a ``lastmod`` returned by
+:meth:`Sitemap.get_latest_lastmod` the sitemap index will have a
+``Last-Modified`` header equal to the latest ``lastmod``.
+
+You should create an index file if one of your sitemaps has more than 50,000
+URLs. In this case, Django will automatically paginate the sitemap, and the
+index will reflect that.
+
+If you're not using the vanilla sitemap view -- for example, if it's wrapped
+with a caching decorator -- you must name your sitemap view and pass
+``sitemap_url_name`` to the index view::
+
+    from django.contrib.sitemaps import views as sitemaps_views
+    from django.views.decorators.cache import cache_page
+
+    urlpatterns = [
+        path(
+            "sitemap.xml",
+            cache_page(86400)(sitemaps_views.index),
+            {"sitemaps": sitemaps, "sitemap_url_name": "sitemaps"},
+        ),
+        path(
+            "sitemap-<section>.xml",
+            cache_page(86400)(sitemaps_views.sitemap),
+            {"sitemaps": sitemaps},
+            name="sitemaps",
+        ),
+    ]
+
+Template customization
+======================
+
+If you wish to use a different template for each sitemap or sitemap index
+available on your site, you may specify it by passing a ``template_name``
+parameter to the ``sitemap`` and ``index`` views via the URLconf::
+
+    from django.contrib.sitemaps import views
+
+    urlpatterns = [
+        path(
+            "custom-sitemap.xml",
+            views.index,
+            {"sitemaps": sitemaps, "template_name": "custom_sitemap.html"},
+            name="django.contrib.sitemaps.views.index",
+        ),
+        path(
+            "custom-sitemap-<section>.xml",
+            views.sitemap,
+            {"sitemaps": sitemaps, "template_name": "custom_sitemap.html"},
+            name="django.contrib.sitemaps.views.sitemap",
+        ),
+    ]
+
+
+These views return :class:`~django.template.response.TemplateResponse`
+instances which allow you to easily customize the response data before
+rendering. For more details, see the :doc:`TemplateResponse documentation
+</ref/template-response>`.
+
+Context variables
+-----------------
+
+When customizing the templates for the
+:func:`~django.contrib.sitemaps.views.index` and
+:func:`~django.contrib.sitemaps.views.sitemap` views, you can rely on the
+following context variables.
+
+.. _sitemap-index-context-variables:
+
+Index
+-----
+
+The variable ``sitemaps`` is a list of objects containing the ``location`` and
+``lastmod`` attribute for each of the sitemaps. Each URL exposes the following
+attributes:
+
+- ``location``: The location (url & page) of the sitemap.
+- ``lastmod``: Populated by the :meth:`~Sitemap.get_latest_lastmod`
+  method for each sitemap.
+
+Sitemap
+-------
+
+The variable ``urlset`` is a list of URLs that should appear in the
+sitemap. Each URL exposes attributes as defined in the
+:class:`~django.contrib.sitemaps.Sitemap` class:
+
+- ``alternates``
+- ``changefreq``
+- ``item``
+- ``lastmod``
+- ``location``
+- ``priority``
+
+The ``alternates`` attribute is available when :attr:`~Sitemap.i18n` and
+:attr:`~Sitemap.alternates` are enabled. It is a list of other language
+versions, including the optional :attr:`~Sitemap.x_default` fallback, for each
+URL. Each alternate is a dictionary with ``location`` and ``lang_code`` keys.
+
+The ``item`` attribute has been added for each URL to allow more flexible
+customization of the templates, such as `Google news sitemaps`_. Assuming
+Sitemap's :attr:`~Sitemap.items()` would return a list of items with
+``publication_data`` and a ``tags`` field something like this would
+generate a Google News compatible sitemap:
+
+.. code-block:: xml+django
+
+    <?xml version="1.0" encoding="UTF-8"?>
+    <urlset
+      xmlns="https://www.sitemaps.org/schemas/sitemap/0.9"
+      xmlns:news="https://www.google.com/schemas/sitemap-news/0.9">
+    {% spaceless %}
+    {% for url in urlset %}
+      <url>
+        <loc>{{ url.location }}</loc>
+        {% if url.lastmod %}<lastmod>{{ url.lastmod|date:"Y-m-d" }}</lastmod>{% endif %}
+        {% if url.changefreq %}<changefreq>{{ url.changefreq }}</changefreq>{% endif %}
+        {% if url.priority %}<priority>{{ url.priority }}</priority>{% endif %}
+        <news:news>
+          {% if url.item.publication_date %}<news:publication_date>{{ url.item.publication_date|date:"Y-m-d" }}</news:publication_date>{% endif %}
+          {% if url.item.tags %}<news:keywords>{{ url.item.tags }}</news:keywords>{% endif %}
+        </news:news>
+       </url>
+    {% endfor %}
+    {% endspaceless %}
+    </urlset>
+
+.. _`Google news sitemaps`: https://support.google.com/news/publisher-center/answer/9606710

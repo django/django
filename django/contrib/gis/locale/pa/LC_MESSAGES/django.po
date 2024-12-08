@@ -1,0 +1,86 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# A S Alam <alam.yellow@gmail.com>, 2013
+# Jannis Leidel <jannis@leidel.info>, 2011
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-09-19 16:40+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Panjabi (Punjabi) (http://www.transifex.com/django/django/"
+"language/pa/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: pa\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "GIS"
+msgstr ""
+
+msgid "The base GIS field."
+msgstr ""
+
+msgid ""
+"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
+msgstr ""
+
+msgid "Point"
+msgstr "ਪੁਆਇੰਟ"
+
+msgid "Line string"
+msgstr "ਲਾਈਨ ਸਤਰ"
+
+msgid "Polygon"
+msgstr "ਬਹੁਭੁਜ"
+
+msgid "Multi-point"
+msgstr "ਕਈ-ਪੁਆਇੰਟ"
+
+msgid "Multi-line string"
+msgstr ""
+
+msgid "Multi polygon"
+msgstr "ਮਲਟੀ ਬਹੁ-ਭੁਜ"
+
+msgid "Geometry collection"
+msgstr "ਜੁਮੈਟਰੀ ਭੰਡਾਰ"
+
+msgid "Extent Aggregate Field"
+msgstr ""
+
+msgid "Raster Field"
+msgstr ""
+
+msgid "No geometry value provided."
+msgstr "ਕੋਈ ਜੁਮੈਟਰੀ ਮੁੱਲ ਨਹੀਂ ਦਿੱਤਾ ਗਿਆ।"
+
+msgid "Invalid geometry value."
+msgstr "ਗਲਤ ਜੁਮੈਟਰੀ ਮੁੱਲ।"
+
+msgid "Invalid geometry type."
+msgstr "ਗਲਤ ਜੁਮੈਟਰੀ ਕਿਸਮ।"
+
+msgid ""
+"An error occurred when transforming the geometry to the SRID of the geometry "
+"form field."
+msgstr ""
+
+msgid "Delete all Features"
+msgstr ""
+
+msgid "WKT debugging window:"
+msgstr ""
+
+msgid "Debugging window (serialized value)"
+msgstr ""
+
+msgid "No feeds are registered."
+msgstr "ਕੋਈ ਫੀਡ ਰਜਿਸਟਰ ਨਹੀਂ ਹੈ।"
+
+#, python-format
+msgid "Slug %r isn't registered."
+msgstr ""

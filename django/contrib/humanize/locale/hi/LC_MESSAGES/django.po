@@ -1,0 +1,263 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Chandan kumar <chandankumar.093047@gmail.com>, 2012
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Sandeep Satavlekar <sandysat@gmail.com>, 2011
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2017-09-19 16:40+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Hindi (http://www.transifex.com/django/django/language/hi/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: hi\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Humanize"
+msgstr ""
+
+msgid "th"
+msgstr "वाँ"
+
+msgid "st"
+msgstr "ला"
+
+msgid "nd"
+msgstr "रा"
+
+msgid "rd"
+msgstr "रा"
+
+#, python-format
+msgid "%(value).1f million"
+msgid_plural "%(value).1f million"
+msgstr[0] "%(value).1f मिलियन"
+msgstr[1] "%(value).1f मिलियन"
+
+#, python-format
+msgid "%(value)s million"
+msgid_plural "%(value)s million"
+msgstr[0] "%(value)s मिलियन"
+msgstr[1] "%(value)s मिलियन"
+
+#, python-format
+msgid "%(value).1f billion"
+msgid_plural "%(value).1f billion"
+msgstr[0] "%(value).1f बिलियन"
+msgstr[1] "%(value).1f बिलियन"
+
+#, python-format
+msgid "%(value)s billion"
+msgid_plural "%(value)s billion"
+msgstr[0] "%(value)s बिलियन"
+msgstr[1] "%(value)s बिलियन"
+
+#, python-format
+msgid "%(value).1f trillion"
+msgid_plural "%(value).1f trillion"
+msgstr[0] "%(value).1f खरब"
+msgstr[1] "%(value).1f खरब"
+
+#, python-format
+msgid "%(value)s trillion"
+msgid_plural "%(value)s trillion"
+msgstr[0] "%(value)s खरब"
+msgstr[1] "%(value)s खरब"
+
+#, python-format
+msgid "%(value).1f quadrillion"
+msgid_plural "%(value).1f quadrillion"
+msgstr[0] "%(value).1f करोड़ शंख"
+msgstr[1] "%(value).1f करोड़ शंख"
+
+#, python-format
+msgid "%(value)s quadrillion"
+msgid_plural "%(value)s quadrillion"
+msgstr[0] "%(value)s करोड़ शंख"
+msgstr[1] "%(value)s करोड़ शंख"
+
+#, python-format
+msgid "%(value).1f quintillion"
+msgid_plural "%(value).1f quintillion"
+msgstr[0] "%(value).1f कुइनतिलिअन "
+msgstr[1] "%(value).1f कुइनतिलिअन "
+
+#, python-format
+msgid "%(value)s quintillion"
+msgid_plural "%(value)s quintillion"
+msgstr[0] "%(value)s कुइनतिलिअन "
+msgstr[1] "%(value)s कुइनतिलिअन "
+
+#, python-format
+msgid "%(value).1f sextillion"
+msgid_plural "%(value).1f sextillion"
+msgstr[0] "%(value).1f सेक्सतिलियन"
+msgstr[1] "%(value).1f सेक्सतिलियन"
+
+#, python-format
+msgid "%(value)s sextillion"
+msgid_plural "%(value)s sextillion"
+msgstr[0] "%(value)s सेक्सतिलियन"
+msgstr[1] "%(value)s सेक्सतिलियन"
+
+#, python-format
+msgid "%(value).1f septillion"
+msgid_plural "%(value).1f septillion"
+msgstr[0] "%(value).1f सेपतिलियन "
+msgstr[1] "%(value).1f सेपतिलियन "
+
+#, python-format
+msgid "%(value)s septillion"
+msgid_plural "%(value)s septillion"
+msgstr[0] "%(value)s सेपतिलियन "
+msgstr[1] "%(value)s सेपतिलियन "
+
+#, python-format
+msgid "%(value).1f octillion"
+msgid_plural "%(value).1f octillion"
+msgstr[0] "%(value).1f ओकतिलियन "
+msgstr[1] "%(value).1f ओकतिलियन "
+
+#, python-format
+msgid "%(value)s octillion"
+msgid_plural "%(value)s octillion"
+msgstr[0] "%(value)s ओकतिलियन "
+msgstr[1] "%(value)s ओकतिलियन "
+
+#, python-format
+msgid "%(value).1f nonillion"
+msgid_plural "%(value).1f nonillion"
+msgstr[0] "%(value).1f नोनिलियन"
+msgstr[1] "%(value).1f नोनिलियन"
+
+#, python-format
+msgid "%(value)s nonillion"
+msgid_plural "%(value)s nonillion"
+msgstr[0] "%(value)s नोनिलियन"
+msgstr[1] "%(value)s नोनिलियन"
+
+#, python-format
+msgid "%(value).1f decillion"
+msgid_plural "%(value).1f decillion"
+msgstr[0] "%(value).1f देसीलियन"
+msgstr[1] "%(value).1f देसीलियन"
+
+#, python-format
+msgid "%(value)s decillion"
+msgid_plural "%(value)s decillion"
+msgstr[0] "%(value)s देसीलियन"
+msgstr[1] "%(value)s देसीलियन"
+
+#, python-format
+msgid "%(value).1f googol"
+msgid_plural "%(value).1f googol"
+msgstr[0] "%(value).1f गोगोल"
+msgstr[1] "%(value).1f गोगोल"
+
+#, python-format
+msgid "%(value)s googol"
+msgid_plural "%(value)s googol"
+msgstr[0] "%(value)s गोगोल"
+msgstr[1] "%(value)s गोगोल"
+
+msgid "one"
+msgstr "एक"
+
+msgid "two"
+msgstr "दो"
+
+msgid "three"
+msgstr "तीन"
+
+msgid "four"
+msgstr "चार"
+
+msgid "five"
+msgstr "पाँच"
+
+msgid "six"
+msgstr "छह"
+
+msgid "seven"
+msgstr "सात"
+
+msgid "eight"
+msgstr "आठ"
+
+msgid "nine"
+msgstr "नौ"
+
+msgid "today"
+msgstr "आज"
+
+msgid "tomorrow"
+msgstr "कल"
+
+msgid "yesterday"
+msgstr "कल (बीता)"
+
+#, python-format
+msgctxt "naturaltime"
+msgid "%(delta)s ago"
+msgstr "%(delta)s पहले"
+
+msgid "now"
+msgstr "अभी"
+
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
+#, python-format
+msgid "a second ago"
+msgid_plural "%(count)s seconds ago"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
+#, python-format
+msgid "a minute ago"
+msgid_plural "%(count)s minutes ago"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
+#, python-format
+msgid "an hour ago"
+msgid_plural "%(count)s hours ago"
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgctxt "naturaltime"
+msgid "%(delta)s from now"
+msgstr "%(delta)s अब से"
+
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
+#, python-format
+msgid "a second from now"
+msgid_plural "%(count)s seconds from now"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
+#, python-format
+msgid "a minute from now"
+msgid_plural "%(count)s minutes from now"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
+#, python-format
+msgid "an hour from now"
+msgid_plural "%(count)s hours from now"
+msgstr[0] ""
+msgstr[1] ""

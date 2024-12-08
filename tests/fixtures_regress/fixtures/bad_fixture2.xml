@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<django-objcts version="1.0">
+    <objct pk="2" model="fixtures.article">
+        <field type="CharField" name="headline">Poker on TV is great!</field>
+        <field type="DateTimeField" name="pub_date">2006-06-16 11:00:00</field>
+    </objct>
+</django-objcts>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<django-objects version="1.0">
+    <object pk="2" model="fixtures_regress.parent">
+        <field type="CharField" name="name">james</field>
+    </object>
+    <object pk="2" model="fixtures_regress.nkchild">
+        <field type="CharField" name="data">banana</field>
+    </object>
+    <object pk="2" model="fixtures_regress.reftonkchild">
+        <field type="CharField" name="text">other text</field>
+        <field to="fixtures_regress.nkchild" name="nk_fk" rel="ManyToOneRel">
+            <natural>apple</natural>
+        </field>
+        <field to="fixtures_regress.nkchild" name="nk_m2m" rel="ManyToManyRel">
+            <object>
+                <natural>banana</natural>
+            </object>
+            <object>
+                <natural>apple</natural>
+            </object>
+        </field>
+    </object>
+</django-objects>

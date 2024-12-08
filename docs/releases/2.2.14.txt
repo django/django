@@ -1,0 +1,13 @@
+===========================
+Django 2.2.14 release notes
+===========================
+
+*July 1, 2020*
+
+Django 2.2.14 fixes a bug in 2.2.13.
+
+Bugfixes
+========
+
+* Fixed messages of ``InvalidCacheKey`` exceptions and ``CacheKeyWarning``
+  warnings raised by cache key validation (:ticket:`31654`).

@@ -1,0 +1,14 @@
+===========================
+Django 1.4.10 release notes
+===========================
+
+*November 6, 2013*
+
+Django 1.4.10 fixes a Python-compatibility bug in the 1.4 series.
+
+Python compatibility
+====================
+
+Django 1.4.9 inadvertently introduced issues with Python 2.5 compatibility.
+Django 1.4.10 restores Python 2.5 compatibility. This was issue #21362 in
+Django's Trac.

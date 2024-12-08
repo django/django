@@ -1,0 +1,16 @@
+==========================
+Django 1.2.6 release notes
+==========================
+
+*September 9, 2011*
+
+Welcome to Django 1.2.6!
+
+This is the sixth bugfix/security release in the Django 1.2 series, fixing
+several security issues present in Django 1.2.5.  Django 1.2.6 is a
+recommended upgrade for all users of any Django release in the 1.2.X series.
+
+For a full list of issues addressed in this release, see the `security
+advisory`_.
+
+.. _security advisory: https://www.djangoproject.com/weblog/2011/sep/09/security-releases-issued/

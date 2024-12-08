@@ -1,0 +1,37 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Jonathan Lindén, 2014
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2017-09-19 16:40+0000\n"
+"Last-Translator: Jonathan Lindén\n"
+"Language-Team: Swedish (http://www.transifex.com/django/django/language/"
+"sv/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: sv\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Sessions"
+msgstr "Sessioner"
+
+msgid "session key"
+msgstr "sessionsnyckel"
+
+msgid "session data"
+msgstr "sessionsdata"
+
+msgid "expire date"
+msgstr "utgångsdatum"
+
+msgid "session"
+msgstr "session"
+
+msgid "sessions"
+msgstr "sessioner"

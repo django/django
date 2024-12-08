@@ -1,0 +1,299 @@
+=======================
+Conditional Expressions
+=======================
+
+.. currentmodule:: django.db.models.expressions
+
+Conditional expressions let you use :keyword:`if` ... :keyword:`elif` ...
+:keyword:`else` logic within filters, annotations, aggregations, and updates. A
+conditional expression evaluates a series of conditions for each row of a
+table and returns the matching result expression. Conditional expressions can
+also be combined and nested like other :doc:`expressions <expressions>`.
+
+The conditional expression classes
+==================================
+
+We'll be using the following model in the subsequent examples::
+
+    from django.db import models
+
+
+    class Client(models.Model):
+        REGULAR = "R"
+        GOLD = "G"
+        PLATINUM = "P"
+        ACCOUNT_TYPE_CHOICES = {
+            REGULAR: "Regular",
+            GOLD: "Gold",
+            PLATINUM: "Platinum",
+        }
+        name = models.CharField(max_length=50)
+        registered_on = models.DateField()
+        account_type = models.CharField(
+            max_length=1,
+            choices=ACCOUNT_TYPE_CHOICES,
+            default=REGULAR,
+        )
+
+``When``
+--------
+
+.. class:: When(condition=None, then=None, **lookups)
+
+A ``When()`` object is used to encapsulate a condition and its result for use
+in the conditional expression. Using a ``When()`` object is similar to using
+the :meth:`~django.db.models.query.QuerySet.filter` method. The condition can
+be specified using :ref:`field lookups <field-lookups>`,
+:class:`~django.db.models.Q` objects, or :class:`~django.db.models.Expression`
+objects that have an ``output_field`` that is a
+:class:`~django.db.models.BooleanField`. The result is provided using the
+``then`` keyword.
+
+Some examples:
+
+.. code-block:: pycon
+
+    >>> from django.db.models import F, Q, When
+    >>> # String arguments refer to fields; the following two examples are equivalent:
+    >>> When(account_type=Client.GOLD, then="name")
+    >>> When(account_type=Client.GOLD, then=F("name"))
+    >>> # You can use field lookups in the condition
+    >>> from datetime import date
+    >>> When(
+    ...     registered_on__gt=date(2014, 1, 1),
+    ...     registered_on__lt=date(2015, 1, 1),
+    ...     then="account_type",
+    ... )
+    >>> # Complex conditions can be created using Q objects
+    >>> When(Q(name__startswith="John") | Q(name__startswith="Paul"), then="name")
+    >>> # Condition can be created using boolean expressions.
+    >>> from django.db.models import Exists, OuterRef
+    >>> non_unique_account_type = (
+    ...     Client.objects.filter(
+    ...         account_type=OuterRef("account_type"),
+    ...     )
+    ...     .exclude(pk=OuterRef("pk"))
+    ...     .values("pk")
+    ... )
+    >>> When(Exists(non_unique_account_type), then=Value("non unique"))
+    >>> # Condition can be created using lookup expressions.
+    >>> from django.db.models.lookups import GreaterThan, LessThan
+    >>> When(
+    ...     GreaterThan(F("registered_on"), date(2014, 1, 1))
+    ...     & LessThan(F("registered_on"), date(2015, 1, 1)),
+    ...     then="account_type",
+    ... )
+
+Keep in mind that each of these values can be an expression.
+
+.. note::
+
+    Since the ``then`` keyword argument is reserved for the result of the
+    ``When()``, there is a potential conflict if a
+    :class:`~django.db.models.Model` has a field named ``then``. This can be
+    resolved in two ways:
+
+    .. code-block:: pycon
+
+        >>> When(then__exact=0, then=1)
+        >>> When(Q(then=0), then=1)
+
+``Case``
+--------
+
+.. class:: Case(*cases, **extra)
+
+A ``Case()`` expression is like the :keyword:`if` ... :keyword:`elif` ...
+:keyword:`else` statement in ``Python``. Each ``condition`` in the provided
+``When()`` objects is evaluated in order, until one evaluates to a
+truthful value. The ``result`` expression from the matching ``When()`` object
+is returned.
+
+An example:
+
+.. code-block:: pycon
+
+    >>>
+    >>> from datetime import date, timedelta
+    >>> from django.db.models import Case, Value, When
+    >>> Client.objects.create(
+    ...     name="Jane Doe",
+    ...     account_type=Client.REGULAR,
+    ...     registered_on=date.today() - timedelta(days=36),
+    ... )
+    >>> Client.objects.create(
+    ...     name="James Smith",
+    ...     account_type=Client.GOLD,
+    ...     registered_on=date.today() - timedelta(days=5),
+    ... )
+    >>> Client.objects.create(
+    ...     name="Jack Black",
+    ...     account_type=Client.PLATINUM,
+    ...     registered_on=date.today() - timedelta(days=10 * 365),
+    ... )
+    >>> # Get the discount for each Client based on the account type
+    >>> Client.objects.annotate(
+    ...     discount=Case(
+    ...         When(account_type=Client.GOLD, then=Value("5%")),
+    ...         When(account_type=Client.PLATINUM, then=Value("10%")),
+    ...         default=Value("0%"),
+    ...     ),
+    ... ).values_list("name", "discount")
+    <QuerySet [('Jane Doe', '0%'), ('James Smith', '5%'), ('Jack Black', '10%')]>
+
+``Case()`` accepts any number of ``When()`` objects as individual arguments.
+Other options are provided using keyword arguments. If none of the conditions
+evaluate to ``TRUE``, then the expression given with the ``default`` keyword
+argument is returned. If a ``default`` argument isn't provided, ``None`` is
+used.
+
+If we wanted to change our previous query to get the discount based on how long
+the ``Client`` has been with us, we could do so using lookups:
+
+.. code-block:: pycon
+
+    >>> a_month_ago = date.today() - timedelta(days=30)
+    >>> a_year_ago = date.today() - timedelta(days=365)
+    >>> # Get the discount for each Client based on the registration date
+    >>> Client.objects.annotate(
+    ...     discount=Case(
+    ...         When(registered_on__lte=a_year_ago, then=Value("10%")),
+    ...         When(registered_on__lte=a_month_ago, then=Value("5%")),
+    ...         default=Value("0%"),
+    ...     )
+    ... ).values_list("name", "discount")
+    <QuerySet [('Jane Doe', '5%'), ('James Smith', '0%'), ('Jack Black', '10%')]>
+
+.. note::
+
+    Remember that the conditions are evaluated in order, so in the above
+    example we get the correct result even though the second condition matches
+    both Jane Doe and Jack Black. This works just like an :keyword:`if` ...
+    :keyword:`elif` ... :keyword:`else` statement in ``Python``.
+
+``Case()`` also works in a ``filter()`` clause. For example, to find gold
+clients that registered more than a month ago and platinum clients that
+registered more than a year ago:
+
+.. code-block:: pycon
+
+    >>> a_month_ago = date.today() - timedelta(days=30)
+    >>> a_year_ago = date.today() - timedelta(days=365)
+    >>> Client.objects.filter(
+    ...     registered_on__lte=Case(
+    ...         When(account_type=Client.GOLD, then=a_month_ago),
+    ...         When(account_type=Client.PLATINUM, then=a_year_ago),
+    ...     ),
+    ... ).values_list("name", "account_type")
+    <QuerySet [('Jack Black', 'P')]>
+
+Advanced queries
+================
+
+Conditional expressions can be used in annotations, aggregations, filters,
+lookups, and updates. They can also be combined and nested with other
+expressions. This allows you to make powerful conditional queries.
+
+Conditional update
+------------------
+
+Let's say we want to change the ``account_type`` for our clients to match
+their registration dates. We can do this using a conditional expression and the
+:meth:`~django.db.models.query.QuerySet.update` method:
+
+.. code-block:: pycon
+
+    >>> a_month_ago = date.today() - timedelta(days=30)
+    >>> a_year_ago = date.today() - timedelta(days=365)
+    >>> # Update the account_type for each Client from the registration date
+    >>> Client.objects.update(
+    ...     account_type=Case(
+    ...         When(registered_on__lte=a_year_ago, then=Value(Client.PLATINUM)),
+    ...         When(registered_on__lte=a_month_ago, then=Value(Client.GOLD)),
+    ...         default=Value(Client.REGULAR),
+    ...     ),
+    ... )
+    >>> Client.objects.values_list("name", "account_type")
+    <QuerySet [('Jane Doe', 'G'), ('James Smith', 'R'), ('Jack Black', 'P')]>
+
+.. _conditional-aggregation:
+
+Conditional aggregation
+-----------------------
+
+What if we want to find out how many clients there are for each
+``account_type``? We can use the ``filter`` argument of :ref:`aggregate
+functions <aggregation-functions>` to achieve this:
+
+.. code-block:: pycon
+
+    >>> # Create some more Clients first so we can have something to count
+    >>> Client.objects.create(
+    ...     name="Jean Grey", account_type=Client.REGULAR, registered_on=date.today()
+    ... )
+    >>> Client.objects.create(
+    ...     name="James Bond", account_type=Client.PLATINUM, registered_on=date.today()
+    ... )
+    >>> Client.objects.create(
+    ...     name="Jane Porter", account_type=Client.PLATINUM, registered_on=date.today()
+    ... )
+    >>> # Get counts for each value of account_type
+    >>> from django.db.models import Count
+    >>> Client.objects.aggregate(
+    ...     regular=Count("pk", filter=Q(account_type=Client.REGULAR)),
+    ...     gold=Count("pk", filter=Q(account_type=Client.GOLD)),
+    ...     platinum=Count("pk", filter=Q(account_type=Client.PLATINUM)),
+    ... )
+    {'regular': 2, 'gold': 1, 'platinum': 3}
+
+This aggregate produces a query with the SQL 2003 ``FILTER WHERE`` syntax
+on databases that support it:
+
+.. code-block:: sql
+
+    SELECT count('id') FILTER (WHERE account_type=1) as regular,
+           count('id') FILTER (WHERE account_type=2) as gold,
+           count('id') FILTER (WHERE account_type=3) as platinum
+    FROM clients;
+
+On other databases, this is emulated using a ``CASE`` statement:
+
+.. code-block:: sql
+
+    SELECT count(CASE WHEN account_type=1 THEN id ELSE null) as regular,
+           count(CASE WHEN account_type=2 THEN id ELSE null) as gold,
+           count(CASE WHEN account_type=3 THEN id ELSE null) as platinum
+    FROM clients;
+
+The two SQL statements are functionally equivalent but the more explicit
+``FILTER`` may perform better.
+
+Conditional filter
+------------------
+
+When a conditional expression returns a boolean value, it is possible to use it
+directly in filters. This means that it will not be added to the ``SELECT``
+columns, but you can still use it to filter results:
+
+.. code-block:: pycon
+
+    >>> non_unique_account_type = (
+    ...     Client.objects.filter(
+    ...         account_type=OuterRef("account_type"),
+    ...     )
+    ...     .exclude(pk=OuterRef("pk"))
+    ...     .values("pk")
+    ... )
+    >>> Client.objects.filter(~Exists(non_unique_account_type))
+
+In SQL terms, that evaluates to:
+
+.. code-block:: sql
+
+    SELECT ...
+    FROM client c0
+    WHERE NOT EXISTS (
+      SELECT c1.id
+      FROM client c1
+      WHERE c1.account_type = c0.account_type AND NOT c1.id = c0.id
+    )

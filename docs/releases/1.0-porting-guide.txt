@@ -1,0 +1,778 @@
+=========================================
+Porting your apps from Django 0.96 to 1.0
+=========================================
+
+Django 1.0 breaks compatibility with 0.96 in some areas.
+
+This guide will help you port 0.96 projects and apps to 1.0. The first part of
+this document includes the common changes needed to run with 1.0. If after going
+through the first part your code still breaks, check the section `Less-common
+Changes`_ for a list of a bunch of less-common compatibility issues.
+
+.. seealso::
+
+    The :doc:`1.0 release notes </releases/1.0>`. That document explains the new
+    features in 1.0 more deeply; the porting guide is more concerned with
+    helping you quickly update your code.
+
+Common changes
+==============
+
+This section describes the changes between 0.96 and 1.0 that most users will
+need to make.
+
+Use Unicode
+-----------
+
+Change string literals (``'foo'``) into Unicode literals (``u'foo'``). Django
+now uses Unicode strings throughout. In most places, raw strings will continue
+to work, but updating to use Unicode literals will prevent some obscure
+problems.
+
+See :doc:`/ref/unicode` for full details.
+
+Models
+------
+
+Common changes to your models file:
+
+Rename ``maxlength`` to ``max_length``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Rename your ``maxlength`` argument to ``max_length`` (this was changed to be
+consistent with form fields):
+
+Replace ``__str__`` with ``__unicode__``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Replace your model's ``__str__`` function with a ``__unicode__`` method, and
+make sure you `use Unicode`_ (``u'foo'``) in that method.
+
+Remove ``prepopulated_from``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Remove the ``prepopulated_from`` argument on model fields. It's no longer valid
+and has been moved to the ``ModelAdmin`` class in ``admin.py``. See `the
+admin`_, below, for more details about changes to the admin.
+
+Remove ``core``
+~~~~~~~~~~~~~~~
+
+Remove the ``core`` argument from your model fields. It is no longer
+necessary, since the equivalent functionality (part of :ref:`inline editing
+<admin-inlines>`) is handled differently by the admin interface now. You don't
+have to worry about inline editing until you get to `the admin`_ section,
+below. For now, remove all references to ``core``.
+
+Replace ``class Admin:`` with ``admin.py``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Remove all your inner ``class Admin`` declarations from your models. They won't
+break anything if you leave them, but they also won't do anything. To register
+apps with the admin you'll move those declarations to an ``admin.py`` file;
+see `the admin`_ below for more details.
+
+.. seealso::
+
+    A contributor to djangosnippets__ has written a script that'll `scan your
+    models.py and generate a corresponding admin.py`__.
+
+    __ https://djangosnippets.org/
+    __ https://djangosnippets.org/snippets/603/
+
+Example
+~~~~~~~
+
+Below is an example ``models.py`` file with all the changes you'll need to make:
+
+Old (0.96) ``models.py``::
+
+    class Author(models.Model):
+        first_name = models.CharField(maxlength=30)
+        last_name = models.CharField(maxlength=30)
+        slug = models.CharField(maxlength=60, prepopulate_from=("first_name", "last_name"))
+
+        class Admin:
+            list_display = ["first_name", "last_name"]
+
+        def __str__(self):
+            return "%s %s" % (self.first_name, self.last_name)
+
+New (1.0) ``models.py``::
+
+    class Author(models.Model):
+        first_name = models.CharField(max_length=30)
+        last_name = models.CharField(max_length=30)
+        slug = models.CharField(max_length=60)
+
+        def __unicode__(self):
+            return "%s %s" % (self.first_name, self.last_name)
+
+New (1.0) ``admin.py``::
+
+    from django.contrib import admin
+    from models import Author
+
+
+    class AuthorAdmin(admin.ModelAdmin):
+        list_display = ["first_name", "last_name"]
+        prepopulated_fields = {"slug": ("first_name", "last_name")}
+
+
+    admin.site.register(Author, AuthorAdmin)
+
+The Admin
+---------
+
+One of the biggest changes in 1.0 is the new admin. The Django administrative
+interface (``django.contrib.admin``) has been completely refactored; admin
+definitions are now completely decoupled from model definitions, the framework
+has been rewritten to use Django's new form-handling library and redesigned with
+extensibility and customization in mind.
+
+Practically, this means you'll need to rewrite all of your ``class Admin``
+declarations. You've already seen in `models`_ above how to replace your ``class
+Admin`` with an ``admin.site.register()`` call in an ``admin.py`` file. Below are
+some more details on how to rewrite that ``Admin`` declaration into the new
+syntax.
+
+Use new inline syntax
+~~~~~~~~~~~~~~~~~~~~~
+
+The new ``edit_inline`` options have all been moved to ``admin.py``. Here's an
+example:
+
+Old (0.96)::
+
+    class Parent(models.Model): ...
+
+
+    class Child(models.Model):
+        parent = models.ForeignKey(Parent, edit_inline=models.STACKED, num_in_admin=3)
+
+
+New (1.0)::
+
+    class ChildInline(admin.StackedInline):
+        model = Child
+        extra = 3
+
+
+    class ParentAdmin(admin.ModelAdmin):
+        model = Parent
+        inlines = [ChildInline]
+
+
+    admin.site.register(Parent, ParentAdmin)
+
+See :ref:`admin-inlines` for more details.
+
+Simplify ``fields``, or use ``fieldsets``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The old ``fields`` syntax was quite confusing, and has been simplified. The old
+syntax still works, but you'll need to use ``fieldsets`` instead.
+
+Old (0.96)::
+
+    class ModelOne(models.Model):
+        ...
+
+        class Admin:
+            fields = ((None, {"fields": ("foo", "bar")}),)
+
+
+    class ModelTwo(models.Model):
+        ...
+
+        class Admin:
+            fields = (
+                ("group1", {"fields": ("foo", "bar"), "classes": "collapse"}),
+                ("group2", {"fields": ("spam", "eggs"), "classes": "collapse wide"}),
+            )
+
+
+New (1.0)::
+
+    class ModelOneAdmin(admin.ModelAdmin):
+        fields = ("foo", "bar")
+
+
+    class ModelTwoAdmin(admin.ModelAdmin):
+        fieldsets = (
+            ("group1", {"fields": ("foo", "bar"), "classes": "collapse"}),
+            ("group2", {"fields": ("spam", "eggs"), "classes": "collapse wide"}),
+        )
+
+
+.. seealso::
+
+    * More detailed information about the changes and the reasons behind them
+      can be found on the `NewformsAdminBranch wiki page`__
+
+    * The new admin comes with a ton of new features; you can read about them in
+      the :doc:`admin documentation </ref/contrib/admin/index>`.
+
+    __ https://code.djangoproject.com/wiki/NewformsAdminBranch
+
+URLs
+----
+
+Update your root ``urls.py``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you're using the admin site, you need to update your root ``urls.py``.
+
+Old (0.96) ``urls.py``::
+
+    from django.conf.urls.defaults import *
+
+    urlpatterns = patterns(
+        "",
+        (r"^admin/", include("django.contrib.admin.urls")),
+        # ... the rest of your URLs here ...
+    )
+
+New (1.0) ``urls.py``::
+
+    from django.conf.urls.defaults import *
+
+    # The next two lines enable the admin and load each admin.py file:
+    from django.contrib import admin
+
+    admin.autodiscover()
+
+    urlpatterns = patterns(
+        "",
+        (r"^admin/(.*)", admin.site.root),
+        # ... the rest of your URLs here ...
+    )
+
+Views
+-----
+
+Use ``django.forms`` instead of ``newforms``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Replace ``django.newforms`` with ``django.forms`` -- Django 1.0 renamed the
+``newforms`` module (introduced in 0.96) to plain old ``forms``. The
+``oldforms`` module was also removed.
+
+If you're already using the ``newforms`` library, and you used our recommended
+``import`` statement syntax, all you have to do is change your import
+statements.
+
+Old::
+
+    from django import newforms as forms
+
+New::
+
+    from django import forms
+
+If you're using the old forms system (formerly known as ``django.forms`` and
+``django.oldforms``), you'll have to rewrite your forms. A good place to start
+is the :doc:`forms documentation </topics/forms/index>`
+
+Handle uploaded files using the new API
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Replace use of uploaded files -- that is, entries in ``request.FILES`` -- as
+simple dictionaries with the new
+:class:`~django.core.files.uploadedfile.UploadedFile`. The old dictionary
+syntax no longer works.
+
+Thus, in a view like::
+
+      def my_view(request):
+          f = request.FILES["file_field_name"]
+          ...
+
+...you'd need to make the following changes:
+
+===================== =====================
+Old (0.96)            New (1.0)
+===================== =====================
+``f['content']``      ``f.read()``
+``f['filename']``     ``f.name``
+``f['content-type']`` ``f.content_type``
+===================== =====================
+
+Work with file fields using the new API
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The internal implementation of :class:`django.db.models.FileField` have changed.
+A visible result of this is that the way you access special attributes (URL,
+filename, image size, etc.) of these model fields has changed. You will need to
+make the following changes, assuming your model's
+:class:`~django.db.models.FileField` is called ``myfile``:
+
+=================================== ========================
+Old (0.96)                           New (1.0)
+=================================== ========================
+``myfile.get_content_filename()``   ``myfile.content.path``
+``myfile.get_content_url()``        ``myfile.content.url``
+``myfile.get_content_size()``       ``myfile.content.size``
+``myfile.save_content_file()``      ``myfile.content.save()``
+``myfile.get_content_width()``      ``myfile.content.width``
+``myfile.get_content_height()``     ``myfile.content.height``
+=================================== ========================
+
+Note that the ``width`` and ``height`` attributes only make sense for
+:class:`~django.db.models.ImageField` fields. More details can be found in the
+:doc:`model API </ref/models/fields>` documentation.
+
+Use ``Paginator`` instead of ``ObjectPaginator``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``ObjectPaginator`` in 0.96 has been removed and replaced with an improved
+version, :class:`django.core.paginator.Paginator`.
+
+Templates
+---------
+
+Learn to love autoescaping
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+By default, the template system now automatically HTML-escapes the output of
+every variable. To learn more, see :ref:`automatic-html-escaping`.
+
+To disable auto-escaping for an individual variable, use the :tfilter:`safe`
+filter:
+
+.. code-block:: html+django
+
+      This will be escaped: {{ data }}
+      This will not be escaped: {{ data|safe }}
+
+To disable auto-escaping for an entire template, wrap the template (or just a
+particular section of the template) in the :ttag:`autoescape` tag:
+
+.. code-block:: html+django
+
+      {% autoescape off %}
+         ... unescaped template content here ...
+      {% endautoescape %}
+
+Less-common changes
+===================
+
+The following changes are smaller, more localized changes. They should only
+affect more advanced users, but it's probably worth reading through the list and
+checking your code for these things.
+
+Signals
+-------
+
+* Add ``**kwargs`` to any registered signal handlers.
+
+* Connect, disconnect, and send signals via methods on the
+  :class:`~django.dispatch.Signal` object instead of through module methods in
+  ``django.dispatch.dispatcher``.
+
+* Remove any use of the ``Anonymous`` and ``Any`` sender options; they no longer
+  exist. You can still receive signals sent by any sender by using
+  ``sender=None``
+
+* Make any custom signals you've declared into instances of
+  :class:`django.dispatch.Signal` instead of anonymous objects.
+
+Here's quick summary of the code changes you'll need to make:
+
+=================================================  ======================================
+Old (0.96)                                         New (1.0)
+=================================================  ======================================
+``def callback(sender)``                           ``def callback(sender, **kwargs)``
+``sig = object()``                                 ``sig = django.dispatch.Signal()``
+``dispatcher.connect(callback, sig)``              ``sig.connect(callback)``
+``dispatcher.send(sig, sender)``                   ``sig.send(sender)``
+``dispatcher.connect(callback, sig, sender=Any)``  ``sig.connect(callback, sender=None)``
+=================================================  ======================================
+
+Comments
+--------
+
+If you were using Django 0.96's ``django.contrib.comments`` app, you'll need to
+upgrade to the new comments app introduced in 1.0. See the upgrade guide
+for details.
+
+Template tags
+-------------
+
+:ttag:`spaceless` tag
+~~~~~~~~~~~~~~~~~~~~~
+
+The ``spaceless`` template tag now removes *all* spaces between HTML tags,
+instead of preserving a single space.
+
+Local flavors
+-------------
+
+U.S. local flavor
+~~~~~~~~~~~~~~~~~
+
+``django.contrib.localflavor.usa`` has been renamed to
+``django.contrib.localflavor.us``. This change was made to match the naming
+scheme of other local flavors. To migrate your code, all you need to do is
+change the imports.
+
+Sessions
+--------
+
+Getting a new session key
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``SessionBase.get_new_session_key()`` has been renamed to
+``_get_new_session_key()``. ``get_new_session_object()`` no longer exists.
+
+Fixtures
+--------
+
+Loading a row no longer calls ``save()``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Previously, loading a row automatically ran the model's ``save()`` method. This
+is no longer the case, so any fields (for example: timestamps) that were
+auto-populated by a ``save()`` now need explicit values in any fixture.
+
+Settings
+--------
+
+Better exceptions
+~~~~~~~~~~~~~~~~~
+
+The old :exc:`EnvironmentError` has split into an
+:exc:`ImportError` when Django fails to find the settings module
+and a :exc:`RuntimeError` when you try to reconfigure settings
+after having already used them.
+
+:setting:`LOGIN_URL` has moved
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :setting:`LOGIN_URL` constant moved from ``django.contrib.auth`` into the
+``settings`` module. Instead of using ``from django.contrib.auth import
+LOGIN_URL`` refer to :setting:`settings.LOGIN_URL <LOGIN_URL>`.
+
+:setting:`APPEND_SLASH` behavior has been updated
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In 0.96, if a URL didn't end in a slash or have a period in the final
+component of its path, and :setting:`APPEND_SLASH` was True, Django would
+redirect to the same URL, but with a slash appended to the end. Now, Django
+checks to see whether the pattern without the trailing slash would be matched
+by something in your URL patterns. If so, no redirection takes place, because
+it is assumed you deliberately wanted to catch that pattern.
+
+For most people, this won't require any changes. Some people, though, have URL
+patterns that look like this::
+
+    r"/some_prefix/(.*)$"
+
+Previously, those patterns would have been redirected to have a trailing
+slash. If you always want a slash on such URLs, rewrite the pattern as::
+
+    r"/some_prefix/(.*/)$"
+
+Smaller model changes
+---------------------
+
+Different exception from ``get()``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Managers now return a :exc:`~django.core.exceptions.MultipleObjectsReturned`
+exception instead of :exc:`AssertionError`:
+
+Old (0.96)::
+
+    try:
+        Model.objects.get(...)
+    except AssertionError:
+        handle_the_error()
+
+New (1.0)::
+
+  try:
+      Model.objects.get(...)
+  except Model.MultipleObjectsReturned:
+      handle_the_error()
+
+``LazyDate`` has been fired
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``LazyDate`` helper class no longer exists.
+
+Default field values and query arguments can both be callable objects, so
+instances of ``LazyDate`` can be replaced with a reference to ``datetime.datetime.now``:
+
+Old (0.96)::
+
+    class Article(models.Model):
+        title = models.CharField(maxlength=100)
+        published = models.DateField(default=LazyDate())
+
+New (1.0)::
+
+    import datetime
+
+
+    class Article(models.Model):
+        title = models.CharField(max_length=100)
+        published = models.DateField(default=datetime.datetime.now)
+
+``DecimalField`` is new, and ``FloatField`` is now a proper float
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Old (0.96)::
+
+    class MyModel(models.Model):
+        field_name = models.FloatField(max_digits=10, decimal_places=3)
+        ...
+
+New (1.0)::
+
+    class MyModel(models.Model):
+        field_name = models.DecimalField(max_digits=10, decimal_places=3)
+        ...
+
+If you forget to make this change, you will see errors about ``FloatField``
+not taking a ``max_digits`` attribute in ``__init__``, because the new
+``FloatField`` takes no precision-related arguments.
+
+If you're using MySQL or PostgreSQL, no further changes are needed. The
+database column types for ``DecimalField`` are the same as for the old
+``FloatField``.
+
+If you're using SQLite, you need to force the database to view the
+appropriate columns as decimal types, rather than floats. To do this, you'll
+need to reload your data. Do this after you have made the change to using
+``DecimalField`` in your code and updated the Django code.
+
+.. warning::
+
+  **Back up your database first!**
+
+  For SQLite, this means making a copy of the single file that stores the
+  database (the name of that file is the ``DATABASE_NAME`` in your
+  ``settings.py`` file).
+
+To upgrade each application to use a ``DecimalField``, you can do the
+following, replacing ``<app>`` in the code below with each app's name:
+
+.. code-block:: console
+
+      $ ./manage.py dumpdata --format=xml <app> > data-dump.xml
+      $ ./manage.py reset <app>
+      $ ./manage.py loaddata data-dump.xml
+
+Notes:
+
+1. It's important that you remember to use XML format in the first step of
+   this process. We are exploiting a feature of the XML data dumps that makes
+   porting floats to decimals with SQLite possible.
+
+2. In the second step you will be asked to confirm that you are prepared to
+   lose the data for the application(s) in question. Say yes; we'll restore
+   this data in the third step.
+
+3. ``DecimalField`` is not used in any of the apps shipped with Django prior
+   to this change being made, so you do not need to worry about performing
+   this procedure for any of the standard Django models.
+
+If something goes wrong in the above process, just copy your backed up
+database file over the original file and start again.
+
+Internationalization
+--------------------
+
+:func:`django.views.i18n.set_language` now requires a POST request
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Previously, a GET request was used. The old behavior meant that state (the
+locale used to display the site) could be changed by a GET request, which is
+against the HTTP specification's recommendations. Code calling this view must
+ensure that a POST request is now made, instead of a GET. This means you can
+no longer use a link to access the view, but must use a form submission of
+some kind (e.g. a button).
+
+``_()`` is no longer in builtins
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``_()`` (the callable object whose name is a single underscore) is no longer
+monkeypatched into builtins -- that is, it's no longer available magically in
+every module.
+
+If you were previously relying on ``_()`` always being present, you should now
+explicitly import ``ugettext`` or ``ugettext_lazy``, if appropriate, and alias
+it to ``_`` yourself::
+
+    from django.utils.translation import ugettext as _
+
+HTTP request/response objects
+-----------------------------
+
+Dictionary access to ``HttpRequest``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``HttpRequest`` objects no longer directly support dictionary-style
+access; previously, both ``GET`` and ``POST`` data were directly
+available on the ``HttpRequest`` object (e.g., you could check for a
+piece of form data by using ``if 'some_form_key' in request`` or by
+reading ``request['some_form_key']``. This is no longer supported; if
+you need access to the combined ``GET`` and ``POST`` data, use
+``request.REQUEST`` instead.
+
+It is strongly suggested, however, that you always explicitly look in
+the appropriate dictionary for the type of request you expect to
+receive (``request.GET`` or ``request.POST``); relying on the combined
+``request.REQUEST`` dictionary can mask the origin of incoming data.
+
+Accessing ``HTTPResponse`` headers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``django.http.HttpResponse.headers`` has been renamed to ``_headers`` and
+:class:`~django.http.HttpResponse` now supports containment checking directly.
+So use ``if header in response:`` instead of ``if header in response.headers:``.
+
+Generic relations
+-----------------
+
+Generic relations have been moved out of core
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The generic relation classes -- ``GenericForeignKey`` and ``GenericRelation``
+-- have moved into the :mod:`django.contrib.contenttypes` module.
+
+Testing
+-------
+
+:meth:`django.test.Client.login` has changed
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Old (0.96)::
+
+    from django.test import Client
+
+    c = Client()
+    c.login("/path/to/login", "myuser", "mypassword")
+
+New (1.0)::
+
+    # ... same as above, but then:
+    c.login(username="myuser", password="mypassword")
+
+Management commands
+-------------------
+
+Running management commands from your code
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:mod:`django.core.management` has been greatly refactored.
+
+Calls to management services in your code now need to use
+``call_command``. For example, if you have some test code that calls flush and
+load_data::
+
+      from django.core import management
+
+      management.flush(verbosity=0, interactive=False)
+      management.load_data(["test_data"], verbosity=0)
+
+...you'll need to change this code to read::
+
+      from django.core import management
+
+      management.call_command("flush", verbosity=0, interactive=False)
+      management.call_command("loaddata", "test_data", verbosity=0)
+
+Subcommands must now precede options
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``django-admin.py`` and ``manage.py`` now require subcommands to precede
+options. So:
+
+.. code-block:: console
+
+      $ django-admin.py --settings=foo.bar runserver
+
+...no longer works and should be changed to:
+
+.. code-block:: console
+
+      $ django-admin.py runserver --settings=foo.bar
+
+Syndication
+-----------
+
+``Feed.__init__`` has changed
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``__init__()`` method of the syndication framework's ``Feed`` class now
+takes an ``HttpRequest`` object as its second parameter, instead of the feed's
+URL. This allows the syndication framework to work without requiring the sites
+framework. This only affects code that subclasses ``Feed`` and overrides the
+``__init__()`` method, and code that calls ``Feed.__init__()`` directly.
+
+Data structures
+---------------
+
+``SortedDictFromList`` is gone
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``django.newforms.forms.SortedDictFromList`` was removed.
+``django.utils.datastructures.SortedDict`` can now be instantiated with
+a sequence of tuples.
+
+To update your code:
+
+1. Use ``django.utils.datastructures.SortedDict`` wherever you were
+   using ``django.newforms.forms.SortedDictFromList``.
+
+2. Because ``django.utils.datastructures.SortedDict.copy`` doesn't
+   return a deepcopy as ``SortedDictFromList.copy()`` did, you will need
+   to update your code if you were relying on a deepcopy. Do this by using
+   ``copy.deepcopy`` directly.
+
+Database backend functions
+--------------------------
+
+Database backend functions have been renamed
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Almost *all* of the database backend-level functions have been renamed and/or
+relocated. None of these were documented, but you'll need to change your code
+if you're using any of these functions, all of which are in :mod:`django.db`:
+
+=======================================  ===================================================
+Old (0.96)                               New (1.0)
+=======================================  ===================================================
+``backend.get_autoinc_sql``              ``connection.ops.autoinc_sql``
+``backend.get_date_extract_sql``         ``connection.ops.date_extract_sql``
+``backend.get_date_trunc_sql``           ``connection.ops.date_trunc_sql``
+``backend.get_datetime_cast_sql``        ``connection.ops.datetime_cast_sql``
+``backend.get_deferrable_sql``           ``connection.ops.deferrable_sql``
+``backend.get_drop_foreignkey_sql``      ``connection.ops.drop_foreignkey_sql``
+``backend.get_fulltext_search_sql``      ``connection.ops.fulltext_search_sql``
+``backend.get_last_insert_id``           ``connection.ops.last_insert_id``
+``backend.get_limit_offset_sql``         ``connection.ops.limit_offset_sql``
+``backend.get_max_name_length``          ``connection.ops.max_name_length``
+``backend.get_pk_default_value``         ``connection.ops.pk_default_value``
+``backend.get_random_function_sql``      ``connection.ops.random_function_sql``
+``backend.get_sql_flush``                ``connection.ops.sql_flush``
+``backend.get_sql_sequence_reset``       ``connection.ops.sequence_reset_sql``
+``backend.get_start_transaction_sql``    ``connection.ops.start_transaction_sql``
+``backend.get_tablespace_sql``           ``connection.ops.tablespace_sql``
+``backend.quote_name``                   ``connection.ops.quote_name``
+``backend.get_query_set_class``          ``connection.ops.query_set_class``
+``backend.get_field_cast_sql``           ``connection.ops.field_cast_sql``
+``backend.get_drop_sequence``            ``connection.ops.drop_sequence_sql``
+``backend.OPERATOR_MAPPING``             ``connection.operators``
+``backend.allows_group_by_ordinal``      ``connection.features.allows_group_by_ordinal``
+``backend.allows_unique_and_pk``         ``connection.features.allows_unique_and_pk``
+``backend.autoindexes_primary_keys``     ``connection.features.autoindexes_primary_keys``
+``backend.needs_datetime_string_cast``   ``connection.features.needs_datetime_string_cast``
+``backend.needs_upper_for_iops``         ``connection.features.needs_upper_for_iops``
+``backend.supports_constraints``         ``connection.features.supports_constraints``
+``backend.supports_tablespaces``         ``connection.features.supports_tablespaces``
+``backend.uses_case_insensitive_names``  ``connection.features.uses_case_insensitive_names``
+``backend.uses_custom_queryset``         ``connection.features.uses_custom_queryset``
+=======================================  ===================================================

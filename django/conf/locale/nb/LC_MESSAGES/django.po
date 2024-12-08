@@ -1,0 +1,1324 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Alexander Hansen <alexander.l.hansen@gmail.com>, 2014
+# Eirik Krogstad <eirikkr@gmail.com>, 2014
+# Jannis Leidel <jannis@leidel.info>, 2011
+# jensadne <jensadne@pvv.ntnu.no>, 2014-2015
+# Jon, 2015-2016
+# Jon, 2014
+# Jon, 2017-2022
+# Jon, 2013
+# Jon, 2011
+# Sigurd Gartmann <sigurdga-transifex@sigurdga.no>, 2012
+# Tommy Strand <transifex@ireality.no>, 2013
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-25 06:49+0000\n"
+"Last-Translator: Jon, 2017-2022\n"
+"Language-Team: Norwegian Bokmål (http://www.transifex.com/django/django/"
+"language/nb/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: nb\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Afrikaans"
+msgstr "Afrikaans"
+
+msgid "Arabic"
+msgstr "Arabisk"
+
+msgid "Algerian Arabic"
+msgstr "Algerisk arabisk"
+
+msgid "Asturian"
+msgstr "Asturiansk"
+
+msgid "Azerbaijani"
+msgstr "Aserbajdsjansk"
+
+msgid "Bulgarian"
+msgstr "Bulgarsk"
+
+msgid "Belarusian"
+msgstr "Hviterussisk"
+
+msgid "Bengali"
+msgstr "Bengalsk"
+
+msgid "Breton"
+msgstr "Bretonsk"
+
+msgid "Bosnian"
+msgstr "Bosnisk"
+
+msgid "Catalan"
+msgstr "Katalansk"
+
+msgid "Central Kurdish (Sorani)"
+msgstr ""
+
+msgid "Czech"
+msgstr "Tsjekkisk"
+
+msgid "Welsh"
+msgstr "Walisisk"
+
+msgid "Danish"
+msgstr "Dansk"
+
+msgid "German"
+msgstr "Tysk"
+
+msgid "Lower Sorbian"
+msgstr "Lavsorbisk"
+
+msgid "Greek"
+msgstr "Gresk"
+
+msgid "English"
+msgstr "Engelsk"
+
+msgid "Australian English"
+msgstr "Engelsk (australsk)"
+
+msgid "British English"
+msgstr "Engelsk (britisk)"
+
+msgid "Esperanto"
+msgstr "Esperanto"
+
+msgid "Spanish"
+msgstr "Spansk"
+
+msgid "Argentinian Spanish"
+msgstr "Argentinsk spansk"
+
+msgid "Colombian Spanish"
+msgstr "Colombiansk spansk"
+
+msgid "Mexican Spanish"
+msgstr "Meksikansk spansk"
+
+msgid "Nicaraguan Spanish"
+msgstr "Nicaraguansk spansk"
+
+msgid "Venezuelan Spanish"
+msgstr "Venezuelanske spansk"
+
+msgid "Estonian"
+msgstr "Estisk"
+
+msgid "Basque"
+msgstr "Baskisk"
+
+msgid "Persian"
+msgstr "Persisk"
+
+msgid "Finnish"
+msgstr "Finsk"
+
+msgid "French"
+msgstr "Fransk"
+
+msgid "Frisian"
+msgstr "Frisisk"
+
+msgid "Irish"
+msgstr "Irsk"
+
+msgid "Scottish Gaelic"
+msgstr "Skotsk-gælisk"
+
+msgid "Galician"
+msgstr "Galisisk"
+
+msgid "Hebrew"
+msgstr "Hebraisk"
+
+msgid "Hindi"
+msgstr "Hindi"
+
+msgid "Croatian"
+msgstr "Kroatisk"
+
+msgid "Upper Sorbian"
+msgstr "Høysorbisk"
+
+msgid "Hungarian"
+msgstr "Ungarsk"
+
+msgid "Armenian"
+msgstr "Armensk"
+
+msgid "Interlingua"
+msgstr "Interlingua"
+
+msgid "Indonesian"
+msgstr "Indonesisk"
+
+msgid "Igbo"
+msgstr "Ibo"
+
+msgid "Ido"
+msgstr "Ido"
+
+msgid "Icelandic"
+msgstr "Islandsk"
+
+msgid "Italian"
+msgstr "Italiensk"
+
+msgid "Japanese"
+msgstr "Japansk"
+
+msgid "Georgian"
+msgstr "Georgisk"
+
+msgid "Kabyle"
+msgstr "Kabylsk"
+
+msgid "Kazakh"
+msgstr "Kasakhisk"
+
+msgid "Khmer"
+msgstr "Khmer"
+
+msgid "Kannada"
+msgstr "Kannada"
+
+msgid "Korean"
+msgstr "Koreansk"
+
+msgid "Kyrgyz"
+msgstr "Kirgisisk"
+
+msgid "Luxembourgish"
+msgstr "Luxembourgsk"
+
+msgid "Lithuanian"
+msgstr "Litauisk"
+
+msgid "Latvian"
+msgstr "Latvisk"
+
+msgid "Macedonian"
+msgstr "Makedonsk"
+
+msgid "Malayalam"
+msgstr "Malayalam"
+
+msgid "Mongolian"
+msgstr "Mongolsk"
+
+msgid "Marathi"
+msgstr "Marathi"
+
+msgid "Malay"
+msgstr "Malayisk"
+
+msgid "Burmese"
+msgstr "Burmesisk"
+
+msgid "Norwegian Bokmål"
+msgstr "Norsk (bokmål)"
+
+msgid "Nepali"
+msgstr "Nepali"
+
+msgid "Dutch"
+msgstr "Nederlandsk"
+
+msgid "Norwegian Nynorsk"
+msgstr "Norsk (nynorsk)"
+
+msgid "Ossetic"
+msgstr "Ossetisk"
+
+msgid "Punjabi"
+msgstr "Panjabi"
+
+msgid "Polish"
+msgstr "Polsk"
+
+msgid "Portuguese"
+msgstr "Portugisisk"
+
+msgid "Brazilian Portuguese"
+msgstr "Brasiliansk portugisisk"
+
+msgid "Romanian"
+msgstr "Rumensk"
+
+msgid "Russian"
+msgstr "Russisk"
+
+msgid "Slovak"
+msgstr "Slovakisk"
+
+msgid "Slovenian"
+msgstr "Slovensk"
+
+msgid "Albanian"
+msgstr "Albansk"
+
+msgid "Serbian"
+msgstr "Serbisk"
+
+msgid "Serbian Latin"
+msgstr "Serbisk latin"
+
+msgid "Swedish"
+msgstr "Svensk"
+
+msgid "Swahili"
+msgstr "Swahili"
+
+msgid "Tamil"
+msgstr "Tamil"
+
+msgid "Telugu"
+msgstr "Telugu"
+
+msgid "Tajik"
+msgstr "Tadsjikisk"
+
+msgid "Thai"
+msgstr "Thai"
+
+msgid "Turkmen"
+msgstr "Turkmensk"
+
+msgid "Turkish"
+msgstr "Tyrkisk"
+
+msgid "Tatar"
+msgstr "Tatarisk"
+
+msgid "Udmurt"
+msgstr "Udmurtisk"
+
+msgid "Ukrainian"
+msgstr "Ukrainsk"
+
+msgid "Urdu"
+msgstr "Urdu"
+
+msgid "Uzbek"
+msgstr "Usbekisk"
+
+msgid "Vietnamese"
+msgstr "Vietnamesisk"
+
+msgid "Simplified Chinese"
+msgstr "Forenklet kinesisk"
+
+msgid "Traditional Chinese"
+msgstr "Tradisjonell kinesisk"
+
+msgid "Messages"
+msgstr "Meldinger"
+
+msgid "Site Maps"
+msgstr "Sidekart"
+
+msgid "Static Files"
+msgstr "Statiske filer"
+
+msgid "Syndication"
+msgstr "Syndikering"
+
+#. Translators: String used to replace omitted page numbers in elided page
+#. range generated by paginators, e.g. [1, 2, '…', 5, 6, 7, '…', 9, 10].
+msgid "…"
+msgstr "…"
+
+msgid "That page number is not an integer"
+msgstr "Sidenummeret er ikke et heltall"
+
+msgid "That page number is less than 1"
+msgstr "Sidenummeret er mindre enn 1"
+
+msgid "That page contains no results"
+msgstr "Siden inneholder ingen resultater"
+
+msgid "Enter a valid value."
+msgstr "Oppgi en gyldig verdi."
+
+msgid "Enter a valid URL."
+msgstr "Oppgi en gyldig nettadresse."
+
+msgid "Enter a valid integer."
+msgstr "Skriv inn et gyldig heltall."
+
+msgid "Enter a valid email address."
+msgstr "Oppgi en gyldig e-postadresse"
+
+#. Translators: "letters" means latin letters: a-z and A-Z.
+msgid ""
+"Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
+msgstr ""
+"Oppgi en gyldig \"slug\" bestående av bokstaver, nummer, understreker eller "
+"bindestreker."
+
+msgid ""
+"Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr ""
+"Oppgi en gyldig \"slug\" bestående av Unicode-bokstaver, nummer, "
+"understreker eller bindestreker."
+
+msgid "Enter a valid IPv4 address."
+msgstr "Oppgi en gyldig IPv4-adresse."
+
+msgid "Enter a valid IPv6 address."
+msgstr "Oppgi en gyldig IPv6-adresse."
+
+msgid "Enter a valid IPv4 or IPv6 address."
+msgstr "Oppgi en gyldig IPv4- eller IPv6-adresse."
+
+msgid "Enter only digits separated by commas."
+msgstr "Oppgi kun tall adskilt med komma."
+
+#, python-format
+msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
+msgstr "Verdien må være %(limit_value)s (den er %(show_value)s)."
+
+#, python-format
+msgid "Ensure this value is less than or equal to %(limit_value)s."
+msgstr "Verdien må være mindre enn eller lik %(limit_value)s."
+
+#, python-format
+msgid "Ensure this value is greater than or equal to %(limit_value)s."
+msgstr "Verdien må være større enn eller lik %(limit_value)s."
+
+#, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr "Verdien må være et multiplum av trinnstørrelse %(limit_value)s."
+
+#, python-format
+msgid ""
+"Ensure this value has at least %(limit_value)d character (it has "
+"%(show_value)d)."
+msgid_plural ""
+"Ensure this value has at least %(limit_value)d characters (it has "
+"%(show_value)d)."
+msgstr[0] ""
+"Sørg for denne verdien har minst %(limit_value)d tegn (den har "
+"%(show_value)d)."
+msgstr[1] ""
+"Sørg for at denne verdien har minst %(limit_value)d tegn (den har "
+"%(show_value)d)."
+
+#, python-format
+msgid ""
+"Ensure this value has at most %(limit_value)d character (it has "
+"%(show_value)d)."
+msgid_plural ""
+"Ensure this value has at most %(limit_value)d characters (it has "
+"%(show_value)d)."
+msgstr[0] ""
+"Sørg for denne verdien har %(limit_value)d tegn (den har nå %(show_value)d)."
+msgstr[1] ""
+"Sørg for at denne verdien har %(limit_value)d eller færre tegn (den har nå "
+"%(show_value)d)."
+
+msgid "Enter a number."
+msgstr "Oppgi et tall."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] "Sørg for at det er kun %(max)s tall."
+msgstr[1] "Sørg for at det er %(max)s eller færre tall totalt."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] "Sørg for at det er kun %(max)s desimal."
+msgstr[1] "Sørg for at det er %(max)s eller færre desimaler."
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] "Sørg for at det kun %(max)s tall før desimalpunkt."
+msgstr[1] "Sørg for at det er %(max)s eller færre tall før desimalpunkt."
+
+#, python-format
+msgid ""
+"File extension “%(extension)s” is not allowed. Allowed extensions are: "
+"%(allowed_extensions)s."
+msgstr ""
+"Filendelsen \"%(extension)s\" er ikke tillatt. Tillatte filendelser er: "
+"%(allowed_extensions)s."
+
+msgid "Null characters are not allowed."
+msgstr "Null-tegn er ikke tillatt."
+
+msgid "and"
+msgstr "og"
+
+#, python-format
+msgid "%(model_name)s with this %(field_labels)s already exists."
+msgstr "%(model_name)s med denne %(field_labels)s finnes allerede."
+
+#, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr "Begrensning \"%(name)s\" er brutt."
+
+#, python-format
+msgid "Value %(value)r is not a valid choice."
+msgstr "Verdien %(value)r er ikke et gyldig valg."
+
+msgid "This field cannot be null."
+msgstr "Feltet kan ikke være tomt."
+
+msgid "This field cannot be blank."
+msgstr "Feltet kan ikke være blankt."
+
+#, python-format
+msgid "%(model_name)s with this %(field_label)s already exists."
+msgstr "%(model_name)s med %(field_label)s finnes allerede."
+
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
+#, python-format
+msgid ""
+"%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
+msgstr "%(field_label)s må være unik for %(date_field_label)s %(lookup_type)s."
+
+#, python-format
+msgid "Field of type: %(field_type)s"
+msgstr "Felt av typen: %(field_type)s"
+
+#, python-format
+msgid "“%(value)s” value must be either True or False."
+msgstr "\"%(value)s\"-verdien må være enten True eller False."
+
+#, python-format
+msgid "“%(value)s” value must be either True, False, or None."
+msgstr "\"%(value)s\"-verdien må være enten True, False, eller None."
+
+msgid "Boolean (Either True or False)"
+msgstr "Boolsk (True eller False)"
+
+#, python-format
+msgid "String (up to %(max_length)s)"
+msgstr "Tekst (opp til %(max_length)s tegn)"
+
+msgid "String (unlimited)"
+msgstr ""
+
+msgid "Comma-separated integers"
+msgstr "Heltall adskilt med komma"
+
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
+"format."
+msgstr ""
+"\"%(value)s\"-verdien har et ugyldig datoformat. Det må være på formen YYYY-"
+"MM-DD."
+
+#, python-format
+msgid ""
+"“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
+"date."
+msgstr ""
+"\"%(value)s\"-verdien er på den korrekte formen (YYYY-MM-DD), men det er en "
+"ugyldig dato."
+
+msgid "Date (without time)"
+msgstr "Dato (uten tid)"
+
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"uuuuuu]][TZ] format."
+msgstr ""
+"\"%(value)s\"-verdien har et ugyldig datoformat. Det må være på formen YYYY-"
+"MM-DD HH:MM[:ss[.uuuuuu]][TZ]."
+
+#, python-format
+msgid ""
+"“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"[TZ]) but it is an invalid date/time."
+msgstr ""
+"\"%(value)s\"-verdien er på den korrekte formen (YYYY-MM-DD HH:MM[:ss[."
+"uuuuuu]][TZ]), men er ugyldig dato/tid."
+
+msgid "Date (with time)"
+msgstr "Dato (med tid)"
+
+#, python-format
+msgid "“%(value)s” value must be a decimal number."
+msgstr "\"%(value)s\"-verdien må være et desimaltall."
+
+msgid "Decimal number"
+msgstr "Desimaltall"
+
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
+"uuuuuu] format."
+msgstr ""
+"\"%(value)s\"-verdien har et ugyldig format. Det må være på formen [DD] [HH:"
+"[MM:]]ss[.uuuuuu]."
+
+msgid "Duration"
+msgstr "Varighet"
+
+msgid "Email address"
+msgstr "E-postadresse"
+
+msgid "File path"
+msgstr "Filsti"
+
+#, python-format
+msgid "“%(value)s” value must be a float."
+msgstr "Verdien \"%(value)s\" må være et flyttall."
+
+msgid "Floating point number"
+msgstr "Flyttall"
+
+#, python-format
+msgid "“%(value)s” value must be an integer."
+msgstr "\"%(value)s\"-verdien må være et heltall."
+
+msgid "Integer"
+msgstr "Heltall"
+
+msgid "Big (8 byte) integer"
+msgstr "Stort (8 byte) heltall"
+
+msgid "Small integer"
+msgstr "Lite heltall"
+
+msgid "IPv4 address"
+msgstr "IPv4-adresse"
+
+msgid "IP address"
+msgstr "IP-adresse"
+
+#, python-format
+msgid "“%(value)s” value must be either None, True or False."
+msgstr "Verdien \"%(value)s\" må være enten None, True eller False."
+
+msgid "Boolean (Either True, False or None)"
+msgstr "Boolsk (True, False eller None)"
+
+msgid "Positive big integer"
+msgstr "Positivt stort heltall"
+
+msgid "Positive integer"
+msgstr "Positivt heltall"
+
+msgid "Positive small integer"
+msgstr "Positivt lite heltall"
+
+#, python-format
+msgid "Slug (up to %(max_length)s)"
+msgstr "Slug (opp til %(max_length)s)"
+
+msgid "Text"
+msgstr "Tekst"
+
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
+"format."
+msgstr ""
+"\"%(value)s\"-verdien har et ugyldig format. Det må være på formen HH:MM[:"
+"ss[.uuuuuu]]."
+
+#, python-format
+msgid ""
+"“%(value)s” value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
+"invalid time."
+msgstr ""
+"Verdien \"%(value)s\" har riktig format (HH:MM[:ss[.uuuuuu]]), men er ikke "
+"et gyldig klokkeslett."
+
+msgid "Time"
+msgstr "Tid"
+
+msgid "URL"
+msgstr "Nettadresse"
+
+msgid "Raw binary data"
+msgstr "Rå binærdata"
+
+#, python-format
+msgid "“%(value)s” is not a valid UUID."
+msgstr "\"%(value)s\" er ikke en gyldig UUID."
+
+msgid "Universally unique identifier"
+msgstr "Universelt unik identifikator"
+
+msgid "File"
+msgstr "Fil"
+
+msgid "Image"
+msgstr "Bilde"
+
+msgid "A JSON object"
+msgstr "Et JSON-objekt"
+
+msgid "Value must be valid JSON."
+msgstr "Verdi må være gyldig JSON."
+
+#, python-format
+msgid "%(model)s instance with %(field)s %(value)r does not exist."
+msgstr "%(model)s-instansen med %(field)s %(value)r finnes ikke."
+
+msgid "Foreign Key (type determined by related field)"
+msgstr "Fremmednøkkel (type bestemmes av relatert felt)"
+
+msgid "One-to-one relationship"
+msgstr "En-til-en-relasjon"
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr "%(from)s-%(to)s-relasjon"
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr "%(from)s-%(to)s-relasjoner"
+
+msgid "Many-to-many relationship"
+msgstr "Mange-til-mange-relasjon"
+
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ":?.!"
+
+msgid "This field is required."
+msgstr "Feltet er påkrevet."
+
+msgid "Enter a whole number."
+msgstr "Oppgi et heltall."
+
+msgid "Enter a valid date."
+msgstr "Oppgi en gyldig dato."
+
+msgid "Enter a valid time."
+msgstr "Oppgi et gyldig tidspunkt."
+
+msgid "Enter a valid date/time."
+msgstr "Oppgi gyldig dato og tidspunkt."
+
+msgid "Enter a valid duration."
+msgstr "Oppgi en gyldig varighet."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "Antall dager må være mellom {min_days} og {max_days}."
+
+msgid "No file was submitted. Check the encoding type on the form."
+msgstr "Ingen fil ble sendt. Sjekk «encoding»-typen på skjemaet."
+
+msgid "No file was submitted."
+msgstr "Ingen fil ble sendt."
+
+msgid "The submitted file is empty."
+msgstr "Filen er tom."
+
+#, python-format
+msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
+msgid_plural ""
+"Ensure this filename has at most %(max)d characters (it has %(length)d)."
+msgstr[0] "Sørg for at filnavnet har %(max)d tegn (det har nå %(length)d)."
+msgstr[1] ""
+"Sørg for at filnavnet har færre enn %(max)d tegn (det har nå %(length)d)."
+
+msgid "Please either submit a file or check the clear checkbox, not both."
+msgstr "Vennligst last opp en ny fil eller marker fjern-boksen, ikke begge."
+
+msgid ""
+"Upload a valid image. The file you uploaded was either not an image or a "
+"corrupted image."
+msgstr ""
+"Last opp et gyldig bilde. Filen du lastet opp var ødelagt eller ikke et "
+"bilde."
+
+#, python-format
+msgid "Select a valid choice. %(value)s is not one of the available choices."
+msgstr "Velg et gyldig valg. %(value)s er ikke et av de tilgjengelige valgene."
+
+msgid "Enter a list of values."
+msgstr "Oppgi en liste med verdier."
+
+msgid "Enter a complete value."
+msgstr "Skriv inn en fullstendig verdi."
+
+msgid "Enter a valid UUID."
+msgstr "Oppgi en gyldig UUID."
+
+msgid "Enter a valid JSON."
+msgstr "Oppgi gyldig JSON."
+
+#. Translators: This is the default suffix added to form field labels
+msgid ":"
+msgstr ":"
+
+#, python-format
+msgid "(Hidden field %(name)s) %(error)s"
+msgstr "(Skjult felt %(name)s) %(error)s"
+
+#, python-format
+msgid ""
+"ManagementForm data is missing or has been tampered with. Missing fields: "
+"%(field_names)s. You may need to file a bug report if the issue persists."
+msgstr ""
+"ManagementForm-data mangler eller har blitt tuklet med. Felt som mangler: "
+"%(field_names)s. Du må muligens rapportere en bug hvis problemet vedvarer."
+
+#, python-format
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] "Vennligst send inn maks %(num)d skjema."
+msgstr[1] "Vennligst send inn maks %(num)d skjemaer."
+
+#, python-format
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] "Vennligst send inn minst %(num)d skjema."
+msgstr[1] "Vennligst send inn minst %(num)d skjemaer."
+
+msgid "Order"
+msgstr "Rekkefølge"
+
+msgid "Delete"
+msgstr "Slett"
+
+#, python-format
+msgid "Please correct the duplicate data for %(field)s."
+msgstr "Vennligst korriger dupliserte data for %(field)s."
+
+#, python-format
+msgid "Please correct the duplicate data for %(field)s, which must be unique."
+msgstr "Vennligst korriger dupliserte data for %(field)s, som må være unike."
+
+#, python-format
+msgid ""
+"Please correct the duplicate data for %(field_name)s which must be unique "
+"for the %(lookup)s in %(date_field)s."
+msgstr ""
+"Vennligst korriger dupliserte data for %(field_name)s, som må være unike for "
+"%(lookup)s i %(date_field)s."
+
+msgid "Please correct the duplicate values below."
+msgstr "Vennligst korriger de dupliserte verdiene nedenfor."
+
+msgid "The inline value did not match the parent instance."
+msgstr "Inline-verdien var ikke i samsvar med foreldre-instansen."
+
+msgid "Select a valid choice. That choice is not one of the available choices."
+msgstr "Velg et gyldig valg. Valget er ikke av de tilgjengelige valgene."
+
+#, python-format
+msgid "“%(pk)s” is not a valid value."
+msgstr "\"%(pk)s\" er ikke en gyldig verdi."
+
+#, python-format
+msgid ""
+"%(datetime)s couldn’t be interpreted in time zone %(current_timezone)s; it "
+"may be ambiguous or it may not exist."
+msgstr ""
+"%(datetime)s kunne ikke tolkes i tidssonen %(current_timezone)s, det kan "
+"være tvetydig eller ikke eksistere."
+
+msgid "Clear"
+msgstr "Fjern"
+
+msgid "Currently"
+msgstr "Nåværende"
+
+msgid "Change"
+msgstr "Endre"
+
+msgid "Unknown"
+msgstr "Ukjent"
+
+msgid "Yes"
+msgstr "Ja"
+
+msgid "No"
+msgstr "Nei"
+
+#. Translators: Please do not add spaces around commas.
+msgid "yes,no,maybe"
+msgstr "ja,nei,kanskje"
+
+#, python-format
+msgid "%(size)d byte"
+msgid_plural "%(size)d bytes"
+msgstr[0] "%(size)d byte"
+msgstr[1] "%(size)d byte"
+
+#, python-format
+msgid "%s KB"
+msgstr "%s KB"
+
+#, python-format
+msgid "%s MB"
+msgstr "%s MB"
+
+#, python-format
+msgid "%s GB"
+msgstr "%s GB"
+
+#, python-format
+msgid "%s TB"
+msgstr "%s TB"
+
+#, python-format
+msgid "%s PB"
+msgstr "%s PB"
+
+msgid "p.m."
+msgstr "p.m."
+
+msgid "a.m."
+msgstr "a.m."
+
+msgid "PM"
+msgstr "PM"
+
+msgid "AM"
+msgstr "AM"
+
+msgid "midnight"
+msgstr "midnatt"
+
+msgid "noon"
+msgstr "12:00"
+
+msgid "Monday"
+msgstr "mandag"
+
+msgid "Tuesday"
+msgstr "tirsdag"
+
+msgid "Wednesday"
+msgstr "onsdag"
+
+msgid "Thursday"
+msgstr "torsdag"
+
+msgid "Friday"
+msgstr "fredag"
+
+msgid "Saturday"
+msgstr "lørdag"
+
+msgid "Sunday"
+msgstr "søndag"
+
+msgid "Mon"
+msgstr "man"
+
+msgid "Tue"
+msgstr "tir"
+
+msgid "Wed"
+msgstr "ons"
+
+msgid "Thu"
+msgstr "tor"
+
+msgid "Fri"
+msgstr "fre"
+
+msgid "Sat"
+msgstr "lør"
+
+msgid "Sun"
+msgstr "søn"
+
+msgid "January"
+msgstr "januar"
+
+msgid "February"
+msgstr "februar"
+
+msgid "March"
+msgstr "mars"
+
+msgid "April"
+msgstr "april"
+
+msgid "May"
+msgstr "mai"
+
+msgid "June"
+msgstr "juni"
+
+msgid "July"
+msgstr "juli"
+
+msgid "August"
+msgstr "august"
+
+msgid "September"
+msgstr "september"
+
+msgid "October"
+msgstr "oktober"
+
+msgid "November"
+msgstr "november"
+
+msgid "December"
+msgstr "desember"
+
+msgid "jan"
+msgstr "jan"
+
+msgid "feb"
+msgstr "feb"
+
+msgid "mar"
+msgstr "mar"
+
+msgid "apr"
+msgstr "apr"
+
+msgid "may"
+msgstr "mai"
+
+msgid "jun"
+msgstr "jun"
+
+msgid "jul"
+msgstr "jul"
+
+msgid "aug"
+msgstr "aug"
+
+msgid "sep"
+msgstr "sep"
+
+msgid "oct"
+msgstr "okt"
+
+msgid "nov"
+msgstr "nov"
+
+msgid "dec"
+msgstr "des"
+
+msgctxt "abbrev. month"
+msgid "Jan."
+msgstr "jan."
+
+msgctxt "abbrev. month"
+msgid "Feb."
+msgstr "feb."
+
+msgctxt "abbrev. month"
+msgid "March"
+msgstr "mar."
+
+msgctxt "abbrev. month"
+msgid "April"
+msgstr "apr."
+
+msgctxt "abbrev. month"
+msgid "May"
+msgstr "mai"
+
+msgctxt "abbrev. month"
+msgid "June"
+msgstr "jun."
+
+msgctxt "abbrev. month"
+msgid "July"
+msgstr "jul."
+
+msgctxt "abbrev. month"
+msgid "Aug."
+msgstr "aug."
+
+msgctxt "abbrev. month"
+msgid "Sept."
+msgstr "sept."
+
+msgctxt "abbrev. month"
+msgid "Oct."
+msgstr "okt."
+
+msgctxt "abbrev. month"
+msgid "Nov."
+msgstr "nov."
+
+msgctxt "abbrev. month"
+msgid "Dec."
+msgstr "des."
+
+msgctxt "alt. month"
+msgid "January"
+msgstr "Januar"
+
+msgctxt "alt. month"
+msgid "February"
+msgstr "Februar"
+
+msgctxt "alt. month"
+msgid "March"
+msgstr "Mars"
+
+msgctxt "alt. month"
+msgid "April"
+msgstr "April"
+
+msgctxt "alt. month"
+msgid "May"
+msgstr "Mai"
+
+msgctxt "alt. month"
+msgid "June"
+msgstr "Juni"
+
+msgctxt "alt. month"
+msgid "July"
+msgstr "Juli"
+
+msgctxt "alt. month"
+msgid "August"
+msgstr "August"
+
+msgctxt "alt. month"
+msgid "September"
+msgstr "September"
+
+msgctxt "alt. month"
+msgid "October"
+msgstr "Oktober"
+
+msgctxt "alt. month"
+msgid "November"
+msgstr "November"
+
+msgctxt "alt. month"
+msgid "December"
+msgstr "Desember"
+
+msgid "This is not a valid IPv6 address."
+msgstr "Dette er ikke en gyldig IPv6-adresse."
+
+#, python-format
+msgctxt "String to return when truncating text"
+msgid "%(truncated_text)s…"
+msgstr "%(truncated_text)s…"
+
+msgid "or"
+msgstr "eller"
+
+#. Translators: This string is used as a separator between list elements
+msgid ", "
+msgstr ", "
+
+#, python-format
+msgid "%(num)d year"
+msgid_plural "%(num)d years"
+msgstr[0] "%(num)d år"
+msgstr[1] "%(num)d år"
+
+#, python-format
+msgid "%(num)d month"
+msgid_plural "%(num)d months"
+msgstr[0] "%(num)d måned"
+msgstr[1] "%(num)d måneder"
+
+#, python-format
+msgid "%(num)d week"
+msgid_plural "%(num)d weeks"
+msgstr[0] "%(num)d uke"
+msgstr[1] "%(num)d uker"
+
+#, python-format
+msgid "%(num)d day"
+msgid_plural "%(num)d days"
+msgstr[0] "%(num)d dag"
+msgstr[1] "%(num)d dager"
+
+#, python-format
+msgid "%(num)d hour"
+msgid_plural "%(num)d hours"
+msgstr[0] "%(num)d time"
+msgstr[1] "%(num)d timer"
+
+#, python-format
+msgid "%(num)d minute"
+msgid_plural "%(num)d minutes"
+msgstr[0] "%(num)d minutt"
+msgstr[1] "%(num)d minutter"
+
+msgid "Forbidden"
+msgstr "Forbudt"
+
+msgid "CSRF verification failed. Request aborted."
+msgstr "CSRF-verifisering feilet. Forespørsel avbrutt."
+
+msgid ""
+"You are seeing this message because this HTTPS site requires a “Referer "
+"header” to be sent by your web browser, but none was sent. This header is "
+"required for security reasons, to ensure that your browser is not being "
+"hijacked by third parties."
+msgstr ""
+"Du ser denne meldingen fordi dette HTTPS-nettstedet krever en 'Referer'-"
+"header til å bli sendt av nettleseren, men ingen ble sendt. Denne headeren "
+"er nødvendig av sikkerhetsmessige årsaker, for å sikre at nettleseren din "
+"ikke blir kapret av tredjeparter."
+
+msgid ""
+"If you have configured your browser to disable “Referer” headers, please re-"
+"enable them, at least for this site, or for HTTPS connections, or for “same-"
+"origin” requests."
+msgstr ""
+"Hvis du har konfigurert nettleseren din til å deaktivere 'Referer'-headers, "
+"kan du aktivere dem, i hvert fall for dette nettstedet, eller for HTTPS-"
+"tilkoblinger, eller for 'same-origin'-forespørsler."
+
+msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the “Referrer-Policy: no-referrer” header, please remove them. The "
+"CSRF protection requires the “Referer” header to do strict referer checking. "
+"If you’re concerned about privacy, use alternatives like <a "
+"rel=\"noreferrer\" …> for links to third-party sites."
+msgstr ""
+"Hvis du bruker <meta name=\"referrer\" content=\"no-referrer\">-taggen eller "
+"inkluderer 'Referrer-Policy: no-referrer'-header, vennligst fjern dem. CSRF-"
+"beskyttelsen krever 'Referer'-headeren for å utføre streng kontroll av "
+"referanser. Hvis du er bekymret for personvern, bruk alternativer som <a "
+"rel=\"noreferrer\" …>for koblinger til tredjeparts nettsteder."
+
+msgid ""
+"You are seeing this message because this site requires a CSRF cookie when "
+"submitting forms. This cookie is required for security reasons, to ensure "
+"that your browser is not being hijacked by third parties."
+msgstr ""
+"Du ser denne meldingen fordi denne nettsiden krever en CSRF-cookie når du "
+"sender inn skjemaer. Denne informasjonskapselen er nødvendig av "
+"sikkerhetsmessige årsaker, for å sikre at nettleseren din ikke blir kapret "
+"av tredjeparter."
+
+msgid ""
+"If you have configured your browser to disable cookies, please re-enable "
+"them, at least for this site, or for “same-origin” requests."
+msgstr ""
+"Hvis du har konfigurert nettleseren din til å deaktivere "
+"informasjonskapsler, kan du aktivere dem, i hvert fall for dette nettstedet, "
+"eller for 'same-origin'-forespørsler."
+
+msgid "More information is available with DEBUG=True."
+msgstr "Mer informasjon er tilgjengelig med DEBUG=True."
+
+msgid "No year specified"
+msgstr "År ikke spesifisert"
+
+msgid "Date out of range"
+msgstr "Date utenfor rekkevidde"
+
+msgid "No month specified"
+msgstr "Måned ikke spesifisert"
+
+msgid "No day specified"
+msgstr "Dag ikke spesifisert"
+
+msgid "No week specified"
+msgstr "Uke ikke spesifisert"
+
+#, python-format
+msgid "No %(verbose_name_plural)s available"
+msgstr "Ingen %(verbose_name_plural)s tilgjengelig"
+
+#, python-format
+msgid ""
+"Future %(verbose_name_plural)s not available because %(class_name)s."
+"allow_future is False."
+msgstr ""
+"Fremtidig %(verbose_name_plural)s ikke tilgjengelig fordi %(class_name)s."
+"allow_future er False."
+
+#, python-format
+msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
+msgstr "Ugyldig datostreng \"%(datestr)s\" gitt formatet \"%(format)s\""
+
+#, python-format
+msgid "No %(verbose_name)s found matching the query"
+msgstr "Fant ingen %(verbose_name)s som passet spørringen"
+
+msgid "Page is not “last”, nor can it be converted to an int."
+msgstr "Siden er ikke \"last\", og kan heller ikke konverteres til et heltall."
+
+#, python-format
+msgid "Invalid page (%(page_number)s): %(message)s"
+msgstr "Ugyldig side (%(page_number)s): %(message)s"
+
+#, python-format
+msgid "Empty list and “%(class_name)s.allow_empty” is False."
+msgstr "Tom liste og \"%(class_name)s.allow_empty\" er False."
+
+msgid "Directory indexes are not allowed here."
+msgstr "Mappeinnhold er ikke tillatt her."
+
+#, python-format
+msgid "“%(path)s” does not exist"
+msgstr "\"%(path)s\" finnes ikke"
+
+#, python-format
+msgid "Index of %(directory)s"
+msgstr "Innhold i %(directory)s"
+
+msgid "The install worked successfully! Congratulations!"
+msgstr "Installasjonen var vellykket! Gratulerer!"
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+"Se <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">produktmerknader</a> for Django "
+"%(version)s"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
+"configured any URLs."
+msgstr ""
+"Du ser denne siden fordi <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> er i din Django-innstillingsfil og du ikke "
+"har konfigurert noen URL-er."
+
+msgid "Django Documentation"
+msgstr "Django-dokumentasjon"
+
+msgid "Topics, references, &amp; how-to’s"
+msgstr "Temaer, referanser &amp; how-tos"
+
+msgid "Tutorial: A Polling App"
+msgstr "Tutorial: en polling-app"
+
+msgid "Get started with Django"
+msgstr "Kom i gang med Django"
+
+msgid "Django Community"
+msgstr "Django nettsamfunn"
+
+msgid "Connect, get help, or contribute"
+msgstr "Koble, få hjelp eller bidra"

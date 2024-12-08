@@ -1,0 +1,86 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# André Hagenbruch, 2012
+# Jannis Leidel <jannis@leidel.info>, 2011-2012,2014-2015,2020
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 18:45+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>, "
+"2011-2012,2014-2015,2020\n"
+"Language-Team: German (http://app.transifex.com/django/django/language/de/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: de\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "GIS"
+msgstr "GIS"
+
+msgid "The base GIS field."
+msgstr "Das Basis-GIS-Feld."
+
+msgid ""
+"The base Geometry field — maps to the OpenGIS Specification Geometry type."
+msgstr ""
+"Das Basis-GIS-Feld – verwendet den Geometrie-Typ der OpenGIS-Spezifikation."
+
+msgid "Point"
+msgstr "Punkt"
+
+msgid "Line string"
+msgstr "Linienzug"
+
+msgid "Polygon"
+msgstr "Polygon"
+
+msgid "Multi-point"
+msgstr "Mehrere Punkte"
+
+msgid "Multi-line string"
+msgstr "Mehrere Linienzüge"
+
+msgid "Multi polygon"
+msgstr "Mehrere Polygone"
+
+msgid "Geometry collection"
+msgstr "Sammlung geometrischer Objekte"
+
+msgid "Extent Aggregate Field"
+msgstr "Ausmaße-Aggregat-Feld"
+
+msgid "Raster Field"
+msgstr "Raster-Feld"
+
+msgid "No geometry value provided."
+msgstr "Kein geometrischer Wert gegeben."
+
+msgid "Invalid geometry value."
+msgstr "Ungültiger geometrischer Wert."
+
+msgid "Invalid geometry type."
+msgstr "Ungültiger geometrischer Typ."
+
+msgid ""
+"An error occurred when transforming the geometry to the SRID of the geometry "
+"form field."
+msgstr ""
+"Ein Fehler ist beim Umwandeln der Geometrie-Werte in die SRID des Geometrie-"
+"Formularfeldes aufgetreten."
+
+msgid "Delete all Features"
+msgstr "Alles löschen"
+
+msgid "Debugging window (serialized value)"
+msgstr "Debugging-Fenster (serialisierter Wert)"
+
+msgid "No feeds are registered."
+msgstr "Keine Feeds registriert."
+
+#, python-format
+msgid "Slug %r isn’t registered."
+msgstr "Kürzel %r ist nicht registriert."

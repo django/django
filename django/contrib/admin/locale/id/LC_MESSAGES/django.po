@@ -1,0 +1,789 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Bayu Satiyo <itsyuukunz@gmail.com>, 2024
+# Claude Paroz <claude@2xlibre.net>, 2014
+# Fery Setiawan <gembelweb@gmail.com>, 2015-2019,2021-2024
+# Jannis Leidel <jannis@leidel.info>, 2011
+# M Asep Indrayana <me@drayanaindra.com>, 2015
+# oon arfiandwi (OonID) <oon.arfiandwi@gmail.com>, 2016,2020
+# rodin <romihardiyanto@gmail.com>, 2011-2013
+# rodin <romihardiyanto@gmail.com>, 2013-2017
+# sag​e <laymonage@gmail.com>, 2019
+# Sutrisno Efendi <kangfend@gmail.com>, 2015
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-10-07 07:05+0000\n"
+"Last-Translator: Fery Setiawan <gembelweb@gmail.com>, 2015-2019,2021-2024\n"
+"Language-Team: Indonesian (http://app.transifex.com/django/django/language/"
+"id/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: id\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Hapus %(verbose_name_plural)s yang dipilih"
+
+#, python-format
+msgid "Successfully deleted %(count)d %(items)s."
+msgstr "Sukses menghapus %(count)d %(items)s."
+
+#, python-format
+msgid "Cannot delete %(name)s"
+msgstr "Tidak dapat menghapus %(name)s"
+
+msgid "Are you sure?"
+msgstr "Yakin?"
+
+msgid "Administration"
+msgstr "Administrasi"
+
+msgid "All"
+msgstr "Semua"
+
+msgid "Yes"
+msgstr "Ya"
+
+msgid "No"
+msgstr "Tidak"
+
+msgid "Unknown"
+msgstr "Tidak diketahui"
+
+msgid "Any date"
+msgstr "Kapanpun"
+
+msgid "Today"
+msgstr "Hari ini"
+
+msgid "Past 7 days"
+msgstr "Tujuh hari terakhir"
+
+msgid "This month"
+msgstr "Bulan ini"
+
+msgid "This year"
+msgstr "Tahun ini"
+
+msgid "No date"
+msgstr "Tidak ada tanggal"
+
+msgid "Has date"
+msgstr "Ada tanggal"
+
+msgid "Empty"
+msgstr "Kosong"
+
+msgid "Not empty"
+msgstr "Tidak kosong"
+
+#, python-format
+msgid ""
+"Please enter the correct %(username)s and password for a staff account. Note "
+"that both fields may be case-sensitive."
+msgstr ""
+"Masukkan nama pengguna %(username)s dan sandi yang benar untuk akun staf. "
+"Huruf besar/kecil pada bidang ini berpengaruh."
+
+msgid "Action:"
+msgstr "Aksi:"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Tambahkan %(verbose_name)s lagi"
+
+msgid "Remove"
+msgstr "Hapus"
+
+msgid "Addition"
+msgstr "Tambahan"
+
+msgid "Change"
+msgstr "Ubah"
+
+msgid "Deletion"
+msgstr "Penghapusan"
+
+msgid "action time"
+msgstr "waktu aksi"
+
+msgid "user"
+msgstr "pengguna"
+
+msgid "content type"
+msgstr "jenis isi"
+
+msgid "object id"
+msgstr "id objek"
+
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/library/functions.html#repr)
+msgid "object repr"
+msgstr "representasi objek"
+
+msgid "action flag"
+msgstr "jenis aksi"
+
+msgid "change message"
+msgstr "ganti pesan"
+
+msgid "log entry"
+msgstr "entri pencatatan"
+
+msgid "log entries"
+msgstr "entri pencatatan"
+
+#, python-format
+msgid "Added “%(object)s”."
+msgstr "“%(object)s” ditambahkan."
+
+#, python-format
+msgid "Changed “%(object)s” — %(changes)s"
+msgstr "“%(object)s” diubah — %(changes)s"
+
+#, python-format
+msgid "Deleted “%(object)s.”"
+msgstr "“%(object)s” dihapus."
+
+msgid "LogEntry Object"
+msgstr "Objek LogEntry"
+
+#, python-brace-format
+msgid "Added {name} “{object}”."
+msgstr "{name} “{object}” ditambahkan."
+
+msgid "Added."
+msgstr "Ditambahkan."
+
+msgid "and"
+msgstr "dan"
+
+#, python-brace-format
+msgid "Changed {fields} for {name} “{object}”."
+msgstr "{fields} diubah untuk {name} “{object}”."
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr "{fields} berubah."
+
+#, python-brace-format
+msgid "Deleted {name} “{object}”."
+msgstr "{name} “{object}” dihapus."
+
+msgid "No fields changed."
+msgstr "Tidak ada bidang yang berubah."
+
+msgid "None"
+msgstr "None"
+
+msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
+msgstr ""
+"Tekan “Control”, atau “Command” pada Mac, untuk memilih lebih dari satu."
+
+msgid "Select this object for an action - {}"
+msgstr "Pilih objek ini untuk suatu aksi - {}"
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully."
+msgstr "{name} “{obj}” berhasil ditambahkan."
+
+msgid "You may edit it again below."
+msgstr "Anda dapat menyunting itu kembali di bawah."
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was added successfully. You may add another {name} below."
+msgstr ""
+"{name} “{obj}” berhasil ditambahkan. Anda dapat menambahkan {name} lain di "
+"bawah."
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may edit it again below."
+msgstr ""
+"{name} “{obj}” berhasil diubah. Anda dapat mengeditnya kembali di bawah."
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+"{name} “{obj}” berhasil diubah. Anda dapat menambahkan {name} lain di bawah."
+
+#, python-brace-format
+msgid "The {name} “{obj}” was changed successfully."
+msgstr "{name} “{obj}” berhasil diubah."
+
+msgid ""
+"Items must be selected in order to perform actions on them. No items have "
+"been changed."
+msgstr ""
+"Objek harus dipilih sebelum dimanipulasi. Tidak ada objek yang berubah."
+
+msgid "No action selected."
+msgstr "Tidak ada aksi yang dipilih."
+
+#, python-format
+msgid "The %(name)s “%(obj)s” was deleted successfully."
+msgstr "%(name)s “%(obj)s” berhasil dihapus."
+
+#, python-format
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
+msgstr "%(name)s dengan ID “%(key)s” tidak ada. Mungkin telah dihapus?"
+
+#, python-format
+msgid "Add %s"
+msgstr "Tambahkan %s"
+
+#, python-format
+msgid "Change %s"
+msgstr "Ubah %s"
+
+#, python-format
+msgid "View %s"
+msgstr "Lihat %s"
+
+msgid "Database error"
+msgstr "Galat basis data"
+
+#, python-format
+msgid "%(count)s %(name)s was changed successfully."
+msgid_plural "%(count)s %(name)s were changed successfully."
+msgstr[0] "%(count)s %(name)s berhasil diubah."
+
+#, python-format
+msgid "%(total_count)s selected"
+msgid_plural "All %(total_count)s selected"
+msgstr[0] "%(total_count)s dipilih"
+
+#, python-format
+msgid "0 of %(cnt)s selected"
+msgstr "0 dari %(cnt)s dipilih"
+
+#, python-format
+msgid "Change history: %s"
+msgstr "Ubah riwayat: %s"
+
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
+#, python-format
+msgid "%(class_name)s %(instance)s"
+msgstr "%(class_name)s %(instance)s"
+
+#, python-format
+msgid ""
+"Deleting %(class_name)s %(instance)s would require deleting the following "
+"protected related objects: %(related_objects)s"
+msgstr ""
+"Menghapus %(class_name)s %(instance)s memerlukan penghapusanobjek "
+"terlindungi yang terkait sebagai berikut: %(related_objects)s"
+
+msgid "Django site admin"
+msgstr "Admin situs Django"
+
+msgid "Django administration"
+msgstr "Administrasi Django"
+
+msgid "Site administration"
+msgstr "Administrasi situs"
+
+msgid "Log in"
+msgstr "Masuk"
+
+#, python-format
+msgid "%(app)s administration"
+msgstr "Administrasi %(app)s"
+
+msgid "Page not found"
+msgstr "Laman tidak ditemukan"
+
+msgid "We’re sorry, but the requested page could not be found."
+msgstr "Maaf, laman yang Anda minta tidak ditemukan."
+
+msgid "Home"
+msgstr "Beranda"
+
+msgid "Server error"
+msgstr "Galat server"
+
+msgid "Server error (500)"
+msgstr "Galat server (500)"
+
+msgid "Server Error <em>(500)</em>"
+msgstr "Galat Server <em>(500)</em>"
+
+msgid ""
+"There’s been an error. It’s been reported to the site administrators via "
+"email and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"Terjadi sebuah galat dan telah dilaporkan ke administrator situs melalui "
+"surel untuk diperbaiki. Terima kasih atas pengertian Anda."
+
+msgid "Run the selected action"
+msgstr "Jalankan aksi terpilih"
+
+msgid "Go"
+msgstr "Buka"
+
+msgid "Click here to select the objects across all pages"
+msgstr "Klik di sini untuk memilih semua objek pada semua laman"
+
+#, python-format
+msgid "Select all %(total_count)s %(module_name)s"
+msgstr "Pilih seluruh %(total_count)s %(module_name)s"
+
+msgid "Clear selection"
+msgstr "Bersihkan pilihan"
+
+msgid "Breadcrumbs"
+msgstr "Breadcrumbs"
+
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "Model pada aplikasi %(name)s"
+
+msgid "Add"
+msgstr "Tambah"
+
+msgid "View"
+msgstr "Lihat"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "Anda tidak memiliki izin untuk melihat atau mengedit apa pun."
+
+msgid ""
+"First, enter a username and password. Then, you’ll be able to edit more user "
+"options."
+msgstr ""
+"Pertama-tama, masukkan nama pengguna dan sandi. Anda akan dapat mengubah "
+"opsi pengguna lebih lengkap setelah itu."
+
+msgid "Enter a username and password."
+msgstr "Masukkan nama pengguna dan sandi."
+
+msgid "Change password"
+msgstr "Ganti sandi"
+
+msgid "Set password"
+msgstr "Setel sandi"
+
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Harap perbaiki kesalahan dibawah."
+
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr "Masukkan sandi baru untuk pengguna <strong>%(username)s</strong>."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+"Tindakan ini akan <strong>enable</strong> autentifikasi brerdasarkan-sandi "
+"untuk pengguna ini."
+
+msgid "Disable password-based authentication"
+msgstr "Tiadakan autentifikasu berdasarkan-sandi"
+
+msgid "Enable password-based authentication"
+msgstr "Adakan autentifikasu berdasarkan-sandi"
+
+msgid "Skip to main content"
+msgstr "Lewati ke isi utama"
+
+msgid "Welcome,"
+msgstr "Selamat datang,"
+
+msgid "View site"
+msgstr "Lihat situs"
+
+msgid "Documentation"
+msgstr "Dokumentasi"
+
+msgid "Log out"
+msgstr "Keluar"
+
+#, python-format
+msgid "Add %(name)s"
+msgstr "Tambahkan %(name)s"
+
+msgid "History"
+msgstr "Riwayat"
+
+msgid "View on site"
+msgstr "Lihat di situs"
+
+msgid "Filter"
+msgstr "Filter"
+
+msgid "Hide counts"
+msgstr "Sembunyikan hitungan"
+
+msgid "Show counts"
+msgstr "Tampilkan hitungan"
+
+msgid "Clear all filters"
+msgstr "Hapus semua penyaringan"
+
+msgid "Remove from sorting"
+msgstr "Dihapus dari pengurutan"
+
+#, python-format
+msgid "Sorting priority: %(priority_number)s"
+msgstr "Prioritas pengurutan: %(priority_number)s"
+
+msgid "Toggle sorting"
+msgstr "Ubah pengurutan"
+
+msgid "Toggle theme (current theme: auto)"
+msgstr "Ganti tema (tema saat ini: otomatis)"
+
+msgid "Toggle theme (current theme: light)"
+msgstr "Ganti tema (tema saat ini: terang)"
+
+msgid "Toggle theme (current theme: dark)"
+msgstr "Ganti tema (tema saat ini: gelap)"
+
+msgid "Delete"
+msgstr "Hapus"
+
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+"Menghapus %(object_name)s '%(escaped_object)s' akan menghapus objek lain "
+"yang terkait, tetapi akun Anda tidak memiliki izin untuk menghapus objek "
+"dengan tipe berikut:"
+
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
+msgstr ""
+"Menghapus %(object_name)s '%(escaped_object)s' memerlukan penghapusan objek "
+"terlindungi yang terkait sebagai berikut:"
+
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+"Yakin ingin menghapus %(object_name)s \"%(escaped_object)s\"? Semua objek "
+"lain yang terkait juga akan dihapus:"
+
+msgid "Objects"
+msgstr "Objek"
+
+msgid "Yes, I’m sure"
+msgstr "Ya, saya yakin"
+
+msgid "No, take me back"
+msgstr "Tidak, bawa saya kembali"
+
+msgid "Delete multiple objects"
+msgstr "Hapus beberapa objek sekaligus"
+
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+"Menghapus %(objects_name)s terpilih akan menghapus objek yang terkait, "
+"tetapi akun Anda tidak memiliki izin untuk menghapus objek dengan tipe "
+"berikut:"
+
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would require deleting the following "
+"protected related objects:"
+msgstr ""
+"Menghapus %(objects_name)s terpilih memerlukan penghapusan objek terlindungi "
+"yang terkait sebagai berikut:"
+
+#, python-format
+msgid ""
+"Are you sure you want to delete the selected %(objects_name)s? All of the "
+"following objects and their related items will be deleted:"
+msgstr ""
+"Yakin akan menghapus %(objects_name)s terpilih? Semua objek berikut beserta "
+"objek terkait juga akan dihapus:"
+
+msgid "Delete?"
+msgstr "Hapus?"
+
+#, python-format
+msgid " By %(filter_title)s "
+msgstr " Berdasarkan %(filter_title)s "
+
+msgid "Summary"
+msgstr "Ringkasan"
+
+msgid "Recent actions"
+msgstr "Tindakan terbaru"
+
+msgid "My actions"
+msgstr "Tindakan saya"
+
+msgid "None available"
+msgstr "Tidak ada yang tersedia"
+
+msgid "Added:"
+msgstr "Ditambahkan:"
+
+msgid "Changed:"
+msgstr "Berubah:"
+
+msgid "Deleted:"
+msgstr "Dihapus:"
+
+msgid "Unknown content"
+msgstr "Konten tidak diketahui"
+
+msgid ""
+"Something’s wrong with your database installation. Make sure the appropriate "
+"database tables have been created, and make sure the database is readable by "
+"the appropriate user."
+msgstr ""
+"Ada masalah dengan instalasi basis data Anda. Pastikan tabel yang sesuai "
+"pada basis data telah dibuat dan dapat dibaca oleh pengguna yang sesuai."
+
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+"Anda diautentikasi sebagai %(username)s, tapi tidak diperbolehkan untuk "
+"mengakses halaman ini. Ingin mencoba mengakses menggunakan akun yang lain?"
+
+msgid "Forgotten your password or username?"
+msgstr "Lupa nama pengguna atau sandi?"
+
+msgid "Toggle navigation"
+msgstr "Alihkan navigasi"
+
+msgid "Sidebar"
+msgstr "Sidebar"
+
+msgid "Start typing to filter…"
+msgstr "Mulai mengetik untuk menyaring..."
+
+msgid "Filter navigation items"
+msgstr "Navigasi pencarian barang"
+
+msgid "Date/time"
+msgstr "Tanggal/waktu"
+
+msgid "User"
+msgstr "Pengguna"
+
+msgid "Action"
+msgstr "Aksi"
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] "masukan"
+
+msgid ""
+"This object doesn’t have a change history. It probably wasn’t added via this "
+"admin site."
+msgstr ""
+"Objek ini tidak memiliki riwayat perubahan. Mungkin objek ini tidak "
+"ditambahkan melalui situs administrasi ini."
+
+msgid "Show all"
+msgstr "Tampilkan semua"
+
+msgid "Save"
+msgstr "Simpan"
+
+msgid "Popup closing…"
+msgstr "Menutup jendela sembulan..."
+
+msgid "Search"
+msgstr "Cari"
+
+#, python-format
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] "%(counter)s buah"
+
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr "%(full_result_count)s total"
+
+msgid "Save as new"
+msgstr "Simpan sebagai baru"
+
+msgid "Save and add another"
+msgstr "Simpan dan tambahkan lagi"
+
+msgid "Save and continue editing"
+msgstr "Simpan dan terus mengedit"
+
+msgid "Save and view"
+msgstr "Simpan dan tampilkan"
+
+msgid "Close"
+msgstr "Tutup"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Ubah %(model)s yang dipilih"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Tambahkan %(model)s yang lain"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Hapus %(model)s yang dipilih"
+
+#, python-format
+msgid "View selected %(model)s"
+msgstr "Menampilkan %(model)s terpilih"
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr ""
+"Terima kasih untuk meluangkan waktu berkualitas dengan jaringan situs hari "
+"ini."
+
+msgid "Log in again"
+msgstr "Masuk kembali"
+
+msgid "Password change"
+msgstr "Ubah sandi"
+
+msgid "Your password was changed."
+msgstr "Sandi Anda telah diubah."
+
+msgid ""
+"Please enter your old password, for security’s sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+"Masukkan sandi lama Anda, demi alasan keamanan, dan masukkan sandi baru Anda "
+"dua kali untuk memastikan Anda tidak salah mengetikkannya."
+
+msgid "Change my password"
+msgstr "Ubah sandi saya"
+
+msgid "Password reset"
+msgstr "Setel ulang sandi"
+
+msgid "Your password has been set.  You may go ahead and log in now."
+msgstr "Sandi Anda telah diperbarui. Silakan masuk."
+
+msgid "Password reset confirmation"
+msgstr "Konfirmasi penyetelan ulang sandi"
+
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr ""
+"Masukkan sandi baru dua kali untuk memastikan Anda tidak salah "
+"mengetikkannya."
+
+msgid "New password:"
+msgstr "Sandi baru:"
+
+msgid "Confirm password:"
+msgstr "Konfirmasi sandi:"
+
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr ""
+"Tautan penyetelan ulang sandi tidak valid. Kemungkinan karena tautan "
+"tersebut telah dipakai sebelumnya. Ajukan permintaan penyetelan sandi sekali "
+"lagi."
+
+msgid ""
+"We’ve emailed you instructions for setting your password, if an account "
+"exists with the email you entered. You should receive them shortly."
+msgstr ""
+"Kami telah mengirimi Anda surel berisi petunjuk untuk mengatur sandi Anda, "
+"jika ada akun dengan alamat surel yang sesuai. Anda seharusnya menerima "
+"surel tersebut sesaat lagi."
+
+msgid ""
+"If you don’t receive an email, please make sure you’ve entered the address "
+"you registered with, and check your spam folder."
+msgstr ""
+"Jika Anda tidak menerima surel, pastikan Anda telah memasukkan alamat yang "
+"digunakan saat pendaftaran serta periksa folder spam Anda."
+
+#, python-format
+msgid ""
+"You're receiving this email because you requested a password reset for your "
+"user account at %(site_name)s."
+msgstr ""
+"Anda menerima email ini karena Anda meminta penyetelan ulang sandi untuk "
+"akun pengguna di %(site_name)s."
+
+msgid "Please go to the following page and choose a new password:"
+msgstr "Kunjungi laman di bawah ini dan ketikkan sandi baru:"
+
+msgid "Your username, in case you’ve forgotten:"
+msgstr "Nama pengguna Anda, jika lupa:"
+
+msgid "Thanks for using our site!"
+msgstr "Terima kasih telah menggunakan situs kami!"
+
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "Tim %(site_name)s"
+
+msgid ""
+"Forgotten your password? Enter your email address below, and we’ll email "
+"instructions for setting a new one."
+msgstr ""
+"Lupa sandi Anda? Masukkan alamat surel Anda di bawah ini dan kami akan "
+"mengirimkan petunjuk untuk mengatur sandi baru Anda."
+
+msgid "Email address:"
+msgstr "Alamat email:"
+
+msgid "Reset my password"
+msgstr "Setel ulang sandi saya"
+
+msgid "Select all objects on this page for an action"
+msgstr "Pilih semua objek di halaman ini untuk suatu aksi"
+
+msgid "All dates"
+msgstr "Semua tanggal"
+
+#, python-format
+msgid "Select %s"
+msgstr "Pilih %s"
+
+#, python-format
+msgid "Select %s to change"
+msgstr "Pilih %s untuk diubah"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "Pilih %s untuk melihat"
+
+msgid "Date:"
+msgstr "Tanggal:"
+
+msgid "Time:"
+msgstr "Waktu:"
+
+msgid "Lookup"
+msgstr "Cari"
+
+msgid "Currently:"
+msgstr "Saat ini:"
+
+msgid "Change:"
+msgstr "Ubah:"

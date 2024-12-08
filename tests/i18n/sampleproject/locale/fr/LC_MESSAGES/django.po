@@ -1,0 +1,52 @@
+msgid ""
+msgstr ""
+"Report-Msgid-Bugs-To: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: templates/percents.html:3
+#, python-format
+msgid "Literal with a percent symbol at the end %%"
+msgstr "Littérale avec un symbole de pour cent à la fin %%"
+
+#: templates/percents.html:4
+#, python-format
+msgid "Literal with a percent %% symbol in the middle"
+msgstr "Pour cent littérale %% avec un symbole au milieu"
+
+#: templates/percents.html:6
+#, python-format
+msgid "It is 100%%"
+msgstr "Il est de 100%%"
+
+#: templates/percents.html:7
+#, python-format
+msgctxt "female"
+msgid "It is 100%%"
+msgstr "Elle est de 100%%"
+
+#: templates/percents.html:8
+#, python-format
+msgid "Looks like a str fmt spec %%s but should not be interpreted as such"
+msgstr ""
+"On dirait un spec str fmt %%s mais ne devrait pas être interprété comme plus "
+"disponible"
+
+#: templates/percents.html:9
+#, python-format
+msgid "Looks like a str fmt spec %% o but should not be interpreted as such"
+msgstr ""
+"On dirait un spec str fmt %% o mais ne devrait pas être interprété comme "
+"plus disponible"
+
+#: templates/percents.html:11
+#, python-format
+msgid "1 percent sign %%, 2 percent signs %%%%, 3 percent signs %%%%%%"
+msgstr ""
+"1 %% signe pour cent, signes %%%% 2 pour cent, trois signes de pourcentage %%"
+"%%%%"
+
+#: templates/percents.html:12
+#, python-format
+msgid "%(name)s says: 1 percent sign %%, 2 percent signs %%%%"
+msgstr "%(name)s dit: 1 pour cent signe %%, deux signes de pourcentage %%%%"

@@ -1,0 +1,252 @@
+=========
+Paginator
+=========
+
+Django provides a few classes that help you manage paginated data -- that is,
+data that's split across several pages, with "Previous/Next" links. These
+classes live in :source:`django/core/paginator.py`.
+
+For examples, see the :doc:`Pagination topic guide </topics/pagination>`.
+
+.. module:: django.core.paginator
+   :synopsis: Classes to help you easily manage paginated data.
+
+``Paginator`` class
+===================
+
+.. class:: Paginator(object_list, per_page, orphans=0, allow_empty_first_page=True, error_messages=None)
+
+    A paginator acts like a sequence of :class:`Page` when using ``len()`` or
+    iterating it directly.
+
+.. attribute:: Paginator.object_list
+
+    Required. A list, tuple, ``QuerySet``, or other sliceable object with a
+    ``count()`` or ``__len__()`` method. For consistent pagination,
+    ``QuerySet``\s should be ordered, e.g. with an
+    :meth:`~django.db.models.query.QuerySet.order_by` clause or with a default
+    :attr:`~django.db.models.Options.ordering` on the model.
+
+    .. admonition:: Performance issues paginating large ``QuerySet``\s
+
+        If you're using a ``QuerySet`` with a very large number of items,
+        requesting high page numbers might be slow on some databases, because
+        the resulting ``LIMIT``/``OFFSET`` query needs to count the number of
+        ``OFFSET`` records which takes longer as the page number gets higher.
+
+.. attribute:: Paginator.per_page
+
+    Required. The maximum number of items to include on a page, not including
+    orphans (see the :attr:`~Paginator.orphans` optional argument below).
+
+.. attribute:: Paginator.orphans
+
+    Optional. Use this when you don't want to have a last page with very few
+    items. If the last page would normally have a number of items less than or
+    equal to ``orphans``, then those items will be added to the previous page
+    (which becomes the last page) instead of leaving the items on a page by
+    themselves. For example, with 23 items, ``per_page=10``, and ``orphans=3``,
+    there will be two pages; the first page with 10 items and the second
+    (and last) page with 13 items. ``orphans`` defaults to zero, which means
+    pages are never combined and the last page may have one item.
+
+.. attribute:: Paginator.allow_empty_first_page
+
+    Optional. Whether or not the first page is allowed to be empty.  If
+    ``False`` and ``object_list`` is  empty, then an ``EmptyPage`` error will
+    be raised.
+
+.. attribute:: Paginator.error_messages
+
+    The ``error_messages`` argument lets you override the default messages that
+    the paginator will raise. Pass in a dictionary with keys matching the error
+    messages you want to override. Available error message keys are:
+    ``invalid_page``, ``min_page``, and ``no_results``.
+
+    For example, here is the default error message:
+
+    .. code-block:: pycon
+
+        >>> from django.core.paginator import Paginator
+        >>> paginator = Paginator([1, 2, 3], 2)
+        >>> paginator.page(5)
+        Traceback (most recent call last):
+          ...
+        EmptyPage: That page contains no results
+
+    And here is a custom error message:
+
+    .. code-block:: pycon
+
+        >>> paginator = Paginator(
+        ...     [1, 2, 3],
+        ...     2,
+        ...     error_messages={"no_results": "Page does not exist"},
+        ... )
+        >>> paginator.page(5)
+        Traceback (most recent call last):
+          ...
+        EmptyPage: Page does not exist
+
+Methods
+-------
+
+.. method:: Paginator.get_page(number)
+
+    Returns a :class:`Page` object with the given 1-based index, while also
+    handling out of range and invalid page numbers.
+
+    If the page isn't a number, it returns the first page. If the page number
+    is negative or greater than the number of pages, it returns the last page.
+
+    Raises an :exc:`EmptyPage` exception only if you specify
+    ``Paginator(..., allow_empty_first_page=False)`` and the ``object_list`` is
+    empty.
+
+.. method:: Paginator.page(number)
+
+    Returns a :class:`Page` object with the given 1-based index. Raises
+    :exc:`PageNotAnInteger` if the ``number`` cannot be converted to an integer
+    by calling ``int()``. Raises :exc:`EmptyPage` if the given page number
+    doesn't exist.
+
+.. method:: Paginator.get_elided_page_range(number, *, on_each_side=3, on_ends=2)
+
+    Returns a 1-based list of page numbers similar to
+    :attr:`Paginator.page_range`, but may add an ellipsis to either or both
+    sides of the current page number when :attr:`Paginator.num_pages` is large.
+
+    The number of pages to include on each side of the current page number is
+    determined by the ``on_each_side`` argument which defaults to 3.
+
+    The number of pages to include at the beginning and end of page range is
+    determined by the ``on_ends`` argument which defaults to 2.
+
+    For example, with the default values for ``on_each_side`` and ``on_ends``,
+    if the current page is 10 and there are 50 pages, the page range will be
+    ``[1, 2, '…', 7, 8, 9, 10, 11, 12, 13, '…', 49, 50]``. This will result in
+    pages 7, 8, and 9 to the left of and 11, 12, and 13 to the right of the
+    current page as well as pages 1 and 2 at the start and 49 and 50 at the
+    end.
+
+    Raises :exc:`InvalidPage` if the given page number doesn't exist.
+
+Attributes
+----------
+
+.. attribute:: Paginator.ELLIPSIS
+
+    A translatable string used as a substitute for elided page numbers in the
+    page range returned by :meth:`~Paginator.get_elided_page_range`. Default is
+    ``'…'``.
+
+.. attribute:: Paginator.count
+
+    The total number of objects, across all pages.
+
+    .. note::
+
+        When determining the number of objects contained in ``object_list``,
+        ``Paginator`` will first try calling ``object_list.count()``. If
+        ``object_list`` has no ``count()`` method, then ``Paginator`` will
+        fall back to using ``len(object_list)``. This allows objects, such as
+        ``QuerySet``, to use a more efficient ``count()`` method when
+        available.
+
+.. attribute:: Paginator.num_pages
+
+    The total number of pages.
+
+.. attribute:: Paginator.page_range
+
+    A 1-based range iterator of page numbers, e.g. yielding ``[1, 2, 3, 4]``.
+
+``Page`` class
+==============
+
+You usually won't construct ``Page`` objects by hand -- you'll get them by
+iterating :class:`Paginator`, or by using :meth:`Paginator.page`.
+
+.. class:: Page(object_list, number, paginator)
+
+    A page acts like a sequence of :attr:`Page.object_list` when using
+    ``len()`` or iterating it directly.
+
+Methods
+-------
+
+.. method:: Page.has_next()
+
+    Returns ``True`` if there's a next page.
+
+.. method:: Page.has_previous()
+
+    Returns ``True`` if there's a previous page.
+
+.. method:: Page.has_other_pages()
+
+    Returns ``True`` if there's a next **or** previous page.
+
+.. method:: Page.next_page_number()
+
+    Returns the next page number. Raises :exc:`InvalidPage` if next page
+    doesn't exist.
+
+.. method:: Page.previous_page_number()
+
+    Returns the previous page number. Raises :exc:`InvalidPage` if previous
+    page doesn't exist.
+
+.. method:: Page.start_index()
+
+    Returns the 1-based index of the first object on the page, relative to all
+    of the objects in the paginator's list. For example, when paginating a list
+    of 5 objects with 2 objects per page, the second page's
+    :meth:`~Page.start_index` would return ``3``.
+
+.. method:: Page.end_index()
+
+    Returns the 1-based index of the last object on the page, relative to all
+    of the objects in the paginator's list. For example, when paginating a list
+    of 5 objects with 2 objects per page, the second page's
+    :meth:`~Page.end_index` would return ``4``.
+
+Attributes
+----------
+
+.. attribute:: Page.object_list
+
+    The list of objects on this page.
+
+.. attribute:: Page.number
+
+    The 1-based page number for this page.
+
+.. attribute:: Page.paginator
+
+    The associated :class:`Paginator` object.
+
+Exceptions
+==========
+
+.. exception:: InvalidPage
+
+    A base class for exceptions raised when a paginator is passed an invalid
+    page number.
+
+The :meth:`Paginator.page` method raises an exception if the requested page is
+invalid (i.e. not an integer) or contains no objects. Generally, it's enough
+to catch the ``InvalidPage`` exception, but if you'd like more granularity,
+you can catch either of the following exceptions:
+
+.. exception:: PageNotAnInteger
+
+    Raised when :meth:`~Paginator.page` is given a value that isn't an integer.
+
+.. exception:: EmptyPage
+
+    Raised when :meth:`~Paginator.page` is given a valid value but no objects
+    exist on that page.
+
+Both of the exceptions are subclasses of :exc:`InvalidPage`, so you can handle
+them both with ``except InvalidPage``.

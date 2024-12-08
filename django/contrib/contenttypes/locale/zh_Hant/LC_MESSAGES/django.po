@@ -1,0 +1,44 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# ilay <ilay@ilay.tw>, 2012
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Tzu-ping Chung <uranusjr@gmail.com>, 2016,2019
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-09-18 09:00+0000\n"
+"Last-Translator: Tzu-ping Chung <uranusjr@gmail.com>\n"
+"Language-Team: Chinese (Taiwan) (http://www.transifex.com/django/django/"
+"language/zh_TW/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_TW\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "Content Types"
+msgstr "內容類型"
+
+msgid "python model class name"
+msgstr "python model 類別名稱"
+
+msgid "content type"
+msgstr "內容類型"
+
+msgid "content types"
+msgstr "內容類型"
+
+#, python-format
+msgid "Content type %(ct_id)s object has no associated model"
+msgstr "內容類型 %(ct_id)s 的物件沒有關聯的資料模型"
+
+#, python-format
+msgid "Content type %(ct_id)s object %(obj_id)s doesn’t exist"
+msgstr "內容類型 %(ct_id)s 的物件 %(obj_id)s 不存在"
+
+#, python-format
+msgid "%(ct_name)s objects don’t have a get_absolute_url() method"
+msgstr "%(ct_name)s 的物件沒有 get_absolute_url() 方法"

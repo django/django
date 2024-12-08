@@ -1,0 +1,533 @@
+========================
+Django 2.2 release notes
+========================
+
+*April 1, 2019*
+
+Welcome to Django 2.2!
+
+These release notes cover the :ref:`new features <whats-new-2.2>`, as well as
+some :ref:`backwards incompatible changes <backwards-incompatible-2.2>` you'll
+want to be aware of when upgrading from Django 2.1 or earlier. We've
+:ref:`begun the deprecation process for some features
+<deprecated-features-2.2>`.
+
+See the :doc:`/howto/upgrade-version` guide if you're updating an existing
+project.
+
+Django 2.2 is designated as a :term:`long-term support release
+<Long-term support release>`. It will receive security updates for at least
+three years after its release. Support for the previous LTS, Django 1.11, will
+end in April 2020.
+
+Python compatibility
+====================
+
+Django 2.2 supports Python 3.5, 3.6, 3.7, 3.8 (as of 2.2.8), and 3.9 (as of
+2.2.17). We **highly recommend** and only officially support the latest release
+of each series.
+
+.. _whats-new-2.2:
+
+What's new in Django 2.2
+========================
+
+Constraints
+-----------
+
+The new :class:`~django.db.models.CheckConstraint` and
+:class:`~django.db.models.UniqueConstraint` classes enable adding custom
+database constraints. Constraints are added to models using the
+:attr:`Meta.constraints <django.db.models.Options.constraints>` option.
+
+Minor features
+--------------
+
+:mod:`django.contrib.admin`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Added a CSS class to the column headers of
+  :class:`~django.contrib.admin.TabularInline`.
+
+:mod:`django.contrib.auth`
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The ``HttpRequest`` is now passed as the first positional argument to
+  :meth:`.RemoteUserBackend.configure_user`, if it accepts it.
+
+:mod:`django.contrib.gis`
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Added Oracle support for the
+  :class:`~django.contrib.gis.db.models.functions.Envelope` function.
+
+* Added SpatiaLite support for the :lookup:`coveredby` and :lookup:`covers`
+  lookups.
+
+:mod:`django.contrib.postgres`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The new ``ordering`` argument for
+  :class:`~django.contrib.postgres.aggregates.ArrayAgg` and
+  :class:`~django.contrib.postgres.aggregates.StringAgg` determines the
+  ordering of the aggregated elements.
+
+* The new :class:`~django.contrib.postgres.indexes.BTreeIndex`,
+  :class:`~django.contrib.postgres.indexes.HashIndex` and
+  :class:`~django.contrib.postgres.indexes.SpGistIndex` classes allow
+  creating ``B-Tree``, ``hash``, and ``SP-GiST`` indexes in the database.
+
+* :class:`~django.contrib.postgres.indexes.BrinIndex` now has the
+  ``autosummarize`` parameter.
+
+* The new ``search_type`` parameter of
+  :class:`~django.contrib.postgres.search.SearchQuery` allows searching for
+  a phrase or raw expression.
+
+:mod:`django.contrib.staticfiles`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Added path matching to the :option:`collectstatic --ignore` option so that
+  patterns like ``/vendor/*.js`` can be used.
+
+Database backends
+~~~~~~~~~~~~~~~~~
+
+* Added result streaming for :meth:`.QuerySet.iterator` on SQLite.
+
+Generic Views
+~~~~~~~~~~~~~
+
+* The new :meth:`View.setup <django.views.generic.base.View.setup>` hook
+  initializes view attributes before calling
+  :meth:`~django.views.generic.base.View.dispatch`. It allows mixins to set up
+  instance attributes for reuse in child classes.
+
+Internationalization
+~~~~~~~~~~~~~~~~~~~~
+
+* Added support and translations for the Armenian language.
+
+Management Commands
+~~~~~~~~~~~~~~~~~~~
+
+* The new :option:`--force-color` option forces colorization of the command
+  output.
+
+* :djadmin:`inspectdb` now creates models for foreign tables on PostgreSQL.
+
+* :option:`inspectdb --include-views` now creates models for materialized views
+  on Oracle and PostgreSQL.
+
+* The new :option:`inspectdb --include-partitions` option allows creating
+  models for partition tables on PostgreSQL. In older versions, models are
+  created child tables instead the parent.
+
+* :djadmin:`inspectdb` now introspects :class:`~django.db.models.DurationField`
+  for Oracle and PostgreSQL, and :class:`~django.db.models.AutoField` for
+  SQLite.
+
+* On Oracle, :djadmin:`dbshell` is wrapped with ``rlwrap``, if available.
+  ``rlwrap`` provides a command history and editing of keyboard input.
+
+* The new :option:`makemigrations --no-header` option avoids writing header
+  comments in generated migration file(s). This option is also available for
+  :djadmin:`squashmigrations`.
+
+* :djadmin:`runserver` can now use `Watchman
+  <https://facebook.github.io/watchman/>`_ to improve the performance of
+  watching a large number of files for changes.
+
+Migrations
+~~~~~~~~~~
+
+* The new :option:`migrate --plan` option prints the list of migration
+  operations that will be performed.
+
+* ``NoneType`` can now be serialized in migrations.
+
+* You can now :ref:`register custom serializers <custom-migration-serializers>`
+  for migrations.
+
+Models
+~~~~~~
+
+* Added support for PostgreSQL operator classes (:attr:`.Index.opclasses`).
+
+* Added support for partial indexes (:attr:`.Index.condition`).
+
+* Added the :class:`~django.db.models.functions.NullIf` and
+  :class:`~django.db.models.functions.Reverse` database functions, as well as
+  many :ref:`math database functions <math-functions>`.
+
+* Setting the new ``ignore_conflicts`` parameter of
+  :meth:`.QuerySet.bulk_create` to ``True`` tells the database to ignore
+  failure to insert rows that fail uniqueness constraints or other checks.
+
+* The new :class:`~django.db.models.functions.ExtractIsoYear` function extracts
+  ISO-8601 week-numbering years from :class:`~django.db.models.DateField` and
+  :class:`~django.db.models.DateTimeField`, and the new :lookup:`iso_year`
+  lookup allows querying by an ISO-8601 week-numbering year.
+
+* The new :meth:`.QuerySet.bulk_update` method allows efficiently updating
+  specific fields on multiple model instances.
+
+* Django no longer always starts a transaction when a single query is being
+  performed, such as ``Model.save()``, ``QuerySet.update()``, and
+  ``Model.delete()``. This improves the performance of autocommit by reducing
+  the number of database round trips.
+
+* Added SQLite support for the :class:`~django.db.models.StdDev` and
+  :class:`~django.db.models.Variance` functions.
+
+* The handling of ``DISTINCT`` aggregation is added to the
+  :class:`~django.db.models.Aggregate` class. Adding :attr:`allow_distinct =
+  True <django.db.models.Aggregate.allow_distinct>` as a class attribute on
+  ``Aggregate`` subclasses allows a ``distinct`` keyword argument to be
+  specified on initialization to ensure that the aggregate function is only
+  called for each distinct value of ``expressions``.
+
+* The :meth:`.RelatedManager.add`, :meth:`~.RelatedManager.create`,
+  :meth:`~.RelatedManager.remove`,  :meth:`~.RelatedManager.set`,
+  ``get_or_create()``, and ``update_or_create()`` methods are now allowed on
+  many-to-many relationships with intermediate models. The new
+  ``through_defaults`` argument is used to specify values for new intermediate
+  model instance(s).
+
+Requests and Responses
+~~~~~~~~~~~~~~~~~~~~~~
+
+* Added :attr:`.HttpRequest.headers` to allow simple access to a request's
+  headers.
+
+Serialization
+~~~~~~~~~~~~~
+
+* You can now deserialize data using natural keys containing :ref:`forward
+  references <natural-keys-and-forward-references>` by passing
+  ``handle_forward_references=True`` to ``serializers.deserialize()``.
+  Additionally, :djadmin:`loaddata` handles forward references automatically.
+
+Tests
+~~~~~
+
+* The new :meth:`.SimpleTestCase.assertURLEqual` assertion checks for a given
+  URL, ignoring the ordering of the query string.
+  :meth:`~.SimpleTestCase.assertRedirects` uses the new assertion.
+
+* The test :class:`~.django.test.Client` now supports automatic JSON
+  serialization of list and tuple ``data`` when
+  ``content_type='application/json'``.
+
+* The new :setting:`ORACLE_MANAGED_FILES <TEST_ORACLE_MANAGED_FILES>` test
+  database setting allows using Oracle Managed Files (OMF) tablespaces.
+
+* Deferrable database constraints are now checked at the end of each
+  :class:`~django.test.TestCase` test on SQLite 3.20+, just like on other
+  backends that support deferrable constraints. These checks aren't implemented
+  for older versions of SQLite because they would require expensive table
+  introspection there.
+
+* :class:`~django.test.runner.DiscoverRunner` now skips the setup of databases
+  not :ref:`referenced by tests<testing-multi-db>`.
+
+URLs
+~~~~
+
+* The new :attr:`.ResolverMatch.route` attribute stores the route of the
+  matching URL pattern.
+
+Validators
+~~~~~~~~~~
+
+* :class:`.MaxValueValidator`, :class:`.MinValueValidator`,
+  :class:`.MinLengthValidator`, and :class:`.MaxLengthValidator` now accept
+  a callable ``limit_value``.
+
+.. _backwards-incompatible-2.2:
+
+Backwards incompatible changes in 2.2
+=====================================
+
+Database backend API
+--------------------
+
+This section describes changes that may be needed in third-party database
+backends.
+
+* Third-party database backends must implement support for table check
+  constraints or set ``DatabaseFeatures.supports_table_check_constraints`` to
+  ``False``.
+
+* Third party database backends must implement support for ignoring
+  constraints or uniqueness errors while inserting or set
+  ``DatabaseFeatures.supports_ignore_conflicts`` to ``False``.
+
+* Third party database backends must implement introspection for
+  ``DurationField`` or set ``DatabaseFeatures.can_introspect_duration_field``
+  to ``False``.
+
+* ``DatabaseFeatures.uses_savepoints`` now defaults to ``True``.
+
+* Third party database backends must implement support for partial indexes or
+  set ``DatabaseFeatures.supports_partial_indexes`` to ``False``.
+
+* ``DatabaseIntrospection.table_name_converter()`` and
+  ``column_name_converter()`` are removed. Third party database backends may
+  need to instead implement ``DatabaseIntrospection.identifier_converter()``.
+  In that case, the constraint names that
+  ``DatabaseIntrospection.get_constraints()`` returns must be normalized by
+  ``identifier_converter()``.
+
+* SQL generation for indexes is moved from :class:`~django.db.models.Index` to
+  ``SchemaEditor`` and these ``SchemaEditor`` methods are added:
+
+  * ``_create_primary_key_sql()`` and ``_delete_primary_key_sql()``
+  * ``_delete_index_sql()`` (to pair with ``_create_index_sql()``)
+  * ``_delete_unique_sql`` (to pair with ``_create_unique_sql()``)
+  * ``_delete_fk_sql()`` (to pair with ``_create_fk_sql()``)
+  * ``_create_check_sql()`` and ``_delete_check_sql()``
+
+* The third argument of ``DatabaseWrapper.__init__()``,
+  ``allow_thread_sharing``, is removed.
+
+Admin actions are no longer collected from base ``ModelAdmin`` classes
+----------------------------------------------------------------------
+
+For example, in older versions of Django::
+
+    from django.contrib import admin
+
+
+    class BaseAdmin(admin.ModelAdmin):
+        actions = ["a"]
+
+
+    class SubAdmin(BaseAdmin):
+        actions = ["b"]
+
+``SubAdmin`` would have actions ``'a'`` and ``'b'``.
+
+Now ``actions`` follows standard Python inheritance. To get the same result as
+before::
+
+    class SubAdmin(BaseAdmin):
+        actions = BaseAdmin.actions + ["b"]
+
+:mod:`django.contrib.gis`
+-------------------------
+
+* Support for GDAL 1.9 and 1.10 is dropped.
+
+``TransactionTestCase`` serialized data loading
+-----------------------------------------------
+
+Initial data migrations are now loaded in
+:class:`~django.test.TransactionTestCase` at the end of the test, after the
+database flush. In older versions, this data was loaded at the beginning of the
+test, but this prevents the :option:`test --keepdb` option from working
+properly (the database was empty at the end of the whole test suite). This
+change shouldn't have an impact on your tests unless you've customized
+:class:`~django.test.TransactionTestCase`'s internals.
+
+``sqlparse`` is required dependency
+-----------------------------------
+
+To simplify a few parts of Django's database handling, :pypi:`sqlparse 0.2.2+
+<sqlparse>` is now a required dependency. It's automatically installed along
+with Django.
+
+``cached_property`` aliases
+---------------------------
+
+In usage like::
+
+    from django.utils.functional import cached_property
+
+
+    class A:
+        @cached_property
+        def base(self):
+            return ...
+
+        alias = base
+
+``alias`` is not cached. Where the problem can be detected (Python 3.6 and
+later), such usage now raises ``TypeError: Cannot assign the same
+cached_property to two different names ('base' and 'alias').``
+
+Use this instead::
+
+    import operator
+
+
+    class A:
+        ...
+
+        alias = property(operator.attrgetter("base"))
+
+Permissions for proxy models
+----------------------------
+
+:ref:`Permissions for proxy models <proxy-models-permissions-topic>` are now
+created using the content type of the proxy model rather than the content type
+of the concrete model. A migration will update existing permissions when you
+run :djadmin:`migrate`.
+
+In the admin, the change is transparent for proxy models having the same
+``app_label`` as their concrete model. However, in older versions, users with
+permissions for a proxy model with a *different* ``app_label`` than its
+concrete model couldn't access the model in the admin. That's now fixed, but
+you might want to audit the permissions assignments for such proxy models
+(``[add|view|change|delete]_myproxy``) prior to upgrading to ensure the new
+access is appropriate.
+
+Finally, proxy model permission strings must be updated to use their own
+``app_label``. For example, for ``app.MyProxyModel`` inheriting from
+``other_app.ConcreteModel``, update
+``user.has_perm('other_app.add_myproxymodel')`` to
+``user.has_perm('app.add_myproxymodel')``.
+
+Merging of form ``Media`` assets
+--------------------------------
+
+Form ``Media`` assets are now merged using a topological sort algorithm, as the
+old pairwise merging algorithm is insufficient for some cases. CSS and
+JavaScript files which don't include their dependencies may now be sorted
+incorrectly (where the old algorithm produced results correctly by
+coincidence).
+
+Audit all ``Media`` classes for any missing dependencies. For example,
+widgets depending on ``django.jQuery`` must specify
+``js=['admin/js/jquery.init.js', ...]`` when :ref:`declaring form media assets
+<assets-as-a-static-definition>`.
+
+Miscellaneous
+-------------
+
+* To improve readability, the ``UUIDField`` form field now displays values with
+  dashes, e.g. ``550e8400-e29b-41d4-a716-446655440000`` instead of
+  ``550e8400e29b41d4a716446655440000``.
+
+* On SQLite, ``PositiveIntegerField`` and ``PositiveSmallIntegerField`` now
+  include a check constraint to prevent negative values in the database. If you
+  have existing invalid data and run a migration that recreates a table, you'll
+  see ``CHECK constraint failed``.
+
+* For consistency with WSGI servers, the test client now sets the
+  ``Content-Length`` header to a string rather than an integer.
+
+* The return value of :func:`django.utils.text.slugify` is no longer marked as
+  HTML safe.
+
+* The default truncation character used by the :tfilter:`urlizetrunc`,
+  :tfilter:`truncatechars`, :tfilter:`truncatechars_html`,
+  :tfilter:`truncatewords`, and :tfilter:`truncatewords_html` template filters
+  is now the real ellipsis character (``…``) instead of 3 dots. You may have to
+  adapt some test output comparisons.
+
+* Support for bytestring paths in the template filesystem loader is removed.
+
+* :func:`django.utils.http.urlsafe_base64_encode` now returns a string instead
+  of a bytestring, and :func:`django.utils.http.urlsafe_base64_decode` may no
+  longer be passed a bytestring.
+
+* Support for ``cx_Oracle`` < 6.0 is removed.
+
+* The minimum supported version of ``mysqlclient`` is increased from 1.3.7 to
+  1.3.13.
+
+* The minimum supported version of SQLite is increased from 3.7.15 to 3.8.3.
+
+* In an attempt to provide more semantic query data, ``NullBooleanSelect`` now
+  renders ``<option>`` values of ``unknown``, ``true``, and ``false`` instead
+  of ``1``, ``2``, and ``3``. For backwards compatibility, the old values are
+  still accepted as data.
+
+* :attr:`Group.name <django.contrib.auth.models.Group.name>` ``max_length``
+  is increased from 80 to 150 characters.
+
+* Tests that violate deferrable database constraints now error when run on
+  SQLite 3.20+, just like on other backends that support such constraints.
+
+* To catch usage mistakes, the test :class:`~django.test.Client` and
+  :func:`django.utils.http.urlencode` now raise ``TypeError`` if ``None`` is
+  passed as a value to encode because ``None`` can't be encoded in GET and POST
+  data. Either pass an empty string or omit the value.
+
+* The ``ping_google`` management command now defaults to ``https``
+  instead of ``http`` for the sitemap's URL. If your site uses http, use the
+  new ``ping_google --sitemap-uses-http`` option. If you use the
+  ``django.contrib.sitemaps.ping_google`` function, set the new
+  ``sitemap_uses_https`` argument to ``False``.
+
+* :djadmin:`runserver` no longer supports ``pyinotify`` (replaced by Watchman).
+
+* The :class:`~django.db.models.Avg`, :class:`~django.db.models.StdDev`, and
+  :class:`~django.db.models.Variance` aggregate functions now return a
+  ``Decimal`` instead of a ``float`` when the input is ``Decimal``.
+
+* Tests will fail on SQLite if apps without migrations have relations to apps
+  with migrations. This has been a documented restriction since migrations were
+  added in Django 1.7, but it fails more reliably now. You'll see tests failing
+  with errors like ``no such table: <app_label>_<model>``. This was observed
+  with several third-party apps that had models in tests without migrations.
+  You must add migrations for such models.
+
+* Providing an integer in the ``key`` argument of the :meth:`.cache.delete` or
+  :meth:`.cache.get` now raises :exc:`ValueError`.
+
+* Plural equations for some languages are changed, because the latest versions
+  from Transifex are incorporated.
+
+  .. note::
+
+    The ability to handle ``.po`` files containing different plural equations
+    for the same language was added in Django 2.2.12.
+
+.. _deprecated-features-2.2:
+
+Features deprecated in 2.2
+==========================
+
+Model ``Meta.ordering`` will no longer affect ``GROUP BY`` queries
+------------------------------------------------------------------
+
+A model's ``Meta.ordering`` affecting ``GROUP BY`` queries (such as
+``.annotate().values()``) is a common source of confusion. Such queries now
+issue a deprecation warning with the advice to add an ``order_by()`` to retain
+the current query. ``Meta.ordering`` will be ignored in such queries starting
+in Django 3.1.
+
+Miscellaneous
+-------------
+
+* ``django.utils.timezone.FixedOffset`` is deprecated in favor of
+  :class:`datetime.timezone`.
+
+* The undocumented ``QuerySetPaginator`` alias of
+  ``django.core.paginator.Paginator`` is deprecated.
+
+* The ``FloatRangeField`` model and form fields in ``django.contrib.postgres``
+  are deprecated in favor of a new name, ``DecimalRangeField``, to match the
+  underlying ``numrange`` data type used in the database.
+
+* The ``FILE_CHARSET`` setting is deprecated. Starting with Django 3.1, files
+  read from disk must be UTF-8 encoded.
+
+* ``django.contrib.staticfiles.storage.CachedStaticFilesStorage`` is
+  deprecated due to the intractable problems that it has. Use
+  :class:`.ManifestStaticFilesStorage` or a third-party cloud storage instead.
+
+* :meth:`.RemoteUserBackend.configure_user` is now passed ``request`` as the
+  first positional argument, if it accepts it. Support for overrides that don't
+  accept it will be removed in Django 3.1.
+
+* The ``SimpleTestCase.allow_database_queries``,
+  ``TransactionTestCase.multi_db``, and ``TestCase.multi_db``
+  attributes are deprecated in favor of :attr:`.SimpleTestCase.databases`,
+  :attr:`.TransactionTestCase.databases`, and :attr:`.TestCase.databases`.
+  These new attributes allow databases dependencies to be declared in order to
+  prevent unexpected queries against non-default databases to leak state
+  between tests. The previous behavior of ``allow_database_queries=True`` and
+  ``multi_db=True`` can be achieved by setting ``databases='__all__'``.

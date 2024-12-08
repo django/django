@@ -1,0 +1,318 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# André Hagenbruch, 2011
+# Florian Apolloner <florian@apolloner.eu>, 2012
+# Florian Apolloner <florian@apolloner.eu>, 2021,2023
+# jnns, 2013
+# Jannis Leidel <jannis@leidel.info>, 2013-2017,2020,2023
+# jnns, 2016
+# Jens Neuhaus <kontakt@jensneuhaus.de>, 2016
+# Markus Holtermann <info@markusholtermann.eu>, 2023
+# Markus Holtermann <info@markusholtermann.eu>, 2013,2015
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-03-17 03:19-0500\n"
+"PO-Revision-Date: 2023-04-25 08:09+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>, 2013-2017,2020,2023\n"
+"Language-Team: German (http://www.transifex.com/django/django/language/de/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: de\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Personal info"
+msgstr "Persönliche Informationen"
+
+msgid "Permissions"
+msgstr "Berechtigungen"
+
+msgid "Important dates"
+msgstr "Wichtige Daten"
+
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "%(name)s-Objekt mit Primärschlüssel %(key)r ist nicht vorhanden."
+
+msgid "Password changed successfully."
+msgstr "Passwort erfolgreich geändert."
+
+#, python-format
+msgid "Change password: %s"
+msgstr "Passwort ändern: %s"
+
+msgid "Authentication and Authorization"
+msgstr "Authentifizierung und Autorisierung"
+
+msgid "password"
+msgstr "Passwort"
+
+msgid "last login"
+msgstr "Letzte Anmeldung"
+
+msgid "No password set."
+msgstr "Kein Passwort gesetzt."
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Ungültiges Passwortformat oder unbekannter Hashing-Algorithmus."
+
+msgid "The two password fields didn’t match."
+msgstr "Die beiden Passwörter sind nicht identisch."
+
+msgid "Password"
+msgstr "Passwort"
+
+msgid "Password confirmation"
+msgstr "Passwort bestätigen"
+
+msgid "Enter the same password as before, for verification."
+msgstr "Bitte das selbe Passwort zur Bestätigung erneut eingeben."
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see this user’s "
+"password, but you can change the password using <a href=\"{}\">this form</a>."
+msgstr ""
+"Die Passwörter werden nicht im Klartext gespeichert und können daher nicht "
+"dargestellt, sondern nur mit <a href=\"{}\">diesem Formular</a> geändert "
+"werden."
+
+#, python-format
+msgid ""
+"Please enter a correct %(username)s and password. Note that both fields may "
+"be case-sensitive."
+msgstr ""
+"Bitte %(username)s und Passwort eingeben. Beide Felder berücksichtigen die "
+"Groß-/Kleinschreibung."
+
+msgid "This account is inactive."
+msgstr "Dieser Benutzer ist inaktiv."
+
+msgid "Email"
+msgstr "E-Mail-Adresse"
+
+msgid "New password"
+msgstr "Neues Passwort"
+
+msgid "New password confirmation"
+msgstr "Neues Passwort bestätigen"
+
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr "Das alte Passwort war falsch. Bitte neu eingeben."
+
+msgid "Old password"
+msgstr "Altes Passwort"
+
+msgid "Password (again)"
+msgstr "Passwort (wiederholen)"
+
+msgid "algorithm"
+msgstr "Algorithmus"
+
+msgid "iterations"
+msgstr "Wiederholungen"
+
+msgid "salt"
+msgstr "Salt"
+
+msgid "hash"
+msgstr "Hash"
+
+msgid "variety"
+msgstr "Vielfalt"
+
+msgid "version"
+msgstr "Version"
+
+msgid "memory cost"
+msgstr "Speicherbedarf"
+
+msgid "time cost"
+msgstr "Zeitbedarf"
+
+msgid "parallelism"
+msgstr "Parallelität"
+
+msgid "work factor"
+msgstr "Arbeitsfaktor"
+
+msgid "checksum"
+msgstr "Prüfsumme"
+
+msgid "block size"
+msgstr "Blockgröße"
+
+msgid "name"
+msgstr "Name"
+
+msgid "content type"
+msgstr "Inhaltstyp"
+
+msgid "codename"
+msgstr "Codename"
+
+msgid "permission"
+msgstr "Berechtigung"
+
+msgid "permissions"
+msgstr "Berechtigungen"
+
+msgid "group"
+msgstr "Gruppe"
+
+msgid "groups"
+msgstr "Gruppen"
+
+msgid "superuser status"
+msgstr "Administrator-Status"
+
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr ""
+"Legt fest, dass der Benutzer alle Berechtigungen hat, ohne diese einzeln "
+"zuweisen zu müssen."
+
+msgid ""
+"The groups this user belongs to. A user will get all permissions granted to "
+"each of their groups."
+msgstr ""
+"Die Gruppen, denen der Benutzer angehört. Ein Benutzer bekommt alle "
+"Berechtigungen dieser Gruppen."
+
+msgid "user permissions"
+msgstr "Berechtigungen"
+
+msgid "Specific permissions for this user."
+msgstr "Spezifische Berechtigungen für diesen Benutzer."
+
+msgid "username"
+msgstr "Benutzername"
+
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr ""
+"Erforderlich. 150 Zeichen oder weniger. Nur Buchstaben, Ziffern und @/./+/-/"
+"_."
+
+msgid "A user with that username already exists."
+msgstr "Dieser Benutzername ist bereits vergeben."
+
+msgid "first name"
+msgstr "Vorname"
+
+msgid "last name"
+msgstr "Nachname"
+
+msgid "email address"
+msgstr "E-Mail-Adresse"
+
+msgid "staff status"
+msgstr "Mitarbeiter-Status"
+
+msgid "Designates whether the user can log into this admin site."
+msgstr ""
+"Legt fest, ob sich der Benutzer an der Administrationsseite anmelden kann."
+
+msgid "active"
+msgstr "Aktiv"
+
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+"Legt fest, ob dieser Benutzer aktiv ist. Kann deaktiviert werden, anstatt "
+"Benutzer zu löschen."
+
+msgid "date joined"
+msgstr "Mitglied seit"
+
+msgid "user"
+msgstr "Benutzer"
+
+msgid "users"
+msgstr "Benutzer"
+
+#, python-format
+msgid ""
+"This password is too short. It must contain at least %(min_length)d "
+"character."
+msgid_plural ""
+"This password is too short. It must contain at least %(min_length)d "
+"characters."
+msgstr[0] ""
+"Dieses Passwort ist zu kurz. Es muss mindestens %(min_length)d Zeichen "
+"enthalten."
+msgstr[1] ""
+"Dieses Passwort ist zu kurz. Es muss mindestens %(min_length)d Zeichen "
+"enthalten."
+
+#, python-format
+msgid "Your password must contain at least %(min_length)d character."
+msgid_plural "Your password must contain at least %(min_length)d characters."
+msgstr[0] "Das Passwort muss mindestens %(min_length)d Zeichen enthalten."
+msgstr[1] "Das Passwort muss mindestens %(min_length)d Zeichen enthalten."
+
+#, python-format
+msgid "The password is too similar to the %(verbose_name)s."
+msgstr "Das Passwort ist zu ähnlich zu %(verbose_name)s."
+
+msgid "Your password can’t be too similar to your other personal information."
+msgstr ""
+"Das Passwort darf nicht zu ähnlich zu anderen persönlichen Informationen "
+"sein."
+
+msgid "This password is too common."
+msgstr "Dieses Passwort ist zu üblich."
+
+msgid "Your password can’t be a commonly used password."
+msgstr "Das Passwort darf nicht allgemein üblich sein."
+
+msgid "This password is entirely numeric."
+msgstr "Dieses Passwort ist komplett numerisch. "
+
+msgid "Your password can’t be entirely numeric."
+msgstr "Das Passwort darf nicht komplett aus Ziffern bestehen."
+
+#, python-format
+msgid "Password reset on %(site_name)s"
+msgstr "Passwort auf %(site_name)s zurücksetzen"
+
+msgid ""
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
+msgstr ""
+"Bitte einen gültigen Benutzernamen eingeben, bestehend aus kleinen und "
+"großen Buchstaben (A-Z, a-z, ohne Sonderzeichen), Ziffern und @/./+/-/_."
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+"Bitte einen gültigen Benutzernamen eingeben, bestehend aus Buchstaben, "
+"Ziffern und @/./+/-/_."
+
+msgid "Logged out"
+msgstr "Abgemeldet"
+
+msgid "Password reset"
+msgstr "Passwort zurücksetzen"
+
+msgid "Password reset sent"
+msgstr "E-Mail zum Passwort zurücksetzen abgesendet"
+
+msgid "Enter new password"
+msgstr "Neues Passwort eingeben"
+
+msgid "Password reset unsuccessful"
+msgstr "Passwort nicht erfolgreich zurückgesetzt"
+
+msgid "Password reset complete"
+msgstr "Passwort zurücksetzen abgeschlossen"
+
+msgid "Password change"
+msgstr "Passwort ändern"
+
+msgid "Password change successful"
+msgstr "Passwort erfolgreich geändert"

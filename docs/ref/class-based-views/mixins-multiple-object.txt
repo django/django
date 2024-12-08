@@ -1,0 +1,225 @@
+======================
+Multiple object mixins
+======================
+
+``MultipleObjectMixin``
+=======================
+
+.. class:: django.views.generic.list.MultipleObjectMixin
+
+    A mixin that can be used to display a list of objects.
+
+    If ``paginate_by`` is specified, Django will paginate the results returned
+    by this. You can specify the page number in the URL in one of two ways:
+
+    * Use the ``page`` parameter in the URLconf. For example, this is what
+      your URLconf might look like::
+
+        path("objects/page<int:page>/", PaginatedView.as_view()),
+
+    * Pass the page number via the ``page`` query-string parameter. For
+      example, a URL would look like this:
+
+      .. code-block:: text
+
+          /objects/?page=3
+
+    These values and lists are 1-based, not 0-based, so the first page would be
+    represented as page ``1``.
+
+    For more on pagination, read the :doc:`pagination documentation
+    </topics/pagination>`.
+
+    As a special case, you are also permitted to use ``last`` as a value for
+    ``page``:
+
+    .. code-block:: text
+
+        /objects/?page=last
+
+    This allows you to access the final page of results without first having to
+    determine how many pages there are.
+
+    Note that ``page`` *must* be either a valid page number or the value
+    ``last``; any other value for ``page`` will result in a 404 error.
+
+    **Extends**
+
+    * :class:`django.views.generic.base.ContextMixin`
+
+    **Methods and Attributes**
+
+    .. attribute:: allow_empty
+
+        A boolean specifying whether to display the page if no objects are
+        available. If this is ``False`` and no objects are available, the view
+        will raise a 404 instead of displaying an empty page. By default, this
+        is ``True``.
+
+    .. attribute:: model
+
+        The model that this view will display data for. Specifying ``model
+        = Foo`` is effectively the same as specifying ``queryset =
+        Foo.objects.all()``, where ``objects`` stands for ``Foo``’s
+        :ref:`default manager <default-managers>`.
+
+    .. attribute:: queryset
+
+        A ``QuerySet`` that represents the objects. If provided, the value of
+        ``queryset`` supersedes the value provided for :attr:`model`.
+
+        .. warning::
+
+            ``queryset`` is a class attribute with a *mutable* value so care
+            must be taken when using it directly. Before using it, either call
+            its :meth:`~django.db.models.query.QuerySet.all` method or
+            retrieve it with :meth:`get_queryset` which takes care of the
+            cloning behind the scenes.
+
+    .. attribute:: ordering
+
+        A string or list of strings specifying the ordering to apply to the ``queryset``.
+        Valid values are the same as those for :meth:`~django.db.models.query.QuerySet.order_by`.
+
+    .. attribute:: paginate_by
+
+        An integer specifying how many objects should be displayed per page. If
+        this is given, the view will paginate objects with
+        ``paginate_by`` objects per page. The view will
+        expect either a ``page`` query string parameter (via ``request.GET``)
+        or a ``page`` variable specified in the URLconf.
+
+    .. attribute:: paginate_orphans
+
+        An integer specifying the number of "overflow" objects the last page
+        can contain. This extends the :attr:`paginate_by` limit on the last
+        page by up to ``paginate_orphans``, in order to keep the last page from
+        having a very small number of objects.
+
+    .. attribute:: page_kwarg
+
+        A string specifying the name to use for the page parameter.
+        The view will expect this parameter to be available either as a query
+        string parameter (via ``request.GET``) or as a kwarg variable specified
+        in the URLconf. Defaults to ``page``.
+
+    .. attribute:: paginator_class
+
+       The paginator class to be used for pagination. By default,
+       :class:`django.core.paginator.Paginator` is used. If the custom paginator
+       class doesn't have the same constructor interface as
+       :class:`django.core.paginator.Paginator`, you will also need to
+       provide an implementation for :meth:`get_paginator`.
+
+    .. attribute:: context_object_name
+
+        Designates the name of the variable to use in the context.
+
+    .. method:: get_queryset()
+
+        Get the list of items for this view. This must be an iterable and may
+        be a queryset (in which queryset-specific behavior will be enabled).
+
+    .. method:: get_ordering()
+
+        Returns a string (or iterable of strings) that defines the ordering that
+        will be applied to the ``queryset``.
+
+        Returns :attr:`ordering` by default.
+
+    .. method:: paginate_queryset(queryset, page_size)
+
+        Returns a 4-tuple containing (``paginator``, ``page``, ``object_list``,
+        ``is_paginated``).
+
+        Constructed by paginating ``queryset`` into pages of size ``page_size``.
+        If the request contains a ``page`` argument, either as a captured URL
+        argument or as a GET argument, ``object_list`` will correspond to the
+        objects from that page.
+
+    .. method:: get_paginate_by(queryset)
+
+        Returns the number of items to paginate by, or ``None`` for no
+        pagination. By default this returns the value of :attr:`paginate_by`.
+
+    .. method:: get_paginator(queryset, per_page, orphans=0, allow_empty_first_page=True)
+
+        Returns an instance of the paginator to use for this view. By default,
+        instantiates an instance of :attr:`paginator_class`.
+
+    .. method:: get_paginate_orphans()
+
+        An integer specifying the number of "overflow" objects the last page
+        can contain. By default this returns the value of
+        :attr:`paginate_orphans`.
+
+    .. method:: get_allow_empty()
+
+        Return a boolean specifying whether to display the page if no objects
+        are available. If this method returns ``False`` and no objects are
+        available, the view will raise a 404 instead of displaying an empty
+        page. By default, this is ``True``.
+
+    .. method:: get_context_object_name(object_list)
+
+        Return the context variable name that will be used to contain
+        the list of data that this view is manipulating. If
+        ``object_list`` is a queryset of Django objects and
+        :attr:`context_object_name` is not set,
+        the context name will be the ``model_name`` of the model that
+        the queryset is composed from, with postfix ``'_list'``
+        appended. For example, the model ``Article`` would have a
+        context object named ``article_list``.
+
+    .. method:: get_context_data(**kwargs)
+
+        Returns context data for displaying the list of objects.
+
+    **Context**
+
+    * ``object_list``: The list of objects that this view is displaying. If
+      ``context_object_name`` is specified, that variable will also be set
+      in the context, with the same value as ``object_list``.
+
+    * ``is_paginated``: A boolean representing whether the results are
+      paginated. Specifically, this is set to ``False`` if no page size has
+      been specified, or if the available objects do not span multiple
+      pages.
+
+    * ``paginator``: An instance of
+      :class:`django.core.paginator.Paginator`. If the page is not
+      paginated, this context variable will be ``None``.
+
+    * ``page_obj``: An instance of
+      :class:`django.core.paginator.Page`. If the page is not paginated,
+      this context variable will be ``None``.
+
+
+``MultipleObjectTemplateResponseMixin``
+=======================================
+
+.. class:: django.views.generic.list.MultipleObjectTemplateResponseMixin
+
+    A mixin class that performs template-based response rendering for views
+    that operate upon a list of object instances. Requires that the view it is
+    mixed with provides ``self.object_list``, the list of object instances that
+    the view is operating on. ``self.object_list`` may be, but is not required
+    to be, a :class:`~django.db.models.query.QuerySet`.
+
+    **Extends**
+
+    * :class:`~django.views.generic.base.TemplateResponseMixin`
+
+    **Methods and Attributes**
+
+    .. attribute:: template_name_suffix
+
+        The suffix to append to the auto-generated candidate template name.
+        Default suffix is ``_list``.
+
+    .. method:: get_template_names()
+
+        Returns a list of candidate template names. Returns the following list:
+
+        * the value of ``template_name`` on the view (if provided)
+        * ``<app_label>/<model_name><template_name_suffix>.html``

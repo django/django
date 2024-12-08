@@ -1,0 +1,60 @@
+name: Visual Regression Tests
+
+on:
+  pull_request:
+    types: [labeled, synchronize, opened, reopened]
+    paths-ignore:
+      - 'docs/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  selenium-screenshots:
+    if: contains(join(github.event.pull_request.labels.*.name, '|'), 'screenshots')
+    runs-on: ubuntu-latest
+    name: Screenshots
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: 'tests/requirements/py3.txt'
+      - name: Install and upgrade packaging tools
+        run: python -m pip install --upgrade pip setuptools wheel
+      - run: python -m pip install -r tests/requirements/py3.txt -e .
+
+      - name: Run Selenium tests with screenshots
+        working-directory: ./tests/
+        run: python -Wall runtests.py --verbosity=2 --noinput --selenium=chrome --headless --screenshots --settings=test_sqlite --parallel=2
+
+      - name: Cache oxipng
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/
+          key: ${{ runner.os }}-cargo
+
+      - name: Install oxipng
+        run: which oxipng || cargo install oxipng
+
+      - name: Optimize screenshots
+        run: oxipng --interlace=0 --opt=4 --strip=safe tests/screenshots/*.png
+
+      - name: Organize screenshots
+        run: |
+          mkdir --parents "/tmp/screenshots/${{ github.event.pull_request.head.sha }}"
+          mv tests/screenshots/* "/tmp/screenshots/${{ github.event.pull_request.head.sha }}/"
+
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots-${{ github.event.pull_request.head.sha }}
+          path: /tmp/screenshots/
+          if-no-files-found: error

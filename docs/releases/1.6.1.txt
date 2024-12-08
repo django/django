@@ -1,0 +1,62 @@
+==========================
+Django 1.6.1 release notes
+==========================
+
+*December 12, 2013*
+
+This is Django 1.6.1, a bugfix release for Django 1.6. In addition to the bug
+fixes listed below, translations submitted since the 1.6 release are also
+included.
+
+Bug fixes
+=========
+
+* Fixed ``BCryptSHA256PasswordHasher`` with ``py-bcrypt`` and Python 3
+  (#21398).
+* Fixed a regression that prevented a ``ForeignKey`` with a hidden reverse
+  manager (``related_name`` ending with '+') from being used as a lookup for
+  ``prefetch_related`` (#21410).
+* Fixed :meth:`Queryset.datetimes<django.db.models.query.QuerySet.datetimes>`
+  raising ``AttributeError`` in some situations (#21432).
+* Fixed :class:`~django.contrib.auth.backends.ModelBackend` raising
+  ``UnboundLocalError`` if :func:`~django.contrib.auth.get_user_model`
+  raised an error (#21439).
+* Fixed a regression that prevented editable ``GenericRelation`` subclasses
+  from working in ``ModelForms`` (#21428).
+* Added missing ``to_python`` method for ``ModelMultipleChoiceField`` which
+  is required in Django 1.6 to properly detect changes from initial values
+  (#21568).
+* Fixed ``django.contrib.humanize`` translations where the Unicode sequence
+  for the non-breaking space was returned verbatim (#21415).
+* Fixed :djadmin:`loaddata` error when fixture file name contained any dots
+  not related to file extensions (#21457) or when fixture path was relative
+  but located in a subdirectory (#21551).
+* Fixed display of inline instances in formsets when parent has 0 for primary
+  key (#21472).
+* Fixed a regression where custom querysets for foreign keys were overwritten
+  if ``ModelAdmin`` had ordering set (#21405).
+* Removed mention of a feature in the ``--locale``/``-l`` option of the
+  ``makemessages`` and ``compilemessages`` commands that never worked as
+  promised: Support of multiple locale names separated by commas. It's still
+  possible to specify multiple locales in one run by using the option
+  multiple times (#21488, #17181).
+* Fixed a regression that unnecessarily triggered settings configuration when
+  importing ``get_wsgi_application`` (#21486).
+* Fixed test client ``logout()`` method when using the cookie-based session
+  backend (#21448).
+* Fixed a crash when a ``GeometryField`` uses a non-geometric widget (#21496).
+* Fixed password hash upgrade when changing the iteration count (#21535).
+* Fixed a bug in the debug view when the URLconf only contains one element
+  (#21530).
+* Re-added missing search result count and reset link in changelist admin view
+  (#21510).
+* The current language is no longer saved to the session by ``LocaleMiddleware``
+  on every response, but rather only after a logout (#21473).
+* Fixed a crash when executing ``runserver`` on non-English systems and when the
+  formatted date in its output contained non-ASCII characters (#21358).
+* Fixed a crash in the debug view after an exception occurred on Python ≥ 3.3
+  (#21443).
+* Fixed a crash in :class:`~django.db.models.ImageField` on some platforms
+  (Homebrew and RHEL6 reported) (#21355).
+* Fixed a regression when using generic relations in ``ModelAdmin.list_filter``
+  (#21431).

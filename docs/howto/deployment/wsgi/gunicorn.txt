@@ -1,0 +1,36 @@
+===============================
+How to use Django with Gunicorn
+===============================
+
+Gunicorn_ ('Green Unicorn') is a pure-Python WSGI server for UNIX. It has no
+dependencies and can be installed using ``pip``.
+
+.. _Gunicorn: https://gunicorn.org/
+
+Installing Gunicorn
+===================
+
+Install gunicorn by running ``python -m pip install gunicorn``. For more
+details, see the `gunicorn documentation`_.
+
+.. _gunicorn documentation: https://docs.gunicorn.org/en/latest/install.html
+
+Running Django in Gunicorn as a generic WSGI application
+========================================================
+
+When Gunicorn is installed, a ``gunicorn`` command is available which starts
+the Gunicorn server process. The simplest invocation of gunicorn is to pass the
+location of a module containing a WSGI application object named
+``application``, which for a typical Django project would look like:
+
+.. code-block:: shell
+
+    gunicorn myproject.wsgi
+
+This will start one process running one thread listening on ``127.0.0.1:8000``.
+It requires that your project be on the Python path; the simplest way to ensure
+that is to run this command from the same directory as your ``manage.py`` file.
+
+See Gunicorn's `deployment documentation`_ for additional tips.
+
+.. _deployment documentation: https://docs.gunicorn.org/en/latest/deploy.html

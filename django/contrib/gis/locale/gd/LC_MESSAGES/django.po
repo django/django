@@ -1,0 +1,89 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# GunChleoc, 2015-2016
+# GunChleoc, 2015
+# GunChleoc, 2015
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 18:45+0000\n"
+"Last-Translator: GunChleoc, 2015\n"
+"Language-Team: Gaelic, Scottish (http://app.transifex.com/django/django/"
+"language/gd/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: gd\n"
+"Plural-Forms: nplurals=4; plural=(n==1 || n==11) ? 0 : (n==2 || n==12) ? 1 : "
+"(n > 2 && n < 20) ? 2 : 3;\n"
+
+msgid "GIS"
+msgstr "GIS"
+
+msgid "The base GIS field."
+msgstr "Bun-raon GIS."
+
+msgid ""
+"The base Geometry field — maps to the OpenGIS Specification Geometry type."
+msgstr ""
+"Bun-raon geomatrais – thèid a mhapachadh dhan t-seòrsa geomatrais a chaidh a "
+"shònrachadh le OpenGIS."
+
+msgid "Point"
+msgstr "Puing"
+
+msgid "Line string"
+msgstr "Sreang loidhne"
+
+msgid "Polygon"
+msgstr "Ioma-cheàrnach"
+
+msgid "Multi-point"
+msgstr "Iomadh-phuing"
+
+msgid "Multi-line string"
+msgstr "Sreang ioma-loidhne"
+
+msgid "Multi polygon"
+msgstr "Iomadh ioma-cheàrnach"
+
+msgid "Geometry collection"
+msgstr "Cruinneachadh geomatrais"
+
+msgid "Extent Aggregate Field"
+msgstr "Raon agragaid a tha ann"
+
+msgid "Raster Field"
+msgstr "Raon raster"
+
+msgid "No geometry value provided."
+msgstr "Cha deach luach geomatrais a shònrachadh."
+
+msgid "Invalid geometry value."
+msgstr "Luach geomatrais mì-dhligheach."
+
+msgid "Invalid geometry type."
+msgstr "Seòrsa geomatrais mì-dhligheach."
+
+msgid ""
+"An error occurred when transforming the geometry to the SRID of the geometry "
+"form field."
+msgstr ""
+"Thachair mearachd le thar-mhùthadh a’ gheomatrais gun SRID aig raon foirme "
+"a’ gheomatrais."
+
+msgid "Delete all Features"
+msgstr "Sguab às a h-uile gleus"
+
+msgid "Debugging window (serialized value)"
+msgstr "Uinneag dì-bhugachaidh (luach sreathaichte)"
+
+msgid "No feeds are registered."
+msgstr "Cha deach inbhir a shònrachadh."
+
+#, python-format
+msgid "Slug %r isn’t registered."
+msgstr "Cha deach an sluga %r a chlàradh."

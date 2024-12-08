@@ -1,0 +1,3 @@
+A comment has been posted on {{ content_object }}.
+The comment reads as follows:
+{{ comment }}

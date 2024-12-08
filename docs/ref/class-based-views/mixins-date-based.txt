@@ -1,0 +1,337 @@
+=================
+Date-based mixins
+=================
+
+.. currentmodule:: django.views.generic.dates
+
+.. note::
+
+    All the date formatting attributes in these mixins use
+    :func:`~time.strftime` format characters. Do not try to use the format
+    characters from the :ttag:`now` template tag as they are not compatible.
+
+``YearMixin``
+=============
+
+.. class:: YearMixin
+
+    A mixin that can be used to retrieve and provide parsing information for a
+    year component of a date.
+
+    **Methods and Attributes**
+
+    .. attribute:: year_format
+
+        The :func:`~time.strftime` format to use when parsing the year.
+        By default, this is ``'%Y'``.
+
+    .. attribute:: year
+
+        **Optional** The value for the year, as a string. By default, set to
+        ``None``, which means the year will be determined using other means.
+
+    .. method:: get_year_format()
+
+        Returns the :func:`~time.strftime` format to use when parsing the
+        year. Returns :attr:`~YearMixin.year_format` by default.
+
+    .. method:: get_year()
+
+        Returns the year for which this view will display data, as a string.
+        Tries the following sources, in order:
+
+        * The value of the :attr:`YearMixin.year` attribute.
+        * The value of the ``year`` argument captured in the URL pattern.
+        * The value of the ``year`` ``GET`` query argument.
+
+        Raises a 404 if no valid year specification can be found.
+
+    .. method:: get_next_year(date)
+
+        Returns a date object containing the first day of the year after the
+        date provided. This function can also return ``None`` or raise an
+        :class:`~django.http.Http404` exception, depending on the values of
+        :attr:`~BaseDateListView.allow_empty` and
+        :attr:`~DateMixin.allow_future`.
+
+    .. method:: get_previous_year(date)
+
+        Returns a date object containing the first day of the year before the
+        date provided. This function can also return ``None`` or raise an
+        :class:`~django.http.Http404` exception, depending on the values of
+        :attr:`~BaseDateListView.allow_empty` and
+        :attr:`~DateMixin.allow_future`.
+
+``MonthMixin``
+==============
+
+.. class:: MonthMixin
+
+    A mixin that can be used to retrieve and provide parsing information for a
+    month component of a date.
+
+    **Methods and Attributes**
+
+    .. attribute:: month_format
+
+        The :func:`~time.strftime` format to use when parsing the month. By
+        default, this is ``'%b'``.
+
+    .. attribute:: month
+
+        **Optional** The value for the month, as a string. By default, set to
+        ``None``, which means the month will be determined using other means.
+
+    .. method:: get_month_format()
+
+        Returns the :func:`~time.strftime` format to use when parsing the
+        month. Returns :attr:`~MonthMixin.month_format` by default.
+
+    .. method:: get_month()
+
+        Returns the month for which this view will display data, as a string.
+        Tries the following sources, in order:
+
+        * The value of the :attr:`MonthMixin.month` attribute.
+        * The value of the ``month`` argument captured in the URL pattern.
+        * The value of the ``month`` ``GET`` query argument.
+
+        Raises a 404 if no valid month specification can be found.
+
+    .. method:: get_next_month(date)
+
+        Returns a date object containing the first day of the month after the
+        date provided. This function can also return ``None`` or raise an
+        :class:`~django.http.Http404` exception, depending on the values of
+        :attr:`~BaseDateListView.allow_empty` and
+        :attr:`~DateMixin.allow_future`.
+
+    .. method:: get_previous_month(date)
+
+        Returns a date object containing the first day of the month before the
+        date provided. This function can also return ``None`` or raise an
+        :class:`~django.http.Http404` exception, depending on the values of
+        :attr:`~BaseDateListView.allow_empty` and
+        :attr:`~DateMixin.allow_future`.
+
+``DayMixin``
+============
+
+.. class:: DayMixin
+
+    A mixin that can be used to retrieve and provide parsing information for a
+    day component of a date.
+
+    **Methods and Attributes**
+
+    .. attribute:: day_format
+
+        The :func:`~time.strftime` format to use when parsing the day. By
+        default, this is ``'%d'``.
+
+    .. attribute:: day
+
+        **Optional** The value for the day, as a string. By default, set to
+        ``None``, which means the day will be determined using other means.
+
+    .. method:: get_day_format()
+
+        Returns the :func:`~time.strftime` format to use when parsing the day.
+        Returns :attr:`~DayMixin.day_format` by default.
+
+    .. method:: get_day()
+
+        Returns the day for which this view will display data, as a string.
+        Tries the following sources, in order:
+
+        * The value of the :attr:`DayMixin.day` attribute.
+        * The value of the ``day`` argument captured in the URL pattern.
+        * The value of the ``day`` ``GET`` query argument.
+
+        Raises a 404 if no valid day specification can be found.
+
+    .. method:: get_next_day(date)
+
+        Returns a date object containing the next valid day after the date
+        provided. This function can also return ``None`` or raise an
+        :class:`~django.http.Http404` exception, depending on the values of
+        :attr:`~BaseDateListView.allow_empty` and
+        :attr:`~DateMixin.allow_future`.
+
+    .. method:: get_previous_day(date)
+
+        Returns a date object containing the previous valid day. This function
+        can also return ``None`` or raise an :class:`~django.http.Http404`
+        exception, depending on the values of
+        :attr:`~BaseDateListView.allow_empty` and
+        :attr:`~DateMixin.allow_future`.
+
+``WeekMixin``
+=============
+
+.. class:: WeekMixin
+
+    A mixin that can be used to retrieve and provide parsing information for a
+    week component of a date.
+
+    **Methods and Attributes**
+
+    .. attribute:: week_format
+
+        The :func:`~time.strftime` format to use when parsing the week. By
+        default, this is ``'%U'``, which means the week starts on Sunday. Set
+        it to ``'%W'`` or ``'%V'`` (ISO 8601 week) if your week starts on
+        Monday.
+
+    .. attribute:: week
+
+        **Optional** The value for the week, as a string. By default, set to
+        ``None``, which means the week will be determined using other means.
+
+    .. method:: get_week_format()
+
+        Returns the :func:`~time.strftime` format to use when parsing the
+        week. Returns :attr:`~WeekMixin.week_format` by default.
+
+    .. method:: get_week()
+
+        Returns the week for which this view will display data, as a string.
+        Tries the following sources, in order:
+
+        * The value of the :attr:`WeekMixin.week` attribute.
+        * The value of the ``week`` argument captured in the URL pattern
+        * The value of the ``week`` ``GET`` query argument.
+
+        Raises a 404 if no valid week specification can be found.
+
+    .. method:: get_next_week(date)
+
+        Returns a date object containing the first day of the week after the
+        date provided. This function can also return ``None`` or raise an
+        :class:`~django.http.Http404` exception, depending on the values of
+        :attr:`~BaseDateListView.allow_empty` and
+        :attr:`~DateMixin.allow_future`.
+
+    .. method:: get_prev_week(date)
+
+        Returns a date object containing the first day of the week before the
+        date provided. This function can also return ``None`` or raise an
+        :class:`~django.http.Http404` exception, depending on the values of
+        :attr:`~BaseDateListView.allow_empty` and
+        :attr:`~DateMixin.allow_future`.
+
+``DateMixin``
+=============
+
+.. class:: DateMixin
+
+    A mixin class providing common behavior for all date-based views.
+
+    **Methods and Attributes**
+
+    .. attribute:: date_field
+
+        The name of the ``DateField`` or ``DateTimeField`` in the
+        ``QuerySet``’s model that the date-based archive should use to
+        determine the list of objects to display on the page.
+
+        When :doc:`time zone support </topics/i18n/timezones>` is enabled and
+        ``date_field`` is a ``DateTimeField``, dates are assumed to be in the
+        current time zone. Otherwise, the queryset could include objects from
+        the previous or the next day in the end user's time zone.
+
+        .. warning::
+
+            In this situation, if you have implemented per-user time zone
+            selection, the same URL may show a different set of objects,
+            depending on the end user's time zone. To avoid this, you should
+            use a ``DateField`` as the ``date_field`` attribute.
+
+    .. attribute:: allow_future
+
+        A boolean specifying whether to include "future" objects on this page,
+        where "future" means objects in which the field specified in
+        ``date_field`` is greater than the current date/time. By default, this
+        is ``False``.
+
+    .. method:: get_date_field()
+
+        Returns the name of the field that contains the date data that this
+        view will operate on. Returns :attr:`~DateMixin.date_field` by default.
+
+    .. method:: get_allow_future()
+
+        Determine whether to include "future" objects on this page, where
+        "future" means objects in which the field specified in ``date_field``
+        is greater than the current date/time. Returns
+        :attr:`~DateMixin.allow_future` by default.
+
+``BaseDateListView``
+====================
+
+.. class:: BaseDateListView
+
+    A base class that provides common behavior for all date-based views. There
+    won't normally be a reason to instantiate
+    :class:`~django.views.generic.dates.BaseDateListView`; instantiate one of
+    the subclasses instead.
+
+    While this view (and its subclasses) are executing, ``self.object_list``
+    will contain the list of objects that the view is operating upon, and
+    ``self.date_list`` will contain the list of dates for which data is
+    available.
+
+    **Mixins**
+
+    * :class:`~django.views.generic.dates.DateMixin`
+    * :class:`~django.views.generic.list.MultipleObjectMixin`
+
+    **Methods and Attributes**
+
+    .. attribute:: allow_empty
+
+        A boolean specifying whether to display the page if no objects are
+        available. If this is ``True`` and no objects are available, the view
+        will display an empty page instead of raising a 404.
+
+        This is identical to
+        :attr:`django.views.generic.list.MultipleObjectMixin.allow_empty`,
+        except for the default value, which is ``False``.
+
+    .. attribute:: date_list_period
+
+        **Optional** A string defining the aggregation period for
+        ``date_list``. It must be one of ``'year'`` (default), ``'month'``, or
+        ``'day'``.
+
+    .. method:: get_dated_items()
+
+        Returns a 3-tuple containing (``date_list``, ``object_list``,
+        ``extra_context``).
+
+        ``date_list`` is the list of dates for which data is available.
+        ``object_list`` is the list of objects. ``extra_context`` is a
+        dictionary of context data that will be added to any context data
+        provided by the
+        :class:`~django.views.generic.list.MultipleObjectMixin`.
+
+    .. method:: get_dated_queryset(**lookup)
+
+        Returns a queryset, filtered using the query arguments defined by
+        ``lookup``. Enforces any restrictions on the queryset, such as
+        ``allow_empty`` and ``allow_future``.
+
+    .. method:: get_date_list_period()
+
+        Returns the aggregation period for ``date_list``. Returns
+        :attr:`~BaseDateListView.date_list_period` by default.
+
+    .. method:: get_date_list(queryset, date_type=None, ordering='ASC')
+
+        Returns the list of dates of type ``date_type`` for which ``queryset``
+        contains entries. For example, ``get_date_list(qs, 'year')`` will
+        return the list of years for which ``qs`` has entries. If
+        ``date_type`` isn't provided, the result of
+        :meth:`~BaseDateListView.get_date_list_period` is used. ``date_type``
+        and ``ordering`` are passed to
+        :meth:`QuerySet.dates()<django.db.models.query.QuerySet.dates>`.

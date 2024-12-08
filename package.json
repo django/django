@@ -1,0 +1,20 @@
+{
+  "name": "Django",
+  "private": true,
+  "scripts": {
+    "pretest": "eslint .",
+    "test": "grunt test --verbose"
+  },
+  "engines": {
+    "npm": ">=1.3.0"
+  },
+  "devDependencies": {
+    "eslint": "^9.12.0",
+    "puppeteer": "^23.5.1",
+    "globals": "^15.8.0",
+    "grunt": "^1.6.1",
+    "grunt-cli": "^1.5.0",
+    "grunt-contrib-qunit": "^10.1.1",
+    "qunit": "^2.21.1"
+  }
+}

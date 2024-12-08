@@ -1,0 +1,513 @@
+======================
+Model ``Meta`` options
+======================
+
+This document explains all the possible :ref:`metadata options
+<meta-options>` that you can give your model in its internal
+``class Meta``.
+
+Available ``Meta`` options
+==========================
+
+.. currentmodule:: django.db.models
+
+``abstract``
+------------
+
+.. attribute:: Options.abstract
+
+    If ``abstract = True``, this model will be an
+    :ref:`abstract base class <abstract-base-classes>`.
+
+``app_label``
+-------------
+
+.. attribute:: Options.app_label
+
+    If a model is defined outside of an application in
+    :setting:`INSTALLED_APPS`, it must declare which app it belongs to::
+
+        app_label = "myapp"
+
+    If you want to represent a model with the format ``app_label.object_name``
+    or ``app_label.model_name`` you can use ``model._meta.label``
+    or ``model._meta.label_lower`` respectively.
+
+``base_manager_name``
+---------------------
+
+.. attribute:: Options.base_manager_name
+
+    The attribute name of the manager, for example, ``'objects'``, to use for
+    the model's :attr:`~django.db.models.Model._base_manager`.
+
+``db_table``
+------------
+
+.. attribute:: Options.db_table
+
+    The name of the database table to use for the model::
+
+        db_table = "music_album"
+
+.. _table-names:
+
+Table names
+~~~~~~~~~~~
+
+To save you time, Django automatically derives the name of the database table
+from the name of your model class and the app that contains it. A model's
+database table name is constructed by joining the model's "app label" -- the
+name you used in :djadmin:`manage.py startapp <startapp>` -- to the model's
+class name, with an underscore between them.
+
+For example, if you have an app ``bookstore`` (as created by
+``manage.py startapp bookstore``), a model defined as ``class Book`` will have
+a database table named ``bookstore_book``.
+
+To override the database table name, use the ``db_table`` parameter in
+``class Meta``.
+
+If your database table name is an SQL reserved word, or contains characters that
+aren't allowed in Python variable names -- notably, the hyphen -- that's OK.
+Django quotes column and table names behind the scenes.
+
+.. admonition:: Use lowercase table names for MariaDB and MySQL
+
+    It is strongly advised that you use lowercase table names when you override
+    the table name via ``db_table``, particularly if you are using the MySQL
+    backend. See the :ref:`MySQL notes <mysql-notes>` for more details.
+
+.. admonition:: Table name quoting for Oracle
+
+   In order to meet the 30-char limitation Oracle has on table names,
+   and match the usual conventions for Oracle databases, Django may shorten
+   table names and turn them all-uppercase. To prevent such transformations,
+   use a quoted name as the value for ``db_table``::
+
+       db_table = '"name_left_in_lowercase"'
+
+   Such quoted names can also be used with Django's other supported database
+   backends; except for Oracle, however, the quotes have no effect. See the
+   :ref:`Oracle notes <oracle-notes>` for more details.
+
+``db_table_comment``
+--------------------
+
+.. attribute:: Options.db_table_comment
+
+The comment on the database table to use for this model. It is useful for
+documenting database tables for individuals with direct database access who may
+not be looking at your Django code. For example::
+
+    class Answer(models.Model):
+        question = models.ForeignKey(Question, on_delete=models.CASCADE)
+        answer = models.TextField()
+
+        class Meta:
+            db_table_comment = "Question answers"
+
+``db_tablespace``
+-----------------
+
+.. attribute:: Options.db_tablespace
+
+    The name of the :doc:`database tablespace </topics/db/tablespaces>` to use
+    for this model. The default is the project's :setting:`DEFAULT_TABLESPACE`
+    setting, if set. If the backend doesn't support tablespaces, this option is
+    ignored.
+
+``default_manager_name``
+------------------------
+
+.. attribute:: Options.default_manager_name
+
+    The name of the manager to use for the model's
+    :attr:`~django.db.models.Model._default_manager`.
+
+``default_related_name``
+------------------------
+
+.. attribute:: Options.default_related_name
+
+    The name that will be used by default for the relation from a related object
+    back to this one. The default is ``<model_name>_set``.
+
+    This option also sets :attr:`~ForeignKey.related_query_name`.
+
+    As the reverse name for a field should be unique, be careful if you intend
+    to subclass your model. To work around name collisions, part of the name
+    should contain ``'%(app_label)s'`` and ``'%(model_name)s'``, which are
+    replaced respectively by the name of the application the model is in,
+    and the name of the model, both lowercased. See the paragraph on
+    :ref:`related names for abstract models <abstract-related-name>`.
+
+``get_latest_by``
+-----------------
+
+.. attribute:: Options.get_latest_by
+
+    The name of a field or a list of field names in the model, typically
+    :class:`DateField`, :class:`DateTimeField`, or :class:`IntegerField`. This
+    specifies the default field(s) to use in your model :class:`Manager`’s
+    :meth:`~django.db.models.query.QuerySet.latest` and
+    :meth:`~django.db.models.query.QuerySet.earliest` methods.
+
+    Example::
+
+        # Latest by ascending order_date.
+        get_latest_by = "order_date"
+
+        # Latest by priority descending, order_date ascending.
+        get_latest_by = ["-priority", "order_date"]
+
+    See the :meth:`~django.db.models.query.QuerySet.latest` docs for more.
+
+``managed``
+-----------
+
+.. attribute:: Options.managed
+
+    Defaults to ``True``, meaning Django will create the appropriate database
+    tables in :djadmin:`migrate` or as part of migrations and remove them as
+    part of a :djadmin:`flush` management command. That is, Django
+    *manages* the database tables' lifecycles.
+
+    If ``False``, no database table creation, modification, or deletion
+    operations will be performed for this model. This is useful if the model
+    represents an existing table or a database view that has been created by
+    some other means. This is the *only* difference when ``managed=False``. All
+    other aspects of model handling are exactly the same as normal. This
+    includes
+
+    #. Adding an automatic primary key field to the model if you don't
+       declare it.  To avoid confusion for later code readers, it's
+       recommended to specify all the columns from the database table you
+       are modeling when using unmanaged models.
+
+    #. If a model with ``managed=False`` contains a
+       :class:`~django.db.models.ManyToManyField` that points to another
+       unmanaged model, then the intermediate table for the many-to-many
+       join will also not be created. However, the intermediary table
+       between one managed and one unmanaged model *will* be created.
+
+       If you need to change this default behavior, create the intermediary
+       table as an explicit model (with ``managed`` set as needed) and use
+       the :attr:`ManyToManyField.through` attribute to make the relation
+       use your custom model.
+
+    For tests involving models with ``managed=False``, it's up to you to ensure
+    the correct tables are created as part of the test setup.
+
+    If you're interested in changing the Python-level behavior of a model class,
+    you *could* use ``managed=False`` and create a copy of an existing model.
+    However, there's a better approach for that situation: :ref:`proxy-models`.
+
+``order_with_respect_to``
+-------------------------
+
+.. attribute:: Options.order_with_respect_to
+
+    Makes this object orderable with respect to the given field, usually a
+    ``ForeignKey``. This can be used to make related objects orderable with
+    respect to a parent object. For example, if an ``Answer`` relates to a
+    ``Question`` object, and a question has more than one answer, and the order
+    of answers matters, you'd do this::
+
+        from django.db import models
+
+
+        class Question(models.Model):
+            text = models.TextField()
+            # ...
+
+
+        class Answer(models.Model):
+            question = models.ForeignKey(Question, on_delete=models.CASCADE)
+            # ...
+
+            class Meta:
+                order_with_respect_to = "question"
+
+    When ``order_with_respect_to`` is set, two additional methods are provided to
+    retrieve and to set the order of the related objects: ``get_RELATED_order()``
+    and ``set_RELATED_order()``, where ``RELATED`` is the lowercased model name. For
+    example, assuming that a ``Question`` object has multiple related ``Answer``
+    objects, the list returned contains the primary keys of the related ``Answer``
+    objects:
+
+    .. code-block:: pycon
+
+        >>> question = Question.objects.get(id=1)
+        >>> question.get_answer_order()
+        [1, 2, 3]
+
+    The order of a ``Question`` object's related ``Answer`` objects can be set by
+    passing in a list of ``Answer`` primary keys:
+
+    .. code-block:: pycon
+
+        >>> question.set_answer_order([3, 1, 2])
+
+    The related objects also get two methods, ``get_next_in_order()`` and
+    ``get_previous_in_order()``, which can be used to access those objects in their
+    proper order. Assuming the ``Answer`` objects are ordered by ``id``:
+
+    .. code-block:: pycon
+
+        >>> answer = Answer.objects.get(id=2)
+        >>> answer.get_next_in_order()
+        <Answer: 3>
+        >>> answer.get_previous_in_order()
+        <Answer: 1>
+
+.. admonition:: ``order_with_respect_to`` implicitly sets the ``ordering`` option
+
+    Internally, ``order_with_respect_to`` adds an additional field/database
+    column named ``_order`` and sets the model's :attr:`~Options.ordering`
+    option to this field. Consequently, ``order_with_respect_to`` and
+    ``ordering`` cannot be used together, and the ordering added by
+    ``order_with_respect_to`` will apply whenever you obtain a list of objects
+    of this model.
+
+.. admonition:: Changing ``order_with_respect_to``
+
+    Because ``order_with_respect_to`` adds a new database column, be sure to
+    make and apply the appropriate migrations if you add or change
+    ``order_with_respect_to`` after your initial :djadmin:`migrate`.
+
+``ordering``
+------------
+
+.. attribute:: Options.ordering
+
+    The default ordering for the object, for use when obtaining lists of objects::
+
+        ordering = ["-order_date"]
+
+    This is a tuple or list of strings and/or query expressions. Each string is
+    a field name with an optional "-" prefix, which indicates descending order.
+    Fields without a leading "-" will be ordered ascending. Use the string "?"
+    to order randomly.
+
+    For example, to order by a ``pub_date`` field ascending, use this::
+
+        ordering = ["pub_date"]
+
+    To order by ``pub_date`` descending, use this::
+
+        ordering = ["-pub_date"]
+
+    To order by ``pub_date`` descending, then by ``author`` ascending, use this::
+
+        ordering = ["-pub_date", "author"]
+
+    You can also use :doc:`query expressions </ref/models/expressions>`. To
+    order by ``author`` ascending and make null values sort last, use this::
+
+        from django.db.models import F
+
+        ordering = [F("author").asc(nulls_last=True)]
+
+.. warning::
+
+    Ordering is not a free operation. Each field you add to the ordering
+    incurs a cost to your database. Each foreign key you add will
+    implicitly include all of its default orderings as well.
+
+    If a query doesn't have an ordering specified, results are returned from
+    the database in an unspecified order. A particular ordering is guaranteed
+    only when ordering by a set of fields that uniquely identify each object in
+    the results. For example, if a ``name`` field isn't unique, ordering by it
+    won't guarantee objects with the same name always appear in the same order.
+
+``permissions``
+---------------
+
+.. attribute:: Options.permissions
+
+    Extra permissions to enter into the permissions table when creating this object.
+    Add, change, delete, and view permissions are automatically created for each
+    model. This example specifies an extra permission, ``can_deliver_pizzas``::
+
+        permissions = [("can_deliver_pizzas", "Can deliver pizzas")]
+
+    This is a list or tuple of 2-tuples in the format ``(permission_code,
+    human_readable_permission_name)``.
+
+``default_permissions``
+-----------------------
+
+.. attribute:: Options.default_permissions
+
+    Defaults to ``('add', 'change', 'delete', 'view')``. You may customize this
+    list, for example, by setting this to an empty list if your app doesn't
+    require any of the default permissions. It must be specified on the model
+    before the model is created by :djadmin:`migrate` in order to prevent any
+    omitted permissions from being created.
+
+``proxy``
+---------
+
+.. attribute:: Options.proxy
+
+    If ``proxy = True``, a model which subclasses another model will be treated as
+    a :ref:`proxy model <proxy-models>`.
+
+``required_db_features``
+------------------------
+
+.. attribute:: Options.required_db_features
+
+    List of database features that the current connection should have so that
+    the model is considered during the migration phase. For example, if you set
+    this list to ``['gis_enabled']``, the model will only be synchronized on
+    GIS-enabled databases. It's also useful to skip some models when testing
+    with several database backends. Avoid relations between models that may or
+    may not be created as the ORM doesn't handle this.
+
+``required_db_vendor``
+----------------------
+
+.. attribute:: Options.required_db_vendor
+
+    Name of a supported database vendor that this model is specific to. Current
+    built-in vendor names are: ``sqlite``, ``postgresql``, ``mysql``,
+    ``oracle``. If this attribute is not empty and the current connection vendor
+    doesn't match it, the model will not be synchronized.
+
+``select_on_save``
+------------------
+
+.. attribute:: Options.select_on_save
+
+    Determines if Django will use the pre-1.6
+    :meth:`django.db.models.Model.save()` algorithm. The old algorithm
+    uses ``SELECT`` to determine if there is an existing row to be updated.
+    The new algorithm tries an ``UPDATE`` directly. In some rare cases the
+    ``UPDATE`` of an existing row isn't visible to Django. An example is the
+    PostgreSQL ``ON UPDATE`` trigger which returns ``NULL``. In such cases the
+    new algorithm will end up doing an ``INSERT`` even when a row exists in
+    the database.
+
+    Usually there is no need to set this attribute. The default is
+    ``False``.
+
+    See :meth:`django.db.models.Model.save()` for more about the old and
+    new saving algorithm.
+
+``indexes``
+-----------
+
+.. attribute:: Options.indexes
+
+    A list of :doc:`indexes </ref/models/indexes>` that you want to define on
+    the model::
+
+        from django.db import models
+
+
+        class Customer(models.Model):
+            first_name = models.CharField(max_length=100)
+            last_name = models.CharField(max_length=100)
+
+            class Meta:
+                indexes = [
+                    models.Index(fields=["last_name", "first_name"]),
+                    models.Index(fields=["first_name"], name="first_name_idx"),
+                ]
+
+``unique_together``
+-------------------
+
+.. attribute:: Options.unique_together
+
+    .. admonition:: Use :class:`.UniqueConstraint` with the :attr:`~Options.constraints` option instead.
+
+        :class:`.UniqueConstraint` provides more functionality than
+        ``unique_together``. ``unique_together`` may be deprecated in the
+        future.
+
+    Sets of field names that, taken together, must be unique::
+
+        unique_together = [["driver", "restaurant"]]
+
+    This is a list of lists that must be unique when considered together.
+    It's used in the Django admin and is enforced at the database level (i.e., the
+    appropriate ``UNIQUE`` statements are included in the ``CREATE TABLE``
+    statement).
+
+    For convenience, ``unique_together`` can be a single list when dealing with
+    a single set of fields::
+
+        unique_together = ["driver", "restaurant"]
+
+    A :class:`~django.db.models.ManyToManyField` cannot be included in
+    ``unique_together``. (It's not clear what that would even mean!) If you
+    need to validate uniqueness related to a
+    :class:`~django.db.models.ManyToManyField`, try using a signal or
+    an explicit :attr:`through <ManyToManyField.through>` model.
+
+    The ``ValidationError`` raised during model validation when the constraint
+    is violated has the ``unique_together`` error code.
+
+``constraints``
+---------------
+
+.. attribute:: Options.constraints
+
+    A list of :doc:`constraints </ref/models/constraints>` that you want to
+    define on the model::
+
+        from django.db import models
+
+
+        class Customer(models.Model):
+            age = models.IntegerField()
+
+            class Meta:
+                constraints = [
+                    models.CheckConstraint(condition=models.Q(age__gte=18), name="age_gte_18"),
+                ]
+
+``verbose_name``
+----------------
+
+.. attribute:: Options.verbose_name
+
+    A human-readable name for the object, singular::
+
+        verbose_name = "pizza"
+
+    If this isn't given, Django will use a munged version of the class name:
+    ``CamelCase`` becomes ``camel case``.
+
+``verbose_name_plural``
+-----------------------
+
+.. attribute:: Options.verbose_name_plural
+
+    The plural name for the object::
+
+        verbose_name_plural = "stories"
+
+    If this isn't given, Django will use :attr:`~Options.verbose_name` + ``"s"``.
+
+Read-only ``Meta`` attributes
+=============================
+
+``label``
+---------
+
+.. attribute:: Options.label
+
+    Representation of the object, returns ``app_label.object_name``, e.g.
+    ``'polls.Question'``.
+
+``label_lower``
+---------------
+
+.. attribute:: Options.label_lower
+
+    Representation of the model, returns ``app_label.model_name``, e.g.
+    ``'polls.question'``.

@@ -1,0 +1,36 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: django tests\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-02-14 17:33+0100\n"
+"PO-Revision-Date: 2011-01-21 21:37-0300\n"
+"Last-Translator: Claude\n"
+"Language-Team: fr <fr@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n==0 ? 1 : 2);\n"
+
+# Plural form is purposefully different from the normal French plural to test
+# multiple plural forms for one language.
+
+#: template.html:3
+# Note: Intentional: variable name is translated.
+msgid "My name is %(person)s."
+msgstr "Mon nom est %(personne)s."
+
+#: template.html:3
+# Note: Intentional: the variable name is badly formatted (missing 's' at the end)
+msgid "My other name is %(person)s."
+msgstr "Mon autre nom est %(person)."
+
+msgid "%d singular"
+msgid_plural "%d plural"
+msgstr[0] "%d singulier"
+msgstr[1] "%d pluriel1"
+msgstr[2] "%d pluriel2"

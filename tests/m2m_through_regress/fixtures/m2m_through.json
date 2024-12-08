@@ -1,0 +1,34 @@
+[
+    {
+        "pk": "1",
+        "model": "m2m_through_regress.person",
+        "fields": {
+            "name": "Guido"
+        }
+    },
+    {
+        "pk": "1",
+        "model": "auth.user",
+        "fields": {
+             "username": "Guido",
+             "email": "bdfl@python.org",
+             "password": "abcde"
+        }
+    },
+    {
+        "pk": "1",
+        "model": "m2m_through_regress.group",
+        "fields": {
+            "name": "Python Core Group"
+        }
+    },
+    {
+        "pk": "1",
+        "model": "m2m_through_regress.usermembership",
+        "fields": {
+            "user": "1",
+            "group": "1",
+            "price": "100"
+        }
+    }
+]

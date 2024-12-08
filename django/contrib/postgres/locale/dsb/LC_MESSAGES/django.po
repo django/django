@@ -1,0 +1,118 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Michael Wolf <milupo@sorbzilla.de>, 2016-2018,2020,2023
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-19 09:22+0000\n"
+"Last-Translator: Michael Wolf <milupo@sorbzilla.de>, 2016-2018,2020,2023\n"
+"Language-Team: Lower Sorbian (http://www.transifex.com/django/django/"
+"language/dsb/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: dsb\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || "
+"n%100==4 ? 2 : 3);\n"
+
+msgid "PostgreSQL extensions"
+msgstr "Rozšyrjenja PostgreSQL"
+
+#, python-format
+msgid "Item %(nth)s in the array did not validate:"
+msgstr "Zapisk %(nth)sw pólnej wariabli njejo se wobkšuśił:"
+
+msgid "Nested arrays must have the same length."
+msgstr "Zakašćikowane pólne wariable muse tu samsku dłujkosć měś."
+
+msgid "Map of strings to strings/nulls"
+msgstr "Konwertěrowanje znamuškowych rjeśazkow do znamuškowych rjeśazkow/nulow"
+
+#, python-format
+msgid "The value of “%(key)s” is not a string or null."
+msgstr "Gódnota „%(key)s“ njejo znamuškowy rjeśazk abo null."
+
+msgid "Could not load JSON data."
+msgstr "JSON-daty njejsu se zacytowaś dali."
+
+msgid "Input must be a JSON dictionary."
+msgstr "Zapódaśe musy JSON-słownik byś."
+
+msgid "Enter two valid values."
+msgstr "Zapódajśo dwě płaśiwej gódnośe."
+
+msgid "The start of the range must not exceed the end of the range."
+msgstr "Zachopjeńk wobcerka njesmějo kóńc wobcerka pśekšocyś."
+
+msgid "Enter two whole numbers."
+msgstr "Zapódajśo dwě cełej licbje."
+
+msgid "Enter two numbers."
+msgstr "Zapódajśo dwě licbje."
+
+msgid "Enter two valid date/times."
+msgstr "Zapódajśo dwě płaśiwej datowej/casowej pódaśi."
+
+msgid "Enter two valid dates."
+msgstr "Zapódajśo dwě płaśiwej datowej pódaśi."
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no more than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no more than "
+"%(limit_value)d."
+msgstr[0] ""
+"Lisćina wopśimujo %(show_value)d element, wóna njeby dejała wěcej ako "
+"%(limit_value)d wopśimowaś."
+msgstr[1] ""
+"Lisćina wopśimujo %(show_value)d elementa, wóna njeby dejała wěcej ako "
+"%(limit_value)d wopśimowaś."
+msgstr[2] ""
+"Lisćina wopśimujo %(show_value)d elementy, wóna njeby dejała wěcej ako "
+"%(limit_value)d wopśimowaś."
+msgstr[3] ""
+"Lisćina wopśimujo %(show_value)d elementow, wóna njeby dejała wěcej ako "
+"%(limit_value)d wopśimowaś."
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no fewer than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no fewer than "
+"%(limit_value)d."
+msgstr[0] ""
+"Lisćina wopśimujo %(show_value)d element, wóna njeby dejała mjenjej ako "
+"%(limit_value)d wopśimowaś."
+msgstr[1] ""
+"Lisćina wopśimujo %(show_value)d elementa, wóna njeby dejała mjenjej ako "
+"%(limit_value)d wopśimowaś."
+msgstr[2] ""
+"Lisćina wopśimujo %(show_value)d elementy, wóna njeby dejała mjenjej ako "
+"%(limit_value)d wopśimowaś."
+msgstr[3] ""
+"Lisćina wopśimujo %(show_value)d elementow, wóna njeby dejała mjenjej ako "
+"%(limit_value)d wopśimowaś."
+
+#, python-format
+msgid "Some keys were missing: %(keys)s"
+msgstr "Někotare kluce feluju: %(keys)s"
+
+#, python-format
+msgid "Some unknown keys were provided: %(keys)s"
+msgstr "Někotare njeznate kluce su se pódali: %(keys)s"
+
+#, python-format
+msgid ""
+"Ensure that the upper bound of the range is not greater than %(limit_value)s."
+msgstr "Zawěsććo, až górna granica wobceŕka njejo wětša ako %(limit_value)s."
+
+#, python-format
+msgid ""
+"Ensure that the lower bound of the range is not less than %(limit_value)s."
+msgstr "Zawěsććo, až dolna granica wobceŕka njejo mjeńša ako %(limit_value)s."

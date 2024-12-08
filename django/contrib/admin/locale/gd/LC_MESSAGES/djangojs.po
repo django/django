@@ -1,0 +1,286 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# GunChleoc, 2015-2016
+# GunChleoc, 2015
+# GunChleoc, 2015
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-07-15 10:43+0000\n"
+"Last-Translator: GunChleoc\n"
+"Language-Team: Gaelic, Scottish (http://www.transifex.com/django/django/"
+"language/gd/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: gd\n"
+"Plural-Forms: nplurals=4; plural=(n==1 || n==11) ? 0 : (n==2 || n==12) ? 1 : "
+"(n > 2 && n < 20) ? 2 : 3;\n"
+
+#, javascript-format
+msgid "Available %s"
+msgstr "%s ri am faighinn"
+
+#, javascript-format
+msgid ""
+"This is the list of available %s. You may choose some by selecting them in "
+"the box below and then clicking the \"Choose\" arrow between the two boxes."
+msgstr ""
+"Seo liosta de %s a tha ri am faighinn. Gus feadhainn a thaghadh, tagh iad sa "
+"bhogsa gu h-ìosal agus briog air an t-saighead “Tagh” eadar an dà bhogsa an "
+"uair sin."
+
+#, javascript-format
+msgid "Type into this box to filter down the list of available %s."
+msgstr ""
+"Sgrìobh sa bhogsa seo gus an liosta de %s ri am faighinn a chriathradh."
+
+msgid "Filter"
+msgstr "Criathraich"
+
+msgid "Choose all"
+msgstr "Tagh na h-uile"
+
+#, javascript-format
+msgid "Click to choose all %s at once."
+msgstr "Briog gus a h-uile %s a thaghadh aig an aon àm."
+
+msgid "Choose"
+msgstr "Tagh"
+
+msgid "Remove"
+msgstr "Thoir air falbh"
+
+#, javascript-format
+msgid "Chosen %s"
+msgstr "%s a chaidh a thaghadh"
+
+#, javascript-format
+msgid ""
+"This is the list of chosen %s. You may remove some by selecting them in the "
+"box below and then clicking the \"Remove\" arrow between the two boxes."
+msgstr ""
+"Seo liosta de %s a chaidh a thaghadh. Gus feadhainn a thoirt air falbh, tagh "
+"iad sa bhogsa gu h-ìosal agus briog air an t-saighead “Thoir air falbh” "
+"eadar an dà bhogsa an uair sin."
+
+msgid "Remove all"
+msgstr "Thoir air falbh na h-uile"
+
+#, javascript-format
+msgid "Click to remove all chosen %s at once."
+msgstr "Briog gus a h-uile %s a chaidh a thaghadh a thoirt air falbh."
+
+msgid "%(sel)s of %(cnt)s selected"
+msgid_plural "%(sel)s of %(cnt)s selected"
+msgstr[0] "Chaidh %(sel)s à %(cnt)s a thaghadh"
+msgstr[1] "Chaidh %(sel)s à %(cnt)s a thaghadh"
+msgstr[2] "Chaidh %(sel)s à %(cnt)s a thaghadh"
+msgstr[3] "Chaidh %(sel)s à %(cnt)s a thaghadh"
+
+msgid ""
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
+msgstr ""
+"Tha atharraichean gun sàbhaladh agad ann an raon no dhà fa leth a ghabhas "
+"deasachadh. Ma ruitheas tu gnìomh, thèid na dh’atharraich thu gun a "
+"shàbhaladh air chall."
+
+msgid ""
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
+"action."
+msgstr ""
+"Thagh thu gnìomh ach cha do shàbhail thu na dh’atharraich thu ann an "
+"raointean fa leth. Briog air “Ceart ma-thà” gus seo a shàbhaladh. Feumaidh "
+"tu an gnìomh a ruith a-rithist."
+
+msgid ""
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
+"button."
+msgstr ""
+"Thagh thu gnìomh agus cha do rinn thu atharrachadh air ran fa leth sam bith. "
+"’S dòcha gu bheil thu airson am putan “Siuthad” a chleachdadh seach am putan "
+"“Sàbhail”."
+
+msgid "Now"
+msgstr "An-dràsta"
+
+msgid "Midnight"
+msgstr "Meadhan-oidhche"
+
+msgid "6 a.m."
+msgstr "6m"
+
+msgid "Noon"
+msgstr "Meadhan-latha"
+
+msgid "6 p.m."
+msgstr "6f"
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] ""
+"An aire: Tha thu %s uair a thìde air thoiseach àm an fhrithealaiche."
+msgstr[1] ""
+"An aire: Tha thu %s uair a thìde air thoiseach àm an fhrithealaiche."
+msgstr[2] ""
+"An aire: Tha thu %s uairean a thìde air thoiseach àm an fhrithealaiche."
+msgstr[3] ""
+"An aire: Tha thu %s uair a thìde air thoiseach àm an fhrithealaiche."
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] ""
+"An aire: Tha thu %s uair a thìde air dheireadh àm an fhrithealaiche."
+msgstr[1] ""
+"An aire: Tha thu %s uair a thìde air dheireadh àm an fhrithealaiche."
+msgstr[2] ""
+"An aire: Tha thu %s uairean a thìde air dheireadh àm an fhrithealaiche."
+msgstr[3] ""
+"An aire: Tha thu %s uair a thìde air dheireadh àm an fhrithealaiche."
+
+msgid "Choose a Time"
+msgstr "Tagh àm"
+
+msgid "Choose a time"
+msgstr "Tagh àm"
+
+msgid "Cancel"
+msgstr "Sguir dheth"
+
+msgid "Today"
+msgstr "An-diugh"
+
+msgid "Choose a Date"
+msgstr "Tagh ceann-là"
+
+msgid "Yesterday"
+msgstr "An-dè"
+
+msgid "Tomorrow"
+msgstr "A-màireach"
+
+msgid "January"
+msgstr "Am Faoilleach"
+
+msgid "February"
+msgstr "An Gearran"
+
+msgid "March"
+msgstr "Am Màrt"
+
+msgid "April"
+msgstr "An Giblean"
+
+msgid "May"
+msgstr "An Cèitean"
+
+msgid "June"
+msgstr "An t-Ògmhios"
+
+msgid "July"
+msgstr "An t-Iuchar"
+
+msgid "August"
+msgstr "An Lùnastal"
+
+msgid "September"
+msgstr "An t-Sultain"
+
+msgid "October"
+msgstr "An Dàmhair"
+
+msgid "November"
+msgstr "An t-Samhain"
+
+msgid "December"
+msgstr "An Dùbhlachd"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "Faoi"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "Gearr"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "Màrt"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "Gibl"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "Cèit"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "Ògmh"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "Iuch"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "Lùna"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "Sult"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "Dàmh"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "Samh"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "Dùbh"
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr "Dò"
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr "Lu"
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr "Mà"
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr "Ci"
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr "Da"
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr "hA"
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr "Sa"
+
+msgid "Show"
+msgstr "Seall"
+
+msgid "Hide"
+msgstr "Falaich"

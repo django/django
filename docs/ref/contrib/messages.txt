@@ -1,0 +1,485 @@
+======================
+The messages framework
+======================
+
+.. module:: django.contrib.messages
+   :synopsis: Provides cookie- and session-based temporary message storage.
+
+Quite commonly in web applications, you need to display a one-time
+notification message (also known as "flash message") to the user after
+processing a form or some other types of user input.
+
+For this, Django provides full support for cookie- and session-based
+messaging, for both anonymous and authenticated users. The messages framework
+allows you to temporarily store messages in one request and retrieve them for
+display in a subsequent request (usually the next one). Every message is
+tagged with a specific ``level`` that determines its priority (e.g., ``info``,
+``warning``, or ``error``).
+
+Enabling messages
+=================
+
+Messages are implemented through a :doc:`middleware </ref/middleware>`
+class and corresponding :doc:`context processor </ref/templates/api>`.
+
+The default ``settings.py`` created by ``django-admin startproject``
+already contains all the settings required to enable message functionality:
+
+* ``'django.contrib.messages'`` is in :setting:`INSTALLED_APPS`.
+
+* :setting:`MIDDLEWARE` contains
+  ``'django.contrib.sessions.middleware.SessionMiddleware'`` and
+  ``'django.contrib.messages.middleware.MessageMiddleware'``.
+
+  The default :ref:`storage backend <message-storage-backends>` relies on
+  :doc:`sessions </topics/http/sessions>`. That's why ``SessionMiddleware``
+  must be enabled and appear before ``MessageMiddleware`` in
+  :setting:`MIDDLEWARE`.
+
+* The ``'context_processors'`` option of the ``DjangoTemplates`` backend
+  defined in your :setting:`TEMPLATES` setting contains
+  ``'django.contrib.messages.context_processors.messages'``.
+
+If you don't want to use messages, you can remove
+``'django.contrib.messages'`` from your :setting:`INSTALLED_APPS`, the
+``MessageMiddleware`` line from :setting:`MIDDLEWARE`, and the ``messages``
+context processor from :setting:`TEMPLATES`.
+
+Configuring the message engine
+==============================
+
+.. _message-storage-backends:
+
+Storage backends
+----------------
+
+The messages framework can use different backends to store temporary messages.
+
+Django provides three built-in storage classes in
+:mod:`django.contrib.messages`:
+
+.. class:: storage.session.SessionStorage
+
+    This class stores all messages inside of the request's session. Therefore
+    it requires Django's ``contrib.sessions`` application.
+
+.. class:: storage.cookie.CookieStorage
+
+    This class stores the message data in a cookie (signed with a secret hash
+    to prevent manipulation) to persist notifications across requests. Old
+    messages are dropped if the cookie data size would exceed 2048 bytes.
+
+.. class:: storage.fallback.FallbackStorage
+
+    This class first uses ``CookieStorage``, and falls back to using
+    ``SessionStorage`` for the messages that could not fit in a single cookie.
+    It also requires Django's ``contrib.sessions`` application.
+
+    This behavior avoids writing to the session whenever possible. It should
+    provide the best performance in the general case.
+
+:class:`~django.contrib.messages.storage.fallback.FallbackStorage` is the
+default storage class. If it isn't suitable to your needs, you can select
+another storage class by setting :setting:`MESSAGE_STORAGE` to its full import
+path, for example::
+
+    MESSAGE_STORAGE = "django.contrib.messages.storage.cookie.CookieStorage"
+
+.. class:: storage.base.BaseStorage
+
+To write your own storage class, subclass the ``BaseStorage`` class in
+``django.contrib.messages.storage.base`` and implement the ``_get`` and
+``_store`` methods.
+
+.. _message-level:
+
+Message levels
+--------------
+
+The messages framework is based on a configurable level architecture similar
+to that of the Python logging module. Message levels allow you to group
+messages by type so they can be filtered or displayed differently in views and
+templates.
+
+The built-in levels, which can be imported from ``django.contrib.messages``
+directly, are:
+
+=========== ========
+Constant    Purpose
+=========== ========
+``DEBUG``   Development-related messages that will be ignored (or removed) in a production deployment
+``INFO``    Informational messages for the user
+``SUCCESS`` An action was successful, e.g. "Your profile was updated successfully"
+``WARNING`` A failure did not occur but may be imminent
+``ERROR``   An action was **not** successful or some other failure occurred
+=========== ========
+
+The :setting:`MESSAGE_LEVEL` setting can be used to change the minimum recorded level
+(or it can be `changed per request`_). Attempts to add messages of a level less
+than this will be ignored.
+
+.. _`changed per request`: `Changing the minimum recorded level per-request`_
+
+Message tags
+------------
+
+Message tags are a string representation of the message level plus any
+extra tags that were added directly in the view (see
+`Adding extra message tags`_ below for more details). Tags are stored in a
+string and are separated by spaces. Typically, message tags
+are used as CSS classes to customize message style based on message type. By
+default, each level has a single tag that's a lowercase version of its own
+constant:
+
+==============  ===========
+Level Constant  Tag
+==============  ===========
+``DEBUG``       ``debug``
+``INFO``        ``info``
+``SUCCESS``     ``success``
+``WARNING``     ``warning``
+``ERROR``       ``error``
+==============  ===========
+
+To change the default tags for a message level (either built-in or custom),
+set the :setting:`MESSAGE_TAGS` setting to a dictionary containing the levels
+you wish to change. As this extends the default tags, you only need to provide
+tags for the levels you wish to override::
+
+    from django.contrib.messages import constants as messages
+
+    MESSAGE_TAGS = {
+        messages.INFO: "",
+        50: "critical",
+    }
+
+Using messages in views and templates
+=====================================
+
+.. function:: add_message(request, level, message, extra_tags='', fail_silently=False)
+
+Adding a message
+----------------
+
+To add a message, call::
+
+    from django.contrib import messages
+
+    messages.add_message(request, messages.INFO, "Hello world.")
+
+Some shortcut methods provide a standard way to add messages with commonly
+used tags (which are usually represented as HTML classes for the message)::
+
+    messages.debug(request, "%s SQL statements were executed." % count)
+    messages.info(request, "Three credits remain in your account.")
+    messages.success(request, "Profile details updated.")
+    messages.warning(request, "Your account expires in three days.")
+    messages.error(request, "Document deleted.")
+
+.. _message-displaying:
+
+Displaying messages
+-------------------
+.. function:: get_messages(request)
+
+**In your template**, use something like:
+
+.. code-block:: html+django
+
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+If you're using the context processor, your template should be rendered with a
+``RequestContext``. Otherwise, ensure ``messages`` is available to
+the template context.
+
+Even if you know there is only one message, you should still iterate over the
+``messages`` sequence, because otherwise the message storage will not be
+cleared for the next request.
+
+The context processor also provides a ``DEFAULT_MESSAGE_LEVELS`` variable which
+is a mapping of the message level names to their numeric value:
+
+.. code-block:: html+django
+
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>
+            {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Important: {% endif %}
+            {{ message }}
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+**Outside of templates**, you can use
+:func:`~django.contrib.messages.get_messages`::
+
+    from django.contrib.messages import get_messages
+
+    storage = get_messages(request)
+    for message in storage:
+        do_something_with_the_message(message)
+
+For instance, you can fetch all the messages to return them in a
+:ref:`JSONResponseMixin <jsonresponsemixin-example>` instead of a
+:class:`~django.views.generic.base.TemplateResponseMixin`.
+
+:func:`~django.contrib.messages.get_messages` will return an
+instance of the configured storage backend.
+
+
+The ``Message`` class
+---------------------
+
+.. class:: Message
+
+    When you loop over the list of messages in a template, what you get are
+    instances of the ``Message`` class. They have only a few attributes:
+
+    * ``message``: The actual text of the message.
+
+    * ``level``: An integer describing the type of the message (see the
+      `message levels`_ section above).
+
+    * ``tags``: A string combining all the message's tags (``extra_tags`` and
+      ``level_tag``) separated by spaces.
+
+    * ``extra_tags``: A string containing custom tags for this message,
+      separated by spaces. It's empty by default.
+
+    * ``level_tag``: The string representation of the level. By default, it's
+      the lowercase version of the name of the associated constant, but this
+      can be changed if you need by using the :setting:`MESSAGE_TAGS` setting.
+
+Creating custom message levels
+------------------------------
+
+Messages levels are nothing more than integers, so you can define your own
+level constants and use them to create more customized user feedback, e.g.::
+
+    CRITICAL = 50
+
+
+    def my_view(request):
+        messages.add_message(request, CRITICAL, "A serious error occurred.")
+
+When creating custom message levels you should be careful to avoid overloading
+existing levels. The values for the built-in levels are:
+
+.. _message-level-constants:
+
+==============  =====
+Level Constant  Value
+==============  =====
+``DEBUG``       10
+``INFO``        20
+``SUCCESS``     25
+``WARNING``     30
+``ERROR``       40
+==============  =====
+
+If you need to identify the custom levels in your HTML or CSS, you need to
+provide a mapping via the :setting:`MESSAGE_TAGS` setting.
+
+.. note::
+   If you are creating a reusable application, it is recommended to use
+   only the built-in `message levels`_ and not rely on any custom levels.
+
+Changing the minimum recorded level per-request
+-----------------------------------------------
+
+The minimum recorded level can be set per request via the ``set_level``
+method::
+
+    from django.contrib import messages
+
+    # Change the messages level to ensure the debug message is added.
+    messages.set_level(request, messages.DEBUG)
+    messages.debug(request, "Test message...")
+
+    # In another request, record only messages with a level of WARNING and higher
+    messages.set_level(request, messages.WARNING)
+    messages.success(request, "Your profile was updated.")  # ignored
+    messages.warning(request, "Your account is about to expire.")  # recorded
+
+    # Set the messages level back to default.
+    messages.set_level(request, None)
+
+Similarly, the current effective level can be retrieved with ``get_level``::
+
+    from django.contrib import messages
+
+    current_level = messages.get_level(request)
+
+For more information on how the minimum recorded level functions, see
+`Message levels`_ above.
+
+Adding extra message tags
+-------------------------
+
+For more direct control over message tags, you can optionally provide a string
+containing extra tags to any of the add methods::
+
+    messages.add_message(request, messages.INFO, "Over 9000!", extra_tags="dragonball")
+    messages.error(request, "Email box full", extra_tags="email")
+
+Extra tags are added before the default tag for that level and are space
+separated.
+
+Failing silently when the message framework is disabled
+-------------------------------------------------------
+
+If you're writing a reusable app (or other piece of code) and want to include
+messaging functionality, but don't want to require your users to enable it
+if they don't want to, you may pass an additional keyword argument
+``fail_silently=True`` to any of the ``add_message`` family of methods. For
+example::
+
+    messages.add_message(
+        request,
+        messages.SUCCESS,
+        "Profile details updated.",
+        fail_silently=True,
+    )
+    messages.info(request, "Hello world.", fail_silently=True)
+
+.. note::
+   Setting ``fail_silently=True`` only hides the ``MessageFailure`` that would
+   otherwise occur when the messages framework disabled and one attempts to
+   use one of the ``add_message`` family of methods. It does not hide failures
+   that may occur for other reasons.
+
+Adding messages in class-based views
+------------------------------------
+
+.. class:: views.SuccessMessageMixin
+
+    Adds a success message attribute to
+    :class:`~django.views.generic.edit.FormView` based classes
+
+    .. method:: get_success_message(cleaned_data)
+
+        ``cleaned_data`` is the cleaned data from the form which is used for
+        string formatting
+
+**Example views.py**::
+
+    from django.contrib.messages.views import SuccessMessageMixin
+    from django.views.generic.edit import CreateView
+    from myapp.models import Author
+
+
+    class AuthorCreateView(SuccessMessageMixin, CreateView):
+        model = Author
+        success_url = "/success/"
+        success_message = "%(name)s was created successfully"
+
+The cleaned data from the ``form`` is available for string interpolation using
+the ``%(field_name)s`` syntax. For ModelForms, if you need access to fields
+from the saved ``object`` override the
+:meth:`~django.contrib.messages.views.SuccessMessageMixin.get_success_message`
+method.
+
+**Example views.py for ModelForms**::
+
+    from django.contrib.messages.views import SuccessMessageMixin
+    from django.views.generic.edit import CreateView
+    from myapp.models import ComplicatedModel
+
+
+    class ComplicatedCreateView(SuccessMessageMixin, CreateView):
+        model = ComplicatedModel
+        success_url = "/success/"
+        success_message = "%(calculated_field)s was created successfully"
+
+        def get_success_message(self, cleaned_data):
+            return self.success_message % dict(
+                cleaned_data,
+                calculated_field=self.object.calculated_field,
+            )
+
+Expiration of messages
+======================
+
+The messages are marked to be cleared when the storage instance is iterated
+(and cleared when the response is processed).
+
+To avoid the messages being cleared, you can set the messages storage to
+``False`` after iterating::
+
+    storage = messages.get_messages(request)
+    for message in storage:
+        do_something_with(message)
+    storage.used = False
+
+Behavior of parallel requests
+=============================
+
+Due to the way cookies (and hence sessions) work, **the behavior of any
+backends that make use of cookies or sessions is undefined when the same
+client makes multiple requests that set or get messages in parallel**. For
+example, if a client initiates a request that creates a message in one window
+(or tab) and then another that fetches any uniterated messages in another
+window, before the first window redirects, the message may appear in the
+second window instead of the first window where it may be expected.
+
+In short, when multiple simultaneous requests from the same client are
+involved, messages are not guaranteed to be delivered to the same window that
+created them nor, in some cases, at all. Note that this is typically not a
+problem in most applications and will become a non-issue in HTML5, where each
+window/tab will have its own browsing context.
+
+Settings
+========
+
+A few :ref:`settings<settings-messages>` give you control over message
+behavior:
+
+* :setting:`MESSAGE_LEVEL`
+* :setting:`MESSAGE_STORAGE`
+* :setting:`MESSAGE_TAGS`
+
+For backends that use cookies, the settings for the cookie are taken from
+the session cookie settings:
+
+* :setting:`SESSION_COOKIE_DOMAIN`
+* :setting:`SESSION_COOKIE_SECURE`
+* :setting:`SESSION_COOKIE_HTTPONLY`
+
+Testing
+=======
+
+This module offers a tailored test assertion method, for testing messages
+attached to an :class:`~.HttpResponse`.
+
+To benefit from this assertion, add ``MessagesTestMixin`` to the class
+hierarchy::
+
+    from django.contrib.messages.test import MessagesTestMixin
+    from django.test import TestCase
+
+
+    class MsgTestCase(MessagesTestMixin, TestCase):
+        pass
+
+Then, inherit from the ``MsgTestCase`` in your tests.
+
+.. module:: django.contrib.messages.test
+
+.. method:: MessagesTestMixin.assertMessages(response, expected_messages, ordered=True)
+
+    Asserts that :mod:`~django.contrib.messages` added to the :class:`response
+    <django.http.HttpResponse>` matches ``expected_messages``.
+
+    ``expected_messages`` is a list of
+    :class:`~django.contrib.messages.Message` objects.
+
+    By default, the comparison is ordering dependent. You can disable this by
+    setting the ``ordered`` argument to ``False``.

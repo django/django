@@ -1,0 +1,366 @@
+=================
+The flatpages app
+=================
+
+.. module:: django.contrib.flatpages
+   :synopsis: A framework for managing simple ?flat? HTML content in a database.
+
+Django comes with an optional "flatpages" application. It lets you store "flat"
+HTML content in a database and handles the management for you via Django's
+admin interface and a Python API.
+
+A flatpage is an object with a URL, title and content. Use it for one-off,
+special-case pages, such as "About" or "Privacy Policy" pages, that you want to
+store in a database but for which you don't want to develop a custom Django
+application.
+
+A flatpage can use a custom template or a default, systemwide flatpage
+template. It can be associated with one, or multiple, sites.
+
+The content field may optionally be left blank if you prefer to put your
+content in a custom template.
+
+Installation
+============
+
+To install the flatpages app, follow these steps:
+
+1. Install the :mod:`sites framework <django.contrib.sites>` by adding
+   ``'django.contrib.sites'`` to your :setting:`INSTALLED_APPS` setting,
+   if it's not already in there.
+
+   Also make sure you've correctly set :setting:`SITE_ID` to the ID of the
+   site the settings file represents. This will usually be ``1`` (i.e.
+   ``SITE_ID = 1``, but if you're using the sites framework to manage
+   multiple sites, it could be the ID of a different site.
+
+2. Add ``'django.contrib.flatpages'`` to your :setting:`INSTALLED_APPS`
+   setting.
+
+Then either:
+
+3. Add an entry in your URLconf. For example::
+
+    urlpatterns = [
+        path("pages/", include("django.contrib.flatpages.urls")),
+    ]
+
+or:
+
+3. Add ``'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware'``
+   to your :setting:`MIDDLEWARE` setting.
+
+4. Run the command :djadmin:`manage.py migrate <migrate>`.
+
+.. currentmodule:: django.contrib.flatpages.middleware
+
+How it works
+============
+
+``manage.py migrate`` creates two tables in your database: ``django_flatpage``
+and ``django_flatpage_sites``. ``django_flatpage`` is a lookup table that maps
+a URL to a title and bunch of text content. ``django_flatpage_sites``
+associates a flatpage with a site.
+
+Using the URLconf
+-----------------
+
+There are several ways to include the flat pages in your URLconf. You can
+dedicate a particular path to flat pages::
+
+    urlpatterns = [
+        path("pages/", include("django.contrib.flatpages.urls")),
+    ]
+
+You can also set it up as a "catchall" pattern. In this case, it is important
+to place the pattern at the end of the other urlpatterns::
+
+    from django.contrib.flatpages import views
+
+    # Your other patterns here
+    urlpatterns += [
+        re_path(r"^(?P<url>.*/)$", views.flatpage),
+    ]
+
+.. warning::
+
+    If you set :setting:`APPEND_SLASH` to ``False``, you must remove the slash
+    in the catchall pattern or flatpages without a trailing slash will not be
+    matched.
+
+Another common setup is to use flat pages for a limited set of known pages and
+to hard code the urls, so you can reference them with the :ttag:`url` template
+tag::
+
+    from django.contrib.flatpages import views
+
+    urlpatterns += [
+        path("about-us/", views.flatpage, {"url": "/about-us/"}, name="about"),
+        path("license/", views.flatpage, {"url": "/license/"}, name="license"),
+    ]
+
+Using the middleware
+--------------------
+
+The :class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware`
+can do all of the work.
+
+.. class:: FlatpageFallbackMiddleware
+
+    Each time any Django application raises a 404 error, this middleware
+    checks the flatpages database for the requested URL as a last resort.
+    Specifically, it checks for a flatpage with the given URL with a site ID
+    that corresponds to the :setting:`SITE_ID` setting.
+
+    If it finds a match, it follows this algorithm:
+
+    * If the flatpage has a custom template, it loads that template.
+      Otherwise, it loads the template :file:`flatpages/default.html`.
+
+    * It passes that template a single context variable, ``flatpage``,
+      which is the flatpage object. It uses
+      :class:`~django.template.RequestContext` in rendering the
+      template.
+
+    The middleware will only add a trailing slash and redirect (by looking
+    at the :setting:`APPEND_SLASH` setting) if the resulting URL refers to
+    a valid flatpage. Redirects are permanent (301 status code).
+
+    If it doesn't find a match, the request continues to be processed as usual.
+
+    The middleware only gets activated for 404s -- not for 500s or responses
+    of any other status code.
+
+.. admonition:: Flatpages will not apply view middleware
+
+   Because the ``FlatpageFallbackMiddleware`` is applied only after
+   URL resolution has failed and produced a 404, the response it
+   returns will not apply any :ref:`view middleware <view-middleware>`
+   methods. Only requests which are successfully routed to a view via
+   normal URL resolution apply view middleware.
+
+Note that the order of :setting:`MIDDLEWARE` matters. Generally, you can put
+:class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware` at the
+end of the list. This means it will run first when processing the response, and
+ensures that any other response-processing middleware see the real flatpage
+response rather than the 404.
+
+For more on middleware, read the :doc:`middleware docs
+</topics/http/middleware>`.
+
+.. admonition:: Ensure that your 404 template works
+
+    Note that the
+    :class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware`
+    only steps in once another view has successfully produced a 404 response.
+    If another view or middleware class attempts to produce a 404 but ends up
+    raising an exception instead, the response will become an HTTP 500
+    ("Internal Server Error") and the
+    :class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware`
+    will not attempt to serve a flat page.
+
+.. currentmodule:: django.contrib.flatpages.models
+
+How to add, change and delete flatpages
+=======================================
+
+.. warning::
+
+    Permissions to add or edit flatpages should be restricted to trusted users.
+    Flatpages are defined by raw HTML and are **not sanitized** by Django. As a
+    consequence, a malicious flatpage can lead to various security
+    vulnerabilities, including permission escalation.
+
+.. _flatpages-admin:
+
+Via the admin interface
+-----------------------
+
+If you've activated the automatic Django admin interface, you should see a
+"Flatpages" section on the admin index page. Edit flatpages as you edit any
+other object in the system.
+
+The ``FlatPage`` model has an ``enable_comments`` field that isn't used by
+``contrib.flatpages``, but that could be useful for your project or third-party
+apps. It doesn't appear in the admin interface, but you can add it by
+registering a custom ``ModelAdmin`` for ``FlatPage``::
+
+    from django.contrib import admin
+    from django.contrib.flatpages.admin import FlatPageAdmin
+    from django.contrib.flatpages.models import FlatPage
+    from django.utils.translation import gettext_lazy as _
+
+
+    # Define a new FlatPageAdmin
+    class FlatPageAdmin(FlatPageAdmin):
+        fieldsets = [
+            (None, {"fields": ["url", "title", "content", "sites"]}),
+            (
+                _("Advanced options"),
+                {
+                    "classes": ["collapse"],
+                    "fields": [
+                        "enable_comments",
+                        "registration_required",
+                        "template_name",
+                    ],
+                },
+            ),
+        ]
+
+
+    # Re-register FlatPageAdmin
+    admin.site.unregister(FlatPage)
+    admin.site.register(FlatPage, FlatPageAdmin)
+
+Via the Python API
+------------------
+
+.. class:: FlatPage
+
+    Flatpages are represented by a standard
+    :doc:`Django model </topics/db/models>`,
+    which lives in :source:`django/contrib/flatpages/models.py`. You can access
+    flatpage objects via the :doc:`Django database API </topics/db/queries>`.
+
+.. currentmodule:: django.contrib.flatpages
+
+.. admonition:: Check for duplicate flatpage URLs.
+
+    If you add or modify flatpages via your own code, you will likely want to
+    check for duplicate flatpage URLs within the same site. The flatpage form
+    used in the admin performs this validation check, and can be imported from
+    ``django.contrib.flatpages.forms.FlatpageForm`` and used in your own
+    views.
+
+Flatpage templates
+==================
+
+By default, flatpages are rendered via the template
+:file:`flatpages/default.html`, but you can override that for a
+particular flatpage: in the admin, a collapsed fieldset titled
+"Advanced options" (clicking will expand it) contains a field for
+specifying a template name. If you're creating a flat page via the
+Python API you can set the template name as the field ``template_name`` on the
+``FlatPage`` object.
+
+Creating the :file:`flatpages/default.html` template is your responsibility;
+in your template directory, create a :file:`flatpages` directory containing a
+file :file:`default.html`.
+
+Flatpage templates are passed a single context variable, ``flatpage``,
+which is the flatpage object.
+
+Here's a sample :file:`flatpages/default.html` template:
+
+.. code-block:: html+django
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+    <title>{{ flatpage.title }}</title>
+    </head>
+    <body>
+    {{ flatpage.content }}
+    </body>
+    </html>
+
+Since you're already entering raw HTML into the admin page for a flatpage,
+both ``flatpage.title`` and ``flatpage.content`` are marked as **not**
+requiring :ref:`automatic HTML escaping <automatic-html-escaping>` in the
+template.
+
+Getting a list of :class:`~django.contrib.flatpages.models.FlatPage` objects in your templates
+==============================================================================================
+
+The flatpages app provides a template tag that allows you to iterate
+over all of the available flatpages on the :ref:`current site
+<hooking-into-current-site-from-views>`.
+
+Like all custom template tags, you'll need to :ref:`load its custom
+tag library <loading-custom-template-libraries>` before you can use
+it. After loading the library, you can retrieve all current flatpages
+via the :ttag:`get_flatpages` tag:
+
+.. code-block:: html+django
+
+    {% load flatpages %}
+    {% get_flatpages as flatpages %}
+    <ul>
+        {% for page in flatpages %}
+            <li><a href="{{ page.url }}">{{ page.title }}</a></li>
+        {% endfor %}
+    </ul>
+
+.. templatetag:: get_flatpages
+
+Displaying ``registration_required`` flatpages
+----------------------------------------------
+
+By default, the :ttag:`get_flatpages` template tag will only show
+flatpages that are marked ``registration_required = False``. If you
+want to display registration-protected flatpages, you need to specify
+an authenticated user using a ``for`` clause.
+
+For example:
+
+.. code-block:: html+django
+
+    {% get_flatpages for someuser as about_pages %}
+
+If you provide an anonymous user, :ttag:`get_flatpages` will behave
+the same as if you hadn't provided a user -- i.e., it will only show you
+public flatpages.
+
+Limiting flatpages by base URL
+------------------------------
+
+An optional argument, ``starts_with``, can be applied to limit the
+returned pages to those beginning with a particular base URL. This
+argument may be passed as a string, or as a variable to be resolved
+from the context.
+
+For example:
+
+.. code-block:: html+django
+
+    {% get_flatpages '/about/' as about_pages %}
+    {% get_flatpages about_prefix as about_pages %}
+    {% get_flatpages '/about/' for someuser as about_pages %}
+
+Integrating with :mod:`django.contrib.sitemaps`
+===============================================
+
+.. currentmodule:: django.contrib.flatpages.sitemaps
+
+.. class:: FlatPageSitemap
+
+    The :class:`sitemaps.FlatPageSitemap
+    <django.contrib.flatpages.sitemaps.FlatPageSitemap>` class looks at all
+    publicly visible :mod:`~django.contrib.flatpages` defined for the current
+    :setting:`SITE_ID` (see the :mod:`sites documentation
+    <django.contrib.sites>`) and creates an entry in the sitemap. These entries
+    include only the :attr:`~django.contrib.sitemaps.Sitemap.location`
+    attribute -- not :attr:`~django.contrib.sitemaps.Sitemap.lastmod`,
+    :attr:`~django.contrib.sitemaps.Sitemap.changefreq` or
+    :attr:`~django.contrib.sitemaps.Sitemap.priority`.
+
+Example
+-------
+
+Here's an example of a URLconf using :class:`FlatPageSitemap`::
+
+    from django.contrib.flatpages.sitemaps import FlatPageSitemap
+    from django.contrib.sitemaps.views import sitemap
+    from django.urls import path
+
+    urlpatterns = [
+        # ...
+        # the sitemap
+        path(
+            "sitemap.xml",
+            sitemap,
+            {"sitemaps": {"flatpages": FlatPageSitemap}},
+            name="django.contrib.sitemaps.views.sitemap",
+        ),
+    ]

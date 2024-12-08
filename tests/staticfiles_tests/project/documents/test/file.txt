@@ -1,0 +1,2 @@
+In STATICFILES_DIRS directory.
+

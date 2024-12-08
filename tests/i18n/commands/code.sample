@@ -1,0 +1,4 @@
+from django.utils.translation import gettext
+
+# This will generate an xgettext "Empty msgid" warning.
+my_string = gettext('')

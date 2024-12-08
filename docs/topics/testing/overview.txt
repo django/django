@@ -1,0 +1,392 @@
+=========================
+Writing and running tests
+=========================
+
+.. module:: django.test
+   :synopsis: Testing tools for Django applications.
+
+.. seealso::
+
+    The :doc:`testing tutorial </intro/tutorial05>`, the :doc:`testing tools
+    reference </topics/testing/tools>`, and the :doc:`advanced testing topics
+    </topics/testing/advanced>`.
+
+This document is split into two primary sections. First, we explain how to write
+tests with Django. Then, we explain how to run them.
+
+Writing tests
+=============
+
+Django's unit tests use a Python standard library module: :mod:`unittest`. This
+module defines tests using a class-based approach.
+
+Here is an example which subclasses from :class:`django.test.TestCase`,
+which is a subclass of :class:`unittest.TestCase` that runs each test inside a
+transaction to provide isolation::
+
+    from django.test import TestCase
+    from myapp.models import Animal
+
+
+    class AnimalTestCase(TestCase):
+        def setUp(self):
+            Animal.objects.create(name="lion", sound="roar")
+            Animal.objects.create(name="cat", sound="meow")
+
+        def test_animals_can_speak(self):
+            """Animals that can speak are correctly identified"""
+            lion = Animal.objects.get(name="lion")
+            cat = Animal.objects.get(name="cat")
+            self.assertEqual(lion.speak(), 'The lion says "roar"')
+            self.assertEqual(cat.speak(), 'The cat says "meow"')
+
+When you :ref:`run your tests <running-tests>`, the default behavior of the
+test utility is to find all the test case classes (that is, subclasses of
+:class:`unittest.TestCase`) in any file whose name begins with ``test``,
+automatically build a test suite out of those test case classes, and run that
+suite.
+
+For more details about :mod:`unittest`, see the Python documentation.
+
+.. admonition:: Where should the tests live?
+
+    The default :djadmin:`startapp` template creates a ``tests.py`` file in the
+    new application. This might be fine if you only have a few tests, but as
+    your test suite grows you'll likely want to restructure it into a tests
+    package so you can split your tests into different submodules such as
+    ``test_models.py``, ``test_views.py``, ``test_forms.py``, etc. Feel free to
+    pick whatever organizational scheme you like.
+
+    See also :ref:`testing-reusable-applications`.
+
+.. warning::
+
+    If your tests rely on database access such as creating or querying models,
+    be sure to create your test classes as subclasses of
+    :class:`django.test.TestCase` rather than :class:`unittest.TestCase`.
+
+    Using :class:`unittest.TestCase` avoids the cost of running each test in a
+    transaction and flushing the database, but if your tests interact with
+    the database their behavior will vary based on the order that the test
+    runner executes them. This can lead to unit tests that pass when run in
+    isolation but fail when run in a suite.
+
+.. _running-tests:
+
+Running tests
+=============
+
+Once you've written tests, run them using the :djadmin:`test` command of
+your project's ``manage.py`` utility:
+
+.. code-block:: shell
+
+    $ ./manage.py test
+
+Test discovery is based on the unittest module's :py:ref:`built-in test
+discovery <unittest-test-discovery>`.  By default, this will discover tests in
+any file named ``test*.py`` under the current working directory.
+
+You can specify particular tests to run by supplying any number of "test
+labels" to ``./manage.py test``. Each test label can be a full Python dotted
+path to a package, module, ``TestCase`` subclass, or test method. For instance:
+
+.. code-block:: shell
+
+    # Run all the tests in the animals.tests module
+    $ ./manage.py test animals.tests
+
+    # Run all the tests found within the 'animals' package
+    $ ./manage.py test animals
+
+    # Run just one test case class
+    $ ./manage.py test animals.tests.AnimalTestCase
+
+    # Run just one test method
+    $ ./manage.py test animals.tests.AnimalTestCase.test_animals_can_speak
+
+You can also provide a path to a directory to discover tests below that
+directory:
+
+.. code-block:: shell
+
+    $ ./manage.py test animals/
+
+You can specify a custom filename pattern match using the ``-p`` (or
+``--pattern``) option, if your test files are named differently from the
+``test*.py`` pattern:
+
+.. code-block:: shell
+
+    $ ./manage.py test --pattern="tests_*.py"
+
+If you press ``Ctrl-C`` while the tests are running, the test runner will
+wait for the currently running test to complete and then exit gracefully.
+During a graceful exit the test runner will output details of any test
+failures, report on how many tests were run and how many errors and failures
+were encountered, and destroy any test databases as usual. Thus pressing
+``Ctrl-C`` can be very useful if you forget to pass the :option:`--failfast
+<test --failfast>` option, notice that some tests are unexpectedly failing and
+want to get details on the failures without waiting for the full test run to
+complete.
+
+If you do not want to wait for the currently running test to finish, you
+can press ``Ctrl-C`` a second time and the test run will halt immediately,
+but not gracefully. No details of the tests run before the interruption will
+be reported, and any test databases created by the run will not be destroyed.
+
+.. admonition:: Test with warnings enabled
+
+    It's a good idea to run your tests with Python warnings enabled:
+    ``python -Wa manage.py test``. The ``-Wa`` flag tells Python to
+    display deprecation warnings. Django, like many other Python libraries,
+    uses these warnings to flag when features are going away. It also might
+    flag areas in your code that aren't strictly wrong but could benefit
+    from a better implementation.
+
+
+.. _the-test-database:
+
+The test database
+-----------------
+
+Tests that require a database (namely, model tests) will not use your "real"
+(production) database. Separate, blank databases are created for the tests.
+
+Regardless of whether the tests pass or fail, the test databases are destroyed
+when all the tests have been executed.
+
+You can prevent the test databases from being destroyed by using the
+:option:`test --keepdb` option. This will preserve the test database between
+runs. If the database does not exist, it will first be created. Any migrations
+will also be applied in order to keep it up to date.
+
+As described in the previous section, if a test run is forcefully interrupted,
+the test database may not be destroyed. On the next run, you'll be asked
+whether you want to reuse or destroy the database. Use the :option:`test
+--noinput` option to suppress that prompt and automatically destroy the
+database. This can be useful when running tests on a continuous integration
+server where tests may be interrupted by a timeout, for example.
+
+The default test database names are created by prepending ``test_`` to the
+value of each :setting:`NAME` in :setting:`DATABASES`. When using SQLite, the
+tests will use an in-memory database by default (i.e., the database will be
+created in memory, bypassing the filesystem entirely!). The :setting:`TEST
+<DATABASE-TEST>` dictionary in :setting:`DATABASES` offers a number of settings
+to configure your test database. For example, if you want to use a different
+database name, specify :setting:`NAME <TEST_NAME>` in the :setting:`TEST
+<DATABASE-TEST>` dictionary for any given database in :setting:`DATABASES`.
+
+On PostgreSQL, :setting:`USER` will also need read access to the built-in
+``postgres`` database.
+
+Aside from using a separate database, the test runner will otherwise
+use all of the same database settings you have in your settings file:
+:setting:`ENGINE <DATABASE-ENGINE>`, :setting:`USER`, :setting:`HOST`, etc. The
+test database is created by the user specified by :setting:`USER`, so you'll
+need to make sure that the given user account has sufficient privileges to
+create a new database on the system.
+
+For fine-grained control over the character encoding of your test
+database, use the :setting:`CHARSET <TEST_CHARSET>` TEST option. If you're using
+MySQL, you can also use the :setting:`COLLATION <TEST_COLLATION>` option to
+control the particular collation used by the test database. See the
+:doc:`settings documentation </ref/settings>` for details of these
+and other advanced settings.
+
+If using an SQLite in-memory database with SQLite, `shared cache
+<https://www.sqlite.org/sharedcache.html>`_ is enabled, so you can write tests
+with ability to share the database between threads.
+
+.. admonition:: Finding data from your production database when running tests?
+
+    If your code attempts to access the database when its modules are compiled,
+    this will occur *before* the test database is set up, with potentially
+    unexpected results. For example, if you have a database query in
+    module-level code and a real database exists, production data could pollute
+    your tests. *It is a bad idea to have such import-time database queries in
+    your code* anyway - rewrite your code so that it doesn't do this.
+
+    This also applies to customized implementations of
+    :meth:`~django.apps.AppConfig.ready()`.
+
+.. seealso::
+
+    The :ref:`advanced multi-db testing topics <topics-testing-advanced-multidb>`.
+
+.. _order-of-tests:
+
+Order in which tests are executed
+---------------------------------
+
+In order to guarantee that all ``TestCase`` code starts with a clean database,
+the Django test runner reorders tests in the following way:
+
+* All :class:`~django.test.TestCase` subclasses are run first.
+
+* Then, all other Django-based tests (test case classes based on
+  :class:`~django.test.SimpleTestCase`, including
+  :class:`~django.test.TransactionTestCase`) are run with no particular
+  ordering guaranteed nor enforced among them.
+
+* Then any other :class:`unittest.TestCase` tests (including doctests) that may
+  alter the database without restoring it to its original state are run.
+
+.. note::
+
+    The new ordering of tests may reveal unexpected dependencies on test case
+    ordering. This is the case with doctests that relied on state left in the
+    database by a given :class:`~django.test.TransactionTestCase` test, they
+    must be updated to be able to run independently.
+
+.. note::
+
+    Failures detected when loading tests are ordered before all of the above
+    for quicker feedback. This includes things like test modules that couldn't
+    be found or that couldn't be loaded due to syntax errors.
+
+You may randomize and/or reverse the execution order inside groups using the
+:option:`test --shuffle` and :option:`--reverse <test --reverse>` options. This
+can help with ensuring your tests are independent from each other.
+
+.. _test-case-serialized-rollback:
+
+Rollback emulation
+------------------
+
+Any initial data loaded in migrations will only be available in ``TestCase``
+tests and not in ``TransactionTestCase`` tests, and additionally only on
+backends where transactions are supported (the most important exception being
+MyISAM). This is also true for tests which rely on ``TransactionTestCase``
+such as :class:`LiveServerTestCase` and
+:class:`~django.contrib.staticfiles.testing.StaticLiveServerTestCase`.
+
+Django can reload that data for you on a per-testcase basis by
+setting the ``serialized_rollback`` option to ``True`` in the body of the
+``TestCase`` or ``TransactionTestCase``, but note that this will slow down
+that test suite by approximately 3x.
+
+Third-party apps or those developing against MyISAM will need to set this;
+in general, however, you should be developing your own projects against a
+transactional database and be using ``TestCase`` for most tests, and thus
+not need this setting.
+
+The initial serialization is usually very quick, but if you wish to exclude
+some apps from this process (and speed up test runs slightly), you may add
+those apps to :setting:`TEST_NON_SERIALIZED_APPS`.
+
+To prevent serialized data from being loaded twice, setting
+``serialized_rollback=True`` disables the
+:data:`~django.db.models.signals.post_migrate` signal when flushing the test
+database.
+
+.. versionchanged:: 5.2
+
+    For :class:`TransactionTestCase`, serialized migration data is made
+    available during ``setUpClass()``.
+
+Other test conditions
+---------------------
+
+Regardless of the value of the :setting:`DEBUG` setting in your configuration
+file, all Django tests run with :setting:`DEBUG`\=False. This is to ensure that
+the observed output of your code matches what will be seen in a production
+setting.
+
+Caches are not cleared after each test, and running ``manage.py test fooapp``
+can insert data from the tests into the cache of a live system if you run your
+tests in production because, unlike databases, a separate "test cache" is not
+used. This behavior :ticket:`may change <11505>` in the future.
+
+Understanding the test output
+-----------------------------
+
+When you run your tests, you'll see a number of messages as the test runner
+prepares itself. You can control the level of detail of these messages with the
+``verbosity`` option on the command line:
+
+.. code-block:: shell
+
+    Creating test database...
+    Creating table myapp_animal
+    Creating table myapp_mineral
+
+This tells you that the test runner is creating a test database, as described
+in the previous section.
+
+Once the test database has been created, Django will run your tests.
+If everything goes well, you'll see something like this:
+
+.. code-block:: shell
+
+    ----------------------------------------------------------------------
+    Ran 22 tests in 0.221s
+
+    OK
+
+If there are test failures, however, you'll see full details about which tests
+failed:
+
+.. code-block:: shell
+
+    ======================================================================
+    FAIL: test_was_published_recently_with_future_poll (polls.tests.PollMethodTests)
+    ----------------------------------------------------------------------
+    Traceback (most recent call last):
+      File "/dev/mysite/polls/tests.py", line 16, in test_was_published_recently_with_future_poll
+        self.assertIs(future_poll.was_published_recently(), False)
+    AssertionError: True is not False
+
+    ----------------------------------------------------------------------
+    Ran 1 test in 0.003s
+
+    FAILED (failures=1)
+
+A full explanation of this error output is beyond the scope of this document,
+but it's pretty intuitive. You can consult the documentation of Python's
+:mod:`unittest` library for details.
+
+Note that the return code for the test-runner script is 1 for any number of
+failed tests (whether the failure was caused by an error, a failed assertion,
+or an unexpected success). If all the tests pass, the return code is 0. This
+feature is useful if you're using the test-runner script in a shell script and
+need to test for success or failure at that level.
+
+.. _speeding-up-tests-auth-hashers:
+
+Speeding up the tests
+---------------------
+
+Running tests in parallel
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+As long as your tests are properly isolated, you can run them in parallel to
+gain a speed up on multi-core hardware. See :option:`test --parallel`.
+
+Password hashing
+~~~~~~~~~~~~~~~~
+
+The default password hasher is rather slow by design. If you're authenticating
+many users in your tests, you may want to use a custom settings file and set
+the :setting:`PASSWORD_HASHERS` setting to a faster hashing algorithm::
+
+    PASSWORD_HASHERS = [
+        "django.contrib.auth.hashers.MD5PasswordHasher",
+    ]
+
+Don't forget to also include in :setting:`PASSWORD_HASHERS` any hashing
+algorithm used in fixtures, if any.
+
+Preserving the test database
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :option:`test --keepdb` option preserves the test database between test
+runs. It skips the create and destroy actions which can greatly decrease the
+time to run tests.
+
+Avoiding disk access for media files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :class:`~django.core.files.storage.InMemoryStorage` is a convenient way to
+prevent disk access for media files. All data is kept in memory, then it gets
+discarded after tests run.

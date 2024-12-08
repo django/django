@@ -1,0 +1,172 @@
+====================
+Single object mixins
+====================
+
+``SingleObjectMixin``
+=====================
+
+.. class:: django.views.generic.detail.SingleObjectMixin
+
+    Provides a mechanism for looking up an object associated with the
+    current HTTP request.
+
+    **Methods and Attributes**
+
+    .. attribute:: model
+
+        The model that this view will display data for. Specifying ``model
+        = Foo`` is effectively the same as specifying ``queryset =
+        Foo.objects.all()``, where ``objects`` stands for ``Foo``’s
+        :ref:`default manager <default-managers>`.
+
+    .. attribute:: queryset
+
+        A ``QuerySet`` that represents the objects. If provided, the value of
+        ``queryset`` supersedes the value provided for :attr:`model`.
+
+        .. warning::
+
+            ``queryset`` is a class attribute with a *mutable* value so care
+            must be taken when using it directly. Before using it, either call
+            its :meth:`~django.db.models.query.QuerySet.all` method or
+            retrieve it with :meth:`get_queryset` which takes care of the
+            cloning behind the scenes.
+
+    .. attribute:: slug_field
+
+        The name of the field on the model that contains the slug. By default,
+        ``slug_field`` is ``'slug'``.
+
+    .. attribute:: slug_url_kwarg
+
+        The name of the URLConf keyword argument that contains the slug. By
+        default, ``slug_url_kwarg`` is ``'slug'``.
+
+    .. attribute:: pk_url_kwarg
+
+        The name of the URLConf keyword argument that contains the primary key.
+        By default, ``pk_url_kwarg`` is ``'pk'``.
+
+    .. attribute:: context_object_name
+
+        Designates the name of the variable to use in the context.
+
+    .. attribute:: query_pk_and_slug
+
+        If ``True``, causes :meth:`get_object()` to perform its lookup using
+        both the primary key and the slug. Defaults to ``False``.
+
+        This attribute can help mitigate `insecure direct object reference`_
+        attacks. When applications allow access to individual objects by a
+        sequential primary key, an attacker could brute-force guess all URLs;
+        thereby obtaining a list of all objects in the application. If users
+        with access to individual objects should be prevented from obtaining
+        this list, setting ``query_pk_and_slug`` to ``True`` will help prevent
+        the guessing of URLs as each URL will require two correct,
+        non-sequential arguments. Using a unique slug may serve the same
+        purpose, but this scheme allows you to have non-unique slugs.
+
+        .. _insecure direct object reference: https://wiki.owasp.org/index.php/Top_10_2013-A4-Insecure_Direct_Object_References
+
+    .. method:: get_object(queryset=None)
+
+        Returns the single object that this view will display. If ``queryset``
+        is provided, that queryset will be used as the source of objects;
+        otherwise, :meth:`get_queryset` will be used. ``get_object()`` looks
+        for a :attr:`pk_url_kwarg` argument in the arguments to the view; if
+        this argument is found, this method performs a primary-key based lookup
+        using that value. If this argument is not found, it looks for a
+        :attr:`slug_url_kwarg` argument, and performs a slug lookup using the
+        :attr:`slug_field`.
+
+        When :attr:`query_pk_and_slug` is ``True``, ``get_object()`` will
+        perform its lookup using both the primary key and the slug.
+
+    .. method:: get_queryset()
+
+        Returns the queryset that will be used to retrieve the object that
+        this view will display. By default, :meth:`get_queryset` returns the
+        value of the :attr:`queryset` attribute if it is set, otherwise
+        it constructs a :class:`~django.db.models.query.QuerySet` by calling
+        the ``all()`` method on the :attr:`model` attribute's default manager.
+
+    .. method:: get_context_object_name(obj)
+
+        Return the context variable name that will be used to contain the
+        data that this view is manipulating. If :attr:`context_object_name` is
+        not set, the context name will be constructed from the ``model_name``
+        of the model that the queryset is composed from. For example, the model
+        ``Article`` would have context object named ``'article'``.
+
+    .. method:: get_context_data(**kwargs)
+
+        Returns context data for displaying the object.
+
+        The base implementation of this method requires that the ``self.object``
+        attribute be set by the view (even if ``None``). Be sure to do this if
+        you are using this mixin without one of the built-in views that does so.
+
+        It returns a dictionary with these contents:
+
+        * ``object``: The object that this view is displaying
+          (``self.object``).
+        * ``context_object_name``: ``self.object`` will also be stored under
+          the name returned by :meth:`get_context_object_name`, which defaults
+          to the lowercased version of the model name.
+
+        .. admonition:: Context variables override values from template context processors
+
+            Any variables from :meth:`get_context_data` take precedence over
+            context variables from :ref:`context processors
+            <subclassing-context-requestcontext>`. For example, if your view
+            sets the :attr:`model` attribute to
+            :class:`~django.contrib.auth.models.User`, the default context
+            object name of ``user`` would override the ``user`` variable from
+            the :func:`django.contrib.auth.context_processors.auth` context
+            processor. Use :meth:`get_context_object_name` to avoid a clash.
+
+    .. method:: get_slug_field()
+
+        Returns the name of a slug field to be used to look up by slug. By
+        default this returns the value of :attr:`slug_field`.
+
+
+``SingleObjectTemplateResponseMixin``
+=====================================
+
+.. class:: django.views.generic.detail.SingleObjectTemplateResponseMixin
+
+    A mixin class that performs template-based response rendering for views
+    that operate upon a single object instance. Requires that the view it is
+    mixed with provides ``self.object``, the object instance that the view is
+    operating on. ``self.object`` will usually be, but is not required to be,
+    an instance of a Django model. It may be ``None`` if the view is in the
+    process of constructing a new instance.
+
+    **Extends**
+
+    * :class:`~django.views.generic.base.TemplateResponseMixin`
+
+    **Methods and Attributes**
+
+    .. attribute:: template_name_field
+
+        The field on the current object instance that can be used to determine
+        the name of a candidate template. If either ``template_name_field``
+        itself or the value of the ``template_name_field`` on the current
+        object instance is ``None``, the object will not be used for a
+        candidate template name.
+
+    .. attribute:: template_name_suffix
+
+        The suffix to append to the auto-generated candidate template name.
+        Default suffix is ``_detail``.
+
+    .. method:: get_template_names()
+
+        Returns a list of candidate template names. Returns the following list:
+
+        * the value of ``template_name`` on the view (if provided)
+        * the contents of the ``template_name_field`` field on the
+          object instance that the view is operating upon (if available)
+        * ``<app_label>/<model_name><template_name_suffix>.html``

@@ -1,0 +1,29 @@
+==================================
+How to delete a Django application
+==================================
+
+Django provides the ability to group sets of features into Python packages
+called :doc:`applications</ref/applications/>`. When requirements change, apps
+may become obsolete or unnecessary. The following steps will help you delete an
+application safely.
+
+#. Remove all references to the app (imports, foreign keys etc.).
+
+#. Remove all models from the corresponding ``models.py`` file.
+
+#. Create relevant migrations by running :djadmin:`makemigrations`. This step
+   generates a migration that deletes tables for the removed models, and any
+   other required migration for updating relationships connected to those
+   models.
+
+#. :ref:`Squash <migration-squashing>` out references to the app in other apps'
+   migrations.
+
+#. Apply migrations locally, runs tests, and verify the correctness of your
+   project.
+
+#. Deploy/release your updated Django project.
+
+#. Remove the app from :setting:`INSTALLED_APPS`.
+
+#. Finally, remove the app's directory.

@@ -1,0 +1,1527 @@
+========================
+Django 1.9 release notes
+========================
+
+*December 1, 2015*
+
+Welcome to Django 1.9!
+
+These release notes cover the :ref:`new features <whats-new-1.9>`, as well as
+some :ref:`backwards incompatible changes <backwards-incompatible-1.9>` you'll
+want to be aware of when upgrading from Django 1.8 or older versions. We've
+:ref:`dropped some features<removed-features-1.9>` that have reached the end of
+their deprecation cycle, and we've :ref:`begun the deprecation process for some
+features <deprecated-features-1.9>`.
+
+See the :doc:`/howto/upgrade-version` guide if you're updating an existing
+project.
+
+Python compatibility
+====================
+
+Django 1.9 requires Python 2.7, 3.4, or 3.5. We **highly recommend** and only
+officially support the latest release of each series.
+
+The Django 1.8 series is the last to support Python 3.2 and 3.3.
+
+.. _whats-new-1.9:
+
+What's new in Django 1.9
+========================
+
+Performing actions after a transaction commit
+---------------------------------------------
+
+The new :func:`~django.db.transaction.on_commit` hook allows performing actions
+after a database transaction is successfully committed. This is useful for
+tasks such as sending notification emails, creating queued tasks, or
+invalidating caches.
+
+This functionality from the :pypi:`django-transaction-hooks` package has been
+integrated into Django.
+
+Password validation
+-------------------
+
+Django now offers password validation to help prevent the usage of weak
+passwords by users. The validation is integrated in the included password
+change and reset forms and is simple to integrate in any other code.
+Validation is performed by one or more validators, configured in the new
+:setting:`AUTH_PASSWORD_VALIDATORS` setting.
+
+Four validators are included in Django, which can enforce a minimum length,
+compare the password to the user's attributes like their name, ensure
+passwords aren't entirely numeric, or check against an included list of common
+passwords. You can combine multiple validators, and some validators have
+custom configuration options. For example, you can choose to provide a custom
+list of common passwords. Each validator provides a help text to explain its
+requirements to the user.
+
+By default, no validation is performed and all passwords are accepted, so if
+you don't set :setting:`AUTH_PASSWORD_VALIDATORS`, you will not see any
+change. In new projects created with the default :djadmin:`startproject`
+template, a simple set of validators is enabled. To enable basic validation in
+the included auth forms for your project, you could set, for example::
+
+    AUTH_PASSWORD_VALIDATORS = [
+        {
+            "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+        },
+        {
+            "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        },
+        {
+            "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+        },
+        {
+            "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+        },
+    ]
+
+See :ref:`password-validation` for more details.
+
+Permission mixins for class-based views
+---------------------------------------
+
+Django now ships with the mixins
+:class:`~django.contrib.auth.mixins.AccessMixin`,
+:class:`~django.contrib.auth.mixins.LoginRequiredMixin`,
+:class:`~django.contrib.auth.mixins.PermissionRequiredMixin`, and
+:class:`~django.contrib.auth.mixins.UserPassesTestMixin` to provide the
+functionality of the ``django.contrib.auth.decorators`` for class-based views.
+These mixins have been taken from, or are at least inspired by, the
+`django-braces`_ project.
+
+There are a few differences between Django's and ``django-braces``\'
+implementation, though:
+
+* The :attr:`~django.contrib.auth.mixins.AccessMixin.raise_exception` attribute
+  can only be ``True`` or ``False``. Custom exceptions or callables are not
+  supported.
+
+* The :meth:`~django.contrib.auth.mixins.AccessMixin.handle_no_permission`
+  method does not take a ``request`` argument. The current request is available
+  in ``self.request``.
+
+* The custom ``test_func()`` of :class:`~django.contrib.auth.mixins.UserPassesTestMixin`
+  does not take a ``user`` argument. The current user is available in
+  ``self.request.user``.
+
+* The :attr:`permission_required <django.contrib.auth.mixins.PermissionRequiredMixin>`
+  attribute supports a string (defining one permission) or a list/tuple of
+  strings (defining multiple permissions) that need to be fulfilled to grant
+  access.
+
+* The new :attr:`~django.contrib.auth.mixins.AccessMixin.permission_denied_message`
+  attribute allows passing a message to the ``PermissionDenied`` exception.
+
+.. _django-braces: https://django-braces.readthedocs.io/en/latest/index.html
+
+New styling for ``contrib.admin``
+---------------------------------
+
+The admin sports a modern, flat design with new SVG icons which look perfect
+on HiDPI screens. It still provides a fully-functional experience to `YUI's
+A-grade`_ browsers. Older browser may experience varying levels of graceful
+degradation.
+
+.. _YUI's A-grade: https://github.com/yui/yui3/wiki/Graded-Browser-Support
+
+Running tests in parallel
+-------------------------
+
+The :djadmin:`test` command now supports a :option:`--parallel <test
+--parallel>` option to run a project's tests in multiple processes in parallel.
+
+Each process gets its own database. You must ensure that different test cases
+don't access the same resources. For instance, test cases that touch the
+filesystem should create a temporary directory for their own use.
+
+This option is enabled by default for Django's own test suite provided:
+
+- the OS supports it (all but Windows)
+- the database backend supports it (all the built-in backends but Oracle)
+
+Minor features
+--------------
+
+:mod:`django.contrib.admin`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Admin views now have ``model_admin`` or ``admin_site`` attributes.
+
+* The URL of the admin change view has been changed (was at
+  ``/admin/<app>/<model>/<pk>/`` by default and is now at
+  ``/admin/<app>/<model>/<pk>/change/``). This should not affect your
+  application unless you have hardcoded admin URLs. In that case, replace those
+  links by :ref:`reversing admin URLs <admin-reverse-urls>` instead. Note that
+  the old URL still redirects to the new one for backwards compatibility, but
+  it may be removed in a future version.
+
+* :meth:`ModelAdmin.get_list_select_related()
+  <django.contrib.admin.ModelAdmin.get_list_select_related>` was added to allow
+  changing the ``select_related()`` values used in the admin's changelist query
+  based on the request.
+
+* The ``available_apps`` context variable, which lists the available
+  applications for the current user, has been added to the
+  :meth:`AdminSite.each_context() <django.contrib.admin.AdminSite.each_context>`
+  method.
+
+* :attr:`AdminSite.empty_value_display
+  <django.contrib.admin.AdminSite.empty_value_display>` and
+  :attr:`ModelAdmin.empty_value_display
+  <django.contrib.admin.ModelAdmin.empty_value_display>` were added to override
+  the display of empty values in admin change list. You can also customize the
+  value for each field.
+
+* Added jQuery events :ref:`when an inline form is added or removed
+  <admin-javascript-inline-form-events>` on the change form page.
+
+* The time picker widget includes a '6 p.m' option for consistency of having
+  predefined options every 6 hours.
+
+* JavaScript slug generation now supports Romanian characters.
+
+:mod:`django.contrib.admindocs`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The model section of the ``admindocs`` now also describes methods that take
+  arguments, rather than ignoring them.
+
+:mod:`django.contrib.auth`
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The default iteration count for the PBKDF2 password hasher has been increased
+  by 20%. This backwards compatible change will not affect users who have
+  subclassed ``django.contrib.auth.hashers.PBKDF2PasswordHasher`` to change the
+  default value.
+
+* The ``BCryptSHA256PasswordHasher`` will now update passwords if its
+  ``rounds`` attribute is changed.
+
+* ``AbstractBaseUser`` and ``BaseUserManager`` were moved to a new
+  ``django.contrib.auth.base_user`` module so that they can be imported without
+  including ``django.contrib.auth`` in :setting:`INSTALLED_APPS` (doing so
+  raised a deprecation warning in older versions and is no longer supported in
+  Django 1.9).
+
+* The permission argument of
+  :func:`~django.contrib.auth.decorators.permission_required()` accepts all
+  kinds of iterables, not only list and tuples.
+
+* The new :class:`~django.contrib.auth.middleware.PersistentRemoteUserMiddleware`
+  makes it possible to use ``REMOTE_USER`` for setups where the header is only
+  populated on login pages instead of every request in the session.
+
+* The ``django.contrib.auth.views.password_reset()`` view accepts an
+  ``extra_email_context`` parameter.
+
+:mod:`django.contrib.contenttypes`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* It's now possible to use
+  :attr:`~django.db.models.Options.order_with_respect_to` with a
+  ``GenericForeignKey``.
+
+:mod:`django.contrib.gis`
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* All ``GeoQuerySet`` methods have been deprecated and replaced by
+  :doc:`equivalent database functions </ref/contrib/gis/functions>`. As soon
+  as the legacy methods have been replaced in your code, you should even be
+  able to remove the special ``GeoManager`` from your GIS-enabled classes.
+
+* The GDAL interface now supports instantiating file-based and in-memory
+  :ref:`GDALRaster objects <raster-data-source-objects>` from raw data.
+  Setters for raster properties such as projection or pixel values have
+  been added.
+
+* For PostGIS users, the new :class:`~django.contrib.gis.db.models.RasterField`
+  allows :ref:`storing GDALRaster objects <creating-and-saving-raster-models>`.
+  It supports automatic spatial index creation and reprojection when saving a
+  model. It does not yet support spatial querying.
+
+* The new :meth:`GDALRaster.warp() <django.contrib.gis.gdal.GDALRaster.warp>`
+  method allows warping a raster by specifying target raster properties such as
+  origin, width, height, or pixel size (among others).
+
+* The new :meth:`GDALRaster.transform()
+  <django.contrib.gis.gdal.GDALRaster.transform>` method allows transforming a
+  raster into a different spatial reference system by specifying a target
+  ``srid``.
+
+* The new :class:`~django.contrib.gis.geoip2.GeoIP2` class allows using
+  MaxMind's GeoLite2 databases which includes support for IPv6 addresses.
+
+* The default OpenLayers library version included in widgets has been updated
+  from 2.13 to 2.13.1.
+
+:mod:`django.contrib.postgres`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Added support for the :lookup:`rangefield.contained_by` lookup for some built
+  in fields which correspond to the range fields.
+
+* Added ``django.contrib.postgres.fields.JSONField``.
+
+* Added :doc:`/ref/contrib/postgres/aggregates`.
+
+* Added the :class:`~django.contrib.postgres.functions.TransactionNow` database
+  function.
+
+:mod:`django.contrib.sessions`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The session model and ``SessionStore`` classes for the ``db`` and
+  ``cached_db`` backends are refactored to allow a custom database session
+  backend to build upon them. See
+  :ref:`extending-database-backed-session-engines` for more details.
+
+:mod:`django.contrib.sites`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* :func:`~django.contrib.sites.shortcuts.get_current_site` now handles the case
+  where ``request.get_host()`` returns ``domain:port``, e.g.
+  ``example.com:80``. If the lookup fails because the host does not match a
+  record in the database and the host has a port, the port is stripped and the
+  lookup is retried with the domain part only.
+
+:mod:`django.contrib.syndication`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Support for multiple enclosures per feed item has been added. If multiple
+  enclosures are defined on a RSS feed, an exception is raised as RSS feeds,
+  unlike Atom feeds, do not support multiple enclosures per feed item.
+
+Cache
+~~~~~
+
+* ``django.core.cache.backends.base.BaseCache`` now has a ``get_or_set()``
+  method.
+
+* :func:`django.views.decorators.cache.never_cache` now sends more persuasive
+  headers (added ``no-cache, no-store, must-revalidate`` to ``Cache-Control``)
+  to better prevent caching. This was also added in Django 1.8.8.
+
+CSRF
+~~~~
+
+* The request header's name used for CSRF authentication can be customized
+  with :setting:`CSRF_HEADER_NAME`.
+
+* The CSRF referer header is now validated against the
+  :setting:`CSRF_COOKIE_DOMAIN` setting if set. See :ref:`how-csrf-works` for
+  details.
+
+* The new :setting:`CSRF_TRUSTED_ORIGINS` setting provides a way to allow
+  cross-origin unsafe requests (e.g. ``POST``) over HTTPS.
+
+Database backends
+~~~~~~~~~~~~~~~~~
+
+* The PostgreSQL backend (``django.db.backends.postgresql_psycopg2``) is also
+  available as ``django.db.backends.postgresql``. The old name will continue to
+  be available for backwards compatibility.
+
+File Storage
+~~~~~~~~~~~~
+
+* :meth:`Storage.get_valid_name()
+  <django.core.files.storage.Storage.get_valid_name>` is now called when
+  the :attr:`~django.db.models.FileField.upload_to` is a callable.
+
+* :class:`~django.core.files.File` now has the ``seekable()`` method when using
+  Python 3.
+
+Forms
+~~~~~
+
+* :class:`~django.forms.ModelForm` accepts the new ``Meta`` option
+  ``field_classes`` to customize the type of the fields. See
+  :ref:`modelforms-overriding-default-fields` for details.
+
+* You can now specify the order in which form fields are rendered with the
+  :attr:`~django.forms.Form.field_order` attribute, the ``field_order``
+  constructor argument , or the :meth:`~django.forms.Form.order_fields` method.
+
+* A form prefix can be specified inside a form class, not only when
+  instantiating a form. See :ref:`form-prefix` for details.
+
+* You can now :ref:`specify keyword arguments <custom-formset-form-kwargs>`
+  that you want to pass to the constructor of forms in a formset.
+
+* :class:`~django.forms.SlugField` now accepts an
+  :attr:`~django.forms.SlugField.allow_unicode` argument to allow Unicode
+  characters in slugs.
+
+* :class:`~django.forms.CharField` now accepts a
+  :attr:`~django.forms.CharField.strip` argument to strip input data of leading
+  and trailing whitespace.  As this defaults to ``True`` this is different
+  behavior from previous releases.
+
+* Form fields now support the :attr:`~django.forms.Field.disabled` argument,
+  allowing the field widget to be displayed disabled by browsers.
+
+* It's now possible to customize bound fields by overriding a field's
+  :meth:`~django.forms.Field.get_bound_field()` method.
+
+Generic Views
+~~~~~~~~~~~~~
+
+* Class-based views generated using ``as_view()`` now have ``view_class``
+  and ``view_initkwargs`` attributes.
+
+* :func:`~django.utils.decorators.method_decorator` can now be used with a list
+  or tuple of decorators. It can also be used to :ref:`decorate classes instead
+  of methods <decorating-class-based-views>`.
+
+Internationalization
+~~~~~~~~~~~~~~~~~~~~
+
+* The :func:`django.views.i18n.set_language` view now properly redirects to
+  :ref:`translated URLs <url-internationalization>`, when available.
+
+* The ``django.views.i18n.javascript_catalog()`` view now works correctly
+  if used multiple times with different configurations on the same page.
+
+* The :func:`django.utils.timezone.make_aware` function gained an ``is_dst``
+  argument to help resolve ambiguous times during DST transitions.
+
+* You can now use locale variants supported by gettext. These are usually used
+  for languages which can be written in different scripts, for example Latin
+  and Cyrillic (e.g. ``be@latin``).
+
+* Added the ``django.views.i18n.json_catalog()`` view to help build a custom
+  client-side i18n library upon Django translations. It returns a JSON object
+  containing a translations catalog, formatting settings, and a plural rule.
+
+* Added the ``name_translated`` attribute to the object returned by the
+  :ttag:`get_language_info` template tag. Also added a corresponding template
+  filter: :tfilter:`language_name_translated`.
+
+* You can now run :djadmin:`compilemessages` from the root directory of your
+  project and it will find all the app message files that were created by
+  :djadmin:`makemessages`.
+
+* :djadmin:`makemessages` now calls ``xgettext`` once per locale directory
+  rather than once per translatable file. This speeds up localization builds.
+
+* :ttag:`blocktrans` supports assigning its output to a variable using
+  ``asvar``.
+
+* Two new languages are available: Colombian Spanish and Scottish Gaelic.
+
+Management Commands
+~~~~~~~~~~~~~~~~~~~
+
+* The new :djadmin:`sendtestemail` command lets you send a test email to
+  easily confirm that email sending through Django is working.
+
+* To increase the readability of the SQL code generated by
+  :djadmin:`sqlmigrate`, the SQL code generated for each migration operation is
+  preceded by the operation's description.
+
+* The :djadmin:`dumpdata` command output is now deterministically ordered.
+  Moreover, when the ``--output`` option is specified, it also shows a progress
+  bar in the terminal.
+
+* The :djadmin:`createcachetable` command now has a ``--dry-run`` flag to
+  print out the SQL rather than execute it.
+
+* The :djadmin:`startapp` command creates an ``apps.py`` file. Since it doesn't
+  use ``default_app_config`` (:ref:`a discouraged API
+  <configuring-applications-ref>`), you must specify the app config's path,
+  e.g. ``'polls.apps.PollsConfig'``, in :setting:`INSTALLED_APPS` for it to be
+  used (instead of just ``'polls'``).
+
+* When using the PostgreSQL backend, the :djadmin:`dbshell` command can connect
+  to the database using the password from your settings file (instead of
+  requiring it to be manually entered).
+
+* The ``django`` package may be run as a script, i.e. ``python -m django``,
+  which will behave the same as ``django-admin``.
+
+* Management commands that have the ``--noinput`` option now also take
+  ``--no-input`` as an alias for that option.
+
+Migrations
+~~~~~~~~~~
+
+* Initial migrations are now marked with an :attr:`initial = True
+  <django.db.migrations.Migration.initial>` class attribute which allows
+  :option:`migrate --fake-initial` to more easily detect initial migrations.
+
+* Added support for serialization of ``functools.partial`` and ``LazyObject``
+  instances.
+
+* When supplying ``None`` as a value in :setting:`MIGRATION_MODULES`, Django
+  will consider the app an app without migrations.
+
+* When applying migrations, the "Rendering model states" step that's displayed
+  when running migrate with verbosity 2 or higher now computes only the states
+  for the migrations that have already been applied. The model states for
+  migrations being applied are generated on demand, drastically reducing the
+  amount of required memory.
+
+  However, this improvement is not available when unapplying migrations and
+  therefore still requires the precomputation and storage of the intermediate
+  migration states.
+
+  This improvement also requires that Django no longer supports mixed migration
+  plans. Mixed plans consist of a list of migrations where some are being
+  applied and others are being unapplied. This was never officially supported
+  and never had a public API that supports this behavior.
+
+* The :djadmin:`squashmigrations` command now supports specifying the starting
+  migration from which migrations will be squashed.
+
+Models
+~~~~~~
+
+* :meth:`QuerySet.bulk_create() <django.db.models.query.QuerySet.bulk_create>`
+  now works on proxy models.
+
+* Database configuration gained a :setting:`TIME_ZONE <DATABASE-TIME_ZONE>`
+  option for interacting with databases that store datetimes in local time and
+  don't support time zones when :setting:`USE_TZ` is ``True``.
+
+* Added the :meth:`RelatedManager.set()
+  <django.db.models.fields.related.RelatedManager.set()>` method to the related
+  managers created by ``ForeignKey``, ``GenericForeignKey``, and
+  ``ManyToManyField``.
+
+* The :meth:`~django.db.models.fields.related.RelatedManager.add` method on
+  a reverse foreign key now has a ``bulk`` parameter to allow executing one
+  query regardless of the number of objects being added rather than one query
+  per object.
+
+* Added the ``keep_parents`` parameter to :meth:`Model.delete()
+  <django.db.models.Model.delete>` to allow deleting only a child's data in a
+  model that uses multi-table inheritance.
+
+* :meth:`Model.delete() <django.db.models.Model.delete>`
+  and :meth:`QuerySet.delete() <django.db.models.query.QuerySet.delete>` return
+  the number of objects deleted.
+
+* Added a system check to prevent defining both ``Meta.ordering`` and
+  ``order_with_respect_to`` on the same model.
+
+* :lookup:`Date and time <year>` lookups can be chained with other lookups
+  (such as :lookup:`exact`, :lookup:`gt`, :lookup:`lt`, etc.). For example:
+  ``Entry.objects.filter(pub_date__month__gt=6)``.
+
+* Time lookups (hour, minute, second) are now supported by
+  :class:`~django.db.models.TimeField` for all database backends. Support for
+  backends other than SQLite was added but undocumented in Django 1.7.
+
+* You can specify the ``output_field`` parameter of the
+  :class:`~django.db.models.Avg` aggregate in order to aggregate over
+  non-numeric columns, such as ``DurationField``.
+
+* Added the :lookup:`date` lookup to :class:`~django.db.models.DateTimeField`
+  to allow querying the field by only the date portion.
+
+* Added the :class:`~django.db.models.functions.Greatest` and
+  :class:`~django.db.models.functions.Least` database functions.
+
+* Added the :class:`~django.db.models.functions.Now` database function, which
+  returns the current date and time.
+
+* :class:`~django.db.models.Transform` is now a subclass of
+  :ref:`Func() <func-expressions>` which allows ``Transform``\s to be used on
+  the right hand side of an expression, just like regular ``Func``\s. This
+  allows registering some database functions like
+  :class:`~django.db.models.functions.Length`,
+  :class:`~django.db.models.functions.Lower`, and
+  :class:`~django.db.models.functions.Upper` as transforms.
+
+* :class:`~django.db.models.SlugField` now accepts an
+  :attr:`~django.db.models.SlugField.allow_unicode` argument to allow Unicode
+  characters in slugs.
+
+* Added support for referencing annotations in ``QuerySet.distinct()``.
+
+* ``connection.queries`` shows queries with substituted parameters on SQLite.
+
+* :doc:`Query expressions </ref/models/expressions>` can now be used when
+  creating new model instances using ``save()``, ``create()``, and
+  ``bulk_create()``.
+
+Requests and Responses
+~~~~~~~~~~~~~~~~~~~~~~
+
+* Unless :attr:`HttpResponse.reason_phrase
+  <django.http.HttpResponse.reason_phrase>` is explicitly set, it now is
+  determined by the current value of :attr:`HttpResponse.status_code
+  <django.http.HttpResponse.status_code>`. Modifying the value of
+  ``status_code`` outside of the constructor will also modify the value of
+  ``reason_phrase``.
+
+* The debug view now shows details of chained exceptions on Python 3.
+
+* The default 40x error views now accept a second positional parameter, the
+  exception that triggered the view.
+
+* View error handlers now support
+  :class:`~django.template.response.TemplateResponse`, commonly used with
+  class-based views.
+
+* Exceptions raised by the ``render()`` method are now passed to the
+  ``process_exception()`` method of each middleware.
+
+* Request middleware can now set :attr:`HttpRequest.urlconf
+  <django.http.HttpRequest.urlconf>` to ``None`` to revert any changes made
+  by previous middleware and return to using the :setting:`ROOT_URLCONF`.
+
+* The :setting:`DISALLOWED_USER_AGENTS` check in
+  :class:`~django.middleware.common.CommonMiddleware` now raises a
+  :class:`~django.core.exceptions.PermissionDenied` exception as opposed to
+  returning an :class:`~django.http.HttpResponseForbidden` so that
+  :data:`~django.conf.urls.handler403` is invoked.
+
+* Added :meth:`HttpRequest.get_port() <django.http.HttpRequest.get_port>` to
+  fetch the originating port of the request.
+
+* Added the ``json_dumps_params`` parameter to
+  :class:`~django.http.JsonResponse` to allow passing keyword arguments to the
+  ``json.dumps()`` call used to generate the response.
+
+* The :class:`~django.middleware.common.BrokenLinkEmailsMiddleware` now
+  ignores 404s when the referer is equal to the requested URL. To circumvent
+  the empty referer check already implemented, some web bots set the referer to
+  the requested URL.
+
+Templates
+~~~~~~~~~
+
+* Template tags created with the :meth:`~django.template.Library.simple_tag`
+  helper can now store results in a template variable by using the ``as``
+  argument.
+
+* Added a :meth:`Context.setdefault() <django.template.Context.setdefault>`
+  method.
+
+* The :ref:`django.template <django-template-logger>` logger was added and
+  includes the following messages:
+
+  * A ``DEBUG`` level message for missing context variables.
+
+  * A ``WARNING`` level message for uncaught exceptions raised
+    during the rendering of an ``{% include %}`` when debug mode is off
+    (helpful since ``{% include %}`` silences the exception and returns an
+    empty string).
+
+* The :ttag:`firstof` template tag supports storing the output in a variable
+  using 'as'.
+
+* :meth:`Context.update() <django.template.Context.update>` can now be used as
+  a context manager.
+
+* Django template loaders can now extend templates recursively.
+
+* The debug page template postmortem now include output from each engine that
+  is installed.
+
+* :ref:`Debug page integration <template-debug-integration>` for custom
+  template engines was added.
+
+* The :class:`~django.template.backends.django.DjangoTemplates` backend gained
+  the ability to register libraries and builtins explicitly through the
+  template :setting:`OPTIONS <TEMPLATES-OPTIONS>`.
+
+* The ``timesince`` and ``timeuntil`` filters were improved to deal with leap
+  years when given large time spans.
+
+* The ``include`` tag now caches parsed templates objects during template
+  rendering, speeding up reuse in places such as for loops.
+
+Tests
+~~~~~
+
+* Added the :meth:`json() <django.test.Response.json>` method to test client
+  responses to give access to the response body as JSON.
+
+* Added the :meth:`~django.test.Client.force_login()` method to the test
+  client. Use this method to simulate the effect of a user logging into the
+  site while skipping the authentication and verification steps of
+  :meth:`~django.test.Client.login()`.
+
+URLs
+~~~~
+
+* Regular expression lookaround assertions are now allowed in URL patterns.
+
+* The application namespace can now be set using an ``app_name`` attribute
+  on the included module or object. It can also be set by passing a 2-tuple
+  of (<list of patterns>, <application namespace>) as the first argument to
+  ``include()``.
+
+* System checks have been added for common URL pattern mistakes.
+
+Validators
+~~~~~~~~~~
+
+* Added :func:`django.core.validators.int_list_validator` to generate
+  validators of strings containing integers separated with a custom character.
+
+* :class:`~django.core.validators.EmailValidator` now limits the length of
+  domain name labels to 63 characters per :rfc:`1034`.
+
+* Added :func:`~django.core.validators.validate_unicode_slug` to validate slugs
+  that may contain Unicode characters.
+
+.. _backwards-incompatible-1.9:
+
+Backwards incompatible changes in 1.9
+=====================================
+
+.. warning::
+
+    In addition to the changes outlined in this section, be sure to review the
+    :ref:`removed-features-1.9` for the features that have reached the end of
+    their deprecation cycle and therefore been removed. If you haven't updated
+    your code within the deprecation timeline for a given feature, its removal
+    may appear as a backwards incompatible change.
+
+Database backend API
+--------------------
+
+* A couple of new tests rely on the ability of the backend to introspect column
+  defaults (returning the result as ``Field.default``). You can set the
+  ``can_introspect_default`` database feature to ``False`` if your backend
+  doesn't implement this. You may want to review the implementation on the
+  backends that Django includes for reference (:ticket:`24245`).
+
+* Registering a global adapter or converter at the level of the DB-API module
+  to handle time zone information of :class:`~datetime.datetime` values passed
+  as query parameters or returned as query results on databases that don't
+  support time zones is discouraged. It can conflict with other libraries.
+
+  The recommended way to add a time zone to :class:`~datetime.datetime` values
+  fetched from the database is to register a converter for ``DateTimeField``
+  in ``DatabaseOperations.get_db_converters()``.
+
+  The ``needs_datetime_string_cast`` database feature was removed. Database
+  backends that set it must register a converter instead, as explained above.
+
+* The ``DatabaseOperations.value_to_db_<type>()`` methods were renamed to
+  ``adapt_<type>field_value()`` to mirror the ``convert_<type>field_value()``
+  methods.
+
+* To use the new ``date`` lookup, third-party database backends may need to
+  implement the ``DatabaseOperations.datetime_cast_date_sql()`` method.
+
+* The ``DatabaseOperations.time_extract_sql()`` method was added. It calls the
+  existing ``date_extract_sql()`` method. This method is overridden by the
+  SQLite backend to add time lookups (hour, minute, second) to
+  :class:`~django.db.models.TimeField`, and may be needed by third-party
+  database backends.
+
+* The ``DatabaseOperations.datetime_cast_sql()`` method (not to be confused
+  with ``DatabaseOperations.datetime_cast_date_sql()`` mentioned above)
+  has been removed. This method served to format dates on Oracle long
+  before 1.0, but hasn't been overridden by any core backend in years
+  and hasn't been called anywhere in Django's code or tests.
+
+* In order to support test parallelization, you must implement the
+  ``DatabaseCreation._clone_test_db()`` method and set
+  ``DatabaseFeatures.can_clone_databases = True``. You may have to adjust
+  ``DatabaseCreation.get_test_db_clone_settings()``.
+
+Default settings that were tuples are now lists
+-----------------------------------------------
+
+The default settings in ``django.conf.global_settings`` were a combination of
+lists and tuples. All settings that were formerly tuples are now lists.
+
+``is_usable`` attribute on template loaders is removed
+------------------------------------------------------
+
+Django template loaders previously required an ``is_usable`` attribute to be
+defined. If a loader was configured in the template settings and this attribute
+was ``False``, the loader would be silently ignored. In practice, this was only
+used by the egg loader to detect if ``setuptools`` was installed. The
+``is_usable`` attribute is now removed and the egg loader instead fails at
+runtime if ``setuptools`` is not installed.
+
+Related set direct assignment
+-----------------------------
+
+Direct assignment of related objects in the ORM used to perform a ``clear()``
+followed by a call to ``add()``. This caused needlessly large data changes and
+prevented using the :data:`~django.db.models.signals.m2m_changed` signal to
+track individual changes in many-to-many relations.
+
+Direct assignment now relies on the new
+:meth:`~django.db.models.fields.related.RelatedManager.set` method on related
+managers which by default only processes changes between the existing related
+set and the one that's newly assigned. The previous behavior can be restored by
+replacing direct assignment by a call to ``set()`` with the keyword argument
+``clear=True``.
+
+``ModelForm``, and therefore ``ModelAdmin``, internally rely on direct
+assignment for many-to-many relations and as a consequence now use the new
+behavior.
+
+Filesystem-based template loaders catch more specific exceptions
+----------------------------------------------------------------
+
+When using the :class:`filesystem.Loader <django.template.loaders.filesystem.Loader>`
+or :class:`app_directories.Loader <django.template.loaders.app_directories.Loader>`
+template loaders, earlier versions of Django raised a
+:exc:`~django.template.TemplateDoesNotExist` error if a template source existed
+but was unreadable. This could happen under many circumstances, such as if
+Django didn't have permissions to open the file, or if the template source was
+a directory. Now, Django only silences the exception if the template source
+does not exist. All other situations result in the original ``IOError`` being
+raised.
+
+HTTP redirects no longer forced to absolute URIs
+------------------------------------------------
+
+Relative redirects are no longer converted to absolute URIs. :rfc:`2616`
+required the ``Location`` header in redirect responses to be an absolute URI,
+but it has been superseded by :rfc:`7231` which allows relative URIs in
+``Location``, recognizing the actual practice of user agents, almost all of
+which support them.
+
+Consequently, the expected URLs passed to ``assertRedirects`` should generally
+no longer include the scheme and domain part of the URLs. For example,
+``self.assertRedirects(response, 'http://testserver/some-url/')`` should be
+replaced by ``self.assertRedirects(response, '/some-url/')`` (unless the
+redirection specifically contained an absolute URL).
+
+In the rare case that you need the old behavior (discovered with an ancient
+version of Apache with ``mod_scgi`` that interprets a relative redirect as an
+"internal redirect"), you can restore it by writing a custom middleware::
+
+    class LocationHeaderFix(object):
+        def process_response(self, request, response):
+            if "Location" in response:
+                response["Location"] = request.build_absolute_uri(response["Location"])
+            return response
+
+Dropped support for PostgreSQL 9.0
+----------------------------------
+
+Upstream support for PostgreSQL 9.0 ended in September 2015. As a consequence,
+Django 1.9 sets 9.1 as the minimum PostgreSQL version it officially supports.
+
+Dropped support for Oracle 11.1
+-------------------------------
+
+Upstream support for Oracle 11.1 ended in August 2015. As a consequence, Django
+1.9 sets 11.2 as the minimum Oracle version it officially supports.
+
+Bulk behavior of ``add()`` method of related managers
+-----------------------------------------------------
+
+To improve performance, the ``add()`` methods of the related managers created
+by ``ForeignKey`` and ``GenericForeignKey`` changed from a series of
+``Model.save()`` calls to a single ``QuerySet.update()`` call. The change means
+that ``pre_save`` and ``post_save`` signals aren't sent anymore. You can use
+the ``bulk=False`` keyword argument to revert to the previous behavior.
+
+Template ``LoaderOrigin`` and ``StringOrigin`` are removed
+----------------------------------------------------------
+
+In previous versions of Django, when a template engine was initialized with
+debug as ``True``, an instance of ``django.template.loader.LoaderOrigin`` or
+``django.template.base.StringOrigin`` was set as the origin attribute on the
+template object. These classes have been combined into
+:class:`~django.template.base.Origin` and is now always set regardless of the
+engine debug setting. For a minimal level of backwards compatibility, the old
+class names will be kept as aliases to the new ``Origin`` class until
+Django 2.0.
+
+.. _default-logging-changes-19:
+
+Changes to the default logging configuration
+--------------------------------------------
+
+To make it easier to write custom logging configurations, Django's default
+logging configuration no longer defines ``django.request`` and
+``django.security`` loggers. Instead, it defines a single ``django`` logger,
+filtered at the ``INFO`` level, with two handlers:
+
+* ``console``: filtered at the ``INFO`` level and only active if ``DEBUG=True``.
+* ``mail_admins``: filtered at the ``ERROR`` level and only active if
+  ``DEBUG=False``.
+
+If you aren't overriding Django's default logging, you should see minimal
+changes in behavior, but you might see some new logging to the ``runserver``
+console, for example.
+
+If you are overriding Django's default logging, you should check to see how
+your configuration merges with the new defaults.
+
+``HttpRequest`` details in error reporting
+------------------------------------------
+
+It was redundant to display the full details of the
+:class:`~django.http.HttpRequest` each time it appeared as a stack frame
+variable in the HTML version of the debug page and error email. Thus, the HTTP
+request will now display the same standard representation as other variables
+(``repr(request)``). As a result, the
+``ExceptionReporterFilter.get_request_repr()`` method and the undocumented
+``django.http.build_request_repr()`` function were removed.
+
+The contents of the text version of the email were modified to provide a
+traceback of the same structure as in the case of AJAX requests. The traceback
+details are rendered by the ``ExceptionReporter.get_traceback_text()`` method.
+
+Removal of time zone aware global adapters and converters for datetimes
+-----------------------------------------------------------------------
+
+Django no longer registers global adapters and converters for managing time
+zone information on :class:`~datetime.datetime` values sent to the database as
+query parameters or read from the database in query results. This change
+affects projects that meet all the following conditions:
+
+* The :setting:`USE_TZ` setting is ``True``.
+* The database is SQLite, MySQL, Oracle, or a third-party database that
+  doesn't support time zones. In doubt, you can check the value of
+  ``connection.features.supports_timezones``.
+* The code queries the database outside of the ORM, typically with
+  ``cursor.execute(sql, params)``.
+
+If you're passing aware :class:`~datetime.datetime` parameters to such
+queries, you should turn them into naive datetimes in UTC::
+
+    from django.utils import timezone
+
+    param = timezone.make_naive(param, timezone.utc)
+
+If you fail to do so, the conversion will be performed as in earlier versions
+(with a deprecation warning) up until Django 1.11. Django 2.0 won't perform any
+conversion, which may result in data corruption.
+
+If you're reading :class:`~datetime.datetime` values from the results, they
+will be naive instead of aware. You can compensate as follows::
+
+    from django.utils import timezone
+
+    value = timezone.make_aware(value, timezone.utc)
+
+You don't need any of this if you're querying the database through the ORM,
+even if you're using :meth:`raw() <django.db.models.query.QuerySet.raw>`
+queries. The ORM takes care of managing time zone information.
+
+Template tag modules are imported when templates are configured
+---------------------------------------------------------------
+
+The :class:`~django.template.backends.django.DjangoTemplates` backend now
+performs discovery on installed template tag modules when instantiated. This
+update enables libraries to be provided explicitly via the ``'libraries'``
+key of :setting:`OPTIONS <TEMPLATES-OPTIONS>` when defining a
+:class:`~django.template.backends.django.DjangoTemplates` backend. Import
+or syntax errors in template tag modules now fail early at instantiation time
+rather than when a template with a :ttag:`{% load %}<load>` tag is first
+compiled.
+
+``django.template.base.add_to_builtins()`` is removed
+-----------------------------------------------------
+
+Although it was a private API, projects commonly used ``add_to_builtins()`` to
+make template tags and filters available without using the
+:ttag:`{% load %}<load>` tag. This API has been formalized. Projects should now
+define built-in libraries via the ``'builtins'`` key of :setting:`OPTIONS
+<TEMPLATES-OPTIONS>` when defining a
+:class:`~django.template.backends.django.DjangoTemplates` backend.
+
+.. _simple-tag-conditional-escape-fix:
+
+``simple_tag`` now wraps tag output in ``conditional_escape``
+-------------------------------------------------------------
+
+In general, template tags do not autoescape their contents, and this behavior is
+:ref:`documented <tags-auto-escaping>`. For tags like
+:class:`~django.template.Library.inclusion_tag`, this is not a problem because
+the included template will perform autoescaping. For ``assignment_tag()``,
+the output will be escaped when it is used as a variable in the template.
+
+For the intended use cases of :class:`~django.template.Library.simple_tag`,
+however, it is very easy to end up with incorrect HTML and possibly an XSS
+exploit. For example::
+
+    @register.simple_tag(takes_context=True)
+    def greeting(context):
+        return "Hello {0}!".format(context["request"].user.first_name)
+
+In older versions of Django, this will be an XSS issue because
+``user.first_name`` is not escaped.
+
+In Django 1.9, this is fixed: if the template context has ``autoescape=True``
+set (the default), then ``simple_tag`` will wrap the output of the tag function
+with :func:`~django.utils.html.conditional_escape`.
+
+To fix your ``simple_tag``\s, it is best to apply the following practices:
+
+* Any code that generates HTML should use either the template system or
+  :func:`~django.utils.html.format_html`.
+
+* If the output of a ``simple_tag`` needs escaping, use
+  :func:`~django.utils.html.escape` or
+  :func:`~django.utils.html.conditional_escape`.
+
+* If you are absolutely certain that you are outputting HTML from a trusted
+  source (e.g. a CMS field that stores HTML entered by admins), you can mark it
+  as such using :func:`~django.utils.safestring.mark_safe`.
+
+Tags that follow these rules will be correct and safe whether they are run on
+Django 1.9+ or earlier.
+
+``Paginator.page_range``
+------------------------
+
+:attr:`Paginator.page_range <django.core.paginator.Paginator.page_range>` is
+now an iterator instead of a list.
+
+In versions of Django previous to 1.8, ``Paginator.page_range`` returned a
+``list`` in Python 2 and a ``range`` in Python 3. Django 1.8 consistently
+returned a list, but an iterator is more efficient.
+
+Existing code that depends on ``list`` specific features, such as indexing,
+can be ported by converting the iterator into a ``list`` using ``list()``.
+
+Implicit ``QuerySet`` ``__in`` lookup removed
+---------------------------------------------
+
+In earlier versions, queries such as::
+
+    Model.objects.filter(related_id=RelatedModel.objects.all())
+
+would implicitly convert to::
+
+    Model.objects.filter(related_id__in=RelatedModel.objects.all())
+
+resulting in SQL like ``"related_id IN (SELECT id FROM ...)"``.
+
+This implicit ``__in`` no longer happens so the "IN" SQL is now "=", and if the
+subquery returns multiple results, at least some databases will throw an error.
+
+.. _admin-browser-support-19:
+
+``contrib.admin`` browser support
+---------------------------------
+
+The admin no longer supports Internet Explorer 8 and below, as these browsers
+have reached end-of-life.
+
+CSS and images to support Internet Explorer 6 and 7 have been removed. PNG and
+GIF icons have been replaced with SVG icons, which are not supported by
+Internet Explorer 8 and earlier.
+
+The jQuery library embedded in the admin has been upgraded from version 1.11.2
+to 2.1.4. jQuery 2.x has the same API as jQuery 1.x, but does not support
+Internet Explorer 6, 7, or 8, allowing for better performance and a smaller
+file size. If you need to support IE8 and must also use the latest version of
+Django, you can override the admin's copy of jQuery with your own by creating
+a Django application with this structure:
+
+.. code-block:: text
+
+    app/static/admin/js/vendor/
+        jquery.js
+        jquery.min.js
+
+.. _syntax-error-old-setuptools-django-19:
+
+``SyntaxError`` when installing Django ``setuptools`` 5.5.x
+-----------------------------------------------------------
+
+When installing Django 1.9 or 1.9.1 with ``setuptools`` 5.5.x, you'll see:
+
+.. code-block:: shell
+
+    Compiling django/conf/app_template/apps.py ...
+      File "django/conf/app_template/apps.py", line 4
+        class {{ camel_case_app_name }}Config(AppConfig):
+              ^
+    SyntaxError: invalid syntax
+
+    Compiling django/conf/app_template/models.py ...
+      File "django/conf/app_template/models.py", line 1
+        {{ unicode_literals }}from django.db import models
+                                 ^
+    SyntaxError: invalid syntax
+
+It's safe to ignore these errors (Django will still install just fine), but you
+can avoid them by upgrading ``setuptools`` to a more recent version. If you're
+using pip, you can upgrade pip using ``python -m pip install -U pip`` which
+will also upgrade ``setuptools``. This is resolved in later versions of Django
+as described in the :doc:`/releases/1.9.2`.
+
+Miscellaneous
+-------------
+
+* The jQuery static files in ``contrib.admin`` have been moved into a
+  ``vendor/jquery`` subdirectory.
+
+* The text displayed for null columns in the admin changelist ``list_display``
+  cells has changed from ``(None)`` (or its translated equivalent) to ``-`` (a
+  dash).
+
+* ``django.http.responses.REASON_PHRASES`` and
+  ``django.core.handlers.wsgi.STATUS_CODE_TEXT`` have been removed. Use
+  Python's Standard Library instead: :data:`http.client.responses` for Python
+  3 and `httplib.responses`_ for Python 2.
+
+  .. _`httplib.responses`: https://docs.python.org/2/library/httplib.html#httplib.responses
+
+* ``ValuesQuerySet`` and ``ValuesListQuerySet`` have been removed.
+
+* The ``admin/base.html`` template no longer sets
+  ``window.__admin_media_prefix__`` or ``window.__admin_utc_offset__``. Image
+  references in JavaScript that used that value to construct absolute URLs have
+  been moved to CSS for easier customization. The UTC offset is stored on a
+  data attribute of the ``<body>`` tag.
+
+* ``CommaSeparatedIntegerField`` validation has been refined to forbid values
+  like ``','``, ``',1'``, and ``'1,,2'``.
+
+* Form initialization was moved from the :meth:`ProcessFormView.get()
+  <django.views.generic.edit.ProcessFormView.get>` method to the new
+  :meth:`FormMixin.get_context_data()
+  <django.views.generic.edit.FormMixin.get_context_data>` method. This may be
+  backwards incompatible if you have overridden the ``get_context_data()``
+  method without calling ``super()``.
+
+* Support for PostGIS 1.5 has been dropped.
+
+* The ``django.contrib.sites.models.Site.domain`` field was changed to be
+  :attr:`~django.db.models.Field.unique`.
+
+* In order to enforce test isolation, database queries are not allowed
+  by default in :class:`~django.test.SimpleTestCase` tests anymore. You
+  can disable this behavior by setting the ``allow_database_queries`` class
+  attribute to ``True`` on your test class.
+
+* ``ResolverMatch.app_name`` was changed to contain the full namespace path in
+  the case of nested namespaces. For consistency with
+  ``ResolverMatch.namespace``, the empty value is now an empty string instead
+  of ``None``.
+
+* For security hardening, session keys must be at least 8 characters.
+
+* Private function ``django.utils.functional.total_ordering()`` has been
+  removed. It contained a workaround for a ``functools.total_ordering()`` bug
+  in Python versions older than 2.7.3.
+
+* XML serialization (either through :djadmin:`dumpdata` or the syndication
+  framework) used to output any characters it received. Now if the content to
+  be serialized contains any control characters not allowed in the XML 1.0
+  standard, the serialization will fail with a :exc:`ValueError`.
+
+* :class:`~django.forms.CharField` now strips input of leading and trailing
+  whitespace by default. This can be disabled by setting the new
+  :attr:`~django.forms.CharField.strip` argument to ``False``.
+
+* Template text that is translated and uses two or more consecutive percent
+  signs, e.g. ``"%%"``, may have a new ``msgid`` after ``makemessages`` is run
+  (most likely the translation will be marked fuzzy). The new ``msgid`` will be
+  marked ``"#, python-format"``.
+
+* If neither :attr:`request.current_app <django.http.HttpRequest.current_app>`
+  nor :class:`Context.current_app <django.template.Context>` are set, the
+  :ttag:`url` template tag will now use the namespace of the current request.
+  Set ``request.current_app`` to ``None`` if you don't want to use a namespace
+  hint.
+
+* The :setting:`SILENCED_SYSTEM_CHECKS` setting now silences messages of all
+  levels. Previously, messages of ``ERROR`` level or higher were printed to the
+  console.
+
+* The ``FlatPage.enable_comments`` field is removed from the ``FlatPageAdmin``
+  as it's unused by the application. If your project or a third-party app makes
+  use of it, :ref:`create a custom ModelAdmin <flatpages-admin>` to add it back.
+
+* The return value of
+  :meth:`~django.test.runner.DiscoverRunner.setup_databases` and the first
+  argument of :meth:`~django.test.runner.DiscoverRunner.teardown_databases`
+  changed. They used to be ``(old_names, mirrors)`` tuples. Now they're just
+  the first item, ``old_names``.
+
+* By default :class:`~django.test.LiveServerTestCase` attempts to find an
+  available port in the 8081-8179 range instead of just trying port 8081.
+
+* The system checks for :class:`~django.contrib.admin.ModelAdmin` now check
+  instances rather than classes.
+
+* The private API to apply mixed migration plans has been dropped for
+  performance reasons. Mixed plans consist of a list of migrations where some
+  are being applied and others are being unapplied.
+
+* The related model object descriptor classes in
+  ``django.db.models.fields.related`` (private API) are moved from the
+  ``related`` module to ``related_descriptors`` and renamed as follows:
+
+  * ``ReverseSingleRelatedObjectDescriptor`` is ``ForwardManyToOneDescriptor``
+  * ``SingleRelatedObjectDescriptor`` is ``ReverseOneToOneDescriptor``
+  * ``ForeignRelatedObjectsDescriptor`` is ``ReverseManyToOneDescriptor``
+  * ``ManyRelatedObjectsDescriptor`` is ``ManyToManyDescriptor``
+
+* If you implement a custom :data:`~django.conf.urls.handler404` view, it must
+  return a response with an HTTP 404 status code. Use
+  :class:`~django.http.HttpResponseNotFound` or pass ``status=404`` to the
+  :class:`~django.http.HttpResponse`. Otherwise, :setting:`APPEND_SLASH` won't
+  work correctly with ``DEBUG=False``.
+
+.. _deprecated-features-1.9:
+
+Features deprecated in 1.9
+==========================
+
+``assignment_tag()``
+--------------------
+
+Django 1.4 added the ``assignment_tag`` helper to ease the creation of
+template tags that store results in a template variable. The
+:meth:`~django.template.Library.simple_tag` helper has gained this same
+ability, making the ``assignment_tag`` obsolete. Tags that use
+``assignment_tag`` should be updated to use ``simple_tag``.
+
+``{% cycle %}`` syntax with comma-separated arguments
+-----------------------------------------------------
+
+The :ttag:`cycle` tag supports an inferior old syntax from previous Django
+versions:
+
+.. code-block:: html+django
+
+    {% cycle row1,row2,row3 %}
+
+Its parsing caused bugs with the current syntax, so support for the old syntax
+will be removed in Django 1.10 following an accelerated deprecation.
+
+``ForeignKey`` and ``OneToOneField`` ``on_delete`` argument
+-----------------------------------------------------------
+
+In order to increase awareness about cascading model deletion, the
+``on_delete`` argument of ``ForeignKey`` and ``OneToOneField`` will be required
+in Django 2.0.
+
+Update models and existing migrations to explicitly set the argument. Since the
+default is ``models.CASCADE``, add ``on_delete=models.CASCADE`` to all
+``ForeignKey`` and ``OneToOneField``\s that don't use a different option. You
+can also pass it as the second positional argument if you don't care about
+compatibility with older versions of Django.
+
+``Field.rel`` changes
+---------------------
+
+``Field.rel`` and its methods and attributes have changed to match the related
+fields API. The ``Field.rel`` attribute is renamed to ``remote_field`` and many
+of its methods and attributes are either changed or renamed.
+
+The aim of these changes is to provide a documented API for relation fields.
+
+``GeoManager`` and ``GeoQuerySet`` custom methods
+-------------------------------------------------
+
+All custom ``GeoQuerySet`` methods (``area()``, ``distance()``, ``gml()``, ...)
+have been replaced by equivalent geographic expressions in annotations (see in
+new features). Hence the need to set a custom ``GeoManager`` to GIS-enabled
+models is now obsolete. As soon as your code doesn't call any of the deprecated
+methods, you can simply remove the ``objects = GeoManager()`` lines from your
+models.
+
+Template loader APIs have changed
+---------------------------------
+
+Django template loaders have been updated to allow recursive template
+extending. This change necessitated a new template loader API. The old
+``load_template()`` and ``load_template_sources()`` methods are now deprecated.
+Details about the new API can be found :ref:`in the template loader
+documentation <custom-template-loaders>`.
+
+Passing a 3-tuple or an ``app_name`` to ``include()``
+-----------------------------------------------------
+
+The instance namespace part of passing a tuple as an argument to ``include()``
+has been replaced by passing the ``namespace`` argument to ``include()``. For
+example::
+
+    polls_patterns = [
+        url(...),
+    ]
+
+    urlpatterns = [
+        url(r"^polls/", include((polls_patterns, "polls", "author-polls"))),
+    ]
+
+becomes::
+
+    polls_patterns = (
+        [
+            url(...),
+        ],
+        "polls",
+    )  # 'polls' is the app_name
+
+    urlpatterns = [
+        url(r"^polls/", include(polls_patterns, namespace="author-polls")),
+    ]
+
+The ``app_name`` argument to ``include()`` has been replaced by passing a
+2-tuple (as above), or passing an object or module with an ``app_name``
+attribute (as below). If the ``app_name`` is set in this new way, the
+``namespace`` argument is no longer required. It will default to the value of
+``app_name``. For example, the URL patterns in the tutorial are changed from:
+
+.. code-block:: python
+    :caption: ``mysite/urls.py``
+
+    urlpatterns = [url(r"^polls/", include("polls.urls", namespace="polls")), ...]
+
+to:
+
+.. code-block:: python
+    :caption: ``mysite/urls.py``
+
+    urlpatterns = [
+        url(r"^polls/", include("polls.urls")),  # 'namespace="polls"' removed
+        ...,
+    ]
+
+.. code-block:: python
+    :caption: ``polls/urls.py``
+
+    app_name = "polls"  # added
+    urlpatterns = [...]
+
+This change also means that the old way of including an ``AdminSite`` instance
+is deprecated. Instead, pass ``admin.site.urls`` directly to
+``django.conf.urls.url()``:
+
+.. code-block:: python
+    :caption: ``urls.py``
+
+    from django.conf.urls import url
+    from django.contrib import admin
+
+    urlpatterns = [
+        url(r"^admin/", admin.site.urls),
+    ]
+
+URL application namespace required if setting an instance namespace
+-------------------------------------------------------------------
+
+In the past, an instance namespace without an application namespace
+would serve the same purpose as the application namespace, but it was
+impossible to reverse the patterns if there was an application namespace
+with the same name. Includes that specify an instance namespace require that
+the included URLconf sets an application namespace.
+
+``current_app`` parameter to ``contrib.auth`` views
+---------------------------------------------------
+
+All views in ``django.contrib.auth.views`` have the following structure:
+
+.. code-block:: text
+
+    def view(request, ..., current_app=None, ...):
+
+        ...
+
+        if current_app is not None:
+            request.current_app = current_app
+
+        return TemplateResponse(request, template_name, context)
+
+As of Django 1.8, ``current_app`` is set on the ``request`` object. For
+consistency, these views will require the caller to set ``current_app`` on the
+``request`` instead of passing it in a separate argument.
+
+``django.contrib.gis.geoip``
+----------------------------
+
+The :mod:`django.contrib.gis.geoip2` module supersedes
+``django.contrib.gis.geoip``. The new module provides a similar API except that
+it doesn't provide the legacy GeoIP-Python API compatibility methods.
+
+Miscellaneous
+-------------
+
+* The ``weak`` argument to ``django.dispatch.signals.Signal.disconnect()`` has
+  been deprecated as it has no effect.
+
+* The ``check_aggregate_support()`` method of
+  ``django.db.backends.base.BaseDatabaseOperations`` has been deprecated and
+  will be removed in Django 2.0. The more general ``check_expression_support()``
+  should be used instead.
+
+* ``django.forms.extras`` is deprecated. You can find
+  :class:`~django.forms.SelectDateWidget` in ``django.forms.widgets``
+  (or simply ``django.forms``) instead.
+
+* Private API ``django.db.models.fields.add_lazy_relation()`` is deprecated.
+
+* The ``django.contrib.auth.tests.utils.skipIfCustomUser()`` decorator is
+  deprecated. With the test discovery changes in Django 1.6, the tests for
+  ``django.contrib`` apps are no longer run as part of the user's project.
+  Therefore, the ``@skipIfCustomUser`` decorator is no longer needed to
+  decorate tests in ``django.contrib.auth``.
+
+* If you customized some :ref:`error handlers <error-views>`, the view
+  signatures with only one request parameter are deprecated. The views should
+  now also accept a second ``exception`` positional parameter.
+
+* The ``django.utils.feedgenerator.Atom1Feed.mime_type`` and
+  ``django.utils.feedgenerator.RssFeed.mime_type`` attributes are deprecated in
+  favor of ``content_type``.
+
+* :class:`~django.core.signing.Signer` now issues a warning if an invalid
+  separator is used. This will become an exception in Django 1.10.
+
+* ``django.db.models.Field._get_val_from_obj()`` is deprecated in favor of
+  ``Field.value_from_object()``.
+
+* ``django.template.loaders.eggs.Loader`` is deprecated as distributing
+  applications as eggs is not recommended.
+
+* The ``callable_obj`` keyword argument to
+  ``SimpleTestCase.assertRaisesMessage()`` is deprecated. Pass the callable as
+  a positional argument instead.
+
+* The ``allow_tags`` attribute on methods of ``ModelAdmin`` has been
+  deprecated. Use :func:`~django.utils.html.format_html`,
+  :func:`~django.utils.html.format_html_join`, or
+  :func:`~django.utils.safestring.mark_safe` when constructing the method's
+  return value instead.
+
+* The ``enclosure`` keyword argument to ``SyndicationFeed.add_item()`` is
+  deprecated. Use the new ``enclosures`` argument which accepts a list of
+  ``Enclosure`` objects instead of a single one.
+
+* The ``django.template.loader.LoaderOrigin`` and
+  ``django.template.base.StringOrigin`` aliases for
+  ``django.template.base.Origin`` are deprecated.
+
+.. _removed-features-1.9:
+
+Features removed in 1.9
+=======================
+
+These features have reached the end of their deprecation cycle and are removed
+in Django 1.9. See :ref:`deprecated-features-1.7` for details, including how to
+remove usage of these features.
+
+* ``django.utils.dictconfig`` is removed.
+
+* ``django.utils.importlib`` is removed.
+
+* ``django.utils.tzinfo`` is removed.
+
+* ``django.utils.unittest`` is removed.
+
+* The ``syncdb`` command is removed.
+
+* ``django.db.models.signals.pre_syncdb`` and
+  ``django.db.models.signals.post_syncdb`` is removed.
+
+* Support for ``allow_syncdb`` on database routers is removed.
+
+* Automatic syncing of apps without migrations is removed. Migrations are
+  compulsory for all apps unless you pass the :option:`migrate --run-syncdb`
+  option.
+
+* The SQL management commands for apps without migrations, ``sql``, ``sqlall``,
+  ``sqlclear``, ``sqldropindexes``, and ``sqlindexes``, are removed.
+
+* Support for automatic loading of ``initial_data`` fixtures and initial SQL
+  data is removed.
+
+* All models need to be defined inside an installed application or declare an
+  explicit :attr:`~django.db.models.Options.app_label`. Furthermore, it isn't
+  possible to import them before their application is loaded. In particular, it
+  isn't possible to import models inside the root package of an application.
+
+* The model and form ``IPAddressField`` is removed. A stub field remains for
+  compatibility with historical migrations.
+
+* ``AppCommand.handle_app()`` is no longer supported.
+
+* ``RequestSite`` and ``get_current_site()`` are no longer importable from
+  ``django.contrib.sites.models``.
+
+* FastCGI support via the ``runfcgi`` management command is removed.
+
+* ``django.utils.datastructures.SortedDict`` is removed.
+
+* ``ModelAdmin.declared_fieldsets`` is removed.
+
+* The ``util`` modules that provided backwards compatibility are removed:
+
+  * ``django.contrib.admin.util``
+  * ``django.contrib.gis.db.backends.util``
+  * ``django.db.backends.util``
+  * ``django.forms.util``
+
+* ``ModelAdmin.get_formsets`` is removed.
+
+* The backward compatible shims introduced to rename the
+  ``BaseMemcachedCache._get_memcache_timeout()`` method to
+  ``get_backend_timeout()`` is removed.
+
+* The ``--natural`` and ``-n`` options for :djadmin:`dumpdata` are removed.
+
+* The ``use_natural_keys`` argument for ``serializers.serialize()`` is removed.
+
+* Private API ``django.forms.forms.get_declared_fields()`` is removed.
+
+* The ability to use a ``SplitDateTimeWidget`` with ``DateTimeField`` is
+  removed.
+
+* The ``WSGIRequest.REQUEST`` property is removed.
+
+* The class ``django.utils.datastructures.MergeDict`` is removed.
+
+* The ``zh-cn`` and ``zh-tw`` language codes are removed.
+
+* The internal ``django.utils.functional.memoize()`` is removed.
+
+* ``django.core.cache.get_cache`` is removed.
+
+* ``django.db.models.loading`` is removed.
+
+* Passing callable arguments to querysets is no longer possible.
+
+* ``BaseCommand.requires_model_validation`` is removed in favor of
+  ``requires_system_checks``. Admin validators is replaced by admin checks.
+
+* The ``ModelAdmin.validator_class`` and ``default_validator_class`` attributes
+  are removed.
+
+* ``ModelAdmin.validate()`` is removed.
+
+* ``django.db.backends.DatabaseValidation.validate_field`` is removed in
+  favor of the ``check_field`` method.
+
+* The ``validate`` management command is removed.
+
+* ``django.utils.module_loading.import_by_path`` is removed in favor of
+  ``django.utils.module_loading.import_string``.
+
+* ``ssi`` and ``url`` template tags are removed from the ``future`` template
+  tag library.
+
+* ``django.utils.text.javascript_quote()`` is removed.
+
+* Database test settings as independent entries in the database settings,
+  prefixed by ``TEST_``, are no longer supported.
+
+* The ``cache_choices`` option to :class:`~django.forms.ModelChoiceField` and
+  :class:`~django.forms.ModelMultipleChoiceField` is removed.
+
+* The default value of the
+  :attr:`RedirectView.permanent <django.views.generic.base.RedirectView.permanent>`
+  attribute has changed from ``True`` to ``False``.
+
+* ``django.contrib.sitemaps.FlatPageSitemap`` is removed in favor of
+  ``django.contrib.flatpages.sitemaps.FlatPageSitemap``.
+
+* Private API ``django.test.utils.TestTemplateLoader`` is removed.
+
+* The ``django.contrib.contenttypes.generic`` module is removed.

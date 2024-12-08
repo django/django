@@ -1,0 +1,244 @@
+========================
+Django 1.0 release notes
+========================
+
+Welcome to Django 1.0!
+
+We've been looking forward to this moment for over three years, and it's finally
+here. Django 1.0 represents the largest milestone in Django's development to
+date: a web framework that a group of perfectionists can truly be proud of.
+
+Django 1.0 represents over three years of community development as an Open
+Source project. Django's received contributions from hundreds of developers,
+been translated into fifty languages, and today is used by developers on every
+continent and in every kind of job.
+
+An interesting historical note: when Django was first released in July 2005, the
+initial released version of Django came from an internal repository at revision
+number 8825. Django 1.0 represents revision 8961 of our public repository. It
+seems fitting that our 1.0 release comes at the moment where community
+contributions overtake those made privately.
+
+Stability and forwards-compatibility
+====================================
+
+The release of Django 1.0 comes with a promise of API
+stability and forwards-compatibility. In a nutshell, this means that code you
+develop against Django 1.0 will continue to work against 1.1 unchanged, and you
+should need to make only minor changes for any 1.X release.
+
+See the :doc:`API stability guide </misc/api-stability>` for full details.
+
+Backwards-incompatible changes
+==============================
+
+Django 1.0 has a number of backwards-incompatible changes from Django 0.96. If
+you have apps written against Django 0.96 that you need to port, see our
+detailed porting guide:
+
+.. toctree::
+   :maxdepth: 1
+
+   1.0-porting-guide
+
+A complete list of backwards-incompatible changes can be found at
+https://code.djangoproject.com/wiki/BackwardsIncompatibleChanges.
+
+What's new in Django 1.0
+========================
+
+A *lot*!
+
+Since Django 0.96, we've made over 4,000 code commits, fixed more than 2,000
+bugs, and edited, added, or removed around 350,000 lines of code. We've also
+added 40,000 lines of new documentation, and greatly improved what was already
+there.
+
+In fact, new documentation is one of our favorite features of Django 1.0, so we
+might as well start there. First, there's a new documentation site:
+
+* https://docs.djangoproject.com/
+
+The documentation has been greatly improved, cleaned up, and generally made
+awesome. There's now dedicated search, indexes, and more.
+
+We can't possibly document everything that's new in 1.0, but the documentation
+will be your definitive guide. Anywhere you see something like:
+
+.. versionadded:: 1.0
+
+   This feature is new in Django 1.0
+
+You'll know that you're looking at something new or changed.
+
+The other major highlights of Django 1.0 are:
+
+Refactored admin application
+----------------------------
+
+The Django administrative interface (``django.contrib.admin``) has been
+completely refactored; admin definitions are now completely decoupled from model
+definitions (no more ``class Admin`` declaration in models!), rewritten to use
+Django's new form-handling library (introduced in the 0.96 release as
+``django.newforms``, and now available as simply ``django.forms``) and
+redesigned with extensibility and customization in mind. Full documentation for
+the admin application is available online in the official Django documentation:
+
+See the :doc:`admin reference </ref/contrib/admin/index>` for details
+
+Improved Unicode handling
+-------------------------
+
+Django's internals have been refactored to use Unicode throughout; this
+drastically simplifies the task of dealing with non-Western-European content and
+data in Django. Additionally, utility functions have been provided to ease
+interoperability with third-party libraries and systems which may or may not
+handle Unicode gracefully. Details are available in Django's Unicode-handling
+documentation.
+
+See :doc:`/ref/unicode`.
+
+An improved ORM
+---------------
+
+Django's object-relational mapper -- the component which provides the mapping
+between Django model classes and your database, and which mediates your database
+queries -- has been dramatically improved by a massive refactoring. For most
+users of Django this is backwards-compatible; the public-facing API for database
+querying underwent a few minor changes, but most of the updates took place in
+the ORM's internals. A guide to the changes, including backwards-incompatible
+modifications and mentions of new features opened up by this refactoring, is
+`available on the Django wiki`__.
+
+__ https://code.djangoproject.com/wiki/QuerysetRefactorBranch
+
+Automatic escaping of template variables
+----------------------------------------
+
+To provide improved security against cross-site scripting (XSS) vulnerabilities,
+Django's template system now automatically escapes the output of variables. This
+behavior is configurable, and allows both variables and larger template
+constructs to be marked as safe (requiring no escaping) or unsafe (requiring
+escaping). A full guide to this feature is in the documentation for the
+:ttag:`autoescape` tag.
+
+``django.contrib.gis`` (GeoDjango)
+----------------------------------
+
+A project over a year in the making, this adds world-class GIS (`Geographic
+Information Systems`_) support to Django, in the form of a ``contrib``
+application. Its documentation is currently being maintained externally, and
+will be merged into the main Django documentation shortly. Huge thanks go to
+Justin Bronn, Jeremy Dunck, Brett Hoerner and Travis Pinney for their efforts in
+creating and completing this feature.
+
+See :doc:`GeoDjango </ref/contrib/gis/index>` for details.
+
+.. _Geographic Information Systems: https://en.wikipedia.org/wiki/Geographic_information_system
+
+Pluggable file storage
+----------------------
+
+Django's built-in ``FileField`` and ``ImageField`` now can take advantage of
+pluggable file-storage backends, allowing extensive customization of where and
+how uploaded files get stored by Django. For details, see :doc:`the files
+documentation </topics/files>`; big thanks go to Marty Alchin for putting in the
+hard work to get this completed.
+
+Jython compatibility
+--------------------
+
+Thanks to a lot of work from Leo Soto during a Google Summer of Code project,
+Django's codebase has been refactored to remove incompatibilities with
+`Jython`_, an implementation of Python written in Java, which runs Python code
+on the Java Virtual Machine. Django is now compatible with the forthcoming
+Jython 2.5 release.
+
+.. _Jython: https://www.jython.org/
+
+Generic relations in forms and admin
+------------------------------------
+
+Classes are now included in ``django.contrib.contenttypes`` which can be used to
+support generic relations in both the admin interface and in end-user forms. See
+:ref:`the documentation for generic relations <generic-relations>` for details.
+
+``INSERT``/``UPDATE`` distinction
+---------------------------------
+
+Although Django's default behavior of having a model's ``save()`` method
+automatically determine whether to perform an ``INSERT`` or an ``UPDATE`` at the
+SQL level is suitable for the majority of cases, there are occasional situations
+where forcing one or the other is useful. As a result, models can now support an
+additional parameter to ``save()`` which can force a specific operation.
+
+See :ref:`ref-models-force-insert` for details.
+
+Split ``CacheMiddleware``
+-------------------------
+
+Django's ``CacheMiddleware`` has been split into three classes:
+``CacheMiddleware`` itself still exists and retains all of its previous
+functionality, but it is now built from two separate middleware classes which
+handle the two parts of caching (inserting into and reading from the cache)
+separately, offering additional flexibility for situations where combining these
+functions into a single middleware posed problems.
+
+Full details, including updated notes on appropriate use, are in :doc:`the
+caching documentation </topics/cache>`.
+
+Refactored ``django.contrib.comments``
+--------------------------------------
+
+As part of a Google Summer of Code project, Thejaswi Puthraya carried out a
+major rewrite and refactoring of Django's bundled comment system, greatly
+increasing its flexibility and customizability.
+
+Removal of deprecated features
+------------------------------
+
+A number of features and methods which had previously been marked as deprecated,
+and which were scheduled for removal prior to the 1.0 release, are no longer
+present in Django. These include imports of the form library from
+``django.newforms`` (now located simply at ``django.forms``), the
+``form_for_model`` and ``form_for_instance`` helper functions (which have been
+replaced by ``ModelForm``) and a number of deprecated features which were
+replaced by the dispatcher, file-uploading and file-storage refactoring
+introduced in the Django 1.0 alpha releases.
+
+Known issues
+============
+
+We've done our best to make Django 1.0 as solid as possible, but unfortunately
+there are a couple of issues that we know about in the release.
+
+Multi-table model inheritance with ``to_field``
+-----------------------------------------------
+
+If you're using :ref:`multiple table model inheritance
+<multi-table-inheritance>`, be aware of this caveat: child models using a custom
+``parent_link`` and ``to_field`` will cause database integrity errors. A set of
+models like the following are **not valid**::
+
+    class Parent(models.Model):
+        name = models.CharField(max_length=10)
+        other_value = models.IntegerField(unique=True)
+
+
+    class Child(Parent):
+        father = models.OneToOneField(
+            Parent, primary_key=True, to_field="other_value", parent_link=True
+        )
+        value = models.IntegerField()
+
+This bug will be fixed in the next release of Django.
+
+Caveats with support of certain databases
+-----------------------------------------
+
+Django attempts to support as many features as possible on all database
+backends. However, not all database backends are alike, and in particular many of the supported database differ greatly from version to version. It's a good idea to checkout our :doc:`notes on supported database </ref/databases>`:
+
+- :ref:`mysql-notes`
+- :ref:`sqlite-notes`
+- :ref:`oracle-notes`

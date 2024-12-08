@@ -1,0 +1,12 @@
+{% extends "gis/openlayers.html" %}
+{% load l10n %}
+
+{% block options %}{{ block.super }}
+options['default_lon'] = {{ default_lon|unlocalize }};
+options['default_lat'] = {{ default_lat|unlocalize }};
+options['default_zoom'] = {{ default_zoom|unlocalize }};
+{% endblock %}
+
+{% block base_layer %}
+var base_layer = new ol.layer.Tile({source: new ol.source.OSM()});
+{% endblock %}

@@ -1,0 +1,45 @@
+==========================
+Django 2.0.1 release notes
+==========================
+
+*January 1, 2018*
+
+Django 2.0.1 fixes several bugs in 2.0.
+
+Bugfixes
+========
+
+* Fixed a regression in Django 1.11 that added newlines between ``MultiWidget``'s
+  subwidgets (:ticket:`28890`).
+
+* Fixed incorrect class-based model index name generation for models with
+  quoted ``db_table`` (:ticket:`28876`).
+
+* Fixed incorrect foreign key constraint name for models with quoted
+  ``db_table`` (:ticket:`28876`).
+
+* Fixed a regression in caching of a ``GenericForeignKey`` when the referenced
+  model instance uses more than one level of multi-table inheritance
+  (:ticket:`28856`).
+
+* Reallowed filtering a queryset with ``GeometryField=None`` (:ticket:`28896`).
+
+* Corrected admin check to allow a ``OneToOneField`` in
+  ``ModelAdmin.autocomplete_fields`` (:ticket:`28898`).
+
+* Fixed a regression on SQLite where ``DecimalField`` returned a result with
+  trailing zeros in the fractional part truncated (:ticket:`28915`).
+
+* Fixed crash in the ``testserver`` command startup (:ticket:`28941`).
+
+* Fixed crash when coercing a translatable URL pattern to ``str``
+  (:ticket:`28947`).
+
+* Fixed crash on SQLite when renaming a field in a model referenced by a
+  ``ManyToManyField`` (:ticket:`28884`).
+
+* Fixed a crash when chaining ``values()`` or ``values_list()`` after
+  ``QuerySet.select_for_update(of=(...))`` (:ticket:`28944`).
+
+* Fixed admin changelist crash when using a query expression in the page's
+  ordering (:ticket:`28958`).

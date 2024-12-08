@@ -1,0 +1,311 @@
+===========================
+Working with Git and GitHub
+===========================
+
+This section explains how the community can contribute code to Django via pull
+requests. If you're interested in how :ref:`mergers <mergers-team>` handle
+them, see :doc:`../committing-code`.
+
+Below, we are going to show how to create a GitHub pull request containing the
+changes for Trac ticket #xxxxx. By creating a fully-ready pull request, you
+will make the reviewer's job easier, meaning that your work is more likely to
+be merged into Django.
+
+You could also upload a traditional patch to Trac, but it's less practical for
+reviews.
+
+Installing Git
+==============
+
+Django uses `Git`_ for its source control. You can `download
+<https://git-scm.com/download>`_ Git, but it's often easier to install with
+your operating system's package manager.
+
+Django's `Git repository`_ is hosted on `GitHub`_, and it is recommended
+that you also work using GitHub.
+
+After installing Git, the first thing you should do is set up your name and
+email:
+
+.. code-block:: shell
+
+  $ git config --global user.name "Your Real Name"
+  $ git config --global user.email "you@email.com"
+
+Note that ``user.name`` should be your real name, not your GitHub nick. GitHub
+should know the email you use in the ``user.email`` field, as this will be
+used to associate your commits with your GitHub account.
+
+.. _Git: https://git-scm.com/
+.. _Git repository: https://github.com/django/django/
+.. _GitHub: https://github.com/
+
+Setting up local repository
+===========================
+
+When you have created your GitHub account, with the nick "GitHub_nick", and
+`forked Django's repository <https://github.com/django/django/fork>`__,
+create a local copy of your fork:
+
+.. code-block:: shell
+
+    git clone https://github.com/GitHub_nick/django.git
+
+This will create a new directory "django", containing a clone of your GitHub
+repository. The rest of the git commands on this page need to be run within the
+cloned directory, so switch to it now:
+
+.. code-block:: shell
+
+    cd django
+
+Your GitHub repository will be called "origin" in Git.
+
+You should also set up ``django/django`` as an "upstream" remote (that is, tell
+git that the reference Django repository was the source of your fork of it):
+
+.. code-block:: shell
+
+    git remote add upstream https://github.com/django/django.git
+    git fetch upstream
+
+You can add other remotes similarly, for example:
+
+.. code-block:: shell
+
+    git remote add akaariai https://github.com/akaariai/django.git
+
+Working on a ticket
+===================
+
+When working on a ticket, create a new branch for the work, and base that work
+on ``upstream/main``:
+
+.. code-block:: shell
+
+    git checkout -b ticket_xxxxx upstream/main
+
+The -b flag creates a new branch for you locally. Don't hesitate to create new
+branches even for the smallest things - that's what they are there for.
+
+If instead you were working for a fix on the 1.4 branch, you would do:
+
+.. code-block:: shell
+
+    git checkout -b ticket_xxxxx_1_4 upstream/stable/1.4.x
+
+Assume the work is carried on the ticket_xxxxx branch. Make some changes and
+commit them:
+
+.. code-block:: shell
+
+    git commit
+
+When writing the commit message, follow the :ref:`commit message
+guidelines <committing-guidelines>` to ease the work of the merger. If you're
+uncomfortable with English, try at least to describe precisely what the commit
+does.
+
+If you need to do additional work on your branch, commit as often as
+necessary:
+
+.. code-block:: shell
+
+    git commit -m 'Added two more tests for edge cases'
+
+Publishing work
+---------------
+
+You can publish your work on GitHub by running:
+
+.. code-block:: shell
+
+  git push origin ticket_xxxxx
+
+When you go to your GitHub page, you will notice a new branch has been created.
+
+If you are working on a Trac ticket, you should mention in the ticket that
+your work is available from branch ticket_xxxxx of your GitHub repo. Include a
+link to your branch.
+
+Note that the above branch is called a "topic branch" in Git parlance. You are
+free to rewrite the history of this branch, by using ``git rebase`` for
+example. Other people shouldn't base their work on such a branch, because
+their clone would become corrupt when you edit commits.
+
+There are also "public branches". These are branches other people are supposed
+to fork, so the history of these branches should never change. Good examples
+of public branches are the ``main`` and ``stable/A.B.x`` branches in the
+``django/django`` repository.
+
+When you think your work is ready to be pulled into Django, you should create
+a pull request at GitHub. A good pull request means:
+
+* commits with one logical change in each, following the
+  :doc:`coding style <coding-style>`,
+
+* well-formed messages for each commit: a summary line and then paragraphs
+  wrapped at 72 characters thereafter -- see the :ref:`committing guidelines
+  <committing-guidelines>` for more details,
+
+* documentation and tests, if needed -- actually tests are always needed,
+  except for documentation changes.
+
+The test suite must pass and the documentation must build without warnings.
+
+Once you have created your pull request, you should add a comment in the
+related Trac ticket explaining what you've done. In particular, you should note
+the environment in which you ran the tests, for instance: "all tests pass
+under SQLite and MySQL".
+
+Pull requests at GitHub have only two states: open and closed. The merger who
+will deal with your pull request has only two options: merge it or close it.
+For this reason, it isn't useful to make a pull request until the code is ready
+for merging -- or sufficiently close that a merger will finish it themselves.
+
+Rebasing branches
+-----------------
+
+In the example above, you created two commits, the "Fixed ticket_xxxxx" commit
+and "Added two more tests" commit.
+
+We do not want to have the entire history of your working process in your
+repository. Your commit "Added two more tests" would be unhelpful noise.
+Instead, we would rather only have one commit containing all your work.
+
+To rework the history of your branch you can squash the commits into one by
+using interactive rebase:
+
+.. code-block:: shell
+
+    git rebase -i HEAD~2
+
+The HEAD~2 above is shorthand for two latest commits. The above command
+will open an editor showing the two commits, prefixed with the word "pick".
+
+Change "pick" on the second line to "squash" instead. This will keep the
+first commit, and squash the second commit into the first one. Save and quit
+the editor. A second editor window should open, so you can reword the
+commit message for the commit now that it includes both your steps.
+
+You can also use the "edit" option in rebase. This way you can change a single
+commit, for example to fix a typo in a docstring:
+
+.. code-block:: shell
+
+    git rebase -i HEAD~3
+    # Choose edit, pick, pick for the commits
+    # Now you are able to rework the commit (use git add normally to add changes)
+    # When finished, commit work with "--amend" and continue
+    git commit --amend
+    # Reword the commit message if needed
+    git rebase --continue
+    # The second and third commits should be applied.
+
+If your topic branch is already published at GitHub, for example if you're
+making minor changes to take into account a review, you will need to force-push
+the changes:
+
+.. code-block:: shell
+
+    git push -f origin ticket_xxxxx
+
+Note that this will rewrite history of ticket_xxxxx - if you check the commit
+hashes before and after the operation at GitHub you will notice that the commit
+hashes do not match anymore. This is acceptable, as the branch is a topic
+branch, and nobody should be basing their work on it.
+
+After upstream has changed
+--------------------------
+
+When upstream (``django/django``) has changed, you should rebase your work. To
+do this, use:
+
+.. code-block:: shell
+
+  git fetch upstream
+  git rebase upstream/main
+
+The work is automatically rebased using the branch you forked on, in the
+example case using ``upstream/main``.
+
+The rebase command removes all your local commits temporarily, applies the
+upstream commits, and then applies your local commits again on the work.
+
+If there are merge conflicts, you will need to resolve them and then use ``git
+rebase --continue``. At any point you can use ``git rebase --abort`` to return
+to the original state.
+
+Note that you want to *rebase* on upstream, not *merge* the upstream.
+
+The reason for this is that by rebasing, your commits will always be *on
+top of* the upstream's work, not *mixed in with* the changes in the upstream.
+This way your branch will contain only commits related to its topic, which
+makes squashing easier.
+
+After review
+------------
+
+It is unusual to get any non-trivial amount of code into core without changes
+requested by reviewers. In this case, it is often a good idea to add the
+changes as one incremental commit to your work. This allows the reviewer to
+easily check what changes you have done.
+
+In this case, do the changes required by the reviewer. Commit as often as
+necessary. Before publishing the changes, rebase your work. If you added two
+commits, you would run:
+
+.. code-block:: shell
+
+    git rebase -i HEAD~2
+
+Squash the second commit into the first. Write a commit message along the lines
+of:
+
+.. code-block:: text
+
+    Made changes asked in review by <reviewer>
+
+    - Fixed whitespace errors in foobar
+    - Reworded the docstring of bar()
+
+Finally, push your work back to your GitHub repository. Since you didn't touch
+the public commits during the rebase, you should not need to force-push:
+
+.. code-block:: shell
+
+    git push origin ticket_xxxxx
+
+Your pull request should now contain the new commit too.
+
+Note that the merger is likely to squash the review commit into the previous
+commit when committing the code.
+
+Working on a patch
+==================
+
+One of the ways that developers can contribute to Django is by reviewing
+patches. Those patches will typically exist as pull requests on GitHub and
+can be easily integrated into your local repository:
+
+.. code-block:: shell
+
+    git checkout -b pull_xxxxx upstream/main
+    curl -L https://github.com/django/django/pull/xxxxx.patch | git am
+
+This will create a new branch and then apply the changes from the pull request
+to it. At this point you can run the tests or do anything else you need to
+do to investigate the quality of the patch.
+
+For more detail on working with pull requests see the
+:ref:`guidelines for mergers <handling-pull-requests>`.
+
+Summary
+=======
+
+* Work on GitHub if you can.
+* Announce your work on the Trac ticket by linking to your GitHub branch.
+* When you have something ready, make a pull request.
+* Make your pull requests as good as you can.
+* When doing fixes to your work, use ``git rebase -i`` to squash the commits.
+* When upstream has changed, do ``git fetch upstream; git rebase``.

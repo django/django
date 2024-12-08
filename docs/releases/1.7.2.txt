@@ -1,0 +1,194 @@
+==========================
+Django 1.7.2 release notes
+==========================
+
+*January 2, 2015*
+
+Django 1.7.2 fixes several bugs in 1.7.1.
+
+Additionally, Django's vendored version of six, ``django.utils.six``, has
+been upgraded to the latest release (1.9.0).
+
+Bugfixes
+========
+
+* Fixed migration's renaming of auto-created many-to-many tables when changing
+  :attr:`Meta.db_table <django.db.models.Options.db_table>` (:ticket:`23630`).
+
+* Fixed a migration crash when adding an explicit ``id`` field to a model on
+  SQLite (:ticket:`23702`).
+
+* Added a warning for duplicate models when a module is reloaded. Previously a
+  ``RuntimeError`` was raised every time two models clashed in the app registry.
+  (:ticket:`23621`).
+
+* Prevented :djadmin:`flush` from loading initial data for migrated apps
+  (:ticket:`23699`).
+
+* Fixed a :djadmin:`makemessages` regression in 1.7.1 when
+  :setting:`STATIC_ROOT` has the default ``None`` value (:ticket:`23717`).
+
+* Added GeoDjango compatibility with mysqlclient database driver.
+
+* Fixed MySQL 5.6+ crash with ``GeometryField``\s in migrations
+  (:ticket:`23719`).
+
+* Fixed a migration crash when removing a field that is referenced in
+  ``AlterIndexTogether`` or ``AlterUniqueTogether`` (:ticket:`23614`).
+
+* Updated the first day of the week in the Ukrainian locale to Monday.
+
+* Added support for transactional spatial metadata initialization on
+  SpatiaLite 4.1+ (:ticket:`23152`).
+
+* Fixed a migration crash that prevented changing a nullable field with a
+  default to non-nullable with the same default (:ticket:`23738`).
+
+* Fixed a migration crash when adding ``GeometryField``\s with ``blank=True``
+  on PostGIS (:ticket:`23731`).
+
+* Allowed usage of ``DateTimeField()`` as ``Transform.output_field``
+  (:ticket:`23420`).
+
+* Fixed a migration serializing bug involving ``float("nan")`` and
+  ``float("inf")`` (:ticket:`23770`).
+
+* Fixed a regression where custom form fields having a ``queryset`` attribute
+  but no ``limit_choices_to`` could not be used in a
+  :class:`~django.forms.ModelForm` (:ticket:`23795`).
+
+* Fixed a custom field type validation error with MySQL backend when
+  ``db_type`` returned ``None`` (:ticket:`23761`).
+
+* Fixed a migration crash when a field is renamed that is part of an
+  ``index_together`` (:ticket:`23859`).
+
+* Fixed :djadmin:`squashmigrations` to respect the ``--no-optimize`` parameter
+  (:ticket:`23799`).
+
+* Made :class:`~django.db.migrations.operations.RenameModel` reversible
+  (:ticket:`22248`)
+
+* Avoided unnecessary rollbacks of migrations from other apps when migrating
+  backwards (:ticket:`23410`).
+
+* Fixed a rare query error when using deeply nested subqueries
+  (:ticket:`23605`).
+
+* Fixed a crash in migrations when deleting a field that is part of a
+  ``index/unique_together`` constraint (:ticket:`23794`).
+
+* Fixed ``django.core.files.File.__repr__()`` when the file's ``name`` contains
+  Unicode characters (:ticket:`23888`).
+
+* Added missing context to the admin's ``delete_selected`` view that prevented
+  custom site header, etc. from appearing (:ticket:`23898`).
+
+* Fixed a regression with dynamically generated inlines and allowed field
+  references in the admin (:ticket:`23754`).
+
+* Fixed an infinite loop bug for certain cyclic migration dependencies, and made
+  the error message for cyclic dependencies much more helpful.
+
+* Added missing ``index_together`` handling for SQLite (:ticket:`23880`).
+
+* Fixed a crash when ``RunSQL`` SQL content was collected by the schema editor,
+  typically when using ``sqlmigrate`` (:ticket:`23909`).
+
+* Fixed a regression in ``contrib.admin`` add/change views which caused some
+  ``ModelAdmin`` methods to receive the incorrect ``obj`` value
+  (:ticket:`23934`).
+
+* Fixed ``runserver`` crash when socket error message contained Unicode
+  characters (:ticket:`23946`).
+
+* Fixed serialization of ``type`` when adding a ``deconstruct()`` method
+  (:ticket:`23950`).
+
+* Prevented the
+  ``django.contrib.auth.middleware.SessionAuthenticationMiddleware`` from
+  setting a ``"Vary: Cookie"`` header on all responses (:ticket:`23939`).
+
+* Fixed a crash when adding ``blank=True`` to ``TextField()`` on MySQL
+  (:ticket:`23920`).
+
+* Fixed index creation by the migration infrastructure, particularly when
+  dealing with PostgreSQL specific ``{text|varchar}_pattern_ops`` indexes
+  (:ticket:`23954`).
+
+* Fixed bug in ``makemigrations`` that created broken migration files when
+  dealing with multiple table inheritance and inheriting from more than one
+  model (:ticket:`23956`).
+
+* Fixed a crash when a ``MultiValueField`` has invalid data (:ticket:`23674`).
+
+* Fixed a crash in the admin when using "Save as new" and also deleting a
+  related inline (:ticket:`23857`).
+
+* Always converted ``related_name`` to text (Unicode), since that is required
+  on Python 3 for interpolation. Removed conversion of ``related_name`` to text
+  in migration deconstruction (:ticket:`23455` and :ticket:`23982`).
+
+* Enlarged the sizes of tablespaces which are created by default for testing
+  on Oracle (the main tablespace was increased from 200M to 300M and the
+  temporary tablespace from 100M to 150M). This was required to accommodate
+  growth in Django's own test suite (:ticket:`23969`).
+
+* Fixed ``timesince`` filter translations in Korean (:ticket:`23989`).
+
+* Fixed the SQLite ``SchemaEditor`` to properly add defaults in the absence of
+  a user specified ``default``. For example, a ``CharField`` with ``blank=True``
+  didn't set existing rows to an empty string which resulted in a crash when
+  adding the ``NOT NULL`` constraint (:ticket:`23987`).
+
+* ``makemigrations`` no longer prompts for a default value when adding
+  ``TextField()`` or ``CharField()`` without a ``default`` (:ticket:`23405`).
+
+* Fixed a migration crash when adding ``order_with_respect_to`` to a table
+  with existing rows (:ticket:`23983`).
+
+* Restored the ``pre_migrate`` signal if all apps have migrations
+  (:ticket:`23975`).
+
+* Made admin system checks run for custom ``AdminSite``\s (:ticket:`23497`).
+
+* Ensured the app registry is fully populated when unpickling models. When an
+  external script (like a queueing infrastructure) reloads pickled models, it
+  could crash with an ``AppRegistryNotReady`` exception (:ticket:`24007`).
+
+* Added quoting to field indexes in the SQL generated by migrations to prevent
+  a crash when the index name requires it (:ticket:`24015`).
+
+* Added ``datetime.time`` support to migrations questioner (:ticket:`23998`).
+
+* Fixed admindocs crash on apps installed as eggs (:ticket:`23525`).
+
+* Changed migrations autodetector to generate an ``AlterModelOptions`` operation
+  instead of ``DeleteModel`` and ``CreateModel`` operations when changing
+  ``Meta.managed``. This prevents data loss when changing ``managed`` from
+  ``False`` to ``True`` and vice versa (:ticket:`24037`).
+
+* Enabled the ``sqlsequencereset`` command on apps with migrations
+  (:ticket:`24054`).
+
+* Added tablespace SQL to apps with migrations (:ticket:`24051`).
+
+* Corrected ``contrib.sites`` default site creation in a multiple database
+  setup (:ticket:`24000`).
+
+* Restored support for objects that aren't :class:`str` or :class:`bytes` in
+  ``django.utils.safestring.mark_for_escaping()`` on Python 3.
+
+* Supported strings escaped by third-party libraries with the ``__html__``
+  convention in the template engine (:ticket:`23831`).
+
+* Prevented extraneous ``DROP DEFAULT`` SQL in migrations (:ticket:`23581`).
+
+* Restored the ability to use more than five levels of subqueries
+  (:ticket:`23758`).
+
+* Fixed crash when ``ValidationError`` is initialized with a ``ValidationError``
+  that is initialized with a dictionary (:ticket:`24008`).
+
+* Prevented a crash on apps without migrations when running ``migrate --list``
+  (:ticket:`23366`).

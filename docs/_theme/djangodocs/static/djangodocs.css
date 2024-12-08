@@ -1,0 +1,145 @@
+/*** setup ***/
+html { background:#092e20;}
+body { font:12px/1.5 Verdana,sans-serif; background:#092e20; color: white;}
+#custom-doc { width:76.54em;*width:74.69em;min-width:995px; max-width:100em; margin:auto; text-align:left; padding-top:16px; margin-top:0;}
+#hd { padding: 4px 0 12px 0; }
+#bd { background:#234F32; }
+#ft { color:#487858; font-size:90%; padding-bottom: 2em; }
+
+/*** links ***/
+a {text-decoration: none;}
+a img {border: none;}
+a:link, a:visited { color:#ffc757; }
+#bd a:link, #bd a:visited { color:#ab5603; text-decoration:underline; }
+#bd #sidebar a:link, #bd #sidebar a:visited { color:#ffc757; text-decoration:none; }
+a:hover { color:#ffe761; }
+#bd a:hover { background-color:#E0FFB8; color:#234f32; text-decoration:none; }
+#bd #sidebar a:hover { color:#ffe761; background:none; }
+h2 a, h3 a, h4 a { text-decoration:none !important; }
+a.reference em { font-style: normal; }
+
+/*** sidebar ***/
+#sidebar div.sphinxsidebarwrapper { font-size:92%; margin-right: 14px; }
+#sidebar h3, #sidebar h4 { color: white; font-size: 125%; }
+#sidebar a { color: white; }
+#sidebar ul ul { margin-top:0; margin-bottom:0; }
+#sidebar li { margin-top: 0.2em; margin-bottom: 0.2em; }
+
+/*** nav ***/
+div.nav { margin: 0; font-size: 11px; text-align: right; color: #487858;}
+#hd div.nav { margin-top: -27px; }
+#ft div.nav { margin-bottom: -18px; }
+#hd h1 a { color: white; }
+#global-nav { position:absolute; top:5px; margin-left: -5px; padding:7px 0; color:#263E2B; }
+#global-nav a:link, #global-nav a:visited {color:#487858;}
+#global-nav a {padding:0 4px;}
+#global-nav a.about {padding-left:0;}
+#global-nav:hover {color:#fff;}
+#global-nav:hover a:link, #global-nav:hover a:visited  { color:#ffc757; }
+
+/*** content ***/
+#yui-main div.yui-b { position: relative; }
+#yui-main div.yui-b { margin: 0 0 0 20px; background: white; color: black; padding: 0.3em 2em 1em 2em; }
+
+/*** basic styles ***/
+dd { margin-left:15px; }
+h1,h2,h3,h4,h5,h6,h7,h8,h9,h10,h11,h12 { margin-top:1em; font-family:"Trebuchet MS",sans-serif; font-weight:normal; }
+h1 { font-size:218%; margin-top:0.6em; margin-bottom:.4em; line-height:1.1em; }
+h2 { font-size:175%; margin-bottom:.6em; line-height:1.2em; color:#092e20; }
+h3 { font-size:150%; font-weight:bold; margin-bottom:.2em; color:#487858; }
+h4 { font-size:125%; font-weight:bold; margin-top:1.5em; margin-bottom:3px; }
+h5 { font-size:110%; font-weight:bold; margin-top:1em; margin-bottom:3px; }
+h6,h7,h8,h9,h10,h11,h12 { font-weight:bold; margin-bottom:3px; }
+div.figure { text-align: center; }
+div.figure p.caption { font-size:1em; margin-top:0; margin-bottom:1.5em; color: #555;}
+hr { color:#ccc; background-color:#ccc; height:1px; border:0; }
+p, ul, dl { margin-top:.6em; margin-bottom:1em; padding-bottom: 0.1em;}
+#yui-main div.yui-b img { max-width: 50em; margin-left: auto; margin-right: auto; display: block; }
+caption { font-size:1em; font-weight:bold; margin-top:0.5em; margin-bottom:0.5em; margin-left: 2px; text-align: center; }
+blockquote { padding: 0 1em; margin: 1em 0; font:125%/1.2em "Trebuchet MS", sans-serif; color:#234f32; border-left:2px solid #94da3a; }
+strong { font-weight: bold; }
+em { font-style: italic; }
+ins { font-weight: bold; text-decoration: none; }
+
+/*** lists ***/
+ul { padding-left:30px; }
+ol { padding-left:30px; }
+ol.arabic li { list-style-type: decimal; }
+ul li { list-style-type:square; margin-bottom:.4em; }
+ul ul li { list-style-type:disc; }
+ul ul ul li { list-style-type:circle; }
+ol li { margin-bottom: .4em; }
+ul ul { padding-left:1.2em; }
+ul ul ul { padding-left:1em; }
+ul.linklist, ul.toc { padding-left:0; }
+ul.toc ul { margin-left:.6em; }
+ul.toc ul li { list-style-type:square; }
+ul.toc ul ul li { list-style-type:disc; }
+ul.linklist li, ul.toc li { list-style-type:none; }
+dt { font-weight:bold; margin-top:.5em; font-size:1.1em; }
+dd { margin-bottom:.8em; }
+ol.toc { margin-bottom: 2em; }
+ol.toc li { font-size:125%; padding: .5em; line-height:1.2em; clear: right; }
+ol.toc li.b { background-color: #E0FFB8; }
+ol.toc li a:hover { background-color: transparent !important; text-decoration: underline !important; }
+ol.toc span.release-date { color:#487858; float: right; font-size: 85%; padding-right: .5em; }
+ol.toc span.comment-count { font-size: 75%; color: #999; }
+
+/*** tables ***/
+table { color:#000; margin-bottom: 1em; width: 100%; }
+table.docutils td p { margin-top:0; margin-bottom:.5em; }
+table.docutils td, table.docutils th { border-bottom:1px solid #dfdfdf; padding:4px 2px;}
+table.docutils thead th { border-bottom:2px solid #dfdfdf; text-align:left; font-weight: bold; white-space: nowrap; }
+table.docutils thead th p { margin: 0; padding: 0; }
+table.docutils { border-collapse:collapse; }
+
+/*** code blocks ***/
+.literal { color:#234f32; white-space:nowrap; }
+dt > tt.literal { white-space: normal; }
+#sidebar .literal { color:white; background:transparent; font-size:11px; }
+h4 .literal { color: #234f32; font-size: 13px; }
+pre { font-size:small; background:#E0FFB8; border:1px solid #94da3a; border-width:1px 0; margin: 1em 0; padding: .3em .4em; overflow: hidden; line-height: 1.3em; white-space: pre-wrap;}
+dt .literal, table .literal { background:none; }
+#bd a.reference { text-decoration: none; }
+#bd a.reference tt.literal { border-bottom: 1px #234f32 dotted; }
+div.code-block-caption { color: white; background-color: #234F32; margin: 0; padding: 2px 5px; width: 100%; font-family: monospace; font-size: small; line-height: 1.3em; }
+div.code-block-caption .literal {color: white; }
+div.literal-block-wrapper pre { margin-top: 0; }
+
+/* Restore colors of pygments hyperlinked code */
+#bd .highlight .k a:link, #bd .highlight .k a:visited { color: #000000; text-decoration: none; border-bottom: 1px dotted #000000; }
+#bd .highlight .nf a:link, #bd .highlight .nf a:visited { color: #990000; text-decoration: none; border-bottom: 1px dotted #990000; }
+
+
+/*** notes & admonitions ***/
+.note, .admonition { padding:.8em 1em .8em; margin: 1em 0; border:1px solid #94da3a; }
+.admonition-title { font-weight:bold; margin-top:0 !important; margin-bottom:0 !important;}
+.admonition .last { margin-bottom:0 !important; }
+.note, .admonition { padding-left:65px; background:url(docicons-note.png) .8em .8em no-repeat;}
+div.admonition-philosophy { padding-left:65px; background:url(docicons-philosophy.png) .8em .8em no-repeat;}
+div.admonition-behind-the-scenes { padding-left:65px; background:url(docicons-behindscenes.png) .8em .8em no-repeat;}
+.admonition.warning { background:url(docicons-warning.png) .8em .8em no-repeat; border:1px solid #ffc83c;}
+
+/*** versionadded/changes ***/
+div.versionadded, div.versionchanged {  }
+div.versionadded span.title, div.versionchanged span.title, span.versionmodified { font-weight: bold; }
+div.versionadded, div.versionchanged, div.deprecated { color:#555; }
+
+/*** p-links ***/
+a.headerlink { color: #c60f0f; font-size: 0.8em; margin-left: 4px; opacity: 0; text-decoration: none; }
+h1:hover > a.headerlink, h2:hover > a.headerlink, h3:hover > a.headerlink, h4:hover > a.headerlink, h5:hover > a.headerlink, h6:hover > a.headerlink, dt:hover > a.headerlink { opacity: 1; }
+a.headerlink:focus { opacity: 1; }
+
+/*** index ***/
+table.indextable td { text-align: left; vertical-align: top;}
+table.indextable dl, table.indextable dd { margin-top: 0; margin-bottom: 0; }
+table.indextable tr.pcap { height: 10px; }
+table.indextable tr.cap { margin-top: 10px; background-color: #f2f2f2;}
+
+/*** page-specific overrides ***/
+div#contents ul { margin-bottom: 0;}
+div#contents ul li { margin-bottom: 0;}
+div#contents ul ul li { margin-top: 0.3em;}
+
+/*** IE hacks ***/
+* pre { width: 100%; }

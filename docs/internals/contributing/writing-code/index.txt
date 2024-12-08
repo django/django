@@ -1,0 +1,51 @@
+=================
+Contributing code
+=================
+
+So you'd like to write some code, documentation or tests to improve Django?
+There are several ways you can help Django's development.
+
+Tutorials
+=========
+
+The Django tutorial contains a whole section that walks you step-by-step
+through the contributing code process.
+
+.. toctree::
+   :maxdepth: 1
+
+   /intro/contributing
+
+How-to guides
+=============
+
+If you already have some familiarity with the processes and principles,
+our documentation also contains useful guidance on specific topics:
+
+.. toctree::
+   :maxdepth: 1
+
+   How to submit a patch to Django for new and/or fixed behavior <submitting-patches>
+   How to write and run tests </topics/testing/overview>
+   How to run Django's unit tests <unit-tests>
+   How to work with Git and GitHub <working-with-git>
+
+Related topics
+==============
+
+It's important to understand how we work and the conventions we adopt.
+
+.. toctree::
+   :maxdepth: 1
+
+   coding-style
+   javascript
+   ../committing-code
+
+We maintain a curated list of small issues suited to first-time or less
+experienced contributors, using the "easy pickings" filter. These are strongly
+recommended for those contributors looking to make a contribution.
+
+* Browse `easy pickings`_ tickets.
+
+.. _easy pickings: https://code.djangoproject.com/query?status=!closed&easy=1

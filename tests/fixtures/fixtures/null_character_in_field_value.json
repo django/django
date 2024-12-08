@@ -1,0 +1,10 @@
+[
+    {
+        "pk": "2",
+        "model": "fixtures.article",
+        "fields": {
+            "headline": "Poker has no place on ESPN\u0000",
+            "pub_date": "2006-06-16 12:00:00"
+        }
+    }
+]

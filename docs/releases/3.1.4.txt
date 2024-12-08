@@ -1,0 +1,34 @@
+==========================
+Django 3.1.4 release notes
+==========================
+
+*December 1, 2020*
+
+Django 3.1.4 fixes several bugs in 3.1.3.
+
+Bugfixes
+========
+
+* Fixed setting the ``Content-Length`` HTTP header in ``AsyncRequestFactory``
+  (:ticket:`32162`).
+
+* Fixed passing extra HTTP headers to ``AsyncRequestFactory`` request methods
+  (:ticket:`32159`).
+
+* Fixed crash of key transforms for :class:`~django.db.models.JSONField` on
+  PostgreSQL when using on a ``Subquery()`` annotation (:ticket:`32182`).
+
+* Fixed a regression in Django 3.1 that caused a crash of auto-reloader for
+  certain invocations of ``runserver`` on Windows with Python 3.7 and below
+  (:ticket:`32202`).
+
+* Fixed a regression in Django 3.1 that caused the incorrect grouping by a
+  ``Q`` object annotation (:ticket:`32200`).
+
+* Fixed a regression in Django 3.1 that caused suppressing connection errors
+  when :class:`~django.db.models.JSONField` is used on SQLite
+  (:ticket:`32224`).
+
+* Fixed a crash on SQLite, when ``QuerySet.values()/values_list()`` contained
+  key transforms for :class:`~django.db.models.JSONField` returning non-string
+  primitive values (:ticket:`32203`).

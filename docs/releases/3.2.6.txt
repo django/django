@@ -1,0 +1,18 @@
+==========================
+Django 3.2.6 release notes
+==========================
+
+*August 2, 2021*
+
+Django 3.2.6 fixes several bugs in 3.2.5.
+
+Bugfixes
+========
+
+* Fixed a regression in Django 3.2 that caused a crash validating ``"NaN"``
+  input with a ``forms.DecimalField`` when additional constraints, e.g.
+  ``max_value``, were specified (:ticket:`32949`).
+
+* Fixed a bug in Django 3.2 where a system check would crash on a model with a
+  reverse many-to-many relation inherited from a parent class
+  (:ticket:`32947`).

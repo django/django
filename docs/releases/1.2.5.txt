@@ -1,0 +1,123 @@
+==========================
+Django 1.2.5 release notes
+==========================
+
+Welcome to Django 1.2.5!
+
+This is the fifth "bugfix" release in the Django 1.2 series,
+improving the stability and performance of the Django 1.2 codebase.
+
+With four exceptions, Django 1.2.5 maintains backwards compatibility
+with Django 1.2.4. It also contains a number of fixes and other
+improvements. Django 1.2.5 is a recommended upgrade for any
+development or deployment currently using or targeting Django 1.2.
+
+For full details on the new features, backwards incompatibilities, and
+deprecated features in the 1.2 branch, see the :doc:`/releases/1.2`.
+
+Backwards incompatible changes
+==============================
+
+CSRF exception for AJAX requests
+--------------------------------
+
+Django includes a CSRF-protection mechanism, which makes use of a
+token inserted into outgoing forms. Middleware then checks for the
+token's presence on form submission, and validates it.
+
+Prior to Django 1.2.5, our CSRF protection made an exception for AJAX
+requests, on the following basis:
+
+* Many AJAX toolkits add an X-Requested-With header when using
+  XMLHttpRequest.
+
+* Browsers have strict same-origin policies regarding
+  XMLHttpRequest.
+
+* In the context of a browser, the only way that a custom header
+  of this nature can be added is with XMLHttpRequest.
+
+Therefore, for ease of use, we did not apply CSRF checks to requests
+that appeared to be AJAX on the basis of the X-Requested-With header.
+The Ruby on Rails web framework had a similar exemption.
+
+Recently, engineers at Google made members of the Ruby on Rails
+development team aware of a combination of browser plugins and
+redirects which can allow an attacker to provide custom HTTP headers
+on a request to any website. This can allow a forged request to appear
+to be an AJAX request, thereby defeating CSRF protection which trusts
+the same-origin nature of AJAX requests.
+
+Michael Koziarski of the Rails team brought this to our attention, and
+we were able to produce a proof-of-concept demonstrating the same
+vulnerability in Django's CSRF handling.
+
+To remedy this, Django will now apply full CSRF validation to all
+requests, regardless of apparent AJAX origin. This is technically
+backwards-incompatible, but the security risks have been judged to
+outweigh the compatibility concerns in this case.
+
+Additionally, Django will now accept the CSRF token in the custom HTTP
+header X-CSRFTOKEN, as well as in the form submission itself, for ease
+of use with popular JavaScript toolkits which allow insertion of
+custom headers into all AJAX requests.
+
+Please see the :ref:`CSRF docs for example jQuery code <csrf-ajax>`
+that demonstrates this technique, ensuring that you are looking at the
+documentation for your version of Django, as the exact code necessary
+is different for some older versions of Django.
+
+FileField no longer deletes files
+---------------------------------
+
+In earlier Django versions, when a model instance containing a
+:class:`~django.db.models.FileField` was deleted,
+:class:`~django.db.models.FileField` took it upon itself to also delete the
+file from the backend storage. This opened the door to several potentially
+serious data-loss scenarios, including rolled-back transactions and fields on
+different models referencing the same file. In Django 1.2.5,
+:class:`~django.db.models.FileField` will never delete files from the backend
+storage. If you need cleanup of orphaned files, you'll need to handle it
+yourself (for instance, with a custom management command that can be run
+manually or scheduled to run periodically via e.g. cron).
+
+Use of custom SQL to load initial data in tests
+-----------------------------------------------
+
+Django provides a custom SQL hooks as a way to inject hand-crafted SQL
+into the database synchronization process. One of the possible uses
+for this custom SQL is to insert data into your database. If your
+custom SQL contains ``INSERT`` statements, those insertions will be
+performed every time your database is synchronized. This includes the
+synchronization of any test databases that are created when you run a
+test suite.
+
+However, in the process of testing the Django 1.3, it was discovered
+that this feature has never completely worked as advertised. When
+using database backends that don't support transactions, or when using
+a TransactionTestCase, data that has been inserted using custom SQL
+will not be visible during the testing process.
+
+Unfortunately, there was no way to rectify this problem without
+introducing a backwards incompatibility. Rather than leave
+SQL-inserted initial data in an uncertain state, Django now enforces
+the policy that data inserted by custom SQL will *not* be visible
+during testing.
+
+This change only affects the testing process. You can still use custom
+SQL to load data into your production database as part of the ``syncdb``
+process. If you require data to exist during test conditions, you
+should either insert it using :ref:`test fixtures
+<topics-testing-fixtures>`, or using the ``setUp()`` method of your
+test case.
+
+ModelAdmin.lookup_allowed signature changed
+-------------------------------------------
+
+Django 1.2.4 introduced a method ``lookup_allowed`` on ``ModelAdmin``, to cope
+with a security issue (changeset :commit:`[15033]
+<85207a245bf09fdebe486b4c7bbcb65300f2a693>`). Although this method was never
+documented, it seems some people have overridden ``lookup_allowed``, especially
+to cope with regressions introduced by that changeset. While the method is
+still undocumented and not marked as stable, it may be helpful to know that the
+signature of this function has changed.

@@ -1,0 +1,19 @@
+{% if debug == True %}
+
+Have debug
+
+First query list: {{ sql_queries|length }}
+
+{% for obj in debug_objects.all %}{{ obj }}{% endfor %}
+
+Second query list: {{ sql_queries|length }}
+
+{% for obj in debug_objects.all %}{{ obj }}{% endfor %}
+
+Third query list: {{ sql_queries|length }}
+
+{% for obj in other_debug_objects.all %}{{ obj }}{% endfor %}
+
+Fourth query list: {{ sql_queries|length }}
+
+{% endif %}

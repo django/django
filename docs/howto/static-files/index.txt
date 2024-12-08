@@ -1,0 +1,194 @@
+=========================================================
+How to manage static files (e.g. images, JavaScript, CSS)
+=========================================================
+
+Websites generally need to serve additional files such as images, JavaScript,
+or CSS. In Django, we refer to these files as "static files".  Django provides
+:mod:`django.contrib.staticfiles` to help you manage them.
+
+This page describes how you can serve these static files.
+
+Configuring static files
+========================
+
+#. Make sure that ``django.contrib.staticfiles`` is included in your
+   :setting:`INSTALLED_APPS`.
+
+#. In your settings file, define :setting:`STATIC_URL`, for example::
+
+      STATIC_URL = "static/"
+
+#. In your templates, use the :ttag:`static` template tag to build the URL for
+   the given relative path using the configured ``staticfiles``
+   :setting:`STORAGES` alias.
+
+   .. _staticfiles-in-templates:
+
+   .. code-block:: html+django
+
+        {% load static %}
+        <img src="{% static 'my_app/example.jpg' %}" alt="My image">
+
+#. Store your static files in a folder called ``static`` in your app. For
+   example ``my_app/static/my_app/example.jpg``.
+
+.. admonition:: Serving the files
+
+    In addition to these configuration steps, you'll also need to actually
+    serve the static files.
+
+    During development, if you use :mod:`django.contrib.staticfiles`, this will
+    be done automatically by :djadmin:`runserver` when :setting:`DEBUG` is set
+    to ``True`` (see :func:`django.contrib.staticfiles.views.serve`).
+
+    This method is **grossly inefficient** and probably **insecure**,
+    so it is **unsuitable for production**.
+
+    See :doc:`/howto/static-files/deployment` for proper strategies to serve
+    static files in production environments.
+
+Your project will probably also have static assets that aren't tied to a
+particular app. In addition to using a ``static/`` directory inside your apps,
+you can define a list of directories (:setting:`STATICFILES_DIRS`) in your
+settings file where Django will also look for static files. For example::
+
+    STATICFILES_DIRS = [
+        BASE_DIR / "static",
+        "/var/www/static/",
+    ]
+
+See the documentation for the :setting:`STATICFILES_FINDERS` setting for
+details on how ``staticfiles`` finds your files.
+
+.. admonition:: Static file namespacing
+
+    Now we *might* be able to get away with putting our static files directly
+    in ``my_app/static/`` (rather than creating another ``my_app``
+    subdirectory), but it would actually be a bad idea. Django will use the
+    first static file it finds whose name matches, and if you had a static file
+    with the same name in a *different* application, Django would be unable to
+    distinguish between them. We need to be able to point Django at the right
+    one, and the best way to ensure this is by *namespacing* them. That is,
+    by putting those static files inside *another* directory named for the
+    application itself.
+
+    You can namespace static assets in :setting:`STATICFILES_DIRS` by
+    specifying :ref:`prefixes <staticfiles-dirs-prefixes>`.
+
+.. _serving-static-files-in-development:
+
+Serving static files during development
+=======================================
+
+If you use :mod:`django.contrib.staticfiles` as explained above,
+:djadmin:`runserver` will do this automatically when :setting:`DEBUG` is set
+to ``True``. If you don't have ``django.contrib.staticfiles`` in
+:setting:`INSTALLED_APPS`, you can still manually serve static files using the
+:func:`django.views.static.serve` view.
+
+This is not suitable for production use! For some common deployment
+strategies, see :doc:`/howto/static-files/deployment`.
+
+For example, if your :setting:`STATIC_URL` is defined as ``static/``, you can
+do this by adding the following snippet to your ``urls.py``::
+
+    from django.conf import settings
+    from django.conf.urls.static import static
+
+    urlpatterns = [
+        # ... the rest of your URLconf goes here ...
+    ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+.. note::
+
+    This helper function works only in debug mode and only if
+    the given prefix is local (e.g. ``static/``) and not a URL (e.g.
+    ``http://static.example.com/``).
+
+    Also this helper function only serves the actual :setting:`STATIC_ROOT`
+    folder; it doesn't perform static files discovery like
+    :mod:`django.contrib.staticfiles`.
+
+    Finally, static files are served via a wrapper at the WSGI application
+    layer. As a consequence, static files requests do not pass through the
+    normal :doc:`middleware chain </topics/http/middleware>`.
+
+.. _serving-uploaded-files-in-development:
+
+Serving files uploaded by a user during development
+===================================================
+
+During development, you can serve user-uploaded media files from
+:setting:`MEDIA_ROOT` using the :func:`django.views.static.serve` view.
+
+This is not suitable for production use! For some common deployment
+strategies, see :doc:`/howto/static-files/deployment`.
+
+For example, if your :setting:`MEDIA_URL` is defined as ``media/``, you can do
+this by adding the following snippet to your :setting:`ROOT_URLCONF`::
+
+    from django.conf import settings
+    from django.conf.urls.static import static
+
+    urlpatterns = [
+        # ... the rest of your URLconf goes here ...
+    ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+.. note::
+
+    This helper function works only in debug mode and only if
+    the given prefix is local (e.g. ``media/``) and not a URL (e.g.
+    ``http://media.example.com/``).
+
+.. _staticfiles-testing-support:
+
+Testing
+=======
+
+When running tests that use actual HTTP requests instead of the built-in
+testing client (i.e. when using the built-in :class:`LiveServerTestCase
+<django.test.LiveServerTestCase>`) the static assets need to be served along
+the rest of the content so the test environment reproduces the real one as
+faithfully as possible, but ``LiveServerTestCase`` has only very basic static
+file-serving functionality: It doesn't know about the finders feature of the
+``staticfiles`` application and assumes the static content has already been
+collected under :setting:`STATIC_ROOT`.
+
+Because of this, ``staticfiles`` ships its own
+:class:`django.contrib.staticfiles.testing.StaticLiveServerTestCase`, a subclass
+of the built-in one that has the ability to transparently serve all the assets
+during execution of these tests in a way very similar to what we get at
+development time with ``DEBUG = True``, i.e. without having to collect them
+using :djadmin:`collectstatic` first.
+
+Deployment
+==========
+
+:mod:`django.contrib.staticfiles` provides a convenience management command
+for gathering static files in a single directory so you can serve them easily.
+
+#. Set the :setting:`STATIC_ROOT` setting to the directory from which you'd
+   like to serve these files, for example::
+
+       STATIC_ROOT = "/var/www/example.com/static/"
+
+#. Run the :djadmin:`collectstatic` management command:
+
+   .. code-block:: shell
+
+       $ python manage.py collectstatic
+
+   This will copy all files from your static folders into the
+   :setting:`STATIC_ROOT` directory.
+
+#. Use a web server of your choice to serve the
+   files. :doc:`/howto/static-files/deployment` covers some common deployment
+   strategies for static files.
+
+Learn more
+==========
+
+This document has covered the basics and some common usage patterns. For
+complete details on all the settings, commands, template tags, and other pieces
+included in :mod:`django.contrib.staticfiles`, see :doc:`the staticfiles
+reference </ref/contrib/staticfiles>`.

@@ -1,0 +1,14 @@
+===========================
+Django 3.0.11 release notes
+===========================
+
+*November 2, 2020*
+
+Django 3.0.11 fixes a regression in 3.0.7 and adds compatibility with Python
+3.9.
+
+Bugfixes
+========
+
+* Fixed a regression in Django 3.0.7 that didn't use ``Subquery()`` aliases in
+  the ``GROUP BY`` clause (:ticket:`32152`).

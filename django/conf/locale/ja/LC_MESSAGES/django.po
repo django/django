@@ -1,0 +1,1331 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# xiu1 <d84ea@hotmail.co.jp>, 2016
+# tadasu <elsee9@me.com>, 2020
+# Goto Hayato <habita.gh@gmail.com>, 2021
+# Goto Hayato <habita.gh@gmail.com>, 2019
+# Hiroki Sawano, 2022
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Kamiyama Satoshi, 2021
+# Kentaro Matsuzaki <kentaro0919@gmail.com>, 2015
+# Masashi SHIBATA <contact@c-bata.link>, 2017
+# Nikita K <hiyori.amatsuki@gmail.com>, 2019
+# Shinichi Katsumata <shinichi.katsumata@gmail.com>, 2019
+# Shinya Okano <tokibito@gmail.com>, 2012-2019,2021,2023-2024
+# TANIGUCHI Taichi, 2022
+# Takuro Onoue <kusanaginoturugi@gmail.com>, 2020
+# Takuya N <takninnovationresearch@gmail.com>, 2020
+# Tetsuya Morimoto <tetsuya.morimoto@gmail.com>, 2011
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 06:49+0000\n"
+"Last-Translator: Shinya Okano <tokibito@gmail.com>, "
+"2012-2019,2021,2023-2024\n"
+"Language-Team: Japanese (http://app.transifex.com/django/django/language/"
+"ja/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ja\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "Afrikaans"
+msgstr "アフリカーンス語"
+
+msgid "Arabic"
+msgstr "アラビア語"
+
+msgid "Algerian Arabic"
+msgstr "アラビア語(アルジェリア)"
+
+msgid "Asturian"
+msgstr "アストゥリアス語"
+
+msgid "Azerbaijani"
+msgstr "アゼルバイジャン語"
+
+msgid "Bulgarian"
+msgstr "ブルガリア語"
+
+msgid "Belarusian"
+msgstr "ベラルーシ語"
+
+msgid "Bengali"
+msgstr "ベンガル語"
+
+msgid "Breton"
+msgstr "ブルトン語"
+
+msgid "Bosnian"
+msgstr "ボスニア語"
+
+msgid "Catalan"
+msgstr "カタロニア語"
+
+msgid "Central Kurdish (Sorani)"
+msgstr "中央クルド語 (ソラニー語)"
+
+msgid "Czech"
+msgstr "チェコ語"
+
+msgid "Welsh"
+msgstr "ウェールズ語"
+
+msgid "Danish"
+msgstr "デンマーク語"
+
+msgid "German"
+msgstr "ドイツ語"
+
+msgid "Lower Sorbian"
+msgstr "低地ソルブ語"
+
+msgid "Greek"
+msgstr "ギリシャ語"
+
+msgid "English"
+msgstr "英語(米国)"
+
+msgid "Australian English"
+msgstr "英語(オーストラリア)"
+
+msgid "British English"
+msgstr "英語(英国)"
+
+msgid "Esperanto"
+msgstr "エスペラント語"
+
+msgid "Spanish"
+msgstr "スペイン語"
+
+msgid "Argentinian Spanish"
+msgstr "アルゼンチンスペイン語"
+
+msgid "Colombian Spanish"
+msgstr "コロンビアスペイン語"
+
+msgid "Mexican Spanish"
+msgstr "メキシコスペイン語"
+
+msgid "Nicaraguan Spanish"
+msgstr "ニカラグアスペイン語"
+
+msgid "Venezuelan Spanish"
+msgstr "ベネズエラスペイン語"
+
+msgid "Estonian"
+msgstr "エストニア語"
+
+msgid "Basque"
+msgstr "バスク語"
+
+msgid "Persian"
+msgstr "ペルシア語"
+
+msgid "Finnish"
+msgstr "フィンランド語"
+
+msgid "French"
+msgstr "フランス語"
+
+msgid "Frisian"
+msgstr "フリジア語"
+
+msgid "Irish"
+msgstr "アイルランド語"
+
+msgid "Scottish Gaelic"
+msgstr "ゲール語(スコットランド)"
+
+msgid "Galician"
+msgstr "ガリシア語"
+
+msgid "Hebrew"
+msgstr "ヘブライ語"
+
+msgid "Hindi"
+msgstr "ヒンディー語"
+
+msgid "Croatian"
+msgstr "クロアチア語"
+
+msgid "Upper Sorbian"
+msgstr "高地ソルブ語"
+
+msgid "Hungarian"
+msgstr "ハンガリー語"
+
+msgid "Armenian"
+msgstr "アルメニア"
+
+msgid "Interlingua"
+msgstr "インターリングア"
+
+msgid "Indonesian"
+msgstr "インドネシア語"
+
+msgid "Igbo"
+msgstr "イグボ語"
+
+msgid "Ido"
+msgstr "イド語"
+
+msgid "Icelandic"
+msgstr "アイスランド語"
+
+msgid "Italian"
+msgstr "イタリア語"
+
+msgid "Japanese"
+msgstr "日本語"
+
+msgid "Georgian"
+msgstr "グルジア語"
+
+msgid "Kabyle"
+msgstr "カビル語"
+
+msgid "Kazakh"
+msgstr "カザフ語"
+
+msgid "Khmer"
+msgstr "クメール語"
+
+msgid "Kannada"
+msgstr "カンナダ語"
+
+msgid "Korean"
+msgstr "韓国語"
+
+msgid "Kyrgyz"
+msgstr "キルギス語"
+
+msgid "Luxembourgish"
+msgstr "ルクセンブルグ語"
+
+msgid "Lithuanian"
+msgstr "リトアニア語"
+
+msgid "Latvian"
+msgstr "ラトビア語"
+
+msgid "Macedonian"
+msgstr "マケドニア語"
+
+msgid "Malayalam"
+msgstr "マラヤーラム語"
+
+msgid "Mongolian"
+msgstr "モンゴル語"
+
+msgid "Marathi"
+msgstr "マラーティー語"
+
+msgid "Malay"
+msgstr "マレー語"
+
+msgid "Burmese"
+msgstr "ビルマ語"
+
+msgid "Norwegian Bokmål"
+msgstr "ノルウェーのブークモール"
+
+msgid "Nepali"
+msgstr "ネパール語"
+
+msgid "Dutch"
+msgstr "オランダ語"
+
+msgid "Norwegian Nynorsk"
+msgstr "ノルウェーのニーノシュク"
+
+msgid "Ossetic"
+msgstr "オセット語"
+
+msgid "Punjabi"
+msgstr "パンジャブ語"
+
+msgid "Polish"
+msgstr "ポーランド語"
+
+msgid "Portuguese"
+msgstr "ポルトガル語"
+
+msgid "Brazilian Portuguese"
+msgstr "ブラジルポルトガル語"
+
+msgid "Romanian"
+msgstr "ルーマニア語"
+
+msgid "Russian"
+msgstr "ロシア語"
+
+msgid "Slovak"
+msgstr "スロバキア語"
+
+msgid "Slovenian"
+msgstr "スロヴェニア語"
+
+msgid "Albanian"
+msgstr "アルバニア語"
+
+msgid "Serbian"
+msgstr "セルビア語"
+
+msgid "Serbian Latin"
+msgstr "セルビア語ラテン文字"
+
+msgid "Swedish"
+msgstr "スウェーデン語"
+
+msgid "Swahili"
+msgstr "スワヒリ語"
+
+msgid "Tamil"
+msgstr "タミル語"
+
+msgid "Telugu"
+msgstr "テルグ語"
+
+msgid "Tajik"
+msgstr "タジク語"
+
+msgid "Thai"
+msgstr "タイ語"
+
+msgid "Turkmen"
+msgstr "トルクメン語"
+
+msgid "Turkish"
+msgstr "トルコ語"
+
+msgid "Tatar"
+msgstr "タタール語"
+
+msgid "Udmurt"
+msgstr "ウドムルト語"
+
+msgid "Uyghur"
+msgstr "ウイグル語"
+
+msgid "Ukrainian"
+msgstr "ウクライナ語"
+
+msgid "Urdu"
+msgstr "ウルドゥー語"
+
+msgid "Uzbek"
+msgstr "ウズベク語"
+
+msgid "Vietnamese"
+msgstr "ベトナム語"
+
+msgid "Simplified Chinese"
+msgstr "簡体字中国語"
+
+msgid "Traditional Chinese"
+msgstr "繁体字中国語"
+
+msgid "Messages"
+msgstr "メッセージ"
+
+msgid "Site Maps"
+msgstr "サイトマップ"
+
+msgid "Static Files"
+msgstr "静的ファイル"
+
+msgid "Syndication"
+msgstr "シンジケーション"
+
+#. Translators: String used to replace omitted page numbers in elided page
+#. range generated by paginators, e.g. [1, 2, '…', 5, 6, 7, '…', 9, 10].
+msgid "…"
+msgstr "…"
+
+msgid "That page number is not an integer"
+msgstr "このページ番号は整数ではありません。"
+
+msgid "That page number is less than 1"
+msgstr "ページ番号が 1 よりも小さいです。"
+
+msgid "That page contains no results"
+msgstr "このページには結果が含まれていません。"
+
+msgid "Enter a valid value."
+msgstr "値を正しく入力してください。"
+
+msgid "Enter a valid domain name."
+msgstr "有効なドメイン名を入力してください。"
+
+msgid "Enter a valid URL."
+msgstr "URLを正しく入力してください。"
+
+msgid "Enter a valid integer."
+msgstr "整数を正しく入力してください。"
+
+msgid "Enter a valid email address."
+msgstr "有効なメールアドレスを入力してください。"
+
+#. Translators: "letters" means latin letters: a-z and A-Z.
+msgid ""
+"Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
+msgstr ""
+"“slug” には半角の英数字、アンダースコア、ハイフン以外は使用できません。"
+
+msgid ""
+"Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr ""
+"ユニコード文字、数字、アンダースコアまたはハイフンで構成された、有効なスラグ"
+"を入力してください。"
+
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr "有効な%(protocol)sアドレスを入力してください。"
+
+msgid "IPv4"
+msgstr "IPv4"
+
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "IPv4 or IPv6"
+msgstr "IPv4またはIPv6"
+
+msgid "Enter only digits separated by commas."
+msgstr "カンマ区切りの数字だけを入力してください。"
+
+#, python-format
+msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
+msgstr ""
+"この値は %(limit_value)s でなければなりません(実際には %(show_value)s でし"
+"た) 。"
+
+#, python-format
+msgid "Ensure this value is less than or equal to %(limit_value)s."
+msgstr "この値は %(limit_value)s 以下でなければなりません。"
+
+#, python-format
+msgid "Ensure this value is greater than or equal to %(limit_value)s."
+msgstr "この値は %(limit_value)s 以上でなければなりません。"
+
+#, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr "この値は %(limit_value)s の倍数でなければなりません。"
+
+#, python-format
+msgid ""
+"Ensure this value is a multiple of step size %(limit_value)s, starting from "
+"%(offset)s, e.g. %(offset)s, %(valid_value1)s, %(valid_value2)s, and so on."
+msgstr ""
+"この値は%(offset)s から始まる %(limit_value)s の倍数でなければなりません。"
+"例. %(offset)s%(valid_value1)s%(valid_value2)s など。"
+
+#, python-format
+msgid ""
+"Ensure this value has at least %(limit_value)d character (it has "
+"%(show_value)d)."
+msgid_plural ""
+"Ensure this value has at least %(limit_value)d characters (it has "
+"%(show_value)d)."
+msgstr[0] ""
+"この値が少なくとも %(limit_value)d 文字以上であることを確認してください "
+"(%(show_value)d 文字になっています)。"
+
+#, python-format
+msgid ""
+"Ensure this value has at most %(limit_value)d character (it has "
+"%(show_value)d)."
+msgid_plural ""
+"Ensure this value has at most %(limit_value)d characters (it has "
+"%(show_value)d)."
+msgstr[0] ""
+"この値は %(limit_value)d 文字以下でなければなりません( %(show_value)d 文字に"
+"なっています)。"
+
+msgid "Enter a number."
+msgstr "数値を入力してください。"
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] "この値は合計 %(max)s 桁以内でなければなりません。"
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] "この値は小数点以下が合計 %(max)s 桁以内でなければなりません。"
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] "この値は小数点より前が合計 %(max)s 桁以内でなければなりません。"
+
+#, python-format
+msgid ""
+"File extension “%(extension)s” is not allowed. Allowed extensions are: "
+"%(allowed_extensions)s."
+msgstr ""
+"ファイル拡張子 “%(extension)s” は許可されていません。許可されている拡張子は "
+"%(allowed_extensions)s です。"
+
+msgid "Null characters are not allowed."
+msgstr "何か文字を入力してください。"
+
+msgid "and"
+msgstr "と"
+
+#, python-format
+msgid "%(model_name)s with this %(field_labels)s already exists."
+msgstr "この %(field_labels)s を持った %(model_name)s が既に存在します。"
+
+#, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr "制約 “%(name)s” に違反しています。"
+
+#, python-format
+msgid "Value %(value)r is not a valid choice."
+msgstr "%(value)r は有効な選択肢ではありません。"
+
+msgid "This field cannot be null."
+msgstr "このフィールドには NULL を指定できません。"
+
+msgid "This field cannot be blank."
+msgstr "このフィールドは空ではいけません。"
+
+#, python-format
+msgid "%(model_name)s with this %(field_label)s already exists."
+msgstr "この %(field_label)s を持った %(model_name)s が既に存在します。"
+
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
+#, python-format
+msgid ""
+"%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
+msgstr ""
+"%(date_field_label)s %(lookup_type)s では %(field_label)s がユニークである必"
+"要があります。"
+
+#, python-format
+msgid "Field of type: %(field_type)s"
+msgstr "タイプが %(field_type)s のフィールド"
+
+#, python-format
+msgid "“%(value)s” value must be either True or False."
+msgstr "“%(value)s” は True または False にしなければなりません。"
+
+#, python-format
+msgid "“%(value)s” value must be either True, False, or None."
+msgstr "“%(value)s” は True 、 False または None の値でなければなりません。"
+
+msgid "Boolean (Either True or False)"
+msgstr "ブール値 (真: True または偽: False)"
+
+#, python-format
+msgid "String (up to %(max_length)s)"
+msgstr "文字列 ( %(max_length)s 字まで )"
+
+msgid "String (unlimited)"
+msgstr "文字列 (無制限)"
+
+msgid "Comma-separated integers"
+msgstr "カンマ区切りの整数"
+
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
+"format."
+msgstr ""
+"“%(value)s” は無効な日付形式です。YYYY-MM-DD 形式にしなければなりません。"
+
+#, python-format
+msgid ""
+"“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
+"date."
+msgstr "“%(value)s” は有効な日付形式(YYYY-MM-DD)ですが、不正な日付です。"
+
+msgid "Date (without time)"
+msgstr "日付"
+
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"uuuuuu]][TZ] format."
+msgstr ""
+"“%(value)s” は無効な形式の値です。 YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ] 形式で"
+"なければなりません。"
+
+#, python-format
+msgid ""
+"“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"[TZ]) but it is an invalid date/time."
+msgstr ""
+"“%(value)s” は正しい形式 (YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) の値ですが、無"
+"効な日時です。"
+
+msgid "Date (with time)"
+msgstr "日時"
+
+#, python-format
+msgid "“%(value)s” value must be a decimal number."
+msgstr "“%(value)s” は10進浮動小数値にしなければなりません。"
+
+msgid "Decimal number"
+msgstr "10 進数 (小数可)"
+
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
+"uuuuuu] format."
+msgstr ""
+"“%(value)s” は無効な形式の値です。 [DD] [HH:[MM:]]ss[.uuuuuu] 形式でなければ"
+"なりません。"
+
+msgid "Duration"
+msgstr "時間差分"
+
+msgid "Email address"
+msgstr "メールアドレス"
+
+msgid "File path"
+msgstr "ファイルの場所"
+
+#, python-format
+msgid "“%(value)s” value must be a float."
+msgstr "“%(value)s” は小数値にしなければなりません。"
+
+msgid "Floating point number"
+msgstr "浮動小数点"
+
+#, python-format
+msgid "“%(value)s” value must be an integer."
+msgstr "“%(value)s” は整数値にしなければなりません。"
+
+msgid "Integer"
+msgstr "整数"
+
+msgid "Big (8 byte) integer"
+msgstr "大きな(8バイト)整数"
+
+msgid "Small integer"
+msgstr "小さな整数"
+
+msgid "IPv4 address"
+msgstr "IPv4アドレス"
+
+msgid "IP address"
+msgstr "IP アドレス"
+
+#, python-format
+msgid "“%(value)s” value must be either None, True or False."
+msgstr "“%(value)s” は None、True または False の値でなければなりません。"
+
+msgid "Boolean (Either True, False or None)"
+msgstr "ブール値 (真: True 、偽: False または None)"
+
+msgid "Positive big integer"
+msgstr "正の多倍長整数"
+
+msgid "Positive integer"
+msgstr "正の整数"
+
+msgid "Positive small integer"
+msgstr "小さな正の整数"
+
+#, python-format
+msgid "Slug (up to %(max_length)s)"
+msgstr "スラグ(%(max_length)s文字以内)"
+
+msgid "Text"
+msgstr "テキスト"
+
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
+"format."
+msgstr ""
+"“%(value)s” は無効な形式の値です。 HH:MM[:ss[.uuuuuu]] 形式でなければなりませ"
+"ん。"
+
+#, python-format
+msgid ""
+"“%(value)s” value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
+"invalid time."
+msgstr "“%(value)s” は正しい形式(HH:MM[:ss[.uuuuuu]])ですが、無効な時刻です。"
+
+msgid "Time"
+msgstr "時刻"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Raw binary data"
+msgstr "生のバイナリデータ"
+
+#, python-format
+msgid "“%(value)s” is not a valid UUID."
+msgstr "“%(value)s” は有効なUUIDではありません。"
+
+msgid "Universally unique identifier"
+msgstr "汎用一意識別子"
+
+msgid "File"
+msgstr "ファイル"
+
+msgid "Image"
+msgstr "画像"
+
+msgid "A JSON object"
+msgstr "JSONオブジェクト"
+
+msgid "Value must be valid JSON."
+msgstr "JSONとして正しい値にしてください。"
+
+#, python-format
+msgid "%(model)s instance with %(field)s %(value)r does not exist."
+msgstr "%(field)s が %(value)r である %(model)s のインスタンスは存在しません。"
+
+msgid "Foreign Key (type determined by related field)"
+msgstr "外部キー(型は関連フィールドによって決まります)"
+
+msgid "One-to-one relationship"
+msgstr "1対1の関連"
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr "%(from)s-%(to)s の関連"
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr "%(from)s-%(to)s の関連"
+
+msgid "Many-to-many relationship"
+msgstr "多対多の関連"
+
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ":?.!"
+
+msgid "This field is required."
+msgstr "このフィールドは必須です。"
+
+msgid "Enter a whole number."
+msgstr "整数を入力してください。"
+
+msgid "Enter a valid date."
+msgstr "日付を正しく入力してください。"
+
+msgid "Enter a valid time."
+msgstr "時間を正しく入力してください。"
+
+msgid "Enter a valid date/time."
+msgstr "日時を正しく入力してください。"
+
+msgid "Enter a valid duration."
+msgstr "時間差分を正しく入力してください。"
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "日数は{min_days}から{max_days}の間でなければなりません。"
+
+msgid "No file was submitted. Check the encoding type on the form."
+msgstr ""
+"ファイルが取得できませんでした。フォームのencoding typeを確認してください。"
+
+msgid "No file was submitted."
+msgstr "ファイルが送信されていません。"
+
+msgid "The submitted file is empty."
+msgstr "入力されたファイルは空です。"
+
+#, python-format
+msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
+msgid_plural ""
+"Ensure this filename has at most %(max)d characters (it has %(length)d)."
+msgstr[0] ""
+"このファイル名は %(max)d 文字以下でなければなりません( %(length)d 文字になっ"
+"ています)。"
+
+msgid "Please either submit a file or check the clear checkbox, not both."
+msgstr ""
+"ファイルを投稿するか、クリアチェックボックスをチェックするかどちらかを選択し"
+"てください。両方とも行ってはいけません。"
+
+msgid ""
+"Upload a valid image. The file you uploaded was either not an image or a "
+"corrupted image."
+msgstr ""
+"画像をアップロードしてください。アップロードしたファイルは画像でないか、また"
+"は壊れています。"
+
+#, python-format
+msgid "Select a valid choice. %(value)s is not one of the available choices."
+msgstr "正しく選択してください。 %(value)s は候補にありません。"
+
+msgid "Enter a list of values."
+msgstr "リストを入力してください。"
+
+msgid "Enter a complete value."
+msgstr "すべての値を入力してください。"
+
+msgid "Enter a valid UUID."
+msgstr "UUIDを正しく入力してください。"
+
+msgid "Enter a valid JSON."
+msgstr "JSONを正しく入力してください。"
+
+#. Translators: This is the default suffix added to form field labels
+msgid ":"
+msgstr ":"
+
+#, python-format
+msgid "(Hidden field %(name)s) %(error)s"
+msgstr "(隠しフィールド %(name)s) %(error)s"
+
+#, python-format
+msgid ""
+"ManagementForm data is missing or has been tampered with. Missing fields: "
+"%(field_names)s. You may need to file a bug report if the issue persists."
+msgstr ""
+"ManagementForm のデータが不足しているか改竄されています。不足するフィールドの"
+"数: %(field_names)s  。問題が続くようならバグレポートを出す必要があるかもしれ"
+"ません。"
+
+#, python-format
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] "最大で %(num)d 個のフォームを送信してください。"
+
+#, python-format
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] "少なくとも %(num)d 個のフォームを送信してください。"
+
+msgid "Order"
+msgstr "並び変え"
+
+msgid "Delete"
+msgstr "削除"
+
+#, python-format
+msgid "Please correct the duplicate data for %(field)s."
+msgstr "%(field)s の重複したデータを修正してください。"
+
+#, python-format
+msgid "Please correct the duplicate data for %(field)s, which must be unique."
+msgstr ""
+"%(field)s の重複したデータを修正してください。このフィールドはユニークである"
+"必要があります。"
+
+#, python-format
+msgid ""
+"Please correct the duplicate data for %(field_name)s which must be unique "
+"for the %(lookup)s in %(date_field)s."
+msgstr ""
+"%(field_name)s の重複したデータを修正してください。%(date_field)s %(lookup)s "
+"では %(field_name)s がユニークである必要があります。"
+
+msgid "Please correct the duplicate values below."
+msgstr "下記の重複したデータを修正してください。"
+
+msgid "The inline value did not match the parent instance."
+msgstr "インライン値が親のインスタンスに一致しません。"
+
+msgid "Select a valid choice. That choice is not one of the available choices."
+msgstr "正しく選択してください。選択したものは候補にありません。"
+
+#, python-format
+msgid "“%(pk)s” is not a valid value."
+msgstr "“%(pk)s” は無効な値です。"
+
+#, python-format
+msgid ""
+"%(datetime)s couldn’t be interpreted in time zone %(current_timezone)s; it "
+"may be ambiguous or it may not exist."
+msgstr ""
+"%(datetime)s は %(current_timezone)s のタイムゾーンでは解釈できませんでした。"
+"それは曖昧であるか、存在しない可能性があります。"
+
+msgid "Clear"
+msgstr "クリア"
+
+msgid "Currently"
+msgstr "現在"
+
+msgid "Change"
+msgstr "変更"
+
+msgid "Unknown"
+msgstr "不明"
+
+msgid "Yes"
+msgstr "はい"
+
+msgid "No"
+msgstr "いいえ"
+
+#. Translators: Please do not add spaces around commas.
+msgid "yes,no,maybe"
+msgstr "はい,いいえ,たぶん"
+
+#, python-format
+msgid "%(size)d byte"
+msgid_plural "%(size)d bytes"
+msgstr[0] "%(size)d バイト"
+
+#, python-format
+msgid "%s KB"
+msgstr "%s KB"
+
+#, python-format
+msgid "%s MB"
+msgstr "%s MB"
+
+#, python-format
+msgid "%s GB"
+msgstr "%s GB"
+
+#, python-format
+msgid "%s TB"
+msgstr "%s TB"
+
+#, python-format
+msgid "%s PB"
+msgstr "%s PB"
+
+msgid "p.m."
+msgstr "p.m."
+
+msgid "a.m."
+msgstr "a.m."
+
+msgid "PM"
+msgstr "PM"
+
+msgid "AM"
+msgstr "AM"
+
+msgid "midnight"
+msgstr "0時"
+
+msgid "noon"
+msgstr "12時"
+
+msgid "Monday"
+msgstr "月曜日"
+
+msgid "Tuesday"
+msgstr "火曜日"
+
+msgid "Wednesday"
+msgstr "水曜日"
+
+msgid "Thursday"
+msgstr "木曜日"
+
+msgid "Friday"
+msgstr "金曜日"
+
+msgid "Saturday"
+msgstr "土曜日"
+
+msgid "Sunday"
+msgstr "日曜日"
+
+msgid "Mon"
+msgstr "月"
+
+msgid "Tue"
+msgstr "火"
+
+msgid "Wed"
+msgstr "水"
+
+msgid "Thu"
+msgstr "木"
+
+msgid "Fri"
+msgstr "金"
+
+msgid "Sat"
+msgstr "土"
+
+msgid "Sun"
+msgstr "日"
+
+msgid "January"
+msgstr "1月"
+
+msgid "February"
+msgstr "2月"
+
+msgid "March"
+msgstr "3月"
+
+msgid "April"
+msgstr "4月"
+
+msgid "May"
+msgstr "5月"
+
+msgid "June"
+msgstr "6月"
+
+msgid "July"
+msgstr "7月"
+
+msgid "August"
+msgstr "8月"
+
+msgid "September"
+msgstr "9月"
+
+msgid "October"
+msgstr "10月"
+
+msgid "November"
+msgstr "11月"
+
+msgid "December"
+msgstr "12月"
+
+msgid "jan"
+msgstr "1月"
+
+msgid "feb"
+msgstr "2月"
+
+msgid "mar"
+msgstr "3月"
+
+msgid "apr"
+msgstr "4月"
+
+msgid "may"
+msgstr "5月"
+
+msgid "jun"
+msgstr "6月"
+
+msgid "jul"
+msgstr "7月"
+
+msgid "aug"
+msgstr "8月"
+
+msgid "sep"
+msgstr "9月"
+
+msgid "oct"
+msgstr "10月"
+
+msgid "nov"
+msgstr "11月"
+
+msgid "dec"
+msgstr "12月"
+
+msgctxt "abbrev. month"
+msgid "Jan."
+msgstr "1月"
+
+msgctxt "abbrev. month"
+msgid "Feb."
+msgstr "2月"
+
+msgctxt "abbrev. month"
+msgid "March"
+msgstr "3月"
+
+msgctxt "abbrev. month"
+msgid "April"
+msgstr "4月"
+
+msgctxt "abbrev. month"
+msgid "May"
+msgstr "5月"
+
+msgctxt "abbrev. month"
+msgid "June"
+msgstr "6月"
+
+msgctxt "abbrev. month"
+msgid "July"
+msgstr "7月"
+
+msgctxt "abbrev. month"
+msgid "Aug."
+msgstr "8月"
+
+msgctxt "abbrev. month"
+msgid "Sept."
+msgstr "9月"
+
+msgctxt "abbrev. month"
+msgid "Oct."
+msgstr "10月"
+
+msgctxt "abbrev. month"
+msgid "Nov."
+msgstr "11月"
+
+msgctxt "abbrev. month"
+msgid "Dec."
+msgstr "12月"
+
+msgctxt "alt. month"
+msgid "January"
+msgstr "1月"
+
+msgctxt "alt. month"
+msgid "February"
+msgstr "2月"
+
+msgctxt "alt. month"
+msgid "March"
+msgstr "3月"
+
+msgctxt "alt. month"
+msgid "April"
+msgstr "4月"
+
+msgctxt "alt. month"
+msgid "May"
+msgstr "5月"
+
+msgctxt "alt. month"
+msgid "June"
+msgstr "6月"
+
+msgctxt "alt. month"
+msgid "July"
+msgstr "7月"
+
+msgctxt "alt. month"
+msgid "August"
+msgstr "8月"
+
+msgctxt "alt. month"
+msgid "September"
+msgstr "9月"
+
+msgctxt "alt. month"
+msgid "October"
+msgstr "10月"
+
+msgctxt "alt. month"
+msgid "November"
+msgstr "11月"
+
+msgctxt "alt. month"
+msgid "December"
+msgstr "12月"
+
+msgid "This is not a valid IPv6 address."
+msgstr "これは有効なIPv6アドレスではありません。"
+
+#, python-format
+msgctxt "String to return when truncating text"
+msgid "%(truncated_text)s…"
+msgstr "%(truncated_text)s…"
+
+msgid "or"
+msgstr "または"
+
+#. Translators: This string is used as a separator between list elements
+msgid ", "
+msgstr ", "
+
+#, python-format
+msgid "%(num)d year"
+msgid_plural "%(num)d years"
+msgstr[0] "%(num)d年"
+
+#, python-format
+msgid "%(num)d month"
+msgid_plural "%(num)d months"
+msgstr[0] "%(num)dヶ月"
+
+#, python-format
+msgid "%(num)d week"
+msgid_plural "%(num)d weeks"
+msgstr[0] "%(num)d週間"
+
+#, python-format
+msgid "%(num)d day"
+msgid_plural "%(num)d days"
+msgstr[0] "%(num)d日"
+
+#, python-format
+msgid "%(num)d hour"
+msgid_plural "%(num)d hours"
+msgstr[0] "%(num)d時間"
+
+#, python-format
+msgid "%(num)d minute"
+msgid_plural "%(num)d minutes"
+msgstr[0] "%(num)d分"
+
+msgid "Forbidden"
+msgstr "アクセス禁止"
+
+msgid "CSRF verification failed. Request aborted."
+msgstr "CSRF検証に失敗したため、リクエストは中断されました。"
+
+msgid ""
+"You are seeing this message because this HTTPS site requires a “Referer "
+"header” to be sent by your web browser, but none was sent. This header is "
+"required for security reasons, to ensure that your browser is not being "
+"hijacked by third parties."
+msgstr ""
+"このメッセージが表示されている理由は、このHTTPSのサイトはウェブブラウザからリ"
+"ファラーヘッダが送信されることを必須としていますが、送信されなかったためで"
+"す。このヘッダはセキュリティ上の理由（使用中のブラウザが第三者によってハイ"
+"ジャックされていないことを確認するため）で必要です。"
+
+msgid ""
+"If you have configured your browser to disable “Referer” headers, please re-"
+"enable them, at least for this site, or for HTTPS connections, or for “same-"
+"origin” requests."
+msgstr ""
+"もしブラウザのリファラーヘッダを無効に設定しているならば、HTTPS接続やsame-"
+"originリクエストのために、少なくともこのサイトでは再度有効にしてください。"
+
+msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the “Referrer-Policy: no-referrer” header, please remove them. The "
+"CSRF protection requires the “Referer” header to do strict referer checking. "
+"If you’re concerned about privacy, use alternatives like <a "
+"rel=\"noreferrer\" …> for links to third-party sites."
+msgstr ""
+"もし <meta name=\"referrer\" content=\"no-referrer\"> タグを使用しているか "
+"“Referrer-Policy: no-referrer” ヘッダを含んでいる場合は削除してください。"
+"CSRF プロテクションは、厳密に “Referer” ヘッダが必要です。プライバシーが気に"
+"なる場合は <a rel=\"noreferrer\" …> などの代替で第三者サイトと接続してくださ"
+"い。"
+
+msgid ""
+"You are seeing this message because this site requires a CSRF cookie when "
+"submitting forms. This cookie is required for security reasons, to ensure "
+"that your browser is not being hijacked by third parties."
+msgstr ""
+"このメッセージが表示されている理由は、このサイトはフォーム送信時にCSRFクッ"
+"キーを必須としているためです。このクッキーはセキュリティ上の理由(使用中のブラ"
+"ウザが第三者によってハイジャックされていないことを確認するため)で必要です。"
+
+msgid ""
+"If you have configured your browser to disable cookies, please re-enable "
+"them, at least for this site, or for “same-origin” requests."
+msgstr ""
+"もしブラウザのクッキーを無効に設定しているならば、same-originリクエストのため"
+"に少なくともこのサイトでは再度有効にしてください。"
+
+msgid "More information is available with DEBUG=True."
+msgstr "詳細な情報は DEBUG=True を設定すると利用できます。"
+
+msgid "No year specified"
+msgstr "年が未指定です"
+
+msgid "Date out of range"
+msgstr "日付が有効範囲外です"
+
+msgid "No month specified"
+msgstr "月が未指定です"
+
+msgid "No day specified"
+msgstr "日が未指定です"
+
+msgid "No week specified"
+msgstr "週が未指定です"
+
+#, python-format
+msgid "No %(verbose_name_plural)s available"
+msgstr "%(verbose_name_plural)s は利用できません"
+
+#, python-format
+msgid ""
+"Future %(verbose_name_plural)s not available because %(class_name)s."
+"allow_future is False."
+msgstr ""
+"%(class_name)s.allow_futureがFalseであるため、未来の%(verbose_name_plural)sは"
+"利用できません。"
+
+#, python-format
+msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
+msgstr "指定された形式 “%(format)s” では “%(datestr)s” は無効な日付文字列です"
+
+#, python-format
+msgid "No %(verbose_name)s found matching the query"
+msgstr "クエリーに一致する %(verbose_name)s は見つかりませんでした"
+
+msgid "Page is not “last”, nor can it be converted to an int."
+msgstr "ページが 「最後」ではないか、数値に変換できる値ではありません。"
+
+#, python-format
+msgid "Invalid page (%(page_number)s): %(message)s"
+msgstr "無効なページです (%(page_number)s): %(message)s"
+
+#, python-format
+msgid "Empty list and “%(class_name)s.allow_empty” is False."
+msgstr "空の一覧かつ “%(class_name)s.allow_empty” が False です。"
+
+msgid "Directory indexes are not allowed here."
+msgstr "ここではディレクトリインデックスが許可されていません。"
+
+#, python-format
+msgid "“%(path)s” does not exist"
+msgstr "“%(path)s” が存在しません"
+
+#, python-format
+msgid "Index of %(directory)s"
+msgstr "%(directory)sのディレクトリインデックス"
+
+msgid "The install worked successfully! Congratulations!"
+msgstr "インストールは成功しました！おめでとうございます！"
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+"Django%(version)sの<a href=\"https://docs.djangoproject.com/en/%(version)s/"
+"releases/\" target=\"_blank\" rel=\"noopener\">リリースノート</a>を見る。"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
+"configured any URLs."
+msgstr ""
+"このページは、設定ファイルで<a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a>が指定され、何もURLが設定されていない時に表示"
+"されます。"
+
+msgid "Django Documentation"
+msgstr "Django ドキュメント"
+
+msgid "Topics, references, &amp; how-to’s"
+msgstr "トピック、リファレンス、ハウツー"
+
+msgid "Tutorial: A Polling App"
+msgstr "チュートリアル: 投票アプリケーション"
+
+msgid "Get started with Django"
+msgstr "Djangoを始めよう"
+
+msgid "Django Community"
+msgstr "Djangoのコミュニティ"
+
+msgid "Connect, get help, or contribute"
+msgstr "つながり、助け合い、貢献しよう"

@@ -1,0 +1,59 @@
+<html>
+<head>
+  <script src="/jsi18n_admin/"></script>
+</head>
+
+<body>
+  <p id="formats">
+    <script>
+    document.write("DATE_INPUT_FORMATS is an " + typeof get_format("DATE_INPUT_FORMATS") + "; ");
+    document.write("DECIMAL_SEPARATOR is a " + typeof get_format("DECIMAL_SEPARATOR") + "; ");
+    document.write("FIRST_DAY_OF_WEEK is a " + typeof get_format("FIRST_DAY_OF_WEEK") + ";");
+    </script>
+  </p>
+
+  <p id="gettext">
+    <script>
+    document.write(gettext("Remove"));
+    </script>
+  </p>
+
+  <p id="ngettext_sing">
+    <script>
+    document.write(interpolate(ngettext("%s item", "%s items", 1), [1]));
+    </script>
+  </p>
+
+  <p id="ngettext_plur">
+    <script>
+    document.write(interpolate(ngettext("%s item", "%s items", 455), [455]));
+    </script>
+  </p>
+
+  <p id="ngettext_onnonplural">
+      <!-- The po file only contains the non plural "Image" string. -->
+      <script>
+          document.write(interpolate(ngettext("Image", "Images", 5), [1]));
+      </script>
+  </p>
+
+  <p id="pgettext">
+    <script>
+    document.write(pgettext("verb", "May"));
+    </script>
+  </p>
+
+  <p id="npgettext_sing">
+    <script>
+    document.write(interpolate(npgettext("search", "%s result", "%s results", 1), [1]));
+    </script>
+  </p>
+
+  <p id="npgettext_plur">
+    <script>
+    document.write(interpolate(npgettext("search", "%s result", "%s results", 455), [455]));
+    </script>
+  </p>
+
+</body>
+</html>

@@ -1,0 +1,18 @@
+================
+Django internals
+================
+
+Documentation for people hacking on Django itself. This is the place to go if
+you'd like to help improve Django or learn about how Django is managed.
+
+.. toctree::
+   :maxdepth: 2
+
+   contributing/index
+   mailing-lists
+   organization
+   security
+   release-process
+   deprecation
+   git
+   howto-release-django

@@ -1,0 +1,53 @@
+==========================
+Django 1.8.6 release notes
+==========================
+
+*November 4, 2015*
+
+Django 1.8.6 adds official support for Python 3.5 and fixes several bugs in
+1.8.5.
+
+Bugfixes
+========
+
+* Fixed a regression causing ``ModelChoiceField`` to ignore
+  ``prefetch_related()`` on its queryset (:ticket:`25496`).
+
+* Allowed "mode=memory" in SQLite test database name if supported
+  (:ticket:`12118`).
+
+* Fixed system check crash on ``ForeignKey`` to abstract model
+  (:ticket:`25503`).
+
+* Fixed incorrect queries when you have multiple ``ManyToManyField``\s on
+  different models that have the same field name, point to the same model, and
+  have their reverse relations disabled (:ticket:`25545`).
+
+* Allowed filtering over a ``RawSQL`` annotation (:ticket:`25506`).
+
+* Made the ``Concat`` database function idempotent on SQLite (:ticket:`25517`).
+
+* Avoided a confusing stack trace when starting :djadmin:`runserver` with an
+  invalid :setting:`INSTALLED_APPS` setting (:ticket:`25510`). This regression
+  appeared in 1.8.5 as a side effect of fixing :ticket:`24704`.
+
+* Made deferred models use their proxied model's ``_meta.apps`` for caching
+  and retrieval (:ticket:`25563`). This prevents any models generated in data
+  migrations using ``QuerySet.defer()`` from leaking to test and application
+  code.
+
+* Fixed a typo in the name of the ``strictly_above`` PostGIS lookup
+  (:ticket:`25592`).
+
+* Fixed crash with ``contrib.postgres.forms.SplitArrayField`` and
+  ``IntegerField`` on invalid value (:ticket:`25597`).
+
+* Added a helpful error message when Django and South migrations exist in the
+  same directory (:ticket:`25618`).
+
+* Fixed a regression in ``URLValidator`` that allowed URLs with consecutive
+  dots in the domain section (like ``http://example..com/``) to pass
+  (:ticket:`25620`).
+
+* Fixed a crash with ``GenericRelation`` and
+  ``BaseModelAdmin.to_field_allowed`` (:ticket:`25622`).

@@ -1,0 +1,14 @@
+===========================
+Django 3.2.20 release notes
+===========================
+
+*July 3, 2023*
+
+Django 3.2.20 fixes a security issue with severity "moderate" in 3.2.19.
+
+CVE-2023-36053: Potential regular expression denial of service vulnerability in ``EmailValidator``/``URLValidator``
+===================================================================================================================
+
+``EmailValidator`` and ``URLValidator`` were subject to potential regular
+expression denial of service attack via a very large number of domain name
+labels of emails and URLs.

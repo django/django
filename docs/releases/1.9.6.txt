@@ -1,0 +1,32 @@
+==========================
+Django 1.9.6 release notes
+==========================
+
+*May 2, 2016*
+
+Django 1.9.6 fixes several bugs in 1.9.5.
+
+Bugfixes
+========
+
+* Added support for relative path redirects to the test client and to
+  ``SimpleTestCase.assertRedirects()`` because Django 1.9 no longer converts
+  redirects to absolute URIs (:ticket:`26428`).
+
+* Fixed ``TimeField`` microseconds round-tripping on MySQL and SQLite
+  (:ticket:`26498`).
+
+* Prevented ``makemigrations`` from generating infinite migrations for a model
+  field that references a ``functools.partial`` (:ticket:`26475`).
+
+* Fixed a regression where ``SessionBase.pop()`` returned ``None`` rather than
+  raising a ``KeyError`` for nonexistent values (:ticket:`26520`).
+
+* Fixed a regression causing the cached template loader to crash when using
+  template names starting with a dash (:ticket:`26536`).
+
+* Restored conversion of an empty string to null when saving values of
+  ``GenericIPAddressField`` on SQLite and MySQL (:ticket:`26557`).
+
+* Fixed a ``makemessages`` regression where temporary ``.py`` extensions were
+  leaked in source file paths (:ticket:`26341`).

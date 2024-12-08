@@ -1,0 +1,52 @@
+=============================
+How to use Django with Daphne
+=============================
+
+:pypi:`Daphne <daphne>` is a pure-Python ASGI server for UNIX, maintained by
+members of the Django project. It acts as the reference server for ASGI.
+
+Installing Daphne
+===================
+
+You can install Daphne with ``pip``:
+
+.. code-block:: shell
+
+    python -m pip install daphne
+
+Running Django in Daphne
+========================
+
+When Daphne is installed, a ``daphne`` command is available which starts the
+Daphne server process. At its simplest, Daphne needs to be called with the
+location of a module containing an ASGI application object, followed by what
+the application is called (separated by a colon).
+
+For a typical Django project, invoking Daphne would look like:
+
+.. code-block:: shell
+
+    daphne myproject.asgi:application
+
+This will start one process listening on ``127.0.0.1:8000``. It requires that
+your project be on the Python path; to ensure that run this command from the
+same directory as your ``manage.py`` file.
+
+.. _daphne-runserver:
+
+Integration with ``runserver``
+==============================
+
+Daphne provides a :djadmin:`runserver` command to serve your site under ASGI
+during development.
+
+This can be enabled by adding ``daphne`` to the start of your
+:setting:`INSTALLED_APPS` and adding an ``ASGI_APPLICATION`` setting pointing
+to your ASGI application object::
+
+    INSTALLED_APPS = [
+        "daphne",
+        ...,
+    ]
+
+    ASGI_APPLICATION = "myproject.asgi.application"

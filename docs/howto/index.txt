@@ -1,0 +1,70 @@
+=============
+How-to guides
+=============
+
+Practical guides covering common tasks and problems.
+
+Models, data and databases
+==========================
+
+.. toctree::
+   :maxdepth: 1
+
+   initial-data
+   legacy-databases
+   custom-model-fields
+   writing-migrations
+   custom-lookups
+
+Templates and output
+====================
+
+.. toctree::
+   :maxdepth: 1
+
+   outputting-csv
+   outputting-pdf
+   overriding-templates
+   custom-template-backend
+   custom-template-tags
+
+Project configuration and management
+====================================
+
+.. toctree::
+   :maxdepth: 1
+
+   static-files/index
+   logging
+   error-reporting
+   delete-app
+
+Installing, deploying and upgrading
+===================================
+
+.. toctree::
+   :maxdepth: 1
+
+   upgrade-version
+   windows
+   deployment/index
+   static-files/deployment
+
+Other guides
+============
+
+.. toctree::
+   :maxdepth: 1
+
+   auth-remote-user
+   csrf
+   custom-management-commands
+   custom-file-storage
+
+.. seealso::
+
+    The `Django community aggregator`_, where we aggregate content from the
+    global Django community. Many writers in the aggregator write this sort of
+    how-to material.
+
+    .. _django community aggregator: https://www.djangoproject.com/community/

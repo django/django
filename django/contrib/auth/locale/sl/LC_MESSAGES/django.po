@@ -1,0 +1,312 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Andrej Marsetič, 2022-2023
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Jure Cuhalev <gandalf@owca.info>, 2012
+# Primoz Verdnik <primoz.verdnik@gmail.com>, 2017
+# zejn <zelo.zejn+transifex@gmail.com>, 2013,2016-2017
+# zejn <zelo.zejn+transifex@gmail.com>, 2011-2013
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-03-17 03:19-0500\n"
+"PO-Revision-Date: 2023-12-04 08:09+0000\n"
+"Last-Translator: Andrej Marsetič, 2022-2023\n"
+"Language-Team: Slovenian (http://app.transifex.com/django/django/language/"
+"sl/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: sl\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || "
+"n%100==4 ? 2 : 3);\n"
+
+msgid "Personal info"
+msgstr "Osebni podatki"
+
+msgid "Permissions"
+msgstr "Dovoljenja"
+
+msgid "Important dates"
+msgstr "Pomembni datumi"
+
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "Objekt %(name)s z glavnim ključem %(key)r ne obstaja."
+
+msgid "Password changed successfully."
+msgstr "Geslo je uspešno spremenjeno."
+
+#, python-format
+msgid "Change password: %s"
+msgstr "Spremeni geslo: %s"
+
+msgid "Authentication and Authorization"
+msgstr "Avtentikacija in avtorizacija"
+
+msgid "password"
+msgstr "geslo"
+
+msgid "last login"
+msgstr "zadnja prijava"
+
+msgid "No password set."
+msgstr "Geslo ni nastavljeno."
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Neveljavna oblika gesla ali neznan algoritem razpršila."
+
+msgid "The two password fields didn’t match."
+msgstr "Polji za geslo se nista ujemali."
+
+msgid "Password"
+msgstr "Geslo"
+
+msgid "Password confirmation"
+msgstr "Potrditev gesla"
+
+msgid "Enter the same password as before, for verification."
+msgstr "Vnesite isto geslo kot prej, za preverjanje."
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see this user’s "
+"password, but you can change the password using <a href=\"{}\">this form</a>."
+msgstr ""
+"Neobdelana gesla niso shranjena, zato gesla tega uporabnika ni mogoče "
+"videti, vendar lahko geslo spremenite z uporabo<a href=\"{}\">tega obrazca</"
+"a>."
+
+#, python-format
+msgid ""
+"Please enter a correct %(username)s and password. Note that both fields may "
+"be case-sensitive."
+msgstr ""
+"Vnesite veljavno %(username)s in geslo. Opomba: obe polji upoštevata "
+"velikost črk."
+
+msgid "This account is inactive."
+msgstr "Ta uporabniški račun ni dejaven."
+
+msgid "Email"
+msgstr "Elektronski naslov"
+
+msgid "New password"
+msgstr "Novo geslo"
+
+msgid "New password confirmation"
+msgstr "Potrditev novega gesla"
+
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr "Vaše staro geslo ni vneseno pravilno. Poskusite znova."
+
+msgid "Old password"
+msgstr "Staro geslo"
+
+msgid "Password (again)"
+msgstr "Geslo (znova)"
+
+msgid "algorithm"
+msgstr "algoritem"
+
+msgid "iterations"
+msgstr "ponovitev"
+
+msgid "salt"
+msgstr "naključna vrednost"
+
+msgid "hash"
+msgstr "razpršilo"
+
+msgid "variety"
+msgstr "pestrost"
+
+msgid "version"
+msgstr "različica"
+
+msgid "memory cost"
+msgstr "pomnilniška zahtevnost"
+
+msgid "time cost"
+msgstr "časovna zahtevnost"
+
+msgid "parallelism"
+msgstr "paralelnost"
+
+msgid "work factor"
+msgstr "faktor obremenitve"
+
+msgid "checksum"
+msgstr "nadzorna vsota"
+
+msgid "block size"
+msgstr "velikost bloka"
+
+msgid "name"
+msgstr "ime"
+
+msgid "content type"
+msgstr "vrsta vsebine"
+
+msgid "codename"
+msgstr "kodno ime"
+
+msgid "permission"
+msgstr "dovoljenje"
+
+msgid "permissions"
+msgstr "dovoljenja"
+
+msgid "group"
+msgstr "skupina"
+
+msgid "groups"
+msgstr "skupine"
+
+msgid "superuser status"
+msgstr "stanje skrbnika"
+
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr ""
+"Določi, da bo uporabnik imel vsa dovoljenja, ne da bi mu jih posebej "
+"dodelili."
+
+msgid ""
+"The groups this user belongs to. A user will get all permissions granted to "
+"each of their groups."
+msgstr ""
+"Skupine, katerih član je ta uporabnik. Uporabnik pridobi vsa dovoljenja, "
+"povezana z vsako izmed skupin."
+
+msgid "user permissions"
+msgstr "uporabniška dovoljenja"
+
+msgid "Specific permissions for this user."
+msgstr "Dovoljenja specifična za tega uporabnika."
+
+msgid "username"
+msgstr "uporabniško ime"
+
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr "Zahtevano. 150 znakov ali manj. Le črke, števke in znaki @/./+/-/_."
+
+msgid "A user with that username already exists."
+msgstr "Uporabnik s tem uporabniškim imenom že obstaja."
+
+msgid "first name"
+msgstr "ime"
+
+msgid "last name"
+msgstr "priimek"
+
+msgid "email address"
+msgstr "elektronski naslov"
+
+msgid "staff status"
+msgstr "stanje osebja"
+
+msgid "Designates whether the user can log into this admin site."
+msgstr "Določi, ali se sme uporabnik prijaviti kot skrbnik."
+
+msgid "active"
+msgstr "dejaven"
+
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+"Določi, ali je uporabnik dejaven. Možnost je priročna in preprečuje brisanje "
+"računov."
+
+msgid "date joined"
+msgstr "vpisan od"
+
+msgid "user"
+msgstr "uporabnik"
+
+msgid "users"
+msgstr "uporabniki"
+
+#, python-format
+msgid ""
+"This password is too short. It must contain at least %(min_length)d "
+"character."
+msgid_plural ""
+"This password is too short. It must contain at least %(min_length)d "
+"characters."
+msgstr[0] "To geslo je prekratko. Imeti mora vsaj %(min_length)d znak."
+msgstr[1] "To geslo je prekratko. Imeti mora vsaj %(min_length)d znaka."
+msgstr[2] "To geslo je prekratko. Imeti mora vsaj %(min_length)d znake."
+msgstr[3] "To geslo je prekratko. Imeti mora vsaj %(min_length)d znakov."
+
+#, python-format
+msgid "Your password must contain at least %(min_length)d character."
+msgid_plural "Your password must contain at least %(min_length)d characters."
+msgstr[0] "Vaše geslo mora imeti vsaj %(min_length)d znak."
+msgstr[1] "Vaše geslo mora imeti vsaj %(min_length)d znaka."
+msgstr[2] "Vaše geslo mora imeti vsaj %(min_length)d znake."
+msgstr[3] "Vaše geslo mora imeti vsaj %(min_length)d znakov."
+
+#, python-format
+msgid "The password is too similar to the %(verbose_name)s."
+msgstr "Geslo je preveč podobno %(verbose_name)s."
+
+msgid "Your password can’t be too similar to your other personal information."
+msgstr "Vaše geslo ne sme biti preveč podobno vašim drugim osebnim podatkom."
+
+msgid "This password is too common."
+msgstr "Geslo je eno izmed preveč pogosto uporabljanih."
+
+msgid "Your password can’t be a commonly used password."
+msgstr "Vaše geslo ne sme biti pogosto uporabljeno geslo."
+
+msgid "This password is entirely numeric."
+msgstr "Vaše geslo je sestavljeno samo iz števk."
+
+msgid "Your password can’t be entirely numeric."
+msgstr "Vaše geslo ne sme biti v celoti sestavljeno iz številk."
+
+#, python-format
+msgid "Password reset on %(site_name)s"
+msgstr "Geslo na %(site_name)s je ponastavljeno."
+
+msgid ""
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
+msgstr ""
+"Vnesite veljavno uporabniško ime. Ta vrednost lahko vsebuje samo nenaglašene "
+"male črke a–z in velike črke A–Z, številke in znake @/./+/-/_."
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+"Vnesite veljavno uporabniško ime. Ta vrednost sme vsebovati le črke, števke "
+"in znake @/./+/-/_."
+
+msgid "Logged out"
+msgstr "Odjavljen"
+
+msgid "Password reset"
+msgstr "Ponastavi geslo"
+
+msgid "Password reset sent"
+msgstr "Navodila za ponastavitev gesla so bila poslana"
+
+msgid "Enter new password"
+msgstr "Vnesite novo geslo"
+
+msgid "Password reset unsuccessful"
+msgstr "Ponastavitev gesla ni uspela"
+
+msgid "Password reset complete"
+msgstr "Ponastavitev gesla zaključena"
+
+msgid "Password change"
+msgstr "Sprememba gesla"
+
+msgid "Password change successful"
+msgstr "Sprememba gesla je uspela"

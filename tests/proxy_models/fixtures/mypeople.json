@@ -1,0 +1,9 @@
+[
+    {
+        "pk": 100,
+        "model": "proxy_models.myperson",
+        "fields": {
+            "name": "Elvis Presley"
+        }
+    }
+]

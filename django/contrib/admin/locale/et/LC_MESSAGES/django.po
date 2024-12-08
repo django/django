@@ -1,0 +1,784 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# eallik <eallik@gmail.com>, 2011
+# Erlend Eelmets <debcf78e@opayq.com>, 2020
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Janno Liivak <jannolii@gmail.com>, 2013-2015
+# Martin <martinpajuste@gmail.com>, 2015,2022-2024
+# Martin <martinpajuste@gmail.com>, 2016,2019-2020
+# Marti Raudsepp <marti@juffo.org>, 2016
+# Ragnar Rebase <rrebase@gmail.com>, 2019
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 07:05+0000\n"
+"Last-Translator: Martin <martinpajuste@gmail.com>, 2015,2022-2024\n"
+"Language-Team: Estonian (http://app.transifex.com/django/django/language/"
+"et/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: et\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Kustuta valitud %(verbose_name_plural)s"
+
+#, python-format
+msgid "Successfully deleted %(count)d %(items)s."
+msgstr "%(count)d %(items)s kustutamine õnnestus."
+
+#, python-format
+msgid "Cannot delete %(name)s"
+msgstr "Ei saa kustutada %(name)s"
+
+msgid "Are you sure?"
+msgstr "Kas olete kindel?"
+
+msgid "Administration"
+msgstr "Administreerimine"
+
+msgid "All"
+msgstr "Kõik"
+
+msgid "Yes"
+msgstr "Jah"
+
+msgid "No"
+msgstr "Ei"
+
+msgid "Unknown"
+msgstr "Tundmatu"
+
+msgid "Any date"
+msgstr "Suvaline kuupäev"
+
+msgid "Today"
+msgstr "Täna"
+
+msgid "Past 7 days"
+msgstr "Viimased 7 päeva"
+
+msgid "This month"
+msgstr "Käesolev kuu"
+
+msgid "This year"
+msgstr "Käesolev aasta"
+
+msgid "No date"
+msgstr "Kuupäev puudub"
+
+msgid "Has date"
+msgstr "Kuupäev olemas"
+
+msgid "Empty"
+msgstr "Tühi"
+
+msgid "Not empty"
+msgstr "Täidetud"
+
+#, python-format
+msgid ""
+"Please enter the correct %(username)s and password for a staff account. Note "
+"that both fields may be case-sensitive."
+msgstr ""
+"Palun sisestage personali kontole õige %(username)s ja parool. Teadke, et "
+"mõlemad väljad võivad olla tõstutundlikud."
+
+msgid "Action:"
+msgstr "Toiming:"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Lisa veel üks %(verbose_name)s"
+
+msgid "Remove"
+msgstr "Eemalda"
+
+msgid "Addition"
+msgstr "Lisamine"
+
+msgid "Change"
+msgstr "Muuda"
+
+msgid "Deletion"
+msgstr "Kustutamine"
+
+msgid "action time"
+msgstr "toimingu aeg"
+
+msgid "user"
+msgstr "kasutaja"
+
+msgid "content type"
+msgstr "sisutüüp"
+
+msgid "object id"
+msgstr "objekti id"
+
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/library/functions.html#repr)
+msgid "object repr"
+msgstr "objekti esitus"
+
+msgid "action flag"
+msgstr "toimingu lipp"
+
+msgid "change message"
+msgstr "muudatuse tekst"
+
+msgid "log entry"
+msgstr "logisissekanne"
+
+msgid "log entries"
+msgstr "logisissekanded"
+
+#, python-format
+msgid "Added “%(object)s”."
+msgstr "Lisati “%(object)s”."
+
+#, python-format
+msgid "Changed “%(object)s” — %(changes)s"
+msgstr "Muudeti “%(object)s” — %(changes)s"
+
+#, python-format
+msgid "Deleted “%(object)s.”"
+msgstr "Kustutati “%(object)s.”"
+
+msgid "LogEntry Object"
+msgstr "Objekt LogEntry"
+
+#, python-brace-format
+msgid "Added {name} “{object}”."
+msgstr "Lisati {name} “{object}”."
+
+msgid "Added."
+msgstr "Lisatud."
+
+msgid "and"
+msgstr "ja"
+
+#, python-brace-format
+msgid "Changed {fields} for {name} “{object}”."
+msgstr "Muudeti {fields} -> {name} “{object}”."
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr "Muudetud {fields}."
+
+#, python-brace-format
+msgid "Deleted {name} “{object}”."
+msgstr "Kustutati {name} “{object}”."
+
+msgid "No fields changed."
+msgstr "Ühtegi välja ei muudetud."
+
+msgid "None"
+msgstr "Puudub"
+
+msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
+msgstr "Hoia all “Control” või “Command” Macil, et valida rohkem kui üks."
+
+msgid "Select this object for an action - {}"
+msgstr "Vali toiminguks käesolev objekt - {}"
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully."
+msgstr "{name} “{obj}” lisamine õnnestus."
+
+msgid "You may edit it again below."
+msgstr "Võite seda uuesti muuta."
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was added successfully. You may add another {name} below."
+msgstr ""
+"{name} “{obj}” lisamine õnnestus. Allpool saate lisada järgmise {name}."
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may edit it again below."
+msgstr "{name} “{obj}” muutmine õnnestus. Allpool saate seda uuesti muuta."
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may add another {name} "
+"below."
+msgstr "{name} ”{obj}” muutmine õnnestus. Allpool saate lisada uue {name}."
+
+#, python-brace-format
+msgid "The {name} “{obj}” was changed successfully."
+msgstr "{name} “{obj}” muutmine õnnestus."
+
+msgid ""
+"Items must be selected in order to perform actions on them. No items have "
+"been changed."
+msgstr ""
+"Palun märgistage elemendid, millega soovite toiminguid sooritada. Ühtegi "
+"elementi ei muudetud."
+
+msgid "No action selected."
+msgstr "Toiming valimata."
+
+#, python-format
+msgid "The %(name)s “%(obj)s” was deleted successfully."
+msgstr "%(name)s “%(obj)s” kustutamine õnnestus."
+
+#, python-format
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
+msgstr "%(name)s ID-ga “%(key)s” ei eksisteeri. Võib-olla on see kustutatud?"
+
+#, python-format
+msgid "Add %s"
+msgstr "Lisa %s"
+
+#, python-format
+msgid "Change %s"
+msgstr "Muuda %s"
+
+#, python-format
+msgid "View %s"
+msgstr "Vaata %s"
+
+msgid "Database error"
+msgstr "Andmebaasi viga"
+
+#, python-format
+msgid "%(count)s %(name)s was changed successfully."
+msgid_plural "%(count)s %(name)s were changed successfully."
+msgstr[0] "%(count)s %(name)s muutmine õnnestus."
+msgstr[1] "%(count)s %(name)s muutmine õnnestus."
+
+#, python-format
+msgid "%(total_count)s selected"
+msgid_plural "All %(total_count)s selected"
+msgstr[0] "%(total_count)s valitud"
+msgstr[1] "Kõik %(total_count)s valitud"
+
+#, python-format
+msgid "0 of %(cnt)s selected"
+msgstr "valitud 0/%(cnt)s"
+
+#, python-format
+msgid "Change history: %s"
+msgstr "Muudatuste ajalugu: %s"
+
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
+#, python-format
+msgid "%(class_name)s %(instance)s"
+msgstr "%(class_name)s %(instance)s"
+
+#, python-format
+msgid ""
+"Deleting %(class_name)s %(instance)s would require deleting the following "
+"protected related objects: %(related_objects)s"
+msgstr ""
+"Et kustutada %(class_name)s %(instance)s, on vaja kustutada järgmised "
+"kaitstud seotud objektid: %(related_objects)s"
+
+msgid "Django site admin"
+msgstr "Django administreerimisliides"
+
+msgid "Django administration"
+msgstr "Django administreerimisliides"
+
+msgid "Site administration"
+msgstr "Saidi administreerimine"
+
+msgid "Log in"
+msgstr "Sisene"
+
+#, python-format
+msgid "%(app)s administration"
+msgstr "%(app)s administreerimine"
+
+msgid "Page not found"
+msgstr "Lehte ei leitud"
+
+msgid "We’re sorry, but the requested page could not be found."
+msgstr "Vabandame, kuid soovitud lehte ei leitud."
+
+msgid "Home"
+msgstr "Kodu"
+
+msgid "Server error"
+msgstr "Serveri viga"
+
+msgid "Server error (500)"
+msgstr "Serveri viga (500)"
+
+msgid "Server Error <em>(500)</em>"
+msgstr "Serveri Viga <em>(500)</em>"
+
+msgid ""
+"There’s been an error. It’s been reported to the site administrators via "
+"email and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"Ilmnes viga. Sellest on e-posti teel teavitatud lehe administraatorit ja "
+"viga parandatakse esimesel võimalusel. Täname kannatlikkuse eest."
+
+msgid "Run the selected action"
+msgstr "Käivita valitud toiming"
+
+msgid "Go"
+msgstr "Mine"
+
+msgid "Click here to select the objects across all pages"
+msgstr "Kliki siin, et märgistada objektid üle kõigi lehekülgede"
+
+#, python-format
+msgid "Select all %(total_count)s %(module_name)s"
+msgstr "Märgista kõik %(total_count)s %(module_name)s"
+
+msgid "Clear selection"
+msgstr "Tühjenda valik"
+
+msgid "Breadcrumbs"
+msgstr "Lingirivi"
+
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "Rakenduse %(name)s moodulid"
+
+msgid "Add"
+msgstr "Lisa"
+
+msgid "View"
+msgstr "Vaata"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "Teil pole õigust midagi vaadata ega muuta."
+
+msgid ""
+"First, enter a username and password. Then, you’ll be able to edit more user "
+"options."
+msgstr ""
+"Kõigepealt sisestage kasutajatunnus ja salasõna. Seejärel saate muuta "
+"täiendavaid kasutajaandmeid."
+
+msgid "Enter a username and password."
+msgstr "Sisestage kasutajanimi ja salasõna."
+
+msgid "Change password"
+msgstr "Muuda salasõna"
+
+msgid "Set password"
+msgstr "Määra parool"
+
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Palun parandage allolev viga."
+msgstr[1] "Palun parandage allolevad vead."
+
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr "Sisestage uus salasõna kasutajale <strong>%(username)s</strong>"
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+
+msgid "Disable password-based authentication"
+msgstr ""
+
+msgid "Enable password-based authentication"
+msgstr ""
+
+msgid "Skip to main content"
+msgstr "Liigu põhisisu juurde"
+
+msgid "Welcome,"
+msgstr "Tere tulemast,"
+
+msgid "View site"
+msgstr "Vaata saiti"
+
+msgid "Documentation"
+msgstr "Dokumentatsioon"
+
+msgid "Log out"
+msgstr "Logi välja"
+
+#, python-format
+msgid "Add %(name)s"
+msgstr "Lisa %(name)s"
+
+msgid "History"
+msgstr "Ajalugu"
+
+msgid "View on site"
+msgstr "Näita lehel"
+
+msgid "Filter"
+msgstr "Filtreeri"
+
+msgid "Hide counts"
+msgstr "Peida loendused"
+
+msgid "Show counts"
+msgstr "Näita loendusi"
+
+msgid "Clear all filters"
+msgstr "Tühjenda kõik filtrid"
+
+msgid "Remove from sorting"
+msgstr "Eemalda sorteerimisest"
+
+#, python-format
+msgid "Sorting priority: %(priority_number)s"
+msgstr "Sorteerimisjärk: %(priority_number)s"
+
+msgid "Toggle sorting"
+msgstr "Sorteerimine"
+
+msgid "Toggle theme (current theme: auto)"
+msgstr "Teema lülitamine (hetkel: automaatne)"
+
+msgid "Toggle theme (current theme: light)"
+msgstr "Teema lülitamine (hetkel: hele)"
+
+msgid "Toggle theme (current theme: dark)"
+msgstr "Teema lülitamine (hetkel: tume)"
+
+msgid "Delete"
+msgstr "Kustuta"
+
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+"Selleks, et kustutada %(object_name)s '%(escaped_object)s', on vaja "
+"kustutada lisaks ka kõik seotud objecktid, aga teil puudub õigus järgnevat "
+"tüüpi objektide kustutamiseks:"
+
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
+msgstr ""
+"Et kustutada %(object_name)s '%(escaped_object)s', on vaja kustutada "
+"järgmised kaitstud seotud objektid:"
+
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+"Kas olete kindel, et soovite kustutada objekti %(object_name)s "
+"\"%(escaped_object)s\"? Kõik järgnevad seotud objektid kustutatakse koos "
+"sellega:"
+
+msgid "Objects"
+msgstr "Objektid"
+
+msgid "Yes, I’m sure"
+msgstr "Jah, olen kindel"
+
+msgid "No, take me back"
+msgstr "Ei, mine tagasi"
+
+msgid "Delete multiple objects"
+msgstr "Kustuta mitu objekti"
+
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+"Kui kustutada valitud %(objects_name)s, peaks kustutama ka seotud objektid, "
+"aga sinu kasutajakontol pole õigusi järgmiste objektitüüpide kustutamiseks:"
+
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would require deleting the following "
+"protected related objects:"
+msgstr ""
+"Et kustutada valitud %(objects_name)s, on vaja kustutada ka järgmised "
+"kaitstud seotud objektid:"
+
+#, python-format
+msgid ""
+"Are you sure you want to delete the selected %(objects_name)s? All of the "
+"following objects and their related items will be deleted:"
+msgstr ""
+"Kas oled kindel, et soovid kustutada valitud %(objects_name)s? Kõik "
+"järgnevad objektid ja seotud objektid kustutatakse:"
+
+msgid "Delete?"
+msgstr "Kustutan?"
+
+#, python-format
+msgid " By %(filter_title)s "
+msgstr " %(filter_title)s "
+
+msgid "Summary"
+msgstr "Kokkuvõte"
+
+msgid "Recent actions"
+msgstr "Hiljutised toimingud"
+
+msgid "My actions"
+msgstr "Minu toimingud"
+
+msgid "None available"
+msgstr "Ei leitud ühtegi"
+
+msgid "Added:"
+msgstr "Lisatud:"
+
+msgid "Changed:"
+msgstr "Muudetud:"
+
+msgid "Deleted:"
+msgstr "Kustutatud:"
+
+msgid "Unknown content"
+msgstr "Tundmatu sisu"
+
+msgid ""
+"Something’s wrong with your database installation. Make sure the appropriate "
+"database tables have been created, and make sure the database is readable by "
+"the appropriate user."
+msgstr ""
+"On tekkinud viga seoses andmebaasiga. Veenduge, et kõik vajalikud "
+"andmebaasitabelid on loodud ja andmebaas on loetav vastava kasutaja poolt."
+
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+"Olete sisse logitud kasutajana %(username)s, kuid teil puudub ligipääs "
+"lehele. Kas te soovite teise kontoga sisse logida?"
+
+msgid "Forgotten your password or username?"
+msgstr "Unustasite oma parooli või kasutajanime?"
+
+msgid "Toggle navigation"
+msgstr "Lülita navigeerimine sisse"
+
+msgid "Sidebar"
+msgstr "Külgriba"
+
+msgid "Start typing to filter…"
+msgstr "Filtreerimiseks alusta trükkimist..."
+
+msgid "Filter navigation items"
+msgstr "Filtreeri navigatsioonielemente"
+
+msgid "Date/time"
+msgstr "Kuupäev/kellaaeg"
+
+msgid "User"
+msgstr "Kasutaja"
+
+msgid "Action"
+msgstr "Toiming"
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] "sissekanne"
+msgstr[1] "sissekanded"
+
+msgid ""
+"This object doesn’t have a change history. It probably wasn’t added via this "
+"admin site."
+msgstr ""
+"Sellel objektil puudub muudatuste ajalugu. Tõenäoliselt ei lisatud objekti "
+"läbi selle administreerimisliidese."
+
+msgid "Show all"
+msgstr "Näita kõiki"
+
+msgid "Save"
+msgstr "Salvesta"
+
+msgid "Popup closing…"
+msgstr "Hüpikaken sulgub…"
+
+msgid "Search"
+msgstr "Otsing"
+
+#, python-format
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] "%(counter)s tulemus"
+msgstr[1] "%(counter)s tulemust"
+
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr "Kokku %(full_result_count)s"
+
+msgid "Save as new"
+msgstr "Salvesta uuena"
+
+msgid "Save and add another"
+msgstr "Salvesta ja lisa uus"
+
+msgid "Save and continue editing"
+msgstr "Salvesta ja jätka muutmist"
+
+msgid "Save and view"
+msgstr "Salvesta ja vaata"
+
+msgid "Close"
+msgstr "Sulge"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Muuda valitud %(model)s"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Lisa veel üks %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Kustuta valitud %(model)s"
+
+#, python-format
+msgid "View selected %(model)s"
+msgstr "Vaata valitud %(model)s"
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr "Tänan, et veetsite aega meie lehel."
+
+msgid "Log in again"
+msgstr "Logi uuesti sisse"
+
+msgid "Password change"
+msgstr "Salasõna muutmine"
+
+msgid "Your password was changed."
+msgstr "Teie salasõna on vahetatud."
+
+msgid ""
+"Please enter your old password, for security’s sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+"Turvalisuse tagamiseks palun sisestage oma praegune salasõna ja seejärel uus "
+"salasõna. Veendumaks, et uue salasõna sisestamisel ei tekkinud vigu, palun "
+"sisestage see kaks korda."
+
+msgid "Change my password"
+msgstr "Muuda salasõna"
+
+msgid "Password reset"
+msgstr "Uue parooli loomine"
+
+msgid "Your password has been set.  You may go ahead and log in now."
+msgstr "Teie salasõna on määratud. Võite nüüd sisse logida."
+
+msgid "Password reset confirmation"
+msgstr "Uue salasõna loomise kinnitamine"
+
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr ""
+"Palun sisestage uus salasõna kaks korda, et saaksime veenduda, et "
+"sisestamisel ei tekkinud vigu."
+
+msgid "New password:"
+msgstr "Uus salasõna:"
+
+msgid "Confirm password:"
+msgstr "Kinnita salasõna:"
+
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr ""
+"Uue salasõna loomise link ei olnud korrektne. Võimalik, et seda on varem "
+"kasutatud. Esitage uue salasõna taotlus uuesti."
+
+msgid ""
+"We’ve emailed you instructions for setting your password, if an account "
+"exists with the email you entered. You should receive them shortly."
+msgstr ""
+"Saatsime teile meilile parooli muutmise juhendi. Kui teie poolt sisestatud e-"
+"posti aadressiga konto on olemas, siis jõuab kiri peagi kohale."
+
+msgid ""
+"If you don’t receive an email, please make sure you’ve entered the address "
+"you registered with, and check your spam folder."
+msgstr ""
+"Kui te ei saa kirja kätte siis veenduge, et sisestasite just selle e-posti "
+"aadressi, millega registreerisite. Kontrollige ka oma rämpsposti kausta."
+
+#, python-format
+msgid ""
+"You're receiving this email because you requested a password reset for your "
+"user account at %(site_name)s."
+msgstr ""
+"Saite käesoleva kirja kuna soovisite muuta lehel %(site_name)s oma "
+"kasutajakontoga seotud parooli."
+
+msgid "Please go to the following page and choose a new password:"
+msgstr "Palun minge järmisele lehele ning sisestage uus salasõna"
+
+msgid "Your username, in case you’ve forgotten:"
+msgstr "Teie kasutajatunnus juhuks, kui olete unustanud:"
+
+msgid "Thanks for using our site!"
+msgstr "Täname meie lehte külastamast!"
+
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "%(site_name)s meeskond"
+
+msgid ""
+"Forgotten your password? Enter your email address below, and we’ll email "
+"instructions for setting a new one."
+msgstr ""
+"Unustasite oma salasõna? Sisestage oma e-posti aadress ja saadame meilile "
+"juhised uue saamiseks."
+
+msgid "Email address:"
+msgstr "E-posti aadress:"
+
+msgid "Reset my password"
+msgstr "Lähtesta mu parool"
+
+msgid "Select all objects on this page for an action"
+msgstr "Vali toiminguks kõik objektid sellel lehel"
+
+msgid "All dates"
+msgstr "Kõik kuupäevad"
+
+#, python-format
+msgid "Select %s"
+msgstr "Vali %s"
+
+#, python-format
+msgid "Select %s to change"
+msgstr "Vali %s mida muuta"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "Vali %s vaatamiseks"
+
+msgid "Date:"
+msgstr "Kuupäev:"
+
+msgid "Time:"
+msgstr "Aeg:"
+
+msgid "Lookup"
+msgstr "Otsi"
+
+msgid "Currently:"
+msgstr "Hetkel:"
+
+msgid "Change:"
+msgstr "Muuda:"

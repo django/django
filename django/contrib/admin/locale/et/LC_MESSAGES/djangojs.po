@@ -1,0 +1,329 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# eallik <eallik@gmail.com>, 2011
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Janno Liivak <jannolii@gmail.com>, 2013-2015
+# Martin <martinpajuste@gmail.com>, 2021,2023
+# Martin <martinpajuste@gmail.com>, 2016,2020
+# Ragnar Rebase <rrebase@gmail.com>, 2019
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-09-18 15:04-0300\n"
+"PO-Revision-Date: 2023-12-04 07:59+0000\n"
+"Last-Translator: Martin <martinpajuste@gmail.com>, 2021,2023\n"
+"Language-Team: Estonian (http://app.transifex.com/django/django/language/"
+"et/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: et\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, javascript-format
+msgid "Available %s"
+msgstr "Saadaval %s"
+
+#, javascript-format
+msgid ""
+"This is the list of available %s. You may choose some by selecting them in "
+"the box below and then clicking the \"Choose\" arrow between the two boxes."
+msgstr ""
+"Nimekiri välja \"%s\" võimalikest väärtustest. Saad valida ühe või mitu "
+"kirjet allolevast kastist ning vajutades noolt \"Vali\" liigutada neid ühest "
+"kastist teise."
+
+#, javascript-format
+msgid "Type into this box to filter down the list of available %s."
+msgstr "Filtreeri selle kasti abil välja \"%s\" nimekirja."
+
+msgid "Filter"
+msgstr "Filter"
+
+msgid "Choose all"
+msgstr "Vali kõik"
+
+#, javascript-format
+msgid "Click to choose all %s at once."
+msgstr "Kliki, et valida kõik %s korraga."
+
+msgid "Choose"
+msgstr "Vali"
+
+msgid "Remove"
+msgstr "Eemalda"
+
+#, javascript-format
+msgid "Chosen %s"
+msgstr "Valitud %s"
+
+#, javascript-format
+msgid ""
+"This is the list of chosen %s. You may remove some by selecting them in the "
+"box below and then clicking the \"Remove\" arrow between the two boxes."
+msgstr ""
+"Nimekiri välja \"%s\" valitud väärtustest. Saad valida ühe või mitu kirjet "
+"allolevast kastist ning vajutades noolt \"Eemalda\" liigutada neid ühest "
+"kastist teise."
+
+#, javascript-format
+msgid "Type into this box to filter down the list of selected %s."
+msgstr "Filtreeri selle kasti abil valitud \"%s\" nimekirja."
+
+msgid "Remove all"
+msgstr "Eemalda kõik"
+
+#, javascript-format
+msgid "Click to remove all chosen %s at once."
+msgstr "Kliki, et eemaldada kõik valitud %s korraga."
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] "%s valik ei ole nähtaval"
+msgstr[1] "%s valikut ei ole nähtaval"
+
+msgid "%(sel)s of %(cnt)s selected"
+msgid_plural "%(sel)s of %(cnt)s selected"
+msgstr[0] "%(sel)s  %(cnt)sst valitud"
+msgstr[1] "%(sel)s  %(cnt)sst valitud"
+
+msgid ""
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
+msgstr ""
+"Muudetavates lahtrites on salvestamata muudatusi. Kui sooritate mõne "
+"toimingu, lähevad salvestamata muudatused kaotsi."
+
+msgid ""
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
+"action."
+msgstr ""
+"Valisite toimingu, kuid pole salvestanud muudatusi lahtrites. Salvestamiseks "
+"palun vajutage OK. Peate toimingu uuesti käivitama."
+
+msgid ""
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
+"button."
+msgstr ""
+"Valisite toimingu, kuid ei muutnud ühtegi lahtrit. Tõenäoliselt otsite Mine "
+"mitte Salvesta nuppu."
+
+msgid "Now"
+msgstr "Praegu"
+
+msgid "Midnight"
+msgstr "Kesköö"
+
+msgid "6 a.m."
+msgstr "6 hommikul"
+
+msgid "Noon"
+msgstr "Keskpäev"
+
+msgid "6 p.m."
+msgstr "6 õhtul"
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "Märkus: Olete %s tund serveri ajast ees."
+msgstr[1] "Märkus: Olete %s tundi serveri ajast ees."
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "Märkus: Olete %s tund serveri ajast maas."
+msgstr[1] "Märkus: Olete %s tundi serveri ajast maas."
+
+msgid "Choose a Time"
+msgstr "Vali aeg"
+
+msgid "Choose a time"
+msgstr "Vali aeg"
+
+msgid "Cancel"
+msgstr "Tühista"
+
+msgid "Today"
+msgstr "Täna"
+
+msgid "Choose a Date"
+msgstr "Vali kuupäev"
+
+msgid "Yesterday"
+msgstr "Eile"
+
+msgid "Tomorrow"
+msgstr "Homme"
+
+msgid "January"
+msgstr "jaanuar"
+
+msgid "February"
+msgstr "veebruar"
+
+msgid "March"
+msgstr "märts"
+
+msgid "April"
+msgstr "aprill"
+
+msgid "May"
+msgstr "mai"
+
+msgid "June"
+msgstr "juuni"
+
+msgid "July"
+msgstr "juuli"
+
+msgid "August"
+msgstr "august"
+
+msgid "September"
+msgstr "september"
+
+msgid "October"
+msgstr "oktoober"
+
+msgid "November"
+msgstr "november"
+
+msgid "December"
+msgstr "detsember"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "jaan"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "veebr"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "märts"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "apr"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "mai"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "juuni"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "juuli"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "aug"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "sept"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "okt"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "nov"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "dets"
+
+msgid "Sunday"
+msgstr "pühapäev"
+
+msgid "Monday"
+msgstr "esmaspäev"
+
+msgid "Tuesday"
+msgstr "teisipäev"
+
+msgid "Wednesday"
+msgstr "kolmapäev"
+
+msgid "Thursday"
+msgstr "neljapäev"
+
+msgid "Friday"
+msgstr "reede"
+
+msgid "Saturday"
+msgstr "laupäev"
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr "pühap."
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr "esmasp."
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr "teisip."
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr "kolmap."
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr "neljap."
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr "reede"
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr "laup."
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr "P"
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr "E"
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr "T"
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr "K"
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr "N"
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr "R"
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr "L"
+
+msgid "Show"
+msgstr "Näita"
+
+msgid "Hide"
+msgstr "Varja"

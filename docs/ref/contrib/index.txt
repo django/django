@@ -1,0 +1,141 @@
+====================
+``contrib`` packages
+====================
+
+Django aims to follow Python's :ref:`"batteries included" philosophy
+<tut-batteries-included>`. It ships with a variety of extra, optional tools
+that solve common web development problems.
+
+This code lives in :source:`django/contrib` in the Django distribution. This document
+gives a rundown of the packages in ``contrib``, along with any dependencies
+those packages have.
+
+.. admonition:: Including ``contrib`` packages in ``INSTALLED_APPS``
+
+    For most of these add-ons -- specifically, the add-ons that include either
+    models or template tags -- you'll need to add the package name (e.g.,
+    ``'django.contrib.redirects'``) to your :setting:`INSTALLED_APPS` setting
+    and rerun ``manage.py migrate``.
+
+.. toctree::
+   :maxdepth: 1
+
+   admin/index
+   auth
+   contenttypes
+   flatpages
+   gis/index
+   humanize
+   messages
+   postgres/index
+   redirects
+   sitemaps
+   sites
+   staticfiles
+   syndication
+
+``admin``
+=========
+
+The automatic Django administrative interface. For more information, see
+:doc:`Tutorial 2 </intro/tutorial02>` and the
+:doc:`admin documentation </ref/contrib/admin/index>`.
+
+Requires the auth_ and contenttypes_ contrib packages to be installed.
+
+``auth``
+========
+
+Django's authentication framework.
+
+See :doc:`/topics/auth/index`.
+
+``contenttypes``
+================
+
+A light framework for hooking into "types" of content, where each installed
+Django model is a separate content type.
+
+See the :doc:`contenttypes documentation </ref/contrib/contenttypes>`.
+
+``flatpages``
+=============
+
+A framework for managing "flat" HTML content in a database.
+
+See the :doc:`flatpages documentation </ref/contrib/flatpages>`.
+
+Requires the sites_ contrib package to be installed as well.
+
+``gis``
+=======
+
+A world-class geospatial framework built on top of Django, that enables
+storage, manipulation and display of spatial data.
+
+See the :doc:`/ref/contrib/gis/index` documentation for more.
+
+``humanize``
+============
+
+A set of Django template filters useful for adding a "human touch" to data.
+
+See the :doc:`humanize documentation </ref/contrib/humanize>`.
+
+``messages``
+============
+
+A framework for storing and retrieving temporary cookie- or session-based
+messages
+
+See the :doc:`messages documentation </ref/contrib/messages>`.
+
+``postgres``
+============
+
+A collection of PostgreSQL specific features.
+
+See the :doc:`contrib.postgres documentation </ref/contrib/postgres/index>`.
+
+``redirects``
+=============
+
+A framework for managing redirects.
+
+See the :doc:`redirects documentation </ref/contrib/redirects>`.
+
+``sessions``
+============
+
+A framework for storing data in anonymous sessions.
+
+See the :doc:`sessions documentation </topics/http/sessions>`.
+
+``sites``
+=========
+
+A light framework that lets you operate multiple websites off of the same
+database and Django installation. It gives you hooks for associating objects to
+one or more sites.
+
+See the :doc:`sites documentation </ref/contrib/sites>`.
+
+``sitemaps``
+============
+
+A framework for generating Google sitemap XML files.
+
+See the :doc:`sitemaps documentation </ref/contrib/sitemaps>`.
+
+``syndication``
+===============
+
+A framework for generating syndication feeds, in RSS and Atom, quite easily.
+
+See the :doc:`syndication documentation </ref/contrib/syndication>`.
+
+Other add-ons
+=============
+
+If you have an idea for functionality to include in ``contrib``, let us know!
+Code it up, and post it to the |django-users| mailing list.

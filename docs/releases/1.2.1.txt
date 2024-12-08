@@ -1,0 +1,8 @@
+==========================
+Django 1.2.1 release notes
+==========================
+
+Django 1.2.1 was released almost immediately after 1.2.0 to correct two small
+bugs: one was in the documentation packaging script, the other was a
+:ticket:`bug <13560>` that affected datetime form field widgets when
+localization was enabled.

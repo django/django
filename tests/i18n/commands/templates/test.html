@@ -1,0 +1,110 @@
+{% load i18n %}
+{% comment %}Translators: Django comment block for translators
+string's meaning unveiled
+{% endcomment %}
+{% translate "This literal should be included." %}
+{% translate "This literal should also be included wrapped or not wrapped depending on the use of the --no-wrap option." %}
+
+{% comment %}Some random comment
+Some random comment
+Translators: One-line translator comment #1
+{% endcomment %}
+{% translate "Translatable literal #1a" %}
+
+{% comment %}Some random comment
+Some random comment
+Translators: Two-line translator comment #1
+continued here.
+{% endcomment %}
+{% translate "Translatable literal #1b" %}
+
+{% comment %}Some random comment
+Translators: One-line translator comment #2
+{% endcomment %}
+{% translate "Translatable literal #2a" %}
+
+{% comment %}Some random comment
+Translators: Two-line translator comment #2
+continued here.
+{% endcomment %}
+{% translate "Translatable literal #2b" %}
+
+{% comment %}
+    Translators: One-line translator comment #3
+{% endcomment %}
+{% translate "Translatable literal #3a" %}
+
+{% comment %}
+Translators: Two-line translator comment #3
+continued here.
+{% endcomment %}
+{% translate "Translatable literal #3b" %}
+
+{% comment %} Translators: One-line translator comment #4{% endcomment %}
+{% translate "Translatable literal #4a" %}
+
+{% comment %}  Translators: Two-line translator comment #4
+continued here.{% endcomment %}
+{% translate "Translatable literal #4b" %}
+
+{% comment %} Translators: One-line translator comment #5 -- with non ASCII characters: áéíóúö{% endcomment %}
+{% translate "Translatable literal #5a" %}
+
+{% comment %}  Translators: Two-line translator comment #5 -- with non ASCII characters: áéíóúö
+continued here.{% endcomment %}
+{% translate "Translatable literal #6b" %}
+
+{% translate "Translatable literal #7a" context "Special trans context #1" %}
+{% translate "Translatable literal #7b" as var context "Special trans context #2" %}
+{% translate "Translatable literal #7c" context "Special trans context #3" as var %}
+
+{% translate "Translatable literal #7.1a" | upper context "context #7.1a" %}
+{% translate "Translatable literal #7.1b" |upper as var context "context #7.1b" %}
+{% translate "Translatable literal #7.1c"| upper context "context #7.1c" as var %}
+
+{% translate "Translatable literal #7.1d"|add:" foo" context "context #7.1d" %}
+{% translate "Translatable literal #7.1e"|add:' ûè本' as var context "context #7.1e" %}
+{% with foo=" foo" %}
+    {% translate "Translatable literal #7.1f"|add:foo context "context #7.1f" as var %}
+{% endwith %}
+{% translate "Translatable literal #7.1g"|add:2 context "context #7.1g" as var %}
+{% translate "Translatable literal #7.1h" | add:"foo" | add:2 context "context #7.1h" as var %}
+
+<!-- Source file inside a msgid, should be left as-is. -->
+{% translate "#: templates/test.html.py" %}
+<!-- Deliberate duplicated string. -->
+{% translate "This literal should be included." %}
+
+{% blocktranslate context "Special blocktranslate context #1" %}Translatable literal #8a{% endblocktranslate %}
+{% blocktranslate count 2 context "Special blocktranslate context #2" %}Translatable literal #8b-singular{% plural %}Translatable literal #8b-plural{% endblocktranslate %}
+{% blocktranslate context "Special blocktranslate context #3" count 2 %}Translatable literal #8c-singular{% plural %}Translatable literal #8c-plural{% endblocktranslate %}
+{% blocktranslate with a=1 context "Special blocktranslate context #4" %}Translatable literal #8d {{ a }}{% endblocktranslate %}
+
+{% translate "Translatable literal with context wrapped in single quotes" context 'Context wrapped in single quotes' as var %}
+{% translate "Translatable literal with context wrapped in double quotes" context "Context wrapped in double quotes" as var %}
+{% blocktranslate context 'Special blocktranslate context wrapped in single quotes' %}Translatable literal with context wrapped in single quotes{% endblocktranslate %}
+{% blocktranslate context "Special blocktranslate context wrapped in double quotes" %}Translatable literal with context wrapped in double quotes{% endblocktranslate %}
+
+{# Backwards compatibility tests #}
+{% blocktrans %}blocktrans text{% endblocktrans %}
+{% trans "trans text" %}
+
+{# BasicExtractorTests.test_blocktranslate_trimmed #}
+{% blocktranslate %}
+  Text with a few
+  line breaks.
+{% endblocktranslate %}
+{% blocktranslate trimmed %}
+  Again some text with a few
+  line breaks, this time
+  should be trimmed.
+{% endblocktranslate %}
+{% translate "Get my line number" %}
+
+{% blocktranslate trimmed count counter=mylist|length %}
+First `translate`, then `blocktranslate` with a plural
+{% plural %}
+Plural for a `translate` and `blocktranslate` collision case
+{% endblocktranslate %}
+
+{% translate "Non-breaking space :" %}

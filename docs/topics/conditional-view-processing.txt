@@ -1,0 +1,218 @@
+===========================
+Conditional View Processing
+===========================
+
+HTTP clients can send a number of headers to tell the server about copies of a
+resource that they have already seen. This is commonly used when retrieving a
+web page (using an HTTP ``GET`` request) to avoid sending all the data for
+something the client has already retrieved. However, the same headers can be
+used for all HTTP methods (``POST``, ``PUT``, ``DELETE``, etc.).
+
+For each page (response) that Django sends back from a view, it might provide
+two HTTP headers: the ``ETag`` header and the ``Last-Modified`` header. These
+headers are optional on HTTP responses. They can be set by your view function,
+or you can rely on the :class:`~django.middleware.http.ConditionalGetMiddleware`
+middleware to set the ``ETag`` header.
+
+When the client next requests the same resource, it might send along a header
+such as either :rfc:`If-Modified-Since <9110#section-13.1.3>` or
+:rfc:`If-Unmodified-Since <9110#section-13.1.4>`, containing the date of the
+last modification time it was sent, or either :rfc:`If-Match
+<9110#section-13.1.1>` or :rfc:`If-None-Match <9110#section-13.1.2>`,
+containing the last ``ETag`` it was sent. If the current version of the page
+matches the ``ETag`` sent by the client, or if the resource has not been
+modified, a 304 status code can be sent back, instead of a full response,
+telling the client that nothing has changed.  Depending on the header, if the
+page has been modified or does not match the ``ETag`` sent by the client, a 412
+status code (Precondition Failed) may be returned.
+
+When you need more fine-grained control you may use per-view conditional
+processing functions.
+
+.. _conditional-decorators:
+
+The ``condition`` decorator
+===========================
+
+Sometimes (in fact, quite often) you can create functions to rapidly compute
+the :rfc:`ETag <9110#section-8.8.3>` value or the last-modified time for a
+resource, **without** needing to do all the computations needed to construct
+the full view. Django can then use these functions to provide an
+"early bailout" option for the view processing. Telling the client that the
+content has not been modified since the last request, perhaps.
+
+These two functions are passed as parameters to the
+``django.views.decorators.http.condition`` decorator. This decorator uses
+the two functions (you only need to supply one, if you can't compute both
+quantities easily and quickly) to work out if the headers in the HTTP request
+match those on the resource. If they don't match, a new copy of the resource
+must be computed and your normal view is called.
+
+The ``condition`` decorator's signature looks like this::
+
+    condition(etag_func=None, last_modified_func=None)
+
+The two functions, to compute the ETag and the last modified time, will be
+passed the incoming ``request`` object and the same parameters, in the same
+order, as the view function they are helping to wrap. The function passed
+``last_modified_func`` should return a standard datetime value specifying the
+last time the resource was modified, or ``None`` if the resource doesn't
+exist. The function passed to the ``etag`` decorator should return a string
+representing the :rfc:`ETag <9110#section-8.8.3>` for the resource, or ``None``
+if it doesn't exist.
+
+The decorator sets the ``ETag`` and ``Last-Modified`` headers on the response
+if they are not already set by the view and if the request's method is safe
+(``GET`` or ``HEAD``).
+
+Using this feature usefully is probably best explained with an example.
+Suppose you have this pair of models, representing a small blog system::
+
+    import datetime
+    from django.db import models
+
+
+    class Blog(models.Model): ...
+
+
+    class Entry(models.Model):
+        blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
+        published = models.DateTimeField(default=datetime.datetime.now)
+        ...
+
+If the front page, displaying the latest blog entries, only changes when you
+add a new blog entry, you can compute the last modified time very quickly. You
+need the latest ``published`` date for every entry associated with that blog.
+One way to do this would be::
+
+    def latest_entry(request, blog_id):
+        return Entry.objects.filter(blog=blog_id).latest("published").published
+
+You can then use this function to provide early detection of an unchanged page
+for your front page view::
+
+    from django.views.decorators.http import condition
+
+
+    @condition(last_modified_func=latest_entry)
+    def front_page(request, blog_id): ...
+
+.. admonition:: Be careful with the order of decorators
+
+    When ``condition()`` returns a conditional response, any decorators below
+    it will be skipped and won't apply to the response. Therefore, any
+    decorators that need to apply to both the regular view response and a
+    conditional response must be above ``condition()``. In particular,
+    :func:`~django.views.decorators.vary.vary_on_cookie`,
+    :func:`~django.views.decorators.vary.vary_on_headers`, and
+    :func:`~django.views.decorators.cache.cache_control` should come first
+    because :rfc:`RFC 9110 <9110#section-15.4.5>` requires that the headers
+    they set be present on 304 responses.
+
+Shortcuts for only computing one value
+======================================
+
+As a general rule, if you can provide functions to compute *both* the ETag and
+the last modified time, you should do so. You don't know which headers any
+given HTTP client will send you, so be prepared to handle both. However,
+sometimes only one value is easy to compute and Django provides decorators
+that handle only ETag or only last-modified computations.
+
+The ``django.views.decorators.http.etag`` and
+``django.views.decorators.http.last_modified`` decorators are passed the same
+type of functions as the ``condition`` decorator. Their signatures are::
+
+    etag(etag_func)
+    last_modified(last_modified_func)
+
+We could write the earlier example, which only uses a last-modified function,
+using one of these decorators::
+
+    @last_modified(latest_entry)
+    def front_page(request, blog_id): ...
+
+...or::
+
+    def front_page(request, blog_id): ...
+
+
+    front_page = last_modified(latest_entry)(front_page)
+
+Use ``condition`` when testing both conditions
+----------------------------------------------
+
+It might look nicer to some people to try and chain the ``etag`` and
+``last_modified`` decorators if you want to test both preconditions. However,
+this would lead to incorrect behavior.
+
+::
+
+    # Bad code. Don't do this!
+    @etag(etag_func)
+    @last_modified(last_modified_func)
+    def my_view(request): ...
+
+
+    # End of bad code.
+
+The first decorator doesn't know anything about the second and might
+answer that the response is not modified even if the second decorators would
+determine otherwise. The ``condition`` decorator uses both callback functions
+simultaneously to work out the right action to take.
+
+Using the decorators with other HTTP methods
+============================================
+
+The ``condition`` decorator is useful for more than only ``GET`` and
+``HEAD`` requests (``HEAD`` requests are the same as ``GET`` in this
+situation). It can also be used to provide checking for ``POST``,
+``PUT`` and ``DELETE`` requests. In these situations, the idea isn't to return
+a "not modified" response, but to tell the client that the resource they are
+trying to change has been altered in the meantime.
+
+For example, consider the following exchange between the client and server:
+
+#. Client requests ``/foo/``.
+#. Server responds with some content with an ETag of ``"abcd1234"``.
+#. Client sends an HTTP ``PUT`` request to ``/foo/`` to update the
+   resource. It also sends an ``If-Match: "abcd1234"`` header to specify
+   the version it is trying to update.
+#. Server checks to see if the resource has changed, by computing the ETag
+   the same way it does for a ``GET`` request (using the same function).
+   If the resource *has* changed, it will return a 412 status code,
+   meaning "precondition failed".
+#. Client sends a ``GET`` request to ``/foo/``, after receiving a 412
+   response, to retrieve an updated version of the content before updating
+   it.
+
+The important thing this example shows is that the same functions can be used
+to compute the ETag and last modification values in all situations. In fact,
+you **should** use the same functions, so that the same values are returned
+every time.
+
+.. admonition:: Validator headers with non-safe request methods
+
+    The ``condition`` decorator only sets validator headers (``ETag`` and
+    ``Last-Modified``) for safe HTTP methods, i.e. ``GET`` and ``HEAD``. If you
+    wish to return them in other cases, set them in your view. See
+    :rfc:`9110#section-9.3.4` to learn about the distinction between setting a
+    validator header in response to requests made with ``PUT`` versus ``POST``.
+
+Comparison with middleware conditional processing
+=================================================
+
+Django provides conditional ``GET`` handling via
+:class:`django.middleware.http.ConditionalGetMiddleware`. While being suitable
+for many situations, the middleware has limitations for advanced usage:
+
+* It's applied globally to all views in your project.
+* It doesn't save you from generating the response, which may be expensive.
+* It's only appropriate for HTTP ``GET`` requests.
+
+You should choose the most appropriate tool for your particular problem here.
+If you have a way to compute ETags and modification times quickly and if some
+view takes a while to generate the content, you should consider using the
+``condition`` decorator described in this document. If everything already runs
+fairly quickly, stick to using the middleware and the amount of network
+traffic sent back to the clients will still be reduced if the view hasn't
+changed.

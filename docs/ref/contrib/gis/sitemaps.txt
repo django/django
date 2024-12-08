@@ -1,0 +1,22 @@
+===================
+Geographic Sitemaps
+===================
+
+KML is an XML language focused on geographic visualization [#]_. ``KMLSitemap``
+and its compressed counterpart ``KMZSitemap`` allow you to present geolocated
+data in a machine-readable format.
+
+Example
+=======
+
+Reference
+=========
+
+``KMLSitemap``
+--------------
+
+``KMZSitemap``
+--------------
+
+.. rubric:: Footnotes
+.. [#] https://www.ogc.org/standard/kml/

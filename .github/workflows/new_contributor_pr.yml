@@ -1,0 +1,27 @@
+name: New contributor message
+
+on:
+  pull_request_target:
+    types: [opened]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  build:
+    name: Hello new contributor
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/first-interaction@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          pr-message: |
+            Hello! Thank you for your contribution 💪
+
+            As it's your first contribution be sure to check out the [patch review checklist](https://docs.djangoproject.com/en/dev/internals/contributing/writing-code/submitting-patches/#patch-review-checklist).
+
+            If you're fixing a ticket [from Trac](https://code.djangoproject.com/) make sure to set the _"Has patch"_ flag and include a link to this PR in the ticket!
+
+            If you have any design or process questions then you can ask in the [Django forum](https://forum.djangoproject.com/c/internals/5).
+
+            Welcome aboard ⛵️!

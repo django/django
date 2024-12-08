@@ -1,0 +1,83 @@
+==========================
+Django 3.2.1 release notes
+==========================
+
+*May 4, 2021*
+
+Django 3.2.1 fixes a security issue and several bugs in 3.2.
+
+CVE-2021-31542: Potential directory-traversal via uploaded files
+================================================================
+
+``MultiPartParser``, ``UploadedFile``, and ``FieldFile`` allowed
+directory-traversal via uploaded files with suitably crafted file names.
+
+In order to mitigate this risk, stricter basename and path sanitation is now
+applied.
+
+Bugfixes
+========
+
+* Corrected detection of GDAL 3.2 on Windows (:ticket:`32544`).
+
+* Fixed a bug in Django 3.2 where subclasses of ``BigAutoField`` and
+  ``SmallAutoField`` were not allowed for the :setting:`DEFAULT_AUTO_FIELD`
+  setting (:ticket:`32620`).
+
+* Fixed a regression in Django 3.2 that caused a crash of
+  ``QuerySet.values()/values_list()`` after ``QuerySet.union()``,
+  ``intersection()``, and ``difference()`` when it was ordered by an
+  unannotated field (:ticket:`32627`).
+
+* Restored, following a regression in Django 3.2, displaying an exception
+  message on the technical 404 debug page (:ticket:`32637`).
+
+* Fixed a bug in Django 3.2 where a system check would crash on a reverse
+  one-to-one relationships in ``CheckConstraint.check`` or
+  ``UniqueConstraint.condition`` (:ticket:`32635`).
+
+* Fixed a regression in Django 3.2 that caused a crash of
+  :attr:`.ModelAdmin.search_fields` when searching against phrases with
+  unbalanced quotes (:ticket:`32649`).
+
+* Fixed a bug in Django 3.2 where variable lookup errors were logged rendering
+  the sitemap template if alternates were not defined (:ticket:`32648`).
+
+* Fixed a regression in Django 3.2 that caused a crash when combining ``Q()``
+  objects which contains boolean expressions (:ticket:`32548`).
+
+* Fixed a regression in Django 3.2 that caused a crash of ``QuerySet.update()``
+  on a queryset ordered by inherited or joined fields on MySQL and MariaDB
+  (:ticket:`32645`).
+
+* Fixed a regression in Django 3.2 that caused a crash when decoding a cookie
+  value, used by ``django.contrib.messages.storage.cookie.CookieStorage``, in
+  the pre-Django 3.2 format (:ticket:`32643`).
+
+* Fixed a regression in Django 3.2 that stopped the shift-key modifier
+  selecting multiple rows in the admin changelist (:ticket:`32647`).
+
+* Fixed a bug in Django 3.2 where a system check would crash on the
+  :setting:`STATICFILES_DIRS` setting with a list of 2-tuples of
+  ``(prefix, path)`` (:ticket:`32665`).
+
+* Fixed a long standing bug involving queryset bitwise combination when used
+  with subqueries that began manifesting in Django 3.2, due to a separate fix
+  using ``Exists`` to ``exclude()`` multi-valued relationships
+  (:ticket:`32650`).
+
+* Fixed a bug in Django 3.2 where variable lookup errors were logged when
+  rendering some admin templates (:ticket:`32681`).
+
+* Fixed a bug in Django 3.2 where an admin changelist would crash when deleting
+  objects filtered against multi-valued relationships (:ticket:`32682`). The
+  admin changelist now uses ``Exists()`` instead of ``QuerySet.distinct()``
+  because calling ``delete()`` after ``distinct()`` is not allowed in Django
+  3.2 to address a data loss possibility.
+
+* Fixed a regression in Django 3.2 where the calling process environment would
+  not be passed to the ``dbshell`` command on PostgreSQL (:ticket:`32687`).
+
+* Fixed a performance regression in Django 3.2 when building complex filters
+  with subqueries (:ticket:`32632`). As a side-effect the private API to check
+  ``django.db.sql.query.Query`` equality is removed.

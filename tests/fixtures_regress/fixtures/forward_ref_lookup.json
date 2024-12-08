@@ -1,0 +1,34 @@
+[
+    {
+        "pk": "4",
+        "model": "fixtures_regress.person",
+        "fields": {
+            "name": "Neal Stephenson"
+        }
+    },
+    {
+        "pk": "2",
+        "model": "fixtures_regress.store",
+        "fields": {
+            "main": null,
+            "name": "Amazon"
+        }
+    },
+    {
+        "pk": "3",
+        "model": "fixtures_regress.store",
+        "fields": {
+            "main": null,
+            "name": "Borders"
+        }
+    },
+    {
+        "pk": 1,
+        "model": "fixtures_regress.book",
+        "fields": {
+            "name": "Cryptonomicon",
+            "author": ["Neal Stephenson"],
+            "stores": [["Amazon"], ["Borders"]]
+        }
+    }
+]

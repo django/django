@@ -1,0 +1,344 @@
+=================
+Django Exceptions
+=================
+
+Django raises some of its own exceptions as well as standard Python exceptions.
+
+Django Core Exceptions
+======================
+
+.. module:: django.core.exceptions
+    :synopsis: Django core exceptions
+
+Django core exception classes are defined in ``django.core.exceptions``.
+
+``AppRegistryNotReady``
+-----------------------
+
+.. exception:: AppRegistryNotReady
+
+    This exception is raised when attempting to use models before the :ref:`app
+    loading process <app-loading-process>`, which initializes the ORM, is
+    complete.
+
+``ObjectDoesNotExist``
+----------------------
+
+.. exception:: ObjectDoesNotExist
+
+    The base class for :exc:`Model.DoesNotExist
+    <django.db.models.Model.DoesNotExist>` exceptions. A ``try/except`` for
+    ``ObjectDoesNotExist`` will catch
+    :exc:`~django.db.models.Model.DoesNotExist` exceptions for all models.
+
+    See :meth:`~django.db.models.query.QuerySet.get()`.
+
+``EmptyResultSet``
+------------------
+
+.. exception:: EmptyResultSet
+
+    ``EmptyResultSet`` may be raised during query generation if a query won't
+    return any results. Most Django projects won't encounter this exception,
+    but it might be useful for implementing custom lookups and expressions.
+
+``FullResultSet``
+-----------------
+
+.. exception:: FullResultSet
+
+    ``FullResultSet`` may be raised during query generation if a query will
+    match everything. Most Django projects won't encounter this exception, but
+    it might be useful for implementing custom lookups and expressions.
+
+``FieldDoesNotExist``
+---------------------
+
+.. exception:: FieldDoesNotExist
+
+    The ``FieldDoesNotExist`` exception is raised by a model's
+    ``_meta.get_field()`` method when the requested field does not exist on the
+    model or on the model's parents.
+
+``MultipleObjectsReturned``
+---------------------------
+
+.. exception:: MultipleObjectsReturned
+
+    The base class for :exc:`Model.MultipleObjectsReturned
+    <django.db.models.Model.MultipleObjectsReturned>` exceptions. A
+    ``try/except`` for ``MultipleObjectsReturned`` will catch
+    :exc:`~django.db.models.Model.MultipleObjectsReturned` exceptions for all
+    models.
+
+    See :meth:`~django.db.models.query.QuerySet.get()`.
+
+``SuspiciousOperation``
+-----------------------
+
+.. exception:: SuspiciousOperation
+
+    The :exc:`SuspiciousOperation` exception is raised when a user has
+    performed an operation that should be considered suspicious from a security
+    perspective, such as tampering with a session cookie. Subclasses of
+    ``SuspiciousOperation`` include:
+
+    * ``DisallowedHost``
+    * ``DisallowedModelAdminLookup``
+    * ``DisallowedModelAdminToField``
+    * ``DisallowedRedirect``
+    * ``InvalidSessionKey``
+    * ``RequestDataTooBig``
+    * ``SuspiciousFileOperation``
+    * ``SuspiciousMultipartForm``
+    * ``SuspiciousSession``
+    * ``TooManyFieldsSent``
+    * ``TooManyFilesSent``
+
+    If a ``SuspiciousOperation`` exception reaches the ASGI/WSGI handler level
+    it is logged at the ``Error`` level and results in
+    a :class:`~django.http.HttpResponseBadRequest`. See the :doc:`logging
+    documentation </topics/logging/>` for more information.
+
+``PermissionDenied``
+--------------------
+
+.. exception:: PermissionDenied
+
+    The :exc:`PermissionDenied` exception is raised when a user does not have
+    permission to perform the action requested.
+
+``ViewDoesNotExist``
+--------------------
+
+.. exception:: ViewDoesNotExist
+
+    The :exc:`ViewDoesNotExist` exception is raised by
+    :mod:`django.urls` when a requested view does not exist.
+
+``MiddlewareNotUsed``
+---------------------
+
+.. exception:: MiddlewareNotUsed
+
+    The :exc:`MiddlewareNotUsed` exception is raised when a middleware is not
+    used in the server configuration.
+
+``ImproperlyConfigured``
+------------------------
+
+.. exception:: ImproperlyConfigured
+
+    The :exc:`ImproperlyConfigured` exception is raised when Django is
+    somehow improperly configured -- for example, if a value in ``settings.py``
+    is incorrect or unparseable.
+
+``FieldError``
+--------------
+
+.. exception:: FieldError
+
+    The :exc:`FieldError` exception is raised when there is a problem with a
+    model field. This can happen for several reasons:
+
+    - A field in a model clashes with a field of the same name from an
+      abstract base class
+    - An infinite loop is caused by ordering
+    - A keyword cannot be parsed from the filter parameters
+    - A field cannot be determined from a keyword in the query
+      parameters
+    - A join is not permitted on the specified field
+    - A field name is invalid
+    - A query contains invalid order_by arguments
+
+``ValidationError``
+-------------------
+
+.. exception:: ValidationError
+
+    The :exc:`ValidationError` exception is raised when data fails form or
+    model field validation. For more information about validation, see
+    :doc:`Form and Field Validation </ref/forms/validation>`,
+    :ref:`Model Field Validation <validating-objects>` and the
+    :doc:`Validator Reference </ref/validators>`.
+
+``NON_FIELD_ERRORS``
+~~~~~~~~~~~~~~~~~~~~
+
+.. data:: NON_FIELD_ERRORS
+
+``ValidationError``\s that don't belong to a particular field in a form
+or model are classified as ``NON_FIELD_ERRORS``. This constant is used
+as a key in dictionaries that otherwise map fields to their respective
+list of errors.
+
+``BadRequest``
+--------------
+
+.. exception:: BadRequest
+
+    The :exc:`BadRequest` exception is raised when the request cannot be
+    processed due to a client error. If a ``BadRequest`` exception reaches the
+    ASGI/WSGI handler level it results in a
+    :class:`~django.http.HttpResponseBadRequest`.
+
+``RequestAborted``
+------------------
+
+.. exception:: RequestAborted
+
+    The :exc:`RequestAborted` exception is raised when an HTTP body being read
+    in by the handler is cut off midstream and the client connection closes,
+    or when the client does not send data and hits a timeout where the server
+    closes the connection.
+
+    It is internal to the HTTP handler modules and you are unlikely to see
+    it elsewhere. If you are modifying HTTP handling code, you should raise
+    this when you encounter an aborted request to make sure the socket is
+    closed cleanly.
+
+``SynchronousOnlyOperation``
+----------------------------
+
+.. exception:: SynchronousOnlyOperation
+
+    The :exc:`SynchronousOnlyOperation` exception is raised when code that
+    is only allowed in synchronous Python code is called from an asynchronous
+    context (a thread with a running asynchronous event loop). These parts of
+    Django are generally heavily reliant on thread-safety to function and don't
+    work correctly under coroutines sharing the same thread.
+
+    If you are trying to call code that is synchronous-only from an
+    asynchronous thread, then create a synchronous thread and call it in that.
+    You can accomplish this is with :func:`asgiref.sync.sync_to_async`.
+
+.. currentmodule:: django.urls
+
+URL Resolver exceptions
+=======================
+
+URL Resolver exceptions are defined in ``django.urls``.
+
+``Resolver404``
+---------------
+
+.. exception:: Resolver404
+
+    The :exc:`Resolver404` exception is raised by
+    :func:`~django.urls.resolve()` if the path passed to ``resolve()`` doesn't
+    map to a view. It's a subclass of :class:`django.http.Http404`.
+
+``NoReverseMatch``
+------------------
+
+.. exception:: NoReverseMatch
+
+    The :exc:`NoReverseMatch` exception is raised by :mod:`django.urls` when a
+    matching URL in your URLconf cannot be identified based on the parameters
+    supplied.
+
+.. currentmodule:: django.db
+
+Database Exceptions
+===================
+
+Database exceptions may be imported from ``django.db``.
+
+Django wraps the standard database exceptions so that your Django code has a
+guaranteed common implementation of these classes.
+
+.. exception:: Error
+.. exception:: InterfaceError
+.. exception:: DatabaseError
+.. exception:: DataError
+.. exception:: OperationalError
+.. exception:: IntegrityError
+.. exception:: InternalError
+.. exception:: ProgrammingError
+.. exception:: NotSupportedError
+
+The Django wrappers for database exceptions behave exactly the same as
+the underlying database exceptions. See :pep:`249`, the Python Database API
+Specification v2.0, for further information.
+
+As per :pep:`3134`, a ``__cause__`` attribute is set with the original
+(underlying) database exception, allowing access to any additional
+information provided.
+
+.. exception:: models.ProtectedError
+
+Raised to prevent deletion of referenced objects when using
+:attr:`django.db.models.PROTECT`. :exc:`models.ProtectedError` is a subclass
+of :exc:`IntegrityError`.
+
+.. exception:: models.RestrictedError
+
+Raised to prevent deletion of referenced objects when using
+:attr:`django.db.models.RESTRICT`. :exc:`models.RestrictedError` is a subclass
+of :exc:`IntegrityError`.
+
+.. currentmodule:: django.http
+
+HTTP Exceptions
+===============
+
+HTTP exceptions may be imported from ``django.http``.
+
+``UnreadablePostError``
+-----------------------
+
+.. exception:: UnreadablePostError
+
+    :exc:`UnreadablePostError` is raised when a user cancels an upload.
+
+.. currentmodule:: django.contrib.sessions.exceptions
+
+Sessions Exceptions
+===================
+
+Sessions exceptions are defined in ``django.contrib.sessions.exceptions``.
+
+``SessionInterrupted``
+----------------------
+
+.. exception:: SessionInterrupted
+
+    :exc:`SessionInterrupted` is raised when a session is destroyed in a
+    concurrent request. It's a subclass of
+    :exc:`~django.core.exceptions.BadRequest`.
+
+Transaction Exceptions
+======================
+
+.. currentmodule:: django.db.transaction
+
+Transaction exceptions are defined in ``django.db.transaction``.
+
+``TransactionManagementError``
+------------------------------
+
+.. exception:: TransactionManagementError
+
+    :exc:`TransactionManagementError` is raised for any and all problems
+    related to database transactions.
+
+.. currentmodule:: django.test
+
+Testing Framework Exceptions
+============================
+
+Exceptions provided by the ``django.test`` package.
+
+``RedirectCycleError``
+----------------------
+
+.. exception:: client.RedirectCycleError
+
+    :exc:`~client.RedirectCycleError` is raised when the test client detects a
+    loop or an overly long chain of redirects.
+
+Python Exceptions
+=================
+
+Django raises built-in Python exceptions when appropriate as well. See the
+Python documentation for further information on the :ref:`bltin-exceptions`.

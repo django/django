@@ -1,0 +1,15 @@
+===========================
+Django 2.2.23 release notes
+===========================
+
+*May 13, 2021*
+
+Django 2.2.23 fixes a regression in 2.2.21.
+
+Bugfixes
+========
+
+* Fixed a regression in Django 2.2.21 where saving ``FileField`` would raise a
+  ``SuspiciousFileOperation`` even when a custom
+  :attr:`~django.db.models.FileField.upload_to` returns a valid file path
+  (:ticket:`32718`).

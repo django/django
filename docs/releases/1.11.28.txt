@@ -1,0 +1,13 @@
+============================
+Django 1.11.28 release notes
+============================
+
+*February 3, 2020*
+
+Django 1.11.28 fixes a security issue in 1.11.27.
+
+CVE-2020-7471: Potential SQL injection via ``StringAgg(delimiter)``
+===================================================================
+
+:class:`~django.contrib.postgres.aggregates.StringAgg` aggregation function was
+subject to SQL injection, using a suitably crafted ``delimiter``.

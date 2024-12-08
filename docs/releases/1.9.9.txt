@@ -1,0 +1,15 @@
+==========================
+Django 1.9.9 release notes
+==========================
+
+*August 1, 2016*
+
+Django 1.9.9 fixes several bugs in 1.9.8.
+
+Bugfixes
+========
+
+* Fixed invalid HTML in template postmortem on the debug page
+  (:ticket:`26938`).
+
+* Fixed some GIS database function crashes on MySQL 5.7 (:ticket:`26657`).

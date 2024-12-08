@@ -1,0 +1,757 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Chen Chun-Chia <ccc.larc@gmail.com>, 2015
+# ilay <ilay@ilay.tw>, 2012
+# Jannis Leidel <jannis@leidel.info>, 2011
+# mail6543210 <mail6543210@yahoo.com.tw>, 2013-2014
+# 0a3cb7bfd0810218facdfb511e592a6d_8d19d07 <c136e508049103f37d35b6c3314e9b1d_5225>, 2011
+# tcc <tcchou@tcchou.org>, 2011
+# Tzu-ping Chung <uranusjr@gmail.com>, 2016-2017
+# YAO WEN LIANG, 2024
+# Yeh-Yung <yyc1217@gmail.com>, 2013
+# yubike, 2024
+# Yeh-Yung <yyc1217@gmail.com>, 2012
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 07:05+0000\n"
+"Last-Translator: YAO WEN LIANG, 2024\n"
+"Language-Team: Chinese (Taiwan) (http://app.transifex.com/django/django/"
+"language/zh_TW/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_TW\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "刪除所選的 %(verbose_name_plural)s"
+
+#, python-format
+msgid "Successfully deleted %(count)d %(items)s."
+msgstr "成功的刪除了 %(count)d 個 %(items)s."
+
+#, python-format
+msgid "Cannot delete %(name)s"
+msgstr "無法刪除 %(name)s"
+
+msgid "Are you sure?"
+msgstr "你確定嗎？"
+
+msgid "Administration"
+msgstr "管理"
+
+msgid "All"
+msgstr "全部"
+
+msgid "Yes"
+msgstr "是"
+
+msgid "No"
+msgstr "否"
+
+msgid "Unknown"
+msgstr "未知"
+
+msgid "Any date"
+msgstr "任何日期"
+
+msgid "Today"
+msgstr "今天"
+
+msgid "Past 7 days"
+msgstr "過去 7 天"
+
+msgid "This month"
+msgstr "本月"
+
+msgid "This year"
+msgstr "今年"
+
+msgid "No date"
+msgstr "沒有日期"
+
+msgid "Has date"
+msgstr "有日期"
+
+msgid "Empty"
+msgstr "空的"
+
+msgid "Not empty"
+msgstr "非空的"
+
+#, python-format
+msgid ""
+"Please enter the correct %(username)s and password for a staff account. Note "
+"that both fields may be case-sensitive."
+msgstr "請輸入正確的工作人員帳號%(username)s及密碼。請注意兩者皆區分大小寫。"
+
+msgid "Action:"
+msgstr "動作:"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "新增其它 %(verbose_name)s"
+
+msgid "Remove"
+msgstr "移除"
+
+msgid "Addition"
+msgstr "新增"
+
+msgid "Change"
+msgstr "修改"
+
+msgid "Deletion"
+msgstr "删除"
+
+msgid "action time"
+msgstr "動作時間"
+
+msgid "user"
+msgstr "使用者"
+
+msgid "content type"
+msgstr "內容類型"
+
+msgid "object id"
+msgstr "物件 id"
+
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/library/functions.html#repr)
+msgid "object repr"
+msgstr "物件 repr"
+
+msgid "action flag"
+msgstr "動作旗標"
+
+msgid "change message"
+msgstr "修改訊息"
+
+msgid "log entry"
+msgstr "日誌記錄"
+
+msgid "log entries"
+msgstr "日誌紀錄"
+
+#, python-format
+msgid "Added “%(object)s”."
+msgstr "\"%(object)s\" 已新增。"
+
+#, python-format
+msgid "Changed “%(object)s” — %(changes)s"
+msgstr "\"%(object)s\" - %(changes)s 已修改。"
+
+#, python-format
+msgid "Deleted “%(object)s.”"
+msgstr "\"%(object)s\" 已刪除。"
+
+msgid "LogEntry Object"
+msgstr "日誌記錄物件"
+
+#, python-brace-format
+msgid "Added {name} “{object}”."
+msgstr "{name} \"{object}\" 已新增。"
+
+msgid "Added."
+msgstr "已新增。"
+
+msgid "and"
+msgstr "和"
+
+#, python-brace-format
+msgid "Changed {fields} for {name} “{object}”."
+msgstr "{name} \"{object}\" 的 {fields} 已修改。"
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr "{fields} 已修改。"
+
+#, python-brace-format
+msgid "Deleted {name} “{object}”."
+msgstr "{name} \"{object}\" 已刪除。"
+
+msgid "No fields changed."
+msgstr "沒有欄位被修改。"
+
+msgid "None"
+msgstr "無"
+
+msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
+msgstr "按住 \"Control\", 或者在 Mac 上按 \"Command\", 以選取更多值"
+
+msgid "Select this object for an action - {}"
+msgstr "選擇此對象進行操作 - {}"
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully."
+msgstr "{name} \"{obj}\" 已成功新增。"
+
+msgid "You may edit it again below."
+msgstr "您可以在下面再次編輯它."
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was added successfully. You may add another {name} below."
+msgstr "{name} \"{obj}\" 新增成功。你可以在下方加入其他 {name}。"
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may edit it again below."
+msgstr "{name} \"{obj}\" 修改成功。你可以在下方再次編輯。"
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may add another {name} "
+"below."
+msgstr "{name} \"{obj}\" 修改成功。你可以在下方加入其他 {name}。"
+
+#, python-brace-format
+msgid "The {name} “{obj}” was changed successfully."
+msgstr "成功修改了 {name}“{obj}”。"
+
+msgid ""
+"Items must be selected in order to perform actions on them. No items have "
+"been changed."
+msgstr "必須要有項目被選中才能進行動作。沒有任何項目被修改。"
+
+msgid "No action selected."
+msgstr "沒有動作被選取。"
+
+#, python-format
+msgid "The %(name)s “%(obj)s” was deleted successfully."
+msgstr "成功删除了 %(name)s“%(obj)s”。"
+
+#, python-format
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
+msgstr "不存在 ID 為「%(key)s」的 %(name)s。或許它已被刪除？"
+
+#, python-format
+msgid "Add %s"
+msgstr "新增 %s"
+
+#, python-format
+msgid "Change %s"
+msgstr "修改 %s"
+
+#, python-format
+msgid "View %s"
+msgstr "查看 %s"
+
+msgid "Database error"
+msgstr "資料庫錯誤"
+
+#, python-format
+msgid "%(count)s %(name)s was changed successfully."
+msgid_plural "%(count)s %(name)s were changed successfully."
+msgstr[0] "共 %(count)s %(name)s 已修改成功。"
+
+#, python-format
+msgid "%(total_count)s selected"
+msgid_plural "All %(total_count)s selected"
+msgstr[0] "選取了 %(total_count)s 個"
+
+#, python-format
+msgid "0 of %(cnt)s selected"
+msgstr "%(cnt)s 中 0 個被選取"
+
+#, python-format
+msgid "Change history: %s"
+msgstr "修改歷史: %s"
+
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
+#, python-format
+msgid "%(class_name)s %(instance)s"
+msgstr "%(class_name)s %(instance)s"
+
+#, python-format
+msgid ""
+"Deleting %(class_name)s %(instance)s would require deleting the following "
+"protected related objects: %(related_objects)s"
+msgstr ""
+"刪除 %(class_name)s %(instance)s 將會同時刪除下面受保護的相關物件："
+"%(related_objects)s"
+
+msgid "Django site admin"
+msgstr "Django 網站管理"
+
+msgid "Django administration"
+msgstr "Django 管理"
+
+msgid "Site administration"
+msgstr "網站管理"
+
+msgid "Log in"
+msgstr "登入"
+
+#, python-format
+msgid "%(app)s administration"
+msgstr "%(app)s 管理"
+
+msgid "Page not found"
+msgstr "找不到頁面"
+
+msgid "We’re sorry, but the requested page could not be found."
+msgstr "很抱歉，請求頁面不存在。"
+
+msgid "Home"
+msgstr "首頁"
+
+msgid "Server error"
+msgstr "伺服器錯誤"
+
+msgid "Server error (500)"
+msgstr "伺服器錯誤 (500)"
+
+msgid "Server Error <em>(500)</em>"
+msgstr "伺服器錯誤 <em>(500)</em>"
+
+msgid ""
+"There’s been an error. It’s been reported to the site administrators via "
+"email and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"存在一個錯誤。已透過電子郵件回報給網站管理員，並且應該很快就會被修正。謝謝您"
+"的耐心等待。"
+
+msgid "Run the selected action"
+msgstr "執行選取的動作"
+
+msgid "Go"
+msgstr "執行"
+
+msgid "Click here to select the objects across all pages"
+msgstr "點選這裡可選取全部頁面的物件"
+
+#, python-format
+msgid "Select all %(total_count)s %(module_name)s"
+msgstr "選擇全部 %(total_count)s %(module_name)s"
+
+msgid "Clear selection"
+msgstr "清除選擇"
+
+msgid "Breadcrumbs"
+msgstr "導覽路徑"
+
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "%(name)s 應用程式中的模型"
+
+msgid "Add"
+msgstr "新增"
+
+msgid "View"
+msgstr "查看"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "你沒有查看或編輯的權限。"
+
+msgid ""
+"First, enter a username and password. Then, you’ll be able to edit more user "
+"options."
+msgstr "輸入使用者名稱和密碼後，你可以編輯更多使用者選項。"
+
+msgid "Enter a username and password."
+msgstr "輸入使用者名稱和密碼。"
+
+msgid "Change password"
+msgstr "修改密碼"
+
+msgid "Set password"
+msgstr "設定密碼"
+
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "請修正以下錯誤。"
+
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr "為使用者<strong>%(username)s</strong>輸入一個新的密碼。"
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr "這會 <strong>啟用</strong> 本用戶基於密碼的驗證"
+
+msgid "Disable password-based authentication"
+msgstr "停用基於密碼的驗證"
+
+msgid "Enable password-based authentication"
+msgstr "啟用基於密碼的驗證"
+
+msgid "Skip to main content"
+msgstr "跳到主要內容"
+
+msgid "Welcome,"
+msgstr "歡迎，"
+
+msgid "View site"
+msgstr "檢視網站"
+
+msgid "Documentation"
+msgstr "文件"
+
+msgid "Log out"
+msgstr "登出"
+
+#, python-format
+msgid "Add %(name)s"
+msgstr "新增 %(name)s"
+
+msgid "History"
+msgstr "歷史"
+
+msgid "View on site"
+msgstr "在網站上檢視"
+
+msgid "Filter"
+msgstr "過濾器"
+
+msgid "Hide counts"
+msgstr "隱藏計數"
+
+msgid "Show counts"
+msgstr "顯示計數"
+
+msgid "Clear all filters"
+msgstr "清除所有篩選"
+
+msgid "Remove from sorting"
+msgstr "從排序中移除"
+
+#, python-format
+msgid "Sorting priority: %(priority_number)s"
+msgstr "優先排序：%(priority_number)s"
+
+msgid "Toggle sorting"
+msgstr "切換排序"
+
+msgid "Toggle theme (current theme: auto)"
+msgstr "切換主題（當前主題:自動）"
+
+msgid "Toggle theme (current theme: light)"
+msgstr "切換主題（當前主題:淺色）"
+
+msgid "Toggle theme (current theme: dark)"
+msgstr "切換主題（當前主題:深色）"
+
+msgid "Delete"
+msgstr "刪除"
+
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+"刪除 %(object_name)s '%(escaped_object)s' 會把相關的物件也刪除，不過你的帳號"
+"並沒有刪除以下型態物件的權限:"
+
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
+msgstr ""
+"要刪除 %(object_name)s '%(escaped_object)s', 將要求刪除下面受保護的相關物件:"
+
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+"你確定想要刪除 %(object_name)s \"%(escaped_object)s\"？以下所有的相關項目都會"
+"被刪除:"
+
+msgid "Objects"
+msgstr "物件"
+
+msgid "Yes, I’m sure"
+msgstr "是的，我確定"
+
+msgid "No, take me back"
+msgstr "不，返回"
+
+msgid "Delete multiple objects"
+msgstr "刪除多個物件"
+
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+"要刪除所選的 %(objects_name)s, 結果會刪除相關物件, 但你的帳號無權刪除下面物件"
+"型態:"
+
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would require deleting the following "
+"protected related objects:"
+msgstr "要刪除所選的 %(objects_name)s, 將要求刪除下面受保護的相關物件:"
+
+#, python-format
+msgid ""
+"Are you sure you want to delete the selected %(objects_name)s? All of the "
+"following objects and their related items will be deleted:"
+msgstr ""
+"你是否確定要刪除已選的 %(objects_name)s? 下面全部物件及其相關項目都將被刪除:"
+
+msgid "Delete?"
+msgstr "刪除？"
+
+#, python-format
+msgid " By %(filter_title)s "
+msgstr " 以 %(filter_title)s"
+
+msgid "Summary"
+msgstr "總結"
+
+msgid "Recent actions"
+msgstr "最近的動作"
+
+msgid "My actions"
+msgstr "我的動作"
+
+msgid "None available"
+msgstr "無資料"
+
+msgid "Added:"
+msgstr "已新增。"
+
+msgid "Changed:"
+msgstr "已修改："
+
+msgid "Deleted:"
+msgstr "已刪除:"
+
+msgid "Unknown content"
+msgstr "未知內容"
+
+msgid ""
+"Something’s wrong with your database installation. Make sure the appropriate "
+"database tables have been created, and make sure the database is readable by "
+"the appropriate user."
+msgstr ""
+"你的資料庫安裝有錯誤。確定資料庫表格已經建立，並確定資料庫可被合適的使用者讀"
+"取。"
+
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+"您目前以%(username)s登入，但並沒有瀏覽此頁面的權限。您是否希望以其他帳號登"
+"入？"
+
+msgid "Forgotten your password or username?"
+msgstr "忘記您的密碼或是使用者名稱？"
+
+msgid "Toggle navigation"
+msgstr "切換導航"
+
+msgid "Sidebar"
+msgstr "側邊欄"
+
+msgid "Start typing to filter…"
+msgstr "輸入內容開始篩選..."
+
+msgid "Filter navigation items"
+msgstr "篩選導航項目"
+
+msgid "Date/time"
+msgstr "日期/時間"
+
+msgid "User"
+msgstr "使用者"
+
+msgid "Action"
+msgstr "動作"
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] "紀錄項目"
+
+msgid ""
+"This object doesn’t have a change history. It probably wasn’t added via this "
+"admin site."
+msgstr "該物件沒有修改的歷史紀錄。它可能不是透過此管理網站新增的。"
+
+msgid "Show all"
+msgstr "顯示全部"
+
+msgid "Save"
+msgstr "儲存"
+
+msgid "Popup closing…"
+msgstr "關閉彈跳視窗中..."
+
+msgid "Search"
+msgstr "搜尋"
+
+#, python-format
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] "%(counter)s 結果"
+
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr "總共 %(full_result_count)s"
+
+msgid "Save as new"
+msgstr "儲存為新的"
+
+msgid "Save and add another"
+msgstr "儲存並新增另一個"
+
+msgid "Save and continue editing"
+msgstr "儲存並繼續編輯"
+
+msgid "Save and view"
+msgstr "儲存並查看"
+
+msgid "Close"
+msgstr "關閉"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "修改所選的 %(model)s"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "新增其它 %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "刪除所選的 %(model)s"
+
+#, python-format
+msgid "View selected %(model)s"
+msgstr "查看已選擇的%(model)s"
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr "感謝您今天在網站上度過了一段美好的時光。"
+
+msgid "Log in again"
+msgstr "重新登入"
+
+msgid "Password change"
+msgstr "密碼修改"
+
+msgid "Your password was changed."
+msgstr "您的密碼已修改。"
+
+msgid ""
+"Please enter your old password, for security’s sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr "為了安全上的考量，請輸入你的舊密碼，然後輸入兩次新密碼已確保輸入正確。"
+
+msgid "Change my password"
+msgstr "修改我的密碼"
+
+msgid "Password reset"
+msgstr "重設密碼"
+
+msgid "Your password has been set.  You may go ahead and log in now."
+msgstr "你的密碼已設置，現在可以繼續登入。"
+
+msgid "Password reset confirmation"
+msgstr "密碼重設確認"
+
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr "請輸入新密碼兩次, 以便系統確認輸入無誤。"
+
+msgid "New password:"
+msgstr "新密碼："
+
+msgid "Confirm password:"
+msgstr "確認密碼："
+
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr "密碼重設連結無效，可能已被使用。請重新申請密碼重設。"
+
+msgid ""
+"We’ve emailed you instructions for setting your password, if an account "
+"exists with the email you entered. You should receive them shortly."
+msgstr ""
+"若您提交的電子郵件地址存在對應帳號，我們已寄出重設密碼的相關指示。您應該很快"
+"就會收到。"
+
+msgid ""
+"If you don’t receive an email, please make sure you’ve entered the address "
+"you registered with, and check your spam folder."
+msgstr ""
+"如果您未收到電子郵件，請確認您輸入的電子郵件地址與您註冊時輸入的一致，並檢查"
+"您的垃圾郵件匣。"
+
+#, python-format
+msgid ""
+"You're receiving this email because you requested a password reset for your "
+"user account at %(site_name)s."
+msgstr "這封電子郵件來自 %(site_name)s，因為您要求為帳號重新設定密碼。"
+
+msgid "Please go to the following page and choose a new password:"
+msgstr "請到該頁面選擇一個新的密碼："
+
+msgid "Your username, in case you’ve forgotten:"
+msgstr "提醒一下，您的用戶名是："
+
+msgid "Thanks for using our site!"
+msgstr "感謝使用本網站！"
+
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "%(site_name)s 團隊"
+
+msgid ""
+"Forgotten your password? Enter your email address below, and we’ll email "
+"instructions for setting a new one."
+msgstr ""
+"忘記您的密碼? 請在下面輸入您的電子郵件, 然後我們會寄出設定新密碼的操作指示。"
+
+msgid "Email address:"
+msgstr "電子信箱："
+
+msgid "Reset my password"
+msgstr "重設我的密碼"
+
+msgid "Select all objects on this page for an action"
+msgstr "選擇此頁面上的所有物件執行操作"
+
+msgid "All dates"
+msgstr "所有日期"
+
+#, python-format
+msgid "Select %s"
+msgstr "選擇 %s"
+
+#, python-format
+msgid "Select %s to change"
+msgstr "選擇 %s 來修改"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "選擇%s查看"
+
+msgid "Date:"
+msgstr "日期"
+
+msgid "Time:"
+msgstr "時間"
+
+msgid "Lookup"
+msgstr "查找"
+
+msgid "Currently:"
+msgstr "目前："
+
+msgid "Change:"
+msgstr "變動："

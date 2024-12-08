@@ -1,0 +1,13 @@
+==========================
+Django 4.2.9 release notes
+==========================
+
+*January 2, 2024*
+
+Django 4.2.9 fixes a bug in 4.2.8.
+
+Bugfixes
+========
+
+* Fixed a regression in Django 4.2.8 where admin fields on the same line could
+  overflow the page and become non-interactive (:ticket:`35012`).

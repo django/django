@@ -1,0 +1,214 @@
+===================
+Measurement Objects
+===================
+
+.. module:: django.contrib.gis.measure
+    :synopsis: GeoDjango's distance and area measurement objects.
+
+The :mod:`django.contrib.gis.measure` module contains objects that allow
+for convenient representation of distance and area units of measure. [#]_
+Specifically, it implements two objects, :class:`Distance` and
+:class:`Area` -- both of which may be accessed via the
+:class:`D` and :class:`A` convenience aliases, respectively.
+
+Example
+=======
+
+:class:`Distance` objects may be instantiated using a keyword argument indicating the
+context of the units.  In the example below, two different distance objects are
+instantiated in units of kilometers (``km``) and miles (``mi``):
+
+.. code-block:: pycon
+
+    >>> from django.contrib.gis.measure import D, Distance
+    >>> d1 = Distance(km=5)
+    >>> print(d1)
+    5.0 km
+    >>> d2 = D(mi=5)  # `D` is an alias for `Distance`
+    >>> print(d2)
+    5.0 mi
+
+For conversions, access the preferred unit attribute to get a converted
+distance quantity:
+
+.. code-block:: pycon
+
+    >>> print(d1.mi)  # Converting 5 kilometers to miles
+    3.10685596119
+    >>> print(d2.km)  # Converting 5 miles to kilometers
+    8.04672
+
+Moreover, arithmetic operations may be performed between the distance
+objects:
+
+.. code-block:: pycon
+
+    >>> print(d1 + d2)  # Adding 5 miles to 5 kilometers
+    13.04672 km
+    >>> print(d2 - d1)  # Subtracting 5 kilometers from 5 miles
+    1.89314403881 mi
+
+Two :class:`Distance` objects multiplied together will yield an :class:`Area`
+object, which uses squared units of measure:
+
+.. code-block:: pycon
+
+    >>> a = d1 * d2  # Returns an Area object.
+    >>> print(a)
+    40.2336 sq_km
+
+To determine what the attribute abbreviation of a unit is, the ``unit_attname``
+class method may be used:
+
+.. code-block:: pycon
+
+    >>> print(Distance.unit_attname("US Survey Foot"))
+    survey_ft
+    >>> print(Distance.unit_attname("centimeter"))
+    cm
+
+.. _supported_units:
+
+Supported units
+===============
+
+=================================  ========================================
+Unit Attribute                     Full name or alias(es)
+=================================  ========================================
+``km``                             Kilometre, Kilometer
+``mi``                             Mile
+``m``                              Meter, Metre
+``yd``                             Yard
+``ft``                             Foot, Foot (International)
+``survey_ft``                      U.S. Foot, US survey foot
+``inch``                           Inches
+``cm``                             Centimeter
+``mm``                             Millimetre, Millimeter
+``um``                             Micrometer, Micrometre
+``british_ft``                     British foot (Sears 1922)
+``british_yd``                     British yard (Sears 1922)
+``british_chain_sears``            British chain (Sears 1922)
+``indian_yd``                      Indian yard, Yard (Indian)
+``sears_yd``                       Yard (Sears)
+``clarke_ft``                      Clarke's Foot
+``chain``                          Chain
+``chain_benoit``                   Chain (Benoit)
+``chain_sears``                    Chain (Sears)
+``british_chain_benoit``           British chain (Benoit 1895 B)
+``british_chain_sears_truncated``  British chain (Sears 1922 truncated)
+``gold_coast_ft``                  Gold Coast foot
+``link``                           Link
+``link_benoit``                    Link (Benoit)
+``link_sears``                     Link (Sears)
+``clarke_link``                    Clarke's link
+``fathom``                         Fathom
+``rod``                            Rod
+``furlong``                        Furlong, Furrow Long
+``nm``                             Nautical Mile
+``nm_uk``                          Nautical Mile (UK)
+``german_m``                       German legal metre
+=================================  ========================================
+
+.. note::
+
+    :class:`Area` attributes are the same as :class:`Distance` attributes,
+    except they are prefixed with ``sq_`` (area units are square in nature).
+    For example, ``Area(sq_m=2)`` creates an :class:`Area` object
+    representing two square meters.
+
+In addition to unit with the ``sq_`` prefix, the following units are also
+supported on :class:`Area`:
+
+=================================  ========================================
+Unit Attribute                     Full name or alias(es)
+=================================  ========================================
+``ha``                             Hectare
+=================================  ========================================
+
+.. versionchanged:: 5.1
+
+    Support for the ``ha`` unit was added.
+
+Measurement API
+===============
+
+``Distance``
+------------
+
+.. class:: Distance(**kwargs)
+
+    To initialize a distance object, pass in a keyword corresponding to the
+    desired :ref:`unit attribute name <supported_units>` set with desired
+    value. For example, the following creates a distance object representing 5
+    miles:
+
+    .. code-block:: pycon
+
+        >>> dist = Distance(mi=5)
+
+    .. method:: __getattr__(unit_att)
+
+    Returns the distance value in units corresponding to the given unit
+    attribute. For example:
+
+    .. code-block:: pycon
+
+        >>> print(dist.km)
+        8.04672
+
+    .. classmethod:: unit_attname(unit_name)
+
+    Returns the distance unit attribute name for the given full unit name. For
+    example:
+
+    .. code-block:: pycon
+
+        >>> Distance.unit_attname("Mile")
+        'mi'
+
+.. class:: D
+
+    Alias for :class:`Distance` class.
+
+``Area``
+--------
+
+.. class:: Area(**kwargs)
+
+    To initialize an area object, pass in a keyword corresponding to the
+    desired :ref:`unit attribute name <supported_units>` set with desired
+    value. For example, the following creates an area object representing 5
+    square miles:
+
+    .. code-block:: pycon
+
+        >>> a = Area(sq_mi=5)
+
+    .. method:: __getattr__(unit_att)
+
+    Returns the area value in units corresponding to the given unit attribute.
+    For example:
+
+    .. code-block:: pycon
+
+        >>> print(a.sq_km)
+        12.949940551680001
+
+    .. classmethod:: unit_attname(unit_name)
+
+    Returns the area unit attribute name for the given full unit name. For
+    example:
+
+    .. code-block:: pycon
+
+        >>> Area.unit_attname("Kilometer")
+        'sq_km'
+
+.. class:: A
+
+    Alias for :class:`Area` class.
+
+.. rubric:: Footnotes
+.. [#] `Robert Coup <https://koordinates.com/>`_ is the initial author of the measure objects,
+       and was inspired by Brian Beck's work in `geopy <https://github.com/geopy/geopy/>`_
+       and Geoff Biggs' PhD work on dimensioned units for robotics.

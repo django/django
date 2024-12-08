@@ -1,0 +1,68 @@
+[main]
+host     = https://www.transifex.com
+lang_map = sr@latin: sr_Latn, zh_CN: zh_Hans, zh_TW: zh_Hant
+
+[o:django:p:django:r:core]
+file_filter = django/conf/locale/<lang>/LC_MESSAGES/django.po
+source_file = django/conf/locale/en/LC_MESSAGES/django.po
+source_lang = en
+
+[o:django:p:django:r:contrib-admin]
+file_filter = django/contrib/admin/locale/<lang>/LC_MESSAGES/django.po
+source_file = django/contrib/admin/locale/en/LC_MESSAGES/django.po
+source_lang = en
+
+[o:django:p:django:r:contrib-admin-js]
+file_filter = django/contrib/admin/locale/<lang>/LC_MESSAGES/djangojs.po
+source_file = django/contrib/admin/locale/en/LC_MESSAGES/djangojs.po
+source_lang = en
+
+[o:django:p:django:r:contrib-admindocs]
+file_filter = django/contrib/admindocs/locale/<lang>/LC_MESSAGES/django.po
+source_file = django/contrib/admindocs/locale/en/LC_MESSAGES/django.po
+source_lang = en
+
+[o:django:p:django:r:contrib-auth]
+file_filter = django/contrib/auth/locale/<lang>/LC_MESSAGES/django.po
+source_file = django/contrib/auth/locale/en/LC_MESSAGES/django.po
+source_lang = en
+
+[o:django:p:django:r:contrib-contenttypes]
+file_filter = django/contrib/contenttypes/locale/<lang>/LC_MESSAGES/django.po
+source_file = django/contrib/contenttypes/locale/en/LC_MESSAGES/django.po
+source_lang = en
+
+[o:django:p:django:r:contrib-flatpages]
+file_filter = django/contrib/flatpages/locale/<lang>/LC_MESSAGES/django.po
+source_file = django/contrib/flatpages/locale/en/LC_MESSAGES/django.po
+source_lang = en
+
+[o:django:p:django:r:contrib-gis]
+file_filter = django/contrib/gis/locale/<lang>/LC_MESSAGES/django.po
+source_file = django/contrib/gis/locale/en/LC_MESSAGES/django.po
+source_lang = en
+
+[o:django:p:django:r:contrib-humanize]
+file_filter = django/contrib/humanize/locale/<lang>/LC_MESSAGES/django.po
+source_file = django/contrib/humanize/locale/en/LC_MESSAGES/django.po
+source_lang = en
+
+[o:django:p:django:r:contrib-postgres]
+file_filter = django/contrib/postgres/locale/<lang>/LC_MESSAGES/django.po
+source_file = django/contrib/postgres/locale/en/LC_MESSAGES/django.po
+source_lang = en
+
+[o:django:p:django:r:contrib-redirects]
+file_filter = django/contrib/redirects/locale/<lang>/LC_MESSAGES/django.po
+source_file = django/contrib/redirects/locale/en/LC_MESSAGES/django.po
+source_lang = en
+
+[o:django:p:django:r:contrib-sessions]
+file_filter = django/contrib/sessions/locale/<lang>/LC_MESSAGES/django.po
+source_file = django/contrib/sessions/locale/en/LC_MESSAGES/django.po
+source_lang = en
+
+[o:django:p:django:r:contrib-sites]
+file_filter = django/contrib/sites/locale/<lang>/LC_MESSAGES/django.po
+source_file = django/contrib/sites/locale/en/LC_MESSAGES/django.po
+source_lang = en

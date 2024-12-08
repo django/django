@@ -1,0 +1,91 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Anastasiadis Stavros <anastasiadis.st00@gmail.com>, 2014
+# Dimitris Glezos <glezos@transifex.com>, 2011
+# Elena Andreou <helenaandreou.ha@gmail.com>, 2016
+# Fotis Athineos <fotis@transifex.com>, 2021
+# Kostas Papadimitriou <vinilios@gmail.com>, 2012
+# Nick Mavrakis <mavrakis.n@gmail.com>, 2016
+# Pãnoș <panos.laganakos@gmail.com>, 2016
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 18:45+0000\n"
+"Last-Translator: Fotis Athineos <fotis@transifex.com>, 2021\n"
+"Language-Team: Greek (http://app.transifex.com/django/django/language/el/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: el\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "GIS"
+msgstr " Γεωγραφικά Συστήματα Πληροφορίας"
+
+msgid "The base GIS field."
+msgstr "Το βασικό GIS πεδίο."
+
+msgid ""
+"The base Geometry field — maps to the OpenGIS Specification Geometry type."
+msgstr ""
+"Το βασικό Γεωμετρικό πεδίο — αντιστοιχεί στον τύπο της Γεωμετρικής "
+"Προδιαγραφής OpenGIS."
+
+msgid "Point"
+msgstr "Σημείο"
+
+msgid "Line string"
+msgstr "Γραμμή string"
+
+msgid "Polygon"
+msgstr "Πολύγωνο"
+
+msgid "Multi-point"
+msgstr "Πολλαπλό σημείο"
+
+msgid "Multi-line string"
+msgstr "Multi-line string"
+
+msgid "Multi polygon"
+msgstr "Πολλαπλό πολύγωνο"
+
+msgid "Geometry collection"
+msgstr "Συλλογή γεωμετριών"
+
+msgid "Extent Aggregate Field"
+msgstr "Πεδίο Extent Aggregate"
+
+msgid "Raster Field"
+msgstr "Πεδίο Raster"
+
+msgid "No geometry value provided."
+msgstr "Δε δόθηκε τιμή γεωμετρίας."
+
+msgid "Invalid geometry value."
+msgstr "Άκυρη γεωμετρική τιμή."
+
+msgid "Invalid geometry type."
+msgstr "Άκυρος γεωμετρικός τύπος."
+
+msgid ""
+"An error occurred when transforming the geometry to the SRID of the geometry "
+"form field."
+msgstr ""
+"Παρουσιάστηκε σφάλμα κατά τη μετατροπή της γεωμετρίας στο SRID του πεδίου "
+"της φόρμας  γεωμετρίας."
+
+msgid "Delete all Features"
+msgstr "Διαγραφή όλων των αντικειμένων"
+
+msgid "Debugging window (serialized value)"
+msgstr "Παράθυρο αποσφαλμάτωσης (σειριακή τιμή)"
+
+msgid "No feeds are registered."
+msgstr "Δεν υπάρχουν εγγεγραμμένες ροές ειδήσεων."
+
+#, python-format
+msgid "Slug %r isn’t registered."
+msgstr "Το slug %r δεν έχει καταχωρηθεί."

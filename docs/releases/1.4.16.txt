@@ -1,0 +1,20 @@
+===========================
+Django 1.4.16 release notes
+===========================
+
+*October 22, 2014*
+
+Django 1.4.16 fixes a couple regressions in the 1.4.14 security release and a
+bug preventing the use of some GEOS versions with GeoDjango.
+
+Bugfixes
+========
+
+* Allowed related many-to-many fields to be referenced in the admin
+  (:ticket:`23604`).
+
+* Allowed inline and hidden references to admin fields
+  (:ticket:`23431`).
+
+* Fixed parsing of the GEOS version string
+  (:ticket:`20036`).

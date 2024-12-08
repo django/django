@@ -1,0 +1,18 @@
+==========================
+Django 2.2.6 release notes
+==========================
+
+*October 1, 2019*
+
+Django 2.2.6 fixes several bugs in 2.2.5.
+
+Bugfixes
+========
+
+* Fixed migrations crash on SQLite when altering a model containing partial
+  indexes (:ticket:`30754`).
+
+* Fixed a regression in Django 2.2.4 that caused a crash when filtering with a
+  ``Subquery()`` annotation of a queryset containing
+  ``django.contrib.postgres.fields.JSONField`` or
+  :class:`~django.contrib.postgres.fields.HStoreField` (:ticket:`30769`).

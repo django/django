@@ -1,0 +1,483 @@
+========================
+Django 2.1 release notes
+========================
+
+*August 1, 2018*
+
+Welcome to Django 2.1!
+
+These release notes cover the :ref:`new features <whats-new-2.1>`, as well as
+some :ref:`backwards incompatible changes <backwards-incompatible-2.1>` you'll
+want to be aware of when upgrading from Django 2.0 or earlier. We've
+:ref:`dropped some features<removed-features-2.1>` that have reached the end of
+their deprecation cycle, and we've :ref:`begun the deprecation process for some
+features <deprecated-features-2.1>`.
+
+See the :doc:`/howto/upgrade-version` guide if you're updating an existing
+project.
+
+Python compatibility
+====================
+
+Django 2.1 supports Python 3.5, 3.6, and 3.7. Django 2.0 is the last version to
+support Python 3.4.  We **highly recommend** and only officially support the
+latest release of each series.
+
+.. _whats-new-2.1:
+
+What's new in Django 2.1
+========================
+
+Model "view" permission
+-----------------------
+
+A "view" permission is added to the model :attr:`Meta.default_permissions
+<django.db.models.Options.default_permissions>`. The new permissions will be
+created automatically when running :djadmin:`migrate`.
+
+This allows giving users read-only access to models in the admin.
+:meth:`.ModelAdmin.has_view_permission` is new. The implementation is backwards
+compatible in that there isn't a need to assign the "view" permission to allow
+users who have the "change" permission to edit objects.
+
+There are a couple of :ref:`backwards incompatible considerations
+<view_permission_backwards_incompatible>`.
+
+Minor features
+--------------
+
+:mod:`django.contrib.admin`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* :attr:`.ModelAdmin.search_fields` now accepts any lookup such as
+  ``field__exact``.
+
+* jQuery is upgraded from version 2.2.3 to 3.3.1.
+
+* The new :meth:`.ModelAdmin.delete_queryset` method allows customizing the
+  deletion process of the "delete selected objects" action.
+
+* You can now :ref:`override the default admin site
+  <overriding-default-admin-site>`.
+
+* The new :attr:`.ModelAdmin.sortable_by` attribute and
+  :meth:`.ModelAdmin.get_sortable_by` method allow limiting the columns that
+  can be sorted in the change list page.
+
+* The ``admin_order_field`` attribute for elements in
+  :attr:`.ModelAdmin.list_display` may now be a query expression.
+
+* The new :meth:`.ModelAdmin.get_deleted_objects()` method allows customizing
+  the deletion process of the delete view and the "delete selected" action.
+
+* The ``actions.html``, ``change_list_results.html``, ``date_hierarchy.html``,
+  ``pagination.html``, ``prepopulated_fields_js.html``, ``search_form.html``,
+  and ``submit_line.html`` templates can now be :ref:`overridden per app or
+  per model <admin-templates-overridden-per-app-or-model>` (besides overridden
+  globally).
+
+* The admin change list and change form object tools can now be :ref:`overridden
+  per app, per model, or globally <admin-templates-overridden-per-app-or-model>`
+  with ``change_list_object_tools.html`` and
+  ``change_form_object_tools.html`` templates.
+
+* :meth:`.InlineModelAdmin.has_add_permission` is now passed the parent object
+  as the second positional argument, ``obj``.
+
+* Admin actions may now :ref:`specify permissions <admin-action-permissions>`
+  to limit their availability to certain users.
+
+:mod:`django.contrib.auth`
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* :djadmin:`createsuperuser` now gives a prompt to allow bypassing the
+  :setting:`AUTH_PASSWORD_VALIDATORS` checks.
+
+:mod:`django.contrib.gis`
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The new :meth:`.GEOSGeometry.buffer_with_style` method is a version of
+  :meth:`~.GEOSGeometry.buffer` that allows customizing the style of the
+  buffer.
+
+* :class:`~django.contrib.gis.forms.widgets.OpenLayersWidget` is now based on
+  OpenLayers 4.6.5 (previously 3.20.1).
+
+:mod:`django.contrib.sessions`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Added the :setting:`SESSION_COOKIE_SAMESITE` setting to set the ``SameSite``
+  cookie flag on session cookies.
+
+Cache
+~~~~~
+
+* The :ref:`local-memory cache backend <local-memory-caching>` now uses a
+  least-recently-used (LRU) culling strategy rather than a pseudo-random one.
+
+* The new :meth:`~django.core.cache.cache.touch` method of the :ref:`low-level
+  cache API <low-level-cache-api>` updates the timeout of cache keys.
+
+CSRF
+~~~~
+
+* Added the :setting:`CSRF_COOKIE_SAMESITE` setting to set the ``SameSite``
+  cookie flag on CSRF cookies.
+
+Forms
+~~~~~
+
+* The widget for ``ImageField`` now renders with the HTML attribute
+  ``accept="image/*"``.
+
+Internationalization
+~~~~~~~~~~~~~~~~~~~~
+
+* Added the :meth:`~django.utils.translation.get_supported_language_variant`
+  function.
+
+* Untranslated strings for territorial language variants now use the
+  translations of the generic language. For example, untranslated ``pt_BR``
+  strings use ``pt`` translations.
+
+Management Commands
+~~~~~~~~~~~~~~~~~~~
+
+* The new :option:`inspectdb --include-views` option allows creating models
+  for database views.
+
+* The :class:`~django.core.management.BaseCommand` class now uses a custom help
+  formatter so that the standard options like ``--verbosity`` or ``--settings``
+  appear last in the help output, giving a more prominent position to subclassed
+  command's options.
+
+Migrations
+~~~~~~~~~~
+
+* Added support for serialization of ``functools.partialmethod`` objects.
+
+* To support frozen environments, migrations may be loaded from ``.pyc`` files.
+
+Models
+~~~~~~
+
+* Models can now use ``__init_subclass__()`` from :pep:`487`.
+
+* A ``BinaryField`` may now be set to ``editable=True`` if you wish to include
+  it in model forms.
+
+* A number of new text database functions are added:
+  :class:`~django.db.models.functions.Chr`,
+  :class:`~django.db.models.functions.Left`,
+  :class:`~django.db.models.functions.LPad`,
+  :class:`~django.db.models.functions.LTrim`,
+  :class:`~django.db.models.functions.Ord`,
+  :class:`~django.db.models.functions.Repeat`,
+  :class:`~django.db.models.functions.Replace`,
+  :class:`~django.db.models.functions.Right`,
+  :class:`~django.db.models.functions.RPad`,
+  :class:`~django.db.models.functions.RTrim`, and
+  :class:`~django.db.models.functions.Trim`.
+
+* The new :class:`~django.db.models.functions.TruncWeek` function truncates
+  :class:`~django.db.models.DateField` and
+  :class:`~django.db.models.DateTimeField` to the Monday of a week.
+
+* Query expressions can now be negated using a minus sign.
+
+* :meth:`.QuerySet.order_by` and :meth:`distinct(*fields) <.QuerySet.distinct>`
+  now support using field transforms.
+
+* :class:`~django.db.models.BooleanField` can now be ``null=True``. This is
+  encouraged instead of ``NullBooleanField``, which will likely be deprecated
+  in the future.
+
+* The new :meth:`.QuerySet.explain` method displays the database's execution
+  plan of a queryset's query.
+
+*  :meth:`.QuerySet.raw` now supports :meth:`~.QuerySet.prefetch_related`.
+
+Requests and Responses
+~~~~~~~~~~~~~~~~~~~~~~
+
+* Added :meth:`.HttpRequest.get_full_path_info`.
+
+* Added the ``samesite`` argument to :meth:`.HttpResponse.set_cookie` to allow
+  setting the ``SameSite`` cookie flag.
+
+* The new ``as_attachment`` argument for :class:`~django.http.FileResponse`
+  sets the ``Content-Disposition`` header to make the browser ask if the user
+  wants to download the file. ``FileResponse`` also tries to set the
+  ``Content-Type`` and ``Content-Length`` headers where appropriate.
+
+Templates
+~~~~~~~~~
+
+* The new :tfilter:`json_script` filter safely outputs a Python object as JSON,
+  wrapped in a ``<script>`` tag, ready for use with JavaScript.
+
+Tests
+~~~~~
+
+* Added test :class:`~django.test.Client` support for 307 and 308 redirects.
+
+* The test :class:`~django.test.Client` now serializes a request data
+  dictionary as JSON if ``content_type='application/json'``. You can customize
+  the JSON encoder with test client's ``json_encoder`` parameter.
+
+* The new :meth:`.SimpleTestCase.assertWarnsMessage` method is a simpler
+  version of :meth:`~unittest.TestCase.assertWarnsRegex`.
+
+.. _backwards-incompatible-2.1:
+
+Backwards incompatible changes in 2.1
+=====================================
+
+Database backend API
+--------------------
+
+This section describes changes that may be needed in third-party database
+backends.
+
+* To adhere to :pep:`249`, exceptions where a database doesn't support a
+  feature are changed from :exc:`NotImplementedError` to
+  :exc:`django.db.NotSupportedError`.
+
+* Renamed the ``allow_sliced_subqueries`` database feature flag to
+  ``allow_sliced_subqueries_with_in``.
+
+* ``DatabaseOperations.distinct_sql()`` now requires an additional ``params``
+  argument and returns a tuple of SQL and parameters instead of an SQL string.
+
+* ``DatabaseFeatures.introspected_boolean_field_type`` is changed from a method
+  to a property.
+
+:mod:`django.contrib.gis`
+-------------------------
+
+* Support for SpatiaLite 4.0 is removed.
+
+Dropped support for MySQL 5.5
+-----------------------------
+
+The end of upstream support for MySQL 5.5 is December 2018. Django 2.1 supports
+MySQL 5.6 and higher.
+
+Dropped support for PostgreSQL 9.3
+----------------------------------
+
+The end of upstream support for PostgreSQL 9.3 is September 2018. Django 2.1
+supports PostgreSQL 9.4 and higher.
+
+Removed ``BCryptPasswordHasher`` from the default ``PASSWORD_HASHERS`` setting
+------------------------------------------------------------------------------
+
+If you used bcrypt with Django 1.4 or 1.5 (before ``BCryptSHA256PasswordHasher``
+was added in Django 1.6), you might have some passwords that use the
+``BCryptPasswordHasher`` hasher.
+
+You can check if that's the case like this::
+
+    from django.contrib.auth import get_user_model
+
+    User = get_user_model()
+    User.objects.filter(password__startswith="bcrypt$$")
+
+If you want to continue to allow those passwords to be used, you'll
+have to define the :setting:`PASSWORD_HASHERS` setting (if you don't already)
+and include ``'django.contrib.auth.hashers.BCryptPasswordHasher'``.
+
+Moved ``wrap_label`` widget template context variable
+-----------------------------------------------------
+
+To fix the lack of ``<label>`` when using ``RadioSelect`` and
+``CheckboxSelectMultiple`` with ``MultiWidget``, the ``wrap_label`` context
+variable now appears as an attribute of each option. For example, in a custom
+``input_option.html`` template, change ``{% if wrap_label %}`` to
+``{% if widget.wrap_label %}``.
+
+``SameSite`` cookies
+--------------------
+
+The cookies used for ``django.contrib.sessions``, ``django.contrib.messages``,
+and Django's CSRF protection now set the ``SameSite`` flag to ``Lax`` by
+default. Browsers that respect this flag won't send these cookies on
+cross-origin requests. If you rely on the old behavior, set the
+:setting:`SESSION_COOKIE_SAMESITE` and/or :setting:`CSRF_COOKIE_SAMESITE`
+setting to ``None``.
+
+.. _view_permission_backwards_incompatible:
+
+Considerations for the new model "view" permission
+--------------------------------------------------
+
+Custom admin forms need to take the view-only case into account
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+With the new "view" permission, existing custom admin forms may raise errors
+when a user doesn't have the change permission because the form might access
+nonexistent fields. Fix this by overriding :meth:`.ModelAdmin.get_form` and
+checking if the user has the "change" permissions and returning the default
+form if not::
+
+    class MyAdmin(admin.ModelAdmin):
+        def get_form(self, request, obj=None, **kwargs):
+            if not self.has_change_permission(request, obj):
+                return super().get_form(request, obj, **kwargs)
+            return CustomForm
+
+New default view permission could allow unwanted access to admin views
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you have a custom permission with a codename of the form
+``view_<modelname>``, the new view permission handling in the admin will allow
+view access to the changelist and detail pages for those models. If this is
+unwanted, you must change your custom permission codename.
+
+Miscellaneous
+-------------
+
+* The minimum supported version of ``mysqlclient`` is increased from 1.3.3 to
+  1.3.7.
+
+* Support for SQLite < 3.7.15 is removed.
+
+* The date format of ``Set-Cookie``'s ``Expires`` directive is changed to
+  follow :rfc:`7231#section-7.1.1.1` instead of Netscape's cookie standard.
+  Hyphens present in dates like ``Tue, 25-Dec-2018 22:26:13 GMT`` are removed.
+  This change should be merely cosmetic except perhaps for antiquated browsers
+  that don't parse the new format.
+
+* ``allowed_hosts`` is now a required argument of private API
+  ``django.utils.http.is_safe_url()``.
+
+* The ``multiple`` attribute rendered by the
+  :class:`~django.forms.SelectMultiple` widget now uses HTML5 boolean syntax
+  rather than XHTML's ``multiple="multiple"``.
+
+* HTML rendered by form widgets no longer includes a closing slash on void
+  elements, e.g. ``<br>``. This is incompatible within XHTML, although some
+  widgets already used aspects of HTML5 such as boolean attributes.
+
+* The value of :class:`~django.forms.SelectDateWidget`'s empty options is
+  changed from 0 to an empty string, which mainly may require some adjustments
+  in tests that compare HTML.
+
+* :meth:`.User.has_usable_password` and the
+  :func:`~django.contrib.auth.hashers.is_password_usable` function no longer
+  return ``False`` if the password is ``None`` or an empty string, or if the
+  password uses a hasher that's not in the :setting:`PASSWORD_HASHERS` setting.
+  This undocumented behavior was a regression in Django 1.6 and prevented users
+  with such passwords from requesting a password reset. Audit your code to
+  confirm that your usage of these APIs don't rely on the old behavior.
+
+* Since migrations are now loaded from ``.pyc`` files, you might need to delete
+  them if you're working in a mixed Python 2 and Python 3 environment.
+
+* Using ``None`` as a ``django.contrib.postgres.fields.JSONField`` lookup
+  value now matches objects that have the specified key and a null value rather
+  than objects that don't have the key.
+
+* The admin CSS class ``field-box`` is renamed to ``fieldBox`` to prevent
+  conflicts with the class given to model fields named "box".
+
+* Since the admin's ``actions.html``, ``change_list_results.html``,
+  ``date_hierarchy.html``, ``pagination.html``, ``prepopulated_fields_js.html``,
+  ``search_form.html``, and ``submit_line.html`` templates can now be
+  overridden per app or per model, you may need to rename existing templates
+  with those names that were written for a different purpose.
+
+* ``QuerySet.raw()`` now caches its results like regular querysets. Use
+  ``iterator()`` if you don't want caching.
+
+* The database router :meth:`allow_relation` method is called in more cases.
+  Improperly written routers may need to be updated accordingly.
+
+* Translations are no longer deactivated before running management commands.
+  If your custom command requires translations to be deactivated (for example,
+  to insert untranslated content into the database), use the new
+  :ref:`@no_translations decorator <management-commands-and-locales>`.
+
+* Management commands no longer allow the abbreviated forms of the
+  ``--settings`` and ``--pythonpath`` arguments.
+
+* The private ``django.db.models.sql.constants.QUERY_TERMS`` constant is
+  removed. The :meth:`~.RegisterLookupMixin.get_lookup`
+  and :meth:`~.RegisterLookupMixin.get_lookups` methods
+  of the :ref:`Lookup Registration API <lookup-registration-api>` may be
+  suitable alternatives. Compared to the ``QUERY_TERMS`` constant, they allow
+  your code to also account for any custom lookups that have been registered.
+
+* Compatibility with ``py-bcrypt`` is removed as it's unmaintained. Use
+  :pypi:`bcrypt` instead.
+
+.. _deprecated-features-2.1:
+
+Features deprecated in 2.1
+==========================
+
+Miscellaneous
+-------------
+
+* The ``ForceRHR`` GIS function is deprecated in favor of the new
+  :class:`~django.contrib.gis.db.models.functions.ForcePolygonCW` function.
+
+* ``django.utils.http.cookie_date()`` is deprecated in favor of
+  :func:`~django.utils.http.http_date`, which follows the format of the latest
+  RFC.
+
+* ``{% load staticfiles %}`` and ``{% load admin_static %}`` are deprecated
+  in favor of ``{% load static %}``, which works the same.
+
+* ``django.contrib.staticfiles.templatetags.static()`` is deprecated in favor
+  of ``django.templatetags.static.static()``.
+
+* Support for :meth:`.InlineModelAdmin.has_add_permission` methods that don't
+  accept ``obj`` as the second positional argument will be removed in Django
+  3.0.
+
+.. _removed-features-2.1:
+
+Features removed in 2.1
+=======================
+
+These features have reached the end of their deprecation cycle and are removed
+in Django 2.1. See :ref:`deprecated-features-1.11` for details, including how
+to remove usage of these features.
+
+* ``contrib.auth.views.login()``, ``logout()``, ``password_change()``,
+  ``password_change_done()``, ``password_reset()``, ``password_reset_done()``,
+  ``password_reset_confirm()``, and ``password_reset_complete()`` are removed.
+
+* The ``extra_context`` parameter of ``contrib.auth.views.logout_then_login()``
+  is removed.
+
+* ``django.test.runner.setup_databases()`` is removed.
+
+* ``django.utils.translation.string_concat()`` is removed.
+
+* ``django.core.cache.backends.memcached.PyLibMCCache`` no longer supports
+  passing ``pylibmc`` behavior settings as top-level attributes of ``OPTIONS``.
+
+* The ``host`` parameter of ``django.utils.http.is_safe_url()`` is removed.
+
+* Silencing of exceptions raised while rendering the ``{% include %}`` template
+  tag is removed.
+
+* ``DatabaseIntrospection.get_indexes()`` is removed.
+
+* The ``authenticate()`` method of authentication backends requires ``request``
+  as the first positional argument.
+
+* The ``django.db.models.permalink()`` decorator is removed.
+
+* The ``USE_ETAGS`` setting is removed. ``CommonMiddleware`` and
+  ``django.utils.cache.patch_response_headers()`` no longer set ETags.
+
+* The ``Model._meta.has_auto_field`` attribute is removed.
+
+* ``url()``'s support for inline flags in regular expression groups (``(?i)``,
+  ``(?L)``, ``(?m)``, ``(?s)``, and ``(?u)``) is removed.
+
+* Support for ``Widget.render()`` methods without the ``renderer`` argument
+  is removed.

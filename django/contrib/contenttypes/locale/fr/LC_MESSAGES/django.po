@@ -1,0 +1,43 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Claude Paroz <claude@2xlibre.net>, 2014,2019
+# Claude Paroz <claude@2xlibre.net>, 2012
+# Jannis Leidel <jannis@leidel.info>, 2011
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-09-18 15:50+0000\n"
+"Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
+"Language-Team: French (http://www.transifex.com/django/django/language/fr/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: fr\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid "Content Types"
+msgstr "Types de contenus"
+
+msgid "python model class name"
+msgstr "nom de la classe python du modèle"
+
+msgid "content type"
+msgstr "type de contenu"
+
+msgid "content types"
+msgstr "types de contenu"
+
+#, python-format
+msgid "Content type %(ct_id)s object has no associated model"
+msgstr "L'objet type de contenu %(ct_id)s n'a pas de modèle associé"
+
+#, python-format
+msgid "Content type %(ct_id)s object %(obj_id)s doesn’t exist"
+msgstr "L'objet %(obj_id)s du type de contenu %(ct_id)s n’existe pas"
+
+#, python-format
+msgid "%(ct_name)s objects don’t have a get_absolute_url() method"
+msgstr "Les objets %(ct_name)s n’ont pas de méthode get_absolute_url()"

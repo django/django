@@ -1,0 +1,211 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Mansoorulhaq Mansoor <mnsrknp@gmail.com>, 2011
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2017-09-19 16:41+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Urdu (http://www.transifex.com/django/django/language/ur/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ur\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, javascript-format
+msgid "Available %s"
+msgstr "دستیاب %s"
+
+#, javascript-format
+msgid ""
+"This is the list of available %s. You may choose some by selecting them in "
+"the box below and then clicking the \"Choose\" arrow between the two boxes."
+msgstr ""
+
+#, javascript-format
+msgid "Type into this box to filter down the list of available %s."
+msgstr ""
+
+msgid "Filter"
+msgstr "چھانٹیں"
+
+msgid "Choose all"
+msgstr "سب منتخب کریں"
+
+#, javascript-format
+msgid "Click to choose all %s at once."
+msgstr ""
+
+msgid "Choose"
+msgstr ""
+
+msgid "Remove"
+msgstr "خارج کریں"
+
+#, javascript-format
+msgid "Chosen %s"
+msgstr "منتخب شدہ %s"
+
+#, javascript-format
+msgid ""
+"This is the list of chosen %s. You may remove some by selecting them in the "
+"box below and then clicking the \"Remove\" arrow between the two boxes."
+msgstr ""
+
+msgid "Remove all"
+msgstr ""
+
+#, javascript-format
+msgid "Click to remove all chosen %s at once."
+msgstr ""
+
+msgid "%(sel)s of %(cnt)s selected"
+msgid_plural "%(sel)s of %(cnt)s selected"
+msgstr[0] "%(cnt)s میں سے %(sel)s منتخب کیا گیا"
+msgstr[1] "%(cnt)s میں سے %(sel)s منتخب کیے گئے"
+
+msgid ""
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
+msgstr ""
+"آپ کے پاس ذاتی قابل تدوین خانوں میں غیر محفوظ تبدیلیاں موجود ھیں۔ اگر آپ "
+"کوئی کاروائی کریں گے تو آپ کی غیر محفوظ تبدیلیاں ضائع ھو جائیں گی۔"
+
+msgid ""
+"You have selected an action, but you haven't saved your changes to "
+"individual fields yet. Please click OK to save. You'll need to re-run the "
+"action."
+msgstr ""
+"آپ نے ایک کاروائی منتخب کی ھے لیکن ابھی تک آپ نے ذاتی خانوں میں اپنی "
+"تبدیلیاں محفوظ نہیں کی ہیں براہ مھربانی محفوط کرنے کے لئے OK پر کلک کریں۔ آپ "
+"کاوائی دوبارہ چلانے کی ضرورت ھوگی۔"
+
+msgid ""
+"You have selected an action, and you haven't made any changes on individual "
+"fields. You're probably looking for the Go button rather than the Save "
+"button."
+msgstr ""
+"آپ نے ایک کاروائی منتخب کی ھے، اور آپ نے ذاتی خانوں میں کوئی تبدیلی نہیں کی "
+"غالباً آپ 'جاؤ' بٹن تلاش کر رھے ھیں بجائے 'مخفوظ کریں' بٹن کے۔"
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] ""
+msgstr[1] ""
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Now"
+msgstr "اب"
+
+msgid "Choose a Time"
+msgstr ""
+
+msgid "Choose a time"
+msgstr "وقت منتخب کریں"
+
+msgid "Midnight"
+msgstr "نصف رات"
+
+msgid "6 a.m."
+msgstr "6 ص"
+
+msgid "Noon"
+msgstr "دوپھر"
+
+msgid "6 p.m."
+msgstr ""
+
+msgid "Cancel"
+msgstr "منسوخ کریں"
+
+msgid "Today"
+msgstr "آج"
+
+msgid "Choose a Date"
+msgstr ""
+
+msgid "Yesterday"
+msgstr "گزشتہ کل"
+
+msgid "Tomorrow"
+msgstr "آئندہ کل"
+
+msgid "January"
+msgstr ""
+
+msgid "February"
+msgstr ""
+
+msgid "March"
+msgstr ""
+
+msgid "April"
+msgstr ""
+
+msgid "May"
+msgstr ""
+
+msgid "June"
+msgstr ""
+
+msgid "July"
+msgstr ""
+
+msgid "August"
+msgstr ""
+
+msgid "September"
+msgstr ""
+
+msgid "October"
+msgstr ""
+
+msgid "November"
+msgstr ""
+
+msgid "December"
+msgstr ""
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr ""
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr ""
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr ""
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr ""
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr ""
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr ""
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr ""
+
+msgid "Show"
+msgstr "دکھائیں"
+
+msgid "Hide"
+msgstr "چھپائیں"

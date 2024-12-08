@@ -1,0 +1,329 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# fasouto <fsoutomoure@gmail.com>, 2011
+# fonso <fonzzo@gmail.com>, 2011,2013
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Leandro Regueiro <leandro.regueiro@gmail.com>, 2013
+# X Bello <xbello@gmail.com>, 2023
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-09-18 15:04-0300\n"
+"PO-Revision-Date: 2023-12-04 07:59+0000\n"
+"Last-Translator: X Bello <xbello@gmail.com>, 2023\n"
+"Language-Team: Galician (http://app.transifex.com/django/django/language/"
+"gl/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: gl\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, javascript-format
+msgid "Available %s"
+msgstr "%s dispoñíbeis"
+
+#, javascript-format
+msgid ""
+"This is the list of available %s. You may choose some by selecting them in "
+"the box below and then clicking the \"Choose\" arrow between the two boxes."
+msgstr ""
+"Esta é unha lista de %s dispoñíbeis. Pode escoller algúns seleccionándoos na "
+"caixa inferior e a continuación facendo clic na frecha \"Escoller\" situada "
+"entre as dúas caixas."
+
+#, javascript-format
+msgid "Type into this box to filter down the list of available %s."
+msgstr "Escriba nesta caixa para filtrar a lista de %s dispoñíbeis."
+
+msgid "Filter"
+msgstr "Filtro"
+
+msgid "Choose all"
+msgstr "Escoller todo"
+
+#, javascript-format
+msgid "Click to choose all %s at once."
+msgstr "Prema para escoller todos/as os/as '%s' dunha vez."
+
+msgid "Choose"
+msgstr "Escoller"
+
+msgid "Remove"
+msgstr "Retirar"
+
+#, javascript-format
+msgid "Chosen %s"
+msgstr "%s escollido/a(s)"
+
+#, javascript-format
+msgid ""
+"This is the list of chosen %s. You may remove some by selecting them in the "
+"box below and then clicking the \"Remove\" arrow between the two boxes."
+msgstr ""
+"Esta é a lista de %s escollidos/as. Pode eliminar algúns seleccionándoos na "
+"caixa inferior e a continuación facendo clic na frecha \"Eliminar\" situada "
+"entre as dúas caixas."
+
+#, javascript-format
+msgid "Type into this box to filter down the list of selected %s."
+msgstr "Escriba nesta caixa para filtrar a lista de %s seleccionados."
+
+msgid "Remove all"
+msgstr "Retirar todos"
+
+#, javascript-format
+msgid "Click to remove all chosen %s at once."
+msgstr "Faga clic para eliminar da lista todos/as os/as '%s' escollidos/as."
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] "%s opción seleccionada non visible"
+msgstr[1] "%s opcións seleccionadas non visibles"
+
+msgid "%(sel)s of %(cnt)s selected"
+msgid_plural "%(sel)s of %(cnt)s selected"
+msgstr[0] "%(sel)s de %(cnt)s escollido"
+msgstr[1] "%(sel)s de %(cnt)s escollidos"
+
+msgid ""
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
+msgstr ""
+"Tes cambios sen guardar en campos editables individuales. Se executas unha "
+"acción, os cambios non gardados perderanse."
+
+msgid ""
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
+"action."
+msgstr ""
+"Escolleu unha acción, pero aínda non gardou os cambios nos campos "
+"individuais. Prema OK para gardar. Despois terá que volver executar a acción."
+
+msgid ""
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
+"button."
+msgstr ""
+"Escolleu unha acción, pero aínda non gardou os cambios nos campos "
+"individuais. Probablemente estea buscando o botón Ir no canto do botón "
+"Gardar."
+
+msgid "Now"
+msgstr "Agora"
+
+msgid "Midnight"
+msgstr "Medianoite"
+
+msgid "6 a.m."
+msgstr "6 da mañá"
+
+msgid "Noon"
+msgstr "Mediodía"
+
+msgid "6 p.m."
+msgstr "6 da tarde"
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "Nota: Está %s hora por diante da hora do servidor."
+msgstr[1] "Nota: Está %s horas por diante da hora do servidor."
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "Nota: Está %s hora por detrás da hora do servidor."
+msgstr[1] "Nota: Está %s horas por detrás da hora do servidor."
+
+msgid "Choose a Time"
+msgstr "Escolla unha Hora"
+
+msgid "Choose a time"
+msgstr "Escolla unha hora"
+
+msgid "Cancel"
+msgstr "Cancelar"
+
+msgid "Today"
+msgstr "Hoxe"
+
+msgid "Choose a Date"
+msgstr "Escolla unha Data"
+
+msgid "Yesterday"
+msgstr "Onte"
+
+msgid "Tomorrow"
+msgstr "Mañá"
+
+msgid "January"
+msgstr "Xaneiro"
+
+msgid "February"
+msgstr "Febreiro"
+
+msgid "March"
+msgstr "Marzo"
+
+msgid "April"
+msgstr "Abril"
+
+msgid "May"
+msgstr "Maio"
+
+msgid "June"
+msgstr "Xuño"
+
+msgid "July"
+msgstr "Xullo"
+
+msgid "August"
+msgstr "Agosto"
+
+msgid "September"
+msgstr "Setembro"
+
+msgid "October"
+msgstr "Outubro"
+
+msgid "November"
+msgstr "Novembro"
+
+msgid "December"
+msgstr "Decembro"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "Xan"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "Feb"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "Mar"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "Abr"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "Maio"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "Xuñ"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "Xul"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "Ago"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "Set"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "Out"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "Nov"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "Dec"
+
+msgid "Sunday"
+msgstr "Domingo"
+
+msgid "Monday"
+msgstr "Luns"
+
+msgid "Tuesday"
+msgstr "Martes"
+
+msgid "Wednesday"
+msgstr "Mércores"
+
+msgid "Thursday"
+msgstr "Xoves"
+
+msgid "Friday"
+msgstr "Venres"
+
+msgid "Saturday"
+msgstr "Sábado"
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr "Domingo"
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr "Lun"
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr "Mar"
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr "Mér"
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr "Xov"
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr "Ven"
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr "Sáb"
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr "D"
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr "L"
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr "M"
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr "M"
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr "X"
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr "V"
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr "S"
+
+msgid "Show"
+msgstr "Amosar"
+
+msgid "Hide"
+msgstr "Esconder"

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<django-objects version="1.0">
+    <object pk="1" model="fixtures_regress.animal">
+        <field type="CharField" name="name">Wolf</field>
+        <field type="CharField" name="extra_name">Super Wolf</field>
+        <field type="CharField" name="latin_name">Canis lupus</field>
+        <field type="IntegerField" name="count">3</field>
+        <field type="FloatField" name="weight">1.2</field>
+    </object>
+</django-objects>

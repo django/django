@@ -1,0 +1,275 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Oleksandr Chernihov <o.chernihov@gmail.com>, 2014
+# Boryslav Larin <brabadu@gmail.com>, 2011
+# Denis Podlesniy <haos616@gmail.com>, 2016
+# Illia Volochii <illia.volochii@gmail.com>, 2021
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Panasoft, 2016
+# Sergey Lysach <sergikoff88@gmail.com>, 2011-2012
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-10-21 18:50+0000\n"
+"Last-Translator: Illia Volochii <illia.volochii@gmail.com>\n"
+"Language-Team: Ukrainian (http://www.transifex.com/django/django/language/"
+"uk/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: uk\n"
+"Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != "
+"11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % "
+"100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || "
+"(n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
+
+#, javascript-format
+msgid "Available %s"
+msgstr "В наявності %s"
+
+#, javascript-format
+msgid ""
+"This is the list of available %s. You may choose some by selecting them in "
+"the box below and then clicking the \"Choose\" arrow between the two boxes."
+msgstr ""
+"Це список всіх доступних %s. Ви можете обрати деякі з них, виділивши їх у "
+"полі нижче і натиснувшт кнопку \"Обрати\"."
+
+#, javascript-format
+msgid "Type into this box to filter down the list of available %s."
+msgstr ""
+"Почніть вводити текст в цьому полі щоб відфільтрувати список доступних %s."
+
+msgid "Filter"
+msgstr "Фільтр"
+
+msgid "Choose all"
+msgstr "Обрати всі"
+
+#, javascript-format
+msgid "Click to choose all %s at once."
+msgstr "Натисніть щоб обрати всі %s відразу."
+
+msgid "Choose"
+msgstr "Обрати"
+
+msgid "Remove"
+msgstr "Видалити"
+
+#, javascript-format
+msgid "Chosen %s"
+msgstr "Обрано %s"
+
+#, javascript-format
+msgid ""
+"This is the list of chosen %s. You may remove some by selecting them in the "
+"box below and then clicking the \"Remove\" arrow between the two boxes."
+msgstr ""
+"Це список обраних %s. Ви можете видалити деякі з них, виділивши їх у полі "
+"нижче і натиснувши кнопку \"Видалити\"."
+
+msgid "Remove all"
+msgstr "Видалити все"
+
+#, javascript-format
+msgid "Click to remove all chosen %s at once."
+msgstr "Натисніть щоб видалити всі обрані %s відразу."
+
+msgid "%(sel)s of %(cnt)s selected"
+msgid_plural "%(sel)s of %(cnt)s selected"
+msgstr[0] "Обрано %(sel)s з %(cnt)s"
+msgstr[1] "Обрано %(sel)s з %(cnt)s"
+msgstr[2] "Обрано %(sel)s з %(cnt)s"
+msgstr[3] "Обрано %(sel)s з %(cnt)s"
+
+msgid ""
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
+msgstr ""
+"Ви зробили якісь зміни у деяких полях. Якщо Ви виконаєте цю дію, всі "
+"незбережені зміни буде втрачено."
+
+msgid ""
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
+"action."
+msgstr ""
+
+msgid ""
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
+"button."
+msgstr ""
+
+msgid "Now"
+msgstr "Зараз"
+
+msgid "Midnight"
+msgstr "Північ"
+
+msgid "6 a.m."
+msgstr "6"
+
+msgid "Noon"
+msgstr "Полудень"
+
+msgid "6 p.m."
+msgstr "18:00"
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "Примітка: Ви на %s годину попереду серверного часу."
+msgstr[1] "Примітка: Ви на %s години попереду серверного часу."
+msgstr[2] "Примітка: Ви на %s годин попереду серверного часу."
+msgstr[3] "Примітка: Ви на %s годин попереду серверного часу."
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "Примітка: Ви на %s годину позаду серверного часу."
+msgstr[1] "Примітка: Ви на %s години позаду серверного часу."
+msgstr[2] "Примітка: Ви на %s годин позаду серверного часу."
+msgstr[3] "Примітка: Ви на %s годин позаду серверного часу."
+
+msgid "Choose a Time"
+msgstr "Оберіть час"
+
+msgid "Choose a time"
+msgstr "Оберіть час"
+
+msgid "Cancel"
+msgstr "Відмінити"
+
+msgid "Today"
+msgstr "Сьогодні"
+
+msgid "Choose a Date"
+msgstr "Оберіть дату"
+
+msgid "Yesterday"
+msgstr "Вчора"
+
+msgid "Tomorrow"
+msgstr "Завтра"
+
+msgid "January"
+msgstr "січня"
+
+msgid "February"
+msgstr "лютого"
+
+msgid "March"
+msgstr "березня"
+
+msgid "April"
+msgstr "квітня"
+
+msgid "May"
+msgstr "травня"
+
+msgid "June"
+msgstr "червня"
+
+msgid "July"
+msgstr "липня"
+
+msgid "August"
+msgstr "серпня"
+
+msgid "September"
+msgstr "вересня"
+
+msgid "October"
+msgstr "жовтня"
+
+msgid "November"
+msgstr "листопада"
+
+msgid "December"
+msgstr "грудня"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "Січ."
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "Лют."
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "Берез."
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "Квіт."
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "Трав."
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "Черв."
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "Лип."
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "Серп."
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "Верес."
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "Жовт."
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "Листоп."
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "Груд."
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr "Н"
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr "П"
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr "В"
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr "С"
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr "Ч"
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr "П"
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr "С"
+
+msgid "Show"
+msgstr "Показати"
+
+msgid "Hide"
+msgstr "Сховати"

@@ -1,0 +1,496 @@
+============================
+Database access optimization
+============================
+
+Django's database layer provides various ways to help developers get the most
+out of their databases. This document gathers together links to the relevant
+documentation, and adds various tips, organized under a number of headings that
+outline the steps to take when attempting to optimize your database usage.
+
+Profile first
+=============
+
+As general programming practice, this goes without saying. Find out :ref:`what
+queries you are doing and what they are costing you <faq-see-raw-sql-queries>`.
+Use :meth:`.QuerySet.explain` to understand how specific ``QuerySet``\s are
+executed by your database. You may also want to use an external project like
+:pypi:`django-debug-toolbar`, or a tool that monitors your database directly.
+
+Remember that you may be optimizing for speed or memory or both, depending on
+your requirements. Sometimes optimizing for one will be detrimental to the
+other, but sometimes they will help each other. Also, work that is done by the
+database process might not have the same cost (to you) as the same amount of
+work done in your Python process. It is up to you to decide what your
+priorities are, where the balance must lie, and profile all of these as required
+since this will depend on your application and server.
+
+With everything that follows, remember to profile after every change to ensure
+that the change is a benefit, and a big enough benefit given the decrease in
+readability of your code. **All** of the suggestions below come with the caveat
+that in your circumstances the general principle might not apply, or might even
+be reversed.
+
+Use standard DB optimization techniques
+=======================================
+
+...including:
+
+* Indexes_. This is a number one priority, *after* you have determined from
+  profiling what indexes should be added. Use
+  :attr:`Meta.indexes <django.db.models.Options.indexes>` or
+  :attr:`Field.db_index <django.db.models.Field.db_index>` to add these from
+  Django. Consider adding indexes to fields that you frequently query using
+  :meth:`~django.db.models.query.QuerySet.filter()`,
+  :meth:`~django.db.models.query.QuerySet.exclude()`,
+  :meth:`~django.db.models.query.QuerySet.order_by()`, etc. as indexes may help
+  to speed up lookups. Note that determining the best indexes is a complex
+  database-dependent topic that will depend on your particular application.
+  The overhead of maintaining an index may outweigh any gains in query speed.
+
+.. _Indexes: https://en.wikipedia.org/wiki/Database_index
+
+* Appropriate use of field types.
+
+We will assume you have done the things listed above. The rest of this document
+focuses on how to use Django in such a way that you are not doing unnecessary
+work. This document also does not address other optimization techniques that
+apply to all expensive operations, such as :doc:`general purpose caching
+</topics/cache>`.
+
+Understand ``QuerySet``\s
+=========================
+
+Understanding :doc:`QuerySets </ref/models/querysets>` is vital to getting good
+performance with simple code. In particular:
+
+Understand ``QuerySet`` evaluation
+----------------------------------
+
+To avoid performance problems, it is important to understand:
+
+* that :ref:`QuerySets are lazy <querysets-are-lazy>`.
+
+* when :ref:`they are evaluated <when-querysets-are-evaluated>`.
+
+* how :ref:`the data is held in memory <caching-and-querysets>`.
+
+Understand cached attributes
+----------------------------
+
+As well as caching of the whole ``QuerySet``, there is caching of the result of
+attributes on ORM objects. In general, attributes that are not callable will be
+cached. For example, assuming the :ref:`example blog models
+<queryset-model-example>`:
+
+.. code-block:: pycon
+
+  >>> entry = Entry.objects.get(id=1)
+  >>> entry.blog  # Blog object is retrieved at this point
+  >>> entry.blog  # cached version, no DB access
+
+But in general, callable attributes cause DB lookups every time:
+
+.. code-block:: pycon
+
+  >>> entry = Entry.objects.get(id=1)
+  >>> entry.authors.all()  # query performed
+  >>> entry.authors.all()  # query performed again
+
+Be careful when reading template code - the template system does not allow use
+of parentheses, but will call callables automatically, hiding the above
+distinction.
+
+Be careful with your own custom properties - it is up to you to implement
+caching when required, for example using the
+:class:`~django.utils.functional.cached_property` decorator.
+
+Use the ``with`` template tag
+-----------------------------
+
+To make use of the caching behavior of ``QuerySet``, you may need to use the
+:ttag:`with` template tag.
+
+Use ``iterator()``
+------------------
+
+When you have a lot of objects, the caching behavior of the ``QuerySet`` can
+cause a large amount of memory to be used. In this case,
+:meth:`~django.db.models.query.QuerySet.iterator()` may help.
+
+Use ``explain()``
+-----------------
+
+:meth:`.QuerySet.explain` gives you detailed information about how the database
+executes a query, including indexes and joins that are used. These details may
+help you find queries that could be rewritten more efficiently, or identify
+indexes that could be added to improve performance.
+
+Do database work in the database rather than in Python
+======================================================
+
+For instance:
+
+* At the most basic level, use :ref:`filter and exclude <queryset-api>` to do
+  filtering in the database.
+
+* Use :class:`F expressions <django.db.models.F>` to filter
+  based on other fields within the same model.
+
+* Use :doc:`annotate to do aggregation in the database
+  </topics/db/aggregation>`.
+
+If these aren't enough to generate the SQL you need:
+
+Use ``RawSQL``
+--------------
+
+A less portable but more powerful method is the
+:class:`~django.db.models.expressions.RawSQL` expression, which allows some SQL
+to be explicitly added to the query. If that still isn't powerful enough:
+
+Use raw SQL
+-----------
+
+Write your own :doc:`custom SQL to retrieve data or populate models
+</topics/db/sql>`. Use ``django.db.connection.queries`` to find out what Django
+is writing for you and start from there.
+
+Retrieve individual objects using a unique, indexed column
+==========================================================
+
+There are two reasons to use a column with
+:attr:`~django.db.models.Field.unique` or
+:attr:`~django.db.models.Field.db_index` when using
+:meth:`~django.db.models.query.QuerySet.get` to retrieve individual objects.
+First, the query will be quicker because of the underlying database index.
+Also, the query could run much slower if multiple objects match the lookup;
+having a unique constraint on the column guarantees this will never happen.
+
+So using the :ref:`example blog models <queryset-model-example>`:
+
+.. code-block:: pycon
+
+  >>> entry = Entry.objects.get(id=10)
+
+will be quicker than:
+
+.. code-block:: pycon
+
+  >>> entry = Entry.objects.get(headline="News Item Title")
+
+because ``id`` is indexed by the database and is guaranteed to be unique.
+
+Doing the following is potentially quite slow:
+
+.. code-block:: pycon
+
+  >>> entry = Entry.objects.get(headline__startswith="News")
+
+First of all, ``headline`` is not indexed, which will make the underlying
+database fetch slower.
+
+Second, the lookup doesn't guarantee that only one object will be returned.
+If the query matches more than one object, it will retrieve and transfer all of
+them from the database. This penalty could be substantial if hundreds or
+thousands of records are returned. The penalty will be compounded if the
+database lives on a separate server, where network overhead and latency also
+play a factor.
+
+Retrieve everything at once if you know you will need it
+========================================================
+
+Hitting the database multiple times for different parts of a single 'set' of
+data that you will need all parts of is, in general, less efficient than
+retrieving it all in one query. This is particularly important if you have a
+query that is executed in a loop, and could therefore end up doing many database
+queries, when only one was needed. So:
+
+Use ``QuerySet.select_related()`` and ``prefetch_related()``
+------------------------------------------------------------
+
+Understand :meth:`~django.db.models.query.QuerySet.select_related` and
+:meth:`~django.db.models.query.QuerySet.prefetch_related` thoroughly, and use
+them:
+
+* in :doc:`managers and default managers </topics/db/managers>` where
+  appropriate. Be aware when your manager is and is not used; sometimes this is
+  tricky so don't make assumptions.
+
+* in view code or other layers, possibly making use of
+  :func:`~django.db.models.prefetch_related_objects` where needed.
+
+Don't retrieve things you don't need
+====================================
+
+Use ``QuerySet.values()`` and ``values_list()``
+-----------------------------------------------
+
+When you only want a ``dict`` or ``list`` of values, and don't need ORM model
+objects, make appropriate usage of
+:meth:`~django.db.models.query.QuerySet.values()`.
+These can be useful for replacing model objects in template code - as long as
+the dicts you supply have the same attributes as those used in the template,
+you are fine.
+
+Use ``QuerySet.defer()`` and ``only()``
+---------------------------------------
+
+Use :meth:`~django.db.models.query.QuerySet.defer()` and
+:meth:`~django.db.models.query.QuerySet.only()` if there are database columns
+you know that you won't need (or won't need in most cases) to avoid loading
+them. Note that if you *do* use them, the ORM will have to go and get them in
+a separate query, making this a pessimization if you use it inappropriately.
+
+Don't be too aggressive in deferring fields without profiling as the database
+has to read most of the non-text, non-``VARCHAR`` data from the disk for a
+single row in the results, even if it ends up only using a few columns. The
+``defer()`` and ``only()`` methods are most useful when you can avoid loading a
+lot of text data or for fields that might take a lot of processing to convert
+back to Python. As always, profile first, then optimize.
+
+Use ``QuerySet.contains(obj)``
+------------------------------
+
+...if you only want to find out if ``obj`` is in the queryset, rather than
+``if obj in queryset``.
+
+Use ``QuerySet.count()``
+------------------------
+
+...if you only want the count, rather than doing ``len(queryset)``.
+
+Use ``QuerySet.exists()``
+-------------------------
+
+...if you only want to find out if at least one result exists, rather than ``if
+queryset``.
+
+But:
+
+.. _overuse_of_count_and_exists:
+
+Don't overuse ``contains()``, ``count()``, and ``exists()``
+-----------------------------------------------------------
+
+If you are going to need other data from the QuerySet, evaluate it immediately.
+
+For example, assuming a ``Group`` model that has a many-to-many relation to
+``User``, the following code is optimal::
+
+    members = group.members.all()
+
+    if display_group_members:
+        if members:
+            if current_user in members:
+                print("You and", len(members) - 1, "other users are members of this group.")
+            else:
+                print("There are", len(members), "members in this group.")
+
+            for member in members:
+                print(member.username)
+        else:
+            print("There are no members in this group.")
+
+It is optimal because:
+
+#. Since QuerySets are lazy, this does no database queries if
+   ``display_group_members`` is ``False``.
+
+#. Storing ``group.members.all()`` in the ``members`` variable allows its
+   result cache to be reused.
+
+#. The line ``if members:`` causes ``QuerySet.__bool__()`` to be called, which
+   causes the ``group.members.all()`` query to be run on the database. If there
+   aren't any results, it will return ``False``, otherwise ``True``.
+
+#. The line ``if current_user in members:`` checks if the user is in the result
+   cache, so no additional database queries are issued.
+
+#. The use of ``len(members)`` calls ``QuerySet.__len__()``, reusing the result
+   cache, so again, no database queries are issued.
+
+#. The ``for member`` loop iterates over the result cache.
+
+In total, this code does either one or zero database queries. The only
+deliberate optimization performed is using the ``members`` variable. Using
+``QuerySet.exists()`` for the ``if``, ``QuerySet.contains()`` for the ``in``,
+or ``QuerySet.count()`` for the count would each cause additional queries.
+
+Use ``QuerySet.update()`` and ``delete()``
+------------------------------------------
+
+Rather than retrieve a load of objects, set some values, and save them
+individual, use a bulk SQL UPDATE statement, via :ref:`QuerySet.update()
+<topics-db-queries-update>`. Similarly, do :ref:`bulk deletes
+<topics-db-queries-delete>` where possible.
+
+Note, however, that these bulk update methods cannot call the ``save()`` or
+``delete()`` methods of individual instances, which means that any custom
+behavior you have added for these methods will not be executed, including
+anything driven from the normal database object :doc:`signals </ref/signals>`.
+
+Use foreign key values directly
+-------------------------------
+
+If you only need a foreign key value, use the foreign key value that is already on
+the object you've got, rather than getting the whole related object and taking
+its primary key. i.e. do::
+
+   entry.blog_id
+
+instead of::
+
+   entry.blog.id
+
+Don't order results if you don't care
+-------------------------------------
+
+Ordering is not free; each field to order by is an operation the database must
+perform. If a model has a default ordering (:attr:`Meta.ordering
+<django.db.models.Options.ordering>`) and you don't need it, remove
+it on a ``QuerySet`` by calling
+:meth:`~django.db.models.query.QuerySet.order_by()` with no parameters.
+
+Adding an index to your database may help to improve ordering performance.
+
+Use bulk methods
+================
+
+Use bulk methods to reduce the number of SQL statements.
+
+Create in bulk
+--------------
+
+When creating objects, where possible, use the
+:meth:`~django.db.models.query.QuerySet.bulk_create()` method to reduce the
+number of SQL queries. For example::
+
+    Entry.objects.bulk_create(
+        [
+            Entry(headline="This is a test"),
+            Entry(headline="This is only a test"),
+        ]
+    )
+
+...is preferable to::
+
+    Entry.objects.create(headline="This is a test")
+    Entry.objects.create(headline="This is only a test")
+
+Note that there are a number of :meth:`caveats to this method
+<django.db.models.query.QuerySet.bulk_create>`, so make sure it's appropriate
+for your use case.
+
+Update in bulk
+--------------
+
+When updating objects, where possible, use the
+:meth:`~django.db.models.query.QuerySet.bulk_update()` method to reduce the
+number of SQL queries. Given a list or queryset of objects::
+
+    entries = Entry.objects.bulk_create(
+        [
+            Entry(headline="This is a test"),
+            Entry(headline="This is only a test"),
+        ]
+    )
+
+The following example::
+
+    entries[0].headline = "This is not a test"
+    entries[1].headline = "This is no longer a test"
+    Entry.objects.bulk_update(entries, ["headline"])
+
+...is preferable to::
+
+    entries[0].headline = "This is not a test"
+    entries[0].save()
+    entries[1].headline = "This is no longer a test"
+    entries[1].save()
+
+Note that there are a number of :meth:`caveats to this method
+<django.db.models.query.QuerySet.bulk_update>`, so make sure it's appropriate
+for your use case.
+
+Insert in bulk
+--------------
+
+When inserting objects into :class:`ManyToManyFields
+<django.db.models.ManyToManyField>`, use
+:meth:`~django.db.models.fields.related.RelatedManager.add` with multiple
+objects to reduce the number of SQL queries. For example::
+
+    my_band.members.add(me, my_friend)
+
+...is preferable to::
+
+    my_band.members.add(me)
+    my_band.members.add(my_friend)
+
+...where ``Bands`` and ``Artists`` have a many-to-many relationship.
+
+When inserting different pairs of objects into
+:class:`~django.db.models.ManyToManyField` or when the custom
+:attr:`~django.db.models.ManyToManyField.through` table is defined, use
+:meth:`~django.db.models.query.QuerySet.bulk_create()` method to reduce the
+number of SQL queries. For example::
+
+    PizzaToppingRelationship = Pizza.toppings.through
+    PizzaToppingRelationship.objects.bulk_create(
+        [
+            PizzaToppingRelationship(pizza=my_pizza, topping=pepperoni),
+            PizzaToppingRelationship(pizza=your_pizza, topping=pepperoni),
+            PizzaToppingRelationship(pizza=your_pizza, topping=mushroom),
+        ],
+        ignore_conflicts=True,
+    )
+
+...is preferable to::
+
+    my_pizza.toppings.add(pepperoni)
+    your_pizza.toppings.add(pepperoni, mushroom)
+
+...where ``Pizza`` and ``Topping`` have a many-to-many relationship. Note that
+there are a number of :meth:`caveats to this method
+<django.db.models.query.QuerySet.bulk_create>`, so make sure it's appropriate
+for your use case.
+
+Remove in bulk
+--------------
+
+When removing objects from :class:`ManyToManyFields
+<django.db.models.ManyToManyField>`, use
+:meth:`~django.db.models.fields.related.RelatedManager.remove` with multiple
+objects to reduce the number of SQL queries. For example::
+
+    my_band.members.remove(me, my_friend)
+
+...is preferable to::
+
+    my_band.members.remove(me)
+    my_band.members.remove(my_friend)
+
+...where ``Bands`` and ``Artists`` have a many-to-many relationship.
+
+When removing different pairs of objects from :class:`ManyToManyFields
+<django.db.models.ManyToManyField>`, use
+:meth:`~django.db.models.query.QuerySet.delete` on a
+:class:`~django.db.models.Q` expression with multiple
+:attr:`~django.db.models.ManyToManyField.through`  model instances to reduce
+the number of SQL queries. For example::
+
+    from django.db.models import Q
+
+    PizzaToppingRelationship = Pizza.toppings.through
+    PizzaToppingRelationship.objects.filter(
+        Q(pizza=my_pizza, topping=pepperoni)
+        | Q(pizza=your_pizza, topping=pepperoni)
+        | Q(pizza=your_pizza, topping=mushroom)
+    ).delete()
+
+...is preferable to::
+
+    my_pizza.toppings.remove(pepperoni)
+    your_pizza.toppings.remove(pepperoni, mushroom)
+
+...where ``Pizza`` and ``Topping`` have a many-to-many relationship.

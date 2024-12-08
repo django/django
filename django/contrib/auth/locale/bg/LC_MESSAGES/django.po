@@ -1,0 +1,343 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# arneatec <arneatec@gmail.com>, 2022-2024
+# Boris Chervenkov <office@sentido.bg>, 2012
+# Georgi Kostadinov <grgkostadinov@gmail.com>, 2012
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Lyuboslav  Petrov <petrov.lyuboslav@gmail.com>, 2014
+# Todor Lubenov <tlubenov@gmail.com>, 2015
+# Venelin Stoykov <vkstoykov@gmail.com>, 2015-2016
+# vestimir <vestimir@gmail.com>, 2014
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2024-08-07 08:09+0000\n"
+"Last-Translator: arneatec <arneatec@gmail.com>, 2022-2024\n"
+"Language-Team: Bulgarian (http://app.transifex.com/django/django/language/"
+"bg/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: bg\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Personal info"
+msgstr "Лична информация"
+
+msgid "Permissions"
+msgstr "Права"
+
+msgid "Important dates"
+msgstr "Важни дати"
+
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "%(name)s обект с първичен ключ %(key)r не съществува."
+
+msgid "Conflicting form data submitted. Please try again."
+msgstr "Изпратихте данни с противоречия чрез формата. Моля опитайте отново."
+
+msgid "Password changed successfully."
+msgstr "Паролата беше променена успешно.  "
+
+msgid "Password-based authentication was disabled."
+msgstr "Автентикацията с парола беше спряна."
+
+#, python-format
+msgid "Change password: %s"
+msgstr "Промени парола: %s"
+
+#, python-format
+msgid "Set password: %s"
+msgstr "Задай парола: %s"
+
+msgid "Authentication and Authorization"
+msgstr "Аутентикация и оторизация"
+
+msgid "password"
+msgstr "парола"
+
+msgid "last login"
+msgstr "последно вписване"
+
+msgid "No password set."
+msgstr "Не е зададена парола."
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Невалиден формат за парола или неизвестен алгоритъм за хеширане."
+
+msgid "Reset password"
+msgstr "Възстановяване на парола"
+
+msgid "Set password"
+msgstr "Задаване на парола"
+
+msgid "The two password fields didn’t match."
+msgstr "Двете полета за паролата не съвпадат.  "
+
+msgid ""
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
+msgstr ""
+"Дали потребителят можи да влиза с парола или не. Ако е забранено, те могат "
+"да влизат чрез други способи, като Единно Влизане /Single Sign-On/ или LDAP."
+
+msgid "Password"
+msgstr "Парола"
+
+msgid "Password confirmation"
+msgstr "Потвърждение на паролата"
+
+msgid "Enter the same password as before, for verification."
+msgstr "Въведете същата парола като преди, за да потвърдите."
+
+msgid "Password-based authentication"
+msgstr "Влизане чрез парола"
+
+msgid "Enabled"
+msgstr "Включено"
+
+msgid "Disabled"
+msgstr "Изключено"
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see the user’s password."
+msgstr ""
+"Паролите не се съхраняват в чист вид, така че няма начин да се види паролата "
+"на потребителя."
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
+msgstr "Включете влизането с парола за този потребител като зададете парола."
+
+#, python-format
+msgid ""
+"Please enter a correct %(username)s and password. Note that both fields may "
+"be case-sensitive."
+msgstr ""
+"Моля, въведете правилните %(username)s и парола. Имайте предвид, че и двете "
+"полета могат да бъдат с малки или главни букви."
+
+msgid "This account is inactive."
+msgstr "Този профил е неактивен."
+
+msgid "Email"
+msgstr "Имейл"
+
+msgid "New password"
+msgstr "Нова парола"
+
+msgid "New password confirmation"
+msgstr "Потвърждение на новата парола"
+
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr "Въвели сте погрешна стара парола. Въведете я отново.  "
+
+msgid "Old password"
+msgstr "Стара парола"
+
+msgid "algorithm"
+msgstr "алгоритъм"
+
+msgid "iterations"
+msgstr "повторения"
+
+msgid "salt"
+msgstr "salt"
+
+msgid "hash"
+msgstr "хеш"
+
+msgid "variety"
+msgstr "разнообразие"
+
+msgid "version"
+msgstr "версия"
+
+msgid "memory cost"
+msgstr "разход памет"
+
+msgid "time cost"
+msgstr "разход време"
+
+msgid "parallelism"
+msgstr "паралелизъм"
+
+msgid "work factor"
+msgstr "работен фактор"
+
+msgid "checksum"
+msgstr "чексума"
+
+msgid "block size"
+msgstr "размер на блока"
+
+msgid "name"
+msgstr "име"
+
+msgid "content type"
+msgstr "тип на съдържанието"
+
+msgid "codename"
+msgstr "код"
+
+msgid "permission"
+msgstr "право"
+
+msgid "permissions"
+msgstr "права"
+
+msgid "group"
+msgstr "група"
+
+msgid "groups"
+msgstr "групи"
+
+msgid "superuser status"
+msgstr "статут на супер-потребител"
+
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr ""
+"Указва, че този потребител има всички права (без да има нужда да се "
+"изброяват изрично)."
+
+msgid ""
+"The groups this user belongs to. A user will get all permissions granted to "
+"each of their groups."
+msgstr ""
+"Групите на които този потребител принадлежи. Потребителят ще получи всички "
+"разрешения, дадени на всяка една от своите групи."
+
+msgid "user permissions"
+msgstr "права на потребител"
+
+msgid "Specific permissions for this user."
+msgstr "Специфични права за този потребител"
+
+msgid "username"
+msgstr "потребител"
+
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr "Задължително. 150 знака или по-малко. Букви, цифри и @/./+/-/_ ."
+
+msgid "A user with that username already exists."
+msgstr "Потребител с това потребителско име вече съществува.  "
+
+msgid "first name"
+msgstr "собствено име"
+
+msgid "last name"
+msgstr "фамилно име"
+
+msgid "email address"
+msgstr "имейл адрес"
+
+msgid "staff status"
+msgstr "статус на персонал"
+
+msgid "Designates whether the user can log into this admin site."
+msgstr "Указва дали този потребител има достъп до административния панел."
+
+msgid "active"
+msgstr "активен"
+
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+"Указва дали този потребител трябва да се третира като активен. Премахнете "
+"тази отметката, вместо да изтривате профили."
+
+msgid "date joined"
+msgstr "дата на регистриране"
+
+msgid "user"
+msgstr "потребител"
+
+msgid "users"
+msgstr "потребители"
+
+#, python-format
+msgid ""
+"This password is too short. It must contain at least %(min_length)d "
+"character."
+msgid_plural ""
+"This password is too short. It must contain at least %(min_length)d "
+"characters."
+msgstr[0] ""
+"Паролата е прекалено къса. Трябва да съдържа поне %(min_length)d символ."
+msgstr[1] ""
+"Паролата е прекалено къса. Трябва да съдържа поне %(min_length)d символа."
+
+#, python-format
+msgid "Your password must contain at least %(min_length)d character."
+msgid_plural "Your password must contain at least %(min_length)d characters."
+msgstr[0] "Вашата парола трябва да съдържа поне %(min_length)d символ."
+msgstr[1] "Вашата парола трябва да съдържа поне %(min_length)d символа."
+
+#, python-format
+msgid "The password is too similar to the %(verbose_name)s."
+msgstr "Паролата е много подобна на %(verbose_name)s."
+
+msgid "Your password can’t be too similar to your other personal information."
+msgstr "Вашата парола не може да прилича на останалата Ви лична информация."
+
+msgid "This password is too common."
+msgstr "Тази парола е често срещана."
+
+msgid "Your password can’t be a commonly used password."
+msgstr "Вашата парола не може да бъде често срещана."
+
+msgid "This password is entirely numeric."
+msgstr "Тази парола е изцяло от цифри."
+
+msgid "Your password can’t be entirely numeric."
+msgstr "Вашата парола не може да бъде само от цифри."
+
+#, python-format
+msgid "Password reset on %(site_name)s"
+msgstr "Промяна на парола за %(site_name)s"
+
+msgid ""
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
+msgstr ""
+"Въведете валидно потребителско име. То може да съдържа неударени малки a-z и "
+"големи A-Z букви, цифри и @/./+/-/_ символи."
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+"Въведете валидно потребителско име. То може да съдържа само букви, цифри и "
+"@/./+/-/_ символи."
+
+msgid "Logged out"
+msgstr "Извън системата"
+
+msgid "Password reset"
+msgstr "Забравена парола"
+
+msgid "Password reset sent"
+msgstr "Нулиране на паролата е изпратено"
+
+msgid "Enter new password"
+msgstr "Въведете нова парола"
+
+msgid "Password reset unsuccessful"
+msgstr "Неуспешна промяна на паролата "
+
+msgid "Password reset complete"
+msgstr "Промяната на парола завърши"
+
+msgid "Password change"
+msgstr "Промяна на парола"
+
+msgid "Password change successful"
+msgstr "Паролата е сменена успешно"
