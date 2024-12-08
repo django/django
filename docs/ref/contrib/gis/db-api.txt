@@ -407,6 +407,7 @@ Function                              PostGIS  Oracle         MariaDB      MySQL
 :class:`FromWKB`                      X        X              X            X           X
 :class:`FromWKT`                      X        X              X            X           X
 :class:`GeoHash`                      X                       X (≥ 11.7)   X           X (LWGEOM/RTTOPO)
+:class:`GeometryDistance`             X
 :class:`Intersection`                 X        X              X            X           X
 :class:`IsEmpty`                      X
 :class:`IsValid`                      X        X              X (≥ 11.7)   X           X
