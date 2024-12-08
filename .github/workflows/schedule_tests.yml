@@ -197,6 +197,54 @@ jobs:
         run: |
           python -Wall runtests.py --verbosity 2 --noinput --selenium=chrome --headless --settings=test_postgres --parallel 2
 
+  sqlite-latest:
+    runs-on: ubuntu-latest
+    name: SQLite latest
+    continue-on-error: true
+    steps:
+      - name: Checkout SQLite
+        uses: actions/checkout@v4
+        with:
+          repository: 'sqlite/sqlite'
+          ref: 'release'
+      - name: Restore SQLite cache
+        id: cache-sqlite-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: /tmp/sqlite3-libs
+          key: ${{ hashFiles('VERSION') }}
+      - name: Build SQLite
+        if: steps.cache-sqlite-restore.outputs.cache-hit != 'true'
+        run: |
+          ./configure
+          make
+          cp -r .libs /tmp/sqlite3-libs
+      - name: Save SQLite cache
+        id: cache-sqlite-save
+        uses: actions/cache/save@v4
+        with:
+          path: /tmp/sqlite3-libs
+          key: ${{ steps.cache-sqlite-restore.outputs.cache-primary-key }}
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip'
+          cache-dependency-path: 'tests/requirements/py3.txt'
+      - name: Install libmemcached-dev for pylibmc
+        run: sudo apt-get install libmemcached-dev
+      - name: Install and upgrade packaging tools
+        run: python -m pip install --upgrade pip setuptools wheel
+      - run: python -m pip install -r tests/requirements/py3.txt -e .
+      - name: Set LD_PRELOAD to use the compiled SQLite library
+        run: echo "LD_PRELOAD=/tmp/sqlite3-libs/libsqlite3.so" >> $GITHUB_ENV
+      - name: Print SQLite version in Python
+        run: python -c 'import sqlite3; print(sqlite3.sqlite_version)'
+      - name: Run tests
+        run: python -Wall tests/runtests.py --verbosity=2
+
   postgresql:
     strategy:
       fail-fast: false
