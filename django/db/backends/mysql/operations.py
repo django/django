@@ -462,6 +462,13 @@ class DatabaseOperations(BaseDatabaseOperations):
         json_element = KeyTextTransform(index, json_array)
 
         if isinstance(lhs.field, UUIDField):
+            lhs = Func(
+                lhs,
+                Value("-"),
+                Value(""),
+                function="REPLACE",
+                output_field=UUIDField(),
+            )
             json_element = Func(
                 json_element,
                 Value("-"),

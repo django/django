@@ -756,7 +756,7 @@ END;
                 function="TO_TIMESTAMP",
                 output_field=DateTimeField(),
             )
-        elif json_element.field != lhs.field:
+        if json_element.field != lhs.field:
             json_element = Cast(json_element, lhs.field)
 
         return lhs, json_element
