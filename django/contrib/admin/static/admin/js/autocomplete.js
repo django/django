@@ -30,4 +30,15 @@
     document.addEventListener('formset:added', (event) => {
         $(event.target).find('.admin-autocomplete').djangoAdminSelect2();
     });
+
+    // document.addEventListener('formset:added', function(e) {
+    //     const formId = e.target.id;  // Get the form ID
+    //     const newField = formId.querySelector('select.selectfilter');
+    //     if (newField) {
+    //         const fieldName = newField.dataset.fieldName;
+    //         const isStacked = parseInt(newField.dataset.isStacked, 10);
+    //         SelectFilter.init(newField.id, fieldName, isStacked);
+    //     }
+    // });
+    
 }

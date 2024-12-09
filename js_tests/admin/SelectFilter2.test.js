@@ -164,3 +164,56 @@ QUnit.test('deselecting option', function(assert) {
         done_left();
     });
 });
+
+QUnit.test('Reinitializes SelectFilter on formset:removed', function (assert) {
+    const $ = django.jQuery;
+
+    // Create inline formset and append it to the fixture
+    const container = $('<div id="formset-container"></div>').appendTo('#qunit-fixture');
+    $('<select id="id_test_select_from" class="filtered"></select>').appendTo(container);
+    $('<select id="id_test_select_to"></select>').appendTo(container);
+
+    // Initialize SelectFilter
+    SelectFilter.init('id_test_select', 'Test Items', 0);
+
+    // Simulate form deletion
+    const event = new Event('formset:removed', { bubbles: true });
+    container[0].dispatchEvent(event);
+
+    // Check if SelectFilter is reinitialized
+    assert.ok(
+        $('#id_test_select_from').length > 0,
+        'The "from" select box exists after reinitialization'
+    );
+    assert.ok(
+        $('#id_test_select_to').length > 0,
+        'The "to" select box exists after reinitialization'
+    );
+});
+
+QUnit.test('Initializes SelectFilter on formset:added', function (assert) {
+    const $ = django.jQuery;
+
+    // Create inline formset and append it to the fixture
+    const container = $('<div id="formset-container"></div>').appendTo('#qunit-fixture');
+    const form = $('<div class="dynamic-form"></div>').appendTo(container);
+    $('<select id="id_new_select_from" class="filtered"></select>').appendTo(form);
+    $('<select id="id_new_select_to"></select>').appendTo(form);
+
+    // Simulate form addition
+    const event = new Event('formset:added', { bubbles: true });
+    form[0].dispatchEvent(event);
+
+    // Initialize SelectFilter for the new select box
+    SelectFilter.init('id_new_select', 'New Test Items', 0);
+
+    // Check if SelectFilter is initialized
+    assert.ok(
+        $('#id_new_select_from').length > 0,
+        'The "from" select box exists after initialization'
+    );
+    assert.ok(
+        $('#id_new_select_to').length > 0,
+        'The "to" select box exists after initialization'
+    );
+});

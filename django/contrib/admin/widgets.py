@@ -38,14 +38,20 @@ class FilteredSelectMultiple(forms.SelectMultiple):
         self.verbose_name = verbose_name
         self.is_stacked = is_stacked
         super().__init__(attrs, choices)
-
+    
     def get_context(self, name, value, attrs):
+        if name is None:
+            name = "None"
+        if attrs is None:
+            attrs = {}
         context = super().get_context(name, value, attrs)
-        context["widget"]["attrs"]["class"] = "selectfilter"
+        widget_attrs = context["widget"]["attrs"]
+        widget_attrs["class"] = "selectfilter"
         if self.is_stacked:
-            context["widget"]["attrs"]["class"] += "stacked"
-        context["widget"]["attrs"]["data-field-name"] = self.verbose_name
-        context["widget"]["attrs"]["data-is-stacked"] = int(self.is_stacked)
+            widget_attrs["class"] += "stacked"
+        widget_attrs["data-field-name"] = self.verbose_name
+        widget_attrs["data-is-stacked"] = int(self.is_stacked)
+        widget_attrs["id"] = attrs.get("id", f"id_{name}")  # Ensure 'id' is set
         return context
 
 
