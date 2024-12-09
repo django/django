@@ -74,6 +74,7 @@ class Coalesce(Func):
     """Return, from left to right, the first non-null expression."""
 
     function = "COALESCE"
+    constrains_nulls = True
 
     def __init__(self, *expressions, **extra):
         if len(expressions) < 2:
@@ -87,6 +88,12 @@ class Coalesce(Func):
             if result is NotImplemented or result is not None:
                 return result
         return None
+
+    def is_nullable(self, nullable_aliases):
+        return not any(
+            not expr.is_nullable(nullable_aliases)
+            for expr in self.get_source_expressions()
+        )
 
     def as_oracle(self, compiler, connection, **extra_context):
         # Oracle prohibits mixing TextField (NCLOB) and CharField (NVARCHAR2),
