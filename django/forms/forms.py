@@ -316,7 +316,7 @@ class BaseForm(RenderableFormMixin):
         """
         Clean all of self.data and populate self._errors and self.cleaned_data.
         """
-        self._errors = ErrorDict()
+        self._errors = ErrorDict(renderer=self.renderer)
         if not self.is_bound:  # Stop further processing.
             return
         self.cleaned_data = {}
