@@ -16,7 +16,6 @@ Requires core.js and SelectBox.js.
             from_box.id += '_from'; // change its ID
             from_box.className = 'filtered';
             from_box.setAttribute('aria-labelledby', field_id + '_from_title');
-            from_box.setAttribute('aria-labelledby', field_id + '_from_title');
 
             for (const p of from_box.parentNode.getElementsByTagName('p')) {
                 if (p.classList.contains("info")) {
@@ -44,15 +43,7 @@ Requires core.js and SelectBox.js.
             selector_available_title.id = field_id + '_from_title';
             selector_available_title.className = 'selector-available-title';
             quickElement('label', selector_available_title, interpolate(gettext('Available %s') + ' ', [field_name]), 'for', field_id + '_from');
-            const selector_available_title = quickElement('div', selector_available);
-            selector_available_title.id = field_id + '_from_title';
-            selector_available_title.className = 'selector-available-title';
-            quickElement('label', selector_available_title, interpolate(gettext('Available %s') + ' ', [field_name]), 'for', field_id + '_from');
             quickElement(
-                'p',
-                selector_available_title,
-                interpolate(gettext('Choose %s by selecting them and then select the "Choose" arrow button.'), [field_name]),
-                'class', 'helptext'
                 'p',
                 selector_available_title,
                 interpolate(gettext('Choose %s by selecting them and then select the "Choose" arrow button.'), [field_name]),
@@ -68,7 +59,6 @@ Requires core.js and SelectBox.js.
                 'span', search_filter_label, '',
                 'class', 'help-tooltip search-label-icon',
                 'aria-label', interpolate(gettext("Type into this box to filter down the list of available %s."), [field_name])
-                'aria-label', interpolate(gettext("Type into this box to filter down the list of available %s."), [field_name])
             );
 
             filter_p.appendChild(document.createTextNode(' '));
@@ -77,13 +67,6 @@ Requires core.js and SelectBox.js.
             filter_input.id = field_id + '_input';
 
             selector_available.appendChild(from_box);
-            const choose_all = quickElement(
-                'button',
-                selector_available,
-                interpolate(gettext('Choose all %s'), [field_name]),
-                'id', field_id + '_add_all',
-                'class', 'selector-chooseall'
-            );
             const choose_all = quickElement(
                 'button',
                 selector_available,
@@ -109,20 +92,6 @@ Requires core.js and SelectBox.js.
                 'id', field_id + '_remove',
                 'class', 'selector-remove'
             );
-            const add_button = quickElement(
-                'button',
-                quickElement('li', selector_chooser),
-                interpolate(gettext('Choose selected %s'), [field_name]),
-                'id', field_id + '_add',
-                'class', 'selector-add'
-            );
-            const remove_button = quickElement(
-                'button',
-                quickElement('li', selector_chooser),
-                interpolate(gettext('Remove selected chosen %s'), [field_name]),
-                'id', field_id + '_remove',
-                'class', 'selector-remove'
-            );
 
             // <div class="selector-chosen">
             const selector_chosen = quickElement('div', selector_div, '', 'id', field_id + '_selector_chosen');
@@ -131,15 +100,7 @@ Requires core.js and SelectBox.js.
             selector_chosen_title.className = 'selector-chosen-title';
             selector_chosen_title.id = field_id + '_to_title';
             quickElement('label', selector_chosen_title, interpolate(gettext('Chosen %s') + ' ', [field_name]), 'for', field_id + '_to');
-            const selector_chosen_title = quickElement('div', selector_chosen);
-            selector_chosen_title.className = 'selector-chosen-title';
-            selector_chosen_title.id = field_id + '_to_title';
-            quickElement('label', selector_chosen_title, interpolate(gettext('Chosen %s') + ' ', [field_name]), 'for', field_id + '_to');
             quickElement(
-                'p',
-                selector_chosen_title,
-                interpolate(gettext('Remove %s by selecting them and then select the "Remove" arrow button.'), [field_name]),
-                'class', 'helptext'
                 'p',
                 selector_chosen_title,
                 interpolate(gettext('Remove %s by selecting them and then select the "Remove" arrow button.'), [field_name]),
@@ -154,7 +115,6 @@ Requires core.js and SelectBox.js.
             quickElement(
                 'span', search_filter_selected_label, '',
                 'class', 'help-tooltip search-label-icon',
-                'aria-label', interpolate(gettext("Type into this box to filter down the list of selected %s."), [field_name])
                 'aria-label', interpolate(gettext("Type into this box to filter down the list of selected %s."), [field_name])
             );
 
@@ -174,27 +134,9 @@ Requires core.js and SelectBox.js.
                 'aria-labelledby', field_id + '_to_title',
                 'class', 'filtered'
             );
-            quickElement(
-                'select',
-                selector_chosen,
-                '',
-                'id', field_id + '_to',
-                'multiple', '',
-                'size', from_box.size,
-                'name', from_box.name,
-                'aria-labelledby', field_id + '_to_title',
-                'class', 'filtered'
-            );
             const warning_footer = quickElement('div', selector_chosen, '', 'class', 'list-footer-display');
             quickElement('span', warning_footer, '', 'id', field_id + '_list-footer-display-text');
             quickElement('span', warning_footer, ' ' + gettext('(click to clear)'), 'class', 'list-footer-display__clear');
-            const clear_all = quickElement(
-                'button',
-                selector_chosen,
-                interpolate(gettext('Remove all %s'), [field_name]),
-                'id', field_id + '_remove_all',
-                'class', 'selector-clearall'
-            );
             const clear_all = quickElement(
                 'button',
                 selector_chosen,
@@ -219,10 +161,8 @@ Requires core.js and SelectBox.js.
                 move_selection(e, this, SelectBox.move_all, field_id + '_from', field_id + '_to');
             });
             add_button.addEventListener('click', function(e) {
-            add_button.addEventListener('click', function(e) {
                 move_selection(e, this, SelectBox.move, field_id + '_from', field_id + '_to');
             });
-            remove_button.addEventListener('click', function(e) {
             remove_button.addEventListener('click', function(e) {
                 move_selection(e, this, SelectBox.move, field_id + '_to', field_id + '_from');
             });
