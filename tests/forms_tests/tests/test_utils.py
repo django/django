@@ -162,6 +162,24 @@ class FormsUtilsTestCase(SimpleTestCase):
             '<a href="http://www.example.com/">example</a></li></ul>',
         )
 
+    def test_error_list_copy(self):
+        e = ErrorList(
+            [
+                ValidationError(
+                    message="message %(i)s",
+                    params={"i": 1},
+                ),
+                ValidationError(
+                    message="message %(i)s",
+                    params={"i": 2},
+                ),
+            ]
+        )
+
+        e_copy = copy.copy(e)
+        self.assertEqual(e, e_copy)
+        self.assertEqual(e.as_data(), e_copy.as_data())
+
     def test_error_list_copy_attributes(self):
         class CustomRenderer(DjangoTemplates):
             pass
@@ -194,6 +212,16 @@ class FormsUtilsTestCase(SimpleTestCase):
 
         e_deepcopy = copy.deepcopy(e)
         self.assertEqual(e, e_deepcopy)
+
+    def test_error_dict_copy_attributes(self):
+        class CustomRenderer(DjangoTemplates):
+            pass
+
+        renderer = CustomRenderer()
+        e = ErrorDict(renderer=renderer)
+
+        e_copy = copy.copy(e)
+        self.assertEqual(e.renderer, e_copy.renderer)
 
     def test_error_dict_html_safe(self):
         e = ErrorDict()
