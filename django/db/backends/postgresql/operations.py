@@ -45,6 +45,8 @@ class DatabaseOperations(BaseDatabaseOperations):
         "AutoField": "integer",
         "BigAutoField": "bigint",
         "SmallAutoField": "smallint",
+        "UUID4Field": "uuid",
+        "UUID4AutoField": "uuid",
     }
 
     if is_psycopg3:
@@ -66,6 +68,8 @@ class DatabaseOperations(BaseDatabaseOperations):
             "IPAddressField",
             "TimeField",
             "UUIDField",
+            "UUID4Field",
+            "UUID4AutoField",
         ):
             # PostgreSQL will resolve a union as type 'text' if input types are
             # 'unknown'.

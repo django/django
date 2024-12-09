@@ -121,6 +121,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         "TextField": "text",
         "TimeField": "time",
         "UUIDField": "uuid",
+        "UUID4Field": "uuid",
+        "UUID4AutoField": "uuid",
     }
     data_type_check_constraints = {
         "PositiveBigIntegerField": '"%(column)s" >= 0',
