@@ -4849,6 +4849,12 @@ class RendererTests(SimpleTestCase):
         form = CustomForm(renderer=custom)
         self.assertEqual(form.renderer, custom)
 
+    def test_get_context_errors(self):
+        custom = CustomRenderer()
+        form = Form(renderer=custom)
+        context = form.get_context()
+        self.assertEqual(context["errors"].renderer, custom)
+
 
 class TemplateTests(SimpleTestCase):
     def test_iterate_radios(self):
