@@ -22,6 +22,7 @@ class Cast(Func):
 
     def as_sqlite(self, compiler, connection, **extra_context):
         db_type = self.output_field.db_type(connection)
+        output_type = self.output_field.get_internal_type()
         if db_type in {"datetime", "time"}:
             # Use strftime as datetime/time don't keep fractional seconds.
             template = "strftime(%%s, %(expressions)s)"
@@ -33,6 +34,11 @@ class Cast(Func):
             return sql, params
         elif db_type == "date":
             template = "date(%(expressions)s)"
+            return super().as_sql(
+                compiler, connection, template=template, **extra_context
+            )
+        elif output_type == "JSONField":
+            template = "JSON(%(expressions)s)"
             return super().as_sql(
                 compiler, connection, template=template, **extra_context
             )
