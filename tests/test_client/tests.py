@@ -29,6 +29,7 @@ from django.contrib.auth.models import User
 from django.core import mail
 from django.http import HttpResponse, HttpResponseNotAllowed
 from django.test import (
+    AsyncClient,
     AsyncRequestFactory,
     Client,
     RequestFactory,
@@ -1249,6 +1250,15 @@ class AsyncClientTest(TestCase):
                     "/async_get_view/", query_params={"example": "data"}
                 )
                 self.assertEqual(response.asgi_request.GET["example"], "data")
+
+    async def test_async_header_defaults(self):
+        async_client = AsyncClient(HTTP_AUTHORIZATION="Bearer I_AM_JWT_TOKEN")
+
+        response = await async_client.get(
+            "/async_default_headers/",
+        )
+
+        self.assertEqual(response.content, b'{"message": "This is a trial view"}')
 
 
 @override_settings(ROOT_URLCONF="test_client.urls")
