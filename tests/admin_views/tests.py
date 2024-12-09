@@ -6225,9 +6225,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.take_screenshot("selectbox-available-perms-some-selected")
 
         # Move permissions to the "Chosen" list, but none is selected yet.
-        self.selenium.find_element(
-            By.CSS_SELECTOR, "#id_user_permissions_add_link"
-        ).click()
+        self.selenium.find_element(By.CSS_SELECTOR, "#id_user_permissions_add").click()
         self.take_screenshot("selectbox-chosen-perms-none-selected")
 
         # Select some permissions from the "Chosen" list.
