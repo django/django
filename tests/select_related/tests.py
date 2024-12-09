@@ -1,5 +1,6 @@
 from django.core.exceptions import FieldError
-from django.test import SimpleTestCase, TestCase
+from django.test import SimpleTestCase, TestCase, ignore_warnings
+from django.utils.deprecation import RemovedInDjango60Warning
 
 from .models import (
     Bookmark,
@@ -119,6 +120,8 @@ class SelectRelatedTests(TestCase):
                 sorted(orders), ["Agaricales", "Diptera", "Fabales", "Primates"]
             )
 
+    # Entire test can be removed once deprecation period ends.
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_select_related_with_extra(self):
         s = (
             Species.objects.all()

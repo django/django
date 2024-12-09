@@ -12,7 +12,8 @@ from django.db.models.functions import ExtractYear, Length, LTrim
 from django.db.models.sql.constants import LOUTER
 from django.db.models.sql.where import AND, OR, NothingNode, WhereNode
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
-from django.test.utils import CaptureQueriesContext, register_lookup
+from django.test.utils import CaptureQueriesContext, ignore_warnings, register_lookup
+from django.utils.deprecation import RemovedInDjango60Warning
 
 from .models import (
     FK1,
@@ -325,26 +326,28 @@ class Queries1Tests(TestCase):
             .count(),
             4,
         )
-        self.assertEqual(
-            (
-                Item.objects.exclude(name="two")
-                .extra(select={"foo": "%s"}, select_params=(1,))
-                .values("creator", "name", "foo")
-                .distinct()
-                .count()
-            ),
-            4,
-        )
-        self.assertEqual(
-            (
-                Item.objects.exclude(name="two")
-                .extra(select={"foo": "%s"}, select_params=(1,))
-                .values("creator", "name")
-                .distinct()
-                .count()
-            ),
-            4,
-        )
+        # Entire block can be removed once deprecation period ends.
+        with ignore_warnings(category=RemovedInDjango60Warning):
+            self.assertEqual(
+                (
+                    Item.objects.exclude(name="two")
+                    .extra(select={"foo": "%s"}, select_params=(1,))
+                    .values("creator", "name", "foo")
+                    .distinct()
+                    .count()
+                ),
+                4,
+            )
+            self.assertEqual(
+                (
+                    Item.objects.exclude(name="two")
+                    .extra(select={"foo": "%s"}, select_params=(1,))
+                    .values("creator", "name")
+                    .distinct()
+                    .count()
+                ),
+                4,
+            )
         xx.delete()
 
     def test_ticket7323(self):
@@ -594,6 +597,8 @@ class Queries1Tests(TestCase):
         with self.assertRaisesMessage(TypeError, msg):
             Author.objects.all() | Tag.objects.all()
 
+    # Entire test can be removed once deprecation period ends.
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_ticket3141(self):
         self.assertEqual(Author.objects.extra(select={"foo": "1"}).count(), 4)
         self.assertEqual(
@@ -750,6 +755,8 @@ class Queries1Tests(TestCase):
             datetime.datetime(2007, 12, 19, 0, 0),
         )
 
+    # Entire test can be removed once deprecation period ends.
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_tickets_7087_12242(self):
         # Dates with extra select columns
         self.assertSequenceEqual(
@@ -893,12 +900,16 @@ class Queries1Tests(TestCase):
             self.assertSequenceEqual(q.annotate(Count("food")), [])
             self.assertSequenceEqual(q.order_by("meal", "food"), [])
             self.assertSequenceEqual(q.distinct(), [])
-            self.assertSequenceEqual(q.extra(select={"foo": "1"}), [])
+            # Block can be removed once deprecation period ends.
+            with ignore_warnings(category=RemovedInDjango60Warning):
+                self.assertSequenceEqual(q.extra(select={"foo": "1"}), [])
             self.assertSequenceEqual(q.reverse(), [])
             q.query.low_mark = 1
-            msg = "Cannot change a query once a slice has been taken."
-            with self.assertRaisesMessage(TypeError, msg):
-                q.extra(select={"foo": "1"})
+            # Block can be removed once deprecation period ends.
+            with ignore_warnings(category=RemovedInDjango60Warning):
+                msg = "Cannot change a query once a slice has been taken."
+                with self.assertRaisesMessage(TypeError, msg):
+                    q.extra(select={"foo": "1"})
             self.assertSequenceEqual(q.defer("meal"), [])
             self.assertSequenceEqual(q.only("meal"), [])
 
@@ -1866,30 +1877,39 @@ class Queries5Tests(TestCase):
             [self.rank1, self.rank2, self.rank3],
         )
 
+        # Block should be changed to use extra(tables).order_by() when
+        # deprecation period ends.
         # Ordering of extra() pieces is possible, too and you can mix extra
         # fields and model fields in the ordering.
-        self.assertSequenceEqual(
-            Ranking.objects.extra(
-                tables=["django_site"], order_by=["-django_site.id", "rank"]
-            ),
-            [self.rank1, self.rank2, self.rank3],
-        )
+        with ignore_warnings(category=RemovedInDjango60Warning):
+            self.assertSequenceEqual(
+                Ranking.objects.extra(
+                    tables=["django_site"], order_by=["-django_site.id", "rank"]
+                ),
+                [self.rank1, self.rank2, self.rank3],
+            )
 
-        sql = "case when %s > 2 then 1 else 0 end" % connection.ops.quote_name("rank")
-        qs = Ranking.objects.extra(select={"good": sql})
-        self.assertEqual(
-            [o.good for o in qs.extra(order_by=("-good",))], [True, False, False]
-        )
-        self.assertSequenceEqual(
-            qs.extra(order_by=("-good", "id")),
-            [self.rank3, self.rank2, self.rank1],
-        )
+        # Entire block can be removed once deprecation period ends.
+        with ignore_warnings(category=RemovedInDjango60Warning):
+            sql = "case when %s > 2 then 1 else 0 end" % connection.ops.quote_name(
+                "rank"
+            )
+            qs = Ranking.objects.extra(select={"good": sql})
+            self.assertEqual(
+                [o.good for o in qs.extra(order_by=("-good",))], [True, False, False]
+            )
+            self.assertSequenceEqual(
+                qs.extra(order_by=("-good", "id")),
+                [self.rank3, self.rank2, self.rank1],
+            )
 
         # Despite having some extra aliases in the query, we can still omit
         # them in a values() query.
         dicts = qs.values("id", "rank").order_by("id")
         self.assertEqual([d["rank"] for d in dicts], [2, 1, 3])
 
+    # Entire test can be removed once deprecation period ends.
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_ticket7256(self):
         # An empty values() call includes all aliases, including those from an
         # extra()
@@ -1962,6 +1982,8 @@ class Queries5Tests(TestCase):
             [self.n1, self.n2],
         )
 
+    # Entire test can be removed once deprecation period ends.
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_extra_select_literal_percent_s(self):
         # Allow %%s to escape select clauses
         self.assertEqual(Note.objects.extra(select={"foo": "'%%s'"})[0].foo, "%s")
@@ -1972,6 +1994,8 @@ class Queries5Tests(TestCase):
             Note.objects.extra(select={"foo": "'bar %%s'"})[0].foo, "bar %s"
         )
 
+    # Entire test can be removed once deprecation period ends.
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_extra_select_alias_sql_injection(self):
         crafted_alias = """injected_name" from "queries_note"; --"""
         msg = (
@@ -2350,6 +2374,8 @@ class QuerysetOrderedTests(unittest.TestCase):
     def test_empty_queryset(self):
         self.assertIs(Annotation.objects.none().ordered, True)
 
+    # Entire test can be removed once deprecation period ends.
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_order_by_extra(self):
         self.assertIs(Annotation.objects.extra(order_by=["id"]).ordered, True)
 
@@ -2682,6 +2708,8 @@ class ValuesQuerysetTests(TestCase):
         qs = qs.values_list("num", flat=True)
         self.assertSequenceEqual(qs, [72])
 
+    # Entire test can be removed once deprecation period ends.
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_extra_values(self):
         # testing for ticket 14930 issues
         qs = Number.objects.extra(
@@ -2692,6 +2720,8 @@ class ValuesQuerysetTests(TestCase):
         qs = qs.values("num")
         self.assertSequenceEqual(qs, [{"num": 72}])
 
+    # Entire test can be removed once deprecation period ends.
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_extra_values_order_twice(self):
         # testing for ticket 14930 issues
         qs = Number.objects.extra(
@@ -2701,6 +2731,8 @@ class ValuesQuerysetTests(TestCase):
         qs = qs.values("num")
         self.assertSequenceEqual(qs, [{"num": 72}])
 
+    # Entire test can be removed once deprecation period ends.
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_extra_values_order_multiple(self):
         # Postgres doesn't allow constants in order by, so check for that.
         qs = Number.objects.extra(
@@ -2714,6 +2746,8 @@ class ValuesQuerysetTests(TestCase):
         qs = qs.values("num")
         self.assertSequenceEqual(qs, [{"num": 72}])
 
+    # Entire test can be removed once deprecation period ends.
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_extra_values_order_in_extra(self):
         # testing for ticket 14930 issues
         qs = Number.objects.extra(
@@ -2722,6 +2756,8 @@ class ValuesQuerysetTests(TestCase):
         )
         qs = qs.values("num")
 
+    # Entire test can be removed once deprecation period ends.
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_extra_select_params_values_order_in_extra(self):
         # testing for 23259 issue
         qs = Number.objects.extra(
@@ -2733,6 +2769,8 @@ class ValuesQuerysetTests(TestCase):
         qs = qs.values("num")
         self.assertSequenceEqual(qs, [{"num": 72}])
 
+    # Entire test can be removed once deprecation period ends.
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_extra_multiple_select_params_values_order_by(self):
         # testing for 23259 issue
         qs = Number.objects.extra(
@@ -2744,6 +2782,8 @@ class ValuesQuerysetTests(TestCase):
         qs = qs.values("num")
         self.assertSequenceEqual(qs, [])
 
+    # Entire test can be removed once deprecation period ends.
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_extra_values_list(self):
         # testing for ticket 14930 issues
         qs = Number.objects.extra(select={"value_plus_one": "num+1"})
@@ -2751,6 +2791,8 @@ class ValuesQuerysetTests(TestCase):
         qs = qs.values_list("num")
         self.assertSequenceEqual(qs, [(72,)])
 
+    # Entire test can be removed once deprecation period ends.
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_flat_extra_values_list(self):
         # testing for ticket 14930 issues
         qs = Number.objects.extra(select={"value_plus_one": "num+1"})
@@ -2772,6 +2814,8 @@ class ValuesQuerysetTests(TestCase):
         with self.assertRaisesMessage(TypeError, msg):
             Number.objects.values_list("num", flat=True, named=True)
 
+    # Entire test can be removed once deprecation period ends.
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_named_values_list_bad_field_name(self):
         msg = "Type names and field names must be valid identifiers: '1'"
         with self.assertRaisesMessage(ValueError, msg):
@@ -2779,6 +2823,8 @@ class ValuesQuerysetTests(TestCase):
                 "1", named=True
             ).first()
 
+    # Entire test can be removed once deprecation period ends.
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_named_values_list_with_fields(self):
         qs = Number.objects.extra(select={"num2": "num+1"}).annotate(Count("id"))
         values = qs.values_list("num", "num2", named=True).first()
@@ -2787,6 +2833,8 @@ class ValuesQuerysetTests(TestCase):
         self.assertEqual(values.num, 72)
         self.assertEqual(values.num2, 73)
 
+    # Entire test can be removed once deprecation period ends.
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_named_values_list_without_fields(self):
         qs = Number.objects.extra(select={"num2": "num+1"}).annotate(Count("id"))
         values = qs.values_list(named=True).first()
@@ -2980,6 +3028,8 @@ class WeirdQuerysetSlicingTests(TestCase):
             self.assertQuerySetEqual(Article.objects.values_list()[n:n], [])
 
 
+# Entire testcase can be removed once deprecation period ends.
+@ignore_warnings(category=RemovedInDjango60Warning)
 class EscapingTests(TestCase):
     def test_ticket_7302(self):
         # Reserved names are appropriately escaped
