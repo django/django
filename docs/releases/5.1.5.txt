@@ -9,4 +9,4 @@ Django 5.1.5 fixes several bugs in 5.1.4.
 Bugfixes
 ========
 
-* ...
+* Removed the invalid "crs" attribute from the GeoJSON serializer output.
