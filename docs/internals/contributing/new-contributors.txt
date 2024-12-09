@@ -27,39 +27,39 @@ Triage tickets
 If an `unreviewed ticket`_ reports a bug, try and reproduce it. If you can
 reproduce it and it seems valid, make a note that you confirmed the bug and
 accept the ticket. Make sure the ticket is filed under the correct component
-area. Consider writing a patch that adds a test for the bug's behavior, even if
-you don't fix the bug itself. See more at :ref:`how-can-i-help-with-triaging`
+area. Consider writing a test for the bug's behavior, even if you don't fix the
+bug itself. See more at :ref:`how-can-i-help-with-triaging`
 
-Review patches of accepted tickets
-----------------------------------
+Review pull requests of accepted tickets
+----------------------------------------
 
 This will help you build familiarity with the codebase and processes. Mark the
-appropriate flags if a patch needs docs or tests. Look through the changes a
-patch makes, and keep an eye out for syntax that is incompatible with older but
-still supported versions of Python. :doc:`Run the tests
+appropriate flags if a pull request needs docs or tests. Look through the
+files changed in the PR, and keep an eye out for syntax that is incompatible
+with older but still supported versions of Python. :doc:`Run the tests
 </internals/contributing/writing-code/unit-tests>` and make sure they pass.
 Where possible and relevant, try them out on a database other than SQLite.
 Leave comments and feedback!
 
-Keep old patches up-to-date
----------------------------
+Keep old pull requests up-to-date
+---------------------------------
 
-Oftentimes the codebase will change between a patch being submitted and the
-time it gets reviewed. Make sure it still applies cleanly and functions as
-expected. Updating a patch is both useful and important! See more on
-:doc:`writing-code/submitting-patches`.
+Oftentimes the codebase will change between a pull request being submitted and
+the time it gets reviewed. Make sure there are no merge conflicts and that the
+code still functions as expected. Updating a pull request is both useful and
+important! See more on :doc:`writing-code/submitting-patches`.
 
 Write some documentation
 ------------------------
 
 Django's documentation is great but it can always be improved. Did you find a
 typo? Do you think that something should be clarified? Go ahead and suggest a
-documentation patch! See also the guide on :doc:`writing-documentation`.
+documentation change! See also the guide on :doc:`writing-documentation`.
 
 .. note::
 
   The `reports page`_ contains links to many useful Trac queries, including
-  several that are useful for triaging tickets and reviewing patches as
+  several that are useful for triaging tickets and reviewing pull requests as
   suggested above.
 
   .. _reports page: https://code.djangoproject.com/wiki/Reports
@@ -118,7 +118,7 @@ Be bold! Leave feedback!
 ------------------------
 
 Sometimes it can be scary to put your opinion out to the world and say "this
-ticket is correct" or "this patch needs work", but it's the only way the
+ticket is correct" or "this pull request needs work", but it's the only way the
 project moves forward. The contributions of the broad Django community
 ultimately have a much greater impact than that of any one person. We can't do
 it without **you**!
@@ -144,25 +144,26 @@ wayside ends up doing more harm than good.
 Be rigorous
 -----------
 
-When we say ":pep:`8`, and must have docs and tests", we mean it. If a patch
-doesn't have docs and tests, there had better be a good reason. Arguments like
-"I couldn't find any existing tests of this feature" don't carry much weight.
-While it may be true, that means you have the extra-important job of writing
-the very first tests for that feature, not that you get a pass from writing
-tests altogether.
+When we say ":pep:`8`, and must have docs and tests", we mean it. If a pull
+request doesn't have docs and tests, there had better be a good reason.
+Arguments like "I couldn't find any existing tests of this feature" don't carry
+much weight. While it may be true, that means you have the extra-important job
+of writing the very first tests for that feature, not that you get a pass from
+writing tests altogether.
 
 Be patient
 ----------
 
-It's not always easy for your ticket or your patch to be reviewed quickly. This
-isn't personal. There are a lot of tickets and pull requests to get through.
+It's not always easy for your ticket or pull request to be reviewed quickly.
+This isn't personal. There are a lot of tickets and pull requests to get
+through.
 
-Keeping your patch up to date is important. Review the ticket on Trac to ensure
-that the *Needs tests*, *Needs documentation*, and *Patch needs improvement*
-flags are unchecked once you've addressed all review comments.
+Keeping your pull request up to date is important. Review the ticket on Trac to
+ensure that the *Needs tests*, *Needs documentation*, and *Pull request needs
+improvement* flags are unchecked once you've addressed all review comments.
 
 Remember that Django has an eight-month release cycle, so there's plenty of
-time for your patch to be reviewed.
+time for your contribution to be reviewed.
 
 Finally, a well-timed reminder can help. See :ref:`contributing code FAQ
 <new-contributors-faq>` for ideas here.
