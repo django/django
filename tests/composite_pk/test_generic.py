@@ -3,8 +3,10 @@ from uuid import UUID
 
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.prefetch import GenericPrefetch
+from django.db import connection
 from django.db.models import Count
 from django.test import TestCase
+from django.test.utils import CaptureQueriesContext
 
 from .models import Comment, Dummy, Post, Tag, Tenant, User
 
@@ -222,8 +224,20 @@ class CompositePKGenericTests(TestCase):
         )
 
     def test_aggregate(self):
-        self.assertEqual(Post.objects.aggregate(Count("tags")), {"tags__count": 1})
-        self.assertEqual(Dummy.objects.aggregate(Count("tags")), {"tags__count": 2})
+        with self.subTest("Post"):
+            with CaptureQueriesContext(connection) as ctx:
+                self.assertEqual(
+                    Post.objects.aggregate(Count("tags")),
+                    {"tags__count": 1},
+                    ctx[-1]["sql"],
+                )
+        with self.subTest("Dummy"):
+            with CaptureQueriesContext(connection) as ctx:
+                self.assertEqual(
+                    Dummy.objects.aggregate(Count("tags")),
+                    {"tags__count": 2},
+                    ctx[-1]["sql"],
+                )
 
     def test_generic_prefetch(self):
         tags = Tag.objects.prefetch_related(
