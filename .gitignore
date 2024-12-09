@@ -17,3 +17,9 @@ tests/.coverage*
 build/
 tests/report/
 tests/screenshots/
+venv/
+.venv/
+env/
+.env/
+myproject/staticfiles
+myproject/
