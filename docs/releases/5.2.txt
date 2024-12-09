@@ -279,6 +279,9 @@ Management Commands
   ``Command.autodetector`` attribute for subclasses to override in order to use
   a custom autodetector class.
 
+* The :djadmin:`startproject` and :djadmin:`startapp` commands now create the
+  custom target directory if it doesn't exist.
+
 Migrations
 ~~~~~~~~~~
 
