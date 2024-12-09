@@ -279,6 +279,10 @@ Management Commands
   ``Command.autodetector`` attribute for subclasses to override in order to use
   a custom autodetector class.
 
+* The new :meth:`.BaseCommand.get_check_kwargs` method can be overridden in
+  custom commands to control the running of system checks, e.g. to opt into
+  database-dependent checks.
+
 Migrations
 ~~~~~~~~~~
 
