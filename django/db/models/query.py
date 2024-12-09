@@ -670,21 +670,10 @@ class QuerySet(AltersData):
     acreate.alters_data = True
 
     def _prepare_for_bulk_create(self, objs):
-        from django.db.models.expressions import DatabaseDefault
-
-        connection = connections[self.db]
         for obj in objs:
             if not obj._is_pk_set():
                 # Populate new PK values.
                 obj.pk = obj._meta.pk.get_pk_value_on_save(obj)
-            if not connection.features.supports_default_keyword_in_bulk_insert:
-                for field in obj._meta.fields:
-                    if field.generated:
-                        continue
-                    value = getattr(obj, field.attname)
-                    if isinstance(value, DatabaseDefault):
-                        setattr(obj, field.attname, field.db_default)
-
             obj._prepare_related_fields_for_save(operation_name="bulk_create")
 
     def _check_bulk_create_options(
