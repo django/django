@@ -322,17 +322,30 @@ class RoutePattern(CheckURLMixin):
         self.name = name
 
     def match(self, path):
-        match = self.regex.search(path)
-        if match:
-            # RoutePattern doesn't allow non-named groups so args are ignored.
-            kwargs = match.groupdict()
-            for key, value in kwargs.items():
-                converter = self.converters[key]
-                try:
-                    kwargs[key] = converter.to_python(value)
-                except ValueError:
-                    return None
-            return path[match.end() :], (), kwargs
+        if self.converters:
+            match = self.regex.search(path)
+            if match:
+                # RoutePattern doesn't allow non-named groups so args are ignored.
+                kwargs = match.groupdict()
+                for key, value in kwargs.items():
+                    converter = self.converters[key]
+                    try:
+                        kwargs[key] = converter.to_python(value)
+                    except ValueError:
+                        return None
+                return path[match.end() :], (), kwargs
+        else:
+            # If there are no converters, skip the regex overhead and
+            # use string operations
+            if self._is_endpoint:
+                # If this is an endpoint, the path should be
+                # exactly the same as the route
+                if self._route == path:
+                    return "", (), {}
+            # If this isn't an endpoint, the path should start with the route
+            elif path.startswith(self._route):
+                return path.removeprefix(self._route), (), {}
+
         return None
 
     def check(self):
