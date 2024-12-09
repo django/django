@@ -384,15 +384,15 @@ class TestInline(TestDataMixin, TestCase):
         self.assertInHTML(
             '<div class="flex-container fieldBox field-position hidden">'
             '<label class="inline">Position:</label>'
-            '<div class="readonly">0</div></div>'
-            '<div class="help hidden"><div>Position help_text.</div></div>',
+            '<div class="help"><div>Position help_text.</div></div>'
+            '<div class="readonly">0</div></div>',
             response.rendered_content,
         )
         self.assertInHTML(
             '<div class="flex-container fieldBox field-position hidden">'
             '<label class="inline">Position:</label>'
-            '<div class="readonly">1</div></div>'
-            '<div class="help hidden"><div>Position help_text.</div></div>',
+            '<div class="help"><div>Position help_text.</div></div>'
+            '<div class="readonly">1</div></div>',
             response.rendered_content,
         )
 
@@ -414,16 +414,16 @@ class TestInline(TestDataMixin, TestCase):
         self.assertInHTML(
             '<div class="form-row hidden field-position">'
             '<div><div class="flex-container"><label>Position:</label>'
+            '<div class="help"><div>Position help_text.</div></div>'
             '<div class="readonly">0</div></div>'
-            '<div class="help hidden"><div>Position help_text.</div></div>'
             "</div></div>",
             response.rendered_content,
         )
         self.assertInHTML(
             '<div class="form-row hidden field-position">'
             '<div><div class="flex-container"><label>Position:</label>'
+            '<div class="help"><div>Position help_text.</div></div>'
             '<div class="readonly">1</div></div>'
-            '<div class="help hidden"><div>Position help_text.</div></div>'
             "</div></div>",
             response.rendered_content,
         )
