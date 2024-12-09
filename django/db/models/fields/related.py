@@ -581,6 +581,7 @@ class ForeignObject(RelatedField):
             *super().check(**kwargs),
             *self._check_to_fields_exist(),
             *self._check_unique_target(),
+            *self._check_conflict_with_managers(),
         ]
 
     def _check_to_fields_exist(self):
@@ -678,6 +679,28 @@ class ForeignObject(RelatedField):
                     )
                 ]
         return []
+
+    def _check_conflict_with_managers(self):
+        errors = []
+        for manager in self.opts.managers:
+            for rel_objs in self.model._meta.related_objects:
+                manager_name = manager.name
+                related_object_name = rel_objs.name
+                if manager_name == related_object_name:
+                    field_name = f"{self.model._meta.object_name}.{self.name}"
+                    errors.append(
+                        checks.Error(
+                            f"Related name for '{field_name}' clashes with "
+                            f"manager: '{related_object_name}' name.",
+                            hint=(
+                                "Rename manager name or related_name "
+                                "in conflicted field"
+                            ),
+                            obj=self,
+                            id="fields.E341",
+                        )
+                    )
+        return errors
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
