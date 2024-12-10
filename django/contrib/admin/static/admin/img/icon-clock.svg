@@ -1,9 +1,15 @@
-<svg width="16" height="32" viewBox="0 0 1792 3584" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-  <defs>
+<svg width="16" height="32" viewBox="0 0 512 1024" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.-->
+ <defs>
     <g id="icon">
-      <path d="M1024 544v448q0 14-9 23t-23 9h-320q-14 0-23-9t-9-23v-64q0-14 9-23t23-9h224v-352q0-14 9-23t23-9h64q14 0 23 9t9 23zm416 352q0-148-73-273t-198-198-273-73-273 73-198 198-73 273 73 273 198 198 273 73 273-73 198-198 73-273zm224 0q0 209-103 385.5t-279.5 279.5-385.5 103-385.5-103-279.5-279.5-103-385.5 103-385.5 279.5-279.5 385.5-103 385.5 103 279.5 279.5 103 385.5z"/>
+      <!--
+        Icon Name: clock
+        Icon Family: classic
+        Icon Style: regular
+      -->
+      <path d="M464 256A208 208 0 1 1 48 256a208 208 0 1 1 416 0zM0 256a256 256 0 1 0 512 0A256 256 0 1 0 0 256zM232 120l0 136c0 8 4 15.5 10.7 20l96 64c11 7.4 25.9 4.4 33.3-6.7s4.4-25.9-6.7-33.3L280 243.2 280 120c0-13.3-10.7-24-24-24s-24 10.7-24 24z"/>
     </g>
   </defs>
-  <use xlink:href="#icon" x="0" y="0" fill="#447e9b" />
-  <use xlink:href="#icon" x="0" y="1792" fill="#003366" />
+  <use xlink:href="#icon" x="0" y="0" fill="#447e9b"/>
+  <use xlink:href="#icon" x="0" y="512" fill="#003366" />
 </svg>
