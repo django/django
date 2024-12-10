@@ -225,11 +225,10 @@ class SqlFlushTests(TransactionTestCase):
         with transaction.atomic():
             self.assertIs(Author.objects.exists(), False)
             self.assertIs(Book.objects.exists(), False)
-            if connection.features.supports_sequence_reset:
-                author = Author.objects.create(name="F. Scott Fitzgerald")
-                self.assertEqual(author.pk, 1)
-                book = Book.objects.create(author=author)
-                self.assertEqual(book.pk, 1)
+            author = Author.objects.create(name="F. Scott Fitzgerald")
+            self.assertEqual(author.pk, 1)
+            book = Book.objects.create(author=author)
+            self.assertEqual(book.pk, 1)
 
 
 class DeprecationTests(TestCase):
