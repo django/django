@@ -461,14 +461,10 @@ class DatabaseOperations(BaseDatabaseOperations):
         json_array = rhs
         json_element = KeyTextTransform(index, json_array)
 
-        if isinstance(lhs.field, UUIDField):
-            lhs = Func(
-                lhs,
-                Value("-"),
-                Value(""),
-                function="REPLACE",
-                output_field=UUIDField(),
-            )
+        if (
+            isinstance(lhs.field, UUIDField)
+            and not self.connection.features.has_native_uuid_field
+        ):
             json_element = Func(
                 json_element,
                 Value("-"),
