@@ -1408,6 +1408,29 @@ class ExplicitRelatedQueryNameClashTests(SimpleTestCase):
 
 
 @isolate_apps("invalid_models_tests")
+class RelatedQueryNameClashWithManagerTests(SimpleTestCase):
+    def test_clash_between_related_query_name_and_manager(self):
+        class Author(models.Model):
+            authors = models.Manager()
+            mentor = models.ForeignKey(
+                "self", related_name="authors", on_delete=models.CASCADE
+            )
+
+        self.assertEqual(
+            Author.check(),
+            [
+                Error(
+                    "Related name for 'Author.mentor' clashes with manager: "
+                    "'authors' name.",
+                    hint="Rename manager name or related_name in conflicted field",
+                    obj=Author._meta.get_field("mentor"),
+                    id="fields.E341",
+                )
+            ],
+        )
+
+
+@isolate_apps("invalid_models_tests")
 class SelfReferentialM2MClashTests(SimpleTestCase):
     def test_clash_between_accessors(self):
         class Model(models.Model):
