@@ -4849,6 +4849,12 @@ class RendererTests(SimpleTestCase):
         form = CustomForm(renderer=custom)
         self.assertEqual(form.renderer, custom)
 
+    def test_get_context_errors(self):
+        custom = CustomRenderer()
+        form = Form(renderer=custom)
+        context = form.get_context()
+        self.assertEqual(context["errors"].renderer, custom)
+
 
 class TemplateTests(SimpleTestCase):
     def test_iterate_radios(self):
@@ -5311,6 +5317,22 @@ class OverrideTests(SimpleTestCase):
             '<div class="error">This field is required.</div></div>'
             '<p>Comment: <input type="text" name="comment" aria-invalid="true" '
             "required></p>",
+        )
+
+    def test_custom_renderer_error_dict(self):
+        class CustomRenderer(DjangoTemplates):
+            def render(self, template_name, context, request=None):
+                if template_name == "django/forms/errors/dict/default.html":
+                    return "<strong>So many errors!</strong>"
+                return super().render(template_name, context, request)
+
+        form = Form({}, renderer=CustomRenderer())
+        form.full_clean()
+        form.add_error(None, "Test error")
+
+        self.assertHTMLEqual(
+            form.errors.render(),
+            "<strong>So many errors!</strong>",
         )
 
     def test_cyclic_context_boundfield_render(self):
