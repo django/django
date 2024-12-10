@@ -26,6 +26,7 @@ from django.db.models import (
     BooleanField,
     CharField,
     CheckConstraint,
+    CompositePrimaryKey,
     DateField,
     DateTimeField,
     DecimalField,
@@ -3513,6 +3514,42 @@ class SchemaTests(TransactionTestCase):
         # Remove constraint.
         with connection.schema_editor() as editor:
             editor.remove_constraint(Author, constraint)
+        self.assertNotIn(constraint.name, self.get_constraints(table))
+
+    @skipUnlessDBFeature("supports_expression_indexes")
+    @isolate_apps("schema")
+    def test_unique_constraint_composite_pk_in_expressions(self):
+        class Release(Model):
+            pk = CompositePrimaryKey("version", "name")
+            version = IntegerField()
+            name = CharField(max_length=20)
+            release_date = DateField()
+
+            class Meta:
+                app_label = "schema"
+
+        with connection.schema_editor() as editor:
+            editor.create_model(Release)
+        # Add constraint.
+        constraint = UniqueConstraint(
+            F("pk"),
+            F("release_date"),
+            name="composite_pk_in_uq",
+        )
+        with connection.schema_editor() as editor:
+            editor.add_constraint(Release, constraint)
+            sql = constraint.create_sql(Release, editor)
+        table = Release._meta.db_table
+        constraints = self.get_constraints(table)
+        self.assertIs(constraints[constraint.name]["unique"], True)
+        self.assertEqual(len(constraints[constraint.name]["columns"]), 3)
+        # SQL contains all database columns.
+        self.assertIs(sql.references_column(table, "version"), True)
+        self.assertIs(sql.references_column(table, "name"), True)
+        self.assertIs(sql.references_column(table, "release_date"), True)
+        # Remove constraint.
+        with connection.schema_editor() as editor:
+            editor.remove_constraint(Release, constraint)
         self.assertNotIn(constraint.name, self.get_constraints(table))
 
     @skipUnlessDBFeature("supports_expression_indexes", "supports_partial_indexes")

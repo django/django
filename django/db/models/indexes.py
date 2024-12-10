@@ -1,7 +1,7 @@
 from types import NoneType
 
 from django.db.backends.utils import names_digest, split_identifier
-from django.db.models.expressions import Col, ExpressionList, F, Func, OrderBy
+from django.db.models.expressions import Col, ColPairs, ExpressionList, F, Func, OrderBy
 from django.db.models.functions import Collate
 from django.db.models.query_utils import Q
 from django.db.models.sql import Query
@@ -272,7 +272,7 @@ class IndexExpression(Func):
             summarize,
             for_save,
         )
-        if not isinstance(resolve_root_expression, Col):
+        if not isinstance(resolve_root_expression, (Col, ColPairs)):
             root_expression = Func(root_expression, template="(%(expressions)s)")
 
         if wrappers:
