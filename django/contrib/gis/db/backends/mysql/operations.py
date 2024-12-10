@@ -100,6 +100,7 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
             "LineLocatePoint",
             "MakeValid",
             "MemSize",
+            "NumDimensions",
             "Perimeter",
             "PointOnSurface",
             "Reverse",

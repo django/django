@@ -132,6 +132,10 @@ Minor features
   :class:`~django.contrib.gis.db.models.functions.IsValid` database functions
   are now supported on MariaDB 11.7+.
 
+* :class:`~django.contrib.gis.db.models.functions.NumDimensions` was added for
+  PostGIS and SpatiaLite backends which returns the number of dimensions used
+  by a geometry.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
