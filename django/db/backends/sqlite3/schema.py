@@ -6,7 +6,7 @@ from django.db import NotSupportedError
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.backends.ddl_references import Statement
 from django.db.backends.utils import strip_quotes
-from django.db.models import NOT_PROVIDED, CompositePrimaryKey, UniqueConstraint
+from django.db.models import CompositePrimaryKey, UniqueConstraint
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
@@ -144,7 +144,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             body[create_field.name] = create_field
             # Choose a default and insert it into the copy map
             if (
-                create_field.db_default is NOT_PROVIDED
+                not create_field.has_db_default()
                 and not (create_field.many_to_many or create_field.generated)
                 and create_field.concrete
             ):
@@ -161,7 +161,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             if new_field.generated:
                 continue
             if old_field.null and not new_field.null:
-                if new_field.db_default is NOT_PROVIDED:
+                if not new_field.has_db_default():
                     default = self.prepare_default(self.effective_default(new_field))
                 else:
                     default, _ = self.db_default_sql(new_field)
@@ -321,10 +321,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             or self.effective_default(field) is not None
             # Fields with non-constant defaults cannot by handled by ALTER
             # TABLE ADD COLUMN statement.
-            or (
-                field.db_default is not NOT_PROVIDED
-                and not isinstance(field.db_default, Value)
-            )
+            or (field.has_db_default() and not isinstance(field.db_default, Value))
         ):
             self._remake_table(model, create_field=field)
         else:

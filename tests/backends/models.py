@@ -5,7 +5,7 @@ from django.db import models
 
 class Square(models.Model):
     root = models.IntegerField()
-    square = models.PositiveIntegerField()
+    square = models.PositiveIntegerField(db_default=9)
 
     def __str__(self):
         return "%s ** 2 == %s" % (self.root, self.square)

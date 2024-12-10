@@ -391,7 +391,7 @@ class Field(RegisterLookupMixin):
         from django.db.models.expressions import Value
 
         if (
-            self.db_default is NOT_PROVIDED
+            not self.has_db_default()
             or (
                 isinstance(self.db_default, Value)
                 or not hasattr(self.db_default, "resolve_expression")
@@ -933,8 +933,7 @@ class Field(RegisterLookupMixin):
     def db_returning(self):
         """Private API intended only to be used by Django itself."""
         return (
-            self.db_default is not NOT_PROVIDED
-            and connection.features.can_return_columns_from_insert
+            self.has_db_default() and connection.features.can_return_columns_from_insert
         )
 
     def set_attributes_from_name(self, name):
@@ -1016,6 +1015,10 @@ class Field(RegisterLookupMixin):
         """Return a boolean of whether this field has a default value."""
         return self.default is not NOT_PROVIDED
 
+    def has_db_default(self):
+        """Return a boolean of whether this field has a db_default value."""
+        return self.db_default is not NOT_PROVIDED
+
     def get_default(self):
         """Return the default value for this field."""
         return self._get_default()
@@ -1027,7 +1030,7 @@ class Field(RegisterLookupMixin):
                 return self.default
             return lambda: self.default
 
-        if self.db_default is not NOT_PROVIDED:
+        if self.has_db_default():
             from django.db.models.expressions import DatabaseDefault
 
             return lambda: DatabaseDefault(
@@ -1045,9 +1048,7 @@ class Field(RegisterLookupMixin):
     @cached_property
     def _db_default_expression(self):
         db_default = self.db_default
-        if db_default is not NOT_PROVIDED and not hasattr(
-            db_default, "resolve_expression"
-        ):
+        if self.has_db_default() and not hasattr(db_default, "resolve_expression"):
             from django.db.models.expressions import Value
 
             db_default = Value(db_default, self)

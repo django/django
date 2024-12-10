@@ -1688,7 +1688,7 @@ class SQLInsertCompiler(SQLCompiler):
     returning_fields = None
     returning_params = ()
 
-    def field_as_sql(self, field, val):
+    def field_as_sql(self, field, get_placeholder, val):
         """
         Take a field and a value intended to be saved on that field, and
         return placeholder SQL and accompanying params. Check for raw values,
@@ -1703,10 +1703,10 @@ class SQLInsertCompiler(SQLCompiler):
         elif hasattr(val, "as_sql"):
             # This is an expression, let's compile it.
             sql, params = self.compile(val)
-        elif hasattr(field, "get_placeholder"):
+        elif get_placeholder is not None:
             # Some fields (e.g. geo fields) need special munging before
             # they can be inserted.
-            sql, params = field.get_placeholder(val, self, self.connection), [val]
+            sql, params = get_placeholder(val, self, self.connection), [val]
         else:
             # Return the common case for the placeholder
             sql, params = "%s", [val]
@@ -1775,8 +1775,12 @@ class SQLInsertCompiler(SQLCompiler):
 
         # list of (sql, [params]) tuples for each object to be saved
         # Shape: [n_objs][n_fields][2]
+        get_placeholders = [getattr(field, "get_placeholder", None) for field in fields]
         rows_of_fields_as_sql = (
-            (self.field_as_sql(field, v) for field, v in zip(fields, row))
+            (
+                self.field_as_sql(field, get_placeholder, value)
+                for field, get_placeholder, value in zip(fields, get_placeholders, row)
+            )
             for row in value_rows
         )
 
@@ -1802,23 +1806,54 @@ class SQLInsertCompiler(SQLCompiler):
             on_conflict=self.query.on_conflict,
         )
         result = ["%s %s" % (insert_statement, qn(opts.db_table))]
-        fields = self.query.fields or [opts.pk]
-        result.append("(%s)" % ", ".join(qn(f.column) for f in fields))
 
-        if self.query.fields:
-            value_rows = [
-                [
-                    self.prepare_value(field, self.pre_save_val(field, obj))
-                    for field in fields
+        if fields := self.query.fields:
+            from django.db.models.expressions import DatabaseDefault
+
+            supports_default_keyword_in_bulk_insert = (
+                self.connection.features.supports_default_keyword_in_bulk_insert
+            )
+            value_cols = []
+            for field in list(fields):
+                field_prepare = partial(self.prepare_value, field)
+                field_pre_save = partial(self.pre_save_val, field)
+                field_values = [
+                    field_prepare(field_pre_save(obj)) for obj in self.query.objs
                 ]
-                for obj in self.query.objs
-            ]
+                if field.has_db_default():
+                    # If all values are DEFAULT don't include the field and its
+                    # values in the query as they are redundant and could prevent
+                    # optimizations. This cannot be done if we're dealing with the
+                    # last field as INSERT statements require at least one.
+                    if len(fields) > 1 and all(
+                        isinstance(value, DatabaseDefault) for value in field_values
+                    ):
+                        fields.remove(field)
+                        continue
+                    elif not supports_default_keyword_in_bulk_insert:
+                        # If the field cannot be excluded from the INSERT for the
+                        # reasons listed above and the backend doesn't support the
+                        # DEFAULT keyword each values must be expanded into their
+                        # underlying expressions.
+                        prepared_db_default = field_prepare(field.db_default)
+                        field_values = [
+                            (
+                                prepared_db_default
+                                if isinstance(value, DatabaseDefault)
+                                else value
+                            )
+                            for value in field_values
+                        ]
+                value_cols.append(field_values)
+            value_rows = list(zip(*value_cols))
+            result.append("(%s)" % ", ".join(qn(f.column) for f in fields))
         else:
             # An empty object.
             value_rows = [
                 [self.connection.ops.pk_default_value()] for _ in self.query.objs
             ]
             fields = [None]
+            result.append("(%s)" % qn(opts.pk.column))
 
         # Currently the backends just accept values when generating bulk
         # queries and generate their own placeholders. Doing that isn't

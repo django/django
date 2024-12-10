@@ -222,7 +222,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         Keep the NULL and DEFAULT properties of the old field. If it has
         changed, it will be handled separately.
         """
-        if field.db_default is not NOT_PROVIDED:
+        if field.has_db_default():
             default_sql, params = self.db_default_sql(field)
             default_sql %= tuple(self.quote_value(p) for p in params)
             new_type += f" DEFAULT {default_sql}"
@@ -266,7 +266,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         return f" COMMENT {comment_sql}"
 
     def _alter_column_null_sql(self, model, old_field, new_field):
-        if new_field.db_default is NOT_PROVIDED:
+        if not new_field.has_db_default():
             return super()._alter_column_null_sql(model, old_field, new_field)
 
         new_db_params = new_field.db_parameters(connection=self.connection)

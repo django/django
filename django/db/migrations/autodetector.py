@@ -1135,7 +1135,7 @@ class MigrationAutodetector:
         preserve_default = (
             field.null
             or field.has_default()
-            or field.db_default is not models.NOT_PROVIDED
+            or field.has_db_default()
             or field.many_to_many
             or (field.blank and field.empty_strings_allowed)
             or (isinstance(field, time_fields) and field.auto_now)
@@ -1150,11 +1150,7 @@ class MigrationAutodetector:
                 field.default = self.questioner.ask_not_null_addition(
                     field_name, model_name
                 )
-        if (
-            field.unique
-            and field.default is not models.NOT_PROVIDED
-            and callable(field.default)
-        ):
+        if field.unique and field.has_default() and callable(field.default):
             self.questioner.ask_unique_callable_default_addition(field_name, model_name)
         self.add_operation(
             app_label,
@@ -1296,7 +1292,7 @@ class MigrationAutodetector:
                         old_field.null
                         and not new_field.null
                         and not new_field.has_default()
-                        and new_field.db_default is models.NOT_PROVIDED
+                        and not new_field.has_db_default()
                         and not new_field.many_to_many
                     ):
                         field = new_field.clone()
