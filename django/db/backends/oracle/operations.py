@@ -6,8 +6,18 @@ from django.conf import settings
 from django.db import DatabaseError, NotSupportedError
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.backends.utils import split_tzname_delta, strip_quotes, truncate_name
-from django.db.models import AutoField, Exists, ExpressionWrapper, Lookup
-from django.db.models.expressions import RawSQL
+from django.db.models import (
+    AutoField,
+    DateTimeField,
+    Exists,
+    ExpressionWrapper,
+    JSONField,
+    Lookup,
+    UUIDField,
+)
+from django.db.models.expressions import Func, RawSQL, Value
+from django.db.models.fields.json import KeyTextTransform
+from django.db.models.functions import Cast
 from django.db.models.sql.where import WhereNode
 from django.utils import timezone
 from django.utils.encoding import force_bytes, force_str
@@ -726,3 +736,27 @@ END;
         if isinstance(expression, RawSQL) and expression.conditional:
             return True
         return False
+
+    def prepare_join_composite_pk_on_json_array(self, lhs, rhs, index):
+        json_array = Cast(rhs, JSONField())
+        json_element = KeyTextTransform(index, json_array)
+
+        if isinstance(lhs.field, UUIDField):
+            json_element = Func(
+                json_element,
+                Value("-"),
+                Value(""),
+                function="REPLACE",
+                output_field=UUIDField(),
+            )
+        if isinstance(lhs.field, DateTimeField):
+            json_element = Func(
+                json_element,
+                Value('YYYY-MM-DD"T"HH24:MI:SS'),
+                function="TO_TIMESTAMP",
+                output_field=DateTimeField(),
+            )
+        if json_element.field != lhs.field:
+            json_element = Cast(json_element, lhs.field)
+
+        return lhs, json_element
