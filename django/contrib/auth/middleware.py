@@ -95,13 +95,22 @@ class RemoteUserMiddleware:
     Middleware for utilizing web-server-provided authentication.
 
     If request.user is not authenticated, then this middleware attempts to
-    authenticate the username passed in the ``REMOTE_USER`` request header.
+    authenticate the username from the ``REMOTE_USER`` key in ``request.META``,
+    an environment variable commonly set by the webserver.
+
     If authentication is successful, the user is automatically logged in to
     persist the user in the session.
 
-    The header used is configurable and defaults to ``REMOTE_USER``.  Subclass
-    this class and change the ``header`` attribute if you need to use a
-    different header.
+    If the username in the key is changed between requests, the user will
+    be logged out and reauthenticated.
+
+    If the key is missing in a request, the user will be logged out.
+    Use ``PersistentRemoteUserMiddleware`` if this is not wanted.
+
+    The the key used is configurable and defaults to ``REMOTE_USER``.
+    Subclass this class and change the ``header`` attribute if you need to
+    use a different key from ``request.META``, for example a HTTP request
+    header.
     """
 
     sync_capable = True
@@ -116,7 +125,7 @@ class RemoteUserMiddleware:
             markcoroutinefunction(self)
         super().__init__()
 
-    # Name of request header to grab username from.  This will be the key as
+    # Name of dictionary key to grab username from.  This will be the key as
     # used in the request.META dictionary, i.e. the normalization of headers to
     # all uppercase and the addition of "HTTP_" prefix apply.
     header = "REMOTE_USER"
@@ -259,10 +268,10 @@ class PersistentRemoteUserMiddleware(RemoteUserMiddleware):
     Middleware for web-server provided authentication on logon pages.
 
     Like RemoteUserMiddleware but keeps the user authenticated even if
-    the header (``REMOTE_USER``) is not found in the request. Useful
-    for setups when the external authentication via ``REMOTE_USER``
-    is only expected to happen on some "logon" URL and the rest of
-    the application wants to use Django's authentication mechanism.
+    the configured key/header is not found in the request. Useful for
+    setups when the external authentication is only expected to happen
+    on some "logon" URL and the rest of the application wants to use
+    Django's authentication mechanism.
     """
 
     force_logout_if_no_header = False
