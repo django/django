@@ -253,6 +253,11 @@ Forms
   HTML ``id`` attribute to be added in the error template. See
   :attr:`.ErrorList.field_id` for details.
 
+* The new asset objects :class:`~django.forms.CSS` and
+  :class:`~django.forms.JS` are available for adding custom HTML-attributes to
+  CSS and JavaScript in form media. See
+  :ref:`paths as objects <form-media-asset-objects>` for more details.
+
 Generic Views
 ~~~~~~~~~~~~~
 

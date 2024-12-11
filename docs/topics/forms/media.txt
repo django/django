@@ -2,6 +2,8 @@
 Form Assets (the ``Media`` class)
 =================================
 
+.. currentmodule:: django.forms
+
 Rendering an attractive and easy-to-use web form requires more than just
 HTML - it also requires CSS stylesheets, and if you want to use fancy widgets,
 you may also need to include some JavaScript on each page. The exact
@@ -123,12 +125,42 @@ If this last CSS definition were to be rendered, it would become the following H
     <link href="https://static.example.com/lo_res.css" media="tv,projector" rel="stylesheet">
     <link href="https://static.example.com/newspaper.css" media="print" rel="stylesheet">
 
+``CSS`` objects
+~~~~~~~~~~~~~~~
+
+.. versionadded:: 5.2
+
+.. class:: CSS(href, **attributes)
+
+    :param href: String path to the CSS file. See
+        :ref:`the section on paths <form-asset-paths>` for details.
+
+    :param attributes: HTML attributes to be set on the rendered
+        ``<link rel="stylesheet">`` tag.
+
+    See :ref:`form-media-asset-objects` for usage examples.
+
 ``js``
 ------
 
 A tuple describing the required JavaScript files. See :ref:`the
 section on paths <form-asset-paths>` for details of how to specify
 paths to these files.
+
+``JS`` objects
+~~~~~~~~~~~~~~
+
+.. versionadded:: 5.2
+
+.. class:: JS(src, **attributes)
+
+    :param src: String path to the JS file. See
+        :ref:`the section on paths <form-asset-paths>` for details.
+
+    :param attributes: HTML attributes to be set on the rendered ``<script>``
+        tag.
+
+    See :ref:`form-media-asset-objects` for usage examples.
 
 ``extend``
 ----------
@@ -271,29 +303,47 @@ Or if :mod:`~django.contrib.staticfiles` is configured using the
     <script src="https://static.example.com/animations.27e20196a850.js"></script>
     <script src="https://othersite.com/actions.js"></script>
 
+.. _form-media-asset-objects:
+
 Paths as objects
 ----------------
 
-Asset paths may also be given as hashable objects implementing an
-``__html__()`` method. The ``__html__()`` method is typically added using the
-:func:`~django.utils.html.html_safe` decorator. The object is responsible for
-outputting the complete HTML ``<script>`` or ``<link>`` tag content:
+Assets may also be object-based, using :class:`.CSS` and :class:`.JS`.
+Furthermore, these allow you to pass custom HTML attributes::
 
-.. code-block:: pycon
+    class Media:
+        css = {
+            "all": [CSS("pretty.css", media="all", crossorigin="anonymous")],
+        }
+        js = [
+            JS(
+                "https://cdn.example.com/something.min.js",
+                **{
+                    "crossorigin": "anonymous",
+                    "async": True,
+                },
+            ),
+        ]
 
-    >>> from django import forms
-    >>> from django.utils.html import html_safe
-    >>>
-    >>> @html_safe
-    ... class JSPath:
-    ...     def __str__(self):
-    ...         return '<script src="https://example.org/asset.js" defer>'
-    ...
+If this Media definition were to be rendered, it would become the following
+HTML:
 
-    >>> class SomeWidget(forms.TextInput):
-    ...     class Media:
-    ...         js = [JSPath()]
-    ...
+.. code-block:: html+django
+
+    <link href="https://static.example.com/pretty.css" media="all" crossorigin="anonymous" rel="stylesheet">
+    <script src="https://cdn.example.com/something.min.js"
+            crossorigin="anonymous"
+            async>
+    </script>
+
+.. note::
+
+    The ``media`` dictionary key of ``Media.css`` is ignored, when using
+    object-based assets.
+
+.. versionchanged:: 5.2
+
+    The object classes ``JS`` and ``CSS`` were added.
 
 ``Media`` objects
 =================

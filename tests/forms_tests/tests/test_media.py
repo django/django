@@ -1,8 +1,111 @@
 from django.forms import CharField, Form, Media, MultiWidget, TextInput
+from django.forms.widgets import CSS, JS, MediaAsset
 from django.template import Context, Template
-from django.templatetags.static import static
 from django.test import SimpleTestCase, override_settings
-from django.utils.html import format_html, html_safe
+from django.utils.html import html_safe
+
+
+@override_settings(
+    STATIC_URL="http://media.example.com/static/",
+)
+class MediaAssetTestCase(SimpleTestCase):
+    def test_init(self):
+        attributes = {"media": "all", "is": "magic-css"}
+        asset = MediaAsset("path/to/css", **attributes)
+        self.assertEqual(asset._path, "path/to/css")
+        self.assertEqual(asset.attributes, attributes)
+        self.assertIsNot(asset.attributes, attributes)
+
+    def test_eq(self):
+        self.assertEqual(MediaAsset("path/to/css"), MediaAsset("path/to/css"))
+        self.assertEqual(MediaAsset("path/to/css"), "path/to/css")
+        self.assertEqual(
+            MediaAsset("path/to/css", media="all"), MediaAsset("path/to/css")
+        )
+
+        self.assertNotEqual(MediaAsset("path/to/css"), MediaAsset("path/to/other.css"))
+        self.assertNotEqual(MediaAsset("path/to/css"), "path/to/other.css")
+        self.assertNotEqual(MediaAsset("path/to/css", media="all"), CSS("path/to/css"))
+
+    def test_hash(self):
+        self.assertEqual(hash(MediaAsset("path/to/css")), hash("path/to/css"))
+        self.assertEqual(
+            hash(MediaAsset("path/to/css")), hash(MediaAsset("path/to/css"))
+        )
+
+    def test_str(self):
+        self.assertEqual(
+            str(MediaAsset("path/to/css")),
+            "http://media.example.com/static/path/to/css",
+        )
+        self.assertEqual(
+            str(MediaAsset("http://media.other.com/path/to/css")),
+            "http://media.other.com/path/to/css",
+        )
+
+    def test_repr(self):
+        self.assertEqual(repr(MediaAsset("path/to/css")), "MediaAsset('path/to/css')")
+        self.assertEqual(
+            repr(MediaAsset("http://media.other.com/path/to/css")),
+            "MediaAsset('http://media.other.com/path/to/css')",
+        )
+
+    def test_path(self):
+        asset = MediaAsset("path/to/css")
+        self.assertEqual(asset.path, "http://media.example.com/static/path/to/css")
+
+        asset = MediaAsset("http://media.other.com/path/to/css")
+        self.assertEqual(asset.path, "http://media.other.com/path/to/css")
+
+
+@override_settings(
+    STATIC_URL="http://media.example.com/static/",
+)
+class CSSTestCase(SimpleTestCase):
+
+    def test_init(self):
+        self.assertEqual(CSS("path/to/css").attributes["rel"], "stylesheet")
+        self.assertEqual(
+            CSS("path/to/css", rel="preload").attributes["rel"], "stylesheet"
+        )
+
+    def test_init_with_href_kwarg(self):
+        self.assertEqual(
+            CSS(href="path/to/css").path, "http://media.example.com/static/path/to/css"
+        )
+
+    def test_str(self):
+        self.assertHTMLEqual(
+            str(CSS("path/to/css")),
+            '<link href="http://media.example.com/static/path/to/css" '
+            'rel="stylesheet">',
+        )
+        self.assertEqual(
+            str(CSS("path/to/css", media="screen")),
+            '<link href="http://media.example.com/static/path/to/css" '
+            'media="screen" rel="stylesheet">',
+        )
+
+
+@override_settings(
+    STATIC_URL="http://media.example.com/static/",
+)
+class JSTestCase(SimpleTestCase):
+
+    def test_init__with_src_kwarg(self):
+        self.assertEqual(
+            JS(src="path/to/js").path, "http://media.example.com/static/path/to/js"
+        )
+
+    def test_str(self):
+        self.assertHTMLEqual(
+            str(JS("path/to/js")),
+            '<script src="http://media.example.com/static/path/to/js"></script>',
+        )
+        self.assertHTMLEqual(
+            str(JS("path/to/js", **{"async": True, "deferred": False})),
+            '<script src="http://media.example.com/static/path/to/js" async></script>',
+        )
 
 
 @override_settings(
@@ -714,63 +817,6 @@ class FormsMediaTestCase(SimpleTestCase):
         self.assertEqual(merged._js_lists, [["a"]])
 
 
-@html_safe
-class Asset:
-    def __init__(self, path):
-        self.path = path
-
-    def __eq__(self, other):
-        return (self.__class__ == other.__class__ and self.path == other.path) or (
-            other.__class__ == str and self.path == other
-        )
-
-    def __hash__(self):
-        return hash(self.path)
-
-    def __str__(self):
-        return self.absolute_path(self.path)
-
-    def absolute_path(self, path):
-        """
-        Given a relative or absolute path to a static asset, return an absolute
-        path. An absolute path will be returned unchanged while a relative path
-        will be passed to django.templatetags.static.static().
-        """
-        if path.startswith(("http://", "https://", "/")):
-            return path
-        return static(path)
-
-    def __repr__(self):
-        return f"{self.path!r}"
-
-
-class CSS(Asset):
-    def __init__(self, path, medium):
-        super().__init__(path)
-        self.medium = medium
-
-    def __str__(self):
-        path = super().__str__()
-        return format_html(
-            '<link href="{}" media="{}" rel="stylesheet">',
-            self.absolute_path(path),
-            self.medium,
-        )
-
-
-class JS(Asset):
-    def __init__(self, path, integrity=None):
-        super().__init__(path)
-        self.integrity = integrity or ""
-
-    def __str__(self, integrity=None):
-        path = super().__str__()
-        template = '<script src="{}"%s></script>' % (
-            ' integrity="{}"' if self.integrity else "{}"
-        )
-        return format_html(template, self.absolute_path(path), self.integrity)
-
-
 @override_settings(
     STATIC_URL="http://media.example.com/static/",
 )
@@ -779,7 +825,12 @@ class FormsMediaObjectTestCase(SimpleTestCase):
 
     def test_construction(self):
         m = Media(
-            css={"all": (CSS("path/to/css1", "all"), CSS("/path/to/css2", "all"))},
+            css={
+                "all": (
+                    CSS("path/to/css1", media="all"),
+                    CSS("/path/to/css2", media="all"),
+                )
+            },
             js=(
                 JS("/path/to/js1"),
                 JS("http://media.other.com/path/to/js2"),
@@ -789,7 +840,7 @@ class FormsMediaObjectTestCase(SimpleTestCase):
                 ),
             ),
         )
-        self.assertEqual(
+        self.assertHTMLEqual(
             str(m),
             '<link href="http://media.example.com/static/path/to/css1" media="all" '
             'rel="stylesheet">\n'
@@ -801,9 +852,9 @@ class FormsMediaObjectTestCase(SimpleTestCase):
         )
         self.assertEqual(
             repr(m),
-            "Media(css={'all': ['path/to/css1', '/path/to/css2']}, "
-            "js=['/path/to/js1', 'http://media.other.com/path/to/js2', "
-            "'https://secure.other.com/path/to/js3'])",
+            "Media(css={'all': [CSS('path/to/css1'), CSS('/path/to/css2')]}, "
+            "js=[JS('/path/to/js1'), JS('http://media.other.com/path/to/js2'), "
+            "JS('https://secure.other.com/path/to/js3')])",
         )
 
     def test_simplest_class(self):
@@ -823,7 +874,7 @@ class FormsMediaObjectTestCase(SimpleTestCase):
     def test_combine_media(self):
         class MyWidget1(TextInput):
             class Media:
-                css = {"all": (CSS("path/to/css1", "all"), "/path/to/css2")}
+                css = {"all": (CSS("path/to/css1", media="all"), "/path/to/css2")}
                 js = (
                     "/path/to/js1",
                     "http://media.other.com/path/to/js2",
@@ -833,12 +884,12 @@ class FormsMediaObjectTestCase(SimpleTestCase):
 
         class MyWidget2(TextInput):
             class Media:
-                css = {"all": (CSS("/path/to/css2", "all"), "/path/to/css3")}
+                css = {"all": (CSS("/path/to/css2", media="all"), "/path/to/css3")}
                 js = (JS("/path/to/js1"), "/path/to/js4")
 
         w1 = MyWidget1()
         w2 = MyWidget2()
-        self.assertEqual(
+        self.assertHTMLEqual(
             str(w1.media + w2.media),
             '<link href="http://media.example.com/static/path/to/css1" media="all" '
             'rel="stylesheet">\n'
@@ -851,20 +902,32 @@ class FormsMediaObjectTestCase(SimpleTestCase):
             "</script>",
         )
 
+    def test_css_media_override(self):
+        # The Media.css keys are ignored for object-based assets.
+        class MyWidget1(TextInput):
+            class Media:
+                css = {"all": (CSS("path/to/css1", media="print"),)}
+
+        self.assertHTMLEqual(
+            str(MyWidget1().media),
+            '<link href="http://media.example.com/static/path/to/css1"'
+            ' media="print" rel="stylesheet">',
+        )
+
     def test_media_deduplication(self):
         # The deduplication doesn't only happen at the point of merging two or
         # more media objects.
         media = Media(
             css={
                 "all": (
-                    CSS("/path/to/css1", "all"),
-                    CSS("/path/to/css1", "all"),
+                    CSS("/path/to/css1", media="all"),
+                    CSS("/path/to/css1", media="all"),
                     "/path/to/css1",
                 )
             },
             js=(JS("/path/to/js1"), JS("/path/to/js1"), "/path/to/js1"),
         )
-        self.assertEqual(
+        self.assertHTMLEqual(
             str(media),
             '<link href="/path/to/css1" media="all" rel="stylesheet">\n'
             '<script src="/path/to/js1"></script>',
