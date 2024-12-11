@@ -62,8 +62,7 @@ A composite primary key can also be filtered by a ``tuple``:
     1
 
 We're still working on composite primary key support for
-:ref:`relational fields <cpk-and-relations>`, including
-:class:`.GenericForeignKey` fields, and the Django admin. Models with composite
+:ref:`relational fields <cpk-and-relations>`, and the Django admin. Models with composite
 primary keys cannot be registered in the Django admin at this time. You can
 expect to see this in future releases.
 
@@ -96,9 +95,8 @@ operation.
 Composite primary keys and relations
 ====================================
 
-:ref:`Relationship fields <relationship-fields>`, including
-:ref:`generic relations <generic-relations>` do not support composite primary
-keys.
+:ref:`Relationship fields <relationship-fields>` do not support composite
+primary keys.
 
 For example, given the ``OrderLineItem`` model, the following is not
 supported::
@@ -130,6 +128,80 @@ database.
 
     ``ForeignObject`` is an internal API. This means it is not covered by our
     :ref:`deprecation policy <internal-release-deprecation-policy>`.
+
+Generic foreign keys & relations
+================================
+
+If a :class:`~django.contrib.contenttypes.fields.GenericForeignKey`\'s
+"object_id" field is a :class:`~django.db.models.CharField` or a
+:class:`~django.db.models.TextField`, Django will automatically serialize the
+related ``CompositePrimaryKey`` into a JSON array::
+
+    class Tag:
+        content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+        object_id = models.CharField(max_length=255)
+        content_object = GenericForeignKey("content_type", "object_id")
+
+This means ``CompositePrimaryKey`` is backwards-compatible with any
+``GenericForeignKey`` that's using a ``CharField`` or ``TextField`` "object_id".
+
+.. code-block:: pycon
+
+    >>> item.pk
+    (2, "B142C")
+    >>> tag = Tag(content_object=item)
+    >>> tag.object_id
+    '[2, "B142C"]'
+
+.. warning:: pk changes are not supported
+
+    Django doesn't automatically update "object_id" if "content_object.pk"
+    changes. If you change an object's ``pk`` in any way, make sure the related
+    generic foreign keys are also updated.
+
+:class:`~django.contrib.contenttypes.fields.GenericRelation`\s on models with
+a ``CompositePrimaryKey`` are also supported. When filtering on a reverse
+relationship, Django performs ``JOIN``\s using the appropriate backend-specific
+JSON functions::
+
+    class OrderLineItem(models.Model):
+        ...
+        tags = GenericRelation("Tag", related_query_name="items")
+
+This means ``CompositePrimaryKey``\s are backwards-compatible with
+``GenericRelation``\s the same way ``GenericForeignKey``\s are.
+
+.. code-block:: pycon
+
+    >>> item.tags.all()  # OK
+    >>> Tag.objects.filter(items__quantity__gte=2)  # OK
+
+.. warning:: JOINs on JSON functions can be slow
+
+    While performing ``JOIN``\s on JSON functions is convenient, it can lead to
+    performance issues. Exercise caution when filtering on the reverse
+    relationship of a ``GenericRelation``.
+
+.. warning:: MariaDB support
+
+    At the time of writing this, MariaDB's JSON_UNQUOTE function cannot process
+    surrogate pairs (e.g. emojis). If you're planning to use JOINs on JSON
+    functions on MariaDB, make sure the primary key doesn't contain any emojis.
+
+.. admonition:: Supported fields
+
+    ``JOIN``s on JSON functions may not work if the ``CompositePrimaryKey``
+    has unsupported fields.
+
+    The supported fields are:
+
+    - ``SmallIntegerField``
+    - ``IntegerField``
+    - ``BigIntegerField``
+    - ``CharField``
+    - ``UUIDField``
+    - ``DateField``
+    - ``DateTimeField``
 
 Composite primary keys and database functions
 =============================================
