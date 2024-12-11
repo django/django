@@ -169,7 +169,7 @@ Requires core.js and SelectBox.js.
             clear_all.addEventListener('click', function(e) {
                 move_selection(e, this, SelectBox.move_all, field_id + '_to', field_id + '_from');
             });
-            warning_footer.addEventListener('click', function(e) {
+            warning_footer.addEventListener('click', function() {
                 filter_selected_input.value = '';
                 SelectBox.filter(field_id + '_to', '');
                 SelectFilter.refresh_filtered_warning(field_id);
@@ -248,12 +248,31 @@ Requires core.js and SelectBox.js.
         refresh_icons: function(field_id) {
             const from = document.getElementById(field_id + '_from');
             const to = document.getElementById(field_id + '_to');
-            // Active if at least one item is selected
-            document.getElementById(field_id + '_add').classList.toggle('active', SelectFilter.any_selected(from));
-            document.getElementById(field_id + '_remove').classList.toggle('active', SelectFilter.any_selected(to));
-            // Active if the corresponding box isn't empty
-            document.getElementById(field_id + '_add_all').classList.toggle('active', from.querySelector('option'));
-            document.getElementById(field_id + '_remove_all').classList.toggle('active', to.querySelector('option'));
+        
+            if (!from || !to) {
+                // If required elements are missing, skip refreshing icons.
+                console.warn(`Skipping icon refresh for field_id: ${field_id}. Elements are missing.`);
+                return;
+            }
+        
+            const addButton = document.getElementById(field_id + '_add');
+            const removeButton = document.getElementById(field_id + '_remove');
+            const addAllButton = document.getElementById(field_id + '_add_all');
+            const removeAllButton = document.getElementById(field_id + '_remove_all');
+        
+            if (addButton) {
+                addButton.classList.toggle('active', SelectFilter.any_selected(from));
+            }
+            if (removeButton) {
+                removeButton.classList.toggle('active', SelectFilter.any_selected(to));
+            }
+            if (addAllButton) {
+                addAllButton.classList.toggle('active', from.querySelector('option'));
+            }
+            if (removeAllButton) {
+                removeAllButton.classList.toggle('active', to.querySelector('option'));
+            }
+        
             SelectFilter.refresh_filtered_warning(field_id);
         },
         filter_key_press: function(event, field_id, source, target) {
@@ -299,10 +318,26 @@ Requires core.js and SelectBox.js.
         }
     };
 
-    window.addEventListener('load', function(e) {
+    window.addEventListener('load', function() {
         document.querySelectorAll('select.selectfilter, select.selectfilterstacked').forEach(function(el) {
             const data = el.dataset;
             SelectFilter.init(el.id, data.fieldName, parseInt(data.isStacked, 10));
         });
     });
+
+    document.addEventListener('formset:removed', function(e) {
+        const inlineElement = e.target;
+        const field = inlineElement.querySelector('select.filtered');
+        if (field) {
+            const field_id = field.id.replace('_from', ''); // Remove '_from' suffix if present
+            const fromBox = document.getElementById(field_id + '_from');
+            const toBox = document.getElementById(field_id + '_to');
+            
+            // Remove elements if present
+            if (fromBox) fromBox.remove();
+            if (toBox) toBox.remove();
+            console.log(`Cleaned up SelectFilter for field_id: ${field_id}`);
+        }
+    });
+    
 }

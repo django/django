@@ -159,6 +159,11 @@
                 updateElementIndex($(forms).get(i), options.prefix, i);
                 $(forms.get(i)).find("*").each(updateElementCallback);
             }
+
+            // Reinitialize SelectFilter widgets to ensure proper functionality
+            if (typeof updateSelectFilter === "function") {
+                updateSelectFilter();
+            }
         };
 
         const toggleDeleteButtonVisibility = function(inlineGroup) {
@@ -169,7 +174,7 @@
             }
         };
 
-        $this.each(function(i) {
+        $this.each(function() {
             $(this).not("." + options.emptyCssClass).addClass(options.formCssClass);
         });
 
@@ -271,7 +276,7 @@
     // Stacked inlines ---------------------------------------------------------
     $.fn.stackedFormset = function(selector, options) {
         const $rows = $(this);
-        const updateInlineLabel = function(row) {
+        const updateInlineLabel = function() {
             $(selector).find(".inline_label").each(function(i) {
                 const count = i + 1;
                 $(this).html($(this).html().replace(/(#\d+)/g, "#" + count));
