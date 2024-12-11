@@ -14,7 +14,7 @@ from django.core.files.temp import NamedTemporaryFile
 from django.core.management import CommandError
 from django.core.management.commands.dumpdata import ProxyModelWarning
 from django.core.serializers.base import ProgressBar
-from django.db import IntegrityError, connection
+from django.db import DatabaseError, IntegrityError, connection
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
 from .models import (
@@ -1148,6 +1148,95 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
                 ],
             )
 
+    def test_stdout(self):
+        """examine stdout of loaddata based on verbosity levels"""
+
+        # level 0
+        out = StringIO()
+        management.call_command("loaddata", "fixture2.json", verbosity=0, stdout=out)
+        observed = out.getvalue()
+        expected = ""
+        self.assertEqual(observed, expected)
+
+        # level 1
+        out = StringIO()
+        management.call_command("loaddata", "fixture2.json", verbosity=1, stdout=out)
+        observed = out.getvalue()
+        expected = "Installed 2 object(s) from 1 fixture(s)\n"
+        self.assertEqual(observed, expected)
+
+        # level 2
+        out = StringIO()
+        management.call_command("loaddata", "fixture2.json", verbosity=2, stdout=out)
+        observed = out.getvalue().lower()
+        self.assertIn("loading 'fixture2' fixtures...\n", observed)
+        self.assertIn("installing json fixture 'fixture2' from ", observed)
+        self.assertIn("loading 'fixture2' fixtures...\n", observed)
+
+        # level 3
+        out = StringIO()
+        management.call_command("loaddata", "fixture2.json", verbosity=3, stdout=out)
+        observed = out.getvalue().lower()
+        self.assertIn("processed 1 object(s).\r", observed)
+        self.assertIn("processed 2 object(s).\n", observed)
+
+    def test_force_insert(self):
+        """use force_insert option to reduce query count"""
+        management.call_command(
+            "loaddata", "fixture2.json", "--force_insert", verbosity=0
+        )
+
+        """rerun to test handling of duplicate pk"""
+        with self.assertRaises(DatabaseError) as e:
+            management.call_command(
+                "loaddata", "fixture2.json", "--force_insert", verbosity=0
+            )
+        observed = e.exception.args[0].lower()
+        self.assertIn("problem installing fixture ", observed)
+
+    def test_bulk_create(self):
+        """use bulk_create option to reduce query count"""
+        out = StringIO()
+        management.call_command(
+            "loaddata", "fixture2.json", "--bulk_create", verbosity=3, stdout=out
+        )
+        observed = out.getvalue().lower()
+
+        self.assertIn("loading 'fixture2' fixtures...\n", observed)
+        self.assertNotIn("processed 1 object(s).\r", observed)
+        self.assertIn("processed 2 object(s).\n", observed)
+        self.assertIn("installed 2 object(s) from 1 fixture(s)\n", observed)
+
+        """rerun to test handling of duplicate pk"""
+        with self.assertRaises(DatabaseError) as e:
+            management.call_command(
+                "loaddata", "fixture2.json", "--bulk_create", verbosity=0
+            )
+        observed = e.exception.args[0].lower()
+        self.assertIn("problem installing fixture ", observed)
+
+    def test_bulk_create_natural_key(self):
+        """validate that bulk_create works with natural keys"""
+        management.call_command(
+            "loaddata",
+            "forward_reference_fk_natural_key.json",
+            "--bulk_create",
+            verbosity=0,
+        )
+        expected = [
+            {
+                "model": "fixtures.naturalkeything",
+                "pk": 1,
+                "fields": {"key": "t1", "other_thing": None, "other_things": []},
+            },
+            {
+                "model": "fixtures.naturalkeything",
+                "pk": 2,
+                "fields": {"key": "t2", "other_thing": None, "other_things": []},
+            },
+        ]
+        self._dumpdata_assert(["fixtures"], expected)
+
 
 class NonexistentFixtureTests(TestCase):
     """
@@ -1232,6 +1321,32 @@ class FixtureTransactionTests(DumpDataAssertMixin, TransactionTestCase):
                 "Poker has no place on ESPN",
             ],
         )
+
+    def test_force_insert(self):
+        """use force_insert option to reduce query count"""
+        from django.db import connection
+
+        with self.settings(DEBUG=True):
+            management.call_command(
+                "loaddata", "fixture2.json", "--force_insert", verbosity=0
+            )
+            self.assertFalse(
+                "UPDATE" in [x["sql"].split(" ", 1)[0] for x in connection.queries]
+            )
+
+    def test_bulk_create(self):
+        """use bulk_create option to reduce query count"""
+        from django.db import connection
+
+        with self.settings(DEBUG=True):
+            management.call_command(
+                "loaddata", "fixture10.json", "--bulk_create", verbosity=0
+            )
+            insert_counter = [
+                x for x in connection.queries if x["sql"].startswith("INSERT")
+            ]
+            self.assertEqual(3, len(insert_counter))
+            self.assertEqual(4, Article.objects.count())
 
 
 class ForwardReferenceTests(DumpDataAssertMixin, TestCase):
