@@ -431,6 +431,9 @@ Models
   (``db_table_comment``).
 * **models.W047**: ``<database>`` does not support unique constraints with
   nulls distinct.
+* **models.E048**: ``constraints/indexes/unique_together`` refers to a
+  ``CompositePrimaryKey`` ``<field name>``, but ``CompositePrimaryKey``\s are
+  not supported for that option.
 
 Management Commands
 -------------------

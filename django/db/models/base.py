@@ -2288,6 +2288,16 @@ class Model(AltersData, metaclass=ModelBase):
                             id="models.E013",
                         )
                     )
+                elif isinstance(field, models.CompositePrimaryKey):
+                    errors.append(
+                        checks.Error(
+                            f"{option!r} refers to a CompositePrimaryKey "
+                            f"{field_name!r}, but CompositePrimaryKeys are not "
+                            f"permitted in {option!r}.",
+                            obj=cls,
+                            id="models.E048",
+                        )
+                    )
                 elif field not in cls._meta.local_fields:
                     errors.append(
                         checks.Error(
