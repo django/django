@@ -30,10 +30,11 @@ class AbstractPerson(models.Model):
     )
 
     # VIRTUAL fields
+    relation_id = models.IntegerField()
     data_not_concrete_abstract = models.ForeignObject(
         Relation,
         on_delete=models.CASCADE,
-        from_fields=["abstract_non_concrete_id"],
+        from_fields=["relation_id"],
         to_fields=["id"],
         related_name="fo_abstract_rel",
     )
@@ -76,7 +77,7 @@ class BasePerson(AbstractPerson):
     data_not_concrete_base = models.ForeignObject(
         Relation,
         on_delete=models.CASCADE,
-        from_fields=["base_non_concrete_id"],
+        from_fields=["relation_id"],
         to_fields=["id"],
         related_name="fo_base_rel",
     )
@@ -108,7 +109,7 @@ class Person(BasePerson):
     data_not_concrete_inherited = models.ForeignObject(
         Relation,
         on_delete=models.CASCADE,
-        from_fields=["model_non_concrete_id"],
+        from_fields=["relation_id"],
         to_fields=["id"],
         related_name="fo_concrete_rel",
     )
