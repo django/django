@@ -15,4 +15,4 @@ To comply with the CC BY 4.0 license, please include the following attribution i
 
 ## Usage
 
-You may use, modify, and distribute the icons in this repository in compliance with the [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/) license.
+You may use, modify, and distribute the icons in this repository in compliance with the [Creative Commons Attribution 4.0 International (CC-BY-4.0)](https://creativecommons.org/licenses/by/4.0/) license.
