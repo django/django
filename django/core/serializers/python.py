@@ -82,12 +82,10 @@ class Serializer(base.Serializer):
                     return self._value_from_field(value, value._meta.pk)
 
                 def queryset_iterator(obj, field):
-                    return (
-                        getattr(obj, field.name)
-                        .select_related(None)
-                        .only("pk")
-                        .iterator()
-                    )
+                    query_set = getattr(obj, field.name).select_related(None).only("pk")
+                    chunk_size = 2000 if query_set._prefetch_related_lookups else None
+
+                    return query_set.iterator(chunk_size=chunk_size)
 
             m2m_iter = getattr(obj, "_prefetched_objects_cache", {}).get(
                 field.name,
