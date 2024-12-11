@@ -23,14 +23,9 @@ Then, please post it in one of the following channels:
   discussions.
 * The |django-users| mailing list. This is for email-based discussions.
 * The `Django Discord server`_ for chat-based discussions.
-* The `#django IRC channel`_ on the Libera.Chat IRC network. This is for
-  chat-based discussions. If you're new to IRC, see the `Libera.Chat
-  documentation`_ for different ways to connect.
 
 .. _`"Using Django"`: https://forum.djangoproject.com/c/users/6
 .. _`Django Discord server`: https://discord.gg/xcRH6mN4fa
-.. _#django IRC channel: https://web.libera.chat/#django
-.. _Libera.Chat documentation: https://libera.chat/guides/connect
 
 In all these channels please abide by the `Django Code of Conduct`_. In
 summary, being friendly and patient, considerate, respectful, and careful in
