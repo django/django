@@ -279,6 +279,9 @@ Management Commands
   ``Command.autodetector`` attribute for subclasses to override in order to use
   a custom autodetector class.
 
+* Introduce a :djadmin:`listurls` command that lists the URLs in the application,
+  including the view function and name, if present.
+
 Migrations
 ~~~~~~~~~~
 

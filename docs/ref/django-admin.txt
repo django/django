@@ -498,6 +498,26 @@ Only support for PostgreSQL is implemented.
 
 If this option is provided, models are also created for database views.
 
+``listurls``
+------------
+
+.. django-admin:: listurls
+
+List URL patterns in the project with optional filtering by prefixes.
+
+.. django-admin-option:: --unsorted
+
+Lists URLs with the original ordering, same order as found in url patterns.
+
+.. django-admin-option:: --prefix [prefix ...]
+
+Filters URLs by given prefixes.
+
+.. django-admin-option:: --format {aligned,table,verbose,json,pretty-json}
+
+Specifies the output format. Available values are ``aligned``, ``table``,
+``verbose``, ``json``, and ``pretty-json``. Default is ``aligned``.
+
 ``loaddata``
 ------------
 
