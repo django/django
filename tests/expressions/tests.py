@@ -2849,3 +2849,36 @@ class OrderByTests(SimpleTestCase):
             F("field").asc(nulls_first=False)
         with self.assertRaisesMessage(ValueError, msg):
             F("field").desc(nulls_last=False)
+
+
+class OuterRefOrderByTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.ceo = Employee.objects.create(
+            firstname="John", lastname="Doe", salary=100000
+        )
+        cls.gmbh = Company.objects.create(
+            name="GmbH",
+            num_employees=50,
+            ceo=cls.ceo,
+            point_of_contact=cls.ceo,
+            based_in_eu=True,
+        )
+        cls.foobar_ltd = Company.objects.create(
+            name="Foobar Ltd",
+            num_employees=100,
+            ceo=cls.ceo,
+            point_of_contact=cls.ceo,
+            based_in_eu=False,
+        )
+
+    def test_order_by_with_outerref(self):
+        inner = Company.objects.filter(
+            num_employees__lt=OuterRef("num_employees")
+        ).order_by("num_employees")
+
+        qs = Company.objects.annotate(next_bigger=Subquery(inner.values("pk")[:1]))
+        foobar_ltd = qs.get(pk=self.foobar_ltd.pk)
+
+        self.assertIsNotNone(foobar_ltd.next_bigger)
+        self.assertEqual(foobar_ltd.next_bigger, self.gmbh.pk)
