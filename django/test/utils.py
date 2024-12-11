@@ -189,6 +189,7 @@ def setup_databases(
     test_databases, mirrored_aliases = get_unique_databases_and_mirrors(aliases)
 
     old_names = []
+    serialize_connections = []
 
     for db_name, aliases in test_databases.values():
         first_alias = None
@@ -200,15 +201,14 @@ def setup_databases(
             if first_alias is None:
                 first_alias = alias
                 with time_keeper.timed("  Creating '%s'" % alias):
-                    serialize_alias = (
-                        serialized_aliases is None or alias in serialized_aliases
-                    )
                     connection.creation.create_test_db(
                         verbosity=verbosity,
                         autoclobber=not interactive,
                         keepdb=keepdb,
-                        serialize=serialize_alias,
+                        serialize=False,
                     )
+                    if serialized_aliases is None or alias in serialized_aliases:
+                        serialize_connections.append(connection)
                 if parallel > 1:
                     for index in range(parallel):
                         with time_keeper.timed("  Cloning '%s'" % alias):
@@ -227,6 +227,16 @@ def setup_databases(
     for alias, mirror_alias in mirrored_aliases.items():
         connections[alias].creation.set_as_test_mirror(
             connections[mirror_alias].settings_dict
+        )
+
+    # Serialize content of test databases only once all of them are setup to
+    # account for database mirroring and routing during serialization. This
+    # slightly horrific process is so people who are testing on databases
+    # without transactions or using TransactionTestCase still get a clean
+    # database on every test run.
+    for serialize_connection in serialize_connections:
+        serialize_connection._test_serialized_contents = (
+            serialize_connection.creation.serialize_db_to_string()
         )
 
     if debug_sql:
