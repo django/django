@@ -10,7 +10,7 @@
 The ``reverse()`` function can be used to return an absolute path reference
 for a given view and optional parameters, similar to the :ttag:`url` tag:
 
-.. function:: reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None)
+.. function:: reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None, *, query=None, fragment=None)
 
 ``viewname`` can be a :ref:`URL pattern name <naming-url-patterns>` or the
 callable view object used in the URLconf. For example, given the following
@@ -66,6 +66,33 @@ namespaces into URLs on specific application instances, according to the
 
 The ``urlconf`` argument is the URLconf module containing the URL patterns to
 use for reversing. By default, the root URLconf for the current thread is used.
+
+The ``query`` keyword argument specifies parameters to be added to the returned
+URL. It can accept an instance of :class:`~django.http.QueryDict` (such as
+``request.GET``) or any value compatible with :func:`urllib.parse.urlencode`.
+The encoded query string is appended to the resolved URL, prefixed by a ``?``.
+
+The ``fragment`` keyword argument specifies a fragment identifier to be
+appended to the returned URL (that is, after the path and query string,
+preceded by a ``#``).
+
+For example:
+
+.. code-block:: pycon
+
+   >>> from django.urls import reverse
+   >>> reverse("admin:index", query={"q": "biscuits", "page": 2}, fragment="results")
+   '/admin/?q=biscuits&page=2#results'
+   >>> reverse("admin:index", query=[("color", "blue"), ("color", 1), ("none", None)])
+   '/admin/?color=blue&color=1&none=None'
+   >>> reverse("admin:index", query={"has empty spaces": "also has empty spaces!"})
+   '/admin/?has+empty+spaces=also+has+empty+spaces%21'
+   >>> reverse("admin:index", fragment="no encoding is done")
+   '/admin/#no encoding is done'
+
+.. versionchanged:: 5.2
+
+    The ``query`` and ``fragment`` arguments were added.
 
 .. note::
 

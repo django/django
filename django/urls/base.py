@@ -1,7 +1,8 @@
-from urllib.parse import unquote, urlsplit, urlunsplit
+from urllib.parse import unquote, urlencode, urlsplit, urlunsplit
 
 from asgiref.local import Local
 
+from django.http import QueryDict
 from django.utils.functional import lazy
 from django.utils.translation import override
 
@@ -24,7 +25,16 @@ def resolve(path, urlconf=None):
     return get_resolver(urlconf).resolve(path)
 
 
-def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None):
+def reverse(
+    viewname,
+    urlconf=None,
+    args=None,
+    kwargs=None,
+    current_app=None,
+    *,
+    query=None,
+    fragment=None,
+):
     if urlconf is None:
         urlconf = get_urlconf()
     resolver = get_resolver(urlconf)
@@ -85,7 +95,17 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None):
                 ns_pattern, resolver, tuple(ns_converters.items())
             )
 
-    return resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+    if query is not None:
+        if isinstance(query, QueryDict):
+            query_string = query.urlencode()
+        else:
+            query_string = urlencode(query, doseq=True)
+        if query_string:
+            resolved_url += "?" + query_string
+    if fragment is not None:
+        resolved_url += "#" + fragment
+    return resolved_url
 
 
 reverse_lazy = lazy(reverse, str)

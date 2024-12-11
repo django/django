@@ -370,7 +370,9 @@ Tests
 URLs
 ~~~~
 
-* ...
+* :func:`~django.urls.reverse` now accepts ``query`` and ``fragment`` keyword
+  arguments, allowing the addition of a query string and/or fragment identifier
+  in the generated URL, respectively.
 
 Utilities
 ~~~~~~~~~
