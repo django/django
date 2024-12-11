@@ -95,13 +95,16 @@ class RemoteUserMiddleware:
     Middleware for utilizing web-server-provided authentication.
 
     If request.user is not authenticated, then this middleware attempts to
-    authenticate the username passed in the ``REMOTE_USER`` request header.
+    authenticate the username from the ``REMOTE_USER`` key in ``request.META``,
+    an environment variable commonly set by the webserver.
+
     If authentication is successful, the user is automatically logged in to
     persist the user in the session.
 
-    The header used is configurable and defaults to ``REMOTE_USER``.  Subclass
-    this class and change the ``header`` attribute if you need to use a
-    different header.
+    The ``request.META`` key is configurable and defaults to ``REMOTE_USER``.
+    Subclass this class and change the ``header`` attribute if you need to
+    use a different key from ``request.META``, for example a HTTP request
+    header.
     """
 
     sync_capable = True
@@ -116,9 +119,9 @@ class RemoteUserMiddleware:
             markcoroutinefunction(self)
         super().__init__()
 
-    # Name of request header to grab username from.  This will be the key as
-    # used in the request.META dictionary, i.e. the normalization of headers to
-    # all uppercase and the addition of "HTTP_" prefix apply.
+    # Name of request.META key to grab username from. Note that for
+    # request headers, normalization to all uppercase and the addition
+    # of a "HTTP_" prefix apply.
     header = "REMOTE_USER"
     force_logout_if_no_header = True
 
@@ -259,10 +262,10 @@ class PersistentRemoteUserMiddleware(RemoteUserMiddleware):
     Middleware for web-server provided authentication on logon pages.
 
     Like RemoteUserMiddleware but keeps the user authenticated even if
-    the header (``REMOTE_USER``) is not found in the request. Useful
-    for setups when the external authentication via ``REMOTE_USER``
-    is only expected to happen on some "logon" URL and the rest of
-    the application wants to use Django's authentication mechanism.
+    the ``request.META`` key is not found in the request. Useful for
+    setups when the external authentication is only expected to happen
+    on some "logon" URL and the rest of the application wants to use
+    Django's authentication mechanism.
     """
 
     force_logout_if_no_header = False
