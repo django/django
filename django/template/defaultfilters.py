@@ -7,7 +7,6 @@ from decimal import ROUND_HALF_UP, Context, Decimal, InvalidOperation, getcontex
 from functools import wraps
 from inspect import unwrap
 from operator import itemgetter
-from pprint import pformat
 from urllib.parse import quote
 
 from django.utils import formats
@@ -18,7 +17,7 @@ from django.utils.html import json_script as _json_script
 from django.utils.html import linebreaks, strip_tags
 from django.utils.html import urlize as _urlize
 from django.utils.safestring import SafeData, mark_safe
-from django.utils.text import Truncator, normalize_newlines, phone2numeric
+from django.utils.text import DebugRepr, Truncator, normalize_newlines, phone2numeric
 from django.utils.text import slugify as _slugify
 from django.utils.text import wrap
 from django.utils.timesince import timesince, timeuntil
@@ -29,6 +28,9 @@ from .library import Library
 
 register = Library()
 
+# The number of characters that will be printed
+# before trimming while printing an exception in reports.
+EXCEPTION_PRINT_LIMIT = 4096
 
 #######################
 # STRING DECORATOR    #
@@ -984,8 +986,13 @@ def phone2numeric_filter(value):
 
 @register.filter(is_safe=True)
 def pprint(value):
-    """A wrapper around pprint.pprint -- for debugging, really."""
+    """A wrapper with custom Repr implementation for debugging."""
+    repr_instance = DebugRepr(limit=EXCEPTION_PRINT_LIMIT)
+
     try:
-        return pformat(value)
+        value = repr_instance.repr(value)
+
     except Exception as e:
-        return "Error in formatting: %s: %s" % (e.__class__.__name__, e)
+        value = "Error in formatting: %s: %s" % (e.__class__.__name__, e)
+
+    return value
