@@ -4,7 +4,9 @@ from .models import (
     AddIndex,
     AlterConstraint,
     AlterIndexTogether,
+    AlterModelBases,
     AlterModelManagers,
+    AlterModelMetaclass,
     AlterModelOptions,
     AlterModelTable,
     AlterModelTableComment,
@@ -43,4 +45,6 @@ __all__ = [
     "RunPython",
     "AlterOrderWithRespectTo",
     "AlterModelManagers",
+    "AlterModelBases",
+    "AlterModelMetaclass",
 ]
