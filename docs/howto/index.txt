@@ -60,6 +60,7 @@ Other guides
    csrf
    custom-management-commands
    custom-file-storage
+   custom-shell
 
 .. seealso::
 
