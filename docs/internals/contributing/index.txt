@@ -31,9 +31,9 @@ a great ecosystem to work in:
   friendly and helpful atmosphere. If you're new to the Django community,
   you should read the `posting guidelines`_.
 
-* Join the `Django Discord server`_ or the `#django IRC channel`_ on
-  Libera.Chat to discuss and answer questions. By explaining Django to other
-  users, you're going to learn a lot about the framework yourself.
+* Join the `Django Discord server`_ to discuss and answer questions. By
+  explaining Django to other users, you're going to learn a lot about the
+  framework yourself.
 
 * Blog about Django. We syndicate all the Django blogs we know about on
   the `community page`_; if you'd like to see your blog on that page you
@@ -45,7 +45,6 @@ a great ecosystem to work in:
   build it!
 
 .. _posting guidelines: https://code.djangoproject.com/wiki/UsingTheMailingList
-.. _#django IRC channel: https://web.libera.chat/#django
 .. _community page: https://www.djangoproject.com/community/
 .. _Django Discord server: https://discord.gg/xcRH6mN4fa
 .. _Django forum: https://forum.djangoproject.com/
