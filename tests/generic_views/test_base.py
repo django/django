@@ -607,8 +607,9 @@ class SingleObjectTemplateResponseMixinTest(SimpleTestCase):
         """
         view = views.TemplateResponseWithoutTemplate()
         msg = (
-            "TemplateResponseMixin requires either a definition of "
-            "'template_name' or an implementation of 'get_template_names()'"
+            "SingleObjectTemplateResponseMixin requires either a definition of "
+            "'template_name_field', a definition of 'model' or an "
+            "implementation of 'get_template_names()'"
         )
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             view.get_template_names()

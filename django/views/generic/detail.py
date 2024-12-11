@@ -123,7 +123,10 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
         Return a list of template names to be used for the request. May not be
         called if render_to_response() is overridden. Return the following list:
 
-        * the value of ``template_name`` on the view (if provided)
+        * if provided the value of ``template_name`` on the view
+
+        or
+
         * the contents of the ``template_name_field`` field on the
           object instance that the view is operating upon (if available)
         * ``<app_label>/<model_name><template_name_suffix>.html``
@@ -170,7 +173,11 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
             # If we still haven't managed to find any template names, we should
             # re-raise the ImproperlyConfigured to alert the user.
             if not names:
-                raise
+                raise ImproperlyConfigured(
+                    "SingleObjectTemplateResponseMixin requires either a definition of "
+                    "'template_name_field', a definition of 'model' or an "
+                    "implementation of 'get_template_names()'"
+                )
 
         return names
 
