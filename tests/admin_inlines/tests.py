@@ -1948,7 +1948,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         def get_delete_checkboxes():
             checkboxes = {}
             for group in [1, 2, 3, 4]:
-                for i in range(3):
+                for i in [0, 1, 2]:
                     key = f"{group}_{i}"
                     checkboxes[key] = self.selenium.find_element(
                         By.ID, f"id_-{group}-{i}-DELETE"

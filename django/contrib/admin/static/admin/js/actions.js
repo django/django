@@ -58,26 +58,24 @@
     }
 
     function updateCounter(actionCheckboxes, options) {
-        if (!options.inline) {
-            const sel = Array.from(actionCheckboxes).filter(function(el) {
-                return el.checked;
-            }).length;
-            const counter = document.querySelector(options.counterContainer);
-            // data-actions-icnt is defined in the generated HTML
-            // and contains the total amount of objects in the queryset
-            const actions_icnt = Number(counter.dataset.actionsIcnt);
-            counter.textContent = interpolate(
-                ngettext('%(sel)s of %(cnt)s selected', '%(sel)s of %(cnt)s selected', sel), {
-                    sel: sel,
-                    cnt: actions_icnt
-                }, true);
-            const allToggle = document.getElementById(options.allToggleId);
-            allToggle.checked = sel === actionCheckboxes.length;
-            if (allToggle.checked) {
-                showQuestion(options);
-            } else {
-                clearAcross(options);
-            }
+        const sel = Array.from(actionCheckboxes).filter(function(el) {
+            return el.checked;
+        }).length;
+        const counter = document.querySelector(options.counterContainer);
+        // data-actions-icnt is defined in the generated HTML
+        // and contains the total amount of objects in the queryset
+        const actions_icnt = Number(counter.dataset.actionsIcnt);
+        counter.textContent = interpolate(
+            ngettext('%(sel)s of %(cnt)s selected', '%(sel)s of %(cnt)s selected', sel), {
+                sel: sel,
+                cnt: actions_icnt
+            }, true);
+        const allToggle = document.getElementById(options.allToggleId);
+        allToggle.checked = sel === actionCheckboxes.length;
+        if (allToggle.checked) {
+            showQuestion(options);
+        } else {
+            clearAcross(options);
         }
     }
 
@@ -107,27 +105,6 @@
             shiftPressed = event.shiftKey;
         });
 
-        document.querySelectorAll(options.acrossQuestions + " a").forEach(function(el) {
-            el.addEventListener('click', function(event) {
-                event.preventDefault();
-                const acrossInputs = document.querySelectorAll(options.acrossInput);
-                acrossInputs.forEach(function(acrossInput) {
-                    acrossInput.value = 1;
-                });
-                showClear(options);
-            });
-        });
-
-        document.querySelectorAll(options.acrossClears + " a").forEach(function(el) {
-            el.addEventListener('click', function(event) {
-                event.preventDefault();
-                document.getElementById(options.allToggleId).checked = false;
-                clearAcross(options);
-                checker(actionCheckboxes, options, false);
-                updateCounter(actionCheckboxes, options);
-            });
-        });
-
         function affectedCheckboxes(target, withModifier) {
             const multiSelect = (lastChecked && withModifier && lastChecked !== target);
             if (!multiSelect) {
@@ -138,14 +115,30 @@
             const lastCheckedIndex = checkboxes.findIndex(el => el === lastChecked);
             const startIndex = Math.min(targetIndex, lastCheckedIndex);
             const endIndex = Math.max(targetIndex, lastCheckedIndex);
-            const filtered = checkboxes.filter((el, index) => (startIndex <= index) && (index <= endIndex));
-            return filtered;
-        };
+            return checkboxes.filter((el, index) => (startIndex <= index) && (index <= endIndex));
+        }
 
         if (!options.inline) {
-            document
-                .getElementById(options.allToggleId)
-                .addEventListener('click', function(event) {
+            document.querySelectorAll(options.acrossQuestions + " a").forEach(function(el) {
+                el.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    const acrossInputs = document.querySelectorAll(options.acrossInput);
+                    acrossInputs.forEach(function(acrossInput) {
+                        acrossInput.value = 1;
+                    });
+                    showClear(options);
+                });
+            });
+            document.querySelectorAll(options.acrossClears + " a").forEach(function(el) {
+                el.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    document.getElementById(options.allToggleId).checked = false;
+                    clearAcross(options);
+                    checker(actionCheckboxes, options, false);
+                    updateCounter(actionCheckboxes, options);
+                });
+            });
+            document.getElementById(options.allToggleId).addEventListener('click', function(event) {
                     checker(actionCheckboxes, options, this.checked);
                     updateCounter(actionCheckboxes, options);
                 });
@@ -173,10 +166,7 @@
                     }
                 }
             });
-        }
-
-
-        if (options.inline) {
+        } else if (options.inline) {
             const handleCheckboxChange = (event) => {
                 const target = event.target;
 
@@ -186,6 +176,7 @@
                 }
 
                 if (lastChecked.name.slice(0, -9) === target.name.slice(0, -9)) {
+                    // Checking for if clicked checkboxes are in the same form with forms common prefix.
                     const checkboxes = affectedCheckboxes(target, shiftPressed);
                     checker(checkboxes, options, target.checked);
                 }
@@ -201,7 +192,7 @@
             };
 
             // Handle tabular inline tables
-            document.querySelectorAll('.tabular_inline_table tbody').forEach(attachChangeListener);
+            document.querySelectorAll('.tabular tbody').forEach(attachChangeListener);
 
             // Handle stacked inlines
             document.querySelectorAll('.inline-related').forEach(attachChangeListener);
