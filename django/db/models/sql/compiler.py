@@ -19,6 +19,7 @@ from django.db.models.sql.constants import (
     MULTI,
     NO_RESULTS,
     ORDER_DIR,
+    ROW_COUNT,
     SINGLE,
 )
 from django.db.models.sql.query import Query, get_order_dir
@@ -1599,12 +1600,19 @@ class SQLCompiler:
         return value is a single data item if result_type is SINGLE, or an
         iterator over the results if the result_type is MULTI.
 
-        result_type is either MULTI (use fetchmany() to retrieve all rows),
-        SINGLE (only retrieve a single row), or None. In this last case, the
-        cursor is returned if any query is executed, since it's used by
-        subclasses such as InsertQuery). It's possible, however, that no query
-        is needed, as the filters describe an empty set. In that case, None is
-        returned, to avoid any unnecessary database interaction.
+        result_type can be one of the following:
+        - MULTI
+           uses fetchmany() to retrieve all rows, potentially wrapping
+           it in an iterator for chunked reads for connections that
+           support it
+        - SINGLE
+           retrieves a single row using fetchone()
+        - ROW_COUNT
+           retrieve the number of rows in the result
+        - CURSOR
+           run the query, and then return the cursor object. In this case
+           it is the caller's responsibility to close the cursor when they
+           are done with it
         """
         result_type = result_type or NO_RESULTS
         try:
@@ -1627,10 +1635,15 @@ class SQLCompiler:
             cursor.close()
             raise
 
-        if result_type == CURSOR:
-            # Give the caller the cursor to process and close.
+        if result_type == ROW_COUNT:
+            try:
+                return cursor.rowcount
+            finally:
+                cursor.close()
+        elif result_type == CURSOR:
+            # here we are returning the cursor without closing it
             return cursor
-        if result_type == SINGLE:
+        elif result_type == SINGLE:
             try:
                 val = cursor.fetchone()
                 if val:
@@ -1639,23 +1652,26 @@ class SQLCompiler:
             finally:
                 # done with the cursor
                 cursor.close()
-        if result_type == NO_RESULTS:
+        elif result_type == NO_RESULTS:
             cursor.close()
             return
-
-        result = cursor_iter(
-            cursor,
-            self.connection.features.empty_fetchmany_value,
-            self.col_count if self.has_extra_select else None,
-            chunk_size,
-        )
-        if not chunked_fetch or not self.connection.features.can_use_chunked_reads:
-            # If we are using non-chunked reads, we return the same data
-            # structure as normally, but ensure it is all read into memory
-            # before going any further. Use chunked_fetch if requested,
-            # unless the database doesn't support it.
-            return list(result)
-        return result
+        else:
+            assert result_type == MULTI
+            # NB: cursor is now managed by cursor_iter, which
+            # will close the cursor if/when everything is consumed
+            result = cursor_iter(
+                cursor,
+                self.connection.features.empty_fetchmany_value,
+                self.col_count if self.has_extra_select else None,
+                chunk_size,
+            )
+            if not chunked_fetch or not self.connection.features.can_use_chunked_reads:
+                # If we are using non-chunked reads, we return the same data
+                # structure as normally, but ensure it is all read into memory
+                # before going any further. Use chunked_fetch if requested,
+                # unless the database doesn't support it.
+                return list(result)
+            return result
 
     def as_subquery_condition(self, alias, columns, compiler):
         qn = compiler.quote_name_unless_alias
@@ -2069,19 +2085,21 @@ class SQLUpdateCompiler(SQLCompiler):
         non-empty query that is executed. Row counts for any subsequent,
         related queries are not available.
         """
-        cursor = super().execute_sql(result_type)
-        try:
-            rows = cursor.rowcount if cursor else 0
-            is_empty = cursor is None
-        finally:
-            if cursor:
-                cursor.close()
+        if result_type not in {ROW_COUNT, NO_RESULTS}:
+            raise ValueError(f"Unknown cursor type for update {repr(result_type)}")
+        row_count = super().execute_sql(result_type)
+        is_empty = row_count is None
+        row_count = row_count or 0
+
         for query in self.query.get_related_updates():
-            aux_rows = query.get_compiler(self.using).execute_sql(result_type)
-            if is_empty and aux_rows:
-                rows = aux_rows
+            # NB: if result_type == NO_RESULTS then aux_row_count is None
+            aux_row_count = query.get_compiler(self.using).execute_sql(result_type)
+            if is_empty and aux_row_count:
+                # this will return the row count for any related updates as
+                # the number of rows updated
+                row_count = aux_row_count
                 is_empty = False
-        return rows
+        return row_count
 
     def pre_sql_setup(self):
         """
