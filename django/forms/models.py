@@ -61,7 +61,7 @@ def construct_instance(form, instance, fields=None, exclude=None):
     for f in opts.fields:
         if (
             not f.editable
-            or isinstance(f, models.AutoField)
+            or isinstance(f, models.AutoFieldMixin)
             or f.name not in cleaned_data
         ):
             continue
@@ -963,7 +963,7 @@ class BaseModelFormSet(BaseFormSet, AltersData):
 
     def add_fields(self, form, index):
         """Add a hidden field for the object's primary key."""
-        from django.db.models import AutoField, ForeignKey, OneToOneField
+        from django.db.models import AutoFieldMixin, ForeignKey, OneToOneField
 
         self._pk_field = pk = self.model._meta.pk
         # If a pk isn't editable, then it won't be on the form, so we need to
@@ -975,7 +975,7 @@ class BaseModelFormSet(BaseFormSet, AltersData):
         def pk_is_not_editable(pk):
             return (
                 (not pk.editable)
-                or (pk.auto_created or isinstance(pk, AutoField))
+                or (pk.auto_created or isinstance(pk, AutoFieldMixin))
                 or (
                     pk.remote_field
                     and pk.remote_field.parent_link

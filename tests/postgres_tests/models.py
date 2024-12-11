@@ -10,6 +10,7 @@ from .fields import (
     HStoreField,
     IntegerRangeField,
     SearchVectorField,
+    UUID4Field,
 )
 
 
@@ -182,6 +183,10 @@ class StatTestModel(PostgreSQLModel):
     int1 = models.IntegerField()
     int2 = models.IntegerField()
     related_field = models.ForeignKey(AggregateTestModel, models.SET_NULL, null=True)
+
+
+class UUIDv4DBSetModel(PostgreSQLModel):
+    id = UUID4Field(primary_key=True)
 
 
 class NowTestModel(models.Model):
