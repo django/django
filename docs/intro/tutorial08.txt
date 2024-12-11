@@ -71,7 +71,6 @@ resolve the issue yourself, there are options available to you.
    Toolbar’s is `on GitHub <https://github.com/django-commons/django-debug-toolbar/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc>`_.
 #. Consult the `Django Forum <https://forum.djangoproject.com/>`_.
 #. Join the `Django Discord server <https://discord.gg/xcRH6mN4fa>`_.
-#. Join the #Django IRC channel on `Libera.chat <https://libera.chat/>`_.
 
 Installing other third-party packages
 =====================================
