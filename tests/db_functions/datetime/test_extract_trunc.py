@@ -1935,3 +1935,43 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
             DTModel.objects.annotate(
                 hour_melb=Trunc("start_time", "hour", tzinfo=melb),
             ).get()
+
+    def test_trunc_in_filter(self):
+        """
+        ticket #34699. When TruncSecond is used in a filter it can behave unexpectedly
+        because the function at the database level returns a timezone naive value. The
+        documentation at docs/ref/models/database-functions.txt describes the problem
+        and provides a work-around in specific cases. These tests confirm the issue
+        exists and confirm that the work-around performs as described. If these tests
+        fail it could be because functionality has changed in which case the
+        documentation should be updated and the release notes should include information
+        about a potentially breaking change.
+        """
+        # UTC: No adjustment required to filtering for TruncSecond
+        now = timezone.now()
+        later = now + timedelta(hours=2)
+        non_utc_model = self.create_model(now, later)
+        models_qs = DTModel.objects.annotate(
+            start_trunc=TruncSecond("start_datetime")
+        ).filter(id=non_utc_model.id, start_trunc__lte=now)
+        self.assertEqual(models_qs.count(), 1)
+        test_timezones = [
+            zoneinfo.ZoneInfo("Europe/Berlin"),
+            zoneinfo.ZoneInfo("Australia/Melbourne"),
+        ]
+        for test_tz in test_timezones:
+            with timezone.override(test_tz):
+                now = timezone.now()
+                later = now + timedelta(hours=2)
+                non_utc_model = self.create_model(now, later)
+                models_qs = DTModel.objects.annotate(
+                    start_trunc=TruncSecond("start_datetime")
+                ).filter(id=non_utc_model.id, start_trunc__lte=now)
+                self.assertNotEqual(models_qs.count(), 1)
+                adjusted_now = timezone.localtime(now).replace(
+                    tzinfo=zoneinfo.ZoneInfo(key="UTC")
+                )
+                models_qs = DTModel.objects.annotate(
+                    start_trunc=TruncSecond("start_datetime")
+                ).filter(id=non_utc_model.id, start_trunc__lte=adjusted_now)
+                self.assertEqual(models_qs.count(), 1)
