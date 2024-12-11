@@ -72,10 +72,7 @@ in effect simulating the experience of an actual user.
 
 These can't report on the internals of your code, but can provide a useful
 insight into your site's overall performance, including aspects that can't be
-adequately measured from within Django environment. Examples include:
-
-* `Yahoo's Yslow <https://yslow.org/>`_
-* `Google PageSpeed <https://developers.google.com/speed/>`_
+adequately measured from within Django environment.
 
 There are also several paid-for services that perform a similar analysis,
 including some that are Django-aware and can integrate with your codebase to
