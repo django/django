@@ -7,6 +7,7 @@ from django.core import serializers
 from django.core.serializers import SerializerDoesNotExist
 from django.core.serializers.base import ProgressBar
 from django.db import connection, transaction
+from django.db.models import Prefetch
 from django.http import HttpResponse
 from django.test import SimpleTestCase, override_settings, skipUnlessDBFeature
 from django.test.utils import Approximate
@@ -280,7 +281,14 @@ class SerializersTestBase:
         with self.assertNumQueries(4):
             serializers.serialize(
                 self.serializer_name,
-                Article.objects.prefetch_related("categories", "meta_data", "topics"),
+                Article.objects.prefetch_related(
+                    "meta_data",
+                    "topics",
+                    Prefetch(
+                        "categories",
+                        queryset=Category.objects.prefetch_related("meta_data"),
+                    ),
+                ),
             )
         # One query for the Article table, and three m2m queries for each
         # article.

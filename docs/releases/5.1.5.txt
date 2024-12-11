@@ -9,4 +9,6 @@ Django 5.1.5 fixes several bugs in 5.1.4.
 Bugfixes
 ========
 
+* Fixed exception related to missing chunk_size when serializing a many-to-many field that had a nested prefetch (:ticket:`35996`).
+
 * ...
