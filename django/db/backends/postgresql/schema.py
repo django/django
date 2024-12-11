@@ -120,6 +120,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         return None
 
     def _using_sql(self, new_field, old_field):
+        if new_field.generated:
+            return ""
         using_sql = " USING %(column)s::%(type)s"
         new_internal_type = new_field.get_internal_type()
         old_internal_type = old_field.get_internal_type()
