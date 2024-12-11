@@ -104,6 +104,9 @@ class MinimumLengthValidator:
     def __init__(self, min_length=8):
         self.min_length = min_length
 
+    def __call__(self, *args, **kwargs):
+        return self.validate(*args, kwargs)
+
     def validate(self, password, user=None):
         if len(password) < self.min_length:
             raise ValidationError(self.get_error_message(), code="password_too_short")
@@ -175,6 +178,9 @@ class UserAttributeSimilarityValidator:
             raise ValueError("max_similarity must be at least 0.1")
         self.max_similarity = max_similarity
 
+    def __call__(self, *args, **kwargs):
+        return self.validate(*args, **kwargs)
+
     def validate(self, password, user=None):
         if not user:
             return
@@ -241,6 +247,9 @@ class CommonPasswordValidator:
             with open(password_list_path) as f:
                 self.passwords = {x.strip() for x in f}
 
+    def __call__(self, *args, **kwargs):
+        return self.validate(*args, **kwargs)
+
     def validate(self, password, user=None):
         if password.lower().strip() in self.passwords:
             raise ValidationError(
@@ -259,6 +268,9 @@ class NumericPasswordValidator:
     """
     Validate that the password is not entirely numeric.
     """
+
+    def __call__(self, *args, **kwargs):
+        return self.validate(*args, **kwargs)
 
     def validate(self, password, user=None):
         if password.isdigit():

@@ -110,6 +110,10 @@ Minor features
   now have a new method ``get_error_message()``, which can be overridden in
   subclasses to customize the error messages.
 
+* The :ref:`password validator classes <included-password-validators>`
+  now have a new method ``__call__()``, calling the password validator class
+  object will perform ``validate()`` method.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
