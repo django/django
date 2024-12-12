@@ -1931,6 +1931,217 @@ class SeleniumTests(AdminSeleniumTestCase):
         with self.disable_implicit_wait():
             self.assertCountSeleniumElements(rows_selector, 0)
 
+    def test_delete_multiselect_tabular_inline(self):
+        from selenium.webdriver.common.action_chains import ActionChains
+        from selenium.webdriver.common.by import By
+        from selenium.webdriver.common.keys import Keys
+
+        def fill_form_data():
+            self.selenium.find_element(By.ID, "id_name").send_keys("Family Name")
+            # Fill inline forms
+            for group in [1, 2]:
+                for i in range(3):
+                    self.selenium.find_element(
+                        By.ID, f"id_{-group}-{i}-name"
+                    ).send_keys(f"person name {group} {i+1}")
+
+        def get_delete_checkboxes():
+            checkboxes = {}
+            for group in range(1, 5):
+                for i in range(3):
+                    key = f"{group}_{i}"
+                    checkboxes[key] = self.selenium.find_element(
+                        By.ID, f"id_-{group}-{i}-DELETE"
+                    )
+            return checkboxes
+
+        def scroll_to_element(element):
+            self.selenium.execute_script(
+                "window.scrollTo(0, %s);" % element.location["y"]
+            )
+
+        def shift_click_range(start_element, end_element):
+            actions = ActionChains(self.selenium)
+            actions.move_to_element(start_element)
+            actions.key_down(Keys.SHIFT)
+            actions.click()
+            actions.move_to_element(end_element)
+            actions.click()
+            actions.key_up(Keys.SHIFT)
+            actions.perform()
+
+        def assert_checkbox_states(checkboxes, expected_states):
+            for key, expected in expected_states.items():
+                actual = checkboxes[key].get_property("checked")
+                self.assertEqual(
+                    actual,
+                    expected,
+                    f"Checkbox {key} state mismatch."
+                    f" Expected: {expected}, Got: {actual}",
+                )
+
+        # Setup
+        self.admin_login(username="super", password="secret")
+        self.selenium.get(
+            self.live_server_url + reverse("admin:admin_inlines_capofamiglia_add")
+        )
+
+        # Fill and save form
+        fill_form_data()
+        with self.wait_page_loaded():
+            btn = self.selenium.find_element(
+                By.XPATH, '//input[@value="Save and continue editing"]'
+            )
+            scroll_to_element(btn)
+            btn.click()
+
+        # Get all delete checkboxes
+        checkboxes = get_delete_checkboxes()
+
+        # Test 1: Initial state - all unchecked
+        assert_checkbox_states(
+            checkboxes,
+            {
+                "1_0": False,
+                "1_1": False,
+                "1_2": False,
+                "2_0": False,
+                "2_1": False,
+                "2_2": False,
+                "3_0": False,
+                "3_1": False,
+                "3_2": False,
+                "4_0": False,
+                "4_1": False,
+                "4_2": False,
+            },
+        )
+
+        # Test 2: Select first row completely
+        scroll_to_element(checkboxes["1_0"])
+        shift_click_range(checkboxes["1_0"], checkboxes["1_2"])
+        assert_checkbox_states(
+            checkboxes,
+            {
+                "1_0": True,
+                "1_1": True,
+                "1_2": True,
+                "2_0": False,
+                "2_1": False,
+                "2_2": False,
+            },
+        )
+
+        # Test 3: Unselect middle checkbox in first row
+        scroll_to_element(checkboxes["1_0"])
+        shift_click_range(checkboxes["1_2"], checkboxes["1_0"])
+        assert_checkbox_states(
+            checkboxes,
+            {
+                "1_0": False,
+                "1_1": False,
+                "1_2": False,
+                "2_0": False,
+                "2_1": False,
+                "2_2": False,
+            },
+        )
+
+        # Test 4: Select across rows
+        actions = ActionChains(self.selenium)
+        scroll_to_element(checkboxes["1_0"])
+        actions.move_to_element(checkboxes["1_0"]).key_down(
+            Keys.SHIFT
+        ).click().perform()
+        scroll_to_element(checkboxes["2_2"])
+        actions.move_to_element(checkboxes["2_2"]).click().perform()
+        assert_checkbox_states(
+            checkboxes,
+            {
+                "1_0": True,
+                "1_1": False,
+                "1_2": False,
+                "2_0": False,
+                "2_1": False,
+                "2_2": True,
+            },
+        )
+
+        # Test 5: Select all remaining checkboxes
+        scroll_to_element(checkboxes["1_0"])
+        shift_click_range(checkboxes["1_0"], checkboxes["1_2"])
+        scroll_to_element(checkboxes["2_0"])
+        shift_click_range(checkboxes["2_0"], checkboxes["2_1"])
+        assert_checkbox_states(
+            checkboxes,
+            {
+                "1_0": True,
+                "1_1": True,
+                "1_2": True,
+                "2_0": True,
+                "2_1": True,
+                "2_2": True,
+            },
+        )
+
+        scroll_to_element(checkboxes["3_0"])
+        shift_click_range(checkboxes["3_0"], checkboxes["3_2"])
+        assert_checkbox_states(
+            checkboxes,
+            {
+                "3_0": True,
+                "3_1": True,
+                "3_2": True,
+                "4_0": False,
+                "4_1": False,
+                "4_2": False,
+            },
+        )
+        scroll_to_element(checkboxes["3_0"])
+        shift_click_range(checkboxes["3_2"], checkboxes["3_0"])
+        assert_checkbox_states(
+            checkboxes,
+            {
+                "3_0": False,
+                "3_1": False,
+                "3_2": False,
+                "4_0": False,
+                "4_1": False,
+                "4_2": False,
+            },
+        )
+
+        actions = ActionChains(self.selenium)
+        scroll_to_element(checkboxes["3_0"])
+        actions.move_to_element(checkboxes["3_0"]).key_down(
+            Keys.SHIFT
+        ).click().perform()
+        scroll_to_element(checkboxes["4_2"])
+        actions.move_to_element(checkboxes["4_2"]).click().perform()
+        assert_checkbox_states(
+            checkboxes,
+            {
+                "3_0": True,
+                "3_1": False,
+                "3_2": False,
+                "4_0": False,
+                "4_1": False,
+                "4_2": True,
+            },
+        )
+
+        scroll_to_element(checkboxes["1_0"])
+        shift_click_range(checkboxes["1_0"], checkboxes["1_2"])
+        scroll_to_element(checkboxes["2_0"])
+        shift_click_range(checkboxes["2_0"], checkboxes["2_2"])
+        scroll_to_element(checkboxes["3_0"])
+        shift_click_range(checkboxes["3_0"], checkboxes["3_2"])
+        scroll_to_element(checkboxes["4_0"])
+        shift_click_range(checkboxes["4_0"], checkboxes["4_2"])
+        btn2 = self.selenium.find_element(By.XPATH, '//input[@value="Save"]')
+        scroll_to_element(btn2)
+        btn2.click()
+
     def test_delete_invalid_stacked_inlines(self):
         from selenium.common.exceptions import NoSuchElementException
         from selenium.webdriver.common.by import By

@@ -467,6 +467,10 @@ body.popup .submit-row {
     font-size: 0.75rem;
 }
 
+.inline-group tr:has(td.delete input:checked) {
+    background-color: var(--selected-row);
+}
+
 .empty-form {
     display: none;
 }
