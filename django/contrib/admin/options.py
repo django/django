@@ -448,9 +448,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
             else self.get_list_display(request)
         )
 
-    # RemovedInDjango60Warning: when the deprecation ends, replace with:
-    # def lookup_allowed(self, lookup, value, request):
-    def lookup_allowed(self, lookup, value, request=None):
+    def lookup_allowed(self, lookup, value, request):
         from django.contrib.admin.filters import SimpleListFilter
 
         model = self.model
@@ -498,12 +496,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
             # Either a local field filter, or no fields at all.
             return True
         valid_lookups = {self.date_hierarchy}
-        # RemovedInDjango60Warning: when the deprecation ends, replace with:
-        # for filter_item in self.get_list_filter(request):
-        list_filter = (
-            self.get_list_filter(request) if request is not None else self.list_filter
-        )
-        for filter_item in list_filter:
+        for filter_item in self.get_list_filter(request):
             if isinstance(filter_item, type) and issubclass(
                 filter_item, SimpleListFilter
             ):

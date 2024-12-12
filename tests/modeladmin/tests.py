@@ -275,36 +275,6 @@ class ModelAdminTests(TestCase):
             True,
         )
 
-    def test_lookup_allowed_without_request_deprecation(self):
-        class ConcertAdmin(ModelAdmin):
-            list_filter = ["main_band__sign_date"]
-
-            def get_list_filter(self, request):
-                return self.list_filter + ["main_band__name"]
-
-            def lookup_allowed(self, lookup, value):
-                return True
-
-        model_admin = ConcertAdmin(Concert, self.site)
-        msg = (
-            "`request` must be added to the signature of ModelAdminTests."
-            "test_lookup_allowed_without_request_deprecation.<locals>."
-            "ConcertAdmin.lookup_allowed()."
-        )
-        request_band_name_filter = RequestFactory().get(
-            "/", {"main_band__name": "test"}
-        )
-        request_band_name_filter.user = User.objects.create_superuser(
-            username="bob", email="bob@test.com", password="test"
-        )
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
-            changelist = model_admin.get_changelist_instance(request_band_name_filter)
-            filterspec = changelist.get_filters(request_band_name_filter)[0][0]
-            self.assertEqual(filterspec.title, "sign date")
-            filterspec = changelist.get_filters(request_band_name_filter)[0][1]
-            self.assertEqual(filterspec.title, "name")
-            self.assertSequenceEqual(filterspec.lookup_choices, [self.band.name])
-
     def test_field_arguments(self):
         # If fields is specified, fieldsets_add and fieldsets_change should
         # just stick the fields into a formsets structure and return it.
