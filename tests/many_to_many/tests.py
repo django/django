@@ -2,7 +2,6 @@ from unittest import mock
 
 from django.db import connection, transaction
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
-from django.utils.deprecation import RemovedInDjango60Warning
 
 from .models import (
     Article,
@@ -576,16 +575,6 @@ class ManyToManyTests(TestCase):
                 self.p3.article_set.exists(), self.p3.article_set.all().exists()
             )
         self.assertIn("JOIN", ctx.captured_queries[0]["sql"])
-
-    def test_get_prefetch_queryset_warning(self):
-        articles = Article.objects.all()
-        msg = (
-            "get_prefetch_queryset() is deprecated. Use get_prefetch_querysets() "
-            "instead."
-        )
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
-            self.a1.publications.get_prefetch_queryset(articles)
-        self.assertEqual(ctx.filename, __file__)
 
     def test_get_prefetch_querysets_invalid_querysets_length(self):
         articles = Article.objects.all()
