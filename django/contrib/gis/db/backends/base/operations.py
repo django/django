@@ -57,6 +57,7 @@ class BaseSpatialOperations:
         "LineLocatePoint",
         "MakeValid",
         "MemSize",
+        "NumDimensions",
         "NumGeometries",
         "NumPoints",
         "Perimeter",
