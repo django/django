@@ -283,6 +283,9 @@ to remove usage of these features.
 
 * Support for ``cx_Oracle`` is removed.
 
+* The ``ChoicesMeta`` alias to ``django.db.models.enums.ChoicesType`` is
+  removed.
+
 See :ref:`deprecated-features-5.1` for details on these changes, including how
 to remove usage of these features.
 
