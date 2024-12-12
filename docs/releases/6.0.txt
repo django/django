@@ -260,6 +260,8 @@ to remove usage of these features.
 * The ``DjangoDivFormRenderer`` and ``Jinja2DivFormRenderer`` transitional form
   renderers are removed.
 
+* ``BaseDatabaseOperations.field_cast_sql()`` is removed.
+
 See :ref:`deprecated-features-5.1` for details on these changes, including how
 to remove usage of these features.
 
