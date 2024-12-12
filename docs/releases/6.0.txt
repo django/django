@@ -273,6 +273,14 @@ to remove usage of these features.
 
 * The ``FORMS_URLFIELD_ASSUME_HTTPS`` transitional setting is removed.
 
+* The ``django.db.models.sql.datastructures.Join`` no longer fallback to
+  ``get_joining_columns()``.
+
+* The ``get_joining_columns()`` method of ``ForeignObject`` and
+  ``ForeignObjectRel`` is removed.
+
+* The ``ForeignObject.get_reverse_joining_columns()`` method is be removed.
+
 See :ref:`deprecated-features-5.1` for details on these changes, including how
 to remove usage of these features.
 
