@@ -320,10 +320,6 @@ inside ``aria-describedby``:
     >>> print(f["username"])
     <input type="text" name="username" aria-describedby="custom-description id_username_helptext" maxlength="255" id="id_username" required>
 
-.. versionchanged:: 5.1
-
-    ``aria-describedby`` support was added for ``<fieldset>``.
-
 ``error_messages``
 ------------------
 
@@ -798,10 +794,6 @@ For each field, we describe the default widget used if you don't specify
 
         Defaults to 39, and behaves the same way as it does for
         :class:`CharField`.
-
-    .. versionchanged:: 4.2.18
-
-        The default value for ``max_length`` was set to 39 characters.
 
 ``ImageField``
 --------------
