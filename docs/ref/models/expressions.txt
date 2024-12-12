@@ -188,8 +188,6 @@ the field value of each one, and saving each one back to the database::
 Slicing ``F()`` expressions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 5.1
-
 For string-based fields, text-based fields, and
 :class:`~django.contrib.postgres.fields.ArrayField`, you can use Python's
 array-slicing syntax. The indices are 0-based and the ``step`` argument to
@@ -920,19 +918,11 @@ ordinary sequence of rows.
     the standard start and end points, such as ``CURRENT ROW`` and ``UNBOUNDED
     FOLLOWING``.
 
-    .. versionchanged:: 5.1
-
-        The ``exclusion`` argument was added.
-
 .. class:: RowRange(start=None, end=None, exclusion=None)
 
     .. attribute:: frame_type
 
         This attribute is set to ``'ROWS'``.
-
-    .. versionchanged:: 5.1
-
-        The ``exclusion`` argument was added.
 
 Both classes return SQL with the template:
 
@@ -941,8 +931,6 @@ Both classes return SQL with the template:
     %(frame_type)s BETWEEN %(start)s AND %(end)s
 
 .. class:: WindowFrameExclusion
-
-    .. versionadded:: 5.1
 
     .. attribute:: CURRENT_ROW
 
@@ -1024,11 +1012,6 @@ released between twelve months before and twelve months after each movie:
     ...     ),
     ... )
 
-.. versionchanged:: 5.1
-
-    Support for positive integer ``start`` and negative integer ``end`` was
-    added for ``RowRange``.
-
 .. currentmodule:: django.db.models
 
 Technical Information
@@ -1058,8 +1041,6 @@ calling the appropriate methods on the wrapped expression.
         :attr:`Field.db_default`. Defaults to ``False``.
 
     .. attribute:: constraint_validation_compatible
-
-        .. versionadded:: 5.1
 
         Tells Django that this expression can be used during a constraint
         validation. Expressions with ``constraint_validation_compatible`` set

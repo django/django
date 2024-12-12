@@ -81,10 +81,6 @@ writing to the cache fails, the exception is handled and logged via the
 :ref:`sessions logger <django-contrib-sessions-logger>`, to avoid failing an
 otherwise successful write operation.
 
-.. versionchanged:: 5.1
-
-    Handling and logging of exceptions when writing to the cache was added.
-
 Session reads use the cache, or the database if the data has been evicted from
 the cache. To use this backend, set :setting:`SESSION_ENGINE` to
 ``"django.contrib.sessions.backends.cached_db"``, and follow the configuration
@@ -202,13 +198,7 @@ You can edit it multiple times.
 
       Example: ``fav_color = request.session.get('fav_color', 'red')``
 
-      .. versionchanged:: 5.1
-
-        ``aget()`` function was added.
-
     .. method:: aset(key, value)
-
-      .. versionadded:: 5.1
 
       Example: ``await request.session.aset('fav_color', 'red')``
 
@@ -219,10 +209,6 @@ You can edit it multiple times.
 
       Example: ``request.session.update({'fav_color': 'red'})``
 
-      .. versionchanged:: 5.1
-
-        ``aupdate()`` function was added.
-
     .. method:: pop(key, default=__not_given)
     .. method:: apop(key, default=__not_given)
 
@@ -230,54 +216,30 @@ You can edit it multiple times.
 
       Example: ``fav_color = request.session.pop('fav_color', 'blue')``
 
-      .. versionchanged:: 5.1
-
-        ``apop()`` function was added.
-
     .. method:: keys()
     .. method:: akeys()
 
       *Asynchronous version*: ``akeys()``
-
-      .. versionchanged:: 5.1
-
-        ``akeys()`` function was added.
 
     .. method:: values()
     .. method:: avalues()
 
       *Asynchronous version*: ``avalues()``
 
-      .. versionchanged:: 5.1
-
-        ``avalues()`` function was added.
-
     .. method:: has_key(key)
     .. method:: ahas_key(key)
 
       *Asynchronous version*: ``ahas_key()``
-
-      .. versionchanged:: 5.1
-
-        ``ahas_key()`` function was added.
 
     .. method:: items()
     .. method:: aitems()
 
       *Asynchronous version*: ``aitems()``
 
-      .. versionchanged:: 5.1
-
-        ``aitems()`` function was added.
-
     .. method:: setdefault()
     .. method:: asetdefault()
 
       *Asynchronous version*: ``asetdefault()``
-
-      .. versionchanged:: 5.1
-
-        ``asetdefault()`` function was added.
 
     .. method:: clear()
 
@@ -293,10 +255,6 @@ You can edit it multiple times.
       can't be accessed again from the user's browser (for example, the
       :func:`django.contrib.auth.logout()` function calls it).
 
-      .. versionchanged:: 5.1
-
-        ``aflush()`` function was added.
-
     .. method:: set_test_cookie()
     .. method:: aset_test_cookie()
 
@@ -306,10 +264,6 @@ You can edit it multiple times.
       cookies. Due to the way cookies work, you won't be able to test this
       until the user's next page request. See `Setting test cookies`_ below for
       more information.
-
-      .. versionchanged:: 5.1
-
-        ``aset_test_cookie()`` function was added.
 
     .. method:: test_cookie_worked()
     .. method:: atest_cookie_worked()
@@ -322,20 +276,12 @@ You can edit it multiple times.
       previous, separate page request.
       See `Setting test cookies`_ below for more information.
 
-      .. versionchanged:: 5.1
-
-        ``atest_cookie_worked()`` function was added.
-
     .. method:: delete_test_cookie()
     .. method:: adelete_test_cookie()
 
       *Asynchronous version*: ``adelete_test_cookie()``
 
       Deletes the test cookie. Use this to clean up after yourself.
-
-      .. versionchanged:: 5.1
-
-        ``adelete_test_cookie()`` function was added.
 
     .. method:: get_session_cookie_age()
 
@@ -367,10 +313,6 @@ You can edit it multiple times.
       Reading a session is not considered activity for expiration
       purposes. Session expiration is computed from the last time the
       session was *modified*.
-
-      .. versionchanged:: 5.1
-
-        ``aset_expiry()`` function was added.
 
     .. method:: get_expiry_age()
     .. method:: aget_expiry_age()
@@ -404,10 +346,6 @@ You can edit it multiple times.
 
             expires_at = modification + timedelta(seconds=settings.SESSION_COOKIE_AGE)
 
-      .. versionchanged:: 5.1
-
-        ``aget_expiry_age()`` function was added.
-
     .. method:: get_expiry_date()
     .. method:: aget_expiry_date()
 
@@ -420,10 +358,6 @@ You can edit it multiple times.
       This function accepts the same keyword arguments as
       :meth:`get_expiry_age`, and similar notes on usage apply.
 
-      .. versionchanged:: 5.1
-
-        ``aget_expiry_date()`` function was added.
-
     .. method:: get_expire_at_browser_close()
     .. method:: aget_expire_at_browser_close()
 
@@ -431,10 +365,6 @@ You can edit it multiple times.
 
       Returns either ``True`` or ``False``, depending on whether the user's
       session cookie will expire when the user's web browser is closed.
-
-      .. versionchanged:: 5.1
-
-        ``aget_expire_at_browser_close()`` function was added.
 
     .. method:: clear_expired()
     .. method:: aclear_expired()
@@ -444,10 +374,6 @@ You can edit it multiple times.
       Removes expired sessions from the session store. This class method is
       called by :djadmin:`clearsessions`.
 
-      .. versionchanged:: 5.1
-
-        ``aclear_expired()`` function was added.
-
     .. method:: cycle_key()
     .. method:: acycle_key()
 
@@ -456,10 +382,6 @@ You can edit it multiple times.
       Creates a new session key while retaining the current session data.
       :func:`django.contrib.auth.login()` calls this method to mitigate against
       session fixation.
-
-      .. versionchanged:: 5.1
-
-        ``acycle_key()`` function was added.
 
 .. _session_serialization:
 
@@ -615,10 +537,6 @@ Here's a typical usage example::
                 return HttpResponse("Please enable cookies and try again.")
         request.session.set_test_cookie()
         return render(request, "foo/login_form.html")
-
-.. versionchanged:: 5.1
-
-    Support for setting test cookies in asynchronous view functions was added.
 
 Using sessions out of views
 ===========================
@@ -867,11 +785,6 @@ any other existing ``SessionStore`` class.
 You can extend the session engines, but doing so with database-backed session
 engines generally requires some extra effort (see the next section for
 details).
-
-.. versionchanged:: 5.1
-
-    ``aexists()``, ``acreate()``, ``asave()``, ``adelete()``, ``aload()``, and
-    ``aclear_expired()`` methods were added.
 
 .. _extending-database-backed-session-engines:
 

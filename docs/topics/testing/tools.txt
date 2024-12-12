@@ -158,10 +158,6 @@ Use the ``django.test.Client`` class to make requests.
     The ``json_encoder`` argument allows setting a custom JSON encoder for
     the JSON serialization that's described in :meth:`post`.
 
-    .. versionchanged:: 5.1
-
-        The ``query_params`` argument was added.
-
     Once you have a ``Client`` instance, you can call any of the following
     methods:
 
@@ -240,10 +236,6 @@ Use the ``django.test.Client`` class to make requests.
 
         If you set ``secure`` to ``True`` the client will emulate an HTTPS
         request.
-
-        .. versionchanged:: 5.1
-
-            The ``query_params`` argument was added.
 
     .. method:: Client.post(path, data=None, content_type=MULTIPART_CONTENT, follow=False, secure=False, *, headers=None, query_params=None, **extra)
 
@@ -360,20 +352,12 @@ Use the ``django.test.Client`` class to make requests.
         If you set ``secure`` to ``True`` the client will emulate an HTTPS
         request.
 
-        .. versionchanged:: 5.1
-
-            The ``query_params`` argument was added.
-
     .. method:: Client.head(path, data=None, follow=False, secure=False, *, headers=None, query_params=None, **extra)
 
         Makes a HEAD request on the provided ``path`` and returns a
         ``Response`` object. This method works just like :meth:`Client.get`,
         including the ``follow``, ``secure``, ``headers``, ``query_params``,
         and ``extra`` parameters, except it does not return a message body.
-
-        .. versionchanged:: 5.1
-
-            The ``query_params`` argument was added.
 
     .. method:: Client.options(path, data='', content_type='application/octet-stream', follow=False, secure=False, *, headers=None, query_params=None, **extra)
 
@@ -386,10 +370,6 @@ Use the ``django.test.Client`` class to make requests.
         The ``follow``, ``secure``, ``headers``, ``query_params``, and
         ``extra`` parameters act the same as for :meth:`Client.get`.
 
-        .. versionchanged:: 5.1
-
-            The ``query_params`` argument was added.
-
     .. method:: Client.put(path, data='', content_type='application/octet-stream', follow=False, secure=False, *, headers=None, query_params=None, **extra)
 
         Makes a PUT request on the provided ``path`` and returns a
@@ -401,10 +381,6 @@ Use the ``django.test.Client`` class to make requests.
         The ``follow``, ``secure``, ``headers``, ``query_params``, and
         ``extra`` parameters act the same as for :meth:`Client.get`.
 
-        .. versionchanged:: 5.1
-
-            The ``query_params`` argument was added.
-
     .. method:: Client.patch(path, data='', content_type='application/octet-stream', follow=False, secure=False, *, headers=None, query_params=None, **extra)
 
         Makes a PATCH request on the provided ``path`` and returns a
@@ -412,10 +388,6 @@ Use the ``django.test.Client`` class to make requests.
 
         The ``follow``, ``secure``, ``headers``, ``query_params``, and
         ``extra`` parameters act the same as for :meth:`Client.get`.
-
-        .. versionchanged:: 5.1
-
-            The ``query_params`` argument was added.
 
     .. method:: Client.delete(path, data='', content_type='application/octet-stream', follow=False, secure=False, *, headers=None, query_params=None, **extra)
 
@@ -428,10 +400,6 @@ Use the ``django.test.Client`` class to make requests.
         The ``follow``, ``secure``, ``headers``, ``query_params``, and
         ``extra`` parameters act the same as for :meth:`Client.get`.
 
-        .. versionchanged:: 5.1
-
-            The ``query_params`` argument was added.
-
     .. method:: Client.trace(path, follow=False, secure=False, *, headers=None, query_params=None, **extra)
 
         Makes a TRACE request on the provided ``path`` and returns a
@@ -443,10 +411,6 @@ Use the ``django.test.Client`` class to make requests.
 
         The ``follow``, ``secure``, ``headers``, ``query_params``, and
         ``extra`` parameters act the same as for :meth:`Client.get`.
-
-        .. versionchanged:: 5.1
-
-            The ``query_params`` argument was added.
 
     .. method:: Client.login(**credentials)
     .. method:: Client.alogin(**credentials)
@@ -1548,11 +1512,6 @@ LOCALE_PATHS, LANGUAGE_CODE       Default translation and loaded translations
 STATIC_ROOT, STATIC_URL, STORAGES Storages configuration
 ================================= ========================
 
-.. versionchanged:: 5.1
-
-    Resetting the default renderer when the ``FORM_RENDERER`` setting is
-    changed was added.
-
 Isolating apps
 --------------
 
@@ -1740,10 +1699,6 @@ your test suite.
     attribute ordering is not significant. See
     :meth:`~SimpleTestCase.assertHTMLEqual` for more details.
 
-    .. versionchanged:: 5.1
-
-        In older versions, error messages didn't contain the response content.
-
 .. method:: SimpleTestCase.assertNotContains(response, text, status_code=200, msg_prefix='', html=False)
 
     Asserts that a :class:`response <django.http.HttpResponse>` produced the
@@ -1755,10 +1710,6 @@ your test suite.
     character-by-character equality. Whitespace is ignored in most cases,
     attribute ordering is not significant. See
     :meth:`~SimpleTestCase.assertHTMLEqual` for more details.
-
-    .. versionchanged:: 5.1
-
-        In older versions, error messages didn't contain the response content.
 
 .. method:: SimpleTestCase.assertTemplateUsed(response, template_name, msg_prefix='', count=None)
 
@@ -1896,13 +1847,7 @@ your test suite.
     Whitespace in most cases is ignored, and attribute ordering is not
     significant. See :meth:`~SimpleTestCase.assertHTMLEqual` for more details.
 
-    .. versionchanged:: 5.1
-
-        In older versions, error messages didn't contain the ``haystack``.
-
 .. method:: SimpleTestCase.assertNotInHTML(needle, haystack, msg_prefix="")
-
-    .. versionadded:: 5.1
 
     Asserts that the HTML fragment ``needle`` is *not* contained in the
     ``haystack``.
@@ -2057,10 +2002,6 @@ test client, with the following exceptions:
 
     >>> c = AsyncClient()
     >>> c.get("/customers/details/", {"name": "fred", "age": 7}, ACCEPT="application/json")
-
-.. versionchanged:: 5.1
-
-    The ``query_params`` argument was added.
 
 Using ``AsyncClient`` any method that makes a request must be awaited::
 

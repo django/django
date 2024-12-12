@@ -957,8 +957,6 @@ output (as a string) inside a variable. This is useful if you want to use
 ``querystring``
 ----------------
 
-.. versionadded:: 5.1
-
 Outputs a URL-encoded formatted query string based on the provided parameters.
 
 This tag requires a :class:`~django.http.QueryDict` instance, which defaults to

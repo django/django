@@ -115,10 +115,6 @@ model it represents, or to retrieve objects from that model:
     on that model, returning the corresponding object. The ``using`` argument
     can be used to specify a different database than the default one.
 
-    .. versionchanged:: 5.1
-
-        The ``using`` argument was added.
-
 .. method:: ContentType.model_class()
 
     Returns the model class represented by this

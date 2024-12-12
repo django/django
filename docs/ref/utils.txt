@@ -1179,11 +1179,6 @@ For a complete discussion on the usage of the following see the
 
     Raises :exc:`LookupError` if nothing is found.
 
-    .. versionchanged:: 4.2.15
-
-        In older versions, ``lang_code`` values over 500 characters were
-        processed without raising a :exc:`LookupError`.
-
 .. function:: to_locale(language)
 
     Turns a language name (en-us) into a locale name (en_US).
