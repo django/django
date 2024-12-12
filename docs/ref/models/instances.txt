@@ -214,10 +214,6 @@ values::
 
     obj.refresh_from_db(from_queryset=MyModel.objects.select_for_update())
 
-.. versionchanged:: 5.1
-
-    The ``from_queryset`` argument was added.
-
 .. method:: Model.get_deferred_fields()
 
 A helper method that returns a set containing the attribute names of all those

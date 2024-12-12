@@ -320,10 +320,6 @@ inside ``aria-describedby``:
     >>> print(f["username"])
     <input type="text" name="username" aria-describedby="custom-description id_username_helptext" maxlength="255" id="id_username" required>
 
-.. versionchanged:: 5.1
-
-    ``aria-describedby`` support was added for ``<fieldset>``.
-
 ``error_messages``
 ------------------
 

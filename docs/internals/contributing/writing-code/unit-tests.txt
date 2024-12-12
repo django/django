@@ -298,11 +298,6 @@ screen, one for a mobile screen, one for right-to-left languages on desktop,
 one for the dark mode on desktop, and one for high contrast mode on desktop
 when using chrome.
 
-.. versionchanged:: 5.1
-
-     The ``--screenshots`` option and ``@screenshot_cases`` decorator were
-     added.
-
 .. _running-unit-tests-dependencies:
 
 Running all the tests
