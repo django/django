@@ -299,3 +299,6 @@ to remove usage of these features.
 
 * ``django.urls.register_converter()`` no longer allows overriding existing
   converters.
+
+* The ``ModelAdmin.log_deletion()`` and ``LogEntryManager.log_action()``
+  methods are removed.
