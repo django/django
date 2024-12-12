@@ -1,8 +1,5 @@
 import functools
 import uuid
-import warnings
-
-from django.utils.deprecation import RemovedInDjango60Warning
 
 
 class IntConverter:
@@ -57,14 +54,7 @@ REGISTERED_CONVERTERS = {}
 
 def register_converter(converter, type_name):
     if type_name in REGISTERED_CONVERTERS or type_name in DEFAULT_CONVERTERS:
-        # RemovedInDjango60Warning: when the deprecation ends, replace with
-        # raise ValueError(f"Converter {type_name} is already registered.")
-        warnings.warn(
-            f"Converter {type_name!r} is already registered. Support for overriding "
-            "registered converters is deprecated and will be removed in Django 6.0.",
-            RemovedInDjango60Warning,
-            stacklevel=2,
-        )
+        raise ValueError(f"Converter {type_name!r} is already registered.")
     REGISTERED_CONVERTERS[type_name] = converter()
     get_converters.cache_clear()
 
