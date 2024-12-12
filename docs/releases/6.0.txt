@@ -271,4 +271,5 @@ to remove usage of these features.
 See :ref:`deprecated-features-5.1` for details on these changes, including how
 to remove usage of these features.
 
-* ...
+* ``django.urls.register_converter()`` no longer allows overriding existing
+  converters.
