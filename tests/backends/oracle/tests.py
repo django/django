@@ -3,16 +3,11 @@ import unittest
 from unittest import mock
 
 from django.core.exceptions import ImproperlyConfigured
-from django.db import DatabaseError, NotSupportedError, ProgrammingError, connection
+from django.db import NotSupportedError, ProgrammingError, connection
 from django.db.models import BooleanField
 from django.test import TestCase, TransactionTestCase
 
-from ..models import Square, VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
-
-try:
-    from django.db.backends.oracle.oracledb_any import is_oracledb
-except ImportError:
-    is_oracledb = False
+from ..models import VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
 
 
 def no_pool_connection(alias=None):
@@ -85,7 +80,6 @@ class Tests(TestCase):
             connection.check_database_version_supported()
         self.assertTrue(mocked_get_database_version.called)
 
-    @unittest.skipUnless(is_oracledb, "Pool specific tests")
     def test_pool_set_to_true(self):
         new_connection = no_pool_connection(alias="default_pool")
         new_connection.settings_dict["OPTIONS"]["pool"] = True
@@ -94,7 +88,6 @@ class Tests(TestCase):
         finally:
             new_connection.close_pool()
 
-    @unittest.skipUnless(is_oracledb, "Pool specific tests")
     def test_pool_reuse(self):
         new_connection = no_pool_connection(alias="default_pool")
         new_connection.settings_dict["OPTIONS"]["pool"] = {
@@ -128,7 +121,6 @@ class Tests(TestCase):
                 conn.close()
             new_connection.close_pool()
 
-    @unittest.skipUnless(is_oracledb, "Pool specific tests")
     def test_cannot_open_new_connection_in_atomic_block(self):
         new_connection = no_pool_connection(alias="default_pool")
         new_connection.settings_dict["OPTIONS"]["pool"] = True
@@ -138,7 +130,6 @@ class Tests(TestCase):
         with self.assertRaisesMessage(ProgrammingError, msg):
             new_connection.ensure_connection()
 
-    @unittest.skipUnless(is_oracledb, "Pool specific tests")
     def test_pooling_not_support_persistent_connections(self):
         new_connection = no_pool_connection(alias="default_pool")
         new_connection.settings_dict["OPTIONS"]["pool"] = True
@@ -147,47 +138,10 @@ class Tests(TestCase):
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             new_connection.pool
 
-    @unittest.skipIf(is_oracledb, "cx_oracle specific tests")
-    def test_cx_Oracle_not_support_pooling(self):
-        new_connection = no_pool_connection()
-        new_connection.settings_dict["OPTIONS"]["pool"] = True
-        msg = "Pooling isn't supported by cx_Oracle. Use python-oracledb instead."
-        with self.assertRaisesMessage(ImproperlyConfigured, msg):
-            new_connection.connect()
-
 
 @unittest.skipUnless(connection.vendor == "oracle", "Oracle tests")
 class TransactionalTests(TransactionTestCase):
     available_apps = ["backends"]
-
-    def test_hidden_no_data_found_exception(self):
-        # "ORA-1403: no data found" exception is hidden by Oracle OCI library
-        # when an INSERT statement is used with a RETURNING clause (see #28859).
-        with connection.cursor() as cursor:
-            # Create trigger that raises "ORA-1403: no data found".
-            cursor.execute(
-                """
-                CREATE OR REPLACE TRIGGER "TRG_NO_DATA_FOUND"
-                AFTER INSERT ON "BACKENDS_SQUARE"
-                FOR EACH ROW
-                BEGIN
-                    RAISE NO_DATA_FOUND;
-                END;
-            """
-            )
-        try:
-            with self.assertRaisesMessage(
-                DatabaseError,
-                (
-                    'The database did not return a new row id. Probably "ORA-1403: no '
-                    'data found" was raised internally but was hidden by the Oracle '
-                    "OCI library (see https://code.djangoproject.com/ticket/28859)."
-                ),
-            ):
-                Square.objects.create(root=2, square=4)
-        finally:
-            with connection.cursor() as cursor:
-                cursor.execute('DROP TRIGGER "TRG_NO_DATA_FOUND"')
 
     def test_password_with_at_sign(self):
         from django.db.backends.oracle.base import Database
