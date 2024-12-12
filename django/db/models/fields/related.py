@@ -1,6 +1,5 @@
 import functools
 import inspect
-import warnings
 from functools import partial
 
 from django import forms
@@ -14,7 +13,6 @@ from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import CASCADE, SET_DEFAULT, SET_NULL
 from django.db.models.query_utils import PathInfo
 from django.db.models.utils import make_model_tuple
-from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
@@ -816,27 +814,6 @@ class ForeignObject(RelatedField):
     def get_attname_column(self):
         attname, column = super().get_attname_column()
         return attname, None
-
-    def get_joining_columns(self, reverse_join=False):
-        warnings.warn(
-            "ForeignObject.get_joining_columns() is deprecated. Use "
-            "get_joining_fields() instead.",
-            RemovedInDjango60Warning,
-            stacklevel=2,
-        )
-        source = self.reverse_related_fields if reverse_join else self.related_fields
-        return tuple(
-            (lhs_field.column, rhs_field.column) for lhs_field, rhs_field in source
-        )
-
-    def get_reverse_joining_columns(self):
-        warnings.warn(
-            "ForeignObject.get_reverse_joining_columns() is deprecated. Use "
-            "get_reverse_joining_fields() instead.",
-            RemovedInDjango60Warning,
-            stacklevel=2,
-        )
-        return self.get_joining_columns(reverse_join=True)
 
     def get_joining_fields(self, reverse_join=False):
         return tuple(
