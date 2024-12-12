@@ -523,8 +523,6 @@ every incoming ``HttpRequest`` object. See :ref:`Authentication in web requests
         ``None``), or :attr:`redirect_field_name`. If ``None`` is returned, a query
         parameter won't be added.
 
-.. versionadded:: 5.1
-
 Redirects all unauthenticated requests to a login page, except for views
 excluded with :func:`~.django.contrib.auth.decorators.login_not_required`. The
 login page defaults to :setting:`settings.LOGIN_URL <LOGIN_URL>`, but can be
@@ -681,8 +679,6 @@ Here are some hints about the ordering of various Django middleware classes:
    After ``SessionMiddleware``: uses session storage.
 
 #. :class:`~django.contrib.auth.middleware.LoginRequiredMiddleware`
-
-   .. versionadded:: 5.1
 
    After ``AuthenticationMiddleware``: uses user object.
 
