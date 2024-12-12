@@ -257,6 +257,9 @@ to remove usage of these features.
 
 * Support for passing positional arguments to ``BaseConstraint`` is removed.
 
+* The ``DjangoDivFormRenderer`` and ``Jinja2DivFormRenderer`` transitional form
+  renderers are removed.
+
 See :ref:`deprecated-features-5.1` for details on these changes, including how
 to remove usage of these features.
 
