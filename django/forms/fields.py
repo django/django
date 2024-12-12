@@ -46,7 +46,7 @@ from django.utils.choices import normalize_choices
 from django.utils.dateparse import parse_datetime, parse_duration
 from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.duration import duration_string
-from django.utils.ipv6 import clean_ipv6_address
+from django.utils.ipv6 import MAX_IPV6_ADDRESS_LENGTH, clean_ipv6_address
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import ngettext_lazy
@@ -1303,6 +1303,7 @@ class GenericIPAddressField(CharField):
         self.default_validators = validators.ip_address_validators(
             protocol, unpack_ipv4
         )
+        kwargs.setdefault("max_length", MAX_IPV6_ADDRESS_LENGTH)
         super().__init__(**kwargs)
 
     def to_python(self, value):
@@ -1310,7 +1311,9 @@ class GenericIPAddressField(CharField):
             return ""
         value = value.strip()
         if value and ":" in value:
-            return clean_ipv6_address(value, self.unpack_ipv4)
+            return clean_ipv6_address(
+                value, self.unpack_ipv4, max_length=self.max_length
+            )
         return value
 
 

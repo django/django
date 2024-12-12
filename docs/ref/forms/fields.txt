@@ -761,7 +761,7 @@ For each field, we describe the default widget used if you don't specify
     * Empty value: ``''`` (an empty string)
     * Normalizes to: A string. IPv6 addresses are normalized as described below.
     * Validates that the given value is a valid IP address.
-    * Error message keys: ``required``, ``invalid``
+    * Error message keys: ``required``, ``invalid``, ``max_length``
 
     The IPv6 address normalization follows :rfc:`4291#section-2.2` section 2.2,
     including using the IPv4 format suggested in paragraph 3 of that section, like
@@ -769,7 +769,7 @@ For each field, we describe the default widget used if you don't specify
     ``2001::1``, and ``::ffff:0a0a:0a0a`` to ``::ffff:10.10.10.10``. All characters
     are converted to lowercase.
 
-    Takes two optional arguments:
+    Takes three optional arguments:
 
     .. attribute:: protocol
 
@@ -783,6 +783,15 @@ For each field, we describe the default widget used if you don't specify
         If this option is enabled that address would be unpacked to
         ``192.0.2.1``. Default is disabled. Can only be used
         when ``protocol`` is set to ``'both'``.
+
+    .. attribute:: max_length
+
+        Defaults to 39, and behaves the same way as it does for
+        :class:`CharField`.
+
+    .. versionchanged:: 4.2.18
+
+        The default value for ``max_length`` was set to 39 characters.
 
 ``ImageField``
 --------------
