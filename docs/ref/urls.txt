@@ -150,10 +150,6 @@ The ``converter`` argument is a converter class, and ``type_name`` is the
 converter name to use in path patterns. See
 :ref:`registering-custom-path-converters` for an example.
 
-.. deprecated:: 5.1
-
-    Overriding existing converters is deprecated.
-
 ==================================================
 ``django.conf.urls`` functions for use in URLconfs
 ==================================================
