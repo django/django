@@ -622,9 +622,9 @@ Miscellaneous
 * The ``ForeignObject.get_reverse_joining_columns()`` method is deprecated.
 
 * The default scheme for ``forms.URLField`` will change from ``"http"`` to
-  ``"https"`` in Django 6.0. Set :setting:`FORMS_URLFIELD_ASSUME_HTTPS`
-  transitional setting to ``True`` to opt into assuming ``"https"`` during the
-  Django 5.x release cycle.
+  ``"https"`` in Django 6.0. Set ``FORMS_URLFIELD_ASSUME_HTTPS`` transitional
+  setting to ``True`` to opt into assuming ``"https"`` during the Django 5.x
+  release cycle.
 
 * ``FORMS_URLFIELD_ASSUME_HTTPS`` transitional setting is deprecated.
 
