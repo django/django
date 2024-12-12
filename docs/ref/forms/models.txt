@@ -54,12 +54,11 @@ produced can be controlled by setting metadata options as attributes of an inner
 
 :attr:`~ModelFormOptions.model` is required as well as either 
 :attr:`~ModelFormOptions.fields` or :attr:`~ModelFormOptions.exclude`.
-All other ``Meta`` attributes are optional.
-each ``Meta`` class, nor does every included field need to be included in every
-option used. If an option isn't set, or if a model's field isn't used with a
-particular option, Django will fall back on whatever has already been defined
-for a field in their model or whatever defaults might exist for that field's
-type.
+All other ``Meta`` attributes are optional. Included fields need not be 
+included in every option used. If an option isn't set, or if a model's 
+field isn't used with a particular option, Django will fall back on whatever 
+has already been defined for a field in their model or whatever defaults 
+might exist for that field's type.
 
 Optional ``Meta`` attributes, other than
 :attr:`~ModelFormOptions.localized_fields` and
