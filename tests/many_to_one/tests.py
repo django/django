@@ -4,7 +4,6 @@ from copy import deepcopy
 from django.core.exceptions import FieldError, MultipleObjectsReturned
 from django.db import IntegrityError, models, transaction
 from django.test import TestCase
-from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.translation import gettext_lazy
 
 from .models import (
@@ -886,29 +885,6 @@ class ManyToOneTests(TestCase):
             usa.cities.remove(chicago.pk)
         with self.assertRaisesMessage(TypeError, msg):
             usa.cities.set([chicago.pk])
-
-    def test_get_prefetch_queryset_warning(self):
-        City.objects.create(name="Chicago")
-        cities = City.objects.all()
-        msg = (
-            "get_prefetch_queryset() is deprecated. Use get_prefetch_querysets() "
-            "instead."
-        )
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
-            City.country.get_prefetch_queryset(cities)
-        self.assertEqual(ctx.filename, __file__)
-
-    def test_get_prefetch_queryset_reverse_warning(self):
-        usa = Country.objects.create(name="United States")
-        City.objects.create(name="Chicago")
-        countries = Country.objects.all()
-        msg = (
-            "get_prefetch_queryset() is deprecated. Use get_prefetch_querysets() "
-            "instead."
-        )
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
-            usa.cities.get_prefetch_queryset(countries)
-        self.assertEqual(ctx.filename, __file__)
 
     def test_get_prefetch_querysets_invalid_querysets_length(self):
         City.objects.create(name="Chicago")
