@@ -30,7 +30,7 @@ produced can be controlled by setting metadata options as attributes of an inner
     # Example using some sort of Book model
 
     from django.forms import ModelForm
-    from myLibraryApp.models import Book
+    from myapp.models import Book
 
 
     class BookForm(ModelForm):
@@ -52,9 +52,9 @@ produced can be controlled by setting metadata options as attributes of an inner
     themselves, raise an error (though they might cause another error to be
     raised if they affect a required attribute).
 
-Other than :attr:`~ModelFormOptions.model` and at least one of
-:attr:`~ModelFormOptions.fields` and :attr:`~ModelFormOptions.exclude`, ``Meta``
-attributes are optional. It is **not** necessary for every option to be set for
+:attr:`~ModelFormOptions.model` is required as well as either 
+:attr:`~ModelFormOptions.fields` or :attr:`~ModelFormOptions.exclude`.
+All other ``Meta`` attributes are optional.
 each ``Meta`` class, nor does every included field need to be included in every
 option used. If an option isn't set, or if a model's field isn't used with a
 particular option, Django will fall back on whatever has already been defined
