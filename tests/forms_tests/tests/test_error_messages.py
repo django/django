@@ -23,8 +23,7 @@ from django.forms import (
     utils,
 )
 from django.template import Context, Template
-from django.test import SimpleTestCase, TestCase, ignore_warnings
-from django.utils.deprecation import RemovedInDjango60Warning
+from django.test import SimpleTestCase, TestCase
 from django.utils.safestring import mark_safe
 
 from ..models import ChoiceModel
@@ -168,12 +167,11 @@ class FormsErrorMessagesTestCase(SimpleTestCase, AssertFormErrorsMixin):
             "invalid": "INVALID",
             "max_length": '"%(value)s" has more than %(limit_value)d characters.',
         }
-        with ignore_warnings(category=RemovedInDjango60Warning):
-            f = URLField(error_messages=e, max_length=17)
+        f = URLField(error_messages=e, max_length=17)
         self.assertFormErrors(["REQUIRED"], f.clean, "")
         self.assertFormErrors(["INVALID"], f.clean, "abc.c")
         self.assertFormErrors(
-            ['"http://djangoproject.com" has more than 17 characters.'],
+            ['"https://djangoproject.com" has more than 17 characters.'],
             f.clean,
             "djangoproject.com",
         )

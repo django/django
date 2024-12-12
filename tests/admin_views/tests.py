@@ -29,7 +29,6 @@ from django.template.response import TemplateResponse
 from django.test import (
     RequestFactory,
     TestCase,
-    ignore_warnings,
     modify_settings,
     override_settings,
     skipUnlessDBFeature,
@@ -39,7 +38,6 @@ from django.test.utils import override_script_prefix
 from django.urls import NoReverseMatch, resolve, reverse
 from django.utils import formats, translation
 from django.utils.cache import get_max_age
-from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.encoding import iri_to_uri
 from django.utils.html import escape
 from django.utils.http import urlencode
@@ -6873,7 +6871,6 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
     def setUp(self):
         self.client.force_login(self.superuser)
 
-    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_readonly_get(self):
         response = self.client.get(reverse("admin:admin_views_post_add"))
         self.assertNotContains(response, 'name="posted"')
@@ -6934,7 +6931,6 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         )
         self.assertContains(response, "%d amount of cool" % p.pk)
 
-    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_readonly_text_field(self):
         p = Post.objects.create(
             title="Readonly test",
@@ -6954,7 +6950,6 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         # Checking readonly field in inline.
         self.assertContains(response, "test<br>link")
 
-    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_readonly_post(self):
         data = {
             "title": "Django Got Readonly Fields",
@@ -7100,7 +7095,6 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         response = self.client.get(reverse("admin:admin_views_square_add"))
         self.assertContains(response, '<div class="readonly">-</div>')
 
-    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_readonly_field_overrides(self):
         """
         Regression test for #22087 - ModelForm Meta overrides are ignored by
@@ -7558,7 +7552,6 @@ class CSSTest(TestCase):
     def setUp(self):
         self.client.force_login(self.superuser)
 
-    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_field_prefix_css_classes(self):
         """
         Fields have a CSS class name with a 'field-' prefix.

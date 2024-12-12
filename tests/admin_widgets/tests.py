@@ -22,12 +22,11 @@ from django.db.models import (
     ManyToManyField,
     UUIDField,
 )
-from django.test import SimpleTestCase, TestCase, ignore_warnings, override_settings
+from django.test import SimpleTestCase, TestCase, override_settings
 from django.test.selenium import screenshot_cases
 from django.test.utils import requires_tz_support
 from django.urls import reverse
 from django.utils import translation
-from django.utils.deprecation import RemovedInDjango60Warning
 
 from .models import (
     Advisor,
@@ -109,7 +108,6 @@ class AdminFormfieldForDBFieldTests(SimpleTestCase):
     def test_TextField(self):
         self.assertFormfield(Event, "description", widgets.AdminTextareaWidget)
 
-    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_URLField(self):
         self.assertFormfield(Event, "link", widgets.AdminURLFieldWidget)
 
@@ -324,7 +322,6 @@ class AdminForeignKeyRawIdWidget(TestDataMixin, TestCase):
     def setUp(self):
         self.client.force_login(self.superuser)
 
-    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_nonexistent_target_id(self):
         band = Band.objects.create(name="Bogey Blues")
         pk = band.pk
@@ -340,7 +337,6 @@ class AdminForeignKeyRawIdWidget(TestDataMixin, TestCase):
             "Select a valid choice. That choice is not one of the available choices.",
         )
 
-    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_invalid_target_id(self):
         for test_str in ("Iñtërnâtiônàlizætiøn", "1234'", -1234):
             # This should result in an error message, not a server exception.
@@ -1738,7 +1734,6 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         self.assertCountSeleniumElements("#id_students_to > option", 2)
 
 
-@ignore_warnings(category=RemovedInDjango60Warning)
 class AdminRawIdWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
     def setUp(self):
         super().setUp()

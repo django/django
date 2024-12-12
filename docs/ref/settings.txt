@@ -1684,19 +1684,6 @@ renderers are:
 * ``'``:class:`django.forms.renderers.Jinja2`\ ``'``
 * ``'``:class:`django.forms.renderers.TemplatesSetting`\ ``'``
 
-.. setting:: FORMS_URLFIELD_ASSUME_HTTPS
-
-``FORMS_URLFIELD_ASSUME_HTTPS``
--------------------------------
-
-.. deprecated:: 5.0
-
-Default: ``False``
-
-Set this transitional setting to ``True`` to opt into using ``"https"`` as the
-new default value of :attr:`URLField.assume_scheme
-<django.forms.URLField.assume_scheme>` during the Django 5.x release cycle.
-
 .. setting:: FORMAT_MODULE_PATH
 
 ``FORMAT_MODULE_PATH``
@@ -3664,7 +3651,6 @@ File uploads
 Forms
 -----
 * :setting:`FORM_RENDERER`
-* :setting:`FORMS_URLFIELD_ASSUME_HTTPS`
 
 Globalization (``i18n``/``l10n``)
 ---------------------------------

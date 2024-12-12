@@ -218,11 +218,6 @@ TEMPLATES = []
 # Default form rendering class.
 FORM_RENDERER = "django.forms.renderers.DjangoTemplates"
 
-# RemovedInDjango60Warning: It's a transitional setting helpful in early
-# adoption of "https" as the new default value of forms.URLField.assume_scheme.
-# Set to True to assume "https" during the Django 5.x release cycle.
-FORMS_URLFIELD_ASSUME_HTTPS = False
-
 # Default email address to use for various automated correspondence from
 # the site managers.
 DEFAULT_FROM_EMAIL = "webmaster@localhost"
