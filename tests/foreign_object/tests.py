@@ -8,7 +8,6 @@ from django.db import models
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import isolate_apps
 from django.utils import translation
-from django.utils.deprecation import RemovedInDjango60Warning
 
 from .models import (
     Article,
@@ -712,52 +711,3 @@ class TestCachedPathInfo(TestCase):
         foreign_object_restored = pickle.loads(pickle.dumps(foreign_object))
         self.assertIn("path_infos", foreign_object_restored.__dict__)
         self.assertIn("reverse_path_infos", foreign_object_restored.__dict__)
-
-
-class GetJoiningDeprecationTests(TestCase):
-    def test_foreign_object_get_joining_columns_warning(self):
-        msg = (
-            "ForeignObject.get_joining_columns() is deprecated. Use "
-            "get_joining_fields() instead."
-        )
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
-            Membership.person.field.get_joining_columns()
-        self.assertEqual(ctx.filename, __file__)
-
-    def test_foreign_object_get_reverse_joining_columns_warning(self):
-        msg = (
-            "ForeignObject.get_reverse_joining_columns() is deprecated. Use "
-            "get_reverse_joining_fields() instead."
-        )
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
-            Membership.person.field.get_reverse_joining_columns()
-        self.assertEqual(ctx.filename, __file__)
-
-    def test_foreign_object_rel_get_joining_columns_warning(self):
-        msg = (
-            "ForeignObjectRel.get_joining_columns() is deprecated. Use "
-            "get_joining_fields() instead."
-        )
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg) as ctx:
-            Membership.person.field.remote_field.get_joining_columns()
-        self.assertEqual(ctx.filename, __file__)
-
-    def test_join_get_joining_columns_warning(self):
-        class CustomForeignKey(models.ForeignKey):
-            def __getattribute__(self, attr):
-                if attr == "get_joining_fields":
-                    raise AttributeError
-                return super().__getattribute__(attr)
-
-        class CustomParent(models.Model):
-            value = models.CharField(max_length=255)
-
-        class CustomChild(models.Model):
-            links = CustomForeignKey(CustomParent, models.CASCADE)
-
-        msg = (
-            "The usage of get_joining_columns() in Join is deprecated. Implement "
-            "get_joining_fields() instead."
-        )
-        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
-            CustomChild.objects.filter(links__value="value")
