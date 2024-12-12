@@ -103,22 +103,12 @@ class BaseConstraintTests(SimpleTestCase):
             },
         )
 
-    def test_deprecation(self):
-        msg = "Passing positional arguments to BaseConstraint is deprecated."
-        with self.assertRaisesMessage(RemovedInDjango60Warning, msg):
-            BaseConstraint("name", "violation error message")
-
     def test_name_required(self):
         msg = (
             "BaseConstraint.__init__() missing 1 required keyword-only argument: 'name'"
         )
         with self.assertRaisesMessage(TypeError, msg):
             BaseConstraint()
-
-    @ignore_warnings(category=RemovedInDjango60Warning)
-    def test_positional_arguments(self):
-        c = BaseConstraint("name", "custom %(name)s message")
-        self.assertEqual(c.get_violation_error_message(), "custom name message")
 
 
 class CheckConstraintTests(TestCase):
