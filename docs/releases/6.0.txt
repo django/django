@@ -281,6 +281,8 @@ to remove usage of these features.
 
 * The ``ForeignObject.get_reverse_joining_columns()`` method is be removed.
 
+* Support for ``cx_Oracle`` is removed.
+
 See :ref:`deprecated-features-5.1` for details on these changes, including how
 to remove usage of these features.
 
