@@ -1,7 +1,4 @@
-import warnings
-
 from django.core import checks
-from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.functional import cached_property
 
 NOT_PROVIDED = object()
@@ -15,22 +12,9 @@ class FieldCacheMixin:
     typically the field’s name.
     """
 
-    # RemovedInDjango60Warning.
-    def get_cache_name(self):
-        raise NotImplementedError
-
     @cached_property
     def cache_name(self):
-        # RemovedInDjango60Warning: when the deprecation ends, replace with:
-        # raise NotImplementedError
-        cache_name = self.get_cache_name()
-        warnings.warn(
-            f"Override {self.__class__.__qualname__}.cache_name instead of "
-            "get_cache_name().",
-            RemovedInDjango60Warning,
-            stacklevel=3,
-        )
-        return cache_name
+        raise NotImplementedError
 
     def get_cached_value(self, instance, default=NOT_PROVIDED):
         try:
