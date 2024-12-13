@@ -99,18 +99,6 @@ Keyword Arguments    Description
 Methods
 =======
 
-Instantiating
--------------
-
-.. classmethod:: GeoIP2.open(path, cache)
-
-This classmethod instantiates the GeoIP object from the given database path
-and given cache setting.
-
-.. deprecated:: 5.1
-
-   Use the :class:`GeoIP2()` constructor instead.
-
 Querying
 --------
 
