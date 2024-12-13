@@ -164,9 +164,10 @@ Single object mixins
 
     .. method:: get_template_names()
 
-        Returns a list of candidate template names. Returns the following list:
+        Returns a list of candidate template names. Return a list containing
+        ``template_name``, if set on the value. Otherwise, return a list
+        containing:
 
-        * the value of ``template_name`` on the view (if provided)
         * the contents of the ``template_name_field`` field on the
           object instance that the view is operating upon (if available)
         * ``<app_label>/<model_name><template_name_suffix>.html``
