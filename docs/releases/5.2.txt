@@ -256,6 +256,9 @@ Forms
   HTML ``id`` attribute to be added in the error template. See
   :attr:`.ErrorList.field_id` for details.
 
+* An :attr:`~django.forms.BoundField.aria_describedby` property is added to
+  ``BoundField`` to ease use of this HTML attribute in templates.
+
 Generic Views
 ~~~~~~~~~~~~~
 
