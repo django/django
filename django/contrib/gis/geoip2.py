@@ -214,15 +214,6 @@ class GeoIP2:
             "is_in_european_union": response.country.is_in_european_union,
         }
 
-    def coords(self, query, ordering=("longitude", "latitude")):
-        warnings.warn(
-            "GeoIP2.coords() is deprecated. Use GeoIP2.lon_lat() instead.",
-            RemovedInDjango60Warning,
-            stacklevel=2,
-        )
-        data = self.city(query)
-        return tuple(data[o] for o in ordering)
-
     def lon_lat(self, query):
         "Return a tuple of the (longitude, latitude) for the given query."
         data = self.city(query)
