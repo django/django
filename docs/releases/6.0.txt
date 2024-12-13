@@ -314,3 +314,5 @@ to remove usage of these features.
   ``Model.asave()`` is removed.
 
 * The setter for ``django.contrib.gis.gdal.OGRGeometry.coord_dim`` is removed.
+
+* The ``check`` keyword argument of ``CheckConstraint`` is removed.

@@ -123,10 +123,6 @@ ensures the age field is never less than 18.
 
         CheckConstraint(condition=Q(age__gte=18) | Q(age__isnull=True), name="age_gte_18")
 
-.. deprecated:: 5.1
-
-    The ``check`` attribute is deprecated in favor of ``condition``.
-
 ``UniqueConstraint``
 ====================
 
