@@ -23,7 +23,7 @@ from django.db.models.sql.constants import (
 )
 from django.db.models.sql.query import Query, get_order_dir
 from django.db.models.sql.where import AND
-from django.db.transaction import TransactionManagementError
+from django.db.transaction import TransactionManagementError, mark_for_rollback_on_error
 from django.utils.functional import cached_property
 from django.utils.hashable import make_hashable
 from django.utils.regex_helper import _lazy_re_compile
@@ -2003,6 +2003,12 @@ class SQLUpdateCompiler(SQLCompiler):
         Create the SQL for this query. Return the SQL string and list of
         parameters.
         """
+        if (
+            self.query.update_returning
+            and not self.connection.features.can_return_columns_from_update
+        ):
+            raise NotSupportedError("This backend does not support UPDATE RETURNING")
+
         self.pre_sql_setup()
         if not self.query.values:
             return "", ()
@@ -2060,28 +2066,48 @@ class SQLUpdateCompiler(SQLCompiler):
             params = []
         else:
             result.append("WHERE %s" % where)
+
+        if self.query.update_returning:
+            select_mask = self.query.get_select_mask()
+            if self.query.default_cols:
+                cols = self.get_default_columns(select_mask)
+            else:
+                cols = self.query.select
+            result.append(
+                "RETURNING %s" % (", ".join(col.target.column for col in cols))
+            )
+
         return " ".join(result), tuple(update_params + params)
 
-    def execute_sql(self, result_type):
+    def execute_sql(
+        self, result_type=MULTI, chunked_fetch=False, chunk_size=GET_ITERATOR_CHUNK_SIZE
+    ):
         """
         Execute the specified update. Return the number of rows affected by
         the primary update query. The "primary update query" is the first
         non-empty query that is executed. Row counts for any subsequent,
         related queries are not available.
         """
-        cursor = super().execute_sql(result_type)
-        try:
-            rows = cursor.rowcount if cursor else 0
-            is_empty = cursor is None
-        finally:
-            if cursor:
-                cursor.close()
-        for query in self.query.get_related_updates():
-            aux_rows = query.get_compiler(self.using).execute_sql(result_type)
-            if is_empty and aux_rows:
-                rows = aux_rows
-                is_empty = False
-        return rows
+        with mark_for_rollback_on_error(using=self.using):
+            cursor = super().execute_sql(
+                result_type=result_type,
+                chunked_fetch=chunked_fetch,
+                chunk_size=chunk_size,
+            )
+            if self.query.update_returning:
+                return cursor
+            try:
+                rows = cursor.rowcount if cursor else 0
+                is_empty = cursor is None
+            finally:
+                if cursor:
+                    cursor.close()
+            for query in self.query.get_related_updates():
+                aux_rows = query.get_compiler(self.using).execute_sql(result_type)
+                if is_empty and aux_rows:
+                    rows = aux_rows
+                    is_empty = False
+            return rows
 
     def pre_sql_setup(self):
         """
@@ -2092,6 +2118,10 @@ class SQLUpdateCompiler(SQLCompiler):
         this point so that they don't change as a result of the progressive
         updates.
         """
+        if self.query.update_returning:
+            self.has_extra_select = False
+            self.setup_query()
+
         refcounts_before = self.query.alias_refcount.copy()
         # Ensure base table is in the query
         self.query.get_initial_alias()

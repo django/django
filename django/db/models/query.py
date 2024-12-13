@@ -1217,10 +1217,9 @@ class QuerySet(AltersData):
 
     _raw_delete.alters_data = True
 
-    def update(self, **kwargs):
+    def _update_query(self, **kwargs):
         """
-        Update all elements in the current QuerySet, setting all the given
-        fields to the appropriate values.
+        Prepare a query for update
         """
         self._not_support_combined_queries("update")
         if self.query.is_sliced:
@@ -1251,8 +1250,33 @@ class QuerySet(AltersData):
 
         # Clear any annotations so that they won't be present in subqueries.
         query.annotations = {}
-        with transaction.mark_for_rollback_on_error(using=self.db):
-            rows = query.get_compiler(self.db).execute_sql(CURSOR)
+        return query
+
+    def update_returning(self, **kwargs):
+        """
+        Update all elements in the current QuerySet, setting all the given
+        fields to the appropriate values. Returns a QuerySet containing all
+        updated objects.
+        """
+        clone = self._chain()
+        clone.query = self._update_query(**kwargs)
+        clone.query.update_returning = True
+        return clone
+
+    update_returning.alters_data = True
+
+    async def aupdate_returning(self, **kwargs):
+        return await sync_to_async(self.update_returning)(**kwargs)
+
+    aupdate_returning.alters_data = True
+
+    def update(self, **kwargs):
+        """
+        Update all elements in the current QuerySet, setting all the given
+        fields to the appropriate values.
+        """
+        query = self._update_query(**kwargs)
+        rows = query.get_compiler(self.db).execute_sql(CURSOR)
         self._result_cache = None
         return rows
 
