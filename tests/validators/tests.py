@@ -126,6 +126,7 @@ VALID_URLS = [
     "http://مثال.إختبار",
     "http://例子.测试",
     "http://उदाहरण.परीक्षा",
+    "https://މިހާރު.com",  # (valid in IDNA 2008 but not IDNA 2003)
     "http://-.~_!$&'()*+,;=%40:80%2f@example.com",
     "http://xn--7sbb4ac0ad0be6cf.xn--p1ai",
     "http://1337.net",
