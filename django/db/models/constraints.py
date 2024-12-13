@@ -1,4 +1,3 @@
-import warnings
 from enum import Enum
 from types import NoneType
 
@@ -12,7 +11,6 @@ from django.db.models.lookups import Exact, IsNull
 from django.db.models.query_utils import Q
 from django.db.models.sql.query import Query
 from django.db.utils import DEFAULT_DB_ALIAS
-from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.translation import gettext_lazy as _
 
 __all__ = ["BaseConstraint", "CheckConstraint", "Deferrable", "UniqueConstraint"]
@@ -130,26 +128,14 @@ class BaseConstraint:
 
 
 class CheckConstraint(BaseConstraint):
-    # RemovedInDjango60Warning: when the deprecation ends, replace with
-    # def __init__(
-    #  self, *, condition, name, violation_error_code=None, violation_error_message=None
-    # )
     def __init__(
         self,
         *,
+        condition,
         name,
-        condition=None,
-        check=None,
         violation_error_code=None,
         violation_error_message=None,
     ):
-        if check is not None:
-            warnings.warn(
-                "CheckConstraint.check is deprecated in favor of `.condition`.",
-                RemovedInDjango60Warning,
-                stacklevel=2,
-            )
-            condition = check
         self.condition = condition
         if not getattr(condition, "conditional", False):
             raise TypeError(
@@ -160,24 +146,6 @@ class CheckConstraint(BaseConstraint):
             violation_error_code=violation_error_code,
             violation_error_message=violation_error_message,
         )
-
-    def _get_check(self):
-        warnings.warn(
-            "CheckConstraint.check is deprecated in favor of `.condition`.",
-            RemovedInDjango60Warning,
-            stacklevel=2,
-        )
-        return self.condition
-
-    def _set_check(self, value):
-        warnings.warn(
-            "CheckConstraint.check is deprecated in favor of `.condition`.",
-            RemovedInDjango60Warning,
-            stacklevel=2,
-        )
-        self.condition = value
-
-    check = property(_get_check, _set_check)
 
     def _check(self, model, connection):
         errors = []
