@@ -95,6 +95,10 @@ Minor features
 * The admin site login view now redirects authenticated users to the next URL,
   if available, instead of always redirecting to the admin index page.
 
+* The admin's ``FilteredSelectMultiple`` widget now uses ``<optgroup>``\s to
+  preserve :ref:`named groups <field-choices-named-groups>` (e.g.
+  ``choices=[("Group", [("1", "Item")]), ...]``).
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
