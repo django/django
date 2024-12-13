@@ -182,20 +182,8 @@
     cursor: pointer;
 }
 
-.selector-chooseall {
-    padding: 0 18px 0 0;
-    background: url(../img/selector-icons.svg) right -160px no-repeat;
-    cursor: default;
-}
-
 .active.selector-chooseall:focus, .active.selector-chooseall:hover {
     background-position: 100% -176px;
-}
-
-.selector-clearall {
-    padding: 0 0 0 18px;
-    background: url(../img/selector-icons.svg) 0 -128px no-repeat;
-    cursor: default;
 }
 
 .active.selector-clearall:focus, .active.selector-clearall:hover {
