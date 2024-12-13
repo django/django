@@ -316,3 +316,5 @@ to remove usage of these features.
 * The setter for ``django.contrib.gis.gdal.OGRGeometry.coord_dim`` is removed.
 
 * The ``check`` keyword argument of ``CheckConstraint`` is removed.
+
+* The ``get_cache_name()`` method of ``FieldCacheMixin`` is removed.
