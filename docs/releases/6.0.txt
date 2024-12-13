@@ -302,3 +302,6 @@ to remove usage of these features.
 
 * The ``ModelAdmin.log_deletion()`` and ``LogEntryManager.log_action()``
   methods are removed.
+
+* The undocumented ``django.utils.itercompat.is_iterable()`` function and the
+  ``django.utils.itercompat`` module is removed.
