@@ -8,6 +8,7 @@ from urllib.parse import quote as urlquote
 from urllib.parse import urlsplit
 
 from django import forms
+from django.apps import apps
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin import helpers, widgets
@@ -71,6 +72,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.generic import RedirectView
 
 IS_POPUP_VAR = "_popup"
+SOURCE_MODEL_VAR = "_source_model"
 TO_FIELD_VAR = "_to_field"
 IS_FACETS_VAR = "_facets"
 
@@ -1342,6 +1344,7 @@ class ModelAdmin(BaseModelAdmin):
                 "save_on_top": self.save_on_top,
                 "to_field_var": TO_FIELD_VAR,
                 "is_popup_var": IS_POPUP_VAR,
+                "source_model_var": SOURCE_MODEL_VAR,
                 "app_label": app_label,
             }
         )
@@ -1398,12 +1401,39 @@ class ModelAdmin(BaseModelAdmin):
             else:
                 attr = obj._meta.pk.attname
             value = obj.serializable_value(attr)
-            popup_response_data = json.dumps(
-                {
-                    "value": str(value),
-                    "obj": str(obj),
-                }
-            )
+            popup_response = {
+                "value": str(value),
+                "obj": str(obj),
+            }
+
+            # Find the optgroup for the new item, if available
+            source_model_name = request.POST.get(SOURCE_MODEL_VAR)
+
+            if source_model_name:
+                app_label, model_name = source_model_name.split(".", 1)
+                try:
+                    source_model = apps.get_model(app_label, model_name)
+                except LookupError:
+                    msg = _('The app "%s" could not be found.') % source_model_name
+                    self.message_user(request, msg, messages.ERROR)
+                else:
+                    source_admin = self.admin_site._registry[source_model]
+                    form = source_admin.get_form(request)()
+                    if self.opts.verbose_name_plural in form.fields:
+                        field = form.fields[self.opts.verbose_name_plural]
+                        for option_value, option_label in field.choices:
+                            # Check if this is an optgroup (label is a sequence
+                            # of choices rather than a single string value).
+                            if isinstance(option_label, (list, tuple)):
+                                # It's an optgroup:
+                                # (group_name, [(value, label), ...])
+                                optgroup_label = option_value
+                                for choice_value, choice_display in option_label:
+                                    if choice_display == str(obj):
+                                        popup_response["optgroup"] = str(optgroup_label)
+                                        break
+
+            popup_response_data = json.dumps(popup_response)
             return TemplateResponse(
                 request,
                 self.popup_response_template
@@ -1913,6 +1943,7 @@ class ModelAdmin(BaseModelAdmin):
             "object_id": object_id,
             "original": obj,
             "is_popup": IS_POPUP_VAR in request.POST or IS_POPUP_VAR in request.GET,
+            "source_model": request.GET.get(SOURCE_MODEL_VAR),
             "to_field": to_field,
             "media": media,
             "inline_admin_formsets": inline_formsets,
