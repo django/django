@@ -547,7 +547,7 @@ class TestQuerying(PostgreSQLTestCase):
             NullableIntegerArrayModel.objects.filter(field__0_2=[2, 3]), self.objs[2:3]
         )
 
-    def test_order_by_slice(self):
+    def test_order_by_index(self):
         more_objs = (
             NullableIntegerArrayModel.objects.create(field=[1, 637]),
             NullableIntegerArrayModel.objects.create(field=[2, 1]),
