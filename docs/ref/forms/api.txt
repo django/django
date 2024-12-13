@@ -1161,6 +1161,15 @@ The field-specific output honors the form object's ``auto_id`` setting:
 Attributes of ``BoundField``
 ----------------------------
 
+.. attribute:: BoundField.aria_describedby
+
+    .. versionadded:: 5.2
+
+    Returns an ``aria-describedby`` reference to associate a field with its
+    help text. Returns ``None`` if ``aria-describedby`` is set in
+    :attr:`Widget.attrs` to preserve the user defined attribute when rendering
+    the form.
+
 .. attribute:: BoundField.auto_id
 
     The HTML ID attribute for this ``BoundField``. Returns an empty string
