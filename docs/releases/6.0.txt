@@ -305,3 +305,5 @@ to remove usage of these features.
 
 * The undocumented ``django.utils.itercompat.is_iterable()`` function and the
   ``django.utils.itercompat`` module is removed.
+
+* The ``django.contrib.gis.geoip2.GeoIP2.coords()`` method is removed.
