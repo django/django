@@ -551,15 +551,6 @@ coordinate transformation:
         >>> polygon.dimension
         2
 
-    .. attribute:: coord_dim
-
-    Returns the coordinate dimension of this geometry. For example, the value
-    would be 2 for two-dimensional geometries.
-
-    .. deprecated:: 5.1
-
-        The ``coord_dim`` setter is deprecated. Use :meth:`.set_3d` instead.
-
     .. attribute:: is_3d
 
     A boolean indicating if this geometry has Z coordinates.
