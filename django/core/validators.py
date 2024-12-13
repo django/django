@@ -2,7 +2,7 @@ import ipaddress
 import math
 import re
 from pathlib import Path
-from urllib.parse import urlsplit, urlunsplit
+from urllib.parse import urlsplit
 
 from django.core.exceptions import ValidationError
 from django.utils.deconstruct import deconstructible
@@ -128,8 +128,6 @@ validate_domain_name = DomainNameValidator()
 
 @deconstructible
 class URLValidator(RegexValidator):
-    ul = "\u00a1-\uffff"  # Unicode letters range (must not be a raw string).
-
     # IP patterns
     ipv4_re = (
         r"(?:0|25[0-5]|2[0-4][0-9]|1[0-9]?[0-9]?|[1-9][0-9]?)"
@@ -177,31 +175,17 @@ class URLValidator(RegexValidator):
             splitted_url = urlsplit(value)
         except ValueError:
             raise ValidationError(self.message, code=self.code, params={"value": value})
-        try:
-            super().__call__(value)
-        except ValidationError as e:
-            # Trivial case failed. Try for possible IDN domain
-            if value:
-                scheme, netloc, path, query, fragment = splitted_url
-                try:
-                    netloc = punycode(netloc)  # IDN -> ACE
-                except UnicodeError:  # invalid domain part
-                    raise e
-                url = urlunsplit((scheme, netloc, path, query, fragment))
-                super().__call__(url)
-            else:
-                raise
-        else:
-            # Now verify IPv6 in the netloc part
-            host_match = re.search(r"^\[(.+)\](?::[0-9]{1,5})?$", splitted_url.netloc)
-            if host_match:
-                potential_ip = host_match[1]
-                try:
-                    validate_ipv6_address(potential_ip)
-                except ValidationError:
-                    raise ValidationError(
-                        self.message, code=self.code, params={"value": value}
-                    )
+        super().__call__(value)
+        # Now verify IPv6 in the netloc part
+        host_match = re.search(r"^\[(.+)\](?::[0-9]{1,5})?$", splitted_url.netloc)
+        if host_match:
+            potential_ip = host_match[1]
+            try:
+                validate_ipv6_address(potential_ip)
+            except ValidationError:
+                raise ValidationError(
+                    self.message, code=self.code, params={"value": value}
+                )
 
         # The maximum length of a full host name is 253 characters per RFC 1034
         # section 3.1. It's defined to be 255 bytes or less, but this includes
