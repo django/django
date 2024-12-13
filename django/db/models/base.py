@@ -50,7 +50,6 @@ from django.db.models.signals import (
     pre_save,
 )
 from django.db.models.utils import AltersData, make_model_tuple
-from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.encoding import force_str
 from django.utils.hashable import make_hashable
 from django.utils.text import capfirst, get_text_list
@@ -786,50 +785,9 @@ class Model(AltersData, metaclass=ModelBase):
             return getattr(self, field_name)
         return getattr(self, field.attname)
 
-    # RemovedInDjango60Warning: When the deprecation ends, remove completely.
-    def _parse_save_params(self, *args, method_name, **kwargs):
-        defaults = {
-            "force_insert": False,
-            "force_update": False,
-            "using": None,
-            "update_fields": None,
-        }
-
-        warnings.warn(
-            f"Passing positional arguments to {method_name}() is deprecated",
-            RemovedInDjango60Warning,
-            stacklevel=3,
-        )
-        total_len_args = len(args) + 1  # include self
-        max_len_args = len(defaults) + 1
-        if total_len_args > max_len_args:
-            # Recreate the proper TypeError message from Python.
-            raise TypeError(
-                f"Model.{method_name}() takes from 1 to {max_len_args} positional "
-                f"arguments but {total_len_args} were given"
-            )
-
-        def get_param(param_name, param_value, arg_index):
-            if arg_index < len(args):
-                if param_value is not defaults[param_name]:
-                    # Recreate the proper TypeError message from Python.
-                    raise TypeError(
-                        f"Model.{method_name}() got multiple values for argument "
-                        f"'{param_name}'"
-                    )
-                return args[arg_index]
-
-            return param_value
-
-        return [get_param(k, v, i) for i, (k, v) in enumerate(kwargs.items())]
-
-    # RemovedInDjango60Warning: When the deprecation ends, replace with:
-    # def save(
-    #   self, *, force_insert=False, force_update=False, using=None, update_fields=None,
-    # ):
     def save(
         self,
-        *args,
+        *,
         force_insert=False,
         force_update=False,
         using=None,
@@ -843,16 +801,6 @@ class Model(AltersData, metaclass=ModelBase):
         that the "save" must be an SQL insert or update (or equivalent for
         non-SQL backends), respectively. Normally, they should not be set.
         """
-        # RemovedInDjango60Warning.
-        if args:
-            force_insert, force_update, using, update_fields = self._parse_save_params(
-                *args,
-                method_name="save",
-                force_insert=force_insert,
-                force_update=force_update,
-                using=using,
-                update_fields=update_fields,
-            )
 
         self._prepare_related_fields_for_save(operation_name="save")
 
@@ -908,28 +856,14 @@ class Model(AltersData, metaclass=ModelBase):
 
     save.alters_data = True
 
-    # RemovedInDjango60Warning: When the deprecation ends, replace with:
-    # async def asave(
-    #   self, *, force_insert=False, force_update=False, using=None, update_fields=None,
-    # ):
     async def asave(
         self,
-        *args,
+        *,
         force_insert=False,
         force_update=False,
         using=None,
         update_fields=None,
     ):
-        # RemovedInDjango60Warning.
-        if args:
-            force_insert, force_update, using, update_fields = self._parse_save_params(
-                *args,
-                method_name="asave",
-                force_insert=force_insert,
-                force_update=force_update,
-                using=using,
-                update_fields=update_fields,
-            )
         return await sync_to_async(self.save)(
             force_insert=force_insert,
             force_update=force_update,

@@ -430,10 +430,6 @@ method. See :ref:`overriding-model-methods` for more details.
 
 The model save process also has some subtleties; see the sections below.
 
-.. deprecated:: 5.1
-
-    Support for positional arguments is deprecated.
-
 Auto-incrementing primary keys
 ------------------------------
 
