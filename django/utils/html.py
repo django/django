@@ -357,6 +357,8 @@ class Urlizer:
                     domain = punycode(domain)
                 except UnicodeError:
                     return word
+                local = quote(local, safe="")
+                domain = quote(domain, safe="")
                 url = self.mailto_template.format(local=local, domain=domain)
                 nofollow_attr = ""
             # Make link.
