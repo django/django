@@ -9,7 +9,6 @@ from urllib.parse import parse_qsl, quote, unquote, urlencode, urlsplit, urlunsp
 
 from django.core.exceptions import SuspiciousOperation, ValidationError
 from django.core.validators import EmailValidator
-from django.utils.encoding import punycode
 from django.utils.functional import Promise, cached_property, keep_lazy, keep_lazy_text
 from django.utils.http import RFC3986_GENDELIMS, RFC3986_SUBDELIMS
 from django.utils.regex_helper import _lazy_re_compile
@@ -237,17 +236,16 @@ def smart_urlquote(url):
         # see also https://bugs.python.org/issue16285
         return quote(segment, safe=RFC3986_SUBDELIMS + RFC3986_GENDELIMS + "~")
 
-    # Handle IDN before quoting.
     try:
         scheme, netloc, path, query, fragment = urlsplit(url)
     except ValueError:
         # invalid IPv6 URL (normally square brackets in hostname part).
         return unquote_quote(url)
 
-    try:
-        netloc = punycode(netloc)  # IDN -> ACE
-    except UnicodeError:  # invalid domain part
-        return unquote_quote(url)
+    # Handle IDN as percent-encoded UTF-8 octets, per WHATWG URL Specification
+    # section 3.5 and RFC 3986 section 3.2.2. Defer any IDNA to the user agent.
+    # See #36013.
+    netloc = unquote_quote(netloc)
 
     if query:
         # Separately unquoting key/value, so as to not mix querystring separators
@@ -348,10 +346,8 @@ class Urlizer:
                 url = smart_urlquote("http://%s" % html.unescape(middle))
             elif ":" not in middle and self.is_email_simple(middle):
                 local, domain = middle.rsplit("@", 1)
-                try:
-                    domain = punycode(domain)
-                except UnicodeError:
-                    return word
+                # Encode per RFC 6068 Section 2 (items 1, 4, 5). Defer any IDNA
+                # to the user agent. See #36013.
                 local = quote(local, safe="")
                 domain = quote(domain, safe="")
                 url = self.mailto_template.format(local=local, domain=domain)
