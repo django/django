@@ -94,7 +94,7 @@ To use nonces in your CSP policy:
           },
       ]
 
-   This context processor makes the CSP nonce available in all templates.
+This context processor makes the CSP nonce available in all templates.
 
 2. In your templates, use the ``request.csp_nonce``:
 
