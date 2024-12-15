@@ -486,11 +486,13 @@ class AdminURLWidgetTest(SimpleTestCase):
         w = widgets.AdminURLFieldWidget()
         self.assertHTMLEqual(
             w.render("test", "http://example-äüö.com"),
-            '<p class="url">Currently: <a href="http://xn--example--7za4pnc.com">'
+            '<p class="url">Currently: <a href="http://example-%C3%A4%C3%BC%C3%B6.com">'
             "http://example-äüö.com</a><br>"
             'Change:<input class="vURLField" name="test" type="url" '
             'value="http://example-äüö.com"></p>',
         )
+        # Does not use obsolete IDNA-2003 encoding (#36013).
+        self.assertNotIn("fass.example.com", w.render("test", "http://faß.example.com"))
 
     def test_render_quoting(self):
         """
@@ -517,7 +519,8 @@ class AdminURLWidgetTest(SimpleTestCase):
         output = w.render("test", "http://example-äüö.com/<sometag>some-text</sometag>")
         self.assertEqual(
             HREF_RE.search(output)[1],
-            "http://xn--example--7za4pnc.com/%3Csometag%3Esome-text%3C/sometag%3E",
+            "http://example-%C3%A4%C3%BC%C3%B6.com/"
+            "%3Csometag%3Esome-text%3C/sometag%3E",
         )
         self.assertEqual(
             TEXT_RE.search(output)[1],
