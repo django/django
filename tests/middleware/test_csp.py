@@ -37,13 +37,6 @@ class BuildCSPTest(SimpleTestCase):
             self.build_policy(policy), "default-src 'self'; script-src 'none'"
         )
 
-    # TODO: Add a warning if we see a directive that is not in the spec.
-    #       - Pros: helpful to developers, in case of typos
-    #       - Cons: have to keep up with the CSP spec and new directives
-    # def test_unsupported_directive(self):
-    #     policy = {"DIRECTIVES": {"default-src": [csp.SELF], "invalid-src": ["foo"]}}
-    #     self.assertPolicyEqual(self.build_policy(policy), "default-src 'self'")
-
     def test_config_value_as_string(self):
         """
         Test that a single value can be passed as a string.
