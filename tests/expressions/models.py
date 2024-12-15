@@ -123,6 +123,7 @@ class JSONFieldModel(models.Model):
     class Meta:
         required_db_features = {"supports_json_field"}
 
+
 class NamedCategory(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255)
