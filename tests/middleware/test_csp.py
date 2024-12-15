@@ -129,9 +129,9 @@ class BuildCSPTest(SimpleTestCase):
         self.assertPolicyEqual(self.build_policy(policy), "")
 
     def test_nonce_sentinel(self):
-        assert csp.Nonce() == csp.Nonce()
-        assert csp.NONCE == csp.Nonce()
-        assert repr(csp.Nonce()) == "django.middleware.csp.NONCE"
+        self.assertEqual(csp.Nonce(), csp.Nonce())
+        self.assertEqual(csp.NONCE, csp.Nonce())
+        self.assertEqual(repr(csp.Nonce()), "django.middleware.csp.NONCE")
 
 
 @override_settings(
