@@ -4,6 +4,8 @@
 Content Security Policy (CSP)
 =============================
 
+.. versionadded:: 5.2
+
 .. module:: django.middleware.csp
    :synopsis: Middleware for Content Security Policy headers
 
@@ -33,9 +35,7 @@ Using CSP
 
 To enable CSP in your Django project:
 
-1. Add the CSP middleware to your ``MIDDLEWARE`` setting:
-
-   .. code-block:: python
+1. Add the CSP middleware to your ``MIDDLEWARE`` setting::
 
       MIDDLEWARE = [
           # ...
@@ -43,9 +43,7 @@ To enable CSP in your Django project:
           # ...
       ]
 
-2. Configure your CSP policies in your ``settings.py`` using either ``SECURE_CSP`` or ``SECURE_CSP_REPORT_ONLY``:
-
-   .. code-block:: python
+2. Configure your CSP policies in your ``settings.py`` using either ``SECURE_CSP`` or ``SECURE_CSP_REPORT_ONLY``::
 
       from django.middleware import csp
 
@@ -68,9 +66,7 @@ To enable CSP in your Django project:
           }
       }
 
-3. To use CSP nonces for inline scripts or styles, include ``csp.NONCE`` in your directives:
-
-   .. code-block:: python
+3. To use CSP nonces for inline scripts or styles, include ``csp.NONCE`` in your directives::
 
       SECURE_CSP = {
           "DIRECTIVES": {
@@ -84,9 +80,7 @@ Nonce Usage
 
 To use nonces in your CSP policy:
 
-1. Add the CSP context processor to your ``TEMPLATES`` setting:
-
-   .. code-block:: python
+1. Add the CSP context processor to your ``TEMPLATES`` setting::
 
       TEMPLATES = [
           {
@@ -112,44 +106,59 @@ To use nonces in your CSP policy:
 
 The CSP middleware will automatically generate and include a nonce in the CSP header for each request.
 
-========
+.. note::
+
+    The CSP nonce is included in the header only if ``request.csp_nonce`` is accessed at some point
+    between when the middleware processes the request and the response. This ensures the nonce is
+    generated and included only when necessary.
+
+    If the Django CSP settings do not explicitly include the ``csp.NONCE`` directive and
+    ``request.csp_nonce`` is accessed in a template, the nonce will appear in the content but not in
+    the CSP header. This discrepancy may lead to confusion or unexpected behavior.
+
+    To avoid such issues:
+
+    * Ensure that the CSP policy in your headers explicitly includes the ``csp.NONCE`` directive
+      when using nonces in your templates.
+    * Verify that both your CSP header and content are aligned for proper security enforcement.
+
 Settings
 ========
 
 Django's CSP middleware is configured using either ``SECURE_CSP`` or ``SECURE_CSP_REPORT_ONLY`` in your
 ``settings.py``. These are dictionaries with a ``"DIRECTIVES"`` key, where the value is another dictionary
-of CSP directives and their corresponding policies. Here's a comprehensive example that demonstrates a decent
-starting point for many applications:
+of CSP directives and their corresponding policies.
 
-This example is considered decent because it:
-1. Sets a default policy for all content types
-2. Provides specific policies for common content types (scripts, styles, images, etc.)
-3. Restricts potentially dangerous sources (e.g., ``object-src``, ``frame-src``)
-4. Enables ``upgrade-insecure-requests`` for better security
-5. Uses CSP nonces for inline scripts and styles
-6. Demonstrates the use of various CSP directives and constant values (``SELF``, ``NONE``, ``NONCE``, etc.)
-
-.. code-block:: python
+Here's a comprehensive example that demonstrates a decent starting point for many applications::
 
     from django.middleware import csp
 
     SECURE_CSP = {
         "DIRECTIVES": {
             "default-src": [csp.SELF],
-            "script-src": [csp.SELF, csp.NONCE],
-            "style-src": [csp.SELF, csp.NONCE],
-            "img-src": [csp.SELF, "https:"],
+            "base-uri": [csp.SELF],
             "connect-src": [csp.SELF],
             "font-src": [csp.SELF],
-            "object-src": [csp.NONE],
-            "media-src": [csp.SELF],
-            "frame-src": [csp.NONE],
             "form-action": [csp.SELF],
-            "base-uri": [csp.SELF],
             "frame-ancestors": [csp.NONE],
+            "frame-src": [csp.NONE],
+            "img-src": [csp.SELF, "https:"],
+            "media-src": [csp.SELF],
+            "object-src": [csp.NONE],
+            "script-src": [csp.SELF, csp.NONCE],
+            "style-src": [csp.SELF, csp.NONCE],
             "upgrade-insecure-requests": True,
         }
     }
+
+This example is considered decent because it:
+
+1. Sets a minimal default policy for all content types
+2. Provides specific policies for common content types (scripts, styles, images, etc.)
+3. Restricts potentially dangerous sources (e.g., ``object-src``, ``frame-src``)
+4. Enables ``upgrade-insecure-requests`` for better security
+5. Uses CSP nonces for inline scripts and styles
+6. Demonstrates the use of various CSP directives and constant values (``SELF``, ``NONE``, ``NONCE``, etc.)
 
 .. _content-security-policy-report-only:
 
@@ -167,9 +176,7 @@ class-based views<decorating-class-based-views>`.
 .. function:: csp_exempt(enforced=True, report_only=True)(view)
 
     This decorator marks a view as being exempt from the Content Security Policy
-    protection ensured by the middleware. Example:
-
-    .. code-block:: python
+    protection ensured by the middleware. Example::
 
         from django.http import HttpResponse
         from django.views.decorators.csp import csp_exempt
@@ -180,9 +187,7 @@ class-based views<decorating-class-based-views>`.
             return HttpResponse("This view will not have either CSP headers")
 
     This decorator takes optional boolean arguments ``enforced`` and ``report_only`` to
-    customize which header is exempt. By default, both headers are exempt. Example:
-
-    .. code-block:: python
+    customize which header is exempt. By default, both headers are exempt. Example::
 
         from django.http import HttpResponse
         from django.views.decorators.csp import csp_exempt
@@ -203,9 +208,7 @@ class-based views<decorating-class-based-views>`.
     This decorator allows you to override the Content Security Policy for a specific view.
     It takes a dictionary as an argument, similar to the ``SECURE_CSP`` and ``SECURE_CSP_REPORT_ONLY``
     settings. This decorator also takes optional boolean arguments ``enforced`` and ``report_only``
-    to customize which header is overridden. By default, both headers are overridden. Example:
-
-    .. code-block:: python
+    to customize which header is overridden. By default, both headers are overridden. Example::
 
         from django.http import HttpResponse
         from django.middleware import csp
@@ -264,8 +267,9 @@ its limitations and considerations, especially in the context of Django's implem
 * Report-Only Mode Limitations: While useful for testing, the report-only mode
   (``SECURE_CSP_REPORT_ONLY``) doesn't actually prevent any violations, it only reports them.
 
-* Nonce Limitations: Nonces are single-use tokens. If you're caching pages that include nonces,
-  you'll need to implement additional logic to ensure the nonces are refreshed appropriately.
+* Nonce Limitations: Nonces are single-use tokens.  If your project uses caching, take into
+  consideration that caching can potentially lead to mismatches between the CSP header and the
+  content, and ensure they stay consistent.
 
 * Limited Directive Validation: Django's CSP middleware doesn't validate that all specified
   directives match the CSP specification. It's the developer's responsibility to ensure the

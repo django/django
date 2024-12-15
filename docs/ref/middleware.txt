@@ -609,6 +609,28 @@ Simple :doc:`clickjacking protection via the X-Frame-Options header </ref/clickj
 
 .. _middleware-ordering:
 
+Content Security Policy middleware
+----------------------------------
+
+.. currentmodule:: django.middleware.csp
+
+.. class:: ContentSecurityPolicyMiddleware
+
+.. versionadded:: 5.2
+
+Adds support for Content Security Policy (CSP), which helps mitigate risks such as Cross-Site
+Scripting (XSS) and data injection attacks by controlling the sources of content that can be loaded
+in the browser. See the :doc:`Content Security Policy documentation </ref/csp>` for details on
+configuring policies.
+
+You can customize your CSP policy through Django settings:
+
+* :setting:`SECURE_CSP` for the enforced policy 
+* :setting:`SECURE_CSP_REPORT_ONLY` for the report-only policy
+
+For per-view manipulation of CSP headers, the decorators :func:`~django.views.decorators.csp.csp_override`
+and :func:`~django.views.decorators.csp.csp_exempt` are also available.
+
 Middleware ordering
 ===================
 
@@ -690,6 +712,11 @@ Here are some hints about the ordering of various Django middleware classes:
 
    After any middleware that modifies the ``Vary`` header: that header is used
    to pick a value for the cache hash-key.
+
+#. :class:`~django.middleware.csp.ContentSecurityPolicyMiddleware`
+
+   Can be placed near the bottom, but ensure any middleware that accesses ``request.csp_nonce`` is
+   positioned after it, so the nonce is properly included in the response header.
 
 #. :class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware`
 
