@@ -171,7 +171,11 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
             # If we still haven't managed to find any template names, we should
             # re-raise the ImproperlyConfigured to alert the user.
             if not names:
-                raise
+                raise ImproperlyConfigured(
+                    "SingleObjectTemplateResponseMixin requires a definition "
+                    "of 'template_name', 'template_name_field', or 'model'; "
+                    "or an implementation of 'get_template_names()'."
+                )
 
         return names
 
