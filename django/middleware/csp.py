@@ -11,11 +11,6 @@ from django.utils.functional import SimpleLazyObject
 # TODO: Should we add a security check to warn if the CSP settings are empty
 # that no CSP headers will be sent. (docs/refs/checks.txt)
 
-# TODO: Should we verify that all specified directives match the spec?
-# - Pros: helpful to developers in case of typos
-# - Cons: requires staying on top of the CSP spec.
-#         outdated Django versions may not be able to set newer directives.
-
 HEADER = "Content-Security-Policy"
 HEADER_REPORT_ONLY = "Content-Security-Policy-Report-Only"
 
