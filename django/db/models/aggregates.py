@@ -6,7 +6,7 @@ from django.core.exceptions import FieldError, FullResultSet
 from django.db import NotSupportedError
 from django.db.models.expressions import Case, ColPairs, Func, Star, Value, When
 from django.db.models.fields import IntegerField
-from django.db.models.functions.comparison import Coalesce
+from django.db.models.functions import Coalesce
 from django.db.models.functions.mixins import (
     FixDurationInputMixin,
     NumericOutputFieldMixin,
