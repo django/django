@@ -2358,6 +2358,8 @@ have it to the value provided.
 ``SECURE_CSP``
 --------------
 
+.. versionadded:: 5.2
+
 Default: ``{}``
 
 If configured with Content Security Policy directives, the
@@ -2369,6 +2371,8 @@ that do not already have it.
 
 ``SECURE_CSP_REPORT_ONLY``
 --------------------------
+
+.. versionadded:: 5.2
 
 Default: ``{}``
 
