@@ -1,12 +1,13 @@
 import datetime
 
+from django.conf import settings
 from django.forms import ChoiceField, Form, MultiWidget, RadioSelect, TextInput
 from django.test import override_settings
 from django.utils.safestring import mark_safe
 
 from .test_choicewidget import ChoiceWidgetTest
 
-BLANK_CHOICE_DASH = (("", "------"),)
+BLANK_CHOICE = (("", settings.BLANK_CHOICE_LABEL),)
 
 
 class RadioSelectTest(ChoiceWidgetTest):
@@ -16,7 +17,9 @@ class RadioSelectTest(ChoiceWidgetTest):
         html = """
         <div>
           <div>
-            <label><input type="radio" name="beatle" value="">------</label>
+            <label>
+                <input type="radio" name="beatle" value="">- Select an option -
+            </label>
           </div>
           <div>
             <label><input checked type="radio" name="beatle" value="J">John</label>
@@ -32,7 +35,7 @@ class RadioSelectTest(ChoiceWidgetTest):
           </div>
         </div>
         """
-        beatles_with_blank = BLANK_CHOICE_DASH + self.beatles
+        beatles_with_blank = BLANK_CHOICE + self.beatles
         for choices in (beatles_with_blank, dict(beatles_with_blank)):
             with self.subTest(choices):
                 self.check_html(self.widget(choices=choices), "beatle", "J", html=html)
@@ -83,11 +86,13 @@ class RadioSelectTest(ChoiceWidgetTest):
         """
         If value is None, none of the options are selected.
         """
-        choices = BLANK_CHOICE_DASH + self.beatles
+        choices = BLANK_CHOICE + self.beatles
         html = """
         <div>
           <div>
-            <label><input checked type="radio" name="beatle" value="">------</label>
+            <label>
+                <input checked type="radio" name="beatle" value="">- Select an option -
+            </label>
           </div>
           <div>
             <label><input type="radio" name="beatle" value="J">John</label>
@@ -463,11 +468,11 @@ class RadioSelectTest(ChoiceWidgetTest):
 
     def test_render_as_subwidget(self):
         """A RadioSelect as a subwidget of MultiWidget."""
-        choices = BLANK_CHOICE_DASH + self.beatles
+        choices = BLANK_CHOICE + self.beatles
         html = """
         <div>
           <div><label>
-            <input type="radio" name="beatle_0" value="">------</label>
+            <input type="radio" name="beatle_0" value="">- Select an option -</label>
           </div>
           <div><label>
             <input checked type="radio" name="beatle_0" value="J">John</label>

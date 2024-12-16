@@ -7,6 +7,7 @@ from unittest import mock
 from urllib.parse import parse_qsl, urljoin, urlsplit
 
 from django import forms
+from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin import AdminSite, ModelAdmin
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
@@ -1595,8 +1596,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             },
             {
                 "NAME": (
-                    "django.contrib.auth.password_validation."
-                    "NumericPasswordValidator"
+                    "django.contrib.auth.password_validation.NumericPasswordValidator"
                 )
             },
         ]
@@ -1667,11 +1667,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
                 "UserAttributeSimilarityValidator"
             )
         },
-        {
-            "NAME": (
-                "django.contrib.auth.password_validation." "NumericPasswordValidator"
-            )
-        },
+        {"NAME": ("django.contrib.auth.password_validation.NumericPasswordValidator")},
     ],
     TEMPLATES=[
         {
@@ -6456,7 +6452,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.selenium.switch_to.window(self.selenium.window_handles[0])
         select = Select(self.selenium.find_element(By.ID, "id_parent"))
         self.assertEqual(ParentWithUUIDPK.objects.count(), 0)
-        self.assertEqual(select.first_selected_option.text, "---------")
+        self.assertEqual(select.first_selected_option.text, settings.BLANK_CHOICE_LABEL)
         self.assertEqual(select.first_selected_option.get_attribute("value"), "")
 
     def test_inline_with_popup_cancel_delete(self):
@@ -6706,7 +6702,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertHTMLEqual(
             _get_HTML_inside_element_by_id(born_country_select_id),
             f"""
-            <option value="" selected="">---------</option>
+            <option value="" selected="">- Select an option -</option>
             <option value="{argentina.pk}" selected="">Argentina</option>
             """,
         )
@@ -6725,7 +6721,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         # limit_choices_to.
         self.assertHTMLEqual(
             _get_HTML_inside_element_by_id(favorite_country_to_vacation_select_id),
-            '<option value="" selected="">---------</option>',
+            '<option value="" selected="">- Select an option -</option>',
         )
 
         # Add new Country from the living_country select.
@@ -6745,7 +6741,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertHTMLEqual(
             _get_HTML_inside_element_by_id(born_country_select_id),
             f"""
-            <option value="" selected="">---------</option>
+            <option value="" selected="">- Select an option -</option>
             <option value="{argentina.pk}" selected="">Argentina</option>
             <option value="{spain.pk}">Spain</option>
             """,
@@ -6767,7 +6763,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         # limit_choices_to.
         self.assertHTMLEqual(
             _get_HTML_inside_element_by_id(favorite_country_to_vacation_select_id),
-            '<option value="" selected="">---------</option>',
+            '<option value="" selected="">- Select an option -</option>',
         )
 
         # Edit second Country created from living_country select.
@@ -6788,7 +6784,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertHTMLEqual(
             _get_HTML_inside_element_by_id(born_country_select_id),
             f"""
-            <option value="" selected="">---------</option>
+            <option value="" selected="">- Select an option -</option>
             <option value="{argentina.pk}" selected="">Argentina</option>
             <option value="{italy.pk}">Italy</option>
             """,
@@ -6808,7 +6804,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         # favorite_country_to_vacation field has no options.
         self.assertHTMLEqual(
             _get_HTML_inside_element_by_id(favorite_country_to_vacation_select_id),
-            '<option value="" selected="">---------</option>',
+            '<option value="" selected="">- Select an option -</option>',
         )
 
         # Add a new Asian country.
