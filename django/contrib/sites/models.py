@@ -54,11 +54,11 @@ class SiteManager(models.Manager):
         """
         from django.conf import settings
 
-        if getattr(settings, "SITE_ID", ""):
+        if request:
+            return self._get_site_by_request(request)
+        elif getattr(settings, "SITE_ID", ""):
             site_id = settings.SITE_ID
             return self._get_site_by_id(site_id)
-        elif request:
-            return self._get_site_by_request(request)
 
         raise ImproperlyConfigured(
             'You\'re using the Django "sites framework" without having '
