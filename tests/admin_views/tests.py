@@ -24,7 +24,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.core.checks import Error
 from django.core.files import temp as tempfile
-from django.db import connection
 from django.forms.utils import ErrorList
 from django.template.response import TemplateResponse
 from django.test import (
@@ -7477,8 +7476,7 @@ class UserAdminTest(TestCase):
         # Don't depend on a warm cache, see #17377.
         ContentType.objects.clear_cache()
 
-        expected_num_queries = 8 if connection.features.uses_savepoints else 6
-        with self.assertNumQueries(expected_num_queries):
+        with self.assertNumQueries(8):
             response = self.client.get(reverse("admin:auth_user_change", args=(u.pk,)))
             self.assertEqual(response.status_code, 200)
 
@@ -7525,8 +7523,7 @@ class GroupAdminTest(TestCase):
         # Ensure no queries are skipped due to cached content type for Group.
         ContentType.objects.clear_cache()
 
-        expected_num_queries = 6 if connection.features.uses_savepoints else 4
-        with self.assertNumQueries(expected_num_queries):
+        with self.assertNumQueries(6):
             response = self.client.get(reverse("admin:auth_group_change", args=(g.pk,)))
             self.assertEqual(response.status_code, 200)
 
