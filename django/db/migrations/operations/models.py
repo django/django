@@ -95,6 +95,17 @@ class CreateModel(ModelOperation):
         model = to_state.apps.get_model(app_label, self.name)
         if self.allow_migrate_model(schema_editor.connection.alias, model):
             schema_editor.create_model(model)
+            # While the `index_together` option has been deprecated some
+            # historical migrations might still have references to them.
+            # This can be moved to the schema editor once it's adapted to
+            # from model states instead of rendered models (#29898).
+            to_model_state = to_state.models[app_label, self.name_lower]
+            if index_together := to_model_state.options.get("index_together"):
+                schema_editor.alter_index_together(
+                    model,
+                    set(),
+                    index_together,
+                )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         model = from_state.apps.get_model(app_label, self.name)
@@ -668,12 +679,13 @@ class AlterTogetherOptionOperation(ModelOptionOperation):
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         new_model = to_state.apps.get_model(app_label, self.name)
         if self.allow_migrate_model(schema_editor.connection.alias, new_model):
-            old_model = from_state.apps.get_model(app_label, self.name)
+            from_model_state = from_state.models[app_label, self.name_lower]
+            to_model_state = to_state.models[app_label, self.name_lower]
             alter_together = getattr(schema_editor, "alter_%s" % self.option_name)
             alter_together(
                 new_model,
-                getattr(old_model._meta, self.option_name, set()),
-                getattr(new_model._meta, self.option_name, set()),
+                from_model_state.options.get(self.option_name) or set(),
+                to_model_state.options.get(self.option_name) or set(),
             )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
