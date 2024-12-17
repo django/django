@@ -112,7 +112,8 @@ class RoundTests(TestCase):
         IntegerModel.objects.create(normal=365)
         obj = IntegerModel.objects.annotate(normal_round=Round("normal", -1)).first()
         self.assertIsInstance(obj.normal_round, int)
-        self.assertEqual(obj.normal_round, 370)
+        expected = 360 if connection.features.rounds_to_even else 370
+        self.assertEqual(obj.normal_round, expected)
 
     def test_transform(self):
         with register_lookup(DecimalField, Round):
