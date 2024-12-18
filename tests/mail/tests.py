@@ -173,11 +173,11 @@ class MailTests(MailTestsMixin, SimpleTestCase):
 
     def test_ascii(self):
         email = EmailMessage(
-            "Subject", "Content", "from@example.com", ["to@example.com"]
+            "Subject", "Content\n", "from@example.com", ["to@example.com"]
         )
         message = email.message()
         self.assertEqual(message["Subject"], "Subject")
-        self.assertEqual(message.get_payload(), "Content")
+        self.assertEqual(message.get_payload(), "Content\n")
         self.assertEqual(message["From"], "from@example.com")
         self.assertEqual(message["To"], "to@example.com")
 
@@ -215,13 +215,13 @@ class MailTests(MailTestsMixin, SimpleTestCase):
     def test_multiple_recipients(self):
         email = EmailMessage(
             "Subject",
-            "Content",
+            "Content\n",
             "from@example.com",
             ["to@example.com", "other@example.com"],
         )
         message = email.message()
         self.assertEqual(message["Subject"], "Subject")
-        self.assertEqual(message.get_payload(), "Content")
+        self.assertEqual(message.get_payload(), "Content\n")
         self.assertEqual(message["From"], "from@example.com")
         self.assertEqual(message["To"], "to@example.com, other@example.com")
 
@@ -671,7 +671,7 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         Regression for #12791 - Encode body correctly with other encodings
         than utf-8
         """
-        email = EmailMessage(body="Firstname Sürname is a great guy.")
+        email = EmailMessage(body="Firstname Sürname is a great guy.\n")
         email.encoding = "iso-8859-1"
         message = email.message()
         self.assertMessageHasHeaders(
@@ -682,14 +682,14 @@ class MailTests(MailTestsMixin, SimpleTestCase):
                 ("Content-Transfer-Encoding", "quoted-printable"),
             },
         )
-        self.assertEqual(message.get_payload(), "Firstname S=FCrname is a great guy.")
+        self.assertEqual(message.get_payload(), "Firstname S=FCrname is a great guy.\n")
 
     def test_encoding_alternatives(self):
         """
         Encode alternatives correctly with other encodings than utf-8.
         """
-        text_content = "Firstname Sürname is a great guy."
-        html_content = "<p>Firstname Sürname is a <strong>great</strong> guy.</p>"
+        text_content = "Firstname Sürname is a great guy.\n"
+        html_content = "<p>Firstname Sürname is a <strong>great</strong> guy.</p>\n"
         email = EmailMultiAlternatives(body=text_content)
         email.encoding = "iso-8859-1"
         email.attach_alternative(html_content, "text/html")
@@ -707,7 +707,7 @@ class MailTests(MailTestsMixin, SimpleTestCase):
             },
         )
         self.assertEndsWith(
-            payload0.as_bytes(), b"\n\nFirstname S=FCrname is a great guy."
+            payload0.as_bytes(), b"\n\nFirstname S=FCrname is a great guy.\n"
         )
         # Check the text/html alternative.
         payload1 = message.get_payload(1)
@@ -723,13 +723,13 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         )
         self.assertEndsWith(
             payload1.as_bytes(),
-            b"\n\n<p>Firstname S=FCrname is a <strong>great</strong> guy.</p>",
+            b"\n\n<p>Firstname S=FCrname is a <strong>great</strong> guy.</p>\n",
         )
 
     def test_attachments(self):
         msg = EmailMessage()
         file_name = "example.txt"
-        file_content = "Text file content"
+        file_content = "Text file content\n"
         mime_type = "text/plain"
         msg.attach(file_name, file_content, mime_type)
 
@@ -747,7 +747,7 @@ class MailTests(MailTestsMixin, SimpleTestCase):
 
     def test_attachments_constructor(self):
         file_name = "example.txt"
-        file_content = "Text file content"
+        file_content = "Text file content\n"
         mime_type = "text/plain"
         msg = EmailMessage(
             attachments=[EmailAttachment(file_name, file_content, mime_type)]
@@ -769,7 +769,7 @@ class MailTests(MailTestsMixin, SimpleTestCase):
 
     def test_attachments_constructor_from_tuple(self):
         file_name = "example.txt"
-        file_content = "Text file content"
+        file_content = "Text file content\n"
         mime_type = "text/plain"
         msg = EmailMessage(attachments=[(file_name, file_content, mime_type)])
 
@@ -884,10 +884,10 @@ class MailTests(MailTestsMixin, SimpleTestCase):
 
     def test_attach_text_as_bytes(self):
         msg = EmailMessage()
-        msg.attach("file.txt", b"file content")
+        msg.attach("file.txt", b"file content\n")
         filename, content, mimetype = self.get_decoded_attachments(msg)[0]
         self.assertEqual(filename, "file.txt")
-        self.assertEqual(content, "file content")  # (decoded)
+        self.assertEqual(content, "file content\n")
         self.assertEqual(mimetype, "text/plain")
 
     def test_attach_utf8_text_as_bytes(self):
@@ -896,10 +896,10 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         in a form that can be decoded at the receiving end.
         """
         msg = EmailMessage()
-        msg.attach("file.txt", b"\xc3\xa4")  # UTF-8 encoded a umlaut.
+        msg.attach("file.txt", b"\xc3\xa4\n")  # UTF-8 encoded a-umlaut.
         filename, content, mimetype = self.get_decoded_attachments(msg)[0]
         self.assertEqual(filename, "file.txt")
-        self.assertEqual(content, "ä")  # (decoded)
+        self.assertEqual(content, "ä\n")  # (decoded)
         self.assertEqual(mimetype, "text/plain")
 
     def test_attach_non_utf8_text_as_bytes(self):
@@ -1208,7 +1208,7 @@ class MailTests(MailTestsMixin, SimpleTestCase):
 
     def test_custom_utf8_encoding(self):
         """A UTF-8 charset with a custom body encoding is respected."""
-        body = "Body with latin characters: àáä."
+        body = "Body with latin characters: àáä.\n"
         msg = EmailMessage("Subject", body, "bounce@example.com", ["to@example.com"])
         encoding = charset.Charset("utf-8")
         encoding.body_encoding = charset.QP
@@ -1502,12 +1502,12 @@ class MailTests(MailTestsMixin, SimpleTestCase):
             # (If you need to insert/remove/reorder any params here,
             # that indicates a breaking change to documented behavior.)
             "subject",
-            "body",
+            "body\n",
             "from@example.com",
             ["to@example.com"],
             ["bcc@example.com"],
             connection,
-            [EmailAttachment("file.txt", "attachment", "text/plain")],
+            [EmailAttachment("file.txt", "attachment\n", "text/plain")],
             {"X-Header": "custom header"},
             ["cc@example.com"],
             ["reply-to@example.com"],
@@ -1521,10 +1521,10 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         self.assertEqual(message.get_all("X-Header"), ["custom header"])
         self.assertEqual(message.get_all("Cc"), ["cc@example.com"])
         self.assertEqual(message.get_all("Reply-To"), ["reply-to@example.com"])
-        self.assertEqual(message.get_payload(0).get_payload(), "body")
+        self.assertEqual(message.get_payload(0).get_payload(), "body\n")
         self.assertEqual(
             self.get_decoded_attachments(email),
-            [("file.txt", "attachment", "text/plain")],
+            [("file.txt", "attachment\n", "text/plain")],
         )
         self.assertEqual(
             email.recipients(), ["to@example.com", "cc@example.com", "bcc@example.com"]
@@ -1542,25 +1542,25 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         new_connection = mail.get_connection(username="new")
         email = EmailMessage(
             "original subject",
-            "original body",
+            "original body\n",
             "original-from@example.com",
             ["original-to@example.com"],
             ["original-bcc@example.com"],
             original_connection,
-            [EmailAttachment("original.txt", "original attachment", "text/plain")],
+            [EmailAttachment("original.txt", "original attachment\n", "text/plain")],
             {"X-Header": "original header"},
             ["original-cc@example.com"],
             ["original-reply-to@example.com"],
         )
         email.subject = "new subject"
-        email.body = "new body"
+        email.body = "new body\n"
         email.from_email = "new-from@example.com"
         email.to = ["new-to@example.com"]
         email.bcc = ["new-bcc@example.com"]
         email.connection = new_connection
         email.attachments = [
-            ("new1.txt", "new attachment 1", "text/plain"),  # plain tuple.
-            EmailAttachment("new2.txt", "new attachment 2", "text/csv"),
+            ("new1.txt", "new attachment 1\n", "text/plain"),  # plain tuple
+            EmailAttachment("new2.txt", "new attachment 2\n", "text/csv"),
             MIMEImage(b"GIF89a...", "gif"),
         ]
         email.extra_headers = {"X-Header": "new header"}
@@ -1574,12 +1574,12 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         self.assertEqual(message.get_all("X-Header"), ["new header"])
         self.assertEqual(message.get_all("Cc"), ["new-cc@example.com"])
         self.assertEqual(message.get_all("Reply-To"), ["new-reply-to@example.com"])
-        self.assertEqual(message.get_payload(0).get_payload(), "new body")
+        self.assertEqual(message.get_payload(0).get_payload(), "new body\n")
         self.assertEqual(
             self.get_decoded_attachments(email),
             [
-                ("new1.txt", "new attachment 1", "text/plain"),
-                ("new2.txt", "new attachment 2", "text/csv"),
+                ("new1.txt", "new attachment 1\n", "text/plain"),
+                ("new2.txt", "new attachment 2\n", "text/csv"),
                 (None, b"GIF89a...", "image/gif"),
             ],
         )
@@ -1674,26 +1674,29 @@ class BaseEmailBackendTests(MailTestsMixin):
 
     def test_send(self):
         email = EmailMessage(
-            "Subject", "Content", "from@example.com", ["to@example.com"]
+            "Subject", "Content\n", "from@example.com", ["to@example.com"]
         )
         num_sent = mail.get_connection().send_messages([email])
         self.assertEqual(num_sent, 1)
         message = self.get_the_message()
         self.assertEqual(message["subject"], "Subject")
-        self.assertEqual(message.get_payload(), "Content")
+        self.assertEqual(message.get_payload(), "Content\n")
         self.assertEqual(message["from"], "from@example.com")
         self.assertEqual(message.get_all("to"), ["to@example.com"])
 
     def test_send_unicode(self):
         email = EmailMessage(
-            "Chère maman", "Je t'aime très fort", "from@example.com", ["to@example.com"]
+            "Chère maman",
+            "Je t'aime très fort\n",
+            "from@example.com",
+            ["to@example.com"],
         )
         num_sent = mail.get_connection().send_messages([email])
         self.assertEqual(num_sent, 1)
         message = self.get_the_message()
         self.assertEqual(message["subject"], "Chère maman")
         self.assertIn(b"Subject: =?utf-8?q?Ch=C3=A8re_maman?=", message.as_bytes())
-        self.assertEqual(message.get_content(), "Je t'aime très fort")
+        self.assertEqual(message.get_content(), "Je t'aime très fort\n")
 
     def test_send_long_lines(self):
         """
@@ -1750,23 +1753,23 @@ class BaseEmailBackendTests(MailTestsMixin):
         Test send_mail without the html_message
         regression test for adding html_message parameter to send_mail()
         """
-        send_mail("Subject", "Content", "sender@example.com", ["nobody@example.com"])
+        send_mail("Subject", "Content\n", "sender@example.com", ["nobody@example.com"])
         message = self.get_the_message()
 
         self.assertEqual(message.get("subject"), "Subject")
         self.assertEqual(message.get_all("to"), ["nobody@example.com"])
         self.assertFalse(message.is_multipart())
-        self.assertEqual(message.get_payload(), "Content")
+        self.assertEqual(message.get_content(), "Content\n")
         self.assertEqual(message.get_content_type(), "text/plain")
 
     def test_html_send_mail(self):
         """Test html_message argument to send_mail"""
         send_mail(
             "Subject",
-            "Content",
+            "Content\n",
             "sender@example.com",
             ["nobody@example.com"],
-            html_message="HTML Content",
+            html_message="HTML Content\n",
         )
         message = self.get_the_message()
 
@@ -1774,9 +1777,9 @@ class BaseEmailBackendTests(MailTestsMixin):
         self.assertEqual(message.get_all("to"), ["nobody@example.com"])
         self.assertTrue(message.is_multipart())
         self.assertEqual(len(message.get_payload()), 2)
-        self.assertEqual(message.get_payload(0).get_payload(), "Content")
+        self.assertEqual(message.get_payload(0).get_content(), "Content\n")
         self.assertEqual(message.get_payload(0).get_content_type(), "text/plain")
-        self.assertEqual(message.get_payload(1).get_payload(), "HTML Content")
+        self.assertEqual(message.get_payload(1).get_content(), "HTML Content\n")
         self.assertEqual(message.get_payload(1).get_content_type(), "text/html")
 
     def test_mail_admins_and_managers(self):
@@ -1807,31 +1810,31 @@ class BaseEmailBackendTests(MailTestsMixin):
     @override_settings(MANAGERS=["nobody@example.com"])
     def test_html_mail_managers(self):
         """Test html_message argument to mail_managers"""
-        mail_managers("Subject", "Content", html_message="HTML Content")
+        mail_managers("Subject", "Content\n", html_message="HTML Content\n")
         message = self.get_the_message()
 
         self.assertEqual(message.get("subject"), "[Django] Subject")
         self.assertEqual(message.get_all("to"), ["nobody@example.com"])
         self.assertTrue(message.is_multipart())
         self.assertEqual(len(message.get_payload()), 2)
-        self.assertEqual(message.get_payload(0).get_payload(), "Content")
+        self.assertEqual(message.get_payload(0).get_content(), "Content\n")
         self.assertEqual(message.get_payload(0).get_content_type(), "text/plain")
-        self.assertEqual(message.get_payload(1).get_payload(), "HTML Content")
+        self.assertEqual(message.get_payload(1).get_content(), "HTML Content\n")
         self.assertEqual(message.get_payload(1).get_content_type(), "text/html")
 
     @override_settings(ADMINS=["nobody@example.com"])
     def test_html_mail_admins(self):
         """Test html_message argument to mail_admins"""
-        mail_admins("Subject", "Content", html_message="HTML Content")
+        mail_admins("Subject", "Content\n", html_message="HTML Content\n")
         message = self.get_the_message()
 
         self.assertEqual(message.get("subject"), "[Django] Subject")
         self.assertEqual(message.get_all("to"), ["nobody@example.com"])
         self.assertTrue(message.is_multipart())
         self.assertEqual(len(message.get_payload()), 2)
-        self.assertEqual(message.get_payload(0).get_payload(), "Content")
+        self.assertEqual(message.get_payload(0).get_content(), "Content\n")
         self.assertEqual(message.get_payload(0).get_content_type(), "text/plain")
-        self.assertEqual(message.get_payload(1).get_payload(), "HTML Content")
+        self.assertEqual(message.get_payload(1).get_content(), "HTML Content\n")
         self.assertEqual(message.get_payload(1).get_content_type(), "text/html")
 
     @override_settings(
@@ -2199,7 +2202,8 @@ class SMTPHandler:
         data = envelope.content
         mail_from = envelope.mail_from
 
-        message = message_from_bytes(data.rstrip())
+        # Convert SMTP's CRNL to NL, to simplify content checks in shared test cases.
+        message = message_from_bytes(data.replace(b"\r\n", b"\n"))
         try:
             header_from = message["from"].addresses[0].addr_spec
         except (KeyError, IndexError):
