@@ -1,3 +1,5 @@
+import json
+
 from django.core import checks
 from django.db.models import NOT_PROVIDED, Field
 from django.db.models.expressions import ColPairs
@@ -127,6 +129,40 @@ class CompositePrimaryKey(Field):
                 id="fields.E013",
             )
         ]
+
+    def to_json(self, pk):
+        from django.core.serializers.json import DjangoJSONEncoder
+
+        fields_len = len(self.fields)
+        pk_len = len(pk)
+        if fields_len != pk_len:
+            raise ValueError(
+                f"{self.__class__.__name__} has {fields_len} fields "
+                f"but it tried to serialize {pk_len}."
+            )
+
+        return json.dumps(
+            [value for value in pk],
+            cls=DjangoJSONEncoder,
+        )
+
+    def from_json(self, s):
+        values = json.loads(s)
+
+        fields_len = len(self.fields)
+        values_len = len(values)
+        if fields_len != values_len:
+            raise ValueError(
+                f"{self.__class__.__name__} has {fields_len} fields "
+                f"but it tried to deserialize {values_len}. "
+                f"Did you change the {self.__class__.__name__} fields "
+                "and forgot to update the related GenericForeignKey "
+                '"object_id" fields?'
+            )
+
+        return tuple(
+            field.to_python(value) for (field, value) in zip(self.fields, values)
+        )
 
 
 CompositePrimaryKey.register_lookup(TupleExact)
